@@ -1,0 +1,13 @@
+[submodule "application/modules/editor"]
+        path = application/modules/editor
+        url = git@bitbucket.com:mittagqi/translate5ZfModule.git
+[submodule "library/Translate5"]
+        path = library/Translate5
+        url = git@bitbucket.com:mittagqi/translate5lib.git
+[submodule "library/ZfExtended"]
+        path = library/ZfExtended
+        url = git@bitbucket.com:mittagqi/ZfExtended.git
+[submodule "public/modules/editor"]
+        path = public/modules/editor
+        url = git@bitbucket.com:mittagqi/translate5GUIApplication.git
+
