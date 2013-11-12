@@ -1,0 +1,42 @@
+Translate5 Editor Javascript GUI
+Copyright (c) 2013, Marc Mittag, MittagQI
+All rights reserved.
+service (ÄTT) MittagQI.com 
+http://www.MittagQI.com/ 
+
+------------------------------------------------------------------------------------------
+One sentence in advance: 
+
+If you do not like our license model: We are convinced Open Source
+people and open to other Open Source license models. The license model below is the result of
+having to respect the Ext Js license. You are welcome to sponsor legal advice, than it might
+be possible to release translate5 in accordance with Ext Js license also under licenses like
+EPL or LGPL.
+
+==========================================================================================
+Start of license information
+------------------------------------------------------------------------------------------
+translate5 Editor Javascript GUI is licensed under the terms of the Open Source GPL 3.0 license. 
+A copy of this license you can find at http://www.gnu.org/licenses/gpl.html or 
+in the same folder as this document in the document gpl3-license.txt.
+
+This software uses the ExtJs 4 lib from Sencha, which is also licensed under the
+terms of the Open Source GPL 3.0 license. More about the ExtJs license you can 
+read on http://www.sencha.com/license. For translate5 Editor Javascript GUI you are
+allowed to make use of the same FLOSS exceptions as specified by Sencha for ExtJs. 
+
+These exceptions are:
+
+* Open Source License Exception for Applications
+  A copy of these License Exception you can find on
+  http://www.sencha.com/products/floss-exception.php or 
+  in the same folder than this document in the document floss-exception.txt.
+
+* Open Source License Exception for Development
+  A copy of these License Exception you can find on
+  http://www.sencha.com/products/ux-exception.php or
+  in the same folder than this document in the document ux-exception.txt.
+
+Please be aware, that Marc Mittag / MittagQI take no warranty for any legal issue, that 
+may arise, if you use these FLOSS exceptions and recommend to stick to GPL 3.
+------------------------------------------------------------------------------------------

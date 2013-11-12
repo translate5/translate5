@@ -1,0 +1,132 @@
+<issues>
+	<issue type="Genauigkeit" level="0" description="" display="yes">
+		<issue type="Terminologie" level="1" description="" display="yes">
+			<issue type="Normative Terminologie" level="2" description="" display="yes"/>
+		</issue>
+		<issue type="Fehlübersetzung" level="1" description="" display="yes">
+			<issue type="Zu wörtlich" level="2" description="" display="yes"/>
+			<issue type="Falscher Freund" level="2" description="" display="yes"/>
+			<issue type="Nicht zu übersetzen" level="2" description="" display="yes"/>
+			<issue type="Datum/Uhrzeit" level="2" description="" display="yes"/>
+			<issue type="Umrechnung von Einheiten" level="2" description="" display="yes"/>
+			<issue type="Zahl" level="2" description="" display="yes"/>
+			<issue type="Objekt (z. B. Name oder Ort)" level="2" description="" display="yes"/>
+		</issue>
+		<issue type="Auslassung" level="1" description="" display="yes"/>
+		<issue type="Ergänzung" level="1" description="" display="yes"/>
+		<issue type="Unübersetzt" level="1" description="" display="yes">
+			<issue type="Grafik" level="2" description="" display="yes"/>
+		</issue>
+	</issue>
+	<issue type="Sprachkompetenz" level="0" description="" display="yes">
+		<issue type="(Inhalt)" level="1" description="" display="yes">
+			<issue type="Register" level="2" description="" display="yes">
+				<issue type="Varianten/Slang" level="3" description="" display="yes"/>
+			</issue>
+			<issue type="Stil" level="2" description="" display="yes">
+				<issue type="Unternehmensstil" level="3" description="" display="yes"/>
+				<issue type="Styleguide" level="3" description="" display="yes"/>
+			</issue>
+			<issue type="Einsprachige Terminologie" level="2" description="" display="yes">
+				<issue type="Normative einsprachige Terminologie" level="3" description="" display="yes"/>
+			</issue>
+			<issue type="Inkonsistenz" level="2" description="" display="yes">
+				<issue type="Abkürzungen" level="3" description="" display="yes"/>
+				<issue type="Bild und Text" level="3" description="" display="yes"/>
+				<issue type="Diskurs" level="3" description="" display="yes"/>
+			</issue>
+			<issue type="Duplizierung" level="2" description="" display="yes"/>
+			<issue type="Mehrdeutigkeit" level="2" description="" display="yes">
+				<issue type="Unklare Verweise" level="3" description="" display="yes"/>
+			</issue>
+		</issue>
+		<issue type="(Mechanisch)" level="1" description="" display="yes">
+			<issue type="Rechtschreibung" level="2" description="" display="yes">
+				<issue type="Groß-/Kleinschreibung" level="3" description="" display="yes"/>
+				<issue type="Diakritische Zeichen" level="3" description="" display="yes"/>
+			</issue>
+			<issue type="Typographie" level="2" description="" display="yes">
+				<issue type="Interpunktion" level="3" description="" display="yes"/>
+				<issue type="Allein stehende Anführungszeichen oder Klammern" level="3" description="" display="yes"/>
+			</issue>
+			<issue type="Grammatik" level="2" description="" display="yes">
+				<issue type="Morphologie (Wortform)" level="3" description="" display="yes"/>
+				<issue type="Wortart" level="3" description="" display="yes"/>
+				<issue type="Übereinstimmung" level="3" description="" display="yes"/>
+				<issue type="Satzbau" level="3" description="" display="yes"/>
+				<issue type="Funktionswörter" level="3" description="" display="yes"/>
+				<issue type="Spannung/Sichtweise/Stimmung" level="3" description="" display="yes"/>
+			</issue>
+			<issue type="Nichteinhaltung von Gebietsschematas" level="2" description="" display="yes">
+				<issue type="Datumsformat" level="3" description="" display="yes"/>
+				<issue type="Zeitformat" level="3" description="" display="yes"/>
+				<issue type="Format von Maßeinheiten" level="3" description="" display="yes"/>
+				<issue type="Zahlenformat" level="3" description="" display="yes"/>
+				<issue type="Art der Anführungszeichen" level="3" description="" display="yes"/>
+				<issue type="Nationaler Sprachstandard" level="3" description="" display="yes"/>
+			</issue>
+			<issue type="Zeichencodierung" level="2" description="" display="yes"/>
+			<issue type="Unzulässige Zeichen" level="2" description="" display="yes"/>
+			<issue type="Strukturproblem" level="2" description="" display="yes"/>
+			<issue type="Sortierung" level="2" description="" display="yes"/>
+			<issue type="Übereinstimmung Textkorpus" level="2" description="" display="yes"/>
+			<issue type="Link/Querverweis" level="2" description="" display="yes">
+				<issue type="Dokumentenintern" level="3" description="" display="yes"/>
+				<issue type="Dokumentenextern" level="3" description="" display="yes"/>
+			</issue>
+			<issue type="Index/Inhaltsverzeichnis" level="2" description="" display="yes">
+				<issue type="Seitenverweise" level="3" description="" display="yes"/>
+				<issue type="Format des Indexes/Inhaltsverzeichnisses" level="3" description="" display="yes"/>
+				<issue type="Fehlender/falscher Eintrag" level="3" description="" display="yes"/>
+			</issue>
+		</issue>
+		<issue type="Unverständlich" level="1" description="" display="yes"/>
+	</issue>
+	<issue type="Richtigkeit" level="0" description="" display="yes">
+		<issue type="Vollständigkeit" level="1" description="" display="yes">
+			<issue type="Listen" level="2" description="" display="yes"/>
+			<issue type="Verfahren" level="2" description="" display="yes"/>
+		</issue>
+		<issue type="Gesetzliche Vorgaben" level="1" description="" display="yes"/>
+		<issue type="Anwendbarkeit von Gebietsschematas" level="1" description="" display="yes"/>
+	</issue>
+	<issue type="Gestaltung (ein- und/oder zweisprachig)" level="0" description="" display="yes">
+		<issue type="Allgemeine Gestaltung (Layout)" level="1" description="" display="yes">
+			<issue type="Farbe" level="2" description="" display="yes"/>
+			<issue type="Globale Schriftartwahl" level="2" description="" display="yes"/>
+			<issue type="Fußnoten-/Endnotenformat" level="2" description="" display="yes"/>
+			<issue type="Kopf- und Fußzeilen" level="2" description="" display="yes"/>
+			<issue type="Ränder" level="2" description="" display="yes"/>
+			<issue type="Hurenkinder/Schusterjungen" level="2" description="" display="yes"/>
+			<issue type="Seitenumbruch" level="2" description="" display="yes"/>
+		</issue>
+		<issue type="Lokale Formatierung" level="1" description="" display="yes">
+			<issue type="Textausrichtung" level="2" description="" display="yes"/>
+			<issue type="Absatzeinzug" level="2" description="" display="yes"/>
+			<issue type="Schriftart" level="2" description="" display="yes">
+				<issue type="Fett/kursiv" level="3" description="" display="yes"/>
+				<issue type="Falsche Größe" level="3" description="" display="yes"/>
+				<issue type="Einfach-/Doppelbreite (nur CJK)" level="3" description="" display="yes"/>
+			</issue>
+			<issue type="Kerning" level="2" description="" display="yes"/>
+			<issue type="Zeilenabstand" level="2" description="" display="yes"/>
+		</issue>
+		<issue type="Markup" level="1" description="" display="yes">
+			<issue type="Inkonsistent" level="2" description="" display="yes"/>
+			<issue type="Falsch platziert" level="2" description="" display="yes"/>
+			<issue type="Hinzugefügt" level="2" description="" display="yes"/>
+			<issue type="Fehlt" level="2" description="" display="yes"/>
+			<issue type="Fragwürdig" level="2" description="" display="yes"/>
+		</issue>
+		<issue type="Leerraum" level="1" description="" display="yes"/>
+		<issue type="Grafiken und Tabellen" level="1" description="" display="yes">
+			<issue type="Position" level="2" description="" display="yes"/>
+			<issue type="Fehlen" level="2" description="" display="yes"/>
+			<issue type="Beschriftungen und Beschreibungen" level="2" description="" display="yes"/>
+		</issue>
+		<issue type="Abgeschnittener Text/Textzuwachs" level="1" description="" display="yes"/>
+		<issue type="Länge" level="1" description="" display="yes"/>
+	</issue>
+	<issue type="Internationalisierung" level="0" description="" display="yes"/>
+	<issue type="Sonstiges" level="0" description="" display="yes"/>
+</issues>
