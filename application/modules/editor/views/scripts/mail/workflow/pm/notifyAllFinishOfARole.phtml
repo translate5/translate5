@@ -1,0 +1,125 @@
+<?php
+ /*
+ START LICENSE AND COPYRIGHT
+ 
+ This file is part of Translate5 Editor PHP Serverside and build on Zend Framework
+ 
+ Copyright (c) 2013 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ÄTT) MittagQI.com
+
+ This file may be used under the terms of the GNU General Public License version 3.0
+ as published by the Free Software Foundation and appearing in the file gpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU General Public License version 3.0 requirements will be met:
+ http://www.gnu.org/copyleft/gpl.html.
+
+ For this file you are allowed to make use of the same FLOSS exceptions to the GNU 
+ General Public License version 3.0 as specified by Sencha for Ext Js. 
+ Please be aware, that Marc Mittag / MittagQI take no warranty  for any legal issue, 
+ that may arise, if you use these FLOSS exceptions and recommend  to stick to GPL 3. 
+ For further information regarding this topic please see the attached license.txt
+ of this software package.
+ 
+ MittagQI would be open to release translate5 under EPL or LGPL also, if this could be
+ brought in accordance with the ExtJs license scheme. You are welcome to support us
+ with legal support, if you are interested in this.
+ 
+ 
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU General Public License version 3.0 http://www.gnu.org/copyleft/gpl.html
+             with FLOSS exceptions (see floss-exception.txt and ux-exception.txt at the root level)
+ 
+ END LICENSE AND COPYRIGHT 
+ */
+/**#@+
+ * @author Marc Mittag
+ * @package portal
+ * @version 2.0
+ *
+ */
+$session = new Zend_Session_Namespace();
+
+//Define Action String
+if($this->isCron) {
+    $this->subject = $this->translate->_('Translate5 - Aufgabe automatisch abgeschlossen').' "'.$this->task->getTaskNr().' - '.$this->task->getTaskName().'"';
+    $action = 'Im Projektportal Translate5 wurde die Aufgabe <b>%1$s - %2$s</b> aufgrund einer Terminüberschreitung automatisch für alle Benutzer der Rolle <i>%3$s</i> abgeschlossen.<br />';
+}
+else {
+    $this->subject = $this->translate->_('Translate5 - Aufgabe abgeschlossen').' "'.$this->task->getTaskNr().' - '.$this->task->getTaskName().'"';
+    $action = 'Im Projektportal Translate5 wurde die Aufgabe <b>%1$s - %2$s</b> durch alle Benutzer der Rolle <i>%3$s</i> abgeschlossen.<br />';
+}
+$action = sprintf($this->translate->_($action), $this->task->getTaskNr(),$this->task->getTaskName(),$this->triggeringRole);
+
+//Define User List
+if(empty($this->nextRole)&&  in_array($this->triggeringRole, $this->workflow->getSteps2Roles())){
+    $userNotification = "Die Aufgabe ist vollständig bearbeitet, es sind keine weiteren Benutzer der Aufgabe zugeordnet.<br />\n<br />\n";
+}
+elseif(!empty($this->nextRole)&&  in_array($this->triggeringRole, $this->workflow->getSteps2Roles())) {
+    $userNotification=<<<'END'
+Die Aufgabe wurde nun automatisch für die folgenden Benutzer in der Rolle <i>%2$s</i> freigegeben:<br />
+%1$s
+<br />
+Die Benutzer wurden per E-Mail darüber informiert.<br />
+<br />
+END;
+    $userNotification = sprintf($this->translate->_($userNotification), $this->workflowNotifyHtmlMailUserList($this->users),$this->translate->_($this->nextRole));
+}
+else{
+    $userNotification = 'Die Rolle <i>%1$s</i> war nicht Teil der Workflowkette, daher wurden keine Benutzer benachrichtigt.<br />\n<br />\n';
+    $userNotification = sprintf($this->translate->_($userNotification), $this->translate->_($this->triggeringRole));
+}
+
+//Define E-Mail Footer
+$footer = <<<'END'
+<br />
+<br />
+Sie erreichen das Portal unter: <a href="%1$s">%1$s</a><br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%3$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!
+END;
+$footer = sprintf($this->translate->_($footer), $session->runtimeOptions->server->protocol.$session->runtimeOptions->server->name,$session->runtimeOptions->companyName);
+
+$this->textbody=<<<'END'
+%1$s %2$s,
+
+%3$s
+%4$s
+%7$s
+END;
+
+$this->textbody = sprintf($this->translate->_($this->textbody),
+    $this->mailEmployeeSalutation(),
+    $this->user['surName'],
+    strip_tags($action),
+    strip_tags("\n==================\n".$userNotification."\n==================\n"),
+    $this->translate->_($this->triggeringRole),
+    '', //displaying segments is not supported in textmails
+    strip_tags($footer)
+);
+
+$html=<<<'END'
+%1$s %2$s,<br />
+<br />
+%3$s<br />
+%4$s<br />
+Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <b>%5$s</b>:<br />
+%6$s
+<hr />
+%7$s
+END;
+
+echo sprintf($this->translate->_($html),
+    $this->mailEmployeeSalutation(),
+    $this->user['surName'],
+    $action,
+    $userNotification,
+    $this->translate->_($this->triggeringRole),
+    $this->workflowNotifyHtmlMailSegmentList($this->segments),
+    $footer
+);

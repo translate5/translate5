@@ -1,0 +1,204 @@
+<?php
+ /*
+ START LICENSE AND COPYRIGHT
+ 
+ This file is part of Translate5 Editor PHP Serverside and build on Zend Framework
+ 
+ Copyright (c) 2013 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ÄTT) MittagQI.com
+
+ This file may be used under the terms of the GNU General Public License version 3.0
+ as published by the Free Software Foundation and appearing in the file gpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU General Public License version 3.0 requirements will be met:
+ http://www.gnu.org/copyleft/gpl.html.
+
+ For this file you are allowed to make use of the same FLOSS exceptions to the GNU 
+ General Public License version 3.0 as specified by Sencha for Ext Js. 
+ Please be aware, that Marc Mittag / MittagQI take no warranty  for any legal issue, 
+ that may arise, if you use these FLOSS exceptions and recommend  to stick to GPL 3. 
+ For further information regarding this topic please see the attached license.txt
+ of this software package.
+ 
+ MittagQI would be open to release translate5 under EPL or LGPL also, if this could be
+ brought in accordance with the ExtJs license scheme. You are welcome to support us
+ with legal support, if you are interested in this.
+ 
+ 
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU General Public License version 3.0 http://www.gnu.org/copyleft/gpl.html
+             with FLOSS exceptions (see floss-exception.txt and ux-exception.txt at the root level)
+ 
+ END LICENSE AND COPYRIGHT 
+ */
+/**
+ * Default Workflow Class
+ */
+class editor_Workflow_Default extends editor_Workflow_Abstract {
+    protected $debug = 0;
+    
+    protected $isCron = false;
+    
+    /**
+     * (non-PHPdoc)
+     * @see editor_Workflow_Abstract::handleImport()
+     */
+    protected function handleImport(){
+        $log = ZfExtended_Factory::get('editor_Workflow_Log');
+        /* @var $log editor_Workflow_Log */
+        $log->log($this->newTask->getTaskGuid(), $this->authenticatedUser->userGuid,  self::STEP_LECTORING);
+        $this->doDebug(__FUNCTION__);
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see editor_Workflow_Abstract::handleAllFinishOfARole()
+     */
+    protected function handleAllFinishOfARole() {
+        $this->doDebug(__FUNCTION__);
+        $userGuid = $this->authenticatedUser->userGuid;
+        $newTua = $this->newTaskUserAssoc;
+        $taskGuid = $newTua->getTaskGuid();
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        
+        $actions = ZfExtended_Factory::get('editor_Workflow_Actions',array($this));
+        /* @var $actions editor_Workflow_Actions */
+        //@todo this needs to be adjusted to check for the workflowstep instead of the role
+        //when the workflowsystem is extended or based on a workflow engine
+        if($newTua->getRole() == self::ROLE_LECTOR) {
+            $actions->openRole(self::ROLE_TRANSLATOR, $newTua);
+            $log = ZfExtended_Factory::get('editor_Workflow_Log');
+            /* @var $log editor_Workflow_Log */
+            $nextStep = $this->getNextStep($this->getStepOfRole($newTua->getRole()));
+            $log->log($taskGuid, $userGuid,  $nextStep);
+            $actions->updateAutoStates($taskGuid,'setUntouchedState');
+            $task->setRealDeliveryDate(date('Y-m-d', $_SERVER['REQUEST_TIME']));
+            $task->save();
+        }
+        $notifier = ZfExtended_Factory::get('editor_Workflow_Notification', array($task, $this));
+        /* @var $notifier editor_Workflow_Notification */
+        $notifier->notifyAllFinishOfARole($newTua->getRole(), $this->isCron); 
+    }
+
+    /**
+     * (non-PHPdoc)
+     * @see editor_Workflow_Abstract::handleFinish()
+     */
+    protected function handleFinish() {
+        $this->doDebug(__FUNCTION__);
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see editor_Workflow_Abstract::handleAllFinish()
+     */
+    protected function handleAllFinish() {
+        $this->doDebug(__FUNCTION__);
+    }
+
+    /**
+     * (non-PHPdoc)
+     * @see editor_Workflow_Abstract::handleEnd()
+     */
+    protected function handleEnd() {
+        $this->doDebug(__FUNCTION__);
+        //actually do nothing
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see editor_Workflow_Abstract::handleFirstFinishOfARole()
+     */
+    protected function handleFirstFinishOfARole(){
+        $this->doDebug(__FUNCTION__);
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see editor_Workflow_Abstract::handleFirstFinish()
+     */
+    protected function handleFirstFinish(){
+        $this->doDebug(__FUNCTION__);
+    }
+    
+    /**
+     * reopen an ended task (task-specific reopening in contrast to taskassoc-specific unfinish)
+     * 
+     * @see editor_Workflow_Abstract::handleReopen()
+     */
+    protected function handleReopen(){
+        $this->doDebug(__FUNCTION__);
+    }
+    
+    /**
+     * unfinish a finished task (taskassoc-specific unfinish in contrast to task-specific reopening)
+     * Set all REVIEWED_UNTOUCHED segments to TRANSLATED
+     * (non-PHPdoc)
+     * @see editor_Workflow_Abstract::handleUnfinish()
+     */
+    protected function handleUnfinish(){
+        $newTua = $this->newTaskUserAssoc;
+        /* @var $actions editor_Workflow_Actions */
+        //@todo this needs to be adjusted to check for the workflowstep instead of the role
+        //when the workflowsystem is extended or based on a workflow engine
+        if($newTua->getRole() == self::ROLE_LECTOR) {
+            $actions = ZfExtended_Factory::get('editor_Workflow_Actions',array($this));
+            $actions->updateAutoStates($newTua->getTaskGuid(),'setInitialStates');
+        }
+        $this->doDebug(__FUNCTION__);
+    }
+    
+        
+    /**
+     * Loads all not finished, lector Assocs where the task is open and the targetDeliveryDate was overdued yesterday or older
+     */
+    protected function loadTasksByPastDeliveryDate() {
+        //select tua.*,t.targetDeliveryDate from LEK_taskUserAssoc tua, LEK_task t where t.taskGuid = tua.taskGuid and role = 'lector' and targetDeliveryDate < CURRENT_DATE;
+        //$s = $this->db->getAdapter()->select()
+        $db = Zend_Registry::get('db');
+        $s = $db->select()
+        ->from(array('tua' => 'LEK_taskUserAssoc'))
+        ->join(array('t' => 'LEK_task'), 'tua.taskGuid = t.taskGuid', array())
+        ->where('tua.role = ?', self::ROLE_LECTOR)
+        ->where('tua.state != ?', self::STATE_FINISH)
+        ->where('t.state = ?', editor_Models_Task::STATE_OPEN)
+        ->where('targetDeliveryDate < CURRENT_DATE');
+        return $db->fetchAll($s);
+    }
+    
+    /**
+     * checks the delivery dates, if a task is overdue, it'll be finished for all lectors, triggers normal workflow handlers if needed.
+     * (non-PHPdoc)
+     * @see editor_Workflow_Abstract::handleCronDaily()
+     */
+    public function doCronDaily() {
+        $this->isCron = true;
+        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        
+        $list = $this->loadTasksByPastDeliveryDate();
+        $acl = ZfExtended_Acl::getInstance();
+        $acl->allow('noRights', 'editorconnect_Models_WsdlWrapper', 'sendToUser');
+        //affected user:
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        foreach($list as $instance) {
+            $task->loadByTaskGuid($instance['taskGuid']);
+            //its much easier to load the entity as setting it (INSERT instead UPDATE issue on save, because of internal zend things on initing rows)
+            $tua->load($instance['id']);
+            $user->loadByGuid($instance['userGuid']);
+            $this->doWithTask($task, $task); //nothing changed on task directly, but call is needed
+            $tuaNew = clone $tua;
+            $tuaNew->setState(self::STATE_FINISH);
+            $tuaNew->save();
+            $this->doWithUserAssoc($tua, $tuaNew);
+            editor_Models_LogTask::create($instance['taskGuid'], self::STATE_FINISH, $this->authenticatedUserModel, $user);
+        }
+    }
+}

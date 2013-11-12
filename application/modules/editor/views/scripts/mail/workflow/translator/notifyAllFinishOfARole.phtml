@@ -1,0 +1,91 @@
+<?php
+ /*
+ START LICENSE AND COPYRIGHT
+ 
+ This file is part of Translate5 Editor PHP Serverside and build on Zend Framework
+ 
+ Copyright (c) 2013 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ÄTT) MittagQI.com
+
+ This file may be used under the terms of the GNU General Public License version 3.0
+ as published by the Free Software Foundation and appearing in the file gpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU General Public License version 3.0 requirements will be met:
+ http://www.gnu.org/copyleft/gpl.html.
+
+ For this file you are allowed to make use of the same FLOSS exceptions to the GNU 
+ General Public License version 3.0 as specified by Sencha for Ext Js. 
+ Please be aware, that Marc Mittag / MittagQI take no warranty  for any legal issue, 
+ that may arise, if you use these FLOSS exceptions and recommend  to stick to GPL 3. 
+ For further information regarding this topic please see the attached license.txt
+ of this software package.
+ 
+ MittagQI would be open to release translate5 under EPL or LGPL also, if this could be
+ brought in accordance with the ExtJs license scheme. You are welcome to support us
+ with legal support, if you are interested in this.
+ 
+ 
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU General Public License version 3.0 http://www.gnu.org/copyleft/gpl.html
+             with FLOSS exceptions (see floss-exception.txt and ux-exception.txt at the root level)
+ 
+ END LICENSE AND COPYRIGHT 
+ */
+/**#@+
+ * @author Marc Mittag
+ * @package portal
+ * @version 2.0
+ *
+ */
+$session = new Zend_Session_Namespace();
+
+$this->subject = $this->translate->_('Translate5 - Aufgabe freigegeben').' "'.$this->task->getTaskNr().' - '.$this->task->getTaskName().'"';
+$this->textbody = sprintf($this->translate->_('%1$s %2$s,
+
+Im Projektportal Translate5 wurde die Aufgabe %5$s - %6$s für Sie freigegeben.
+
+Sie erreichen das Portal unter: %3$s
+
+Vielen Dank und viele Grüße,
+Ihr Projektmanagement Team
+%7$s
+
+Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!'),
+    $this->mailEmployeeSalutation(),
+    $this->user['surName'],
+    $session->runtimeOptions->server->protocol.$session->runtimeOptions->server->name,
+    '', //displaying segments is not supported in textmails
+    $this->task->getTaskNr(),
+    $this->task->getTaskName(),
+    $session->runtimeOptions->companyName
+);
+
+echo sprintf($this->translate->_('%1$s %2$s,<br />
+<br />
+Im Projektportal Translate5 wurde die Aufgabe <b>%5$s - %6$s</b> für Sie freigegeben.<br />
+<br />
+Im folgenden die getätigten Änderungen der vorhergehenden Lektoren:<br />
+%4$s
+<hr />
+<br />
+<br />
+Sie erreichen das Portal unter: %3$s<br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%7$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!'),
+    $this->mailEmployeeSalutation(),
+    $this->user['surName'],
+    $session->runtimeOptions->server->protocol.$session->runtimeOptions->server->name,
+    $this->workflowNotifyHtmlMailSegmentList($this->segments),
+    $this->task->getTaskNr(),
+    $this->task->getTaskName(),
+    $session->runtimeOptions->companyName
+);
+
+
+
