@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.1" version="1.1">
+    <file original="php-sourcecode" source-language="de" datatype="php" target-language="en">
+        <body>
+            <trans-unit id="UU0gU3Vic2VnbWVudGU=">
+                <source>QM Subsegmente</source>
+                <target state="needs-review-adaptation">QM Subsegments</target>
+            </trans-unit>
+<trans-unit id='dHJhbnNsYXRlNSAtIE9wZW4tU291cmNlLUxla3RvcmF0CiAgICBmw7xyIGRlbiBCcm93c2Vy'><source>translate5 - Open-Source-Lektorat
+    für den Browser</source><target>translate5 - open source proofreading environment for the browser</target></trans-unit>
+
+<trans-unit id='TWl0IHRyYW5zbGF0ZTUga8O2bm5lbiBTaWUgU0RMWExJRkYtIHVuZCBDU1YtRGF0ZWllbiBpbSBCcm93c2VyIGxla3RvcmllcmVuIGxhc3NlbiAtIG9obmUgTGl6ZW56a29zdGVuIC0gYXVmIE9wZW4gU291cmNlLUJhc2lzLg=='><source>Mit translate5 können Sie SDLXLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</source><target>With translate5 you can proofread SDLXLIFF and CSV files in the browser - without licensing costs and on open-source basis</target></trans-unit>
+        </body>
+    </file>
+<!-- ids are base64-encoded --></xliff>

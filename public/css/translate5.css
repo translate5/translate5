@@ -1,0 +1,111 @@
+/*
+ START LICENSE AND COPYRIGHT
+ 
+ This file is part of Translate5 Editor Javascript GUI and build on ExtJs 4 lib
+ 
+ Copyright (c) 2013 Marc Mittag; MittagQI - Quality Informatics; All rights reserved.
+ 
+ Contact:  http://www.MittagQI.com/  /  service (ÄTT) MittagQI.com
+ 
+ This file may be used under the terms of the GNU General Public License version 3.0
+ as published by the Free Software Foundation and appearing in the file gpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU General Public License version 3.0 requirements will be met:
+ http://www.gnu.org/copyleft/gpl.html.
+
+ For this file you are allowed to make use of the same FLOSS exceptions to the GNU 
+ General Public License version 3.0 as specified by Sencha for Ext Js. 
+ Please be aware, that Marc Mittag / MittagQI take no warranty
+ for any legal issue, that may arise, if you use these FLOSS exceptions and recommend
+ to stick to GPL 3. For further information regarding this topic please see the attached 
+ license.txt of this software package.
+ 
+ MittagQI would be open to release translate5 under EPL or LGPL also, if this could be
+ brought in accordance with the ExtJs license scheme. You are welcome to support us
+ with legal support, if you are interested in this.
+ 
+ 
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU General Public License version 3.0 http://www.gnu.org/copyleft/gpl.html
+             with FLOSS exceptions (see floss-exception.txt and ux-exception.txt at the root level)
+ 
+ END LICENSE AND COPYRIGHT 
+ */
+
+/*allgemeines css*/
+body{
+    font-family: tahoma,verdana,helvetica,sans-serif;
+    font-size: 12px;
+    padding:0;margin:0;
+    background: #ffffff;
+}
+a,a:active{
+    color: black;
+}
+a:hover{
+    color: #e8a33c;
+    text-decoration: underline;
+}
+#content {
+    margin: 1em;
+    clear: both;
+}
+h1,h2{
+    margin: 1em 0 0.5em;
+}
+h1{font-size:1.4em;}
+h2{font-size:1.2em;}
+.errors {
+    color: red;
+}
+#header {height:150px;}
+#header h1 {height:150px;background: url(/images/logo_t5_2013.png?v=3) no-repeat left top #ffffff;padding:0;margin:0;}
+#header h1 span {display:none;}
+h1 {font-size:}
+th {text-align:left;}
+
+#menu{padding-top:20px;padding-bottom:20px;position:relative;}
+#menu a {text-decoration: none;padding:5px 15px;line-height:20px;font-size:14px;display:block;border-right:1px solid #efefef;}
+#menu a:hover {text-decoration: underline;color:#000000;background-color:#f3f3f3;}
+#menu ul {list-style-type: none;height:30px;margin:0;padding:0;border-style:solid;border-color:#e8a33c;border-width:1px 0px 1px 0px;}
+#menu ul li {float:left;}
+#menu ul li.clear {float:none;clear:both;height:1px;line-height:1px;font-size:1px;}
+
+#language-selector-box {position: absolute; top: 50px; left: 500px;}
+
+#footer {border-top:1px solid #e8a33c;padding:1em;}
+
+#content .main {width:500px;float:left;}
+#content .sidebar{width:200px;margin-left:540px;}
+#content .sidebar .teaser {padding:5px;border:1px solid #efefef;margin-bottom:10px;}
+#content .sidebar p,#content .sidebar h2 {margin-top:0;}
+#content .clear{clear:both;}
+#content .start-button{
+	 display:block;
+	 margin:10px auto;
+	 background:#e8a33c;
+	 border:1px outset #cbcbcb;
+	 font-weight:bold;
+	 font-size:14px;
+	 text-align:center;
+	 line-height:20px;
+	 padding:5px 10px; 
+	 border-radius:5px;
+	 width:200px;
+}
+#content .start-button:hover{
+	border:1px outset #646464;
+	color:#000000;
+}
+
+#content dl.zend_form dt{padding-top:7px;padding-bottom:2px;}
+#content .important-notices li {padding-bottom:3px;}
+#content table.usage-info {width:950px;margin-top:10px;}
+#content .usage-info td {border-right:#efefef 1px solid;vertical-align: top;}
+#content div.usage-info{width:600px;margin-bottom:30px;}
+#content div.usage-info h3{font-size:12px;font-weight:bold;margin:0;padding:0;}
+
+#locale-label {display: none;}
+#locale-element{margin: 0;padding: 2px 15px;}
+/* orange #e8a33c grau #cbcbcb */

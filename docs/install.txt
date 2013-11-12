@@ -1,0 +1,30 @@
+============
+Softwarevorausetzungen unter Linux
+- apache2
+- mysql 5.0 oder höher
+- php5.3 oder höher mit den Extensions: mbstring, pdo_mysql
+- Zend Framework 1.11.12 oder höher innerhalb der Linie Zend Framework 1.11, vermutlich ist auch ein Upgrade innerhalb der Linie 1 möglich (in include_path der php.ini aufnehmen)
+- ExtJs 4.0.7
+
+============
+- php.ini-Konfiguration:
+    -- session vernünftig konfigurieren - vor allem save path zu einem Verzeichnis, dass sich nicht erraten lässt
+
+============
+Konfiguration von translate5
+
+- Anpassung aller ini-Dateien innerhalb von /application/iniOverwrites/APPLICATION_AGENCY/
+  auf die von der APPLICATION_AGENCY (also z. B. beo) gewünschten Werte
+- Schreibrechte unterhalb von
+    -- /data/cache
+    -- /data/filesUploadedArchive
+    -- /data/tmp
+
+- Every module may have it's own configuration-files beneath /application/modules/MODULENAME/config, which can be customized in  /application/iniOverwrites/APPLICATION_AGENCY/
+- Every module may have it's own install.txt and install-changes.txt beneath /application/modules/MODULENAME/docs. Please respect them.
+
+============
+Wichtig:
+- /docs/install-changes.txt lesen
+- /application/modules/docs/install.txt und /application/modules/docs/install-changes.txt lesen
+

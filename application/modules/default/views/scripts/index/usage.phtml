@@ -1,0 +1,123 @@
+<?php
+ /*
+ START LICENSE AND COPYRIGHT
+ 
+ This file is part of Translate5 Editor PHP Serverside and build on Zend Framework
+ 
+ Copyright (c) 2013 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ÄTT) MittagQI.com
+
+ This file may be used under the terms of the GNU General Public License version 3.0
+ as published by the Free Software Foundation and appearing in the file gpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU General Public License version 3.0 requirements will be met:
+ http://www.gnu.org/copyleft/gpl.html.
+
+ For this file you are allowed to make use of the same FLOSS exceptions to the GNU 
+ General Public License version 3.0 as specified by Sencha for Ext Js. 
+ Please be aware, that Marc Mittag / MittagQI take no warranty  for any legal issue, 
+ that may arise, if you use these FLOSS exceptions and recommend  to stick to GPL 3. 
+ For further information regarding this topic please see the attached license.txt
+ of this software package.
+ 
+ MittagQI would be open to release translate5 under EPL or LGPL also, if this could be
+ brought in accordance with the ExtJs license scheme. You are welcome to support us
+ with legal support, if you are interested in this.
+ 
+ 
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU General Public License version 3.0 http://www.gnu.org/copyleft/gpl.html
+             with FLOSS exceptions (see floss-exception.txt and ux-exception.txt at the root level)
+ 
+ END LICENSE AND COPYRIGHT 
+ */
+
+$config = Zend_Registry::get('config');
+$pathToQMFile =  '/'.$config->runtimeOptions->editor->qmFlagXmlFileDir.'/'.
+        $config->runtimeOptions->editor->qmFlagXmlFileName;
+?>
+<h1><?php echo $this->translate->_('Informationen zur Bedienung'); ?></h1>
+<div class="usage-info">
+    <p><?php echo $this->translate->_('Diese translate5 Demoversion ist öffentlich, alle hochgeladenen Projekte können von jedem eingesehen und exportiert werden!'); ?></p>
+<h2><a name="import"><?php echo $this->translate->_('Zip-Datei mit Import Daten'); ?></a></h2>
+
+
+
+<h3><?php echo $this->translate->_('proofRead: Verzeichnis mit zu lektorierenden Dateien'); ?></h3>
+<p><?php echo $this->translate->_('Die Zip-Datei muss ein Verzeichnis "proofRead" enthalten, welches mehrere SDLXLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.'); ?></p>
+<h3><?php echo $this->translate->_('Struktur von CSV-Dateien (falls als Lektoratsquelle verwendet)'); ?></h3>
+<p><?php echo $this->translate->_('CSV-Dateien müssen drei Spalten enthalten, deren Spaltenköpfe mit den Bezeichnungen "mid", "quelle", "ziel" gekennzeichnet sind. Diese Spalten können in beliebiger Reihenfolge in der CSV-Datei enthalten sein. Weitere Spalten der CSV-Datei werden beim Import ignoriert. Spaltentrenner der CSV ist ein Komma ",", Texterkennungszeichen ein doppeltes Anführungszeichen "&apos;". Zeilentrenner der CSV ist ein Linux-, Mac- oder Windowszeilenumbruch. Codierung der CSV-Datei kann utf-8, iso-8859-1 oder windows-1251 sein. Die CSV-Datei wird in der selben Codierung exportiert, in der sie beim Import vorlag (Achtung: Bei einer Übersetzung in Nicht-Westeuropäische Sprachen sollte daher utf-8 bereits als Importcodierung gewählt werden).'); ?></p>
+<h3><?php echo $this->translate->_('Verzeichnisstruktur beim Export'); ?></h3>
+<p><?php echo $this->translate->_('Beim Export wird die gleiche Datei und Verzeichnisstruktur in Form einer Zip-Datei wieder ausgespielt'); ?></p>
+<h3><?php echo $this->translate->_('TBX-Datei zur Auszeichnung von Terminologie'); ?></h3>
+<p><?php echo $this->translate->_('Die TBX-Datei kann beliebig viele Sprachen enthalten. Sie muss mindestens die zwei Sprachen enthalten, die beim Aufgabenimport als Quell- und Zielsprachen ausgewählt werden. Die TBX Datei darf sich in keinem Unterverzeichnis befinden, sonst wird Sie nicht importiert. Befinden sich mehrere TBX Dateien in der Zip-Datei, so wird nach alphabetischer Sortierung die erste TBX Datei verwendet.'); ?><p>
+<h3><?php echo $this->translate->_('Relaissprache zur Verfügung stellen'); ?></h3>
+<p><?php echo $this->translate->_('Versteht der Lektor die Ausgangssprache nicht kann ihm eine Relaissprache zur Verfügung gestellt werden, die er versteht (z. B. Englisch). Dazu muss das zu lektorierende Dokument strukturgleich als Englischübersetzung vorliegen. Dieses oder diese strukturgleichen Dokumente werden im optionalen Verzeichnis "relais" zur Verfügung gestellt. Dabei muss die Dateistruktur identisch zu den Inhalten im "proofRead" Verzeichnis sein.'); ?></p>
+<h3><?php echo $this->translate->_('Referenzdateien zur Verfügung stellen'); ?></h3>
+<p><?php echo $this->translate->_('Das optionale Verzeichnis "referenceFiles" kann eine beliebige Dateistruktur enthalten, welche als Referenzdateien importiert werden.'); ?></p>
+<h3><?php echo $this->translate->_('XML-Datei zur Konfiguration der QM-Subsegment-Kriterien'); ?></h3>
+<p><?php $out = $this->translate->_('Die optionale XML-Datei zur Konfiguration der QM-Subsegment-Kriterien bestimmt, welche QM-Subsegment Fehlerkategorien während des Lektorats zur Verfügung stehen. Eine übergebene Datei muss im Format der Standarddatei entsprechen, welche %shier als Bespiel heruntergeladen werden kann%s. Wird keine Datei übergeben, wird die Standard-Datei verwendet. '); ?></p>
+<p><?php 
+printf($out,'<a href="'.$pathToQMFile.'" target="_blank">','</a>');
+?></p>
+<p><?php echo $this->translate->_('<b>Beispielhafter Inhalt einer Zip Datei: </b>'); ?></p>
+<pre>
+<?php echo $config->runtimeOptions->editor->qmFlagXmlFileName; ?>  => <?php 
+$out = $this->translate->_('Optionale XML-Datei zur Konfiguration der QM-Subsegment Kriterien (Beispiel <a href="%s" target="_blank">siehe hier</a>).');
+printf($out,$pathToQMFile); ?> 
+proofRead/                => <?php echo $this->translate->_('Dieses Verzeichnis ist zwingend nötig, und beinhaltet die zu lektorierenden Dateien.'); ?> 
+proofRead/test.sdlxliff
+relais/                   => <?php echo $this->translate->_('Dieses Verzeichnis ist optional, muss wenn vorhanden die gleiche Dateistruktur wie "proofRead" aufweisen'); ?> 
+relais/test.sdlxliff
+term.tbx                  => <?php echo $this->translate->_('optionale TBX Datei mit Termen, die erste gefunden TBX Datei wird verwendet'); ?> 
+referenceFiles/           => <?php echo $this->translate->_('optionales Verzeichnis mit Referenzdateien'); ?> 
+referenceFiles/Referenz.pdf
+</pre>
+</div>
+
+
+<h2><?php echo $this->translate->_('Hinweise zum Lektorat'); ?><a name="lektorat"></a></h2>
+<img src="/images/screen-fuer-web.jpg" alt="<?php echo $this->translate->_('Screenshot Lektorat'); ?>"/>
+<table class="usage-info">
+<tbody>
+<tr>
+<td><strong><?php echo $this->translate->_('Dateiübersicht'); ?></strong>
+<ul>
+<li><?php echo $this->translate->_('Beliebig verkleiner- und vergrößerbar'); ?></li>
+<li><?php echo $this->translate->_('Dateireihenfolge sortierbar'); ?></li>
+<li><?php echo $this->translate->_('Klick auf Datei springt zum ersten Segment'); ?></li>
+</ul>
+</td>
+<td><strong><?php echo $this->translate->_('Filter'); ?></strong>
+<ul>
+<li><?php echo $this->translate->_('Alle Spalten filter- und sortierbar'); ?></li>
+<li><?php echo $this->translate->_('Filter mehrerer Spalten kombinierbar'); ?></li>
+<li><?php echo $this->translate->_('Ermöglicht flexibles Review'); ?></li>
+</ul>
+</td>
+<td><strong><?php echo $this->translate->_('Terminologie im Segment'); ?></strong>
+<ul>
+<li><?php echo $this->translate->_('Blau unterstrichen: Term und Übersetzung vorhanden'); ?></li>
+<li><?php echo $this->translate->_('Rot unterstrichen: Term fehlt in Übersetzung'); ?></li>
+<li><?php echo $this->translate->_('Violett hinterlegt: Verwendeter Term ist verbotene Benennung'); ?></li>
+</ul>
+</td>
+<td><strong><?php echo $this->translate->_('Autostatus'); ?></strong>
+<ul>
+<li><?php echo $this->translate->_('Wird bei Speichern des Segments automatisch gesetzt'); ?></li>
+<li><?php echo $this->translate->_('Häkchen: Wurde lektoriert'); ?></li>
+<li><?php echo $this->translate->_('Zahnrad: Automatisch angepasste Wiederholung'); ?></li>
+</ul>
+</td>
+<td><strong><?php echo $this->translate->_('Segment-Metadaten'); ?></strong>
+<ul>
+<li><?php echo $this->translate->_('Zeigen die Werte des aktuellen Segments'); ?></li>
+<li><?php echo $this->translate->_('Terminologie enthält auch nicht im Segment verwendete Terme eines verwendeten Begriffs'); ?></li>
+<li><?php echo $this->translate->_('Wählbare Werte für "QM" und "Status" sind pro Installation frei konfigurierbar'); ?></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>

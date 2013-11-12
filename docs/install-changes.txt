@@ -1,0 +1,12 @@
+### Diese Datei enthält alle für alle Updates die dazugehörigen Konfigurationserweiterungen / -änderungen, 
+### die in /application/iniOverwrites/APPLICATION_AGENCY durchgeführt werden müssen.
+### Neuste Updates finden sich oben.
+2013-11-02: have a look for changes in ZfExtended
+2013-04-10: restructuring of third-party libraries: translate5 needs the
+            third-party-libs Horde_Text_Diff (for the diff of the export), 
+            restful-zend-framework (for general REST-Communication of the JS-Frontend)
+            and XliffTermTagger (for the terminology-feature). All these libs are
+            not part of the translate5-package and are not published in the translate5
+            repositories on github. The reason is to enable every user by himself
+            to keep an eye on the license-issues of these componenents regarding his
+            needs. For more information see license.txt of this package.
