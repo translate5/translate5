@@ -1238,31 +1238,26 @@ E-Mail: service@MittagQI.com</pre>
                 <target>Quality-assured version - <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">please ask us!</a>
                 </target>
             </trans-unit>
-<trans-unit id='dHJhbnNsYXRlNSBRdWVsbGNvZGUgYXVmIGJpdGJ1Y2tldC5vcmc='>
-    <source>translate5 Quellcode auf bitbucket.org</source>
-    <target>translate5 source code on bitbucket.org</target>
-</trans-unit>
-<trans-unit id='RGVyIGxldHp0ZSBTdGFuZCBkZXIgRW50d2lja2x1bmcgdm9uIHRyYW5zbGF0ZTUgaXN0IGpld2VpbHMgPGEgaHJlZj0iJXMiIHRhcmdldD0iX2JsYW5rIj5hdWYgYml0YnVja2V0Lm9yZyB2ZXLDtmZmZW50bGljaHQ8L2E+Lg=='>
-    <source>Der letzte Stand der Entwicklung von translate5 ist jeweils <a href="%s" target="_blank">auf bitbucket.org veröffentlicht</a>.</source>
-    <target>The latest state of development of translate5<a href="%s" target="_blank"> is always published on bitbucket.org</a>.</target>
-</trans-unit>
-            <trans-unit id="Z2l0aHViIGRpZW50IGRlciBFbnR3aWNrbHVuZyBhbHMgUmVwb3NpdG9yeSB1bmQgZW50aMOkbHQgZGVuIGxldHp0ZW4gU3RhbmQgZGVyIEVudHdpY2tsdW5nLiBEaWVzZXIgaXN0IG51ciBiZWRpbmd0IGbDvHIgZGVuIFByb2R1a3RpdmVpbnNhdHogZ2VlaWduZXQgdW5kIGthbm4gRmVobGVyIGVudGhhbHRlbiE8YnI+PGJyPiBFaW4gcXVhbGl0w6R0c2dlc2ljaGVydGVzIFJlbGVhc2UsIHdlbGNoZXMgYmVyZWl0cyBhbGxlIEFiaMOkbmdpZ2tlaXRlbiBrb3JyZWt0IGVudGjDpGx0IGVyaGFsdGVuIFNpZSA8YSBocmVmPSJodHRwOi8vd3d3Lm1pdHRhZ3FpLmNvbS93aWxsa29tbWVuL2ltcHJlc3N1bSIgdGFyZ2V0PSJfYmxhbmsiPmdlcm4gdm9uIHVucyBhdWYgQW5mcmFnZTwvYT4uIERpZSBWZXLDtmZmZW50bGljaHVuZyBhdWYgZ2l0aHViIGlzdCBmw7xyIEVudHdpY2tsZXIgZ2VkYWNodC4=">
-                <source>Bitbucket dient der Entwicklung als Repository und enthält den letzten Stand der Entwicklung. Dieser ist nur bedingt für den Produktiveinsatz geeignet und kann Fehler enthalten!
-                    <br/>
-                    <br/> Ein qualitätsgesichertes Release, welches bereits alle Abhängigkeiten korrekt enthält erhalten Sie 
-                    <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">gern von uns auf Anfrage</a>. Die Veröffentlichung auf bitbucket.org ist für Entwickler gedacht.
-                </source>
+            <trans-unit id='dHJhbnNsYXRlNSBRdWVsbGNvZGUgYXVmIGJpdGJ1Y2tldC5vcmc='>
+                <source>translate5 Quellcode auf bitbucket.org</source>
+                <target>translate5 source code on bitbucket.org</target>
+            </trans-unit>
+            <trans-unit id='RGVyIGxldHp0ZSBTdGFuZCBkZXIgRW50d2lja2x1bmcgdm9uIHRyYW5zbGF0ZTUgaXN0IGpld2VpbHMgPGEgaHJlZj0iJXMiIHRhcmdldD0iX2JsYW5rIj5hdWYgYml0YnVja2V0Lm9yZyB2ZXLDtmZmZW50bGljaHQ8L2E+Lg=='>
+                <source>Der letzte Stand der Entwicklung von translate5 ist jeweils <a href="%s" target="_blank">auf bitbucket.org veröffentlicht</a>.</source>
+                <target>The latest state of development of translate5 <a href="%s" target="_blank">is always published on bitbucket.org</a>.</target>
+            </trans-unit>
+            <trans-unit id='Qml0YnVja2V0IGRpZW50IGRlciBFbnR3aWNrbHVuZyBhbHMgUmVwb3NpdG9yeSB1bmQgZW50aMOkbHQgZGVuIGxldHp0ZW4gU3RhbmQgZGVyIEVudHdpY2tsdW5nLiBEaWVzZXIgaXN0IG51ciBiZWRpbmd0IGbDvHIgZGVuIFByb2R1a3RpdmVpbnNhdHogZ2VlaWduZXQgdW5kIGthbm4gRmVobGVyIGVudGhhbHRlbiE8YnIvPiBFaW4gcXVhbGl0w6R0c2dlc2ljaGVydGVzIFJlbGVhc2UsIHdlbGNoZXMgYmVyZWl0cyBhbGxlIEFiaMOkbmdpZ2tlaXRlbiBrb3JyZWt0IGVudGjDpGx0IGVyaGFsdGVuIFNpZSA8YSBocmVmPSJodHRwOi8vd3d3Lm1pdHRhZ3FpLmNvbS93aWxsa29tbWVuL2ltcHJlc3N1bSIgdGFyZ2V0PSJfYmxhbmsiPmdlcm4gdm9uIHVucyBhdWYgQW5mcmFnZTwvYT4uIERpZSBWZXLDtmZmZW50bGljaHVuZyBhdWYgYml0YnVja2V0Lm9yZyBpc3QgZsO8ciBFbnR3aWNrbGVyIGdlZGFjaHQu'><source>Bitbucket dient der Entwicklung als Repository und enthält den letzten Stand der Entwicklung. Dieser ist nur bedingt für den Produktiveinsatz geeignet und kann Fehler enthalten!<br/> Ein qualitätsgesichertes Release, welches bereits alle Abhängigkeiten korrekt enthält erhalten Sie <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">gern von uns auf Anfrage</a>. Die Veröffentlichung auf bitbucket.org ist für Entwickler gedacht.</source>
                 <target>Bitbucket serves as the development repository and contains the latest state of development. It is suitable for development use only and may contain errors!
                     <br/> A quality-assured release, which already contains all the dependencies correctly, is receivable 
                     <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank"> from us on request </a>. The source code on bitbucket.org is intended for developers.   
                 </target>
             </trans-unit>
-            <trans-unit id="dHJhbnNsYXRlNSBFbnR3aWNrbGVyLVJlcG9zaXRvcnkgYXVmIGdpdGh1Yg==">
+            <trans-unit id='dHJhbnNsYXRlNSBFbnR3aWNrbGVyLVJlcG9zaXRvcnkgYXVmIGJpdGJ1Y2tldC5vcmc='>
                 <source>translate5 Entwickler-Repository auf bitbucket.org</source>
                 <target>translate5 developer repository on bitbucket.org</target>
             </trans-unit>
-            <trans-unit id="dHJhbnNsYXRlNSBpc3QgYXVmIGF1ZiBtZWhyZXJlIGdpdGh1Yi1SZXBvc2l0b3JpZXMgdmVydGVpbHQgdW5kIGJlbsO2dGlndCBkYXLDvGJlciBoaW5hdXMgZWluZSBSZWloZSBleHRlcm5lciBCaWJsaW90aGVrZW4uIERhcyBoaWVyYXJjaGlzY2ggb2JlcnN0ZSBSZXBvc2l0b3J5IGlzdCAidHJhbnNsYXRlNSIsIHdlbGNoZXMgZGllIEFiaMOkbmdpZ2tlaXRlbiBhbHMgZ2l0LXN1Ym1vZHVsZSBvZGVyIFZlcndlaXNlIGVudGjDpGx0Lg==">
-                <source>translate5 ist auf auf mehrere Bitbucket-Repositories verteilt und benötigt darüber hinaus eine Reihe externer Bibliotheken. Das hierarchisch oberste Repository ist "translate5", welches die Abhängigkeiten als git-submodule oder Verweise enthält.</source>
+            <trans-unit id='dHJhbnNsYXRlNSBpc3QgYXVmIGF1ZiBtZWhyZXJlIGJpdGJ1Y2tldC1SZXBvc2l0b3JpZXMgdmVydGVpbHQgdW5kIGJlbsO2dGlndCBkYXLDvGJlciBoaW5hdXMgZWluZSBSZWloZSBleHRlcm5lciBCaWJsaW90aGVrZW4uIERhcyBoaWVyYXJjaGlzY2ggb2JlcnN0ZSBSZXBvc2l0b3J5IGlzdCAidHJhbnNsYXRlNSIsIHdlbGNoZXMgZGllIEFiaMOkbmdpZ2tlaXRlbiBhbHMgZ2l0LXN1Ym1vZHVsZSBvZGVyIFZlcndlaXNlIGVudGjDpGx0Lg=='>
+                <source>translate5 ist auf auf mehrere bitbucket-Repositories verteilt und benötigt darüber hinaus eine Reihe externer Bibliotheken. Das hierarchisch oberste Repository ist "translate5", welches die Abhängigkeiten als git-submodule oder Verweise enthält.</source>
                 <target>translate5 is spread over multiple Bitbucket repositories and also requires a number of external libraries. The top repository is "translate5", which contains the dependencies as submodules or references.</target>
             </trans-unit>
             <trans-unit id="PGI+Qml0dGUgYmVhY2h0ZW4gU2llOjwvYj4gRGllc2UgdHJhbnNsYXRlNSBEZW1vdmVyc2lvbiBpc3Qgw7ZmZmVudGxpY2gsIGFsbGUgaG9jaGdlbGFkZW5lbiBQcm9qZWt0ZSBrw7ZubmVuIHZvbiBqZWRlbSBlaW5nZXNlaGVuIHdlcmRlbi4gRWluIEV4cG9ydCBzcGllbHQgYWxsZSBha3R1ZWxsIGVpbmdlY2hlY2t0ZW4gRGF0ZWllbiBlaW5lcyBQcm9qZWt0ZXMgYXVzLg==">
@@ -1384,7 +1379,8 @@ E-Mail: service@MittagQI.com</pre>
 <trans-unit id="V2hpdGVzcGFjZSc+PDx0cmFucy11bml0IGlkPSdXaGl0ZXNwYWNl"><source>Whitespace</source><target>Whitespace</target></trans-unit>
 <trans-unit id="TW9ub2xpbmd1YWwgdDx0cmFucy11bml0IGlkPSdNb25vbGluZ3VhbCB0ZXJtaW5vbG9neSwgaW5jb25zaXN0ZW50"><source>Monolingual terminology, inconsistent</source><target>Monolingual terminology, inconsistent</target></trans-unit>
 
-<trans-unit id="TWl0dGFnUUkgLSBRdWFsaXR5IEluZm9ybWF0aWNzPGJyIC8+S29ucmFkLUxvcmVuei1XZWcgMTA8YnIgLz43MjExNiBNw7Zzc2luZ2VuPGJyIC8+VGVsLiAwNzQ3My8yMjAyMDI8YnIgLz5GYXggMDc0NzMvMjIwMjExPGJyIC8+RS1NYWlsOiBzZXJ2aWNlQE1pdHRhZ1FJLmNvbQ=="><source>MittagQI - Quality Informatics<br />Konrad-Lorenz-Weg 10<br />72116 Mössingen<br />Tel. 07473/220202<br />Fax 07473/220211<br />E-Mail: service@MittagQI.com</source><target>MittagQI - Quality Informatics<br />Konrad-Lorenz-Weg 10<br />72116 Mössingen<br />Tel. 07473/220202<br />Fax 07473/220211<br />E-Mail: service@MittagQI.com</target></trans-unit>
+<trans-unit id="TWl0dGFnUUkgLSBRdWFsaXR5IEluZm9ybWF0aWNzPGJyIC8+S29ucmFkLUxvcmVuei1XZWcgMTA8YnIgLz43MjExNiBNw7Zzc2luZ2VuPGJyIC8+VGVsLiAwNzQ3My8yMjAyMDI8YnIgLz5GYXggMDc0NzMvMjIwMjExPGJyIC8+RS1NYWlsOiBzZXJ2aWNlQE1pdHRhZ1FJLmNvbQ=="><source>
+<br />Konrad-Lorenz-Weg 10<br />72116 Mössingen<br />Tel. 07473/220202<br />Fax 07473/220211<br />E-Mail: service@MittagQI.com</source><target>MittagQI - Quality Informatics<br />Konrad-Lorenz-Weg 10<br />72116 Mössingen<br />Tel. 07473/220202<br />Fax 07473/220211<br />E-Mail: service@MittagQI.com</target></trans-unit>
    
 <trans-unit id="QW53ZW5kdW5nc2ZlaGxlcg=="><source>Anwendungsfehler</source><target>Anwendungsfehler</target></trans-unit>
 <trans-unit id="TW9ub2xpbmd1YWwgdGVybWlub2xvZ3ksIGluY29uc2lzdGVudA=="><source>Monolingual terminology, inconsistent</source><target>Monolingual terminology, inconsistent</target></trans-unit>
