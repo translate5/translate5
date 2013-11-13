@@ -60,7 +60,6 @@ class IndexController extends ZfExtended_Controllers_Action {
     public function indexAction() {}
     public function usageAction() {}
     public function testdataAction() {}
-    public function desktopAction() {}
     public function sourceAction() {}
     public function newsletterAction() {}
     public function tasksAction() {

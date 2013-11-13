@@ -704,10 +704,6 @@
                 <source>Schon jetzt ist translate5 als Open Source in Form einer Stand Alone Version f&#xFC;r den Betrieb unter Windows verf&#xFC;gbar.</source>
                 <target state="needs-review-adaptation">translate5 is already available now as open source in the form of a stand alone version for use with Windows.</target>
             </trans-unit>
-            <trans-unit id="WnVzw6R0emxpY2ggd2lyZCB0cmFuc2xhdGU1IGluIEvDvHJ6ZSBhdWYgR2l0SHViIHZlcsO2ZmZlbnRsaWNodC4=">
-                <source>Zus&#xE4;tzlich wird translate5 in K&#xFC;rze auf GitHub ver&#xF6;ffentlicht.</source>
-                <target state="needs-review-adaptation">In addition, translate5 will soon be released for GitHub.</target>
-            </trans-unit>
             <trans-unit id="Qml0dGUgYmVhY2h0ZW4gU2llOiBEaWVzZSB0cmFuc2xhdGU1IFN0YW5kIEFsb25lIFZlcnNpb24gdW50ZXJzdMO8dHp0IGVpbiBQcm9qZWt0IHBybyBJbnN0YWxsYXRpb24uIERhcyBiZWRldXRldDogQWxsZSBpbXBvcnRpZXJ0ZW4gRGF0ZWllbiB3ZXJkZW4gZ2VtZWluc2FtIGluIGVpbmVtIERhdGVpYmF1bSBsZWt0b3JpZXJ0LiBTaW5kIGJlcmVpdHMgRGF0ZWllbiBlaW5nZWNoZWNrdCwga2FubiBlaW4gd2VpdGVyZXIgQ2hlY2tpbiBlcnN0IGR1cmNoZ2Vmw7xocnQgd2VyZGVuLCB3ZW5uIGRpZXNlIERhdGVpZW4gd2llZGVyIGF1cyB0cmFuc2xhdGU1IGdlbMO2c2NodCBzaW5kLg==">
                 <source>Bitte beachten Sie: Diese translate5 Stand Alone Version unterst&#xFC;tzt ein Projekt pro Installation. Das bedeutet: Alle importierten Dateien werden gemeinsam in einem Dateibaum lektoriert. Sind bereits Dateien eingecheckt, kann ein weiterer Checkin erst durchgef&#xFC;hrt werden, wenn diese Dateien wieder aus translate5 gel&#xF6;scht sind.</source>
                 <target state="needs-review-adaptation">Please note: this translate5 stand alone version supports one project per installation. This means that all files imported are edited together in one file tree. If files are already checked in, a further check-in can only be conducted when these files are deleted again from translate5.</target>
@@ -1082,65 +1078,16 @@
                 <source>Hinweis!</source>
                 <target>Note!</target>
             </trans-unit>
-      
-      
-      
-      
-      
-            <trans-unit id="dHJhbnNsYXRlNSBRdWVsbGNvZGUgYXVmIGdpdGh1Yg==">
-                <source>translate5 Quellcode auf github</source>
-                <target>translate5 source code on github</target>
-            </trans-unit>
-            <trans-unit id="RGVyIGxldHp0ZSBTdGFuZCBkZXIgRW50d2lja2x1bmcgdm9uIHRyYW5zbGF0ZTUgaXN0IGpld2VpbHMgPGEgaHJlZj0iJXMiIHRhcmdldD0iX2JsYW5rIj5hdWYgZ2l0aHViIHZlcsO2ZmZlbnRsaWNodDwvYT4u">
-                <source>Der letzte Stand der Entwicklung von translate5 ist jeweils 
-                    <a href="%s" target="_blank">auf github veröffentlicht</a>.
-                </source>
-                <target>The latest state of development of translate5
-                    <a href="%s" target="_blank"> is always published on github</a>.
-                </target>
-            </trans-unit>
-            <trans-unit id="dHJhbnNsYXRlNSBpc3QgYXVmIGdpdGh1YiBhdWYgbWVocmVyZSBSZXBvc2l0b3JpZXMgdmVydGVpbHQgdW5kIGJlbsO2dGlndCBkYXLDvGJlciBoaW5hdXMgZWluZSBSZWloZSBleHRlcm5lciBCaWJsaW90aGVrZW4uIERhcyBoaWVyYXJjaGlzY2ggb2JlcnN0ZSBSZXBvc2l0b3J5IGlzdCAidHJhbnNsYXRlNSIsIHdlbGNoZXMgZGllIEFiaMOkbmdpZ2tlaXRlbiBhbHMgZ2l0LXN1Ym1vZHVsZSBvZGVyIFZlcndlaXNlIGVudGjDpGx0Lg==">
-                <source>translate5 ist auf github auf mehrere Repositories verteilt und benötigt darüber hinaus eine Reihe externer Bibliotheken. Das hierarchisch oberste Repository ist "translate5", welches die Abhängigkeiten als git-submodule oder Verweise enthält.</source>
-                <target>translate5 is spread across multiple repositories on github and also requires a number of external libraries. The top repository is "translate5" which contains the dependencies as git submodule or references.</target>
-            </trans-unit>
-            <trans-unit id="Qml0dGUgYmVhY2h0ZW4gU2llOiBnaXRodWIgZGllbnQgYXVjaCBkZXIgRW50d2lja2x1bmcgYWxzIHJlcG9zaXRvcnkuIERhaGVyIGlzdCBkZXIgbGV0enRlIFN0YW5kIGRlciBFbnR3aWNrbHVuZyBpbiBkZXIgUmVnZWwgbmljaHQgZsO8ciBkZW4gUHJvZHVrdGl2ZWluc2F0eiBnZWRhY2h0IHVuZCBrYW5uIEZlaGxlciBlbnRoYWx0ZW4hIEVpbiBsYXVmZsOkaGlnZXMgUmVsZWFzZSwgd2VsY2hlcyBiZXJlaXRzIGFsbGUgQWJow6RuZ2lna2VpdGVuIGtvcnJla3QgZW50aMOkbHQgZXJoYWx0ZW4gU2llIGdlcm4gdm9uIHVucyBhdWYgQW5mcmFnZS4=">
-                <source>Bitte beachten Sie: github dient auch der Entwicklung als repository. Daher ist der letzte Stand der Entwicklung in der Regel nicht für den Produktiveinsatz gedacht und kann Fehler enthalten! Ein lauffähiges Release, welches bereits alle Abhängigkeiten korrekt enthält erhalten Sie gern von uns auf Anfrage.</source>
-                <target>Please note: github also serves as a repository of development. Therefore, the most recent development is usually not intended for production use and may contain errors! For an executable release, which contains all dependencies correctly please email us!</target>
-            </trans-unit>
-            <trans-unit id='Z2l0aHViIGRpZW50IGRlciBFbnR3aWNrbHVuZyBhbHMgUmVwb3NpdG9yeSB1bmQgZW50aMOkbHQgZGVuIGxldHp0ZW4gU3RhbmQgZGVyIEVudHdpY2tsdW5nLiBEaWVzZXIgaXN0IG51ciBiZWRpbmd0IGbDvHIgZGVuIFByb2R1a3RpdmVpbnNhdHogZ2VlaWduZXQgdW5kIGthbm4gRmVobGVyIGVudGhhbHRlbiE8YnIvPiBFaW4gcXVhbGl0w6R0c2dlc2ljaGVydGVzIFJlbGVhc2UsIHdlbGNoZXMgYmVyZWl0cyBhbGxlIEFiaMOkbmdpZ2tlaXRlbiBrb3JyZWt0IGVudGjDpGx0IGVyaGFsdGVuIFNpZSA8YSBocmVmPSJodHRwOi8vd3d3Lm1pdHRhZ3FpLmNvbS93aWxsa29tbWVuL2ltcHJlc3N1bSIgdGFyZ2V0PSJfYmxhbmsiPmdlcm4gdm9uIHVucyBhdWYgQW5mcmFnZTwvYT4uIERpZSBWZXLDtmZmZW50bGljaHVuZyBhdWYgZ2l0aHViIGlzdCBmw7xyIEVudHdpY2tsZXIgZ2VkYWNodC4='>
-                <source>github dient der Entwicklung als Repository und enthält den letzten Stand der Entwicklung. Dieser ist nur bedingt für den Produktiveinsatz geeignet und kann Fehler enthalten!<br/> Ein qualitätsgesichertes Release, welches bereits alle Abhängigkeiten korrekt enthält erhalten Sie <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">gern von uns auf Anfrage</a>. Die Veröffentlichung auf github ist für Entwickler gedacht.</source>
-                <target>github serves as a repository of development and contains the most recent development version. This version is usually not intended for production use and may contain errors!<br/> <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">Please email us</a> to get a quality assured release, containing all dependencies. The publication on github is intended for developers only.</target>
-            </trans-unit>
-
-            <trans-unit id="RGVza3RvcCBWZXJzaW9u">
-                <source>Desktop Version</source>
-                <target>Desktop version</target>
-            </trans-unit>
             <trans-unit id="UXVlbGxjb2Rl">
                 <source>Quellcode</source>
                 <target>Source code</target>
-            </trans-unit>
-            <trans-unit id="dHJhbnNsYXRlNSBEZXNrdG9wIFZlcnNpb24=">
-                <source>translate5 Desktop Version</source>
-                <target>translate5 desktop version</target>
-            </trans-unit>
-            <trans-unit id="QXVmIFd1bnNjaCBpc3QgdHJhbnNsYXRlNSBhbHMgRGVza3RvcCBWZXJzaW9uIHZlcmbDvGdiYXIu">
-                <source>Auf Wunsch ist translate5 als Desktop Version verfügbar.</source>
-                <target>Upon request translate5 is available as desktop version.</target>
             </trans-unit>
             <trans-unit id="Qml0dGUgZnJhZ2VuIFNpZSB1bnMgYW4h">
                 <source>Bitte fragen Sie uns an!</source>
                 <target>Please contact us!</target>
             </trans-unit>
             <trans-unit id="TWl0dGFnUUkgLSBRdWFsaXR5IEluZm9ybWF0aWNzPGJyIC8+PGJyIC8+S29ucmFkLUxvcmVuei1XZWcgMTA8YnIgLz43MjExNiBNw7Zzc2luZ2VuPGJyIC8+VGVsLiAwNzQ3My8yMjAyMDI8YnIgLz5GYXggMDc0NzMvMjIwMjExPGJyIC8+RS1NYWlsOiBzZXJ2aWNlQE1pdHRhZ1FJLmNvbQ==">
-                <source>MittagQI - Quality Informatics
-                    <br />
-                    <br />Konrad-Lorenz-Weg 10
-                    <br />72116 Mössingen
-                    <br />Tel. 07473/220202
-                    <br />Fax 07473/220211
-                    <br />E-Mail: service@MittagQI.com
-                </source>
+                <source>MittagQI - Quality Informatics<br /><br />Konrad-Lorenz-Weg 10<br />72116 Mössingen<br />Tel. 07473/220202<br />Fax 07473/220211<br />E-Mail: service@MittagQI.com</source>
                 <target>
                     <pre style="font-family: tahoma,verdana,helvetica,sans-serif">MittagQI - Quality Informatics
 Konrad-Lorenz-Weg 10
@@ -1278,44 +1225,45 @@ E-Mail: service@MittagQI.com</pre>
                 <target>Operational information</target>
             </trans-unit>
             <trans-unit id="RGllIG9wdGlvbmFsZSBYTUwtRGF0ZWkgenVyIEtvbmZpZ3VyYXRpb24gZGVyIFFNLVN1YnNlZ21lbnQtS3JpdGVyaWVuIGJlc3RpbW10LCB3ZWxjaGUgUU0tU3Vic2VnbWVudCBGZWhsZXJrYXRlZ29yaWVuIHfDpGhyZW5kIGRlcyBMZWt0b3JhdHMgenVyIFZlcmbDvGd1bmcgc3RlaGVuLiBFaW5lIMO8YmVyZ2ViZW5lIERhdGVpIG11c3MgaW0gRm9ybWF0IGRlciBTdGFuZGFyZGRhdGVpIGVudHNwcmVjaGVuLCB3ZWxjaGUgPGEgaHJlZj0iJXMiIHRhcmdldD0iX2JsYW5rIj5oaWVyIGFscyBCZXNwaWVsIGhlcnVudGVyZ2VsYWRlbiB3ZXJkZW4ga2FubjwvYT4uIFdpcmQga2VpbmUgRGF0ZWkgw7xiZXJnZWJlbiwgd2lyZCBkaWUgU3RhbmRhcmQtRGF0ZWkgdmVyd2VuZGV0LiA=">
-                <source>Die optionale XML-Datei zur Konfiguration der QM-Subsegment-Kriterien bestimmt, welche QM-Subsegment Fehlerkategorien während des Lektorats zur Verfügung stehen. Eine übergebene Datei muss im Format der Standarddatei entsprechen, welche 
-                    <a href="%s" target="_blank">hier als Bespiel heruntergeladen werden kann</a>. Wird keine Datei übergeben, wird die Standard-Datei verwendet. 
-                </source>
-                <target>The optional XML file for the configuration of the QM subsegment criteria determines which QM subsegment error categories are  available during the proofreading. A given file must be in the same format as the default file, which 
-                    <a href="%s" target="_blank"> can be downloaded here as an example </a>. If no file is given, the default file is used.
-                </target>
+                <source>Die optionale XML-Datei zur Konfiguration der QM-Subsegment-Kriterien bestimmt, welche QM-Subsegment Fehlerkategorien während des Lektorats zur Verfügung stehen. Eine übergebene Datei muss im Format der Standarddatei entsprechen, welche <a href="%s" target="_blank">hier als Bespiel heruntergeladen werden kann</a>. Wird keine Datei übergeben, wird die Standard-Datei verwendet.</source>
+                <target>The optional XML file for the configuration of the QM subsegment criteria determines which QM subsegment error categories are  available during the proofreading. A given file must be in the same format as the default file, which <a href="%s" target="_blank"> can be downloaded here as an example </a>. If no file is given, the default file is used.</target>
             </trans-unit>
-
             <trans-unit id="QmVpIEZyYWdlbiB6dSB0cmFuc2xhdGU1Og==">
                 <source>Bei Fragen zu translate5:</source>
                 <target>For questions about translate5:</target>
             </trans-unit>
             <trans-unit id="UXVhbGl0w6R0c2dlc2ljaGVydGUgVmVyc2lvbiAtIDxhIGhyZWY9Imh0dHA6Ly93d3cubWl0dGFncWkuY29tL3dpbGxrb21tZW4vaW1wcmVzc3VtIiB0YXJnZXQ9Il9ibGFuayI+Yml0dGUgZnJhZ2VuIFNpZSB1bnMgYW4hPC9hPg==">
-                <source>Qualitätsgesicherte Version - 
-                    <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">bitte fragen Sie uns an!</a>
+                <source>Qualitätsgesicherte Version - <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">bitte fragen Sie uns an!</a>
                 </source>
-                <target>Quality-assured version - 
-                    <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">please ask us!</a>
+                <target>Quality-assured version - <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">please ask us!</a>
                 </target>
             </trans-unit>
+<trans-unit id='dHJhbnNsYXRlNSBRdWVsbGNvZGUgYXVmIGJpdGJ1Y2tldC5vcmc='>
+    <source>translate5 Quellcode auf bitbucket.org</source>
+    <target>translate5 source code on bitbucket.org</target>
+</trans-unit>
+<trans-unit id='RGVyIGxldHp0ZSBTdGFuZCBkZXIgRW50d2lja2x1bmcgdm9uIHRyYW5zbGF0ZTUgaXN0IGpld2VpbHMgPGEgaHJlZj0iJXMiIHRhcmdldD0iX2JsYW5rIj5hdWYgYml0YnVja2V0Lm9yZyB2ZXLDtmZmZW50bGljaHQ8L2E+Lg=='>
+    <source>Der letzte Stand der Entwicklung von translate5 ist jeweils <a href="%s" target="_blank">auf bitbucket.org veröffentlicht</a>.</source>
+    <target>The latest state of development of translate5<a href="%s" target="_blank"> is always published on bitbucket.org</a>.</target>
+</trans-unit>
             <trans-unit id="Z2l0aHViIGRpZW50IGRlciBFbnR3aWNrbHVuZyBhbHMgUmVwb3NpdG9yeSB1bmQgZW50aMOkbHQgZGVuIGxldHp0ZW4gU3RhbmQgZGVyIEVudHdpY2tsdW5nLiBEaWVzZXIgaXN0IG51ciBiZWRpbmd0IGbDvHIgZGVuIFByb2R1a3RpdmVpbnNhdHogZ2VlaWduZXQgdW5kIGthbm4gRmVobGVyIGVudGhhbHRlbiE8YnI+PGJyPiBFaW4gcXVhbGl0w6R0c2dlc2ljaGVydGVzIFJlbGVhc2UsIHdlbGNoZXMgYmVyZWl0cyBhbGxlIEFiaMOkbmdpZ2tlaXRlbiBrb3JyZWt0IGVudGjDpGx0IGVyaGFsdGVuIFNpZSA8YSBocmVmPSJodHRwOi8vd3d3Lm1pdHRhZ3FpLmNvbS93aWxsa29tbWVuL2ltcHJlc3N1bSIgdGFyZ2V0PSJfYmxhbmsiPmdlcm4gdm9uIHVucyBhdWYgQW5mcmFnZTwvYT4uIERpZSBWZXLDtmZmZW50bGljaHVuZyBhdWYgZ2l0aHViIGlzdCBmw7xyIEVudHdpY2tsZXIgZ2VkYWNodC4=">
-                <source>github dient der Entwicklung als Repository und enthält den letzten Stand der Entwicklung. Dieser ist nur bedingt für den Produktiveinsatz geeignet und kann Fehler enthalten!
+                <source>Bitbucket dient der Entwicklung als Repository und enthält den letzten Stand der Entwicklung. Dieser ist nur bedingt für den Produktiveinsatz geeignet und kann Fehler enthalten!
                     <br/>
                     <br/> Ein qualitätsgesichertes Release, welches bereits alle Abhängigkeiten korrekt enthält erhalten Sie 
-                    <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">gern von uns auf Anfrage</a>. Die Veröffentlichung auf github ist für Entwickler gedacht.
+                    <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">gern von uns auf Anfrage</a>. Die Veröffentlichung auf bitbucket.org ist für Entwickler gedacht.
                 </source>
-                <target>github serves as the development repository and contains the latest state of development. It is suitable for development use only and may contain errors!
+                <target>Bitbucket serves as the development repository and contains the latest state of development. It is suitable for development use only and may contain errors!
                     <br/> A quality-assured release, which already contains all the dependencies correctly, is receivable 
-                    <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank"> from us on request </a>. The source code on github is intended for developers.   
+                    <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank"> from us on request </a>. The source code on bitbucket.org is intended for developers.   
                 </target>
             </trans-unit>
             <trans-unit id="dHJhbnNsYXRlNSBFbnR3aWNrbGVyLVJlcG9zaXRvcnkgYXVmIGdpdGh1Yg==">
-                <source>translate5 Entwickler-Repository auf github</source>
-                <target>translate5 developer repository on github</target>
+                <source>translate5 Entwickler-Repository auf bitbucket.org</source>
+                <target>translate5 developer repository on bitbucket.org</target>
             </trans-unit>
             <trans-unit id="dHJhbnNsYXRlNSBpc3QgYXVmIGF1ZiBtZWhyZXJlIGdpdGh1Yi1SZXBvc2l0b3JpZXMgdmVydGVpbHQgdW5kIGJlbsO2dGlndCBkYXLDvGJlciBoaW5hdXMgZWluZSBSZWloZSBleHRlcm5lciBCaWJsaW90aGVrZW4uIERhcyBoaWVyYXJjaGlzY2ggb2JlcnN0ZSBSZXBvc2l0b3J5IGlzdCAidHJhbnNsYXRlNSIsIHdlbGNoZXMgZGllIEFiaMOkbmdpZ2tlaXRlbiBhbHMgZ2l0LXN1Ym1vZHVsZSBvZGVyIFZlcndlaXNlIGVudGjDpGx0Lg==">
-                <source>translate5 ist auf auf mehrere github-Repositories verteilt und benötigt darüber hinaus eine Reihe externer Bibliotheken. Das hierarchisch oberste Repository ist "translate5", welches die Abhängigkeiten als git-submodule oder Verweise enthält.</source>
-                <target>translate5 is spread over multiple github repositories and also requires a number of external libraries. The top repository is "translate5", which contains the dependencies as submodules or references.</target>
+                <source>translate5 ist auf auf mehrere Bitbucket-Repositories verteilt und benötigt darüber hinaus eine Reihe externer Bibliotheken. Das hierarchisch oberste Repository ist "translate5", welches die Abhängigkeiten als git-submodule oder Verweise enthält.</source>
+                <target>translate5 is spread over multiple Bitbucket repositories and also requires a number of external libraries. The top repository is "translate5", which contains the dependencies as submodules or references.</target>
             </trans-unit>
             <trans-unit id="PGI+Qml0dGUgYmVhY2h0ZW4gU2llOjwvYj4gRGllc2UgdHJhbnNsYXRlNSBEZW1vdmVyc2lvbiBpc3Qgw7ZmZmVudGxpY2gsIGFsbGUgaG9jaGdlbGFkZW5lbiBQcm9qZWt0ZSBrw7ZubmVuIHZvbiBqZWRlbSBlaW5nZXNlaGVuIHdlcmRlbi4gRWluIEV4cG9ydCBzcGllbHQgYWxsZSBha3R1ZWxsIGVpbmdlY2hlY2t0ZW4gRGF0ZWllbiBlaW5lcyBQcm9qZWt0ZXMgYXVzLg==">
                 <source>
