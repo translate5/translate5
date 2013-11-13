@@ -31,7 +31,6 @@
              with FLOSS exceptions (see floss-exception.txt and ux-exception.txt at the root level)
  
  END LICENSE AND COPYRIGHT 
- */D LICENSE AND COPYRIGHT 
  */
 
 /**#@++
