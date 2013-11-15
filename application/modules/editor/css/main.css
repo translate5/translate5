@@ -306,6 +306,7 @@ tr.no-users td div {color:#ff0000;}
 .ico-user-save {background-image: url("../images/disk.png");}
 .ico-user-delete {background-image: url("../images/user_delete.png");}
 .ico-user-reset-pw {background-image: url("../images/lock_go.png");}
+.ico-setting-save {background-image: url("../images/disk.png");}
 .not-editable .ico-user-delete {display:none;}
 .not-editable .ico-user-reset-pw {display:none;}
 

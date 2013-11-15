@@ -120,13 +120,15 @@ Ext.define('Editor.view.ui.preferences.Window', {
           items: [
             {
               xtype: 'button',
-              itemId: 'cancelBtn',
-              text: this.item_cancelBtn
+              iconCls: 'ico-setting-save',
+              itemId: 'saveBtn',
+              text: this.item_saveBtn
             },
             {
               xtype: 'button',
-              itemId: 'saveBtn',
-              text: this.item_saveBtn
+              iconCls: 'ico-cancel',
+              itemId: 'cancelBtn',
+              text: this.item_cancelBtn
             }
           ]
         }

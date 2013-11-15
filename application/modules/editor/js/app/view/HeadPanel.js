@@ -45,7 +45,6 @@ Ext.define('Editor.view.HeadPanel', {
         task: '#UT#Aufgabe',
         logout: '#UT# Abmelden',
         tasks: '#UT#Aufgaben',
-        settings: '#UT# Meine Einstellungen',
         loggedinAs: '#UT# Eingeloggter Benutzer',
         loginName: '#UT# Loginname',
         back: '#UT#zurück zur Aufgabenliste',
@@ -88,10 +87,6 @@ Ext.define('Editor.view.HeadPanel', {
                     ui: 'footer',
                     items: [{
                         xtype: 'tbfill'
-                    },{
-                        xtype: 'button',
-                        hidden: true, //FIXME nextRelease Thomas diesen Button erst im zweiten Schritt
-                        text: me.strings.settings
                     },{
                         xtype: 'button',
                         text: me.strings.tasks,
