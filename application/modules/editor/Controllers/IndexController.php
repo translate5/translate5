@@ -270,8 +270,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             'Preferences', 'MetaPanel', 'Fileorder', 'Localizer',
             'ChangeAlike', 'Comments');
         
-        $controllers[] = 'HeadPanel'; //Bei ITL wird der nicht benötigt
-        $controllers[] = 'UserPreferences'; //Bei ITL & BEO wird der nicht benötigt
+        if($acl->isInAllowedRoles($userSession->data->roles,'headPanelFrontendController')){
+            $controllers[] = 'HeadPanel'; //Bei ITL wird der nicht benötigt
+        }
+        if($acl->isInAllowedRoles($userSession->data->roles,'userPrefFrontendController')){
+            $controllers[] = 'UserPreferences'; //Bei ITL & BEO wird der nicht benötigt
+        }
         
         if($ed->enableQmSubSegments){
             $controllers[] = 'QmSubSegments';

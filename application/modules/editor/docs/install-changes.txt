@@ -1,5 +1,7 @@
 ### this file holds all changes and necessary configs needed for updates
 ### newest changes on top
+2013-11-15: Look for changes in aclConfig.ini - new frontendControllers introduced
+
 2013-11-07: New INI setting introduced: "enable100pEditWarning" default is true
 
 2013-11-04: Look for ZfExtended-changes
