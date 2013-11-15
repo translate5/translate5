@@ -271,6 +271,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             'ChangeAlike', 'Comments');
         
         $controllers[] = 'HeadPanel'; //Bei ITL wird der nicht benötigt
+        $controllers[] = 'UserPreferences'; //Bei ITL & BEO wird der nicht benötigt
         
         if($ed->enableQmSubSegments){
             $controllers[] = 'QmSubSegments';

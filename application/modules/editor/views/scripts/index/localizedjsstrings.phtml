@@ -476,6 +476,23 @@ Ext.define('Editor.controller.Localizer', {
     };
     
 <?php
+    if($hasFrontendController('Editor.controller.UserPreferences')) {
+?>
+    Editor.controller.UserPreferences.prototype.strings = {
+        settings: '<?php echo $this->translate->_('Meine Einstellungen');?>',
+        pwSave: '<?php echo $this->translate->_('Passwort erfolgreich gespeichert!');?>'
+    };
+    Editor.view.preferences.UserWindow.prototype.title = '<?php echo $this->translate->_('Meine Einstellungen');?>';
+    Editor.view.preferences.UserWindow.prototype.strings = {
+        editPassword: '<?php echo $this->translate->_('Passwort ändern');?>',
+        password: '<?php echo $this->translate->_('Passwort');?>',
+        password_check: '<?php echo $this->translate->_('Passwort Kontrolle');?>',
+        passwordMisMatch: '<?php echo $this->translate->_('Die Passwörter stimmern nicht überein!');?>',
+        saveBtn: '<?php echo $this->translate->_('Speichern');?>',
+        cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>'
+    };
+<?php
+    }
     if($hasFrontendController('Editor.controller.admin.User')){ 
 ?>
     Editor.controller.admin.User.prototype.strings = {
