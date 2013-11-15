@@ -286,6 +286,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         if($acl->isInAllowedRoles($userSession->data->roles,'adminUserFrontendController')){
             $controllers[] = 'admin.User'; //nur PMs
         }
+        //error_log(print_r($controllers,1));
         return $controllers;
     }
     

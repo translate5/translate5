@@ -99,22 +99,22 @@ Ext.define('Editor.controller.Localizer', {
         'Editor.view.admin.ExportMenu',
         'Editor.controller.admin.TaskUserAssoc',
         'Editor.controller.admin.TaskOverview',
-        'Editor.controller.HeadPanel',
         'Editor.view.admin.TaskAddWindow',
         'Editor.view.admin.TaskUserAssocGrid',
         'Editor.view.admin.TaskUserAssocWindow',
         'Editor.view.admin.UserChooseWindow',
-        'Editor.view.HeadPanel',
 <?php
-    if($hasFrontendController('Editor.controller.admin.User')){
+    if($hasFrontendController('Editor.controller.HeadPanel')){
 ?>
-        'Editor.controller.admin.User', //FIXME User Controller loaded
+        'Editor.controller.HeadPanel',
 <?php 
     } 
-    //END FIXME nextRelease Thomas per PHP if die Sprach Defines für den Admin Bereich (je nach Rolle) einbinden.
-    
-    
-    
+    if($hasFrontendController('Editor.controller.admin.User')){
+?>
+        'Editor.controller.admin.User',
+<?php 
+    } 
+    //END FIXME nextRelease Thomas per PHP if die Sprach Defines für den Admin Bereich (je nach Rolle) einbinden. Ein Großteil per $hasFrontendController erledigt, einige noch offen.
     ?>
 		'Editor.MessageBox'
 	],
@@ -339,16 +339,6 @@ Ext.define('Editor.controller.Localizer', {
         "openTaskAdminBtn": '<?php echo $this->translate->_('Aufgabenübersicht');?>'
     };
 
-    Editor.controller.HeadPanel.prototype.strings = {
-        confirmFinish: '<?php echo $this->translate->_('Aufgabe abschließen?');?>', 
-        confirmFinishMsg: '<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>',
-        confirmEnd: '<?php echo $this->translate->_('Aufgabe endgültig beenden?');?>', 
-        confirmEndMsg: '<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer endgültig beenden?');?>',
-        taskClosed: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich verlassen.');?>',
-        taskFinished: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich abgeschlossen.');?>',
-        taskEnded: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich beendet.');?>'
-    };
-
     Editor.controller.admin.TaskOverview.prototype.confirmStrings = {
       "finish":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>"},
       "unfinish":     {title: "<?php echo $this->translate->_('Aufgabe wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich wieder öffnen?');?>"},
@@ -462,6 +452,20 @@ Ext.define('Editor.controller.Localizer', {
         cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>'
     };
     
+    
+<?php
+    if($hasFrontendController('Editor.controller.HeadPanel')){
+?>
+    Editor.controller.HeadPanel.prototype.strings = {
+        confirmFinish: '<?php echo $this->translate->_('Aufgabe abschließen?');?>', 
+        confirmFinishMsg: '<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>',
+        confirmEnd: '<?php echo $this->translate->_('Aufgabe endgültig beenden?');?>', 
+        confirmEndMsg: '<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer endgültig beenden?');?>',
+        taskClosed: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich verlassen.');?>',
+        taskFinished: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich abgeschlossen.');?>',
+        taskEnded: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich beendet.');?>'
+    };
+    
     Editor.view.HeadPanel.prototype.strings = {
         task: '<?php echo $this->translate->_('Aufgabe');?>',
         logout: '<?php echo $this->translate->_('Abmelden');?>',
@@ -474,8 +478,8 @@ Ext.define('Editor.controller.Localizer', {
         endBtn: '<?php echo $this->translate->_('Aufgabe beenden');?>',
         readonly: '<?php echo $this->translate->_(' - schreibgeschützt');?>'
     };
-    
 <?php
+    }//END if($hasFrontendController('Editor.controller.HeadPanel'))
     if($hasFrontendController('Editor.controller.UserPreferences')) {
 ?>
     Editor.controller.UserPreferences.prototype.strings = {
@@ -492,7 +496,7 @@ Ext.define('Editor.controller.Localizer', {
         cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>'
     };
 <?php
-    }
+    }//END if $this->hasFrontendController('Editor.controller.UserPreferences')
     if($hasFrontendController('Editor.controller.admin.User')){ 
 ?>
     Editor.controller.admin.User.prototype.strings = {
