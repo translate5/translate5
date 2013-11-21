@@ -440,9 +440,18 @@ Ext.define('Editor.controller.ChangeAlike', {
    * @return {Editor.model.Segment}
    */
   updateSegment: function(id, data) {
-    var rec = this.getStore('Segments').getById(id);
+    var store = this.getStore('Segments'),
+        rec = store.getById(id);
     if(!rec) {
-      return null;
+      if(!store.prefetchData){
+          return null;
+      }
+      rec = store.prefetchData.findBy(function(rec){
+          return rec.internalId == id;
+      });
+      if(!rec) {
+          return null;
+      }
     }
     rec._editorDataSave = Ext.apply({}, rec.data);
     rec.beginEdit();
