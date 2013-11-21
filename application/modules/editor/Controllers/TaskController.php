@@ -623,5 +623,6 @@ class editor_TaskController extends ZfExtended_RestController {
         header('Content-Type: application/zip');
         header('Content-Disposition: attachment; filename="'.$this->entity->getTasknameForDownload($suffix).'"');
         readfile($zipFile);
+        exit;
     }
 }
