@@ -286,7 +286,7 @@ class editor_Models_Import_InvokeTermTagger {
         $localEncoded = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('LocalEncoded');
         $files = file($this->termTagFileList);
         foreach ($files as $file) {
-            $file = trim($file);
+            $file = $localEncoded->encode(trim($file));
             rename($file,$file.'.untagged');
             rename($file.'.xlf',$file);
         }
