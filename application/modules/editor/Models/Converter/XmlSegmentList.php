@@ -99,6 +99,15 @@ class editor_Models_Converter_XmlSegmentList {
         $lang->load($task->getTargetLang());
         $targetLang = $lang->getRfc5646();
         
+        $relaisLang = $task->getRelaisLang();
+        if(empty($relaisLang)){
+            $relaisLang = false;
+        }
+        else {
+            $lang->load($task->getRelaisLang());
+            $relaisLang = $lang->getRfc5646();
+        }
+        
         $result = array('<?xml version="1.0" encoding="UTF-8"?>');
         $result[] = '<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dx="http://www.interoperability-now.org/schema" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-doc-1_0_extensions.xsd" dx:version="1.4" xmlns:translate5="http://www.translate5.net/" >';
         $result[] = '<!-- attention: currently the usage of g- and x-tags in this doc is not completely in line with the xliff:doc-spec. This will change, when resources for this issue will be assigned -->';
@@ -130,7 +139,10 @@ class editor_Models_Converter_XmlSegmentList {
             $result[] = '<source>'.$this->prepareText($segment['source']).'</source>';
             $matchRate = number_format($segment['matchRate'], 1, '.', '');
             $result[] = '<target dx:match-quality="'.$matchRate.'">'.$this->prepareText($segment['edited']).'</target>';
-
+            $result[] = '<alt-trans><target xml:lang="'.$targetLang.'">'.$this->prepareText($segment['target']).'</target></alt-trans>';
+            if($relaisLang !== false) {
+                $result[] = '<alt-trans><target xml:lang="'.$relaisLang.'">'.$this->prepareText($segment['relais']).'</target></alt-trans>';
+            }
             if(!empty($segment['comments'])) {
                 $comments = $this->comment->loadBySegmentAndTaskPlain((integer)$segment['id'], $task->getTaskGuid());
                 $note = '<dx:note dx:modified-by="%1$s" dx:annotates="target" dx:modified-at="%2$s">%3$s</dx:note>';
