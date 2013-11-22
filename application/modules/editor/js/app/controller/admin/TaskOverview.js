@@ -447,14 +447,17 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * @param {Editor.model.admin.Task} task
    * @param {Ext.EventObjectImpl} event
    */
-  handleTaskExport: function(task, event) {
+  handleTaskShowexportmenu: function(task, event) {
       var me = this,
           hasQm = task.hasQmSub(),
+          exportAllowed = me.isAllowed('editorExportTask'),
           menu;
       if(!me.exportMenu) {
           me.exportMenu = Ext.widget('adminExportMenu');
       }
       menu = me.exportMenu;
+      menu.down('#exportItem').setVisible(exportAllowed);
+      menu.down('#exportDiffItem').setVisible(exportAllowed);
       menu.down('#exportTargetQmItem').setVisible(hasQm);
       menu.down('#exportSourceQmItem').setVisible(hasQm && task.isSourceEditable());
       menu.showAt(event.getXY());

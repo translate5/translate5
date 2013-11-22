@@ -60,12 +60,12 @@ Ext.define('Editor.view.admin.ExportMenu', {
     me.items = [{
         itemId: 'exportItem',
         hrefTarget: '_blank',
-        href: path+'task/{0}?export=1',
+        href: path+'task/export/id/{0}',
         text: me.messages.exportDef
     },{
         itemId: 'exportDiffItem',
         hrefTarget: '_blank',
-        href: path+'task/{0}?export=1&diff=1',
+        href: path+'task/export/id/{0}/diff/1',
         text : me.messages.exportDiff
     },{
         itemId: 'exportTargetQmItem',

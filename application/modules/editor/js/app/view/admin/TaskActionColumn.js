@@ -106,8 +106,8 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
               // - Export Icon, bei Klick darauf öffnet sich ein Menü mit den verschiedenen Export Möglichkeiten. 
               // Die einzelnen Menüpunkte ebenfalls per isAllowed abfragen. 
               tooltip: me.messages.exp,
-              isAllowedFor: 'editorExportTask',
-              iconCls: 'ico-task-export'
+              isAllowedFor: 'editorShowexportmenuTask',
+              iconCls: 'ico-task-showexportmenu'
           },{
               tooltip: me.messages.actionDelete,
               isAllowedFor: 'editorDeleteTask',

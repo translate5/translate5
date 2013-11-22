@@ -65,7 +65,8 @@ Ext.define('Editor.model.admin.User', {
     }
   },
   isAllowed: function(right, task) {
-      var isAllowed = (Ext.Array.indexOf(Editor.data.app.userRights, right) >= 0);
+      var me = this,
+          isAllowed = (Ext.Array.indexOf(Editor.data.app.userRights, right) >= 0);
       if(!task) {
           return isAllowed;
       }
@@ -107,6 +108,11 @@ Ext.define('Editor.model.admin.User', {
           case 'editorUnfinishTask':
               //if user is not associated to the task or task is not finished, it cant be unfinished
               if(task.get('userRole') == '' || !task.isFinished() || task.isEnded()) {
+                  return false;
+              }
+              break;
+          case 'editorShowexportmenuTask':
+              if(!task.hasQmSub() && !me.isAllowed('editorExportTask')){
                   return false;
               }
               break;
