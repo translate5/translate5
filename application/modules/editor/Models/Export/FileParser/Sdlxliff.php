@@ -137,9 +137,10 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
      * entfernt dabei Informationen zu trans[Not]Found
      * 
      * @param string $segment
+     * @param boolean $rermoveTermTags, default = true
      * @return string $segment
      */
-    protected function recreateTermTags($segment) {
+    protected function recreateTermTags($segment,$rermoveTermTags=true) {
         $segmentArr = preg_split('/<div\s*class="term([^"]+)"\s+id="([^"]+)-\d+"[^>]*>/s', $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
         
         $cssClassFilter = function($input) {
@@ -147,6 +148,10 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         };
         
         $count = count($segmentArr);
+        $closingTag =  '</mrk>';
+        if($rermoveTermTags){
+            $closingTag = '';
+        }
         for ($i = 1; $i < $count; $i = $i + 3) {
             $tagExpl/* segment aufgespalten an den öffenden Tags */ = explode('<div', $segmentArr[$i + 2]/* segmentteil hinter öffnendem Termtag */);
             $openTagCount = 0;
@@ -161,7 +166,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
                         ($containsOpeningTag === false and $numOfClosedDiv === 1))) {
                     $parts = explode('</div>', $tagExpl[$j]); //der letzte </div> muss der schließende mrk-Tag sein, da ja kein div-Tag innerhalb des Term-Tags mehr geöffnet ist
                     $end = array_pop($parts);
-                    $tagExpl[$j] = implode('</div>', $parts) . '</mrk>' . $end;
+                    $tagExpl[$j] = implode('</div>', $parts) . $closingTag. $end;
                     break; //go to the next termtag, because this one is now closed.
                 } elseif (($containsOpeningTag === true and $numOfClosedDiv > 1)
                         or
@@ -171,11 +176,17 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
                     $openTagCount++;
                 }
             }
-            $cssClasses = explode(' ', trim($segmentArr[$i]));
-            //@todo actually were removing the trans[Not]Found info. 
-            //it would be better to set it for source segments by checking the target if the term exists  
-            $segmentArr[$i] = join('-', array_filter($cssClasses, $cssClassFilter));
-            $segmentArr[$i] = '<mrk mtype="x-term-' . $segmentArr[$i] . '" mid="' . $segmentArr[$i + 1] . '">' . implode('<div', $tagExpl);
+            if(!$rermoveTermTags){
+                $cssClasses = explode(' ', trim($segmentArr[$i]));
+                //@todo actually were removing the trans[Not]Found info. 
+                //it would be better to set it for source segments by checking the target if the term exists  
+                $segmentArr[$i] = join('-', array_filter($cssClasses, $cssClassFilter));
+                $segmentArr[$i] = '<mrk mtype="x-term-' . $segmentArr[$i] . '" mid="' . $segmentArr[$i + 1] . '">';
+            }
+            else{
+                $segmentArr[$i] = '';
+            }
+            $segmentArr[$i] .= implode('<div', $tagExpl);
             unset($segmentArr[$i + 1]);
             unset($segmentArr[$i + 2]);
         }

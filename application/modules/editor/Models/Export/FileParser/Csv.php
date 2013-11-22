@@ -82,10 +82,10 @@ class editor_Models_Export_FileParser_Csv extends editor_Models_Export_FileParse
      * - nothing todo here for csv so far, cause termtagging is not supported so far
      * 
      * @param string $segment
+     * @param boolean $rermoveTermTags, default = true
      * @return string $segment
      */
-
-    protected function recreateTermTags($segment){
+    protected function recreateTermTags($segment,$rermoveTermTags=true) {
         return $segment;
     }
     /**
