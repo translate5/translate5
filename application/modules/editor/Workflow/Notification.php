@@ -156,7 +156,7 @@ class editor_Workflow_Notification {
         foreach($pms as $pm) {
             $params['user'] = $pm;
             $this->createNotification('pm', __FUNCTION__, $params); //@todo PM currently not defined as WORKFLOW_ROLE, so hardcoded here
-            $this->attachXmlSegmentList($segmentHash, $segments);
+            $this->attachXliffSegmentList($segmentHash, $segments);
             $this->notify($pm);
         }
         
@@ -168,7 +168,7 @@ class editor_Workflow_Notification {
         foreach($users as $user) {
             $params['user'] = $user;
             $this->createNotification($nextRole, __FUNCTION__, $params);
-            $this->attachXmlSegmentList($segmentHash, $segments);
+            $this->attachXliffSegmentList($segmentHash, $segments);
             $this->notify($user);
         }
     }
@@ -178,7 +178,7 @@ class editor_Workflow_Notification {
      * @param string $segmentHash
      * @param array $segments
      */
-    protected function attachXmlSegmentList($segmentHash, array $segments) {
+    protected function attachXliffSegmentList($segmentHash, array $segments) {
         if(empty($segments)) {
             return;
         }
@@ -193,7 +193,7 @@ class editor_Workflow_Notification {
             'mimeType' => Zend_Mime::TYPE_OCTETSTREAM,
             'disposition' => Zend_Mime::DISPOSITION_ATTACHMENT,
             'encoding' => Zend_Mime::ENCODING_BASE64,
-            'filename' => 'changes.xml',
+            'filename' => 'changes.xliff',
         );
         $this->mailer->setAttachment(array($attachment));
     }
