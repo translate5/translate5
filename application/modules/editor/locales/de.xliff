@@ -637,6 +637,11 @@ Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-M
 <trans-unit id='QmVhY2h0dW5nIHZvbiBBbndlaXN1bmdlbg=='><source>Beachtung von Anweisungen</source><target>Beachtung von Anweisungen</target></trans-unit>
 <trans-unit id='S29uc2lzdGVueg=='><source>Konsistenz</source><target>Konsistenz</target></trans-unit>
 <trans-unit id='QWNodHVuZywgU2llIGVkaXRpZXJlbiBlaW5lbiAxMDAlIE1hdGNoIQ=='><source>Achtung, Sie editieren einen 100% Match!</source><target>Achtung, Sie editieren einen 100% Match!</target></trans-unit>
+<trans-unit id='RGVyemVpdCBsw6R1ZnQgYmVyZWl0cyBlaW4gRXhwb3J0IGbDvHIgZGllc2VuIFRhc2suIEJpdHRlIHZlcnN1Y2hlbiBTaWUgZXMgaW4gZWluaWdlciBaZWl0IG5vY2htYWxzLg=='><source>Derzeit läuft bereits ein Export für diesen Task. Bitte versuchen Sie es in einiger Zeit nochmals.</source><target>Derzeit läuft bereits ein Export für diesen Task. Bitte versuchen Sie es in einiger Zeit nochmals.</target></trans-unit>
+<trans-unit id='WmZFeHRlbmRlZF9Ob3RGb3VuZEV4Y2VwdGlvbiBLZXk6IFpmRXh0ZW5kZWRfTW9kZWxzX0VudGl0eV9BYnN0cmFjdCNQSzsgVmFsdWU6IA=='><source>ZfExtended_NotFoundException Key: ZfExtended_Models_Entity_Abstract#PK; Value: </source><target>ZfExtended_NotFoundException Key: ZfExtended_Models_Entity_Abstract#PK; Value: </target></trans-unit>
+<trans-unit id='IC0gbWl0IMOEbmRlcnVuZ2VuIG5hY2h2ZXJmb2xnZW4uemlw'><source> - mit Änderungen nachverfolgen.zip</source><target> - mit Änderungen nachverfolgen.zip</target></trans-unit>
+<trans-unit id='IC0gbWl0IEFlbmRlcnVuZ2VuIG5hY2h2ZXJmb2xnZW4uemlw'><source> - mit Aenderungen nachverfolgen.zip</source><target> - mit Aenderungen nachverfolgen.zip</target></trans-unit>
+<trans-unit id='RXhwb3J0b3B0aW9uZW4='><source>Exportoptionen</source><target>Exportoptionen</target></trans-unit>
   </body>
  </file>
 </xliff>

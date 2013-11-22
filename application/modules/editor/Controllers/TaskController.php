@@ -588,18 +588,14 @@ class editor_TaskController extends ZfExtended_RestController {
                     $this->user->data->userGuid, true)){
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
-        if($this->_getParam('export', false)) {
-            $this->handleExport();
-        }
-        else {
-            return $res;
-        }
+        return $res;
     }
     
     /**
      * does the export as zip file.
      */
-    protected function handleExport() {
+    public function exportAction() {
+        parent::getAction();
         $diff = (boolean)$this->getRequest()->getParam('diff');
 
         $export = ZfExtended_Factory::get('editor_Models_Export');
@@ -614,7 +610,7 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         $zipFile = $export->exportToZip();
         if($diff) {
-            $suffix = ' - with history.zip';
+            $suffix = $translate->_(' - mit Aenderungen nachverfolgen.zip');
         }
         else {
             $suffix = '.zip';
