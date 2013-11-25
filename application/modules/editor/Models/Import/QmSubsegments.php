@@ -68,7 +68,7 @@
         if(!file_exists($qmFlagXmlFile) && ! is_readable($qmFlagXmlFile)) {
             //if task-specific file does not exist, take the standard one
             $qmFlagXmlFile = APPLICATION_PATH.
-                DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.
+                DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.
                 APPLICATION_RUNDIR.
                 $config->runtimeOptions->editor->qmFlagXmlFileDir.
                 DIRECTORY_SEPARATOR.
