@@ -131,17 +131,22 @@ abstract class editor_Models_Export_FileParser {
      */
 
     protected function getSegment(integer $segmentId) {
+        $config = Zend_Registry::get('config');
+        $removeTaggingOnExport = $config->runtimeOptions->termTagger->removeTaggingOnExport;
         $this->_segmentEntity = ZfExtended_Factory::get('ZfExtended_Models_Entity', array('editor_Models_Db_Segments',
                     array()));
         $this->_segmentEntity->load($segmentId);
         
         $edited = (string) $this->_segmentEntity->getEdited();
-        $edited = $this->recreateTermTags($edited);
-        $edited = $this->parseSegment($edited);
         
         if(!$this->_diff){
+            $edited = $this->recreateTermTags($edited,(boolean)$removeTaggingOnExport->normalExport);
+            $edited = $this->parseSegment($edited);
             return $edited;
         }
+        
+        $edited = $this->recreateTermTags($edited,(boolean)$removeTaggingOnExport->diffExport);
+        $edited = $this->parseSegment($edited);
         
         $target = (string) $this->_segmentEntity->getTarget();
         $target = $this->recreateTermTags($target);
@@ -237,10 +242,11 @@ abstract class editor_Models_Export_FileParser {
      * Stellt die Term Auszeichnungen wieder her
      * 
      * @param string $segment
+     * @param boolean $rermoveTermTags, default = false
      * @return string $segment
      */
 
-    abstract protected function recreateTermTags($segment);
+    abstract protected function recreateTermTags($segment,$rermoveTermTags=true);
     /**
      * - converts $this->_exportFile back to the original encoding registered in the LEK_files
      */

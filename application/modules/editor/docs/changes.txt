@@ -1,3 +1,7 @@
+2013-11-22: By default export does not export termTags in the target any more 
+            (but still in the source). Reason is, that Trados Studio sometimes
+            seem to destroy segments when termTags and change-history are contained.
+            The export of termTags in the target can be activated again by application.ini
 2013-10-29: changes in translation process. See ZfExtended/docs/changes.txt
 2013-10-07: new features:
         - Integration of taskoverview and useradministration
