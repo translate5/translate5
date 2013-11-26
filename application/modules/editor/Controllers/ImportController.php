@@ -153,6 +153,7 @@ class Editor_ImportController extends ZfExtended_Controllers_Action {
         $result->taskNr = urldecode($this->_getParam('taskNr','Default taskNr'));//set Default taskNr, if not set
         $result->wordCount = urldecode($this->_getParam('wordCount',0));//set Default wordCount, if not set
         $result->targetDeliveryDate = date("Y-m-d H:i:s",$this->_getParam('targetDeliveryDate',  time()));//set Default targetDeliveryDate, if not set
+        $result->orderDate = date("Y-m-d H:i:s",$this->_getParam('orderDate',  time()));//set Default targetDeliveryDate, if not set
 
         $result->taskGuid = urldecode($this->_getParam('taskGuid'));
         $result->taskName = urldecode($this->_getParam('taskName','Default Task Name'));//set Default Task Name, if not set
