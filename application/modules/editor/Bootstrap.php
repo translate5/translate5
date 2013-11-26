@@ -94,6 +94,14 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap {
     		'action'     => 'terms'
     ));
     $this->front->getRouter()->addRoute('terms', $termsRoute);
+    $exportRoute = new Zend_Controller_Router_Route(
+    	'editor/task/export/*',
+    	array(
+    		'module'     => 'editor',
+    		'controller' => 'task',
+    		'action'     => 'export'
+    ));
+    $this->front->getRouter()->addRoute('export', $exportRoute);
   }
   
   public function _initOtherRoutes() {

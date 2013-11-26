@@ -607,7 +607,40 @@ Ihr Projektmanagement Team
 %5$s
 
 Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail.</target></trans-unit>
+<trans-unit id='UnVzc2lzY2g='><source>Russisch</source><target>Russisch</target></trans-unit>
+<trans-unit id='RGV1dHNjaA=='><source>Deutsch</source><target>Deutsch</target></trans-unit>
+<trans-unit id='RW5nbGlzY2g='><source>Englisch</source><target>Englisch</target></trans-unit>
+<trans-unit id='VHNjaGVjaGlzY2g='><source>Tschechisch</source><target>Tschechisch</target></trans-unit>
+<trans-unit id='RMOkbmlzY2g='><source>Dänisch</source><target>Dänisch</target></trans-unit>
+<trans-unit id='U3BhbmlzY2g='><source>Spanisch</source><target>Spanisch</target></trans-unit>
+<trans-unit id='RmlubmlzY2g='><source>Finnisch</source><target>Finnisch</target></trans-unit>
+<trans-unit id='SmFwYW5pc2No'><source>Japanisch</source><target>Japanisch</target></trans-unit>
+<trans-unit id='TmllZGVybMOkbmRpc2No'><source>Niederländisch</source><target>Niederländisch</target></trans-unit>
+<trans-unit id='RmzDpG1pc2No'><source>Flämisch</source><target>Flämisch</target></trans-unit>
+<trans-unit id='Tm9yd2VnaXNjaCAoQm9rbWFsKQ=='><source>Norwegisch (Bokmal)</source><target>Norwegisch (Bokmal)</target></trans-unit>
+<trans-unit id='UnVtw6RuaXNjaA=='><source>Rumänisch</source><target>Rumänisch</target></trans-unit>
+<trans-unit id='UG9sbmlzY2g='><source>Polnisch</source><target>Polnisch</target></trans-unit>
+<trans-unit id='UG9ydHVnaWVzaXNjaA=='><source>Portugiesisch</source><target>Portugiesisch</target></trans-unit>
+<trans-unit id='VW5nYXJpc2No'><source>Ungarisch</source><target>Ungarisch</target></trans-unit>
+<trans-unit id='QnVsZ2FyaXNjaA=='><source>Bulgarisch</source><target>Bulgarisch</target></trans-unit>
+<trans-unit id='Q2hpbmVzaXNjaA=='><source>Chinesisch</source><target>Chinesisch</target></trans-unit>
+<trans-unit id='RnJhbnrDtnNpc2No'><source>Französisch</source><target>Französisch</target></trans-unit>
+<trans-unit id='VGVybWlub2xvZ2llZmVobGVy'><source>Terminologiefehler</source><target>Terminologiefehler</target></trans-unit>
+<trans-unit id='SW5oYWx0bGljaGVyIEZlaGxlcg=='><source>Inhaltlicher Fehler</source><target>Inhaltlicher Fehler</target></trans-unit>
+<trans-unit id='R3JhbW1hdGlrZmVobGVy'><source>Grammatikfehler</source><target>Grammatikfehler</target></trans-unit>
+<trans-unit id='UmVjaHRzY2hyZWliZmVobGVy'><source>Rechtschreibfehler</source><target>Rechtschreibfehler</target></trans-unit>
+<trans-unit id='WmVpY2hlbnNldHp1bmdzZmVobGVy'><source>Zeichensetzungsfehler</source><target>Zeichensetzungsfehler</target></trans-unit>
+<trans-unit id='U29uc3RpZ2VyIEZlaGxlcg=='><source>Sonstiger Fehler</source><target>Sonstiger Fehler</target></trans-unit>
+<trans-unit id='WmFobGVuL0VpbmhlaXRlbg=='><source>Zahlen/Einheiten</source><target>Zahlen/Einheiten</target></trans-unit>
+<trans-unit id='VGFncw=='><source>Tags</source><target>Tags</target></trans-unit>
+<trans-unit id='VGV4dCB6aWVsZ3J1cHBlbmdlcmVjaHQgKFN0aWwp'><source>Text zielgruppengerecht (Stil)</source><target>Text zielgruppengerecht (Stil)</target></trans-unit>
+<trans-unit id='QmVhY2h0dW5nIHZvbiBBbndlaXN1bmdlbg=='><source>Beachtung von Anweisungen</source><target>Beachtung von Anweisungen</target></trans-unit>
+<trans-unit id='S29uc2lzdGVueg=='><source>Konsistenz</source><target>Konsistenz</target></trans-unit>
 <trans-unit id='QWNodHVuZywgU2llIGVkaXRpZXJlbiBlaW5lbiAxMDAlIE1hdGNoIQ=='><source>Achtung, Sie editieren einen 100% Match!</source><target>Achtung, Sie editieren einen 100% Match!</target></trans-unit>
+<trans-unit id='RGVyemVpdCBsw6R1ZnQgYmVyZWl0cyBlaW4gRXhwb3J0IGbDvHIgZGllc2VuIFRhc2suIEJpdHRlIHZlcnN1Y2hlbiBTaWUgZXMgaW4gZWluaWdlciBaZWl0IG5vY2htYWxzLg=='><source>Derzeit läuft bereits ein Export für diesen Task. Bitte versuchen Sie es in einiger Zeit nochmals.</source><target>Derzeit läuft bereits ein Export für diesen Task. Bitte versuchen Sie es in einiger Zeit nochmals.</target></trans-unit>
+<trans-unit id='WmZFeHRlbmRlZF9Ob3RGb3VuZEV4Y2VwdGlvbiBLZXk6IFpmRXh0ZW5kZWRfTW9kZWxzX0VudGl0eV9BYnN0cmFjdCNQSzsgVmFsdWU6IA=='><source>ZfExtended_NotFoundException Key: ZfExtended_Models_Entity_Abstract#PK; Value: </source><target>ZfExtended_NotFoundException Key: ZfExtended_Models_Entity_Abstract#PK; Value: </target></trans-unit>
+<trans-unit id='IC0gbWl0IEFlbmRlcnVuZ2VuIG5hY2h2ZXJmb2xnZW4uemlw'><source> - mit Aenderungen nachverfolgen.zip</source><target> - mit Aenderungen nachverfolgen.zip</target></trans-unit>
+<trans-unit id='RXhwb3J0b3B0aW9uZW4='><source>Exportoptionen</source><target>Exportoptionen</target></trans-unit>
   </body>
  </file>
 </xliff>

@@ -546,11 +546,12 @@ class editor_TaskController extends ZfExtended_RestController {
         $msgs = array(
             'noZipFile' => 'Bitte eine Zip Datei auswählen.',
         );
+        $translate = Zend_Registry::get('Zend_Translate');
         if(empty($msgs[$errorType])) {
-            $msg = $this->view->translate->_('Unbekannter Fehler beim Dateiupload.');
+            $msg = $translate->_('Unbekannter Fehler beim Dateiupload.');
         }
         else {
-            $msg = $this->view->translate->_($msgs[$errorType]);
+            $msg = $translate->_($msgs[$errorType]);
         }
         $args = func_get_args();
         array_shift($args); //remove type
@@ -587,31 +588,29 @@ class editor_TaskController extends ZfExtended_RestController {
                     $this->user->data->userGuid, true)){
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
-        if($this->_getParam('export', false)) {
-            $this->handleExport();
-        }
-        else {
-            return $res;
-        }
+        return $res;
     }
     
     /**
      * does the export as zip file.
      */
-    protected function handleExport() {
+    public function exportAction() {
+        parent::getAction();
         $diff = (boolean)$this->getRequest()->getParam('diff');
 
         $export = ZfExtended_Factory::get('editor_Models_Export');
+        
+        $translate = Zend_Registry::get('Zend_Translate');
         /* @var $export editor_Models_Export */
         if(!$export->setTaskToExport($this->entity, $diff)){
             //@todo: this should show up in JS-Frontend in a nice way
-            echo $this->view->translate->_(
+            echo $translate->_(
                     'Derzeit läuft bereits ein Export für diesen Task. Bitte versuchen Sie es in einiger Zeit nochmals.');
-            return;
+            exit;
         }
         $zipFile = $export->exportToZip();
         if($diff) {
-            $suffix = ' - with history.zip';
+            $suffix = $translate->_(' - mit Aenderungen nachverfolgen.zip');
         }
         else {
             $suffix = '.zip';
