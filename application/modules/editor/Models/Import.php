@@ -598,6 +598,7 @@ class editor_Models_Import {
         
         $task->setWordCount($params->wordCount);
         $task->setTargetDeliveryDate($params->targetDeliveryDate);
+        $task->setOrderdate($params->orderDate);
         $config = Zend_Registry::get('config');
         //Task based Source Editing can only be enabled if its allowed in the whole editor instance 
         $enableSourceEditing = (bool) $config->runtimeOptions->import->enableSourceEditing;

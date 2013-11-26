@@ -38,7 +38,7 @@
 $modified = new Zend_Date($this->comment['modified']);
 ?>
 <div class="comment">
-    <span class="content"><?php echo $this->comment['comment']; ?></span>
-    <span class="author"><?php echo $this->comment['userName']; ?></span>
+    <span class="content"><?php echo htmlspecialchars($this->comment['comment']); ?></span>
+    <span class="author"><?php echo htmlspecialchars($this->comment['userName']); ?></span>
     <span class="modified"><?php echo $modified; ?></span>
 </div>
