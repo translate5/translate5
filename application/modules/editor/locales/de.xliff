@@ -639,9 +639,103 @@ Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-M
 <trans-unit id='QWNodHVuZywgU2llIGVkaXRpZXJlbiBlaW5lbiAxMDAlIE1hdGNoIQ=='><source>Achtung, Sie editieren einen 100% Match!</source><target>Achtung, Sie editieren einen 100% Match!</target></trans-unit>
 <trans-unit id='RGVyemVpdCBsw6R1ZnQgYmVyZWl0cyBlaW4gRXhwb3J0IGbDvHIgZGllc2VuIFRhc2suIEJpdHRlIHZlcnN1Y2hlbiBTaWUgZXMgaW4gZWluaWdlciBaZWl0IG5vY2htYWxzLg=='><source>Derzeit läuft bereits ein Export für diesen Task. Bitte versuchen Sie es in einiger Zeit nochmals.</source><target>Derzeit läuft bereits ein Export für diesen Task. Bitte versuchen Sie es in einiger Zeit nochmals.</target></trans-unit>
 <trans-unit id='WmZFeHRlbmRlZF9Ob3RGb3VuZEV4Y2VwdGlvbiBLZXk6IFpmRXh0ZW5kZWRfTW9kZWxzX0VudGl0eV9BYnN0cmFjdCNQSzsgVmFsdWU6IA=='><source>ZfExtended_NotFoundException Key: ZfExtended_Models_Entity_Abstract#PK; Value: </source><target>ZfExtended_NotFoundException Key: ZfExtended_Models_Entity_Abstract#PK; Value: </target></trans-unit>
-<trans-unit id='IC0gbWl0IMOEbmRlcnVuZ2VuIG5hY2h2ZXJmb2xnZW4uemlw'><source> - mit Änderungen nachverfolgen.zip</source><target> - mit Änderungen nachverfolgen.zip</target></trans-unit>
 <trans-unit id='IC0gbWl0IEFlbmRlcnVuZ2VuIG5hY2h2ZXJmb2xnZW4uemlw'><source> - mit Aenderungen nachverfolgen.zip</source><target> - mit Aenderungen nachverfolgen.zip</target></trans-unit>
 <trans-unit id='RXhwb3J0b3B0aW9uZW4='><source>Exportoptionen</source><target>Exportoptionen</target></trans-unit>
+<trans-unit id='UGFzc3dvcnQgZXJmb2xncmVpY2ggZ2VzcGVpY2hlcnQh'><source>Passwort erfolgreich gespeichert!</source><target>Passwort erfolgreich gespeichert!</target></trans-unit>
+<trans-unit id='PGJyIC8+CjxiciAvPgpTaWUgZXJyZWljaGVuIGRhcyBQb3J0YWwgdW50ZXI6IDxhIGhyZWY9IiUxJHMiPiUxJHM8L2E+PGJyIC8+CjxiciAvPgo8YnIgLz5WaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKPGJyIC8+SWhyIFByb2pla3RtYW5hZ2VtZW50IFRlYW0KPGJyIC8+JTIkcwo8YnIgLz4KPGJyIC8+RGllc2UgRW1haWwgd3VyZGUgYXV0b21hdGlzY2ggZ2VuZXJpZXJ0LiBCaXR0ZSBhbnR3b3J0ZW4gU2llIG5pY2h0IGF1ZiBkaWVzZSBFLU1haWwh'><source><br />
+<br />
+Sie erreichen das Portal unter: <a href="%1$s">%1$s</a><br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%2$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source><target><br />
+<br />
+Sie erreichen das Portal unter: <a href="%1$s">%1$s</a><br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%2$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</target></trans-unit>
+<trans-unit id='JTEkcyAlMiRzLAoKJTMkcwolNCRzCiU3JHM='><source>%1$s %2$s,
+
+%3$s
+%4$s
+%7$s</source><target>%1$s %2$s,
+
+%3$s
+%4$s
+%7$s</target></trans-unit>
+<trans-unit id='bGVjdG9y'><source>lector</source><target>lector</target></trans-unit>
+<trans-unit id='JTEkcyAlMiRzLDxiciAvPgo8YnIgLz4KJTMkczxiciAvPgolNCRzPGJyIC8+CkltIGZvbGdlbmRlbiBkaWUgZ2V0w6R0aWd0ZW4gw4RuZGVydW5nZW4gZGVyIHp1dm9yIGFrdGl2ZW4gQmVudXR6ZXIgZGVyIFJvbGxlIDxiPiU1JHM8L2I+OjxiciAvPgolNiRzCjxociAvPgolNyRz'><source>%1$s %2$s,<br />
+<br />
+%3$s<br />
+%4$s<br />
+Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <b>%5$s</b>:<br />
+%6$s
+<hr />
+%7$s</source><target>%1$s %2$s,<br />
+<br />
+%3$s<br />
+%4$s<br />
+Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <b>%5$s</b>:<br />
+%6$s
+<hr />
+%7$s</target></trans-unit>
+<trans-unit id='JTEkcyAlMiRzLAoKSW0gUHJvamVrdHBvcnRhbCBUcmFuc2xhdGU1IHd1cmRlIGRpZSBBdWZnYWJlICU1JHMgLSAlNiRzIGbDvHIgU2llIGZyZWlnZWdlYmVuLgoKU2llIGVycmVpY2hlbiBkYXMgUG9ydGFsIHVudGVyOiAlMyRzCgpWaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKSWhyIFByb2pla3RtYW5hZ2VtZW50IFRlYW0KJTckcwoKRGllc2UgRW1haWwgd3VyZGUgYXV0b21hdGlzY2ggZ2VuZXJpZXJ0LiBCaXR0ZSBhbnR3b3J0ZW4gU2llIG5pY2h0IGF1ZiBkaWVzZSBFLU1haWwh'><source>%1$s %2$s,
+
+Im Projektportal Translate5 wurde die Aufgabe %5$s - %6$s für Sie freigegeben.
+
+Sie erreichen das Portal unter: %3$s
+
+Vielen Dank und viele Grüße,
+Ihr Projektmanagement Team
+%7$s
+
+Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source><target>%1$s %2$s,
+
+Im Projektportal Translate5 wurde die Aufgabe %5$s - %6$s für Sie freigegeben.
+
+Sie erreichen das Portal unter: %3$s
+
+Vielen Dank und viele Grüße,
+Ihr Projektmanagement Team
+%7$s
+
+Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</target></trans-unit>
+<trans-unit id='JTEkcyAlMiRzLDxiciAvPgo8YnIgLz4KSW0gUHJvamVrdHBvcnRhbCBUcmFuc2xhdGU1IHd1cmRlIGRpZSBBdWZnYWJlIDxiPiU1JHMgLSAlNiRzPC9iPiBmw7xyIFNpZSBmcmVpZ2VnZWJlbi48YnIgLz4KPGJyIC8+CkltIGZvbGdlbmRlbiBkaWUgZ2V0w6R0aWd0ZW4gw4RuZGVydW5nZW4gZGVyIHZvcmhlcmdlaGVuZGVuIExla3RvcmVuOjxiciAvPgolNCRzCjxociAvPgo8YnIgLz4KPGJyIC8+ClNpZSBlcnJlaWNoZW4gZGFzIFBvcnRhbCB1bnRlcjogJTMkczxiciAvPgo8YnIgLz4KPGJyIC8+VmllbGVuIERhbmsgdW5kIHZpZWxlIEdyw7zDn2UsCjxiciAvPklociBQcm9qZWt0bWFuYWdlbWVudCBUZWFtCjxiciAvPiU3JHMKPGJyIC8+CjxiciAvPkRpZXNlIEVtYWlsIHd1cmRlIGF1dG9tYXRpc2NoIGdlbmVyaWVydC4gQml0dGUgYW50d29ydGVuIFNpZSBuaWNodCBhdWYgZGllc2UgRS1NYWlsIQ=='><source>%1$s %2$s,<br />
+<br />
+Im Projektportal Translate5 wurde die Aufgabe <b>%5$s - %6$s</b> für Sie freigegeben.<br />
+<br />
+Im folgenden die getätigten Änderungen der vorhergehenden Lektoren:<br />
+%4$s
+<hr />
+<br />
+<br />
+Sie erreichen das Portal unter: %3$s<br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%7$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source><target>%1$s %2$s,<br />
+<br />
+Im Projektportal Translate5 wurde die Aufgabe <b>%5$s - %6$s</b> für Sie freigegeben.<br />
+<br />
+Im folgenden die getätigten Änderungen der vorhergehenden Lektoren:<br />
+%4$s
+<hr />
+<br />
+<br />
+Sie erreichen das Portal unter: %3$s<br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%7$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</target></trans-unit>
   </body>
  </file>
 </xliff>
