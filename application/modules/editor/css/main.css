@@ -274,6 +274,17 @@ table.task-users td.username,
 table.task-users td.state {font-weight:bold;}
 table.task-users td.state {padding-right:0;}
 
+/*own heck column*/
+.grid-ownchecker {
+    background-color: transparent;
+    height: 14px;
+}
+.grid-ownchecker-checked {
+    background-image: url("../images/tick-grey.png");
+    background-position: 2px -2px;
+    background-repeat: no-repeat;
+}
+
 /* Task Grid State Styles */
 tr.end td div,
 tr.finished td div {color:#acacac;}

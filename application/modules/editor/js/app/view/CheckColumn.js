@@ -39,12 +39,11 @@ Ext.define('Editor.view.CheckColumn', {
     extend: 'Ext.grid.column.Column',
     alias: 'widget.owncheckcolumn',
     renderer : function(value){
-        var cssPrefix = Ext.baseCSSPrefix,
-            cls = [cssPrefix + 'grid-checkheader'];
+        var cls = ['grid-ownchecker'];
 
         if (value) {
-            cls.push(cssPrefix + 'grid-checkheader-checked');
+            cls.push('grid-ownchecker-checked');
         }
-        return '<div class="' + cls.join(' ') + '">&#160;</div>';
+        return '<div class="' + cls.join(' ') + '">&#160;&#160;&#160;&#160;&#160;</div>';
     }
 });

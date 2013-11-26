@@ -166,47 +166,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
     Ext.applyIf(me, {
       languageStore: Ext.StoreMgr.get('admin.Languages'),
       columns: [{
-          xtype: 'gridcolumn',
-          width: 90,
-          dataIndex: 'taskNr',
-          tdCls: 'taskNr',
-          text: me.text_cols.taskNr
-      },{
-          xtype: 'gridcolumn',
-          width: 160,
-          dataIndex: 'taskName',
-          text: me.text_cols.taskName
-      },{
           text: me.text_cols.taskActions,
           menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter
           xtype: 'taskActionColumn',
-          sortable: false
-      },{
-          xtype: 'gridcolumn',
-          width: 70,
-          cls: 'source-lang',
-          renderer: me.langRenderer,
-          dataIndex: 'sourceLang',
-          tooltip: me.text_cols.sourceLang,
-          text: me.text_cols.sourceLang,
-          sortable: false
-      },{
-          xtype: 'gridcolumn',
-          width: 70,
-          cls: 'relais-lang',
-          renderer: me.langRenderer,
-          dataIndex: 'relaisLang',
-          tooltip: me.text_cols.relaisLang,
-          text: me.text_cols.relaisLang,
-          sortable: false
-      },{
-          xtype: 'gridcolumn',
-          width: 70,
-          cls: 'target-lang',
-          renderer: me.langRenderer,
-          dataIndex: 'targetLang',
-          tooltip: me.text_cols.targetLang,
-          text: me.text_cols.targetLang,
           sortable: false
       },{
           xtype: 'gridcolumn',
@@ -234,43 +196,48 @@ Ext.define('Editor.view.admin.TaskGrid', {
           sortable: false
       },{
           xtype: 'gridcolumn',
-          width: 45,
-          renderer: function(v, meta, rec){
-              if(v == 0) {
-                  return '<b>'+v+' !</b>';
-              }
-              return v;
-          },
-          tdCls: 'task-users',
-          cls: 'task-users',
-          dataIndex: 'userCount',
-          tooltip: me.text_cols.users,
-          text: me.text_cols.users
+          width: 220,
+          dataIndex: 'taskName',
+          text: me.text_cols.taskName
       },{
           xtype: 'gridcolumn',
-          width: 120,
-          dataIndex: 'pmName',
-          renderer: function(v, meta) {
-              meta.tdAttr = 'data-qtip="' + v + '"';
-              return v;
-          },
-          text: me.text_cols.pmGuid
+          width: 110,
+          dataIndex: 'taskNr',
+          tdCls: 'taskNr',
+          text: me.text_cols.taskNr
       },{
           xtype: 'numbercolumn',
-          width: 60,
+          width: 70,
           dataIndex: 'wordCount',
           format: '0',
           text: me.text_cols.wordCount
       },{
-          xtype: 'datecolumn',
-          width: 120,
-          dataIndex: 'targetDeliveryDate',
-          text: me.text_cols.targetDeliveryDate
+          xtype: 'gridcolumn',
+          width: 110,
+          cls: 'source-lang',
+          renderer: me.langRenderer,
+          dataIndex: 'sourceLang',
+          tooltip: me.text_cols.sourceLang,
+          text: me.text_cols.sourceLang,
+          sortable: false
       },{
-          xtype: 'datecolumn',
-          width: 120,
-          dataIndex: 'realDeliveryDate',
-          text: me.text_cols.realDeliveryDate
+          xtype: 'gridcolumn',
+          width: 110,
+          cls: 'relais-lang',
+          renderer: me.langRenderer,
+          dataIndex: 'relaisLang',
+          tooltip: me.text_cols.relaisLang,
+          text: me.text_cols.relaisLang,
+          sortable: false
+      },{
+          xtype: 'gridcolumn',
+          width: 110,
+          cls: 'target-lang',
+          renderer: me.langRenderer,
+          dataIndex: 'targetLang',
+          tooltip: me.text_cols.targetLang,
+          text: me.text_cols.targetLang,
+          sortable: false
       },{
           xtype: 'owncheckcolumn',
           cls: 'ref-files',
@@ -286,6 +253,44 @@ Ext.define('Editor.view.admin.TaskGrid', {
           tooltip: me.text_cols.terminologie,
           text: me.text_cols.terminologie
       },{
+          xtype: 'gridcolumn',
+          width: 45,
+          renderer: function(v, meta, rec){
+              if(v == 0) {
+                  return '<b>'+v+' !</b>';
+              }
+              return v;
+          },
+          tdCls: 'task-users',
+          cls: 'task-users',
+          dataIndex: 'userCount',
+          tooltip: me.text_cols.users,
+          text: me.text_cols.users
+      },{
+          xtype: 'gridcolumn',
+          width: 135,
+          dataIndex: 'pmName',
+          renderer: function(v, meta) {
+              meta.tdAttr = 'data-qtip="' + v + '"';
+              return v;
+          },
+          text: me.text_cols.pmGuid
+      },{
+          xtype: 'datecolumn',
+          width: 100,
+          dataIndex: 'orderdate',
+          text: me.text_cols.orderdate
+      },{
+          xtype: 'datecolumn',
+          width: 120,
+          dataIndex: 'targetDeliveryDate',
+          text: me.text_cols.targetDeliveryDate
+      },{
+          xtype: 'datecolumn',
+          width: 120,
+          dataIndex: 'realDeliveryDate',
+          text: me.text_cols.realDeliveryDate
+      },{
           xtype: 'owncheckcolumn',
           width: 45,
           cls: 'fullMatchEdit',
@@ -293,11 +298,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
           dataIndex: 'edit100PercentMatch',
           tooltip: me.text_cols.fullMatchEdit,
           text: me.text_cols.fullMatchEdit
-      },{
-          xtype: 'datecolumn',
-          width: 100,
-          dataIndex: 'orderdate',
-          text: me.text_cols.orderdate
       },{
           xtype: 'owncheckcolumn',
           hidden: ! Editor.data.enableSourceEditing,
