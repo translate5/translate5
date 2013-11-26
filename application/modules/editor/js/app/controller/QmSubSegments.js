@@ -189,16 +189,19 @@ Ext.define('Editor.controller.QmSubSegments', {
      * @param menuitem
      */
     handleAddQmFlagClick: function(menuitem) {
-    	var me = this,
-    		sev = me.getQmFieldset().down('combo[name="qmsubseverity"]');
-    		comment = me.getQmFieldset().down('textfield[name="qmsubcomment"]');
-    	if(! me.addQmFlagToEditor(menuitem.qmid, comment.getValue(), sev.getValue())) {
-    		Ext.Msg.alert(me.strings.emptySelTitle, me.strings.emptySelText);
-    		return;
-    	}
-    	sev.reset();
-    	comment.reset();
-    	me.addQmFlagHistory(menuitem);
+        var me = this,
+            sev = me.getQmFieldset().down('combo[name="qmsubseverity"]');
+            commentField = me.getQmFieldset().down('textfield[name="qmsubcomment"]'),
+            format = Ext.util.Format,
+            comment = format.stripTags(commentField.getValue()).replace(/[<>"']/g,'');
+                
+        if(! me.addQmFlagToEditor(menuitem.qmid, comment, sev.getValue())) {
+            Ext.Msg.alert(me.strings.emptySelTitle, me.strings.emptySelText);
+            return;
+        }
+        sev.reset();
+        commentField.reset();
+        me.addQmFlagHistory(menuitem);
     },
     /**
      * Inserts the QM Issue IMG Tags around the text selection in the editor 
