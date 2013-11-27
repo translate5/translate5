@@ -43,6 +43,12 @@ class Editor_UserController extends ZfExtended_RestController {
     protected $entity;
     
     /**
+     * flag to preserve twice put data encoding
+     * @var boolean
+     */
+    protected $alreadyDecoded = false;
+    
+    /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
      * 
@@ -83,6 +89,10 @@ class Editor_UserController extends ZfExtended_RestController {
         }
     }
     
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::getAction()
+     */
     public function getAction() {
         parent::getAction();
         if($this->entity->getLogin() == 'system') {
@@ -91,6 +101,10 @@ class Editor_UserController extends ZfExtended_RestController {
         $this->credentialCleanup();
     }
     
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::deleteAction()
+     */
     public function deleteAction() {
         $this->entity->load($this->_getParam('id'));
         $this->checkIsEditable();
@@ -103,6 +117,42 @@ class Editor_UserController extends ZfExtended_RestController {
         $users = $assoc->deleteByUserguid($this->entity->getUserGuid());
         
         $this->entity->delete();
+    }
+    
+    /**
+     * encapsulate a separate REST sub request for authenticated users only.
+     * A authenticated user is allowed to get and change (PUT) himself, nothing more, nothing less.
+     * @throws ZfExtended_BadMethodCallException
+     */
+    public function authenticatedAction() {
+        $userSession = new Zend_Session_Namespace('user');
+        $id = $userSession->data->id;
+        $this->_setParam('id', $id);
+        if($this->_request->isPut()){
+            $this->entity->load($id);
+            $this->filterDataForAuthenticated();
+            return $this->putAction();
+        }
+        if($this->_request->isGet()){
+            return $this->getAction();
+        }
+        throw new ZfExtended_BadMethodCallException();
+    }
+    
+    /**
+     * decodes the put data and filters them to values the logged in user is allowed to change on himself
+     */
+    protected function filterDataForAuthenticated() {
+        $allowed = array('passwd');
+        $this->decodePutData();
+        $data = get_object_vars($this->data);
+        $keys = array_keys($data);
+        $this->data = new stdClass();
+        foreach($allowed as $allow) {
+            if(in_array($allow, $keys)){
+                $this->data->$allow = $data[$allow];
+            }
+        }
     }
     
     /**
@@ -123,6 +173,10 @@ class Editor_UserController extends ZfExtended_RestController {
      * @see ZfExtended_RestController::decodePutData()
      */
     protected function decodePutData() {
+        if($this->alreadyDecoded) {
+            return;
+        }
+        $this->alreadyDecoded = true;
         $this->_request->isPost() || $this->checkIsEditable(); //checkEditable only if not POST
         parent::decodePutData();
         if($this->_request->isPost()) {
