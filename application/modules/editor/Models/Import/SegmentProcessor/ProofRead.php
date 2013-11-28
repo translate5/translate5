@@ -160,8 +160,8 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
             $sql[]= " (NULL , ".
                (int)$segmentId.
                ", ".(int)$term->id.
-                    ", '".mysql_real_escape_string((string)$term->term).
-               "', ".(int)$term->projectTerminstanceId.
+                    ", ".$this->db->quote((string)$term->term).
+               ", ".(int)$term->projectTerminstanceId.
                ")";
     	}
         if(count($sql)>0){
