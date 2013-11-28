@@ -160,11 +160,12 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
             $sql[]= " (NULL , ".
                (int)$segmentId.
                ", ".(int)$term->id.
-               ", '".(string)$term->term.
+                    ", '".mysql_real_escape_string((string)$term->term).
                "', ".(int)$term->projectTerminstanceId.
                ")";
     	}
         if(count($sql)>0){
+            error_log('INSERT INTO `LEK_terminstances` (`id` ,`segmentId` ,`termId` ,`term` ,`projectTerminstanceId`) VALUES'. implode(',', $sql));
             $this->db->query(
                 'INSERT INTO `LEK_terminstances` (`id` ,`segmentId` ,`termId` ,`term` ,`projectTerminstanceId`) VALUES'. implode(',', $sql));
         }
