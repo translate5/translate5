@@ -287,6 +287,7 @@ table.task-users td.state {padding-right:0;}
 
 /* Task Grid State Styles */
 tr.end td div,
+tr.pending td div,
 tr.finished td div {color:#acacac;}
 tr.end td div.x-grid-checkheader,
 tr.finished td div.x-grid-checkheader {opacity:0.3;display: block;overflow: hidden;text-indent: 100%;white-space: nowrap;}
@@ -308,6 +309,8 @@ tr.no-users td div {color:#ff0000;}
 .adminTaskGrid tr.editorReopenTask .ico-task-reopen {background-image: url("../images/control_start.png");display:inline;}
 .adminTaskGrid tr.editorDeleteTask .ico-task-delete {background-image: url("../images/page_delete.png");display:inline;}
 .adminTaskGrid tr.editorShowexportmenuTask .ico-task-showexportmenu {background-image: url("../images/database_go.png");display:inline;}
+.adminTaskGrid tr.pending img {display:none !important;}
+.adminTaskGrid tr.pending td.state div {background: url("../images/loading_ico.gif") no-repeat 6px center;}
 
 /* User Admin */
 

@@ -149,22 +149,41 @@ Ext.define('Editor.model.admin.Task', {
       return me.modified.userState == wait || me.get('userState') == wait;
   },
   /**
+   * edit or view state implies currently, that a saving request of the task is running,
+   * since view and edit states should not be shown in the task grid. 
+   * After successful save request the userState will be corrected.
+   * No translations should provided for this states.
+   * @returns {Boolean}
+   */
+  isPending: function() {
+      var me = this, 
+          state = me.get('userState');
+      return state == me.USER_STATE_VIEW || state == me.USER_STATE_EDIT;
+  },
+  /**
    * returns if task is openable
    * @returns {Boolean}
    */
   isOpenable: function() {
-      //actually all task associated to a user are openable
+      //if a task is pending, it cant be opened
+      if(this.isPending()){
+          return false;
+      }
+      //a user with editorEditAllTasks (normally PMs) can always open the task
+      if(Editor.app.authenticatedUser.isAllowed('editorEditAllTasks')){
+          return true;
+      }
+      //per default all tasks associated to a user are openable
       return this.get('userRole') != '' && this.get('userState') != '';
   },
   /**
-   * FIXME wenn ich den Editor mutwillig readOnly öffne, dann liefert isReadOnly noch false, isReadOnly wird aber an Stellen benutzt die dann auch true  liefern müssen. daher in isReadOnly das isEditAble recht abprüfen?
    * returns if task is readonly
    * @returns {Boolean}
    */
   isReadOnly: function() {
       var me = this;
       //FIXME nextRelease This should be done by userRights, a clear way isnt specified yet. Perhaps move to Editor.model.admin.User.isAllowed!
-      if(me.get('userRole') == 'visitor'){
+      if(me.get('userRole') == 'visitor' || me.get('userState') == me.USER_STATE_VIEW){
           return true;
       }
       return me.isLocked() || me.isFinished() || me.isWaiting() || me.isEnded();

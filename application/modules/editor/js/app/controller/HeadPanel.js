@@ -65,6 +65,16 @@ Ext.define('Editor.controller.HeadPanel', {
   }],
   init : function() {
       var me = this;
+      
+      this.addEvents(
+              /**
+               * @event taskUpdated
+               * @param {Editor.model.admin.Task} task
+               * Fires after a task has successfully updated / saved
+               */
+              'taskUpdated'
+      );
+      
       //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
       Editor.app.on('editorViewportOpened', me.handleInitEditor, me);
       Editor.app.on('adminViewportOpened', me.handleInitAdmin, me);
@@ -122,7 +132,8 @@ Ext.define('Editor.controller.HeadPanel', {
           case 'backBtn':
               task.set('userState','open');
               task.save({
-                  success: function() {
+                  success: function(rec) {
+                      me.fireEvent('taskUpdated', rec);
                       Editor.MessageBox.addSuccess(me.strings.taskClosed);
                   }
               });
@@ -136,7 +147,8 @@ Ext.define('Editor.controller.HeadPanel', {
                   if(btn == 'yes') {
                       task.set('userState','finished');
                       task.save({
-                          success: function() {
+                          success: function(rec) {
+                              me.fireEvent('taskUpdated', rec);
                               Editor.MessageBox.addSuccess(me.strings.taskFinished);
                           }
                       });
@@ -153,7 +165,8 @@ Ext.define('Editor.controller.HeadPanel', {
                       task.set('userState',task.get('userState')); //triggers userState as dirty
                       task.set('state','end');
                       task.save({
-                          success: function() {
+                          success: function(rec) {
+                              me.fireEvent('taskUpdated', rec);
                               Editor.MessageBox.addSuccess(me.strings.taskEnded);
                           }
                       });
