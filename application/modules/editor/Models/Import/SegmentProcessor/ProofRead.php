@@ -165,7 +165,6 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
                ")";
     	}
         if(count($sql)>0){
-            error_log('INSERT INTO `LEK_terminstances` (`id` ,`segmentId` ,`termId` ,`term` ,`projectTerminstanceId`) VALUES'. implode(',', $sql));
             $this->db->query(
                 'INSERT INTO `LEK_terminstances` (`id` ,`segmentId` ,`termId` ,`term` ,`projectTerminstanceId`) VALUES'. implode(',', $sql));
         }
