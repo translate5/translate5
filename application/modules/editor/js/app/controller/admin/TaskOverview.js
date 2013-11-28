@@ -76,9 +76,10 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       openTaskAdminBtn: "#UT#Aufgabenübersicht"
   },
   init : function() {
-      var me = this;
+      var me = this,
+          hp = me.application.controllers.get('HeadPanel');
       
-      this.addEvents(
+      me.addEvents(
               /**
                * @event taskCreated
                * @param {Ext.form.Panel} form
@@ -98,6 +99,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
       Editor.app.on('adminViewportClosed', me.clearTasks, me);
       Editor.app.on('editorViewportOpened', me.handleInitEditor, me);
+      hp && hp.on('taskUpdated', me.handleTaskUpdate, me);
 
       me.control({
           'headPanel toolbar#top-menu' : {
@@ -285,6 +287,15 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   savingHide: function() {
       var win = this.getTaskAddWindow();
       win.loadingMask.hide();
+  },
+  /**
+   * updates the task in the store/grid by the task processed by the head panel
+   * Necessary by TRANSLATE-88
+   */
+  handleTaskUpdate: function(task) {
+      var target = this.getAdminTasksStore().getById(task.get('id'));
+      target.set(task.data);
+      target.dirty = false;
   },
   /**
    * is called after clicking save task, starts the upload / form submit

@@ -104,6 +104,12 @@ Ext.define('Editor.view.admin.TaskGrid', {
           if(task.isLocked()) {
               res.push('locked');
           }
+          if(task.isOpenable()) {
+              res.push('openable');
+          }
+          if(task.isPending()) {
+              res.push('pending');
+          }
           if(task.isReadOnly()) {
               res.push('readonly');
           }
