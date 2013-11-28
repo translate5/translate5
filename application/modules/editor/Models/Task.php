@@ -396,7 +396,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $where = 'not locked is null and lockedInternalSessionUniqId not in ('.$validSessionIds.')';
         $toUnlock = $this->db->fetchAll($this->db->select()->where($where))->toArray();
         /* @var $tua editor_Models_TaskUserAssoc */
-        $this->db->update(array('locked' => null, 'lockedInternalSessionUniqId' => null), $where);
+        $this->db->update(array('lockingUser' => null, 'locked' => null, 'lockedInternalSessionUniqId' => null), $where);
         return $toUnlock;
     }
     
