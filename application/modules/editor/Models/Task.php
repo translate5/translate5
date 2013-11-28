@@ -393,7 +393,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      */
     public function cleanupLockedJobs() {
         $validSessionIds = 'select internalSessionUniqId  from sessionMapInternalUniqId m, session s  where s.modified + lifetime >= UNIX_TIMESTAMP() and s.session_id = m.session_id';
-        $where = 'not locked is null and lockedInternalSessionUniqId not in ('.$validSessionIds.')';
+        $where = 'not locked is null and (lockedInternalSessionUniqId not in ('.$validSessionIds.') or lockedInternalSessionUniqId is null)';
         $toUnlock = $this->db->fetchAll($this->db->select()->where($where))->toArray();
         /* @var $tua editor_Models_TaskUserAssoc */
         $this->db->update(array('lockingUser' => null, 'locked' => null, 'lockedInternalSessionUniqId' => null), $where);
