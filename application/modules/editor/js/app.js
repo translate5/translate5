@@ -214,6 +214,16 @@ Ext.application({
       this.beforeUnloadCalled = true;
       me.fireEvent('adminViewportOpened');
   },
+  mask: function(msg, title) {
+      if(!this.appMask) {
+          this.appMask = Ext.widget('messagebox');
+      }
+      this.appMask.wait(msg, title);
+  },
+  unmask: function() {
+      //no "this" usage, so we can use this method directly as failure handler 
+      Editor.app.appMask.close();
+  },
   logout: function() {
       window.location = Editor.data.loginUrl;
   }

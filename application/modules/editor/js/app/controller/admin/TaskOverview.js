@@ -72,12 +72,17 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       "delete":       {title: "#UT#Aufgabe komplett löschen?", msg: "#UT#Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?"}
   },
   strings: {
+      taskOpening: '#UT#Aufgabe wird im Editor geöffnet...',
+      taskFinishing: '#UT#Aufgabe wird abgeschlossen...',
+      taskUnFinishing: '#UT#Aufgabe wird abgeschlossen...',
+      taskReopen: '#UT#Aufgabe wird wieder eröffnet...',
+      taskEnding: '#UT#Aufgabe wird beendet...',
+      taskDestroy: '#UT#Aufgabe wird gelöscht...',
       forcedReadOnly: '#UT#Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!',
       openTaskAdminBtn: "#UT#Aufgabenübersicht"
   },
   init : function() {
-      var me = this,
-          hp = me.application.controllers.get('HeadPanel');
+      var me = this;
       
       me.addEvents(
               /**
@@ -99,7 +104,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
       Editor.app.on('adminViewportClosed', me.clearTasks, me);
       Editor.app.on('editorViewportOpened', me.handleInitEditor, me);
-      hp && hp.on('taskUpdated', me.handleTaskUpdate, me);
 
       me.control({
           'headPanel toolbar#top-menu' : {
@@ -252,20 +256,24 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    */
   openTaskRequest: function(task, readonly) {
       var me = this,
-          initialState;
+          initialState,
+          app = Editor.app;
       if(!me.isAllowed('editorOpenTask', task) && !me.isAllowed('editorEditTask', task)){
           return;
       }
       readonly = (readonly === true || task.isReadOnly());
       initialState = readonly ? task.USER_STATE_VIEW : task.USER_STATE_EDIT;
       task.set('userState', initialState);
+      app.mask(me.strings.taskOpening, task.get('taskName'));
       task.save({
           success: function(rec, op) {
               if(rec && initialState == task.USER_STATE_EDIT && rec.get('userState') == task.USER_STATE_VIEW) {
                   Editor.MessageBox.addInfo(Ext.String.format(me.strings.forcedReadOnly, rec.get('lockingUsername')));
               }
+              app.unmask();
               Editor.app.openEditor(rec, readonly);
-          }
+          },
+          failure: app.unmask
       });
   },
   handleTaskCancel: function() {
@@ -287,15 +295,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   savingHide: function() {
       var win = this.getTaskAddWindow();
       win.loadingMask.hide();
-  },
-  /**
-   * updates the task in the store/grid by the task processed by the head panel
-   * Necessary by TRANSLATE-88
-   */
-  handleTaskUpdate: function(task) {
-      var target = this.getAdminTasksStore().getById(task.get('id'));
-      target.set(task.data);
-      target.dirty = false;
   },
   /**
    * is called after clicking save task, starts the upload / form submit
@@ -385,6 +384,17 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           }
       });
   },
+  /**
+   * Shorthand method to get the default task save handlers
+   * @return {Object}
+   */
+  getTaskMaskBindings: function(){
+      var app = Editor.app;
+      return {
+          success: app.unmask,
+          failure: app.unmask
+      };
+  },
   
   //
   //Task Handler:
@@ -411,8 +421,10 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * @param {Editor.model.admin.Task} task
    */
   handleTaskFinish: function(task) {
+      var me = this;
+      Editor.app.mask(me.strings.taskFinishing, task.get('taskName'));
       task.set('userState', task.USER_STATE_FINISH);
-      task.save();
+      task.save(me.getTaskMaskBindings());
   },
   
   /**
@@ -420,8 +432,10 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * @param {Editor.model.admin.Task} task
    */
   handleTaskUnfinish: function(task) {
+      var me = this;
+      Editor.app.mask(me.strings.taskUnFinishing, task.get('taskName'));
       task.set('userState', task.USER_STATE_OPEN);
-      task.save();
+      task.save(me.getTaskMaskBindings());
   },
   
   /**
@@ -429,8 +443,10 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * @param {Editor.model.admin.Task} task
    */
   handleTaskEnd: function(task) {
+      var me = this;
+      Editor.app.mask(me.strings.taskEnding, task.get('taskName'));
       task.set('state', 'end');
-      task.save();
+      task.save(me.getTaskMaskBindings());
   },
   
   /**
@@ -438,19 +454,26 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * @param {Editor.model.admin.Task} task
    */
   handleTaskReopen: function(task) {
+      var me = this;
+      Editor.app.mask(me.strings.taskReopen, task.get('taskName'));
       task.set('state', 'open');
-      task.save();
+      task.save(me.getTaskMaskBindings());
   },
   /**
    * delete the task
    * @param {Editor.model.admin.Task} task
    */
   handleTaskDelete: function(task) {
-      var store = task.store;
+      var me = this,
+          store = task.store,
+          app = Editor.app;
+      app.mask(me.strings.taskDestroy, task.get('taskName'));
       task.destroy({
           success: function() {
               store.load();
-          }
+              app.unmask();
+          },
+          failure: app.unmask
       });
   },
   /**
@@ -476,7 +499,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },
   
   /**
-   * triggerd by click on the Change Task User Asspoc Button / (Cell also => @todo)
+   * triggerd by click on the Change Task User Assoc Button / (Cell also => @todo)
    * fires only an event to allow flexible handling of this click
    * @param {Editor.model.admin.Task} task
    */

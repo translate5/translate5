@@ -54,7 +54,10 @@ Ext.define('Editor.controller.HeadPanel', {
       confirmEndMsg: "#UT#Wollen Sie die Aufgabe wirklich beenden?",
       taskClosed: '#UT#Aufgabe wurde erfolgreich verlassen.',
       taskFinished: '#UT#Aufgabe wurde erfolgreich abgeschlossen.',
-      taskEnded: '#UT#Aufgabe wurde erfolgreich beendet.'
+      taskEnded: '#UT#Aufgabe wurde erfolgreich beendet.',
+      taskClosing: '#UT#Aufgabe wird verlassen...',
+      taskFinishing: '#UT#Aufgabe wird abgeschlossen und verlassen...',
+      taskEnding: '#UT#Aufgabe wird beendet und verlassen...'
   },
   refs:[{
       ref : 'headPanel',
@@ -127,17 +130,21 @@ Ext.define('Editor.controller.HeadPanel', {
   },
   tasksMenuDispatcher: function(menu, item) {
       var me = this,
-          task = Editor.data.task; 
+          task = Editor.data.task,
+          app = Editor.app;
       switch(item.itemId){
           case 'backBtn':
+              app.mask(me.strings.taskClosing, task.get('taskName'));
               task.set('userState','open');
               task.save({
                   success: function(rec) {
                       me.fireEvent('taskUpdated', rec);
+                      Editor.app.openAdministration();
+                      app.unmask();
                       Editor.MessageBox.addSuccess(me.strings.taskClosed);
-                  }
+                  },
+                  failure: app.unmask
               });
-              Editor.app.openAdministration();
               break;
           case 'finishBtn':
               if(! Editor.app.authenticatedUser.isAllowed('editorFinishTask')){
@@ -145,14 +152,17 @@ Ext.define('Editor.controller.HeadPanel', {
               }
               Ext.Msg.confirm(me.strings.confirmFinish, me.strings.confirmFinishMsg, function(btn){
                   if(btn == 'yes') {
+                      app.mask(me.strings.taskFinishing, task.get('taskName'));
                       task.set('userState','finished');
                       task.save({
                           success: function(rec) {
                               me.fireEvent('taskUpdated', rec);
+                              Editor.app.openAdministration();
+                              app.unmask();
                               Editor.MessageBox.addSuccess(me.strings.taskFinished);
-                          }
+                          },
+                          failure: app.unmask
                       });
-                      Editor.app.openAdministration();
                   }
               });
               break;
@@ -162,15 +172,18 @@ Ext.define('Editor.controller.HeadPanel', {
               }
               Ext.Msg.confirm(me.strings.confirmEnd, me.strings.confirmEndMsg, function(btn){
                   if(btn == 'yes') {
+                      app.mask(me.strings.taskEnding, task.get('taskName'));
                       task.set('userState',task.get('userState')); //triggers userState as dirty
                       task.set('state','end');
                       task.save({
                           success: function(rec) {
                               me.fireEvent('taskUpdated', rec);
+                              Editor.app.openAdministration();
+                              app.unmask();
                               Editor.MessageBox.addSuccess(me.strings.taskEnded);
-                          }
+                          },
+                          failure: app.unmask
                       });
-                      Editor.app.openAdministration();
                   }
               });
               break;

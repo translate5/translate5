@@ -37,7 +37,7 @@ Ext.define('Editor.view.admin.TaskUserAssocWindow', {
     alias : 'widget.adminTaskUserAssocWindow',
     requires: 'Editor.view.admin.TaskUserAssocGrid',
     itemId : 'adminTaskUserAssocWindow',
-    title : '#UT#Benutzer zuordnen',
+    title : '#UT#Benutzer zuordnen zu Aufgabe "{0}"',
     text_save: '#UT#Änderungen speichern',
     text_cancel: '#UT#Abbrechen',
     height : 400,
@@ -47,6 +47,7 @@ Ext.define('Editor.view.admin.TaskUserAssocWindow', {
     modal : true,
     initComponent : function() {
         var me = this;
+        me.title = Ext.String.format(me.title, me.actualTask.get('taskName'));
         Ext.applyIf(me, {
             items : [{
                 xtype: 'adminTaskUserAssocGrid'
