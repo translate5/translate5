@@ -86,6 +86,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap {
     ));
     $this->front->getRouter()->addRoute('filemap', $filemapRoute);
     
+    $authUserRoute = new ZfExtended_Controller_RestLikeRoute(
+    	'editor/user/authenticated/*',
+    	array(
+    		'module'     => 'editor',
+    		'controller' => 'user',
+    		'action'     => 'authenticated'
+    ));
+    $this->front->getRouter()->addRoute('authUser', $authUserRoute);
+    
     $termsRoute = new Zend_Controller_Router_Route(
     	'editor/segment/terms/*',
     	array(
@@ -94,6 +103,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap {
     		'action'     => 'terms'
     ));
     $this->front->getRouter()->addRoute('terms', $termsRoute);
+    
     $exportRoute = new Zend_Controller_Router_Route(
     	'editor/task/export/*',
     	array(
