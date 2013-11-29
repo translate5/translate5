@@ -87,8 +87,10 @@ Ext.define('Editor.controller.UserPreferences', {
    * zeigt das Preferences Fenster an
    */
   showPreferences: function() {
-      this.window = Ext.create('Editor.view.preferences.UserWindow');
-      this.window.show();
+      var me = this;
+      me.window = Ext.create('Editor.view.preferences.UserWindow');
+      me.getForm().setDisabled(! Editor.app.authenticatedUser.get('editable'));
+      me.window.show();
   },
   /**
    * Speichert die Einstellungen und schließt das Fenster
@@ -101,6 +103,7 @@ Ext.define('Editor.controller.UserPreferences', {
       if(form.isValid()) {
           user.set('passwd', pw);
           user.save({
+              url: Editor.data.restpath+'user/authenticated',
               success: function() {
                   Editor.MessageBox.addSuccess(me.strings.pwSave);
               }
