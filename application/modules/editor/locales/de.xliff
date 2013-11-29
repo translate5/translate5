@@ -736,6 +736,15 @@ Sie erreichen das Portal unter: %3$s<br />
 <br />%7$s
 <br />
 <br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</target></trans-unit>
+<trans-unit id='QXVmZ2FiZSB3aXJkIGltIEVkaXRvciBnZcO2ZmZuZXQuLi4='><source>Aufgabe wird im Editor geöffnet...</source><target>Aufgabe wird im Editor geöffnet...</target></trans-unit>
+<trans-unit id='QXVmZ2FiZSB3aXJkIGFiZ2VzY2hsb3NzZW4uLi4='><source>Aufgabe wird abgeschlossen...</source><target>Aufgabe wird abgeschlossen...</target></trans-unit>
+<trans-unit id='QXVmZ2FiZSB3aXJkIHdpZWRlciBlcsO2ZmZuZXQuLi4='><source>Aufgabe wird wieder eröffnet...</source><target>Aufgabe wird wieder eröffnet...</target></trans-unit>
+<trans-unit id='QXVmZ2FiZSB3aXJkIGJlZW5kZXQuLi4='><source>Aufgabe wird beendet...</source><target>Aufgabe wird beendet...</target></trans-unit>
+<trans-unit id='QXVmZ2FiZSB3aXJkIGdlbMO2c2NodC4uLg=='><source>Aufgabe wird gelöscht...</source><target>Aufgabe wird gelöscht...</target></trans-unit>
+<trans-unit id='QXVmZ2FiZSB3aXJkIHZlcmxhc3Nlbi4uLg=='><source>Aufgabe wird verlassen...</source><target>Aufgabe wird verlassen...</target></trans-unit>
+<trans-unit id='QXVmZ2FiZSB3aXJkIGFiZ2VzY2hsb3NzZW4gdW5kIHZlcmxhc3Nlbi4uLg=='><source>Aufgabe wird abgeschlossen und verlassen...</source><target>Aufgabe wird abgeschlossen und verlassen...</target></trans-unit>
+<trans-unit id='QXVmZ2FiZSB3aXJkIGJlZW5kZXQgdW5kIHZlcmxhc3Nlbi4uLg=='><source>Aufgabe wird beendet und verlassen...</source><target>Aufgabe wird beendet und verlassen...</target></trans-unit>
+<trans-unit id='QmVudXR6ZXIgenVvcmRuZW4genUgQXVmZ2FiZSAiezB9Ig=='><source>Benutzer zuordnen zu Aufgabe "{0}"</source><target>Benutzer zuordnen zu Aufgabe "{0}"</target></trans-unit>
   </body>
  </file>
 </xliff>
