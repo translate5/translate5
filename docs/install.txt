@@ -2,7 +2,7 @@
 Softwarevorausetzungen unter Linux
 - apache2
 - mysql 5.0 oder höher
-- php5.3 oder höher mit den Extensions: mbstring, pdo_mysql
+- php5.4 oder höher mit den Extensions: mbstring, pdo_mysql
 - Zend Framework 1.11.12 oder höher innerhalb der Linie Zend Framework 1.11, vermutlich ist auch ein Upgrade innerhalb der Linie 1 möglich (in include_path der php.ini aufnehmen)
 - ExtJs 4.0.7
 
