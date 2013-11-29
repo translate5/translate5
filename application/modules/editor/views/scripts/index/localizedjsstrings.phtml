@@ -335,8 +335,14 @@ Ext.define('Editor.controller.Localizer', {
     };
 
     Editor.controller.admin.TaskOverview.prototype.strings = {
-        "forcedReadOnly": '<?php echo $this->translate->_('Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!');?>',
-        "openTaskAdminBtn": '<?php echo $this->translate->_('Aufgabenübersicht');?>'
+        taskOpening: '<?php echo $this->translate->_('Aufgabe wird im Editor geöffnet...');?>',
+        taskFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen...');?>',
+        taskUnFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen...');?>',
+        taskReopen: '<?php echo $this->translate->_('Aufgabe wird wieder eröffnet...');?>',
+        taskEnding: '<?php echo $this->translate->_('Aufgabe wird beendet...');?>',
+        taskDestroy: '<?php echo $this->translate->_('Aufgabe wird gelöscht...');?>',
+        forcedReadOnly: '<?php echo $this->translate->_('Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!');?>',
+        openTaskAdminBtn: '<?php echo $this->translate->_('Aufgabenübersicht');?>'
     };
 
     Editor.controller.admin.TaskOverview.prototype.confirmStrings = {
@@ -438,7 +444,7 @@ Ext.define('Editor.controller.Localizer', {
       removeUserTip: '<?php echo $this->translate->_('Den gewählten Benutzer aus dieser Aufgabe entfernen.');?>'
     };
     
-    Editor.view.admin.TaskUserAssocWindow.prototype.title = '<?php echo $this->translate->_('Benutzer zuordnen');?>';
+    Editor.view.admin.TaskUserAssocWindow.prototype.title = '<?php echo $this->translate->_('Benutzer zuordnen zu Aufgabe "{0}"');?>';
     Editor.view.admin.TaskUserAssocWindow.prototype.text_save = '<?php echo $this->translate->_('Änderungen speichern');?>';
     Editor.view.admin.TaskUserAssocWindow.prototype.text_cancel = '<?php echo $this->translate->_('Abbrechen');?>';
     
@@ -463,7 +469,10 @@ Ext.define('Editor.controller.Localizer', {
         confirmEndMsg: '<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer endgültig beenden?');?>',
         taskClosed: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich verlassen.');?>',
         taskFinished: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich abgeschlossen.');?>',
-        taskEnded: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich beendet.');?>'
+        taskEnded: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich beendet.');?>',
+        taskClosing: '<?php echo $this->translate->_('Aufgabe wird verlassen...');?>',
+        taskFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen und verlassen...');?>',
+        taskEnding: '<?php echo $this->translate->_('Aufgabe wird beendet und verlassen...');?>'
     };
     
     Editor.view.HeadPanel.prototype.strings = {
