@@ -247,6 +247,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $php2js->set('app.wfSteps', array(
           $workflow::STEP_LECTORING => $this->translate->_('Lektorat'),
           $workflow::STEP_TRANSLATORCHECK => $this->translate->_('Übersetzer Prüfung'),
+          $workflow::STEP_PM_CHECK => $this->translate->_('PM Prüfung'),
         ));
         
         $php2js->set('app.wfStepChain', $workflow->getStepChain());

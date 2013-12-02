@@ -65,6 +65,7 @@ abstract class editor_Workflow_Abstract {
     //translation and PHP editor_Workflow_Default for programmatic usage
     const STEP_LECTORING = 'lectoring';
     const STEP_TRANSLATORCHECK = 'translatorCheck';
+    const STEP_PM_CHECK = 'pmCheck';
     
     /**
      * Container for the old Task Model provided by doWithTask
@@ -342,6 +343,7 @@ abstract class editor_Workflow_Abstract {
      * @param boolean $checkReadable checks in addition if task is readable for user and only returns true if yes
      * @param boolean $checkWriteable checks in addition if task is writeable for user and only returns true if yes
      * @return boolean
+     * FIXME wo wird diese Methode überall verwendet? Zwecks PM editing
      */
     public function isTaskOfUser(string $taskGuid, string $userGuid,$checkReadable = false, $checkWriteable = false) {
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
@@ -419,11 +421,13 @@ abstract class editor_Workflow_Abstract {
     
     /**
      * manipulates the segment as needed by workflow after updated by user
+     * @param editor_Models_Segment $segmentToSave
+     * @param boolean $sourceEditing defines if source editing is used on the current task or not
      */
-    public function beforeSegmentSave(editor_Models_Segment $segmentToSave) {
-        $updateAutoStates = function($autostates, $segment, $tua) {
+    public function beforeSegmentSave(editor_Models_Segment $segmentToSave, $sourceEditing) {
+        $updateAutoStates = function($autostates, $segment, $tua) use($sourceEditing) {
             //sets the calculated autoStateId
-            $segment->setAutoStateId($autostates->calculateSegmentState($segment, $tua));
+            $segment->setAutoStateId($autostates->calculateSegmentState($segment, $tua, $sourceEditing));
         };
         $this->commonBeforeSegmentSave($segmentToSave, $updateAutoStates);
     }
@@ -433,7 +437,7 @@ abstract class editor_Workflow_Abstract {
      */
     public function beforeCommentedSegmentSave(editor_Models_Segment $segmentToSave) {
         $updateAutoStates = function($autostates, $segment, $tua) {
-            $autostates->updateAfterCommented($segment);
+            $autostates->updateAfterCommented($segment, $tua);
         };
         $this->commonBeforeSegmentSave($segmentToSave, $updateAutoStates);
     }
@@ -448,14 +452,27 @@ abstract class editor_Workflow_Abstract {
         $sessionUser = new Zend_Session_Namespace('user');
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
-        $tua->loadByParams($sessionUser->data->userGuid,$session->taskGuid);
         
-        //sets the actual workflow step
-        $segmentToSave->setWorkflowStepNr($session->taskWorkflowStepNr);
+        try {
+            $tua->loadByParams($sessionUser->data->userGuid,$session->taskGuid);
+            
+            //sets the actual workflow step
+            $segmentToSave->setWorkflowStepNr($session->taskWorkflowStepNr);
+            
+            //sets the actual workflow step name, does currently depend only on the userTaskRole!
+            $roles2Step = array_flip($this->steps2Roles);
+            $segmentToSave->setWorkflowStep($roles2Step[$tua->getRole()]);
+        }
+        //if no assoc entry is found, we have to check if its an editAllTasks request
+        catch(ZfExtended_NotFoundException $e) {
+            $acl = ZfExtended_Acl::getInstance();
+            if(!$acl->isInAllowedRoles($sessionUser->data->roles,'editAllTasks')) {
+                throw $e;
+            }
+            //set only the workflow step, the stepNr is not changed 
+            $segmentToSave->setWorkflowStep(self::STEP_PM_CHECK);
+        }
         
-        //sets the actual workflow step name, does currently depend only on the userTaskRole!
-        $roles2Step = array_flip($this->steps2Roles);
-        $segmentToSave->setWorkflowStep($roles2Step[$tua->getRole()]);
         $autostates = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
         
         //set the autostate as defined in the given Closure
@@ -517,7 +534,7 @@ abstract class editor_Workflow_Abstract {
         
         switch($newState) {
             case $this::STATE_OPEN:
-                //FIXME nextRelease Thomas: leere doOpen-Methode hinterlegen und verwenden this would be doOpen (formerly known as unFinish, since we got also "waiting" unfinish is above.)
+                $this->doOpen();
                 break;
             case self::STATE_FINISH: 
                 $this->doFinish();
@@ -556,6 +573,12 @@ abstract class editor_Workflow_Abstract {
      */
     protected function doReopen() {
         $this->handleReopen();
+    }
+    
+    /**
+     * is called when a task assoc state gets OPEN again
+     */
+    protected function doOpen() {
     }
     
     /**

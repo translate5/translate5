@@ -79,6 +79,7 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
         
       if($session->taskGuid === $segment->get('taskGuid')) {
           $segment->set('comments', join("\n", $commentsMarkup));
+          //@todo do this with events
           $workflow->beforeCommentedSegmentSave($segment);
           $segment->save();
       }

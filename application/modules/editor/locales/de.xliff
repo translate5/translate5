@@ -745,6 +745,11 @@ Sie erreichen das Portal unter: %3$s<br />
 <trans-unit id='QXVmZ2FiZSB3aXJkIGFiZ2VzY2hsb3NzZW4gdW5kIHZlcmxhc3Nlbi4uLg=='><source>Aufgabe wird abgeschlossen und verlassen...</source><target>Aufgabe wird abgeschlossen und verlassen...</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSB3aXJkIGJlZW5kZXQgdW5kIHZlcmxhc3Nlbi4uLg=='><source>Aufgabe wird beendet und verlassen...</source><target>Aufgabe wird beendet und verlassen...</target></trans-unit>
 <trans-unit id='QmVudXR6ZXIgenVvcmRuZW4genUgQXVmZ2FiZSAiezB9Ig=='><source>Benutzer zuordnen zu Aufgabe "{0}"</source><target>Benutzer zuordnen zu Aufgabe "{0}"</target></trans-unit>
+<trans-unit id='UE0gZ2VwcsO8ZnQ='><source>PM geprüft</source><target>PM geprüft</target></trans-unit>
+<trans-unit id='UE0gQXV0b2dlcHLDvGZ0'><source>PM Autogeprüft</source><target>PM Autogeprüft</target></trans-unit>
+<trans-unit id='UE0gZ2VwcsO8ZnQsIHVudmVyw6RuZGVydA=='><source>PM geprüft, unverändert</source><target>PM geprüft, unverändert</target></trans-unit>
+<trans-unit id='UE0gQXV0b2dlcHLDvGZ0LCB1bnZlcsOkbmRlcnQ='><source>PM Autogeprüft, unverändert</source><target>PM Autogeprüft, unverändert</target></trans-unit>
+<trans-unit id='UE0gUHLDvGZ1bmc='><source>PM Prüfung</source><target>PM Prüfung</target></trans-unit>
   </body>
  </file>
 </xliff>

@@ -102,6 +102,30 @@ class editor_Models_SegmentAutoStates {
     const REVIEWED_TRANSLATOR_AUTO = 9;
     
     /**
+     * reviewed by a pm not associated in the workflow of a task
+     * @var integer
+     */
+    const REVIEWED_PM = 10;
+    
+    /**
+     * reviewed through the repetition editor by a pm not associated in the workflow of a task
+     * @var integer
+     */
+    const REVIEWED_PM_AUTO = 11;
+    
+    /**
+     * reviewed but unchanged by a pm not associated in the workflow of a task
+     * @var integer
+     */
+    const REVIEWED_PM_UNCHANGED = 12;
+    
+    /**
+     * reviewed but unchanged through the repetition editor by a pm not associated in the workflow of a task
+     * @var integer
+     */
+    const REVIEWED_PM_UNCHANGED_AUTO = 13;
+    
+    /**
      * Internal state used to show segment is pending
      * @var integer
      */
@@ -118,6 +142,10 @@ class editor_Models_SegmentAutoStates {
         self::REVIEWED_UNCHANGED_AUTO => 'Autolektoriert, unverändert',
         self::REVIEWED_TRANSLATOR => 'Übersetzer geprüft',
         self::REVIEWED_TRANSLATOR_AUTO => 'Übersetzer autogeprüft',
+        self::REVIEWED_PM => 'PM geprüft',
+        self::REVIEWED_PM_AUTO => 'PM Autogeprüft',
+        self::REVIEWED_PM_UNCHANGED => 'PM geprüft, unverändert',
+        self::REVIEWED_PM_UNCHANGED_AUTO => 'PM Autogeprüft, unverändert',
     );
     
     /**
@@ -141,10 +169,24 @@ class editor_Models_SegmentAutoStates {
         return array_keys($this->states);
     }
     
+    /**
+     * returns a mapping between user workflow roles, and segment auto states to be used for this role
+     * @return multitype:string
+     */
     public function getRoleToStateMap() {
         $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
+        
+        //if the user is not assigned to the task directly, but he is allowed to edit the user
+        //then the default state would be REVIEWED_PM instead a normal REVIEWED
+        if($this->isEditWithoutAssoc()){
+            $default = self::REVIEWED_PM;
+        }
+        else {
+            $default = self::REVIEWED;
+        }
+        
         return array(
-          'default' => self::REVIEWED, //missing role fallback
+          'default' => $default, //missing role fallback for "editAllTasks" users
           $workflow::ROLE_LECTOR => self::REVIEWED,
           $workflow::ROLE_TRANSLATOR => self::REVIEWED_TRANSLATOR
         );
@@ -161,6 +203,10 @@ class editor_Models_SegmentAutoStates {
                 return self::REVIEWED_AUTO;
             case self::REVIEWED_UNCHANGED:
                 return self::REVIEWED_UNCHANGED_AUTO;
+            case self::REVIEWED_PM:
+                return self::REVIEWED_PM_AUTO;
+            case self::REVIEWED_PM_UNCHANGED:
+                return self::REVIEWED_PM_UNCHANGED_AUTO;
             case self::REVIEWED_TRANSLATOR:
                 return self::REVIEWED_TRANSLATOR_AUTO;
             default:
@@ -188,12 +234,13 @@ class editor_Models_SegmentAutoStates {
      * calculates and returns the autoStateID to use
      * @param editor_Models_Segment $segment
      * @param editor_Models_TaskUserAssoc $tua
+     * @param boolean $sourceEditing
      */
-    public function calculateSegmentState(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua) {
-        $isSourceModified = $segment->isModified('sourceEdited') && $segment->getSource() !== $segment->getSourceEdited();
-        $isTargetModified = $segment->isModified('edited') && $segment->getTarget() !== $segment->getEdited();
+    public function calculateSegmentState(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua, $sourceEditing) {
+        $isSourceModified = $sourceEditing && ($segment->getSource() !== $segment->getSourceEdited());
+        $isTargetModified = $segment->getTarget() !== $segment->getEdited();
         $isModified = $isSourceModified || $isTargetModified;
-        $alreadyReviewed = $segment->getAutoStateId() == self::REVIEWED;
+        
         $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
         
         if($segment->getAutoStateId() == self::BLOCKED){
@@ -204,9 +251,13 @@ class editor_Models_SegmentAutoStates {
             return self::REVIEWED_TRANSLATOR;
         }
         if($tua->getRole() == $workflow::ROLE_LECTOR) {
-            //REVIEWED state must not be revoked by editing again
-            return ($isModified || $alreadyReviewed) ? self::REVIEWED : self::REVIEWED_UNCHANGED;
+            return $isModified ? self::REVIEWED : self::REVIEWED_UNCHANGED;
         }
+        
+        if($this->isEditWithoutAssoc($tua)){
+            return $isModified ? self::REVIEWED_PM : self::REVIEWED_PM_UNCHANGED;
+        }
+        
         //if no role match, return old value
         return $segment->getAutoStateId(); 
     }
@@ -237,9 +288,26 @@ class editor_Models_SegmentAutoStates {
      * changes the state after add / edit a comment of this task
      * @param editor_Models_Segment $segment
      */
-    public function updateAfterCommented(editor_Models_Segment $segment) {
+    public function updateAfterCommented(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua) {
         if($segment->getAutoStateId() == self::TRANSLATED || $segment->getAutoStateId() == self::NOT_TRANSLATED) {
-            $segment->setAutoStateId(self::REVIEWED_UNCHANGED);
+            if($this->isEditWithoutAssoc($tua)) {
+                $stateToSet = self::REVIEWED_PM_UNCHANGED;
+            }
+            else {
+                $stateToSet = self::REVIEWED_UNCHANGED;
+            }
+            $segment->setAutoStateId($stateToSet);
         }
+    }
+    
+    /**
+     * returns true if user has right to edit all Tasks, checks optionally the workflow role of the user
+     * @param editor_Models_TaskUserAssoc $tua optional, if not given only acl is considered
+     */
+    protected function isEditWithoutAssoc(editor_Models_TaskUserAssoc $tua = null) {
+        $userSession = new Zend_Session_Namespace('user');
+        $role = $tua && $tua->getRole();
+        $acl = ZfExtended_Acl::getInstance();
+        return empty($role) && $acl->isInAllowedRoles($userSession->data->roles,'editAllTasks');
     }
 }

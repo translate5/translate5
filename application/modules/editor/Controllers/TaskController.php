@@ -88,14 +88,19 @@ class editor_TaskController extends ZfExtended_RestController {
     protected $filterClass = 'editor_Models_Filter_TaskSpecific';
     
     /**
-     *
      * @var editor_Workflow_Abstract 
      */
     protected $workflow;
+    
+    /**
+     * @var ZfExtended_Acl 
+     */
+    protected $acl;
 
     public function init() {
         parent::init();
         $this->now = date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME']);
+        $this->acl = ZfExtended_Acl::getInstance();
         $this->user = new Zend_Session_Namespace('user');
         $this->workflow = ZfExtended_Factory::get('editor_Workflow_Default');
     }
@@ -125,11 +130,9 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     public function loadAll()
     {
-        $acl = ZfExtended_Acl::getInstance();
-        /* @var $acl ZfExtended_Acl */
         $filter = $this->entity->getFilter();
         $assocFilter = $filter->isUserAssocNeeded();
-        $isAllowedToLoadAll = $acl->isInAllowedRoles($this->user->data->roles,'loadAllTasks');
+        $isAllowedToLoadAll = $this->acl->isInAllowedRoles($this->user->data->roles,'loadAllTasks');
         if(!$assocFilter && $isAllowedToLoadAll) {
             $this->totalCount = $this->entity->getTotalCount();
             $rows = $this->entity->loadAll();
@@ -339,9 +342,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->setDataInEntity();
         $this->entity->validate();
         
-        $acl = ZfExtended_Acl::getInstance();
-        /* @var $acl ZfExtended_Acl */
-        if(!$acl->isInAllowedRoles($this->user->data->roles,'loadAllTasks')
+        if(!$this->acl->isInAllowedRoles($this->user->data->roles,'loadAllTasks')
                 &&
                 ($this->isOpenTaskRequest(true)&&
                     !$this->workflow->isTaskOfUser($taskguid, $this->user->data->userGuid, false,true)
@@ -349,6 +350,9 @@ class editor_TaskController extends ZfExtended_RestController {
                     !$this->workflow->isTaskOfUser($taskguid, $this->user->data->userGuid, true,false)
                 )
            ){
+            //if the task was already in session, we must delete it. 
+            //If not the user will always receive an error in JS, and would not be able to do anything.
+            $this->entity->unregisterInSession(); //FIXME XXX the changes in the session made by this method is not stored in the session!
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
         
@@ -392,11 +396,15 @@ class editor_TaskController extends ZfExtended_RestController {
      * @param array $allAssocInfos
      */
     protected function addUserInfos(array &$row, $taskguid, array $userAssocInfos, array $allAssocInfos) {
+        $isEditAll = $this->acl->isInAllowedRoles($this->user->data->roles,'editAllTasks');
         //Add actual User Assoc Infos to each Task
         if(isset($userAssocInfos[$taskguid])) {
             $row['userRole'] = $userAssocInfos[$taskguid]['role'];
             $row['userState'] = $userAssocInfos[$taskguid]['state'];
             $row['userStep'] = $this->workflow->getStepOfRole($row['userRole']);
+        }
+        elseif($isEditAll && isset($this->data->userState)) {
+            $row['userState'] = $this->data->userState; //returning the given userState for usage in frontend
         }
         
         //Add all User Assoc Infos to each Task
@@ -490,7 +498,15 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $userTaskAssoc editor_Models_TaskUserAssoc */
-        $userTaskAssoc->loadByParams($userGuid,$this->entity->getTaskGuid());
+        try {
+            $userTaskAssoc->loadByParams($userGuid,$this->entity->getTaskGuid());
+        }
+        catch(ZfExtended_NotFoundException $e) {
+            if($this->acl->isInAllowedRoles($this->user->data->roles,'editAllTasks')){
+                return;
+            }
+            throw $e;
+        }
 
         $oldUserTaskAssoc = clone $userTaskAssoc;
         
@@ -581,9 +597,7 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     public function getAction() {
         $res = parent::getAction();
-        $acl = ZfExtended_Acl::getInstance();
-        /* @var $acl ZfExtended_Acl */
-        if(!$acl->isInAllowedRoles($this->user->data->roles,'loadAllTasks') && 
+        if(!$this->acl->isInAllowedRoles($this->user->data->roles,'loadAllTasks') && 
                 !$this->workflow->isTaskOfUser($this->entity->getTaskGuid(), 
                     $this->user->data->userGuid, true)){
             throw new ZfExtended_Models_Entity_NoAccessException();

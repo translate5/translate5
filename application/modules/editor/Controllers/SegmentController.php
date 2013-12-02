@@ -95,9 +95,10 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->entity->setUserGuid($sessionUser->data->userGuid);
         $this->entity->setUserName($sessionUser->data->userName);
         
+        //@todo do this with events
         $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
         /* @var $workflow editor_Workflow_Default */
-        $workflow->beforeSegmentSave($this->entity);
+        $workflow->beforeSegmentSave($this->entity, $session->task->enableSourceEditing);
         
         $this->entity->validate();
         
