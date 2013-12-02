@@ -165,10 +165,6 @@ Ext.define('Editor.model.admin.Task', {
    * @returns {Boolean}
    */
   isOpenable: function() {
-      //if a task is pending, it cant be opened
-      if(this.isPending()){
-          return false;
-      }
       //a user with editorEditAllTasks (normally PMs) can always open the task
       if(Editor.app.authenticatedUser.isAllowed('editorEditAllTasks')){
           return true;

@@ -207,7 +207,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       var vm = this.application.getController('ViewModes'),
           task = Editor.data.task,
           sep;
-      if(task.get('userState') == 'view' || ! this.isAllowed('editorEditTask', task)) {
+      if(task.isReadOnly() || ! this.isAllowed('editorEditTask', task)) {
           //readonly:
           grid.down('#viewModeMenu').hide();
           sep = grid.down('#viewModeMenu').nextNode('.tbseparator');
