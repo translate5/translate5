@@ -159,6 +159,7 @@ Ext.define('Editor.controller.Localizer', {
 
     Editor.view.ViewPortEditor.prototype.items_west_title = '<?php echo $this->translate->_('Dateien');?>';
   	Editor.view.ui.segments.Grid.prototype.title = '<?php echo $this->translate->_('Segmentliste und Editor');?>';
+  	Editor.view.ui.segments.Grid.prototype.title_readonly = '<?php echo $this->translate->_('Segmentliste und Editor - [LESEMODUS]');?>';
   	Editor.view.ui.segments.Grid.prototype.item_viewModesMenu = '<?php echo $this->translate->_('Editormodi');?>',
   	Editor.view.ui.segments.Grid.prototype.item_viewModeBtn = '<?php echo $this->translate->_('Ansicht');?>',
   	Editor.view.ui.segments.Grid.prototype.item_editModeBtn = '<?php echo $this->translate->_('Bearbeitung');?>',
@@ -484,7 +485,7 @@ Ext.define('Editor.controller.Localizer', {
         back: '<?php echo $this->translate->_('zurück zur Aufgabenliste');?>',
         finishBtn: '<?php echo $this->translate->_('Aufgabe abschließen');?>',
         endBtn: '<?php echo $this->translate->_('Aufgabe beenden');?>',
-        readonly: '<?php echo $this->translate->_(' - schreibgeschützt');?>'
+        readonly: '<?php echo $this->translate->_(' - [LESEMODUS]');?>'
     };
 <?php
     }//END if($hasFrontendController('Editor.controller.HeadPanel'))

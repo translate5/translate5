@@ -198,6 +198,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         else {
             $task = ZfExtended_Factory::get('editor_Models_Task');
             /* @var $task editor_Models_Task */
+            //FIXME TRANSLATE-55 if a taskguid remains in the session, 
+            //the user will be caught in a zend 404 Screen instead of getting the adminpanel.
             $task->loadByTaskGuid($this->session->taskGuid);
             $taskData = $task->getDataObject();
             unset($taskData->qmSubsegmentFlags);
