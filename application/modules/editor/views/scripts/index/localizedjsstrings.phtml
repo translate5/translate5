@@ -285,12 +285,11 @@ Ext.define('Editor.controller.Localizer', {
 
     Editor.view.admin.task.GridFilter.prototype.noRelaisLang = '<?php echo $this->translate->_('- Ohne Relaissprache -');?>';
     Editor.view.admin.task.GridFilter.prototype.strings = {
-        task_state_open: '<?php echo $this->translate->_('offen (nicht beendet)');?>',
-        user_state_open: '<?php echo $this->translate->_('offen (für mich bearbeitbar)');?>',
+        user_state_open: '<?php echo $this->translate->_('offen');?>',
         locked: '<?php echo $this->translate->_('in Arbeit');?>',
-        user_state_waiting: '<?php echo $this->translate->_('wartend (für mich künftig bearbeitbar)');?>',
-        user_state_finished: '<?php echo $this->translate->_('abgeschlossen (von mir fertig bearbeitet)');?>',
-        task_state_end: '<?php echo $this->translate->_('beendet (für alle Benutzer)');?>',
+        user_state_waiting: '<?php echo $this->translate->_('wartend');?>',
+        user_state_finished: '<?php echo $this->translate->_('abgeschlossen');?>',
+        task_state_end: '<?php echo $this->translate->_('beendet');?>',
         forMe: '<?php echo $this->translate->_('für mich ');?>'
     };
         

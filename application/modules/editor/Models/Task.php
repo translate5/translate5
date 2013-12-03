@@ -413,9 +413,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $rowsUpdated = $this->db->update(array('locked'=>  $datetime), 
                 array('taskGuid = ? and locked is null'=>$this->getTaskGuid()));
         if($rowsUpdated===0){
-            if(!is_null($this->getLocked())&&$this->getLockingUser()==$user->data->userGuid)//already locked by this same user
-                return true;
-            return false;
+            return !is_null($this->getLocked()) && $this->getLockingUser() == $user->data->userGuid;//already locked by this same user
         }
         if($rowsUpdated===1){
             $session = new Zend_Session_Namespace();

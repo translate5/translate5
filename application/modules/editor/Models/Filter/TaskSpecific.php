@@ -78,6 +78,10 @@ class editor_Models_Filter_TaskSpecific extends ZfExtended_Models_Filter_ExtJs {
         //remove old state $filter provided by client
         unset($this->filter[$key]); 
         
+        $orFilter = new stdClass();
+        $orFilter->type = 'orExpression';
+        $orFilter->value = array();
+        
         $userStates = array();
         $taskStates = array();
         
@@ -104,28 +108,23 @@ class editor_Models_Filter_TaskSpecific extends ZfExtended_Models_Filter_ExtJs {
         //adds the additional locked filter
         if(!empty($locked)){
             $filter->_table = $task::TABLE_ALIAS;
-            $this->filter[] = $locked;
+            $orFilter->value[] = $locked;
         }
         
-        if(empty($taskStates)){
-            //if a user State filter is set, with should to consider only open tasks:
-            if($this->isUserAssocNeeded) {
-                $f = clone $filter;
-                $f->value = array('open');
-                $f->_table = $task::TABLE_ALIAS;
-                $this->filter[] = $f;
-            }
-        } else {
+        if(!empty($taskStates)){
             $filter->value = $taskStates;
             $filter->_table = $task::TABLE_ALIAS;
-            $this->filter[] = $filter;
+            $orFilter->value[] = $filter;
         }
         if($this->isUserAssocNeeded){
             $f = clone $filter;
             $f->value = $userStates;
             $f->_table = $task::ASSOC_TABLE_ALIAS;
-            $this->filter[] = $f;
+            $orFilter->value[] = $f;
         }
+        
+        //add the new OR filter to the filter list
+        $this->filter[] = $orFilter;
     }
     
     /**
