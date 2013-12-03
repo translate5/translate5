@@ -255,11 +255,6 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
         /* @var $workflow editor_Workflow_Default */
         $this->db->update(array('state' => $workflow::STATE_OPEN), array('state = ?' => $workflow::STATE_EDIT, 'taskGuid = ?' => $taskGuid, 'userGuid = ?' => $lockingUser));
-        $this->db->update(array('state' => $workflow::STATE_OPEN), array(
-            'state in (?)' => array($workflow::STATE_EDIT, $workflow::STATE_VIEW),
-            'taskGuid = ?' => $taskGuid,
-            'userGuid = ?' => $lockingUser
-        ));
     }
     
     /**
