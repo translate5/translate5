@@ -180,7 +180,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
       },{
           xtype: 'gridcolumn',
           width: 70,
-          menuDisabled: true,
           dataIndex: 'state',
           tdCls: 'state',
           renderer: function(v, meta, rec) {

@@ -51,16 +51,15 @@ Ext.define('Editor.view.admin.task.GridFilter', {
     noRelaisLang: '#UT#- Ohne Relaissprache -',
     
     strings: {
-        task_state_open: '#UT#offen (nicht beendet)',
-        user_state_open: '#UT#offen (für mich bearbeitbar)',
+        user_state_open: '#UT#offen',
+        user_state_waiting: '#UT#wartend',
+        user_state_finished: '#UT#abgeschlossen',
+        task_state_end: '#UT#beendet',
         locked: '#UT#in Arbeit',
-        user_state_waiting: '#UT#wartend (für mich künftig bearbeitbar)',
-        user_state_finished: '#UT#abgeschlossen (von mir fertig bearbeitet)',
-        task_state_end: '#UT#beendet (für alle Benutzer)',
         forMe: '#UT#für mich '
     },
     
-    stateFilterOrder: ['task_state_open','user_state_open','locked','user_state_waiting','user_state_finished','task_state_end'],
+    stateFilterOrder: ['user_state_open','user_state_waiting','user_state_finished','locked', 'task_state_end'],
 
     constructor: function(config) {
         var me = this;

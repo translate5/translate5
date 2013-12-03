@@ -194,6 +194,9 @@ Ext.define('Editor.controller.QmSubSegments', {
             commentField = me.getQmFieldset().down('textfield[name="qmsubcomment"]'),
             format = Ext.util.Format,
             comment = format.stripTags(commentField.getValue()).replace(/[<>"']/g,'');
+            //@todo when we are going to make qm subsegments editable, we should improve the handling of html tags in comments.
+            //since TRANSLATE-80 we are stripping the above chars, 
+            //because IE did not display the segment content completly with qm subsegments containing these chars
                 
         if(! me.addQmFlagToEditor(menuitem.qmid, comment, sev.getValue())) {
             Ext.Msg.alert(me.strings.emptySelTitle, me.strings.emptySelText);
