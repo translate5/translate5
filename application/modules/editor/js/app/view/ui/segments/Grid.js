@@ -71,6 +71,7 @@ Ext.define('Editor.view.ui.segments.Grid', {
   cls: 'segment-tag-viewer',
   id: 'segment-grid',
   title: 'Segmentliste und Editor',
+  title_readonly: '#UT#Segmentliste und Editor - [LESEMODUS]',
 
   //Item Strings: 
   item_viewModesMenu: 'Editormodi',

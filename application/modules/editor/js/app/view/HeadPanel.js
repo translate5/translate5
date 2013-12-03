@@ -50,7 +50,7 @@ Ext.define('Editor.view.HeadPanel', {
         back: '#UT#zurück zur Aufgabenliste',
         finishBtn: '#UT#Aufgabe abschließen',
         endBtn: '#UT#Aufgabe beenden',
-        readonly: '#UT# - schreibgeschützt'
+        readonly: '#UT# - [LESEMODUS]'
     },
     infoTpl: [
                   '<div class="info-line"><span class="user-label">{userLabel}:</span> <span class="user-name">{user.firstName} {user.surName}</span></div>',

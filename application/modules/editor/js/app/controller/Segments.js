@@ -129,6 +129,8 @@ Ext.define('Editor.controller.Segments', {
       },
       '#segmentgrid' : {
           afterrender: function(grid) {
+              var ro = Editor.data.task && Editor.data.task.isReadOnly();
+              grid.setTitle(ro ? grid.title_readonly : grid.title);
               this.styleResetFilterButton(grid.filters);
           },
         selectionchange: me.handleSegmentSelectionChange,
