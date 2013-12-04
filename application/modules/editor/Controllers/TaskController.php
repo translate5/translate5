@@ -112,12 +112,18 @@ class editor_TaskController extends ZfExtended_RestController {
     public function indexAction()
     {
         $unlockedTasks = $this->entity->cleanupLockedJobs();
-        if(!empty($unlockedTasks)) {
-            $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-            /* @var $tua editor_Models_TaskUserAssoc */
-            foreach($unlockedTasks as $task) {
-                $tua->cleanupLocked($task['taskGuid'], $task['lockingUser']);
-            }
+        $userGuid = $this->user->data->userGuid;
+        
+        //we clean up ALL tasks belonging to the actual user, 
+        //since if this action is called he has left the task (TRANSLATE-91)
+        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        $tasksOfUser = $tua->loadByUserGuid($userGuid);
+        if(!empty($tasksOfUser)) {
+            $reduce = function($task){
+                return $task['taskGuid'];
+            };
+            $tua->cleanupLocked(array_map($reduce, $tasksOfUser), $userGuid);
         }
         
         $this->view->rows = $this->loadAll();

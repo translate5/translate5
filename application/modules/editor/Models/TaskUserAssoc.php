@@ -245,16 +245,18 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * FIXME die state transistions on unlock (aktuell edit zu open) in den workflow verlagern. 
-     * Dies durchführen mit der Umsetzung des FIXMEs in TaskController Line 348
-     * Noch besser das TaskUserAssoc cleanup per event an das Task cleanup binden
-     * @param string $taskGuid
-     * @param string $lockingUser GUID
+     * @param array $taskGuids
+     * @param string $userGuid
      */
-    public function cleanupLocked($taskGuid, $lockingUser) {
+    public function cleanupLocked(array $taskGuids, $userGuid) {
         $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
         /* @var $workflow editor_Workflow_Default */
-        $this->db->update(array('state' => $workflow::STATE_OPEN), array('state = ?' => $workflow::STATE_EDIT, 'taskGuid = ?' => $taskGuid, 'userGuid = ?' => $lockingUser));
+        
+        $this->db->update(array('state' => $workflow::STATE_OPEN), array(
+            'state in (?)' => $workflow->getAllowedTransitionStates($workflow::STATE_OPEN),
+            'taskGuid in (?)' => $taskGuids,
+            'userGuid = ?' => $userGuid
+        ));
     }
     
     /**

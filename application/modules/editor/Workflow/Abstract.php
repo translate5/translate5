@@ -400,6 +400,18 @@ abstract class editor_Workflow_Abstract {
         $state = $taskUserAssoc->getState();
         return !($state == self::STATE_FINISH || $state == self::STATE_WAITING);
     }
+
+    /**
+     * returns the possible start states for a transition to the target state
+     * @param string $targetState
+     * @return array
+     */
+    public function getAllowedTransitionStates($targetState) {
+        if($targetState == self::STATE_OPEN){
+            return array(self::STATE_EDIT, self::STATE_VIEW);
+        }
+        return array();
+    }
     
     /**
      * simple debugging
