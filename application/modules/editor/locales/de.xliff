@@ -753,6 +753,7 @@ Sie erreichen das Portal unter: %3$s<br />
 <trans-unit id='UE0gUHLDvGZ1bmc='><source>PM Prüfung</source><target>PM Prüfung</target></trans-unit>
 <trans-unit id='U2VnbWVudGxpc3RlIHVuZCBFZGl0b3IgLSBbTEVTRU1PRFVTXQ=='><source>Segmentliste und Editor - [LESEMODUS]</source><target>Segmentliste und Editor - [LESEMODUS]</target></trans-unit>
 <trans-unit id='IC0gW0xFU0VNT0RVU10='><source> - [LESEMODUS]</source><target> - [LESEMODUS]</target></trans-unit>
+<trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFpJUCBEYXRlaSE='><source>Bitte verwenden Sie eine ZIP Datei!</source><target>Bitte verwenden Sie eine ZIP Datei!</target></trans-unit>
   </body>
  </file>
 </xliff>
