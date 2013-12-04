@@ -41,6 +41,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     strings: {
         importZipTip: '#UT#Wählen Sie die zu importierenden Daten (ZIP, CSV; Angabe notwendig)',
         importZipLabel: '#UT#Import Datei¹',
+        importZipType: '#UT#Bitte verwenden Sie eine ZIP Datei!',
         taskNrLabel: '#UT#Auftragsnummer',
         taskNameTip: '#UT#Projektname (frei wählbar, Angabe notwendig)',
         taskNameLabel: '#UT#Projektname¹',
@@ -115,6 +116,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                 }, langCombo),{
                     xtype: 'filefield',
                     name: 'importZip',
+                    regex: /\.zip$/i,
+                    regexText: me.strings.importZipType,
                     allowBlank: false,
                     toolTip: me.strings.importZipTip,
                     fieldLabel: me.strings.importZipLabel
