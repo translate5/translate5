@@ -325,6 +325,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         if(empty($taskGuid)) {
             return;
         }
+        
+        if($this->isLocked($taskGuid)) {
+            throw new ZfExtended_BadMethodCallException("task is locked by user");
+        }
+        
         //An der Segment und Files Tabelle hängen mehrere Abhängigkeiten,
         //daher diese manuell löschen vorher um DB Last durch Table Locks zu verringern.
         $segmentTable = ZfExtended_Factory::get('editor_Models_Db_Segments');
