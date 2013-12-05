@@ -215,6 +215,12 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      */
     public function delete() {
         $taskGuid = $this->get('taskGuid');
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        if($task->isLocked($taskGuid, $this->getUserGuid())) {
+            throw new ZfExtended_BadMethodCallException("task is locked by user");
+        }
+
         $result = parent::delete();
         $this->updateTask($taskGuid);
         return $result;

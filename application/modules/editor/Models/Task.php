@@ -450,6 +450,25 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * checks if the given taskGuid is locked. If optional userGuid is given, 
+     * checks if is locked by given userGuid. 
+     * @param string $taskGuid
+     * @param string $userGuid
+     * @return false|datetime returns false if not locked, lock timestamp if locked
+     */
+    public function isLocked(string $taskGuid, string $userGuid = null) {
+        $s = $this->db->select()->where('taskGuid = ?', $taskGuid);
+        if(!empty($userGuid)) {
+            $s->where('lockingUser = ?', $userGuid);
+        }
+        $row = $this->db->fetchRow($s);
+        if(empty($row) || empty($row['locked'])){
+            return false;
+        }
+        return $row['locked'];
+    }
+    
+    /**
      * returns a Zend_Config Object with task specific settings
      * @return Zend_Config
      */
