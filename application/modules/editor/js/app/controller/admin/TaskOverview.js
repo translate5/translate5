@@ -78,6 +78,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       taskReopen: '#UT#Aufgabe wird wieder eröffnet...',
       taskEnding: '#UT#Aufgabe wird beendet...',
       taskDestroy: '#UT#Aufgabe wird gelöscht...',
+      taskNotDestroyed : '#UT#Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!',
       forcedReadOnly: '#UT#Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!',
       openTaskAdminBtn: "#UT#Aufgabenübersicht"
   },
@@ -469,11 +470,21 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           app = Editor.app;
       app.mask(me.strings.taskDestroy, task.get('taskName'));
       task.destroy({
+          //callback as empty function to prevent default ServerException handling
+          callback: Ext.emptyFn,
           success: function() {
               store.load();
               app.unmask();
           },
-          failure: app.unmask
+          failure: function(records, op){
+              app.unmask();
+              if(op.getError().status == '405') {
+                  Editor.MessageBox.addError(me.strings.taskNotDestroyed);
+              }
+              else {
+                  Editor.app.getController('ServerException').handleException(op.response);
+              }
+          }
       });
   },
   /**
