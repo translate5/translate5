@@ -46,6 +46,7 @@ Ext.define('Editor.controller.ServerException', {
         "403_create": '#UT#Zum Speichern von neuen Daten fehlen Ihnen die nötigen Berechtigungen!',
         "403_edit": '#UT#Zum Speichern der bearbeiten Daten fehlen Ihnen die nötigen Berechtigungen!',
         "404": '#UT#Die angeforderten / zu bearbeitenden Daten wurden nicht gefunden!',
+        "405_del_assoc": '#UT#Ein Benutzer konnte nicht aus der Aufgabe entfernt werden, da er die Aufgabe aktuell benutzt.',
         "401_title": '#UT#Erneute Anmeldung',
         "401_msg": '#UT#Ihre Sitzungsdaten sind abgelaufen. Sie werden nun zur Anmeldeseite weitergeleitet.',
         "406": '#UT#Es ist ein Fehler aufgetreten!',
@@ -107,6 +108,16 @@ Ext.define('Editor.controller.ServerException', {
                 Ext.Msg.alert(str.title, appendServerMsg(text));
                 return;
             case 403:
+            //@todo remove this specific 405 handler with TRANSLATE-94
+            case 405: 
+                var req = response.request,
+                    regex = new RegExp('^'+Editor.data.restpath+'taskuserassoc');
+                if(req && req.options && req.options.method == 'DELETE' && regex.test(req.options.url)) {
+                    Editor.MessageBox.addError(appendServerMsg(str["405_del_assoc"]));
+                    return;
+                }
+                Ext.Msg.alert(str.title, text+tpl.apply([status, statusText]));
+                return;
             case 404:
                 if(str[_status+'_'+action]) {
                     _status = _status+'_'+action;
