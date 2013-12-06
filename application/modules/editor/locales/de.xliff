@@ -756,6 +756,7 @@ Sie erreichen das Portal unter: %3$s<br />
 <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFpJUCBEYXRlaSE='><source>Bitte verwenden Sie eine ZIP Datei!</source><target>Bitte verwenden Sie eine ZIP Datei!</target></trans-unit>
 <trans-unit id='RWluIEJlbnV0emVyIGtvbm50ZSBuaWNodCBhdXMgZGVyIEF1ZmdhYmUgZW50ZmVybnQgd2VyZGVuLCBkYSBlciBkaWUgQXVmZ2FiZSBha3R1ZWxsIGJlbnV0enQu'><source>Ein Benutzer konnte nicht aus der Aufgabe entfernt werden, da er die Aufgabe aktuell benutzt.</source><target>Ein Benutzer konnte nicht aus der Aufgabe entfernt werden, da er die Aufgabe aktuell benutzt.</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSB3aXJkIG5vY2ggdmVyd2VuZGV0IHVuZCBrYW5uIGRhaGVyIG5pY2h0IGdlbMO2c2NodCB3ZXJkZW4h'><source>Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!</source><target>Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!</target></trans-unit>
+<trans-unit id='TmljaHQgYXV0aGVudGlmaXppZXJ0IQ=='><source>Nicht authentifiziert!</source><target>Nicht authentifiziert!</target></trans-unit>
   </body>
  </file>
 </xliff>
