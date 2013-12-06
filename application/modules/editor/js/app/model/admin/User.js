@@ -77,12 +77,6 @@ Ext.define('Editor.model.admin.User', {
                   return false;
               }
               break;
-          case 'editorDeleteTask':
-          case 'editorChangeUserAssocTask':
-              if(task.isLocked()) {
-                  return false;
-              }
-              break;
           case 'editorEndTask':
               if(task.isEnded() || task.isLocked()) {
                   return false;
