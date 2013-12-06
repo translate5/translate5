@@ -46,12 +46,16 @@
  * @method string getTaskGuid() getTaskGuid()
  * @method string getUserGuid() getUserGuid()
  * @method string getState() getState()
- * @method string getRole() getRole() FOO BAR
+ * @method string getRole() getRole()
+ * @method string getUsedState() getUsedState()
+ * @method string getUsedInternalSessionUniqId() getUsedInternalSessionUniqId()
  * @method void setId() setId(integer $id)
  * @method void setTaskGuid() setTaskGuid(string $taskGuid)
  * @method void setUserGuid() setUserGuid(string $userGuid)
  * @method void setState() setState(string $state)
- * @method void setRole() setRole(string $role) FOO BAR
+ * @method void setRole() setRole(string $role)
+ * @method void setUsedState() setUsedState(string $state)
+ * @method void setUsedInternalSessionUniqId() setUsedInternalSessionUniqId(string $sessionId)
  */
 class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     
@@ -216,6 +220,10 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     public function delete() {
         $taskGuid = $this->get('taskGuid');
         $task = ZfExtended_Factory::get('editor_Models_Task');
+        if($this->isUsed()) {
+            throw new ZfExtended_BadMethodCallException("task is used by user");
+        }
+        
         /* @var $task editor_Models_Task */
         if($task->isLocked($taskGuid, $this->getUserGuid())) {
             throw new ZfExtended_BadMethodCallException("task is locked by user");
@@ -243,26 +251,70 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * @todo this method is a perfect example for the usage in events!
      */
     protected function updateTask($taskGuid) {
-        $sql = 'update `LEK_task` t, (select count(*) cnt, taskGuid from `LEK_taskUserAssoc` where taskGuid = ?) tua 
+        $sql = 'update `LEK_task` t, (select count(*) cnt, ? taskGuid from `LEK_taskUserAssoc` where taskGuid = ?) tua 
             set t.userCount = tua.cnt where t.taskGuid = tua.taskGuid';
         $db = $this->db->getAdapter();
-        $sql = $db->quoteInto($sql, $taskGuid);
+        $sql = $db->quoteInto($sql, $taskGuid, 'string', 2);
         $db->query($sql);
     }
     
     /**
-     * @param array $taskGuids
-     * @param string $userGuid
+     * set all associations of the given taskGuid (or for all tasks if null) to unused where the session is expired
+     * sets also the state to open where allowed
+     * @param string $taskGuid optional, if omitted cleanup all taskUserAssocs
      */
-    public function cleanupLocked(array $taskGuids, $userGuid) {
+    public function cleanupLocked($taskGuid = null) {
         $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
         /* @var $workflow editor_Workflow_Default */
         
-        $this->db->update(array('state' => $workflow::STATE_OPEN), array(
-            'state in (?)' => $workflow->getAllowedTransitionStates($workflow::STATE_OPEN),
-            'taskGuid in (?)' => $taskGuids,
-            'userGuid = ?' => $userGuid
-        ));
+        $validSessionIds = ZfExtended_Models_Db_Session::GET_VALID_SESSIONS_SQL;
+        $where = array('not usedState is null and (usedInternalSessionUniqId not in ('.$validSessionIds.') or usedInternalSessionUniqId is null)');
+        
+        if(!empty($taskGuid)) {
+            $where['taskGuid = ?'] = $taskGuid;
+        }
+
+        //updates the workflow state back to open if allowed
+        $where2 = $where;
+        $where2['state in (?)'] = $workflow->getAllowedTransitionStates($workflow::STATE_OPEN);
+        $this->db->update(array('state' => $workflow::STATE_OPEN), $where2);
+        
+        //unuse the associations where the using sessionId was expired, this update must be performed after the other!
+        $this->db->update(array('usedState' => null,'usedInternalSessionUniqId' => null), $where);
+    }
+    
+    /**
+     * returns true if user of the currently loaded taskUserAssoc uses the associated task
+     * @return boolean
+     */
+    public function isUsed() {
+        $validSessionIds = ZfExtended_Models_Db_Session::GET_VALID_SESSIONS_SQL;
+        $validSessionIds .= ' AND internalSessionUniqId = ?';
+        $res = $this->db->getAdapter()->query($validSessionIds, array($this->getUsedInternalSessionUniqId()));
+        $validSessions = $res->fetchAll();
+        //if usedInternalSessionUniqId not exists in the session table reset it, 
+        //  also the usedState value and return false
+        if(empty($validSessions)){
+            $this->db->update(array('usedState' => null, 'usedInternalSessionUniqId' => null), 'id = '.(int)$this->getId());
+            return false;
+        }
+        $usedState = $this->getUsedState();
+        // if usedState is set and sessionId is valid return true
+        return !empty($usedState);
+    }
+    
+    /**
+     * loads and returns the currently used associations of the given taskGuid
+     * @param string $taskGuid
+     * @return array
+     */
+    public function loadUsed(string $taskGuid) {
+        $this->cleanupLocked($taskGuid);
+        $s = $this->db->select()
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('not usedState is null')
+            ->where('not usedInternalSessionUniqId is null');
+        return $this->db->fetchAll($s)->toArray();
     }
     
     /**

@@ -118,13 +118,7 @@ class editor_TaskController extends ZfExtended_RestController {
         //since if this action is called he has left the task (TRANSLATE-91)
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
-        $tasksOfUser = $tua->loadByUserGuid($userGuid);
-        if(!empty($tasksOfUser)) {
-            $reduce = function($task){
-                return $task['taskGuid'];
-            };
-            $tua->cleanupLocked(array_map($reduce, $tasksOfUser), $userGuid);
-        }
+        $tua->cleanupLocked();
         
         $this->view->rows = $this->loadAll();
         $this->view->total = $this->totalCount;
@@ -516,10 +510,21 @@ class editor_TaskController extends ZfExtended_RestController {
 
         $oldUserTaskAssoc = clone $userTaskAssoc;
         
+        if($this->isOpenTaskRequest()){
+            $session = new Zend_Session_Namespace();
+            $userTaskAssoc->setUsedInternalSessionUniqId($session->internalSessionUniqId);
+            $userTaskAssoc->setUsedState($this->data->userState);
+        }else {
+            $userTaskAssoc->setUsedInternalSessionUniqId(null);
+            $userTaskAssoc->setUsedState(null);
+        }
+        
         if($this->workflow->isStateChangeable($userTaskAssoc)) {
             $userTaskAssoc->setState($this->data->userState);
-            $userTaskAssoc->save();
         }
+        
+        $userTaskAssoc->save();
+        
         $this->workflow->doWithUserAssoc($oldUserTaskAssoc, $userTaskAssoc);
         
         if($oldUserTaskAssoc->getState() != $this->data->userState){

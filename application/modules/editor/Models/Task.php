@@ -326,6 +326,10 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             return;
         }
         
+        if($this->isUsed($taskGuid)) {
+            throw new ZfExtended_BadMethodCallException("task is used by user");
+        }
+        
         if($this->isLocked($taskGuid)) {
             throw new ZfExtended_BadMethodCallException("task is locked by user");
         }
@@ -397,10 +401,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return array an array with tasks which were unlocked
      */
     public function cleanupLockedJobs() {
-        $validSessionIds = 'select internalSessionUniqId  from sessionMapInternalUniqId m, session s  where s.modified + lifetime >= UNIX_TIMESTAMP() and s.session_id = m.session_id';
+        $validSessionIds = ZfExtended_Models_Db_Session::GET_VALID_SESSIONS_SQL;
         $where = 'not locked is null and (lockedInternalSessionUniqId not in ('.$validSessionIds.') or lockedInternalSessionUniqId is null)';
         $toUnlock = $this->db->fetchAll($this->db->select()->where($where))->toArray();
-        /* @var $tua editor_Models_TaskUserAssoc */
         $this->db->update(array('lockingUser' => null, 'locked' => null, 'lockedInternalSessionUniqId' => null), $where);
         return $toUnlock;
     }
@@ -471,6 +474,17 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             return false;
         }
         return $row['locked'];
+    }
+    
+    /**
+     * checks if the given taskGuid is used by any user
+     * @param string $taskGuid
+     */
+    public function isUsed(string $taskGuid) {
+        /* @var $tua editor_Models_TaskUserAssoc */
+        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        $used = $tua->loadUsed($taskGuid);
+        return !empty($used);
     }
     
     /**
