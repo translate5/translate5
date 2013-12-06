@@ -409,6 +409,10 @@ class editor_TaskController extends ZfExtended_RestController {
         
         //Add all User Assoc Infos to each Task
         if(isset($allAssocInfos[$taskguid])) {
+            $reducer = function($accu, $item) {
+                return $accu || !empty($item['usedState']);
+            };
+            $row['isUsed'] = array_reduce($allAssocInfos[$taskguid], $reducer, false);
             $row['users'] = $allAssocInfos[$taskguid];
         }
         
