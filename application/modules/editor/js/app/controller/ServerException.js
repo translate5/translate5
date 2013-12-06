@@ -113,6 +113,12 @@ Ext.define('Editor.controller.ServerException', {
                 var req = response.request,
                     regex = new RegExp('^'+Editor.data.restpath+'taskuserassoc');
                 if(req && req.options && req.options.method == 'DELETE' && regex.test(req.options.url)) {
+                    if(req.options && req.options.records && req.options.records.length > 0) {
+                        //for this Array.difference see TRANSLATE-95 it should be changed with TRANSLATE-94
+                        var assocs = Ext.getStore('admin.TaskUserAssocs'),
+                            removed = assocs.getRemovedRecords();
+                        assocs.removed = Ext.Array.difference(removed, req.options.records);
+                    }
                     Editor.MessageBox.addError(appendServerMsg(str["405_del_assoc"]));
                     return;
                 }
