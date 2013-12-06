@@ -107,10 +107,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
           if(task.isOpenable()) {
               res.push('openable');
           }
-          if(task.isPending()) {
-              //FIXME see TRANSLATE-91, the out commented line is a workaround:
-              //res.push('pending');
-          }
           if(task.isReadOnly()) {
               res.push('readonly');
           }
