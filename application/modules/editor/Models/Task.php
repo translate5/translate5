@@ -327,11 +327,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         
         if($this->isUsed($taskGuid)) {
-            throw new ZfExtended_BadMethodCallException("task is used by user");
+            throw new ZfExtended_BadMethodCallException("Die Aufgabe wird von einem Benutzer benutzt",0,null,true);
         }
         
         if($this->isLocked($taskGuid)) {
-            throw new ZfExtended_BadMethodCallException("task is locked by user");
+            throw new ZfExtended_BadMethodCallException("Die Aufgabe ist durch einen Benutzer gesperrt",0,null,true);
         }
         
         //An der Segment und Files Tabelle hängen mehrere Abhängigkeiten,

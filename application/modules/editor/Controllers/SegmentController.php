@@ -158,7 +158,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
 
     /**
      * checks if current put makes sense to save
-     * @throws ZfExtended_Models_Entity_NotAcceptableException
      * @return boolean
      */
     protected function checkPlausibilityOfPut() {

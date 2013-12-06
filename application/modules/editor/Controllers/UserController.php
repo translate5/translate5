@@ -96,7 +96,7 @@ class Editor_UserController extends ZfExtended_RestController {
     public function getAction() {
         parent::getAction();
         if($this->entity->getLogin() == 'system') {
-            throw new ZfExtended_Models_Entity_NotFoundException("System User was accessed");
+            throw new ZfExtended_Models_Entity_NotFoundException("System Benutzer wurde versucht zu erreichen",0,null,true);
         }
         $this->credentialCleanup();
     }

@@ -230,12 +230,12 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $taskGuid = $this->get('taskGuid');
         $task = ZfExtended_Factory::get('editor_Models_Task');
         if($this->isUsed()) {
-            throw new ZfExtended_BadMethodCallException("task is used by user");
+            throw new ZfExtended_BadMethodCallException("Die Aufgabe wird von einem Benutzer benutzt",0,null,true);
         }
         
         /* @var $task editor_Models_Task */
         if($task->isLocked($taskGuid, $this->getUserGuid())) {
-            throw new ZfExtended_BadMethodCallException("task is locked by user");
+            throw new ZfExtended_BadMethodCallException("Die Aufgabe ist durch einen Benutzer gesperrt",0,null,true);
         }
 
         $result = parent::delete();
