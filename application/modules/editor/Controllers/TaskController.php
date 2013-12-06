@@ -173,7 +173,6 @@ class editor_TaskController extends ZfExtended_RestController {
     protected function getUserAssocInfos($taskGuids, &$userAssocInfos) {
         $userAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $userAssoc editor_Models_TaskUserAssoc */
-        //$assocs = $userAssoc->loadByUserGuid($this->user->data->userGuid);
         $userGuid = $this->user->data->userGuid;
         $assocs = $userAssoc->loadByTaskGuidList($taskGuids);
         $res = array();
@@ -187,7 +186,10 @@ class editor_TaskController extends ZfExtended_RestController {
             $userInfo = $this->getUserinfo($assoc['userGuid']);
             $assoc['userName'] = $userInfo['surName'].', '.$userInfo['firstName'];
             $assoc['login'] = $userInfo['login'];
-            $res[$assoc['taskGuid']][] = $assoc;
+            //set only not pmOverrides
+            if(empty($assoc['isPmOverride'])) {
+                $res[$assoc['taskGuid']][] = $assoc;
+            }
         }
         $userSorter = function($first, $second){
             if($first['userName'] > $second['userName']) {
@@ -500,25 +502,42 @@ class editor_TaskController extends ZfExtended_RestController {
             return;
         }
         
+        $isEditAllTasks = $this->acl->isInAllowedRoles($this->user->data->roles,'editAllTasks');
+        $isOpen = $this->isOpenTaskRequest();
+        $isPmOverride = false;
+        
+        $taskGuid = $this->entity->getTaskGuid();
+        
         $userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $userTaskAssoc editor_Models_TaskUserAssoc */
         try {
-            $userTaskAssoc->loadByParams($userGuid,$this->entity->getTaskGuid());
+            $userTaskAssoc->loadByParams($userGuid,$taskGuid);
+            $isPmOverride = (boolean) $userTaskAssoc->getIsPmOverride();
         }
         catch(ZfExtended_NotFoundException $e) {
-            if($this->acl->isInAllowedRoles($this->user->data->roles,'editAllTasks')){
-                return;
+            if(! $isEditAllTasks){
+                throw $e;
             }
-            throw $e;
+            $userTaskAssoc->setUserGuid($userGuid);
+            $userTaskAssoc->setTaskGuid($taskGuid);
+            $userTaskAssoc->setRole('');
+            $userTaskAssoc->setState('');
+            $isPmOverride = true;
+            $userTaskAssoc->setIsPmOverride($isPmOverride);
         }
 
         $oldUserTaskAssoc = clone $userTaskAssoc;
         
-        if($this->isOpenTaskRequest()){
+        if($isOpen){
             $session = new Zend_Session_Namespace();
             $userTaskAssoc->setUsedInternalSessionUniqId($session->internalSessionUniqId);
             $userTaskAssoc->setUsedState($this->data->userState);
-        }else {
+        } else {
+            if($isPmOverride && $isEditAllTasks) {
+                editor_Models_LogTask::createWithUserGuid($taskGuid, $this->data->userState, $this->user->data->userGuid);
+                $userTaskAssoc->deletePmOverride();
+                return;
+            }
             $userTaskAssoc->setUsedInternalSessionUniqId(null);
             $userTaskAssoc->setUsedState(null);
         }
@@ -532,7 +551,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->workflow->doWithUserAssoc($oldUserTaskAssoc, $userTaskAssoc);
         
         if($oldUserTaskAssoc->getState() != $this->data->userState){
-            editor_Models_LogTask::createWithUserGuid($this->entity->getTaskGuid(), $this->data->userState, $this->user->data->userGuid);
+            editor_Models_LogTask::createWithUserGuid($taskGuid, $this->data->userState, $this->user->data->userGuid);
         }
     }
     

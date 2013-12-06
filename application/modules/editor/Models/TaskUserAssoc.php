@@ -49,6 +49,7 @@
  * @method string getRole() getRole()
  * @method string getUsedState() getUsedState()
  * @method string getUsedInternalSessionUniqId() getUsedInternalSessionUniqId()
+ * @method string getIsPmOverride() getIsPmOverride()
  * @method void setId() setId(integer $id)
  * @method void setTaskGuid() setTaskGuid(string $taskGuid)
  * @method void setUserGuid() setUserGuid(string $userGuid)
@@ -56,6 +57,7 @@
  * @method void setRole() setRole(string $role)
  * @method void setUsedState() setUsedState(string $state)
  * @method void setUsedInternalSessionUniqId() setUsedInternalSessionUniqId(string $sessionId)
+ * @method void setIsPmOverride() setIsPmOverride(boolean $isPmOverride)
  */
 class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     
@@ -79,7 +81,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * loads the tasks to the given user guid
+     * loads all tasks to the given user guid
      * @param guid $userGuid
      * @return array|null
      */
@@ -94,6 +96,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * loads the assocs regardless isPmOverride is set or not
      * @param array $list
      * @return array
      */
@@ -112,6 +115,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     /**
      * loads one TaskUserAssoc Instance by given params. If params taskGuid or role are
      * null, task is loaded regardless of taskGuid or role
+     * this method loads the assoc regardless isPmOverride is set or not
      * 
      * @param string $userGuid
      * @param string $taskGuid
@@ -153,17 +157,19 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * returns a matrix with the usage counts for all state, role combinations of the actually loaded assoc's task
+     * returns a matrix with the usage counts for all state, 
+     * role combinations of the actually loaded assoc's task (exclude pmOverrides)
      * @return array
      */
     public function getUsageStat() {
-        $sql = 'select state, role, count(userGuid) cnt from LEK_taskUserAssoc where taskGuid = ? group by state, role;';
+        $sql = 'select state, role, count(userGuid) cnt from LEK_taskUserAssoc where taskGuid = ? and isPmOverride = 0 group by state, role;';
         $res = $this->db->getAdapter()->query($sql, array($this->getTaskGuid()));
         return $res->fetchAll();
     }
     
     /**
      * returns a list with users to the actually loaded taskGuid and role
+     * loads only assocs where isPmOverride not set
      * @param string $taskGuid
      * @param string $role
      * @return array
@@ -174,6 +180,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $s = $user->db->select()
         ->from(array('u' => $user->db->info($db::NAME)))
         ->join(array('tua' => $db->info($db::NAME)), 'tua.userGuid = u.userGuid', array())
+        ->where('tua.isPmOverride = 0')
         ->where('tua.role = ?', $this->getRole())
         ->where('tua.taskGuid = ?', $this->getTaskGuid());
         return $user->db->fetchAll($s)->toArray();
@@ -181,6 +188,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * loads the TaskUserAssoc Content joined with userinfos (currently only login)
+     * loads only assocs where isPmOverride not set
      * @return array
      */
     public function loadAllWithUserInfo() {
@@ -189,7 +197,8 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $s = $db->select()
         ->setIntegrityCheck(false)
         ->from(array('tua' => $db->info($db::NAME)))
-        ->join(array('u' => $user->db->info($db::NAME)), 'tua.userGuid = u.userGuid', array('login', 'surName', 'firstName'));
+        ->join(array('u' => $user->db->info($db::NAME)), 'tua.userGuid = u.userGuid', array('login', 'surName', 'firstName'))
+        ->where('tua.isPmOverride = 0');
         //->where('tua.taskGuid = ?', $this->getTaskGuid()); kommt per filter aktuell!
         
         //default sort: 
@@ -233,6 +242,19 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $this->updateTask($taskGuid);
         return $result;
     }
+    
+    /**
+     * deletes the actual loaded assoc if it is a pmOverride assoc
+     */
+    public function deletePmOverride() {
+        $this->db->delete(array(
+            'id = ?' => $this->getId(),
+            'taskGuid = ?' => $this->getTaskGuid(),
+            'userGuid = ?' => $this->getUserGuid(),
+            'isPmOverride = 1',
+        ));
+        $this->init();
+    }
 
     /**
      * deletes all assoc entries for this userGuid, and updates the users counter in the Task Entity
@@ -251,7 +273,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * @todo this method is a perfect example for the usage in events!
      */
     protected function updateTask($taskGuid) {
-        $sql = 'update `LEK_task` t, (select count(*) cnt, ? taskGuid from `LEK_taskUserAssoc` where taskGuid = ?) tua 
+        $sql = 'update `LEK_task` t, (select count(*) cnt, ? taskGuid from `LEK_taskUserAssoc` where taskGuid = ? and isPmOverride = 0) tua 
             set t.userCount = tua.cnt where t.taskGuid = tua.taskGuid';
         $db = $this->db->getAdapter();
         $sql = $db->quoteInto($sql, $taskGuid, 'string', 2);
@@ -278,6 +300,11 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $where2 = $where;
         $where2['state in (?)'] = $workflow->getAllowedTransitionStates($workflow::STATE_OPEN);
         $this->db->update(array('state' => $workflow::STATE_OPEN), $where2);
+        
+        //delete all pmEditAll fake entries
+        $where3 = $where;
+        $where3[] = 'isPmOverride = 1';
+        $this->db->delete($where);
         
         //unuse the associations where the using sessionId was expired, this update must be performed after the other!
         $this->db->update(array('usedState' => null,'usedInternalSessionUniqId' => null), $where);

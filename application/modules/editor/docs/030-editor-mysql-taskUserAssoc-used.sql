@@ -35,3 +35,4 @@
 -- 
 alter table LEK_taskUserAssoc add column usedState varchar(60) default null;
 alter table LEK_taskUserAssoc add column usedInternalSessionUniqId char(32) default null;
+alter table LEK_taskUserAssoc add column isPmOverride int(1) not null default 0;

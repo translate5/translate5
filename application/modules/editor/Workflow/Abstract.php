@@ -465,9 +465,12 @@ abstract class editor_Workflow_Abstract {
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
         
-        try {
-            $tua->loadByParams($sessionUser->data->userGuid,$session->taskGuid);
-            
+        //we assume that on editing a segment, every user (also not associated pms) have a assoc, so no notFound must be handled
+        $tua->loadByParams($sessionUser->data->userGuid,$session->taskGuid);
+        if($tua->getIsPmOverride() == 1){
+            $segmentToSave->setWorkflowStep(self::STEP_PM_CHECK);
+        }
+        else {
             //sets the actual workflow step
             $segmentToSave->setWorkflowStepNr($session->taskWorkflowStepNr);
             
@@ -475,16 +478,7 @@ abstract class editor_Workflow_Abstract {
             $roles2Step = array_flip($this->steps2Roles);
             $segmentToSave->setWorkflowStep($roles2Step[$tua->getRole()]);
         }
-        //if no assoc entry is found, we have to check if its an editAllTasks request
-        catch(ZfExtended_NotFoundException $e) {
-            $acl = ZfExtended_Acl::getInstance();
-            if(!$acl->isInAllowedRoles($sessionUser->data->roles,'editAllTasks')) {
-                throw $e;
-            }
-            //set only the workflow step, the stepNr is not changed 
-            $segmentToSave->setWorkflowStep(self::STEP_PM_CHECK);
-        }
-        
+
         $autostates = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
         
         //set the autostate as defined in the given Closure
