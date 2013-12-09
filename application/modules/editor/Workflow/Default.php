@@ -196,6 +196,7 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
             $this->doWithTask($task, $task); //nothing changed on task directly, but call is needed
             $tuaNew = clone $tua;
             $tuaNew->setState(self::STATE_FINISH);
+            $tuaNew->validate();
             $tuaNew->save();
             $this->doWithUserAssoc($tua, $tuaNew);
             editor_Models_LogTask::create($instance['taskGuid'], self::STATE_FINISH, $this->authenticatedUserModel, $user);
