@@ -48,5 +48,8 @@ class editor_Models_Validator_TaskUserAssoc extends ZfExtended_Models_Validator_
         $this->addValidator('userGuid', 'guid');
         $this->addValidator('state', 'inArray', array($workflow->getStates()));
         $this->addValidator('role', 'inArray', array($workflow->getRoles()));
+        $this->addValidator('usedState', 'inArray', array($workflow->getStates()));
+        $this->addValidator('usedInternalSessionUniqId', 'guid');
+        $this->addValidator('isPmOverride', 'boolean');
     }
 }
