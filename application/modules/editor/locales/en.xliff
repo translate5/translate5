@@ -388,6 +388,26 @@
         <source>Benutzer speichern</source>
         <target>save user</target>
       </trans-unit>
+      <trans-unit id='UE0gZ2VwcsO8ZnQ='>
+        <source>PM geprüft</source>
+	<target>PM reviewed</target>
+      </trans-unit>
+      <trans-unit id='UE0gQXV0b2dlcHLDvGZ0'>
+        <source>PM Autogeprüft</source>
+	<target>PM auto-reviewed</target>
+      </trans-unit>
+      <trans-unit id='UE0gZ2VwcsO8ZnQsIHVudmVyw6RuZGVydA=='>
+        <source>PM geprüft, unverändert</source>
+	<target>PM reviewed, unchanged</target>
+      </trans-unit>
+      <trans-unit id='UE0gQXV0b2dlcHLDvGZ0LCB1bnZlcsOkbmRlcnQ='>
+        <source>PM Autogeprüft, unverändert</source>
+	<target>PM auto-reviewed, unchanged</target>
+      </trans-unit>
+      <trans-unit id='UE0gUHLDvGZ1bmc='>
+        <source>PM Prüfung</source>
+	<target>PM review</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
