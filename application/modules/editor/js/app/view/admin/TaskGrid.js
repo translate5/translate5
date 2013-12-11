@@ -140,8 +140,11 @@ Ext.define('Editor.view.admin.TaskGrid', {
 
   initComponent: function() {
     var me = this,
-        utStates = Editor.data.app.utStates,
+        //copy the utStates:
+        utStates = Ext.applyIf({}, Editor.data.app.utStates), 
         actions;
+    //add the grid only utStates to the copied utStates Object:
+    utStates = Ext.applyIf(utStates, Editor.data.app.utStatesGO), 
     me.userTipTpl = new Ext.XTemplate(
             '<tpl>',
             '<table class="task-users">',
@@ -185,13 +188,17 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   return me.strings.locked;
               }
               if(rec.isEnded()) {
+                  meta.tdAttr = 'data-qtip="' + me.strings.ended +'"';
                   return me.strings.ended;
               }
               if(!userState || userState.length == 0) {
                   //if we got only v here, the state should be handled like locked or ended above
-                  return utStates[v] ? utStates[v] : v; 
+                  v = utStates[v] ? utStates[v] : v;
+                  meta.tdAttr = 'data-qtip="' + v +'"';
+                  return v; 
               }
               //if no global state is applicable, use userState instead
+              meta.tdAttr = 'data-qtip="' + utStates[userState] +'"';
               return utStates[userState];
           },
           text: me.text_cols.state,
