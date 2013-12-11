@@ -760,6 +760,7 @@ Sie erreichen das Portal unter: %3$s<br />
 <trans-unit id='S2VpbmUgWnVncmlmZnNiZXJlY2h0aWd1bmch'><source>Keine Zugriffsberechtigung!</source><target>Keine Zugriffsberechtigung!</target></trans-unit>
 <trans-unit id='c2VsYnN0IGluIEFyYmVpdA=='><source>selbst in Arbeit</source><target>selbst in Arbeit</target></trans-unit>
 <trans-unit id='c2VsYnN0IGdlw7ZmZm5ldA=='><source>selbst geöffnet</source><target>selbst geöffnet</target></trans-unit>
+<trans-unit id='RGllIEF1ZmdhYmUgd2lyZCB2b24gZWluZW0gQmVudXR6ZXIgYmVudXR6dA=='><source>Die Aufgabe wird von einem Benutzer benutzt</source><target>Die Aufgabe wird von einem Benutzer benutzt</target></trans-unit>
   </body>
  </file>
 </xliff>
