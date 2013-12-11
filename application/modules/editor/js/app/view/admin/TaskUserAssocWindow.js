@@ -41,7 +41,7 @@ Ext.define('Editor.view.admin.TaskUserAssocWindow', {
     text_save: '#UT#Änderungen speichern',
     text_cancel: '#UT#Abbrechen',
     height : 400,
-    width : 500,
+    width : 560,
     loadingMask: null,
     layout: 'fit',
     modal : true,

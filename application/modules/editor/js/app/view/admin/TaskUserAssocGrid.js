@@ -35,11 +35,12 @@
 Ext.define('Editor.view.admin.TaskUserAssocGrid', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.adminTaskUserAssocGrid',
+  cls: 'task-user-assoc-grid',
   itemId: 'adminTaskUserAssocGrid',
   strings: {
       userGuidCol: '#UT#Benutzer',
-      roleCol: '#UT#Rolle',
-      stateCol: '#UT#Status',
+      roleCol: '#UT#Rolle (Doppelklick zum Ändern)',
+      stateCol: '#UT#Status (Doppelklick zum Ändern)',
       addUser: '#UT#Benutzer hinzufügen',
       addUserTip: '#UT#Einen Benutzer dieser Aufgabe zuordnen.',
       removeUser: '#UT#Benutzer entfernen',
@@ -60,7 +61,8 @@ Ext.define('Editor.view.admin.TaskUserAssocGrid', {
         roles.push([key, role]);
     });
     Ext.applyIf(me, {
-      plugins: [Ext.create('Ext.grid.plugin.CellEditing', {})],
+      plugins: [Ext.create('Ext.grid.plugin.CellEditing', {
+      })],
       columns: [{
           xtype: 'gridcolumn',
           width: 160,
@@ -71,7 +73,7 @@ Ext.define('Editor.view.admin.TaskUserAssocGrid', {
           text: me.strings.userGuidCol
       },{
           xtype: 'gridcolumn',
-          width: 160,
+          width: 190,
           dataIndex: 'role',
           editor: {
               xtype: 'combo',
@@ -88,7 +90,7 @@ Ext.define('Editor.view.admin.TaskUserAssocGrid', {
           text: me.strings.roleCol
       },{
           xtype: 'gridcolumn',
-          width: 160,
+          width: 190,
           dataIndex: 'state',
           editor: {
               xtype: 'combo',
