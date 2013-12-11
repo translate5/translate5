@@ -42,9 +42,7 @@ INSERT INTO `Zf_users` (
 `login` ,
 `email` ,
 `roles` ,
-`passwd` ,
-`passwdReset`
+`passwd` 
 )
 VALUES (
-'0', '{00000000-0000-0000-0000-000000000000}', 'system', 'user', 'm', 'system', 'system@example.translate5.net', '', 'asdfasdfsdfsf', '0'
-)
+'0', '{00000000-0000-0000-0000-000000000000}', 'system', 'user', 'm', 'system', 'system@example.translate5.net', '', 'asdfasdfsdfsf');
