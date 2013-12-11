@@ -244,6 +244,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
           $workflow::STATE_WAITING => $this->translate->_('wartend'),
           $workflow::STATE_FINISH => $this->translate->_('abgeschlossen'),
         ));
+        
+        //this user states are needed in the grid only, to be displayed there
+        $php2js->set('app.utStatesGO', array(
+          $workflow::STATE_EDIT => $this->translate->_('selbst in Arbeit'),
+          $workflow::STATE_VIEW => $this->translate->_('selbst geöffnet'),
+        ));
+        
         //currently we have 2 places to define userSteps: IndexController 
         //for translation and editor_Workflow_Default for programmatic usage
         $php2js->set('app.wfSteps', array(
