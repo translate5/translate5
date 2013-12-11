@@ -36,6 +36,10 @@
 
 /**
  * converts the given Filter and Sort String from ExtJS to an object structure appliable to a Zend Select Object
+ * 
+ * The implemented filter logic is a "or" based status filter, depending on the state displayed in the taskGrid.
+ * That means, the tasks must not be ended expect one wants to filter the ended explicitly.
+ * 
  * @author Marc Mittag
  */
 class editor_Models_Filter_TaskSpecific extends ZfExtended_Models_Filter_ExtJs {
@@ -44,29 +48,21 @@ class editor_Models_Filter_TaskSpecific extends ZfExtended_Models_Filter_ExtJs {
     const USER_STATE = 'user_state_';
     const TASK_STATE = 'task_state_';
     
-    protected $isUserAssocNeeded = false;
-    
-    protected function init() {
-        $this->separateStates();
-        parent::init();
-    }
+    protected static $isUserAssocNeeded = false;
     
     /**
      * refactor the state filter given by client, separates task and user states
+     * @param boolean $loadAllAllowed optional, if true current user is allowed to see all tasks
      */
-    protected function separateStates() {
+    public function convertStates($loadAllAllowed = false) {
         //get affected filters: field = state
         foreach($this->filter as $key => $filter) {
             if(!is_object($filter) || empty($filter->field) || $filter->field !== 'state') {
                 continue;
             }
             $states = is_array($filter->value) ? $filter->value : array($filter->value);
-            if(in_array(self::STATE_LOCKED, $states)){
-                $locked = new stdClass();
-                $locked->field = 'locked';
-                $locked->type = 'notIsNull';
-                $locked->value = ''; //we have to provide a value
-            }
+            $locked = in_array(self::STATE_LOCKED, $states);
+            $isLoadAllOpen = $loadAllAllowed && in_array(self::USER_STATE.'open', $states);
             break;
         }
         
@@ -97,18 +93,31 @@ class editor_Models_Filter_TaskSpecific extends ZfExtended_Models_Filter_ExtJs {
             $stateFill(self::USER_STATE, $state, $userStates);
             $stateFill(self::TASK_STATE, $state, $taskStates);
         }
+        //error_log('$userStates: '.print_r($userStates,1));
+        //error_log('$taskStates: '.print_r($taskStates,1));
         
         //add the filters as separate new filter objects
         $filter = new stdClass();
         $filter->field = 'state';
         $filter->type = 'list';
-        $this->isUserAssocNeeded = !empty($userStates);
+        self::$isUserAssocNeeded = !empty($userStates);
         $task = $this->entity;
         
         //adds the additional locked filter
-        if(!empty($locked)){
-            $filter->_table = $task::TABLE_ALIAS;
-            $orFilter->value[] = $locked;
+        $l = new stdClass();
+        $l->field = 'locked';
+        $l->value = ''; //we have to provide a value
+        $l->_table = $task::TABLE_ALIAS;
+        
+        if($locked){
+            //if the locked filter is set, we have to include them by OR
+            $l->type = 'notIsNull';
+            $orFilter->value[] = $l;
+        }
+        else {
+            //if no locked filter is set, we have to exclude all locked tasks
+            $l->type = 'isNull';
+            $this->filter[] = $l;
         }
         
         if(!empty($taskStates)){
@@ -116,11 +125,47 @@ class editor_Models_Filter_TaskSpecific extends ZfExtended_Models_Filter_ExtJs {
             $filter->_table = $task::TABLE_ALIAS;
             $orFilter->value[] = $filter;
         }
-        if($this->isUserAssocNeeded){
+        
+        if(self::$isUserAssocNeeded){
+            $and = new stdClass();
+            $and->type = 'andExpression';
+            $and->value = array();
+            
+            $open = clone $filter;
+            $open->value = array('open');
+            //$open->type = 'eq';
+            $open->_table = $task::TABLE_ALIAS;
+            $and->value[] = $open;
+            
             $f = clone $filter;
             $f->value = $userStates;
             $f->_table = $task::ASSOC_TABLE_ALIAS;
-            $orFilter->value[] = $f;
+            $and->value[] = $f; //connect by AND taskOpen and userState
+            
+            $orFilter->value[] = $and;
+        }
+        
+        //if the user is allowed to see all tasks, and he is filtering the open tasks
+        // we have also to consider task_state_open on not associated (isNull) tasks, not only user_state_open
+        if($isLoadAllOpen){
+            $and = new stdClass();
+            $and->type = 'andExpression';
+            $and->value = array();
+            
+            $open = clone $filter;
+            $open->value = array('open');
+            //$open->type = 'eq';
+            $open->_table = $task::TABLE_ALIAS;
+            $and->value[] = $open;
+            
+            $f = new stdClass();
+            $f->field = 'state';
+            $f->value = '';
+            $f->type = 'isNull';
+            $f->_table = $task::ASSOC_TABLE_ALIAS;
+            $and->value[] = $f;
+            
+            $orFilter->value[] = $and;
         }
         
         //add the new OR filter to the filter list
@@ -131,8 +176,8 @@ class editor_Models_Filter_TaskSpecific extends ZfExtended_Models_Filter_ExtJs {
      * (non-PHPdoc)
      * @see ZfExtended_Models_Filter_ExtJs::initFilterData()
      */
-    public function initFilterData($filter) {
-        if(isset($filter->_table) && $this->isUserAssocNeeded) {
+    protected function initFilterData($filter) {
+        if(isset($filter->_table) && self::$isUserAssocNeeded) {
             $filter->table = $filter->_table;
             unset ($filter->_table);
         }
@@ -144,7 +189,7 @@ class editor_Models_Filter_TaskSpecific extends ZfExtended_Models_Filter_ExtJs {
      * @return boolean
      */
     public function isUserAssocNeeded() {
-        return $this->isUserAssocNeeded;
+        return self::$isUserAssocNeeded;
     }
     
     /**
@@ -152,6 +197,6 @@ class editor_Models_Filter_TaskSpecific extends ZfExtended_Models_Filter_ExtJs {
      * @param boolean $isNeeded
      */
     public function setUserAssocNeeded($isNeeded = true) {
-        $this->isUserAssocNeeded = $isNeeded;
+        self::$isUserAssocNeeded = $isNeeded;
     }
 }

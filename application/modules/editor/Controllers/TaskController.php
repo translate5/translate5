@@ -130,17 +130,18 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     public function loadAll()
     {
-        $filter = $this->entity->getFilter();
-        $assocFilter = $filter->isUserAssocNeeded();
         $isAllowedToLoadAll = $this->acl->isInAllowedRoles($this->user->data->roles,'loadAllTasks');
+        $filter = $this->entity->getFilter();
+        $filter->convertStates($isAllowedToLoadAll);
+        $assocFilter = $filter->isUserAssocNeeded();
         if(!$assocFilter && $isAllowedToLoadAll) {
             $this->totalCount = $this->entity->getTotalCount();
             $rows = $this->entity->loadAll();
         }
         else {
             $filter->setUserAssocNeeded();
-            $this->totalCount = $this->entity->getTotalCountByUserAssoc($this->user->data->userGuid);
-            $rows = $this->entity->loadListByUserAssoc($this->user->data->userGuid);
+            $this->totalCount = $this->entity->getTotalCountByUserAssoc($this->user->data->userGuid, $isAllowedToLoadAll);
+            $rows = $this->entity->loadListByUserAssoc($this->user->data->userGuid, $isAllowedToLoadAll);
         }
         $config = Zend_Registry::get('config');
         
