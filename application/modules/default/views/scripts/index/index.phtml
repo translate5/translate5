@@ -62,7 +62,7 @@ $session = new Zend_Session_Namespace();
 </div>
 <div class="sidebar">
     <div class="teaser">
-        <p><strong><?php echo $this->translate->_('Infos zu translate5 auf MittagQI.com'); ?></strong></p>
+        <h2><?php echo $this->translate->_('Infos zu translate5 auf MittagQI.com'); ?></h2>
         <ul>
             <li><a href="http://www.mittagqi.com/translate5/features" target="_blank"><?php echo $this->translate->_('Features'); ?></a></li>
             <li><a href="http://www.mittagqi.com/translate5/customizing" target="_blank"><?php echo $this->translate->_('Entwicklung'); ?></a></li>
@@ -72,6 +72,7 @@ $session = new Zend_Session_Namespace();
         </ul>
     </div>
     <?php
+    echo $this->render('index/testdataSidebar.phtml');
     echo $this->render('index/betanotice.phtml');
     ?>
 </div>

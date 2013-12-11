@@ -41,9 +41,9 @@ $pathToQMFile =  '/'.$config->runtimeOptions->editor->qmFlagXmlFileDir.'/'.
 <h1><?php echo $this->translate->_('Informationen zur Bedienung'); ?></h1>
 <div class="usage-info">
     <p><?php echo $this->translate->_('Diese translate5 Demoversion ist öffentlich, alle hochgeladenen Projekte können von jedem eingesehen und exportiert werden!'); ?></p>
+<?php echo $this->render('index/testdataSidebar.phtml'); ?>
+
 <h2><a name="import"><?php echo $this->translate->_('Zip-Datei mit Import Daten'); ?></a></h2>
-
-
 
 <h3><?php echo $this->translate->_('proofRead: Verzeichnis mit zu lektorierenden Dateien'); ?></h3>
 <p><?php echo $this->translate->_('Die Zip-Datei muss ein Verzeichnis "proofRead" enthalten, welches mehrere SDLXLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.'); ?></p>
@@ -76,7 +76,6 @@ referenceFiles/           => <?php echo $this->translate->_('optionales Verzeich
 referenceFiles/Referenz.pdf
 </pre>
 </div>
-
 
 <h2><?php echo $this->translate->_('Hinweise zum Lektorat'); ?><a name="lektorat"></a></h2>
 <img src="/images/screen-fuer-web.jpg" alt="<?php echo $this->translate->_('Screenshot Lektorat'); ?>"/>
@@ -121,3 +120,4 @@ referenceFiles/Referenz.pdf
 </tr>
 </tbody>
 </table>
+
