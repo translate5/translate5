@@ -229,7 +229,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     public function delete() {
         $taskGuid = $this->get('taskGuid');
         $task = ZfExtended_Factory::get('editor_Models_Task');
-        
+
         $e = new ZfExtended_BadMethodCallException();
         $e->setLogging(false);
         
