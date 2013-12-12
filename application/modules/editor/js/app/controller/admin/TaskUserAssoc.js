@@ -46,6 +46,9 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       ref: 'assocDelBtn',
       selector: '#adminTaskUserAssocGrid #remove-user-btn'
   },{
+      ref: 'userAssocGrid',
+      selector: '#adminTaskUserAssocGrid'
+  },{
       ref: 'taskUserAssocWindow',
       selector: '#adminTaskUserAssocWindow'
   }],
@@ -186,7 +189,9 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
    * @param {Ext.button.Button} btn
    */
   handleSaveAssoc: function (btn) {
-      var me = this;
+      var me = this,
+          grid = me.getUserAssocGrid();
+      grid.editingPlugin && grid.editingPlugin.completeEdit();
       btn.up('window').close();
       me.getAdminTaskUserAssocsStore().sync();
   },
