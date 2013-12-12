@@ -761,6 +761,8 @@ Sie erreichen das Portal unter: %3$s<br />
 <trans-unit id='c2VsYnN0IGluIEFyYmVpdA=='><source>selbst in Arbeit</source><target>selbst in Arbeit</target></trans-unit>
 <trans-unit id='c2VsYnN0IGdlw7ZmZm5ldA=='><source>selbst geöffnet</source><target>selbst geöffnet</target></trans-unit>
 <trans-unit id='RGllIEF1ZmdhYmUgd2lyZCB2b24gZWluZW0gQmVudXR6ZXIgYmVudXR6dA=='><source>Die Aufgabe wird von einem Benutzer benutzt</source><target>Die Aufgabe wird von einem Benutzer benutzt</target></trans-unit>
+<trans-unit id='Um9sbGUgKERvcHBlbGtsaWNrIHp1bSDDhG5kZXJuKQ=='><source>Rolle (Doppelklick zum Ändern)</source><target>Rolle (Doppelklick zum Ändern)</target></trans-unit>
+<trans-unit id='U3RhdHVzIChEb3BwZWxrbGljayB6dW0gw4RuZGVybik='><source>Status (Doppelklick zum Ändern)</source><target>Status (Doppelklick zum Ändern)</target></trans-unit>
   </body>
  </file>
 </xliff>
