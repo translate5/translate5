@@ -310,7 +310,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         //delete all pmEditAll fake entries
         $where3 = $where;
         $where3[] = 'isPmOverride = 1';
-        $this->db->delete($where);
+        $this->db->delete($where3);
         
         //unuse the associations where the using sessionId was expired, this update must be performed after the other!
         $this->db->update(array('usedState' => null,'usedInternalSessionUniqId' => null), $where);
