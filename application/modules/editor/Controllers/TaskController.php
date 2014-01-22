@@ -120,6 +120,10 @@ class editor_TaskController extends ZfExtended_RestController {
         /* @var $tua editor_Models_TaskUserAssoc */
         $tua->cleanupLocked();
         
+        //set default sort
+        $f = $this->entity->getFilter();
+        $f->hasSort() || $f->addSort('orderdate', true);
+        
         $this->view->rows = $this->loadAll();
         $this->view->total = $this->totalCount;
     }
