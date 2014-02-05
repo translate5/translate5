@@ -214,8 +214,8 @@ class Editor_UserController extends ZfExtended_RestController {
             throw $e; //otherwise throw this again
         }
         
-        $t = Zend_Registry::get('Zend_Translate');
-        /* @var $t Zend_Translate */
+        $t = ZfExtended_Zendoverwrites_Translate::getInstance();
+        /* @var $t ZfExtended_Zendoverwrites_Translate */;;
         
         $errors = array('login' => $t->_('Dieser Anmeldename wird bereits verwendet.'));
         $e = new ZfExtended_ValidateException();
@@ -232,7 +232,8 @@ class Editor_UserController extends ZfExtended_RestController {
             $general = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
                 'general'
             );
-            $translate = Zend_Registry::get('Zend_Translate');
+            $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+            /* @var $translate ZfExtended_Zendoverwrites_Translate */;
             $general->mail(
                     $this->entity->getEmail(),
                     '',

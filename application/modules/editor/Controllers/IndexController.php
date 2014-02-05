@@ -49,14 +49,14 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
      */
     protected $session;
     /**
-     * @var Zend_Translate
+     * @var ZfExtended_Zendoverwrites_Translate
      */
     protected $translate;
     
     public function indexAction() {
         $this->session = new Zend_Session_Namespace();
         $this->_helper->layout->disableLayout();
-        $this->translate = Zend_Registry::get('Zend_Translate');
+        $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->view->pathToIMAGES = APPLICATION_RUNDIR.$this->session->runtimeOptions->server->pathToIMAGES;
         $extJs = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
               'ExtJs'
