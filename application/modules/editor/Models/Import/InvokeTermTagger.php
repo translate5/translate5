@@ -88,6 +88,7 @@ class editor_Models_Import_InvokeTermTagger {
     protected $fuzzy;
     protected $fuzzyPercent;
     protected $lowercase;
+    protected $targetStringMatch;
     protected $parameter = '-Xmx1024M';
 
     public function __construct(array $filePaths = NULL, $importFolder = NULL, editor_Models_Import_MetaData $metaDataImporter = NULL) {
@@ -106,6 +107,10 @@ class editor_Models_Import_InvokeTermTagger {
         $this->maxWordLengthSearch = (int)$config->runtimeOptions->termTagger->maxWordLengthSearch;
         $this->minFuzzyStringLength = (int)$config->runtimeOptions->termTagger->minFuzzyStringLength;
         $this->minFuzzyStartLength = (int)$config->runtimeOptions->termTagger->minFuzzyStartLength;
+        $this->targetStringMatch = $config->runtimeOptions->termTagger->targetStringMatch->toArray();
+        foreach($this->targetStringMatch as $k => &$v){
+			$v = strtolower($v);
+		}
         $cp = array('.', $this->libDir.'openTMS.jar', $this->libDir.'external.jar', '');
         $this->classPath = join(PATH_SEPARATOR, $cp);
     }
@@ -149,15 +154,19 @@ class editor_Models_Import_InvokeTermTagger {
         if($this->fuzzy){
             $cmd[] = '-fuzzyPercent';
             $cmd[] = $this->fuzzyPercent;
-         //   $cmd[] = '-maxWordLengthSearch';
-           // $cmd[] = $this->maxWordLengthSearch;
-           // $cmd[] = '-minFuzzyStringLength';
-           // $cmd[] = $this->minFuzzyStringLength;
-           // $cmd[] = '-minFuzzyStartLength';
-           // $cmd[] = $this->minFuzzyStartLength;
+            $cmd[] = '-maxWordLengthSearch';
+            $cmd[] = $this->maxWordLengthSearch;
+            $cmd[] = '-minFuzzyStringLength';
+            $cmd[] = $this->minFuzzyStringLength;
+            $cmd[] = '-minFuzzyStartLength';
+            $cmd[] = $this->minFuzzyStartLength;
         }
         $cmd[] = '-lowercase';
         $cmd[] = $this->lowercase;
+        if(in_array($targetLang,$this->targetStringMatch)){
+			$cmd[] = '-targetStringMatch';
+			$cmd[] = 'true';
+		}
 
         if(strtolower(PHP_OS) == 'linux') {
           $cmd[] = '2>&1';
