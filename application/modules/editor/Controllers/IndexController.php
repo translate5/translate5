@@ -45,6 +45,7 @@
  */ 
 class Editor_IndexController extends ZfExtended_Controllers_Action {
     /**
+     * FIXME remove session: session is redundant here, since parent class has _session
      * @var Zend_Session_Namespace
      */
     protected $session;
