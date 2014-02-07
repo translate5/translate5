@@ -153,7 +153,9 @@ class editor_Models_SegmentAutoStates {
      * @return array
      */
     public function getLabelMap() {
-        $translate = Zend_Registry::get('Zend_Translate');
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        /* @var $translate ZfExtended_Zendoverwrites_Translate */;
+        //no json_encode because later on passed to php2js, which does json-encoding
         $states = $this->states;
         $states[self::PENDING] = 'wird ermittelt...'; //actually only needed in frontend
         return array_map(function($value) use ($translate) {

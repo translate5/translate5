@@ -188,7 +188,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return mixed depending on $asJson
      */
     public function getQmSubsegmentIssuesTranslated($asJson = true){
-        $translate = Zend_Registry::get('Zend_Translate');
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        /* @var $translate ZfExtended_Zendoverwrites_Translate */;
         $walk = function(array $qmFlagTree)use ($translate,&$walk){
             foreach ($qmFlagTree as $node) {
                 $node->text = $translate->_($node->text);
@@ -260,7 +261,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return string|array depends on $asJson
      */
     public function getQmSubsegmentSeveritiesTranslated($asJson = true, array $row = null) {
-        $translate = Zend_Registry::get('Zend_Translate');
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        /* @var $translate ZfExtended_Zendoverwrites_Translate */;
         if(is_null($row))$row = $this->row->toArray();
         $tree = Zend_Json::decode($row['qmSubsegmentFlags'], Zend_Json::TYPE_OBJECT);
         $result = array();

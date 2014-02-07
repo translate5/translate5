@@ -307,7 +307,8 @@ class editor_Models_Qmsubsegments extends ZfExtended_Models_Entity_Abstract {
      * @return object as returned by $taskModel->getQmSubsegmentIssuesTranslated, but with a toplevel rootnode added
      */
     protected function addRootNodeToQmFlags(string $taskGuid) {
-        $translate = Zend_Registry::get('Zend_Translate');
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        /* @var $translate ZfExtended_Zendoverwrites_Translate */;
         $taskModel = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $taskModel editor_Models_Task */
         $taskModel->loadByTaskGuid($taskGuid);

@@ -601,7 +601,8 @@ class editor_TaskController extends ZfExtended_RestController {
         $msgs = array(
             'noZipFile' => 'Bitte eine Zip Datei auswählen.',
         );
-        $translate = Zend_Registry::get('Zend_Translate');
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        /* @var $translate ZfExtended_Zendoverwrites_Translate */;
         if(empty($msgs[$errorType])) {
             $msg = $translate->_('Unbekannter Fehler beim Dateiupload.');
         }
@@ -653,7 +654,8 @@ class editor_TaskController extends ZfExtended_RestController {
 
         $export = ZfExtended_Factory::get('editor_Models_Export');
         
-        $translate = Zend_Registry::get('Zend_Translate');
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        /* @var $translate ZfExtended_Zendoverwrites_Translate */;
         /* @var $export editor_Models_Export */
         if(!$export->setTaskToExport($this->entity, $diff)){
             //@todo: this should show up in JS-Frontend in a nice way

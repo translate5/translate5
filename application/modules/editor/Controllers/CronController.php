@@ -45,7 +45,7 @@ class Editor_CronController extends ZfExtended_Controllers_Action {
      */
     protected $session;
     /**
-     * @var Zend_Translate
+     * @var ZfExtended_Zendoverwrites_Translate
      */
     protected $translate;
     
