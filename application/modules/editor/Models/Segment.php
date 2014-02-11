@@ -56,11 +56,26 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Segments';
     protected $validatorInstanceClass = 'editor_Models_Validator_Segment';
 
+    protected $_segmentfield = array();
+    protected $_segmentdata = array();
+
     /**
      *
      * @var type Zend_Config
      */
     protected $config = null;
+
+    protected function initField($TaskGuid)
+    {
+        $segmentfield = new editor_Models_Segmentfield();
+        $this->_segmentfield = $segmentfield->loadBytaskGuid($TaskGuid);
+    }
+
+    protected function initData($TaskGuid)
+    {
+        $segmentdata = new editor_Models_Segmentdata();
+        $this->_segmentdata = $segmentdata->loadBytaskGuid($TaskGuid);
+    }
 
     /**
      * erzeugt ein neues, ungespeichertes SegmentHistory Entity
@@ -82,6 +97,33 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         return parent::setQmId(trim($qmId, ';'));
     }
 
+    protected function updateView($taskguid)
+    {
+        // TODO by import und drop if exist
+        $this->initField($taskguid);
+        $this->initData($taskguid);
+
+        $sStmt_step1 = "SELECT segmentId,";
+        foreach($this->_segmentdata as $value){
+            $sStmt_step1 .= "MAX(IF(name = '".$value['name']."', edited, NULL)) AS '".$value['name']."',";
+        }
+        $sStmt_step1 = substr($sStmt_step1, 0, (strlen($sStmt_step1)-1));
+        $sStmt_step1 .= "FROM LEK_segment_data GROUP BY segmentId";
+
+        $sStmt_step2 = "
+            SELECT *
+            FROM `LEK_segments`
+            join (
+              ".$sStmt_step1."
+            )
+            AS data ON (data.segmentId = LEK_segments.id)
+            WHERE `taskGuid` = '".$taskguid."'
+        ";
+        $sStmt_step3 = "CREATE VIEW v AS ".$sStmt_step2.";";
+        print $sStmt_step3;
+
+        exit;
+    }
     /**
      * Load segments by taskguid. Second Parameter decides if SourceEdited column should be provided
      * @param string $taskguid
@@ -89,9 +131,14 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     public function loadByTaskGuid($taskguid, $loadSourceEdited = false) {
         $this->initDefaultSort();
+        $this->updateView($taskguid);
+        exit;
+
+
         $s = $this->db->select(false);
         $db = $this->db;
         $cols = $this->db->info($db::COLS);
+
         //dont load sourceEdited* Cols if not needed
         if (!$loadSourceEdited) {
             $cols = array_filter($cols, function($val) {
@@ -100,9 +147,18 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         $s->from($this->db, $cols);
         $s->where('taskGuid = ?', $taskguid);
+
+//        $table = parent::loadFilterdCustom($s);
+//        var_dump($table);
+
+
         return parent::loadFilterdCustom($s);
     }
 
+    /**
+     * @param $taskguid
+     * @return int
+     */
     public function getTotalCountByTaskGuid($taskguid) {
         $s = $this->db->select();
         $s->where('taskGuid = ?', $taskguid);

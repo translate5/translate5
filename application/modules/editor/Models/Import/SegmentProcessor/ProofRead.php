@@ -82,12 +82,14 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
         $this->db = Zend_Registry::get('db');
         $this->taskConf = $this->task->getAsConfig();
     }
-    
+    // TODO rebuild method process, so that instead filling all segment fields manually, the segment setFieldContents method is used
+
     public function process(editor_Models_Import_FileParser $parser){
         $seg = ZfExtended_Factory::get('ZfExtended_Models_Entity',array('editor_Models_Db_Segments',array()));
         //statische, Task spezifische Daten zum Segment
         $seg->setUserGuid($this->userGuid);
         $seg->setUserName($this->userName);
+
         $seg->setTaskGuid($this->taskGuid);
         
         //Segment Spezifische Daten
