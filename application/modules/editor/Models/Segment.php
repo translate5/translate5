@@ -155,6 +155,14 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->db->getAdapter()->getConnection()->exec($sStmt_create_view_segment);
         return;
     }
+
+    /**
+     * check the given fields against the really available fields for this task.
+     */
+    public function setFieldContents(editor_Models_Segmentfield $field)
+    {
+        return;
+    }
     /**
      * Load segments by taskguid. Second Parameter decides if SourceEdited column should be provided
      * @param string $taskguid
@@ -162,8 +170,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     public function loadByTaskGuid($taskguid, $loadSourceEdited = false) {
         $this->initDefaultSort();
-        $this->updateView($taskguid);
-
 
         $s = $this->db->select(false);
         $db = $this->db;
