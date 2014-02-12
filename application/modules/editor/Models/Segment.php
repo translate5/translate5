@@ -99,28 +99,45 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
 
     protected function updateView($taskguid)
     {
-        // TODO by import und drop if exist
         $this->initField($taskguid);
         $this->initData($taskguid);
 
-        $sStmt_step1 = "SELECT segmentId,";
+        // TODO by import und drop if exist
+        $str_View_data_name         = "data_" . md5($taskguid);
+        $str_View_segment_name      = "segment_" . md5($taskguid);
+
+        $sStmt_drop_view_data       = "DROP VIEW IF EXISTS " . $str_View_data_name;
+        $sStmt_drop_view_segment    = "DROP VIEW IF EXISTS " . $str_View_segment_name;
+
+        // TODO get fields name
+        $sStmt_step1 = "CREATE VIEW " . $str_View_data_name . " AS ";
+        $sStmt_step1 .= "SELECT segmentId,";
         foreach($this->_segmentdata as $value){
             $sStmt_step1 .= "MAX(IF(name = '".$value['name']."', edited, NULL)) AS '".$value['name']."',";
         }
         $sStmt_step1 = substr($sStmt_step1, 0, (strlen($sStmt_step1)-1));
         $sStmt_step1 .= "FROM LEK_segment_data GROUP BY segmentId";
-
-        $sStmt_step2 = "
+//        join LEK_segment_field AS field
+//        ON LEK_segment_data.name = field.name
+        $sStmt_step2 = "CREATE VIEW " . $str_View_segment_name . " AS ";
+        $sStmt_step2 .= "
             SELECT *
             FROM `LEK_segments`
-            join (
-              ".$sStmt_step1."
-            )
-            AS data ON (data.segmentId = LEK_segments.id)
+            join " . $str_View_data_name . "
+            AS data ON data.segmentId = LEK_segments.id
             WHERE `taskGuid` = '".$taskguid."'
         ";
-        $sStmt_step3 = "CREATE VIEW v AS ".$sStmt_step2.";";
-        print $sStmt_step3;
+//        $sStmt_step3 = "CREATE VIEW v AS ".$sStmt_step2.";";
+//
+//        $str_stmt_creteView_data    = "CREATE VIEW " . $str_View_data_name . " AS " . $sStmt_step1 . ";";
+
+        print $sStmt_step1;
+        print "<br /><br />";
+        print $sStmt_step2;
+        print "<br /><br />";
+
+        print $sStmt_drop_view_data . "<br />";
+        print $sStmt_drop_view_segment . "<br />";
 
         exit;
     }
@@ -132,7 +149,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     public function loadByTaskGuid($taskguid, $loadSourceEdited = false) {
         $this->initDefaultSort();
         $this->updateView($taskguid);
-        exit;
 
 
         $s = $this->db->select(false);
