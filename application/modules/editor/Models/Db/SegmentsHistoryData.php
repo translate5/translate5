@@ -35,7 +35,7 @@
  */
 
 /**#@+ 
- * @author Marc Mittag
+ * @author Konstantin Kolesnikov
  * @package editor
  * @version 1.0
  * 
@@ -45,7 +45,7 @@
  * 
  *
  */
-class editor_Models_Db_SegmentsHistory extends Zend_Db_Table_Abstract {
-    protected $_name    = 'LEK_segment_history';
+class editor_Models_Db_SegmentsHistoryData extends Zend_Db_Table_Abstract {
+    protected $_name    = 'LEK_segment_history_data';
     public $_primary = 'id';
 }

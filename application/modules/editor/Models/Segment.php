@@ -77,6 +77,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->_segmentdata = $segmentdata->loadBytaskGuid($TaskGuid);
     }
 
+    protected function initHistoryData($TaskGuid)
+    {
+        $segmentdata = new editor_Models_SegmentHistoryData();
+        $this->_segmentdata = $segmentdata->loadByuserGuid($TaskGuid);
+    }
     /**
      * erzeugt ein neues, ungespeichertes SegmentHistory Entity
      * @return editor_Models_SegmentHistory
@@ -98,10 +103,15 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
+     * create / update View
      * @param string $taskguid
      */
     protected function updateView($taskguid)
     {
+        if(empty($taskguid)) {
+            // TODO add error handling
+            return;
+        }
         $cols = "*";
         // TODO get columns
 
@@ -161,6 +171,60 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     public function setFieldContents(editor_Models_Segmentfield $field)
     {
+        return;
+    }
+
+    /**
+     * create / update View
+     * @param string $userguid
+     */
+    public function updateHistoryView($userguid)
+    {
+        if(empty($userguid)) {
+            // TODO add error handling
+            return;
+        }
+        $cols = "*";
+        // TODO get columns
+        $this->initHistoryData($userguid);
+
+        $sView_data_history_name         = "data_history_" . md5($userguid);
+        $sView_segment_history_name      = "segment_history_" . md5($userguid);
+
+        $sStmt_drop_view_data_history       = "DROP VIEW IF EXISTS " . $sView_data_history_name;
+        $sStmt_drop_view_segment_history    = "DROP VIEW IF EXISTS " . $sView_segment_history_name;
+
+
+        $sStmt_create_view_data_history = "CREATE VIEW " . $sView_data_history_name . " AS ";
+        $sStmt_create_view_data_history .= "
+        SELECT
+            LEK_segment_history_data.segmentId,
+            LEK_segment_history_data.origina,
+            LEK_segment_history_data.originalMd5,
+            LEK_segment_history_data.originalToSort,
+            LEK_segment_history_data.edited,
+            LEK_segment_history_data.editedMd5,
+            LEK_segment_history_data.editedToSort,
+             ";
+        foreach($this->_segmentdata as $value){
+            $sStmt_create_view_data_history .= "MAX(IF(LEK_segment_history_data.name = '".$value['name']."', edited, NULL)) AS '".$value['name']."',";
+        }
+        $sStmt_create_view_data_history = substr($sStmt_create_view_data_history, 0, (strlen($sStmt_create_view_data_history)-1));
+        $sStmt_create_view_data_history .= " FROM LEK_segment_history_data GROUP BY segmentId";
+
+        $sStmt_create_view_segment_history = "CREATE VIEW " . $sView_segment_history_name . " AS ";
+        $sStmt_create_view_segment_history .= "
+            SELECT  LEK_segment_history." . $cols . "
+            FROM `LEK_segment_history`
+            join " . $sView_data_history_name . "
+            AS data ON data.segmentId = LEK_segment_history.id
+            WHERE `userGuid` = '".$userguid."'
+        ";
+
+        $this->db->getAdapter()->getConnection()->exec($sStmt_drop_view_data_history);
+        $this->db->getAdapter()->getConnection()->exec($sStmt_drop_view_segment_history);
+        $this->db->getAdapter()->getConnection()->exec($sStmt_create_view_data_history);
+        $this->db->getAdapter()->getConnection()->exec($sStmt_create_view_segment_history);
         return;
     }
     /**
