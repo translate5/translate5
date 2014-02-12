@@ -23,7 +23,6 @@
 <trans-unit id='SG9zdGluZw=='><source>Hosting</source><target>Hosting</target></trans-unit>
 <trans-unit id='VGVzdGRhdGVu'><source>Testdaten</source><target>Testdaten</target></trans-unit>
 <trans-unit id='RmFsbHMgU2llIGtlaW5lIFRlc3RkYXRlbiB6dXIgSGFuZCBoYWJlbiwga8O2bm5lbiBTaWUgPGEgaHJlZj0iL2luZGV4L3Rlc3RkYXRhLyI+aGllciBUZXN0ZGF0ZW4gZG93bmxvYWRlbjwvYT4gdW5kIGFscyBuZXVlcyBQcm9qZWt0IGltcG9ydGllcmVuLg=='><source>Falls Sie keine Testdaten zur Hand haben, können Sie <a href="/index/testdata/">hier Testdaten downloaden</a> und als neues Projekt importieren.</source><target>Falls Sie keine Testdaten zur Hand haben, können Sie <a href="/index/testdata/">hier Testdaten downloaden</a> und als neues Projekt importieren.</target></trans-unit>
-<trans-unit id='R2VuZXJhbE1ldGF0YWdUaXRsZVN1ZmZpeA=='><source>GeneralMetatagTitleSuffix</source><target>GeneralMetatagTitleSuffix</target></trans-unit>
   </body>
  </file>
 </xliff>

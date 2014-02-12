@@ -11,6 +11,10 @@
 <trans-unit id="UXVlbGxjb2Rl"><source>Quellcode</source><target>Quellcode</target></trans-unit>
 <trans-unit id="TmV3c2xldHRlcg=="><source>Newsletter</source><target>Newsletter</target></trans-unit>
 <trans-unit id="QmVpIEZyYWdlbiB6dSB0cmFuc2xhdGU1Og=="><source>Bei Fragen zu translate5:</source><target>Bei Fragen zu translate5:</target></trans-unit>
+<trans-unit id="R2VuZXJhbE1ldGF0YWdUaXRsZVN1ZmZpeA==">
+                <source>GeneralMetatagTitleSuffix</source>
+                <target state="needs-review-adaptation">translate5</target>
+            </trans-unit>
   </body>
  </file>
 </xliff>
