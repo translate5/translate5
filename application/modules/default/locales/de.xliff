@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<xliff version='1.1' xmlns='urn:oasis:names:tc:xliff:document:1.1'>
+<!-- the transunit-ID should contain the base64-encoded source-string als used in the php source-code. This ID is used for matching. -->
+<!-- html-tags inside the target-string must not be encoded as they should regarding xliff but should be left as plain hmtl. At this stage ZfExtended does not support xliff inline tags -->
+ <file original='php-sourcecode' source-language='ha' target-language='de' datatype='php' xml:space='preserve'>
+  <body><trans-unit id='RGV1dHNjaA=='><source>Deutsch</source><target>Deutsch</target></trans-unit>
+<trans-unit id='RW5nbGlzY2g='><source>Englisch</source><target>Englisch</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRlNSAtIE9wZW4tU291cmNlLUxla3RvcmF0CiAgICBmw7xyIGRlbiBCcm93c2Vy'><source>translate5 - Open-Source-Lektorat
+    für den Browser</source><target>translate5 - Open-Source-Lektorat
+    für den Browser</target></trans-unit>
+<trans-unit id='TWl0IHRyYW5zbGF0ZTUga8O2bm5lbiBTaWUgU0RMWExJRkYtIHVuZCBDU1YtRGF0ZWllbiBpbSBCcm93c2VyIGxla3RvcmllcmVuIGxhc3NlbiAtIG9obmUgTGl6ZW56a29zdGVuIC0gYXVmIE9wZW4gU291cmNlLUJhc2lzLg=='><source>Mit translate5 können Sie SDLXLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</source><target>Mit translate5 können Sie SDLXLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRlNSBiaWV0ZXQgbW9kZXJuc3RlcyBkZXNrdG9wYXJ0aWdlcyBBcmJlaXRlbiBpbSBCcm93c2VyIG1pdCB2aWVsZW4gaW50ZXJlc3NhbnRlbiwgdGVpbHdlaXNlIGVpbnppZ2FydGlnZW4gRmVhdHVyZXMu'><source>translate5 bietet modernstes desktopartiges Arbeiten im Browser mit vielen interessanten, teilweise einzigartigen Features.</source><target>translate5 bietet modernstes desktopartiges Arbeiten im Browser mit vielen interessanten, teilweise einzigartigen Features.</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRlNSBpc3QgT3BlbiBTb3VyY2UgdW5kIGRhbWl0IGtvc3Rlbmxvc2UgU29mdHdhcmUu'><source>translate5 ist Open Source und damit kostenlose Software.</source><target>translate5 ist Open Source und damit kostenlose Software.</target></trans-unit>
+<trans-unit id='PHN0cm9uZz48YSBocmVmPSJodHRwOi8vd3d3Lm1pdHRhZ3FpLmNvbS90cmFuc2xhdGU1L2ZlYXR1cmVzLyIgdGFyZ2V0PSJfYmxhbmsiPkVpbmUgdW1mYXNzZW5kZSBGZWF0dXJlbGlzdGU8L2E+PC9zdHJvbmc+IHVuZCB3ZWl0ZXJlIEluZm9ybWF0aW9uZW4genUgdHJhbnNsYXRlNSBmaW5kZW4gU2llIGF1ZiA8YSBocmVmPSJodHRwOi8vd3d3Lm1pdHRhZ3FpLmNvbS90cmFuc2xhdGU1LyIgdGFyZ2V0PSJfYmxhbmsiPnd3dy5taXR0YWdxaS5jb208L2E+Lg=='><source><strong><a href="http://www.mittagqi.com/translate5/features/" target="_blank">Eine umfassende Featureliste</a></strong> und weitere Informationen zu translate5 finden Sie auf <a href="http://www.mittagqi.com/translate5/" target="_blank">www.mittagqi.com</a>.</source><target><strong><a href="http://www.mittagqi.com/translate5/features/" target="_blank">Eine umfassende Featureliste</a></strong> und weitere Informationen zu translate5 finden Sie auf <a href="http://www.mittagqi.com/translate5/" target="_blank">www.mittagqi.com</a>.</target></trans-unit>
+<trans-unit id='RGVtb3ZlcnNpb24gc3RhcnRlbg=='><source>Demoversion starten</source><target>Demoversion starten</target></trans-unit>
+<trans-unit id='U3BvbnNlcmluZyB2b24gdHJhbnNsYXRlNQ=='><source>Sponsering von translate5</source><target>Sponsering von translate5</target></trans-unit>
+<trans-unit id='VW5zZXIgRGFuayBnZWh0IGFuOg=='><source>Unser Dank geht an:</source><target>Unser Dank geht an:</target></trans-unit>
+<trans-unit id='U2llIGVybcO2Z2xpY2hlbiBkaWVzZXMgUHJvamVrdCE='><source>Sie ermöglichen dieses Projekt!</source><target>Sie ermöglichen dieses Projekt!</target></trans-unit>
+<trans-unit id='SW5mb3MgenUgdHJhbnNsYXRlNSBhdWYgTWl0dGFnUUkuY29t'><source>Infos zu translate5 auf MittagQI.com</source><target>Infos zu translate5 auf MittagQI.com</target></trans-unit>
+<trans-unit id='RmVhdHVyZXM='><source>Features</source><target>Features</target></trans-unit>
+<trans-unit id='RW50d2lja2x1bmc='><source>Entwicklung</source><target>Entwicklung</target></trans-unit>
+<trans-unit id='Q29uc3VsdGluZyB1bmQgSW5zdGFsbGF0aW9uZW4='><source>Consulting und Installationen</source><target>Consulting und Installationen</target></trans-unit>
+<trans-unit id='SG9zdGluZw=='><source>Hosting</source><target>Hosting</target></trans-unit>
+<trans-unit id='VGVzdGRhdGVu'><source>Testdaten</source><target>Testdaten</target></trans-unit>
+<trans-unit id='RmFsbHMgU2llIGtlaW5lIFRlc3RkYXRlbiB6dXIgSGFuZCBoYWJlbiwga8O2bm5lbiBTaWUgPGEgaHJlZj0iL2luZGV4L3Rlc3RkYXRhLyI+aGllciBUZXN0ZGF0ZW4gZG93bmxvYWRlbjwvYT4gdW5kIGFscyBuZXVlcyBQcm9qZWt0IGltcG9ydGllcmVuLg=='><source>Falls Sie keine Testdaten zur Hand haben, können Sie <a href="/index/testdata/">hier Testdaten downloaden</a> und als neues Projekt importieren.</source><target>Falls Sie keine Testdaten zur Hand haben, können Sie <a href="/index/testdata/">hier Testdaten downloaden</a> und als neues Projekt importieren.</target></trans-unit>
+<trans-unit id='R2VuZXJhbE1ldGF0YWdUaXRsZVN1ZmZpeA=='><source>GeneralMetatagTitleSuffix</source><target>GeneralMetatagTitleSuffix</target></trans-unit>
+  </body>
+ </file>
+</xliff>
