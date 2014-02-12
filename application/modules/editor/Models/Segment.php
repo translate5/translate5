@@ -97,49 +97,63 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         return parent::setQmId(trim($qmId, ';'));
     }
 
+    /**
+     * @param string $taskguid
+     */
     protected function updateView($taskguid)
     {
+        $cols = "*";
+        // TODO get columns
+
         $this->initField($taskguid);
         $this->initData($taskguid);
 
-        // TODO by import und drop if exist
-        $str_View_data_name         = "data_" . md5($taskguid);
-        $str_View_segment_name      = "segment_" . md5($taskguid);
+        $sView_data_name         = "data_" . md5($taskguid);
+        $sView_segment_name      = "segment_" . md5($taskguid);
 
-        $sStmt_drop_view_data       = "DROP VIEW IF EXISTS " . $str_View_data_name;
-        $sStmt_drop_view_segment    = "DROP VIEW IF EXISTS " . $str_View_segment_name;
+        $sStmt_drop_view_data       = "DROP VIEW IF EXISTS " . $sView_data_name;
+        $sStmt_drop_view_segment    = "DROP VIEW IF EXISTS " . $sView_segment_name;
 
-        // TODO get fields name
-        $sStmt_step1 = "CREATE VIEW " . $str_View_data_name . " AS ";
-        $sStmt_step1 .= "SELECT segmentId,";
+
+        $sStmt_create_view_data = "CREATE VIEW " . $sView_data_name . " AS ";
+        $sStmt_create_view_data .= "
+        SELECT
+            LEK_segment_data.segmentId,
+            LEK_segment_data.origina,
+            LEK_segment_data.originalMd5,
+            LEK_segment_data.originalToSort,
+            LEK_segment_data.edited,
+            LEK_segment_data.editedMd5,
+            LEK_segment_data.editedToSort,
+
+            LEK_segment_field.label,
+            LEK_segment_field.rankable,
+            LEK_segment_field.editable,
+             ";
         foreach($this->_segmentdata as $value){
-            $sStmt_step1 .= "MAX(IF(name = '".$value['name']."', edited, NULL)) AS '".$value['name']."',";
+            $sStmt_create_view_data .= "MAX(IF(LEK_segment_data.name = '".$value['name']."', edited, NULL)) AS '".$value['name']."',";
         }
-        $sStmt_step1 = substr($sStmt_step1, 0, (strlen($sStmt_step1)-1));
-        $sStmt_step1 .= "FROM LEK_segment_data GROUP BY segmentId";
-//        join LEK_segment_field AS field
-//        ON LEK_segment_data.name = field.name
-        $sStmt_step2 = "CREATE VIEW " . $str_View_segment_name . " AS ";
-        $sStmt_step2 .= "
-            SELECT *
+        $sStmt_create_view_data = substr($sStmt_create_view_data, 0, (strlen($sStmt_create_view_data)-1));
+        $sStmt_create_view_data .= " FROM LEK_segment_data
+        JOIN LEK_segment_field
+        ON LEK_segment_data.name = LEK_segment_field.name
+        GROUP BY segmentId
+        ";
+
+        $sStmt_create_view_segment = "CREATE VIEW " . $sView_segment_name . " AS ";
+        $sStmt_create_view_segment .= "
+            SELECT LEK_segments." . $cols . "
             FROM `LEK_segments`
-            join " . $str_View_data_name . "
+            join " . $sView_data_name . "
             AS data ON data.segmentId = LEK_segments.id
             WHERE `taskGuid` = '".$taskguid."'
         ";
-//        $sStmt_step3 = "CREATE VIEW v AS ".$sStmt_step2.";";
-//
-//        $str_stmt_creteView_data    = "CREATE VIEW " . $str_View_data_name . " AS " . $sStmt_step1 . ";";
 
-        print $sStmt_step1;
-        print "<br /><br />";
-        print $sStmt_step2;
-        print "<br /><br />";
-
-        print $sStmt_drop_view_data . "<br />";
-        print $sStmt_drop_view_segment . "<br />";
-
-        exit;
+        $this->db->getAdapter()->getConnection()->exec($sStmt_drop_view_data);
+        $this->db->getAdapter()->getConnection()->exec($sStmt_drop_view_segment);
+        $this->db->getAdapter()->getConnection()->exec($sStmt_create_view_data);
+        $this->db->getAdapter()->getConnection()->exec($sStmt_create_view_segment);
+        return;
     }
     /**
      * Load segments by taskguid. Second Parameter decides if SourceEdited column should be provided
@@ -163,10 +177,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         $s->from($this->db, $cols);
         $s->where('taskGuid = ?', $taskguid);
-
-//        $table = parent::loadFilterdCustom($s);
-//        var_dump($table);
-
 
         return parent::loadFilterdCustom($s);
     }
