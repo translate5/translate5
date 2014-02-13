@@ -174,10 +174,10 @@ Ext.define('Editor.view.segments.RowEditor', {
         field.margins = '0 0 0 2';
         
         //Dieses IF kommt hinzu  
-        if(column.dataIndex == 'edited'){
+        if(column.dataIndex == 'targetEdit'){
             me.mainEditor = field;
         }
-        else if(column.dataIndex == 'sourceEdited'){
+        else if(column.dataIndex == 'sourceEdit'){
             me.sourceEditor = field;
         }
         
@@ -228,19 +228,19 @@ Ext.define('Editor.view.segments.RowEditor', {
         var showSourceEditor = me.isSourceEditing(me.context),
         posMain = me.items.indexOf(me.mainEditor), 
         posSrc = me.items.indexOf(me.sourceEditor), 
-        isOnSource = (me.columnToEdit == 'sourceEdited'),
+        isOnSource = (me.columnToEdit == 'sourceEdit'),
         posLeft, 
         posRight,
         vis,
         toSwap;
         
         if(showSourceEditor) {
-            me.columnToEdit = 'sourceEdited';
-            toSwap = 'edited';
+            me.columnToEdit = 'sourceEdit';
+            toSwap = 'targetEdit';
         }
         else {
-            me.columnToEdit = 'edited';
-            toSwap = 'sourceEdited';
+            me.columnToEdit = 'targetEdit';
+            toSwap = 'sourceEdit';
         }
         //enabling the following line, disables text editing in source column:
         //me.mainEditor.setReadOnly(showSourceEditor);
@@ -274,7 +274,7 @@ Ext.define('Editor.view.segments.RowEditor', {
      */
     isSourceEditing: function(context) {
         var f = context.field; 
-        return Editor.data.task.isSourceEditable() && (f == 'source' || f == 'sourceEdited');
+        return Editor.data.task.isSourceEditable() && (f == 'source' || f == 'sourceEdit');
     },
 
     /**

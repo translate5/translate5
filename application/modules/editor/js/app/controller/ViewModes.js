@@ -55,13 +55,13 @@ Ext.define('Editor.controller.ViewModes', {
     selector : '#segmentgrid #sourceColumn'
   },{
     ref : 'sourceEditorColumn',
-    selector : '#segmentgrid #sourceEditorColumn'
+    selector : '#segmentgrid #sourceEditColumn'
   },{
     ref : 'targetColumn',
     selector : '#segmentgrid #targetColumn'
   },{
     ref : 'editorColumn',
-    selector : '#segmentgrid #editorColumn'
+    selector : '#segmentgrid #targetEditColumn'
   },{
     ref : 'shortTagBtn',
     selector : '#segmentgrid #shortTagBtn'
@@ -289,7 +289,7 @@ Ext.define('Editor.controller.ViewModes', {
         }
     },me);
     //inject css to the head to manipulate the column css, because it is easier than to set inject ergomic class for each column in the dom
-    Ext.util.CSS.createStyleSheet('#segment-grid .x-grid-row .source-field .x-grid-cell-inner,#segment-grid .x-grid-row .source-edited-field .x-grid-cell-inner,#segment-grid .x-grid-row .relais-field .x-grid-cell-inner,#segment-grid .x-grid-row .target-field .x-grid-cell-inner,#segment-grid .x-grid-row .target-edited-field .x-grid-cell-inner { width: '+me.colWidth+'px; } #segment-grid.ergonomic .x-grid-row .x-grid-cell, #segment-grid.ergonomic .x-grid-row-editor .x-form-display-field {    font-size: 19pt !important;    line-height: 39px;}',me.self.ergonomicStyleId);
+    Ext.util.CSS.createStyleSheet('#segment-grid .x-grid-row .source-field .x-grid-cell-inner,#segment-grid .x-grid-row .source-edit-field .x-grid-cell-inner,#segment-grid .x-grid-row .relais-field .x-grid-cell-inner,#segment-grid .x-grid-row .target-field .x-grid-cell-inner,#segment-grid .x-grid-row .target-edit-field .x-grid-cell-inner { width: '+me.colWidth+'px; } #segment-grid.ergonomic .x-grid-row .x-grid-cell, #segment-grid.ergonomic .x-grid-row-editor .x-form-display-field {    font-size: 19pt !important;    line-height: 39px;}',me.self.ergonomicStyleId);
 
     me.getSegmentGrid().addCls(me.self.MODE_ERGONOMIC);
     me.self.setViewMode(me.self.MODE_ERGONOMIC);

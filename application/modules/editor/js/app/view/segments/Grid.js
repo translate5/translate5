@@ -140,47 +140,60 @@ Ext.define('Editor.view.segments.Grid', {
             width: 140
         },{
             xtype: 'contentColumn',
-            itemId: 'sourceColumn',
-            dataIndex: 'source',
-            tdCls: 'source-field segment-tag-column',
+            fieldName: 'source',
             isErgonomicVisible: true,
             isErgonomicSetWidth: true,
             text: '#UT#Ausgangstext'
         }]);
     
+        //old strings to grep for:
+        /*
+        itemId: 'sourceColumn',
+        dataIndex: 'source',
+        tdCls: 'source-field segment-tag-column',
+        
+        itemId: 'sourceEditorColumn',  → changes to sourceEditColumn
+        dataIndex: 'sourceEdited', → changes to sourceEdit
+        tdCls: 'source-edited-field segment-tag-column',  → first part changes to source-edit-field
+        
+        itemId: 'relaisColumn'
+        dataIndex: 'relais',
+        tdCls: 'relais-field segment-tag-column',
+        
+        itemId: 'editorColumn', → targetEditColumn
+        dataIndex: 'edited', → targetEdit
+        tdCls: 'target-edited-field segment-tag-column', → first part changes to target-edit-field
+
+        itemId: 'targetColumn'
+        dataIndex: 'target',
+        tdCls: 'target-field segment-tag-column',
+        */
+        
         if(Editor.data.task.get('enableSourceEditing')){
             columns.push({
                 xtype: 'contentEditableColumn',
-                dataIndex: 'sourceEdited',
-                itemId: 'sourceEditorColumn',
-                tdCls: 'source-edited-field segment-tag-column',
+                fieldName: 'source',
                 text: '#UT#Ausgangstext überarbeitet'
             });
         }
     
         if(Editor.data.task.hasRelaisSource()){
             columns.push({
-                isErgonomicSetWidth: true,
-                dataIndex: 'relais',
-                tdCls: 'relais-field segment-tag-column',
-                text: '#UT#Relaistext',
                 xtype: 'contentColumn',
-                itemId: 'relaisColumn'
+                isErgonomicSetWidth: true,
+                fieldName: 'relais',
+                text: '#UT#Relaistext'
             });
         }
     
         columns.push.apply(columns, [{
-            isErgonomicSetWidth: true,
-            dataIndex: 'target',
-            tdCls: 'target-field segment-tag-column',
-            text: '#UT#Zieltext',
             xtype: 'contentColumn',
-            itemId: 'targetColumn'
+            isErgonomicSetWidth: true,
+            fieldName: 'target',
+            text: '#UT#Zieltext'
         },{
             xtype: 'contentEditableColumn',
-            dataIndex: 'edited',
-            itemId: 'editorColumn',
-            tdCls: 'target-edited-field segment-tag-column',
+            fieldName: 'target',
             text: '#UT#Zieltext überarbeitet'
         },{
             xtype: 'commentsColumn',

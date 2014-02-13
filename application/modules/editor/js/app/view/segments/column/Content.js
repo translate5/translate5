@@ -48,6 +48,13 @@ Ext.define('Editor.view.segments.column.Content', {
   extend: 'Ext.grid.column.Column',
   alias: 'widget.contentColumn',
   mixins: ['Editor.view.segments.column.BaseMixin'],
+  
+  /**
+   * @cfg {String} fieldName
+   * The name of the segment data field, is processed automatically as dataIndex and so on.
+   * **Required.**
+   */
+  fieldName: null,
   width: 250,
   resizable: false,
   fixed: true,
@@ -55,9 +62,18 @@ Ext.define('Editor.view.segments.column.Content', {
       xtype: 'displayfield',
       fieldCls: 'x-form-display-field segment-tag-container'
   },
+  constructor: function(conf) {
+      var field = conf.fieldName;
+      conf.width = 250; //needed, otherwise the Columns are overwritten with 100. Why ever...
+      Ext.applyIf(conf, {
+          dataIndex: field,
+          itemId: field + 'Column',
+          tdCls: field + '-field segment-tag-column'
+      });
+      this.callParent(arguments);
+  },
   initComponent: function() {
     var me = this;
-    me.width = 250; //needed, otherwise the Columns are to small. Why ever...
     me.initBaseMixin();
     me.callParent(arguments);
   }

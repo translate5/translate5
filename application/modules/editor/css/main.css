@@ -33,12 +33,13 @@
  END LICENSE AND COPYRIGHT 
  */
 
+/* FIXME unify the column CSS! */
 #changealike-grid .x-grid-row .segment-tag-column .x-grid-cell-inner,
 #segment-grid .x-grid-row .source-field .x-grid-cell-inner,
 #segment-grid .x-grid-row .relais-field .x-grid-cell-inner,
-#segment-grid .x-grid-row .source-edited-field .x-grid-cell-inner,
+#segment-grid .x-grid-row .source-edit-field .x-grid-cell-inner,
 #segment-grid .x-grid-row .target-field .x-grid-cell-inner,
-#segment-grid .x-grid-row .target-edited-field .x-grid-cell-inner {
+#segment-grid .x-grid-row .target-edit-field .x-grid-cell-inner {
   white-space: normal;
   width: 250px;
 }

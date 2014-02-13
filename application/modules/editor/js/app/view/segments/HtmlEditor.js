@@ -60,7 +60,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   enableColors : false,
   enableAlignments : false,
   enableLists : false,
-  enableSourceEdit : false,
+  enableSourceEdit : false, //FIXME this value should be obsolete
   enableLinks : false,
   enableFont : false,
   isTagOrderClean: true,
