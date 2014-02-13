@@ -123,7 +123,7 @@ Ext.define('Editor.view.segments.GridFilter', {
           dataIndex: 'source'
       },{
           type: 'string',
-          dataIndex: 'sourceEdited'
+          dataIndex: 'sourceEdit'
       },{
           type: 'string',
           dataIndex: 'target'
@@ -132,7 +132,7 @@ Ext.define('Editor.view.segments.GridFilter', {
     	  dataIndex: 'relais'
       },{
           type: 'string',
-          dataIndex: 'editor'
+          dataIndex: 'targetEdit'
       },{
           type: 'string',
           dataIndex: 'comments'
