@@ -173,10 +173,10 @@ Ext.define('Editor.view.segments.RowEditor', {
         field.margins = '0 0 0 2';
         
         //Dieses IF kommt hinzu  
-        if(column instanceof Editor.view.segments.column.Editor){
+        if(column.dataIndex == 'edited'){
             me.mainEditor = field;
         }
-        else if(column instanceof Editor.view.segments.column.SourceEditor){
+        else if(column.dataIndex == 'sourceEdited'){
             me.sourceEditor = field;
         }
         

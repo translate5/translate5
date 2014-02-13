@@ -49,12 +49,9 @@ Ext.define('Editor.view.segments.Grid', {
     requires: [
         'Editor.view.segments.RowEditing',
         'Editor.view.segments.GridFilter',
-        'Editor.view.segments.column.Source',
+        'Editor.view.segments.column.Content',
+        'Editor.view.segments.column.ContentEditable',
         'Editor.view.segments.column.SegmentNrInTask',
-        'Editor.view.segments.column.SourceEditor',
-        'Editor.view.segments.column.Target',
-        'Editor.view.segments.column.Relais',
-        'Editor.view.segments.column.Editor',
         'Editor.view.segments.column.State',
         'Editor.view.segments.column.Quality',
         'Editor.view.segments.column.Matchrate',
@@ -75,16 +72,16 @@ Ext.define('Editor.view.segments.Grid', {
     title_readonly: '#UT#Segmentliste und Editor - [LESEMODUS]',
 
     //Item Strings: 
-    item_viewModesMenu: 'EditormodiX',
-    item_viewModeBtn: 'Ansichtsmodus',
-    item_editModeBtn: 'Bearbeitungsmodus',
-    item_ergonomicModeBtn: 'Ergonimic',
-    item_hideTagBtn: 'Tags verbergen',
-    item_shortTagBtn: 'Tag-Kurzansicht',
-    item_fullTagBtn: 'Tag-Vollansicht',
-    item_qmsummaryBtn: 'QM-Subsegment-Statistik',
-    item_optionsTagBtn: 'Einstellungen',
-    item_clearSortAndFilterBtn: 'Sortierung und Filter zurücksetzen',
+    item_viewModesMenu: '#UT#Editormodi',
+    item_viewModeBtn: '#UT#Ansichtsmodus',
+    item_editModeBtn: '#UT#Bearbeitungsmodus',
+    item_ergonomicModeBtn: '#UT#Ergonimic',
+    item_hideTagBtn: '#UT#Tags verbergen',
+    item_shortTagBtn: '#UT#Tag-Kurzansicht',
+    item_fullTagBtn: '#UT#Tag-Vollansicht',
+    item_qmsummaryBtn: '#UT#QM-Subsegment-Statistik',
+    item_optionsTagBtn: '#UT#Einstellungen',
+    item_clearSortAndFilterBtn: '#UT#Sortierung und Filter zurücksetzen',
   
     columnMap:{},
     stateData: {},
@@ -142,35 +139,49 @@ Ext.define('Editor.view.segments.Grid', {
             },
             width: 140
         },{
-            xtype: 'sourceColumn',
+            xtype: 'contentColumn',
             itemId: 'sourceColumn',
-            width: 250
+            dataIndex: 'source',
+            tdCls: 'source-field segment-tag-column',
+            isErgonomicVisible: true,
+            isErgonomicSetWidth: true,
+            text: '#UT#Ausgangstext'
         }]);
     
         if(Editor.data.task.get('enableSourceEditing')){
             columns.push({
-                xtype: 'sourceEditorColumn',
+                xtype: 'contentEditableColumn',
+                dataIndex: 'sourceEdited',
                 itemId: 'sourceEditorColumn',
-                width: 250
+                tdCls: 'source-edited-field segment-tag-column',
+                text: '#UT#Ausgangstext überarbeitet'
             });
         }
     
         if(Editor.data.task.hasRelaisSource()){
             columns.push({
-                xtype: 'relaisColumn',
-                itemId: 'relaisColumn',
-                width: 250
+                isErgonomicSetWidth: true,
+                dataIndex: 'relais',
+                tdCls: 'relais-field segment-tag-column',
+                text: '#UT#Relaistext',
+                xtype: 'contentColumn',
+                itemId: 'relaisColumn'
             });
         }
     
         columns.push.apply(columns, [{
-            xtype: 'targetColumn',
-            itemId: 'targetColumn',
-            width: 250
+            isErgonomicSetWidth: true,
+            dataIndex: 'target',
+            tdCls: 'target-field segment-tag-column',
+            text: '#UT#Zieltext',
+            xtype: 'contentColumn',
+            itemId: 'targetColumn'
         },{
-            xtype: 'editorColumn',
+            xtype: 'contentEditableColumn',
+            dataIndex: 'edited',
             itemId: 'editorColumn',
-            width: 250
+            tdCls: 'target-edited-field segment-tag-column',
+            text: '#UT#Zieltext überarbeitet'
         },{
             xtype: 'commentsColumn',
             itemId: 'commentsColumn',
