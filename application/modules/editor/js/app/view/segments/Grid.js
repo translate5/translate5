@@ -45,58 +45,297 @@
  * @initalGenerated
  */
 Ext.define('Editor.view.segments.Grid', {
-  requires: ['Editor.view.segments.GridFilter'],
-  extend: 'Editor.view.ui.segments.Grid',
-  alias: 'widget.segments.grid',
-  store: 'Segments',
-  stateful: false,
-  columnMap:{},
-  stateData: {},
-  qualityData: {},
-  features: [{
-    ftype: 'editorGridFilter'
-  }],
-  //eigener X-Type für den Scroller
-  verticalScrollerType: 'editorgridscroller',
-  invalidateScrollerOnRefresh: false,
-  //Einbindung des eigenen Editor Plugins
-  plugins: [
-    Ext.create('Editor.view.segments.RowEditing', {
-      clicksToMoveEditor: 1,
-      autoCancel: false
-    })
-  ],
-  /**
-   * Config Parameter für die {Ext.grid.View} des Grids
-   */
-  viewConfig: {
-    blockRefresh: true,
-    getRowClass: function(record, rowIndex, rowParams, store){
-      if(record.get('editable')){
-        return "";
-      }
-      return "editing-disabled";
-    }
-  },
-  initComponent: function() {
-    var me = this;
+    extend: 'Ext.grid.Panel',
+    requires: [
+        'Editor.view.segments.RowEditing',
+        'Editor.view.segments.GridFilter',
+        'Editor.view.segments.column.Source',
+        'Editor.view.segments.column.SegmentNrInTask',
+        'Editor.view.segments.column.SourceEditor',
+        'Editor.view.segments.column.Target',
+        'Editor.view.segments.column.Relais',
+        'Editor.view.segments.column.Editor',
+        'Editor.view.segments.column.State',
+        'Editor.view.segments.column.Quality',
+        'Editor.view.segments.column.Matchrate',
+        'Editor.view.segments.column.AutoState',
+        'Editor.view.segments.column.UserName',
+        'Editor.view.segments.column.Comments',
+        'Editor.view.segments.column.WorkflowStep',
+        'Editor.view.segments.column.Editable'
+    ],
+    alias: 'widget.segments.grid',
+    store: 'Segments',
+    stateful: false,
+  
+    cls: 'segment-tag-viewer',
+    id: 'segment-grid',
+  
+    title: 'Segmentliste und Editor',
+    title_readonly: '#UT#Segmentliste und Editor - [LESEMODUS]',
+
+    //Item Strings: 
+    item_viewModesMenu: 'EditormodiX',
+    item_viewModeBtn: 'Ansichtsmodus',
+    item_editModeBtn: 'Bearbeitungsmodus',
+    item_ergonomicModeBtn: 'Ergonimic',
+    item_hideTagBtn: 'Tags verbergen',
+    item_shortTagBtn: 'Tag-Kurzansicht',
+    item_fullTagBtn: 'Tag-Vollansicht',
+    item_qmsummaryBtn: 'QM-Subsegment-Statistik',
+    item_optionsTagBtn: 'Einstellungen',
+    item_clearSortAndFilterBtn: 'Sortierung und Filter zurücksetzen',
+  
+    columnMap:{},
+    stateData: {},
+    qualityData: {},
+    features: [{
+        ftype: 'editorGridFilter'
+    }],
+    //eigener X-Type für den Scroller
+    verticalScrollerType: 'editorgridscroller',
+    invalidateScrollerOnRefresh: false,
+    //Einbindung des eigenen Editor Plugins
+    /**
+     * Config Parameter für die {Ext.grid.View} des Grids
+     */
+    viewConfig: {
+        blockRefresh: true,
+        getRowClass: function(record, rowIndex, rowParams, store){
+            if(record.get('editable')){
+                return "";
+            }
+            return "editing-disabled";
+        }
+    },
+    constructor: function() {
+        this.plugins = [
+            Ext.create('Editor.view.segments.RowEditing', {
+                clicksToMoveEditor: 1,
+                autoCancel: false
+            })
+        ];
+        this.callParent(arguments);
+    },
+    initComponent: function() {
+        var me = this,
+            columns = [];
+        
+        //befülle interne Hash Map mit QM und Status Werten:
+        Ext.each(Editor.data.segments.stateFlags, function(item){
+            me.stateData[item.id] = item.label;
+        });
+        Ext.each(Editor.data.segments.qualityFlags, function(item){
+            me.qualityData[item.id] = item.label;
+        });
+
+        columns.push.apply(columns, [{
+            xtype: 'segmentNrInTaskColumn',
+            itemId: 'segmentNrInTaskColumn',
+            width: 50
+        },{
+            xtype: 'workflowStepColumn',
+            itemId: 'workflowStepColumn',
+            renderer: function(v) {
+                var steps = Editor.data.app.wfSteps;
+                return steps[v] ? steps[v] : v;
+            },
+            width: 140
+        },{
+            xtype: 'sourceColumn',
+            itemId: 'sourceColumn',
+            width: 250
+        }]);
     
-    //befülle interne Hash Map mit QM und Status Werten:
-    Ext.each(Editor.data.segments.stateFlags, function(item){
-      me.stateData[item.id] = item.label;
-    });
-    Ext.each(Editor.data.segments.qualityFlags, function(item){
-      me.qualityData[item.id] = item.label;
-    });
-    me.callParent(arguments);
-  },
-  selectOrFocus: function(localRowIndex) {
-    var sm = this.getSelectionModel();
-    if(sm.isSelected(localRowIndex)){
-      this.getView().focusRow(localRowIndex);
+        if(Editor.data.task.get('enableSourceEditing')){
+            columns.push({
+                xtype: 'sourceEditorColumn',
+                itemId: 'sourceEditorColumn',
+                width: 250
+            });
+        }
+    
+        if(Editor.data.task.hasRelaisSource()){
+            columns.push({
+                xtype: 'relaisColumn',
+                itemId: 'relaisColumn',
+                width: 250
+            });
+        }
+    
+        columns.push.apply(columns, [{
+            xtype: 'targetColumn',
+            itemId: 'targetColumn',
+            width: 250
+        },{
+            xtype: 'editorColumn',
+            itemId: 'editorColumn',
+            width: 250
+        },{
+            xtype: 'commentsColumn',
+            itemId: 'commentsColumn',
+            width: 200
+        }]);
+    
+        if(Editor.data.segments.showStatus){
+            columns.push({
+                xtype: 'stateColumn',
+                itemId: 'stateColumn'
+            });
+        }
+    
+        columns.push.apply(columns, [{
+            xtype: 'qualityColumn',
+            itemId: 'qualityColumn'
+        },{
+            xtype: 'matchrateColumn',
+            itemId: 'matchrateColumn',
+            width: 82
+        },{
+            xtype: 'autoStateColumn',
+            itemId: 'autoStateColumn',
+            width: 82
+        },{
+            xtype: 'usernameColumn',
+            itemId: 'usernameColumn',
+            width: 122
+        },{
+            xtype: 'editableColumn',
+            itemId: 'editableColumn'
+        }]);
+    
+        Ext.applyIf(me, {
+       /**
+        * for information se below onReconfigure
+        *
+        * listeners: {'reconfigure': Ext.bind(this.onReconfigure, this)},
+        */
+            columns: columns,
+            viewConfig: {},
+            dockedItems: [{
+                xtype: 'toolbar',
+                width: 150,
+                dock: 'top',
+                items: [{
+                    xtype: 'button',
+                    text:me.item_viewModesMenu,
+                    itemId: 'viewModeMenu',
+                    menu: {
+                        xtype: 'menu',
+                        items: [{
+                            xtype: 'button',
+                            itemId: 'viewModeBtn',
+                            enableToggle: true,
+                            text: me.item_viewModeBtn,
+                            toggleGroup: 'toggleView',
+                            textAlign: 'left'
+                        },{
+                            xtype: 'button',
+                            itemId: 'editModeBtn',
+                            enableToggle: true,
+                            pressed: true,
+                            text: me.item_editModeBtn,
+                            toggleGroup: 'toggleView',
+                            textAlign: 'left'
+                        },{
+                            xtype: 'button',
+                            itemId: 'ergonomicModeBtn',
+                            enableToggle: true,
+                            text: me.item_ergonomicModeBtn,
+                            toggleGroup: 'toggleView',
+                            textAlign: 'left'
+                        }]
+                    }
+                },{
+                    xtype: 'tbseparator'
+                },{
+                    xtype: 'button',
+                    disabled: true,
+                    itemId: 'hideTagBtn',
+                    enableToggle: true,
+                    text: me.item_hideTagBtn,
+                    toggleGroup: 'tagMode'
+                },{
+                    xtype: 'button',
+                    itemId: 'shortTagBtn',
+                    enableToggle: true,
+                    pressed: true,
+                    text: me.item_shortTagBtn,
+                    toggleGroup: 'tagMode'
+                },{
+                    xtype: 'button',
+                    itemId: 'fullTagBtn',
+                    enableToggle: true,
+                    text: me.item_fullTagBtn,
+                    toggleGroup: 'tagMode'
+                },{
+                    xtype: 'tbseparator'
+                },{
+                    xtype: 'button',
+                    itemId: 'clearSortAndFilterBtn',
+                    cls: 'clearSortAndFilterBtn',
+                    text: me.item_clearSortAndFilterBtn
+                },{
+                    xtype: 'tbseparator',
+                    hidden: !Editor.data.task.hasQmSub()
+                },{
+                    xtype: 'button',
+                    itemId: 'qmsummaryBtn',
+                    text: me.item_qmsummaryBtn,
+                    hidden: !Editor.data.task.hasQmSub()
+                },{
+                    xtype: 'tbfill'
+                },{
+                    xtype: 'button',
+                    itemId: 'optionsBtn',
+                    text: me.item_optionsTagBtn
+                }]
+            }]
+        });
+        me.callParent(arguments);
+    },
+    selectOrFocus: function(localRowIndex) {
+        var sm = this.getSelectionModel();
+        if(sm.isSelected(localRowIndex)){
+            this.getView().focusRow(localRowIndex);
+        }
+        else {
+            sm.select(localRowIndex);
+        }
     }
-    else {
-      sm.select(localRowIndex);
-    }
-  }
+  /**
+   *code which tries to get the roweditor behave on reconfigure of the grid - does not work with ext 4.0.7 so far. Trial-code
+   * This code can be removed after upgrade to >4.1.1a - should be fixed there. See http://stackoverflow.com/questions/11963870/using-ext-grid-panel-reconfigure-breaks-the-grids-rowediting-plugin
+   * @event reconfigure
+   * Fires after a reconfigure.
+   * @param {Ext.grid.Panel} this
+   * @param {Ext.data.Store} store The store that was passed to the {@link #method-reconfigure} method
+   * @param {Object[]} columns The column configs that were passed to the {@link #method-reconfigure} method
+
+    onReconfigure: function (grid, store, columnConfigs) {
+        var columns = grid.headerCt.getGridColumns(),
+            rowEditingPlugin = grid.editingPlugin,
+            me = this;
+        //
+        // Re-attached the 'getField' and 'setField' extension methods to each column
+        //
+        rowEditingPlugin.initFieldAccessors(columns);
+    
+        //
+        // Re-create the actual editor (the UI component within the 'RowEditing' plugin itself)
+        //
+        // 1. Destroy and make sure we aren't holding a reference to it.
+        //
+        Ext.destroy(rowEditingPlugin.editor);
+        rowEditingPlugin.editor = null;
+        //
+        // 2. This method has some lazy load logic built into it and will initialize a new row editor.
+        //
+        me.editor = rowEditingPlugin.getEditor();
+        /*rowEditingPlugin.initEditor();
+        Ext.Array.each(columns, function(col){
+            me.editor.setField(col);
+        },me);
+        me.editor = rowEditingPlugin.getEditor();
+    }*/
 });
