@@ -42,11 +42,6 @@ Ext.define('Editor.view.ViewPort', {
         type: 'border'
     },
     initComponent: function() {
-      var me = this;
-      me.items = me.getAdminPanels();
-      me.callParent(arguments);
-    },
-    initComponent: function() {
         var me = this,
             items = [{
                 xtype: 'headPanel',
