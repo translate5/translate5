@@ -38,6 +38,7 @@
  */
 Ext.define('Editor.model.admin.Task', {
   extend: 'Ext.data.Model',
+  requires: ['Editor.model.segment.Field'],
   //currently we have 3 places to define userStates: IndexController for translation, JS Task Model and PHP TaskUserAssoc Model for programmatic usage
   USER_STATE_OPEN: 'open',
   USER_STATE_EDIT: 'edit',
@@ -76,6 +77,7 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'users', type: 'auto', persist: false},
     {name: 'userCount', type: 'integer', persist: false}
   ],
+  hasMany: {model: 'Editor.model.segment.Field', name: 'segmentFields'},
   idProperty: 'id',
   proxy : {
     type : 'rest',
