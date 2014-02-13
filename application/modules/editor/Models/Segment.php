@@ -52,18 +52,583 @@
  * @method void setWorkflowStep() setWorkflowStep(string $name)
  */
 class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
-
+    /**
+     * @var
+     */
+    protected $_id;
+    /**
+     * @var
+     */
+    protected $_segmentNrInTask;
+    /**
+     * @var
+     */
+    protected $_fileId;
+    /**
+     * @var
+     */
+    protected $_mid;
+    /**
+     * @var
+     */
+    protected $_source;
+    /**
+     * @var
+     */
+    protected $_sourceToSort;
+    /**
+     * @var
+     */
+    protected $_sourceMd5;
+    /**
+     * @var
+     */
+    protected $_targetMd5;
+    /**
+     * @var
+     */
+    protected $_target;
+    /**
+     * @var
+     */
+    protected $_targetToSort;
+    /**
+     * @var
+     */
+    protected $_edited;
+    /**
+     * @var
+     */
+    protected $_editedToSort;
+    /**
+     * @var
+     */
+    protected $_relais;
+    /**
+     * @var
+     */
+    protected $_relaisToSort;
+    /**
+     * @var
+     */
+    protected $_relaisMd5;
+    /**
+     * @var
+     */
+    protected $_userGuid;
+    /**
+     * @var
+     */
+    protected $_userName;
+    /**
+     * @var
+     */
+    protected $_taskGuid;
+    /**
+     * @var
+     */
+    protected $_timestamp;
+    /**
+     * @var
+     */
+    protected $_editable;
+    /**
+     * @var
+     */
+    protected $_pretrans;
+    /**
+     * @var
+     */
+    protected $_matchRate;
+    /**
+     * @var
+     */
+    protected $_qmId;
+    /**
+     * @var
+     */
+    protected $_stateId;
+    /**
+     * @var
+     */
+    protected $_autoStateId;
+    /**
+     * @var
+     */
+    protected $_fileOrder;
+    /**
+     * @var
+     */
+    protected $_sourceEdited;
+    /**
+     * @var
+     */
+    protected $_sourceEditedToSort;
+    /**
+     * @var
+     */
+    protected $_comments;
+    /**
+     * @var
+     */
+    protected $_workflowStepNr;
+    /**
+     * @var
+     */
+    protected $_workflowStep;
+    /**
+     * @var string
+     */
     protected $dbInstanceClass = 'editor_Models_Db_Segments';
+    /**
+     * @var string
+     */
     protected $validatorInstanceClass = 'editor_Models_Validator_Segment';
-
+    /**
+     * @var array
+     */
     protected $_segmentfield = array();
+    /**
+     * @var array
+     */
     protected $_segmentdata = array();
 
     /**
-     *
+     * @param mixed $comments
+     */
+    public function setComments($comments)
+    {
+        $this->_comments = $comments;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getComments()
+    {
+        return $this->_comments;
+    }
+
+    /**
+     * @param mixed $editable
+     */
+    public function setEditable($editable)
+    {
+        $this->_editable = $editable;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEditable()
+    {
+        return $this->_editable;
+    }
+
+    /**
+     * @param mixed $edited
+     */
+    public function setEdited($edited)
+    {
+        $this->_edited = $edited;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEdited()
+    {
+        return $this->_edited;
+    }
+
+    /**
+     * @param mixed $editedToSort
+     */
+    public function setEditedToSort($editedToSort)
+    {
+        $this->_editedToSort = $editedToSort;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEditedToSort()
+    {
+        return $this->_editedToSort;
+    }
+
+    /**
+     * @param mixed $fileId
+     */
+    public function setFileId($fileId)
+    {
+        $this->_fileId = $fileId;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFileId()
+    {
+        return $this->_fileId;
+    }
+
+    /**
+     * @param mixed $fileOrder
+     */
+    public function setFileOrder($fileOrder)
+    {
+        $this->_fileOrder = $fileOrder;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFileOrder()
+    {
+        return $this->_fileOrder;
+    }
+
+    /**
+     * @param mixed $id
+     */
+    public function setId($id)
+    {
+        $this->_id = $id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->_id;
+    }
+
+    /**
+     * @param mixed $matchRate
+     */
+    public function setMatchRate($matchRate)
+    {
+        $this->_matchRate = $matchRate;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMatchRate()
+    {
+        return $this->_matchRate;
+    }
+
+    /**
+     * @param mixed $mid
+     */
+    public function setMid($mid)
+    {
+        $this->_mid = $mid;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMid()
+    {
+        return $this->_mid;
+    }
+
+    /**
+     * @param mixed $pretrans
+     */
+    public function setPretrans($pretrans)
+    {
+        $this->_pretrans = $pretrans;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPretrans()
+    {
+        return $this->_pretrans;
+    }
+
+    /**
+     * @param mixed $relais
+     */
+    public function setRelais($relais)
+    {
+        $this->_relais = $relais;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRelais()
+    {
+        return $this->_relais;
+    }
+
+    /**
+     * @param mixed $relaisMd5
+     */
+    public function setRelaisMd5($relaisMd5)
+    {
+        $this->_relaisMd5 = $relaisMd5;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRelaisMd5()
+    {
+        return $this->_relaisMd5;
+    }
+
+    /**
+     * @param mixed $relaisToSort
+     */
+    public function setRelaisToSort($relaisToSort)
+    {
+        $this->_relaisToSort = $relaisToSort;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRelaisToSort()
+    {
+        return $this->_relaisToSort;
+    }
+
+    /**
+     * @param mixed $segmentNrInTask
+     */
+    public function setSegmentNrInTask($segmentNrInTask)
+    {
+        $this->_segmentNrInTask = $segmentNrInTask;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSegmentNrInTask()
+    {
+        return $this->_segmentNrInTask;
+    }
+
+    /**
+     * @param mixed $source
+     */
+    public function setSource($source)
+    {
+        $this->_source = $source;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSource()
+    {
+        return $this->_source;
+    }
+
+    /**
+     * @param mixed $sourceEdited
+     */
+    public function setSourceEdited($sourceEdited)
+    {
+        $this->_sourceEdited = $sourceEdited;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSourceEdited()
+    {
+        return $this->_sourceEdited;
+    }
+
+    /**
+     * @param mixed $sourceEditedToSort
+     */
+    public function setSourceEditedToSort($sourceEditedToSort)
+    {
+        $this->_sourceEditedToSort = $sourceEditedToSort;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSourceEditedToSort()
+    {
+        return $this->_sourceEditedToSort;
+    }
+
+    /**
+     * @param mixed $sourceMd5
+     */
+    public function setSourceMd5($sourceMd5)
+    {
+        $this->_sourceMd5 = $sourceMd5;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSourceMd5()
+    {
+        return $this->_sourceMd5;
+    }
+
+    /**
+     * @param mixed $sourceToSort
+     */
+    public function setSourceToSort($sourceToSort)
+    {
+        $this->_sourceToSort = $sourceToSort;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSourceToSort()
+    {
+        return $this->_sourceToSort;
+    }
+
+    /**
+     * @param mixed $stateId
+     */
+    public function setStateId($stateId)
+    {
+        $this->_stateId = $stateId;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getStateId()
+    {
+        return $this->_stateId;
+    }
+
+    /**
+     * @param mixed $target
+     */
+    public function setTarget($target)
+    {
+        $this->_target = $target;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTarget()
+    {
+        return $this->_target;
+    }
+
+    /**
+     * @param mixed $targetMd5
+     */
+    public function setTargetMd5($targetMd5)
+    {
+        $this->_targetMd5 = $targetMd5;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTargetMd5()
+    {
+        return $this->_targetMd5;
+    }
+
+    /**
+     * @param mixed $targetToSort
+     */
+    public function setTargetToSort($targetToSort)
+    {
+        $this->_targetToSort = $targetToSort;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTargetToSort()
+    {
+        return $this->_targetToSort;
+    }
+
+    /**
+     * @param mixed $taskGuid
+     */
+    public function setTaskGuid($taskGuid)
+    {
+        $this->_taskGuid = $taskGuid;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTaskGuid()
+    {
+        return $this->_taskGuid;
+    }
+
+    /**
+     * @param mixed $timestamp
+     */
+    public function setTimestamp($timestamp)
+    {
+        $this->_timestamp = $timestamp;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTimestamp()
+    {
+        return $this->_timestamp;
+    }
+
+    /**
+     * @param mixed $userGuid
+     */
+    public function setUserGuid($userGuid)
+    {
+        $this->_userGuid = $userGuid;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUserGuid()
+    {
+        return $this->_userGuid;
+    }
+
+    /**
+     * @param mixed $userName
+     */
+    public function setUserName($userName)
+    {
+        $this->_userName = $userName;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUserName()
+    {
+        return $this->_userName;
+    }
+    /**
      * @var type Zend_Config
      */
     protected $config = null;
+
 
     protected function initField($TaskGuid)
     {
