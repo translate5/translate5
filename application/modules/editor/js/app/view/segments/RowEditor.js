@@ -284,6 +284,8 @@ Ext.define('Editor.view.segments.RowEditor', {
     completeEdit: function() {
         var me = this,
         newValue = '',
+        //FIXME also for TRANSLATE-118:
+        fieldToCheck = (me.columnToEdit == 'sourceEdited' ? 'source' : 'target');
         record = me.context.record;
         //der replace aufruf entfernt vom Editor automatisch hinzugefügte unsichtbare Zeichen, 
         //und verhindert so, dass der Record nicht als modified markiert wird, wenn am Inhalt eigentlich nichts verändert wurde
@@ -298,8 +300,7 @@ Ext.define('Editor.view.segments.RowEditor', {
             return false;
         }
         
-        //FIXME for TRANSLATE-118: check real used field instead target!
-        if(newValue.length == 0 && record.get('target').length > 0) {
+        if(newValue.length == 0 && record.get(fieldToCheck).length > 0) {
             Editor.MessageBox.addError(me.messages.cantSaveEmptySegment);
             return false;
         }
