@@ -105,3 +105,59 @@ Ext.define('Editor.model.Segment', {
     }
   }
 });
+
+
+Editor.model._Segment = function(fields) {
+    Ext.define('Editor.model.Segment', {
+        statics: {
+            redefine: Editor.model._Segment
+        },
+        extend: 'Ext.data.Model',
+        fields: fields,
+        idProperty: 'id',
+    });
+};
+
+//default fields
+Editor.model._Segment([{
+    name: 'id',
+    type: 'int'
+},{
+    name: 'fileId',
+    type:'int'
+},{
+    name: 'segmentNrInTask',
+    type: 'int'
+}]);
+console.dir(Editor.model.Segment.create({segmentNrInTask: 123}).data);
+
+Editor.model.Segment.redefine([{
+    name: 'id',
+    type: 'int'
+},{
+    name: 'fileId',
+    type:'int'
+},{
+    name: 'segmentNrInTask',
+    type: 'int'
+},{
+    name: 'source', 
+    type: 'string'
+},{
+    name: 'sourceEdited',
+    type: 'string'
+},{
+    name: 'relais',
+    type: 'string'
+},{
+    name: 'target',
+    type: 'string'
+},{
+    name: 'targetEdited',
+    type: 'string'}
+]);
+
+console.dir(Editor.model.Segment.create({segmentNrInTask: 123, source: "TEST"}).data);
+
+    //tested in 4.0.7 and 4.2
+    //improve redefine, so that it can merge the fields instead completly overwrite it.

@@ -82,6 +82,7 @@ Ext.define('Editor.view.segments.Grid', {
     item_qmsummaryBtn: '#UT#QM-Subsegment-Statistik',
     item_optionsTagBtn: '#UT#Einstellungen',
     item_clearSortAndFilterBtn: '#UT#Sortierung und Filter zurücksetzen',
+    column_edited: '#UT#{0}: bearbeitet',
   
     columnMap:{},
     stateData: {},
@@ -116,7 +117,8 @@ Ext.define('Editor.view.segments.Grid', {
     },
     initComponent: function() {
         var me = this,
-            columns = [];
+            columns = [],
+            fields = Editor.data.task.segmentFields();
         
         //befülle interne Hash Map mit QM und Status Werten:
         Ext.each(Editor.data.segments.stateFlags, function(item){
@@ -138,14 +140,40 @@ Ext.define('Editor.view.segments.Grid', {
                 return steps[v] ? steps[v] : v;
             },
             width: 140
-        },{
-            xtype: 'contentColumn',
-            fieldName: 'source',
-            isErgonomicVisible: true,
-            isErgonomicSetWidth: true,
-            text: '#UT#Ausgangstext'
+        //},{
+            //xtype: 'contentColumn',
+            //fieldName: 'source',
+            //isErgonomicVisible: true,
+            //isErgonomicSetWidth: true,
+            //text: '#UT#Ausgangstext'
         }]);
     
+        fields.each(function(rec){
+            var name = rec.get('name'),
+                editable = rec.get('editable'),
+                //FIXME first target is not always target, since in future target columns can be deactivated!
+                // → solution: loop over fiels and find first with /^target/.test(name);
+                isErgoVisible = (name == 'source' || name == 'target'); 
+            
+            columns.push({
+                xtype: 'contentColumn',
+                fieldName: name,
+                isErgonomicVisible: isErgoVisible && !editable,
+                isErgonomicSetWidth: true, //currently true for all our affected default fields
+                text: rec.get('label')
+            });
+            
+            if(editable){
+                columns.push({
+                    xtype: 'contentEditableColumn',
+                    fieldName: name,
+                    isErgonomicVisible: isErgoVisible,
+                    isErgonomicSetWidth: true, //currently true for all our affected default fields
+                    text: Ext.String.format(me.column_edited, rec.get('label'))
+                });
+            }
+        });
+        
         //old strings to grep for:
         /*
         itemId: 'sourceColumn',
@@ -169,33 +197,33 @@ Ext.define('Editor.view.segments.Grid', {
         tdCls: 'target-field segment-tag-column',
         */
         
-        if(Editor.data.task.get('enableSourceEditing')){
-            columns.push({
-                xtype: 'contentEditableColumn',
-                fieldName: 'source',
-                text: '#UT#Ausgangstext überarbeitet'
-            });
-        }
+        //if(Editor.data.task.get('enableSourceEditing')){ FIXME enableSourceEditing is not needed in JS anymore?? but in PHP it should set the source editable to true! 
+            //columns.push({
+                //xtype: 'contentEditableColumn',
+                //fieldName: 'source',
+                //text: '#UT#Ausgangstext überarbeitet'
+            //});
+        //}
     
-        if(Editor.data.task.hasRelaisSource()){
-            columns.push({
-                xtype: 'contentColumn',
-                isErgonomicSetWidth: true,
-                fieldName: 'relais',
-                text: '#UT#Relaistext'
-            });
-        }
+        //if(Editor.data.task.hasRelaisSource()){ //FIXME if hasRelaisSource is synonym to have a field named relais
+            //columns.push({
+                //xtype: 'contentColumn',
+                //isErgonomicSetWidth: true,
+                //fieldName: 'relais',
+                //text: '#UT#Relaistext'
+            //});
+        //}
     
         columns.push.apply(columns, [{
-            xtype: 'contentColumn',
-            isErgonomicSetWidth: true,
-            fieldName: 'target',
-            text: '#UT#Zieltext'
-        },{
-            xtype: 'contentEditableColumn',
-            fieldName: 'target',
-            text: '#UT#Zieltext überarbeitet'
-        },{
+            //xtype: 'contentColumn',
+            //isErgonomicSetWidth: true,
+            //fieldName: 'target',
+            //text: '#UT#Zieltext'
+        //},{
+            //xtype: 'contentEditableColumn',
+            //fieldName: 'target',
+            //text: '#UT#Zieltext überarbeitet'
+        //},{
             xtype: 'commentsColumn',
             itemId: 'commentsColumn',
             width: 200
