@@ -63,8 +63,8 @@
  * saveChainEnd (fires event "chainEnd")
  * 
  * additional events:
- * segmentUsageFinished: called once after change alike handling or on chainEnd, called also in case of an error
- * chainEnd: called at the very end of the save process, called also in case of an error
+ * segmentUsageFinished: called once after change alike handling or on chainEnd, if bound by config not called in case of an error on completing the editor
+ * chainEnd: called at the very end of the save process, if bound by config not called in case of an error on completing the editor
  * 
  * The ChangeAlike Controller hooks into the save chain, @see Editor.controller.ChangeAlike
  * 
