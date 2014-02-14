@@ -63,7 +63,8 @@
  * saveChainEnd (fires event "chainEnd")
  * 
  * additional events:
- * segmentUsageFinished: called once after change alike handling or on chainEnd
+ * segmentUsageFinished: called once after change alike handling or on chainEnd, called also in case of an error
+ * chainEnd: called at the very end of the save process, called also in case of an error
  * 
  * The ChangeAlike Controller hooks into the save chain, @see Editor.controller.ChangeAlike
  * 
@@ -367,6 +368,15 @@ Ext.define('Editor.controller.Segments', {
           me.addLoadMask();
           return;
       }
+      
+      me.saveChainMutex = true;
+      ed.completeEdit();
+      //if completeEdit fails, the plugin remains editing and the record is not dirty.
+      if(ed.editing && !ed.context.record.dirty) {
+          me.saveChainEnd(); //FIXME the below by config bound handlers can also be bound elsewhere and get no information about success or failed chainend!
+          return;
+      }
+
       //the following handlers should only be bound if no 
       if(config.chainEnd && Ext.isFunction(config.chainEnd)) {
           me.on('chainEnd', config.chainEnd, (config.scope || me), {single: true});
@@ -374,8 +384,6 @@ Ext.define('Editor.controller.Segments', {
       if(config.segmentUsageFinished && Ext.isFunction(config.segmentUsageFinished)) {
           me.on('segmentUsageFinished', config.segmentUsageFinished, (config.scope || me), {single: true});
       }
-      me.saveChainMutex = true;
-      ed.completeEdit();
       me.saveChainCheckAlikes(); //NEXT step in save chain
   },
   /**
@@ -419,6 +427,7 @@ Ext.define('Editor.controller.Segments', {
           return;
       }
       
+      //this check also prevents saving if RowEditor.completeEdit was returning false!
       if(! record.dirty) {
           me.saveChainEnd();
           return;
