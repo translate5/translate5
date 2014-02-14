@@ -1,330 +1,413 @@
 <?xml version="1.0"?>
-<xliff version="1.1" xmlns="urn:oasis:names:tc:xliff:document:1.1">
-<!-- the transunit-ID should contain the base64-encoded source-string als used in the php source-code. This ID is used for matching. -->
-<!-- html-tags inside the target-string must not be encoded as they should regarding xliff but should be left as plain hmtl. At this stage ZfExtended does not support xliff inline tags -->
-<file original="php-sourcecode" source-language="ha" target-language="en" datatype="php">
-<body>
-<trans-unit id="TGVrdG9y"><source>Lektor</source><target>Reviewer</target></trans-unit>
-<trans-unit id="YWJnZXNjaGxvc3Nlbg=="><source>abgeschlossen</source><target>Completed</target></trans-unit>
-<trans-unit id="TGVrdG9yYXQ="><source>Lektorat</source><target>Review</target></trans-unit>
-<trans-unit id="QmVpIGRlciBTcGVpY2hlcnVuZyB0cmF0IGVpbiBGZWhsZXIgYXVmLiBCaXR0ZSBicmVjaGVuIFNpZSBkaWUgQmVhcmJlaXR1bmcgZGVzIFNlZ21lbnRzIGFiIHVuZCBkcsO8Y2tlbiBTaWUgZGFubiBGNSB1bSBkZW4gRWRpdG9yIHZvbGxzdMOkbmRpZyBuZXUgenUgbGFkZW4uIEJpdHRlIHN1Y2hlbiBTaWUgZGFubiBkYXMgZ2VyYWRlIGJlYXJiZWl0ZXRlIFNlZ21lbnQgdW5kIGRhcyBkaXJla3QgZGF2b3IgYmVhcmJlaXRldGUgU2VnbWVudCB1bmQgcHLDvGZlbiBTaWUgZGVzc2VuIEluaGFsdCBhdWYgS29ycmVrdGhlaXQuIFZpZWxlbiBEYW5rIQ=="><source>Bei der Speicherung trat ein Fehler auf. Bitte brechen Sie die Bearbeitung des Segments ab und drücken Sie dann F5 um den Editor vollständig neu zu laden. Bitte suchen Sie dann das gerade bearbeitete Segment und das direkt davor bearbeitete Segment und prüfen Sie dessen Inhalt auf Korrektheit. Vielen Dank!</source><target>An error occurred whilst saving. Please stop editing the segment and press F5 to completely reload the editor. Please then search for the segment preceding the previously edited segment and ensure that its contents are correct. Thank you!</target></trans-unit>
-<trans-unit id="VW5iZWthbm50ZXIgRmVobGVyIGJlaW0gRGF0ZWl1cGxvYWQu"><source>Unbekannter Fehler beim Dateiupload.</source><target>Unknown error during upload of file.</target></trans-unit>
-<trans-unit id="RXMgd3VyZGVuIGtlaW5lIFNlZ21lbnRlIHZlcsOkbmRlcnQh"><source>Es wurden keine Segmente verändert!</source><target>No segments have been changed!</target></trans-unit>
-<trans-unit id="TnIu"><source>Nr.</source><target>No.</target></trans-unit>
-<trans-unit id="UXVlbGx0ZXh0"><source>Quelltext</source><target>Source text</target></trans-unit>
-<trans-unit id="UXVlbGx0ZXh0IC0gYmVhcmJlaXRldA=="><source>Quelltext - bearbeitet</source><target>Source text – edited</target></trans-unit>
-<trans-unit id="WmllbHRleHQgLSBiZWFyYmVpdGV0"><source>Zieltext - bearbeitet</source><target>Target text – edited</target></trans-unit>
-<trans-unit id="U3RhdHVz"><source>Status</source><target>Status</target></trans-unit>
-<trans-unit id="UU0="><source>QM</source><target>QM</target></trans-unit>
-<trans-unit id="QXV0b1N0YXR1cw=="><source>AutoStatus</source><target>AutoStatus</target></trans-unit>
-<trans-unit id="TWF0Y2hyYXRl"><source>Matchrate</source><target>Match rate</target></trans-unit>
-<trans-unit id="S29tbWVudGFyZQ=="><source>Kommentare</source><target>Comments</target></trans-unit>
-<trans-unit id="dHJhbnNsYXRlNSBFeHBvcnQ="><source>translate5 Export</source><target>Review editor export</target></trans-unit>
-<trans-unit id="RGVyIEV4cG9ydCB3YXIgZXJmb2xncmVpY2gu"><source>Der Export war erfolgreich.</source><target>The export was successful.</target></trans-unit>
-<trans-unit id="Rm9sZ2VuZGUgT3B0aW9uZW4gc2luZCBha3R1ZWxsIG3DtmdsaWNo"><source>Folgende Optionen sind aktuell möglich</source><target>The following options are currently available</target></trans-unit>
-<trans-unit id="UHJvamVrdCBsZWt0b3JpZXJlbg=="><source>Projekt lektorieren</source><target>Review project</target></trans-unit>
-<trans-unit id="UHJvamVrdCBleHBvcnRpZXJlbg=="><source>Projekt exportieren</source><target>Export project</target></trans-unit>
-<trans-unit id="UHJvamVrdCBhdXMgRGF0ZW5iYW5rIHZvbGxzdMOkbmRpZyBsw7ZzY2hlbg=="><source>Projekt aus Datenbank vollständig löschen</source><target>Delete the project from the database completely</target></trans-unit>
-<trans-unit id="dHJhbnNsYXRlNSBJbXBvcnQ="><source>translate5 Import</source><target>Review editor import</target></trans-unit>
-<trans-unit id="RGVyIEltcG9ydCB3YXIgZXJmb2xncmVpY2gu"><source>Der Import war erfolgreich.</source><target>The import was successful.</target></trans-unit>
-<trans-unit id="SGlsZmU="><source>Hilfe</source><target>Help</target></trans-unit>
-<trans-unit id="SW0gV2llZGVyaG9sdW5nc2VkaXRvciB3ZXJkZW4gYWxsZSBzaWNoIGltIFZlcmdsZWljaCB6dW0gYWt0dWVsbGVuIFNlZ21lbnQgd2llZGVyaG9sZW5kZW4gU2VnbWVudGUgYW5nZXplaWd0LiBEaWVzIGvDtm5uZW4gU2VnbWVudGUgc2VpbiwgZGVyZW4gcXVlbGxzcHJhY2hsaWNoZXIgSW5oYWx0IGRlciBxdWVsbHNwcmFjaGxpY2hlbiBTcGFsdGUgZGVzIGFrdHVlbGxlbiBTZWdtZW50cyBlbnRzcHJpY2h0IChrbGFzc2lzY2hlIFdpZWRlcmhvbHVuZykuIERpZXMga8O2bm5lbiBhYmVyIGF1Y2ggU2VnbWVudGUgc2VpbiwgZGVyZW4gWklFTHNwcmFjaGxpY2hlciBJbmhhbHQgZGVyIFpJRUxzcHJhY2hsaWNoZW4gU3BhbHRlIGRlcyBha3R1ZWxsZW4gU2VnbWVudHMgZW50c3ByaWNodC4="><source>Im Wiederholungseditor werden alle sich im Vergleich zum aktuellen Segment wiederholenden Segmente angezeigt. Dies können Segmente sein, deren quellsprachlicher Inhalt der quellsprachlichen Spalte des aktuellen Segments entspricht (klassische Wiederholung). Dies können aber auch Segmente sein, deren ZIELsprachlicher Inhalt der ZIELsprachlichen Spalte des aktuellen Segments entspricht.</source><target>All segments which are repetitions of the current segment are displayed in the repetition editor. These may be segments whose source text content corresponds to the source text column of the current segment (classic repetition). However, these may also be segments whose TARGET text content corresponds to the TARGET text column of the current segment.</target></trans-unit>
-<trans-unit id="RGllIFNwYWx0ZW4gUXVlbGwtIGJ6dy4gWmllbC1UcmVmZmVyIHplaWdlbiBhbiwgd2VsY2hlIFNwYWx0ZSBkZXIgV2llZGVyaG9sdW5nIG1pdCBkZW0gYWt0dWVsbGVuIFNlZ21lbnQgw7xiZXJlaW5zdGltbXQu"><source>Die Spalten Quell- bzw. Ziel-Treffer zeigen an, welche Spalte der Wiederholung mit dem aktuellen Segment übereinstimmt.</source><target>The &quot;Source match&quot; and &quot;Target match&quot; columns indicate which column of the repetition matches the current segment.</target></trans-unit>
-<trans-unit id="RGllIFNwYWx0ZSAiSW4gYWt0dWVsbGVyIEZpbHRlcnVuZyBlbnRoYWx0ZW4iIHplaWd0IGFuLCBvYiBkYXMgYW5nZXplaWd0ZSBTZWdtZW50IGdlbcOkw58gZGVyIGFrdHVlbGxlbiBGaWx0ZXJ1bmcgaW4gZGVyIFNlZ21lbnTDvGJlcnNpY2h0IGFrdHVlbGwgYW5nZXplaWd0IHdpcmQgKEphKSwgb2RlciBkdXJjaCBkaWUgZ2VzZXR6dGVuIEZpbHRlciBhdXNnZWJsZW5kZXQgaXN0IChOZWluKS4="><source>Die Spalte "In aktueller Filterung enthalten" zeigt an, ob das angezeigte Segment gemäß der aktuellen Filterung in der Segmentübersicht aktuell angezeigt wird (Ja), oder durch die gesetzten Filter ausgeblendet ist (Nein).</source><target>The column &quot;Included in current filter&quot; indicates whether the indicated segment is currently displayed according to the current filter settings in the segment overview (Yes), or whether it is faded out by the set filter (No).</target></trans-unit>
-<trans-unit id="IktlaW5lIMOEbmRlcnVuZyBkdXJjaGbDvGhyZW4iIGJyaWNodCBkZW4gV2llZGVyaG9sdW5nc2VkaXRvciBvaG5lIMOEbmRlcnVuZyBhbiBkZW4gd2VpdGVyZW4gU2VnbWVudGVuIGFiLiAiw4RuZGVydW5nIMO8YmVybmVobWVuIiBzcGVpY2hlcnQgZGllIMOEbmRlcnVuZ2VuIGRlciBhdXNnZXfDpGhsdGVuIFNlZ21lbnRlIChIYWtlbiBpbiBkZXIgWmVpbGUgZGVzIFNlZ21lbnRzIGltIFdpZWRlcmhvbHVuZ3NlZGl0b3IgaXN0IGdlc2V0enQpLg=="><source>"Keine Änderung durchführen" bricht den Wiederholungseditor ohne Änderung an den weiteren Segmenten ab. "Änderung übernehmen" speichert die Änderungen der ausgewählten Segmente (Haken in der Zeile des Segments im Wiederholungseditor ist gesetzt).</source><target>&quot;Make no changes&quot; cancels the repetition editor without making changes to the additional segments. &quot;Accept changes&quot; saves the changes to the selected segments (a tick is made in the respective segment line in the repetition editor window).</target></trans-unit>
-<trans-unit id="w5xiZXIgZGFzIEjDpGtjaGVuIGluIGRlciBTcGFsdGVuw7xiZXJzY2hyaWZ0IGxhc3NlbiBzaWNoIGFsbGUgU2VnbWVudGUgc2VsZWt0aWVyZW4gb2RlciBkZXNlbGVrdGllcmVuLg=="><source>Über das Häkchen in der Spaltenüberschrift lassen sich alle Segmente selektieren oder deselektieren.</source><target>All segments can be selected or deselected by ticking the box in the column header.</target></trans-unit>
-<trans-unit id="dHJhbnNsYXRlNQ=="><source>translate5</source><target>beo Review Editor</target></trans-unit>
-<trans-unit id="SmE="><source>Ja</source><target>Yes</target></trans-unit>
-<trans-unit id="TmVpbg=="><source>Nein</source><target>No</target></trans-unit>
-<trans-unit id="w5xiZXJ0cmFnZSBEYXRlbi4uLg=="><source>Übertrage Daten...</source><target>Data transferring...</target></trans-unit>
-<trans-unit id="RWluc3RlbGx1bmdlbiBmw7xyIGRpZXNlIFNpdHp1bmcgZ2VzcGVpY2hlcnQh"><source>Einstellungen für diese Sitzung gespeichert!</source><target>Settings for this session saved!</target></trans-unit>
-<trans-unit id="RGFzIFNlZ21lbnQgd3VyZGUgZ2VzcGVpY2hlcnQh"><source>Das Segment wurde gespeichert!</source><target>The segment has been saved!</target></trans-unit>
-<trans-unit id="RGllIGdld8OkaGx0ZSBTb3J0aWVydW5nIGRlciBTZWdtZW50ZSB3dXJkZSB6dXLDvGNrZ2VzZXR6dCE="><source>Die gewählte Sortierung der Segmente wurde zurückgesetzt!</source><target>The selected segment sorting has been reset!</target></trans-unit>
-<trans-unit id="RGFzIHp1bGV0enQgZ2XDtmZmbmV0ZSBTZWdtZW50IChOci4gezB9KSBrb25udGUgbmljaHQgZ2VzcGVpY2hlcnQgd2VyZGVuIQ=="><source>Das zuletzt geöffnete Segment (Nr. {0}) konnte nicht gespeichert werden!</source><target>The previously opened segment (no. {0}) could not be saved!</target></trans-unit>
-<trans-unit id="S2VpbiBTZWdtZW50IGRpZXNlciBEYXRlaSBlbnRzcHJpY2h0IGRlbiBGaWx0ZXJrcml0ZXJpZW4="><source>Kein Segment dieser Datei entspricht den Filterkriterien</source><target>No segments in this file meet the filter criteria</target></trans-unit>
-<trans-unit id="RXJuZXV0ZSBBbm1lbGR1bmc="><source>Erneute Anmeldung</source><target>New login</target></trans-unit>
-<trans-unit id="SWhyZSBTaXR6dW5nc2RhdGVuIHNpbmQgYWJnZWxhdWZlbi4gU2llIHdlcmRlbiBudW4genVyIEFubWVsZGVzZWl0ZSB3ZWl0ZXJnZWxlaXRldC4="><source>Ihre Sitzungsdaten sind abgelaufen. Sie werden nun zur Anmeldeseite weitergeleitet.</source><target>Your session data have expired. You will now be directed to the login page.</target></trans-unit>
-<trans-unit id="RsO8ciBkaWUgYW5nZWZvcmRlcnRlbiBEYXRlbiBmZWhsZW4gSWhuZW4gZGllIG7DtnRpZ2VuIEJlcmVjaHRpZ3VuZ2VuIQ=="><source>Für die angeforderten Daten fehlen Ihnen die nötigen Berechtigungen!</source><target>You are not authorised to access the requested data!</target></trans-unit>
-<trans-unit id="WnVtIEzDtnNjaGVuIGRlciBEYXRlbiBmZWhsZW4gSWhuZW4gZGllIG7DtnRpZ2VuIEJlcmVjaHRpZ3VuZ2VuIQ=="><source>Zum Löschen der Daten fehlen Ihnen die nötigen Berechtigungen!</source><target>You are not authorised to delete the data!</target></trans-unit>
-<trans-unit id="WnVtIFNwZWljaGVybiB2b24gbmV1ZW4gRGF0ZW4gZmVobGVuIElobmVuIGRpZSBuw7Z0aWdlbiBCZXJlY2h0aWd1bmdlbiE="><source>Zum Speichern von neuen Daten fehlen Ihnen die nötigen Berechtigungen!</source><target>You are not authorised to save new data!</target></trans-unit>
-<trans-unit id="WnVtIFNwZWljaGVybiBkZXIgYmVhcmJlaXRlbiBEYXRlbiBmZWhsZW4gSWhuZW4gZGllIG7DtnRpZ2VuIEJlcmVjaHRpZ3VuZ2VuIQ=="><source>Zum Speichern der bearbeiten Daten fehlen Ihnen die nötigen Berechtigungen!</source><target>You are not authorised to save the edited data!</target></trans-unit>
-<trans-unit id="RGllIGFuZ2Vmb3JkZXJ0ZW4gYnp3LiB6dSBiZWFyYmVpdGVuZGVuIERhdGVuIHd1cmRlbiBuaWNodCBnZWZ1bmRlbiE="><source>Die angeforderten bzw. zu bearbeitenden Daten wurden nicht gefunden!</source><target>The data requested/data to be edited could not be found!</target></trans-unit>
-<trans-unit id="RXMgaXN0IGVpbiBGZWhsZXIgYXVmZ2V0cmV0ZW4h"><source>Es ist ein Fehler aufgetreten!</source><target>An error has occurred!</target></trans-unit>
-<trans-unit id="RmVobGVy"><source>Fehler</source><target>Error</target></trans-unit>
-<trans-unit id="RmVobGVyIGJlaW0gU3BlaWNoZXJuIG9kZXIgYmVpbSBBdXNsZXNlbiB2b24gRGF0ZW4uIEJpdHRlIHdlbmRlbiBTaWUgc2ljaCBhbiB1bnNlcmVuIFN1cHBvcnQh"><source>Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!</source><target>Error whilst saving or reading data. Please contact our support service!</target></trans-unit>
-<trans-unit id="PGJyIC8+TWVsZHVuZyB2b20gU2VydmVyOiA8aT57MH0gezF9PC9pPg=="><source><br/>Meldung vom Server: <i>{0} {1}</i></source><target><br/>Message from the server: <i>{0} {1}</i></target></trans-unit>
-<trans-unit id="RGllIERhdGVpIHp1bSBWb3JhdXNsYWRlbiBkZXIgVGFnZ3JhZmlrZW4gd3VyZGUgbmljaHQgZ2VmdW5kZW4uIERhaGVyIGvDtm5uZW4gZGllIFRhZ2dyYWZpa2VuIGVyc3QgYmVpbSDDlmZmbmVuIGRlcyBqZXdlaWxpZ2VuIFNlZ21lbnRzIGdlbGFkZW4gd2VyZGVuLg=="><source>Die Datei zum Vorausladen der Taggrafiken wurde nicht gefunden. Daher können die Taggrafiken erst beim Öffnen des jeweiligen Segments geladen werden.</source><target>The file for pre-loading the tag graphics was not found. For this reason, the tag graphics can only be loaded when opening the respective individual segment.</target></trans-unit>
-<trans-unit id="b2s="><source>ok</source><target>OK</target></trans-unit>
-<trans-unit id="ZXJyb3I="><source>error</source><target>Error</target></trans-unit>
-<trans-unit id="bm90aWNl"><source>notice</source><target>Notice</target></trans-unit>
-<trans-unit id="RGFzIGxldHp0ZSBiZWFyYmVpdGV0ZSBTZWdtZW50IGlzdCBkYXMgU2VnbWVudCBtaXQgZGVtIEluaGFsdCAiezB9Ii4g"><source>Das letzte bearbeitete Segment ist das Segment mit dem Inhalt "{0}". </source><target>The previously edited segment is the segment containing &quot;{0}&quot;. </target></trans-unit>
-<trans-unit id="V29sbGVuIFNpZSBkYXMgTGVrdG9yYXQgd2lya2xpY2ggc2NobGllw59lbj8="><source>Wollen Sie das Lektorat wirklich schließen?</source><target>Do you really want to close the review?</target></trans-unit>
-<trans-unit id="RGF0ZWllbg=="><source>Dateien</source><target>Files</target></trans-unit>
-<trans-unit id="U2VnbWVudGxpc3RlIHVuZCBFZGl0b3I="><source>Segmentliste und Editor</source><target>Segment list and editor</target></trans-unit>
-<trans-unit id="RWRpdG9ybW9kaQ=="><source>Editormodi</source><target>Editor modes</target></trans-unit>
-<trans-unit id="QW5zaWNodA=="><source>Ansicht</source><target>View</target></trans-unit>
-<trans-unit id="QmVhcmJlaXR1bmc="><source>Bearbeitung</source><target>Editing</target></trans-unit>
-<trans-unit id="RXJnb25vbWlj"><source>Ergonomic</source><target>Ergonomic</target></trans-unit>
-<trans-unit id="VGFncyB2ZXJiZXJnZW4="><source>Tags verbergen</source><target>Hide tags</target></trans-unit>
-<trans-unit id="VGFnLUt1cnphbnNpY2h0"><source>Tag-Kurzansicht</source><target>Short tag view</target></trans-unit>
-<trans-unit id="VGFnLVZvbGxhbnNpY2h0"><source>Tag-Vollansicht</source><target>Full tag view</target></trans-unit>
-<trans-unit id="UU0gU3Vic2VnbWVudCBTdGF0aXN0aWs="><source>QM Subsegment Statistik</source><target>QM subsegment statistics</target></trans-unit>
-<trans-unit id="RWluc3RlbGx1bmdlbg=="><source>Einstellungen</source><target>Settings</target></trans-unit>
-<trans-unit id="U29ydGllcnVuZyAvIEZpbHRlcnVuZyB6dXLDvGNrc2V0emVu"><source>Sortierung / Filterung zurücksetzen</source><target>Reset sorting/filter</target></trans-unit>
-<trans-unit id="WmllbHRleHQgw7xiZXJhcmJlaXRldA=="><source>Zieltext überarbeitet</source><target>Edited target text</target></trans-unit>
-<trans-unit id="R2VzcGVycnQ="><source>Gesperrt</source><target>Locked</target></trans-unit>
-<trans-unit id="QXV0b3N0YXR1cw=="><source>Autostatus</source><target>Autostatus</target></trans-unit>
-<trans-unit id="QXVzZ2FuZ3N0ZXh0"><source>Ausgangstext</source><target>Source text</target></trans-unit>
-<trans-unit id="QXVzZ2FuZ3N0ZXh0IMO8YmVyYXJiZWl0ZXQ="><source>Ausgangstext überarbeitet</source><target>Edited source text</target></trans-unit>
-<trans-unit id="UmVsYWlz"><source>Relais</source><target>Relay</target></trans-unit>
-<trans-unit id="WmllbHRleHQ="><source>Zieltext</source><target>Target text</target></trans-unit>
-<trans-unit id="bGV0enRlciBCZWFyYmVpdGVy"><source>letzter Bearbeiter</source><target>Last editor</target></trans-unit>
-<trans-unit id="YmVhcmJlaXRldCBiZWk="><source>bearbeitet bei</source><target>Edited during</target></trans-unit>
-<trans-unit id="KHswfSB3ZWl0ZXJlIEtvbW1lbnRhcmUp"><source>({0} weitere Kommentare)</source><target>({0} Additional comments)</target></trans-unit>
-<trans-unit id="KHswfSB3ZWl0ZXJlciBLb21tZW50YXIp"><source>({0} weiterer Kommentar)</source><target>({0} Additional comment)</target></trans-unit>
-<trans-unit id="QXJiZWl0cy1EYXRlaWVu"><source>Arbeits-Dateien</source><target>Working files</target></trans-unit>
-<trans-unit id="UmVmZXJlbnotRGF0ZWllbg=="><source>Referenz-Dateien</source><target>Reference files</target></trans-unit>
-<trans-unit id="SW4gQXVzZ2FuZ3N0ZXh0"><source>In Ausgangstext</source><target>In source text</target></trans-unit>
-<trans-unit id="SW4gWmllbHRleHQ="><source>In Zieltext</source><target>In target text</target></trans-unit>
-<trans-unit id="RmVobGVydHlw"><source>Fehlertyp</source><target>Error type</target></trans-unit>
-<trans-unit id="R2VzYW10"><source>Gesamt</source><target>Total</target></trans-unit>
-<trans-unit id="U3VtbWU="><source>Summe</source><target>Sum</target></trans-unit>
-<trans-unit id="R2V3aWNodHVuZw=="><source>Gewichtung</source><target>Weighting</target></trans-unit>
-<trans-unit id="S29tbWVudGFy"><source>Kommentar</source><target>Comment</target></trans-unit>
-<trans-unit id="UU0gU3Vic2VnbWVudCBoaW56dWbDvGdlbg=="><source>QM Subsegment hinzufügen</source><target>Add QM subsegment</target></trans-unit>
-<trans-unit id="UU0gU3Vic2VnbWVudGU="><source>QM Subsegmente</source><target>QM subsegments</target></trans-unit>
-<trans-unit id="S2VpbiBTdWJzZWdtZW50IGF1c2dld8OkaGx0Lg=="><source>Kein Subsegment ausgewählt.</source><target>No subsegment selected.</target></trans-unit>
-<trans-unit id="Qml0dGUgd8OkaGxlbiBTaWUgaW0gRWRpdG9yIGVpbiBTdWJzZWdtZW50IGF1cyE="><source>Bitte wählen Sie im Editor ein Subsegment aus!</source><target>Please select a subsegment in the editor!</target></trans-unit>
-<trans-unit id="VmVyaGFsdGVuIGRlcyBXaWVkZXJob2x1bmdzZWRpdG9y"><source>Verhalten des Wiederholungseditor</source><target>Properties of the repetition editor</target></trans-unit>
-<trans-unit id="SW1tZXIgYXV0b21hdGlzY2ggZXJzZXR6ZW4gdW5kIFN0YXR1cyBzZXR6ZW4="><source>Immer automatisch ersetzen und Status setzen</source><target>Always automatically replace and set status</target></trans-unit>
-<trans-unit id="QmVpIGplZGVyIFdpZWRlcmhvbHVuZyBlaW56ZWxuIGVudHNjaGVpZGVu"><source>Bei jeder Wiederholung einzeln entscheiden</source><target>Decide for each individual repetition</target></trans-unit>
-<trans-unit id="TmllIGF1dG9tYXRpc2NoIGVyc2V0emVuIHVuZCBTdGF0dXMgc2V0emVu"><source>Nie automatisch ersetzen und Status setzen</source><target>Never automatically replace and set status</target></trans-unit>
-<trans-unit id="QWJicmVjaGVu"><source>Abbrechen</source><target>Cancel</target></trans-unit>
-<trans-unit id="U3BlaWNoZXJu"><source>Speichern</source><target>Save</target></trans-unit>
-<trans-unit id="U2VnbWVudC1NZXRhZGF0ZW4="><source>Segment-Metadaten</source><target>Segment metadata</target></trans-unit>
-<trans-unit id="VGVybWlub2xvZ2ll"><source>Terminologie</source><target>Terminology</target></trans-unit>
-<trans-unit id="U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgw7ZmZm5lbg=="><source>Speichern und nächstes öffnen</source><target>Save and open next</target></trans-unit>
-<trans-unit id="U3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIMO2ZmZuZW4="><source>Speichern und vorheriges öffnen</source><target>Save and open previous</target></trans-unit>
-<trans-unit id="RW5kZSBkZXIgU2VnbWVudGUgZXJyZWljaHQh"><source>Ende der Segmente erreicht!</source><target>End of the segments reached!</target></trans-unit>
-<trans-unit id="QmVnaW5uIGRlciBTZWdtZW50ZSBlcnJlaWNodCE="><source>Beginn der Segmente erreicht!</source><target>Start of the segments reached!</target></trans-unit>
-<trans-unit id="RGFzIFNlZ21lbnQga29ubnRlIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbi4gQml0dGUgc2NobGllw59lbiBTaWUgZGFzIFNlZ21lbnQgZ2dmLiBkdXJjaCBLbGljayBhdWYgIkFiYnJlY2hlbiIgdW5kIMO2ZmZuZW4sIGJlYXJiZWl0ZW4gdW5kIHNwZWljaGVybiBTaWUgZXMgZXJuZXV0LiBWaWVsZW4gRGFuayEgPGJyLz48YnIvPkdlcmFkZSBiZWFyYmVpdGV0ZXIgVGV4dCB3YXI6PGJyLz48YnIvPg=="><source>Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank! <br/><br/>Gerade bearbeiteter Text war:<br/><br/></source><target>The segment could not be saved. Please close the segment if necessary by clicking &quot;Cancel&quot;, and then open, edit and save it once more. Thank you! <br/><br/>The text just edited was:<br/><br/></target></trans-unit>
-<trans-unit id="RGFzIFNlZ21lbnQga29ubnRlIG5pY2h0IHp1bSBCZWFyYmVpdGVuIGdlw7ZmZm5ldCB3ZXJkZW4sIGRhIGRhcyB2b3JoZXJpZ2UgU2VnbWVudCBub2NoIG5pY2h0IGtvcnJla3Qgc2VpbmUgU3BlaWNoZXJ1bmcgYmVlbmRldCBoYXR0ZS4gQml0dGUgdmVyc3VjaGVuIFNpZSBlcyBub2NoIGVpbm1hbC4gU29sbHRlIGVzIGRhbm4gbm9jaCBuaWNodCBmdW5rdGlvbmllcmVuLCBkcsO8Y2tlbiBTaWUgYml0dGUgRjUuIFZpZWxlbiBEYW5rIQ=="><source>Das Segment konnte nicht zum Bearbeiten geöffnet werden, da das vorherige Segment noch nicht korrekt seine Speicherung beendet hatte. Bitte versuchen Sie es noch einmal. Sollte es dann noch nicht funktionieren, drücken Sie bitte F5. Vielen Dank!</source><target>The segment could not be opened for editing, as the previous segment had not yet finished saving correctly. Please try again. If the problem still persists, please press F5. Thank you!</target></trans-unit>
-<trans-unit id="QWt0dWVsbGVzIFNlZ21lbnQgZsO8ciBkaWUgZm9sZ2VuZGVuIFNlZ21lbnRlIMO8YmVybmVobWVuPw=="><source>Aktuelles Segment für die folgenden Segmente übernehmen?</source><target>Use current changes for the following segments?</target></trans-unit>
-<trans-unit id="S2VpbmUgw4RuZGVydW5nZW4gZHVyY2hmw7xocmVu"><source>Keine Änderungen durchführen</source><target>Make no changes</target></trans-unit>
-<trans-unit id="w4RuZGVydW5nZW4gw7xiZXJuZWhtZW4="><source>Änderungen übernehmen</source><target>Accept changes</target></trans-unit>
-<trans-unit id="SGlsZmU6"><source>Hilfe:</source><target>Help:</target></trans-unit>
-<trans-unit id="QWNodHVuZzogRGVyIEF1c2dhbmdzdGV4dCB3aXJkIMO8YmVyc2NocmllYmVuIQ=="><source>Achtung: Der Ausgangstext wird überschrieben!</source><target>Attention: The source text will be overwritten!</target></trans-unit>
-<trans-unit id="UXVlbGxl"><source>Quelle</source><target>Source</target></trans-unit>
-<trans-unit id="WmllbA=="><source>Ziel</source><target>Target</target></trans-unit>
-<trans-unit id="SW4gYWt0dWVsbGVyIEZpbHRlcnVuZyBlbnRoYWx0ZW4="><source>In aktueller Filterung enthalten</source><target>Included in current filter</target></trans-unit>
-<trans-unit id="UXVlbGwtVHJlZmZlcg=="><source>Quell-Treffer</source><target>Source matches</target></trans-unit>
-<trans-unit id="WmllbC1UcmVmZmVy"><source>Ziel-Treffer</source><target>Target matches</target></trans-unit>
-<trans-unit id="UmVsYWlzLVRyZWZmZXI="><source>Relais-Treffer</source><target>Relay matches</target></trans-unit>
-<trans-unit id="ezB9IFdpZWRlcmhvbHVuZyB3dXJkZSBiZWFyYmVpdGV0IHVuZCBnZXNwZWljaGVydA=="><source>{0} Wiederholung wurde bearbeitet und gespeichert</source><target>{0} Repetition has been edited and saved</target></trans-unit>
-<trans-unit id="ezB9IFdpZWRlcmhvbHVuZ2VuIHd1cmRlbiBiZWFyYmVpdGV0IHVuZCBnZXNwZWljaGVydA=="><source>{0} Wiederholungen wurden bearbeitet und gespeichert</source><target>{0} Repetitions have been edited and saved</target></trans-unit>
-<trans-unit id="RGllIFdpZWRlcmhvbHVuZ2VuIGtvbm50ZW4gbmljaHQgZ2VzcGVpY2hlcnQgd2VyZGVu"><source>Die Wiederholungen konnten nicht gespeichert werden</source><target>The repetitions could not be saved</target></trans-unit>
-<trans-unit id="TnVtbWVyIGVpbmdlYmVuLi4u"><source>Nummer eingeben...</source><target>Enter number...</target></trans-unit>
-<trans-unit id="Z3LDtsOfZXIgYWxz"><source>größer als</source><target>Larger than</target></trans-unit>
-<trans-unit id="a2xlaW5lciBhbHM="><source>kleiner als</source><target>Smaller than</target></trans-unit>
-<trans-unit id="aXN0IGdsZWljaA=="><source>ist gleich</source><target>Equal to</target></trans-unit>
-<trans-unit id="RmlsdGVy"><source>Filter</source><target>Filter</target></trans-unit>
-<trans-unit id="YW0="><source>am</source><target>On</target></trans-unit>
-<trans-unit id="bmFjaA=="><source>nach</source><target>After</target></trans-unit>
-<trans-unit id="YmV2b3I="><source>bevor</source><target>Before</target></trans-unit>
-<trans-unit id="LSBPaG5lIFJlbGFpc3NwcmFjaGUgLQ=="><source>- Ohne Relaissprache -</source><target>– Without relay language –</target></trans-unit>
-<trans-unit id="QXVmZ2FiZW4gaW4gQXJiZWl0"><source>Aufgaben in Arbeit</source><target>Tasks in progress</target></trans-unit>
-<trans-unit id="a29tcGxldHQgYmVlbmRldGUgQXVmZ2FiZW4="><source>komplett beendete Aufgaben</source><target>Finalised tasks</target></trans-unit>
-<trans-unit id="Z2VuZXJlbGwgb2ZmZW5lIEF1ZmdhYmVu"><source>generell offene Aufgaben</source><target>Generally open tasks</target></trans-unit>
-<trans-unit id="ZsO8ciBtaWNoIA=="><source>für mich </source><target>For me </target></trans-unit>
-<trans-unit id="RmVobGVyIGJlaSBkZXIgU2VnbWVudCBWYWxpZGllcnVuZyE="><source>Fehler bei der Segment Validierung!</source><target>Error during segment validation!</target></trans-unit>
-<trans-unit id="RWluaWdlIGRlciBpbSBTZWdtZW50IHZlcndlbmRldGVuIFRhZ3Mgc2luZCBpbiBkZXIgZmFsc2NoZW4gUmVpaGVuZm9sZ2VuIChzY2hsaWXDn2VuZGVyIHZvciDDtmZmbmVuZGVtIFRhZyku"><source>Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).</source><target>Some of the tags used in the segment are in the wrong order (closing tag before opening tag).</target></trans-unit>
-<trans-unit id="RXMgd3VyZGVuIFRhZ3MgbWl0IGZlaGxlbmRlbSBQYXJ0bmVyIGVudGZlcm50IQ=="><source>Es wurden Tags mit fehlendem Partner entfernt!</source><target>Tags with a missing partner have been deleted!</target></trans-unit>
-<trans-unit id="T2sh"><source>Ok!</source><target>OK!</target></trans-unit>
-<trans-unit id="RmVobGVyIQ=="><source>Fehler!</source><target>Error!</target></trans-unit>
-<trans-unit id="SGlud2VpcyE="><source>Hinweis!</source><target>Notice!</target></trans-unit>
-<trans-unit id="UmVmZXJlbnogRGF0ZWllbg=="><source>Referenz Dateien</source><target>Reference files</target></trans-unit>
-<trans-unit id="YmVhcmJlaXRldA=="><source>bearbeitet</source><target>Edited</target></trans-unit>
-<trans-unit id="QmVhcmJlaXRlbg=="><source>Bearbeiten</source><target>Edit</target></trans-unit>
-<trans-unit id="TMO2c2NoZW4="><source>Löschen</source><target>Delete</target></trans-unit>
-<trans-unit id="S29tbWVudGFyZSB6dW0gU2VnbWVudCBOci4gezB9"><source>Kommentare zum Segment Nr. {0}</source><target>Comments on segment no. {0}</target></trans-unit>
-<trans-unit id="U2NobGllw59lbg=="><source>Schließen</source><target>Close</target></trans-unit>
-<trans-unit id="S29tbWVudGFyIG5ldSAvIGJlYXJiZWl0ZW46"><source>Kommentar neu / bearbeiten:</source><target>New comment/edit comment:</target></trans-unit>
-<trans-unit id="TmV1ZXIgS29tbWVudGFy"><source>Neuer Kommentar</source><target>New comment</target></trans-unit>
-<trans-unit id="TMO2c2NoZW4gZGVzIEtvbW1lbnRhcnMgYmVzdMOkdGlnZW4="><source>Löschen des Kommentars bestätigen</source><target>Confirm deletion of comment</target></trans-unit>
-<trans-unit id="U29sbCBkZXIgS29tbWVudGFyIHdpcmtsaWNoIGdlbMO2c2NodCB3ZXJkZW4/"><source>Soll der Kommentar wirklich gelöscht werden?</source><target>Do you really want to delete the comment?</target></trans-unit>
-<trans-unit id="w4RuZGVydW5nZW4gZ2VzcGVpY2hlcnQh"><source>Änderungen gespeichert!</source><target>Changes saved!</target></trans-unit>
-<trans-unit id="RmVobGVyIGJlaW0gU3BlaWNoZXJuIGRlciDDhG5kZXJ1bmdlbiE="><source>Fehler beim Speichern der Änderungen!</source><target>Error whilst saving changes!</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSB3aXJkIGR1cmNoIEJlbnV0emVyICJ7MH0iIGJlYXJiZWl0ZXQgdW5kIGlzdCBkYWhlciBzY2hyZWliZ2VzY2jDvHR6dCE="><source>Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!</source><target>Task is being edited by user &quot;{0}&quot; and is therefore write-protected!</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSBhYnNjaGxpZcOfZW4/"><source>Aufgabe abschließen?</source><target>Complete task?</target></trans-unit>
-<trans-unit id="V29sbGVuIFNpZSBkaWUgQXVmZ2FiZSB3aXJrbGljaCBhYnNjaGxpZcOfZW4/"><source>Wollen Sie die Aufgabe wirklich abschließen?</source><target>Do you really want to complete the task?</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSBlbmRnw7xsdGlnIGJlZW5kZW4/"><source>Aufgabe endgültig beenden?</source><target>Finalise task?</target></trans-unit>
-<trans-unit id="V29sbGVuIFNpZSBkaWUgQXVmZ2FiZSB3aXJrbGljaCBmw7xyIGFsbGUgQmVudXR6ZXIgZW5kZ8O8bHRpZyBiZWVuZGVuPw=="><source>Wollen Sie die Aufgabe wirklich für alle Benutzer endgültig beenden?</source><target>Do you really want to finalise the task for all users?</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSB3dXJkZSBlcmZvbGdyZWljaCB2ZXJsYXNzZW4u"><source>Aufgabe wurde erfolgreich verlassen.</source><target>You have successfully left the task.</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSB3dXJkZSBlcmZvbGdyZWljaCBhYmdlc2NobG9zc2VuLg=="><source>Aufgabe wurde erfolgreich abgeschlossen.</source><target>You have successfully completed the task.</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSB3dXJkZSBlcmZvbGdyZWljaCBiZWVuZGV0Lg=="><source>Aufgabe wurde erfolgreich beendet.</source><target>You have successfully ended the task.</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSB3aWVkZXIgw7ZmZm5lbj8="><source>Aufgabe wieder öffnen?</source><target>Re-open task?</target></trans-unit>
-<trans-unit id="V29sbGVuIFNpZSBkaWUgQXVmZ2FiZSB3aXJrbGljaCB3aWVkZXIgw7ZmZm5lbj8="><source>Wollen Sie die Aufgabe wirklich wieder öffnen?</source><target>Do you really want to re-open the task?</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSBmw7xyIGFsbGUgTnV0emVyIGFic2NobGllw59lbj8="><source>Aufgabe für alle Nutzer abschließen?</source><target>Complete task for all users?</target></trans-unit>
-<trans-unit id="V29sbGVuIFNpZSBkaWUgQXVmZ2FiZSB3aXJrbGljaCBmw7xyIGFsbGUgQmVudXR6ZXIgYWJzY2hsaWXDn2VuPw=="><source>Wollen Sie die Aufgabe wirklich für alle Benutzer abschließen?</source><target>Do you really want to complete the task for all users?</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSBmw7xyIGFsbGUgTnV0emVyIHdpZWRlciDDtmZmbmVuPw=="><source>Aufgabe für alle Nutzer wieder öffnen?</source><target>Re-open task for all users?</target></trans-unit>
-<trans-unit id="V29sbGVuIFNpZSBkaWUgQXVmZ2FiZSB3aXJrbGljaCBmw7xyIGFsbGUgQmVudXR6ZXIgd2llZGVyIMO2ZmZuZW4/"><source>Wollen Sie die Aufgabe wirklich für alle Benutzer wieder öffnen?</source><target>Do you really want to re-open the task for all users?</target></trans-unit>
-<trans-unit id="QmVlbmRldGUgQXVmZ2FiZSB3aWVkZXIgw7ZmZm5lbj8="><source>Beendete Aufgabe wieder öffnen?</source><target>Re-open ended task?</target></trans-unit>
-<trans-unit id="V29sbGVuIFNpZSBkaWUgYmVlbmRldGUgQXVmZ2FiZSB3aXJrbGljaCB3aWVkZXIgw7ZmZm5lbj8="><source>Wollen Sie die beendete Aufgabe wirklich wieder öffnen?</source><target>Do you really want to re-open the ended task?</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSBrb21wbGV0dCBsw7ZzY2hlbj8="><source>Aufgabe komplett löschen?</source><target>Completely delete task?</target></trans-unit>
-<trans-unit id="V29sbGVuIFNpZSBkaWUgQXVmZ2FiZSB3aXJrbGljaCBrb21wbGV0dCB1bmQgdW53aWRlcnJ1ZmxpY2ggbMO2c2NoZW4/"><source>Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?</source><target>Do you really want to completely and irreversibly delete the task?</target></trans-unit>
-<trans-unit id="QXVmZ2FiZW4gw5xiZXJzaWNodA=="><source>Aufgaben Übersicht</source><target>Task overview</target></trans-unit>
-<trans-unit id="YmVlbmRldA=="><source>beendet</source><target>Ended</target></trans-unit>
-<trans-unit id="S2VpbmUgQmVudXR6ZXIgenVnZW9yZG5ldCE="><source>Keine Benutzer zugeordnet!</source><target>No users assigned!</target></trans-unit>
-<trans-unit id="aW4gQXJiZWl0"><source>in Arbeit</source><target>In progress</target></trans-unit>
-<trans-unit id="QmVhcmJlaXRldCB1bmQgR2VzcGVycnQgZHVyY2ggezB9"><source>Bearbeitet und Gesperrt durch {0}</source><target>Edited and locked by {0}</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSBoaW56dWbDvGdlbg=="><source>Aufgabe hinzufügen</source><target>Add task</target></trans-unit>
-<trans-unit id="RWluZSBuZXVlIEF1ZmdhYmUgaGluenVmw7xnZW4u"><source>Eine neue Aufgabe hinzufügen.</source><target>Add a new task.</target></trans-unit>
-<trans-unit id="QWt0dWFsaXNpZXJlbg=="><source>Aktualisieren</source><target>Update</target></trans-unit>
-<trans-unit id="QXVmZ2FiZW5saXN0ZSB2b20gU2VydmVyIGFrdHVhbGlzaWVyZW4u"><source>Aufgabenliste vom Server aktualisieren.</source><target>Update task list from the server.</target></trans-unit>
-<trans-unit id="QXVmdHJhZ3Nuci4="><source>Auftragsnr.</source><target>Order no.</target></trans-unit>
-<trans-unit id="QXVmZ2FiZW5uYW1l"><source>Aufgabenname</source><target>Task name</target></trans-unit>
-<trans-unit id="QWt0aW9uZW4="><source>Aktionen</source><target>Actions</target></trans-unit>
-<trans-unit id="UXVlbGxzcHJhY2hl"><source>Quellsprache</source><target>Source language</target></trans-unit>
-<trans-unit id="UmVsYWlzc3ByYWNoZQ=="><source>Relaissprache</source><target>Relay language</target></trans-unit>
-<trans-unit id="WmllbHNwcmFjaGU="><source>Zielsprache</source><target>Target language</target></trans-unit>
-<trans-unit id="UHJvamVrdG1hbmFnZXI="><source>Projektmanager</source><target>Project manager</target></trans-unit>
-<trans-unit id="QmVudXR6ZXI="><source>Benutzer</source><target>User</target></trans-unit>
-<trans-unit id="V8O2cnRlcg=="><source>Wörter</source><target>Words</target></trans-unit>
-<trans-unit id="QW56YWhsIFfDtnJ0ZXI="><source>Anzahl Wörter</source><target>Number of words</target></trans-unit>
-<trans-unit id="TGllZmVyZGF0dW0gKHNvbGwp"><source>Lieferdatum (soll)</source><target>Delivery date (planned)</target></trans-unit>
-<trans-unit id="TGllZmVyZGF0dW0gKGlzdCk="><source>Lieferdatum (ist)</source><target>Delivery date (actual)</target></trans-unit>
-<trans-unit id="UmVmZXJlbnpkYXRlaWVu"><source>Referenzdateien</source><target>Reference files</target></trans-unit>
-<trans-unit id="MTAwJSBNYXRjaGVzIHNpbmQgZWRpdGllcmJhcg=="><source>100% Matches sind editierbar</source><target>100% matches can be edited</target></trans-unit>
-<trans-unit id="QmVzdGVsbGRhdHVt"><source>Bestelldatum</source><target>Order date</target></trans-unit>
-<trans-unit id="UXVlbGxzcHJhY2hlIGJlYXJiZWl0YmFy"><source>Quellsprache bearbeitbar</source><target>Source language can be edited</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSBlcnN0ZWxsZW4="><source>Aufgabe erstellen</source><target>Create task</target></trans-unit>
-<trans-unit id="V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIERhdGVuIChaSVAsIENTVjsgQW5nYWJlIG5vdHdlbmRpZyk="><source>Wählen Sie die zu importierenden Daten (ZIP, CSV; Angabe notwendig)</source><target>Select the data to be imported (ZIP, CSV; specification necessary)</target></trans-unit>
-<trans-unit id="SW1wb3J0ZGF0ZWnCuQ=="><source>Importdatei¹</source><target>Import file¹</target></trans-unit>
-<trans-unit id="QXVmdHJhZ3NudW1tZXI="><source>Auftragsnummer</source><target>Order number</target></trans-unit>
-<trans-unit id="UHJvamVrdG5hbWUgKGZyZWkgd8OkaGxiYXIsIEFuZ2FiZSBub3R3ZW5kaWcp"><source>Projektname (frei wählbar, Angabe notwendig)</source><target>Project name (freely selectable, specification necessary)</target></trans-unit>
-<trans-unit id="UHJvamVrdG5hbWXCuQ=="><source>Projektname¹</source><target>Project name¹</target></trans-unit>
-<trans-unit id="UXVlbGxzcHJhY2hlIGRlcyBQcm9qZWt0ZXMgKEFuZ2FiZSBub3R3ZW5kaWcp"><source>Quellsprache des Projektes (Angabe notwendig)</source><target>Source language of the project (specification necessary)</target></trans-unit>
-<trans-unit id="UXVlbGxzcHJhY2hlwrk="><source>Quellsprache¹</source><target>Source language¹</target></trans-unit>
-<trans-unit id="WmllbHNwcmFjaGUgZGVzIFByb2pla3RlcyAoQW5nYWJlIG5vdHdlbmRpZyk="><source>Zielsprache des Projektes (Angabe notwendig)</source><target>Target language of the project (specification necessary)</target></trans-unit>
-<trans-unit id="WmllbHNwcmFjaGXCuQ=="><source>Zielsprache¹</source><target>Target language¹</target></trans-unit>
-<trans-unit id="UmVsYWlzc3ByYWNoZSAoQW5nYWJlIG5vdHdlbmRpZyBzb2Zlcm4gUmVsYWlzZGF0ZW4gdm9yaGFuZGVuKQ=="><source>Relaissprache (Angabe notwendig sofern Relaisdaten vorhanden)</source><target>Relay language (specification necessary if relay data are available)</target></trans-unit>
-<trans-unit id="TGllZmVyZGF0dW0="><source>Lieferdatum</source><target>Delivery date</target></trans-unit>
-<trans-unit id="QXVzZ2FuZ3N0ZXh0IGlzdCBlZGl0aWVyYmFy"><source>Ausgangstext ist editierbar</source><target>Source text can be edited</target></trans-unit>
-<trans-unit id="wrkgRGllc2UgQW5nYWJlbiAvIERhdGVuIHdlcmRlbiBmw7xyIGRlbiBJbXBvcnQgendpbmdlbmQgYmVuw7Z0aWd0Lg=="><source>¹ Diese Angaben / Daten werden für den Import zwingend benötigt.</source><target>¹ These specifications/data are strictly necessary for the import.</target></trans-unit>
-<trans-unit id="RmVobGVyIGJlaW0gSW1wb3J0IQ=="><source>Fehler beim Import!</source><target>Error during import!</target></trans-unit>
-<trans-unit id="RmVobGVyIGJlaW0gSW1wb3J0OiBCaXR0ZSB3ZW5kZW4gU2llIHNpY2ggYW4gZGVuIFN1cHBvcnQh"><source>Fehler beim Import: Bitte wenden Sie sich an den Support!</source><target>Error during import: Please contact the support service!</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSDDtmZmbmVuIChudXIgTGVzZW1vZHVzKQ=="><source>Aufgabe öffnen (nur Lesemodus)</source><target>Open task (read-only)</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSBiZWFyYmVpdGVu"><source>Aufgabe bearbeiten</source><target>Edit task</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSBhYnNjaGxpZcOfZW4="><source>Aufgabe abschließen</source><target>Complete task</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSB3aWVkZXIgw7ZmZm5lbg=="><source>Aufgabe wieder öffnen</source><target>Re-open task</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSBmw7xyIGFsbGUgQmVudXR6ZXIgYWJzY2hsaWXDn2Vu"><source>Aufgabe für alle Benutzer abschließen</source><target>Complete task for all users</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSBmw7xyIGFsbGUgQmVudXR6ZXIgd2llZGVyIMO2ZmZuZW4="><source>Aufgabe für alle Benutzer wieder öffnen</source><target>Re-open task for all users</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSBrb21wbGV0dCBiZWVuZGVu"><source>Aufgabe komplett beenden</source><target>Finalise task</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSBrb21wbGV0dCBsw7ZzY2hlbg=="><source>Aufgabe komplett löschen</source><target>Completely delete task</target></trans-unit>
-<trans-unit id="QmVudXR6ZXIgZGVyIEF1ZmdhYmUgenV3ZWlzZW4="><source>Benutzer der Aufgabe zuweisen</source><target>Assign user to the task</target></trans-unit>
-<trans-unit id="YmVlbmRldGUgQXVmZ2FiZSB3aWVkZXIgw7ZmZm5lbg=="><source>beendete Aufgabe wieder öffnen</source><target>Re-open ended task</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSBleHBvcnRpZXJlbg=="><source>Aufgabe exportieren</source><target>Export task</target></trans-unit>
-<trans-unit id="ZXhwb3J0aWVyZW4="><source>exportieren</source><target>Export</target></trans-unit>
-<trans-unit id="ZXhwb3J0aWVyZW4gbWl0IMOEbmRlcnVuZ3NoaXN0b3JpZQ=="><source>exportieren mit Änderungshistorie</source><target>Export with change history</target></trans-unit>
-<trans-unit id="RXhwb3J0IFppZWx0ZXh0IFFNLVN0YXRpc3RpayAoWE1MKQ=="><source>Export Zieltext QM-Statistik (XML)</source><target>Export target text QM statistics (XML)</target></trans-unit>
-<trans-unit id="RXhwb3J0IEF1c2dhbmdzdGV4dCBRTS1TdGF0aXN0aWsgKFhNTCk="><source>Export Ausgangstext QM-Statistik (XML)</source><target>Export source text QM statistics (XML)</target></trans-unit>
-<trans-unit id="Um9sbGU="><source>Rolle</source><target>Role</target></trans-unit>
-<trans-unit id="QmVudXR6ZXIgaGluenVmw7xnZW4="><source>Benutzer hinzufügen</source><target>Add user</target></trans-unit>
-<trans-unit id="RWluZW4gQmVudXR6ZXIgZGllc2VyIEF1ZmdhYmUgenVvcmRuZW4u"><source>Einen Benutzer dieser Aufgabe zuordnen.</source><target>Assign a user to this task.</target></trans-unit>
-<trans-unit id="QmVudXR6ZXIgZW50ZmVybmVu"><source>Benutzer entfernen</source><target>Remove user</target></trans-unit>
-<trans-unit id="RGVuIGdld8OkaGx0ZW4gQmVudXR6ZXIgYXVzIGRpZXNlciBBdWZnYWJlIGVudGZlcm5lbi4="><source>Den gewählten Benutzer aus dieser Aufgabe entfernen.</source><target>Remove the selected user from this task.</target></trans-unit>
-<trans-unit id="QmVudXR6ZXIgenVvcmRuZW4="><source>Benutzer zuordnen</source><target>Assign user</target></trans-unit>
-<trans-unit id="w4RuZGVydW5nZW4gc3BlaWNoZXJu"><source>Änderungen speichern</source><target>Save changes</target></trans-unit>
-<trans-unit id="RWluZW4gb2RlciBtZWhyZXJlIEJlbnV0emVyIGF1c3fDpGhsZW4="><source>Einen oder mehrere Benutzer auswählen</source><target>Select one or more users</target></trans-unit>
-<trans-unit id="TG9naW4="><source>Login</source><target>Login</target></trans-unit>
-<trans-unit id="TmFtZQ=="><source>Name</source><target>Name</target></trans-unit>
-<trans-unit id="RS1NYWls"><source>E-Mail</source><target>E-mail</target></trans-unit>
-<trans-unit id="QXVmZ2FiZQ=="><source>Aufgabe</source><target>Task</target></trans-unit>
-<trans-unit id="QWJtZWxkZW4="><source>Abmelden</source><target>Log out</target></trans-unit>
-<trans-unit id="QXVmZ2FiZW4="><source>Aufgaben</source><target>Tasks</target></trans-unit>
-<trans-unit id="QmVudXR6ZXIgRWluc3RlbGx1bmdlbg=="><source>Benutzer Einstellungen</source><target>User settings</target></trans-unit>
-<trans-unit id="RWluZ2Vsb2dndGVyIEJlbnV0emVy"><source>Eingeloggter Benutzer</source><target>Logged-in user</target></trans-unit>
-<trans-unit id="TG9naW5uYW1l"><source>Loginname</source><target>Login name</target></trans-unit>
-<trans-unit id="enVyw7xjayB6dXIgQXVmZ2FiZW5saXN0ZQ=="><source>zurück zur Aufgabenliste</source><target>Return to the task list</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSBiZWVuZGVu"><source>Aufgabe beenden</source><target>End task</target></trans-unit>
-<trans-unit id="IC0gc2NocmVpYmdlc2Now7x0enQ="><source> - schreibgeschützt</source><target> – Write-protected</target></trans-unit>
-<trans-unit id="VHJhbnNsYXRlNSAtIEF1ZmdhYmUgYXV0b21hdGlzY2ggYWJnZXNjaGxvc3Nlbg=="><source>Translate5 - Aufgabe automatisch abgeschlossen</source><target>beo Review Editor – task automatically completed</target></trans-unit>
-<trans-unit id="VHJhbnNsYXRlNSAtIEF1ZmdhYmUgYWJnZXNjaGxvc3Nlbg=="><source>Translate5 - Aufgabe abgeschlossen</source><target>beo Review Editor – task completed</target></trans-unit>
-<trans-unit id="VHJhbnNsYXRlNSAtIEF1ZmdhYmUgZnJlaWdlZ2ViZW4="><source>Translate5 - Aufgabe freigegeben</source><target>beo Review Editor – task released</target></trans-unit>
-<trans-unit id="JTEkcyAlMiRzLAoKSW0gUHJvamVrdHBvcnRhbCBUcmFuc2xhdGU1IHd1cmRlIGRpZSBBdWZnYWJlICU1JHMgLSAlNiRzIGbDvHIgU2llIGZyZWlnZWdlYmVuLgoKU2llIGVycmVpY2hlbiBkYXMgUG9ydGFsIHVudGVyOiAlMyRzCgpWaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKSWhyIFByb2pla3RtYW5hZ2VtZW50IFRlYW0KVHJhbnNsYXRlNQoKRGllc2UgRW1haWwgd3VyZGUgYXV0b21hdGlzY2ggZ2VuZXJpZXJ0LiBCaXR0ZSBhbnR3b3J0ZW4gU2llIG5pY2h0IGF1ZiBkaWVzZSBFLU1haWwh"><source>%1$s %2$s, Im Projektportal Translate5 wurde die Aufgabe %5$s - %6$s für Sie freigegeben. Sie erreichen das Portal unter: %3$s Vielen Dank und viele Grüße, Ihr Projektmanagement Team Translate5 Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source><target>%1$s %2$s, Task %5$s – %6$s has been released for you in the beo Review Editor. You can access the portal at: %3$s Many thanks and best regards, The Project Management team beo Gesellschaft für Sprachen und Technologie mbH This e-mail has been generated automatically. Please do not reply to this e-mail!</target></trans-unit>
-<trans-unit id="JTEkcyAlMiRzLDxiciAvPgo8YnIgLz4KSW0gUHJvamVrdHBvcnRhbCBUcmFuc2xhdGU1IHd1cmRlIGRpZSBBdWZnYWJlIDxiPiU1JHMgLSAlNiRzPC9iPiBmw7xyIFNpZSBmcmVpZ2VnZWJlbi48YnIgLz4KPGJyIC8+CkltIGZvbGdlbmRlbiBkaWUgZ2V0w6R0aWd0ZW4gw4RuZGVydW5nZW4gZGVyIHZvcmhlcmdlaGVuZGVuIExla3RvcmVuOjxiciAvPgolNCRzCjxociAvPgo8YnIgLz4KPGJyIC8+ClNpZSBlcnJlaWNoZW4gZGFzIFBvcnRhbCB1bnRlcjogJTMkczxiciAvPgo8YnIgLz4KPGJyIC8+VmllbGVuIERhbmsgdW5kIHZpZWxlIEdyw7zDn2UsCjxiciAvPklociBQcm9qZWt0bWFuYWdlbWVudCBUZWFtCjxiciAvPlRyYW5zbGF0ZTUKPGJyIC8+CjxiciAvPkRpZXNlIEVtYWlsIHd1cmRlIGF1dG9tYXRpc2NoIGdlbmVyaWVydC4gQml0dGUgYW50d29ydGVuIFNpZSBuaWNodCBhdWYgZGllc2UgRS1NYWlsIQ=="><source>%1$s %2$s,<br/><br/>Im Projektportal Translate5 wurde die Aufgabe <b>%5$s - %6$s</b> für Sie freigegeben.<br/><br/>Im folgenden die getätigten Änderungen der vorhergehenden Lektoren:<br/>%4$s<hr/><br/><br/>Sie erreichen das Portal unter: %3$s<br/><br/><br/>Vielen Dank und viele Grüße,<br/>Ihr Projektmanagement Team<br/>Translate5<br/><br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source><target>%1$s %2$s,<br/><br/>The task <b>%5$s – %6$s</b> has been released for you in the beo Review Editor.<br/><br/>The changes effected by the previous reviewers are as follows:<br/>%4$s<hr/><br/><br/>You can access the portal at: %3$s<br/><br/><br/>Many thanks and best regards,<br/>The Project Management team<br/>beo Gesellschaft für Sprachen und Technologie mbH<br/><br/>This e-mail has been generated automatically. Please do not reply to this e-mail!</target></trans-unit>
-<trans-unit id="JTEkcyAlMiRzLDxiciAvPgo8YnIgLz4KSW0gUHJvamVrdHBvcnRhbCBUcmFuc2xhdGU1IHd1cmRlIGRpZSBBdWZnYWJlIDxiPiU1JHMgLSAlNiRzPC9iPiBmw7xyIFNpZSBmcmVpZ2VnZWJlbi48YnIgLz4KPGJyIC8+CkltIGZvbGdlbmRlbiBkaWUgZ2V0w6R0aWd0ZW4gw4RuZGVydW5nZW4gZGVyIHZvcmhlcmdlaGVuZGVuIMOcYmVyc2V0emVyOjxiciAvPgolNCRzCjxociAvPgo8YnIgLz4KPGJyIC8+ClNpZSBlcnJlaWNoZW4gZGFzIFBvcnRhbCB1bnRlcjogJTMkczxiciAvPgo8YnIgLz4KPGJyIC8+VmllbGVuIERhbmsgdW5kIHZpZWxlIEdyw7zDn2UsCjxiciAvPklociBQcm9qZWt0bWFuYWdlbWVudCBUZWFtCjxiciAvPlRyYW5zbGF0ZTUKPGJyIC8+CjxiciAvPkRpZXNlIEVtYWlsIHd1cmRlIGF1dG9tYXRpc2NoIGdlbmVyaWVydC4gQml0dGUgYW50d29ydGVuIFNpZSBuaWNodCBhdWYgZGllc2UgRS1NYWlsIQ=="><source>%1$s %2$s,<br/><br/>Im Projektportal Translate5 wurde die Aufgabe <b>%5$s - %6$s</b> für Sie freigegeben.<br/><br/>Im folgenden die getätigten Änderungen der vorhergehenden Übersetzer:<br/>%4$s<hr/><br/><br/>Sie erreichen das Portal unter: %3$s<br/><br/><br/>Vielen Dank und viele Grüße,<br/>Ihr Projektmanagement Team<br/>Translate5<br/><br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source><target>%1$s %2$s,<br/><br/>The task <b>%5$s – %6$s</b> has been released for you in the beo Review Editor.<br/><br/>The changes effected by the previous translators are as follows:<br/>%4$s<hr/><br/><br/>You can access the portal at: %3$s<br/><br/><br/>Many thanks and best regards,<br/>The Project Management team<br/>beo Gesellschaft für Sprachen und Technologie mbH<br/><br/>This e-mail has been generated automatically. Please do not reply to this e-mail!</target></trans-unit>
-<trans-unit id="SW4gUXVlbGxlOg=="><source>In Quelle:</source><target>In the source segment:</target></trans-unit>
-<trans-unit id="SW4gWmllbDo="><source>In Ziel:</source><target>In the target segment:</target></trans-unit>
-<trans-unit id="ZXJsYXVidGUgQmVuZW5udW5n"><source>erlaubte Benennung</source><target>Permitted term</target></trans-unit>
-<trans-unit id="dmVyYm90ZW5lIEJlbmVubnVuZw=="><source>verbotene Benennung</source><target>Prohibited term</target></trans-unit>
-<trans-unit id="Vm9yenVnc2JlbmVubnVuZw=="><source>Vorzugsbenennung</source><target>Priority term</target></trans-unit>
-<trans-unit id="VW5iZWthbm50ZXIgVGVybSBTdGF0dXM="><source>Unbekannter Term Status</source><target>Unknown term status</target></trans-unit>
-<trans-unit id="QWxsZSBLYXRlZ29yaWVu"><source>Alle Kategorien</source><target>All categories</target></trans-unit>
-<trans-unit id="UnVzc2lzY2g="><source>Russisch</source><target>Russian</target></trans-unit>
-<trans-unit id="RGV1dHNjaA=="><source>Deutsch</source><target>German</target></trans-unit>
-<trans-unit id="RW5nbGlzY2g="><source>Englisch</source><target>English</target></trans-unit>
-<trans-unit id="VHNjaGVjaGlzY2g="><source>Tschechisch</source><target>Czech</target></trans-unit>
-<trans-unit id="RMOkbmlzY2g="><source>Dänisch</source><target>Danish</target></trans-unit>
-<trans-unit id="U3BhbmlzY2g="><source>Spanisch</source><target>Spanish</target></trans-unit>
-<trans-unit id="RmlubmlzY2g="><source>Finnisch</source><target>Finnish</target></trans-unit>
-<trans-unit id="SmFwYW5pc2No"><source>Japanisch</source><target>Japanese</target></trans-unit>
-<trans-unit id="TmllZGVybMOkbmRpc2No"><source>Niederländisch</source><target>Dutch</target></trans-unit>
-<trans-unit id="RmzDpG1pc2No"><source>Flämisch</source><target>Flemish</target></trans-unit>
-<trans-unit id="Tm9yd2VnaXNjaCAoQm9rbWFsKQ=="><source>Norwegisch (Bokmal)</source><target>Norwegian (Bokmål)</target></trans-unit>
-<trans-unit id="UnVtw6RuaXNjaA=="><source>Rumänisch</source><target>Romanian</target></trans-unit>
-<trans-unit id="UG9sbmlzY2g="><source>Polnisch</source><target>Polish</target></trans-unit>
-<trans-unit id="UG9ydHVnaWVzaXNjaA=="><source>Portugiesisch</source><target>Portuguese</target></trans-unit>
-<trans-unit id="VW5nYXJpc2No"><source>Ungarisch</source><target>Hungarian</target></trans-unit>
-<trans-unit id="QnVsZ2FyaXNjaA=="><source>Bulgarisch</source><target>Bulgarian</target></trans-unit>
-<trans-unit id="Q2hpbmVzaXNjaA=="><source>Chinesisch</source><target>Chinese</target></trans-unit>
-<trans-unit id="RnJhbnrDtnNpc2No"><source>Französisch</source><target>French</target></trans-unit>
-<trans-unit id="VGVybWlub2xvZ2llZmVobGVy"><source>Terminologiefehler</source><target>Terminology error</target></trans-unit>
-<trans-unit id="SW5oYWx0bGljaGVyIEZlaGxlcg=="><source>Inhaltlicher Fehler</source><target>Error in content</target></trans-unit>
-<trans-unit id="QXVzbGFzc3VuZw=="><source>Auslassung</source><target>Omission</target></trans-unit>
-<trans-unit id="R3JhbW1hdGlrZmVobGVy"><source>Grammatikfehler</source><target>Grammatical error</target></trans-unit>
-<trans-unit id="UmVjaHRzY2hyZWliZmVobGVy"><source>Rechtschreibfehler</source><target>Spelling error</target></trans-unit>
-<trans-unit id="WmVpY2hlbnNldHp1bmdzZmVobGVy"><source>Zeichensetzungsfehler</source><target>Punctuation error</target></trans-unit>
-<trans-unit id="U29uc3RpZ2VyIEZlaGxlcg=="><source>Sonstiger Fehler</source><target>Other error</target></trans-unit>
-<trans-unit id="WmFobGVuL0VpbmhlaXRlbg=="><source>Zahlen/Einheiten</source><target>Numbers/units</target></trans-unit>
-<trans-unit id="VGFncw=="><source>Tags</source><target>Tags</target></trans-unit>
-<trans-unit id="VGV4dCB6aWVsZ3J1cHBlbmdlcmVjaHQgKFN0aWwp"><source>Text zielgruppengerecht (Stil)</source><target>Text appropriate for audience (style)</target></trans-unit>
-<trans-unit id="QmVhY2h0dW5nIHZvbiBBbndlaXN1bmdlbg=="><source>Beachtung von Anweisungen</source><target>Compliance with instructions</target></trans-unit>
-<trans-unit id="S29uc2lzdGVueg=="><source>Konsistenz</source><target>Consistency</target></trans-unit>
-<trans-unit id="U3RhdHVzIDE="><source>Status 1</source><target>Status 1</target></trans-unit>
-<trans-unit id="U3RhdHVzIDI="><source>Status 2</source><target>Status 2</target></trans-unit>
-<trans-unit id="U3RhdHVzIDM="><source>Status 3</source><target>Status 3</target></trans-unit>
-<trans-unit id="w5xiZXJzZXR6dA=="><source>Übersetzt</source><target>Translated</target></trans-unit>
-<trans-unit id="TmljaHQgw7xiZXJzZXR6dA=="><source>Nicht übersetzt</source><target>Not translated</target></trans-unit>
-<trans-unit id="TGVrdG9yaWVydA=="><source>Lektoriert</source><target>Corrected</target></trans-unit>
-<trans-unit id="QXV0b2xla3RvcmllcnQ="><source>Autolektoriert</source><target>Autocorrected</target></trans-unit>
-<trans-unit id="TGVrdG9yaWVydCwgdW5iZXLDvGhydCwgYXV0by1nZXNldHp0"><source>Lektoriert, unberührt, auto-gesetzt</source><target>Not opened, confirmed</target></trans-unit>
-<trans-unit id="TGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0"><source>Lektoriert, unverändert</source><target>Opened, unchanged, confirmed</target></trans-unit>
-<trans-unit id="QXV0b2xla3RvcmllcnQsIHVudmVyw6RuZGVydA=="><source>Autolektoriert, unverändert</source><target>Opened, unchanged, autoconfirmed</target></trans-unit>
-<trans-unit id="w5xiZXJzZXR6ZXIgZ2VwcsO8ZnQ="><source>Übersetzer geprüft</source><target>Translator reviewed</target></trans-unit>
-<trans-unit id="w5xiZXJzZXR6ZXIgYXV0b2dlcHLDvGZ0"><source>Übersetzer autogeprüft</source><target>Translator reviewed</target></trans-unit>
-<trans-unit id="d2lyZCBlcm1pdHRlbHQuLi4="><source>wird ermittelt...</source><target>Searching...</target></trans-unit>
-<trans-unit id="SW0gUHJvamVrdHBvcnRhbCBUcmFuc2xhdGU1IHd1cmRlIGRpZSBBdWZnYWJlIDxiPiUxJHMgLSAlMiRzPC9iPiBkdXJjaCBhbGxlIEJlbnV0emVyIGRlciBSb2xsZSA8aT4lMyRzPC9pPiBhYmdlc2NobG9zc2VuLjxiciAvPg=="><source>Im Projektportal Translate5 wurde die Aufgabe <b>%1$s - %2$s</b> durch alle Benutzer der Rolle <i>%3$s</i> abgeschlossen.<br/></source><target>The task <b>%1$s – %2$s</b> has been completed in the beo Review Editor by all users in the <i>%3$s</i> role.<br/></target></trans-unit>
-<trans-unit id="PGJyIC8+CjxiciAvPgpTaWUgZXJyZWljaGVuIGRhcyBQb3J0YWwgdW50ZXI6IDxhIGhyZWY9IiUxJHMiPiUxJHM8L2E+PGJyIC8+CjxiciAvPgo8YnIgLz5WaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKPGJyIC8+SWhyIFByb2pla3RtYW5hZ2VtZW50IFRlYW0KPGJyIC8+VHJhbnNsYXRlNQo8YnIgLz4KPGJyIC8+RGllc2UgRW1haWwgd3VyZGUgYXV0b21hdGlzY2ggZ2VuZXJpZXJ0LiBCaXR0ZSBhbnR3b3J0ZW4gU2llIG5pY2h0IGF1ZiBkaWVzZSBFLU1haWwh"><source><br/><br/>Sie erreichen das Portal unter: <a href="%1$s">%1$s</a><br/><br/><br/>Vielen Dank und viele Grüße,<br/>Ihr Projektmanagement Team<br/>Translate5<br/><br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source><target><br/><br/>You can access the portal at: <a href="%1$s">%1$s</a><br/><br/><br/>Many thanks and best regards,<br/>The Project Management team<br/>beo Gesellschaft für Sprachen und Technologie mbH<br/><br/>This e-mail has been generated automatically. Please do not reply to this e-mail!</target></trans-unit>
-<trans-unit id="JTEkcyAlMiRzLAoKJTMkcwolNCRzCiU3JHM="><source>%1$s %2$s, %3$s %4$s %7$s</source><target>%1$s %2$s, %3$s %4$s %7$s</target></trans-unit>
-<trans-unit id="dHJhbnNsYXRvcg=="><source>translator</source><target>Translator</target></trans-unit>
-<trans-unit id="JTEkcyAlMiRzLDxiciAvPgo8YnIgLz4KJTMkczxiciAvPgolNCRzPGJyIC8+CkltIGZvbGdlbmRlbiBkaWUgZ2V0w6R0aWd0ZW4gw4RuZGVydW5nZW4gZGVyIHp1dm9yIGFrdGl2ZW4gQmVudXR6ZXIgZGVyIFJvbGxlIDxiPiU1JHM8L2I+OjxiciAvPgolNiRzCjxociAvPgolNyRz"><source>%1$s %2$s,<br/><br/>%3$s<br/>%4$s<br/>Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <b>%5$s</b>:<br/>%6$s<hr/>%7$s</source><target>%1$s %2$s,<br/><br/>%3$s<br/>%4$s<br/>The changes effected by the previously active users in the role are as follows <b>%5$s</b>:<br/>%6$s<hr/>%7$s</target></trans-unit>
-<trans-unit id="b2ZmZW4gKG5pY2h0IGJlZW5kZXQp"><source>offen (nicht beendet)</source><target>Open (not ended)</target></trans-unit>
-<trans-unit id="b2ZmZW4gKGbDvHIgbWljaCBiZWFyYmVpdGJhcik="><source>offen (für mich bearbeitbar)</source><target>Open (can be edited by me)</target></trans-unit>
-<trans-unit id="d2FydGVuZCAoZsO8ciBtaWNoIGvDvG5mdGlnIGJlYXJiZWl0YmFy"><source>wartend (für mich künftig bearbeitbar</source><target>Pending (can be edited by me in future)</target></trans-unit>
-<trans-unit id="YWJnZXNjaGxvc3NlbiAodm9uIG1pciBmZXJ0aWcgYmVhcmJlaXRldCk="><source>abgeschlossen (von mir fertig bearbeitet)</source><target>Completed (completed by me)</target></trans-unit>
-<trans-unit id="YmVlbmRldCAoZsO8ciBhbGxlIEJlbnV0emVyKQ=="><source>beendet (für alle Benutzer)</source><target>Ended (for all users)</target></trans-unit>
-<trans-unit id="d2FydGVuZCAoZsO8ciBtaWNoIGvDvG5mdGlnIGJlYXJiZWl0YmFyKQ=="><source>wartend (für mich künftig bearbeitbar)</source><target>Pending (can be edited by me in future)</target></trans-unit>
-<trans-unit id="QXVmZ2FiZW7DvGJlcnNpY2h0"><source>Aufgabenübersicht</source><target>Task overview</target></trans-unit>
-<trans-unit id="Vm9ybmFtZQ=="><source>Vorname</source><target>Name</target></trans-unit>
-<trans-unit id="TmFjaG5hbWU="><source>Nachname</source><target>Surname</target></trans-unit>
-<trans-unit id="TWVpbmUgRWluc3RlbGx1bmdlbg=="><source>Meine Einstellungen</source><target>My settings</target></trans-unit>
-<trans-unit id="d2FydGVuZA=="><source>wartend</source><target>Pending</target></trans-unit>
-<trans-unit id="w5xiZXJzZXR6ZXI="><source>Übersetzer</source><target>Translator</target></trans-unit>
-<trans-unit id="QmVzdWNoZXI="><source>Besucher</source><target>Visitor</target></trans-unit>
-<trans-unit id="b2ZmZW4="><source>offen</source><target>Open</target></trans-unit>
-<trans-unit id="w5xiZXJzZXR6ZXIgUHLDvGZ1bmc="><source>Übersetzer Prüfung</source><target>Translator review</target></trans-unit>
-</body></file></xliff>
-
-
-
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.1" version="1.1">
+  <!-- the transunit-ID should contain the base64-encoded source-string als used in the php source-code. This ID is used for matching. -->
+  <!-- html-tags inside the target-string must not be encoded as they should regarding xliff but should be left as plain hmtl. At this stage ZfExtended does not support xliff inline tags -->
+  <file original="php-sourcecode" source-language="ha" target-language="en" datatype="php">
+    <body>
+      <trans-unit id="w5xiZXJzZXR6dA==">
+        <source>&#xDC;bersetzt</source>
+        <target>translated</target>
+      </trans-unit>
+      <trans-unit id="TmljaHQgw7xiZXJzZXR6dA==">
+        <source>Nicht &#xFC;bersetzt</source>
+        <target>untranslated</target>
+      </trans-unit>
+      <trans-unit id="QXV0b2xla3RvcmllcnQ=">
+        <source>Autolektoriert</source>
+        <target>auto-reviewed</target>
+      </trans-unit>
+      <trans-unit id="TGVrdG9yaWVydCwgdW5iZXLDvGhydCwgYXV0by1nZXNldHp0">
+        <source>Lektoriert, unber&#xFC;hrt, auto-gesetzt</source>
+        <target>reviewed, untouched, auto-set</target>
+      </trans-unit>
+      <trans-unit id="TGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0">
+        <source>Lektoriert, unver&#xE4;ndert</source>
+        <target>reviewed, untouched</target>
+      </trans-unit>
+      <trans-unit id="QXV0b2xla3RvcmllcnQsIHVudmVyw6RuZGVydA==">
+        <source>Autolektoriert, unver&#xE4;ndert</source>
+        <target>auto-reviewed, untouched</target>
+      </trans-unit>
+      <trans-unit id="w5xiZXJzZXR6ZXIgZ2VwcsO8ZnQ=">
+        <source>&#xDC;bersetzer gepr&#xFC;ft</source>
+        <target>translator reviewed</target>
+      </trans-unit>
+      <trans-unit id="w5xiZXJzZXR6ZXIgYXV0b2dlcHLDvGZ0">
+        <source>&#xDC;bersetzer autogepr&#xFC;ft</source>
+        <target>translator autoreviewed</target>
+      </trans-unit>
+      <trans-unit id="d2lyZCBlcm1pdHRlbHQuLi4=">
+        <source>wird ermittelt...</source>
+        <target>calculating...</target>
+      </trans-unit>
+      <trans-unit id="RWRpdGVk">
+        <source>Edited</source>
+        <target>edited</target>
+      </trans-unit>
+      <trans-unit id="QmxvY2tlZA==">
+        <source>Blocked</source>
+        <target>blocked</target>
+      </trans-unit>
+      <trans-unit id="QmVzdWNoZXI=">
+        <source>Besucher</source>
+        <target>visitor</target>
+      </trans-unit>
+      <trans-unit id="w5xiZXJzZXR6ZXIgUHLDvGZ1bmc=">
+        <source>&#xDC;bersetzer Pr&#xFC;fung</source>
+        <target>translator review</target>
+      </trans-unit>
+      <trans-unit id="RXJuZXV0ZSBBbm1lbGR1bmc=">
+        <source>Erneute Anmeldung</source>
+        <target>login again</target>
+      </trans-unit>
+      <trans-unit id="SWhyZSBTaXR6dW5nc2RhdGVuIHNpbmQgYWJnZWxhdWZlbi4gU2llIHdlcmRlbiBudW4genVyIEFubWVsZGVzZWl0ZSB3ZWl0ZXJnZWxlaXRldC4=">
+        <source>Ihre Sitzungsdaten sind abgelaufen. Sie werden nun zur Anmeldeseite weitergeleitet.</source>
+        <target>Your session is expired. You will be redirected to the login page.</target>
+      </trans-unit>
+      <trans-unit id="RsO8ciBkaWUgYW5nZWZvcmRlcnRlbiBEYXRlbiBmZWhsZW4gSWhuZW4gZGllIG7DtnRpZ2VuIEJlcmVjaHRpZ3VuZ2VuIQ==">
+        <source>F&#xFC;r die angeforderten Daten fehlen Ihnen die n&#xF6;tigen Berechtigungen!</source>
+        <target>You are not authorized to access the requested data.</target>
+      </trans-unit>
+      <trans-unit id="WnVtIEzDtnNjaGVuIGRlciBEYXRlbiBmZWhsZW4gSWhuZW4gZGllIG7DtnRpZ2VuIEJlcmVjaHRpZ3VuZ2VuIQ==">
+        <source>Zum L&#xF6;schen der Daten fehlen Ihnen die n&#xF6;tigen Berechtigungen!</source>
+        <target>You are not authorized to delete the requested data.</target>
+      </trans-unit>
+      <trans-unit id="WnVtIFNwZWljaGVybiB2b24gbmV1ZW4gRGF0ZW4gZmVobGVuIElobmVuIGRpZSBuw7Z0aWdlbiBCZXJlY2h0aWd1bmdlbiE=">
+        <source>Zum Speichern von neuen Daten fehlen Ihnen die n&#xF6;tigen Berechtigungen!</source>
+        <target>You are not authorized to save new data.</target>
+      </trans-unit>
+      <trans-unit id="WnVtIFNwZWljaGVybiBkZXIgYmVhcmJlaXRlbiBEYXRlbiBmZWhsZW4gSWhuZW4gZGllIG7DtnRpZ2VuIEJlcmVjaHRpZ3VuZ2VuIQ==">
+        <source>Zum Speichern der bearbeiten Daten fehlen Ihnen die n&#xF6;tigen Berechtigungen!</source>
+        <target>You are not authorized to save the edited data.</target>
+      </trans-unit>
+      <trans-unit id="RGllIGFuZ2Vmb3JkZXJ0ZW4gYnp3LiB6dSBiZWFyYmVpdGVuZGVuIERhdGVuIHd1cmRlbiBuaWNodCBnZWZ1bmRlbiE=">
+        <source>Die angeforderten bzw. zu bearbeitenden Daten wurden nicht gefunden!</source>
+        <target>The requested data was not found.</target>
+      </trans-unit>
+      <trans-unit id="RXMgaXN0IGVpbiBGZWhsZXIgYXVmZ2V0cmV0ZW4h">
+        <source>Es ist ein Fehler aufgetreten!</source>
+        <target>An error occurred!</target>
+      </trans-unit>
+      <trans-unit id="YmVhcmJlaXRldCBiZWk=">
+        <source>bearbeitet bei</source>
+        <target>edited at</target>
+      </trans-unit>
+      <trans-unit id="RGFzIFNlZ21lbnQga29ubnRlIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbi4gQml0dGUgc2NobGllw59lbiBTaWUgZGFzIFNlZ21lbnQgZ2dmLiBkdXJjaCBLbGljayBhdWYgIkFiYnJlY2hlbiIgdW5kIMO2ZmZuZW4sIGJlYXJiZWl0ZW4gdW5kIHNwZWljaGVybiBTaWUgZXMgZXJuZXV0LiBWaWVsZW4gRGFuayEgPGJyLz48YnIvPkdlcmFkZSBiZWFyYmVpdGV0ZXIgVGV4dCB3YXI6PGJyLz48YnIvPg==">
+        <source>Das Segment konnte nicht gespeichert werden. Bitte schlie&#xDF;en Sie das Segment ggf. durch Klick auf "Abbrechen" und &#xF6;ffnen, bearbeiten und speichern Sie es erneut. Vielen Dank! <br/><br/>Gerade bearbeiteter Text war:<br/><br/></source>
+        <target>The segment could not be saved. Please close the segment by clicking "cancel". Then open, edit and save it again. Thank you! <br/><br/>Edited text was:<br/><br/></target>
+      </trans-unit>
+      <trans-unit id="YW0=">
+        <source>am</source>
+        <target>at</target>
+      </trans-unit>
+      <trans-unit id="bmFjaA==">
+        <source>nach</source>
+        <target>after</target>
+      </trans-unit>
+      <trans-unit id="YmV2b3I=">
+        <source>bevor</source>
+        <target>before</target>
+      </trans-unit>
+      <trans-unit id="LSBPaG5lIFJlbGFpc3NwcmFjaGUgLQ==">
+        <source>- Ohne Relaissprache -</source>
+        <target>- no relay language -</target>
+      </trans-unit>
+      <trans-unit id="b2ZmZW4gKG5pY2h0IGJlZW5kZXQp">
+        <source>offen (nicht beendet)</source>
+        <target>open (not ended)</target>
+      </trans-unit>
+      <trans-unit id="b2ZmZW4gKGbDvHIgbWljaCBiZWFyYmVpdGJhcik=">
+        <source>offen (f&#xFC;r mich bearbeitbar)</source>
+        <target>open (editable by myself)</target>
+      </trans-unit>
+      <trans-unit id="d2FydGVuZCAoZsO8ciBtaWNoIGvDvG5mdGlnIGJlYXJiZWl0YmFyKQ==">
+        <source>wartend (f&#xFC;r mich k&#xFC;nftig bearbeitbar)</source>
+        <target>waiting (in future editable by myself)</target>
+      </trans-unit>
+      <trans-unit id="YWJnZXNjaGxvc3NlbiAodm9uIG1pciBmZXJ0aWcgYmVhcmJlaXRldCk=">
+        <source>abgeschlossen (von mir fertig bearbeitet)</source>
+        <target>finished (editing finished by myself)</target>
+      </trans-unit>
+      <trans-unit id="YmVlbmRldCAoZsO8ciBhbGxlIEJlbnV0emVyKQ==">
+        <source>beendet (f&#xFC;r alle Benutzer)</source>
+        <target>ended (for all users)</target>
+      </trans-unit>
+      <trans-unit id="ZsO8ciBtaWNoIA==">
+        <source>f&#xFC;r mich </source>
+        <target>for myself </target>
+      </trans-unit>
+      <trans-unit id="QXVmZ2FiZSB3aXJkIGR1cmNoIEJlbnV0emVyICJ7MH0iIGJlYXJiZWl0ZXQgdW5kIGlzdCBkYWhlciBzY2hyZWliZ2VzY2jDvHR6dCE=">
+        <source>Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgesch&#xFC;tzt!</source>
+        <target>User "{0}" is editing the task, which therefore is read-only!</target>
+      </trans-unit>
+      <trans-unit id="QXVmZ2FiZW7DvGJlcnNpY2h0">
+        <source>Aufgaben&#xFC;bersicht</source>
+        <target>Task Overview</target>
+      </trans-unit>
+      <trans-unit id="QXVmZ2FiZSB3dXJkZSBlcmZvbGdyZWljaCB2ZXJsYXNzZW4u">
+        <source>Aufgabe wurde erfolgreich verlassen.</source>
+        <target>task left successfully.</target>
+      </trans-unit>
+      <trans-unit id="QXVmZ2FiZSB3dXJkZSBlcmZvbGdyZWljaCBhYmdlc2NobG9zc2VuLg==">
+        <source>Aufgabe wurde erfolgreich abgeschlossen.</source>
+        <target>task finished successfully.</target>
+      </trans-unit>
+      <trans-unit id="QXVmZ2FiZSB3dXJkZSBlcmZvbGdyZWljaCBiZWVuZGV0Lg==">
+        <source>Aufgabe wurde erfolgreich beendet.</source>
+        <target>task ended successfully.</target>
+      </trans-unit>
+      <trans-unit id="QXVmZ2FiZSBrb21wbGV0dCBsw7ZzY2hlbj8=">
+        <source>Aufgabe komplett l&#xF6;schen?</source>
+        <target>Delete task completely?</target>
+      </trans-unit>
+      <trans-unit id="V29sbGVuIFNpZSBkaWUgQXVmZ2FiZSB3aXJrbGljaCBrb21wbGV0dCB1bmQgdW53aWRlcnJ1ZmxpY2ggbMO2c2NoZW4/">
+        <source>Wollen Sie die Aufgabe wirklich komplett und unwiderruflich l&#xF6;schen?</source>
+        <target>Do you really want to delete the the task irrevocably?</target>
+      </trans-unit>
+      <trans-unit id="S2VpbmUgQmVudXR6ZXIgenVnZW9yZG5ldCE=">
+        <source>Keine Benutzer zugeordnet!</source>
+        <target>No user assigned!</target>
+      </trans-unit>
+      <trans-unit id="UXVlbGxzcHJhY2hl">
+        <source>Quellsprache</source>
+        <target>Source language</target>
+      </trans-unit>
+      <trans-unit id="WmllbHNwcmFjaGU=">
+        <source>Zielsprache</source>
+        <target>Target language</target>
+      </trans-unit>
+      <trans-unit id="QmVzdGVsbGRhdHVt">
+        <source>Bestelldatum</source>
+        <target>Order date</target>
+      </trans-unit>
+      <trans-unit id="UXVlbGxzcHJhY2hlIGJlYXJiZWl0YmFy">
+        <source>Quellsprache bearbeitbar</source>
+        <target>source language editable</target>
+      </trans-unit>
+      <trans-unit id="SW1wb3J0ZGF0ZWnCuQ==">
+        <source>Importdatei&#xB9;</source>
+        <target>File to import&#xB9;</target>
+      </trans-unit>
+      <trans-unit id="QXVmZ2FiZSBrb21wbGV0dCBiZWVuZGVu">
+        <source>Aufgabe komplett beenden</source>
+        <target>End task completely</target>
+      </trans-unit>
+      <trans-unit id="QXVmZ2FiZSBrb21wbGV0dCBsw7ZzY2hlbg==">
+        <source>Aufgabe komplett l&#xF6;schen</source>
+        <target>Delete task completely</target>
+      </trans-unit>
+      <trans-unit id="Vm9ybmFtZQ==">
+        <source>Vorname</source>
+        <target>Forename</target>
+      </trans-unit>
+      <trans-unit id="TmFjaG5hbWU=">
+        <source>Nachname</source>
+        <target>Surname</target>
+      </trans-unit>
+      <trans-unit id="QXVmZ2FiZW4=">
+        <source>Aufgaben</source>
+        <target>Tasks</target>
+      </trans-unit>
+      <trans-unit id="TWVpbmUgRWluc3RlbGx1bmdlbg==">
+        <source>Meine Einstellungen</source>
+        <target>My settings</target>
+      </trans-unit>
+      <trans-unit id="RWluZ2Vsb2dndGVyIEJlbnV0emVy">
+        <source>Eingeloggter Benutzer</source>
+        <target>Authenticated user</target>
+      </trans-unit>
+      <trans-unit id="TG9naW5uYW1l">
+        <source>Loginname</source>
+        <target>Login name</target>
+      </trans-unit>
+      <trans-unit id="IC0gc2NocmVpYmdlc2Now7x0enQ=">
+        <source> - schreibgesch&#xFC;tzt</source>
+        <target> - read-only</target>
+      </trans-unit>
+      <trans-unit id="QmVudXR6ZXIgZW5kZ8O8bHRpZyBsw7ZzY2hlbj8=">
+        <source>Benutzer endg&#xFC;ltig l&#xF6;schen?</source>
+        <target>Delete the user completely?</target>
+      </trans-unit>
+      <trans-unit id="U29sbCBkZXIgZ2V3w6RobHRlIEJlbnV0emVyICJ7MH0iIHdpcmtsaWNoIGVuZGfDvGx0aWcgZ2Vsw7ZzY2h0IHdlcmRlbj8=">
+        <source>Soll der gew&#xE4;hlte Benutzer "{0}" wirklich endg&#xFC;ltig gel&#xF6;scht werden?</source>
+        <target>Do you really want to delete completely the user "{0}"?</target>
+      </trans-unit>
+      <trans-unit id="UGFzc3dvcnQgenVyw7xja3NldHplbj8=">
+        <source>Passwort zur&#xFC;cksetzen?</source>
+        <target>Reset Password</target>
+      </trans-unit>
+      <trans-unit id="U29sbCBkYXMgUGFzc3dvcnQgZGVzIEJlbnV0emVycyAiezB9IiB3aXJrbGljayB6dXLDvGNrZ2VzZXR6dCB3ZXJkZW4/PGJyIC8+IERlciBCZW51dHplciB3aXJkIHBlciBFLU1haWwgYmVuYWNocmljaHRpZ3QsIGRhc3MgZXIgZWluIG5ldWVzIFBhc3N3b3J0IGFuZm9yZGVybiBtdXNzLg==">
+        <source>Soll das Passwort des Benutzers "{0}" wirklick zur&#xFC;ckgesetzt werden?<br/> Der Benutzer wird per E-Mail benachrichtigt, dass er ein neues Passwort anfordern muss.</source>
+        <target>Do you really want to reset the password of user "{0}"?<br/> The user will be informed by e-mail to request a new password.</target>
+      </trans-unit>
+      <trans-unit id="RGVyIMOEbmRlcnVuZ2VuIGFuIEJlbnV0emVyICJ7MH0iIHd1cmRlbiBlcmZvbGdyZWljaCBnZXNwZWljaGVydC4=">
+        <source>Der &#xC4;nderungen an Benutzer "{0}" wurden erfolgreich gespeichert.</source>
+        <target>Changes at user "{0}" were successfully saved.</target>
+      </trans-unit>
+      <trans-unit id="QmVudXR6ZXJ2ZXJ3YWx0dW5n">
+        <source>Benutzerverwaltung</source>
+        <target>User Administration</target>
+      </trans-unit>
+      <trans-unit id="RGVyIEJlbnV0emVyICJ7MH0iIHd1cmRlIGVyZm9sZ3JlaWNoIGVyc3RlbGx0Lg==">
+        <source>Der Benutzer "{0}" wurde erfolgreich erstellt.</source>
+        <target>User "{0}" created successfully.</target>
+      </trans-unit>
+      <trans-unit id="QmVudXR6ZXLDvGJlcnNpY2h0">
+        <source>Benutzer&#xFC;bersicht</source>
+        <target>User Overview</target>
+      </trans-unit>
+      <trans-unit id="QW5yZWRl">
+        <source>Anrede</source>
+        <target>Salutation</target>
+      </trans-unit>
+      <trans-unit id="U3lzdGVtcm9sbGVu">
+        <source>Systemrollen</source>
+        <target>System roles</target>
+      </trans-unit>
+      <trans-unit id="RWluZW4gbmV1ZW4gQmVudXR6ZXIgaGluenVmw7xnZW4u">
+        <source>Einen neuen Benutzer hinzuf&#xFC;gen.</source>
+        <target>Add a new user</target>
+      </trans-unit>
+      <trans-unit id="QmVudXR6ZXIgYmVhcmJlaXRlbg==">
+        <source>Benutzer bearbeiten</source>
+        <target>edit user</target>
+      </trans-unit>
+      <trans-unit id="QmVudXR6ZXIgbMO2c2NoZW4=">
+        <source>Benutzer l&#xF6;schen</source>
+        <target>delete user</target>
+      </trans-unit>
+      <trans-unit id="UGFzc3dvcnQgZGVzIEJlbnV0emVycyB6dXLDvGNrc2V0emVu">
+        <source>Passwort des Benutzers zur&#xFC;cksetzen</source>
+        <target>reset password of user</target>
+      </trans-unit>
+      <trans-unit id="RnJhdQ==">
+        <source>Frau</source>
+        <target>Mrs.</target>
+      </trans-unit>
+      <trans-unit id="SGVycg==">
+        <source>Herr</source>
+        <target>Mr.</target>
+      </trans-unit>
+      <trans-unit id="QmVudXR6ZXJsaXN0ZSB2b20gU2VydmVyIGFrdHVhbGlzaWVyZW4u">
+        <source>Benutzerliste vom Server aktualisieren.</source>
+        <target>Reload users from server.</target>
+      </trans-unit>
+      <trans-unit id="QmVudXR6ZXIgZXJzdGVsbGVu">
+        <source>Benutzer erstellen</source>
+        <target>Create user</target>
+      </trans-unit>
+      <trans-unit id="QmVudXR6ZXJpbmZvcm1hdGlvbmVu">
+        <source>Benutzerinformationen</source>
+        <target>User information</target>
+      </trans-unit>
+      <trans-unit id="QW5tZWxkZWluZm9ybWF0aW9uZW4=">
+        <source>Anmeldeinformationen</source>
+        <target>Login details</target>
+      </trans-unit>
+      <trans-unit id="TmFtZSAoQW5nYWJlIG5vdHdlbmRpZyk=">
+        <source>Name (Angabe notwendig)</source>
+        <target>Name (mandatory)</target>
+      </trans-unit>
+      <trans-unit id="TmFtZcK5">
+        <source>Name&#xB9;</source>
+        <target>Name&#xB9;</target>
+      </trans-unit>
+      <trans-unit id="Vm9ybmFtZSAoQW5nYWJlIG5vdHdlbmRpZyk=">
+        <source>Vorname (Angabe notwendig)</source>
+        <target>Forename (mandatory)</target>
+      </trans-unit>
+      <trans-unit id="Vm9ybmFtZcK5">
+        <source>Vorname&#xB9;</source>
+        <target>Forename&#xB9;</target>
+      </trans-unit>
+      <trans-unit id="TmFjaG5hbWUgKEFuZ2FiZSBub3R3ZW5kaWcp">
+        <source>Nachname (Angabe notwendig)</source>
+        <target>Surname (mandatory)</target>
+      </trans-unit>
+      <trans-unit id="TmFjaG5hbWXCuQ==">
+        <source>Nachname&#xB9;</source>
+        <target>Surname&#xB9;</target>
+      </trans-unit>
+      <trans-unit id="QW5tZWxkZW5hbWUgKEFuZ2FiZSBub3R3ZW5kaWcp">
+        <source>Anmeldename (Angabe notwendig)</source>
+        <target>Loginname (mandatory)</target>
+      </trans-unit>
+      <trans-unit id="QW5tZWxkZW5hbWXCuQ==">
+        <source>Anmeldename&#xB9;</source>
+        <target>Loginname&#xB9;</target>
+      </trans-unit>
+      <trans-unit id="RS1NYWlsIEFkcmVzc2UgKEFuZ2FiZSBub3R3ZW5kaWcp">
+        <source>E-Mail Adresse (Angabe notwendig)</source>
+        <target>E-mail address (mandatory)</target>
+      </trans-unit>
+      <trans-unit id="RS1NYWlsIEFkcmVzc2XCuQ==">
+        <source>E-Mail Adresse&#xB9;</source>
+        <target>E-mail address&#xB9;</target>
+      </trans-unit>
+      <trans-unit id="U3lzdGVtcm9sbGVuwrI=">
+        <source>Systemrollen&#xB2;</source>
+        <target>System roles&#xB2;</target>
+      </trans-unit>
+      <trans-unit id="UGFzc3dvcnQgc2V0emVuwrM=">
+        <source>Passwort setzen&#xB3;</source>
+        <target>set password&#xB3;</target>
+      </trans-unit>
+      <trans-unit id="UGFzc3dvcnQgw6RuZGVybg==">
+        <source>Passwort &#xE4;ndern</source>
+        <target>change password</target>
+      </trans-unit>
+      <trans-unit id="UGFzc3dvcnQgS29udHJvbGxl">
+        <source>Passwort Kontrolle</source>
+        <target>Password control</target>
+      </trans-unit>
+      <trans-unit id="RGllIFBhc3N3w7ZydGVyIHN0aW1tZXJuIG5pY2h0IMO8YmVyZWluIQ==">
+        <source>Die Passw&#xF6;rter stimmern nicht &#xFC;berein!</source>
+        <target>The passwords does not match!</target>
+      </trans-unit>
+      <trans-unit id="IMK5IERpZXNlIEFuZ2FiZW4gd2VyZGVuIHp3aW5nZW5kIGJlbsO2dGlndC4=">
+        <source> &#xB9; Diese Angaben werden zwingend ben&#xF6;tigt.</source>
+        <target> &#xB9; This fields are mandatory.</target>
+      </trans-unit>
+      <trans-unit id="IMKyIFN5c3RlbXJvbGxlbiBiZXN0aW1tZW4gZGFyw7xiZXIsIHdlbGNoZSBSZWNodGUgaW0gU3lzdGVtIGVpbiBOdXR6ZXIgaGF0LiBEaWUgUm9sbGUgRWRpdG9yIGRhcmYgYXVmIGFsbGUgS29tcG9uZW50ZW4gZGVzIEVkaXRvcnMgenVncmVpZmVuLCBzb3dpZSBhdWYgZGllIEtvbXBvbmVudGVuIGRlciBBdWZnYWJlbsO8YmVyc2ljaHQsIGRpZSBmw7xyIGRhcyBFZGl0aWVyZW4gdm9uIEF1ZmdhYmVuIG7DtnRpZyBzaW5kLiBEaWUgUm9sbGUgUE0gZGFyZiBCZW51dHplciB2ZXJ3YWx0ZW4gdW5kIEJlbnV0emVyIEF1ZmdhYmVuIGltIFdvcmtmbG93IHp1d2Vpc2VuIG9kZXIgZW50emllaGVuLiBBY2h0dW5nOiBTeXN0ZW1yb2xsZW4gZMO8cmZlbiBuaWNodCBtaXQgV29ya2Zsb3dyb2xsZW4gd2llIExla3RvciBvZGVyIMOcYmVyc2V0emVyIHZlcndlY2hzZWx0IHdlcmRlbi4gQmVudXR6ZXIgZGllIGltIFdvcmtmbG93IEF1ZmdhYmVuIMO8YmVybmVobWVuIHNvbGxlbiBtw7xzc2VuIG1pbmRlc3RlbnMgZGllIFN5c3RlbXJvbGxlIEVkaXRvciBlcmhhbHRlbi4=">
+        <source> &#xB2; Systemrollen bestimmen dar&#xFC;ber, welche Rechte im System ein Nutzer hat. Die Rolle Editor darf auf alle Komponenten des Editors zugreifen, sowie auf die Komponenten der Aufgaben&#xFC;bersicht, die f&#xFC;r das Editieren von Aufgaben n&#xF6;tig sind. Die Rolle PM darf Benutzer verwalten und Benutzer Aufgaben im Workflow zuweisen oder entziehen. Achtung: Systemrollen d&#xFC;rfen nicht mit Workflowrollen wie Lektor oder &#xDC;bersetzer verwechselt werden. Benutzer die im Workflow Aufgaben &#xFC;bernehmen sollen m&#xFC;ssen mindestens die Systemrolle Editor erhalten.</source>
+        <target> &#xB2; The system roles defines the access rights of the user. The role "editor" may access all components needed for proofreading. The role "PM" may access the user administration, and is allowed to associate users to tasks. Warning: System roles are not to be confused with workflow roles like "reviewer" and "translator". Users which are part of the workflow, have to get at least the system role "editor".</target>
+      </trans-unit>
+      <trans-unit id="IMKzIFdpcmQga2VpbiBQYXNzd29ydCBnZXNldHp0IGJla29tbXQgZGVyIEJlbnV0emVyIGF1dG9tYXRpc2NoIGVpbmUgRS1NYWlsIHp1ciBFcnN0ZWxsdW5nIGVpbmVzIFBhc3N3b3J0cy4=">
+        <source> &#xB3; Wird kein Passwort gesetzt bekommt der Benutzer automatisch eine E-Mail zur Erstellung eines Passworts.</source>
+        <target> &#xB3; If no password is provided, the user will receive an e-mail for password creation.</target>
+      </trans-unit>
+      <trans-unit id="IEZlaGxlciBiZWltIFNwZWljaGVybiE=">
+        <source> Fehler beim Speichern!</source>
+        <target> Error on saving!</target>
+      </trans-unit>
+      <trans-unit id="RmVobGVyIGJlaW0gU3BlaWNoZXJuIGRlcyBCZW51dHplcnM6IEJpdHRlIHdlbmRlbiBTaWUgc2ljaCBhbiBkZW4gU3VwcG9ydCE=">
+        <source>Fehler beim Speichern des Benutzers: Bitte wenden Sie sich an den Support!</source>
+        <target>Error on saving the user: please contact the support!</target>
+      </trans-unit>
+      <trans-unit id="QmVudXR6ZXIgc3BlaWNoZXJu">
+        <source>Benutzer speichern</source>
+        <target>save user</target>
+      </trans-unit>
+      <trans-unit id='UE0gZ2VwcsO8ZnQ='>
+        <source>PM geprüft</source>
+	<target>PM reviewed</target>
+      </trans-unit>
+      <trans-unit id='UE0gQXV0b2dlcHLDvGZ0'>
+        <source>PM Autogeprüft</source>
+	<target>PM auto-reviewed</target>
+      </trans-unit>
+      <trans-unit id='UE0gZ2VwcsO8ZnQsIHVudmVyw6RuZGVydA=='>
+        <source>PM geprüft, unverändert</source>
+	<target>PM reviewed, unchanged</target>
+      </trans-unit>
+      <trans-unit id='UE0gQXV0b2dlcHLDvGZ0LCB1bnZlcsOkbmRlcnQ='>
+        <source>PM Autogeprüft, unverändert</source>
+	<target>PM auto-reviewed, unchanged</target>
+      </trans-unit>
+      <trans-unit id='UE0gUHLDvGZ1bmc='>
+        <source>PM Prüfung</source>
+	<target>PM review</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
