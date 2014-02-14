@@ -298,6 +298,7 @@ Ext.define('Editor.view.segments.RowEditor', {
             return false;
         }
         
+        //FIXME for TRANSLATE-118: check real used field instead target!
         if(newValue.length == 0 && record.get('target').length > 0) {
             Editor.MessageBox.addError(me.messages.cantSaveEmptySegment);
             return false;
