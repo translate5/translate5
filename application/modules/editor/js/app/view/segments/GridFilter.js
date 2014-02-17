@@ -144,7 +144,6 @@ Ext.define('Editor.view.segments.GridFilter', {
             dataIndex: 'editable'
         }];
         Editor.data.task.segmentFields().each(function(rec) {
-            console.log(rec.get('name'));
             fields.push({dataIndex: rec.get('name'), type: 'string'});
             if(rec.get('editable')) {
                 fields.push({dataIndex: rec.get('name')+'Edit', type: 'string'});

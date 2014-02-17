@@ -42,6 +42,9 @@
 /**
  * @class Editor.model.Segment
  * @extends Ext.data.Model
+ * @param {Array|Ext.data.Store} Segment Field Definitions. As Array: ready to use field config. As Store: segment fields store!
+ * 
+ * redefinition algorithm tested in 4.0.7 and 4.2
  */
 Editor.model._Segment = function(fields) {
     if(fields instanceof Ext.data.Store) {
@@ -101,7 +104,7 @@ Editor.model._Segment = function(fields) {
     });
 };
 
-//default fields
+//default fields:
 Editor.model._Segment([
     {name: 'id', type: 'int'},
     {name: 'fileId', type: 'int'},
@@ -117,5 +120,3 @@ Editor.model._Segment([
     {name: 'qmId', type: 'string'},
     {name: 'stateId', type: 'int'}
 ]);
-    //tested in 4.0.7 and 4.2
-    //improve redefine, so that it can merge the fields instead completly overwrite it.
