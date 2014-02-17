@@ -60,6 +60,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @var type Zend_Config
      */
     protected $config           = null;
+
     protected $_lengthToTruncateSegmentsToSort = null;
 
     protected $_segmentfield    = array();
@@ -95,35 +96,38 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
 
     public function getField($name)
     {
-        return $this->_segmentdata[$name];
+        return $this->_segmentdata[$name]['original'];
     }
 
-//    public function getFieldEdited($name)
-//    {
-//        return $this->_segmentdata[$name];
-//    }
+    public function getFieldMd5($name)
+    {
+        return $this->_segmentdata[$name]['originalMd5'];
+    }
+    public function getFieldToSort($name)
+    {
+        return $this->_segmentdata[$name]['originalToSort'];
+    }
 
-    /*
 
-    public function setFieldEditable($name, $value){}
-    public function getFieldEditable($name){}
-    public function getFieldSort($name){}
-    public function getFieldMd5($name){}
+    public function getFieldEdited($name)
+    {
+        return $this->_segmentdata[$name]['edited'];
+    }
 
-    public function setSource(){}
-    public function setTarget(){}
-    public function setRelais(){}
-    public function setEditor(){}
-    public function setSourceEdited(){}
+    public function getFieldEditedMd5($name)
+    {
+        return $this->_segmentdata[$name]['editedMd5'];
+    }
 
-    public function getSource(){}
-    public function getTarget(){}
-    public function getRelais(){}
-    public function getEditor(){}
-    public function getSourceEdited(){}
+    public function getFieldEditedToSort($name)
+    {
+        return $this->_segmentdata[$name]['editedToSort'];
+    }
 
-    public function setFieldMd5($name){}
-*/
+
+
+
+
     protected function initField($TaskGuid)
     {
         $segmentfield = new editor_Models_Segmentfield();
