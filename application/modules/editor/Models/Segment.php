@@ -60,18 +60,30 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @var type Zend_Config
      */
     protected $config           = null;
-
+    /**
+     * @var null
+     */
     protected $_lengthToTruncateSegmentsToSort = null;
-
+    /**
+     * @var array
+     */
     protected $_segmentfield    = array();
+    /**
+     * @var array
+     */
     protected $_segmentdata     = array();
-
+    /**
+     *
+     */
     public function __construct()
     {
         $session = new Zend_Session_Namespace();
         $this->lengthToTruncateSegmentsToSort = $session->runtimeOptions->lengthToTruncateSegmentsToSort;
     }
-
+    /**
+     * @param $segment
+     * @return string
+     */
     protected function _truncateSegmentsToSort($segment)
     {
         if(!is_string($segment)){
@@ -79,73 +91,100 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         return mb_substr($segment,0,$this->lengthToTruncateSegmentsToSort,'utf-8');
     }
-
+    /**
+     * @param $name
+     * @param $value
+     */
     public function setField($name, $value)
     {
         $this->_segmentdata[$name]['original'] = $value;
         $this->_segmentdata[$name]['originalMd5'] = md5($value);
         $this->_segmentdata[$name]['originalToSort'] = $this->_truncateSegmentsToSort($value);
     }
-
+    /**
+     * @param $name
+     * @param $value
+     */
     public function setFieldEdited($name, $value)
     {
         $this->_segmentdata[$name]['edited'] = $value;
         $this->_segmentdata[$name]['editedMd5'] = md5($value);
         $this->_segmentdata[$name]['editedToSort'] = $this->_truncateSegmentsToSort($value);
     }
-
+    /**
+     * @param $name
+     * @return mixed
+     */
     public function getField($name)
     {
         return $this->_segmentdata[$name]['original'];
     }
-
+    /**
+     * @param $name
+     * @return mixed
+     */
     public function getFieldMd5($name)
     {
         return $this->_segmentdata[$name]['originalMd5'];
     }
+    /**
+     * @param $name
+     * @return mixed
+     */
     public function getFieldToSort($name)
     {
         return $this->_segmentdata[$name]['originalToSort'];
     }
-
-
+    /**
+     * @param $name
+     * @return mixed
+     */
     public function getFieldEdited($name)
     {
         return $this->_segmentdata[$name]['edited'];
     }
-
+    /**
+     * @param $name
+     * @return mixed
+     */
     public function getFieldEditedMd5($name)
     {
         return $this->_segmentdata[$name]['editedMd5'];
     }
-
+    /**
+     * @param $name
+     * @return mixed
+     */
     public function getFieldEditedToSort($name)
     {
         return $this->_segmentdata[$name]['editedToSort'];
     }
-
-
-
-
-
+    /**
+     * @param $TaskGuid
+     */
     protected function initField($TaskGuid)
     {
         $segmentfield = new editor_Models_Segmentfield();
         $this->_segmentfield = $segmentfield->loadBytaskGuid($TaskGuid);
     }
-
+    /**
+     * @param $TaskGuid
+     */
     protected function initData($TaskGuid)
     {
         $segmentdata = new editor_Models_Segmentdata();
         $this->_segmentdata = $segmentdata->loadBytaskGuid($TaskGuid);
 
     }
-
+    /**
+     * @param $TaskGuid
+     */
     protected function initHistoryData($TaskGuid)
     {
         $segmentdata = new editor_Models_SegmentHistoryData();
         $this->_segmentdata = $segmentdata->loadByuserGuid($TaskGuid);
     }
+
     /**
      * erzeugt ein neues, ungespeichertes SegmentHistory Entity
      * @return editor_Models_SegmentHistory
@@ -299,8 +338,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     public function loadByTaskGuid($taskguid, $loadSourceEdited = false) {
         $this->initDefaultSort();
 
-        $this->initData($taskguid);
-        exit;
+//        $this->initData($taskguid);
+//        exit;
 
         $s = $this->db->select(false);
         $db = $this->db;
