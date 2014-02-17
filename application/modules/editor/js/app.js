@@ -147,6 +147,7 @@ Ext.application({
       }
       readonly = (readonly === true || task.isReadOnly());
       Editor.data.task = task;
+      Editor.model.Segment.redefine(task.segmentFields());
       if(me.viewport){
           me.viewport.destroy();
           me.fireEvent('adminViewportClosed');
