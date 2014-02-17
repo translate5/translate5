@@ -13,6 +13,10 @@ class editor_Models_Segmentdata extends ZfExtended_Models_Entity_Abstract {
         $s = $this->db->select()
             ->where('taskGuid = ?', $taskGuid)
             ->order('id ASC');
-        return $this->db->getAdapter()->fetchAll($s);
+        $data = $this->db->getAdapter()->fetchAll($s);
+        foreach($data as $kex=>$value){
+            $dataAssoc[$value['name']] = $value;
+        }
+        return $dataAssoc;
     }
 } 

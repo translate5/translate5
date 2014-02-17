@@ -55,15 +55,38 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
 
     protected $dbInstanceClass = 'editor_Models_Db_Segments';
     protected $validatorInstanceClass = 'editor_Models_Validator_Segment';
-
-    protected $_segmentfield = array();
-    protected $_segmentdata = array();
-
     /**
      *
      * @var type Zend_Config
      */
     protected $config = null;
+
+    protected $_segmentfield = array();
+    protected $_segmentdata = array();
+
+    public function setField($name, $value){}
+    public function getField($name){}
+    public function setFieldEditable($name, $value){}
+    public function getFieldEditable($name){}
+    public function getFieldSort($name){}
+    public function getFieldMd5($name){}
+
+    public function setSource(){}
+    public function setTarget(){}
+    public function setRelais(){}
+    public function setEditor(){}
+    public function setSourceEdited(){}
+
+    public function getSource(){}
+    public function getTarget(){}
+    public function getRelais(){}
+    public function getEditor(){}
+    public function getSourceEdited(){}
+
+    public function setFieldMd5($name)
+    {
+        $this->_segmentfield[$name];
+    }
 
     protected function initField($TaskGuid)
     {
