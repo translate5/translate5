@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `LEK_segment_data` (
   `name` varchar(300) NOT NULL,
   `segmentId` int(11) NOT NULL,
   `mid` varchar(1000) DEFAULT NULL,
-  `origina` longtext NOT NULL,
+  `original` longtext NOT NULL,
   `originalMd5` varchar(32) NOT NULL,
   `originalToSort` varchar(300) DEFAULT NULL,
   `edited` longtext,
