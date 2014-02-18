@@ -79,7 +79,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     {
         $session = new Zend_Session_Namespace();
         $this->lengthToTruncateSegmentsToSort = $session->runtimeOptions->lengthToTruncateSegmentsToSort;
-        parent::__construct();
+        $this->db = ZfExtended_Factory::get($this->dbInstanceClass, array(array(), "data_" . md5($session->taskGuid)));
+//        parent::__construct();
     }
     /**
      * @param $segment
@@ -165,7 +166,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     protected function initField($TaskGuid)
     {
-        $segmentfield = new editor_Models_SegmentFieldv();
+        $segmentfield = new editor_Models_SegmentField();
         $this->_segmentfield = $segmentfield->loadBytaskGuid($TaskGuid);
     }
     /**
@@ -204,7 +205,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * check the given fields against the really available fields for this task.
      */
-    public function setFieldContents(editor_Models_SegmentFieldv $field)
+    public function setFieldContents(editor_Models_SegmentField $field)
     {
         return;
     }
