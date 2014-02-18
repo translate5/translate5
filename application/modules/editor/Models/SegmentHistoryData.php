@@ -44,11 +44,14 @@ END LICENSE AND COPYRIGHT
 class editor_Models_SegmentHistoryData  extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_SegmentsHistoryData';
 
-    public function loadByuserGuid($userGuid)
-    {
+    public function loadBySegmentID($segmentHistoryId) {
         $s = $this->db->select()
-            ->where('userGuid = ?', $userGuid)
+            ->where('segmentHistoryId = ?', $segmentHistoryId)
             ->order('id ASC');
-        return $this->db->getAdapter()->fetchAll($s);
+        $data = $this->db->getAdapter()->fetchAll($s);
+        foreach($data as $value){
+            $dataAssoc[$value['name']] = $value;
+        }
+        return $dataAssoc;
     }
-} 
+}
