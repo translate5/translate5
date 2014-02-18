@@ -221,9 +221,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     public function loadByTaskGuid($taskguid, $loadSourceEdited = false) {
         $this->initDefaultSort();
-
-//        $this->initData($taskguid);
-//        exit;
+        $this->initData($taskguid);
 
         $s = $this->db->select(false);
         $db = $this->db;
