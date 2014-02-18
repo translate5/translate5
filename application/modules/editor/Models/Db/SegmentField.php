@@ -6,7 +6,7 @@
  * Time: 10:17 AM
  */
 
-class editor_Models_Db_Segmentfield  extends Zend_Db_Table_Abstract {
+class editor_Models_Db_SegmentField  extends Zend_Db_Table_Abstract {
     protected $_name    = 'LEK_segment_field';
     public $_primary = 'id';
 } 

@@ -6,8 +6,8 @@
  * Time: 10:16 AM
  */
 
-class editor_Models_Segmentfield extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = 'editor_Models_Db_Segmentfield';
+class editor_Models_SegmentFieldv extends ZfExtended_Models_Entity_Abstract {
+    protected $dbInstanceClass = 'editor_Models_Db_SegmentField';
 
     public function loadBytaskGuid($taskGuid) {
         $s = $this->db->select()
