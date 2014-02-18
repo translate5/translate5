@@ -26,18 +26,13 @@ SET time_zone = "+00:00";
 -- Table structure for table `LEK_segment_history_data`
 --
 
+
 CREATE TABLE IF NOT EXISTS `LEK_segment_history_data` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `taskGuid` varchar(38) NOT NULL,
   `name` varchar(300) NOT NULL,
-  `segmentId` int(11) NOT NULL,
-  `mid` varchar(1000) DEFAULT NULL,
-  `origina` longtext NOT NULL,
-  `originalMd5` varchar(32) NOT NULL,
-  `originalToSort` varchar(300) DEFAULT NULL,
+  `segmentHistoryId` int(11) NOT NULL,
   `edited` longtext,
-  `editedMd5` varchar(32) NOT NULL,
-  `editedToSort` varchar(300) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `taskGuid` (`taskGuid`)
 ) ENGINE=InnoDB;
