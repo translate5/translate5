@@ -157,6 +157,7 @@ Ext.define('Editor.view.segments.Grid', {
             
             columns.push({
                 xtype: 'contentColumn',
+                segmentField: rec,
                 fieldName: name,
                 isErgonomicVisible: isErgoVisible && !editable,
                 isErgonomicSetWidth: true, //currently true for all our affected default fields
@@ -166,6 +167,7 @@ Ext.define('Editor.view.segments.Grid', {
             if(editable){
                 columns.push({
                     xtype: 'contentEditableColumn',
+                    segmentField: rec,
                     fieldName: name,
                     isErgonomicVisible: isErgoVisible,
                     isErgonomicSetWidth: true, //currently true for all our affected default fields
@@ -178,23 +180,18 @@ Ext.define('Editor.view.segments.Grid', {
         /*
         itemId: 'sourceColumn',
         dataIndex: 'source',
-        tdCls: 'source-field segment-tag-column',
         
         itemId: 'sourceEditorColumn',  → changes to sourceEditColumn
         dataIndex: 'sourceEdited', → changes to sourceEdit
-        tdCls: 'source-edited-field segment-tag-column',  → first part changes to source-edit-field
         
         itemId: 'relaisColumn'
         dataIndex: 'relais',
-        tdCls: 'relais-field segment-tag-column',
         
         itemId: 'editorColumn', → targetEditColumn
         dataIndex: 'edited', → targetEdit
-        tdCls: 'target-edited-field segment-tag-column', → first part changes to target-edit-field
 
         itemId: 'targetColumn'
         dataIndex: 'target',
-        tdCls: 'target-field segment-tag-column',
         */
         
         //if(Editor.data.task.get('enableSourceEditing')){ FIXME enableSourceEditing is not needed in JS anymore?? but in PHP it should set the source editable to true! 
