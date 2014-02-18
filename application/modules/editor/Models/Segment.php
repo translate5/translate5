@@ -165,7 +165,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     protected function initField($TaskGuid)
     {
-        $segmentfield = new editor_Models_Segmentfield();
+        $segmentfield = new editor_Models_SegmentFieldv();
         $this->_segmentfield = $segmentfield->loadBytaskGuid($TaskGuid);
     }
     /**
@@ -173,7 +173,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     protected function initData($TaskGuid)
     {
-        $segmentdata = new editor_Models_Segmentdata();
+        $segmentdata = new editor_Models_SegmentData();
         $this->_segmentdata = $segmentdata->loadBytaskGuid($TaskGuid);
 
     }
@@ -204,7 +204,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * check the given fields against the really available fields for this task.
      */
-    public function setFieldContents(editor_Models_Segmentfield $field)
+    public function setFieldContents(editor_Models_SegmentFieldv $field)
     {
         return;
     }

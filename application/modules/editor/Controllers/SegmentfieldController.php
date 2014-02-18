@@ -10,7 +10,7 @@ class Editor_SegmentfieldController extends editor_Controllers_EditorrestControl
     /**
      * @var string
      */
-    protected $entityClass = 'editor_Models_Segmentfield';
+    protected $entityClass = 'editor_Models_SegmentFieldv';
     /**
      * @var int
      */
