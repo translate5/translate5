@@ -36,7 +36,7 @@
 insert into LEK_segment_data
   (taskGuid, name, segmentId, mid, original, originalMd5, originalToSort, edited, editedMd5, editedToSort)
 select
-  taskGuid, 'source', id, mid, source, sourceMd5, sourceToSort, edited, MD5(edited), editedToSort
+  taskGuid, 'source', id, mid, source, sourceMd5, sourceToSort, sourceEdited, MD5(sourceEdited), sourceEditedToSort
 from LEK_segments;
 
 insert into LEK_segment_field
