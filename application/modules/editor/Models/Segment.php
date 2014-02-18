@@ -79,6 +79,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     {
         $session = new Zend_Session_Namespace();
         $this->lengthToTruncateSegmentsToSort = $session->runtimeOptions->lengthToTruncateSegmentsToSort;
+        parent::__construct();
     }
     /**
      * @param $segment
