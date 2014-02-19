@@ -35,12 +35,8 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Created by PhpStorm.
- * User: kkolesnikov
- * Date: 2/12/14
- * Time: 5:20 PM
+ * Entity Model for History Data Entries
  */
-
 class editor_Models_SegmentHistoryData  extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_SegmentsHistoryData';
 

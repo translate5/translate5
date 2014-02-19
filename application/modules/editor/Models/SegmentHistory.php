@@ -34,16 +34,8 @@ with legal support, if you are interested in this.
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-
 /**
- * Foldertree Object Instanz wie in der Applikation benötigt
- *
+ * SegmentHistory Entity Model
  */
 class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
 {

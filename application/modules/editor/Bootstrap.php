@@ -78,7 +78,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
     public function _initRestRoutes()
     {
         $restRoute = new Zend_Rest_Route($this->front, array(), array(
-            'editor' => array('file', 'segment', 'alikesegment', 'referencefile', 'qmstatistics', 'comment', 'task', 'user', 'taskuserassoc', 'segmentdata' ,'segmentfield'),
+            'editor' => array('file', 'segment', 'alikesegment', 'referencefile', 'qmstatistics', 'comment', 'task', 'user', 'taskuserassoc', 'segmentfield'),
         ));
         $this->front->getRouter()->addRoute('restDefault', $restRoute);
 
