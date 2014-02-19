@@ -50,11 +50,12 @@ class editor_Models_Db_Segments extends Zend_Db_Table_Abstract {
     public $_primary = 'id';
 
     /**
+     * @param array $config see Zend_Db_Table_Abstract::__construct
      * @param string $name the default table name, can be overwritten for dynamic view usage
      */
-    public function __construct($tableName = 'LEK_segments')
+    public function __construct(array $config = array(), $tableName = 'LEK_segments')
     {
         $this->_name = $tableName;
-        parent::__construct();
+        parent::__construct($config);
     }
 }
