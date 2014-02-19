@@ -33,6 +33,12 @@
 --  END LICENSE AND COPYRIGHT
 --  */
 
+insert into LEK_segment_field
+  (taskGuid, name, label, rankable, editable)
+select
+  taskGuid, 'source', 'Ausgangstext', 0, enableSourceEditing
+from LEK_task;
+
 insert into LEK_segment_data
   (taskGuid, name, segmentId, mid, original, originalMd5, originalToSort, edited, editedMd5, editedToSort)
 select
@@ -42,34 +48,25 @@ from LEK_segments;
 insert into LEK_segment_field
   (taskGuid, name, label, rankable, editable)
 select
-  LEK_segments.taskGuid, 'source', 'source', 0, enableSourceEditing
-from LEK_segments, LEK_task
-where LEK_task.taskGuid = LEK_segments.taskGuid;
-
+  taskGuid, 'target', 'Zieltext', 0, 1
+from LEK_task;
 
 insert into LEK_segment_data
-  (taskGuid, name, segmentId, mid, original, originalMd5, originalToSort)
+  (taskGuid, name, segmentId, mid, original, originalMd5, originalToSort, edited, editedMd5, editedToSort)
 select
-  taskGuid, 'target', id, mid, target, targetMd5, targetToSort
+  taskGuid, 'target', id, mid, target, targetMd5, targetToSort, edited, MD5(edited), editedToSort
 from LEK_segments;
 
 insert into LEK_segment_field
   (taskGuid, name, label, rankable, editable)
 select
-  taskGuid, 'target', 'target', 0, 1
-from LEK_segments;
-
+  LEK_task.taskGuid, 'relais', 'relais', 0, 0
+from LEK_task
+where LEK_task.relaisLang > 0;
 
 insert into LEK_segment_data
   (taskGuid, name, segmentId, mid, original, originalMd5, originalToSort)
 select
-  LEK_segments.taskGuid, 'relais', LEK_segments.id, mid, relais, relaisMd5, relaisToSort
-from LEK_segments, LEK_task
-where LEK_task.relaisLang > 0 and LEK_task.taskGuid = LEK_segments.taskGuid;
-
-insert into LEK_segment_field
-  (taskGuid, name, label, rankable, editable)
-select
-  LEK_segments.taskGuid, 'relais', 'relais', 0, 0
-from LEK_segments, LEK_task
-where LEK_task.relaisLang > 0 and LEK_task.taskGuid = LEK_segments.taskGuid;
+  s.taskGuid, 'relais', s.id, s.mid, s.relais, s.relaisMd5, s.relaisToSort
+from LEK_segments s, LEK_task t
+where t.relaisLang > 0 and t.taskGuid = s.taskGuid;
