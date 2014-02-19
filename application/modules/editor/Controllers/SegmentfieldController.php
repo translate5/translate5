@@ -10,7 +10,7 @@ class Editor_SegmentfieldController extends editor_Controllers_EditorrestControl
     /**
      * @var string
      */
-    protected $entityClass = 'editor_Models_SegmentFieldv';
+    protected $entityClass = 'editor_Models_SegmentField';
     /**
      * @var int
      */
@@ -22,25 +22,4 @@ class Editor_SegmentfieldController extends editor_Controllers_EditorrestControl
         $this->view->rows = $this->entity->loadBytaskGuid($session->taskGuid);
         $this->view->total = count($this->view->rows);
     }
-
-//    public function getAction()
-//    {
-//
-//    }
-//
-//    public function deleteAction()
-//    {
-//
-//    }
-//
-//    public function postAction()
-//    {
-//
-//    }
-//
-//    public function updateAction()
-//    {
-//
-//    }
-
 } 

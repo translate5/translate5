@@ -177,6 +177,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * FIXME Wird diese Methode überhaupt benötigt? Wenn ja, dann nur beim PUT und Import, zwecks Speichern der Änderungen.
+     * Dazu müssen auch die save and delete Methoden zwecks anderer DB Klasse angepasst werden. 
      * @param $TaskGuid
      */
     protected function initData($TaskGuid)

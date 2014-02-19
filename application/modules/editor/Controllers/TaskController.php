@@ -425,8 +425,9 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $row['lockingUsername'] = $this->getUsername($this->getUserinfo($row['lockingUser']));
         
-        //FIXME here load from segment_fields instead dummy file
-        $row['segmentFields'] = json_decode(file_get_contents(APPLICATION_PATH.'/../public//modules/editor/fieldsdummy.json'))->rows;
+        $fields = ZfExtended_Factory::get('editor_Models_SegmentField');
+        /* @var $fields editor_Models_SegmentField */
+        $row['segmentFields'] = $fields->loadByTaskGuid($taskguid);
     }
     
     /**

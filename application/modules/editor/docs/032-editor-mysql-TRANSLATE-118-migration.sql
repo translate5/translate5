@@ -34,33 +34,33 @@
 --  */
 
 insert into LEK_segment_field
-  (taskGuid, name, label, rankable, editable)
+  (taskGuid, name, `type`, `label`, rankable, editable)
 select
-  taskGuid, 'source', 'Ausgangstext', 0, enableSourceEditing
+  taskGuid, 'source', 'source', 'Ausgangstext', 0, enableSourceEditing
 from LEK_task;
 
 insert into LEK_segment_data
   (taskGuid, name, segmentId, mid, original, originalMd5, originalToSort, edited, editedMd5, editedToSort)
 select
-  taskGuid, 'source', id, mid, source, sourceMd5, sourceToSort, sourceEdited, MD5(sourceEdited), sourceEditedToSort
+  taskGuid, 'source', `id`, mid, `source`, sourceMd5, sourceToSort, sourceEdited, MD5(sourceEdited), sourceEditedToSort
 from LEK_segments;
 
 insert into LEK_segment_field
-  (taskGuid, name, label, rankable, editable)
+  (taskGuid, name, `type`, `label`, rankable, editable)
 select
-  taskGuid, 'target', 'Zieltext', 0, 1
+  taskGuid, 'target', 'target', 'Zieltext', 0, 1
 from LEK_task;
 
 insert into LEK_segment_data
   (taskGuid, name, segmentId, mid, original, originalMd5, originalToSort, edited, editedMd5, editedToSort)
 select
-  taskGuid, 'target', id, mid, target, targetMd5, targetToSort, edited, MD5(edited), editedToSort
+  taskGuid, 'target', `id`, mid, target, targetMd5, targetToSort, edited, MD5(edited), editedToSort
 from LEK_segments;
 
 insert into LEK_segment_field
-  (taskGuid, name, label, rankable, editable)
+  (taskGuid, name, `type`, `label`, rankable, editable)
 select
-  LEK_task.taskGuid, 'relais', 'relais', 0, 0
+  LEK_task.taskGuid, 'relais', 'relais', 'Relaissprache', 0, 0
 from LEK_task
 where LEK_task.relaisLang > 0;
 
