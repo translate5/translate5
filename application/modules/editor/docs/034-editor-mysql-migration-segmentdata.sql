@@ -36,37 +36,40 @@
 insert into LEK_segment_data
   (taskGuid, name, segmentId, mid, original, originalMd5, originalToSort, edited, editedMd5, editedToSort)
 select
-  taskGuid, 'source', id, mid, source, sourceMd5, sourceToSort, edited, MD5(edited), editedToSort
+  taskGuid, 'source', id, mid, source, sourceMd5, sourceToSort, sourceEdited, MD5(sourceEdited), sourceEditedToSort
 from LEK_segments;
 
-insert into LEK_segment_fields
+insert into LEK_segment_field
   (taskGuid, name, label, rankable, editable)
 select
-  taskGuid, 'source', 'source', 1, 1
+  LEK_segments.taskGuid, 'source', 'source', 0, enableSourceEditing
+from LEK_segments, LEK_task
+where LEK_task.taskGuid = LEK_segments.taskGuid;
+
+
+insert into LEK_segment_data
+  (taskGuid, name, segmentId, mid, original, originalMd5, originalToSort)
+select
+  taskGuid, 'target', id, mid, target, targetMd5, targetToSort
+from LEK_segments;
+
+insert into LEK_segment_field
+  (taskGuid, name, label, rankable, editable)
+select
+  taskGuid, 'target', 'target', 0, 1
 from LEK_segments;
 
 
 insert into LEK_segment_data
   (taskGuid, name, segmentId, mid, original, originalMd5, originalToSort)
 select
-  taskGuid, 'target', id, mid, source, targetMd5, targetToSort
-from LEK_segments;
+  LEK_segments.taskGuid, 'relais', LEK_segments.id, mid, relais, relaisMd5, relaisToSort
+from LEK_segments, LEK_task
+where LEK_task.relaisLang > 0 and LEK_task.taskGuid = LEK_segments.taskGuid;
 
-insert into LEK_segment_fields
-  (taskGuid, name, label)
+insert into LEK_segment_field
+  (taskGuid, name, label, rankable, editable)
 select
-  taskGuid, 'target', 'target'
-from LEK_segments;
-
-
-insert into LEK_segment_data
-  (taskGuid, name, segmentId, mid, original, originalMd5, originalToSort)
-select
-  taskGuid, 'relais', id, mid, source, targetMd5, targetToSort
-from LEK_segments;
-
-insert into LEK_segment_fields
-  (taskGuid, name, label, editable)
-select
-  taskGuid, 'relais', 'relais', 1
-from LEK_segments;
+  LEK_segments.taskGuid, 'relais', 'relais', 0, 0
+from LEK_segments, LEK_task
+where LEK_task.relaisLang > 0 and LEK_task.taskGuid = LEK_segments.taskGuid;
