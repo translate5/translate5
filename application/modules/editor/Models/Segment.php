@@ -80,7 +80,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     {
         $session = new Zend_Session_Namespace();
         $this->lengthToTruncateSegmentsToSort = $session->runtimeOptions->lengthToTruncateSegmentsToSort;
-        $segmentField = $this->initField($taskGuid);
+        $segmentField = $this->initField($session->taskGuid);
         $this->db = ZfExtended_Factory::get($this->dbInstanceClass, array(array(), $segmentField->getDataViewName($session->taskGuid)));
     }
     
