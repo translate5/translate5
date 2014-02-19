@@ -67,21 +67,23 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * @var array
      */
-    protected $_segmentfield    = array();
+    protected $_segmentfields    = array();
     /**
      * @var array
      */
     protected $_segmentdata     = array();
+    
     /**
-     *
+     * init the internal segment field and the DB object
      */
     public function __construct()
     {
         $session = new Zend_Session_Namespace();
         $this->lengthToTruncateSegmentsToSort = $session->runtimeOptions->lengthToTruncateSegmentsToSort;
-        $this->db = ZfExtended_Factory::get($this->dbInstanceClass, array(array(), "data_" . md5($session->taskGuid)));
-//        parent::__construct();
+        $segmentField = $this->initField($taskGuid);
+        $this->db = ZfExtended_Factory::get($this->dbInstanceClass, array(array(), $segmentField->getDataViewName($session->taskGuid)));
     }
+    
     /**
      * @param $segment
      * @return string
@@ -161,14 +163,19 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     {
         return $this->_segmentdata[$name]['editedToSort'];
     }
+    
     /**
-     * @param $TaskGuid
+     * initiates the task specific segment fields
+     * @param $taskGuid
+     * @return editor_Models_SegmentField for reusage
      */
-    protected function initField($TaskGuid)
+    protected function initField($taskGuid)
     {
         $segmentfield = new editor_Models_SegmentField();
-        $this->_segmentfield = $segmentfield->loadBytaskGuid($TaskGuid);
+        $this->_segmentfields = $segmentfield->loadBytaskGuid($taskGuid);
+        return $segmentfield;
     }
+    
     /**
      * @param $TaskGuid
      */

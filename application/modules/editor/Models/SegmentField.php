@@ -6,15 +6,29 @@
  * Time: 10:16 AM
  */
 
-class editor_Models_SegmentFieldv extends ZfExtended_Models_Entity_Abstract {
+class editor_Models_SegmentField extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_SegmentField';
 
-    public function loadBytaskGuid($taskGuid) {
+    /**
+     * @param string $taskGuid
+     * @return array
+     */
+    public function loadByTaskGuid($taskGuid) {
         $s = $this->db->select()
             ->where('taskGuid = ?', $taskGuid)
             ->order('id ASC');
         return $this->db->getAdapter()->fetchAll($s);
     }
+    
+    /**
+     * creates the nam of the data view
+     * @param string $taskGuid
+     * @return string
+     */
+    public function getDataViewName($taskGuid) {
+        return "data_" . md5($taskGuid);
+    }
+    
     /**
      * create / update View
      * @param string $taskguid
@@ -31,18 +45,17 @@ class editor_Models_SegmentFieldv extends ZfExtended_Models_Entity_Abstract {
         $this->initField($taskguid);
         $this->initData($taskguid);
 
-        $sView_data_name         = "data_" . md5($taskguid);
+        $sView_data_name         = $this->getDataViewName($taskguid);
         $sView_segment_name      = "segment_" . md5($taskguid);
 
         $sStmt_drop_view_data       = "DROP VIEW IF EXISTS " . $sView_data_name;
         $sStmt_drop_view_segment    = "DROP VIEW IF EXISTS " . $sView_segment_name;
 
-
         $sStmt_create_view_data = "CREATE VIEW " . $sView_data_name . " AS ";
         $sStmt_create_view_data .= "
         SELECT
             LEK_segment_data.segmentId,
-            LEK_segment_data.origina,
+            LEK_segment_data.original,
             LEK_segment_data.originalMd5,
             LEK_segment_data.originalToSort,
             LEK_segment_data.edited,
@@ -53,10 +66,12 @@ class editor_Models_SegmentFieldv extends ZfExtended_Models_Entity_Abstract {
             LEK_segment_field.rankable,
             LEK_segment_field.editable,
              ";
-        foreach($this->_segmentdata as $value){
-            $sStmt_create_view_data .= "MAX(IF(LEK_segment_data.name = '".$value['name']."', edited, NULL)) AS '".$value['name']."',";
-        }
-        $sStmt_create_view_data = substr($sStmt_create_view_data, 0, (strlen($sStmt_create_view_data)-1));
+
+        $sStmt_create_view_data = join(',', array_map(function($value) {
+            $name = $this->db->getAdapter()->quote($value['name']);
+            return "MAX(IF(LEK_segment_data.name = '".$name."', edited, NULL)) AS '".$name."'";
+        }, $this->_segmentdata));
+        
         $sStmt_create_view_data .= " FROM LEK_segment_data
         JOIN LEK_segment_field
         ON LEK_segment_data.name = LEK_segment_field.name
@@ -103,12 +118,7 @@ class editor_Models_SegmentFieldv extends ZfExtended_Models_Entity_Abstract {
         $sStmt_create_view_data_history .= "
         SELECT
             LEK_segment_history_data.segmentId,
-            LEK_segment_history_data.origina,
-            LEK_segment_history_data.originalMd5,
-            LEK_segment_history_data.originalToSort,
             LEK_segment_history_data.edited,
-            LEK_segment_history_data.editedMd5,
-            LEK_segment_history_data.editedToSort,
              ";
         foreach($this->_segmentdata as $value){
             $sStmt_create_view_data_history .= "MAX(IF(LEK_segment_history_data.name = '".$value['name']."', edited, NULL)) AS '".$value['name']."',";
