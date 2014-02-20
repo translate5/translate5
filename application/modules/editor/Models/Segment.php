@@ -65,11 +65,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     protected $_lengthToTruncateSegmentsToSort = null;
     /**
-     * @var array
+     * @var editor_Models_SegmentFieldManager
      */
-    protected $_segmentfields    = array();
+    protected $segmentFieldManager = null;
     /**
-     * @var array
+     * @var [editor_Models_Db_SegmentDataRow]
      */
     protected $_segmentdata     = array();
     
@@ -80,8 +80,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     {
         $session = new Zend_Session_Namespace();
         $this->lengthToTruncateSegmentsToSort = $session->runtimeOptions->lengthToTruncateSegmentsToSort;
-        $segmentField = $this->initField($session->taskGuid);
-        $this->db = ZfExtended_Factory::get($this->dbInstanceClass, array(array(), $segmentField->getDataViewName($session->taskGuid)));
+        $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        parent::__construct();
     }
     
     /**
@@ -165,29 +165,42 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * initiates the task specific segment fields
-     * @param $taskGuid
-     * @return editor_Models_SegmentField for reusage
+     * loads the segment data hunks for this segment
+     * @param $segmentId
      */
-    protected function initField($taskGuid)
+    protected function initData($segmentId)
     {
-        $segmentfield = new editor_Models_SegmentField();
-        $this->_segmentfields = $segmentfield->loadBytaskGuid($taskGuid);
-        return $segmentfield;
+        $this->_segmentdata = array();
+        $db = ZfExtended_Factory::get('editor_Models_Db_SegmentData');
+        /* @var $db editor_Models_Db_SegmentData */
+        $s = $db->select()->where('segmentId = ?', $segmentId);
+        $datas = $db->fetchAll($s);
+        foreach($datas as $data) {
+            $this->_segmentdata[$data['name']] = $data;
+        }
+    }
+
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_Models_Entity_Abstract::__call()
+     * overwrite __call to catch setFIELDNAME calls and set the segment data instead
+     */
+    public function __call($name, $arguments) {
+        //FIXME implement me!
+        return parent::__call($name, $arguments);
     }
     
     /**
-     * FIXME Wird diese Methode überhaupt benötigt? Wenn ja, dann nur beim PUT und Import, zwecks Speichern der Änderungen.
-     * Dazu müssen auch die save and delete Methoden zwecks anderer DB Klasse angepasst werden. 
-     * @param $TaskGuid
+     * loads the Entity by Primary Key Id
+     * @param integer $id
+     * @return FIXME what returns?
      */
-    protected function initData($TaskGuid)
-    {
-        $segmentdata = new editor_Models_SegmentData();
-        $this->_segmentdata = $segmentdata->loadBytaskGuid($TaskGuid);
-
+    public function load($id) {
+        $row = parent::load($id);
+        $this->segmentFieldManager->initFields($this->getTaskGuid());
+        $this->initData($id);
+        return $row;
     }
-
 
     /**
      * erzeugt ein neues, ungespeichertes SegmentHistory Entity
@@ -209,29 +222,59 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         return parent::setQmId(trim($qmId, ';'));
     }
 
-
-
     /**
+     * gets the data from import, sets it into the data fields
      * check the given fields against the really available fields for this task.
+     * @param editor_Models_SegmentFieldManager $sfm
+     * @param array $segmentData
      */
-    public function setFieldContents(editor_Models_SegmentField $field)
-    {
-        return;
+    public function setFieldContents(editor_Models_SegmentFieldManager $sfm, array $segmentData) {
+        $db = ZfExtended_Factory::get('editor_Models_Db_SegmentData');
+        /* @var $db editor_Models_Db_SegmentData */
+        foreach($segmentData as $name => $data) {
+            $row = $db->createRow($data);
+            /* @var $row editor_Models_Db_SegmentDataRow */
+            $row->name = $name;
+            $field = $sfm->getByName($name);
+            $row->originalToSort = $this->_truncateSegmentsToSort($row->original);
+            $row->taskGuid = $this->getTaskGuid();
+            $row->mid = $this->getMid();
+            if($field->editable) {
+                $row->edited = $row->original;
+                $row->editedMd5 = $row->originalMd5;
+                $row->editedToSort = $row->originalToSort;
+            }
+            /* @var $row editor_Models_Db_SegmentDataRow */
+            $this->_segmentdata[] = $row;
+        }
+    }
+    
+    /**
+     * save the segment and the associated segmentd data hunks
+     * (non-PHPdoc)
+     * @see ZfExtended_Models_Entity_Abstract::save()
+     */
+    public function save() {
+        $segmentId = parent::save();
+        foreach($this->_segmentdata as $data) {
+            /* @var $data editor_Models_Db_SegmentDataRow */
+            if(empty($data->segmentId)) {
+                $data->segmentId = $segmentId;
+            }
+            error_log(print_r($data,1));
+            $data->save();
+        }
     }
 
-
-    public function addFields()
-    {
-        return;
-    }
     /**
      * Load segments by taskguid. Second Parameter decides if SourceEdited column should be provided
      * @param string $taskguid
      * @param boolean $loadSourceEdited
      */
     public function loadByTaskGuid($taskguid, $loadSourceEdited = false) {
+        $this->db = ZfExtended_Factory::get($this->dbInstanceClass, array(array(), $this->segmentFieldManager->getDataViewName($taskguid)));
+        
         $this->initDefaultSort();
-        $this->initData($taskguid);
 
         $s = $this->db->select(false);
         $db = $this->db;

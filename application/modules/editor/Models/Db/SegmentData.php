@@ -39,4 +39,9 @@
 class editor_Models_Db_SegmentData extends Zend_Db_Table_Abstract {
     protected $_name    = 'LEK_segment_data';
     public $_primary = 'id';
+    /**
+     * Own row Class
+     * @var string
+     */
+    protected $_rowClass = 'Zend_Db_Table_Row';
 }

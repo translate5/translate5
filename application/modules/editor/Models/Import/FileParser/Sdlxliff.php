@@ -470,6 +470,7 @@ Das Leerzeichen (U+0020)
      *         wobei die id die ID des Segments in der Tabelle Segments darstellt
      */
     protected function extractSegment($transUnit) {
+        $this->segmentData = array();
         //extrahiere das Zielsegment
         $targetExp = explode('<target', $transUnit);
         $targetExp[1] = explode('</target>', $targetExp[1]);
@@ -502,22 +503,33 @@ Das Leerzeichen (U+0020)
             //extrahiere das sourcesegment
             $sourceExp[1][0][$i] = explode('</mrk>', $sourceExp[1][0][$i]);
             array_pop($sourceExp[1][0][$i]);
-            $this->_sourceOrig = implode('</mrk>', $sourceExp[1][0][$i]);
-            $this->_source = $this->parseSegment($this->_sourceOrig,true);
+            $sourceOrig = implode('</mrk>', $sourceExp[1][0][$i]);
+            
+            $this->segmentData[$this->segmentFieldManager->getFirstSourceName()] = array(
+                     'original' => $this->parseSegment($sourceOrig,true),
+                     'originalMd5' => md5($sourceOrig)
+            );
 
             //extrahiere das targetsegment
             $targetExp[1][0][$i] = explode('</mrk>', $targetExp[1][0][$i]);
             //falls das Zielsegment eine Übersetzung enthält
+            $targetName = $this->segmentFieldManager->getFirstTargetName();
             if ($targetExp[1][0][$i]>1) {
                 $afterTargetTag = array_pop($targetExp[1][0][$i]);
-                $this->_targetOrig = implode('</mrk>', $targetExp[1][0][$i]);
-                $this->_target = $this->parseSegment($this->_targetOrig,false);
+                $targetOrig = implode('</mrk>', $targetExp[1][0][$i]);
+                $this->segmentData[$targetName] = array(
+                     'original' => $this->parseSegment($targetOrig,false),
+                     'originalMd5' => md5($targetOrig)
+                );
+                
                 $segmentId = $this->setAndSaveSegmentValues();
                 $targetExp[1][0][$i] = '<lekTargetSeg id="' . $segmentId .
                         '"/></mrk>' . $afterTargetTag;
             } else {
-                $this->_targetOrig = NULL;
-                $this->_target = NULL;
+                $this->segmentData[$targetName] = array(
+                     'original' => NULL,
+                     'originalMd5' => NULL
+                );
                 $segmentId = $this->setAndSaveSegmentValues();
                 $targetExp[1][0][$i] = '<lekTargetSeg id="' . $segmentId .
                         '"/></mrk>' . $targetExp[1][0][$i][0];

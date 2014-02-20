@@ -70,3 +70,17 @@ select
   s.taskGuid, 'relais', s.id, s.mid, s.relais, s.relaisMd5, s.relaisToSort
 from LEK_segments s, LEK_task t
 where t.relaisLang > 0 and t.taskGuid = s.taskGuid;
+
+alter table LEK_segments drop column `source`;
+alter table LEK_segments drop column sourceToSort;
+alter table LEK_segments drop column sourceMd5;
+alter table LEK_segments drop column targetMd5;
+alter table LEK_segments drop column target;
+alter table LEK_segments drop column targetToSort;
+alter table LEK_segments drop column edited;
+alter table LEK_segments drop column editedToSort;
+alter table LEK_segments drop column relais;
+alter table LEK_segments drop column relaisToSort;
+alter table LEK_segments drop column relaisMd5;
+alter table LEK_segments drop column sourceEdited;
+alter table LEK_segments drop column sourceEditedToSort;

@@ -33,38 +33,22 @@
  
  END LICENSE AND COPYRIGHT 
  */
-
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
-
 /**
- * Stellt Methoden zur Verarbeitung der vom Parser ermittelteten Segment Daten bereit
- * speichert die ermittelten Segment Daten in die Relais Spalte des entsprechenden Segments 
+ * DB Row Model for segment data fields
+ * provides the available data fields for convenience
  */
-class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_SegmentProcessor {
-    public function process(editor_Models_Import_FileParser $parser){
-        //FIXME ensure that segment field "relais" is added
-        $data = array(
-            //FIXME rework this methods!
-            'relais' => $parser->getTarget(),
-            'relaisMd5' => md5($parser->getTargetOrig()),
-            'relaisToSort' => $this->truncateSegmentsToSort($parser->getTarget()),
-        );
-        
-        /* @var $table editor_Models_Db_Segments */
-        $table = ZfExtended_Factory::get('editor_Models_Db_Segments');
-        $adapter = $table->getAdapter();
-        
-        $where = array();
-        $where[] = $adapter->quoteInto('taskGuid = ?', $this->taskGuid);
-        $where[] = $adapter->quoteInto('fileId = ?', $this->fileId);
-        $where[] = $adapter->quoteInto('mid = ?', $parser->getMid());
-        
-        $table->update($data, $where);
-        
-    	return 0; //0 als dummy Rückgabe OK, da Wert nur für den Export gesammelt wird, ansonsten müsste es die DB SegmentId sein
-    }    
+class editor_Models_Db_SegmentDataRow extends Zend_Db_Table_Row_Abstract {
+    /**
+     * @property mixed $id id auto inc id of this segment data row item
+     * @property mixed $taskGuid taskGuid of this segment
+     * @property mixed $name name of this segment field (mapping to segment field)
+     * @property mixed $segmentId segmentId segment id of this data row (mapping to segment)
+     * @property mixed $mid mid of the segment
+     * @property mixed $original original readonly segment content
+     * @property mixed $originalMd5 originalMd5 md5 hash of the original unparsed content
+     * @property mixed $originalToSort originalToSort shortened original content for sorting
+     * @property mixed $edited edited user edited content
+     * @property mixed $editedMd5 editedMd5 md5 hash of the edited content (FIXME with tags and qm tags this is nonsense! No alike would be found because of different ids in the tags)
+     * @property mixed $editedToSort editedToSort shortened user edited content for sorting
+     */
 }

@@ -124,6 +124,18 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         }
         $this->_skeletonFile = implode('', $file);//liinebreaks are added by extractSegment
     }
+    
+    /**
+     * (non-PHPdoc)
+     * @see editor_Models_Import_FileParser::initDefaultSegmentFields()
+     * 
+     * for CSV we need only source, target(s) is/are given by CSV
+     */
+    protected function initDefaultSegmentFields() {
+        $sfm = $this->segmentFieldManager;
+        $sfm->addField($sfm::LABEL_SOURCE, editor_Models_SegmentField::TYPE_SOURCE);
+    }
+    
     /**
      * extracts the segment and saves them to db
      *

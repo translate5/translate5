@@ -85,7 +85,8 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
     // TODO rebuild method process, so that instead filling all segment fields manually, the segment setFieldContents method is used
 
     public function process(editor_Models_Import_FileParser $parser){
-        $seg = ZfExtended_Factory::get('ZfExtended_Models_Entity',array('editor_Models_Db_Segments',array()));
+        $seg = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $seg editor_Models_Segment */
         //statische, Task spezifische Daten zum Segment
         $seg->setUserGuid($this->userGuid);
         $seg->setUserName($this->userName);
@@ -99,27 +100,31 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
         $seg->setEditable($parser->getEditable());
         $seg->setAutoStateId($parser->getAutoStateId());
         $seg->setPretrans($parser->getPretrans());
+
+//FIXME remove comments
+//$srcToSort = $this->truncateSegmentsToSort($parser->getSource());
         
-        $srcToSort = $this->truncateSegmentsToSort($parser->getSource());
-        $seg->setSource($parser->getSource()); 
-        $seg->setSourceToSort($srcToSort);
-        $seg->setSourceMd5(md5($parser->getSourceOrig()));
+        
+//$seg->setSource($parser->getSource()); 
+//$seg->setSourceToSort($srcToSort);
+//$seg->setSourceMd5(md5($parser->getSourceOrig()));
         
         $this->segmentNrInTask++;
         $seg->setSegmentNrInTask($this->segmentNrInTask);
+        $seg->setFieldContents($parser->getSegmentFieldManager(), $parser->getFieldContents());
         
-        if($this->taskConf->enableSourceEditing) {
-            $seg->setSourceEdited($parser->getSource()); 
-            $seg->setSourceEditedToSort($srcToSort);
-        }
+//if($this->taskConf->enableSourceEditing) {
+//    $seg->setSourceEdited($parser->getSource()); 
+//    $seg->setSourceEditedToSort($srcToSort);
+//}
         
-        $seg->setTarget($parser->getTarget());
-        $seg->setTargetMd5(md5($parser->getTargetOrig()));
+//$seg->setTarget($parser->getTarget());
+//$seg->setTargetMd5(md5($parser->getTargetOrig()));
         
-        $targetToSort = $this->truncateSegmentsToSort($parser->getTarget());
-        $seg->setTargetToSort($targetToSort);
-        $seg->setEdited($parser->getTarget());
-        $seg->setEditedToSort($targetToSort);
+//$targetToSort = $this->truncateSegmentsToSort($parser->getTarget());
+//$seg->setTargetToSort($targetToSort);
+//$seg->setEdited($parser->getTarget());
+//$seg->setEditedToSort($targetToSort);
         $segmentId = $seg->save();
         $this->saveTerms2Db($parser->getAndCleanTerms(), $segmentId);
         return $segmentId; 

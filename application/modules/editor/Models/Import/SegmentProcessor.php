@@ -98,7 +98,7 @@ abstract class editor_Models_Import_SegmentProcessor {
     
     /**
      * Verarbeitet ein einzelnes Segment und gibt die ermittelte SegmentId zurück
-     * @return integer 
+     * @return integer MUST return the segmentId
      */
     abstract public function process(editor_Models_Import_FileParser $parser);
     

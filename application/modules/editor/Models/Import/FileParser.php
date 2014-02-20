@@ -40,11 +40,11 @@
  * @version 1.0
  *
 
-  /**
- * Enthält Methoden zum Fileparsing für den Import
- *
+/**
+ * Contains Methods for Fileparsing on the Import
+ * 
+ * - Child Classes must implement and use the abstract methods
  */
-
 abstract class editor_Models_Import_FileParser {
     /**
      * @var string
@@ -62,22 +62,13 @@ abstract class editor_Models_Import_FileParser {
      * @var integer
      */
     protected $_fileId = NULL;
+    
     /**
-     * @var string aktuell geparstes source-Segment
+     * array containing all segment data parsed
+     * @var [array] 2D array, first level has keys which map to the segment field names. Second Level array must be compliant to editor_Models_Db_SegmentDataRow
      */
-    protected $_source = NULL;
-    /**
-     * @var string aktuell geparstes source-Segment, wie es ursprünglich in der geparsten Datei enthalten war
-     */
-    protected $_sourceOrig = NULL;
-    /**
-     * @var string aktuell geparstes target-Segment
-     */
-    protected $_target = NULL;
-    /**
-     * @var string aktuell geparstes target-Segment, wie es ursprünglich in der geparsten Datei enthalten war
-     */
-    protected $_targetOrig = NULL;
+    protected $segmentData = array();
+    
     /**
      * @var string mid des aktuellen Segments
      */
@@ -171,10 +162,11 @@ abstract class editor_Models_Import_FileParser {
     protected $_taskGuid = NULL;
 
     /**
-     * Beinhaltet ein Objekt welches die beim Parsen ermittelten Segmentdaten verarbeitet
-     * @var editor_Models_Import_SegmentProcessor
+     * Contains a list of processors of the parsed segmentdata
+     * @var [editor_Models_Import_SegmentProcessor]
      */
-    protected $segmentProcessor = null;
+    protected $segmentProcessor = array();
+    
     /**
      * all files with extensions listet here are converted to utf8. For details see method convert2utf8
      * @var array
@@ -190,6 +182,11 @@ abstract class editor_Models_Import_FileParser {
      * @var editor_Models_SegmentAutoStates
      */
     protected $autoStates;
+    
+    /**
+     * @var editor_Models_SegmentFieldManager
+     */
+    protected $segmentFieldManager;
     
     /**
      * @param string $path pfad zur Datei in der Kodierung des Filesystems (also runtimeOptions.fileSystemEncoding)
@@ -210,6 +207,7 @@ abstract class editor_Models_Import_FileParser {
         $this->_rightTag = ZfExtended_Factory::get('editor_ImageTag_Right');
         $this->_singleTag = ZfExtended_Factory::get('editor_ImageTag_Single');
         $this->_editor_Models_Segment = ZfExtended_Factory::get('editor_Models_Segment');
+        $this->_editor_Models_Segment->setTaskGuid($taskGuid);
         $this->_sourceLang = $sourceLang;
         $this->_targetLang = $targetLang;
         $this->_taskGuid = $taskGuid;
@@ -217,8 +215,25 @@ abstract class editor_Models_Import_FileParser {
         $this->handleEncoding();
     }
     
-    public function setSegmentProcessor(editor_Models_Import_SegmentProcessor $proc){
-        $this->segmentProcessor = $proc;
+    public function addSegmentProcessor(editor_Models_Import_SegmentProcessor $proc){
+        $this->segmentProcessor[] = $proc;
+    }
+    
+    /**
+     * set the shared instance of the segmentFieldManager
+     * @param $sfm editor_Models_SegmentFieldManager
+     */
+    public function setSegmentFieldManager(editor_Models_SegmentFieldManager $sfm) {
+        $this->segmentFieldManager = $sfm;
+        $this->initDefaultSegmentFields();
+    }
+    
+    /**
+     * returns the internally used SegmentFieldManager
+     * @return editor_Models_SegmentFieldManager
+     */
+    public function getSegmentFieldManager() {
+        return $this->segmentFieldManager;
     }
     
     /**
@@ -247,14 +262,27 @@ abstract class editor_Models_Import_FileParser {
      *
      */
     abstract protected function parse();
+
+    /**
+     * initiates the default fields source and target, should be overwritten if fields differ.
+     */
+    protected function initDefaultSegmentFields() {
+        $sfm = $this->segmentFieldManager;
+        $sfm->addField($sfm::LABEL_SOURCE, editor_Models_SegmentField::TYPE_SOURCE);
+        $sfm->addField($sfm::LABEL_TARGET, editor_Models_SegmentField::TYPE_TARGET);
+    }
     
     /**
      * Does the fileparsing
      */
     public function parseFile() {
-        $this->segmentProcessor->preParseHandler($this);
+        foreach($this->segmentProcessor as $p) {
+            $p->preParseHandler($this);
+        }
         $this->parse();
-        $this->segmentProcessor->postParseHandler($this);
+        foreach($this->segmentProcessor as $p) {
+            $p->postParseHandler($this);
+        }
     }
     
     /**
@@ -265,7 +293,10 @@ abstract class editor_Models_Import_FileParser {
      */
     protected function setAndSaveSegmentValues(){
         $this->calculateLocalSegmentAttribs();
-        return $this->segmentProcessor->process($this);
+        foreach($this->segmentProcessor as $p) {
+            $result = $p->process($this);
+        }
+        return $result; //since all process methods has to return the segmentId, we can take the last one
     }
 
     /**
@@ -338,18 +369,33 @@ abstract class editor_Models_Import_FileParser {
      * calculates and sets segment attributes needed by us, this info doesnt exist directly in the segment. 
      * These are currently: pretransSegment, editSegment, autoStateId
      * Parameters are given by the current segment
-     * 
-     * $this->_target and $this->_source must be defined already!
      */
     protected function calculateLocalSegmentAttribs() {
         $matchRate = $this->_matchRateSegment[$this->_mid];
         $isAutoprop = $this->_autopropagated[$this->_mid];
         $isFullMatch = ($matchRate === 100);
         $isEditable  = !$isFullMatch || $this->_edit100PercentMatches || $isAutoprop;
-        $isTranslated = !empty($this->_target);
+        $isTranslated = $this->isTranslated();
         $this->_editSegment[$this->_mid] = $isEditable;
         $this->_pretransSegment[$this->_mid] = $isFullMatch && !$isAutoprop;
         $this->_autoStateId[$this->_mid] = $this->autoStates->calculateImportState($isEditable, $isTranslated);
+    }
+    
+    /**
+     * FIXME test me → use our test data for single targets, construct CSV test data for multicolumns!
+     * returns true if at least one target has a translation set
+     */
+    protected function isTranslated() {
+        foreach($this->segmentData as $name => $data) {
+            $field = $this->segmentFieldManager->getByName($name);
+            if($field->type !== 'target') {
+                continue;
+            }
+            if(!empty($data['original'])) {
+                return true;
+            }
+        }
+        return false;
     }
     
     /**
@@ -423,30 +469,9 @@ abstract class editor_Models_Import_FileParser {
     }
 
     /**
-     * Gibt den Source String des Segments zurück
+     * returns an array with alle parsed data fields
      */
-    public function getSource() {
-        return $this->_source;
-    }
-    
-    /**
-     * Gibt den Source Orig String des Segments zurück
-     */
-    public function getSourceOrig() {
-        return $this->_sourceOrig;
-    }
-    
-    /**
-     * Gibt den Target String des Segments zurück
-     */
-    public function getTarget() {
-        return $this->_target;
-    }
-    
-    /**
-     * Gibt den Targe Orig String des Segments zurück
-     */
-    public function getTargetOrig() {
-        return $this->_targetOrig;
+    public function getFieldContents() {
+        return $this->segmentData;
     }
 }
