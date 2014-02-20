@@ -62,8 +62,9 @@ Ext.define('Editor.view.segments.Grid', {
         'Editor.view.segments.column.Editable'
     ],
     alias: 'widget.segments.grid',
-    store: 'Segments',
     stateful: false,
+    
+    store: 'Segments',
   
     cls: 'segment-tag-viewer',
     id: 'segment-grid',
@@ -120,6 +121,10 @@ Ext.define('Editor.view.segments.Grid', {
             columns = [],
             fields = Editor.data.task.segmentFields();
         
+        this.store = Ext.create('Editor.store.Segments',{
+            storeId: 'Segments'
+        });
+        
         //befülle interne Hash Map mit QM und Status Werten:
         Ext.each(Editor.data.segments.stateFlags, function(item){
             me.stateData[item.id] = item.label;
@@ -154,6 +159,10 @@ Ext.define('Editor.view.segments.Grid', {
                 //FIXME first target is not always target, since in future target columns can be deactivated!
                 // → solution: loop over fiels and find first with /^target/.test(name);
                 isErgoVisible = (name == 'source' || name == 'target'); 
+            
+            //FIXME adapt this for T-118, logic was: 
+            //if Editor.view.segments.column.SourceEditable exists, 
+            //then Editor.view.segments.column.Source.prototype.isErgonomicVisible = false;
             
             columns.push({
                 xtype: 'contentColumn',
