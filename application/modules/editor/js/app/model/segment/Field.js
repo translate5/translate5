@@ -50,8 +50,12 @@ Ext.define('Editor.model.segment.Field', {
     {name: 'taskGuid', type: 'string'},
     {name: 'name', type: 'string'},
     {name: 'label', type: 'string'},
+    {name: 'type', type: 'string'},
     {name: 'rankable', type: 'boolean'},
     {name: 'editable', type: 'boolean'}
   ],
-  idProperty: 'id'
+  idProperty: 'id',
+  isTarget: function() {
+      return this.get('type') == 'target';
+  }
 });
