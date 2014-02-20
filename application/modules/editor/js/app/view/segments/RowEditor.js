@@ -52,7 +52,7 @@ Ext.define('Editor.view.segments.RowEditor', {
     
     //beinhaltet den gekürzten Inhalt des letzten geöffneteten Segments
     lastSegmentShortInfo: '',
-    columnToEdit: 'edited', //for source editing
+    columnToEdit: null, //for source editing
     previousRecord: null,
     messages: {
         segmentNotSavedUserMessage: 'Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank!',
@@ -135,6 +135,7 @@ Ext.define('Editor.view.segments.RowEditor', {
                 me.el.setY(y);
                 invalidateScroller();
             }
+            //FIXME hier ist der HTMLEditor gemeint
             me.mainEditor.setHeight(newHeight-6);
         }
         if (me.getWidth() != mainBodyWidth) {
@@ -148,7 +149,7 @@ Ext.define('Editor.view.segments.RowEditor', {
      * das Setzen der internen Referenz mainEditor kommmt hinzu.
      * @param column
      */
-   setField: function(column) {
+    setField: function(column) {
         var me = this,
             field;
 
@@ -173,12 +174,10 @@ Ext.define('Editor.view.segments.RowEditor', {
         });
         field.margins = '0 0 0 2';
         
-        //Dieses IF kommt hinzu  
-        if(column.dataIndex == 'targetEdit'){
+        //keeping reference of the mainEditor (= single HtmlEditor instance).
+        if(field instanceof Editor.view.segments.HtmlEditor){
+            me.lastEditedField = column.dataIndex; // initial set
             me.mainEditor = field;
-        }
-        else if(column.dataIndex == 'sourceEdit'){
-            me.sourceEditor = field;
         }
         
         field.setWidth(column.getDesiredWidth() - 2);
@@ -209,52 +208,68 @@ Ext.define('Editor.view.segments.RowEditor', {
         var me = this;
         me.callParent(new Array(record));
         me.setColumnToEdit(record);
-        me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit));
+        //FIXME den zu editierenden inhalt in den HTMLEditor laden
+        //me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit));
+        //FIXME aktuell gibt es keine content spalten!!!! daher der folgende dummy:
+        me.mainEditor.setValueAndMarkup("FOO");
         me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
     },
     
     /**
-     * Method Implements "Editable Source Column" 
-     * We may have only one Editor Instance in the App, for editing Source Column we have to swap the Editor Fields.
+     * Method Implements that we can have multiple editable columns, but only one HtmlEditor Instance 
+     * This is done by swaping the position of the different field editors
      * 
-     * Disable Feature by not including "sourceEditor" column in the grid
      * @param {Editor.model.Segment} record
      */
     setColumnToEdit: function(record) {
-        var me = this; 
-        if(! me.sourceEditor) {
-            return;
-        }
-        var showSourceEditor = me.isSourceEditing(me.context),
-        posMain = me.items.indexOf(me.mainEditor), 
-        posSrc = me.items.indexOf(me.sourceEditor), 
-        isOnSource = (me.columnToEdit == 'sourceEdit'),
-        posLeft, 
-        posRight,
-        vis,
-        toSwap;
+        var me = this,
+            firstTarget = Editor.view.segments.column.ContentEditable.firstTarget,
+            col = me.context.column, //clicked column
+            toEdit = me.context.field, //dataindex of clicked col
+            posMain, 
+            posSrc, 
+            posLeft, 
+            posRight,
+            vis;
         
-        if(showSourceEditor) {
-            me.columnToEdit = 'sourceEdit';
-            toSwap = 'targetEdit';
+        //if user clicked on a not content column open default dataindex (also if it is a content column but not editable)
+        if(!col.segmentField || !col.segmentField.get('editable')) {
+            toEdit = firstTarget;
         }
-        else {
-            me.columnToEdit = 'targetEdit';
-            toSwap = 'sourceEdit';
+        //if its the readonly column take the edit one
+        else if(col instanceof Editor.view.segments.column.Content) {
+            toEdit = col.dataIndex+'Edit';
         }
+        
+        if(!me.columnToEdit) {
+            console.log("firstTarget", firstTarget);
+            me.columnToEdit = firstTarget;
+        }
+        //return; raus wenn nur eine Spalte editable. Dann ists klar.
+        
         //enabling the following line, disables text editing in source column:
         //me.mainEditor.setReadOnly(showSourceEditor);
-        me.sourceEditor.setValue(record.get(toSwap));
-        if(isOnSource === showSourceEditor) {
+        
+        //FIXME for what is this line????
+        //me.swappedEditor.setValue(record.get(toSwap));
+        
+        //no swap if last edited column was the same
+        console.log(me.columnToEdit, toEdit);
+        if(me.columnToEdit === toEdit) {
             return;
         }
+        me.columnToEdit = toEdit;
+        me.swappedEditor = col.field;
         
         //swap visibility
         vis = me.mainEditor.isVisible();
-        me.mainEditor.setVisible(me.sourceEditor.isVisible());
-        me.sourceEditor.setVisible(vis);
+        me.mainEditor.setVisible(me.swappedEditor.isVisible());
+        me.swappedEditor.setVisible(vis);
         
         //swap position
+        posMain = me.items.indexOf(me.mainEditor);
+        posSrc = me.items.indexOf(me.swappedEditor); 
+
         if(posMain > posSrc) {
             posLeft = posSrc;
             posRight = posMain;
@@ -268,6 +283,7 @@ Ext.define('Editor.view.segments.RowEditor', {
     },
     
     /**
+     * FIXME
      * reusable method to get info if actual opened editor is source editing
      * @param {Object} context
      * @returns {Boolean}

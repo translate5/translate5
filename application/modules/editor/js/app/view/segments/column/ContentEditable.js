@@ -78,9 +78,6 @@ Ext.define('Editor.view.segments.column.ContentEditable', {
   },
   initComponent: function() {
   //disable ergo mode on source column
-  //FIXME adapt this for T-118, logic was: 
-  //if Editor.view.segments.column.SourceEditable exists, 
-  //then Editor.view.segments.column.Source.prototype.isErgonomicVisible = false;
     var me = this;
     me.initBaseMixin();
     me.callParent(arguments);
@@ -90,11 +87,18 @@ Ext.define('Editor.view.segments.column.ContentEditable', {
    * @returns {Editor.view.segments.HtmlEditor}
    */
   getEditor: function() {
-    if(!this.field){
-      this.field = new Editor.view.segments.HtmlEditor();
-      //FIXME we have only one Editor in the application, how to ensure this? Since our fieldnames are at least source and target we can check on targetEdit? → no because target can be not editable
-      //this.field = Ext.create('widget.displayfield',{fieldCls: 'x-form-display-field segment-tag-container'});
-    }
-    return this.field;
+      var me = this;
+      if(this.field){
+          return this.field;
+      }
+      //ensure that we have only one Editor in the application, created for the first target column
+      if(me.segmentField.isTarget() && !me.self.firstTarget || (me.self.firstTarget == me.dataIndex)) {
+          me.self.firstTarget = me.dataIndex;
+          this.field = new Editor.view.segments.HtmlEditor();
+      }
+      else {
+          this.field = Ext.create('widget.displayfield',{fieldCls: 'x-form-display-field segment-tag-container'});
+      }
+      return this.field;
   } 
 });
