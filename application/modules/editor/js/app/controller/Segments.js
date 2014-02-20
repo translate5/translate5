@@ -115,9 +115,6 @@ Ext.define('Editor.controller.Segments', {
       caCtrl.on('segmentUsageFinished', me.onSegmentUsageFinished, me);
       
       //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following event bindings 
-      me.getSegmentsStore().on('load', me.invalidatePager, me);
-      me.getSegmentsStore().on('load', me.refreshGridView, me);
-      me.getSegmentsStore().on('write', me.handleSegmentSaved, me);
       me.getStore('Files').on('write', me.reloadGrid, me);
       Editor.app.on('editorViewportClosed', me.clearSegments, me);
 
@@ -130,9 +127,17 @@ Ext.define('Editor.controller.Segments', {
       },
       '#segmentgrid' : {
           afterrender: function(grid) {
-              var ro = Editor.data.task && Editor.data.task.isReadOnly();
+              var me = this,
+                  ro = Editor.data.task && Editor.data.task.isReadOnly();
               grid.setTitle(ro ? grid.title_readonly : grid.title);
-              this.styleResetFilterButton(grid.filters);
+              me.styleResetFilterButton(grid.filters);
+              
+              //moved the store handler into after grid render, because of 
+              //the fluent reconfiguration of the model and late instanciation of the store.
+              //@todo should be replaced with Event Domains after update to ExtJS >4.2
+              me.getSegmentsStore().on('load', me.invalidatePager, me);
+              me.getSegmentsStore().on('load', me.refreshGridView, me);
+              me.getSegmentsStore().on('write', me.handleSegmentSaved, me);
           },
         selectionchange: me.handleSegmentSelectionChange,
         filterupdate: me.handleFilterChange
