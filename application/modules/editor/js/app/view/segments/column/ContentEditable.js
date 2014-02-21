@@ -94,11 +94,11 @@ Ext.define('Editor.view.segments.column.ContentEditable', {
       //ensure that we have only one Editor in the application, created for the first target column
       if(me.segmentField.isTarget() && !me.self.firstTarget || (me.self.firstTarget == me.dataIndex)) {
           me.self.firstTarget = me.dataIndex;
-          this.field = new Editor.view.segments.HtmlEditor();
       }
-      else {
-          this.field = Ext.create('widget.displayfield',{fieldCls: 'x-form-display-field segment-tag-container'});
-      }
+      this.field = Ext.create('widget.displayfield',{
+          name: this.dataIndex,
+          fieldCls: 'x-form-display-field segment-tag-container'
+      });
       return this.field;
   } 
 });

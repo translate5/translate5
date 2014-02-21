@@ -52,11 +52,16 @@ Ext.define('Editor.view.segments.RowEditor', {
     
     //beinhaltet den gekürzten Inhalt des letzten geöffneteten Segments
     lastSegmentShortInfo: '',
-    columnToEdit: null, //for source editing
+    columnToEdit: null,
     previousRecord: null,
     messages: {
         segmentNotSavedUserMessage: 'Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank!',
         cantSaveEmptySegment: '#UT#Das Segment kann nicht ohne Inhalt gespeichert werden!'
+    },
+    
+    initComponent: function() {
+        this.callParent(arguments);
+        this.mainEditor = this.add(new Editor.view.segments.HtmlEditor());
     },
     
     /**
@@ -135,7 +140,6 @@ Ext.define('Editor.view.segments.RowEditor', {
                 me.el.setY(y);
                 invalidateScroller();
             }
-            //FIXME hier ist der HTMLEditor gemeint
             me.mainEditor.setHeight(newHeight-6);
         }
         if (me.getWidth() != mainBodyWidth) {
@@ -174,12 +178,6 @@ Ext.define('Editor.view.segments.RowEditor', {
         });
         field.margins = '0 0 0 2';
         
-        //keeping reference of the mainEditor (= single HtmlEditor instance).
-        if(field instanceof Editor.view.segments.HtmlEditor){
-            me.lastEditedField = column.dataIndex; // initial set
-            me.mainEditor = field;
-        }
-        
         field.setWidth(column.getDesiredWidth() - 2);
         me.mon(field, 'change', me.onFieldChange, me);
 
@@ -199,19 +197,16 @@ Ext.define('Editor.view.segments.RowEditor', {
      * Da die HtmlEditor.[set|get]Value Methoden aus Performance Gründen nicht überschrieben werden können, 
      * muss das (Un)Markup hier in der loadRecord bzw. completeEdit passieren.
      * Performance Gründe deshalb, weil set und getValue mehrmals aufgerufen wird (getValue z.B. in isDirty)
-     * Editable Source Column: Method contains also logic to reposition the HtmlEditor according to the column to be edited. 
+     * Alternate Targets: Method contains also logic to reposition the HtmlEditor according to the column to be edited. 
      *   A better Place for this logic would be in the startEdit Method before loadRecord is called, but then the complete startEdit Method must be duplicated. 
      * @override
      * @param {Editor.model.Segment} record
      */
     loadRecord: function(record) {
         var me = this;
-        me.callParent(new Array(record));
+        me.callParent(arguments);
         me.setColumnToEdit(record);
-        //FIXME den zu editierenden inhalt in den HTMLEditor laden
-        //me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit));
-        //FIXME aktuell gibt es keine content spalten!!!! daher der folgende dummy:
-        me.mainEditor.setValueAndMarkup("FOO");
+        me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit));
         me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
     },
     
@@ -223,14 +218,11 @@ Ext.define('Editor.view.segments.RowEditor', {
      */
     setColumnToEdit: function(record) {
         var me = this,
-            firstTarget = Editor.view.segments.column.ContentEditable.firstTarget,
+            firstTarget = Editor.view.segments.column.ContentEditable.firstTarget, //is the dataIndex
             col = me.context.column, //clicked column
             toEdit = me.context.field, //dataindex of clicked col
-            posMain, 
-            posSrc, 
-            posLeft, 
-            posRight,
-            vis;
+            colToDisable,
+            posMain;
         
         //if user clicked on a not content column open default dataindex (also if it is a content column but not editable)
         if(!col.segmentField || !col.segmentField.get('editable')) {
@@ -241,56 +233,45 @@ Ext.define('Editor.view.segments.RowEditor', {
             toEdit = col.dataIndex+'Edit';
         }
         
-        if(!me.columnToEdit) {
-            console.log("firstTarget", firstTarget);
-            me.columnToEdit = firstTarget;
-        }
-        //return; raus wenn nur eine Spalte editable. Dann ists klar.
-        
-        //enabling the following line, disables text editing in source column:
-        //me.mainEditor.setReadOnly(showSourceEditor);
-        
-        //FIXME for what is this line????
-        //me.swappedEditor.setValue(record.get(toSwap));
-        
         //no swap if last edited column was the same
-        console.log(me.columnToEdit, toEdit);
         if(me.columnToEdit === toEdit) {
             return;
         }
         me.columnToEdit = toEdit;
-        me.swappedEditor = col.field;
         
-        //swap visibility
-        vis = me.mainEditor.isVisible();
-        me.mainEditor.setVisible(me.swappedEditor.isVisible());
-        me.swappedEditor.setVisible(vis);
+        me.items.each(function(field){
+            if(field.name == toEdit) {
+                colToDisable = field;
+                return;
+            }
+            if(field.swappedWithEditor) {
+                field.setVisible(field._oldVisibility);
+                field.swappedWithEditor = false;
+            }
+        });
+        
+        if(!colToDisable) {
+            Ext.Error.raise('No Column Editor for dataIndex '+toEdit+'found!');
+        }
+        posToEdit = me.items.indexOf(colToDisable);
+        colToDisable.swappedWithEditor = true;
+        colToDisable._oldVisibility = colToDisable.isVisible();
+        colToDisable.setVisible(false);
+        me.mainEditor.setWidth(colToDisable.width);
         
         //swap position
         posMain = me.items.indexOf(me.mainEditor);
-        posSrc = me.items.indexOf(me.swappedEditor); 
-
-        if(posMain > posSrc) {
-            posLeft = posSrc;
-            posRight = posMain;
-        }
-        else {
-            posLeft = posMain;
-            posRight = posSrc;
-        }
-        me.move(posRight, posLeft); 
-        me.move(posLeft + 1, posRight); 
+        posToEdit = me.items.indexOf(colToDisable); 
+        me.move(posMain, posToEdit); 
     },
     
     /**
-     * FIXME
-     * reusable method to get info if actual opened editor is source editing
-     * @param {Object} context
-     * @returns {Boolean}
+     * reusable method to get info which field is edited by opened editor
+     * returns the dataIndex of the field
+     * @return {String}
      */
-    isSourceEditing: function(context) {
-        var f = context.field; 
-        return Editor.data.task.isSourceEditable() && (f == 'source' || f == 'sourceEdit');
+    getEditedField: function() {
+        return me.columnToEdit;
     },
 
     /**
@@ -299,13 +280,10 @@ Ext.define('Editor.view.segments.RowEditor', {
      */
     completeEdit: function() {
         var me = this,
-        newValue = '',
-        //FIXME also for TRANSLATE-118:
-        fieldToCheck = (me.columnToEdit == 'sourceEdited' ? 'source' : 'target');
-        record = me.context.record;
-        //der replace aufruf entfernt vom Editor automatisch hinzugefügte unsichtbare Zeichen, 
-        //und verhindert so, dass der Record nicht als modified markiert wird, wenn am Inhalt eigentlich nichts verändert wurde
-        newValue = Ext.String.trim(me.mainEditor.getValueAndUnMarkup()).replace(/\u200B/g, '');
+            record = me.context.record,
+            //der replace aufruf entfernt vom Editor automatisch hinzugefügte unsichtbare Zeichen, 
+            //und verhindert so, dass der Record nicht als modified markiert wird, wenn am Inhalt eigentlich nichts verändert wurde
+            newValue = Ext.String.trim(me.mainEditor.getValueAndUnMarkup()).replace(/\u200B/g, '');
         
         //check, if the context delivers really the correct record, because through some issues in reallive data 
         //rose the idea, that there might exist special race conditions, where
@@ -316,7 +294,7 @@ Ext.define('Editor.view.segments.RowEditor', {
             return false;
         }
         
-        if(newValue.length == 0 && record.get(fieldToCheck).length > 0) {
+        if(newValue.length == 0 && record.get(me.columnToEdit).length > 0) {
             Editor.MessageBox.addError(me.messages.cantSaveEmptySegment);
             return false;
         }
