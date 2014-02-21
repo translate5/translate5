@@ -119,6 +119,7 @@ Ext.define('Editor.view.segments.Grid', {
     initComponent: function() {
         var me = this,
             columns = [],
+            firstTargetFound = false,
             fields = Editor.data.task.segmentFields();
         
         this.store = Ext.create('Editor.store.Segments',{
@@ -145,24 +146,17 @@ Ext.define('Editor.view.segments.Grid', {
                 return steps[v] ? steps[v] : v;
             },
             width: 140
-        //},{
-            //xtype: 'contentColumn',
-            //fieldName: 'source',
-            //isErgonomicVisible: true,
-            //isErgonomicSetWidth: true,
-            //text: '#UT#Ausgangstext'
         }]);
     
         fields.each(function(rec){
             var name = rec.get('name'),
+                type = rec.get('type'),
                 editable = rec.get('editable'),
-                //FIXME first target is not always target, since in future target columns can be deactivated!
-                // → solution: loop over fiels and find first with /^target/.test(name);
-                isErgoVisible = (name == 'source' || name == 'target'); 
+                isEditableTarget = type == 'target' && editable,
+                isErgoVisible = !firstTargetFound && isEditableTarget || type == 'source';
             
-            //FIXME adapt this for T-118, logic was: 
-            //if Editor.view.segments.column.SourceEditable exists, 
-            //then Editor.view.segments.column.Source.prototype.isErgonomicVisible = false;
+            //stored outside of function and must be set after isErgoVisible!
+            firstTargetFound = firstTargetFound || isEditableTarget; 
             
             columns.push({
                 xtype: 'contentColumn',
@@ -185,51 +179,8 @@ Ext.define('Editor.view.segments.Grid', {
             }
         });
         
-        //old strings to grep for:
-        /*
-        itemId: 'sourceColumn',
-        dataIndex: 'source',
-        
-        itemId: 'sourceEditorColumn',  → changes to sourceEditColumn
-        dataIndex: 'sourceEdited', → changes to sourceEdit
-        
-        itemId: 'relaisColumn'
-        dataIndex: 'relais',
-        
-        itemId: 'editorColumn', → targetEditColumn
-        dataIndex: 'edited', → targetEdit
-
-        itemId: 'targetColumn'
-        dataIndex: 'target',
-        */
-        
-        //if(Editor.data.task.get('enableSourceEditing')){ FIXME enableSourceEditing is not needed in JS anymore?? but in PHP it should set the source editable to true! 
-            //columns.push({
-                //xtype: 'contentEditableColumn',
-                //fieldName: 'source',
-                //text: '#UT#Ausgangstext überarbeitet'
-            //});
-        //}
-    
-        //if(Editor.data.task.hasRelaisSource()){ //FIXME if hasRelaisSource is synonym to have a field named relais
-            //columns.push({
-                //xtype: 'contentColumn',
-                //isErgonomicSetWidth: true,
-                //fieldName: 'relais',
-                //text: '#UT#Relaistext'
-            //});
-        //}
     
         columns.push.apply(columns, [{
-            //xtype: 'contentColumn',
-            //isErgonomicSetWidth: true,
-            //fieldName: 'target',
-            //text: '#UT#Zieltext'
-        //},{
-            //xtype: 'contentEditableColumn',
-            //fieldName: 'target',
-            //text: '#UT#Zieltext überarbeitet'
-        //},{
             xtype: 'commentsColumn',
             itemId: 'commentsColumn',
             width: 200

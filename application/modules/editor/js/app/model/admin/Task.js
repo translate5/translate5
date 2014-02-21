@@ -108,13 +108,6 @@ Ext.define('Editor.model.admin.Task', {
       return res; 
   },
   /**
-   * returns if task has relais language
-   * @return {Boolean}
-   */
-  hasRelaisSource: function() {
-      return this.get('relaisLang')>0;
-  },
-  /**
    * returns if QM Subsegments are enabled for this task
    * @returns
    */
@@ -126,7 +119,7 @@ Ext.define('Editor.model.admin.Task', {
    * @return {Boolean}
    */
   isSourceEditable: function() {
-      return this.get('enableSourceEditing');
+      return this.get('enableSourceEditing'); //should be the same value as in segmentFields().source.editable
   },
   /**
    * returns if task is locked
