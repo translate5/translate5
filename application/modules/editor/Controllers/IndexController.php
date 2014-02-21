@@ -156,6 +156,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       
       $this->view->Php2JsVars()->set('headerOptions.height', (int)$rop->headerOptions->height);
       $this->view->Php2JsVars()->set('languages', $this->getAvailableLanguages());
+      
+      //FIXME Hint T-118: Editor.data.enableSourceEditing → nach wie vor benötigt um das Feature (Checkbox beim Import) ein oder auszublenden.
       $this->view->Php2JsVars()->set('enableSourceEditing', (boolean) $rop->import->enableSourceEditing);
       
       /*

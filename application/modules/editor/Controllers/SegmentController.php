@@ -72,7 +72,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
 
     public function indexAction() {
         $session = new Zend_Session_Namespace();
-        $this->view->rows = $this->entity->loadByTaskGuid($session->taskGuid, $session->task->enableSourceEditing);
+        $this->view->rows = $this->entity->loadByTaskGuid($session->taskGuid);
         $this->view->total = $this->entity->getTotalCountByTaskGuid($session->taskGuid);
     }
 

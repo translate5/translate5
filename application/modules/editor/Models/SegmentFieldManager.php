@@ -180,6 +180,9 @@ class editor_Models_SegmentFieldManager {
      * creates / updates the View of the internal stored taskGuid
      */
     public function updateView() {
+        if(empty($this->taskGuid)) {
+            throw new LogicException('You have to call initFields before!');
+        }
         $viewName         = $this->getDataViewName($this->taskGuid);
         $createViewSql = array('CREATE VIEW '.$viewName.' as SELECT s.*');
 

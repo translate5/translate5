@@ -261,18 +261,39 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             if(empty($data->segmentId)) {
                 $data->segmentId = $segmentId;
             }
-            error_log(print_r($data,1));
             $data->save();
         }
     }
 
     /**
-     * Load segments by taskguid. Second Parameter decides if SourceEdited column should be provided
-     * @param string $taskguid
+     * Load segments by taskGuid.
+     * @param string $taskGuid
      * @param boolean $loadSourceEdited
+     * @return array
      */
-    public function loadByTaskGuid($taskguid, $loadSourceEdited = false) {
-        $this->db = ZfExtended_Factory::get($this->dbInstanceClass, array(array(), $this->segmentFieldManager->getDataViewName($taskguid)));
+    public function loadByTaskGuid($taskGuid) {
+        try {
+            return $this->_loadByTaskGuid($taskGuid);
+        }
+        catch(Zend_Db_Statement_Exception $e) {
+            $m = $e->getMessage();
+            if(strpos($m,'SQLSTATE') !== 0 || strpos($m,'Base table or view not found') === false) {
+                throw $e;
+            }
+        }
+        //fallback mechanism for not existing views. If not exists, we are trying to create it.
+        $this->segmentFieldManager->initFields($taskGuid);
+        $this->segmentFieldManager->updateView();
+        return $this->_loadByTaskGuid($taskGuid);
+    }
+    
+    /**
+     * encapsulate the load by taskGuid code.
+     * @param string $taskGuid
+     * @return array
+     */
+    protected function _loadByTaskGuid($taskGuid) {
+        $this->db = ZfExtended_Factory::get($this->dbInstanceClass, array(array(), $this->segmentFieldManager->getDataViewName($taskGuid)));
         
         $this->initDefaultSort();
 
@@ -280,17 +301,21 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $db = $this->db;
         $cols = $this->db->info($db::COLS);
 
-        //dont load sourceEdited* Cols if not needed
+        /**
+         * FIXME should we implement this filter in SegmentFieldManager?
+         * Filtering out unused cols is needed for TaskManagement Feature (user dependent cols) 
         if (!$loadSourceEdited) {
             $cols = array_filter($cols, function($val) {
                         return strpos($val, 'sourceEdited') === false;
                     });
         }
+         */
         $s->from($this->db, $cols);
-        $s->where('taskGuid = ?', $taskguid);
+        $s->where('taskGuid = ?', $taskGuid);
 
         return parent::loadFilterdCustom($s);
     }
+    
 
     /**
      * @param $taskguid
