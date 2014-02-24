@@ -140,6 +140,8 @@ Ext.define('Editor.controller.Segments', {
               me.getSegmentsStore().on('write', me.handleSegmentSaved, me);
           },
         selectionchange: me.handleSegmentSelectionChange,
+        columnhide: me.handleColumnHide,
+        columnshow: me.handleColumnShow,
         filterupdate: me.handleFilterChange
       },
       '#fileorderTree': {
@@ -176,6 +178,18 @@ Ext.define('Editor.controller.Segments', {
       var ed = this.getSegmentGrid().editingPlugin;
       if(ed && ed.editor && ed.openedRecord && ! ed.disableEditBySelect){
         this.saveChainStart();
+      }
+  },
+  handleColumnHide: function() {
+      var ed = this.getSegmentGrid().editingPlugin;
+      if(ed && ed.editor) {
+          ed.editor.toggleMainEditor(false);
+      }
+  },
+  handleColumnShow: function() {
+      var ed = this.getSegmentGrid().editingPlugin;
+      if(ed && ed.editor) {
+          ed.editor.toggleMainEditor(true);
       }
   },
   /**

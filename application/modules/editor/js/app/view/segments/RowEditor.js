@@ -53,6 +53,7 @@ Ext.define('Editor.view.segments.RowEditor', {
     //beinhaltet den gekürzten Inhalt des letzten geöffneteten Segments
     lastSegmentShortInfo: '',
     columnToEdit: null,
+    fieldToEdit: null,
     previousRecord: null,
     messages: {
         segmentNotSavedUserMessage: 'Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank!',
@@ -60,8 +61,9 @@ Ext.define('Editor.view.segments.RowEditor', {
     },
     
     initComponent: function() {
-        this.callParent(arguments);
-        this.mainEditor = this.add(new Editor.view.segments.HtmlEditor());
+        var me = this;
+        me.callParent(arguments);
+        me.mainEditor = me.add(new Editor.view.segments.HtmlEditor());
     },
     
     /**
@@ -211,7 +213,7 @@ Ext.define('Editor.view.segments.RowEditor', {
     },
     
     /**
-     * Method Implements that we can have multiple editable columns, but only one HtmlEditor Instance 
+     * Method Implements that we can have multiple editable columns, but only one HtmlEditor Instance
      * This is done by swaping the position of the different field editors
      * 
      * @param {Editor.model.Segment} record
@@ -221,7 +223,8 @@ Ext.define('Editor.view.segments.RowEditor', {
             firstTarget = Editor.view.segments.column.ContentEditable.firstTarget, //is the dataIndex
             col = me.context.column, //clicked column
             toEdit = me.context.field, //dataindex of clicked col
-            colToDisable,
+            hasToSwap = false,
+            fieldToDisable = null,
             posMain;
         
         //if user clicked on a not content column open default dataindex (also if it is a content column but not editable)
@@ -232,36 +235,39 @@ Ext.define('Editor.view.segments.RowEditor', {
         else if(col instanceof Editor.view.segments.column.Content) {
             toEdit = col.dataIndex+'Edit';
         }
-        
         //no swap if last edited column was the same
-        if(me.columnToEdit === toEdit) {
+        hasToSwap = me.columnToEdit !== toEdit;
+        
+        me.items.each(function(field){
+            if(!me.columns.containsKey(field.id)) {
+                return; //ignore the editor itself, which has no col mapping
+            }
+            var vis = me.columns.get(field.id).isVisible();
+            if(field.name == toEdit) {
+                field.setVisible(false);
+                me.mainEditor.setVisible(vis);
+                fieldToDisable = field;
+                return;
+            }
+            else if(field.name == me.columnToEdit) {
+                field.setVisible(vis);
+                return;
+            }
+        });
+        
+        //all editor fields disabled
+        if(!fieldToDisable || !hasToSwap) {
             return;
         }
         me.columnToEdit = toEdit;
         
-        me.items.each(function(field){
-            if(field.name == toEdit) {
-                colToDisable = field;
-                return;
-            }
-            if(field.swappedWithEditor) {
-                field.setVisible(field._oldVisibility);
-                field.swappedWithEditor = false;
-            }
-        });
-        
-        if(!colToDisable) {
-            Ext.Error.raise('No Column Editor for dataIndex '+toEdit+'found!');
-        }
-        posToEdit = me.items.indexOf(colToDisable);
-        colToDisable.swappedWithEditor = true;
-        colToDisable._oldVisibility = colToDisable.isVisible();
-        colToDisable.setVisible(false);
-        me.mainEditor.setWidth(colToDisable.width);
+        posToEdit = me.items.indexOf(fieldToDisable);
+        //disable editor if column was also disabled
+        me.mainEditor.setWidth(fieldToDisable.width);
         
         //swap position
         posMain = me.items.indexOf(me.mainEditor);
-        posToEdit = me.items.indexOf(colToDisable); 
+        posToEdit = me.items.indexOf(fieldToDisable); 
         me.move(posMain, posToEdit); 
     },
     
@@ -274,6 +280,13 @@ Ext.define('Editor.view.segments.RowEditor', {
         return me.columnToEdit;
     },
 
+    /**
+     * shows / hides the main editor, used as show hide column handler
+     */
+    toggleMainEditor: function(show) {
+        this.mainEditor.setVisible(show);
+    },
+    
     /**
      * erweitert die Orginal Methode
      * @returns {Boolean}
