@@ -44,10 +44,19 @@ class editor_Models_SegmentFieldManager {
     const LABEL_TARGET = 'Zieltext'; 
     const LABEL_RELAIS = 'Relaissprache';
     
+    const _MAP_DELIM = '#';
+    const _EDIT_PREFIX = 'Edit';
+    
     /**
      * @var array
      */
     protected $segmentfields;
+    
+    /**
+     * contains a map between Segment get and set keys (targetEditMd5) and the field and db col name (target#editedMd5)
+     * @var array
+     */
+    protected $segmentDataMap = array();
     
     /**
      * @var array
@@ -61,6 +70,19 @@ class editor_Models_SegmentFieldManager {
     protected $taskGuid;
     
     /**
+     * base definition of our cols in the segment data table
+     * @var array
+     */
+    protected $baseFieldColMap = array(
+        '' => 'original',
+        'Md5' => 'originalMd5',
+        'ToSort' => 'originalToSort',
+        'Edit' => 'edited',
+        'EditMd5' => 'editedMd5',
+        'EditToSort' => 'editedToSort',
+    );
+    
+    /**
      * initiates the task specific segment fields
      * @param $taskGuid
      */
@@ -71,11 +93,22 @@ class editor_Models_SegmentFieldManager {
         $fields = $segmentfield->loadByTaskGuidAsRowset($taskGuid);
 
         $this->segmentfields = array();
+        $this->segmentDataMap = array();
         foreach($fields as $field) {
             if(empty($this->firstNameOfType[$field->type])){
                 $this->firstNameOfType[$field->type] = $field->name;
             }
             $this->segmentfields[$field->name] = $field;
+            $this->addFieldToDataMap($field->name);
+        }
+    }
+    
+    /**
+     * fills the data col to field map
+     */
+    protected function addFieldToDataMap($fieldname) {
+        foreach($this->baseFieldColMap as $k => $v) {
+            $this->segmentDataMap[$fieldname.$k] = $fieldname.self::_MAP_DELIM.$v;
         }
     }
     
@@ -86,6 +119,19 @@ class editor_Models_SegmentFieldManager {
      */
     public function getByName($name) {
         return $this->segmentfields[$name];
+    }
+    
+    /**
+     * returns an array with the segment field and the DB Col name to the given get / set key (dataindex)
+     * the array looks for "targetEditMd5" like: ['field' => 'target', 'column' => 'editedMd5']
+     * @param string $dataindex
+     * @return array | false if no matching field was found
+     */
+    public function getDataLocationByKey($key) {
+        if(array_key_exists($key, $this->segmentDataMap)) {
+            return array_combine(array('field', 'column'), explode(self::_MAP_DELIM, $this->segmentDataMap[$key]));
+        }
+        return false;
     }
     
     /**
@@ -186,15 +232,15 @@ class editor_Models_SegmentFieldManager {
         $viewName         = $this->getDataViewName($this->taskGuid);
         $createViewSql = array('CREATE VIEW '.$viewName.' as SELECT s.*');
 
+        //loop over all available segment fields for this task
         foreach($this->segmentfields as $field) {
             $name = $field->name;
-            $createViewSql[] = sprintf('MAX(IF(d.name = \'%s\', d.original, NULL)) AS %s', $name, $name);
-            $createViewSql[] = sprintf('MAX(IF(d.name = \'%s\', d.originalMd5, NULL)) AS %sMd5', $name, $name);
-            $createViewSql[] = sprintf('MAX(IF(d.name = \'%s\', d.originalToSort, NULL)) AS %sToSort', $name, $name);
-            if($field->editable) {
-                $createViewSql[] = sprintf('MAX(IF(d.name = \'%s\', d.edited, NULL)) AS %sEdit', $name, $name);
-                $createViewSql[] = sprintf('MAX(IF(d.name = \'%s\', d.editedMd5, NULL)) AS %sEditMd5', $name, $name);
-                $createViewSql[] = sprintf('MAX(IF(d.name = \'%s\', d.editedToSort, NULL)) AS %sEditToSort', $name, $name);
+            //loop over our available base data columns and generate them
+            foreach($this->baseFieldColMap as $k => $v) {
+                if(!$field->editable && strpos($k, self::_EDIT_PREFIX) === 0) {
+                    continue;
+                }
+                $createViewSql[] = sprintf('MAX(IF(d.name = \'%s\', d.%s, NULL)) AS %s%s', $name, $v, $name, $k);
             }
         }
         $createViewSql = join(',', $createViewSql);
@@ -214,6 +260,27 @@ class editor_Models_SegmentFieldManager {
     public function dropView($taskGuid) {
         $db = Zend_Db_Table::getDefaultAdapter();
         $this->_dropView($this->getDataViewName($taskGuid), $db);
+    }
+
+    /**
+     * generates all needed data attributes for the segment fields and fills them up with the given data. 
+     * Attributes are merged into the given resultObject. Since the object is given by reference no return value is used.
+     * @param array $segmentData
+     * @param stdClass $resultObj
+     */
+    public function mergeData(array $segmentData, stdClass $resultObj) {
+        //loop over all available segment fields for this task
+        foreach($this->segmentfields as $field) {
+            $name = $field->name;
+            $data = $segmentData[$name];
+            //loop over our available base data columns and generate them
+            foreach($this->baseFieldColMap as $k => $v) {
+                if(!$field->editable && strpos($k, self::_EDIT_PREFIX) === 0) {
+                    continue;
+                }
+                $resultObj->{$name.$k} = $data->{$v};
+            }
+        }
     }
     
     /**

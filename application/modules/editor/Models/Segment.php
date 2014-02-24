@@ -90,78 +90,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     protected function _truncateSegmentsToSort($segment)
     {
+        //FIXME this should be done in the Controller!
         if(!is_string($segment)){
             return $segment;
         }
         return mb_substr($segment,0,$this->lengthToTruncateSegmentsToSort,'utf-8');
-    }
-    /**
-     * @param $name
-     * @param $value
-     */
-    public function setField($name, $value)
-    {
-        $this->_segmentdata[$name]['original'] = $value;
-        $this->_segmentdata[$name]['originalMd5'] = md5($value);
-        $this->_segmentdata[$name]['originalToSort'] = $this->_truncateSegmentsToSort($value);
-    }
-    /**
-     * @param $name
-     * @param $value
-     */
-    public function setFieldEdited($name, $value)
-    {
-        $this->_segmentdata[$name]['edited'] = $value;
-        $this->_segmentdata[$name]['editedMd5'] = md5($value);
-        $this->_segmentdata[$name]['editedToSort'] = $this->_truncateSegmentsToSort($value);
-    }
-    /**
-     * @param $name
-     * @return mixed
-     */
-    public function getField($name)
-    {
-        return $this->_segmentdata[$name]['original'];
-    }
-    /**
-     * @param $name
-     * @return mixed
-     */
-    public function getFieldMd5($name)
-    {
-        return $this->_segmentdata[$name]['originalMd5'];
-    }
-    /**
-     * @param $name
-     * @return mixed
-     */
-    public function getFieldToSort($name)
-    {
-        return $this->_segmentdata[$name]['originalToSort'];
-    }
-    /**
-     * @param $name
-     * @return mixed
-     */
-    public function getFieldEdited($name)
-    {
-        return $this->_segmentdata[$name]['edited'];
-    }
-    /**
-     * @param $name
-     * @return mixed
-     */
-    public function getFieldEditedMd5($name)
-    {
-        return $this->_segmentdata[$name]['editedMd5'];
-    }
-    /**
-     * @param $name
-     * @return mixed
-     */
-    public function getFieldEditedToSort($name)
-    {
-        return $this->_segmentdata[$name]['editedToSort'];
     }
     
     /**
@@ -181,13 +114,48 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
+     * filters the fluent fields and stores them separatly
+     * @param string $name
+     * @param mixed $value
      * (non-PHPdoc)
-     * @see ZfExtended_Models_Entity_Abstract::__call()
-     * overwrite __call to catch setFIELDNAME calls and set the segment data instead
+     * @see ZfExtended_Models_Entity_Abstract::set()
      */
-    public function __call($name, $arguments) {
-        //FIXME implement me!
-        return parent::__call($name, $arguments);
+    protected function set($name, $value) {
+        $loc = $this->segmentFieldManager->getDataLocationByKey($name);
+        if($loc !== false) {
+            return $this->_segmentdata[$loc['field']]->__set($loc['column'], $value);
+        }
+        return parent::set($name, $value);
+    }
+
+    /**
+     * filters the fluent fields and gets them from a separate store
+     * @param string $name
+     * (non-PHPdoc)
+     * @see ZfExtended_Models_Entity_Abstract::get()
+     */
+    protected function get($name) {
+        $loc = $this->segmentFieldManager->getDataLocationByKey($name);
+        if($loc !== false) {
+            return $this->_segmentdata[$loc['field']]->__get($loc['column']);
+        }
+        return parent::get($name);
+    }
+    
+    /**
+     * Loops over all data fields and checks if at least one of them was changed (compare by original and edited content)
+     * @param string $typeFilter optional, checks only data fields of given type
+     */
+    public function isDataModified($typeFilter = null) {
+        foreach ($this->_segmentdata as $data) {
+            if(!empty($typeFilter) && $data->type !== $typeFilter) {
+                continue;
+            }
+            if($data->edited !== $data->original) {
+                return true;
+            }
+        }
+        return false;
     }
     
     /**
@@ -263,6 +231,17 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             }
             $data->save();
         }
+    }
+    
+    /**
+     * merges the segment data into the result set
+     * (non-PHPdoc)
+     * @see ZfExtended_Models_Entity_Abstract::getDataObject()
+     */
+    public function getDataObject() {
+        $res = parent::getDataObject();
+        $this->segmentFieldManager->mergeData($this->_segmentdata, $res);
+        return $res;
     }
 
     /**

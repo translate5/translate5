@@ -239,9 +239,7 @@ class editor_Models_SegmentAutoStates {
      * @param boolean $sourceEditing
      */
     public function calculateSegmentState(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua, $sourceEditing) {
-        $isSourceModified = $sourceEditing && ($segment->getSource() !== $segment->getSourceEdited());
-        $isTargetModified = $segment->getTarget() !== $segment->getEdited();
-        $isModified = $isSourceModified || $isTargetModified;
+        $isModified = $segment->isDataModified();
         
         $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
         

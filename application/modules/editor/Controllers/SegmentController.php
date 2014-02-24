@@ -51,6 +51,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      * mappt zu sortierende Spalten auf eine Spalte, nach der statt der übergebenen
      * Spalte sortiert werden soll (key = übergebene Spalte, value = Spalte, nach
      * der sortiert werden soll)
+     * FIXME die Sort Col Map muss automatisiert werden!
      * @var array
      */
     protected $_sortColMap = array(
@@ -84,7 +85,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
 
         $this->checkTaskGuidAndEditable();
 
-        $history = $this->entity->getNewHistoryEntity();
+        //FIXME repais history creation!
+        //$history = $this->entity->getNewHistoryEntity();
 
         $this->decodePutData();
         $this->convertQmId();
@@ -105,16 +107,17 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->checkPlausibilityOfPut();
         $this->rememberSegmentInSession();
 
-        $history->save();
+        //$history->save();
 
-        if($session->task->enableSourceEditing && isset($this->data->sourceEdited)) {
-            $this->updateQmSubSegmentsSource($this->entity->getSourceEdited());
-            $this->entity->recreateTermTagsSource();
-        }
-        else {
-            $this->updateQmSubSegmentsTarget($this->entity->getEdited());
-            $this->entity->recreateTermTagsTarget();
-        }
+        //FIXME get the changed fields and do the below steps for them!
+        //if($session->task->enableSourceEditing && isset($this->data->sourceEdited)) {
+            //$this->updateQmSubSegmentsSource($this->entity->getSourceEdited());
+            //$this->entity->recreateTermTagsSource();
+        //}
+        //else {
+            //$this->updateQmSubSegmentsTarget($this->entity->getEdited());
+            //$this->entity->recreateTermTagsTarget();
+        //}
 
         $this->entity->save();
         $this->view->rows = $this->entity->getDataObject();
