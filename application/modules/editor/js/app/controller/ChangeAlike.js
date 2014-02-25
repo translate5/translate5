@@ -208,7 +208,7 @@ Ext.define('Editor.controller.ChangeAlike', {
           rec = context.record;
       me.callbackToSaveChain = finalCallback;
       me.actualRecord = rec;
-      me.isSourceEditing = plug.editor.isSourceEditing(context);
+      //FIXME: me.isSourceEditing = plug.editor.isSourceEditing(context);
       me.saveIsRunning = true;
       if(me.isManualProcessingDisabled() || me.noAlikes()) {
           me.fireEvent('segmentUsageFinished', me);

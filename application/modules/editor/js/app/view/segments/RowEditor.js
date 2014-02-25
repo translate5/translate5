@@ -319,9 +319,9 @@ Ext.define('Editor.view.segments.RowEditor', {
         record.beginEdit();
         record.set(me.columnToEdit, newValue);
         record.set('autoStateId', 999);
-        //record.set('autoStateId', me.getAutoState());
+        //FIXME record.set('autoStateId', me.getAutoState());
         record.endEdit();
-        me.callParent(arguments);
+        me.hide();
         me.previousRecord = me.editingPlugin.openedRecord;
         me.editingPlugin.openedRecord = null;
         return true;
