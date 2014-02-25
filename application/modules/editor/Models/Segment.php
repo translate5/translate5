@@ -143,6 +143,16 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * integrates the segment fields into the hasfield check
+     * (non-PHPdoc)
+     * @see ZfExtended_Models_Entity_Abstract::hasField()
+     */
+    public function hasField($field) {
+        $loc = $this->segmentFieldManager->getDataLocationByKey($field);
+        return $loc !== false || parent::hasField($field);
+    }
+    
+    /**
      * Loops over all data fields and checks if at least one of them was changed (compare by original and edited content)
      * @param string $typeFilter optional, checks only data fields of given type
      */
@@ -176,8 +186,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     public function getNewHistoryEntity() {
         $history = ZfExtended_Factory::get('editor_Models_SegmentHistory');
+        /* @var $history editor_Models_SegmentHistory */
+        $history->setSegmentFieldManager($this->segmentFieldManager);
 
-        $fields = array('sourceEdited', 'edited', 'userGuid', 'userName', 'timestamp', 'editable', 'pretrans', 'qmId', 'stateId', 'autoStateId', 'workflowStep', 'workflowStepNr');
+        $fields = array('userGuid', 'userName', 'timestamp', 'editable', 'pretrans', 'qmId', 'stateId', 'autoStateId', 'workflowStep', 'workflowStepNr');
+        $fields = array_merge($fields, $this->segmentFieldManager->getEditableDataIndexList());
         $history->setSegmentId($this->getId());
 
         foreach ($fields as $field) {
@@ -244,6 +257,14 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         return $res;
     }
 
+    /**
+     * returns a list with editable dataindex
+     * @return array
+     */
+    public function getEditableDataIndexList() {
+        return $this->segmentFieldManager->getEditableDataIndexList();
+    }
+    
     /**
      * Load segments by taskGuid.
      * @param string $taskGuid
@@ -465,26 +486,13 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * recreates term tags in target / edited fields
+     * recreates the term markup in the data field with the given dataindex
+     * @param string $dataindex dataindex of the segment field to be processed
      */
-    public function recreateTermTagsTarget() {
-        $this->setEdited($this->recreateTermTags($this->getEdited()));
-    }
-
-    /**
-     * recreates term tags in source / sourceEdited fields
-     */
-    public function recreateTermTagsSource() {
-        $this->setSourceEdited($this->recreateTermTags($this->getSourceEdited(), true));
-    }
-
-    /**
-     * recreates the term markup in the given segment content
-     * @param string $segmentContent textuall segment content
-     * @param boolean $useSource optional, default false, if true terms of source column are used (instead of target)
-     * @return string segment with recreated terms
-     */
-    protected function recreateTermTags($segmentContent, $useSource = false) {
+    public function recreateTermTags($dataindex) {
+//FIXME remove the isSource thing! replace it with the alternates!
+        return;
+        $segmentContent = $this->get($dataindex);
         $this->config = Zend_Registry::get('config');
         //gibt alle Terme und zugehörige MetaDaten zu den im Segment verwendeten Terminstanzen zurück
         //sortiert nach String Länge, und bearbeitet die längsten Strings zuerst. 
@@ -510,9 +518,25 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         //Im zweiten Schritt die Platzhalter durch die Terminstanzen ersetzen.
         //Der Umweg über die uniquen Platzhalter ist nötig, da ansonsten gleichlautende Terminstanzen mehrfach mit sich selbst ersetzt und damit mehrere divs hinzugefügt werden
-        return str_replace(array_keys($this->replacements), $this->replacements, $segmentContent);
+        $this->set($dataindex, str_replace(array_keys($this->replacements), $this->replacements, $segmentContent));
     }
 
+    /**
+     * Updates - if enabled - the QM Sub Segments with correct IDs in the given String and stores it with the given Method in the entity
+     * @param string $field
+     */
+    public function updateQmSubSegments(string $dataindex) {
+        $field = $this->segmentFieldManager->getDataLocationByKey($dataindex);
+        $config = Zend_Registry::get('config');
+        if(! $config->runtimeOptions->editor->enableQmSubSegments) {
+            return;
+        }
+        $qmsubsegments = ZfExtended_Factory::get('editor_Models_Qmsubsegments');
+        /* @var $qmsubsegments editor_Models_Qmsubsegments */
+        $withQm = $qmsubsegments->updateQmSubSegments($this->get($dataindex), (int)$this->getId(), $field['field']);
+        $this->set($dataindex, $withQm);
+    }
+    
     /**
      * ensures, that a term does not match content inside internal tags
      * 

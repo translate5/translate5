@@ -72,3 +72,8 @@ CREATE TABLE IF NOT EXISTS `LEK_segment_data` (
   CONSTRAINT FOREIGN KEY (`segmentId`) REFERENCES `LEK_segments` (`id`) ON DELETE CASCADE,
   KEY `taskGuid` (`taskGuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+alter table LEK_segment_history add column taskGuid varchar(38) not null after segmentId;
+update LEK_segment_history h, LEK_segments s set h.taskGuid = s.taskGuid where s.id = h.segmentId;
+
+alter table LEK_qmsubsegments MODIFY fieldedited varchar(300) not null default 'target';

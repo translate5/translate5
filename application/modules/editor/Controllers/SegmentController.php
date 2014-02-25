@@ -42,10 +42,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      * @var editor_Models_Segment
      */
     protected $entity;
-    /**
-     * @var integer
-     */
-    protected $segmentId;
 
     /**
      * mappt zu sortierende Spalten auf eine Spalte, nach der statt der übergebenen
@@ -80,19 +76,18 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     public function putAction() {
         $session = new Zend_Session_Namespace();
         $sessionUser = new Zend_Session_Namespace('user');
-        $this->segmentId = (int) $this->_getParam('id');
-        $this->entity->load($this->segmentId);
+        $this->entity->load((int) $this->_getParam('id'));
 
         $this->checkTaskGuidAndEditable();
 
-        //FIXME repais history creation!
-        //$history = $this->entity->getNewHistoryEntity();
+        $history = $this->entity->getNewHistoryEntity();
 
         $this->decodePutData();
         $this->convertQmId();
 
-        $allowedToChange = array('edited', 'qmId', 'stateId', 'autoStateId', 'sourceEdited');
-        $this->setDataInEntity($allowedToChange, self::SET_DATA_WHITELIST);
+        $allowedToChange = array('qmId', 'stateId', 'autoStateId');
+        $allowedAlternatesToChange = $this->entity->getEditableDataIndexList();
+        $this->setDataInEntity(array_merge($allowedToChange, $allowedAlternatesToChange), self::SET_DATA_WHITELIST);
 
         $this->entity->setUserGuid($sessionUser->data->userGuid);
         $this->entity->setUserName($sessionUser->data->userName);
@@ -107,60 +102,22 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->checkPlausibilityOfPut();
         $this->rememberSegmentInSession();
 
-        //$history->save();
+        $history->save();
 
-        //FIXME get the changed fields and do the below steps for them!
-        //if($session->task->enableSourceEditing && isset($this->data->sourceEdited)) {
-            //$this->updateQmSubSegmentsSource($this->entity->getSourceEdited());
-            //$this->entity->recreateTermTagsSource();
-        //}
-        //else {
-            //$this->updateQmSubSegmentsTarget($this->entity->getEdited());
-            //$this->entity->recreateTermTagsTarget();
-        //}
+        foreach($allowedAlternatesToChange as $field) {
+            if($this->entity->isModified($field)) {
+                $this->entity->updateQmSubSegments($field);
+                $this->entity->recreateTermTags($field);
+            }
+        }
 
         $this->entity->save();
         $this->view->rows = $this->entity->getDataObject();
     }
     
     /**
-     * @see self::updateQmSubSegments
-     * @param string $edited
-     */
-    protected function updateQmSubSegmentsSource(string $edited) {
-        $field = editor_Models_Qmsubsegments::TYPE_SOURCE;
-        $this->entity->setSourceEdited($this->updateQmSubSegments($edited, $field));
-    }
-
-    /**
-     * @see self::updateQmSubSegments
-     * @param string $edited
-     */
-    protected function updateQmSubSegmentsTarget(string $edited) {
-        $field = editor_Models_Qmsubsegments::TYPE_TARGET;
-        $this->entity->setEdited($this->updateQmSubSegments($edited, $field));
-    }
-
-    /**
-     * Updates - if enabled - the QM Sub Segments with correct IDs in the given String and stores it with the given Method in the entity
-     * @param string $edited
-     * @param string $setMethod
-     * @return string the segment content with updated subsegments
-     */
-    protected function updateQmSubSegments(string $edited, string $field) {
-        $config = Zend_Registry::get('config');
-        if(! $config->runtimeOptions->editor->enableQmSubSegments) {
-            return $edited;
-        }
-
-        $qmsubsegments = ZfExtended_Factory::get('editor_Models_Qmsubsegments');
-        /* @var $qmsubsegments editor_Models_Qmsubsegments */
-
-        return $qmsubsegments->updateQmSubSegments($edited, $this->segmentId, $field);
-    }
-
-    /**
      * checks if current put makes sense to save
+     * FIXME adapt me for alternates
      * @return boolean
      */
     protected function checkPlausibilityOfPut() {

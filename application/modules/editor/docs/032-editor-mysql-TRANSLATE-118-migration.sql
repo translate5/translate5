@@ -42,8 +42,9 @@ from LEK_task;
 insert into LEK_segment_data
   (taskGuid, name, segmentId, mid, original, originalMd5, originalToSort, edited, editedMd5, editedToSort)
 select
-  taskGuid, 'source', `id`, mid, `source`, sourceMd5, sourceToSort, sourceEdited, MD5(sourceEdited), sourceEditedToSort
-from LEK_segments;
+  s.taskGuid, 'source', s.`id`, s.mid, s.`source`, s.sourceMd5, s.sourceToSort, s.sourceEdited, MD5(s.sourceEdited), s.sourceEditedToSort
+from LEK_segments s, LEK_task t
+where t.enableSourceEditing > 0 and t.taskGuid = s.taskGuid;
 
 insert into LEK_segment_field
   (taskGuid, name, `type`, `label`, rankable, editable)
@@ -84,3 +85,19 @@ alter table LEK_segments drop column relaisToSort;
 alter table LEK_segments drop column relaisMd5;
 alter table LEK_segments drop column sourceEdited;
 alter table LEK_segments drop column sourceEditedToSort;
+
+insert into LEK_segment_history_data
+  (taskGuid, segmentHistoryId, name, edited)
+select
+  taskGuid, `id`, 'target', edited
+from LEK_segment_history;
+
+insert into LEK_segment_history_data
+  (taskGuid, segmentHistoryId, name, edited)
+select
+  h.taskGuid, h.`id`, 'source', h.sourceEdited
+from LEK_segment_history h, LEK_task t
+where t.enableSourceEditing > 0 and t.taskGuid = h.taskGuid;
+
+alter table LEK_segment_history drop column edited;
+alter table LEK_segment_history drop column sourceEdited;

@@ -223,6 +223,20 @@ class editor_Models_SegmentFieldManager {
     }
     
     /**
+     * returns a list of editable field dataindizes
+     * @return array
+     */
+    public function getEditableDataIndexList() {
+        $result = array();
+        foreach($this->segmentfields as $field) {
+            if($field->editable) {
+                $result[] = $field->name.self::_EDIT_PREFIX;
+            }
+        }
+        return $result;
+    }
+    
+    /**
      * creates / updates the View of the internal stored taskGuid
      */
     public function updateView() {

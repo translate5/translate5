@@ -45,9 +45,6 @@
  * Methods for Management of QM-Subsegments
  */
 class editor_Models_Qmsubsegments extends ZfExtended_Models_Entity_Abstract {
-    const TYPE_SOURCE = 'source';
-    const TYPE_TARGET = 'target';
-    
     protected $dbInstanceClass = 'editor_Models_Db_Qmsubsegments';
     
      /** 
