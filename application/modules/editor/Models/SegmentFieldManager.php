@@ -113,11 +113,14 @@ class editor_Models_SegmentFieldManager {
     }
     
     /**
-     * returns a field instance by given name
+     * returns a field instance by given name or false if not found
      * @param string $name
-     * @return Zend_Db_Table_Row_Abstract of type SegmentField
+     * @return Zend_Db_Table_Row_Abstract | false RowAbstract is of type SegmentField
      */
     public function getByName($name) {
+        if(! array_key_exists($name, $this->segmentfields)){
+            return false;
+        }
         return $this->segmentfields[$name];
     }
     
