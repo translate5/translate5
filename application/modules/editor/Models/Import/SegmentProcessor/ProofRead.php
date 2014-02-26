@@ -126,7 +126,7 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
      * befüllt für alle Terms eines Segments die Tabellen LEK_terminstances
      * und LEK_segment2terms auf Basis der im parser gesammelten Terme
      * 
-     * @todo sofern die Term Speicher Geschichte wiederverwendet werden soll (z.B. in den Relais), diese auch auslagern
+     * @todo sofern die Term Speicher Geschichte wiederverwendet werden soll (z.B. in den Relais), diese auch auslagern (see TRANSLATE-22)
      * 
      * @param int $segmentId
      */
@@ -142,18 +142,21 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
      */
     protected function saveTermInstances(array $terms2save, $segmentId) {
         $sql = array();
-    	foreach($terms2save as $term){
-            $sql[]= " (NULL , ".
-               (int)$segmentId.
-               ", ".(int)$term->id.
-                    ", ".$this->db->quote((string)$term->term).
-               ", ".(int)$term->projectTerminstanceId.
-               ")";
-    	}
-        if(count($sql)>0){
-            $this->db->query(
-                'INSERT INTO `LEK_terminstances` (`id` ,`segmentId` ,`termId` ,`term` ,`projectTerminstanceId`) VALUES'. implode(',', $sql));
+        if(empty($terms2save)) {
+            return;
         }
+        foreach($terms2save as $term){
+            $data = array(
+                        'NULL',
+                        (int)$segmentId,
+                        (int)$term->id,
+                        $this->db->quote((string)$term->term),
+                        (int)$term->projectTerminstanceId,
+                    );
+            $sql[]= ' ('.join(',',$data).')';
+        }
+        $sql = 'INSERT INTO `LEK_terminstances` (`id` ,`segmentId` ,`termId` ,`term` ,`projectTerminstanceId`) VALUES'. join(',', $sql);
+        $this->db->query($sql);
     }
     
     /**
@@ -162,57 +165,57 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
      * @param integer $segmentId
      */
     protected function saveSegment2Terms(array $terms2save, $segmentId) {
-    	$termModel = ZfExtended_Factory::get('editor_Models_Term');
+        $termModel = ZfExtended_Factory::get('editor_Models_Term');
         /* @var $termModel editor_Models_Term */
-    	$saved = array();
-         $sql = array();
-    	foreach($terms2save as $term){
-    		$lang = ($term->isSource)?$this->sourceLang:$this->targetLang;
-    		$relTerms = $termModel->getTermEntryTermsByTaskGuidTermIdLangId($this->taskGuid, $term->id,$lang->getId());
-                
-    		foreach ($relTerms as $relTerm) {
-                    if(isset($saved[$relTerm['id']])){
-                        if($term->id == $relTerm['id']){
-                            $sql[$relTerm['id']]['used'] = true;
-                        }
-    			continue;
+        $saved = array();
+        $sql = array();
+        foreach($terms2save as $term){
+            $lang = ($term->isSource)?$this->sourceLang:$this->targetLang;
+            $relTerms = $termModel->getTermEntryTermsByTaskGuidTermIdLangId($this->taskGuid, $term->id,$lang->getId());
+
+            foreach ($relTerms as $relTerm) {
+                if(isset($saved[$relTerm['id']])){
+                    if($term->id == $relTerm['id']){
+                        $sql[$relTerm['id']]['used'] = true;
                     }
-                    $saved[$relTerm['id']] = true;
-                    $sql[$relTerm['id']]['segmentId'] = (int)$segmentId;
-                    $sql[$relTerm['id']]['isSource'] = (int)$term->isSource;
-                    $sql[$relTerm['id']]['used'] = $term->id == $relTerm['id'];
-                    $sql[$relTerm['id']]['termId'] = (int)$relTerm['id'];
-                    $sql[$relTerm['id']]['transFound'] = (int)$term->transFound;
-    		}
-                //and now the corresponding lang (source or target) to get also target-terms not existent in the target segment and vice versa
-    		$lang = ($term->isSource)?$this->targetLang:$this->sourceLang;
-    		$relTerms = $termModel->getTermEntryTermsByTaskGuidTermIdLangId($this->taskGuid,$term->id,$lang->getId());
-    		foreach ($relTerms as $relTerm) {
-                    if(isset($saved[$relTerm['id']])){
-                        if($term->id == $relTerm['id']){
-                            $sql[$relTerm['id']]['used'] = true;
-                        }
-    			continue;
+                    continue;
+                }
+                $saved[$relTerm['id']] = true;
+                $sql[$relTerm['id']]['segmentId'] = (int)$segmentId;
+                $sql[$relTerm['id']]['isSource'] = (int)$term->isSource;
+                $sql[$relTerm['id']]['used'] = $term->id == $relTerm['id'];
+                $sql[$relTerm['id']]['termId'] = (int)$relTerm['id'];
+                $sql[$relTerm['id']]['transFound'] = (int)$term->transFound;
+            }
+            //and now the corresponding lang (source or target) to get also target-terms not existent in the target segment and vice versa
+            $lang = ($term->isSource)?$this->targetLang:$this->sourceLang;
+            $relTerms = $termModel->getTermEntryTermsByTaskGuidTermIdLangId($this->taskGuid,$term->id,$lang->getId());
+            foreach ($relTerms as $relTerm) {
+                if(isset($saved[$relTerm['id']])){
+                    if($term->id == $relTerm['id']){
+                        $sql[$relTerm['id']]['used'] = true;
                     }
-                    $saved[$relTerm['id']] = true;
-                    $sql[$relTerm['id']]['segmentId'] = (int)$segmentId;
-                    $sql[$relTerm['id']]['isSource'] = $term->isSource?0:1;
-                    $sql[$relTerm['id']]['used'] = $term->id == $relTerm['id'];
-                    $sql[$relTerm['id']]['termId'] = (int)$relTerm['id'];
-                    $sql[$relTerm['id']]['transFound'] = (int)$term->transFound;
-    		}
-    		$saved[$term->id] = true;
-    	}
+                    continue;
+                }
+                $saved[$relTerm['id']] = true;
+                $sql[$relTerm['id']]['segmentId'] = (int)$segmentId;
+                $sql[$relTerm['id']]['isSource'] = $term->isSource?0:1;
+                $sql[$relTerm['id']]['used'] = $term->id == $relTerm['id'];
+                $sql[$relTerm['id']]['termId'] = (int)$relTerm['id'];
+                $sql[$relTerm['id']]['transFound'] = (int)$term->transFound;
+            }
+            $saved[$term->id] = true;
+        }
         if(count($sql)>0){
             foreach ($sql as &$value) {
                 $value = " (NULL , ".
-                    $value['segmentId'].
-                    ", '".$value['isSource']."', '".
-                    $value['used'].
-                    "', '".$value['termId']."', '".$value['transFound']."')";
+                                $value['segmentId'].
+                                ", '".$value['isSource']."', '".
+                                $value['used'].
+                                "', '".$value['termId']."', '".$value['transFound']."')";
             }
             $this->db->query(
-                'INSERT INTO `LEK_segments2terms` (`id` ,`segmentId` ,`isSource` ,`used` ,`termId` ,`transFound`) VALUES'. implode(',', $sql));
+                            'INSERT INTO `LEK_segments2terms` (`id` ,`segmentId` ,`isSource` ,`used` ,`termId` ,`transFound`) VALUES'. implode(',', $sql));
         }
     }
 }
