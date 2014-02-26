@@ -335,12 +335,13 @@ class editor_Models_Import {
      * @param editor_Models_RelaisFoldertree $tree
      */
     protected function importRelaisFiles(editor_Models_RelaisFoldertree $tree){
-    	$segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_Relais', array($this->_sourceLang, $this->_relaisLang, $this->task));
+        $params = array($this->_sourceLang, $this->_relaisLang, $this->task, $this->segmentFieldManager);
+        $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_Relais', $params);
         /* @var $segProc editor_Models_Import_SegmentProcessor_Relais */
-    	foreach ($this->_filePaths as $fileId => $path) {
-    	    if(!$tree->isFileToImport($path)){
-    	        continue;
-    	    }
+        foreach ($this->_filePaths as $fileId => $path) {
+            if(!$tree->isFileToImport($path)){
+                continue;
+            }
             if($this->isCheckRun){
                     trigger_error('Check of Relais File: '.$this->_importFolder.DIRECTORY_SEPARATOR.$path);
             }

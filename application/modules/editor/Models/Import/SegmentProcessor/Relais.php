@@ -45,26 +45,51 @@
  * speichert die ermittelten Segment Daten in die Relais Spalte des entsprechenden Segments 
  */
 class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_SegmentProcessor {
+    /**
+     * @var editor_Models_SegmentFieldManager
+     */
+    protected $sfm;
+    
+    /**
+     * @var editor_Models_Segment
+     */
+    protected $segment;
+    
+    /**
+     * Relais Field
+     * @var Zend_Db_Table_Row_Abstract
+     */
+    protected $relaisField;
+    
+    /**
+     * @param editor_Models_Languages $sourceLang
+     * @param editor_Models_Languages $targetLang
+     * @param editor_Models_Task $task
+     * @param editor_Models_SegmentFieldManager $sfm receive the already inited sfm
+     */
+    public function __construct(editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task, editor_Models_SegmentFieldManager $sfm) {
+        parent::__construct($sourceLang, $targetLang, $task);
+        
+        //FIXME wie die Reihenfolge der Felder sicherstellen? ich denke wir benötigen ein Position Feld o.ä.
+        $relais = $sfm->addField($sfm::LABEL_RELAIS, editor_Models_SegmentField::TYPE_RELAIS);
+        $this->relaisField = $sfm->getByName($relais);
+        $this->sfm = $sfm;
+        
+        $this->segment = ZfExtended_Factory::get('editor_Models_Segment');
+        $this->segment->setTaskGuid($task->getTaskGuid());
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see editor_Models_Import_SegmentProcessor::process()
+     */
     public function process(editor_Models_Import_FileParser $parser){
-        //FIXME ensure that segment field "relais" is added
-        $data = array(
-            //FIXME rework this methods!
-            'relais' => $parser->getTarget(),
-            'relaisMd5' => md5($parser->getTargetOrig()),
-            'relaisToSort' => $this->truncateSegmentsToSort($parser->getTarget()),
-        );
+        $data = $parser->getFieldContents();
+        $target = $this->sfm->getFirstTargetName();
         
-        /* @var $table editor_Models_Db_Segments */
-        $table = ZfExtended_Factory::get('editor_Models_Db_Segments');
-        $adapter = $table->getAdapter();
+        //FIXME testen was passiert wenn ein relais target fehlt, kracht das dann hier?
+        $this->segment->addFieldContent($this->relaisField, $this->fileId, $parser->getMid(), $data[$target]);
         
-        $where = array();
-        $where[] = $adapter->quoteInto('taskGuid = ?', $this->taskGuid);
-        $where[] = $adapter->quoteInto('fileId = ?', $this->fileId);
-        $where[] = $adapter->quoteInto('mid = ?', $parser->getMid());
-        
-        $table->update($data, $where);
-        
-    	return 0; //0 als dummy Rückgabe OK, da Wert nur für den Export gesammelt wird, ansonsten müsste es die DB SegmentId sein
+        return 0; //0 als dummy Rückgabe OK, da Wert nur für den Export gesammelt wird, ansonsten müsste es die DB SegmentId sein
     }    
 }

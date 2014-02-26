@@ -84,7 +84,7 @@ abstract class editor_Models_Import_SegmentProcessor {
      * Konstruktor
      * @param editor_Models_Languages $sourceLang
      * @param editor_Models_Languages $targetLang
-     * @param string $task
+     * @param editor_Models_Task $task
      */
      public function __construct(editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task){
          $session = new Zend_Session_Namespace();

@@ -425,6 +425,7 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $row['lockingUsername'] = $this->getUsername($this->getUserinfo($row['lockingUser']));
         
+        //FIXME hier wird pro Task ein Request an die DB abgesetzt, das kann man vergleichbar der TaskUserAssoc geschichte optimieren, in dem man alle fields für alle angeforderten Tasks holt und dann einsortiert! 
         $fields = ZfExtended_Factory::get('editor_Models_SegmentField');
         /* @var $fields editor_Models_SegmentField */
         $row['segmentFields'] = $fields->loadByTaskGuid($taskguid);

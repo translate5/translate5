@@ -115,7 +115,7 @@ class editor_Models_SegmentFieldManager {
     /**
      * returns a field instance by given name or false if not found
      * @param string $name
-     * @return Zend_Db_Table_Row_Abstract | false RowAbstract is of type SegmentField
+     * @return Zend_Db_Table_Row_Abstract | false; if not false, then RowAbstract is of type SegmentField
      */
     public function getByName($name) {
         if(! array_key_exists($name, $this->segmentfields)){
@@ -170,7 +170,7 @@ class editor_Models_SegmentFieldManager {
         $field->setName($name);
         $field->setTaskGuid($this->taskGuid);
         $field->setType($type);
-        $field->setEditable($isTarget); // FIXME or is sourceEditing = true
+        $field->setEditable($isTarget); // FIXME or is sourceEditing = true // if isRelais dann false!
         $field->setRankable($isTarget);
         $field->save();
         if(empty($this->firstNameOfType[$type])){
@@ -222,7 +222,7 @@ class editor_Models_SegmentFieldManager {
      * @return string
      */
     public function getDataViewName($taskGuid) {
-        return "LEK_segment_" . md5($taskGuid);
+        return "LEK_segment_view_" . md5($taskGuid);
     }
     
     /**
@@ -277,6 +277,17 @@ class editor_Models_SegmentFieldManager {
     public function dropView($taskGuid) {
         $db = Zend_Db_Table::getDefaultAdapter();
         $this->_dropView($this->getDataViewName($taskGuid), $db);
+    }
+    
+    /**
+     * returns the SQL to add one segment field to an existing segment identified by mid, taskGuid and fileId
+     * placeholders in SQL are: fieldName, 
+     * sql for encapsulating purposes in this class
+     */
+    public function getAddOneFieldSql() {
+        return 'INSERT INTO LEK_segment_data (taskGuid, name, segmentId, mid, 
+                original, originalMd5, originalToSort, edited, editedMd5, editedToSort) 
+                SELECT taskGuid, ?, id, mid, ?, ?, ?, ?, ?, ?, ?, ';
     }
 
     /**

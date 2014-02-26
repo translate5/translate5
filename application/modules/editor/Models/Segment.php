@@ -88,7 +88,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @param $segment
      * @return string
      */
-    protected function _truncateSegmentsToSort($segment)
+    protected function truncateSegmentsToSort($segment)
     {
         //FIXME this should be done in the Controller!
         if(!is_string($segment)){
@@ -171,7 +171,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * loads the Entity by Primary Key Id
      * @param integer $id
-     * @return FIXME what returns?
+     * @return Zend_Db_Table_Row
      */
     public function load($id) {
         $row = parent::load($id);
@@ -217,7 +217,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             /* @var $row editor_Models_Db_SegmentDataRow */
             $row->name = $name;
             $field = $sfm->getByName($name);
-            $row->originalToSort = $this->_truncateSegmentsToSort($row->original);
+            $row->originalToSort = $this->truncateSegmentsToSort($row->original);
             $row->taskGuid = $this->getTaskGuid();
             $row->mid = $this->getMid();
             if($field->editable) {
@@ -228,6 +228,43 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             /* @var $row editor_Models_Db_SegmentDataRow */
             $this->_segmentdata[] = $row;
         }
+    }
+    
+    /**
+     * adds one single field content ([original => TEXT, originalMd5 => HASH]) to a given segment, 
+     * identified by MID and fileId. taskGuid MUST be given by setTaskGuid before!
+     * 
+     * @param Zend_Db_Table_Row_Abstract $field
+     * @param integer $fileId
+     * @param string $mid
+     * @param array $data
+     */
+    public function addFieldContent(Zend_Db_Table_Row_Abstract $field, $fileId, $mid, array $data) {
+        $db = ZfExtended_Factory::get('editor_Models_Db_SegmentData');
+        /* @var $db editor_Models_Db_SegmentData */
+
+        $segmentId = new Zend_Db_Expr('('.$this->db->select()
+                            ->from($this->db->info($db::NAME), array('id'))
+                            ->where('taskGuid = ?', $this->getTaskGuid())
+                            ->where('fileId = ?', $fileId)
+                            ->where('mid = ?', $mid).')');
+        
+        $data = array(
+            'taskGuid' => $this->getTaskGuid(),
+            'name' => $field->name,
+            'segmentId' => $segmentId,
+            'mid' => $mid,
+            'original' => $data['original'],
+            'originalMd5' => $data['originalMd5'],
+            'originalToSort' => $this->truncateSegmentsToSort($data['original']),
+        );
+        if($field->editable) {
+            $data['edited'] = $data['original'];
+            $data['editedMd5'] = $data['originalMd5'];
+            $data['editedToSort'] = $this->truncateSegmentsToSort($data['original']);
+        }
+        
+        $db->insert($data);
     }
     
     /**
