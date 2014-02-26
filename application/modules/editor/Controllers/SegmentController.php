@@ -53,9 +53,18 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     );
 
     protected function afterTaskGuidCheck() {
-        $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($this->session->taskGuid);
+        $sfm = $this->initSegmentFieldManager($this->session->taskGuid);
         $this->_sortColMap = $sfm->getSortColMap();
         parent::afterTaskGuidCheck();
+    }
+    
+    /**
+     * initiates the internal SegmentFieldManager
+     * @param string $taskGuid
+     * @return editor_Models_SegmentFieldManager
+     */
+    protected function initSegmentFieldManager($taskGuid) {
+        return editor_Models_SegmentFieldManager::getForTaskGuid($taskGuid);
     }
     
     public function indexAction() {

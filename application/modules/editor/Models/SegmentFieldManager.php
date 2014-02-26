@@ -105,10 +105,21 @@ class editor_Models_SegmentFieldManager {
     
     /**
      * initiates the task specific segment fields
-     * @param $taskGuid
+     * @param string $taskGuid
+     * @param boolean $reload optional, if true overwrite the internal stored fields for the task (if they were already loaded)
      */
-    public function initFields($taskGuid) {
+    public function initFields($taskGuid, $reload = false) {
+        if($this->taskGuid == $taskGuid && !$reload) {
+            return; //already loaded for this guid
+        }
         $this->taskGuid = $taskGuid;
+        if(isset(self::$instances[$taskGuid]) && !$reload) {
+            $inst = self::$instances[$taskGuid];
+            $this->segmentfields = $inst->segmentfields;
+            $this->segmentDataMap = $inst->segmentDataMap;
+            $this->firstNameOfType = $inst->firstNameOfType;
+            return; //recycle already loaded fields
+        }
         $segmentfield = ZfExtended_Factory::get('editor_Models_SegmentField');
         /* @var $segmentfield editor_Models_SegmentField */
         $fields = $segmentfield->loadByTaskGuidAsRowset($taskGuid);
@@ -122,6 +133,7 @@ class editor_Models_SegmentFieldManager {
             $this->segmentfields[$field->name] = $field;
             $this->addFieldToDataMap($field->name);
         }
+        self::$instances[$taskGuid] = $this;
     }
     
     /**
@@ -174,6 +186,7 @@ class editor_Models_SegmentFieldManager {
     
     /**
      * Add the given segment field (for the internally stored taskGuid)
+     * FIXME Sortierung der Felder!!!
      * @param $label string any string as label
      * @param $type one of the editor_Models_SegmentField::TYPE_... consts
      * @return string returns the fieldname to be used by the segment data instances for this field

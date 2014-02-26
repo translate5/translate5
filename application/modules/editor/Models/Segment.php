@@ -331,6 +331,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     protected function _loadByTaskGuid($taskGuid) {
+        $this->segmentFieldManager->initFields($taskGuid);
         $this->db = ZfExtended_Factory::get($this->dbInstanceClass, array(array(), $this->segmentFieldManager->getDataViewName($taskGuid)));
         
         $this->initDefaultSort();
@@ -395,7 +396,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     public function getFileMap($taskGuid) {
-        $this->initDefaultSort();
+        $this->loadByTaskGuid($taskGuid);
         $s = $this->db->select()
                 ->from($this->db, 'fileId')
                 ->where('taskGuid = ?', $taskGuid);
