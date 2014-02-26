@@ -48,8 +48,6 @@ class editor_Models_Db_SegmentDataRow extends Zend_Db_Table_Row_Abstract {
      * @property mixed $originalMd5 originalMd5 md5 hash of the original unparsed content
      * @property mixed $originalToSort originalToSort shortened original content for sorting
      * @property mixed $edited edited user edited content
-     * (FIXME $editedMd5: with tags and qm tags this is nonsense! No alike would be found because of different ids in the tags)
-     * @property mixed $editedMd5 editedMd5 md5 hash of the edited content
      * @property mixed $editedToSort editedToSort shortened user edited content for sorting
      */
 }

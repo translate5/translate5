@@ -66,7 +66,6 @@ CREATE TABLE IF NOT EXISTS `LEK_segment_data` (
   `originalMd5` varchar(32) NOT NULL,
   `originalToSort` varchar(300) DEFAULT NULL,
   `edited` longtext,
-  `editedMd5` varchar(32) NOT NULL,
   `editedToSort` varchar(300) DEFAULT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT FOREIGN KEY (`segmentId`) REFERENCES `LEK_segments` (`id`) ON DELETE CASCADE,

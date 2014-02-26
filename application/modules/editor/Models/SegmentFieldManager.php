@@ -53,7 +53,7 @@ class editor_Models_SegmentFieldManager {
     protected $segmentfields;
     
     /**
-     * contains a map between Segment get and set keys (targetEditMd5) and the field and db col name (target#editedMd5)
+     * contains a map between Segment get and set keys (targetEditToSort) and the field and db col name (target#editedToSort)
      * @var array
      */
     protected $segmentDataMap = array();
@@ -78,7 +78,6 @@ class editor_Models_SegmentFieldManager {
         'Md5' => 'originalMd5',
         'ToSort' => 'originalToSort',
         'Edit' => 'edited',
-        'EditMd5' => 'editedMd5',
         'EditToSort' => 'editedToSort',
     );
     
@@ -157,6 +156,22 @@ class editor_Models_SegmentFieldManager {
             }
         }
         return $result;
+    }
+    
+    /**
+     * returns true if we have exactly one source and one target field. A relais field can be optional.
+     * If we have alternatives return false.
+     * Is used to determine if we can use alikes or not.
+     */
+    public function isDefaultLayout() {
+        $fields = array_keys($this->segmentfields);
+        $defaultFields = array(
+            editor_Models_SegmentField::TYPE_RELAIS,
+            editor_Models_SegmentField::TYPE_SOURCE,
+            editor_Models_SegmentField::TYPE_TARGET,
+        );
+        $diff = array_diff($fields, $defaultFields);
+        return empty($diff);
     }
     
     /**
@@ -334,8 +349,8 @@ class editor_Models_SegmentFieldManager {
      */
     public function getAddOneFieldSql() {
         return 'INSERT INTO LEK_segment_data (taskGuid, name, segmentId, mid, 
-                original, originalMd5, originalToSort, edited, editedMd5, editedToSort) 
-                SELECT taskGuid, ?, id, mid, ?, ?, ?, ?, ?, ?, ?, ';
+                original, originalMd5, originalToSort, edited, editedToSort) 
+                SELECT taskGuid, ?, id, mid, ?, ?, ?, ?, ?, ?, ';
     }
 
     /**

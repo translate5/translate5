@@ -223,7 +223,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             $row->mid = $this->getMid();
             if($field->editable) {
                 $row->edited = $row->original;
-                $row->editedMd5 = $row->originalMd5;
                 $row->editedToSort = $row->originalToSort;
             }
             /* @var $row editor_Models_Db_SegmentDataRow */
@@ -261,7 +260,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         );
         if($field->editable) {
             $data['edited'] = $data['original'];
-            $data['editedMd5'] = $data['originalMd5'];
             $data['editedToSort'] = $this->truncateSegmentsToSort($data['original']);
         }
         
@@ -373,6 +371,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @param string $workflowStep
      */
     public function loadByWorkflowStep(string $taskguid, string $workflowStep) {
+        //FIXME generell ist noch unklar ob eventuell die Felder autoStateId, stateId etc für alternates angepasst werden müssen, daher die Änderung der nachfolgenden Datenfelder noch offen.
         $fields = array('id', 'mid', 'segmentNrInTask', 'source', 'sourceEdited', 'relais', 'target', 'edited', 'stateId', 'autoStateId', 'matchRate', 'qmId', 'comments');
         $this->initDefaultSort();
         $s = $this->db->select(false);
@@ -447,12 +446,20 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * holt die Wiederholungen des aktuell geladenene Segments
+     * fetch the alikes of the actually loaded segment
+     * 
+     * cannot handle alternate targets! can only handle source and target field! actually not refactored!
+     * 
      * @return array
      */
     public function getAlikes($taskGuid) {
-        $segmentsTableName = $this->db->info(Zend_Db_Table_Abstract::NAME);
-        $sql = $this->_getAlikesSql();
+        $this->segmentFieldManager->initFields($taskGuid);
+        //if we are using alternates we cant use change alikes, that means we return an empty list here
+        if(!$this->segmentFieldManager->isDefaultLayout()) {
+            return array(); 
+        }
+        $segmentsViewName = $this->segmentFieldManager->getDataViewName($taskGuid);
+        $sql = $this->_getAlikesSql($segmentsViewName);
         $stmt = $this->db->getAdapter()->query($sql, array(
             $this->getSourceMd5(),
             $this->getTargetMd5(),
@@ -461,7 +468,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             $taskGuid));
         $alikes = $stmt->fetchAll();
         //gefilterte Segmente bestimmen und flag setzen
-        $hasIdFiltered = $this->getIdsAfterFilter($segmentsTableName, $taskGuid);
+        $hasIdFiltered = $this->getIdsAfterFilter($segmentsViewName, $taskGuid);
         foreach ($alikes as $key => $alike) {
             $alikes[$key]['infilter'] = isset($hasIdFiltered[$alike['id']]);
             //das aktuelle eigene Segment, zu dem die Alikes gesucht wurden, aus der Liste entfernen
@@ -499,17 +506,18 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * Muss für MSSQL überschrieben werden!
      *
      * Für MSSQL (getestet mit konkreten Werten und ohne die letzte Zeile in MSSQL direkt):
-      select id, source, target,
-      case when sourceMd5 like '?' then 1 else 0 end as sourceMatch,
-      case when targetMd5 like '?' then 1 else 0 end as targetMatch
-      from LEK_segments where (sourceMd5 like '?' or targetMd5 like '?')
-      and taskGuid = ? and editable = 1 order by fileOrder, id;
+     * select id, source, target,
+     * case when sourceMd5 like '?' then 1 else 0 end as sourceMatch,
+     * case when targetMd5 like '?' then 1 else 0 end as targetMatch
+     * from LEK_segments where (sourceMd5 like '?' or targetMd5 like '?')
+     * and taskGuid = ? and editable = 1 order by fileOrder, id;
      *
+     * @param string $viewName
      * @return string
      */
-    protected function _getAlikesSql() {
+    protected function _getAlikesSql(string $viewName) {
         return 'select id, segmentNrInTask, source, target, sourceMd5=? sourceMatch, targetMd5=? targetMatch
-    from LEK_segments 
+    from '.$viewName.' 
     where (sourceMd5 = ? 
         or (targetMd5 = ? and target != \'\' and target IS NOT NULL)) 
         and taskGuid = ? and editable = 1

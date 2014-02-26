@@ -40,9 +40,9 @@ select
 from LEK_task;
 
 insert into LEK_segment_data
-  (taskGuid, name, segmentId, mid, original, originalMd5, originalToSort, edited, editedMd5, editedToSort)
+  (taskGuid, name, segmentId, mid, original, originalMd5, originalToSort, edited, editedToSort)
 select
-  s.taskGuid, 'source', s.`id`, s.mid, s.`source`, s.sourceMd5, s.sourceToSort, s.sourceEdited, MD5(s.sourceEdited), s.sourceEditedToSort
+  s.taskGuid, 'source', s.`id`, s.mid, s.`source`, s.sourceMd5, s.sourceToSort, s.sourceEdited, s.sourceEditedToSort
 from LEK_segments s, LEK_task t
 where t.enableSourceEditing > 0 and t.taskGuid = s.taskGuid;
 
@@ -53,9 +53,9 @@ select
 from LEK_task;
 
 insert into LEK_segment_data
-  (taskGuid, name, segmentId, mid, original, originalMd5, originalToSort, edited, editedMd5, editedToSort)
+  (taskGuid, name, segmentId, mid, original, originalMd5, originalToSort, edited, editedToSort)
 select
-  taskGuid, 'target', `id`, mid, target, targetMd5, targetToSort, edited, MD5(edited), editedToSort
+  taskGuid, 'target', `id`, mid, target, targetMd5, targetToSort, edited, editedToSort
 from LEK_segments;
 
 insert into LEK_segment_field
