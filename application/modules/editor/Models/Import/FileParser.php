@@ -134,12 +134,12 @@ abstract class editor_Models_Import_FileParser {
      *
      */
     protected $_terms = array();
-    /**
-     * @var editor_Models_Segment im Konstruktor initialisiert, um die Methode getGeneratedTermTag beim Segmentparsing nutzen zu können
-     *
-     */
-    protected $_editor_Models_Segment = NULL;
 
+    /**
+     * @var editor_Models_Segment_TermTag
+     */
+    protected $segmentTermTag;
+    
     /**
      * @var array terms2save ein Array mit editor_Models_TermTagData-Objekten als Werten, das
      *           während des Parsings eines Segments befüllt, danach genutzt und wieder geleert wird usw.
@@ -206,8 +206,7 @@ abstract class editor_Models_Import_FileParser {
         $this->_leftTag = ZfExtended_Factory::get('editor_ImageTag_Left');
         $this->_rightTag = ZfExtended_Factory::get('editor_ImageTag_Right');
         $this->_singleTag = ZfExtended_Factory::get('editor_ImageTag_Single');
-        $this->_editor_Models_Segment = ZfExtended_Factory::get('editor_Models_Segment');
-        $this->_editor_Models_Segment->setTaskGuid($taskGuid);
+        $this->segmentTermTag = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
         $this->_sourceLang = $sourceLang;
         $this->_targetLang = $targetLang;
         $this->_taskGuid = $taskGuid;

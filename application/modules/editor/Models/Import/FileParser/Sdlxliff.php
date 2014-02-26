@@ -699,7 +699,7 @@ Das Leerzeichen (U+0020)
                     unset($data->segment[$k]);
                     $termTagData->term = implode('', $term);
                     $this->_terms2save[] = $termTagData;
-                    $data->segment[$data->currentTermIndex] = $this->_editor_Models_Segment->getGeneratedTermTag($termTagData);
+                    $data->segment[$data->currentTermIndex] = $this->segmentTermTag->getGeneratedTermTag($termTagData);
                     return $data;
                 }
                 $openCount--;
