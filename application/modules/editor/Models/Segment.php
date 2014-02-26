@@ -63,7 +63,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * @var null
      */
-    protected $_lengthToTruncateSegmentsToSort = null;
+    protected $lengthToSort = null;
     /**
      * @var editor_Models_SegmentFieldManager
      */
@@ -71,7 +71,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * @var [editor_Models_Db_SegmentDataRow]
      */
-    protected $_segmentdata     = array();
+    protected $segmentdata     = array();
     
     /**
      * init the internal segment field and the DB object
@@ -79,7 +79,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     public function __construct()
     {
         $session = new Zend_Session_Namespace();
-        $this->lengthToTruncateSegmentsToSort = $session->runtimeOptions->lengthToTruncateSegmentsToSort;
+        $this->lengthToSort = $session->runtimeOptions->lengthToTruncateSegmentsToSort;
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         parent::__construct();
     }
@@ -90,31 +90,32 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     protected function truncateSegmentsToSort($segment)
     {
-        //FIXME this should be done in the Controller!
+        //FIXME this should be done in the Controller bzw. in a unified way!
         if(!is_string($segment)){
             return $segment;
         }
-        return mb_substr($segment,0,$this->lengthToTruncateSegmentsToSort,'utf-8');
+        //FIXME search mb_substr since there are more usages of the ToSort thing
+        return mb_substr(strip_tags($segment),0,$this->lengthToSort,'utf-8');
     }
     
     /**
-     * loads the segment data hunks for this segment
+     * loads the segment data hunks for this segment as Row Objects in segmentdata
      * @param $segmentId
      */
     protected function initData($segmentId)
     {
-        $this->_segmentdata = array();
+        $this->segmentdata = array();
         $db = ZfExtended_Factory::get('editor_Models_Db_SegmentData');
         /* @var $db editor_Models_Db_SegmentData */
         $s = $db->select()->where('segmentId = ?', $segmentId);
         $datas = $db->fetchAll($s);
         foreach($datas as $data) {
-            $this->_segmentdata[$data['name']] = $data;
+            $this->segmentdata[$data['name']] = $data;
         }
     }
 
     /**
-     * filters the fluent fields and stores them separatly
+     * sets segment attributes, filters the fluent fields and stores them separatly
      * @param string $name
      * @param mixed $value
      * (non-PHPdoc)
@@ -123,13 +124,13 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     protected function set($name, $value) {
         $loc = $this->segmentFieldManager->getDataLocationByKey($name);
         if($loc !== false) {
-            return $this->_segmentdata[$loc['field']]->__set($loc['column'], $value);
+            return $this->segmentdata[$loc['field']]->__set($loc['column'], $value);
         }
         return parent::set($name, $value);
     }
 
     /**
-     * filters the fluent fields and gets them from a separate store
+     * gets segment attributes, filters the fluent fields and gets them from a different location
      * @param string $name
      * (non-PHPdoc)
      * @see ZfExtended_Models_Entity_Abstract::get()
@@ -137,7 +138,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     protected function get($name) {
         $loc = $this->segmentFieldManager->getDataLocationByKey($name);
         if($loc !== false) {
-            return $this->_segmentdata[$loc['field']]->__get($loc['column']);
+            return $this->segmentdata[$loc['field']]->__get($loc['column']);
         }
         return parent::get($name);
     }
@@ -157,7 +158,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @param string $typeFilter optional, checks only data fields of given type
      */
     public function isDataModified($typeFilter = null) {
-        foreach ($this->_segmentdata as $data) {
+        foreach ($this->segmentdata as $data) {
             if(!empty($typeFilter) && $data->type !== $typeFilter) {
                 continue;
             }
@@ -189,7 +190,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         /* @var $history editor_Models_SegmentHistory */
         $history->setSegmentFieldManager($this->segmentFieldManager);
 
-        $fields = array('userGuid', 'userName', 'timestamp', 'editable', 'pretrans', 'qmId', 'stateId', 'autoStateId', 'workflowStep', 'workflowStepNr');
+        $fields = array('taskGuid', 'userGuid', 'userName', 'timestamp', 'editable', 'pretrans', 'qmId', 'stateId', 'autoStateId', 'workflowStep', 'workflowStepNr');
         $fields = array_merge($fields, $this->segmentFieldManager->getEditableDataIndexList());
         $history->setSegmentId($this->getId());
 
@@ -207,7 +208,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * gets the data from import, sets it into the data fields
      * check the given fields against the really available fields for this task.
      * @param editor_Models_SegmentFieldManager $sfm
-     * @param array $segmentData
+     * @param array $segmentData key: fieldname; value: array with original and originalMd5
      */
     public function setFieldContents(editor_Models_SegmentFieldManager $sfm, array $segmentData) {
         $db = ZfExtended_Factory::get('editor_Models_Db_SegmentData');
@@ -226,7 +227,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
                 $row->editedToSort = $row->originalToSort;
             }
             /* @var $row editor_Models_Db_SegmentDataRow */
-            $this->_segmentdata[] = $row;
+            $this->segmentdata[] = $row;
         }
     }
     
@@ -274,7 +275,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     public function save() {
         $segmentId = parent::save();
-        foreach($this->_segmentdata as $data) {
+        foreach($this->segmentdata as $data) {
             /* @var $data editor_Models_Db_SegmentDataRow */
             if(empty($data->segmentId)) {
                 $data->segmentId = $segmentId;
@@ -291,7 +292,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     public function getDataObject() {
         $res = parent::getDataObject();
-        $this->segmentFieldManager->mergeData($this->_segmentdata, $res);
+        $this->segmentFieldManager->mergeData($this->segmentdata, $res);
         return $res;
     }
 
