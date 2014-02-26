@@ -55,6 +55,11 @@ abstract class editor_Controllers_EditorrestController extends ZfExtended_RestCo
       if(!$guid->isValid($this->session->taskGuid)) {
         throw new ZfExtended_NotAuthenticatedException();
       }
+      $this->afterTaskGuidCheck();
       parent::init();
+    }
+    
+    protected function afterTaskGuidCheck() {
+        //do nothing, for overwriting
     }
 }

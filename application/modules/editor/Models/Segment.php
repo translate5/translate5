@@ -281,6 +281,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             }
             $data->save();
         }
+        return $segmentId;
     }
     
     /**
@@ -525,10 +526,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * recreates the term markup in the data field with the given dataindex
      * @param string $dataindex dataindex of the segment field to be processed
+     * @param boolean $useSource optional, default false, if true terms of source column are used (instead of target)
      */
-    public function recreateTermTags($dataindex) {
-//FIXME remove the isSource thing! replace it with the alternates!
-        return;
+    public function recreateTermTags($dataindex, $useSource = false) {
         $segmentContent = $this->get($dataindex);
         $this->config = Zend_Registry::get('config');
         //gibt alle Terme und zugehörige MetaDaten zu den im Segment verwendeten Terminstanzen zurück

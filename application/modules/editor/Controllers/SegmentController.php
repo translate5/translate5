@@ -44,21 +44,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     protected $entity;
 
     /**
-     * mappt zu sortierende Spalten auf eine Spalte, nach der statt der übergebenen
-     * Spalte sortiert werden soll (key = übergebene Spalte, value = Spalte, nach
-     * der sortiert werden soll)
-     * FIXME die Sort Col Map muss automatisiert werden!
-     * @var array
-     */
-    protected $_sortColMap = array(
-        'source' => 'sourceToSort',
-        'sourceEdited' => 'sourceEditedToSort',
-        'target' => 'targetToSort',
-        'edited' => 'editedToSort',
-        'relais' => 'relaisToSort',
-    );
-
-    /**
      * mappt einen eingehenden Filtertyp auf einen anderen Filtertyp für ein bestimmtes
      * Feld.
      * @var array array($field => array(origType => newType),...)
@@ -67,6 +52,12 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         array('qmId' => array('list' => 'listAsString'))
     );
 
+    protected function afterTaskGuidCheck() {
+        $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($this->session->taskGuid);
+        $this->_sortColMap = $sfm->getSortColMap();
+        parent::afterTaskGuidCheck();
+    }
+    
     public function indexAction() {
         $session = new Zend_Session_Namespace();
         $this->view->rows = $this->entity->loadByTaskGuid($session->taskGuid);
@@ -107,7 +98,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         foreach($allowedAlternatesToChange as $field) {
             if($this->entity->isModified($field)) {
                 $this->entity->updateQmSubSegments($field);
-                $this->entity->recreateTermTags($field);
+                $this->entity->recreateTermTags($field, strpos($field, editor_Models_SegmentField::TYPE_SOURCE) === 0);
             }
         }
 

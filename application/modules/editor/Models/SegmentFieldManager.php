@@ -83,6 +83,27 @@ class editor_Models_SegmentFieldManager {
     );
     
     /**
+     * key: taskGuid, value: the segmentFieldManager instance for the taskGuid
+     * @var array
+     */
+    protected static $instances = array();
+    
+    /**
+     * Since SegmentFieldManager is used frequently at different places, 
+     * we provide an internal cache of already initialized Instances for specific taskGuids
+     * @param string $taskGuid
+     * @return editor_Models_SegmentFieldManager
+     */
+    public static function getForTaskGuid($taskGuid) {
+        if(empty(self::$instances[$taskGuid])) {
+            $sfm = ZfExtended_Factory::get(__CLASS__);
+            $sfm->initFields($taskGuid);
+            self::$instances[$taskGuid] = $sfm;
+        }
+        return self::$instances[$taskGuid];
+    }
+    
+    /**
      * initiates the task specific segment fields
      * @param $taskGuid
      */
@@ -110,6 +131,20 @@ class editor_Models_SegmentFieldManager {
         foreach($this->baseFieldColMap as $k => $v) {
             $this->segmentDataMap[$fieldname.$k] = $fieldname.self::_MAP_DELIM.$v;
         }
+    }
+    
+    /**
+     * returns the sortColMap for the loaded fields
+     */
+    public function getSortColMap() {
+        $result = array();
+        foreach($this->segmentDataMap as $key => $val) {
+            $pos = strrpos($key, 'ToSort');
+            if($pos !== false) {
+                $result[substr($key, 0, $pos)] = $key;
+            }
+        }
+        return $result;
     }
     
     /**
