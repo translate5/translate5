@@ -76,3 +76,6 @@ alter table LEK_segment_history add column taskGuid varchar(38) not null after s
 update LEK_segment_history h, LEK_segments s set h.taskGuid = s.taskGuid where s.id = h.segmentId;
 
 alter table LEK_qmsubsegments MODIFY fieldedited varchar(300) not null default 'target';
+
+alter table LEK_segment_history modify `timestamp` datetime not null comment 'This is the old segment mod time';
+alter table LEK_segment_history add column `created` timestamp not null default CURRENT_TIMESTAMP comment 'This is the DB save time of the History entry!' after id;
