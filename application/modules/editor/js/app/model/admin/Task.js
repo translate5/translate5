@@ -75,7 +75,8 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'isUsed', type: 'boolean', persist: false}, //actually not used, so no isUsed method
     {name: 'userStep', type: 'string', persist: false},
     {name: 'users', type: 'auto', persist: false},
-    {name: 'userCount', type: 'integer', persist: false}
+    {name: 'userCount', type: 'integer', persist: false},
+    {name: 'defaultSegmentLayout', type: 'boolean', persist: false}
   ],
   hasMany: {model: 'Editor.model.segment.Field', name: 'segmentFields'},
   idProperty: 'id',

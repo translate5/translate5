@@ -65,8 +65,7 @@ Ext.define('Editor.view.comments.Window', {
     /**
      * updates the info text panel with the current segment record.
      * 
-     * @param {Editor.model.Segment}
-     *            record
+     * @param {Editor.model.Segment} record
      */
     updateInfoText : function(record) {
         var me = this;
@@ -96,7 +95,7 @@ Ext.define('Editor.view.comments.Window', {
                 height : 100,
                 autoScroll : true,
                 cls : 'segment-tag-container',
-                tpl : '{edited}',
+                tpl : '{targetEdit}', //FIXME if target edit is hidden, what to show the user?
                 itemId : 'infoText'
             },{
                 xtype : 'toolbar',

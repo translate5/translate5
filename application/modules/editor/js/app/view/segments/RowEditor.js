@@ -319,25 +319,11 @@ Ext.define('Editor.view.segments.RowEditor', {
         record.beginEdit();
         record.set(me.columnToEdit, newValue);
         record.set('autoStateId', 999);
-        //FIXME record.set('autoStateId', me.getAutoState());
         record.endEdit();
         me.hide();
         me.previousRecord = me.editingPlugin.openedRecord;
         me.editingPlugin.openedRecord = null;
         return true;
-    },
-    /**
-     * returns the autostate to the actual userRole
-     * @returns integer
-     */
-    getAutoState: function() {
-        var role = Editor.data.task.get('userRole'),
-            map = Editor.data.segments.roleAutoStateMap;
-        if(map[role]) {
-            return map[role];
-        }
-        return map['default'];
-        
     },
     /**
      * erweitert die Orginal Methode, setzt den Record zurück.
