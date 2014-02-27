@@ -331,7 +331,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     protected function _loadByTaskGuid($taskGuid) {
         $this->segmentFieldManager->initFields($taskGuid);
-        $this->db = ZfExtended_Factory::get($this->dbInstanceClass, array(array(), $this->segmentFieldManager->getDataViewName($taskGuid)));
+        $this->reInitDb($taskGuid);
         
         $this->initDefaultSort();
 
@@ -478,7 +478,31 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         return array_values($alikes); //neues numerisches Array für JSON Rückgabe, durch das unset oben macht json_decode ein Object draus
     }
+    
+    /**
+     * Enter description here ...
+     * @param unknown_type $taskGuid
+     */
+    protected function reInitDb($taskGuid) {
+        $this->db = ZfExtended_Factory::get($this->dbInstanceClass, array(array(), $this->segmentFieldManager->getDataViewName($taskGuid)));
+    }
 
+    /**
+     * overwrite for segment field integration
+     * (non-PHPdoc)
+     * @see ZfExtended_Models_Entity_Abstract::validatorLazyInstatiation()
+     */
+    protected function validatorLazyInstatiation() {
+        $taskGuid = $this->getTaskGuid();
+        if(empty($taskGuid)) {
+            throw new Zend_Exception("For using the editor_Models_Validator_Segment Validator a taskGuid must be set in the segment!");
+        }
+        $this->segmentFieldManager->initFields($taskGuid);
+        if(empty($this->validator)) {
+            $this->validator = ZfExtended_Factory::get($this->validatorInstanceClass, array($this->segmentFieldManager));
+        }
+    }
+    
     /**
      * Gibt ein assoziatives Array mit den Segment IDs zurück, die nach Anwendung des Filters noch da sind.
      * ArrayKeys: SegmentId, ArrayValue immer true
@@ -487,6 +511,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     protected function getIdsAfterFilter(string $segmentsTableName, string $taskGuid) {
+        $this->reInitDb($taskGuid);
         $s = $this->db->select()
                 ->from($segmentsTableName, array('id'))
                 ->where('taskGuid = ?', $taskGuid)
@@ -573,9 +598,27 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             'autoStateId = ?' => $oldState,
             'taskGuid = ?' => $taskGuid
         );
-        if($emptyEditedOnly)
+        //FIXME adapt for fluent
+        if($emptyEditedOnly) {
             $where['edited = ?'] = '';
+        }
         $this->db->update(array('autoStateId' => $newState), $where);
     }
 
+    /**
+     * includes the fluent segment data
+     * (non-PHPdoc)
+     * @see ZfExtended_Models_Entity_Abstract::getModifiedData()
+     */
+    public function getModifiedData() {
+        $result = parent::getModifiedData(); //assoc mit key = dataindex und value = modValue
+        $modKeys = array_keys($result);
+        $modFields = array_unique(array_diff($this->modified, $modKeys));
+        foreach($modFields as $field) {
+            if($this->segmentFieldManager->getDataLocationByKey($field) !== false) {
+                $result[$field] = $this->get($field);
+            }
+        }
+        return $result;
+    }
 }

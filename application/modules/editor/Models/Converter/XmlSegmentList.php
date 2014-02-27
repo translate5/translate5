@@ -138,6 +138,7 @@ class editor_Models_Converter_XmlSegmentList {
             //$result[] = '<segmentNr>'.$segment['segmentNrInTask'].'</segmentNr>';
             $result[] = '<source>'.$this->prepareText($segment['source']).'</source>';
             $matchRate = number_format($segment['matchRate'], 1, '.', '');
+            //FIXME adapt for fluent
             $result[] = '<target dx:match-quality="'.$matchRate.'">'.$this->prepareText($segment['edited']).'</target>';
             $result[] = '<alt-trans><target xml:lang="'.$targetLang.'">'.$this->prepareText($segment['target']).'</target></alt-trans>';
             if($relaisLang !== false) {

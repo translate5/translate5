@@ -96,6 +96,11 @@ class editor_TaskController extends ZfExtended_RestController {
      * @var ZfExtended_Acl 
      */
     protected $acl;
+    
+    /**
+     * @var editor_Models_SegmentFieldManager
+     */
+    protected $segmentFieldManager;
 
     public function init() {
         parent::init();
@@ -427,8 +432,16 @@ class editor_TaskController extends ZfExtended_RestController {
         
         //FIXME hier wird pro Task ein Request an die DB abgesetzt, das kann man vergleichbar der TaskUserAssoc geschichte optimieren, in dem man alle fields für alle angeforderten Tasks holt und dann einsortiert! 
         $fields = ZfExtended_Factory::get('editor_Models_SegmentField');
+        
         /* @var $fields editor_Models_SegmentField */
         $row['segmentFields'] = $fields->loadByTaskGuid($taskguid);
+        if(empty($this->segmentFieldManager)) {
+            $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        }
+        //sets he information if this task has default segment field layout or not
+        $row['defaultSegmentLayout'] = $this->segmentFieldManager->isDefaultLayout(array_map(function($field){
+            return $field['name'];
+        }, $row['segmentFields']));
     }
     
     /**

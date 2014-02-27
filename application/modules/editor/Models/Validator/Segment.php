@@ -35,40 +35,55 @@
  */
 
 class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstract {
-  
-  /**
-   * Validators for Segment Entity
-   * Validation will be done on calling entity->validate
-   */
-  protected function defineValidators() {
-    //edited = string, ohne längenbegrenzung. Daher kein Validator nötig / möglich 
-    $this->addDontValidateField('edited');
-    $this->addValidator('editedToSort', 'stringLength', array('min' => 0, 'max' => 300)); //es wird kein assoc Array benötigt, aber so ist besser lesbar; stringlenght auf 300 statt 100 um auch Multibyte-Strings prüfen zu können ohne iconv_set_encoding('internal_encoding', 'UTF-8'); setzen zu müssen
-    $this->addDontValidateField('sourceEdited');
-    $this->addValidator('sourceEditedToSort', 'stringLength', array('min' => 0, 'max' => 300)); //es wird kein assoc Array benötigt, aber so ist besser lesbar; stringlenght auf 300 statt 100 um auch Multibyte-Strings prüfen zu können ohne iconv_set_encoding('internal_encoding', 'UTF-8'); setzen zu müssen
+    /**
+     * @var editor_Models_SegmentFieldManager
+     */
+    protected $segmentFieldManager;
     
-    $this->addValidator('userGuid', 'guid');
-    $this->addValidator('userName', 'stringLength', array('min' => 0, 'max' => 255)); //es wird kein assoc Array benötigt, aber so ist besser lesbar
-    $this->addValidator('taskGuid', 'guid');
-    $this->addValidator('matchRate', 'between', array('min' => 0, 'max' => 100));
-    $this->addValidator('workflowStepNr', 'int');
+    /**
+     * Segment Validator needs a instanced editor_Models_SegmentFieldManager
+     * @param editor_Models_SegmentFieldManager $sfm
+     */
+    public function __construct(editor_Models_SegmentFieldManager $sfm) {
+        $this->segmentFieldManager = $sfm;
+        parent::__construct();
+    }
     
-    $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
-    /* @var $workflow editor_Workflow_Default */
-    $this->addValidator('workflowStep', 'inArray', array($workflow->getSteps()));
+    /**
+     * Validators for Segment Entity
+     * Validation will be done on calling entity->validate
+     */
+    protected function defineValidators() {
+        $editable = $this->segmentFieldManager->getEditableDataIndexList();
+        $toValidate = $this->segmentFieldManager->getSortColMap();
+        foreach($toValidate as $edit => $toSort) {
+            //edited = string, ohne längenbegrenzung. Daher kein Validator nötig / möglich 
+            $this->addDontValidateField($edit);
+            $this->addValidator($toSort, 'stringLength', array('min' => 0, 'max' => 300)); //es wird kein assoc Array benötigt, aber so ist besser lesbar; stringlenght auf 300 statt 100 um auch Multibyte-Strings prüfen zu können ohne iconv_set_encoding('internal_encoding', 'UTF-8'); setzen zu müssen
+        }
     
-    $session = new Zend_Session_Namespace();
-    $flagConfig = $session->runtimeOptions->segments;
-
-    $this->setQualityValidator(array_keys($flagConfig->qualityFlags->toArray()));
+        $this->addValidator('userGuid', 'guid');
+        $this->addValidator('userName', 'stringLength', array('min' => 0, 'max' => 255)); //es wird kein assoc Array benötigt, aber so ist besser lesbar
+        $this->addValidator('taskGuid', 'guid');
+        $this->addValidator('matchRate', 'between', array('min' => 0, 'max' => 100));
+        $this->addValidator('workflowStepNr', 'int');
+        
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
+        /* @var $workflow editor_Workflow_Default */
+        $this->addValidator('workflowStep', 'inArray', array($workflow->getSteps()));
+        
+        $session = new Zend_Session_Namespace();
+        $flagConfig = $session->runtimeOptions->segments;
     
-    $allowedValues = array_keys($flagConfig->stateFlags->toArray());
-    $this->addValidator('stateId', 'inArray', array($allowedValues));
-    
-    $states = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
-    /* @var $states editor_Models_SegmentAutoStates */
-    $this->addValidator('autoStateId', 'inArray', array($states->getStates()));
-  }
+        $this->setQualityValidator(array_keys($flagConfig->qualityFlags->toArray()));
+        
+        $allowedValues = array_keys($flagConfig->stateFlags->toArray());
+        $this->addValidator('stateId', 'inArray', array($allowedValues));
+        
+        $states = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
+        /* @var $states editor_Models_SegmentAutoStates */
+        $this->addValidator('autoStateId', 'inArray', array($states->getStates()));
+    }
   
   protected function setQualityValidator(array $allowedValues) {
     $inArray = $this->validatorFactory('inArray', array($allowedValues));

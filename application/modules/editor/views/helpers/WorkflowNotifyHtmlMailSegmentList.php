@@ -176,6 +176,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
             $result[] = "\n".'<tr>';
             $result[] = '<td valign="top">'.$segment['segmentNrInTask'].'</td>';
             $result[] = '<td valign="top">'.$this->prepareSegment($segment['source']).'</td>';
+            //FIXME adapt for fluent
             if($task->getEnableSourceEditing()) {
                 $result[] = '<td valign="top">'.$this->prepareSegment($segment['sourceEdited']).'</td>';
             }

@@ -241,6 +241,4 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->view->termGroups = $terms->getByTaskGuidAndSegment($session->taskGuid, (int) $this->_getParam('id'));
         $this->view->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
     }
-
-    
 }

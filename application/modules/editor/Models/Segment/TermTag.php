@@ -75,7 +75,7 @@ class editor_Models_Segment_TermTag {
           where i.segmentId = ? and i.segmentId = s2t.segmentId and t.id = i.termId
               and s2t.termId = i.termId and s2t.used and s2t.isSource = ? order by length(i.term) desc';
         $isSource = $useSource ? 1 : 0;
-        $stmt = $this->db->getAdapter()->query($sql, array($segmentId, $isSource));
+        $stmt = $this->db->query($sql, array($segmentId, $isSource));
         $terms = $stmt->fetchAll();
 
         $this->termNr = 0; //laufende Nummer der Term Tags

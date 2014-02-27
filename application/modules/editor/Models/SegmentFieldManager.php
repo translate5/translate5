@@ -162,9 +162,12 @@ class editor_Models_SegmentFieldManager {
      * returns true if we have exactly one source and one target field. A relais field can be optional.
      * If we have alternatives return false.
      * Is used to determine if we can use alikes or not.
+     * @param array $fields optional, if omitted the internal loaded fields are used
      */
-    public function isDefaultLayout() {
-        $fields = array_keys($this->segmentfields);
+    public function isDefaultLayout(array $fields = null) {
+        if(empty($fields)) {
+            $fields = array_keys($this->segmentfields);
+        }
         $defaultFields = array(
             editor_Models_SegmentField::TYPE_RELAIS,
             editor_Models_SegmentField::TYPE_SOURCE,

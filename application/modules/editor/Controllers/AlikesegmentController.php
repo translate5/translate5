@@ -51,18 +51,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
      * @var editor_Models_Segment
      */
     protected $entity;
-    /**
-     * mappt zu sortierende Spalten auf eine Spalte, nach der statt der übergebenen
-     * Spalte sortiert werden soll (key = übergebene Spalte, value = Spalte, nach
-     * der sortiert werden soll)
-     * @var array
-     */
-    protected $_sortColMap = array(
-                    'source' => 'sourceToSort',
-                    'target' => 'targetToSort',
-                    'edited' => 'editedToSort',
-                    'relais' => 'relaisToSort',
-    );
+    
     /**
      * mappt einen eingehenden Filtertyp auf einen anderen Filtertyp für ein bestimmtes
      * Feld.
@@ -94,17 +83,13 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         $session = new Zend_Session_Namespace();
         $editedSegmentId = (int)$this->_getParam('id');
         $fieldToProcess = (string)$this->_getParam('process');
-        
-        if($fieldToProcess == 'sourceEdited'){
-            $getter = 'getSourceEdited';
-            $setter = 'setSourceEdited';
-            $editedfield = editor_Models_Qmsubsegments::TYPE_SOURCE;
+
+        //Only this fields can be processed
+        if($fieldToProcess != 'target' && $fieldToProcess != 'source') {
+            return;
         }
-        else {
-            $getter = 'getEdited';
-            $setter = 'setEdited';
-            $editedfield = editor_Models_Qmsubsegments::TYPE_TARGET;
-        }
+        $getter = 'get'.$fieldToProcess.'Edit';
+        $setter = 'set'.$fieldToProcess.'Edit';
         
         $this->entity->load($editedSegmentId);
         
@@ -147,13 +132,14 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
 
                 //Entity befüllen:
                 if($config->runtimeOptions->editor->enableQmSubSegments) {
-                    $entity->{$setter}($qmSubsegmentAlikes->cloneAndUpdate($id, $editedfield));
+                    $entity->{$setter}($qmSubsegmentAlikes->cloneAndUpdate($id, $fieldToProcess));
                 }
                 else {
                     $entity->{$setter}($this->entity->{$getter}());
                 }
                 $truncLength = $session->runtimeOptions->lengthToTruncateSegmentsToSort;
                 $toSort = (string)mb_substr($entity->{$getter}(),0,$truncLength,'utf-8');
+                //FIXME die toSort Spalte wird beim WDHE neu gesetzt, mache ich das beim normalen Segment PUT auch?
                 $entity->{$setter.'ToSort'}($toSort);
                 
                 $entity->setQmId((string) $this->entity->getQmId());
