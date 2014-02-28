@@ -169,7 +169,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                     E_USER_ERROR);
         }
     }
-    /*
+    
+    /**
      * Setzt $this->_tagMapping[$tagId]['imgText'] und $this->_tagMapping[$tagId]['text']
      * bei Tags, die auf einen gesperrten Text verweisen
      *
@@ -186,7 +187,6 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * @param string tagId Id des im Param tag übergebenen Tags
      *
      */
-
     protected function setLockedTagContent($tag, $tagId) {
         if (strstr($tag, 'xid=')=== false) {
             trigger_error('Locked-Tag-Inhalt wurde angefordert, aber Tag enthält keine xid', E_USER_ERROR);
@@ -204,23 +204,20 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $this->_tagMapping[$tagId]['text'] = $text;
     }
 
-    /*
+    /**
      * Entfernt vom TermTagger eingefügte leerer xmlns-Attribute
-     *
      */
-
     protected function removeEmtpyXmlns() {
         $this->_origFile = preg_replace('"(\s*)xmlns=\"\"\s*"s', '\\1', $this->_origFile);
     }
     
     
-    /*
+    /**
      * protects whitespace inside a segment with a tag
      *
      * @param string $segment
      * @return string $segment
      */
-
     protected function parseSegmentProtectWhitespace($segment) {
         $search = array(
           "\r\n",  
@@ -263,15 +260,12 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     }
     
     /**
-     * 
-Das Leerzeichen (U+0020)
-
+     * Das Leerzeichen (U+0020)
      * Schützt Zeichenketten, die im sdlxliff enthalten sind und aus einer
      * Unicode Private Use Area oder bestimmten schutzwürdigen Whitespaces oder
      * von mssql nicht verkrafteten Zeichen stammen mit einem Tag
      *
      */
-
     protected function protectUnicodeSpecialChars() {
         $this->_origFileUnicodeProtected = preg_replace_callback(
                 array('"\p{Co}"u', //Alle private use chars
@@ -548,14 +542,13 @@ Das Leerzeichen (U+0020)
                 $targetExp[1][1];
     }
 
-    /*
+    /**
      * Hilfsfunktion für parseSegment: Festlegung der tagId im JS
      *
      * @param string $tag enthält den Tag als String
      * @param string $tagName enthält den Tagnamen
      * @return string $id ID des Tags im JS
      */
-
     protected function parseSegmentGetTagId($tag, $tagName) {
         if ($tagName == 'unicodePrivateUseArea'||$tagName == 'hardReturn'||$tagName == 'softReturn'||$tagName == 'macReturn'||$tagName == 'space') {
             return $tagName;
@@ -569,7 +562,7 @@ Das Leerzeichen (U+0020)
         return preg_replace('"<.* id=\"([^\"]*)\".*>"', '\\1', $tag);
     }
 
-    /*
+    /**
      * Hilfsfunktion für parseSegment: Verpackung verschiedener Strings zur Zwischenspeicherung als HTML-Klassenname im JS
      *
      * @param string $tag enthält den Tag als String
@@ -577,7 +570,6 @@ Das Leerzeichen (U+0020)
      * @param boolean $locked gibt an, ob der übergebene Tag die Referenzierung auf einen gesperrten inline-Text im sdlxliff ist
      * @return string $id ID des Tags im JS
      */
-
     protected function parseSegmentGetStorageClass($tag) {
         if(preg_match('"^<(.*)>$"', $tag)==0){
             trigger_error('The Tag ' . $tag .
@@ -664,7 +656,7 @@ Das Leerzeichen (U+0020)
         return implode('', $data->segment);
     }
 
-    /*
+    /**
      * ersetzt alle Array-Indizes von $data->segment, die sich innerhalb des Term-Tags
      * befinden, der mit $data->segment[$data->currentTermIndex] startet durch einen
      * einzigen Index, der bereits den gesamten Termtag mit allen in ihm enthaltenen
@@ -678,7 +670,6 @@ Das Leerzeichen (U+0020)
      * @param boolean isSource
      * @return editor_Models_Import_FileParser_Sdlxliff_ParseSegmentData $data
      */
-
     protected function parseSegmentReplaceTermSlicesByHtmlTermString($data,$isSource) {
         $termTagData = $this->getTermTagDataWhileParsingSegment($data, $isSource);
         $term = array();
@@ -711,13 +702,12 @@ Das Leerzeichen (U+0020)
                             $data->segment[$data->currentTermIndex], E_USER_ERROR);
     }
 
-    /*
+    /**
      * Befüllt ein editor_Models_TermTagData-Objekt abgesehen von ->term
      * @param editor_Models_Import_FileParser_Sdlxliff_ParseSegmentData $data
      * @param boolean isSource
      * @return editor_Models_TermTagData $termTagData
      */
-
     protected function getTermTagDataWhileParsingSegment($data,$isSource) {
          $tag = $data->segment[$data->currentTermIndex];
          $termTagData = new editor_Models_TermTagData();
@@ -742,13 +732,12 @@ Das Leerzeichen (U+0020)
          return $termTagData;
     }
 
-    /*
+    /**
      * parsing von left-Tags für parseSegment (öffnenden Tags)
      *
      * @param editor_Models_Import_FileParser_Sdlxliff_parseSegmentData $data enthält alle für das Segmentparsen wichtigen Daten
      * @return editor_Models_Import_FileParser_Sdlxliff_parseSegmentData  $data enthält alle für das Segmentparsen wichtigen Daten
      */
-
     protected function parseLeftTag($data) {
         $data->openCounter++;
         $tagName = preg_replace('"<([^ ]*).*>"', '\\1', $data->segment[$data->i]);
@@ -810,7 +799,6 @@ Das Leerzeichen (U+0020)
      * @param editor_Models_Import_FileParser_Sdlxliff_parseSegmentData $data enthält alle für das Segmentparsen wichtigen Daten
      * @return editor_Models_Import_FileParser_Sdlxliff_parseSegmentData  $data enthält alle für das Segmentparsen wichtigen Daten
      */
-
     protected function parseSingleTag($data) {
         $tagName = preg_replace('"<([^/ ]*).*>"', '\\1', $data->segment[$data->i]);
         $this->verifyTagName($tagName, $data);
@@ -844,7 +832,6 @@ Das Leerzeichen (U+0020)
      * @param string text
      * @return string text
      */
-
     protected function encodeTagsForDisplay($text) {
         return str_replace(array('"',"'",'<','>'),array('&quot;','&#39;','&lt;','&gt;'),$text);
     }
