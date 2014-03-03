@@ -50,7 +50,7 @@ class editor_Models_SegmentFieldManager {
     /**
      * @var array
      */
-    protected $segmentfields;
+    protected $segmentfields = array();
     
     /**
      * contains a map between Segment get and set keys (targetEditToSort) and the field and db col name (target#editedToSort)
@@ -210,23 +210,22 @@ class editor_Models_SegmentFieldManager {
      * @return string returns the fieldname to be used by the segment data instances for this field
      */
     public function addField($label, $type) {
-        $maxFieldCnt = 0;
-        $fieldCnt = 0;
+        $fieldCnt = array();
         foreach($this->segmentfields as $field) {
             //label already exists, so we take this fields name
             if($label === $field->label) {
                 return $field->name;
             }
             if($field->type === $type) {
-                $fieldCnt = (int) substr($field->name, strlen($field->type));
-                error_log(__FILE__.' '.__LINE__." This should be a integer bigger as 0 for multi targets: ".$fieldCnt);
+                $fieldCnt[] = (int) substr($field->name, strlen($field->type));
             }
-            $maxFieldCnt = max($maxFieldCnt,$fieldCnt);
         }
         $name = $type;
-        if($maxFieldCnt > 0) {
-            $name .= ($maxFieldCnt + 1);
+        if(!empty($fieldCnt)) {
+            $name .= max($fieldCnt)+1;
         }
+//FIXME make a unique key on name and taskGuid
+        $this->addFieldToDataMap($name);
         $field = ZfExtended_Factory::get('editor_Models_SegmentField');
         /* @var $field editor_Models_SegmentField */
         

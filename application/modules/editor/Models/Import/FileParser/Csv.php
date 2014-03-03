@@ -52,6 +52,11 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      * @var string
      */
     const CONFIG_COLUMN_SOURCE = 'source';
+    /**
+     * string "mid" as defined in application.ini column definition
+     * @var string
+     */
+    const CONFIG_COLUMN_MID = 'mid';
     
     /**
      *
@@ -79,6 +84,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         $this->_delimiter = $config->runtimeOptions->import->csv->delimiter;
         $this->_enclosure = $config->runtimeOptions->import->csv->enclosure;
     }
+    
     /**
      * @param string $line 
      * @return string $line
@@ -115,7 +121,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         }
         //check header and column order
         $config = Zend_Registry::get('config');
-        $csvSettings = $config->runtimeOptions->import->csv->toArray();
+        $csvSettings = $config->runtimeOptions->import->csv->fields->toArray();
         //$csvSettings quelle => source, mid => mid
         $header = $this->prepareLine($file[0]);
         
@@ -124,7 +130,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             trigger_error('in application.ini configured column-header(s) '.join(';', $missing).' not found in CSV.',E_USER_ERROR);
         }
         if(count($header) < 3) {
-            trigger_error('source and mid given but not more data columns found in CSV.',E_USER_ERROR);
+            trigger_error('source and mid given but no more data columns found in CSV.',E_USER_ERROR);
         }
         $i=0;
         $csvSettings = array_flip($csvSettings);
@@ -135,10 +141,8 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
                 $type = editor_Models_SegmentField::TYPE_TARGET;
             } elseif($csvSettings[$colHead] == self::CONFIG_COLUMN_SOURCE) {
                 $type = editor_Models_SegmentField::TYPE_SOURCE;
-            }
-            //if got no type, its the MID:
-            if($type === false) {
-                $this->colOrder[$csvSettings[$colHead]] = $i++;
+            } elseif($csvSettings[$colHead] == self::CONFIG_COLUMN_MID) {
+                $this->colOrder[self::CONFIG_COLUMN_MID] = $i++;
                 continue;
             }
             $name = $this->segmentFieldManager->addField($colHead, $type);
@@ -148,18 +152,15 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         for ($i=1; $i<$lineCount; $i++) {
             $file[$i] = $this->extractSegment($file[$i]);
         }
-        $this->_skeletonFile = implode('', $file);//liinebreaks are added by extractSegment
+        $this->_skeletonFile = implode('', $file);//linebreaks are added by extractSegment
     }
     
     /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::initDefaultSegmentFields()
-     * 
-     * for CSV we need only source, target(s) is/are given by CSV
      */
     protected function initDefaultSegmentFields() {
-        $sfm = $this->segmentFieldManager;
-        $sfm->addField($sfm::LABEL_SOURCE, editor_Models_SegmentField::TYPE_SOURCE);
+        //CSV adds all fields automatically, so omit default fields here.
     }
     
     /**
@@ -169,22 +170,30 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      * @return mixed $transUnit
      */
     protected function extractSegment($line){
+        $this->segmentData = array();
         $lineArr = $this->prepareLine($line);
         
-//FIXME hier bin ich!
-        
-        $this->_sourceOrig = $lineArr[$this->colOrder['source']];
-        $this->_targetOrig = $lineArr[$this->colOrder['target']];
-        $this->_mid = $lineArr[$this->colOrder['mid']];
-        $this->_source = $this->parseSegment($this->_sourceOrig, true);
-        $this->_target = $this->parseSegment($this->_targetOrig, false);
-        
+        foreach($this->colOrder as $name => $idx) {
+            if($name == self::CONFIG_COLUMN_MID) {
+                $this->_mid = $lineArr[$idx];
+                continue;
+            }
+            $field = $this->segmentFieldManager->getByName($name);
+            $isSource = $field->type == editor_Models_SegmentField::TYPE_SOURCE;
+            $this->segmentData[$name] = array(
+                 'original' => $this->parseSegment($lineArr[$idx], $isSource),
+                 'originalMd5' => md5($lineArr[$idx])
+            );
+        }
+
         $this->setSegmentAttribs($line);
         $segmentId = $this->setAndSaveSegmentValues();
-        
-        $lineArr[$this->colOrder['target']] = '<lekTargetSeg id="' .
-                $segmentId .'"/>';
-        
+        foreach($this->colOrder as $name => $idx) {
+            $field = $this->segmentFieldManager->getByName($name);
+            if($field && $field->editable) {
+                $lineArr[$idx] = $this->getFieldPlaceholder($segmentId, $name);
+            }
+        }
         return $this->str_putcsv($lineArr, $this->_delimiter, $this->_enclosure, $this->break);
     }
     /**

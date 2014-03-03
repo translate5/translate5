@@ -499,6 +499,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             array_pop($sourceExp[1][0][$i]);
             $sourceOrig = implode('</mrk>', $sourceExp[1][0][$i]);
             
+            //FIXME getFieldPlaceholder einbauen wenn source = editable und Marc ein Rückspeichern wünscht
+            
             $this->segmentData[$this->segmentFieldManager->getFirstSourceName()] = array(
                      'original' => $this->parseSegment($sourceOrig,true),
                      'originalMd5' => md5($sourceOrig)
@@ -517,6 +519,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                 );
                 
                 $segmentId = $this->setAndSaveSegmentValues();
+                //FIXME getFieldPlaceholder verwenden
                 $targetExp[1][0][$i] = '<lekTargetSeg id="' . $segmentId .
                         '"/></mrk>' . $afterTargetTag;
             } else {
@@ -525,6 +528,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                      'originalMd5' => NULL
                 );
                 $segmentId = $this->setAndSaveSegmentValues();
+                //FIXME getFieldPlaceholder verwenden
                 $targetExp[1][0][$i] = '<lekTargetSeg id="' . $segmentId .
                         '"/></mrk>' . $targetExp[1][0][$i][0];
             }

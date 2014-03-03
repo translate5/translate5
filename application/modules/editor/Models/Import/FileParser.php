@@ -299,6 +299,15 @@ abstract class editor_Models_Import_FileParser {
     }
 
     /**
+     * returns a placeholder for reexport the edited content
+     * @param integer $segmentId
+     * @param string $name
+     */
+    protected function getFieldPlaceholder($segmentId, $name) {
+        return '<lek'.ucfirst($name).'Seg id="'.$segmentId.'"/>';
+    }
+    
+    /**
      * checks the encoding of the file and saves the encoding to the file-table
      * - only saves encoding for formats listed in this->_convert2utf8
      * @triggers error if encoding could not be detected; in this case does not save anything to db
