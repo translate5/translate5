@@ -304,7 +304,7 @@ abstract class editor_Models_Import_FileParser {
      * @param string $name
      */
     protected function getFieldPlaceholder($segmentId, $name) {
-        return '<lek'.ucfirst($name).'Seg id="'.$segmentId.'"/>';
+        return '<lekTargetSeg id="'.$segmentId.'" field="'.$name.'" />';
     }
     
     /**

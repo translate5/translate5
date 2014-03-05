@@ -295,6 +295,22 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
+     * returns the original content of a field 
+     * @param string $field Fieldname
+     */
+    public function getFieldOriginal($field) {
+        return $this->segmentdata[$field]->original;
+    }
+
+    /**
+     * returns the edited content of a field 
+     * @param string $field Fieldname
+     */
+    public function getFieldEdited($field) {
+        return $this->segmentdata[$field]->edited;
+    }
+
+    /**
      * returns a list with editable dataindex
      * @return array
      */

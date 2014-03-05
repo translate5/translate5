@@ -519,18 +519,14 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                 );
                 
                 $segmentId = $this->setAndSaveSegmentValues();
-                //FIXME getFieldPlaceholder verwenden
-                $targetExp[1][0][$i] = '<lekTargetSeg id="' . $segmentId .
-                        '"/></mrk>' . $afterTargetTag;
+                $targetExp[1][0][$i] = $this->getFieldPlaceholder($segmentId, $targetName).'</mrk>'.$afterTargetTag;
             } else {
                 $this->segmentData[$targetName] = array(
                      'original' => NULL,
                      'originalMd5' => NULL
                 );
                 $segmentId = $this->setAndSaveSegmentValues();
-                //FIXME getFieldPlaceholder verwenden
-                $targetExp[1][0][$i] = '<lekTargetSeg id="' . $segmentId .
-                        '"/></mrk>' . $targetExp[1][0][$i][0];
+                $targetExp[1][0][$i] = $this->getFieldPlaceholder($segmentId, $targetName).'</mrk>'.$targetExp[1][0][$i][0];
             }
             $targetMrkString.= $targetExp[1][0][$h] . $targetExp[1][0][$i];
             $i++; //überspringe den delimiter

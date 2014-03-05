@@ -137,10 +137,10 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
      * entfernt dabei Informationen zu trans[Not]Found
      * 
      * @param string $segment
-     * @param boolean $rermoveTermTags, default = true
+     * @param boolean $removeTermTags, default = true
      * @return string $segment
      */
-    protected function recreateTermTags($segment,$rermoveTermTags=true) {
+    protected function recreateTermTags($segment, $removeTermTags=true) {
         $segmentArr = preg_split('/<div\s*class="term([^"]+)"\s+id="([^"]+)-\d+"[^>]*>/s', $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
         
         $cssClassFilter = function($input) {
@@ -149,7 +149,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         
         $count = count($segmentArr);
         $closingTag =  '</mrk>';
-        if($rermoveTermTags){
+        if($removeTermTags){
             $closingTag = '';
         }
         for ($i = 1; $i < $count; $i = $i + 3) {
@@ -176,7 +176,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
                     $openTagCount++;
                 }
             }
-            if(!$rermoveTermTags){
+            if(!$removeTermTags){
                 $cssClasses = explode(' ', trim($segmentArr[$i]));
                 //@todo actually were removing the trans[Not]Found info. 
                 //it would be better to set it for source segments by checking the target if the term exists  
