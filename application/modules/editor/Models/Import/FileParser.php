@@ -157,7 +157,12 @@ abstract class editor_Models_Import_FileParser {
     protected $_targetLang = NULL;
     
     /**
-     * @var strung taskGuid
+     * @var editor_Models_Task
+     */
+    protected $task;
+    
+    /**
+     * @var string taskGuid
      */
     protected $_taskGuid = NULL;
 
@@ -195,9 +200,10 @@ abstract class editor_Models_Import_FileParser {
      * @param boolean $edit100PercentMatches
      * @param editor_Models_Languages $sourceLang
      * @param editor_Models_Languages $targetLang
+     * @param editor_Models_Task $targetLang
      */
     public function __construct(string $path, string $fileName,integer $fileId,
-            boolean $edit100PercentMatches, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, string $taskGuid){
+            boolean $edit100PercentMatches, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task){
         $this->_origFile = file_get_contents($path);
         $this->_path = $path;
         $this->_fileName = $fileName;
@@ -209,7 +215,8 @@ abstract class editor_Models_Import_FileParser {
         $this->segmentTermTag = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
         $this->_sourceLang = $sourceLang;
         $this->_targetLang = $targetLang;
-        $this->_taskGuid = $taskGuid;
+        $this->task = $task;
+        $this->_taskGuid = $task->getTaskGuid();
         $this->autoStates = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
         $this->handleEncoding();
     }
@@ -267,7 +274,8 @@ abstract class editor_Models_Import_FileParser {
      */
     protected function initDefaultSegmentFields() {
         $sfm = $this->segmentFieldManager;
-        $sfm->addField($sfm::LABEL_SOURCE, editor_Models_SegmentField::TYPE_SOURCE);
+        $sourceEdit = (boolean) $this->task->getEnableSourceEditing();
+        $sfm->addField($sfm::LABEL_SOURCE, editor_Models_SegmentField::TYPE_SOURCE, $sourceEdit);
         $sfm->addField($sfm::LABEL_TARGET, editor_Models_SegmentField::TYPE_TARGET);
     }
     

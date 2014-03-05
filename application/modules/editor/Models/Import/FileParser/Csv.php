@@ -77,9 +77,9 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      */
     protected $_enclosure;
     
-    public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, string $taskGuid) {
+    public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task) {
         ini_set('auto_detect_line_endings', true);//to tell php to respect mac-lineendings
-        parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $sourceLang, $targetLang, $taskGuid);
+        parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $sourceLang, $targetLang, $task);
         $config = Zend_Registry::get('config');
         $this->_delimiter = $config->runtimeOptions->import->csv->delimiter;
         $this->_enclosure = $config->runtimeOptions->import->csv->enclosure;
@@ -139,13 +139,15 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             if(empty($csvSettings[$colHead])){
                 //if no column is configured, its a target
                 $type = editor_Models_SegmentField::TYPE_TARGET;
+                $editable = true;
             } elseif($csvSettings[$colHead] == self::CONFIG_COLUMN_SOURCE) {
                 $type = editor_Models_SegmentField::TYPE_SOURCE;
+                $editable = (boolean)$this->task->getEnableSourceEditing();
             } elseif($csvSettings[$colHead] == self::CONFIG_COLUMN_MID) {
                 $this->colOrder[self::CONFIG_COLUMN_MID] = $i++;
                 continue;
             }
-            $name = $this->segmentFieldManager->addField($colHead, $type);
+            $name = $this->segmentFieldManager->addField($colHead, $type, $editable);
             $this->colOrder[$name] = $i++;
         }
         $lineCount = count($file);

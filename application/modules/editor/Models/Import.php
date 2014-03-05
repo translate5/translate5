@@ -366,7 +366,7 @@ class editor_Models_Import {
             $this->_edit100PercentMatches, 
             $this->_sourceLang, 
             $this->_targetLang,
-            $this->_taskGuid
+            $this->task,
         );
     }
     

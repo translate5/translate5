@@ -148,8 +148,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     /**
      * Initiert Tagmapping
      */
-    public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, string $taskGuid) {
-        parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $sourceLang, $targetLang, $taskGuid);
+    public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task) {
+        parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $sourceLang, $targetLang, $task);
         $this->checkForSdlChangeMarker();
         $this->removeEmtpyXmlns();
         $this->protectUnicodeSpecialChars();
@@ -500,8 +500,10 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             $sourceOrig = implode('</mrk>', $sourceExp[1][0][$i]);
             
             //FIXME getFieldPlaceholder einbauen wenn source = editable und Marc ein Rückspeichern wünscht
-            
-            $this->segmentData[$this->segmentFieldManager->getFirstSourceName()] = array(
+            // → Marc sagt OK, allerdings ist hier die Einbau Logik doch erheblich umfangreicher als zunächst gedacht!
+            // Daher bei SDLXLIFF zunächst kein Rückspeichern der editierten Sources. 
+            $sourceName = $this->segmentFieldManager->getFirstSourceName();
+            $this->segmentData[$sourceName] = array(
                      'original' => $this->parseSegment($sourceOrig,true),
                      'originalMd5' => md5($sourceOrig)
             );

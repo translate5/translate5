@@ -69,9 +69,9 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
      */
     public function __construct(editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task, editor_Models_SegmentFieldManager $sfm) {
         parent::__construct($sourceLang, $targetLang, $task);
-        
         //FIXME wie die Reihenfolge der Felder sicherstellen? ich denke wir benötigen ein Position Feld o.ä.
-        $relais = $sfm->addField($sfm::LABEL_RELAIS, editor_Models_SegmentField::TYPE_RELAIS);
+        //relais is forced non editable (last parameter)
+        $relais = $sfm->addField($sfm::LABEL_RELAIS, editor_Models_SegmentField::TYPE_RELAIS, false);
         $this->relaisField = $sfm->getByName($relais);
         $this->sfm = $sfm;
         
