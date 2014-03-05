@@ -78,6 +78,15 @@ class editor_Models_Export_FileParser_Csv extends editor_Models_Export_FileParse
     }
     
     /**
+     * unescape the CSV enclosures
+     * (non-PHPdoc)
+     * @see editor_Models_Export_FileParser::preProcessReplacement()
+     */
+    protected function preProcessReplacement($attributes) {
+        return str_replace($this->_enclosure.$this->_enclosure,$this->_enclosure,$attributes);
+    }
+    
+    /**
      * reconstructs termTags to orignal source format
      * - nothing todo here for csv so far, cause termtagging is not supported so far
      * 
@@ -94,7 +103,7 @@ class editor_Models_Export_FileParser_Csv extends editor_Models_Export_FileParse
      * @see editor_Models_Export_FileParser::getSegmentContent()
      */
     protected function getSegmentContent($segmentId, $field) {
-        $segment = parent::getSegmentContent($segmentId);
+        $segment = parent::getSegmentContent($segmentId, $field);
         return str_replace($this->_enclosure,$this->_enclosure.$this->_enclosure,$segment);
     }
 }

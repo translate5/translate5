@@ -127,31 +127,42 @@ abstract class editor_Models_Export_FileParser {
         
         $count = count($file) - 1;
         for ($i = 1; $i < $count;) {
-          if (!preg_match('#^\s*id="([^"]+)"\s*(field="([^"]+)"\s*)?$#', $file[$i], $matches)) {
-            throw $exception($file[$i]);
-          }
+            $file[$i] = $this->preProcessReplacement($file[$i]);
+            if (!preg_match('#^\s*id="([^"]+)"\s*(field="([^"]+)"\s*)?$#', $file[$i], $matches)) {
+                throw $exception($file[$i]);
+            }
           
-          //check $matches[1] for integer (segmentId) if empty throw an exception
-          settype($matches[1], 'int');
-          if(empty($matches[1])) {
-            throw $exception($file[$i]);
-          }
+            //check $matches[1] for integer (segmentId) if empty throw an exception
+            settype($matches[1], 'int');
+            if(empty($matches[1])) {
+                throw $exception($file[$i]);
+            }
           
-          //alternate column is optional, use target as default
-          if(isset($matches[3])) {
-            $field = $matches[3];
-          }
-          else {
-            $field = editor_Models_SegmentField::TYPE_TARGET;
-          }
+            //alternate column is optional, use target as default
+            if(isset($matches[3])) {
+                $field = $matches[3];
+            }
+            else {
+              $field = editor_Models_SegmentField::TYPE_TARGET;
+            }
           
-          //$file[$i] = 'replaced: '.$matches[1].' # '.$col;
-          $file[$i] = $this->getSegmentContent($matches[1], $field);
-          $i = $i + 2;
+            //$file[$i] = 'replaced: '.$matches[1].' # '.$col;
+            $file[$i] = $this->getSegmentContent($matches[1], $field);
+            $i = $i + 2;
         }
         $this->_exportFile = implode('', $file);
     }
-
+    
+    /**
+     * pre processor for the extracted lekTargetSeg attributes
+     * for overwriting purposes only
+     * @param string $attributes
+     * @return string
+     */
+    protected function preProcessReplacement($attributes) {
+        return $attributes;
+    }
+    
     /**
      * returns the segment content for the given segmentId and field. Adds optional diff markup, and handles tags.
      * @param integer $segmentId
