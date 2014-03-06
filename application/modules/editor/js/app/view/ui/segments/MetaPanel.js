@@ -61,16 +61,27 @@ Ext.define('Editor.view.ui.segments.MetaPanel', {
   title: 'Segment-Metadaten',
 
   //Item Strings:
-  item_metaQm_title: 'QM',
-  item_metaStates_title: 'Status',
-  item_metaTerms_title: 'Terminologie',
-  item_cancel: 'Abbrechen',
-  item_save: 'Speichern',
-  item_saveAndNext: 'Speichern und nächstes öffnen',
-  item_saveAndPrevious: 'Speichern und vorheriges öffnen',
+  item_metaQm_title: '#UT#QM',
+  item_metaStates_title: '#UT#Status',
+  item_metaTerms_title: '#UT#Terminologie',
+  item_cancel: '#UT#Abbrechen',
+  item_save: '#UT#Speichern',
+  item_saveAndNext: '#UT#Speichern und nächstes öffnen',
+  item_saveAndPrevious: '#UT#Speichern und vorheriges öffnen',
+  item_alternateLeft: '#UT#Vorherige Spalte editieren',
+  item_alternateRight: '#UT#Nächste Spalte editieren',
   initComponent: function() {
-    var me = this;
-
+    var me = this,
+        fields = Editor.data.task.segmentFields(),
+        editableCnt = 0;
+        useHNavArrow = false;
+    fields.each(function(field) {
+        if(field.get('editable')) {
+            editableCnt++;
+        }
+    });
+    useHNavArrow = editableCnt > 1;
+    
     //Editor.data.segments.showStatus = false;
     Ext.applyIf(me, {
       items: [
@@ -93,6 +104,7 @@ Ext.define('Editor.view.ui.segments.MetaPanel', {
                   xtype: 'button',
                   itemId: 'cancelSegmentBtn',
                   text: me.item_cancel,
+                  text: 'XX',
                   icon: Editor.data.moduleFolder+'images/cross.png',
                   iconAlign: 'right'
                 },
@@ -100,22 +112,39 @@ Ext.define('Editor.view.ui.segments.MetaPanel', {
                   xtype: 'button',
                   itemId: 'saveSegmentBtn',
                   text: me.item_save,
+                  text: 'XX',
                   icon: Editor.data.moduleFolder+'images/tick.png',
                   iconAlign: 'right'
                 },
                 {
                   xtype: 'button',
                   itemId: 'savePreviousSegmentBtn',
-                  icon: Editor.data.moduleFolder+'images/arrow_left.png',
+                  icon: Editor.data.moduleFolder+'images/arrow_up.png',
                   iconAlign: 'right',
                   tooltip: me.item_saveAndPrevious
                 },
                 {
                   xtype: 'button',
                   itemId: 'saveNextSegmentBtn',
-                  icon: Editor.data.moduleFolder+'images/arrow_right.png',
+                  icon: Editor.data.moduleFolder+'images/arrow_down.png',
                   iconAlign: 'right',
                   tooltip: me.item_saveAndNext
+                },
+                {
+                    xtype: 'button',
+                    itemId: 'goAlternateLeftBtn',
+                    hidden: !useHNavArrow,
+                    icon: Editor.data.moduleFolder+'images/arrow_left.png',
+                    iconAlign: 'right',
+                    tooltip: me.item_alternateLeft
+                },
+                {
+                    xtype: 'button',
+                    itemId: 'goAlternateRightBtn',
+                    hidden: !useHNavArrow,
+                    icon: Editor.data.moduleFolder+'images/arrow_right.png',
+                    iconAlign: 'right',
+                    tooltip: me.item_alternateRight
                 }
               ]
             },

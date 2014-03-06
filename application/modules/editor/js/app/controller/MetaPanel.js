@@ -47,7 +47,6 @@
 Ext.define('Editor.controller.MetaPanel', {
   extend : 'Ext.app.Controller',
   requires: ['Editor.view.qmsubsegments.AddFlagFieldset'],
-  lastColumnIdx: 0, //needed for interaction with editable source column
   messages: {
     gridEndReached: 'Ende der Segmente erreicht!',
     gridStartReached: 'Start der Segmente erreicht!'
@@ -58,6 +57,12 @@ Ext.define('Editor.controller.MetaPanel', {
   },{
     ref : 'metaTermPanel',
     selector : '#metapanel #metaTermPanel'
+  },{
+    ref : 'leftBtn',
+    selector : '#metapanel #goAlternateLeftBtn'
+  },{
+    ref : 'rightBtn',
+    selector : '#metapanel #goAlternateRightBtn'
   },{
     ref : 'segmentGrid',
     selector : '#segmentgrid'
@@ -76,8 +81,17 @@ Ext.define('Editor.controller.MetaPanel', {
       '#metapanel #savePreviousSegmentBtn' : {
         click : this.savePrevious
       },
+      '#metapanel #goAlternateLeftBtn' : {
+          click : this.goToAlternate
+      },
+      '#metapanel #goAlternateRightBtn' : {
+          click : this.goToAlternate
+      },
       '#metapanel' : {
-        show : this.layout
+          show : this.layout
+      },
+      '#roweditor':{
+          afterEditorMoved: this.refreshLeftRight
       },
       '#segmentgrid': {
           afterrender: this.initEditPluginHandler
@@ -134,10 +148,16 @@ Ext.define('Editor.controller.MetaPanel', {
           ed = me.getEditPlugin(),
           rec = ed.openedRecord,
           store = grid.store,
+          lastColumnIdx = 0,
           newRec = store.getAt(store.indexOf(rec) + rowIdxChange);
       while(newRec && !newRec.get('editable')) {
           newRec = store.getAt(store.indexOf(newRec) + rowIdxChange);
       }
+      Ext.Array.each(grid.columns, function(col, idx) {
+          if(col.dataIndex == ed.editor.getEditedField()) {
+              lastColumnIdx = idx;
+          }
+      });
       me.fireEvent('saveSegment', {
           scope: me,
           segmentUsageFinished: function(){
@@ -145,7 +165,7 @@ Ext.define('Editor.controller.MetaPanel', {
                   //editing by selection handler must be disabled, otherwise saveChainStart will be triggered twice
                   ed.disableEditBySelect = true;
                   selModel.select(newRec);
-                  Ext.defer(ed.startEdit, 100, ed, [newRec, me.lastColumnIdx]); //defer reduces problems with editorDomCleanUp see comment on Bug 38
+                  Ext.defer(ed.startEdit, 100, ed, [newRec, lastColumnIdx]); //defer reduces problems with editorDomCleanUp see comment on Bug 38
                   ed.disableEditBySelect = false;
               }
               else{
@@ -166,10 +186,10 @@ Ext.define('Editor.controller.MetaPanel', {
    */
   startEdit: function(column) {
     var me = this,
-    mp = me.getMetaPanel(),
-    segmentId = column.record.get('id');
+        mp = me.getMetaPanel(),
+        segmentId = column.record.get('id');
+        
     me.record = column.record;
-    me.lastColumnIdx = column.colIdx;
     me.getMetaTermPanel().getLoader().load({params: {id: segmentId}});
     //bindStore(me.record.terms());
     me.loadRecord(me.record);
@@ -216,5 +236,70 @@ Ext.define('Editor.controller.MetaPanel', {
    */
   cancelEdit: function() {
     this.getMetaPanel().down('#metaInfoForm').hide();
+  },
+  /**
+   * Move the editor about one editable field
+   */
+  goToAlternate: function(btn, ev) {
+    var me = this,
+        direction = (btn.itemId == 'goAlternateLeftBtn' ? -1 : 1),
+        info = me.getColInfo(),
+        idx = info && info.foundIdx,
+        cols = info && info.columns;
+    
+    if(info === false) {
+      return;
+    }
+        
+    if(cols[idx + direction]) {
+      info.plug.editor.changeColumnToEdit(cols[idx + direction]);
+    }
+  },
+  /**
+   * enables / disables the left right buttons
+   */
+  refreshLeftRight: function() {
+      var me = this,
+          info = me.getColInfo(),
+          idx = info && info.foundIdx,
+          cols = info && info.columns;
+
+      if(info !== false) {
+          me.getLeftBtn().setDisabled(idx == 0);
+          me.getRightBtn().setDisabled(idx == (cols.length - 1));
+      }
+  },
+  /**
+   * returns the visible columns and which column has actually the editor
+   * @return {Object}
+   */
+  getColInfo: function() {
+    var me = this,
+        plug = me.getEditPlugin(),
+        columns = me.getSegmentGrid().query('.contentEditableColumn:not([hidden])'),
+        foundIdx = false,
+        current = plug.editor.getEditedField();
+    
+    if(!plug || !plug.editor) {
+      me.getLeftBtn().disable();
+      me.getRightBtn().disable();
+      return false;
+    }
+    
+    Ext.Array.each(columns, function(col, idx) {
+      if(col.dataIndex == current) {
+        foundIdx = idx;
+      }
+    });
+    if(foundIdx === false) {
+      Ext.Error.raise('current dataIndex not found in visible columns!');
+      return false;
+    }
+
+    return {
+      plug: plug,
+      columns: columns,
+      foundIdx: foundIdx
+    };
   }
 });

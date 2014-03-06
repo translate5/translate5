@@ -64,6 +64,16 @@ Ext.define('Editor.view.segments.RowEditor', {
         var me = this;
         me.callParent(arguments);
         me.mainEditor = me.add(new Editor.view.segments.HtmlEditor());
+        
+        this.addEvents(
+             /**
+              * @event afterEditorMoved
+              * @param {String} toEdit the dataIndex of the actual edited column
+              * @param {Editor.view.segments.RowEditor} editor the rowEditor instance
+              * Fires after the html maineditor was moved to another column
+              */
+            'afterEditorMoved'
+        );
     },
     
     /**
@@ -106,7 +116,12 @@ Ext.define('Editor.view.segments.RowEditor', {
             // offsetTop will be relative to the table, and is incorrect
             // when mixed with certain grid features (e.g., grouping).
             y = row.getXY()[1] - 5;
-            rowH = row.getHeight();
+            rowH = row.getHeight();            
+            if(rowH == 0) {
+                //on moving the editor horizontally, we get here with a row without a height,
+                //this positions the editor outside of the view. so return in this case.
+                return; 
+            }
             newHeight = rowH + 10;
 
             // IE doesn't set the height quite right.
@@ -193,6 +208,31 @@ Ext.define('Editor.view.segments.RowEditor', {
             me.renderColumnData(field, me.context.record);
         }
     },
+    
+    /**
+     * changes the maineditor to the given column
+     * @param {Editor.view.segments.column.ContentEditable} column
+     */
+    changeColumnToEdit: function(column) {
+        var me = this,
+            oldIdx = me.columnToEdit,
+            rec = me.context.record,
+            oldField = me.query('.displayfield[name="'+oldIdx+'"]');
+        if(oldIdx == column.dataIndex) {
+            //column did not change
+            return;
+        }
+        if(!me.saveMainEditorContent(rec)) {
+            return; //errors on saving, also do not change
+        }
+        if(oldField && oldField.length > 0) {
+            oldField[0].setValue(rec.get(oldIdx));
+        }
+        if(me.setColumnToEdit(column)) {            
+            me.mainEditor.setValueAndMarkup(rec.get(me.columnToEdit));
+            me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
+        }
+    },
 
     /**
      * Lädt den Datensatz in den Editor, erweitert das Orginal um die Integration des Markup.
@@ -207,7 +247,7 @@ Ext.define('Editor.view.segments.RowEditor', {
     loadRecord: function(record) {
         var me = this;
         me.callParent(arguments);
-        me.setColumnToEdit(record);
+        me.setColumnToEdit(me.context.column);
         me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit));
         me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
     },
@@ -215,14 +255,14 @@ Ext.define('Editor.view.segments.RowEditor', {
     /**
      * Method Implements that we can have multiple editable columns, but only one HtmlEditor Instance
      * This is done by swaping the position of the different field editors
-     * 
-     * @param {Editor.model.Segment} record
+     *
+     * @param {Ext.grid.column.Column} col
+     * @return {Boolean} returns true if column has changed, false otherwise
      */
-    setColumnToEdit: function(record) {
+    setColumnToEdit: function(col) {
         var me = this,
             firstTarget = Editor.view.segments.column.ContentEditable.firstTarget, //is the dataIndex
-            col = me.context.column, //clicked column
-            toEdit = me.context.field, //dataindex of clicked col
+            toEdit = col.dataIndex,
             hasToSwap = false,
             fieldToDisable = null,
             posMain;
@@ -257,7 +297,7 @@ Ext.define('Editor.view.segments.RowEditor', {
         
         //all editor fields disabled
         if(!fieldToDisable || !hasToSwap) {
-            return;
+            return false;
         }
         me.columnToEdit = toEdit;
         
@@ -268,7 +308,32 @@ Ext.define('Editor.view.segments.RowEditor', {
         //swap position
         posMain = me.items.indexOf(me.mainEditor);
         posToEdit = me.items.indexOf(fieldToDisable); 
-        me.move(posMain, posToEdit); 
+        me.move(posMain, posToEdit);
+        me.repositionHorizontally();
+        me.fireEvent('afterEditorMoved', toEdit, me);
+        return true;
+    },
+    
+    /**
+     * repositions the grid view so that, the mainEditor is visible after change the editing column
+     */
+    repositionHorizontally: function () {
+        var me = this, 
+            gridReg = me.editingPlugin.grid.getView().getEl().getRegion(),
+            offset,
+            edReg = me.mainEditor.getEl().getRegion();
+        if(gridReg.contains(edReg)) {
+            return;
+        }
+            
+        if(edReg.right > gridReg.right) {
+            offset = -1 * gridReg.getOutOfBoundOffsetX(edReg.right) + 10;
+            me.editingPlugin.grid.horizontalScroller.scrollByDeltaX(offset);
+        }
+        else {
+            offset = -1 * gridReg.getOutOfBoundOffsetX(edReg.x) - 10;
+            me.editingPlugin.grid.horizontalScroller.scrollByDeltaX(offset);
+        }
     },
     
     /**
@@ -277,7 +342,7 @@ Ext.define('Editor.view.segments.RowEditor', {
      * @return {String}
      */
     getEditedField: function() {
-        return me.columnToEdit;
+        return this.columnToEdit;
     },
 
     /**
@@ -292,17 +357,33 @@ Ext.define('Editor.view.segments.RowEditor', {
      * @returns {Boolean}
      */
     completeEdit: function() {
-        var me = this,
-            record = me.context.record,
+        var me = this;
+
+        if(!me.saveMainEditorContent(me.context.record)) {
+            return false;
+        }
+
+        me.hide();
+        me.previousRecord = me.editingPlugin.openedRecord;
+        me.editingPlugin.openedRecord = null;
+        return true;
+    },
+    
+    /**
+     * saves the Editor Content into the loaded record
+     * @returns {Boolean}
+     */
+    saveMainEditorContent: function(record) {
+        var me = this, 
             //der replace aufruf entfernt vom Editor automatisch hinzugefügte unsichtbare Zeichen, 
             //und verhindert so, dass der Record nicht als modified markiert wird, wenn am Inhalt eigentlich nichts verändert wurde
             newValue = Ext.String.trim(me.mainEditor.getValueAndUnMarkup()).replace(/\u200B/g, '');
-        
+            
         //check, if the context delivers really the correct record, because through some issues in reallive data 
         //rose the idea, that there might exist special race conditions, where
         //the context.record is not the record of the newValue
         if(me.editingPlugin.openedRecord === null || me.editingPlugin.openedRecord.internalId != record.internalId ){
-            Editor.MessageBox.addError(this.messages.segmentNotSavedUserMessage + newValue,' Das Segment konnte nicht gespeichert werden. Im folgenden der Debug-Werte: ' + newValue + 'me.editingPlugin.openedRecord.internalId: ' + me.editingPlugin.openedRecord.internalId + ' record.internalId: ' + record.internalId);
+            Editor.MessageBox.addError(me.messages.segmentNotSavedUserMessage + newValue,' Das Segment konnte nicht gespeichert werden. Im folgenden der Debug-Werte: ' + newValue + 'me.editingPlugin.openedRecord.internalId: ' + me.editingPlugin.openedRecord.internalId + ' record.internalId: ' + record.internalId);
             me.editingPlugin.openedRecord = null;
             return false;
         }
@@ -320,9 +401,6 @@ Ext.define('Editor.view.segments.RowEditor', {
         record.set(me.columnToEdit, newValue);
         record.set('autoStateId', 999);
         record.endEdit();
-        me.hide();
-        me.previousRecord = me.editingPlugin.openedRecord;
-        me.editingPlugin.openedRecord = null;
         return true;
     },
     /**

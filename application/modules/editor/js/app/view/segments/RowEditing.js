@@ -90,9 +90,10 @@ Ext.define('Editor.view.segments.RowEditing', {
     /**
      * Erweitert die Orginalmethode um die "editingAllowed" Prüfung
      * @param {Editor.model.Segment} record
+     * @param {Ext.grid.column.Column/Number} columnHeader The Column object defining the column to be edited, or index of the column.
      * @returns booelean|void
      */
-    startEdit: function(record) {
+    startEdit: function(record, columnHeader) {
         //to prevent race-conditions, check if there isalready an openedRecord and if yes show an error (see RowEditor.js function completeEdit for more information)
         if(this.openedRecord !== null){
             Editor.MessageBox.addError(this.messages.previousSegmentNotSaved,' Das Segment konnte nicht zum Bearbeiten geöffnet werden, da das vorherige Segment noch nicht korrekt gespeichert wurde. Im folgenden der Debug-Werte: this.openedRecord.internalId: ' + this.openedRecord.internalId + ' record.internalId: ' + record.internalId);
