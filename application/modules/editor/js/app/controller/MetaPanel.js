@@ -67,6 +67,7 @@ Ext.define('Editor.controller.MetaPanel', {
     ref : 'segmentGrid',
     selector : '#segmentgrid'
   }],
+  hideLeftRight: false,
   init : function() {
     this.control({
       '#metapanel #cancelSegmentBtn' : {
@@ -106,11 +107,18 @@ Ext.define('Editor.controller.MetaPanel', {
     return this.getSegmentGrid().editingPlugin;
   },
   initEditPluginHandler: function() {
+      var me = this, 
+          multiEdit = me.getSegmentGrid().query('.contentEditableColumn').length > 1,
+          useChangeAlikes = Editor.app.authenticatedUser.isAllowed('useChangeAlikes', Editor.data.task);
+
     //Diese Events können erst in onlauch gebunden werden, in init existiert das Plugin noch nicht
-    this.getEditPlugin().on('beforeedit', this.startEdit, this);
-    this.getEditPlugin().on('canceledit', this.cancelEdit, this);
-    this.getEditPlugin().on('edit', this.saveEdit, this);
-    this.getEditPlugin().on('canCompleteEdit', this.canCompleteEdit, this);
+      me.getEditPlugin().on('beforeedit', me.startEdit, me);
+      me.getEditPlugin().on('canceledit', me.cancelEdit, me);
+      me.getEditPlugin().on('edit', me.saveEdit, me);
+      me.getEditPlugin().on('canCompleteEdit', me.canCompleteEdit, me);
+    
+      me.getLeftBtn().setVisible(multiEdit && ! useChangeAlikes);
+      me.getRightBtn().setVisible(multiEdit && ! useChangeAlikes);
   },
   /**
    * Handler für save Button
@@ -260,9 +268,15 @@ Ext.define('Editor.controller.MetaPanel', {
    */
   refreshLeftRight: function() {
       var me = this,
-          info = me.getColInfo(),
-          idx = info && info.foundIdx,
-          cols = info && info.columns;
+          info, idx, cols;
+      
+      if(me.hideLeftRight) {
+          return;
+      }
+      
+      info = me.getColInfo();
+      idx = info && info.foundIdx;
+      cols = info && info.columns;
 
       if(info !== false) {
           me.getLeftBtn().setDisabled(idx == 0);

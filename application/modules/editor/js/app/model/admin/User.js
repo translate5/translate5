@@ -110,6 +110,11 @@ Ext.define('Editor.model.admin.User', {
                   return false;
               }
               break;
+          case 'useChangeAlikes':
+              if(!task.get('defaultSegmentLayout')) {
+                  return false;
+              }
+              break;
       }
       // @todo should we move the rights into the model?
       return isAllowed;

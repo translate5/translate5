@@ -147,7 +147,7 @@ Ext.define('Editor.controller.ChangeAlike', {
    */
   initEditPluginHandler: function() {
       var me = this,
-          enabled = Editor.data.task.get('defaultSegmentLayout');
+          enabled = Editor.app.authenticatedUser.isAllowed('useChangeAlikes', Editor.data.task);
       //disable the whole settings button, since no other settings are currently available!
       me.getOptionsBtn().setVisible(enabled);
       me.isDisabled = ! enabled;
