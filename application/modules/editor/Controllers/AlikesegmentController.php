@@ -84,10 +84,14 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         $editedSegmentId = (int)$this->_getParam('id');
         $fieldToProcess = (string)$this->_getParam('process');
 
-        //Only this fields can be processed
-        if($fieldToProcess != 'target' && $fieldToProcess != 'source') {
+        $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($session->taskGuid);
+        $fieldMeta = $sfm->getByName($fieldToProcess);
+        $isRelais = ($fieldMeta !== false && $fieldMeta->type == editor_Models_SegmentField::TYPE_RELAIS);
+        //Only default Layout and therefore no relais can be processed:
+        if(!$sfm->isDefaultLayout() || $isRelais) {
             return;
         }
+        
         $getter = 'get'.$fieldToProcess.'Edit';
         $setter = 'set'.$fieldToProcess.'Edit';
         
