@@ -205,11 +205,12 @@ class editor_Models_SegmentFieldManager {
     /**
      * Add the given segment field (for the internally stored taskGuid)
      * FIXME Sortierung der Felder!!!
-     * @param $label string any string as label
-     * @param $type one of the editor_Models_SegmentField::TYPE_... consts
+     * @param string $label string any string as label
+     * @param string $type one of the editor_Models_SegmentField::TYPE_... consts
+     * @param boolean $editable optional, default null means that editable is calculated. if boolean use the given value for editable
      * @return string returns the fieldname to be used by the segment data instances for this field
      */
-    public function addField($label, $type) {
+    public function addField($label, $type, $editable = null) {
         $fieldCnt = array();
         foreach($this->segmentfields as $field) {
             //label already exists, so we take this fields name
@@ -230,12 +231,15 @@ class editor_Models_SegmentFieldManager {
         /* @var $field editor_Models_SegmentField */
         
         $isTarget = ($type === $field::TYPE_TARGET);
+        if(is_null($editable)) {
+            $editable = $isTarget;
+        }
         //FIXME what about translations of the label? → solution: we set the default strings for source target relais as consts in fileparser. Translation is done in place of output. Passt das mit dem CSV Konzept?
         $field->setLabel($label);
         $field->setName($name);
         $field->setTaskGuid($this->taskGuid);
         $field->setType($type);
-        $field->setEditable($isTarget); // FIXME or is sourceEditing = true // if isRelais dann false!
+        $field->setEditable($editable);
         $field->setRankable($isTarget);
         $field->save();
         if(empty($this->firstNameOfType[$type])){
