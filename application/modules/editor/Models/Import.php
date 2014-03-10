@@ -275,7 +275,7 @@ class editor_Models_Import {
     protected function importMetaData() {
         $this->metaDataImporter = ZfExtended_Factory::get('editor_Models_Import_MetaData', array($this->_sourceLang, $this->_targetLang));
         /* @var $this->metaDataImporter editor_Models_Import_MetaData */
-        $this->metaDataImporter->import($this->_taskGuid, $this->_importFolder);
+        $this->metaDataImporter->import($this->task, $this->_importFolder);
     }
 
     /**
@@ -291,7 +291,8 @@ class editor_Models_Import {
      * - befüllt $this->_imagesInTask
      */
     protected function importFiles(){
-        $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_ProofRead', array($this->_sourceLang, $this->_targetLang, $this->task, $this->_userGuid, $this->_userName));
+        $mqmProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_MqmParser', array($this->task, $this->segmentFieldManager));
+        $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_ProofRead', array($this->task, $this->_sourceLang, $this->_targetLang, $this->_userGuid, $this->_userName));
         /* @var $segProc editor_Models_Import_SegmentProcessor_ProofRead */
         foreach ($this->_filePaths as $fileId => $path) {
             if($this->isCheckRun){
@@ -301,6 +302,7 @@ class editor_Models_Import {
             $parser = $this->getFileParser($path, $params);
             /* @var $parser editor_Models_Import_FileParser */
             $segProc->setSegmentFile($fileId, $params[1]); //$params[1] => filename
+            $parser->addSegmentProcessor($mqmProc);
             $parser->addSegmentProcessor($segProc);
             $parser->parseFile();
             $this->_imagesInTask = array_merge($this->_imagesInTask,$parser->getTagImageNames());
@@ -335,8 +337,7 @@ class editor_Models_Import {
      * @param editor_Models_RelaisFoldertree $tree
      */
     protected function importRelaisFiles(editor_Models_RelaisFoldertree $tree){
-        $params = array($this->_sourceLang, $this->_relaisLang, $this->task, $this->segmentFieldManager);
-        $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_Relais', $params);
+        $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_Relais', array($this->task, $this->segmentFieldManager));
         /* @var $segProc editor_Models_Import_SegmentProcessor_Relais */
         foreach ($this->_filePaths as $fileId => $path) {
             if(!$tree->isFileToImport($path)){

@@ -301,9 +301,15 @@ abstract class editor_Models_Import_FileParser {
     protected function setAndSaveSegmentValues(){
         $this->calculateLocalSegmentAttribs();
         foreach($this->segmentProcessor as $p) {
-            $result = $p->process($this);
+            $r = $p->process($this);
+            if($r !== false) {
+                $result = $r;
+            }
         }
-        return $result; //since all process methods has to return the segmentId, we can take the last one
+        foreach($this->segmentProcessor as $p) {
+            $result = $p->postProcessHandler($this, $result);
+        }
+        return $result;
     }
 
     /**
@@ -485,9 +491,11 @@ abstract class editor_Models_Import_FileParser {
     }
 
     /**
-     * returns an array with alle parsed data fields
+     * returns a reference to the array with alle parsed data fields
+     * The reference enables the ability to manipulate the parsed data in the segmentprocessors (see MqmParser)
+     * @see editor_Models_Import_SegmentProcessor_MqmParser
      */
-    public function getFieldContents() {
+    public function & getFieldContents() {
         return $this->segmentData;
     }
 }

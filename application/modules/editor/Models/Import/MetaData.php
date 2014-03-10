@@ -51,8 +51,14 @@
 class editor_Models_Import_MetaData {
     const META_TBX = 'tbx';
     const META_QMFLAGS = 'qmflags';
-    
-    protected $taskGuid;
+
+    /**
+     * @var editor_Models_Task
+     */
+    protected $task;
+    /**
+     * @var string
+     */
     protected $importPath;
     /**
      * @var editor_Models_Languages
@@ -96,11 +102,11 @@ class editor_Models_Import_MetaData {
 
     /**
      * intiiert die Suche nach und dann den import von MetaDaten zum Projekt
-     * @param string $taskGuid
+     * @param editor_Models_Task $task
      * @param string $importPath
      */
-    public function import(string $taskGuid, string $importPath) {
-        $this->taskGuid = $taskGuid;
+    public function import(editor_Models_Task $task, string $importPath) {
+        $this->task = $task;
         $this->importPath = $importPath;
 
         $this->importTbx();
@@ -145,7 +151,7 @@ class editor_Models_Import_MetaData {
     protected function importQmFlagXmlFile() {
         $importer = ZfExtended_Factory::get('editor_Models_Import_QmSubsegments');
         /* @var $importer editor_Models_Import_QmSubsegments */
-        $importer->importFromXml($this->taskGuid,$this->importPath);
+        $importer->importFromXml($this->task,$this->importPath);
         $this->importers[] = $importer;
         if($importer->hasTaskSpecific()) {
             $this->hasMetaData[] = self::META_QMFLAGS;
@@ -165,7 +171,7 @@ class editor_Models_Import_MetaData {
         /* @var $importer editor_Models_Import_TermListParser_Tbx */
         foreach($tbxfiles as $file) {
             /* @var $file SplFileInfo */
-            $importer->import($file, $this->taskGuid, $this->sourceLang, $this->targetLang);
+            $importer->import($file, $this->task->getTaskGuid(), $this->sourceLang, $this->targetLang);
         }
         $this->importers[] = $importer;
         $this->hasMetaData[] = self::META_TBX;

@@ -69,14 +69,26 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
     protected $segmentNrInTask = 0;
     
     /**
-     * @param editor_Models_Languages $sourceLang
-     * @param editor_Models_Languages $targetLang
+     * @var editor_Models_Languages Entity Instanz der Sprache
+     */
+    protected $sourceLang = null;
+    
+    /**
+     * @var editor_Models_Languages Entity Instanz der Sprache
+     */
+    protected $targetLang = null;
+    
+    /**
      * @param editor_Models_Task $task
+     * @param editor_Models_Languages $sourceLang
+     * @param editor_Models_Languages $targetLang,
      * @param string $userGuid
      * @param string $userName
      */
-    public function __construct(editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task, $userGuid, $userName){
-        parent::__construct($sourceLang, $targetLang, $task);
+    public function __construct(editor_Models_Task $task, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, $userGuid, $userName){
+        parent::__construct($task);
+        $this->sourceLang = $sourceLang;
+        $this->targetLang = $targetLang;
         $this->userGuid = $userGuid;
         $this->userName = $userName;
         $this->db = Zend_Registry::get('db');

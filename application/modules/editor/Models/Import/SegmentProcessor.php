@@ -63,16 +63,6 @@ abstract class editor_Models_Import_SegmentProcessor {
     protected $fileName;
     
     /**
-     * @var editor_Models_Languages Entity Instanz der Sprache
-     */
-    protected $sourceLang = null;
-    
-    /**
-     * @var editor_Models_Languages Entity Instanz der Sprache
-     */
-    protected $targetLang = null;
-    
-    /**
      * @var integer Länge, auf die die Spalten mit Text gekürzt werden, bevor
      *      sie in die DB-Spalten die für die Sortierung der Textspalten zuständig
      *      sind eingefügt werden (nötig für (krank) MSSQL, da MSSQL das auf
@@ -82,23 +72,18 @@ abstract class editor_Models_Import_SegmentProcessor {
         
     /**
      * Konstruktor
-     * @param editor_Models_Languages $sourceLang
-     * @param editor_Models_Languages $targetLang
      * @param editor_Models_Task $task
      */
-     public function __construct(editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task){
+     public function __construct(editor_Models_Task $task){
          $session = new Zend_Session_Namespace();
          $this->lengthToTruncateSegmentsToSort = $session->runtimeOptions->lengthToTruncateSegmentsToSort;
-         $this->sourceLang = $sourceLang;
-         $this->targetLang = $targetLang;
-
          $this->task = $task;
          $this->taskGuid = $task->getTaskGuid();
     }
     
     /**
      * Verarbeitet ein einzelnes Segment und gibt die ermittelte SegmentId zurück
-     * @return integer MUST return the segmentId
+     * @return integer|false MUST return the segmentId or false
      */
     abstract public function process(editor_Models_Import_FileParser $parser);
     
@@ -114,13 +99,22 @@ abstract class editor_Models_Import_SegmentProcessor {
     
     /**
      * Template Methode welche vor dem Parsen der Datei aufgerufen wird
+     * @param editor_Models_Import_FileParser $parser
      */
     public function preParseHandler(editor_Models_Import_FileParser $parser){}
     
     /**
      * Template Methode welche nach dem Parsen der Datei aufgerufen wird
+     * @param editor_Models_Import_FileParser $parser
      */
     public function postParseHandler(editor_Models_Import_FileParser $parser){}
+    
+    /**
+     * Template Method which is called after all segment processors were processed
+     * @param editor_Models_Import_FileParser $parser
+     * @param integer $segmentId
+     */
+    public function postProcessHandler(editor_Models_Import_FileParser $parser, $segmentId) {}
     
     /**
      * Segment Source / Target String gekürzt auf $this->lengthToTruncateSegmentsToSort

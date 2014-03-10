@@ -356,5 +356,34 @@ class editor_Models_Qmsubsegments extends ZfExtended_Models_Entity_Abstract {
         }
         return $groupedData;
     }
-
+    
+    /**
+     * creates the mqm tag ready for HTML output
+     * the format of the tag is used in the editor
+     */
+    public function createTag($open = true) {
+        //one time lazy creation of the strings
+        if(empty($this->_tagSkel)) {
+            $s = new Zend_Session_Namespace();
+            $this->_tagSkel = '<img class="%1$s qmflag ownttip %2$s qmflag-%3$d" data-seq="%4$d" data-comment="%5$s" src="%6$s" />';
+            $this->_tagUrl = APPLICATION_RUNDIR.'/'.$s->runtimeOptions->dir->tagImagesBasePath.'/qmsubsegment-%d-%s.png';
+        }
+        $side = $open ? 'open' : 'close';
+        $tagSide = $open ? 'left' : 'right';
+        $url = sprintf($this->_tagUrl, $this->getQmtype(), $tagSide);
+        //return Editor.data.segments.subSegment.tagPath+'qmsubsegment-'+qmid+'-'+(open ? 'left' : 'right')+'.png';
+        return sprintf($this->_tagSkel, $this->getSeverity(), $side, $this->getQmtype(), $this->getId(), $this->getComment(), $url);
+    }
+    
+    /**
+     * set the given segmentId for the given MQM Ids in the second parameter. 
+     * @param integer $segmentId
+     * @param array $ids
+     */
+    public function updateSegmentId($segmentId, array $ids) {
+        $ids = array_map(function($id) {
+            return (int) $id;
+        }, $ids);
+        $this->db->update(array('segmentId' => $segmentId), array('id in (?)' => $ids));
+    }
 }

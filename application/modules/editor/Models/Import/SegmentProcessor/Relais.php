@@ -62,19 +62,16 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
     protected $relaisField;
     
     /**
-     * @param editor_Models_Languages $sourceLang
-     * @param editor_Models_Languages $targetLang
      * @param editor_Models_Task $task
      * @param editor_Models_SegmentFieldManager $sfm receive the already inited sfm
      */
-    public function __construct(editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task, editor_Models_SegmentFieldManager $sfm) {
-        parent::__construct($sourceLang, $targetLang, $task);
+    public function __construct(editor_Models_Task $task, editor_Models_SegmentFieldManager $sfm) {
+        parent::__construct($task);
         //FIXME wie die Reihenfolge der Felder sicherstellen? ich denke wir benötigen ein Position Feld o.ä.
         //relais is forced non editable (last parameter)
         $relais = $sfm->addField($sfm::LABEL_RELAIS, editor_Models_SegmentField::TYPE_RELAIS, false);
         $this->relaisField = $sfm->getByName($relais);
         $this->sfm = $sfm;
-        
         $this->segment = ZfExtended_Factory::get('editor_Models_Segment');
         $this->segment->setTaskGuid($task->getTaskGuid());
     }
@@ -90,6 +87,6 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
         //FIXME testen was passiert wenn ein relais target fehlt, kracht das dann hier?
         $this->segment->addFieldContent($this->relaisField, $this->fileId, $parser->getMid(), $data[$target]);
         
-        return 0; //0 als dummy Rückgabe OK, da Wert nur für den Export gesammelt wird, ansonsten müsste es die DB SegmentId sein
+        return false;
     }    
 }

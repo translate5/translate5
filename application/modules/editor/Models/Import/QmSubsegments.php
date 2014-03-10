@@ -43,7 +43,7 @@
 /**
  * Bundles all import-Methods around the qm subsegment flags
  */
- class editor_Models_Import_QmSubsegments {
+ class editor_Models_Import_QmSubsegments implements editor_Models_Import_IMetaDataImporter {
     /**
      * Flag containing info if qm subsegment import uses a task specific xml file
      * @var boolean
@@ -53,11 +53,11 @@
     /**
      * imports the configured qmFlagXmlFile, store it in the internal JSON tree in qmSubsegmentFlags 
      * 
-     * @param string $taskGuid
+     * @param editor_Models_Task $task
      * @param string $importPath
      * @throws Zend_Exception
      */
-    public function importFromXml(string $taskGuid,string $importPath) {
+    public function importFromXml(editor_Models_Task $task,string $importPath) {
         $config = Zend_Registry::get('config');
         if(! $config->runtimeOptions->editor->enableQmSubSegments) {
             return;
@@ -86,11 +86,7 @@
         unset($root->children);
         $root->severities = $config->runtimeOptions->editor->qmSeverity->toArray();
         
-        $taskModel = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $taskModel editor_Models_Task */
-        $taskModel->loadByTaskGuid($taskGuid);
-        $taskModel->setQmSubsegmentFlags(json_encode($root));
-        $taskModel->save();
+        $task->setQmSubsegmentFlags(json_encode($root));
     }
 
     /**
