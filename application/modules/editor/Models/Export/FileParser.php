@@ -255,7 +255,7 @@ abstract class editor_Models_Export_FileParser {
         for (; $i < $count; $i=$i+2) {//the uneven numbers are the tags
             $id = $extract('data-seq',true);
             $class = $extract('class');
-            $open = (boolean)preg_match('"^(open .*)|(.* open)|(.* open .*)$"', $class)?TRUE:FALSE;
+            $open = (boolean)preg_match('"^(open .*)|(.* open)|(.* open .*)$"', $class);
             
             if($open){
                 $comment = $extract('data-comment',false,false);
