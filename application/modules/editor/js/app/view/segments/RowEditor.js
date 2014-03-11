@@ -231,6 +231,7 @@ Ext.define('Editor.view.segments.RowEditor', {
         if(me.setColumnToEdit(column)) {            
             me.mainEditor.setValueAndMarkup(rec.get(me.columnToEdit));
             me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
+            me.focusContextCell();
         }
     },
 
@@ -264,8 +265,7 @@ Ext.define('Editor.view.segments.RowEditor', {
             firstTarget = Editor.view.segments.column.ContentEditable.firstTarget, //is the dataIndex
             toEdit = col.dataIndex,
             hasToSwap = false,
-            fieldToDisable = null,
-            posMain;
+            fieldToDisable = null;
         
         //if user clicked on a not content column open default dataindex (also if it is a content column but not editable)
         if(!col.segmentField || !col.segmentField.get('editable')) {
@@ -297,20 +297,37 @@ Ext.define('Editor.view.segments.RowEditor', {
         
         //all editor fields disabled
         if(!fieldToDisable || !hasToSwap) {
+            me.fieldToDisable = false;
             return false;
         }
         me.columnToEdit = toEdit;
+        //if isset fieldToDisable the cols get changed in focusContextCell
+        me.fieldToDisable = fieldToDisable;
+        return true;
+    },
+    
+    /**
+     * overrides original focusing with our repositioning of the editor
+     */
+    focusContextCell: function() {
+        var me = this, 
+            posMain, posToEdit,
+            toDis = me.fieldToDisable;
         
-        posToEdit = me.items.indexOf(fieldToDisable);
+        if(! toDis) {
+            me.mainEditor.focus();
+            return;
+        }
+        posMain = me.items.indexOf(me.mainEditor),
+        posToEdit = me.items.indexOf(toDis);
+        
         //disable editor if column was also disabled
-        me.mainEditor.setWidth(fieldToDisable.width);
-        
+        me.mainEditor.setWidth(toDis.width);
         //swap position
-        posMain = me.items.indexOf(me.mainEditor);
-        posToEdit = me.items.indexOf(fieldToDisable); 
         me.move(posMain, posToEdit);
         me.repositionHorizontally();
-        me.fireEvent('afterEditorMoved', toEdit, me);
+        me.fireEvent('afterEditorMoved', me.columnToEdit, me);
+        me.mainEditor.focus();
         return true;
     },
     
@@ -325,7 +342,7 @@ Ext.define('Editor.view.segments.RowEditor', {
         if(gridReg.contains(edReg)) {
             return;
         }
-            
+        
         if(edReg.right > gridReg.right) {
             offset = -1 * gridReg.getOutOfBoundOffsetX(edReg.right) + 10;
             me.editingPlugin.grid.horizontalScroller.scrollByDeltaX(offset);
@@ -411,12 +428,6 @@ Ext.define('Editor.view.segments.RowEditor', {
       me.context.record.reject();
       me.editingPlugin.openedRecord = null;
       me.callParent(arguments);
-    },
-    /**
-     * deaktiviert die Orginal focus Methode, 
-     * diese springt an falsche Stellen nach einem RangeLoad
-     */
-    focusContextCell: function() {
     },
     /**
      * setzt den gekürzten Inhalt des letzten Segments. Muss mit dem "gemarkupten" Content aufgerufen werden um alle Tags zu entfernen. 
