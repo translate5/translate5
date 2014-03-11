@@ -45,7 +45,6 @@
  * speichert die ermittelten Segment Daten in die Relais Spalte des entsprechenden Segments 
  */
 class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Import_SegmentProcessor {
-    //FIXME adapt statistics GUI for fluent!
     //FIXME export der Statistiken, müssen auch noch angepasst werden! Umsetzung offen (als weitere Ebene beim Export Ausklapp Menü?)
     const OPEN_TAG = true;
     const CLOSE_TAG = false;
@@ -77,7 +76,6 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
         $this->segment = ZfExtended_Factory::get('editor_Models_Segment');
         $this->segment->setTaskGuid($task->getTaskGuid());
         $this->issues = array_flip($this->task->getQmSubsegmentIssuesFlat());
-        error_log(print_r($this->issues,1));
         $this->mqm = ZfExtended_Factory::get('editor_Models_Qmsubsegments');
     }
     
@@ -111,6 +109,8 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
         if(count($split) == 1) {
             return $data;
         }
+        
+        $data['originalMd5'] = md5(preg_replace('#<mqm:(startIssue|)([^>]+)/>#', '', $seg));
         
         $closeTags = array();
         for($i = 1; $i < $splitCnt; $i++) {
@@ -154,7 +154,6 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
         }
         
         $data['original'] = join('', $split);
-        //FIXME here originalMd5 setzen ohne tags drin!
         return $data;
     }
 
@@ -176,7 +175,7 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
         $data = array(
             'fieldedited' => $attributes['segmentfield'],
             'taskGuid' => $this->taskGuid,
-            //'segmentId' => '', //FIXME die kann erst nachträglich gesetzt werden!
+            //'segmentId' => '', //can only be set by postprocesshandler
             'qmtype' => $this->issues[$attributes['type']],
             'severity' => $attributes['severity'],
             'comment' => $attributes['note'],
@@ -191,7 +190,6 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
      */
     public function postProcessHandler($parser, $segmentId) {
         if(!empty($this->segmentMqmIds)) {
-            error_log($segmentId.'#'.print_r( $this->segmentMqmIds,1));
             $this->mqm->updateSegmentId($segmentId, $this->segmentMqmIds);
         }
     }

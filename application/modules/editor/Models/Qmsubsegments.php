@@ -269,8 +269,7 @@ class editor_Models_Qmsubsegments extends ZfExtended_Models_Entity_Abstract {
                         $issue->totalTotal += $storage->statData[$issue->id]['sum'];
                     }
                 }
-                //useful for debugging:
-                //$issue->text .= ' '.$issue->id;
+                $issue->qmtype = $issue->id;
                 unset($issue->id);
                 
                 if($hasChilds){
@@ -285,7 +284,7 @@ class editor_Models_Qmsubsegments extends ZfExtended_Models_Entity_Abstract {
                         $issue->totalTotal += $childsIssue->totalTotal;
                     }
                     $issue->children = $storage->issues;
-                    $issue->children = array_values($issue->children);//insure that we have a numerical array for json-conversion (otherwhise we will not get a json-array, but a json-object)
+                    $issue->children = array_values($issue->children);//ensure that we have a numerical array for json-conversion (otherwhise we will not get a json-array, but a json-object)
                 }
                 if($issue->totalTotal == 0){
                     unset($issues[$keyIssue]);
