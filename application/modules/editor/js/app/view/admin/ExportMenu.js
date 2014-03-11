@@ -42,42 +42,44 @@ Ext.define('Editor.view.admin.ExportMenu', {
   messages: {
       exportDef: '#UT#exportieren',
       exportDiff: '#UT#exportieren mit Änderungshistorie',
-      exportTargetQm: '#UT#Export Zieltext QM-Statistik (XML)',
-      exportSourceQm: '#UT#Export Ausgangstext QM-Statistik (XML)'
+      exportQmField: '#UT#Export QM-Statistik (XML) für Feld: {0}'
   },
   alias: 'widget.adminExportMenu',
-  updatePaths: function(task) {
-      var me = this;
-      me.items.each(function(menu){
-          menu.itemEl.set({
-              href: Ext.String.format(menu.href, task.get('id'), task.get('taskGuid'))
-          });
-      });
+  makePath: function(path, field) {
+      var task = this.initialConfig.task;
+      return Editor.data.restpath+Ext.String.format(path, task.get('id'), task.get('taskGuid'), field);
   },
   initComponent: function() {
     var me = this,
-        path = Editor.data.restpath;
+        fields = this.initialConfig.fields;
+    
     me.items = [{
         itemId: 'exportItem',
         hrefTarget: '_blank',
-        href: path+'task/export/id/{0}',
+        href: me.makePath('task/export/id/{0}'),
         text: me.messages.exportDef
     },{
         itemId: 'exportDiffItem',
         hrefTarget: '_blank',
-        href: path+'task/export/id/{0}/diff/1',
+        href: me.makePath('task/export/id/{0}/diff/1'),
         text : me.messages.exportDiff
-    },{
-        itemId: 'exportTargetQmItem',
-        hrefTarget: '_blank',
-        href: path+'qmstatistics/index/taskGuid/{1}/',
-        text : me.messages.exportTargetQm
-    },{
-        itemId: 'exportSourceQmItem',
-        hrefTarget: '_blank',
-        href: path+'qmstatistics/index/taskGuid/{1}/?type=source',
-        text : me.messages.exportSourceQm
     }];
+    
+    if(fields === false) {
+        me.callParent(arguments);
+        return;
+    }
+    
+    fields.each(function(field){
+        if(!field.get('editable')) {
+            return;
+        }
+        me.items.push({
+            hrefTarget: '_blank',
+            href: me.makePath('qmstatistics/index/taskGuid/{1}/?type={2}', field.get('name')),
+            text : Ext.String.format(me.messages.exportQmField, field.get('label'))
+        });
+    });
     me.callParent(arguments);
   }
 });
