@@ -74,7 +74,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     }
 
     public function putAction() {
-        $session = new Zend_Session_Namespace();
         $sessionUser = new Zend_Session_Namespace('user');
         $this->entity->load((int) $this->_getParam('id'));
 
@@ -95,7 +94,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         //@todo do this with events
         $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
         /* @var $workflow editor_Workflow_Default */
-        $workflow->beforeSegmentSave($this->entity, $session->task->enableSourceEditing);
+        $workflow->beforeSegmentSave($this->entity);
         
         $this->entity->validate();
         
