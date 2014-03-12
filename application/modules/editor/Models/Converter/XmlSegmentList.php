@@ -108,6 +108,8 @@ class editor_Models_Converter_XmlSegmentList {
             $relaisLang = $lang->getRfc5646();
         }
         
+        //For Xliff see https://code.google.com/p/interoperability-now/downloads/detail?name=XLIFFdoc%20Representation%20Guide%20v1.0.1.pdf&can=2&q=
+        // and http://docs.oasis-open.org/xliff/v1.2/os/xliff-core.html
         $result = array('<?xml version="1.0" encoding="UTF-8"?>');
         $result[] = '<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dx="http://www.interoperability-now.org/schema" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-doc-1_0_extensions.xsd" dx:version="1.4" xmlns:translate5="http://www.translate5.net/" >';
         $result[] = '<!-- attention: currently the usage of g- and x-tags in this doc is not completely in line with the xliff:doc-spec. This will change, when resources for this issue will be assigned -->';
