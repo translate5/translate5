@@ -171,7 +171,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
             }
             //if field is editable (source or target), show the edited data
             if($field->editable) {
-                $fieldsToShow[$sfm->getEditIndex($field->name)] = $t->_($field->label.' - bearbeitet');
+                $fieldsToShow[$sfm->getEditIndex($field->name)] = sprintf($t->_('%s - bearbeitet'), $t->_($field->label));
             }
         }
         

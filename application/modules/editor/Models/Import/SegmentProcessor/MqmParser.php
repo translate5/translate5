@@ -45,7 +45,6 @@
  * speichert die ermittelten Segment Daten in die Relais Spalte des entsprechenden Segments 
  */
 class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Import_SegmentProcessor {
-    //FIXME export der Statistiken, müssen auch noch angepasst werden! Umsetzung offen (als weitere Ebene beim Export Ausklapp Menü?)
     const OPEN_TAG = true;
     const CLOSE_TAG = false;
     /**

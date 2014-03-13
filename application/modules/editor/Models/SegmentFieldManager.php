@@ -233,7 +233,6 @@ class editor_Models_SegmentFieldManager {
         if(!empty($fieldCnt)) {
             $name .= max($fieldCnt)+1;
         }
-//FIXME make a unique key on name and taskGuid
         $this->addFieldToDataMap($name);
         $field = ZfExtended_Factory::get('editor_Models_SegmentField');
         /* @var $field editor_Models_SegmentField */
@@ -242,7 +241,6 @@ class editor_Models_SegmentFieldManager {
         if(is_null($editable)) {
             $editable = $isTarget;
         }
-        //FIXME what about translations of the label? → solution: we set the default strings for source target relais as consts in fileparser. Translation is done in place of output. Passt das mit dem CSV Konzept?
         $field->setLabel($label);
         $field->setName($name);
         $field->setTaskGuid($this->taskGuid);
@@ -350,6 +348,7 @@ class editor_Models_SegmentFieldManager {
     
     /**
      * creates / updates the View of the internal stored taskGuid
+     * @todo adapt this method for history tables when needed!
      */
     public function updateView() {
         if(empty($this->taskGuid)) {
@@ -427,55 +426,5 @@ class editor_Models_SegmentFieldManager {
      */
     protected function _dropView($viewname, Zend_Db_Adapter_Abstract $db) {
         $db->query("DROP VIEW IF EXISTS " . $viewname);
-    }
-    
-    /**
-     * FIXME rework me along above updateview
-     * create / update View
-     * @param string $userguid
-     */
-    public function updateHistoryView($userguid)
-    {
-        if(empty($userguid)) {
-            // TODO add error handling
-            return;
-        }
-        $cols = "*";
-        // TODO get columns
-        $this->initHistoryData($userguid);
-
-        $sView_data_history_name         = "data_history_" . md5($userguid);
-        $sView_segment_history_name      = "segment_history_" . md5($userguid);
-
-        $sStmt_drop_view_data_history       = "DROP VIEW IF EXISTS " . $sView_data_history_name;
-        $sStmt_drop_view_segment_history    = "DROP VIEW IF EXISTS " . $sView_segment_history_name;
-
-
-        $sStmt_create_view_data_history = "CREATE VIEW " . $sView_data_history_name . " AS ";
-        $sStmt_create_view_data_history .= "
-        SELECT
-            LEK_segment_history_data.segmentId,
-            LEK_segment_history_data.edited,
-             ";
-        foreach($this->_segmentdata as $value){
-            $sStmt_create_view_data_history .= "MAX(IF(LEK_segment_history_data.name = '".$value['name']."', edited, NULL)) AS '".$value['name']."',";
-        }
-        $sStmt_create_view_data_history = substr($sStmt_create_view_data_history, 0, (strlen($sStmt_create_view_data_history)-1));
-        $sStmt_create_view_data_history .= " FROM LEK_segment_history_data GROUP BY segmentId";
-
-        $sStmt_create_view_segment_history = "CREATE VIEW " . $sView_segment_history_name . " AS ";
-        $sStmt_create_view_segment_history .= "
-            SELECT  LEK_segment_history." . $cols . "
-            FROM `LEK_segment_history`
-            join " . $sView_data_history_name . "
-            AS data ON data.segmentId = LEK_segment_history.id
-            WHERE `userGuid` = '".$userguid."'
-        ";
-
-        $this->db->getAdapter()->getConnection()->exec($sStmt_drop_view_data_history);
-        $this->db->getAdapter()->getConnection()->exec($sStmt_drop_view_segment_history);
-        $this->db->getAdapter()->getConnection()->exec($sStmt_create_view_data_history);
-        $this->db->getAdapter()->getConnection()->exec($sStmt_create_view_segment_history);
-        return;
     }
 }
