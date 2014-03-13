@@ -51,6 +51,7 @@
  * @method void setEditable() setEditable(boolean $editable)
  */
 class editor_Models_SegmentField extends ZfExtended_Models_Entity_Abstract {
+    //consts also defined in GUI Model Editor.model.segment.Field 
     const TYPE_SOURCE = 'source';
     const TYPE_TARGET = 'target';
     const TYPE_RELAIS = 'relais';

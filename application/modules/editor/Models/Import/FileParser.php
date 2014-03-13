@@ -404,13 +404,12 @@ abstract class editor_Models_Import_FileParser {
     }
     
     /**
-     * FIXME test me → use our test data for single targets, construct CSV test data for multicolumns!
      * returns true if at least one target has a translation set
      */
     protected function isTranslated() {
         foreach($this->segmentData as $name => $data) {
             $field = $this->segmentFieldManager->getByName($name);
-            if($field->type !== 'target') {
+            if($field->type !== editor_Models_SegmentField::TYPE_TARGET) {
                 continue;
             }
             if(!empty($data['original'])) {

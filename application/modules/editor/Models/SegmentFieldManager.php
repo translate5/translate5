@@ -212,7 +212,6 @@ class editor_Models_SegmentFieldManager {
     
     /**
      * Add the given segment field (for the internally stored taskGuid)
-     * FIXME Sortierung der Felder!!!
      * @param string $label string any string as label
      * @param string $type one of the editor_Models_SegmentField::TYPE_... consts
      * @param boolean $editable optional, default null means that editable is calculated. if boolean use the given value for editable
