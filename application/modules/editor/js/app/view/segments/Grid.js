@@ -120,7 +120,8 @@ Ext.define('Editor.view.segments.Grid', {
         var me = this,
             columns = [],
             firstTargetFound = false,
-            fields = Editor.data.task.segmentFields();
+            fields = Editor.data.task.segmentFields(),
+            fieldList = [];
         
         this.store = Ext.create('Editor.store.Segments',{
             storeId: 'Segments'
@@ -147,13 +148,25 @@ Ext.define('Editor.view.segments.Grid', {
             },
             width: 140
         }]);
-    
+        
+        //conv store data to an array
         fields.each(function(rec){
+            fieldList.push(rec);
+        });
+        
+        //sort the fieldList array by type
+        fieldList = Ext.Array.sort(fieldList, function(one, two) {
+            one = one.typeSortOrder[one.get('type')];
+            two = two.typeSortOrder[two.get('type')];
+            return one - two;
+        });
+        
+        Ext.Array.each(fieldList, function(rec){
             var name = rec.get('name'),
                 type = rec.get('type'),
                 editable = rec.get('editable'),
-                isEditableTarget = type == 'target' && editable,
-                isErgoVisible = !firstTargetFound && isEditableTarget || type == 'source';
+                isEditableTarget = type == rec.TYPE_TARGET && editable,
+                isErgoVisible = !firstTargetFound && isEditableTarget || type == rec.TYPE_SOURCE;
             
             //stored outside of function and must be set after isErgoVisible!
             firstTargetFound = firstTargetFound || isEditableTarget; 

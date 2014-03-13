@@ -44,6 +44,14 @@
  * @extends Ext.data.Model
  */
 Ext.define('Editor.model.segment.Field', {
+    TYPE_SOURCE: 'source',
+    TYPE_RELAIS: 'relais',
+    TYPE_TARGET: 'target',
+    typeSortOrder: {
+        'source': 0,
+        'relais': 1,
+        'target': 2
+    },
   extend: 'Ext.data.Model',
   fields: [
     {name: 'id', type: 'int'},
@@ -56,6 +64,6 @@ Ext.define('Editor.model.segment.Field', {
   ],
   idProperty: 'id',
   isTarget: function() {
-      return this.get('type') == 'target';
+      return this.get('type') == this.TYPE_TARGET;
   }
 });

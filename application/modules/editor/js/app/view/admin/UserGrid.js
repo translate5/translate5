@@ -63,7 +63,7 @@ Ext.define('Editor.view.admin.UserGrid', {
       reloadBtnTip: '#UT#Benutzerliste vom Server aktualisieren.'
   },
   store: 'admin.Users',
-  //FIXME define filters for the user grid!
+  //TODO define filters for the user grid!
   //features: [{
     //ftype: 'editorGridFilter'
   //}],
