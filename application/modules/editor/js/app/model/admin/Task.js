@@ -116,13 +116,6 @@ Ext.define('Editor.model.admin.Task', {
       return this.get('qmSubEnabled');
   },
   /**
-   * returns if tasks source is editable
-   * @return {Boolean}
-   */
-  isSourceEditable: function() {
-      return this.get('enableSourceEditing'); //should be the same value as in segmentFields().source.editable
-  },
-  /**
    * returns if task is locked
    * @return {Boolean}
    */
