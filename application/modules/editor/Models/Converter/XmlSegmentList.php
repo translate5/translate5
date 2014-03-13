@@ -67,12 +67,13 @@ class editor_Models_Converter_XmlSegmentList {
     /**
      * @var boolean
      */
-    protected $saveXmlToFile = true; //@todo let me come from an INI file
+    protected $saveXmlToFile = true;
     
     public function __construct(){
         $session = new Zend_Session_Namespace();
         $this->stateFlags = $session->runtimeOptions->segments->stateFlags->toArray();
         $this->qualityFlags = $session->runtimeOptions->segments->qualityFlags->toArray();
+        $this->saveXmlToFile = (boolean) $session->runtimeOptions->saveXmlToFile;
         
         $this->comment = ZfExtended_Factory::get('editor_Models_Comment');
     }
@@ -108,6 +109,8 @@ class editor_Models_Converter_XmlSegmentList {
             $relaisLang = $lang->getRfc5646();
         }
         
+        $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
+        
         //For Xliff see https://code.google.com/p/interoperability-now/downloads/detail?name=XLIFFdoc%20Representation%20Guide%20v1.0.1.pdf&can=2&q=
         // and http://docs.oasis-open.org/xliff/v1.2/os/xliff-core.html
         $result = array('<?xml version="1.0" encoding="UTF-8"?>');
@@ -118,6 +121,11 @@ class editor_Models_Converter_XmlSegmentList {
         $file = '<file original="%1$s" source-language="%2$s" target-language="%3$s" xml:space="preserve">';
         $result[] = sprintf($file, $task->getTaskName(), $sourceLang, $targetLang);
         $result[] = '<body>';
+        
+        //both getFirst calls throw an exception if no corresponding field is given, that should not be, so uncatched is OK.
+        $firstTarget = $sfm->getFirstTargetName();
+        $firstSource = $sfm->getFirstSourceName();
+        
         foreach($segments as $segment) {
             $segStart = '<trans-unit id="%1$s" translate5:autostateId="%2$s" translate5:autostateText="%3$s">';
             if(isset($consts[$segment['autoStateId']])) {
@@ -138,14 +146,31 @@ class editor_Models_Converter_XmlSegmentList {
             
             
             //$result[] = '<segmentNr>'.$segment['segmentNrInTask'].'</segmentNr>';
-            $result[] = '<source>'.$this->prepareText($segment['source']).'</source>';
-            $matchRate = number_format($segment['matchRate'], 1, '.', '');
-            //FIXME adapt for fluent
-            $result[] = '<target dx:match-quality="'.$matchRate.'">'.$this->prepareText($segment['edited']).'</target>';
-            $result[] = '<alt-trans><target xml:lang="'.$targetLang.'">'.$this->prepareText($segment['target']).'</target></alt-trans>';
-            if($relaisLang !== false) {
-                $result[] = '<alt-trans><target xml:lang="'.$relaisLang.'">'.$this->prepareText($segment['relais']).'</target></alt-trans>';
+            $result[] = '<source>'.$this->prepareText($segment[$firstSource]).'</source>';
+
+            $fields = $sfm->getFieldList();
+            foreach($fields as $field) {
+                if($field->type == editor_Models_SegmentField::TYPE_SOURCE) {
+                    continue; //handled above
+                }
+                if($field->type == editor_Models_SegmentField::TYPE_RELAIS && $relaisLang !== false) {
+                    $result[] = '<alt-trans dx:origin-shorttext="'.$field->label.'"><target xml:lang="'.$relaisLang.'">'.$this->prepareText($segment[$field->name]).'</target></alt-trans>';
+                    continue;
+                }
+                if($field->type != editor_Models_SegmentField::TYPE_TARGET) {
+                    continue;
+                }
+                if($firstTarget == $field->name) {
+                    $matchRate = number_format($segment['matchRate'], 1, '.', '');
+                    $result[] = '<target dx:match-quality="'.$matchRate.'">'.$this->prepareText($segment[$sfm->getEditIndex($firstTarget)]).'</target>';
+                    $result[] = '<alt-trans dx:origin-shorttext="'.$field->label.'" alttranstype="previous-version">';
+                }
+                else {
+                    $result[] = '<alt-trans dx:origin-shorttext="'.$field->label.'">';
+                }
+                $result[] = '<target xml:lang="'.$targetLang.'">'.$this->prepareText($segment[$field->name]).'</target></alt-trans>';
             }
+            
             if(!empty($segment['comments'])) {
                 $comments = $this->comment->loadBySegmentAndTaskPlain((integer)$segment['id'], $task->getTaskGuid());
                 $note = '<dx:note dx:modified-by="%1$s" dx:annotates="target" dx:modified-at="%2$s">%3$s</dx:note>';

@@ -47,6 +47,12 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
     protected static $segmentCache = array();
     
     /**
+     * segment list
+     * @var array
+     */
+    protected $segments;
+    
+    /**
      * This var ist initilized lazy
      * @var editor_Models_Converter_XmlSegmentList
      */
@@ -143,6 +149,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
         /* @var $states editor_Models_SegmentAutoStates */
         $stateMap = $states->getLabelMap();
         
+        
         $this->xmlConverter = ZfExtended_Factory::get('editor_Models_Converter_XmlSegmentList');
         
         $t = $this->view->translate;
@@ -150,16 +157,32 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
             return '<b>'.$t->_('Es wurden keine Segmente verändert!').'</b>';
         }
         $task = $this->view->task;
+        $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
+        
+        $fields = $sfm->getFieldList();
+        $fieldsToShow = array();
+        foreach($fields as $field) {
+            if($field->type == editor_Models_SegmentField::TYPE_RELAIS) {
+                continue;
+            }
+            //show the original source
+            if($field->type == editor_Models_SegmentField::TYPE_SOURCE) {
+                $fieldsToShow[$field->name] = $t->_($field->label);
+            }
+            //if field is editable (source or target), show the edited data
+            if($field->editable) {
+                $fieldsToShow[$sfm->getEditIndex($field->name)] = $t->_($field->label.' - bearbeitet');
+            }
+        }
+        
         /* @var $task editor_Models_Task */
         $result = array('<br /><br /><table cellpadding="4">');
         $th = '<th align="left" valign="top">';
         $result[] = '<tr>';
         $result[] = $th.$t->_('Nr.').'</th>';
-        $result[] = $th.$t->_('Quelltext').'</th>';
-        if($task->getEnableSourceEditing()) {
-            $result[] = $th.$t->_('Quelltext - bearbeitet').'</th>';
+        foreach($fieldsToShow as $field) {
+            $result[] = $th.$field.'</th>';
         }
-        $result[] = $th.$t->_('Zieltext - bearbeitet').'</th>';
         $result[] = $th.$t->_('Status').'</th>';
         $result[] = $th.$t->_('QM').'</th>';
         $result[] = $th.$t->_('AutoStatus').'</th>';
@@ -175,12 +198,9 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
             $state = isset($stateMap[$segment['autoStateId']]) ? $stateMap[$segment['autoStateId']] : '- not found -'; //else tree should not be so untranslated
             $result[] = "\n".'<tr>';
             $result[] = '<td valign="top">'.$segment['segmentNrInTask'].'</td>';
-            $result[] = '<td valign="top">'.$this->prepareSegment($segment['source']).'</td>';
-            //FIXME adapt for fluent
-            if($task->getEnableSourceEditing()) {
-                $result[] = '<td valign="top">'.$this->prepareSegment($segment['sourceEdited']).'</td>';
+            foreach($fieldsToShow as $fieldName => $field) {
+                $result[] = '<td valign="top">'.$this->prepareSegment($segment[$fieldName]).'</td>';
             }
-            $result[] = '<td valign="top">'.$this->prepareSegment($segment['edited']).'</td>';
             $result[] = '<td valign="top" nowrap="nowrap">'.$t->_($this->xmlConverter->convertStateId($segment['stateId'])).'</td>';
             $qms = array_map($translateQm, $this->xmlConverter->convertQmIds($segment['qmId']));
             $result[] = '<td valign="top" nowrap="nowrap">'.join(',<br />', $qms).'</td>';

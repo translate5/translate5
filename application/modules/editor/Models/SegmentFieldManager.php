@@ -103,6 +103,14 @@ class editor_Models_SegmentFieldManager {
     }
     
     /**
+     * returns the loaded fields as array of Zend_Db_Table_Row
+     * @return [Zend_Db_Table_Row]
+     */
+    public function getFieldList() {
+        return $this->segmentfields;
+    }
+    
+    /**
      * initiates the task specific segment fields
      * @param string $taskGuid
      * @param boolean $reload optional, if true overwrite the internal stored fields for the task (if they were already loaded)
@@ -299,13 +307,45 @@ class editor_Models_SegmentFieldManager {
      * @return array
      */
     public function getEditableDataIndexList() {
+        return $this->_getDataIndexList(true);
+    }
+    
+    /**
+     * returns a list of all field dataindizes
+     * @return array
+     */
+    public function getDataIndexList() {
+        return $this->_getDataIndexList(false);
+    }
+    
+    /**
+     * returns a list of all or editable field dataindizes, depending on param
+     * @param boolean $editableOnly if true return editable field data indizes only
+     * @return array
+     */
+    protected function _getDataIndexList($editableOnly) {
         $result = array();
         foreach($this->segmentfields as $field) {
+            if(!$editableOnly) {
+                $result[] = $field->name;
+            }
             if($field->editable) {
-                $result[] = $field->name.self::_EDIT_PREFIX;
+                $result[] = $this->getEditIndex($field->name);
             }
         }
         return $result;
+    }
+    
+    /**
+     * returns the editable Data Index to a given field name, false if field does not exists or is not editable!
+     * @param string $name
+     * @return string|false
+     */
+    public function getEditIndex($name) {
+        if($this->getByName($name) === false){
+            return false;
+        }
+        return $name.self::_EDIT_PREFIX;
     }
     
     /**

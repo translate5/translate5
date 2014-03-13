@@ -438,7 +438,7 @@ class editor_TaskController extends ZfExtended_RestController {
         if(empty($this->segmentFieldManager)) {
             $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         }
-        //sets he information if this task has default segment field layout or not
+        //sets the information if this task has default segment field layout or not
         $row['defaultSegmentLayout'] = $this->segmentFieldManager->isDefaultLayout(array_map(function($field){
             return $field['name'];
         }, $row['segmentFields']));

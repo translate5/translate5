@@ -279,7 +279,7 @@ class editor_Models_SegmentAutoStates {
      * @param editor_Models_Segment $segment
      */
     public function setInitialStates(string $taskGuid, editor_Models_Segment $segment) {
-        $segment->updateAutoState($taskGuid, self::REVIEWED_UNTOUCHED, self::NOT_TRANSLATED,true);
+        $segment->updateAutoState($taskGuid, self::REVIEWED_UNTOUCHED, self::NOT_TRANSLATED, true);
         $segment->updateAutoState($taskGuid, self::REVIEWED_UNTOUCHED, self::TRANSLATED);
     }
     

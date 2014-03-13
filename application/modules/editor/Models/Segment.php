@@ -383,17 +383,21 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
 
     /**
      * Loads segments by a specific workflowStep, fetch only specific fields.
-     * @param string $taskguid
+     * @param string $taskGuid
      * @param string $workflowStep
      */
-    public function loadByWorkflowStep(string $taskguid, string $workflowStep) {
-        //FIXME generell ist noch unklar ob eventuell die Felder autoStateId, stateId etc für alternates angepasst werden müssen, daher die Änderung der nachfolgenden Datenfelder noch offen.
-        $fields = array('id', 'mid', 'segmentNrInTask', 'source', 'sourceEdited', 'relais', 'target', 'edited', 'stateId', 'autoStateId', 'matchRate', 'qmId', 'comments');
+    public function loadByWorkflowStep(string $taskGuid, string $workflowStep) {
+        $this->segmentFieldManager->initFields($taskGuid);
+        $this->reInitDb($taskGuid);
+        
+        $fields = array('id', 'mid', 'segmentNrInTask', 'stateId', 'autoStateId', 'matchRate', 'qmId', 'comments');
+        $fields = array_merge($fields, $this->segmentFieldManager->getDataIndexList());
+        
         $this->initDefaultSort();
         $s = $this->db->select(false);
         $db = $this->db;
         $s->from($this->db, $fields);
-        $s->where('taskGuid = ?', $taskguid)->where('workflowStep = ?', $workflowStep);
+        $s->where('taskGuid = ?', $taskGuid)->where('workflowStep = ?', $workflowStep);
         return parent::loadFilterdCustom($s);
     }
 
@@ -476,6 +480,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         $segmentsViewName = $this->segmentFieldManager->getDataViewName($taskGuid);
         $sql = $this->_getAlikesSql($segmentsViewName);
+        //since alikes are only usable with segment field default layout we can use the following hardcoded methods
         $stmt = $this->db->getAdapter()->query($sql, array(
             $this->getSourceMd5(),
             $this->getTargetMd5(),
@@ -520,7 +525,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * Gibt ein assoziatives Array mit den Segment IDs zurück, die nach Anwendung des Filters noch da sind.
+     * For ChangeAlikes: Gibt ein assoziatives Array mit den Segment IDs zurück, die nach Anwendung des Filters noch da sind.
      * ArrayKeys: SegmentId, ArrayValue immer true
      * @param string $segmentsTableName
      * @param string $taskGuid
@@ -610,15 +615,25 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @param boolean $emptyEditedOnly
      */
     public function updateAutoState(string $taskGuid, integer $oldState, integer $newState, $emptyEditedOnly = false) {
-        $where = array(
-            'autoStateId = ?' => $oldState,
-            'taskGuid = ?' => $taskGuid
-        );
-        //FIXME adapt for fluent
-        if($emptyEditedOnly) {
-            $where['edited = ?'] = '';
+        $sfm = $this->segmentFieldManager;
+        $db = $this->db;
+        $sql = 'UPDATE `%s` d, `%s` v set d.autoStateId = ? where d.id = v.id and v.autoStateId = ? and v.taskGuid = ?';
+        $sql = sprintf($sql, $db->info($db::NAME), $sfm->getDataViewName($taskGuid));
+        $bind = array($newState, $oldState, $taskGuid);
+        
+        if(!$emptyEditedOnly) {
+            $this->db->getAdapter()->query($sql, $bind);
+            return;
         }
-        $this->db->update(array('autoStateId' => $newState), $where);
+        $sfm->initFields($taskGuid);
+        $fields = $sfm->getFieldList();
+        foreach($fields as $field) {
+            if($field->type == editor_Models_SegmentField::TYPE_TARGET && $field->editable) {
+                $sql .= ' and '.$sfm->getEditIndex($field->name).' = ?';
+                $bind[] = '';
+            }
+        }
+        $this->db->getAdapter()->query($sql, $bind);
     }
 
     /**
