@@ -43,8 +43,6 @@
 
 /**
  * Stellt Methoden bereit, die translate5 grundsätzlich als Stand Alone-Anwendung verfügbar machen
- *
- * @todo: Bei Entwicklung einer Serverapplication für translate5 getParams filtern
  */
 class IndexController extends ZfExtended_Controllers_Action {
     /*
@@ -155,7 +153,6 @@ class IndexController extends ZfExtended_Controllers_Action {
                 continue;
             }
             $sql = file_get_contents($realfile);
-//FIXME query kommt nicht mit mehreren Statements zurecht. MultiQuery?
             //$dbAdapter->query($sql);
             $dbAdapter->insert('dbversion', array('name' => $file));
         }
@@ -182,8 +179,6 @@ class IndexController extends ZfExtended_Controllers_Action {
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
         $test = $config->runtimeOptions->imageTag->fontFilePath;
-        
-        //@todo wegen openbasedir muss um die file_exists ein try catch bzw. dann um jeden einzelnen Test
         
         if(! file_exists($test)){
             echo 'ERROR "'.$test.'" does not exist!';
