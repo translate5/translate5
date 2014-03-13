@@ -36,12 +36,13 @@
 CREATE TABLE IF NOT EXISTS `LEK_segment_field` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `taskGuid` varchar(38) NOT NULL COMMENT 'Foreign Key to LEK_task',
-  `name` varchar(300) NOT NULL COMMENT 'contains the label without invalid chars',
+  `name` varchar(120) NOT NULL COMMENT 'contains the label without invalid chars',
   `type` varchar(60) not null default 'target',
   `label` varchar(300) NOT NULL COMMENT 'field label as provided by CSV / directory',
   `rankable` tinyint(1) NOT NULL default 0 COMMENT 'defines if this field is rankable in the ranker',
   `editable` tinyint(1) NOT NULL default 0 COMMENT 'defines if only the readOnly Content column is provided',
   PRIMARY KEY (`id`),
+  UNIQUE KEY (`taskGuid`,`name`),
   CONSTRAINT FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
