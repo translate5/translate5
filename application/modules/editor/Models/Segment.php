@@ -85,16 +85,28 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * updates the toSort attribute of the given attribute name (only if toSort exists!)
+     * @param string $field
+     */
+    public function updateToSort($name) {
+        $toSort = $name.'ToSort';
+        if(!$this->hasField($toSort)) {
+            return;
+        }
+        $v = $this->__call('get'.ucfirst($name), array());
+        $this->__call('set'.ucfirst($toSort), array($this->truncateSegmentsToSort($v)));
+    }
+    
+    /**
+     * truncates the given segment content and strips tags for the toSort fields
+     * truncation is needed for sorting in MSSQL
      * @param $segment
      * @return string
      */
-    protected function truncateSegmentsToSort($segment)
-    {
-        //FIXME this should be done in the Controller bzw. in a unified way!
+    protected function truncateSegmentsToSort($segment) {
         if(!is_string($segment)){
             return $segment;
         }
-        //FIXME search mb_substr since there are more usages of the ToSort thing
         return mb_substr(strip_tags($segment),0,$this->lengthToSort,'utf-8');
     }
     
@@ -356,9 +368,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $cols = $this->db->info($db::COLS);
 
         /**
-         * FIXME should we implement this filter in SegmentFieldManager?
-         * Filtering out unused cols is needed for TaskManagement Feature (user dependent cols) 
-        if (!$loadSourceEdited) {
+         * FIXME reminder for TRANSLATE-113: Filtering out unused cols is needed for TaskManagement Feature (user dependent cols)
+         * This is a example for field filtering. 
+         if (!$loadSourceEdited) {
             $cols = array_filter($cols, function($val) {
                         return strpos($val, 'sourceEdited') === false;
                     });

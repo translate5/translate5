@@ -84,7 +84,6 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
         $data = $parser->getFieldContents();
         $target = $this->sfm->getFirstTargetName();
         
-        //FIXME testen was passiert wenn ein relais target fehlt, kracht das dann hier?
         $this->segment->addFieldContent($this->relaisField, $this->fileId, $parser->getMid(), $data[$target]);
         
         return false;

@@ -92,8 +92,9 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
             return;
         }
         
-        $getter = 'get'.$fieldToProcess.'Edit';
-        $setter = 'set'.$fieldToProcess.'Edit';
+        $editField = $fieldToProcess.'Edit';
+        $getter = 'get'.$editField;
+        $setter = 'set'.$editField;
         
         $this->entity->load($editedSegmentId);
         
@@ -141,10 +142,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 else {
                     $entity->{$setter}($this->entity->{$getter}());
                 }
-                $truncLength = $session->runtimeOptions->lengthToTruncateSegmentsToSort;
-                $toSort = (string)mb_substr($entity->{$getter}(),0,$truncLength,'utf-8');
-                //FIXME die toSort Spalte wird beim WDHE neu gesetzt, mache ich das beim normalen Segment PUT auch?
-                $entity->{$setter.'ToSort'}($toSort);
+                $entity->updateToSort($editField);
                 
                 $entity->setQmId((string) $this->entity->getQmId());
                 if(!is_null($this->entity->getStateId())) {

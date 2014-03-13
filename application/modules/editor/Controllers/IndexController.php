@@ -292,7 +292,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         if($ed->enableQmSubSegments){
             $controllers[] = 'QmSubSegments';
         }
-        //FIXME abhängig von Rolle setzen
+        //FIXME abhängig von Rolle setzen (on ITL Adaption)
         $controllers[] = 'admin.TaskOverview'; //Bei ITL wird der nicht benötigt
         $controllers[] = 'admin.TaskUserAssoc'; //nur PMs
         if($acl->isInAllowedRoles($userSession->data->roles,'adminUserFrontendController')){

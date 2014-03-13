@@ -63,20 +63,10 @@ abstract class editor_Models_Import_SegmentProcessor {
     protected $fileName;
     
     /**
-     * @var integer Länge, auf die die Spalten mit Text gekürzt werden, bevor
-     *      sie in die DB-Spalten die für die Sortierung der Textspalten zuständig
-     *      sind eingefügt werden (nötig für (krank) MSSQL, da MSSQL das auf
-     *      DB-Ebene nicht vernünftig kann.
-     */
-    protected $lengthToTruncateSegmentsToSort = null;
-        
-    /**
      * Konstruktor
      * @param editor_Models_Task $task
      */
      public function __construct(editor_Models_Task $task){
-         $session = new Zend_Session_Namespace();
-         $this->lengthToTruncateSegmentsToSort = $session->runtimeOptions->lengthToTruncateSegmentsToSort;
          $this->task = $task;
          $this->taskGuid = $task->getTaskGuid();
     }
@@ -115,16 +105,4 @@ abstract class editor_Models_Import_SegmentProcessor {
      * @param integer $segmentId
      */
     public function postProcessHandler(editor_Models_Import_FileParser $parser, $segmentId) {}
-    
-    /**
-     * Segment Source / Target String gekürzt auf $this->lengthToTruncateSegmentsToSort
-     * @param string|NULL segment
-     * @return string
-     */
-    protected function truncateSegmentsToSort($segment){
-    	if(!is_string($segment)){
-    		return $segment;
-    	}
-    	return mb_substr($segment,0,$this->lengthToTruncateSegmentsToSort,'utf-8');
-    }
 }
