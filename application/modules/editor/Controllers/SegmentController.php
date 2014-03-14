@@ -87,6 +87,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $allowedToChange = array('qmId', 'stateId', 'autoStateId');
         $allowedAlternatesToChange = $this->entity->getEditableDataIndexList();
         $updateToSort = array_intersect(array_keys((array)$this->data), $allowedAlternatesToChange);
+        $this->checkPlausibilityOfPut($allowedAlternatesToChange);
         $this->setDataInEntity(array_merge($allowedToChange, $allowedAlternatesToChange), self::SET_DATA_WHITELIST);
         foreach($updateToSort as $toSort) {
             $this->entity->updateToSort($toSort);
@@ -102,9 +103,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         
         $this->entity->validate();
         
-        $this->checkPlausibilityOfPut();
-        $this->rememberSegmentInSession();
-
         $history->save();
 
         foreach($allowedAlternatesToChange as $field) {
@@ -120,62 +118,45 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     
     /**
      * checks if current put makes sense to save
-     * FIXME adapt me for alternates
+     * @param array $fieldnames allowed fieldnames to be saved
      * @return boolean
      */
-    protected function checkPlausibilityOfPut() {
-        $session = new Zend_Session_Namespace();
-        if (
-                isset($session->lastSegment)&&
-                $session->lastSegment->data->id !== $this->data->id &&
-                isset($session->lastSegment->data->edited) &&
-                isset($this->data->edited) &&
-                $session->lastSegment->data->edited === $this->data->edited &&
-                (time()-19 < $session->lastSegment->timestamp || (isset($session->lastCallPlausibiltyError) && $session->lastCallPlausibiltyError ))
-                ){
-            $alikes = $this->entity->getAlikes($session->taskGuid);
-            foreach ($alikes as $alike) {
-                if($session->lastSegment->data->id == $alike['id']){
-                    return;
-                }
+    protected function checkPlausibilityOfPut($fieldnames) {
+        $error = array();
+        foreach($this->data as $key => $value) {
+            //consider only changeable datafields:
+            if(! in_array($key, $fieldnames)) {
+                continue;
             }
-            $session->lastCallPlausibiltyError = true;
-            ob_start();
-            var_dump($this->data);
-            $putData = ob_get_clean();
-            ob_start();
-            var_dump($session->lastSegment->data);
-            $prevPutData = ob_get_clean();
-            $timespan = time()-$session->lastSegment->timestamp;
-            
-            $log = ZfExtended_Factory::get('ZfExtended_Log');
-            /* @var $log ZfExtended_Log */
-            
-            $logText = 'The plausibility of the put of the segment with the following data is not given.'; 
-            $logText .= 'It has the same edited value as the previously edited segment which has';
-            $logText .= ' been edited not more than 19 sec ago but it has not the same segmentId and is no repetition of the previous segment.';
-            $logText .= ' Therefore it has not been saved.'."\n";
-            $logText .= 'Actually saved Segment PUT data and data to be saved in DB:'."\n";
-            $logText .= $putData."\n".print_r($this->entity->getDataObject(),1)."\n\n";
-            $logText .= 'Previous saved Segment PUT data and data saved in DB:'."\n";
-            $logText .= $prevPutData."\n".print_r($session->lastSegment->entityData,1);
-            $logText .= 'Timespan between the 2 puts had been: '.$timespan."\n";
-            $logText .= 'Content of $_SERVER had been: '.  print_r($_SERVER,true);
-            
-            $log->logError('Possible Error on saving a segment!', $logText);
+            //search for the img tag, get the data and remove it
+            $regex = '#<img[^>]+class="duplicatesavecheck"[^>]+data-segmentid="([0-9]+)" data-fieldname="([^"]+)"[^>]*>#';
+            if(! preg_match($regex, $value, $match)) {
+                continue;
+            }
+            $this->data->{$key} = str_replace($match[0], '', $value);
+            //if segmentId and fieldname from content differ to the segment to be saved, throw the error!
+            if($match[2] != $key || $match[1] != $this->entity->getId()) {
+                $error['real fieldname: '.$key] = array('segmentId' => $match[1], 'fieldName' => $match[2]);
+            }
         }
-        $session->lastCallPlausibiltyError = false;
-    }
-   
-    /**
-     * sets $session->lastSegment with the value of the current segment
-     */
-    protected function rememberSegmentInSession() {
-        $session = new Zend_Session_Namespace();
-        $session->lastSegment = new stdClass();
-        $session->lastSegment->timestamp = time();
-        $session->lastSegment->data = $this->data;
-        $session->lastSegment->entityData = $this->entity->getDataObject();
+        if(empty($error)) {
+            return;
+        }
+        
+        $log = ZfExtended_Factory::get('ZfExtended_Log');
+        /* @var $log ZfExtended_Log */
+        
+        $logText = 'Error on saving a segment!!! Parts of the content in the PUT request ';
+        $logText .= 'delivered the following segmentId(s) and fieldName(s):'."\n"; 
+        $logText .= print_r($error, 1)."\n";
+        $logText .= 'but the request was for segmentId '.$this->entity->getId(); 
+        $logText .= ' (compare also the above fieldnames!).'."\n";
+        $logText .= 'Therefore the segment has not been saved!'."\n";
+        $logText .= 'Actually saved Segment PUT data and data to be saved in DB:'."\n";
+        $logText .= print_r($this->data,1)."\n".print_r($this->entity->getDataObject(),1)."\n\n";
+        $logText .= 'Content of $_SERVER had been: '.  print_r($_SERVER,true);
+        
+        $log->logError('Possible Error on saving a segment!', $logText);
     }
    
     /**
