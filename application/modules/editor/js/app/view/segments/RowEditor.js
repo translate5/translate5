@@ -229,7 +229,7 @@ Ext.define('Editor.view.segments.RowEditor', {
             oldField[0].setValue(rec.get(oldIdx));
         }
         if(me.setColumnToEdit(column)) {            
-            me.mainEditor.setValueAndMarkup(rec.get(me.columnToEdit));
+            me.mainEditor.setValueAndMarkup(rec.get(me.columnToEdit), rec.get('id'), me.columnToEdit);
             me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
             me.focusContextCell();
         }
@@ -249,7 +249,7 @@ Ext.define('Editor.view.segments.RowEditor', {
         var me = this;
         me.callParent(arguments);
         me.setColumnToEdit(me.context.column);
-        me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit));
+        me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit), record.get('id'), me.columnToEdit);
         me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
     },
     

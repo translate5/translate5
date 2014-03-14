@@ -130,9 +130,13 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * Setzt Daten im HtmlEditor und fügt markup hinzu
    * @param value String
    */
-  setValueAndMarkup: function(value){
-    this.lastSegmentContentWithoutTags = [];
-    this.setValue(this.markup(value));
+  setValueAndMarkup: function(value, segmentId, fieldName){
+      //check tag is needed for the checkplausibilityofput feature on server side 
+      var me = this,
+          checkTag = me.getDuplicateCheckImg(segmentId, fieldName);
+      
+      me.lastSegmentContentWithoutTags = [];
+      me.setValue(me.markup(value)+checkTag);
   },
   /**
    * Holt Daten aus dem HtmlEditor und entfernt das markup
@@ -160,9 +164,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     value = value.replace(/> /g, '>'+Editor.TRANSTILDE);
     Ext.fly(tempNode).update(value);
     me.replaceTagToImage(tempNode);
-    if(me.viewModesController.isHideTag()){
-      me.hideTags();
-    }
     return me.result.join('');
   },
   replaceTagToImage: function(rootnode) {
@@ -181,9 +182,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         me.result.push(Ext.htmlEncode(text));
         return;
       }
-      if(item.tagName == 'IMG'){
-    	  me.result.push(me.imgNodeToString(item, true));
-    	  return;
+      if(item.tagName == 'IMG' && !me.isDuplicateSaveTag(item)){
+          me.result.push(me.imgNodeToString(item, true));
+          return;
       }
       // Span für Terminologie
       if(item.tagName == 'DIV' && /(^|[\s])term([\s]|$)/.test(item.className)){
@@ -251,45 +252,49 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * @return String
    */
   unMarkup: function(node){
-    var me = this,
-    result = [];
+      var me = this,
+          result = [];
     
-    if(!node.hasChildNodes()){
-        return "";
-    }
+      if(!node.hasChildNodes()){
+          return "";
+      }
     
-    Ext.each(node.childNodes, function(item){
-      var markupImage,
-      text;
-      if(Ext.isTextNode(item)){
-        text = item.data;
-        result.push(Ext.htmlEncode(text));
-        me.lastSegmentContentWithoutTags.push(text);
-        return;
-      }
-      // recursive processing of Terminologie spans, removes the term span
-      //@todo die Term Spans fliegen hier richtigerweise raus (wg. Umsortierung des Textes)
-      //Allerdings muss danach die Terminologie anhand der Begriffe im Text wiederhergestellt werden.
-      if(item.tagName == 'SPAN' && item.hasChildNodes()){
-        result.push(me.unMarkup(item));
-        return;
-      }
-      if(item.tagName == 'IMG'){
-        if(markupImage = me.getMarkupImage(item.id)){
-          result.push(markupImage.html);
-        }
-        else if(/^qm-image-/.test(item.id)){
-            result.push(me.imgNodeToString(item, false));
-        }
-        return;
-      }
-      if(item.hasChildNodes()){
-    	result.push(me.unMarkup(item));
-    	return;
-      }
-      result.push(item.textContent || item.innerText);
-    });
-    return result.join('');
+      Ext.each(node.childNodes, function(item){
+          var markupImage,
+              text, img;
+          if(Ext.isTextNode(item)){
+              text = item.data;
+              result.push(Ext.htmlEncode(text));
+              me.lastSegmentContentWithoutTags.push(text);
+              return;
+          }
+          // recursive processing of Terminologie spans, removes the term span
+          //@todo die Term Spans fliegen hier richtigerweise raus (wg. Umsortierung des Textes)
+          //Allerdings muss danach die Terminologie anhand der Begriffe im Text wiederhergestellt werden.
+          if(item.tagName == 'SPAN' && item.hasChildNodes()){
+              result.push(me.unMarkup(item));
+              return;
+          }
+          if(item.tagName == 'IMG'){
+              if(me.isDuplicateSaveTag(item)){
+                  img = Ext.fly(item);
+                  result.push(me.getDuplicateCheckImg(img.getAttribute('data-segmentid'), img.getAttribute('data-fieldname')));
+              }
+              else if(markupImage = me.getMarkupImage(item.id)){
+                  result.push(markupImage.html);
+              }
+              else if(/^qm-image-/.test(item.id)){
+                  result.push(me.imgNodeToString(item, false));
+              }
+              return;
+          }
+          if(item.hasChildNodes()){
+              result.push(me.unMarkup(item));
+              return;
+          }
+          result.push(item.textContent || item.innerText);
+      });
+      return result.join('');
   },
   /**
    * generates a img tag string
@@ -310,6 +315,23 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 		  id = 'id="qm-image-'+id+'-'+seq+'"';
 	  }
 	  return Ext.String.format('<img {0} class="{1}" data-seq="{2}" data-comment="{3}" src="{4}" />', id, imgNode.className, seq, comment ? comment : '', src);
+  },
+  /**
+   * returns a IMG tag with a segment identifier for "checkplausibilityofput" check in PHP
+   * @param {Integer} segmentId
+   * @param {String} fieldName
+   * @return {String}
+   */
+  getDuplicateCheckImg: function(segmentId, fieldName) {
+      return '<img src="'+Ext.BLANK_IMAGE_URL+'" style="display:none;height:0;width:0;" class="duplicatesavecheck" data-segmentid="'+segmentId+'" data-fieldname="'+fieldName+'">';
+  },
+  /**
+   * returns true if given html node is a duplicatesavecheck img tag
+   * @param {HtmlNode} img
+   * @return {Boolean}
+   */
+  isDuplicateSaveTag: function(img) {
+      return img.tagName == 'IMG' && img.className && /duplicatesavecheck/.test(img.className);
   },
   hasAndDisplayErrors: function() {
 	 if(!this.isTagOrderClean){
@@ -335,9 +357,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * @param {Array} nodelist
    */
   checkTagOrder: function(nodelist) {
-	  var open = {}, clean = true;
+	  var me = this, open = {}, clean = true;
 	  Ext.each(nodelist, function(img) {
-		  if(/^remove/.test(img.id) || /-single/.test(img.id)){
+		  if(me.isDuplicateSaveTag(img) || /^remove/.test(img.id) || /-single/.test(img.id)){
 			  //ignore tags marked to remove
 			  return;
 		  }
@@ -380,18 +402,19 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * @param {Array} nodelist
    */
   fixDuplicateImgIds: function(nodelist) {
-	  var ids = {}, 
-	  	stackList = {}, 
-	  	updateId = function(img, newSeq, oldSeq) {
-	    	//dieses img mit der neuen seq versorgen.
-		  	img.id = img.id.replace(new RegExp(oldSeq+'$'), newSeq);
-	    	img.setAttribute('data-seq', newSeq);
-	  	};
+	  var me = this, 
+	      ids = {}, 
+	      stackList = {}, 
+	      updateId = function(img, newSeq, oldSeq) {
+	          //dieses img mit der neuen seq versorgen.
+	          img.id = img.id.replace(new RegExp(oldSeq+'$'), newSeq);
+	          img.setAttribute('data-seq', newSeq);
+	      };
 	    //duplicate id fix vor removeOrphanedLogik, da diese auf eindeutigkeit der IDs baut
 	    //dupl id fix benötigt checkTagOrder, welcher sich aber mit removeOrphanedLogik beißt
 	    Ext.each(nodelist, function(img) {
 	    	var newSeq, oldSeq = img.getAttribute('data-seq'), id = img.id, pid, open;
-	    	if(! id) {
+	    	if(! id || me.isDuplicateSaveTag(img)) {
 	    		return;
 	    	}
 	    	if(! ids[id]) {
@@ -433,8 +456,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * @param {Array} nodelist
    */
   removeOrphanedTags: function(nodelist) {
-	var openers = {}, closers = {}, hasRemoves = false;
+	var me = this, openers = {}, closers = {}, hasRemoves = false;
     Ext.each(nodelist, function(img) {
+        if(me.isDuplicateSaveTag(img)) {
+            return;
+        }
       if(/-open/.test(img.id)){
         openers[img.id] = img;
       }

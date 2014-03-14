@@ -91,9 +91,6 @@ Ext.define('Editor.controller.MetaPanel', {
       '#metapanel' : {
           show : this.layout
       },
-      '#roweditor':{
-          afterEditorMoved: this.refreshLeftRight
-      },
       '#segmentgrid': {
           afterrender: this.initEditPluginHandler
       }
@@ -246,6 +243,7 @@ Ext.define('Editor.controller.MetaPanel', {
     this.getMetaPanel().down('#metaInfoForm').hide();
   },
   /**
+   * FIXME: Repositionierung beim Durchklicken mit links / rechts ist noch im Arsch!
    * Move the editor about one editable field
    */
   goToAlternate: function(btn, ev) {
@@ -261,27 +259,18 @@ Ext.define('Editor.controller.MetaPanel', {
         
     if(cols[idx + direction]) {
       info.plug.editor.changeColumnToEdit(cols[idx + direction]);
+      return;
     }
-  },
-  /**
-   * enables / disables the left right buttons
-   */
-  refreshLeftRight: function() {
-      var me = this,
-          info, idx, cols;
-      
-      if(me.hideLeftRight) {
-          return;
-      }
-      
-      info = me.getColInfo();
-      idx = info && info.foundIdx;
-      cols = info && info.columns;
-
-      if(info !== false) {
-          me.getLeftBtn().setDisabled(idx == 0);
-          me.getRightBtn().setDisabled(idx == (cols.length - 1));
-      }
+    if(direction > 0) {
+        //goto next segment and first col
+        info.plug.editor.changeColumnToEdit(cols[0]);
+        me.saveNext();
+    }
+    else {
+        //goto prev segment and last col
+        info.plug.editor.changeColumnToEdit(cols[cols.length - 1]);
+        me.savePrevious();
+    }
   },
   /**
    * returns the visible columns and which column has actually the editor
@@ -295,9 +284,7 @@ Ext.define('Editor.controller.MetaPanel', {
         current = plug.editor.getEditedField();
     
     if(!plug || !plug.editor) {
-      me.getLeftBtn().disable();
-      me.getRightBtn().disable();
-      return false;
+        return false;
     }
     
     Ext.Array.each(columns, function(col, idx) {
