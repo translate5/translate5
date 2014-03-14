@@ -137,7 +137,6 @@ Ext.define('Editor.controller.Segments', {
               //@todo should be replaced with Event Domains after update to ExtJS >4.2
               me.getSegmentsStore().on('load', me.invalidatePager, me);
               me.getSegmentsStore().on('load', me.refreshGridView, me);
-              me.getSegmentsStore().on('write', me.handleSegmentSaved, me);
           },
         selectionchange: me.handleSegmentSelectionChange,
         columnhide: me.handleColumnHide,
@@ -168,9 +167,6 @@ Ext.define('Editor.controller.Segments', {
   refreshGridView: function() {
     this.getSegmentGrid().getView().refresh();
   },  
-  handleSegmentSaved: function () {
-    Editor.MessageBox.addSuccess(this.messages.segmentSaved);
-  },
   /**
    * geöffnete Segmente werden bei der Wahl eines anderen Segments gespeichert
    */
@@ -480,6 +476,8 @@ Ext.define('Editor.controller.Segments', {
           me.saveChainEnd();
           return;
       }
+      //show save segment success message 
+      Editor.MessageBox.addSuccess(me.messages.segmentSaved);
       //invoking change alike handling:
       if(me.fireEvent('saveComplete')){
           me.saveChainEnd(); //NEXT step in save chain
