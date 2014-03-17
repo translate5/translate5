@@ -37,6 +37,7 @@ body{box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: bo
 body.ergonomic {font-size:19pt !important; line-height: 37px !important;}
 body.hide-tag img{display:none;}
 img {width: auto !important;height: 14px !important; vertical-align:middle;cursor: pointer;}
+img.duplicatesavecheck {width:0 !important;height:0 !important;display:none;}
 span.term {background:transparent;border-bottom:1px solid #0000ff;}
 span.transNotFound {border-bottom-color:#ff0000;}
 span.notRecommended,

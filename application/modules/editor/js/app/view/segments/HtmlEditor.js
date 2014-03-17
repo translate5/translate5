@@ -122,7 +122,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   getDocMarkup: function() {
     var me = this,
-        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'/css/htmleditor.css?v=8" />'; //disable Img resizing
+        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'/css/htmleditor.css?v=10" />'; //disable Img resizing
         //ursprünglich wurde ein body style height gesetzt. Das führte aber zu Problemen beim wechsel zwischen den unterschiedlich großen Segmente, daher wurde die Höhe entfernt.
     return Ext.String.format('<html><head><style type="text/css">body{border:0;margin:0;padding:{0}px;}</style>{1}</head><body style="font-size:9pt;line-height:14px;"></body></html>', me.iframePad, additionalCss);
   },
@@ -323,7 +323,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * @return {String}
    */
   getDuplicateCheckImg: function(segmentId, fieldName) {
-      return '<img src="'+Ext.BLANK_IMAGE_URL+'" style="display:none;height:0;width:0;" class="duplicatesavecheck" data-segmentid="'+segmentId+'" data-fieldname="'+fieldName+'">';
+      return '<img src="'+Ext.BLANK_IMAGE_URL+'" class="duplicatesavecheck" data-segmentid="'+segmentId+'" data-fieldname="'+fieldName+'">';
   },
   /**
    * returns true if given html node is a duplicatesavecheck img tag

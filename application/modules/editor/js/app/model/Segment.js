@@ -46,6 +46,9 @@
  * 
  * redefinition algorithm tested in 4.0.7 and 4.2
  */
+if(!Editor.model) {
+    Editor.model = {};
+}
 Editor.model._Segment = function(fields) {
     if(fields instanceof Ext.data.Store) {
         var newFields = [];
