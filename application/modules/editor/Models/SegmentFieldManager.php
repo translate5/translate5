@@ -354,7 +354,9 @@ class editor_Models_SegmentFieldManager {
             throw new LogicException('You have to call initFields before!');
         }
         $viewName         = $this->getDataViewName($this->taskGuid);
-        $createViewSql = array('CREATE VIEW '.$viewName.' as SELECT s.*');
+        //"or replace" to avoid race conditions if no view exists and api/task api/segment call 
+        //    are coming simultaneously and both calls try to create the view
+        $createViewSql = array('CREATE OR REPLACE VIEW '.$viewName.' as SELECT s.*');
 
         //loop over all available segment fields for this task
         foreach($this->segmentfields as $field) {
