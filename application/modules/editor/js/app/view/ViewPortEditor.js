@@ -63,10 +63,17 @@ Ext.define('Editor.view.ViewPortEditor', {
     initComponent: function() {
       var me = this,
           items = [me.getNorth(), {
+              xtype: 'panel',
               region: 'east',
-              xtype: 'segments.metapanel',
               itemId: 'metapanel',
+              collapsible: true,
               animCollapse: !Ext.isIE, //BugID 3
+              layout: {type:'accordion'},
+              items: [{
+                  xtype: 'segments.metapanel'
+              },{
+                  xtype: 'commentWindow'
+              }],
               width: 260
           },{
               region: 'center',

@@ -206,6 +206,7 @@ background-color: #EAF1FB;
 #segment-grid .comment {margin-bottom:0px;}
 #segment-grid .comment .ellipsis {font-size:7pt;line-hight:3pt;display:block;line-height:10pt;}
 .comment .content,
+.comments-grid .comment .modified,
 .comments-grid .comment .content {white-space: normal;display:block;}
 .comment .author, .comment .created, .comment .modified {font-size: 7pt; font-style: italic;line-height:10pt;}
 

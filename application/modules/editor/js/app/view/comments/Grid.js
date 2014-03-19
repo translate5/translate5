@@ -76,6 +76,7 @@ Ext.define('Editor.view.comments.Grid', {
                 {
                     xtype: 'gridcolumn',
                     dataIndex: 'comment',
+                    flex: 1,
                     itemId: 'commentColumn',
                     renderer: function(v, meta, rec) {
                         var modified = Ext.Date.format(rec.get('modified'), dateFormat),
@@ -89,8 +90,7 @@ Ext.define('Editor.view.comments.Grid', {
                                 author: rec.get('userName')
                             };
                         return me.commentTpl.apply(data);
-                    },
-                    width: 400
+                    }
                 },
         {
             xtype: 'actioncolumn',
