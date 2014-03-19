@@ -72,7 +72,7 @@ Ext.define('Editor.controller.Localizer', {
 		'Editor.view.ui.fileorder.Tree',
 		'Editor.view.fileorder.ReferenceTree',
 		'Editor.view.ui.preferences.Window',
-		'Editor.view.ui.segments.MetaPanel',
+		'Editor.view.segments.MetaPanel',
 		'Editor.view.ui.changealike.Window',
 		'Editor.view.ui.changealike.Grid',
 		'Editor.view.comments.Window',
@@ -192,8 +192,7 @@ Ext.define('Editor.controller.Localizer', {
         if($config->runtimeOptions->editor->enableQmSubSegments){
         ?>
         Editor.view.qmsubsegments.Window.prototype.title = '<?php echo $this->translate->_('QM Subsegment Statistik');?>';
-  	Editor.view.qmsubsegments.Window.prototype.tab_title_source = '<?php echo $this->translate->_('In Ausgangstext');?>';
-  	Editor.view.qmsubsegments.Window.prototype.tab_title_target = '<?php echo $this->translate->_('In Zieltext');?>';
+  	Editor.view.qmsubsegments.Window.prototype.tab_title_field = '<?php echo $this->translate->_('In Feld: {0}');?>';
   	Editor.view.qmsubsegments.SummaryTree.prototype.treepanel_text = '<?php echo $this->translate->_('Fehlertyp');?>';
   	Editor.view.qmsubsegments.SummaryTree.prototype.treepanel_totalTotal = '<?php echo $this->translate->_('Gesamt');?>';
   	Editor.view.qmsubsegments.SummaryTree.prototype.treepanel_total = '<?php echo $this->translate->_('Summe');?>';
@@ -220,17 +219,17 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.ui.preferences.Window.prototype.item_cancelBtn = '<?php echo $this->translate->_('Abbrechen');?>';
     Editor.view.ui.preferences.Window.prototype.item_saveBtn = '<?php echo $this->translate->_('Speichern');?>';
 
-    Editor.view.ui.segments.MetaPanel.prototype.title = '<?php echo $this->translate->_('Segment-Metadaten');?>';
-    Editor.view.ui.segments.MetaPanel.prototype.item_metaQm_title = '<?php echo $this->translate->_('QM');?>';
-  	Editor.view.ui.segments.MetaPanel.prototype.item_metaStates_title = '<?php echo $this->translate->_('Status');?>';
-  	Editor.view.ui.segments.MetaPanel.prototype.item_metaTerms_title = '<?php echo $this->translate->_('Terminologie');?>';
-  	Editor.view.ui.segments.MetaPanel.prototype.item_cancel = '<?php echo $this->translate->_('Abbrechen');?>';
-  	Editor.view.ui.segments.MetaPanel.prototype.item_save = '<?php echo $this->translate->_('Speichern');?>';
+    Editor.view.segments.MetaPanel.prototype.title = '<?php echo $this->translate->_('Segment-Metadaten');?>';
+    Editor.view.segments.MetaPanel.prototype.item_metaQm_title = '<?php echo $this->translate->_('QM');?>';
+  	Editor.view.segments.MetaPanel.prototype.item_metaStates_title = '<?php echo $this->translate->_('Status');?>';
+  	Editor.view.segments.MetaPanel.prototype.item_metaTerms_title = '<?php echo $this->translate->_('Terminologie');?>';
+  	Editor.view.segments.MetaPanel.prototype.item_cancel = '<?php echo $this->translate->_('Abbrechen');?>';
+  	Editor.view.segments.MetaPanel.prototype.item_save = '<?php echo $this->translate->_('Speichern');?>';
 
-  	Editor.view.ui.segments.MetaPanel.prototype.item_saveAndNext = '<?php echo $this->translate->_('Speichern und nächstes öffnen');?>';
-  	Editor.view.ui.segments.MetaPanel.prototype.item_saveAndPrevious = '<?php echo $this->translate->_('Speichern und vorheriges öffnen');?>';
+  	Editor.view.segments.MetaPanel.prototype.item_saveAndNext = '<?php echo $this->translate->_('Speichern und nächstes öffnen');?>';
+  	Editor.view.segments.MetaPanel.prototype.item_saveAndPrevious = '<?php echo $this->translate->_('Speichern und vorheriges öffnen');?>';
         
-  	Editor.view.ui.segments.MetaPanel.prototype.messages = {
+  	Editor.view.segments.MetaPanel.prototype.messages = {
             gridEndReached: '<?php echo $this->translate->_('Ende der Segmente erreicht!');?>',
             gridStartReached: '<?php echo $this->translate->_('Beginn der Segmente erreicht!');?>'
         };
@@ -315,11 +314,13 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.comments.Grid.prototype.text_edit = '<?php echo $this->translate->_('Bearbeiten');?>';
     Editor.view.comments.Grid.prototype.text_delete = '<?php echo $this->translate->_('Löschen');?>';
 
-    Editor.view.comments.Window.prototype.title = '<?php echo $this->translate->_('Kommentare zum Segment Nr. {0}');?>';
+    Editor.view.comments.Window.prototype.title = '<?php echo $this->translate->_('Kommentare zum aktuellen Segment');?>';
     Editor.view.comments.Window.prototype.item_cancelBtn = '<?php echo $this->translate->_('Abbrechen');?>';
     Editor.view.comments.Window.prototype.item_saveBtn = '<?php echo $this->translate->_('Speichern');?>';
     Editor.view.comments.Window.prototype.item_closeBtn = '<?php echo $this->translate->_('Schließen');?>';
-    Editor.view.comments.Window.prototype.item_commentLabel = '<?php echo $this->translate->_('Kommentar neu / bearbeiten:');?>';
+    Editor.view.comments.Window.prototype.item_commentNew = '<?php echo $this->translate->_('Kommentar neu');?>';
+    Editor.view.comments.Window.prototype.item_commentEdit = '<?php echo $this->translate->_('Kommentar bearbeiten');?>';
+    
     Editor.view.comments.Window.prototype.item_addComment = '<?php echo $this->translate->_('Neuer Kommentar');?>';
     Editor.view.comments.Window.prototype.delete_confirm_title = '<?php echo $this->translate->_('Löschen des Kommentars bestätigen');?>';
     Editor.view.comments.Window.prototype.delete_confirm_msg = '<?php echo $this->translate->_('Soll der Kommentar wirklich gelöscht werden?');?>';
@@ -429,8 +430,7 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.admin.ExportMenu.prototype.messages = {
       exportDef: '<?php echo $this->translate->_('exportieren');?>',
       exportDiff: '<?php echo $this->translate->_('exportieren mit Änderungshistorie');?>',
-      exportTargetQm: '<?php echo $this->translate->_('Export Zieltext QM-Statistik (XML)');?>',
-      exportSourceQm: '<?php echo $this->translate->_('Export Ausgangstext QM-Statistik (XML)');?>'
+      exportQmField: '<?php echo $this->translate->_('Export QM-Statistik (XML) für Feld: {0}');?>'
     };
     
     Editor.view.admin.TaskUserAssocGrid.prototype.strings = {
