@@ -327,7 +327,6 @@ Ext.define('Editor.view.segments.RowEditor', {
         me.move(posMain, posToEdit);
         me.repositionHorizontally();
         me.fireEvent('afterEditorMoved', me.columnToEdit, me);
-        me.mainEditor.focus();
         return true;
     },
     
@@ -417,7 +416,7 @@ Ext.define('Editor.view.segments.RowEditor', {
         record.beginEdit();
         record.set(me.columnToEdit, newValue);
         record.set('autoStateId', 999);
-        record.endEdit();
+        record.endEdit(true); //silent = true → dont notify the store. if notifiying the store we get a "grid jumps to top problem" with left right navi
         return true;
     },
     /**
