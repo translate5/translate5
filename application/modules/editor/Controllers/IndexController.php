@@ -310,12 +310,14 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $langs = $langs->loadAll();
         $result = array();
         foreach ($langs as $lang) {
-            $result[] = array($lang['id'], $lang['langName'].' ('.$lang['rfc5646'].')');
+            $name = $this->translate->_($lang['langName']);
+            $result[$name] = array($lang['id'], $name.' ('.$lang['rfc5646'].')');
         }
+        ksort($result); //sort by name of language
         if(empty($result)){
             throw new Zend_Exception('No languages defined. Please use /docs/003fill-LEK-languages-after-editor-sql or define them otherwhise.');
         }
-        return $result;
+        return array_values($result);
     }
     
     protected function setJsSegmentFlags($type, array $qualityFlags) {
