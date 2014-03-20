@@ -56,7 +56,6 @@ class editor_Models_Languages extends ZfExtended_Models_Entity_Abstract {
     const LANG_TYPE_ID = 'id';
     const LANG_TYPE_RFC5646 = 'rfc5646';
     const LANG_TYPE_LCID = 'lcid';
-    const LANG_TYPE_UNIX = 'unix';
 
     /**
      * Lädt die Sprache anhand dem übergebenen Sprachkürzel (nach RFC5646)
@@ -74,15 +73,6 @@ class editor_Models_Languages extends ZfExtended_Models_Entity_Abstract {
      */
     public function loadByLcid($lcid){
         return $this->loader($lcid, 'lcid');
-    }
-
-    /**
-     * Lädt die Sprache anhand der übergebenen UNIX Locale
-     * @param string $unixLocale
-     * @return Zend_Db_Table_Row_Abstract | null
-     */
-    public function loadByUnix($unixLocale){
-        return $this->loader($unixLocale, 'unixLocale');
     }
 
     /**
@@ -126,16 +116,6 @@ class editor_Models_Languages extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * Gibt die interne Sprach ID (PK der Sprach Tabelle) zu einer UNIX Locale zurück
-     * @param int $lcid UNIX Locale, wie in Tabelle languages hinterlegt
-     * @return int id der gesuchten Sprache
-     */
-    public function getLangIdByUnix($lang){
-        $this->loadByUnix($lang);
-        return $this->getId();
-    }
-
-    /**
      * Gibt die interne Sprach ID anhand der übergebenen Sprache im spezifizierten Typ zurück
      * @param mixed $lang
      * @param unknown_type $lang
@@ -159,8 +139,6 @@ class editor_Models_Languages extends ZfExtended_Models_Entity_Abstract {
                 return $this->loadByLcid($lang);
             case self::LANG_TYPE_RFC5646:
                 return $this->loadByRfc5646($lang);
-            case self::LANG_TYPE_UNIX:
-                return $this->loadByUnix($lang);
             default:
                 return $this->loadLang($lang, $this->getAutoDetectedType($lang));
         }
@@ -174,9 +152,6 @@ class editor_Models_Languages extends ZfExtended_Models_Entity_Abstract {
     public function getAutoDetectedType($lang) {
         if(is_int($lang)) {
             return self::LANG_TYPE_LCID;
-        }
-        if(strpos($lang, '_') !== false) {
-            return self::LANG_TYPE_UNIX;
         }
         return self::LANG_TYPE_RFC5646;
     }
