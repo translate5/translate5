@@ -74,8 +74,6 @@ class factoryOverwrites_translate5_modules_editor_Models_Languages extends edito
         $this->setLcid(null);
         $this->setLangName($this->languages[$lang]);
         $lang = preg_split('/[_-]/', $lang);
-        $this->setIso639($lang[0]);
-        $this->setUnixLocale($this->toUnix($lang));
         $this->setRfc5646($this->toRfc5646($lang));
         try {
             $this->save();
@@ -88,8 +86,6 @@ class factoryOverwrites_translate5_modules_editor_Models_Languages extends edito
         }
         return $this->row;
     }
-
-
 
     protected function toUnix(array $lang){
         $lang[0] = strtolower($lang[0]);
