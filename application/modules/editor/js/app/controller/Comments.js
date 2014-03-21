@@ -271,12 +271,12 @@ Ext.define('Editor.controller.Comments', {
    */
   handleCommentsColumnClick: function(view, rec, tr, idx, ev) {
       var me = this,
+          ed = me.getSegmentGrid().editingPlugin,
           add = ev.getTarget('img.add'),
           edit = ev.getTarget('img.edit');
       if(add || edit) {
-          console.log("FOO");
-          //me.getCommentWindow().expand();
-          //me.openCommentWindow(rec);
+          ed.startEdit(rec, view.getHeaderAtIndex(0));
+          me.handleEditorCommentBtn();
       }
   },
   /**
