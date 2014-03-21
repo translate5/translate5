@@ -42,9 +42,9 @@ from LEK_task;
 insert into LEK_segment_data
   (taskGuid, name, segmentId, mid, original, originalMd5, originalToSort, edited, editedToSort)
 select
-  s.taskGuid, 'source', s.`id`, s.mid, s.`source`, s.sourceMd5, s.sourceToSort, s.sourceEdited, s.sourceEditedToSort
+  s.taskGuid, 'source', s.`id`, s.mid, s.`source`, s.sourceMd5, s.sourceToSort, IF(t.enableSourceEditing > 0, s.sourceEdited, null), IF(t.enableSourceEditing > 0, s.sourceEditedToSort, null)
 from LEK_segments s, LEK_task t
-where t.enableSourceEditing > 0 and t.taskGuid = s.taskGuid;
+where t.taskGuid = s.taskGuid;
 
 insert into LEK_segment_field
   (taskGuid, name, `type`, `label`, rankable, editable)
