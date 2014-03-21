@@ -590,6 +590,14 @@
 <trans-unit id='Q3JpdGljYWw='><source>Critical</source><target>Critical</target></trans-unit>
 <trans-unit id='TWFqb3I='><source>Major</source><target>Major</target></trans-unit>
 <trans-unit id='TWlub3I='><source>Minor</source><target>Minor</target></trans-unit>
+<trans-unit id='SW4gRmVsZDogezB9'><source>In Feld: {0}</source><target>In Feld: {0}</target></trans-unit>
+<trans-unit id='S29tbWVudGFyZSB6dW0gYWt0dWVsbGVuIFNlZ21lbnQ='><source>Kommentare zum aktuellen Segment</source><target>Kommentare zum aktuellen Segment</target></trans-unit>
+<trans-unit id='S29tbWVudGFyIG5ldQ=='><source>Kommentar neu</source><target>Kommentar neu</target></trans-unit>
+<trans-unit id='S29tbWVudGFyIGJlYXJiZWl0ZW4='><source>Kommentar bearbeiten</source><target>Kommentar bearbeiten</target></trans-unit>
+<trans-unit id='RXhwb3J0IFFNLVN0YXRpc3RpayAoWE1MKSBmw7xyIEZlbGQ6IHswfQ=='><source>Export QM-Statistik (XML) für Feld: {0}</source><target>Export QM-Statistik (XML) für Feld: {0}</target></trans-unit>
+<trans-unit id='ezB9OiBiZWFyYmVpdGV0'><source>{0}: bearbeitet</source><target>{0}: bearbeitet</target></trans-unit>
+<trans-unit id='Vm9yaGVyaWdlIFNwYWx0ZSBlZGl0aWVyZW4='><source>Vorherige Spalte editieren</source><target>Vorherige Spalte editieren</target></trans-unit>
+<trans-unit id='TsOkY2hzdGUgU3BhbHRlIGVkaXRpZXJlbg=='><source>Nächste Spalte editieren</source><target>Nächste Spalte editieren</target></trans-unit>
   </body>
  </file>
 </xliff>
