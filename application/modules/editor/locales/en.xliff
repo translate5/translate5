@@ -408,6 +408,346 @@
         <source>PM Prüfung</source>
 	<target>PM review</target>
       </trans-unit>
+      <trans-unit id="QnVsZ2FyaXNjaA==">
+        <source>Bulgarisch</source>
+        <target>Bulgarian</target>
+      </trans-unit>
+      <trans-unit id="VHNjaGVjaGlzY2g=">
+        <source>Tschechisch</source>
+        <target>Czech</target>
+      </trans-unit>
+      <trans-unit id="RGV1dHNjaA==">
+        <source>Deutsch</source>
+        <target>German</target>
+      </trans-unit>
+      <trans-unit id="RMOkbmlzY2g=">
+        <source>Dänisch</source>
+        <target>Danish</target>
+      </trans-unit>
+      <trans-unit id="RW5nbGlzY2g=">
+        <source>Englisch</source>
+        <target>English</target>
+      </trans-unit>
+      <trans-unit id="U3BhbmlzY2g=">
+        <source>Spanisch</source>
+        <target>Spanish</target>
+      </trans-unit>
+      <trans-unit id="RmlubmlzY2g=">
+        <source>Finnisch</source>
+        <target>Finnish</target>
+      </trans-unit>
+      <trans-unit id="RnJhbnrDtnNpc2No">
+        <source>Französisch</source>
+        <target>French</target>
+      </trans-unit>
+      <trans-unit id="SmFwYW5pc2No">
+        <source>Japanisch</source>
+        <target>Japanese</target>
+      </trans-unit>
+      <trans-unit id="TmllZGVybMOkbmRpc2No">
+        <source>Niederländisch</source>
+        <target>Dutch</target>
+      </trans-unit>
+      <trans-unit id="RmzDpG1pc2No">
+        <source>Flämisch</source>
+        <target>Flemish</target>
+      </trans-unit>
+      <trans-unit id="Tm9yd2VnaXNjaCAoQm9rbWFsKQ==">
+        <source>Norwegisch (Bokmal)</source>
+        <target>Norwegian (Bokmål)</target>
+      </trans-unit>
+      <trans-unit id="UnVtw6RuaXNjaA==">
+        <source>Rumänisch</source>
+        <target>Romanian</target>
+      </trans-unit>
+      <trans-unit id="UnVzc2lzY2g=">
+        <source>Russisch</source>
+        <target>Russian</target>
+      </trans-unit>
+      <trans-unit id="UG9sbmlzY2g=">
+        <source>Polnisch</source>
+        <target>Polish</target>
+      </trans-unit>
+      <trans-unit id="UG9ydHVnaWVzaXNjaA==">
+        <source>Portugiesisch</source>
+        <target>Portuguese</target>
+      </trans-unit>
+      <trans-unit id="Q2hpbmVzaXNjaA==">
+        <source>Chinesisch</source>
+        <target>Chinese</target>
+      </trans-unit>
+      <trans-unit id="VW5nYXJpc2No">
+        <source>Ungarisch</source>
+        <target>Hungarian</target>
+      </trans-unit>
+      <trans-unit id="RW5nbGlzY2ggKFVLKQ==">
+        <source>Englisch (UK)</source>
+        <target>English (UK)</target>
+      </trans-unit>
+      <trans-unit id="RW5nbGlzY2ggKFVTKQ==">
+        <source>Englisch (US)</source>
+        <target>English (US)</target>
+      </trans-unit>
+      <trans-unit id="SXRhbGllbmlzY2g=">
+        <source>Italienisch</source>
+        <target>Italian</target>
+      </trans-unit>
+      <trans-unit id="RXN0bmlzY2g=">
+        <source>Estnisch</source>
+        <target>Estonian</target>
+      </trans-unit>
+      <trans-unit id="R3JpZWNoaXNjaA==">
+        <source>Griechisch</source>
+        <target>Greek</target>
+      </trans-unit>
+      <trans-unit id="S3JvYXRpc2No">
+        <source>Kroatisch</source>
+        <target>Croatian</target>
+      </trans-unit>
+      <trans-unit id="TGV0dGlzY2g=">
+        <source>Lettisch</source>
+        <target>Latvian</target>
+      </trans-unit>
+      <trans-unit id="Tm9yd2VnaXNjaA==">
+        <source>Norwegisch</source>
+        <target>Norwegian</target>
+      </trans-unit>
+      <trans-unit id="UG9ydHVnaWVzaXNjaCAoQlIp">
+        <source>Portugiesisch (BR)</source>
+        <target>Portuguese (BR)</target>
+      </trans-unit>
+      <trans-unit id="U2Nod2VkaXNjaA==">
+        <source>Schwedisch</source>
+        <target>Swedish</target>
+      </trans-unit>
+      <trans-unit id="U2xvd2FraXNjaA==">
+        <source>Slowakisch</source>
+        <target>Slovak</target>
+      </trans-unit>
+      <trans-unit id="U2xvd2VuaXNjaA==">
+        <source>Slowenisch</source>
+        <target>Slovene</target>
+      </trans-unit>
+      <trans-unit id="Q2hpbmVzaXNjaCB0cmFkaXRpb25lbGw=">
+        <source>Chinesisch traditionell</source>
+        <target>Chinese (traditional)</target>
+      </trans-unit>
+      <trans-unit id="Q2hpbmVzaXNjaCB2ZXJlaW5mYWNodA==">
+        <source>Chinesisch vereinfacht</source>
+        <target>Chinese (simplified)</target>
+      </trans-unit>
+      <trans-unit id="QWZyaWthYW5z">
+        <source>Afrikaans</source>
+        <target>Afrikaans</target>
+      </trans-unit>
+      <trans-unit id="QWxiYW5pc2No">
+        <source>Albanisch</source>
+        <target>Albanian</target>
+      </trans-unit>
+      <trans-unit id="QXJtZW5pc2No">
+        <source>Armenisch</source>
+        <target>Armenian</target>
+      </trans-unit>
+      <trans-unit id="QXNlcmJhaWRzY2hhbmlzY2g=">
+        <source>Aserbaidschanisch</source>
+        <target>Azerbaijani</target>
+      </trans-unit>
+      <trans-unit id="QmVuZ2FsaXNjaA==">
+        <source>Bengalisch</source>
+        <target>Bengali</target>
+      </trans-unit>
+      <trans-unit id="Qm9zbmlzY2g=">
+        <source>Bosnisch</source>
+        <target>Bosnian</target>
+      </trans-unit>
+      <trans-unit id="R8OkbGlzY2ggKElyaXNjaCk=">
+        <source>Gälisch (Irisch)</source>
+        <target>Gaelic (Irish)</target>
+      </trans-unit>
+      <trans-unit id="R2Vvcmdpc2No">
+        <source>Georgisch</source>
+        <target>Georgian</target>
+      </trans-unit>
+      <trans-unit id="R3VqYXJhdGk=">
+        <source>Gujarati</source>
+        <target>Gujarati</target>
+      </trans-unit>
+      <trans-unit id="SGluZGk=">
+        <source>Hindi</source>
+        <target>Hindi</target>
+      </trans-unit>
+      <trans-unit id="SWdibw==">
+        <source>Igbo</source>
+        <target>Igbo</target>
+      </trans-unit>
+      <trans-unit id="SW5kb25lc2lzY2g=">
+        <source>Indonesisch</source>
+        <target>Indonesian</target>
+      </trans-unit>
+      <trans-unit id="SXNsw6RuZGlzY2g=">
+        <source>Isländisch</source>
+        <target>Icelandic</target>
+      </trans-unit>
+      <trans-unit id="S2FtYm9kaWFuaXNjaA==">
+        <source>Kambodianisch</source>
+        <target>Khmer</target>
+      </trans-unit>
+      <trans-unit id="S2FubmFkYQ==">
+        <source>Kannada</source>
+        <target>Kannada</target>
+      </trans-unit>
+      <trans-unit id="S2FzYWNoaXNjaA==">
+        <source>Kasachisch</source>
+        <target>Kazakh</target>
+      </trans-unit>
+      <trans-unit id="S2F0YWxhbmlzY2g=">
+        <source>Katalanisch</source>
+        <target>Catalan</target>
+      </trans-unit>
+      <trans-unit id="S2lyZ2lzaXNjaA==">
+        <source>Kirgisisch</source>
+        <target>Kyrgyz</target>
+      </trans-unit>
+      <trans-unit id="S29yZWFuaXNjaA==">
+        <source>Koreanisch</source>
+        <target>Korean</target>
+      </trans-unit>
+      <trans-unit id="TGl0YXVpc2No">
+        <source>Litauisch</source>
+        <target>Lithuanian</target>
+      </trans-unit>
+      <trans-unit id="TWFsYXlhbGFt">
+        <source>Malayalam</source>
+        <target>Malayalam</target>
+      </trans-unit>
+      <trans-unit id="TWFsYXlpc2No">
+        <source>Malayisch</source>
+        <target>Malay</target>
+      </trans-unit>
+      <trans-unit id="TWFsdGVzaXNjaA==">
+        <source>Maltesisch</source>
+        <target>Maltese</target>
+      </trans-unit>
+      <trans-unit id="TWFyYXRoaQ==">
+        <source>Marathi</source>
+        <target>Marathi</target>
+      </trans-unit>
+      <trans-unit id="TWF6ZWRvbmlzY2g=">
+        <source>Mazedonisch</source>
+        <target>Macedonian</target>
+      </trans-unit>
+      <trans-unit id="TW9sZGF3aXNjaA==">
+        <source>Moldawisch</source>
+        <target>Moldovan</target>
+      </trans-unit>
+      <trans-unit id="UGFuamFiaQ==">
+        <source>Panjabi</source>
+        <target>Punjabi</target>
+      </trans-unit>
+      <trans-unit id="UGFzY2h0dQ==">
+        <source>Paschtu</source>
+        <target>Pashto</target>
+      </trans-unit>
+      <trans-unit id="UGVyc2lzY2ggKEZhcnNpKQ==">
+        <source>Persisch (Farsi)</source>
+        <target>Persian (Farsi)</target>
+      </trans-unit>
+      <trans-unit id="U2VyYmlzY2g=">
+        <source>Serbisch</source>
+        <target>Serbian</target>
+      </trans-unit>
+      <trans-unit id="U2Vzb3Robw==">
+        <source>Sesotho</source>
+        <target>Sotho</target>
+      </trans-unit>
+      <trans-unit id="U29tYWxp">
+        <source>Somali</source>
+        <target>Somali</target>
+      </trans-unit>
+      <trans-unit id="U3BhbmlzY2ggKEtvbHVtYmllbik=">
+        <source>Spanisch (Kolumbien)</source>
+        <target>Spanish (Columbia)</target>
+      </trans-unit>
+      <trans-unit id="U3BhbmlzY2ggKE1leGlrbyk=">
+        <source>Spanisch (Mexiko)</source>
+        <target>Spanish (Mexico)</target>
+      </trans-unit>
+      <trans-unit id="U3VhaGVsaQ==">
+        <source>Suaheli</source>
+        <target>Swahili</target>
+      </trans-unit>
+      <trans-unit id="VGFkc2NoaWtpc2No">
+        <source>Tadschikisch</source>
+        <target>Tajik</target>
+      </trans-unit>
+      <trans-unit id="VGFnYWxvZw==">
+        <source>Tagalog</source>
+        <target>Tagalog</target>
+      </trans-unit>
+      <trans-unit id="VGFtaWxpc2No">
+        <source>Tamilisch</source>
+        <target>Tamil</target>
+      </trans-unit>
+      <trans-unit id="VGVsdWd1">
+        <source>Telugu</source>
+        <target>Telugu</target>
+      </trans-unit>
+      <trans-unit id="VGhhaQ==">
+        <source>Thai</source>
+        <target>Thai</target>
+      </trans-unit>
+      <trans-unit id="VGliZXRpc2No">
+        <source>Tibetisch</source>
+        <target>Tibetan</target>
+      </trans-unit>
+      <trans-unit id="VHN3YW5h">
+        <source>Tswana</source>
+        <target>Tswana</target>
+      </trans-unit>
+      <trans-unit id="VMO8cmtpc2No">
+        <source>Türkisch</source>
+        <target>Turkish</target>
+      </trans-unit>
+      <trans-unit id="VHVya21lbmlzY2g=">
+        <source>Turkmenisch</source>
+        <target>Turkmen</target>
+      </trans-unit>
+      <trans-unit id="VWtyYWluaXNjaA==">
+        <source>Ukrainisch</source>
+        <target>Ukrainian</target>
+      </trans-unit>
+      <trans-unit id="VXNiZWtpc2No">
+        <source>Usbekisch</source>
+        <target>Uzbek</target>
+      </trans-unit>
+      <trans-unit id="VmlldG5hbWVzaXNjaA==">
+        <source>Vietnamesisch</source>
+        <target>Vietnamese</target>
+      </trans-unit>
+      <trans-unit id="V2Vpw59ydXNzaXNjaA==">
+        <source>Weißrussisch</source>
+        <target>Belarusian</target>
+      </trans-unit>
+      <trans-unit id="WGhvc2E=">
+        <source>Xhosa</source>
+        <target>Xhosa</target>
+      </trans-unit>
+      <trans-unit id="WW9ydWJh">
+        <source>Yoruba</source>
+        <target>Yoruba</target>
+      </trans-unit>
+      <trans-unit id="WnVsdQ==">
+        <source>Zulu</source>
+        <target>Zulu</target>
+      </trans-unit>
+      <trans-unit id='TmllZGVybMOkbmRpc2NoIChCZWxnaWVuKQ=='>
+        <source>Niederländisch (Belgien)</source>
+        <target>Dutch (Belgium)</target>
+      </trans-unit>
+      <trans-unit id='RnJhbnrDtnNpc2NoIChCZWxnaWVuKQ=='>
+        <source>Französisch (Belgien)</source>
+        <target>French (Belgium)</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
