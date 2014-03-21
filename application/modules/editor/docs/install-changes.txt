@@ -1,5 +1,11 @@
 ### this file holds all changes and necessary configs needed for updates
 ### newest changes on top
+2014-03-21: Changes for Target Alternates:
+            - Look for and adapt changes in the editor AclConfig.ini file, also in iniOverwrites
+            - make a database backup! the data is migrated in a different format by the following SQL files.
+            - apply 031-editor-mysql-TRANSLATE-118-alternates.sql
+            - apply 032-editor-mysql-TRANSLATE-118-migration.sql
+
 2013-12-05: Changes in User Task Association
             - apply 030-editor-mysql-taskUserAssoc-used.sql
 

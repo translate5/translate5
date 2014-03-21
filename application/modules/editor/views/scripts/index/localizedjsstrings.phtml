@@ -167,6 +167,7 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.segments.Grid.prototype.item_qmsummaryBtn = '<?php echo $this->translate->_('QM Subsegment Statistik');?>',
   	Editor.view.segments.Grid.prototype.item_optionsTagBtn = '<?php echo $this->translate->_('Einstellungen');?>',
   	Editor.view.segments.Grid.prototype.item_clearSortAndFilterBtn = '<?php echo $this->translate->_('Sortierung / Filterung zurücksetzen');?>',
+  	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('{0}: bearbeitet');?>',
 
   	Editor.view.ui.segments.column.Quality.prototype.text = '<?php echo $this->translate->_('QM');?>';
   	Editor.view.ui.segments.column.Matchrate.prototype.text = '<?php echo $this->translate->_('Matchrate');?>';
@@ -228,7 +229,9 @@ Ext.define('Editor.controller.Localizer', {
 
   	Editor.view.segments.MetaPanel.prototype.item_saveAndNext = '<?php echo $this->translate->_('Speichern und nächstes öffnen');?>';
   	Editor.view.segments.MetaPanel.prototype.item_saveAndPrevious = '<?php echo $this->translate->_('Speichern und vorheriges öffnen');?>';
-        
+  	Editor.view.segments.MetaPanel.prototype.item_alternateLeft = '<?php echo $this->translate->_('Vorherige Spalte editieren');?>';
+  	Editor.view.segments.MetaPanel.prototype.item_alternateRight = '<?php echo $this->translate->_('Nächste Spalte editieren');?>';
+  	
   	Editor.view.segments.MetaPanel.prototype.messages = {
             gridEndReached: '<?php echo $this->translate->_('Ende der Segmente erreicht!');?>',
             gridStartReached: '<?php echo $this->translate->_('Beginn der Segmente erreicht!');?>'

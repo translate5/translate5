@@ -150,6 +150,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     protected function get($name) {
         $loc = $this->segmentFieldManager->getDataLocationByKey($name);
         if($loc !== false) {
+            //if we are getting missing index errors here, the data is corrupt!
             return $this->segmentdata[$loc['field']]->__get($loc['column']);
         }
         return parent::get($name);

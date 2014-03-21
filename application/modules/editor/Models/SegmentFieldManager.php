@@ -409,7 +409,7 @@ class editor_Models_SegmentFieldManager {
         //loop over all available segment fields for this task
         foreach($this->segmentfields as $field) {
             $name = $field->name;
-            $data = $segmentData[$name];
+            $data = $segmentData[$name]; //if we're getting missing index here, the data is corrupt!
             //loop over our available base data columns and generate them
             foreach($this->baseFieldColMap as $k => $v) {
                 if(!$field->editable && strpos($k, self::_EDIT_PREFIX) === 0) {

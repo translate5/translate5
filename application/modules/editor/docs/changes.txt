@@ -1,3 +1,8 @@
+2014-03-21: new features:
+            - alternates: All columns of CSV files are imported now, and displayed as editable columns
+            - a horizontal navigation between the editable columns is available if there are more than one target
+            - Comments of a segment are relocated into the metapanel on the right
+
 2013-11-22: By default export does not export termTags in the target any more 
             (but still in the source). Reason is, that Trados Studio sometimes
             seem to destroy segments when termTags and change-history are contained.
