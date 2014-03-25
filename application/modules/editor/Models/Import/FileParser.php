@@ -235,6 +235,34 @@ abstract class editor_Models_Import_FileParser {
     }
     
     /**
+     * protects whitespace inside a segment with a tag
+     *
+     * @param string $segment
+     * @return string $segment
+     */
+    protected function parseSegmentProtectWhitespace($segment) {
+        $search = array(
+          "\r\n",  
+          "\n",  
+          "\r"
+        );
+        $replace = array(
+          '<hardReturn />',
+          '<softReturn />',
+          '<macReturn />'
+        );
+        $segment =  str_replace($search, $replace, $segment);
+        
+        return preg_replace_callback(
+                array(
+                    '" ( +)"'), //protect multispaces
+                        function ($match) {
+                            return ' <space ts="' . implode(',', unpack('H*', $match[1])) . '"/>';
+                        }, 
+            $segment);
+    }
+    
+    /**
      * returns the internally used SegmentFieldManager
      * @return editor_Models_SegmentFieldManager
      */

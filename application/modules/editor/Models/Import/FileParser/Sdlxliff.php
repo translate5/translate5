@@ -219,26 +219,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * @return string $segment
      */
     protected function parseSegmentProtectWhitespace($segment) {
-        $search = array(
-          "\r\n",  
-          "\n",  
-          "\r"
-        );
-        $replace = array(
-          '<hardReturn />',
-          '<softReturn />',
-          '<macReturn />'
-        );
-        $segment =  str_replace($search, $replace, $segment);
-        
-        $segment = preg_replace_callback(
-                array(
-                    '" ( +)"'), //protect multispaces
-                        function ($match) {
-                            return ' <space ts="' . implode(',', unpack('H*', $match[1])) . '"/>';
-                        }, 
-            $segment);
-        
+        $segment = parent::parseSegmentProtectWhitespace($segment);
         return preg_replace_callback(
                 array(
                     '"\x{0009}"u', //Hex UTF-8 bytes or codepoint of horizontal tab
@@ -757,14 +738,11 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $data->openTags[$data->openCounter]['tagName'] = $tagName;
         $data->openTags[$data->openCounter]['tagId'] = $tagId;
         $data->openTags[$data->openCounter]['nr'] = $data->j;
+        
         //ersetzte gegen Tag für die Anzeige
-        $data->segment[$data->i] = '<div class="open ' . $this->parseSegmentGetStorageClass($data->segment[$data->i]) . '"><span title="' .
-                 $this->encodeTagsForDisplay($this->_tagMapping[$tagId]['text']) .
-                '" class="short">&lt;' . $shortTagIdent .
-                '&gt;</span><span id="' . $tagId . '-' . $this->_tagCount .
-                '-' . $fileNameHash . '" class="full">' .
-               $this->encodeTagsForDisplay($this->_tagMapping[$tagId]['text']) . 
-                '</span></div>';
+        $p = $this->getTagParams($data, $shortTagIdent, $tagId, $fileNameHash);
+        $data->segment[$data->i] = $this->_leftTag->getHtmlTag($p);
+        
         $this->_leftTag->createAndSaveIfNotExists($this->_tagMapping[$tagId]['imgText'], $fileNameHash);
         $data->j++;
         return $data;
@@ -783,14 +761,12 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $openTag = $data->openTags[$data->openCounter];
         $mappedTag = $this->_tagMapping[$openTag['tagId']];
         $fileNameHash = md5($mappedTag['imgEptText']);
-        $data->segment[$data->i] = '<div class="close ' . $this->parseSegmentGetStorageClass($data->segment[$data->i]) . '"><span title="' .
-                $this->encodeTagsForDisplay($mappedTag['eptText']) .
-                '" class="short">&lt;/' . $openTag['nr'] .
-                '&gt;</span><span id="' . $openTag['tagId'] . '-' . $this->_tagCount .
-                '-' . $fileNameHash . '" class="full">' .
-                $this->encodeTagsForDisplay($mappedTag['eptText']) . '</span></div>';
-        $this->_rightTag->createAndSaveIfNotExists(
-                $mappedTag['imgEptText'], $fileNameHash);
+        
+        //generate the html tag for the editor
+        $p = $this->getTagParams($data, $openTag['nr'], $openTag['tagId'], $fileNameHash, $mappedTag['eptText']);
+        $data->segment[$data->i] = $this->_rightTag->getHtmlTag($p);
+        
+        $this->_rightTag->createAndSaveIfNotExists($mappedTag['imgEptText'], $fileNameHash);
         $data->openCounter--;
         return $data;
     }
@@ -813,18 +789,26 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             $locked = true;
         }
         $fileNameHash = md5($this->_tagMapping[$tagId]['imgText']);
-        $data->segment[$data->i] = '<div class="single ' . 
-                $this->parseSegmentGetStorageClass($data->segment[$data->i]). '"><span title="' .
-                $this->encodeTagsForDisplay($this->_tagMapping[$tagId]['text']) .
-                '" class="short">&lt;' . $shortTagIdent .
-                '/&gt;</span><span id="' . $tagId . '-' . $this->_tagCount .
-                '-' . $fileNameHash . '" class="full">' .
-                $this->encodeTagsForDisplay($this->_tagMapping[$tagId]['text']) . 
-                '</span></div>';
-        $this->_singleTag->createAndSaveIfNotExists(
-                $this->_tagMapping[$tagId]['imgText'], $fileNameHash);
+        
+        //generate the html tag for the editor
+        $p = $this->getTagParams($data, $shortTagIdent, $tagId, $fileNameHash);
+        $data->segment[$data->i] = $this->_singleTag->getHtmlTag($p);
+
+        $this->_singleTag->createAndSaveIfNotExists($this->_tagMapping[$tagId]['imgText'], $fileNameHash);
         $data->j++;
         return $data;
+    }
+    
+    protected function getTagParams($data, $shortTag, $tagId, $fileNameHash, $text = false) {
+        if($text === false) {
+            $text = $this->_tagMapping[$tagId]['text'];
+        }
+        return array(
+            'class' => $this->parseSegmentGetStorageClass($data->segment[$data->i]),
+            'text' => $this->encodeTagsForDisplay($text),
+            'shortTag' => $shortTag,
+            'id' => $tagId.'-'.$this->_tagCount.'-' . $fileNameHash,
+        );
     }
     
     /**

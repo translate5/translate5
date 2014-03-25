@@ -52,4 +52,14 @@ class editor_ImageTag_Right extends editor_ImageTag {
   protected function generateFilepath($filename){
     return parent::generateFilepath($filename.'-right');
   }
+  
+  /**
+   * (non-PHPdoc)
+   * @see editor_ImageTag::getHtmlTag()
+   */
+  public function getHtmlTag(array $parameters) {
+      $parameters['type'] = 'close';
+      $parameters['shortTag'] = '&lt;/'.$parameters['shortTag'].'&gt';
+      return parent::getHtmlTag($parameters);
+  }
 }
