@@ -389,17 +389,6 @@ class editor_Models_SegmentFieldManager {
     }
     
     /**
-     * returns the SQL to add one segment field to an existing segment identified by mid, taskGuid and fileId
-     * placeholders in SQL are: fieldName, 
-     * sql for encapsulating purposes in this class
-     */
-    public function getAddOneFieldSql() {
-        return 'INSERT INTO LEK_segment_data (taskGuid, name, segmentId, mid, 
-                original, originalMd5, originalToSort, edited, editedToSort) 
-                SELECT taskGuid, ?, id, mid, ?, ?, ?, ?, ?, ?, ';
-    }
-
-    /**
      * generates all needed data attributes for the segment fields and fills them up with the given data. 
      * Attributes are merged into the given resultObject. Since the object is given by reference no return value is used.
      * @param array $segmentData
