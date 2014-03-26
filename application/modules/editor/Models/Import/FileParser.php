@@ -236,6 +236,7 @@ abstract class editor_Models_Import_FileParser {
     }
     
     public function addSegmentProcessor(editor_Models_Import_SegmentProcessor $proc){
+        //error_log(get_class($proc));
         $this->segmentProcessor[] = $proc;
     }
     
@@ -382,6 +383,7 @@ abstract class editor_Models_Import_FileParser {
      */
     protected function setAndSaveSegmentValues(){
         $this->calculateLocalSegmentAttribs();
+        $result = false;
         foreach($this->segmentProcessor as $p) {
             $r = $p->process($this);
             if($r !== false) {

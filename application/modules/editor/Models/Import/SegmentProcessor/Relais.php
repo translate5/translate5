@@ -86,5 +86,5 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
         $this->segment->addFieldContent($this->relaisField, $this->fileId, $parser->getMid(), $data[$target]);
         
         return false;
-    }    
+    }
 }
