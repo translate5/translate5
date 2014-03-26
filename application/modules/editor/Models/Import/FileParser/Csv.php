@@ -86,11 +86,19 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     }
     
     /**
-     * @param string $line 
+     * @param handle $handle
      * @return string $line
      */
-    protected function prepareLine(string $line){
-        $line = str_getcsv(trim($line),  $this->_delimiter,$this->_enclosure);
+    protected function prepareLine(SplTempFileObject $csv){
+        //do while to jump over empty lines
+        do {
+            $line = $csv->fgetcsv($this->_delimiter, $this->_enclosure);
+        } while (count($line) === 1 && empty($line[0]));
+        
+        if($line === false){
+            trigger_error('Error on parsing a line of CSV. Current line is: '.$csv->current()
+                            .'. Error could also be in previous line!', E_USER_ERROR);
+        }
         if(!isset($line[2])){
             trigger_error('In the line "'.
                 implode($this->_enclosure.$this->_delimiter.$this->_enclosure,$line).
@@ -109,21 +117,27 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      *
      */
     protected function parse(){
-        $tmpPath = $this->_path.'.tmp';
-        file_put_contents($tmpPath, $this->_origFile);
-        $file = file($tmpPath);
-        unlink($tmpPath);
-        if(preg_match('"\r\n$"', $file[0]))$this->break = "\r\n";
-        elseif(preg_match('"\n$"', $file[0]))$this->break = "\n";
-        elseif(preg_match('"\r$"', $file[0]))$this->break = "\r";
+        if(preg_match('"\r\n$"', $this->_origFile))$this->break = "\r\n";
+        elseif(preg_match('"\n$"', $this->_origFile))$this->break = "\n";
+        elseif(preg_match('"\r$"', $this->_origFile))$this->break = "\r";
         else{
             trigger_error('no linebreak found in csv.',E_USER_ERROR);
         }
+        
+        //for this ini set see php docu: http://de2.php.net/manual/en/filesystem.configuration.php#ini.auto-detect-line-endings
+        ini_set("auto_detect_line_endings", true);
+        $csv = new SplTempFileObject();
+        //we skip empty lines in the CSV files
+        $csv->fwrite($this->_origFile);
+        $csv->rewind();
+        unset ($this->_origFile); //save memory, is not needed anymore.
+        
         //check header and column order
         $config = Zend_Registry::get('config');
         $csvSettings = $config->runtimeOptions->import->csv->fields->toArray();
         //$csvSettings quelle => source, mid => mid
-        $header = $this->prepareLine($file[0]);
+        $header = $this->prepareLine($csv);
+        $skel = array($this->str_putcsv($header, $this->_delimiter, $this->_enclosure, $this->break));
         
         $missing = array_diff($csvSettings, $header);
         if(!empty($missing)) {
@@ -134,8 +148,17 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         }
         $i=0;
         $csvSettings = array_flip($csvSettings);
+        $foundHeader = array();
         foreach($header as $colHead) {
             $type = false;
+
+            //we ignore empty colHeads on import, so we have to track their col position
+            if(empty($colHead)) {
+                $i++; //increase the col index, but do nothing else!
+                continue;
+            }
+
+            //get type and editable state of the field
             if(empty($csvSettings[$colHead])){
                 //if no column is configured, its a target
                 $type = editor_Models_SegmentField::TYPE_TARGET;
@@ -147,14 +170,25 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
                 $this->colOrder[self::CONFIG_COLUMN_MID] = $i++;
                 continue;
             }
+            
+            //we ensure that columns with the same name in one csv file are made unique
+            // this is needed by addfield to map fields between different files 
+            // if mid exists multiple times in the header, only the last one is used. 
+            if(empty($foundHeader[$colHead])) {
+                $foundHeader[$colHead] = 1;
+            }
+            else {
+                $colHead .= '_'.($foundHeader[$colHead]++);
+            }
             $name = $this->segmentFieldManager->addField($colHead, $type, $editable);
+            
             $this->colOrder[$name] = $i++;
         }
-        $lineCount = count($file);
-        for ($i=1; $i<$lineCount; $i++) {
-            $file[$i] = $this->extractSegment($file[$i]);
+        while(!$csv->eof()){
+            $extracted = $this->extractSegment($this->prepareLine($csv));
+            $skel[] = $this->str_putcsv($extracted, $this->_delimiter, $this->_enclosure, $this->break);
         }
-        $this->_skeletonFile = implode('', $file);//linebreaks are added by extractSegment
+        $this->_skeletonFile = join('', $skel);
     }
     
     /**
@@ -169,12 +203,10 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      * extracts the segment and saves them to db
      *
      * @param mixed $transUnit
-     * @return mixed $transUnit
+     * @return array $transUnit
      */
-    protected function extractSegment($line){
+    protected function extractSegment($lineArr){
         $this->segmentData = array();
-        $lineArr = $this->prepareLine($line);
-        
         foreach($this->colOrder as $name => $idx) {
             if($name == self::CONFIG_COLUMN_MID) {
                 $this->_mid = $lineArr[$idx];
@@ -182,13 +214,19 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             }
             $field = $this->segmentFieldManager->getByName($name);
             $isSource = $field->type == editor_Models_SegmentField::TYPE_SOURCE;
+            if(empty($lineArr[$idx])) {
+                $original = '';
+            }
+            else {
+                $original = $lineArr[$idx];
+            }
             $this->segmentData[$name] = array(
-                 'original' => $this->parseSegment($lineArr[$idx], $isSource),
-                 'originalMd5' => md5($lineArr[$idx])
+                 'original' => $this->parseSegment($original, $isSource),
+                 'originalMd5' => md5($original)
             );
         }
 
-        $this->setSegmentAttribs($line);
+        $this->setSegmentAttribs($lineArr); //<< hier kann crap übergeben werden
         $segmentId = $this->setAndSaveSegmentValues();
         foreach($this->colOrder as $name => $idx) {
             $field = $this->segmentFieldManager->getByName($name);
@@ -196,7 +234,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
                 $lineArr[$idx] = $this->getFieldPlaceholder($segmentId, $name);
             }
         }
-        return $this->str_putcsv($lineArr, $this->_delimiter, $this->_enclosure, $this->break);
+        return $lineArr;
     }
     /**
      * extracts tags and converts terms of the segment 
@@ -208,8 +246,50 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      * @return string $segment
      */
     protected function parseSegment($segment,$isSource){
-        return $segment;
+        $count = 0;
+        $segment = $this->parseSegmentProtectWhitespace($segment, $count);
+        
+        if($count == 0) {
+            return $segment;
+        }
+        
+        //In CSV we have to directly replace our whitespace tags with their HTML replacement
+        $search = array(
+          '#<hardReturn />#',
+          '#<softReturn />#',
+          '#<macReturn />#',
+          '#<space ts="[^"]*"/>#',
+        );
+        
+        //set data neede by $this->whitespaceTagReplacer
+        $this->shortTagIdent = 1;
+        $this->_segment = $segment;
+        
+        return preg_replace_callback($search, array($this,'whitespaceTagReplacer'), $segment);
     }
+    
+    /**
+     * callback for replace method in parseSegment
+     * @param array $match
+     * @return string
+     */
+    protected function whitespaceTagReplacer(array $match) {
+        //$replacer = function($match) use ($segment, $shortTagIdent, $map) {
+        $tag = $match[0];
+        $tagName = preg_replace('"<([^/ ]*).*>"', '\\1', $tag);
+        if(!isset($this->_tagMapping[$tagName])) {
+            trigger_error('The used tag ' . $tagName .' is undefined! Segment: '.$this->_segment, E_USER_ERROR);
+        }
+        $fileNameHash = md5($this->_tagMapping[$tagName]['imgText']);
+
+        //generate the html tag for the editor
+        $p = $this->getTagParams($tag, $this->shortTagIdent++, $tagName, $fileNameHash);
+        $tag = $this->_singleTag->getHtmlTag($p);
+        $this->_singleTag->createAndSaveIfNotExists($this->_tagMapping[$tagName]['imgText'], $fileNameHash);
+        $this->_tagCount++;
+        return $tag;
+    }
+    
     /**
      * Sets $this->_editSegment, $this->_matchRateSegment and $this->_autopropagated
      * and $this->_pretransSegment and $this->_autoStateId for the segment currently worked on

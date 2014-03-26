@@ -47,6 +47,10 @@
  */
 abstract class editor_Models_Import_FileParser {
     /**
+     * @var integer Counter of tags used in a segment.
+     */
+    protected $_tagCount = 1;
+    /**
      * @var string
      */
     protected $_origFile = NULL;
@@ -103,20 +107,30 @@ abstract class editor_Models_Import_FileParser {
      *              editiert werden dürfen (true) oder nicht (false)
      */
     public $_edit100PercentMatches = false;
+    
+    /**
+     * defines the GUI representation of internal used tags for masking special characters  
+     * @var array
+     */
+    protected $_tagMapping = array(
+        'hardReturn' => array('text' => '&lt;hardReturn/&gt;', 'imgText' => '<hardReturn/>'),
+        'softReturn' => array('text' => '&lt;softReturn/&gt;', 'imgText' => '<softReturn/>'),
+        'macReturn' => array('text' => '&lt;macReturn/&gt;', 'imgText' => '<macReturn/>'),
+        'space' => array('text' => '&lt;space/&gt;', 'imgText' => '<space/>'));
+
     /**
      * @var editor_ImageTag_Left
      */
-
     protected $_leftTag = NULL;
+
     /**
      * @var editor_ImageTag_Right
      */
-
     protected $_rightTag = NULL;
+
     /**
      * @var editor_ImageTag_Single
      */
-
     protected $_singleTag = NULL;
 
     /**
@@ -238,9 +252,10 @@ abstract class editor_Models_Import_FileParser {
      * protects whitespace inside a segment with a tag
      *
      * @param string $segment
+     * @param integer $count optional, variable passed by reference stores the replacement count
      * @return string $segment
      */
-    protected function parseSegmentProtectWhitespace($segment) {
+    protected function parseSegmentProtectWhitespace($segment, &$count = 0) {
         $search = array(
           "\r\n",  
           "\n",  
@@ -251,15 +266,54 @@ abstract class editor_Models_Import_FileParser {
           '<softReturn />',
           '<macReturn />'
         );
-        $segment =  str_replace($search, $replace, $segment);
+        $segment =  str_replace($search, $replace, $segment, $returnCount);
+        $count += $returnCount;
         
-        return preg_replace_callback(
-                array(
-                    '" ( +)"'), //protect multispaces
-                        function ($match) {
-                            return ' <space ts="' . implode(',', unpack('H*', $match[1])) . '"/>';
-                        }, 
-            $segment);
+        $replacer = function ($match) {
+                        return ' <space ts="' . implode(',', unpack('H*', $match[1])) . '"/>';
+                    };
+        
+        //protect multispaces
+        $res = preg_replace_callback('" ( +)"', $replacer, $segment, -1, $spaceCount);
+        $count += $spaceCount;
+        return $res;
+    }
+    
+    /**
+     * Hilfsfunktion für parseSegment: Verpackung verschiedener Strings zur Zwischenspeicherung als HTML-Klassenname im JS
+     *
+     * @param string $tag enthält den Tag als String
+     * @param string $tagName enthält den Tagnamen
+     * @param boolean $locked gibt an, ob der übergebene Tag die Referenzierung auf einen gesperrten inline-Text im sdlxliff ist
+     * @return string $id ID des Tags im JS
+     */
+    protected function parseSegmentGetStorageClass($tag) {
+        $tagContent = preg_replace('"^<(.*)>$"', '\\1', $tag);
+        if($tagContent == $tag){
+            trigger_error('The Tag ' . $tag .
+                    ' has not the structure of a tag.', E_USER_ERROR);
+        }
+        return implode('', unpack('H*', $tagContent));
+    }
+    
+    /**
+     * returns the parameters for creating the HtmlTags used in the GUI
+     * @param string $tag
+     * @param string $shortTag
+     * @param string $tagId
+     * @param string $fileNameHash
+     * @param string $text
+     */
+    protected function getTagParams($tag, $shortTag, $tagId, $fileNameHash, $text = false) {
+        if($text === false) {
+            $text = $this->_tagMapping[$tagId]['text'];
+        }
+        return array(
+            'class' => $this->parseSegmentGetStorageClass($tag),
+            'text' => $text,
+            'shortTag' => $shortTag,
+            'id' => $tagId.'-'.$this->_tagCount.'-' . $fileNameHash,
+        );
     }
     
     /**

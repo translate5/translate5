@@ -66,55 +66,6 @@
  */
 class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_FileParser {
     /**
-     * Mapping von tagId zu Name und anzuzeigendem Text fuer den Nutzer
-     *
-     * - kann in der Klassenvar-Def. bereits Inhalte enthalten, die für spezielle
-     *   Zwecke benötigt werden und nicht dynamisch aus der sdlxliff-Datei kommen.
-     *
-     *   Beispiel bpt:
-     *   [1192]=>
-     *    array(6) {
-     *      ["name"]=>
-     *      string(3) "bpt"
-     *      ["text"]=>
-     *      string(44) "&lt;cf style=&quot;z_AS_disclaimer&quot;&gt;"
-     *      ["imgText"]=>
-     *      string(28) "<cf style="z_AS_disclaimer">"
-     *      ["eptName"]=>
-     *      string(3) "ept"
-     *      ["eptText"]=>
-     *      string(11) "&lt;/cf&gt;"
-     *      ["imgEptText"]=>
-     *      string(5) "</cf>"
-     *    }
-     *   Beispiel ph:
-     *    [0]=>
-     *     array(3) {
-     *       ["name"]=>
-     *       string(2) "ph"
-     *       ["text"]=>
-     *       string(58) "&lt;format type=&quot;&amp;lt;fullPara/&amp;gt;&quot;/&gt;"
-     *       ["imgText"]=>
-     *       string(34) "<format type="&lt;fullPara/&gt;"/>"
-     *     }
-     * @var array array('tagId' => array('name' => string '', 'text' => string '','imgText' => string '', ['eptName' => string '', 'eptText' => string '','imgEptText' => string '']),'tagId2' => ...)
-     */
-    protected $_tagMapping = array(
-        'unicodePrivateUseArea' => array('name' => 'ph', 'text' => '&lt;SpecialChar/&gt;', 'imgText' => '<SpecialChar/>'),
-        'hardReturn' => array('name' => 'ph', 'text' => '&lt;hardReturn/&gt;', 'imgText' => '<hardReturn/>'),
-        'softReturn' => array('name' => 'ph', 'text' => '&lt;softReturn/&gt;', 'imgText' => '<softReturn/>'),
-        'macReturn' => array('name' => 'ph', 'text' => '&lt;macReturn/&gt;', 'imgText' => '<macReturn/>'),
-        'space' => array('name' => 'ph', 'text' => '&lt;space/&gt;', 'imgText' => '<space/>'),
-        'mrkSingle' => array('name' => 'ph', 'text' => '&lt;InternalReference/&gt;', 'imgText' => '<InternalReference/>'),
-        'mrkPaired' => array('name' => 'bpt', 'text' => '&lt;InternalReference&gt;', 'imgText' => '<InternalReference>','eptName'=>'ept','eptText'=>'&lt;/InternalReference&gt;','imgEptText'  => '</InternalReference>')
-        );
-
-    /**
-     * @var integer Zählt bei jedem Tag eins hoch
-     */
-    protected $_tagCount = 1;
-    
-    /**
      * @var array mappt alle Tag-Referenzen im Header der sdlxliff-Datei innerhalb von
      *      <tag-defs><tag></tag></tag-defs> auf die Tags in Segmenten des sdlxliff
      *      die auf sie verweisen. Die Referenz ist gemäß der sdlxliff-Logik
@@ -149,6 +100,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * Initiert Tagmapping
      */
     public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task) {
+        //add sdlxliff tagMapping
+        $this->addSldxliffTagMappings();
         parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $sourceLang, $targetLang, $task);
         $this->checkForSdlChangeMarker();
         $this->removeEmtpyXmlns();
@@ -156,6 +109,51 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $this->prepareTagMapping();
     }
 
+    /**
+     * Adds the sdlxliff specific tagmappings
+     * Mapping von tagId zu Name und anzuzeigendem Text fuer den Nutzer
+     *
+     * - kann in der Klassenvar-Def. bereits Inhalte enthalten, die für spezielle
+     *   Zwecke benötigt werden und nicht dynamisch aus der sdlxliff-Datei kommen.
+     *
+     *   Beispiel bpt:
+     *   [1192]=>
+     *    array(6) {
+     *      ["name"]=>
+     *      string(3) "bpt"
+     *      ["text"]=>
+     *      string(44) "&lt;cf style=&quot;z_AS_disclaimer&quot;&gt;"
+     *      ["imgText"]=>
+     *      string(28) "<cf style="z_AS_disclaimer">"
+     *      ["eptName"]=>
+     *      string(3) "ept"
+     *      ["eptText"]=>
+     *      string(11) "&lt;/cf&gt;"
+     *      ["imgEptText"]=>
+     *      string(5) "</cf>"
+     *    }
+     *   Beispiel ph:
+     *    [0]=>
+     *     array(3) {
+     *       ["name"]=>
+     *       string(2) "ph"
+     *       ["text"]=>
+     *       string(58) "&lt;format type=&quot;&amp;lt;fullPara/&amp;gt;&quot;/&gt;"
+     *       ["imgText"]=>
+     *       string(34) "<format type="&lt;fullPara/&gt;"/>"
+     *     }
+     * @var array array('tagId' => array('name' => string '', 'text' => string '','imgText' => string '', ['eptName' => string '', 'eptText' => string '','imgEptText' => string '']),'tagId2' => ...)
+     */
+    private function addSldxliffTagMappings() {
+        $this->_tagMapping['hardReturn']['name'] = 'ph';
+        $this->_tagMapping['softReturn']['name'] = 'ph';
+        $this->_tagMapping['macReturn']['name'] = 'ph';
+        $this->_tagMapping['hardReturn']['name'] = 'ph';
+        $this->_tagMapping['unicodePrivateUseArea'] = array('name' => 'ph', 'text' => '&lt;SpecialChar/&gt;', 'imgText' => '<SpecialChar/>');
+        $this->_tagMapping['mrkSingle'] = array('name' => 'ph', 'text' => '&lt;InternalReference/&gt;', 'imgText' => '<InternalReference/>');
+        $this->_tagMapping['mrkPaired'] = array('name' => 'bpt', 'text' => '&lt;InternalReference&gt;', 'imgText' => '<InternalReference>','eptName'=>'ept','eptText'=>'&lt;/InternalReference&gt;','imgEptText'  => '</InternalReference>');
+    }
+    
     /**
      * Checks, if there are any change-markers in the sdlxliff. If yes, triggers an error
      */
@@ -216,11 +214,12 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * protects whitespace inside a segment with a tag
      *
      * @param string $segment
+     * @param integer $count optional, variable passed by reference stores the replacement count
      * @return string $segment
      */
-    protected function parseSegmentProtectWhitespace($segment) {
-        $segment = parent::parseSegmentProtectWhitespace($segment);
-        return preg_replace_callback(
+    protected function parseSegmentProtectWhitespace($segment, &$count = 0) {
+        $segment = parent::parseSegmentProtectWhitespace($segment, $count);
+        $res = preg_replace_callback(
                 array(
                     '"\x{0009}"u', //Hex UTF-8 bytes or codepoint of horizontal tab
                     '"\x{000B}"u', //Hex UTF-8 bytes or codepoint of vertical tab
@@ -237,7 +236,9 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                         function ($match) {
                             return '<space ts="' . implode(',', unpack('H*', $match[0])) . '"/>';
                         }, 
-            $segment);
+            $segment, -1, $replaceCount);
+        $count += $replaceCount;
+        return $res;
     }
     
     /**
@@ -546,22 +547,6 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     }
 
     /**
-     * Hilfsfunktion für parseSegment: Verpackung verschiedener Strings zur Zwischenspeicherung als HTML-Klassenname im JS
-     *
-     * @param string $tag enthält den Tag als String
-     * @param string $tagName enthält den Tagnamen
-     * @param boolean $locked gibt an, ob der übergebene Tag die Referenzierung auf einen gesperrten inline-Text im sdlxliff ist
-     * @return string $id ID des Tags im JS
-     */
-    protected function parseSegmentGetStorageClass($tag) {
-        if(preg_match('"^<(.*)>$"', $tag)==0){
-            trigger_error('The Tag ' . $tag .
-                    ' has not the structure of a tag.', E_USER_ERROR);
-        }
-        return implode('', unpack('H*', preg_replace('"^<(.*)>$"', '\\1', $tag)));
-    }
-
-    /**
      * prüft, ob ein Tagname $this->_tagDefMapping definiert ist
      *
      * @param string $tagName
@@ -722,10 +707,11 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * @return editor_Models_Import_FileParser_Sdlxliff_parseSegmentData  $data enthält alle für das Segmentparsen wichtigen Daten
      */
     protected function parseLeftTag($data) {
+        $tag = &$data->segment[$data->i];
         $data->openCounter++;
-        $tagName = preg_replace('"<([^ ]*).*>"', '\\1', $data->segment[$data->i]);
+        $tagName = preg_replace('"<([^ ]*).*>"', '\\1', $tag);
         $this->verifyTagName($tagName, $data);
-        $tagId = $this->parseSegmentGetTagId($data->segment[$data->i], $tagName);
+        $tagId = $this->parseSegmentGetTagId($tag, $tagName);
         $shortTagIdent = $data->j;
         if (strpos($tagId, 'locked')!== false) {
             trigger_error('Der öffnende Tag ' . $tagName .
@@ -740,8 +726,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $data->openTags[$data->openCounter]['nr'] = $data->j;
         
         //ersetzte gegen Tag für die Anzeige
-        $p = $this->getTagParams($data, $shortTagIdent, $tagId, $fileNameHash);
-        $data->segment[$data->i] = $this->_leftTag->getHtmlTag($p);
+        $p = $this->getTagParams($tag, $shortTagIdent, $tagId, $fileNameHash);
+        $tag = $this->_leftTag->getHtmlTag($p);
         
         $this->_leftTag->createAndSaveIfNotExists($this->_tagMapping[$tagId]['imgText'], $fileNameHash);
         $data->j++;
@@ -763,7 +749,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $fileNameHash = md5($mappedTag['imgEptText']);
         
         //generate the html tag for the editor
-        $p = $this->getTagParams($data, $openTag['nr'], $openTag['tagId'], $fileNameHash, $mappedTag['eptText']);
+        $p = $this->getTagParams($data->segment[$data->i], $openTag['nr'], $openTag['tagId'], $fileNameHash, $mappedTag['eptText']);
         $data->segment[$data->i] = $this->_rightTag->getHtmlTag($p);
         
         $this->_rightTag->createAndSaveIfNotExists($mappedTag['imgEptText'], $fileNameHash);
@@ -778,37 +764,36 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * @return editor_Models_Import_FileParser_Sdlxliff_parseSegmentData  $data enthält alle für das Segmentparsen wichtigen Daten
      */
     protected function parseSingleTag($data) {
-        $tagName = preg_replace('"<([^/ ]*).*>"', '\\1', $data->segment[$data->i]);
+        $tag = &$data->segment[$data->i];
+        $tagName = preg_replace('"<([^/ ]*).*>"', '\\1', $tag);
         $this->verifyTagName($tagName, $data);
-        $tagId = $this->parseSegmentGetTagId($data->segment[$data->i], $tagName);
+        $tagId = $this->parseSegmentGetTagId($tag, $tagName);
         $shortTagIdent = $data->j;
         $locked = false;
         if (strpos($tagId, 'locked')!== false) {
-            $this->setLockedTagContent($data->segment[$data->i], $tagId);
+            $this->setLockedTagContent($tag, $tagId);
             $shortTagIdent = 'locked' . $data->j;
             $locked = true;
         }
         $fileNameHash = md5($this->_tagMapping[$tagId]['imgText']);
         
         //generate the html tag for the editor
-        $p = $this->getTagParams($data, $shortTagIdent, $tagId, $fileNameHash);
-        $data->segment[$data->i] = $this->_singleTag->getHtmlTag($p);
+        $p = $this->getTagParams($tag, $shortTagIdent, $tagId, $fileNameHash);
+        $tag = $this->_singleTag->getHtmlTag($p);
 
         $this->_singleTag->createAndSaveIfNotExists($this->_tagMapping[$tagId]['imgText'], $fileNameHash);
         $data->j++;
         return $data;
     }
     
-    protected function getTagParams($data, $shortTag, $tagId, $fileNameHash, $text = false) {
-        if($text === false) {
-            $text = $this->_tagMapping[$tagId]['text'];
-        }
-        return array(
-            'class' => $this->parseSegmentGetStorageClass($data->segment[$data->i]),
-            'text' => $this->encodeTagsForDisplay($text),
-            'shortTag' => $shortTag,
-            'id' => $tagId.'-'.$this->_tagCount.'-' . $fileNameHash,
-        );
+    /**
+     * (non-PHPdoc)
+     * @see editor_Models_Import_FileParser::getTagParams()
+     */
+    protected function getTagParams($tag, $shortTag, $tagId, $fileNameHash, $text = false) {
+        $data = parent::getTagParams($tag, $shortTag, $tagId, $fileNameHash, $text);
+        $data['text'] = $this->encodeTagsForDisplay($data['text']);
+        return $data;
     }
     
     /**
