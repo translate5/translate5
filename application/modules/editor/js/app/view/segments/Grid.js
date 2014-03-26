@@ -154,17 +154,7 @@ Ext.define('Editor.view.segments.Grid', {
             fieldList.push(rec);
         });
         
-        //sort the fieldList array by type
-        fieldList = Ext.Array.sort(fieldList, function(one, two) {
-            one = one.typeSortOrder[one.get('type')];
-            two = two.typeSortOrder[two.get('type')];
-            //FIXME same sort in MQM list tab as here???
-            //for same type sort by import order (id)
-            if(one == two) {
-                return one.get('id') - two.get('id');
-            }
-            return one - two;
-        });
+        fieldList = Editor.model.segment.Field.listSort(fieldList);
         
         Ext.Array.each(fieldList, function(rec){
             var name = rec.get('name'),

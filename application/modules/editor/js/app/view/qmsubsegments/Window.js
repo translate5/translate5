@@ -66,6 +66,8 @@ Ext.define('Editor.view.qmsubsegments.Window', {
             }
         });
         
+        editable = Editor.model.segment.Field.listSort(editable);
+        
         if(editable.length == 1) {
             me.items = [me.getField(editable[0])];
         }
