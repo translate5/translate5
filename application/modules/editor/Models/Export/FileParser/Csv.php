@@ -61,9 +61,8 @@ class editor_Models_Export_FileParser_Csv extends editor_Models_Export_FileParse
 
     public function __construct(integer $fileId, boolean $diff,editor_Models_Task $task) {
         parent::__construct($fileId, $diff,$task);
-        $config = Zend_Registry::get('config');
-        $this->_delimiter = $config->runtimeOptions->import->csv->delimiter;
-        $this->_enclosure = $config->runtimeOptions->import->csv->enclosure;
+        $this->_delimiter = $this->config->runtimeOptions->import->csv->delimiter;
+        $this->_enclosure = $this->config->runtimeOptions->import->csv->enclosure;
     }
     /**
      * reconstructs segment to the original source format
@@ -74,7 +73,8 @@ class editor_Models_Export_FileParser_Csv extends editor_Models_Export_FileParse
      */
 
     protected function parseSegment($segment){
-        return htmlspecialchars_decode($this->convertQmTags2XliffFormat($segment));
+        $segment = $this->convertQmTags2XliffFormat($segment);
+        return htmlspecialchars_decode(parent::parseSegment($segment));
     }
     
     /**

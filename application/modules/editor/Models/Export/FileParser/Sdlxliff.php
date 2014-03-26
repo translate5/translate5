@@ -45,10 +45,9 @@
  */
 
 class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_FileParser {
-    /*
+    /**
      * @var string Klassenname des Difftaggers
      */
-
     protected $_classNameDifftagger = 'editor_Models_Export_DiffTagger_Sdlxliff';
 
     public function __construct(integer $fileId, boolean $diff,editor_Models_Task $task) {
@@ -74,6 +73,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         //die folgende Form besteht nur noch, weil vor dem 31.02.2013 importierte 
         //Projekte noch nicht den gesamten tagContent als CSS-Klasse verpackt mitgegeben 
         //hatten, sondern je nach Tagart ggf. nur ausgesuchte Teile. Dies ist seit dem anders.
+        //Daher sollten alle Betandsprojekte entfernt sein, kann diese parseSegment durch die nachfolgend auskommentierte ersetzt werden.
         $rebuildTag = function ($tagType, $tagId, $toPack) {
                     try {
                         $tagContent = pack('H*', $toPack);
@@ -111,13 +111,10 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
                 };
 /*@todo nächste Zeile rauswerfen, wenn qm-subsegments im Export korrekt abgebildet werden. Das gleiche gilt für den vermerk in tasks.phtml */
         $segment = preg_replace('"<img[^>]*>"','', $segment);
-        $config = Zend_Registry::get('config');
-        $segmentArr = preg_split($config->runtimeOptions->editor->export->regexInternalTags, $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
+        $segmentArr = preg_split($this->config->runtimeOptions->editor->export->regexInternalTags, $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
         $count = count($segmentArr);
         for ($i = 1; $i < $count;) {
             $j = $i + 2;
-            //@todo sobald keine Altdaten mehr in der DB sind, die vor dem 31.01.2013 importiert wurden,
-            // kann die folgende Zeile durch den folgenden Code ersetzt werden und die Methode $rebuildTag komplett gelöscht werden: 
             //$segmentArr[$i] = '<' . pack('H*', $segmentArr[$i + 1]) .'">';
             $segmentArr[$i] = $rebuildTag($segmentArr[$i], $segmentArr[$j], $segmentArr[$i + 1]);
             unset($segmentArr[$j]);
@@ -126,6 +123,17 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         }
         return implode('', $segmentArr);
     }
+    
+    /**
+     * @todo sobald keine Altdaten mehr in der DB sind, die vor dem 31.01.2013 importiert wurden,
+     * kann die obige parseSegment Methode durch die folgende komplett ersetzt werden!
+     *  
+    protected function parseSegment($segment) {
+        //@todo nächste Zeile rauswerfen, wenn qm-subsegments im Export korrekt abgebildet werden. Das gleiche gilt für den vermerk in tasks.phtml 
+        $segment = preg_replace('"<img[^>]*>"','', $segment);
+        return parent::parseSegment($segment);
+    }
+     */
 
     /**
      * Stellt die Term Auszeichnungen gemäß sdlxliff-Syntax (<mrk ...) wieder her
@@ -198,11 +206,9 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
      *
      * @return string file
      */
-
     public function getFile() {
         parent::getFile();
         $this->unProtectUnicodeSpecialChars();
-        $this->unprotectWhitespace();
         $this->_exportFile = preg_replace('"(<mrk[^>]*[^/])></mrk>"i', '\\1/>', $this->_exportFile);
         $this->injectRevisions();
         return $this->_exportFile;
@@ -211,8 +217,8 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
     /**
      * Generiert die Revisionshistorie für den head der sdlxliff-Datei
      * Beispiel einer Revision: <rev-def id="b37e487f-2c70-4259-84e0-677d8c01f5b8" type="Delete" author="christine.schulze" date="10/23/2012 10:25:04" />
+     * @return string
      */
-
     protected function generateRevisions() {
         $createRevision = function ($rev, $tagType = NULL) {
                     $delete = '';
@@ -234,9 +240,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
 
     /**
      * Injiziert die Revisionshistorie in den head der sdlxliff-Datei
-     *
      */
-
     protected function injectRevisions() {
         $revisions = $this->generateRevisions();
         if ($revisions != '') {
@@ -257,40 +261,11 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
     /**
      * Entschützt Zeichenketten, die im sdlxliff enthalten sind und mit
      * ImportController->protectUnicodeSpecialChars geschützt wurden
-     *
      */
-
     protected function unProtectUnicodeSpecialChars() {
         $this->_exportFile = preg_replace_callback('"<unicodePrivateUseArea ts=\"[A-Fa-f0-9]*\"/>"', function ($match) {
                     $r = preg_replace('"<unicodePrivateUseArea ts=\"([A-Fa-f0-9]*)\"/>"', "\\1", $match[0]);
                     return pack('H*', $r);
                 }, $this->_exportFile);
     }
-    /**
-     * unprotects whitespace inside a segment with a tag
-     * 
-     * - import operates on parseSegment-level. Since we insert there a translate5-
-     *   specific syntax, it is easier to do the replacement once for a file in
-     *   the export. In addition a replacement inside of parseSegment would interfere
-     *   with the diffTagger, since it does not handle whitespace-diffs
-     *
-     */
-
-    protected function unprotectWhitespace() {
-        $search = array(
-          '<hardReturn />',
-          '<softReturn />',
-          '<macReturn />'
-        );
-        $replace = array(
-          "\r\n",  
-          "\n",  
-          "\r"
-        );
-        $this->_exportFile = str_replace($search, $replace, $this->_exportFile);
-        $this->_exportFile = preg_replace_callback('"<space ts=\"([A-Fa-f0-9]*)\"/>"', function ($match) {
-                    return pack('H*', $match[1]);
-                }, $this->_exportFile);
-    }
-
 }

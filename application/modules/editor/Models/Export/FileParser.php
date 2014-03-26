@@ -49,7 +49,6 @@ abstract class editor_Models_Export_FileParser {
     /**
      * @var string
      */
-
     protected $_exportFile = NULL;
     /**
      * @var string
@@ -83,9 +82,13 @@ abstract class editor_Models_Export_FileParser {
     protected $_diff= false;
     /**
      * @var editor_Models_Task current task
-     *
      */
     protected $_task;
+    
+    /**
+     * @var Zend_Config
+     */
+    protected $config;
     
     public function __construct(integer $fileId,boolean $diff,editor_Models_Task $task) {
         if(is_null($this->_classNameDifftagger)){
@@ -95,6 +98,7 @@ abstract class editor_Models_Export_FileParser {
         $this->_diffTagger = ZfExtended_Factory::get($this->_classNameDifftagger);
         $this->_diff = $diff;
         $this->_task = $task;
+        $this->config = Zend_Registry::get('config');
     }
 
     /**
@@ -170,8 +174,7 @@ abstract class editor_Models_Export_FileParser {
      * @return string
      */
     protected function getSegmentContent($segmentId, $field) {
-        $config = Zend_Registry::get('config');
-        $removeTaggingOnExport = $config->runtimeOptions->termTagger->removeTaggingOnExport;
+        $removeTaggingOnExport = $this->config->runtimeOptions->termTagger->removeTaggingOnExport;
         $this->_segmentEntity = $segment = $this->getSegment($segmentId);
         
         $edited = (string) $segment->getFieldEdited($field);
@@ -180,20 +183,22 @@ abstract class editor_Models_Export_FileParser {
         
         $edited = $this->recreateTermTags($edited,(boolean)$removeTermTags);
         $edited = $this->parseSegment($edited);
-        
+
         if(!$this->_diff){
-            return $edited;
+            return $this->unprotectWhitespace($edited);
         }
         
         $original = (string) $segment->getFieldOriginal($field);
         $original = $this->recreateTermTags($original);
         $original = $this->parseSegment($original);
         
-        return $this->_diffTagger->diffSegment(
+        $diffed = $this->_diffTagger->diffSegment(
                 $original, 
                 $edited,
                 $segment->getTimestamp(),
                 $segment->getUserName());
+        // unprotectWhitespace must be done after diffing!
+        return $this->unprotectWhitespace($diffed);
     }
     
     /**
@@ -291,7 +296,18 @@ abstract class editor_Models_Export_FileParser {
      * @param string $segment
      * @return string $segment 
      */
-    abstract protected function parseSegment($segment);
+    protected function parseSegment($segment) {
+        $segmentArr = preg_split($this->config->runtimeOptions->editor->export->regexInternalTags, $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
+        $count = count($segmentArr);
+        for ($i = 1; $i < $count;) {
+            $j = $i + 2;
+            $segmentArr[$i] = '<' . pack('H*', $segmentArr[$i + 1]) .'>';
+            unset($segmentArr[$j]);
+            unset($segmentArr[$i + 1]);
+            $i = $i + 4;
+        }
+        return implode('', $segmentArr);
+    }
     
     /**
      * Stellt die Term Auszeichnungen wieder her
@@ -320,5 +336,28 @@ abstract class editor_Models_Export_FileParser {
      */
     public function exportSingleSegmentContent($segment) {
         return $this->recreateTermTags($this->parseSegment($segment));
+    }
+    
+    /**
+     * unprotects tag protected whitespace inside the given segment content
+     * keep attention to the different invocation points for this method!
+     * @param string $content
+     * @return string
+     */
+    protected function unprotectWhitespace($content) {
+        $search = array(
+          '<hardReturn />',
+          '<softReturn />',
+          '<macReturn />'
+        );
+        $replace = array(
+          "\r\n",  
+          "\n",  
+          "\r"
+        );
+        $content = str_replace($search, $replace, $content);
+        return preg_replace_callback('"<space ts=\"([A-Fa-f0-9]*)\"/>"', function ($match) {
+                    return pack('H*', $match[1]);
+                }, $content);
     }
 }

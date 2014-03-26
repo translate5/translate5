@@ -391,7 +391,7 @@ abstract class editor_Models_Import_FileParser {
             }
         }
         foreach($this->segmentProcessor as $p) {
-            $result = $p->postProcessHandler($this, $result);
+            $p->postProcessHandler($this, $result);
         }
         return $result;
     }
