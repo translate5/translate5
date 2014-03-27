@@ -136,6 +136,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     protected function set($name, $value) {
         $loc = $this->segmentFieldManager->getDataLocationByKey($name);
         if($loc !== false) {
+            if(empty($this->segmentdata[$loc['field']])) {
+                $this->segmentdata[$loc['field']] = $this->createData($loc['field']);
+            }
             return $this->segmentdata[$loc['field']]->__set($loc['column'], $value);
         }
         return parent::set($name, $value);
@@ -150,7 +153,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     protected function get($name) {
         $loc = $this->segmentFieldManager->getDataLocationByKey($name);
         if($loc !== false) {
-            //if we are getting missing index errors here, the data is corrupt!
+            //if we have a missing index here, that means, 
+            //the data field ist not existing yet, since the field itself was defined by another file!
+            //so returning an empty string is OK here. 
+            if(empty($this->segmentdata[$loc['field']])) {
+                return '';
+            }
             return $this->segmentdata[$loc['field']]->__get($loc['column']);
         }
         return parent::get($name);
@@ -280,6 +288,30 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * method to add a data hunk later on 
+     * (edit a alternate which was defined by another file, and is therefore empty in this segment)
+     * @param string $field the field name
+     * @return editor_Models_Db_SegmentDataRow
+     */
+    protected function createData($field) {
+        $db = ZfExtended_Factory::get('editor_Models_Db_SegmentData');
+        /* @var $db editor_Models_Db_SegmentData */
+        $row = $db->createRow();
+        /* @var $row editor_Models_Db_SegmentDataRow */
+        $row->taskGuid = $this->get('taskGuid');
+        $row->name = $field;
+        $row->segmentId = $this->get('id');
+        $row->mid = $this->get('mid');
+        $row->original = '';
+        $row->originalMd5 = 'd41d8cd98f00b204e9800998ecf8427e'; //empty string md5 hash
+        $row->originalToSort = '';
+        $row->edited = '';
+        $row->editedToSort = '';
+        $row->save();
+        return $row;
+    }
+    
+    /**
      * save the segment and the associated segmentd data hunks
      * (non-PHPdoc)
      * @see ZfExtended_Models_Entity_Abstract::save()
@@ -312,6 +344,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @param string $field Fieldname
      */
     public function getFieldOriginal($field) {
+        //since fields can be merged from different files, data for a field can be empty
+        if(empty($this->segmentdata[$field])) {
+            return '';
+        }
         return $this->segmentdata[$field]->original;
     }
 
@@ -320,6 +356,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @param string $field Fieldname
      */
     public function getFieldEdited($field) {
+        //since fields can be merged from different files, data for a field can be empty
+        if(empty($this->segmentdata[$field])) {
+            return '';
+        }
         return $this->segmentdata[$field]->edited;
     }
 

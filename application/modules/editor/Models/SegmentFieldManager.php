@@ -398,10 +398,22 @@ class editor_Models_SegmentFieldManager {
         //loop over all available segment fields for this task
         foreach($this->segmentfields as $field) {
             $name = $field->name;
-            $data = $segmentData[$name]; //if we're getting missing index here, the data is corrupt!
+            //if we have a missing index here, that means, 
+            //the data field ist not existing yet, since the field itself was defined by another file!
+            //so returning an empty string is OK here.
+            if(empty($segmentData[$name])) {
+                $data = false;
+            }
+            else {
+                $data = $segmentData[$name]; 
+            }
             //loop over our available base data columns and generate them
             foreach($this->baseFieldColMap as $k => $v) {
                 if(!$field->editable && strpos($k, self::_EDIT_PREFIX) === 0) {
+                    continue;
+                }
+                if($data === false) {
+                    $resultObj->{$name.$k} = '';
                     continue;
                 }
                 $resultObj->{$name.$k} = $data->{$v};
