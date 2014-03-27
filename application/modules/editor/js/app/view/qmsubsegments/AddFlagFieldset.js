@@ -54,11 +54,7 @@ Ext.define('Editor.view.qmsubsegments.AddFlagFieldset', {
 	},
 	initComponent : function() {
 		var me = this,
-			sevStore = Ext.create('Ext.data.Store', {
-			    fields: ['id', 'text'],
-			    storeId: 'Severities',
-			    data: Editor.data.task.get('qmSubSeverities')
-			});
+		    sevStore = Ext.StoreMgr.get('Severities');
 		Ext.applyIf(me, {
 			items : [{
 				xtype : 'button',
@@ -66,7 +62,7 @@ Ext.define('Editor.view.qmsubsegments.AddFlagFieldset', {
 				margin: '0 0 6 0',
 				menu : {
 					bodyCls: 'qmflag-menu',
-					items: me.controller.getMenuConfig(),
+					items: me.controller.menuConfig,
 					listeners: {
 	                    afterrender: function(component) {
 	                    	if(component.keyNav) {
