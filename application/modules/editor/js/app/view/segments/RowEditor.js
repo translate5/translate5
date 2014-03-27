@@ -63,6 +63,9 @@ Ext.define('Editor.view.segments.RowEditor', {
     initComponent: function() {
         var me = this;
         me.callParent(arguments);
+        me.on('render', function(p) {
+            p.body.on('dblclick', me.changeColumnByClick, me);
+        });
         me.mainEditor = me.add(new Editor.view.segments.HtmlEditor());
         
         this.addEvents(
@@ -208,7 +211,29 @@ Ext.define('Editor.view.segments.RowEditor', {
             me.renderColumnData(field, me.context.record);
         }
     },
-    
+    /**
+     * handles clicking on the displayfields of the roweditor to change the editor position
+     * @param {Ext.Event} ev
+     * @param {DOMNode} target
+     */
+    changeColumnByClick: function(ev, target) {
+        var me = this, 
+            cmp = null;
+ 
+        //bubble up to the dom element which is the el of the Component
+        while (target && target.nodeType === 1) {
+            if(/displayfield-[0-9]+/.test(target.id)) {
+                cmp = me.columns.get(target.id);
+                if (cmp) {
+                    break;
+                }
+            }
+            target = target.parentNode;
+        }
+        if(cmp) {
+            me.changeColumnToEdit(cmp);
+        }
+    },
     /**
      * changes the maineditor to the given column
      * @param {Editor.view.segments.column.ContentEditable} column
@@ -234,7 +259,6 @@ Ext.define('Editor.view.segments.RowEditor', {
             me.focusContextCell();
         }
     },
-
     /**
      * Lädt den Datensatz in den Editor, erweitert das Orginal um die Integration des Markup.
      * Da die HtmlEditor.[set|get]Value Methoden aus Performance Gründen nicht überschrieben werden können, 
