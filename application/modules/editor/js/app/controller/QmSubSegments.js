@@ -104,7 +104,7 @@ Ext.define('Editor.controller.QmSubSegments', {
     		return;
     	}
     	var pos = mpForm.items.findIndex('itemId', 'metaQm');
-    	mpForm.insert(pos+1, {xtype: 'qmSubsegmentsFlagFieldset', controller: this});
+    	mpForm.insert(pos, {xtype: 'qmSubsegmentsFlagFieldset', controller: this});
     },
     /**
      * generates the config menu tree for QM Flag Menu

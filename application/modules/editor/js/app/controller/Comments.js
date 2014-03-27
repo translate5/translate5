@@ -114,7 +114,6 @@ Ext.define('Editor.controller.Comments', {
   },
   cancelEdit: function() {
       this.activeComment = null;
-      this.getCommentContainer().hide();
   },
   getEditPlugin: function() {
       return this.getSegmentGrid().editingPlugin;
@@ -259,8 +258,10 @@ Ext.define('Editor.controller.Comments', {
       if(rec.get('isEditable')){
           me.activeComment = rec;
           me.getCommentWindow().setComment(rec.get('comment'));
-          area.selectText();
-          area.focus(false, 500);
+          if(area.rendered) {
+              area.selectText();
+              area.focus(false, 500);
+          }
       }
   },
   /**
@@ -319,8 +320,10 @@ Ext.define('Editor.controller.Comments', {
       }
       
       me.handleAddComment();
-      area.selectText();
-      area.focus(false, 500);
+      if(area.rendered) {
+          area.selectText();
+          area.focus(false, 500);
+      }
       
       store.load({
           params: {segmentId: id}

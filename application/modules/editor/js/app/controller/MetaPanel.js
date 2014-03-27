@@ -64,6 +64,9 @@ Ext.define('Editor.controller.MetaPanel', {
     ref : 'rightBtn',
     selector : '#metapanel #goAlternateRightBtn'
   },{
+      ref : 'navi',
+      selector : '#metapanel #naviToolbar'
+  },{
     ref : 'segmentGrid',
     selector : '#segmentgrid'
   }],
@@ -121,7 +124,7 @@ Ext.define('Editor.controller.MetaPanel', {
    * Handler für save Button
    */
   layout: function() {
-    this.getMetaPanel().down('#metaInfoForm #naviToolbar').doLayout();
+    this.getNavi().doLayout(); //FIXME noch was anderes layouten?
   },
   /**
    * Handler für save Button
@@ -198,9 +201,8 @@ Ext.define('Editor.controller.MetaPanel', {
     me.getMetaTermPanel().getLoader().load({params: {id: segmentId}});
     //bindStore(me.record.terms());
     me.loadRecord(me.record);
-    mp.down('#metaInfoForm').doLayout();
-    mp.down('#metaInfoForm').show();
-    mp.down('#metaInfoForm #naviToolbar').doLayout();
+    //FIXME here doLayout???
+    mp.show();
   },
   /**
    * lädt die konkreten record ins Meta Panel 
@@ -208,10 +210,10 @@ Ext.define('Editor.controller.MetaPanel', {
    */
   loadRecord: function(record) {
     var me = this,
-    mp = me.getMetaPanel(),
-    form = mp.down('#metaInfoForm'),
-    values = record.getQmAsArray(),
-    qmBoxes = mp.query('#metaQm .checkbox');
+        mp = me.getMetaPanel(),
+        form = mp.down('#metaInfoForm'),
+        values = record.getQmAsArray(),
+        qmBoxes = mp.query('#metaQm .checkbox');
     statBoxes = mp.query('#metaStates .radio');
     Ext.each(statBoxes, function(box){
       box.setValue(false);
@@ -226,10 +228,10 @@ Ext.define('Editor.controller.MetaPanel', {
    */
   saveEdit: function() {
     var me = this,
-    mp = me.getMetaPanel(),
-    form = mp.down('#metaInfoForm'),
-    qmBoxes = mp.query('#metaQm .checkbox'),
-    quality = [];
+        mp = me.getMetaPanel(),
+        form = mp.down('#metaInfoForm'),
+        qmBoxes = mp.query('#metaQm .checkbox'),
+        quality = [];
     Ext.each(qmBoxes, function(box){box.getValue() && quality.push(box.inputValue);});
     me.record.set('stateId', form.getValues().stateId);
     me.record.setQmFromArray(quality);
@@ -240,7 +242,7 @@ Ext.define('Editor.controller.MetaPanel', {
    * Editor.view.segments.RowEditing canceledit handler
    */
   cancelEdit: function() {
-    this.getMetaPanel().down('#metaInfoForm').hide();
+    this.getMetaPanel().hide();
   },
   /**
    * FIXME: Repositionierung beim Durchklicken mit links / rechts ist noch im Arsch!

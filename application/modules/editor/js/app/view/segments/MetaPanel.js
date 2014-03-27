@@ -58,23 +58,9 @@ Ext.define('Editor.view.segments.MetaPanel', {
     item_metaQm_title: '#UT#QM',
     item_metaStates_title: '#UT#Status',
     item_metaTerms_title: '#UT#Terminologie',
-    item_cancel: '#UT#Abbrechen',
-    item_save: '#UT#Speichern',
-    item_saveAndNext: '#UT#Speichern und nächstes öffnen',
-    item_saveAndPrevious: '#UT#Speichern und vorheriges öffnen',
-    item_alternateLeft: '#UT#Vorherige Spalte editieren',
-    item_alternateRight: '#UT#Nächste Spalte editieren',
+    
     initComponent: function() {
-      var me = this,
-          fields = Editor.data.task.segmentFields(),
-          editableCnt = 0;
-          useHNavArrow = false;
-      fields.each(function(field) {
-          if(field.get('editable')) {
-              editableCnt++;
-          }
-      });
-      useHNavArrow = editableCnt > 1;
+      var me = this;
       
       //Editor.data.segments.showStatus = false;
       Ext.applyIf(me, {
@@ -82,63 +68,23 @@ Ext.define('Editor.view.segments.MetaPanel', {
           {
             xtype: 'form',
             border: 0,
-            hidden: true,
             itemId: 'metaInfoForm',
-            items: [
-              {
-                xtype: 'toolbar',
-                itemId: 'naviToolbar',
-                ui: 'header',
-                layout: {
-                  pack: 'start',
-                  type: 'hbox'
-                },
-                items: [
-                  {
-                    xtype: 'button',
-                    itemId: 'cancelSegmentBtn',
-                    tooltip: me.item_cancel,
-                    icon: Editor.data.moduleFolder+'images/cross.png',
-                    iconAlign: 'right'
-                  },
-                  {
-                    xtype: 'button',
-                    itemId: 'saveSegmentBtn',
-                    tooltip: me.item_save,
-                    icon: Editor.data.moduleFolder+'images/tick.png',
-                    iconAlign: 'right'
-                  },
-                  {
-                    xtype: 'button',
-                    itemId: 'savePreviousSegmentBtn',
-                    icon: Editor.data.moduleFolder+'images/arrow_up.png',
-                    iconAlign: 'right',
-                    tooltip: me.item_saveAndPrevious
-                  },
-                  {
-                    xtype: 'button',
-                    itemId: 'saveNextSegmentBtn',
-                    icon: Editor.data.moduleFolder+'images/arrow_down.png',
-                    iconAlign: 'right',
-                    tooltip: me.item_saveAndNext
-                  },
-                  {
-                      xtype: 'button',
-                      itemId: 'goAlternateLeftBtn',
-                      hidden: !useHNavArrow,
-                      icon: Editor.data.moduleFolder+'images/arrow_left.png',
-                      iconAlign: 'right',
-                      tooltip: me.item_alternateLeft
-                  },
-                  {
-                      xtype: 'button',
-                      itemId: 'goAlternateRightBtn',
-                      hidden: !useHNavArrow,
-                      icon: Editor.data.moduleFolder+'images/arrow_right.png',
-                      iconAlign: 'right',
-                      tooltip: me.item_alternateRight
-                  }
-                ]
+            items: [{
+                  xtype: 'fieldset',
+                  itemId: 'metaTerms',
+                  title: me.item_metaTerms_title,
+                  items: [
+                    {
+                      xtype: 'panel',
+                      itemId: 'metaTermPanel',
+                      cls: 'metaTermPanel',
+                      loader: {
+                        url: Editor.data.restpath+'segment/terms',
+                        renderer: 'html'
+                      },
+                      anchor: '100%'
+                    }
+                  ]
               },
               {
                 xtype: 'fieldset',
@@ -153,24 +99,7 @@ Ext.define('Editor.view.segments.MetaPanel', {
                 hideable: Editor.data.segments.showStatus, 
                 hidden:  !Editor.data.segments.showStatus,
                 title: me.item_metaStates_title
-              },
-              {
-                xtype: 'fieldset',
-                itemId: 'metaTerms',
-                title: me.item_metaTerms_title,
-                items: [
-                  {
-                    xtype: 'panel',
-                    itemId: 'metaTermPanel',
-                    cls: 'metaTermPanel',
-                    loader: {
-                      url: Editor.data.restpath+'segment/terms',
-                      renderer: 'html'
-                    },
-                    anchor: '100%'
-                  }
-                ]
-              }            
+              }
             ]
           }
         ]
