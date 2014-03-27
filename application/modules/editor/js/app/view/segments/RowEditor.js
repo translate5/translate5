@@ -228,7 +228,7 @@ Ext.define('Editor.view.segments.RowEditor', {
         if(oldField && oldField.length > 0) {
             oldField[0].setValue(rec.get(oldIdx));
         }
-        if(me.setColumnToEdit(column)) {            
+        if(me.setColumnToEdit(column)) {
             me.mainEditor.setValueAndMarkup(rec.get(me.columnToEdit), rec.get('id'), me.columnToEdit);
             me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
             me.focusContextCell();

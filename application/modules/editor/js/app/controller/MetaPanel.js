@@ -134,20 +134,23 @@ Ext.define('Editor.controller.MetaPanel', {
   },
   /**
    * Handler for saveNext Button
+   * @return {Boolean} true if there is a next segment, false otherwise
    */
   saveNext: function() {
-      this.saveOtherRow(1, this.messages.gridEndReached);
+      return this.saveOtherRow(1, this.messages.gridEndReached);
   },
   /**
    * Handler for savePrevious Button
+   * @return {Boolean} true if there is a next segment, false otherwise
    */
   savePrevious: function() {
-      this.saveOtherRow(-1, this.messages.gridStartReached);
+      return this.saveOtherRow(-1, this.messages.gridStartReached);
   },
   /**
    * save and go to other row
    * @param {Integer} rowIdxChange positive or negative integer value to choose the index of the next row
    * @param {String} errorText
+   * @return {Boolean} true if there is a next segment, false otherwise
    */
   saveOtherRow: function(rowIdxChange, errorText) {
       var me = this,
@@ -181,6 +184,7 @@ Ext.define('Editor.controller.MetaPanel', {
               }
           }
       });
+      return (newRec !== undefined);
   },
   /**
    * Handler für cancel Button
@@ -245,7 +249,6 @@ Ext.define('Editor.controller.MetaPanel', {
     this.getMetaPanel().hide();
   },
   /**
-   * FIXME: Repositionierung beim Durchklicken mit links / rechts ist noch im Arsch!
    * Move the editor about one editable field
    */
   goToAlternate: function(btn, ev) {
@@ -253,24 +256,35 @@ Ext.define('Editor.controller.MetaPanel', {
         direction = (btn.itemId == 'goAlternateLeftBtn' ? -1 : 1),
         info = me.getColInfo(),
         idx = info && info.foundIdx,
-        cols = info && info.columns;
+        cols = info && info.columns,
+        store = me.getSegmentGrid().store,
+        newRec = store.getAt(store.indexOf(me.getEditPlugin().openedRecord) + direction);
     
     if(info === false) {
       return;
     }
-        
+    
+    //check if there exists a next/prev row, if not we dont need to move the editor.
+    while(newRec && !newRec.get('editable')) {
+        newRec = store.getAt(store.indexOf(newRec) + direction);
+    }
+    
     if(cols[idx + direction]) {
       info.plug.editor.changeColumnToEdit(cols[idx + direction]);
       return;
     }
     if(direction > 0) {
         //goto next segment and first col
-        info.plug.editor.changeColumnToEdit(cols[0]);
+        if(newRec) {
+            info.plug.editor.changeColumnToEdit(cols[0]);
+        }
         me.saveNext();
     }
     else {
         //goto prev segment and last col
-        info.plug.editor.changeColumnToEdit(cols[cols.length - 1]);
+        if(newRec) {
+            info.plug.editor.changeColumnToEdit(cols[cols.length - 1]);
+        }
         me.savePrevious();
     }
   },
