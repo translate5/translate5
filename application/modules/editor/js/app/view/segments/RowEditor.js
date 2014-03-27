@@ -315,7 +315,7 @@ Ext.define('Editor.view.segments.RowEditor', {
             toDis = me.fieldToDisable;
         
         if(! toDis) {
-            me.mainEditor.focus();
+            me.mainEditor.deferFocus();
             return;
         }
         posMain = me.items.indexOf(me.mainEditor),
@@ -326,6 +326,7 @@ Ext.define('Editor.view.segments.RowEditor', {
         //swap position
         me.move(posMain, posToEdit);
         me.repositionHorizontally();
+        me.mainEditor.deferFocus();
         me.fireEvent('afterEditorMoved', me.columnToEdit, me);
         return true;
     },
