@@ -139,8 +139,8 @@ Ext.define('Editor.controller.Segments', {
               me.getSegmentsStore().on('load', me.refreshGridView, me);
           },
         selectionchange: me.handleSegmentSelectionChange,
-        columnhide: me.handleColumnHide,
-        columnshow: me.handleColumnShow,
+        columnhide: me.handleColumnVisibility,
+        columnshow: me.handleColumnVisibility,
         filterupdate: me.handleFilterChange
       },
       '#fileorderTree': {
@@ -176,16 +176,15 @@ Ext.define('Editor.controller.Segments', {
         this.saveChainStart();
       }
   },
-  handleColumnHide: function() {
+  /**
+   * maintains the visibility of the editor on showing/hiding columns
+   * @param {Ext.grid.header.Container} head
+   * @param {Editor.view.segments.column.Content} col
+   */
+  handleColumnVisibility: function(head, col) {
       var ed = this.getSegmentGrid().editingPlugin;
-      if(ed && ed.editor) {
-          ed.editor.toggleMainEditor(false);
-      }
-  },
-  handleColumnShow: function() {
-      var ed = this.getSegmentGrid().editingPlugin;
-      if(ed && ed.editor) {
-          ed.editor.toggleMainEditor(true);
+      if(ed && ed.editor && ed.editor.columnToEdit == col.dataIndex) {
+          ed.editor.toggleMainEditor(col.isVisible());
       }
   },
   /**
