@@ -68,6 +68,9 @@ Ext.define('Editor.controller.Comments', {
     ref: 'commentForm',
     selector: '#commentForm'
   },{
+      ref: 'autoStateDisplay',
+      selector: '#roweditor .displayfield[name=autoStateId]'
+  },{
       ref: 'commentDisplay',
       selector: '#roweditor .displayfield[name=comments]'
   }],
@@ -360,6 +363,7 @@ Ext.define('Editor.controller.Comments', {
       Editor.model.Segment.load(segId, {
           success: function(rec, op) {
               var dis = me.getCommentDisplay(),
+                  stateid = me.getAutoStateDisplay(),
                   ed = me.getRowEditor(),
                   origRec = me.getSegmentsStore().getById(segId);
               //we cant update the complete segment, since this would overwrite unsaved 
@@ -376,6 +380,7 @@ Ext.define('Editor.controller.Comments', {
                   ed.context.row = me.getSegmentGrid().getView().getNode(origRec);
                   ed.reposition();
                   dis.setRawValue(Editor.view.segments.column.Comments.getFirstComment(rec.get('comments')));
+                  stateid.setRawValue(ed.columns.get(stateid.id).renderer(rec.get('autoStateId')));
               }
           }
       });
