@@ -168,7 +168,7 @@ class editor_Models_Converter_XmlSegmentList {
                 else {
                     $result[] = '<alt-trans dx:origin-shorttext="'.$field->label.'">';
                 }
-                $result[] = '<target xml:lang="'.$targetLang.'">'.$this->prepareText($segment[$field->name]).'</target></alt-trans>';
+                $result[] = '<target xml:lang="'.$targetLang.'">'.$this->prepareText($sfm->getEditIndex($field->name)).'</target></alt-trans>';
             }
             
             if(!empty($segment['comments'])) {
