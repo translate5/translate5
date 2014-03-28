@@ -119,9 +119,16 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      *
      */
     protected function parse(){
-        if(preg_match('"\r\n$"', $this->_origFile))$this->break = "\r\n";
-        elseif(preg_match('"\n$"', $this->_origFile))$this->break = "\n";
-        elseif(preg_match('"\r$"', $this->_origFile))$this->break = "\r";
+        //@todo is the following link a improvement? http://stackoverflow.com/questions/11066857/detect-eol-type-using-php
+        if(preg_match('"\r\n$"', $this->_origFile)){
+            $this->break = "\r\n";
+        }
+        elseif(preg_match('"\n$"', $this->_origFile)){
+            $this->break = "\n";
+        }
+        elseif(preg_match('"\r$"', $this->_origFile)){
+            $this->break = "\r";
+        }
         else{
             trigger_error('no linebreak found in CSV: '.$this->_fileName,E_USER_ERROR);
         }
