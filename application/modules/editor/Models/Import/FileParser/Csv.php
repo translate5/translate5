@@ -86,14 +86,16 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     }
     
     /**
+     * returns the csv content of one line, or false if line was empty / or eof reached
      * @param handle $handle
-     * @return string $line
+     * @return array $line or boolean false if nothing found in line
      */
     protected function prepareLine(SplTempFileObject $csv){
-        //do while to jump over empty lines
-        do {
-            $line = $csv->fgetcsv($this->_delimiter, $this->_enclosure);
-        } while (count($line) === 1 && empty($line[0]));
+        $line = $csv->fgetcsv($this->_delimiter, $this->_enclosure);
+        //empty lines or eof trigger false
+        if(count($line) === 1 && empty($line[0]) || is_null($line)) {
+            return false;
+        }
         
         if($line === false){
             trigger_error('Error on parsing a line of CSV. Current line is: '.$csv->current()
@@ -121,7 +123,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         elseif(preg_match('"\n$"', $this->_origFile))$this->break = "\n";
         elseif(preg_match('"\r$"', $this->_origFile))$this->break = "\r";
         else{
-            trigger_error('no linebreak found in csv.',E_USER_ERROR);
+            trigger_error('no linebreak found in CSV: '.$this->_fileName,E_USER_ERROR);
         }
         
         //for this ini set see php docu: http://de2.php.net/manual/en/filesystem.configuration.php#ini.auto-detect-line-endings
@@ -137,14 +139,18 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         $csvSettings = $config->runtimeOptions->import->csv->fields->toArray();
         //$csvSettings quelle => source, mid => mid
         $header = $this->prepareLine($csv);
+        if($header === false) {
+            trigger_error('no header column found in CSV: '.$this->_fileName,E_USER_ERROR);
+        }
         $skel = array($this->str_putcsv($header, $this->_delimiter, $this->_enclosure, $this->break));
         
         $missing = array_diff($csvSettings, $header);
         if(!empty($missing)) {
-            trigger_error('in application.ini configured column-header(s) '.join(';', $missing).' not found in CSV.',E_USER_ERROR);
+            trigger_error('in application.ini configured column-header(s) '.
+                            join(';', $missing).' not found in CSV: '.$this->_fileName,E_USER_ERROR);
         }
         if(count($header) < 3) {
-            trigger_error('source and mid given but no more data columns found in CSV.',E_USER_ERROR);
+            trigger_error('source and mid given but no more data columns found in CSV: '.$this->_fileName,E_USER_ERROR);
         }
         $i=0;
         $csvSettings = array_flip($csvSettings);
@@ -185,7 +191,13 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             $this->colOrder[$name] = $i++;
         }
         while(!$csv->eof()){
-            $extracted = $this->extractSegment($this->prepareLine($csv));
+            $line = $this->prepareLine($csv);
+            //ignore empty lines:
+            if($line === false) {
+                $skel[] = $this->break;
+                continue;
+            }
+            $extracted = $this->extractSegment($line);
             $skel[] = $this->str_putcsv($extracted, $this->_delimiter, $this->_enclosure, $this->break);
         }
         $this->_skeletonFile = join('', $skel);
