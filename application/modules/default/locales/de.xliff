@@ -3,849 +3,8 @@
 <!-- the transunit-ID should contain the base64-encoded source-string als used in the php source-code. This ID is used for matching. -->
 <!-- html-tags inside the target-string must not be encoded as they should regarding xliff but should be left as plain hmtl. At this stage ZfExtended does not support xliff inline tags -->
  <file original='php-sourcecode' source-language='ha' target-language='de' datatype='php' xml:space='preserve'>
-  <body><trans-unit id="QWxsZ2VtZWluZXIgRmVobGVy"><source>Allgemeiner Fehler</source><target>Allgemeiner Fehler</target></trans-unit>
-<trans-unit id="RGllIERhdGVuIElocmVzIEZvcm11bGFycyBrb25udGVuIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbi4="><source>Die Daten Ihres Formulars konnten nicht gespeichert werden.</source><target>Die Daten Ihres Formulars konnten nicht gespeichert werden.</target></trans-unit>
-<trans-unit id="RXMga29ubnRlIGltIHRtcC1EaXIga2VpbiBWZXJ6ZWljaG5pcyBmw7xyIGRlbiBVcGxvYWQgZXJzdGVsbHQgd2VyZGVuLg=="><source>Es konnte im tmp-Dir kein Verzeichnis für den Upload erstellt werden.</source><target>Es konnte kein temporäres Verzeichnis für den Upload erstellt werden.</target></trans-unit>
-<trans-unit id="RXMgd3VyZGUga2VpbmUgRGF0ZWkgZ2VmdW5kZW4u"><source>Es wurde keine Datei gefunden.</source><target>Es wurde keine Datei gefunden.</target></trans-unit>
-<trans-unit id="RGllIERhdGVpIMO8YmVyc2NocmVpdGV0IGRpZSBlcmxhdWJ0ZSBHcsO2w59l"><source>Die Datei überschreitet die erlaubte Größe</source><target>Die Datei überschreitet die erlaubte Größe von 240 MB</target></trans-unit>
-<trans-unit id="RGllIERhdGVpIHd1cmRlIG51ciB0ZWlsd2Vpc2UgaG9jaGdlbGFkZW4="><source>Die Datei wurde nur teilweise hochgeladen</source><target>Die Datei wurde nur teilweise hochgeladen</target></trans-unit>
-<trans-unit id="RXMgd3VyZGUga2VpbmUgRGF0ZWkgaG9jaGdlbGFkZW4="><source>Es wurde keine Datei hochgeladen</source><target>Es wurde keine Datei hochgeladen</target></trans-unit>
-<trans-unit id="RXMgdHJhdCBlaW4gaW50ZXJuZXIgRmVobGVyIGF1Zi4="><source>Es trat ein interner Fehler auf.</source><target>Es trat ein interner Fehler auf.</target></trans-unit>
-<trans-unit id="RXMgd3VyZGUga2VpbiBEYXRlaW5hbWUgw7xiZXJtaXR0ZWx0Lg=="><source>Es wurde kein Dateiname übermittelt.</source><target>Es wurde kein Dateiname übermittelt.</target></trans-unit>
-<trans-unit id="RGllIGZvbGdlbmRlIERhdGVpIGtvbm50ZSBuaWNodCBnZXNwZWljaGVydCB3ZXJkZW46"><source>Die folgende Datei konnte nicht gespeichert werden:</source><target>Die folgende Datei konnte nicht gespeichert werden:</target></trans-unit>
-<trans-unit id="RGllIERhdGVpICVzIGtvbm50ZSBuaWNodCBob2NoZ2VsYWRlbiB3ZXJkZW4uIEJlaSBCZW5hY2hyaWNodGlndW5nIHVuc2VyZXMgUHJvamVrdG1hbmFnZW1lbnQtVGVhbXMgaGluc2ljaHRsaWNoIGRpZXNlcyBGZWhsZXJzIHNpbmQgd2lyIElobmVuIHNlaHIgZGFua2Jhci4="><source>Die Datei %s konnte nicht hochgeladen werden. Bei Benachrichtigung unseres Projektmanagement-Teams hinsichtlich dieses Fehlers sind wir Ihnen sehr dankbar.</source><target>Die Datei %s konnte nicht hochgeladen werden. Bitte wenden Sie sich an unser Projektmanagement-Team hinsichtlich dieses Fehlers. Vielen Dank für Ihr Verständnis.</target></trans-unit>
-<trans-unit id="RGllIERhdGVpICVzIGtvbm50ZSBuaWNodCB6dW0gVW50ZXJuZWhtZW5zc2VydmVyIGhvY2hnZWxhZGVuIHdlcmRlbi4gQmVpIEJlbmFjaHJpY2h0aWd1bmcgdW5zZXJlcyBQcm9qZWt0bWFuYWdlbWVudC1UZWFtcyBoaW5zaWNodGxpY2ggZGllc2VzIEZlaGxlcnMgc2luZCB3aXIgSWhuZW4gc2VociBkYW5rYmFyLg=="><source>Die Datei %s konnte nicht zum Unternehmensserver hochgeladen werden. Bei Benachrichtigung unseres Projektmanagement-Teams hinsichtlich dieses Fehlers sind wir Ihnen sehr dankbar.</source><target>Die Datei %s konnte nicht zum Unternehmensserver hochgeladen werden. Bitte wenden Sie sich an unser Projektmanagement-Team hinsichtlich dieses Fehlers. Vielen Dank für Ihr Verständnis.</target></trans-unit>
-<trans-unit id="RGllIGltIFJlcXVlc3Qgw7xiZXJnZWJlbmUgR1VJRCBleGlzdGllcnQgaW0gUHJvamVrdGNhY2hlIG5pY2h0IQ=="><source>Die im Request übergebene GUID existiert im Projektcache nicht!</source><target>Diese Sitzung ist nicht mehr gültig. Bitte melden Sie sich im Portal neu an.</target></trans-unit>
-<trans-unit id="Qml0dGUgZWluZW4gQXVnZW5ibGljayB3YXJ0ZW4gLQ0KICAgICAgICAgICAgICAgICAgICBkZXIgQ2FjaGUgd2lyZCBnZXJhZGUgYmVmw7xsbHQhIFZpZWxlbiBEYW5rIQ=="><source>Bitte einen Augenblick warten -
-                    der Cache wird gerade befüllt! Vielen Dank!</source><target>Bitte warten -
-                    der Speicher wird gerade befüllt! Vielen Dank!</target></trans-unit>
-<trans-unit id="RGllIEt1bmRlbmRhdGVuIHd1cmRlbiBlcmZvbGdyZWljaCB2b20gVW50ZXJuZWhtZW5zc2VydmVyIGdlbGFkZW4="><source>Die Kundendaten wurden erfolgreich vom Unternehmensserver geladen</source><target>Die Kundendaten wurden erfolgreich vom Unternehmensserver geladen</target></trans-unit>
-<trans-unit id="SWhyZSBQcsOkZmVyZW56ZW4gd3VyZGVuIGdlc3BlaWNoZXJ0IQ=="><source>Ihre Präferenzen wurden gespeichert!</source><target>Ihre Präferenzen wurden gespeichert!</target></trans-unit>
-<trans-unit id="RGllIERhdGVuIElocmVzIEZvcm11bGFycyBrb25udGVuIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbi4gQml0dGUgdmVyc3VjaGVuIFNpZSBlcyBpbiA1IG1pbiBub2NoIGVpbm1hbC4gU29sbHRlIGRhbm4gZGVyIGdsZWljaGUgRmVobGVyIHdpZWRlciBhdWZ0cmV0ZW4sIHNpbmQgd2lyIElobmVuIMO8YmVyIGVpbmUgTWl0dGVpbHVuZyBhbiB1bnNlciBQcm9qZWt0bWFuYWdlbWVudC1UZWFtIGRhbmtiYXIh"><source>Die Daten Ihres Formulars konnten nicht gespeichert werden. Bitte versuchen Sie es in 5 min noch einmal. Sollte dann der gleiche Fehler wieder auftreten, sind wir Ihnen über eine Mitteilung an unser Projektmanagement-Team dankbar!</source><target>Die Daten Ihres Formulars konnten nicht gespeichert werden. Bitte versuchen Sie es in 5 min noch einmal. Sollte dann der gleiche Fehler wieder auftreten, wenden Sie sich an unser Projektmanagement-Team. Vielen Dank für Ihr Verständnis.</target></trans-unit>
-<trans-unit id="SWhyZSBEYXRlbiB3dXJkZW4gYWt0dWFsaXNpZXJ0ISBWaWVsZW4gRGFuayE="><source>Ihre Daten wurden aktualisiert! Vielen Dank!</source><target>Ihre Daten wurden aktualisiert! Vielen Dank!</target></trans-unit>
-<trans-unit id="Qml0dGUgYmVhY2h0ZW4gU2llIGRpZSBiZWkgZGVuIGVpbnplbG5lbiBGb3JtdWxhcmZlbGRlcm4gYW5nZXplaWd0ZW4gTWVsZHVuZ2VuIQ=="><source>Bitte beachten Sie die bei den einzelnen Formularfeldern angezeigten Meldungen!</source><target>Bitte beachten Sie die bei den einzelnen Formularfeldern angezeigten Meldungen!</target></trans-unit>
-<trans-unit id="QW5nZWJvdA=="><source>Angebot</source><target>Angebot</target></trans-unit>
-<trans-unit id="UmVjaG51bmc="><source>Rechnung</source><target>Rechnung</target></trans-unit>
-<trans-unit id="SGlsZmU="><source>Hilfe</source><target>Hilfe</target></trans-unit>
-<trans-unit id="S29udGFrdA=="><source>Kontakt</source><target>Kontakt</target></trans-unit>
-<trans-unit id="UGVyc8O2bmxpY2hlIEFuc3ByZWNocGFydG5lcg=="><source>Persönliche Ansprechpartner</source><target>Persönliche Ansprechpartner</target></trans-unit>
-<trans-unit id="QXVzZ2Vsb2dndA=="><source>Ausgeloggt</source><target>Ausgeloggt</target></trans-unit>
-<trans-unit id="TmFjaCBkZXIgQWt0dWFsaXNpZXJ1bmcgSWhyZXIgRGF0ZW4gd3VyZGVuIFNpZSBhdWZncnVuZCBudW4gZmVobGVuZGVyIExvZ2luYmVyZWNodGlndW5nIHdpZWRlciBhdXNnZWxvZ2d0LjxiciAvPjxiciAvPklzdCBkaWVzIGVpbiBJcnJ0dW0sIHNpbmQgd2lyIElobmVuIGbDvHIgZGllIEtvbnRha3RhdWZuYWhtZSBtaXQgdW5zZXJlbSBQcm9qZWt0bWFuYWdlbWVudC1UZWFtIGRhbmtiYXIuPGJyIC8+PGJyIC8+VmllbGVuIERhbmsh"><source>Nach der Aktualisierung Ihrer Daten wurden Sie aufgrund nun fehlender Loginberechtigung wieder ausgeloggt.<br/><br/>Ist dies ein Irrtum, sind wir Ihnen für die Kontaktaufnahme mit unserem Projektmanagement-Team dankbar.<br/><br/>Vielen Dank!</source><target>Nach der Aktualisierung Ihrer Daten wurden Sie aufgrund nun fehlender Loginberechtigung wieder ausgeloggt.<br/><br/>Ist dies ein Irrtum, sind wir Ihnen für die Kontaktaufnahme mit unserem Projektmanagement-Team dankbar.<br/><br/>Vielen Dank für Ihr Verständnis.</target></trans-unit>
-<trans-unit id="RmVobGVyIGJlaSBkZXIgQmVmw7xsbHVuZyBkZXMgQ2FjaGU="><source>Fehler bei der Befüllung des Cache</source><target>Fehler beim laden Ihrer Daten</target></trans-unit>
-<trans-unit id="Qml0dGUgdmVyc3VjaGVuIFNpZSBub2NobWFscywgc2ljaCBlaW56dWxvZ2dlbi4gU29sbHRlbiBTaWUgZGFuYWNoIGRpZSBnbGVpY2hlIEZlaGxlcm1lbGR1bmcgZXJoYWx0ZW4sIHNpbmQgd2lyIElobmVuIGbDvHIgZWluZSBNZWxkdW5nIGFuIHVuc2VyIFByb2pla3RtYW5hZ2VtZW50LVRlYW0gc2VociBkYW5rYmFyLjxiciAvPjxiciAvPlZpZWxlbiBEYW5rIQ=="><source>Bitte versuchen Sie nochmals, sich einzuloggen. Sollten Sie danach die gleiche Fehlermeldung erhalten, sind wir Ihnen für eine Meldung an unser Projektmanagement-Team sehr dankbar.<br/><br/>Vielen Dank!</source><target>Bitte versuchen Sie nochmals, sich einzuloggen. Sollten Sie danach die gleiche Fehlermeldung erhalten, sind wir Ihnen für eine Meldung an unser Projektmanagement-Team sehr dankbar.<br/><br/>Vielen Dank für Ihr Verständnis.</target></trans-unit>
-<trans-unit id="U2llIGhhYmVuIGV2ZW50dWVsbCB1bmdlc3BlaWNoZXJ0ZSBGb3JtdWxhcmU="><source>Sie haben eventuell ungespeicherte Formulare</source><target>Sie haben eventuell ungespeicherte Formulare</target></trans-unit>
-<trans-unit id="U29sbCBkaWUgYWt0dWVsbGUgU2VpdGUgbmFjaCBkZW0gVXBkYXRlIGRlcyBDYWNoZSB0cm90emRlbSBuZXUgZ2VsYWRlbiB3ZXJkZW4sIHVtIGdnZi4gaW0gQ2FjaGUgYWt0dWFsaXNpZXJ0ZSBEYXRlbiBzb2ZvcnQgZGFyenVzdGVsbGVuPyBGYWxscyBTaWUgYW4gZGllc2VyIFN0ZWxsZSAiTmVpbiIgd8OkaGxlbiwgd2VyZGVuIGFrdHVhbGlzaWVydGUgRGF0ZW4gZXJzdCBiZWltIG7DpGNoc3RlbiBBdWZydWYgZWluZXIgU2VpdGUgw7xiZXIgZGFzIE1lbsO8IGFuZ2V6ZWlndC4="><source>Soll die aktuelle Seite nach dem Update des Cache trotzdem neu geladen werden, um ggf. im Cache aktualisierte Daten sofort darzustellen? Falls Sie an dieser Stelle "Nein" wählen, werden aktualisierte Daten erst beim nächsten Aufruf einer Seite über das Menü angezeigt.</source><target>Soll die aktuelle Seite nach dem Update des Cache trotzdem neu geladen werden, um ggf. im Cache aktualisierte Daten sofort darzustellen? Falls Sie an dieser Stelle "Nein" wählen, werden aktualisierte Daten erst beim nächsten Aufruf einer Seite über das Menü angezeigt.</target></trans-unit>
-<trans-unit id="Qml0dGUgd2FydGVuLi4u"><source>Bitte warten...</source><target>Bitte warten...</target></trans-unit>
-<trans-unit id="Qml0dGUgd2FydGVuIFNpZSwgZGVyIENhY2hlIGRlcyBQb3J0YWxzIHdpcmQgYWt0dWVsbCBiZWbDvGxsdCEgVmllbGVuIERhbmsh"><source>Bitte warten Sie, der Cache des Portals wird aktuell befüllt! Vielen Dank!</source><target>Bitte warten Sie, das Portal wird aktuell mit Ihren Daten befüllt! Vielen Dank!</target></trans-unit>
-<trans-unit id="VXBkYXRlIENhY2hl"><source>Update Cache</source><target>Aktualisieren</target></trans-unit>
-<trans-unit id="Rm9ybXVsYXJmZWxkICVz"><source>Formularfeld %s</source><target>Formularfeld %s</target></trans-unit>
-<trans-unit id="S2VpbmUgUmVmZXJlbnpkYXRlaWVuIMO8YmVybWl0dGVsdA=="><source>Keine Referenzdateien übermittelt</source><target>Keine Referenzdateien übermittelt</target></trans-unit>
-<trans-unit id="S2VpbiBEVFA="><source>Kein DTP</source><target>Kein DTP</target></trans-unit>
-<trans-unit id="RGF0ZWlncsO2w59lIGluIE1COg=="><source>Dateigröße in MB:</source><target>Dateigröße in MB:</target></trans-unit>
-<trans-unit id="S3VuZGVuaW5mb3M="><source>Kundeninfos</source><target>Kundeninfos</target></trans-unit>
-<trans-unit id="TWV0YXRhZ1RpdGxlNCVz"><source>MetatagTitle4%s</source><target>beoSphere - Aufträge anlegen, verfolgen, freigeben, analysieren</target></trans-unit>
-<trans-unit id="SW5mb3JtYXRpb25lbiB6dXIgQmVkaWVudW5nIGRlciBTZWl0ZSA="><source>Informationen zur Bedienung der Seite </source><target>Informationen zur Bedienung der Seite </target></trans-unit>
-<trans-unit id="UHJvamVrdGUgdW5kIEFuZ2Vib3RlIGR1cmNoc3VjaGVuIC4uLg=="><source>Projekte und Angebote durchsuchen ...</source><target>Projekte und Angebote durchsuchen ...</target></trans-unit>
-<trans-unit id="QW53ZW5kdW5nZW4="><source>Anwendungen</source><target>Module</target></trans-unit>
-<trans-unit id="JyV2YWx1ZSUnIGlzdCBrZWluZSB2YWxpZGUgRFRQLVF1YWxpdMOkdA=="><source>'%value%' ist keine valide DTP-Qualität</source><target>'%value%' ist keine gültige DTP-Qualität</target></trans-unit>
-<trans-unit id="JyV2YWx1ZSUnIGhhdCBuaWNodCBlaW5lbiBkZXIgV2VydGUgVmVyeSBzYXRpc2ZpZWQsIFNhdGlzZmllZCBvZGVyIE5vdCBTYXRpc2ZpZWQ="><source>'%value%' hat nicht einen der Werte Very satisfied, Satisfied oder Not Satisfied</source><target>'%value%' hat nicht einen der Werte Very satisfied, Satisfied oder Not Satisfied</target></trans-unit>
-<trans-unit id="RGllIEFuZ2FiZSB6dXIgRGF0ZWlncsO2w59lIGVpbmVyIGRlciBEYXRlaWVuIGlzdCBrZWluZSBuYXTDvHJsaWNoZSBaYWhsIHVuZCBzb21pdCBrZWluZSBCeXRlYW5nYWJl"><source>Die Angabe zur Dateigröße einer der Dateien ist keine natürliche Zahl und somit keine Byteangabe</source><target>Die Angabe zur Dateigröße einer der Dateien ist keine natürliche Zahl und somit keine Byteangabe</target></trans-unit>
-<trans-unit id="J0bDvHIgZWluZSBkZXIgRGF0ZWllbiB3dXJkZSBrZWluIEZvcm11bGFyZmVsZC1LZXkgIMO8YmVybWl0dGVsdA=="><source>'Für eine der Dateien wurde kein Formularfeld-Key  übermittelt</source><target>'Für eine der Dateien wurde kein Formularfeld-Key übermittelt</target></trans-unit>
-<trans-unit id="JyV2YWx1ZSUnIGlzdCBrZWluZSB2YWxpZGUgWmllbHNwcmFjaGU="><source>'%value%' ist keine valide Zielsprache</source><target>'%value%' ist keine valide Zielsprache</target></trans-unit>
-<trans-unit id="RGVyIFdlcnQgZGVyIFF1ZWxsc3ByYWNoZSBlaW5lciBkZXIgRGF0ZWllbiBpc3Qga2VpbiBTcHJhY2hrw7xyemVs"><source>Der Wert der Quellsprache einer der Dateien ist kein Sprachkürzel</source><target>Der Wert der Quellsprache einer der Dateien ist kein Sprachkürzel</target></trans-unit>
-<trans-unit id="RGVyIFdlcnQgZGVyIFppZWxzcHJhY2hlIGVpbmVyIGRlciBEYXRlaWVuIGVudGjDpGx0IGtlaW5lIFNwcmFjaGvDvHJ6ZWw="><source>Der Wert der Zielsprache einer der Dateien enthält keine Sprachkürzel</source><target>Der Wert der Zielsprache einer der Dateien enthält keine Sprachkürzel</target></trans-unit>
-<trans-unit id="RGFzIEZlbGQgRFRQIGVpbmVyIGRlciBEYXRlaWVuIGVudGjDpGx0IGtlaW5lbiBlcmxhdWJ0ZW4gV2VydCAoZW50d2VkZXIgdHJ1ZSBvZGVyIGZhbHNlKQ=="><source>Das Feld DTP einer der Dateien enthält keinen erlaubten Wert (entweder true oder false)</source><target>Das Feld DTP einer der Dateien enthält keinen erlaubten Wert</target></trans-unit>
-<trans-unit id="RGFzIEZlbGQgRFRQLVF1YWxpdMOkdCBlaW5lciBkZXIgRGF0ZWllbiBlbnRow6RsdCBlaW5lbiBuaWNodCBlcmxhdWJ0ZW4gV2VydC4gRGEgRFRQIGFuZ2V3w6RobHQgaXN0LCBtdXNzIGRlciBXZXJ0ICdmYWxzZScgc2Vpbg=="><source>Das Feld DTP-Qualität einer der Dateien enthält einen nicht erlaubten Wert. Da DTP angewählt ist, muss der Wert 'false' sein</source><target>Das Feld DTP-Qualität einer der Dateien enthält einen nicht erlaubten Wert.</target></trans-unit>
-<trans-unit id="RGFzIEZlbGQgRFRQLVF1YWxpdMOkdCBlaW5lciBkZXIgRGF0ZWllbiBlbnRow6RsdCBlaW5lbiBuaWNodCBlcmxhdWJ0ZW4gV2VydC4gRXMgc2luZCBudXIgZGllIFdlcnRlICdwZXJmZWN0JyBvZGVyICdyZWFkYWJsZScgZXJsYXVidA=="><source>Das Feld DTP-Qualität einer der Dateien enthält einen nicht erlaubten Wert. Es sind nur die Werte 'perfect' oder 'readable' erlaubt</source><target>Das Feld DTP-Qualität einer der Dateien enthält einen nicht erlaubten Wert. Es sind nur die Werte 'Grob-Layout' oder 'Komplettes Fremdsprachen-Layout' erlaubt</target></trans-unit>
-<trans-unit id="J0bDvHIgZWluZSBkZXIgRGF0ZWllbiB3dXJkZSBlaW4gbmljaHQgZXJsYXVidGVyIEZvcm11bGFyZmVsZC1LZXkgIMO8YmVybWl0dGVsdA=="><source>'Für eine der Dateien wurde ein nicht erlaubter Formularfeld-Key  übermittelt</source><target>'Für eine der Dateien wurde ein nicht erlaubter Formularfeld-Key übermittelt</target></trans-unit>
-<trans-unit id="RXMgd3VyZGVuIGtlaW5lIGRhdGVpc3BlemlmaXNjaGVuIEVpbnN0ZWxsdW5nZW4gZ2V0cm9mZmVu"><source>Es wurden keine dateispezifischen Einstellungen getroffen</source><target>Es wurden keine dateispezifischen Einstellungen getroffen</target></trans-unit>
-<trans-unit id="JyV2YWx1ZSUnIGlzdCBrZWluZSB2YWxpZGUgUXVlbGxzcHJhY2hl"><source>'%value%' ist keine valide Quellsprache</source><target>'%value%' ist keine valide Quellsprache</target></trans-unit>
-<trans-unit id="RHVyY2hzdWNodCB3ZXJkZW4="><source>Durchsucht werden</source><target>Durchsucht werden</target></trans-unit>
-<trans-unit id="QWxsZSBUZXh0ZWZlbGRlciB2b24gUHJvamVrdGVuIHVuZCBBbmdlYm90ZW4gc293aWUgZGVyZW4gUG9zaXRpb25lbg=="><source>Alle Textefelder von Projekten und Angeboten sowie deren Positionen</source><target>Alle Textefelder von Projekten und Angeboten sowie deren Positionen</target></trans-unit>
-<trans-unit id="SW0gRGV0YWlsIHNpbmQgZGllczo="><source>Im Detail sind dies:</source><target>Im Detail sind dies:</target></trans-unit>
-<trans-unit id="RGllIFRpdGVsIHZvbiBQcm9qZWt0ZW4sIEFuZ2Vib3RlbiB1bmQgUG9zaXRpb25lbg=="><source>Die Titel von Projekten, Angeboten und Positionen</source><target>Die Titel von Projekten, Angeboten und Positionen</target></trans-unit>
-<trans-unit id="RGllIEluc3RydWt0aW9uZW4genUgUHJvamVrdGVuIHVuZCBBbmdlYm90ZW4="><source>Die Instruktionen zu Projekten und Angeboten</source><target>Die Instruktionen zu Projekten und Angeboten</target></trans-unit>
-<trans-unit id="RGllIEtvbW1lbnRhcmUgYXVmIFBvc2l0aW9ucy0gdW5kIERhdGVpZWJlbmU="><source>Die Kommentare auf Positions- und Dateiebene</source><target>Die Kommentare auf Positions- und Dateiebene</target></trans-unit>
-<trans-unit id="RGllIE5hbWVuIGRlciB6dXN0w6RuZGlnZW4gUHJvamVrdG1hbmFnZXI="><source>Die Namen der zuständigen Projektmanager</source><target>Die Namen der zuständigen Projektmanager</target></trans-unit>
-<trans-unit id="VW50ZXJzY2hlaWR1bmcgR3Jvw58tIHVuZCBLbGVpbnNjaHJlaWJ1bmc="><source>Unterscheidung Groß- und Kleinschreibung</source><target>Unterscheidung Groß- und Kleinschreibung</target></trans-unit>
-<trans-unit id="RXMgd2lyZCBuaWNodCB1bnRlcnNjaGllZGVu"><source>Es wird nicht unterschieden</source><target>Es wird nicht unterschieden</target></trans-unit>
-<trans-unit id="QW56ZWlnZSB1bmQgTmF2aWdhdGlvbiBkdXJjaCBkaWUgU3VjaGVyZ2Vibmlzc2U="><source>Anzeige und Navigation durch die Suchergebnisse</source><target>Anzeige und Navigation durch die Suchergebnisse</target></trans-unit>
-<trans-unit id="RGllIEFuemVpZ2UgdmVyd2VuZGV0IGRpZSBhdXMgUHJvamVrdC0gdW5kIEFuZ2Vib3Rzw7xiZXJzaWNodCBiZWthbm50ZSBGb3JtLiBJbmZvcm1hdGlvbmVuIHp1ciBTdWNoZSwgRmlsdGVydW5nIHVuZCBTb3J0aWVydW5nIGRlciDDnGJlcnNpY2h0ZW4gZmluZGVuIHNpY2ggaW4gZGVuICJJbmZvcm1hdGlvbmVuIHp1ciBCZWRpZW51bmciIGRpZXNlciBTZWl0ZW4uIA=="><source>Die Anzeige verwendet die aus Projekt- und Angebotsübersicht bekannte Form. Informationen zur Suche, Filterung und Sortierung der Übersichten finden sich in den "Informationen zur Bedienung" dieser Seiten. </source><target>Die Anzeige verwendet die aus Projekt- und Angebotsübersicht bekannte Form. Informationen zur Suche, Filterung und Sortierung der Übersichten finden sich in den "Informationen zur Bedienung" dieser Seiten. </target></trans-unit>
-<trans-unit id="WnVvYmVyc3Qgd2VyZGVuIGRpZSBnZWZ1bmRlbmVuIFByb2pla3RlLCBkYXJ1bnRlciBkaWUgZ2VmdW5kZW5lbiBBbmdlYm90ZSBpbiB0YWJlbGxhcmlzY2hlciBGb3JtIGRhcmdzdGVsbHQu"><source>Zuoberst werden die gefundenen Projekte, darunter die gefundenen Angebote in tabellarischer Form dargstellt.</source><target>Zuoberst werden die gefundenen Projekte, darunter die gefundenen Angebote in tabellarischer Form dargstellt.</target></trans-unit>
-<trans-unit id="RGllIGpld2VpbGlnZW4gVGFiZWxsZW4gZW50aGFsdGVuIGF1c3NjaGxpZcOfbGljaCBkdXJjaCBkaWUgU3VjaGUgZWluZ2VncmVuenRlIFByb2pla3RlIGJ6dy4gQW5nZWJvdGUu"><source>Die jeweiligen Tabellen enthalten ausschließlich durch die Suche eingegrenzte Projekte bzw. Angebote.</source><target>Die jeweiligen Tabellen enthalten ausschließlich durch die Suche eingegrenzte Projekte bzw. Angebote.</target></trans-unit>
-<trans-unit id="VHJlZmZlciBzaW5kIGluIGRlbiBqZXdlaWxpZ2VuIFNwYWx0ZW4gcm90IG1hcmtpZXJ0Lg=="><source>Treffer sind in den jeweiligen Spalten rot markiert.</source><target>Treffer sind in den jeweiligen Spalten rot markiert.</target></trans-unit>
-<trans-unit id="SW0gVmVyZ2xlaWNoIHp1ciBQcm9qZWt0LSB1bmQgQW5nZWJvdHPDvGJlcnNpY2h0IGVudGhhbHRlbiBkaWUgVGFiZWxsZW4gamV3ZWlscyBlaW5lIHdlaXRlcmUgU3BhbHRlICJUcmVmZmVyIGluIERldGFpbHMiLiBEaWVzZSB6ZWlndCBhbiwgb2Igc2ljaCBpbiBkZW4gRGV0YWlscyBkZXMgUHJvamVrdHMgb2RlciBBbmdlYm90cyBlaW4gVHJlZmZlciBiZWZpbmRldC4="><source>Im Vergleich zur Projekt- und Angebotsübersicht enthalten die Tabellen jeweils eine weitere Spalte "Treffer in Details". Diese zeigt an, ob sich in den Details des Projekts oder Angebots ein Treffer befindet.</source><target>Im Vergleich zur Projekt- und Angebotsübersicht enthalten die Tabellen jeweils eine weitere Spalte "Treffer in Details". Diese zeigt an, ob sich in den Details des Projekts oder Angebots ein Treffer befindet.</target></trans-unit>
-<trans-unit id="QmVmaW5kZXQgc2ljaCBpbiBlaW5lbSBLb21tZW50YXIgenUgZWluZXIgRGF0ZWkgZWluIFRyZWZmZXIsIGlzdCBpbiBkZW4gUHJvamVrdC0gYnp3LiBBbmdlYm90c2RldGFpbHMgZGVyIFJlaXRlciBkZXIgenUgZGllc2VuIERhdGVpZW4gZsO8aHJ0IGluIHJvdGVyIFNjaHJpZnQgZ2VoYWx0ZW4u"><source>Befindet sich in einem Kommentar zu einer Datei ein Treffer, ist in den Projekt- bzw. Angebotsdetails der Reiter der zu diesen Dateien führt in roter Schrift gehalten.</source><target>Befindet sich in einem Kommentar zu einer Datei ein Treffer, ist in den Projekt- bzw. Angebotsdetails der Reiter der zu diesen Dateien führt in roter Schrift gehalten.</target></trans-unit>
-<trans-unit id="Um9sbGVuIGltIFBvcnRhbCBkZXIgTWl0YXJiZWl0ZXIgZWluZXMgVW50ZXJuZWhtZW5zIGJlYXJiZWl0ZW4="><source>Rollen im Portal der Mitarbeiter eines Unternehmens bearbeiten</source><target>Rollen im Portal der Mitarbeiter eines Unternehmens bearbeiten</target></trans-unit>
-<trans-unit id="QWxsZSBVbnRlcm5laG1lbiBpbSBQb3J0YWwgc2luZCBnZWxpc3RldCAtIGF1Y2ggZGVyIFBvcnRhbGJldHJlaWJlcg=="><source>Alle Unternehmen im Portal sind gelistet - auch der Portalbetreiber</source><target>Alle Unternehmen im Portal sind gelistet - auch der Portalbetreiber</target></trans-unit>
-<trans-unit id="S2xpY2sgYXVmIGVpbiBVbnRlcm5laG1lbiDDtmZmbmV0IGVpbiBGZW5zdGVyIHp1ciBCZWFyYmVpdHVuZyBkZXIgUm9sbGVuIGRlciBNaXRhcmJlaXRlciwgZGVyIE1pdGFyYmVpdGVyLUdydXBwZW4gdW5kIGRlciBFaW5zdGVsbHVuZ2VuIGRlcyBVbnRlcm5laG1lbnMu"><source>Klick auf ein Unternehmen öffnet ein Fenster zur Bearbeitung der Rollen der Mitarbeiter, der Mitarbeiter-Gruppen und der Einstellungen des Unternehmens.</source><target>Klick auf ein Unternehmen öffnet ein Fenster zur Bearbeitung der Rollen der Mitarbeiter, der Mitarbeiter-Gruppen und der Einstellungen des Unternehmens.</target></trans-unit>
-<trans-unit id="RHVyY2ggS2xpY2sgYXVmIGRlbiBQZmVpbCBpbSBTcGFsdGVua29wZiBkZXIgU3BhbHRlICJVbnRlcm5laG1lbiIgbGFzc2VuIHNpY2ggZGllIFVudGVybmVobWVuIGZpbHRlcm4u"><source>Durch Klick auf den Pfeil im Spaltenkopf der Spalte "Unternehmen" lassen sich die Unternehmen filtern.</source><target>Durch Klick auf den Pfeil im Spaltenkopf der Spalte "Unternehmen" lassen sich die Unternehmen filtern.</target></trans-unit>
-<trans-unit id="RHVyY2ggZGllIEFrdGl2aWVydW5nIGRlciBPcHRpb25lbiAiQWxsZSBBbmdlYm90ZSBzaWNodGJhciIgYnp3LiAiQWxsZSBQcm9qZWt0ZSBzaWNodGJhciIga2FubiBkZXIgTWl0YXJiZWl0ZXIgdW5nZWFjaHRldCBzZWluZXIgR3J1cHBlbm1pdGdsaWVkc2NoYWZ0IGFsbGUgUHJvamVrdGUgYnp3LiBBbmdlYm90ZSBzZWhlbi4="><source>Durch die Aktivierung der Optionen "Alle Angebote sichtbar" bzw. "Alle Projekte sichtbar" kann der Mitarbeiter ungeachtet seiner Gruppenmitgliedschaft alle Projekte bzw. Angebote sehen.</source><target>Durch die Aktivierung der Optionen "Alle Angebote sichtbar" bzw. "Alle Projekte sichtbar" kann der Mitarbeiter ungeachtet seiner Gruppenmitgliedschaft alle Projekte bzw. Angebote sehen.</target></trans-unit>
-<trans-unit id="RHVyY2ggZGllIEFrdGl2aWVydW5nIGRlciBPcHRpb24gIlJlY2hudW5nZW4gYW5kZXJlciBNaXRhcmJlaXRlciBzZWhlbiIga8O2bm5lbiBkaWUgUmVjaG51bmdlbiB2b24gUHJvamVrdGVuIGFuZGVyZXIgTWl0Z2xpZWRlciBnZXNlaGVuIHdlcmRlbi4="><source>Durch die Aktivierung der Option "Rechnungen anderer Mitarbeiter sehen" können die Rechnungen von Projekten anderer Mitglieder gesehen werden.</source><target>Durch die Aktivierung der Option "Rechnungen anderer Mitarbeiter sehen" können die Rechnungen von Projekten anderer Mitglieder gesehen werden.</target></trans-unit>
-<trans-unit id="TcO2Z2xpY2hlIFJvbGxlbiBpbSBQb3J0YWw="><source>Mögliche Rollen im Portal</source><target>Mögliche Rollen im Portal</target></trans-unit>
-<trans-unit id="Y3VzdG9tZXJWaXNpdG9y"><source>customerVisitor</source><target>customerVisitor</target></trans-unit>
-<trans-unit id="RWluc2ljaHQgZGVyIEluZm9ybWF0aW9uc8O8YmVyc2ljaHRlbiB6dSBQcm9qZWt0ZW4gdW5kIEFuZ2Vib3Rlbg=="><source>Einsicht der Informationsübersichten zu Projekten und Angeboten</source><target>Einsicht der Informationsübersichten zu Projekten und Angeboten</target></trans-unit>
-<trans-unit id="SGVydW50ZXJsYWRlbiB2b24gw5xiZXJzZXR6dW5nZW4="><source>Herunterladen von Übersetzungen</source><target>Herunterladen von Übersetzungen</target></trans-unit>
-<trans-unit id="SGVydW50ZXJsYWRlbiB2b24gUmVjaG51bmdlbg=="><source>Herunterladen von Rechnungen</source><target>Herunterladen von Rechnungen</target></trans-unit>
-<trans-unit id="SGVydW50ZXJsYWRlbiB2b24gS3VuZGVuaW5mb3JtYXRpb25lbg=="><source>Herunterladen von Kundeninformationen</source><target>Herunterladen von Kundeninformationen</target></trans-unit>
-<trans-unit id="QmVhcmJlaXR1bmcgZGVyIGVpZ2VuZW4gTWl0YXJiZWl0ZXJkYXRlbg=="><source>Bearbeitung der eigenen Mitarbeiterdaten</source><target>Bearbeitung der eigenen Mitarbeiterdaten</target></trans-unit>
-<trans-unit id="Y3VzdG9tZXJQbQ=="><source>customerPm</source><target>customerPm</target></trans-unit>
-<trans-unit id="UmVjaHRlIGRlcyBjdXN0b21lclZpc3Rvcg=="><source>Rechte des customerVistor</source><target>Rechte des customerVistor</target></trans-unit>
-<trans-unit id="QW5mcmFnZW4gdm9uIEFuZ2Vib3Rlbg=="><source>Anfragen von Angeboten</source><target>Anfragen von Angeboten</target></trans-unit>
-<trans-unit id="QmVhdWZ0cmFndW5nIHZvbiBQcm9qZWt0ZW4="><source>Beauftragung von Projekten</source><target>Beauftragung von Projekten</target></trans-unit>
-<trans-unit id="QmVhcmJlaXR1bmcgdm9uIFByb2pla3Rlbg=="><source>Bearbeitung von Projekten</source><target>Bearbeitung von Projekten</target></trans-unit>
-<trans-unit id="UmVjaHRlIGRlcyBjdXN0b21lclBt"><source>Rechte des customerPm</source><target>Rechte des customerPm</target></trans-unit>
-<trans-unit id="QmVhcmJlaXR1bmcgYWxsZXIgTWl0YXJiZWl0ZXJkYXRlbiB1bmQgUm9sbGVuIGltIFBvcnRhbA=="><source>Bearbeitung aller Mitarbeiterdaten und Rollen im Portal</source><target>Bearbeitung aller Mitarbeiterdaten und Rollen im Portal</target></trans-unit>
-<trans-unit id="QmVhcmJlaXR1bmcgZGVyIFVudGVybmVobWVuc3N0YW1tZGF0ZW4="><source>Bearbeitung der Unternehmensstammdaten</source><target>Bearbeitung der Unternehmensstammdaten</target></trans-unit>
-<trans-unit id="RWluc3RlbGx1bmdlbg=="><source>Einstellungen</source><target>Einstellungen</target></trans-unit>
-<trans-unit id="Rmxhc2ggVXBsb2Fk"><source>Flash Upload</source><target>Flash Upload</target></trans-unit>
-<trans-unit id="R2lidCBhbiwgb2IgZsO8ciBkaWVzZW4gS3VuZGVuIGRlciBGbGFzaCBVcGxvYWRlciBkZWFrdGl2aWVydCBpc3Qu"><source>Gibt an, ob für diesen Kunden der Flash Uploader deaktiviert ist.</source><target>Gibt an, ob für diesen Kunden der Flash Uploader deaktiviert ist.</target></trans-unit>
-<trans-unit id="R3J1cHBlbg=="><source>Gruppen</source><target>Gruppen</target></trans-unit>
-<trans-unit id="RXMgbGFzc2VuIHNpY2ggZGllIEJlbnV0emVyZ3J1cHBlbiBkZXMgZ2V3w6RobHRlbiBVbnRlcm5laG1lbnMsIHNvd2llIGRpZSBadW9yZG51bmcgZGVyIE1pdGFyYmVpdGVyIHp1IGRlbiBHcnVwcGVuIGJlYXJiZWl0ZW4u"><source>Es lassen sich die Benutzergruppen des gewählten Unternehmens, sowie die Zuordnung der Mitarbeiter zu den Gruppen bearbeiten.</source><target>Es lassen sich die Benutzergruppen des gewählten Unternehmens, sowie die Zuordnung der Mitarbeiter zu den Gruppen bearbeiten.</target></trans-unit>
-<trans-unit id="TmV1ZW4gTWl0YXJiZWl0ZXIgaW0gUG9ydGFsIGFubGVnZW4="><source>Neuen Mitarbeiter im Portal anlegen</source><target>Neuen Mitarbeiter im Portal anlegen</target></trans-unit>
-<trans-unit id="S2xpY2sgYXVmICJOZXVlbiBNaXRhcmJlaXRlciBpbSBQb3J0YWwgYW5sZWdlbiI="><source>Klick auf "Neuen Mitarbeiter im Portal anlegen"</source><target>Klick auf "Neuen Mitarbeiter im Portal anlegen"</target></trans-unit>
-<trans-unit id="Rm9ybXVsYXIgYXVzZsO8bGxlbiB1bmQgYWJzZW5kZW4="><source>Formular ausfüllen und absenden</source><target>Formular ausfüllen und absenden</target></trans-unit>
-<trans-unit id="TcO2Y2h0ZW4gU2llIGRlbiBNaXRhcmJlaXRlciBudXIgdm9yYXVzc2NoYXVlbmQgYW5sZWdlbiwga2FubiBkaWUgIlJvbGxlIGltIFBvcnRhbCIga2FubiBub2NoIGF1ZiAia2VpbmUgUmVjaHRlIiBiZWxhc3NlbiB3ZXJkZW4uIFNpZSBrw7ZubmVuIGRlbiBzbyBhbmdlbGVndGVuIE1pdGFyYmVpdGVyIHNww6R0ZXIgYmVhcmJlaXRlbiB1bmQgaWhtIGRhbm4gUmVjaHRlIHp1d2Vpc2VuLg=="><source>Möchten Sie den Mitarbeiter nur vorausschauend anlegen, kann die "Rolle im Portal" kann noch auf "keine Rechte" belassen werden. Sie können den so angelegten Mitarbeiter später bearbeiten und ihm dann Rechte zuweisen.</source><target>Möchten Sie den Mitarbeiter nur vorausschauend anlegen, kann die "Rolle im Portal" kann noch auf "keine Rechte" belassen werden. Sie können den so angelegten Mitarbeiter später bearbeiten und ihm dann Rechte zuweisen.</target></trans-unit>
-<trans-unit id="SGF0IGRlciBNaXRhcmJlaXRlciBkdXJjaCBkaWUgQW5sYWdlIGltIFBvcnRhbCBSZWNodGUgZXJoYWx0ZW4sIHdpcmQgaWhtIG5hY2ggQWJzZW5kZW4gZGVzIEZvcm11bGFycyBlaW5lIEUtTWFpbCB6dWdlc2FuZHQuIERpZXNlIGVudGjDpGx0IGVpbmVuIExpbmsgenUgZWluZW0gRm9ybXVsYXIsIG1pdCB3ZWxjaGVtIGVyIHNlaW4gUGFzc3dvcnQgZsO8ciBkYXMgUG9ydGFsIHNlbGJzdCBzZXR6dC4gRGFzIGRhYmVpIGdld8OkaGx0ZSBWZXJmYWhyZW4gZm9sZ3QgZWluZW0gc2VociBob2hlbiBTaWNoZXJoZWl0c3RhbmRhcmQsIGRlciBlcyBudXIgZGVtIEluaGFiZXIgZGVyIE1haWxhZHJlc3NlIGVybcO2Z2xpY2h0LCBkYXMgUGFzc3dvcnQgbmV1IHp1IHNldHplbi4gWnVkZW0gaW5mb3JtaWVydCBpaG4gZGllIEUtTWFpbCwgd2VyIGlobSBSZWNodGUgaW0gUG9ydGFsIGVpbmdlcsOkdW10IGhhdC4="><source>Hat der Mitarbeiter durch die Anlage im Portal Rechte erhalten, wird ihm nach Absenden des Formulars eine E-Mail zugesandt. Diese enthält einen Link zu einem Formular, mit welchem er sein Passwort für das Portal selbst setzt. Das dabei gewählte Verfahren folgt einem sehr hohen Sicherheitstandard, der es nur dem Inhaber der Mailadresse ermöglicht, das Passwort neu zu setzen. Zudem informiert ihn die E-Mail, wer ihm Rechte im Portal eingeräumt hat.</source><target>Hat der Mitarbeiter durch die Anlage im Portal Rechte erhalten, wird ihm nach Absenden des Formulars eine E-Mail zugesandt. Diese enthält einen Link zu einem Formular, mit welchem er sein Passwort für das Portal selbst setzt. Das dabei gewählte Verfahren folgt einem sehr hohen Sicherheitstandard, der es nur dem Inhaber der Mailadresse ermöglicht, das Passwort neu zu setzen. Zudem informiert ihn die E-Mail, wer ihm Rechte im Portal eingeräumt hat.</target></trans-unit>
-<trans-unit id="QmVhcmJlaXRlbiBlaW5lcyBNaXRhcmJlaXRlcnM="><source>Bearbeiten eines Mitarbeiters</source><target>Bearbeiten eines Mitarbeiters</target></trans-unit>
-<trans-unit id="S2xpY2sgYXVmIGRhcyAiQmxlaXN0aWZ0Ii1TeW1ib2wgdm9yIGRlbSBOYW1lbiBkZXMgTWl0YXJiZWl0ZXJz"><source>Klick auf das "Bleistift"-Symbol vor dem Namen des Mitarbeiters</source><target>Klick auf das "Bleistift"-Symbol vor dem Namen des Mitarbeiters</target></trans-unit>
-<trans-unit id="Rm9ybXVsYXJ3ZXJ0ZSDDpG5kZXJuIHVuZCBGb3JtdWxhciBhYnNlbmRlbg=="><source>Formularwerte ändern und Formular absenden</source><target>Formularwerte ändern und Formular absenden</target></trans-unit>
-<trans-unit id="SGF0IHNpY2ggZGllICJSb2xsZSBpbSBQb3J0YWwiIGRlcyBNaXRhcmJlaXRlcnMgZHVyY2ggZGllIEJlYXJiZWl0dW5nIGdlw6RuZGVydCwgZXJow6RsdCBkZXIgTWl0YXJiZWl0ZXIgbmFjaCBBYnNlbmRlbiBkZXMgRm9ybXVsYXJzIGVpbmUgRS1NYWlsIHp1Z2VzYW5kdC4gRGllc2UgaW5mb3JtaWVydCBpaG4gZGFyw7xiZXIsIGRhc3Mgc2VpbmUgUm9sbGUgaW0gUG9ydGFsIGdlw6RuZGVydCB3dXJkZSB1bmQgZHVyY2ggd2VuLg=="><source>Hat sich die "Rolle im Portal" des Mitarbeiters durch die Bearbeitung geändert, erhält der Mitarbeiter nach Absenden des Formulars eine E-Mail zugesandt. Diese informiert ihn darüber, dass seine Rolle im Portal geändert wurde und durch wen.</source><target>Hat sich die "Rolle im Portal" des Mitarbeiters durch die Bearbeitung geändert, erhält der Mitarbeiter nach Absenden des Formulars eine E-Mail zugesandt. Diese informiert ihn darüber, dass seine Rolle im Portal geändert wurde und durch wenn.</target></trans-unit>
-<trans-unit id="TGVnZW4gU2llIElocmUgU3RhbmRhcmR3ZXJ0ZSBmw7xyIGRhcyBBbmdlYm90c2Zvcm11bGFyIGZlc3Q="><source>Legen Sie Ihre Standardwerte für das Angebotsformular fest</source><target>Legen Sie Ihre Standardwerte für das Angebotsformular fest</target></trans-unit>
-<trans-unit id="QW5nZWJvdHNmb3JtdWxhcmUgd2VyZGVuIGF1dG9tYXRpc2NoIG1pdCBkZW4gaGllciBoaW50ZXJsZWd0ZW4gV2VydGVuIHZvcmJlZsO8bGx0Lg=="><source>Angebotsformulare werden automatisch mit den hier hinterlegten Werten vorbefüllt.</source><target>Angebotsformulare werden automatisch mit den hier hinterlegten Werten vorbefüllt.</target></trans-unit>
-<trans-unit id="TGllZmVyZGF0dW0gV2Vya3RhZ2UgaW4gZGVyIFp1a3VuZnQ="><source>Lieferdatum Werktage in der Zukunft</source><target>Lieferdatum Werktage in der Zukunft</target></trans-unit>
-<trans-unit id="QXVmIGRlciBCYXNpcyBkaWVzZXIgQW5nYWJlIHdpcmQgZGFzIHZvcmVpbmdlc3RlbGx0ZSBMaWVmZXJkYXR1bSBiZXJlY2huZXQuIEF1c2dlaGVuZCB2b20gYWt0dWVsbGVuIFRhZyB3aXJkIGRhcyBMaWVmZXJkYXR1bSBnZXfDpGhsdCwgd2VsY2hlcyBzaWNoIGRpZSBnZW5hbm50ZSBBbnphaGwgdm9uIFdlcmt0YWdlbiBpbiBkZXIgWnVrdW5mdCBiZWZpbmRldC4="><source>Auf der Basis dieser Angabe wird das voreingestellte Lieferdatum berechnet. Ausgehend vom aktuellen Tag wird das Lieferdatum gewählt, welches sich die genannte Anzahl von Werktagen in der Zukunft befindet.</source><target>Auf der Basis dieser Angabe wird das voreingestellte Lieferdatum berechnet. Ausgehend vom aktuellen Tag wird das Lieferdatum gewählt, welches sich die genannte Anzahl von Werktagen in der Zukunft befindet.</target></trans-unit>
-<trans-unit id="RGF0ZWlzcGV6aWZpc2NoZSBGb3JtdWxhcmZlbGRlcg=="><source>Dateispezifische Formularfelder</source><target>Dateispezifische Formularfelder</target></trans-unit>
-<trans-unit id="RGllIEZvcm11bGFyZmVsZGVyICJRdWVsbHNwcmFjaGUiLCAiWmllbHNwcmFjaGVuIiwgIkRUUCIsICJEVFAtUXVhbGl0w6R0IiwgdW5kICJFcmzDpHV0ZXJ1bmdlbiB6dXIgRGF0ZWkiIHdlcmRlbiBmw7xyIGplZGUgc3DDpHRlciBpbSBBbmdlYm90c2Zvcm11bGFyIGF1c2dld8OkaGx0ZSBEYXRlaSB2b3JiZWxlZ3QsIHdpZSBzaWUgaGllciBoaW50ZXJsZWd0IHd1cmRlbi4="><source>Die Formularfelder "Quellsprache", "Zielsprachen", "DTP", "DTP-Qualität", und "Erläuterungen zur Datei" werden für jede später im Angebotsformular ausgewählte Datei vorbelegt, wie sie hier hinterlegt wurden.</source><target>Die Formularfelder "Quellsprache", "Zielsprachen", "DTP", "DTP-Qualität", und "Erläuterungen zur Datei" werden für jede später im Angebotsformular ausgewählte Datei vorbelegt, wie sie hier hinterlegt wurden.</target></trans-unit>
-<trans-unit id="RmlsdGVydW5nIGRlciBGb3JtdWxhcmVpbmdhYmVu"><source>Filterung der Formulareingaben</source><target>Filterung der Formulareingaben</target></trans-unit>
-<trans-unit id="QmVpIGFsbGVuIEZvcm11bGFyZmVsZGVybiB3ZXJkZW4gZGllIFplaWNoZW4gXCBgIMK0IHwgPSBbIF0geyB9ICIgJiMzOTsgJiMzODsgIGF1cyBTaWNoZXJoZWl0c2dyw7xuZGVuIHNlcnZlcnNlaXRpZyB2b3IgZGVyIFdlaXRlcnZlcmFyYmVpdHVuZyBkZXIgRGF0ZW4gYXVzZ2VmaWx0ZXJ0IHVuZCBkdXJjaCBlaW5lbiBVbnRlcnN0cmljaCAoXykgZXJzZXR6dC4="><source>Bei allen Formularfeldern werden die Zeichen \ ` ´ | = [ ] { } "  &#39; &#38;  aus Sicherheitsgründen serverseitig vor der Weiterverarbeitung der Daten ausgefiltert und durch einen Unterstrich (_) ersetzt.</source><target>Bei allen Formularfeldern werden die Zeichen \ ` ´ | = [ ] { } "  &#39; &#38;  aus Sicherheitsgründen serverseitig vor der Weiterverarbeitung der Daten ausgefiltert und durch einen Unterstrich (_) ersetzt.</target></trans-unit>
-<trans-unit id="TGVnZW4gU2llIElocmUgU3RhbmRhcmR3ZXJ0ZSBmw7xyIFByb2pla3RiZWF1ZnRyYWd1bmdzLSB1bmQgUHJvamVrdGJlYXJiZWl0dW5nc2Zvcm11bGFyIGZlc3Q="><source>Legen Sie Ihre Standardwerte für Projektbeauftragungs- und Projektbearbeitungsformular fest</source><target>Legen Sie Ihre Standardwerte für Projektbeauftragungs- und Projektbearbeitungsformular fest</target></trans-unit>
-<trans-unit id="UHJvamVrdGZvcm11bGFyZSB3ZXJkZW4gYXV0b21hdGlzY2ggbWl0IGRlbiBoaWVyIGhpbnRlcmxlZ3RlbiBXZXJ0ZW4gdm9yYmVmw7xsbHQuIEJlaW0gUHJvamVrdGJlYXJiZWl0dW5nc2Zvcm11bGFyIGdpbHQgZGllcyBudXIgZsO8ciBkaWUgZGF0ZWlzcGV6aWZpc2NoZW4gRm9ybXVsYXJmZWxkZXIgIlF1ZWxsc3ByYWNoZSIsICJaaWVsc3ByYWNoZW4iLCAiRFRQIiwgIkRUUC1RdWFsaXTDpHQiLCB1bmQgIkVybMOkdXRlcnVuZ2VuIHp1ciBEYXRlaSI="><source>Projektformulare werden automatisch mit den hier hinterlegten Werten vorbefüllt. Beim Projektbearbeitungsformular gilt dies nur für die dateispezifischen Formularfelder "Quellsprache", "Zielsprachen", "DTP", "DTP-Qualität", und "Erläuterungen zur Datei"</source><target>Projektformulare werden automatisch mit den hier hinterlegten Werten vorbefüllt. Beim Projektbearbeitungsformular gilt dies nur für die dateispezifischen Formularfelder "Quellsprache", "Zielsprachen", "DTP", "DTP-Qualität", und "Erläuterungen zur Datei"</target></trans-unit>
-<trans-unit id="RGllIEZvcm11bGFyZmVsZGVyICJRdWVsbHNwcmFjaGUiLCAiWmllbHNwcmFjaGVuIiwgIkRUUCIsICJEVFAtUXVhbGl0w6R0IiwgdW5kICJFcmzDpHV0ZXJ1bmdlbiB6dXIgRGF0ZWkiIHdlcmRlbiBmw7xyIGplZGUgc3DDpHRlciBpbSBQcm9qZWt0Zm9ybXVsYXIgYXVzZ2V3w6RobHRlIERhdGVpIHZvcmJlbGVndCwgd2llIHNpZSBoaWVyIGhpbnRlcmxlZ3Qgd3VyZGVuLg=="><source>Die Formularfelder "Quellsprache", "Zielsprachen", "DTP", "DTP-Qualität", und "Erläuterungen zur Datei" werden für jede später im Projektformular ausgewählte Datei vorbelegt, wie sie hier hinterlegt wurden.</source><target>Die Formularfelder "Quellsprache", "Zielsprachen", "DTP", "DTP-Qualität", und "Erläuterungen zur Datei" werden für jede später im Projektformular ausgewählte Datei vorbelegt, wie sie hier hinterlegt wurden.</target></trans-unit>
-<trans-unit id="Vm9yYmVsZWd1bmdlbiBkZXIgRm9ybXVsYXJmZWxkZXI="><source>Vorbelegungen der Formularfelder</source><target>Vorbelegungen der Formularfelder</target></trans-unit>
-<trans-unit id="Vm9yYmVsZWd1bmdlbiBrw7ZubmVuIFNpZSB1bnRlciBkZW0gTWVuw7xwdW5rdCAiUHJvZmlsIMOkbmRlcm4iIC8gIlZvcmJlbGVndW5nIEFuZ2Vib3QgYW5mcmFnZW4iIGhpbnRlcmxlZ2VuLg=="><source>Vorbelegungen können Sie unter dem Menüpunkt "Profil ändern" / "Vorbelegung Angebot anfragen" hinterlegen.</source><target>Vorbelegungen können Sie unter dem Menüpunkt "Profil ändern" / "Vorbelegung Angebot anfragen" hinterlegen.</target></trans-unit>
-<trans-unit id="QXVzZsO8bGxlbiBkYXRlaXNwZXppZmlzY2hlciBGZWxkZXI="><source>Ausfüllen dateispezifischer Felder</source><target>Ausfüllen dateispezifischer Felder</target></trans-unit>
-<trans-unit id="RsO8ciBqZWRlIGF1c2dld8OkaGx0ZSBEYXRlaSBrw7ZubmVuIFNpZSBnZXRyZW5udCAodW5kIGdnZi4gdW50ZXJzY2hpZWRsaWNoKSBkaWUgZGF0ZWlzcGV6aWZpc2NoZW4gRm9ybXVsYXJmZWxkZXIgIlF1ZWxsc3ByYWNoZSIsICJaaWVsc3ByYWNoZW4iLCAiRFRQIER1cmNoZsO8aHJlbiIsICJEVFAgUXVhbGl0w6R0IiB1bmQgIkVybMOkdXRlcnVuZ2VuIHp1ciBEYXRlaSIgYXVzZsO8bGxlbi4gQml0dGUga2xpY2tlbiBTaWUgZWluZSBkZXIgYXVzZ2V3w6RobHRlbiBEYXRlaWVuIGFuLCB1bSBmw7xyIGRpZXNlIERhdGVpIGRpZSBkYXRlaXNwZXppZmlzY2hlbiBGb3JtdWxhcmZlbGRlciBhdXN6dWbDvGxsZW4u"><source>Für jede ausgewählte Datei können Sie getrennt (und ggf. unterschiedlich) die dateispezifischen Formularfelder "Quellsprache", "Zielsprachen", "DTP Durchführen", "DTP Qualität" und "Erläuterungen zur Datei" ausfüllen. Bitte klicken Sie eine der ausgewählten Dateien an, um für diese Datei die dateispezifischen Formularfelder auszufüllen.</source><target>Für jede ausgewählte Datei können Sie getrennt (und ggf. unterschiedlich) die dateispezifischen Formularfelder "Quellsprache", "Zielsprachen", "DTP Durchführen", "DTP Qualität" und "Erläuterungen zur Datei" ausfüllen. Bitte klicken Sie eine der ausgewählten Dateien an, um für diese Datei die dateispezifischen Formularfelder auszufüllen.</target></trans-unit>
-<trans-unit id="w5xiZXJuYWhtZSBkYXRlaXNwZXppZmlzY2hlciBGZWxkZXIgZsO8ciBhbGxlIERhdGVpZW4="><source>Übernahme dateispezifischer Felder für alle Dateien</source><target>Übernahme dateispezifischer Felder für alle Dateien</target></trans-unit>
-<trans-unit id="TWl0IGRlciBTY2hhbHRmbMOkY2hlICJEYXRlaWVpbnN0ZWxsdW5nZW4gw7xiZXJuZWhtZW4iIGvDtm5uZW4gc2llIGRpZSBFaW5zdGVsbHVuZ2VuIGVpbmVzIG9kZXIgbWVocmVyZXIgZGVyIGRhdGVpc3BlemlmaXNjaGVuIEZvcm11bGFyZmVsZGVyIGbDvHIgYWxsZSBhdXNnZXfDpGhsdGVuIERhdGVpZW4gw7xiZXJuZWhtZW4u"><source>Mit der Schaltfläche "Dateieinstellungen übernehmen" können sie die Einstellungen eines oder mehrerer der dateispezifischen Formularfelder für alle ausgewählten Dateien übernehmen.</source><target>Mit der Schaltfläche "Dateieinstellungen übernehmen" können sie die Einstellungen eines oder mehrerer der dateispezifischen Formularfelder für alle ausgewählten Dateien übernehmen.</target></trans-unit>
-<trans-unit id="QW5nYWJlbiB6dW0gRFRQ"><source>Angaben zum DTP</source><target>Angaben zum DTP</target></trans-unit>
-<trans-unit id="w5xiZXJzZXR6dW5nZW4gd2VyZGVuIGkuIGQuIFIuIGltIERhdGVpZm9ybWF0IGRlciBBdXNnYW5nc3NwcmFjaGUgYXVzZ2VsaWVmZXJ0LiBCaXR0ZSBnZWJlbiBTaWUgYmVpIGplZGVyIERhdGVpIGFuLCBvYiBlaW5lIE5hY2hmb3JtYXRpZXJ1bmcgZGVzIMO8YmVyc2V0enRlbiBEb2t1bWVudHMgKERUUCkgZXJmb2xnZW4gc29sbC4gQml0dGUgZ2ViZW4gU2llIGhpZXJ6dSBlYmVuZmFsbHMgYW4sIHdpZSBncsO8bmRsaWNoIGRpZXNlIE5hY2hmb3JtYXRpZXJ1bmcgc2VpbiBzb2xsOiBNdXNzIGRhcyBEb2t1bWVudCBndXQgbGVzYmFyIHNlaW4sIG9kZXIgc29sbCBkaWUgRm9ybWF0aWVydW5nIG3DtmdsaWNoc3QgcGVyZmVrdCBhbmFsb2cgZGVyIEF1c2dhbmdzc3BhY2hlIGVyZm9sZ2VuPw=="><source>Übersetzungen werden i. d. R. im Dateiformat der Ausgangssprache ausgeliefert. Bitte geben Sie bei jeder Datei an, ob eine Nachformatierung des übersetzten Dokuments (DTP) erfolgen soll. Bitte geben Sie hierzu ebenfalls an, wie gründlich diese Nachformatierung sein soll: Muss das Dokument gut lesbar sein, oder soll die Formatierung möglichst perfekt analog der Ausgangsspache erfolgen?</source><target>Übersetzungen werden i. d. R. im Dateiformat der Ausgangssprache ausgeliefert. Bitte geben Sie bei jeder Datei an, ob eine Nachformatierung des übersetzten Dokuments (DTP) erfolgen soll. Bitte geben Sie hierzu ebenfalls an, wie gründlich diese Nachformatierung sein soll: Muss das Dokument gut lesbar sein, oder soll die Formatierung möglichst perfekt analog der Ausgangsspache erfolgen?</target></trans-unit>
-<trans-unit id="QXVzd2FobCB2b24gUmVmZXJlbnpkYXRlaWVu"><source>Auswahl von Referenzdateien</source><target>Auswahl von Referenzdateien</target></trans-unit>
-<trans-unit id="SMOkdWZpZyBpc3QgZXMgZsO8ciBkaWUgw5xiZXJzZXR6dW5nIHNpbm52b2xsLCBkZW0gw5xiZXJzZXR6ZXIgUmVmZXJlbnptYXRlcmlhbCB6dW0gS29udGV4dCBkZXIgw5xiZXJzZXR6dW5nIG1pdHp1bGllZmVybi4gRGllcyBrw7ZubmVuIHNvd29obCBhdXNnYW5ncy0gd2llIGF1Y2ggemllbHNwcmFjaGxpY2hlIERva3VtZW50ZSBzZWluIC0gaW4gZGVyIFJlZ2VsIFBERi4gQml0dGUgbGVnZW4gU2llIGRpZXNlIFJlZmVyZW56ZGF0ZWllbiBuaWNodCBkZW4gWklQLVBha2V0ZW4gbWl0IHp1IMO8YmVyc2V0emVuZGVuIERhdGVpZW4gYmVpIC0gaW4gZGllc2VtIEZhbGwgd8O8cmRlbiBzaWUgbWl0IMO8YmVyc2V0enQgd2VyZGVuLiBCaXR0ZSBmw7xnZW4gU2llIGdnZi4gdm9yaGFuZGVuZXMgUmVmZXJlbnptYXRlcmlhbCB1bnRlciBkZXIgU2NoYWx0ZmzDpGNoZSAiUmVmZXJlbnpkYXRlaWVuIGF1c3fDpGhsZW4iIGhpbnp1Lg=="><source>Häufig ist es für die Übersetzung sinnvoll, dem Übersetzer Referenzmaterial zum Kontext der Übersetzung mitzuliefern. Dies können sowohl ausgangs- wie auch zielsprachliche Dokumente sein - in der Regel PDF. Bitte legen Sie diese Referenzdateien nicht den ZIP-Paketen mit zu übersetzenden Dateien bei - in diesem Fall würden sie mit übersetzt werden. Bitte fügen Sie ggf. vorhandenes Referenzmaterial unter der Schaltfläche "Referenzdateien auswählen" hinzu.</source><target>Häufig ist es für die Übersetzung sinnvoll, dem Übersetzer Referenzmaterial zum Kontext der Übersetzung mitzuliefern. Dies können sowohl ausgangs- wie auch zielsprachliche Dokumente sein - in der Regel PDF. Bitte legen Sie diese Referenzdateien nicht den ZIP-Paketen mit zu übersetzenden Dateien bei - in diesem Fall würden sie mit übersetzt werden. Bitte fügen Sie ggf. vorhandenes Referenzmaterial unter der Schaltfläche "Referenzdateien auswählen" hinzu.</target></trans-unit>
-<trans-unit id="VmVycmluZ2VydW5nIGRlciDDnGJlcnRyYWd1bmdzZGF1ZXI="><source>Verringerung der Übertragungsdauer</source><target>Verringerung der Übertragungsdauer</target></trans-unit>
-<trans-unit id="RXMgZW1wZmllaGx0IHNpY2gsIGRpZSB6dSDDvGJlcnNldHplbmRlbiBEYXRlaWVuIHZvciBkZXIgw5xiZXJ0cmFndW5nIHp1IHppcHBlbi4="><source>Es empfiehlt sich, die zu übersetzenden Dateien vor der Übertragung zu zippen.</source><target>Es empfiehlt sich, die zu übersetzenden Dateien vor der Übertragung zu zippen.</target></trans-unit>
-<trans-unit id="TWF4aW1hbGUgRGF0ZWlncsO2w59l"><source>Maximale Dateigröße</source><target>Maximale Dateigröße</target></trans-unit>
-<trans-unit id="RGF0ZWllbiBncsO2w59lciA0MjAgTUIga8O2bm5lbiBuaWNodCBhdXNnZXfDpGhsdCB3ZXJkZW4uIFNvbGx0ZW4gU2llIGdyw7bDn2VyZSBEYXRlbm1lbmdlbiDDvGJlcnRyYWdlbiB3b2xsZW4sIGJpdHRlbiB3aXIgU2llOg=="><source>Dateien größer 420 MB können nicht ausgewählt werden. Sollten Sie größere Datenmengen übertragen wollen, bitten wir Sie:</source><target>Dateien größer 280 MB können nicht ausgewählt werden. Sollten Sie größere Datenmengen übertragen wollen, bitten wir Sie:</target></trans-unit>
-<trans-unit id="SWhyZSBEYXRlbiBkdXJjaCB6aXBwZW4genUga29tcHJpbWllcmVu"><source>Ihre Daten durch zippen zu komprimieren</source><target>Ihre Daten durch zippen zu komprimieren</target></trans-unit>
-<trans-unit id="SWhyZSBEYXRlbiBtw7ZnbGljaHN0IGF1ZiBtZWhyZXJlIFpJUC1QYWtldGUgYXVmenV0ZWlsZW4="><source>Ihre Daten möglichst auf mehrere ZIP-Pakete aufzuteilen</source><target>Ihre Daten möglichst auf mehrere ZIP-Pakete aufzuteilen</target></trans-unit>
-<trans-unit id="SXN0IGVpbmUgQXVmdGVpbHVuZyBkZXIgRGF0ZW4gYXVmIG1laHJlcmUgWklQLVBha2V0ZSBuaWNodCBtw7ZnbGljaCwgc2luZCB3aXIgSWhuZW4gZGFua2JhciBmw7xyIGRpZSBLb250YWt0YXVmbmFobWUgbWl0IHVuc2VyZW0gUHJvamVrdG1hbmFnZW1lbnQtVGVhbS4gV2lyIHdlcmRlbiBkYW5uIGVpbmUgYW5kZXJlIEzDtnN1bmcgZmluZGVuLg=="><source>Ist eine Aufteilung der Daten auf mehrere ZIP-Pakete nicht möglich, sind wir Ihnen dankbar für die Kontaktaufnahme mit unserem Projektmanagement-Team. Wir werden dann eine andere Lösung finden.</source><target>Ist eine Aufteilung der Daten auf mehrere ZIP-Pakete nicht möglich, sind wir Ihnen dankbar für die Kontaktaufnahme mit unserem Projektmanagement-Team. Wir werden dann eine andere Lösung finden.</target></trans-unit>
-<trans-unit id="QmVpIEFua2xpY2tlbiBkZXMgVGl0ZWxzIGthbm4gZGllc2VzIEZlbnN0ZXIgdmVyc2Nob2JlbiB3ZXJkZW4u"><source>Bei Anklicken des Titels kann dieses Fenster verschoben werden.</source><target>Bei Anklicken des Titels kann dieses Fenster verschoben werden.</target></trans-unit>
-<trans-unit id="QmVhcmJlaXRlbiBkZXIgZWlnZW5lbiBEYXRlbiBpbSBQb3J0YWw="><source>Bearbeiten der eigenen Daten im Portal</source><target>Bearbeiten der eigenen Daten im Portal</target></trans-unit>
-<trans-unit id="RGllIGdlw6RuZGVydGVuIERhdGVuIHNpbmQgQmFzaXMgdW5zZXJlciBrw7xuZnRpZ2VuIEtvbW11bmlrYXRpb24gbWl0IElobmVuIQ=="><source>Die geänderten Daten sind Basis unserer künftigen Kommunikation mit Ihnen!</source><target>Die geänderten Daten sind Basis unserer künftigen Kommunikation mit Ihnen!</target></trans-unit>
-<trans-unit id="U3VjaGUsIEZpbHRlcnVuZyB1bmQgU29ydGllcnVuZyB2b24gQW5nZWJvdGVu"><source>Suche, Filterung und Sortierung von Angeboten</source><target>Suche, Filterung und Sortierung von Angeboten</target></trans-unit>
-<trans-unit id="SmVkZSBTcGFsdGUgZWluZXMgQW5nZWJvdHMga2FubiAiZ2VmaWx0ZXJ0IiB3ZXJkZW4="><source>Jede Spalte eines Angebots kann "gefiltert" werden</source><target>Jede Spalte eines Angebots kann "gefiltert" werden</target></trans-unit>
-<trans-unit id="S2xpY2sgYXVmIGRlbiBQZmVpbCByZWNodHMgaW0gU3BhbHRlbmtvcGY="><source>Klick auf den Pfeil rechts im Spaltenkopf</source><target>Klick auf den Pfeil rechts im Spaltenkopf</target></trans-unit>
-<trans-unit id="QmV3ZWdlbiBkZXIgTWF1cyBhdWYgIkFuZ2Vib3RlIGZpbHRlcm4i"><source>Bewegen der Maus auf "Angebote filtern"</source><target>Bewegen der Maus auf "Angebote filtern"</target></trans-unit>
-<trans-unit id="RWluZ2FiZSBlaW5lcyBmw7xyIGRhcyBBbmdlYm90IHJlbGV2YW50ZW4gU3VjaGtyaXRlcml1bXM="><source>Eingabe eines für das Angebot relevanten Suchkriteriums</source><target>Eingabe eines für das Angebot relevanten Suchkriteriums</target></trans-unit>
-<trans-unit id="RmlsdGVyIGvDtm5uZW4gZsO8ciBiZWxpZWJpZyB2aWVsZSBTcGFsdGVuIGdsZWljaHplaXRpZyBnZXNldHp0IHdlcmRlbg=="><source>Filter können für beliebig viele Spalten gleichzeitig gesetzt werden</source><target>Filter können für beliebig viele Spalten gleichzeitig gesetzt werden</target></trans-unit>
-<trans-unit id="QXVmaGViZW4gZGVyIEZpbHRlcnVuZw=="><source>Aufheben der Filterung</source><target>Aufheben der Filterung</target></trans-unit>
-<trans-unit id="S2xpY2sgYXVmICJGaWx0ZXJ1bmcgYXVmaGViZW4iIGltIEZ1w58gZGVyIEFuZ2Vib3RzdGFiZWxsZQ=="><source>Klick auf "Filterung aufheben" im Fuß der Angebotstabelle</source><target>Klick auf "Filterung aufheben" im Fuß der Angebotstabelle</target></trans-unit>
-<trans-unit id="RGllIEFuZ2Vib3RzdGFiZWxsZSBlbnRow6RsdCBudW4gd2llZGVyIGFsbGUgQW5nZWJvdGU="><source>Die Angebotstabelle enthält nun wieder alle Angebote</source><target>Die Angebotstabelle enthält nun wieder alle Angebote</target></trans-unit>
-<trans-unit id="U29ydGllcnVuZyBkZXIgQW5nZWJvdGU="><source>Sortierung der Angebote</source><target>Sortierung der Angebote</target></trans-unit>
-<trans-unit id="S2xpY2sgYXVmIGRlbiBTcGFsdGVua29wZiBkZXIgQW5nZWJvdHPDvGJlcnNpY2h0IHNvcnRpZXJ0IGRpZSBBbmdlYm90ZSBpbiBhdWZzdGVpZ2VuZGVyIFJlaWhlbmZvbGdlIG5hY2ggZGllc2VyIFNwYWx0ZQ=="><source>Klick auf den Spaltenkopf der Angebotsübersicht sortiert die Angebote in aufsteigender Reihenfolge nach dieser Spalte</source><target>Klick auf den Spaltenkopf der Angebotsübersicht sortiert die Angebote in aufsteigender Reihenfolge nach dieser Spalte</target></trans-unit>
-<trans-unit id="RWluIHdlaXRlcmVyIEtsaWNrIGF1ZiBkZW4gc2VsYmVuIFNwYWx0ZW5rb3BmIMOkbmRlcnQgZGllIFNvcnRpZXJyZWloZW5mb2xnZSBpbiBhYnN0ZWlnZW5kZSBSZWloZW5mb2xnZQ=="><source>Ein weiterer Klick auf den selben Spaltenkopf ändert die Sortierreihenfolge in absteigende Reihenfolge</source><target>Ein weiterer Klick auf den selben Spaltenkopf ändert die Sortierreihenfolge in absteigende Reihenfolge</target></trans-unit>
-<trans-unit id="TmF2aWdhdGlvbiB6dXIgbsOkY2hzdGVuIFRhYmVsbGVuc2VpdGU="><source>Navigation zur nächsten Tabellenseite</source><target>Navigation zur nächsten Tabellenseite</target></trans-unit>
-<trans-unit id="SmVkZSBUYWJlbGxlbnNlaXRlIGVudGjDpGx0IG51ciBlaW5lIGJlZ3Jlbnp0ZSBaYWhsIHZvbiBFaW50csOkZ2VuIC8gWmVpbGVu"><source>Jede Tabellenseite enthält nur eine begrenzte Zahl von Einträgen / Zeilen</source><target>Jede Tabellenseite enthält nur eine begrenzte Zahl von Einträgen / Zeilen</target></trans-unit>
-<trans-unit id="RHVyY2ggZGllIFNlaXRlbm5hdmlnYXRpb24gaW0gRnXDnyBkZXIgQW5nZWJvdHN0YWJlbGxlIGvDtm5uZW4gc2llIHp1IGVpbmVyIHdlaXRlcmVuIFNlaXRlIGRlciBUYWJlbGxlIGdlbGFuZ2Vu"><source>Durch die Seitennavigation im Fuß der Angebotstabelle können sie zu einer weiteren Seite der Tabelle gelangen</source><target>Durch die Seitennavigation im Fuß der Angebotstabelle können sie zu einer weiteren Seite der Tabelle gelangen</target></trans-unit>
-<trans-unit id="RGllIFNlaXRlbm5hdmlnYXRpb24gYmVyw7xja3NpY2h0aWd0IGRpZSBha3R1ZWxsZSBGaWx0ZXJ1bmcsIGQuIGguIMO8YmVyIGRpZSBTZWl0ZW5uYXZpZ2F0aW9uIGvDtm5uZW4gbnVyIFRhYmVsbGVuZWludHLDpGdlIGVycmVpY2h0IHdlcmRlbiwgZGllIG5pY2h0IGFrdHVlbGwgYXVzZ2VmaWx0ZXJ0IHd1cmRlbi4="><source>Die Seitennavigation berücksichtigt die aktuelle Filterung, d. h. über die Seitennavigation können nur Tabelleneinträge erreicht werden, die nicht aktuell ausgefiltert wurden.</source><target>Die Seitennavigation berücksichtigt die aktuelle Filterung, d. h. über die Seitennavigation können nur Tabelleneinträge erreicht werden, die nicht aktuell ausgefiltert wurden.</target></trans-unit>
-<trans-unit id="QXVmcnVmIGRlciBBbmdlYm90c2RldGFpbHMgdW5kIC1wb3NpdGlvbmVu"><source>Aufruf der Angebotsdetails und -positionen</source><target>Aufruf der Angebotsdetails und -positionen</target></trans-unit>
-<trans-unit id="RGVyIEtsaWNrIGF1ZiBlaW4gQW5nZWJvdCDDtmZmbmV0IGVpbiBGZW5zdGVyIG1pdCBkZW4gQW5nZWJvdHNkZXRhaWxzOg=="><source>Der Klick auf ein Angebot öffnet ein Fenster mit den Angebotsdetails:</source><target>Der Klick auf ein Angebot öffnet ein Fenster mit den Angebotsdetails:</target></trans-unit>
-<trans-unit id="UG9zaXRpb25lbiBkZXMgQW5nZWJvdHMgKFN1Y2hlLCBGaWx0ZXJ1bmcgdW5kIFNvcnRpZXJ1bmcgdm9uIFBvc2l0aW9uZW4gYW5hbG9nIGRlciBBbmdlYm90c2ZpbHRlcnVuZyk="><source>Positionen des Angebots (Suche, Filterung und Sortierung von Positionen analog der Angebotsfilterung)</source><target>Positionen des Angebots (Suche, Filterung und Sortierung von Positionen analog der Angebotsfilterung)</target></trans-unit>
-<trans-unit id="QW5nZWJvdHMtSW5zdHJ1a3Rpb25lbg=="><source>Angebots-Instruktionen</source><target>Angebots-Instruktionen</target></trans-unit>
-<trans-unit id="RGVuIERhdGVpZW4gaW0gQW5nZWJvdHN1bWZhbmcgKFN1Y2hlLCBGaWx0ZXJ1bmcgdW5kIFNvcnRpZXJ1bmcgZGVyIERhdGVpZW4gYW5hbG9nIGRlciBBbmdlYm90c2ZpbHRlcnVuZyk="><source>Den Dateien im Angebotsumfang (Suche, Filterung und Sortierung der Dateien analog der Angebotsfilterung)</source><target>Den Dateien im Angebotsumfang (Suche, Filterung und Sortierung der Dateien analog der Angebotsfilterung)</target></trans-unit>
-<trans-unit id="RGVuIGJlcmVpdHMgUmVmZXJlbnpkYXRlaWVuLCBkaWUgZGVtIEFuZ2Vib3QgYmVpZ2Vmw7xndCB3dXJkZW4gKFN1Y2hlLCBGaWx0ZXJ1bmcgdW5kIFNvcnRpZXJ1bmcgZGVyIFJlZmVyZW56ZGF0ZWllbiBhbmFsb2cgZGVyIEFuZ2Vib3RzZmlsdGVydW5nKQ=="><source>Den bereits Referenzdateien, die dem Angebot beigefügt wurden (Suche, Filterung und Sortierung der Referenzdateien analog der Angebotsfilterung)</source><target>Den bereits Referenzdateien, die dem Angebot beigefügt wurden (Suche, Filterung und Sortierung der Referenzdateien analog der Angebotsfilterung)</target></trans-unit>
-<trans-unit id="QXVzd2VydHVuZyB2b24gQW5nZWJvdGVuLCBQb3NpdGlvbmVuLCBEYXRlaWVuIGltIEFuZ2Vib3RzdW1mYW5nIHVuZCBSZWZlcmVuemRhdGVpZW4="><source>Auswertung von Angeboten, Positionen, Dateien im Angebotsumfang und Referenzdateien</source><target>Auswertung von Angeboten, Positionen, Dateien im Angebotsumfang und Referenzdateien</target></trans-unit>
-<trans-unit id="V8OkaGxlbiBTaWUgZGllIEZpbHRlcmtyaXRlcmllbiBlbnRzcHJlY2hlbmQgSWhyZW4gQXVzd2VydHVuZ3Nrcml0ZXJpZW4="><source>Wählen Sie die Filterkriterien entsprechend Ihren Auswertungskriterien</source><target>Wählen Sie die Filterkriterien entsprechend Ihren Auswertungskriterien</target></trans-unit>
-<trans-unit id="SW0gRnXDnyBkZXIgZ2VmaWx0ZXJ0ZW4gVGFiZWxsZSBmaW5kZXQgc2ljaDo="><source>Im Fuß der gefilterten Tabelle findet sich:</source><target>Im Fuß der gefilterten Tabelle findet sich:</target></trans-unit>
-<trans-unit id="RGllIEFuemFobCBkZXIgZsO8ciBJaHJlIEZpbHRlcnVuZyBnZWZ1bmRlbmVuIFplaWxlbiBkaWVzZXIgVGFiZWxsZQ=="><source>Die Anzahl der für Ihre Filterung gefundenen Zeilen dieser Tabelle</source><target>Die Anzahl der für Ihre Filterung gefundenen Zeilen dieser Tabelle</target></trans-unit>
-<trans-unit id="RGllIEdlc2FtdHN1bW1lIGRlciBQcmVpc2UsIHNvZmVybiBkaWUgVGFiZWxsZSBlaW5lIFNwYWx0ZSAiUHJlaXMiIGVudGjDpGx0"><source>Die Gesamtsumme der Preise, sofern die Tabelle eine Spalte "Preis" enthält</source><target>Die Gesamtsumme der Preise, sofern die Tabelle eine Spalte "Preis" enthält</target></trans-unit>
-<trans-unit id="QW56ZWlnZSBkZXIgenUgZWluZW0gU3ByYWNoa8O8cnplbCBnZWjDtnJlbmRlbiBTcHJhY2hl"><source>Anzeige der zu einem Sprachkürzel gehörenden Sprache</source><target>Anzeige der zu einem Sprachkürzel gehörenden Sprache</target></trans-unit>
-<trans-unit id="U29iYWxkIGRlciBNYXVzemVpZ2VyIMO8YmVyIGVpbiBTcHJhY2hrw7xyemVsIGluIGRlciBUYWJlbGxlIGJld2VndCB3aXJkLCBlcnNjaGVpbnQgZWluIFRvb2x0aXAgbWl0IGRlciB6dWdlaMO2cmlnZW4gU3ByYWNoZQ=="><source>Sobald der Mauszeiger über ein Sprachkürzel in der Tabelle bewegt wird, erscheint ein Tooltip mit der zugehörigen Sprache</source><target>Sobald der Mauszeiger über ein Sprachkürzel in der Tabelle bewegt wird, erscheint ein Tooltip mit der zugehörigen Sprache</target></trans-unit>
-<trans-unit id="S29uZmlndXJhdGlvbiBJaHJlciBTdGFydHNlaXRl"><source>Konfiguration Ihrer Startseite</source><target>Konfiguration Ihrer Startseite</target></trans-unit>
-<trans-unit id="RGVyIEluaGFsdCBkaWVzZXIgU2VpdGUgaXN0IHVudGVyIGRlbSBNZW7DvHB1bmt0ICJQcm9maWwgw6RuZGVybiIgZnJlaSBrb25maWd1cmllcmJhci4gSW4gZGVyIGluaXRpYWxlbiBFaW5zdGVsbHVuZyB3aXJkIGRpZSBQcm9qZWt0w7xiZXJzaWNodCBnZXplaWd0Lg=="><source>Der Inhalt dieser Seite ist unter dem Menüpunkt "Profil ändern" frei konfigurierbar. In der initialen Einstellung wird die Projektübersicht gezeigt.</source><target>Der Inhalt dieser Seite ist unter dem Menüpunkt "Profil ändern" frei konfigurierbar. In der initialen Einstellung wird die Projektübersicht gezeigt.</target></trans-unit>
-<trans-unit id="SGlzdG9yaWUgZGVyIEt1bmRlbmFrdGlvbmVu"><source>Historie der Kundenaktionen</source><target>Historie der Kundenaktionen</target></trans-unit>
-<trans-unit id="TGlzdGV0IGFsbGUgdm9uIEt1bmRlbiBkdXJjaGdlZsO8aHJ0ZW4gQWt0aW9uZW4u"><source>Listet alle von Kunden durchgeführten Aktionen.</source><target>Listet alle von Kunden durchgeführten Aktionen.</target></trans-unit>
-<trans-unit id="U3VjaGUsIEZpbHRlcnVuZyB1bmQgU29ydGllcnVuZyBkZXIgSGlzdG9yaWU="><source>Suche, Filterung und Sortierung der Historie</source><target>Suche, Filterung und Sortierung der Historie</target></trans-unit>
-<trans-unit id="SmVkZSBTcGFsdGUga2FubiAiZ2VmaWx0ZXJ0IiB3ZXJkZW4="><source>Jede Spalte kann "gefiltert" werden</source><target>Jede Spalte kann "gefiltert" werden</target></trans-unit>
-<trans-unit id="QmV3ZWdlbiBkZXIgTWF1cyBhdWYgIkhpc3RvcmllIGZpbHRlcm4i"><source>Bewegen der Maus auf "Historie filtern"</source><target>Bewegen der Maus auf "Historie filtern"</target></trans-unit>
-<trans-unit id="RWluZ2FiZSBlaW5lcyBmw7xyIGRpZSBIaXN0b3JpZSByZWxldmFudGVuIFN1Y2hrcml0ZXJpdW1z"><source>Eingabe eines für die Historie relevanten Suchkriteriums</source><target>Eingabe eines für die Historie relevanten Suchkriteriums</target></trans-unit>
-<trans-unit id="S2xpY2sgYXVmICJGaWx0ZXJ1bmcgYXVmaGViZW4iIGltIEZ1w58gZGVyIFRhYmVsbGU="><source>Klick auf "Filterung aufheben" im Fuß der Tabelle</source><target>Klick auf "Filterung aufheben" im Fuß der Tabelle</target></trans-unit>
-<trans-unit id="RGllIFRhYmVsbGUgZW50aMOkbHQgbnVuIHdpZWRlciBhbGxlIEVpbnRyw6RnZSBkZXIgSGlzdG9yaWU="><source>Die Tabelle enthält nun wieder alle Einträge der Historie</source><target>Die Tabelle enthält nun wieder alle Einträge der Historie</target></trans-unit>
-<trans-unit id="U29ydGllcnVuZyBkZXIgSGlzdG9yaWU="><source>Sortierung der Historie</source><target>Sortierung der Historie</target></trans-unit>
-<trans-unit id="S2xpY2sgYXVmIGRlbiBTcGFsdGVua29wZiBkZXIgSGlzdG9yaWUgc29ydGllcnQgZGllIEt1bmRlbmFrdGlvbmVuIGluIGF1ZnN0ZWlnZW5kZXIgUmVpaGVuZm9sZ2UgbmFjaCBkaWVzZXIgU3BhbHRl"><source>Klick auf den Spaltenkopf der Historie sortiert die Kundenaktionen in aufsteigender Reihenfolge nach dieser Spalte</source><target>Klick auf den Spaltenkopf der Historie sortiert die Kundenaktionen in aufsteigender Reihenfolge nach dieser Spalte</target></trans-unit>
-<trans-unit id="RHVyY2ggZGllIFNlaXRlbm5hdmlnYXRpb24gaW0gRnXDnyBkZXIgSGlzdG9yaWVudGFiZWxsZSBrw7ZubmVuIHNpZSB6dSBlaW5lciB3ZWl0ZXJlbiBTZWl0ZSBkZXIgVGFiZWxsZSBnZWxhbmdlbg=="><source>Durch die Seitennavigation im Fuß der Historientabelle können sie zu einer weiteren Seite der Tabelle gelangen</source><target>Durch die Seitennavigation im Fuß der Historientabelle können sie zu einer weiteren Seite der Tabelle gelangen</target></trans-unit>
-<trans-unit id="U2llIGRlZmluaWVyZW4sIHdlbGNoZSBPcHRpb25lbiBhdWYgZGVyIFN0YXJ0c2VpdGUgYW5nZXplaWd0IHdlcmRlbjo="><source>Sie definieren, welche Optionen auf der Startseite angezeigt werden:</source><target>Sie definieren, welche Optionen auf der Startseite angezeigt werden:</target></trans-unit>
-<trans-unit id="QWxsZSBhbmdlaGFrdGVuIE9wdGlvbmVuIHdlcmRlbiBhbmdlemVpZ3Q="><source>Alle angehakten Optionen werden angezeigt</source><target>Alle angehakten Optionen werden angezeigt</target></trans-unit>
-<trans-unit id="RGllIFJlaWhlbmZvbGdlIGF1ZiBkZXIgU3RhcnRzZWl0ZSBlbnRzcHJpY2h0IGRlciBSZWloZW5mb2xnZSBhdWYgZGllc2VyIFNlaXRl"><source>Die Reihenfolge auf der Startseite entspricht der Reihenfolge auf dieser Seite</source><target>Die Reihenfolge auf der Startseite entspricht der Reihenfolge auf dieser Seite</target></trans-unit>
-<trans-unit id="U3VjaGUsIEZpbHRlcnVuZyB1bmQgU29ydGllcnVuZyB2b24gUHJvamVrdGVu"><source>Suche, Filterung und Sortierung von Projekten</source><target>Suche, Filterung und Sortierung von Projekten</target></trans-unit>
-<trans-unit id="SmVkZSBTcGFsdGUgZWluZXMgUHJvamVrdHMga2FubiAiZ2VmaWx0ZXJ0IiB3ZXJkZW4="><source>Jede Spalte eines Projekts kann "gefiltert" werden</source><target>Jede Spalte eines Projekts kann "gefiltert" werden</target></trans-unit>
-<trans-unit id="QmV3ZWdlbiBkZXIgTWF1cyBhdWYgIlByb2pla3RlIGZpbHRlcm4i"><source>Bewegen der Maus auf "Projekte filtern"</source><target>Bewegen der Maus auf "Projekte filtern"</target></trans-unit>
-<trans-unit id="RWluZ2FiZSBlaW5lcyBmw7xyIGRhcyBQcm9qZWt0IHJlbGV2YW50ZW4gU3VjaGtyaXRlcml1bXM="><source>Eingabe eines für das Projekt relevanten Suchkriteriums</source><target>Eingabe eines für das Projekt relevanten Suchkriteriums</target></trans-unit>
-<trans-unit id="S2xpY2sgYXVmICJGaWx0ZXJ1bmcgYXVmaGViZW4iIGltIEZ1w58gZGVyIFByb2pla3R0YWJlbGxl"><source>Klick auf "Filterung aufheben" im Fuß der Projekttabelle</source><target>Klick auf "Filterung aufheben" im Fuß der Projekttabelle</target></trans-unit>
-<trans-unit id="RGllIFByb2pla3R0YWJlbGxlIGVudGjDpGx0IG51biB3aWVkZXIgYWxsZSBQcm9qZWt0ZQ=="><source>Die Projekttabelle enthält nun wieder alle Projekte</source><target>Die Projekttabelle enthält nun wieder alle Projekte</target></trans-unit>
-<trans-unit id="U29ydGllcnVuZyBkZXIgUHJvamVrdGU="><source>Sortierung der Projekte</source><target>Sortierung der Projekte</target></trans-unit>
-<trans-unit id="S2xpY2sgYXVmIGRlbiBTcGFsdGVua29wZiBkZXIgUHJvamVrdMO8YmVyc2ljaHQgc29ydGllcnQgZGllIFByb2pla3RlIGluIGF1ZnN0ZWlnZW5kZXIgUmVpaGVuZm9sZ2UgbmFjaCBkaWVzZXIgU3BhbHRl"><source>Klick auf den Spaltenkopf der Projektübersicht sortiert die Projekte in aufsteigender Reihenfolge nach dieser Spalte</source><target>Klick auf den Spaltenkopf der Projektübersicht sortiert die Projekte in aufsteigender Reihenfolge nach dieser Spalte</target></trans-unit>
-<trans-unit id="RHVyY2ggZGllIFNlaXRlbm5hdmlnYXRpb24gaW0gRnXDnyBkZXIgUHJvamVrdHRhYmVsbGUga8O2bm5lbiBzaWUgenUgZWluZXIgd2VpdGVyZW4gU2VpdGUgZGVyIFRhYmVsbGUgZ2VsYW5nZW4="><source>Durch die Seitennavigation im Fuß der Projekttabelle können sie zu einer weiteren Seite der Tabelle gelangen</source><target>Durch die Seitennavigation im Fuß der Projekttabelle können sie zu einer weiteren Seite der Tabelle gelangen</target></trans-unit>
-<trans-unit id="QXVmcnVmIGRlciBQcm9qZWt0ZGV0YWlscyB1bmQgLXBvc2l0aW9uZW4="><source>Aufruf der Projektdetails und -positionen</source><target>Aufruf der Projektdetails und -positionen</target></trans-unit>
-<trans-unit id="RGVyIEtsaWNrIGF1ZiBlaW4gUHJvamVrdCDDtmZmbmV0IGVpbiBGZW5zdGVyIG1pdCBkZW4gUHJvamVrdGRldGFpbHM6"><source>Der Klick auf ein Projekt öffnet ein Fenster mit den Projektdetails:</source><target>Der Klick auf ein Projekt öffnet ein Fenster mit den Projektdetails:</target></trans-unit>
-<trans-unit id="UG9zaXRpb25lbiBkZXMgUHJvamVrdHMgKFN1Y2hlLCBGaWx0ZXJ1bmcgdW5kIFNvcnRpZXJ1bmcgdm9uIFBvc2l0aW9uZW4gYW5hbG9nIGRlciBQcm9qZWt0ZSk="><source>Positionen des Projekts (Suche, Filterung und Sortierung von Positionen analog der Projekte)</source><target>Positionen des Projekts (Suche, Filterung und Sortierung von Positionen analog der Projekte)</target></trans-unit>
-<trans-unit id="UHJvamVrdC1JbnN0cnVrdGlvbmVu"><source>Projekt-Instruktionen</source><target>Projekt-Instruktionen</target></trans-unit>
-<trans-unit id="RGVyIE3DtmdsaWNoa2VpdCB6dXIgQmVhcmJlaXR1bmcgZGVzIFByb2pla3Rz"><source>Der Möglichkeit zur Bearbeitung des Projekts</source><target>Der Möglichkeit zur Bearbeitung des Projekts</target></trans-unit>
-<trans-unit id="RGVuIGJlcmVpdHMgw7xiZXJzZXR6dGVuIERhdGVpZW4gaW0gUHJvamVrdCAoU3VjaGUsIEZpbHRlcnVuZyB1bmQgU29ydGllcnVuZyBkZXIgw7xiZXJzZXR6dGVuIERhdGVpZW4gYW5hbG9nIGRlciBQcm9qZWt0ZSk="><source>Den bereits übersetzten Dateien im Projekt (Suche, Filterung und Sortierung der übersetzten Dateien analog der Projekte)</source><target>Den bereits übersetzten Dateien im Projekt (Suche, Filterung und Sortierung der übersetzten Dateien analog der Projekte)</target></trans-unit>
-<trans-unit id="RGVuIGJlcmVpdHMgUmVmZXJlbnpkYXRlaWVuLCBkaWUgZGVtIFByb2pla3QgYmVpIGRlciBCZWF1ZnRyYWd1bmcgb2RlciBzcMOkdGVyIGJlaWdlZsO8Z3Qgd3VyZGVuIChTdWNoZSwgRmlsdGVydW5nIHVuZCBTb3J0aWVydW5nIGRlciBSZWZlcmVuemRhdGVpZW4gYW5hbG9nIGRlciBQcm9qZWt0ZSk="><source>Den bereits Referenzdateien, die dem Projekt bei der Beauftragung oder später beigefügt wurden (Suche, Filterung und Sortierung der Referenzdateien analog der Projekte)</source><target>Den bereits Referenzdateien, die dem Projekt bei der Beauftragung oder später beigefügt wurden (Suche, Filterung und Sortierung der Referenzdateien analog der Projekte)</target></trans-unit>
-<trans-unit id="RG93bmxvYWQgw7xiZXJzZXR6dGVyIERhdGVpZW4="><source>Download übersetzter Dateien</source><target>Download übersetzter Dateien</target></trans-unit>
-<trans-unit id="S2xpY2sgYXVmIGRhcyByZWxldmFudGUgUHJvamVrdCAtIGVzIMO2ZmZuZXQgc2ljaCBlaW4gRmVuc3RlciBtaXQgZGVuIFByb2pla3RkZXRhaWxz"><source>Klick auf das relevante Projekt - es öffnet sich ein Fenster mit den Projektdetails</source><target>Klick auf das relevante Projekt - es öffnet sich ein Fenster mit den Projektdetails</target></trans-unit>
-<trans-unit id="S2xpY2sgYXVmICLDnGJlcnNldHp0ZSBEYXRlaWVuIg=="><source>Klick auf "Übersetzte Dateien"</source><target>Klick auf "Übersetzte Dateien"</target></trans-unit>
-<trans-unit id="S2xpY2sgYXVmIGRpZSBnZXfDvG5zY2h0ZSBEYXRlaSBvZGVyIGRhcyBQYWtldCBtaXQgYWxsZW4gw7xiZXJzZXR6dGVuIERhdGVpZW4gKHNvZmVybiBiZXJlaXRzIHZvcmhhbmRlbik="><source>Klick auf die gewünschte Datei oder das Paket mit allen übersetzten Dateien (sofern bereits vorhanden)</source><target>Klick auf die gewünschte Datei oder das Paket mit allen übersetzten Dateien (sofern bereits vorhanden)</target></trans-unit>
-<trans-unit id="RG93bmxvYWQgZWluZXIgUmVjaG51bmc="><source>Download einer Rechnung</source><target>Download einer Rechnung</target></trans-unit>
-<trans-unit id="S2xpY2sgYXVmIGRpZSBSZWNobnVuZ3NudW1tZXIgZGVzIHJlbGV2YW50ZW4gUHJvamVrdHM="><source>Klick auf die Rechnungsnummer des relevanten Projekts</source><target>Klick auf die Rechnungsnummer des relevanten Projekts</target></trans-unit>
-<trans-unit id="UHJvamVrdCBiZWFyYmVpdGVu"><source>Projekt bearbeiten</source><target>Projekt bearbeiten</target></trans-unit>
-<trans-unit id="S2xpY2sgYXVmICJQcm9qZWt0IGJlYXJiZWl0ZW4i"><source>Klick auf "Projekt bearbeiten"</source><target>Klick auf "Projekt bearbeiten"</target></trans-unit>
-<trans-unit id="RGV0YWlsbGllcnRlICJJbmZvcm1hdGlvbmVuIHp1ciBCZWRpZW51bmciIGZpbmRlbiBzaWNoIGRvcnQ="><source>Detaillierte "Informationen zur Bedienung" finden sich dort</source><target>Detaillierte "Informationen zur Bedienung" finden sich dort</target></trans-unit>
-<trans-unit id="QXVzd2VydHVuZyB2b24gUHJvamVrdGVuLCBQb3NpdGlvbmVuLCDDnGJlcnNldHp0ZW4gRGF0ZWllbiB1bmQgUmVmZXJlbnpkYXRlaWVu"><source>Auswertung von Projekten, Positionen, Übersetzten Dateien und Referenzdateien</source><target>Auswertung von Projekten, Positionen, Übersetzten Dateien und Referenzdateien</target></trans-unit>
-<trans-unit id="w4RuZGVydW5nIGRlciBTdGFtbWRhdGVuIElocmVzIFVudGVybmVobWVucw=="><source>Änderung der Stammdaten Ihres Unternehmens</source><target>Änderung der Stammdaten Ihres Unternehmens</target></trans-unit>
-<trans-unit id="RGllIMOEbmRlcnVuZyBkZXIgU3RhbW1kYXRlbiB3aXJkIGFscyBCYXNpcyBmw7xyIHVuc2VyZSBLb21tdW5pa2F0aW9uIG1pdCBJaHJlbSBVbnRlcm5laG1lbiDDvGJlcm5vbW1lbg=="><source>Die Änderung der Stammdaten wird als Basis für unsere Kommunikation mit Ihrem Unternehmen übernommen</source><target>Die Änderung der Stammdaten wird als Basis für unsere Kommunikation mit Ihrem Unternehmen übernommen</target></trans-unit>
-<trans-unit id="RHVyY2ggZGFzIExhZGVuIGRlciBLdW5kZW4tIHVuZCBNaXRhcmJlaXRlcmRhdGVuIHZvbSBVbnRlcm5laG1lbnNzZXJ2ZXIgd2VyZGVu"><source>Durch das Laden der Kunden- und Mitarbeiterdaten vom Unternehmensserver werden</source><target>Durch das Laden der Kunden- und Mitarbeiterdaten vom Unternehmensserver werden</target></trans-unit>
-<trans-unit id="bmV1ZSBLdW5kZW4gdW5kIE1pdGFyYmVpdGVyIGRlbSBQb3J0YWwgaGluenVnZWbDvGd0"><source>neue Kunden und Mitarbeiter dem Portal hinzugefügt</source><target>neue Kunden und Mitarbeiter dem Portal hinzugefügt</target></trans-unit>
-<trans-unit id="S3VuZGVuIHVuZCBNaXRhcmJlaXRlciBlbnRzcHJlY2hlbmQgSWhyZXIgU3RhdGkgYXVmIGRlbSBVbnRlcm5laG1lbnNzZXJ2ZXIgaW0gUG9ydGFsIGFrdGl2aWVydCBvZGVyIGRlYWt0aXZpZXJ0"><source>Kunden und Mitarbeiter entsprechend Ihrer Stati auf dem Unternehmensserver im Portal aktiviert oder deaktiviert</source><target>Kunden und Mitarbeiter entsprechend Ihrer Stati auf dem Unternehmensserver im Portal aktiviert oder deaktiviert</target></trans-unit>
-<trans-unit id="V2VpdGVyZSBaZWl0cHVua3RlIGRlciBEYXRlbmFrdHVhbGlzaWVydW5nIGltIFBvcnRhbA=="><source>Weitere Zeitpunkte der Datenaktualisierung im Portal</source><target>Weitere Zeitpunkte der Datenaktualisierung im Portal</target></trans-unit>
-<trans-unit id="RGllIEt1bmRlbi0gdW5kIE1pdGFyYmVpdGVyZGF0ZW4gd2VyZGVuIGF1dG9tYXRpc2NoIGplZGUgTmFjaHQgdm9tIFVudGVybmVobWVuc3NlcnZlciBnZWxhZGVuLiBFaW5lIE5vdHdlbmRpZ2tlaXQgenVyIG1hbnVlbGxlbiBBdXNmw7xocnVuZyBkdXJjaCBkaWVzZSBTZWl0ZSBiZXN0ZWh0IG51ciwgd2VubiBlaW5lIGjDtmhlcmUgQWt0dWFsaXTDpHQgZGVyIERhdGVuIGdlZm9yZGVydCBpc3Qu"><source>Die Kunden- und Mitarbeiterdaten werden automatisch jede Nacht vom Unternehmensserver geladen. Eine Notwendigkeit zur manuellen Ausführung durch diese Seite besteht nur, wenn eine höhere Aktualität der Daten gefordert ist.</source><target>Die Kunden- und Mitarbeiterdaten werden automatisch jede Nacht vom Unternehmensserver geladen. Eine Notwendigkeit zur manuellen Ausführung durch diese Seite besteht nur, wenn eine höhere Aktualität der Daten gefordert ist.</target></trans-unit>
-<trans-unit id="S3VuZGVuLSB1bmQgTWl0YXJiZWl0ZXJkYXRlbiBlaW5lcyBiZXN0aW1tdGVuIFVudGVybmVobWVucyB3ZXJkZW4gYWt0dWFsaXNpZXJ0LCB3ZW5uIHNpY2ggZWluIE1pdGFyYmVpdGVyIGRpZXNlcyBVbnRlcm5laG1lbnMgZWlubG9nZ3Qu"><source>Kunden- und Mitarbeiterdaten eines bestimmten Unternehmens werden aktualisiert, wenn sich ein Mitarbeiter dieses Unternehmens einloggt.</source><target>Kunden- und Mitarbeiterdaten eines bestimmten Unternehmens werden aktualisiert, wenn sich ein Mitarbeiter dieses Unternehmens einloggt.</target></trans-unit>
-<trans-unit id="WmVpdGRhdWVyIGRlcyBMYWRlbnM="><source>Zeitdauer des Ladens</source><target>Zeitdauer des Ladens</target></trans-unit>
-<trans-unit id="RGFzIExhZGVuIGthbm4gZWluaWdlIFplaXQgaW4gQW5zcHJ1Y2ggbmVobWVu"><source>Das Laden kann einige Zeit in Anspruch nehmen</source><target>Das Laden kann einige Zeit in Anspruch nehmen</target></trans-unit>
-<trans-unit id="U3VjaGVyZ2Vibmlzc2U="><source>Suchergebnisse</source><target>Suchergebnisse</target></trans-unit>
-<trans-unit id="R2VmdW5kZW5lIFByb2pla3Rl"><source>Gefundene Projekte</source><target>Gefundene Projekte</target></trans-unit>
-<trans-unit id="RXMgd3VyZGVuIGtlaW5lIFByb2pla3RlIGdlZnVuZGVu"><source>Es wurden keine Projekte gefunden</source><target>Es wurden keine Projekte gefunden</target></trans-unit>
-<trans-unit id="R2VmdW5kZW5lIEFuZ2Vib3Rl"><source>Gefundene Angebote</source><target>Gefundene Angebote</target></trans-unit>
-<trans-unit id="RXMgd3VyZGVuIGtlaW5lIEFuZ2Vib3RlIGdlZnVuZGVu"><source>Es wurden keine Angebote gefunden</source><target>Es wurden keine Angebote gefunden</target></trans-unit>
-<trans-unit id="Qml0dGUgZXJuZXVlcm4gU2llIElocmUgU3VjaGFiZnJhZ2Uu"><source>Bitte erneuern Sie Ihre Suchabfrage.</source><target>Bitte erneuern Sie Ihre Suchabfrage.</target></trans-unit>
-<trans-unit id="WmllbHNwcmFjaGVu"><source>Zielsprachen</source><target>Zielsprachen</target></trans-unit>
-<trans-unit id="RGllc2VzIEZlbGQgZGFyZiBuaWNodCBsZWVyIHNlaW4="><source>Dieses Feld darf nicht leer sein</source><target>Dieses Feld darf nicht leer sein</target></trans-unit>
-<trans-unit id="V8OkaGxiYXI="><source>Wählbar</source><target>Wählbar</target></trans-unit>
-<trans-unit id="QXVzZ2V3w6RobHQ="><source>Ausgewählt</source><target>Ausgewählt</target></trans-unit>
-<trans-unit id="QWxsZSBsw7ZzY2hlbg=="><source>Alle löschen</source><target>Alle löschen</target></trans-unit>
-<trans-unit id="RmVobGVyIGJlaW0gVXBsb2Fk"><source>Fehler beim Upload</source><target>Fehler beim Upload</target></trans-unit>
-<trans-unit id="RXZlbnR1ZWxsIGlzdCBzaW5kIGRpZSBTaWNoZXJoZWl0c2NvZGVzIGRlcyBGb3JtdWxhcnMgbmljaHQgbWVociBnw7xsdGlnLiBCaXR0ZSBsYWRlbiBTaWUgei4gQi4gZHVyY2ggRHLDvGNrZW4gZGVyIFRhc3RlIEY1IGRhcyBGb3JtdWxhciBuZXUsIHfDpGhsZW4gU2llIGRhbm4gSWhyZSBEYXRlaWVuIG5ldSBhdXMgdW5kIGxhZGVuIGRhbm4gSWhyZSBEYXRlaWVuIGhvY2guIFNvbGx0ZW4gU2llIGRhbmFjaCBkaWUgZ2xlaWNoZSBGZWhsZXJtZWxkdW5nIGVyaGFsdGVuLCBzaW5kIHdpciBJaG5lbiBmw7xyIGVpbmUgTWVsZHVuZyBhbiB1bnNlciBQcm9qZWt0bWFuYWdlbWVudC1UZWFtIHNlaHIgZGFua2Jhci48YnIgLz48YnIgLz5WaWVsZW4gRGFuayE="><source>Eventuell ist sind die Sicherheitscodes des Formulars nicht mehr gültig. Bitte laden Sie z. B. durch Drücken der Taste F5 das Formular neu, wählen Sie dann Ihre Dateien neu aus und laden dann Ihre Dateien hoch. Sollten Sie danach die gleiche Fehlermeldung erhalten, sind wir Ihnen für eine Meldung an unser Projektmanagement-Team sehr dankbar.<br /><br />Vielen Dank!</source><target>Eventuell ist sind die Sicherheitscodes des Formulars nicht mehr gültig. Bitte laden Sie z. B. durch Drücken der Taste F5 das Formular neu, wählen Sie dann Ihre Dateien neu aus und laden dann Ihre Dateien hoch. Sollten Sie danach die gleiche Fehlermeldung erhalten, bitten wir Sie sich im Portal erneut anzumelden. Für eine Meldung an unser Projektmanagement-Team sind wir Ihnen sehr dankbar.<br /><br />Vielen Dank!</target></trans-unit>
-<trans-unit id="RGF0ZWllbiBhdXRvbWF0aXNjaCBob2NobGFkZW4/"><source>Dateien automatisch hochladen?</source><target>Dateien automatisch hochladen?</target></trans-unit>
-<trans-unit id="RWluaWdlIERhdGVpZW4gd3VyZGVuIG5vY2ggbmljaHQgaG9jaGdlbGFkZW4uIFNvbGwgZGllcyBudW4gYXV0b21hdGlzY2ggZXJmb2xnZW4/IDxiciAvPldlbm4gU2llIGRpZSBEYXRlaWVuIG5pY2h0IGhvY2hsYWRlbiwga2FubiBkYXMgRm9ybXVsYXIgbm9jaCBuaWNodCB2ZXJzZW5kZXQgd2VyZGVuLg=="><source>Einige Dateien wurden noch nicht hochgeladen. Soll dies nun automatisch erfolgen? <br />Wenn Sie die Dateien nicht hochladen, kann das Formular noch nicht versendet werden.</source><target>Einige Dateien wurden noch nicht hochgeladen. Soll dies nun automatisch erfolgen? <br/>Wenn Sie die Dateien nicht hochladen, kann das Formular noch nicht versendet werden.</target></trans-unit>
-<trans-unit id="RGllIGF1c3N0ZWhlbmRlbiBEYXRlaWVuIHdlcmRlbiBob2NoZ2VsYWRlbi4="><source>Die ausstehenden Dateien werden hochgeladen.</source><target>Die ausstehenden Dateien werden hochgeladen.</target></trans-unit>
-<trans-unit id="RGF0ZWllbiB3ZXJkZW4gaG9jaGdlbGFkZW4="><source>Dateien werden hochgeladen</source><target>Dateien werden hochgeladen</target></trans-unit>
-<trans-unit id="RGllIGVpbmdldHJhZ2VuZW4gV2VydGUgd3VyZGVuIG5vY2ggbmljaHQgZ2VzcGVpY2hlcnQu"><source>Die eingetragenen Werte wurden noch nicht gespeichert.</source><target>Die eingetragenen Werte wurden noch nicht gespeichert.</target></trans-unit>
-<trans-unit id="WnUgw7xiZXJzZXR6ZW5kZSBEYXRlaWVuIGhvY2hsYWRlbg=="><source>Zu übersetzende Dateien hochladen</source><target>Zu übersetzende Dateien hochladen</target></trans-unit>
-<trans-unit id="QWJicmVjaGVu"><source>Abbrechen</source><target>Abbrechen</target></trans-unit>
-<trans-unit id="Qml0dGUgZWluZSBEYXRlaSB6dW0gQWJicnVjaCBhdXN3w6RobGVuIQ=="><source>Bitte eine Datei zum Abbruch auswählen!</source><target>Bitte eine Datei zum Abbruch auswählen!</target></trans-unit>
-<trans-unit id="QWxsZSBBYmJyZWNoZW4="><source>Alle Abbrechen</source><target>Alle Abbrechen</target></trans-unit>
-<trans-unit id="RW50ZmVybmVu"><source>Entfernen</source><target>Entfernen</target></trans-unit>
-<trans-unit id="Qml0dGUgZWluZSBEYXRlaSB6dW0gRW50ZmVybmVuIGF1c3fDpGhsZW4h"><source>Bitte eine Datei zum Entfernen auswählen!</source><target>Bitte eine Datei zum Entfernen auswählen!</target></trans-unit>
-<trans-unit id="QWxsZSBFbnRmZXJuZW4="><source>Alle Entfernen</source><target>Alle Entfernen</target></trans-unit>
-<trans-unit id="V2FydGVu"><source>Warten</source><target>Warten</target></trans-unit>
-<trans-unit id="U2VuZGVu"><source>Senden</source><target>Senden</target></trans-unit>
-<trans-unit id="RmVobGVy"><source>Fehler</source><target>Fehler</target></trans-unit>
-<trans-unit id="QWJnZWJyb2NoZW4="><source>Abgebrochen</source><target>Abgebrochen</target></trans-unit>
-<trans-unit id="SG9jaGdlbGFkZW4="><source>Hochgeladen</source><target>Hochgeladen</target></trans-unit>
-<trans-unit id="WnUgw7xiZXJzZXR6ZW5kZSBEYXRlaWVuIGF1c3fDpGhsZW4="><source>Zu übersetzende Dateien auswählen</source><target>Zu übersetzende Dateien auswählen</target></trans-unit>
-<trans-unit id="QXVzd8OkaGxlbg=="><source>Auswählen</source><target>Auswählen</target></trans-unit>
-<trans-unit id="RGF0ZWkgYmVyZWl0cyB2b3JoYW5kZW4="><source>Datei bereits vorhanden</source><target>Datei bereits vorhanden</target></trans-unit>
-<trans-unit id="RWluZSBEYXRlaSBkaWVzZXMgTmFtZW5zIGlzdCBiZXJlaXRzIGF1c2dld8OkaGx0IHdvcmRlbi4gRWluZSB3ZWl0ZXJlIERhdGVpIGdsZWljaGVuIE5hbWVucyBrYW5uIGRhaGVyIG5pY2h0IGhpbnp1Z2Vmw7xndCB3ZXJkZW4u"><source>Eine Datei dieses Namens ist bereits ausgewählt worden. Eine weitere Datei gleichen Namens kann daher nicht hinzugefügt werden.</source><target>Eine Datei dieses Namens ist bereits ausgewählt worden. Eine weitere Datei gleichen Namens kann daher nicht hinzugefügt werden.</target></trans-unit>
-<trans-unit id="SW52YWxpZGUgSlNPTi1BbnR3b3J0IHZvbSBTZXJ2ZXI="><source>Invalide JSON-Antwort vom Server</source><target>Invalide JSON-Antwort vom Server</target></trans-unit>
-<trans-unit id="RGF0ZWlzcGV6aWZpc2NoZSBGZWxkZXI="><source>Dateispezifische Felder</source><target>Dateispezifische Felder</target></trans-unit>
-<trans-unit id="UXVlbGxzcHJhY2hl"><source>Quellsprache</source><target>Quellsprache</target></trans-unit>
-<trans-unit id="LS0gQml0dGUgYXVzd8OkaGxlbiAtLQ=="><source>-- Bitte auswählen --</source><target>-- Bitte auswählen --</target></trans-unit>
-<trans-unit id="RsO8ciBkaWVzZSBEYXRlaSBEVFAgZHVyY2hmw7xocmVu"><source>Für diese Datei DTP durchführen</source><target>Für diese Datei DTP durchführen</target></trans-unit>
-<trans-unit id="RFRQIFF1YWxpdMOkdA=="><source>DTP Qualität</source><target>DTP Qualität</target></trans-unit>
-<trans-unit id="TGVzYmFy"><source>Lesbar</source><target>Grob-Layout</target></trans-unit>
-<trans-unit id="UGVyZmVrdA=="><source>Perfekt</source><target>Komplettes Fremdsprachen-Layout</target></trans-unit>
-<trans-unit id="RXJsw6R1dGVydW5nZW4genVyIERhdGVp"><source>Erläuterungen zur Datei</source><target>Erläuterungen zur Datei</target></trans-unit>
-<trans-unit id="Qml0dGUgZsO8bGxlbiBTaWUgenVzw6R0emxpY2ggZGllIHJvdCB1bXJhbmRldGVuIEZlbGRlciBhdXMu"><source>Bitte füllen Sie zusätzlich die rot umrandeten Felder aus.</source><target>Bitte füllen Sie zusätzlich die rot umrandeten Felder aus.</target></trans-unit>
-<trans-unit id="Qml0dGUgZsO8bGxlbiBTaWUgbWluZGVzdGVucyBlaW4gRm9ybXVsYXJmZWxkIGF1cyBvZGVyIGxhZGVuIFNpZSBtaW5kZXN0ZW5zIGVpbmUgRGF0ZWkgaG9jaC4="><source>Bitte füllen Sie mindestens ein Formularfeld aus oder laden Sie mindestens eine Datei hoch.</source><target>Bitte füllen Sie mindestens ein Formularfeld aus oder laden Sie mindestens eine Datei hoch.</target></trans-unit>
-<trans-unit id="Qml0dGUgZsO8bGxlbiBTaWUgbWluZGVzdGVucyBlaW4gRm9ybXVsYXJmZWxkIGF1cy4="><source>Bitte füllen Sie mindestens ein Formularfeld aus.</source><target>Bitte füllen Sie mindestens ein Formularfeld aus.</target></trans-unit>
-<trans-unit id="RGF0ZWllaW5zdGVsbHVuZ2VuIMO8YmVybmVobWVu"><source>Dateieinstellungen übernehmen</source><target>Dateieinstellungen übernehmen</target></trans-unit>
-<trans-unit id="RsO8ciBhbGxlIGRhdGVpc3BlemlmaXNjaGVuIEZlbGRlcg=="><source>Für alle dateispezifischen Felder</source><target>Für alle dateispezifischen Felder</target></trans-unit>
-<trans-unit id="SGlud2Vpcw=="><source>Hinweis</source><target>Hinweis</target></trans-unit>
-<trans-unit id="RGllIEZlbGRlciBmw7xyIFF1ZWxsc3ByYWNoZSwgWmllbHNwcmFjaGVuLCBEVFAsIERUUC1RdWFsaXTDpHQgdW5kIGRpZSBFcmzDpHV0ZXJ1bmdlbiB6dXIgRGF0ZWkgd3VyZGVuIGbDvHIgYWxsZSBiZXJlaXRzIGF1c2dld8OkaGx0ZW4gRGF0ZWllbiBhdWYgZGllIGFrdHVlbGxlbiBXZXJ0ZSBnZXNldHp0Lg=="><source>Die Felder für Quellsprache, Zielsprachen, DTP, DTP-Qualität und die Erläuterungen zur Datei wurden für alle bereits ausgewählten Dateien auf die aktuellen Werte gesetzt.</source><target>Die Felder für Quellsprache, Zielsprachen, DTP, DTP-Qualität und die Erläuterungen zur Datei wurden für alle bereits ausgewählten Dateien auf die aktuellen Werte gesetzt.</target></trans-unit>
-<trans-unit id="RsO8ciBkaWUgUXVlbGxzcHJhY2hl"><source>Für die Quellsprache</source><target>Für die Quellsprache</target></trans-unit>
-<trans-unit id="RGllIFF1ZWxsc3ByYWNoZSB3dXJkZSBmw7xyIGFsbGUgYmVyZWl0cyBhdXNnZXfDpGhsdGVuIERhdGVpZW4gYXVmIGRlbiBha3R1ZWxsZW4gV2VydCBnZXNldHp0Lg=="><source>Die Quellsprache wurde für alle bereits ausgewählten Dateien auf den aktuellen Wert gesetzt.</source><target>Die Quellsprache wurde für alle bereits ausgewählten Dateien auf den aktuellen Wert gesetzt.</target></trans-unit>
-<trans-unit id="RsO8ciBkaWUgWmllbHNwcmFjaGVu"><source>Für die Zielsprachen</source><target>Für die Zielsprachen</target></trans-unit>
-<trans-unit id="RGllIFppZWxzcHJhY2hlbiB3dXJkZW4gZsO8ciBhbGxlIGJlcmVpdHMgYXVzZ2V3w6RobHRlbiBEYXRlaWVuIGF1ZiBkaWUgYWt0dWVsbGVuIFdlcnRlIGdlc2V0enQu"><source>Die Zielsprachen wurden für alle bereits ausgewählten Dateien auf die aktuellen Werte gesetzt.</source><target>Die Zielsprachen wurden für alle bereits ausgewählten Dateien auf die aktuellen Werte gesetzt.</target></trans-unit>
-<trans-unit id="RsO8ciBkaWUgRXJsw6R1dGVydW5nZW4="><source>Für die Erläuterungen</source><target>Für die Erläuterungen</target></trans-unit>
-<trans-unit id="RGllIEVybMOkdXRlcnVuZ2VuIHd1cmRlIGbDvHIgYWxsZSBiZXJlaXRzIGF1c2dld8OkaGx0ZW4gRGF0ZWllbiBhdWYgZGVuIGFrdHVlbGxlbiBXZXJ0IGdlc2V0enQu"><source>Die Erläuterungen wurde für alle bereits ausgewählten Dateien auf den aktuellen Wert gesetzt.</source><target>Die Erläuterungen wurde für alle bereits ausgewählten Dateien auf den aktuellen Wert gesetzt.</target></trans-unit>
-<trans-unit id="RsO8ciBkaWUgRFRQLUR1cmNoZsO8aHJ1bmc="><source>Für die DTP-Durchführung</source><target>Für die DTP-Durchführung</target></trans-unit>
-<trans-unit id="RGllIERUUC1EdXJjaGbDvGhydW5nIHd1cmRlIGbDvHIgYWxsZSBiZXJlaXRzIGF1c2dld8OkaGx0ZW4gRGF0ZWllbiBhdWYgZGVuIGFrdHVlbGxlbiBXZXJ0IGdlc2V0enQu"><source>Die DTP-Durchführung wurde für alle bereits ausgewählten Dateien auf den aktuellen Wert gesetzt.</source><target>Die DTP-Durchführung wurde für alle bereits ausgewählten Dateien auf den aktuellen Wert gesetzt.</target></trans-unit>
-<trans-unit id="RsO8ciBkaWUgRFRQLVF1YWxpdMOkdA=="><source>Für die DTP-Qualität</source><target>Für die DTP-Qualität</target></trans-unit>
-<trans-unit id="U29mZXJuIGbDvHIgZWluZSBEYXRlaSBEVFAgYW5nZXfDpGhsdCB3dXJkZSwgd3VyZGUgZGllIERUUC1RdWFsaXTDpHQgYXVmIGRlbiBXZXJ0IGRlciBha3R1ZWxsZW4gRGF0ZWkgZ2VzZXR6dC4="><source>Sofern für eine Datei DTP angewählt wurde, wurde die DTP-Qualität auf den Wert der aktuellen Datei gesetzt.</source><target>Sofern für eine Datei DTP angewählt wurde, wurde die DTP-Qualität auf den Wert der aktuellen Datei gesetzt.</target></trans-unit>
-<trans-unit id="RGF0ZWluYW1l"><source>Dateiname</source><target>Dateiname</target></trans-unit>
-<trans-unit id="R3LDtsOfZQ=="><source>Größe</source><target>Größe</target></trans-unit>
-<trans-unit id="U3RhdHVz"><source>Status</source><target>Status</target></trans-unit>
-<trans-unit id="Rm9ydHNjaHJpdHQ="><source>Fortschritt</source><target>Fortschritt</target></trans-unit>
-<trans-unit id="Qml0dGUgbGFkZW4gU2llIGFsbGUgenUgw7xiZXJzZXR6ZW5kZW4gRGF0ZWllbiB2b2xsc3TDpG5kaWcgaG9jaCwgYmV2b3IgU2llIGRhcyBGb3JtdWxhciBhYnNlbmRlbi4="><source>Bitte laden Sie alle zu übersetzenden Dateien vollständig hoch, bevor Sie das Formular absenden.</source><target>Bitte laden Sie alle zu übersetzenden Dateien vollständig hoch, bevor Sie das Formular absenden.</target></trans-unit>
-<trans-unit id="Qml0dGUgbGFkZW4gU2llIGFsbGUgUmVmZXJlbnpkYXRlaWVuIHZvbGxzdMOkbmRpZyBob2NoLCBiZXZvciBTaWUgZGFzIEZvcm11bGFyIGFic2VuZGVuLg=="><source>Bitte laden Sie alle Referenzdateien vollständig hoch, bevor Sie das Formular absenden.</source><target>Bitte laden Sie alle Referenzdateien vollständig hoch, bevor Sie das Formular absenden.</target></trans-unit>
-<trans-unit id="Qml0dGUgd8OkaGxlbiBTaWUgZsO8ciBkaWUgZm9sZ2VuZGVuIERhdGVpZW4gZWluZSBRdWVsbHNwcmFjaGUgYXVzOiA="><source>Bitte wählen Sie für die folgenden Dateien eine Quellsprache aus: </source><target>Bitte wählen Sie für die folgenden Dateien eine Quellsprache aus: </target></trans-unit>
-<trans-unit id="Qml0dGUgd8OkaGxlbiBTaWUgZsO8ciBkaWUgZm9sZ2VuZGVuIERhdGVpZW4gWmllbHNwcmFjaGVuIGF1czog"><source>Bitte wählen Sie für die folgenden Dateien Zielsprachen aus: </source><target>Bitte wählen Sie für die folgenden Dateien Zielsprachen aus: </target></trans-unit>
-<trans-unit id="Qml0dGUgd8OkaGxlbiBTaWUgZsO8ciBkaWUgZm9sZ2VuZGVuIERhdGVpZW4gSWhyZSBQcsOkZmVyZW56ZW4genVyIERUUC1RdWFsaXTDpHQgYXVzOiA="><source>Bitte wählen Sie für die folgenden Dateien Ihre Präferenzen zur DTP-Qualität aus: </source><target>Bitte wählen Sie für die folgenden Dateien Ihre Präferenzen zur DTP-Qualität aus: </target></trans-unit>
-<trans-unit id="UmVmZXJlbnpkYXRlaWVuIGF1c3fDpGhsZW4="><source>Referenzdateien auswählen</source><target>Referenzdateien auswählen</target></trans-unit>
-<trans-unit id="Qml0dGUgd8OkaGxlbiBTaWUgbWluZGVzdGVucyBlaW5lIHp1IMO8YmVyc2V0emVuZGUgRGF0ZWkgYXVzLg=="><source>Bitte wählen Sie mindestens eine zu übersetzende Datei aus.</source><target>Bitte wählen Sie mindestens eine zu übersetzende Datei aus.</target></trans-unit>
-<trans-unit id="Rm9ybXVsYXIgYWJzZW5kZW4="><source>Formular absenden</source><target>Formular versenden</target></trans-unit>
-<trans-unit id="VW5iZWthbm50ZSB3c2RsTWV0aG9kICVz"><source>Unbekannte wsdlMethod %s</source><target>Unbekannte wsdlMethod %s</target></trans-unit>
-<trans-unit id="VmllbGVuIERhbmsh"><source>Vielen Dank!</source><target>Vielen Dank!</target></trans-unit>
-<trans-unit id="Rm9ybXVsYXJwcsO8ZnVuZw=="><source>Formularprüfung</source><target>Formularprüfung</target></trans-unit>
-<trans-unit id="RXMgd2VyZGVuIGFrdHVlbGwgRGF0ZWllbiBob2NoZ2VsYWRlbi4gQml0dGUgd2FydGVuIFNpZS4gVmllbGVuIERhbmsh"><source>Es werden aktuell Dateien hochgeladen. Bitte warten Sie. Vielen Dank!</source><target>Es werden aktuell Dateien hochgeladen. Bitte warten Sie. Vielen Dank!</target></trans-unit>
-<trans-unit id="Rm9ybXVsYXIgdmVyc2VuZGV0"><source>Formular versendet</source><target>Formular versendet</target></trans-unit>
-<trans-unit id="SWhyZSBEYXRlbiB3dXJkZW4gZXJmb2xncmVpY2ggw7xiZXJtaXR0ZWx0ISBWaWVsZW4gRGFuayE8YnIgLz48YnIgLz5EYXMgRm9ybXVsYXIgd3VyZGUgenVyw7xja2dlc2V0enQu"><source>Ihre Daten wurden erfolgreich übermittelt! Vielen Dank!<br/><br/>Das Formular wurde zurückgesetzt.</source><target>Ihre Daten wurden erfolgreich übermittelt! Vielen Dank!<br /><br />Das Formular wurde zurückgesetzt.</target></trans-unit>
-<trans-unit id="RGVyIFNlcnZlciBrb25udGUgbmljaHQgZXJyZWljaHQgd2VyZGVuIG9kZXIgZ2FiIGVpbmVuIHVuZXJ3YXJ0ZXRlbiBGZWhsZXIgenVyw7xjay48YnIgLz48YnIgLz5CaXR0ZSBwcsO8ZmVuIFNpZSwgb2IgZWluZSBJbnRlcm5ldHZlcmJpbmR1bmcgYmVzdGVodCB1bmQgdmVyc3VjaGVuIFNpZSBkYW5uIG5vY2htYWxzLCBkYXMgRm9ybXVsYXIgYWJ6dXNlbmRlbi48YnIgLz48YnIgLz5Tb2xsdGUgc2ljaCBkZXIgRmVobGVyIHRyb3R6IGJlc3RlaGVuZGVyIEludGVybmV0dmVyYmluZHVuZyB3aWVkZXJob2xlbiBzaW5kIHdpciBmw7xyIGVpbmVuIEhpbndlaXMgYW4gdW5zZXIgUHJvamVrdG1hbmFnZW1lbnQtVGVhbSBzZWhyIGRhbmtiYXIu"><source>Der Server konnte nicht erreicht werden oder gab einen unerwarteten Fehler zurück.<br /><br />Bitte prüfen Sie, ob eine Internetverbindung besteht und versuchen Sie dann nochmals, das Formular abzusenden.<br /><br />Sollte sich der Fehler trotz bestehender Internetverbindung wiederholen sind wir für einen Hinweis an unser Projektmanagement-Team sehr dankbar.</source><target>Der Server konnte nicht erreicht werden oder gab einen unerwarteten Fehler zurück.<br /><br />Bitte prüfen Sie, ob eine Internetverbindung besteht und versuchen Sie dann nochmals, das Formular abzusenden.<br /><br />Sollte sich der Fehler trotz bestehender Internetverbindung wiederholen sind wir für einen Hinweis an unser Projektmanagement-Team sehr dankbar.</target></trans-unit>
-<trans-unit id="RmVobGVyIGJlaSBkZXIgc2VydmVyc2VpdGlnZW4gRm9ybXVsYXJ2YWxpZGllcnVuZw=="><source>Fehler bei der serverseitigen Formularvalidierung</source><target>Fehler bei der serverseitigen Formularvalidierung</target></trans-unit>
-<trans-unit id="WmllbHNwcmFjaGU="><source>Zielsprache</source><target>Zielsprache</target></trans-unit>
-<trans-unit id="RFRQ"><source>DTP</source><target>DTP</target></trans-unit>
-<trans-unit id="RXJsw6R1dGVydW5nZW4="><source>Erläuterungen</source><target>Erläuterungen</target></trans-unit>
-<trans-unit id="SmE="><source>Ja</source><target>Ja</target></trans-unit>
-<trans-unit id="TmVpbg=="><source>Nein</source><target>Nein</target></trans-unit>
-<trans-unit id="UmVmZXJlbnpkYXRlaWVuIGhvY2hsYWRlbg=="><source>Referenzdateien hochladen</source><target>Referenzdateien hochladen</target></trans-unit>
-<trans-unit id="YmVvU3BoZXJlIC0gSWhyZSBCZWF1ZnRyYWd1bmcgdm9tIEFuZ2Vib3Qg"><source>beoSphere - Ihre Beauftragung vom Angebot </source><target>beoSphere - Ihre Beauftragung vom Angebot </target></trans-unit>
-<trans-unit id="JTEkcyAlMiRzLAoKdmllbGVuIERhbmsgZsO8ciBkaWUgQmVhdWZ0cmFndW5nIGRlcyBBbmdlYm90cyAiJTMkcyIhCldpciB3ZXJkZW4gZGllIEFuZnJhZ2UgdW1nZWhlbmQgYmVhcmJlaXRlbi4KCkbDvHIgRnJhZ2VuIHN0ZWhlbiB3aXIgSWhuZW4gZ2VybmUgenVyIFZlcmbDvGd1bmcuCgpWaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKSWhyIFByb2pla3RtYW5hZ2VtZW50LVRlYW0KYmVvIEdlc2VsbHNjaGFmdCBmw7xyIFNwcmFjaGVuIHVuZCBUZWNobm9sb2dpZSBtYkgKCkRpZXNlIEVtYWlsIHd1cmRlIGF1dG9tYXRpc2NoIGdlbmVyaWVydC4gUGxlYXNlIGRvIG5vdCByZXBseSB0byB0aGlzIGVtYWls"><source>%1$s %2$s,
-
-vielen Dank für die Beauftragung des Angebots "%3$s"!
-Wir werden die Anfrage umgehend bearbeiten.
-
-Für Fragen stehen wir Ihnen gerne zur Verfügung.
-
-Vielen Dank und viele Grüße,
-Ihr Projektmanagement-Team
-beo Gesellschaft für Sprachen und Technologie mbH
-Diese Email wurde automatisch generiert. Please do not reply to this email</source><target>%1$s %2$s,
-
-vielen Dank für die Beauftragung des Angebots "%3$s"!
-Wir werden die Anfrage umgehend bearbeiten.
-
-Für Fragen stehen wir Ihnen gerne zur Verfügung.
-
-Vielen Dank und viele Grüße,
-Ihr Projektmanagement-Team
-beo Gesellschaft für Sprachen und Technologie mbH
-
-Diese Email wurde automatisch generiert. Please do not reply to this email</target></trans-unit>
-<trans-unit id="JTEkcw=="><source>%1$s</source><target>%1$s</target></trans-unit>
-<trans-unit id="QmVhdWZ0cmFndW5nIGRlcyBBbmdlYm90cyAtIA=="><source>Beauftragung des Angebots - </source><target>Beauftragung des Angebots - </target></trans-unit>
-<trans-unit id="JTEkcyAlMiRzLA0KDQp2aWVsZW4gRGFuayBmw7xyIGRpZSBCZWF1ZnRyYWd1bmcgZGVzIEFuZ2Vib3RzICIlMyRzIiENCldpciB3ZXJkZW4gZGllIEFuZnJhZ2UgdW1nZWhlbmQgYmVhcmJlaXRlbi4NCg0KVmllbGVuIERhbmsgdW5kIHZpZWxlIEdyw7zDn2UNCg0KSWhyIFByb2pla3RtYW5hZ2VtZW50LVRlYW0="><source>%1$s %2$s,
-
-vielen Dank für die Beauftragung des Angebots "%3$s"!
-Wir werden die Anfrage umgehend bearbeiten.
-
-Vielen Dank und viele Grüße
-
-Ihr Projektmanagement-Team</source><target>%1$s %2$s,
-
-vielen Dank für die Beauftragung des Angebots "%3$s"!
-Wir werden die Anfrage umgehend bearbeiten.
-
-Vielen Dank und viele Grüße
-Ihr Projektmanagement-Team</target></trans-unit>
-<trans-unit id="JTEkcyAlMiRzLDxiciAvPg0KPGJyIC8+DQp2aWVsZW4gRGFuayBmw7xyIGRpZSBCZWF1ZnRyYWd1bmcgZGVzIEFuZ2Vib3RzICIlMyRzIiE8YnIgLz4NCldpciB3ZXJkZW4gZGllIEFuZnJhZ2UgdW1nZWhlbmQgYmVhcmJlaXRlbi48YnIgLz4NCjxiciAvPg0KPGI+VmllbGVuIERhbmsgdW5kIHZpZWxlIEdyw7zDn2U8L2I+PGJyIC8+DQo8aW1nIHNyYz0iY2lkOiU0JHMiIGJvcmRlcj0iMSIvPjxiciAvPg0KPGJyIC8+DQpJaHIgUHJvamVrdG1hbmFnZW1lbnQtVGVhbQ=="><source>%1$s %2$s,<br />
-<br />
-vielen Dank für die Beauftragung des Angebots "%3$s"!<br />
-Wir werden die Anfrage umgehend bearbeiten.<br />
-<br />
-<b>Vielen Dank und viele Grüße</b><br />
-<img src="cid:%4$s" border="1"/><br />
-<br />
-Ihr Projektmanagement-Team</source><target>%1$s %2$s,<br />
-<br />
-vielen Dank für die Beauftragung des Angebots "%3$s"!<br />
-Wir werden die Anfrage umgehend bearbeiten.<br />
-<br />
-<b>Vielen Dank und viele Grüße</b><br />
-<img src="cid:%4$s" border="1"/><br />
-<br />
-Ihr Projektmanagement-Team</target></trans-unit>
-<trans-unit id="YmVvU3BoZXJlIC0gSWhyZSBBbmdlYm90c2FuZnJhZ2U="><source>beoSphere - Ihre Angebotsanfrage</source><target>beoSphere - Ihre Angebotsanfrage</target></trans-unit>
-<trans-unit id="JTEkcyAlMiRzLAoKdmllbGVuIERhbmsgZsO8ciBJaHJlIEFuZ2Vib3RzYW5mcmFnZSBiZWkgYmVvIMO8YmVyIHVuc2VyZSBiZW9TcGhlcmUhCklocmUgQW5mcmFnZSB3dXJkZSBhbiBkYXMgenVzdMOkbmRpZ2UgUHJvamVrdG1hbmFnZW1lbnQgd2VpdGVyZ2VsZWl0ZXQuIFdpciB3ZXJkZW4gSWhuZW4gdW1nZWhlbmQgdW5zZXIgQW5nZWJvdCB6dWtvbW1lbiBsYXNzZW4uIAoKSW0gZm9sZ2VuZGVuIGZpbmRlbiBTaWUgenUgSWhyZXIgSW5mb3JtYXRpb24gdW5kIEtvbnRyb2xsZSBkaWUgWnVzYW1tZW5zdGVsbHVuZyBkZXIgdm9uIElobmVuIMO8YmVybWl0dGVsdGVuIERhdGVuOgoKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CiU0JHMKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CgpXZW5uIFNpZSBldHdhcyB2ZXLDpG5kZXJuIG3DtmNodGVuLCBiaXR0ZW4gd2lyIFNpZSB1bnNlciBQcm9qZWt0bWFuYWdlbWVudCBkYXLDvGJlciB6dSBpbmZvcm1pZXJlbi4gCgpWaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKSWhyIFByb2pla3RtYW5hZ2VtZW50IFRlYW0KYmVvIEdlc2VsbHNjaGFmdCBmw7xyIFNwcmFjaGVuIHVuZCBUZWNobm9sb2dpZQoKRGllc2UgRW1haWwgd3VyZGUgYXV0b21hdGlzY2ggZ2VuZXJpZXJ0LiBQbGVhc2UgZG8gbm90IHJlcGx5IHRvIHRoaXMgZW1haWwu"><source>%1$s %2$s,
-
-vielen Dank für Ihre Angebotsanfrage bei beo über unsere beoSphere!
-Ihre Anfrage wurde an das zuständige Projektmanagement weitergeleitet. Wir werden Ihnen umgehend unser Angebot zukommen lassen. 
-
-Im folgenden finden Sie zu Ihrer Information und Kontrolle die Zusammenstellung der von Ihnen übermittelten Daten:
-
-==============================
-%4$s
-==============================
-
-Wenn Sie etwas verändern möchten, bitten wir Sie unser Projektmanagement darüber zu informieren. 
-
-Vielen Dank und viele Grüße,
-Ihr Projektmanagement Team
-beo Gesellschaft für Sprachen und Technologie
-
-Diese Email wurde automatisch generiert. Please do not reply to this email.</source><target>%1$s %2$s,
-
-vielen Dank für Ihre Angebotsanfrage bei beo über unsere beoSphere!
-Ihre Anfrage wurde an das zuständige Projektmanagement weitergeleitet. Wir werden Ihnen umgehend unser Angebot zukommen lassen. 
-
-Im folgenden finden Sie zu Ihrer Information und Kontrolle die Zusammenstellung der von Ihnen übermittelten Daten:
-
-==============================
-%4$s
-==============================
-
-Wenn Sie etwas verändern möchten, bitten wir Sie unser Projektmanagement darüber zu informieren. 
-
-Vielen Dank und viele Grüße,
-Ihr Projektmanagement Team
-beo Gesellschaft für Sprachen und Technologie
-
-Diese Email wurde automatisch generiert. Please do not reply to this email.</target></trans-unit>
-<trans-unit id="SWhyZSBCZWFyYmVpdHVuZyBkZXMgUHJvamVrdHM="><source>Ihre Bearbeitung des Projekts</source><target>Ihre Bearbeitung des Projekts</target></trans-unit>
-<trans-unit id="JTEkcyAlMiRzLAoKdmllbGVuIERhbmsgZsO8ciBkaWUgQmVhcmJlaXR1bmcgSWhyZXMgUHJvamVrdHMgYXVmICUzJHMhIFdpciB3ZXJkZW4gZGllIHZvbiBJaG5lbgrDvGJlcm1pdHRlbHRlbiB6dXPDpHR6bGljaGVuIEluZm9ybWF0aW9uIGJhbGRtw7ZnbGljaHN0IGF1c3dlcnRlbiB1bmQgdW5zIHNvZmVybgpuw7Z0aWcgbWl0IElobmVuIGluIFZlcmJpbmR1bmcgc2V0emVuLgoKSW0gZm9sZ2VuZGVuIGZpbmRlbiBTaWUgenUgSWhyZXIgSW5mb3JtYXRpb24gdW5kIEtvbnRyb2xsZSBkaWUgWnVzYW1tZW5zdGVsbHVuZwpkZXIgdm9uIElobmVuIMO8YmVybWl0dGVsdGVuIERhdGVuOgoKJTQkcwoKVmllbGVuIERhbmsgdW5kIHZpZWxlIEdyw7zDn2UKCklociBQcm9qZWt0bWFuYWdlbWVudC1UZWFt"><source>%1$s %2$s,
-
-vielen Dank für die Bearbeitung Ihres Projekts auf %3$s! Wir werden die von Ihnen
-übermittelten zusätzlichen Information baldmöglichst auswerten und uns sofern
-nötig mit Ihnen in Verbindung setzen.
-
-Im folgenden finden Sie zu Ihrer Information und Kontrolle die Zusammenstellung
-der von Ihnen übermittelten Daten:
-
-%4$s
-
-Vielen Dank und viele Grüße
-
-Ihr Projektmanagement-Team</source><target>%1$s %2$s,
-
-vielen Dank für die Bearbeitung Ihres Projekts auf %3$s! Wir werden die von Ihnen
-übermittelten zusätzlichen Information baldmöglichst auswerten und uns sofern
-nötig mit Ihnen in Verbindung setzen.
-
-Im folgenden finden Sie zu Ihrer Information und Kontrolle die Zusammenstellung
-der von Ihnen übermittelten Daten:
-
-%4$s
-
-Vielen Dank und viele Grüße
-
-Ihr Projektmanagement-Team</target></trans-unit>
-<trans-unit id="JTEkcyAlMiRzLAoKU2llIGVyaGFsdGVuIGRpZXNlIEVtYWlsLCB3ZWlsIHdpciBlaW5lIEFuZnJhZ2UgenVyIMOEbmRlcnVuZyBkZXMgUGFzc3dvcnRlcyBmw7xyIElociBiZW9TcGhlcmUgS29udG8gYXVmIGh0dHA6Ly93d3cuYmVvLWRvYy5kZS9wb3J0YWwvcHVibGljLyBlcmhhbHRlbiBoYWJlbi4gCgpXZW5uIFNpZSBhbmdlZnJhZ3QgaGFiZW4gdW5kIElociBQYXNzd29ydCDDpG5kZXJuIG3DtmNodGVuLCBkYW5uIGJlZm9sZ2VuIFNpZSBiaXR0ZSBmb2xnZW5kZSBBbndlaXN1bmdlbjoKCkRlciBmb2xnZW5kZSBMaW5rIGVudGjDpGx0IGVpbmVuIGbDvHIgMzAgTWludXRlbiBnw7xsdGlnZW4gU2NobMO8c3NlbCwgbWl0IHdlbGNoZW0gU2llIElociBQYXNzd29ydCBuZXUgc2V0emVuIGvDtm5uZW4uIEF1cyBTaWNoZXJoZWl0c2dyw7xuZGVuIGZ1bmt0aW9uaWVydCBkaWVzIG51ciwgd2VubiBTaWUgZGVuIGZvbGdlbmRlbiBMaW5rIGltIHNlbGJlbiBCcm93c2VyIGluIGRlbSBTaWUgZGllIMOEbmRlcnVuZyBJaHJlcyBQYXNzd29ydCBhbmdlZm9yZGVydCBoYWJlbiDDtmZmbmVuIHVuZCB6dWRlbSBuYWNoIFp1csO8Y2tzZXR6ZW4gZGVzIFBhc3N3b3J0cyBJaHJlbiBCcm93c2VyIG5pY2h0IG5ldSBnZXN0YXJ0ZXQgaGFiZW4uCgo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KTGluayB1bSBQYXNzd29ydCBuZXUgenUgc2V0emVuCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQolMyRzJTQkcyU1JHMlNiRzCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KClNvbGx0ZSBJaHIgU2NobMO8c3NlbCBuaWNodCBtZWhyIGfDvGx0aWcgc2Vpbiwga8O2bm5lbiBTaWUgamVkZXJ6ZWl0IGVpbmVuIG5ldWVuIFNjaGzDvHNzZWwgYW5mb3JkZXJuLgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KJTMkcyU0JHMlNSRzJTckcwotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KClNvbGx0ZW4gU2llIGRpZSBBbmZyYWdlIG5pY2h0IHNlbGJzdCBhdXNnZWzDtnN0IGhhYmVuLCBiaXR0ZW4gd2lyIFNpZSB1bnMgZGFyw7xiZXIgenUgaW5mb3JtaWVyZW4uCgpWaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKSWhyIFByb2pla3RtYW5hZ2VtZW50IFRlYW0KYmVvIEdlc2VsbHNjaGFmdCBmw7xyIFNwcmFjaGVuIHVuZCBUZWNobm9sb2dpZQoKRGllc2UgRW1haWwgd3VyZGUgYXV0b21hdGlzY2ggZ2VuZXJpZXJ0LiBQbGVhc2UgZG8gbm90IHJlcGx5IHRvIHRoaXMgZW1haWwu"><source>%1$s %2$s,
-
-Sie erhalten diese Email, weil wir eine Anfrage zur Änderung des Passwortes für Ihr beoSphere Konto auf http://www.beo-doc.de/portal/public/ erhalten haben. 
-
-Wenn Sie angefragt haben und Ihr Passwort ändern möchten, dann befolgen Sie bitte folgende Anweisungen:
-
-Der folgende Link enthält einen für 30 Minuten gültigen Schlüssel, mit welchem Sie Ihr Passwort neu setzen können. Aus Sicherheitsgründen funktioniert dies nur, wenn Sie den folgenden Link im selben Browser in dem Sie die Änderung Ihres Passwort angefordert haben öffnen und zudem nach Zurücksetzen des Passworts Ihren Browser nicht neu gestartet haben.
-
-==============================
-Link um Passwort neu zu setzen
-------------------------------
-%3$s%4$s%5$s%6$s
-------------------------------
-==============================
-
-Sollte Ihr Schlüssel nicht mehr gültig sein, können Sie jederzeit einen neuen Schlüssel anfordern.
-------------------------------
-%3$s%4$s%5$s%7$s
-------------------------------
-
-Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüber zu informieren.
-
-Vielen Dank und viele Grüße,
-Ihr Projektmanagement Team
-beo Gesellschaft für Sprachen und Technologie
-
-Diese Email wurde automatisch generiert. Please do not reply to this email.</source><target>%1$s %2$s,
-
-Sie erhalten diese Email, weil wir eine Anfrage zur Änderung des Passwortes für Ihr beoSphere Konto auf http://www.beo-doc.de/portal/public/ erhalten haben. 
-
-Wenn Sie angefragt haben und Ihr Passwort ändern möchten, dann befolgen Sie bitte folgende Anweisungen:
-
-Der folgende Link enthält einen für 30 Minuten gültigen Schlüssel, mit welchem Sie Ihr Passwort neu setzen können. Aus Sicherheitsgründen funktioniert dies nur, wenn Sie den folgenden Link im selben Browser in dem Sie die Änderung Ihres Passwort angefordert haben öffnen und zudem nach Zurücksetzen des Passworts Ihren Browser nicht neu gestartet haben.
-
-==============================
-Link um Passwort neu zu setzen
-------------------------------
-%3$s%4$s%5$s%6$s
-------------------------------
-==============================
-
-Sollte Ihr Schlüssel nicht mehr gültig sein, können Sie jederzeit einen neuen Schlüssel anfordern.
-------------------------------
-%3$s%4$s%5$s%7$s
-------------------------------
-
-Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüber zu informieren.
-
-Vielen Dank und viele Grüße,
-Ihr Projektmanagement Team
-beo Gesellschaft für Sprachen und Technologie
-
-Diese Email wurde automatisch generiert. Please do not reply to this email.</target></trans-unit>
-<trans-unit id="YmVvU3BoZXJlIC0gSWhyZSBQcm9qZWt0YmVzdMOkdGlndW5n"><source>beoSphere - Ihre Projektbestätigung</source><target>beoSphere - Ihre Projektbestätigung</target></trans-unit>
-<trans-unit id="JTEkcyAlMiRzLAoKdmllbGVuIERhbmsgZsO8ciBkaWUgQmVhdWZ0cmFndW5nIElocmVzIFByb2pla3RlcyAiJTMkcyIgYmVpIGJlbyDDvGJlciB1bnNlcmUgYmVvU3BoZXJlIQpJaHIgUHJvamVrdCB3dXJkZSBhbiBkYXMgenVzdMOkbmRpZ2UgUHJvamVrdG1hbmFnZW1lbnQgd2VpdGVyZ2VsZWl0ZXQuIFdpciB3ZXJkZW4gSWhyIFByb2pla3QgdW1nZWhlbmQgYmVhcmJlaXRlbi4gCgpJbSBmb2xnZW5kZW4gZmluZGVuIFNpZSB6dSBJaHJlciBJbmZvcm1hdGlvbiB1bmQgS29udHJvbGxlIGRpZSBadXNhbW1lbnN0ZWxsdW5nIGRlciB2b24gSWhuZW4gw7xiZXJtaXR0ZWx0ZW4gRGF0ZW46Cgo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KJTQkcwo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KCldlbm4gU2llIGV0d2FzIHZlcsOkbmRlcm4gbcO2Y2h0ZW4sIGJpdHRlbiB3aXIgU2llIHVuc2VyIFByb2pla3RtYW5hZ2VtZW50IHNjaG5lbGxzdG3DtmdsaWNoIGRhcsO8YmVyIHp1IGluZm9ybWllcmVuLiAKClZpZWxlbiBEYW5rIHVuZCB2aWVsZSBHcsO8w59lLApJaHIgUHJvamVrdG1hbmFnZW1lbnQgVGVhbQpiZW8gR2VzZWxsc2NoYWZ0IGbDvHIgU3ByYWNoZW4gdW5kIFRlY2hub2xvZ2llCgpEaWVzZSBFbWFpbCB3dXJkZSBhdXRvbWF0aXNjaCBnZW5lcmllcnQuIFBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBlbWFpbC4="><source>%1$s %2$s,
-
-vielen Dank für die Beauftragung Ihres Projektes "%3$s" bei beo über unsere beoSphere!
-Ihr Projekt wurde an das zuständige Projektmanagement weitergeleitet. Wir werden Ihr Projekt umgehend bearbeiten. 
-
-Im folgenden finden Sie zu Ihrer Information und Kontrolle die Zusammenstellung der von Ihnen übermittelten Daten:
-
-==============================
-%4$s
-==============================
-
-Wenn Sie etwas verändern möchten, bitten wir Sie unser Projektmanagement schnellstmöglich darüber zu informieren. 
-
-Vielen Dank und viele Grüße,
-Ihr Projektmanagement Team
-beo Gesellschaft für Sprachen und Technologie
-
-Diese Email wurde automatisch generiert. Please do not reply to this email.</source><target>%1$s %2$s,
-
-vielen Dank für die Beauftragung Ihres Projektes "%3$s" bei beo über unsere die beoSphere!
-Ihr Projekt wurde an das zuständige Projektmanagement weitergeleitet. Wir werden Ihr Projekt umgehend bearbeiten.
-
-Im folgenden finden Sie zu Ihrer Information und Kontrolle die Zusammenstellung der von Ihnen übermittelten Daten:
-
-==============================
-%4$s
-==============================
-
-Wenn Sie etwas verändern möchten, bitten wir Sie unser Projektmanagement schnellstmöglich darüber zu informieren. 
-
-Vielen Dank und viele Grüße,
-Ihr Projektmanagement Team
-beo Gesellschaft für Sprachen und Technologie
-
-Diese Email wurde automatisch generiert. Please do not reply to this email.</target></trans-unit>
-<trans-unit id="RGllIEFud2VuZHVuZyBrb25udGUgbmljaHQgZ2VmdW5kZW4gd2VyZGVuIQ=="><source>Die Anwendung konnte nicht gefunden werden!</source><target>Die Anwendung konnte nicht gefunden werden!</target></trans-unit>
-<trans-unit id="RGllIEFud2VuZHVuZyB3aXJkIGdlbGFkZW4h"><source>Die Anwendung wird geladen!</source><target>Die Anwendung wird geladen!</target></trans-unit>
-<trans-unit id="QW5nZWJvdHPDvGJlcnNpY2h0"><source>Angebotsübersicht</source><target>Angebotsübersicht</target></trans-unit>
-<trans-unit id="SW5mb3JtYXRpb25lbiB6dXIgQmVkaWVudW5n"><source>Informationen zur Bedienung</source><target>Informationen zur Bedienung</target></trans-unit>
-<trans-unit id="QW5nZWJvdHN0aXRlbA=="><source>Angebotstitel</source><target>Angebotstitel</target></trans-unit>
-<trans-unit id="S3VuZGVuLUFuZ2Vib3RzbnVtbWVy"><source>Kunden-Angebotsnummer</source><target>Bestellnummer</target></trans-unit>
-<trans-unit id="R2V3w7xuc2NodGVzIExpZWZlcmRhdHVt"><source>Gewünschtes Lieferdatum</source><target>Gewünschtes Lieferdatum</target></trans-unit>
-<trans-unit id="RGFzIGZyw7xoZXN0IG3DtmdsaWNoZSBMaWVmZXJkYXR1bSBpc3QgZGVyIHswfQ=="><source>Das frühest mögliche Lieferdatum ist der {0}</source><target>Das frühest mögliche Lieferdatum ist der {0}</target></trans-unit>
-<trans-unit id="SW5zdHJ1a3Rpb25lbiB6dXIgQW5nZWJvdHNhbmZyYWdl"><source>Instruktionen zur Angebotsanfrage</source><target>Instruktionen zur Angebotsanfrage</target></trans-unit>
-<trans-unit id="QW5nZWJvdCBhbmZyYWdlbg=="><source>Angebot anfragen</source><target>Angebot anfragen</target></trans-unit>
-<trans-unit id="VGl0ZWw="><source>Titel</source><target>Titel</target></trans-unit>
-<trans-unit id="QXVzZ2FuZ3NzcHJhY2hl"><source>Ausgangssprache</source><target>Ausgangssprache</target></trans-unit>
-<trans-unit id="UHJlaXM="><source>Preis</source><target>Preis</target></trans-unit>
-<trans-unit id="R2VzYW10ZSBNZW5nZQ=="><source>Gesamte Menge</source><target>Gesamte Menge</target></trans-unit>
-<trans-unit id="QmVyZWNobmV0ZSBNZW5nZQ=="><source>Berechnete Menge</source><target>Berechnete Menge</target></trans-unit>
-<trans-unit id="RWluaGVpdA=="><source>Einheit</source><target>Einheit</target></trans-unit>
-<trans-unit id="TGllZmVyZGF0dW0="><source>Lieferdatum</source><target>Lieferdatum</target></trans-unit>
-<trans-unit id="S29tbWVudGFy"><source>Kommentar</source><target>Kommentar</target></trans-unit>
-<trans-unit id="VHJlZmZlcjog"><source>Treffer: </source><target>Treffer: </target></trans-unit>
-<trans-unit id="RGF0ZWlmb3JtYXQ="><source>Dateiformat</source><target>Dateiformat</target></trans-unit>
-<trans-unit id="RGF0ZWlncsO2w59l"><source>Dateigröße</source><target>Dateigröße</target></trans-unit>
-<trans-unit id="RGF0dW0gZGVyIGxldHp0ZW4gw4RuZGVydW5n"><source>Datum der letzten Änderung</source><target>Datum der letzten Änderung</target></trans-unit>
-<trans-unit id="UG9zaXRpb25lbiBmaWx0ZXJu"><source>Positionen filtern</source><target>Positionen filtern</target></trans-unit>
-<trans-unit id="Qml0dGUgV2VydCBlaW5nZWJlbi4uLg=="><source>Bitte Wert eingeben...</source><target>Bitte Wert eingeben...</target></trans-unit>
-<trans-unit id="Vm9yIGRlbQ=="><source>Vor dem</source><target>Vor dem</target></trans-unit>
-<trans-unit id="TmFjaCBkZW0="><source>Nach dem</source><target>Nach dem</target></trans-unit>
-<trans-unit id="QW0="><source>Am</source><target>Am</target></trans-unit>
-<trans-unit id="UG9zaXRpb25lbg=="><source>Positionen</source><target>Positionen</target></trans-unit>
-<trans-unit id="RmlsdGVydW5nIGF1ZmhlYmVu"><source>Filterung aufheben</source><target>Filterung aufheben</target></trans-unit>
-<trans-unit id="U2VpdGUmIzE2MDs="><source>Seite&#160;</source><target>Seite&#160;</target></trans-unit>
-<trans-unit id="JiMxNjA7dm9uIA=="><source>&#160;von </source><target>&#160;von </target></trans-unit>
-<trans-unit id="S2VpbmUgUG9zaXRpb25lbiB2b3JoYW5kZW4="><source>Keine Positionen vorhanden</source><target>Keine Positionen vorhanden</target></trans-unit>
-<trans-unit id="RXJzdGUgU2VpdGU="><source>Erste Seite</source><target>Erste Seite</target></trans-unit>
-<trans-unit id="TGV0enRlIFNlaXRl"><source>Letzte Seite</source><target>Letzte Seite</target></trans-unit>
-<trans-unit id="TsOkY2hzdGUgU2VpdGU="><source>Nächste Seite</source><target>Nächste Seite</target></trans-unit>
-<trans-unit id="Vm9yaGVyaWdlIFNlaXRl"><source>Vorherige Seite</source><target>Vorherige Seite</target></trans-unit>
-<trans-unit id="QWt0dWFsaXNpZXJlbg=="><source>Aktualisieren</source><target>Aktualisieren</target></trans-unit>
-<trans-unit id="S29tbWVudGFyIHp1ciBQb3NpdGlvbg=="><source>Kommentar zur Position</source><target>Kommentar zur Position</target></trans-unit>
-<trans-unit id="RGF0ZWllbiBpbSBBbmdlYm90c3VtZmFuZw=="><source>Dateien im Angebotsumfang</source><target>Dateien im Angebotsumfang</target></trans-unit>
-<trans-unit id="S2VpbmUgRGF0ZWllbiBpbSBBbmdlYm90IHZvcmhhbmRlbg=="><source>Keine Dateien im Angebot vorhanden</source><target>Keine Dateien im Angebot vorhanden</target></trans-unit>
-<trans-unit id="S3VuZGVua29tbWVudGFyIHp1ciBEYXRlaSA="><source>Kundenkommentar zur Datei </source><target>Kundenkommentar zur Datei </target></trans-unit>
-<trans-unit id="VHJlZmZlciBpbiBEZXRhaWxz"><source>Treffer in Details</source><target>Treffer in Details</target></trans-unit>
-<trans-unit id="YmVhdWZ0cmFndA=="><source>beauftragt</source><target>beauftragt</target></trans-unit>
-<trans-unit id="YXBwcm92ZWQ="><source>approved</source><target>erwarte Erteilung...</target></trans-unit>
-<trans-unit id="b3JkZXJlZA=="><source>ordered</source><target>Angebot bestellt</target></trans-unit>
-<trans-unit id="QW5nZWJvdHNudW1tZXI="><source>Angebotsnummer</source><target>Angebotsnummer</target></trans-unit>
-<trans-unit id="QXVzZ2FuZ3NzcHJhY2hlbg=="><source>Ausgangssprachen</source><target>Ausgangssprachen</target></trans-unit>
-<trans-unit id="UHJvamVrdG1hbmFnZXI="><source>Projektmanager</source><target>Projektmanager</target></trans-unit>
-<trans-unit id="SW5pdGlhdG9y"><source>Initiator</source><target>Initiator</target></trans-unit>
-<trans-unit id="ZW50ZXJlZA=="><source>entered</source><target>in Vorbereitung...</target></trans-unit>
-<trans-unit id="Y2FuY2VsZWQ="><source>canceled</source><target>Angebot abgelehnt</target></trans-unit>
-<trans-unit id="Y2xvc2Vk"><source>closed</source><target>Angebot abgelaufen</target></trans-unit>
-<trans-unit id="QW5mcmFnZWRhdHVt"><source>Anfragedatum</source><target>Anfragedatum</target></trans-unit>
-<trans-unit id="R8O8bHRpZyBiaXM="><source>Gültig bis</source><target>Gültig bis</target></trans-unit>
-<trans-unit id="U3RhcnRkYXR1bQ=="><source>Startdatum</source><target>Startdatum</target></trans-unit>
-<trans-unit id="RGF0ZWllbiBmaWx0ZXJu"><source>Dateien filtern</source><target>Dateien filtern</target></trans-unit>
-<trans-unit id="UmVmZXJlbnotRGF0ZWllbg=="><source>Referenz-Dateien</source><target>Referenz-Dateien</target></trans-unit>
-<trans-unit id="S2VpbmUgUmVmZXJlbnotRGF0ZWllbiB2b3JoYW5kZW4="><source>Keine Referenz-Dateien vorhanden</source><target>Keine Referenz-Dateien vorhanden</target></trans-unit>
-<trans-unit id="QW5nZWJvdDo="><source>Angebot:</source><target>Angebot:</target></trans-unit>
-<trans-unit id="QW5nZWJvdCBOci46"><source>Angebot Nr.:</source><target>Angebot Nr.:</target></trans-unit>
-<trans-unit id="UHJlaXM6"><source>Preis:</source><target>Preis:</target></trans-unit>
-<trans-unit id="UXVlbGxzcHJhY2hlbjo="><source>Quellsprachen:</source><target>Quellsprachen:</target></trans-unit>
-<trans-unit id="WmllbHNwcmFjaGVuOg=="><source>Zielsprachen:</source><target>Zielsprachen:</target></trans-unit>
-<trans-unit id="QW5nZWJvdCBiZWF1ZnRyYWdlbj8="><source>Angebot beauftragen?</source><target>Angebot beauftragen?</target></trans-unit>
-<trans-unit id="QW5nZWJvdCBiZWF1ZnRyYWdlbg=="><source>Angebot beauftragen</source><target>Angebot beauftragen</target></trans-unit>
-<trans-unit id="QmVhdWZ0cmFnZW4="><source>Beauftragen</source><target>Beauftragen</target></trans-unit>
-<trans-unit id="QXVmdHJhZyB3aXJkIGJlYXVmdHJhZ3QuIEJpdHRlIHdhcnRlbi4uLg=="><source>Auftrag wird beauftragt. Bitte warten...</source><target>Auftrag wird beauftragt. Bitte warten...</target></trans-unit>
-<trans-unit id="S2VpbmUgUHJvamVrdGUgdm9yaGFuZGVu"><source>Keine Projekte vorhanden</source><target>Keine Projekte vorhanden</target></trans-unit>
-<trans-unit id="UG9zaXRpb25zdGl0ZWw="><source>Positionstitel</source><target>Positionstitel</target></trans-unit>
-<trans-unit id="S3VuZGVua29tbWVudGFy"><source>Kundenkommentar</source><target>Kundenkommentar</target></trans-unit>
-<trans-unit id="JiMxNjA7JiMxNjA7JiMxNjA7QW56YWhsIERhdGVpZW46JiMxNjA7"><source>&#160;&#160;&#160;Anzahl Dateien:&#160;</source><target>&#160;&#160;&#160;Anzahl Dateien:&#160;</target></trans-unit>
-<trans-unit id="QW5nZWJvdGUgZmlsdGVybg=="><source>Angebote filtern</source><target>Angebote filtern</target></trans-unit>
-<trans-unit id="JiMxNjA7U3VtbWU6JiMxNjA7"><source>&#160;Summe:&#160;</source><target>&#160;Summe:&#160;</target></trans-unit>
-<trans-unit id="JiMxNjA7JiMxNjA7JiMxNjA7QW56YWhsIEFuZ2Vib3RlOiYjMTYwOw=="><source>&#160;&#160;&#160;Anzahl Angebote:&#160;</source><target>&#160;&#160;&#160;Anzahl Angebote:&#160;</target></trans-unit>
-<trans-unit id="RGV0YWlscyBkZXMgQW5nZWJvdHMg"><source>Details des Angebots </source><target>Details des Angebots </target></trans-unit>
-<trans-unit id="JiMxNjA7JiMxNjA7JiMxNjA7QW56YWhsIFBvc2l0aW9uZW46JiMxNjA7"><source>&#160;&#160;&#160;Anzahl Positionen:&#160;</source><target>&#160;&#160;&#160;Anzahl Positionen:&#160;</target></trans-unit>
-<trans-unit id="QW56ZWlnZW4gYXVmIGRlciBTdGFydHNlaXRl"><source>Anzeigen auf der Startseite</source><target>Anzeigen auf der Startseite</target></trans-unit>
-<trans-unit id="RmVobGVyIGltIEZvcm11bGFy"><source>Fehler im Formular</source><target>Fehler im Formular</target></trans-unit>
-<trans-unit id="TWl0YXJiZWl0ZXIgaW0gUG9ydGFs"><source>Mitarbeiter im Portal</source><target>Mitarbeiter im Portal</target></trans-unit>
-<trans-unit id="SW0gUG9ydGFsIGFuZ2VsZWd0ZSBNaXRhcmJlaXRlcg=="><source>Im Portal angelegte Mitarbeiter</source><target>Im Portal angelegte Mitarbeiter</target></trans-unit>
-<trans-unit id="RWRpdGllcmVu"><source>Editieren</source><target>Editieren</target></trans-unit>
-<trans-unit id="TmFjaG5hbWU="><source>Nachname</source><target>Nachname</target></trans-unit>
-<trans-unit id="Vm9ybmFtZQ=="><source>Vorname</source><target>Vorname</target></trans-unit>
-<trans-unit id="Um9sbGVuIGltIFBvcnRhbA=="><source>Rollen im Portal</source><target>Rollen im Portal</target></trans-unit>
-<trans-unit id="QWJ0ZWlsdW5n"><source>Abteilung</source><target>Abteilung</target></trans-unit>
-<trans-unit id="VGVsZWZvbg=="><source>Telefon</source><target>Telefon</target></trans-unit>
-<trans-unit id="TW9iaWw="><source>Mobil</source><target>Mobil</target></trans-unit>
-<trans-unit id="RmF4"><source>Fax</source><target>Fax</target></trans-unit>
-<trans-unit id="RS1NYWls"><source>E-Mail</source><target>E-Mail</target></trans-unit>
-<trans-unit id="RWlnZW5lIERhdGVuIMOkbmRlcm4="><source>Eigene Daten ändern</source><target>Eigene Daten ändern</target></trans-unit>
-<trans-unit id="TWl0YXJiZWl0ZXJkYXRlbiBiZWFyYmVpdGVu"><source>Mitarbeiterdaten bearbeiten</source><target>Mitarbeiterdaten bearbeiten</target></trans-unit>
-<trans-unit id="U3RhbW1kYXRlbiDDpG5kZXJu"><source>Stammdaten ändern</source><target>Stammdaten ändern</target></trans-unit>
-<trans-unit id="LS0="><source>--</source><target>--</target></trans-unit>
-<trans-unit id="SWhyZSBEYXRlbiB3dXJkZW4gZ2VzcGVpY2hlcnQhIFZpZWxlbiBEYW5rIQ=="><source>Ihre Daten wurden gespeichert! Vielen Dank!</source><target>Ihre Daten wurden gespeichert! Vielen Dank!</target></trans-unit>
-<trans-unit id="Vm9yYmVsZWd1bmcgIkFuZ2Vib3QgYW5mcmFnZW4i"><source>Vorbelegung "Angebot anfragen"</source><target>Vorlagen "Angebot anfragen"</target></trans-unit>
-<trans-unit id="UHJvamVrdHRpdGVs"><source>Projekttitel</source><target>Projekttitel</target></trans-unit>
-<trans-unit id="S3VuZGVuLUF1ZnRyYWdzbnVtbWVy"><source>Kunden-Auftragsnummer</source><target>Kunden-Auftragsnummer</target></trans-unit>
-<trans-unit id="SW5zdHJ1a3Rpb25lbiB6dW0gUHJvamVrdA=="><source>Instruktionen zum Projekt</source><target>Instruktionen zum Projekt</target></trans-unit>
-<trans-unit id="Vm9yYmVsZWd1bmcgIlByb2pla3QgYmVhdWZ0cmFnZW4iIHVuZCAiUHJvamVrdCBiZWFyYmVpdGVuIg=="><source>Vorbelegung "Projekt beauftragen" und "Projekt bearbeiten"</source><target>Vorbelegung "Projekt beauftragen" und "Projekt bearbeiten"</target></trans-unit>
-<trans-unit id="SWhyZSDDhG5kZXJ1bmdlbiB3dXJkZW4gZ2VzcGVpY2hlcnQh"><source>Ihre Änderungen wurden gespeichert!</source><target>Ihre Änderungen wurden gespeichert!</target></trans-unit>
-<trans-unit id="w5xiZXJ0cmFnZSBEYXRlbi4uLg=="><source>Übertrage Daten...</source><target>Übertrage Daten...</target></trans-unit>
-<trans-unit id="RmVobGVyIGJlaW0gU3BlaWNoZXJu"><source>Fehler beim Speichern</source><target>Fehler beim Speichern</target></trans-unit>
-<trans-unit id="RGllIERhdGVuIGtvbm50ZW4gbmljaHQgZ2VzcGVpY2hlcnQgd2VyZGVu"><source>Die Daten konnten nicht gespeichert werden</source><target>Die Daten konnten nicht gespeichert werden</target></trans-unit>
-<trans-unit id="R3J1cHBlIGzDtnNjaGVuPw=="><source>Gruppe löschen?</source><target>Gruppe löschen?</target></trans-unit>
-<trans-unit id="U29sbCBkaWUgR3J1cHBlIHdpcmtsaWNoIGdlbMO2c2NodCB3ZXJkZW4/IERhcyBMw7ZzY2hlbiBnZXNjaGllaHQgc29mb3J0IHVuZCB1bndpZWRlcnJ1ZmxpY2gh"><source>Soll die Gruppe wirklich gelöscht werden? Das Löschen geschieht sofort und unwiederruflich!</source><target>Soll die Gruppe wirklich gelöscht werden? Das Löschen geschieht sofort und unwiederruflich!</target></trans-unit>
-<trans-unit id="VmVyZsO8Z2JhcmUgQmVudXR6ZXI="><source>Verfügbare Benutzer</source><target>Verfügbare Benutzer</target></trans-unit>
-<trans-unit id="TWl0Z2xpZWQgaW4gZGVyIGdld8OkaGx0ZW4gR3J1cHBl"><source>Mitglied in der gewählten Gruppe</source><target>Mitglied in der gewählten Gruppe</target></trans-unit>
-<trans-unit id="QW4gZGVuIEFuZmFuZyB2ZXJzY2hpZWJlbg=="><source>An den Anfang verschieben</source><target>An den Anfang verschieben</target></trans-unit>
-<trans-unit id="TmFjaCBvYmVuIHZlcnNjaGllYmVu"><source>Nach oben verschieben</source><target>Nach oben verschieben</target></trans-unit>
-<trans-unit id="RGVyIEF1c3dhaGwgaGluenVmw7xnZW4="><source>Der Auswahl hinzufügen</source><target>Der Auswahl hinzufügen</target></trans-unit>
-<trans-unit id="QXVzIEF1c3dhaGxlbnRmZXJuZW4="><source>Aus Auswahlentfernen</source><target>Aus Auswahl entfernen</target></trans-unit>
-<trans-unit id="TmFjaCB1bnRlbiB2ZXJzY2hpZWJlbg=="><source>Nach unten verschieben</source><target>Nach unten verschieben</target></trans-unit>
-<trans-unit id="QW5zIEVuZGUgdmVyc2NoaWViZW4="><source>Ans Ende verschieben</source><target>Ans Ende verschieben</target></trans-unit>
-<trans-unit id="SGluenVmw7xnZW4="><source>Hinzufügen</source><target>Hinzufügen</target></trans-unit>
-<trans-unit id="TMO2c2NoZW4="><source>Löschen</source><target>Löschen</target></trans-unit>
-<trans-unit id="R3J1cHBlbm5hbWU="><source>Gruppenname</source><target>Gruppenname</target></trans-unit>
-<trans-unit id="R3J1cHBlbmJlc2NocmVpYnVuZw=="><source>Gruppenbeschreibung</source><target>Gruppenbeschreibung</target></trans-unit>
-<trans-unit id="WnVvcmRudW5nIFNwZWljaGVybg=="><source>Zuordnung Speichern</source><target>Zuordnung speichern</target></trans-unit>
-<trans-unit id="R3J1cHBlIHd1cmRlIGdlbGVzZW4h"><source>Gruppe wurde gelesen!</source><target>Gruppe wurde gelesen!</target></trans-unit>
-<trans-unit id="R3J1cHBlIHd1cmRlIGFuZ2VsZWd0IQ=="><source>Gruppe wurde angelegt!</source><target>Gruppe wurde angelegt!</target></trans-unit>
-<trans-unit id="R3J1cHBlIHd1cmRlIGdlc3BlaWNoZXJ0IQ=="><source>Gruppe wurde gespeichert!</source><target>Gruppe wurde gespeichert!</target></trans-unit>
-<trans-unit id="R3J1cHBlIHd1cmRlIGVudGZlcm50IQ=="><source>Gruppe wurde entfernt!</source><target>Gruppe wurde entfernt!</target></trans-unit>
-<trans-unit id="WnVvcmRudW5nIHZvbiBHcnVwcGVubWl0Z2xpZWRlcm4gZ2VzcGVpY2hlcnQh"><source>Zuordnung von Gruppenmitgliedern gespeichert!</source><target>Zuordnung von Gruppenmitgliedern gespeichert!</target></trans-unit>
-<trans-unit id="U2llIGhhYmVuIGtlaW5lIMOEbmRlcnVuZ2VuIHZvcmdlbm9tbWVuIQ=="><source>Sie haben keine Änderungen vorgenommen!</source><target>Sie haben keine Änderungen vorgenommen!</target></trans-unit>
-<trans-unit id="S3VuZGU="><source>Kunde</source><target>Kunde</target></trans-unit>
-<trans-unit id="RGF0dW0="><source>Datum</source><target>Datum</target></trans-unit>
-<trans-unit id="QWt0aW9u"><source>Aktion</source><target>Aktion</target></trans-unit>
-<trans-unit id="UHJpb3JpdMOkdA=="><source>Priorität</source><target>Priorität</target></trans-unit>
-<trans-unit id="S3VuZGUgYmVhcmJlaXRlbg=="><source>Kunde bearbeiten</source><target>Kunde bearbeiten</target></trans-unit>
-<trans-unit id="Um9sbGVuIGRlciBNaXRhcmJlaXRlciBiZWFyYmVpdGVu"><source>Rollen der Mitarbeiter bearbeiten</source><target>Rollen der Mitarbeiter bearbeiten</target></trans-unit>
-<trans-unit id="SGlzdG9yaWUgZmlsdGVybg=="><source>Historie filtern</source><target>Historie filtern</target></trans-unit>
-<trans-unit id="VW50ZXJuZWhtZW4="><source>Unternehmen</source><target>Unternehmen</target></trans-unit>
-<trans-unit id="JiMxNjA7JiMxNjA7JiMxNjA7QW56YWhsIEt1bmRlbjomIzE2MDs="><source>&#160;&#160;&#160;Anzahl Kunden:&#160;</source><target>&#160;&#160;&#160;Anzahl Kunden:&#160;</target></trans-unit>
-<trans-unit id="VW50ZXJuZWhtZW4gZmlsdGVybg=="><source>Unternehmen filtern</source><target>Unternehmen filtern</target></trans-unit>
-<trans-unit id="JiMxNjA7JiMxNjA7JiMxNjA7QW56YWhsIEFrdGlvbmVuOiYjMTYwOw=="><source>&#160;&#160;&#160;Anzahl Aktionen:&#160;</source><target>&#160;&#160;&#160;Anzahl Aktionen:&#160;</target></trans-unit>
-<trans-unit id="S3VuZGVuZGF0ZW4gdm9tIFVudGVybmVobWVuc3NlcnZlciBsYWRlbg=="><source>Kundendaten vom Unternehmensserver laden</source><target>Kundendaten vom Unternehmensserver laden</target></trans-unit>
-<trans-unit id="UHJvamVrdMO8YmVyc2ljaHQ="><source>Projektübersicht</source><target>Projektübersicht</target></trans-unit>
-<trans-unit id="UHJvamVrdCBiZWF1ZnRyYWdlbg=="><source>Projekt beauftragen</source><target>Projekt beauftragen</target></trans-unit>
-<trans-unit id="RmVlZGJhY2sgenVtIFByb2pla3Q="><source>Feedback zum Projekt</source><target>Feedback zum Projekt</target></trans-unit>
-<trans-unit id="U2VociB6dWZyaWVkZW4="><source>Sehr zufrieden</source><target>Sehr zufrieden</target></trans-unit>
-<trans-unit id="WnVmcmllZGVu"><source>Zufrieden</source><target>Zufrieden</target></trans-unit>
-<trans-unit id="TmljaHQgenVmcmllZGVu"><source>Nicht zufrieden</source><target>Nicht zufrieden</target></trans-unit>
-<trans-unit id="QXVzZsO8aHJsaWNoZXMgRmVlZGJhY2s="><source>Ausführliches Feedback</source><target>Ausführliches Feedback</target></trans-unit>
-<trans-unit id="R2V3w7xuc2NodGVzIG5ldWVzIExpZWZlcmRhdHVt"><source>Gewünschtes neues Lieferdatum</source><target>Gewünschtes neues Lieferdatum</target></trans-unit>
-<trans-unit id="SW5zdHJ1a3Rpb25lbiB6dSBFcmfDpG56dW5nZW4gYW0gUHJvamVrdA=="><source>Instruktionen zu Ergänzungen am Projekt</source><target>Instruktionen zu Ergänzungen am Projekt</target></trans-unit>
-<trans-unit id="V29ya2Zsb3dzY2hyaXR0"><source>Workflowschritt</source><target>Workflowschritt</target></trans-unit>
-<trans-unit id="RXJ3YXJ0ZXRlcyBMaWVmZXJkYXR1bQ=="><source>Erwartetes Lieferdatum</source><target>Erwartetes Lieferdatum</target></trans-unit>
-<trans-unit id="QXVzbGllZmVydW5n"><source>Auslieferung</source><target>Auslieferung</target></trans-unit>
-<trans-unit id="w5xiZXJzZXR6dGUgRGF0ZWllbg=="><source>Übersetzte Dateien</source><target>Übersetzte Dateien</target></trans-unit>
-<trans-unit id="S2VpbmUgw7xiZXJzZXR6dGVuIERhdGVpZW4gdm9yaGFuZGVu"><source>Keine übersetzten Dateien vorhanden</source><target>Keine übersetzten Dateien vorhanden</target></trans-unit>
-<trans-unit id="JiMxNjA7JiMxNjA7JiMxNjA7QW56YWhsIFByb2pla3RlOiYjMTYwOw=="><source>&#160;&#160;&#160;Anzahl Projekte:&#160;</source><target>&#160;&#160;&#160;Anzahl Projekte:&#160;</target></trans-unit>
-<trans-unit id="QXVmdHJhZ3NudW1tZXI="><source>Auftragsnummer</source><target>Auftragsnummer</target></trans-unit>
-<trans-unit id="QmVhdWZ0cmFnZXI="><source>Beauftrager</source><target>Auftraggeber</target></trans-unit>
-<trans-unit id="cGVuZGluZw=="><source>pending</source><target>in Vorbereitung...</target></trans-unit>
-<trans-unit id="aW5Xb3Jr"><source>inWork</source><target>in Arbeit</target></trans-unit>
-<trans-unit id="bGF0ZQ=="><source>late</source><target>verspätet</target></trans-unit>
-<trans-unit id="ZGVsaXZlcmVk"><source>delivered</source><target>geliefert</target></trans-unit>
-<trans-unit id="aW52b2ljZWQ="><source>invoiced</source><target>abgerechnet</target></trans-unit>
-<trans-unit id="cGFpZA=="><source>paid</source><target>bezahlt</target></trans-unit>
-<trans-unit id="QmVhdWZ0cmFndW5n"><source>Beauftragung</source><target>Beauftragung</target></trans-unit>
-<trans-unit id="UmVjaG51bmdzbnIu"><source>Rechnungsnr.</source><target>Rechnungsnr.</target></trans-unit>
-<trans-unit id="UmVjaG51bmdzZGF0dW0="><source>Rechnungsdatum</source><target>Rechnungsdatum</target></trans-unit>
-<trans-unit id="QmV6YWhsdA=="><source>Bezahlt</source><target>Bezahlt</target></trans-unit>
-<trans-unit id="UHJvamVrdGUgZmlsdGVybg=="><source>Projekte filtern</source><target>Projekte filtern</target></trans-unit>
-<trans-unit id="RGV0YWlscyBkZXMgUHJvamVrdHMg"><source>Details des Projekts </source><target>Details des Projekts </target></trans-unit>
-<trans-unit id="QmVhcmJlaXRlbiBkZXMgUHJvamVrdHMgYmVlbmRlbj8="><source>Bearbeiten des Projekts beenden?</source><target>Bearbeiten des Projekts beenden?</target></trans-unit>
-<trans-unit id="SWhyZSDDhG5kZXJ1bmdzd8O8bnNjaGUgYW0gUHJvamVrdCB3dXJkZW4gbm9jaCBuaWNodCDDvGJlcnRyYWdlbi4gU29sbCBkaWVzZXMgRmVuc3RlciBkZW5ub2NoIGdlc2NobG9zc2VuIHdlcmRlbj8="><source>Ihre Änderungswünsche am Projekt wurden noch nicht übertragen. Soll dieses Fenster dennoch geschlossen werden?</source><target>Ihre Änderungswünsche am Projekt wurden noch nicht übertragen. Soll dieses Fenster dennoch geschlossen werden?</target></trans-unit>
-<trans-unit id="YmVvU3BoZXJl"><source>beoSphere</source><target>beoSphere</target></trans-unit>
-<trans-unit id="RGFzIFBvcnRhbCBtaXQgbGVpc3R1bmdzc3RhcmtlbiBNb2R1bGUgenVyIFZlcndhbHR1bmcgdW5kIFZlcmZvbGd1bmcgdm9uIMOcYmVyc2V0enVuZ3NhdWZ0csOkZ2VuIHVuZCBkZXJlbiBRdWFsaXTDpHRzc2ljaGVydW5nOiBBdWZ0csOkZ2Ugd2VyZGVuIMO8YmVyIGVpbiBXZWItRm9ybXVsYXIgYW5nZWxlZ3QsIEFuZ2Vib3RlIHVuZCBTdGF0dXMtQW56ZWlnZW4gYXV0b21hdGlzY2ggZXJ6ZXVndC4gRGllIFRlcm1pbm9sb2dpZS0gdW5kIFJldmlldy1Nb2R1bGUgYmV6aWVoZW4gZGVuIEt1bmRlbiDDvGJlciBkZW4gQnJvd3NlciBpbiDDhG5kZXJ1bmdzLSB1bmQgRnJlaWdhYmVwcm96ZXNzZSBlaW4gLSBCZWlzcGllbGU6IEFrdGl2ZSBUZXJtaW5vbG9naWVhcmJlaXQsIHVudGVybmVobWVuc3dlaXRlIFZlcnRlaWx1bmcgdm9uIFRlcm1pbm9sb2dpZSAoQ29ycG9yYXRlIExhbmd1YWdlKSBvZGVyIG9wdGltYWxlIEFucGFzc3VuZyBkZXIgw5xiZXJzZXR6dW5nIGbDvHIgbG9rYWxlIE3DpHJrdGUu"><source>Das Portal mit leistungsstarken Module zur Verwaltung und Verfolgung von Übersetzungsaufträgen und deren Qualitätssicherung: Aufträge werden über ein Web-Formular angelegt, Angebote und Status-Anzeigen automatisch erzeugt. Die Terminologie- und Review-Module beziehen den Kunden über den Browser in Änderungs- und Freigabeprozesse ein - Beispiele: Aktive Terminologiearbeit, unternehmensweite Verteilung von Terminologie (Corporate Language) oder optimale Anpassung der Übersetzung für lokale Märkte.</source><target>Das Portal mit leistungsstarken Modulen zur Verwaltung und Verfolgung von Übersetzungsaufträgen und deren Qualitätssicherung: Aufträge werden über ein Web-Formular angelegt, Angebote und Status-Anzeigen automatisch erzeugt. Die Terminologie- und Review-Module beziehen den Kunden über den Browser in Änderungs- und Freigabeprozesse ein - Beispiele: Aktive Terminologiearbeit, unternehmensweite Verteilung von Terminologie (Corporate Language) oder optimale Anpassung der Übersetzung für lokale Märkte.</target></trans-unit>
-<trans-unit id="RGFzIFF1YWxpdMOkdHNtYW5hZ2VtZW50IHVtZmFzc3QgbWVocmVyZSBNb2R1bGUsIGRlcmVuIFp1c2FtbWVuc3BpZWwgZGFzIDQgQXVnZW4tUHJpbnppcCBzb3dlaXQgd2llIG3DtmdsaWNoIHp1IGF1dG9tYXRpc2llcmVuIGhpbGZ0OiBWb2xsc3TDpG5kaWdrZWl0c2tvbnRyb2xsZSBhdWYgVmVyemVpY2huaXNlYmVuZSwgVmFsaWTDpHRzcHLDvGZ1bmcgdm9uIFRhZ3MgdW5kIEZvcm1hdGVuIHNvd2llIFByw7xmdW5nIHZvbiBUZXJtaW5vbG9naWUsIE9ydGhvZ3JhZmllLCBUeXBvZ3JhZmllIHVuZCBEYXRlbmludGVyZ3JpdMOkdC4gRGllIFByw7xma3JpdGVyaWVuIGJhc2llcmVuIGF1ZiBkZW0gRmVobGVybWVzc3ZlcmZhaHJlbiBuYWNoIFNBRSBKMjQ1MC4gRGllIFByw7xmZXJnZWJuaXNzZSB3ZXJkZW4gaW4gZWluZXIgZWxla3RvbmlzY2hlbiBGZWhsZXJzYW1tZWxrYXJ0ZSBlcmZhc3N0IHVuZCBkb2t1bWVudGllcnQuIEbDvHIgZGFzIGt1bmRlbnNlaXRpZ2UgUmlzaWtvbWFuYWdlbWVudCBpc3QgZWluIFp1Z3JpZmYgYXVmIGRlbiB2aXN1YWxpc2llcnRlbiBGZWhsZXJyYXVtIG3DtmdsaWNoLiBCZWluYWhlIGJlbGllYmlnZSBBdXN3ZXJ0dW5nZW4gc2luZCDDvGJhciBkYXMgUG9ydGFsIGplZGVyemVpdCBhYnJ1ZmJhci4="><source>Das Qualitätsmanagement umfasst mehrere Module, deren Zusammenspiel das 4 Augen-Prinzip soweit wie möglich zu automatisieren hilft: Vollständigkeitskontrolle auf Verzeichnisebene, Validätsprüfung von Tags und Formaten sowie Prüfung von Terminologie, Orthografie, Typografie und Datenintergrität. Die Prüfkriterien basieren auf dem Fehlermessverfahren nach SAE J2450. Die Prüfergebnisse werden in einer elektonischen Fehlersammelkarte erfasst und dokumentiert. Für das kundenseitige Risikomanagement ist ein Zugriff auf den visualisierten Fehlerraum möglich. Beinahe beliebige Auswertungen sind übar das Portal jederzeit abrufbar.</source><target>Das Qualitätsmanagement umfasst mehrere Module, deren Zusammenspiel das 4 Augen-Prinzip soweit wie möglich zu automatisieren hilft: Vollständigkeitskontrolle auf Verzeichnisebene, Validätsprüfung von Tags und Formaten sowie Prüfung von Terminologie, Orthografie, Typografie und Datenintergrität. Die Prüfkriterien basieren auf dem Fehlermessverfahren nach SAE J2450. Die Prüfergebnisse werden in einer elektonischen Fehlersammelkarte erfasst und dokumentiert. Für das kundenseitige Risikomanagement ist ein Zugriff auf den visualisierten Fehlerraum möglich. Beinahe beliebige Auswertungen sind übar das Portal jederzeit abrufbar.</target></trans-unit>
-<trans-unit id="VGVjaG5vbG9naWU="><source>Technologie</source><target>Technologie</target></trans-unit>
-<trans-unit id="PGI+YmVvPC9iPiBzZXR6dCBhdWYgZWluZSBiZXfDpGhydGUgTWlzY2h1bmcgYXVzIGludGVybmF0aW9uYWxlbiBTdGFuZGFydHMgd2llIFhMSUZGLCBUTVgsIFRCWCwgU1JYIHNvd2llIG1vZGVybmUgQ29tcHV0ZXJsaW5ndWlzdGlrLU1ldGhvZGVuLCBlcmfDpG56dCBkdXJjaCBXZWItVGVjaG5vbG9naWVuIHVuZCBnZWVpZ25ldGUgRGF0ZW5iYW5rZW4sIHVtIGhvaGUgUXVhbGl0w6R0IGVmZml6aWVudCB6dSBwcm9kdXppZXJlbi4gQWxsZSBNb2R1bGUgZnVua3Rpb25pZXJlbiBtaXQgZGVyIEF1c2dhbmdzc3ByYWNoZSBEZXV0c2NoLCBlaW5pZ2UgbWl0IEVuZ2xpc2NoLg=="><source><b>beo</b> setzt auf eine bewährte Mischung aus internationalen Standarts wie XLIFF, TMX, TBX, SRX sowie moderne Computerlinguistik-Methoden, ergänzt durch Web-Technologien und geeignete Datenbanken, um hohe Qualität effizient zu produzieren. Alle Module funktionieren mit der Ausgangssprache Deutsch, einige mit Englisch.</source><target><b>beo</b> setzt auf eine bewährte Mischung aus internationalen Standarts wie XLIFF, TMX, TBX, SRX sowie moderne Computerlinguistik-Methoden, ergänzt durch Web-Technologien und geeignete Datenbanken, um hohe Qualität effizient zu produzieren. Alle Module funktionieren mit der Ausgangssprache Deutsch, einige mit Englisch.</target></trans-unit>
-<trans-unit id="TWl0IGRlbSBQb3J0YWwgaXN0IGVpbmUgd2VpdGdlaGVuZGUgSW50ZXJncmF0aW9uIGRlciDDnGJlcnNldHp1bmdzcHJvemVzc2UgaW4gZGllIHVudGVybmVobWVuc2ludGVybmVuIFByb3plc3NlIGRlcyBLdW5kZW4gbcO2Z2xpY2guIERpZSBOdXR6dW5nIGlzdCBpbiBkZXIgUmVnZWwgd2VkZXIgbWl0IExpemVuemtvc3RlbiBub2NoIG1pdCBlaW5lciBHZWLDvGhyIHZlcmJ1bmRlbi4gTGVkaWdsaWNoIGF1ZnfDpG5kaWdlIEtvbmZpZ3VyYXRpb25lbiBzb3dpZSBFbnR3aWNrbHVuZyB1bmQgQW5wYXNzdW5nIG5hY2gga3VuZGVuc3BlemlmaXNjaGVuIEFuZm9yZGVydW5nZW4gd2VyZGVuIGluZGl2aWR1ZWxsIGFuZ2Vib3Rlbi4="><source>Mit dem Portal ist eine weitgehende Intergration der Übersetzungsprozesse in die unternehmensinternen Prozesse des Kunden möglich. Die Nutzung ist in der Regel weder mit Lizenzkosten noch mit einer Gebühr verbunden. Lediglich aufwändige Konfigurationen sowie Entwicklung und Anpassung nach kundenspezifischen Anforderungen werden individuell angeboten.</source><target>Mit dem Portal ist eine weitgehende Intergration der Übersetzungsprozesse in die unternehmensinternen Prozesse des Kunden möglich. Die Nutzung ist in der Regel weder mit Lizenzkosten noch mit einer Gebühr verbunden. Lediglich aufwändige Konfigurationen sowie Entwicklung und Anpassung nach kundenspezifischen Anforderungen werden individuell angeboten.</target></trans-unit>
-<trans-unit id="PGI+YmVvPC9iPiwgaGF0IDxiPm9wZW5UTVM8L2I+LCBkYXMgZXJzdGUgcHJvZmVzc2lvbmVsbGUgT3BlbiBTb3VyY2UgYmFzaWVydGUgVHJhbnNsYXRpb24gTWVtb3J5LVN5c3RlbSBpbml0aWlydCB1bmQgaXN0IGltIFN0ZXVlcnVuZ3NrcmVpcyB2b24gT3BlblRNMiBha3Rpdi4="><source><b>beo</b>, hat <b>openTMS</b>, das erste professionelle Open Source basierte Translation Memory-System initiirt und ist im Steuerungskreis von OpenTM2 aktiv.</source><target><b>beo</b>, hat <b>openTMS</b>, das erste professionelle Open Source basierte Translation Memory-System initiirt und ist im Steuerungskreis von OpenTM2 aktiv.</target></trans-unit>
-<trans-unit id="SGlsZmUgenVyIEJlZGllbnVuZw=="><source>Hilfe zur Bedienung</source><target>Hilfe zur Bedienung</target></trans-unit>
-<trans-unit id="S3VyemFubGVpdHVuZyBiZW9TcGhlcmU="><source>Kurzanleitung beoSphere</source><target>Kurzanleitung beoSphere</target></trans-unit>
-<trans-unit id="VGVsLg=="><source>Tel.</source><target>Tel.</target></trans-unit>
-<trans-unit id="R2VzY2jDpGZ0c2xlaXR1bmcgdW5kIFZlcnRyaWVi"><source>Geschäftsleitung und Vertrieb</source><target>Geschäftsleitung und Vertrieb</target></trans-unit>
-<trans-unit id="UXVhbGl0w6R0c21hbmFnZW1lbnRiZWF1ZnRyYWd0ZQ=="><source>Qualitätsmanagementbeauftragte</source><target>Qualitätsmanagementbeauftragte</target></trans-unit>
-<trans-unit id="TmllZGVybGFzc3VuZ3NsZWl0dW5nOg=="><source>Niederlassungsleitung:</source><target>Niederlassungsleitung:</target></trans-unit>
-<trans-unit id="UHJvamVrdGU6"><source>Projekte:</source><target>Projekte:</target></trans-unit>
-<trans-unit id="UmVzc291cmNlbjo="><source>Ressourcen:</source><target>Ressourcen:</target></trans-unit>
-<trans-unit id="TWFya2V0aW5nOg=="><source>Marketing:</source><target>Marketing:</target></trans-unit>
-<trans-unit id="S2V5IEFjY291bnQgTWFuYWdlbWVudDo="><source>Key Account Management:</source><target>Key Account Management:</target></trans-unit>
-<trans-unit id="U3ByYWNoc2NodWx1bmc6"><source>Sprachschulung:</source><target>Sprachschulung:</target></trans-unit>
-<trans-unit id="QWxsZQ=="><source>Alle</source><target>Alle</target></trans-unit>
-<trans-unit id="RGllIGFuZ2VnZWJlbmUgRS1NYWlsIHdpcmQgYmVyZWl0cyB2b24gZWluZW0gYW5kZXJlbiBMb2dpbiB2ZXJ3ZW5kZXQh"><source>Die angegebene E-Mail wird bereits von einem anderen Login verwendet!</source><target>Die angegebene E-Mail wird bereits von einem anderen Benutzer verwendet!</target></trans-unit>
-<trans-unit id="RXMgd3VyZGUgZWluIG5ldWVyIE1pdGFyYmVpdGVyIGFuZ2VsZWd0ISBWaWVsZW4gRGFuayE="><source>Es wurde ein neuer Mitarbeiter angelegt! Vielen Dank!</source><target>Es wurde ein neuer Mitarbeiter angelegt! Vielen Dank!</target></trans-unit>
-<trans-unit id="QnVsZ2FyaXNjaA=="><source>Bulgarisch</source><target>Bulgarisch</target></trans-unit>
-<trans-unit id="VHNjaGVjaGlzY2g="><source>Tschechisch</source><target>Tschechisch</target></trans-unit>
-<trans-unit id="RGV1dHNjaA=="><source>Deutsch</source><target>Deutsch</target></trans-unit>
-<trans-unit id="RMOkbmlzY2g="><source>Dänisch</source><target>Dänisch</target></trans-unit>
-<trans-unit id="RW5nbGlzY2g="><source>Englisch</source><target>Englisch</target></trans-unit>
-<trans-unit id="U3BhbmlzY2g="><source>Spanisch</source><target>Spanisch</target></trans-unit>
-<trans-unit id="RmlubmlzY2g="><source>Finnisch</source><target>Finnisch</target></trans-unit>
-<trans-unit id="RnJhbnrDtnNpc2No"><source>Französisch</source><target>Französisch</target></trans-unit>
-<trans-unit id="SmFwYW5pc2No"><source>Japanisch</source><target>Japanisch</target></trans-unit>
-<trans-unit id="TmllZGVybMOkbmRpc2No"><source>Niederländisch</source><target>Niederländisch</target></trans-unit>
-<trans-unit id="RmzDpG1pc2No"><source>Flämisch</source><target>Flämisch</target></trans-unit>
-<trans-unit id="Tm9yd2VnaXNjaCAoQm9rbWFsKQ=="><source>Norwegisch (Bokmal)</source><target>Norwegisch (Bokmal)</target></trans-unit>
-<trans-unit id="UnVtw6RuaXNjaA=="><source>Rumänisch</source><target>Rumänisch</target></trans-unit>
-<trans-unit id="UnVzc2lzY2g="><source>Russisch</source><target>Russisch</target></trans-unit>
-<trans-unit id="UG9sbmlzY2g="><source>Polnisch</source><target>Polnisch</target></trans-unit>
-<trans-unit id="UG9ydHVnaWVzaXNjaA=="><source>Portugiesisch</source><target>Portugiesisch</target></trans-unit>
-<trans-unit id="Q2hpbmVzaXNjaA=="><source>Chinesisch</source><target>Chinesisch</target></trans-unit>
-<trans-unit id="VW5nYXJpc2No"><source>Ungarisch</source><target>Ungarisch</target></trans-unit>
-<trans-unit id="SXRhbGllbmlzY2g="><source>Italienisch</source><target>Italienisch</target></trans-unit>
-<trans-unit id="QmVudXR6ZXJuYW1l"><source>Benutzername</source><target>Benutzername</target></trans-unit>
-<trans-unit id="UGFzc3dvcnQ="><source>Passwort</source><target>Passwort</target></trans-unit>
-<trans-unit id="RWlubG9nZ2Vu"><source>Einloggen</source><target>Anmelden</target></trans-unit>
-<trans-unit id="VmFsdWUgaXMgcmVxdWlyZWQgYW5kIGNhbid0IGJlIGVtcHR5"><source>Value is required and can't be empty</source><target>Dieses Feld darf nicht leer sein</target></trans-unit>
-<trans-unit id="JyV2YWx1ZSUnIGFwcGVhcnMgdG8gYmUgYSBETlMgaG9zdG5hbWUgYnV0IGNhbm5vdCBleHRyYWN0IFRMRCBwYXJ0"><source>'%value%' appears to be a DNS hostname but cannot extract TLD part</source><target>'%value%' appears to be a DNS hostname but cannot extract TLD part</target></trans-unit>
-<trans-unit id="QWJtZWxkZW4="><source>Abmelden</source><target>Abmelden</target></trans-unit>
-<trans-unit id="U3RhcnRzZWl0ZQ=="><source>Startseite</source><target>Startseite</target></trans-unit>
-<trans-unit id="QW5nZWJvdGU="><source>Angebote</source><target>Angebote</target></trans-unit>
-<trans-unit id="UHJvamVrdGU="><source>Projekte</source><target>Projekte</target></trans-unit>
-<trans-unit id="TGVrdG9yYXRzw7xiZXJzaWNodA=="><source>Lektoratsübersicht</source><target>Lektoratsübersicht</target></trans-unit>
-<trans-unit id="SW5mb3JtYXRpb25lbiB6dW0gV29ya2Zsb3c="><source>Informationen zum Workflow</source><target>Informationen zum Workflow</target></trans-unit>
-<trans-unit id="UHJlaXNsaXN0ZQ=="><source>Preisliste</source><target>Preisliste</target></trans-unit>
-<trans-unit id="RU4="><source>EN</source><target>EN</target></trans-unit>
-<trans-unit id="RlI="><source>FR</source><target>FR</target></trans-unit>
-<trans-unit id="REU="><source>DE</source><target>DE</target></trans-unit>
-<trans-unit id="Q1o="><source>CZ</source><target>CZ</target></trans-unit>
-<trans-unit id="UlU="><source>RU</source><target>RU</target></trans-unit>
-<trans-unit id="Wkg="><source>ZH</source><target>ZH</target></trans-unit>
-<trans-unit id="SlA="><source>JP</source><target>JP</target></trans-unit>
-<trans-unit id="Q2hpbmVzZQ=="><source>Chinese</source><target>Chinese</target></trans-unit>
-<trans-unit id="RW5nbGlzaA=="><source>English</source><target>English</target></trans-unit>
-<trans-unit id="R2VybWFu"><source>German</source><target>German</target></trans-unit>
-<trans-unit id="SXRhbGlhbg=="><source>Italian</source><target>Italian</target></trans-unit>
-<trans-unit id="ZW50ZXJlZCxhcHByb3ZlZA=="><source>entered,approved</source><target>in Vorbereitung...,erwarte Erteilung...</target></trans-unit>
-<trans-unit id="SFU="><source>HU</source><target>HU</target></trans-unit>
-<trans-unit id="RVM="><source>ES</source><target>ES</target></trans-unit>
-<trans-unit id="cGw="><source>pl</source><target>pl</target></trans-unit>
-<trans-unit id="RW5nbGlzY2ggKFVLKQ=="><source>Englisch (UK)</source><target>Englisch (UK)</target></trans-unit>
-<trans-unit id="RW5nbGlzY2ggKFVTKQ=="><source>Englisch (US)</source><target>Englisch (US)</target></trans-unit>
-<trans-unit id="RXN0bmlzY2g="><source>Estnisch</source><target>Estnisch</target></trans-unit>
-<trans-unit id="R3JpZWNoaXNjaA=="><source>Griechisch</source><target>Griechisch</target></trans-unit>
-<trans-unit id="S3JvYXRpc2No"><source>Kroatisch</source><target>Kroatisch</target></trans-unit>
-<trans-unit id="TGV0dGlzY2g="><source>Lettisch</source><target>Lettisch</target></trans-unit>
-<trans-unit id="Tm9yd2VnaXNjaA=="><source>Norwegisch</source><target>Norwegisch</target></trans-unit>
-<trans-unit id="UG9ydHVnaWVzaXNjaCAoQlIp"><source>Portugiesisch (BR)</source><target>Portugiesisch (BR)</target></trans-unit>
-<trans-unit id="UG9ydHVnaWVzaXNjaCAoRVUp"><source>Portugiesisch (EU)</source><target>Portugiesisch (EU)</target></trans-unit>
-<trans-unit id="U2Nod2VkaXNjaA=="><source>Schwedisch</source><target>Schwedisch</target></trans-unit>
-<trans-unit id="U2xvd2FraXNjaA=="><source>Slowakisch</source><target>Slowakisch</target></trans-unit>
-<trans-unit id="U2xvd2VuaXNjaA=="><source>Slowenisch</source><target>Slowenisch</target></trans-unit>
-<trans-unit id="Q2hpbmVzaXNjaCB0cmFkaXRpb25lbGw="><source>Chinesisch traditionell</source><target>Chinesisch traditionell</target></trans-unit>
-<trans-unit id="Q2hpbmVzaXNjaCB2ZXJlaW5mYWNodA=="><source>Chinesisch vereinfacht</source><target>Chinesisch vereinfacht</target></trans-unit>
-<trans-unit id="QWZyaWthYW5z"><source>Afrikaans</source><target>Afrikaans</target></trans-unit>
-<trans-unit id="QWxiYW5pc2No"><source>Albanisch</source><target>Albanisch</target></trans-unit>
-<trans-unit id="QXJhYmlzY2g="><source>Arabisch</source><target>Arabisch</target></trans-unit>
-<trans-unit id="QXJtZW5pc2No"><source>Armenisch</source><target>Armenisch</target></trans-unit>
-<trans-unit id="QXNlcmJhaWRzY2hhbmlzY2g="><source>Aserbaidschanisch</source><target>Aserbaidschanisch</target></trans-unit>
-<trans-unit id="QmVuZ2FsaXNjaA=="><source>Bengalisch</source><target>Bengalisch</target></trans-unit>
-<trans-unit id="Qm9zbmlzY2g="><source>Bosnisch</source><target>Bosnisch</target></trans-unit>
-<trans-unit id="RnJhbnrDtnNpc2NoKEJlbGdpZW4p"><source>Französisch(Belgien)</source><target>Französisch(Belgien)</target></trans-unit>
-<trans-unit id="R8OkbGlzY2ggKElyaXNjaCk="><source>Gälisch (Irisch)</source><target>Gälisch (Irisch)</target></trans-unit>
-<trans-unit id="R2Vvcmdpc2No"><source>Georgisch</source><target>Georgisch</target></trans-unit>
-<trans-unit id="R3VqYXJhdGk="><source>Gujarati</source><target>Gujarati</target></trans-unit>
-<trans-unit id="SGF1c3Nh"><source>Haussa</source><target>Haussa</target></trans-unit>
-<trans-unit id="SGVicsOkaXNjaA=="><source>Hebräisch</source><target>Hebräisch</target></trans-unit>
-<trans-unit id="SGluZGk="><source>Hindi</source><target>Hindi</target></trans-unit>
-<trans-unit id="SWdibw=="><source>Igbo</source><target>Igbo</target></trans-unit>
-<trans-unit id="SW5kb25lc2lzY2g="><source>Indonesisch</source><target>Indonesisch</target></trans-unit>
-<trans-unit id="SXNsw6RuZGlzY2g="><source>Isländisch</source><target>Isländisch</target></trans-unit>
-<trans-unit id="S2FtYm9kaWFuaXNjaA=="><source>Kambodianisch</source><target>Kambodianisch</target></trans-unit>
-<trans-unit id="S2FubmFkYQ=="><source>Kannada</source><target>Kannada</target></trans-unit>
-<trans-unit id="S2FzYWNoaXNjaA=="><source>Kasachisch</source><target>Kasachisch</target></trans-unit>
-<trans-unit id="S2F0YWxhbmlzY2g="><source>Katalanisch</source><target>Katalanisch</target></trans-unit>
-<trans-unit id="S2lyZ2lzaXNjaA=="><source>Kirgisisch</source><target>Kirgisisch</target></trans-unit>
-<trans-unit id="S29yZWFuaXNjaA=="><source>Koreanisch</source><target>Koreanisch</target></trans-unit>
-<trans-unit id="TGl0YXVpc2No"><source>Litauisch</source><target>Litauisch</target></trans-unit>
-<trans-unit id="TWFsYXlhbGFt"><source>Malayalam</source><target>Malayalam</target></trans-unit>
-<trans-unit id="TWFsYXlpc2No"><source>Malayisch</source><target>Malayisch</target></trans-unit>
-<trans-unit id="TWFsdGVzaXNjaA=="><source>Maltesisch</source><target>Maltesisch</target></trans-unit>
-<trans-unit id="TWFyYXRoaQ=="><source>Marathi</source><target>Marathi</target></trans-unit>
-<trans-unit id="TWF6ZWRvbmlzY2g="><source>Mazedonisch</source><target>Mazedonisch</target></trans-unit>
-<trans-unit id="TW9sZGF3aXNjaA=="><source>Moldawisch</source><target>Moldawisch</target></trans-unit>
-<trans-unit id="UGFuamFiaQ=="><source>Panjabi</source><target>Panjabi</target></trans-unit>
-<trans-unit id="UGFzY2h0dQ=="><source>Paschtu</source><target>Paschtu</target></trans-unit>
-<trans-unit id="UGVyc2lzY2ggKEZhcnNpKQ=="><source>Persisch (Farsi)</source><target>Persisch (Farsi)</target></trans-unit>
-<trans-unit id="U2VyYmlzY2g="><source>Serbisch</source><target>Serbisch</target></trans-unit>
-<trans-unit id="U2VyYm8tS3JvYXRpc2No"><source>Serbo-Kroatisch</source><target>Serbo-Kroatisch</target></trans-unit>
-<trans-unit id="U2Vzb3Robw=="><source>Sesotho</source><target>Sesotho</target></trans-unit>
-<trans-unit id="U29tYWxp"><source>Somali</source><target>Somali</target></trans-unit>
-<trans-unit id="U3BhbmlzY2ggKEtvbHVtYmllbik="><source>Spanisch (Kolumbien)</source><target>Spanisch (Kolumbien)</target></trans-unit>
-<trans-unit id="U3BhbmlzY2ggKE1leGlrbyk="><source>Spanisch (Mexiko)</source><target>Spanisch (Mexiko)</target></trans-unit>
-<trans-unit id="U3VhaGVsaQ=="><source>Suaheli</source><target>Suaheli</target></trans-unit>
-<trans-unit id="VGFkc2NoaWtpc2No"><source>Tadschikisch</source><target>Tadschikisch</target></trans-unit>
-<trans-unit id="VGFnYWxvZw=="><source>Tagalog</source><target>Tagalog</target></trans-unit>
-<trans-unit id="VGFtaWxpc2No"><source>Tamilisch</source><target>Tamilisch</target></trans-unit>
-<trans-unit id="VGVsdWd1"><source>Telugu</source><target>Telugu</target></trans-unit>
-<trans-unit id="VGhhaQ=="><source>Thai</source><target>Thai</target></trans-unit>
-<trans-unit id="VGliZXRpc2No"><source>Tibetisch</source><target>Tibetisch</target></trans-unit>
-<trans-unit id="VHN3YW5h"><source>Tswana</source><target>Tswana</target></trans-unit>
-<trans-unit id="VMO8cmtpc2No"><source>Türkisch</source><target>Türkisch</target></trans-unit>
-<trans-unit id="VHVya21lbmlzY2g="><source>Turkmenisch</source><target>Turkmenisch</target></trans-unit>
-<trans-unit id="VWtyYWluaXNjaA=="><source>Ukrainisch</source><target>Ukrainisch</target></trans-unit>
-<trans-unit id="VXJkdQ=="><source>Urdu</source><target>Urdu</target></trans-unit>
-<trans-unit id="VXNiZWtpc2No"><source>Usbekisch</source><target>Usbekisch</target></trans-unit>
-<trans-unit id="VmlldG5hbWVzaXNjaA=="><source>Vietnamesisch</source><target>Vietnamesisch</target></trans-unit>
-<trans-unit id="V2Vpw59ydXNzaXNjaA=="><source>Weißrussisch</source><target>Weißrussisch</target></trans-unit>
-<trans-unit id="WGhvc2E="><source>Xhosa</source><target>Xhosa</target></trans-unit>
-<trans-unit id="WW9ydWJh"><source>Yoruba</source><target>Yoruba</target></trans-unit>
-<trans-unit id="WnVsdQ=="><source>Zulu</source><target>Zulu</target></trans-unit>
-<trans-unit id="S3VuZGVuIGVkaXRpZXJlbg=="><source>Kunden editieren</source><target>Kunden editieren</target></trans-unit>
-<trans-unit id="S3VuZGVuZGF0ZW4gbGFkZW4="><source>Kundendaten laden</source><target>Kundendaten laden</target></trans-unit>
-<trans-unit id="ZGVtbywgYmVv"><source>demo, beo</source><target>demo, beo</target></trans-unit>
-<trans-unit id="QWxsZSBQcm9qZWt0ZSBzaWNodGJhcjo="><source>Alle Projekte sichtbar:</source><target>Alle Projekte sichtbar:</target></trans-unit>
-<trans-unit id="QWxsZSBBbmdlYm90ZSBzaWNodGJhcjo="><source>Alle Angebote sichtbar:</source><target>Alle Angebote sichtbar:</target></trans-unit>
-<trans-unit id="UmVjaG51bmdlbiBhbmRlcmVyIE1pdGFyYmVpdGVyIHNlaGVuOg=="><source>Rechnungen anderer Mitarbeiter sehen:</source><target>Rechnungen anderer Mitarbeiter sehen:</target></trans-unit>
-<trans-unit id="SW4gUm9sbGUgZGVzIEJlbnV0emVycyB3ZWNoc2Vsbg=="><source>In Rolle des Benutzers wechseln</source><target>In Rolle des Benutzers wechseln</target></trans-unit>
-<trans-unit id="ZGVtbywgbXIu"><source>demo, mr.</source><target>demo, mr.</target></trans-unit>
-<trans-unit id="ZGVtb2FjY291bnQsIG1hcmM="><source>demoaccount, marc</source><target>demoaccount, marc</target></trans-unit>
-<trans-unit id="U2NobHVyY2gsIFdhbHRlcg=="><source>Schlurch, Walter</source><target>Schlurch, Walter</target></trans-unit>
-<trans-unit id="Um9sbGVuIHNwZWljaGVybg=="><source>Rollen speichern</source><target>Rollen speichern</target></trans-unit>
-<trans-unit id="REVNTyBUZXJtaW5vbG9naWU="><source>DEMO Terminologie</source><target>DEMO Terminologie</target></trans-unit>
-<trans-unit id="REVNTyBlRlNLLUZvcm11bGFy"><source>DEMO eFSK-Formular</source><target>DEMO eFSK-Formular</target></trans-unit>
-<trans-unit id="REVNTyBEWEY="><source>DEMO DXF</source><target>DEMO DXF</target></trans-unit>
-<trans-unit id="REVNTyBRQQ=="><source>DEMO QA</source><target>DEMO QA</target></trans-unit>
-<trans-unit id="REVNTyBGZWhsZXJyYXVt"><source>DEMO Fehlerraum</source><target>DEMO Fehlerraum</target></trans-unit>
-<trans-unit id="REVNTyBUZXJtZXh0cmFrdG9y"><source>DEMO Termextraktor</source><target>DEMO Termextraktor</target></trans-unit>
-<trans-unit id="REVNTyBGQVE="><source>DEMO FAQ</source><target>DEMO FAQ</target></trans-unit>
-<trans-unit id="VlcgZUZTSyBEZW1v"><source>VW eFSK Demo</source><target>VW eFSK Demo</target></trans-unit>
-<trans-unit id="UmFobWVudmVydHJhZw=="><source>Rahmenvertrag</source><target>Rahmenvertrag</target></trans-unit>
-<trans-unit id="VmVydHJhdWxpY2hrZWl0c3ZlcmVpbmJhcnVuZw=="><source>Vertraulichkeitsvereinbarung</source><target>Vertraulichkeitsvereinbarung</target></trans-unit>
-<trans-unit id="w5xiZXJzZXR6dW5nc3JpY2h0bGluaWVu"><source>Übersetzungsrichtlinien</source><target>Übersetzungsrichtlinien</target></trans-unit>
-<trans-unit id="WmZFeHRlbmRlZF9Ob3RGb3VuZEV4Y2VwdGlvbiBLZXk6IFpmRXh0ZW5kZWRfTW9kZWxzX0VudGl0eV9BYnN0cmFjdCN3aGVyZSA7IFZhbHVlOiBzZXNzaW9uX2lkID0gPw=="><source>ZfExtended_NotFoundException Key: ZfExtended_Models_Entity_Abstract#where ; Value: session_id = ?</source><target>ZfExtended_NotFoundException Key: ZfExtended_Models_Entity_Abstract#where ; Value: session_id = ?</target></trans-unit>
+  <body><trans-unit id='RGV1dHNjaA=='><source>Deutsch</source><target>Deutsch</target></trans-unit>
+<trans-unit id='RW5nbGlzY2g='><source>Englisch</source><target>Englisch</target></trans-unit>
 <trans-unit id='dHJhbnNsYXRlNSAtIE9wZW4tU291cmNlLUxla3RvcmF0CiAgICBmw7xyIGRlbiBCcm93c2Vy'><source>translate5 - Open-Source-Lektorat
     für den Browser</source><target>translate5 - Open-Source-Lektorat
     für den Browser</target></trans-unit>
@@ -862,10 +21,20 @@ Diese Email wurde automatisch generiert. Please do not reply to this email.</tar
 <trans-unit id='RW50d2lja2x1bmc='><source>Entwicklung</source><target>Entwicklung</target></trans-unit>
 <trans-unit id='Q29uc3VsdGluZyB1bmQgSW5zdGFsbGF0aW9uZW4='><source>Consulting und Installationen</source><target>Consulting und Installationen</target></trans-unit>
 <trans-unit id='SG9zdGluZw=='><source>Hosting</source><target>Hosting</target></trans-unit>
-<trans-unit id='U3RhbmRhcmRiZW51dHplciBmw7xyIHRyYW5zbGF0ZTU='><source>Standardbenutzer für translate5</source><target>Standardbenutzer für translate5</target></trans-unit>
-<trans-unit id='QWNodHVuZzogSW4gZGVyIHRyYW5zbGF0ZTUtRGVtb2luc3RhbGxhdGlvbiBzaW5kIGRpZXNlIFN0YW5kYXJkYmVudXR6ZXIgbmljaHQgZWRpdGllcmJhciAtIGFuZGVyZSBCZW51dHplciBoaW5nZWdlbiBzY2hvbi4='><source>Achtung: In der translate5-Demoinstallation sind diese Standardbenutzer nicht editierbar - andere Benutzer hingegen schon.</source><target>Achtung: In der translate5-Demoinstallation sind diese Standardbenutzer nicht editierbar - andere Benutzer hingegen schon.</target></trans-unit>
 <trans-unit id='VGVzdGRhdGVu'><source>Testdaten</source><target>Testdaten</target></trans-unit>
 <trans-unit id='RmFsbHMgU2llIGtlaW5lIFRlc3RkYXRlbiB6dXIgSGFuZCBoYWJlbiwga8O2bm5lbiBTaWUgPGEgaHJlZj0iL2luZGV4L3Rlc3RkYXRhLyI+aGllciBUZXN0ZGF0ZW4gZG93bmxvYWRlbjwvYT4gdW5kIGFscyBuZXVlcyBQcm9qZWt0IGltcG9ydGllcmVuLg=='><source>Falls Sie keine Testdaten zur Hand haben, können Sie <a href="/index/testdata/">hier Testdaten downloaden</a> und als neues Projekt importieren.</source><target>Falls Sie keine Testdaten zur Hand haben, können Sie <a href="/index/testdata/">hier Testdaten downloaden</a> und als neues Projekt importieren.</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRlNSBMb2dpbg=='><source>translate5 Login</source><target>translate5 Login</target></trans-unit>
+<trans-unit id='U3RhbmRhcmRiZW51dHplciBmw7xyIHRyYW5zbGF0ZTU='><source>Standardbenutzer für translate5</source><target>Standardbenutzer für translate5</target></trans-unit>
+<trans-unit id='QWNodHVuZzogSW4gZGVyIHRyYW5zbGF0ZTUtRGVtb2luc3RhbGxhdGlvbiBzaW5kIGRpZXNlIFN0YW5kYXJkYmVudXR6ZXIgbmljaHQgZWRpdGllcmJhciAtIGFuZGVyZSBCZW51dHplciBoaW5nZWdlbiBzY2hvbi4='><source>Achtung: In der translate5-Demoinstallation sind diese Standardbenutzer nicht editierbar - andere Benutzer hingegen schon.</source><target>Achtung: In der translate5-Demoinstallation sind diese Standardbenutzer nicht editierbar - andere Benutzer hingegen schon.</target></trans-unit>
+<trans-unit id='QmVudXR6ZXJuYW1l'><source>Benutzername</source><target>Benutzername</target></trans-unit>
+<trans-unit id='UGFzc3dvcnQ='><source>Passwort</source><target>Passwort</target></trans-unit>
+<trans-unit id='TG9naW4='><source>Login</source><target>Login</target></trans-unit>
+<trans-unit id='RWlubG9nZ2Vu'><source>Einloggen</source><target>Einloggen</target></trans-unit>
+<trans-unit id='UGFzc3dvcnQgbmV1IHNldHplbg=='><source>Passwort neu setzen</source><target>Passwort neu setzen</target></trans-unit>
+<trans-unit id='VW5nw7xsdGlnZSBMb2dpbmRhdGVuITxici8+SGFiZW4gU2llIElociBQYXNzd29ydCB2ZXJnZXNzZW4gb2RlciBiaXNsYW5nIG5vY2gga2VpbiBQYXNzd29ydCBmw7xyIElocmVuIExvZ2luIGdlc2V0enQ/ICBTaWUga8O2bm5lbiBqZWRlcnplaXQgZWluZW4gbmV1ZW4gTGluayAlc2hpZXIlcyBhbmZvcmRlcm4u'><source>Ungültige Logindaten!<br/>Haben Sie Ihr Passwort vergessen oder bislang noch kein Passwort für Ihren Login gesetzt?  Sie können jederzeit einen neuen Link %shier%s anfordern.</source><target>Ungültige Logindaten!<br/>Haben Sie Ihr Passwort vergessen oder bislang noch kein Passwort für Ihren Login gesetzt?  Sie können jederzeit einen neuen Link %shier%s anfordern.</target></trans-unit>
+<trans-unit id='U2VpdGUgbmljaHQgZ2VmdW5kZW46IA=='><source>Seite nicht gefunden: </source><target>Seite nicht gefunden: </target></trans-unit>
+<trans-unit id='LyBBdWZydWYgZXJmb2xndGUgZHVyY2ggSVA6IA=='><source>/ Aufruf erfolgte durch IP: </source><target>/ Aufruf erfolgte durch IP: </target></trans-unit>
+<trans-unit id='SW5mb3JtYXRpb25lbiB6dXIgQmVkaWVudW5n'><source>Informationen zur Bedienung</source><target>Informationen zur Bedienung</target></trans-unit>
 <trans-unit id='RGllc2UgdHJhbnNsYXRlNSBEZW1vdmVyc2lvbiBpc3Qgw7ZmZmVudGxpY2gsIGFsbGUgaG9jaGdlbGFkZW5lbiBQcm9qZWt0ZSBrw7ZubmVuIHZvbiBqZWRlbSBlaW5nZXNlaGVuIHVuZCBleHBvcnRpZXJ0IHdlcmRlbiE='><source>Diese translate5 Demoversion ist öffentlich, alle hochgeladenen Projekte können von jedem eingesehen und exportiert werden!</source><target>Diese translate5 Demoversion ist öffentlich, alle hochgeladenen Projekte können von jedem eingesehen und exportiert werden!</target></trans-unit>
 <trans-unit id='WmlwLURhdGVpIG1pdCBJbXBvcnQgRGF0ZW4='><source>Zip-Datei mit Import Daten</source><target>Zip-Datei mit Import Daten</target></trans-unit>
 <trans-unit id='cHJvb2ZSZWFkOiBWZXJ6ZWljaG5pcyBtaXQgenUgbGVrdG9yaWVyZW5kZW4gRGF0ZWllbg=='><source>proofRead: Verzeichnis mit zu lektorierenden Dateien</source><target>proofRead: Verzeichnis mit zu lektorierenden Dateien</target></trans-unit>
@@ -910,15 +79,9 @@ Diese Email wurde automatisch generiert. Please do not reply to this email.</tar
 <trans-unit id='WmVpZ2VuIGRpZSBXZXJ0ZSBkZXMgYWt0dWVsbGVuIFNlZ21lbnRz'><source>Zeigen die Werte des aktuellen Segments</source><target>Zeigen die Werte des aktuellen Segments</target></trans-unit>
 <trans-unit id='VGVybWlub2xvZ2llIGVudGjDpGx0IGF1Y2ggbmljaHQgaW0gU2VnbWVudCB2ZXJ3ZW5kZXRlIFRlcm1lIGVpbmVzIHZlcndlbmRldGVuIEJlZ3JpZmZz'><source>Terminologie enthält auch nicht im Segment verwendete Terme eines verwendeten Begriffs</source><target>Terminologie enthält auch nicht im Segment verwendete Terme eines verwendeten Begriffs</target></trans-unit>
 <trans-unit id='V8OkaGxiYXJlIFdlcnRlIGbDvHIgIlFNIiB1bmQgIlN0YXR1cyIgc2luZCBwcm8gSW5zdGFsbGF0aW9uIGZyZWkga29uZmlndXJpZXJiYXI='><source>Wählbare Werte für "QM" und "Status" sind pro Installation frei konfigurierbar</source><target>Wählbare Werte für "QM" und "Status" sind pro Installation frei konfigurierbar</target></trans-unit>
-<trans-unit id='dHJhbnNsYXRlNSBRdWVsbGNvZGUgYXVmIGJpdGJ1Y2tldC5vcmc='><source>translate5 Quellcode auf bitbucket.org</source><target>translate5 Quellcode auf bitbucket.org</target></trans-unit>
-<trans-unit id='UXVhbGl0w6R0c2dlc2ljaGVydGUgVmVyc2lvbiAtIDxhIGhyZWY9Imh0dHA6Ly93d3cubWl0dGFncWkuY29tL3dpbGxrb21tZW4vaW1wcmVzc3VtIiB0YXJnZXQ9Il9ibGFuayI+Yml0dGUgZnJhZ2VuIFNpZSB1bnMgYW4hPC9hPg=='><source>Qualitätsgesicherte Version - <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">bitte fragen Sie uns an!</a></source><target>Qualitätsgesicherte Version - <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">bitte fragen Sie uns an!</a></target></trans-unit>
-<trans-unit id='Qml0YnVja2V0IGRpZW50IGRlciBFbnR3aWNrbHVuZyBhbHMgUmVwb3NpdG9yeSB1bmQgZW50aMOkbHQgZGVuIGxldHp0ZW4gU3RhbmQgZGVyIEVudHdpY2tsdW5nLiBEaWVzZXIgaXN0IG51ciBiZWRpbmd0IGbDvHIgZGVuIFByb2R1a3RpdmVpbnNhdHogZ2VlaWduZXQgdW5kIGthbm4gRmVobGVyIGVudGhhbHRlbiE8YnIvPiBFaW4gcXVhbGl0w6R0c2dlc2ljaGVydGVzIFJlbGVhc2UsIHdlbGNoZXMgYmVyZWl0cyBhbGxlIEFiaMOkbmdpZ2tlaXRlbiBrb3JyZWt0IGVudGjDpGx0IGVyaGFsdGVuIFNpZSA8YSBocmVmPSJodHRwOi8vd3d3Lm1pdHRhZ3FpLmNvbS93aWxsa29tbWVuL2ltcHJlc3N1bSIgdGFyZ2V0PSJfYmxhbmsiPmdlcm4gdm9uIHVucyBhdWYgQW5mcmFnZTwvYT4uIERpZSBWZXLDtmZmZW50bGljaHVuZyBhdWYgYml0YnVja2V0Lm9yZyBpc3QgZsO8ciBFbnR3aWNrbGVyIGdlZGFjaHQu'><source>Bitbucket dient der Entwicklung als Repository und enthält den letzten Stand der Entwicklung. Dieser ist nur bedingt für den Produktiveinsatz geeignet und kann Fehler enthalten!<br/> Ein qualitätsgesichertes Release, welches bereits alle Abhängigkeiten korrekt enthält erhalten Sie <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">gern von uns auf Anfrage</a>. Die Veröffentlichung auf bitbucket.org ist für Entwickler gedacht.</source><target>Bitbucket dient der Entwicklung als Repository und enthält den letzten Stand der Entwicklung. Dieser ist nur bedingt für den Produktiveinsatz geeignet und kann Fehler enthalten!<br/> Ein qualitätsgesichertes Release, welches bereits alle Abhängigkeiten korrekt enthält erhalten Sie <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">gern von uns auf Anfrage</a>. Die Veröffentlichung auf bitbucket.org ist für Entwickler gedacht.</target></trans-unit>
-<trans-unit id='dHJhbnNsYXRlNSBFbnR3aWNrbGVyLVJlcG9zaXRvcnkgYXVmIGJpdGJ1Y2tldC5vcmc='><source>translate5 Entwickler-Repository auf bitbucket.org</source><target>translate5 Entwickler-Repository auf bitbucket.org</target></trans-unit>
-<trans-unit id='RGVyIGxldHp0ZSBTdGFuZCBkZXIgRW50d2lja2x1bmcgdm9uIHRyYW5zbGF0ZTUgaXN0IGpld2VpbHMgPGEgaHJlZj0iJXMiIHRhcmdldD0iX2JsYW5rIj5hdWYgYml0YnVja2V0Lm9yZyB2ZXLDtmZmZW50bGljaHQ8L2E+Lg=='><source>Der letzte Stand der Entwicklung von translate5 ist jeweils <a href="%s" target="_blank">auf bitbucket.org veröffentlicht</a>.</source><target>Der letzte Stand der Entwicklung von translate5 ist jeweils <a href="%s" target="_blank">auf bitbucket.org veröffentlicht</a>.</target></trans-unit>
-<trans-unit id='dHJhbnNsYXRlNSBpc3QgYXVmIGF1ZiBtZWhyZXJlIGJpdGJ1Y2tldC1SZXBvc2l0b3JpZXMgdmVydGVpbHQgdW5kIGJlbsO2dGlndCBkYXLDvGJlciBoaW5hdXMgZWluZSBSZWloZSBleHRlcm5lciBCaWJsaW90aGVrZW4uIERhcyBoaWVyYXJjaGlzY2ggb2JlcnN0ZSBSZXBvc2l0b3J5IGlzdCAidHJhbnNsYXRlNSIsIHdlbGNoZXMgZGllIEFiaMOkbmdpZ2tlaXRlbiBhbHMgZ2l0LXN1Ym1vZHVsZSBvZGVyIFZlcndlaXNlIGVudGjDpGx0Lg=='><source>translate5 ist auf auf mehrere bitbucket-Repositories verteilt und benötigt darüber hinaus eine Reihe externer Bibliotheken. Das hierarchisch oberste Repository ist "translate5", welches die Abhängigkeiten als git-submodule oder Verweise enthält.</source><target>translate5 ist auf auf mehrere bitbucket-Repositories verteilt und benötigt darüber hinaus eine Reihe externer Bibliotheken. Das hierarchisch oberste Repository ist "translate5", welches die Abhängigkeiten als git-submodule oder Verweise enthält.</target></trans-unit>
+<trans-unit id='RGllc2UgU2l0ZSBpc3QgZGVtIE9wZW4gU291cmNlIFByb2pla3QgInRyYW5zbGF0ZTUiIGdld2lkbWV0LiBTaWUgd2lyZCBnZXNwb25zZXJ0IHZvbjo='><source>Diese Site ist dem Open Source Projekt "translate5" gewidmet. Sie wird gesponsert von:</source><target>Diese Site ist dem Open Source Projekt "translate5" gewidmet. Sie wird gesponsert von:</target></trans-unit>
 <trans-unit id='TWl0dGFnUUkgLSBRdWFsaXR5IEluZm9ybWF0aWNzPGJyIC8+S29ucmFkLUxvcmVuei1XZWcgMTA8YnIgLz43MjExNiBNw7Zzc2luZ2VuPGJyIC8+VGVsLiAwNzQ3My8yMjAyMDI8YnIgLz5GYXggMDc0NzMvMjIwMjExPGJyIC8+RS1NYWlsOiBzZXJ2aWNlQE1pdHRhZ1FJLmNvbQ=='><source>MittagQI - Quality Informatics<br />Konrad-Lorenz-Weg 10<br />72116 Mössingen<br />Tel. 07473/220202<br />Fax 07473/220211<br />E-Mail: service@MittagQI.com</source><target>MittagQI - Quality Informatics<br />Konrad-Lorenz-Weg 10<br />72116 Mössingen<br />Tel. 07473/220202<br />Fax 07473/220211<br />E-Mail: service@MittagQI.com</target></trans-unit>
-<trans-unit id='dHJhbnNsYXRlNSBOZXdzbGV0dGVy'><source>translate5 Newsletter</source><target>translate5 Newsletter</target></trans-unit>
-<trans-unit id='RGVyIDxhIGhyZWY9Imh0dHA6Ly93d3cubWl0dGFncWkuY29tL25ld3NsZXR0ZXIiIHRhcmdldD0iX2JsYW5rIj50cmFuc2xhdGU1LU5ld3NsZXR0ZXIgdm9uIE1pdHRhZ1FJPC9hPiBpbmZvcm1pZXJ0IHJlZ2VsbcOkw59pZyB6dSBuZXVlbiBGZWF0dXJlcyB1bmQgYW5kZXJlbiBOZXVpZ2tlaXRlbi4='><source>Der <a href="http://www.mittagqi.com/newsletter" target="_blank">translate5-Newsletter von MittagQI</a> informiert regelmäßig zu neuen Features und anderen Neuigkeiten.</source><target>Der <a href="http://www.mittagqi.com/newsletter" target="_blank">translate5-Newsletter von MittagQI</a> informiert regelmäßig zu neuen Features und anderen Neuigkeiten.</target></trans-unit>
+<trans-unit id='U3BvbnNlcmluZyB2b24gdHJhbnNsYXRlNSBhbHMgQXBwbGlrYXRpb24='><source>Sponsering von translate5 als Applikation</source><target>Sponsering von translate5 als Applikation</target></trans-unit>
 <trans-unit id='RmFsbHMgU2llIGtlaW5lIFRlc3RkYXRlbiB6dXIgSGFuZCBoYWJlbiwga8O2bm5lbiBTaWUgZGllIGZvbGdlbmRlbiBaaXAgRGF0ZWllbiBkb3dubG9hZGVuIHVuZCBhbHMgbmV1ZSBQcm9qZWt0ZSBpbXBvcnRpZXJlbjo='><source>Falls Sie keine Testdaten zur Hand haben, können Sie die folgenden Zip Dateien downloaden und als neue Projekte importieren:</source><target>Falls Sie keine Testdaten zur Hand haben, können Sie die folgenden Zip Dateien downloaden und als neue Projekte importieren:</target></trans-unit>
 <trans-unit id='KGVpbmZhY2hlIFRlc3RkYXRlbik='><source>(einfache Testdaten)</source><target>(einfache Testdaten)</target></trans-unit>
 <trans-unit id='KFRlc3RkYXRlbiBtaXQgUmVsYWlzc3ByYWNoZSk='><source>(Testdaten mit Relaissprache)</source><target>(Testdaten mit Relaissprache)</target></trans-unit>
@@ -927,6 +90,99 @@ Diese Email wurde automatisch generiert. Please do not reply to this email.</tar
 <trans-unit id='RsO8ciBlaW5lIGtvcnJla3RlIEF1c3plaWNobnVuZyBkZXIgVGVybWlub2xvZ2llIGJpdHRlIGRpZSBRdWVsbHNwcmFjaGUgYXVmIEVuZ2xpc2NoIHVuZCBkaWUgWmllbHNwcmFjaGUgYXVmIERldXRzY2ggc3RlbGxlbi4='><source>Für eine korrekte Auszeichnung der Terminologie bitte die Quellsprache auf Englisch und die Zielsprache auf Deutsch stellen.</source><target>Für eine korrekte Auszeichnung der Terminologie bitte die Quellsprache auf Englisch und die Zielsprache auf Deutsch stellen.</target></trans-unit>
 <trans-unit id='JiMxODc7IFp1ciBEZW1vdmVyc2lvbg=='><source>&#187; Zur Demoversion</source><target>&#187; Zur Demoversion</target></trans-unit>
 <trans-unit id='JiMxODc7IEJlZGllbnVuZ3NoaW53ZWlzZSBmw7xyIGRpZSBFcnN0ZWxsdW5nIGVpZ2VuZXIgVGVzdGRhdGVu'><source>&#187; Bedienungshinweise für die Erstellung eigener Testdaten</source><target>&#187; Bedienungshinweise für die Erstellung eigener Testdaten</target></trans-unit>
+<trans-unit id='RGVyIEJlbnV0emVybmFtZSBpc3QgenUga3VyeiE='><source>Der Benutzername ist zu kurz!</source><target>Der Benutzername ist zu kurz!</target></trans-unit>
+<trans-unit id='VGhlIHR3byBnaXZlbiB0b2tlbnMgZG8gbm90IG1hdGNo'><source>The two given tokens do not match</source><target>The two given tokens do not match</target></trans-unit>
+<trans-unit id='Qml0dGUgZ2ViZW4gU2llIGVpbiBQYXNzd29ydCBhbiE='><source>Bitte geben Sie ein Passwort an!</source><target>Bitte geben Sie ein Passwort an!</target></trans-unit>
+<trans-unit id='Tm8gdG9rZW4gd2FzIHByb3ZpZGVkIHRvIG1hdGNoIGFnYWluc3Q='><source>No token was provided to match against</source><target>No token was provided to match against</target></trans-unit>
+<trans-unit id='RGFzIFBhc3N3b3J0IGlzdCB6dSBrdXJ6IQ=='><source>Das Passwort ist zu kurz!</source><target>Das Passwort ist zu kurz!</target></trans-unit>
+<trans-unit id='JTEkcyAlMiRzLA0KDQpTaWUgZXJoYWx0ZW4gZGllc2UgRW1haWwsIHdlaWwgd2lyIGVpbmUgQW5mcmFnZSB6dXIgw4RuZGVydW5nIGRlcyBQYXNzd29ydGVzIGbDvHIgSWhyIEtvbnRvIGF1ZiAlMyRzJTQkcyU1JHMgZXJoYWx0ZW4gaGFiZW4uIA0KDQpXZW5uIFNpZSBJaHIgUGFzc3dvcnQgw6RuZGVybiBtw7ZjaHRlbiwgZGFubiBiZWZvbGdlbiBTaWUgYml0dGUgZm9sZ2VuZGUgQW53ZWlzdW5nZW46DQoNCkRlciBmb2xnZW5kZSBMaW5rIGVudGjDpGx0IGVpbmVuIGbDvHIgMzAgTWludXRlbiBnw7xsdGlnZW4gU2NobMO8c3NlbCwgbWl0IHdlbGNoZW0gU2llIElociBQYXNzd29ydCBuZXUgc2V0emVuIGvDtm5uZW4uIEF1cyBTaWNoZXJoZWl0c2dyw7xuZGVuIGZ1bmt0aW9uaWVydCBkaWVzIG51ciwgd2VubiBTaWUgZGVuIGZvbGdlbmRlbiBMaW5rIGltIHNlbGJlbiBCcm93c2VyIGluIGRlbSBTaWUgZGllIMOEbmRlcnVuZyBJaHJlcyBQYXNzd29ydCBhbmdlZm9yZGVydCBoYWJlbiDDtmZmbmVuIHVuZCB6dWRlbSBuYWNoIFp1csO8Y2tzZXR6ZW4gZGVzIFBhc3N3b3J0cyBJaHJlbiBCcm93c2VyIG5pY2h0IG5ldSBnZXN0YXJ0ZXQgaGFiZW4uDQoNCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KTGluayB1bSBQYXNzd29ydCBuZXUgenUgc2V0emVuDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCiUzJHMlNCRzJTUkcyU2JHMNCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09DQoNClNvbGx0ZSBJaHIgU2NobMO8c3NlbCBuaWNodCBtZWhyIGfDvGx0aWcgc2Vpbiwga8O2bm5lbiBTaWUgdW50ZXIgamVkZXJ6ZWl0IGVpbmVuIG5ldWVuIFNjaGzDvHNzZWwgYW5mb3JkZXJuLg0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQolMyRzJTQkcyU1JHMlNyRzDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCg0KU29sbHRlbiBTaWUgZGllIEFuZnJhZ2UgbmljaHQgc2VsYnN0IGF1c2dlbMO2c3QgaGFiZW4sIGJpdHRlbiB3aXIgU2llIHVucyBkYXLDvGJlciB6dSBpbmZvcm1pZXJlbi4NCg0KVmllbGVuIERhbmsgdW5kIHZpZWxlIEdyw7zDn2UsDQpJaHIgUHJvamVrdG1hbmFnZW1lbnQgVGVhbQ0KJTgkcw0KDQpEaWVzZSBFbWFpbCB3dXJkZSBhdXRvbWF0aXNjaCBnZW5lcmllcnQuIFBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBlbWFpbC4='><source>%1$s %2$s,
+
+Sie erhalten diese Email, weil wir eine Anfrage zur Änderung des Passwortes für Ihr Konto auf %3$s%4$s%5$s erhalten haben. 
+
+Wenn Sie Ihr Passwort ändern möchten, dann befolgen Sie bitte folgende Anweisungen:
+
+Der folgende Link enthält einen für 30 Minuten gültigen Schlüssel, mit welchem Sie Ihr Passwort neu setzen können. Aus Sicherheitsgründen funktioniert dies nur, wenn Sie den folgenden Link im selben Browser in dem Sie die Änderung Ihres Passwort angefordert haben öffnen und zudem nach Zurücksetzen des Passworts Ihren Browser nicht neu gestartet haben.
+
+==============================
+Link um Passwort neu zu setzen
+------------------------------
+%3$s%4$s%5$s%6$s
+------------------------------
+==============================
+
+Sollte Ihr Schlüssel nicht mehr gültig sein, können Sie unter jederzeit einen neuen Schlüssel anfordern.
+------------------------------
+%3$s%4$s%5$s%7$s
+------------------------------
+
+Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüber zu informieren.
+
+Vielen Dank und viele Grüße,
+Ihr Projektmanagement Team
+%8$s
+
+Diese Email wurde automatisch generiert. Please do not reply to this email.</source><target>%1$s %2$s,
+
+Sie erhalten diese Email, weil wir eine Anfrage zur Änderung des Passwortes für Ihr Konto auf %3$s%4$s%5$s erhalten haben. 
+
+Wenn Sie Ihr Passwort ändern möchten, dann befolgen Sie bitte folgende Anweisungen:
+
+Der folgende Link enthält einen für 30 Minuten gültigen Schlüssel, mit welchem Sie Ihr Passwort neu setzen können. Aus Sicherheitsgründen funktioniert dies nur, wenn Sie den folgenden Link im selben Browser in dem Sie die Änderung Ihres Passwort angefordert haben öffnen und zudem nach Zurücksetzen des Passworts Ihren Browser nicht neu gestartet haben.
+
+==============================
+Link um Passwort neu zu setzen
+------------------------------
+%3$s%4$s%5$s%6$s
+------------------------------
+==============================
+
+Sollte Ihr Schlüssel nicht mehr gültig sein, können Sie unter jederzeit einen neuen Schlüssel anfordern.
+------------------------------
+%3$s%4$s%5$s%7$s
+------------------------------
+
+Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüber zu informieren.
+
+Vielen Dank und viele Grüße,
+Ihr Projektmanagement Team
+%8$s
+
+Diese Email wurde automatisch generiert. Please do not reply to this email.</target></trans-unit>
+<trans-unit id='U2VociBnZWVocnRlIEZyYXU='><source>Sehr geehrte Frau</source><target>Sehr geehrte Frau</target></trans-unit>
+<trans-unit id='VW5nw7xsdGlnZSBMb2dpbmRhdGVuIC0gWnVnYW5nIGdlc3BlcnJ0ITxici8+U2llIGhhYmVuIElociBQYXNzd29ydCBpbiBkZW4gbGV0enRlbiAyNCBTdHVuZGVuIG1laHJtYWxzIGZhbHNjaCBlaW5nZWdlYmVuLCBpaHIgTG9naW4gd3VyZGUgZ2VzcGVycnQuPGJyIC8+UGVyIEUtTWFpbCB3dXJkZSBJaG5lbiBlaW4gTGluayB6dWdlc2FuZHQsIG1pdCB3ZWxjaGVtIFNpZSBJaHIgUGFzc3dvcnQgbmV1IHNldHplbiBrw7ZubmVuLiBEaWVzZXIgTGluayBpc3QgMzAgbWluIGfDvGx0aWcgdW5kIGZ1bmt0aW9uaWVydCBudXIsIHNvIGxhbmdlIFNpZSBJaHJlbiBCcm93c2VyIG5pY2h0IHp3aXNjaGVuemVpdGxpY2ggZ2VzY2hsb3NzZW4gaGFiZW4uIFNpZSBrw7ZubmVuIGplZGVyemVpdCBlaW5lbiBuZXVlbiBMaW5rICVzaGllciVzIGFuZm9yZGVybi4='><source>Ungültige Logindaten - Zugang gesperrt!<br/>Sie haben Ihr Passwort in den letzten 24 Stunden mehrmals falsch eingegeben, ihr Login wurde gesperrt.<br />Per E-Mail wurde Ihnen ein Link zugesandt, mit welchem Sie Ihr Passwort neu setzen können. Dieser Link ist 30 min gültig und funktioniert nur, so lange Sie Ihren Browser nicht zwischenzeitlich geschlossen haben. Sie können jederzeit einen neuen Link %shier%s anfordern.</source><target>Ungültige Logindaten - Zugang gesperrt!<br/>Sie haben Ihr Passwort in den letzten 24 Stunden mehrmals falsch eingegeben, ihr Login wurde gesperrt.<br />Per E-Mail wurde Ihnen ein Link zugesandt, mit welchem Sie Ihr Passwort neu setzen können. Dieser Link ist 30 min gültig und funktioniert nur, so lange Sie Ihren Browser nicht zwischenzeitlich geschlossen haben. Sie können jederzeit einen neuen Link %shier%s anfordern.</target></trans-unit>
+<trans-unit id='TmV1ZXMgUGFzc3dvcnQ='><source>Neues Passwort</source><target>Neues Passwort</target></trans-unit>
+<trans-unit id='RS1NYWlsIGFuZm9yZGVybg=='><source>E-Mail anfordern</source><target>E-Mail anfordern</target></trans-unit>
+<trans-unit id='WnVyw7xjayB6dXIgU3RhcnRzZWl0ZQ=='><source>Zurück zur Startseite</source><target>Zurück zur Startseite</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRlNSBEZW1vdmVyc2lvbg=='><source>translate5 Demoversion</source><target>translate5 Demoversion</target></trans-unit>
+<trans-unit id='SGlud2Vpc2UgenVyIEJlZGllbnVuZw=='><source>Hinweise zur Bedienung</source><target>Hinweise zur Bedienung</target></trans-unit>
+<trans-unit id='PGI+Qml0dGUgYmVhY2h0ZW4gU2llOjwvYj4gRGllc2UgdHJhbnNsYXRlNSBEZW1vdmVyc2lvbiBpc3Qgw7ZmZmVudGxpY2gsIGFsbGUgaG9jaGdlbGFkZW5lbiBQcm9qZWt0ZSBrw7ZubmVuIHZvbiBqZWRlbSBlaW5nZXNlaGVuIHdlcmRlbi4gRWluIEV4cG9ydCBzcGllbHQgYWxsZSBha3R1ZWxsIGVpbmdlY2hlY2t0ZW4gRGF0ZWllbiBlaW5lcyBQcm9qZWt0ZXMgYXVzLg=='><source><b>Bitte beachten Sie:</b> Diese translate5 Demoversion ist öffentlich, alle hochgeladenen Projekte können von jedem eingesehen werden. Ein Export spielt alle aktuell eingecheckten Dateien eines Projektes aus.</source><target><b>Bitte beachten Sie:</b> Diese translate5 Demoversion ist öffentlich, alle hochgeladenen Projekte können von jedem eingesehen werden. Ein Export spielt alle aktuell eingecheckten Dateien eines Projektes aus.</target></trans-unit>
+<trans-unit id='PGI+QnJvd2VyLVN1cHBvcnQ6PC9iPiBEaWUgYWt0dWVsbGUgVmVyc2lvbiB1bnRlcnN0w7x0enQgb2ZmaXppZWxsIG5ldWVyZSBWZXJzaW9uZW4gdm9uIEZpcmVmb3gsIENocm9tZSB1bmQgU2FmYXJpLCBzb3dpZSBJbnRlcm5ldCBFeHBsb3JlciA3LCA4LCA5IHVuZCAxMC4='><source><b>Brower-Support:</b> Die aktuelle Version unterstützt offiziell neuere Versionen von Firefox, Chrome und Safari, sowie Internet Explorer 7, 8, 9 und 10.</source><target><b>Brower-Support:</b> Die aktuelle Version unterstützt offiziell neuere Versionen von Firefox, Chrome und Safari, sowie Internet Explorer 7, 8, 9 und 10.</target></trans-unit>
+<trans-unit id='PGI+UU0tU3Vic2VnbWVudC1NYXJraWVydW5nZW48L2I+IHdlcmRlbiBpbSBFeHBvcnQgYWt0dWVsbCBudXIgYmVpbSBGb3JtYXQgQ1NWIGFiZ2ViaWxkZXQu'><source><b>QM-Subsegment-Markierungen</b> werden im Export aktuell nur beim Format CSV abgebildet.</source><target><b>QM-Subsegment-Markierungen</b> werden im Export aktuell nur beim Format CSV abgebildet.</target></trans-unit>
+<trans-unit id='UHJvamVrdMO8YmVyc2ljaHQ='><source>Projektübersicht</source><target>Projektübersicht</target></trans-unit>
+<trans-unit id='UHJvamVrdA=='><source>Projekt</source><target>Projekt</target></trans-unit>
+<trans-unit id='QWN0aW9ucw=='><source>Actions</source><target>Actions</target></trans-unit>
+<trans-unit id='bGVrdG9yaWVyZW4='><source>lektorieren</source><target>lektorieren</target></trans-unit>
+<trans-unit id='ZXhwb3J0aWVyZW4='><source>exportieren</source><target>exportieren</target></trans-unit>
+<trans-unit id='ZXhwb3J0aWVyZW4gbWl0IMOEbmRlcnVuZ3NoaXN0b3JpZQ=='><source>exportieren mit Änderungshistorie</source><target>exportieren mit Änderungshistorie</target></trans-unit>
+<trans-unit id='RXhwb3J0IFFNLVN0YXRpc3Rpaw=='><source>Export QM-Statistik</source><target>Export QM-Statistik</target></trans-unit>
+<trans-unit id='RXhwb3J0IFppZWx0ZXh0IFFNLVN0YXRpc3RpayAoWE1MKQ=='><source>Export Zieltext QM-Statistik (XML)</source><target>Export Zieltext QM-Statistik (XML)</target></trans-unit>
+<trans-unit id='RXhwb3J0IEF1c2dhbmdzdGV4dCBRTS1TdGF0aXN0aWsgKFhNTCk='><source>Export Ausgangstext QM-Statistik (XML)</source><target>Export Ausgangstext QM-Statistik (XML)</target></trans-unit>
+<trans-unit id='TmV1ZXMgUHJvamVrdCBhbmxlZ2Vu'><source>Neues Projekt anlegen</source><target>Neues Projekt anlegen</target></trans-unit>
+<trans-unit id='TmV1ZSBQcm9qZWt0ZGF0ZW4gaW1wb3J0aWVyZW4='><source>Neue Projektdaten importieren</source><target>Neue Projektdaten importieren</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRlNSBOZXdzbGV0dGVy'><source>translate5 Newsletter</source><target>translate5 Newsletter</target></trans-unit>
+<trans-unit id='RGVyIDxhIGhyZWY9Imh0dHA6Ly93d3cubWl0dGFncWkuY29tL25ld3NsZXR0ZXIiIHRhcmdldD0iX2JsYW5rIj50cmFuc2xhdGU1LU5ld3NsZXR0ZXIgdm9uIE1pdHRhZ1FJPC9hPiBpbmZvcm1pZXJ0IHJlZ2VsbcOkw59pZyB6dSBuZXVlbiBGZWF0dXJlcyB1bmQgYW5kZXJlbiBOZXVpZ2tlaXRlbi4='><source>Der <a href="http://www.mittagqi.com/newsletter" target="_blank">translate5-Newsletter von MittagQI</a> informiert regelmäßig zu neuen Features und anderen Neuigkeiten.</source><target>Der <a href="http://www.mittagqi.com/newsletter" target="_blank">translate5-Newsletter von MittagQI</a> informiert regelmäßig zu neuen Features und anderen Neuigkeiten.</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRlNSBRdWVsbGNvZGUgYXVmIGJpdGJ1Y2tldC5vcmc='><source>translate5 Quellcode auf bitbucket.org</source><target>translate5 Quellcode auf bitbucket.org</target></trans-unit>
+<trans-unit id='UXVhbGl0w6R0c2dlc2ljaGVydGUgVmVyc2lvbiAtIDxhIGhyZWY9Imh0dHA6Ly93d3cubWl0dGFncWkuY29tL3dpbGxrb21tZW4vaW1wcmVzc3VtIiB0YXJnZXQ9Il9ibGFuayI+Yml0dGUgZnJhZ2VuIFNpZSB1bnMgYW4hPC9hPg=='><source>Qualitätsgesicherte Version - <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">bitte fragen Sie uns an!</a></source><target>Qualitätsgesicherte Version - <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">bitte fragen Sie uns an!</a></target></trans-unit>
+<trans-unit id='Qml0YnVja2V0IGRpZW50IGRlciBFbnR3aWNrbHVuZyBhbHMgUmVwb3NpdG9yeSB1bmQgZW50aMOkbHQgZGVuIGxldHp0ZW4gU3RhbmQgZGVyIEVudHdpY2tsdW5nLiBEaWVzZXIgaXN0IG51ciBiZWRpbmd0IGbDvHIgZGVuIFByb2R1a3RpdmVpbnNhdHogZ2VlaWduZXQgdW5kIGthbm4gRmVobGVyIGVudGhhbHRlbiE8YnIvPiBFaW4gcXVhbGl0w6R0c2dlc2ljaGVydGVzIFJlbGVhc2UsIHdlbGNoZXMgYmVyZWl0cyBhbGxlIEFiaMOkbmdpZ2tlaXRlbiBrb3JyZWt0IGVudGjDpGx0IGVyaGFsdGVuIFNpZSA8YSBocmVmPSJodHRwOi8vd3d3Lm1pdHRhZ3FpLmNvbS93aWxsa29tbWVuL2ltcHJlc3N1bSIgdGFyZ2V0PSJfYmxhbmsiPmdlcm4gdm9uIHVucyBhdWYgQW5mcmFnZTwvYT4uIERpZSBWZXLDtmZmZW50bGljaHVuZyBhdWYgYml0YnVja2V0Lm9yZyBpc3QgZsO8ciBFbnR3aWNrbGVyIGdlZGFjaHQu'><source>Bitbucket dient der Entwicklung als Repository und enthält den letzten Stand der Entwicklung. Dieser ist nur bedingt für den Produktiveinsatz geeignet und kann Fehler enthalten!<br/> Ein qualitätsgesichertes Release, welches bereits alle Abhängigkeiten korrekt enthält erhalten Sie <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">gern von uns auf Anfrage</a>. Die Veröffentlichung auf bitbucket.org ist für Entwickler gedacht.</source><target>Bitbucket dient der Entwicklung als Repository und enthält den letzten Stand der Entwicklung. Dieser ist nur bedingt für den Produktiveinsatz geeignet und kann Fehler enthalten!<br/> Ein qualitätsgesichertes Release, welches bereits alle Abhängigkeiten korrekt enthält erhalten Sie <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">gern von uns auf Anfrage</a>. Die Veröffentlichung auf bitbucket.org ist für Entwickler gedacht.</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRlNSBFbnR3aWNrbGVyLVJlcG9zaXRvcnkgYXVmIGJpdGJ1Y2tldC5vcmc='><source>translate5 Entwickler-Repository auf bitbucket.org</source><target>translate5 Entwickler-Repository auf bitbucket.org</target></trans-unit>
+<trans-unit id='RGVyIGxldHp0ZSBTdGFuZCBkZXIgRW50d2lja2x1bmcgdm9uIHRyYW5zbGF0ZTUgaXN0IGpld2VpbHMgPGEgaHJlZj0iJXMiIHRhcmdldD0iX2JsYW5rIj5hdWYgYml0YnVja2V0Lm9yZyB2ZXLDtmZmZW50bGljaHQ8L2E+Lg=='><source>Der letzte Stand der Entwicklung von translate5 ist jeweils <a href="%s" target="_blank">auf bitbucket.org veröffentlicht</a>.</source><target>Der letzte Stand der Entwicklung von translate5 ist jeweils <a href="%s" target="_blank">auf bitbucket.org veröffentlicht</a>.</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRlNSBpc3QgYXVmIGF1ZiBtZWhyZXJlIGJpdGJ1Y2tldC1SZXBvc2l0b3JpZXMgdmVydGVpbHQgdW5kIGJlbsO2dGlndCBkYXLDvGJlciBoaW5hdXMgZWluZSBSZWloZSBleHRlcm5lciBCaWJsaW90aGVrZW4uIERhcyBoaWVyYXJjaGlzY2ggb2JlcnN0ZSBSZXBvc2l0b3J5IGlzdCAidHJhbnNsYXRlNSIsIHdlbGNoZXMgZGllIEFiaMOkbmdpZ2tlaXRlbiBhbHMgZ2l0LXN1Ym1vZHVsZSBvZGVyIFZlcndlaXNlIGVudGjDpGx0Lg=='><source>translate5 ist auf auf mehrere bitbucket-Repositories verteilt und benötigt darüber hinaus eine Reihe externer Bibliotheken. Das hierarchisch oberste Repository ist "translate5", welches die Abhängigkeiten als git-submodule oder Verweise enthält.</source><target>translate5 ist auf auf mehrere bitbucket-Repositories verteilt und benötigt darüber hinaus eine Reihe externer Bibliotheken. Das hierarchisch oberste Repository ist "translate5", welches die Abhängigkeiten als git-submodule oder Verweise enthält.</target></trans-unit>
+<trans-unit id='VW50ZXJzdMO8dHp1bmcgZGVyIEVudHdpY2tsdW5nIHZvbiB0cmFuc2xhdGU1'><source>Unterstützung der Entwicklung von translate5</source><target>Unterstützung der Entwicklung von translate5</target></trans-unit>
+<trans-unit id='VW5zZXIgZ3Jvw59lciBEYW5rIGdlaHQgYW4gZGllIGZvbGdlbmRlbiBVbnRlcm5laG1lbiB1bmQgT3JnYW5pc2F0aW9uZW4uIFNpZSBmaW5hbnppZXJlbiBkaWUgRmVhdHVyZXMsIGRpZSBzaWUgdm9uIHRyYW5zbGF0ZTUgZXJ3YXJ0ZW4u'><source>Unser großer Dank geht an die folgenden Unternehmen und Organisationen. Sie finanzieren die Features, die sie von translate5 erwarten.</source><target>Unser großer Dank geht an die folgenden Unternehmen und Organisationen. Sie finanzieren die Features, die sie von translate5 erwarten.</target></trans-unit>
+<trans-unit id='U2llIGVybcO2Z2xpY2hlbiBzbyBkaWVzZXMgUHJvamVrdCE='><source>Sie ermöglichen so dieses Projekt!</source><target>Sie ermöglichen so dieses Projekt!</target></trans-unit>
+<trans-unit id='VmllbGVuIERhbmsgZGFmw7xyIQ=='><source>Vielen Dank dafür!</source><target>Vielen Dank dafür!</target></trans-unit>
+<trans-unit id='SGF1cHR1bnRlcnN0w7x0emVyIHZvbiB0cmFuc2xhdGU1'><source>Hauptunterstützer von translate5</source><target>Hauptunterstützer von translate5</target></trans-unit>
+<trans-unit id='VW50ZXJzdMO8dHplciBhdXNnZXfDpGhsdGVyIEZlYXR1cmVz'><source>Unterstützer ausgewählter Features</source><target>Unterstützer ausgewählter Features</target></trans-unit>
   </body>
  </file>
 </xliff>
