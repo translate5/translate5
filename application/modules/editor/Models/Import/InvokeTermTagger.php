@@ -123,9 +123,9 @@ class editor_Models_Import_InvokeTermTagger {
         $cmd[] = 'de.folt.models.documentmodel.tbx.TbxDocument';
         $cmd[] = $source;
         $cmd[] = $target;
-        if(strtolower(PHP_OS) == 'linux') {
-          $cmd[] = '2>&1';
-        }
+        //if(strtolower(PHP_OS) == 'linux') {
+          $cmd[] = '2>&1';//seems also be necessary for windows to work with shell_exec
+        //}
         $out = $this->invoke($cmd);
         if(strpos($out, 'error code: 0')=== false){
           trigger_error('Die Rückgabe des Tools, welches der TBX IDs hinzufügt enthielt einen Fehler. Der übergebene Command sah wie folgt aus:<br/> '.
@@ -168,9 +168,9 @@ class editor_Models_Import_InvokeTermTagger {
 			$cmd[] = 'true';
 		}
 
-        if(strtolower(PHP_OS) == 'linux') {
-          $cmd[] = '2>&1';
-        }
+        //if(strtolower(PHP_OS) == 'linux') {
+          $cmd[] = '2>&1';//seems also be necessary for windows to work with shell_exec
+        //}
         $out = $this->invoke($cmd);
 
         if(strpos($out, 'error')!== false){
