@@ -491,10 +491,10 @@ class editor_TaskController extends ZfExtended_RestController {
             }
         }
         if($this->isOpenTaskRequest()){
+            $this->entity->createMaterializedView();
             $this->entity->registerInSession($this->data->userState);
         }
     }
-    
     
     /**
      * unlocks the current task if its an request that closes the task (set state to open, end, finish)

@@ -105,6 +105,7 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      * @see editor_Workflow_Abstract::handleEnd()
      */
     protected function handleEnd() {
+        //FIXME here drop the MV
         $this->doDebug(__FUNCTION__);
         //actually do nothing
     }

@@ -259,7 +259,7 @@ class editor_Models_Import {
      * refreshes / creates the database views for this task
      */
     protected function updateSegmentFieldViews() {
-        $this->segmentFieldManager->updateView();
+        $this->segmentFieldManager->createMaterializedView();
     }
     
     /**

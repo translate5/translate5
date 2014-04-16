@@ -385,6 +385,15 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * creates (if needed) the materialized view to the task
+     */
+    public function createMaterializedView() {
+        $sfm = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        $sfm->initFields($this->getTaskGuid());
+        $sfm->createMaterializedView();
+    }
+    
+    /**
      * update the workflowStep of a specific task 
      * @param string $taskGuid
      * @param integer $step

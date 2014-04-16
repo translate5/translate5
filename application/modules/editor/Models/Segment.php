@@ -325,6 +325,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             }
             $data->save();
         }
+        //FIXME do not do this on import!
+        $this->segmentFieldManager->updateMaterializedView($this);
         return $segmentId;
     }
     
@@ -389,7 +391,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         //fallback mechanism for not existing views. If not exists, we are trying to create it.
         $this->segmentFieldManager->initFields($taskGuid);
-        $this->segmentFieldManager->updateView();
+        $this->segmentFieldManager->createMaterializedView();
         return $this->_loadByTaskGuid($taskGuid);
     }
     
