@@ -121,6 +121,7 @@ class editor_Models_Export {
         $localEncoded = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
             'LocalEncoded'
         );
+        sort($dirPaths);
         foreach ($dirPaths as $path) {
             $path = $localEncoded->encode($path);
             $path = $exportRootFolder.DIRECTORY_SEPARATOR.$path;
