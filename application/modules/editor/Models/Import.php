@@ -192,6 +192,7 @@ class editor_Models_Import {
         $this->task->setReferenceFiles($this->hasReferenceFiles());
         $this->task->save(); //Task erst Speichern wenn die obigen validates und checks durch sind.
         
+        
         $this->segmentFieldManager->initFields($this->task->getTaskGuid());
         
         //call import Methods:
@@ -259,7 +260,7 @@ class editor_Models_Import {
      * refreshes / creates the database views for this task
      */
     protected function updateSegmentFieldViews() {
-        $this->segmentFieldManager->createMaterializedView();
+        $this->task->createMaterializedView();
     }
     
     /**

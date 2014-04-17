@@ -317,6 +317,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @see ZfExtended_Models_Entity_Abstract::save()
      */
     public function save() {
+        $oldIdValue = $this->getId();
         $segmentId = parent::save();
         foreach($this->segmentdata as $data) {
             /* @var $data editor_Models_Db_SegmentDataRow */
@@ -325,8 +326,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             }
             $data->save();
         }
-        //FIXME do not do this on import!
-        $this->segmentFieldManager->updateMaterializedView($this);
+        //only update the mat view if the segment was already in DB (so do not save mat view on import!)
+        if(!empty($oldIdValue)) {
+            $this->segmentFieldManager->getView()->updateSegment($this);
+        }
         return $segmentId;
     }
     
@@ -391,7 +394,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         //fallback mechanism for not existing views. If not exists, we are trying to create it.
         $this->segmentFieldManager->initFields($taskGuid);
-        $this->segmentFieldManager->createMaterializedView();
+        $this->segmentFieldManager->getView()->create();
         return $this->_loadByTaskGuid($taskGuid);
     }
     
@@ -533,7 +536,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         if(!$this->segmentFieldManager->isDefaultLayout()) {
             return array(); 
         }
-        $segmentsViewName = $this->segmentFieldManager->getDataViewName($taskGuid);
+        $segmentsViewName = $this->segmentFieldManager->getView()->getName();
         $sql = $this->_getAlikesSql($segmentsViewName);
         //since alikes are only usable with segment field default layout we can use the following hardcoded methods
         $stmt = $this->db->getAdapter()->query($sql, array(
@@ -556,11 +559,13 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * Enter description here ...
-     * @param unknown_type $taskGuid
+     * reset the internal used db object to the view to the given taskGuid
+     * @param string $taskGuid
      */
     protected function reInitDb($taskGuid) {
-        $this->db = ZfExtended_Factory::get($this->dbInstanceClass, array(array(), $this->segmentFieldManager->getDataViewName($taskGuid)));
+        $mv = $this->segmentFieldManager->getView();
+        /* @var $mv editor_Models_Segment_MaterializedView */
+        $this->db = ZfExtended_Factory::get($this->dbInstanceClass, array(array(), $mv->getName()));
     }
 
     /**
@@ -671,9 +676,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     public function updateAutoState(string $taskGuid, integer $oldState, integer $newState, $emptyEditedOnly = false) {
         $sfm = $this->segmentFieldManager;
+        $sfm->initFields($taskGuid);
         $db = $this->db;
         $sql = 'UPDATE `%s` d, `%s` v set d.autoStateId = ? where d.id = v.id and v.autoStateId = ? and v.taskGuid = ?';
-        $sql = sprintf($sql, $db->info($db::NAME), $sfm->getDataViewName($taskGuid));
+        $sql = sprintf($sql, $db->info($db::NAME), $sfm->getView()->getName());
         $bind = array($newState, $oldState, $taskGuid);
         
         if(!$emptyEditedOnly) {

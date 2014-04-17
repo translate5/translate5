@@ -358,9 +358,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         
         //delete the generated views for this task
-        $sfm = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
-        /* @var $sfm editor_Models_SegmentFieldManager */
-        $sfm->dropView($taskGuid);
+        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView', array($taskGuid));
+        /* @var $mv editor_Models_Segment_MaterializedView */
+        $mv->drop();
         
         //An der Segment und Files Tabelle hängen mehrere Abhängigkeiten,
         //daher diese manuell löschen vorher um DB Last durch Table Locks zu verringern.
@@ -375,7 +375,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         
         /* @var $recursivedircleaner ZfExtended_Controller_Helper_Recursivedircleaner */
         $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-        		'Recursivedircleaner'
+            'Recursivedircleaner'
         );
         $taskPath = (string)$this->getAbsoluteTaskDataPath();
         if(is_dir($taskPath)){
@@ -388,9 +388,18 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * creates (if needed) the materialized view to the task
      */
     public function createMaterializedView() {
-        $sfm = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
-        $sfm->initFields($this->getTaskGuid());
-        $sfm->createMaterializedView();
+        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView', array($this->getTaskGuid()));
+        /* @var $mv editor_Models_Segment_MaterializedView */
+        $mv->create();
+    }
+    
+    /**
+     * drops the materialized view to the task
+     */
+    public function dropMaterializedView() {
+        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView', array($this->getTaskGuid()));
+        /* @var $mv editor_Models_Segment_MaterializedView */
+        $mv->drop();
     }
     
     /**

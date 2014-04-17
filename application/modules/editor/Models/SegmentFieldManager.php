@@ -291,15 +291,6 @@ class editor_Models_SegmentFieldManager {
     }
     
     /**
-     * creates the nam of the data view
-     * @param string $taskGuid
-     * @return string
-     */
-    public function getDataViewName($taskGuid) {
-        return "LEK_segment_view_" . md5($taskGuid);
-    }
-    
-    /**
      * returns a list of editable field dataindizes
      * @return array
      */
@@ -346,158 +337,34 @@ class editor_Models_SegmentFieldManager {
     }
     
     /**
-     * creates a temporary table used as materialized view
-     *      * FIXME Diese Methode immer aufrufen wenn ein Task geöffnet wird!
+     * returns a list of the basicly used column names
      */
-    public function createMaterializedView() {
-        if(empty($this->taskGuid)) {
-            throw new LogicException('You have to call initFields before!');
-        }
-        
-        $start = microtime(true);
-        if($this->createMvMutexed()) {
-            $this->addMvFields();
-            $this->fillMaterializedView();
-            return;
-        }
-        $this->checkMvFillState();
-        error_log("Fill Duration: ".(microtime(true) - $start));
+    public function getBaseColumns() {
+        return array_values($this->baseFieldColMap);
     }
     
     /**
-     * created the MV table mutexed, if it already exists return false, if created return true.
-     * @return boolean true if table was created, false if it already exists
+     * calls the $walker function for each field column combination,
+     * Parameters for $walker are: 
+     *     $name     -> Name of the Field
+     *     $suffix   -> Suffix for the View Column name
+     *     $realCol  -> Real Name of the Column in the SegmentData table
+     * The results of $walker are collected and returned as array. 
+     * @param Closure $walker
      */
-    protected function createMvMutexed() {
-        $viewName = $this->getDataViewName($this->taskGuid);
-        $createSql = 'CREATE TABLE `'.$viewName.'` LIKE `LEK_segments`; ALTER TABLE `'.$viewName.'` ENGINE=MyISAM;';
-        $db = Zend_Db_Table::getDefaultAdapter();
-        try {
-            $db->query($createSql);
-            return true;
-        }
-        catch(Zend_Db_Statement_Exception $e) {
-            $m = $e->getMessage();
-            if(strpos($m,'SQLSTATE') !== 0 || strpos($m,'Base table or view already exists: 1050 Table \''.$viewName.'\' already exists') === false) {
-                throw $e;
-            }
-            return false;
-        }
-    }
-
-    /**
-     * Adds the fluent field names to the materialized view
-     */
-    protected function addMvFields() {
-        $viewName = $this->getDataViewName($this->taskGuid);
-        $db = Zend_Db_Table::getDefaultAdapter();
-        $data = ZfExtended_Factory::get('editor_Models_Db_SegmentData');
-        /* @var $data editor_Models_Db_SegmentData */
-        $md = $data->info($data::METADATA);
-        
-        //define the add column states based on the field type stored in the DB
-        $addColTpl = array();
-        foreach($this->baseFieldColMap as $k => $v) {
-            if(empty($md[$v])) {
-                throw new Zend_Exception('Missing Column '.$v.' in LEK_segment_data on creating the materialized view!');
-            }
-            $sql = 'ADD COLUMN `%s%s` '.strtoupper($md[$v]['DATA_TYPE']);
-            if(!empty($md[$v]['LENGTH'])) {
-                $sql .= '('.$md[$v]['LENGTH'].')';
-            }
-            if(empty($md[$v]['NULLABLE'])) {
-                $sql .= ' NOT NULL';
-            }
-            $addColTpl[$v] = $sql;
-        }
-        
-        //loop over all available segment fields for this task
-        $addColSql = array();
+    public function walkFields(Closure $walker) {
+        $result = array();
         foreach($this->segmentfields as $field) {
             $name = $field->name;
-            //loop over our available base data columns and generate them
+            //loop over our available base data columns and calls $walker
             foreach($this->baseFieldColMap as $k => $v) {
                 if(!$field->editable && strpos($k, self::_EDIT_PREFIX) === 0) {
                     continue;
                 }
-                $addColSql[] = sprintf($addColTpl[$v], $name, $k);
+                $result[] = $walker($name, $k, $v);
             }
         }
-        
-        $sql = 'ALTER TABLE `'.$viewName.'` '.join(', ', $addColSql).';';
-        $db->query($sql);
-    }
-    
-    /**
-     * checks if the MV is already filled up, if not, wait a maximum of 28 seconds.
-     * @throws Zend_Exception
-     */
-    protected function checkMvFillState() {
-        $viewName = $this->getDataViewName($this->taskGuid);
-        $fillQuery = 'select mv.cnt mvCnt, tab.cnt tabCnt from (select count(*) cnt from LEK_segments where taskGuid = ?) mv, ';
-        $fillQuery .= '(select count(*) cnt from '.$viewName.' where taskGuid = ?) tab;';
-        $db = Zend_Db_Table::getDefaultAdapter();
-        //we assume a maximum of 28 seconds to wait on the MV
-        for($i=1;$i<8;$i++) {
-            //if the MV was already created, wait until it is already completly filled 
-            $res = $db->fetchRow($fillQuery, array($this->taskGuid,$this->taskGuid));
-            if($res && $res['mvCnt'] == $res['tabCnt']) {
-                return;
-            }
-            sleep($i);
-        }
-        //here throw exception
-        throw new Zend_Exception('TimeOut on waiting for the following materialized view to be filled (Task '.$this->taskGuid.'): '.$viewName);
-    }
-    
-    /**
-     * prefills the materialized view
-     */
-    protected function fillMaterializedView() {
-        $viewName = $this->getDataViewName($this->taskGuid);
-        $selectSql = array('INSERT INTO '.$viewName.' SELECT s.*');
-
-        //loop over all available segment fields for this task
-        foreach($this->segmentfields as $field) {
-            $name = $field->name;
-            //loop over our available base data columns and generate them
-            foreach($this->baseFieldColMap as $k => $v) {
-                if(!$field->editable && strpos($k, self::_EDIT_PREFIX) === 0) {
-                    continue;
-                }
-                $selectSql[] = sprintf('MAX(IF(d.name = \'%s\', d.%s, NULL)) AS %s%s', $name, $v, $name, $k);
-            }
-        }
-        $selectSql = join(',', $selectSql);
-        $selectSql .= ' FROM LEK_segment_data d, LEK_segments s';
-        $selectSql .= ' WHERE d.taskGuid = ? and s.taskGuid = d.taskGuid and d.segmentId = s.id';
-        $selectSql .= ' GROUP BY d.segmentId';
-
-        $db = Zend_Db_Table::getDefaultAdapter();
-        $db->query($selectSql, $this->taskGuid);
-    }
-    
-    /**
-     * Updates the Materialized View Data Object with the saved data.
-     * @param editor_Models_Segment $segment
-     */
-    public function updateMaterializedView(editor_Models_Segment $segment) {
-        $viewName = $this->getDataViewName($this->taskGuid);
-        $db = ZfExtended_Factory::get('editor_Models_Db_Segments', array(array(), $viewName));
-        /* @var $db editor_Models_Db_Segments */
-        $data = $segment->getDataObject();
-        $id = $data->id;
-        unset($data->id);
-        $db->update((array) $data, array('id = ?' => $id));
-    }
-    
-    /**
-     * drops the segment data view to the given taskguid
-     * @param string $taskGuid
-     */
-    public function dropView($taskGuid) {
-        $db = Zend_Db_Table::getDefaultAdapter();
-        $this->_dropView($this->getDataViewName($taskGuid), $db);
+        return $result;
     }
     
     /**
@@ -534,11 +401,10 @@ class editor_Models_SegmentFieldManager {
     }
     
     /**
-     * reusable internal delete view function
-     * @param string $viewname
-     * @param Zend_Db_Adapter_Abstract $db
+     * returns the instance of the editor_Models_Segment_MaterializedView
+     * @return editor_Models_Segment_MaterializedView
      */
-    protected function _dropView($viewname, Zend_Db_Adapter_Abstract $db) {
-        $db->query("DROP TABLE IF EXISTS " . $viewname);
+    public function getView() {
+        return ZfExtended_Factory::get('editor_Models_Segment_MaterializedView', array($this->taskGuid));
     }
 }
