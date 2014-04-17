@@ -209,7 +209,7 @@ class editor_Models_Segment_MaterializedView {
         $selectSql .= ' GROUP BY d.segmentId';
         
         $db = Zend_Db_Table::getDefaultAdapter();
-        $db->fetchAll($selectSql, $this->taskGuid);
+        $db->query($selectSql, $this->taskGuid);
     }
     
     /**
