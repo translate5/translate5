@@ -76,8 +76,9 @@ Ext.define('Editor.controller.ChangeAlike', {
   stores: ['AlikeSegments','Segments'],
   views: ['changealike.Window'],
   messages: {
-    alikeSingular: 'Wiederholung wurde bearbeitet und gespeichert',
-    alikePlural: 'Wiederholungen wurden bearbeitet und gespeichert'
+    alikeSingular: '#UT#Wiederholung wurde bearbeitet und gespeichert',
+    alikePlural: '#UT#Wiederholungen wurden bearbeitet und gespeichert',
+    alikesDisabled: '#UT#Das Projekt enthält alternative Übersetzungen. Der Wiederholungseditor wurde daher deaktiviert.'
   },
   alikesToProcess: null,
   fetchedAlikes: null,
@@ -147,11 +148,17 @@ Ext.define('Editor.controller.ChangeAlike', {
    */
   initEditPluginHandler: function() {
       var me = this,
-          enabled = Editor.app.authenticatedUser.isAllowed('useChangeAlikes', Editor.data.task);
+          t = Editor.data.task,
+          auth = Editor.app.authenticatedUser,
+          enabledACL = auth.isAllowed('useChangeAlikes');
+          enabled = auth.isAllowed('useChangeAlikes', t);
       //disable the whole settings button, since no other settings are currently available!
       me.getOptionsBtn().setVisible(enabled);
       me.isDisabled = ! enabled;
       me.getEditPlugin().on('beforeedit', me.handleBeforeEdit, me);
+      if(!t.get('defaultSegmentLayout') && enabledACL) {
+          Editor.MessageBox.addInfo(this.messages.alikesDisabled, 1.4);
+      }
   },
   clearAlikeSegments: function() {
       this.getAlikeSegmentsStore().removeAll();
