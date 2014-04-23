@@ -68,6 +68,11 @@ Ext.define('Editor.view.HeadPanel', {
     initComponent: function() {
         var me = this,
             isEditor = false; //FIXME Thomas initial value differs for example for ITL
+            translations = [];
+            
+        Ext.Object.each(Editor.data.translations, function(i, n) {
+            translations.push([i, n]);
+        });
 
         Ext.applyIf(me, {
             items: [{
@@ -117,6 +122,15 @@ Ext.define('Editor.view.HeadPanel', {
                         xtype: 'button',
                         itemId: 'logoutSingle',
                         text: me.strings.logout
+                    },{
+                        xtype: 'combo',
+                        itemId: 'languageSwitch',
+                        width:90,
+                        forceSelection: true,
+                        value: Editor.data.locale,
+                        editable: false,
+                        store: translations,
+                        queryMode: 'local'
                     }]
                 }
             ]

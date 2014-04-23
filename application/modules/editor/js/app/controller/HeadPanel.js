@@ -83,6 +83,9 @@ Ext.define('Editor.controller.HeadPanel', {
       Editor.app.on('adminViewportOpened', me.handleInitAdmin, me);
       
       me.control({
+          '#languageSwitch' : {
+              change: me.changeLocale
+          },
           '#logoutSingle' : {
               click: me.handleLogout
           },
@@ -127,6 +130,9 @@ Ext.define('Editor.controller.HeadPanel', {
   },
   handleLogout: function() {
       Editor.app.logout();
+  },
+  changeLocale: function(combo, locale) {
+      Editor.app.setTranslation(locale);
   },
   tasksMenuDispatcher: function(menu, item) {
       var me = this,

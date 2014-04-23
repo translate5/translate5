@@ -226,5 +226,28 @@ Ext.application({
   },
   logout: function() {
       window.location = Editor.data.loginUrl;
+  },
+  /**
+   * sets the locale / language to be used by the application. Restarts the application.
+   * @param {String} lang
+   */
+  setTranslation: function(lang) {
+      var formSpec = {
+              tag: 'form',
+              action: window.location.href,
+              method: 'POST',
+              target: '_self',
+              style: 'display:none',
+              cn: [{
+                  tag: 'input',
+                  type: 'hidden',
+                  name: 'locale',
+                  value: Ext.String.htmlEncode(lang)
+              }]
+          },
+          // Create the form
+          form = Ext.DomHelper.append(Ext.getBody(), formSpec);
+
+      form.submit();
   }
 });
