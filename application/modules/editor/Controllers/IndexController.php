@@ -157,6 +157,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       
       $this->view->Php2JsVars()->set('headerOptions.height', (int)$rop->headerOptions->height);
       $this->view->Php2JsVars()->set('languages', $this->getAvailableLanguages());
+      $this->view->Php2JsVars()->set('translations', $this->translate->getAvailableTranslations());
       $this->view->Php2JsVars()->set('enableSourceEditing', (boolean) $rop->import->enableSourceEditing);
       
       /*

@@ -1,5 +1,8 @@
 ### this file holds all changes and necessary configs needed for updates
 ### newest changes on top
+
+2014-04-23: Look for ZfExtended-changes
+
 2013-12-05: Changes in User Task Association
             - apply 030-editor-mysql-taskUserAssoc-used.sql
 
