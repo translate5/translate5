@@ -115,7 +115,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @param string $workflowStep
      */
     public function loadByWorkflowStep(string $taskguid, string $workflowStep) {
-        $fields = array('id', 'mid', 'segmentNrInTask', 'source', 'sourceEdited', 'relais', 'target', 'edited', 'stateId', 'autoStateId', 'matchRate', 'qmId', 'comments');
+        $fields = array('id', 'mid', 'segmentNrInTask', 'source', 'sourceEdited', 'relais', 'target', 'edited', 'stateId', 'autoStateId', 'matchRate', 'qmId', 'comments', 'fileId');
         $this->initDefaultSort();
         $s = $this->db->select(false);
         $db = $this->db;
