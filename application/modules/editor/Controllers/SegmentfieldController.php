@@ -33,30 +33,22 @@
  
  END LICENSE AND COPYRIGHT 
  */
-
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
-
 /**
- * Kapselt den Import der Meta Daten zu einem Projekt.
- * - sucht selbstständig nach MetaDaten im Projekt
- * - importiert die gefundenen MetaDaten
+ * segment fields controller
  */
-abstract class editor_Models_Import_TermListParser implements editor_Models_Import_IMetaDataImporter {
+class Editor_SegmentfieldController extends editor_Controllers_EditorrestController{
     /**
-     * abstrakte Methode um den Term Import Vorgang anzustoßen
-     * @param SplFileInfo $file
-     * @param string $taskGuid
-     * @param editor_Models_Languages $sourceLang
-     * @param editor_Models_Languages $targetLang
+     * @var string
      */
-    abstract function import(SplFileInfo $file, string $taskGuid, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang);
+    protected $entityClass = 'editor_Models_SegmentField';
+    /**
+     * @var int
+     */
+    protected $segmentfieldId;
 
-    /**
-     * abstrakte Methode welche durch MetaData am Ende des Imports aufgerufen wird (z.B. um tmp Dateien zu löschen)
-     */
-    abstract function cleanup();
-}
+    public function indexAction() {
+        $session = new Zend_Session_Namespace();
+        $this->view->rows = $this->entity->loadByTaskGuid($session->taskGuid);
+        $this->view->total = count($this->view->rows);
+    }
+} 

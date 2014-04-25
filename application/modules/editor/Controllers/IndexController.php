@@ -158,6 +158,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('headerOptions.height', (int)$rop->headerOptions->height);
       $this->view->Php2JsVars()->set('languages', $this->getAvailableLanguages());
       $this->view->Php2JsVars()->set('translations', $this->translate->getAvailableTranslations());
+      
+      //Editor.data.enableSourceEditing → still needed for enabling / disabling the whole feature (Checkbox at Import).
       $this->view->Php2JsVars()->set('enableSourceEditing', (boolean) $rop->import->enableSourceEditing);
       
       /*
@@ -292,7 +294,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         if($ed->enableQmSubSegments){
             $controllers[] = 'QmSubSegments';
         }
-        //FIXME abhängig von Rolle setzen
+        //FIXME abhängig von Rolle setzen (on ITL Adaption)
         $controllers[] = 'admin.TaskOverview'; //Bei ITL wird der nicht benötigt
         $controllers[] = 'admin.TaskUserAssoc'; //nur PMs
         if($acl->isInAllowedRoles($userSession->data->roles,'adminUserFrontendController')){

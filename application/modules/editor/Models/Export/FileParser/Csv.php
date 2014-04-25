@@ -61,9 +61,8 @@ class editor_Models_Export_FileParser_Csv extends editor_Models_Export_FileParse
 
     public function __construct(integer $fileId, boolean $diff,editor_Models_Task $task) {
         parent::__construct($fileId, $diff,$task);
-        $config = Zend_Registry::get('config');
-        $this->_delimiter = $config->runtimeOptions->import->csv->delimiter;
-        $this->_enclosure = $config->runtimeOptions->import->csv->enclosure;
+        $this->_delimiter = $this->config->runtimeOptions->import->csv->delimiter;
+        $this->_enclosure = $this->config->runtimeOptions->import->csv->enclosure;
     }
     /**
      * reconstructs segment to the original source format
@@ -74,7 +73,17 @@ class editor_Models_Export_FileParser_Csv extends editor_Models_Export_FileParse
      */
 
     protected function parseSegment($segment){
-        return htmlspecialchars_decode($this->convertQmTags2XliffFormat($segment));
+        $segment = $this->convertQmTags2XliffFormat($segment);
+        return htmlspecialchars_decode(parent::parseSegment($segment));
+    }
+    
+    /**
+     * unescape the CSV enclosures
+     * (non-PHPdoc)
+     * @see editor_Models_Export_FileParser::preProcessReplacement()
+     */
+    protected function preProcessReplacement($attributes) {
+        return str_replace($this->_enclosure.$this->_enclosure,$this->_enclosure,$attributes);
     }
     
     /**
@@ -82,19 +91,19 @@ class editor_Models_Export_FileParser_Csv extends editor_Models_Export_FileParse
      * - nothing todo here for csv so far, cause termtagging is not supported so far
      * 
      * @param string $segment
-     * @param boolean $rermoveTermTags, default = true
+     * @param boolean $removeTermTags, default = true
      * @return string $segment
      */
-    protected function recreateTermTags($segment,$rermoveTermTags=true) {
+    protected function recreateTermTags($segment, $removeTermTags=true) {
         return $segment;
     }
+    
     /**
-     * @param integer $segmentId
-     * @return string $segment - bereits inkl. ggf. nötigem Parsing für Tags
+     * (non-PHPdoc)
+     * @see editor_Models_Export_FileParser::getSegmentContent()
      */
-
-    protected function getSegment(integer $segmentId) {
-        $segment = parent::getSegment($segmentId);
+    protected function getSegmentContent($segmentId, $field) {
+        $segment = parent::getSegmentContent($segmentId, $field);
         return str_replace($this->_enclosure,$this->_enclosure.$this->_enclosure,$segment);
     }
 }

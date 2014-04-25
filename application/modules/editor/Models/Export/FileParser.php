@@ -49,7 +49,6 @@ abstract class editor_Models_Export_FileParser {
     /**
      * @var string
      */
-
     protected $_exportFile = NULL;
     /**
      * @var string
@@ -63,6 +62,11 @@ abstract class editor_Models_Export_FileParser {
      * @var editor_Models_Db_Segments aktuell bearbeitetes Segment
      */
     protected $_segmentEntity = NULL;
+    /**
+     * contains a limited amount of loaded segments
+     * @var array
+     */
+    protected $segmentCache = array();
     /**
      * @var string Klassenname des Difftaggers
      */
@@ -78,9 +82,13 @@ abstract class editor_Models_Export_FileParser {
     protected $_diff= false;
     /**
      * @var editor_Models_Task current task
-     *
      */
     protected $_task;
+    
+    /**
+     * @var Zend_Config
+     */
+    protected $config;
     
     public function __construct(integer $fileId,boolean $diff,editor_Models_Task $task) {
         if(is_null($this->_classNameDifftagger)){
@@ -90,6 +98,7 @@ abstract class editor_Models_Export_FileParser {
         $this->_diffTagger = ZfExtended_Factory::get($this->_classNameDifftagger);
         $this->_diff = $diff;
         $this->_task = $task;
+        $this->config = Zend_Registry::get('config');
     }
 
     /**
@@ -97,7 +106,6 @@ abstract class editor_Models_Export_FileParser {
      * 
      * @return string file
      */
-
     public function getFile() {
         $this->getSkeleton();
         $this->parse();
@@ -111,61 +119,114 @@ abstract class editor_Models_Export_FileParser {
      * - setzt an Stelle von <lekTargetSeg... wieder das überarbeitete Targetsegment ein
      * - befüllt $this->_exportFile
      */
-
     protected function parse() {
-        $file = preg_split('"<lekTargetSeg\s*id=\"\"?(\d*)\"\"?\s*/>"', $this->_skeletonFile, NULL, PREG_SPLIT_DELIM_CAPTURE);
+        $file = preg_split('#<lekTargetSeg([^>]+)/>#', $this->_skeletonFile, null, PREG_SPLIT_DELIM_CAPTURE);
+
+        //reusable exception creation
+        $exception = function($val) {
+            $e  = 'Error in Export-Fileparsing. instead of a id="INT" and a optional ';
+            $e .= 'field="STRING" attribute the following content was extracted: ' . $val;
+            return new Zend_Exception($e);
+        };
+        
         $count = count($file) - 1;
         for ($i = 1; $i < $count;) {
-            if (!preg_match('"^\d+$"', $file[$i])) {
-                throw new Zend_Exception('Export-Fileparsing schlug fehl. Statt einer targetSeg-ID wurde ' . $file[$i] . ' extrahiert.');
+            $file[$i] = $this->preProcessReplacement($file[$i]);
+            if (!preg_match('#^\s*id="([^"]+)"\s*(field="([^"]+)"\s*)?$#', $file[$i], $matches)) {
+                throw $exception($file[$i]);
             }
-            $file[$i] = $this->getSegment((int) $file[$i]);
+          
+            //check $matches[1] for integer (segmentId) if empty throw an exception
+            settype($matches[1], 'int');
+            if(empty($matches[1])) {
+                throw $exception($file[$i]);
+            }
+          
+            //alternate column is optional, use target as default
+            if(isset($matches[3])) {
+                $field = $matches[3];
+            }
+            else {
+              $field = editor_Models_SegmentField::TYPE_TARGET;
+            }
+          
+            //$file[$i] = 'replaced: '.$matches[1].' # '.$col;
+            $file[$i] = $this->getSegmentContent($matches[1], $field);
             $i = $i + 2;
         }
         $this->_exportFile = implode('', $file);
     }
-
+    
     /**
-     * @param integer $segmentId
-     * @return string $segment - bereits inkl. ggf. nötigem Parsing für Tags
+     * pre processor for the extracted lekTargetSeg attributes
+     * for overwriting purposes only
+     * @param string $attributes
+     * @return string
      */
+    protected function preProcessReplacement($attributes) {
+        return $attributes;
+    }
+    
+    /**
+     * returns the segment content for the given segmentId and field. Adds optional diff markup, and handles tags.
+     * @param integer $segmentId
+     * @param string $field fieldname to get the content from
+     * @return string
+     */
+    protected function getSegmentContent($segmentId, $field) {
+        $removeTaggingOnExport = $this->config->runtimeOptions->termTagger->removeTaggingOnExport;
+        $this->_segmentEntity = $segment = $this->getSegment($segmentId);
+        
+        $edited = (string) $segment->getFieldEdited($field);
+        
+        $removeTermTags = $this->_diff ? $removeTaggingOnExport->diffExport : $removeTaggingOnExport->normalExport;
+        
+        $edited = $this->recreateTermTags($edited,(boolean)$removeTermTags);
+        $edited = $this->parseSegment($edited);
 
-    protected function getSegment(integer $segmentId) {
-        $config = Zend_Registry::get('config');
-        $removeTaggingOnExport = $config->runtimeOptions->termTagger->removeTaggingOnExport;
-        $this->_segmentEntity = ZfExtended_Factory::get('ZfExtended_Models_Entity', array('editor_Models_Db_Segments',
-                    array()));
-        $this->_segmentEntity->load($segmentId);
-        
-        $edited = (string) $this->_segmentEntity->getEdited();
-        
         if(!$this->_diff){
-            $edited = $this->recreateTermTags($edited,(boolean)$removeTaggingOnExport->normalExport);
-            $edited = $this->parseSegment($edited);
-            return $edited;
+            return $this->unprotectWhitespace($edited);
         }
         
-        $edited = $this->recreateTermTags($edited,(boolean)$removeTaggingOnExport->diffExport);
-        $edited = $this->parseSegment($edited);
+        $original = (string) $segment->getFieldOriginal($field);
+        $original = $this->recreateTermTags($original);
+        $original = $this->parseSegment($original);
         
-        $target = (string) $this->_segmentEntity->getTarget();
-        $target = $this->recreateTermTags($target);
-        $target = $this->parseSegment($target);
-        
-        return $this->_diffTagger->diffSegment(
-                $target, 
+        $diffed = $this->_diffTagger->diffSegment(
+                $original, 
                 $edited,
-                $this->_segmentEntity->getTimestamp(),
-                $this->_segmentEntity->getUserName());
+                $segment->getTimestamp(),
+                $segment->getUserName());
+        // unprotectWhitespace must be done after diffing!
+        return $this->unprotectWhitespace($diffed);
+    }
+    
+    /**
+     * loads the segment to the given Id, caches a limited count of segments internally 
+     * to prevent loading again while switching between fields
+     * @param integer $segmentId
+     * @return editor_Models_Segment
+     */
+    protected function getSegment($segmentId){
+        if(isset($this->segmentCache[$segmentId])) {
+            return $this->segmentCache[$segmentId];
+        }
+        $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segment editor_Models_Segment */
+        $this->segmentCache[$segmentId] = $segment->load($segmentId);
+        //we keep a max of 5 segments, this should be enough
+        if($this->segmentCache > 5) {
+            array_shift($this->segmentCache);
+        }
+        return $segment;
     }
     
     /**
      * converts the QM-Subsegment-Tags to xliff-format
      * 
      * @param string $segment
-     * @return string $segment
+     * @return string
      */
-
     protected function convertQmTags2XliffFormat($segment){
         $flags = $this->_task->getQmSubsegmentFlags();
         if(empty($flags)){
@@ -199,7 +260,7 @@ abstract class editor_Models_Export_FileParser {
         for (; $i < $count; $i=$i+2) {//the uneven numbers are the tags
             $id = $extract('data-seq',true);
             $class = $extract('class');
-            $open = (boolean)preg_match('"^(open .*)|(.* open)|(.* open .*)$"', $class)?TRUE:FALSE;
+            $open = (boolean)preg_match('"^(open .*)|(.* open)|(.* open .*)$"', $class);
             
             if($open){
                 $comment = $extract('data-comment',false,false);
@@ -223,7 +284,6 @@ abstract class editor_Models_Export_FileParser {
     /**
      * befüllt $this->_skeletonFile
      */
-
     protected function getSkeleton() {
         $skel = ZfExtended_Factory::get('editor_Models_Skeletonfile');
         $skel->loadRow('fileId = ?', $this->_fileId);
@@ -236,17 +296,28 @@ abstract class editor_Models_Export_FileParser {
      * @param string $segment
      * @return string $segment 
      */
-
-    abstract protected function parseSegment($segment);
+    protected function parseSegment($segment) {
+        $segmentArr = preg_split($this->config->runtimeOptions->editor->export->regexInternalTags, $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
+        $count = count($segmentArr);
+        for ($i = 1; $i < $count;) {
+            $j = $i + 2;
+            $segmentArr[$i] = '<' . pack('H*', $segmentArr[$i + 1]) .'>';
+            unset($segmentArr[$j]);
+            unset($segmentArr[$i + 1]);
+            $i = $i + 4;
+        }
+        return implode('', $segmentArr);
+    }
+    
     /**
      * Stellt die Term Auszeichnungen wieder her
      * 
      * @param string $segment
-     * @param boolean $rermoveTermTags, default = false
+     * @param boolean $removeTermTags, default = false
      * @return string $segment
      */
-
-    abstract protected function recreateTermTags($segment,$rermoveTermTags=true);
+    abstract protected function recreateTermTags($segment, $removeTermTags=true);
+    
     /**
      * - converts $this->_exportFile back to the original encoding registered in the LEK_files
      */
@@ -265,5 +336,28 @@ abstract class editor_Models_Export_FileParser {
      */
     public function exportSingleSegmentContent($segment) {
         return $this->recreateTermTags($this->parseSegment($segment));
+    }
+    
+    /**
+     * unprotects tag protected whitespace inside the given segment content
+     * keep attention to the different invocation points for this method!
+     * @param string $content
+     * @return string
+     */
+    protected function unprotectWhitespace($content) {
+        $search = array(
+          '<hardReturn />',
+          '<softReturn />',
+          '<macReturn />'
+        );
+        $replace = array(
+          "\r\n",  
+          "\n",  
+          "\r"
+        );
+        $content = str_replace($search, $replace, $content);
+        return preg_replace_callback('"<space ts=\"([A-Fa-f0-9]*)\"/>"', function ($match) {
+                    return pack('H*', $match[1]);
+                }, $content);
     }
 }

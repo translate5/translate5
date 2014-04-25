@@ -53,14 +53,154 @@
  */
 class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
 
-    protected $dbInstanceClass = 'editor_Models_Db_Segments';
-    protected $validatorInstanceClass = 'editor_Models_Validator_Segment';
-
+    protected $dbInstanceClass          = 'editor_Models_Db_Segments';
+    protected $validatorInstanceClass   = 'editor_Models_Validator_Segment';
     /**
      *
      * @var type Zend_Config
      */
-    protected $config = null;
+    protected $config           = null;
+    /**
+     * @var null
+     */
+    protected $lengthToSort = null;
+    /**
+     * @var editor_Models_SegmentFieldManager
+     */
+    protected $segmentFieldManager = null;
+    /**
+     * @var [editor_Models_Db_SegmentDataRow]
+     */
+    protected $segmentdata     = array();
+    
+    /**
+     * init the internal segment field and the DB object
+     */
+    public function __construct()
+    {
+        $session = new Zend_Session_Namespace();
+        $this->lengthToSort = $session->runtimeOptions->lengthToTruncateSegmentsToSort;
+        $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        parent::__construct();
+    }
+    
+    /**
+     * updates the toSort attribute of the given attribute name (only if toSort exists!)
+     * @param string $field
+     */
+    public function updateToSort($name) {
+        $toSort = $name.'ToSort';
+        if(!$this->hasField($toSort)) {
+            return;
+        }
+        $v = $this->__call('get'.ucfirst($name), array());
+        $this->__call('set'.ucfirst($toSort), array($this->truncateSegmentsToSort($v)));
+    }
+    
+    /**
+     * truncates the given segment content and strips tags for the toSort fields
+     * truncation is needed for sorting in MSSQL
+     * @param $segment
+     * @return string
+     */
+    protected function truncateSegmentsToSort($segment) {
+        if(!is_string($segment)){
+            return $segment;
+        }
+        return mb_substr(strip_tags($segment),0,$this->lengthToSort,'utf-8');
+    }
+    
+    /**
+     * loads the segment data hunks for this segment as Row Objects in segmentdata
+     * @param $segmentId
+     */
+    protected function initData($segmentId)
+    {
+        $this->segmentdata = array();
+        $db = ZfExtended_Factory::get('editor_Models_Db_SegmentData');
+        /* @var $db editor_Models_Db_SegmentData */
+        $s = $db->select()->where('segmentId = ?', $segmentId);
+        $datas = $db->fetchAll($s);
+        foreach($datas as $data) {
+            $this->segmentdata[$data['name']] = $data;
+        }
+    }
+
+    /**
+     * sets segment attributes, filters the fluent fields and stores them separatly
+     * @param string $name
+     * @param mixed $value
+     * (non-PHPdoc)
+     * @see ZfExtended_Models_Entity_Abstract::set()
+     */
+    protected function set($name, $value) {
+        $loc = $this->segmentFieldManager->getDataLocationByKey($name);
+        if($loc !== false) {
+            if(empty($this->segmentdata[$loc['field']])) {
+                $this->segmentdata[$loc['field']] = $this->createData($loc['field']);
+            }
+            return $this->segmentdata[$loc['field']]->__set($loc['column'], $value);
+        }
+        return parent::set($name, $value);
+    }
+
+    /**
+     * gets segment attributes, filters the fluent fields and gets them from a different location
+     * @param string $name
+     * (non-PHPdoc)
+     * @see ZfExtended_Models_Entity_Abstract::get()
+     */
+    protected function get($name) {
+        $loc = $this->segmentFieldManager->getDataLocationByKey($name);
+        if($loc !== false) {
+            //if we have a missing index here, that means, 
+            //the data field ist not existing yet, since the field itself was defined by another file!
+            //so returning an empty string is OK here. 
+            if(empty($this->segmentdata[$loc['field']])) {
+                return '';
+            }
+            return $this->segmentdata[$loc['field']]->__get($loc['column']);
+        }
+        return parent::get($name);
+    }
+    
+    /**
+     * integrates the segment fields into the hasfield check
+     * (non-PHPdoc)
+     * @see ZfExtended_Models_Entity_Abstract::hasField()
+     */
+    public function hasField($field) {
+        $loc = $this->segmentFieldManager->getDataLocationByKey($field);
+        return $loc !== false || parent::hasField($field);
+    }
+    
+    /**
+     * Loops over all data fields and checks if at least one of them was changed (compare by original and edited content)
+     * @param string $typeFilter optional, checks only data fields of given type
+     */
+    public function isDataModified($typeFilter = null) {
+        foreach ($this->segmentdata as $data) {
+            if(!empty($typeFilter) && $data->type !== $typeFilter) {
+                continue;
+            }
+            if($data->edited !== $data->original) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * loads the Entity by Primary Key Id
+     * @param integer $id
+     * @return Zend_Db_Table_Row
+     */
+    public function load($id) {
+        $row = parent::load($id);
+        $this->segmentFieldManager->initFields($this->getTaskGuid());
+        $this->initData($id);
+        return $row;
+    }
 
     /**
      * erzeugt ein neues, ungespeichertes SegmentHistory Entity
@@ -68,8 +208,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     public function getNewHistoryEntity() {
         $history = ZfExtended_Factory::get('editor_Models_SegmentHistory');
+        /* @var $history editor_Models_SegmentHistory */
+        $history->setSegmentFieldManager($this->segmentFieldManager);
 
-        $fields = array('sourceEdited', 'edited', 'userGuid', 'userName', 'timestamp', 'editable', 'pretrans', 'qmId', 'stateId', 'autoStateId', 'workflowStep', 'workflowStepNr');
+        $fields = array('taskGuid', 'userGuid', 'userName', 'timestamp', 'editable', 'pretrans', 'qmId', 'stateId', 'autoStateId', 'workflowStep', 'workflowStepNr');
+        $fields = array_merge($fields, $this->segmentFieldManager->getEditableDataIndexList());
         $history->setSegmentId($this->getId());
 
         foreach ($fields as $field) {
@@ -83,26 +226,213 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * Load segments by taskguid. Second Parameter decides if SourceEdited column should be provided
-     * @param string $taskguid
-     * @param boolean $loadSourceEdited
+     * gets the data from import, sets it into the data fields
+     * check the given fields against the really available fields for this task.
+     * @param editor_Models_SegmentFieldManager $sfm
+     * @param array $segmentData key: fieldname; value: array with original and originalMd5
      */
-    public function loadByTaskGuid($taskguid, $loadSourceEdited = false) {
+    public function setFieldContents(editor_Models_SegmentFieldManager $sfm, array $segmentData) {
+        $db = ZfExtended_Factory::get('editor_Models_Db_SegmentData');
+        /* @var $db editor_Models_Db_SegmentData */
+        foreach($segmentData as $name => $data) {
+            $row = $db->createRow($data);
+            /* @var $row editor_Models_Db_SegmentDataRow */
+            $row->name = $name;
+            $field = $sfm->getByName($name);
+            $row->originalToSort = $this->truncateSegmentsToSort($row->original);
+            $row->taskGuid = $this->getTaskGuid();
+            $row->mid = $this->getMid();
+            if($field->editable) {
+                $row->edited = $row->original;
+                $row->editedToSort = $row->originalToSort;
+            }
+            /* @var $row editor_Models_Db_SegmentDataRow */
+            $this->segmentdata[] = $row;
+        }
+    }
+    
+    /**
+     * adds one single field content ([original => TEXT, originalMd5 => HASH]) to a given segment, 
+     * identified by MID and fileId. taskGuid MUST be given by setTaskGuid before!
+     * 
+     * @param Zend_Db_Table_Row_Abstract $field
+     * @param integer $fileId
+     * @param string $mid
+     * @param array $data
+     */
+    public function addFieldContent(Zend_Db_Table_Row_Abstract $field, $fileId, $mid, array $data) {
+        $db = ZfExtended_Factory::get('editor_Models_Db_SegmentData');
+        /* @var $db editor_Models_Db_SegmentData */
+
+        $segmentId = new Zend_Db_Expr('('.$this->db->select()
+                            ->from($this->db->info($db::NAME), array('id'))
+                            ->where('taskGuid = ?', $this->getTaskGuid())
+                            ->where('fileId = ?', $fileId)
+                            ->where('mid = ?', $mid).')');
+        
+        $data = array(
+            'taskGuid' => $this->getTaskGuid(),
+            'name' => $field->name,
+            'segmentId' => $segmentId,
+            'mid' => $mid,
+            'original' => $data['original'],
+            'originalMd5' => $data['originalMd5'],
+            'originalToSort' => $this->truncateSegmentsToSort($data['original']),
+        );
+        if($field->editable) {
+            $data['edited'] = $data['original'];
+            $data['editedToSort'] = $this->truncateSegmentsToSort($data['original']);
+        }
+        
+        $db->insert($data);
+    }
+    
+    /**
+     * method to add a data hunk later on 
+     * (edit a alternate which was defined by another file, and is therefore empty in this segment)
+     * @param string $field the field name
+     * @return editor_Models_Db_SegmentDataRow
+     */
+    protected function createData($field) {
+        $db = ZfExtended_Factory::get('editor_Models_Db_SegmentData');
+        /* @var $db editor_Models_Db_SegmentData */
+        $row = $db->createRow();
+        /* @var $row editor_Models_Db_SegmentDataRow */
+        $row->taskGuid = $this->get('taskGuid');
+        $row->name = $field;
+        $row->segmentId = $this->get('id');
+        $row->mid = $this->get('mid');
+        $row->original = '';
+        $row->originalMd5 = 'd41d8cd98f00b204e9800998ecf8427e'; //empty string md5 hash
+        $row->originalToSort = '';
+        $row->edited = '';
+        $row->editedToSort = '';
+        $row->save();
+        return $row;
+    }
+    
+    /**
+     * save the segment and the associated segmentd data hunks
+     * (non-PHPdoc)
+     * @see ZfExtended_Models_Entity_Abstract::save()
+     */
+    public function save() {
+        $oldIdValue = $this->getId();
+        $segmentId = parent::save();
+        foreach($this->segmentdata as $data) {
+            /* @var $data editor_Models_Db_SegmentDataRow */
+            if(empty($data->segmentId)) {
+                $data->segmentId = $segmentId;
+            }
+            $data->save();
+        }
+        //only update the mat view if the segment was already in DB (so do not save mat view on import!)
+        if(!empty($oldIdValue)) {
+            $this->segmentFieldManager->getView()->updateSegment($this);
+        }
+        return $segmentId;
+    }
+    
+    /**
+     * merges the segment data into the result set
+     * (non-PHPdoc)
+     * @see ZfExtended_Models_Entity_Abstract::getDataObject()
+     */
+    public function getDataObject() {
+        $res = parent::getDataObject();
+        $this->segmentFieldManager->mergeData($this->segmentdata, $res);
+        return $res;
+    }
+
+    /**
+     * returns the original content of a field 
+     * @param string $field Fieldname
+     */
+    public function getFieldOriginal($field) {
+        //since fields can be merged from different files, data for a field can be empty
+        if(empty($this->segmentdata[$field])) {
+            return '';
+        }
+        return $this->segmentdata[$field]->original;
+    }
+
+    /**
+     * returns the edited content of a field 
+     * @param string $field Fieldname
+     */
+    public function getFieldEdited($field) {
+        //since fields can be merged from different files, data for a field can be empty
+        if(empty($this->segmentdata[$field])) {
+            return '';
+        }
+        return $this->segmentdata[$field]->edited;
+    }
+
+    /**
+     * returns a list with editable dataindex
+     * @return array
+     */
+    public function getEditableDataIndexList() {
+        return $this->segmentFieldManager->getEditableDataIndexList();
+    }
+    
+    /**
+     * Load segments by taskGuid.
+     * @param string $taskGuid
+     * @param boolean $loadSourceEdited
+     * @return array
+     */
+    public function loadByTaskGuid($taskGuid) {
+        try {
+            return $this->_loadByTaskGuid($taskGuid);
+        }
+        catch(Zend_Db_Statement_Exception $e) {
+            $m = $e->getMessage();
+            if(strpos($m,'SQLSTATE') !== 0 || strpos($m,'Base table or view not found') === false) {
+                throw $e;
+            }
+        }
+        //fallback mechanism for not existing views. If not exists, we are trying to create it.
+        $this->segmentFieldManager->initFields($taskGuid);
+        $this->segmentFieldManager->getView()->create();
+        return $this->_loadByTaskGuid($taskGuid);
+    }
+    
+    /**
+     * encapsulate the load by taskGuid code.
+     * @param string $taskGuid
+     * @return array
+     */
+    protected function _loadByTaskGuid($taskGuid) {
+        $this->segmentFieldManager->initFields($taskGuid);
+        $this->reInitDb($taskGuid);
+        
         $this->initDefaultSort();
+
         $s = $this->db->select(false);
         $db = $this->db;
         $cols = $this->db->info($db::COLS);
-        //dont load sourceEdited* Cols if not needed
-        if (!$loadSourceEdited) {
+
+        /**
+         * FIXME reminder for TRANSLATE-113: Filtering out unused cols is needed for TaskManagement Feature (user dependent cols)
+         * This is a example for field filtering. 
+         if (!$loadSourceEdited) {
             $cols = array_filter($cols, function($val) {
                         return strpos($val, 'sourceEdited') === false;
                     });
         }
+         */
         $s->from($this->db, $cols);
-        $s->where('taskGuid = ?', $taskguid);
+        $s->where('taskGuid = ?', $taskGuid);
+
         return parent::loadFilterdCustom($s);
     }
+    
 
+    /**
+     * @param $taskguid
+     * @return int
+     */
     public function getTotalCountByTaskGuid($taskguid) {
         $s = $this->db->select();
         $s->where('taskGuid = ?', $taskguid);
@@ -111,16 +441,21 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
 
     /**
      * Loads segments by a specific workflowStep, fetch only specific fields.
-     * @param string $taskguid
+     * @param string $taskGuid
      * @param string $workflowStep
      */
-    public function loadByWorkflowStep(string $taskguid, string $workflowStep) {
-        $fields = array('id', 'mid', 'segmentNrInTask', 'source', 'sourceEdited', 'relais', 'target', 'edited', 'stateId', 'autoStateId', 'matchRate', 'qmId', 'comments', 'fileId');
+    public function loadByWorkflowStep(string $taskGuid, string $workflowStep) {
+        $this->segmentFieldManager->initFields($taskGuid);
+        $this->reInitDb($taskGuid);
+        
+        $fields = array('id', 'mid', 'segmentNrInTask', 'stateId', 'autoStateId', 'matchRate', 'qmId', 'comments', 'fileId');
+        $fields = array_merge($fields, $this->segmentFieldManager->getDataIndexList());
+        
         $this->initDefaultSort();
         $s = $this->db->select(false);
         $db = $this->db;
         $s->from($this->db, $fields);
-        $s->where('taskGuid = ?', $taskguid)->where('workflowStep = ?', $workflowStep);
+        $s->where('taskGuid = ?', $taskGuid)->where('workflowStep = ?', $workflowStep);
         return parent::loadFilterdCustom($s);
     }
 
@@ -139,7 +474,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     public function getFileMap($taskGuid) {
-        $this->initDefaultSort();
+        $this->loadByTaskGuid($taskGuid);
         $s = $this->db->select()
                 ->from($this->db, 'fileId')
                 ->where('taskGuid = ?', $taskGuid);
@@ -189,12 +524,21 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * holt die Wiederholungen des aktuell geladenene Segments
+     * fetch the alikes of the actually loaded segment
+     * 
+     * cannot handle alternate targets! can only handle source and target field! actually not refactored!
+     * 
      * @return array
      */
     public function getAlikes($taskGuid) {
-        $segmentsTableName = $this->db->info(Zend_Db_Table_Abstract::NAME);
-        $sql = $this->_getAlikesSql();
+        $this->segmentFieldManager->initFields($taskGuid);
+        //if we are using alternates we cant use change alikes, that means we return an empty list here
+        if(!$this->segmentFieldManager->isDefaultLayout()) {
+            return array(); 
+        }
+        $segmentsViewName = $this->segmentFieldManager->getView()->getName();
+        $sql = $this->_getAlikesSql($segmentsViewName);
+        //since alikes are only usable with segment field default layout we can use the following hardcoded methods
         $stmt = $this->db->getAdapter()->query($sql, array(
             $this->getSourceMd5(),
             $this->getTargetMd5(),
@@ -203,7 +547,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             $taskGuid));
         $alikes = $stmt->fetchAll();
         //gefilterte Segmente bestimmen und flag setzen
-        $hasIdFiltered = $this->getIdsAfterFilter($segmentsTableName, $taskGuid);
+        $hasIdFiltered = $this->getIdsAfterFilter($segmentsViewName, $taskGuid);
         foreach ($alikes as $key => $alike) {
             $alikes[$key]['infilter'] = isset($hasIdFiltered[$alike['id']]);
             //das aktuelle eigene Segment, zu dem die Alikes gesucht wurden, aus der Liste entfernen
@@ -213,15 +557,42 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         return array_values($alikes); //neues numerisches Array für JSON Rückgabe, durch das unset oben macht json_decode ein Object draus
     }
+    
+    /**
+     * reset the internal used db object to the view to the given taskGuid
+     * @param string $taskGuid
+     */
+    protected function reInitDb($taskGuid) {
+        $mv = $this->segmentFieldManager->getView();
+        /* @var $mv editor_Models_Segment_MaterializedView */
+        $this->db = ZfExtended_Factory::get($this->dbInstanceClass, array(array(), $mv->getName()));
+    }
 
     /**
-     * Gibt ein assoziatives Array mit den Segment IDs zurück, die nach Anwendung des Filters noch da sind.
+     * overwrite for segment field integration
+     * (non-PHPdoc)
+     * @see ZfExtended_Models_Entity_Abstract::validatorLazyInstatiation()
+     */
+    protected function validatorLazyInstatiation() {
+        $taskGuid = $this->getTaskGuid();
+        if(empty($taskGuid)) {
+            throw new Zend_Exception("For using the editor_Models_Validator_Segment Validator a taskGuid must be set in the segment!");
+        }
+        $this->segmentFieldManager->initFields($taskGuid);
+        if(empty($this->validator)) {
+            $this->validator = ZfExtended_Factory::get($this->validatorInstanceClass, array($this->segmentFieldManager));
+        }
+    }
+    
+    /**
+     * For ChangeAlikes: Gibt ein assoziatives Array mit den Segment IDs zurück, die nach Anwendung des Filters noch da sind.
      * ArrayKeys: SegmentId, ArrayValue immer true
      * @param string $segmentsTableName
      * @param string $taskGuid
      * @return array
      */
     protected function getIdsAfterFilter(string $segmentsTableName, string $taskGuid) {
+        $this->reInitDb($taskGuid);
         $s = $this->db->select()
                 ->from($segmentsTableName, array('id'))
                 ->where('taskGuid = ?', $taskGuid)
@@ -241,17 +612,18 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * Muss für MSSQL überschrieben werden!
      *
      * Für MSSQL (getestet mit konkreten Werten und ohne die letzte Zeile in MSSQL direkt):
-      select id, source, target,
-      case when sourceMd5 like '?' then 1 else 0 end as sourceMatch,
-      case when targetMd5 like '?' then 1 else 0 end as targetMatch
-      from LEK_segments where (sourceMd5 like '?' or targetMd5 like '?')
-      and taskGuid = ? and editable = 1 order by fileOrder, id;
+     * select id, source, target,
+     * case when sourceMd5 like '?' then 1 else 0 end as sourceMatch,
+     * case when targetMd5 like '?' then 1 else 0 end as targetMatch
+     * from LEK_segments where (sourceMd5 like '?' or targetMd5 like '?')
+     * and taskGuid = ? and editable = 1 order by fileOrder, id;
      *
+     * @param string $viewName
      * @return string
      */
-    protected function _getAlikesSql() {
+    protected function _getAlikesSql(string $viewName) {
         return 'select id, segmentNrInTask, source, target, sourceMd5=? sourceMatch, targetMd5=? targetMatch
-    from LEK_segments 
+    from '.$viewName.' 
     where (sourceMd5 = ? 
         or (targetMd5 = ? and target != \'\' and target IS NOT NULL)) 
         and taskGuid = ? and editable = 1
@@ -268,178 +640,31 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * recreates term tags in target / edited fields
-     */
-    public function recreateTermTagsTarget() {
-        $this->setEdited($this->recreateTermTags($this->getEdited()));
-    }
-
-    /**
-     * recreates term tags in source / sourceEdited fields
-     */
-    public function recreateTermTagsSource() {
-        $this->setSourceEdited($this->recreateTermTags($this->getSourceEdited(), true));
-    }
-
-    /**
-     * recreates the term markup in the given segment content
-     * @param string $segmentContent textuall segment content
+     * recreates the term markup in the data field with the given dataindex
+     * @param string $dataindex dataindex of the segment field to be processed
      * @param boolean $useSource optional, default false, if true terms of source column are used (instead of target)
-     * @return string segment with recreated terms
      */
-    protected function recreateTermTags($segmentContent, $useSource = false) {
-        $this->config = Zend_Registry::get('config');
-        //gibt alle Terme und zugehörige MetaDaten zu den im Segment verwendeten Terminstanzen zurück
-        //sortiert nach String Länge, und bearbeitet die längsten Strings zuerst. 
-        $sql = 'select i.term, i.projectTerminstanceId, t.mid, t.status, s2t.transFound, t.definition
-          from LEK_terminstances i, LEK_terms t, LEK_segments2terms s2t
-          where i.segmentId = ? and i.segmentId = s2t.segmentId and t.id = i.termId
-              and s2t.termId = i.termId and s2t.used and s2t.isSource = ? order by length(i.term) desc';
-        $isSource = $useSource ? 1 : 0;
-        $stmt = $this->db->getAdapter()->query($sql, array($this->getId(), $isSource));
-        $terms = $stmt->fetchAll();
-
-        $this->termNr = 0; //laufende Nummer der Term Tags
-        $this->replacements = array();
-
-        foreach ($terms as $term) {
-            $termData = new editor_Models_TermTagData();
-            $termData->isSource = $useSource;
-            foreach ($term as $key => $value) {
-                $termData->$key = $value;
-            }
-            $searchLength = mb_strlen($term['term']);
-            $segmentContent = $this->findTerminstancesTagAware($termData, $segmentContent, $searchLength);
-        }
-        //Im zweiten Schritt die Platzhalter durch die Terminstanzen ersetzen.
-        //Der Umweg über die uniquen Platzhalter ist nötig, da ansonsten gleichlautende Terminstanzen mehrfach mit sich selbst ersetzt und damit mehrere divs hinzugefügt werden
-        return str_replace(array_keys($this->replacements), $this->replacements, $segmentContent);
+    public function recreateTermTags($dataindex, $useSource = false) {
+        $termTag = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
+        /* @var $termTag editor_Models_Segment_TermTag */
+        $withTerms = $termTag->recreate($this->getId(), $this->get($dataindex), $useSource);
+        $this->set($dataindex, $withTerms);
     }
 
     /**
-     * ensures, that a term does not match content inside internal tags
-     * 
-     * @param editor_Models_TermTagData $termData 
-     * @param string $segment
-     * @param integer $searchLength
-     * @return string $segment
+     * Updates - if enabled - the QM Sub Segments with correct IDs in the given String and stores it with the given Method in the entity
+     * @param string $field
      */
-    protected function findTerminstancesTagAware($termData, $segment, $searchLength) {
-        //if there is an internal tag in the term, the term will not match strings inside internal tags
-        if (preg_match($this->config->runtimeOptions->editor->segment->recreateTermTags->regexInternalTags, $termData->term)) {
-            return $this->findTerminstances($termData, $segment, $searchLength);
+    public function updateQmSubSegments(string $dataindex) {
+        $field = $this->segmentFieldManager->getDataLocationByKey($dataindex);
+        $config = Zend_Registry::get('config');
+        if(! $config->runtimeOptions->editor->enableQmSubSegments) {
+            return;
         }
-        //otherwhise we ensure, that internal tags will not be matched by termRecreation
-        $segmentArr = preg_split($this->config->runtimeOptions->editor->segment->recreateTermTags->regexInternalTags, $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
-        $count = count($segmentArr);
-        for ($i = 0; $i < $count; $i = $i + 2) {//the uneven numbers are the tags, we skip them
-            $segmentArr[$i] = $this->findTerminstances($termData, $segmentArr[$i], $searchLength);
-        }
-        return implode('', $segmentArr);
-    }
-
-    /**
-     * Durchsucht das Segment nach dem Term und ordnet die Fundstellen nach einer Priorisierung ob diese Fundstelle ein eigenständiges Wort ist, oder aber durch andere Zeichen abgegrenzt ist. 
-     * Handelt es sich um eine Teilzeichenkette anstatt einem eigenständige Wort, wird die Fundstelle ignoriert.
-     * 
-     * @param editor_Models_TermTagData $termData 
-     * @param string $segment
-     * @param integer $searchLength
-     * @param integer $offset
-     * @return string $segment
-     */
-    protected function findTerminstances($termData, $segment, $searchLength, $offset = 0) {
-        $term = $termData->term;
-        $pos = mb_strpos($segment, $term, $offset);
-        if ($pos === false) {
-            $pos = mb_stripos($segment, $term, $offset);
-        }
-        $offset = $pos + $searchLength;
-        if ($searchLength > 1) {
-            $offset--;
-        }
-        $segLength = mb_strlen($segment);
-        if ($pos === false || $offset >= $segLength) {
-            return $segment;
-        }
-        //holt Term für die Ersetzung und Rückgabe
-        $term2Mark = mb_substr($segment, $pos, $searchLength);
-
-        //holt die Zeichen vor und nach dem gesuchten Term
-        if ($pos === 0) {
-            $leftChar = '';
-        } else {
-            $leftChar = trim(mb_substr($segment, $pos - 1, 1));
-        }
-        $rightChar = trim(mb_substr($segment, $pos + $searchLength, 1));
-
-        /**
-         * Im folgenden werden die linken und rechten Zeichen nicht per RegEx oder gegen Zeichenliste verglichen,
-         * sondern mit trim eine Zeichenliste angewendet und dann das Resultat analysiert (im Regelfall Ergebnis == Leerstring.
-         * Das erscheint mir pragmatischer und schneller als per RegEx o.ä.
-         * Im folgenden werden die linken und rechten Zeichen in drei Prios eingeteilt 0,1,2 in dieser Reihenfolge werden Sie dann später auch ersetzt.
-         * Das heißt wenn der Term "foo" ist, dann wird im String "bar foo<lala> bar foo dada" das zweite "foo" zuerst ersetzt, 
-         * da ein whitespace als Wortgrenze höher als ein Tag angesehen wird.    
-         */
-        if ($rightChar === '' && $leftChar === '') {
-            $placeholder = '#~<~#' . $this->termNr++ . '#~>~#';
-            $segment = mb_substr($segment, 0, $pos) . $placeholder . mb_substr($segment, $pos + $searchLength);
-            $offset = $pos + strlen($placeholder) - 1;
-            if ($offset < $segLength) {
-                $segment = $this->findTerminstances($termData, $segment, $searchLength, $offset);
-            }
-            $termData->term = $term2Mark;
-            $this->replacements[$placeholder] = $this->getGeneratedTermTag($termData);
-            return $segment;
-        }
-
-        $rightChar = trim($rightChar, '<');
-        $leftChar = trim($leftChar, '>');
-
-        if ($rightChar === '' && $leftChar === '') {
-            $placeholder = '#~<~#' . $this->termNr++ . '#~>~#';
-            $segment = mb_substr($segment, 0, $pos) . $placeholder . mb_substr($segment, $pos + $searchLength);
-            $offset = $pos + strlen($placeholder) - 1;
-            if ($offset < $segLength) {
-                $segment = $this->findTerminstances($termData, $segment, $searchLength, $offset);
-            }
-            $termData->term = $term2Mark;
-            $this->replacements[$placeholder] = $this->getGeneratedTermTag($termData);
-            return $segment;
-        }
-
-        $wordspacers = '.,&;:?!„“\'"…·|「」『』»«›‹¡’‚';
-        $rightChar = trim($rightChar, $wordspacers);
-        $leftChar = trim($leftChar, $wordspacers);
-
-        if ($rightChar === '' && $leftChar === '') {
-            $placeholder = '#~<~#' . $this->termNr++ . '#~>~#';
-            $segment = mb_substr($segment, 0, $pos) . $placeholder . mb_substr($segment, $pos + $searchLength);
-            $offset = $pos + strlen($placeholder) - 1;
-            if ($offset < $segLength) {
-                $segment = $this->findTerminstances($termData, $segment, $searchLength, $offset);
-            }
-            $termData->term = $term2Mark;
-            $this->replacements[$placeholder] = $this->getGeneratedTermTag($termData);
-            return $segment;
-        }
-        //weiter suchen, aber die Fundstelle nicht erfassen.
-        return $this->findTerminstances($termData, $segment, $searchLength, $offset);
-    }
-
-    /**
-     * erstellt den term div tag anhand den gegebene Daten
-     * @param editor_Models_TermTagData $termData
-     * @param boolean $transFound
-     */
-    public function getGeneratedTermTag(editor_Models_TermTagData $termData) {
-        $class = array('term', $termData->status);
-        if ($termData->isSource) {
-            $class[] = ($termData->transFound ? 'transFound' : 'transNotFound');
-        }
-        $class = join(' ', $class);
-        $id = join('-', array($termData->mid, $termData->projectTerminstanceId));
-        return sprintf('<div class="%1$s" id="%2$s" title="%4$s">%3$s</div>', $class, $id, $termData->term, htmlspecialchars($termData->definition));
+        $qmsubsegments = ZfExtended_Factory::get('editor_Models_Qmsubsegments');
+        /* @var $qmsubsegments editor_Models_Qmsubsegments */
+        $withQm = $qmsubsegments->updateQmSubSegments($this->get($dataindex), (int)$this->getId(), $field['field']);
+        $this->set($dataindex, $withQm);
     }
 
     /**
@@ -450,13 +675,42 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @param boolean $emptyEditedOnly
      */
     public function updateAutoState(string $taskGuid, integer $oldState, integer $newState, $emptyEditedOnly = false) {
-        $where = array(
-            'autoStateId = ?' => $oldState,
-            'taskGuid = ?' => $taskGuid
-        );
-        if($emptyEditedOnly)
-            $where['edited = ?'] = '';
-        $this->db->update(array('autoStateId' => $newState), $where);
+        $sfm = $this->segmentFieldManager;
+        $sfm->initFields($taskGuid);
+        $db = $this->db;
+        $sql = 'UPDATE `%s` d, `%s` v set d.autoStateId = ? where d.id = v.id and v.autoStateId = ? and v.taskGuid = ?';
+        $sql = sprintf($sql, $db->info($db::NAME), $sfm->getView()->getName());
+        $bind = array($newState, $oldState, $taskGuid);
+        
+        if(!$emptyEditedOnly) {
+            $this->db->getAdapter()->query($sql, $bind);
+            return;
+        }
+        $sfm->initFields($taskGuid);
+        $fields = $sfm->getFieldList();
+        foreach($fields as $field) {
+            if($field->type == editor_Models_SegmentField::TYPE_TARGET && $field->editable) {
+                $sql .= ' and '.$sfm->getEditIndex($field->name).' = ?';
+                $bind[] = '';
+            }
+        }
+        $this->db->getAdapter()->query($sql, $bind);
     }
 
+    /**
+     * includes the fluent segment data
+     * (non-PHPdoc)
+     * @see ZfExtended_Models_Entity_Abstract::getModifiedData()
+     */
+    public function getModifiedData() {
+        $result = parent::getModifiedData(); //assoc mit key = dataindex und value = modValue
+        $modKeys = array_keys($result);
+        $modFields = array_unique(array_diff($this->modified, $modKeys));
+        foreach($modFields as $field) {
+            if($this->segmentFieldManager->getDataLocationByKey($field) !== false) {
+                $result[$field] = $this->get($field);
+            }
+        }
+        return $result;
+    }
 }

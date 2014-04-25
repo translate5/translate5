@@ -434,12 +434,11 @@ abstract class editor_Workflow_Abstract {
     /**
      * manipulates the segment as needed by workflow after updated by user
      * @param editor_Models_Segment $segmentToSave
-     * @param boolean $sourceEditing defines if source editing is used on the current task or not
      */
-    public function beforeSegmentSave(editor_Models_Segment $segmentToSave, $sourceEditing) {
-        $updateAutoStates = function($autostates, $segment, $tua) use($sourceEditing) {
+    public function beforeSegmentSave(editor_Models_Segment $segmentToSave) {
+        $updateAutoStates = function($autostates, $segment, $tua) {
             //sets the calculated autoStateId
-            $segment->setAutoStateId($autostates->calculateSegmentState($segment, $tua, $sourceEditing));
+            $segment->setAutoStateId($autostates->calculateSegmentState($segment, $tua));
         };
         $this->commonBeforeSegmentSave($segmentToSave, $updateAutoStates);
     }

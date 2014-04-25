@@ -73,9 +73,7 @@ class editor_Models_Export {
         $this->task = $task;
         $this->taskGuid = $task->getTaskGuid();
         $this->optionDiff = $diff;
-        if(!$this->exportFolderExists() && (!$setExportRunningStamp || $this->setExportRunningStamp()))
-            return true;
-        return false;
+        return (!$this->exportFolderExists() && (!$setExportRunningStamp || $this->setExportRunningStamp()));
     }
     /**
      * sets a timestamp in LEK_task for the task, if timestamp column is null
@@ -123,6 +121,7 @@ class editor_Models_Export {
         $localEncoded = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
             'LocalEncoded'
         );
+        sort($dirPaths);
         foreach ($dirPaths as $path) {
             $path = $localEncoded->encode($path);
             $path = $exportRootFolder.DIRECTORY_SEPARATOR.$path;

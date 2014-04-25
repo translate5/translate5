@@ -143,6 +143,12 @@ class editor_Models_Import {
      * @var editor_Models_Import_DataProvider_Abstract
      */
     protected $dataProvider;
+    
+    /**
+     * shared instance over all parse objects of the segment field manager
+     * @var editor_Models_SegmentFieldManager
+     */
+    protected $segmentFieldManager;
 
     /**
      * Konstruktor
@@ -150,6 +156,7 @@ class editor_Models_Import {
     public function __construct(){
         $this->gh = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('General');
         $this->_localEncoded = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('LocalEncoded');
+        $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
     }
     
     /**
@@ -184,7 +191,10 @@ class editor_Models_Import {
         }
         $this->task->setReferenceFiles($this->hasReferenceFiles());
         $this->task->save(); //Task erst Speichern wenn die obigen validates und checks durch sind.
-
+        
+        
+        $this->segmentFieldManager->initFields($this->task->getTaskGuid());
+        
         //call import Methods:
         $this->importWithCollectableErrors();
         
@@ -212,6 +222,7 @@ class editor_Models_Import {
         $this->syncFileOrder();
         $this->removeMetaDataTmpFiles();
         $this->importAndGenerateRelaisFiles();
+        $this->updateSegmentFieldViews();
         
         //disable errorCollecting for post processing
         Zend_Registry::set('errorCollect', false);
@@ -246,6 +257,13 @@ class editor_Models_Import {
     }
     
     /**
+     * refreshes / creates the database views for this task
+     */
+    protected function updateSegmentFieldViews() {
+        $this->task->createMaterializedView();
+    }
+    
+    /**
      * löscht alle Daten des aktuell im Importer geladenen Tasks aus der DB
      */
     public function deleteTask() {
@@ -258,7 +276,7 @@ class editor_Models_Import {
     protected function importMetaData() {
         $this->metaDataImporter = ZfExtended_Factory::get('editor_Models_Import_MetaData', array($this->_sourceLang, $this->_targetLang));
         /* @var $this->metaDataImporter editor_Models_Import_MetaData */
-        $this->metaDataImporter->import($this->_taskGuid, $this->_importFolder);
+        $this->metaDataImporter->import($this->task, $this->_importFolder);
     }
 
     /**
@@ -274,7 +292,8 @@ class editor_Models_Import {
      * - befüllt $this->_imagesInTask
      */
     protected function importFiles(){
-        $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_ProofRead', array($this->_sourceLang, $this->_targetLang, $this->task, $this->_userGuid, $this->_userName));
+        $mqmProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_MqmParser', array($this->task, $this->segmentFieldManager));
+        $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_ProofRead', array($this->task, $this->_sourceLang, $this->_targetLang, $this->_userGuid, $this->_userName));
         /* @var $segProc editor_Models_Import_SegmentProcessor_ProofRead */
         foreach ($this->_filePaths as $fileId => $path) {
             if($this->isCheckRun){
@@ -284,7 +303,8 @@ class editor_Models_Import {
             $parser = $this->getFileParser($path, $params);
             /* @var $parser editor_Models_Import_FileParser */
             $segProc->setSegmentFile($fileId, $params[1]); //$params[1] => filename
-            $parser->setSegmentProcessor($segProc);
+            $parser->addSegmentProcessor($mqmProc);
+            $parser->addSegmentProcessor($segProc);
             $parser->parseFile();
             $this->_imagesInTask = array_merge($this->_imagesInTask,$parser->getTagImageNames());
             $this->removeTaggedFile($params[0]); //$params[0] => abs Path to File
@@ -301,10 +321,15 @@ class editor_Models_Import {
         $ext = preg_replace('".*\.([^.]*)$"i', '\\1', $path);
         try {
             $class = 'editor_Models_Import_FileParser_'.  ucfirst(strtolower($ext));
-            return ZfExtended_Factory::get($class,$params);
-            
-        } catch (Exception $e) { 
-            throw new Zend_Exception('For the fileextension '.$ext. ' no parser is registered. (Class '.$class.' not found).',0,$e);
+            $parser = ZfExtended_Factory::get($class,$params);
+            /* var $parser editor_Models_Import_FileParser */
+            $parser->setSegmentFieldManager($this->segmentFieldManager);
+            return $parser;
+        } catch (ReflectionException $e) {
+            if(strpos($e->getMessage(), 'Class '.$class.' does not exist') !== false){
+                throw new Zend_Exception('For the fileextension '.$ext. ' no parser is registered. (Class '.$class.' not found).',0,$e);
+            }
+            throw $e;
         }
     }
     
@@ -313,12 +338,12 @@ class editor_Models_Import {
      * @param editor_Models_RelaisFoldertree $tree
      */
     protected function importRelaisFiles(editor_Models_RelaisFoldertree $tree){
-    	$segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_Relais', array($this->_sourceLang, $this->_relaisLang, $this->task));
+        $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_Relais', array($this->task, $this->segmentFieldManager));
         /* @var $segProc editor_Models_Import_SegmentProcessor_Relais */
-    	foreach ($this->_filePaths as $fileId => $path) {
-    	    if(!$tree->isFileToImport($path)){
-    	        continue;
-    	    }
+        foreach ($this->_filePaths as $fileId => $path) {
+            if(!$tree->isFileToImport($path)){
+                continue;
+            }
             if($this->isCheckRun){
                     trigger_error('Check of Relais File: '.$this->_importFolder.DIRECTORY_SEPARATOR.$path);
             }
@@ -326,7 +351,7 @@ class editor_Models_Import {
             $parser = $this->getFileParser($path, $params);
             /* @var $parser editor_Models_Import_FileParser */
             $segProc->setSegmentFile($fileId, $params[1]);  //$params[1] => filename
-            $parser->setSegmentProcessor($segProc);
+            $parser->addSegmentProcessor($segProc);
             $parser->parseFile();
     	}
     }
@@ -343,7 +368,7 @@ class editor_Models_Import {
             $this->_edit100PercentMatches, 
             $this->_sourceLang, 
             $this->_targetLang,
-            $this->_taskGuid
+            $this->task,
         );
     }
     

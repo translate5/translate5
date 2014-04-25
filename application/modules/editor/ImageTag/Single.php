@@ -52,4 +52,14 @@ class editor_ImageTag_Single extends editor_ImageTag {
   protected function generateFilepath($filename){
     return parent::generateFilepath($filename.'-single');
   }
+  
+  /**
+   * (non-PHPdoc)
+   * @see editor_ImageTag::getHtmlTag()
+   */
+  public function getHtmlTag(array $parameters) {
+      $parameters['type'] = 'single';
+      $parameters['shortTag'] = '&lt;'.$parameters['shortTag'].'/&gt';
+      return parent::getHtmlTag($parameters);
+  }
 }

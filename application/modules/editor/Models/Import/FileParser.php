@@ -40,12 +40,16 @@
  * @version 1.0
  *
 
-  /**
- * Enthält Methoden zum Fileparsing für den Import
- *
+/**
+ * Contains Methods for Fileparsing on the Import
+ * 
+ * - Child Classes must implement and use the abstract methods
  */
-
 abstract class editor_Models_Import_FileParser {
+    /**
+     * @var integer Counter of tags used in a segment.
+     */
+    protected $_tagCount = 1;
     /**
      * @var string
      */
@@ -62,22 +66,13 @@ abstract class editor_Models_Import_FileParser {
      * @var integer
      */
     protected $_fileId = NULL;
+    
     /**
-     * @var string aktuell geparstes source-Segment
+     * array containing all segment data parsed
+     * @var [array] 2D array, first level has keys which map to the segment field names. Second Level array must be compliant to editor_Models_Db_SegmentDataRow
      */
-    protected $_source = NULL;
-    /**
-     * @var string aktuell geparstes source-Segment, wie es ursprünglich in der geparsten Datei enthalten war
-     */
-    protected $_sourceOrig = NULL;
-    /**
-     * @var string aktuell geparstes target-Segment
-     */
-    protected $_target = NULL;
-    /**
-     * @var string aktuell geparstes target-Segment, wie es ursprünglich in der geparsten Datei enthalten war
-     */
-    protected $_targetOrig = NULL;
+    protected $segmentData = array();
+    
     /**
      * @var string mid des aktuellen Segments
      */
@@ -112,20 +107,30 @@ abstract class editor_Models_Import_FileParser {
      *              editiert werden dürfen (true) oder nicht (false)
      */
     public $_edit100PercentMatches = false;
+    
+    /**
+     * defines the GUI representation of internal used tags for masking special characters  
+     * @var array
+     */
+    protected $_tagMapping = array(
+        'hardReturn' => array('text' => '&lt;hardReturn/&gt;', 'imgText' => '<hardReturn/>'),
+        'softReturn' => array('text' => '&lt;softReturn/&gt;', 'imgText' => '<softReturn/>'),
+        'macReturn' => array('text' => '&lt;macReturn/&gt;', 'imgText' => '<macReturn/>'),
+        'space' => array('text' => '&lt;space/&gt;', 'imgText' => '<space/>'));
+
     /**
      * @var editor_ImageTag_Left
      */
-
     protected $_leftTag = NULL;
+
     /**
      * @var editor_ImageTag_Right
      */
-
     protected $_rightTag = NULL;
+
     /**
      * @var editor_ImageTag_Single
      */
-
     protected $_singleTag = NULL;
 
     /**
@@ -143,12 +148,12 @@ abstract class editor_Models_Import_FileParser {
      *
      */
     protected $_terms = array();
-    /**
-     * @var editor_Models_Segment im Konstruktor initialisiert, um die Methode getGeneratedTermTag beim Segmentparsing nutzen zu können
-     *
-     */
-    protected $_editor_Models_Segment = NULL;
 
+    /**
+     * @var editor_Models_Segment_TermTag
+     */
+    protected $segmentTermTag;
+    
     /**
      * @var array terms2save ein Array mit editor_Models_TermTagData-Objekten als Werten, das
      *           während des Parsings eines Segments befüllt, danach genutzt und wieder geleert wird usw.
@@ -166,15 +171,21 @@ abstract class editor_Models_Import_FileParser {
     protected $_targetLang = NULL;
     
     /**
-     * @var strung taskGuid
+     * @var editor_Models_Task
+     */
+    protected $task;
+    
+    /**
+     * @var string taskGuid
      */
     protected $_taskGuid = NULL;
 
     /**
-     * Beinhaltet ein Objekt welches die beim Parsen ermittelten Segmentdaten verarbeitet
-     * @var editor_Models_Import_SegmentProcessor
+     * Contains a list of processors of the parsed segmentdata
+     * @var [editor_Models_Import_SegmentProcessor]
      */
-    protected $segmentProcessor = null;
+    protected $segmentProcessor = array();
+    
     /**
      * all files with extensions listet here are converted to utf8. For details see method convert2utf8
      * @var array
@@ -192,15 +203,21 @@ abstract class editor_Models_Import_FileParser {
     protected $autoStates;
     
     /**
+     * @var editor_Models_SegmentFieldManager
+     */
+    protected $segmentFieldManager;
+    
+    /**
      * @param string $path pfad zur Datei in der Kodierung des Filesystems (also runtimeOptions.fileSystemEncoding)
      * @param string $fileName Dateiname utf-8 kodiert
      * @param integer $fileId
      * @param boolean $edit100PercentMatches
      * @param editor_Models_Languages $sourceLang
      * @param editor_Models_Languages $targetLang
+     * @param editor_Models_Task $targetLang
      */
     public function __construct(string $path, string $fileName,integer $fileId,
-            boolean $edit100PercentMatches, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, string $taskGuid){
+            boolean $edit100PercentMatches, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task){
         $this->_origFile = file_get_contents($path);
         $this->_path = $path;
         $this->_fileName = $fileName;
@@ -209,16 +226,103 @@ abstract class editor_Models_Import_FileParser {
         $this->_leftTag = ZfExtended_Factory::get('editor_ImageTag_Left');
         $this->_rightTag = ZfExtended_Factory::get('editor_ImageTag_Right');
         $this->_singleTag = ZfExtended_Factory::get('editor_ImageTag_Single');
-        $this->_editor_Models_Segment = ZfExtended_Factory::get('editor_Models_Segment');
+        $this->segmentTermTag = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
         $this->_sourceLang = $sourceLang;
         $this->_targetLang = $targetLang;
-        $this->_taskGuid = $taskGuid;
+        $this->task = $task;
+        $this->_taskGuid = $task->getTaskGuid();
         $this->autoStates = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
         $this->handleEncoding();
     }
     
-    public function setSegmentProcessor(editor_Models_Import_SegmentProcessor $proc){
-        $this->segmentProcessor = $proc;
+    public function addSegmentProcessor(editor_Models_Import_SegmentProcessor $proc){
+        //error_log(get_class($proc));
+        $this->segmentProcessor[] = $proc;
+    }
+    
+    /**
+     * set the shared instance of the segmentFieldManager
+     * @param $sfm editor_Models_SegmentFieldManager
+     */
+    public function setSegmentFieldManager(editor_Models_SegmentFieldManager $sfm) {
+        $this->segmentFieldManager = $sfm;
+        $this->initDefaultSegmentFields();
+    }
+    
+    /**
+     * protects whitespace inside a segment with a tag
+     *
+     * @param string $segment
+     * @param integer $count optional, variable passed by reference stores the replacement count
+     * @return string $segment
+     */
+    protected function parseSegmentProtectWhitespace($segment, &$count = 0) {
+        $search = array(
+          "\r\n",  
+          "\n",  
+          "\r"
+        );
+        $replace = array(
+          '<hardReturn />',
+          '<softReturn />',
+          '<macReturn />'
+        );
+        $segment =  str_replace($search, $replace, $segment, $returnCount);
+        $count += $returnCount;
+        
+        $replacer = function ($match) {
+                        return ' <space ts="' . implode(',', unpack('H*', $match[1])) . '"/>';
+                    };
+        
+        //protect multispaces
+        $res = preg_replace_callback('" ( +)"', $replacer, $segment, -1, $spaceCount);
+        $count += $spaceCount;
+        return $res;
+    }
+    
+    /**
+     * Hilfsfunktion für parseSegment: Verpackung verschiedener Strings zur Zwischenspeicherung als HTML-Klassenname im JS
+     *
+     * @param string $tag enthält den Tag als String
+     * @param string $tagName enthält den Tagnamen
+     * @param boolean $locked gibt an, ob der übergebene Tag die Referenzierung auf einen gesperrten inline-Text im sdlxliff ist
+     * @return string $id ID des Tags im JS
+     */
+    protected function parseSegmentGetStorageClass($tag) {
+        $tagContent = preg_replace('"^<(.*)>$"', '\\1', $tag);
+        if($tagContent == $tag){
+            trigger_error('The Tag ' . $tag .
+                    ' has not the structure of a tag.', E_USER_ERROR);
+        }
+        return implode('', unpack('H*', $tagContent));
+    }
+    
+    /**
+     * returns the parameters for creating the HtmlTags used in the GUI
+     * @param string $tag
+     * @param string $shortTag
+     * @param string $tagId
+     * @param string $fileNameHash
+     * @param string $text
+     */
+    protected function getTagParams($tag, $shortTag, $tagId, $fileNameHash, $text = false) {
+        if($text === false) {
+            $text = $this->_tagMapping[$tagId]['text'];
+        }
+        return array(
+            'class' => $this->parseSegmentGetStorageClass($tag),
+            'text' => $text,
+            'shortTag' => $shortTag,
+            'id' => $tagId.'-'.$this->_tagCount.'-' . $fileNameHash,
+        );
+    }
+    
+    /**
+     * returns the internally used SegmentFieldManager
+     * @return editor_Models_SegmentFieldManager
+     */
+    public function getSegmentFieldManager() {
+        return $this->segmentFieldManager;
     }
     
     /**
@@ -247,14 +351,28 @@ abstract class editor_Models_Import_FileParser {
      *
      */
     abstract protected function parse();
+
+    /**
+     * initiates the default fields source and target, should be overwritten if fields differ.
+     */
+    protected function initDefaultSegmentFields() {
+        $sfm = $this->segmentFieldManager;
+        $sourceEdit = (boolean) $this->task->getEnableSourceEditing();
+        $sfm->addField($sfm::LABEL_SOURCE, editor_Models_SegmentField::TYPE_SOURCE, $sourceEdit);
+        $sfm->addField($sfm::LABEL_TARGET, editor_Models_SegmentField::TYPE_TARGET);
+    }
     
     /**
      * Does the fileparsing
      */
     public function parseFile() {
-        $this->segmentProcessor->preParseHandler($this);
+        foreach($this->segmentProcessor as $p) {
+            $p->preParseHandler($this);
+        }
         $this->parse();
-        $this->segmentProcessor->postParseHandler($this);
+        foreach($this->segmentProcessor as $p) {
+            $p->postParseHandler($this);
+        }
     }
     
     /**
@@ -265,9 +383,28 @@ abstract class editor_Models_Import_FileParser {
      */
     protected function setAndSaveSegmentValues(){
         $this->calculateLocalSegmentAttribs();
-        return $this->segmentProcessor->process($this);
+        $result = false;
+        foreach($this->segmentProcessor as $p) {
+            $r = $p->process($this);
+            if($r !== false) {
+                $result = $r;
+            }
+        }
+        foreach($this->segmentProcessor as $p) {
+            $p->postProcessHandler($this, $result);
+        }
+        return $result;
     }
 
+    /**
+     * returns a placeholder for reexport the edited content
+     * @param integer $segmentId
+     * @param string $name
+     */
+    protected function getFieldPlaceholder($segmentId, $name) {
+        return '<lekTargetSeg id="'.$segmentId.'" field="'.$name.'" />';
+    }
+    
     /**
      * checks the encoding of the file and saves the encoding to the file-table
      * - only saves encoding for formats listed in this->_convert2utf8
@@ -338,18 +475,32 @@ abstract class editor_Models_Import_FileParser {
      * calculates and sets segment attributes needed by us, this info doesnt exist directly in the segment. 
      * These are currently: pretransSegment, editSegment, autoStateId
      * Parameters are given by the current segment
-     * 
-     * $this->_target and $this->_source must be defined already!
      */
     protected function calculateLocalSegmentAttribs() {
         $matchRate = $this->_matchRateSegment[$this->_mid];
         $isAutoprop = $this->_autopropagated[$this->_mid];
         $isFullMatch = ($matchRate === 100);
         $isEditable  = !$isFullMatch || $this->_edit100PercentMatches || $isAutoprop;
-        $isTranslated = !empty($this->_target);
+        $isTranslated = $this->isTranslated();
         $this->_editSegment[$this->_mid] = $isEditable;
         $this->_pretransSegment[$this->_mid] = $isFullMatch && !$isAutoprop;
         $this->_autoStateId[$this->_mid] = $this->autoStates->calculateImportState($isEditable, $isTranslated);
+    }
+    
+    /**
+     * returns true if at least one target has a translation set
+     */
+    protected function isTranslated() {
+        foreach($this->segmentData as $name => $data) {
+            $field = $this->segmentFieldManager->getByName($name);
+            if($field->type !== editor_Models_SegmentField::TYPE_TARGET) {
+                continue;
+            }
+            if(!empty($data['original'])) {
+                return true;
+            }
+        }
+        return false;
     }
     
     /**
@@ -423,30 +574,11 @@ abstract class editor_Models_Import_FileParser {
     }
 
     /**
-     * Gibt den Source String des Segments zurück
+     * returns a reference to the array with alle parsed data fields
+     * The reference enables the ability to manipulate the parsed data in the segmentprocessors (see MqmParser)
+     * @see editor_Models_Import_SegmentProcessor_MqmParser
      */
-    public function getSource() {
-        return $this->_source;
-    }
-    
-    /**
-     * Gibt den Source Orig String des Segments zurück
-     */
-    public function getSourceOrig() {
-        return $this->_sourceOrig;
-    }
-    
-    /**
-     * Gibt den Target String des Segments zurück
-     */
-    public function getTarget() {
-        return $this->_target;
-    }
-    
-    /**
-     * Gibt den Targe Orig String des Segments zurück
-     */
-    public function getTargetOrig() {
-        return $this->_targetOrig;
+    public function & getFieldContents() {
+        return $this->segmentData;
     }
 }

@@ -51,18 +51,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
      * @var editor_Models_Segment
      */
     protected $entity;
-    /**
-     * mappt zu sortierende Spalten auf eine Spalte, nach der statt der übergebenen
-     * Spalte sortiert werden soll (key = übergebene Spalte, value = Spalte, nach
-     * der sortiert werden soll)
-     * @var array
-     */
-    protected $_sortColMap = array(
-                    'source' => 'sourceToSort',
-                    'target' => 'targetToSort',
-                    'edited' => 'editedToSort',
-                    'relais' => 'relaisToSort',
-    );
+    
     /**
      * mappt einen eingehenden Filtertyp auf einen anderen Filtertyp für ein bestimmtes
      * Feld.
@@ -94,17 +83,18 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         $session = new Zend_Session_Namespace();
         $editedSegmentId = (int)$this->_getParam('id');
         $fieldToProcess = (string)$this->_getParam('process');
+
+        $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($session->taskGuid);
+        $fieldMeta = $sfm->getByName($fieldToProcess);
+        $isRelais = ($fieldMeta !== false && $fieldMeta->type == editor_Models_SegmentField::TYPE_RELAIS);
+        //Only default Layout and therefore no relais can be processed:
+        if(!$sfm->isDefaultLayout() || $isRelais) {
+            return;
+        }
         
-        if($fieldToProcess == 'sourceEdited'){
-            $getter = 'getSourceEdited';
-            $setter = 'setSourceEdited';
-            $editedfield = editor_Models_Qmsubsegments::TYPE_SOURCE;
-        }
-        else {
-            $getter = 'getEdited';
-            $setter = 'setEdited';
-            $editedfield = editor_Models_Qmsubsegments::TYPE_TARGET;
-        }
+        $editField = $fieldToProcess.'Edit';
+        $getter = 'get'.$editField;
+        $setter = 'set'.$editField;
         
         $this->entity->load($editedSegmentId);
         
@@ -147,14 +137,12 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
 
                 //Entity befüllen:
                 if($config->runtimeOptions->editor->enableQmSubSegments) {
-                    $entity->{$setter}($qmSubsegmentAlikes->cloneAndUpdate($id, $editedfield));
+                    $entity->{$setter}($qmSubsegmentAlikes->cloneAndUpdate($id, $fieldToProcess));
                 }
                 else {
                     $entity->{$setter}($this->entity->{$getter}());
                 }
-                $truncLength = $session->runtimeOptions->lengthToTruncateSegmentsToSort;
-                $toSort = (string)mb_substr($entity->{$getter}(),0,$truncLength,'utf-8');
-                $entity->{$setter.'ToSort'}($toSort);
+                $entity->updateToSort($editField);
                 
                 $entity->setQmId((string) $this->entity->getQmId());
                 if(!is_null($this->entity->getStateId())) {

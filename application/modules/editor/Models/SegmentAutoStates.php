@@ -236,12 +236,9 @@ class editor_Models_SegmentAutoStates {
      * calculates and returns the autoStateID to use
      * @param editor_Models_Segment $segment
      * @param editor_Models_TaskUserAssoc $tua
-     * @param boolean $sourceEditing
      */
-    public function calculateSegmentState(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua, $sourceEditing) {
-        $isSourceModified = $sourceEditing && ($segment->getSource() !== $segment->getSourceEdited());
-        $isTargetModified = $segment->getTarget() !== $segment->getEdited();
-        $isModified = $isSourceModified || $isTargetModified;
+    public function calculateSegmentState(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua) {
+        $isModified = $segment->isDataModified();
         
         $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
         
@@ -282,7 +279,7 @@ class editor_Models_SegmentAutoStates {
      * @param editor_Models_Segment $segment
      */
     public function setInitialStates(string $taskGuid, editor_Models_Segment $segment) {
-        $segment->updateAutoState($taskGuid, self::REVIEWED_UNTOUCHED, self::NOT_TRANSLATED,true);
+        $segment->updateAutoState($taskGuid, self::REVIEWED_UNTOUCHED, self::NOT_TRANSLATED, true);
         $segment->updateAutoState($taskGuid, self::REVIEWED_UNTOUCHED, self::TRANSLATED);
     }
     

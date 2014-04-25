@@ -96,6 +96,16 @@ class editor_TaskController extends ZfExtended_RestController {
      * @var ZfExtended_Acl 
      */
     protected $acl;
+    
+    /**
+     * @var editor_Models_SegmentFieldManager
+     */
+    protected $segmentFieldManager;
+    
+    /**
+     * @var ZfExtended_Zendoverwrites_Translate
+     */
+    protected $translate;
 
     public function init() {
         parent::init();
@@ -103,6 +113,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->acl = ZfExtended_Acl::getInstance();
         $this->user = new Zend_Session_Namespace('user');
         $this->workflow = ZfExtended_Factory::get('editor_Workflow_Default');
+        $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
     }
     
     /**
@@ -424,6 +435,21 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         
         $row['lockingUsername'] = $this->getUsername($this->getUserinfo($row['lockingUser']));
+        
+        $fields = ZfExtended_Factory::get('editor_Models_SegmentField');
+        
+        /* @var $fields editor_Models_SegmentField */
+        $row['segmentFields'] = $fields->loadByTaskGuid($taskguid);
+        foreach($row['segmentFields'] as $key => &$field) {
+            $field['label'] = $this->translate->_($field['label']);
+        } 
+        if(empty($this->segmentFieldManager)) {
+            $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        }
+        //sets the information if this task has default segment field layout or not
+        $row['defaultSegmentLayout'] = $this->segmentFieldManager->isDefaultLayout(array_map(function($field){
+            return $field['name'];
+        }, $row['segmentFields']));
     }
     
     /**
@@ -465,10 +491,10 @@ class editor_TaskController extends ZfExtended_RestController {
             }
         }
         if($this->isOpenTaskRequest()){
+            $this->entity->createMaterializedView();
             $this->entity->registerInSession($this->data->userState);
         }
     }
-    
     
     /**
      * unlocks the current task if its an request that closes the task (set state to open, end, finish)

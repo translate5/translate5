@@ -92,11 +92,14 @@ abstract class editor_ImageTag {
      * @var string
      */
     protected $_filename;
+    
+    protected $htmlTagTpl = '<div class="{type} {class}"><span title="{text}" class="short">{shortTag}</span><span id="{id}" class="full">{text}</span></div>';
+    
     /**
      * @var array enthält alle images, die mit dem aktuellen Objekt erzeugt wurden als Values
      */
     public $_imagesInObject = array();
-
+    
     public function __construct() {
         $this->existsGd();
         $this->_session = new Zend_Session_Namespace();
@@ -127,6 +130,20 @@ abstract class editor_ImageTag {
         }
         $this->_existingImages[$text] = '';
         return $this;
+    }
+    
+    /**
+     * returns the Html Tag used in the editor for this tag type. 
+     * The Tag template can contain "{varnames}" in curly braces (like in ExtJS)
+     * These {varnames} are replaced by the content of the given assoc array.
+     * @param array $parameters an assoc array; keys => varnames WITHOUT curly braces, value => value to replace the varname
+     * @return string
+     */
+    public function getHtmlTag(array $parameters) {
+        $keys = array_map(function($k){
+            return '{'.$k.'}';
+        }, array_keys($parameters));
+        return str_replace($keys, $parameters, $this->htmlTagTpl);
     }
 
     /**

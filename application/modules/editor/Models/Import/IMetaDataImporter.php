@@ -34,18 +34,18 @@
  END LICENSE AND COPYRIGHT 
  */
 
-/**#@+ 
+/**#@+
  * @author Marc Mittag
  * @package editor
  * @version 1.0
- * 
- */
-/**
- * Klasse zum Zugriff auf die Tabelle mit Namen des Klassennamens (in lower case)
- * 
  *
+
+/**
+ * Defines the default interface for MetaData Importers
  */
-class editor_Models_Db_Segmentmetadata extends Zend_Db_Table_Abstract {
-    protected $_name    = 'LEK_segmentmetadata';
-    public $_primary = 'id';
+interface editor_Models_Import_IMetaDataImporter {
+    /**
+     * calls internal clean up stuff
+     */
+    public function cleanup();
 }

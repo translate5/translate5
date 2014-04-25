@@ -105,8 +105,8 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      * @see editor_Workflow_Abstract::handleEnd()
      */
     protected function handleEnd() {
+        $this->newTask->dropMaterializedView();
         $this->doDebug(__FUNCTION__);
-        //actually do nothing
     }
     
     /**

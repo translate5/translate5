@@ -60,24 +60,19 @@ Ext.define('Editor.controller.Localizer', {
 		'Editor.controller.PreloadImages',
 		'Editor.controller.ChangeAlike',
 		'Editor.store.Files',
-		'Editor.MessageBox',
-		'Editor.view.ui.segments.Grid',
+		'Editor.view.segments.Grid',
 		'Editor.view.ui.segments.column.Quality',
 		'Editor.view.ui.segments.column.Matchrate',
-		'Editor.view.ui.segments.column.Editor',
 		'Editor.view.ui.segments.column.Editable',
 		'Editor.view.ui.segments.column.AutoState',
-		'Editor.view.ui.segments.column.Source',
 		'Editor.view.ui.segments.column.State',
-		'Editor.view.ui.segments.column.Target',
-		'Editor.view.ui.segments.column.Relais',
 		'Editor.view.ui.segments.column.UserName',
 		'Editor.view.segments.column.WorkflowStep',
 		'Editor.view.segments.column.Comments',
 		'Editor.view.ui.fileorder.Tree',
 		'Editor.view.fileorder.ReferenceTree',
 		'Editor.view.ui.preferences.Window',
-		'Editor.view.ui.segments.MetaPanel',
+		'Editor.view.segments.MetaPanel',
 		'Editor.view.ui.changealike.Window',
 		'Editor.view.ui.changealike.Grid',
 		'Editor.view.comments.Window',
@@ -160,29 +155,30 @@ Ext.define('Editor.controller.Localizer', {
 
 
     Editor.view.ViewPortEditor.prototype.items_west_title = '<?php echo $this->translate->_('Dateien');?>';
-  	Editor.view.ui.segments.Grid.prototype.title = '<?php echo $this->translate->_('Segmentliste und Editor');?>';
-  	Editor.view.ui.segments.Grid.prototype.title_readonly = '<?php echo $this->translate->_('Segmentliste und Editor - [LESEMODUS]');?>';
-  	Editor.view.ui.segments.Grid.prototype.item_viewModesMenu = '<?php echo $this->translate->_('Editormodi');?>',
-  	Editor.view.ui.segments.Grid.prototype.item_viewModeBtn = '<?php echo $this->translate->_('Ansicht');?>',
-  	Editor.view.ui.segments.Grid.prototype.item_editModeBtn = '<?php echo $this->translate->_('Bearbeitung');?>',
-  	Editor.view.ui.segments.Grid.prototype.item_ergonomicModeBtn = '<?php echo $this->translate->_('Ergonomic');?>',
-  	Editor.view.ui.segments.Grid.prototype.item_hideTagBtn = '<?php echo $this->translate->_('Tags verbergen');?>',
-  	Editor.view.ui.segments.Grid.prototype.item_shortTagBtn = '<?php echo $this->translate->_('Tag-Kurzansicht');?>',
-	  Editor.view.ui.segments.Grid.prototype.item_fullTagBtn = '<?php echo $this->translate->_('Tag-Vollansicht');?>',
-	  Editor.view.ui.segments.Grid.prototype.item_qmsummaryBtn = '<?php echo $this->translate->_('QM Subsegment Statistik');?>',
-  	Editor.view.ui.segments.Grid.prototype.item_optionsTagBtn = '<?php echo $this->translate->_('Einstellungen');?>',
-  	Editor.view.ui.segments.Grid.prototype.item_clearSortAndFilterBtn = '<?php echo $this->translate->_('Sortierung / Filterung zurücksetzen');?>',
+  	Editor.view.segments.Grid.prototype.title = '<?php echo $this->translate->_('Segmentliste und Editor');?>';
+  	Editor.view.segments.Grid.prototype.title_readonly = '<?php echo $this->translate->_('Segmentliste und Editor - [LESEMODUS]');?>';
+  	Editor.view.segments.Grid.prototype.item_viewModesMenu = '<?php echo $this->translate->_('Editormodi');?>',
+  	Editor.view.segments.Grid.prototype.item_viewModeBtn = '<?php echo $this->translate->_('Ansicht');?>',
+  	Editor.view.segments.Grid.prototype.item_editModeBtn = '<?php echo $this->translate->_('Bearbeitung');?>',
+  	Editor.view.segments.Grid.prototype.item_ergonomicModeBtn = '<?php echo $this->translate->_('Ergonomic');?>',
+  	Editor.view.segments.Grid.prototype.item_hideTagBtn = '<?php echo $this->translate->_('Tags verbergen');?>',
+  	Editor.view.segments.Grid.prototype.item_shortTagBtn = '<?php echo $this->translate->_('Tag-Kurzansicht');?>',
+  	Editor.view.segments.Grid.prototype.item_fullTagBtn = '<?php echo $this->translate->_('Tag-Vollansicht');?>',
+  	Editor.view.segments.Grid.prototype.item_qmsummaryBtn = '<?php echo $this->translate->_('QM Subsegment Statistik');?>',
+  	Editor.view.segments.Grid.prototype.item_optionsTagBtn = '<?php echo $this->translate->_('Einstellungen');?>',
+  	Editor.view.segments.Grid.prototype.item_clearSortAndFilterBtn = '<?php echo $this->translate->_('Sortierung / Filterung zurücksetzen');?>',
+  	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('{0}: bearbeitet');?>',
 
   	Editor.view.ui.segments.column.Quality.prototype.text = '<?php echo $this->translate->_('QM');?>';
   	Editor.view.ui.segments.column.Matchrate.prototype.text = '<?php echo $this->translate->_('Matchrate');?>';
-  	Editor.view.ui.segments.column.Editor.prototype.text = '<?php echo $this->translate->_('Zieltext überarbeitet');?>';
+  	//Editor.view.ui.segments.column.Editor.prototype.text = '<?php echo $this->translate->_('Zieltext überarbeitet');?>';
   	Editor.view.ui.segments.column.Editable.prototype.text = '<?php echo $this->translate->_('Gesperrt');?>';
   	Editor.view.ui.segments.column.AutoState.prototype.text = '<?php echo $this->translate->_('Autostatus');?>';
-  	Editor.view.ui.segments.column.Source.prototype.text = '<?php echo $this->translate->_('Ausgangstext');?>';
-  	Editor.view.ui.segments.column.SourceEditor.prototype.text = '<?php echo $this->translate->_('Ausgangstext überarbeitet');?>';
+  	//Editor.view.ui.segments.column.Source.prototype.text = '<?php echo $this->translate->_('Ausgangstext');?>';
+  	//Editor.view.ui.segments.column.SourceEditor.prototype.text = '<?php echo $this->translate->_('Ausgangstext überarbeitet');?>';
   	Editor.view.ui.segments.column.State.prototype.text = '<?php echo $this->translate->_('Status');?>';
-  	Editor.view.ui.segments.column.Relais.prototype.text = '<?php echo $this->translate->_('Relais');?>';
-  	Editor.view.ui.segments.column.Target.prototype.text = '<?php echo $this->translate->_('Zieltext');?>';
+  	//Editor.view.ui.segments.column.Relais.prototype.text = '<?php echo $this->translate->_('Relais');?>';
+  	//Editor.view.ui.segments.column.Target.prototype.text = '<?php echo $this->translate->_('Zieltext');?>';
   	Editor.view.ui.segments.column.UserName.prototype.text = '<?php echo $this->translate->_('letzter Bearbeiter');?>';
   	Editor.view.segments.column.WorkflowStep.prototype.text = '<?php echo $this->translate->_('bearbeitet bei');?>';
   	Editor.view.segments.column.Comments.prototype.text = '<?php echo $this->translate->_('Kommentare');?>';
@@ -197,8 +193,7 @@ Ext.define('Editor.controller.Localizer', {
         if($config->runtimeOptions->editor->enableQmSubSegments){
         ?>
         Editor.view.qmsubsegments.Window.prototype.title = '<?php echo $this->translate->_('QM Subsegment Statistik');?>';
-  	Editor.view.qmsubsegments.Window.prototype.tab_title_source = '<?php echo $this->translate->_('In Ausgangstext');?>';
-  	Editor.view.qmsubsegments.Window.prototype.tab_title_target = '<?php echo $this->translate->_('In Zieltext');?>';
+  	Editor.view.qmsubsegments.Window.prototype.tab_title_field = '<?php echo $this->translate->_('In Feld: {0}');?>';
   	Editor.view.qmsubsegments.SummaryTree.prototype.treepanel_text = '<?php echo $this->translate->_('Fehlertyp');?>';
   	Editor.view.qmsubsegments.SummaryTree.prototype.treepanel_totalTotal = '<?php echo $this->translate->_('Gesamt');?>';
   	Editor.view.qmsubsegments.SummaryTree.prototype.treepanel_total = '<?php echo $this->translate->_('Summe');?>';
@@ -225,17 +220,19 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.ui.preferences.Window.prototype.item_cancelBtn = '<?php echo $this->translate->_('Abbrechen');?>';
     Editor.view.ui.preferences.Window.prototype.item_saveBtn = '<?php echo $this->translate->_('Speichern');?>';
 
-    Editor.view.ui.segments.MetaPanel.prototype.title = '<?php echo $this->translate->_('Segment-Metadaten');?>';
-    Editor.view.ui.segments.MetaPanel.prototype.item_metaQm_title = '<?php echo $this->translate->_('QM');?>';
-  	Editor.view.ui.segments.MetaPanel.prototype.item_metaStates_title = '<?php echo $this->translate->_('Status');?>';
-  	Editor.view.ui.segments.MetaPanel.prototype.item_metaTerms_title = '<?php echo $this->translate->_('Terminologie');?>';
-  	Editor.view.ui.segments.MetaPanel.prototype.item_cancel = '<?php echo $this->translate->_('Abbrechen');?>';
-  	Editor.view.ui.segments.MetaPanel.prototype.item_save = '<?php echo $this->translate->_('Speichern');?>';
+    Editor.view.segments.MetaPanel.prototype.title = '<?php echo $this->translate->_('Segment-Metadaten');?>';
+    Editor.view.segments.MetaPanel.prototype.item_metaQm_title = '<?php echo $this->translate->_('QM');?>';
+  	Editor.view.segments.MetaPanel.prototype.item_metaStates_title = '<?php echo $this->translate->_('Status');?>';
+  	Editor.view.segments.MetaPanel.prototype.item_metaTerms_title = '<?php echo $this->translate->_('Terminologie');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_cancel = '<?php echo $this->translate->_('Abbrechen');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_save = '<?php echo $this->translate->_('Speichern');?>';
 
-  	Editor.view.ui.segments.MetaPanel.prototype.item_saveAndNext = '<?php echo $this->translate->_('Speichern und nächstes öffnen');?>';
-  	Editor.view.ui.segments.MetaPanel.prototype.item_saveAndPrevious = '<?php echo $this->translate->_('Speichern und vorheriges öffnen');?>';
-        
-  	Editor.view.ui.segments.MetaPanel.prototype.messages = {
+    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNext = '<?php echo $this->translate->_('Speichern und nächstes öffnen');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndPrevious = '<?php echo $this->translate->_('Speichern und vorheriges öffnen');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_alternateLeft = '<?php echo $this->translate->_('Vorherige Spalte editieren');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_alternateRight = '<?php echo $this->translate->_('Nächste Spalte editieren');?>';
+  	
+  	Editor.view.segments.MetaPanel.prototype.messages = {
             gridEndReached: '<?php echo $this->translate->_('Ende der Segmente erreicht!');?>',
             gridStartReached: '<?php echo $this->translate->_('Beginn der Segmente erreicht!');?>'
         };
@@ -268,6 +265,7 @@ Ext.define('Editor.controller.Localizer', {
     Editor.controller.ChangeAlike.prototype.messages = {
         alikeSingular: '<?php echo $this->translate->_('{0} Wiederholung wurde bearbeitet und gespeichert');?>',
         alikePlural: '<?php echo $this->translate->_('{0} Wiederholungen wurden bearbeitet und gespeichert');?>',
+        alikesDisabled: '<?php echo $this->translate->_('Das Projekt enthält alternative Übersetzungen. Der Wiederholungseditor wurde daher deaktiviert.');?>',
         alikesFailure: '<?php echo $this->translate->_('Die Wiederholungen konnten nicht gespeichert werden');?>'
     };
     
@@ -321,11 +319,13 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.comments.Grid.prototype.text_edit = '<?php echo $this->translate->_('Bearbeiten');?>';
     Editor.view.comments.Grid.prototype.text_delete = '<?php echo $this->translate->_('Löschen');?>';
 
-    Editor.view.comments.Window.prototype.title = '<?php echo $this->translate->_('Kommentare zum Segment Nr. {0}');?>';
+    Editor.view.comments.Window.prototype.title = '<?php echo $this->translate->_('Kommentare zum aktuellen Segment');?>';
     Editor.view.comments.Window.prototype.item_cancelBtn = '<?php echo $this->translate->_('Abbrechen');?>';
     Editor.view.comments.Window.prototype.item_saveBtn = '<?php echo $this->translate->_('Speichern');?>';
     Editor.view.comments.Window.prototype.item_closeBtn = '<?php echo $this->translate->_('Schließen');?>';
-    Editor.view.comments.Window.prototype.item_commentLabel = '<?php echo $this->translate->_('Kommentar neu / bearbeiten:');?>';
+    Editor.view.comments.Window.prototype.item_commentNew = '<?php echo $this->translate->_('Kommentar neu');?>';
+    Editor.view.comments.Window.prototype.item_commentEdit = '<?php echo $this->translate->_('Kommentar bearbeiten');?>';
+    
     Editor.view.comments.Window.prototype.item_addComment = '<?php echo $this->translate->_('Neuer Kommentar');?>';
     Editor.view.comments.Window.prototype.delete_confirm_title = '<?php echo $this->translate->_('Löschen des Kommentars bestätigen');?>';
     Editor.view.comments.Window.prototype.delete_confirm_msg = '<?php echo $this->translate->_('Soll der Kommentar wirklich gelöscht werden?');?>';
@@ -435,8 +435,7 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.admin.ExportMenu.prototype.messages = {
       exportDef: '<?php echo $this->translate->_('exportieren');?>',
       exportDiff: '<?php echo $this->translate->_('exportieren mit Änderungshistorie');?>',
-      exportTargetQm: '<?php echo $this->translate->_('Export Zieltext QM-Statistik (XML)');?>',
-      exportSourceQm: '<?php echo $this->translate->_('Export Ausgangstext QM-Statistik (XML)');?>'
+      exportQmField: '<?php echo $this->translate->_('Export QM-Statistik (XML) für Feld: {0}');?>'
     };
     
     Editor.view.admin.TaskUserAssocGrid.prototype.strings = {

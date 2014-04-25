@@ -33,7 +33,11 @@
  
  END LICENSE AND COPYRIGHT 
  */
-
+$this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+if(empty($this->termGroups)) {
+    echo '<p style="margin-bottom:5px;">'.$this->translate->_('Keine Terminologie vorhanden!').'</p>';
+    return;
+}
 ?>
 <table>
     <tr>

@@ -56,7 +56,7 @@ class Editor_QmstatisticsController extends ZfExtended_RestController {
             $task = ZfExtended_Factory::get('editor_Models_Task');
             /* @var $task editor_Models_Task */
             $task->loadByTaskGuid($taskGuid);
-            $taskname = $task->getTasknameForDownload(' - '.$this->getFieldType().'.xml');
+            $taskname = $task->getTasknameForDownload(' - '.$this->getFieldType($taskGuid).'.xml');
             
             header('Content-disposition: attachment; filename="'.$taskname.'"');
             header('Content-type: "text/xml"; charset="utf8"');
@@ -69,7 +69,7 @@ class Editor_QmstatisticsController extends ZfExtended_RestController {
             throw new ZfExtended_NotAuthenticatedException();
         }
         $this->view->text = '.';
-        $this->view->children = $this->entity->getQmStatTreeByTaskGuid($taskGuid, $this->getFieldType());
+        $this->view->children = $this->entity->getQmStatTreeByTaskGuid($taskGuid, $this->getFieldType($taskGuid));
     }
 
     /**
@@ -78,15 +78,15 @@ class Editor_QmstatisticsController extends ZfExtended_RestController {
      * if nothing is given or value is invalid returns "target"
      * @return string
      */
-    protected function getFieldType() {
+    protected function getFieldType($taskGuid) {
         $type = $this->getRequest()->getParam('type');
-        $e = $this->entity;
-        switch ($type) {
-            case $e::TYPE_SOURCE:
-            case $e::TYPE_TARGET:
-                return $type;
+        $sfm = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        /* @var $sfm editor_Models_SegmentFieldManager */
+        $sfm->initFields($taskGuid);
+        if($sfm->getByName($type) === false) {
+            return $sfm->getFirstTargetName();
         }
-        return $e::TYPE_TARGET;
+        return $type;
     }
 
     public function getAction()

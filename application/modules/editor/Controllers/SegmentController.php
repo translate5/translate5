@@ -42,24 +42,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      * @var editor_Models_Segment
      */
     protected $entity;
-    /**
-     * @var integer
-     */
-    protected $segmentId;
-
-    /**
-     * mappt zu sortierende Spalten auf eine Spalte, nach der statt der übergebenen
-     * Spalte sortiert werden soll (key = übergebene Spalte, value = Spalte, nach
-     * der sortiert werden soll)
-     * @var array
-     */
-    protected $_sortColMap = array(
-        'source' => 'sourceToSort',
-        'sourceEdited' => 'sourceEditedToSort',
-        'target' => 'targetToSort',
-        'edited' => 'editedToSort',
-        'relais' => 'relaisToSort',
-    );
 
     /**
      * mappt einen eingehenden Filtertyp auf einen anderen Filtertyp für ein bestimmtes
@@ -70,17 +52,30 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         array('qmId' => array('list' => 'listAsString'))
     );
 
+    protected function afterTaskGuidCheck() {
+        $sfm = $this->initSegmentFieldManager($this->session->taskGuid);
+        $this->_sortColMap = $sfm->getSortColMap();
+        parent::afterTaskGuidCheck();
+    }
+    
+    /**
+     * initiates the internal SegmentFieldManager
+     * @param string $taskGuid
+     * @return editor_Models_SegmentFieldManager
+     */
+    protected function initSegmentFieldManager($taskGuid) {
+        return editor_Models_SegmentFieldManager::getForTaskGuid($taskGuid);
+    }
+    
     public function indexAction() {
         $session = new Zend_Session_Namespace();
-        $this->view->rows = $this->entity->loadByTaskGuid($session->taskGuid, $session->task->enableSourceEditing);
+        $this->view->rows = $this->entity->loadByTaskGuid($session->taskGuid);
         $this->view->total = $this->entity->getTotalCountByTaskGuid($session->taskGuid);
     }
 
     public function putAction() {
-        $session = new Zend_Session_Namespace();
         $sessionUser = new Zend_Session_Namespace('user');
-        $this->segmentId = (int) $this->_getParam('id');
-        $this->entity->load($this->segmentId);
+        $this->entity->load((int) $this->_getParam('id'));
 
         $this->checkTaskGuidAndEditable();
 
@@ -89,8 +84,14 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->decodePutData();
         $this->convertQmId();
 
-        $allowedToChange = array('edited', 'qmId', 'stateId', 'autoStateId', 'sourceEdited');
-        $this->setDataInEntity($allowedToChange, self::SET_DATA_WHITELIST);
+        $allowedToChange = array('qmId', 'stateId', 'autoStateId');
+        $allowedAlternatesToChange = $this->entity->getEditableDataIndexList();
+        $updateToSort = array_intersect(array_keys((array)$this->data), $allowedAlternatesToChange);
+        $this->checkPlausibilityOfPut($allowedAlternatesToChange);
+        $this->setDataInEntity(array_merge($allowedToChange, $allowedAlternatesToChange), self::SET_DATA_WHITELIST);
+        foreach($updateToSort as $toSort) {
+            $this->entity->updateToSort($toSort);
+        }
 
         $this->entity->setUserGuid($sessionUser->data->userGuid);
         $this->entity->setUserName($sessionUser->data->userName);
@@ -98,22 +99,17 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         //@todo do this with events
         $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
         /* @var $workflow editor_Workflow_Default */
-        $workflow->beforeSegmentSave($this->entity, $session->task->enableSourceEditing);
+        $workflow->beforeSegmentSave($this->entity);
         
         $this->entity->validate();
         
-        $this->checkPlausibilityOfPut();
-        $this->rememberSegmentInSession();
-
         $history->save();
 
-        if($session->task->enableSourceEditing && isset($this->data->sourceEdited)) {
-            $this->updateQmSubSegmentsSource($this->entity->getSourceEdited());
-            $this->entity->recreateTermTagsSource();
-        }
-        else {
-            $this->updateQmSubSegmentsTarget($this->entity->getEdited());
-            $this->entity->recreateTermTagsTarget();
+        foreach($allowedAlternatesToChange as $field) {
+            if($this->entity->isModified($field)) {
+                $this->entity->updateQmSubSegments($field);
+                $this->entity->recreateTermTags($field, strpos($field, editor_Models_SegmentField::TYPE_SOURCE) === 0);
+            }
         }
 
         $this->entity->save();
@@ -121,98 +117,46 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     }
     
     /**
-     * @see self::updateQmSubSegments
-     * @param string $edited
-     */
-    protected function updateQmSubSegmentsSource(string $edited) {
-        $field = editor_Models_Qmsubsegments::TYPE_SOURCE;
-        $this->entity->setSourceEdited($this->updateQmSubSegments($edited, $field));
-    }
-
-    /**
-     * @see self::updateQmSubSegments
-     * @param string $edited
-     */
-    protected function updateQmSubSegmentsTarget(string $edited) {
-        $field = editor_Models_Qmsubsegments::TYPE_TARGET;
-        $this->entity->setEdited($this->updateQmSubSegments($edited, $field));
-    }
-
-    /**
-     * Updates - if enabled - the QM Sub Segments with correct IDs in the given String and stores it with the given Method in the entity
-     * @param string $edited
-     * @param string $setMethod
-     * @return string the segment content with updated subsegments
-     */
-    protected function updateQmSubSegments(string $edited, string $field) {
-        $config = Zend_Registry::get('config');
-        if(! $config->runtimeOptions->editor->enableQmSubSegments) {
-            return $edited;
-        }
-
-        $qmsubsegments = ZfExtended_Factory::get('editor_Models_Qmsubsegments');
-        /* @var $qmsubsegments editor_Models_Qmsubsegments */
-
-        return $qmsubsegments->updateQmSubSegments($edited, $this->segmentId, $field);
-    }
-
-    /**
      * checks if current put makes sense to save
+     * @param array $fieldnames allowed fieldnames to be saved
      * @return boolean
      */
-    protected function checkPlausibilityOfPut() {
-        $session = new Zend_Session_Namespace();
-        if (
-                isset($session->lastSegment)&&
-                $session->lastSegment->data->id !== $this->data->id &&
-                isset($session->lastSegment->data->edited) &&
-                isset($this->data->edited) &&
-                $session->lastSegment->data->edited === $this->data->edited &&
-                (time()-19 < $session->lastSegment->timestamp || (isset($session->lastCallPlausibiltyError) && $session->lastCallPlausibiltyError ))
-                ){
-            $alikes = $this->entity->getAlikes($session->taskGuid);
-            foreach ($alikes as $alike) {
-                if($session->lastSegment->data->id == $alike['id']){
-                    return;
-                }
+    protected function checkPlausibilityOfPut($fieldnames) {
+        $error = array();
+        foreach($this->data as $key => $value) {
+            //consider only changeable datafields:
+            if(! in_array($key, $fieldnames)) {
+                continue;
             }
-            $session->lastCallPlausibiltyError = true;
-            ob_start();
-            var_dump($this->data);
-            $putData = ob_get_clean();
-            ob_start();
-            var_dump($session->lastSegment->data);
-            $prevPutData = ob_get_clean();
-            $timespan = time()-$session->lastSegment->timestamp;
-            
-            $log = ZfExtended_Factory::get('ZfExtended_Log');
-            /* @var $log ZfExtended_Log */
-            
-            $logText = 'The plausibility of the put of the segment with the following data is not given.'; 
-            $logText .= 'It has the same edited value as the previously edited segment which has';
-            $logText .= ' been edited not more than 19 sec ago but it has not the same segmentId and is no repetition of the previous segment.';
-            $logText .= ' Therefore it has not been saved.'."\n";
-            $logText .= 'Actually saved Segment PUT data and data to be saved in DB:'."\n";
-            $logText .= $putData."\n".print_r($this->entity->getDataObject(),1)."\n\n";
-            $logText .= 'Previous saved Segment PUT data and data saved in DB:'."\n";
-            $logText .= $prevPutData."\n".print_r($session->lastSegment->entityData,1);
-            $logText .= 'Timespan between the 2 puts had been: '.$timespan."\n";
-            $logText .= 'Content of $_SERVER had been: '.  print_r($_SERVER,true);
-            
-            $log->logError('Possible Error on saving a segment!', $logText);
+            //search for the img tag, get the data and remove it
+            $regex = '#<img[^>]+class="duplicatesavecheck"[^>]+data-segmentid="([0-9]+)" data-fieldname="([^"]+)"[^>]*>#';
+            if(! preg_match($regex, $value, $match)) {
+                continue;
+            }
+            $this->data->{$key} = str_replace($match[0], '', $value);
+            //if segmentId and fieldname from content differ to the segment to be saved, throw the error!
+            if($match[2] != $key || $match[1] != $this->entity->getId()) {
+                $error['real fieldname: '.$key] = array('segmentId' => $match[1], 'fieldName' => $match[2]);
+            }
         }
-        $session->lastCallPlausibiltyError = false;
-    }
-   
-    /**
-     * sets $session->lastSegment with the value of the current segment
-     */
-    protected function rememberSegmentInSession() {
-        $session = new Zend_Session_Namespace();
-        $session->lastSegment = new stdClass();
-        $session->lastSegment->timestamp = time();
-        $session->lastSegment->data = $this->data;
-        $session->lastSegment->entityData = $this->entity->getDataObject();
+        if(empty($error)) {
+            return;
+        }
+        
+        $log = ZfExtended_Factory::get('ZfExtended_Log');
+        /* @var $log ZfExtended_Log */
+        
+        $logText = 'Error on saving a segment!!! Parts of the content in the PUT request ';
+        $logText .= 'delivered the following segmentId(s) and fieldName(s):'."\n"; 
+        $logText .= print_r($error, 1)."\n";
+        $logText .= 'but the request was for segmentId '.$this->entity->getId(); 
+        $logText .= ' (compare also the above fieldnames!).'."\n";
+        $logText .= 'Therefore the segment has not been saved!'."\n";
+        $logText .= 'Actually saved Segment PUT data and data to be saved in DB:'."\n";
+        $logText .= print_r($this->data,1)."\n".print_r($this->entity->getDataObject(),1)."\n\n";
+        $logText .= 'Content of $_SERVER had been: '.  print_r($_SERVER,true);
+        
+        $log->logError('Possible Error on saving a segment!', $logText);
     }
    
     /**
@@ -281,6 +225,4 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->view->termGroups = $terms->getByTaskGuidAndSegment($session->taskGuid, (int) $this->_getParam('id'));
         $this->view->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
     }
-
-    
 }
