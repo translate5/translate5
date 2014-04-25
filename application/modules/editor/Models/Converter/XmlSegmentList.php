@@ -69,6 +69,23 @@ class editor_Models_Converter_XmlSegmentList {
      */
     protected $saveXmlToFile = true;
     
+    /**
+     * resulting XML buffer
+     * @var array
+     */
+    protected $result = array();
+    
+    /**
+     * different data needed while converting to XML
+     * @var array
+     */
+    protected $data = array();
+    
+    /**
+     * @var editor_Models_SegmentFieldManager
+     */
+    protected $sfm;
+    
     public function __construct(){
         $session = new Zend_Session_Namespace();
         $this->stateFlags = $session->runtimeOptions->segments->stateFlags->toArray();
@@ -79,144 +96,217 @@ class editor_Models_Converter_XmlSegmentList {
     }
     
     /**
-     * converts a list with segment data to xml
+     * converts a list with segment data to xml (xliff)
+     * 
+     * For Xliff see https://code.google.com/p/interoperability-now/downloads/detail?name=XLIFFdoc%20Representation%20Guide%20v1.0.1.pdf&can=2&q=
+     * and http://docs.oasis-open.org/xliff/v1.2/os/xliff-core.html
+     * 
      * @param editor_Models_Task $task
      * @param array $segments
      */
     public function convert(editor_Models_Task $task, array $segments) {
+        $this->result = array('<?xml version="1.0" encoding="UTF-8"?>');
         $this->task = $task;
         $allSegmentsByFile = $this->reorderByFilename($segments);
         
-        $this->exportParser = ZfExtended_Factory::get('editor_Models_Export_FileParser_Sdlxliff', array(0, false, $task));
-        /* @var $lang editor_Models_Export_FileParser_Sdlxliff */
+        $this->initConvertionData();
         
-        $autoStates = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
-        $refl = new ReflectionClass($autoStates);
-        $consts = array_map('strtolower', array_flip($refl->getConstants()));
+        $this->createXmlHeader();
         
-        $lang = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $lang editor_Models_Languages */
-        $lang->load($task->getSourceLang());
-        $sourceLang = $lang->getRfc5646();
-        $lang->load($task->getTargetLang());
-        $targetLang = $lang->getRfc5646();
-        
-        $relaisLang = $task->getRelaisLang();
-        if(empty($relaisLang)){
-            $relaisLang = false;
-        }
-        else {
-            $lang->load($task->getRelaisLang());
-            $relaisLang = $lang->getRfc5646();
-        }
-        
-        $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
-        
-        //For Xliff see https://code.google.com/p/interoperability-now/downloads/detail?name=XLIFFdoc%20Representation%20Guide%20v1.0.1.pdf&can=2&q=
-        // and http://docs.oasis-open.org/xliff/v1.2/os/xliff-core.html
-        $result = array('<?xml version="1.0" encoding="UTF-8"?>');
-        $taskname = 'translate5:taskname="'.htmlspecialchars($task->getTaskName()).'"';
-        $result[] = '<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dx="http://www.interoperability-now.org/schema" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-doc-1_0_extensions.xsd" dx:version="1.4" xmlns:translate5="http://www.translate5.net/" '.$taskname.'>';
-        $result[] = '<!-- attention: currently the usage of g- and x-tags in this doc is not completely in line with the xliff:doc-spec. This will change, when resources for this issue will be assigned -->';
-        $result[] = '<!-- attention: we know, that the structure of this document is not complete regarding xliff:doc-spec. This will change, when resources for this issue will be assigned -->';
-        $result[] = '<!-- attention: regarding internal tags the source and the target-content are in the same format as the contents of the original source formats would have been. For SDLXLIFF this means: No mqm-Tags; Terms marked with <mrk type="x-term-...">-Tags; Internal Tags marked with g- and x-tags; For CSV this means: No internal tags except mqm-tags -->';
         foreach($allSegmentsByFile as $filename => $segmentsOfFile) {
-            if(empty($segmentsOfFile)) {
-                continue;
-            }
-            $file = '<file original="%1$s" source-language="%2$s" target-language="%3$s" xml:space="preserve">';
-            $result[] = sprintf($file, htmlspecialchars($filename), $sourceLang, $targetLang);
-            $result[] = '<body>';
-            
-            //both getFirst calls throw an exception if no corresponding field is given, that should not be, so uncatched is OK.
-            $firstTarget = $sfm->getFirstTargetName();
-            $firstSource = $sfm->getFirstSourceName();
-            
-            foreach($segmentsOfFile as $segment) {
-                $segStart = '<trans-unit id="%1$s" translate5:autostateId="%2$s" translate5:autostateText="%3$s">';
-                if(isset($consts[$segment['autoStateId']])) {
-                    $autoStateText =  $consts[$segment['autoStateId']];
-                }
-                else {
-                    $autoStateText = 'NOT_FOUND_'.$segment['autoStateId'];
-                }
-                //@todo actually we are messing around on creating the xliff file. 
-                //since the mid is only unique in the source file, and we are merging here 
-                //several files together, we have to use the segmentNrInTask to achieve uniqueness,
-                //instead using the desired MID
-                $result[] = "\n".sprintf($segStart, $segment['segmentNrInTask'], $segment['autoStateId'], $autoStateText);
-                
-                /*
-    			<!-- attention: regarding internal tags the source and the target-content are in the same format as the contents of the original source formats would have been. For SDLXLIFF this means: No mqm-Tags; Terms marked with <mrk type="x-term-...">-Tags; Internal Tags marked with g- and x-tags; For CSV this means: No internal tags except mqm-tags -->
-    		*/
-                
-                
-                //$result[] = '<segmentNr>'.$segment['segmentNrInTask'].'</segmentNr>';
-                $result[] = '<source>'.$this->prepareText($segment[$firstSource]).'</source>';
-    
-                $fields = $sfm->getFieldList();
-                foreach($fields as $field) {
-                    if($field->type == editor_Models_SegmentField::TYPE_SOURCE) {
-                        continue; //handled above
-                    }
-                    if($field->type == editor_Models_SegmentField::TYPE_RELAIS && $relaisLang !== false) {
-                        $result[] = '<alt-trans dx:origin-shorttext="'.$field->label.'"><target xml:lang="'.$relaisLang.'">'.$this->prepareText($segment[$field->name]).'</target></alt-trans>';
-                        continue;
-                    }
-                    if($field->type != editor_Models_SegmentField::TYPE_TARGET) {
-                        continue;
-                    }
-                    if($firstTarget == $field->name) {
-                        $matchRate = number_format($segment['matchRate'], 1, '.', '');
-                        $result[] = '<target dx:match-quality="'.$matchRate.'">'.$this->prepareText($segment[$sfm->getEditIndex($firstTarget)]).'</target>';
-                        $result[] = '<alt-trans dx:origin-shorttext="'.$field->label.'" alttranstype="previous-version">';
-                    }
-                    else {
-                        $result[] = '<alt-trans dx:origin-shorttext="'.$field->label.'">';
-                    }
-                    $result[] = '<target xml:lang="'.$targetLang.'">'.$this->prepareText($sfm->getEditIndex($field->name)).'</target></alt-trans>';
-                }
-                
-                if(!empty($segment['comments'])) {
-                    $comments = $this->comment->loadBySegmentAndTaskPlain((integer)$segment['id'], $task->getTaskGuid());
-                    $note = '<dx:note dx:modified-by="%1$s" dx:annotates="target" dx:modified-at="%2$s">%3$s</dx:note>';
-                    foreach($comments as $comment) {
-                        $modified = new DateTime($comment['modified']);
-                        //if the +0200 at the end makes trouble use the following
-                        //gmdate('Y-m-d\TH:i:s\Z', $modified->getTimestamp());
-                        $modified = $modified->format($modified::ISO8601);
-                        $result[] = sprintf($note, htmlspecialchars($comment['userName']), $modified, htmlspecialchars($comment['comment']));
-                    }
-                }
-                
-                $result[] = '<state stateid="'.$segment['stateId'].'">'.$this->convertStateId($segment['stateId']).'</state>';
-                $qms = $this->convertQmIds($segment['qmId']);
-                if(empty($qms)) {
-                    $result[] = '<dx:qa-hits></dx:qa-hits>';
-                }
-                else {
-                    $result[] = '<dx:qa-hits>';
-                    $qmXml = '<dx:qa-hit dx:qa-origin="target" dx:qa-code="%1$s" dx:qa-shorttext="%2$s" />';
-                    foreach ($qms as $qmid => $qm) {
-                        $result[] = sprintf($qmXml, $qmid, $qm);
-                    }
-                    $result[] = '</dx:qa-hits>';
-                }
-                //$result[] = '<autoStateId>'.$segment['autoStateId'].'</autoStateId>';
-                //$result[] = '<matchRate>'.$segment['matchRate'].'</matchRate>';
-                //$result[] = '<comments>'.$segment['comments'].'</comments>';
-                $result[] = '</trans-unit>';
-            }
-            $result[] = '</body>';
-            $result[] = '</file>';
+            $this->processAllSegments($filename, $segmentsOfFile);
         }
-        $result[] = '</xliff>';
         
-        $xml = join("\n", $result);
+        //XML Footer, no extra method
+        $this->result[] = '</xliff>';
+        
+        $xml = join("\n", $this->result);
         if($this->saveXmlToFile) {
             $this->saveXmlToFile($xml);
         }
         return $xml;
+    }
+    
+    /**
+     * initializes internally needed data for convertion
+     */
+    protected function initConvertionData() {
+        $task = $this->task;
+        
+        $this->exportParser = ZfExtended_Factory::get('editor_Models_Export_FileParser_Sdlxliff', array(0, false, $task));
+        
+        /**
+         * define autostates
+         */
+        $autoStates = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
+        $refl = new ReflectionClass($autoStates);
+        $this->data['autostates'] = array_map('strtolower', array_flip($refl->getConstants()));
+        
+        /**
+         * define languages
+         */
+        $lang = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $lang editor_Models_Languages */
+        $lang->load($task->getSourceLang());
+        $this->data['sourceLang'] = $lang->getRfc5646();
+        $lang->load($task->getTargetLang());
+        $this->data['targetLang'] = $lang->getRfc5646();
+        
+        $this->data['relaisLang'] = $task->getRelaisLang();
+        if(empty($this->data['relaisLang'])){
+            $this->data['relaisLang'] = false;
+        }
+        else {
+            $lang->load($task->getRelaisLang());
+            $this->data['relaisLang'] = $lang->getRfc5646();
+        }
+        
+        /**
+         * define first soruce and target fields
+         */
+        $this->sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
+        //both getFirst calls throw an exception if no corresponding field is given, that should not be, so uncatched is OK.
+        $this->data['firstTarget'] = $this->sfm->getFirstTargetName();
+        $this->data['firstSource'] = $this->sfm->getFirstSourceName();
+    }
+    
+    /**
+     * Helper function to create the XML Header
+     */
+    protected function createXmlHeader() {
+        $taskname = 'translate5:taskname="'.htmlspecialchars($this->task->getTaskName()).'"';
+        $this->result[] = '<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dx="http://www.interoperability-now.org/schema" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-doc-1_0_extensions.xsd" dx:version="1.4" xmlns:translate5="http://www.translate5.net/" '.$taskname.'>';
+        $this->result[] = '<!-- attention: currently the usage of g- and x-tags in this doc is not completely in line with the xliff:doc-spec. This will change, when resources for this issue will be assigned -->';
+        $this->result[] = '<!-- attention: we know, that the structure of this document is not complete regarding xliff:doc-spec. This will change, when resources for this issue will be assigned -->';
+        $this->result[] = '<!-- attention: regarding internal tags the source and the target-content are in the same format as the contents of the original source formats would have been. For SDLXLIFF this means: No mqm-Tags; Terms marked with <mrk type="x-term-...">-Tags; Internal Tags marked with g- and x-tags; For CSV this means: No internal tags except mqm-tags -->';
+    }
+    
+    /**
+     * process and convert all segments to xliff
+     * @param string $filename
+     * @param array $segmentsOfFile
+     */
+    protected function processAllSegments($filename, array $segmentsOfFile) {
+        if(empty($segmentsOfFile)) {
+            return;
+        }
+        $file = '<file original="%1$s" source-language="%2$s" target-language="%3$s" xml:space="preserve">';
+        $this->result[] = sprintf($file, htmlspecialchars($filename), $this->data['sourceLang'], $this->data['targetLang']);
+        $this->result[] = '<body>';
+        
+        foreach($segmentsOfFile as $segment) {
+            $this->processSegmentsOfFile($segment);
+        }
+        
+        $this->result[] = '</body>';
+        $this->result[] = '</file>';
+    }
+    
+    /**
+     * process and convert the segments of one file to xliff
+     * @param array $segment
+     */
+    protected function processSegmentsOfFile($segment) {
+        $segStart = '<trans-unit id="%1$s" translate5:autostateId="%2$s" translate5:autostateText="%3$s">';
+        if(isset($this->data['autostates'][$segment['autoStateId']])) {
+            $autoStateText =  $this->data['autostates'][$segment['autoStateId']];
+        }
+        else {
+            $autoStateText = 'NOT_FOUND_'.$segment['autoStateId'];
+        }
+        //@todo actually we are messing around on creating the xliff file. 
+        //since the mid is only unique in the source file, and we are merging here 
+        //several files together, we have to use the segmentNrInTask to achieve uniqueness,
+        //instead using the desired MID
+        $this->result[] = "\n".sprintf($segStart, $segment['segmentNrInTask'], $segment['autoStateId'], $autoStateText);
+        
+        /*
+         * <!-- attention: regarding internal tags the source and the target-content are in the same format as the contents of the original source formats would have been. For SDLXLIFF this means: No mqm-Tags; Terms marked with <mrk type="x-term-...">-Tags; Internal Tags marked with g- and x-tags; For CSV this means: No internal tags except mqm-tags -->
+         */
+        
+        //$this->result[] = '<segmentNr>'.$segment['segmentNrInTask'].'</segmentNr>';
+        $this->result[] = '<source>'.$this->prepareText($segment[$this->data['firstSource']]).'</source>';
+
+        $fields = $this->sfm->getFieldList();
+        foreach($fields as $field) {
+            $this->processSegmentField($field, $segment);
+        }
+        
+        if(!empty($segment['comments'])) {
+            $this->processComment($segment);
+        }
+        
+        $this->processStateAndQm($segment);
+        
+        //$this->result[] = '<autoStateId>'.$segment['autoStateId'].'</autoStateId>';
+        //$this->result[] = '<matchRate>'.$segment['matchRate'].'</matchRate>';
+        //$this->result[] = '<comments>'.$segment['comments'].'</comments>';
+        $this->result[] = '</trans-unit>';
+    }
+    
+    /**
+     * process and convert the segments of one file to xliff
+     * @param Zend_Db_Table_Row $field
+     * @param array $segment
+     */
+    protected function processSegmentField(Zend_Db_Table_Row $field, array $segment) {
+        if($field->type == editor_Models_SegmentField::TYPE_SOURCE) {
+            return; //handled before
+        }
+        if($field->type == editor_Models_SegmentField::TYPE_RELAIS && $this->data['relaisLang'] !== false) {
+            $this->result[] = '<alt-trans dx:origin-shorttext="'.$field->label.'"><target xml:lang="'.$this->data['relaisLang'].'">'.$this->prepareText($segment[$field->name]).'</target></alt-trans>';
+            return;
+        }
+        if($field->type != editor_Models_SegmentField::TYPE_TARGET) {
+            return;
+        }
+        if($this->data['firstTarget'] == $field->name) {
+            $matchRate = number_format($segment['matchRate'], 1, '.', '');
+            $target = $this->prepareText($segment[$this->sfm->getEditIndex($this->data['firstTarget'])]);
+            $this->result[] = '<target dx:match-quality="'.$matchRate.'">'.$target.'</target>';
+            $this->result[] = '<alt-trans dx:origin-shorttext="'.$field->label.'" alttranstype="previous-version">';
+        }
+        else {
+            $this->result[] = '<alt-trans dx:origin-shorttext="'.$field->label.'">';
+        }
+        $target = $this->prepareText($this->sfm->getEditIndex($field->name));
+        $this->result[] = '<target xml:lang="'.$this->data['targetLang'].'">'.$target.'</target></alt-trans>';
+    }
+    
+    /**
+     * process and convert the segment comments
+     * @param array $segment
+     */
+    protected function processComment(array $segment) {
+        $comments = $this->comment->loadBySegmentAndTaskPlain((integer)$segment['id'], $this->task->getTaskGuid());
+        $note = '<dx:note dx:modified-by="%1$s" dx:annotates="target" dx:modified-at="%2$s">%3$s</dx:note>';
+        foreach($comments as $comment) {
+            $modified = new DateTime($comment['modified']);
+            //if the +0200 at the end makes trouble use the following
+            //gmdate('Y-m-d\TH:i:s\Z', $modified->getTimestamp());
+            $modified = $modified->format($modified::ISO8601);
+            $this->result[] = sprintf($note, htmlspecialchars($comment['userName']), $modified, htmlspecialchars($comment['comment']));
+        }
+    }
+    
+    /**
+     * process and convert the segment states and QM states
+     * @param array $segment
+     */
+    protected function processStateAndQm(array $segment) {
+        $this->result[] = '<state stateid="'.$segment['stateId'].'">'.$this->convertStateId($segment['stateId']).'</state>';
+        $qms = $this->convertQmIds($segment['qmId']);
+        if(empty($qms)) {
+            $this->result[] = '<dx:qa-hits></dx:qa-hits>';
+        }
+        else {
+            $this->result[] = '<dx:qa-hits>';
+            $qmXml = '<dx:qa-hit dx:qa-origin="target" dx:qa-code="%1$s" dx:qa-shorttext="%2$s" />';
+            foreach ($qms as $qmid => $qm) {
+                $this->result[] = sprintf($qmXml, $qmid, $qm);
+            }
+            $this->result[] = '</dx:qa-hits>';
+        }
     }
     
     /**
