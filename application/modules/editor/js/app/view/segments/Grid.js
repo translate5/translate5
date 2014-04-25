@@ -231,7 +231,6 @@ Ext.define('Editor.view.segments.Grid', {
             viewConfig: {},
             dockedItems: [{
                 xtype: 'toolbar',
-                width: 150,
                 dock: 'top',
                 items: [{
                     xtype: 'button',

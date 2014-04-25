@@ -265,6 +265,7 @@ Ext.define('Editor.controller.Segments', {
       else {
           btn.removeCls(cls);
       }
+      btn.ownerCt.doLayout();
   },
   invalidatePagerOnNextLoad: function() {
     this._invalidatePagerOnNextLoad = true;
