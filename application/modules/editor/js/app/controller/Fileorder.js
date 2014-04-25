@@ -85,7 +85,9 @@ Ext.define('Editor.controller.Fileorder', {
   },
   clearStores: function() {
       this.getFilesStore().getRootNode().removeAll();
+      this.getFilesStore().removed = [];
       this.getReferenceFilesStore().getRootNode().removeAll();
+      this.getReferenceFilesStore().removed = [];
   },
   handleItemMoved: function() {
     this.getFilesStore().sync();
