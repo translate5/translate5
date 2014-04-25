@@ -510,6 +510,19 @@
 <trans-unit id='WGhvc2E='><source>Xhosa</source><target>Xhosa</target></trans-unit>
 <trans-unit id='WW9ydWJh'><source>Yoruba</source><target>Yoruba</target></trans-unit>
 <trans-unit id='WnVsdQ=='><source>Zulu</source><target>Zulu</target></trans-unit>
+<trans-unit id='RWlud2FuZGZyZWk='><source>Einwandfrei</source><target>Einwandfrei</target></trans-unit>
+<trans-unit id='TGVpY2h0ZSBNw6RuZ2Vs'><source>Leichte Mängel</source><target>Leichte Mängel</target></trans-unit>
+<trans-unit id='TXVzcyDDvGJlcmFyYmVpdGV0IHdlcmRlbg=='><source>Muss überarbeitet werden</source><target>Muss überarbeitet werden</target></trans-unit>
+<trans-unit id='ezB9OiBiZWFyYmVpdGV0'><source>{0}: bearbeitet</source><target>{0}: bearbeitet</target></trans-unit>
+<trans-unit id='SW4gRmVsZDogezB9'><source>In Feld: {0}</source><target>In Feld: {0}</target></trans-unit>
+<trans-unit id='Vm9yaGVyaWdlIFNwYWx0ZSBlZGl0aWVyZW4='><source>Vorherige Spalte editieren</source><target>Vorherige Spalte editieren</target></trans-unit>
+<trans-unit id='TsOkY2hzdGUgU3BhbHRlIGVkaXRpZXJlbg=='><source>Nächste Spalte editieren</source><target>Nächste Spalte editieren</target></trans-unit>
+<trans-unit id='RGFzIFByb2pla3QgZW50aMOkbHQgYWx0ZXJuYXRpdmUgw5xiZXJzZXR6dW5nZW4uIERlciBXaWVkZXJob2x1bmdzZWRpdG9yIHd1cmRlIGRhaGVyIGRlYWt0aXZpZXJ0Lg=='><source>Das Projekt enthält alternative Übersetzungen. Der Wiederholungseditor wurde daher deaktiviert.</source><target>Das Projekt enthält alternative Übersetzungen. Der Wiederholungseditor wurde daher deaktiviert.</target></trans-unit>
+<trans-unit id='S29tbWVudGFyZSB6dW0gYWt0dWVsbGVuIFNlZ21lbnQ='><source>Kommentare zum aktuellen Segment</source><target>Kommentare zum aktuellen Segment</target></trans-unit>
+<trans-unit id='S29tbWVudGFyIG5ldQ=='><source>Kommentar neu</source><target>Kommentar neu</target></trans-unit>
+<trans-unit id='S29tbWVudGFyIGJlYXJiZWl0ZW4='><source>Kommentar bearbeiten</source><target>Kommentar bearbeiten</target></trans-unit>
+<trans-unit id='RXhwb3J0IFFNLVN0YXRpc3RpayAoWE1MKSBmw7xyIEZlbGQ6IHswfQ=='><source>Export QM-Statistik (XML) für Feld: {0}</source><target>Export QM-Statistik (XML) für Feld: {0}</target></trans-unit>
+<trans-unit id='UGFzc3dvcnQgZXJmb2xncmVpY2ggZ2VzcGVpY2hlcnQh'><source>Passwort erfolgreich gespeichert!</source><target>Passwort erfolgreich gespeichert!</target></trans-unit>
   </body>
  </file>
 </xliff>
