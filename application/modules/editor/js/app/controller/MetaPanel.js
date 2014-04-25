@@ -47,7 +47,6 @@
 Ext.define('Editor.controller.MetaPanel', {
   extend : 'Ext.app.Controller',
   requires: ['Editor.view.qmsubsegments.AddFlagFieldset'],
-  lastColumnIdx: 0, //needed for interaction with editable source column
   messages: {
     gridEndReached: 'Ende der Segmente erreicht!',
     gridStartReached: 'Start der Segmente erreicht!'
@@ -59,9 +58,19 @@ Ext.define('Editor.controller.MetaPanel', {
     ref : 'metaTermPanel',
     selector : '#metapanel #metaTermPanel'
   },{
+    ref : 'leftBtn',
+    selector : '#metapanel #goAlternateLeftBtn'
+  },{
+    ref : 'rightBtn',
+    selector : '#metapanel #goAlternateRightBtn'
+  },{
+      ref : 'navi',
+      selector : '#metapanel #naviToolbar'
+  },{
     ref : 'segmentGrid',
     selector : '#segmentgrid'
   }],
+  hideLeftRight: false,
   init : function() {
     this.control({
       '#metapanel #cancelSegmentBtn' : {
@@ -76,8 +85,14 @@ Ext.define('Editor.controller.MetaPanel', {
       '#metapanel #savePreviousSegmentBtn' : {
         click : this.savePrevious
       },
+      '#metapanel #goAlternateLeftBtn' : {
+          click : this.goToAlternate
+      },
+      '#metapanel #goAlternateRightBtn' : {
+          click : this.goToAlternate
+      },
       '#metapanel' : {
-        show : this.layout
+          show : this.layout
       },
       '#segmentgrid': {
           afterrender: this.initEditPluginHandler
@@ -92,17 +107,24 @@ Ext.define('Editor.controller.MetaPanel', {
     return this.getSegmentGrid().editingPlugin;
   },
   initEditPluginHandler: function() {
+      var me = this, 
+          multiEdit = me.getSegmentGrid().query('.contentEditableColumn').length > 1,
+          useChangeAlikes = Editor.app.authenticatedUser.isAllowed('useChangeAlikes', Editor.data.task);
+
     //Diese Events können erst in onlauch gebunden werden, in init existiert das Plugin noch nicht
-    this.getEditPlugin().on('beforeedit', this.startEdit, this);
-    this.getEditPlugin().on('canceledit', this.cancelEdit, this);
-    this.getEditPlugin().on('edit', this.saveEdit, this);
-    this.getEditPlugin().on('canCompleteEdit', this.canCompleteEdit, this);
+      me.getEditPlugin().on('beforeedit', me.startEdit, me);
+      me.getEditPlugin().on('canceledit', me.cancelEdit, me);
+      me.getEditPlugin().on('edit', me.saveEdit, me);
+      me.getEditPlugin().on('canCompleteEdit', me.canCompleteEdit, me);
+    
+      me.getLeftBtn().setVisible(multiEdit && ! useChangeAlikes);
+      me.getRightBtn().setVisible(multiEdit && ! useChangeAlikes);
   },
   /**
    * Handler für save Button
    */
   layout: function() {
-    this.getMetaPanel().down('#metaInfoForm #naviToolbar').doLayout();
+    this.getNavi().doLayout(); //FIXME noch was anderes layouten?
   },
   /**
    * Handler für save Button
@@ -112,20 +134,23 @@ Ext.define('Editor.controller.MetaPanel', {
   },
   /**
    * Handler for saveNext Button
+   * @return {Boolean} true if there is a next segment, false otherwise
    */
   saveNext: function() {
-      this.saveOtherRow(1, this.messages.gridEndReached);
+      return this.saveOtherRow(1, this.messages.gridEndReached);
   },
   /**
    * Handler for savePrevious Button
+   * @return {Boolean} true if there is a next segment, false otherwise
    */
   savePrevious: function() {
-      this.saveOtherRow(-1, this.messages.gridStartReached);
+      return this.saveOtherRow(-1, this.messages.gridStartReached);
   },
   /**
    * save and go to other row
    * @param {Integer} rowIdxChange positive or negative integer value to choose the index of the next row
    * @param {String} errorText
+   * @return {Boolean} true if there is a next segment, false otherwise
    */
   saveOtherRow: function(rowIdxChange, errorText) {
       var me = this,
@@ -134,10 +159,16 @@ Ext.define('Editor.controller.MetaPanel', {
           ed = me.getEditPlugin(),
           rec = ed.openedRecord,
           store = grid.store,
+          lastColumnIdx = 0,
           newRec = store.getAt(store.indexOf(rec) + rowIdxChange);
       while(newRec && !newRec.get('editable')) {
           newRec = store.getAt(store.indexOf(newRec) + rowIdxChange);
       }
+      Ext.Array.each(grid.columns, function(col, idx) {
+          if(col.dataIndex == ed.editor.getEditedField()) {
+              lastColumnIdx = idx;
+          }
+      });
       me.fireEvent('saveSegment', {
           scope: me,
           segmentUsageFinished: function(){
@@ -145,7 +176,7 @@ Ext.define('Editor.controller.MetaPanel', {
                   //editing by selection handler must be disabled, otherwise saveChainStart will be triggered twice
                   ed.disableEditBySelect = true;
                   selModel.select(newRec);
-                  Ext.defer(ed.startEdit, 100, ed, [newRec, me.lastColumnIdx]); //defer reduces problems with editorDomCleanUp see comment on Bug 38
+                  Ext.defer(ed.startEdit, 100, ed, [newRec, lastColumnIdx]); //defer reduces problems with editorDomCleanUp see comment on Bug 38
                   ed.disableEditBySelect = false;
               }
               else{
@@ -153,6 +184,7 @@ Ext.define('Editor.controller.MetaPanel', {
               }
           }
       });
+      return (newRec !== undefined);
   },
   /**
    * Handler für cancel Button
@@ -166,16 +198,15 @@ Ext.define('Editor.controller.MetaPanel', {
    */
   startEdit: function(column) {
     var me = this,
-    mp = me.getMetaPanel(),
-    segmentId = column.record.get('id');
+        mp = me.getMetaPanel(),
+        segmentId = column.record.get('id');
+        
     me.record = column.record;
-    me.lastColumnIdx = column.colIdx;
     me.getMetaTermPanel().getLoader().load({params: {id: segmentId}});
     //bindStore(me.record.terms());
     me.loadRecord(me.record);
-    mp.down('#metaInfoForm').doLayout();
-    mp.down('#metaInfoForm').show();
-    mp.down('#metaInfoForm #naviToolbar').doLayout();
+    //FIXME here doLayout???
+    mp.show();
   },
   /**
    * lädt die konkreten record ins Meta Panel 
@@ -183,10 +214,10 @@ Ext.define('Editor.controller.MetaPanel', {
    */
   loadRecord: function(record) {
     var me = this,
-    mp = me.getMetaPanel(),
-    form = mp.down('#metaInfoForm'),
-    values = record.getQmAsArray(),
-    qmBoxes = mp.query('#metaQm .checkbox');
+        mp = me.getMetaPanel(),
+        form = mp.down('#metaInfoForm'),
+        values = record.getQmAsArray(),
+        qmBoxes = mp.query('#metaQm .checkbox');
     statBoxes = mp.query('#metaStates .radio');
     Ext.each(statBoxes, function(box){
       box.setValue(false);
@@ -201,10 +232,10 @@ Ext.define('Editor.controller.MetaPanel', {
    */
   saveEdit: function() {
     var me = this,
-    mp = me.getMetaPanel(),
-    form = mp.down('#metaInfoForm'),
-    qmBoxes = mp.query('#metaQm .checkbox'),
-    quality = [];
+        mp = me.getMetaPanel(),
+        form = mp.down('#metaInfoForm'),
+        qmBoxes = mp.query('#metaQm .checkbox'),
+        quality = [];
     Ext.each(qmBoxes, function(box){box.getValue() && quality.push(box.inputValue);});
     me.record.set('stateId', form.getValues().stateId);
     me.record.setQmFromArray(quality);
@@ -215,6 +246,77 @@ Ext.define('Editor.controller.MetaPanel', {
    * Editor.view.segments.RowEditing canceledit handler
    */
   cancelEdit: function() {
-    this.getMetaPanel().down('#metaInfoForm').hide();
+    this.getMetaPanel().hide();
+  },
+  /**
+   * Move the editor about one editable field
+   */
+  goToAlternate: function(btn, ev) {
+    var me = this,
+        direction = (btn.itemId == 'goAlternateLeftBtn' ? -1 : 1),
+        info = me.getColInfo(),
+        idx = info && info.foundIdx,
+        cols = info && info.columns,
+        store = me.getSegmentGrid().store,
+        newRec = store.getAt(store.indexOf(me.getEditPlugin().openedRecord) + direction);
+    
+    if(info === false) {
+      return;
+    }
+    
+    //check if there exists a next/prev row, if not we dont need to move the editor.
+    while(newRec && !newRec.get('editable')) {
+        newRec = store.getAt(store.indexOf(newRec) + direction);
+    }
+    
+    if(cols[idx + direction]) {
+      info.plug.editor.changeColumnToEdit(cols[idx + direction]);
+      return;
+    }
+    if(direction > 0) {
+        //goto next segment and first col
+        if(newRec) {
+            info.plug.editor.changeColumnToEdit(cols[0]);
+        }
+        me.saveNext();
+    }
+    else {
+        //goto prev segment and last col
+        if(newRec) {
+            info.plug.editor.changeColumnToEdit(cols[cols.length - 1]);
+        }
+        me.savePrevious();
+    }
+  },
+  /**
+   * returns the visible columns and which column has actually the editor
+   * @return {Object}
+   */
+  getColInfo: function() {
+    var me = this,
+        plug = me.getEditPlugin(),
+        columns = me.getSegmentGrid().query('.contentEditableColumn:not([hidden])'),
+        foundIdx = false,
+        current = plug.editor.getEditedField();
+    
+    if(!plug || !plug.editor) {
+        return false;
+    }
+    
+    Ext.Array.each(columns, function(col, idx) {
+      if(col.dataIndex == current) {
+        foundIdx = idx;
+      }
+    });
+    if(foundIdx === false) {
+      Ext.Error.raise('current dataIndex not found in visible columns!');
+      return false;
+    }
+
+    return {
+      plug: plug,
+      columns: columns,
+      foundIdx: foundIdx
+    };
   }
 });

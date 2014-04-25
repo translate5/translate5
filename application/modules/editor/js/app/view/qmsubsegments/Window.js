@@ -54,47 +54,52 @@ Ext.define('Editor.view.qmsubsegments.Window', {
     width: 1024,
     title: 'QM Subsegment Statistik',
     modal: true,
-    tab_title_source: '#UT# In Ausgangstext',
-    tab_title_target: '#UT# In Zieltext',
+    tab_title_field: '#UT# In Feld: {0}',
 
     initComponent: function() {
-        var me = this;
-        if(Editor.data.task.isSourceEditable()) {
-            me.items = [me.getTabbed()];
+        var me = this,
+            fields = Editor.data.task.segmentFields(),
+            editable = [];
+        fields.each(function(field){
+            if(field.get('editable')) {
+                editable.push(field);
+            }
+        });
+        
+        editable = Editor.model.segment.Field.listSort(editable);
+        
+        if(editable.length == 1) {
+            me.items = [me.getField(editable[0])];
         }
         else {
-            me.items = [me.getTarget()];
+            me.items = [me.getTabbed(editable)];
         }
+        
         me.callParent(arguments);
     },
-    getTarget: function() {
+    getField: function(field) {
         var me = this;
         return {
             xtype: 'qmSummaryTree',
             //creating each time a new store is ugly but simplifies the handling with different tasks and refreshing the store content
             store: Ext.create('Editor.store.QmSummary',{
-                storeId: 'QmSummary'
+                storeId: 'QmSummary'+field.get('name'),
+                proxy: Ext.applyIf({
+                    extraParams: {
+                        type: field.get('name')
+                    }
+                }, Editor.store.QmSummary.prototype.proxy)
             }),
-            title: me.tab_title_target
+            title: Ext.String.format(me.tab_title_field, field.get('label'))
         };
     },
-    getTabbed: function() {
+    getTabbed: function(fields) {
         var me = this;
         return {
             xtype: 'tabpanel',
-            items: [me.getTarget(),{
-                xtype: 'qmSummaryTree',
-                //own store for source summary, add type parameter to this store.
-                store: Ext.create('Editor.store.QmSummary',{
-                    storeId: 'QmSummarySource',
-                    proxy: Ext.applyIf({
-                        extraParams: {
-                            type: 'source'
-                        }
-                    }, Editor.store.QmSummary.prototype.proxy)
-                }),
-                title: me.tab_title_source
-            }]
+            items: Ext.Array.map(fields, function(field){
+                return me.getField(field);
+            })
         };
     }
 });

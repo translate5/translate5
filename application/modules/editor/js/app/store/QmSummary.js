@@ -82,6 +82,9 @@ Ext.define('Editor.store.QmSummary', {
             },{
                 name: 'total',
                 type: 'integer'
+            },{
+                name: 'qmtype',
+                type: 'integer'
             }],
             sev = Editor.data.task.get('qmSubSeverities');
         Ext.each(sev, function(severity,index, myself) {

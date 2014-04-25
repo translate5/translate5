@@ -42,21 +42,76 @@
 /**
  * @class Editor.model.Segment
  * @extends Ext.data.Model
+ * @param {Array|Ext.data.Store} Segment Field Definitions. As Array: ready to use field config. As Store: segment fields store!
+ * 
+ * redefinition algorithm tested in 4.0.7 and 4.2
  */
-Ext.define('Editor.model.Segment', {
-//  requires: [
-//    'Editor.model.Terminologie'
-//  ],
-  extend: 'Ext.data.Model',
-  fields: [
+if(!Editor.model) {
+    Editor.model = {};
+}
+Editor.model._Segment = function(fields) {
+    if(fields instanceof Ext.data.Store) {
+        var newFields = [];
+        fields.each(function(rec) {
+            newFields.push({name: rec.get('name'), type: 'string'});
+            if(rec.get('editable')) {
+                newFields.push({name: rec.get('name')+'Edit', type: 'string'});
+            }
+        });
+        fields = Ext.Array.merge(Editor.model._Segment.defaultFields, newFields);
+    }
+    else {
+        Editor.model._Segment.defaultFields = fields;
+    }
+    Ext.define('Editor.model.Segment', {
+        statics: {
+            redefine: Editor.model._Segment
+        },
+        extend: 'Ext.data.Model',
+        fields: fields,
+        idProperty: 'id',
+        proxy : {
+            type : 'rest',
+            url: Editor.data.restpath+'segment',
+            reader : {
+                root: 'rows',
+                type : 'json'
+            },
+            writer: {
+                encode: true,
+                root: 'data',
+                writeAllFields: false
+            }
+        },
+        /**
+         * konvertiert die serverseitig als string gespeicherte QM Liste in ein Array
+         * @returns Integer[]
+         */
+        getQmAsArray: function (){
+            return Ext.Array.map(this.get('qmId').replace(/^[;]+|[;]+$/g, '').split(';'), function(item){
+                return parseInt(item);
+            });
+        },
+        /**
+         * konvertiert ein Array mit QmIds zurück in das serverseitig benötigte String Format
+         * @param {Integer[]} qmArray
+         */
+        setQmFromArray: function (qmArray){
+            if(qmArray.length > 0){
+                this.set('qmId', ';'+qmArray.sort().join(';')+';');
+            }
+            else {
+                this.set('qmId', '');
+            }
+        }
+    });
+};
+
+//default fields:
+Editor.model._Segment([
     {name: 'id', type: 'int'},
     {name: 'fileId', type: 'int'},
     {name: 'segmentNrInTask', type: 'int'},
-    {name: 'source', type: 'string'},
-    {name: 'sourceEdited', type: 'string'},
-    {name: 'relais', type: 'string'},
-    {name: 'target', type: 'string'},
-    {name: 'edited', type: 'string'},
     {name: 'userName', type: 'string'},
     {name: 'timestamp', type: 'date'},
     {name: 'editable', type: 'boolean'},
@@ -67,41 +122,4 @@ Ext.define('Editor.model.Segment', {
     {name: 'comments', type: 'string', persist: false},
     {name: 'qmId', type: 'string'},
     {name: 'stateId', type: 'int'}
-  ],
-  idProperty: 'id',
-//  hasMany: {model: 'Editor.model.Terminologie', name: 'terms'},
-  proxy : {
-    type : 'rest',
-    url: Editor.data.restpath+'segment',
-    reader : {
-      root: 'rows',
-      type : 'json'
-    },
-    writer: {
-      encode: true,
-      root: 'data',
-      writeAllFields: false
-    }
-  },
-  /**
-   * konvertiert die serverseitig als string gespeicherte QM Liste in ein Array
-   * @returns Integer[]
-   */
-  getQmAsArray: function (){
-    return Ext.Array.map(this.get('qmId').replace(/^[;]+|[;]+$/g, '').split(';'), function(item){
-      return parseInt(item);
-    });
-  },
-  /**
-   * konvertiert ein Array mit QmIds zurück in das serverseitig benötigte String Format
-   * @param {Integer[]} qmArray
-   */
-  setQmFromArray: function (qmArray){
-    if(qmArray.length > 0){
-      this.set('qmId', ';'+qmArray.sort().join(';')+';');
-    }
-    else {
-      this.set('qmId', '');
-    }
-  }
-});
+]);

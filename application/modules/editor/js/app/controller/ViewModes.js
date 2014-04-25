@@ -51,18 +51,6 @@ Ext.define('Editor.controller.ViewModes', {
     ref : 'segmentGrid',
     selector : '#segmentgrid'
   },{
-    ref : 'sourceColumn',
-    selector : '#segmentgrid #sourceColumn'
-  },{
-    ref : 'sourceEditorColumn',
-    selector : '#segmentgrid #sourceEditorColumn'
-  },{
-    ref : 'targetColumn',
-    selector : '#segmentgrid #targetColumn'
-  },{
-    ref : 'editorColumn',
-    selector : '#segmentgrid #editorColumn'
-  },{
     ref : 'shortTagBtn',
     selector : '#segmentgrid #shortTagBtn'
   },{
@@ -208,7 +196,17 @@ Ext.define('Editor.controller.ViewModes', {
           }
       });
       me.self.filesRegionVisible = !me.getFilePanel().collapsed;
-    },
+  },
+  /**
+   * returns all ContentColumn instances which should be hidden on view mode (and shown again in edit mode)
+   * @return [Editor.view.segment.ContentColumn]
+   */
+  getHideColumns: function() {
+      var cols = this.getSegmentGrid().query('.contentColumn');
+      return Ext.Array.filter(cols, function(col) {
+          return col.segmentField.get('editable');
+      });
+  },
   /**
    * aktiviert den Bearbeitungsmodus des Grids (alle Spalten eingeblendet, editieren möglich, Hide Tags deaktivieren) 
    */
@@ -222,7 +220,9 @@ Ext.define('Editor.controller.ViewModes', {
     me.getShortTagBtn().toggle(true);
     me.showShortTags();
     me.getHideTagBtn().disable();
-    me.getTargetColumn().show();
+    Ext.Array.each(me.getHideColumns(), function(col){
+        col.show();
+    });
     me.getSegmentGrid().editingPlugin.enable();
     me.self.setViewMode(me.self.MODE_EDIT);
   },
@@ -289,7 +289,7 @@ Ext.define('Editor.controller.ViewModes', {
         }
     },me);
     //inject css to the head to manipulate the column css, because it is easier than to set inject ergomic class for each column in the dom
-    Ext.util.CSS.createStyleSheet('#segment-grid .x-grid-row .source-field .x-grid-cell-inner,#segment-grid .x-grid-row .source-edited-field .x-grid-cell-inner,#segment-grid .x-grid-row .relais-field .x-grid-cell-inner,#segment-grid .x-grid-row .target-field .x-grid-cell-inner,#segment-grid .x-grid-row .target-edited-field .x-grid-cell-inner { width: '+me.colWidth+'px; } #segment-grid.ergonomic .x-grid-row .x-grid-cell, #segment-grid.ergonomic .x-grid-row-editor .x-form-display-field {    font-size: 19pt !important;    line-height: 39px;}',me.self.ergonomicStyleId);
+    Ext.util.CSS.createStyleSheet('#segment-grid .x-grid-row .x-grid-cell .x-grid-cell-inner { width: '+me.colWidth+'px; } #segment-grid.ergonomic .x-grid-row .x-grid-cell, #segment-grid.ergonomic .x-grid-row-editor .x-form-display-field {    font-size: 19pt !important;    line-height: 39px;}',me.self.ergonomicStyleId);
 
     me.getSegmentGrid().addCls(me.self.MODE_ERGONOMIC);
     me.self.setViewMode(me.self.MODE_ERGONOMIC);
@@ -329,7 +329,9 @@ Ext.define('Editor.controller.ViewModes', {
     me.getShortTagBtn().toggle(true);
     me.showShortTags();
     me.getHideTagBtn().enable();
-    me.getTargetColumn().hide();
+    Ext.Array.each(me.getHideColumns(), function(col){
+        col.hide();
+    });
     editorPlugin.disable();
     this.self.setViewMode(this.self.MODE_VIEW);
   },

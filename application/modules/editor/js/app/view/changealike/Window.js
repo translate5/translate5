@@ -146,7 +146,7 @@ Ext.define('Editor.view.changealike.Window', {
    * @param {Boolean} sourceEdited
    */
   updateInfoText: function(segmentRecord, sourceEdited) {
-      var edited = sourceEdited ? 'sourceEdited' : 'edited';
+      var edited = sourceEdited ? 'sourceEdit' : 'targetEdit';
           addition = sourceEdited ? '<p class="changealike-info-text">'+this.additionSourceEdition+'</p>' : '';
 
       this.down('#infoText').update({

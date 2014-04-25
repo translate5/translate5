@@ -38,6 +38,7 @@
  */
 Ext.define('Editor.model.admin.Task', {
   extend: 'Ext.data.Model',
+  requires: ['Editor.model.segment.Field'],
   //currently we have 3 places to define userStates: IndexController for translation, JS Task Model and PHP TaskUserAssoc Model for programmatic usage
   USER_STATE_OPEN: 'open',
   USER_STATE_EDIT: 'edit',
@@ -74,8 +75,10 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'isUsed', type: 'boolean', persist: false}, //actually not used, so no isUsed method
     {name: 'userStep', type: 'string', persist: false},
     {name: 'users', type: 'auto', persist: false},
-    {name: 'userCount', type: 'integer', persist: false}
+    {name: 'userCount', type: 'integer', persist: false},
+    {name: 'defaultSegmentLayout', type: 'boolean', persist: false}
   ],
+  hasMany: {model: 'Editor.model.segment.Field', name: 'segmentFields'},
   idProperty: 'id',
   proxy : {
     type : 'rest',
@@ -106,25 +109,11 @@ Ext.define('Editor.model.admin.Task', {
       return res; 
   },
   /**
-   * returns if task has relais language
-   * @return {Boolean}
-   */
-  hasRelaisSource: function() {
-      return this.get('relaisLang')>0;
-  },
-  /**
    * returns if QM Subsegments are enabled for this task
    * @returns
    */
   hasQmSub: function() {
       return this.get('qmSubEnabled');
-  },
-  /**
-   * returns if tasks source is editable
-   * @return {Boolean}
-   */
-  isSourceEditable: function() {
-      return this.get('enableSourceEditing');
   },
   /**
    * returns if task is locked

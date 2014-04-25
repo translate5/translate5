@@ -52,11 +52,31 @@ Ext.define('Editor.view.segments.RowEditor', {
     
     //beinhaltet den gekürzten Inhalt des letzten geöffneteten Segments
     lastSegmentShortInfo: '',
-    columnToEdit: 'edited', //for source editing
+    columnToEdit: null,
+    fieldToEdit: null,
     previousRecord: null,
     messages: {
         segmentNotSavedUserMessage: 'Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank!',
         cantSaveEmptySegment: '#UT#Das Segment kann nicht ohne Inhalt gespeichert werden!'
+    },
+    
+    initComponent: function() {
+        var me = this;
+        me.callParent(arguments);
+        me.on('render', function(p) {
+            p.body.on('dblclick', me.changeColumnByClick, me);
+        });
+        me.mainEditor = me.add(new Editor.view.segments.HtmlEditor());
+        
+        this.addEvents(
+             /**
+              * @event afterEditorMoved
+              * @param {String} toEdit the dataIndex of the actual edited column
+              * @param {Editor.view.segments.RowEditor} editor the rowEditor instance
+              * Fires after the html maineditor was moved to another column
+              */
+            'afterEditorMoved'
+        );
     },
     
     /**
@@ -99,7 +119,12 @@ Ext.define('Editor.view.segments.RowEditor', {
             // offsetTop will be relative to the table, and is incorrect
             // when mixed with certain grid features (e.g., grouping).
             y = row.getXY()[1] - 5;
-            rowH = row.getHeight();
+            rowH = row.getHeight();            
+            if(rowH == 0) {
+                //on moving the editor horizontally, we get here with a row without a height,
+                //this positions the editor outside of the view. so return in this case.
+                return; 
+            }
             newHeight = rowH + 10;
 
             // IE doesn't set the height quite right.
@@ -148,7 +173,7 @@ Ext.define('Editor.view.segments.RowEditor', {
      * das Setzen der internen Referenz mainEditor kommmt hinzu.
      * @param column
      */
-   setField: function(column) {
+    setField: function(column) {
         var me = this,
             field;
 
@@ -173,14 +198,6 @@ Ext.define('Editor.view.segments.RowEditor', {
         });
         field.margins = '0 0 0 2';
         
-        //Dieses IF kommt hinzu  
-        if(column instanceof Editor.view.segments.column.Editor){
-            me.mainEditor = field;
-        }
-        else if(column instanceof Editor.view.segments.column.SourceEditor){
-            me.sourceEditor = field;
-        }
-        
         field.setWidth(column.getDesiredWidth() - 2);
         me.mon(field, 'change', me.onFieldChange, me);
 
@@ -194,113 +211,225 @@ Ext.define('Editor.view.segments.RowEditor', {
             me.renderColumnData(field, me.context.record);
         }
     },
-
+    /**
+     * handles clicking on the displayfields of the roweditor to change the editor position
+     * @param {Ext.Event} ev
+     * @param {DOMNode} target
+     */
+    changeColumnByClick: function(ev, target) {
+        var me = this, 
+            cmp = null;
+ 
+        //bubble up to the dom element which is the el of the Component
+        while (target && target.nodeType === 1) {
+            if(/displayfield-[0-9]+/.test(target.id)) {
+                cmp = me.columns.get(target.id);
+                if (cmp) {
+                    break;
+                }
+            }
+            target = target.parentNode;
+        }
+        if(cmp) {
+            me.changeColumnToEdit(cmp);
+        }
+    },
+    /**
+     * changes the maineditor to the given column
+     * @param {Editor.view.segments.column.ContentEditable} column
+     */
+    changeColumnToEdit: function(column) {
+        var me = this,
+            oldIdx = me.columnToEdit,
+            rec = me.context.record,
+            oldField = me.query('.displayfield[name="'+oldIdx+'"]');
+        if(oldIdx == column.dataIndex) {
+            //column did not change
+            return;
+        }
+        if(!me.saveMainEditorContent(rec)) {
+            return; //errors on saving, also do not change
+        }
+        if(oldField && oldField.length > 0) {
+            oldField[0].setValue(rec.get(oldIdx));
+        }
+        if(me.setColumnToEdit(column)) {
+            me.mainEditor.setValueAndMarkup(rec.get(me.columnToEdit), rec.get('id'), me.columnToEdit);
+            me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
+            me.focusContextCell();
+        }
+    },
     /**
      * Lädt den Datensatz in den Editor, erweitert das Orginal um die Integration des Markup.
      * Da die HtmlEditor.[set|get]Value Methoden aus Performance Gründen nicht überschrieben werden können, 
      * muss das (Un)Markup hier in der loadRecord bzw. completeEdit passieren.
      * Performance Gründe deshalb, weil set und getValue mehrmals aufgerufen wird (getValue z.B. in isDirty)
-     * Editable Source Column: Method contains also logic to reposition the HtmlEditor according to the column to be edited. 
+     * Alternate Targets: Method contains also logic to reposition the HtmlEditor according to the column to be edited. 
      *   A better Place for this logic would be in the startEdit Method before loadRecord is called, but then the complete startEdit Method must be duplicated. 
      * @override
      * @param {Editor.model.Segment} record
      */
     loadRecord: function(record) {
         var me = this;
-        me.callParent(new Array(record));
-        me.setColumnToEdit(record);
-        me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit));
+        me.callParent(arguments);
+        me.setColumnToEdit(me.context.column);
+        me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit), record.get('id'), me.columnToEdit);
         me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
     },
     
     /**
-     * Method Implements "Editable Source Column" 
-     * We may have only one Editor Instance in the App, for editing Source Column we have to swap the Editor Fields.
-     * 
-     * Disable Feature by not including "sourceEditor" column in the grid
-     * @param {Editor.model.Segment} record
+     * Method Implements that we can have multiple editable columns, but only one HtmlEditor Instance
+     * This is done by swaping the position of the different field editors
+     *
+     * @param {Ext.grid.column.Column} col
+     * @return {Boolean} returns true if column has changed, false otherwise
      */
-    setColumnToEdit: function(record) {
-        var me = this; 
-        if(! me.sourceEditor) {
-            return;
-        }
-        var showSourceEditor = me.isSourceEditing(me.context),
-        posMain = me.items.indexOf(me.mainEditor), 
-        posSrc = me.items.indexOf(me.sourceEditor), 
-        isOnSource = (me.columnToEdit == 'sourceEdited'),
-        posLeft, 
-        posRight,
-        vis,
-        toSwap;
+    setColumnToEdit: function(col) {
+        var me = this,
+            firstTarget = Editor.view.segments.column.ContentEditable.firstTarget, //is the dataIndex
+            toEdit = col.dataIndex,
+            hasToSwap = false,
+            fieldToDisable = null;
         
-        if(showSourceEditor) {
-            me.columnToEdit = 'sourceEdited';
-            toSwap = 'edited';
+        //if user clicked on a not content column open default dataindex (also if it is a content column but not editable)
+        if(!col.segmentField || !col.segmentField.get('editable')) {
+            toEdit = firstTarget;
         }
-        else {
-            me.columnToEdit = 'edited';
-            toSwap = 'sourceEdited';
+        //if its the readonly column take the edit one
+        else if(col instanceof Editor.view.segments.column.Content) {
+            toEdit = col.dataIndex+'Edit';
         }
-        //enabling the following line, disables text editing in source column:
-        //me.mainEditor.setReadOnly(showSourceEditor);
-        me.sourceEditor.setValue(record.get(toSwap));
-        if(isOnSource === showSourceEditor) {
-            return;
-        }
+        //no swap if last edited column was the same
+        hasToSwap = me.columnToEdit !== toEdit;
         
-        //swap visibility
-        vis = me.mainEditor.isVisible();
-        me.mainEditor.setVisible(me.sourceEditor.isVisible());
-        me.sourceEditor.setVisible(vis);
+        me.items.each(function(field){
+            if(!me.columns.containsKey(field.id)) {
+                return; //ignore the editor itself, which has no col mapping
+            }
+            var vis = me.columns.get(field.id).isVisible();
+            if(field.name == toEdit) {
+                field.setVisible(false);
+                me.mainEditor.setVisible(vis);
+                fieldToDisable = field;
+                return;
+            }
+            else if(field.name == me.columnToEdit) {
+                field.setVisible(vis);
+                return;
+            }
+        });
         
-        //swap position
-        if(posMain > posSrc) {
-            posLeft = posSrc;
-            posRight = posMain;
+        //all editor fields disabled
+        if(!fieldToDisable || !hasToSwap) {
+            me.fieldToDisable = false;
+            return false;
         }
-        else {
-            posLeft = posMain;
-            posRight = posSrc;
-        }
-        me.move(posRight, posLeft); 
-        me.move(posLeft + 1, posRight); 
+        me.columnToEdit = toEdit;
+        //if isset fieldToDisable the cols get changed in focusContextCell
+        me.fieldToDisable = fieldToDisable;
+        return true;
     },
     
     /**
-     * reusable method to get info if actual opened editor is source editing
-     * @param {Object} context
-     * @returns {Boolean}
+     * overrides original focusing with our repositioning of the editor
      */
-    isSourceEditing: function(context) {
-        var f = context.field; 
-        return Editor.data.task.isSourceEditable() && (f == 'source' || f == 'sourceEdited');
+    focusContextCell: function() {
+        var me = this, 
+            posMain, posToEdit,
+            toDis = me.fieldToDisable;
+        
+        if(! toDis) {
+            me.mainEditor.deferFocus();
+            return;
+        }
+        posMain = me.items.indexOf(me.mainEditor),
+        posToEdit = me.items.indexOf(toDis);
+        
+        //disable editor if column was also disabled
+        me.mainEditor.setWidth(toDis.width);
+        //swap position
+        me.move(posMain, posToEdit);
+        me.repositionHorizontally();
+        me.mainEditor.deferFocus();
+        me.fireEvent('afterEditorMoved', me.columnToEdit, me);
+        return true;
+    },
+    
+    /**
+     * repositions the grid view so that, the mainEditor is visible after change the editing column
+     */
+    repositionHorizontally: function () {
+        var me = this, 
+            gridReg = me.editingPlugin.grid.getView().getEl().getRegion(),
+            offset,
+            edReg = me.mainEditor.getEl().getRegion();
+        if(gridReg.contains(edReg)) {
+            return;
+        }
+        
+        if(edReg.right > gridReg.right) {
+            offset = -1 * gridReg.getOutOfBoundOffsetX(edReg.right) + 10;
+            me.editingPlugin.grid.horizontalScroller.scrollByDeltaX(offset);
+        }
+        else {
+            offset = -1 * gridReg.getOutOfBoundOffsetX(edReg.x) - 10;
+            me.editingPlugin.grid.horizontalScroller.scrollByDeltaX(offset);
+        }
+    },
+    
+    /**
+     * reusable method to get info which field is edited by opened editor
+     * returns the dataIndex of the field
+     * @return {String}
+     */
+    getEditedField: function() {
+        return this.columnToEdit;
     },
 
+    /**
+     * shows / hides the main editor, used as show hide column handler
+     */
+    toggleMainEditor: function(show) {
+        this.mainEditor.setVisible(show);
+    },
+    
     /**
      * erweitert die Orginal Methode
      * @returns {Boolean}
      */
     completeEdit: function() {
-        var me = this,
-        newValue = '',
-        //FIXME also for TRANSLATE-118:
-        fieldToCheck = (me.columnToEdit == 'sourceEdited' ? 'source' : 'target');
-        record = me.context.record;
-        //der replace aufruf entfernt vom Editor automatisch hinzugefügte unsichtbare Zeichen, 
-        //und verhindert so, dass der Record nicht als modified markiert wird, wenn am Inhalt eigentlich nichts verändert wurde
-        newValue = Ext.String.trim(me.mainEditor.getValueAndUnMarkup()).replace(/\u200B/g, '');
-        
+        var me = this;
+
+        if(!me.saveMainEditorContent(me.context.record)) {
+            return false;
+        }
+
+        me.hide();
+        me.previousRecord = me.editingPlugin.openedRecord;
+        me.editingPlugin.openedRecord = null;
+        return true;
+    },
+    
+    /**
+     * saves the Editor Content into the loaded record
+     * @returns {Boolean}
+     */
+    saveMainEditorContent: function(record) {
+        var me = this, 
+            //der replace aufruf entfernt vom Editor automatisch hinzugefügte unsichtbare Zeichen, 
+            //und verhindert so, dass der Record nicht als modified markiert wird, wenn am Inhalt eigentlich nichts verändert wurde
+            newValue = Ext.String.trim(me.mainEditor.getValueAndUnMarkup()).replace(/\u200B/g, '');
+            
         //check, if the context delivers really the correct record, because through some issues in reallive data 
         //rose the idea, that there might exist special race conditions, where
         //the context.record is not the record of the newValue
         if(me.editingPlugin.openedRecord === null || me.editingPlugin.openedRecord.internalId != record.internalId ){
-            Editor.MessageBox.addError(this.messages.segmentNotSavedUserMessage + newValue,' Das Segment konnte nicht gespeichert werden. Im folgenden der Debug-Werte: ' + newValue + 'me.editingPlugin.openedRecord.internalId: ' + me.editingPlugin.openedRecord.internalId + ' record.internalId: ' + record.internalId);
+            Editor.MessageBox.addError(me.messages.segmentNotSavedUserMessage + newValue,' Das Segment konnte nicht gespeichert werden. Im folgenden der Debug-Werte: ' + newValue + 'me.editingPlugin.openedRecord.internalId: ' + me.editingPlugin.openedRecord.internalId + ' record.internalId: ' + record.internalId);
             me.editingPlugin.openedRecord = null;
             return false;
         }
         
-        if(newValue.length == 0 && record.get(fieldToCheck).length > 0) {
+        if(newValue.length == 0 && record.get(me.columnToEdit).length > 0) {
             Editor.MessageBox.addError(me.messages.cantSaveEmptySegment);
             return false;
         }
@@ -312,25 +441,8 @@ Ext.define('Editor.view.segments.RowEditor', {
         record.beginEdit();
         record.set(me.columnToEdit, newValue);
         record.set('autoStateId', 999);
-        //record.set('autoStateId', me.getAutoState());
-        record.endEdit();
-        me.callParent(arguments);
-        me.previousRecord = me.editingPlugin.openedRecord;
-        me.editingPlugin.openedRecord = null;
+        record.endEdit(true); //silent = true → dont notify the store. if notifiying the store we get a "grid jumps to top problem" with left right navi
         return true;
-    },
-    /**
-     * returns the autostate to the actual userRole
-     * @returns integer
-     */
-    getAutoState: function() {
-        var role = Editor.data.task.get('userRole'),
-            map = Editor.data.segments.roleAutoStateMap;
-        if(map[role]) {
-            return map[role];
-        }
-        return map['default'];
-        
     },
     /**
      * erweitert die Orginal Methode, setzt den Record zurück.
@@ -340,12 +452,6 @@ Ext.define('Editor.view.segments.RowEditor', {
       me.context.record.reject();
       me.editingPlugin.openedRecord = null;
       me.callParent(arguments);
-    },
-    /**
-     * deaktiviert die Orginal focus Methode, 
-     * diese springt an falsche Stellen nach einem RangeLoad
-     */
-    focusContextCell: function() {
     },
     /**
      * setzt den gekürzten Inhalt des letzten Segments. Muss mit dem "gemarkupten" Content aufgerufen werden um alle Tags zu entfernen. 

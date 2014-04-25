@@ -70,6 +70,10 @@ Ext.define('Editor.view.qmsubsegments.SummaryTree', {
                     text: this.treepanel_text,
                     flex: 10,
                     sortable: true,
+                    renderer: function(v, md, rec) {
+                        md.tdAttr = 'data-qtip="' + rec.get('text')+' ('+rec.get('qmtype')+')'+'"';
+                        return v;
+                    },
                     dataIndex: 'text'
                 },{
                     text: this.treepanel_totalTotal,

@@ -48,7 +48,7 @@ Ext.define('Editor.controller.UserPreferences', {
     views: ['preferences.UserWindow'],
     strings: {
         settings: '#UT# Meine Einstellungen',
-        pwSave: '#UT#Passwort erfolgreich gespeichert!',
+        pwSave: '#UT#Passwort erfolgreich gespeichert!'
     },
     window: null,
     refs:[{

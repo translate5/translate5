@@ -93,7 +93,7 @@ Ext.define('Editor.model.admin.User', {
               }
               break;
           case 'editorFinishTask':
-              //FIXME role visitor should be encapsulated some how
+              //TODO role visitor should be encapsulated some how
               //if user is not associated to the task or task is already finished, it cant be finished
               if(task.get('userRole') == 'visitor' || task.get('userRole') == '' || task.isFinished() || task.isEnded()) {
                   return false;
@@ -107,6 +107,11 @@ Ext.define('Editor.model.admin.User', {
               break;
           case 'editorShowexportmenuTask':
               if(!task.hasQmSub() && !me.isAllowed('editorExportTask')){
+                  return false;
+              }
+              break;
+          case 'useChangeAlikes':
+              if(!task.get('defaultSegmentLayout')) {
                   return false;
               }
               break;

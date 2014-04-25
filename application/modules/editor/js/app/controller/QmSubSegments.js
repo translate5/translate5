@@ -70,9 +70,14 @@ Ext.define('Editor.controller.QmSubSegments', {
     	emptySelText: '##UT##Bitte wählen Sie im Editor ein Subsegment aus!',
     	emptySelTitle: '##UT##Kein Subsegment ausgewählt.'
     },
+    
     init : function() {
         var me = this;
         me.useAlternateInsertion = Ext.isIE;
+        
+        //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
+        Editor.app.on('editorViewportOpened', me.handleInitEditor, me);
+        
         me.control({
             '#segmentgrid #qmsummaryBtn': {
                 click: me.showQmSummary
@@ -96,6 +101,14 @@ Ext.define('Editor.controller.QmSubSegments', {
             }
         });
     },
+    handleInitEditor: function() {
+        Ext.create('Ext.data.Store', {
+            fields: ['id', 'text'],
+            storeId: 'Severities',
+            data: Editor.data.task.get('qmSubSeverities')
+        });
+        this.menuConfig = this.getMenuConfig();
+    },
     /**
      * initialises the QM SubSegment Fieldset in the MetaPanel
      */
@@ -104,7 +117,7 @@ Ext.define('Editor.controller.QmSubSegments', {
     		return;
     	}
     	var pos = mpForm.items.findIndex('itemId', 'metaQm');
-    	mpForm.insert(pos+1, {xtype: 'qmSubsegmentsFlagFieldset', controller: this});
+    	mpForm.insert(pos, {xtype: 'qmSubsegmentsFlagFieldset', controller: this});
     },
     /**
      * generates the config menu tree for QM Flag Menu

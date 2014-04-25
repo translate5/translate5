@@ -102,62 +102,54 @@ Ext.define('Editor.view.segments.GridFilter', {
         var autoStates = Ext.Array.filter(Editor.data.segments.autoStateFlags, function(item) {
             return item.id != 999;
         }),
-        boolProto = Ext.ux.grid.filter.BooleanFilter.prototype;
-      return [{
+        boolProto = Ext.ux.grid.filter.BooleanFilter.prototype,
+        fields = [{
             type: 'numeric',
             dataIndex: 'segmentNrInTask'
         },{
-          type: 'list',
-          dataIndex: 'stateId',
-          labelField: 'label',
-          phpMode: false,
-          options: Editor.data.segments.stateFlags
-      },{
-          type: 'list',
-          dataIndex: 'qmId',
-          labelField: 'label',
-          phpMode: false,
-          options: Editor.data.segments.qualityFlags
-      },{
-          type: 'string',
-          dataIndex: 'source'
-      },{
-          type: 'string',
-          dataIndex: 'sourceEdited'
-      },{
-          type: 'string',
-          dataIndex: 'target'
-      },{
-    	  type: 'string',
-    	  dataIndex: 'relais'
-      },{
-          type: 'string',
-          dataIndex: 'editor'
-      },{
-          type: 'string',
-          dataIndex: 'comments'
-      },{
-          type: 'numeric',
-          dataIndex: 'matchRate'
-      },{
-          type: 'list',
-          dataIndex: 'autoStateId',
-          labelField: 'label',
-          phpMode: false,
-          options: autoStates
-      },{
-          type: 'workflowStep',
-          dataIndex: 'workflowStep'
-      },{
-          type: 'string',
-          dataIndex: 'userName'
-      },{
-          type: 'boolean',
-          //wording in frontend is not editable but locked, so the yes/no buttons has to be changed:
-          yesText: boolProto.noText, 
-          noText: boolProto.yesText,
-          dataIndex: 'editable'
-      }];
+            type: 'list',
+            dataIndex: 'stateId',
+            labelField: 'label',
+            phpMode: false,
+            options: Editor.data.segments.stateFlags
+        },{
+            type: 'list',
+            dataIndex: 'qmId',
+            labelField: 'label',
+            phpMode: false,
+            options: Editor.data.segments.qualityFlags
+        },{
+            type: 'string',
+            dataIndex: 'comments'
+        },{
+            type: 'numeric',
+            dataIndex: 'matchRate'
+        },{
+            type: 'list',
+            dataIndex: 'autoStateId',
+            labelField: 'label',
+            phpMode: false,
+            options: autoStates
+        },{
+            type: 'workflowStep',
+            dataIndex: 'workflowStep'
+        },{
+            type: 'string',
+            dataIndex: 'userName'
+        },{
+            type: 'boolean',
+            //wording in frontend is not editable but locked, so the yes/no buttons has to be changed:
+            yesText: boolProto.noText, 
+            noText: boolProto.yesText,
+            dataIndex: 'editable'
+        }];
+        Editor.data.task.segmentFields().each(function(rec) {
+            fields.push({dataIndex: rec.get('name'), type: 'string'});
+            if(rec.get('editable')) {
+                fields.push({dataIndex: rec.get('name')+'Edit', type: 'string'});
+            }
+        });
+        return fields;
   }
 }, function(){
     //initiere die Fixes für diverse Ext 3 Bugs in den Filtern

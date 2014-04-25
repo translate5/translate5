@@ -44,6 +44,11 @@
  * @class Editor.controller.ChangeAlike
  * @extends Ext.app.Controller
  * 
+ * IMPORTANT:
+ * ChangeAlikes are working only with a default column layout 
+ * of source and target column (optional relais)! 
+ * ChangeAlikes does not work with Alternates!!!
+ * 
  * Binding to the save chain: 
  * Method onAfterSaveCall to save chain event "afterSaveCall"
  * Method onSaveComplete to save chain event "saveComplete"
@@ -71,8 +76,9 @@ Ext.define('Editor.controller.ChangeAlike', {
   stores: ['AlikeSegments','Segments'],
   views: ['changealike.Window'],
   messages: {
-    alikeSingular: 'Wiederholung wurde bearbeitet und gespeichert',
-    alikePlural: 'Wiederholungen wurden bearbeitet und gespeichert'
+    alikeSingular: '#UT#Wiederholung wurde bearbeitet und gespeichert',
+    alikePlural: '#UT#Wiederholungen wurden bearbeitet und gespeichert',
+    alikesDisabled: '#UT#Das Projekt enthält alternative Übersetzungen. Der Wiederholungseditor wurde daher deaktiviert.'
   },
   alikesToProcess: null,
   fetchedAlikes: null,
@@ -81,6 +87,7 @@ Ext.define('Editor.controller.ChangeAlike', {
   alikeSegmentsUrl: '',
   actualRecord: null,
   isSourceEditing: null,
+  isDisabled: false,
   callbackToSaveChain: Ext.emptyFn,
   refs : [{
     ref : 'segmentGrid',
@@ -91,10 +98,14 @@ Ext.define('Editor.controller.ChangeAlike', {
   },{
     ref : 'alikeGrid',
     selector : '#changealikeWindow .gridpanel'
+  },{
+    ref : 'optionsBtn',
+    selector : '#segmentgrid #optionsBtn'
   }],
   init : function() {
       var me = this,
           segCtrl = me.application.getController('Segments');
+      
       //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following event bindings
       Editor.app.on('editorViewportClosed', me.clearAlikeSegments, me);
       segCtrl.on('afterSaveCall', me.onAfterSaveCall, me);
@@ -136,8 +147,18 @@ Ext.define('Editor.controller.ChangeAlike', {
    * inits the editing plugin
    */
   initEditPluginHandler: function() {
-      var me = this;
+      var me = this,
+          t = Editor.data.task,
+          auth = Editor.app.authenticatedUser,
+          enabledACL = auth.isAllowed('useChangeAlikes');
+          enabled = auth.isAllowed('useChangeAlikes', t);
+      //disable the whole settings button, since no other settings are currently available!
+      me.getOptionsBtn().setVisible(enabled);
+      me.isDisabled = ! enabled;
       me.getEditPlugin().on('beforeedit', me.handleBeforeEdit, me);
+      if(!t.get('defaultSegmentLayout') && enabledACL) {
+          Editor.MessageBox.addInfo(this.messages.alikesDisabled, 1.4);
+      }
   },
   clearAlikeSegments: function() {
       this.getAlikeSegmentsStore().removeAll();
@@ -159,7 +180,7 @@ Ext.define('Editor.controller.ChangeAlike', {
         proxy = store.getProxy(),
         op;
     
-    if(me.isManualProcessingDisabled()) {
+    if(me.isDisabled || me.isManualProcessingDisabled()) {
         return;
     }
     
@@ -181,14 +202,14 @@ Ext.define('Editor.controller.ChangeAlike', {
    * @param {Ext.data.Operation} operation
    */
   handleAlikesRead: function(operation) {
-      if(! operation.wasSuccessful()){
+      var me = this, 
+          id = operation.segmentsId;
+      
+      if(me.isDisabled || ! operation.wasSuccessful()){
           //@todo Meldung machen, dass keine WDHs geholt werden konnten!
           operation.handleReadAfterSave && operation.handleReadAfterSave();
           return;
       }
-      
-      var me = this, 
-          id = operation.segmentsId;
       
       me.fetchedAlikes = operation.getRecords();
       if(me.isManualProcessing()) {
@@ -208,9 +229,9 @@ Ext.define('Editor.controller.ChangeAlike', {
           rec = context.record;
       me.callbackToSaveChain = finalCallback;
       me.actualRecord = rec;
-      me.isSourceEditing = plug.editor.isSourceEditing(context);
+      me.isSourceEditing = me.getSourceEditing();
       me.saveIsRunning = true;
-      if(me.isManualProcessingDisabled() || me.noAlikes()) {
+      if(me.isDisabled || me.isManualProcessingDisabled() || me.noAlikes()) {
           me.fireEvent('segmentUsageFinished', me);
           me.callbackToSaveChain();
           return;
@@ -226,15 +247,20 @@ Ext.define('Editor.controller.ChangeAlike', {
    * @return boolean true, if no alikes are present
    */
   noAlikes: function() {
-       var me = this,
-          plug = me.getEditPlugin(),
-          context = plug.context;
-      me.isSourceEditing = plug.editor.isSourceEditing(context);
+      var me = this;
+      me.isSourceEditing = me.getSourceEditing();
       me.allAlikes = me.getAllAlikeIds(me.isSourceEditing);
       if(Ext.isEmpty(me.allAlikes)) {
           return true;
       }
       return false;
+  },
+  /**
+   * checks if we are editing the source column or target
+   * @returns {Boolean}
+   */
+  getSourceEditing: function() {
+      return this.getEditPlugin().editor.columnToEdit == "sourceEdit";
   },
   /**
    * Startet das Speichern der Wiederholungen. Wird je nach Einstellung automatisch oder manuell getriggert.
@@ -252,9 +278,9 @@ Ext.define('Editor.controller.ChangeAlike', {
       autoStateId: 999
     };
     if(me.isSourceEditing) {
-        data.sourceEdited = rec.data.sourceEdited;
+        data.sourceEdit = rec.data.sourceEdit;
     }else {
-        data.edited = rec.data.edited;
+        data.targetEdit = rec.data.targetEdit;
     }
     me.alikesToProcess = me.getAlikesToProcess();
     
@@ -310,7 +336,7 @@ Ext.define('Editor.controller.ChangeAlike', {
       url: me.alikeSegmentsUrl+'/'+id,
       method: 'put',
       params: {
-          process: me.isSourceEditing ? 'sourceEdited' : 'edited',
+          process: me.isSourceEditing ? 'source' : 'target',
           "alikes[]": alikes
       },
       success: me.alikesSaveSuccessHandler,

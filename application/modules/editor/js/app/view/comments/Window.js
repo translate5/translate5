@@ -43,36 +43,21 @@
  * @class Editor.view.changealike.Window
  * @extends Editor.view.ui.changealike.Window
  */
-Ext.define('Editor.view.comments.Window', {
-    extend : 'Ext.window.Window',
-    alias : 'widget.commentWindow',
+Ext.define('Editor.view.comments.Window', { //FIXME move from Window to panel
+    extend : 'Ext.panel.Panel',
+    alias : 'widget.commentWindow',  //FIXME move from Window to panel
     requires : [ 'Editor.view.comments.Grid' ],
-    title : '#UT#Kommentare zum Segment Nr. {0}',
-    height : 500,
-    width : 795,
+    title : '#UT#Kommentare zum aktuellen Segment',
     itemId : 'commentWindow',
     layout: 'fit',
-    closeAction : 'hide',
-    modal : true,
     item_cancelBtn : '#UT#Abbrechen',
     item_saveBtn : '#UT#Speichern',
     item_closeBtn: '#UT#Schließen',
-    item_commentLabel: '#UT#Kommentar neu / bearbeiten:',
+    item_commentNew: '#UT#Kommentar neu',
+    item_commentEdit: '#UT#Kommentar bearbeiten',
     item_addComment: '#UT#Neuer Kommentar',
     delete_confirm_title: '#UT#Löschen des Kommentars bestätigen',
     delete_confirm_msg: '#UT#Soll der Kommentar wirklich gelöscht werden?',
-
-    /**
-     * updates the info text panel with the current segment record.
-     * 
-     * @param {Editor.model.Segment}
-     *            record
-     */
-    updateInfoText : function(record) {
-        var me = this;
-        me.setTitle(Ext.String.format(me.self.prototype.title, record.get('segmentNrInTask')));
-        me.down('#infoText').update(record.data);
-    },
 
     /**
      * show a confirm message box before the deletion of a comment
@@ -86,61 +71,47 @@ Ext.define('Editor.view.comments.Window', {
         e.stopEvent(); 
         this.close();
     },
+    /**
+     * set the formfield in edit mode: preset the value to edit
+     */
+    setComment: function(comment) {
+        var me = this,
+            area = me.down('textarea');
+        area.setValue(comment);
+        area.labelEl && area.labelEl.update(me.item_commentEdit+':');
+    },
+    /**
+     * cancel the actual edited comment
+     */
+    cancel: function() {
+        var me = this,
+            area = me.down('textarea');
+        area.setValue('');
+        area.labelEl && area.labelEl.update(me.item_commentNew+':');
+    },
     initComponent : function() {
         var me = this;
         Ext.applyIf(me, {
-            dockedItems : [ {
-                dock : 'top',
-                xtype : 'container',
-                padding : 10,
-                height : 100,
-                autoScroll : true,
-                cls : 'segment-tag-container',
-                tpl : '{edited}',
-                itemId : 'infoText'
-            },{
-                xtype : 'toolbar',
-                ui : 'footer',
-                flex : 1,
-                dock : 'bottom',
-                layout : {
-                    pack : 'end',
-                    type : 'hbox'
-                },
-                items : [{
-                    xtype: 'button',
-                    itemId: 'commentAddBtn',
-                    iconCls: 'ico-comment-add',
-                    text: me.item_addComment
-                },{
-                    xtype : 'button',
-                    itemId : 'closeBtn',
-                    //iconCls: 'ico-loading',
-                    text : me.item_closeBtn
-                }]
-            }],
             items : [ {
                 xtype : 'container',
+                hidden: true,
+                itemId: 'commentContainer',
                 layout: {
                     align: 'stretch',
-                    type: 'hbox'
+                    type: 'vbox'
                 },
                 items : [ {
-                    xtype : 'commentsGrid',
-                    flex : 1
-                },{
                     xtype : 'form',
                     itemId: 'commentForm',
                     bodyPadding: 5,
-                    width: 300,
-                    disabled: true,
+                    //width: 300,
                     //dock : 'right',
                     items : [{
                         labelAlign: 'top',
                         xtype : 'textarea',
                         name: 'comment',
-                        height: 200,
-                        fieldLabel: me.item_commentLabel,
+                        height: 100,
+                        fieldLabel: me.item_commentNew,
                         anchor: '100%'
                     },{
                         xtype : 'toolbar',
@@ -161,6 +132,9 @@ Ext.define('Editor.view.comments.Window', {
                             text : me.item_saveBtn
                         }]
                     }]
+                },{
+                    xtype : 'commentsGrid',
+                    flex : 1
                 }]
             } ]
         });

@@ -49,6 +49,7 @@ Ext.define('Editor.view.ViewPortEditor', {
       'Editor.view.fileorder.Tree',
       'Editor.view.fileorder.ReferenceTree',
       'Editor.view.segments.Grid',
+      'Editor.view.segments.MetaPanelNavi',
       'Editor.view.segments.MetaPanel'
     ],
 
@@ -63,10 +64,27 @@ Ext.define('Editor.view.ViewPortEditor', {
     initComponent: function() {
       var me = this,
           items = [me.getNorth(), {
+              xtype: 'panel',
               region: 'east',
-              xtype: 'segments.metapanel',
-              itemId: 'metapanel',
+              collapsible: true,
+              layout: 'fit',
               animCollapse: !Ext.isIE, //BugID 3
+              items:[{
+                  xtype: 'panel',
+                  hidden: true,
+                  preventHeader: true,
+                  itemId: 'metapanel',
+                  layout: {type:'accordion'},
+                  dockedItems: [{
+                      xtype: 'metapanelNavi',
+                      dock: 'top'
+                  }],
+                  items: [{
+                      xtype: 'segments.metapanel'
+                  },{
+                      xtype: 'commentWindow'
+                  }]
+              }],
               width: 260
           },{
               region: 'center',

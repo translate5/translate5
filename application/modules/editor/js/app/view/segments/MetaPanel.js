@@ -45,43 +45,99 @@
  * @initalGenerated
  */
 Ext.define('Editor.view.segments.MetaPanel', {
-  extend: 'Editor.view.ui.segments.MetaPanel',
-  alias: 'widget.segments.metapanel',
-  initComponent: function() {
-    var me = this;
-    me.callParent(arguments);
-    this.addQualityFlags();
-    this.addStateFlags();
-  },
-  /**
-   * Fügt anhand der php2js Daten die Status Felder hinzu
-   */
-  addStateFlags: function() {
-    var me = this,
-    stati = me.down('#metaStates'),
-    flags = Editor.data.segments.stateFlags;
-    Ext.each(flags, function(item){
-      stati.add({
-        name: 'stateId',
-        inputValue: item.id,
-        boxLabel: item.label
+    alias: 'widget.segments.metapanel',
+    extend: 'Ext.panel.Panel',
+
+    height: 250,
+    bodyPadding: 10,
+    autoScroll: true,
+    frameHeader: false,
+    title: 'Segment-Metadaten',
+
+    //Item Strings:
+    item_metaQm_title: '#UT#QM',
+    item_metaStates_title: '#UT#Status',
+    item_metaTerms_title: '#UT#Terminologie',
+    
+    initComponent: function() {
+      var me = this;
+      
+      //Editor.data.segments.showStatus = false;
+      Ext.applyIf(me, {
+        items: [
+          {
+            xtype: 'form',
+            border: 0,
+            itemId: 'metaInfoForm',
+            items: [{
+                  xtype: 'fieldset',
+                  itemId: 'metaTerms',
+                  title: me.item_metaTerms_title,
+                  items: [
+                    {
+                      xtype: 'panel',
+                      itemId: 'metaTermPanel',
+                      cls: 'metaTermPanel',
+                      loader: {
+                        url: Editor.data.restpath+'segment/terms',
+                        renderer: 'html'
+                      },
+                      anchor: '100%'
+                    }
+                  ]
+              },
+              {
+                xtype: 'fieldset',
+                itemId: 'metaQm',
+                defaultType: 'radio',
+                title: me.item_metaQm_title
+              },
+              {
+                xtype: 'fieldset',
+                itemId: 'metaStates',
+                defaultType: 'radio',
+                hideable: Editor.data.segments.showStatus, 
+                hidden:  !Editor.data.segments.showStatus,
+                title: me.item_metaStates_title
+              }
+            ]
+          }
+        ]
       });
-    });
-  },
-  /**
-   * Fügt anhand der php2js Daten die QM Felder hinzu
-   */
-  addQualityFlags: function() {
-    var me = this,
-    qm = me.down('#metaQm'),
-    flags = Editor.data.segments.qualityFlags;
-    Ext.each(flags, function(item){
-      qm.add({
-        xtype: 'checkbox',
-        name: 'qmId', 
-        inputValue: item.id,
-        boxLabel: item.label
+
+      me.callParent(arguments);
+      me.addQualityFlags();
+      me.addStateFlags();
+    },
+    /**
+     * Fügt anhand der php2js Daten die Status Felder hinzu
+     */
+    addStateFlags: function() {
+      var me = this,
+      stati = me.down('#metaStates'),
+      flags = Editor.data.segments.stateFlags;
+      Ext.each(flags, function(item){
+        stati.add({
+          name: 'stateId',
+          inputValue: item.id,
+          boxLabel: item.label
+        });
       });
-    });
-  }
-});
+    },
+    /**
+     * Fügt anhand der php2js Daten die QM Felder hinzu
+     */
+    addQualityFlags: function() {
+      var me = this,
+      qm = me.down('#metaQm'),
+      flags = Editor.data.segments.qualityFlags;
+      Ext.each(flags, function(item){
+        qm.add({
+          xtype: 'checkbox',
+          name: 'qmId', 
+          inputValue: item.id,
+          boxLabel: item.label
+        });
+      });
+    }
+  });

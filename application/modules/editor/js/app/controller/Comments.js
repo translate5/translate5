@@ -53,8 +53,14 @@ Ext.define('Editor.controller.Comments', {
     ref : 'segmentGrid',
     selector : '#segmentgrid'
   },{
+      ref : 'saveBtn',
+      selector : '#commentWindow #saveBtn'
+  },{
     ref: 'commentWindow',
     selector: '#commentWindow'
+  },{
+      ref: 'commentContainer',
+      selector: '#commentWindow #commentContainer'
   },{
       ref: 'rowEditor',
       selector: '#roweditor'
@@ -62,30 +68,25 @@ Ext.define('Editor.controller.Comments', {
     ref: 'commentForm',
     selector: '#commentForm'
   },{
-      ref: 'commentAddBtn',
-      selector: '#commentAddBtn'
-  },{
-      ref: 'closeBtn',
-      selector: '#commentWindow #closeBtn'
+      ref: 'autoStateDisplay',
+      selector: '#roweditor .displayfield[name=autoStateId]'
   },{
       ref: 'commentDisplay',
       selector: '#roweditor .displayfield[name=comments]'
   }],
+  activeComment: null,
   loadedSegmentId: null,
-  runningRequests: 0,
   init : function() {
       var me = this;
       //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following event bindings 
       Editor.app.on('editorViewportClosed', me.clearComments, me);
       me.control({
           '#commentWindow' : {
-              beforeshow: me.initWindow,
-              beforeclose: function() {
-                  return this.runningRequests <= 0;
-              }
+              expand: me.expandWindow
           },
           '#segmentgrid' : {
-              itemclick: me.handleCommentsColumnClick
+              itemclick: me.handleCommentsColumnClick,
+              afterrender: me.initEditPluginHandler
           },
           '#roweditor .displayfield[name=comments]': {
               change: me.updateEditorComment
@@ -99,31 +100,33 @@ Ext.define('Editor.controller.Comments', {
           '#commentWindow .grid' : {
               itemdblclick: me.handleGridDblClick
           },
-          '#commentWindow #closeBtn' : {
-              click: me.handleWindowClose
-          },
           '#commentWindow #saveBtn' : {
               click: me.handleCommentSave
           },
           '#commentWindow #cancelBtn' : {
-              click: me.handleCommentCancel
-          },
-          '#commentWindow #commentAddBtn' : {
               click: me.handleAddComment
           }
       });
-      me.getCommentsStore().on('write', me.handleCommentsChanged, me);
-      me.getCommentsStore().getProxy().on('exception', me.removeRequest, me);
   },
-  initWindow: function () {
+  initEditPluginHandler: function() {
       var me = this;
-      me.getCommentForm().getForm().reset();
-      me.handleAddComment();
+    //Diese Events können erst in onlauch gebunden werden, in init existiert das Plugin noch nicht
+      me.getEditPlugin().on('beforeedit', me.expandWindow, me);
+      me.getEditPlugin().on('canceledit', me.cancelEdit, me);
+      me.getEditPlugin().on('edit', me.cancelEdit, me);
   },
-  handleWindowClose: function () {
-      this.getCommentWindow().close();
+  cancelEdit: function() {
+      this.activeComment = null;
   },
+  getEditPlugin: function() {
+      return this.getSegmentGrid().editingPlugin;
+  },
+  /**
+   * clean up the loaded comments.
+   */
   clearComments: function() {
+      this.loadedSegmentId = null;
+      this.activeComment = null;
       this.getCommentsStore().removeAll();
   },
   /**
@@ -132,90 +135,137 @@ Ext.define('Editor.controller.Comments', {
    * @param {Editor.model.Comment} rec
    */
   handleGridDblClick: function(view, rec) {
-      var me = this,
-          form = me.getCommentForm(),
-          area = form.down('textarea');
-      if(rec.get('isEditable')){
-          me.getCommentAddBtn().disable();
-          form.enable();
-          form.loadRecord(rec);
-          area.selectText();
-          area.focus(false, 500);
-      }
+      this.loadComment(rec);
   },
   /**
    * saves comment to server
    */
   handleCommentSave: function() {
       var me = this,
+          now = new Date(),
+          btn = me.getSaveBtn(),
           store = me.getCommentsStore(),
           form = me.getCommentForm(),
-          rec = form.getRecord();
-      me.addRequest();
-      form.getForm().updateRecord(rec);
+          rec = me.activeComment,
+          data = {
+              segmentId: me.loadedSegmentId,
+              comment: form.getForm().getValues().comment,
+              modified: now
+          };
+      
+      if(rec.phantom) {
+          data.created = now;
+      }
+
+      rec.set(data);
+      
+      if(!rec.isModified('comment')) {
+          rec.reject();
+          me.handleAddComment();
+          return;
+      }
+      
+      form.disable();
+      form._enabled = false;
+      btn.setIconCls('ico-loading');
+      
+      rec.save({
+          callback: function(newrec, op) {
+              var errorHandler = Editor.app.getController('ServerException');
+              me.handleAddComment();
+              //enabling the collapsed form gives a visual misbehaviour, so enable it by a own flag on expand
+              me.getCommentWindow().collapsed || form.enable();
+              form._enabled = true;
+              btn.setIconCls('');
+              if(op.wasSuccessful()) {
+                  me.handleCommentsChanged(rec); //rec from outer scope is needed!
+                  return;
+              }
+              if(rec.phantom) {
+                  store.remove(rec);
+              }
+              else {
+                  rec.reject();
+              }
+              errorHandler.handleCallback.apply(errorHandler, arguments);
+          }
+      });
+      
       if(!rec.store){
           store.insert(0, rec);
       }
-      me.getCommentAddBtn().enable();
-      me.getCommentForm().disable();
-  },
-  handleCommentCancel: function() {
-      var me = this;
-      me.getCommentAddBtn().enable();
-      me.getCommentForm().disable();
   },
   /**
    * creates a new record and loads it into the form
+   * @return {Editor.model.Comment} returns the newly created comment
    */
   handleAddComment: function() {
       var me = this, 
-          now = new Date(),
-          form = me.getCommentForm(),
           rec = me.getCommentsStore().model.create({
-              modified: now,
-              created: now,
-              segmentId: me.loadedSegmentId
+              isEditable: true
           });
       rec.phantom = true;
-      
-      me.getCommentAddBtn().disable();
-      form.enable();
-      form.loadRecord(rec);
-      form.down('textarea').focus(false, 500);
+      me.activeComment = rec;
+      me.loadComment(rec);
+      me.getCommentWindow().cancel();
   },
   /**
    * Handles the action column clicks
    */
   handleGridAction: function(view, td, rowIdx, cellIdx, ev) {
       var me = this,
-          rec = me.getCommentsStore().getAt(rowIdx),
+          comments = me.getCommentsStore(),
+          rec = comments.getAt(rowIdx),
           del = ev.getTarget('img.ico-comment-delete'),
-          edit = ev.getTarget('img.ico-comment-edit'),
-          form = me.getCommentForm(),
-          area = form.down('textarea');
+          edit = ev.getTarget('img.ico-comment-edit');
       if(!rec.get('isEditable')){
           return;
       }
-      if(del) {
-          me.getCommentWindow().showDeleteConfirm(function(btn){
-              if(btn == 'yes') {
-                  me.deleteComment(rec);
+      if(edit) {
+          me.loadComment(rec);
+          return;
+      }
+      if(!del) {
+          return;
+      }
+      me.getCommentWindow().showDeleteConfirm(function(btn){
+          if(btn != 'yes') {
+              return;
+          }
+          var id = rec.get('segmentId');
+          rec.store.remove(rec);
+          rec.destroy({
+              callback: function(rec, op) {
+                  var errorHandler = Editor.app.getController('ServerException');
+                  //reload comments if they are still shown to the user
+                  if(!op.wasSuccessful() && me.loadedSegmentId == id) {
+                      comments.load({
+                          params: {
+                                segmentId: id
+                          }
+                      });
+                  }
+                  errorHandler.handleCallback.apply(errorHandler, arguments);
               }
           });
-          return;
-      }
-      if(edit) {
-          me.getCommentAddBtn().disable();
-          form.enable();
-          form.loadRecord(rec);
-          area.selectText();
-          area.focus(false, 500);
-          return;
-      }
+      });
   },
-  deleteComment: function(rec) {
-      this.addRequest();
-      rec.store.remove(rec);
+  /**
+   * loads a single comment into the comment edit form, if editable
+   * @param {Editor.model.Comment} rec
+   */
+  loadComment: function(rec) {
+      var me = this,
+          form = me.getCommentForm(),
+          area = form.down('textarea');
+      if(rec.get('isEditable')){
+          me.activeComment = rec;
+          me.getCommentWindow().setComment(rec.get('comment'));
+          if(area.rendered) {
+              area.selectText();
+              area.focus(false, 500);
+          }
+      }
   },
   /**
    * handle clicks on the comment column of the grid.
@@ -225,33 +275,36 @@ Ext.define('Editor.controller.Comments', {
    */
   handleCommentsColumnClick: function(view, rec, tr, idx, ev) {
       var me = this,
+          ed = me.getSegmentGrid().editingPlugin,
           add = ev.getTarget('img.add'),
           edit = ev.getTarget('img.edit');
       if(add || edit) {
-          me.openCommentWindow(rec);
+          ed.startEdit(rec, view.getHeaderAtIndex(0));
+          me.handleEditorCommentBtn();
       }
   },
   /**
-   * prevents the window to be closed unless all requests are saved
+   * handles expand of comment panel, reloads store if needed
+   * @param {Ext.panel.Panel} pan
    */
-  addRequest: function() {
-      var btn = this.getCloseBtn();
-      this.runningRequests++;
-      btn.setIconCls('ico-loading');
-      btn.disable();
-  },
-  /**
-   * removes a request from the request stack.
-   * enables the window closing if no requests are running.
-   */
-  removeRequest: function() {
-      var btn = this.getCloseBtn();
-      this.runningRequests--;
-      if(this.runningRequests <= 0) {
-          btn.setIconCls('');
-          btn.enable();
-          this.runningRequests = 0;
+  expandWindow: function(pan) {
+      var me = this,
+          rec = me.getEditPlugin().openedRecord,
+          id = rec && rec.get('id'),
+          box = me.getCommentContainer(),
+          form = me.getCommentForm();
+      if(form._enabled) {
+          form.enable();
       }
+      if(!id) {
+          box.hide();
+          return;
+      }
+      box.show();
+      if(me.loadedSegmentId && me.loadedSegmentId == id) {
+          return;
+      }
+      me.openCommentWindow(rec);
   },
   /**
    * Opens a Commen window to the given Segment Id
@@ -259,46 +312,60 @@ Ext.define('Editor.controller.Comments', {
    */
   openCommentWindow: function(rec) {
       var me = this,
+          form = me.getCommentForm(),
+          area = form.down('textarea'),
           store = me.getCommentsStore(),
-          id = rec.get('id'),
-          win;
-      store.removeAll();
+          id = rec.get('id');
+      
+      me.clearComments();
+      if(me.getCommentWindow().collapsed) {
+          return; //collapsed no data load needed
+      }
+      
+      me.handleAddComment();
+      if(area.rendered) {
+          area.selectText();
+          area.focus(false, 500);
+      }
+      
       store.load({
           params: {segmentId: id}
       });
       me.loadedSegmentId = id;
-      win = me.getCommentWindow();
-      if(!win) {
-          win = Ext.widget('commentWindow');
-      }
-      win.updateInfoText(rec);
-      win.show();
   },
   /**
    * updates the comments column in the grid
    * @param {Ext.data.Store} store
    * @param {Ext.data.Operation} op
    */
-  handleCommentsChanged: function(store, op) {
+  handleCommentsChanged: function(rec) {
       var me = this, 
-          rec = null,
-          segId = 0;
-      if(op.records && op.records.length > 0) {
-          rec = op.records[0];
-          segId = rec.get('segmentId');
-      }
-      if(! rec) {
-          me.removeRequest();
+          segId = rec && rec.get('segmentId'),
+          comments = me.getCommentsStore(),
+          comment = comments.getById(rec.get('id'));
+      
+      if(! segId) {
           return;
       }
+      
+      //if comment store was changed and restored in the meantime, 
+      //  we have to add / edit the record again
+      if(comment !== rec && rec.get('segmentId') == me.loadedSegmentId) {
+          if(comment) {
+              comment.set(rec.data);
+              comment.commit();
+          }
+          else {
+              comments.insert(0, rec);
+          }
+      }
+      
       Editor.model.Segment.load(segId, {
-          failure: function() {
-              me.removeRequest();
-          },
           success: function(rec, op) {
               var dis = me.getCommentDisplay(),
-              ed = me.getRowEditor(),
-              origRec = me.getSegmentsStore().getById(segId);
+                  stateid = me.getAutoStateDisplay(),
+                  ed = me.getRowEditor(),
+                  origRec = me.getSegmentsStore().getById(segId);
               //we cant update the complete segment, since this would overwrite unsaved 
               //changes the user has made in the opened segment
               origRec.beginEdit();
@@ -308,18 +375,13 @@ Ext.define('Editor.controller.Comments', {
               delete origRec.modified.autoStateId;
               delete origRec.modified.workflowStep;
               origRec.endEdit();
-              if(ed && ed.context) {
+              if(ed && ed.context && me.loadedSegmentId == segId) {
                   //update the context of the editor, because the set comments above changes the grid view
                   ed.context.row = me.getSegmentGrid().getView().getNode(origRec);
                   ed.reposition();
-                  try {
-                      //very few times some part of the following object path is not defined. 
-                      // since its not reproducable we will try / catch it
-                      dis.setRawValue(ed.context.column.self.getFirstComment(rec.get('comments')));
-                  }
-                  catch(e){}
+                  dis.setRawValue(Editor.view.segments.column.Comments.getFirstComment(rec.get('comments')));
+                  stateid.setRawValue(ed.columns.get(stateid.id).renderer(rec.get('autoStateId')));
               }
-              me.removeRequest();
           }
       });
   },
@@ -327,9 +389,8 @@ Ext.define('Editor.controller.Comments', {
    * Handles the click on the button in the comment displayfield
    */
   handleEditorCommentBtn: function() {
-      var me = this,
-          rec = me.getRowEditor().editingPlugin.openedRecord;
-      me.openCommentWindow(rec);
+      var me = this;
+      me.getCommentWindow().expand();
   },
   /**
    * updates the tooltip in the comment displayfield

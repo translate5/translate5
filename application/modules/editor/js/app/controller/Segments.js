@@ -115,9 +115,6 @@ Ext.define('Editor.controller.Segments', {
       caCtrl.on('segmentUsageFinished', me.onSegmentUsageFinished, me);
       
       //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following event bindings 
-      me.getSegmentsStore().on('load', me.invalidatePager, me);
-      me.getSegmentsStore().on('load', me.refreshGridView, me);
-      me.getSegmentsStore().on('write', me.handleSegmentSaved, me);
       me.getStore('Files').on('write', me.reloadGrid, me);
       Editor.app.on('editorViewportClosed', me.clearSegments, me);
 
@@ -130,11 +127,20 @@ Ext.define('Editor.controller.Segments', {
       },
       '#segmentgrid' : {
           afterrender: function(grid) {
-              var ro = Editor.data.task && Editor.data.task.isReadOnly();
+              var me = this,
+                  ro = Editor.data.task && Editor.data.task.isReadOnly();
               grid.setTitle(ro ? grid.title_readonly : grid.title);
-              this.styleResetFilterButton(grid.filters);
+              me.styleResetFilterButton(grid.filters);
+              
+              //moved the store handler into after grid render, because of 
+              //the fluent reconfiguration of the model and late instanciation of the store.
+              //@todo should be replaced with Event Domains after update to ExtJS >4.2
+              me.getSegmentsStore().on('load', me.invalidatePager, me);
+              me.getSegmentsStore().on('load', me.refreshGridView, me);
           },
         selectionchange: me.handleSegmentSelectionChange,
+        columnhide: me.handleColumnVisibility,
+        columnshow: me.handleColumnVisibility,
         filterupdate: me.handleFilterChange
       },
       '#fileorderTree': {
@@ -161,9 +167,6 @@ Ext.define('Editor.controller.Segments', {
   refreshGridView: function() {
     this.getSegmentGrid().getView().refresh();
   },  
-  handleSegmentSaved: function () {
-    Editor.MessageBox.addSuccess(this.messages.segmentSaved);
-  },
   /**
    * geöffnete Segmente werden bei der Wahl eines anderen Segments gespeichert
    */
@@ -171,6 +174,17 @@ Ext.define('Editor.controller.Segments', {
       var ed = this.getSegmentGrid().editingPlugin;
       if(ed && ed.editor && ed.openedRecord && ! ed.disableEditBySelect){
         this.saveChainStart();
+      }
+  },
+  /**
+   * maintains the visibility of the editor on showing/hiding columns
+   * @param {Ext.grid.header.Container} head
+   * @param {Editor.view.segments.column.Content} col
+   */
+  handleColumnVisibility: function(head, col) {
+      var ed = this.getSegmentGrid().editingPlugin;
+      if(ed && ed.editor && ed.editor.columnToEdit == col.dataIndex) {
+          ed.editor.toggleMainEditor(col.isVisible());
       }
   },
   /**
@@ -373,7 +387,8 @@ Ext.define('Editor.controller.Segments', {
       ed.completeEdit();
       //if completeEdit fails, the plugin remains editing and the record is not dirty.
       if(ed.editing && !ed.context.record.dirty) {
-          me.saveChainEnd(); //FIXME the below by config bound handlers can also be bound elsewhere and get no information about success or failed chainend!
+          //TODO the below by config bound handlers can also be bound elsewhere and get no information about success or failed chainend!
+          me.saveChainEnd(); 
           return;
       }
 
@@ -460,6 +475,8 @@ Ext.define('Editor.controller.Segments', {
           me.saveChainEnd();
           return;
       }
+      //show save segment success message 
+      Editor.MessageBox.addSuccess(me.messages.segmentSaved);
       //invoking change alike handling:
       if(me.fireEvent('saveComplete')){
           me.saveChainEnd(); //NEXT step in save chain

@@ -34,11 +34,7 @@
  */
 
 #changealike-grid .x-grid-row .segment-tag-column .x-grid-cell-inner,
-#segment-grid .x-grid-row .source-field .x-grid-cell-inner,
-#segment-grid .x-grid-row .relais-field .x-grid-cell-inner,
-#segment-grid .x-grid-row .source-edited-field .x-grid-cell-inner,
-#segment-grid .x-grid-row .target-field .x-grid-cell-inner,
-#segment-grid .x-grid-row .target-edited-field .x-grid-cell-inner {
+#segment-grid .x-grid-row .x-grid-cell .x-grid-cell-inner {
   white-space: normal;
   width: 250px;
 }
@@ -210,6 +206,7 @@ background-color: #EAF1FB;
 #segment-grid .comment {margin-bottom:0px;}
 #segment-grid .comment .ellipsis {font-size:7pt;line-hight:3pt;display:block;line-height:10pt;}
 .comment .content,
+.comments-grid .comment .modified,
 .comments-grid .comment .content {white-space: normal;display:block;}
 .comment .author, .comment .created, .comment .modified {font-size: 7pt; font-style: italic;line-height:10pt;}
 

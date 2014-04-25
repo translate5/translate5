@@ -50,7 +50,7 @@ Ext.define('Editor.store.Comments', {
   storeId: 'segmentComments',
   remoteFilter: true,
   autoLoad: false,
-  autoSync: true,
+  autoSync: false,
   pageSize: 0,
   buffered: false
 });
