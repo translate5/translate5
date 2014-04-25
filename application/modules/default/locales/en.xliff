@@ -10,6 +10,13 @@
     für den Browser</source><target>translate5 - open source proofreading environment for the browser</target></trans-unit>
 
 <trans-unit id='TWl0IHRyYW5zbGF0ZTUga8O2bm5lbiBTaWUgU0RMWExJRkYtIHVuZCBDU1YtRGF0ZWllbiBpbSBCcm93c2VyIGxla3RvcmllcmVuIGxhc3NlbiAtIG9obmUgTGl6ZW56a29zdGVuIC0gYXVmIE9wZW4gU291cmNlLUJhc2lzLg=='><source>Mit translate5 können Sie SDLXLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</source><target>With translate5 you can proofread SDLXLIFF and CSV files in the browser - without licensing costs and on open-source basis</target></trans-unit>
+
+<trans-unit id='VW50ZXJzdMO8dHp1bmcgZGVyIEVudHdpY2tsdW5nIHZvbiB0cmFuc2xhdGU1'><source>Unterstützung der Entwicklung von translate5</source><target>Support of translate5 development</target></trans-unit>
+<trans-unit id='VW5zZXIgZ3Jvw59lciBEYW5rIGdlaHQgYW4gZGllIGZvbGdlbmRlbiBVbnRlcm5laG1lbiB1bmQgT3JnYW5pc2F0aW9uZW4uIFNpZSBmaW5hbnppZXJlbiBkaWUgRmVhdHVyZXMsIGRpZSBzaWUgdm9uIHRyYW5zbGF0ZTUgZXJ3YXJ0ZW4u'><source>Unser großer Dank geht an die folgenden Unternehmen und Organisationen. Sie finanzieren die Features, die sie von translate5 erwarten.</source><target>All of our gratitudes go to the following companies and organizations. They finance the features they expect from translate5.</target></trans-unit>
+<trans-unit id='U2llIGVybcO2Z2xpY2hlbiBzbyBkaWVzZXMgUHJvamVrdCE='><source>Sie ermöglichen so dieses Projekt!</source><target>This way they make this project possible!</target></trans-unit>
+<trans-unit id='VmllbGVuIERhbmsgZGFmw7xyIQ=='><source>Vielen Dank dafür!</source><target>Many thanks for this!</target></trans-unit>
+<trans-unit id='SGF1cHR1bnRlcnN0w7x0emVyIHZvbiB0cmFuc2xhdGU1'><source>Hauptunterstützer von translate5</source><target>Main supporters of translate5</target></trans-unit>
+<trans-unit id='VW50ZXJzdMO8dHplciBhdXNnZXfDpGhsdGVyIEZlYXR1cmVz'><source>Unterstützer ausgewählter Features</source><target>Supporters of selected features</target></trans-unit>
         </body>
     </file>
 <!-- ids are base64-encoded --></xliff>

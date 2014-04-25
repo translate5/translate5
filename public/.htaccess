@@ -1,8 +1,8 @@
 #php_value session.auto_start 0
 RewriteEngine On
+#RewriteRule ^v-[0-9]\.[0-9]\.[0-9]/(.*)$ $1 [NC,L]
 RewriteCond %{REQUEST_FILENAME} -s [OR]
 RewriteCond %{REQUEST_FILENAME} -l [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^.*$ - [NC,L]
 RewriteRule ^.*$ index.php [NC,L]
-
