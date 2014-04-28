@@ -60,11 +60,6 @@ class IndexController extends ZfExtended_Controllers_Action {
     public function testdataAction() {}
     public function sourceAction() {}
     public function newsletterAction() {}
-    public function tasksAction() {
-        /* @var $task editor_Models_Task */
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        $this->view->tasks = $task->loadAll();
-    }
 
     /**
      * registers the needed data for editor usage in session
