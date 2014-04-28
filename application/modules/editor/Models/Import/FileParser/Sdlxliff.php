@@ -475,7 +475,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         for ($i = 2; $i < $countTargetMrk; $i++) {//die ersten beiden Array-Elemente sind irrelevant, da vor dem ersten Segment und Delimiter
             $h = $i - 1;
             //setzte allgemeine Segmenteigenschaften
-            $this->_mid = preg_replace('".*mid=\"([^\"]*)\".*"', '\\1', $sourceExp[1][0][$h]);
+            $this->setMid(preg_replace('".*mid=\"([^\"]*)\".*"', '\\1', $sourceExp[1][0][$h]));
             //extrahiere das sourcesegment
             $sourceExp[1][0][$i] = explode('</mrk>', $sourceExp[1][0][$i]);
             array_pop($sourceExp[1][0][$i]);

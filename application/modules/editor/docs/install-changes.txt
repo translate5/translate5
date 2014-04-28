@@ -1,6 +1,8 @@
 ### this file holds all changes and necessary configs needed for updates
 ### newest changes on top
 
+2014-04-28: apply 034-editor-mysql-TRANSLATE-167.sql
+
 2014-04-23: Look for ZfExtended-changes
 
 2014-03-21: Changes for Target Alternates:

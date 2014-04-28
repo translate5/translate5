@@ -228,7 +228,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         $this->segmentData = array();
         foreach($this->colOrder as $name => $idx) {
             if($name == self::CONFIG_COLUMN_MID) {
-                $this->_mid = $lineArr[$idx];
+                $this->setMid($lineArr[$idx]);
                 continue;
             }
             $field = $this->segmentFieldManager->getByName($name);

@@ -472,6 +472,18 @@ abstract class editor_Models_Import_FileParser {
     abstract protected function setSegmentAttribs($transunit);
     
     /**
+     * checks and sets the given MID internally
+     * Because of DB reasons we only accept a 60chars long MID. If the given value was longer we throw an exception.
+     * @param string $mid
+     */
+    protected function setMid($mid) {
+        if(mb_strlen($mid) > 60) {
+            throw new Zend_Exception('Given MID was to long (max 60 chars), MID: '.$mid);
+        }
+        $this->_mid = $mid;
+    }
+    
+    /**
      * calculates and sets segment attributes needed by us, this info doesnt exist directly in the segment. 
      * These are currently: pretransSegment, editSegment, autoStateId
      * Parameters are given by the current segment
