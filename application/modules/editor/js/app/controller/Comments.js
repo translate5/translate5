@@ -88,6 +88,9 @@ Ext.define('Editor.controller.Comments', {
               itemclick: me.handleCommentsColumnClick,
               afterrender: me.initEditPluginHandler
           },
+          '#roweditor': {
+              afterEditorMoved: me.onEditorMoved
+          },
           '#roweditor .displayfield[name=comments]': {
               change: me.updateEditorComment
           },
@@ -111,7 +114,7 @@ Ext.define('Editor.controller.Comments', {
   initEditPluginHandler: function() {
       var me = this;
     //Diese Events können erst in onlauch gebunden werden, in init existiert das Plugin noch nicht
-      me.getEditPlugin().on('beforeedit', me.expandWindow, me);
+      me.getEditPlugin().on('beforeedit', me.onStartEdit, me);
       me.getEditPlugin().on('canceledit', me.cancelEdit, me);
       me.getEditPlugin().on('edit', me.cancelEdit, me);
   },
@@ -290,6 +293,30 @@ Ext.define('Editor.controller.Comments', {
       }
   },
   /**
+   * handles starting the segment editor
+   * @param {String} toEdit field which is really be edited by the editor 
+   * @param {Editor.view.segments.RowEditor} editor 
+   */
+  onEditorMoved: function(toEdit, editor) {
+      if(editor.columnClicked == 'comments' && me.getCommentWindow().collapsed) {
+          me.getCommentWindow().expand();
+      }
+  },
+  /**
+   * handles starting the segment editor
+   * @param {Object} context
+   */
+  onStartEdit: function(context) {
+      var me = this,
+          isOnStartEdit = context.field && !context.isPanel;
+            //opens the commentpanel if the editor was started by clicking on the comment column 
+      if(isOnStartEdit && context.field == 'comments' && me.getCommentWindow().collapsed) {
+          me.getCommentWindow().expand();
+          return;
+      }
+      me.expandWindow();
+  },
+  /**
    * handles expand of comment panel, reloads store if needed
    * @param {Ext.panel.Panel} pan
    */
@@ -299,6 +326,7 @@ Ext.define('Editor.controller.Comments', {
           id = rec && rec.get('id'),
           box = me.getCommentContainer(),
           form = me.getCommentForm();
+          
       if(form._enabled) {
           form.enable();
       }
@@ -307,6 +335,7 @@ Ext.define('Editor.controller.Comments', {
           return;
       }
       box.show();
+      //jump out here if comments already loaded for this segment.
       if(me.loadedSegmentId && me.loadedSegmentId == id) {
           return;
       }

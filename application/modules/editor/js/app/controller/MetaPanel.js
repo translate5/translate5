@@ -194,14 +194,14 @@ Ext.define('Editor.controller.MetaPanel', {
   },
   /**
    * Editor.view.segments.RowEditing beforeedit handler, initiert das MetaPanel mit den Daten
-   * @param {Ext.grid.column.Column} column
+   * @param {Object} context
    */
-  startEdit: function(column) {
+  startEdit: function(context) {
     var me = this,
         mp = me.getMetaPanel(),
-        segmentId = column.record.get('id');
-        
-    me.record = column.record;
+        segmentId = context.record.get('id');
+    
+    me.record = context.record;
     me.getMetaTermPanel().getLoader().load({params: {id: segmentId}});
     //bindStore(me.record.terms());
     me.loadRecord(me.record);

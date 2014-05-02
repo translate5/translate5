@@ -325,6 +325,8 @@ Ext.define('Editor.view.segments.RowEditor', {
             return false;
         }
         me.columnToEdit = toEdit;
+        me.columnClicked = col.dataIndex;
+        
         //if isset fieldToDisable the cols get changed in focusContextCell
         me.fieldToDisable = fieldToDisable;
         return true;
@@ -363,6 +365,7 @@ Ext.define('Editor.view.segments.RowEditor', {
             gridReg = me.editingPlugin.grid.getView().getEl().getRegion(),
             offset,
             edReg = me.mainEditor.getEl().getRegion();
+        
         if(gridReg.contains(edReg)) {
             return;
         }
