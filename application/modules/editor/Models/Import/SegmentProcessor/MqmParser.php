@@ -47,6 +47,11 @@
 class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Import_SegmentProcessor {
     const OPEN_TAG = true;
     const CLOSE_TAG = false;
+    
+    const ERR_TAG_INVALID = 1;
+    const ERR_TAG_CLOSE = 2;
+    const ERR_TAG_SAVE = 3;
+    
     /**
      * @var editor_Models_SegmentFieldManager
      */
@@ -64,6 +69,12 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
     protected $issues;
     
     protected $segmentMqmIds = array();
+    
+    /**
+     * list of occured MQM Import errors
+     * @var array
+     */
+    protected $errors = array();
     
     /**
      * @param editor_Models_Task $task
@@ -118,14 +129,14 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
             preg_match_all('/(type|severity|note|id)="([^"]*)"/i',$split[$current], $attributes);
             
             if(count($attributes) != 3) {
-                error_log('Invalid MQM Tag ignored on import of task '.$this->taskGuid.': '.'<mqm:startIssue '.$split[$current].'/>');
+                $this->logError(self::ERR_TAG_INVALID, '<mqm:startIssue '.$split[$current].'/>');
                 $split[$current] = ''; //delete given mqm tag
                 continue;
             }
             $attributes = array_combine($attributes[1], $attributes[2]);
             $attributes['segmentfield'] = $field;
             if($this->createAndSaveInternalMqm($attributes) === false) {
-                error_log('MQM Tag cant be saved and was ignored on import of task '.$this->taskGuid.': '.'<mqm:startIssue '.$split[$current].'/>');
+                $this->logError(self::ERR_TAG_SAVE, '<mqm:startIssue '.$split[$current].'/>');
                 $split[$current] = ''; //delete given mqm tag
                 continue;
             }
@@ -145,7 +156,7 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
             preg_match('/id="([^"]*)"/i',$split[$current], $match);
             settype($match[1], 'integer');
             if(empty($match[1]) || empty($closeTags[$match[1]])) {
-                error_log('Invalid closing MQM Tag ignored on import of task '.$this->taskGuid.': '.'<mqm:endIssue '.$split[$current].'/> either the tag was invalid or no open tag was found.');
+                $this->logError(self::ERR_TAG_CLOSE, '<mqm:endIssue '.$split[$current].'/>');
                 $split[$current] = ''; //delete given mqm tag
                 continue;
             }
@@ -191,5 +202,44 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
         if(!empty($this->segmentMqmIds)) {
             $this->mqm->updateSegmentId($segmentId, $this->segmentMqmIds);
         }
+    }
+    
+    /**
+     * logs one error
+     * @param string $error
+     * @param string $context MQM segment where the error occured
+     */
+    protected function logError($error, $context) {
+        switch ($error) {
+            case self::ERR_TAG_INVALID:
+                $this->errors[] = 'Invalid MQM Tag ignored on import: '.$context;
+                return;
+            case self::ERR_TAG_SAVE:
+                $this->errors[] = 'MQM Tag cant be saved (wrong type or empty severity / id) and was ignored on import: '.$context;
+                return;
+            case self::ERR_TAG_CLOSE:
+                $msg = 'Invalid closing MQM Tag ignored on import: '.$context;
+                $msg .= ' either the tag was invalid or no open tag was found.';
+                $this->errors[] = $msg;
+                return;
+            default:
+                $this->errors[] = 'Unknown error while importing MQM Tag: '.$context;
+                return;
+        }
+    }
+    
+    /**
+     * sends a mail with all occured MQM Import errors
+     */
+    public function handleErrors() {
+        if(empty($this->errors)) {
+            return;
+        }
+        $log = ZfExtended_Factory::get('ZfExtended_Log');
+        /* @var $log ZfExtended_Log */
+        array_unshift($this->errors, '');
+        array_unshift($this->errors, 'Errors on importing MQM in task '.$this->taskGuid);
+        $this->errors[] = '';
+        $log->logError('Errors on importing MQM!', join("\n", $this->errors));
     }
 }
