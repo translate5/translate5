@@ -116,7 +116,7 @@ Ext.define('Editor.controller.Comments', {
       me.getEditPlugin().on('edit', me.cancelEdit, me);
   },
   cancelEdit: function() {
-      this.activeComment = null;
+      this.handleAddComment();
   },
   getEditPlugin: function() {
       return this.getSegmentGrid().editingPlugin;
@@ -128,6 +128,7 @@ Ext.define('Editor.controller.Comments', {
       this.loadedSegmentId = null;
       this.activeComment = null;
       this.getCommentsStore().removeAll();
+      this.getCommentsStore().removed = [];
   },
   /**
    * loads the clicked comment into the comment form
@@ -155,6 +156,7 @@ Ext.define('Editor.controller.Comments', {
       
       if(rec.phantom) {
           data.created = now;
+          data.userName = Editor.data.app.user.userName;
       }
 
       rec.set(data);
@@ -178,7 +180,7 @@ Ext.define('Editor.controller.Comments', {
               form._enabled = true;
               btn.setIconCls('');
               if(op.wasSuccessful()) {
-                  me.handleCommentsChanged(rec); //rec from outer scope is needed!
+                  me.handleCommentsChanged(rec, 'save'); //rec from outer scope is needed!
                   return;
               }
               if(rec.phantom) {
@@ -235,7 +237,7 @@ Ext.define('Editor.controller.Comments', {
           var id = rec.get('segmentId');
           rec.store.remove(rec);
           rec.destroy({
-              callback: function(rec, op) {
+              callback: function(nothing, op) {
                   var errorHandler = Editor.app.getController('ServerException');
                   //reload comments if they are still shown to the user
                   if(!op.wasSuccessful() && me.loadedSegmentId == id) {
@@ -244,6 +246,10 @@ Ext.define('Editor.controller.Comments', {
                                 segmentId: id
                           }
                       });
+                  }
+                  if(op.wasSuccessful()) {
+                      me.handleCommentsChanged(rec, 'destroy'); //rec from outer scope is needed!
+                      return;
                   }
                   errorHandler.handleCallback.apply(errorHandler, arguments);
               }
@@ -335,10 +341,10 @@ Ext.define('Editor.controller.Comments', {
   },
   /**
    * updates the comments column in the grid
-   * @param {Ext.data.Store} store
-   * @param {Ext.data.Operation} op
+   * @param {Editor.model.Comment} rec
+   * @param {String} type change type: 'save' or 'destroy'
    */
-  handleCommentsChanged: function(rec) {
+  handleCommentsChanged: function(rec, type) {
       var me = this, 
           segId = rec && rec.get('segmentId'),
           comments = me.getCommentsStore(),
@@ -349,8 +355,8 @@ Ext.define('Editor.controller.Comments', {
       }
       
       //if comment store was changed and restored in the meantime, 
-      //  we have to add / edit the record again
-      if(comment !== rec && rec.get('segmentId') == me.loadedSegmentId) {
+      //  we have to add / edit / delete the record again
+      if(type == 'save' && comment !== rec && segId == me.loadedSegmentId) {
           if(comment) {
               comment.set(rec.data);
               comment.commit();
@@ -358,6 +364,9 @@ Ext.define('Editor.controller.Comments', {
           else {
               comments.insert(0, rec);
           }
+      }
+      if(type == 'destroy' && comment && comment.get('id') == rec.get('id') && segId == me.loadedSegmentId) {
+          comments.remove(comment);
       }
       
       Editor.model.Segment.load(segId, {
