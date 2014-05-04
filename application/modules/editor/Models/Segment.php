@@ -511,6 +511,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $filesTableName = ZfExtended_Factory::get('editor_Models_Db_Files')->info($infokey);
         $sql = $this->_syncFilesortSql($segmentsTableName, $filesTableName);
         $this->db->getAdapter()->query($sql, array($taskguid));
+        //do the resort also for the view!
+        $this->segmentFieldManager->initFields($taskguid);
+        $segmentsViewName = $this->segmentFieldManager->getView()->getName();
+        $sql = $this->_syncFilesortSql($segmentsViewName, $filesTableName);
+        $this->db->getAdapter()->query($sql, array($taskguid));
     }
 
     /**
