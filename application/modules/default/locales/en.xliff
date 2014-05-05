@@ -17,6 +17,9 @@
 <trans-unit id='VmllbGVuIERhbmsgZGFmw7xyIQ=='><source>Vielen Dank dafür!</source><target>Many thanks for this!</target></trans-unit>
 <trans-unit id='SGF1cHR1bnRlcnN0w7x0emVyIHZvbiB0cmFuc2xhdGU1'><source>Hauptunterstützer von translate5</source><target>Main supporters of translate5</target></trans-unit>
 <trans-unit id='VW50ZXJzdMO8dHplciBhdXNnZXfDpGhsdGVyIEZlYXR1cmVz'><source>Unterstützer ausgewählter Features</source><target>Supporters of selected features</target></trans-unit>
+<trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBudXIgQVNDSUktWmVpY2hlbiBpbiBEYXRlaS0gb2RlciBWZXJ6ZWljaG5pc25hbWVuIHVuZCBrZWluZSBTb25kZXJ6ZWljaGVuIG9kZXIgVW1sYXV0ZS4gRGFzIFppcC1Gb3JtYXQgw7xiZXJtaXR0ZWx0IGtlaW5lIEluZm9ybWF0aW9uZW4sIGluIHdlbGNoZXIgQ29kaWVydW5nIElociBCZXRyaWVic3N5c3RlbSBEYXRlaS0gb2RlciBWZXJ6ZWljaG5pc25hbWVuIGdlc3BlaWNoZXJ0IGhhdC4gQXVmZ3J1bmQgZGllc2VzIE1hbmdlbHMgZGVzIFpJUC1TdGFuZGFyZHMga2FubiB0cmFuc2xhdGU1IE5pY2h0LUFTQ0lJLVplaWNoZW4gbmljaHQgZmVobGVyZnJlaSBhdXNsZXNlbi4='><source>Bitte verwenden Sie nur ASCII-Zeichen in Datei- oder Verzeichnisnamen und keine Sonderzeichen oder Umlaute. Das Zip-Format übermittelt keine Informationen, in welcher Codierung Ihr Betriebssystem Datei- oder Verzeichnisnamen gespeichert hat. Aufgrund dieses Mangels des ZIP-Standards kann translate5 Nicht-ASCII-Zeichen nicht fehlerfrei auslesen.</source>
+<target>Please use only ASCII characters in file or directory names and no special characters or German Umlaute. The Zip format does not provide any information in which encoding your operating system has saved a file or directory name. Due to this lack of the ZIP standard, translate5 can not read such file or directory names with NON-ASCII characters without errors. Only exception to this rule: Your file system does use UFT-8 encoding for your filesystem, like Linux systems do.</target>
+</trans-unit>
         </body>
     </file>
 <!-- ids are base64-encoded --></xliff>

@@ -44,6 +44,7 @@ $pathToQMFile =  '/'.$config->runtimeOptions->editor->qmFlagXmlFileDir.'/'.
 <?php echo $this->render('index/testdataSidebar.phtml'); ?>
 
 <h2><a name="import"><?php echo $this->translate->_('Zip-Datei mit Import Daten'); ?></a></h2>
+<p><?php echo $this->translate->_('Bitte verwenden Sie nur ASCII-Zeichen in Datei- oder Verzeichnisnamen und keine Sonderzeichen oder Umlaute. Das Zip-Format übermittelt keine Informationen, in welcher Codierung Ihr Betriebssystem Datei- oder Verzeichnisnamen gespeichert hat. Aufgrund dieses Mangels des ZIP-Standards kann translate5 Nicht-ASCII-Zeichen nicht fehlerfrei auslesen. Einzige Ausnahme: Ihr Dateisystem speichert Dateinamen in der UTF-8-Kodierung, wie Linux-Systeme dies tun.'); ?></p>
 
 <h3><?php echo $this->translate->_('proofRead: Verzeichnis mit zu lektorierenden Dateien'); ?></h3>
 <p><?php echo $this->translate->_('Die Zip-Datei muss ein Verzeichnis "proofRead" enthalten, welches mehrere SDLXLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.'); ?></p>
