@@ -65,6 +65,8 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
     
     protected $segmentMqmIds = array();
     
+    protected $mqmEnabled = true;
+    
     /**
      * @param editor_Models_Task $task
      * @param editor_Models_SegmentFieldManager $sfm receive the already inited sfm
@@ -74,6 +76,11 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
         $this->sfm = $sfm;
         $this->segment = ZfExtended_Factory::get('editor_Models_Segment');
         $this->segment->setTaskGuid($task->getTaskGuid());
+        $config = Zend_Registry::get('config');
+        $this->mqmEnabled = $config->runtimeOptions->editor->enableQmSubSegments;
+        if(! $this->mqmEnabled) {
+            return;
+        }
         $this->issues = array_flip($this->task->getQmSubsegmentIssuesFlat());
         $this->mqm = ZfExtended_Factory::get('editor_Models_Qmsubsegments');
     }
@@ -87,7 +94,12 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
         $this->segmentMqmIds = array();
         $allFields = &$parser->getFieldContents();
         foreach($allFields as $field => $data) {
-            $allFields[$field] = $this->restoreMqmTags($data, $field);
+            if($this->mqmEnabled) {
+                $allFields[$field] = $this->restoreMqmTags($data, $field);
+            }
+            else {
+                $allFields[$field] = $this->removeMqmTags($data, $field);
+            }
         }
         return false;
     }
@@ -97,7 +109,7 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
      * @param array $data
      * @param string $data
      */
-    public function restoreMqmTags(array $data, $field){
+    protected function restoreMqmTags(array $data, $field){
         $seg = $data['original'];
         
         //start tags
@@ -155,13 +167,27 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
         $data['original'] = join('', $split);
         return $data;
     }
+    
+    /**
+     * removes the MQM Tags for the given data array (original => "FOO", originalMd5 => "123")
+     * @param array $data
+     * @param string $data
+     */
+    protected function removeMqmTags(array $data, $field){
+        $seg = $data['original'];
+
+        $data['original'] = preg_replace('#<mqm:(startIssue|endIssue)([^>]+)/>#', '', $seg);
+        $data['originalMd5'] = md5($data['original']);
+
+        return $data;
+    }
 
     /**
      * fills the internal mqm object with the parsed data and saves it to db
      * @param array $attributes
      * @return integer the db id of the saved mqm entry
      */
-    public function createAndSaveInternalMqm(array $attributes) {
+    protected function createAndSaveInternalMqm(array $attributes) {
         settype($attributes['type'], 'string');
         settype($attributes['severity'], 'string');
         settype($attributes['note'], 'string');
