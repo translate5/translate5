@@ -41,12 +41,24 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
     protected $segmentFieldManager;
     
     /**
+     * @var array
+     */
+    protected $dbMetaData = null;
+    
+    /**
      * Segment Validator needs a instanced editor_Models_SegmentFieldManager
      * @param editor_Models_SegmentFieldManager $sfm
      */
     public function __construct(editor_Models_SegmentFieldManager $sfm) {
         $this->segmentFieldManager = $sfm;
         parent::__construct();
+    }
+    
+    /**
+     * sets the DbMetaData of the entity for internal reusage
+     */
+    public function setDbMetaData(array $md) {
+      $this->dbMetaData = $md;
     }
     
     /**
@@ -59,7 +71,9 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         foreach($toValidate as $edit => $toSort) {
             //edited = string, ohne längenbegrenzung. Daher kein Validator nötig / möglich 
             $this->addDontValidateField($edit);
-            $this->addValidator($toSort, 'stringLength', array('min' => 0, 'max' => 30)); //es wird kein assoc Array benötigt, aber so ist besser lesbar; stringlenght auf 300 statt 100 um auch Multibyte-Strings prüfen zu können ohne iconv_set_encoding('internal_encoding', 'UTF-8'); setzen zu müssen
+            //FIXME den toSort length anstatt als config als const festlegen, da in der DB ja auch fix definiert.
+            $length = $this->dbMetaData[$toSort]['LENGTH'];
+            $this->addValidator($toSort, 'stringLength', array('min' => 0, 'max' => $length)); //es wird kein assoc Array benötigt, aber so ist besser lesbar; stringlenght auf 300 statt 100 um auch Multibyte-Strings prüfen zu können ohne iconv_set_encoding('internal_encoding', 'UTF-8'); setzen zu müssen
         }
     
         $this->addValidator('userGuid', 'guid');

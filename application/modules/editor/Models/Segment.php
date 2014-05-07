@@ -580,7 +580,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         $this->segmentFieldManager->initFields($taskGuid);
         if(empty($this->validator)) {
+            $db = $this->db;
             $this->validator = ZfExtended_Factory::get($this->validatorInstanceClass, array($this->segmentFieldManager));
+            $this->validator->setDbMetaData($db->info($db::METADATA));
         }
     }
     
