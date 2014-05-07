@@ -80,9 +80,9 @@ abstract class editor_ImageTag {
      */
     protected $basePath;
     /**
-     * @var Zend_Session_Namespace
+     * @var Zend_Config
      */
-    protected $_session;
+    protected $_config;
     /**
      * Tagdefinitionen aus der application.ini
      * @var Zend_Config_Ini
@@ -102,9 +102,9 @@ abstract class editor_ImageTag {
     
     public function __construct() {
         $this->existsGd();
-        $this->_session = new Zend_Session_Namespace();
-        $this->_tagDef = $this->_session->runtimeOptions->imageTag;
-        $parts = explode('/', $this->_session->runtimeOptions->dir->tagImagesBasePath);
+        $this->_config = Zend_Registry::get('config');
+        $this->_tagDef = $this->_config->runtimeOptions->imageTag;
+        $parts = explode('/', $this->_config->runtimeOptions->dir->tagImagesBasePath);
         $path = array(APPLICATION_PATH, '..', 'public');
         $path = array_merge($path, $parts);
         $path = join(DIRECTORY_SEPARATOR, $path);
@@ -163,16 +163,17 @@ abstract class editor_ImageTag {
         $imageWidth = $box['width'] + $this->_tagDef->horizStart + $this->_tagDef->paddingRight;
         $this->image = imagecreate($imageWidth, $this->_tagDef->height);
     }
-    /*
+    
+    /**
      * Gibt Maße der durch den aktuell in $this->text gesetzten Text erzeugten Box zurück
      *
      * @return array array(
-            "left" => integer,
-            "top" => integer,
-            "width" => integer,
-            "height" => integer,
-            "box" => integer
-        )
+     *       "left" => integer,
+     *       "top" => integer,
+     *       "width" => integer,
+     *       "height" => integer,
+     *       "box" => integer
+     *   )
      */
     protected function calculateTextBox() {
         $rect = imagettfbbox(

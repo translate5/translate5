@@ -48,8 +48,8 @@ abstract class editor_ImageTag_QmSubSegment extends editor_ImageTag {
         parent::__construct();
         $this->_tagDef = new Zend_Config(array(), 1);
         //preset the internal config with the default values
-        $this->_tagDef->merge($this->_session->runtimeOptions->imageTag);
+        $this->_tagDef->merge($this->_config->runtimeOptions->imageTag);
         //override the custimized values in the clone
-        $this->_tagDef->merge($this->_session->runtimeOptions->imageTags->qmSubSegment);
+        $this->_tagDef->merge($this->_config->runtimeOptions->imageTags->qmSubSegment);
     }
 }
