@@ -52,22 +52,25 @@
  * @method void setWorkflowStep() setWorkflowStep(string $name)
  */
 class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
-
+    /**
+     * This value is normally extracted from DB, because of the fluent interface we have to define it for segments
+     * @var integer
+     */
+    const TOSORT_LENGTH = 30;
+    
     protected $dbInstanceClass          = 'editor_Models_Db_Segments';
     protected $validatorInstanceClass   = 'editor_Models_Validator_Segment';
+    
     /**
-     *
      * @var type Zend_Config
      */
     protected $config           = null;
-    /**
-     * @var null
-     */
-    protected $lengthToSort = null;
+    
     /**
      * @var editor_Models_SegmentFieldManager
      */
     protected $segmentFieldManager = null;
+    
     /**
      * @var [editor_Models_Db_SegmentDataRow]
      */
@@ -78,8 +81,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     public function __construct()
     {
-        $session = new Zend_Session_Namespace();
-        $this->lengthToSort = $session->runtimeOptions->lengthToTruncateSegmentsToSort;
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         parent::__construct();
     }
@@ -107,7 +108,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         if(!is_string($segment)){
             return $segment;
         }
-        return mb_substr(strip_tags($segment),0,$this->lengthToSort,'utf-8');
+        return mb_substr(strip_tags($segment),0,self::TOSORT_LENGTH,'utf-8');
     }
     
     /**
