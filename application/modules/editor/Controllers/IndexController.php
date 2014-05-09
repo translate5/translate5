@@ -195,7 +195,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $php2js = $this->view->Php2JsVars();
         $php2js->set('app.controllers', $this->getFrontendControllers());
         
-        //FIXME ensure that in ITL at this point the taskGuid is already loaded, for initializing correctly! in this cased throw an error instead
         if(empty($this->session->taskGuid)) {
             $php2js->set('app.initMethod', 'openAdministration');
         }
@@ -285,22 +284,22 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             'ChangeAlike', 'Comments');
         
         if($acl->isInAllowedRoles($userSession->data->roles,'headPanelFrontendController')){
-            $controllers[] = 'HeadPanel'; //Bei ITL wird der nicht benötigt
+            $controllers[] = 'HeadPanel';
         }
         if($acl->isInAllowedRoles($userSession->data->roles,'userPrefFrontendController')){
-            $controllers[] = 'UserPreferences'; //Bei ITL & BEO wird der nicht benötigt
+            $controllers[] = 'UserPreferences';
         }
         
         if($ed->enableQmSubSegments){
             $controllers[] = 'QmSubSegments';
         }
-        //FIXME abhängig von Rolle setzen (on ITL Adaption)
-        $controllers[] = 'admin.TaskOverview'; //Bei ITL wird der nicht benötigt
-        $controllers[] = 'admin.TaskUserAssoc'; //nur PMs
-        if($acl->isInAllowedRoles($userSession->data->roles,'adminUserFrontendController')){
-            $controllers[] = 'admin.User'; //nur PMs
+        if($acl->isInAllowedRoles($userSession->data->roles,'taskOverviewFrontendController')){
+            $controllers[] = 'admin.TaskOverview';
         }
-        //error_log(print_r($controllers,1));
+        if($acl->isInAllowedRoles($userSession->data->roles,'adminUserFrontendController')){
+            $controllers[] = 'admin.TaskUserAssoc';
+            $controllers[] = 'admin.User';
+        }
         return $controllers;
     }
     
