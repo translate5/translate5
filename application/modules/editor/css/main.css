@@ -114,7 +114,7 @@
 #head-panel {height: 150px;position:relative;}/* possible to overwrite bg => whole container */
 #head-panel .head-panel-brand {} /* box for html branding */
 #head-panel .head-panel-info-panel {position:absolute;right:20px;top:20px;}
-#head-panel .head-panel-toolbar {position:absolute;right:20px;bottom:20px;width:400px;}
+#head-panel .head-panel-toolbar {position:absolute;right:20px;bottom:20px;width:440px;}
 
 .head-panel-info-panel span.user-label,
 .head-panel-info-panel span.login-label,

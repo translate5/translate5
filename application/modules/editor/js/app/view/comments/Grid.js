@@ -57,8 +57,7 @@ Ext.define('Editor.view.comments.Grid', {
   },
   commentTpl: null,
   initComponent: function() {
-    var me = this,
-        dateFormat = Ext.grid.DateColumn.prototype.format+' H:i:s';
+    var me = this;
     
     me.commentTpl = new Ext.XTemplate([
        '<div class="comment">',
@@ -79,8 +78,8 @@ Ext.define('Editor.view.comments.Grid', {
                     flex: 1,
                     itemId: 'commentColumn',
                     renderer: function(v, meta, rec) {
-                        var modified = Ext.Date.format(rec.get('modified'), dateFormat),
-                            created = Ext.Date.format(rec.get('created'), dateFormat),
+                        var modified = Ext.Date.format(rec.get('modified'), Editor.DATE_ISO_FORMAT),
+                            created = Ext.Date.format(rec.get('created'), Editor.DATE_ISO_FORMAT),
                             data = {
                                 content: v,
                                 isMod: (created !== modified),

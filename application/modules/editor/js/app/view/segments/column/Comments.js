@@ -71,7 +71,7 @@ Ext.define('Editor.view.segments.column.Comments', {
         if(!val || val.length == 0) {
             return '<img class="add" src="'+Ext.BLANK_IMAGE_URL+'">';
         }
-        value = Ext.String.htmlEncode(val);
+        var value = Ext.String.htmlEncode(val);
         meta.tdAttr = 'data-qtip="'+value+'"';
         return Editor.view.segments.column.Comments.getFirstComment(val) + '<img class="edit" src="'+Ext.BLANK_IMAGE_URL+'">';
     },
