@@ -505,12 +505,22 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * Syncs the Files fileorder to the Segments Table, for faster sorted reading from segment table
      * @param string $taskguid
+     * @param boolean $omitView if true do not update the view
      */
-    public function syncFileOrderFromFiles(string $taskguid) {
+    public function syncFileOrderFromFiles(string $taskguid, $omitView = false) {
         $infokey = Zend_Db_Table_Abstract::NAME;
         $segmentsTableName = $this->db->info($infokey);
         $filesTableName = ZfExtended_Factory::get('editor_Models_Db_Files')->info($infokey);
         $sql = $this->_syncFilesortSql($segmentsTableName, $filesTableName);
+        $this->db->getAdapter()->query($sql, array($taskguid));
+        
+        if($omitView) {
+            return true;
+        }
+        //do the resort also for the view!
+        $this->segmentFieldManager->initFields($taskguid);
+        $segmentsViewName = $this->segmentFieldManager->getView()->getName();
+        $sql = $this->_syncFilesortSql($segmentsViewName, $filesTableName);
         $this->db->getAdapter()->query($sql, array($taskguid));
     }
 

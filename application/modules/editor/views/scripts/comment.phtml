@@ -35,7 +35,7 @@
  */
 
 //$created = $this->comment['created'];
-$modified = new Zend_Date($this->comment['modified']);
+$modified = $this->comment['modified']; //we ignore the locale for comments (see TRANSLATE-109)
 ?>
 <div class="comment">
     <span class="content"><?php echo htmlspecialchars($this->comment['comment']); ?></span>

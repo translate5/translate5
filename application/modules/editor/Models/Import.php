@@ -340,6 +340,7 @@ class editor_Models_Import {
             $this->_imagesInTask = array_merge($this->_imagesInTask,$parser->getTagImageNames());
             $this->removeTaggedFile($params[0]); //$params[0] => abs Path to File
         }
+        $mqmProc->handleErrors();
     }
     /**
      * decide regarding to the fileextension, which FileParser should be loaded and return it
@@ -601,7 +602,8 @@ class editor_Models_Import {
     protected function syncFileOrder() {
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */
-        $segment->syncFileOrderFromFiles($this->_taskGuid);
+        //dont update view here, since it is not existing yet!
+        $segment->syncFileOrderFromFiles($this->_taskGuid, true); 
     }
 
     /**
