@@ -229,6 +229,35 @@ class editor_Models_Import {
     }
     
     /**
+     * Handler of Import Exceptions
+     * We delete the task from database, the import directory remains on the disk,
+     * if runtimeOptions.import.keepFilesOnError is set to true (for developing mainly)
+     * @param Exception $e
+     * @param editor_Models_Import_DataProvider_Abstract $dataProvider
+     */
+    public function handleImportException(Exception $e, editor_Models_Import_DataProvider_Abstract $dataProvider) {
+        $config = Zend_Registry::get('config');
+        //delete task but keep taskfolder if configured, on checkRun never keep files
+        $deleteFiles = $this->isCheckRun || !$config->runtimeOptions->import->keepFilesOnError;
+        
+        $log = ZfExtended_Factory::get('ZfExtended_Log');
+        /* @var $log ZfExtended_Log */
+        $msg = 'More information see in the next exception email!';
+        if(!$deleteFiles) {
+            $msg = "\n".'The imported data is kept in '.$config->runtimeOptions->dir->taskData;
+        }
+        $log->logError('Exception while importing task '.$this->task->getTaskGuid(), $msg);
+        
+        if($deleteFiles) {
+            $this->task->delete();
+            $dataProvider->handleImportException($e);
+        }
+        else {
+            $this->task->deleteButKeepFiles();
+        }
+    }
+    
+    /**
      * Importiert die Relais Dateien eines Tasks, welche noch nicht importiert wurde. 
      * Stößt bei Bedarf auch die Erzeugung per openTMS an
      * 
@@ -260,7 +289,9 @@ class editor_Models_Import {
      * refreshes / creates the database views for this task
      */
     protected function updateSegmentFieldViews() {
-        $this->task->createMaterializedView();
+        if(! $this->isCheckRun) {
+            $this->task->createMaterializedView();
+        }
     }
     
     /**

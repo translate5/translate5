@@ -473,12 +473,12 @@ abstract class editor_Models_Import_FileParser {
     
     /**
      * checks and sets the given MID internally
-     * Because of DB reasons we only accept a 60chars long MID. If the given value was longer we throw an exception.
+     * Because of DB reasons we only accept a 60chars long MID. If the given value was longer we trigger an error.
      * @param string $mid
      */
     protected function setMid($mid) {
         if(mb_strlen($mid) > 60) {
-            throw new Zend_Exception('Given MID was to long (max 60 chars), MID: '.$mid);
+            trigger_error('Given MID was to long (max 60 chars), MID: '.$mid, E_USER_ERROR);
         }
         $this->_mid = $mid;
     }

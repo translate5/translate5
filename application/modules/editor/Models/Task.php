@@ -337,7 +337,38 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         throw new Zend_Exception('TaskData Directory is not writeable:  "'.$taskData->getPathname().'".');
     }
     
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_Models_Entity_Abstract::delete()
+     */
     public function delete() {
+        $this->preDelete();
+        
+        //also delete files on default delete
+        $taskPath = (string)$this->getAbsoluteTaskDataPath();
+        if(is_dir($taskPath)){
+            /* @var $recursivedircleaner ZfExtended_Controller_Helper_Recursivedircleaner */
+            $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
+                'Recursivedircleaner'
+            );
+            $recursivedircleaner->delete($taskPath);
+        }
+        
+        parent::delete();
+    }
+
+    /**
+     * delete the whole task, but keep the imported files (for debugging purposes)
+     */
+    public function deleteButKeepFiles() {
+        $this->preDelete();
+        parent::delete();
+    }
+    
+    /**
+     * internal function with stuff to be excecuted before deleting a task
+     */
+    protected function preDelete() {
         //@todo ask marc if logging tables should also be deleted (no constraint is set)
         $taskGuid = $this->getTaskGuid();
         if(empty($taskGuid)) {
@@ -372,16 +403,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         
         $filesTable = ZfExtended_Factory::get('editor_Models_Db_Files');
         $filesTable->delete(array('taskGuid = ?' => $taskGuid));
-        
-        /* @var $recursivedircleaner ZfExtended_Controller_Helper_Recursivedircleaner */
-        $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-            'Recursivedircleaner'
-        );
-        $taskPath = (string)$this->getAbsoluteTaskDataPath();
-        if(is_dir($taskPath)){
-            $recursivedircleaner->delete($taskPath);
-        }
-        parent::delete();
     }
     
     /**
