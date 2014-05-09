@@ -213,7 +213,7 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
      * (non-PHPdoc)
      * @see editor_Models_Import_SegmentProcessor::postProcessHandler()
      */
-    public function postProcessHandler($parser, $segmentId) {
+    public function postProcessHandler(editor_Models_Import_FileParser $parser, $segmentId) {
         if(!empty($this->segmentMqmIds)) {
             $this->mqm->updateSegmentId($segmentId, $this->segmentMqmIds);
         }
