@@ -191,6 +191,9 @@ Ext.application({
    */
   openAdministration: function() {
       var me = this;
+      if(!Editor.admin || ! Editor.admin.TaskOverview) {
+          return;
+      }
       if(me.viewport){
           me.viewport.destroy();
           me.fireEvent('editorViewportClosed');
