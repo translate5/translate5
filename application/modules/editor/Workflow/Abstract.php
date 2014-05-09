@@ -240,12 +240,19 @@ abstract class editor_Workflow_Abstract {
      */
     protected function loadAuthenticatedUser(){
         $userSession = new Zend_Session_Namespace('user');
+        if(isset($userSession->data) && isset($userSession->data->userGuid)) {
+            $userGuid = $userSession->data->userGuid;
+        }
+        else {
+            $userGuid = false;
+        }
         $config = Zend_Registry::get('config');
+        $isCron = $config->runtimeOptions->cronIP === $_SERVER['REMOTE_ADDR'];
         $this->authenticatedUserModel = ZfExtended_Factory::get('ZfExtended_Models_User');
-        if(!isset($userSession->data->userGuid)&& 
-                $config->runtimeOptions->cronIP === $_SERVER['REMOTE_ADDR']){
+        
+        if($userGuid === false && $isCron){
+            //set session user data with system user
             $this->authenticatedUserModel->setUserSessionNamespaceWithoutPwCheck('system');
-            
         }
         $this->authenticatedUserModel->loadByGuid($userSession->data->userGuid);
         $this->authenticatedUser = $userSession->data;
