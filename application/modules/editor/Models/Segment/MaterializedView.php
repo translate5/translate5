@@ -97,6 +97,7 @@ class editor_Models_Segment_MaterializedView {
             $this->fillWithData();
             return;
         }
+        //the following check call is to avoid using a not completly filled MV in a second request accessing this task
         $this->checkMvFillState();
         //error_log("Fill Duration: ".(microtime(true) - $start));
     }
@@ -124,7 +125,8 @@ class editor_Models_Segment_MaterializedView {
         }
         catch(Zend_Db_Statement_Exception $e) {
             $m = $e->getMessage();
-            if(strpos($m,'SQLSTATE') !== 0 || strpos($m,'Base table or view already exists: 1050 Table \''.$this->viewName.'\' already exists') === false) {
+            //the second string check must be case insensitive for windows usage
+            if(strpos($m,'SQLSTATE') !== 0 || stripos($m,'Base table or view already exists: 1050 Table \''.$this->viewName.'\' already exists') === false) {
                 throw $e;
             }
             return false;
