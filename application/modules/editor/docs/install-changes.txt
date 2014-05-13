@@ -11,6 +11,7 @@
             - apply 031-editor-mysql-TRANSLATE-118-alternates.sql
             - apply 032-editor-mysql-TRANSLATE-118-migration.sql
             - apply 033-editor-mysql-TRANSLATE-118-fixes.sql
+            - apply 031-editor-mysql-TRANSLATE-148.sql
 
 2013-12-05: Changes in User Task Association
             - apply 030-editor-mysql-taskUserAssoc-used.sql
