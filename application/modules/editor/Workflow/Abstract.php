@@ -250,7 +250,10 @@ abstract class editor_Workflow_Abstract {
         $isCron = $config->runtimeOptions->cronIP === $_SERVER['REMOTE_ADDR'];
         $this->authenticatedUserModel = ZfExtended_Factory::get('ZfExtended_Models_User');
         
-        if($userGuid === false && $isCron){
+        if($userGuid === false){
+            if(!$isCron) {
+                throw new ZfExtended_NotAuthenticatedException("Cannot authenticate the system user!");
+            }
             //set session user data with system user
             $this->authenticatedUserModel->setUserSessionNamespaceWithoutPwCheck('system');
         }
