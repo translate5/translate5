@@ -191,7 +191,7 @@ Ext.application({
    */
   openAdministration: function() {
       var me = this;
-      if(!Editor.admin || ! Editor.admin.TaskOverview) {
+      if(!Editor.controller.admin || ! Editor.controller.admin.TaskOverview) {
           return;
       }
       if(me.viewport){
