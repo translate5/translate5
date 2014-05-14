@@ -143,4 +143,22 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
             $data->save();
         }
     }
+    
+    /**
+     * gets the time tracking information as stdClass and sets the values into the separated data objects per field
+     * @param stdClass $durations
+     * @param integer $divisor optional, default = 1; if greater than 1 divide the duration through this value (for changeAlikes)
+     */
+    public function setTimeTrackData(stdClass $durations, $divisor = 1) {
+        $sfm = $this->segmentFieldManager;
+        foreach($this->historydata as $field => $data) {
+            $field = $sfm->getEditIndex($field);
+            if($field !== false && isset($durations->$field)) {
+                $data->duration = $durations->$field;
+                if($divisor > 1) {
+                    $data->duration = (int) round($data->duration / $divisor);
+                }
+            }
+        }
+    }
 }

@@ -83,6 +83,9 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         $session = new Zend_Session_Namespace();
         $editedSegmentId = (int)$this->_getParam('id');
         $fieldToProcess = (string)$this->_getParam('process');
+        $editField = $fieldToProcess.'Edit';
+        $duration = new stdClass();
+        $duration->$editField = (int)$this->_getParam('duration');
 
         $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($session->taskGuid);
         $fieldMeta = $sfm->getByName($fieldToProcess);
@@ -92,7 +95,6 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
             return;
         }
         
-        $editField = $fieldToProcess.'Edit';
         $getter = 'get'.$editField;
         $setter = 'set'.$editField;
         
@@ -113,6 +115,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         $states = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
         /* @var $states editor_Models_SegmentAutoStates */
         
+        $alikeCount = count($ids);
         foreach($ids as $id) {
             $id = (int) $id;
             try {
@@ -130,6 +133,8 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 }
 
                 $history = $entity->getNewHistoryEntity();
+                $history->setTimeTrackData($duration, $alikeCount);
+                
                 //Entity auf Editierbarkeit überprüfen
                 if($entity->getTaskGuid() != $session->taskGuid || ! $entity->isEditable() || $editedSegmentId === $id) {
                     continue;

@@ -221,7 +221,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         return $history;
     }
-
+    
     public function setQmId($qmId) {
         return parent::setQmId(trim($qmId, ';'));
     }

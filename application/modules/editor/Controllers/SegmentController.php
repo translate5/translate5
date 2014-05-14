@@ -82,6 +82,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $history = $this->entity->getNewHistoryEntity();
 
         $this->decodePutData();
+        //set the editing durations for time tracking into the history object
+        $history->setTimeTrackData($this->data->durations);
         $this->convertQmId();
 
         $allowedToChange = array('qmId', 'stateId', 'autoStateId');
