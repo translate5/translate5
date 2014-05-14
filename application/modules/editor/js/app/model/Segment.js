@@ -119,6 +119,7 @@ Editor.model._Segment([
     {name: 'workflowStep', type: 'string'},
     {name: 'matchRate', type: 'int'},
     //{name: 'terms', type: 'string'},
+    {name: 'durations', defaultValue: {}}, //we are using an object here
     {name: 'comments', type: 'string', persist: false},
     {name: 'qmId', type: 'string'},
     {name: 'stateId', type: 'int'}

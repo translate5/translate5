@@ -55,6 +55,7 @@ Ext.define('Editor.view.segments.RowEditor', {
     columnToEdit: null,
     fieldToEdit: null,
     previousRecord: null,
+    timeTrackingData: null,
     messages: {
         segmentNotSavedUserMessage: 'Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank!',
         cantSaveEmptySegment: '#UT#Das Segment kann nicht ohne Inhalt gespeichert werden!'
@@ -301,6 +302,10 @@ Ext.define('Editor.view.segments.RowEditor', {
         }
         //no swap if last edited column was the same
         hasToSwap = me.columnToEdit !== toEdit;
+        if(hasToSwap && me.columnToEdit){
+            me.stopTimeTrack(me.columnToEdit);
+        }
+        me.startTimeTrack(me.toEdit);
         
         me.items.each(function(field){
             if(!me.columns.containsKey(field.id)) {
@@ -401,11 +406,18 @@ Ext.define('Editor.view.segments.RowEditor', {
      * @returns {Boolean}
      */
     completeEdit: function() {
-        var me = this;
+        var me = this,
+            rec = me.context.record;
 
-        if(!me.saveMainEditorContent(me.context.record)) {
+        if(!me.saveMainEditorContent(rec)) {
             return false;
         }
+        
+        me.stopTimeTrack(me.columnToEdit);
+        //we have to provide the durations to the change alike handler, 
+        //since the record is available there, we put them into a tmp field,
+        //the setted durations field is overwritten / cleared by successfull PUT
+        rec.set('durations', me.getTimeTrackingData());
 
         me.hide();
         me.previousRecord = me.editingPlugin.openedRecord;
@@ -418,7 +430,7 @@ Ext.define('Editor.view.segments.RowEditor', {
      * @returns {Boolean}
      */
     saveMainEditorContent: function(record) {
-        var me = this, 
+        var me = this,
             //der replace aufruf entfernt vom Editor automatisch hinzugefügte unsichtbare Zeichen, 
             //und verhindert so, dass der Record nicht als modified markiert wird, wenn am Inhalt eigentlich nichts verändert wurde
             newValue = Ext.String.trim(me.mainEditor.getValueAndUnMarkup()).replace(/\u200B/g, '');
@@ -438,7 +450,7 @@ Ext.define('Editor.view.segments.RowEditor', {
         }
         
         if(me.mainEditor.hasAndDisplayErrors()) {
-        	return false;
+            return false;
         }
         me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
         record.beginEdit();
@@ -453,6 +465,7 @@ Ext.define('Editor.view.segments.RowEditor', {
     cancelEdit: function() {
       var me = this;
       me.context.record.reject();
+      me.getTimeTrackingData();
       me.editingPlugin.openedRecord = null;
       me.callParent(arguments);
     },
@@ -462,5 +475,44 @@ Ext.define('Editor.view.segments.RowEditor', {
      */
     setLastSegmentShortInfo: function (segmentText) {
       this.lastSegmentShortInfo = Ext.String.ellipsis(Ext.util.Format.stripTags(segmentText), 60, true);
+    },
+    /**
+     * starts tracking the editing time for the given field
+     * @param {String} field
+     */
+    startTimeTrack: function(field) {
+        if(!this.timeTrackingData) {
+            this.timeTrackingData = {};
+        }
+        this.timeTrackingData._start = new Date();
+    },
+    /**
+     * stops and saves the elapsed milliseconds since last startTimeTrack call for the given field
+     * @param {String} field
+     */
+    stopTimeTrack: function(field) {
+        var end = new Date(), 
+            data = this.timeTrackingData,
+            value = data[field],
+            duration;
+        if(!data._start) {
+            return;
+        }
+        duration = end - data._start;
+        delete(data._start);
+        if(value) {
+            duration += value;
+        }
+        data[field] = duration;
+    },
+    /**
+     * resets the tracking information and returns them as a object
+     * @return {Object}
+     */
+    getTimeTrackingData: function() {
+        var result = this.timeTrackingData;
+        delete(result._start);
+        this.timeTrackingData = {};
+        return result;
     }
 });

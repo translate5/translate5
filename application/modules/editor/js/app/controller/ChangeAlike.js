@@ -87,6 +87,7 @@ Ext.define('Editor.controller.ChangeAlike', {
   alikeSegmentsUrl: '',
   actualRecord: null,
   isSourceEditing: null,
+  timeTracking: null,
   isDisabled: false,
   callbackToSaveChain: Ext.emptyFn,
   refs : [{
@@ -241,6 +242,7 @@ Ext.define('Editor.controller.ChangeAlike', {
           return;
       }
       //manualProcessing:
+      me.timeTracking = new Date(); // starting the time tracking
       me.window.show(rec, me.isSourceEditing);
   },
   /**
@@ -283,6 +285,7 @@ Ext.define('Editor.controller.ChangeAlike', {
         data.targetEdit = rec.data.targetEdit;
     }
     me.alikesToProcess = me.getAlikesToProcess();
+    me.calculateUsedTime();
     
     //Next Step in save chain Callback
     me.fireEvent('segmentUsageFinished', me);
@@ -300,6 +303,20 @@ Ext.define('Editor.controller.ChangeAlike', {
     if(!me.saveIsRunning) {
         me.savePendingAlikes();
     }
+  },
+  /**
+   * calculates the elapsed time the user needs to process the change alikes 
+   */
+  calculateUsedTime: function() {
+      var me = this;
+      //if it was a date, this was the opening time of the change alike editor
+      if(me.timeTracking instanceof Date) {
+          me.timeTracking = (new Date()) - me.timeTracking;
+      }
+      else {
+          //otherwise it is automatic handling, so that we assume 0 as time.
+          me.timeTracking = 0;
+      }
   },
   /**
    * Handler is called after saving a segment successfully to the server in save chain (called by Ajax callback)
@@ -324,8 +341,7 @@ Ext.define('Editor.controller.ChangeAlike', {
    */
   savePendingAlikes: function() {
     var me = this,
-        id = me.actualRecord.getId();
-        type = null,
+        id = me.actualRecord.getId(),
         alikes = me.alikesToProcess;
     if(!alikes || alikes.length == 0) {
         me.callbackToSaveChain();
@@ -337,6 +353,7 @@ Ext.define('Editor.controller.ChangeAlike', {
       method: 'put',
       params: {
           process: me.isSourceEditing ? 'source' : 'target',
+          "duration": me.timeTracking,
           "alikes[]": alikes
       },
       success: me.alikesSaveSuccessHandler,
