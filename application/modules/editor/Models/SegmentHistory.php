@@ -145,19 +145,16 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
     }
     
     /**
-     * gets the time tracking information as stdClass and sets the values into the separated data objects per field
-     * @param stdClass $durations
-     * @param integer $divisor optional, default = 1; if greater than 1 divide the duration through this value (for changeAlikes)
+     * since the duration field is stored in the HistoryData Object but is not 
+     * used transparently like the other alternate fields, we have to store it separtly
+     * (duration is not needed in daily business in the segment grid, so does not exist in the MV!)
+     * @param array $durations keys → fieldnames; values → durations
      */
-    public function setTimeTrackData(stdClass $durations, $divisor = 1) {
+    public function setTimeTrackData(array $durations) {
         $sfm = $this->segmentFieldManager;
-        foreach($this->historydata as $field => $data) {
-            $field = $sfm->getEditIndex($field);
-            if($field !== false && isset($durations->$field)) {
-                $data->duration = $durations->$field;
-                if($divisor > 1) {
-                    $data->duration = (int) round($data->duration / $divisor);
-                }
+        foreach($durations as $field => $duration) {
+            if(isset($this->historydata[$field])) {
+                $this->historydata[$field]->duration = $duration;
             }
         }
     }

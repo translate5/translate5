@@ -219,7 +219,31 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         foreach ($fields as $field) {
             $history->__call('set' . ucfirst($field), array($this->get($field)));
         }
+        
+        $durations = array();
+        foreach ($this->segmentdata as $data) {
+            $durations[$data->name] = $data->duration;
+        }
+        $history->setTimeTrackData($durations);
         return $history;
+    }
+    
+    /**
+     * gets the time tracking information as stdClass and sets the values into the separated data objects per field
+     * @param stdClass $durations
+     * @param integer $divisor optional, default = 1; if greater than 1 divide the duration through this value (for changeAlikes)
+     */
+    public function setTimeTrackData(stdClass $durations, $divisor = 1) {
+        $sfm = $this->segmentFieldManager;
+        foreach($this->segmentdata as $field => $data) {
+            $field = $sfm->getEditIndex($field);
+            if($field !== false && isset($durations->$field)) {
+                $data->duration = $durations->$field;
+                if($divisor > 1) {
+                    $data->duration = (int) round($data->duration / $divisor);
+                }
+            }
+        }
     }
     
     public function setQmId($qmId) {
