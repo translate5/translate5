@@ -133,7 +133,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 }
 
                 $history = $entity->getNewHistoryEntity();
-                $history->setTimeTrackData($duration, $alikeCount);
+                $entity->setTimeTrackData($duration, $alikeCount);
                 
                 //Entity auf Editierbarkeit überprüfen
                 if($entity->getTaskGuid() != $session->taskGuid || ! $entity->isEditable() || $editedSegmentId === $id) {

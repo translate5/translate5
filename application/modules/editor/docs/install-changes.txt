@@ -1,6 +1,25 @@
 ### this file holds all changes and necessary configs needed for updates
 ### newest changes on top
-2014-05-15: apply 035-editor-mysql-TRANSLATE-158.sql
+2014-05-15: TRANSLATE-158 time tracking for each segment edit
+            - apply 035-editor-mysql-TRANSLATE-158.sql
+            - The integer value stored in the duration field is the used time in milliseconds
+            - with the following select an easy access to the duration values is provided
+              if fields, which are only provided in LEK_segments (since not change in history, 
+              like MID or segmentNrInTask) should also appear in the result, 
+              then we can either join LEK_segments to the whole view, 
+              or we can add a join to LEK_segments in the second select of the union statement,
+              and add the desired fields in both selects of the union
+
+              With the following select you can get all durations of one task (taskGuid = XXXXXXXXXX),
+              for performance issues each select of the union must have a taskGuid filter, 
+              that means no view can be used!
+                (select s.id segmentId, s.taskGuid, s.userGuid, s.userName, s.timestamp, s.editable, s.pretrans, s.qmId, s.stateId, s.autoStateId, s.workflowStepNr, s.workflowStep, sd.name, sd.duration
+                  from LEK_segments s
+                  join LEK_segment_data sd on s.id = sd.segmentId where s.taskGuid = 'XXXXXXXXXX')
+                union all
+                  (select h.segmentId segmentId, h.taskGuid, h.userGuid, h.userName, h.timestamp, h.editable, h.pretrans, h.qmId, h.stateId, h.autoStateId, h.workflowStepNr, h.workflowStep, hd.name, hd.duration
+                  from LEK_segment_history h
+                  join LEK_segment_history_data hd on hd.segmentHistoryId = h.id where h.taskGuid = 'XXXXXXXXXX');
 
 2014-04-28: apply 034-editor-mysql-TRANSLATE-167.sql
 
