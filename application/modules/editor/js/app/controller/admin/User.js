@@ -46,6 +46,9 @@ Ext.define('Editor.controller.admin.User', {
       ref: 'headToolBar',
       selector: 'headPanel toolbar#top-menu'
   },{
+      ref: 'logoutButton',
+      selector: 'headPanel toolbar#top-menu #logoutSingle'
+  },{
       ref: 'centerRegion',
       selector: 'viewport container[region="center"]'
   },{
@@ -116,7 +119,13 @@ Ext.define('Editor.controller.admin.User', {
    * injects the user menu into the main menu
    */
   initMainMenu: function() {
-      this.getHeadToolBar().insert(1, {
+      var toolbar = this.getHeadToolBar(),
+          insertIdx = 1,
+          logout = this.getLogoutButton();
+      if(logout) {
+          insertIdx = toolbar.items.indexOf(logout) + 1;
+      }
+      toolbar.insert(insertIdx, {
           itemId: 'user-admin-btn',
           xtype: 'button',
           text: this.strings.openUserAdminBtn
