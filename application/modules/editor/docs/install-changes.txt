@@ -1,5 +1,6 @@
 ### this file holds all changes and necessary configs needed for updates
 ### newest changes on top
+2014-05-15: apply 035-editor-mysql-TRANSLATE-158.sql
 
 2014-04-28: apply 034-editor-mysql-TRANSLATE-167.sql
 
