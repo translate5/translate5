@@ -173,6 +173,7 @@ class editor_Models_Import {
      * @param string $importFolderPath
      */
     public function import(editor_Models_Import_DataProvider_Abstract $dataProvider) {
+        $config = Zend_Registry::get('config');
         if(is_null($this->_taskGuid)){
             throw new Zend_Exception('taskGuid not set - please set using $this->setTask');
         }
@@ -189,6 +190,8 @@ class editor_Models_Import {
             //reset given relais language value if no relais data is provided / feature is off
             $this->task->setRelaisLang(0); 
         }
+        
+        $this->task->setWorkflow(editor_Workflow_Abstract::getId($config->import->taskWorkflow));
         $this->task->setReferenceFiles($this->hasReferenceFiles());
         $this->task->save(); //Task erst Speichern wenn die obigen validates und checks durch sind.
         
