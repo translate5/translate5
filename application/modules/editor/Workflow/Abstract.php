@@ -67,6 +67,8 @@ abstract class editor_Workflow_Abstract {
     const STEP_TRANSLATORCHECK = 'translatorCheck';
     const STEP_PM_CHECK = 'pmCheck';
     
+    //const WORKFLOW_ID = ''; this is the internal used name for this workflow, it has to be defined in each subclass!
+    
     /**
      * Container for the old Task Model provided by doWithTask
      * (task as loaded from DB)
@@ -185,6 +187,19 @@ abstract class editor_Workflow_Abstract {
 
     public function __construct() {
         $this->loadAuthenticatedUser();
+    }
+    
+    /**
+     * returns the workflow ID used in translate5
+     * if parameter $className is given return the ID of the given classname,
+     * if no $className is given, the current class is used
+     * @param string $className optional
+     */
+    public static function getId($className = null) {
+        if(empty($className)) {
+            return static::WORKFLOW_ID;
+        }
+        return call_user_func(array($className, __METHOD__));
     }
     
     /**
