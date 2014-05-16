@@ -51,7 +51,7 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
       actionEnd: '#UT# Aufgabe komplett Beenden',
       actionReOpen: '#UT# beendete Aufgabe wieder öffnen',
       actionDelete: '#UT#Aufgabe komplett löschen',
-      assocUser: '#UT# Benutzer der Aufgabe zuweisen',
+      taskPrefs: '#UT# Aufgabenspezifische Einstellungen',
       exp: '#UT# Aufgabe exportieren'
   },
   
@@ -98,7 +98,11 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
               isAllowedFor: 'editorReopenTask',
               iconCls: 'ico-task-reopen'
           },{
-              // - wieder öffnen (Recht editorReOpenTask benötigt, setzt den Task auf Status ""open"")
+              tooltip: me.messages.taskPrefs,
+              isAllowedFor: 'editorChangeTaskPrefs',
+              iconCls: 'ico-task-task-pref'
+          },{
+              //FIXME remove me!
               tooltip: me.messages.assocUser,
               isAllowedFor: 'editorChangeUserAssocTask',
               iconCls: 'ico-task-change-user-assoc'

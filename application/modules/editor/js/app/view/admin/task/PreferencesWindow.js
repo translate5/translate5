@@ -32,14 +32,12 @@
  
  END LICENSE AND COPYRIGHT 
  */
-Ext.define('Editor.view.admin.TaskUserAssocWindow', {
+Ext.define('Editor.view.admin.task.PreferencesWindow', {
     extend : 'Ext.window.Window',
-    alias : 'widget.adminTaskUserAssocWindow',
-    requires: 'Editor.view.admin.TaskUserAssocGrid',
-    itemId : 'adminTaskUserAssocWindow',
-    title : '#UT#Benutzer zuordnen zu Aufgabe "{0}"',
-    text_save: '#UT#Änderungen speichern',
-    text_cancel: '#UT#Abbrechen',
+    alias : 'widget.adminTaskPreferencesWindow',
+    requires: 'Editor.view.admin.task.UserAssocGrid',
+    itemId : 'adminTaskPreferencesWindow',
+    title : '#UT#Einstellungen zu Aufgabe "{0}"',
     height : 400,
     width : 560,
     loadingMask: null,
@@ -50,27 +48,11 @@ Ext.define('Editor.view.admin.TaskUserAssocWindow', {
         me.title = Ext.String.format(me.title, me.actualTask.get('taskName'));
         Ext.applyIf(me, {
             items : [{
-                xtype: 'adminTaskUserAssocGrid'
-            }],
-            dockedItems : [{
-                xtype : 'toolbar',
-                dock : 'bottom',
-                ui: 'footer',
-                layout: {
-                    type: 'hbox',
-                    pack: 'end'
-                },
-                items : [{
-                    xtype : 'button',
-                    iconCls : 'ico-save',
-                    itemId : 'save-assoc-btn',
-                    text : me.text_save
-                }, {
-                    xtype : 'button',
-                    iconCls : 'ico-cancel',
-                    itemId : 'cancel-assoc-btn',
-                    text : me.text_cancel
-                }]
+                xtype: 'tabpanel',
+                activeTab: 0,
+                items: {
+                    xtype: 'adminTaskUserAssocGrid'
+                }
             }]
         });
 

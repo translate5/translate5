@@ -44,8 +44,11 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
       addUser: '#UT#Benutzer hinzufügen',
       addUserTip: '#UT#Einen Benutzer dieser Aufgabe zuordnen.',
       removeUser: '#UT#Benutzer entfernen',
-      removeUserTip: '#UT#Den gewählten Benutzer aus dieser Aufgabe entfernen.'
+      removeUserTip: '#UT#Den gewählten Benutzer aus dieser Aufgabe entfernen.',
+      save: '#UT#Änderungen speichern',
+      cancel: '#UT#Abbrechen',
   },
+  title : '#UT#Benutzer zu Aufgabe zuordnen',
   store: 'admin.TaskUserAssocs',
   //features: [{
     //ftype: 'editorGridFilter'
@@ -123,6 +126,24 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
               text: me.strings.removeUser,
               tooltip: me.strings.removeUserTip
           }]
+        },{
+            xtype : 'toolbar',
+            dock : 'bottom',
+            layout: {
+                type: 'hbox',
+                pack: 'end'
+            },
+            items : [{
+                xtype : 'button',
+                iconCls : 'ico-save',
+                itemId : 'save-assoc-btn',
+                text : me.strings.save
+            }, {
+                xtype : 'button',
+                iconCls : 'ico-cancel',
+                itemId : 'cancel-assoc-btn',
+                text : me.strings.cancel
+            }]
         }]
     });
 
