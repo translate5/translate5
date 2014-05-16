@@ -32,7 +32,7 @@
  
  END LICENSE AND COPYRIGHT 
  */
-Ext.define('Editor.view.admin.TaskUserAssocGrid', {
+Ext.define('Editor.view.admin.task.UserAssocGrid', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.adminTaskUserAssocGrid',
   cls: 'task-user-assoc-grid',
