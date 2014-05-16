@@ -39,9 +39,9 @@
  */
 Ext.define('Editor.controller.admin.TaskUserAssoc', {
   extend : 'Ext.app.Controller',
-  models: ['admin.TaskUserAssoc','admin.Task'],
+  models: ['admin.TaskUserAssoc','admin.Task','admin.task.UserPref'],
   stores: ['admin.Users', 'admin.TaskUserAssocs'],
-  views: ['admin.TaskUserAssocWindow', 'Editor.view.admin.UserChooseWindow'],
+  views: ['admin.task.PreferencesWindow','admin.task.UserAssocGrid','Editor.view.admin.UserChooseWindow'],
   refs : [{
       ref: 'assocDelBtn',
       selector: '#adminTaskUserAssocGrid #remove-user-btn'
@@ -49,8 +49,8 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       ref: 'userAssocGrid',
       selector: '#adminTaskUserAssocGrid'
   },{
-      ref: 'taskUserAssocWindow',
-      selector: '#adminTaskUserAssocWindow'
+      ref: 'taskPreferencesWindow',
+      selector: '#adminTaskPreferencesWindow'
   }],
   messages: {
       assocSave: '#UT#Änderungen gespeichert!',
@@ -88,10 +88,10 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           '#adminUserChooseWindow #cancel-btn': {
               click: me.handleCancel
           },
-          '#adminTaskUserAssocWindow #save-assoc-btn': {
+          '#adminTaskUserAssocGrid #save-assoc-btn': {
               click: me.handleSaveAssoc
           },
-          '#adminTaskUserAssocWindow #cancel-assoc-btn': {
+          '#adminTaskUserAssocGrid #cancel-assoc-btn': {
               click: me.handleCancel
           }
       });
@@ -110,7 +110,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
   showUserChooser: function() {
       Ext.widget('adminUserChooseWindow',{
           excludeLogins: this.getAdminTaskUserAssocsStore().collect('login'),
-          task: this.getTaskUserAssocWindow().actualTask
+          task: this.getTaskPreferencesWindow().actualTask
       }).show();
   },
   /**
@@ -130,7 +130,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
               filter: '[{"type":"string","value":"'+task.get('taskGuid')+'","field":"taskGuid"}]'
           }
       });
-      Ext.widget('adminTaskUserAssocWindow',{
+      Ext.widget('adminTaskPreferencesWindow',{
           actualTask: task
       }).show();
   },
@@ -157,7 +157,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
               surName: rec.get('surName'),
               firstName: rec.get('firstName'),
               login: rec.get('login'),
-              taskGuid: me.getTaskUserAssocWindow().actualTask.get('taskGuid'),
+              taskGuid: me.getTaskPreferencesWindow().actualTask.get('taskGuid'),
               role: role,
               state: state
           });
