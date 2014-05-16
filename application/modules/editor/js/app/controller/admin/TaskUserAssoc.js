@@ -57,11 +57,12 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       assocSaveError: '#UT#Fehler beim Speichern der Änderungen!'
   },
   init : function() {
-      var me = this,
-          toc = me.application.getController('admin.TaskOverview');
-      //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
-      toc.on('handleTaskChangeUserAssoc', me.handleShow, me);
-      toc.on('taskCreated', me.handleShow, me);
+      var me = this;
+
+      if(!Editor.controller.admin.TaskPreferences) {
+          //controller.TaskPreferences is somekind of parent controller of controller.TaskUserAssoc so it must be loaded!
+          Ext.Error.raise('TaskPreferences controller must be loaded!');
+      }
       
       //FIXME nextRelease Thomas Fehlerfälle werden aktuell nicht abgefangen und angezeigt!
       //Den Speichervorgang umbauen, so dass entweder jeder record direct gespeichert und damit success / failure handlebar wird
@@ -111,27 +112,6 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       Ext.widget('adminUserChooseWindow',{
           excludeLogins: this.getAdminTaskUserAssocsStore().collect('login'),
           task: this.getTaskPreferencesWindow().actualTask
-      }).show();
-  },
-  /**
-   * Opens the User Assoc List to the choosen Task
-   * @param {Editor.model.admin.Task} task => after POST this model may not be complete (userStates etc)
-   */
-  handleShow: function(task) {
-      var me = this,
-          store = me.getAdminTaskUserAssocsStore();
-      if(!me.isAllowed('editorChangeUserAssocTask')){
-          return;
-      }
-      store.loadData([],false);
-      store.load({
-          //wenn der Store einen echten Filter bekommt muss der Wert hier miteingebaut werden!
-          params: {
-              filter: '[{"type":"string","value":"'+task.get('taskGuid')+'","field":"taskGuid"}]'
-          }
-      });
-      Ext.widget('adminTaskPreferencesWindow',{
-          actualTask: task
       }).show();
   },
   /**

@@ -32,40 +32,46 @@
  
  END LICENSE AND COPYRIGHT 
  */
-Ext.define('Editor.view.admin.task.PreferencesWindow', {
-    extend : 'Ext.window.Window',
-    alias : 'widget.adminTaskPreferencesWindow',
-    requires: ['Editor.view.admin.task.UserAssocGrid','Editor.view.admin.task.Preferences'],
-    itemId : 'adminTaskPreferencesWindow',
-    title : '#UT#Einstellungen zu Aufgabe "{0}"',
-    height : 500,
-    width : 700,
-    loadingMask: null,
-    layout: 'fit',
-    modal : true,
-    initComponent : function() {
-        var me = this,
-            auth = Editor.app.authenticatedUser,
-            tabs = [];
-        if(auth.isAllowed('editorChangeUserAssocTask')) {
-            tabs.push({
-                xtype: 'adminTaskUserAssocGrid'
-            });
+/**
+ * @class Editor.model.admin.workflow.UserPref
+ * @extends Ext.data.Model
+ */
+Ext.define('Editor.model.admin.task.UserPref', {
+  extend: 'Ext.data.Model',
+  fields: [
+    {name: 'id', type: 'int'},
+    {name: 'taskGuid', type: 'string'},
+    {name: 'workflow', type: 'string'},
+    {name: 'workflowStep', type: 'string'},
+    {name: 'userGuid', type: 'string'},
+    {name: 'fields', type: 'string'},
+    {
+        name: 'userName', 
+        type: 'string', 
+        persist: false, 
+        convert: function() {
+            console.log(arguments);
+            return "FOO";
         }
-        if(auth.isAllowed('editorUserPrefsTask')) {
-            tabs.push({
-                xtype: 'editorAdminTaskPreferences'
-            });
-        }
-        me.title = Ext.String.format(me.title, me.actualTask.get('taskName'));
-        Ext.applyIf(me, {
-            items : [{
-                xtype: 'tabpanel',
-                activeTab: 0,
-                items: tabs
-            }]
-        });
-
-        me.callParent(arguments);
     }
+  ],
+  validations: [
+      {type: 'presence', field: 'taskGuid'},
+      {type: 'presence', field: 'workflow'}//,
+      //FIXME can we do this out of segmentfields dynamically? {type: 'inclusion', field: 'fields', list: Ext.Object.getKeys(Editor.data.app.utRoles)}
+  ],
+  idProperty: 'id',
+  proxy : {
+    type : 'rest',
+    url: Editor.data.restpath+'workflowuserpref',
+    reader : {
+      root: 'rows',
+      type : 'json'
+    },
+    writer: {
+      encode: true,
+      root: 'data',
+      writeAllFields: false
+    }
+  }
 });

@@ -32,40 +32,15 @@
  
  END LICENSE AND COPYRIGHT 
  */
-Ext.define('Editor.view.admin.task.PreferencesWindow', {
-    extend : 'Ext.window.Window',
-    alias : 'widget.adminTaskPreferencesWindow',
-    requires: ['Editor.view.admin.task.UserAssocGrid','Editor.view.admin.task.Preferences'],
-    itemId : 'adminTaskPreferencesWindow',
-    title : '#UT#Einstellungen zu Aufgabe "{0}"',
-    height : 500,
-    width : 700,
-    loadingMask: null,
-    layout: 'fit',
-    modal : true,
-    initComponent : function() {
-        var me = this,
-            auth = Editor.app.authenticatedUser,
-            tabs = [];
-        if(auth.isAllowed('editorChangeUserAssocTask')) {
-            tabs.push({
-                xtype: 'adminTaskUserAssocGrid'
-            });
-        }
-        if(auth.isAllowed('editorUserPrefsTask')) {
-            tabs.push({
-                xtype: 'editorAdminTaskPreferences'
-            });
-        }
-        me.title = Ext.String.format(me.title, me.actualTask.get('taskName'));
-        Ext.applyIf(me, {
-            items : [{
-                xtype: 'tabpanel',
-                activeTab: 0,
-                items: tabs
-            }]
-        });
-
-        me.callParent(arguments);
-    }
+/**
+ * Store for Editor.model.admin.task.UserPref
+ * @class Editor.store.admin.task.UserPrefs
+ * @extends Ext.data.Store
+ */
+Ext.define('Editor.store.admin.task.UserPrefs', {
+  extend : 'Ext.data.Store',
+  model: 'Editor.model.admin.task.UserPref',
+  remoteSort: false,
+  autoLoad: false,
+  pageSize: 20
 });

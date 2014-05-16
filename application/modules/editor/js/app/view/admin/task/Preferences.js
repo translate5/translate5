@@ -32,37 +32,43 @@
  
  END LICENSE AND COPYRIGHT 
  */
-Ext.define('Editor.view.admin.task.PreferencesWindow', {
-    extend : 'Ext.window.Window',
-    alias : 'widget.adminTaskPreferencesWindow',
-    requires: ['Editor.view.admin.task.UserAssocGrid','Editor.view.admin.task.Preferences'],
-    itemId : 'adminTaskPreferencesWindow',
-    title : '#UT#Einstellungen zu Aufgabe "{0}"',
-    height : 500,
-    width : 700,
-    loadingMask: null,
-    layout: 'fit',
-    modal : true,
-    initComponent : function() {
+Ext.define('Editor.view.admin.task.Preferences', {
+    extend: 'Ext.panel.Panel',
+    alias: 'widget.editorAdminTaskPreferences',
+
+    requires: [
+        'Editor.view.admin.task.UserPrefsGrid',
+        'Editor.view.admin.task.UserPrefsForm'
+    ],
+
+    layout: {
+        type: 'border'
+    },
+    title: '#UT#My Tab',
+
+    initComponent: function() {
         var me = this,
-            auth = Editor.app.authenticatedUser,
-            tabs = [];
-        if(auth.isAllowed('editorChangeUserAssocTask')) {
-            tabs.push({
-                xtype: 'adminTaskUserAssocGrid'
+            workflows = Ext.Array.map(Editor.data.app.workflows, function(item) {
+                return [item.name, item.label];
             });
-        }
-        if(auth.isAllowed('editorUserPrefsTask')) {
-            tabs.push({
-                xtype: 'editorAdminTaskPreferences'
-            });
-        }
-        me.title = Ext.String.format(me.title, me.actualTask.get('taskName'));
         Ext.applyIf(me, {
-            items : [{
-                xtype: 'tabpanel',
-                activeTab: 0,
-                items: tabs
+            items: [{
+                xtype: 'editorAdminTaskUserPrefsGrid',
+                region: 'center'
+            },{
+                xtype: 'container',
+                region: 'north',
+                height: 50,
+                padding: 10,
+                items: [{
+                    xtype: 'combobox',
+                    itemId: 'taskWorkflow',
+                    fieldLabel: 'Workflow',
+                    store: workflows
+                }]
+            },{
+                xtype: 'editorAdminTaskUserPrefsForm',
+                region: 'east'
             }]
         });
 

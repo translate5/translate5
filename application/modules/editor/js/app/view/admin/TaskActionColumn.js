@@ -99,13 +99,8 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
               iconCls: 'ico-task-reopen'
           },{
               tooltip: me.messages.taskPrefs,
-              isAllowedFor: 'editorChangeTaskPrefs',
-              iconCls: 'ico-task-task-pref'
-          },{
-              //FIXME remove me!
-              tooltip: me.messages.assocUser,
-              isAllowedFor: 'editorChangeUserAssocTask',
-              iconCls: 'ico-task-change-user-assoc'
+              isAllowedFor: 'editorPreferencesTask',
+              iconCls: 'ico-task-preferences'
           },{
               // - Export Icon, bei Klick darauf öffnet sich ein Menü mit den verschiedenen Export Möglichkeiten. 
               // Die einzelnen Menüpunkte ebenfalls per isAllowed abfragen. 
