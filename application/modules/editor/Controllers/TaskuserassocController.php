@@ -77,9 +77,9 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
     }
     
     public function putAction() {
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
-        /* @var $workflow editor_Workflow_Default */
-        
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
+        /* @var $workflow editor_Workflow_Abstract */
+
         $this->entity->load($this->_getParam('id'));
         $oldEntity = clone $this->entity;
         $this->decodePutData();

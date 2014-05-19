@@ -99,9 +99,9 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->entity->setUserName($sessionUser->data->userName);
         
         //@todo do this with events
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
-        /* @var $workflow editor_Workflow_Default */
-        $workflow->beforeSegmentSave($this->entity);
+        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $wfm editor_Workflow_Manager */
+        $wfm->getActive()->beforeSegmentSave($this->entity);
         
         $wfh = $this->_helper->workflow;
         /* @var $wfh ZfExtended_Controller_Helper_Workflow */
