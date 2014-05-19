@@ -36,7 +36,7 @@
 CREATE TABLE IF NOT EXISTS `LEK_workflow_user_pref` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `taskGuid` varchar(38) NOT NULL COMMENT 'Foreign Key to LEK_task',
-  `workflow` varchar(120) NOT NULL COMMENT 'FIXME comment',
+  `workflow` varchar(60) NOT NULL COMMENT 'FIXME comment',
   `workflowStep` varchar(60) DEFAULT NULL COMMENT 'FIXME comment',
   `userGuid` varchar(38) DEFAULT NULL COMMENT 'Foreign Key to Zf_users',
   `fields` varchar(300) NOT NULL COMMENT 'field names as used in LEK_segment_fields',
@@ -49,3 +49,5 @@ CREATE TABLE IF NOT EXISTS `LEK_workflow_user_pref` (
 
 INSERT INTO `LEK_workflow_user_pref` (`taskGuid`, `workflow`, `fields`) 
 select taskGuid, 'default-workflow', GROUP_CONCAT(name ORDER BY id SEPARATOR ',') from LEK_segment_field GROUP BY taskGuid;
+
+ALTER TABLE `LEK_task` ADD COLUMN `workflow` VARCHAR(60) NOT NULL DEFAULT 'default' AFTER `state`;
