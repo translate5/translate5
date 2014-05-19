@@ -70,6 +70,25 @@ abstract class editor_Workflow_Abstract {
     //const WORKFLOW_ID = ''; this is the internal used name for this workflow, it has to be defined in each subclass!
     
     /**
+     * labels of the states, roles and steps. Can be changed / added in constructor
+     * @var array
+     */
+    protected $labels = array(
+        'WORKFLOW_ID' => 'Standard Ablaufplan', 
+        'STATE_WAITING' => 'wartend', 
+        'STATE_FINISH' => 'abgeschlossen', 
+        'STATE_OPEN' => 'offen', 
+        'STATE_EDIT' => 'selbst in Arbeit', 
+        'STATE_VIEW' => 'selbst geöffnet', 
+        'ROLE_VISITOR' => 'Besucher',
+        'ROLE_LECTOR' => 'Lektor',
+        'ROLE_TRANSLATOR' => 'Übersetzer',
+        'STEP_LECTORING' => 'Lektorat',
+        'STEP_TRANSLATORCHECK' => 'Übersetzer Prüfung',
+        'STEP_PM_CHECK' => 'PM Prüfung',
+    );
+    
+    /**
      * Container for the old Task Model provided by doWithTask
      * (task as loaded from DB)
      * @var editor_Models_Task
@@ -290,6 +309,18 @@ abstract class editor_Workflow_Abstract {
     public function getRoles(){
         return $this->getFilteredConstants('ROLE_');
     }
+    
+    /**
+     * returns the already translated labels as assoc array
+     * @return array
+     */
+    public function getLabels() {
+        $t = ZfExtended_Zendoverwrites_Translate::getInstance();
+        return array_map(function($label) use ($t) {
+            return $t->_($label);
+        }, $this->labels);
+    }
+    
     /**
      * 
      * @param string $role
