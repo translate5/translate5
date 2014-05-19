@@ -40,8 +40,8 @@ class editor_Models_Validator_TaskUserAssoc extends ZfExtended_Models_Validator_
      * Validators for Task User Assoc Entity
      */
     protected function defineValidators() {
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
-        /* @var $workflow editor_Workflow_Default */
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
+        /* @var $workflow editor_Workflow_Abstract */
         //comment = string, without length contrain. No validator needed / possible
         $this->addValidator('id', 'int');
         $this->addValidator('taskGuid', 'guid');
