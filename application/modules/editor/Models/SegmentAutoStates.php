@@ -176,7 +176,8 @@ class editor_Models_SegmentAutoStates {
      * @return multitype:string
      */
     public function getRoleToStateMap() {
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
+        /* @var $workflow editor_Workflow_Abstract */
         
         //if the user is not assigned to the task directly, but he is allowed to edit the user
         //then the default state would be REVIEWED_PM instead a normal REVIEWED
@@ -240,7 +241,8 @@ class editor_Models_SegmentAutoStates {
     public function calculateSegmentState(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua) {
         $isModified = $segment->isDataModified();
         
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
+        /* @var $workflow editor_Workflow_Abstract */
         
         if($segment->getAutoStateId() == self::BLOCKED){
             return self::BLOCKED;

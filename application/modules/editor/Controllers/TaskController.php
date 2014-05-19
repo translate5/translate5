@@ -105,7 +105,9 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->now = date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME']);
         $this->acl = ZfExtended_Acl::getInstance();
         $this->user = new Zend_Session_Namespace('user');
-        $this->workflow = ZfExtended_Factory::get('editor_Workflow_Default');
+        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $wfm editor_Workflow_Manager */
+        $this->workflow = $wfm->getActive();
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->upload = ZfExtended_Factory::get('editor_Models_Import_UploadProcessor');
     }

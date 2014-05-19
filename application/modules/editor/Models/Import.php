@@ -191,7 +191,9 @@ class editor_Models_Import {
             $this->task->setRelaisLang(0); 
         }
         
-        $this->task->setWorkflow(editor_Workflow_Abstract::getId($config->import->taskWorkflow));
+        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $wfm editor_Workflow_Manager */
+        $this->task->setWorkflow($wfm->getIdToClass($config->import->taskWorkflow));
         $this->task->setReferenceFiles($this->hasReferenceFiles());
         $this->task->save(); //Task erst Speichern wenn die obigen validates und checks durch sind.
         

@@ -71,9 +71,14 @@ class Editor_CronController extends ZfExtended_Controllers_Action {
     public function dailyAction() {
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender();
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
-        /* @var $workflow editor_Workflow_Default */
-        $workflow->doCronDaily();
+        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $wfm editor_Workflow_Manager */
+        $workflows = $wfm->getWorkflows();
+        foreach($workflows as $wfId => $cls) {
+            $workflow = $wfm->get($wfId);
+            /* @var $workflow editor_Workflow_Abstract */
+            $workflow->doCronDaily();
+        }
         echo "OK";
     }
 }
