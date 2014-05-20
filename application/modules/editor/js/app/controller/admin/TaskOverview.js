@@ -46,6 +46,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       ref: 'headToolBar',
       selector: 'headPanel toolbar#top-menu'
   },{
+      ref: 'logoutButton',
+      selector: 'headPanel toolbar#top-menu #logoutSingle'
+  },{
       ref: 'taskAddForm',
       selector: '#adminTaskAddWindow form'
   },{
@@ -146,7 +149,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * injects the task menu into the main menu
    */
   initMainMenu: function() {
-      this.getHeadToolBar().insert(1, {
+      var toolbar = this.getHeadToolBar(),
+          insertIdx = 1,
+          logout = this.getLogoutButton();
+      if(logout) {
+          insertIdx = toolbar.items.indexOf(logout) + 1;
+      }
+      toolbar.insert(insertIdx, {
           itemId: 'task-admin-btn',
           xtype: 'button',
           hidden: true,
