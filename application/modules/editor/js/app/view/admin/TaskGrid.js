@@ -148,22 +148,22 @@ Ext.define('Editor.view.admin.TaskGrid', {
     me.userTipTpl = new Ext.XTemplate(
             '<tpl>',
             '<table class="task-users">',
-            '<tpl for=".">',
+            '<tpl for="users">',
             '<tr>',
-            '<td class="username">{userName}</td><td class="login">{login}</td><td class="role">{[this.getRole(values.role)]}</td><td class="state">{[this.getState(values.state)]}</td>',
+            '<td class="username">{userName}</td><td class="login">{login}</td><td class="role">{[this.getRole(parent, values)]}</td><td class="state">{[this.getState(parent, values)]}</td>',
             '</tr>',
             '</tpl>',
             '</table>',
             '</tpl>',
             {
-                getState: function(state) {
-                    if(state == 'edit') {
+                getState: function(data, user) {
+                    if(user.state == 'edit') {
                         return me.strings.locked;
                     }
-                    return utStates[state];
+                    return data.states[user.state];
                 },
-                getRole: function(role) {
-                    return Editor.data.app.utRoles[role];
+                getRole: function(data, user) {
+                    return data.roles[user.role];
                 }
             }
     );
@@ -369,12 +369,17 @@ Ext.define('Editor.view.admin.TaskGrid', {
               beforeshow: function updateTipBody(tip) {
                   var tr = Ext.fly(tip.triggerElement).up('tr'),
                       rec = me.view.getRecord(tr),
-                      users = rec.get('users');
-                  if(!users || users.length == 0) {
+                      wf = rec.getWorkflowMetaData(),
+                      data = {
+                          states: wf.states,
+                          roles: wf.roles,
+                          users: rec.get('users')
+                      };
+                  if(!data.users || data.users.length == 0) {
                       tip.update(me.strings.noUsers);
                       return;
                   }
-                  tip.update(me.userTipTpl.apply(rec.get('users')));
+                  tip.update(me.userTipTpl.apply(data));
               }
           }
       });

@@ -54,44 +54,19 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
                     xtype: 'combobox',
                     anchor: '100%',
                     fieldLabel: 'User'
-                },
-                {
+                },{
                     xtype: 'checkboxfield',
                     anchor: '100%',
                     boxLabel: 'Anonymous olumn Label'
-                },
-                {
+                },{
                     xtype: 'fieldset',
+                    itemId: 'alternates',
                     title: 'Alternative Access',
-                    items: [
-                        {
-                            xtype: 'checkboxgroup',
-                            items: [
-                                {
-                                    xtype: 'checkboxfield',
-                                    boxLabel: 'Box Label'
-                                },
-                                {
-                                    xtype: 'checkboxfield',
-                                    boxLabel: 'Box Label'
-                                },
-                                {
-                                    xtype: 'checkboxfield',
-                                    boxLabel: 'Box Label'
-                                },
-                                {
-                                    xtype: 'checkboxfield',
-                                    boxLabel: 'Box Label'
-                                },
-                                {
-                                    xtype: 'checkboxfield',
-                                    boxLabel: 'Box Label'
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
+                    items: [{
+                        xtype: 'checkboxgroup',
+                        columns: 2
+                    }]
+                },{
                     xtype: 'fieldset',
                     title: 'Visibility of non-editable target columns',
                     items: [

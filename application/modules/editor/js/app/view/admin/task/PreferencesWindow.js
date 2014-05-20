@@ -49,11 +49,13 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
             tabs = [];
         if(auth.isAllowed('editorChangeUserAssocTask')) {
             tabs.push({
+                actualTask: me.actualTask,
                 xtype: 'adminTaskUserAssocGrid'
             });
         }
         if(auth.isAllowed('editorUserPrefsTask')) {
             tabs.push({
+                actualTask: me.actualTask,
                 xtype: 'editorAdminTaskPreferences'
             });
         }
@@ -61,7 +63,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
         Ext.applyIf(me, {
             items : [{
                 xtype: 'tabpanel',
-                activeTab: 0,
+                activeTab: 1, //FIXME
                 items: tabs
             }]
         });

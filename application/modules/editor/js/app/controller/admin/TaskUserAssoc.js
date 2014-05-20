@@ -127,9 +127,11 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       var me = this,
           assoc = me.getAdminTaskUserAssocsStore(),
           win = btn.up('window'),
+          task = me.getTaskPreferencesWindow().actualTask,
+          meta = task.getWorkflowMetaData(),
           sel = win.down('grid').getSelectionModel().getSelection(),
-          role = Ext.Object.getKeys(Editor.data.app.utRoles)[0],
-          state = Ext.Object.getKeys(Editor.data.app.utStates)[0];
+          role = Ext.Object.getKeys(meta.roles)[0],
+          state = Ext.Object.getKeys(meta.states)[0];
           
       Ext.Array.each(sel, function(rec){
           var mod = assoc.model.create({
@@ -137,7 +139,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
               surName: rec.get('surName'),
               firstName: rec.get('firstName'),
               login: rec.get('login'),
-              taskGuid: me.getTaskPreferencesWindow().actualTask.get('taskGuid'),
+              taskGuid: task.get('taskGuid'),
               role: role,
               state: state
           });
