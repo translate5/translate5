@@ -96,8 +96,8 @@ Ext.define('Editor.controller.Localizer', {
         'Editor.controller.admin.TaskUserAssoc',
         'Editor.controller.admin.TaskOverview',
         'Editor.view.admin.TaskAddWindow',
-        'Editor.view.admin.TaskUserAssocGrid',
-        'Editor.view.admin.TaskUserAssocWindow',
+        'Editor.view.admin.task.UserAssocGrid',
+        'Editor.view.admin.task.PreferencesWindow',
         'Editor.view.admin.UserChooseWindow',
 <?php
     if($hasFrontendController('Editor.controller.HeadPanel')){
@@ -432,7 +432,8 @@ Ext.define('Editor.controller.Localizer', {
       actionUnFinishAll: '<?php echo $this->translate->_('Aufgabe für alle Benutzer wieder öffnen');?>',
       actionEnd: '<?php echo $this->translate->_('Aufgabe komplett beenden');?>',
       actionDelete: '<?php echo $this->translate->_('Aufgabe komplett löschen');?>',
-      assocUser: '<?php echo $this->translate->_('Benutzer der Aufgabe zuweisen');?>',
+      assocUser: '<?php echo $this->translate->_('Benutzer der Aufgabe zuweisen');?>', //FIXME remove me!
+      taskPrefs: '<?php echo $this->translate->_('Aufgabenspezifische Einstellungen');?>',
       actionReOpen: '<?php echo $this->translate->_('beendete Aufgabe wieder öffnen');?>',
       exp: '<?php echo $this->translate->_('Exportoptionen');?>'
     };
@@ -443,19 +444,20 @@ Ext.define('Editor.controller.Localizer', {
       exportQmField: '<?php echo $this->translate->_('Export QM-Statistik (XML) für Feld: {0}');?>'
     };
     
-    Editor.view.admin.TaskUserAssocGrid.prototype.strings = {
+    Editor.view.admin.task.PreferencesWindow.prototype.title = '<?php echo $this->translate->_('Einstellungen zu Aufgabe "{0}"');?>';
+    
+    Editor.view.admin.task.UserAssocGrid.prototype.title = '<?php echo $this->translate->_('Benutzer zu Aufgabe zuordnen');?>';
+    Editor.view.admin.task.UserAssocGrid.prototype.strings = {
       userGuidCol: '<?php echo $this->translate->_('Benutzer');?>',
       roleCol: '<?php echo $this->translate->_('Rolle (Doppelklick zum Ändern)');?>',
       stateCol: '<?php echo $this->translate->_('Status (Doppelklick zum Ändern)');?>',
       addUser: '<?php echo $this->translate->_('Benutzer hinzufügen');?>',
       addUserTip: '<?php echo $this->translate->_('Einen Benutzer dieser Aufgabe zuordnen.');?>',
       removeUser: '<?php echo $this->translate->_('Benutzer entfernen');?>',
-      removeUserTip: '<?php echo $this->translate->_('Den gewählten Benutzer aus dieser Aufgabe entfernen.');?>'
+      removeUserTip: '<?php echo $this->translate->_('Den gewählten Benutzer aus dieser Aufgabe entfernen.');?>',
+      save: '<?php echo $this->translate->_('Änderungen speichern');?>',
+      cancel: '<?php echo $this->translate->_('Abbrechen');?>'
     };
-    
-    Editor.view.admin.TaskUserAssocWindow.prototype.title = '<?php echo $this->translate->_('Benutzer zuordnen zu Aufgabe "{0}"');?>';
-    Editor.view.admin.TaskUserAssocWindow.prototype.text_save = '<?php echo $this->translate->_('Änderungen speichern');?>';
-    Editor.view.admin.TaskUserAssocWindow.prototype.text_cancel = '<?php echo $this->translate->_('Abbrechen');?>';
     
     Editor.view.admin.UserChooseWindow.prototype.title = '<?php echo $this->translate->_('Einen oder mehrere Benutzer auswählen');?>';
     Editor.view.admin.UserChooseWindow.prototype.strings = {
