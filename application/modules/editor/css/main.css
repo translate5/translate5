@@ -306,7 +306,7 @@ tr.no-users td div {color:#ff0000;}
 .x-menu .ico-task-end,
 .adminTaskGrid tr.editorEndTask .ico-task-end {background-image: url("../images/control_stop.png");display:inline;}
 .adminTaskGrid tr.editorChangeUserAssocTask .ico-task-change-user-assoc {background-image: url("../images/group.png");display:inline;}
-.adminTaskGrid tr.editorChangeTaskPrefs .ico-task-task-pref {background-image: url("../images/cog.png");display:inline;}
+.adminTaskGrid tr.editorPreferencesTask .ico-task-preferences {background-image: url("../images/page_gear.png");display:inline;}
 .adminTaskGrid tr.editorReopenTask .ico-task-reopen {background-image: url("../images/control_start.png");display:inline;}
 .adminTaskGrid tr.editorDeleteTask .ico-task-delete {background-image: url("../images/page_delete.png");display:inline;}
 .adminTaskGrid tr.editorShowexportmenuTask .ico-task-showexportmenu {background-image: url("../images/database_go.png");display:inline;}

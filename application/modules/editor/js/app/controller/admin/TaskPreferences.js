@@ -47,8 +47,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       selector: '#adminTaskAddWindow'
   }],
   strings: {
-      openTaskAdminBtn: "#UT#DUMMY ENTRY"
+      taskWorkflowSaved: "#UT#Workflow der Aufgabe gespeichert!"
   },
+  actualTask: null,
   init : function() {
       var me = this,
           toc = me.application.getController('admin.TaskOverview');
@@ -64,14 +65,16 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
                */
               'DUMMY EVENT'
       );
-      return;
       
       //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
-      Editor.app.on('adminViewportClosed', me.clearStores, me); //FIXME clear the local used stores?
+      Editor.app.on('adminViewportClosed', me.clearStores, me);
 
       me.control({
-          'headPanel toolbar#top-menu' : {
-              beforerender: me.initMainMenu //FIXME
+          '.editorAdminTaskPreferences #taskWorkflow': {
+              change: me.changeWorkflow
+          },
+          '.editorAdminTaskUserPrefsForm #alternates .checkboxgroup': {
+              beforerender: me.prepareAlternates
           }
       });
   },
@@ -103,6 +106,8 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
               }
           };
       
+      me.actualTask = task;
+      
       if(me.isAllowed('editorPreferencesTask')){
           //FIXME dieses isAllowed nur in der view!
       }
@@ -126,5 +131,38 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       Ext.widget('adminTaskPreferencesWindow',{
           actualTask: task
       }).show();
+  },
+  
+  /**
+   * saves the new workflow into the task, and to the server
+   * @param {Ext.form.fiueld.ComboBox} combo
+   * @param {String} val
+   */
+  changeWorkflow: function(combo, val) {
+      var me = this;
+      me.actualTask.set('workflow', val);
+      me.actualTask.save({
+          success: function(rec, op) {
+              Editor.MessageBox.addInfo(me.strings.taskWorkflowSaved);
+          }
+      });
+      
+  },
+  /**
+   * adds one checkbox per alternate in the config form 
+   * @param {Ext.form.CheckboxGroup} checkboxGroup
+   */
+  prepareAlternates: function(checkboxGroup) {
+      this.actualTask.segmentFields().each(function(field){
+          checkboxGroup.add({
+              xtype: 'checkbox',
+              boxLabel: field.get('label'),
+              name: field.get('name')
+          });
+      });
+  },
+  //FIXME clear the local used stores?
+  clearStores: function() {
+      
   }
 });

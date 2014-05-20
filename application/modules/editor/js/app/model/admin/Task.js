@@ -57,6 +57,7 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'lockingUser', type: 'string', persist: false},
     {name: 'lockingUsername', type: 'string', persist: false},
     {name: 'state', type: 'string'},
+    {name: 'workflow', type: 'string'},
     {name: 'pmGuid', type: 'string'},
     {name: 'pmName', type: 'string'},
     {name: 'wordCount', type: 'integer'},
@@ -181,7 +182,17 @@ Ext.define('Editor.model.admin.Task', {
   isEnded: function(){
       return this.get('state')=='end';
   },
-  
+  /**
+   * returns the the metadata for the workflow of the task
+   */
+  getWorkflowMetaData: function() {
+      var me = this,
+          wf = me.get('workflow');
+      if(!Editor.data.app.workflows[wf]) {
+          Ext.Error.raise('requested workflow meta data not found! (workflow '+wf+')');
+      }
+      return Editor.data.app.workflows[wf];
+  },
   /**
    * @todo improve workflow handling in Javascript, => adapt the php workflow in js, a class with same methods (like getNextStep step2Role etc)
    * actually all workflow information is encapsulated in frontendRights (thats OK) 

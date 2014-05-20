@@ -55,12 +55,14 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
   //}],
   initComponent: function() {
     var me = this,
+        wf = me.actualTask.getWorkflowMetaData(),
         states = [],
         roles = [];
-    Ext.Object.each(Editor.data.app.utStates, function(key, state) {
+    console.log(wf);
+    Ext.Object.each(wf.states, function(key, state) {
         states.push([key, state]);
     });
-    Ext.Object.each(Editor.data.app.utRoles, function(key, role) {
+    Ext.Object.each(wf.roles, function(key, role) {
         roles.push([key, role]);
     });
     Ext.applyIf(me, {
@@ -88,7 +90,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
               store: roles
           },
           renderer: function(v) {
-              return Editor.data.app.utRoles[v];
+              return wf.roles[v];
           },
           text: me.strings.roleCol
       },{

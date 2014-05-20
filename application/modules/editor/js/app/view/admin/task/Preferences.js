@@ -45,11 +45,13 @@ Ext.define('Editor.view.admin.task.Preferences', {
         type: 'border'
     },
     title: '#UT#My Tab',
+    workflow_label: '#UT#Workflow',
 
     initComponent: function() {
         var me = this,
-            workflows = Ext.Array.map(Editor.data.app.workflows, function(item) {
-                return [item.name, item.label];
+            workflows = [];
+            Ext.Object.each(Editor.data.app.workflows, function(key, item) {
+                workflows.push([item.name, item.label]);
             });
         Ext.applyIf(me, {
             items: [{
@@ -63,7 +65,9 @@ Ext.define('Editor.view.admin.task.Preferences', {
                 items: [{
                     xtype: 'combobox',
                     itemId: 'taskWorkflow',
-                    fieldLabel: 'Workflow',
+                    forceSelection: true,
+                    fieldLabel: me.workflow_label,
+                    value: me.actualTask.get('workflow'),
                     store: workflows
                 }]
             },{
