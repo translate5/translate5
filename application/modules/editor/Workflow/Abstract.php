@@ -89,6 +89,16 @@ abstract class editor_Workflow_Abstract {
     );
     
     /**
+     * This part is very ugly: in the frontend we are working only with all states expect the ones listed here.
+     * The states listed here are only used in the frontend grid for rendering purposes, 
+     * they are not used to be activly set to a user, or to be filtered etc. pp.
+     * So we define them as "pending" states, which have to be delivered in a separate matter to the frontend
+     * The values are a subset of the above STATE_CONSTANTs
+     * @var array
+     */
+    protected $pendingStates = array(self::STATE_EDIT, self::STATE_VIEW);
+    
+    /**
      * Container for the old Task Model provided by doWithTask
      * (task as loaded from DB)
      * @var editor_Models_Task
@@ -267,6 +277,14 @@ abstract class editor_Workflow_Abstract {
      */
     public function getStepChain() {
         return $this->stepChain;
+    }
+    
+    /**
+     * return the states defined as pending (is a subset of the getStates result)
+     * @return array
+     */
+    public function getPendingStates() {
+        return array_intersect($this->getStates(), $this->pendingStates);
     }
 
     /**
