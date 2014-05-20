@@ -264,6 +264,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         $php2js->set('app.wfStepChain', $workflow->getStepChain());
         
+        //FIXME remove above workflow settings, because successed by below:
+        $wm = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $wm editor_Workflow_Manager */
+        $php2js->set('app.workflows', $wm->getWorkflowData());
+        
         $php2js->set('app.userRights', $acl->getFrontendRights($userSession->data->roles));
     }
     
@@ -295,6 +300,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         }
         if($acl->isInAllowedRoles($userSession->data->roles,'taskOverviewFrontendController')){
             $controllers[] = 'admin.TaskOverview';
+            $controllers[] = 'admin.TaskPreferences'; //FIXME add a own role?
         }
         if($acl->isInAllowedRoles($userSession->data->roles,'adminUserFrontendController')){
             $controllers[] = 'admin.TaskUserAssoc';
