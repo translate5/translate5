@@ -96,6 +96,10 @@ class editor_Workflow_Manager {
 
     /**
      * returns all workflow metadata (roles, steps, etc) as array of objects
+     * Warning: in backend states are ment to be all states including the pending states
+     *          in frontend states are ment to be the states WITHOUT the pending states.
+     *          Since this method ist the bridge between frontend and backend, 
+     *          the states returned in the states field here are without the pending states!
      * @return array
      */
     public function getWorkflowData() {
@@ -113,10 +117,14 @@ class editor_Workflow_Manager {
             $data = new stdClass();
             $data->id = $id;
             $data->label = $labels['WORKFLOW_ID'];
-            $data->anonymousFieldLabel = false; //true | false, comes from app.ini not from wf class
+            $data->anonymousFieldLabel = false; //FIXME true | false, comes from app.ini not from wf class
             
             $data->roles = $labelize($wf->getRoles());
-            $data->states = $labelize($wf->getStates());
+            $allStates = $wf->getStates();
+            $pendingStates = $wf->getPendingStates();
+            //the returned states are the states without the pending ones
+            $data->states = $labelize(array_diff($allStates, $pendingStates));
+            $data->pendingStates = $labelize($pendingStates);
             $data->steps = $labelize($wf->getSteps());
             $data->stepChain = $wf->getStepChain();
             $result[$id] = $data;
