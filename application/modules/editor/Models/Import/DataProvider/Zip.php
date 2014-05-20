@@ -128,7 +128,7 @@ class editor_Models_Import_DataProvider_Zip extends editor_Models_Import_DataPro
 	    $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
 	    		'Recursivedircleaner'
 	    );
-	    if(isset($this->importFolder)) {
+	    if(isset($this->importFolder) && is_dir($this->importFolder)) {
     	    $recursivedircleaner->delete($this->importFolder);
 	    }
 	}
