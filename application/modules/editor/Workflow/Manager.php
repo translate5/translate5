@@ -130,7 +130,7 @@ class editor_Workflow_Manager {
     public function getActive() {
         if(empty($session->taskWorkflow)) {
             $config = Zend_Registry::get('config');
-            return $this->get($config->import->taskWorkflow);
+            return $this->get($this->getIdToClass($config->runtimeOptions->import->taskWorkflow));
         }
         return $this->get($session->taskWorkflow);
     }
