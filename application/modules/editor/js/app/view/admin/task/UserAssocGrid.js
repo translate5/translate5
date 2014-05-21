@@ -58,7 +58,6 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
         wf = me.actualTask.getWorkflowMetaData(),
         states = [],
         roles = [];
-    console.log(wf);
     Ext.Object.each(wf.states, function(key, state) {
         states.push([key, state]);
     });
@@ -107,7 +106,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
               store: states
           },
           renderer: function(v) {
-              return Editor.data.app.utStates[v];
+              return wf.states[v];
           },
           text: me.strings.stateCol
       }],

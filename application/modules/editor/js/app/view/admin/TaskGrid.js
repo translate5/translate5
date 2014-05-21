@@ -140,11 +140,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
 
   initComponent: function() {
     var me = this,
-        //copy the utStates:
-        utStates = Ext.applyIf({}, Editor.data.app.utStates), 
         actions;
-    //add the grid only utStates to the copied utStates Object:
-    utStates = Ext.applyIf(utStates, Editor.data.app.utStatesGO), 
+ 
     me.userTipTpl = new Ext.XTemplate(
             '<tpl>',
             '<table class="task-users">',
@@ -182,7 +179,10 @@ Ext.define('Editor.view.admin.TaskGrid', {
           dataIndex: 'state',
           tdCls: 'state',
           renderer: function(v, meta, rec) {
-              var userState = rec.get('userState');
+              var userState = rec.get('userState'),
+                  wfMeta = rec.getWorkflowMetaData(),
+                  allStates = me.prepareStates(wfMeta);
+
               if(rec.isLocked()) {
                   meta.tdAttr = 'data-qtip="' + Ext.String.format(me.strings.lockedBy, rec.get('lockingUsername'))+'"';
                   return me.strings.locked;
@@ -193,13 +193,13 @@ Ext.define('Editor.view.admin.TaskGrid', {
               }
               if(!userState || userState.length == 0) {
                   //if we got only v here, the state should be handled like locked or ended above
-                  v = utStates[v] ? utStates[v] : v;
+                  v = allStates[v] ? allStates[v] : v;
                   meta.tdAttr = 'data-qtip="' + v +'"';
                   return v; 
               }
               //if no global state is applicable, use userState instead
-              meta.tdAttr = 'data-qtip="' + utStates[userState] +'"';
-              return utStates[userState];
+              meta.tdAttr = 'data-qtip="' + allStates[userState] +'"';
+              return allStates[userState];
           },
           text: me.text_cols.state,
           sortable: false
@@ -355,6 +355,19 @@ Ext.define('Editor.view.admin.TaskGrid', {
     this.view.on('afterrender', function(){
         me.tooltip = me.createToolTip();
     });
+  },
+  /**
+   * prepares (merges) the states, and cache it internally
+   * @param wfMeta
+   */
+  prepareStates: function(wfMeta) {
+      if(!wfMeta.mergedStates) {
+          //copy the states:
+          wfMeta.mergedStates = Ext.applyIf({}, wfMeta.states);
+          //add the grid only pendingStates to the copied mergedStates Object:
+          Ext.applyIf(wfMeta.mergedStates, wfMeta.pendingStates);
+      }
+      return wfMeta.mergedStates;
   },
   createToolTip: function() {
       var me = this;
