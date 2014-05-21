@@ -120,13 +120,13 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      */
     protected function parse(){
         //@todo is the following link a improvement? http://stackoverflow.com/questions/11066857/detect-eol-type-using-php
-        if(preg_match('"\r\n$"', $this->_origFile)){
+        if(preg_match('"\r\n"', $this->_origFile)){
             $this->break = "\r\n";
         }
-        elseif(preg_match('"\n$"', $this->_origFile)){
+        elseif(preg_match('"\n"', $this->_origFile)){
             $this->break = "\n";
         }
-        elseif(preg_match('"\r$"', $this->_origFile)){
+        elseif(preg_match('"\r"', $this->_origFile)){
             $this->break = "\r";
         }
         else{
