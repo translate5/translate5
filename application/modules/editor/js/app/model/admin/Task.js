@@ -204,7 +204,7 @@ Ext.define('Editor.model.admin.Task', {
           filter = null,
           idx = 0,
           data = Editor.data,
-          stepChain = data.app.wfStepChain,
+          stepChain = me.getWorkflowMetaData().stepChain,
           task = data.task,
           step = task.get('userStep'),
           useFilter = !(me.isFinished() || me.isWaiting() || me.isEnded());

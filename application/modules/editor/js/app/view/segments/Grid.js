@@ -143,7 +143,7 @@ Ext.define('Editor.view.segments.Grid', {
             xtype: 'workflowStepColumn',
             itemId: 'workflowStepColumn',
             renderer: function(v) {
-                var steps = Editor.data.app.wfSteps;
+                var steps = Editor.data.task.getWorkflowMetaData().steps;
                 return steps[v] ? steps[v] : v;
             },
             width: 140

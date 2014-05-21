@@ -48,7 +48,7 @@ Ext.define('Editor.view.admin.task.WorkflowStepFilter', {
       if(col.length > 0) {
           prefix = col[0].text;
       }
-      Ext.Object.each(Editor.data.app.wfSteps, function(key, value){
+      Ext.Object.each(Editor.data.task.getWorkflowMetaData().steps, function(key, value){
           defaults.options.push({id:key, label:value});
       });
       
