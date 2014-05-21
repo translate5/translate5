@@ -229,42 +229,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         }
         $php2js->set('app.roles', $roles);
         
-        
-        //Warning changing available roles / states / steps means also to 
-        //change or extend editor_Workflow_abstract
-        //
-        //currently we have 2 places to define userRoles: IndexController 
-        //for translation and editor_Workflow_Default for programmatic usage
-        
-        $php2js->set('app.utRoles', array(
-          $workflow::ROLE_LECTOR=> $this->translate->_('Lektor'),
-          $workflow::ROLE_TRANSLATOR => $this->translate->_('Übersetzer'),
-          $workflow::ROLE_VISITOR => $this->translate->_('Besucher'),
-        ));
-        //currently we have 3 places to define userStates: IndexController for translation, JS Task Model and PHP TaskUserAssoc Model for programmatic usage
-        $php2js->set('app.utStates', array(
-          $workflow::STATE_OPEN => $this->translate->_('offen'),
-          $workflow::STATE_WAITING => $this->translate->_('wartend'),
-          $workflow::STATE_FINISH => $this->translate->_('abgeschlossen'),
-        ));
-        
-        //this user states are needed in the grid only, to be displayed there
-        $php2js->set('app.utStatesGO', array(
-          $workflow::STATE_EDIT => $this->translate->_('selbst in Arbeit'),
-          $workflow::STATE_VIEW => $this->translate->_('selbst geöffnet'),
-        ));
-        
-        //currently we have 2 places to define userSteps: IndexController 
-        //for translation and editor_Workflow_Default for programmatic usage
-        $php2js->set('app.wfSteps', array(
-          $workflow::STEP_LECTORING => $this->translate->_('Lektorat'),
-          $workflow::STEP_TRANSLATORCHECK => $this->translate->_('Übersetzer Prüfung'),
-          $workflow::STEP_PM_CHECK => $this->translate->_('PM Prüfung'),
-        ));
-        
-        $php2js->set('app.wfStepChain', $workflow->getStepChain());
-        
-        //FIXME remove above workflow settings, because successed by below:
         $wm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wm editor_Workflow_Manager */
         $php2js->set('app.workflows', $wm->getWorkflowData());
