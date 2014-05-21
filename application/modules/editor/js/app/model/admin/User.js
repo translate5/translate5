@@ -95,7 +95,10 @@ Ext.define('Editor.model.admin.User', {
           case 'editorFinishTask':
               //TODO role visitor should be encapsulated some how
               //if user is not associated to the task or task is already finished, it cant be finished
-              if(task.get('userRole') == 'visitor' || task.get('userRole') == '' || task.isFinished() || task.isEnded()) {
+              //TODO this is a good example how currently workflow state transtions 
+              //     are encapuslated in JS, we want to finish the task, and have to check the current state.
+              //     This should also come from the PHP workflow definition.
+              if(task.get('userRole') == 'visitor' || task.get('userRole') == '' || task.isWaiting() || task.isFinished() || task.isEnded()) {
                   return false;
               }
               break;
