@@ -44,16 +44,7 @@ Ext.define('Editor.model.admin.task.UserPref', {
     {name: 'workflow', type: 'string'},
     {name: 'workflowStep', type: 'string'},
     {name: 'userGuid', type: 'string'},
-    {name: 'fields', type: 'string'},
-    {
-        name: 'userName', 
-        type: 'string', 
-        persist: false, 
-        convert: function() {
-            console.log(arguments);
-            return "FOO";
-        }
-    }
+    {name: 'fields', type: 'string'}
   ],
   validations: [
       {type: 'presence', field: 'taskGuid'},

@@ -35,6 +35,7 @@
 Ext.define('Editor.view.admin.task.UserPrefsGrid', {
     extend: 'Ext.grid.Panel',
     alias: 'widget.editorAdminTaskUserPrefsGrid',
+    store: 'admin.task.UserPrefs',
 
     initComponent: function() {
         var me = this;
@@ -68,6 +69,13 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                 {
                     xtype: 'gridcolumn',
                     dataIndex: 'username',
+                    renderer: function(v, meta, rec) {
+                        var userGuid = rec.get('userGuid');
+                        if(userGuid.length == 0) {
+                            return null;
+                        }
+                        return "FOO";
+                    },
                     text: 'Non-editable Targets'
                 }
             ],

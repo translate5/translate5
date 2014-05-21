@@ -51,7 +51,7 @@ Ext.define('Editor.view.admin.task.Preferences', {
         var me = this,
             workflows = [];
             Ext.Object.each(Editor.data.app.workflows, function(key, item) {
-                workflows.push([item.name, item.label]);
+                workflows.push([item.id, item.label]);
             });
         Ext.applyIf(me, {
             items: [{
