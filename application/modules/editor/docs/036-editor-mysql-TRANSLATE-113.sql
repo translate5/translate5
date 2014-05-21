@@ -33,7 +33,7 @@
 --  END LICENSE AND COPYRIGHT
 --  */
 
-CREATE TABLE IF NOT EXISTS `LEK_workflow_user_pref` (
+CREATE TABLE IF NOT EXISTS `LEK_workflow_userpref` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `taskGuid` varchar(38) NOT NULL COMMENT 'Foreign Key to LEK_task',
   `workflow` varchar(60) NOT NULL COMMENT 'FIXME comment',
@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `LEK_workflow_user_pref` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-INSERT INTO `LEK_workflow_user_pref` (`taskGuid`, `workflow`, `fields`) 
-select taskGuid, 'default-workflow', GROUP_CONCAT(name ORDER BY id SEPARATOR ',') from LEK_segment_field GROUP BY taskGuid;
+INSERT INTO `LEK_workflow_userpref` (`taskGuid`, `workflow`, `fields`) 
+select taskGuid, 'default', GROUP_CONCAT(name ORDER BY id SEPARATOR ',') from LEK_segment_field GROUP BY taskGuid;
 
 ALTER TABLE `LEK_task` ADD COLUMN `workflow` VARCHAR(60) NOT NULL DEFAULT 'default' AFTER `state`;
