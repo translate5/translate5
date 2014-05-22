@@ -347,56 +347,72 @@ abstract class editor_Workflow_Abstract {
     }
 
     /**
-     * 
+     * returns the TaskUserAssoc Entity to the given combination of $taskGuid and $userGuid, 
+     * returns null if nothing found
      * @param string $taskGuid
      * @param string $userGuid
-     * @param boolean $checkReadable checks in addition if task is readable for user and only returns true if yes
-     * @param boolean $checkWriteable checks in addition if task is writeable for user and only returns true if yes
-     * @return boolean
-     * FIXME wo wird diese Methode überall verwendet? Zwecks PM editing
+     * @return editor_Models_TaskUserAssoc returns null if nothing found
      */
-    public function isTaskOfUser(string $taskGuid, string $userGuid,$checkReadable = false, $checkWriteable = false) {
+    public function getTaskUserAssoc(string $taskGuid, string $userGuid) {
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
-        
-        $s = $tua->db->select()
-                    ->where('taskGuid = ?', $taskGuid)
-                    ->where('userGuid = ?', $userGuid);
-        $roles = array();
-        $states = array();
-        if($checkReadable){
-            $roles = $this->getReadableRoles();
-            $states = $this->getReadableStates();
+        try {
+            $tua->loadByParams($userGuid, $taskGuid);
+            return $tua;
         }
-        if($checkWriteable){
-            $roles = array_merge($roles,$this->getWriteableRoles());
-            $states = array_merge($states,$this->getWriteableStates());
+        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            return null;
         }
-        //var_dump($roles);
-        //var_dump($states);
-        if(count($roles)>0){
-            $sql = array();
-            $qValues = array();
-            foreach ($roles as $key => $value) {
-                $sql[] = $tua->db->getAdapter()->quoteInto('role = ?', $value);
-            }
-            $s->where(implode(' or ', $sql), $qValues);
-        }
-        if(count($states)>0){
-            $sql = array();
-            $qValues = array();
-            foreach ($states as $key => $value) {
-                $sql[] = $tua->db->getAdapter()->quoteInto('state = ?', $value);
-            }
-            $s->where(implode(' or ', $sql));
-        }
-        //var_dump($s->assemble());exit;
-        $tuas = $tua->db->fetchAll($s)->toArray();
-        if(count($tuas)>0)
-            return true;
-        return false;
     }
-    //does not deliver task-states, only workflow-states
+    
+    /**
+     * checks if the given TaskUserAssoc Instance allows reading of the task according to the Workflow Definitions
+     * @param editor_Models_TaskUserAssoc $tua (default null is only to allow null as value)
+     * @param boolean $useUsedState optional, per default false means using TaskUserAssoc field state, otherwise TaskUserAssoc field usedState
+     * @return boolean
+     */
+    public function isReadable(editor_Models_TaskUserAssoc $tua = null, $useUsedState = false) {
+        return $this->isTuaAllowed($this->getReadableRoles(), $this->getReadableStates(), $tua, $useUsedState);
+    }
+    
+    /**
+     * checks if the given TaskUserAssoc Instance allows writing to the task according to the Workflow Definitions
+     * @param editor_Models_TaskUserAssoc $tua (default null is only to allow null as value)
+     * @param boolean $useUsedState optional, per default false means using TaskUserAssoc field state, otherwise TaskUserAssoc field usedState
+     * @return boolean
+     */
+    public function isWriteable(editor_Models_TaskUserAssoc $tua = null, $useUsedState = false) {
+        return $this->isTuaAllowed($this->getWriteableRoles(), $this->getWriteableStates(), $tua, $useUsedState);
+    }
+    
+    /**
+     * helper function for isReadable and isWriteable
+     * @param array $roles
+     * @param array $states
+     * @param editor_Models_TaskUserAssoc $tua (default null is only to allow null as value)
+     * @param boolean $useUsedState
+     * @return boolean
+     */
+    protected function isTuaAllowed(array $roles, array $states, editor_Models_TaskUserAssoc $tua = null, $useUsedState = false) {
+        if(empty($tua)) {
+            return false;
+        }
+        $state = $useUsedState ? $tua->getUsedState() : $tua->getState();
+        return in_array($tua->getRole(), $roles) && in_array($state, $states);
+    }
+    
+    /**
+     * checks if the given TaskUserAssoc Instance allows writing to and reading from the task according to the Workflow Definitions
+     * @param editor_Models_TaskUserAssoc $tua (default null is only to allow null as value)
+     * @param boolean $useUsedState optional, per default false means using TaskUserAssoc field state, otherwise TaskUserAssoc field usedState
+     * @return boolean
+     */
+    public function isReadAndWritable(editor_Models_TaskUserAssoc $tua = null, $useUsedState = false) {
+        //since a tua can either be readable or writeable, 
+        //we have to make an "or" here, although the method is named "isRead AND Writable"!
+        return $this->isReadable($tua, $useUsedState) || $this->isWriteable($tua, $useUsedState);
+    }
+    
     /**
      * returns true if a normal user can change the state of this assoc, false otherwise. 
      * false means that the user has finished this task already or the user is still waiting.

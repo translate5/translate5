@@ -145,7 +145,7 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     public function loadAll()
     {
-        $isAllowedToLoadAll = $this->acl->isInAllowedRoles($this->user->data->roles,'loadAllTasks');
+        $isAllowedToLoadAll = $this->isAllowed('loadAllTasks');
         $filter = $this->entity->getFilter();
         $filter->convertStates($isAllowedToLoadAll);
         $assocFilter = $filter->isUserAssocNeeded();
@@ -360,12 +360,13 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->setDataInEntity();
         $this->entity->validate();
         
-        if(!$this->acl->isInAllowedRoles($this->user->data->roles,'loadAllTasks')
-                &&
+        $mayLoadAllTasks = $this->isAllowed('loadAllTasks');
+        $tua = $this->workflow->getTaskUserAssoc($taskguid, $this->user->data->userGuid);
+        if(!$mayLoadAllTasks &&
                 ($this->isOpenTaskRequest(true)&&
-                    !$this->workflow->isTaskOfUser($taskguid, $this->user->data->userGuid, false,true)
+                    !$this->workflow->isWriteable($tua)
                 || $this->isOpenTaskRequest(false,true)&&
-                    !$this->workflow->isTaskOfUser($taskguid, $this->user->data->userGuid, true,false)
+                    !$this->workflow->isReadable($tua)
                 )
            ){
             //if the task was already in session, we must delete it. 
@@ -414,7 +415,7 @@ class editor_TaskController extends ZfExtended_RestController {
      * @param array $allAssocInfos
      */
     protected function addUserInfos(array &$row, $taskguid, array $userAssocInfos, array $allAssocInfos) {
-        $isEditAll = $this->acl->isInAllowedRoles($this->user->data->roles,'editAllTasks');
+        $isEditAll = $this->isAllowed('editAllTasks');
         //Add actual User Assoc Infos to each Task
         if(isset($userAssocInfos[$taskguid])) {
             $row['userRole'] = $userAssocInfos[$taskguid]['role'];
@@ -533,7 +534,7 @@ class editor_TaskController extends ZfExtended_RestController {
             return;
         }
         
-        $isEditAllTasks = $this->acl->isInAllowedRoles($this->user->data->roles,'editAllTasks');
+        $isEditAllTasks = $this->isAllowed('editAllTasks');
         $isOpen = $this->isOpenTaskRequest();
         $isPmOverride = false;
         
@@ -663,9 +664,9 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     public function getAction() {
         $res = parent::getAction();
-        if(!$this->acl->isInAllowedRoles($this->user->data->roles,'loadAllTasks') && 
-                !$this->workflow->isTaskOfUser($this->entity->getTaskGuid(), 
-                    $this->user->data->userGuid, true)){
+        $tua = $this->workflow->getTaskUserAssoc();
+        if(!$this->isAllowed('loadAllTasks') &&
+                !$this->workflow->isReadable($tua)){
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
         return $res;
@@ -704,5 +705,15 @@ class editor_TaskController extends ZfExtended_RestController {
         header('Content-Disposition: attachment; filename="'.$this->entity->getTasknameForDownload($suffix).'"');
         readfile($zipFile);
         exit;
+    }
+    
+    /**
+     * checks if currently logged in user is allowed to access the given ressource
+     * shortcut method for convience
+     * @param string $ressource
+     * @return boolean
+     */
+    protected function isAllowed($ressource) {
+        return $this->acl->isInAllowedRoles($this->user->data->roles, $ressource);
     }
 }
