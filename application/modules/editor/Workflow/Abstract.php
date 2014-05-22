@@ -386,6 +386,20 @@ abstract class editor_Workflow_Abstract {
     }
     
     /**
+     * FIXME this is a small ugly workaround for that fact that we do not differ 
+     * between state transitions and "whats allowed" in a state. 
+     * The isWriteable and isReadable methods are only used in conjunction with state 
+     * transitions, and so cannot be used with the desired behaviour here. 
+     * Here we want to know if a task can be written in the given state (which 
+     * is currently only edit). See TRANSLATE-7 and TRANSLATE-18.
+     * @param string $userState
+     * @return boolean
+     */
+    public function isWritingAllowedForState($userState) {
+        return $userState == self::STATE_EDIT;
+    }
+    
+    /**
      * helper function for isReadable and isWriteable
      * @param array $roles
      * @param array $states
@@ -399,18 +413,6 @@ abstract class editor_Workflow_Abstract {
         }
         $state = $useUsedState ? $tua->getUsedState() : $tua->getState();
         return in_array($tua->getRole(), $roles) && in_array($state, $states);
-    }
-    
-    /**
-     * checks if the given TaskUserAssoc Instance allows writing to and reading from the task according to the Workflow Definitions
-     * @param editor_Models_TaskUserAssoc $tua (default null is only to allow null as value)
-     * @param boolean $useUsedState optional, per default false means using TaskUserAssoc field state, otherwise TaskUserAssoc field usedState
-     * @return boolean
-     */
-    public function isReadAndWritable(editor_Models_TaskUserAssoc $tua = null, $useUsedState = false) {
-        //since a tua can either be readable or writeable, 
-        //we have to make an "or" here, although the method is named "isRead AND Writable"!
-        return $this->isReadable($tua, $useUsedState) || $this->isWriteable($tua, $useUsedState);
     }
     
     /**

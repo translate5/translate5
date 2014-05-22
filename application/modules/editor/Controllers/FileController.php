@@ -57,6 +57,11 @@ class Editor_FileController extends editor_Controllers_EditorrestController {
   {
     $session = new Zend_Session_Namespace();
     $data = json_decode($this->_getParam('data'));
+    
+    $wfh = $this->_helper->workflow;
+    /* @var $wfh ZfExtended_Controller_Helper_Workflow */
+    $wfh->checkWorkflowWriteable($session->taskGuid);
+    
     $this->entity->loadByTaskGuid($session->taskGuid);
     $mover = ZfExtended_Factory::get('editor_Models_Foldertree_Mover', array($this->entity));
     $mover->moveNode((int)$data->id, (int)$data->parentId, (int)$data->index);

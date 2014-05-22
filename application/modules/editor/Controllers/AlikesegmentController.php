@@ -87,6 +87,10 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         $duration = new stdClass();
         $duration->$editField = (int)$this->_getParam('duration');
 
+        $wfh = $this->_helper->workflow;
+        /* @var $wfh ZfExtended_Controller_Helper_Workflow */
+        $wfh->checkWorkflowWriteable();
+
         $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($session->taskGuid);
         $fieldMeta = $sfm->getByName($fieldToProcess);
         $isRelais = ($fieldMeta !== false && $fieldMeta->type == editor_Models_SegmentField::TYPE_RELAIS);

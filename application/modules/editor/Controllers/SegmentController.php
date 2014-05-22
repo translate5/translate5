@@ -103,6 +103,10 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         /* @var $workflow editor_Workflow_Default */
         $workflow->beforeSegmentSave($this->entity);
         
+        $wfh = $this->_helper->workflow;
+        /* @var $wfh ZfExtended_Controller_Helper_Workflow */
+        $wfh->checkWorkflowWriteable($this->entity->getTaskGuid(), $sessionUser->data->userGuid, $workflow);
+        
         $this->entity->validate();
         
         $history->save();
