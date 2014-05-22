@@ -523,6 +523,27 @@
 <trans-unit id='S29tbWVudGFyIGJlYXJiZWl0ZW4='><source>Kommentar bearbeiten</source><target>Kommentar bearbeiten</target></trans-unit>
 <trans-unit id='RXhwb3J0IFFNLVN0YXRpc3RpayAoWE1MKSBmw7xyIEZlbGQ6IHswfQ=='><source>Export QM-Statistik (XML) für Feld: {0}</source><target>Export QM-Statistik (XML) für Feld: {0}</target></trans-unit>
 <trans-unit id='UGFzc3dvcnQgZXJmb2xncmVpY2ggZ2VzcGVpY2hlcnQh'><source>Passwort erfolgreich gespeichert!</source><target>Passwort erfolgreich gespeichert!</target></trans-unit>
+<trans-unit id='S2VpbmUgVGVybWlub2xvZ2llIHZvcmhhbmRlbiE='><source>Keine Terminologie vorhanden!</source><target>Keine Terminologie vorhanden!</target></trans-unit>
+<trans-unit id='cXVlbGxl'><source>quelle</source><target>quelle</target></trans-unit>
+<trans-unit id='emllbA=='><source>ziel</source><target>ziel</target></trans-unit>
+<trans-unit id='emllbDE='><source>ziel1</source><target>ziel1</target></trans-unit>
+<trans-unit id='emllbDI='><source>ziel2</source><target>ziel2</target></trans-unit>
+<trans-unit id='emllbDM='><source>ziel3</source><target>ziel3</target></trans-unit>
+<trans-unit id='emllbDQ='><source>ziel4</source><target>ziel4</target></trans-unit>
+<trans-unit id='emllbDY='><source>ziel6</source><target>ziel6</target></trans-unit>
+<trans-unit id='emllbDZfMQ=='><source>ziel6_1</source><target>ziel6_1</target></trans-unit>
+<trans-unit id='emllbDg='><source>ziel8</source><target>ziel8</target></trans-unit>
+<trans-unit id='emllbDk='><source>ziel9</source><target>ziel9</target></trans-unit>
+<trans-unit id='emllbDEw'><source>ziel10</source><target>ziel10</target></trans-unit>
+<trans-unit id='emllbE90aGVy'><source>zielOther</source><target>zielOther</target></trans-unit>
+<trans-unit id='emllbE90aGVyXzE='><source>zielOther_1</source><target>zielOther_1</target></trans-unit>
+<trans-unit id='emllbE90aGVyMg=='><source>zielOther2</source><target>zielOther2</target></trans-unit>
+<trans-unit id='Y29tcGxldGx5TmV3'><source>completlyNew</source><target>completlyNew</target></trans-unit>
+<trans-unit id='emllbE5FVw=='><source>zielNEW</source><target>zielNEW</target></trans-unit>
+<trans-unit id='emllbE5FV2FnYWlu'><source>zielNEWagain</source><target>zielNEWagain</target></trans-unit>
+<trans-unit id='emllbE5FV18x'><source>zielNEW_1</source><target>zielNEW_1</target></trans-unit>
+<trans-unit id='emllbDU='><source>ziel5</source><target>ziel5</target></trans-unit>
+<trans-unit id='emllbDc='><source>ziel7</source><target>ziel7</target></trans-unit>
   </body>
  </file>
 </xliff>
