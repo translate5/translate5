@@ -290,15 +290,19 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * set all associations of the given taskGuid (or for all tasks if null) to unused where the session is expired
      * sets also the state to open where allowed
      * @param string $taskGuid optional, if omitted cleanup all taskUserAssocs
+     * @param string $forced optional, default false. if true cleanup also taskUserAssocs with validSessionsIds, only usable with given taskGuid!
      */
-    public function cleanupLocked($taskGuid = null) {
+    public function cleanupLocked($taskGuid = null, $forced = false) {
         $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
         /* @var $workflow editor_Workflow_Default */
         
         $validSessionIds = ZfExtended_Models_Db_Session::GET_VALID_SESSIONS_SQL;
         $where = array('not usedState is null and (usedInternalSessionUniqId not in ('.$validSessionIds.') or usedInternalSessionUniqId is null)');
-        
         if(!empty($taskGuid)) {
+            if($forced) {
+                //since with force = true we throw out all users we allow this only with a given taskguid
+                $where = array();
+            }
             $where['taskGuid = ?'] = $taskGuid;
         }
 
