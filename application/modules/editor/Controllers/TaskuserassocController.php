@@ -61,6 +61,21 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->view->total = $this->entity->getTotalCount();
     }
 
+    /**
+     * for post requests we have to check the existance of the desired task first!
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::validate()
+     */
+    protected function validate() {
+        if($this->_request->isPost()) {
+            settype($this->data->taskGuid, 'string');
+            $t = ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $t editor_Models_Task */
+            $t->loadByTaskGuid($this->data->taskGuid);
+        }
+        return parent::validate();
+    }
+    
     public function putAction() {
         $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
         /* @var $workflow editor_Workflow_Default */
