@@ -748,6 +748,35 @@
         <source>Französisch (Belgien)</source>
         <target>French (Belgium)</target>
       </trans-unit>
+      <trans-unit id='V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIERhdGVuIChaSVAsIENTViwgU0RMWExJRkY7IEFuZ2FiZSBub3R3ZW5kaWcp'>
+        <source>Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF; Angabe notwendig)</source>
+        <target>Select the data to be imported (ZIP, CSV, SDLXLIFF; specifying required)</target>
+      </trans-unit>
+      <trans-unit id='SW1wb3J0IERhdGVpwrk='><source>Import Datei¹</source><target>Import Datei¹</target></trans-unit>
+      <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFpJUCwgQ1NWIG9kZXIgU0RMWExJRkYgRGF0ZWkh'>
+        <source>Bitte verwenden Sie eine ZIP, CSV oder SDLXLIFF Datei!</source>
+        <target>Please use a ZIP, CSV oder SDLXLIFF file only!</target>
+      </trans-unit>
+      <trans-unit id='V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIFRCWCBEYXRlbiBmw7xyIGRhcyBUZXJtVGFnZ2luZw=='>
+        <source>Wählen Sie die zu importierenden TBX Daten für das TermTagging</source>
+        <target>Please choose the TBX data to be imported for the term tagging</target>
+      </trans-unit>
+      <trans-unit id='VEJYIERhdGVpwrkgwrI='>
+        <source>TBX Datei¹ ²</source>
+        <target>TBX file¹ ²</target>
+      </trans-unit>
+      <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRCWCBEYXRlaSE='>
+        <source>Bitte verwenden Sie eine TBX Datei!</source>
+        <target>Please use a TBX file!</target>
+      </trans-unit>
+      <trans-unit id='PGIgc3R5bGU9ImNvbG9yOiNmZjAwMDA7Ij5OZXU6PC9iPiBTaWUga8O2bm5lbiBudW4gbmViZW4gWklQIGF1Y2ggZGlyZWt0IFNETFhMSUZGIG9kZXIgQ1NWIERhdGVpZW4gYmVudXR6ZW4hIDxhIHRhcmdldD0iX2JsYW5rIiBocmVmPSJ7MH0vaW5kZXgvdXNhZ2Ujc2luZ2xlLWltcG9ydCI+TWVociBJbmZvPC9hPi4='>
+        <source><b style="color:#ff0000;">Neu:</b> Sie können nun neben ZIP auch direkt SDLXLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage#single-import">Mehr Info</a>.</source>
+        <target><b style="color:#ff0000;">New:</b> You can now also use SDLXLIFF or CSV files directly! <a target="_blank" href="{0}/index/usage#single-import">More information</a>.</target>
+      </trans-unit>
+      <trans-unit id='wrIgc2VwYXJhdGUgVEJYIG51ciBiZWltIEltcG9ydCBlaW5lciBTRExYTElGRiBEYXRlaSBtw7ZnbGljaC4='>
+        <source>² separate TBX nur beim Import einer SDLXLIFF Datei möglich.</source>
+        <target>² extra TBX file only available for SDLXLIFF import.</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
