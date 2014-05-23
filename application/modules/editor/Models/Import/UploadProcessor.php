@@ -54,7 +54,7 @@ class editor_Models_Import_UploadProcessor {
     protected $validUploadTypes = array(
         self::TYPE_ZIP => 'application/zip',
         self::TYPE_SDLXLIFF => 'application/xml',
-        self::TYPE_CSV => 'application/csv',
+        self::TYPE_CSV => 'text/plain',
     );
     
     /**
@@ -106,7 +106,10 @@ class editor_Models_Import_UploadProcessor {
         if(isset($this->validUploadTypes[$ext]) && $mime == $this->validUploadTypes[$ext]) {
             return $ext; //extension is also the internal used type!
         }
-        
+        $log = ZfExtended_Factory::get('ZfExtended_Log');
+        /* @var $log ZfExtended_Log */
+        $log->logError('Unknown mime type for extension "'.$ext.'" discovered',
+                        'Someone tried the file extension "'.$ext.'" which should be the mime "'.$this->validUploadTypes[$ext].'" but we got the following mime: "'.$mime.'"');
         $this->addUploadError('noValidUploadFile', $importInfo['importUpload']['name']);
         $this->throwOnUploadError();
     }
