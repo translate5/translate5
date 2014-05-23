@@ -51,14 +51,11 @@ Ext.define('Editor.store.admin.Users', {
   getUserName: function(id) {
       var me = this, 
           user = null,
-          name = function(user) {
-            return user.get('firstName')+' '+user.get('surName');
-          },
           idx = -1;
 
       if(Ext.isString(id)){
           if(me.userGuidName[id]) {
-              return name(me.userGuidName[id]);
+              return me.userGuidName[id].getUserName();
           }
           idx = me.find('userGuid', id);
           if(idx < 0) {
@@ -71,7 +68,7 @@ Ext.define('Editor.store.admin.Users', {
           user = me.getById(id);
       }
       if(user) {
-          return name(user); 
+          return user.getUserName(); 
       }
       return '';
   }

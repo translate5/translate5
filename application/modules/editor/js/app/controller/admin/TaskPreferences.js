@@ -43,8 +43,14 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
   stores: ['admin.Users', 'admin.TaskUserAssocs', 'admin.task.UserPrefs'],
   views: ['Editor.view.admin.task.PreferencesWindow', 'Editor.view.admin.task.UserAssocGrid','Editor.view.admin.task.Preferences'],
   refs : [{
-      ref: 'taskAddWindow', //FIXME DUMMY entry
-      selector: '#adminTaskAddWindow'
+      ref: 'prefForm',
+      selector: '.editorAdminTaskUserPrefsForm'
+  },{
+      ref: 'wfStepCombo',
+      selector: '.editorAdminTaskUserPrefsForm .combobox[name="workflowStep"]'
+  },{
+      ref: 'usersCombo',
+      selector: '.editorAdminTaskUserPrefsForm .combobox[name="userGuid"]'
   }],
   strings: {
       taskWorkflowSaved: "#UT#Workflow der Aufgabe gespeichert!"
@@ -76,8 +82,23 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           '.editorAdminTaskUserPrefsForm #alternates .checkboxgroup': {
               beforerender: me.prepareAlternates
           },
+          '.editorAdminTaskUserPrefsForm': {
+              beforerender: me.setActualTaskInCmp
+          },
           '.editorAdminTaskUserPrefsGrid': {
-              beforerender: me.setActualTaskInGrid
+              beforerender: me.setActualTaskInCmp
+          },
+          '.editorAdminTaskUserPrefsGrid #userPrefAdd': {
+              click: me.handleAddClick
+          },
+          '.editorAdminTaskUserPrefsGrid #userPrefDelete': {
+              click: me.handleDeleteClick
+          },
+          '.editorAdminTaskUserPrefsForm #cancelBtn': {
+              click: me.clickCancel
+          },
+          '.editorAdminTaskUserPrefsForm #saveBtn': {
+              click: me.clickSave
           }
       });
   },
@@ -136,6 +157,68 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       }).show();
   },
   
+  handleAddClick: function() {
+      var me = this,
+          task = me.actualTask,
+          fields = task.segmentFields().collect('name'),
+          rec,
+          firstStep = me.updateWorkflowSteps(),
+          form = me.getPrefForm();
+      form.enable();
+      me.updateUsers();
+      rec = Ext.create(Editor.model.admin.task.UserPref, {
+          fields: fields,
+          workflow: task.get('workflow'),
+          workflowStep: firstStep,
+          taskGuid: task.get('taskGuid')
+      });
+      form.getForm().reset();
+      form.loadRecord(rec);
+  },
+  
+  handleDeleteClick: function() {
+      
+  },
+  
+  /**
+   * prefills the workflow step combo in the form with the available steps for the selected workflow
+   * returns the first workflow step name in the combo
+   * @return {String}
+   */
+  updateWorkflowSteps: function() {
+      var me = this,
+          data = me.actualTask.getWorkflowMetaData(),
+          steps = [];
+      Ext.Object.each(data.steps, function(key, val) {
+          steps.push([key, val]);
+      });
+      me.getWfStepCombo().store.loadData(steps);
+      if(steps.length == 0){
+          return "";
+      }
+      return steps[0][0];
+  },
+  
+  /**
+   * prefills the workflow step combo in the form with the available steps for the selected workflow
+   */
+  updateUsers: function() {
+      var me = this,
+          tua = me.getAdminTaskUserAssocsStore(),
+          prefs = me.getAdminTaskUserPrefsStore(),
+          users = [];
+      tua.each(function(rec){
+          var ug = rec.get('userGuid'),
+              userName = rec.get('surName')+', '+rec.get('firstName')+' ('+rec.get('login')+')';
+          if(! prefs.find('userGuid', ug) >= 0) {
+              users.push([ug, userName]);
+          }
+      });
+      me.getUsersCombo().setDisabled(users.length == 0);
+      console.log(users);
+      me.getUsersCombo().store.loadData(users);
+  },
+  
   /**
    * saves the new workflow into the task, and to the server
    * @param {Ext.form.fiueld.ComboBox} combo
@@ -160,23 +243,36 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           checkboxGroup.add({
               xtype: 'checkbox',
               boxLabel: field.get('label'),
-              name: field.get('name')
+              value: field.get('name'),
+              inputValue: field.get('name'),
+              name: 'fields'
           });
       });
   },
   /**
-   * sets a reference of the actual task in the grid
-   * @param grid
+   * sets a reference of the actual task in the given component
+   * @param {Ext.AbstractComponent} cmp
    */
-  setActualTaskInGrid: function(grid) {
+  setActualTaskInCmp: function(cmp) {
       var labels = {};
-      grid.actualTask = this.actualTask;
+      cmp.actualTask = this.actualTask;
       this.actualTask.segmentFields().each(function(field){
           labels[field.get('name')] = field.get('label');
       });
-      grid.fieldLabels = labels;
+      cmp.fieldLabels = labels;
   },
   //FIXME clear the local used stores?
   clearStores: function() {
+  },
+  clickSave: function(){
+      var form = this.getPrefForm(),
+          rec = form.getRecord();
+      form.getForm().updateRecord(rec);
+      rec.set('fields', form.getValues().fields.join(','))
+      rec.save();
+  },
+  clickCancel: function() {
+      this.getPrefForm().getForm().reset();
+      this.getPrefForm().disable();
   }
 });

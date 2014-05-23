@@ -64,6 +64,9 @@ Ext.define('Editor.model.admin.User', {
       writeAllFields: false
     }
   },
+  getUserName: function() {
+      return this.get('firstName')+' '+this.get('surName');
+  },
   isAllowed: function(right, task) {
       var me = this,
           isAllowed = (Ext.Array.indexOf(Editor.data.app.userRights, right) >= 0);
