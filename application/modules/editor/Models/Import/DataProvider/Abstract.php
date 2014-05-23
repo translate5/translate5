@@ -67,6 +67,47 @@ abstract class editor_Models_Import_DataProvider_Abstract {
     }
     
     /**
+     * creates a temporary folder to contain the import data 
+     * @throws Zend_Exception
+     */
+    protected function checkAndMakeTempImportFolder() {
+        $this->importFolder = $this->taskPath.DIRECTORY_SEPARATOR.'_tempImport';
+        if(is_dir($this->importFolder)) {
+            throw new Zend_Exception('Temporary directory for Task GUID ' . $this->task->getTaskGuid() . ' already exists!');
+        }
+        $msg = 'Temporary directory for Task GUID ' . $this->task->getTaskGuid() . ' could not be created!';
+        $this->mkdir($this->importFolder, $msg);
+    }
+    
+    /**
+     * deletes the temporary import folder
+     */
+    protected function removeTempFolder() {
+        /* @var $recursivedircleaner ZfExtended_Controller_Helper_Recursivedircleaner */
+        $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
+                    'Recursivedircleaner'
+        );
+        if(isset($this->importFolder) && is_dir($this->importFolder)) {
+            $recursivedircleaner->delete($this->importFolder);
+        }
+    }
+    
+    /**
+     * exception throwing mkdir
+     * @param string $path
+     * @param string $errMsg
+     * @throws Zend_Exception
+     */
+    protected function mkdir($path, $errMsg = null) {
+        if(empty($errMsg)) {
+            $errMsg = 'Could not create folder '.$path;
+        }
+        if(!@mkdir($path)) {
+            throw new Zend_Exception($errMsg);
+        }
+    }
+    
+    /**
      * sets the internal used task object
      * @param editor_Models_Task $task
      */

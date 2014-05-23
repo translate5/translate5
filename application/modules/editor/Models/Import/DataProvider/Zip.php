@@ -54,24 +54,10 @@ class editor_Models_Import_DataProvider_Zip extends editor_Models_Import_DataPro
 	 * @see editor_Models_Import_DataProvider_Abstract::checkAndPrepare()
 	 */
 	public function checkAndPrepare() {
-	    $this->checkAndMakeUnzipFolder();
+	    $this->checkAndMakeTempImportFolder();
 	    $this->unzip();
 	}
 	
-	/**
-	 * creates the temporary folder to unzip the data 
-	 * @throws Zend_Exception
-	 */
-	protected function checkAndMakeUnzipFolder() {
-	    $this->importFolder = $this->taskPath.DIRECTORY_SEPARATOR.'_tempImport';
-	    if(is_dir($this->importFolder)) {
-	    	throw new Zend_Exception('Temporary directory for Task GUID ' . $this->task->getTaskGuid() . ' already exists!');
-	    }
-	    if(!@mkdir($this->importFolder)) {
-	    	throw new Zend_Exception('Temporary directory for Task GUID ' . $this->task->getTaskGuid() . ' could not be created!');
-	    }
-	}
-
 	/**
 	 * (non-PHPdoc)
 	 * @see editor_Models_Import_DataProvider_Abstract::archiveImportedData()
@@ -109,7 +95,7 @@ class editor_Models_Import_DataProvider_Zip extends editor_Models_Import_DataPro
 	 */
 	public function postImportHandler() {
 	    parent::postImportHandler();
-	    $this->removeUnzipFolder();
+	    $this->removeTempFolder();
 	}
 
 	/**
@@ -117,19 +103,6 @@ class editor_Models_Import_DataProvider_Zip extends editor_Models_Import_DataPro
 	 * @see editor_Models_Import_DataProvider_Abstract::handleImportException()
 	 */
 	public function handleImportException(Exception $e) {
-	    $this->removeUnzipFolder();
-	}
-	
-	/**
-	 * deletes the temporary import folder
-	 */
-	protected function removeUnzipFolder() {
-	    /* @var $recursivedircleaner ZfExtended_Controller_Helper_Recursivedircleaner */
-	    $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-	    		'Recursivedircleaner'
-	    );
-	    if(isset($this->importFolder) && is_dir($this->importFolder)) {
-    	    $recursivedircleaner->delete($this->importFolder);
-	    }
+	    $this->removeTempFolder();
 	}
 }

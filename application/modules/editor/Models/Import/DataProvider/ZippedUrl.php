@@ -55,7 +55,7 @@ class editor_Models_Import_DataProvider_ZippedUrl extends editor_Models_Import_D
      * @throws Zend_Exception
      */
     public function checkAndPrepare() {
-        $this->checkAndMakeUnzipFolder();
+        $this->checkAndMakeTempImportFolder();
         $this->importZip = $this->getZipArchivePath();
         $this->fetchFile();
         $this->unzip();
