@@ -526,24 +526,14 @@
 <trans-unit id='S2VpbmUgVGVybWlub2xvZ2llIHZvcmhhbmRlbiE='><source>Keine Terminologie vorhanden!</source><target>Keine Terminologie vorhanden!</target></trans-unit>
 <trans-unit id='cXVlbGxl'><source>quelle</source><target>quelle</target></trans-unit>
 <trans-unit id='emllbA=='><source>ziel</source><target>ziel</target></trans-unit>
-<trans-unit id='emllbDE='><source>ziel1</source><target>ziel1</target></trans-unit>
-<trans-unit id='emllbDI='><source>ziel2</source><target>ziel2</target></trans-unit>
-<trans-unit id='emllbDM='><source>ziel3</source><target>ziel3</target></trans-unit>
-<trans-unit id='emllbDQ='><source>ziel4</source><target>ziel4</target></trans-unit>
-<trans-unit id='emllbDY='><source>ziel6</source><target>ziel6</target></trans-unit>
-<trans-unit id='emllbDZfMQ=='><source>ziel6_1</source><target>ziel6_1</target></trans-unit>
-<trans-unit id='emllbDg='><source>ziel8</source><target>ziel8</target></trans-unit>
-<trans-unit id='emllbDk='><source>ziel9</source><target>ziel9</target></trans-unit>
-<trans-unit id='emllbDEw'><source>ziel10</source><target>ziel10</target></trans-unit>
-<trans-unit id='emllbE90aGVy'><source>zielOther</source><target>zielOther</target></trans-unit>
-<trans-unit id='emllbE90aGVyXzE='><source>zielOther_1</source><target>zielOther_1</target></trans-unit>
-<trans-unit id='emllbE90aGVyMg=='><source>zielOther2</source><target>zielOther2</target></trans-unit>
-<trans-unit id='Y29tcGxldGx5TmV3'><source>completlyNew</source><target>completlyNew</target></trans-unit>
-<trans-unit id='emllbE5FVw=='><source>zielNEW</source><target>zielNEW</target></trans-unit>
-<trans-unit id='emllbE5FV2FnYWlu'><source>zielNEWagain</source><target>zielNEWagain</target></trans-unit>
-<trans-unit id='emllbE5FV18x'><source>zielNEW_1</source><target>zielNEW_1</target></trans-unit>
-<trans-unit id='emllbDU='><source>ziel5</source><target>ziel5</target></trans-unit>
-<trans-unit id='emllbDc='><source>ziel7</source><target>ziel7</target></trans-unit>
+<trans-unit id='V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIERhdGVuIChaSVAsIENTViwgU0RMWExJRkY7IEFuZ2FiZSBub3R3ZW5kaWcp'><source>Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF; Angabe notwendig)</source><target>Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF; Angabe notwendig)</target></trans-unit>
+<trans-unit id='SW1wb3J0IERhdGVpwrk='><source>Import Datei¹</source><target>Import Datei¹</target></trans-unit>
+<trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFpJUCwgQ1NWIG9kZXIgU0RMWExJRkYgRGF0ZWkh'><source>Bitte verwenden Sie eine ZIP, CSV oder SDLXLIFF Datei!</source><target>Bitte verwenden Sie eine ZIP, CSV oder SDLXLIFF Datei!</target></trans-unit>
+<trans-unit id='V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIFRCWCBEYXRlbiBmw7xyIGRhcyBUZXJtVGFnZ2luZw=='><source>Wählen Sie die zu importierenden TBX Daten für das TermTagging</source><target>Wählen Sie die zu importierenden TBX Daten für das TermTagging</target></trans-unit>
+<trans-unit id='VEJYIERhdGVpwrkgwrI='><source>TBX Datei¹ ²</source><target>TBX Datei¹ ²</target></trans-unit>
+<trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRCWCBEYXRlaSE='><source>Bitte verwenden Sie eine TBX Datei!</source><target>Bitte verwenden Sie eine TBX Datei!</target></trans-unit>
+<trans-unit id='PGIgc3R5bGU9ImNvbG9yOiNmZjAwMDA7Ij5OZXU6PC9iPiBTaWUga8O2bm5lbiBudW4gbmViZW4gWklQIGF1Y2ggZGlyZWt0IFNETFhMSUZGIG9kZXIgQ1NWIERhdGVpZW4gYmVudXR6ZW4hIDxhIHRhcmdldD0iX2JsYW5rIiBocmVmPSJ7MH0vaW5kZXgvdXNhZ2UiPk1laHIgSW5mbzwvYT4u'><source><b style="color:#ff0000;">Neu:</b> Sie können nun neben ZIP auch direkt SDLXLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage">Mehr Info</a>.</source><target><b style="color:#ff0000;">Neu:</b> Sie können nun neben ZIP auch direkt SDLXLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage">Mehr Info</a>.</target></trans-unit>
+<trans-unit id='wrIgc2VwYXJhdGUgVEJYIG51ciBiZWltIEltcG9ydCBlaW5lciBTRExYTElGRiBEYXRlaSBtw7ZnbGljaC4='><source>² separate TBX nur beim Import einer SDLXLIFF Datei möglich.</source><target>² separate TBX nur beim Import einer SDLXLIFF Datei möglich.</target></trans-unit>
   </body>
  </file>
 </xliff>
