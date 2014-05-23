@@ -47,12 +47,20 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
             items: [
                 {
                     xtype: 'combobox',
+                    name: 'workflowStep',
+                    forceSelection: true,
+                    queryMode: 'local',
+                    store: [['','']],//dummy entry to get correct fields
                     anchor: '100%',
                     fieldLabel: 'Workflow Step'
                 },
                 {
                     xtype: 'combobox',
                     anchor: '100%',
+                    name: 'userGuid',
+                    forceSelection: true,
+                    queryMode: 'local',
+                    store: [['','']],//dummy entry to get correct fields
                     fieldLabel: 'User'
                 },{
                     xtype: 'checkboxfield',
@@ -99,10 +107,12 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
                         },
                         {
                             xtype: 'button',
+                            itemId: 'cancelBtn',
                             text: 'Cancel'
                         },
                         {
                             xtype: 'button',
+                            itemId: 'saveBtn',
                             text: 'Save'
                         }
                     ]
@@ -111,5 +121,17 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
         });
 
         me.callParent(arguments);
+    },
+    loadRecord: function(rec) {
+        var me = this,
+            fields = me.actualTask.segmentFields().collect('name'),
+            res = me.callParent(arguments),
+            checked = rec.get('fields').split(','),
+            toSet = {};
+        Ext.Array.each(fields, function(val) {
+            toSet[val] = (Ext.Array.indexOf(checked, val) >= 0);
+        });
+        me.getForm().setValues({fields: rec.get('fields').split(',')});
+        return res;
     }
 });
