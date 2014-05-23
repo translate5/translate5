@@ -75,6 +75,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           },
           '.editorAdminTaskUserPrefsForm #alternates .checkboxgroup': {
               beforerender: me.prepareAlternates
+          },
+          '.editorAdminTaskUserPrefsGrid': {
+              beforerender: me.setActualTaskInGrid
           }
       });
   },
@@ -161,8 +164,19 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           });
       });
   },
+  /**
+   * sets a reference of the actual task in the grid
+   * @param grid
+   */
+  setActualTaskInGrid: function(grid) {
+      var labels = {};
+      grid.actualTask = this.actualTask;
+      this.actualTask.segmentFields().each(function(field){
+          labels[field.get('name')] = field.get('label');
+      });
+      grid.fieldLabels = labels;
+  },
   //FIXME clear the local used stores?
   clearStores: function() {
-      
   }
 });

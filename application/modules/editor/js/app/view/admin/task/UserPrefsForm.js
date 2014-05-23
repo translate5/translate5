@@ -57,7 +57,7 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
                 },{
                     xtype: 'checkboxfield',
                     anchor: '100%',
-                    boxLabel: 'Anonymous olumn Label'
+                    boxLabel: 'Anonymous Column Label'
                 },{
                     xtype: 'fieldset',
                     itemId: 'alternates',
