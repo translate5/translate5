@@ -39,9 +39,15 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     cls : 'adminTaskAddWindow',
     title : '#UT#Aufgabe erstellen',
     strings: {
-        importZipTip: '#UT#Wählen Sie die zu importierenden Daten (ZIP, CSV; Angabe notwendig)',
-        importZipLabel: '#UT#Import Datei¹',
-        importZipType: '#UT#Bitte verwenden Sie eine ZIP Datei!',
+        importUploadTip: '#UT#Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF; Angabe notwendig)',
+        importUploadLabel: '#UT#Import Datei¹',
+        importUploadType: '#UT#Bitte verwenden Sie eine ZIP, CSV oder SDLXLIFF Datei!',
+        importTbxTip: '#UT#Wählen Sie die zu importierenden TBX Daten für das TermTagging',
+        importTbxTipDis: '#UT#Wählen Sie die zu importierenden TBX Daten für das TermTagging',
+        importTbxLabel: '#UT#TBX Datei¹²',
+        importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!',
+        importNews: '#UT#<b style="color:#ff0000;">Neu:</b> Sie können nun direkt SDLXLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage">Mehr Info</a>.',
+        
         taskNrLabel: '#UT#Auftragsnummer',
         taskNameTip: '#UT#Projektname (frei wählbar, Angabe notwendig)',
         taskNameLabel: '#UT#Projektname¹',
@@ -56,13 +62,14 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         fullMatchLabel: '#UT#100% Matches sind editierbar',
         sourceEditLabel: '#UT#Ausgangstext ist editierbar',
         bottomInfo: '#UT# ¹ Diese Angaben / Daten werden für den Import zwingend benötigt.',
+        bottomInfo2: '#UT# ² separate TBX nur beim Import einer SDLXLIFF Datei möglich.',
         feedbackText: "#UT# Fehler beim Import!",
         feedbackTip: '#UT#Fehler beim Import: Bitte wenden Sie sich an den Support!',
         addBtn: '#UT#Task hinzufügen',
         cancelBtn: '#UT#Abbrechen'
     },
-    height : 400,
-    width : 500,
+    height : 500,
+    width : 550,
     loadingMask: null,
     modal : true,
     initComponent : function() {
@@ -115,12 +122,25 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     fieldLabel: me.strings.relaisLangLabel
                 }, langCombo),{
                     xtype: 'filefield',
-                    name: 'importZip',
-                    regex: /\.zip$/i,
-                    regexText: me.strings.importZipType,
+                    name: 'importUpload',
+                    regex: /\.(zip|sdlxliff|csv)$/i,
+                    regexText: me.strings.importUploadType,
                     allowBlank: false,
-                    toolTip: me.strings.importZipTip,
-                    fieldLabel: me.strings.importZipLabel
+                    toolTip: me.strings.importUploadTip,
+                    fieldLabel: me.strings.importUploadLabel
+                },{
+                    xtype: 'container',
+                    padding: '0 0 10 0',
+                    html: Ext.String.format(me.strings.importNews, Editor.data.pathToRunDir)
+                },{
+                    xtype: 'filefield',
+                    name: 'importTbx',
+                    regex: /\.tbx$/i,
+                    regexText: me.strings.importTbxType,
+                    allowBlank: true,
+                    disabled: true,
+                    toolTip: me.strings.importTbxTip,
+                    fieldLabel: me.strings.importTbxLabel
                 },{
                     xtype: 'datefield',
                     name: 'orderdate',
@@ -153,7 +173,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     fieldLabel: me.strings.fullMatchLabel
                 },{
                     xtype: 'container',
-                    html: me.strings.bottomInfo,
+                    html: me.strings.bottomInfo+'<br />'+me.strings.bottomInfo2,
                     dock : 'bottom'
                 }]
             }],

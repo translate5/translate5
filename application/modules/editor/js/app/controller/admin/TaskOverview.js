@@ -52,6 +52,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       ref: 'taskAddForm',
       selector: '#adminTaskAddWindow form'
   },{
+      ref: 'tbxField',
+      selector: '#adminTaskAddWindow form filefield[name="importTbx"]'
+  },{
       ref: 'centerRegion',
       selector: 'viewport container[region="center"]'
   },{
@@ -137,8 +140,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           '#adminTaskAddWindow #cancel-task-btn': {
               click: me.handleTaskCancel
           },
-          '#adminTaskAddWindow filefield[name=importZip]': {
-              change: me.initEmptyTaskName
+          '#adminTaskAddWindow filefield[name=importUpload]': {
+              change: me.handleChangeImportFile
           },
           '#segmentgrid': {
               afterrender: me.initTaskReadMode
@@ -204,11 +207,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   loadTasks: function() {
       this.getAdminTasksStore().load();
   },
-  initEmptyTaskName: function(field, val){
+  handleChangeImportFile: function(field, val){
       var name = this.getTaskAddForm().down('textfield[name=taskName]');
       if(name.getValue() == '') {
           name.setValue(val.replace(/\.[^.]+$/, ''));
       }
+      this.getTbxField().setDisabled(! /\.sdlxliff$/i.test(val));
   },
   /**
    * Inits the loaded task and the segment grid read only if necessary
@@ -334,6 +338,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               me.savingHide();
               if(submit.failureType == 'server' && submit.result && submit.result.errors && !Ext.isDefined(submit.result.success)) {
                   //all other failures should mark a field invalid
+                  this.getTbxField().setDisabled(true);
                   error.show();
               }
           }
