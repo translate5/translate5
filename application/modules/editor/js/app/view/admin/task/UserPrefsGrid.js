@@ -55,8 +55,17 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                 {
                     xtype: 'gridcolumn',
                     renderer: function(value, metaData, record, rowIndex, colIndex, store, view) {
-                        console.log("RENDERER see JIRA screen");
-                        return value;
+                        var fields = value.split(','),
+                            result = [];
+                        Ext.Object.each(this.fieldLabels, function(k, v){
+                            if(Ext.Array.indexOf(fields, k) >= 0) {
+                                result.push(v);
+                            }
+                            else {
+                                result.push('<strike>'+v+'</strike>');
+                            }
+                        });
+                        return result.join('<br />');
                     },
                     dataIndex: 'fields',
                     text: 'Target Columns'
@@ -68,13 +77,12 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                 },
                 {
                     xtype: 'gridcolumn',
-                    dataIndex: 'username',
+                    dataIndex: 'userGuid',
                     renderer: function(v, meta, rec) {
-                        var userGuid = rec.get('userGuid');
-                        if(userGuid.length == 0) {
-                            return null;
+                        if(v.length == 0) {
+                            return "#UT#Default Entry";
                         }
-                        return "FOO";
+                        Ext.StoreMgr.get();
                     },
                     text: 'Non-editable Targets'
                 }
