@@ -394,9 +394,13 @@ Ext.define('Editor.controller.Localizer', {
     
     Editor.view.admin.TaskAddWindow.prototype.title = '<?php echo $this->translate->_('Aufgabe erstellen');?>';
     Editor.view.admin.TaskAddWindow.prototype.strings = {
-        importZipTip: '<?php echo $this->translate->_('Wählen Sie die zu importierenden Daten (ZIP, CSV; Angabe notwendig)');?>',
-        importZipLabel: '<?php echo $this->translate->_('Importdatei¹');?>',
-        importZipType: '<?php echo $this->translate->_('Bitte verwenden Sie eine ZIP Datei!');?>',
+        importUploadTip: '<?php echo $this->translate->_('Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF; Angabe notwendig)');?>',
+        importUploadLabel: '<?php echo $this->translate->_('Import Datei¹');?>',
+        importUploadType: '<?php echo $this->translate->_('Bitte verwenden Sie eine ZIP, CSV oder SDLXLIFF Datei!');?>',
+        importTbxTip: '<?php echo $this->translate->_('Wählen Sie die zu importierenden TBX Daten für das TermTagging');?>',
+        importTbxLabel: '<?php echo $this->translate->_('TBX Datei¹ ²');?>',
+        importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>',
+        importNews: '<?php echo $this->translate->_('<b style="color:#ff0000;">Neu:</b> Sie können nun neben ZIP auch direkt SDLXLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage">Mehr Info</a>.');?>',
         taskNrLabel: '<?php echo $this->translate->_('Auftragsnummer');?>',
         taskNameTip: '<?php echo $this->translate->_('Projektname (frei wählbar, Angabe notwendig)');?>',
         taskNameLabel: '<?php echo $this->translate->_('Projektname¹');?>',
@@ -412,6 +416,7 @@ Ext.define('Editor.controller.Localizer', {
         orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
         sourceEditLabel: '<?php echo $this->translate->_('Ausgangstext ist editierbar');?>',
         bottomInfo: '<?php echo $this->translate->_('¹ Diese Angaben / Daten werden für den Import zwingend benötigt.');?>',
+        bottomInfo2: '<?php echo $this->translate->_('² separate TBX nur beim Import einer SDLXLIFF Datei möglich.');?>',
         feedbackText: '<?php echo $this->translate->_('Fehler beim Import!');?>',
         feedbackTip: '<?php echo $this->translate->_('Fehler beim Import: Bitte wenden Sie sich an den Support!');?>',
         addBtn: '<?php echo $this->translate->_('Aufgabe hinzufügen');?>',
