@@ -58,18 +58,6 @@ class editor_TaskController extends ZfExtended_RestController {
     protected $entity;
     
     /**
-     * container for upload errors
-     * @var array
-     */
-    protected $uploadErrors = array();
-    
-    /**
-     * Path to uploaded Zip File
-     * @var string
-     */
-    protected $pathToZip;
-    
-    /**
      * Cached map of userGuids to userNames
      * @var array
      */
@@ -106,6 +94,11 @@ class editor_TaskController extends ZfExtended_RestController {
      * @var ZfExtended_Zendoverwrites_Translate
      */
     protected $translate;
+    
+    /**
+     * @var editor_Models_Import_UploadProcessor
+     */
+    protected $upload;
 
     public function init() {
         parent::init();
@@ -114,6 +107,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->user = new Zend_Session_Namespace('user');
         $this->workflow = ZfExtended_Factory::get('editor_Workflow_Default');
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        $this->upload = ZfExtended_Factory::get('editor_Models_Import_UploadProcessor');
     }
     
     /**
@@ -283,8 +277,8 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->processUploadedFile();
             $this->view->success = true;
             $this->view->rows = $this->entity->getDataObject();
+            $this->workflow->doImport($this->entity);
         }
-        $this->workflow->doImport($this->entity);
     }
 
     /**
@@ -317,7 +311,7 @@ class editor_TaskController extends ZfExtended_RestController {
                         $this->entity->getRelaisLang(), 
                         editor_Models_Languages::LANG_TYPE_ID);
         $import->setTask($this->entity);
-        $dp = $this->getDataProvider($this->pathToZip);
+        $dp = $this->upload->getDataProvider();
         
         try {
             $import->import($dp);
@@ -328,14 +322,6 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         #auskommentiert, da Serverabsturz bei inetsolutions
         //if(file_exists($flagFile))unlink($flagFile);
-    }
-    
-    /**
-     * @param string $zipfile
-     * @return editor_Models_Import_DataProvider_Abstract
-     */
-    protected function getDataProvider(string $zipfile) {
-        return ZfExtended_Factory::get('editor_Models_Import_DataProvider_Zip', array($zipfile));
     }
     
     /**
@@ -608,52 +594,7 @@ class editor_TaskController extends ZfExtended_RestController {
      * gets and validates the uploaded zip file
      */
     protected function additionalValidations() {
-        $upload = new Zend_File_Transfer_Adapter_Http();
-        $uploaded = $upload->getFileInfo('importZip');
-        $zip = $uploaded['importZip']['tmp_name'];
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
-        if ($finfo->file($zip) != 'application/zip') {
-            $this->addUploadError('noZipFile', $uploaded['importZip']['name']);
-        }
-        $this->throwOnUploadError();
-        $this->pathToZip = $zip;
-    }
-
-    /**
-     * Adds an upload error
-     * @see throwOnUploadError
-     * @param string $errorType
-     */
-    protected function addUploadError($errorType) {
-        $msgs = array(
-            'noZipFile' => 'Bitte eine Zip Datei auswählen.',
-        );
-        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        /* @var $translate ZfExtended_Zendoverwrites_Translate */;
-        if(empty($msgs[$errorType])) {
-            $msg = $translate->_('Unbekannter Fehler beim Dateiupload.');
-        }
-        else {
-            $msg = $translate->_($msgs[$errorType]);
-        }
-        $args = func_get_args();
-        array_shift($args); //remove type
-        array_unshift($args, $msg); //add formatted string as first parameter
-        $this->uploadErrors[$errorType] = call_user_func_array('sprintf', $args);
-    }
-
-    /**
-     * throws upload errors if some occured 
-     * @throws ZfExtended_ValidateException
-     */
-    protected function throwOnUploadError() {
-        if(empty($this->uploadErrors)) {
-            return;
-        }
-        $errors = array('importZip' => $this->uploadErrors);
-        $e = new ZfExtended_ValidateException(print_r($errors, 1));
-        $e->setErrors($errors);
-        throw $e;
+        $this->upload->initAndValidate();
     }
 
     /**
