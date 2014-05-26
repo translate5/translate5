@@ -29,6 +29,8 @@
     <source>Unsere regelmäßigen Minor-Releases enthaltenen bereits früher neue Features und notwendige Bug-Fixes. Minor-Releases stehen allen Kunden von MittagQI im Rahmen eines <a href="%s" target="_blank">"Vertrag zu Unterstützung und Updates für translate5"</a> zur Verfügung.</source>
     <target>Our regular minor releases more early contain new features and necessary bug fixes. Minor releases are available to all customers who are having a <a href="%s" target="_blank">"maintenance and support contract"</a> with MittagQI.</target>
 </trans-unit>
+<trans-unit id='KENTVi1EYXRlaWZvcm1hdCBtaXQgTVFNLUF1c3plaWNobnVuZ2VuKQ=='><source>(CSV-Dateiformat mit MQM-Auszeichnungen)</source><target>(CSV file with MQM markup)</target></trans-unit>
+<trans-unit id='KENTVi1EYXRlaWZvcm1hdCBtaXQgbWVocmVyZW4gemllbHNwcmFjaGxpY2hlbiBBbHRlcm5hdGl2c3BhbHRlbik='><source>(CSV-Dateiformat mit mehreren zielsprachlichen Alternativspalten)</source><target>(CSV file with multiple target alternatives)</target></trans-unit>
         </body>
     </file>
 <!-- ids are base64-encoded --></xliff>
