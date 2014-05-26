@@ -41,15 +41,15 @@
  *
  */
 ?>
-<h1><?php echo $this->translate->_('translate5 Quellcode auf bitbucket.org'); ?></h1>
+<h1><?php echo $this->translate->_('translate5 Quellcode auf bitbucket'); ?></h1>
 <div class="main">
-    <h2><?php echo $this->translate->_('Qualitätsgesicherte Version - <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">bitte fragen Sie uns an!</a>'); ?></h2>
-    <p><?php echo $this->translate->_('Bitbucket dient der Entwicklung als Repository und enthält den letzten Stand der Entwicklung. Dieser ist nur bedingt für den Produktiveinsatz geeignet und kann Fehler enthalten!<br/> Ein qualitätsgesichertes Release, welches bereits alle Abhängigkeiten korrekt enthält erhalten Sie <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">gern von uns auf Anfrage</a>. Die Veröffentlichung auf bitbucket.org ist für Entwickler gedacht.'); ?>
+    <p><?php $out = $this->translate->_('Das letzte Major-Release von translate5 ist jeweils <a href="%s" target="_blank">auf bitbucket veröffentlicht</a>. Ein neues Major-Release wird mindestens jedes halbe Jahr veröffentlicht.'); 
+printf($out,'https://bitbucket.org/mittagqi');    
+    ?>
 </p>
-<h2><?php echo $this->translate->_('translate5 Entwickler-Repository auf bitbucket.org'); ?></h2>
 <p>
-    <?php $out = $this->translate->_('Der letzte Stand der Entwicklung von translate5 ist jeweils <a href="%s" target="_blank">auf bitbucket.org veröffentlicht</a>.'); 
-    printf($out,'https://bitbucket.org/mittagqi');
+    <?php $out = $this->translate->_('Unsere regelmäßigen Minor-Releases enthaltenen bereits früher neue Features und notwendige Bug-Fixes. Minor-Releases stehen allen Kunden von MittagQI im Rahmen eines <a href="%s" target="_blank">"Vertrag zu Unterstützung und Updates für translate5"</a> zur Verfügung.'); 
+    printf($out,'http://www.mittagqi.com/translate5/maintenance-contract');
     ?>
 </p>
 <p>
