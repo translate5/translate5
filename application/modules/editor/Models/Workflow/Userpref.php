@@ -33,21 +33,55 @@
  
  END LICENSE AND COPYRIGHT 
  */
-
-/* * #@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-
 /**
  * Workflow_Userpref Entity Objekt
  * 
- * FIXME @method integer getAutoStateId() getAutoStateId()
- * FIXME @method void setAutoStateId() setAutoStateId(integer $id)
+ * @method integer getId() getId()
+ * @method void setId() setId(integer $id)
+ * @method integer getTaskGuid() getTaskGuid()
+ * @method void setTaskGuid() setTaskGuid(string $taskGuid)
+ * @method integer getWorkflowStep() getWorkflowStep()
+ * @method void setWorkflowStep() setWorkflowStep(string $step)
+ * @method integer getAnonymousCols() getAnonymousCols()
+ * @method void setAnonymousCols() setAnonymousCols(boolean $anon)
+ * @method integer getVisibility() getVisibility()
+ * @method void setVisibility() setVisibility(string $vis)
+ * @method integer getUserGuid() getUserGuid()
+ * @method void setUserGuid() setUserGuid(string $userGuid)
+ * @method integer getFields() getFields()
+ * @method void setFields() setFields(string $userGuid)
  */
 class editor_Models_Workflow_Userpref extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass          = 'editor_Models_Db_Workflow_Userpref';
     protected $validatorInstanceClass   = 'editor_Models_Validator_Workflow_Userpref';
+
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_Models_Entity_Abstract::save()
+     */
+    public function save() {
+        //ensure that both values are null in the DB
+        if(empty($this->row->userGuid)) {
+            $this->row->userGuid = null;
+        }
+        if(empty($this->row->workflowStep)) {
+            $this->row->workflowStep = null;
+        }
+        parent::save();
+    }
+    
+    protected function validatorLazyInstatiation() {
+        parent::validatorLazyInstatiation();
+        $this->validator->setTaskGuid($this->getTaskGuid());
+    }
+    
+    /**
+     * returns true if this is the default entry
+     * @return boolean
+     */
+    public function isDefault() {
+        $step = $this->getWorkflowStep();
+        $userGuid = $this->getUserGuid();
+        return empty($step) && empty($userGuid);
+    }
 }
