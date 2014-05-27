@@ -38,7 +38,9 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
 
     width: 250,
     bodyPadding: 10,
-    title: '#UT#User Pref Details',
+    disabled: true,
+    title_edit: '#UT#Bearbeite Eintrag Nr.: {0}',
+    title: '#UT#Eintrag erstellen',
 
     initComponent: function() {
         var me = this;
@@ -48,6 +50,7 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
                 {
                     xtype: 'combobox',
                     name: 'workflowStep',
+                    allowBlank: false,
                     forceSelection: true,
                     queryMode: 'local',
                     store: [['','']],//dummy entry to get correct fields
@@ -58,6 +61,7 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
                     xtype: 'combobox',
                     anchor: '100%',
                     name: 'userGuid',
+                    allowBlank: false,
                     forceSelection: true,
                     queryMode: 'local',
                     store: [['','']],//dummy entry to get correct fields
@@ -65,6 +69,7 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
                 },{
                     xtype: 'checkboxfield',
                     anchor: '100%',
+                    name: 'anonymousCols',
                     boxLabel: 'Anonymous Column Label'
                 },{
                     xtype: 'fieldset',
@@ -80,18 +85,24 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
                     items: [
                         {
                             xtype: 'radiofield',
+                            name: 'visibility',
                             anchor: '100%',
-                            boxLabel: 'Box Label'
+                            inputValue: 'show',
+                            boxLabel: 'Show'
                         },
                         {
                             xtype: 'radiofield',
+                            name: 'visibility',
                             anchor: '100%',
-                            boxLabel: 'Box Label'
+                            inputValue: 'hide',
+                            boxLabel: 'Hide'
                         },
                         {
                             xtype: 'radiofield',
+                            name: 'visibility',
                             anchor: '100%',
-                            boxLabel: 'Box Label'
+                            inputValue: 'disable',
+                            boxLabel: 'Disabled'
                         }
                     ]
                 }
@@ -107,13 +118,13 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
                         },
                         {
                             xtype: 'button',
-                            itemId: 'cancelBtn',
-                            text: 'Cancel'
+                            itemId: 'saveBtn',
+                            text: 'Save'
                         },
                         {
                             xtype: 'button',
-                            itemId: 'saveBtn',
-                            text: 'Save'
+                            itemId: 'cancelBtn',
+                            text: 'Cancel'
                         }
                     ]
                 }
@@ -122,16 +133,28 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
 
         me.callParent(arguments);
     },
-    loadRecord: function(rec) {
+    /**
+     * sets the values from the given record into the form
+     * @param {Editor.model.admin.task.UserPref} rec
+     * @param {String} FOR_ALL the value to be used for null steps and users
+     */
+    loadRecord: function(rec, FOR_ALL) {
         var me = this,
             fields = me.actualTask.segmentFields().collect('name'),
             res = me.callParent(arguments),
             checked = rec.get('fields').split(','),
             toSet = {};
+        this.fireEvent('beforeLoadRecord', this, rec);
+        //set the field checkboxes by the stored string
         Ext.Array.each(fields, function(val) {
             toSet[val] = (Ext.Array.indexOf(checked, val) >= 0);
         });
-        me.getForm().setValues({fields: rec.get('fields').split(',')});
+        me.getForm().setValues({
+            fields: rec.get('fields').split(','),
+            userGuid: rec.get('userGuid') || FOR_ALL,
+            workflowStep: rec.get('workflowStep') || FOR_ALL
+        });
+        me.setTitle(rec.phantom ? me.title : Ext.String.format(me.title_edit, (rec.store.indexOfTotal(rec) + 1)));
         return res;
     }
 });

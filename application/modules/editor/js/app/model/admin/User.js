@@ -64,8 +64,13 @@ Ext.define('Editor.model.admin.User', {
       writeAllFields: false
     }
   },
+  statics: {
+      getUserName: function(rec) {
+        return rec.get('firstName')+' '+rec.get('surName');
+      },
+  },
   getUserName: function() {
-      return this.get('firstName')+' '+this.get('surName');
+      return this.self.getUserName(this);
   },
   isAllowed: function(right, task) {
       var me = this,
