@@ -43,4 +43,37 @@ class editor_WorkflowuserprefController extends ZfExtended_RestController {
      * @var editor_Models_Workflow_Userpref
      */
     protected $entity;
+    
+    /**
+     * overridden to prepare data
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::decodePutData()
+     */
+    protected function decodePutData() {
+        parent::decodePutData();
+        if($this->_request->isPost()) {
+            unset($this->data->id); //don't set the ID from client side
+            //a new default entry cannot be created:
+            if(empty($this->data->workflowStep) && empty($this->data->userGuid)) {
+                throw new ZfExtended_Models_Entity_NotAcceptableException();
+            }
+        }
+        if($this->_request->isPut() && $this->entity->isDefault()) {
+            unset($this->data->workflowStep); //don't update the workflowStep of the default entry
+            unset($this->data->userGuid); //don't update the userGuid of the default entry
+        }
+    }
+    
+    /**
+     * deletes the UserPref entry, ensures that the default entry cannot be deleted by API!
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::deleteAction()
+     */
+    public function deleteAction() {
+        $this->entity->load($this->_getParam('id'));
+        if($this->entity->isDefault()) {
+            throw new ZfExtended_Models_Entity_NoAccessException();
+        }
+        $this->entity->delete();
+    }
 }
