@@ -43,15 +43,27 @@ Ext.define('Editor.model.admin.task.UserPref', {
     {name: 'taskGuid', type: 'string'},
     {name: 'workflow', type: 'string'},
     {name: 'workflowStep', type: 'string'},
+    {name: 'anonymousCols', type: 'boolean'},
+    {name: 'visibility', type: 'string'},
     {name: 'userGuid', type: 'string'},
     {name: 'fields', type: 'string'}
   ],
   validations: [
       {type: 'presence', field: 'taskGuid'},
-      {type: 'presence', field: 'workflow'}//,
-      //FIXME can we do this out of segmentfields dynamically? {type: 'inclusion', field: 'fields', list: Ext.Object.getKeys(Editor.data.app.utRoles)}
+      {type: 'presence', field: 'workflow'},
+      {type: 'inclusion', field: 'visibility', list: ['show','hide','disable']},
+      {type: 'inclusion', field: 'workflow', list: Ext.Object.getKeys(Editor.data.app.workflows)}
+      //FIXME can we do this out of segmentfields dynamically?
+      //{type: 'inclusion', field: 'fields', list: Ext.Object.getKeys(Editor.data.app.utRoles)}
   ],
   idProperty: 'id',
+  /**
+   * is the Default entry if userGuid and workflowStep are empty
+   * @return {Boolean} 
+   */
+  isDefault: function() {
+      return !this.phantom && this.get('userGuid').length == 0 && this.get('workflowStep').length == 0;
+  },
   proxy : {
     type : 'rest',
     url: Editor.data.restpath+'workflowuserpref',

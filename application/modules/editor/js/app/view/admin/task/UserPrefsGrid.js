@@ -37,19 +37,54 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
     alias: 'widget.editorAdminTaskUserPrefsGrid',
     store: 'admin.task.UserPrefs',
 
+    strings: {
+        defaultEntry: '#UT# Standard Eintrag'
+    },
+
     initComponent: function() {
-        var me = this;
+        var me = this,
+            userStore = Ext.StoreMgr.get('admin.TaskUserAssocs');
+            
+        me.addEvents(
+              /**
+               * @event taskCreated
+               * @param {Ext.form.Panel} grid
+               * @param {Editor.model.admin.task.UserPref[]} toDelete
+               * @param {Ext.button.Button} btn
+               */
+              'confirmDelete'
+        );
 
         Ext.applyIf(me, {
             columns: [
+                {xtype: 'rownumberer'},
                 {
                     xtype: 'gridcolumn',
                     dataIndex: 'workflowStep',
-                    text: 'Workflow Step'
+                    text: 'Workflow Step',
+                    renderer: function(v, meta, rec) {
+                        var meta;
+                        if(v.length == 0) {
+                            return me.strings.defaultEntry;
+                        }
+                        meta = me.actualTask.getWorkflowMetaData();
+                        return meta.steps[v] || v;
+                    }
                 },
                 {
                     xtype: 'gridcolumn',
-                    dataIndex: 'username',
+                    dataIndex: 'userGuid',
+                    renderer: function(v, meta, rec) {
+                        if(v.length == 0) {
+                            return me.strings.defaultEntry;
+                        }
+                        var idx = userStore.find('userGuid', v),
+                            user = userStore.getAt(idx);
+                        if(user) {
+                            return Editor.model.admin.User.getUserName(user);
+                        }
+                        return v;
+                    },
                     text: 'Username'
                 },
                 {
@@ -72,18 +107,12 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                 },
                 {
                     xtype: 'booleancolumn',
-                    dataIndex: 'bool',
+                    dataIndex: 'anonymousCols',
                     text: 'Anonymous Columns'
                 },
                 {
                     xtype: 'gridcolumn',
-                    dataIndex: 'userGuid',
-                    renderer: function(v, meta, rec) {
-                        if(v.length == 0) {
-                            return "#UT#Default Entry";
-                        }
-                        Ext.StoreMgr.get();
-                    },
+                    dataIndex: 'visibility',
                     text: 'Non-editable Targets'
                 }
             ],
@@ -100,6 +129,14 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                         {
                             xtype: 'button',
                             itemId: 'userPrefDelete',
+                            handler: function() {
+                                Ext.Msg.confirm('Löschi Löschi', "Löschi Löschi", function(btn){
+                                    var toDelete = me.getSelectionModel().getSelection();
+                                    if(btn == 'yes') {
+                                        me.fireEvent('confirmDelete', me, toDelete, this);
+                                    }
+                                });
+                            },
                             text: 'Delete'
                         }
                     ]
