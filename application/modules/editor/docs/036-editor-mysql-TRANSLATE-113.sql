@@ -32,20 +32,18 @@
 --
 --  END LICENSE AND COPYRIGHT
 --  */
-
 CREATE TABLE IF NOT EXISTS `LEK_workflow_userpref` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `taskGuid` varchar(38) NOT NULL COMMENT 'Foreign Key to LEK_task',
-  `workflow` varchar(60) NOT NULL COMMENT 'FIXME comment',
-  `workflowStep` varchar(60) DEFAULT NULL COMMENT 'FIXME comment',
-  `userGuid` varchar(38) DEFAULT NULL COMMENT 'Foreign Key to Zf_users',
+  `workflow` varchar(60) NOT NULL COMMENT 'links to the used workflow for this ',
+  `workflowStep` varchar(60) DEFAULT NULL COMMENT 'the workflow step which is affected by the settings, optional, null to affect all steps',
+  `anonymousCols` tinyint(1) DEFAULT 0 NOT NULL COMMENT 'should the column names be rendered anonymously',
+  `visibility` enum('show', 'hide', 'disable') DEFAULT 'show' COMMENT 'visibility of non-editable target columns',
+  `userGuid` varchar(38) DEFAULT NULL COMMENT 'Foreign Key to Zf_users, optional, constrain the prefs to this user',
   `fields` varchar(300) NOT NULL COMMENT 'field names as used in LEK_segment_fields',
   PRIMARY KEY (`id`),
-  CONSTRAINT FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE,
-  CONSTRAINT FOREIGN KEY (`userGuid`) REFERENCES `Zf_users` (`userGuid`) ON DELETE CASCADE
--- FIXME unique of taskGuid and userGuid???
+  CONSTRAINT FOREIGN KEY (`taskGuid`, `userGuid`) REFERENCES `LEK_taskUserAssoc` (`taskGuid`, `userGuid`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 
 INSERT INTO `LEK_workflow_userpref` (`taskGuid`, `workflow`, `fields`) 
 select taskGuid, 'default', GROUP_CONCAT(name ORDER BY id SEPARATOR ',') from LEK_segment_field GROUP BY taskGuid;
