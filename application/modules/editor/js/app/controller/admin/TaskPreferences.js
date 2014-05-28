@@ -48,6 +48,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       ref: 'prefGrid',
       selector: '.editorAdminTaskUserPrefsGrid'
   },{
+      ref: 'editInfo',
+      selector: '#editInfoOverlay'
+  },{
       ref: 'prefForm',
       selector: '.editorAdminTaskUserPrefsForm'
   },{
@@ -59,6 +62,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
   },{
       ref: 'deleteBtn',
       selector: '.editorAdminTaskUserPrefsGrid #userPrefDelete'
+  },{
+      ref: 'addBtn',
+      selector: '.editorAdminTaskUserPrefsGrid #userPrefAdd'
   },{
       ref: 'taskWorkflow',
       selector: '.editorAdminTaskPreferences #taskWorkflow'
@@ -95,6 +101,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
               deselect: me.handleDeselect,
               itemclick: me.handleGridClick
           },
+          '.editorAdminTaskUserPrefsGrid #userPrefReload': {
+              click: me.handleReload
+          },
           '.editorAdminTaskUserPrefsGrid #userPrefAdd': {
               click: me.handleAddClick
           },
@@ -111,15 +120,20 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
    */
   calculateAvailableCombinations: function() {
       var me = this,
+          workflow = me.actualTask.get('workflow'),
           steps = Ext.apply({}, me.actualTask.getWorkflowMetaData().steps),
           tuas = me.getAdminTaskUserAssocsStore(),
           prefs = me.getAdminTaskUserPrefsStore(),
-          used = {};
+          used = {},
+          cnt = 0;
       steps[me.FOR_ALL] = me.strings.forAll;
       me.available = {};
 
       //calculate the already used step / user combinations          
       prefs.each(function(rec) {
+          if(rec.get('workflow') != workflow){
+              return;
+          }
           var step = rec.get('workflowStep') || me.FOR_ALL;
           if(!used[step]) {
               used[step] = [];
@@ -139,6 +153,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
                   me.available[step] = [];
               }
               me.available[step].push(guid);
+              cnt++;
           });
           //add the forAll step and user
           if(!used[step] || Ext.Array.indexOf(used[step], me.FOR_ALL) < 0) {
@@ -146,8 +161,11 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
                   me.available[step] = [];
               }
               me.available[step].push(me.FOR_ALL);
+              cnt++;
           }
       });
+      //disable the add button if all combinations are reached
+      this.getAddBtn().setDisabled(cnt == 0);
       console.log("calculateAvailableCombinations: ", me.available);
   }, 
   /**
@@ -216,13 +234,14 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           rec,
           firstStep = me.updateWorkflowSteps(),
           form = me.getPrefForm();
-      form.enable();
+      form.show();
+      me.getEditInfo().hide();
       rec = Ext.create(Editor.model.admin.task.UserPref, {
           fields: fields,
           anonymousCols: true, //FIXME from app.ini
           visibility: 'show', //FIXME from app.ini
           workflow: task.get('workflow'),
-          workflowStep: null,
+          workflowStep: firstStep,
           taskGuid: task.get('taskGuid')
       });
       me.getPrefGrid().getSelectionModel().deselectAll();
@@ -232,11 +251,13 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
   },
    
   handleDeleteConfirmClick: function(grid, records) {
+      var me = this;
       Ext.Array.each(records, function(rec){
           rec.destroy({
               success: function() {
                   //FIXME do we have to update some other stores? taskStore && taskStore.load();
                   grid.store.remove(rec);
+                  me.calculateAvailableCombinations();
               }
           });
       });
@@ -250,6 +271,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
   comboChange: function() {
     var me = this,
         rec = me.getPrefForm().getRecord();
+    me.getUsersCombo().setValue();
     me.updateUsers(rec);
   },
   
@@ -273,6 +295,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           steps.push([me.FOR_ALL, me.strings.forAll]);
       }
       me.getWfStepCombo().store.loadData(steps);
+      console.log("RESULT updateWorkflowSteps", steps);
       if(steps.length == 0){
           return "";
       }
@@ -288,10 +311,15 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           tuas = me.getAdminTaskUserAssocsStore(),
           prefs = me.getAdminTaskUserPrefsStore(),
           step = me.getWfStepCombo().getValue(),
+          userCombo = me.getUsersCombo(),
+          value = userCombo.getValue(),
           isAvailable = function(guid) {
-              return me.available[step] && (Ext.Array.indexOf(me.available[step], guid) >= 0);
+              return !!me.available[step] && (Ext.Array.indexOf(me.available[step], guid) >= 0);
           },
           users = [];
+      if(step && step.length == 0) {
+          return;
+      }
       console.log("update users", rec.data);
       tuas.each(function(tua){
           var ug = tua.get('userGuid'),
@@ -299,15 +327,16 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
               userName = tua.get('surName')+', '+tua.get('firstName')+' ('+tua.get('login')+')';
               
           if(isAvailable(ug) || isSelf) {
+              console.log("user added ", userName, isSelf, isAvailable(ug), ug, step);
               users.push([ug, userName]);
           }
       });
-      //isSelf is an empty guid here:
       if(isAvailable(me.FOR_ALL) || (step != me.FOR_ALL && rec && rec.get('userGuid').length == 0)) {
           users.push([me.FOR_ALL, me.strings.forAll]);
       }
-      me.getUsersCombo().setDisabled(rec.isDefault());
-      me.getUsersCombo().store.loadData(users);
+      userCombo.setDisabled(rec.isDefault());
+      userCombo.store.loadData(users);
+      userCombo.setValue(value);
   },
   
   /**
@@ -322,6 +351,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       me.actualTask.save({
           success: function(rec, op) {
               Editor.MessageBox.addInfo(me.strings.taskWorkflowSaved);
+              me.calculateAvailableCombinations();
           }
       });
   },
@@ -361,20 +391,27 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       });
       cmp.fieldLabels = labels;
   },
-  //FIXME clear the local used stores?
+  //FIXME clear the local used stores for task change?
   clearStores: function() {
   },
+  /**
+   * edit an entry handler
+   */
   handleGridClick: function(grid, rec) {
       var me = this,
           form = me.getPrefForm();
-      form.enable();
+      form.show();
+      me.getEditInfo().hide();
       form.down('.combobox[name="workflowStep"]').setDisabled(rec.isDefault());
       me.getUsersCombo().setDisabled(rec.isDefault());
       me.getDeleteBtn().setDisabled(rec.isDefault());
       me.updateWorkflowSteps(rec);
-      form.getForm().reset();
+      //form.getForm().reset();
       form.loadRecord(rec, me.FOR_ALL);
   },
+  /**
+   * save handler
+   */
   clickSave: function(){
       var me = this,
           form = me.getPrefForm(),
@@ -382,6 +419,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           rec = form.getRecord(),
           fields = form.getValues().fields;
       form.getForm().updateRecord(rec);
+      if(! form.getForm().isValid()) {
+        return;
+      }
       if(Ext.isArray(fields)) {
           fields = fields.join(',');
       }
@@ -399,6 +439,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
               if(!rec.store) {
                   store.insert(0,rec);
               }
+              me.calculateAvailableCombinations();
           },
           failure: function() {
             console.log("FAILED");
@@ -408,6 +449,10 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
   clickCancel: function() {
       var form = this.getPrefForm();
       form.getForm().reset();
-      form.disable();
+      form.hide();
+      this.getEditInfo().show();
+  },
+  handleReload: function() {
+      alert("adapt handleTaskPreferences content");
   }
 });

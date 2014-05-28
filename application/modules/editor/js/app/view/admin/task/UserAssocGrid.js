@@ -46,7 +46,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
       removeUser: '#UT#Benutzer entfernen',
       removeUserTip: '#UT#Den gewählten Benutzer aus dieser Aufgabe entfernen.',
       save: '#UT#Änderungen speichern',
-      cancel: '#UT#Abbrechen',
+      cancel: '#UT#Abbrechen'
   },
   title : '#UT#Benutzer zu Aufgabe zuordnen',
   store: 'admin.TaskUserAssocs',

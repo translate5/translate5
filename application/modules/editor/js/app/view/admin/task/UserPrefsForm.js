@@ -35,12 +35,19 @@
 Ext.define('Editor.view.admin.task.UserPrefsForm', {
     extend: 'Ext.form.Panel',
     alias: 'widget.editorAdminTaskUserPrefsForm',
-
-    width: 250,
     bodyPadding: 10,
-    disabled: true,
     title_edit: '#UT#Bearbeite Eintrag Nr.: {0}',
-    title: '#UT#Eintrag erstellen',
+    title_add: '#UT#Eintrag erstellen',
+    strings: {
+        fieldStep: '#UT#Workflow Schritt',
+        fieldUsername: '#UT#Benutzer',
+        fieldTargets: '#UT#sichtbare Spalten',
+        fieldAnonymous: '#UT#anonymisierte Spaltennamen',
+        fieldVisibility: '#UT#Sichtbarkeit der nicht editierbaren Zielsprachen',
+        visShow: '#UT#Anzeigen',
+        visHide: '#UT#Ausblenden',
+        visDisabled: '#UT#komplett deaktivieren'
+    },
 
     initComponent: function() {
         var me = this;
@@ -55,7 +62,7 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
                     queryMode: 'local',
                     store: [['','']],//dummy entry to get correct fields
                     anchor: '100%',
-                    fieldLabel: 'Workflow Step'
+                    fieldLabel: me.strings.fieldStep
                 },
                 {
                     xtype: 'combobox',
@@ -65,44 +72,44 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
                     forceSelection: true,
                     queryMode: 'local',
                     store: [['','']],//dummy entry to get correct fields
-                    fieldLabel: 'User'
+                    fieldLabel: me.strings.fieldUsername
                 },{
                     xtype: 'checkboxfield',
                     anchor: '100%',
                     name: 'anonymousCols',
-                    boxLabel: 'Anonymous Column Label'
+                    boxLabel: me.strings.fieldAnonymous
                 },{
                     xtype: 'fieldset',
                     itemId: 'alternates',
-                    title: 'Alternative Access',
+                    title: me.strings.fieldTargets,
                     items: [{
                         xtype: 'checkboxgroup',
                         columns: 2
                     }]
                 },{
                     xtype: 'fieldset',
-                    title: 'Visibility of non-editable target columns',
+                    title: me.strings.fieldVisibility,
                     items: [
                         {
                             xtype: 'radiofield',
                             name: 'visibility',
                             anchor: '100%',
                             inputValue: 'show',
-                            boxLabel: 'Show'
+                            boxLabel: me.strings.visShow
                         },
                         {
                             xtype: 'radiofield',
                             name: 'visibility',
                             anchor: '100%',
                             inputValue: 'hide',
-                            boxLabel: 'Hide'
+                            boxLabel: me.strings.visHide
                         },
                         {
                             xtype: 'radiofield',
                             name: 'visibility',
                             anchor: '100%',
                             inputValue: 'disable',
-                            boxLabel: 'Disabled'
+                            boxLabel: me.strings.visDisabled
                         }
                     ]
                 }
@@ -141,7 +148,6 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
     loadRecord: function(rec, FOR_ALL) {
         var me = this,
             fields = me.actualTask.segmentFields().collect('name'),
-            res = me.callParent(arguments),
             checked = rec.get('fields').split(','),
             toSet = {};
         this.fireEvent('beforeLoadRecord', this, rec);
@@ -149,12 +155,17 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
         Ext.Array.each(fields, function(val) {
             toSet[val] = (Ext.Array.indexOf(checked, val) >= 0);
         });
-        me.getForm().setValues({
+        me.getForm()._record = rec;
+        //manipulate the record data as needed
+        me.getForm().setValues(Ext.applyIf({
             fields: rec.get('fields').split(','),
-            userGuid: rec.get('userGuid') || FOR_ALL,
-            workflowStep: rec.get('workflowStep') || FOR_ALL
+            workflowStep: ''
+        }, rec.data));
+        //set the userGuid separatly since we have first to calculate the entries by setting the workflowStep again
+        me.getForm().setValues({
+            workflowStep: rec.get('workflowStep') || FOR_ALL,
+            userGuid: rec.get('userGuid') || FOR_ALL
         });
-        me.setTitle(rec.phantom ? me.title : Ext.String.format(me.title_edit, (rec.store.indexOfTotal(rec) + 1)));
-        return res;
+        me.setTitle(rec.phantom ? me.title_add : Ext.String.format(me.title_edit, (rec.store.indexOfTotal(rec) + 1)));
     }
 });
