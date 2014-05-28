@@ -104,10 +104,13 @@ class editor_Workflow_Manager {
      */
     public function getWorkflowData() {
         $result = array();
-        $labelize = function(array $data) use (&$labels) {
+        $labelize = function(array $data, $cls) use (&$labels) {
             $usedLabels = array_intersect_key($labels, $data);
             ksort($usedLabels);
             ksort($data);
+            if(count($data) !== count($usedLabels)) {
+                throw new ZfExtended_Exception($cls.'::$labels has to much / or missing labels!');
+            }
             return array_combine($data, $usedLabels);
         };
         foreach($this->workflowList as $id => $cls) {
@@ -119,13 +122,13 @@ class editor_Workflow_Manager {
             $data->label = $labels['WORKFLOW_ID'];
             $data->anonymousFieldLabel = false; //FIXME true | false, comes from app.ini not from wf class
             
-            $data->roles = $labelize($wf->getRoles());
+            $data->roles = $labelize($wf->getRoles(), $cls);
             $allStates = $wf->getStates();
             $pendingStates = $wf->getPendingStates();
             //the returned states are the states without the pending ones
-            $data->states = $labelize(array_diff($allStates, $pendingStates));
-            $data->pendingStates = $labelize($pendingStates);
-            $data->steps = $labelize($wf->getSteps());
+            $data->states = $labelize(array_diff($allStates, $pendingStates), $cls);
+            $data->pendingStates = $labelize($pendingStates, $cls);
+            $data->steps = $labelize($wf->getSteps(), $cls);
             $data->stepChain = $wf->getStepChain();
             $result[$id] = $data;
         }

@@ -52,6 +52,9 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract 
     $this->addValidator('locked', 'date', array('Y-m-d H:i:s'));
     $this->addValidator('lockingUser', 'guid');
     $this->addValidator('state', 'inArray', array(array(editor_Models_Task::STATE_OPEN, editor_Models_Task::STATE_END)));
+    $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+    /* @var $wfm editor_Workflow_Manager */
+    $this->addValidator('workflow', 'inArray', array(array_keys($wfm->getWorkflows())));
     $this->addValidator('workflowStep', 'int');
     $this->addValidator('pmGuid', 'guid');
     $this->addValidator('pmName', 'stringLength', array('min' => 0, 'max' => 512));

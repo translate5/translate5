@@ -59,6 +59,9 @@ class editor_Models_Validator_Workflow_Userpref extends ZfExtended_Models_Valida
         $this->addValidator('anonymousCols', 'boolean');
         $this->addValidator('visibility', 'inArray', array(array('show', 'hide', 'disable')));
         $this->addValidator('userGuid', 'guid', array('allowEmpty' => true));
+        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $wfm editor_Workflow_Manager */
+        $this->addValidator('workflow', 'inArray', array(array_keys($wfm->getWorkflows())));
         $this->addSegmentFieldValidator();
         $this->addWorkflowStepValidator();
     }
@@ -96,7 +99,7 @@ class editor_Models_Validator_Workflow_Userpref extends ZfExtended_Models_Valida
             }
             $task = ZfExtended_Factory::get('editor_Models_Task');
             /* @var $task editor_Models_Task */
-            $task->loadByTaskGuid($this->taskGuid);
+            $task->loadByTaskGuid($taskGuid);
             $workflow = $wfm->getByTask($task);
             return in_array($value, $workflow->getSteps());
         };
