@@ -46,6 +46,7 @@ Ext.define('Editor.view.admin.task.Preferences', {
     },
     title: '#UT#My Tab',
     workflow_label: '#UT#Workflow',
+    editInfo: '#UT#Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!',
 
     initComponent: function() {
         var me = this,
@@ -71,8 +72,19 @@ Ext.define('Editor.view.admin.task.Preferences', {
                     store: workflows
                 }]
             },{
-                xtype: 'editorAdminTaskUserPrefsForm',
-                region: 'east'
+                xtype: 'container',
+                region: 'east',
+                width: 250,
+                items: [{
+                    xtype: 'container',
+                    itemId: 'editInfoOverlay',
+                    cls: 'edit-info-overlay',
+                    padding: 10,
+                    html: me.editInfo
+                },{
+                    xtype: 'editorAdminTaskUserPrefsForm',
+                    hidden: true
+                }]
             }]
         });
 

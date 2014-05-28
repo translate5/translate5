@@ -38,7 +38,17 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
     store: 'admin.task.UserPrefs',
 
     strings: {
-        defaultEntry: '#UT# Standard Eintrag'
+        defaultEntry: '#UT# Standard Eintrag',
+        confirmDeleteTitle: '#UT#Eintrag löschen?',
+        confirmDelete: '#UT#Soll dieser Eintrag wirklich gelöscht werden?',
+        colStep: '#UT#Workflow Schritt',
+        colUsername: '#UT#Benutzer',
+        colTargets: '#UT#Spalten (sichtbar)',
+        colAnonymous: '#UT#Namen deaktiviert',
+        colVisibility: '#UT#Sichtbarkeit',
+        add: '#UT#Eintrag hinzufügen',
+        reload: '#UT#Aktualisieren',
+        remove: '#UT#Eintrag löschen'
     },
 
     initComponent: function() {
@@ -61,7 +71,7 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                 {
                     xtype: 'gridcolumn',
                     dataIndex: 'workflowStep',
-                    text: 'Workflow Step',
+                    text: me.strings.colStep,
                     renderer: function(v, meta, rec) {
                         var meta;
                         if(v.length == 0) {
@@ -85,35 +95,40 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                         }
                         return v;
                     },
-                    text: 'Username'
+                    text: me.strings.colUsername
                 },
                 {
                     xtype: 'gridcolumn',
                     renderer: function(value, metaData, record, rowIndex, colIndex, store, view) {
                         var fields = value.split(','),
-                            result = [];
+                            cnt = 0,
+                            result = [],
+                            visible = 0;
                         Ext.Object.each(this.fieldLabels, function(k, v){
+                            cnt++;
                             if(Ext.Array.indexOf(fields, k) >= 0) {
                                 result.push(v);
-                            }
-                            else {
+                                visible++;
+                            } else {
                                 result.push('<strike>'+v+'</strike>');
                             }
                         });
-                        return result.join('<br />');
+                        metaData.tdAttr = 'data-qtip="'+result.join('<br />')+'"';
+
+                        return cnt+' ('+visible+')';
                     },
                     dataIndex: 'fields',
-                    text: 'Target Columns'
+                    text: me.strings.colTargets
                 },
                 {
                     xtype: 'booleancolumn',
                     dataIndex: 'anonymousCols',
-                    text: 'Anonymous Columns'
+                    text: me.strings.colAnonymous
                 },
                 {
                     xtype: 'gridcolumn',
                     dataIndex: 'visibility',
-                    text: 'Non-editable Targets'
+                    text: me.strings.colVisibility
                 }
             ],
             dockedItems: [
@@ -124,20 +139,29 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                         {
                             xtype: 'button',
                             itemId: 'userPrefAdd',
-                            text: 'Add'
+                            iconCls: 'ico-add',
+                            text: me.strings.add
                         },
                         {
                             xtype: 'button',
                             itemId: 'userPrefDelete',
+                            iconCls: 'ico-del',
+                            disabled: true,
                             handler: function() {
-                                Ext.Msg.confirm('Löschi Löschi', "Löschi Löschi", function(btn){
+                                Ext.Msg.confirm(me.strings.confirmDeleteTitle, me.strings.confirmDelete, function(btn){
                                     var toDelete = me.getSelectionModel().getSelection();
                                     if(btn == 'yes') {
                                         me.fireEvent('confirmDelete', me, toDelete, this);
                                     }
                                 });
                             },
-                            text: 'Delete'
+                            text: me.strings.remove
+                        },
+                        {
+                            xtype: 'button',
+                            itemId: 'userPrefReload',
+                            iconCls: 'ico-refresh',
+                            text: me.strings.reload
                         }
                     ]
                 }
