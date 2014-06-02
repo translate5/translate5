@@ -80,6 +80,31 @@ class editor_Models_SegmentField extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * loads the fields by the userprefs defined for the given taskGuid, userGuid and workflowStep
+     * @param string $taskGuid
+     * @param string $workflow
+     * @param string $userGuid
+     * @param string $taskStep
+     */
+    public function loadByUserPref($taskGuid, $workflow, $userGuid, $taskStep) {
+        $allFields = $this->loadByTaskGuid($taskGuid);
+        $userPrefs = ZfExtended_Factory::get('editor_Models_Workflow_Userpref');
+        /* @var $userPrefs editor_Models_Workflow_Userpref */
+        $prefs = $userPrefs->loadByTaskUserAndStep($taskGuid, $workflow, $userGuid, $taskStep);
+        error_log(print_r($prefs,1));
+        
+        //FIXME HERE AM I: 
+        // Beim Auswerten der geladenen userPrefs tat sich die Frage auf, welcher der folgenden Einträge gilt:
+        // Ich habe die UG 1 und den Step X. Des Weiteren gibt es einen UserPref Eintrag 
+        //  mit UG 1 und Step null und einen mit UG null und Step X. Welcher der beiden soll nun verwendet werden?
+        // Nach weiterer Überlegung haben Marc und ich beschlossen das "Für Alle" bei den Workflowsteps rauszuwerfen, 
+        // sprich es muss immer ein step gesetzt sein. (Ausser beim default, bei dem beides null ist)
+        
+        return $allFields;
+        //FIXME TaskController Logic für diesen Aufruf beim Export der QM Statistics bzw. eigentlich bei jedem bisherigen loadByTaskGuid adaptieren!
+    }
+    
+    /**
      * Segment Fields are internally processed as ZendRowObjects, so we need a way to get it.
      * @return Zend_Db_Table_Row_Abstract
      */

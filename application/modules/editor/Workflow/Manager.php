@@ -66,7 +66,7 @@ class editor_Workflow_Manager {
     }
     
     /**
-     * returns an workflow instance by given string ID (e.g. default for "Default" Workflow)
+     * returns a new workflow instance by given string ID (e.g. default for "Default" Workflow)
      * @param string $wfId
      * @return editor_Workflow_Abstract
      */
@@ -75,6 +75,19 @@ class editor_Workflow_Manager {
             throw new ZfExtended_Exception('Workflow with ID "'.$wfId.'" not found!');
         }
         return ZfExtended_Factory::get($this->workflowList[$wfId]);
+    }
+    
+    /**
+     * returns a workflow instance by given string ID, caches the workflow instances internally
+     * @see self::get
+     * @param string $wfId
+     * @return editor_Workflow_Abstract
+     */
+    public function getCached($wfId) {
+        if(empty($this->instances[$wfId])) {
+            $this->instances[$wfId] = $this->get($wfId);
+        }
+        return $this->instances[$wfId];
     }
     
     /**
