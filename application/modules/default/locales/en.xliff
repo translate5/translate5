@@ -31,6 +31,8 @@
 </trans-unit>
 <trans-unit id='KENTVi1EYXRlaWZvcm1hdCBtaXQgTVFNLUF1c3plaWNobnVuZ2VuKQ=='><source>(CSV-Dateiformat mit MQM-Auszeichnungen)</source><target>(CSV file with MQM markup)</target></trans-unit>
 <trans-unit id='KENTVi1EYXRlaWZvcm1hdCBtaXQgbWVocmVyZW4gemllbHNwcmFjaGxpY2hlbiBBbHRlcm5hdGl2c3BhbHRlbik='><source>(CSV-Dateiformat mit mehreren zielsprachlichen Alternativspalten)</source><target>(CSV file with multiple target alternatives)</target></trans-unit>
+<trans-unit id='SW5zdGFsbGF0aW9uZW4gJmFtcDsgSG9zdGluZw=='><source>Installationen &amp; Hosting</source><target>Installations &amp; Hosting</target></trans-unit>
+<trans-unit id='U3VwcG9ydCAmYW1wOyBVcGRhdGVz'><source>Support &amp; Updates</source><target>Support &amp; Updates</target></trans-unit>
         </body>
     </file>
 <!-- ids are base64-encoded --></xliff>
