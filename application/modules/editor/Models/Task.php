@@ -467,6 +467,15 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * returns true if the loaded task is registered in the session
+     * @return boolean
+     */
+    public function isRegisteredInSession() {
+        $session = new Zend_Session_Namespace();
+        return !empty($session->taskGuid) && $session->taskGuid == $this->getTaskGuid();
+    }
+    
+    /**
      * unlocks all tasks, where the associated session is invalid
      * @return array an array with tasks which were unlocked
      */

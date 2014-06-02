@@ -84,4 +84,20 @@ class editor_Models_Workflow_Userpref extends ZfExtended_Models_Entity_Abstract 
         $userGuid = $this->getUserGuid();
         return empty($step) && empty($userGuid);
     }
+    
+    /**
+     * loads the userprefs defined for the given taskGuid, userGuid and workflowStep
+     * @param string $taskGuid
+     * @param string $workflow
+     * @param string $userGuid
+     * @param string $workflowStep
+     */
+    public function loadByTaskUserAndStep($taskGuid, $workflow, $userGuid, $workflowStep) {
+        $s = $this->db->select()
+        ->where('taskGuid = ?', $taskGuid)
+        ->where('workflow = ?', $workflow)
+        ->where('userGuid = ? or userGuid is null', $userGuid)
+        ->where('workflowStep = ? or workflowStep is null', $workflowStep);
+        return $this->db->fetchAll($s)->toArray();
+    }
 }
