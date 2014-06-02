@@ -156,7 +156,7 @@ class editor_Models_Import_UploadProcessor {
      */
     protected function handleTbx($args) {
         if(!$this->upload->isValid('importTbx')){
-            return;
+            return $args;
         }
         $args[] = array(); //currently no relais files
         $args[] = array(); //currently no reference files
