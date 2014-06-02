@@ -63,7 +63,16 @@ Ext.define('Editor.view.admin.UserChooseWindow', {
                         type : 'json'
                     }
                 }
-            });
+            }),
+            wf = me.task.getWorkflowMetaData(),
+            states = [],
+            roles = [];
+        Ext.Object.each(wf.states, function(key, state) {
+            states.push([key, state]);
+        });
+        Ext.Object.each(wf.roles, function(key, role) {
+            roles.push([key, role]);
+        });
         if(me.excludeLogins && me.excludeLogins.length > 0) {
             store.getProxy().extraParams = {
                 defaultFilter: '[{"field":"login","type":"notInList","value":["'+me.excludeLogins.join('","')+'"]}]'
@@ -100,6 +109,32 @@ Ext.define('Editor.view.admin.UserChooseWindow', {
                 }]
             }],
             dockedItems : [{
+                xtype: 'container',
+                dock : 'top',
+                items:[{
+                    xtype: 'fieldset',
+                    titel: '#UT# Vorbelegung',
+                    items:[{
+                        xtype: 'combo',
+                        fieldLabel: '#UT#Status',
+                        editable: false,
+                        //displayField: 'label',
+                        //valueField: 'id',
+                        forceSelection: true,
+                        queryMode: 'local',
+                        store: states
+                    },{
+                        xtype: 'combo',
+                        fieldLabel: '#UT#Rolle',
+                        editable: false,
+                        //displayField: 'label',
+                        //valueField: 'id',
+                        forceSelection: true,
+                        queryMode: 'local',
+                        store: roles
+                    }]
+                }]
+            },{
                 xtype : 'toolbar',
                 dock : 'bottom',
                 ui: 'footer',
