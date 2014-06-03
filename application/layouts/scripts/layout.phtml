@@ -40,13 +40,13 @@
  * @version 2.0
  *
  */
-/*
+/**
  * Generiert das allgemeine Layout
  *
  * - Achtung: Bei Hinzufügen weiterer Layoutelemente darauf achten, dass diese
  *   im Viewhelper View_Helper_DisableBodyLayout deaktiviert werden
  */
-$session = new Zend_Session_Namespace();
+$config = Zend_Registry::get('config');
 echo $this->doctype() ?>
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
@@ -54,7 +54,7 @@ echo $this->doctype() ?>
         <?php   echo $this->headMeta() ?>
         <?php   echo $this->headLink() ?>
         <?php echo $this->headStyle() ?>
-        <link rel="shortcut icon" href="<?php echo APPLICATION_RUNDIR.$session->runtimeOptions->server->pathToIMAGES; ?>/favicon.ico" type="image/x-icon"/>
+        <link rel="shortcut icon" href="<?php echo APPLICATION_RUNDIR.$config->runtimeOptions->server->pathToIMAGES; ?>/favicon.ico" type="image/x-icon"/>
         <?php echo $this->headScript() ?>
     </head>
     <body>
