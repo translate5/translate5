@@ -29,6 +29,15 @@
     <source>Unsere regelmäßigen Minor-Releases enthaltenen bereits früher neue Features und notwendige Bug-Fixes. Minor-Releases stehen allen Kunden von MittagQI im Rahmen eines <a href="%s" target="_blank">"Vertrag zu Unterstützung und Updates für translate5"</a> zur Verfügung.</source>
     <target>Our regular minor releases more early contain new features and necessary bug fixes. Minor releases are available to all customers who are having a <a href="%s" target="_blank">"maintenance and support contract"</a> with MittagQI.</target>
 </trans-unit>
+<trans-unit id='RGllc2VyIEJlbnV0emVyIHdpcmQgYmVyZWl0cyB2ZXJ3ZW5kZXQuIDxici8+Qml0dGUgd2FydGVuIFNpZSBiaXMgZGVyIEJlbnV0emVyIHdpZWRlciB2ZXJmw7xnYmFyIGlzdCwgb2RlciBiZW51dHplbiBTaWUgZWluZW4gYW5kZXJlbiE='>
+    <source>Dieser Benutzer wird bereits verwendet. <br/>Bitte warten Sie bis der Benutzer wieder verfügbar ist, oder benutzen Sie einen anderen!</source>
+    <target>This user is already used.<br/>Please wait until the user is available again, or use another one!</target>
+</trans-unit>
+<trans-unit id='d2lyZCBtb21lbnRhbiB2ZXJ3ZW5kZXQ='>
+    <source>wird momentan verwendet</source>
+    <target>is actually used</target>
+</trans-unit>
+
         </body>
     </file>
 <!-- ids are base64-encoded --></xliff>
