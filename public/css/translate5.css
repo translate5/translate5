@@ -62,7 +62,7 @@ h2{font-size:1.2em;}
 #header {height:150px;}
 #header h1 {height:150px;background: url(/images/logo_t5_2013.png?v=3) no-repeat left top #ffffff;padding:0;margin:0;}
 #header h1 span {display:none;}
-h1 {font-size:}
+h1 {font-size: 17px;}
 th {text-align:left;}
 
 #menu{padding-top:20px;padding-bottom:20px;position:relative;}
