@@ -242,10 +242,6 @@
                 <source>Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!</source>
                 <target state="needs-review-adaptation">Error whilst saving or reading data. Please contact our support team!</target>
             </trans-unit>
-            <trans-unit id="PGJyIC8+TWVsZHVuZyB2b20gU2VydmVyOiA8aT57MH0gezF9PC9pPg==">
-                <source>Meldung vom Server: </source>
-                <target state="needs-review-adaptation">Message from server: </target>
-            </trans-unit>
             <trans-unit id="RGllIERhdGVpIHp1bSBWb3JhdXNsYWRlbiBkZXIgVGFnZ3JhZmlrZW4gd3VyZGUgbmljaHQgZ2VmdW5kZW4uIERhaGVyIGvDtm5uZW4gZGllIFRhZ2dyYWZpa2VuIGVyc3QgYmVpbSDDlmZmbmVuIGRlcyBqZXdlaWxpZ2VuIFNlZ21lbnRzIGdlbGFkZW4gd2VyZGVuLg==">
                 <source>Die Datei zum Vorausladen der Taggrafiken wurde nicht gefunden. Daher k&#xF6;nnen die Taggrafiken erst beim &#xD6;ffnen des jeweiligen Segments geladen werden.</source>
                 <target state="needs-review-adaptation">The file for pre-loading the tag graphics was not found. Therefore the tag graphics can only be loaded when the respective segment is opened.</target>
