@@ -163,6 +163,10 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $logText .= 'Content of $_SERVER had been: '.  print_r($_SERVER,true);
         
         $log->logError('Possible Error on saving a segment!', $logText);
+        
+        $e = new ZfExtended_Models_Entity_NotAcceptableException();
+        $e->setMessage('Aufgrund der langsamen Darstellung im Internet Explorer wurden versucht veraltete Daten zu speichern. Bitte überprüfen Sie den Inhalt des Segments!',true);
+        throw $e;
     }
    
     /**
