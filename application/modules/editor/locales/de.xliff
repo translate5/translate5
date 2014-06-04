@@ -569,6 +569,8 @@
 <trans-unit id='S2VpbmUgWnVncmlmZnNiZXJlY2h0aWd1bmch'><source>Keine Zugriffsberechtigung!</source><target>Keine Zugriffsberechtigung!</target></trans-unit>
 <trans-unit id='ZXJsYXVidGUgQmVuZW5udW5n'><source>erlaubte Benennung</source><target>erlaubte Benennung</target></trans-unit>
 <trans-unit id='dmVyYm90ZW5lIEJlbmVubnVuZw=='><source>verbotene Benennung</source><target>verbotene Benennung</target></trans-unit>
+<trans-unit id='QW5mcmFnZSBrYW5uIG5pY2h0IGFremVwdGllcnQgd2VyZGVuIQ=='><source>Anfrage kann nicht akzeptiert werden!</source><target>Anfrage kann nicht akzeptiert werden!</target></trans-unit>
+<trans-unit id='QXVmZ3J1bmQgZGVyIGxhbmdzYW1lbiBEYXJzdGVsbHVuZyBpbSBJbnRlcm5ldCBFeHBsb3JlciB3dXJkZW4gdmVyc3VjaHQgdmVyYWx0ZXRlIERhdGVuIHp1IHNwZWljaGVybi4gQml0dGUgw7xiZXJwcsO8ZmVuIFNpZSBkZW4gSW5oYWx0IGRlcyBTZWdtZW50cyE='><source>Aufgrund der langsamen Darstellung im Internet Explorer wurden versucht veraltete Daten zu speichern. Bitte überprüfen Sie den Inhalt des Segments!</source><target>Aufgrund der langsamen Darstellung im Internet Explorer wurden versucht veraltete Daten zu speichern. Bitte überprüfen Sie den Inhalt des Segments!</target></trans-unit>
   </body>
  </file>
 </xliff>

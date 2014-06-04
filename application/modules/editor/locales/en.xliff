@@ -777,6 +777,14 @@
         <source>² separate TBX nur beim Import einer SDLXLIFF Datei möglich.</source>
         <target>² extra TBX file only available for SDLXLIFF import.</target>
       </trans-unit>
+      <trans-unit id='QW5mcmFnZSBrYW5uIG5pY2h0IGFremVwdGllcnQgd2VyZGVuIQ=='>
+        <source>Anfrage kann nicht akzeptiert werden!</source>
+        <target>Request to the server could not be accepted!</target>
+      </trans-unit>
+      <trans-unit id='QXVmZ3J1bmQgZGVyIGxhbmdzYW1lbiBEYXJzdGVsbHVuZyBpbSBJbnRlcm5ldCBFeHBsb3JlciB3dXJkZW4gdmVyc3VjaHQgdmVyYWx0ZXRlIERhdGVuIHp1IHNwZWljaGVybi4gQml0dGUgw7xiZXJwcsO8ZmVuIFNpZSBkZW4gSW5oYWx0IGRlcyBTZWdtZW50cyE='>
+        <source>Aufgrund der langsamen Darstellung im Internet Explorer wurden versucht veraltete Daten zu speichern. Bitte überprüfen Sie den Inhalt des Segments!</source>
+        <target>Old data was tried to be saved to the server. This happens because of the slow rendering of the Internet Explorer. Please review the content of the currently saved segment!</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
