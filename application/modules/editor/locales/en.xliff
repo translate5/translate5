@@ -781,9 +781,9 @@
         <source>Anfrage kann nicht akzeptiert werden!</source>
         <target>Request to the server could not be accepted!</target>
       </trans-unit>
-      <trans-unit id='QXVmZ3J1bmQgZGVyIGxhbmdzYW1lbiBEYXJzdGVsbHVuZyBpbSBJbnRlcm5ldCBFeHBsb3JlciB3dXJkZW4gdmVyc3VjaHQgdmVyYWx0ZXRlIERhdGVuIHp1IHNwZWljaGVybi4gQml0dGUgw7xiZXJwcsO8ZmVuIFNpZSBkZW4gSW5oYWx0IGRlcyBTZWdtZW50cyE='>
-        <source>Aufgrund der langsamen Darstellung im Internet Explorer wurden versucht veraltete Daten zu speichern. Bitte überprüfen Sie den Inhalt des Segments!</source>
-        <target>Old data was tried to be saved to the server. This happens because of the slow rendering of the Internet Explorer. Please review the content of the currently saved segment!</target>
+      <trans-unit id='QXVmZ3J1bmQgZGVyIGxhbmdzYW1lbiBWZXJhcmJlaXR1bmcgdm9uIEphdmFzY3JpcHQgaW0gSW50ZXJuZXQgRXhwbG9yZXIga29ubnRlIGRhcyBTZWdtZW50IG5pY2h0IGtvcnJla3QgZ2VzcGVpY2hlcnQgd2VyZGVuLiBCaXR0ZSDDtmZmbmVuIFNpZSBkYXMgU2VnbWVudCBub2NobWFscyB1bmQgc3BlaWNoZXJuIFNpZSBlcyBlcm5ldXQuIFNvbGx0ZSBkYXMgUHJvYmxlbSBiZXN0ZWhlbiBibGVpYmVuLCBkcsO8Y2tlbiBTaWUgYml0dGUgRjUgdW5kIGJlYXJiZWl0ZW4gZGFubiBkYXMgU2VnbWVudCBlcm5ldXQuIFZpZWxlbiBEYW5rIQ=='>
+        <source>Aufgrund der langsamen Verarbeitung von Javascript im Internet Explorer konnte das Segment nicht korrekt gespeichert werden. Bitte öffnen Sie das Segment nochmals und speichern Sie es erneut. Sollte das Problem bestehen bleiben, drücken Sie bitte F5 und bearbeiten dann das Segment erneut. Vielen Dank!</source>
+        <target>Due to the slow processing of Javascript in Internet Explorer, the segment could not be saved properly. Please open the segment and save it again. If the problem persists, please press F5 and then edit the segment again. Thank you!</target>
       </trans-unit>
     </body>
   </file>
