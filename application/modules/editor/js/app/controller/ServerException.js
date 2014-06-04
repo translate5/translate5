@@ -107,9 +107,9 @@ Ext.define('Editor.controller.ServerException', {
             case -1:
                 Ext.Msg.alert(str.title, appendServerMsg(text));
                 return;
-            case 403:
+            case 403: //Forbidden: authenticated, but not allowed to see the specific resource 
             //@todo remove this specific 405 handler with TRANSLATE-94
-            case 405: 
+            case 405: //Method Not Allowed: the used HTTP Method is not allowed
                 var req = response.request,
                     regex = new RegExp('^'+Editor.data.restpath+'taskuserassoc');
                 if(req && req.options && req.options.method == 'DELETE' && regex.test(req.options.url)) {
@@ -124,13 +124,13 @@ Ext.define('Editor.controller.ServerException', {
                 }
                 Ext.Msg.alert(str.title, text+tpl.apply([status, statusText]));
                 return;
-            case 404:
+            case 404: //Not Found: Ressource does not exist
                 if(str[_status+'_'+action]) {
                     _status = _status+'_'+action;
                 }
                 Editor.MessageBox.addError(appendServerMsg(str[_status]));
                 return;
-            case 401:
+            case 401: //Unauthorized → redirect to login
                 Ext.MessageBox.show({
                     title: str["401_title"],
                     msg: str["401_msg"],
@@ -141,7 +141,7 @@ Ext.define('Editor.controller.ServerException', {
                     icon: Ext.MessageBox.WARNING
                 });
                 return;
-            case 406: 
+            case 406: //Not Acceptable: show message from server
                 Editor.MessageBox.addError(appendServerMsg(str["406"]));
                 return;
         }
