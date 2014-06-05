@@ -48,6 +48,7 @@ Ext.define('Editor.view.fileorder.Tree', {
   extend: 'Editor.view.ui.fileorder.Tree',
   alias: 'widget.fileorder.tree',
   itemId: 'fileorderTree',
+  cls: 'fileTree',
   store: 'Files',
   rootVisible: false,  
   initComponent: function() {

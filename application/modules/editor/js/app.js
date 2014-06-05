@@ -47,6 +47,7 @@ Ext.data.Connection.disableCaching = false;
 Ext.data.JsonP.disableCaching = false;
 Ext.data.proxy.Server.prototype.noCache = false;
 Ext.Ajax.disableCaching = false;
+Ext.Ajax.timeout = 120000; //2minutes
 
 /**
  * enables the ability to set a optional menuOffset in menus

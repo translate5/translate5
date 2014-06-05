@@ -43,7 +43,8 @@ Ext.define('Editor.view.fileorder.ReferenceTree', {
   extend: 'Ext.tree.Panel',
   alias: 'widget.referenceFileTree',
   store: 'ReferenceFiles',
-  title: '__untranslated__Referenz-Dateien',
+  title: '#UT#Referenz-Dateien',
+  cls: 'fileTree',
   rootVisible: false,
   initComponent: function() {
     var me = this;
