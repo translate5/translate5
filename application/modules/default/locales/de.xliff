@@ -5,8 +5,13 @@
  <file original='php-sourcecode' source-language='ha' target-language='de' datatype='php' xml:space='preserve'>
   <body><trans-unit id='RGV1dHNjaA=='><source>Deutsch</source><target>Deutsch</target></trans-unit>
 <trans-unit id='RW5nbGlzY2g='><source>Englisch</source><target>Englisch</target></trans-unit>
+<<<<<<< HEAD
 <trans-unit id='dHJhbnNsYXRlNSAtIE9wZW4tU291cmNlLUxla3RvcmF0CiAgICBmw7xyIGRlbiBCcm93c2Vy'><source>translate5 - Open-Source-Lektorat
     für den Browser</source><target>translate5 - Open-Source-Lektorat
+=======
+<trans-unit id='dHJhbnNsYXRlNSAtIE9wZW4tU291cmNlLUxla3RvcmF0CiAgICBmw7xyIGRlbiBCcm93c2Vy'><source>translate5 - Open-Source-Lektorat
+    für den Browser</source><target>translate5 - Open-Source-Lektorat
+>>>>>>> f71f55ec6ab7ff2b23cae18039946100d5fe0da7
     für den Browser</target></trans-unit>
 <trans-unit id='TWl0IHRyYW5zbGF0ZTUga8O2bm5lbiBTaWUgU0RMWExJRkYtIHVuZCBDU1YtRGF0ZWllbiBpbSBCcm93c2VyIGxla3RvcmllcmVuIGxhc3NlbiAtIG9obmUgTGl6ZW56a29zdGVuIC0gYXVmIE9wZW4gU291cmNlLUJhc2lzLg=='><source>Mit translate5 können Sie SDLXLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</source><target>Mit translate5 können Sie SDLXLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</target></trans-unit>
 <trans-unit id='dHJhbnNsYXRlNSBiaWV0ZXQgbW9kZXJuc3RlcyBkZXNrdG9wYXJ0aWdlcyBBcmJlaXRlbiBpbSBCcm93c2VyIG1pdCB2aWVsZW4gaW50ZXJlc3NhbnRlbiwgdGVpbHdlaXNlIGVpbnppZ2FydGlnZW4gRmVhdHVyZXMu'><source>translate5 bietet modernstes desktopartiges Arbeiten im Browser mit vielen interessanten, teilweise einzigartigen Features.</source><target>translate5 bietet modernstes desktopartiges Arbeiten im Browser mit vielen interessanten, teilweise einzigartigen Features.</target></trans-unit>
