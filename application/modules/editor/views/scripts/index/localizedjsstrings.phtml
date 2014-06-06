@@ -584,7 +584,44 @@ Ext.define('Editor.controller.Localizer', {
     };
 <?php
     } //END if $this->hasFrontendController('Editor.controller.admin.User')
+    
+    //FIXME frontend rights for the following items!
 ?>
+    Editor.view.admin.task.UserPrefsGrid.prototype.strings = {
+        defaultEntry: '<?php echo $this->translate->_('Standard Eintrag');?>',
+        confirmDeleteTitle: '<?php echo $this->translate->_('Eintrag löschen?');?>',
+        confirmDelete: '<?php echo $this->translate->_('Soll dieser Eintrag wirklich gelöscht werden?');?>',
+        colStep: '<?php echo $this->translate->_('Workflow Schritt');?>',
+        colUsername: '<?php echo $this->translate->_('Benutzer');?>',
+        colTargets: '<?php echo $this->translate->_('Spalten (vorhanden)');?>',
+        colAnonymous: '<?php echo $this->translate->_('Anonymisiert');?>',
+        colVisibility: '<?php echo $this->translate->_('Sichtbarkeit');?>',
+        add: '<?php echo $this->translate->_('Eintrag hinzufügen');?>',
+        reload: '<?php echo $this->translate->_('Aktualisieren');?>',
+        remove: '<?php echo $this->translate->_('Eintrag löschen');?>'
+    };
+    
+    Editor.view.admin.task.UserPrefsForm.prototype.title_edit = '<?php echo $this->translate->_('Bearbeite Eintrag: "{0} - {1}"');?>';
+    Editor.view.admin.task.UserPrefsForm.prototype.title_add = '<?php echo $this->translate->_('Eintrag erstellen');?>';
+    Editor.view.admin.task.UserPrefsForm.prototype.strings = {
+        fieldStep: '<?php echo $this->translate->_('Workflow Schritt');?>',
+        fieldUsername: '<?php echo $this->translate->_('Benutzer');?>',
+        fieldTargets: '<?php echo $this->translate->_('vorhandene Spalten');?>',
+        fieldAnonymous: '<?php echo $this->translate->_('anonymisierte Zieltextspalten');?>',
+        fieldVisibility: '<?php echo $this->translate->_('Sichtbarkeit der nicht editierbaren Zielsprachen');?>',
+        visShow: '<?php echo $this->translate->_('Anzeigen');?>',
+        visHide: '<?php echo $this->translate->_('Ausblenden');?>',
+        visDisabled: '<?php echo $this->translate->_('nicht vorhanden');?>'
+    };
+    
+    Editor.view.admin.task.Preferences.prototype.title = '<?php echo $this->translate->_('Einstellungen zur Aufgabe');?>';
+    Editor.view.admin.task.Preferences.prototype.workflow_label = '<?php echo $this->translate->_('Workflow');?>';
+    Editor.view.admin.task.Preferences.prototype.editInfo = '<?php echo $this->translate->_('Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!');?>';
+    
+    Editor.controller.admin.TaskPreferences.prototype.strings = {
+      taskWorkflowSaved: '<?php echo $this->translate->_('Änderung des Workflows der Aufgabe gespeichert!');?>',
+      forAll: '<?php echo $this->translate->_('für alle');?>'
+    };
   }
 });
 <?php
