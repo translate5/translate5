@@ -42,5 +42,14 @@ Ext.define('Editor.store.admin.task.UserPrefs', {
   model: 'Editor.model.admin.task.UserPref',
   remoteSort: false,
   autoLoad: false,
-  pageSize: 20
+  pageSize: 20,
+  getDefaultFor: function(workflow) {
+      var idx = this.findBy(function(rec){
+          return (rec.get('workflow') == workflow && rec.isDefault());
+      });
+      if(idx >= 0) {
+          return this.getAt(idx);
+      }
+      return null;
+  }
 });

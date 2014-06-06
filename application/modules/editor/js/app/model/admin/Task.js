@@ -79,7 +79,11 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'userCount', type: 'integer', persist: false},
     {name: 'defaultSegmentLayout', type: 'boolean', persist: false}
   ],
-  hasMany: {model: 'Editor.model.segment.Field', name: 'segmentFields'},
+  hasMany: [{
+      model: 'Editor.model.segment.Field', name: 'segmentFields'
+  },{
+      model: 'Editor.model.admin.task.UserPref', name: 'userPrefs'
+  }],
   idProperty: 'id',
   proxy : {
     type : 'rest',

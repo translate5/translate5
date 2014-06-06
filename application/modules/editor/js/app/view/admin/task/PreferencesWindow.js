@@ -69,5 +69,23 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
         });
 
         me.callParent(arguments);
+    },
+    /**
+     * setting a loading mask for the window / grid is not possible, using savingShow / savingHide instead.
+     * perhaps because of bug for ext-4.0.7 (see http://www.sencha.com/forum/showthread.php?157954)
+     * This Fix is better as in {Editor.view.changealike.Window} because of useing body as LoadMask el.
+     */
+    loadingShow: function() {
+        var me = this;
+        if(!me.loadingMask) {
+            me.loadingMask = new Ext.LoadMask(Ext.getBody(), {store: false});
+            me.on('destroy', function(){
+                me.loadingMask.destroy();
+            });
+        }
+        me.loadingMask.show();
+    },
+    loadingHide: function() {
+        this.loadingMask.hide();
     }
 });

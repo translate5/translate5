@@ -49,6 +49,11 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
       cancel: '#UT#Abbrechen'
   },
   title : '#UT#Benutzer zu Aufgabe zuordnen',
+  
+  viewConfig: {
+      loadMask: false
+  },
+  
   store: 'admin.TaskUserAssocs',
   //features: [{
     //ftype: 'editorGridFilter'

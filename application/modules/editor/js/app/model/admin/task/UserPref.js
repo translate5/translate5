@@ -54,6 +54,7 @@ Ext.define('Editor.model.admin.task.UserPref', {
       {type: 'inclusion', field: 'visibility', list: ['show','hide','disable']},
       {type: 'inclusion', field: 'workflow', list: Ext.Object.getKeys(Editor.data.app.workflows)}
       //FIXME can we do this out of segmentfields dynamically?
+      //if yes, than we can move the visibility flags to CONSTs
       //{type: 'inclusion', field: 'fields', list: Ext.Object.getKeys(Editor.data.app.utRoles)}
   ],
   idProperty: 'id',
@@ -63,6 +64,12 @@ Ext.define('Editor.model.admin.task.UserPref', {
    */
   isDefault: function() {
       return !this.phantom && this.get('userGuid').length == 0 && this.get('workflowStep').length == 0;
+  },
+  isNonEditableColumnVisible: function() {
+      return (this.get('visibility') == 'show');
+  },
+  isNonEditableColumnDisabled: function() {
+      return (this.get('visibility') == 'disable');
   },
   proxy : {
     type : 'rest',

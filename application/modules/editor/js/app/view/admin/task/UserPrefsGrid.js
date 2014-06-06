@@ -43,12 +43,16 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
         confirmDelete: '#UT#Soll dieser Eintrag wirklich gelöscht werden?',
         colStep: '#UT#Workflow Schritt',
         colUsername: '#UT#Benutzer',
-        colTargets: '#UT#Spalten (sichtbar)',
-        colAnonymous: '#UT#Namen deaktiviert',
+        colTargets: '#UT#Spalten (vorhanden)',
+        colAnonymous: '#UT#Anonymisiert',
         colVisibility: '#UT#Sichtbarkeit',
         add: '#UT#Eintrag hinzufügen',
         reload: '#UT#Aktualisieren',
         remove: '#UT#Eintrag löschen'
+    },
+    
+    viewConfig: {
+        loadMask: false
     },
 
     initComponent: function() {
@@ -67,7 +71,6 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
 
         Ext.applyIf(me, {
             columns: [
-                {xtype: 'rownumberer'},
                 {
                     xtype: 'gridcolumn',
                     dataIndex: 'workflowStep',
@@ -91,7 +94,7 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                         var idx = userStore.find('userGuid', v),
                             user = userStore.getAt(idx);
                         if(user) {
-                            return Editor.model.admin.User.getUserName(user);
+                            return Editor.model.admin.User.getUserName(user)+"add login";
                         }
                         return v;
                     },

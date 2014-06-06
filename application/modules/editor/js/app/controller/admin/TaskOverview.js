@@ -233,11 +233,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           grid.down('#viewModeMenu').hide();
           sep = grid.down('#viewModeMenu').nextNode('.tbseparator');
           sep && sep.hide();
-          vm && vm.viewMode();
+          vm && vm.viewMode(true); //true means called on init
       }
       else {
           //show not needed
-          vm && vm.editMode();
+          vm && vm.editMode(true); //true means called on init
       }
   },
   /**

@@ -36,17 +36,17 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
     extend: 'Ext.form.Panel',
     alias: 'widget.editorAdminTaskUserPrefsForm',
     bodyPadding: 10,
-    title_edit: '#UT#Bearbeite Eintrag Nr.: {0}',
+    title_edit: '#UT#Bearbeite Eintrag: "{0} - {1}"',
     title_add: '#UT#Eintrag erstellen',
     strings: {
         fieldStep: '#UT#Workflow Schritt',
         fieldUsername: '#UT#Benutzer',
-        fieldTargets: '#UT#sichtbare Spalten',
-        fieldAnonymous: '#UT#anonymisierte Spaltennamen',
+        fieldTargets: '#UT#vorhandene Spalten',
+        fieldAnonymous: '#UT#anonymisierte Zieltextspalten',
         fieldVisibility: '#UT#Sichtbarkeit der nicht editierbaren Zielsprachen',
         visShow: '#UT#Anzeigen',
         visHide: '#UT#Ausblenden',
-        visDisabled: '#UT#komplett deaktivieren'
+        visDisabled: '#UT#nicht vorhanden'
     },
 
     initComponent: function() {
@@ -149,7 +149,9 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
         var me = this,
             fields = me.actualTask.segmentFields().collect('name'),
             checked = rec.get('fields').split(','),
-            toSet = {};
+            toSet = {},
+            wfLabel,
+            userLabel;
         this.fireEvent('beforeLoadRecord', this, rec);
         //set the field checkboxes by the stored string
         Ext.Array.each(fields, function(val) {
@@ -166,6 +168,8 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
             workflowStep: rec.get('workflowStep') || FOR_ALL,
             userGuid: rec.get('userGuid') || FOR_ALL
         });
-        me.setTitle(rec.phantom ? me.title_add : Ext.String.format(me.title_edit, (rec.store.indexOfTotal(rec) + 1)));
+        wfLabel = me.down('.combobox[name="workflowStep"]').getRawValue();
+        userLabel = me.down('.combobox[name="userGuid"]').getRawValue();
+        me.setTitle(rec.phantom ? me.title_add : Ext.String.format(me.title_edit, wfLabel, userLabel));
     }
 });

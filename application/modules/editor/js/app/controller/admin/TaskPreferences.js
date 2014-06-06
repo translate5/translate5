@@ -51,6 +51,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       ref: 'editInfo',
       selector: '#editInfoOverlay'
   },{
+      ref: 'prefWindow',
+      selector: '.adminTaskPreferencesWindow'
+  },{
       ref: 'prefForm',
       selector: '.editorAdminTaskUserPrefsForm'
   },{
@@ -126,10 +129,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           prefs = me.getAdminTaskUserPrefsStore(),
           used = {},
           cnt = 0;
-      steps[me.FOR_ALL] = me.strings.forAll;
       me.available = {};
 
-      //calculate the already used step / user combinations          
+      //calculate the already used step / user combinations
       prefs.each(function(rec) {
           if(rec.get('workflow') != workflow){
               return;
@@ -166,7 +168,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       });
       //disable the add button if all combinations are reached
       this.getAddBtn().setDisabled(cnt == 0);
-      console.log("calculateAvailableCombinations: ", me.available);
   }, 
   /**
    * Method Shortcut for convenience
@@ -179,13 +180,11 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
   },
   
   /**
-   * Opens the Preferences to the choosen Task
-   * fires also an event to allow flexible handling of this click, 
-   * if handler(s) return false no preferences are opened!
+   * Loads all preferences and userassocs to the choosen Task
    * triggerd by click on the Task Preferences Button / (Cell also => @todo)
    * @param {Editor.model.admin.Task} task
    */
-  handleTaskPreferences: function(task) {
+  loadAllPreferences: function(task) {
       var me = this,
           userPrefs = me.getAdminTaskUserPrefsStore(),
           userAssocs = me.getAdminTaskUserAssocsStore(),
@@ -197,6 +196,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           };
       
       me.actualTask = task;
+      me.getPrefWindow().loadingShow();
       
       if(me.isAllowed('editorPreferencesTask')){
           //FIXME dieses isAllowed nur in der view!
@@ -213,18 +213,35 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           tupParams.callback = function() {
               me.calculateAvailableCombinations();
               me.updatePrefsFilter(task.get('workflow'));
+              me.getPrefWindow().loadingHide();
           };
           tuaParams.callback = function() {
               userPrefs.load(tupParams);
           };
       }
+      else {
+          tuaParams.callback = function() {
+              me.getPrefWindow().loadingHide();
+          };
+      }
       
       userAssocs.loadData([],false); //cleanup old contents
       userAssocs.load(tuaParams);
-      
-      Ext.widget('adminTaskPreferencesWindow',{
+  },
+  
+  /**
+   * Opens the Preferences to the choosen Task
+   * triggerd by click on the Task Preferences Button / (Cell also => @todo)
+   * @param {Editor.model.admin.Task} task
+   */
+  handleTaskPreferences: function(task) {
+      this.actualTask = task;
+      var win = Ext.widget('adminTaskPreferencesWindow',{
           actualTask: task
-      }).show();
+      });
+      win.show();
+      //win.loadingShow();
+      this.loadAllPreferences(task);
   },
   
   handleAddClick: function() {
@@ -233,13 +250,16 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           fields = task.segmentFields().collect('name'),
           rec,
           firstStep = me.updateWorkflowSteps(),
+          userPrefs = me.getAdminTaskUserPrefsStore(),
+          defaultPref = userPrefs.getDefaultFor(task.get('workflow')),
           form = me.getPrefForm();
       form.show();
+      form.down('.combobox[name="workflowStep"]').setDisabled(false);
       me.getEditInfo().hide();
       rec = Ext.create(Editor.model.admin.task.UserPref, {
           fields: fields,
-          anonymousCols: true, //FIXME from app.ini
-          visibility: 'show', //FIXME from app.ini
+          anonymousCols: defaultPref.get('anonymousCols'),
+          visibility: defaultPref.get('visibility'),
           workflow: task.get('workflow'),
           workflowStep: firstStep,
           taskGuid: task.get('taskGuid')
@@ -264,7 +284,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
   },
   
   handleDeselect: function() {
-      console.log(arguments); //FIXME was wollte ich hier machen als ich den log rein hab?
       this.getDeleteBtn().setDisabled();
   },
   
@@ -285,7 +304,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       var me = this,
           data = me.actualTask.getWorkflowMetaData(),
           steps = [];
-      console.log("update workflowStep");
       Ext.Object.each(data.steps, function(key, val) {
           if(me.available[key] || rec && rec.get('workflowStep') == key) {
               steps.push([key, val]);
@@ -295,7 +313,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           steps.push([me.FOR_ALL, me.strings.forAll]);
       }
       me.getWfStepCombo().store.loadData(steps);
-      console.log("RESULT updateWorkflowSteps", steps);
       if(steps.length == 0){
           return "";
       }
@@ -309,7 +326,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
   updateUsers: function(rec) {
       var me = this,
           tuas = me.getAdminTaskUserAssocsStore(),
-          prefs = me.getAdminTaskUserPrefsStore(),
           step = me.getWfStepCombo().getValue(),
           userCombo = me.getUsersCombo(),
           value = userCombo.getValue(),
@@ -320,14 +336,12 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       if(step && step.length == 0) {
           return;
       }
-      console.log("update users", rec.data);
       tuas.each(function(tua){
           var ug = tua.get('userGuid'),
               isSelf = rec && rec.get('userGuid') == ug,
               userName = tua.get('surName')+', '+tua.get('firstName')+' ('+tua.get('login')+')';
               
           if(isAvailable(ug) || isSelf) {
-              console.log("user added ", userName, isSelf, isAvailable(ug), ug, step);
               users.push([ug, userName]);
           }
       });
@@ -442,6 +456,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
               me.calculateAvailableCombinations();
           },
           failure: function() {
+              //FIXME
             console.log("FAILED");
           }
       });
@@ -453,6 +468,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       this.getEditInfo().show();
   },
   handleReload: function() {
-      alert("adapt handleTaskPreferences content");
+      this.loadAllPreferences(this.actualTask);
   }
 });
