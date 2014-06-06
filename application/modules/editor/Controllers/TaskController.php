@@ -290,6 +290,12 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->data['pmName'] = $pm->getUsernameLong();
         $this->setDataInEntity();
         $this->entity->createTaskGuidIfNeeded();
+        
+        //init workflow id for the task
+        $config = Zend_Registry::get('config');
+        $defaultWorkflow = $config->runtimeOptions->import->taskWorkflow;
+        $this->entity->setWorkflow($this->workflowManager->getIdToClass($defaultWorkflow));
+        
         if($this->validate()) {
             $this->initWorkflow();
             //$this->entity->save(); => is done by the import call!
@@ -298,6 +304,8 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->view->rows = $this->entity->getDataObject();
             $this->workflow->doImport($this->entity);
         }
+        
+        $this->workflowManager->initDefaultUserPrefs($this->entity);
     }
 
     /**
@@ -447,8 +455,8 @@ class editor_TaskController extends ZfExtended_RestController {
         /* @var $fields editor_Models_SegmentField */
         
         //we load alls fields, if we are in taskOverview and are allowed to edit all 
-        // or we have not userStep to filter / search by. 
-        // No userStep means indirectly that we do not have a TUA
+        // or we have no userStep to filter / search by. 
+        // No userStep means indirectly that we do not have a TUA (pmCheck)
         if(!$this->entity->isRegisteredInSession() && $isEditAll || empty($row['userStep'])) {
             $row['segmentFields'] = $fields->loadByTaskGuid($taskguid);
         } else {

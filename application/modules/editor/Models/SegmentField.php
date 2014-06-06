@@ -90,17 +90,23 @@ class editor_Models_SegmentField extends ZfExtended_Models_Entity_Abstract {
         $allFields = $this->loadByTaskGuid($taskGuid);
         $userPrefs = ZfExtended_Factory::get('editor_Models_Workflow_Userpref');
         /* @var $userPrefs editor_Models_Workflow_Userpref */
-        $prefs = $userPrefs->loadByTaskUserAndStep($taskGuid, $workflow, $userGuid, $taskStep);
-        error_log(print_r($prefs,1));
-        
-        //FIXME HERE AM I: 
-        // Beim Auswerten der geladenen userPrefs tat sich die Frage auf, welcher der folgenden Einträge gilt:
-        // Ich habe die UG 1 und den Step X. Des Weiteren gibt es einen UserPref Eintrag 
-        //  mit UG 1 und Step null und einen mit UG null und Step X. Welcher der beiden soll nun verwendet werden?
-        // Nach weiterer Überlegung haben Marc und ich beschlossen das "Für Alle" bei den Workflowsteps rauszuwerfen, 
-        // sprich es muss immer ein step gesetzt sein. (Ausser beim default, bei dem beides null ist)
-        
-        return $allFields;
+        $pref = $userPrefs->loadByTaskUserAndStep($taskGuid, $workflow, $userGuid, $taskStep);
+        error_log(print_r($pref,1));
+        $fields = explode(',', $pref->fields);
+        $result = array();
+        $anon = 'A';
+        foreach($allFields as $field) {
+            if(! in_array($field['name'], $fields)) {
+                continue;
+            }
+            if($pref->anonymousCols && $field['type'] == editor_Models_SegmentField::TYPE_TARGET) {
+                $field['label'] = 'Spalte '.($anon++);
+            }
+            //FIXME how to do visibility??? Wie war das, bezieht sich die Visibility auf die nicht vorhandenen fields? Oder nur wie beschrieben auf die nicht editierbaren Felder?
+            //Gleiches auf die Anon Geschichte, hier sollten doch nur die target spalten betroffen sein?
+            $result[] = $field;
+        }
+        return $result;
         //FIXME TaskController Logic für diesen Aufruf beim Export der QM Statistics bzw. eigentlich bei jedem bisherigen loadByTaskGuid adaptieren!
     }
     

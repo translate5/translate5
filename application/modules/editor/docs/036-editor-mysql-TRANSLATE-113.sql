@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS `LEK_workflow_userpref` (
   `userGuid` varchar(38) DEFAULT NULL COMMENT 'Foreign Key to Zf_users, optional, constrain the prefs to this user',
   `fields` varchar(300) NOT NULL COMMENT 'field names as used in LEK_segment_fields',
   PRIMARY KEY (`id`),
+  CONSTRAINT FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE,
   CONSTRAINT FOREIGN KEY (`taskGuid`, `userGuid`) REFERENCES `LEK_taskUserAssoc` (`taskGuid`, `userGuid`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

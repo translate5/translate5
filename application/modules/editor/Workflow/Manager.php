@@ -158,6 +158,36 @@ class editor_Workflow_Manager {
         }
         return $this->get($session->taskWorkflow);
     }
+    
+    /**
+     * creates the initial userpref settings for the given task
+     * @param editor_Models_Task $task
+     */
+    public function initDefaultUserPrefs(editor_Models_Task $task) {
+        $config = Zend_Registry::get('config');
+        $wfconf = $config->runtimeOptions->workflow;
+        $taskGuid  = $task->getTaskGuid();
+        
+        $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($taskGuid);
+        /* @var $sfm editor_Models_SegmentFieldManager */
+        $fields = array_map(function(Zend_Db_Table_Row $row){
+            return $row->name;
+        },$sfm->getFieldList());
+        
+        foreach($this->workflowList as $key => $className) {
+            $userPref = ZfExtended_Factory::get('editor_Models_Workflow_Userpref');
+            /* @var $userPref editor_Models_Workflow_Userpref */
+            $userPref->setWorkflow($key);
+            $userPref->setTaskGuid($taskGuid);
+            $userPref->setWorkflowStep(null); //default entry
+            $userPref->setUserGuid(null);     //default entry
+            $userPref->setAnonymousCols($wfconf->$key && $wfconf->$key->anonymousColumns);
+            $userPref->setFields(join(',', $fields));
+            $vis = $wfconf->$key && $wfconf->$key->visibility || 'show';
+            $userPref->setVisibility($vis);
+            $userPref->save();
+        }
+    }
 }
     /*
 //FIXME → rework all places currently the workflow is instanced manually!"			1.5
