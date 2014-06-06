@@ -283,11 +283,18 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
   handleDeleteConfirmClick: function(grid, records) {
       var me = this;
       Ext.Array.each(records, function(rec){
+          Ext.defer(function(){
+              me.getPrefWindow().loadingShow();
+          },10);//weired xmask extjs bug
           rec.destroy({
               success: function() {
                   //FIXME do we have to update some other stores? taskStore && taskStore.load();
                   grid.store.remove(rec);
                   me.calculateAvailableCombinations();
+                  me.getPrefWindow().loadingHide();
+              },
+              failure: function() {
+                  me.getPrefWindow().loadingHide();
               }
           });
       });

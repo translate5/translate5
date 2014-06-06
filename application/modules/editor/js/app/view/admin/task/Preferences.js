@@ -67,6 +67,7 @@ Ext.define('Editor.view.admin.task.Preferences', {
                     xtype: 'combobox',
                     itemId: 'taskWorkflow',
                     forceSelection: true,
+                    editable: false,
                     fieldLabel: me.workflow_label,
                     value: me.actualTask.get('workflow'),
                     store: workflows
@@ -74,6 +75,8 @@ Ext.define('Editor.view.admin.task.Preferences', {
             },{
                 xtype: 'container',
                 region: 'east',
+                autoScroll: true,
+                height: 'auto',
                 width: 250,
                 items: [{
                     xtype: 'container',

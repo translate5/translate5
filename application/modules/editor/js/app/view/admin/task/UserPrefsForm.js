@@ -60,6 +60,7 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
                     name: 'workflowStep',
                     allowBlank: false,
                     forceSelection: true,
+                    editable: false,
                     queryMode: 'local',
                     store: [['','']],//dummy entry to get correct fields
                     anchor: '100%',
