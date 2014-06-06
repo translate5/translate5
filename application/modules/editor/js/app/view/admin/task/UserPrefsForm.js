@@ -36,6 +36,7 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
     extend: 'Ext.form.Panel',
     alias: 'widget.editorAdminTaskUserPrefsForm',
     bodyPadding: 10,
+    autoScroll: true,
     title_edit: '#UT#Bearbeite Eintrag: "{0} - {1}"',
     title_add: '#UT#Eintrag erstellen',
     strings: {

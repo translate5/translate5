@@ -240,10 +240,15 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           actualTask: task
       });
       win.show();
-      //win.loadingShow();
+      Ext.defer(function(){
+          win.loadingShow(); //deferred because of weired xmask bug in ext 4.0.7
+      },50);
       this.loadAllPreferences(task);
   },
   
+  /**
+   * adds a new userpref entry
+   */
   handleAddClick: function() {
       var me = this,
           task = me.actualTask,
@@ -270,6 +275,11 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       me.getUsersCombo().setValue();
   },
    
+  /**
+   * deletes a userpref entry
+   * @param {Ext.grid.Panel} grid
+   * @param {Editor.model.admin.task.UserPref[]} records
+   */
   handleDeleteConfirmClick: function(grid, records) {
       var me = this;
       Ext.Array.each(records, function(rec){
@@ -362,10 +372,15 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       var me = this;
       me.actualTask.set('workflow', val);
       me.updatePrefsFilter(val);
+      me.getPrefWindow().loadingShow();
       me.actualTask.save({
           success: function(rec, op) {
               Editor.MessageBox.addInfo(me.strings.taskWorkflowSaved);
               me.calculateAvailableCombinations();
+              me.getPrefWindow().loadingHide();
+          },
+          failure: function() {
+              me.getPrefWindow().loadingHide();
           }
       });
   },
@@ -447,6 +462,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           rec.set('userGuid', null);
       }
       rec.set('workflow', me.getTaskWorkflow().getValue());
+      me.getPrefWindow().loadingShow();
       rec.save({
           success: function() {
               me.clickCancel();
@@ -454,13 +470,17 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
                   store.insert(0,rec);
               }
               me.calculateAvailableCombinations();
+              me.getPrefWindow().loadingHide();
           },
           failure: function() {
-              //FIXME
-            console.log("FAILED");
+              me.getPrefWindow().loadingHide();
+              me.handleReload();
           }
       });
   },
+  /**
+   * Cancels adding / editing a userpref 
+   */
   clickCancel: function() {
       var form = this.getPrefForm();
       form.getForm().reset();
