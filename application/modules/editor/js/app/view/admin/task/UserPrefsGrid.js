@@ -50,7 +50,6 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
         reload: '#UT#Aktualisieren',
         remove: '#UT#Eintrag löschen'
     },
-    
     viewConfig: {
         loadMask: false
     },

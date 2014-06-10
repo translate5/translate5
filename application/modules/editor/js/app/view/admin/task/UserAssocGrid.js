@@ -48,11 +48,9 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
       save: '#UT#Änderungen speichern',
       cancel: '#UT#Abbrechen'
   },
-  
   viewConfig: {
       loadMask: false
   },
-  
   store: 'admin.TaskUserAssocs',
   //features: [{
     //ftype: 'editorGridFilter'
@@ -103,6 +101,24 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
               text: me.strings.removeUser,
               tooltip: me.strings.removeUserTip
           }]
+        },{
+            xtype : 'toolbar',
+            dock : 'bottom',
+            layout: {
+                type: 'hbox',
+                pack: 'end'
+            },
+            items : [{
+                xtype : 'button',
+                iconCls : 'ico-save',
+                itemId : 'save-assoc-btn',
+                text : me.strings.save
+            }, {
+                xtype : 'button',
+                iconCls : 'ico-cancel',
+                itemId : 'cancel-assoc-btn',
+                text : me.strings.cancel
+            }]
         }]
     });
 
