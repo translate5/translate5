@@ -35,7 +35,7 @@
 Ext.define('Editor.view.admin.task.PreferencesWindow', {
     extend : 'Ext.window.Window',
     alias : 'widget.adminTaskPreferencesWindow',
-    requires: ['Editor.view.admin.task.UserAssocGrid','Editor.view.admin.task.Preferences'],
+    requires: ['Editor.view.admin.task.UserAssoc','Editor.view.admin.task.Preferences'],
     itemId : 'adminTaskPreferencesWindow',
     title : '#UT#Einstellungen zu Aufgabe "{0}"',
     height : 500,
@@ -50,7 +50,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
         if(auth.isAllowed('editorChangeUserAssocTask')) {
             tabs.push({
                 actualTask: me.actualTask,
-                xtype: 'adminTaskUserAssocGrid'
+                xtype: 'adminTaskUserAssoc'
             });
         }
         if(auth.isAllowed('editorUserPrefsTask')) {
@@ -63,7 +63,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
         Ext.applyIf(me, {
             items : [{
                 xtype: 'tabpanel',
-                activeTab: 1, //FIXME
+                activeTab: 0,
                 items: tabs
             }]
         });

@@ -48,7 +48,6 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
       save: '#UT#Änderungen speichern',
       cancel: '#UT#Abbrechen'
   },
-  title : '#UT#Benutzer zu Aufgabe zuordnen',
   
   viewConfig: {
       loadMask: false
@@ -60,18 +59,8 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
   //}],
   initComponent: function() {
     var me = this,
-        wf = me.actualTask.getWorkflowMetaData(),
-        states = [],
-        roles = [];
-    Ext.Object.each(wf.states, function(key, state) {
-        states.push([key, state]);
-    });
-    Ext.Object.each(wf.roles, function(key, role) {
-        roles.push([key, role]);
-    });
+        wf = me.actualTask.getWorkflowMetaData();
     Ext.applyIf(me, {
-      plugins: [Ext.create('Ext.grid.plugin.CellEditing', {
-      })],
       columns: [{
           xtype: 'gridcolumn',
           width: 160,
@@ -84,15 +73,6 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
           xtype: 'gridcolumn',
           width: 190,
           dataIndex: 'role',
-          editor: {
-              xtype: 'combo',
-              editable: false,
-              //displayField: 'label',
-              //valueField: 'id',
-              forceSelection: true,
-              queryMode: 'local',
-              store: roles
-          },
           renderer: function(v) {
               return wf.roles[v];
           },
@@ -101,15 +81,6 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
           xtype: 'gridcolumn',
           width: 190,
           dataIndex: 'state',
-          editor: {
-              xtype: 'combo',
-              editable: false,
-              //displayField: 'label',
-              //valueField: 'id',
-              forceSelection: true,
-              queryMode: 'local',
-              store: states
-          },
           renderer: function(v) {
               return wf.states[v];
           },
@@ -132,24 +103,6 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
               text: me.strings.removeUser,
               tooltip: me.strings.removeUserTip
           }]
-        },{
-            xtype : 'toolbar',
-            dock : 'bottom',
-            layout: {
-                type: 'hbox',
-                pack: 'end'
-            },
-            items : [{
-                xtype : 'button',
-                iconCls : 'ico-save',
-                itemId : 'save-assoc-btn',
-                text : me.strings.save
-            }, {
-                xtype : 'button',
-                iconCls : 'ico-cancel',
-                itemId : 'cancel-assoc-btn',
-                text : me.strings.cancel
-            }]
         }]
     });
 

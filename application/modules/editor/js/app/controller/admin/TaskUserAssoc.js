@@ -49,6 +49,12 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       ref: 'userAssocGrid',
       selector: '#adminTaskUserAssocGrid'
   },{
+      ref: 'userAssocForm',
+      selector: '.adminTaskUserAssoc .form'
+  },{
+      ref: 'editInfo',
+      selector: '.adminTaskUserAssoc #editInfoOverlay'
+  },{
       ref: 'taskPreferencesWindow',
       selector: '#adminTaskPreferencesWindow'
   }],
@@ -89,10 +95,10 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           '#adminUserChooseWindow #cancel-btn': {
               click: me.handleCancel
           },
-          '#adminTaskUserAssocGrid #save-assoc-btn': {
+          '.adminTaskUserAssocGrid #save-assoc-btn': {
               click: me.handleSaveAssoc
           },
-          '#adminTaskUserAssocGrid #cancel-assoc-btn': {
+          '.adminTaskUserAssocGrid #cancel-assoc-btn': {
               click: me.handleCancel
           }
       });
@@ -154,7 +160,17 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
    * @param {Array} selection
    */
   handleAssocSelection: function(grid, selection) {
-      this.getAssocDelBtn().setDisabled(selection.length == 0);
+      var me = this,
+          emptySel = selection.length == 0;
+      me.getAssocDelBtn().setDisabled(emptySel);
+      me.getEditInfo().setVisible(emptySel);
+      me.getUserAssocForm().setVisible(!emptySel);
+      if(emptySel) {
+          me.getUserAssocForm().getForm().reset();
+      }
+      else {
+          me.getUserAssocForm().loadRecord(selection[0]);
+      }
   },
   /**
    * Removes the selected User Task Association

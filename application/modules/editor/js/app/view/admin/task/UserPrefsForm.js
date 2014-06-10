@@ -45,6 +45,8 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
         fieldTargets: '#UT#vorhandene Spalten',
         fieldAnonymous: '#UT#anonymisierte Zieltextspalten',
         fieldVisibility: '#UT#Sichtbarkeit der nicht editierbaren Zielsprachen',
+        btnSave: '#UT#Speichern',
+        btnCancel: '#UT#Abbrechen',
         visShow: '#UT#Anzeigen',
         visHide: '#UT#Ausblenden',
         visDisabled: '#UT#nicht vorhanden'
@@ -128,12 +130,12 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
                         {
                             xtype: 'button',
                             itemId: 'saveBtn',
-                            text: 'Save'
+                            text: me.strings.save
                         },
                         {
                             xtype: 'button',
                             itemId: 'cancelBtn',
-                            text: 'Cancel'
+                            text: me.strings.cancel
                         }
                     ]
                 }

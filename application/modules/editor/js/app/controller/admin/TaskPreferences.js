@@ -49,7 +49,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       selector: '.editorAdminTaskUserPrefsGrid'
   },{
       ref: 'editInfo',
-      selector: '#editInfoOverlay'
+      selector: '.editorAdminTaskPreferences #editInfoOverlay'
   },{
       ref: 'prefWindow',
       selector: '.adminTaskPreferencesWindow'
