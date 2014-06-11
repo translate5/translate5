@@ -74,20 +74,32 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
   }],
   strings: {
       taskWorkflowSaved: '#UT#Änderung des Workflows der Aufgabe gespeichert!',
+      entrySaved: '#UT#Eintrag gespeichert',
+      entryDeleted: '#UT#Eintrag gelöscht',
+      entrySaveError: '#UT#Fehler beim Speichern der Änderungen!',
       forAll: '#UT#für alle'
   },
   actualTask: null,
   init : function() {
       var me = this,
-          toc = me.application.getController('admin.TaskOverview');
+          toc = me.application.getController('admin.TaskOverview'),
+          tua;
       
-      toc.on('handleTaskPreferences', me.handleTaskPreferences, me);     
       //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
+      if(Editor.controller.admin.TaskUserAssoc){
+          tua = me.application.getController('admin.TaskUserAssoc');
+          tua.on('addUserAssoc', me.calculateAvailableCombinations, me);
+          tua.on('removeUserAssoc', me.handleReload, me);
+      }
+      toc.on('handleTaskPreferences', me.handleTaskPreferences, me);
       Editor.app.on('adminViewportClosed', me.clearStores, me);
 
       me.control({
           '.editorAdminTaskPreferences #taskWorkflow': {
               change: me.changeWorkflow
+          },
+          '.adminTaskPreferencesWindow #close-btn': {
+              click: me.handleCloseWindow
           },
           '.editorAdminTaskUserPrefsForm #alternates .checkboxgroup': {
               beforerender: me.prepareAlternates
@@ -101,10 +113,12 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           '.editorAdminTaskUserPrefsGrid': {
               beforerender: me.setActualTaskInCmp,
               confirmDelete: me.handleDeleteConfirmClick,
-              deselect: me.handleDeselect,
-              itemclick: me.handleGridClick
+              selectionchange: me.handleAssocSelection
           },
           '.editorAdminTaskUserPrefsGrid #userPrefReload': {
+              click: me.handleReload
+          },
+          '#adminTaskUserAssocGrid #reload-btn': {
               click: me.handleReload
           },
           '.editorAdminTaskUserPrefsGrid #userPrefAdd': {
@@ -167,7 +181,8 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           }
       });
       //disable the add button if all combinations are reached
-      this.getAddBtn().setDisabled(cnt == 0);
+      me.getAddBtn().setDisabled(cnt == 0);
+      me.updateUsers(me.getPrefForm().getRecord());
   }, 
   /**
    * Method Shortcut for convenience
@@ -178,7 +193,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
   isAllowed: function(right, task) {
       return Editor.app.authenticatedUser.isAllowed(right, task);
   },
-  
   /**
    * Loads all preferences and userassocs to the choosen Task
    * triggerd by click on the Task Preferences Button / (Cell also => @todo)
@@ -197,13 +211,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       
       me.actualTask = task;
       me.getPrefWindow().loadingShow();
-      
-      if(me.isAllowed('editorPreferencesTask')){
-          //FIXME dieses isAllowed nur in der view!
-      }
-      if(me.isAllowed('editorChangeUserAssocTask')){
-          //FIXME dieses isAllowed nur in der view!
-      }
       
       //userPrefs must be loaded after userAssocs, 
       //so add the load as a callback dynamically, based on the rights 
@@ -228,7 +235,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       userAssocs.loadData([],false); //cleanup old contents
       userAssocs.load(tuaParams);
   },
-  
   /**
    * Opens the Preferences to the choosen Task
    * triggerd by click on the Task Preferences Button / (Cell also => @todo)
@@ -245,7 +251,12 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       },50);
       this.loadAllPreferences(task);
   },
-  
+  /**
+   * handler if close button is pressed
+   */
+  handleCloseWindow: function () {
+      this.getPrefWindow().close();
+  },
   /**
    * adds a new userpref entry
    */
@@ -274,7 +285,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       form.loadRecord(rec, me.FOR_ALL);
       me.getUsersCombo().setValue();
   },
-   
   /**
    * deletes a userpref entry
    * @param {Ext.grid.Panel} grid
@@ -288,29 +298,27 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           },10);//weired xmask extjs bug
           rec.destroy({
               success: function() {
-                  //FIXME do we have to update some other stores? taskStore && taskStore.load();
                   grid.store.remove(rec);
                   me.calculateAvailableCombinations();
+                  Editor.MessageBox.addSuccess(me.strings.entryDeleted);
                   me.getPrefWindow().loadingHide();
               },
               failure: function() {
+                  Editor.MessageBox.addError(me.strings.entrySaveError);
                   me.getPrefWindow().loadingHide();
               }
           });
       });
   },
-  
-  handleDeselect: function() {
-      this.getDeleteBtn().setDisabled();
-  },
-  
+  /**
+   * handler to update user data if the workflowStep combo was changed
+   */
   comboChange: function() {
     var me = this,
         rec = me.getPrefForm().getRecord();
     me.getUsersCombo().setValue();
     me.updateUsers(rec);
   },
-  
   /**
    * prefills the workflow step combo in the form with the available steps for the selected workflow
    * returns the first workflow step name in the combo
@@ -365,11 +373,10 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       if(isAvailable(me.FOR_ALL) || (step != me.FOR_ALL && rec && rec.get('userGuid').length == 0)) {
           users.push([me.FOR_ALL, me.strings.forAll]);
       }
-      userCombo.setDisabled(rec.isDefault());
+      userCombo.setDisabled(rec && rec.isDefault());
       userCombo.store.loadData(users);
       userCombo.setValue(value);
   },
-  
   /**
    * saves the new workflow into the task, and to the server
    * @param {Ext.form.fiueld.ComboBox} combo
@@ -427,22 +434,27 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       });
       cmp.fieldLabels = labels;
   },
-  //FIXME clear the local used stores for task change?
   clearStores: function() {
+      this.getAdminTaskUserPrefsStore().removeAll();
   },
   /**
-   * edit an entry handler
+   * handler for changing the selection in the userpref grid
    */
-  handleGridClick: function(grid, rec) {
+  handleAssocSelection: function(grid, selection) {
       var me = this,
-          form = me.getPrefForm();
+          form = me.getPrefForm(),
+          emptySel = selection.length == 0,
+          rec = emptySel ? null : selection[0];
+      
+      me.getDeleteBtn().setDisabled(emptySel || rec.isDefault());
+      if(emptySel) {
+          return;
+      }
       form.show();
       me.getEditInfo().hide();
       form.down('.combobox[name="workflowStep"]').setDisabled(rec.isDefault());
       me.getUsersCombo().setDisabled(rec.isDefault());
-      me.getDeleteBtn().setDisabled(rec.isDefault());
       me.updateWorkflowSteps(rec);
-      //form.getForm().reset();
       form.loadRecord(rec, me.FOR_ALL);
   },
   /**
@@ -478,9 +490,11 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
               }
               me.calculateAvailableCombinations();
               me.getPrefWindow().loadingHide();
+              Editor.MessageBox.addSuccess(me.strings.entrySaved);
           },
           failure: function() {
               me.getPrefWindow().loadingHide();
+              Editor.MessageBox.addError(me.strings.entrySaveError);
               me.handleReload();
           }
       });
@@ -494,6 +508,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       form.hide();
       this.getEditInfo().show();
   },
+  /**
+   * reloads all preferences and assocs of current task
+   */
   handleReload: function() {
       this.loadAllPreferences(this.actualTask);
   }

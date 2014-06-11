@@ -39,8 +39,11 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
   strings: {
       fieldRole: '#UT#Rolle',
       fieldState: '#UT#Status',
+      fieldUser: '#UT#Benutzer',
       btnSave: '#UT#Speichern',
       btnCancel: '#UT#Abbrechen',
+      formTitleAdd: '#UT#Benutzerzuweisung hinzufügen:',
+      formTitleEdit: '#UT#Bearbeite Benutzer "{0}"',
       editInfo: '#UT#Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!'
   },
   layout: {
@@ -59,7 +62,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
     Ext.Object.each(wf.roles, function(key, role) {
         roles.push([key, role]);
     });
-
+    
     Ext.applyIf(me, {
       items: [{
           xtype: 'adminTaskUserAssocGrid',
@@ -70,7 +73,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
           region: 'east',
           autoScroll: true,
           height: 'auto',
-          width: 250,
+          width: 300,
           items: [{
               xtype: 'container',
               itemId: 'editInfoOverlay',
@@ -79,7 +82,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
               html: me.strings.editInfo
           },{
               xtype: 'form',
-              title : '#UT#bar',
+              title : me.strings.formTitleAdd,
               hidden: true,
               bodyPadding: 10,
               region: 'east',
@@ -87,9 +90,28 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                   anchor: '100%',
                   xtype: 'combo',
                   allowBlank: false,
+                  listConfig: {
+                      loadMask: false
+                  },
+                  store: Ext.create('Ext.data.Store', {
+                      model: 'Editor.model.admin.User',
+                      autoLoad: false,
+                      pageSize: 0
+                  }),
+                  forceSelection: true,
+                  queryMode: 'local',
+                  name: 'userGuid',
+                  displayField: 'longUserName',
+                  valueField: 'userGuid',
+                  fieldLabel: me.strings.fieldUser
+              },{
+                  anchor: '100%',
+                  xtype: 'combo',
+                  allowBlank: false,
                   editable: false,
                   forceSelection: true,
                   queryMode: 'local',
+                  name: 'role',
                   fieldLabel: me.strings.fieldRole,
                   store: roles
               },{
@@ -98,6 +120,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                   allowBlank: false,
                   editable: false,
                   forceSelection: true,
+                  name: 'state',
                   queryMode: 'local',
                   fieldLabel: me.strings.fieldState,
                   store: states
@@ -126,5 +149,44 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
     });
 
     me.callParent(arguments);
+  },
+  /**
+   * loads all or all available users into the dropdown, the store is reused to get the username to userguids
+   * @param {Boolean} edit true if edit an assoc, false if add a new one
+   */
+  loadUsers: function() {
+      var me = this,
+          user = me.down('.combo[name="userGuid"]'),
+      store = user.store;
+      if(!me.excludeLogins || me.excludeLogins.length == 0) {
+          store.load();
+      }
+      else {
+          store.load({
+              params: {
+                  defaultFilter: '[{"field":"login","type":"notInList","value":["'+me.excludeLogins.join('","')+'"]}]'
+              }
+          });
+      }
+  },
+  /**
+   * loads the given record into the userAssoc form
+   * @param {Editor.data.model.admin.TaskUserAssoc} rec
+   */
+  loadRecord: function(rec) {
+      var me = this,
+          edit = !rec.phantom,
+          form = me.down('.form'),
+          user = me.down('.combo[name="userGuid"]');
+      form.loadRecord(rec);
+      if(edit) {
+          form.setTitle(Ext.String.format(me.strings.formTitleEdit, rec.get('longUserName')));
+      }
+      else {
+          me.loadUsers(edit);
+          form.setTitle(me.strings.formTitleAdd);
+      }
+      user.setVisible(!edit);
+      user.setDisabled(edit);
   }
 });

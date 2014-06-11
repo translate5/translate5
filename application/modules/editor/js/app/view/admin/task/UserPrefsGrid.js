@@ -48,7 +48,10 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
         colVisibility: '#UT#Sichtbarkeit',
         add: '#UT#Eintrag hinzufügen',
         reload: '#UT#Aktualisieren',
-        remove: '#UT#Eintrag löschen'
+        remove: '#UT#Eintrag löschen',
+        vis_show: '#UT#anzeigen',
+        vis_hide: '#UT#ausblenden',
+        vis_disable: '#UT#nicht vorhanden'
     },
     viewConfig: {
         loadMask: false
@@ -93,7 +96,7 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                         var idx = userStore.find('userGuid', v),
                             user = userStore.getAt(idx);
                         if(user) {
-                            return Editor.model.admin.User.getUserName(user)+"add login";
+                            return Editor.model.admin.User.getLongUserName(user);
                         }
                         return v;
                     },
@@ -130,6 +133,9 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                 {
                     xtype: 'gridcolumn',
                     dataIndex: 'visibility',
+                    renderer: function(v) {
+                        return me.strings['vis_'+v];
+                    },
                     text: me.strings.colVisibility
                 }
             ],

@@ -45,6 +45,9 @@ Ext.define('Editor.model.admin.User', {
     {name: 'surName', type: 'string'},
     {name: 'gender', type: 'string'},
     {name: 'login', type: 'string'},
+    {name: 'longUserName', type: 'string', persist: false, convert: function(v, rec) {
+        return Editor.model.admin.User.getLongUserName(rec);
+    }},
     {name: 'email', type: 'string'},
     {name: 'roles', type: 'string'},
     {name: 'passwd', type: 'string'},
@@ -68,6 +71,9 @@ Ext.define('Editor.model.admin.User', {
       getUserName: function(rec) {
         return rec.get('firstName')+' '+rec.get('surName');
       },
+      getLongUserName: function(rec) {
+          return rec.get('surName')+', '+rec.get('firstName')+' ('+rec.get('login')+')';
+      }
   },
   getUserName: function() {
       return this.self.getUserName(this);

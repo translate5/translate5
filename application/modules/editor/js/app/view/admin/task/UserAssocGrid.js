@@ -39,13 +39,14 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
   itemId: 'adminTaskUserAssocGrid',
   strings: {
       userGuidCol: '#UT#Benutzer',
-      roleCol: '#UT#Rolle (Doppelklick zum Ändern)',
-      stateCol: '#UT#Status (Doppelklick zum Ändern)',
+      roleCol: '#UT#Rolle',
+      stateCol: '#UT#Status',
       addUser: '#UT#Benutzer hinzufügen',
       addUserTip: '#UT#Einen Benutzer dieser Aufgabe zuordnen.',
       removeUser: '#UT#Benutzer entfernen',
       removeUserTip: '#UT#Den gewählten Benutzer aus dieser Aufgabe entfernen.',
       save: '#UT#Änderungen speichern',
+      reload: '#UT#Aktualisieren',
       cancel: '#UT#Abbrechen'
   },
   viewConfig: {
@@ -69,7 +70,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
           text: me.strings.userGuidCol
       },{
           xtype: 'gridcolumn',
-          width: 190,
+          width: 90,
           dataIndex: 'role',
           renderer: function(v) {
               return wf.roles[v];
@@ -77,7 +78,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
           text: me.strings.roleCol
       },{
           xtype: 'gridcolumn',
-          width: 190,
+          width: 90,
           dataIndex: 'state',
           renderer: function(v) {
               return wf.states[v];
@@ -100,25 +101,12 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
               itemId: 'remove-user-btn',
               text: me.strings.removeUser,
               tooltip: me.strings.removeUserTip
+          },{
+              xtype: 'button',
+              itemId: 'reload-btn',
+              iconCls: 'ico-refresh',
+              text: me.strings.reload
           }]
-        },{
-            xtype : 'toolbar',
-            dock : 'bottom',
-            layout: {
-                type: 'hbox',
-                pack: 'end'
-            },
-            items : [{
-                xtype : 'button',
-                iconCls : 'ico-save',
-                itemId : 'save-assoc-btn',
-                text : me.strings.save
-            }, {
-                xtype : 'button',
-                iconCls : 'ico-cancel',
-                itemId : 'cancel-assoc-btn',
-                text : me.strings.cancel
-            }]
         }]
     });
 

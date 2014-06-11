@@ -167,7 +167,7 @@ Ext.define('Editor.view.segments.Grid', {
             //stored outside of function and must be set after isErgoVisible!
             firstTargetFound = firstTargetFound || isEditableTarget; 
             
-            if(! userPref.isNonEditableColumnDisabled() && rec.isTarget()) {
+            if(!rec.isTarget() || ! userPref.isNonEditableColumnDisabled()) {
                 columns.push({
                     xtype: 'contentColumn',
                     segmentField: rec,

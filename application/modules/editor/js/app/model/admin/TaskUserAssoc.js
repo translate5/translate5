@@ -45,6 +45,9 @@ Ext.define('Editor.model.admin.TaskUserAssoc', {
     {name: 'login', type: 'string', persist: false},
     {name: 'surName', type: 'string', persist: false},
     {name: 'firstName', type: 'string', persist: false},
+    {name: 'longUserName', type: 'string', persist: false, convert: function(v, rec) {
+        return Editor.model.admin.User.getLongUserName(rec);
+    }},
     {name: 'state', type: 'string'},
     {name: 'role', type: 'string'}
   ],

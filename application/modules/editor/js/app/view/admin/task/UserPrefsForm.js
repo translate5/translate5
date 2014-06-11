@@ -130,12 +130,14 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
                         {
                             xtype: 'button',
                             itemId: 'saveBtn',
-                            text: me.strings.save
+                            iconCls : 'ico-save',
+                            text: me.strings.btnSave
                         },
                         {
                             xtype: 'button',
                             itemId: 'cancelBtn',
-                            text: me.strings.cancel
+                            iconCls : 'ico-cancel',
+                            text: me.strings.btnCancel
                         }
                     ]
                 }

@@ -38,8 +38,11 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
     requires: ['Editor.view.admin.task.UserAssoc','Editor.view.admin.task.Preferences'],
     itemId : 'adminTaskPreferencesWindow',
     title : '#UT#Einstellungen zu Aufgabe "{0}"',
+    strings: {
+        close: '#UT#Fenster schließen'
+    },
     height : 500,
-    width : 700,
+    width : 800,
     loadingMask: null,
     layout: 'fit',
     modal : true,
@@ -65,6 +68,20 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                 xtype: 'tabpanel',
                 activeTab: 0,
                 items: tabs
+            }],
+            dockedItems: [{
+                xtype : 'toolbar',
+                dock : 'bottom',
+                layout: {
+                    type: 'hbox',
+                    pack: 'end'
+                },
+                items : [{
+                    xtype : 'button',
+                    iconCls : 'ico-cancel',
+                    itemId : 'close-btn',
+                    text : me.strings.close
+                }]
             }]
         });
 
