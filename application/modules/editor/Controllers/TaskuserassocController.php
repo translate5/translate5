@@ -100,8 +100,30 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $workflow->doWithUserAssoc($oldEntity, $this->entity);
         
         $this->view->rows = $this->entity->getDataObject();
+        $this->addUserInfoToResult();
         if(isset($this->data->state) && $oldEntity->getState() != $this->data->state){
             editor_Models_LogTask::createWithUserGuid($this->entity->getTaskGuid(), $this->data->state, $this->entity->getUserGuid());
         }
+    }
+
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::postAction()
+     */
+    public function postAction() {
+        parent::postAction();
+        $this->addUserInfoToResult();
+    }
+    
+    /**
+     * adds the extended userinfo to the resultset
+     */
+    protected function addUserInfoToResult() {
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $user->loadByGuid($this->entity->getUserGuid());
+        $this->view->rows->login = $user->getLogin();
+        $this->view->rows->firstName = $user->getFirstName();
+        $this->view->rows->surName = $user->getSurName();
     }
 }

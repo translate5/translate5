@@ -454,15 +454,27 @@ class editor_TaskController extends ZfExtended_RestController {
         $fields = ZfExtended_Factory::get('editor_Models_SegmentField');
         /* @var $fields editor_Models_SegmentField */
         
+        $userPref = ZfExtended_Factory::get('editor_Models_Workflow_Userpref');
+        /* @var $userPref editor_Models_Workflow_Userpref */
+        
         //we load alls fields, if we are in taskOverview and are allowed to edit all 
         // or we have no userStep to filter / search by. 
         // No userStep means indirectly that we do not have a TUA (pmCheck)
         if(!$this->entity->isRegisteredInSession() && $isEditAll || empty($row['userStep'])) {
             $row['segmentFields'] = $fields->loadByTaskGuid($taskguid);
+            //the pm sees all, so fix userprefs
+            $userPref->setAnonymousCols(false);
+            $userPref->setVisibility($userPref::VIS_HIDE);
+            $allFields = array_map(function($item) { 
+                return $item['name']; 
+            }, $row['segmentFields']);
+            $userPref->setFields(join(',', $allFields));
         } else {
             $wf = $this->workflow;
-            $row['segmentFields'] = $fields->loadByUserPref($taskguid, $wf::WORKFLOW_ID, $this->user->data->userGuid, $row['userStep']);
+            $userPref->loadByTaskUserAndStep($taskguid, $wf::WORKFLOW_ID, $this->user->data->userGuid, $row['userStep']);
+            $row['segmentFields'] = $fields->loadByUserPref($userPref);
         }
+        $row['userPrefs'] = array($userPref->getDataObject());
         
         //$row['segmentFields'] = $fields->loadByCurrentUser($taskguid);
         foreach($row['segmentFields'] as $key => &$field) {

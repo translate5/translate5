@@ -52,6 +52,10 @@
  * @method void setFields() setFields(string $userGuid)
  */
 class editor_Models_Workflow_Userpref extends ZfExtended_Models_Entity_Abstract {
+    const VIS_SHOW = 'show';
+    const VIS_HIDE = 'hide';
+    const VIS_DISABLE = 'disable';
+    
     protected $dbInstanceClass          = 'editor_Models_Db_Workflow_Userpref';
     protected $validatorInstanceClass   = 'editor_Models_Validator_Workflow_Userpref';
 

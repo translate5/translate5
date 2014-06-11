@@ -81,29 +81,20 @@ class editor_Models_SegmentField extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * loads the fields by the userprefs defined for the given taskGuid, userGuid and workflowStep
-     * @param string $taskGuid
-     * @param string $workflow
-     * @param string $userGuid
-     * @param string $taskStep
+     * @param editor_Models_Workflow_Userpref $userPref
      */
-    public function loadByUserPref($taskGuid, $workflow, $userGuid, $taskStep) {
-        $allFields = $this->loadByTaskGuid($taskGuid);
-        $userPrefs = ZfExtended_Factory::get('editor_Models_Workflow_Userpref');
-        /* @var $userPrefs editor_Models_Workflow_Userpref */
-        $pref = $userPrefs->loadByTaskUserAndStep($taskGuid, $workflow, $userGuid, $taskStep);
-        error_log(print_r($pref,1));
-        $fields = explode(',', $pref->fields);
+    public function loadByUserPref(editor_Models_Workflow_Userpref $userPref) {
+        $allFields = $this->loadByTaskGuid($userPref->getTaskGuid());
+        $fields = explode(',', $userPref->getFields());
         $result = array();
         $anon = 'A';
         foreach($allFields as $field) {
             if(! in_array($field['name'], $fields)) {
                 continue;
             }
-            if($pref->anonymousCols && $field['type'] == editor_Models_SegmentField::TYPE_TARGET) {
+            if($userPref->getAnonymousCols() && $field['type'] == editor_Models_SegmentField::TYPE_TARGET) {
                 $field['label'] = 'Spalte '.($anon++);
             }
-            //FIXME how to do visibility??? Wie war das, bezieht sich die Visibility auf die nicht vorhandenen fields? Oder nur wie beschrieben auf die nicht editierbaren Felder?
-            //Gleiches auf die Anon Geschichte, hier sollten doch nur die target spalten betroffen sein?
             $result[] = $field;
         }
         return $result;

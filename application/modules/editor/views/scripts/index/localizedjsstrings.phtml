@@ -96,6 +96,7 @@ Ext.define('Editor.controller.Localizer', {
         'Editor.controller.admin.TaskUserAssoc',
         'Editor.controller.admin.TaskOverview',
         'Editor.view.admin.TaskAddWindow',
+        'Editor.view.admin.task.UserAssoc',
         'Editor.view.admin.task.UserAssocGrid',
         'Editor.view.admin.task.PreferencesWindow',
         'Editor.view.admin.UserChooseWindow',
@@ -333,7 +334,8 @@ Ext.define('Editor.controller.Localizer', {
     //FIXME nextRelease Thomas per PHP if die Sprach Defines für den Admin Bereich (je nach Rolle) einbinden.
     ?>
     Editor.controller.admin.TaskUserAssoc.prototype.messages = {
-      assocSave: '<?php echo $this->translate->_('Änderungen gespeichert!');?>',
+      assocSave: '<?php echo $this->translate->_('Eintrag gespeichert!');?>',
+      assocDeleted: '<?php echo $this->translate->_('Eintrag gelöscht!');?>',
       assocSaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>'
     };
 
@@ -445,13 +447,28 @@ Ext.define('Editor.controller.Localizer', {
     };
     
     Editor.view.admin.task.PreferencesWindow.prototype.title = '<?php echo $this->translate->_('Einstellungen zu Aufgabe "{0}"');?>';
+    Editor.view.admin.task.PreferencesWindow.prototype.strings = {
+        close: '<?php echo $this->translate->_('Fenster schließen');?>'
+    };
     
-    Editor.view.admin.task.UserAssocGrid.prototype.title = '<?php echo $this->translate->_('Benutzer zu Aufgabe zuordnen');?>';
+    Editor.view.admin.task.UserAssoc.prototype.title = '<?php echo $this->translate->_('Benutzer zu Aufgabe zuordnen');?>';
+    Editor.view.admin.task.UserAssoc.prototype.strings = {
+      fieldRole: '<?php echo $this->translate->_('Rolle');?>',
+      fieldState: '<?php echo $this->translate->_('Status');?>',
+      fieldUser: '<?php echo $this->translate->_('Benutzer');?>',
+      btnSave: '<?php echo $this->translate->_('Speichern');?>',
+      btnCancel: '<?php echo $this->translate->_('Abbrechen');?>',
+      formTitleAdd: '<?php echo $this->translate->_('Benutzerzuweisung hinzufügen:');?>',
+      formTitleEdit: '<?php echo $this->translate->_('Bearbeite Benutzer "{0}"');?>',
+      editInfo: '<?php echo $this->translate->_('Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!');?>'
+    };
+    
     Editor.view.admin.task.UserAssocGrid.prototype.strings = {
       userGuidCol: '<?php echo $this->translate->_('Benutzer');?>',
-      roleCol: '<?php echo $this->translate->_('Rolle (Doppelklick zum Ändern)');?>',
-      stateCol: '<?php echo $this->translate->_('Status (Doppelklick zum Ändern)');?>',
+      roleCol: '<?php echo $this->translate->_('Rolle');?>',
+      stateCol: '<?php echo $this->translate->_('Status');?>',
       addUser: '<?php echo $this->translate->_('Benutzer hinzufügen');?>',
+      reload: '<?php echo $this->translate->_('Aktualisieren');?>',
       addUserTip: '<?php echo $this->translate->_('Einen Benutzer dieser Aufgabe zuordnen.');?>',
       removeUser: '<?php echo $this->translate->_('Benutzer entfernen');?>',
       removeUserTip: '<?php echo $this->translate->_('Den gewählten Benutzer aus dieser Aufgabe entfernen.');?>',
@@ -586,6 +603,7 @@ Ext.define('Editor.controller.Localizer', {
     } //END if $this->hasFrontendController('Editor.controller.admin.User')
     
     //FIXME frontend rights for the following items!
+    //FIXME in require mit aufnehmen!
 ?>
     Editor.view.admin.task.UserPrefsGrid.prototype.strings = {
         defaultEntry: '<?php echo $this->translate->_('Standard Eintrag');?>',
@@ -598,7 +616,10 @@ Ext.define('Editor.controller.Localizer', {
         colVisibility: '<?php echo $this->translate->_('Sichtbarkeit');?>',
         add: '<?php echo $this->translate->_('Eintrag hinzufügen');?>',
         reload: '<?php echo $this->translate->_('Aktualisieren');?>',
-        remove: '<?php echo $this->translate->_('Eintrag löschen');?>'
+        remove: '<?php echo $this->translate->_('Eintrag löschen');?>',
+        vis_show: '<?php echo $this->translate->_('anzeigen');?>',
+        vis_hide: '<?php echo $this->translate->_('ausblenden');?>',
+        vis_disable: '<?php echo $this->translate->_('nicht vorhanden');?>'
     };
     
     Editor.view.admin.task.UserPrefsForm.prototype.title_edit = '<?php echo $this->translate->_('Bearbeite Eintrag: "{0} - {1}"');?>';
@@ -609,6 +630,8 @@ Ext.define('Editor.controller.Localizer', {
         fieldTargets: '<?php echo $this->translate->_('vorhandene Spalten');?>',
         fieldAnonymous: '<?php echo $this->translate->_('anonymisierte Zieltextspalten');?>',
         fieldVisibility: '<?php echo $this->translate->_('Sichtbarkeit der nicht editierbaren Zielsprachen');?>',
+        btnSave: '<?php echo $this->translate->_('Speichern');?>',
+        btnCancel: '<?php echo $this->translate->_('Abbrechen');?>',
         visShow: '<?php echo $this->translate->_('Anzeigen');?>',
         visHide: '<?php echo $this->translate->_('Ausblenden');?>',
         visDisabled: '<?php echo $this->translate->_('nicht vorhanden');?>'
@@ -620,6 +643,9 @@ Ext.define('Editor.controller.Localizer', {
     
     Editor.controller.admin.TaskPreferences.prototype.strings = {
       taskWorkflowSaved: '<?php echo $this->translate->_('Änderung des Workflows der Aufgabe gespeichert!');?>',
+      entrySaved: '<?php echo $this->translate->_('Eintrag gespeichert');?>',
+      entryDeleted: '<?php echo $this->translate->_('Eintrag gelöscht');?>',
+      entrySaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>',
       forAll: '<?php echo $this->translate->_('für alle');?>'
     };
   }

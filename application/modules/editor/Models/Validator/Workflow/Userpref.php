@@ -57,7 +57,12 @@ class editor_Models_Validator_Workflow_Userpref extends ZfExtended_Models_Valida
         $this->addValidator('id', 'int');
         $this->addValidator('taskGuid', 'guid');
         $this->addValidator('anonymousCols', 'boolean');
-        $this->addValidator('visibility', 'inArray', array(array('show', 'hide', 'disable')));
+        $visibilities = array(
+            editor_Models_Workflow_Userpref::VIS_SHOW,
+            editor_Models_Workflow_Userpref::VIS_HIDE,
+            editor_Models_Workflow_Userpref::VIS_DISABLE,
+        );
+        $this->addValidator('visibility', 'inArray', array($visibilities));
         $this->addValidator('userGuid', 'guid', array('allowEmpty' => true));
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wfm editor_Workflow_Manager */
