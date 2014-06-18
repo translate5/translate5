@@ -288,6 +288,7 @@ class editor_TaskController extends ZfExtended_RestController {
         /* @var $pm ZfExtended_Models_User */
         $pm->init((array)$this->user->data);
         $this->data['pmName'] = $pm->getUsernameLong();
+        $this->processClientReferenceVersion();
         $this->setDataInEntity();
         $this->entity->createTaskGuidIfNeeded();
         
@@ -370,6 +371,7 @@ class editor_TaskController extends ZfExtended_RestController {
         if(isset($this->data->enableSourceEditing)){
             $this->data->enableSourceEditing = (boolean)$this->data->enableSourceEditing;
         }
+        $this->processClientReferenceVersion();
         $this->setDataInEntity();
         $this->entity->validate();
         $this->initWorkflow();
@@ -654,6 +656,7 @@ class editor_TaskController extends ZfExtended_RestController {
     public function getAction() {
         parent::getAction();
         $taskguid = $this->entity->getTaskGuid();
+        $this->initWorkflow();
         
         $obj = $this->entity->getDataObject();
         

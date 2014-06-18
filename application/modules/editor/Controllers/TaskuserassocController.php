@@ -75,7 +75,11 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         }
         return parent::validate();
     }
-    
+
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::putAction()
+     */
     public function putAction() {
         $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
         /* @var $workflow editor_Workflow_Abstract */
@@ -83,6 +87,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->entity->load($this->_getParam('id'));
         $oldEntity = clone $this->entity;
         $this->decodePutData();
+        $this->processClientReferenceVersion();
         $this->setDataInEntity();
         //@todo in next release uncomment $workflow->isStateChangeable again and 
         //ensure in workflow, that the rights of a role decide, which states are changeable

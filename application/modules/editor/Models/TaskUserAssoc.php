@@ -60,7 +60,6 @@
  * @method void setIsPmOverride() setIsPmOverride(boolean $isPmOverride)
  */
 class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
-    
     protected $dbInstanceClass = 'editor_Models_Db_TaskUserAssoc';
     protected $validatorInstanceClass = 'editor_Models_Validator_TaskUserAssoc';
 

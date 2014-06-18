@@ -81,6 +81,7 @@ class editor_WorkflowuserprefController extends ZfExtended_RestController {
         if($this->entity->isDefault()) {
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
+        $this->processClientReferenceVersion();
         $this->entity->delete();
     }
 }
