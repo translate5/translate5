@@ -650,18 +650,22 @@ class editor_TaskController extends ZfExtended_RestController {
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::getAction()
-     * GET with parameter export=1 does an export
-     * accepts also parameter diff=0|1
      */
     public function getAction() {
-        $res = parent::getAction();
-        $this->initWorkflow();
-        $tua = $this->workflow->getTaskUserAssoc();
-        if(!$this->isAllowed('loadAllTasks') &&
-                !$this->workflow->isReadable($tua)){
-            throw new ZfExtended_Models_Entity_NoAccessException();
-        }
-        return $res;
+        parent::getAction();
+        $taskguid = $this->entity->getTaskGuid();
+        
+        $obj = $this->entity->getDataObject();
+        
+        $userAssocInfos = array();
+        $allAssocInfos = $this->getUserAssocInfos(array($taskguid), $userAssocInfos);
+        
+        //because we are mixing objects (getDataObject) and arrays (loadAll) as entity container we have to cast here
+        $row = (array) $obj; 
+        $this->addUserInfos($row, $taskguid, $userAssocInfos, $allAssocInfos);
+            
+        $this->view->rows = (object)$row;
+        unset($this->view->rows->qmSubsegmentFlags);
     }
     
     /**
