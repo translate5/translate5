@@ -40,6 +40,7 @@ Ext.define('Editor.model.admin.task.UserPref', {
   extend: 'Ext.data.Model',
   fields: [
     {name: 'id', type: 'int'},
+    {name: 'entityVersion', type: 'int'}, //does not exist in DB, for versioning only
     {name: 'taskGuid', type: 'string'},
     {name: 'workflow', type: 'string'},
     {name: 'workflowStep', type: 'string'},

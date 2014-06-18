@@ -63,7 +63,7 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
             
         me.addEvents(
               /**
-               * @event taskCreated
+               * @event confirmDelete
                * @param {Ext.form.Panel} grid
                * @param {Editor.model.admin.task.UserPref[]} toDelete
                * @param {Ext.button.Button} btn

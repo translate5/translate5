@@ -38,6 +38,8 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
   cls: 'task-user-assoc-grid',
   itemId: 'adminTaskUserAssocGrid',
   strings: {
+      confirmDeleteTitle: '#UT#Eintrag löschen?',
+      confirmDelete: '#UT#Soll dieser Eintrag wirklich gelöscht werden?',
       userGuidCol: '#UT#Benutzer',
       roleCol: '#UT#Rolle',
       stateCol: '#UT#Status',
@@ -59,6 +61,17 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
   initComponent: function() {
     var me = this,
         wf = me.actualTask.getWorkflowMetaData();
+    
+    me.addEvents(
+          /**
+           * @event confirmDelete
+           * @param {Ext.form.Panel} grid
+           * @param {Editor.model.admin.task.UserPref[]} toDelete
+           * @param {Ext.button.Button} btn
+           */
+          'confirmDelete'
+    );
+    
     Ext.applyIf(me, {
       columns: [{
           xtype: 'gridcolumn',
@@ -99,6 +112,14 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
               iconCls: 'ico-user-del',
               disabled: true,
               itemId: 'remove-user-btn',
+              handler: function() {
+                  Ext.Msg.confirm(me.strings.confirmDeleteTitle, me.strings.confirmDelete, function(btn){
+                      var toDelete = me.getSelectionModel().getSelection();
+                      if(btn == 'yes') {
+                          me.fireEvent('confirmDelete', me, toDelete, this);
+                      }
+                  });
+              },
               text: me.strings.removeUser,
               tooltip: me.strings.removeUserTip
           },{

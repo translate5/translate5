@@ -100,13 +100,11 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       
       me.control({
           '#adminTaskUserAssocGrid': {
+              confirmDelete: me.handleDeleteConfirmClick,
               selectionchange: me.handleAssocSelection
           },
           '#adminTaskUserAssocGrid #add-user-btn': {
               click: me.handleAddUser
-          },
-          '#adminTaskUserAssocGrid #remove-user-btn': {
-              click: me.handleRemoveAssoc
           },
           '.adminTaskUserAssoc .combo[name="role"]': {
               change: me.initState
@@ -177,15 +175,14 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
   },
   /**
    * Removes the selected User Task Association
-   * @param {Ext.button.Button} btn
    */
-  handleRemoveAssoc: function(btn) {
+  handleDeleteConfirmClick: function(grid, toDelete, btn) {
       var me = this,
-          win = btn.up('window'),
-          sel = win.down('grid').getSelectionModel().getSelection(),
+          task = me.getPrefWindow().actualTask,
           assoc = me.getAdminTaskUserAssocsStore();
-      Ext.Array.each(sel, function(toDel){
-          toDel.destroy({
+      
+      Ext.Array.each(toDelete, function(toDel){
+          toDel.destroyVersioned(task, {
               success: function() {
                   assoc.remove(toDel);
                   me.updateUsers(assoc);
@@ -193,7 +190,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
                   Editor.MessageBox.addSuccess(me.messages.assocDeleted);
               },
               failure: function() {
-                  Editor.MessageBox.addError(me.messages.assocSaveError);
+                  me.application.getController('admin.TaskPreferences').handleReload();
               }
           });
       });
@@ -205,6 +202,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
   handleSaveAssoc: function (btn) {
       var me = this,
           form = me.getUserAssocForm(),
+          task = me.getPrefWindow().actualTask,
           store = me.getUserAssocGrid().store,
           rec = form.getRecord();
       form.getForm().updateRecord(rec);
@@ -212,22 +210,19 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           return;
       }
       me.getPrefWindow().loadingShow();
-      rec.save({
-          success: function() {
+      rec.saveVersioned(task, {
+          success: function(savedRec, op) {
               me.handleCancel();
               if(!rec.store) {
                   store.insert(0,rec);
                   me.updateUsers(store);
                   me.fireEvent('addUserAssoc', me, rec, store);
               }
-              //@todo do this with an event:
-              me.application.getController('admin.TaskOverview').handleTaskReload();
+              task.reload();//reload only the task, not the whole task prefs, should be OK
               Editor.MessageBox.addSuccess(me.messages.assocSave);
               me.getPrefWindow().loadingHide();
           },
           failure: function() {
-              me.getPrefWindow().loadingHide();
-              Editor.MessageBox.addError(me.messages.assocSaveError);
               me.application.getController('admin.TaskPreferences').handleReload();
           }
       });

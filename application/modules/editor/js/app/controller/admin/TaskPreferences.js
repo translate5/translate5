@@ -291,21 +291,21 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
    * @param {Editor.model.admin.task.UserPref[]} records
    */
   handleDeleteConfirmClick: function(grid, records) {
-      var me = this;
+      var me = this,
+          task = me.actualTask;
       Ext.Array.each(records, function(rec){
           Ext.defer(function(){
               me.getPrefWindow().loadingShow();
           },10);//weired xmask extjs bug
-          rec.destroy({
+          rec.destroyVersioned(task, {
               success: function() {
                   grid.store.remove(rec);
                   me.calculateAvailableCombinations();
                   Editor.MessageBox.addSuccess(me.strings.entryDeleted);
-                  me.getPrefWindow().loadingHide();
+                  me.handleReload();
               },
               failure: function() {
-                  Editor.MessageBox.addError(me.strings.entrySaveError);
-                  me.getPrefWindow().loadingHide();
+                  me.handleReload();
               }
           });
       });
@@ -384,17 +384,20 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
    */
   changeWorkflow: function(combo, val) {
       var me = this;
-      me.actualTask.set('workflow', val);
       me.updatePrefsFilter(val);
+      if(combo.eventsSuspended) {
+          return;
+      }
+      me.actualTask.set('workflow', val);
       me.getPrefWindow().loadingShow();
       me.actualTask.save({
           success: function(rec, op) {
               Editor.MessageBox.addInfo(me.strings.taskWorkflowSaved);
               me.calculateAvailableCombinations();
-              me.getPrefWindow().loadingHide();
+              me.handleReload();
           },
           failure: function() {
-              me.getPrefWindow().loadingHide();
+              me.handleReload();
           }
       });
   },
@@ -482,19 +485,17 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       }
       rec.set('workflow', me.getTaskWorkflow().getValue());
       me.getPrefWindow().loadingShow();
-      rec.save({
+      rec.saveVersioned(me.actualTask, {
           success: function() {
               me.clickCancel();
               if(!rec.store) {
                   store.insert(0,rec);
               }
               me.calculateAvailableCombinations();
-              me.getPrefWindow().loadingHide();
+              me.handleReload();
               Editor.MessageBox.addSuccess(me.strings.entrySaved);
           },
           failure: function() {
-              me.getPrefWindow().loadingHide();
-              Editor.MessageBox.addError(me.strings.entrySaveError);
               me.handleReload();
           }
       });
@@ -512,6 +513,18 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
    * reloads all preferences and assocs of current task
    */
   handleReload: function() {
-      this.loadAllPreferences(this.actualTask);
+      var me = this;
+      me.actualTask.reload({
+          success: function(rec) {
+              var combo = me.getTaskWorkflow(),
+                  wf = rec.get('workflow');
+              combo.suspendEvents();
+              combo.setValue(wf);
+              combo.resetOriginalValue();
+              combo.resumeEvents();
+              me.updatePrefsFilter(wf);
+          }
+      });
+      me.loadAllPreferences(me.actualTask);
   }
 });

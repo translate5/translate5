@@ -40,6 +40,7 @@ Ext.define('Editor.model.admin.TaskUserAssoc', {
   extend: 'Ext.data.Model',
   fields: [
     {name: 'id', type: 'int'},
+    {name: 'entityVersion', type: 'int'}, //does not exist in DB, for versioning only
     {name: 'taskGuid', type: 'string'},
     {name: 'userGuid', type: 'string'},
     {name: 'login', type: 'string', persist: false},

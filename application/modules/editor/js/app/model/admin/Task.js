@@ -48,6 +48,7 @@ Ext.define('Editor.model.admin.Task', {
   fields: [
     {name: 'id', type: 'int'},
     {name: 'taskGuid', type: 'string'},
+    {name: 'entityVersion', type: 'integer'},
     {name: 'taskNr', type: 'string'},
     {name: 'taskName', type: 'string'},
     {name: 'sourceLang', type: 'string'},
@@ -99,7 +100,8 @@ Ext.define('Editor.model.admin.Task', {
     }
   },
   /**
-   * ensures that the userState is always send to the server.
+   * 1. ensures that entityVersion is always send to the server!
+   * 2. ensures that the userState is send to the server, after setting it to the same value and is therefore normally not modified.
    * ExtJS sends per default only modified fields, this can lead to errors here.
    * It could be, that after a session time out, the actual task isn't active anymore, but he is still marked es "edit"
    * In this case the user would not be able to open the task again! 
@@ -110,6 +112,10 @@ Ext.define('Editor.model.admin.Task', {
       var res = this.callParent(arguments);
       if(field == 'userState' && !this.modified.userState) {
           this.modified.userState = value;
+      }
+      //FIXME: should we do this in a general way?
+      if(field != 'entityVersion' && this.modified.entityVersion === undefined) {
+          this.modified.entityVersion = this.data.entityVersion;
       }
       return res; 
   },
@@ -227,7 +233,5 @@ Ext.define('Editor.model.admin.Task', {
               };
           }
       }
-      
-      
   }
 });
