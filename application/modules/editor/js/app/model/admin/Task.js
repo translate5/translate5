@@ -113,8 +113,8 @@ Ext.define('Editor.model.admin.Task', {
       if(field == 'userState' && !this.modified.userState) {
           this.modified.userState = value;
       }
-      //FIXME: should we do this in a general way?
-      if(field != 'entityVersion' && this.modified.entityVersion === undefined) {
+      //FIXME: should we do this in a general way? would be difficulty since exceptions like userState etc
+      if(field != 'userState' && field != 'entityVersion' && this.modified.entityVersion === undefined) {
           this.modified.entityVersion = this.data.entityVersion;
       }
       return res; 
