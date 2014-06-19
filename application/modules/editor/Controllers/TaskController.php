@@ -466,7 +466,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $row['segmentFields'] = $fields->loadByTaskGuid($taskguid);
             //the pm sees all, so fix userprefs
             $userPref->setAnonymousCols(false);
-            $userPref->setVisibility($userPref::VIS_HIDE);
+            $userPref->setVisibility($userPref::VIS_SHOW);
             $allFields = array_map(function($item) { 
                 return $item['name']; 
             }, $row['segmentFields']);
