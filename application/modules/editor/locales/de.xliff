@@ -607,6 +607,18 @@
 <trans-unit id='V8OkaGxlbiBTaWUgZWluZW4gRWludHJhZyBpbiBkZXIgVGFiZWxsZSBhdXMgdW0gZGllc2VuIHp1IGJlYXJiZWl0ZW4h'><source>Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!</source><target>Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!</target></trans-unit>
 <trans-unit id='w4RuZGVydW5nIGRlcyBXb3JrZmxvd3MgZGVyIEF1ZmdhYmUgZ2VzcGVpY2hlcnQh'><source>Änderung des Workflows der Aufgabe gespeichert!</source><target>Änderung des Workflows der Aufgabe gespeichert!</target></trans-unit>
 <trans-unit id='ZsO8ciBhbGxl'><source>für alle</source><target>für alle</target></trans-unit>
+<trans-unit id='SWhyZSBEYXRlbiBrb25udGVuIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbiwgYmVpbSBTcGVpY2hlcm4ga2FtIGVzIHp1IGVpbmVtIEtvbmZsaWt0IQ=='><source>Ihre Daten konnten nicht gespeichert werden, beim Speichern kam es zu einem Konflikt!</source><target>Ihre Daten konnten nicht gespeichert werden, beim Speichern kam es zu einem Konflikt!</target></trans-unit>
+<trans-unit id='RWludHJhZyBnZXNwZWljaGVydCE='><source>Eintrag gespeichert!</source><target>Eintrag gespeichert!</target></trans-unit>
+<trans-unit id='RWludHJhZyBnZWzDtnNjaHQh'><source>Eintrag gelöscht!</source><target>Eintrag gelöscht!</target></trans-unit>
+<trans-unit id='RmVuc3RlciBzY2hsaWXDn2Vu'><source>Fenster schließen</source><target>Fenster schließen</target></trans-unit>
+<trans-unit id='Um9sbGU='><source>Rolle</source><target>Rolle</target></trans-unit>
+<trans-unit id='QmVudXR6ZXJ6dXdlaXN1bmcgaGluenVmw7xnZW46'><source>Benutzerzuweisung hinzufügen:</source><target>Benutzerzuweisung hinzufügen:</target></trans-unit>
+<trans-unit id='QmVhcmJlaXRlIEJlbnV0emVyICJ7MH0i'><source>Bearbeite Benutzer "{0}"</source><target>Bearbeite Benutzer "{0}"</target></trans-unit>
+<trans-unit id='YW56ZWlnZW4='><source>anzeigen</source><target>anzeigen</target></trans-unit>
+<trans-unit id='YXVzYmxlbmRlbg=='><source>ausblenden</source><target>ausblenden</target></trans-unit>
+<trans-unit id='RWludHJhZyBnZXNwZWljaGVydA=='><source>Eintrag gespeichert</source><target>Eintrag gespeichert</target></trans-unit>
+<trans-unit id='RWludHJhZyBnZWzDtnNjaHQ='><source>Eintrag gelöscht</source><target>Eintrag gelöscht</target></trans-unit>
+<trans-unit id='RGllIEF1c2dhbmdzZGF0ZW4gd3VyZGVuIGluIGRlciBad2lzY2hlbnplaXQgdmVyw6RuZGVydC4gQml0dGUgYWt0dWFsaXNpZXJlbiBTaWUgSWhyZSBBbnNpY2h0IQ=='><source>Die Ausgangsdaten wurden in der Zwischenzeit verändert. Bitte aktualisieren Sie Ihre Ansicht!</source><target>Die Ausgangsdaten wurden in der Zwischenzeit verändert. Bitte aktualisieren Sie Ihre Ansicht!</target></trans-unit>
   </body>
  </file>
 </xliff>
