@@ -1389,8 +1389,8 @@ E-Mail: service@MittagQI.com</pre>
 
 <trans-unit id="dHJhbnNsYXRlNSBMb2dpbg=="><source>translate5 Login</source><target>translate5 Login</target></trans-unit>
 
-<trans-unit id='U3RhbmRhcmRiZW51dHplciBmw7xyIHRyYW5zbGF0ZTU='><source>Standardbenutzer für translate5</source><target>Defaultuser for translate5</target></trans-unit>
-<trans-unit id='QWNodHVuZzogSW4gZGVyIHRyYW5zbGF0ZTUtRGVtb2luc3RhbGxhdGlvbiBzaW5kIGRpZXNlIFN0YW5kYXJkYmVudXR6ZXIgbmljaHQgZWRpdGllcmJhciAtIGFuZGVyZSBCZW51dHplciBoaW5nZWdlbiBzY2hvbi4='><source>Achtung: In der translate5-Demoinstallation sind diese Standardbenutzer nicht editierbar - andere Benutzer hingegen schon.</source><target>Attention: These default users are not editable in the translate5 demo - other users however are editable.</target></trans-unit>
+<trans-unit id='U3RhbmRhcmRiZW51dHplciBmw7xyIHRyYW5zbGF0ZTU='><source>Standardbenutzer für translate5</source><target>Demo user for translate5</target></trans-unit>
+<trans-unit id='QWNodHVuZzogSW4gZGVyIHRyYW5zbGF0ZTUtRGVtb2luc3RhbGxhdGlvbiBzaW5kIGRpZXNlIFN0YW5kYXJkYmVudXR6ZXIgbmljaHQgZWRpdGllcmJhciAtIGFuZGVyZSBCZW51dHplciBoaW5nZWdlbiBzY2hvbi4='><source>Achtung: In der translate5-Demoinstallation sind diese Standardbenutzer nicht editierbar - andere Benutzer hingegen schon.</source><target>Attention: These demo users are not editable in the translate5 demo - other users however are editable.</target></trans-unit>
 
 <trans-unit id="QmVudXR6ZXJuYW1l"><source>Benutzername</source><target>User</target></trans-unit>
 <trans-unit id="UGFzc3dvcnQ="><source>Passwort</source><target>Password</target></trans-unit>
