@@ -50,6 +50,7 @@ Ext.define('Editor.controller.ServerException', {
         "401_title": '#UT#Erneute Anmeldung',
         "401_msg": '#UT#Ihre Sitzungsdaten sind abgelaufen. Sie werden nun zur Anmeldeseite weitergeleitet.',
         "406": '#UT#Es ist ein Fehler aufgetreten!',
+        "409": '#UT#Ihre Daten konnten nicht gespeichert werden, beim Speichern kam es zu einem Konflikt!',
         title: '#UT#Fehler',
         text: '#UT#Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!',
         serverMsg: '#UT#<br />Meldung vom Server: <i>{0} {1}</i>'
@@ -140,6 +141,9 @@ Ext.define('Editor.controller.ServerException', {
                     },
                     icon: Ext.MessageBox.WARNING
                 });
+                return;
+            case 409: //Conflict: show message from server
+                Editor.MessageBox.addError(appendServerMsg(str["409"]));
                 return;
             case 406: //Not Acceptable: show message from server
                 Editor.MessageBox.addError(appendServerMsg(str["406"]));

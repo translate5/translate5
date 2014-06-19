@@ -79,7 +79,7 @@ Ext.application({
   name : 'Editor',
   models : [ 'File', 'Segment', 'admin.User' ],
   stores : [ 'Files', 'Segments', 'AlikeSegments' ],
-  requires: ['Editor.view.ViewPortEditor', Editor.data.app.viewport],
+  requires: ['Editor.view.ViewPortEditor', Editor.data.app.viewport, 'Editor.model.ModelOverride'],
   controllers: Editor.data.app.controllers,
   //preload images is deactivated, because it is of little use and is eating a lot of performance at the beginning of the editing process with big projects
   //controllers: ['ServerException', 'ViewModes', 'Segments', 'Preferences', 'MetaPanel', 'Fileorder', 'Localizer', 'PreloadImages', 'ChangeAlike','QmSubSegments' ],

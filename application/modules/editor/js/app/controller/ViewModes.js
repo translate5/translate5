@@ -210,7 +210,7 @@ Ext.define('Editor.controller.ViewModes', {
   /**
    * aktiviert den Bearbeitungsmodus des Grids (alle Spalten eingeblendet, editieren möglich, Hide Tags deaktivieren) 
    */
-  editMode: function() {
+  editMode: function(calledOnInit) {
     var me = this;
     me.getViewModeMenu().hideMenu();
     me.getSegmentGrid().removeCls(me.self.MODE_ERGONOMIC);
@@ -220,9 +220,11 @@ Ext.define('Editor.controller.ViewModes', {
     me.getShortTagBtn().toggle(true);
     me.showShortTags();
     me.getHideTagBtn().disable();
-    Ext.Array.each(me.getHideColumns(), function(col){
-        col.show();
-    });
+    if(calledOnInit !== true) {
+        Ext.Array.each(me.getHideColumns(), function(col){
+            col.show();
+        });
+    }
     me.getSegmentGrid().editingPlugin.enable();
     me.self.setViewMode(me.self.MODE_EDIT);
   },

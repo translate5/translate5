@@ -48,6 +48,7 @@ Ext.define('Editor.model.admin.Task', {
   fields: [
     {name: 'id', type: 'int'},
     {name: 'taskGuid', type: 'string'},
+    {name: 'entityVersion', type: 'integer'},
     {name: 'taskNr', type: 'string'},
     {name: 'taskName', type: 'string'},
     {name: 'sourceLang', type: 'string'},
@@ -57,6 +58,7 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'lockingUser', type: 'string', persist: false},
     {name: 'lockingUsername', type: 'string', persist: false},
     {name: 'state', type: 'string'},
+    {name: 'workflow', type: 'string'},
     {name: 'pmGuid', type: 'string'},
     {name: 'pmName', type: 'string'},
     {name: 'wordCount', type: 'integer'},
@@ -78,7 +80,11 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'userCount', type: 'integer', persist: false},
     {name: 'defaultSegmentLayout', type: 'boolean', persist: false}
   ],
-  hasMany: {model: 'Editor.model.segment.Field', name: 'segmentFields'},
+  hasMany: [{
+      model: 'Editor.model.segment.Field', name: 'segmentFields'
+  },{
+      model: 'Editor.model.admin.task.UserPref', name: 'userPrefs'
+  }],
   idProperty: 'id',
   proxy : {
     type : 'rest',
@@ -94,7 +100,8 @@ Ext.define('Editor.model.admin.Task', {
     }
   },
   /**
-   * ensures that the userState is always send to the server.
+   * 1. ensures that entityVersion is always send to the server!
+   * 2. ensures that the userState is send to the server, after setting it to the same value and is therefore normally not modified.
    * ExtJS sends per default only modified fields, this can lead to errors here.
    * It could be, that after a session time out, the actual task isn't active anymore, but he is still marked es "edit"
    * In this case the user would not be able to open the task again! 
@@ -105,6 +112,10 @@ Ext.define('Editor.model.admin.Task', {
       var res = this.callParent(arguments);
       if(field == 'userState' && !this.modified.userState) {
           this.modified.userState = value;
+      }
+      //FIXME: should we do this in a general way? would be difficulty since exceptions like userState etc
+      if(field != 'userState' && field != 'entityVersion' && this.modified.entityVersion === undefined) {
+          this.modified.entityVersion = this.data.entityVersion;
       }
       return res; 
   },
@@ -181,7 +192,17 @@ Ext.define('Editor.model.admin.Task', {
   isEnded: function(){
       return this.get('state')=='end';
   },
-  
+  /**
+   * returns the the metadata for the workflow of the task
+   */
+  getWorkflowMetaData: function() {
+      var me = this,
+          wf = me.get('workflow');
+      if(!Editor.data.app.workflows[wf]) {
+          Ext.Error.raise('requested workflow meta data not found! (workflow '+wf+')');
+      }
+      return Editor.data.app.workflows[wf];
+  },
   /**
    * @todo improve workflow handling in Javascript, => adapt the php workflow in js, a class with same methods (like getNextStep step2Role etc)
    * actually all workflow information is encapsulated in frontendRights (thats OK) 
@@ -193,7 +214,7 @@ Ext.define('Editor.model.admin.Task', {
           filter = null,
           idx = 0,
           data = Editor.data,
-          stepChain = data.app.wfStepChain,
+          stepChain = me.getWorkflowMetaData().stepChain,
           task = data.task,
           step = task.get('userStep'),
           useFilter = !(me.isFinished() || me.isWaiting() || me.isEnded());
@@ -212,7 +233,5 @@ Ext.define('Editor.model.admin.Task', {
               };
           }
       }
-      
-      
   }
 });

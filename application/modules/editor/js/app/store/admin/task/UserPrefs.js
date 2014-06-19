@@ -32,48 +32,24 @@
  
  END LICENSE AND COPYRIGHT 
  */
-Ext.define('Editor.view.admin.TaskUserAssocWindow', {
-    extend : 'Ext.window.Window',
-    alias : 'widget.adminTaskUserAssocWindow',
-    requires: 'Editor.view.admin.TaskUserAssocGrid',
-    itemId : 'adminTaskUserAssocWindow',
-    title : '#UT#Benutzer zuordnen zu Aufgabe "{0}"',
-    text_save: '#UT#Änderungen speichern',
-    text_cancel: '#UT#Abbrechen',
-    height : 400,
-    width : 560,
-    loadingMask: null,
-    layout: 'fit',
-    modal : true,
-    initComponent : function() {
-        var me = this;
-        me.title = Ext.String.format(me.title, me.actualTask.get('taskName'));
-        Ext.applyIf(me, {
-            items : [{
-                xtype: 'adminTaskUserAssocGrid'
-            }],
-            dockedItems : [{
-                xtype : 'toolbar',
-                dock : 'bottom',
-                ui: 'footer',
-                layout: {
-                    type: 'hbox',
-                    pack: 'end'
-                },
-                items : [{
-                    xtype : 'button',
-                    iconCls : 'ico-save',
-                    itemId : 'save-assoc-btn',
-                    text : me.text_save
-                }, {
-                    xtype : 'button',
-                    iconCls : 'ico-cancel',
-                    itemId : 'cancel-assoc-btn',
-                    text : me.text_cancel
-                }]
-            }]
-        });
-
-        me.callParent(arguments);
-    }
+/**
+ * Store for Editor.model.admin.task.UserPref
+ * @class Editor.store.admin.task.UserPrefs
+ * @extends Ext.data.Store
+ */
+Ext.define('Editor.store.admin.task.UserPrefs', {
+  extend : 'Ext.data.Store',
+  model: 'Editor.model.admin.task.UserPref',
+  remoteSort: false,
+  autoLoad: false,
+  pageSize: 20,
+  getDefaultFor: function(workflow) {
+      var idx = this.findBy(function(rec){
+          return (rec.get('workflow') == workflow && rec.isDefault());
+      });
+      if(idx >= 0) {
+          return this.getAt(idx);
+      }
+      return null;
+  }
 });

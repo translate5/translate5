@@ -33,35 +33,48 @@
  END LICENSE AND COPYRIGHT 
  */
 /**
- * @class Editor.model.admin.TaskUserAssoc
+ * @class Editor.model.admin.workflow.UserPref
  * @extends Ext.data.Model
  */
-Ext.define('Editor.model.admin.TaskUserAssoc', {
+Ext.define('Editor.model.admin.task.UserPref', {
   extend: 'Ext.data.Model',
   fields: [
     {name: 'id', type: 'int'},
     {name: 'entityVersion', type: 'int'}, //does not exist in DB, for versioning only
     {name: 'taskGuid', type: 'string'},
+    {name: 'workflow', type: 'string'},
+    {name: 'workflowStep', type: 'string'},
+    {name: 'anonymousCols', type: 'boolean'},
+    {name: 'visibility', type: 'string'},
     {name: 'userGuid', type: 'string'},
-    {name: 'login', type: 'string', persist: false},
-    {name: 'surName', type: 'string', persist: false},
-    {name: 'firstName', type: 'string', persist: false},
-    {name: 'longUserName', type: 'string', persist: false, convert: function(v, rec) {
-        return Editor.model.admin.User.getLongUserName(rec);
-    }},
-    {name: 'state', type: 'string'},
-    {name: 'role', type: 'string'}
+    {name: 'fields', type: 'string'}
   ],
   validations: [
       {type: 'presence', field: 'taskGuid'},
-      {type: 'presence', field: 'userGuid'}//,
-      //FIXME make me dynamic? {type: 'inclusion', field: 'state', list: Ext.Object.getKeys(Editor.data.app.utStates)},
-      //FIXME make me dynamic? {type: 'inclusion', field: 'role', list: Ext.Object.getKeys(Editor.data.app.utRoles)}
+      {type: 'presence', field: 'workflow'},
+      {type: 'inclusion', field: 'visibility', list: ['show','hide','disable']},
+      {type: 'inclusion', field: 'workflow', list: Ext.Object.getKeys(Editor.data.app.workflows)}
+      //FIXME can we do this out of segmentfields dynamically?
+      //if yes, than we can move the visibility flags to CONSTs
+      //{type: 'inclusion', field: 'fields', list: Ext.Object.getKeys(Editor.data.app.utRoles)}
   ],
   idProperty: 'id',
+  /**
+   * is the Default entry if userGuid and workflowStep are empty
+   * @return {Boolean} 
+   */
+  isDefault: function() {
+      return !this.phantom && this.get('userGuid').length == 0 && this.get('workflowStep').length == 0;
+  },
+  isNonEditableColumnVisible: function() {
+      return (this.get('visibility') == 'show');
+  },
+  isNonEditableColumnDisabled: function() {
+      return (this.get('visibility') == 'disable');
+  },
   proxy : {
     type : 'rest',
-    url: Editor.data.restpath+'taskuserassoc',
+    url: Editor.data.restpath+'workflowuserpref',
     reader : {
       root: 'rows',
       type : 'json'

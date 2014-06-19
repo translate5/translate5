@@ -236,6 +236,8 @@ body.loading {background: url("../images/loading_ico.gif") center 100px no-repea
 .ico-task-add {background-image: url("../images/page_add.png");}
 .ico-user-add {background-image: url("../images/user_add.png");}
 .ico-user-del {background-image: url("../images/user_delete.png");}
+.ico-add {background-image: url("../images/table_row_insert.png");}
+.ico-del {background-image: url("../images/table_row_delete.png");}
 .ico-task-back {background-image: url("../images/table_back.png");}
 .adminTaskGrid tr.openable td.taskNr div {text-decoration: underline;cursor: pointer !important;}
 .adminTaskGrid .locked td.state div {padding-left:20px;background:url(../images/information.png) no-repeat left top;}
@@ -311,6 +313,7 @@ tr.no-users td div {color:#ff0000;}
 .x-menu .ico-task-end,
 .adminTaskGrid tr.editorEndTask .ico-task-end {background-image: url("../images/control_stop.png");display:inline;}
 .adminTaskGrid tr.editorChangeUserAssocTask .ico-task-change-user-assoc {background-image: url("../images/group.png");display:inline;}
+.adminTaskGrid tr.editorPreferencesTask .ico-task-preferences {background-image: url("../images/page_gear.png");display:inline;}
 .adminTaskGrid tr.editorReopenTask .ico-task-reopen {background-image: url("../images/control_start.png");display:inline;}
 .adminTaskGrid tr.editorDeleteTask .ico-task-delete {background-image: url("../images/page_delete.png");display:inline;}
 .adminTaskGrid tr.editorShowexportmenuTask .ico-task-showexportmenu {background-image: url("../images/database_go.png");display:inline;}
@@ -318,7 +321,6 @@ tr.no-users td div {color:#ff0000;}
 .adminTaskGrid tr.pending td.state div {background: url("../images/loading_ico.gif") no-repeat 6px center;}
 
 /* User Admin */
-
 .gender-male {background: url("../images/user.png") no-repeat 6px center;}
 .gender-female {background: url("../images/user_female.png") no-repeat 6px center;}
 .ico-user-edit {background-image: url("../images/user_edit.png");}
@@ -330,3 +332,6 @@ tr.no-users td div {color:#ff0000;}
 .not-editable .ico-user-reset-pw {display:none;}
 
 .x-action-col-cell img{height:16px;width:16px;margin-right:2px;cursor: pointer;}
+
+/* User Task Prefs */
+.edit-info-overlay {

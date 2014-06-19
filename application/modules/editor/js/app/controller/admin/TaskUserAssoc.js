@@ -39,9 +39,9 @@
  */
 Ext.define('Editor.controller.admin.TaskUserAssoc', {
   extend : 'Ext.app.Controller',
-  models: ['admin.TaskUserAssoc','admin.Task'],
+  models: ['admin.TaskUserAssoc','admin.Task','admin.task.UserPref'],
   stores: ['admin.Users', 'admin.TaskUserAssocs'],
-  views: ['admin.TaskUserAssocWindow', 'Editor.view.admin.UserChooseWindow'],
+  views: ['admin.task.PreferencesWindow','admin.task.UserAssocGrid','Editor.view.admin.UserChooseWindow'],
   refs : [{
       ref: 'assocDelBtn',
       selector: '#adminTaskUserAssocGrid #remove-user-btn'
@@ -49,49 +49,70 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       ref: 'userAssocGrid',
       selector: '#adminTaskUserAssocGrid'
   },{
-      ref: 'taskUserAssocWindow',
-      selector: '#adminTaskUserAssocWindow'
+      ref: 'userAssoc',
+      selector: '.adminTaskUserAssoc'
+  },{
+      ref: 'userAssocForm',
+      selector: '.adminTaskUserAssoc .form'
+  },{
+      ref: 'editInfo',
+      selector: '.adminTaskUserAssoc #editInfoOverlay'
+  },{
+      ref: 'prefWindow',
+      selector: '#adminTaskPreferencesWindow'
   }],
   messages: {
-      assocSave: '#UT#Änderungen gespeichert!',
+      assocSave: '#UT#Eintrag gespeichert!',
+      assocDeleted: '#UT#Eintrag gelöscht!',
       assocSaveError: '#UT#Fehler beim Speichern der Änderungen!'
   },
   init : function() {
-      var me = this,
-          toc = me.application.getController('admin.TaskOverview');
-      //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
-      toc.on('handleTaskChangeUserAssoc', me.handleShow, me);
-      toc.on('taskCreated', me.handleShow, me);
+      var me = this;
+
+      me.addEvents(
+              /**
+               * @event addUserAssoc
+               * @param {Editor.controller.admin.TaskUserAssoc} me
+               * @param {Editor.model.admin.TaskUserAssoc} rec
+               * @param {Editor.store.admin.TaskUserAssocs} store
+               * Fires after a task user assoc entry was successfully created
+               */
+              'addUserAssoc',
+              
+              /**
+               * @event removeUserAssoc
+               * @param {Editor.controller.admin.TaskUserAssoc} me
+               * @param {Editor.model.admin.TaskUserAssoc} toDel
+               * @param {Editor.store.admin.TaskUserAssocs} assoc
+               * Fires after a task user assoc entry was successfully deleted
+               */
+              'removeUserAssoc'
+      );
       
-      //FIXME nextRelease Thomas Fehlerfälle werden aktuell nicht abgefangen und angezeigt!
-      //Den Speichervorgang umbauen, so dass entweder jeder record direct gespeichert und damit success / failure handlebar wird
-      //Oder den aktuellen Ansatz lassen, und die einzelnen Batch Vorgänge mit handlern versehen, aktuell unklar ob das geht-
-      me.getAdminTaskUserAssocsStore().on('write',function(){
-          me.application.getController('admin.TaskOverview').handleTaskReload();
-          Editor.MessageBox.addSuccess(me.messages.assocSave);
-      });
+      if(!Editor.controller.admin.TaskPreferences) {
+          //controller.TaskPreferences is somekind of parent controller of controller.TaskUserAssoc so it must be loaded!
+          Ext.Error.raise('TaskPreferences controller must be loaded!');
+      }
+      
+      //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
+      Editor.app.on('adminViewportClosed', me.clearStores, me);
+      me.getAdminTaskUserAssocsStore().on('load', me.updateUsers, me);
       
       me.control({
           '#adminTaskUserAssocGrid': {
-              selectionchange: me.handleAssocSelection,
-              edit: me.initStates
+              confirmDelete: me.handleDeleteConfirmClick,
+              selectionchange: me.handleAssocSelection
           },
           '#adminTaskUserAssocGrid #add-user-btn': {
-              click: me.showUserChooser
-          },
-          '#adminTaskUserAssocGrid #remove-user-btn': {
-              click: me.handleRemoveAssoc
-          },
-          '#adminUserChooseWindow #add-user-btn': {
               click: me.handleAddUser
           },
-          '#adminUserChooseWindow #cancel-btn': {
-              click: me.handleCancel
+          '.adminTaskUserAssoc .combo[name="role"]': {
+              change: me.initState
           },
-          '#adminTaskUserAssocWindow #save-assoc-btn': {
+          '.adminTaskUserAssoc #save-assoc-btn': {
               click: me.handleSaveAssoc
           },
-          '#adminTaskUserAssocWindow #cancel-assoc-btn': {
+          '.adminTaskUserAssoc #cancel-assoc-btn': {
               click: me.handleCancel
           }
       });
@@ -105,40 +126,13 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       return Editor.app.authenticatedUser.isAllowed(right);
   },
   /**
-   * Display window to choose users to add to the task
-   */
-  showUserChooser: function() {
-      Ext.widget('adminUserChooseWindow',{
-          excludeLogins: this.getAdminTaskUserAssocsStore().collect('login'),
-          task: this.getTaskUserAssocWindow().actualTask
-      }).show();
-  },
-  /**
-   * Opens the User Assoc List to the choosen Task
-   * @param {Editor.model.admin.Task} task => after POST this model may not be complete (userStates etc)
-   */
-  handleShow: function(task) {
-      var me = this,
-          store = me.getAdminTaskUserAssocsStore();
-      if(!me.isAllowed('editorChangeUserAssocTask')){
-          return;
-      }
-      store.loadData([],false);
-      store.load({
-          //wenn der Store einen echten Filter bekommt muss der Wert hier miteingebaut werden!
-          params: {
-              filter: '[{"type":"string","value":"'+task.get('taskGuid')+'","field":"taskGuid"}]'
-          }
-      });
-      Ext.widget('adminTaskUserAssocWindow',{
-          actualTask: task
-      }).show();
-  },
-  /**
    * @param {Ext.button.Button} btn
    */
   handleCancel: function(btn){
-      btn.up('window').close();
+      var form = this.getUserAssocForm();
+      form.getForm().reset();
+      form.hide();
+      this.getEditInfo().show();
   },
   /**
    * @param {Ext.button.Button} btn
@@ -146,25 +140,20 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
   handleAddUser: function(btn){
       var me = this,
           assoc = me.getAdminTaskUserAssocsStore(),
-          win = btn.up('window'),
-          sel = win.down('grid').getSelectionModel().getSelection(),
-          role = Ext.Object.getKeys(Editor.data.app.utRoles)[0],
-          state = Ext.Object.getKeys(Editor.data.app.utStates)[0];
-          
-      Ext.Array.each(sel, function(rec){
-          var mod = assoc.model.create({
-              userGuid: rec.get('userGuid'),
-              surName: rec.get('surName'),
-              firstName: rec.get('firstName'),
-              login: rec.get('login'),
-              taskGuid: me.getTaskUserAssocWindow().actualTask.get('taskGuid'),
+          task = me.getPrefWindow().actualTask,
+          meta = task.getWorkflowMetaData(),
+          role = Ext.Object.getKeys(meta.roles)[0],
+          state = Ext.Object.getKeys(meta.states)[0],
+          newRec = assoc.model.create({
+              taskGuid: task.get('taskGuid'),
               role: role,
               state: state
           });
-          mod.setDirty();
-          assoc.insert(0, mod);
-      });
-      win.close();
+      me.getAssocDelBtn().disable();
+      me.getEditInfo().hide();
+      me.getUserAssocForm().show();
+      me.getUserAssoc().loadRecord(newRec);
+      me.initState(null, role, '');
   },
   /**
    * Disable Delete Button if no User is selected
@@ -172,17 +161,39 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
    * @param {Array} selection
    */
   handleAssocSelection: function(grid, selection) {
-      this.getAssocDelBtn().setDisabled(selection.length == 0);
+      var me = this,
+          emptySel = selection.length == 0;
+      me.getAssocDelBtn().setDisabled(emptySel);
+      me.getEditInfo().setVisible(emptySel);
+      me.getUserAssocForm().setVisible(!emptySel);
+      if(emptySel) {
+          me.getUserAssocForm().getForm().reset();
+      }
+      else {
+          me.getUserAssoc().loadRecord(selection[0]);
+      }
   },
   /**
    * Removes the selected User Task Association
-   * @param {Ext.button.Button} btn
    */
-  handleRemoveAssoc: function(btn) {
-      var win = btn.up('window'),
-      sel = win.down('grid').getSelectionModel().getSelection(),
-      assoc = this.getAdminTaskUserAssocsStore();
-      assoc.remove(sel);
+  handleDeleteConfirmClick: function(grid, toDelete, btn) {
+      var me = this,
+          task = me.getPrefWindow().actualTask,
+          assoc = me.getAdminTaskUserAssocsStore();
+      
+      Ext.Array.each(toDelete, function(toDel){
+          toDel.destroyVersioned(task, {
+              success: function() {
+                  assoc.remove(toDel);
+                  me.updateUsers(assoc);
+                  me.fireEvent('removeUserAssoc', me, toDel, assoc);
+                  Editor.MessageBox.addSuccess(me.messages.assocDeleted);
+              },
+              failure: function() {
+                  me.application.getController('admin.TaskPreferences').handleReload();
+              }
+          });
+      });
   },
   /**
    * save the user task assoc info.
@@ -190,25 +201,71 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
    */
   handleSaveAssoc: function (btn) {
       var me = this,
-          grid = me.getUserAssocGrid();
-      grid.editingPlugin && grid.editingPlugin.completeEdit();
-      btn.up('window').close();
-      me.getAdminTaskUserAssocsStore().sync();
+          form = me.getUserAssocForm(),
+          task = me.getPrefWindow().actualTask,
+          store = me.getUserAssocGrid().store,
+          rec = form.getRecord();
+      form.getForm().updateRecord(rec);
+      if(! form.getForm().isValid()) {
+          return;
+      }
+      me.getPrefWindow().loadingShow();
+      rec.saveVersioned(task, {
+          success: function(savedRec, op) {
+              me.handleCancel();
+              if(!rec.store) {
+                  store.insert(0,rec);
+                  me.updateUsers(store);
+                  me.fireEvent('addUserAssoc', me, rec, store);
+              }
+              task.reload();//reload only the task, not the whole task prefs, should be OK
+              Editor.MessageBox.addSuccess(me.messages.assocSave);
+              me.getPrefWindow().loadingHide();
+          },
+          failure: function() {
+              me.application.getController('admin.TaskPreferences').handleReload();
+          }
+      });
+  },
+  clearStores: function() {
+      this.getAdminTaskUserAssocsStore().removeAll();
   },
   /**
-   * sets the initial state values dependent on the role
-   * @param {Ext.grid.plugin.CellEditing} plug
-   * @param {Object} context
+   * updates the user list to be excluded from the add user drop down
+   * @param {} store
    */
-  initStates: function(plug, context) {
-      var rec = context.record,
-          task = Editor.model.admin.Task.prototype;
-
-      if(context.field == 'role' && context.value == 'translator' && rec.phantom) {
-          rec.set('state', task.USER_STATE_WAITING);
+  updateUsers: function(store) {
+      var me = this;
+      if(me.getUserAssoc()) {
+          me.getUserAssoc().excludeLogins = store.collect('login');
       }
-      if(context.field == 'role' && context.value == 'lector' && rec.phantom) {
-          rec.set('state', task.USER_STATE_OPEN);
+  },
+  /**
+   * sets the initial state value dependent on the role
+   * @param {Ext.form.field.ComboBox} roleCombo
+   * @param {String} newValue
+   * @param {String} oldValue
+   */
+  initState: function(roleCombo, newValue, oldValue) {
+      var me = this,
+          form = me.getUserAssocForm(),
+          task = Editor.model.admin.Task.prototype,
+          stateCombo = form.down('.combo[name="state"]'),
+          newState = task.USER_STATE_OPEN,
+          rec = form.getRecord(),
+          isChanged = stateCombo.getValue() != rec.get('state');
+      if(!rec.phantom || isChanged) {
+          return;
       }
+      switch (newValue) {
+          case 'translator':
+              newState = task.USER_STATE_WAITING;
+              break;
+          case 'lector':
+              newState = task.USER_STATE_OPEN;
+              break;
+      }
+      rec.set('state', newState);
+      stateCombo.setValue(newState);
   }
 });

@@ -53,7 +53,7 @@ Ext.define('Editor.controller.Preferences', {
     alikeBehaviour: Editor.data.preferences.alikeBehaviour
   },
   messages: {
-    preferencesSaved: 'Einstellungen für diese Sitzung gespeichert!'
+    preferencesSaved: '#UT#Einstellungen für diese Sitzung gespeichert!'
   },
   window: null,
   refs:[{

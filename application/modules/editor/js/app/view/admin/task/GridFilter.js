@@ -59,6 +59,7 @@ Ext.define('Editor.view.admin.task.GridFilter', {
         forMe: '#UT#für mich '
     },
     
+    //we must have here an own ordered list of states to be filtered 
     stateFilterOrder: ['user_state_open','user_state_waiting','user_state_finished','locked', 'task_state_end'],
 
     constructor: function(config) {
@@ -74,19 +75,21 @@ Ext.define('Editor.view.admin.task.GridFilter', {
             msg = this.strings,
             states = [];
         
-        //we're hardcoding the state filter options order, all other (unordered) utStates are added below
+        //we're hardcoding the state filter options order, all other (unordered) workflow states are added below
         Ext.Array.each(this.stateFilterOrder, function(state){
             if(msg[state]) {
                 states.push([state, msg[state]]);
             }
         });
         
-        //adding additional, not ordered utStates
-        Ext.Object.each(Editor.data.app.utStates, function(key, value){
-            var state = 'user_state_'+key;
-            if(!msg[state]) {
-                states.push([state, msg.forMe+' '+value]);
-            }
+        //adding additional, not ordered states
+        Ext.Object.each(Editor.data.app.workflows, function(key, workflow){
+            Ext.Object.each(workflow.states, function(key, value){
+                var state = 'user_state_'+key;
+                if(!msg[state]) {
+                    states.push([state, msg.forMe+' '+value]);
+                }
+            });
         });
         
         relaisLanguages.unshift([0, this.noRelaisLang]);

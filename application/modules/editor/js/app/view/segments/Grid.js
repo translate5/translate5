@@ -121,6 +121,7 @@ Ext.define('Editor.view.segments.Grid', {
             columns = [],
             firstTargetFound = false,
             fields = Editor.data.task.segmentFields(),
+            userPref = Editor.data.task.userPrefs().first(),
             fieldList = [];
         
         this.store = Ext.create('Editor.store.Segments',{
@@ -143,7 +144,7 @@ Ext.define('Editor.view.segments.Grid', {
             xtype: 'workflowStepColumn',
             itemId: 'workflowStepColumn',
             renderer: function(v) {
-                var steps = Editor.data.app.wfSteps;
+                var steps = Editor.data.task.getWorkflowMetaData().steps;
                 return steps[v] ? steps[v] : v;
             },
             width: 140
@@ -166,14 +167,17 @@ Ext.define('Editor.view.segments.Grid', {
             //stored outside of function and must be set after isErgoVisible!
             firstTargetFound = firstTargetFound || isEditableTarget; 
             
-            columns.push({
-                xtype: 'contentColumn',
-                segmentField: rec,
-                fieldName: name,
-                isErgonomicVisible: isErgoVisible && !editable,
-                isErgonomicSetWidth: true, //currently true for all our affected default fields
-                text: rec.get('label')
-            });
+            if(!rec.isTarget() || ! userPref.isNonEditableColumnDisabled()) {
+                columns.push({
+                    xtype: 'contentColumn',
+                    segmentField: rec,
+                    fieldName: name,
+                    hidden: !userPref.isNonEditableColumnVisible() && rec.isTarget(),
+                    isErgonomicVisible: isErgoVisible && !editable,
+                    isErgonomicSetWidth: true, //currently true for all our affected default fields
+                    text: rec.get('label')
+                });
+            }
             
             if(editable){
                 columns.push({

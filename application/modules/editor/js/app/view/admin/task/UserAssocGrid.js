@@ -32,19 +32,27 @@
  
  END LICENSE AND COPYRIGHT 
  */
-Ext.define('Editor.view.admin.TaskUserAssocGrid', {
+Ext.define('Editor.view.admin.task.UserAssocGrid', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.adminTaskUserAssocGrid',
   cls: 'task-user-assoc-grid',
   itemId: 'adminTaskUserAssocGrid',
   strings: {
+      confirmDeleteTitle: '#UT#Eintrag löschen?',
+      confirmDelete: '#UT#Soll dieser Eintrag wirklich gelöscht werden?',
       userGuidCol: '#UT#Benutzer',
-      roleCol: '#UT#Rolle (Doppelklick zum Ändern)',
-      stateCol: '#UT#Status (Doppelklick zum Ändern)',
+      roleCol: '#UT#Rolle',
+      stateCol: '#UT#Status',
       addUser: '#UT#Benutzer hinzufügen',
       addUserTip: '#UT#Einen Benutzer dieser Aufgabe zuordnen.',
       removeUser: '#UT#Benutzer entfernen',
-      removeUserTip: '#UT#Den gewählten Benutzer aus dieser Aufgabe entfernen.'
+      removeUserTip: '#UT#Den gewählten Benutzer aus dieser Aufgabe entfernen.',
+      save: '#UT#Änderungen speichern',
+      reload: '#UT#Aktualisieren',
+      cancel: '#UT#Abbrechen'
+  },
+  viewConfig: {
+      loadMask: false
   },
   store: 'admin.TaskUserAssocs',
   //features: [{
@@ -52,17 +60,19 @@ Ext.define('Editor.view.admin.TaskUserAssocGrid', {
   //}],
   initComponent: function() {
     var me = this,
-        states = [],
-        roles = [];
-    Ext.Object.each(Editor.data.app.utStates, function(key, state) {
-        states.push([key, state]);
-    });
-    Ext.Object.each(Editor.data.app.utRoles, function(key, role) {
-        roles.push([key, role]);
-    });
+        wf = me.actualTask.getWorkflowMetaData();
+    
+    me.addEvents(
+          /**
+           * @event confirmDelete
+           * @param {Ext.form.Panel} grid
+           * @param {Editor.model.admin.task.UserPref[]} toDelete
+           * @param {Ext.button.Button} btn
+           */
+          'confirmDelete'
+    );
+    
     Ext.applyIf(me, {
-      plugins: [Ext.create('Ext.grid.plugin.CellEditing', {
-      })],
       columns: [{
           xtype: 'gridcolumn',
           width: 160,
@@ -73,36 +83,18 @@ Ext.define('Editor.view.admin.TaskUserAssocGrid', {
           text: me.strings.userGuidCol
       },{
           xtype: 'gridcolumn',
-          width: 190,
+          width: 90,
           dataIndex: 'role',
-          editor: {
-              xtype: 'combo',
-              editable: false,
-              //displayField: 'label',
-              //valueField: 'id',
-              forceSelection: true,
-              queryMode: 'local',
-              store: roles
-          },
           renderer: function(v) {
-              return Editor.data.app.utRoles[v];
+              return wf.roles[v];
           },
           text: me.strings.roleCol
       },{
           xtype: 'gridcolumn',
-          width: 190,
+          width: 90,
           dataIndex: 'state',
-          editor: {
-              xtype: 'combo',
-              editable: false,
-              //displayField: 'label',
-              //valueField: 'id',
-              forceSelection: true,
-              queryMode: 'local',
-              store: states
-          },
           renderer: function(v) {
-              return Editor.data.app.utStates[v];
+              return wf.states[v];
           },
           text: me.strings.stateCol
       }],
@@ -120,8 +112,21 @@ Ext.define('Editor.view.admin.TaskUserAssocGrid', {
               iconCls: 'ico-user-del',
               disabled: true,
               itemId: 'remove-user-btn',
+              handler: function() {
+                  Ext.Msg.confirm(me.strings.confirmDeleteTitle, me.strings.confirmDelete, function(btn){
+                      var toDelete = me.getSelectionModel().getSelection();
+                      if(btn == 'yes') {
+                          me.fireEvent('confirmDelete', me, toDelete, this);
+                      }
+                  });
+              },
               text: me.strings.removeUser,
               tooltip: me.strings.removeUserTip
+          },{
+              xtype: 'button',
+              itemId: 'reload-btn',
+              iconCls: 'ico-refresh',
+              text: me.strings.reload
           }]
         }]
     });

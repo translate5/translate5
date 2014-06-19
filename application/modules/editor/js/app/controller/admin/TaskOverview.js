@@ -101,6 +101,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               'taskCreated',
               
               /**
+               * @event handleTaskPreferences
+               * @param {Editor.model.admin.Task} task
+               * Fires after the User has clicked on the icon to edit the Task Preferences
+               */
+              'handleTaskPreferences',
+              
+              /**
                * @event handleTaskChangeUserAssoc
                * @param {Editor.model.admin.Task} task
                * Fires after the User has clicked on the button / cell to edit the Task User Assoc
@@ -226,11 +233,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           grid.down('#viewModeMenu').hide();
           sep = grid.down('#viewModeMenu').nextNode('.tbseparator');
           sep && sep.hide();
-          vm && vm.viewMode();
+          vm && vm.viewMode(true); //true means called on init
       }
       else {
           //show not needed
-          vm && vm.editMode();
+          vm && vm.editMode(true); //true means called on init
       }
   },
   /**
@@ -519,6 +526,15 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       menu.down('#exportItem').setVisible(exportAllowed);
       menu.down('#exportDiffItem').setVisible(exportAllowed);
       menu.showAt(event.getXY());
+  },
+  
+  /**
+   * triggerd by click on the Task Preferences Icon
+   * fires only an event to allow flexible handling of this click
+   * @param {Editor.model.admin.Task} task
+   */
+  handleTaskPreferences: function(task) {
+      this.fireEvent('handleTaskPreferences', task);
   },
   
   /**
