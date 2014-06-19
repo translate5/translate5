@@ -65,6 +65,8 @@
  * @method void setPmGuid() setPmGuid(string $guid)
  * @method string getState() getState()
  * @method void setState() setState(string $state)
+ * @method string getWorkflow() getWorkflow()
+ * @method void setWorkflow() setWorkflow(string $workflow)
  * @method integer getWorkflowStep() getWorkflowStep()
  * @method void setWorkflowStep() setWorkflowStep(integer $stepNr)
  * @method integer getWordCount() getWordCount()
@@ -446,6 +448,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $session->taskGuid = $this->getTaskGuid();
         $session->task = $this->getAsConfig();
         $session->taskOpenState = $openState;
+        $session->taskWorkflow = $this->getWorkflow();
         $session->taskWorkflowStepNr = $this->getWorkflowStep();
     }
     
@@ -461,6 +464,15 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $session->task = null;
         $session->taskOpenState = null;
         $session->taskWorkflowStepNr = null;
+    }
+    
+    /**
+     * returns true if the loaded task is registered in the session
+     * @return boolean
+     */
+    public function isRegisteredInSession() {
+        $session = new Zend_Session_Namespace();
+        return !empty($session->taskGuid) && $session->taskGuid == $this->getTaskGuid();
     }
     
     /**

@@ -80,6 +80,28 @@ class editor_Models_SegmentField extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * loads the fields by the userprefs defined for the given taskGuid, userGuid and workflowStep
+     * @param editor_Models_Workflow_Userpref $userPref
+     */
+    public function loadByUserPref(editor_Models_Workflow_Userpref $userPref) {
+        $allFields = $this->loadByTaskGuid($userPref->getTaskGuid());
+        $fields = explode(',', $userPref->getFields());
+        $result = array();
+        $anon = 'A';
+        foreach($allFields as $field) {
+            if(! in_array($field['name'], $fields)) {
+                continue;
+            }
+            if($userPref->getAnonymousCols() && $field['type'] == editor_Models_SegmentField::TYPE_TARGET) {
+                $field['label'] = 'Spalte '.($anon++);
+            }
+            $result[] = $field;
+        }
+        return $result;
+        //FIXME TaskController Logic für diesen Aufruf beim Export der QM Statistics bzw. eigentlich bei jedem bisherigen loadByTaskGuid adaptieren!
+    }
+    
+    /**
      * Segment Fields are internally processed as ZendRowObjects, so we need a way to get it.
      * @return Zend_Db_Table_Row_Abstract
      */

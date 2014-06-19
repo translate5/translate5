@@ -785,6 +785,118 @@
         <source>Aufgrund der langsamen Verarbeitung von Javascript im Internet Explorer konnte das Segment nicht korrekt gespeichert werden. Bitte öffnen Sie das Segment nochmals und speichern Sie es erneut. Sollte das Problem bestehen bleiben, drücken Sie bitte F5 und bearbeiten dann das Segment erneut. Vielen Dank!</source>
         <target>Due to the slow processing of Javascript in Internet Explorer, the segment could not be saved properly. Please open the segment and save it again. If the problem persists, please press F5 and then edit the segment again. Thank you!</target>
       </trans-unit>
+      <trans-unit id='U3RhbmRhcmQgQWJsYXVmcGxhbg=='>
+        <source>Standard Ablaufplan</source>
+        <target>Default workflow</target>
+      </trans-unit>
+      <trans-unit id='VGVzdCBXb3JrZmxvdw=='>
+        <source>Test Workflow</source>
+	<target>Test Workflow</target>
+      </trans-unit>
+      <trans-unit id='VGVzdGVpbnRyYWc='>
+        <source>Testeintrag</source>
+        <target>Testentry</target>
+      </trans-unit>
+      <trans-unit id='QXVmZ2FiZW5zcGV6aWZpc2NoZSBFaW5zdGVsbHVuZ2Vu'>
+        <source>Aufgabenspezifische Einstellungen</source>
+        <target>Taskspecific properties</target>
+      </trans-unit>
+      <trans-unit id='RWluc3RlbGx1bmdlbiB6dSBBdWZnYWJlICJ7MH0i'>
+        <source>Einstellungen zu Aufgabe "{0}"</source>
+        <target>Properties to task "{0}"</target>
+      </trans-unit>
+      <trans-unit id='QmVudXR6ZXIgenUgQXVmZ2FiZSB6dW9yZG5lbg=='>
+        <source>Benutzer zu Aufgabe zuordnen</source>
+        <target>Associate users to task</target>
+      </trans-unit>
+      <trans-unit id='U3RhbmRhcmQgRWludHJhZw=='>
+        <source>Standard Eintrag</source>
+        <target>Default entry</target>
+      </trans-unit>
+      <trans-unit id='RWludHJhZyBsw7ZzY2hlbj8='>
+        <source>Eintrag löschen?</source>
+        <target>Delete entry?</target>
+      </trans-unit>
+      <trans-unit id='U29sbCBkaWVzZXIgRWludHJhZyB3aXJrbGljaCBnZWzDtnNjaHQgd2VyZGVuPw=='>
+        <source>Soll dieser Eintrag wirklich gelöscht werden?</source>
+        <target>Do you really want to delete this entry?</target>
+      </trans-unit>
+      <trans-unit id='V29ya2Zsb3cgU2Nocml0dA=='>
+        <source>Workflow Schritt</source>
+        <target>Workflow step</target>
+      </trans-unit>
+      <trans-unit id='U3BhbHRlbiAodm9yaGFuZGVuKQ=='>
+        <source>Spalten (vorhanden)</source>
+        <target>Columns (available)</target>
+      </trans-unit>
+      <trans-unit id='QW5vbnltaXNpZXJ0'>
+        <source>Anonymisiert</source>
+        <target>Anonymised</target>
+      </trans-unit>
+      <trans-unit id='U2ljaHRiYXJrZWl0'>
+        <source>Sichtbarkeit</source>
+        <target>Visibility</target>
+      </trans-unit>
+      <trans-unit id='RWludHJhZyBoaW56dWbDvGdlbg=='>
+        <source>Eintrag hinzufügen</source>
+        <target>Add entry</target>
+      </trans-unit>
+      <trans-unit id='RWludHJhZyBsw7ZzY2hlbg=='>
+        <source>Eintrag löschen</source>
+        <target>Delete entry</target>
+      </trans-unit>
+      <trans-unit id='QmVhcmJlaXRlIEVpbnRyYWc6ICJ7MH0gLSB7MX0i'>
+        <source>Bearbeite Eintrag: "{0} - {1}"</source>
+        <target>Edit entry: "{0} - {1}"</target>
+      </trans-unit>
+      <trans-unit id='RWludHJhZyBlcnN0ZWxsZW4='>
+        <source>Eintrag erstellen</source>
+        <target>Create entry</target>
+      </trans-unit>
+      <trans-unit id='dm9yaGFuZGVuZSBTcGFsdGVu'>
+        <source>Vorhandene Spalten</source>
+        <target>Available columns</target>
+      </trans-unit>
+      <trans-unit id='YW5vbnltaXNpZXJ0ZSBaaWVsdGV4dHNwYWx0ZW4='>
+        <source>Anonymisierte Zieltextspalten</source>
+        <target>Anonymised target columns</target>
+      </trans-unit>
+      <trans-unit id='U2ljaHRiYXJrZWl0IGRlciBuaWNodCBlZGl0aWVyYmFyZW4gWmllbHNwcmFjaGVu'>
+        <source>Sichtbarkeit der nicht editierbaren Zielsprachen</source>
+        <target>Visibility of the non editable target languages</target>
+      </trans-unit>
+      <trans-unit id='QW56ZWlnZW4='>
+        <source>Anzeigen</source>
+        <target>Show</target>
+      </trans-unit>
+      <trans-unit id='QXVzYmxlbmRlbg=='>
+        <source>Ausblenden</source>
+        <target>Hide</target>
+      </trans-unit>
+      <trans-unit id='bmljaHQgdm9yaGFuZGVu'>
+        <source>nicht vorhanden</source>
+        <target>Not available</target>
+      </trans-unit>
+      <trans-unit id='RWluc3RlbGx1bmdlbiB6dXIgQXVmZ2FiZQ=='>
+        <source>Einstellungen zur Aufgabe</source>
+        <target>Task-properties</target>
+      </trans-unit>
+      <trans-unit id='V29ya2Zsb3c='>
+        <source>Workflow</source>
+        <target>Workflow</target>
+      </trans-unit>
+      <trans-unit id='V8OkaGxlbiBTaWUgZWluZW4gRWludHJhZyBpbiBkZXIgVGFiZWxsZSBhdXMgdW0gZGllc2VuIHp1IGJlYXJiZWl0ZW4h'>
+        <source>Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!</source>
+        <target>Choose an entry in the table to edit it!</target>
+      </trans-unit>
+      <trans-unit id='w4RuZGVydW5nIGRlcyBXb3JrZmxvd3MgZGVyIEF1ZmdhYmUgZ2VzcGVpY2hlcnQh'>
+        <source>Änderung des Workflows der Aufgabe gespeichert!</source>
+        <target>Workflow changes saved!</target>
+      </trans-unit>
+      <trans-unit id='ZsO8ciBhbGxl'>
+        <source>für alle</source>
+        <target>for all</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

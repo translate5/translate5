@@ -74,8 +74,9 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
       /* @var $segment editor_Models_Segment */
       $segment->load($segmentId);
       
-      $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
-      /* @var $workflow editor_Workflow_Default */
+      $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+      /* @var $wfm editor_Workflow_Manager */
+      $workflow = $wfm->getActive();
         
       if($session->taskGuid === $segment->get('taskGuid')) {
           $segment->set('comments', join("\n", $commentsMarkup));

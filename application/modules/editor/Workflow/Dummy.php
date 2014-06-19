@@ -33,23 +33,21 @@
  
  END LICENSE AND COPYRIGHT 
  */
-
-class editor_Models_Validator_TaskUserAssoc extends ZfExtended_Models_Validator_Abstract {
-
+/**
+ * Default Workflow Class
+ */
+class editor_Workflow_Dummy extends editor_Workflow_Default {
     /**
-     * Validators for Task User Assoc Entity
+     * internal used name of the workflow
+     * @var string
      */
-    protected function defineValidators() {
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
-        /* @var $workflow editor_Workflow_Abstract */
-        //comment = string, without length contrain. No validator needed / possible
-        $this->addValidator('id', 'int');
-        $this->addValidator('taskGuid', 'guid');
-        $this->addValidator('userGuid', 'guid');
-        $this->addValidator('state', 'inArray', array($workflow->getStates()));
-        $this->addValidator('role', 'inArray', array($workflow->getRoles()));
-        $this->addValidator('usedState', 'inArray', array($workflow->getStates()));
-        $this->addValidator('usedInternalSessionUniqId', 'stringLength', array('min' => 0, 'max' => 32));
-        $this->addValidator('isPmOverride', 'boolean');
+    const WORKFLOW_ID = 'dummy';
+    
+    const STEP_TESTING = 'testing';
+
+    public function __construct() {
+        $this->labels['STEP_TESTING'] = 'Testeintrag';
+        $this->labels['WORKFLOW_ID'] = 'Test Workflow';
+        parent::__construct();
     }
 }

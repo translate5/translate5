@@ -69,8 +69,8 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         $this->addValidator('matchRate', 'between', array('min' => 0, 'max' => 100));
         $this->addValidator('workflowStepNr', 'int');
         
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
-        /* @var $workflow editor_Workflow_Default */
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
+        /* @var $workflow editor_Workflow_Abstract */
         $this->addValidator('workflowStep', 'inArray', array($workflow->getSteps()));
         
         $session = new Zend_Session_Namespace();

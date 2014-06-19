@@ -67,6 +67,37 @@ abstract class editor_Workflow_Abstract {
     const STEP_TRANSLATORCHECK = 'translatorCheck';
     const STEP_PM_CHECK = 'pmCheck';
     
+    //const WORKFLOW_ID = ''; this is the internal used name for this workflow, it has to be defined in each subclass!
+    
+    /**
+     * labels of the states, roles and steps. Can be changed / added in constructor
+     * @var array
+     */
+    protected $labels = array(
+        'WORKFLOW_ID' => 'Standard Ablaufplan', 
+        'STATE_WAITING' => 'wartend', 
+        'STATE_FINISH' => 'abgeschlossen', 
+        'STATE_OPEN' => 'offen', 
+        'STATE_EDIT' => 'selbst in Arbeit', 
+        'STATE_VIEW' => 'selbst geöffnet', 
+        'ROLE_VISITOR' => 'Besucher',
+        'ROLE_LECTOR' => 'Lektor',
+        'ROLE_TRANSLATOR' => 'Übersetzer',
+        'STEP_LECTORING' => 'Lektorat',
+        'STEP_TRANSLATORCHECK' => 'Übersetzer Prüfung',
+        'STEP_PM_CHECK' => 'PM Prüfung',
+    );
+    
+    /**
+     * This part is very ugly: in the frontend we are working only with all states expect the ones listed here.
+     * The states listed here are only used in the frontend grid for rendering purposes, 
+     * they are not used to be activly set to a user, or to be filtered etc. pp.
+     * So we define them as "pending" states, which have to be delivered in a separate matter to the frontend
+     * The values are a subset of the above STATE_CONSTANTs
+     * @var array
+     */
+    protected $pendingStates = array(self::STATE_EDIT, self::STATE_VIEW);
+    
     /**
      * Container for the old Task Model provided by doWithTask
      * (task as loaded from DB)
@@ -188,6 +219,19 @@ abstract class editor_Workflow_Abstract {
     }
     
     /**
+     * returns the workflow ID used in translate5
+     * if parameter $className is given return the ID of the given classname,
+     * if no $className is given, the current class is used
+     * @param string $className optional
+     */
+    public static function getId($className = null) {
+        if(empty($className)) {
+            return static::WORKFLOW_ID;
+        }
+        return call_user_func(array($className, __METHOD__));
+    }
+    
+    /**
      * returns the step to roles mapping
      * @return array
      */
@@ -234,6 +278,14 @@ abstract class editor_Workflow_Abstract {
     public function getStepChain() {
         return $this->stepChain;
     }
+    
+    /**
+     * return the states defined as pending (is a subset of the getStates result)
+     * @return array
+     */
+    public function getPendingStates() {
+        return array_intersect($this->getStates(), $this->pendingStates);
+    }
 
     /**
      * loads the system user as authenticatedUser, if no user is logged in
@@ -275,6 +327,18 @@ abstract class editor_Workflow_Abstract {
     public function getRoles(){
         return $this->getFilteredConstants('ROLE_');
     }
+    
+    /**
+     * returns the already translated labels as assoc array
+     * @return array
+     */
+    public function getLabels() {
+        $t = ZfExtended_Zendoverwrites_Translate::getInstance();
+        return array_map(function($label) use ($t) {
+            return $t->_($label);
+        }, $this->labels);
+    }
+    
     /**
      * 
      * @param string $role

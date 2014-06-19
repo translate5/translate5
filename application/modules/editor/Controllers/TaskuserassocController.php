@@ -75,14 +75,19 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         }
         return parent::validate();
     }
-    
+
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::putAction()
+     */
     public function putAction() {
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
-        /* @var $workflow editor_Workflow_Default */
-        
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
+        /* @var $workflow editor_Workflow_Abstract */
+
         $this->entity->load($this->_getParam('id'));
         $oldEntity = clone $this->entity;
         $this->decodePutData();
+        $this->processClientReferenceVersion();
         $this->setDataInEntity();
         //@todo in next release uncomment $workflow->isStateChangeable again and 
         //ensure in workflow, that the rights of a role decide, which states are changeable
@@ -100,8 +105,30 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $workflow->doWithUserAssoc($oldEntity, $this->entity);
         
         $this->view->rows = $this->entity->getDataObject();
+        $this->addUserInfoToResult();
         if(isset($this->data->state) && $oldEntity->getState() != $this->data->state){
             editor_Models_LogTask::createWithUserGuid($this->entity->getTaskGuid(), $this->data->state, $this->entity->getUserGuid());
         }
+    }
+
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::postAction()
+     */
+    public function postAction() {
+        parent::postAction();
+        $this->addUserInfoToResult();
+    }
+    
+    /**
+     * adds the extended userinfo to the resultset
+     */
+    protected function addUserInfoToResult() {
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $user->loadByGuid($this->entity->getUserGuid());
+        $this->view->rows->login = $user->getLogin();
+        $this->view->rows->firstName = $user->getFirstName();
+        $this->view->rows->surName = $user->getSurName();
     }
 }

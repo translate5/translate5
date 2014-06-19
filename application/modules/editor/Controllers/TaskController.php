@@ -81,6 +81,11 @@ class editor_TaskController extends ZfExtended_RestController {
     protected $workflow;
     
     /**
+     * @var editor_Workflow_Manager 
+     */
+    protected $workflowManager;
+    
+    /**
      * @var ZfExtended_Acl 
      */
     protected $acl;
@@ -105,9 +110,20 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->now = date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME']);
         $this->acl = ZfExtended_Acl::getInstance();
         $this->user = new Zend_Session_Namespace('user');
-        $this->workflow = ZfExtended_Factory::get('editor_Workflow_Default');
+        $this->workflowManager = ZfExtended_Factory::get('editor_Workflow_Manager');
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->upload = ZfExtended_Factory::get('editor_Models_Import_UploadProcessor');
+    }
+    
+    /**
+     * init the internal used workflow
+     * @param string $wfId workflow ID. optional, if omitted use the workflow of $this->entity
+     */
+    protected function initWorkflow($wfId = null) {
+        if(empty($wfId)) {
+            $wfId = $this->entity->getWorkflow();
+        }
+        $this->workflow = $this->workflowManager->getCached($wfId);
     }
     
     /**
@@ -162,6 +178,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $allAssocInfos = $this->getUserAssocInfos($taskGuids, $userAssocInfos);
         
         foreach ($rows as &$row) {
+            $this->initWorkflow($row['workflow']);
             //adding QM SubSegment Infos to each Task
             $row['qmSubEnabled'] = false;
             if($config->runtimeOptions->editor->enableQmSubSegments &&
@@ -261,6 +278,7 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     public function postAction() {
         $this->entity->init();
+        //FIXME woher kommt der default workflow des tasks beim import???
         //$this->decodePutData(); → not needed, data was set directly out of params because of file upload
         $this->data = $this->_getAllParams();
         settype($this->data['wordCount'], 'integer');
@@ -270,15 +288,25 @@ class editor_TaskController extends ZfExtended_RestController {
         /* @var $pm ZfExtended_Models_User */
         $pm->init((array)$this->user->data);
         $this->data['pmName'] = $pm->getUsernameLong();
+        $this->processClientReferenceVersion();
         $this->setDataInEntity();
         $this->entity->createTaskGuidIfNeeded();
+        
+        //init workflow id for the task
+        $config = Zend_Registry::get('config');
+        $defaultWorkflow = $config->runtimeOptions->import->taskWorkflow;
+        $this->entity->setWorkflow($this->workflowManager->getIdToClass($defaultWorkflow));
+        
         if($this->validate()) {
+            $this->initWorkflow();
             //$this->entity->save(); => is done by the import call!
             $this->processUploadedFile();
             $this->view->success = true;
             $this->view->rows = $this->entity->getDataObject();
             $this->workflow->doImport($this->entity);
         }
+        
+        $this->workflowManager->initDefaultUserPrefs($this->entity);
     }
 
     /**
@@ -343,8 +371,10 @@ class editor_TaskController extends ZfExtended_RestController {
         if(isset($this->data->enableSourceEditing)){
             $this->data->enableSourceEditing = (boolean)$this->data->enableSourceEditing;
         }
+        $this->processClientReferenceVersion();
         $this->setDataInEntity();
         $this->entity->validate();
+        $this->initWorkflow();
         
         $mayLoadAllTasks = $this->isAllowed('loadAllTasks');
         $tua = $this->workflow->getTaskUserAssoc($taskguid, $this->user->data->userGuid);
@@ -424,9 +454,31 @@ class editor_TaskController extends ZfExtended_RestController {
         $row['lockingUsername'] = $this->getUsername($this->getUserinfo($row['lockingUser']));
         
         $fields = ZfExtended_Factory::get('editor_Models_SegmentField');
-        
         /* @var $fields editor_Models_SegmentField */
-        $row['segmentFields'] = $fields->loadByTaskGuid($taskguid);
+        
+        $userPref = ZfExtended_Factory::get('editor_Models_Workflow_Userpref');
+        /* @var $userPref editor_Models_Workflow_Userpref */
+        
+        //we load alls fields, if we are in taskOverview and are allowed to edit all 
+        // or we have no userStep to filter / search by. 
+        // No userStep means indirectly that we do not have a TUA (pmCheck)
+        if(!$this->entity->isRegisteredInSession() && $isEditAll || empty($row['userStep'])) {
+            $row['segmentFields'] = $fields->loadByTaskGuid($taskguid);
+            //the pm sees all, so fix userprefs
+            $userPref->setAnonymousCols(false);
+            $userPref->setVisibility($userPref::VIS_HIDE);
+            $allFields = array_map(function($item) { 
+                return $item['name']; 
+            }, $row['segmentFields']);
+            $userPref->setFields(join(',', $allFields));
+        } else {
+            $wf = $this->workflow;
+            $userPref->loadByTaskUserAndStep($taskguid, $wf::WORKFLOW_ID, $this->user->data->userGuid, $row['userStep']);
+            $row['segmentFields'] = $fields->loadByUserPref($userPref);
+        }
+        $row['userPrefs'] = array($userPref->getDataObject());
+        
+        //$row['segmentFields'] = $fields->loadByCurrentUser($taskguid);
         foreach($row['segmentFields'] as $key => &$field) {
             $field['label'] = $this->translate->_($field['label']);
         } 
@@ -600,17 +652,23 @@ class editor_TaskController extends ZfExtended_RestController {
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::getAction()
-     * GET with parameter export=1 does an export
-     * accepts also parameter diff=0|1
      */
     public function getAction() {
-        $res = parent::getAction();
-        $tua = $this->workflow->getTaskUserAssoc();
-        if(!$this->isAllowed('loadAllTasks') &&
-                !$this->workflow->isReadable($tua)){
-            throw new ZfExtended_Models_Entity_NoAccessException();
-        }
-        return $res;
+        parent::getAction();
+        $taskguid = $this->entity->getTaskGuid();
+        $this->initWorkflow();
+        
+        $obj = $this->entity->getDataObject();
+        
+        $userAssocInfos = array();
+        $allAssocInfos = $this->getUserAssocInfos(array($taskguid), $userAssocInfos);
+        
+        //because we are mixing objects (getDataObject) and arrays (loadAll) as entity container we have to cast here
+        $row = (array) $obj; 
+        $this->addUserInfos($row, $taskguid, $userAssocInfos, $allAssocInfos);
+            
+        $this->view->rows = (object)$row;
+        unset($this->view->rows->qmSubsegmentFlags);
     }
     
     /**
@@ -621,10 +679,11 @@ class editor_TaskController extends ZfExtended_RestController {
         $diff = (boolean)$this->getRequest()->getParam('diff');
 
         $export = ZfExtended_Factory::get('editor_Models_Export');
+        /* @var $export editor_Models_Export */
         
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $translate ZfExtended_Zendoverwrites_Translate */;
-        /* @var $export editor_Models_Export */
+        
         if(!$export->setTaskToExport($this->entity, $diff)){
             //@todo: this should show up in JS-Frontend in a nice way
             echo $translate->_(
