@@ -139,6 +139,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       var me = this,
           workflow = me.actualTask.get('workflow'),
           steps = Ext.apply({}, me.actualTask.getWorkflowMetaData().steps),
+          steps2roles = Ext.apply({}, me.actualTask.getWorkflowMetaData().steps2roles),
           tuas = me.getAdminTaskUserAssocsStore(),
           prefs = me.getAdminTaskUserPrefsStore(),
           used = {},
@@ -160,8 +161,15 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       //calculate all combinations, without the already used ones
       Ext.Object.each(steps, function(k,v){
           var step = k;
+          if(step == 'pmCheck') {
+              //ignore pmCheck since this state can not be assigned to user directly and a PM sees all columns
+              return;
+          }
           tuas.each(function(tua){
               var guid = tua.get('userGuid');
+              if(steps2roles[step] && steps2roles[step] != tua.get('role')) {
+                  return; //show only the users with the role matching to the selected step 
+              }
               if(used[step] && Ext.Array.indexOf(used[step], guid) >= 0){
                   return; //not available since already used!
               }
