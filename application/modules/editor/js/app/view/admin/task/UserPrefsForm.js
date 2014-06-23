@@ -44,7 +44,7 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
         fieldUsername: '#UT#Benutzer',
         fieldTargets: '#UT#vorhandene Spalten',
         fieldAnonymous: '#UT#anonymisierte Zieltextspalten',
-        fieldVisibility: '#UT#Sichtbarkeit der nicht editierbaren Zielsprachen',
+        fieldVisibility: '#UT#Sichtbarkeit nicht editierbarer Zieltextspalten',
         btnSave: '#UT#Speichern',
         btnCancel: '#UT#Abbrechen',
         visShow: '#UT#Anzeigen',
