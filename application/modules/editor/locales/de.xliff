@@ -598,7 +598,6 @@
 <trans-unit id='RWludHJhZyBlcnN0ZWxsZW4='><source>Eintrag erstellen</source><target>Eintrag erstellen</target></trans-unit>
 <trans-unit id='dm9yaGFuZGVuZSBTcGFsdGVu'><source>vorhandene Spalten</source><target>vorhandene Spalten</target></trans-unit>
 <trans-unit id='YW5vbnltaXNpZXJ0ZSBaaWVsdGV4dHNwYWx0ZW4='><source>anonymisierte Zieltextspalten</source><target>anonymisierte Zieltextspalten</target></trans-unit>
-<trans-unit id='U2ljaHRiYXJrZWl0IGRlciBuaWNodCBlZGl0aWVyYmFyZW4gWmllbHNwcmFjaGVu'><source>Sichtbarkeit der nicht editierbaren Zielsprachen</source><target>Sichtbarkeit der nicht editierbaren Zielsprachen</target></trans-unit>
 <trans-unit id='QW56ZWlnZW4='><source>Anzeigen</source><target>Anzeigen</target></trans-unit>
 <trans-unit id='QXVzYmxlbmRlbg=='><source>Ausblenden</source><target>Ausblenden</target></trans-unit>
 <trans-unit id='bmljaHQgdm9yaGFuZGVu'><source>nicht vorhanden</source><target>nicht vorhanden</target></trans-unit>
@@ -619,6 +618,7 @@
 <trans-unit id='RWludHJhZyBnZXNwZWljaGVydA=='><source>Eintrag gespeichert</source><target>Eintrag gespeichert</target></trans-unit>
 <trans-unit id='RWludHJhZyBnZWzDtnNjaHQ='><source>Eintrag gelöscht</source><target>Eintrag gelöscht</target></trans-unit>
 <trans-unit id='RGllIEF1c2dhbmdzZGF0ZW4gd3VyZGVuIGluIGRlciBad2lzY2hlbnplaXQgdmVyw6RuZGVydC4gQml0dGUgYWt0dWFsaXNpZXJlbiBTaWUgSWhyZSBBbnNpY2h0IQ=='><source>Die Ausgangsdaten wurden in der Zwischenzeit verändert. Bitte aktualisieren Sie Ihre Ansicht!</source><target>Die Ausgangsdaten wurden in der Zwischenzeit verändert. Bitte aktualisieren Sie Ihre Ansicht!</target></trans-unit>
+<trans-unit id='U2ljaHRiYXJrZWl0IG5pY2h0IGVkaXRpZXJiYXJlciBaaWVsdGV4dHNwYWx0ZW4='><source>Sichtbarkeit nicht editierbarer Zieltextspalten</source><target>Sichtbarkeit nicht editierbarer Zieltextspalten</target></trans-unit>
   </body>
  </file>
 </xliff>

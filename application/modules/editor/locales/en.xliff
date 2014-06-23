@@ -861,9 +861,9 @@
         <source>Anonymisierte Zieltextspalten</source>
         <target>Anonymised target columns</target>
       </trans-unit>
-      <trans-unit id='U2ljaHRiYXJrZWl0IGRlciBuaWNodCBlZGl0aWVyYmFyZW4gWmllbHNwcmFjaGVu'>
-        <source>Sichtbarkeit der nicht editierbaren Zielsprachen</source>
-        <target>Visibility of the non editable target languages</target>
+      <trans-unit id='U2ljaHRiYXJrZWl0IG5pY2h0IGVkaXRpZXJiYXJlciBaaWVsdGV4dHNwYWx0ZW4='>
+        <source>Sichtbarkeit nicht editierbarer Zieltextspalten</source>
+        <target>Visibility of the non editable target columns</target>
       </trans-unit>
       <trans-unit id='QW56ZWlnZW4='>
         <source>Anzeigen</source>
