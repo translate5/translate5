@@ -220,7 +220,11 @@ Ext.define('Editor.controller.ViewModes', {
     me.getShortTagBtn().toggle(true);
     me.showShortTags();
     me.getHideTagBtn().disable();
-    if(calledOnInit !== true) {
+    if(calledOnInit === true) {
+        // is needed to initilize the grid filters (createFilters method) correctly:
+        me.getSegmentGrid().headerCt.getMenu(); 
+    }
+    else {
         Ext.Array.each(me.getHideColumns(), function(col){
             col.show();
         });

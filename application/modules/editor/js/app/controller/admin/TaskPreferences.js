@@ -450,11 +450,12 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           rec = emptySel ? null : selection[0];
       
       me.getDeleteBtn().setDisabled(emptySel || rec.isDefault());
+      me.getEditInfo().setVisible(emptySel);
+      form.setVisible(!emptySel);
       if(emptySel) {
+          form.getForm().reset();
           return;
       }
-      form.show();
-      me.getEditInfo().hide();
       form.down('.combobox[name="workflowStep"]').setDisabled(rec.isDefault());
       me.getUsersCombo().setDisabled(rec.isDefault());
       me.updateWorkflowSteps(rec);

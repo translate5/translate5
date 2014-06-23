@@ -145,7 +145,7 @@ Ext.define('Editor.view.segments.GridFilter', {
                 dataIndex: 'editable'
             }];
         Editor.data.task.segmentFields().each(function(rec) {
-            if(! userPref.isNonEditableColumnDisabled() && rec.isTarget()) {
+            if(!rec.isTarget() || ! userPref.isNonEditableColumnDisabled()) {
                 fields.push({dataIndex: rec.get('name'), type: 'string'});
             }
             if(rec.get('editable')) {
