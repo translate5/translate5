@@ -1,5 +1,10 @@
 ### this file holds all changes and necessary configs needed for updates
 ### newest changes on top
+2014-06-25: TRANSLATE-113: Task-Management-Window
+            - apply 036-editor-mysql-TRANSLATE-113.sql
+            - ensure that triggers can be used in Database
+            - apply 037-editor-mysql-TRANSLATE-113.sql
+
 2014-05-15: TRANSLATE-158 time tracking for each segment edit
             - apply 035-editor-mysql-TRANSLATE-158.sql
             - The integer value stored in the duration field is the used time in milliseconds

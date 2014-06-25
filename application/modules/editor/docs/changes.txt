@@ -1,3 +1,20 @@
+2014-06-25: new features:
+            TRANSLATE-113: enhanced task properties in task overview
+            TRANSLATE-191: restriction that one user can only login once (optional)
+            TRANSLATE-185: User can upload a single file (and a optional TBX for SDLXLIFF)
+            TRANSLATE-142: PHP fatal error are also get reported by mail
+            TRANSLATE-192: Check plausibility of put should produce an error in the frontend
+            TRANSLATE-183: Login page does now a redirect to the configured login target if user is already authenticated
+            TRANSLATE-143: max execution time in im- and export can now be set in app.ini
+            TRANSLATE-158: introduced a time tracking for each segment edit
+            
+            Bugfixes: 
+            TRANSLATE-180: removed a nonsense finish icon on waiting task
+            TRANSLATE-179: fixed an error on import with missing linefeed at the end of the last line in a csv
+            TRANSLATE-177: algorithm for shortend toSort-Fields is now able to handle multibyte chars
+            TRANSLATE-148: removed unused fields in language table
+            - several smaller fixes and content changes
+
 2014-03-21: new features:
             - alternates: All columns with a column header of CSV files are imported now, and displayed as editable columns
             - a horizontal navigation between the editable columns is available if there are more than one target
