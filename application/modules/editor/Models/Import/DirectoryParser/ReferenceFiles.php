@@ -53,7 +53,7 @@ class editor_Models_Import_DirectoryParser_ReferenceFiles extends editor_Models_
      * @var array
      */
     protected $_importExtensionList = array();
-    
+
     /**
      * Adds reference file specific infos to the tree node 
      * @param string $filename
@@ -61,14 +61,14 @@ class editor_Models_Import_DirectoryParser_ReferenceFiles extends editor_Models_
      */
     protected function getFileNode($filename) {
         $node = parent::getFileNode($filename);
-    	if($node->isFile) {
-    	    $node->href = $node->path.$node->filename;
-    	    $node->hrefTarget = '_blank';
-    	}
-    	unset($node->id); //@see class head comment
-    	return $node;
+        if($node->isFile) {
+            $node->href = $node->path.$node->filename;
+            $node->hrefTarget = '_blank';
+        }
+        unset($node->id); //@see class head comment
+        return $node;
     }
-    
+
     /**
      * (non-PHPdoc)
      * @see editor_Models_Import_DirectoryParser_WorkingFiles::getDirectoryNode()
@@ -76,9 +76,9 @@ class editor_Models_Import_DirectoryParser_ReferenceFiles extends editor_Models_
     protected function getDirectoryNode($directory){
         $node = parent::getDirectoryNode($directory);
         unset($node->id); //@see class head comment
-        return $node;        
+        return $node;
     }
-    
+
     /**
      * (non-PHPdoc)
      * @see editor_Models_Import_DirectoryParser_WorkingFiles::getInitialRootNode()
