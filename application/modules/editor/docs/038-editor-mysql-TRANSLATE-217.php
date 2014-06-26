@@ -88,7 +88,6 @@ if ($db->connect_error) {
     die('Connect Error (' . $db->connect_errno . ') '. $db->connect_error."\n");
 }
 $res = $db->query("select * from LEK_foldertree where referenceFileTree != ''");
-
 /**
  * remove the system dependant prefix from a single path
  * @param string $path
@@ -129,7 +128,7 @@ $stmt->bind_param('si', $tree, $id);
 /**
  * loop through the fetched foldertree entries, convert them, and save it back to the DB.
  */
-foreach($res as $row) {
+while($row = $res->fetch_assoc()) {
     $id = $row['id'];
     $refs = json_decode($row['referenceFileTree']);
     if($refs === null) {
