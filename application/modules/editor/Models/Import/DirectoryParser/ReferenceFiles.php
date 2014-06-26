@@ -85,7 +85,7 @@ class editor_Models_Import_DirectoryParser_ReferenceFiles extends editor_Models_
      */
     protected function getInitialRootNode() {
         $node = parent::getInitialRootNode();
-        $node->path = APPLICATION_RUNDIR.'/editor/referencefile';
+        $node->path = 'referencefile';
         unset($node->id); //@see class head comment
         return $node;
     }

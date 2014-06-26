@@ -1,4 +1,4 @@
-2014-06-25: new features:
+2014-06-26: new features:
             TRANSLATE-113: enhanced task properties in task overview
             TRANSLATE-191: restriction that one user can only login once (optional)
             TRANSLATE-185: User can upload a single file (and a optional TBX for SDLXLIFF)
@@ -8,7 +8,8 @@
             TRANSLATE-143: max execution time in im- and export can now be set in app.ini
             TRANSLATE-158: introduced a time tracking for each segment edit
             
-            Bugfixes: 
+            Bugfixes:
+            TRANSLATE-217: fixed an issue with the paths of reference files
             TRANSLATE-180: removed a nonsense finish icon on waiting task
             TRANSLATE-179: fixed an error on import with missing linefeed at the end of the last line in a csv
             TRANSLATE-177: algorithm for shortend toSort-Fields is now able to handle multibyte chars
