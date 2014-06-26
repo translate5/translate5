@@ -186,7 +186,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             if(!$isEditable || !empty($typeFilter) && $data->type !== $typeFilter) {
                 continue;
             }
-            
             if($data->edited !== $data->original) {
                 return true;
             }
