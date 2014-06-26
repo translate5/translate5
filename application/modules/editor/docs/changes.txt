@@ -7,6 +7,7 @@
             TRANSLATE-183: Login page does now a redirect to the configured login target if user is already authenticated
             TRANSLATE-143: max execution time in im- and export can now be set in app.ini
             TRANSLATE-158: introduced a time tracking for each segment edit
+	    TRANSLATE-219: change default MQM definitions
             
             Bugfixes:
 	    TRANSLATE-221: fixed and major issue with the unchanged autostates
