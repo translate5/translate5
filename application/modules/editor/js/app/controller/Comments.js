@@ -298,6 +298,7 @@ Ext.define('Editor.controller.Comments', {
    * @param {Editor.view.segments.RowEditor} editor 
    */
   onEditorMoved: function(toEdit, editor) {
+      var me = this;
       if(editor.columnClicked == 'comments' && me.getCommentWindow().collapsed) {
           me.getCommentWindow().expand();
       }
