@@ -624,9 +624,11 @@ class editor_Models_Import {
 
     /**
      * sets a optional taskname and options of the imported task
+     * returns the created task
      * Current Options: 
      *   enableSourceEditing => boolean
      * @param stdClass $params
+     * @return editor_Models_Task
      */
     public function createTask(stdClass $params) {
         $task = ZfExtended_Factory::get('editor_Models_Task');
@@ -654,6 +656,7 @@ class editor_Models_Import {
         $relaisId = empty($this->_relaisLang) ? 0 : $this->_relaisLang->getId();
         $task->setRelaisLang($relaisId);
         
+        $task->setWorkflow($params->workflow);
         $task->setWordCount($params->wordCount);
         $task->setTargetDeliveryDate($params->targetDeliveryDate);
         $task->setOrderdate($params->orderDate);
@@ -663,6 +666,7 @@ class editor_Models_Import {
         $task->setEnableSourceEditing(! empty($params->enableSourceEditing) && $enableSourceEditing);
         $task->validate();
         $this->setTask($task);
+        return $task;
     }
     
     /**
