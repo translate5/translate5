@@ -9,6 +9,7 @@
             TRANSLATE-158: introduced a time tracking for each segment edit
             
             Bugfixes:
+	    TRANSLATE-221: fixed and major issue with the unchanged autostates
             TRANSLATE-217: fixed an issue with the paths of reference files
             TRANSLATE-180: removed a nonsense finish icon on waiting task
             TRANSLATE-179: fixed an error on import with missing linefeed at the end of the last line in a csv
