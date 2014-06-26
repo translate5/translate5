@@ -181,9 +181,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     public function isDataModified($typeFilter = null) {
         foreach ($this->segmentdata as $data) {
-            if(!empty($typeFilter) && $data->type !== $typeFilter) {
+            $field = $this->segmentFieldManager->getByName($data->name);
+            $isEditable = $field->editable;
+            if(!$isEditable || !empty($typeFilter) && $data->type !== $typeFilter) {
                 continue;
             }
+            
             if($data->edited !== $data->original) {
                 return true;
             }
