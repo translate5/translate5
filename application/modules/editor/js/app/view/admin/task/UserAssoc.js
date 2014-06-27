@@ -158,6 +158,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
       var me = this,
           user = me.down('.combo[name="userGuid"]'),
       store = user.store;
+      store.clearFilter(true);
       if(!me.excludeLogins || me.excludeLogins.length == 0) {
           store.load();
       }
