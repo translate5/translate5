@@ -56,7 +56,7 @@ set_time_limit(0);
  */
 $argc = count($argv);
 if(empty($argv) || $argc < 5 || $argc > 7) {
-    die("please call the script with the following parameters: \n  /usr/bin/php 038-editor-mysql-TRANSLATE-217.php DBHOST DBNAME DBUSER DBPASSWD\n\n");
+    die("please call the script with the following parameters: \n  /usr/bin/php 038-editor-mysql-TRANSLATE-217.php DBHOST DBNAME DBUSER DBPASSWD [DBPORT [DBSOCKET]]\n\n");
 }
 if(!empty($argv[1])) {
     $dbhost = $argv[1];
