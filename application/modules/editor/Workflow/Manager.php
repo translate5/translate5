@@ -48,6 +48,11 @@ class editor_Workflow_Manager {
      */
     public function __construct() {
         $config = Zend_Registry::get('config');
+        if(empty($config->runtimeOptions->workflows)) {
+            //setting the default workflow if nothing is configured
+            $this->workflowList[editor_Workflow_Default::WORKFLOW_ID] = 'editor_Workflow_Default';
+            return;
+        }
         foreach($config->runtimeOptions->workflows as $wf) {
             $this->workflowList[constant($wf.'::WORKFLOW_ID')] = $wf;
         }
@@ -153,11 +158,14 @@ class editor_Workflow_Manager {
      * returns the workflow for the current "active" task, if nothing loaded take config.import.taskWorkflow as default 
      */
     public function getActive() {
-        if(empty($session->taskWorkflow)) {
-            $config = Zend_Registry::get('config');
-            return $this->get($this->getIdToClass($config->runtimeOptions->import->taskWorkflow));
+        if(!empty($session->taskWorkflow)) {
+            return $this->get($session->taskWorkflow);
         }
-        return $this->get($session->taskWorkflow);
+        $config = Zend_Registry::get('config');
+        if(empty($config->runtimeOptions->import->taskWorkflow)) {
+            return null;
+        }
+        return $this->get($this->getIdToClass($config->runtimeOptions->import->taskWorkflow));
     }
     
     /**

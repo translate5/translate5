@@ -305,10 +305,12 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             $where['taskGuid = ?'] = $taskGuid;
         }
 
-        //updates the workflow state back to open if allowed
-        $where2 = $where;
-        $where2['state in (?)'] = $workflow->getAllowedTransitionStates($workflow::STATE_OPEN);
-        $this->db->update(array('state' => $workflow::STATE_OPEN), $where2);
+        if(!empty($workflow)) {
+            //updates the workflow state back to open if allowed
+            $where2 = $where;
+            $where2['state in (?)'] = $workflow->getAllowedTransitionStates($workflow::STATE_OPEN);
+            $this->db->update(array('state' => $workflow::STATE_OPEN), $where2);
+        }
         
         //delete all pmEditAll fake entries
         $where3 = $where;
