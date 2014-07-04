@@ -157,6 +157,10 @@
     left:0;
 }
 
+/* Fix for TRANSLATE-237 recheck on ExtJS update */
+.x-tip .x-tip-body {white-space: nowrap;}
+ /* END Fix for TRANSLATE-237 recheck on ExtJS update */
+
 /*qmsummary*/
 .x-tree-panel .x-grid-row:nth-of-type(odd) .x-grid-cell {
 background-color: #EAF1FB;
@@ -332,6 +336,3 @@ tr.no-users td div {color:#ff0000;}
 .not-editable .ico-user-reset-pw {display:none;}
 
 .x-action-col-cell img{height:16px;width:16px;margin-right:2px;cursor: pointer;}
-
-/* User Task Prefs */
-.edit-info-overlay {
