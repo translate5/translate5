@@ -111,6 +111,16 @@ Ext.define('Editor.controller.Localizer', {
         'Editor.controller.admin.User',
 <?php 
     } 
+    if($hasFrontendController('Editor.controller.admin.task.UserPrefsGrid')){
+?>
+        'Editor.controller.admin.task.UserPrefsGrid',
+<?php 
+    } 
+    if($hasFrontendController('Editor.view.admin.task.Preferences')){
+?>
+        'Editor.view.admin.task.Preferences',
+<?php 
+    } 
     //END FIXME nextRelease Thomas per PHP if die Sprach Defines für den Admin Bereich (je nach Rolle) einbinden. Ein Großteil per $hasFrontendController erledigt, einige noch offen.
     ?>
 		'Editor.MessageBox'
@@ -605,8 +615,7 @@ Ext.define('Editor.controller.Localizer', {
 <?php
     } //END if $this->hasFrontendController('Editor.controller.admin.User')
     
-    //FIXME frontend rights for the following items!
-    //FIXME in require mit aufnehmen!
+    if($hasFrontendController('Editor.controller.admin.task.UserPrefsGrid')){ 
 ?>
     Editor.view.admin.task.UserPrefsGrid.prototype.strings = {
         defaultEntry: '<?php echo $this->translate->_('Standard Eintrag');?>',
@@ -639,7 +648,10 @@ Ext.define('Editor.controller.Localizer', {
         visHide: '<?php echo $this->translate->_('Ausblenden');?>',
         visDisabled: '<?php echo $this->translate->_('nicht vorhanden');?>'
     };
-    
+<?php
+    }; //END if($hasFrontendController('Editor.controller.admin.task.UserPrefsGrid')){
+    if($hasFrontendController('Editor.view.admin.task.Preferences')){ 
+?>    
     Editor.view.admin.task.Preferences.prototype.title = '<?php echo $this->translate->_('Einstellungen zur Aufgabe');?>';
     Editor.view.admin.task.Preferences.prototype.workflow_label = '<?php echo $this->translate->_('Workflow');?>';
     Editor.view.admin.task.Preferences.prototype.editInfo = '<?php echo $this->translate->_('Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!');?>';
@@ -651,6 +663,9 @@ Ext.define('Editor.controller.Localizer', {
       entrySaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>',
       forAll: '<?php echo $this->translate->_('für alle');?>'
     };
+<?php 
+    }; //if($hasFrontendController('Editor.view.admin.task.Preferences')){ 
+?>
   }
 });
 <?php
