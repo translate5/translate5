@@ -619,6 +619,16 @@
 <trans-unit id='RWludHJhZyBnZWzDtnNjaHQ='><source>Eintrag gelöscht</source><target>Eintrag gelöscht</target></trans-unit>
 <trans-unit id='RGllIEF1c2dhbmdzZGF0ZW4gd3VyZGVuIGluIGRlciBad2lzY2hlbnplaXQgdmVyw6RuZGVydC4gQml0dGUgYWt0dWFsaXNpZXJlbiBTaWUgSWhyZSBBbnNpY2h0IQ=='><source>Die Ausgangsdaten wurden in der Zwischenzeit verändert. Bitte aktualisieren Sie Ihre Ansicht!</source><target>Die Ausgangsdaten wurden in der Zwischenzeit verändert. Bitte aktualisieren Sie Ihre Ansicht!</target></trans-unit>
 <trans-unit id='U2ljaHRiYXJrZWl0IG5pY2h0IGVkaXRpZXJiYXJlciBaaWVsdGV4dHNwYWx0ZW4='><source>Sichtbarkeit nicht editierbarer Zieltextspalten</source><target>Sichtbarkeit nicht editierbarer Zieltextspalten</target></trans-unit>
+<trans-unit id='VGVybWlub2xvZ3k='><source>Terminology</source><target>Terminology</target></trans-unit>
+<trans-unit id='Q29udGVudA=='><source>Content</source><target>Content</target></trans-unit>
+<trans-unit id='U3R5bGU='><source>Style</source><target>Style</target></trans-unit>
+<trans-unit id='SW5jb25zaXN0ZW5jeQ=='><source>Inconsistency</source><target>Inconsistency</target></trans-unit>
+<trans-unit id='TWVjaGFuaWNhbA=='><source>Mechanical</source><target>Mechanical</target></trans-unit>
+<trans-unit id='TG9jYWxlIHZpb2xhdGlvbg=='><source>Locale violation</source><target>Locale violation</target></trans-unit>
+<trans-unit id='VmVyaXR5'><source>Verity</source><target>Verity</target></trans-unit>
+<trans-unit id='Q29tcGxldGVuZXNz'><source>Completeness</source><target>Completeness</target></trans-unit>
+<trans-unit id='TGVnYWwgcmVxdWlyZW1lbnRz'><source>Legal requirements</source><target>Legal requirements</target></trans-unit>
+<trans-unit id='TG9jYWxlIGFwcGxpY2FiaWxpdHk='><source>Locale applicability</source><target>Locale applicability</target></trans-unit>
   </body>
  </file>
 </xliff>
