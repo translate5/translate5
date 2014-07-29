@@ -267,13 +267,17 @@ Ext.define('Editor.controller.Comments', {
       var me = this,
           form = me.getCommentForm(),
           area = form.down('textarea');
-      if(rec.get('isEditable')){
-          me.activeComment = rec;
-          me.getCommentWindow().setComment(rec.get('comment'));
-          if(area.rendered) {
-              area.selectText();
-              area.focus(false, 500);
-          }
+      if(! rec.get('isEditable')){
+          return;
+      }
+      me.activeComment = rec;
+      me.getCommentWindow().setComment(rec.get('comment'));
+      if(me.getCommentWindow().collapsed) {
+          return; //collapsed no select / focus needed
+      }
+      if(area.rendered && area.isVisible()) {
+          area.selectText();
+          area.focus(false, 500);
       }
   },
   /**
@@ -359,7 +363,7 @@ Ext.define('Editor.controller.Comments', {
       }
       
       me.handleAddComment();
-      if(area.rendered) {
+      if(area.rendered && area.isVisible()) {
           area.selectText();
           area.focus(false, 500);
       }
