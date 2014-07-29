@@ -53,8 +53,7 @@ Ext.define('Editor.view.qmsubsegments.AddFlagFieldset', {
 		qmAddBtn: '##UT##QM Subsegment hinzufügen'
 	},
 	initComponent : function() {
-		var me = this,
-		    sevStore = Ext.StoreMgr.get('Severities');
+		var me = this;
 		Ext.applyIf(me, {
 			items : [{
 				xtype : 'button',
@@ -80,10 +79,8 @@ Ext.define('Editor.view.qmsubsegments.AddFlagFieldset', {
 				fieldLabel: me.strings.severityLabel,
 				forceSelection: true,
 				editable: false,
-				value: sevStore.getAt(0).get('id'),
 			    displayField: 'text',
-			    valueField: 'id',
-				store: sevStore
+			    valueField: 'id'
 			},{
 				xtype: 'textfield',
 				anchor: '100%',

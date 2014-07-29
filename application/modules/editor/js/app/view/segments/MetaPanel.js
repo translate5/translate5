@@ -48,7 +48,6 @@ Ext.define('Editor.view.segments.MetaPanel', {
     alias: 'widget.segments.metapanel',
     extend: 'Ext.panel.Panel',
 
-    height: 250,
     bodyPadding: 10,
     autoScroll: true,
     frameHeader: false,
@@ -61,7 +60,6 @@ Ext.define('Editor.view.segments.MetaPanel', {
     
     initComponent: function() {
       var me = this;
-      
       //Editor.data.segments.showStatus = false;
       Ext.applyIf(me, {
         items: [

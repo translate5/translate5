@@ -71,7 +71,11 @@ Ext.define('Editor.view.ViewPortEditor', {
               animCollapse: !Ext.isIE, //BugID 3
               items:[{
                   xtype: 'panel',
-                  hidden: true,
+                  listeners: {
+                      afterrender: function() {
+                          this.hide();
+                      }
+                  },
                   preventHeader: true,
                   itemId: 'metapanel',
                   layout: {type:'accordion'},

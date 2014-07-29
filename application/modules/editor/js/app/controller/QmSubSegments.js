@@ -65,6 +65,9 @@ Ext.define('Editor.controller.QmSubSegments', {
     {
 	    ref : 'segmentGrid',
 	    selector : '#segmentgrid'
+    },{
+        ref: 'metaSevCombo',
+        selector: '#metapanel combobox[name="qmsubseverity"]'
     }],
     strings: {
     	emptySelText: '##UT##Bitte wählen Sie im Editor ein Subsegment aus!',
@@ -102,11 +105,15 @@ Ext.define('Editor.controller.QmSubSegments', {
         });
     },
     handleInitEditor: function() {
-        Ext.create('Ext.data.Store', {
-            fields: ['id', 'text'],
-            storeId: 'Severities',
-            data: Editor.data.task.get('qmSubSeverities')
-        });
+        var combo = this.getMetaSevCombo(),
+            sevStore = Ext.create('Ext.data.Store', {
+                fields: ['id', 'text'],
+                storeId: 'Severities',
+                data: Editor.data.task.get('qmSubSeverities')
+            });
+        //bindStore dynamically to combo:
+        combo.bindStore(sevStore);
+        combo.setValue(sevStore.getAt(0).get('id'));
         this.menuConfig = this.getMenuConfig();
     },
     /**
