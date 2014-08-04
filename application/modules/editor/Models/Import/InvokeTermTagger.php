@@ -95,22 +95,23 @@ class editor_Models_Import_InvokeTermTagger {
         $this->metaDataImporter = $metaDataImporter;
         $this->filePaths = $filePaths;
         $this->importFolder = $importFolder;
-        $config = Zend_Registry::get('config');
+        $allConfig = Zend_Registry::get('config');
+        $config = $allConfig->runtimeOptions->termTagger;
 
-        $this->java = $config->runtimeOptions->termTagger->javaExec;
-        $this->libDir = $config->runtimeOptions->termTagger->dir.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR;
-        $this->debug = $config->runtimeOptions->termTagger->debug;
-        $this->stemmed = $config->runtimeOptions->termTagger->stemmed;
-        $this->fuzzy = ($config->runtimeOptions->termTagger->fuzzy === 'true');
-        $this->fuzzyPercent = (int)$config->runtimeOptions->termTagger->fuzzyPercent;
-        $this->lowercase = $config->runtimeOptions->termTagger->lowercase;
-        $this->maxWordLengthSearch = (int)$config->runtimeOptions->termTagger->maxWordLengthSearch;
-        $this->minFuzzyStringLength = (int)$config->runtimeOptions->termTagger->minFuzzyStringLength;
-        $this->minFuzzyStartLength = (int)$config->runtimeOptions->termTagger->minFuzzyStartLength;
-        $this->targetStringMatch = $config->runtimeOptions->termTagger->targetStringMatch->toArray();
+        $this->java = $config->javaExec;
+        $this->libDir = $config->dir.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR;
+        $this->debug = $config->debug;
+        $this->stemmed = $config->stemmed;
+        $this->fuzzy = $config->fuzzy;
+        $this->fuzzyPercent = max(0, min(100, (int) $config->fuzzyPercent));
+        $this->lowercase = $config->lowercase;
+        $this->maxWordLengthSearch = (int)$config->maxWordLengthSearch;
+        $this->minFuzzyStringLength = (int)$config->minFuzzyStringLength;
+        $this->minFuzzyStartLength = (int)$config->minFuzzyStartLength;
+        $this->targetStringMatch = $config->targetStringMatch->toArray();
         foreach($this->targetStringMatch as $k => &$v){
-			$v = strtolower($v);
-		}
+            $v = strtolower($v);
+        }
         $cp = array('.', $this->libDir.'openTMS.jar', $this->libDir.'external.jar', '');
         $this->classPath = join(PATH_SEPARATOR, $cp);
     }
@@ -148,9 +149,9 @@ class editor_Models_Import_InvokeTermTagger {
         $cmd[] = '-targetLanguage';
         $cmd[] = $targetLang;
         $cmd[] = '-debug';
-        $cmd[] = $this->debug;
+        $cmd[] = $this->debug ? 'true' : 'false';
         $cmd[] = '-stemmed';
-        $cmd[] = $this->stemmed;
+        $cmd[] = $this->stemmed ? 'true' : 'false';
         if($this->fuzzy){
             $cmd[] = '-fuzzyPercent';
             $cmd[] = $this->fuzzyPercent;
@@ -162,7 +163,7 @@ class editor_Models_Import_InvokeTermTagger {
             $cmd[] = $this->minFuzzyStartLength;
         }
         $cmd[] = '-lowercase';
-        $cmd[] = $this->lowercase;
+        $cmd[] = $this->lowercase ? 'true' : 'false';
         if(in_array($targetLang,$this->targetStringMatch)){
 			$cmd[] = '-targetStringMatch';
 			$cmd[] = 'true';
