@@ -1,5 +1,9 @@
 ### this file holds all changes and necessary configs needed for updates
 ### newest changes on top
+
+2014-08-06: TRANSLATE-123: configuration refactored
+            - execute 039-editor-mysql-TRANSLATE-123-ACL.sql
+
 2014-06-26: TRANSLATE-217: fix with reference file paths
             - run php script 038-editor-mysql-TRANSLATE-217.php in commandline, script needs DB credentials as parameters
 
