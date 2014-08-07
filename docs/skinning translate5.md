@@ -35,6 +35,14 @@ The container containing the above HTML is addressable by the following CSS:
 	
 This will not be changed for the unified skinning mechanism.
 
+### Tag Images
+Segment Tags are rendered in Translate5 as HTML or as images in edited segments. The HTML ones can be styled by using CSS, see above. For the images there are several configuration parameters. 
+See therefore the DB config category *imagetag*. This category contains all necessary configurations.
+
+#### MQM Image Tags
+For MQM tagging also image tags are used. This images can also be configured like the above Image Tags. All the values existing for imageTags can also be changed for MQM Tags. **The Image Tag settings are the default values for MQM Tags!**
+Per default some colors are different for MQM Tags, so the are listed in the DB Config category *qmimagetag*. The namespace for the mqm tag settings starts with: *runtimeOptions.imageTags.qmSubSegment.*
+
 ## Frame-pages
 
 ### CSS, image and other public files
