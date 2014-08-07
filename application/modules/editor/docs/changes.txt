@@ -1,3 +1,6 @@
+2014-08-07: new features:
+            TRANSLATE-123: configuration clean up
+
 2014-06-26: new features:
             TRANSLATE-113: enhanced task properties in task overview
             TRANSLATE-191: restriction that one user can only login once (optional)
