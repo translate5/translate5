@@ -7,6 +7,8 @@
             - have a look at /application/modules/editor/docs/install-changes.txt  and apply the TRANSLATE-123 DB changes first!
             - after that execute 005-translate5-mysql-TRANSLATE-123-ACL.sql
             - after that execute 006-translate5-mysql-TRANSLATE-123-config-updates.sql
+            - copy the installation.ini from your corresponding iniOverwrites directory to application/config/installation.ini
+              → check the contents of this file
             - after that execute the file "installation-specific.sql" from your corresponding iniOverwrites directory to your installation!
               → This file is only applied once for applying patch TRANSLATE-123!
 
