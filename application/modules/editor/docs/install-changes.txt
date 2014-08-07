@@ -2,6 +2,7 @@
 ### newest changes on top
 
 2014-08-06: TRANSLATE-123: configuration refactored
+            - look into the ROOT/docs/install-changes.txt before! 
             - execute 039-editor-mysql-TRANSLATE-123-ACL.sql
 
 2014-06-26: TRANSLATE-217: fix with reference file paths
