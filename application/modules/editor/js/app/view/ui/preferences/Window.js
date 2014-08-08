@@ -46,6 +46,7 @@ Ext.define('Editor.view.ui.preferences.Window', {
   height: 274,
   itemId: 'preferencesWindow',
   width: 460,
+  resizable: false, //needed for boxLabel width
   title: 'Einstellungen',
   modal: true,
   
@@ -78,18 +79,21 @@ Ext.define('Editor.view.ui.preferences.Window', {
                 {
                   xtype: 'radiofield',
                   name: 'alikeBehaviour',
+                  width: 426, //needed for long labels to wrap
                   boxLabel: this.item_alikeBehaviour_always_boxLabel,
                   inputValue: 'always'
                 },
                 {
                   xtype: 'radiofield',
                   name: 'alikeBehaviour',
+                  width: 426, //needed for long labels to wrap
                   boxLabel: this.item_alikeBehaviour_individual_boxLabel,
                   inputValue: 'individual'
                 },
                 {
                   xtype: 'radiofield',
                   name: 'alikeBehaviour',
+                  width: 426, //needed for long labels to wrap
                   boxLabel: this.item_alikeBehaviour_never_boxLabel,
                   inputValue: 'never'
                 }
