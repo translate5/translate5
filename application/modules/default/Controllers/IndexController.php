@@ -55,11 +55,24 @@ class IndexController extends ZfExtended_Controllers_Action {
         $this->setProjectImported();
         $this->view->languageSelector();
     }
-    public function indexAction() {}
+    //public function indexAction() {}
+    /*
     public function usageAction() {}
     public function testdataAction() {}
     public function sourceAction() {}
     public function newsletterAction() {}
+    */
+    
+    
+    public function __call($method, $args)
+    {
+        $tmp_viewName = substr_replace($method, "", -strlen("Action"));
+        $config = Zend_Registry::get('config');
+        //print_r($config->runtimeOptions); exit; // $config.runtimeOptions.content.viewTemplatesAllowed
+        $tmp_allowedViews = $config->runtimeOptions->content->viewTemplatesAllowed->toArray();
+        if (!in_array($tmp_viewName, $tmp_allowedViews)) $tmp_viewName = "";
+        $this->render($tmp_viewName);
+    }
 
     /**
      * registers the needed data for editor usage in session
