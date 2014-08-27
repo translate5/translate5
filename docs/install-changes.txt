@@ -1,6 +1,21 @@
 ### Diese Datei enthält alle für alle Updates die dazugehörigen Konfigurationserweiterungen / -änderungen, 
 ### die in /application/iniOverwrites/APPLICATION_AGENCY durchgeführt werden müssen.
 ### Neuste Updates finden sich oben.
+
+2014-08-13: TRANSLATE-130: DB Updater as a first part of the Install and Update Kit introduced.
+            - moved all DB SQL files from */docs to */database
+            - have a look at /library/ZfExtended/docs/install-changes.txt
+
+2014-08-06: TRANSLATE-123: configuration refactored
+            - have a look at /library/ZfExtended/docs/install-changes.txt and apply the TRANSLATE-123 DB changes first!
+            - have a look at /application/modules/editor/docs/install-changes.txt  and apply the TRANSLATE-123 DB changes first!
+            - after that execute 005-translate5-mysql-TRANSLATE-123-ACL.sql
+            - after that execute 006-translate5-mysql-TRANSLATE-123-config-updates.sql
+            - copy the installation.ini from your corresponding iniOverwrites directory to application/config/installation.ini
+              → check the contents of this file
+            - after that execute the file "installation-specific.sql" from your corresponding iniOverwrites directory to your installation!
+              → This file is only applied once for applying patch TRANSLATE-123!
+
 2013-11-02: have a look for changes in ZfExtended
 2013-04-10: restructuring of third-party libraries: translate5 needs the
             third-party-libs Horde_Text_Diff (for the diff of the export), 
