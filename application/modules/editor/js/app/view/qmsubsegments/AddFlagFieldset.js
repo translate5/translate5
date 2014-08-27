@@ -61,8 +61,10 @@ Ext.define('Editor.view.qmsubsegments.AddFlagFieldset', {
 				margin: '0 0 6 0',
 				menu : {
 					bodyCls: 'qmflag-menu',
-					items: me.controller.menuConfig,
 					listeners: {
+					    beforerender: function(component) {
+					        component.add(me.controller.menuConfig);
+					    },
 	                    afterrender: function(component) {
 	                    	if(component.keyNav) {
 	                    		component.keyNav.disable();
