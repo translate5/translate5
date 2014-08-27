@@ -3,7 +3,7 @@
 ## Editor
 ### CSS
 
-In the client specific editorApplication.ini file add / modify / delete the following entry:
+In the client specific editorApplication.ini file add / modify / delete the following config in the DB, category layout:
 
 	runtimeOptions.publicAdditions.css.0 = 'css/editorAdditions.css'
 
@@ -11,29 +11,34 @@ runtimeOptions.publicAdditions.css is a array, so you can add multiple css files
 
 **Hint for own skinning:** The editorAdditions.css file provided by translate5 contains the default translate5 logo and must the therefore removed from ini or overwritten by own css.
 
-Currently the referenced css file can be placed everywhere. The deployment process is responsible to put the files in the desired place. For the unified skinning mechanism described below this must be changed, and the path to the CSS file(s) would then be:
+The CSS files of an own skin has to be placed in 
 
-	runtimeOptions.publicAdditions.css.0 = 'client-specific/hereWhatEverYouWantPath.css'
+    APPLICATION_ROOT/client-specific/public
+
+This results in the following CSS config:
+
+    runtimeOptions.publicAdditions.css.0 = 'client-specific/hereWhatEverYouWantPath.css'
+
+The public directory above is already linked to the WEBROOT/client-specific directory. From there all custom styles and images can be accessed.
+
+If MittagQI is maintaining the client-specific skin, the content of client-specific is provided by the build script and
+the deployment process is responsible to put the files in the desired place. For the unified skinning mechanism described below this must be changed, and the path to the CSS file(s) would then be:
 	
 ### Logo and other image files
 
 As specified above the default logo is defined by the default delivered translate5 css.
 
-All other files should be delivered in one client specific directory, so it is possible to do any customizing possible with images and css, also the background of the header.
-
-With the unified skinning mechanism all files can then be addressed like the above CSS files.
+All other files needed by the skin should be delivered in the client-specific/public directory, so it is possible to do any customizing possible with images and css, also the background of the header.
 
 ### Additional HTML structure in the Editor Header (branding)
 
-In addition to CSS and images above, own HTML structure can be added to the Editor header. Therefore the header provides an container where HTML can be added  by the following config in editorApplication.ini:
+In addition to CSS and images above, own HTML structure can be added to the Editor header. Therefore the header provides an container where HTML can be added  by the following config in the DB, category layout:
 
 	runtimeOptions.editor.branding = 'OWN HTML'
 	
 The container containing the above HTML is addressable by the following CSS:
 
 	#head-panel .head-panel-brand
-	
-This will not be changed for the unified skinning mechanism.
 
 ### Tag Images
 Segment Tags are rendered in Translate5 as HTML or as images in edited segments. The HTML ones can be styled by using CSS, see above. For the images there are several configuration parameters. 
@@ -47,47 +52,46 @@ Per default some colors are different for MQM Tags, so the are listed in the DB 
 
 ### CSS, image and other public files
 
-The used CSS file by the default layout is defined in the following application.ini config:
+The used CSS file by the default layout is defined in the following DB config (category layout):
 
 	runtimeOptions.server.pathToCSS = '/css/translate5.css?v=2'
-	runtimeOptions.server.pathToCSSDir = '/css'
 	
 The first config “pathToCSS” defines the CSS file included by the default layout, and can therefore be customized. Another way to add more or customize the included CSS files is to provide a customized layout.
 
-The second config “pathToCSSDir” is obsolete.
+All public files like images and so on, must be placed in client-specific/public either managed manually by the client, or by MittagQI by the build and deploy process:
 
-Other public files like images and so on, can actually be copied by the deploy script to the place where they should be accessible.
-
-With the unified skinning mechanism all files can then be addressed like the above Editor CSS files in: 
-
-	public/client-specific/YourStructure/
+	APPLIACTION_ROOT/client-specific/public/YourStructure/
 	
 ### Layout
 
-The layout can be changed in the application.ini by setting:
+The place of the layout file is defined in the application.ini and can can overwritten by adding the following setting in the installation.ini:
 
-	resources.layout.layoutPath = APPLICATION_PATH "/layouts/scripts"
-	resources.layout.layout = "layout"
-	
-After the config refactoring for the install-and-update-kit this setting will come from DB config.
+	resources.layout.layoutPath = APPLICATION_PATH "/client-specific/layouts/"
 
-For customizing we have to provide a layout.phtml on a own location, and configure it above.
+For customizing a own layout.phtml has to been provided on the above location.
 
 By customizing the layout, own CSS can be supplied. For using the default layout see the above section about CSS and other public files.
 
-With the unified skinning mechanism the layout can be customized by using the following config:  all files can then be addressed like the above Editor CSS files in: 
+### Own Menu
 
-	resources.layout.layoutPath = APPLICATION_PATH "/client-specific/layouts"
-	resources.layout.layout = "layout"
+A own main menu can be provided by providing a own, edited layout.phtml as described above. 
 	
 ### View Scripts
+Own View Scripts can be provided in 
 
-View Scripts can currently not be changed / overwritten. A patch in the ViewSetup is therefore needed.
-
-With the unified skinning mechanism the view script files can the be overwritten by rebuilding the default module view script folder in:
-
-	public/client-specific/views/
+	APPLICATION_ROOT/client-specific/views/scripts
 	
+You can either overwrite existing view files, by placing identically named files in the above defined directory, or you can add completly new view scripts which is described later.
+
+### Own Pages / Own Viewscripts / Disable default Viewscripts
+If you want to provide your own pages in your skin, this is also possible in a simple manner. Each page is provided by one view script. So you can simply add own view scripts. They are callable as all other view scripts:
+
+    /VIEWSCRIPTNAME/
+    
+For security reasons and to provide the posibility to deactivate default views, all valid views has to be listed in the following DB config, category system:
+
+    runtimeOptions.content.viewTemplatesAllowed = ["index", "usage", "test", "source", "newsletter"]
+
 ## Other currently used client specific files
 
 ### Arial.ttf
@@ -104,6 +108,3 @@ With the unified skinning mechanism this file is included automatically if it ex
 ### .htaccess and .htpasswd
 
 If above apache config files are needed, this is not in the responsibility of  the install-and-update-kit, so they should be therefore completely ignored. 
-
-## todo in this document
-after implementing TRANSLATE-277 rework this document, so that only the valid documentation remains.
