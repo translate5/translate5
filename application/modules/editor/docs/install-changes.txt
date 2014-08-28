@@ -1,6 +1,13 @@
 ### this file holds all changes and necessary configs needed for updates
 ### newest changes on top
 
+2014-08-27 - Bugfixes: 
+            TRANSLATE-286: in Tab 'task properties' all text are still #UT# in my local translate5
+            TRANSLATE-289: MQM-flags are empty in new imported task (local version Marc)
+            TRANSLATE-268: text in config-window of repetition editor is not complete viewable
+            TRANSLATE-168: Rendering Bug of the comment accordion title on the right
+            TRANSLATE-276: comment-metadata-accordion in editor has a misfunction
+
 2014-08-13: TRANSLATE-130: DB Updater as a first part of the Install and Update Kit introduced.
             - moved all DB SQL files from */docs to */database
             - have a look at /library/ZfExtended/docs/install-changes.txt

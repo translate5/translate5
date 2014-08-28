@@ -111,13 +111,9 @@ Ext.define('Editor.controller.Localizer', {
         'Editor.controller.admin.User',
 <?php 
     } 
-    if($hasFrontendController('Editor.controller.admin.task.UserPrefsGrid')){
+    if($hasFrontendController('Editor.controller.admin.TaskPreferences')){
 ?>
-        'Editor.controller.admin.task.UserPrefsGrid',
-<?php 
-    } 
-    if($hasFrontendController('Editor.view.admin.task.Preferences')){
-?>
+        'Editor.view.admin.task.UserPrefsGrid',
         'Editor.view.admin.task.Preferences',
 <?php 
     } 
@@ -615,7 +611,7 @@ Ext.define('Editor.controller.Localizer', {
 <?php
     } //END if $this->hasFrontendController('Editor.controller.admin.User')
     
-    if($hasFrontendController('Editor.controller.admin.task.UserPrefsGrid')){ 
+    if($hasFrontendController('Editor.controller.admin.TaskPreferences')){
 ?>
     Editor.view.admin.task.UserPrefsGrid.prototype.strings = {
         defaultEntry: '<?php echo $this->translate->_('Standard Eintrag');?>',
@@ -648,10 +644,7 @@ Ext.define('Editor.controller.Localizer', {
         visHide: '<?php echo $this->translate->_('Ausblenden');?>',
         visDisabled: '<?php echo $this->translate->_('nicht vorhanden');?>'
     };
-<?php
-    }; //END if($hasFrontendController('Editor.controller.admin.task.UserPrefsGrid')){
-    if($hasFrontendController('Editor.view.admin.task.Preferences')){ 
-?>    
+    
     Editor.view.admin.task.Preferences.prototype.title = '<?php echo $this->translate->_('Einstellungen zur Aufgabe');?>';
     Editor.view.admin.task.Preferences.prototype.workflow_label = '<?php echo $this->translate->_('Workflow');?>';
     Editor.view.admin.task.Preferences.prototype.editInfo = '<?php echo $this->translate->_('Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!');?>';
@@ -664,7 +657,7 @@ Ext.define('Editor.controller.Localizer', {
       forAll: '<?php echo $this->translate->_('für alle');?>'
     };
 <?php 
-    }; //if($hasFrontendController('Editor.view.admin.task.Preferences')){ 
+    }; //if($hasFrontendController('Editor.controller.admin.TaskPreferences')){ 
 ?>
   }
 });
