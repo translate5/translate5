@@ -629,6 +629,50 @@
 <trans-unit id='Q29tcGxldGVuZXNz'><source>Completeness</source><target>Completeness</target></trans-unit>
 <trans-unit id='TGVnYWwgcmVxdWlyZW1lbnRz'><source>Legal requirements</source><target>Legal requirements</target></trans-unit>
 <trans-unit id='TG9jYWxlIGFwcGxpY2FiaWxpdHk='><source>Locale applicability</source><target>Locale applicability</target></trans-unit>
+<trans-unit id='IC0gbWl0IEFlbmRlcnVuZ2VuIG5hY2h2ZXJmb2xnZW4uemlw'><source> - mit Aenderungen nachverfolgen.zip</source><target> - mit Aenderungen nachverfolgen.zip</target></trans-unit>
+<trans-unit id='UGFzc3dvcnQgc2V0emVu'><source>Passwort setzen</source><target>Passwort setzen</target></trans-unit>
+<trans-unit id='JTEkcyAlMiRzLAoKU2llIGVyaGFsdGVuIGRpZXNlIEVtYWlsLCB3ZWlsIElociBLb250byBhdWYgJTMkcyBuZXUgYW5nZWxlZ3Qgb2RlciBJaHIgUGFzc3dvcnQgenVyw7xja2dlc2V0enQgd3VyZGUuIAoKSWhyIEJlbnV0emVybmFtZToKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCiU2JHMKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgpXZW5uIFNpZSBJaHIgS29udG8ga8O8bmZ0aWcgbnV0emVuIG3DtmNodGVuLCBkYW5uIGZvcmRlcm4gU2llIHVudGVyIGRlciBmb2xnZW5kZW4KQWRyZXNzZSBlaW5lIExpbmsgYW4sIHVtIElociBQYXNzd29ydCBuZXUgc2V0emVuIHp1IGvDtm5uZW4uCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KJTMkcyU0JHMKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgpWaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKSWhyIFByb2pla3RtYW5hZ2VtZW50IFRlYW0KJTUkcwoKRGllc2UgRW1haWwgd3VyZGUgYXV0b21hdGlzY2ggZ2VuZXJpZXJ0LiBCaXR0ZSBhbnR3b3J0ZW4gU2llIG5pY2h0IGF1ZiBkaWVzZSBFLU1haWwu'><source>%1$s %2$s,
+
+Sie erhalten diese Email, weil Ihr Konto auf %3$s neu angelegt oder Ihr Passwort zurückgesetzt wurde. 
+
+Ihr Benutzername:
+------------------------------
+%6$s
+------------------------------
+
+Wenn Sie Ihr Konto künftig nutzen möchten, dann fordern Sie unter der folgenden
+Adresse eine Link an, um Ihr Passwort neu setzen zu können.
+
+------------------------------
+%3$s%4$s
+------------------------------
+
+Vielen Dank und viele Grüße,
+Ihr Projektmanagement Team
+%5$s
+
+Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail.</source><target>%1$s %2$s,
+
+Sie erhalten diese Email, weil Ihr Konto auf %3$s neu angelegt oder Ihr Passwort zurückgesetzt wurde. 
+
+Ihr Benutzername:
+------------------------------
+%6$s
+------------------------------
+
+Wenn Sie Ihr Konto künftig nutzen möchten, dann fordern Sie unter der folgenden
+Adresse eine Link an, um Ihr Passwort neu setzen zu können.
+
+------------------------------
+%3$s%4$s
+------------------------------
+
+Vielen Dank und viele Grüße,
+Ihr Projektmanagement Team
+%5$s
+
+Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail.</target></trans-unit>
+<trans-unit id='U2VociBnZWVocnRlIEZyYXU='><source>Sehr geehrte Frau</source><target>Sehr geehrte Frau</target></trans-unit>
   </body>
  </file>
 </xliff>
