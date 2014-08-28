@@ -9,8 +9,8 @@
 2014-08-06: TRANSLATE-123: configuration refactored
             - have a look at /library/ZfExtended/docs/install-changes.txt and apply the TRANSLATE-123 DB changes first!
             - have a look at /application/modules/editor/docs/install-changes.txt  and apply the TRANSLATE-123 DB changes first!
-            - after that execute 005-translate5-mysql-TRANSLATE-123-ACL.sql
-            - after that execute 006-translate5-mysql-TRANSLATE-123-config-updates.sql
+            - after that execute /application/modules/default/database/005-translate5-mysql-TRANSLATE-123-ACL.sql
+            - after that execute /application/modules/database/006-translate5-mysql-TRANSLATE-123-config-updates.sql
             - copy the installation.ini from your corresponding iniOverwrites directory to application/config/installation.ini
               → check the contents of this file
             - after that execute the file "installation-specific.sql" from your corresponding iniOverwrites directory to your installation!
