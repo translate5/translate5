@@ -2,6 +2,9 @@
 ### die in /application/iniOverwrites/APPLICATION_AGENCY durchgeführt werden müssen.
 ### Neuste Updates finden sich oben.
 
+2014-08-13: TRANSLATE-277: Skinning mechanism
+            see docs/skinning translate5.md
+
 2014-08-13: TRANSLATE-130: DB Updater as a first part of the Install and Update Kit introduced.
             - moved all DB SQL files from */docs to */database
             - have a look at /library/ZfExtended/docs/install-changes.txt
