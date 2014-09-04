@@ -55,7 +55,8 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
    * - all others will be ignored
    * @var array
    */
-  protected $_importExtensionList = array('sdlxliff','csv');
+  //protected $_importExtensionList = array('sdlxliff','csv');
+  protected $_importExtensionList = array('sdlxliff','xlf','csv');
   
   /**
    * RootNode Container

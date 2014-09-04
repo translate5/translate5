@@ -44,6 +44,7 @@
 class editor_Models_Import_UploadProcessor {
     const TYPE_ZIP = 'zip';
     const TYPE_SDLXLIFF = 'sdlxliff';
+    const TYPE_XLF = 'xlf';
     const TYPE_CSV = 'csv';
     
     /**
@@ -54,6 +55,7 @@ class editor_Models_Import_UploadProcessor {
     protected $validUploadTypes = array(
         self::TYPE_ZIP => 'application/zip',
         self::TYPE_SDLXLIFF => 'application/xml',
+        self::TYPE_XLF => 'application/xml',
         self::TYPE_CSV => 'text/plain',
     );
     
@@ -104,7 +106,7 @@ class editor_Models_Import_UploadProcessor {
         $mime = $finfo->file($importFile);
         
         if(isset($this->validUploadTypes[$ext]) && $mime == $this->validUploadTypes[$ext]) {
-            return $ext; //extension is also the internal used type!
+            return $ext;
         }
         
         if(empty($importInfo['importUpload']['size'])) {
@@ -137,6 +139,13 @@ class editor_Models_Import_UploadProcessor {
                     array($importInfo['importUpload']), //proofReads
                 );
                 $args = $this->handleTbx($args);
+            break;
+            case self::TYPE_XLF:
+                $dp = 'editor_Models_Import_DataProvider_SingleUploads';
+                $args = array(
+                    array($importInfo['importUpload']), //proofReads
+                );
+                //$args = $this->handleTbx($args);
             break;
             case self::TYPE_CSV:
                 $dp = 'editor_Models_Import_DataProvider_SingleUploads';
@@ -179,7 +188,7 @@ class editor_Models_Import_UploadProcessor {
      */
     protected function addUploadError($errorType) {
         $msgs = array(
-            'noValidUploadFile' => 'Bitte eine ZIP, SDLXLIFF oder CSV Datei auswählen.',
+            'noValidUploadFile' => 'Bitte eine ZIP, SDLXLIFF, XLIFF oder CSV Datei auswählen.',
             'emptyUploadFile' => 'Die ausgewählte Datei war leer!',
         );
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
