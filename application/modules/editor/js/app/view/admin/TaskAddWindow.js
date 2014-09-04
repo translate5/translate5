@@ -123,7 +123,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                 }, langCombo),{
                     xtype: 'filefield',
                     name: 'importUpload',
-                    regex: /\.(zip|sdlxliff|csv)$/i,
+                    regex: /\.(zip|sdlxliff|xlf|csv)$/i,
                     regexText: me.strings.importUploadType,
                     allowBlank: false,
                     toolTip: me.strings.importUploadTip,
