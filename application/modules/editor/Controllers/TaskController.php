@@ -301,12 +301,13 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->initWorkflow();
             //$this->entity->save(); => is done by the import call!
             $this->processUploadedFile();
+            $this->workflow->doImport($this->entity);
+            $this->workflowManager->initDefaultUserPrefs($this->entity);
+            //reload because entityVersion was changed by above workflow and workflow manager calls
+            $this->entity->load($this->entity->getId());
             $this->view->success = true;
             $this->view->rows = $this->entity->getDataObject();
-            $this->workflow->doImport($this->entity);
         }
-        
-        $this->workflowManager->initDefaultUserPrefs($this->entity);
     }
 
     /**
