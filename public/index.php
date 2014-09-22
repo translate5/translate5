@@ -38,7 +38,7 @@
 if(file_exists('../index_prerun.php')) {
     include('../index_prerun.php');
 }
-if(date('Y-m-d') === '2014-09-08') {
+if(false && date('Y-m-d') === '2014-09-08') {
     header("HTTP/1.1 503 Service Unavailable", true, 503);
     header("Retry-After: 86400");
     require('maintenance.html');
