@@ -140,19 +140,15 @@ class editor_Models_Import_UploadProcessor {
                 );
                 $args = $this->handleTbx($args);
             break;
+            case self::TYPE_CSV:
             case self::TYPE_XLF:
                 $dp = 'editor_Models_Import_DataProvider_SingleUploads';
                 $args = array(
                     array($importInfo['importUpload']), //proofReads
                 );
-                //$args = $this->handleTbx($args);
             break;
-            case self::TYPE_CSV:
-                $dp = 'editor_Models_Import_DataProvider_SingleUploads';
-                $args = array(
-                    array($importInfo['importUpload']), //proofReads
-                );
-            break;
+            
+            
         }
         $this->dataProvider = ZfExtended_Factory::get($dp, $args);
     }

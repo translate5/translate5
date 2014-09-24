@@ -44,6 +44,13 @@
  * 
  * - Prüfung ob XLF-Datei dem Namespace der IBM-XLIFF entspricht, da evtl, andere Formate mit selber Dateiendung geladen werden können.
  *   ??? test ob folgende Zeichenkette enthalten: xmlns="urn:oasis:names:tc:xliff:document:1.1" ???
+ *   
+ *   => ??? wie Import abbrechen ???
+ *      exit; geht nicht, da ja bei einer ZIP-Verabreitung die restlichen Dateien nicht berücksichtigt werden.
+ *      return in parse() stoppt lediglich den Import der Segmente. Die Datei und damit der Task bleibt trotzdem bestehen.
+ * 
+ * - was mit in XLF-Datei enhaltenen Word-Counts machen ???
+ * 
  */
 
 /**
@@ -53,26 +60,8 @@
  */
 class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParser
 {
-    /**
-     * !!! SBE: Beschreibung stimmt so nicht. Muss nach Code-Review angepasst werden
-     * 
-     * @var array mappt alle Tag-Referenzen im Header der sdlxliff-Datei innerhalb von
-     *      <tag-defs><tag></tag></tag-defs> auf die Tags in Segmenten des sdlxliff
-     *      die auf sie verweisen. Die Referenz ist gemäß der sdlxliff-Logik
-     *      immer der firstchild von tag
-     *      wird auch zur Prüfung verwendet, ob in dem Segmenten oder im Header
-     *      Tagnamen verwendet werden, die von diesem sdlxliff-Fileparser nicht
-     *      berücksichtigt werden
-     */
+    private $ibmXliffNeedle = 'xmlns="urn:oasis:names:tc:xliff:document:1.1" xmlns:tmgr="http://www.ibm.com"';
     
-    protected $_tagDefMapping = array(
-        //'ph' => 'ph', 
-        'unicodePrivateUseArea' => 'unicodePrivateUseArea', 
-        'hardReturn' => 'hardReturn',
-        'softReturn' => 'softReturn',
-        'macReturn' => 'macReturn',
-        'space' => 'space'
-        );
     
     /**
      * Initiert Tagmapping
@@ -91,8 +80,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      * 
      * 
      */
-    private function addXlfTagMappings() {
-        
+    private function addXlfTagMappings()
+    {
         $this->_tagMapping['hardReturn']['name'] = 'ph';
         $this->_tagMapping['softReturn']['name'] = 'ph';
         $this->_tagMapping['macReturn']['name'] = 'ph';
@@ -100,42 +89,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $this->_tagMapping['ph'] = array('name' => 'DummiePH', 'text' => '&lt;DummiePH/&gt;', 'imgText' => '<DummiePH/>');
     }
     
-    /**
-     * Entfernt vom TermTagger eingefügte leerer xmlns-Attribute
-     */
-    protected function removeEmtpyXmlns() {
-        $this->_origFile = preg_replace('"(\s*)xmlns=\"\"\s*"s', '\\1', $this->_origFile);
-    }
     
-    
-    /**
-     * Das Leerzeichen (U+0020)
-     * Schützt Zeichenketten, die im sdlxliff enthalten sind und aus einer
-     * Unicode Private Use Area oder bestimmten schutzwürdigen Whitespaces oder
-     * von mssql nicht verkrafteten Zeichen stammen mit einem Tag
-     *
-     */
-    protected function protectUnicodeSpecialChars() {
-        $this->_origFileUnicodeProtected = preg_replace_callback(
-                array('"\p{Co}"u', //Alle private use chars
-            '"\x{2028}"u', //Hex UTF-8 bytes or codepoint 	E2 80 A8//schutzbedürftiger Whitespace + von mssql nicht vertragen
-            '"\x{2029}"u', //Hex UTF-8 bytes 	E2 80 A9//schutzbedürftiger Whitespace + von mssql nicht vertragen
-            '"\x{201E}"u', //Hex UTF-8 bytes 	E2 80 9E //von mssql nicht vertragen
-            '"\x{201C}"u'), //Hex UTF-8 bytes 	E2 80 9C//von mssql nicht vertragen
-                function ($match) {
-                    return '<unicodePrivateUseArea ts="' . implode(',', unpack('H*', $match[0])) . '"/>';
-                }, $this->_origFile);
-        $this->_origFileUnicodeSpecialCharsRemoved = preg_replace_callback(
-                array('"\p{Co}"u', //Alle private use chars
-            '"\x{2028}"u', //Hex UTF-8 bytes 	E2 80 A8//schutzbedürftiger Whitespace + von mssql nicht vertragen
-            '"\x{2029}"u', //Hex UTF-8 bytes 	E2 80 A9//schutzbedürftiger Whitespace + von mssql nicht vertragen
-            '"\x{201E}"u', //Hex UTF-8 bytes 	E2 80 9E //von mssql nicht vertragen
-            '"\x{201C}"u'), //Hex UTF-8 bytes 	E2 80 9C//von mssql nicht vertragen
-                function ($match) {
-                    return '';
-                }, $this->_origFile);
-    }
-
     /**
      * übernimmt das eigentliche FileParsing
      *
@@ -144,6 +98,12 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     protected function parse()
     {
         $this->_skeletonFile = $this->_origFileUnicodeProtected;
+        
+        if (strpos($this->_origFileUnicodeProtected, $this->ibmXliffNeedle) === false)
+        {
+            error_log('Die Datei ' . $this->_fileName . ' ist keine gültige IBM-Xliff Datei! ('.$this->ibmXliffNeedle.' nicht enthalten)');
+            return;
+        } 
         
         //gibt die Verschachtelungstiefe der <group>-Tags an
         $groupLevel = 0;
@@ -165,29 +125,32 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             preg_match_all($match_expression, $group, $units, PREG_SET_ORDER);
             $groupLevel = $groupLevel - substr_count($units[0][0], '</group>');
             
-            if (!empty($units))
+            if (empty($units))
             {
-                foreach($units as &$unit)
+                $groupLevel++;
+                continue;
+            }
+            
+            foreach($units as &$unit)
+            {
+                //print_r($unit); exit;
+                $translate = $translateGroupLevels[$groupLevel];
+                if (preg_match('/translate="no"/i', $unit[1]))
                 {
-                    //print_r($unit); exit;
-                    $translate = $translateGroupLevels[$groupLevel];
-                    if (preg_match('/translate="no"/i', $unit[1]))
-                    {
-                        $translate = false;
-                    }
-                    elseif (preg_match('/translate="yes"/i', $unit[1]))
-                    {
-                        $translate = true;
-                    }
-                    
-                    $groupLevel = $groupLevel - substr_count($unit[0], '</group>');
-                    if ($translate)
-                    {
-                        $counterTrans++;
-                        $this->setSegmentAttribs($unit);
-                        $tempUnitSkeleton = $this->extractSegment($unit);
-                        $this->_skeletonFile = str_replace($unit[0], $tempUnitSkeleton, $this->_skeletonFile);
-                    }
+                    $translate = false;
+                }
+                elseif (preg_match('/translate="yes"/i', $unit[1]))
+                {
+                    $translate = true;
+                }
+                
+                $groupLevel = $groupLevel - substr_count($unit[0], '</group>');
+                if ($translate)
+                {
+                    $counterTrans++;
+                    $this->setSegmentAttribs($unit);
+                    $tempUnitSkeleton = $this->extractSegment($unit);
+                    $this->_skeletonFile = str_replace($unit[0], $tempUnitSkeleton, $this->_skeletonFile);
                 }
             }
             $groupLevel++;
@@ -267,24 +230,14 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     
     
     /**
-     * Konvertiert in einem Segment (bereits ohne umschließende Tags) die Tags für ExtJs
+     * Konvertiert in einem Segment (bereits ohne umschließende Tags) die PH-Tags für ExtJs
      *
-     * - die id des <div>-Tags, der als Container-Tag für das JS zurückgeliefert wird,
-     *   wird - so gesetzt - als Speichercontainer für Inhalte verwendet, die für
-     *   diesen Tag für die Rückkonvertierung geschützt werden müssen. So z. B.
-     *   der Wert des mid-Attributs eines ein Subsegment referenzierenden mrk-Tags
-     *   Achtung: Hier dürfen aber nur Werte übergeben werden, die unkritisch sind
-     *   hinsichtlich potentieller Zerstörung im Browser - also z. B. GUIDs (die rein
-     *   alphanumerisch sind), aber keine Freitexte.
-     * - die id des innerhalb des <div>-Tags liegenden span-Tags dient als Referenz-ID
-     *   für die Rückkonvertierung und den Bezug zu den tagMappings im sdlxliff-header
      *
      * @param string $segment
-     * @param boolean isSource
      * @return string $segment enthält anstelle der Tags die vom JS benötigten Replacement-Tags
      *         wobei die id die ID des Segments in der Tabelle Segments darstellt
      */
-    protected function parseSegment($segment,$isSource)
+    protected function parseSegment($segment, $isSource)
     {
         $segment = $this->parseSegmentProtectWhitespace($segment);
         //echo "Segment: ".$segment."<br />\n";
@@ -344,28 +297,4 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         //print_r($data); // exit;
         return implode('', $data->segment);
     }
-    
-    
-    /**
-     * callback for replace method in parseSegment
-     * @param array $match
-     * @return string
-     */
-    protected function whitespaceTagReplacer(array $match) {
-        //$replacer = function($match) use ($segment, $shortTagIdent, $map) {
-        $tag = $match[0];
-        $tagName = preg_replace('"<([^/ ]*).*>"', '\\1', $tag);
-        if(!isset($this->_tagMapping[$tagName])) {
-            trigger_error('The used tag ' . $tagName .' is undefined! Segment: '.$this->_segment, E_USER_ERROR);
-        }
-        $fileNameHash = md5($this->_tagMapping[$tagName]['imgText']);
-
-        //generate the html tag for the editor
-        $p = $this->getTagParams($tag, $this->shortTagIdent++, $tagName, $fileNameHash);
-        $tag = $this->_singleTag->getHtmlTag($p);
-        $this->_singleTag->createAndSaveIfNotExists($this->_tagMapping[$tagName]['imgText'], $fileNameHash);
-        $this->_tagCount++;
-        return $tag;
-    }
-
 }
