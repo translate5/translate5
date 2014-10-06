@@ -237,14 +237,6 @@ abstract class editor_Models_Import_FileParser {
     
     
     /**
-     * Entfernt vom TermTagger eingefügte leerer xmlns-Attribute
-     */
-    protected function removeEmtpyXmlns() {
-        $this->_origFile = preg_replace('"(\s*)xmlns=\"\"\s*"s', '\\1', $this->_origFile);
-    }
-    
-    
-    /**
      * Das Leerzeichen (U+0020)
      * Schützt Zeichenketten, die im sdlxliff enthalten sind und aus einer
      * Unicode Private Use Area oder bestimmten schutzwürdigen Whitespaces oder

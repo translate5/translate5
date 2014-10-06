@@ -110,6 +110,14 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     }
 
     /**
+     * Entfernt vom TermTagger eingefügte leerer xmlns-Attribute
+     */
+    protected function removeEmtpyXmlns() {
+        $this->_origFile = preg_replace('"(\s*)xmlns=\"\"\s*"s', '\\1', $this->_origFile);
+    }
+    
+    
+    /**
      * Adds the sdlxliff specific tagmappings
      * Mapping von tagId zu Name und anzuzeigendem Text fuer den Nutzer
      *

@@ -43,7 +43,6 @@
 /* TODO: !!!
  * 
  * - Prüfung ob XLF-Datei dem Namespace der IBM-XLIFF entspricht, da evtl, andere Formate mit selber Dateiendung geladen werden können.
- *   ??? test ob folgende Zeichenkette enthalten: xmlns="urn:oasis:names:tc:xliff:document:1.1" ???
  *   
  *   => ??? wie Import abbrechen ???
  *      exit; geht nicht, da ja bei einer ZIP-Verabreitung die restlichen Dateien nicht berücksichtigt werden.
@@ -60,7 +59,7 @@
  */
 class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParser
 {
-    private $ibmXliffNeedle = 'xmlns="urn:oasis:names:tc:xliff:document:1.1" xmlns:tmgr="http://www.ibm.com"';
+    private $ibmXliffNeedle = 'xmlns:tmgr="http://www.ibm.com"';
     
     
     /**
@@ -71,7 +70,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $this->addXlfTagMappings();
         parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $sourceLang, $targetLang, $task);
         
-        $this->removeEmtpyXmlns();
         $this->protectUnicodeSpecialChars();
     }
 
