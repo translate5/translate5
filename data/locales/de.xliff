@@ -15,6 +15,45 @@
                 <source>GeneralMetatagTitleSuffix</source>
                 <target state="needs-review-adaptation">translate5</target>
             </trans-unit>
+	
+	<!-- oneword texte -->
+	<trans-unit id='b25ld29yZF9mb290ZXI='>
+		<source>oneword_footer</source>
+		<target>
+			<div class="footer-contact">
+				<h2>ONEWORD GMBH</h2>
+				<p>OTTO-LILIENTHAL-STRASSE 36 <span class="footerSeparator">.</span> 71034 BÖBLINGEN <span class="span_br" />TELEFON: +49 7031 714 9550 <span class="footerSeparator">.</span> E-MAIL: <a href="mailto:KONTAKT@ONEWORD.DE" title="Opens window for sending email" class="mail">KONTAKT@ONEWORD.DE</a> <span class="footerSeparator">.</span> WWW.ONEWORD.DE</p>
+			</div>
+			<div class="footer-navigation-wrap">
+				<ul class="footer-navigation">
+					<li><a href="http://www.oneword.de/footer-navigation/datenschutz.html" target="_blank">Datenschutz</a></li>
+					<li> . </li>
+					<li><a href="http://www.oneword.de/footer-navigation/agb.html" target="_blank">AGB</a></li>
+					<li> . </li>
+					<li><a href="http://www.oneword.de/footer-navigation/impressum.html" target="_blank">Impressum</a></li>
+				</ul>
+			</div>
+			<div class="footer-separator"></div>
+			<div class="footer-logos">
+				<ul>
+					<li><a target="_blank" href="http://www.sdl.com/" alt="SDL"><img src="http://www.oneword.de/fileadmin/templates/assets/images/sdl.png" alt="" /></a></li>
+					<li><a target="_blank" href="http://www.across.net/"><img src="http://www.oneword.de/fileadmin/templates/assets/images/acrossCertified_SP.png" alt="" /></a></li>
+					<li><a target="_blank" href="http://www.tekom.de/"><img src="http://www.oneword.de/fileadmin/templates/assets/images/tekom_Striche_kurz.png" alt="" /></a></li>
+					<li><a target="_blank" href=""><img src="http://www.oneword.de/fileadmin/templates/assets/images/SE-EN15038.png" alt="" /></a></li>
+					<li class="last"><a target="_blank" href="http://www.lics-zertifizierung.de/"><img src="http://www.oneword.de/fileadmin/templates/assets/images/logoLICS_CMYK.png" alt="" /></a></li>
+				</ul>
+			</div>
+			<div class="footer-copyright">
+				<p>
+					© 2013 ONEWORD GMBH <span class="footerSeparator">.</span>
+					ÜBERSETZUNGSAGENTUR STUTTGART BÖBLINGEN<span class="span_br" />
+					ÜBERSETZUNGSBÜRO FÜR TECHNISCHE ÜBERSETZUNGEN UND FACHÜBERSETZUNGEN <span class="footerSeparator">.</span> SOFTWARELOKALISIERUNG
+				</p>
+			</div>
+		</target>
+	</trans-unit>
+	<!-- ENDE oneword texte -->
+	
   </body>
  </file>
 </xliff>
