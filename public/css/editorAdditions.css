@@ -34,6 +34,5 @@
  */
 @CHARSET "UTF-8";
 #head-panel{
-    /*background: url(/images/logo_t5_2013.png?v=3) no-repeat left -12px #ffffff;*/
-    background: url(/client-specific/public/bilder/logo.png) no-repeat 5px 95px #ffffff;
+    background: url(/images/logo_t5_2013.png?v=3) no-repeat left -12px #ffffff;
 }
