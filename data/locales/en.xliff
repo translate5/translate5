@@ -1569,11 +1569,11 @@ E-Mail: service@MittagQI.com</pre>
 			</div>
 			<div class="footer-navigation-wrap">
 				<ul class="footer-navigation">
-					<li class="first"><a href="http://www.oneword.de/en/footer-navigation/data-protection.html">Data protection</a></li>
+					<li class="first"><a href="http://www.oneword.de/en/footer-navigation/data-protection.html" target="_blank">Data protection</a></li>
 					<li> . </li>
-					<li><a href="http://www.oneword.de/en/footer-navigation/general-terms-conditions.html">General Terms &amp; Conditions</a></li>
+					<li><a href="http://www.oneword.de/en/footer-navigation/general-terms-conditions.html" target="_blank">General Terms &amp; Conditions</a></li>
 					<li> . </li>
-					<li class="last"><a href="http://www.oneword.de/en/footer-navigation/legal-notice.html">Legal Notice</a></li>
+					<li class="last"><a href="http://www.oneword.de/en/footer-navigation/legal-notice.html" target="_blank">Legal Notice</a></li>
 				</ul>
 			</div>
 			<div class="footer-separator"></div>
@@ -1593,6 +1593,7 @@ E-Mail: service@MittagQI.com</pre>
 			</div>
 		</target>
 	</trans-unit>
+	<trans-unit id='Qml0dGUgc2VuZGVuIFNpZSBtaXIgWnVnYW5nc2RhdGVuIHp1ciBvbmV3b3JkIFJldmlldy1QbGF0dGZvcm0genU='><source>Bitte senden Sie mir Zugangsdaten zur oneword Review-Plattform zu</source><target>[EN] TOD0: Bitte senden Sie mir Zugangsdaten zur oneword Review-Plattform zu</target></trans-unit>
 	<trans-unit id='WnVnYW5nc2RhdGVuIGFuZm9yZGVybg=='><source>Zugangsdaten anfordern</source><target>Request access data</target></trans-unit>
 	<trans-unit id='U2llIGJlZmluZGVuIHNpY2ggYXVmIGRlciBMb2dpbi1TZWl0ZSBkZXIgb25ld29yZCBSZXZpZXctUGxhdHRmb3JtLCBtaXQgZGVyIFNpZSBJaHJlIMOcYmVyc2V0enVuZ2VuIGltIEJyb3dzZXIgbGVzZW4sIHByw7xmZW4gdW5kIGtvcnJpZ2llcmVuIGvDtm5uZW4u'><source>Sie befinden sich auf der Login-Seite der oneword Review-Plattform, mit der Sie Ihre Übersetzungen im Browser lesen, prüfen und korrigieren können.</source><target>You are now on the oneword Review  Platform Login page. On this platform you can use the browser to read, check and correct your translations.</target></trans-unit>
 	<trans-unit id='PGEgaHJlZj0iaHR0cDovL3d3dy5vbmV3b3JkLmRlL3VlYmVyc2V0enVuZy9vbmxpbmUtcmV2aWV3Lmh0bWwiIHRhcmdldD0iX2JsYW5rIj5XZWl0ZXJlIEluZm9ybWF0aW9uZW48L2E+'><source><a href="http://www.oneword.de/uebersetzung/online-review.html" target="_blank">Weitere Informationen</a></source><target><a href="http://www.oneword.de/uebersetzung/online-review.html" target="_blank">Additional Information</a></target></trans-unit>
