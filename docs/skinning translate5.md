@@ -3,26 +3,25 @@
 ## Editor
 ### CSS
 
-In the client specific editorApplication.ini file add / modify / delete the following config in the DB, category layout:
+In the configurations-table Zf_configuration modify the following config:
 
-	runtimeOptions.publicAdditions.css.0 = 'css/editorAdditions.css'
+	runtimeOptions.publicAdditions.css = ['css/editorAdditions.css']
 
-runtimeOptions.publicAdditions.css is a array, so you can add multiple css files.
+runtimeOptions.publicAdditions.css is a array, so you can add one or multiple css files.
 
-**Hint for own skinning:** The editorAdditions.css file provided by translate5 contains the default translate5 logo and must the therefore removed from ini or overwritten by own css.
+**Hint for own skinning:** The editorAdditions.css file provided by translate5 contains the default translate5 logo and must therefore removed or overwritten by own css.
 
 The CSS files of an own skin has to be placed in 
 
     APPLICATION_ROOT/client-specific/public
 
-This results in the following CSS config:
+This results in the following Zf_configuration setting:
 
-    runtimeOptions.publicAdditions.css.0 = 'client-specific/hereWhatEverYouWantPath.css'
+    runtimeOptions.publicAdditions.css = ['client-specific/editorAdditions.css']
 
-The public directory above is already linked to the WEBROOT/client-specific directory. From there all custom styles and images can be accessed.
+The public directory above is already linked to the WEBROOT/client-specific/public directory. From there all custom styles and images can be accessed.
 
-If MittagQI is maintaining the client-specific skin, the content of client-specific is provided by the build script and
-the deployment process is responsible to put the files in the desired place. For the unified skinning mechanism described below this must be changed, and the path to the CSS file(s) would then be:
+If MittagQI is maintaining the client-specific skin, the content of client-specific is provided by the build script and the deployment process is responsible to put the files in the desired place. For the unified skinning mechanism described below this must be changed, and the path to the CSS file(s) would then be:
 	
 ### Logo and other image files
 
@@ -39,6 +38,8 @@ In addition to CSS and images above, own HTML structure can be added to the Edit
 The container containing the above HTML is addressable by the following CSS:
 
 	#head-panel .head-panel-brand
+
+**Hint:** Code/Text in runtimeOptions.editor.branding will be send threw the translate5 translation mechanism. So ist you have defined a corresponding translation, the branding will be translatet into the actual language.
 
 ### Tag Images
 Segment Tags are rendered in Translate5 as HTML or as images in edited segments. The HTML ones can be styled by using CSS, see above. For the images there are several configuration parameters. 
@@ -79,9 +80,10 @@ A own main menu can be provided by providing a own, edited layout.phtml as descr
 ### View Scripts
 Own View Scripts can be provided in 
 
-	APPLICATION_ROOT/client-specific/views/scripts
+	APPLICATION_ROOT/client-specific/views/<modul>/scripts
 	
 You can either overwrite existing view files, by placing identically named files in the above defined directory, or you can add completly new view scripts which is described later.
+<modul> in the above path ist the name of the actual-used modul. Normaly this should be "default" for ordinary frame-pages.
 
 ### Own Pages / Own Viewscripts / Disable default Viewscripts
 If you want to provide your own pages in your skin, this is also possible in a simple manner. Each page is provided by one view script. So you can simply add own view scripts. They are callable as all other view scripts:
@@ -91,6 +93,14 @@ If you want to provide your own pages in your skin, this is also possible in a s
 For security reasons and to provide the posibility to deactivate default views, all valid views has to be listed in the following DB config, category system:
 
     runtimeOptions.content.viewTemplatesAllowed = ["index", "usage", "test", "source", "newsletter"]
+
+##Translations
+You can make client-specific translations. Therefor you should place your translation-xliff-files into
+
+    APPLICATION_ROOT/client-specific/locales
+
+Client-specific translation-files are loaded automatic after all other translation-files. So you can overwrite existing translations. Also you can define new translations which you use in your special views or layouts or even in your editor-branding as mentioned above.
+
 
 ## Other currently used client specific files
 
