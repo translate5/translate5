@@ -215,7 +215,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         }
          
         $php2js->set('app.viewport', $ed->editorViewPort);
-        $php2js->set('app.branding', (string) $ed->branding);
+        $php2js->set('app.branding', (string) $this->translate->_($ed->branding));
         $php2js->set('app.user', $userSession->data);
         
         $allRoles = $acl->getRoles();
