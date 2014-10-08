@@ -148,14 +148,9 @@ class editor_Models_Export {
      */
     protected function getFileParser(integer $fileId,string $path){
        $ext = preg_replace('".*\.([^.]*)$"i', '\\1', $path);
-       // SBE TRANSLATE-284: use same Fileparser for IBM-XLIFF as for SDL-XLIFF
-       if ($ext == "XLF")
-       {
-           $ext = "SDLXLIFF";
-       }
        
        try {
-           return ZfExtended_Factory::get('editor_Models_Export_FileParser_'.ucfirst(strtolower($ext)),array($fileId,$this->optionDiff,  $this->task));
+           return ZfExtended_Factory::get('editor_Models_Export_FileParser_'.ucfirst(strtolower($ext)), array($fileId, $this->optionDiff,  $this->task));
            
         } catch (Exception $e) { 
             throw new Zend_Exception('For the fileextension '.$ext. ' no parser is registered.',0,$e);
