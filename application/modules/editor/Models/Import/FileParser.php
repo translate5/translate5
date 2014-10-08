@@ -237,6 +237,15 @@ abstract class editor_Models_Import_FileParser {
     
     
     /**
+     * Prototyp-function for getting word-count while import process.
+     * This function is (or is not) overwritten by typ-specific import-parser 
+     */
+    public function getWordCount()
+    {
+        return false;
+    }
+    
+    /**
      * Das Leerzeichen (U+0020)
      * Schützt Zeichenketten, die im sdlxliff enthalten sind und aus einer
      * Unicode Private Use Area oder bestimmten schutzwürdigen Whitespaces oder

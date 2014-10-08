@@ -60,6 +60,7 @@
 class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParser
 {
     private $ibmXliffNeedle = 'xmlns:tmgr="http://www.ibm.com"';
+    private $wordCount = 0;
     
     
     /**
@@ -72,7 +73,18 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         
         $this->protectUnicodeSpecialChars();
     }
-
+    
+    
+    /**
+     * This function return the number of words of the source-part in the imported xlf-file
+     * 
+     * @return: (int) number of words
+     */
+    public function getWordCount()
+    {
+        return $this->wordCount;
+    }
+    
     /**
      * Adds the ibm-xlif specific tagmappings
      * 
@@ -147,6 +159,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 {
                     $counterTrans++;
                     $this->setSegmentAttribs($unit);
+                    $this->addupSegmentWordCount($unit);
                     $tempUnitSkeleton = $this->extractSegment($unit);
                     $this->_skeletonFile = str_replace($unit[0], $tempUnitSkeleton, $this->_skeletonFile);
                 }
@@ -182,8 +195,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     
     
     /**
-     * Extrahiert aus einem durch parseFile erzeugten Code-Schnipsel mit genau einer trans-unit Quell-
-     * und Zielsegmente
+     * Extrahiert aus einem durch parseFile erzeugten Code-Schnipsel mit genau einer trans-unit 
+     * Quell- und Zielsegmente
      *
      * - speichert die Segmente in der Datenbank
      * @param array $transUnit
@@ -224,6 +237,22 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         
         
         return $temp_return;
+    }
+    
+    /**
+     * Extrahiert aus einem durch parseFile erzeugten Code-Schnipsel mit genau einer trans-unit
+     * den WordCount, also die Anzahl an Wörtern welche im Tag <count> hinterlegt ist.
+     * 
+     * Diese Anzahl wird dann in der privaten Variablen $this->wordCount aufsummiert.
+     * 
+     * Beispiel: <count count-type="word count" unit="word">13</count>
+     *
+     * @param array $transUnit
+     */
+    protected function addupSegmentWordCount($transUnit)
+    {
+        $tempCount = preg_replace('/.*<count.*?>(.*)<\/count>.*/is', '${1}', $transUnit[2]);
+        $this->wordCount += $tempCount;
     }
     
     
