@@ -251,7 +251,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      */
     protected function addupSegmentWordCount($transUnit)
     {
-        $tempCount = preg_replace('/.*<count.*?>(.*)<\/count>.*/is', '${1}', $transUnit[2]);
+        $tempCount = preg_replace('/.*<count.*?count-type="word count".*?>(.*)<\/count>.*/is', '${1}', $transUnit[2]);
         $this->wordCount += $tempCount;
     }
     
