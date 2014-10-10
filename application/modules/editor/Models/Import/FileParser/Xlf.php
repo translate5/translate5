@@ -42,13 +42,9 @@
 
 /* TODO: !!!
  * 
- * - Prüfung ob XLF-Datei dem Namespace der IBM-XLIFF entspricht, da evtl, andere Formate mit selber Dateiendung geladen werden können.
- *   
- *   => ??? wie Import abbrechen ???
- *      exit; geht nicht, da ja bei einer ZIP-Verabreitung die restlichen Dateien nicht berücksichtigt werden.
- *      return in parse() stoppt lediglich den Import der Segmente. Die Datei und damit der Task bleibt trotzdem bestehen.
- * 
- * - was mit in XLF-Datei enhaltenen Word-Counts machen ???
+ * ??? wie Import abbrechen ???
+ * exit; geht nicht, da ja bei einer ZIP-Verabreitung die restlichen Dateien nicht berücksichtigt werden.
+ * return in parse() stoppt lediglich den Import der Segmente. Die Datei und damit der Task bleibt trotzdem bestehen.
  * 
  */
 
@@ -61,6 +57,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
 {
     private $ibmXliffNeedle = 'xmlns:tmgr="http://www.ibm.com"';
     private $wordCount = 0;
+    private $segmentCount = 1;
     
     
     /**
@@ -143,7 +140,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             
             foreach($units as &$unit)
             {
-                //print_r($unit); exit;
                 $translate = $translateGroupLevels[$groupLevel];
                 if (preg_match('/translate="no"/i', $unit[1]))
                 {
@@ -170,8 +166,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         if ($counterTrans === 0) {
             error_log('Die Datei ' . $this->_fileName . ' enthielt keine übersetzungsrelevanten Segmente!');
         }
-        
-        //echo "Import-Skeleton: ".$this->_skeletonFile; exit;
     }
     
     
@@ -183,13 +177,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      */
     protected function setSegmentAttribs($transunit)
     {
-        $id = preg_replace('/.*id="(.*?)".*/i', '${1}', $transunit[1]);
+        $id = $this->segmentCount++;
         $matchRate = (int) preg_replace('/.*tmgr:matchratio="(.*?)".*/i', '${1}', $transunit[1]);
-        $matchInfo = preg_replace('/.*tmgr:matchinfo="AUTOSUBST".*/i', '${1}', $transunit[1]);
-        //echo ".. ID: ".$id."<br />\n.. matchRate: ".$matchRate."<br />\n.. matchInfo: ".$matchInfo."<br />\n";
         
         $this->_matchRateSegment[$id] = $matchRate;
-        $this->_autopropagated[$id] = !(boolean) strlen($matchInfo); // false; 
+        $this->_autopropagated[$id] = false;
         $this->setMid($id);
     }
     
@@ -206,7 +198,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      */
     protected function extractSegment($transUnit)
     {
-        //print_r($transUnit[2]); exit;
         $this->segmentData = array();
         $sourceName = $this->segmentFieldManager->getFirstSourceName();
         $targetName = $this->segmentFieldManager->getFirstTargetName();
@@ -214,27 +205,20 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $temp_source = preg_replace('/.*<source.*?>(.*)<\/source>.*/is', '${1}', $transUnit[2]);
         $temp_target = preg_replace('/.*<target.*?>(.*)<\/target>.*/is', '${1}', $transUnit[2]);
         
-        //echo ("Source: ".$temp_source."<br />\n<br />\n<br />\nTarget: ".$temp_target."<br >/\n<br />\n<br />\n"); exit;
-        
         $this->segmentData[$sourceName] = array(
-                'original' => $this->parseSegment($temp_source, true),
-                'originalMd5' => md5($temp_source)
+            'original' => $this->parseSegment($temp_source, true),
+            'originalMd5' => md5($temp_source)
         );
         
         $this->segmentData[$targetName] = array(
-                'original' => $this->parseSegment($temp_target, false),
-                'originalMd5' => md5($temp_target)
+            'original' => $this->parseSegment($temp_target, false),
+            'originalMd5' => md5($temp_target)
         );
         $segmentId = $this->setAndSaveSegmentValues();
         $targetName = $this->segmentFieldManager->getFirstTargetName();
         $tempTargetPlaceholder = $this->getFieldPlaceholder($segmentId, $targetName);
-        //echo "Placeholder: ".$tempTargetPlaceholder."<br />\n";
         
         $temp_return = preg_replace('/(.*)<target(.*?)>.*<\/target>(.*)/is', '${1}<target${2}>'.$tempTargetPlaceholder.'</target>${3}', $transUnit[0]);
-        //echo "Return: ".$temp_return."<br />\n";
-        
-        //print_r($transUnit); exit;
-        
         
         return $temp_return;
     }
@@ -267,22 +251,19 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     protected function parseSegment($segment, $isSource)
     {
         $segment = $this->parseSegmentProtectWhitespace($segment);
-        //echo "Segment: ".$segment."<br />\n";
+        
         if (strpos($segment, '<')=== false) {
             return $segment;
         }
         $data = new editor_Models_Import_FileParser_Sdlxliff_ParseSegmentData();
         
-        /*$data->segment = preg_split('/(<.*?>)/is', $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);*/
         $data->segment = preg_split('/(<ph>.*?<\/ph>.*?)/is', $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
         
         $data->segmentCount = count($data->segment);
-        //$openCountInTerm = 0;
         $this->shortTagIdent = 1;
         
         foreach($data->segment as &$subsegment)
         {
-            //echo ".. Subsegment: ".$subsegment."<br />\n";
             if (strpos($subsegment, "<ph>") !== false)
             {
                 $tagName = "ph";
@@ -302,7 +283,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $this->_tagCount++;
                 
                 $subsegment = $tag;
-                //echo ".. Subsegment ersetzt: ".$subsegment."<br />\n";
             }
             else
             {
@@ -321,7 +301,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
         }
         
-        //print_r($data); // exit;
         return implode('', $data->segment);
     }
 }
