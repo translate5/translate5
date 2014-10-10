@@ -185,11 +185,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     {
         $id = preg_replace('/.*id="(.*?)".*/i', '${1}', $transunit[1]);
         $matchRate = (int) preg_replace('/.*tmgr:matchratio="(.*?)".*/i', '${1}', $transunit[1]);
-        $matchInfo = preg_replace('/.*tmgr:matchinfo="(.*?)".*/i', '${1}', $transunit[1]);
+        $matchInfo = preg_replace('/.*tmgr:matchinfo="AUTOSUBST".*/i', '${1}', $transunit[1]);
         //echo ".. ID: ".$id."<br />\n.. matchRate: ".$matchRate."<br />\n.. matchInfo: ".$matchInfo."<br />\n";
         
         $this->_matchRateSegment[$id] = $matchRate;
-        $this->_autopropagated[$id] = strpos($matchInfo, 'AUTOSUBST')!==false;
+        $this->_autopropagated[$id] = !(boolean) strlen($matchInfo); // false; 
         $this->setMid($id);
     }
     
