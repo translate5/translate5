@@ -15,7 +15,9 @@ in the same folder as this document in the document gpl3-license.txt.
 The "translate5 Editor Javascript GUI" (which can be used together with the 
 "translate5 PHP Server") uses the ExtJs 4 lib from Sencha, which is also
 licensed under the terms of the Open Source GPL 3.0 license. More about the ExtJs license
-you can read on http://www.sencha.com/license. For translate5 you are allowed to make
+you can read on http://www.sencha.com/license. 
+
+For translate5 you are allowed to make
 use of the same FLOSS exceptions to GPL3 as specified by Sencha for ExtJs. 
 
 These exceptions are:
