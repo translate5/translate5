@@ -414,15 +414,24 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             return $this->_loadByTaskGuid($taskGuid);
         }
         catch(Zend_Db_Statement_Exception $e) {
-            $m = $e->getMessage();
-            if(strpos($m,'SQLSTATE') !== 0 || strpos($m,'Base table or view not found') === false) {
-                throw $e;
-            }
+            $this->catchMissingView($e);
         }
         //fallback mechanism for not existing views. If not exists, we are trying to create it.
         $this->segmentFieldManager->initFields($taskGuid);
         $this->segmentFieldManager->getView()->create();
         return $this->_loadByTaskGuid($taskGuid);
+    }
+    
+    /**
+     * If the given exception was thrown because of a missing view do nothing.
+     * If it was another Db Exception throw it!
+     * @param Zend_Db_Statement_Exception $e
+     */
+    protected function catchMissingView(Zend_Db_Statement_Exception $e) {
+        $m = $e->getMessage();
+        if(strpos($m,'SQLSTATE') !== 0 || strpos($m,'Base table or view not found') === false) {
+            throw $e;
+        }
     }
     
     /**
@@ -709,31 +718,75 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @param string $taskGuid
      * @param integer $oldState
      * @param integer $newState
-     * @param boolean $emptyEditedOnly
+     * @param boolean $emptyEditedOnly if true only segments where all alternative targets are empty are affected
      */
     public function updateAutoState(string $taskGuid, integer $oldState, integer $newState, $emptyEditedOnly = false) {
         $sfm = $this->segmentFieldManager;
         $sfm->initFields($taskGuid);
         $db = $this->db;
-        $sql = 'UPDATE `%s` d, `%s` v set d.autoStateId = ? where d.id = v.id and v.autoStateId = ? and v.taskGuid = ?';
-        $sql = sprintf($sql, $db->info($db::NAME), $sfm->getView()->getName());
+        $segTable = $db->info($db::NAME);
+        $viewName = $sfm->getView()->getName();
+        
+        $sql_tpl = 'UPDATE `%s` set autoStateId = ? where autoStateId = ? and taskGuid = ?';
+        $sql = sprintf($sql_tpl, $segTable);
+        $sql_view = sprintf($sql_tpl, $viewName);
+        
         $bind = array($newState, $oldState, $taskGuid);
         
         if(!$emptyEditedOnly) {
+            //updates the view (if existing)
+            $this->queryWithExistingView($sql_view, $bind);
+            //updates LEK_segments directly
             $this->db->getAdapter()->query($sql, $bind);
             return;
         }
+        
         $sfm->initFields($taskGuid);
         $fields = $sfm->getFieldList();
+        $affectedFieldNames = array();
         foreach($fields as $field) {
             if($field->type == editor_Models_SegmentField::TYPE_TARGET && $field->editable) {
-                $sql .= ' and '.$sfm->getEditIndex($field->name).' = ?';
-                $bind[] = '';
+                $sql_view .= ' and '.$sfm->getEditIndex($field->name)." = ''";
+                $affectedFieldNames[] = $field->name;
             }
         }
+        //updates the view (if existing)
+        $this->queryWithExistingView($sql_view, $bind);
+        
+        //updates LEK_segments directly, but only where all above requested fields are empty
+        $bind = array($taskGuid, $newState, $oldState, $taskGuid);
+        $sql  = 'UPDATE `%s` segment, %s subquery set segment.autoStateId = ? where segment.autoStateId = ? and segment.taskGuid = ? ';
+        $sql .= 'and subquery.segmentId = segment.id and subquery.cnt = %s';
+        
+        //subQuery to get the count of empty fields, fields as requested above
+        //if empty field count equals the the count of requested fiels,
+        //that means all fields are empty and the corresponding segment has to be changed. 
+        $subQuery  = '(select segmentId, count(*) cnt from LEK_segment_data where taskGuid = ? and ';
+        $subQuery .= "edited = '' and name in ('".join("','", $affectedFieldNames)."') group by segmentId)";
+        
+        $sql = sprintf($sql, $segTable, $subQuery, count($affectedFieldNames));
         $this->db->getAdapter()->query($sql, $bind);
     }
-
+    
+    /**
+     * shortcut to db->query catching errors complaining missing segment view
+     * returns true if query was successfull, returns false if view was missing
+     * @param string $sql
+     * @param array $bind
+     * @return boolean
+     */
+    protected function queryWithExistingView($sql, array $bind){
+        try {
+            $this->db->getAdapter()->query($sql, $bind);
+            return true;
+        }
+        catch(Zend_Db_Statement_Exception $e) {
+            $this->catchMissingView($e);
+        }
+        return false;
+    }
+    
+    
     /**
      * includes the fluent segment data
      * (non-PHPdoc)
