@@ -269,7 +269,7 @@ class editor_Models_Converter_XmlSegmentList {
         else {
             $this->result[] = '<alt-trans dx:origin-shorttext="'.$field->label.'">';
         }
-        $target = $this->prepareText($this->sfm->getEditIndex($field->name));
+        $target = $this->prepareText($segment[$this->sfm->getEditIndex($field->name)]);
         $this->result[] = '<target xml:lang="'.$this->data['targetLang'].'">'.$target.'</target></alt-trans>';
     }
     
