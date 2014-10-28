@@ -69,7 +69,6 @@ class IndexController extends ZfExtended_Controllers_Action {
         $tmp_viewName = substr_replace($method, "", -strlen("Action"));
         $config = Zend_Registry::get('config');
         $allowed = $config->runtimeOptions->content->viewTemplatesAllowed;
-        //print_r($config->runtimeOptions); exit; // $config.runtimeOptions.content.viewTemplatesAllowed
         if(empty($allowed)) {
             return;
         }
