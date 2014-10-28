@@ -181,6 +181,9 @@ Diese Email wurde automatisch generiert. Please do not reply to this email.</tar
 <trans-unit id='TmV1IHNldHplbg=='><source>Neu setzen</source><target>Neu setzen</target></trans-unit>
 <trans-unit id='SWhyIFBhc3N3b3J0IHd1cmRlIG5ldSBnZXNldHp0LiBTaWUga8O2bm5lbiBzaWNoIG51biBlaW5sb2dnZW4u'><source>Ihr Passwort wurde neu gesetzt. Sie können sich nun einloggen.</source><target>Ihr Passwort wurde neu gesetzt. Sie können sich nun einloggen.</target></trans-unit>
 <trans-unit id='Qml0dGUgc2VuZGVuIFNpZSBtaXIgWnVnYW5nc2RhdGVuIHp1ciBvbmV3b3JkIFJldmlldy1QbGF0dGZvcm0genU='><source>Bitte senden Sie mir Zugangsdaten zur oneword Review-Plattform zu</source><target>Bitte senden Sie mir Zugangsdaten zur oneword Review-Plattform zu</target></trans-unit>
+<trans-unit id='U2VpdGUgbmljaHQgZ2VmdW5kZW4h'><source>Seite nicht gefunden!</source><target>Seite nicht gefunden!</target></trans-unit>
+<trans-unit id='U2VpdGUgbmljaHQgZ2VmdW5kZW46IA=='><source>Seite nicht gefunden: </source><target>Seite nicht gefunden: </target></trans-unit>
+<trans-unit id='LyBBdWZydWYgZXJmb2xndGUgZHVyY2ggSVA6IA=='><source>/ Aufruf erfolgte durch IP: </source><target>/ Aufruf erfolgte durch IP: </target></trans-unit>
   </body>
  </file>
 </xliff>
