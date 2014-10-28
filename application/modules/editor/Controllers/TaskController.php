@@ -104,6 +104,11 @@ class editor_TaskController extends ZfExtended_RestController {
      * @var editor_Models_Import_UploadProcessor
      */
     protected $upload;
+    
+    /**
+     * @var Zend_Config
+     */
+    protected $config;
 
     public function init() {
         parent::init();
@@ -113,6 +118,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->workflowManager = ZfExtended_Factory::get('editor_Workflow_Manager');
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->upload = ZfExtended_Factory::get('editor_Models_Import_UploadProcessor');
+        $this->config = Zend_Registry::get('config');
     }
     
     /**
@@ -168,7 +174,6 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->totalCount = $this->entity->getTotalCountByUserAssoc($this->user->data->userGuid, $isAllowedToLoadAll);
             $rows = $this->entity->loadListByUserAssoc($this->user->data->userGuid, $isAllowedToLoadAll);
         }
-        $config = Zend_Registry::get('config');
         
         $taskGuids = array_map(function($item){
             return $item['taskGuid'];
@@ -181,7 +186,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->initWorkflow($row['workflow']);
             //adding QM SubSegment Infos to each Task
             $row['qmSubEnabled'] = false;
-            if($config->runtimeOptions->editor->enableQmSubSegments &&
+            if($this->config->runtimeOptions->editor->enableQmSubSegments &&
                     !empty($row['qmSubsegmentFlags'])) { 
                 $row['qmSubEnabled'] = true;
             }
@@ -293,8 +298,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity->createTaskGuidIfNeeded();
         
         //init workflow id for the task
-        $config = Zend_Registry::get('config');
-        $defaultWorkflow = $config->runtimeOptions->import->taskWorkflow;
+        $defaultWorkflow = $this->config->runtimeOptions->import->taskWorkflow;
         $this->entity->setWorkflow($this->workflowManager->getIdToClass($defaultWorkflow));
         
         if($this->validate()) {
@@ -481,6 +485,11 @@ class editor_TaskController extends ZfExtended_RestController {
         
         //$row['segmentFields'] = $fields->loadByCurrentUser($taskguid);
         foreach($row['segmentFields'] as $key => &$field) {
+            //TRANSLATE-318: replacing of a subpart of the column name is a client specific feature
+            $needle = $this->config->runtimeOptions->segments->fieldMetaIdentifier;
+            if(!empty($needle)) {
+                $field['label'] = str_replace($needle, '', $field['label']);
+            }
             $field['label'] = $this->translate->_($field['label']);
         } 
         if(empty($this->segmentFieldManager)) {
@@ -631,10 +640,9 @@ class editor_TaskController extends ZfExtended_RestController {
      * Not usable for indexAction, must be called after entity->save and this->view->rows = Data
      */
     protected function addQmSubToResult() {
-        $config = Zend_Registry::get('config');
         $qmSubFlags = $this->entity->getQmSubsegmentFlags();
         $this->view->rows->qmSubEnabled = false;
-        if($config->runtimeOptions->editor->enableQmSubSegments &&
+        if($this->config->runtimeOptions->editor->enableQmSubSegments &&
                 !empty($qmSubFlags)) { 
             $this->view->rows->qmSubFlags = $this->entity->getQmSubsegmentIssuesTranslated(false);
             $this->view->rows->qmSubSeverities = $this->entity->getQmSubsegmentSeveritiesTranslated(false);
