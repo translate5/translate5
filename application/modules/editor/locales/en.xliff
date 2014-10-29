@@ -945,6 +945,110 @@
         <source>Die Ausgangsdaten wurden in der Zwischenzeit verändert. Bitte aktualisieren Sie Ihre Ansicht!</source>
         <target>The displayed data was changed in the meantime on the server. Please refresh your view!</target>
       </trans-unit>
+      <trans-unit id='c2VsYnN0IGluIEFyYmVpdA=='>
+        <source>selbst in Arbeit</source>
+	<target>in work by myself</target>
+      </trans-unit>
+      <trans-unit id='c2VsYnN0IGdlw7ZmZm5ldA=='>
+        <source>selbst geöffnet</source>
+	<target>opened by myself</target>
+      </trans-unit>
+      <trans-unit id='RWluIEJlbnV0emVyIGtvbm50ZSBuaWNodCBhdXMgZGVyIEF1ZmdhYmUgZW50ZmVybnQgd2VyZGVuLCBkYSBlciBkaWUgQXVmZ2FiZSBha3R1ZWxsIGJlbnV0enQu'>
+	  <source>Ein Benutzer konnte nicht aus der Aufgabe entfernt werden, da er die Aufgabe aktuell benutzt.</source>
+	  <target>A user could not be removed from the task, because he is actually using the task.</target>
+      </trans-unit>
+      <trans-unit id='U2VnbWVudGxpc3RlIHVuZCBFZGl0b3IgLSBbTEVTRU1PRFVTXQ=='>
+	<source>Segmentliste und Editor - [LESEMODUS]</source>
+	<target>Segment list and editor - [READ-ONLY]</target>
+      </trans-unit>
+      <trans-unit id='ezB9OiBlZGl0aWVyYmFy'>
+	<source>{0}: editierbar</source>
+	<target>{0}: editable</target>
+      </trans-unit>
+      <trans-unit id='SW4gRmVsZDogezB9'>
+	<source>In Feld: {0}</source>
+	<target>In field: {0}</target>
+      </trans-unit>
+      <trans-unit id='Vm9yaGVyaWdlIFNwYWx0ZSBlZGl0aWVyZW4='>
+	<source>Vorherige Spalte editieren</source>
+	<target>edit previous column</target>
+      </trans-unit>
+      <trans-unit id='TsOkY2hzdGUgU3BhbHRlIGVkaXRpZXJlbg=='>
+	<source>Nächste Spalte editieren</source>
+	<target>edit next column</target>
+      </trans-unit>
+      <trans-unit id='RGFzIFNlZ21lbnQga2FubiBuaWNodCBvaG5lIEluaGFsdCBnZXNwZWljaGVydCB3ZXJkZW4h'>
+	<source>Das Segment kann nicht ohne Inhalt gespeichert werden!</source>
+	<target>The segment could not be saved without content!</target>
+      </trans-unit>
+      <trans-unit id='RGFzIFByb2pla3QgZW50aMOkbHQgYWx0ZXJuYXRpdmUgw5xiZXJzZXR6dW5nZW4uIERlciBXaWVkZXJob2x1bmdzZWRpdG9yIHd1cmRlIGRhaGVyIGRlYWt0aXZpZXJ0Lg=='>
+	<source>Das Projekt enthält alternative Übersetzungen. Der Wiederholungseditor wurde daher deaktiviert.</source>
+	<target>The task contains alternate translations. The repetition editor was deactivated therefore.</target>
+      </trans-unit>
+      <trans-unit id='S29tbWVudGFyZSB6dW0gYWt0dWVsbGVuIFNlZ21lbnQ='>
+	<source>Kommentare zum aktuellen Segment</source>
+	<target>Comments to the actual segment</target>
+      </trans-unit>
+      <trans-unit id='S29tbWVudGFyIG5ldQ=='>
+	<source>Kommentar neu</source>
+	<target>new comment</target>
+      </trans-unit>
+      <trans-unit id='S29tbWVudGFyIGJlYXJiZWl0ZW4='>
+	<source>Kommentar bearbeiten</source>
+	<target>edit comment</target>
+      </trans-unit>
+      <trans-unit id='QXVmZ2FiZSB3aXJkIGltIEVkaXRvciBnZcO2ZmZuZXQuLi4='>
+	<source>Aufgabe wird im Editor geöffnet...</source>
+	<target>Opening task...</target>
+      </trans-unit>
+      <trans-unit id='QXVmZ2FiZSB3aXJkIGFiZ2VzY2hsb3NzZW4uLi4='>
+	<source>Aufgabe wird abgeschlossen...</source>
+	<target>Finishing task...</target>
+      </trans-unit>
+      <trans-unit id='QXVmZ2FiZSB3aXJkIHdpZWRlciBlcsO2ZmZuZXQuLi4='>
+	<source>Aufgabe wird wieder eröffnet...</source>
+	<target>Reopening task...</target>
+      </trans-unit>
+      <trans-unit id='QXVmZ2FiZSB3aXJkIGJlZW5kZXQuLi4='>
+	<source>Aufgabe wird beendet...</source>
+	<target>Ending task...</target>
+      </trans-unit>
+      <trans-unit id='QXVmZ2FiZSB3aXJkIGdlbMO2c2NodC4uLg=='>
+	<source>Aufgabe wird gelöscht...</source>
+	<target>Deleting task...</target>
+      </trans-unit>
+      <trans-unit id='QXVmZ2FiZSB3aXJkIG5vY2ggdmVyd2VuZGV0IHVuZCBrYW5uIGRhaGVyIG5pY2h0IGdlbMO2c2NodCB3ZXJkZW4h'>
+	<source>Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!</source>
+	<target>Task is being used and cannot be deleted therefore!</target>
+      </trans-unit>
+      <trans-unit id='RXhwb3J0b3B0aW9uZW4='>
+	<source>Exportoptionen</source>
+	<target>export options</target>
+      </trans-unit>
+      <trans-unit id='RXhwb3J0IFFNLVN0YXRpc3RpayAoWE1MKSBmw7xyIEZlbGQ6IHswfQ=='>
+	<source>Export QM-Statistik (XML) für Feld: {0}</source>
+	<target>Export QM-statistics (XML) for field: {0}</target>
+      </trans-unit>
+      <trans-unit id='QXVmZ2FiZSB3aXJkIHZlcmxhc3Nlbi4uLg=='>
+	<source>Aufgabe wird verlassen...</source>
+	<target>Leaving task...</target>
+      </trans-unit>
+      <trans-unit id='QXVmZ2FiZSB3aXJkIGFiZ2VzY2hsb3NzZW4gdW5kIHZlcmxhc3Nlbi4uLg=='>
+	<source>Aufgabe wird abgeschlossen und verlassen...</source>
+	<target>Leaving and finishing task...</target>
+      </trans-unit>
+      <trans-unit id='QXVmZ2FiZSB3aXJkIGJlZW5kZXQgdW5kIHZlcmxhc3Nlbi4uLg=='>
+	<source>Aufgabe wird beendet und verlassen...</source>
+	<target>Leaving and ending task...</target>
+      </trans-unit>
+      <trans-unit id='IC0gW0xFU0VNT0RVU10='>
+	<source> - [LESEMODUS]</source>
+	<target> - [READ-ONLY]</target>
+      </trans-unit>
+      <trans-unit id='UGFzc3dvcnQgZXJmb2xncmVpY2ggZ2VzcGVpY2hlcnQh'>
+	<source>Passwort erfolgreich gespeichert!</source>
+	<target>Password saved successfully!</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
