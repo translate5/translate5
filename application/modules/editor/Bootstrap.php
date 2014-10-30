@@ -131,16 +131,4 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ));
         $this->front->getRouter()->addRoute('localizedJs', $localizedJsRoute);
     }
-    
-    public function _initPlugins()
-    {
-        $config = Zend_Registry::get('config');
-        $pluginClasses = $config->runtimeOptions->plugins->active->toArray();
-        foreach ($pluginClasses as $pluginClass)
-        {
-            //error_log("Plugin-Class ".$pluginClass." initialized.");
-            ZfExtended_Factory::get($pluginClass);
-        }
-    }
-
 }
