@@ -37,12 +37,13 @@
 /**
  * Initial Class of Plugin "TermTagger"
  */
-class editor_TermTagger_PluginBootstrap {
+class editor_TermTagger_PluginBootstrap
+{
     
     /**
-     * Zend_EventManager
+     * @var Zend_EventManager_StaticEventManager
      */
-    protected $events = false;
+    protected $staticEvents = false;
     
     
     public function __construct()
@@ -53,39 +54,59 @@ class editor_TermTagger_PluginBootstrap {
             error_log("Plugin TermTagger initialized but no Zf_configuration termTagger.url.default is defined.");
             return false;
         }
-        
-        $this->events = Zend_EventManager_StaticEventManager::getInstance();
-        $this->events->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndex'));
-        $this->events->attach('editor_Models_Segment', 'beforeSave', array($this, 'handleBeforeSegmentSave'));
-        //$this->events->attach('???', 'afterTaskOpen', array($this, 'handleAfterTaskOpen'));
-        
-        //error_log("Plugin TermTagger initialized.");
+        // event-listeners
+        $this->staticEvents = Zend_EventManager_StaticEventManager::getInstance();
+        $this->staticEvents->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndex'));
+        $this->staticEvents->attach('editor_Workflow_Default', array('doView', 'doEdit'), array($this, 'handleAfterTaskOpen'));
+        $this->staticEvents->attach('editor_Models_Segment', 'beforeSave', array($this, 'handleBeforeSegmentSave'));
+        // end of event-listeners
+    }
+
+
+    /**
+     * handler for event: Editor_IndexController#afterIndexAction
+     */
+    public function handleAfterIndex(Zend_EventManager_Event $event)
+    {
+        error_log('function called: ' . get_class($this) . '->' . __FUNCTION__);
     }
     
     /**
-     * handler for event: Editor_IndexController#afterIndexAction
-     * must be public for useing as callback-function in class-constructor event-binder
+     * handler for event(s): editor_Workflow_Default#[doView, doEdit]
+     * 
+     * Writes runtimeOptions.termTagger.segmentsPerCall for use in ExtJS
+     * into JsVar Editor.data.plugins.termTagger.segmentsPerCall
+     * 
+     * @param $event Zend_EventManager_Event
      */
-    public function handleAfterIndex() // 
+    public function handleAfterTaskOpen(Zend_EventManager_Event $event)
     {
-        error_log("function called: ".get_class($this)."->".__FUNCTION__);
-    } 
+        $params = $event->getParams();
+        $view = $params[0];
+        
+        $config = Zend_Registry::get('config');
+        $termTaggerSegmentsPerCall = $config->runtimeOptions->termTagger->segmentsPerCall;
+        
+        $view->Php2JsVars()->set('plugins.termTagger.segmentsPerCall', $termTaggerSegmentsPerCall);
+    }
+    
     
     /**
-     * handler for event: Editor_Models_Segment#beforeSave
-     * must be public for useing as callback-function in class-constructor event-binder
+     * handler for event: editor_Models_Segment#beforeSave
+     * 
+     * Re-TermTagg the (modified) segment-text.
      */
-    public function handleBeforeSegmentSave() // 
+    public function handleBeforeSegmentSave(Zend_EventManager_Event $event)
     {
-        error_log("function called: ".get_class($this)."->".__FUNCTION__);
-    } 
-    
-    /**
-     * handler for event: ??#??
-     * must be public for useing as callback-function in class-constructor event-binder
-     */
-    public function handleAfterTaskOpen() // 
-    {
-        error_log("function called: ".get_class($this)."->".__FUNCTION__);
-    } 
+        $segment = $event->getParam('model');
+        /* @var $segment editor_Models_Segment */
+        
+        // TODO: how to detect changes/modification in segment-text?? $segment->isModified(); is not the correct result.
+        // TODO: only if change/modification is detected, call Worker_TermTagger->run()
+        
+        $worker = ZfExtended_Factory::get('editor_Worker_TermTagger');
+        /* @var $worker editor_Worker_TermTagger */
+        $worker->run();
+        
+    }
 }

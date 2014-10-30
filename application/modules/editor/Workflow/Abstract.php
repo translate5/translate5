@@ -213,9 +213,16 @@ abstract class editor_Workflow_Abstract {
         self::STEP_LECTORING=>self::ROLE_LECTOR,
         self::STEP_TRANSLATORCHECK=>self::ROLE_TRANSLATOR
     );
-
+    
+    /**
+     * @var ZfExtended_EventManager
+     */
+    protected $events = false;
+    
+    
     public function __construct() {
         $this->loadAuthenticatedUser();
+        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
     }
     
     /**
@@ -596,16 +603,19 @@ abstract class editor_Workflow_Abstract {
         $oldState = $oldTask->getState();
 
         if($newState == $oldState) {
+            $this->events->trigger("doNothing", $this);
             return; //saved some other attributes, do nothing
         }
         switch($newState) {
             case $newTask::STATE_OPEN:
                 if($oldState == $newTask::STATE_END) {
                     $this->doReopen();
+                    $this->events->trigger("doReopen", $this);
                 }
                 break;
-            case $newTask::STATE_END: 
+            case $newTask::STATE_END:
                 $this->doEnd();
+                $this->events->trigger("doEnd", $this);
                 break;
         }
     }
@@ -627,17 +637,27 @@ abstract class editor_Workflow_Abstract {
         
         if($oldState == self::STATE_FINISH && $newState != self::STATE_FINISH) {
             $this->doUnfinish();
+            $this->events->trigger("doUnfinish", $this);
         }
         
         switch($newState) {
             case $this::STATE_OPEN:
                 $this->doOpen();
+                $this->events->trigger("doOpen", $this);
                 break;
-            case self::STATE_FINISH: 
+            case $this::STATE_VIEW:
+                $this->events->trigger("doView", $this);
+                break;
+            case $this::STATE_EDIT:
+                $this->events->trigger("doEdit", $this);
+                break;
+            case self::STATE_FINISH:
                 $this->doFinish();
+                $this->events->trigger("doFinish", $this);
                 break;
-            case self::STATE_WAITING: 
+            case self::STATE_WAITING:
                 $this->doWait();
+                $this->events->trigger("doWait", $this);
                 break;
         }
     }
