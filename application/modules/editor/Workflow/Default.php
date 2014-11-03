@@ -137,6 +137,7 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      * @see editor_Workflow_Abstract::handleReopen()
      */
     protected function handleReopen(){
+        $this->newTask->createMaterializedView();
         $this->doDebug(__FUNCTION__);
     }
     
