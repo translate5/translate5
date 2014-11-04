@@ -83,8 +83,13 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
         $data = $parser->getFieldContents();
         $target = $this->sfm->getFirstTargetName();
         
-        $this->segment->addFieldContent($this->relaisField, $this->fileId, $parser->getMid(), $data[$target]);
-        
+        try {
+            $this->segment->addFieldContent($this->relaisField, $this->fileId, $parser->getMid(), $data[$target]);
+        }
+        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            $msg = 'Errors in adding relais segment: Original Segment not Found! Segment Info:'.$e->getMessage();
+            trigger_error($msg, E_USER_ERROR);
+        }
         return false;
     }
 }

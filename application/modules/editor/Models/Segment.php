@@ -286,19 +286,21 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @param integer $fileId
      * @param string $mid
      * @param array $data
+     * @throws ZfExtended_Models_Entity_NotFoundException if the segment where the content should be added could not be found
      */
     public function addFieldContent(Zend_Db_Table_Row_Abstract $field, $fileId, $mid, array $data) {
         $db = ZfExtended_Factory::get('editor_Models_Db_SegmentData');
         /* @var $db editor_Models_Db_SegmentData */
 
+        $taskGuid = $this->getTaskGuid();
         $segmentId = new Zend_Db_Expr('('.$this->db->select()
                             ->from($this->db->info($db::NAME), array('id'))
-                            ->where('taskGuid = ?', $this->getTaskGuid())
+                            ->where('taskGuid = ?', $taskGuid)
                             ->where('fileId = ?', $fileId)
                             ->where('mid = ?', $mid).')');
         
         $data = array(
-            'taskGuid' => $this->getTaskGuid(),
+            'taskGuid' => $taskGuid,
             'name' => $field->name,
             'segmentId' => $segmentId,
             'mid' => $mid,
@@ -311,7 +313,15 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             $data['editedToSort'] = $this->truncateSegmentsToSort($data['original']);
         }
         
-        $db->insert($data);
+        try {
+            $db->insert($data);
+        }
+        catch(Zend_Db_Statement_Exception $e) {
+            if(strpos($e->getMessage(), "Column 'segmentId' cannot be null") !== false) {
+                $msg = 'Segment with fileId %s and MID %s in task %s not found!';
+                throw new ZfExtended_Models_Entity_NotFoundException(sprintf($msg, $fileId, $mid, $taskGuid));
+            }
+        }
     }
     
     /**
