@@ -742,12 +742,14 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $sql_view = sprintf($sql_tpl, $viewName);
         
         $bind = array($newState, $oldState, $taskGuid);
+        $db->getAdapter()->beginTransaction();
         
         if(!$emptyEditedOnly) {
             //updates the view (if existing)
             $this->queryWithExistingView($sql_view, $bind);
             //updates LEK_segments directly
-            $this->db->getAdapter()->query($sql, $bind);
+            $db->getAdapter()->query($sql, $bind);
+            $db->getAdapter()->commit();
             return;
         }
         
@@ -775,7 +777,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $subQuery .= "edited = '' and name in ('".join("','", $affectedFieldNames)."') group by segmentId)";
         
         $sql = sprintf($sql, $segTable, $subQuery, count($affectedFieldNames));
-        $this->db->getAdapter()->query($sql, $bind);
+        $db->getAdapter()->query($sql, $bind);
+        $db->getAdapter()->commit();
     }
     
     /**

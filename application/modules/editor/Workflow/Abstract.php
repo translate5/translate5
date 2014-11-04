@@ -594,6 +594,7 @@ abstract class editor_Workflow_Abstract {
         $this->newTask = $newTask;
         $newState = $newTask->getState();
         $oldState = $oldTask->getState();
+        //a segment mv creation is currently not needed, since doEnd deletes it, and doReopen creates it implicitly!
 
         if($newState == $oldState) {
             return; //saved some other attributes, do nothing
@@ -618,6 +619,17 @@ abstract class editor_Workflow_Abstract {
     public function doWithUserAssoc(editor_Models_TaskUserAssoc $oldTua, editor_Models_TaskUserAssoc $newTua) {
         $this->oldTaskUserAssoc = $oldTua;
         $this->newTaskUserAssoc = $newTua;
+        
+        //ensure that segment MV is createad
+        if(empty($this->newTask)) {
+            $task = ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $task editor_Models_Task */
+            $task->loadByTaskGuid($newTua->getTaskGuid());
+        }
+        else {
+            $task = $this->newTask;
+        }
+        $task->createMaterializedView();
         
         $oldState = $oldTua->getState();
         $newState = $newTua->getState();
