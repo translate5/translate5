@@ -2,6 +2,12 @@
 ### die in /application/iniOverwrites/APPLICATION_AGENCY durchgeführt werden müssen.
 ### Neuste Updates finden sich oben.
 
+2014-11-05 - New Features:
+            TRANSLATE-285: Skinning mechanism improvements
+            TRANSLATE-284: reset entries in language-xliffs and editorAdditions.css
+
+=================
+
 2014-08-13: TRANSLATE-277: Skinning mechanism
             see docs/skinning translate5.md
 
