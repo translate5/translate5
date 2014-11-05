@@ -1,6 +1,17 @@
 ### this file holds all changes and necessary configs needed for updates
 ### newest changes on top
 
+
+2014-05-11 - New Features:
+            TRANSLATE-284: allow import-file format "*.XLF" for new IBM-XLIFF import
+            TRANSLATE-318: Hiding the string [META] as columns header in translate5 GUI
+            TRANSLATE-285: Skinning mechanism improvements: localize-able branding in editor
+
+2014-05-11 - Bugfixes:
+            TRANSLATE-315: wrong content on generated XML after finishing a task
+            TRANSLATE-314: SQL update error on changing user state with missing segment view
+            TRANSLATE-281: After import a new task a version conflict is thrown when trying to add an user
+
 2014-08-27 - Bugfixes: 
             TRANSLATE-286: in Tab 'task properties' all text are still #UT# in my local translate5
             TRANSLATE-289: MQM-flags are empty in new imported task (local version Marc)
