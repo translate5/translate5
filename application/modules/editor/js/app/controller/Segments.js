@@ -332,7 +332,8 @@ Ext.define('Editor.controller.Segments', {
    * @returns boolean|string
    */
   getLastSegmentShortInfo: function() {
-    if(this.getSegmentGrid().editingPlugin.editor) {
+    var grid = this.getSegmentGrid();
+    if(grid && grid.editingPlugin.editor) {
       return this.getSegmentGrid().editingPlugin.editor.lastSegmentShortInfo;
     }
     return false;
