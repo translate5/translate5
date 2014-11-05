@@ -235,6 +235,67 @@ abstract class editor_Models_Import_FileParser {
         $this->handleEncoding();
     }
     
+    
+    /**
+     * Prototyp-function for getting word-count while import process.
+     * This function is (or is not) overwritten by typ-specific import-parser 
+     */
+    public function getWordCount()
+    {
+        return false;
+    }
+    
+    /**
+     * Das Leerzeichen (U+0020)
+     * Schützt Zeichenketten, die im sdlxliff enthalten sind und aus einer
+     * Unicode Private Use Area oder bestimmten schutzwürdigen Whitespaces oder
+     * von mssql nicht verkrafteten Zeichen stammen mit einem Tag
+     *
+     */
+    protected function protectUnicodeSpecialChars() {
+        $this->_origFileUnicodeProtected = preg_replace_callback(
+                array('"\p{Co}"u', //Alle private use chars
+            '"\x{2028}"u', //Hex UTF-8 bytes or codepoint 	E2 80 A8//schutzbedürftiger Whitespace + von mssql nicht vertragen
+            '"\x{2029}"u', //Hex UTF-8 bytes 	E2 80 A9//schutzbedürftiger Whitespace + von mssql nicht vertragen
+            '"\x{201E}"u', //Hex UTF-8 bytes 	E2 80 9E //von mssql nicht vertragen
+            '"\x{201C}"u'), //Hex UTF-8 bytes 	E2 80 9C//von mssql nicht vertragen
+                function ($match) {
+                    return '<unicodePrivateUseArea ts="' . implode(',', unpack('H*', $match[0])) . '"/>';
+                }, $this->_origFile);
+        $this->_origFileUnicodeSpecialCharsRemoved = preg_replace_callback(
+                array('"\p{Co}"u', //Alle private use chars
+            '"\x{2028}"u', //Hex UTF-8 bytes 	E2 80 A8//schutzbedürftiger Whitespace + von mssql nicht vertragen
+            '"\x{2029}"u', //Hex UTF-8 bytes 	E2 80 A9//schutzbedürftiger Whitespace + von mssql nicht vertragen
+            '"\x{201E}"u', //Hex UTF-8 bytes 	E2 80 9E //von mssql nicht vertragen
+            '"\x{201C}"u'), //Hex UTF-8 bytes 	E2 80 9C//von mssql nicht vertragen
+                function ($match) {
+                    return '';
+                }, $this->_origFile);
+    }
+    
+    /**
+     * callback for replace method in parseSegment
+     * @param array $match
+     * @return string
+     */
+    protected function whitespaceTagReplacer(array $match) {
+        //$replacer = function($match) use ($segment, $shortTagIdent, $map) {
+        $tag = $match[0];
+        $tagName = preg_replace('"<([^/ ]*).*>"', '\\1', $tag);
+        if(!isset($this->_tagMapping[$tagName])) {
+            trigger_error('The used tag ' . $tagName .' is undefined! Segment: '.$this->_segment, E_USER_ERROR);
+        }
+        $fileNameHash = md5($this->_tagMapping[$tagName]['imgText']);
+        
+        //generate the html tag for the editor
+        $p = $this->getTagParams($tag, $this->shortTagIdent++, $tagName, $fileNameHash);
+        $tag = $this->_singleTag->getHtmlTag($p);
+        $this->_singleTag->createAndSaveIfNotExists($this->_tagMapping[$tagName]['imgText'], $fileNameHash);
+        $this->_tagCount++;
+        return $tag;
+    }
+        
+    
     public function addSegmentProcessor(editor_Models_Import_SegmentProcessor $proc){
         //error_log(get_class($proc));
         $this->segmentProcessor[] = $proc;

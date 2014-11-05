@@ -149,6 +149,13 @@ class editor_Models_Import {
      * @var editor_Models_SegmentFieldManager
      */
     protected $segmentFieldManager;
+    
+    /**
+     * Counter for number of imported words
+     * if set to "false" word-counting will be disabled
+     * @var (int) / boolean
+     */
+    private $wordCount = 0;
 
     /**
      * Konstruktor
@@ -337,10 +344,33 @@ class editor_Models_Import {
             $parser->addSegmentProcessor($mqmProc);
             $parser->addSegmentProcessor($segProc);
             $parser->parseFile();
+            $this->countWords($parser->getWordCount());
             $this->_imagesInTask = array_merge($this->_imagesInTask,$parser->getTagImageNames());
             $this->removeTaggedFile($params[0]); //$params[0] => abs Path to File
         }
+        if ($this->task->getWordCount() == 0) {
+            $this->task->setWordCount($this->wordCount);
+        }
         $mqmProc->handleErrors();
+    }
+    
+    /**
+     * Adds up the number of words of the inported files
+     * and saves this into the private variable $this->wordCount
+     * 
+     * If this function is once called with "false", the addup-process will be canceled for the whole import-process
+     * 
+     * @param int or boolean false $count
+     */
+    private function countWords($count)
+    {
+        if ($count === false) {
+            $this->wordCount = false;
+        }
+        
+        if ($this->wordCount !== false) {
+            $this->wordCount += $count;
+        }
     }
     /**
      * decide regarding to the fileextension, which FileParser should be loaded and return it
