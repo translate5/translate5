@@ -35,8 +35,8 @@
  */
 
 //The index_prerun file is automatically added by the deploy process of some concrete t5 instances
-if(file_exists('../index_prerun.php')) {
-    include('../index_prerun.php');
+if(file_exists('../client-specific/index_prerun.php')) {
+    include('../client-specific/index_prerun.php');
 }
 if(false && date('Y-m-d') === '2014-09-08') {
     header("HTTP/1.1 503 Service Unavailable", true, 503);
