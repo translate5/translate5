@@ -34,7 +34,7 @@
  END LICENSE AND COPYRIGHT 
  */
 
-/* * #@+
+/** #@+
  * @author Marc Mittag
  * @package translate5
  * @version 0.7
@@ -45,7 +45,7 @@
  * Stellt Methoden bereit, die translate5 grundsätzlich als Stand Alone-Anwendung verfügbar machen
  */
 class IndexController extends ZfExtended_Controllers_Action {
-    /*
+    /**
      * @var boolean projectImported Projekt ist importiert
      */
     protected $projectImported;
@@ -55,15 +55,7 @@ class IndexController extends ZfExtended_Controllers_Action {
         $this->setProjectImported();
         $this->view->languageSelector();
     }
-    //public function indexAction() {}
-    /*
-    public function usageAction() {}
-    public function testdataAction() {}
-    public function sourceAction() {}
-    public function newsletterAction() {}
-    */
-    
-    
+
     public function __call($method, $args)
     {
         $tmp_viewName = substr_replace($method, "", -strlen("Action"));
@@ -131,58 +123,6 @@ class IndexController extends ZfExtended_Controllers_Action {
         );
     }
 
-    public function dbupdaterAction() {
-        $sqlDirs = array(
-                        APPLICATION_PATH.'/../docs',
-                        APPLICATION_PATH.'/modules/editor/docs'
-                        );
-        
-        //get SQL files on disk
-        $filesToProcess = array();
-        foreach($sqlDirs as $dir) {
-            $files = scandir($dir);
-            natcasesort($files);
-            foreach($files as $file) {
-                if($file == '.' || $file == '..'){
-                    continue;
-                }
-                $info = pathinfo($file);
-                if(empty($info['extension']) || $info['extension'] != 'sql'){
-                    continue;
-                }
-                //simple filter for mssql
-                if(strpos($info['basename'], 'mssql')!== false) {
-                    continue;
-                }
-                $filesToProcess[] = str_replace(APPLICATION_PATH, '', $dir.DIRECTORY_SEPARATOR.$file);
-            }
-        }
-
-        $dbAdapter = Zend_Db_Table::getDefaultAdapter();
-        $alreadyInDb = $dbAdapter->fetchAll($dbAdapter->select()->from('dbversion', 'name'), array(), Zend_Db::FETCH_COLUMN);
-
-        $filesToProcess = array_diff($filesToProcess, $alreadyInDb);
-        foreach($filesToProcess as $file) {
-            $realfile = realpath(APPLICATION_PATH.$file);
-            if(!file_exists($realfile)) {
-                continue;
-            }
-            $sql = file_get_contents($realfile);
-            //$dbAdapter->query($sql);
-            $dbAdapter->insert('dbversion', array('name' => $file));
-        }
-        //get imported SQL files from DB
-        echo '<h2>Already in DB</h2>';
-        echo '<pre>';
-        print_r($alreadyInDb);
-        echo '</pre>';
-        echo '<h2>New Imported in DB</h2>';
-        echo '<pre>';
-        print_r($filesToProcess);
-        echo '</pre>';
-        exit;
-    }
-    
     public function checkconfigAction() {
         echo "<h2>application agency loaded: </h2>".APPLICATION_AGENCY.'<br />';
         echo "<h2>loaded INI config files:</h2>".join("<br/>\n", ZfExtended_BaseIndex::getInstance()->applicationInis).'<br />';
