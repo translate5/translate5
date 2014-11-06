@@ -37,8 +37,7 @@
 /**
  * Initial Class of Plugin "TermTagger"
  */
-class editor_TermTagger_PluginBootstrap
-{
+class editor_TermTagger_PluginBootstrap {
     
     /**
      * @var Zend_EventManager_StaticEventManager
@@ -46,11 +45,9 @@ class editor_TermTagger_PluginBootstrap
     protected $staticEvents = false;
     
     
-    public function __construct()
-    {
+    public function __construct() {
         $config = Zend_Registry::get('config');
-        if (empty($config->runtimeOptions->termTagger->url->default->toArray()))
-        {
+        if (empty($config->runtimeOptions->termTagger->url->default->toArray())) {
             error_log("Plugin TermTagger initialized but no Zf_configuration termTagger.url.default is defined.");
             return false;
         }
@@ -66,9 +63,14 @@ class editor_TermTagger_PluginBootstrap
     /**
      * handler for event: Editor_IndexController#afterIndexAction
      */
-    public function handleAfterIndex(Zend_EventManager_Event $event)
-    {
-        error_log('function called: ' . get_class($this) . '->' . __FUNCTION__);
+    public function handleAfterIndex(Zend_EventManager_Event $event) {
+        $params = $event->getParams();
+        $view = $params[0];
+        
+        $config = Zend_Registry::get('config');
+        $termTaggerSegmentsPerCall = $config->runtimeOptions->termTagger->segmentsPerCall;
+        
+        $view->Php2JsVars()->set('plugins.termTagger.segmentsPerCall', $termTaggerSegmentsPerCall);
     }
     
     /**
@@ -79,15 +81,11 @@ class editor_TermTagger_PluginBootstrap
      * 
      * @param $event Zend_EventManager_Event
      */
-    public function handleAfterTaskOpen(Zend_EventManager_Event $event)
-    {
-        $params = $event->getParams();
-        $view = $params[0];
+    public function handleAfterTaskOpen(Zend_EventManager_Event $event) {
+        error_log('function called: ' . get_class($this) . '->' . __FUNCTION__);
         
-        $config = Zend_Registry::get('config');
-        $termTaggerSegmentsPerCall = $config->runtimeOptions->termTagger->segmentsPerCall;
-        
-        $view->Php2JsVars()->set('plugins.termTagger.segmentsPerCall', $termTaggerSegmentsPerCall);
+        // TODO
+        //$editor_Worker_TermLoader->queue();
     }
     
     
@@ -96,17 +94,44 @@ class editor_TermTagger_PluginBootstrap
      * 
      * Re-TermTagg the (modified) segment-text.
      */
-    public function handleBeforeSegmentSave(Zend_EventManager_Event $event)
-    {
+    public function handleBeforeSegmentSave(Zend_EventManager_Event $event) {
         $segment = $event->getParam('model');
         /* @var $segment editor_Models_Segment */
+        //error_log('Segment: '.print_r($segment->getDataObject(), true));
         
-        // TODO: how to detect changes/modification in segment-text?? $segment->isModified(); is not the correct result.
-        // TODO: only if change/modification is detected, call Worker_TermTagger->run()
+        // TODO how to detect change/modification in segment-text?? $segment->isModified(); is not the correct result.
+        // TODO only if change/modification is detected
+        //      AND if task has tbx
+        //      => call Worker_TermTagger->run()
         
+        // FIXME Liste mit Segment Daten dynamisieren!
+        $dataElement = array(   'id' => $segment->getId(),
+                                'source' => $segment->getSource(),
+                                'targetEdit' => $segment->getTargetEdit());
+        $data[] = $dataElement;
+        
+        //error_log(print_r($data, true));
+        $taskGuid = $segment->getTaskGuid();
         $worker = ZfExtended_Factory::get('editor_Worker_TermTagger');
         /* @var $worker editor_Worker_TermTagger */
-        $worker->run();
+        $worker->init($taskGuid, array('segmentData' => $data));
         
+        $worker->run($taskGuid);
+        //$worker->runQueued($taskGuid);
+        $result = $worker->getResult();
+        //error_log(__CLASS__.' -> '.__FUNCTION__.' Result: '.print_r($result, true));
+        $tempTaggedText = $result[0]['targetEdit'];
+        $segment->setTargetEdit($tempTaggedText);
+        
+        return;
+        
+        // TEST TEST TEST TEST 
+        // the following lines will only work is editor_Worker_TermTagger.init() send ALL parameters to its parent::init (which are saved in the DB worker-table and needed in static ::instanceByModel
+        $tempModel = $worker->getModel();
+        $worker2 = ZfExtended_Worker_Abstract::instanceByModel($tempModel);
+        /* @var $workere editor_Worker_TermTagger */
+        $worker2->run($taskGuid);
+        $result = $worker2->getResult();
+        error_log(__CLASS__.' -> '.__FUNCTION__.': '.print_r($result, true));
     }
 }
