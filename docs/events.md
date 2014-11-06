@@ -23,8 +23,8 @@ defined in `/library/ZfExtended/Controllers/Action.php`  will trigger an event o
  - **after&lt;Controllername&gt;Action** with parameter $this->view on Zend postDispatch
 
 
-###ZfExtended_Model_Abstract
-- **beforeSave** on every save as first function. !!! be careful on overwritten methods to call parent::save() in first place or to take care of events !!!
+###ZfExtended_Models_Entity_Abstract
+- **beforeSave** with parameter array('model' => $this), on every save as first function. !!! be careful on overwritten methods to call parent::save() in first place or to take care of events !!!
 
 ###editor_Workflow_Abstract
 ####Task
