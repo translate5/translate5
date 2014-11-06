@@ -63,11 +63,11 @@ class View_Helper_LanguageSelector extends Zend_View_Helper_Abstract {
         $session = new Zend_Session_Namespace();
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         
-        $form = new Zend_Form([
+        $form = new Zend_Form(array(
                 'method' => 'post',
                 'id' => 'languageSelector',
                 'name' => 'languageSelector'
-        ]);
+        ));
         
         $form->setAction($this->view->getUrl(array('locale')));
         
