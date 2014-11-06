@@ -36,10 +36,42 @@
 /**
  * editor_Worker_TermTagger Class
  */
-abstract class editor_Worker_Termtagger extend ZfExtendend_Worker_Abstract
-{
-    public function run()
-    {
-        parent::run();
+class editor_Worker_Termtagger extends ZfExtended_Worker_Abstract {
+    
+    protected $maxLifetime = '2 HOUR';
+    
+    protected $TESTDATA = false;
+    
+    public function init($taskGuid, $data = array()) {
+        
+        // seperate data from datalist which are needed while working queued-worker
+        // all informations which are only relevant in 'normal processing (not queued)'
+        // must not be saved in DB worker-table
+        // aka not send to parent::init as second parameter.
+        $dataToSave = array();
+        foreach ($data['segmentData'] as $item) {
+            $dataToSave[] = $item['id'];
+        }
+         
+        parent::init($taskGuid, array('segmentIds' => $dataToSave));
+        parent::init($taskGuid, $data);
+        
+        $this->TESTDATA = $data['segmentData'];
+    }
+    
+    public function queue() {
+        throw new BadMethodCallException('Du kommst hier nicht rein '.__CLASS__.'->'.__FUNCTION__);
+    }
+    
+    public function getResult() {
+        $tempReturn = $this->TESTDATA;
+        $tempReturn[0]['targetEdit'] = 'PSEUDO-TERMTAGGED: '.$tempReturn[0]['targetEdit'];
+        return $tempReturn;
+    }
+    
+    public function run($taskGuid) {
+        //$this->setTaskGuid($taskGuid);
+        parent::run($taskGuid);
+        //$this->cleanGarbage(); // Aufruf nur für Testzwecke !!!
     }
 }
