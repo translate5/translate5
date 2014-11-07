@@ -510,7 +510,7 @@
             </trans-unit>
             <trans-unit id='RGllIFppcC1EYXRlaSBtdXNzIGVpbiBWZXJ6ZWljaG5pcyAicHJvb2ZSZWFkIiBlbnRoYWx0ZW4sIHdlbGNoZXMgbWVocmVyZSBTRExYTElGRiB1bmQgLyBvZGVyIENTVi1EYXRlaWVuIGluIGVpbmVyIGJlbGllYmlnZW4gVmVyemVpY2huaXNzdHJ1a3R1ciBiZWluaGFsdGVuIGthbm4uIENTVi0gdW5kIFNETFhMSUZGLURhdGVpZW4ga8O2bm5lbiBiZWxpZWJpZyBnZW1pc2NodCB3ZXJkZW4uIERpZSBTdHJ1a3R1ciB3aXJkIGltIExla3RvcmF0IGFiZ2ViaWxkZXQu'>
                 <source>Die Zip-Datei muss ein Verzeichnis "proofRead" enthalten, welches mehrere SDLXLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.</source>
-                <target>The zip folder must include a directory called "proofRead", which can contain multiple SDLXLIFF and / or CSV files in any directory structure. CSV and SDLXLIFF files can be mixed up. The structure is depicted in editing.</target>
+                <target>The zip folder must include a directory called "proofRead", which can contain multiple SDLXLIFF and / or openTM2-XLIFF and / or CSV files in any directory structure. CSV, openTM2-XLIFF and SDLXLIFF files can be mixed up. The structure is depicted in editing.</target>
             </trans-unit>
             <trans-unit id='U3RydWt0dXIgdm9uIENTVi1EYXRlaWVuIChmYWxscyBhbHMgTGVrdG9yYXRzcXVlbGxlIHZlcndlbmRldCk='>
                 <source>Struktur von CSV-Dateien (falls als Lektoratsquelle verwendet)</source>
@@ -1302,7 +1302,7 @@ E-Mail: service@MittagQI.com</pre>
             </trans-unit>
             <trans-unit id='TWl0IHRyYW5zbGF0ZTUga8O2bm5lbiBTaWUgU0RMWExJRkYtIHVuZCBDU1YtRGF0ZWllbiBpbSBCcm93c2VyIGxla3RvcmllcmVuIGxhc3NlbiAtIG9obmUgTGl6ZW56a29zdGVuIC0gYXVmIE9wZW4gU291cmNlLUJhc2lzLg=='>
                 <source>Mit translate5 können Sie SDLXLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</source>
-                <target>With translate5 you can proofread SDLXLIFF and CSV files in the browser - without licensing costs and on open-source basis.</target>
+                <target>With translate5 you can proofread SDLXLIFF, openTM2-XLIFF and CSV files in the browser - without licensing costs and on open-source basis.</target>
             </trans-unit>
 
             <trans-unit id="dHJhbnNsYXRlNSBiaWV0ZXQgbW9kZXJuc3RlcyBkZXNrdG9wYXJ0aWdlcyBBcmJlaXRlbiBpbSBCcm93c2VyIG1pdCB2aWVsZW4gaW50ZXJlc3NhbnRlbiwgdGVpbHdlaXNlIGVpbnppZ2FydGlnZW4gRmVhdHVyZXMu">
