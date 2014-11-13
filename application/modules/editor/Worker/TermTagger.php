@@ -38,40 +38,206 @@
  */
 class editor_Worker_Termtagger extends ZfExtended_Worker_Abstract {
     
+    /**
+     * overwrites $this->workerModel->maxLifetime
+     */
     protected $maxLifetime = '2 HOUR';
     
-    protected $TESTDATA = false;
+    // TEST: setting a different blocking-type
+    // protected $blockingType = ZfExtended_Worker_Abstract::BLOCK_RESOURCE;
     
-    public function init($taskGuid, $data = array()) {
+    /**
+     * resourcePool for the different TermTagger-Operations;
+     * Possible Values: self::allowdResourcePools = array('default', 'gui', 'import');
+     * @var string
+     */
+    protected $resourcePool = 'default';
+    /**
+     * Allowd values for setting resourcePool
+     * @var array(strings)
+     */
+    private static $allowedResourcePools = array('default', 'gui', 'import');
+    
+    /**
+     * Praefix for workers resource-name
+     * @var string
+     */
+    const praefixResourceName = 'TermTagger_';
+    
+    
+    /**
+     * Stores the init-paramters from the initial call
+     * @var array
+     */
+    protected $data = false;
+    
+    
+    
+    /**
+     * Special Paramters
+     * - resourcePool:
+     * sets the resourcePool for slot-calculation depending on the context.
+     * Possible values are all values out of self::allowedResourcePool
+     * 
+     * On very first init:
+     * seperate data from parameters which are needed while processing queued-worker.
+     * All informations which are only relevant in 'normal processing (not queued)'
+     * are not needed to be saved in DB worker-table (aka not send to parent::init as $parameters)
+     * 
+     * ATTENTION:
+     * for queued-operating $parameters saved in parent::init MUST have all necessary paramters
+     * to call this init function again on instanceByModel
+     * 
+     * (non-PHPdoc)
+     * @see ZfExtended_Worker_Abstract::init()
+     */
+    public function init($taskGuid = NULL, $parameters = array()) {
+        $this->data = $parameters;
         
-        // seperate data from datalist which are needed while working queued-worker
-        // all informations which are only relevant in 'normal processing (not queued)'
-        // must not be saved in DB worker-table
-        // aka not send to parent::init as second parameter.
-        $dataToSave = array();
-        foreach ($data['segmentData'] as $item) {
-            $dataToSave[] = $item['id'];
+        $parametersToSave = array();
+        
+        if (isset($parameters['segmentData'])) {
+            foreach ($parameters['segmentData'] as $item) {
+                $parametersToSave['segmentIds'][] = $item['id'];
+            }
         }
-         
-        parent::init($taskGuid, array('segmentIds' => $dataToSave));
-        parent::init($taskGuid, $data);
         
-        $this->TESTDATA = $data['segmentData'];
+        if (isset($parameters['resourcePool'])) {
+            if (in_array($parameters['resourcePool'], self::$allowedResourcePools)) {
+                $this->resourcePool = $parameters['resourcePool'];
+                $parametersToSave['resourcePool'] = $this->resourcePool;
+            }
+        }
+        
+        return parent::init($taskGuid, $parametersToSave);
     }
     
+    
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_Worker_Abstract::validateParameters()
+     */
+    protected function validateParameters($parameters = array()) {
+        if (!isset($parameters['segmentData'][0]['targetEdit']) && !isset($parameters['segmentIds'])) {
+            return false;
+        }
+        return true;
+    } 
+    
+    
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_Worker_Abstract::calculateDirectSlot()
+     */
+    protected function calculateDirectSlot() {
+        //return array('resource' => 'TermTagger_default', 'slot' => 'Termtagger.local/index.php');
+        return $this->calculateSlot('default');
+    }
+    
+    /**
+     * (non-PHPdoc) 
+     * @see ZfExtended_Worker_Abstract::calculateQueuedSlot()
+     */
+    protected function calculateQueuedSlot() {
+        //return array('resource' => 'TermTagger_default', 'slot' => 'TermTaggerSlot_'.rand(1, 3).'.local/index.php');
+        return $this->calculateSlot($this->resourcePool);
+    }
+    
+    public function calculateSlot($resourcePool = 'default') {
+        $resourceName = self::praefixResourceName.$resourcePool;
+        //error_log(__CLASS__.' -> '.__FUNCTION__.' $resourcePool: '.$resourcePool.' $resourceName: '.$resourceName);
+        
+        // detect defined slots for the resourcePool
+        $config = Zend_Registry::get('config');
+        switch ($resourcePool) {
+            case 'gui':
+                $availableSlots = $config->runtimeOptions->termTagger->url->gui->toArray();
+                break;
+            
+            case 'import':
+                $availableSlots = $config->runtimeOptions->termTagger->url->import->toArray();
+                break;
+            
+            case 'default':
+                $availableSlots = $config->runtimeOptions->termTagger->url->default->toArray();
+                break;
+        }
+        // no slots foor this resourcePool defined
+        if (empty($availableSlots) && $resourcePool != 'default') {
+            // calculate slot from default resourcePool
+            return $this->calculateSlot('default');
+        }
+        
+        $usedSlots = $this->workerModel->getListSlotsCount($resourceName);
+        
+        // all slotes in use
+        if (count($usedSlots) == count($availableSlots)) {
+            // take first slot in use which is the one with the min. number of counts
+            $return = array('resource' => $resourceName, 'slot' => $usedSlots[0]['slot']);
+            //error_log(__CLASS__.' -> '.__FUNCTION__.'; $return '.print_r($return, true));
+            return $return;
+        }
+        
+        // some slots in use
+        if (!empty($usedSlots)) {
+            // select a random slot of the unused slots
+            $unusedSlots = $availableSlots;
+            
+            foreach ($usedSlots as $usedSlot) {
+                $key = array_search($usedSlot['slot'], $unusedSlots);
+                if($key!==false) {
+                    unset($unusedSlots[$key]);
+                }
+            }
+            $unusedSlots = array_values($unusedSlots);
+            
+            $return = array('resource' => $resourceName, 'slot' => $unusedSlots[array_rand($unusedSlots)]);
+            //error_log(__CLASS__.' -> '.__FUNCTION__.'; $return '.print_r($return, true));
+            return $return;
+        }
+        
+        // no slot in use = default return
+        $return = array('resource' => $resourceName, 'slot' => $availableSlots[array_rand($availableSlots)]);
+        //error_log(__CLASS__.' -> '.__FUNCTION__.'; $return '.print_r($return, true));
+        return $return;
+        
+    }
+    
+    
+    /*
     public function queue() {
         throw new BadMethodCallException('Du kommst hier nicht rein '.__CLASS__.'->'.__FUNCTION__);
     }
+    */
     
-    public function getResult() {
-        $tempReturn = $this->TESTDATA;
-        $tempReturn[0]['targetEdit'] = 'PSEUDO-TERMTAGGED: '.$tempReturn[0]['targetEdit'];
-        return $tempReturn;
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_Worker_Abstract::run()
+     */
+    public function run() {
+        $result = parent::run();
+        return $result;
     }
     
-    public function run($taskGuid) {
-        //$this->setTaskGuid($taskGuid);
-        parent::run($taskGuid);
-        //$this->cleanGarbage(); // Aufruf nur für Testzwecke !!!
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_Worker_Abstract::work()
+     */
+    public function work() {
+        //error_log(__CLASS__.' -> '.__FUNCTION__);
+        if (empty($this->data)) {
+            return false;
+        }
+        
+        foreach ($this->data['segmentData'] as &$segment) {
+            $tempText = $segment['targetEdit'];
+            $tempText = 'PSEUDO-TERMTAGGED: '.$tempText;
+            $segment['targetEdit'] = $tempText;
+        }
+        
+        $this->result = $this->data['segmentData'];
+        
+        return true;
     }
+    
 }
