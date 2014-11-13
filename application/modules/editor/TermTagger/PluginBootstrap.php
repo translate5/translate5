@@ -56,10 +56,12 @@ class editor_TermTagger_PluginBootstrap {
         $this->staticEvents->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndex'));
         $this->staticEvents->attach('editor_Workflow_Default', array('doView', 'doEdit'), array($this, 'handleAfterTaskOpen'));
         $this->staticEvents->attach('editor_Models_Segment', 'beforeSave', array($this, 'handleBeforeSegmentSave'));
+        // SBE: only for testing
+        $this->staticEvents->attach('IndexController', 'beforeStephanAction', array($this, 'handleTest'));
         // end of event-listeners
     }
-
-
+    
+    
     /**
      * handler for event: Editor_IndexController#afterIndexAction
      */
@@ -72,6 +74,7 @@ class editor_TermTagger_PluginBootstrap {
         
         $view->Php2JsVars()->set('plugins.termTagger.segmentsPerCall', $termTaggerSegmentsPerCall);
     }
+    
     
     /**
      * handler for event(s): editor_Workflow_Default#[doView, doEdit]
@@ -97,14 +100,15 @@ class editor_TermTagger_PluginBootstrap {
     public function handleBeforeSegmentSave(Zend_EventManager_Event $event) {
         $segment = $event->getParam('model');
         /* @var $segment editor_Models_Segment */
-        //error_log('Segment: '.print_r($segment->getDataObject(), true));
+        //$taskGuid = $segment->getTaskGuid();
+        //error_log(__CLASS__.' -> '.__FUNCTION__.' $taskGuid: '.$taskGuid);
         
         // TODO how to detect change/modification in segment-text?? $segment->isModified(); is not the correct result.
         // TODO only if change/modification is detected
         //      AND if task has tbx
         //      => call Worker_TermTagger->run()
         
-        // FIXME Liste mit Segment Daten dynamisieren!
+        // FIXME Liste mit Segment Daten dynamisieren!?!
         $dataElement = array(   'id' => $segment->getId(),
                                 'source' => $segment->getSource(),
                                 'targetEdit' => $segment->getTargetEdit());
@@ -112,26 +116,97 @@ class editor_TermTagger_PluginBootstrap {
         
         //error_log(print_r($data, true));
         $taskGuid = $segment->getTaskGuid();
+        
         $worker = ZfExtended_Factory::get('editor_Worker_TermTagger');
         /* @var $worker editor_Worker_TermTagger */
-        $worker->init($taskGuid, array('segmentData' => $data));
+        if (!$worker->init($taskGuid, array('segmentData' => $data))) {
+            //error_log(__CLASS__.' -> '.__FUNCTION__.' Worker could not be initialized');
+            return false;
+        }
         
-        $worker->run($taskGuid);
-        //$worker->runQueued($taskGuid);
+        // #1 run immediately
+        if (!$worker->run()) {return false;};
+        
+        // #2 run from queue (mutex-save)
+        //$worker->queue();
+        //if (!$worker->runQueued()) {return false;}
+        
+        
         $result = $worker->getResult();
         //error_log(__CLASS__.' -> '.__FUNCTION__.' Result: '.print_r($result, true));
         $tempTaggedText = $result[0]['targetEdit'];
         $segment->setTargetEdit($tempTaggedText);
+        //$segment->setTextTagged = true;
         
         return;
         
-        // TEST TEST TEST TEST 
-        // the following lines will only work is editor_Worker_TermTagger.init() send ALL parameters to its parent::init (which are saved in the DB worker-table and needed in static ::instanceByModel
+        
+        // TEST TEST TEST TEST
+        // Demonstration of starting a worker that was rebuild(instanciated) from a worker-model
+        $worker->queue(); // just to save the upper worker into the queue (DB-table LEK_worker)
+        
         $tempModel = $worker->getModel();
         $worker2 = ZfExtended_Worker_Abstract::instanceByModel($tempModel);
-        /* @var $workere editor_Worker_TermTagger */
-        $worker2->run($taskGuid);
+        /* @var $worker2 editor_Worker_TermTagger */
+        
+        if (!$worker2) {
+            error_log(__CLASS__.' -> '.__FUNCTION__.' Worker2 could not be initialized');
+            return false;
+        }
+        $worker2->runQueued();
         $result = $worker2->getResult();
         error_log(__CLASS__.' -> '.__FUNCTION__.': '.print_r($result, true));
+    }
+    
+    
+    /**
+     * handler for test-events: IndexController#beforeStephanAction
+     */
+    public function handleTest() {
+        $request = ZfExtended_Factory::get('Zend_Controller_Request_Http');
+        /* @var $request Zend_Controller_Request_Http */
+        
+        if ($request->getParam('startTest') == 1) {
+            $this->test();
+        }
+        
+        if ($request->getParam('startTest_2')) {
+            $this->test_2();
+        }
+        
+        if ($request->getParam('startTest_3')) {
+            $this->test_3();
+        }
+        
+        return false;
+    }
+    
+    private function test() {
+        error_log(__CLASS__.' -> '.__FUNCTION__);
+        
+        $workerQueue = ZfExtended_Factory::get('ZfExtended_Worker_Queue');
+        /* @var $workerQueue ZfExtended_Worker_Queue */
+        $workerQueue->process();
+    }
+    
+    private function test_2() {
+        error_log(__CLASS__.' -> '.__FUNCTION__);
+        
+        $workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        /* @var $workerModel ZfExtended_Models_Worker */
+        $workerListQueued = $workerModel->getListQueued();
+        
+        //error_log(__CLASS__.' -> '.__FUNCTION__.'; Liste-Queued: '.print_r($workerListQueued, true));
+    }
+    
+    
+    private function test_3() {
+        error_log(__CLASS__.' -> '.__FUNCTION__);
+        
+        $workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        /* @var $workerModel ZfExtended_Models_Worker */
+        $workerListSlotsCount = $workerModel->getListSlotsCount('TermTagger_default');
+        
+        error_log(__CLASS__.' -> '.__FUNCTION__.'; Liste-Resource: '.print_r($workerListSlotsCount, true));
     }
 }
