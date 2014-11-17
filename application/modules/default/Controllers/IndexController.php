@@ -68,7 +68,7 @@ class IndexController extends ZfExtended_Controllers_Action {
         
         $tmp_allowedViews = $allowed->toArray();
         if (!in_array($tmp_viewName, $tmp_allowedViews)){
-            $tmp_viewName = "";
+            throw new ZfExtended_NotFoundException();
         }
         $this->render($tmp_viewName);
     }
