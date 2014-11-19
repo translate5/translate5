@@ -47,7 +47,7 @@ $pathToQMFile =  '/'.$config->runtimeOptions->editor->qmFlagXmlFileDir.'/'.
 <p><?php echo $this->translate->_('Bitte verwenden Sie nur ASCII-Zeichen in Datei- oder Verzeichnisnamen und keine Sonderzeichen oder Umlaute. Das Zip-Format übermittelt keine Informationen, in welcher Codierung Ihr Betriebssystem Datei- oder Verzeichnisnamen gespeichert hat. Aufgrund dieses Mangels des ZIP-Standards kann translate5 Nicht-ASCII-Zeichen nicht fehlerfrei auslesen. Einzige Ausnahme: Ihr Dateisystem speichert Dateinamen in der UTF-8-Kodierung, wie Linux-Systeme dies tun.'); ?></p>
 
 <h3><?php echo $this->translate->_('proofRead: Verzeichnis mit zu lektorierenden Dateien'); ?></h3>
-<p><?php echo $this->translate->_('Die Zip-Datei muss ein Verzeichnis "proofRead" enthalten, welches mehrere SDLXLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.'); ?></p>
+<p><?php echo $this->translate->_('Die Zip-Datei muss ein Verzeichnis "proofRead" enthalten, welches mehrere SDLXLIFF, openTM2-XLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV-, openTM2-XLIFF- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.'); ?></p>
 <h3><?php echo $this->translate->_('Struktur von CSV-Dateien (falls als Lektoratsquelle verwendet)'); ?></h3>
 <p><?php echo $this->translate->_('CSV-Dateien müssen drei Spalten enthalten, deren Spaltenköpfe mit den Bezeichnungen "mid", "quelle", "ziel" gekennzeichnet sind. Diese Spalten können in beliebiger Reihenfolge in der CSV-Datei enthalten sein. Weitere Spalten der CSV-Datei werden beim Import ignoriert. Spaltentrenner der CSV ist ein Komma ",", Texterkennungszeichen ein doppeltes Anführungszeichen "&apos;". Zeilentrenner der CSV ist ein Linux-, Mac- oder Windowszeilenumbruch. Codierung der CSV-Datei kann utf-8, iso-8859-1 oder windows-1251 sein. Die CSV-Datei wird in der selben Codierung exportiert, in der sie beim Import vorlag (Achtung: Bei einer Übersetzung in Nicht-Westeuropäische Sprachen sollte daher utf-8 bereits als Importcodierung gewählt werden).'); ?></p>
 <h3><?php echo $this->translate->_('Verzeichnisstruktur beim Export'); ?></h3>
@@ -77,8 +77,8 @@ referenceFiles/           => <?php echo $this->translate->_('optionales Verzeich
 referenceFiles/Referenz.pdf
 </pre>
 
-<h2><a name="single-import"><?php echo $this->translate->_('Import von einzelnen SDLXLIFF oder CSV Dateien'); ?></a></h2>
-<p><?php echo $this->translate->_('Soll nur eine einzelne CSV oder SDLXLIFF Datei ins Projekt importiert werden, so kann diese auch direkt hochgeladen werden. Die Erstellung einer ZIP Datei ist so nicht nötig.'); ?></p>
+<h2><a name="single-import"><?php echo $this->translate->_('Import von einzelnen SDLXLIFF, openTM2-XLIFF oder CSV Dateien'); ?></a></h2>
+<p><?php echo $this->translate->_('Soll nur eine einzelne CSV, openTM2-XLIFF oder SDLXLIFF Datei ins Projekt importiert werden, so kann diese auch direkt hochgeladen werden. Die Erstellung einer ZIP Datei ist so nicht nötig.'); ?></p>
 <p><?php echo $this->translate->_('Handelt es sich um eine SDLXLIFF Datei, so kann zusätzlich eine TBX Datei mit Terminologie ausgewählt werden.'); ?></p>
 </div>
 
