@@ -225,7 +225,6 @@ class editor_Models_Import {
         $this->saveDirTrees();
         $this->termTagFiles();
         $this->importFiles();
-        $this->saveJsonTagImageNames();
         $this->syncFileOrder();
         $this->removeMetaDataTmpFiles();
         $this->importAndGenerateRelaisFiles();
