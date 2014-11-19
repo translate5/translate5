@@ -45,6 +45,8 @@
  * @method void setType() setType(string $type)
  * @method string getLabel() getLabel()
  * @method void setLabel() setLabel(string $label)
+ * @method string getWidth() getWidth()
+ * @method void setWidth() setWidth(string $width)
  * @method string getRankable() getRankable()
  * @method void setRankable() setRankable(boolean $rankable)
  * @method string getEditable() getEditable()
