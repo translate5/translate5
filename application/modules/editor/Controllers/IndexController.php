@@ -76,24 +76,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     }
 
     /**
-     * Generates response for ajax-call of /public/modules/editor/js/app/controller/PreloadImages.js
-     */
-    public function preloadimagesAction() {
-        $this->session = new Zend_Session_Namespace();
-        $this->_helper->layout->disableLayout();
-        $this->_helper->viewRenderer->setNoRender();
-        $start = (int)$this->_getParam('start')+10;
-        $parts = explode('/', $this->_session->runtimeOptions->dir->tagImagesJsonBasePath);
-        $path = array(APPLICATION_PATH, '..', 'public');
-        $path = array_merge($path, $parts);
-        $path = join(DIRECTORY_SEPARATOR, $path);
-        $tagImages = Zend_Json::decode(file_get_contents($path.'/'.$this->session->taskGuid.'.json'));
-        $goOn = !$start>=count($tagImages);
-        $images2preload = array_slice($tagImages, $start, 10);
-        echo Zend_Json::encode(array('goOn'=>$goOn,'start'=>$start,'images2preload'=>$images2preload));
-    }
-    
-    /**
      * Gibt die zusätzlich konfigurierte CSS Dateien als Array zurück
      * @return array
      */
@@ -144,7 +126,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $tagPath = APPLICATION_RUNDIR.'/'.$rop->dir->tagImagesBasePath.'/';
       $this->view->Php2JsVars()->set('segments.shortTagPath', $tagPath);
       $this->view->Php2JsVars()->set('segments.fullTagPath', $tagPath);
-      $this->view->Php2JsVars()->set('segments.imagePreloader', APPLICATION_RUNDIR.'/'.$rop->dir->tagImagesJsonBasePath.'/');
       
       if($rop->editor->enableQmSubSegments) {
           $this->view->Php2JsVars()->set('segments.subSegment.tagPath', $tagPath);

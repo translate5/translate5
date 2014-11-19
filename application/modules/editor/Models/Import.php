@@ -446,26 +446,6 @@ class editor_Models_Import {
         }
     }
     /**
-     * speichert JSON-Datei mit den Namen aller im aktuellen Importtask enthaltenen
-     * Taggrafiken in das Verzeichnis $config->runtimeOptions->dir->tagImagesJsonBasePath
-     * - fügt noch die Grafiken für Short-Tags für 1 bis 20 hinzu
-     */
-    protected function saveJsonTagImageNames(){
-        $shortTags = array();
-        for($i=1;$i<21;$i++){
-            $shortTags[] = $i.'-left.png';
-            $shortTags[] = $i.'-right.png';
-            $shortTags[] = $i.'-single.png';
-        }
-        $this->_imagesInTask = array_merge($shortTags, $this->_imagesInTask);
-        $config = Zend_Registry::get('config');
-        $json = Zend_Json_Encoder::encode($this->_imagesInTask);
-        file_put_contents(APPLICATION_PATH.DIRECTORY_SEPARATOR.'..'.
-                        DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.
-                        $config->runtimeOptions->dir->tagImagesJsonBasePath.
-                        DIRECTORY_SEPARATOR.$this->_taskGuid.'.json',$json);
-    }
-    /**
      * - liest den Directory-Tree aus
      * - speichert ihn in der DB als Objekt (LEK_foldertree) und flach durch Befüllung von LEK_files
      * - befüllt $this->_filePaths

@@ -57,7 +57,6 @@ Ext.define('Editor.controller.Localizer', {
 		'Editor.controller.Preferences',
 		'Editor.controller.Segments',
 		'Editor.controller.ServerException',
-		'Editor.controller.PreloadImages',
 		'Editor.controller.ChangeAlike',
 		'Editor.store.Files',
 		'Editor.view.segments.Grid',
@@ -150,9 +149,6 @@ Ext.define('Editor.controller.Localizer', {
         text: '<?php echo $this->translate->_('Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!');?>',
         serverMsg: '<?php echo $this->translate->_('<br />Meldung vom Server: <i>{0} {1}</i>');?>'
     };
-
-    Editor.controller.PreloadImages.prototype.ERROR_TITLE = '<?php echo $this->translate->_('Fehler');?>';
-    Editor.controller.PreloadImages.prototype.ERROR_TEXT = '<?php echo $this->translate->_('Die Datei zum Vorausladen der Taggrafiken wurde nicht gefunden. Daher können die Taggrafiken erst beim Öffnen des jeweiligen Segments geladen werden.');?>';
 
     Editor.MessageBox.prototype.self.SUCCESS = '<?php echo $this->translate->_('ok');?>';
     Editor.MessageBox.prototype.self.ERROR = '<?php echo $this->translate->_('error');?>';
