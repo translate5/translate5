@@ -167,27 +167,37 @@ Ext.define('Editor.view.segments.Grid', {
             //stored outside of function and must be set after isErgoVisible!
             firstTargetFound = firstTargetFound || isEditableTarget; 
             
+            var col2push = false;
             if(!rec.isTarget() || ! userPref.isNonEditableColumnDisabled()) {
-                columns.push({
+                col2push = {
                     xtype: 'contentColumn',
                     segmentField: rec,
                     fieldName: name,
                     hidden: !userPref.isNonEditableColumnVisible() && rec.isTarget(),
                     isErgonomicVisible: isErgoVisible && !editable,
                     isErgonomicSetWidth: true, //currently true for all our affected default fields
-                    text: rec.get('label')
-                });
+                    text: rec.get('label'),
+                    width: rec.get('width')
+                };
             }
             
             if(editable){
-                columns.push({
+                col2push = {
                     xtype: 'contentEditableColumn',
                     segmentField: rec,
                     fieldName: name,
                     isErgonomicVisible: isErgoVisible,
                     isErgonomicSetWidth: true, //currently true for all our affected default fields
-                    text: Ext.String.format(me.column_edited, rec.get('label'))
-                });
+                    text: Ext.String.format(me.column_edited, rec.get('label')),
+                    width: rec.get('width')
+                };
+            }
+            
+            if(col2push){
+                if(rec.get('width') !== 250){
+                    col2push.ergonomicWidth = rec.get('width');
+                }
+                columns.push(col2push);
             }
         });
         

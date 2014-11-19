@@ -63,7 +63,6 @@ Ext.define('Editor.view.segments.column.Content', {
   },
   constructor: function(conf) {
       var field = conf.fieldName;
-      conf.width = 250; //needed, otherwise the Columns are overwritten with 100. Why ever...
       Ext.applyIf(conf, {
           dataIndex: field,
           itemId: field + 'Column',

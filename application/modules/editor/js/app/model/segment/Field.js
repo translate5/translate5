@@ -72,6 +72,7 @@ Ext.define('Editor.model.segment.Field', {
     {name: 'taskGuid', type: 'string'},
     {name: 'name', type: 'string'},
     {name: 'label', type: 'string'},
+    {name: 'width', type: 'integer'},
     {name: 'type', type: 'string'},
     {name: 'rankable', type: 'boolean'},
     {name: 'editable', type: 'boolean'}
