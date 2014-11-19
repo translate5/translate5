@@ -81,8 +81,6 @@ Ext.application({
   stores : [ 'Files', 'Segments', 'AlikeSegments' ],
   requires: ['Editor.view.ViewPortEditor', Editor.data.app.viewport, 'Editor.model.ModelOverride'],
   controllers: Editor.data.app.controllers,
-  //preload images is deactivated, because it is of little use and is eating a lot of performance at the beginning of the editing process with big projects
-  //controllers: ['ServerException', 'ViewModes', 'Segments', 'Preferences', 'MetaPanel', 'Fileorder', 'Localizer', 'PreloadImages', 'ChangeAlike','QmSubSegments' ],
   beforeUnloadCalled : false,//stellt sicher, dass aufgrund von Wechselwirkungen bei einem per JS aus einem anderen Fenster heraus getriggerten window.close die unload-Frage nicht zweimal kommt
   appFolder : Editor.data.appFolder,
   viewport: null,
