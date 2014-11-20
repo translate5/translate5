@@ -34,4 +34,71 @@
 --  */
 -- 
 
-ALTER TABLE  `LEK_segment_field` ADD  `width` INT NOT NULL DEFAULT  '250' COMMENT  'sets the width of the column in the GUI. Default 250.';
+ALTER TABLE  `LEK_segment_field` ADD  `width` INT NOT NULL DEFAULT  '250' COMMENT  'first we have to set the default to 250 to have a sensemaking default for already imported data.';
+
+ALTER TABLE  `LEK_segment_field` CHANGE  `width`  `width` INT( 11 ) NOT NULL DEFAULT  '0' COMMENT 'sets the width of the column in the GUI. Default 0, because actual max value is set with runtimeOptions.editor.columns.maxWidth and calculation needs to start at 0';
+
+INSERT INTO  `Zf_configuration` (
+`id` ,
+`name` ,
+`confirmed` ,
+`module` ,
+`category` ,
+`value` ,
+`default` ,
+`defaults` ,
+`type` ,
+`description`
+)
+VALUES (
+NULL ,  'runtimeOptions.editor.columns.widthFactor',  '1',  'editor',  'layout',  '8.6',  '8.6', NULL ,  'string', 'factor which is used to calculate the column width from the max chars of a column, if it can be smaller than maxWidth'
+);
+
+INSERT INTO  `Zf_configuration` (
+`id` ,
+`name` ,
+`confirmed` ,
+`module` ,
+`category` ,
+`value` ,
+`default` ,
+`defaults` ,
+`type` ,
+`description`
+)
+VALUES (
+NULL ,  'runtimeOptions.editor.columns.widthFactorHeader',  '1',  'editor',  'layout',  '7',  '7', NULL ,  'string', 'factor which is used to calculate the column width from the chars of a column-header, if the otherwise calculated width would be to small for the header'
+);
+
+INSERT INTO  `translate5`.`Zf_configuration` (
+`id` ,
+`name` ,
+`confirmed` ,
+`module` ,
+`category` ,
+`value` ,
+`default` ,
+`defaults` ,
+`type` ,
+`description`
+)
+VALUES (
+NULL ,  'runtimeOptions.editor.columns.widthFactorErgonomic',  '1',  'editor',  'layout',  '1.9',  '1.9', NULL ,  'string', 'factor which is used to calculate the column width for the ergonomic mode from the width which is set for the editing mode, if it is smaller than the maxWidth '
+);
+
+
+INSERT INTO  `Zf_configuration` (
+`id` ,
+`name` ,
+`confirmed` ,
+`module` ,
+`category` ,
+`value` ,
+`default` ,
+`defaults` ,
+`type` ,
+`description`
+)
+VALUES (
+NULL ,  'runtimeOptions.editor.columns.maxWidth',  '1',  'editor',  'layout',  '250',  '250', NULL ,  'integer', 'default width for text contents columns in the editor in pixel. If column needs less space, this is adjusted automatically'
+);

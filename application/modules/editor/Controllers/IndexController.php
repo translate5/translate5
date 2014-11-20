@@ -143,6 +143,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       //Editor.data.enableSourceEditing → still needed for enabling / disabling the whole feature (Checkbox at Import).
       $this->view->Php2JsVars()->set('enableSourceEditing', (boolean) $rop->import->enableSourceEditing);
       
+      $this->view->Php2JsVars()->set('columns.widthFactorHeader', (float)$rop->editor->columns->widthFactorHeader);
+      $this->view->Php2JsVars()->set('columns.widthFactorErgonomic', (float)$rop->editor->columns->widthFactorErgonomic);
+      $this->view->Php2JsVars()->set('columns.maxWidth', (integer)$rop->editor->columns->maxWidth);
+      
       /*
       Format of initial preset grid filters
       can be used for every grid filter

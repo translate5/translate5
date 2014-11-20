@@ -63,6 +63,12 @@ abstract class editor_Models_Import_SegmentProcessor {
     protected $fileName;
     
     /**
+     * array containing calculated field width for the GUI for each field
+     * @var [array] 1D array, keys map to the segment field names. Values contain the width in pixel
+     */
+    protected $fieldWidth = array();
+    
+    /**
      * Konstruktor
      * @param editor_Models_Task $task
      */
@@ -105,4 +111,65 @@ abstract class editor_Models_Import_SegmentProcessor {
      * @param integer $segmentId
      */
     public function postProcessHandler(editor_Models_Import_FileParser $parser, $segmentId) {}
+    
+    /**
+     * 
+     * @param editor_Models_Import_FileParser $parser
+     * @param array $fields2Calculate 1-D array, key is name of field in file and value is mapped field name for db (may be same as key, or e. g. "relais" | default null; if null, all fields are calculated
+     * @throws ZfExtended_Exception
+     */
+    protected function calculateFieldWidth(editor_Models_Import_FileParser $parser, $fields2Calculate = null) {
+        $fieldContents = $parser->getFieldContents();
+        $config = Zend_Registry::get('config');
+        $widthFactor = (float)$config->runtimeOptions->editor->columns->widthFactor;
+        foreach ($fieldContents as $field => $contents) {
+            if(!is_null($fields2Calculate)){
+                if(!array_key_exists($field, $fields2Calculate)){
+                    continue;
+                }
+                $field = $fields2Calculate[$field];
+            }
+            $strlen = mb_strlen(strip_tags($contents['original']));
+            if($strlen === false){
+                ob_start();
+                var_dump($contents);
+                error_log(ob_get_clean());
+                throw new ZfExtended_Exception('strlen could not be detected. Something with the internal encoding must be wrong.');
+            }
+            if(!isset($this->fieldWidth[$field])){
+                $this->fieldWidth[$field] = 0;
+            }
+            $calculatedWidth = $strlen*$widthFactor;
+            $this->fieldWidth[$field] = ($this->fieldWidth[$field]>$calculatedWidth)?$this->fieldWidth[$field]:$calculatedWidth;
+        }
+    }
+    
+    /**
+     * 
+     * @param editor_Models_Import_FileParser $parser
+     */
+    protected function saveFieldWidth(editor_Models_Import_FileParser $parser) {
+        $config = Zend_Registry::get('config');
+        $maxWidth = (integer)$config->runtimeOptions->editor->columns->maxWidth;
+        $sfm = $parser->getSegmentFieldManager();
+        $fieldList = $sfm->getFieldList();
+        foreach ($fieldList as $fieldName => $fieldEntity) {
+            if(!isset($this->fieldWidth[$fieldName])){
+                continue;
+            }
+            $width2Save = false;
+            $currentWidth = $fieldEntity->width;
+            $newWidth = $this->fieldWidth[$fieldName];
+            if($newWidth > $currentWidth){
+                $width2Save = $newWidth;
+            }
+            if($width2Save && $width2Save > $maxWidth){
+                $width2Save = $maxWidth;
+            }
+            if($width2Save){
+                $fieldEntity->width = $width2Save;
+                $fieldEntity->save();
+            }
+        }
+    }
 }

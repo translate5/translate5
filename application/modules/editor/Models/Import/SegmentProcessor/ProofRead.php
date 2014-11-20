@@ -132,6 +132,15 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
     	$skel->setfileId($this->fileId);
     	$skel->setFile($parser->getSkeletonFile()); // wird in Sdlxliff.php befüllt
     	$skel->save();
+        $this->saveFieldWidth($parser);
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see editor_Models_Import_SegmentProcessor::postProcessHandler()
+     */
+    public function postProcessHandler(editor_Models_Import_FileParser $parser, $segmentId) {
+        $this->calculateFieldWidth($parser);
     }
     
     /**

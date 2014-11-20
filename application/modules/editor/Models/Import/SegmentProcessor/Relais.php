@@ -92,4 +92,21 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
         }
         return false;
     }
+      
+    /**
+     * Überschriebener Post Parse Handler, erstellt in diesem Fall das Skeleton File
+     * @override
+     * @param editor_Models_Import_FileParser $parser
+     */
+    public function postParseHandler(editor_Models_Import_FileParser $parser) {
+        $this->saveFieldWidth($parser);
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see editor_Models_Import_SegmentProcessor::postProcessHandler()
+     */
+    public function postProcessHandler(editor_Models_Import_FileParser $parser, $segmentId) {
+        $this->calculateFieldWidth($parser,array($this->sfm->getFirstTargetName() => 'relais'));
+    }
 }
