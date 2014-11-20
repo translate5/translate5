@@ -161,41 +161,72 @@ Ext.define('Editor.view.segments.Grid', {
             var name = rec.get('name'),
                 type = rec.get('type'),
                 editable = rec.get('editable'),
+                label = rec.get('label'),
+                width = rec.get('width'),
+                widthFactorHeader = Editor.data.columns.widthFactorHeader,
                 isEditableTarget = type == rec.TYPE_TARGET && editable,
                 isErgoVisible = !firstTargetFound && isEditableTarget || type == rec.TYPE_SOURCE;
+            
             
             //stored outside of function and must be set after isErgoVisible!
             firstTargetFound = firstTargetFound || isEditableTarget; 
             
-            var col2push = false;
             if(!rec.isTarget() || ! userPref.isNonEditableColumnDisabled()) {
-                col2push = {
+                var labelWidth = (label.length)*widthFactorHeader;
+                if(labelWidth > width){
+                    width = labelWidth;
+                }
+                var col2push = {
                     xtype: 'contentColumn',
                     segmentField: rec,
                     fieldName: name,
                     hidden: !userPref.isNonEditableColumnVisible() && rec.isTarget(),
                     isErgonomicVisible: isErgoVisible && !editable,
                     isErgonomicSetWidth: true, //currently true for all our affected default fields
-                    text: rec.get('label'),
-                    width: rec.get('width')
+                    text: label,
+                    width: width
                 };
+                if(width !== Editor.data.columns.maxWidth){
+                //the following line would be an alternative to only adjust the columnWidth of 
+                //hidden cols in ergoMode. This would ensure, that the horizontal scrollbar
+                //keeps working, which it does not if it is not initialized at the first place
+                //(due to an ExtJs-bug)    
+                //if(width !== Editor.data.columns.maxWidth && (isErgoVisible && !editable)=== false){
+                    var ergoWidth = rec.get('width') * Editor.data.columns.widthFactorErgonomic;
+                    if(labelWidth > ergoWidth){
+                        ergoWidth = labelWidth;
+                    }
+                    col2push.ergonomicWidth = ergoWidth;
+                }
+                columns.push(col2push);
             }
             
             if(editable){
-                col2push = {
+                label = Ext.String.format(me.column_edited, label);
+                var labelWidth = (label.length)*widthFactorHeader;
+                if(labelWidth > width){
+                    width = labelWidth;
+                }
+                var col2push = {
                     xtype: 'contentEditableColumn',
                     segmentField: rec,
                     fieldName: name,
                     isErgonomicVisible: isErgoVisible,
                     isErgonomicSetWidth: true, //currently true for all our affected default fields
-                    text: Ext.String.format(me.column_edited, rec.get('label')),
-                    width: rec.get('width')
+                    text: label,
+                    width: width
                 };
-            }
-            
-            if(col2push){
-                if(rec.get('width') !== 250){
-                    col2push.ergonomicWidth = rec.get('width');
+                if(width !== Editor.data.columns.maxWidth){
+                //the following line would be an alternative to only adjust the columnWidth of 
+                //hidden cols in ergoMode. This would ensure, that the horizontal scrollbar
+                //keeps working, which it does not if it is not initialized at the first place
+                //(due to an ExtJs-bug)
+                //if(width !== Editor.data.columns.maxWidth && !isErgoVisible){
+                    var ergoWidth = rec.get('width') * Editor.data.columns.widthFactorErgonomic;
+                    if(labelWidth > ergoWidth){
+                        ergoWidth = labelWidth;
+                    }
+                    col2push.ergonomicWidth = ergoWidth;
                 }
                 columns.push(col2push);
             }
