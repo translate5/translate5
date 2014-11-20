@@ -399,6 +399,7 @@ class editor_Models_Import {
      * @param editor_Models_RelaisFoldertree $tree
      */
     protected function importRelaisFiles(editor_Models_RelaisFoldertree $tree){
+        $mqmProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_MqmParser', array($this->task, $this->segmentFieldManager));
         $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_Relais', array($this->task, $this->segmentFieldManager));
         /* @var $segProc editor_Models_Import_SegmentProcessor_Relais */
         foreach ($this->_filePaths as $fileId => $path) {
@@ -412,9 +413,11 @@ class editor_Models_Import {
             $parser = $this->getFileParser($path, $params);
             /* @var $parser editor_Models_Import_FileParser */
             $segProc->setSegmentFile($fileId, $params[1]);  //$params[1] => filename
+            $parser->addSegmentProcessor($mqmProc);
             $parser->addSegmentProcessor($segProc);
             $parser->parseFile();
     	}
+        $mqmProc->handleErrors();
     }
     
     /**
