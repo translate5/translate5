@@ -128,7 +128,7 @@ class editor_TermTagger_PluginBootstrap {
         if (!$worker->run()) {return false;};
         
         // #2 run from queue (mutex-save)
-        //$worker->queue();
+        //$worker->queue(); return;
         //if (!$worker->runQueued()) {return false;}
         
         
@@ -166,8 +166,8 @@ class editor_TermTagger_PluginBootstrap {
         $request = ZfExtended_Factory::get('Zend_Controller_Request_Http');
         /* @var $request Zend_Controller_Request_Http */
         
-        if ($request->getParam('startTest') == 1) {
-            $this->test();
+        if ($request->getParam('startTest_1') == 1) {
+            $this->test_1();
         }
         
         if ($request->getParam('startTest_2')) {
@@ -181,7 +181,7 @@ class editor_TermTagger_PluginBootstrap {
         return false;
     }
     
-    private function test() {
+    private function test_1() {
         error_log(__CLASS__.' -> '.__FUNCTION__);
         
         $workerQueue = ZfExtended_Factory::get('ZfExtended_Worker_Queue');
@@ -192,9 +192,9 @@ class editor_TermTagger_PluginBootstrap {
     private function test_2() {
         error_log(__CLASS__.' -> '.__FUNCTION__);
         
-        $workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $workerModel ZfExtended_Models_Worker */
-        $workerListQueued = $workerModel->getListQueued();
+        $trigger = ZfExtended_Factory::get('ZfExtended_Worker_TriggerByHttp');
+        /* @var $trigger ZfExtended_Worker_TriggerByHttp */
+        $trigger->triggerWorker(23, '5462000c27cc39.07467709');
         
         //error_log(__CLASS__.' -> '.__FUNCTION__.'; Liste-Queued: '.print_r($workerListQueued, true));
     }
@@ -205,8 +205,10 @@ class editor_TermTagger_PluginBootstrap {
         
         $workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
         /* @var $workerModel ZfExtended_Models_Worker */
-        $workerListSlotsCount = $workerModel->getListSlotsCount('TermTagger_default');
+        //$workerListSlotsCount = $workerModel->getListSlotsCount('TermTagger_default');
+        //error_log(__CLASS__.' -> '.__FUNCTION__.'; Liste-Resource: '.print_r($workerListSlotsCount, true));
         
-        error_log(__CLASS__.' -> '.__FUNCTION__.'; Liste-Resource: '.print_r($workerListSlotsCount, true));
+        $workerModel->wakeupScheduled('{10ea5327-8257-4f4e-abf0-8063e9878b17}');
+        
     }
 }

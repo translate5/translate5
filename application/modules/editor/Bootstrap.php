@@ -54,11 +54,13 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
 {
     protected $front;
     
+    
     public function _initController()
     {
         $this->front = Zend_Controller_Front::getInstance();
     }
-
+    
+    
     public function _initREST()
     {
         $this->front->setRequest(new REST_Controller_Request_Http);
@@ -74,11 +76,14 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $restContexts = new REST_Controller_Action_Helper_RestContexts();
         Zend_Controller_Action_HelperBroker::addHelper($restContexts);
     }
-
+    
+    
     public function _initRestRoutes()
     {
         $restRoute = new Zend_Rest_Route($this->front, array(), array(
-            'editor' => array('file', 'segment', 'alikesegment', 'referencefile', 'qmstatistics', 'comment', 'task', 'user', 'taskuserassoc', 'segmentfield','workflowuserpref'),
+            //'editor' => array('file', 'segment', 'alikesegment', 'referencefile', 'qmstatistics', 'comment', 'task', 'user', 'taskuserassoc', 'segmentfield','workflowuserpref'),
+            'editor' => array(  'file', 'segment', 'alikesegment', 'referencefile', 'qmstatistics', 'comment',
+                                'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker'),
         ));
         $this->front->getRouter()->addRoute('restDefault', $restRoute);
 
@@ -118,8 +123,18 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'export'
             ));
         $this->front->getRouter()->addRoute('export', $exportRoute);
+        
+        $workerRoute = new Zend_Controller_Router_Route(
+            'editor/worker/queue/*',
+            array(
+                'module' => 'editor',
+                'controller' => 'worker',
+                'action' => 'queue'
+            ));
+        $this->front->getRouter()->addRoute('queue', $workerRoute);
     }
-
+    
+    
     public function _initOtherRoutes()
     {
         $localizedJsRoute = new Zend_Controller_Router_Route(

@@ -74,10 +74,12 @@ class editor_Worker_Termtagger extends ZfExtended_Worker_Abstract {
     
     
     /**
-     * Special Paramters
-     * - resourcePool:
+     * Special Paramters:
+     * 
+     * $parameters['resourcePool']
      * sets the resourcePool for slot-calculation depending on the context.
      * Possible values are all values out of self::allowedResourcePool
+     * 
      * 
      * On very first init:
      * seperate data from parameters which are needed while processing queued-worker.
@@ -96,16 +98,24 @@ class editor_Worker_Termtagger extends ZfExtended_Worker_Abstract {
         
         $parametersToSave = array();
         
-        if (isset($parameters['segmentData'])) {
-            foreach ($parameters['segmentData'] as $item) {
-                $parametersToSave['segmentIds'][] = $item['id'];
-            }
-        }
-        
         if (isset($parameters['resourcePool'])) {
             if (in_array($parameters['resourcePool'], self::$allowedResourcePools)) {
                 $this->resourcePool = $parameters['resourcePool'];
                 $parametersToSave['resourcePool'] = $this->resourcePool;
+            }
+        }
+        
+        // TODO (siehe auch ->work())
+        // Unterscheidung zwischen einer Liste an Segmenten die ausgezeichnet werden sollen
+        // und einem einzelnen Text der Ausgezeichnet werden soll.
+        
+        if (isset($parameters['segmentIds'])) {
+            $parametersToSave['segmentIds'] = $parameters['segmentIds'];
+        }
+        
+        if (isset($parameters['segmentData'])) {
+            foreach ($parameters['segmentData'] as $item) {
+                $parametersToSave['segmentIds'][] = $item['id'];
             }
         }
         
@@ -118,7 +128,8 @@ class editor_Worker_Termtagger extends ZfExtended_Worker_Abstract {
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        if (!isset($parameters['segmentData'][0]['targetEdit']) && !isset($parameters['segmentIds'])) {
+        if (!isset($parameters['segmentData'][0]['targetEdit']) && empty($parameters['segmentIds'])) {
+            error_log(__CLASS__.' -> '.__FUNCTION__.' can not validate $parameters: '.print_r($parameters, true));
             return false;
         }
         return true;
@@ -143,7 +154,15 @@ class editor_Worker_Termtagger extends ZfExtended_Worker_Abstract {
         return $this->calculateSlot($this->resourcePool);
     }
     
-    public function calculateSlot($resourcePool = 'default') {
+    
+    /**
+     * Calculates the resource and slot for the given $resourcePool
+     * Some kind of "load-balancing" is used in calculations so every resource/slot-combination is used in the same weight
+     * 
+     * @param string $resourcePool
+     * @return array('resource' => resourceName, 'slot' => slotName)
+     */
+    private function calculateSlot($resourcePool = 'default') {
         $resourceName = self::praefixResourceName.$resourcePool;
         //error_log(__CLASS__.' -> '.__FUNCTION__.' $resourcePool: '.$resourcePool.' $resourceName: '.$resourceName);
         
@@ -162,7 +181,7 @@ class editor_Worker_Termtagger extends ZfExtended_Worker_Abstract {
                 $availableSlots = $config->runtimeOptions->termTagger->url->default->toArray();
                 break;
         }
-        // no slots foor this resourcePool defined
+        // no slots for this resourcePool defined
         if (empty($availableSlots) && $resourcePool != 'default') {
             // calculate slot from default resourcePool
             return $this->calculateSlot('default');
@@ -172,7 +191,7 @@ class editor_Worker_Termtagger extends ZfExtended_Worker_Abstract {
         
         // all slotes in use
         if (count($usedSlots) == count($availableSlots)) {
-            // take first slot in use which is the one with the min. number of counts
+            // take first slot in list of usedSlots which is the one with the min. number of counts
             $return = array('resource' => $resourceName, 'slot' => $usedSlots[0]['slot']);
             //error_log(__CLASS__.' -> '.__FUNCTION__.'; $return '.print_r($return, true));
             return $return;
@@ -196,7 +215,7 @@ class editor_Worker_Termtagger extends ZfExtended_Worker_Abstract {
             return $return;
         }
         
-        // no slot in use = default return
+        // no slot in use
         $return = array('resource' => $resourceName, 'slot' => $availableSlots[array_rand($availableSlots)]);
         //error_log(__CLASS__.' -> '.__FUNCTION__.'; $return '.print_r($return, true));
         return $return;
@@ -224,18 +243,32 @@ class editor_Worker_Termtagger extends ZfExtended_Worker_Abstract {
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
-        //error_log(__CLASS__.' -> '.__FUNCTION__);
+        
+        error_log(__CLASS__.' -> '.__FUNCTION__);
+        sleep(3);
+        
         if (empty($this->data)) {
             return false;
         }
         
-        foreach ($this->data['segmentData'] as &$segment) {
-            $tempText = $segment['targetEdit'];
-            $tempText = 'PSEUDO-TERMTAGGED: '.$tempText;
-            $segment['targetEdit'] = $tempText;
+        // TODO hier klinkt sich später der tatsächliche TermTagger-Process ein.
+        // Unterscheidung zwischen einer Liste an Segmenten die ausgezeichnet werden sollen
+        // und einem einzelnen Text der Ausgezeichnet werden soll.
+        
+        if (isset($this->data['segmentIds'])) {
+            $this->result = $this->data['segmentIds'];
         }
         
-        $this->result = $this->data['segmentData'];
+        if (isset($this->data['segmentData'])) {
+            foreach ($this->data['segmentData'] as &$segment) {
+                $tempText = $segment['targetEdit'];
+                $tempText = 'PSEUDO-TERMTAGGED: '.$tempText;
+                $segment['targetEdit'] = $tempText;
+                
+            }
+            $this->result = $this->data['segmentData'];
+        }
+        
         
         return true;
     }
