@@ -1,6 +1,15 @@
 ### this file holds all changes and necessary configs needed for updates
 ### newest changes on top
 
+2014-11-21 - New Features:
+            TRANSLATE-317: Smaller width for alternative columns
+
+2014-05-11 - Bugfixes:
+            TRANSLATE-197: Fixed: Changing a user state in a ended task throws an exception
+            TRANSLATE-321: Fixed: Meaningless error message if relais and proofread data are not aligned properly
+            TRANSLATE-320: Fixed: Reopening a bug does not recreate the materialized view of a task
+            TRANSLATE-316: Translated: check untranslated GUI strings
+            Code Clean Up: removed old preloadImages code
 
 2014-05-11 - New Features:
             TRANSLATE-284: allow import-file format "*.XLF" for new IBM-XLIFF import
