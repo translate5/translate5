@@ -118,7 +118,7 @@ abstract class editor_Models_Import_SegmentProcessor {
      * @param array $fields2Calculate 1-D array, key is name of field in file and value is mapped field name for db (may be same as key, or e. g. "relais" | default null; if null, all fields are calculated
      * @throws ZfExtended_Exception
      */
-    protected function calculateFieldWidth(editor_Models_Import_FileParser $parser, $fields2Calculate = null) {
+    protected function calculateFieldWidth(editor_Models_Import_FileParser $parser, array $fields2Calculate = null) {
         $fieldContents = $parser->getFieldContents();
         $config = Zend_Registry::get('config');
         $widthFactor = (float)$config->runtimeOptions->editor->columns->widthFactor;
@@ -140,7 +140,7 @@ abstract class editor_Models_Import_SegmentProcessor {
                 $this->fieldWidth[$field] = 0;
             }
             $calculatedWidth = $strlen*$widthFactor;
-            $this->fieldWidth[$field] = ($this->fieldWidth[$field]>$calculatedWidth)?$this->fieldWidth[$field]:$calculatedWidth;
+            $this->fieldWidth[$field] = max($this->fieldWidth[$field], $calculatedWidth);
         }
     }
     
