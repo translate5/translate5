@@ -131,9 +131,6 @@ abstract class editor_Models_Import_SegmentProcessor {
             }
             $strlen = mb_strlen(strip_tags($contents['original']));
             if($strlen === false){
-                ob_start();
-                var_dump($contents);
-                error_log(ob_get_clean());
                 throw new ZfExtended_Exception('strlen could not be detected. Something with the internal encoding must be wrong.');
             }
             if(!isset($this->fieldWidth[$field])){
