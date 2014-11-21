@@ -164,6 +164,7 @@ Ext.define('Editor.view.segments.Grid', {
                 label = rec.get('label'),
                 width = rec.get('width'),
                 widthFactorHeader = Editor.data.columns.widthFactorHeader,
+                maxWidth = Editor.data.columns.maxWidth,
                 isEditableTarget = type == rec.TYPE_TARGET && editable,
                 isErgoVisible = !firstTargetFound && isEditableTarget || type == rec.TYPE_SOURCE;
             
@@ -175,6 +176,9 @@ Ext.define('Editor.view.segments.Grid', {
                 var labelWidth = (label.length)*widthFactorHeader;
                 if(labelWidth > width){
                     width = labelWidth;
+                    if(width > maxWidth){
+                       width = maxWidth;
+                    }
                 }
                 var col2push = {
                     xtype: 'contentColumn',
@@ -186,12 +190,12 @@ Ext.define('Editor.view.segments.Grid', {
                     text: label,
                     width: width
                 };
-                if(width !== Editor.data.columns.maxWidth){
+                if(width !== maxWidth){
                 //the following line would be an alternative to only adjust the columnWidth of 
                 //hidden cols in ergoMode. This would ensure, that the horizontal scrollbar
                 //keeps working, which it does not if it is not initialized at the first place
                 //(due to an ExtJs-bug)    
-                //if(width !== Editor.data.columns.maxWidth && (isErgoVisible && !editable)=== false){
+                //if(width !== maxWidth && (isErgoVisible && !editable)=== false){
                     var ergoWidth = rec.get('width') * Editor.data.columns.widthFactorErgonomic;
                     if(labelWidth > ergoWidth){
                         ergoWidth = labelWidth;
@@ -206,6 +210,9 @@ Ext.define('Editor.view.segments.Grid', {
                 var labelWidth = (label.length)*widthFactorHeader;
                 if(labelWidth > width){
                     width = labelWidth;
+                    if(width > maxWidth){
+                       width = maxWidth;
+                    }
                 }
                 var col2push = {
                     xtype: 'contentEditableColumn',
@@ -216,12 +223,12 @@ Ext.define('Editor.view.segments.Grid', {
                     text: label,
                     width: width
                 };
-                if(width !== Editor.data.columns.maxWidth){
+                if(width !== maxWidth){
                 //the following line would be an alternative to only adjust the columnWidth of 
                 //hidden cols in ergoMode. This would ensure, that the horizontal scrollbar
                 //keeps working, which it does not if it is not initialized at the first place
                 //(due to an ExtJs-bug)
-                //if(width !== Editor.data.columns.maxWidth && !isErgoVisible){
+                //if(width !== maxWidth && !isErgoVisible){
                     var ergoWidth = rec.get('width') * Editor.data.columns.widthFactorErgonomic;
                     if(labelWidth > ergoWidth){
                         ergoWidth = labelWidth;
