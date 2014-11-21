@@ -164,6 +164,8 @@ Ext.define('Editor.view.segments.Grid', {
                 label = rec.get('label'),
                 width = rec.get('width'),
                 widthFactorHeader = Editor.data.columns.widthFactorHeader,
+                ergoWidth = width * Editor.data.columns.widthFactorErgonomic,
+                labelWidth = (label.length) * widthFactorHeader,
                 isEditableTarget = type == rec.TYPE_TARGET && editable,
                 isErgoVisible = !firstTargetFound && isEditableTarget || type == rec.TYPE_SOURCE;
             
@@ -172,10 +174,7 @@ Ext.define('Editor.view.segments.Grid', {
             firstTargetFound = firstTargetFound || isEditableTarget; 
             
             if(!rec.isTarget() || ! userPref.isNonEditableColumnDisabled()) {
-                var labelWidth = (label.length)*widthFactorHeader;
-                if(labelWidth > width){
-                    width = labelWidth;
-                }
+                width = Math.max(width, labelWidth);
                 var col2push = {
                     xtype: 'contentColumn',
                     segmentField: rec,
@@ -192,21 +191,15 @@ Ext.define('Editor.view.segments.Grid', {
                 //keeps working, which it does not if it is not initialized at the first place
                 //(due to an ExtJs-bug)    
                 //if(width !== Editor.data.columns.maxWidth && (isErgoVisible && !editable)=== false){
-                    var ergoWidth = rec.get('width') * Editor.data.columns.widthFactorErgonomic;
-                    if(labelWidth > ergoWidth){
-                        ergoWidth = labelWidth;
-                    }
-                    col2push.ergonomicWidth = ergoWidth;
+                    col2push.ergonomicWidth = Math.max(labelWidth, ergoWidth);
                 }
                 columns.push(col2push);
             }
             
             if(editable){
                 label = Ext.String.format(me.column_edited, label);
-                var labelWidth = (label.length)*widthFactorHeader;
-                if(labelWidth > width){
-                    width = labelWidth;
-                }
+                labelWidth = (label.length) * widthFactorHeader;
+                width = Math.max(width, labelWidth);
                 var col2push = {
                     xtype: 'contentEditableColumn',
                     segmentField: rec,
@@ -222,11 +215,7 @@ Ext.define('Editor.view.segments.Grid', {
                 //keeps working, which it does not if it is not initialized at the first place
                 //(due to an ExtJs-bug)
                 //if(width !== Editor.data.columns.maxWidth && !isErgoVisible){
-                    var ergoWidth = rec.get('width') * Editor.data.columns.widthFactorErgonomic;
-                    if(labelWidth > ergoWidth){
-                        ergoWidth = labelWidth;
-                    }
-                    col2push.ergonomicWidth = ergoWidth;
+                    col2push.ergonomicWidth = Math.max(labelWidth, ergoWidth);
                 }
                 columns.push(col2push);
             }
