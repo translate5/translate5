@@ -70,7 +70,7 @@ VALUES (
 NULL ,  'runtimeOptions.editor.columns.widthFactorHeader',  '1',  'editor',  'layout',  '7',  '7', NULL ,  'string', 'factor which is used to calculate the column width from the chars of a column-header, if the otherwise calculated width would be to small for the header'
 );
 
-INSERT INTO  `translate5`.`Zf_configuration` (
+INSERT INTO  `Zf_configuration` (
 `id` ,
 `name` ,
 `confirmed` ,
@@ -85,7 +85,6 @@ INSERT INTO  `translate5`.`Zf_configuration` (
 VALUES (
 NULL ,  'runtimeOptions.editor.columns.widthFactorErgonomic',  '1',  'editor',  'layout',  '1.9',  '1.9', NULL ,  'string', 'factor which is used to calculate the column width for the ergonomic mode from the width which is set for the editing mode, if it is smaller than the maxWidth '
 );
-
 
 INSERT INTO  `Zf_configuration` (
 `id` ,
