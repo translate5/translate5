@@ -592,8 +592,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * Deep Cloning of the internal data object
+     * now implemented in ZfExtended_Models_Entity_Abstract
      */
+    /*
     public function __clone() {
         $this->row = clone $this->row;
     }
+    */
 }
