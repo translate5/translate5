@@ -83,8 +83,10 @@ Ext.define('Editor.view.segments.Grid', {
     item_qmsummaryBtn: '#UT#QM-Subsegment-Statistik',
     item_optionsTagBtn: '#UT#Einstellungen',
     item_clearSortAndFilterBtn: '#UT#Sortierung und Filter zurücksetzen',
-    column_edited: '#UT#{0}: bearbeitet',
-  
+    column_edited: '#UT#bearbeibar',
+    
+    column_edited_icon: '{0} <img src="{1}" class="icon-editable" alt="{2}" title="{3}">',
+    
     columnMap:{},
     stateData: {},
     qualityData: {},
@@ -164,6 +166,7 @@ Ext.define('Editor.view.segments.Grid', {
                 label = rec.get('label'),
                 width = rec.get('width'),
                 widthFactorHeader = Editor.data.columns.widthFactorHeader,
+                widthOffsetEditable = Editor.data.columns.widthOffsetEditable,
                 ergoWidth = width * Editor.data.columns.widthFactorErgonomic,
                 labelWidth = (label.length) * widthFactorHeader,
                 maxWidth = Editor.data.columns.maxWidth,
@@ -198,8 +201,8 @@ Ext.define('Editor.view.segments.Grid', {
             }
             
             if(editable){
-                label = Ext.String.format(me.column_edited, label);
-                labelWidth = (label.length) * widthFactorHeader;
+                labelWidth = (label.length) * widthFactorHeader + widthOffsetEditable;
+                label = Ext.String.format(me.column_edited_icon, label, Ext.BLANK_IMAGE_URL, me.column_edited, me.column_edited);
                 width = Math.min(Math.max(width, labelWidth), maxWidth);
                 var col2push = {
                     xtype: 'contentEditableColumn',
