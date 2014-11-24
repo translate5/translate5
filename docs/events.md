@@ -39,20 +39,6 @@ defined in `/library/ZfExtended/Controllers/Action.php`  will trigger an event o
 - **doFinish**
 - **doWait**
 
-###editor_Workflow_Abstract
-####Task
-- **doReopen** 
-- **doEnd**
-
-####TaskUserAssoc
-- **doUnfinish** 
-- **doOpen**
-- **doView**
-- **doEdit**
-- **doFinish**
-- **doWait**
-
-
 
 ##Handmade events
 Handmade events are spezial events wich are defined direct in the code. No automatic definition is used while trigger.
