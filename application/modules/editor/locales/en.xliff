@@ -1053,6 +1053,7 @@
 	<target>Password saved successfully!</target>
       </trans-unit>
       <trans-unit id='cXVlbGxl'><source>quelle</source><target>source</target></trans-unit>
+      <trans-unit id='ZWRpdGllcmJhcg=='><source>editierbar</source><target>editable</target></trans-unit>
     </body>
   </file>
 </xliff>
