@@ -318,6 +318,7 @@ abstract class editor_Models_Import_FileParser {
      * @return string $segment
      */
     protected function parseSegmentProtectWhitespace($segment, &$count = 0) {
+        $split = preg_split('#(<[^>]+>)#', $segment, null, PREG_SPLIT_DELIM_CAPTURE);
         $search = array(
           "\r\n",  
           "\n",  
@@ -328,17 +329,25 @@ abstract class editor_Models_Import_FileParser {
           '<softReturn />',
           '<macReturn />'
         );
-        $segment =  str_replace($search, $replace, $segment, $returnCount);
-        $count += $returnCount;
-        
-        $replacer = function ($match) {
-                        return ' <space ts="' . implode(',', unpack('H*', $match[1])) . '"/>';
-                    };
-        
-        //protect multispaces
-        $res = preg_replace_callback('" ( +)"', $replacer, $segment, -1, $spaceCount);
-        $count += $spaceCount;
-        return $res;
+        $i = 0;
+        foreach($split as $idx => $chunk) {
+            if($i++ % 2 === 1 || strlen($chunk) == 0) {
+                //ignore found tags in the content or empty chunks
+                continue; 
+            }
+            //replace only on real text
+            $chunk = str_replace($search, $replace, $chunk, $returnCount);
+            $count += $returnCount;
+            
+            $replacer = function ($match) {
+                            return ' <space ts="' . implode(',', unpack('H*', $match[1])) . '"/>';
+                        };
+            
+            //protect multispaces
+            $split[$idx] = preg_replace_callback('" ( +)"', $replacer, $chunk, -1, $spaceCount);
+            $count += $spaceCount;
+        }
+        return join($split);
     }
     
     /**

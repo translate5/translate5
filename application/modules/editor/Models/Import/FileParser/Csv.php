@@ -288,28 +288,6 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     }
     
     /**
-     * callback for replace method in parseSegment
-     * @param array $match
-     * @return string
-     */
-    protected function whitespaceTagReplacer(array $match) {
-        //$replacer = function($match) use ($segment, $shortTagIdent, $map) {
-        $tag = $match[0];
-        $tagName = preg_replace('"<([^/ ]*).*>"', '\\1', $tag);
-        if(!isset($this->_tagMapping[$tagName])) {
-            trigger_error('The used tag ' . $tagName .' is undefined! Segment: '.$this->_segment, E_USER_ERROR);
-        }
-        $fileNameHash = md5($this->_tagMapping[$tagName]['imgText']);
-
-        //generate the html tag for the editor
-        $p = $this->getTagParams($tag, $this->shortTagIdent++, $tagName, $fileNameHash);
-        $tag = $this->_singleTag->getHtmlTag($p);
-        $this->_singleTag->createAndSaveIfNotExists($this->_tagMapping[$tagName]['imgText'], $fileNameHash);
-        $this->_tagCount++;
-        return $tag;
-    }
-    
-    /**
      * Sets $this->_editSegment, $this->_matchRateSegment and $this->_autopropagated
      * and $this->_pretransSegment and $this->_autoStateId for the segment currently worked on
      * 
