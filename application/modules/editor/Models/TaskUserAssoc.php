@@ -355,10 +355,4 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         return $this->db->fetchAll($s)->toArray();
     }
     
-    /**
-     * Deep Cloning of the internal data object
-     */
-    public function __clone() {
-        $this->row = clone $this->row;
-    }
 }
