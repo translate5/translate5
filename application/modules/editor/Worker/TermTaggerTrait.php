@@ -63,7 +63,7 @@ trait editor_Worker_TermTaggerTrait {
      * Praefix for workers resource-name
      * @var string
     */
-    const praefixResourceName = 'TermTagger_';
+    private static $praefixResourceName = 'TermTagger_';
     
     
     /**
@@ -100,7 +100,7 @@ trait editor_Worker_TermTaggerTrait {
      * @return array('resource' => resourceName, 'slot' => slotName)
      */
     private function calculateSlot($resourcePool = 'default') {
-        $resourceName = self::praefixResourceName.$resourcePool;
+        $resourceName = $this->praefixResourceName.$resourcePool;
         //error_log(__CLASS__.' -> '.__FUNCTION__.' $resourcePool: '.$resourcePool.' $resourceName: '.$resourceName);
         
         // detect defined slots for the resourcePool
