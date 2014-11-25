@@ -108,7 +108,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         
         if (strpos($this->_origFileUnicodeProtected, $this->ibmXliffNeedle) === false)
         {
-            error_log('Die Datei ' . $this->_fileName . ' ist keine gültige IBM-Xliff Datei! ('.$this->ibmXliffNeedle.' nicht enthalten)');
+            /* @var $log ZfExtended_Log */
+            $msg = 'Die Datei ' . $this->_fileName . ' ist keine gültige IBM-Xliff Datei! ('.$this->ibmXliffNeedle.' nicht enthalten)';
+            $log = ZfExtended_Factory::get('ZfExtended_Log');
+            $log->logError($msg);
             return;
         } 
         
@@ -192,7 +195,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      *
      * - speichert die Segmente in der Datenbank
      * @param array $transUnit
-     * TODO:
      * @return array $transUnit enthält anstelle der Segmente die Replacement-Tags <lekSourceSeg id=""/> und <lekTargetSeg id=""/>
      *         wobei die id die ID des Segments in der Tabelle Segments darstellt
      */
