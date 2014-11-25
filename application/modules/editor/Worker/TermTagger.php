@@ -46,7 +46,7 @@ class editor_Worker_Termtagger extends ZfExtended_Worker_Abstract {
      * 
      * $parameters['resourcePool']
      * sets the resourcePool for slot-calculation depending on the context.
-     * Possible values are all values out of self::allowedResourcePool
+     * Possible values are all values out of $this->allowedResourcePool
      * 
      * 
      * On very first init:
@@ -67,7 +67,7 @@ class editor_Worker_Termtagger extends ZfExtended_Worker_Abstract {
         $parametersToSave = array();
         
         if (isset($parameters['resourcePool'])) {
-            if (in_array($parameters['resourcePool'], self::$allowedResourcePools)) {
+            if (in_array($parameters['resourcePool'], $this->allowedResourcePools)) {
                 $this->resourcePool = $parameters['resourcePool'];
                 $parametersToSave['resourcePool'] = $this->resourcePool;
             }

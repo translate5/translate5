@@ -49,7 +49,7 @@ trait editor_Worker_TermTaggerTrait {
     
     /**
      * resourcePool for the different TermTagger-Operations;
-     * Possible Values: self::allowdResourcePools = array('default', 'gui', 'import');
+     * Possible Values: $this->allowdResourcePools = array('default', 'gui', 'import');
      * @var string
      */
     protected $resourcePool = 'default';
@@ -100,7 +100,7 @@ trait editor_Worker_TermTaggerTrait {
      * @return array('resource' => resourceName, 'slot' => slotName)
      */
     private function calculateSlot($resourcePool = 'default') {
-        $resourceName = $this->praefixResourceName.$resourcePool;
+        $resourceName = self::$praefixResourceName.$resourcePool;
         //error_log(__CLASS__.' -> '.__FUNCTION__.' $resourcePool: '.$resourcePool.' $resourceName: '.$resourceName);
         
         // detect defined slots for the resourcePool
@@ -156,6 +156,6 @@ trait editor_Worker_TermTaggerTrait {
         $return = array('resource' => $resourceName, 'slot' => $availableSlots[array_rand($availableSlots)]);
         //error_log(__CLASS__.' -> '.__FUNCTION__.'; $return '.print_r($return, true));
         return $return;
-        
     }
+    
 }
