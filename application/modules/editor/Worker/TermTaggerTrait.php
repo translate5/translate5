@@ -57,7 +57,7 @@ trait editor_Worker_TermTaggerTrait {
      * Allowd values for setting resourcePool
      * @var array(strings)
      */
-    private static $allowedResourcePools = array('default', 'gui', 'import');
+    protected static $allowedResourcePools = array('default', 'gui', 'import');
     
     /**
      * Praefix for workers resource-name

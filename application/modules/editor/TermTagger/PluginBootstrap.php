@@ -119,7 +119,7 @@ class editor_TermTagger_PluginBootstrap {
         
         $worker = ZfExtended_Factory::get('editor_Worker_TermTagger');
         /* @var $worker editor_Worker_TermTagger */
-        if (!$worker->init($taskGuid, array('segmentData' => $data))) {
+        if (!$worker->init($taskGuid, array('segmentData' => $data, 'resourcePool' => 'gui'))) {
             //error_log(__CLASS__.' -> '.__FUNCTION__.' Worker could not be initialized');
             return false;
         }

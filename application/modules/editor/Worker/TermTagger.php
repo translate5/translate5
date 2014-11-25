@@ -67,7 +67,7 @@ class editor_Worker_Termtagger extends ZfExtended_Worker_Abstract {
         $parametersToSave = array();
         
         if (isset($parameters['resourcePool'])) {
-            if (in_array($parameters['resourcePool'], $this->allowedResourcePools)) {
+            if (in_array($parameters['resourcePool'], self::$allowedResourcePools)) {
                 $this->resourcePool = $parameters['resourcePool'];
                 $parametersToSave['resourcePool'] = $this->resourcePool;
             }
