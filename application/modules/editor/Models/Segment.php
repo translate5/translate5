@@ -416,7 +416,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * Load segments by taskGuid.
      * @param string $taskGuid
-     * @param boolean $loadSourceEdited
      * @return array
      */
     public function loadByTaskGuid($taskGuid) {
@@ -430,6 +429,66 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->segmentFieldManager->initFields($taskGuid);
         $this->segmentFieldManager->getView()->create();
         return $this->_loadByTaskGuid($taskGuid);
+    }
+    
+    /**
+     * Loads the first segment of the given taskGuid.
+     * The found segment is stored internally (like load).
+     * First Segment is defined as the segment with the lowest id of the task
+     * 
+     * @param string $taskGuid
+     * @return editor_Models_Segment
+     */
+    public function loadFirst($taskGuid) {
+        $this->segmentFieldManager->initFields($taskGuid);
+        $this->reInitDb($taskGuid);
+        //ensure that view exists (does nothing if already):
+        $this->segmentFieldManager->getView()->create();
+
+        $seg = $this->loadNext($taskGuid, 0);
+        
+        if(empty($seg)) {
+            $this->notFound('first segment of task', $taskGuid);
+        }
+        return $seg;
+    }
+    
+    /**
+     * Loads the next segment after the given id from the given taskGuid
+     * next is defined as the segment with the next higher segmentId
+     * This method assumes that segmentFieldManager was already loaded internally
+     * @param string $taskGuid
+     * @param integer $id
+     * @return editor_Models_Segment | null if no next found
+     */
+    public function loadNext($taskGuid, $id) {
+        $s = $this->db->select()
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('id > ?', $id)
+            ->order('id ASC')
+            ->limit(1);
+
+        $row = $this->db->fetchRow($s);
+        if(empty($row)) {
+            return null;
+        }
+        $this->row = $row;
+        $this->initData($this->getId());
+        return $this;
+    }
+    
+    /**
+     * returns the segment count of the given taskGuid
+     * @param string $taskGuid
+     * @return integer the segment count
+     */
+    public function count($taskGuid) {
+        $s = $this->db->select()
+            ->from($this->db, array('cnt' => 'COUNT(id)'))
+            ->where('taskGuid = ?', $taskGuid);
+
+        $row = $this->db->fetchRow($s);
+        return $row->cnt;
     }
     
     /**
@@ -470,7 +529,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
          */
         $s->from($this->db, $cols);
         $s->where('taskGuid = ?', $taskGuid);
-
+        
         return parent::loadFilterdCustom($s);
     }
     
