@@ -212,6 +212,10 @@ class editor_Models_Import {
         
         //call post import Methods:
         $dataProvider->postImportHandler();
+        
+        //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
+        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
+        $eventManager->trigger('afterImport', $this, array('task' => $this->task));
     }
     
     /**
