@@ -39,6 +39,9 @@ defined in `/library/ZfExtended/Controllers/Action.php`  will trigger an event o
 - **doFinish**
 - **doWait**
 
+###Editor_SegmentController
+- **beforePutSave** with parameter array('model' => $this->entity), used in function putAction() after normal processing before saving the entity (= the segment)
+
 
 ##Handmade events
 Handmade events are spezial events wich are defined direct in the code. No automatic definition is used while trigger.
@@ -87,7 +90,7 @@ Example:
     public function __construct()
     {
 		$this->staticEvents = Zend_EventManager_StaticEventManager::getInstance();
-		$this->staticEvents->attach('classNameTriggerClass', 'eventName', array($this, 'handleEvent));
+		$this->staticEvents->attach('classNameTriggerClass', 'eventName', array($this, 'handleEvent'));
 	}
 	
 	public function handleEvent(Zend_EventManager_Event $event)
