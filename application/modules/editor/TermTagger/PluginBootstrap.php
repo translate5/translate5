@@ -56,6 +56,8 @@ class editor_TermTagger_PluginBootstrap {
         $this->staticEvents->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndex'));
         $this->staticEvents->attach('editor_Workflow_Default', array('doView', 'doEdit'), array($this, 'handleAfterTaskOpen'));
         $this->staticEvents->attach('editor_Models_Segment', 'beforeSave', array($this, 'handleBeforeSegmentSave'));
+        $this->staticEvents->attach('Editor_SegmentController', 'beforePutSave', array($this, 'handleTest'));
+        
         // SBE: only for testing
         $this->staticEvents->attach('IndexController', 'beforeStephanAction', array($this, 'handleTest'));
         // end of event-listeners
@@ -162,7 +164,11 @@ class editor_TermTagger_PluginBootstrap {
     /**
      * handler for test-events: IndexController#beforeStephanAction
      */
-    public function handleTest() {
+    public function handleTest(Zend_EventManager_Event $event) {
+        //$segment = $event->getParam('model');
+        /* @var $segment editor_Models_Segment */
+        //error_log(__CLASS__.' -> '.__FUNCTION__.'; $segment: '.print_r($segment->getDataObject(), true));
+        
         $request = ZfExtended_Factory::get('Zend_Controller_Request_Http');
         /* @var $request Zend_Controller_Request_Http */
         
@@ -208,7 +214,10 @@ class editor_TermTagger_PluginBootstrap {
         //$workerListSlotsCount = $workerModel->getListSlotsCount('TermTagger_default');
         //error_log(__CLASS__.' -> '.__FUNCTION__.'; Liste-Resource: '.print_r($workerListSlotsCount, true));
         
-        $workerModel->wakeupScheduled('{10ea5327-8257-4f4e-abf0-8063e9878b17}');
+        //$workerModel->wakeupScheduled('{10ea5327-8257-4f4e-abf0-8063e9878b17}');
         
+        $termtaggerService = ZfExtended_Factory::get('editor_TermTagger_Service');
+        /* @var $termtaggerService editor_TermTagger_Service */
+        $termtaggerService->test($config)
     }
 }

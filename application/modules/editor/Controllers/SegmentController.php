@@ -51,7 +51,29 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     protected $_filterTypeMap = array(
         array('qmId' => array('list' => 'listAsString'))
     );
-
+    
+    /**
+     * @var ZfExtended_EventManager
+     */
+    protected $events = false;
+    
+    
+    /**
+     * Initialize event-trigger.
+     * 
+     * For more Information see definition of parent-class
+     * 
+     * @param Zend_Controller_Request_Abstract $request
+     * @param Zend_Controller_Response_Abstract $response
+     * @param array $invokeArgs
+     */
+    public function __construct(Zend_Controller_Request_Abstract $request, Zend_Controller_Response_Abstract $response, array $invokeArgs = array())
+    {
+        parent::__construct($request, $response);
+        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
+    }
+    
+    
     protected function afterTaskGuidCheck() {
         $sfm = $this->initSegmentFieldManager($this->session->taskGuid);
         $this->_sortColMap = $sfm->getSortColMap();
@@ -117,7 +139,9 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
                 $this->entity->recreateTermTags($field, strpos($field, editor_Models_SegmentField::TYPE_SOURCE) === 0);
             }
         }
-
+        
+        $this->events->trigger("beforePutSave", $this, array('model' => $this->entity));
+        
         $this->entity->save();
         $this->view->rows = $this->entity->getDataObject();
     }
