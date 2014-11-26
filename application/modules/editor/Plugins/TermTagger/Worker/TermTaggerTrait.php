@@ -37,7 +37,7 @@
  * Trait for "TermTagger"
  * used as shared-code-base for the differen TermTaggerWorker.
  */
-trait editor_Worker_TermTaggerTrait {
+trait editor_Plugins_TermTagger_Worker_TermTaggerTrait {
     
     /**
      * overwrites $this->workerModel->maxLifetime

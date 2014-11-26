@@ -34,11 +34,11 @@
  END LICENSE AND COPYRIGHT 
  */
 /**
- * editor_Worker_TermTagger Class
+ * editor_Plugins_TermTagger_Worker_TermTagger Class
  */
-class editor_Worker_Termtagger extends ZfExtended_Worker_Abstract {
+class editor_Plugins_TermTagger_Worker_TermTagger extends ZfExtended_Worker_Abstract {
     
-    use editor_Worker_TermTaggerTrait;
+    use editor_Plugins_TermTagger_Worker_TermTaggerTrait;
     
     
     /**

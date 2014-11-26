@@ -37,7 +37,7 @@
 /**
  * Service Class of Plugin "TermTagger"
  */
-class editor_TermTagger_Service {
+class editor_Plugins_TermTagger_Service {
     
     
     public function ping($config, $tbxhash = null) {
@@ -46,8 +46,7 @@ class editor_TermTagger_Service {
     }
     
     public function test() {
-        error_log(__CLASS__.' -> '.__FUNCTION__.'; $url: '.$url);
-        
+        error_log(__CLASS__.' -> '.__FUNCTION__);
         
         $client = new Zend_Http_Client();
         $client->setUri('http://example.org');

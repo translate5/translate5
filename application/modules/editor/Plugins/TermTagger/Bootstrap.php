@@ -37,7 +37,7 @@
 /**
  * Initial Class of Plugin "TermTagger"
  */
-class editor_TermTagger_PluginBootstrap {
+class editor_Plugins_TermTagger_Bootstrap {
     
     /**
      * @var Zend_EventManager_StaticEventManager
@@ -119,8 +119,8 @@ class editor_TermTagger_PluginBootstrap {
         //error_log(print_r($data, true));
         $taskGuid = $segment->getTaskGuid();
         
-        $worker = ZfExtended_Factory::get('editor_Worker_TermTagger');
-        /* @var $worker editor_Worker_TermTagger */
+        $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTagger');
+        /* @var $worker editor_Plugins_TermTagger_Worker_TermTagger */
         if (!$worker->init($taskGuid, array('segmentData' => $data, 'resourcePool' => 'gui'))) {
             //error_log(__CLASS__.' -> '.__FUNCTION__.' Worker could not be initialized');
             return false;
@@ -149,7 +149,7 @@ class editor_TermTagger_PluginBootstrap {
         
         $tempModel = $worker->getModel();
         $worker2 = ZfExtended_Worker_Abstract::instanceByModel($tempModel);
-        /* @var $worker2 editor_Worker_TermTagger */
+        /* @var $worker2 editor_Plugins_TermTagger_Worker_TermTagger */
         
         if (!$worker2) {
             error_log(__CLASS__.' -> '.__FUNCTION__.' Worker2 could not be initialized');
@@ -209,15 +209,15 @@ class editor_TermTagger_PluginBootstrap {
     private function test_3() {
         error_log(__CLASS__.' -> '.__FUNCTION__);
         
-        $workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        //$workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
         /* @var $workerModel ZfExtended_Models_Worker */
         //$workerListSlotsCount = $workerModel->getListSlotsCount('TermTagger_default');
         //error_log(__CLASS__.' -> '.__FUNCTION__.'; Liste-Resource: '.print_r($workerListSlotsCount, true));
         
         //$workerModel->wakeupScheduled('{10ea5327-8257-4f4e-abf0-8063e9878b17}');
         
-        $termtaggerService = ZfExtended_Factory::get('editor_TermTagger_Service');
-        /* @var $termtaggerService editor_TermTagger_Service */
-        $termtaggerService->test($config)
+        $termtaggerService = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
+        /* @var $termtaggerService editor_Plugins_TermTagger_Service */
+        $termtaggerService->test();
     }
 }
