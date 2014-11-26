@@ -35,4 +35,4 @@
 -- 
 
 INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES 
-('runtimeOptions.plugins.active', 1, 'default', 'system', '', '', '', 'list', 'List of Plugin(-classes) to activate. Classes are just loaded so thei logic sholud be activated by the class-constructor');
+('runtimeOptions.plugins.active', 1, 'default', 'system', '', '', '', 'list', 'List of Plugin(-classes) to activate. Classes are just loaded so the logic should be activated by the class-constructor');
