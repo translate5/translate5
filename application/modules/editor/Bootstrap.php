@@ -123,6 +123,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ));
         $this->front->getRouter()->addRoute('export', $exportRoute);
         
+        $taskStat = new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/statistics/*',
+            array(
+                'module' => 'editor',
+                'controller' => 'task',
+                'action' => 'statistics'
+            ));
+        $this->front->getRouter()->addRoute('taskStat', $taskStat);
+        
         $workerRoute = new Zend_Controller_Router_Route(
             'editor/worker/queue/*',
             array(
