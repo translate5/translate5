@@ -717,6 +717,23 @@ class editor_TaskController extends ZfExtended_RestController {
     }
     
     /**
+     * generates a statistics summary to the given task
+     */
+    public function statisticsAction() {
+        parent::getAction();
+        $result = new stdClass();
+        $task = $this->entity;
+        $result->taskGuid = $task->getTaskGuid();
+        $result->taskName = $task->getTaskName();
+        $result->wordCount = $task->getWordCount();
+        $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segment editor_Models_Segment */
+        $result->segmentCount = $segment->count($task->getTaskGuid());
+        unset($this->view->rows);
+        $this->view->statistics = $result;
+    }
+    
+    /**
      * checks if currently logged in user is allowed to access the given ressource
      * shortcut method for convience
      * @param string $ressource
