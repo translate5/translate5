@@ -217,7 +217,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             'originalMd5' => md5($temp_target)
         );
         $segmentId = $this->setAndSaveSegmentValues();
-        $targetName = $this->segmentFieldManager->getFirstTargetName();
         $tempTargetPlaceholder = $this->getFieldPlaceholder($segmentId, $targetName);
         
         $temp_return = preg_replace('/(.*)<target(.*?)>.*<\/target>(.*)/is', '${1}<target${2}>'.$tempTargetPlaceholder.'</target>${3}', $transUnit[0]);
