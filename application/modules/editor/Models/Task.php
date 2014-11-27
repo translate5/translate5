@@ -91,10 +91,10 @@
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';
     const STATE_END = 'end';
-    
+
     const ASSOC_TABLE_ALIAS = 'tua';
     const TABLE_ALIAS = 't';
-    
+
     protected $dbInstanceClass = 'editor_Models_Db_Task';
     protected $validatorInstanceClass = 'editor_Models_Validator_Task';
 
@@ -103,7 +103,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @var integer
      */
     protected $qmFlagId = 0;
-    
+
+    /**
+     * @var editor_Models_Task_Meta
+     */
+    protected $meta;
+
     /**
      * loads the task to the given guid
      * @param guid $taskGuid
@@ -590,4 +595,14 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $this->setTaskGuid($guidHelper->create(true));
     }
     
+    /**
+     * convenient method to get the task meta data
+     * @return editor_Models_Task_Meta
+     */
+    public function meta() {
+        if(empty($this->meta)) {
+            $this->meta = ZfExtended_Factory::get('editor_Models_Task_Meta');
+        }
+        return $this->meta;
+    }
 }
