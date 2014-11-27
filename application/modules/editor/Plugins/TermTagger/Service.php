@@ -39,19 +39,185 @@
  */
 class editor_Plugins_TermTagger_Service {
     
+    /**
+     * @var ZfExtended_Log
+     */
+    protected $log;
     
-    public function ping($config, $tbxhash = null) {
-        error_log(__CLASS__.' -> '.__FUNCTION__.'; $url: '.$url);
-        
+    
+    public function __construct() {
+        $this->log = ZfExtended_Factory::get('ZfExtended_Log');
     }
+    
+    
+    /**
+     * Checks if there is a TermTagger-server behind $url.
+     * 
+     * @param url $url
+     * @return boolean true if there is a TermTagger-Server behind $url 
+     */
+    public function testServerUrl(string $url) {
+        try {
+            $httpClient = new Zend_Http_Client();
+            $httpClient->setUri($url);
+            $response = $httpClient->request('GET');
+            /* @var $response Zend_Http_Response */
+        }
+        catch(Exception $requestException) {
+            $this->log->logError('Exception in processing '.__CLASS__.'->'.__FUNCTION__.'; $url: '.$url);
+            throw $requestException;
+            return false;
+        }
+        
+        // $url is OK if status == 200 AND string 'TermTagger Server' is in the response-body
+        if ($response->getStatus() == '200' && strpos($response->getBody(), 'TermTagger Server')) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * If no $tbxId given, checks if the TermTagger-Sever behind $url is alive. The returned status "404" in this case means "Server is alive".
+     * If $tbxId is given, check if Server has loaded the tbx-file with the id $tbxId.
+     * 
+     * @param string $url
+     * @param optional string $tbxId
+     * @return number http-status of server-response (eg. 200 or 404)
+     */
+    public function ping(string $url, $tbxId = null) {
+        error_log(__CLASS__.' -> '.__FUNCTION__.'; $url: '.$url);
+        $url .= '/tbxFile/'.$tbxId;
+        
+        $httpClient = new Zend_Http_Client();
+        $httpClient->setUri($url.$tbxId);
+        $response = $httpClient->request('HEAD');
+        /* @var $response Zend_Http_Response */
+        //error_log(__CLASS__.'->'.__FUNCTION__.'; PING  $httpClient->getUri(): '.$url."\n".'$httpClient->getLastRequest(): '.$httpClient->getLastRequest());
+        //error_log(__CLASS__.'->'.__FUNCTION__.'; PING  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
+        
+        //error_log(__CLASS__.'->'.__FUNCTION__.'; PING  $httpClient->getUri(): '.$httpClient->getUri()
+        //                                        ."\n".'$response->getStatus() / $response->getMessage(): '.$response->getStatus().' / '.$response->getMessage()
+        //                                        ."\n".'$response->getHeaders(): '.print_r($response->getHeaders(), true)
+        //                                        ."\n".'$response->getBody(): '.$response->getBody());
+        return $response->getStatus();
+    }
+    
+    public function open($url, $tbxId, $tbxFilePath) {
+        $response = $this->_open($url, $tbxId, $tbxFilePath);
+        /* @var $response Zend_Http_Response */
+        return $response->getStatus();
+    }
+    
+    public function openFetchIds($url, $tbxId, $tbxFilePath) {
+        $response = $this->_open($url, $tbxId, $tbxFilePath, array('addIds' => true));
+        /* @var $response Zend_Http_Response */
+        return $response->getBody();
+    }
+    
+    private function _open($url, $tbxId, $tbxFilePath, $moreParams = array()) {
+        // set default- and additional- (if any) -options for server-communication
+        $serverCommunication = new stdClass();
+        $serverCommunication->tbxFile = $tbxId;
+        $serverCommunication->tbxdata = file_get_contents($tbxFilePath);
+        foreach ($moreParams as $key => $value) {
+            $serverCommunication->$key = $value;
+        }
+        
+        // send request to TermTagger-server
+        $httpClient = new Zend_Http_Client();
+        $httpClient->setUri($url.'/tbxFile/');
+        $httpClient->setRawData(json_encode($serverCommunication), 'application/json');
+        $response = $httpClient->request('POST');
+        /* @var $response Zend_Http_Response */
+        //error_log(__CLASS__.'->'.__FUNCTION__.'; $httpClient->getUri(): '.$url."\n".'$httpClient->getLastRequest(): '.$httpClient->getLastRequest());
+        //error_log(__CLASS__.'->'.__FUNCTION__.'; $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
+        
+        return $response;
+    }
+    
+    
+    
     
     public function test() {
         error_log(__CLASS__.' -> '.__FUNCTION__);
         
-        $client = new Zend_Http_Client();
-        $client->setUri('http://example.org');
-        $client->setConfig(array(
-                        'maxredirects' => 0,
-                        'timeout'      => 30));
+        $config = Zend_Registry::get('config');
+        $defaultServers = $config->runtimeOptions->termTagger->url->default->toArray();
+        $url = $defaultServers[array_rand($defaultServers)];
+        $tbxId = 'a300e1140d20e0ac18672d6790e69e0b';
+        $url .= '/tbxFile/';
+        
+        $httpClient = new Zend_Http_Client();
+        
+        // push tbx to TermTaggerServer
+        $httpClient->setUri($url);
+        $httpClient->setRawData($this->getTestJson($tbxId), 'application/json');
+        $response = $httpClient->request('POST');
+        /* @var $response Zend_Http_Response */
+        //error_log(__CLASS__.'->'.__FUNCTION__.'; $httpClient->getUri(): '.$url."\n".'$httpClient->getLastRequest(): '.$httpClient->getLastRequest());
+        error_log(__CLASS__.'->'.__FUNCTION__.'; UPLOAD TBX  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
+        
+        // check tbx on TermTaggerServer
+        $httpClient->setUri($url.$tbxId);
+        $response = $httpClient->request('HEAD');
+        error_log(__CLASS__.'->'.__FUNCTION__.'; CHECK TBX  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
+        
+        // delete tbx on TermTaggerServer
+        $httpClient->setUri($url.$tbxId);
+        $response = $httpClient->request('DELETE');
+        //error_log(__CLASS__.'->'.__FUNCTION__.'; $httpClient->getUri(): '.$url."\n".'$httpClient->getLastRequest(): '.$httpClient->getLastRequest());
+        error_log(__CLASS__.'->'.__FUNCTION__.'; DELETE TBX  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
+        
+        // check tbx on TermTaggerServer
+        $httpClient->setUri($url.$tbxId);
+        $response = $httpClient->request('HEAD');
+        error_log(__CLASS__.'->'.__FUNCTION__.'; CHECK TBX AGAIN  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
+        
+    }
+    
+    
+    private function getTestJson($tbxFileId = NULL) {
+        //$testJson = file_get_contents('/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/json_test_data/tbx_post_request.json');
+        //return $testJson;
+                
+        $tempReturn = array();
+        $tempReturn['tbxFile'] = $tbxFileId;
+        $tempReturn['addIds'] = true;
+        // !! tbxdata vs. tbxData ???
+        $tempReturn['tbxdata'] = file_get_contents('/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/{C1D11C25-45D2-11D0-B0E2-444553540203}.tbx');
+        //error_log(__CLASS__.'->'.__FUNCTION__.'; $tempReturn: '.print_r($tempReturn, true));
+        
+        return json_encode($tempReturn);
+    }
+    
+    
+    public function test_2() {
+        $this->test();
+        
+        $config = Zend_Registry::get('config');
+        $defaultServers = $config->runtimeOptions->termTagger->url->default->toArray();
+        $url = $defaultServers[array_rand($defaultServers)];
+        $tbxId = 'a300e1140d20e0ac18672d6790e69e0b';
+        $url .= '/termTag/';
+        
+        $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication');
+        /*@var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
+        
+        $serverCommunication->tbxFile = $tbxId;
+        $serverCommunication->sourceLang = 'de';
+        $serverCommunication->targetLang = 'en';
+        
+        $serverCommunication->addSegment(123, 'target', 'Source-Text', 'Target-Text');
+        $serverCommunication->addSegment(456, 'target', 'Source-Text', 'Target-Text');
+        
+        error_log(__CLASS__.' -> '.__FUNCTION__.'; $serverCommunication: '.print_r($serverCommunication, true));
+        error_log(__CLASS__.' -> '.__FUNCTION__.'; $serverCommunication: '.json_encode($serverCommunication));
+        
+        $httpClient = new Zend_Http_Client();
+        $httpClient->setUri($url);
+        $httpClient->setRawData(json_encode($serverCommunication), 'application/json');
+        $response = $httpClient->request('POST');
+        error_log(__CLASS__.'->'.__FUNCTION__.'; TERMTAG  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
     }
 }
