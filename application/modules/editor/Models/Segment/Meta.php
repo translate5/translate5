@@ -40,17 +40,6 @@
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $guid)
  */
-class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_Abstract {
+class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     protected $dbInstanceClass = 'editor_Models_Db_SegmentMeta';
-    
-    const META_TYPE_STRING = 'string';
-    const META_TYPE_BOOLEAN = 'boolean';
-    const META_TYPE_INTEGER = 'integer';
-    const META_TYPE_FLOAT = 'float';
-    
-    public function addMeta($name, $type, $default, $comment, $length = 0) {
-        if(! $this->hasField($name)) {
-            call_user_func_array(array($this->db, 'addColumn'), func_get_args());
-        }
-    }
 }
