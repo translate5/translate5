@@ -59,7 +59,7 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
     
     // OPTIONAL FIELDS:
     // *****************************************************
-    public $debug = 1;
+    // commented out for easyser use of class. can be activated if needed
     /*
     public $debug = 0;
     public $fuzzy = 1;
@@ -71,9 +71,17 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
     public $minFuzzyStringLength = 5;
     */
     
-    public function addSegment ($id, $field = 'target', string $source , string $target) {
+    /**
+     * Adds a segment to the server-communication.
+     * 
+     * @param string $id
+     * @param string $field
+     * @param string $source
+     * @param string $target
+     */
+    public function addSegment ($id, $field = 'target',  $source, $target) {
         $segment = new stdClass();
-        $segment->id = $id;
+        $segment->id = (string) $id;
         $segment->field = $field;
         $segment->source = $source;
         $segment->target = $target;

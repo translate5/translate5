@@ -235,6 +235,9 @@ class editor_Plugins_TermTagger_Bootstrap {
         /* @var $termtaggerService editor_Plugins_TermTagger_Service */
         //$termtaggerService->test();
         //$termtaggerService->test_2();
+        $termtaggerService->testTagging();
+        return;
+        
         
         $config = Zend_Registry::get('config');
         $defaultServers = $config->runtimeOptions->termTagger->url->default->toArray();
@@ -242,7 +245,7 @@ class editor_Plugins_TermTagger_Bootstrap {
         //error_log(__CLASS__.' -> '.__FUNCTION__.'; Teste TermTagger-Server $url: '.$url.'; Ergebnis: '.$termtaggerService->testServerUrl($url));
         //$termtaggerService->ping($url, rand(10000000, 99999999));
         //$response = $termtaggerService->openFetchIds($url, 'a300e1140d20e0ac18673d6790e69e0b', '/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/{C1D11C25-45D2-11D0-B0E2-444553540203}.tbx');
-        $response = $termtaggerService->openFetchIds($url, 'a300e1140d20e0ac18673d6790e69e03', '/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/Test_2.tbx');
+        $response = $termtaggerService->openFetchIds($url, rand(10000000, 99999999), '/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/Test_2.tbx');
         error_log(__CLASS__.' -> '.__FUNCTION__.'; $response: '.$response);
     }
 }
