@@ -42,4 +42,8 @@
  */
 class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     protected $dbInstanceClass = 'editor_Models_Db_TaskMeta';
+    
+    public function loadByTaskGuid($taskGuid) {
+        return $this->loadRow('taskGuid = ?', $taskGuid);
+    }
 }

@@ -49,11 +49,11 @@ abstract class editor_Models_Import_TermListParser implements editor_Models_Impo
     /**
      * abstrakte Methode um den Term Import Vorgang anzustoßen
      * @param SplFileInfo $file
-     * @param string $taskGuid
+     * @param editor_Models_Task $task
      * @param editor_Models_Languages $sourceLang
      * @param editor_Models_Languages $targetLang
      */
-    abstract function import(SplFileInfo $file, string $taskGuid, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang);
+    abstract function import(SplFileInfo $file, editor_Models_Task $task, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang);
 
     /**
      * abstrakte Methode welche durch MetaData am Ende des Imports aufgerufen wird (z.B. um tmp Dateien zu löschen)

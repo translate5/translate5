@@ -54,6 +54,7 @@ interface editor_Models_Export_Terminology_Interface {
     
     /**
      * exports the internally stored data
+     * @return string the generated data
      */
     public function export();
 }

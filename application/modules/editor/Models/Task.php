@@ -600,8 +600,14 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return editor_Models_Task_Meta
      */
     public function meta() {
-        if(empty($this->meta)) {
-            $this->meta = ZfExtended_Factory::get('editor_Models_Task_Meta');
+        if(!empty($this->meta)) {
+            return $this->meta;
+        }
+        $this->meta = ZfExtended_Factory::get('editor_Models_Task_Meta');
+        try {
+            $this->meta->loadByTaskGuid($this->getTaskGuid());
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            $this->meta->init(array('taskGuid' => $this->getTaskGuid()));
         }
         return $this->meta;
     }

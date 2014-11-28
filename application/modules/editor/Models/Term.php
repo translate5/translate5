@@ -232,6 +232,9 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         ->order('language ASC')
         ->order('id ASC');
         $data = $this->db->fetchAll($s);
+        if($data->count() == 0) {
+            return null;
+        }
         $exporteur->setData($data);
         return $exporteur->export();
     }

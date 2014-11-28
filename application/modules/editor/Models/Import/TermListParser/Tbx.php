@@ -46,15 +46,17 @@
  * - importiert die gefundenen MetaDaten
  */
 class editor_Models_Import_TermListParser_Tbx extends editor_Models_Import_TermListParser {
+    const TBX_ARCHIV_NAME = 'terminology.tbx';
+    
     /**
      * @var XmlReader
      */
     protected $xml;
 
     /**
-     * @var string
+     * @var editor_Models_Task
      */
-    protected $taskGuid;
+    protected $task;
 
     /**
      * @var editor_Models_Term
@@ -164,12 +166,14 @@ class editor_Models_Import_TermListParser_Tbx extends editor_Models_Import_TermL
      * Die als SplFileInfo übergebenen TBX Datei importieren
      * @see editor_Models_Import_TermListParser::import()
      */
-    public function import(SplFileInfo $file, string $taskGuid, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang){
+    public function import(SplFileInfo $file, editor_Models_Task $task, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang){
         if(! $file->isReadable()){
             throw new Zend_Exception($file.' is not Readable!');
         }
+        $this->task = $task;
+        
         $start = microtime(true);
-        $this->insertIdsInTbx($file->getPathname());
+        $tbxRegisteredInServer = $this->insertIdsInTbx($file->getPathname());
         $after_insert = microtime(true);
 
         //languages welche aus dem TBX importiert werden sollen
@@ -177,9 +181,7 @@ class editor_Models_Import_TermListParser_Tbx extends editor_Models_Import_TermL
         $this->languages[$targetLang->getId()] = $this->normalizeLanguage($targetLang->getRfc5646());
 
         $this->xml = new XmlReader();
-        $this->xml->open($file->getPathname());
-
-        $this->taskGuid = $taskGuid;
+        $this->xml->open(self::getTbxPath($task));
 
         //Bis zum ersten TermEntry springen und alle TermEntries verarbeiten.
         while($this->fastForwardTo('termEntry')) {
@@ -215,14 +217,24 @@ class editor_Models_Import_TermListParser_Tbx extends editor_Models_Import_TermL
      * @return boolean
      */
     protected function insertIdsInTbx($filePath) {
-        $tagger = ZfExtended_Factory::get('editor_Models_Import_InvokeTermTagger');
-        /* @var $tagger editor_Models_Import_InvokeTermTagger */
-        $tagger->tagTbx($filePath, $filePath.'.withIds');
-
-        $tempOrig = $filePath.'.orig';
-        $this->tempFilesToRemove[$tempOrig] = $filePath;
-        rename($filePath,$tempOrig);
-        rename($filePath.'.withIds',$filePath);
+        $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerLoader');
+        /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerLoader */
+        $worker->init($this->task->getTaskGuid(), array('task' => $this->task));
+        
+        //prepare the uploaded file as base TBX file
+        rename($filePath, self::getTbxPath($this->task));
+        
+        //run the worker to send it to the termtagger
+        $worker->run(); throw new ZfExtended_Exception("DEBUG STOP");
+        return $worker->run();
+    }
+    
+    /**
+     * returns the path to the archived TBX file
+     * @param editor_Models_Task $task
+     */
+    public static function getTbxPath(editor_Models_Task $task) {
+        return $task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.self::TBX_ARCHIV_NAME;
     }
 
     /**
@@ -353,7 +365,7 @@ class editor_Models_Import_TermListParser_Tbx extends editor_Models_Import_TermL
     protected function saveTermEntity() {
         $config = Zend_Registry::get('config');
         foreach ($this->actualTermsInLangSet as $mid => $termData) {
-            $termData['taskGuid'] = $this->taskGuid;
+            $termData['taskGuid'] = $this->task->getTaskGuid();
             //term; mid; status in $termData
             $termData['definition'] = $this->actualDefinition;
             $termData['groupId'] = $this->actualTermEntry;
@@ -445,6 +457,13 @@ class editor_Models_Import_TermListParser_Tbx extends editor_Models_Import_TermL
         }
         return $this->statusMap[$tbxStatus];
     }
+    
+    /**
+     * returns the status map
+     */
+    public function getStatusMap() {
+        return $this->statusMap;
+    }
 
     /**
      * Extrahiert die Term Definition
@@ -465,7 +484,7 @@ class editor_Models_Import_TermListParser_Tbx extends editor_Models_Import_TermL
     }
 
     protected function log($logMessage) {
-        $msg = $logMessage.'. Task: '.$this->taskGuid;
+        $msg = $logMessage.'. Task: '.$this->task->getTaskGuid();
         //error_log($msg);
         /* @var $log ZfExtended_Log */
         $log = ZfExtended_Factory::get('ZfExtended_Log');

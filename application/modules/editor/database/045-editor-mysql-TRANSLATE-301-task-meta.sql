@@ -39,5 +39,6 @@ CREATE TABLE IF NOT EXISTS `LEK_task_meta` (
   `taskGuid` varchar(38) NOT NULL COMMENT 'Foreign Key to LEK_task',
   `tbxHash` varchar(36) NOT NULL COMMENT 'TBX Hash value',
   PRIMARY KEY (`id`),
+  UNIQUE(`taskGuid`),
   CONSTRAINT FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

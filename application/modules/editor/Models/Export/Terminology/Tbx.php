@@ -52,7 +52,7 @@ class editor_Models_Export_Terminology_Tbx implements editor_Models_Export_Termi
     /**
      * @var string
      */
-    protected $target;
+    protected $target = null;
     
     /**
      * @var array
@@ -134,7 +134,11 @@ class editor_Models_Export_Terminology_Tbx implements editor_Models_Export_Termi
             $termNote = $tig->addChild('termNote', $row->status); //FIXME Status gemapped???
             $termNote->addAttribute('type', 'normativeAuthorization');
         }
-        $this->tbx->asXML($this->target);
+        //SimpleXML throws an error when giving null, so we need this workaround: 
+        if(empty($this->target)) {
+            return $this->tbx->asXML();
+        }
+        return $this->tbx->asXML($this->target);
     }
     
     /**

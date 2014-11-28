@@ -171,7 +171,8 @@ class editor_Models_Import_MetaData {
         /* @var $importer editor_Models_Import_TermListParser_Tbx */
         foreach($tbxfiles as $file) {
             /* @var $file SplFileInfo */
-            $importer->import($file, $this->task->getTaskGuid(), $this->sourceLang, $this->targetLang);
+            $importer->import($file, $this->task, $this->sourceLang, $this->targetLang);
+            break; //we consider only one TBX file!
         }
         $this->importers[] = $importer;
         $this->hasMetaData[] = self::META_TBX;
