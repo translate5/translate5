@@ -157,9 +157,12 @@ class editor_Plugins_TermTagger_Service {
     
     
     /**
+     * TermTaggs segment-text(s) in $data on TermTagger-server $url 
      * 
      * @param unknown $url
      * @param editor_Plugins_TermTagger_Service_ServerCommunication $data
+     * 
+     * @return array((obj) segments) list of segment-objects of FALSE on error
      */
     public function tagterms($url, editor_Plugins_TermTagger_Service_ServerCommunication $data) {
         $httpClient = new Zend_Http_Client();
@@ -167,8 +170,8 @@ class editor_Plugins_TermTagger_Service {
         $httpClient->setRawData(json_encode($data), 'application/json');
         $response = $httpClient->request('POST');
         /* @var $response Zend_Http_Response */
-        //error_log(__CLASS__.'->'.__FUNCTION__.'; TERMTAG-REQUEST  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$httpClient->getLastRequest(): '.$httpClient->getLastRequest());
-        //error_log(__CLASS__.'->'.__FUNCTION__.'; TERMTAG-RESPONSE  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
+        error_log(__CLASS__.'->'.__FUNCTION__.'; TERMTAG-REQUEST  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$httpClient->getLastRequest(): '.$httpClient->getLastRequest());
+        error_log(__CLASS__.'->'.__FUNCTION__.'; TERMTAG-RESPONSE  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
         
         if ($response->getStatus() != "200") {
             return false;

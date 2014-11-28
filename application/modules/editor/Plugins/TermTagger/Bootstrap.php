@@ -117,26 +117,44 @@ class editor_Plugins_TermTagger_Bootstrap {
     public function handleBeforeSegmentSave(Zend_EventManager_Event $event) {
         $segment = $event->getParam('model');
         /* @var $segment editor_Models_Segment */
-        //$taskGuid = $segment->getTaskGuid();
+        //error_log(__CLASS__.' -> '.__FUNCTION__.' $segment: '.print_r($segment->getDataObject(), true));
+        $taskGuid = $segment->getTaskGuid();
         //error_log(__CLASS__.' -> '.__FUNCTION__.' $taskGuid: '.$taskGuid);
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        
+        // stop if task has no terminologie
+        if (!$task->getTerminologie()) {
+            return;
+        }
+            
         
         // TODO how to detect change/modification in segment-text?? $segment->isModified(); is not the correct result.
         // TODO only if change/modification is detected
-        //      AND if task has tbx
-        //      => call Worker_TermTagger->run()
         
-        // FIXME Liste mit Segment Daten dynamisieren!?!
-        $dataElement = array(   'id' => $segment->getId(),
-                                'source' => $segment->getSource(),
-                                'targetEdit' => $segment->getTargetEdit());
-        $data[] = $dataElement;
+        $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication');
+        /*@var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
+        $serverCommunication->tbxFile = 'a300e1140d20e0ac18673d6790e69e0b';
+        $langModel = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $langModel editor_Models_Languages */
+        $langModel->load($task->getSourceLang());
+        $serverCommunication->sourceLang = $langModel->getRfc5646();
+        $langModel->load($task->getTargetLang());
+        $serverCommunication->targetLang = $langModel->getRfc5646();
         
-        //error_log(print_r($data, true));
-        $taskGuid = $segment->getTaskGuid();
+        //$serverCommunication->sourceLang = 'en';
+        //$serverCommunication->targetLang = 'de';
+        
+        $serverCommunication->addSegment($segment->getId(), 'target', $segment->getSource(), $segment->getTargetEdit());
+        
+                // hint to get the tbx file if not. Maybe better moved to editor_Plugins_TermTagger_Service
+        // $this->task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.'terminology.tbx';
+        
         
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTagger');
         /* @var $worker editor_Plugins_TermTagger_Worker_TermTagger */
-        if (!$worker->init($taskGuid, array('segmentData' => $data, 'resourcePool' => 'gui'))) {
+        if (!$worker->init($taskGuid, array('serverCommunication' => $serverCommunication, 'resourcePool' => 'gui'))) {
             //error_log(__CLASS__.' -> '.__FUNCTION__.' Worker could not be initialized');
             return false;
         }
@@ -151,7 +169,7 @@ class editor_Plugins_TermTagger_Bootstrap {
         
         $result = $worker->getResult();
         //error_log(__CLASS__.' -> '.__FUNCTION__.' Result: '.print_r($result, true));
-        $tempTaggedText = $result[0]['targetEdit'];
+        $tempTaggedText = $result[0]->target;
         $segment->setTargetEdit($tempTaggedText);
         //$segment->setTextTagged = true;
         
@@ -211,13 +229,15 @@ class editor_Plugins_TermTagger_Bootstrap {
     }
     
     private function test_2() {
-        error_log(__CLASS__.' -> '.__FUNCTION__);
+        $termtaggerService = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
+        /* @var $termtaggerService editor_Plugins_TermTagger_Service */
+        $url = 'http://localhost:9001/termTagger';
+        $tbxId = 'a300e1140d20e0ac18673d6790e69e0b';
+        $tbxFilePath = '/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/Test_2.tbx';
+        $response = $termtaggerService->open($url, $tbxId, $tbxFilePath);
         
-        $trigger = ZfExtended_Factory::get('ZfExtended_Worker_TriggerByHttp');
-        /* @var $trigger ZfExtended_Worker_TriggerByHttp */
-        $trigger->triggerWorker(23, '5462000c27cc39.07467709');
         
-        //error_log(__CLASS__.' -> '.__FUNCTION__.'; Liste-Queued: '.print_r($workerListQueued, true));
+        error_log(__CLASS__.' -> '.__FUNCTION__.'; $response: '.$response);
     }
     
     
@@ -245,7 +265,7 @@ class editor_Plugins_TermTagger_Bootstrap {
         //error_log(__CLASS__.' -> '.__FUNCTION__.'; Teste TermTagger-Server $url: '.$url.'; Ergebnis: '.$termtaggerService->testServerUrl($url));
         //$termtaggerService->ping($url, rand(10000000, 99999999));
         //$response = $termtaggerService->openFetchIds($url, 'a300e1140d20e0ac18673d6790e69e0b', '/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/{C1D11C25-45D2-11D0-B0E2-444553540203}.tbx');
-        $response = $termtaggerService->openFetchIds($url, rand(10000000, 99999999), '/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/Test_2.tbx');
+        $response = $termtaggerService->open($url, 'a300e1140d20e0ac18673d6790e69e0b', '/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/Test_2.tbx');
         error_log(__CLASS__.' -> '.__FUNCTION__.'; $response: '.$response);
     }
 }

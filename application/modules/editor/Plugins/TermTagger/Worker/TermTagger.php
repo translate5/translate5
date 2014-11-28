@@ -76,7 +76,7 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends ZfExtended_Worker_Abst
         // TODO (siehe auch ->work())
         // Unterscheidung zwischen einer Liste an Segmenten die ausgezeichnet werden sollen
         // und einem einzelnen Text der Ausgezeichnet werden soll.
-        
+        /*
         if (isset($parameters['segmentIds'])) {
             $parametersToSave['segmentIds'] = $parameters['segmentIds'];
         }
@@ -85,6 +85,11 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends ZfExtended_Worker_Abst
             foreach ($parameters['segmentData'] as $item) {
                 $parametersToSave['segmentIds'][] = $item['id'];
             }
+        }
+        */
+        
+        if (isset($parameters['serverCommunication'])) {
+            $parametersToSave['serverCommunication'] = $parameters['serverCommunication'];
         }
         
         return parent::init($taskGuid, $parametersToSave);
@@ -96,8 +101,8 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends ZfExtended_Worker_Abst
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        if (!isset($parameters['segmentData'][0]['targetEdit']) && empty($parameters['segmentIds'])) {
-            error_log(__CLASS__.' -> '.__FUNCTION__.' can not validate $parameters: '.print_r($parameters, true));
+        if (!isset($parameters['segmentData'][0]['targetEdit']) && empty($parameters['segmentIds']) && empty($parameters['serverCommunication'])) {
+            $this->log->logError('Plugin TermTagger paramter validation failed', __CLASS__.' -> '.__FUNCTION__.' can not validate $parameters: '.print_r($parameters, true));
             return false;
         }
         return true;
@@ -127,17 +132,18 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends ZfExtended_Worker_Abst
      */
     public function work() {
         
-        error_log(__CLASS__.' -> '.__FUNCTION__);
-        sleep(3);
+        //error_log(__CLASS__.' -> '.__FUNCTION__.'; $this->data'.print_r($this->data, true));
+        //sleep(3);
         
         if (empty($this->data)) {
+            //error_log(__CLASS__.' -> '.__FUNCTION__.'; $this->data is empty');
             return false;
         }
         
         // TODO hier klinkt sich später der tatsächliche TermTagger-Process ein.
         // Unterscheidung zwischen einer Liste an Segmenten die ausgezeichnet werden sollen
         // und einem einzelnen Text der Ausgezeichnet werden soll.
-        
+        /*
         if (isset($this->data['segmentIds'])) {
             $this->result = $this->data['segmentIds'];
         }
@@ -151,8 +157,28 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends ZfExtended_Worker_Abst
             }
             $this->result = $this->data['segmentData'];
         }
+        */
         
+        if (!isset($this->data['serverCommunication'])) {
+            return false;
+        }
+        $serverCommunication = $this->data['serverCommunication'];
+        /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
+        error_log(__CLASS__.' -> '.__FUNCTION__.'; $serverCommunication: '.print_r($serverCommunication, true));
         
+        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
+        /* @var $termTagger editor_Plugins_TermTagger_Service */
+        $response = $termTagger->tagterms($this->workerModel->getSlot(), $serverCommunication);
+        
+        // on error return false and store original untagged data
+        if ($response == false) {
+            error_log(__CLASS__.' -> '.__FUNCTION__.'; TermTagger-Server response = FALSE');
+            $this->result = $serverCommunication->segments;
+            
+            return false;
+        }
+        
+        $this->result = $response;
         return true;
     }
     
