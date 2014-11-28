@@ -43,13 +43,10 @@
 /**
  * Plugin Bootstrap for Segment Statistics Plugin
  */
-class editor_Plugins_SegmentStatistics_Bootstrap {
-    
-    public function __construct() {
-        $event = Zend_EventManager_StaticEventManager::getInstance();
-        /* @var $event Zend_EventManager_StaticEventManager */
-        $event->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'));
-        $event->attach('editor_TaskController', 'afterStatisticsAction', array($this, 'handleAfterStatistics'));
+class editor_Plugins_SegmentStatistics_Bootstrap extends ZfExtended_Plugin_Abstract {
+    public function init() {
+        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'));
+        $this->eventManager->attach('editor_TaskController', 'afterStatisticsAction', array($this, 'handleAfterStatistics'));
     }
     
     /**
@@ -95,13 +92,14 @@ class editor_Plugins_SegmentStatistics_Bootstrap {
         $xml = new SimpleXMLElement('<statistics/>');
         $xml->addChild('taskGuid', $statistics->taskGuid);
         $xml->addChild('taskName', $statistics->taskName);
-        //the wordcount from Task Table is mostly empty because must be set manually on taskCreation
-        //$xml->addChild('wordCount', $statistics->wordCount);
-        $xml->addChild('segmentCount', $statistics->segmentCount);
         $files = $xml->addChild('files');
         
+        $taskFieldsStat = array();
+        
         $lastFileId = 0;
+        $lastField = null;
         foreach($statistics->files as $fileStat) {
+            //implement next file:
             if($lastFileId != $fileStat['fileId']) {
                 $file = $files->addChild('file');
                 $file->addChild('fileName', $fileStat['fileName']);
@@ -109,11 +107,35 @@ class editor_Plugins_SegmentStatistics_Bootstrap {
                 $fields = $file->addChild('fields');
                 $lastFileId = $fileStat['fileId'];
             }
+
+            //calculate statistics per field for whole task
+            $fieldName = $fileStat['fieldName'];
+            settype($taskFieldsStat[$fieldName], 'array');
+            settype($taskFieldsStat[$fieldName]['taskCharCount'], 'integer');
+            settype($taskFieldsStat[$fieldName]['taskTermNotFound'], 'integer');
+            $taskFieldsStat[$fieldName]['taskCharCount'] += $fileStat['charCount'];
+            $taskFieldsStat[$fieldName]['taskTermNotFound'] += $fileStat['termNotFoundCount'];
+            
             $field = $fields->addChild('field');
-            $field->addChild('fieldName', $fileStat['fieldName']);
+            $field->addChild('fieldName', $fieldName);
             $field->addChild('charCount', $fileStat['charCount']);
             $field->addChild('termNotFoundCount', $fileStat['termNotFoundCount']);
             $field->addChild('segmentsPerFile', $fileStat['segmentsPerFile']);
+        }
+        
+        $xml->addChild('segmentCount', $statistics->segmentCount);
+        
+        //the wordcount from Task Table is mostly empty because must be set manually on taskCreation
+        //$xml->addChild('wordCount', $statistics->wordCount);
+        
+        //add the statistics per field for whole task
+        foreach($taskFieldsStat as $fieldName => $fieldStat) {
+            $fields = $xml->addChild('fields');
+            $field = $fields->addChild('field');
+            $field->addChild('fieldName', $fieldName);
+            foreach($fieldStat as $key => $value) {
+                $field->addChild($key, $value);
+            }
         }
         
         $filename = $task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.'segmentstatistics.xml';
