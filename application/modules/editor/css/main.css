@@ -175,6 +175,7 @@ background-color: #EAF1FB;
 /*messagebox*/
 .app-msg .x-icon-text {padding-left:20px;background:no-repeat left center;} 
 .app-msg .icon-status-error {background-image: url("../images/exclamation.png");}
+.app-msg .icon-status-warning {background-image: url("../images/error.png");}
 .app-msg .icon-status-notice {background-image: url("../images/information.png");}
 .app-msg .icon-status-ok {background-image: url("../images/tick.png");}
 

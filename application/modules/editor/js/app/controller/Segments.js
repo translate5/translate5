@@ -477,6 +477,8 @@ Ext.define('Editor.controller.Segments', {
           me.saveChainEnd();
           return;
       }
+      //show other messages on the segment:
+      Editor.MessageBox.addByOperation(operation);
       //show save segment success message 
       Editor.MessageBox.addSuccess(me.messages.segmentSaved);
       //invoking change alike handling:

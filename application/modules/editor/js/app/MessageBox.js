@@ -49,11 +49,13 @@ Ext.define('Editor.MessageBox',{
   titles: {
 	  ok: '#UT# Ok!',
 	  error: '#UT# Fehler!',
+	  warning: '#UT# Warnung!',
 	  notice: '#UT# Hinweis!'
   },
   statics: {
     SUCCESS: 'ok',
     ERROR: 'error',
+    WARNING: 'warning',
     INFO: 'notice',
     addSuccess: function(msg,delayFactor) {
       Editor.MessageBox.getInstance().addMessage(msg, Editor.MessageBox.SUCCESS, delayFactor);
@@ -71,6 +73,24 @@ Ext.define('Editor.MessageBox',{
     },
     addInfo: function(msg, delayFactor) {
       Editor.MessageBox.getInstance().addMessage(msg, Editor.MessageBox.INFO, delayFactor);
+    },
+    //mostly used to display other messages delivered by REST
+    addByOperation: function(operation) {
+        if(!operation.success) {
+            return; //on a real server error the message is processed by serverexception!
+        }
+        var resp = operation.response,
+            json;
+        if(!resp || !resp.responseText) {
+            return;
+        }
+        json = Ext.JSON.decode(resp.responseText);
+        if(!json.errors) {
+            return;
+        }
+        Ext.Array.each(json.errors, function(error){
+            Editor.MessageBox.getInstance().addMessage(error.msg, error.type || Editor.MessageBox.INFO);
+        });
     },
     getInstance: function() {
       if(!Editor.MessageBox.instance){
