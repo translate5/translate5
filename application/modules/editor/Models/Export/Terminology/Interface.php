@@ -33,13 +33,27 @@
  
  END LICENSE AND COPYRIGHT 
  */
+
 /**
- * Entity Model for segment meta data
- * @method integer getId() getId()
- * @method void setId() setId(integer $id)
- * @method string getTaskGuid() getTaskGuid()
- * @method void setTaskGuid() setTaskGuid(string $guid)
+ * generall interface for Terminology exporters 
  */
-class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
-    protected $dbInstanceClass = 'editor_Models_Db_SegmentMeta';
+interface editor_Models_Export_Terminology_Interface {
+    /**
+     * Sets the Terminology data to be processed
+     * Data must already be sorted by: groupId, language, id
+     * @param Iterator $data
+     */
+    public function setData(Iterator $data);
+    
+    /**
+     * sets the target where the data should be exported to
+     * can be a file name or directory. This depends on the exporteur.
+     * @param string $target
+     */
+    public function setTarget($target);
+    
+    /**
+     * exports the internally stored data
+     */
+    public function export();
 }

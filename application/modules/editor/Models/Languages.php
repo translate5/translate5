@@ -47,7 +47,6 @@
  *
  * @method string getRfc5646() getRfc5646()
  * @method int getLcid() getLcid()
- * @method string getUnix() getUnix()
  * @method int getId() getId()
  */
 class editor_Models_Languages extends ZfExtended_Models_Entity_Abstract {

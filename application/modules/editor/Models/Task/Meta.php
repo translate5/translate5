@@ -40,6 +40,6 @@
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $guid)
  */
-class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
-    protected $dbInstanceClass = 'editor_Models_Db_SegmentMeta';
+class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract {
+    protected $dbInstanceClass = 'editor_Models_Db_TaskMeta';
 }

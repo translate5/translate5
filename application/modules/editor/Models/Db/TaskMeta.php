@@ -33,13 +33,18 @@
  
  END LICENSE AND COPYRIGHT 
  */
-/**
- * Entity Model for segment meta data
- * @method integer getId() getId()
- * @method void setId() setId(integer $id)
- * @method string getTaskGuid() getTaskGuid()
- * @method void setTaskGuid() setTaskGuid(string $guid)
+
+/**#@+ 
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ * 
  */
-class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
-    protected $dbInstanceClass = 'editor_Models_Db_SegmentMeta';
+/**
+ * DB Access for Task Meta Data
+ */
+class editor_Models_Db_TaskMeta extends Zend_Db_Table_Abstract {
+    use ZfExtended_Models_Db_MetaTrait;
+    protected $_name = 'LEK_task_meta';
+    public $_primary = 'id';
 }

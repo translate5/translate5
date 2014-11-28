@@ -214,4 +214,25 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         }
         return -1;
     }
+    
+    /**
+     * @param editor_Models_Task $task
+    //FIXME editor_Models_Export_Tbx durch entsprechendes Interface ersetzen
+     * @param editor_Models_Export_Tbx $exporteur
+     */
+    public function export(editor_Models_Task $task, editor_Models_Export_Terminology_Tbx $exporteur) {
+        $langs = array($task->getSourceLang(), $task->getTargetLang());
+        if($task->getRelaisLang() > 0) {
+            $langs[] = $task->getRelaisLang();
+        }
+        $s = $this->db->select()
+        ->where('taskGuid = ?', $task->getTaskGuid())
+        ->where('language in (?)', $langs)
+        ->order('groupId ASC')
+        ->order('language ASC')
+        ->order('id ASC');
+        $data = $this->db->fetchAll($s);
+        $exporteur->setData($data);
+        return $exporteur->export();
+    }
 }

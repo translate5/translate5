@@ -44,47 +44,7 @@
  * DB Access for Segment Meta Data
  */
 class editor_Models_Db_SegmentMeta extends Zend_Db_Table_Abstract {
+    use ZfExtended_Models_Db_MetaTrait;
     protected $_name = 'LEK_segments_meta';
     public $_primary = 'id';
-    
-    /**
-     * Adds a columns to the meta table
-     * type is one of editor_Models_Segment_Meta::META_TYPE_* constants
-     * @param string $name
-     * @param string $type
-     * @param mixed $default
-     * @param string $comment
-     * @param integer $length
-     */
-    public function addColumn($columnname, $type, $default, $comment, $length = 0) {
-        switch($type) {
-            case editor_Models_Segment_Meta::META_TYPE_BOOLEAN:
-                $type = 'TINYINT';
-                $default = (int)(boolean)$default;
-                break;
-            case editor_Models_Segment_Meta::META_TYPE_INTEGER:
-                $type = 'INT(11)';
-                $default = (int)$default;
-                break;
-            case editor_Models_Segment_Meta::META_TYPE_FLOAT:
-                $type = 'FLOAT(5,2)';
-                $default = (float)$default;
-                break;
-            case editor_Models_Segment_Meta::META_TYPE_STRING:
-                $type = 'VARCHAR('.(empty($length) ? '255' : $length).')';
-                $default = "'".(string)addslashes($default)."'";
-                break;
-            default:
-                break;
-        }
-        if(is_null($default)) {
-            $default = 'NULL';
-        }
-        $db = $this->getAdapter();
-        $alter = 'ALTER TABLE `%s` ADD COLUMN `%s` %s DEFAULT %s COMMENT "%s";';
-        $db->query(sprintf($alter, $this->_name, $columnname, $type, $default, addslashes($comment)));
-        $this->_metadata = array();
-        $this->_metadataCache = null;
-        $this->_setupMetadata();
-    }
 }
