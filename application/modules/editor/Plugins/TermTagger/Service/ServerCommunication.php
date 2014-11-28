@@ -45,7 +45,6 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
     public $sourceLang = NULL;
     public $targetLang = NULL;
     public $segments = NULL;
-    
     /*
     {
         "id": "123",

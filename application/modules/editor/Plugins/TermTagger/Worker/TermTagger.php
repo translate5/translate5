@@ -73,21 +73,6 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends ZfExtended_Worker_Abst
             }
         }
         
-        // TODO (siehe auch ->work())
-        // Unterscheidung zwischen einer Liste an Segmenten die ausgezeichnet werden sollen
-        // und einem einzelnen Text der Ausgezeichnet werden soll.
-        /*
-        if (isset($parameters['segmentIds'])) {
-            $parametersToSave['segmentIds'] = $parameters['segmentIds'];
-        }
-        
-        if (isset($parameters['segmentData'])) {
-            foreach ($parameters['segmentData'] as $item) {
-                $parametersToSave['segmentIds'][] = $item['id'];
-            }
-        }
-        */
-        
         if (isset($parameters['serverCommunication'])) {
             $parametersToSave['serverCommunication'] = $parameters['serverCommunication'];
         }
@@ -101,7 +86,7 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends ZfExtended_Worker_Abst
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        if (!isset($parameters['segmentData'][0]['targetEdit']) && empty($parameters['segmentIds']) && empty($parameters['serverCommunication'])) {
+        if (empty($parameters['serverCommunication'])) {
             $this->log->logError('Plugin TermTagger paramter validation failed', __CLASS__.' -> '.__FUNCTION__.' can not validate $parameters: '.print_r($parameters, true));
             return false;
         }
@@ -109,21 +94,12 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends ZfExtended_Worker_Abst
     } 
     
     
-    
-    
-    /*
-    public function queue() {
-        throw new BadMethodCallException('Du kommst hier nicht rein '.__CLASS__.'->'.__FUNCTION__);
-    }
-    */
-    
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::run()
      */
     public function run() {
-        $result = parent::run();
-        return $result;
+        return parent::run();
     }
     
     /**
@@ -132,49 +108,27 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends ZfExtended_Worker_Abst
      */
     public function work() {
         
-        //error_log(__CLASS__.' -> '.__FUNCTION__.'; $this->data'.print_r($this->data, true));
-        //sleep(3);
-        
         if (empty($this->data)) {
-            //error_log(__CLASS__.' -> '.__FUNCTION__.'; $this->data is empty');
             return false;
         }
-        
-        // TODO hier klinkt sich später der tatsächliche TermTagger-Process ein.
-        // Unterscheidung zwischen einer Liste an Segmenten die ausgezeichnet werden sollen
-        // und einem einzelnen Text der Ausgezeichnet werden soll.
-        /*
-        if (isset($this->data['segmentIds'])) {
-            $this->result = $this->data['segmentIds'];
-        }
-        
-        if (isset($this->data['segmentData'])) {
-            foreach ($this->data['segmentData'] as &$segment) {
-                $tempText = $segment['targetEdit'];
-                $tempText = 'PSEUDO-TERMTAGGED: '.$tempText;
-                $segment['targetEdit'] = $tempText;
-                
-            }
-            $this->result = $this->data['segmentData'];
-        }
-        */
         
         if (!isset($this->data['serverCommunication'])) {
             return false;
         }
+        
         $serverCommunication = $this->data['serverCommunication'];
         /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
-        error_log(__CLASS__.' -> '.__FUNCTION__.'; $serverCommunication: '.print_r($serverCommunication, true));
         
         $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
         /* @var $termTagger editor_Plugins_TermTagger_Service */
-        $response = $termTagger->tagterms($this->workerModel->getSlot(), $serverCommunication);
         
+        if (!$this->checkTermTaggerTbx($this->workerModel->getSlot(), $serverCommunication->tbxFile)) {
+            return false;
+        }
+            
+        $response = $termTagger->tagterms($this->workerModel->getSlot(), $serverCommunication);
         // on error return false and store original untagged data
         if ($response == false) {
-            error_log(__CLASS__.' -> '.__FUNCTION__.'; TermTagger-Server response = FALSE');
-            $this->result = $serverCommunication->segments;
-            
             return false;
         }
         
@@ -182,4 +136,39 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends ZfExtended_Worker_Abst
         return true;
     }
     
+    /**
+     * Checks if tbx-file with hash $tbxHash is loaded on the TermTagger-server behind $url.
+     * If not already loaded, tries to load the tbx-file from the task.
+     * 
+     * @param unknown $url the TermTagger-server-url
+     * @param unknown $tbxHash unic id of the tbx-file
+     * 
+     * @return boolean true if tbx-file is loaded on the TermTagger-server
+     */
+    private function checkTermTaggerTbx($url, $tbxHash) {
+        
+        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
+        /* @var $termTagger editor_Plugins_TermTagger_Service */
+        
+        // test if tbx-file is already loaded
+        if ($termTagger->ping($url, $tbxHash)) {
+            return true;
+        }
+        
+        // try to load tbx-file to the TermTagger-server
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($this->workerModel->getTaskGuid());
+        $tbxPath = $this->getTbxFilename($task);
+        $tbxData = $this->assertTbxExists($task, $tbxPath);
+        $response = $termTagger->open($url, $tbxHash, $tbxData);
+        
+        // if tbx file can not be loaded to the server
+        if ($response != "200") {
+            return false;
+        }
+        
+        // tbx-file is succesfully loaded to the TermTagger-server
+        return true;
+    }
 }

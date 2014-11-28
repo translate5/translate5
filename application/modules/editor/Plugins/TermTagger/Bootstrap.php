@@ -81,6 +81,10 @@ class editor_Plugins_TermTagger_Bootstrap {
     }
     
     
+    public function handleAfterImport(Zend_EventManager_Event $event) {
+        error_log("FOOBAR");
+    }
+    
     /**
      * handler for event: Editor_IndexController#afterIndexAction
      */
@@ -92,10 +96,6 @@ class editor_Plugins_TermTagger_Bootstrap {
         $termTaggerSegmentsPerCall = $config->runtimeOptions->termTagger->segmentsPerCall;
         
         $view->Php2JsVars()->set('plugins.termTagger.segmentsPerCall', $termTaggerSegmentsPerCall);
-    }
-    
-    public function handleAfterImport(Zend_EventManager_Event $event) {
-        error_log("FOOBAR");
     }
     
     /**
@@ -140,7 +140,7 @@ class editor_Plugins_TermTagger_Bootstrap {
         
         $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication');
         /*@var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
-        $serverCommunication->tbxFile = 'a300e1140d20e0ac18673d6790e69e0b';
+        $serverCommunication->tbxFile = $task->meta()->getTbxHash();;
         $langModel = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $langModel editor_Models_Languages */
         $langModel->load($task->getSourceLang());
@@ -148,14 +148,10 @@ class editor_Plugins_TermTagger_Bootstrap {
         $langModel->load($task->getTargetLang());
         $serverCommunication->targetLang = $langModel->getRfc5646();
         
-        //$serverCommunication->sourceLang = 'en';
-        //$serverCommunication->targetLang = 'de';
+        //$serverCommunication->sourceLang = 'de';
+        //$serverCommunication->targetLang = 'en';
         
         $serverCommunication->addSegment($segment->getId(), 'target', $segment->getSource(), $segment->getTargetEdit());
-        
-                // hint to get the tbx file if not. Maybe better moved to editor_Plugins_TermTagger_Service
-        // $this->task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.'terminology.tbx';
-        
         
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTagger');
         /* @var $worker editor_Plugins_TermTagger_Worker_TermTagger */
@@ -237,9 +233,9 @@ class editor_Plugins_TermTagger_Bootstrap {
         $termtaggerService = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
         /* @var $termtaggerService editor_Plugins_TermTagger_Service */
         $url = 'http://localhost:9001/termTagger';
-        $tbxId = 'a300e1140d20e0ac18673d6790e69e0b';
-        $tbxFilePath = '/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/Test_2.tbx';
-        $response = $termtaggerService->open($url, $tbxId, $tbxFilePath);
+        $tbxHash = 'a300e1140d20e0ac18672d6790e69e0b';
+        $tbxData = file_get_contents('/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/Test_2.tbx');
+        $response = $termtaggerService->open($url, $tbxHash, $tbxData);
         
         
         error_log(__CLASS__.' -> '.__FUNCTION__.'; $response: '.$response);
@@ -269,8 +265,8 @@ class editor_Plugins_TermTagger_Bootstrap {
         $url = $defaultServers[array_rand($defaultServers)];
         //error_log(__CLASS__.' -> '.__FUNCTION__.'; Teste TermTagger-Server $url: '.$url.'; Ergebnis: '.$termtaggerService->testServerUrl($url));
         //$termtaggerService->ping($url, rand(10000000, 99999999));
-        //$response = $termtaggerService->openFetchIds($url, 'a300e1140d20e0ac18673d6790e69e0b', '/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/{C1D11C25-45D2-11D0-B0E2-444553540203}.tbx');
-        $response = $termtaggerService->open($url, 'a300e1140d20e0ac18673d6790e69e0b', '/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/Test_2.tbx');
+        //$response = $termtaggerService->openFetchIds($url, 'a300e1140d20e0ac18672d6790e69e0b', '/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/{C1D11C25-45D2-11D0-B0E2-444553540203}.tbx');
+        $response = $termtaggerService->open($url, 'a300e1140d20e0ac18672d6790e69e0b', file_get_contents('/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/Test_2.tbx'));
         error_log(__CLASS__.' -> '.__FUNCTION__.'; $response: '.$response);
     }
 }

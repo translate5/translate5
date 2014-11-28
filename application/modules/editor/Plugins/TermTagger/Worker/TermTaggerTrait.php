@@ -158,4 +158,33 @@ trait editor_Plugins_TermTagger_Worker_TermTaggerTrait {
         return $return;
     }
     
+    
+    /**
+     * @param editor_Models_Task $task
+     * @return SplFileInfo
+     */
+    protected function getTbxFilename(editor_Models_Task $task) {
+        return new SplFileInfo(editor_Models_Import_TermListParser_Tbx::getTbxPath($task));
+    }
+    
+    /**
+     * checks if the needed TBX file exists, otherwise recreate if from DB
+     * @param editor_Models_Task $task
+     * @param SplFileInfo $tbxPath
+     */
+    protected function assertTbxExists(editor_Models_Task $task, SplFileInfo $tbxPath) {
+        if($tbxPath->isReadable()) {
+            return file_get_contents($tbxPath);
+        }
+        //after recreation we need to fetch the IDs!
+        $this->data['fetchIds'] = true;
+        
+        //fallback for recreation of TBX file:
+        $term = ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $term editor_Models_Term */
+        
+        $export = ZfExtended_Factory::get('editor_Models_Export_Terminology_Tbx');
+        /* @var $export editor_Models_Export_Terminology_Tbx */
+        return $term->export($task, $export);
+    }
 }
