@@ -122,6 +122,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerLoader extends ZfExtended_Worke
         $tbxData = $this->assertTbxExists($task, $tbxPath);
         
         if(empty($tbxData)) {
+            $this->log->logError('Terminology disabled since empty TBX data given!');
             return false;
         }
         

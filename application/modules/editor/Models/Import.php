@@ -205,8 +205,6 @@ class editor_Models_Import {
         //call import Methods:
         $this->importWithCollectableErrors();
         
-        $mdi = $this->metaDataImporter;
-        $this->task->setTerminologie($mdi->hasMetaData($mdi::META_TBX));
         //saving task twice is the simplest way to do this. has meta data is only available after import.
         $this->task->save();
         

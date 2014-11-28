@@ -60,7 +60,8 @@ class editor_Plugins_TermTagger_Bootstrap {
             return false;
         }
         
-        if (empty($config->runtimeOptions->termTagger->url->default->toArray())) {
+        $defaultUrl = $config->runtimeOptions->termTagger->url->default->toArray();
+        if (empty($defaultUrl)) {
             $this->log->logError('Plugin TermTagger config not set',
                                  'The required config-setting runtimeOptions.termTagger.url.default is not set in DB-table Zf_configuration. Value is empty');
             return false;
@@ -68,6 +69,7 @@ class editor_Plugins_TermTagger_Bootstrap {
         
         // event-listeners
         $this->staticEvents = Zend_EventManager_StaticEventManager::getInstance();
+        $this->staticEvents->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'));
         $this->staticEvents->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndex'));
         $this->staticEvents->attach('editor_Workflow_Default', array('doView', 'doEdit'), array($this, 'handleAfterTaskOpen'));
         $this->staticEvents->attach('editor_Models_Segment', 'beforeSave', array($this, 'handleBeforeSegmentSave'));
@@ -92,6 +94,9 @@ class editor_Plugins_TermTagger_Bootstrap {
         $view->Php2JsVars()->set('plugins.termTagger.segmentsPerCall', $termTaggerSegmentsPerCall);
     }
     
+    public function handleAfterImport(Zend_EventManager_Event $event) {
+        error_log("FOOBAR");
+    }
     
     /**
      * handler for event(s): editor_Workflow_Default#[doView, doEdit]

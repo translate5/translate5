@@ -85,12 +85,6 @@ class editor_Models_Import_MetaData {
     public $tbxFilterRegex = '/\.tbx$/i';
     
     /**
-     * contains a key for each imported meta data
-     * @var array
-     */
-    protected $hasMetaData = array();
-
-    /**
      * Erhält als Parameter die zu importierenden Sprachen
      * @param editor_Models_Languages $sourceLang
      * @param editor_Models_Languages $targetLang
@@ -153,9 +147,6 @@ class editor_Models_Import_MetaData {
         /* @var $importer editor_Models_Import_QmSubsegments */
         $importer->importFromXml($this->task,$this->importPath);
         $this->importers[] = $importer;
-        if($importer->hasTaskSpecific()) {
-            $this->hasMetaData[] = self::META_QMFLAGS;
-        }
     }
 
     /**
@@ -175,7 +166,6 @@ class editor_Models_Import_MetaData {
             break; //we consider only one TBX file!
         }
         $this->importers[] = $importer;
-        $this->hasMetaData[] = self::META_TBX;
     }
 
     /**
@@ -185,13 +175,5 @@ class editor_Models_Import_MetaData {
         foreach($this->importers as $importer){
             $importer->cleanup();
         }
-    }
-    
-    /**
-     * Checks if the given type of meta data was imported
-     * @param string $type Valid types are alle META_* constants of this class
-     */
-    public function hasMetaData($type) {
-        return in_array($type, $this->hasMetaData);
     }
 }

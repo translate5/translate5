@@ -125,12 +125,6 @@ class editor_Models_Import_TermListParser_Tbx extends editor_Models_Import_TermL
     protected $javaPathSep = ':';
 
     /**
-     * Liste mit temporären Dateien die nach dem Import gelöscht werden sollen.
-     * @var array
-     */
-    protected $tempFilesToRemove = array();
-
-    /**
      * Um den Durchsatz beim Speichern der Terme zu erhöhen, werde diese zwischengespeichert und en block in die DB gelegt.
      * @var array
      */
@@ -171,10 +165,14 @@ class editor_Models_Import_TermListParser_Tbx extends editor_Models_Import_TermL
             throw new Zend_Exception($file.' is not Readable!');
         }
         $this->task = $task;
-        
+
         $start = microtime(true);
         $tbxRegisteredInServer = $this->insertIdsInTbx($file->getPathname());
+        $this->task->setTerminologie((boolean)$tbxRegisteredInServer); 
         $after_insert = microtime(true);
+        if(!$tbxRegisteredInServer) {
+            return;
+        }
 
         //languages welche aus dem TBX importiert werden sollen
         $this->languages[$sourceLang->getId()] = $this->normalizeLanguage($sourceLang->getRfc5646());
@@ -225,7 +223,6 @@ class editor_Models_Import_TermListParser_Tbx extends editor_Models_Import_TermL
         rename($filePath, self::getTbxPath($this->task));
         
         //run the worker to send it to the termtagger
-        $worker->run(); throw new ZfExtended_Exception("DEBUG STOP");
         return $worker->run();
     }
     
@@ -490,17 +487,8 @@ class editor_Models_Import_TermListParser_Tbx extends editor_Models_Import_TermL
         $log = ZfExtended_Factory::get('ZfExtended_Log');
         $log->logError($msg);
     }
-
-    /**
-     * entfernt die tmp Dateien
-     * @see editor_Models_Import_TermListParser::cleanup()
-     */
+    
     public function cleanup() {
-        foreach($this->tempFilesToRemove as $torestore => $toremove) {
-            if(file_exists($torestore) && file_exists($toremove)) {
-                unlink($toremove);
-                rename($torestore, $toremove);
-            }
-        }
+        //nothing to do
     }
 }

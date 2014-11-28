@@ -760,6 +760,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @param boolean $useSource optional, default false, if true terms of source column are used (instead of target)
      */
     public function recreateTermTags($dataindex, $useSource = false) {
+        throw new BadMethodCallException('deprecated');
         $termTag = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
         /* @var $termTag editor_Models_Segment_TermTag */
         $withTerms = $termTag->recreate($this->getId(), $this->get($dataindex), $useSource);
