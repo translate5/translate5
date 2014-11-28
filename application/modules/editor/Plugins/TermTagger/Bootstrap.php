@@ -44,13 +44,28 @@ class editor_Plugins_TermTagger_Bootstrap {
      */
     protected $staticEvents = false;
     
+    /**
+     * @var ZfExtended_Log
+     */
+    protected $log;
+    
+    
     
     public function __construct() {
         $config = Zend_Registry::get('config');
-        if (empty($config->runtimeOptions->termTagger->url->default->toArray())) {
-            error_log("Plugin TermTagger initialized but no Zf_configuration termTagger.url.default is defined.");
+        
+        if (!isset($config->runtimeOptions->termTagger->url->default)) {
+            $this->log->logError('Plugin TermTagger config not defined',
+                                 'The required config-setting runtimeOptions.termTagger.url.default is not defined in DB-table Zf_configuration.');
             return false;
         }
+        
+        if (empty($config->runtimeOptions->termTagger->url->default->toArray())) {
+            $this->log->logError('Plugin TermTagger config not set',
+                                 'The required config-setting runtimeOptions.termTagger.url.default is not set in DB-table Zf_configuration. Value is empty');
+            return false;
+        }
+        
         // event-listeners
         $this->staticEvents = Zend_EventManager_StaticEventManager::getInstance();
         $this->staticEvents->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndex'));
@@ -218,6 +233,19 @@ class editor_Plugins_TermTagger_Bootstrap {
         
         $termtaggerService = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
         /* @var $termtaggerService editor_Plugins_TermTagger_Service */
-        $termtaggerService->test();
+        //$termtaggerService->test();
+        //$termtaggerService->test_2();
+        $termtaggerService->testTagging();
+        return;
+        
+        
+        $config = Zend_Registry::get('config');
+        $defaultServers = $config->runtimeOptions->termTagger->url->default->toArray();
+        $url = $defaultServers[array_rand($defaultServers)];
+        //error_log(__CLASS__.' -> '.__FUNCTION__.'; Teste TermTagger-Server $url: '.$url.'; Ergebnis: '.$termtaggerService->testServerUrl($url));
+        //$termtaggerService->ping($url, rand(10000000, 99999999));
+        //$response = $termtaggerService->openFetchIds($url, 'a300e1140d20e0ac18673d6790e69e0b', '/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/{C1D11C25-45D2-11D0-B0E2-444553540203}.tbx');
+        $response = $termtaggerService->openFetchIds($url, rand(10000000, 99999999), '/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/Test_2.tbx');
+        error_log(__CLASS__.' -> '.__FUNCTION__.'; $response: '.$response);
     }
 }
