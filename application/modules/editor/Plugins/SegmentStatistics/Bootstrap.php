@@ -43,13 +43,10 @@
 /**
  * Plugin Bootstrap for Segment Statistics Plugin
  */
-class editor_Plugins_SegmentStatistics_Bootstrap {
-    
-    public function __construct() {
-        $event = Zend_EventManager_StaticEventManager::getInstance();
-        /* @var $event Zend_EventManager_StaticEventManager */
-        $event->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'));
-        $event->attach('editor_TaskController', 'afterStatisticsAction', array($this, 'handleAfterStatistics'));
+class editor_Plugins_SegmentStatistics_Bootstrap extends ZfExtended_Plugin_Abstract {
+    public function init() {
+        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'));
+        $this->eventManager->attach('editor_TaskController', 'afterStatisticsAction', array($this, 'handleAfterStatistics'));
     }
     
     /**
