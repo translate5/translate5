@@ -369,6 +369,10 @@ class editor_TaskController extends ZfExtended_RestController {
     public function putAction() {
         $this->entity->load($this->_getParam('id'));
         
+        if($this->entity->isImporting()) {
+            throw new ZfExtended_Models_Entity_NoAccessException();
+        }
+        
         $taskguid = $this->entity->getTaskGuid();
         
         $oldTask = clone $this->entity;
@@ -680,11 +684,24 @@ class editor_TaskController extends ZfExtended_RestController {
         unset($this->view->rows->qmSubsegmentFlags);
     }
     
+    public function deleteAction() {
+        $this->entity->load($this->_getParam('id'));
+        if($this->entity->isImporting()) {
+            throw new ZfExtended_Models_Entity_NoAccessException();
+        }
+        return parent::deleteAction();
+    }
+    
     /**
      * does the export as zip file.
      */
     public function exportAction() {
         parent::getAction();
+        
+        if($this->entity->isImporting()) {
+            throw new ZfExtended_Models_Entity_NoAccessException();
+        }
+        
         $diff = (boolean)$this->getRequest()->getParam('diff');
 
         $export = ZfExtended_Factory::get('editor_Models_Export');
