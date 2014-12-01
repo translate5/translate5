@@ -69,17 +69,37 @@ class editor_Plugins_TermTagger_Bootstrap {
         
         // event-listeners
         $this->staticEvents = Zend_EventManager_StaticEventManager::getInstance();
-        $this->staticEvents->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'));
+        $this->staticEvents->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterTaskImport'));
         $this->staticEvents->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndex'));
         $this->staticEvents->attach('editor_Workflow_Default', array('doView', 'doEdit'), array($this, 'handleAfterTaskOpen'));
         $this->staticEvents->attach('editor_Models_Segment', 'beforeSave', array($this, 'handleBeforeSegmentSave'));
-        $this->staticEvents->attach('Editor_SegmentController', 'beforePutSave', array($this, 'handleTest'));
         
         // SBE: only for testing
+        //$this->staticEvents->attach('Editor_SegmentController', 'beforePutSave', array($this, 'handleTest'));
         $this->staticEvents->attach('IndexController', 'beforeStephanAction', array($this, 'handleTest'));
         // end of event-listeners
     }
     
+    
+    public function handleAfterTaskImport(Zend_EventManager_Event $event) {
+        error_log(__CLASS__.'->'.__FUNCTION__);
+        $task = $event->getParam('task');
+        /* @var $task editor_Models_Task */
+        if (!$task->getTerminologie()) {
+            return;
+        }
+        
+        $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
+        /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
+        if (!$worker->init($taskGuid, array('lastSegmentId' => 0,
+                                            'resourcePool' => 'import',
+                                            'task' => $task))) {
+            $this->log('TermTagger-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
+            return false;
+        }
+        
+        $worker->queue();
+    }
     
     /**
      * handler for event: Editor_IndexController#afterIndexAction
@@ -92,10 +112,6 @@ class editor_Plugins_TermTagger_Bootstrap {
         $termTaggerSegmentsPerCall = $config->runtimeOptions->termTagger->segmentsPerCall;
         
         $view->Php2JsVars()->set('plugins.termTagger.segmentsPerCall', $termTaggerSegmentsPerCall);
-    }
-    
-    public function handleAfterImport(Zend_EventManager_Event $event) {
-        error_log("FOOBAR");
     }
     
     /**
@@ -136,11 +152,11 @@ class editor_Plugins_TermTagger_Bootstrap {
             
         
         // TODO how to detect change/modification in segment-text?? $segment->isModified(); is not the correct result.
-        // TODO only if change/modification is detected
+        // TODO continue only if change/modification is detected
         
         $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication');
         /*@var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
-        $serverCommunication->tbxFile = 'a300e1140d20e0ac18673d6790e69e0b';
+        $serverCommunication->tbxFile = $task->meta()->getTbxHash();;
         $langModel = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $langModel editor_Models_Languages */
         $langModel->load($task->getSourceLang());
@@ -148,28 +164,21 @@ class editor_Plugins_TermTagger_Bootstrap {
         $langModel->load($task->getTargetLang());
         $serverCommunication->targetLang = $langModel->getRfc5646();
         
-        //$serverCommunication->sourceLang = 'en';
-        //$serverCommunication->targetLang = 'de';
-        
         $serverCommunication->addSegment($segment->getId(), 'target', $segment->getSource(), $segment->getTargetEdit());
-        
-                // hint to get the tbx file if not. Maybe better moved to editor_Plugins_TermTagger_Service
-        // $this->task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.'terminology.tbx';
-        
         
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTagger');
         /* @var $worker editor_Plugins_TermTagger_Worker_TermTagger */
         if (!$worker->init($taskGuid, array('serverCommunication' => $serverCommunication, 'resourcePool' => 'gui'))) {
-            //error_log(__CLASS__.' -> '.__FUNCTION__.' Worker could not be initialized');
+            $this->log('TermTagger-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }
         
-        // #1 run immediately
-        if (!$worker->run()) {return false;};
-        
-        // #2 run from queue (mutex-save)
-        //$worker->queue(); return;
-        //if (!$worker->runQueued()) {return false;}
+        if (!$worker->run()) {
+            $messages = Zend_Registry::get('rest_messages');
+            /* @var $messages ZfExtended_Models_Messages */
+            $messages->addError('Terme dieses Segments konnten nicht ausgezeichnte werden.');
+            return false;
+        }
         
         
         $result = $worker->getResult();
@@ -178,24 +187,7 @@ class editor_Plugins_TermTagger_Bootstrap {
         $segment->setTargetEdit($tempTaggedText);
         //$segment->setTextTagged = true;
         
-        return;
-        
-        
-        // TEST TEST TEST TEST
-        // Demonstration of starting a worker that was rebuild(instanciated) from a worker-model
-        $worker->queue(); // just to save the upper worker into the queue (DB-table LEK_worker)
-        
-        $tempModel = $worker->getModel();
-        $worker2 = ZfExtended_Worker_Abstract::instanceByModel($tempModel);
-        /* @var $worker2 editor_Plugins_TermTagger_Worker_TermTagger */
-        
-        if (!$worker2) {
-            error_log(__CLASS__.' -> '.__FUNCTION__.' Worker2 could not be initialized');
-            return false;
-        }
-        $worker2->runQueued();
-        $result = $worker2->getResult();
-        error_log(__CLASS__.' -> '.__FUNCTION__.': '.print_r($result, true));
+        return true;
     }
     
     
@@ -234,15 +226,14 @@ class editor_Plugins_TermTagger_Bootstrap {
     }
     
     private function test_2() {
-        $termtaggerService = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
-        /* @var $termtaggerService editor_Plugins_TermTagger_Service */
-        $url = 'http://localhost:9001/termTagger';
-        $tbxId = 'a300e1140d20e0ac18673d6790e69e0b';
-        $tbxFilePath = '/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/Test_2.tbx';
-        $response = $termtaggerService->open($url, $tbxId, $tbxFilePath);
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->load(6);
         
+        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
+        $eventManager->trigger('afterImport', 'editor_Models_Import', array('task' => $task));;
         
-        error_log(__CLASS__.' -> '.__FUNCTION__.'; $response: '.$response);
+        error_log(__CLASS__.' -> '.__FUNCTION__.'; $task: '.print_r($task, true));
     }
     
     
@@ -269,8 +260,8 @@ class editor_Plugins_TermTagger_Bootstrap {
         $url = $defaultServers[array_rand($defaultServers)];
         //error_log(__CLASS__.' -> '.__FUNCTION__.'; Teste TermTagger-Server $url: '.$url.'; Ergebnis: '.$termtaggerService->testServerUrl($url));
         //$termtaggerService->ping($url, rand(10000000, 99999999));
-        //$response = $termtaggerService->openFetchIds($url, 'a300e1140d20e0ac18673d6790e69e0b', '/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/{C1D11C25-45D2-11D0-B0E2-444553540203}.tbx');
-        $response = $termtaggerService->open($url, 'a300e1140d20e0ac18673d6790e69e0b', '/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/Test_2.tbx');
+        //$response = $termtaggerService->openFetchIds($url, 'a300e1140d20e0ac18672d6790e69e0b', '/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/{C1D11C25-45D2-11D0-B0E2-444553540203}.tbx');
+        $response = $termtaggerService->open($url, 'a300e1140d20e0ac18672d6790e69e0b', file_get_contents('/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/Test_2.tbx'));
         error_log(__CLASS__.' -> '.__FUNCTION__.'; $response: '.$response);
     }
 }

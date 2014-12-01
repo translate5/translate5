@@ -60,7 +60,7 @@ class editor_Plugins_TermTagger_Service {
     public function testServerUrl(string $url) {
         try {
             $httpClient = new Zend_Http_Client();
-            $httpClient->setUri($url);
+            $httpClient->setUri($url.'/termTagger');
             $response = $httpClient->request('GET');
             /* @var $response Zend_Http_Response */
         }
@@ -79,17 +79,17 @@ class editor_Plugins_TermTagger_Service {
     }
     
     /**
-     * If no $tbxId given, checks if the TermTagger-Sever behind $url is alive. The returned status "404" in this case means "Server is alive".
-     * If $tbxId is given, check if Server has loaded the tbx-file with the id $tbxId.
+     * If no $tbxHash given, checks if the TermTagger-Sever behind $url is alive.
+     * If $tbxHash is given, check if Server has loaded the tbx-file with the id $tbxHash.
      * 
      * @param string $url url of the TermTagger-Server
-     * @param string $tbxId unic id for a tbx-file
+     * @param string tbxHash unic id for a tbx-file
      * 
-     * @return number http-status of server-response (eg. 200 or 404)
+     * @return boolean True if ping was succesfull
      */
-    public function ping(string $url, $tbxId = null) {
+    public function ping(string $url, $tbxHash = null) {
         $httpClient = new Zend_Http_Client();
-        $httpClient->setUri($url.'/tbxFile/'.$tbxId);
+        $httpClient->setUri($url.'/termTagger/tbxFile/'.$tbxHash);
         $response = $httpClient->request('HEAD');
         /* @var $response Zend_Http_Response */
         //error_log(__CLASS__.'->'.__FUNCTION__.'; PING  $httpClient->getUri(): '.$url."\n".'$httpClient->getLastRequest(): '.$httpClient->getLastRequest());
@@ -99,7 +99,13 @@ class editor_Plugins_TermTagger_Service {
         //                                        ."\n".'$response->getStatus() / $response->getMessage(): '.$response->getStatus().' / '.$response->getMessage()
         //                                        ."\n".'$response->getHeaders(): '.print_r($response->getHeaders(), true)
         //                                        ."\n".'$response->getBody(): '.$response->getBody());
-        return $response->getStatus();
+        $status = $response->getStatus();
+        
+        if ($tbxHash && $status == '200' || !$tbxHash && $status == '404') {
+            return true;
+        }
+        
+        return false;
     }
     
     
@@ -146,7 +152,6 @@ class editor_Plugins_TermTagger_Service {
         // send request to TermTagger-server
         $httpClient = new Zend_Http_Client();
         $httpClient->setUri($url.'/termTagger/tbxFile/');
-    error_log($httpClient->getUri(true));
         $httpClient->setRawData(json_encode($serverCommunication), 'application/json');
         $response = $httpClient->request('POST');
         /* @var $response Zend_Http_Response */
@@ -167,12 +172,12 @@ class editor_Plugins_TermTagger_Service {
      */
     public function tagterms($url, editor_Plugins_TermTagger_Service_ServerCommunication $data) {
         $httpClient = new Zend_Http_Client();
-        $httpClient->setUri($url.'/termTag/');
+        $httpClient->setUri($url.'/termTagger/termTag/');
         $httpClient->setRawData(json_encode($data), 'application/json');
         $response = $httpClient->request('POST');
         /* @var $response Zend_Http_Response */
-        error_log(__CLASS__.'->'.__FUNCTION__.'; TERMTAG-REQUEST  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$httpClient->getLastRequest(): '.$httpClient->getLastRequest());
-        error_log(__CLASS__.'->'.__FUNCTION__.'; TERMTAG-RESPONSE  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
+        //error_log(__CLASS__.'->'.__FUNCTION__.'; TERMTAG-REQUEST  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$httpClient->getLastRequest(): '.$httpClient->getLastRequest());
+        //error_log(__CLASS__.'->'.__FUNCTION__.'; TERMTAG-RESPONSE  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
         
         if ($response->getStatus() != "200") {
             return false;
@@ -186,9 +191,6 @@ class editor_Plugins_TermTagger_Service {
     
     
     
-    
-    
-    
     // ***********************************************************************
     // all following functions are only for testing while development.... can be deleted
     // ***********************************************************************
@@ -199,7 +201,7 @@ class editor_Plugins_TermTagger_Service {
         $defaultServers = $config->runtimeOptions->termTagger->url->default->toArray();
         $url = $defaultServers[array_rand($defaultServers)];
         $tbxId = 'a300e1140d20e0ac18672d6790e69e0b';
-        $url .= '/tbxFile/';
+        $url .= '/termTagger/tbxFile/';
         
         $httpClient = new Zend_Http_Client();
         
@@ -247,13 +249,13 @@ class editor_Plugins_TermTagger_Service {
     
     
     public function test_2() {
-        $this->test();
+        //$this->test();
         
         $config = Zend_Registry::get('config');
         $defaultServers = $config->runtimeOptions->termTagger->url->default->toArray();
         $url = $defaultServers[array_rand($defaultServers)];
         $tbxId = 'a300e1140d20e0ac18672d6790e69e0b';
-        $url .= '/termTag/';
+        $url .= '/termTagger/termTag/';
         
         $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication');
         /*@var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
@@ -262,8 +264,8 @@ class editor_Plugins_TermTagger_Service {
         $serverCommunication->sourceLang = 'de';
         $serverCommunication->targetLang = 'en';
         
-        $serverCommunication->addSegment(123, 'target', 'Source-Text', 'Target-Text');
-        $serverCommunication->addSegment(456, 'target', 'Source-Text', 'Target-Text');
+        $serverCommunication->addSegment(123, 'target', 'Haus', 'home');
+        $serverCommunication->addSegment(456, 'target', 'Apache', 'Apache');
         
         //error_log(__CLASS__.' -> '.__FUNCTION__.'; $serverCommunication: '.print_r($serverCommunication, true));
         //error_log(__CLASS__.' -> '.__FUNCTION__.'; $serverCommunication: '.json_encode($serverCommunication));
@@ -288,12 +290,12 @@ class editor_Plugins_TermTagger_Service {
         /*@var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
         
         $serverCommunication->tbxFile = $tbxId;
-        $serverCommunication->sourceLang = 'de';
-        $serverCommunication->targetLang = 'en';
+        $serverCommunication->sourceLang = 'en';
+        $serverCommunication->targetLang = 'de';
         
-        $serverCommunication->addSegment(123, 'target', 'Source-Text', 'Target-Text');
-        $serverCommunication->addSegment(456, 'target', 'Source-Text', 'Target-Text');
-        
+        //$serverCommunication->addSegment(123, 'target', 'macht prefork Haus home', 'macht prefork Haus home');
+        $serverCommunication->addSegment(1417, 'target', 'More information about installation options for Apache may be found there.', 'Apache macht prefork Haus home');
+                
         // finally call $this-
         $response = $this->tagterms($url, $serverCommunication);
         error_log(__CLASS__.'->'.__FUNCTION__.'; $response: '.print_r($response, true));

@@ -34,9 +34,9 @@
  END LICENSE AND COPYRIGHT 
  */
 /**
- * editor_Plugins_TermTagger_Worker_TermTagger Class
+ * editor_Plugins_TermTagger_Worker_TermTaggerImport Class
  */
-class editor_Plugins_TermTagger_Worker_TermTagger extends ZfExtended_Worker_Abstract {
+class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worker_Abstract {
     
     use editor_Plugins_TermTagger_Worker_TermTaggerTrait;
     
@@ -73,8 +73,12 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends ZfExtended_Worker_Abst
             }
         }
         
-        if (isset($parameters['serverCommunication'])) {
-            $parametersToSave['serverCommunication'] = $parameters['serverCommunication'];
+        if (isset($parameters['lastSegmentId'])) {
+            $parametersToSave['lastSegmentId'] = $parameters['lastSegmentId'];
+        }
+        
+        if (isset($parameters['task'])) {
+            $parametersToSave['lask'] = $parameters['task'];
         }
         
         return parent::init($taskGuid, $parametersToSave);
@@ -86,8 +90,8 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends ZfExtended_Worker_Abst
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        if (empty($parameters['serverCommunication'])) {
-            $this->log->logError('Plugin TermTagger paramter validation failed', __CLASS__.' -> '.__FUNCTION__.' can not validate $parameters: '.print_r($parameters, true));
+        if (empty($parameters['lastSegmentId']) || is_object($parameters['task'])) {
+            $this->log->logError('Plugin TermTaggerImport paramter validation failed', __CLASS__.' -> '.__FUNCTION__.' can not validate $parameters: '.print_r($parameters, true));
             return false;
         }
         return true;
@@ -113,9 +117,16 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends ZfExtended_Worker_Abst
             return false;
         }
         
-        if (!isset($this->data['serverCommunication'])) {
+        if (!isset($this->data['lastSegmentId'])) {
             return false;
         }
+        
+        $lastSegmentId = $this->data['lastSegmentId'];
+        
+        
+        $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication');
+        /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
+        $serverCommunication->tbxFile = '12345';
         
         $serverCommunication = $this->data['serverCommunication'];
         /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
@@ -136,4 +147,5 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends ZfExtended_Worker_Abst
         $this->result = $response;
         return true;
     }
+    
 }
