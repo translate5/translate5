@@ -77,8 +77,8 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
             $parametersToSave['lastSegmentId'] = $parameters['lastSegmentId'];
         }
         
-        if (isset($parameters['task'])) {
-            $parametersToSave['lask'] = $parameters['task'];
+        if (isset($parameters['taskId'])) {
+            $parametersToSave['taskId'] = $parameters['taskId'];
         }
         
         return parent::init($taskGuid, $parametersToSave);
@@ -90,7 +90,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        if (empty($parameters['lastSegmentId']) || is_object($parameters['task'])) {
+        if (!isset($parameters['lastSegmentId']) || !isset($parameters['taskId'])) {
             $this->log->logError('Plugin TermTaggerImport paramter validation failed', __CLASS__.' -> '.__FUNCTION__.' can not validate $parameters: '.print_r($parameters, true));
             return false;
         }

@@ -155,8 +155,8 @@ class editor_Plugins_TermTagger_Service {
         $httpClient->setRawData(json_encode($serverCommunication), 'application/json');
         $response = $httpClient->request('POST');
         /* @var $response Zend_Http_Response */
-        error_log(__CLASS__.'->'.__FUNCTION__.'; $httpClient->getUri(): '.$url."\n".'$httpClient->getLastRequest(): '.$httpClient->getLastRequest());
-        error_log(__CLASS__.'->'.__FUNCTION__.'; $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
+        //error_log(__CLASS__.'->'.__FUNCTION__.'; $httpClient->getUri(): '.$url."\n".'$httpClient->getLastRequest(): '.$httpClient->getLastRequest());
+        //error_log(__CLASS__.'->'.__FUNCTION__.'; $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
         
         return $response;
     }

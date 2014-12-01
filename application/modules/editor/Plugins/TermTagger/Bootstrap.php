@@ -67,6 +67,7 @@ class editor_Plugins_TermTagger_Bootstrap {
             return false;
         }
         
+        
         // event-listeners
         $this->staticEvents = Zend_EventManager_StaticEventManager::getInstance();
         $this->staticEvents->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterTaskImport'));
@@ -77,7 +78,7 @@ class editor_Plugins_TermTagger_Bootstrap {
         // SBE: only for testing
         //$this->staticEvents->attach('Editor_SegmentController', 'beforePutSave', array($this, 'handleTest'));
         $this->staticEvents->attach('IndexController', 'beforeStephanAction', array($this, 'handleTest'));
-        // end of event-listeners
+        // SBE end of testing event-listeners
     }
     
     
@@ -91,9 +92,9 @@ class editor_Plugins_TermTagger_Bootstrap {
         
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
         /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
-        if (!$worker->init($taskGuid, array('lastSegmentId' => 0,
+        if (!$worker->init($task->getTaskGuid(), array('lastSegmentId' => 0,
                                             'resourcePool' => 'import',
-                                            'task' => $task))) {
+                                            'taskId' => $task->getId()))) {
             $this->log('TermTagger-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }
@@ -233,7 +234,7 @@ class editor_Plugins_TermTagger_Bootstrap {
         $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         $eventManager->trigger('afterImport', 'editor_Models_Import', array('task' => $task));;
         
-        error_log(__CLASS__.' -> '.__FUNCTION__.'; $task: '.print_r($task, true));
+        error_log(__CLASS__.' -> '.__FUNCTION__);
     }
     
     
