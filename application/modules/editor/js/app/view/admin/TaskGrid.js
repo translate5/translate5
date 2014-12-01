@@ -110,6 +110,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
           if(task.isReadOnly()) {
               res.push('readonly');
           }
+          if(task.isImporting()) {
+              res.push('import');
+          }
           if(task.isEnded()) {
               res.push('end');
           }

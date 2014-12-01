@@ -45,6 +45,7 @@ Ext.define('Editor.model.admin.Task', {
   USER_STATE_VIEW: 'view',
   USER_STATE_WAITING: 'waiting',
   USER_STATE_FINISH: 'finished',
+  STATE_IMPORT: 'import',
   fields: [
     {name: 'id', type: 'int'},
     {name: 'taskGuid', type: 'string'},
@@ -162,10 +163,20 @@ Ext.define('Editor.model.admin.Task', {
       return state == me.USER_STATE_VIEW || state == me.USER_STATE_EDIT;
   },
   /**
+   * returns if task is still in import state
+   * @returns {Boolean}
+   */
+  isImporting: function() {
+      return this.get('state') == this.STATE_IMPORT;
+  },
+  /**
    * returns if task is openable
    * @returns {Boolean}
    */
   isOpenable: function() {
+      if(this.get('state') == this.STATE_IMPORT) {
+          return false;
+      }
       //a user with editorEditAllTasks (normally PMs) can always open the task
       if(Editor.app.authenticatedUser.isAllowed('editorEditAllTasks')){
           return true;
