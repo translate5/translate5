@@ -191,9 +191,6 @@ class editor_Plugins_TermTagger_Service {
     
     
     
-    
-    
-    
     // ***********************************************************************
     // all following functions are only for testing while development.... can be deleted
     // ***********************************************************************

@@ -65,6 +65,11 @@ trait editor_Plugins_TermTagger_Worker_TermTaggerTrait {
     */
     private static $praefixResourceName = 'TermTagger_';
     
+    /**
+     * Allowd values for setting resourcePool
+     * @var array(strings)
+     */
+    protected static $SEGMENT_STATE_UNTAGGED = 'untagged';
     
     /**
      * Stores the init-paramters from the initial call
@@ -187,4 +192,42 @@ trait editor_Plugins_TermTagger_Worker_TermTaggerTrait {
         /* @var $export editor_Models_Export_Terminology_Tbx */
         return $term->export($task, $export);
     }
+    
+    
+    /**
+     * Checks if tbx-file with hash $tbxHash is loaded on the TermTagger-server behind $url.
+     * If not already loaded, tries to load the tbx-file from the task.
+     *
+     * @param unknown $url the TermTagger-server-url
+     * @param unknown $tbxHash unic id of the tbx-file
+     *
+     * @return boolean true if tbx-file is loaded on the TermTagger-server
+     */
+    protected function checkTermTaggerTbx($url, $tbxHash) {
+    
+        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
+        /* @var $termTagger editor_Plugins_TermTagger_Service */
+    
+        // test if tbx-file is already loaded
+        if ($termTagger->ping($url, $tbxHash)) {
+            return true;
+        }
+    
+        // try to load tbx-file to the TermTagger-server
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($this->workerModel->getTaskGuid());
+        $tbxPath = $this->getTbxFilename($task);
+        $tbxData = $this->assertTbxExists($task, $tbxPath);
+        $response = $termTagger->open($url, $tbxHash, $tbxData);
+    
+        // if tbx file can not be loaded to the server
+        if ($response != "200") {
+            return false;
+        }
+    
+        // tbx-file is succesfully loaded to the TermTagger-server
+        return true;
+    }
+    
 }
