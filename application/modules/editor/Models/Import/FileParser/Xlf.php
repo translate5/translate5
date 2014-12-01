@@ -173,8 +173,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     
     
     /**
-     * Sets $this->_editSegment, $this->_matchRateSegment and $this->_autopropagated
-     * and $this->_pretransSegment and $this->_autoStateId for the segment currently worked on
+     * Sets $this->_matchRateSegment and $this->_autopropagated
+     * for the segment currently worked on
      *
      * @param array transunit
      */
@@ -256,7 +256,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         if (strpos($segment, '<')=== false) {
             return $segment;
         }
-        $data = new editor_Models_Import_FileParser_Sdlxliff_ParseSegmentData();
+        $data = ZfExtended_Factory::get('editor_Models_Import_FileParser_Sdlxliff_ParseSegmentData');
         
         $data->segment = preg_split('/(<ph>.*?<\/ph>.*?)/is', $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
         
