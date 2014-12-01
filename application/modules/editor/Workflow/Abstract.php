@@ -75,6 +75,7 @@ abstract class editor_Workflow_Abstract {
      */
     protected $labels = array(
         'WORKFLOW_ID' => 'Standard Ablaufplan', 
+        'STATE_IMPORT' => 'import', 
         'STATE_WAITING' => 'wartend', 
         'STATE_FINISH' => 'abgeschlossen', 
         'STATE_OPEN' => 'offen', 
@@ -705,7 +706,7 @@ abstract class editor_Workflow_Abstract {
     }
     
     /**
-     * is called when a task assoc state gets OPEN again
+     * is called when a task assoc state gets OPEN
      */
     protected function doOpen() {
     }

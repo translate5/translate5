@@ -91,6 +91,7 @@
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';
     const STATE_END = 'end';
+    const STATE_IMPORT = 'import';
 
     const ASSOC_TABLE_ALIAS = 'tua';
     const TABLE_ALIAS = 't';
@@ -559,8 +560,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         return $row['locked'];
     }
-    
     /**
+    
      * checks if the given taskGuid is used by any user
      * @param string $taskGuid
      */
@@ -569,6 +570,14 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         $used = $tua->loadUsed($taskGuid);
         return !empty($used);
+    }
+    
+    /**
+     * returns true if current task is in state import
+     * @return boolean
+     */
+    public function isImporting() {
+        return $this->getState() == self::STATE_IMPORT;
     }
     
     /**

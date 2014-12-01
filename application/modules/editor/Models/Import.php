@@ -214,6 +214,28 @@ class editor_Models_Import {
         //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
         $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         $eventManager->trigger('afterImport', $this, array('task' => $this->task));
+        
+        //we set and configure a general worker to set the open state of the task, after all other work
+        $setToOpenWorker = ZfExtended_Factory::get('ZfExtended_Worker_Callback');
+        /* @var $setToOpenWorker ZfExtended_Worker_Callback */
+        $setToOpenWorker->init($this->task->getTaskGuid(), array(
+                'class' => get_class($this), 
+                'callback' => 'setTaskToOpen')
+        );
+        $setToOpenWorker->queue();
+    }
+    
+    /**
+     * Callback Method for the $setToOpenWorker
+     * @param unknown $taskGuid
+     * @param unknown $parameters
+     */
+    public function setTaskToOpen($taskGuid, array $parameters) {
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        $task->setState($task::STATE_OPEN);
+        $task->save();
     }
     
     /**
