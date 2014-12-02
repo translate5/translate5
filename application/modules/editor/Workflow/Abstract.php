@@ -223,7 +223,7 @@ abstract class editor_Workflow_Abstract {
     
     public function __construct() {
         $this->loadAuthenticatedUser();
-        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
+        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
     }
     
     /**
@@ -605,19 +605,19 @@ abstract class editor_Workflow_Abstract {
         //a segment mv creation is currently not needed, since doEnd deletes it, and doReopen creates it implicitly!
 
         if($newState == $oldState) {
-            $this->events->trigger("doNothing", $this);
+            $this->events->trigger("doNothing", $this, array('oldTask' => $oldTask, 'newTask' => $newTask));
             return; //saved some other attributes, do nothing
         }
         switch($newState) {
             case $newTask::STATE_OPEN:
                 if($oldState == $newTask::STATE_END) {
                     $this->doReopen();
-                    $this->events->trigger("doReopen", $this);
+                    $this->events->trigger("doReopen", $this, array('oldTask' => $oldTask, 'newTask' => $newTask));
                 }
                 break;
             case $newTask::STATE_END:
                 $this->doEnd();
-                $this->events->trigger("doEnd", $this);
+                $this->events->trigger("doEnd", $this, array('oldTask' => $oldTask, 'newTask' => $newTask));
                 break;
         }
     }
@@ -642,37 +642,59 @@ abstract class editor_Workflow_Abstract {
         }
         $task->createMaterializedView();
         
+        $state = $this->getTriggeredState($oldTua, $newTua);
+        if(!empty($state)) {
+            if(method_exists($this, $state)) {
+                $this->{$state}();
+            } 
+            $this->events->trigger($state, __CLASS__, array('oldTua' => $oldTua, 'newTua' => $newTua));
+        }
+    }
+    
+    /**
+     * triggers a beforeSTATE event
+     * @param editor_Models_TaskUserAssoc $oldTua
+     * @param editor_Models_TaskUserAssoc $newTua
+     */
+    public function triggerBeforeEvents(editor_Models_TaskUserAssoc $oldTua, editor_Models_TaskUserAssoc $newTua) {
+        $state = $this->getTriggeredState($oldTua, $newTua, 'before');
+        $this->events->trigger($state, __CLASS__, array('oldTua' => $oldTua, 'newTua' => $newTua));
+    }
+    
+    /**
+     * method returns the triggered state as string ready to use in events, these are mainly:
+     * doUnfinish, doView, doEdit, doFinish, doWait
+     * beforeUnfinish, beforeView, beforeEdit, beforeFinish, beforeWait
+     * 
+     * @param editor_Models_TaskUserAssoc $oldTua
+     * @param editor_Models_TaskUserAssoc $newTua
+     * @param $prefix optional, defaults to "do"
+     * @return string
+     */
+    public function getTriggeredState(editor_Models_TaskUserAssoc $oldTua, editor_Models_TaskUserAssoc $newTua, $prefix = 'do') {
         $oldState = $oldTua->getState();
         $newState = $newTua->getState();
         if($oldState == $newState) {
-            return;
+            return null;
         }
         
         if($oldState == self::STATE_FINISH && $newState != self::STATE_FINISH) {
-            $this->doUnfinish();
-            $this->events->trigger("doUnfinish", $this);
+            return $prefix.'Unfinish';
         }
         
         switch($newState) {
             case $this::STATE_OPEN:
-                $this->doOpen();
-                $this->events->trigger("doOpen", $this);
-                break;
+                return $prefix.'Open';
             case $this::STATE_VIEW:
-                $this->events->trigger("doView", $this);
-                break;
+                return $prefix.'View';
             case $this::STATE_EDIT:
-                $this->events->trigger("doEdit", $this);
-                break;
+                return $prefix.'Edit';
             case self::STATE_FINISH:
-                $this->doFinish();
-                $this->events->trigger("doFinish", $this);
-                break;
+                return $prefix.'Finish';
             case self::STATE_WAITING:
-                $this->doWait();
-                $this->events->trigger("doWait", $this);
-                break;
+                return $prefix.'Wait';
         }
+        return null;
     }
 
     /*

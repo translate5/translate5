@@ -100,6 +100,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
             //$this->entity->setState($this->data->state);
         //}
         $this->entity->validate();
+        $workflow->triggerBeforeEvents($oldEntity, $this->entity);
         $this->entity->save();
 
         $workflow->doWithUserAssoc($oldEntity, $this->entity);
