@@ -62,8 +62,6 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
      * @see ZfExtended_Worker_Abstract::init()
      */
     public function init($taskGuid = NULL, $parameters = array()) {
-        $this->data = $parameters;
-        
         $parametersToSave = array();
         
         if (isset($parameters['resourcePool'])) {
@@ -71,14 +69,6 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
                 $this->resourcePool = $parameters['resourcePool'];
                 $parametersToSave['resourcePool'] = $this->resourcePool;
             }
-        }
-        
-        if (isset($parameters['lastSegmentId'])) {
-            $parametersToSave['lastSegmentId'] = $parameters['lastSegmentId'];
-        }
-        
-        if (isset($parameters['taskId'])) {
-            $parametersToSave['taskId'] = $parameters['taskId'];
         }
         
         return parent::init($taskGuid, $parametersToSave);
@@ -90,7 +80,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        if (!isset($parameters['lastSegmentId']) || !isset($parameters['taskId'])) {
+        if (!isset($parameters['taskId'])) {
             $this->log->logError('Plugin TermTaggerImport paramter validation failed', __CLASS__.' -> '.__FUNCTION__.' can not validate $parameters: '.print_r($parameters, true));
             return false;
         }
@@ -113,39 +103,93 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
      */
     public function work() {
         
-        if (empty($this->data)) {
+        $segmentIds = $this->loadUntaggedSegmentIds($this->workerModel->getTaskGuid());
+        
+        if (empty($segmentIds)) {
             return false;
         }
-        
-        if (!isset($this->data['lastSegmentId'])) {
-            return false;
-        }
-        
-        $lastSegmentId = $this->data['lastSegmentId'];
-        
         
         $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication');
-        /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
-        $serverCommunication->tbxFile = '12345';
+        /*@var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
+        $serverCommunication->tbxFile = $task->meta()->getTbxHash();
         
-        $serverCommunication = $this->data['serverCommunication'];
-        /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
+        $langModel = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $langModel editor_Models_Languages */
+        $langModel->load($task->getSourceLang());
+        $serverCommunication->sourceLang = $langModel->getRfc5646();
+        $langModel->load($task->getTargetLang());
+        $serverCommunication->targetLang = $langModel->getRfc5646();
         
+        foreach ($segmentIds as $segmentId) {
+            $segment = ZfExtended_Factory::get('editor_Models_Segment');
+            /* @var $segment editor_Models_Segment */
+            $segment->load($segmentId);
+            $segment->meta()->setTermtagState($this::$SEGMENT_STATE_INPROGRESS);
+            $segment->meta()->save();
+            $serverCommunication->addSegment($segment->getId(), 'target', $segment->getSource(), $segment->getTargetEdit());
+        }
+                
         $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
         /* @var $termTagger editor_Plugins_TermTagger_Service */
-        
         if (!$this->checkTermTaggerTbx($this->workerModel->getSlot(), $serverCommunication->tbxFile)) {
             return false;
         }
             
-        $response = $termTagger->tagterms($this->workerModel->getSlot(), $serverCommunication);
+        $responses = $termTagger->tagterms($this->workerModel->getSlot(), $serverCommunication);
         // on error return false and store original untagged data
         if ($response == false) {
             return false;
         }
         
-        $this->result = $response;
+        foreach ($responses as $response) {
+            $tempTaggedText = $response->target;
+            
+            $segment = ZfExtended_Factory::get('editor_Models_Segment');
+            /* @var $segment editor_Models_Segment */
+            $segment->load($response->id);
+            
+            $segment->setTargetEdit('TAGGED: '.$tempTaggedText);
+        }
+        
+        // initialize an new worker-queue-entry
+        $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
+        /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
+        if (!$worker->init($this->workerModel->getTaskGuid(), array('resourcePool' => 'import'))) {
+            $this->log('TermTaggerImport-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
+            return false;
+        }
+        $worker->queue();
+        
         return true;
+    }
+    
+    /**
+     * Loads a list of segmentIds where terms are not tagged yet.
+     * Limit for this list is $config->runtimeOptions->termTagger->segmentsPerCall
+     * 
+     * @param string $taskGuid
+     */
+    private function loadUntaggedSegmentIds($taskGuid) {
+        $config = Zend_Registry::get('config');
+        $limit = $config->runtimeOptions->termTagger->segmentsPerCall;
+        
+        // get list of untagged segments
+        $db = ZfExtended_Factory::get('editor_Models_Db_Segments');
+        $dbName = $db->info($db::NAME);
+        /* @var $db editor_Models_Db_Segments */
+        $sql = $db->select()
+                    ->from(array('segment' => $dbName), 'segment.id')
+                    ->joinLeft(array('meta' => $dbName.'_meta'), 'segment.id = meta.segmentId', array())
+                    ->where('segment.taskGuid = ?', $taskGuid)
+                    ->where('meta.termtagState IS NULL OR meta.termtagState NOT IN (?)',
+                            array($this::$SEGMENT_STATE_TAGGED, $this::$SEGMENT_STATE_INPROGRESS)) // later there may will be a state 'targetnotfound'
+                    ->order('segment.id')
+                    ->limit($limit);
+        error_log(__CLASS__.' -> '.__FUNCTION__.'; $sql: '.$sql);
+        $segmentIds = $db->fetchAll($sql)->toArray();
+        error_log(__CLASS__.' -> '.__FUNCTION__.'; $segmentIds: '.$segmentIds);
+        
+        return $segmentIds;
     }
     
 }

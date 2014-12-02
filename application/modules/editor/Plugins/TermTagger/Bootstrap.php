@@ -92,13 +92,17 @@ class editor_Plugins_TermTagger_Bootstrap {
         
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
         /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
-        if (!$worker->init($task->getTaskGuid(), array('lastSegmentId' => 0,
-                                            'resourcePool' => 'import',
-                                            'taskId' => $task->getId()))) {
-            $this->log('TermTagger-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
+        
+        // Create segments_meta-field 'termtagState' if not exists
+        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+        /* @var $tempSegement editor_Models_Segment_Meta */
+        $meta->addMeta('termtagState', $meta::META_TYPE_STRING, $worker::$SEGMENT_STATE_UNTAGGED, 'Contains the TermTagger-state for this segment while importing', 36);
+        
+        // init worker and queue it
+        if (!$worker->init($task->getTaskGuid(), array('resourcePool' => 'import'))) {
+            $this->log('TermTaggerImport-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }
-        
         $worker->queue();
     }
     
@@ -227,14 +231,22 @@ class editor_Plugins_TermTagger_Bootstrap {
     }
     
     private function test_2() {
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->load(6);
+        $taskGuid = '{1288e9f4-e3b0-4dc0-8f33-c838dcb386ab}';
         
-        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
-        $eventManager->trigger('afterImport', 'editor_Models_Import', array('task' => $task));;
+        $task = ZfExtended_Factory::get('editor_Models_task');
+        /* @var $task editor_Models_task */
+        $task->loadByTaskGuid($taskGuid);
         
-        error_log(__CLASS__.' -> '.__FUNCTION__);
+        
+        if (empty($segmentIds)) {
+            return;
+        }
+        
+        //error_log(__CLASS__.' -> '.__FUNCTION__.'; $serverCommunication: '.print_r($serverCommunication, true));
+        
+        
+        
+        
     }
     
     

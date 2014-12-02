@@ -39,7 +39,13 @@
  * @method void setId() setId(integer $id)
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $guid)
+ * @method string getSegmentId() getSegmentId()
+ * @method void setSegmentId() setSegmentId(integer $id)
  */
 class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     protected $dbInstanceClass = 'editor_Models_Db_SegmentMeta';
+    
+    public function loadBySegmentId($id) {
+        return $this->loadRow('segmentId = ?', $id);
+    }
 }
