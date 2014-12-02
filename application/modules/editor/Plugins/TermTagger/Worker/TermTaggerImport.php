@@ -80,10 +80,6 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        if (!isset($parameters['taskId'])) {
-            $this->log->logError('Plugin TermTaggerImport paramter validation failed', __CLASS__.' -> '.__FUNCTION__.' can not validate $parameters: '.print_r($parameters, true));
-            return false;
-        }
         return true;
     } 
     
@@ -102,12 +98,17 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
+        error_log(__CLASS__.' -> '.__FUNCTION__);
         
         $segmentIds = $this->loadUntaggedSegmentIds($this->workerModel->getTaskGuid());
         
         if (empty($segmentIds)) {
             return false;
         }
+        
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_task */
+        $task->loadByTaskGuid($this->workerModel->getTaskGuid());
         
         $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication');
         /*@var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
@@ -126,6 +127,11 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
             $segment->load($segmentId);
             $segment->meta()->setTermtagState($this::$SEGMENT_STATE_INPROGRESS);
             $segment->meta()->save();
+            
+            //foreach $fieldList as $fieldName
+            //{ $segment->get$FieldName Edit();
+            // !!! auch SOURCE zurückspeichern da getaggt wird, vorher nicht !
+            
             $serverCommunication->addSegment($segment->getId(), 'target', $segment->getSource(), $segment->getTargetEdit());
         }
                 
@@ -137,7 +143,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
             
         $responses = $termTagger->tagterms($this->workerModel->getSlot(), $serverCommunication);
         // on error return false and store original untagged data
-        if ($response == false) {
+        if ($responses == false) {
             return false;
         }
         
@@ -148,7 +154,12 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
             /* @var $segment editor_Models_Segment */
             $segment->load($response->id);
             
-            $segment->setTargetEdit('TAGGED: '.$tempTaggedText);
+            $segment->setSource('IMPORT-TERMTAGGED: '.$response->source);
+            $segment->setTargetEdit('IMPORT-TERMTAGGED: '.$response->target);
+            $segment->save();
+            
+            $segment->meta()->setTermtagState($this::$SEGMENT_STATE_TAGGED);
+            $segment->meta()->save();
         }
         
         // initialize an new worker-queue-entry
@@ -185,9 +196,9 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
                             array($this::$SEGMENT_STATE_TAGGED, $this::$SEGMENT_STATE_INPROGRESS)) // later there may will be a state 'targetnotfound'
                     ->order('segment.id')
                     ->limit($limit);
-        error_log(__CLASS__.' -> '.__FUNCTION__.'; $sql: '.$sql);
+        //error_log(__CLASS__.' -> '.__FUNCTION__.'; $sql: '.$sql);
         $segmentIds = $db->fetchAll($sql)->toArray();
-        error_log(__CLASS__.' -> '.__FUNCTION__.'; $segmentIds: '.$segmentIds);
+        //error_log(__CLASS__.' -> '.__FUNCTION__.'; $segmentIds: '.print_r($segmentIds, true));
         
         return $segmentIds;
     }

@@ -77,6 +77,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     protected $segmentdata     = array();
     
     /**
+     * @var editor_Models_Task_Meta
+     */
+    protected $meta;
+
+    /**
      * init the internal segment field and the DB object
      */
     public function __construct()
@@ -134,7 +139,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * (non-PHPdoc)
      * @see ZfExtended_Models_Entity_Abstract::set()
      */
-    protected function set($name, $value) {
+    public function set($name, $value) {
         $loc = $this->segmentFieldManager->getDataLocationByKey($name);
         if($loc !== false) {
             if(empty($this->segmentdata[$loc['field']])) {
@@ -151,7 +156,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * (non-PHPdoc)
      * @see ZfExtended_Models_Entity_Abstract::get()
      */
-    protected function get($name) {
+    public function get($name) {
         $loc = $this->segmentFieldManager->getDataLocationByKey($name);
         if($loc !== false) {
             //if we have a missing index here, that means, 
@@ -760,6 +765,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @param boolean $useSource optional, default false, if true terms of source column are used (instead of target)
      */
     public function recreateTermTags($dataindex, $useSource = false) {
+        return false;
         throw new BadMethodCallException('deprecated');
         $termTag = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
         /* @var $termTag editor_Models_Segment_TermTag */
@@ -875,5 +881,22 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             }
         }
         return $result;
+    }
+    
+    /**
+     * convenient method to get the task meta data
+     * @return editor_Models_Segment_Meta
+     */
+    public function meta() {
+        if(!empty($this->meta)) {
+            return $this->meta;
+        }
+        $this->meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+        try {
+            $this->meta->loadBySegmentId($this->getId());
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            $this->meta->init(array('taskGuid' => $this->getTaskGuid(), 'segmentId' => $this->getId()));
+        }
+        return $this->meta;
     }
 }
