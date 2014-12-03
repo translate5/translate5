@@ -39,11 +39,17 @@ defined in `/library/ZfExtended/Controllers/Action.php`  will trigger an event o
 - **doEnd**
 
 ####TaskUserAssoc
+- **beforeFinish**
 - **doUnfinish** 
+- **beforeOpen**
 - **doOpen**
+- **beforeView**
 - **doView**
+- **beforeEdit**
 - **doEdit**
+- **beforeFinish**
 - **doFinish**
+- **beforeWait**
 - **doWait**
 
 ###Editor_SegmentController
