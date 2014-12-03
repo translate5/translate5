@@ -99,9 +99,12 @@ Ext.define('Editor.controller.ServerException', {
             respText = response && response.responseText || '{"errors": [{"_errorMessage": "unknown"}]}',
             tpl = new Ext.Template(str.serverMsg),
             action = response && response.request && response.request.options.action,
+            getServerMsg = function() {
+                var json = Ext.JSON.decode(respText);
+                return json.errors[0]._errorMessage;
+            },
             appendServerMsg = function(msg) {
-                respText = Ext.JSON.decode(respText);
-                return  msg + tpl.apply(['', respText.errors[0]._errorMessage]);
+                return msg + tpl.apply(['', getServerMsg()]);
             };
         
         switch(status) {
@@ -146,7 +149,7 @@ Ext.define('Editor.controller.ServerException', {
                 Editor.MessageBox.addError(appendServerMsg(str["409"]));
                 return;
             case 406: //Not Acceptable: show message from server
-                Editor.MessageBox.addError(appendServerMsg(str["406"]));
+                Editor.MessageBox.addError(getServerMsg());
                 return;
         }
         Ext.Msg.alert(str.title, text+tpl.apply([status, statusText]));
