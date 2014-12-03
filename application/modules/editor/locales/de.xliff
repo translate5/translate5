@@ -679,6 +679,7 @@ Ihr Projektmanagement Team
 Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail.</target></trans-unit>
 <trans-unit id='U2VociBnZWVocnRlIEZyYXU='><source>Sehr geehrte Frau</source><target>Sehr geehrte Frau</target></trans-unit>
 <trans-unit id='aW1wb3J0'><source>import</source><target>import</target></trans-unit>
+<trans-unit id='RGVyIFRhc2sga2FubiBuaWNodCBhYmdlc2NobG9zc2VuIHdlcmRlbiwgZGEgbmljaHQgYWxsZSBTZWdtZW50ZSBlaW5lbiBTdGF0dXMgZ2VzZXR6dCBoYWJlbi4gQml0dGUgdmVyd2VuZGVuIFNpZSBkaWUgRmlsdGVyZnVua3Rpb24gdW0gZGllIGJldHJvZmZlbmVuIFNlZ21lbnRlIHp1IGZpbmRlbi4='><source>Der Task kann nicht abgeschlossen werden, da nicht alle Segmente einen Status gesetzt haben. Bitte verwenden Sie die Filterfunktion um die betroffenen Segmente zu finden.</source><target>Der Task kann nicht abgeschlossen werden, da nicht alle Segmente einen Status gesetzt haben. Bitte verwenden Sie die Filterfunktion um die betroffenen Segmente zu finden.</target></trans-unit>
   </body>
  </file>
 </xliff>
