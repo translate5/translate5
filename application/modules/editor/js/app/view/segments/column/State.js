@@ -63,12 +63,12 @@ Ext.define('Editor.view.segments.column.State', {
    * @returns {String}
    */
   renderer: function(value,t,record){
+    if(value == 0){
+      return '';
+    }
     //bound to the grid!
     if(this.stateData[value]){
       return this.stateData[value];
-    }
-    if(value == 0){
-        return '';
     }
     return value;
   }
