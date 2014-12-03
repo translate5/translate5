@@ -64,6 +64,7 @@ class editor_Plugins_ManualStatusCheck_Bootstrap extends ZfExtended_Plugin_Abstr
         $s = $segment->select()
             ->from($segment, array('unsetStatusCount' => 'COUNT(id)'))
             ->where('stateId = 0')
+            ->where('editable = 1')
             ->where('taskGuid = ?', $tua->getTaskGuid());
         
         $row = $segment->fetchRow($s);
