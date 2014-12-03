@@ -415,7 +415,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       var app = Editor.app;
       return {
           success: app.unmask,
-          failure: app.unmask
+          failure: function(rec, op){
+              var recs = op.getRecords(),
+                  task = recs && recs[0] || false;
+              task && task.reject();
+              app.unmask();
+          }
       };
   },
   
