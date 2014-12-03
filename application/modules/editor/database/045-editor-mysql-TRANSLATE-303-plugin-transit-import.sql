@@ -34,15 +34,63 @@
 --  */
 -- 
 
-CREATE TABLE IF NOT EXISTS `LEK_segments_meta` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `taskGuid` varchar(38) NOT NULL COMMENT 'Foreign Key to LEK_task',
-  `segmentId` int(11) NOT NULL COMMENT 'Foreign Key to LEK_segments',
-  PRIMARY KEY (`id`),
-  CONSTRAINT FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE,
-  CONSTRAINT FOREIGN KEY (`segmentId`) REFERENCES `LEK_segments` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-ALTER TABLE  `LEK_segments_meta` ADD  `notTranslated` TINYINT NOT NULL DEFAULT  0 COMMENT  'defines, if segment is marked in imported file as locked not translated - or is acutally empty, but the source is not empty.';
-ALTER TABLE LEK_segments_meta ADD UNIQUE (
-segmentId
+INSERT INTO  `Zf_configuration` (
+`id` ,
+`name` ,
+`confirmed` ,
+`module` ,
+`category` ,
+`value` ,
+`default` ,
+`defaults` ,
+`type` ,
+`description`
+)
+VALUES (
+NULL ,  'runtimeOptions.plugins.transit.writeInfoField.enabled',  '1',  'editor',  'import',  '1',  '0', NULL ,  'boolean', 'decides, if information is added to the target-infofield of a segment- further config values decide, which information.'
+);
+INSERT INTO  `Zf_configuration` (
+`id` ,
+`name` ,
+`confirmed` ,
+`module` ,
+`category` ,
+`value` ,
+`default` ,
+`defaults` ,
+`type` ,
+`description`
+)
+VALUES (
+NULL ,  'runtimeOptions.plugins.transit.writeInfoField.exportDate',  '1',  'editor',  'import',  '1',  '0', NULL ,  'boolean', 'decides, if exportdate is written to infofield.'
+);
+INSERT INTO  `Zf_configuration` (
+`id` ,
+`name` ,
+`confirmed` ,
+`module` ,
+`category` ,
+`value` ,
+`default` ,
+`defaults` ,
+`type` ,
+`description`
+)
+VALUES (
+NULL ,  'runtimeOptions.plugins.transit.writeInfoField.manualStatus',  '1',  'editor',  'import',  '1',  '0', NULL ,  'boolean', 'decides, if manualStatus is written to infofield.'
+);
+INSERT INTO  `Zf_configuration` (
+`id` ,
+`name` ,
+`confirmed` ,
+`module` ,
+`category` ,
+`value` ,
+`default` ,
+`defaults` ,
+`type` ,
+`description`
+)
+VALUES (
+NULL ,  'runtimeOptions.plugins.transit.writeInfoField.termsWithoutTranslation',  '1',  'editor',  'import',  '1',  '0', NULL ,  'boolean', 'decides, if SourceTermsWithoutTranslation are written to infofield.'
 );

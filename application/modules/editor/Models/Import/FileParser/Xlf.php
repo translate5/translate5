@@ -108,7 +108,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         
         if (strpos($this->_origFileUnicodeProtected, $this->ibmXliffNeedle) === false)
         {
-            error_log('Die Datei ' . $this->_fileName . ' ist keine gültige IBM-Xliff Datei! ('.$this->ibmXliffNeedle.' nicht enthalten)');
+            /* @var $log ZfExtended_Log */
+            $msg = 'Die Datei ' . $this->_fileName . ' ist keine gültige IBM-Xliff Datei! ('.$this->ibmXliffNeedle.' nicht enthalten)';
+            $log = ZfExtended_Factory::get('ZfExtended_Log');
+            $log->logError($msg);
             return;
         } 
         
@@ -170,8 +173,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     
     
     /**
-     * Sets $this->_editSegment, $this->_matchRateSegment and $this->_autopropagated
-     * and $this->_pretransSegment and $this->_autoStateId for the segment currently worked on
+     * Sets $this->_matchRateSegment and $this->_autopropagated
+     * for the segment currently worked on
      *
      * @param array transunit
      */
@@ -192,7 +195,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      *
      * - speichert die Segmente in der Datenbank
      * @param array $transUnit
-     * TODO:
      * @return array $transUnit enthält anstelle der Segmente die Replacement-Tags <lekSourceSeg id=""/> und <lekTargetSeg id=""/>
      *         wobei die id die ID des Segments in der Tabelle Segments darstellt
      */
@@ -215,7 +217,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             'originalMd5' => md5($temp_target)
         );
         $segmentId = $this->setAndSaveSegmentValues();
-        $targetName = $this->segmentFieldManager->getFirstTargetName();
         $tempTargetPlaceholder = $this->getFieldPlaceholder($segmentId, $targetName);
         
         $temp_return = preg_replace('/(.*)<target(.*?)>.*<\/target>(.*)/is', '${1}<target${2}>'.$tempTargetPlaceholder.'</target>${3}', $transUnit[0]);
@@ -255,7 +256,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         if (strpos($segment, '<')=== false) {
             return $segment;
         }
-        $data = new editor_Models_Import_FileParser_Sdlxliff_ParseSegmentData();
+        $data = ZfExtended_Factory::get('editor_Models_Import_FileParser_Sdlxliff_ParseSegmentData');
         
         $data->segment = preg_split('/(<ph>.*?<\/ph>.*?)/is', $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
         

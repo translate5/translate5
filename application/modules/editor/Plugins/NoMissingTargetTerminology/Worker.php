@@ -33,18 +33,36 @@
  
  END LICENSE AND COPYRIGHT 
  */
+class editor_Plugins_NoMissingTargetTerminology_Worker extends ZfExtended_Worker_Abstract{
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_Worker_Abstract::validateParameters()
+     */
+    protected function validateParameters($parameters = array()) {
+        return empty($parameters);
+    } 
+    /**
+     * 
+     * @param string $taskGuid
+     */
+    public function work() {
+        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+        /* @var $meta editor_Models_Segment_Meta */
+        $meta->addMeta('noMissingTargetTermOnImport', $meta::META_TYPE_BOOLEAN, true, 'Is set to false only if all terms in source exists also in target column');
 
-/**#@+ 
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- * 
- */
-/**
- * DB Access for Segment Meta Data
- */
-class editor_Models_Db_SegmentMeta extends Zend_Db_Table_Abstract {
-    use ZfExtended_Models_Db_MetaTrait;
-    protected $_name = 'LEK_segments_meta';
-    public $_primary = 'id';
+        $statDb = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_Db_Statistics');
+        /* @var $statDb editor_Plugins_SegmentStatistics_Models_Db_Statistics */
+        
+        $select = $statDb->select()
+            ->from($statDb, array(new Zend_Db_Expr ('1 AS noMissingTargetTermOnImport'), 'taskGuid', 'segmentId'))
+            ->where('taskGuid = ?', $this->taskGuid)
+            ->where('termNotFound = 0')
+            ->group('segmentId');
+        
+        $md = $meta->db;
+        $table = $md->info($md::NAME);
+        $insert = 'INSERT INTO '.$table.' (`noMissingTargetTermOnImport`, `taskGuid`, `segmentId`) '.$select; 
+        $md->getAdapter()->query($insert);
+        error_log('hier1');
+    }
 }

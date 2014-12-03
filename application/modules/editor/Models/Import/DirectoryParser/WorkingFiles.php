@@ -53,10 +53,11 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
    * filenames with this extension will be imported (without leading dot)
    * - caseInsensitiv
    * - all others will be ignored
+   * - transit-fileextension does not exist in real life, since transit has none.
+   *   It is added by editor_Transit_PluginBootstrap
    * @var array
    */
-  //protected $_importExtensionList = array('sdlxliff','csv');
-  protected $_importExtensionList = array('sdlxliff','xlf','csv');
+  protected $_importExtensionList = array('sdlxliff','xlf','csv','transit');
   
   /**
    * RootNode Container

@@ -605,6 +605,20 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * generates a statistics summary to the given task
+     */
+    public function getStatistics() {
+        $result = new stdClass();
+        $result->taskGuid = $this->getTaskGuid();
+        $result->taskName = $this->getTaskName();
+        $result->wordCount = $this->getWordCount();
+        $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segment editor_Models_Segment */
+        $result->segmentCount = $segment->count($this->getTaskGuid());
+        return $result;
+    }
+    
+    /**
      * convenient method to get the task meta data
      * @return editor_Models_Task_Meta
      */
