@@ -46,10 +46,11 @@
 class editor_Models_Db_SegmentMeta extends Zend_Db_Table_Abstract {
     protected $_name = 'LEK_segments_meta';
     public $_primary = 'id';
-    
+
     /**
      * Adds a columns to the meta table
      * type is one of editor_Models_Segment_Meta::META_TYPE_* constants
+     * 
      * @param string $name
      * @param string $type
      * @param mixed $default
@@ -80,9 +81,8 @@ class editor_Models_Db_SegmentMeta extends Zend_Db_Table_Abstract {
         if(is_null($default)) {
             $default = 'NULL';
         }
-        $db = $this->getAdapter();
         $alter = 'ALTER TABLE `%s` ADD COLUMN `%s` %s DEFAULT %s COMMENT "%s";';
-        $db->query(sprintf($alter, $this->_name, $columnname, $type, $default, addslashes($comment)));
+        $this->_db->query(sprintf($alter, $this->_name, $columnname, $type, $default, addslashes($comment)));
         $this->_metadata = array();
         $this->_metadataCache = null;
         $this->_setupMetadata();

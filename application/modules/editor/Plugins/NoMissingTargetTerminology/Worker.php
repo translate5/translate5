@@ -33,32 +33,36 @@
  
  END LICENSE AND COPYRIGHT 
  */
-
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-/**
- * Plugin Bootstrap for Segment Statistics Plugin
- */
-class editor_Plugins_SegmentStatistics_Bootstrap extends ZfExtended_Plugin_Abstract {
-    public function init() {
-        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'));
-    }
-    
+class editor_Plugins_NoMissingTargetTerminology_Worker extends ZfExtended_Worker_Abstract{
     /**
-     * handler for event: editor_Models_Import#afterImport
-     * @param $event Zend_EventManager_Event
+     * (non-PHPdoc)
+     * @see ZfExtended_Worker_Abstract::validateParameters()
      */
-    public function handleAfterImport(Zend_EventManager_Event $event) {
-        $task = $event->getParam('task');
-        /* @var $task editor_Models_Task */
+    protected function validateParameters($parameters = array()) {
+        return empty($parameters);
+    } 
+    /**
+     * 
+     * @param string $taskGuid
+     */
+    public function work() {
+        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+        /* @var $meta editor_Models_Segment_Meta */
+        $meta->addMeta('noMissingTargetTermOnImport', $meta::META_TYPE_BOOLEAN, true, 'Is set to false only if all terms in source exists also in target column');
+
+        $statDb = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_Db_Statistics');
+        /* @var $statDb editor_Plugins_SegmentStatistics_Models_Db_Statistics */
         
-        $worker = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Worker');
-        /* @var $worker editor_Plugins_SegmentStatistics_Worker */
-        $worker->init($task->getTaskGuid());
-        $worker->queue();
+        $select = $statDb->select()
+            ->from($statDb, array(new Zend_Db_Expr ('1 AS noMissingTargetTermOnImport'), 'taskGuid', 'segmentId'))
+            ->where('taskGuid = ?', $this->taskGuid)
+            ->where('termNotFound = 0')
+            ->group('segmentId');
+        
+        $md = $meta->db;
+        $table = $md->info($md::NAME);
+        $insert = 'INSERT INTO '.$table.' (`noMissingTargetTermOnImport`, `taskGuid`, `segmentId`) '.$select; 
+        $md->getAdapter()->query($insert);
+        error_log('hier1');
     }
 }

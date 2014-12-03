@@ -1,4 +1,5 @@
 <?php
+
  /*
  START LICENSE AND COPYRIGHT
  
@@ -33,32 +34,35 @@
  
  END LICENSE AND COPYRIGHT 
  */
-
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
- * Plugin Bootstrap for Segment Statistics Plugin
+ * class with helper methods for import- and export-parsing (which are used in both)
+ * 
  */
-class editor_Plugins_SegmentStatistics_Bootstrap extends ZfExtended_Plugin_Abstract {
-    public function init() {
-        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'));
+trait editor_Plugins_Transit_TraitParse {
+    
+    /**
+     * 
+     * @param type $text
+     * @return boolean
+     */
+    protected function containsOnlyTagsOrEmpty($text){
+        if(preg_replace(array('"<Tag .*?</Tag>"','"<FontTag .*?</FontTag>"'), array('',''), $text)===''){
+            return true;
+        }
+        return false;
     }
     
     /**
-     * handler for event: editor_Models_Import#afterImport
-     * @param $event Zend_EventManager_Event
+     * checks if number of source and target-segments match - and logs it if not
+     * @return boolean
      */
-    public function handleAfterImport(Zend_EventManager_Event $event) {
-        $task = $event->getParam('task');
-        /* @var $task editor_Models_Task */
-        
-        $worker = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Worker');
-        /* @var $worker editor_Plugins_SegmentStatistics_Worker */
-        $worker->init($task->getTaskGuid());
-        $worker->queue();
+    protected function isEvenLanguagePair() {
+        if ($this->sourceDOM->getSegmentCount() === $this->targetDOM->getSegmentCount()){
+            return true;
+        }
+        $msg = "The number of segments of source- and target-files are not identical. LanguagePair can not be parsed properly. Path to targetFile is ".$path;
+        $this->log->logError($msg);
+        return false;
     }
+   
 }

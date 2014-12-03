@@ -48,7 +48,7 @@ class editor_TermTagger_PluginBootstrap {
     public function __construct() {
         $config = Zend_Registry::get('config');
         if (empty($config->runtimeOptions->termTagger->url->default->toArray())) {
-            error_log("Plugin TermTagger initialized but no Zf_configuration termTagger.url.default is defined.");
+            throw new Zend_Exception("Plugin TermTagger initialized but no Zf_configuration termTagger.url.default is defined.");
             return false;
         }
         // event-listeners
@@ -143,7 +143,7 @@ class editor_TermTagger_PluginBootstrap {
         
         // TEST TEST TEST TEST
         // Demonstration of starting a worker that was rebuild(instanciated) from a worker-model
-        $worker->queue(); // just to save the upper worker into the queue (DB-table LEK_worker)
+        $worker->queue(); // just to save the upper worker into the queue (DB-table Zf_worker)
         
         $tempModel = $worker->getModel();
         $worker2 = ZfExtended_Worker_Abstract::instanceByModel($tempModel);

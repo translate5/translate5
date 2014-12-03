@@ -132,7 +132,7 @@ class editor_Models_Export {
             $path = $exportRootFolder.DIRECTORY_SEPARATOR.$path;
             $parser = $this->getFileParser((int)$fileId, $path);
             /* @var $parser editor_Models_Export_FileParser */
-            file_put_contents($path,$parser->getFile());
+            $parser->saveFile();
         }
         if($unsetExportRunningStamp)
             $this->unsetExportRunningStamp();
@@ -150,7 +150,7 @@ class editor_Models_Export {
        $ext = preg_replace('".*\.([^.]*)$"i', '\\1', $path);
        
        try {
-           return ZfExtended_Factory::get('editor_Models_Export_FileParser_'.ucfirst(strtolower($ext)), array($fileId, $this->optionDiff,  $this->task));
+           return ZfExtended_Factory::get('editor_Models_Export_FileParser_'.ucfirst(strtolower($ext)), array($fileId, $this->optionDiff,  $this->task, $path));
            
         } catch (Exception $e) { 
             throw new Zend_Exception('For the fileextension '.$ext. ' no parser is registered.',0,$e);
@@ -171,12 +171,15 @@ class editor_Models_Export {
         }
         $this->exportToFolder($exportRoot,false);
         $zipFile = $taskRoot.DIRECTORY_SEPARATOR.'export.zip';
-        $filter = new Zend_Filter_Compress(array(
-            'adapter' => 'Zip',
-            'options' => array(
-                'archive' => $zipFile
-            ),
-        ));
+        $filter = ZfExtended_Factory::get('Zend_Filter_Compress',array(
+            array(
+                    'adapter' => 'Zip',
+                    'options' => array(
+                        'archive' => $zipFile
+                    ),
+                )
+            )
+        );
         if(!$filter->filter($exportRoot)){
             throw new Zend_Exception('Could not create export-zip of task '.$this->taskGuid.'.');
         }

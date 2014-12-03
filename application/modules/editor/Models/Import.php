@@ -156,6 +156,11 @@ class editor_Models_Import {
      * @var (int) / boolean
      */
     private $wordCount = 0;
+    
+    /**
+     * @var ZfExtended_EventManager
+     */
+    protected $events = false;
 
     /**
      * Konstruktor
@@ -164,6 +169,7 @@ class editor_Models_Import {
         $this->gh = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('General');
         $this->_localEncoded = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('LocalEncoded');
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
     }
     
     /**
@@ -212,7 +218,6 @@ class editor_Models_Import {
         
         //call post import Methods:
         $dataProvider->postImportHandler();
-        
         //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
         $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         $eventManager->trigger('afterImport', $this, array('task' => $this->task));
@@ -226,6 +231,7 @@ class editor_Models_Import {
         Zend_Registry::set('errorCollect', $this->isCheckRun);
         
         $this->importMetaData(); //Im MetaData Importer die TMX Geschichte integrieren
+        $this->events->trigger("beforeDirectoryParsing", $this,array('importFolder'=>$this->_importFolder));
         $this->saveDirTrees();
         $this->termTagFiles();
         $this->importFiles();
@@ -269,7 +275,6 @@ class editor_Models_Import {
     
     /**
      * Importiert die Relais Dateien eines Tasks, welche noch nicht importiert wurde. 
-     * Stößt bei Bedarf auch die Erzeugung per openTMS an
      * 
      */
     public function importAndGenerateRelaisFiles() {

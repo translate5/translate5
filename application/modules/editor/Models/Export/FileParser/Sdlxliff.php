@@ -50,8 +50,8 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
      */
     protected $_classNameDifftagger = 'editor_Models_Export_DiffTagger_Sdlxliff';
 
-    public function __construct(integer $fileId, boolean $diff,editor_Models_Task $task) {
-        parent::__construct($fileId, $diff,$task);
+    public function __construct(integer $fileId, boolean $diff,editor_Models_Task $task,string $path) {
+        parent::__construct($fileId, $diff,$task,$path);
     }
 
     /**
@@ -134,72 +134,6 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         return parent::parseSegment($segment);
     }
      */
-
-    /**
-     * Stellt die Term Auszeichnungen gemäß sdlxliff-Syntax (<mrk ...) wieder her
-     * 
-     * Konvertiert von:
-     * <div class="term admittedTerm transNotFound" id="term_05_1_de_1_00010-0" title="">Hause</div>
-     * nach:
-     * <mrk mtype="x-term-admittedTerm" mid="term_05_1_de_1_00010">Hause</mrk>
-     * entfernt dabei Informationen zu trans[Not]Found
-     * 
-     * @param string $segment
-     * @param boolean $removeTermTags, default = true
-     * @return string $segment
-     */
-    protected function recreateTermTags($segment, $removeTermTags=true) {
-        $segmentArr = preg_split('/<div\s*class="term([^"]+)"\s+id="([^"]+)-\d+"[^>]*>/s', $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
-        
-        $cssClassFilter = function($input) {
-            return($input !== 'transFound' && $input !== 'transNotFound');
-        };
-        
-        $count = count($segmentArr);
-        $closingTag =  '</mrk>';
-        if($removeTermTags){
-            $closingTag = '';
-        }
-        for ($i = 1; $i < $count; $i = $i + 3) {
-            $tagExpl/* segment aufgespalten an den öffenden Tags */ = explode('<div', $segmentArr[$i + 2]/* segmentteil hinter öffnendem Termtag */);
-            $openTagCount = 0;
-            $tCount = count($tagExpl);
-            for ($j = 0; $j < $tCount; $j++) {
-                $numOfClosedDiv = substr_count($tagExpl[$j], '</div>');
-                $containsOpeningTag = preg_match('"^ class=\""', $tagExpl[$j]) === 1 || false;
-                if ($openTagCount === 0 and
-                        (
-                        ($containsOpeningTag === true and $numOfClosedDiv > 1)
-                        or
-                        ($containsOpeningTag === false and $numOfClosedDiv === 1))) {
-                    $parts = explode('</div>', $tagExpl[$j]); //der letzte </div> muss der schließende mrk-Tag sein, da ja kein div-Tag innerhalb des Term-Tags mehr geöffnet ist
-                    $end = array_pop($parts);
-                    $tagExpl[$j] = implode('</div>', $parts) . $closingTag. $end;
-                    break; //go to the next termtag, because this one is now closed.
-                } elseif (($containsOpeningTag === true and $numOfClosedDiv > 1)
-                        or
-                        ($containsOpeningTag === false and $numOfClosedDiv === 1)) {
-                    $openTagCount--;
-                } elseif ($containsOpeningTag and $numOfClosedDiv === 0) {
-                    $openTagCount++;
-                }
-            }
-            if(!$removeTermTags){
-                $cssClasses = explode(' ', trim($segmentArr[$i]));
-                //@todo actually were removing the trans[Not]Found info. 
-                //it would be better to set it for source segments by checking the target if the term exists  
-                $segmentArr[$i] = join('-', array_filter($cssClasses, $cssClassFilter));
-                $segmentArr[$i] = '<mrk mtype="x-term-' . $segmentArr[$i] . '" mid="' . $segmentArr[$i + 1] . '">';
-            }
-            else{
-                $segmentArr[$i] = '';
-            }
-            $segmentArr[$i] .= implode('<div', $tagExpl);
-            unset($segmentArr[$i + 1]);
-            unset($segmentArr[$i + 2]);
-        }
-        return implode('', $segmentArr);
-    }
 
     /**
      * Gibt eine zu exportierende Datei bereits korrekt für den Export geparsed zurück

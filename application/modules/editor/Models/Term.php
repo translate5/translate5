@@ -129,6 +129,18 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
+     * 
+     * @param string $mid
+     * @return type
+     */
+    protected function loadByMid(string $mid) {
+        $s = $this->db->getAdapter()->select()
+        ->from(array('t' => 'LEK_terms'))
+        ->where('t.mid = ?', $taskGuid);
+        return $this->row = $this->db->getAdapter()->fetchRow($s);
+    }
+
+    /**
      * Sortiert die Terme innerhalb der Termgruppen:
      * @param array $termGroups
      * @return array

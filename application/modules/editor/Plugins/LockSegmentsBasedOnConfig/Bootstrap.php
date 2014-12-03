@@ -33,39 +33,36 @@
  
  END LICENSE AND COPYRIGHT 
  */
-/**
- * editor_Plugins_MissingTargetTerminology_Worker Class
+
+/**#@+
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
  */
-class editor_Plugins_MissingTargetTerminology_Worker extends ZfExtended_Worker_Abstract {
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = array()) {
-        return empty($parameters);
-    } 
+/**
+ * Plugin Bootstrap for Missing Target Terminology Plugin
+ * depends on editor_Plugins_SegmentStatistics_Bootstrap
+ */
+class editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap extends ZfExtended_Plugin_Abstract {
+    
+    public function init() {
+        $this->dependsOn('editor_Plugins_SegmentStatistics_Bootstrap');
+        //priority -10000 in order to always allow other plugins to modify meta-data before locking runs
+        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'), -10000);
+    }
     
     /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::work()
+     * handler for event: editor_Models_Import#afterImport
+     * @param $event Zend_EventManager_Event
      */
-    public function work() {
-        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
-        /* @var $meta editor_Models_Segment_Meta */
-        $meta->addMeta('missingTargetTermOnImport', $meta::META_TYPE_BOOLEAN, true, 'Is set to false only if all terms in source exists also in target column');
-
-        $statDb = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_Db_Statistics');
-        /* @var $statDb editor_Plugins_SegmentStatistics_Models_Db_Statistics */
+    public function handleAfterImport(Zend_EventManager_Event $event) {
+        $task = $event->getParam('task');
+        /* @var $task editor_Models_Task */
         
-        $select = $statDb->select()
-            ->from($statDb, array(new Zend_Db_Expr ('1 AS missingTargetTermOnImport'), 'taskGuid', 'segmentId'))
-            ->where('taskGuid = ?', $this->taskGuid)
-            ->where('termNotFound > 0')
-            ->group('segmentId');
-        
-        $md = $meta->db;
-        $table = $md->info($md::NAME);
-        $insert = 'INSERT INTO '.$table.' (`missingTargetTermOnImport`, `taskGuid`, `segmentId`) '.$select; 
-        $md->getAdapter()->query($insert);
+        $worker = ZfExtended_Factory::get('editor_Plugins_LockSegmentsBasedOnConfig_Worker');
+        /* @var $worker editor_Plugins_LockSegmentsBasedOnConfig_Worker */
+        $worker->init($task->getTaskGuid());
+        $worker->queue();
     }
 }

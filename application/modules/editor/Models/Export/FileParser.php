@@ -84,13 +84,28 @@ abstract class editor_Models_Export_FileParser {
      * @var editor_Models_Task current task
      */
     protected $_task;
-    
     /**
      * @var Zend_Config
      */
     protected $config;
-    
-    public function __construct(integer $fileId,boolean $diff,editor_Models_Task $task) {
+    /**
+     *
+     * @var string path including filename, on which the exported file will be saved
+     */
+    protected $path;
+    /**
+     * @var ZfExtended_Zendoverwrites_Translate
+     */
+    protected $translate;
+    /**
+     * 
+     * @param integer $fileId
+     * @param boolean $diff
+     * @param editor_Models_Task $task
+     * @param string $path 
+     * @throws Zend_Exception
+     */
+    public function __construct(integer $fileId,boolean $diff,editor_Models_Task $task, string $path) {
         if(is_null($this->_classNameDifftagger)){
             throw new Zend_Exception('$this->_classNameDifftagger muss in der Child-Klasse definiert sein.');
         }
@@ -98,7 +113,9 @@ abstract class editor_Models_Export_FileParser {
         $this->_diffTagger = ZfExtended_Factory::get($this->_classNameDifftagger);
         $this->_diff = $diff;
         $this->_task = $task;
+        $this->path = $path;
         $this->config = Zend_Registry::get('config');
+        $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
     }
 
     /**
@@ -112,7 +129,10 @@ abstract class editor_Models_Export_FileParser {
         $this->convertEncoding();
         return $this->_exportFile;
     }
-
+    
+    public function saveFile() {
+        file_put_contents($this->path, $this->getFile());
+    }
     /**
      * übernimmt das eigentliche FileParsing
      *
@@ -150,7 +170,6 @@ abstract class editor_Models_Export_FileParser {
               $field = editor_Models_SegmentField::TYPE_TARGET;
             }
           
-            //$file[$i] = 'replaced: '.$matches[1].' # '.$col;
             $file[$i] = $this->getSegmentContent($matches[1], $field);
             $i = $i + 2;
         }
@@ -214,11 +233,79 @@ abstract class editor_Models_Export_FileParser {
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */
         $this->segmentCache[$segmentId] = $segment->load($segmentId);
-        //we keep a max of 5 segments, this should be enough
-        if($this->segmentCache > 5) {
-            array_shift($this->segmentCache);
+        //we keep a max of 50 segments, this should be enough
+        if(count($this->segmentCache) > 50) {
+            reset($this->segmentCache);
+            $firstKey = key($this->segmentCache);
+            unset($this->segmentCache[$firstKey]);
         }
         return $segment;
+    }
+    
+    /**
+     * creates termMarkup according to xliff-Syntax (<mrk ...) 
+     * 
+     * converts from:
+     * <div class="term admittedTerm transNotFound" id="term_05_1_de_1_00010-0" title="">Hause</div>
+     * to:
+     * <mrk mtype="x-term-admittedTerm" mid="term_05_1_de_1_00010">Hause</mrk>
+     * and removes the information about trans[Not]Found
+     * 
+     * @param string $segment
+     * @param boolean $removeTermTags, default = true
+     * @return string $segment
+     */
+    protected function recreateTermTags($segment, $removeTermTags=true) {
+        $segmentArr = preg_split('/<div\s*class="term([^"]+)"\s+id="([^"]+)-\d+"[^>]*>/s', $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
+        
+        $cssClassFilter = function($input) {
+            return($input !== 'transFound' && $input !== 'transNotFound');
+        };
+        
+        $count = count($segmentArr);
+        $closingTag =  '</mrk>';
+        if($removeTermTags){
+            $closingTag = '';
+        }
+        for ($i = 1; $i < $count; $i = $i + 3) {
+            $tagExpl/* segment aufgespalten an den öffenden Tags */ = explode('<div', $segmentArr[$i + 2]/* segmentteil hinter öffnendem Termtag */);
+            $openTagCount = 0;
+            $tCount = count($tagExpl);
+            for ($j = 0; $j < $tCount; $j++) {
+                $numOfClosedDiv = substr_count($tagExpl[$j], '</div>');
+                $containsOpeningTag = preg_match('"^ class=\""', $tagExpl[$j]) === 1 || false;
+                if ($openTagCount === 0 and
+                        (
+                        ($containsOpeningTag === true and $numOfClosedDiv > 1)
+                        or
+                        ($containsOpeningTag === false and $numOfClosedDiv === 1))) {
+                    $parts = explode('</div>', $tagExpl[$j]); //der letzte </div> muss der schließende mrk-Tag sein, da ja kein div-Tag innerhalb des Term-Tags mehr geöffnet ist
+                    $end = array_pop($parts);
+                    $tagExpl[$j] = implode('</div>', $parts) . $closingTag. $end;
+                    break; //go to the next termtag, because this one is now closed.
+                } elseif (($containsOpeningTag === true and $numOfClosedDiv > 1)
+                        or
+                        ($containsOpeningTag === false and $numOfClosedDiv === 1)) {
+                    $openTagCount--;
+                } elseif ($containsOpeningTag and $numOfClosedDiv === 0) {
+                    $openTagCount++;
+                }
+            }
+            if(!$removeTermTags){
+                $cssClasses = explode(' ', trim($segmentArr[$i]));
+                //@todo actually were removing the trans[Not]Found info. 
+                //it would be better to set it for source segments by checking the target if the term exists  
+                $segmentArr[$i] = join('-', array_filter($cssClasses, $cssClassFilter));
+                $segmentArr[$i] = '<mrk mtype="x-term-' . $segmentArr[$i] . '" mid="' . $segmentArr[$i + 1] . '">';
+            }
+            else{
+                $segmentArr[$i] = '';
+            }
+            $segmentArr[$i] .= implode('<div', $tagExpl);
+            unset($segmentArr[$i + 1]);
+            unset($segmentArr[$i + 2]);
+        }
+        return implode('', $segmentArr);
     }
     
     /**
@@ -282,7 +369,7 @@ abstract class editor_Models_Export_FileParser {
     }
 
     /**
-     * befüllt $this->_skeletonFile
+     * sets $this->_skeletonFile
      */
     protected function getSkeleton() {
         $skel = ZfExtended_Factory::get('editor_Models_Skeletonfile');
@@ -308,15 +395,6 @@ abstract class editor_Models_Export_FileParser {
         }
         return implode('', $segmentArr);
     }
-    
-    /**
-     * Stellt die Term Auszeichnungen wieder her
-     * 
-     * @param string $segment
-     * @param boolean $removeTermTags, default = false
-     * @return string $segment
-     */
-    abstract protected function recreateTermTags($segment, $removeTermTags=true);
     
     /**
      * - converts $this->_exportFile back to the original encoding registered in the LEK_files

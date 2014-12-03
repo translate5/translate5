@@ -44,11 +44,11 @@
  * Plugin Bootstrap for Missing Target Terminology Plugin
  * depends on editor_Plugins_SegmentStatistics_Bootstrap
  */
-class editor_Plugins_MissingTargetTerminology_Bootstrap extends ZfExtended_Plugin_Abstract {
+class editor_Plugins_NoMissingTargetTerminology_Bootstrap extends ZfExtended_Plugin_Abstract {
     
     public function init() {
         $this->dependsOn('editor_Plugins_SegmentStatistics_Bootstrap');
-        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'));
+        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'),-100);
     }
     
     /**
@@ -59,8 +59,7 @@ class editor_Plugins_MissingTargetTerminology_Bootstrap extends ZfExtended_Plugi
         $task = $event->getParam('task');
         /* @var $task editor_Models_Task */
         
-        $worker = ZfExtended_Factory::get('editor_Plugins_MissingTargetTerminology_Worker');
-        /* @var $worker editor_Plugins_MissingTargetTerminology_Worker */
+        $worker = ZfExtended_Factory::get('editor_Plugins_NoMissingTargetTerminology_Worker');
         $worker->init($task->getTaskGuid());
         $worker->queue();
     }
