@@ -400,10 +400,8 @@ class editor_TaskController extends ZfExtended_RestController {
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
         
-        
-        //the following methods check internally what to do 
+        //opening a task must be done before all workflow "do" calls which triggers some events
         $this->openAndLock();
-        $this->closeAndUnlock();
         
         $this->workflow->doWithTask($oldTask, $this->entity);
         
@@ -411,7 +409,11 @@ class editor_TaskController extends ZfExtended_RestController {
             editor_Models_LogTask::createWithUserGuid($taskguid, $this->entity->getState(), $this->user->data->userGuid);
         }
         
+        //updateUserState does also call workflow "do" methods!
         $this->updateUserState($this->user->data->userGuid);
+        
+        //closing a task must be done after all workflow "do" calls which triggers some events
+        $this->closeAndUnlock();
         
         $this->entity->save();
         $obj = $this->entity->getDataObject();
@@ -562,7 +564,9 @@ class editor_TaskController extends ZfExtended_RestController {
         $task = $this->entity;
         $hasState = !empty($this->data->userState);
         $isEnding = isset($this->data->state) && $this->data->state == $task::STATE_END;
-        if($hasState && $this->data->userState == $workflow::STATE_EDIT && $isEnding) {
+        $resetToOpen = $hasState && $this->data->userState == $workflow::STATE_EDIT && $isEnding;
+        if($resetToOpen) {
+            //This state change will be saved at the end of this method.
             $this->data->userState = $workflow::STATE_OPEN;
         }
         if(!$isEnding && (!$hasState || !in_array($this->data->userState, $closingStates))){
@@ -575,13 +579,19 @@ class editor_TaskController extends ZfExtended_RestController {
             }
         }
         $this->entity->unregisterInSession();
+        
+        if($resetToOpen) {
+            $this->updateUserState($this->user->data->userGuid, true);
+        }
     }
     
     /**
      * Updates the transferred User Assoc State to the given userGuid (normally the current user)
+     * Per Default all state changes trigger something in the workflow. In some circumstances this should be disabled.
      * @param string $userGuid
+     * @param boolean $disableWorkflowEvents optional, defaults to false
      */
-    protected function updateUserState(string $userGuid) {
+    protected function updateUserState(string $userGuid, $disableWorkflowEvents = false) {
         if(empty($this->data->userState)) {
             return;
         }
@@ -630,10 +640,14 @@ class editor_TaskController extends ZfExtended_RestController {
             $userTaskAssoc->setState($this->data->userState);
         }
         
-        $this->workflow->triggerBeforeEvents($oldUserTaskAssoc, $userTaskAssoc);
+        if(!$disableWorkflowEvents) {
+            $this->workflow->triggerBeforeEvents($oldUserTaskAssoc, $userTaskAssoc);
+        }
         $userTaskAssoc->save();
         
-        $this->workflow->doWithUserAssoc($oldUserTaskAssoc, $userTaskAssoc);
+        if(!$disableWorkflowEvents) {
+            $this->workflow->doWithUserAssoc($oldUserTaskAssoc, $userTaskAssoc);
+        }
         
         if($oldUserTaskAssoc->getState() != $this->data->userState){
             editor_Models_LogTask::createWithUserGuid($taskGuid, $this->data->userState, $this->user->data->userGuid);
