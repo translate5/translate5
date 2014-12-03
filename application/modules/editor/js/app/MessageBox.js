@@ -49,6 +49,7 @@ Ext.define('Editor.MessageBox',{
   titles: {
 	  ok: '#UT# Ok!',
 	  error: '#UT# Fehler!',
+	  directError: '#UT# Es ist ein Fehler aufgetreten!',
 	  warning: '#UT# Warnung!',
 	  notice: '#UT# Hinweis!'
   },
@@ -138,7 +139,7 @@ Ext.define('Editor.MessageBox',{
   showDirectError: function(msg) {
       var box = Ext.MessageBox;
       box.show({
-          title: this.titles[this.self.ERROR],
+          title: this.titles.directError,
           msg: msg,
           buttons: box.OK,
           icon: box.ERROR
