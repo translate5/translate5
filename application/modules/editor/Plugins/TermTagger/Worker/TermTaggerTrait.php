@@ -66,13 +66,13 @@ trait editor_Plugins_TermTagger_Worker_TermTaggerTrait {
     private static $praefixResourceName = 'TermTagger_';
     
     /**
-     * Allowd values for setting resourcePool
+     * Values for termtagging segment-states
      * @var array(strings)
      */
-    protected static $SEGMENT_STATE_UNTAGGED = 'untagged';
-    protected static $SEGMENT_STATE_INPROGRESS = 'inprogress';
-    protected static $SEGMENT_STATE_TAGGED = 'tagged';
-    //protected static $SEGMENT_STATE_TARGETNOTFOUND = 'targetnotfound';
+    public static $SEGMENT_STATE_UNTAGGED = 'untagged';
+    public static $SEGMENT_STATE_INPROGRESS = 'inprogress';
+    public static $SEGMENT_STATE_TAGGED = 'tagged';
+    //public static $SEGMENT_STATE_TARGETNOTFOUND = 'targetnotfound';
     
     /**
      * Stores the init-paramters from the initial call

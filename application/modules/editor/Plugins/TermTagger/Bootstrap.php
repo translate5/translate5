@@ -73,10 +73,10 @@ class editor_Plugins_TermTagger_Bootstrap {
         $this->staticEvents->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterTaskImport'));
         $this->staticEvents->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndex'));
         $this->staticEvents->attach('editor_Workflow_Default', array('doView', 'doEdit'), array($this, 'handleAfterTaskOpen'));
-        $this->staticEvents->attach('editor_Models_Segment', 'beforeSave', array($this, 'handleBeforeSegmentSave'));
+        //$this->staticEvents->attach('editor_Models_Segment', 'beforeSave', array($this, 'handleBeforeSegmentSave'));
+        $this->staticEvents->attach('Editor_SegmentController', 'beforePutSave', array($this, 'handleBeforeSegmentSave'));
         
         // SBE: only for testing
-        //$this->staticEvents->attach('Editor_SegmentController', 'beforePutSave', array($this, 'handleTest'));
         $this->staticEvents->attach('IndexController', 'beforeStephanAction', array($this, 'handleTest'));
         // SBE end of testing event-listeners
     }
@@ -92,13 +92,17 @@ class editor_Plugins_TermTagger_Bootstrap {
         
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
         /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
-        if (!$worker->init($task->getTaskGuid(), array('lastSegmentId' => 0,
-                                            'resourcePool' => 'import',
-                                            'taskId' => $task->getId()))) {
-            $this->log('TermTagger-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
+        
+        // Create segments_meta-field 'termtagState' if not exists
+        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+        /* @var $tempSegement editor_Models_Segment_Meta */
+        $meta->addMeta('termtagState', $meta::META_TYPE_STRING, $worker::$SEGMENT_STATE_UNTAGGED, 'Contains the TermTagger-state for this segment while importing', 36);
+        
+        // init worker and queue it
+        if (!$worker->init($task->getTaskGuid(), array('resourcePool' => 'import'))) {
+            $this->log('TermTaggerImport-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }
-        
         $worker->queue();
     }
     
@@ -139,9 +143,8 @@ class editor_Plugins_TermTagger_Bootstrap {
     public function handleBeforeSegmentSave(Zend_EventManager_Event $event) {
         $segment = $event->getParam('model');
         /* @var $segment editor_Models_Segment */
-        //error_log(__CLASS__.' -> '.__FUNCTION__.' $segment: '.print_r($segment->getDataObject(), true));
         $taskGuid = $segment->getTaskGuid();
-        //error_log(__CLASS__.' -> '.__FUNCTION__.' $taskGuid: '.$taskGuid);
+        
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
@@ -150,10 +153,7 @@ class editor_Plugins_TermTagger_Bootstrap {
         if (!$task->getTerminologie()) {
             return;
         }
-            
         
-        // TODO how to detect change/modification in segment-text?? $segment->isModified(); is not the correct result.
-        // TODO continue only if change/modification is detected
         
         $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication');
         /*@var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
@@ -165,7 +165,35 @@ class editor_Plugins_TermTagger_Bootstrap {
         $langModel->load($task->getTargetLang());
         $serverCommunication->targetLang = $langModel->getRfc5646();
         
-        $serverCommunication->addSegment($segment->getId(), 'target', $segment->getSource(), $segment->getTargetEdit());
+        
+        $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        /* @var $fieldManager editor_Models_SegmentFieldManager */
+        $fieldManager->initFields($taskGuid);
+        $sourceFieldName = $fieldManager->getFirstSourceName();
+        $sourceText = $segment->get($sourceFieldName);
+        
+        if ($task->getEnableSourceEditing()) {
+            $sourceFieldNameOriginal = $sourceFieldName;
+            $sourceTextOriginal = $sourceText;
+            $sourceFieldName = $fieldManager->getEditIndex($fieldManager->getFirstSourceName());
+            $sourceText = $segment->get($sourceFieldName);
+        }
+        
+        $fields = $fieldManager->getFieldList();
+        $firstField = true;
+        foreach ($fields as $field) {
+            if($field->type != editor_Models_SegmentField::TYPE_TARGET || !$field->editable) {
+                continue;
+            }
+            
+            if ($firstField && $task->getEnableSourceEditing()) {
+                $serverCommunication->addSegment($segment->getId(), 'SourceOriginal', $sourceTextOriginal, $segment->get($fieldName));
+                $firstField = false;
+            }
+            
+            $fieldName = $fieldManager->getEditIndex($field->name);
+            $serverCommunication->addSegment($segment->getId(), $fieldName, $sourceText, $segment->get($fieldName));
+        }
         
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTagger');
         /* @var $worker editor_Plugins_TermTagger_Worker_TermTagger */
@@ -177,16 +205,25 @@ class editor_Plugins_TermTagger_Bootstrap {
         if (!$worker->run()) {
             $messages = Zend_Registry::get('rest_messages');
             /* @var $messages ZfExtended_Models_Messages */
-            $messages->addError('Terme dieses Segments konnten nicht ausgezeichnte werden.');
+            $messages->addError('Terme des zuletzt bearbeiteten Segments konnten nicht ausgezeichnte werden.');
             return false;
         }
         
-        
-        $result = $worker->getResult();
-        //error_log(__CLASS__.' -> '.__FUNCTION__.' Result: '.print_r($result, true));
-        $tempTaggedText = $result[0]->target;
-        $segment->setTargetEdit($tempTaggedText);
-        //$segment->setTextTagged = true;
+        $results = $worker->getResult();
+        $sourceTextTagged = false;
+        foreach ($results as $result) {
+            if ($result->field == 'SourceOriginal') {
+                $segment->set($sourceFieldNameOriginal, $result->source);
+                continue;
+            }
+            
+            if (!$sourceTextTagged) {
+                $segment->set($sourceFieldName, $result->source);
+                $sourceTextTagged = true;
+            }
+            
+            $segment->set($result->field, $result->target);
+        }
         
         return true;
     }
@@ -227,13 +264,6 @@ class editor_Plugins_TermTagger_Bootstrap {
     }
     
     private function test_2() {
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->load(6);
-        
-        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
-        $eventManager->trigger('afterImport', 'editor_Models_Import', array('task' => $task));;
-        
         error_log(__CLASS__.' -> '.__FUNCTION__);
     }
     
