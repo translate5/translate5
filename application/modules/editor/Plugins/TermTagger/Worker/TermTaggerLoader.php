@@ -62,6 +62,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerLoader extends ZfExtended_Worke
      * @see ZfExtended_Worker_Abstract::init()
      */
     public function init($taskGuid = NULL, $parameters = array()) {
+        settype($parameters['fetchIds'], 'boolean');
         $this->data = $parameters;
         
         $parametersToSave = array();
@@ -78,7 +79,6 @@ class editor_Plugins_TermTagger_Worker_TermTaggerLoader extends ZfExtended_Worke
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        settype($parameters['fetchIds'], 'boolean');
         return true;
     } 
     
