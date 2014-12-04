@@ -58,7 +58,7 @@ class editor_Plugins_TermTagger_Bootstrap {
         
         // event-listeners
         $this->staticEvents = Zend_EventManager_StaticEventManager::getInstance();
-        $this->staticEvents->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterTaskImport'));
+        $this->staticEvents->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterTaskImport'),100);
         $this->staticEvents->attach('editor_Models_Import_MetaData', 'importMetaData', array($this, 'handleImportMeta'));
         $this->staticEvents->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndex'));
         $this->staticEvents->attach('editor_Workflow_Default', array('doView', 'doEdit'), array($this, 'handleAfterTaskOpen'));
@@ -84,7 +84,7 @@ class editor_Plugins_TermTagger_Bootstrap {
     protected function assertConfig() {
         $config = Zend_Registry::get('config');
         $c = $config->runtimeOptions->termTagger->url;
-        
+
         if (!isset($c->default) || !isset($c->import) || !isset($c->gui)) {
             $this->log->logError('Plugin TermTagger URL config default, import or gui not defined',
                                  'One of the required config-settings default, import or gui under runtimeOptions.termTagger.url is not defined in configuration.');
@@ -112,7 +112,7 @@ class editor_Plugins_TermTagger_Bootstrap {
         
         // Create segments_meta-field 'termtagState' if not exists
         $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
-        /* @var $tempSegement editor_Models_Segment_Meta */
+        /* @var $meta editor_Models_Segment_Meta */
         $meta->addMeta('termtagState', $meta::META_TYPE_STRING, $worker::$SEGMENT_STATE_UNTAGGED, 'Contains the TermTagger-state for this segment while importing', 36);
         
         // init worker and queue it
