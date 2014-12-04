@@ -41,68 +41,57 @@ class editor_Plugins_LockSegmentsBasedOnConfig_Worker extends ZfExtended_Worker_
     protected function validateParameters($parameters = array()) {
         return empty($parameters);
     } 
-    /**
-     * 
-     * @param string $taskGuid
-     
-    public function work() {
-        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
-        /* @var $meta editor_Models_Segment_Meta 
-        $meta->addMeta('noMissingTargetTermOnImport', $meta::META_TYPE_BOOLEAN, true, 'Is set to false only if all terms in source exists also in target column');
-
-        $statDb = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_Db_Statistics');
-        /* @var $statDb editor_Plugins_SegmentStatistics_Models_Db_Statistics 
-        
-        $select = $statDb->select()
-            ->from($statDb, array(new Zend_Db_Expr ('1 AS noMissingTargetTermOnImport'), 'taskGuid', 'segmentId'))
-            ->where('taskGuid = ?', $this->taskGuid)
-            ->where('termNotFound = 0')
-            ->group('segmentId');
-        
-        $md = $meta->db;
-        $table = $md->info($md::NAME);
-        $insert = 'INSERT INTO '.$table.' (`noMissingTargetTermOnImport`, `taskGuid`, `segmentId`) '.$select; 
-        $md->getAdapter()->query($insert);
-        error_log('hier1');
-    }*/
+    
     /**
      * 
      * @param string $taskGuid
      */
     public function work() {
-        error_log('hier1');
         $config = Zend_Registry::get('config');
         $metaToLock = $config->runtimeOptions->plugins->LockSegmentsBasedOnConfig->metaToLock;
         
         $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
         /* @var $meta editor_Models_Segment_Meta */
+        $md = $meta->db;
+        $metaTable = $md->info($md::NAME);
         
         $orWhere = array();
-        foreach($metaToLock as $meta => $val){
+        foreach($metaToLock as $metadate => $val){
             if($val == 1){
-                $orWhere[] = $meta.' = 1';
+                $orWhere[] = $metadate.' = 1';
             }
         }
-        if(!empty($orWhere)){//nothing should be locked based on meta
-            $adapater = Zend_Registry::get('db');
-            $query = $adapater->quoteInto('SELECT segmentId FROM `'.$md::NAME.'` WHERE taskGuid = ?', $this->taskGuid );
+        if(!empty($orWhere)){//if empty, nothing should be locked based on meta
+            $query = $md->getAdapter()->quoteInto('SELECT segmentId FROM `'.$metaTable.'` WHERE taskGuid = ?', $this->taskGuid );
             $query .= ' and (('.join(') or (', $orWhere).'))';
-
-            $return = $adapater->query($query);
-
+            $return = $md->getAdapter()->query($query);
             $rows = $return->fetchAll();
+            
+            $segment = ZfExtended_Factory::get('editor_Models_Segment');
+            /* @var $meta editor_Models_Segment */
+            $sg = $segment->db;
+            $sgTable = $sg->info($sg::NAME);
+            
 
             $segmentUpdateWhere = array();
             foreach ($rows as $key => $row) {
-                $segmentUpdateWhere[] = 'id = '.$row->segmentId;
+                $segmentUpdateWhere[] = 'id = '.$row["segmentId"];
             }
+            $query = $sg->getAdapter()->quoteInto('UPDATE `'.$sgTable.'` SET  `editable` = 0, autoStateId = '.
+                    editor_Models_SegmentAutoStates::BLOCKED.' WHERE taskGuid = ?', $this->taskGuid );
+            $joinSegmentUpdateWhere = ' and (('.join(') or (', $segmentUpdateWhere).'))';
+            $query .= $joinSegmentUpdateWhere;
+            $sg->getAdapter()->query($query);
+            
+            $segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+            /* @var $segmentFieldManager editor_Models_SegmentFieldManager */
+            $segmentFieldManager->initFields($this->taskGuid);
+            $mv = $segmentFieldManager->getView();
+            $query = $sg->getAdapter()->quoteInto('UPDATE `'.$mv->getName().'` SET  `editable` = 0, autoStateId = '.
+                    editor_Models_SegmentAutoStates::BLOCKED.' WHERE taskGuid = ?', $this->taskGuid );
+            $query .= $joinSegmentUpdateWhere;
 
-            $query = $adapater->quoteInto('UPDATE `'.$md::NAME.'` SET  `editable` = 0 WHERE taskGuid = ?', $this->taskGuid );
-            $query .= ' and (('.join(') or (', $segmentUpdateWhere).'))';
-            error_log('hier2');
-
-            $return = $adapater->query($query);
-            error_log('hier3');
+            $sg->getAdapter()->query($query);
         }
     }
 }

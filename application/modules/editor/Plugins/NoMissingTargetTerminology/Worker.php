@@ -58,11 +58,16 @@ class editor_Plugins_NoMissingTargetTerminology_Worker extends ZfExtended_Worker
             ->where('taskGuid = ?', $this->taskGuid)
             ->where('termNotFound = 0')
             ->group('segmentId');
-        
+
         $md = $meta->db;
         $table = $md->info($md::NAME);
-        $insert = 'INSERT INTO '.$table.' (`noMissingTargetTermOnImport`, `taskGuid`, `segmentId`) '.$select; 
+        $insert = 'INSERT INTO '.$table.' (`noMissingTargetTermOnImport`, `taskGuid`, `segmentId`) '.
+                $select->assemble().
+                'ON DUPLICATE KEY UPDATE
+                `noMissingTargetTermOnImport` = VALUES(`noMissingTargetTermOnImport`)
+                , `taskGuid` = VALUES(`taskGuid`)
+                , `segmentId` = VALUES(`segmentId`)'; 
         $md->getAdapter()->query($insert);
-        error_log('hier1');
+        //@todo: check task data not up2date after new insert of task when assigning user
     }
 }
