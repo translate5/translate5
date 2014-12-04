@@ -253,7 +253,6 @@ class editor_Models_Import {
         $this->importMetaData(); //Im MetaData Importer die TMX Geschichte integrieren
         $this->events->trigger("beforeDirectoryParsing", $this,array('importFolder'=>$this->_importFolder));
         $this->saveDirTrees();
-        $this->termTagFiles();
         $this->importFiles();
         $this->syncFileOrder();
         $this->removeMetaDataTmpFiles();
@@ -310,12 +309,6 @@ class editor_Models_Import {
         $this->_filePaths = $tree->checkAndGetRelaisFiles($this->_importFolder);
         
         $tree->save();
-        
-        $tagger = ZfExtended_Factory::get('editor_Models_Import_InvokeTermTagger',array($this->_filePaths,$this->_importFolder));
-        /* @var $tagger editor_Models_Import_InvokeTermTagger */
-        $tagger->saveTermTagFileList();
-        $tagger->removeTermTags();
-        $tagger->deleteTermTagFileList();
         
         $this->importRelaisFiles($tree);
     }
@@ -374,7 +367,6 @@ class editor_Models_Import {
             $parser->parseFile();
             $this->countWords($parser->getWordCount());
             $this->_imagesInTask = array_merge($this->_imagesInTask,$parser->getTagImageNames());
-            $this->removeTaggedFile($params[0]); //$params[0] => abs Path to File
         }
         if ($this->task->getWordCount() == 0) {
             $this->task->setWordCount($this->wordCount);
@@ -465,17 +457,6 @@ class editor_Models_Import {
         );
     }
     
-    /**
-     * löscht das temporäre File, das durch den Tagger getaggt wurde
-     *
-     * @param string $pathLocalEncoded Pfad zur eigentlich importierten Datei in Filesystemcodierung
-     */
-    protected function removeTaggedFile($pathLocalEncoded){
-        if(file_exists($pathLocalEncoded.'.untagged')){
-            unlink($pathLocalEncoded);
-            rename($pathLocalEncoded.'.untagged',$pathLocalEncoded);
-        }
-    }
     /**
      * - liest den Directory-Tree aus
      * - speichert ihn in der DB als Objekt (LEK_foldertree) und flach durch Befüllung von LEK_files
@@ -586,18 +567,6 @@ class editor_Models_Import {
     protected function getAbsReferencePath() {
         $config = Zend_Registry::get('config');
         return $this->task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.$config->runtimeOptions->import->referenceDirectory;
-    }
-    
-       /**
-     * parses all files in the import dir to the termTagger
-     *
-     * - first removes 
-     * - Caution: at the moment the termTagger only parses sdlxliff
-     */
-    protected function termTagFiles(){
-        $tagger = ZfExtended_Factory::get('editor_Models_Import_InvokeTermTagger',array($this->_filePaths,$this->_importFolder,$this->metaDataImporter));
-        /* @var $tagger editor_Models_Import_InvokeTermTagger */
-        $tagger->termTagFiles($this->_sourceLang,$this->_targetLang);
     }
     
     /**

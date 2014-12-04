@@ -51,6 +51,14 @@
     protected $hasTaskSpecific = false;
     
     /**
+     * (non-PHPdoc)
+     * @see editor_Models_Import_IMetaDataImporter::import()
+     */
+    public function import(editor_Models_Task $task, editor_Models_Import_MetaData $meta) {
+        $this->importFromXml($task, $meta->getImportPath());
+    }
+    
+    /**
      * imports the configured qmFlagXmlFile, store it in the internal JSON tree in qmSubsegmentFlags 
      * 
      * @param editor_Models_Task $task

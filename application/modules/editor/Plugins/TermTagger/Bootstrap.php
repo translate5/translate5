@@ -49,28 +49,17 @@ class editor_Plugins_TermTagger_Bootstrap {
      */
     protected $log;
     
-    
-    
     public function __construct() {
-        $config = Zend_Registry::get('config');
-        
-        if (!isset($config->runtimeOptions->termTagger->url->default)) {
-            $this->log->logError('Plugin TermTagger config not defined',
-                                 'The required config-setting runtimeOptions.termTagger.url.default is not defined in DB-table Zf_configuration.');
+        $this->log = ZfExtended_Factory::get('ZfExtended_Log', array(false));
+
+        if(!$this->assertConfig()) {
             return false;
         }
-        
-        $defaultUrl = $config->runtimeOptions->termTagger->url->default->toArray();
-        if (empty($defaultUrl)) {
-            $this->log->logError('Plugin TermTagger config not set',
-                                 'The required config-setting runtimeOptions.termTagger.url.default is not set in DB-table Zf_configuration. Value is empty');
-            return false;
-        }
-        
         
         // event-listeners
         $this->staticEvents = Zend_EventManager_StaticEventManager::getInstance();
         $this->staticEvents->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterTaskImport'));
+        $this->staticEvents->attach('editor_Models_Import_MetaData', 'importMetaData', array($this, 'handleImportMeta'));
         $this->staticEvents->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndex'));
         $this->staticEvents->attach('editor_Workflow_Default', array('doView', 'doEdit'), array($this, 'handleAfterTaskOpen'));
         //$this->staticEvents->attach('editor_Models_Segment', 'beforeSave', array($this, 'handleBeforeSegmentSave'));
@@ -81,6 +70,35 @@ class editor_Plugins_TermTagger_Bootstrap {
         // SBE end of testing event-listeners
     }
     
+    /**
+     * Invokes to the meta file parsing of task, adds TBX parsing
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleImportMeta(Zend_EventManager_Event $event) {
+        $meta = $event->getParam('metaImporter');
+        /* @var $meta editor_Models_Import_MetaData */
+        $importer = ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
+        $meta->addImporter($importer);
+    }
+    
+    protected function assertConfig() {
+        $config = Zend_Registry::get('config');
+        $c = $config->runtimeOptions->termTagger->url;
+        
+        if (!isset($c->default) || !isset($c->import) || !isset($c->gui)) {
+            $this->log->logError('Plugin TermTagger URL config default, import or gui not defined',
+                                 'One of the required config-settings default, import or gui under runtimeOptions.termTagger.url is not defined in configuration.');
+            return false;
+        }
+        
+        $defaultUrl = $c->default->toArray();
+        if (empty($defaultUrl)) {
+            $this->log->logError('Plugin TermTagger config not set',
+                                 'The required config-setting runtimeOptions.termTagger.url.default is not set in configuration. Value is empty');
+            return false;
+        }
+        return true;
+    }
     
     public function handleAfterTaskImport(Zend_EventManager_Event $event) {
         //error_log(__CLASS__.'->'.__FUNCTION__);

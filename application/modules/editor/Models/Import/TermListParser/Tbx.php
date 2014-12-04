@@ -45,7 +45,7 @@
  * - sucht selbstständig nach MetaDaten im Projekt
  * - importiert die gefundenen MetaDaten
  */
-class editor_Models_Import_TermListParser_Tbx extends editor_Models_Import_TermListParser {
+class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IMetaDataImporter {
     const TBX_ARCHIV_NAME = 'terminology.tbx';
     
     /**
@@ -157,10 +157,32 @@ class editor_Models_Import_TermListParser_Tbx extends editor_Models_Import_TermL
     }
 
     /**
-     * Die als SplFileInfo übergebenen TBX Datei importieren
-     * @see editor_Models_Import_TermListParser::import()
+     * Imports only the first TBX file found!
+     * (non-PHPdoc)
+     * @see editor_Models_Import_IMetaDataImporter::import()
      */
-    public function import(SplFileInfo $file, editor_Models_Task $task, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang){
+    public function import(editor_Models_Task $task, editor_Models_Import_MetaData $meta){
+        $tbxFilterRegex = '/\.tbx$/i';
+        $tbxfiles = $meta->getMetaFileToImport($tbxFilterRegex);
+        if(empty($tbxfiles)){
+            return;
+        }
+        /* @var $importer editor_Models_Import_TermListParser_Tbx */
+        foreach($tbxfiles as $file) {
+            /* @var $file SplFileInfo */
+            $this->importOneTbx($file, $task, $meta->getSourceLang(), $meta->getTargetLang());
+            break; //we consider only one TBX file!
+        }
+    }
+    
+    /**
+     * Import the given TBX file
+     * @param SplFileInfo $file
+     * @param editor_Models_Task $task
+     * @param editor_Models_Languages $sourceLang
+     * @param editor_Models_Languages $targetLang
+     */
+    protected function importOneTbx(SplFileInfo $file, editor_Models_Task $task, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang){
         if(! $file->isReadable()){
             throw new Zend_Exception($file.' is not Readable!');
         }
