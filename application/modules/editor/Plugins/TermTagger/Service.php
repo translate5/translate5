@@ -197,7 +197,7 @@ class editor_Plugins_TermTagger_Service {
             $response = $httpClient->request('POST');
         } catch(Exception $httpException) {
             $this->log->logError('Exception in processing '.__CLASS.'::'.__FUNCTION__);
-            //throw $httpException;
+            $this->log->logException($httpException);
             return false;
         }
         /* @var $response Zend_Http_Response */
