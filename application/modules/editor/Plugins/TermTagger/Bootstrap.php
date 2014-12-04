@@ -74,7 +74,7 @@ class editor_Plugins_TermTagger_Bootstrap {
         $this->staticEvents->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndex'));
         $this->staticEvents->attach('editor_Workflow_Default', array('doView', 'doEdit'), array($this, 'handleAfterTaskOpen'));
         //$this->staticEvents->attach('editor_Models_Segment', 'beforeSave', array($this, 'handleBeforeSegmentSave'));
-        $this->staticEvents->attach('Editor_SegmentController', 'beforePutSave', array($this, 'handleBeforeSegmentSave'));
+        $this->staticEvents->attach('Editor_SegmentController', 'beforePutSave', array($this, 'handleBeforePutSave'));
         
         // SBE: only for testing
         $this->staticEvents->attach('IndexController', 'beforeStephanAction', array($this, 'handleTest'));
@@ -83,7 +83,7 @@ class editor_Plugins_TermTagger_Bootstrap {
     
     
     public function handleAfterTaskImport(Zend_EventManager_Event $event) {
-        error_log(__CLASS__.'->'.__FUNCTION__);
+        //error_log(__CLASS__.'->'.__FUNCTION__);
         $task = $event->getParam('task');
         /* @var $task editor_Models_Task */
         if (!$task->getTerminologie()) {
@@ -108,8 +108,14 @@ class editor_Plugins_TermTagger_Bootstrap {
     
     /**
      * handler for event: Editor_IndexController#afterIndexAction
+     * 
+     * Writes runtimeOptions.termTagger.segmentsPerCall for use in ExtJS
+     * into JsVar Editor.data.plugins.termTagger.segmentsPerCall
+     * 
+     * @param $event Zend_EventManager_Event
      */
     public function handleAfterIndex(Zend_EventManager_Event $event) {
+        //error_log('function called: ' . get_class($this) . '->' . __FUNCTION__);
         $params = $event->getParams();
         $view = $params[0];
         
@@ -122,25 +128,17 @@ class editor_Plugins_TermTagger_Bootstrap {
     /**
      * handler for event(s): editor_Workflow_Default#[doView, doEdit]
      * 
-     * Writes runtimeOptions.termTagger.segmentsPerCall for use in ExtJS
-     * into JsVar Editor.data.plugins.termTagger.segmentsPerCall
-     * 
      * @param $event Zend_EventManager_Event
      */
     public function handleAfterTaskOpen(Zend_EventManager_Event $event) {
-        error_log('function called: ' . get_class($this) . '->' . __FUNCTION__);
-        
-        // TODO
-        //$editor_Worker_TermLoader->queue();
+        //error_log('function called: ' . get_class($this) . '->' . __FUNCTION__);
     }
     
     
     /**
-     * handler for event: editor_Models_Segment#beforeSave
-     * 
-     * Re-TermTagg the (modified) segment-text.
+     * Re-TermTag the (modified) segment-text.
      */
-    public function handleBeforeSegmentSave(Zend_EventManager_Event $event) {
+    public function handleBeforePutSave(Zend_EventManager_Event $event) {
         $segment = $event->getParam('model');
         /* @var $segment editor_Models_Segment */
         $taskGuid = $segment->getTaskGuid();
@@ -154,17 +152,7 @@ class editor_Plugins_TermTagger_Bootstrap {
             return;
         }
         
-        
-        $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication');
-        /*@var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
-        $serverCommunication->tbxFile = $task->meta()->getTbxHash();;
-        $langModel = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $langModel editor_Models_Languages */
-        $langModel->load($task->getSourceLang());
-        $serverCommunication->sourceLang = $langModel->getRfc5646();
-        $langModel->load($task->getTargetLang());
-        $serverCommunication->targetLang = $langModel->getRfc5646();
-        
+        $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication', array($task));
         
         $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         /* @var $fieldManager editor_Models_SegmentFieldManager */
@@ -186,13 +174,15 @@ class editor_Plugins_TermTagger_Bootstrap {
                 continue;
             }
             
+            $targetFieldName = $fieldManager->getEditIndex($field->name);
+            
+            // if source is editable compare original Source with first targetField
             if ($firstField && $task->getEnableSourceEditing()) {
-                $serverCommunication->addSegment($segment->getId(), 'SourceOriginal', $sourceTextOriginal, $segment->get($fieldName));
+                $serverCommunication->addSegment($segment->getId(), 'SourceOriginal', $sourceTextOriginal, $segment->get($targetFieldName));
                 $firstField = false;
             }
             
-            $fieldName = $fieldManager->getEditIndex($field->name);
-            $serverCommunication->addSegment($segment->getId(), $fieldName, $sourceText, $segment->get($fieldName));
+            $serverCommunication->addSegment($segment->getId(), $targetFieldName, $sourceText, $segment->get($targetFieldName));
         }
         
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTagger');
@@ -205,7 +195,7 @@ class editor_Plugins_TermTagger_Bootstrap {
         if (!$worker->run()) {
             $messages = Zend_Registry::get('rest_messages');
             /* @var $messages ZfExtended_Models_Messages */
-            $messages->addError('Terme des zuletzt bearbeiteten Segments konnten nicht ausgezeichnte werden.');
+            $messages->addError('Terme des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.');
             return false;
         }
         

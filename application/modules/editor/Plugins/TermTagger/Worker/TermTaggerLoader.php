@@ -140,17 +140,11 @@ class editor_Plugins_TermTagger_Worker_TermTaggerLoader extends ZfExtended_Worke
         
         $result = $service->openFetchIds($url, $hash, $tbxData);
         
-        //FIXME: depends on TERMTAGGER-26, should be valid JSON, but is not.
-        //correct code:
-        //$data = json_decode($result);
-        //unset($result);
-        //use $data->tbxdata instead $result;
-        //So we hack temporarly around Klemens Code:
-        $result = preg_replace('/^[^<]+/', '', $result);
-        $result = preg_replace('/>[^>]*$/', '>', $result);
+        $data = json_decode($result);
+        unset($result);
         
         $tmpFile = tempnam(dirname($tbxPath), 'tbx');
-        file_put_contents($tmpFile, $result);
+        file_put_contents($tmpFile, $data->tbxdata);
         rename($tmpFile, $tbxPath);
         return true;
     }
