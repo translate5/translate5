@@ -74,7 +74,7 @@ class editor_Plugins_TermTagger_Bootstrap {
         $this->staticEvents->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndex'));
         $this->staticEvents->attach('editor_Workflow_Default', array('doView', 'doEdit'), array($this, 'handleAfterTaskOpen'));
         //$this->staticEvents->attach('editor_Models_Segment', 'beforeSave', array($this, 'handleBeforeSegmentSave'));
-        $this->staticEvents->attach('Editor_SegmentController', 'beforePutSave', array($this, 'handleBeforeSegmentSave'));
+        $this->staticEvents->attach('Editor_SegmentController', 'beforePutSave', array($this, 'handleBeforePutSave'));
         
         // SBE: only for testing
         $this->staticEvents->attach('IndexController', 'beforeStephanAction', array($this, 'handleTest'));
@@ -136,11 +136,9 @@ class editor_Plugins_TermTagger_Bootstrap {
     
     
     /**
-     * handler for event: editor_Models_Segment#beforeSave
-     * 
      * Re-TermTagg the (modified) segment-text.
      */
-    public function handleBeforeSegmentSave(Zend_EventManager_Event $event) {
+    public function handleBeforePutSave(Zend_EventManager_Event $event) {
         $segment = $event->getParam('model');
         /* @var $segment editor_Models_Segment */
         $taskGuid = $segment->getTaskGuid();
