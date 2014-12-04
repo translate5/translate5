@@ -60,7 +60,6 @@ Ext.define('Editor.view.segments.MetaPanel', {
     
     initComponent: function() {
       var me = this;
-      //Editor.data.segments.showStatus = false;
       Ext.applyIf(me, {
         items: [
           {
@@ -88,6 +87,8 @@ Ext.define('Editor.view.segments.MetaPanel', {
                 xtype: 'fieldset',
                 itemId: 'metaQm',
                 defaultType: 'radio',
+                hideable: Editor.data.segments.showQM, 
+                hidden:  !Editor.data.segments.showQM,
                 title: me.item_metaQm_title
               },
               {

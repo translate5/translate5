@@ -204,11 +204,15 @@ Ext.define('Editor.view.segments.Grid', {
                 itemId: 'stateColumn'
             });
         }
+        
+        if(Editor.data.segments.showQM){
+            columns.push({
+                xtype: 'qualityColumn',
+                itemId: 'qualityColumn'
+            });
+        }
     
         columns.push.apply(columns, [{
-            xtype: 'qualityColumn',
-            itemId: 'qualityColumn'
-        },{
             xtype: 'matchrateColumn',
             itemId: 'matchrateColumn',
             width: 82
