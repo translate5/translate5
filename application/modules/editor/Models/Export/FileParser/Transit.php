@@ -181,6 +181,7 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
         }
         if((int)$this->config->runtimeOptions->plugins->transit->writeInfoField->manualStatus === 1){
             $termModel = ZfExtended_Factory::get('editor_Models_Term');
+            /* @var $termModel editor_Models_Term */
             $stateId = $segmentModel->getStateId();
             $state = $this->config->runtimeOptions->segments->stateFlags->$stateId;
             $infoFieldContent .= ' '.$state;

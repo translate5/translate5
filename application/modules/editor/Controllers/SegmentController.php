@@ -136,7 +136,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         foreach($allowedAlternatesToChange as $field) {
             if($this->entity->isModified($field)) {
                 $this->entity->updateQmSubSegments($field);
-                $this->entity->recreateTermTags($field, strpos($field, editor_Models_SegmentField::TYPE_SOURCE) === 0);
             }
         }
         

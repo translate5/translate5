@@ -409,7 +409,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         return $this->segmentdata[$field]->edited;
     }
-
+    
     /**
      * returns a list with editable dataindex
      * @return array
@@ -757,20 +757,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     protected function _getSqlTextCompareOp() {
         return ' = ';
         //return ' like ' bei MSSQL
-    }
-
-    /**
-     * recreates the term markup in the data field with the given dataindex
-     * @param string $dataindex dataindex of the segment field to be processed
-     * @param boolean $useSource optional, default false, if true terms of source column are used (instead of target)
-     */
-    public function recreateTermTags($dataindex, $useSource = false) {
-        return false;
-        throw new BadMethodCallException('deprecated');
-        $termTag = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
-        /* @var $termTag editor_Models_Segment_TermTag */
-        $withTerms = $termTag->recreate($this->getId(), $this->get($dataindex), $useSource);
-        $this->set($dataindex, $withTerms);
     }
 
     /**

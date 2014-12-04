@@ -207,7 +207,6 @@ trait editor_Plugins_TermTagger_Worker_TermTaggerTrait {
      * @return boolean true if tbx-file is loaded on the TermTagger-server
      */
     protected function checkTermTaggerTbx($url, $tbxHash) {
-    
         $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
         /* @var $termTagger editor_Plugins_TermTagger_Service */
     
@@ -215,22 +214,19 @@ trait editor_Plugins_TermTagger_Worker_TermTaggerTrait {
         if ($termTagger->ping($url, $tbxHash)) {
             return true;
         }
-    
+        
+        $taskGuid = $this->workerModel->getTaskGuid();
+        
         // try to load tbx-file to the TermTagger-server
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($this->workerModel->getTaskGuid());
-        $tbxPath = $this->getTbxFilename($task);
-        $tbxData = $this->assertTbxExists($task, $tbxPath);
-        $response = $termTagger->open($url, $tbxHash, $tbxData);
+        $task->loadByTaskGuid($taskGuid);
     
-        // if tbx file can not be loaded to the server
-        if ($response != "200") {
-            return false;
-        }
-    
-        // tbx-file is succesfully loaded to the TermTagger-server
-        return true;
+        $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerLoader');
+        /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerLoader */
+        $worker->init($taskGuid, array('task' => $task));
+        //run the worker to send it to the termtagger
+        return $worker->run();
     }
     
 }
