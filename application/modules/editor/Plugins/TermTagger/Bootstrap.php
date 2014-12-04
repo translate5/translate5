@@ -83,7 +83,7 @@ class editor_Plugins_TermTagger_Bootstrap {
     
     
     public function handleAfterTaskImport(Zend_EventManager_Event $event) {
-        error_log(__CLASS__.'->'.__FUNCTION__);
+        //error_log(__CLASS__.'->'.__FUNCTION__);
         $task = $event->getParam('task');
         /* @var $task editor_Models_Task */
         if (!$task->getTerminologie()) {
@@ -108,8 +108,14 @@ class editor_Plugins_TermTagger_Bootstrap {
     
     /**
      * handler for event: Editor_IndexController#afterIndexAction
+     * 
+     * Writes runtimeOptions.termTagger.segmentsPerCall for use in ExtJS
+     * into JsVar Editor.data.plugins.termTagger.segmentsPerCall
+     * 
+     * @param $event Zend_EventManager_Event
      */
     public function handleAfterIndex(Zend_EventManager_Event $event) {
+        //error_log('function called: ' . get_class($this) . '->' . __FUNCTION__);
         $params = $event->getParams();
         $view = $params[0];
         
@@ -122,16 +128,10 @@ class editor_Plugins_TermTagger_Bootstrap {
     /**
      * handler for event(s): editor_Workflow_Default#[doView, doEdit]
      * 
-     * Writes runtimeOptions.termTagger.segmentsPerCall for use in ExtJS
-     * into JsVar Editor.data.plugins.termTagger.segmentsPerCall
-     * 
      * @param $event Zend_EventManager_Event
      */
     public function handleAfterTaskOpen(Zend_EventManager_Event $event) {
-        error_log('function called: ' . get_class($this) . '->' . __FUNCTION__);
-        
-        // TODO
-        //$editor_Worker_TermLoader->queue();
+        //error_log('function called: ' . get_class($this) . '->' . __FUNCTION__);
     }
     
     
@@ -195,7 +195,7 @@ class editor_Plugins_TermTagger_Bootstrap {
         if (!$worker->run()) {
             $messages = Zend_Registry::get('rest_messages');
             /* @var $messages ZfExtended_Models_Messages */
-            $messages->addError('Terme des zuletzt bearbeiteten Segments konnten nicht ausgezeichnte werden.');
+            $messages->addError('Terme des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.');
             return false;
         }
         

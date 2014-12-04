@@ -88,9 +88,16 @@ class editor_Plugins_TermTagger_Service {
      * @return boolean True if ping was succesfull
      */
     public function ping(string $url, $tbxHash = null) {
-        $httpClient = new Zend_Http_Client();
-        $httpClient->setUri($url.'/termTagger/tbxFile/'.$tbxHash);
-        $response = $httpClient->request('HEAD');
+        try {
+            $httpClient = new Zend_Http_Client();
+            $httpClient->setUri($url.'/termTagger/tbxFile/'.$tbxHash);
+            $response = $httpClient->request('HEAD');
+        }
+        catch(Exception $requestException) {
+            $this->log->logError('Exception in processing '.__CLASS__.'->'.__FUNCTION__.'; TermTagger-Server not available under $url: '.$url);
+            //throw $requestException;
+            return false;
+        }
         /* @var $response Zend_Http_Response */
         //error_log(__CLASS__.'->'.__FUNCTION__.'; PING  $httpClient->getUri(): '.$url."\n".'$httpClient->getLastRequest(): '.$httpClient->getLastRequest());
         //error_log(__CLASS__.'->'.__FUNCTION__.'; PING  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
@@ -121,6 +128,11 @@ class editor_Plugins_TermTagger_Service {
     public function open(string $url, string $tbxHash, string $tbxData) {
         $response = $this->_open($url, $tbxHash, $tbxData);
         /* @var $response Zend_Http_Response */
+        
+        if (!$response) {
+            return false;
+        }
+        
         return $response->getStatus();
     }
     
@@ -150,11 +162,17 @@ class editor_Plugins_TermTagger_Service {
         $serverCommunication->tbxdata = $tbxData;
         
         // send request to TermTagger-server
-        $httpClient = new Zend_Http_Client();
-        $httpClient->setUri($url.'/termTagger/tbxFile/');
-        $httpClient->setRawData(json_encode($serverCommunication), 'application/json');
-        $response = $httpClient->request('POST');
-        /* @var $response Zend_Http_Response */
+        try {
+            $httpClient = new Zend_Http_Client();
+            $httpClient->setUri($url.'/termTagger/tbxFile/');
+            $httpClient->setRawData(json_encode($serverCommunication), 'application/json');
+            $response = $httpClient->request('POST');
+        } catch(Exception $httpException) {
+            $this->log->logError('Exception in processing '.__CLASS__.'::'.__FUNCTION__);
+            //throw $httpException;
+            return false;
+        }
+            /* @var $response Zend_Http_Response */
         //error_log(__CLASS__.'->'.__FUNCTION__.'; $httpClient->getUri(): '.$url."\n".'$httpClient->getLastRequest(): '.$httpClient->getLastRequest());
         //error_log(__CLASS__.'->'.__FUNCTION__.'; $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
         
@@ -171,11 +189,17 @@ class editor_Plugins_TermTagger_Service {
      * @return array((obj) segments) list of segment-objects of FALSE on error
      */
     public function tagterms($url, editor_Plugins_TermTagger_Service_ServerCommunication $data) {
-        $httpClient = new Zend_Http_Client();
-        $httpClient->setUri($url.'/termTagger/termTag/');
-        $httpClient->setRawData(json_encode($data), 'application/json');
-        $httpClient->setConfig(array('timeout' => 60));
-        $response = $httpClient->request('POST');
+        try {
+            $httpClient = new Zend_Http_Client();
+            $httpClient->setUri($url.'/termTagger/termTag/');
+            $httpClient->setRawData(json_encode($data), 'application/json');
+            $httpClient->setConfig(array('timeout' => 60));
+            $response = $httpClient->request('POST');
+        } catch(Exception $httpException) {
+            $this->log->logError('Exception in processing '.__CLASS.'::'.__FUNCTION__);
+            //throw $httpException;
+            return false;
+        }
         /* @var $response Zend_Http_Response */
         //error_log(__CLASS__.'->'.__FUNCTION__.'; TERMTAG-REQUEST  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$httpClient->getLastRequest(): '.$httpClient->getLastRequest());
         //error_log(__CLASS__.'->'.__FUNCTION__.'; TERMTAG-RESPONSE  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
