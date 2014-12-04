@@ -44,11 +44,11 @@
  * Plugin Bootstrap for Missing Target Terminology Plugin
  * depends on editor_Plugins_SegmentStatistics_Bootstrap
  */
-class editor_Plugins_MissingTargetTerminology_Bootstrap extends ZfExtended_Plugin_Abstract {
+class editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap extends ZfExtended_Plugin_Abstract {
     
     public function init() {
-        $this->dependsOn('editor_Plugins_SegmentStatistics_Bootstrap');
-        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'));
+        //priority -10000 in order to always allow other plugins to modify meta-data before locking runs
+        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'), -10000);
     }
     
     /**
@@ -59,8 +59,8 @@ class editor_Plugins_MissingTargetTerminology_Bootstrap extends ZfExtended_Plugi
         $task = $event->getParam('task');
         /* @var $task editor_Models_Task */
         
-        $worker = ZfExtended_Factory::get('editor_Plugins_MissingTargetTerminology_Worker');
-        /* @var $worker editor_Plugins_MissingTargetTerminology_Worker */
+        $worker = ZfExtended_Factory::get('editor_Plugins_LockSegmentsBasedOnConfig_Worker');
+        /* @var $worker editor_Plugins_LockSegmentsBasedOnConfig_Worker */
         $worker->init($task->getTaskGuid());
         $worker->queue();
     }

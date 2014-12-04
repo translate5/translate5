@@ -59,8 +59,8 @@ class editor_Models_Export_FileParser_Csv extends editor_Models_Export_FileParse
      */
     protected $_enclosure;
 
-    public function __construct(integer $fileId, boolean $diff,editor_Models_Task $task) {
-        parent::__construct($fileId, $diff,$task);
+    public function __construct(integer $fileId, boolean $diff,editor_Models_Task $task,string $path) {
+        parent::__construct($fileId, $diff,$task,$path);
         $this->_delimiter = $this->config->runtimeOptions->import->csv->delimiter;
         $this->_enclosure = $this->config->runtimeOptions->import->csv->enclosure;
     }
@@ -84,18 +84,6 @@ class editor_Models_Export_FileParser_Csv extends editor_Models_Export_FileParse
      */
     protected function preProcessReplacement($attributes) {
         return str_replace($this->_enclosure.$this->_enclosure,$this->_enclosure,$attributes);
-    }
-    
-    /**
-     * reconstructs termTags to orignal source format
-     * - nothing todo here for csv so far, cause termtagging is not supported so far
-     * 
-     * @param string $segment
-     * @param boolean $removeTermTags, default = true
-     * @return string $segment
-     */
-    protected function recreateTermTags($segment, $removeTermTags=true) {
-        return $segment;
     }
     
     /**

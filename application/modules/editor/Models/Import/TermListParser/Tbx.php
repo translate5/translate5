@@ -187,9 +187,6 @@ class editor_Models_Import_TermListParser_Tbx extends editor_Models_Import_TermL
         }
         $this->saveTermEntityToDb();
         $end = microtime(true);
-        //error_log('Whole Time     '.($end-$start));
-        //error_log('insertIdsInTbx '.($after_insert-$start));
-        //error_log(print_r($this->timer, 1));
 
         $notProcessed = array_diff(
             array_keys($this->languages),
@@ -481,8 +478,7 @@ class editor_Models_Import_TermListParser_Tbx extends editor_Models_Import_TermL
     }
 
     protected function log($logMessage) {
-        $msg = $logMessage.'. Task: '.$this->task->getTaskGuid();
-        //error_log($msg);
+        $msg = $logMessage.'. Task: '.$this->taskGuid;
         /* @var $log ZfExtended_Log */
         $log = ZfExtended_Factory::get('ZfExtended_Log');
         $log->logError($msg);
