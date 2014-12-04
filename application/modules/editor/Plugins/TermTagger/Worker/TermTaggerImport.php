@@ -110,16 +110,13 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
         /* @var $task editor_Models_task */
         $task->loadByTaskGuid($this->workerModel->getTaskGuid());
         
-        $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication');
-        /*@var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
-        $serverCommunication->tbxFile = $task->meta()->getTbxHash();
+        $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication', array($task));
         
-        $langModel = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $langModel editor_Models_Languages */
-        $langModel->load($task->getSourceLang());
-        $serverCommunication->sourceLang = $langModel->getRfc5646();
-        $langModel->load($task->getTargetLang());
-        $serverCommunication->targetLang = $langModel->getRfc5646();
+        $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        /* @var $fieldManager editor_Models_SegmentFieldManager */
+        $fieldManager->initFields($this->workerModel->getTaskGuid());
+        $segmentFields = $fieldManager->getFieldList();
+        $sourceFieldName = $fieldManager->getFirstSourceName();
         
         foreach ($segmentIds as $segmentId) {
             $segment = ZfExtended_Factory::get('editor_Models_Segment');
@@ -128,11 +125,15 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
             $segment->meta()->setTermtagState($this::$SEGMENT_STATE_INPROGRESS);
             $segment->meta()->save();
             
-            //foreach $fieldList as $fieldName
-            //{ $segment->get$FieldName Edit();
-            // !!! auch SOURCE zurückspeichern da getaggt wird, vorher nicht !
+            $sourceText = $segment->get($sourceFieldName);
             
-            $serverCommunication->addSegment($segment->getId(), 'target', $segment->getSource(), $segment->getTargetEdit());
+            foreach ($segmentFields as $field) {
+                if($field->type != editor_Models_SegmentField::TYPE_TARGET || !$field->editable) {
+                    continue;
+                }
+                
+                $serverCommunication->addSegment($segment->getId(), $field->name, $sourceText, $segment->getTargetEdit());
+            }
         }
                 
         $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
@@ -147,15 +148,24 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
             return false;
         }
         
-        foreach ($responses as $response) {
-            $tempTaggedText = $response->target;
+        $responses = $this->groupResponseById($responses);
+        
+        foreach ($responses as $segmentId => $responseGroup) {
             
             $segment = ZfExtended_Factory::get('editor_Models_Segment');
             /* @var $segment editor_Models_Segment */
-            $segment->load($response->id);
+            $segment->load($segmentId);
             
-            $segment->setSource('IMPORT-TERMTAGGED: '.$response->source);
-            $segment->setTargetEdit('IMPORT-TERMTAGGED: '.$response->target);
+            $segment->set($sourceFieldName, 'TT-Source: '.$responseGroup[0]->source);
+            if ($task->getEnableSourceEditing()) {
+                $segment->set($fieldManager->getEditIndex($sourceFieldName), 'TT-SourceEdit: '.$responseGroup[0]->source);
+            }
+            
+            foreach ($responseGroup as $response) {
+                $segment->set($response->field, 'TT-'.$response->field.': '.$response->target);
+                $segment->set($fieldManager->getEditIndex($response->field), 'TT-'.$response->field.'Edit: '.$response->target);
+            }
+            
             $segment->save();
             
             $segment->meta()->setTermtagState($this::$SEGMENT_STATE_TAGGED);
@@ -201,6 +211,23 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
         //error_log(__CLASS__.' -> '.__FUNCTION__.'; $segmentIds: '.print_r($segmentIds, true));
         
         return $segmentIds;
+    }
+    
+    /**
+     * In case of multiple target-fields in one segment, there are multiple responses for the same segment.
+     * This function groups this different responses under the same segmentId
+     * 
+     * @param array $responses
+     * @return array grouped
+     */
+    private function groupResponseById($responses) {
+        $return = array();
+        
+        foreach ($responses as $response) {
+            $return[$response->id][] = $response;
+        }
+        
+        return $return;
     }
     
 }

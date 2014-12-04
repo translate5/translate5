@@ -33,14 +33,4 @@
 --  END LICENSE AND COPYRIGHT 
 --  */
 -- 
-
-CREATE TABLE IF NOT EXISTS `LEK_segments_meta` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `taskGuid` varchar(38) NOT NULL COMMENT 'Foreign Key to LEK_task',
-  `segmentId` int(11) NOT NULL COMMENT 'Foreign Key to LEK_segments',
-  PRIMARY KEY (`id`),
-  UNIQUE (`segmentId`),
-  CONSTRAINT FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE,
-  CONSTRAINT FOREIGN KEY (`segmentId`) REFERENCES `LEK_segments` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-ALTER TABLE  `LEK_segments_meta` ADD  `notTranslated` TINYINT NOT NULL DEFAULT  0 COMMENT  'defines, if segment is marked in imported file as locked not translated - or is acutally empty, but the source is not empty.';
+ALTER TABLE `LEK_segments` MODIFY `stateId` INT(11) NOT NULL DEFAULT 0;

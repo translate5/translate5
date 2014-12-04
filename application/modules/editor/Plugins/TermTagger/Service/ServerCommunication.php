@@ -71,6 +71,27 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
     */
     
     /**
+     * If $task is sumbitted, ServerCommunication is initialiced with alls required fields,
+     * so after that all there has to be done is addSegment()
+     * 
+     * @param editor_Models_Task $task
+     */
+    public function __construct(editor_Models_Task $task = NULL) {
+        if (!$task) {
+            return;
+        }
+        
+        $this->tbxFile = $task->meta()->getTbxHash();
+        
+        $langModel = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $langModel editor_Models_Languages */
+        $langModel->load($task->getSourceLang());
+        $this->sourceLang = $langModel->getRfc5646();
+        $langModel->load($task->getTargetLang());
+        $this->targetLang = $langModel->getRfc5646();
+    } 
+    
+    /**
      * Adds a segment to the server-communication.
      * 
      * @param string $id
