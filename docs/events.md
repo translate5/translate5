@@ -22,6 +22,13 @@ defined in `/library/ZfExtended/Controllers/Action.php`  will trigger an event o
  - **before&lt;Controllername&gt;Action** on Zend preDispatch
  - **after&lt;Controllername&gt;Action** with parameter $this->view on Zend postDispatch
 
+###RestController-Events
+ - **before&lt;Controllername&gt;Action** with the following parameters:
+   - entity: $this->entity
+ - **after&lt;Controllername&gt;Action** with the following parameters:
+   - entity: $this->entity
+   - view: $this->view
+
 
 ###ZfExtended_Models_Entity_Abstract
 - **beforeSave** with parameter array('model' => $this), on every save as first function. !!! be careful on overwritten methods to call parent::save() in first place or to take care of events !!!
@@ -32,11 +39,17 @@ defined in `/library/ZfExtended/Controllers/Action.php`  will trigger an event o
 - **doEnd**
 
 ####TaskUserAssoc
+- **beforeFinish**
 - **doUnfinish** 
+- **beforeOpen**
 - **doOpen**
+- **beforeView**
 - **doView**
+- **beforeEdit**
 - **doEdit**
+- **beforeFinish**
 - **doFinish**
+- **beforeWait**
 - **doWait**
 
 ###Editor_SegmentController
