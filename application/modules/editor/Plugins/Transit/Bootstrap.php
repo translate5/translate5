@@ -82,6 +82,9 @@ class editor_Plugins_Transit_Bootstrap {
         $this->staticEvents->attach('editor_Models_Import_DataProvider_Abstract', 'beforeArchiveImportedData', array($this, 'handleTransitImportCleanup'));
         // end of event-listeners
         $this->proofReadDirName = $config->runtimeOptions->import->proofReadDirectory;
+        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+        /* @var $meta editor_Models_Segment_Meta */
+        $meta->addMeta('transitLockedForRefMat', $meta::META_TYPE_BOOLEAN, false, 'Is set to true if segment is locked for reference material in transit file');
     }
     
     
