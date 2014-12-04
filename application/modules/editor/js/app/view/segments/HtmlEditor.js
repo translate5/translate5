@@ -63,10 +63,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   enableLinks : false,
   enableFont : false,
   isTagOrderClean: true,
+  missingContentTags: [],
+  duplicatedContentTags: [],
   
   strings: {
 	  errorTitle: '#UT# Fehler bei der Segment Validierung!',
 	  tagOrderErrorText: '#UT# Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
+	  tagMissingText: '#UT# Die nachfolgenden Tags wurden beim Editieren gelöscht, das Segment kann nicht gespeichert werden. Versuchen Sie mit der Rückgängigfunktion STRG-Z die Tags wiederherzustellen. <br />Fehlende Tags:',
+	  tagDuplicatedText: '#UT# Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:',
 	  tagRemovedText: '#UT# Es wurden Tags mit fehlendem Partner entfernt!'
   },
 
@@ -334,11 +338,29 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       return img.tagName == 'IMG' && img.className && /duplicatesavecheck/.test(img.className);
   },
   hasAndDisplayErrors: function() {
-	 if(!this.isTagOrderClean){
-		 Ext.Msg.alert(this.strings.errorTitle, this.strings.tagOrderErrorText);
-		 return true;
-	 }
-	 return false;
+      var me = this;
+      if(me.missingContentTags.length > 0 || me.duplicatedContentTags.length > 0){
+          var msg = '', 
+              todo = [['missingContentTags', 'tagMissingText'],['duplicatedContentTags','tagDuplicatedText']];
+          for(var i = 0;i<todo.length;i++) {
+              if(me[todo[i][0]].length > 0) {
+                  msg += me.strings[todo[i][1]];
+                  Ext.each(me[todo[i][0]], function(tag) {
+                      msg += '<img src="'+tag.shortPath+'"> ';
+                  })
+                  msg += '<br /><br />';
+              }
+          }
+          Ext.Msg.alert(this.strings.errorTitle, msg, function() {
+              me.deferFocus();
+          });
+          return true;
+      }
+      if(!me.isTagOrderClean){
+          Ext.Msg.alert(me.strings.errorTitle, me.strings.tagOrderErrorText);
+          return true;
+      }
+      return false;
   },
   /**
    * check and fix tags
@@ -347,11 +369,45 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   checkTags: function(node) {
 	  var nodelist = node.getElementsByTagName('img');
 	  this.fixDuplicateImgIds(nodelist);
+	  if(!this.checkContentTags(nodelist)) {
+	      return; //no more checks if missing tags found
+	  }
 	  this.removeOrphanedTags(nodelist);
 	  this.checkTagOrder(nodelist);
   },
   /**
-   * Tag Order Check
+   * returns true if all tags are OK
+   * @param {Array} nodelist
+   * @return {Boolean}
+   */
+  checkContentTags: function(nodelist) {
+      var me = this,
+          foundIds = [];
+      me.missingContentTags = [];
+      me.duplicatedContentTags = [];
+      console.dir(nodelist);
+      console.dir(this.markupImages);
+      Ext.each(nodelist, function(img) {
+          if(Ext.Array.contains(foundIds, img.id)) {
+              console.log(me.markupImages);
+                console.log(img.id, img.id.replace(new RegExp('^'+me.idPrefix), ''));
+              me.duplicatedContentTags.push(me.markupImages[img.id.replace(new RegExp('^'+me.idPrefix), '')]);
+          }
+          else {
+              foundIds.push(img.id);
+          }
+      });
+      Ext.Object.each(this.markupImages, function(key, item){
+          if(!Ext.Array.contains(foundIds, me.idPrefix+key)) {
+              me.missingContentTags.push(item);
+          }
+      });
+      console.dir(me.missingContentTags);
+      console.dir(me.duplicatedContentTags);
+      return me.missingContentTags.length == 0 && me.duplicatedContentTags.length == 0;
+  },
+  /**
+   * Tag Order Check (MQM and content tags)
    * assumes that img tag contains an id with substring "-open" or "-close"
    * ids starting with "remove" are ignored, because they are marked to be removed by removeOrphanedTags   
    * @param {Array} nodelist
@@ -376,7 +432,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 	  this.isTagOrderClean = clean;
   },
   /**
-   * Fixes duplicate img ids in the opened editor on unmarkup
+   * Fixes duplicate img ids in the opened editor on unmarkup (MQM tags)
    * Works with <img> tags with the following specifications: 
    * IMG needs an id Attribute. Assuming that the id contains the strings "-open" or "-close". The rest of the id string is identical.
    * Needs also an attribute "data-seq" which is containing the plain ID of the tag pair.
@@ -450,6 +506,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   },
   
   /**
+   * removes orphaned tags (MQM only)
    * assuming same id for open and close tag. Each Tag ID contains the string "-open" or "-close"
    * prepends "remove-" to the id of an orphaned tag
    * @see fixDuplicateImgIds
