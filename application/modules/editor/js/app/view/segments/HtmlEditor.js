@@ -385,12 +385,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           foundIds = [];
       me.missingContentTags = [];
       me.duplicatedContentTags = [];
-      console.dir(nodelist);
-      console.dir(this.markupImages);
       Ext.each(nodelist, function(img) {
           if(Ext.Array.contains(foundIds, img.id)) {
-              console.log(me.markupImages);
-                console.log(img.id, img.id.replace(new RegExp('^'+me.idPrefix), ''));
               me.duplicatedContentTags.push(me.markupImages[img.id.replace(new RegExp('^'+me.idPrefix), '')]);
           }
           else {
@@ -402,8 +398,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
               me.missingContentTags.push(item);
           }
       });
-      console.dir(me.missingContentTags);
-      console.dir(me.duplicatedContentTags);
       return me.missingContentTags.length == 0 && me.duplicatedContentTags.length == 0;
   },
   /**
