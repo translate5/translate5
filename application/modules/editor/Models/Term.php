@@ -94,40 +94,117 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         if(empty($taskGuid) || empty($segmentId)) {
             return array();
         }
-
-        $result = $this->getSortedTermGroups($taskGuid, $segmentId);
-
+        
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        
+        if (!$task->getTerminologie()) {
+            return array();
+        }
+        
+        $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segment editor_Models_Segment */
+        $segment->load($segmentId);
+        
+        $termIds = $this->getTermIdsFromTaskSegment($task, $segment);
+        
+        if(empty($termIds)) {
+            return array();
+        }
+        
+        $result = $this->getSortedTermGroups($task->getTaskGuid(), $termIds);
+        
         if(empty($result)) {
             return array();
         }
         return $this->sortTerms($result);
     }
-
+    
+    private function getTermIdsFromTaskSegment(editor_Models_Task $task, editor_Models_Segment $segment) {
+        
+        $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        /* @var $fieldManager editor_Models_SegmentFieldManager */
+        $fieldManager->initFields($task->getTaskGuid());
+        
+        $sourceFieldName = $fieldManager->getFirstSourceName();
+        $sourceText = $segment->get($sourceFieldName);
+        
+        if ($task->getEnableSourceEditing()) {
+            $sourceFieldName = $fieldManager->getEditIndex($fieldManager->getFirstSourceName());
+            $sourceText = $segment->get($sourceFieldName);
+        }
+        
+        $targetFieldName = $fieldManager->getEditIndex($fieldManager->getFirstTargetName());
+        $targetText = $segment->get($targetFieldName);
+        
+        $getTermIdRegEx = '/<div.*?id="(term_.*?)".*?>/';
+        preg_match_all($getTermIdRegEx, $sourceText, $matches);
+        $sourceMatches = $matches[1];
+        preg_match_all($getTermIdRegEx, $targetText, $matches);
+        $targetMatches = $matches[1];
+        
+        if (empty($sourceMatches) && empty($targetMatches)) {
+            return array();
+        }
+        
+        $termIds = array('source' => $sourceMatches, 'target' => $targetMatches);
+        //error_log(__CLASS__.'->'.__FUNCTION__.' $termIds: '.print_r($termIds, true));
+        
+        return $termIds;
+    }
+    
     /**
-     * Gibt ein Multidimensionales Array zurück:
-     * erste Ebene: keys: groupId, values: Array mit Termen gruppiert nach GroupId
-     * zweite Ebene: Terme der Gruppe
-     * Sortierung der Gruppen in der Reihenfolge wie sie im Segment auftauchen (order by seg2term.id sollte hinreichend sein)
-     * @param string $taskGuid
-     * @param integer $segmentId
+     * Returns a multidimensional array.
+     * 1. level: keys: groupId, values: array of terms grouped by groupId
+     * 2. level: terms of group groupId
+     * 
+     * !! TODO: Sortierung der Gruppen in der Reihenfolge wie sie im Segment auftauchen (order by seg2term.id sollte hinreichend sein)
+     * 
+     * @param string $taskGuid unic id of current task
+     * @param array $termIds as 2-dimensional array('source' => array(ids), 'target' => array(ids))
+     * 
      * @return array
      */
-    protected function getSortedTermGroups(string $taskGuid, integer $segmentId) {
-        $s = $this->db->getAdapter()->select()
-        ->from(array('t' => 'LEK_terms'))
-        ->join(array('s2t' => 'LEK_segments2terms'), 's2t.termId = t.id')
-        ->where('t.taskGuid = ?', $taskGuid)
-        ->where('s2t.segmentId = ?', $segmentId)
-        ->order('s2t.id');
-        $terms = $this->db->getAdapter()->fetchAll($s);
+    protected function getSortedTermGroups($taskGuid, array $termIds) {
+        $allIds = array_merge($termIds['source'], $termIds['target']);
+        $serialIds = '"'.implode('", "', $termIds['target']).'"';
+        $sql = $this->db->getAdapter()->select()
+                ->from(array('t1' =>'LEK_terms'))
+                ->joinLeft(array('t2' =>'LEK_terms'), 't1.groupId = t2.groupId')
+                ->where('t1.taskGuid = ?', $taskGuid)
+                ->where('t1.mid IN('.$serialIds.')')
+                //->group('t1.mid')
+                ;
+        error_log(__CLASS__.'->'.__FUNCTION__.' $sql: '.$sql);
+        $terms = $this->db->getAdapter()->fetchAll($sql);
+        
         $termGroups = array();
         foreach($terms as $term) {
-            settype($termGroups[$term['groupId']], 'array');
-            $termGroups[$term['groupId']][] = (object)$term;
+            $term = (object) $term;
+            
+            settype($termGroups[$term->groupId], 'array');
+            
+            settype($term->used, 'boolean');
+            if (in_array($term->mid, $allIds)) {
+                $term->used = true;
+            }
+            settype($term->isSource, 'boolean');
+            if (in_array($term->mid, $termIds['source'])) {
+                $term->isSource = true;
+            }
+            settype($term->transFound, 'boolean');
+            if (in_array($term->mid, $termIds['source']) && in_array($term->mid, $termIds['target'])) {
+                $term->transFound = true;
+            }
+            
+            $termGroups[$term->groupId][] = $term;
         }
+        //error_log(__CLASS__.'->'.__FUNCTION__.' $termGroups: '.print_r($termGroups, true));
+        
         return $termGroups;
     }
-
+    
     /**
      * 
      * @param string $mid
