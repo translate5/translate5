@@ -48,7 +48,7 @@ class editor_Plugins_NoMissingTargetTerminology_Worker extends ZfExtended_Worker
     public function work() {
         $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
         /* @var $meta editor_Models_Segment_Meta */
-        $meta->addMeta('noMissingTargetTermOnImport', $meta::META_TYPE_BOOLEAN, true, 'Is set to false only if all terms in source exists also in target column');
+        $meta->addMeta('noMissingTargetTermOnImport', $meta::META_TYPE_BOOLEAN, true, 'Is set to false if a term in source does not exist in target column');
 
         $statDb = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_Db_Statistics');
         /* @var $statDb editor_Plugins_SegmentStatistics_Models_Db_Statistics */
