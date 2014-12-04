@@ -101,7 +101,6 @@ class editor_Plugins_TermTagger_Bootstrap {
     }
     
     public function handleAfterTaskImport(Zend_EventManager_Event $event) {
-        //error_log(__CLASS__.'->'.__FUNCTION__);
         $task = $event->getParam('task');
         /* @var $task editor_Models_Task */
         if (!$task->getTerminologie()) {

@@ -149,6 +149,11 @@ class editor_Plugins_TermTagger_Service {
     public function openFetchIds(string $url, string $tbxHash, string $tbxData) {
         $response = $this->_open($url, $tbxHash, $tbxData, array('addIds' => true));
         /* @var $response Zend_Http_Response */
+            
+        if (!$response) {
+            return false;
+        }
+        
         return $response->getBody();
     }
     
