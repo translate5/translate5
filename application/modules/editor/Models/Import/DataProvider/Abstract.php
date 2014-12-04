@@ -128,6 +128,9 @@ abstract class editor_Models_Import_DataProvider_Abstract {
      * is called after import process by the import class. 
      */
     public function postImportHandler() {
+        //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
+        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
+        $eventManager->trigger('beforeArchiveImportedData', $this, array());
         $this->archiveImportedData();
     }
     

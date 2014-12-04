@@ -34,17 +34,45 @@
  END LICENSE AND COPYRIGHT 
  */
 
-/**#@+ 
+/**#@+
  * @author Marc Mittag
  * @package editor
  * @version 1.0
- * 
+ *
  */
 /**
- * DB Access for Segment Meta Data
+ * Plugin Bootstrap for ManualStatusCheck Plugin
+ * This Plugin checks if all segments has a manual status set. If not, the task can not be finished.
  */
-class editor_Models_Db_SegmentMeta extends Zend_Db_Table_Abstract {
-    use ZfExtended_Models_Db_MetaTrait;
-    protected $_name = 'LEK_segments_meta';
-    public $_primary = 'id';
+class editor_Plugins_ManualStatusCheck_Bootstrap extends ZfExtended_Plugin_Abstract {
+    
+    public function init() {
+        $this->eventManager->attach('editor_Workflow_Abstract', 'beforeFinish', array($this, 'handleBeforeFinish'));
+    }
+    
+    /**
+     * handler for event: editor_Workflow_Abstract#handleBeforeFinish
+     * @param $event Zend_EventManager_Event
+     */
+    public function handleBeforeFinish(Zend_EventManager_Event $event) {
+        $tua = $event->getParam('oldTua');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        
+        $segment = ZfExtended_Factory::get('editor_Models_Db_Segments');
+        /* @var $segment editor_Models_Db_Segments */
+        
+        $s = $segment->select()
+            ->from($segment, array('unsetStatusCount' => 'COUNT(id)'))
+            ->where('stateId = 0')
+            ->where('editable = 1')
+            ->where('taskGuid = ?', $tua->getTaskGuid());
+        
+        $row = $segment->fetchRow($s);
+        if($row->unsetStatusCount > 0) {
+            $msg = 'Der Task kann nicht abgeschlossen werden, da nicht alle Segmente einen Status gesetzt haben. Bitte verwenden Sie die Filterfunktion um die betroffenen Segmente zu finden.';
+            $e = new ZfExtended_NotAcceptableException($msg);
+            $e->setMessage($msg, true);
+            throw $e;
+        }
+    }
 }

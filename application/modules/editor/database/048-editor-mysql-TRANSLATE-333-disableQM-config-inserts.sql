@@ -3,7 +3,7 @@
 --  
 --  This file is part of Translate5 Editor PHP Serverside and build on Zend Framework
 --  
---  Copyright (c) 2014 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+--  Copyright (c) 2013 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 -- 
 --  Contact:  http://www.MittagQI.com/  /  service (ÄTT) MittagQI.com
 -- 
@@ -34,13 +34,5 @@
 --  */
 -- 
 
-CREATE TABLE IF NOT EXISTS `LEK_segments_meta` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `taskGuid` varchar(38) NOT NULL COMMENT 'Foreign Key to LEK_task',
-  `segmentId` int(11) NOT NULL COMMENT 'Foreign Key to LEK_segments',
-  PRIMARY KEY (`id`),
-  UNIQUE (`segmentId`),
-  CONSTRAINT FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE,
-  CONSTRAINT FOREIGN KEY (`segmentId`) REFERENCES `LEK_segments` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-ALTER TABLE  `LEK_segments_meta` ADD  `notTranslated` TINYINT NOT NULL DEFAULT  0 COMMENT  'defines, if segment is marked in imported file as locked not translated - or is acutally empty, but the source is not empty.';
+INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES 
+('runtimeOptions.segments.showQM', 1, 'editor', 'metadata', '0', '1', '', 'boolean', 'enables (value = 1) / or disables (value = 0) the complete QM Feature in the Metapanel');

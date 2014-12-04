@@ -1,4 +1,5 @@
 <?php
+
  /*
  START LICENSE AND COPYRIGHT
  
@@ -33,18 +34,35 @@
  
  END LICENSE AND COPYRIGHT 
  */
-
-/**#@+ 
- * @author Marc Mittag
- * @package editor
- * @version 1.0
+/**
+ * class with helper methods for import- and export-parsing (which are used in both)
  * 
  */
-/**
- * DB Access for Segment Meta Data
- */
-class editor_Models_Db_SegmentMeta extends Zend_Db_Table_Abstract {
-    use ZfExtended_Models_Db_MetaTrait;
-    protected $_name = 'LEK_segments_meta';
-    public $_primary = 'id';
+trait editor_Plugins_Transit_TraitParse {
+    
+    /**
+     * 
+     * @param type $text
+     * @return boolean
+     */
+    protected function containsOnlyTagsOrEmpty($text){
+        if(preg_replace(array('"<Tag .*?</Tag>"','"<FontTag .*?</FontTag>"'), array('',''), $text)===''){
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * checks if number of source and target-segments match - and logs it if not
+     * @return boolean
+     */
+    protected function isEvenLanguagePair() {
+        if ($this->sourceDOM->getSegmentCount() === $this->targetDOM->getSegmentCount()){
+            return true;
+        }
+        $msg = "The number of segments of source- and target-files are not identical. LanguagePair can not be parsed properly. Path to targetFile is ".$path;
+        $this->log->logError($msg);
+        return false;
+    }
+   
 }

@@ -47,6 +47,11 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
     
     protected $isCron = false;
     
+    public function __construct() {
+        parent::__construct();
+        $this->events->addIdentifiers(__CLASS__);
+    }
+    
     /**
      * (non-PHPdoc)
      * @see editor_Workflow_Abstract::handleImport()
@@ -204,6 +209,7 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
             $tuaNew = clone $tua;
             $tuaNew->setState(self::STATE_FINISH);
             $tuaNew->validate();
+            $this->triggerBeforeEvents($tua, $tuaNew);
             $tuaNew->save();
             $this->doWithUserAssoc($tua, $tuaNew);
             editor_Models_LogTask::create($instance['taskGuid'], self::STATE_FINISH, $this->authenticatedUserModel, $user);

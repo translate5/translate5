@@ -79,6 +79,7 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         $this->setQualityValidator(array_keys($flagConfig->qualityFlags->toArray()));
         
         $allowedValues = array_keys($flagConfig->stateFlags->toArray());
+        $allowedValues[] = 0; //adding "not set" state
         $this->addValidator('stateId', 'inArray', array($allowedValues));
         
         $states = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');

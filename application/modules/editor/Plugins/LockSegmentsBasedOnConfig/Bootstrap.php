@@ -34,17 +34,34 @@
  END LICENSE AND COPYRIGHT 
  */
 
-/**#@+ 
+/**#@+
  * @author Marc Mittag
  * @package editor
  * @version 1.0
- * 
+ *
  */
 /**
- * DB Access for Segment Meta Data
+ * Plugin Bootstrap for Missing Target Terminology Plugin
+ * depends on editor_Plugins_SegmentStatistics_Bootstrap
  */
-class editor_Models_Db_SegmentMeta extends Zend_Db_Table_Abstract {
-    use ZfExtended_Models_Db_MetaTrait;
-    protected $_name = 'LEK_segments_meta';
-    public $_primary = 'id';
+class editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap extends ZfExtended_Plugin_Abstract {
+    
+    public function init() {
+        //priority -10000 in order to always allow other plugins to modify meta-data before locking runs
+        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'), -10000);
+    }
+    
+    /**
+     * handler for event: editor_Models_Import#afterImport
+     * @param $event Zend_EventManager_Event
+     */
+    public function handleAfterImport(Zend_EventManager_Event $event) {
+        $task = $event->getParam('task');
+        /* @var $task editor_Models_Task */
+        
+        $worker = ZfExtended_Factory::get('editor_Plugins_LockSegmentsBasedOnConfig_Worker');
+        /* @var $worker editor_Plugins_LockSegmentsBasedOnConfig_Worker */
+        $worker->init($task->getTaskGuid());
+        $worker->queue();
+    }
 }

@@ -93,8 +93,6 @@ class editor_Models_Filter_TaskSpecific extends ZfExtended_Models_Filter_ExtJs {
             $stateFill(self::USER_STATE, $state, $userStates);
             $stateFill(self::TASK_STATE, $state, $taskStates);
         }
-        //error_log('$userStates: '.print_r($userStates,1));
-        //error_log('$taskStates: '.print_r($taskStates,1));
         
         //add the filters as separate new filter objects
         $filter = new stdClass();
