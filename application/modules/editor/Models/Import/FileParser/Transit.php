@@ -239,6 +239,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         }
         if($targetseg->getStatus()===editor_Plugins_Transit_Segment::STATUS_NOT_TRANSLATED || $targetText === ''){
             //@todo: enable setting of $this->meta->setNotTranslated(1); on empty target for other import formats
+            $save = true;
             $this->meta->setNotTranslated(1);
         }
         if($save){
