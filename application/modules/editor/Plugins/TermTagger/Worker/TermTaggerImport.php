@@ -110,16 +110,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
         /* @var $task editor_Models_task */
         $task->loadByTaskGuid($this->workerModel->getTaskGuid());
         
-        $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication');
-        /*@var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
-        $serverCommunication->tbxFile = $task->meta()->getTbxHash();
-        
-        $langModel = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $langModel editor_Models_Languages */
-        $langModel->load($task->getSourceLang());
-        $serverCommunication->sourceLang = $langModel->getRfc5646();
-        $langModel->load($task->getTargetLang());
-        $serverCommunication->targetLang = $langModel->getRfc5646();
+        $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication', array($task));
         
         $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         /* @var $fieldManager editor_Models_SegmentFieldManager */

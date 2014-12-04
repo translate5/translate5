@@ -136,7 +136,7 @@ class editor_Plugins_TermTagger_Bootstrap {
     
     
     /**
-     * Re-TermTagg the (modified) segment-text.
+     * Re-TermTag the (modified) segment-text.
      */
     public function handleBeforePutSave(Zend_EventManager_Event $event) {
         $segment = $event->getParam('model');
@@ -152,17 +152,7 @@ class editor_Plugins_TermTagger_Bootstrap {
             return;
         }
         
-        
-        $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication');
-        /*@var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
-        $serverCommunication->tbxFile = $task->meta()->getTbxHash();;
-        $langModel = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $langModel editor_Models_Languages */
-        $langModel->load($task->getSourceLang());
-        $serverCommunication->sourceLang = $langModel->getRfc5646();
-        $langModel->load($task->getTargetLang());
-        $serverCommunication->targetLang = $langModel->getRfc5646();
-        
+        $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication', array($task));
         
         $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         /* @var $fieldManager editor_Models_SegmentFieldManager */
@@ -184,13 +174,15 @@ class editor_Plugins_TermTagger_Bootstrap {
                 continue;
             }
             
+            $targetFieldName = $fieldManager->getEditIndex($field->name);
+            
+            // if source is editable compare original Source with first targetField
             if ($firstField && $task->getEnableSourceEditing()) {
-                $serverCommunication->addSegment($segment->getId(), 'SourceOriginal', $sourceTextOriginal, $segment->get($fieldName));
+                $serverCommunication->addSegment($segment->getId(), 'SourceOriginal', $sourceTextOriginal, $segment->get($targetFieldName));
                 $firstField = false;
             }
             
-            $fieldName = $fieldManager->getEditIndex($field->name);
-            $serverCommunication->addSegment($segment->getId(), $fieldName, $sourceText, $segment->get($fieldName));
+            $serverCommunication->addSegment($segment->getId(), $targetFieldName, $sourceText, $segment->get($targetFieldName));
         }
         
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTagger');

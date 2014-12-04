@@ -174,6 +174,7 @@ class editor_Plugins_TermTagger_Service {
         $httpClient = new Zend_Http_Client();
         $httpClient->setUri($url.'/termTagger/termTag/');
         $httpClient->setRawData(json_encode($data), 'application/json');
+        $httpClient->setConfig(array('timeout' => 60));
         $response = $httpClient->request('POST');
         /* @var $response Zend_Http_Response */
         //error_log(__CLASS__.'->'.__FUNCTION__.'; TERMTAG-REQUEST  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$httpClient->getLastRequest(): '.$httpClient->getLastRequest());
