@@ -54,21 +54,6 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
     },
     { ... MORE SEGMENTS ... }
     ],
-    */
-    
-    // OPTIONAL FIELDS:
-    // *****************************************************
-    // commented out for easyser use of class. can be activated if needed
-    /*
-    public $debug = 0;
-    public $fuzzy = 1;
-    public $stemmed = 1;
-    public $targetStringMatch = 1;
-    public $fuzzyPercent = 70;
-    public $maxWordLengthSearch = 2;
-    public $minFuzzyStartLength = 2;
-    public $minFuzzyStringLength = 5;
-    */
     
     /**
      * If $task is sumbitted, ServerCommunication is initialized with all required fields,
@@ -89,6 +74,23 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
         $this->sourceLang = $langModel->getRfc5646();
         $langModel->load($task->getTargetLang());
         $this->targetLang = $langModel->getRfc5646();
+        
+        $config = Zend_Registry::get('config');
+        $taggerConfig = $config->runtimeOptions->termTagger;
+        $this->debug = (integer)$taggerConfig->debug;
+        $this->fuzzy = (integer)$taggerConfig->fuzzy;
+        $this->stemmed = (integer)$taggerConfig->stemmed;
+        $this->fuzzyPercent = (integer)$taggerConfig->fuzzyPercent;
+        $this->maxWordLengthSearch = (integer)$taggerConfig->maxWordLengthSearch;
+        $this->minFuzzyStartLength = (integer)$taggerConfig->minFuzzyStartLength;
+        $this->minFuzzyStringLength = (integer)$taggerConfig->minFuzzyStringLength;
+        
+        $this->targetStringMatch = 0;
+        foreach ($taggerConfig->targetStringMatch as  $targetLangOnlyStringMatch) {
+            if($this->targetLang === $targetLangOnlyStringMatch){
+                $this->targetStringMatch = 1;
+            }
+        }
     } 
     
     /**
