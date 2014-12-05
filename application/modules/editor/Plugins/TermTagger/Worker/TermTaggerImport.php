@@ -181,7 +181,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
             $this->log('TermTaggerImport-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }
-        $worker->queue();
+        $worker->queue(ZfExtended_Models_Worker::STATE_WAITING);
         
         return true;
     }
