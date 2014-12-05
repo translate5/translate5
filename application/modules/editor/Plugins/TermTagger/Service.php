@@ -44,11 +44,33 @@ class editor_Plugins_TermTagger_Service {
      */
     protected $log;
     
+    /**
+     * contains the HTTP status of the last request
+     * @var integer
+     */
+    protected $lastStatus;
+    
     
     public function __construct() {
         $this->log = ZfExtended_Factory::get('ZfExtended_Log');
     }
     
+    /**
+     * returns the HTTP Status of the last request 
+     * @return integer
+     */
+    public function getLastStatus() {
+        return (int) $this->lastStatus;
+    }
+    
+    /**
+     * returns true if the last request was HTTP state 2**
+     * @return boolean
+     */
+    public function wasSuccessfull() {
+        $stat = $this->getLastStatus();
+        return $stat >= 200 && $stat < 300;
+    }
     
     /**
      * Checks if there is a TermTagger-server behind $url.
@@ -58,24 +80,11 @@ class editor_Plugins_TermTagger_Service {
      * @return boolean true if there is a TermTagger-Server behind $url 
      */
     public function testServerUrl(string $url) {
-        try {
-            $httpClient = new Zend_Http_Client();
-            $httpClient->setUri($url.'/termTagger');
-            $response = $httpClient->request('GET');
-            /* @var $response Zend_Http_Response */
-        }
-        catch(Exception $requestException) {
-            $this->log->logError('Exception in processing '.__CLASS__.'->'.__FUNCTION__.'; TermTagger-Server not available under $url: '.$url);
-            throw $requestException;
-            return false;
-        }
+        $httpClient = $this->getHttpClient($url.'/termTagger');
+        $response = $this->sendRequest($httpClient, $httpClient::GET);
         
         // $url is OK if status == 200 AND string 'TermTagger Server' is in the response-body
-        if ($response->getStatus() == '200' && strpos($response->getBody(), 'TermTagger Server')) {
-            return true;
-        }
-        
-        return false;
+        return $response && $this->wasSuccessfull() && strpos($response->getBody(), 'TermTagger Server') !== false;
     }
     
     /**
@@ -88,31 +97,9 @@ class editor_Plugins_TermTagger_Service {
      * @return boolean True if ping was succesfull
      */
     public function ping(string $url, $tbxHash = null) {
-        try {
-            $httpClient = new Zend_Http_Client();
-            $httpClient->setUri($url.'/termTagger/tbxFile/'.$tbxHash);
-            $response = $httpClient->request('HEAD');
-        }
-        catch(Exception $requestException) {
-            $this->log->logError('Exception in processing '.__CLASS__.'->'.__FUNCTION__.'; TermTagger-Server not available under $url: '.$url);
-            //throw $requestException;
-            return false;
-        }
-        /* @var $response Zend_Http_Response */
-        //error_log(__CLASS__.'->'.__FUNCTION__.'; PING  $httpClient->getUri(): '.$url."\n".'$httpClient->getLastRequest(): '.$httpClient->getLastRequest());
-        //error_log(__CLASS__.'->'.__FUNCTION__.'; PING  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
-        
-        //error_log(__CLASS__.'->'.__FUNCTION__.'; PING  $httpClient->getUri(): '.$httpClient->getUri()
-        //                                        ."\n".'$response->getStatus() / $response->getMessage(): '.$response->getStatus().' / '.$response->getMessage()
-        //                                        ."\n".'$response->getHeaders(): '.print_r($response->getHeaders(), true)
-        //                                        ."\n".'$response->getBody(): '.$response->getBody());
-        $status = $response->getStatus();
-        
-        if ($tbxHash && $status == '200' || !$tbxHash && $status == '404') {
-            return true;
-        }
-        
-        return false;
+        $httpClient = $this->getHttpClient($url.'/termTagger/tbxFile/'.$tbxHash);
+        $response = $this->sendRequest($httpClient, $httpClient::HEAD);
+        return ($response && ($tbxHash && $this->wasSuccessfull() || !$tbxHash && $this->getLastStatus() == 404));
     }
     
     
@@ -123,17 +110,10 @@ class editor_Plugins_TermTagger_Service {
      * @param string $tbxHash TBX hash
      * @param string $tbxData TBX data 
      * 
-     * @return number Http-response-status of the server. If everything is OK "200" else "404"
+     * @return Zend_Http_Response|false
      */
     public function open(string $url, string $tbxHash, string $tbxData) {
-        $response = $this->_open($url, $tbxHash, $tbxData);
-        /* @var $response Zend_Http_Response */
-        
-        if (!$response) {
-            return false;
-        }
-        
-        return $response->getStatus();
+        return $this->_open($url, $tbxHash, $tbxData);
     }
     
     /**
@@ -144,19 +124,20 @@ class editor_Plugins_TermTagger_Service {
      * @param string $tbxHash TBX hash
      * @param string $tbxData TBX data 
      * 
-     * @return string json-decoded tbx-file
+     * @return Zend_Http_Response|false
      */
     public function openFetchIds(string $url, string $tbxHash, string $tbxData) {
-        $response = $this->_open($url, $tbxHash, $tbxData, array('addIds' => true));
-        /* @var $response Zend_Http_Response */
-            
-        if (!$response) {
-            return false;
-        }
-        
-        return $response->getBody();
+        return $this->_open($url, $tbxHash, $tbxData, array('addIds' => true));
     }
     
+    /**
+     * sends an open request to the termtagger
+     * @param string $url
+     * @param string $tbxHash
+     * @param string $tbxData
+     * @param array $moreParams
+     * @return boolean|Zend_Http_Response
+     */
     private function _open($url, $tbxHash, $tbxData, $moreParams = array()) {
         // get default- and additional- (if any) -options for server-communication
         $serverCommunication = new stdClass();
@@ -167,23 +148,56 @@ class editor_Plugins_TermTagger_Service {
         $serverCommunication->tbxdata = $tbxData;
         
         // send request to TermTagger-server
-        try {
-            $httpClient = new Zend_Http_Client();
-            $httpClient->setUri($url.'/termTagger/tbxFile/');
-            $httpClient->setRawData(json_encode($serverCommunication), 'application/json');
-            $response = $httpClient->request('POST');
-        } catch(Exception $httpException) {
-            $this->log->logError('Exception in processing '.__CLASS__.'::'.__FUNCTION__);
-            //throw $httpException;
+        $httpClient = $this->getHttpClient($url.'/termTagger/tbxFile/');
+        $httpClient->setRawData(json_encode($serverCommunication), 'application/json');
+        $response = $this->sendRequest($httpClient, $httpClient::POST);
+        if(!$response) {
+            //was exception => already logged
             return false;
         }
-            /* @var $response Zend_Http_Response */
-        //error_log(__CLASS__.'->'.__FUNCTION__.'; $httpClient->getUri(): '.$url."\n".'$httpClient->getLastRequest(): '.$httpClient->getLastRequest());
-        //error_log(__CLASS__.'->'.__FUNCTION__.'; $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
+        if(!$this->wasSuccessfull()) {
+            $msg = 'TermTagger HTTP Status was: '.$this->getLastStatus();
+            $msg .= "\n URL: ".$httpClient->getUri(true)."\n\nRequested Data: ";
+            $msg .= print_r($serverCommunication,true)."\n\nPlain Server Response: ";
+            $msg .= print_r($response,true);
+            $this->log->logError('Result of opening a TBX was not OK!', $msg);
+            return false;
+        }
         
         return $response;
     }
     
+    /**
+     * send request method with unified logging
+     * @param Zend_Http_Client $client
+     * @param string $method
+     * @return Zend_Http_Response | false on error
+     */
+    protected function sendRequest(Zend_Http_Client $client, $method) {
+        $this->lastStatus = false;
+        try {
+            $result = $client->request($method);
+            $this->lastStatus = $result->getStatus();
+            return $result;
+        } catch(Exception $httpException) {
+            //logging the send data is irrelevant here, since we are logging communication errors, not termtagger server errors!
+            $msg = 'Method: '.$method.'; URL was: '.$client->getUri(true);
+            $this->log->logError('Exception in communication with termtagger in '.__CLASS__, $msg);
+            $this->log->logException($httpException);
+        }
+        return false;
+    }
+    
+    /**
+     * instances a Zend_Http_Client Object, sets the desired URI and returns it
+     * @param string $uri
+     * @return Zend_Http_Client
+     */
+    protected function getHttpClient($uri) {
+        $client = new Zend_Http_Client();
+        $client->setUri($uri);
+        return $client;
+    }
     
     /**
      * TermTaggs segment-text(s) in $data on TermTagger-server $url 
@@ -201,7 +215,7 @@ class editor_Plugins_TermTagger_Service {
             $httpClient->setConfig(array('timeout' => 60));
             $response = $httpClient->request('POST');
         } catch(Exception $httpException) {
-            $this->log->logError('Exception in processing '.__CLASS.'::'.__FUNCTION__);
+            $this->log->logError('Exception in communication with termtagger in '.__CLASS__.'::'.__FUNCTION__);
             $this->log->logException($httpException);
             return false;
         }

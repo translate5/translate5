@@ -100,16 +100,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerLoader extends ZfExtended_Worke
             return false;
         }
         
-        //load task or use given task in direct runs
-        if(empty($this->data->task) || !is_subclass_of($this->data->task, 'editor_Models_Task')) {
-            $task = ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $task editor_Models_Task */
-            $task->loadByTaskGuid($this->taskGuid);
-        }
-        else {
-            $task = $this->data->task;
-        }
-        
+        $task = $this->getTask();
         $meta = $task->meta();
         //ensure existence of the tbxHash field
         $meta->addMeta('tbxHash', $meta::META_TYPE_STRING, null, 'Contains the MD5 hash of the original imported TBX file before adding IDs', 36);
@@ -138,15 +129,59 @@ class editor_Plugins_TermTagger_Worker_TermTaggerLoader extends ZfExtended_Worke
         $task->meta()->setTbxHash($hash);
         $task->meta()->save();
         
-        $result = $service->openFetchIds($url, $hash, $tbxData);
+        $response = $service->openFetchIds($url, $hash, $tbxData);
+        $result = $this->decodeServiceResult($response->getBody());
         
-        $data = json_decode($result);
-        unset($result);
-        
+        if(empty($result)) {
+            return false;
+        }
         $tmpFile = tempnam(dirname($tbxPath), 'tbx');
-        file_put_contents($tmpFile, $data->tbxdata);
+        file_put_contents($tmpFile, $result->tbxdata);
         rename($tmpFile, $tbxPath);
         return true;
     }
     
+    /**
+     * returns a task model reference
+     * @return editor_Models_Task
+     */
+    protected function getTask() {
+        //load task or use given task in direct runs
+        if(empty($this->data->task) || !is_subclass_of($this->data->task, 'editor_Models_Task')) {
+            $task = ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $task editor_Models_Task */
+            $task->loadByTaskGuid($this->taskGuid);
+            return $task;
+        }
+        return $this->data->task;
+    }
+    
+    /**
+     * decodes the TermTagger JSON and logs an error if data can not be processed
+     * @param string $result
+     * @return stdClass or null on error
+     */
+    protected function decodeServiceResult($result) {
+        $data = json_decode($result);
+        if(!empty($data)) {
+            return $data;
+        }
+        $msg = "Original TermTagger Result was: \n".$result."\n JSON decode error was: ";
+        if (function_exists('json_last_error_msg')) {
+            $msg .= json_last_error_msg();
+        } else {
+            static $errors = array(
+                JSON_ERROR_NONE             => null,
+                JSON_ERROR_DEPTH            => 'Maximum stack depth exceeded',
+                JSON_ERROR_STATE_MISMATCH   => 'Underflow or the modes mismatch',
+                JSON_ERROR_CTRL_CHAR        => 'Unexpected control character found',
+                JSON_ERROR_SYNTAX           => 'Syntax error, malformed JSON',
+                JSON_ERROR_UTF8             => 'Malformed UTF-8 characters, possibly incorrectly encoded'
+            );
+            $error = json_last_error();
+            $msg .=  array_key_exists($error, $errors) ? $errors[$error] : "Unknown error ({$error})";
+        }
+        $this->log->logError(__CLASS__.' cannot json_decode TermTagger Result!', $msg);
+        return null;
+    }
 }
