@@ -48,7 +48,7 @@ class editor_Plugins_NoMissingTargetTerminology_Worker extends ZfExtended_Worker
     public function work() {
         $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
         /* @var $meta editor_Models_Segment_Meta */
-        $meta->addMeta('noMissingTargetTermOnImport', $meta::META_TYPE_BOOLEAN, true, 'Is set to false if a term in source does not exist in target column');
+        $meta->addMeta('noMissingTargetTermOnImport', $meta::META_TYPE_BOOLEAN, false, 'Is set to false if a term in source does not exist in target column');
 
         $statDb = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_Db_Statistics');
         /* @var $statDb editor_Plugins_SegmentStatistics_Models_Db_Statistics */
@@ -56,6 +56,7 @@ class editor_Plugins_NoMissingTargetTerminology_Worker extends ZfExtended_Worker
         $select = $statDb->select()
             ->from($statDb, array(new Zend_Db_Expr ('1 AS noMissingTargetTermOnImport'), 'taskGuid', 'segmentId'))
             ->where('taskGuid = ?', $this->taskGuid)
+            ->where("fieldType = 'source'")
             ->where('termNotFound = 0')
             ->group('segmentId');
 
@@ -67,6 +68,7 @@ class editor_Plugins_NoMissingTargetTerminology_Worker extends ZfExtended_Worker
                 `noMissingTargetTermOnImport` = VALUES(`noMissingTargetTermOnImport`)
                 , `taskGuid` = VALUES(`taskGuid`)
                 , `segmentId` = VALUES(`segmentId`)'; 
+        
         $md->getAdapter()->query($insert);
         //@todo: check task data not up2date after new insert of task when assigning user
     }
