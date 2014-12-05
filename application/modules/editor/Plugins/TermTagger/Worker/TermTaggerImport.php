@@ -156,14 +156,14 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
             /* @var $segment editor_Models_Segment */
             $segment->load($segmentId);
             
-            $segment->set($sourceFieldName, 'TT-Source: '.$responseGroup[0]->source);
+            $segment->set($sourceFieldName, $responseGroup[0]->source);
             if ($task->getEnableSourceEditing()) {
-                $segment->set($fieldManager->getEditIndex($sourceFieldName), 'TT-SourceEdit: '.$responseGroup[0]->source);
+                $segment->set($fieldManager->getEditIndex($sourceFieldName), $responseGroup[0]->source);
             }
             
             foreach ($responseGroup as $response) {
-                $segment->set($response->field, 'TT-'.$response->field.': '.$response->target);
-                $segment->set($fieldManager->getEditIndex($response->field), 'TT-'.$response->field.'Edit: '.$response->target);
+                $segment->set($response->field, $response->target);
+                $segment->set($fieldManager->getEditIndex($response->field), $response->target);
             }
             
             $segment->save();

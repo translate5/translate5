@@ -84,8 +84,12 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         ->where('t2.language = ? and t2.groupId = ('.$s1->assemble().')', $langId);
         return $this->db->getAdapter()->fetchAll($s2);
     }
+    
+    
     /**
-     * Gibt die mit einem bestimmten Segment assozierten Terme sortiert und gruppiert zurück. TaskGuid zur Sicherheit als zusätzlicher Filter.
+     * Returns term-informations for $segmentId in $taskGuid.
+     * Includes assoziated terms corresponding to the tagged terms
+     * 
      * @param string $taskGuid
      * @param int $segmentId
      * @return array
@@ -113,7 +117,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             return array();
         }
         
-        $result = $this->getSortedTermGroups($task->getTaskGuid(), $termIds);
+        $result = $this->getSortedTermGroups($task->getTaskGuid(), $termIds, $task->getSourceLang());
         
         if(empty($result)) {
             return array();
@@ -139,17 +143,14 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $targetText = $segment->get($targetFieldName);
         
         $getTermIdRegEx = '/<div.*?id="(term_.*?)".*?>/';
-        preg_match_all($getTermIdRegEx, $sourceText, $matches);
-        $sourceMatches = $matches[1];
-        preg_match_all($getTermIdRegEx, $targetText, $matches);
-        $targetMatches = $matches[1];
+        preg_match_all($getTermIdRegEx, $sourceText, $sourceMatches, PREG_SET_ORDER);
+        preg_match_all($getTermIdRegEx, $targetText, $targetMatches, PREG_SET_ORDER);
         
         if (empty($sourceMatches) && empty($targetMatches)) {
             return array();
         }
         
         $termIds = array('source' => $sourceMatches, 'target' => $targetMatches);
-        //error_log(__CLASS__.'->'.__FUNCTION__.' $termIds: '.print_r($termIds, true));
         
         return $termIds;
     }
@@ -162,20 +163,34 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * !! TODO: Sortierung der Gruppen in der Reihenfolge wie sie im Segment auftauchen (order by seg2term.id sollte hinreichend sein)
      * 
      * @param string $taskGuid unic id of current task
-     * @param array $termIds as 2-dimensional array('source' => array(ids), 'target' => array(ids))
+     * @param array $termIds as 2-dimensional array('source' => array(), 'target' => array())
+     * @parma $sourceLang
      * 
      * @return array
      */
-    protected function getSortedTermGroups($taskGuid, array $termIds) {
-        $allIds = array_merge($termIds['source'], $termIds['target']);
-        $serialIds = '"'.implode('", "', $termIds['target']).'"';
+    protected function getSortedTermGroups($taskGuid, array $termIds,  $sourceLang) {
+        $sourceIds = array();
+        $targetIds = array();
+        $transFoundSearch = array();
+        foreach ($termIds['source'] as $termId) {
+            $sourceIds[] = $termId[1];
+            $transFoundSearch[$termId[1]] = $termId[0];
+        }
+        foreach ($termIds['target'] as $termId) {
+            $targetIds[] = $termId[1];
+            $transFoundSearch[$termId[1]] = $termId[0];
+        }
+        
+        $allIds = array_merge($sourceIds, $targetIds);
+        $serialIds = '"'.implode('", "', $allIds).'"';
+        
         $sql = $this->db->getAdapter()->select()
-                ->from(array('t1' =>'LEK_terms'))
+                ->distinct()
+                ->from(array('t1' =>'LEK_terms'), array('t2.*'))
                 ->joinLeft(array('t2' =>'LEK_terms'), 't1.groupId = t2.groupId')
                 ->where('t1.taskGuid = ?', $taskGuid)
                 ->where('t2.taskGuid = ?', $taskGuid)
                 ->where('t1.mid IN('.$serialIds.')');
-        //error_log(__CLASS__.'->'.__FUNCTION__.' $sql: '.$sql);
         $terms = $this->db->getAdapter()->fetchAll($sql);
         
         $termGroups = array();
@@ -184,22 +199,15 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             
             settype($termGroups[$term->groupId], 'array');
             
-            settype($term->used, 'boolean');
-            if (in_array($term->mid, $allIds)) {
-                $term->used = true;
-            }
-            settype($term->isSource, 'boolean');
-            if (in_array($term->mid, $termIds['source'])) {
-                $term->isSource = true;
-            }
-            settype($term->transFound, 'boolean');
-            if (in_array($term->mid, $termIds['source']) && in_array($term->mid, $termIds['target'])) {
-                $term->transFound = true;
+            $term->used = in_array($term->mid, $allIds);
+            $term->isSource = in_array($term->language, array($sourceLang));
+            $term->transFound = false;
+            if ($term->used) {
+                $term->transFound = preg_match('/class=".*?transFound.*?"/', $transFoundSearch[$term->mid]);
             }
             
             $termGroups[$term->groupId][] = $term;
         }
-        //error_log(__CLASS__.'->'.__FUNCTION__.' $termGroups: '.print_r($termGroups, true));
         
         return $termGroups;
     }
