@@ -171,14 +171,14 @@ trait editor_Plugins_TermTagger_Worker_TermTaggerTrait {
      * @param Zend_Http_Response $result
      * @return stdClass or null on error
      */
-    protected function decodeServiceResult(Zend_Http_Response $result) {
+    protected function decodeServiceResult(Zend_Http_Response $result = null) {
         if(empty($result)) {
             return null;
         }
         
         $data = json_decode($result->getBody());
         if(!empty($data)) {
-            if(isset($data->error)) {
+            if(!empty($data->error)) {
                 $this->log->logError(__CLASS__.' decoded TermTagger Result but with following Error from TermTagger: ', print_r($data,1));
             }
             return $data;
