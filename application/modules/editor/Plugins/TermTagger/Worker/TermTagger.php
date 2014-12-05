@@ -128,12 +128,13 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends ZfExtended_Worker_Abst
         }
             
         $response = $termTagger->tagterms($this->workerModel->getSlot(), $serverCommunication);
-        // on error return false and store original untagged data
-        if ($response == false) {
-            return false;
-        }
+        $result = $this->decodeServiceResult($response);
         
-        $this->result = $response;
+        // on error return false and store original untagged data
+        if(empty($result)) {
+            return false;
+        }        
+        $this->result = $result->segments;
         return true;
     }
 }

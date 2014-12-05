@@ -136,7 +136,7 @@ class editor_Plugins_TermTagger_Service {
      * @param string $tbxHash
      * @param string $tbxData
      * @param array $moreParams
-     * @return boolean|Zend_Http_Response
+     * @return Zend_Http_Response
      */
     private function _open($url, $tbxHash, $tbxData, $moreParams = array()) {
         // get default- and additional- (if any) -options for server-communication
@@ -153,7 +153,7 @@ class editor_Plugins_TermTagger_Service {
         $response = $this->sendRequest($httpClient, $httpClient::POST);
         if(!$response) {
             //was exception => already logged
-            return false;
+            return null;
         }
         if(!$this->wasSuccessfull()) {
             $msg = 'TermTagger HTTP Status was: '.$this->getLastStatus();
@@ -161,7 +161,7 @@ class editor_Plugins_TermTagger_Service {
             $msg .= print_r($serverCommunication,true)."\n\nPlain Server Response: ";
             $msg .= print_r($response,true);
             $this->log->logError('Result of opening a TBX was not OK!', $msg);
-            return false;
+            return null;
         }
         
         return $response;
@@ -205,32 +205,29 @@ class editor_Plugins_TermTagger_Service {
      * @param unknown $url
      * @param editor_Plugins_TermTagger_Service_ServerCommunication $data
      * 
-     * @return array((obj) segments) list of segment-objects of FALSE on error
+     * @return Zend_Http_Response or null on error
      */
     public function tagterms($url, editor_Plugins_TermTagger_Service_ServerCommunication $data) {
-        try {
-            $httpClient = new Zend_Http_Client();
-            $httpClient->setUri($url.'/termTagger/termTag/');
-            $httpClient->setRawData(json_encode($data), 'application/json');
-            $httpClient->setConfig(array('timeout' => 60));
-            $response = $httpClient->request('POST');
-        } catch(Exception $httpException) {
-            $this->log->logError('Exception in communication with termtagger in '.__CLASS__.'::'.__FUNCTION__);
-            $this->log->logException($httpException);
-            return false;
-        }
-        /* @var $response Zend_Http_Response */
-        //error_log(__CLASS__.'->'.__FUNCTION__.'; TERMTAG-REQUEST  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$httpClient->getLastRequest(): '.$httpClient->getLastRequest());
-        //error_log(__CLASS__.'->'.__FUNCTION__.'; TERMTAG-RESPONSE  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
+        $httpClient = $this->getHttpClient($url.'/termTagger/termTag/');
+        $httpClient->setRawData(json_encode($data), 'application/json');
+        $httpClient->setConfig(array('timeout' => 60));
+        $response = $this->sendRequest($httpClient, $httpClient::POST);
         
-        if ($response->getStatus() != "200") {
-            return false;
+        if(!$response) {
+            //was exception => already logged
+            return null;
         }
         
-        $responseDecoded = json_decode($response->getBody());
-        $segments = $responseDecoded->segments;
+        if(!$this->wasSuccessfull()) {
+            $msg = 'TermTagger HTTP Status was: '.$this->getLastStatus();
+            $msg .= "\n URL: ".$httpClient->getUri(true)."\n\nRequested Data: ";
+            $msg .= print_r($serverCommunication,true)."\n\nPlain Server Response: ";
+            $msg .= print_r($response,true);
+            $this->log->logError('Result of Tagging a Term was not OK!', $msg);
+            return null;
+        }
         
-        return $segments;
+        return $response;
     }
     
     
