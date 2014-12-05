@@ -170,6 +170,7 @@ class editor_Plugins_TermTagger_Bootstrap {
         }
         
         $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication', array($task));
+        /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
         
         $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         /* @var $fieldManager editor_Models_SegmentFieldManager */
