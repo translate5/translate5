@@ -62,19 +62,6 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
      * @param editor_Models_Task $task
      */
     public function __construct(editor_Models_Task $task = NULL) {
-        if (!$task) {
-            return;
-        }
-        
-        $this->tbxFile = $task->meta()->getTbxHash();
-        
-        $langModel = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $langModel editor_Models_Languages */
-        $langModel->load($task->getSourceLang());
-        $this->sourceLang = $langModel->getRfc5646();
-        $langModel->load($task->getTargetLang());
-        $this->targetLang = $langModel->getRfc5646();
-        
         $config = Zend_Registry::get('config');
         $taggerConfig = $config->runtimeOptions->termTagger;
         $this->debug = (integer)$taggerConfig->debug;
@@ -91,6 +78,19 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
                 $this->targetStringMatch = 1;
             }
         }
+        
+        if (!$task) {
+            return;
+        }
+        
+        $this->tbxFile = $task->meta()->getTbxHash();
+        
+        $langModel = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $langModel editor_Models_Languages */
+        $langModel->load($task->getSourceLang());
+        $this->sourceLang = $langModel->getRfc5646();
+        $langModel->load($task->getTargetLang());
+        $this->targetLang = $langModel->getRfc5646();
     } 
     
     /**
