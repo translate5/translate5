@@ -500,7 +500,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     }
 
     protected function log($logMessage) {
-        $msg = $logMessage.'. Task: '.$this->taskGuid;
+        $msg = $logMessage.'. Task: '.$this->task->getTaskGuid();
         /* @var $log ZfExtended_Log */
         $log = ZfExtended_Factory::get('ZfExtended_Log');
         $log->logError($msg);
