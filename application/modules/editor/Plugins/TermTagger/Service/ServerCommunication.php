@@ -71,7 +71,7 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
     */
     
     /**
-     * If $task is sumbitted, ServerCommunication is initialiced with alls required fields,
+     * If $task is sumbitted, ServerCommunication is initialized with all required fields,
      * so after that all there has to be done is addSegment()
      * 
      * @param editor_Models_Task $task

@@ -173,10 +173,9 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 ->from(array('t1' =>'LEK_terms'))
                 ->joinLeft(array('t2' =>'LEK_terms'), 't1.groupId = t2.groupId')
                 ->where('t1.taskGuid = ?', $taskGuid)
-                ->where('t1.mid IN('.$serialIds.')')
-                //->group('t1.mid')
-                ;
-        error_log(__CLASS__.'->'.__FUNCTION__.' $sql: '.$sql);
+                ->where('t2.taskGuid = ?', $taskGuid)
+                ->where('t1.mid IN('.$serialIds.')');
+        //error_log(__CLASS__.'->'.__FUNCTION__.' $sql: '.$sql);
         $terms = $this->db->getAdapter()->fetchAll($sql);
         
         $termGroups = array();
