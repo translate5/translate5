@@ -142,13 +142,14 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
             return false;
         }
             
-        $responses = $termTagger->tagterms($this->workerModel->getSlot(), $serverCommunication);
+        $response = $termTagger->tagterms($this->workerModel->getSlot(), $serverCommunication);
+        $result = $this->decodeServiceResult($response);
         // on error return false and store original untagged data
-        if ($responses == false) {
+        if (empty($result)) {
             return false;
         }
         
-        $responses = $this->groupResponseById($responses);
+        $responses = $this->groupResponseById($result->segments);
         
         foreach ($responses as $segmentId => $responseGroup) {
             
