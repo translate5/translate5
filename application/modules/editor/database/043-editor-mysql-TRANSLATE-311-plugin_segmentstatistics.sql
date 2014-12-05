@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS `LEK_plugin_segmentstatistics` (
   `segmentId` int(11) NOT NULL COMMENT 'Foreign Key to LEK_segments',
   `fileId` int(11) NOT NULL COMMENT 'Foreign Key to segment source file, needed for grouping',
   `fieldName` varchar(120) NOT NULL COMMENT 'name of the segment field',
+  `fieldType` varchar(120) NOT NULL COMMENT 'type of the segment field',
   `charCount` int(11) NOT NULL COMMENT 'number of chars (incl. whitespace) in the segment field',
   `termNotFound` int(11) NOT NULL COMMENT 'number of terms not translated in the target',
 

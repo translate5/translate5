@@ -58,11 +58,6 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
         $sfm->initFields($this->taskGuid);
         
         $fields = $sfm->getFieldList();
-        
-        $fields = array_map(function($field){
-            return $field->name;
-        }, $fields);
-        
         $termNotFoundRegEx = '#<div[^>]+class="[^"]*((term[^"]*transNotFound)|(transNotFound[^"]*term))[^"]*"[^>]*>#';
         
         $stat = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_Statistics');
@@ -70,11 +65,13 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
         //walk over segments and fields and get and store statistics data
         foreach($data as $segment) {
             foreach($fields as $field) {
-                $segmentContent = $segment->getDataObject()->$field;
+                $fieldName = $field->name;
+                $segmentContent = $segment->getDataObject()->$fieldName;
                 $stat->init();
                 $stat->setTaskGuid($this->taskGuid);
                 $stat->setSegmentId($segment->getId());
-                $stat->setFieldName($field);
+                $stat->setFieldName($fieldName);
+                $stat->setFieldType($field->type);
                 $stat->setFileId($segment->getFileId());
                 $stat->setCharCount(mb_strlen(strip_tags($segmentContent)));
                 $count = preg_match_all($termNotFoundRegEx, $segmentContent, $matches);

@@ -48,6 +48,7 @@
  * @method void setSegmentId() setSegmentId(integer $segmentid)
  * @method void setFileId() setFileId(integer $fileid)
  * @method void setFieldName() setFieldName(string $name)
+ * @method void setFieldType() setFieldType(string $type)
  * @method void setTermNotFound() setTermNotFound(integer $count)
  * @method void setCharCount() setCharCount(integer $count)
  * 
@@ -55,7 +56,7 @@
  * @method string getTaskGuid() getTaskGuid()
  * @method integer getSegmentId() getSegmentId()
  * @method integer getFileId() getFileId()
- * @method string getFieldName() getFieldName()
+ * @method string getFieldType() getFieldType()
  * @method integer getTermNotFound() getTermNotFound()
  * @method integer getCharCount() getCharCount()
  */
