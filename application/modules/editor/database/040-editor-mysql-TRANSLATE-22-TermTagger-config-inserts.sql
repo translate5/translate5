@@ -35,7 +35,7 @@
 -- 
 
 INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES 
-('runtimeOptions.termTagger.url.default', 1, 'plugin', 'termtagger', '', '', '', 'list', 'List of available TermTagger-URLs. At least one available URL must be defined'),
-('runtimeOptions.termTagger.url.import', 1, 'plugin', 'termtagger', '', '', '', 'list', 'Optional list of TermTagger-URL to use for task-import processing. Fallback is list runtimeOptions.termTagger.url.default'),
-('runtimeOptions.termTagger.url.gui', 1, 'plugin', 'termtagger', '', '', '', 'list', 'Optional list of TermTagger-URL to use for gui-response processing. Fallback is list runtimeOptions.termTagger.url.default'),
+('runtimeOptions.termTagger.url.default', 1, 'plugin', 'termtagger', '', '', '', 'list', 'List of available TermTagger-URLs. At least one available URL must be defined. Example: ["http://localhost:9000"]'),
+('runtimeOptions.termTagger.url.import', 1, 'plugin', 'termtagger', '', '', '', 'list', 'Optional list of TermTagger-URL to use for task-import processing. Fallback is list runtimeOptions.termTagger.url.default. Example: ["http://localhost:9000"]'),
+('runtimeOptions.termTagger.url.gui', 1, 'plugin', 'termtagger', '', '', '', 'list', 'Optional list of TermTagger-URL to use for gui-response processing. Fallback is list runtimeOptions.termTagger.url.default. Example: ["http://localhost:9000"]'),
 ('runtimeOptions.termTagger.segmentsPerCall', 1, 'plugin', 'termtagger', '20', '20', '', 'integer', 'Maximal number of segments the TermTagger will process in one step');
