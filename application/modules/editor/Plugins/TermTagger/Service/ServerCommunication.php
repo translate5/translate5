@@ -54,6 +54,7 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
     },
     { ... MORE SEGMENTS ... }
     ],
+    */
     
     /**
      * If $task is sumbitted, ServerCommunication is initialized with all required fields,
@@ -107,8 +108,8 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
         $segment->field = $field;
         $segment->source = $this->stripTermTagging($source);
         $segment->target = $this->stripTermTagging($target);
-        error_log(__CLASS__.'->'.__FUNCTION__.'; $source: '.$source.'; $segment->source: '.$segment->source);
-        error_log(__CLASS__.'->'.__FUNCTION__.'; $target: '.$target.'; $segment->source: '.$segment->target);
+        //error_log(__CLASS__.'->'.__FUNCTION__.'; $source: '.$source.'; $segment->source: '.$segment->source);
+        //error_log(__CLASS__.'->'.__FUNCTION__.'; $target: '.$target.'; $segment->source: '.$segment->target);
         
         $this->segments[] = $segment;
     }
