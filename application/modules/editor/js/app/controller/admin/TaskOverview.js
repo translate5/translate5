@@ -78,6 +78,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       "delete":       {title: "#UT#Aufgabe komplett löschen?", msg: "#UT#Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?"}
   },
   strings: {
+      taskImported: '#UT#Aufgabe "{0}" vollständig importiert',
       taskOpening: '#UT#Aufgabe wird im Editor geöffnet...',
       taskFinishing: '#UT#Aufgabe wird abgeschlossen...',
       taskUnFinishing: '#UT#Aufgabe wird abgeschlossen...',
@@ -118,6 +119,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
       Editor.app.on('adminViewportClosed', me.clearTasks, me);
       Editor.app.on('editorViewportOpened', me.handleInitEditor, me);
+      
+      me.getAdminTasksStore().on('load', me.startCheckImportStates, me);
 
       me.control({
           'headPanel toolbar#top-menu' : {
@@ -213,6 +216,41 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },
   loadTasks: function() {
       this.getAdminTasksStore().load();
+  },
+  startCheckImportStates: function(store) {
+      if(!this.checkImportStateTask) {
+          this.checkImportStateTask = {
+                  run: this.checkImportState,
+                  scope: this,
+                  interval: 10000
+          };
+      }
+      Ext.TaskManager.start(this.checkImportStateTask);
+  },
+  /**
+   * Checks if all actually loaded tasks are imported completly
+   */
+  checkImportState: function() {
+      var me = this, 
+          tasks = me.getAdminTasksStore(),
+          foundImporting = 0,
+          taskReloaded = function(rec) {
+              if(!rec.isImporting()) {
+                  Editor.MessageBox.addSuccess(Ext.String.format(me.strings.taskImported, rec.get('taskName')));
+              }
+          };
+      tasks.each(function(task){
+          if(!task.isImporting()){
+              return;
+          }
+          task.reload({
+              success: taskReloaded
+          });
+          foundImporting++;
+      });
+      if(foundImporting == 0) {
+          Ext.TaskManager.stop(this.checkImportStateTask);
+      }
   },
   handleChangeImportFile: function(field, val){
       var name = this.getTaskAddForm().down('textfield[name=taskName]');
