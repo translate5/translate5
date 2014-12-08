@@ -36,4 +36,4 @@
 
 INSERT INTO Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES 
 ('editor', 'noRights', 'editor_worker', 'all'),
-('editor', 'noRights', 'queue', 'all');
+('editor', 'noRights', 'editor_worker', 'queue');
