@@ -192,7 +192,7 @@ class editor_Plugins_TermTagger_Service {
             return $result;
         } catch(Exception $httpException) {
             //logging the send data is irrelevant here, since we are logging communication errors, not termtagger server errors!
-            $msg = 'Method: '.$method.'; URL was: '.$client->getUri(true);
+            $msg = 'Method: '.$method.'; URL was: '.$client->getUri(true).'; Message was: '.$httpException->getMessage();
             $this->log->logError('Exception in communication with termtagger in '.__CLASS__, $msg);
             $this->log->logException($httpException);
         }
