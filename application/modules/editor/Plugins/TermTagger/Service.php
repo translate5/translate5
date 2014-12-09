@@ -50,9 +50,19 @@ class editor_Plugins_TermTagger_Service {
      */
     protected $lastStatus;
     
-    
+    /**
+     *
+     * @var Zend_Config
+     */
+    protected $config;
+
+
+
+
     public function __construct() {
         $this->log = ZfExtended_Factory::get('ZfExtended_Log');
+        $config = Zend_Registry::get('config');
+        $this->config = $config->runtimeOptions->termTagger;
     }
     
     /**
@@ -149,6 +159,7 @@ class editor_Plugins_TermTagger_Service {
         
         // send request to TermTagger-server
         $httpClient = $this->getHttpClient($url.'/termTagger/tbxFile/');
+        $httpClient->setConfig(array('timeout' => (integer)$this->config->timeOut->tbxParsing));
         $httpClient->setRawData(json_encode($serverCommunication), 'application/json');
         $response = $this->sendRequest($httpClient, $httpClient::POST);
         if(!$response) {
@@ -181,7 +192,7 @@ class editor_Plugins_TermTagger_Service {
             return $result;
         } catch(Exception $httpException) {
             //logging the send data is irrelevant here, since we are logging communication errors, not termtagger server errors!
-            $msg = 'Method: '.$method.'; URL was: '.$client->getUri(true);
+            $msg = 'Method: '.$method.'; URL was: '.$client->getUri(true).'; Message was: '.$httpException->getMessage();
             $this->log->logError('Exception in communication with termtagger in '.__CLASS__, $msg);
             $this->log->logException($httpException);
         }
@@ -210,7 +221,7 @@ class editor_Plugins_TermTagger_Service {
     public function tagterms($url, editor_Plugins_TermTagger_Service_ServerCommunication $data) {
         $httpClient = $this->getHttpClient($url.'/termTagger/termTag/');
         $httpClient->setRawData(json_encode($data), 'application/json');
-        $httpClient->setConfig(array('timeout' => 60));
+        $httpClient->setConfig(array('timeout' => (integer)$this->config->timeOut->segmentTagging));
         $response = $this->sendRequest($httpClient, $httpClient::POST);
         
         if(!$response) {
@@ -238,8 +249,7 @@ class editor_Plugins_TermTagger_Service {
     public function test() {
         error_log(__CLASS__.' -> '.__FUNCTION__);
         
-        $config = Zend_Registry::get('config');
-        $defaultServers = $config->runtimeOptions->termTagger->url->default->toArray();
+        $defaultServers = $this->config->url->default->toArray();
         $url = $defaultServers[array_rand($defaultServers)];
         $tbxId = 'a300e1140d20e0ac18672d6790e69e0b';
         $url .= '/termTagger/tbxFile/';
@@ -292,8 +302,7 @@ class editor_Plugins_TermTagger_Service {
     public function test_2() {
         //$this->test();
         
-        $config = Zend_Registry::get('config');
-        $defaultServers = $config->runtimeOptions->termTagger->url->default->toArray();
+        $defaultServers = $this->config->url->default->toArray();
         $url = $defaultServers[array_rand($defaultServers)];
         $tbxId = 'a300e1140d20e0ac18672d6790e69e0b';
         $url .= '/termTagger/termTag/';
@@ -321,8 +330,7 @@ class editor_Plugins_TermTagger_Service {
     
     public function testTagging() {
         // select a TermTagger-Server and set tbxId
-        $config = Zend_Registry::get('config');
-        $defaultServers = $config->runtimeOptions->termTagger->url->default->toArray();
+        $defaultServers = $this->config->url->default->toArray();
         $url = $defaultServers[array_rand($defaultServers)];
         $tbxId = 'a300e1140d20e0ac18672d6790e69e0b';
         

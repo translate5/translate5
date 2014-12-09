@@ -38,4 +38,6 @@ INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`
 ('runtimeOptions.termTagger.url.default', 1, 'plugin', 'termtagger', '', '', '', 'list', 'List of available TermTagger-URLs. At least one available URL must be defined. Example: ["http://localhost:9000"]'),
 ('runtimeOptions.termTagger.url.import', 1, 'plugin', 'termtagger', '', '', '', 'list', 'Optional list of TermTagger-URL to use for task-import processing. Fallback is list runtimeOptions.termTagger.url.default. Example: ["http://localhost:9000"]'),
 ('runtimeOptions.termTagger.url.gui', 1, 'plugin', 'termtagger', '', '', '', 'list', 'Optional list of TermTagger-URL to use for gui-response processing. Fallback is list runtimeOptions.termTagger.url.default. Example: ["http://localhost:9000"]'),
-('runtimeOptions.termTagger.segmentsPerCall', 1, 'plugin', 'termtagger', '20', '20', '', 'integer', 'Maximal number of segments the TermTagger will process in one step');
+('runtimeOptions.termTagger.segmentsPerCall', 1, 'plugin', 'termtagger', '20', '20', '', 'integer', 'Maximal number of segments the TermTagger will process in one step'),
+('runtimeOptions.termTagger.timeOut.tbxParsing', 1, 'plugin', 'termtagger', '120', '120', '', 'integer', 'connection timeout when parsing tbx'),
+('runtimeOptions.termTagger.timeOut.segmentTagging', 1, 'plugin', 'termtagger', '60', '60', '', 'integer', 'connection timeout when tagging segments');

@@ -106,8 +106,15 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
         $segment = new stdClass();
         $segment->id = (string) $id;
         $segment->field = $field;
+<<<<<<< HEAD
         $segment->source = $source;
         $segment->target = $target;
+=======
+        $segment->source = $this->stripTermTagging($source);
+        $segment->target = $this->stripTermTagging($target);
+        //error_log(__CLASS__.'->'.__FUNCTION__.'; $source: '.$source.'; $segment->source: '.$segment->source);
+        //error_log(__CLASS__.'->'.__FUNCTION__.'; $target: '.$target.'; $segment->source: '.$segment->target);
+>>>>>>> f6760879e367a44d2752603540e7ae68060f7c1c
         
         $this->segments[] = $segment;
     }

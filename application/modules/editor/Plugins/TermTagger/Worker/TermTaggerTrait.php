@@ -113,17 +113,18 @@ trait editor_Plugins_TermTagger_Worker_TermTaggerTrait {
         
         // detect defined slots for the resourcePool
         $config = Zend_Registry::get('config');
+        $url = $config->runtimeOptions->termTagger->url;
         switch ($resourcePool) {
             case 'gui':
-                $availableSlots = $config->runtimeOptions->termTagger->url->gui->toArray();
+                $availableSlots = $url->gui->toArray();
                 break;
             
             case 'import':
-                $availableSlots = $config->runtimeOptions->termTagger->url->import->toArray();
+                $availableSlots = $url->import->toArray();
                 break;
             
             case 'default':
-                $availableSlots = $config->runtimeOptions->termTagger->url->default->toArray();
+                $availableSlots = $url->default->toArray();
                 break;
         }
         // no slots for this resourcePool defined

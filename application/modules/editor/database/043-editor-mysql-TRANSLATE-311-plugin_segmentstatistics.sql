@@ -34,7 +34,7 @@
 --  */
 -- 
 
-CREATE TABLE IF NOT EXISTS `LEK_plugin_segmentstatistics` (
+CREATE TABLE `LEK_plugin_segmentstatistics` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `taskGuid` varchar(38) NOT NULL COMMENT 'Foreign Key to LEK_task',
   `segmentId` int(11) NOT NULL COMMENT 'Foreign Key to LEK_segments',

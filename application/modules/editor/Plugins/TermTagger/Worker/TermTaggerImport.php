@@ -112,7 +112,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
-        error_log(__CLASS__.' -> '.__FUNCTION__);
+        //error_log(__CLASS__.' -> '.__FUNCTION__);
         
         $segmentIds = $this->loadUntaggedSegmentIds($this->workerModel->getTaskGuid());
         
