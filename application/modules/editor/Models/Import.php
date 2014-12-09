@@ -241,6 +241,9 @@ class editor_Models_Import {
         $task->loadByTaskGuid($taskGuid);
         $task->setState($task::STATE_OPEN);
         $task->save();
+        
+        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
+        $eventManager->trigger('importCompleted', $this, array('task' => $task));
     }
     
     /**
