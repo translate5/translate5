@@ -109,7 +109,6 @@ trait editor_Plugins_TermTagger_Worker_TermTaggerTrait {
      */
     private function calculateSlot($resourcePool = 'default') {
         $resourceName = self::$praefixResourceName.$resourcePool;
-        //error_log(__CLASS__.' -> '.__FUNCTION__.' $resourcePool: '.$resourcePool.' $resourceName: '.$resourceName);
         
         // detect defined slots for the resourcePool
         $config = Zend_Registry::get('config');
@@ -139,7 +138,6 @@ trait editor_Plugins_TermTagger_Worker_TermTaggerTrait {
         if (count($usedSlots) == count($availableSlots)) {
             // take first slot in list of usedSlots which is the one with the min. number of counts
             $return = array('resource' => $resourceName, 'slot' => $usedSlots[0]['slot']);
-            //error_log(__CLASS__.' -> '.__FUNCTION__.'; $return '.print_r($return, true));
             return $return;
         }
         
@@ -157,13 +155,11 @@ trait editor_Plugins_TermTagger_Worker_TermTaggerTrait {
             $unusedSlots = array_values($unusedSlots);
             
             $return = array('resource' => $resourceName, 'slot' => $unusedSlots[array_rand($unusedSlots)]);
-            //error_log(__CLASS__.' -> '.__FUNCTION__.'; $return '.print_r($return, true));
             return $return;
         }
         
         // no slot in use
         $return = array('resource' => $resourceName, 'slot' => $availableSlots[array_rand($availableSlots)]);
-        //error_log(__CLASS__.' -> '.__FUNCTION__.'; $return '.print_r($return, true));
         return $return;
     }
     
