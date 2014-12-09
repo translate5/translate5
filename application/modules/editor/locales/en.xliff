@@ -990,7 +990,7 @@
       </trans-unit>
       <trans-unit id='S29tbWVudGFyZSB6dW0gYWt0dWVsbGVuIFNlZ21lbnQ='>
 	<source>Kommentare zum aktuellen Segment</source>
-	<target>Comments to the actual segment</target>
+	<target>Comments for the current segment</target>
       </trans-unit>
       <trans-unit id='S29tbWVudGFyIG5ldQ=='>
 	<source>Kommentar neu</source>
@@ -1066,7 +1066,18 @@
 	  <source>Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:</source>
 	  <target>The following tags were duplicated while editing the segment. Therefore the segment cannot be saved. Please delete the duplicated tags. <br />Duplicated tags:</target>
 	</trans-unit>
-	<trans-unit id='V2FybnVuZyE='><source>Warnung!</source><target>Warning!</target></trans-unit>
+	<trans-unit id='V2FybnVuZyE='>
+	  <source>Warnung!</source>
+	  <target>Warning!</target>
+	</trans-unit>
+	<trans-unit id='VGVybWUgZGVzIHp1bGV0enQgYmVhcmJlaXRldGVuIFNlZ21lbnRzIGtvbm50ZW4gbmljaHQgYXVzZ2V6ZWljaG5ldCB3ZXJkZW4u'>
+	  <source>Terme des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.</source>
+	  <target>The term tagger could not tag the terminology in the last edited segment!</target>
+	</trans-unit>
+	<trans-unit id='QXVmZ2FiZSAiezB9IiB2b2xsc3TDpG5kaWcgaW1wb3J0aWVydA=='>
+	  <source>Aufgabe "{0}" vollständig importiert</source>
+	  <target>Import of Task "{0}" completed!</target>
+	</trans-unit>
     </body>
   </file>
 </xliff>
