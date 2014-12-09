@@ -278,7 +278,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             $this->log('termEntry Tag without an ID found and ignored!');
             return;
         }
-
+        
         //alles was kein termEntry ist verarbeiten.
         //Wenn ein termEntry erreicht wird, ist das das EndTag des aktuellen Term Entries
         while($this->xml->read() && $this->xml->name !== 'termEntry') {
@@ -383,7 +383,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         foreach ($this->actualTermsInLangSet as $mid => $termData) {
             $termData['taskGuid'] = $this->task->getTaskGuid();
             //term; mid; status in $termData
-            $termData['definition'] = $this->actualDefinition;
+            if (!empty($termData['definition']) && !empty($this->actualDefinition)) {
+                $termData['definition'] = $this->actualDefinition." ".$termData['definition'];
+            }
+            if (empty($termData['definition'])) {
+                $termData['definition'] = $this->actualDefinition;
+            }
             $termData['groupId'] = $this->actualTermEntry;
             $termData['language'] = $this->actualLangID;
             if(empty($termData['status'])){
@@ -428,7 +433,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
      */
     protected function handleTig() {
         if($this->isStartTag()){
-            $this->actualTig = array('mid' => null, 'term' => null, 'status' => null);
+            $this->actualTig = array('mid' => null, 'term' => null, 'status' => null, 'definition' => null);
             return;
         }
         if(!$this->isEndTag()){
@@ -485,10 +490,19 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
      * Extrahiert die Term Definition
      */
     protected function handleDefinition() {
-        if(!$this->isStartTag() || $this->xml->getAttribute('type') !== 'Definition'){
-          return;
+        if(!$this->isStartTag() || !in_array($this->xml->getAttribute('type'), array('definition', 'Definition'))) {
+            return;
         }
-        $this->actualDefinition = $this->xml->readString();
+        
+        // if <descrip> on <tig>-level, write term-definition direct into actualTig
+        if ($this->xml->getAttribute('type') == 'definition') {
+            $this->actualTig['definition'] = $this->xml->readString();
+            return;
+        }
+        
+        if ($this->xml->getAttribute('type') == 'Definition') {
+            $this->actualDefinition = $this->xml->readString();
+        }
     }
 
     protected function isEndTag() {

@@ -109,7 +109,6 @@ trait editor_Plugins_TermTagger_Worker_TermTaggerTrait {
      */
     private function calculateSlot($resourcePool = 'default') {
         $resourceName = self::$praefixResourceName.$resourcePool;
-        //error_log(__CLASS__.' -> '.__FUNCTION__.' $resourcePool: '.$resourcePool.' $resourceName: '.$resourceName);
         
         // detect defined slots for the resourcePool
         $config = Zend_Registry::get('config');
@@ -139,7 +138,6 @@ trait editor_Plugins_TermTagger_Worker_TermTaggerTrait {
         if (count($usedSlots) == count($availableSlots)) {
             // take first slot in list of usedSlots which is the one with the min. number of counts
             $return = array('resource' => $resourceName, 'slot' => $usedSlots[0]['slot']);
-            //error_log(__CLASS__.' -> '.__FUNCTION__.'; $return '.print_r($return, true));
             return $return;
         }
         
@@ -157,51 +155,14 @@ trait editor_Plugins_TermTagger_Worker_TermTaggerTrait {
             $unusedSlots = array_values($unusedSlots);
             
             $return = array('resource' => $resourceName, 'slot' => $unusedSlots[array_rand($unusedSlots)]);
-            //error_log(__CLASS__.' -> '.__FUNCTION__.'; $return '.print_r($return, true));
             return $return;
         }
         
         // no slot in use
         $return = array('resource' => $resourceName, 'slot' => $availableSlots[array_rand($availableSlots)]);
-        //error_log(__CLASS__.' -> '.__FUNCTION__.'; $return '.print_r($return, true));
         return $return;
     }
     
-    /**
-     * decodes the TermTagger JSON and logs an error if data can not be processed
-     * @param Zend_Http_Response $result
-     * @return stdClass or null on error
-     */
-    protected function decodeServiceResult(Zend_Http_Response $result = null) {
-        if(empty($result)) {
-            return null;
-        }
-        
-        $data = json_decode($result->getBody());
-        if(!empty($data)) {
-            if(!empty($data->error)) {
-                $this->log->logError(__CLASS__.' decoded TermTagger Result but with following Error from TermTagger: ', print_r($data,1));
-            }
-            return $data;
-        }
-        $msg = "Original TermTagger Result was: \n".$result->getBody()."\n JSON decode error was: ";
-        if (function_exists('json_last_error_msg')) {
-            $msg .= json_last_error_msg();
-        } else {
-            static $errors = array(
-                JSON_ERROR_NONE             => null,
-                JSON_ERROR_DEPTH            => 'Maximum stack depth exceeded',
-                JSON_ERROR_STATE_MISMATCH   => 'Underflow or the modes mismatch',
-                JSON_ERROR_CTRL_CHAR        => 'Unexpected control character found',
-                JSON_ERROR_SYNTAX           => 'Syntax error, malformed JSON',
-                JSON_ERROR_UTF8             => 'Malformed UTF-8 characters, possibly incorrectly encoded'
-            );
-            $error = json_last_error();
-            $msg .=  array_key_exists($error, $errors) ? $errors[$error] : "Unknown error ({$error})";
-        }
-        $this->log->logError(__CLASS__.' cannot json_decode TermTagger Result!', $msg);
-        return null;
-    }
     
     /**
      * @param editor_Models_Task $task

@@ -49,6 +49,20 @@ class editor_Plugins_TermTagger_Bootstrap {
      */
     protected $log;
     
+    /**
+     * Fieldname of the source-field of this task
+     * @var string
+     */
+    private $sourceFieldName = '';
+    
+    /**
+     * Fieldname of the source-field of this task if the task is editable
+     * @var string
+     */
+    private $sourceFieldNameOriginal = '';
+    
+    
+    
     public function __construct() {
         $this->log = ZfExtended_Factory::get('ZfExtended_Log', array(false));
 
@@ -62,12 +76,7 @@ class editor_Plugins_TermTagger_Bootstrap {
         $this->staticEvents->attach('editor_Models_Import_MetaData', 'importMetaData', array($this, 'handleImportMeta'));
         $this->staticEvents->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndex'));
         $this->staticEvents->attach('editor_Workflow_Default', array('doView', 'doEdit'), array($this, 'handleAfterTaskOpen'));
-        //$this->staticEvents->attach('editor_Models_Segment', 'beforeSave', array($this, 'handleBeforeSegmentSave'));
         $this->staticEvents->attach('Editor_SegmentController', 'beforePutSave', array($this, 'handleBeforePutSave'));
-        
-        // SBE: only for testing
-        $this->staticEvents->attach('IndexController', 'beforeStephanAction', array($this, 'handleTest'));
-        // SBE end of testing event-listeners
     }
     
     /**
@@ -132,7 +141,6 @@ class editor_Plugins_TermTagger_Bootstrap {
      * @param $event Zend_EventManager_Event
      */
     public function handleAfterIndex(Zend_EventManager_Event $event) {
-        //error_log('function called: ' . get_class($this) . '->' . __FUNCTION__);
         $params = $event->getParams();
         $view = $params[0];
         
@@ -148,7 +156,6 @@ class editor_Plugins_TermTagger_Bootstrap {
      * @param $event Zend_EventManager_Event
      */
     public function handleAfterTaskOpen(Zend_EventManager_Event $event) {
-        //error_log('function called: ' . get_class($this) . '->' . __FUNCTION__);
     }
     
     
@@ -169,20 +176,67 @@ class editor_Plugins_TermTagger_Bootstrap {
             return;
         }
         
+        $serverCommunication = $this->fillServerCommunication($task, $segment);
+        /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
+        
+        $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTagger');
+        /* @var $worker editor_Plugins_TermTagger_Worker_TermTagger */
+        if (!$worker->init($taskGuid, array('serverCommunication' => $serverCommunication, 'resourcePool' => 'gui'))) {
+            $this->log('TermTagger-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
+            return false;
+        }
+        
+        if (!$worker->run()) {
+            $messages = Zend_Registry::get('rest_messages');
+            /* @var $messages ZfExtended_Models_Messages */
+            $messages->addError('Terme des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.');
+            return false;
+        }
+        
+        $results = $worker->getResult();
+        $sourceTextTagged = false;
+        foreach ($results as $result) {
+            if ($result->field == 'SourceOriginal') {
+                $segment->set($this->sourceFieldNameOriginal, $result->source);
+                continue;
+            }
+            
+            if (!$sourceTextTagged) {
+                $segment->set($this->sourceFieldName, $result->source);
+                $sourceTextTagged = true;
+            }
+            
+            $segment->set($result->field, $result->target);
+        }
+        
+        return true;
+    }
+    
+    /**
+     * inclusive all fields of the provided $segment
+     * Creates a ServerCommunication-Object initialized with $task
+     * 
+     * @param editor_Models_Task $task
+     * @param editor_Models_Segment $segment
+     * @return editor_Plugins_TermTagger_Service_ServerCommunication
+     */
+    private function fillServerCommunication (editor_Models_Task $task, editor_Models_Segment $segment) {
+        
         $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication', array($task));
         /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
         
         $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         /* @var $fieldManager editor_Models_SegmentFieldManager */
-        $fieldManager->initFields($taskGuid);
-        $sourceFieldName = $fieldManager->getFirstSourceName();
-        $sourceText = $segment->get($sourceFieldName);
+        $fieldManager->initFields($task->getTaskGuid());
+        
+        $this->sourceFieldName = $fieldManager->getFirstSourceName();
+        $sourceText = $segment->get($this->sourceFieldName);
         
         if ($task->getEnableSourceEditing()) {
-            $sourceFieldNameOriginal = $sourceFieldName;
+            $this->sourceFieldNameOriginal = $this->sourceFieldName;
             $sourceTextOriginal = $sourceText;
-            $sourceFieldName = $fieldManager->getEditIndex($fieldManager->getFirstSourceName());
-            $sourceText = $segment->get($sourceFieldName);
+            $this->sourceFieldName = $fieldManager->getEditIndex($fieldManager->getFirstSourceName());
+            $sourceText = $segment->get($this->sourceFieldName);
         }
         
         $fields = $fieldManager->getFieldList();
@@ -203,104 +257,7 @@ class editor_Plugins_TermTagger_Bootstrap {
             $serverCommunication->addSegment($segment->getId(), $targetFieldName, $sourceText, $segment->get($targetFieldName));
         }
         
-        $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTagger');
-        /* @var $worker editor_Plugins_TermTagger_Worker_TermTagger */
-        if (!$worker->init($taskGuid, array('serverCommunication' => $serverCommunication, 'resourcePool' => 'gui'))) {
-            $this->log('TermTagger-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
-            return false;
-        }
-        
-        if (!$worker->run()) {
-            $messages = Zend_Registry::get('rest_messages');
-            /* @var $messages ZfExtended_Models_Messages */
-            $messages->addError('Terme des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.');
-            return false;
-        }
-        
-        $results = $worker->getResult();
-        $sourceTextTagged = false;
-        foreach ($results as $result) {
-            if ($result->field == 'SourceOriginal') {
-                $segment->set($sourceFieldNameOriginal, $result->source);
-                continue;
-            }
-            
-            if (!$sourceTextTagged) {
-                $segment->set($sourceFieldName, $result->source);
-                $sourceTextTagged = true;
-            }
-            
-            $segment->set($result->field, $result->target);
-        }
-        
-        return true;
+        return $serverCommunication;
     }
     
-    
-    /**
-     * handler for test-events: IndexController#beforeStephanAction
-     */
-    public function handleTest(Zend_EventManager_Event $event) {
-        //$segment = $event->getParam('model');
-        /* @var $segment editor_Models_Segment */
-        //error_log(__CLASS__.' -> '.__FUNCTION__.'; $segment: '.print_r($segment->getDataObject(), true));
-        
-        $request = ZfExtended_Factory::get('Zend_Controller_Request_Http');
-        /* @var $request Zend_Controller_Request_Http */
-        
-        if ($request->getParam('startTest_1') == 1) {
-            $this->test_1();
-        }
-        
-        if ($request->getParam('startTest_2')) {
-            $this->test_2();
-        }
-        
-        if ($request->getParam('startTest_3')) {
-            $this->test_3();
-        }
-        
-        return false;
-    }
-    
-    private function test_1() {
-        error_log(__CLASS__.' -> '.__FUNCTION__);
-        
-        $workerQueue = ZfExtended_Factory::get('ZfExtended_Worker_Queue');
-        /* @var $workerQueue ZfExtended_Worker_Queue */
-        $workerQueue->process();
-    }
-    
-    private function test_2() {
-        error_log(__CLASS__.' -> '.__FUNCTION__);
-    }
-    
-    
-    private function test_3() {
-        error_log(__CLASS__.' -> '.__FUNCTION__);
-        
-        //$workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $workerModel ZfExtended_Models_Worker */
-        //$workerListSlotsCount = $workerModel->getListSlotsCount('TermTagger_default');
-        //error_log(__CLASS__.' -> '.__FUNCTION__.'; Liste-Resource: '.print_r($workerListSlotsCount, true));
-        
-        //$workerModel->wakeupScheduled('{10ea5327-8257-4f4e-abf0-8063e9878b17}');
-        
-        $termtaggerService = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
-        /* @var $termtaggerService editor_Plugins_TermTagger_Service */
-        //$termtaggerService->test();
-        //$termtaggerService->test_2();
-        $termtaggerService->testTagging();
-        return;
-        
-        
-        $config = Zend_Registry::get('config');
-        $defaultServers = $config->runtimeOptions->termTagger->url->default->toArray();
-        $url = $defaultServers[array_rand($defaultServers)];
-        //error_log(__CLASS__.' -> '.__FUNCTION__.'; Teste TermTagger-Server $url: '.$url.'; Ergebnis: '.$termtaggerService->testServerUrl($url));
-        //$termtaggerService->ping($url, rand(10000000, 99999999));
-        //$response = $termtaggerService->openFetchIds($url, 'a300e1140d20e0ac18672d6790e69e0b', '/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/{C1D11C25-45D2-11D0-B0E2-444553540203}.tbx');
-        $response = $termtaggerService->open($url, 'a300e1140d20e0ac18672d6790e69e0b', file_get_contents('/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/Test_2.tbx'));
-        error_log(__CLASS__.' -> '.__FUNCTION__.'; $response: '.$response);
-    }
 }

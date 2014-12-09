@@ -42,6 +42,20 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
     
     
     /**
+     * 
+     * @var editor_Plugins_TermTagger_Service_ServerCommunication
+     */
+    private $serverCommunication = NULL;
+    
+    /**
+     * Fieldname of the source-field of this task
+     * @var string
+     */
+    private $sourceFieldName = '';
+    
+    
+    
+    /**
      * Special Paramters:
      * 
      * $parameters['resourcePool']
@@ -98,8 +112,6 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
-        //error_log(__CLASS__.' -> '.__FUNCTION__);
-        
         $segmentIds = $this->loadUntaggedSegmentIds($this->workerModel->getTaskGuid());
         
         if (empty($segmentIds)) {
@@ -107,72 +119,26 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
         }
         
         $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_task */
+        /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($this->workerModel->getTaskGuid());
         
-        $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication', array($task));
+        $serverCommunication = $this->fillServerCommunication($task, $segmentIds);
         /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
         
-        $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
-        /* @var $fieldManager editor_Models_SegmentFieldManager */
-        $fieldManager->initFields($this->workerModel->getTaskGuid());
-        $segmentFields = $fieldManager->getFieldList();
-        $sourceFieldName = $fieldManager->getFirstSourceName();
-        
-        foreach ($segmentIds as $segmentId) {
-            $segment = ZfExtended_Factory::get('editor_Models_Segment');
-            /* @var $segment editor_Models_Segment */
-            $segment->load($segmentId);
-            $segment->meta()->setTermtagState($this::$SEGMENT_STATE_INPROGRESS);
-            $segment->meta()->save();
-            
-            $sourceText = $segment->get($sourceFieldName);
-            
-            foreach ($segmentFields as $field) {
-                if($field->type != editor_Models_SegmentField::TYPE_TARGET || !$field->editable) {
-                    continue;
-                }
-                
-                $serverCommunication->addSegment($segment->getId(), $field->name, $sourceText, $segment->getTargetEdit());
-            }
-        }
-                
         $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
         /* @var $termTagger editor_Plugins_TermTagger_Service */
         if (!$this->checkTermTaggerTbx($this->workerModel->getSlot(), $serverCommunication->tbxFile)) {
             return false;
         }
             
-        $response = $termTagger->tagterms($this->workerModel->getSlot(), $serverCommunication);
-        $result = $this->decodeServiceResult($response);
+        $result = $termTagger->tagterms($this->workerModel->getSlot(), $serverCommunication);
+        
         // on error return false and store original untagged data
         if (empty($result)) {
             return false;
         }
         
-        $responses = $this->groupResponseById($result->segments);
-        
-        foreach ($responses as $segmentId => $responseGroup) {
-            
-            $segment = ZfExtended_Factory::get('editor_Models_Segment');
-            /* @var $segment editor_Models_Segment */
-            $segment->load($segmentId);
-            
-            $segment->set($sourceFieldName, $responseGroup[0]->source);
-            if ($task->getEnableSourceEditing()) {
-                $segment->set($fieldManager->getEditIndex($sourceFieldName), $responseGroup[0]->source);
-            }
-            
-            foreach ($responseGroup as $response) {
-                $segment->set($response->field, $response->target);
-                $segment->set($fieldManager->getEditIndex($response->field), $response->target);
-            }
-            
-            $segment->save();
-            
-            $segment->meta()->setTermtagState($this::$SEGMENT_STATE_TAGGED);
-            $segment->meta()->save();
-        }
+        $this->saveSegments($task, $result->segments);
         
         // initialize an new worker-queue-entry
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
@@ -208,11 +174,85 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
                             array($this::$SEGMENT_STATE_TAGGED, $this::$SEGMENT_STATE_INPROGRESS)) // later there may will be a state 'targetnotfound'
                     ->order('segment.id')
                     ->limit($limit);
-        //error_log(__CLASS__.' -> '.__FUNCTION__.'; $sql: '.$sql);
         $segmentIds = $db->fetchAll($sql)->toArray();
-        //error_log(__CLASS__.' -> '.__FUNCTION__.'; $segmentIds: '.print_r($segmentIds, true));
         
         return $segmentIds;
+    }
+    
+    /**
+     * Creates a ServerCommunication-Object initialized with $task
+     * inclusive all field of alls segments provided in $segmentIds
+     * 
+     * @param editor_Models_Task $task
+     * @param array $segmentIds
+     * @return editor_Plugins_TermTagger_Service_ServerCommunication
+     */
+    private function fillServerCommunication (editor_Models_Task $task, array $segmentIds) {
+        
+        $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication', array($task));
+        /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
+        
+        $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        /* @var $fieldManager editor_Models_SegmentFieldManager */
+        $fieldManager->initFields($this->workerModel->getTaskGuid());
+        $segmentFields = $fieldManager->getFieldList();
+        $this->sourceFieldName = $fieldManager->getFirstSourceName();
+        
+        foreach ($segmentIds as $segmentId) {
+            $segment = ZfExtended_Factory::get('editor_Models_Segment');
+            /* @var $segment editor_Models_Segment */
+            $segment->load($segmentId);
+            $segment->meta()->setTermtagState($this::$SEGMENT_STATE_INPROGRESS);
+            $segment->meta()->save();
+            
+            $sourceText = $segment->get($this->sourceFieldName);
+            
+            foreach ($segmentFields as $field) {
+                if($field->type != editor_Models_SegmentField::TYPE_TARGET || !$field->editable) {
+                    continue;
+                }
+                
+                $serverCommunication->addSegment($segment->getId(), $field->name, $sourceText, $segment->getTargetEdit());
+            }
+        }
+        
+        return $serverCommunication;
+    }
+    
+    /**
+     * Save TermTagged-segments for $task povided in $segments
+     * 
+     * @param editor_Models_Task $task
+     * @param unknown $segments
+     */
+    private function saveSegments(editor_Models_Task $task, $segments) {
+        $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        /* @var $fieldManager editor_Models_SegmentFieldManager */
+        $fieldManager->initFields($this->workerModel->getTaskGuid());
+        
+        $responses = $this->groupResponseById($segments);
+        
+        foreach ($responses as $segmentId => $responseGroup) {
+        
+            $segment = ZfExtended_Factory::get('editor_Models_Segment');
+            /* @var $segment editor_Models_Segment */
+            $segment->load($segmentId);
+        
+            $segment->set($this->sourceFieldName, $responseGroup[0]->source);
+            if ($task->getEnableSourceEditing()) {
+                $segment->set($fieldManager->getEditIndex($this->sourceFieldName), $responseGroup[0]->source);
+            }
+        
+            foreach ($responseGroup as $response) {
+                $segment->set($response->field, $response->target);
+                $segment->set($fieldManager->getEditIndex($response->field), $response->target);
+            }
+        
+            $segment->save();
+        
+            $segment->meta()->setTermtagState($this::$SEGMENT_STATE_TAGGED);
+            $segment->meta()->save();
+        }
     }
     
     /**

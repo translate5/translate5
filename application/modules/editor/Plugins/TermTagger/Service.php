@@ -55,10 +55,24 @@ class editor_Plugins_TermTagger_Service {
      * @var Zend_Config
      */
     protected $config;
-
-
-
-
+    
+    
+    /**
+     * Two corresponding array to hold replaced tags.
+     * Tags must be replaced in every text-element before send to the TermTagger-Server,
+     * because TermTagger can not handle with already TermTagged-text.
+     */
+    private $replacedTagsNeedles = array();
+    private $replacedTagsReplacements = array();
+    
+    /**
+     * Holds a counter for replacedTags to make needles unic
+     * @var integer
+    */
+    private $replaceCounter = 1;
+    
+    
+    
     public function __construct() {
         $this->log = ZfExtended_Factory::get('ZfExtended_Log');
         $config = Zend_Registry::get('config');
@@ -175,6 +189,10 @@ class editor_Plugins_TermTagger_Service {
             return null;
         }
         
+        $response = $this->decodeServiceResult($response);
+        if (!$response) {
+            return NULL;
+        }
         return $response;
     }
     
@@ -219,6 +237,9 @@ class editor_Plugins_TermTagger_Service {
      * @return Zend_Http_Response or null on error
      */
     public function tagterms($url, editor_Plugins_TermTagger_Service_ServerCommunication $data) {
+        
+        $data = $this->encodeSegments($data);
+        
         $httpClient = $this->getHttpClient($url.'/termTagger/termTag/');
         $httpClient->setRawData(json_encode($data), 'application/json');
         $httpClient->setConfig(array('timeout' => (integer)$this->config->timeOut->segmentTagging));
@@ -238,115 +259,104 @@ class editor_Plugins_TermTagger_Service {
             return null;
         }
         
+        $response = $this->decodeServiceResult($response);
+        if (!$response) {
+            return NULL;
+        }
+        
+        $response = $this->decodeSegments($response);
+        
         return $response;
     }
     
+    private function encodeSegments(editor_Plugins_TermTagger_Service_ServerCommunication $data) {
+        $matchContentRegExp = '/<div[^>]+class="(open|close|single).*?".*?\/div>/is';
+        
+        foreach ($data->segments as & $segment) {
+            $segment->source = $this->encodeText($segment->source);
+            $segment->target = $this->encodeText($segment->target);
+        }
+        
+        return $data;
+    }
     
+    private function decodeSegments($data) {
+        foreach ($data->segments as & $segment) {
+            $segment->source = $this->decodeText($segment->source);
+            $segment->target = $this->decodeText($segment->target);
+        }
+        
+        return $data;
+    }
     
-    // ***********************************************************************
-    // all following functions are only for testing while development.... can be deleted
-    // ***********************************************************************
-    public function test() {
-        error_log(__CLASS__.' -> '.__FUNCTION__);
+    private function encodeText($text) {
+        $matchContentRegExp = '/<div[^>]+class="(open|close|single).*?".*?\/div>/is';
         
-        $defaultServers = $this->config->url->default->toArray();
-        $url = $defaultServers[array_rand($defaultServers)];
-        $tbxId = 'a300e1140d20e0ac18672d6790e69e0b';
-        $url .= '/termTagger/tbxFile/';
+        preg_match_all($matchContentRegExp, $text, $tempMatches);
         
-        $httpClient = new Zend_Http_Client();
+        if (empty($tempMatches)) {
+            return $text;
+        }
+        $textOriginal = $text;
         
-        // push tbx to TermTaggerServer
-        $httpClient->setUri($url);
-        $httpClient->setRawData($this->getTestJson($tbxId), 'application/json');
-        $response = $httpClient->request('POST');
-        /* @var $response Zend_Http_Response */
-        //error_log(__CLASS__.'->'.__FUNCTION__.'; $httpClient->getUri(): '.$url."\n".'$httpClient->getLastRequest(): '.$httpClient->getLastRequest());
-        error_log(__CLASS__.'->'.__FUNCTION__.'; UPLOAD TBX  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
+        foreach ($tempMatches[0] as $match) {
+            $needle = '<img class="content-tag" src="'.$this->replaceCounter++.'" alt="TaggingError" />';
+            $this->replacedTagsNeedles[] = $needle;
+            $this->replacedTagsReplacements[] = $match;
+            
+            $text = str_replace($match, $needle, $text);
+        }
+        $text = preg_replace('/<div[^>]+>/is', '', $text);
+        $text = preg_replace('/<\/div>/', '', $text);
         
-        return;
+        return $text;
+    }
+    
+    private function decodeText($text) {
+        if (empty($this->replacedTagsNeedles)) {
+            return $text;
+        }
+        $textOriginal = $text;
+        $text = str_replace($this->replacedTagsNeedles, $this->replacedTagsReplacements, $text);
         
-        // check tbx on TermTaggerServer
-        $httpClient->setUri($url.$tbxId);
-        $response = $httpClient->request('HEAD');
-        error_log(__CLASS__.'->'.__FUNCTION__.'; CHECK TBX  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
-        
-        // delete tbx on TermTaggerServer
-        $httpClient->setUri($url.$tbxId);
-        $response = $httpClient->request('DELETE');
-        //error_log(__CLASS__.'->'.__FUNCTION__.'; $httpClient->getUri(): '.$url."\n".'$httpClient->getLastRequest(): '.$httpClient->getLastRequest());
-        error_log(__CLASS__.'->'.__FUNCTION__.'; DELETE TBX  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
-        
-        // check tbx on TermTaggerServer
-        $httpClient->setUri($url.$tbxId);
-        $response = $httpClient->request('HEAD');
-        error_log(__CLASS__.'->'.__FUNCTION__.'; CHECK TBX AGAIN  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
-        
+        return $text;
     }
     
     
-    private function getTestJson($tbxFileId = NULL) {
-        //$testJson = file_get_contents('/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/json_test_data/tbx_post_request.json');
-        //return $testJson;
-                
-        $tempReturn = array();
-        $tempReturn['tbxFile'] = $tbxFileId;
-        $tempReturn['addIds'] = true;
-        $tempReturn['tbxdata'] = file_get_contents('/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/{C1D11C25-45D2-11D0-B0E2-444553540203}.tbx');
-        //error_log(__CLASS__.'->'.__FUNCTION__.'; $tempReturn: '.print_r($tempReturn, true));
-        
-        return json_encode($tempReturn);
+    /**
+     * decodes the TermTagger JSON and logs an error if data can not be processed
+     * @param Zend_Http_Response $result
+     * @return stdClass or null on error
+     */
+    private function decodeServiceResult(Zend_Http_Response $result = null) {
+        if(empty($result)) {
+            return null;
+        }
+    
+        $data = json_decode($result->getBody());
+        if(!empty($data)) {
+            if(!empty($data->error)) {
+                $this->log->logError(__CLASS__.' decoded TermTagger Result but with following Error from TermTagger: ', print_r($data,1));
+            }
+            return $data;
+        }
+        $msg = "Original TermTagger Result was: \n".$result->getBody()."\n JSON decode error was: ";
+        if (function_exists('json_last_error_msg')) {
+            $msg .= json_last_error_msg();
+        } else {
+            static $errors = array(
+                            JSON_ERROR_NONE             => null,
+                            JSON_ERROR_DEPTH            => 'Maximum stack depth exceeded',
+                            JSON_ERROR_STATE_MISMATCH   => 'Underflow or the modes mismatch',
+                            JSON_ERROR_CTRL_CHAR        => 'Unexpected control character found',
+                            JSON_ERROR_SYNTAX           => 'Syntax error, malformed JSON',
+                            JSON_ERROR_UTF8             => 'Malformed UTF-8 characters, possibly incorrectly encoded'
+            );
+            $error = json_last_error();
+            $msg .=  array_key_exists($error, $errors) ? $errors[$error] : "Unknown error ({$error})";
+        }
+        $this->log->logError(__CLASS__.' cannot json_decode TermTagger Result!', $msg);
+        return null;
     }
     
-    
-    public function test_2() {
-        //$this->test();
-        
-        $defaultServers = $this->config->url->default->toArray();
-        $url = $defaultServers[array_rand($defaultServers)];
-        $tbxId = 'a300e1140d20e0ac18672d6790e69e0b';
-        $url .= '/termTagger/termTag/';
-        
-        $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication');
-        /*@var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
-        
-        $serverCommunication->tbxFile = $tbxId;
-        $serverCommunication->sourceLang = 'de';
-        $serverCommunication->targetLang = 'en';
-        
-        $serverCommunication->addSegment(123, 'target', 'Haus', 'home');
-        $serverCommunication->addSegment(456, 'target', 'Apache', 'Apache');
-        
-        //error_log(__CLASS__.' -> '.__FUNCTION__.'; $serverCommunication: '.print_r($serverCommunication, true));
-        //error_log(__CLASS__.' -> '.__FUNCTION__.'; $serverCommunication: '.json_encode($serverCommunication));
-        
-        $httpClient = new Zend_Http_Client();
-        $httpClient->setUri($url);
-        $httpClient->setRawData(json_encode($serverCommunication), 'application/json');
-        $response = $httpClient->request('POST');
-        error_log(__CLASS__.'->'.__FUNCTION__.'; TERMTAG-REQUEST  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$httpClient->getLastRequest(): '.$httpClient->getLastRequest());
-        error_log(__CLASS__.'->'.__FUNCTION__.'; TERMTAG-RESPONSE  $httpClient->getUri(): '.$httpClient->getUri()."\n".'$response: '.$response);
-    }
-    
-    public function testTagging() {
-        // select a TermTagger-Server and set tbxId
-        $defaultServers = $this->config->url->default->toArray();
-        $url = $defaultServers[array_rand($defaultServers)];
-        $tbxId = 'a300e1140d20e0ac18672d6790e69e0b';
-        
-        // config  ServerCommunication-data
-        $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication');
-        /*@var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
-        
-        $serverCommunication->tbxFile = $tbxId;
-        $serverCommunication->sourceLang = 'en';
-        $serverCommunication->targetLang = 'de';
-        
-        //$serverCommunication->addSegment(123, 'target', 'macht prefork Haus home', 'macht prefork Haus home');
-        $serverCommunication->addSegment(1417, 'target', 'More information about installation options for Apache may be found there.', 'Apache macht prefork Haus home');
-                
-        // finally call $this-
-        $response = $this->tagterms($url, $serverCommunication);
-        error_log(__CLASS__.'->'.__FUNCTION__.'; $response: '.print_r($response, true));
-    }
 }

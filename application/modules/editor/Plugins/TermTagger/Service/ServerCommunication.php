@@ -106,17 +106,9 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
         $segment = new stdClass();
         $segment->id = (string) $id;
         $segment->field = $field;
-        $segment->source = $this->stripTermTagging($source);
-        $segment->target = $this->stripTermTagging($target);
-        //error_log(__CLASS__.'->'.__FUNCTION__.'; $source: '.$source.'; $segment->source: '.$segment->source);
-        //error_log(__CLASS__.'->'.__FUNCTION__.'; $target: '.$target.'; $segment->source: '.$segment->target);
+        $segment->source = $source;
+        $segment->target = $target;
         
         $this->segments[] = $segment;
     }
-    
-    private function stripTermTagging($text) {
-        return $text;
-        return preg_replace('/<div.*?class=".*?term.*?".*?>/', '<div>', $text);
-    }
-
 }
