@@ -129,8 +129,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerLoader extends ZfExtended_Worke
         $task->meta()->setTbxHash($hash);
         $task->meta()->save();
         
-        $response = $service->openFetchIds($url, $hash, $tbxData);
-        $result = $this->decodeServiceResult($response);
+        $result = $service->openFetchIds($url, $hash, $tbxData);
         
         if(empty($result)) {
             return false;

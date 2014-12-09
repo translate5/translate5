@@ -55,10 +55,24 @@ class editor_Plugins_TermTagger_Service {
      * @var Zend_Config
      */
     protected $config;
-
-
-
-
+    
+    
+    /**
+     * Two corresponding array to hold replaced tags.
+     * Tags must be replaced in every text-element before send to the TermTagger-Server,
+     * because TermTagger can not handle with already TermTagged-text.
+     */
+    private $replacedTagsNeedles = array();
+    private $replacedTagsReplacements = array();
+    
+    /**
+     * Holds a counter for replacedTags to make needles unic
+     * @var integer
+    */
+    private $replaceCounter = 1;
+    
+    
+    
     public function __construct() {
         $this->log = ZfExtended_Factory::get('ZfExtended_Log');
         $config = Zend_Registry::get('config');
@@ -175,6 +189,10 @@ class editor_Plugins_TermTagger_Service {
             return null;
         }
         
+        $response = $this->decodeServiceResult($response);
+        if (!$response) {
+            return NULL;
+        }
         return $response;
     }
     
@@ -219,6 +237,9 @@ class editor_Plugins_TermTagger_Service {
      * @return Zend_Http_Response or null on error
      */
     public function tagterms($url, editor_Plugins_TermTagger_Service_ServerCommunication $data) {
+        
+        $data = $this->encodeSegments($data);
+        
         $httpClient = $this->getHttpClient($url.'/termTagger/termTag/');
         $httpClient->setRawData(json_encode($data), 'application/json');
         $httpClient->setConfig(array('timeout' => (integer)$this->config->timeOut->segmentTagging));
@@ -238,6 +259,104 @@ class editor_Plugins_TermTagger_Service {
             return null;
         }
         
+        $response = $this->decodeServiceResult($response);
+        if (!$response) {
+            return NULL;
+        }
+        
+        $response = $this->decodeSegments($response);
+        
         return $response;
     }
+    
+    private function encodeSegments(editor_Plugins_TermTagger_Service_ServerCommunication $data) {
+        $matchContentRegExp = '/<div[^>]+class="(open|close|single).*?".*?\/div>/is';
+        
+        foreach ($data->segments as & $segment) {
+            $segment->source = $this->encodeText($segment->source);
+            $segment->target = $this->encodeText($segment->target);
+        }
+        
+        return $data;
+    }
+    
+    private function decodeSegments($data) {
+        foreach ($data->segments as & $segment) {
+            $segment->source = $this->decodeText($segment->source);
+            $segment->target = $this->decodeText($segment->target);
+        }
+        
+        return $data;
+    }
+    
+    private function encodeText($text) {
+        $matchContentRegExp = '/<div[^>]+class="(open|close|single).*?".*?\/div>/is';
+        
+        preg_match_all($matchContentRegExp, $text, $tempMatches);
+        
+        if (empty($tempMatches)) {
+            return $text;
+        }
+        $textOriginal = $text;
+        
+        foreach ($tempMatches[0] as $match) {
+            $needle = '<img class="content-tag" src="'.$this->replaceCounter++.'" alt="TaggingError" />';
+            $this->replacedTagsNeedles[] = $needle;
+            $this->replacedTagsReplacements[] = $match;
+            
+            $text = str_replace($match, $needle, $text);
+        }
+        $text = preg_replace('/<div[^>]+>/is', '', $text);
+        $text = preg_replace('/<\/div>/', '', $text);
+        
+        return $text;
+    }
+    
+    private function decodeText($text) {
+        if (empty($this->replacedTagsNeedles)) {
+            return $text;
+        }
+        $textOriginal = $text;
+        $text = str_replace($this->replacedTagsNeedles, $this->replacedTagsReplacements, $text);
+        
+        return $text;
+    }
+    
+    
+    /**
+     * decodes the TermTagger JSON and logs an error if data can not be processed
+     * @param Zend_Http_Response $result
+     * @return stdClass or null on error
+     */
+    private function decodeServiceResult(Zend_Http_Response $result = null) {
+        if(empty($result)) {
+            return null;
+        }
+    
+        $data = json_decode($result->getBody());
+        if(!empty($data)) {
+            if(!empty($data->error)) {
+                $this->log->logError(__CLASS__.' decoded TermTagger Result but with following Error from TermTagger: ', print_r($data,1));
+            }
+            return $data;
+        }
+        $msg = "Original TermTagger Result was: \n".$result->getBody()."\n JSON decode error was: ";
+        if (function_exists('json_last_error_msg')) {
+            $msg .= json_last_error_msg();
+        } else {
+            static $errors = array(
+                            JSON_ERROR_NONE             => null,
+                            JSON_ERROR_DEPTH            => 'Maximum stack depth exceeded',
+                            JSON_ERROR_STATE_MISMATCH   => 'Underflow or the modes mismatch',
+                            JSON_ERROR_CTRL_CHAR        => 'Unexpected control character found',
+                            JSON_ERROR_SYNTAX           => 'Syntax error, malformed JSON',
+                            JSON_ERROR_UTF8             => 'Malformed UTF-8 characters, possibly incorrectly encoded'
+            );
+            $error = json_last_error();
+            $msg .=  array_key_exists($error, $errors) ? $errors[$error] : "Unknown error ({$error})";
+        }
+        $this->log->logError(__CLASS__.' cannot json_decode TermTagger Result!', $msg);
+        return null;
+    }
+    
 }

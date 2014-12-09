@@ -62,20 +62,6 @@ class editor_Plugins_TermTagger_Bootstrap {
     private $sourceFieldNameOriginal = '';
     
     
-    /**
-     * Two corresponding array to hold replaced tags.
-     * Tags must be replaced in every text-element before send to the TermTagger-Server,
-     * because TermTagger can not handle with already TermTagged-text.
-     */
-    private $replacedTagsNeedles = array();
-    private $replacedTagsReplacements = array();
-    
-    /**
-     * Holds a counter for replacedTags to make needles unic
-     * @var integer
-     */
-    private $replaceCounter = 1;
-    
     
     public function __construct() {
         $this->log = ZfExtended_Factory::get('ZfExtended_Log', array(false));
@@ -211,16 +197,16 @@ class editor_Plugins_TermTagger_Bootstrap {
         $sourceTextTagged = false;
         foreach ($results as $result) {
             if ($result->field == 'SourceOriginal') {
-                $segment->set($this->sourceFieldNameOriginal, $this->decodeText($result->source));
+                $segment->set($this->sourceFieldNameOriginal, $result->source);
                 continue;
             }
             
             if (!$sourceTextTagged) {
-                $segment->set($this->sourceFieldName, $this->decodeText($result->source));
+                $segment->set($this->sourceFieldName, $result->source);
                 $sourceTextTagged = true;
             }
             
-            $segment->set($result->field, $this->decodeText($result->target));
+            $segment->set($result->field, $result->target);
         }
         
         return true;
@@ -264,49 +250,14 @@ class editor_Plugins_TermTagger_Bootstrap {
             
             // if source is editable compare original Source with first targetField
             if ($firstField && $task->getEnableSourceEditing()) {
-                $serverCommunication->addSegment($segment->getId(), 'SourceOriginal', $this->encodeText($sourceTextOriginal), $this->encodeText($segment->get($targetFieldName)));
+                $serverCommunication->addSegment($segment->getId(), 'SourceOriginal', $sourceTextOriginal, $segment->get($targetFieldName));
                 $firstField = false;
             }
             
-            $serverCommunication->addSegment($segment->getId(), $targetFieldName, $this->encodeText($sourceText), $this->encodeText($segment->get($targetFieldName)));
+            $serverCommunication->addSegment($segment->getId(), $targetFieldName, $sourceText, $segment->get($targetFieldName));
         }
         
         return $serverCommunication;
-    }
-    
-    
-    
-    private function encodeText($text) {
-        $matchContentRegExp = '/<div[^>]+class="(open|close|single).*?".*?\/div>/is';
-        
-        preg_match_all($matchContentRegExp, $text, $tempMatches);
-        
-        if (empty($tempMatches)) {
-            return $text;
-        }
-        $textOriginal = $text;
-        
-        foreach ($tempMatches[0] as $match) {
-            $needle = '<img class="content-tag" src="'.$this->replaceCounter++.'" alt="TaggingError" />';
-            $this->replacedTagsNeedles[] = $needle;
-            $this->replacedTagsReplacements[] = $match;
-            
-            $text = str_replace($match, $needle, $text);
-        }
-        $text = preg_replace('/<div[^>]+>/is', '', $text);
-        $text = preg_replace('/<\/div>/', '', $text);
-        
-        return $text;
-    }
-    
-    private function decodeText($text) {
-        if (empty($this->replacedTagsNeedles)) {
-            return $text;
-        }
-        $textOriginal = $text;
-        $text = str_replace($this->replacedTagsNeedles, $this->replacedTagsReplacements, $text);
-        
-        return $text;
     }
     
 }
