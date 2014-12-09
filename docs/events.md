@@ -56,6 +56,11 @@ defined in `/library/ZfExtended/Controllers/Action.php`  will trigger an event o
 - **beforePutSave** with parameter array('model' => $this->entity), used in function putAction() after normal processing before saving the entity (= the segment)
 
 
+### editor_Models_Import
+- **afterImport** is fired after parsing the data and storing the segments in DB. Parameter: 'task' => editor_Models_Task
+- **importCompleted** is fired after all import plugins were run, defines the end of import. Parameter: 'task' => editor_Models_Task
+- **beforeDirectoryParsing** is fired before directory parsing of proofread file. Parameter: 'importFolder' => string
+
 ##Handmade events
 Handmade events are spezial events wich are defined direct in the code. No automatic definition is used while trigger.
 
