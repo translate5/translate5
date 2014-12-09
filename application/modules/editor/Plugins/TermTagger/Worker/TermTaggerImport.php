@@ -112,8 +112,6 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
-        //error_log(__CLASS__.' -> '.__FUNCTION__);
-        
         $segmentIds = $this->loadUntaggedSegmentIds($this->workerModel->getTaskGuid());
         
         if (empty($segmentIds)) {
@@ -176,9 +174,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
                             array($this::$SEGMENT_STATE_TAGGED, $this::$SEGMENT_STATE_INPROGRESS)) // later there may will be a state 'targetnotfound'
                     ->order('segment.id')
                     ->limit($limit);
-        //error_log(__CLASS__.' -> '.__FUNCTION__.'; $sql: '.$sql);
         $segmentIds = $db->fetchAll($sql)->toArray();
-        //error_log(__CLASS__.' -> '.__FUNCTION__.'; $segmentIds: '.print_r($segmentIds, true));
         
         return $segmentIds;
     }

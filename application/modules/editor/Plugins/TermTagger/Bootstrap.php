@@ -90,7 +90,6 @@ class editor_Plugins_TermTagger_Bootstrap {
         $this->staticEvents->attach('editor_Models_Import_MetaData', 'importMetaData', array($this, 'handleImportMeta'));
         $this->staticEvents->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndex'));
         $this->staticEvents->attach('editor_Workflow_Default', array('doView', 'doEdit'), array($this, 'handleAfterTaskOpen'));
-        //$this->staticEvents->attach('editor_Models_Segment', 'beforeSave', array($this, 'handleBeforeSegmentSave'));
         $this->staticEvents->attach('Editor_SegmentController', 'beforePutSave', array($this, 'handleBeforePutSave'));
     }
     
@@ -156,7 +155,6 @@ class editor_Plugins_TermTagger_Bootstrap {
      * @param $event Zend_EventManager_Event
      */
     public function handleAfterIndex(Zend_EventManager_Event $event) {
-        //error_log('function called: ' . get_class($this) . '->' . __FUNCTION__);
         $params = $event->getParams();
         $view = $params[0];
         
@@ -172,7 +170,6 @@ class editor_Plugins_TermTagger_Bootstrap {
      * @param $event Zend_EventManager_Event
      */
     public function handleAfterTaskOpen(Zend_EventManager_Event $event) {
-        //error_log('function called: ' . get_class($this) . '->' . __FUNCTION__);
     }
     
     
@@ -280,8 +277,6 @@ class editor_Plugins_TermTagger_Bootstrap {
     
     
     private function encodeText($text) {
-        //return $text;
-        
         $matchContentRegExp = '/<div[^>]+class="(open|close|single).*?".*?\/div>/is';
         
         preg_match_all($matchContentRegExp, $text, $tempMatches);
@@ -291,7 +286,6 @@ class editor_Plugins_TermTagger_Bootstrap {
         }
         $textOriginal = $text;
         
-        //error_log(__CLASS__.'->'.__FUNCTION__.'; $tempMatches: '.print_r($tempMatches, true));
         foreach ($tempMatches[0] as $match) {
             $needle = '<img class="content-tag" src="'.$this->replaceCounter++.'" alt="TaggingError" />';
             $this->replacedTagsNeedles[] = $needle;
@@ -302,22 +296,16 @@ class editor_Plugins_TermTagger_Bootstrap {
         $text = preg_replace('/<div[^>]+>/is', '', $text);
         $text = preg_replace('/<\/div>/', '', $text);
         
-        //error_log(__CLASS__.'->'.__FUNCTION__.'; '."\n".$textOriginal.' => '."\n".$text."\n\n");
-        error_log(__CLASS__.'->'.__FUNCTION__.'; '.$text."\n\n");
         return $text;
     }
     
     private function decodeText($text) {
-        //return $text;
-        
         if (empty($this->replacedTagsNeedles)) {
             return $text;
         }
         $textOriginal = $text;
-        //error_log(__CLASS__.'->'.__FUNCTION__.'; Replacements: '.print_r(array_merge($this->replacedTagsNeedles, $this->replacedTagsReplacements), true));
         $text = str_replace($this->replacedTagsNeedles, $this->replacedTagsReplacements, $text);
         
-        error_log(__CLASS__.'->'.__FUNCTION__.'; '."\n".$textOriginal.' => '."\n".$text."\n\n");
         return $text;
     }
     
