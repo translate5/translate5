@@ -49,6 +49,34 @@ class editor_Plugins_TermTagger_Bootstrap {
      */
     protected $log;
     
+    /**
+     * Fieldname of the source-field of this task
+     * @var string
+     */
+    private $sourceFieldName = '';
+    
+    /**
+     * Fieldname of the source-field of this task if the task is editable
+     * @var string
+     */
+    private $sourceFieldNameOriginal = '';
+    
+    
+    /**
+     * Two corresponding array to hold replaced tags.
+     * Tags must be replaced in every text-element before send to the TermTagger-Server,
+     * because TermTagger can not handle with already TermTagged-text.
+     */
+    private $replacedTagsNeedles = array();
+    private $replacedTagsReplacements = array();
+    
+    /**
+     * Holds a counter for replacedTags to make needles unic
+     * @var integer
+     */
+    private $replaceCounter = 1;
+    
+    
     public function __construct() {
         $this->log = ZfExtended_Factory::get('ZfExtended_Log', array(false));
 
@@ -64,10 +92,6 @@ class editor_Plugins_TermTagger_Bootstrap {
         $this->staticEvents->attach('editor_Workflow_Default', array('doView', 'doEdit'), array($this, 'handleAfterTaskOpen'));
         //$this->staticEvents->attach('editor_Models_Segment', 'beforeSave', array($this, 'handleBeforeSegmentSave'));
         $this->staticEvents->attach('Editor_SegmentController', 'beforePutSave', array($this, 'handleBeforePutSave'));
-        
-        // SBE: only for testing
-        $this->staticEvents->attach('IndexController', 'beforeStephanAction', array($this, 'handleTest'));
-        // SBE end of testing event-listeners
     }
     
     /**
@@ -169,39 +193,8 @@ class editor_Plugins_TermTagger_Bootstrap {
             return;
         }
         
-        $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication', array($task));
+        $serverCommunication = $this->fillServerCommunication($task, $segment);
         /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
-        
-        $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
-        /* @var $fieldManager editor_Models_SegmentFieldManager */
-        $fieldManager->initFields($taskGuid);
-        $sourceFieldName = $fieldManager->getFirstSourceName();
-        $sourceText = $segment->get($sourceFieldName);
-        
-        if ($task->getEnableSourceEditing()) {
-            $sourceFieldNameOriginal = $sourceFieldName;
-            $sourceTextOriginal = $sourceText;
-            $sourceFieldName = $fieldManager->getEditIndex($fieldManager->getFirstSourceName());
-            $sourceText = $segment->get($sourceFieldName);
-        }
-        
-        $fields = $fieldManager->getFieldList();
-        $firstField = true;
-        foreach ($fields as $field) {
-            if($field->type != editor_Models_SegmentField::TYPE_TARGET || !$field->editable) {
-                continue;
-            }
-            
-            $targetFieldName = $fieldManager->getEditIndex($field->name);
-            
-            // if source is editable compare original Source with first targetField
-            if ($firstField && $task->getEnableSourceEditing()) {
-                $serverCommunication->addSegment($segment->getId(), 'SourceOriginal', $sourceTextOriginal, $segment->get($targetFieldName));
-                $firstField = false;
-            }
-            
-            $serverCommunication->addSegment($segment->getId(), $targetFieldName, $sourceText, $segment->get($targetFieldName));
-        }
         
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTagger');
         /* @var $worker editor_Plugins_TermTagger_Worker_TermTagger */
@@ -221,86 +214,111 @@ class editor_Plugins_TermTagger_Bootstrap {
         $sourceTextTagged = false;
         foreach ($results as $result) {
             if ($result->field == 'SourceOriginal') {
-                $segment->set($sourceFieldNameOriginal, $result->source);
+                $segment->set($this->sourceFieldNameOriginal, $this->decodeText($result->source));
                 continue;
             }
             
             if (!$sourceTextTagged) {
-                $segment->set($sourceFieldName, $result->source);
+                $segment->set($this->sourceFieldName, $this->decodeText($result->source));
                 $sourceTextTagged = true;
             }
             
-            $segment->set($result->field, $result->target);
+            $segment->set($result->field, $this->decodeText($result->target));
         }
         
         return true;
     }
     
-    
     /**
-     * handler for test-events: IndexController#beforeStephanAction
+     * inclusive all fields of the provided $segment
+     * Creates a ServerCommunication-Object initialized with $task
+     * 
+     * @param editor_Models_Task $task
+     * @param editor_Models_Segment $segment
+     * @return editor_Plugins_TermTagger_Service_ServerCommunication
      */
-    public function handleTest(Zend_EventManager_Event $event) {
-        //$segment = $event->getParam('model');
-        /* @var $segment editor_Models_Segment */
-        //error_log(__CLASS__.' -> '.__FUNCTION__.'; $segment: '.print_r($segment->getDataObject(), true));
+    private function fillServerCommunication (editor_Models_Task $task, editor_Models_Segment $segment) {
         
-        $request = ZfExtended_Factory::get('Zend_Controller_Request_Http');
-        /* @var $request Zend_Controller_Request_Http */
+        $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication', array($task));
+        /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
         
-        if ($request->getParam('startTest_1') == 1) {
-            $this->test_1();
+        $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        /* @var $fieldManager editor_Models_SegmentFieldManager */
+        $fieldManager->initFields($task->getTaskGuid());
+        
+        $this->sourceFieldName = $fieldManager->getFirstSourceName();
+        $sourceText = $segment->get($this->sourceFieldName);
+        
+        if ($task->getEnableSourceEditing()) {
+            $this->sourceFieldNameOriginal = $this->sourceFieldName;
+            $sourceTextOriginal = $sourceText;
+            $this->sourceFieldName = $fieldManager->getEditIndex($fieldManager->getFirstSourceName());
+            $sourceText = $segment->get($this->sourceFieldName);
         }
         
-        if ($request->getParam('startTest_2')) {
-            $this->test_2();
+        $fields = $fieldManager->getFieldList();
+        $firstField = true;
+        foreach ($fields as $field) {
+            if($field->type != editor_Models_SegmentField::TYPE_TARGET || !$field->editable) {
+                continue;
+            }
+            
+            $targetFieldName = $fieldManager->getEditIndex($field->name);
+            
+            // if source is editable compare original Source with first targetField
+            if ($firstField && $task->getEnableSourceEditing()) {
+                $serverCommunication->addSegment($segment->getId(), 'SourceOriginal', $this->encodeText($sourceTextOriginal), $this->encodeText($segment->get($targetFieldName)));
+                $firstField = false;
+            }
+            
+            $serverCommunication->addSegment($segment->getId(), $targetFieldName, $this->encodeText($sourceText), $this->encodeText($segment->get($targetFieldName)));
         }
         
-        if ($request->getParam('startTest_3')) {
-            $this->test_3();
+        return $serverCommunication;
+    }
+    
+    
+    
+    private function encodeText($text) {
+        //return $text;
+        
+        $matchContentRegExp = '/<div[^>]+class="(open|close|single).*?".*?\/div>/is';
+        
+        preg_match_all($matchContentRegExp, $text, $tempMatches);
+        
+        if (empty($tempMatches)) {
+            return $text;
         }
+        $textOriginal = $text;
         
-        return false;
+        //error_log(__CLASS__.'->'.__FUNCTION__.'; $tempMatches: '.print_r($tempMatches, true));
+        foreach ($tempMatches[0] as $match) {
+            $needle = '<img class="content-tag" src="'.$this->replaceCounter++.'" alt="TaggingError" />';
+            $this->replacedTagsNeedles[] = $needle;
+            $this->replacedTagsReplacements[] = $match;
+            
+            $text = str_replace($match, $needle, $text);
+        }
+        $text = preg_replace('/<div[^>]+>/is', '', $text);
+        $text = preg_replace('/<\/div>/', '', $text);
+        
+        //error_log(__CLASS__.'->'.__FUNCTION__.'; '."\n".$textOriginal.' => '."\n".$text."\n\n");
+        error_log(__CLASS__.'->'.__FUNCTION__.'; '.$text."\n\n");
+        return $text;
     }
     
-    private function test_1() {
-        error_log(__CLASS__.' -> '.__FUNCTION__);
+    private function decodeText($text) {
+        //return $text;
         
-        $workerQueue = ZfExtended_Factory::get('ZfExtended_Worker_Queue');
-        /* @var $workerQueue ZfExtended_Worker_Queue */
-        $workerQueue->process();
+        if (empty($this->replacedTagsNeedles)) {
+            return $text;
+        }
+        $textOriginal = $text;
+        //error_log(__CLASS__.'->'.__FUNCTION__.'; Replacements: '.print_r(array_merge($this->replacedTagsNeedles, $this->replacedTagsReplacements), true));
+        $text = str_replace($this->replacedTagsNeedles, $this->replacedTagsReplacements, $text);
+        
+        error_log(__CLASS__.'->'.__FUNCTION__.'; '."\n".$textOriginal.' => '."\n".$text."\n\n");
+        return $text;
     }
     
-    private function test_2() {
-        error_log(__CLASS__.' -> '.__FUNCTION__);
-    }
-    
-    
-    private function test_3() {
-        error_log(__CLASS__.' -> '.__FUNCTION__);
-        
-        //$workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $workerModel ZfExtended_Models_Worker */
-        //$workerListSlotsCount = $workerModel->getListSlotsCount('TermTagger_default');
-        //error_log(__CLASS__.' -> '.__FUNCTION__.'; Liste-Resource: '.print_r($workerListSlotsCount, true));
-        
-        //$workerModel->wakeupScheduled('{10ea5327-8257-4f4e-abf0-8063e9878b17}');
-        
-        $termtaggerService = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
-        /* @var $termtaggerService editor_Plugins_TermTagger_Service */
-        //$termtaggerService->test();
-        //$termtaggerService->test_2();
-        $termtaggerService->testTagging();
-        return;
-        
-        
-        $config = Zend_Registry::get('config');
-        $defaultServers = $config->runtimeOptions->termTagger->url->default->toArray();
-        $url = $defaultServers[array_rand($defaultServers)];
-        //error_log(__CLASS__.' -> '.__FUNCTION__.'; Teste TermTagger-Server $url: '.$url.'; Ergebnis: '.$termtaggerService->testServerUrl($url));
-        //$termtaggerService->ping($url, rand(10000000, 99999999));
-        //$response = $termtaggerService->openFetchIds($url, 'a300e1140d20e0ac18672d6790e69e0b', '/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/{C1D11C25-45D2-11D0-B0E2-444553540203}.tbx');
-        $response = $termtaggerService->open($url, 'a300e1140d20e0ac18672d6790e69e0b', file_get_contents('/Users/sb/Desktop/_MittagQI/TRANSLATE-22/TermTagger-Server/Test_2.tbx'));
-        error_log(__CLASS__.' -> '.__FUNCTION__.'; $response: '.$response);
-    }
 }
