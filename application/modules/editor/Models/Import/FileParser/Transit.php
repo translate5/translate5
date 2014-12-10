@@ -316,13 +316,16 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
      */
     protected function parseDefinedSingleTags(){
         for($i = 1; $i < $this->segmentPartsCount; $i++) {
-            $tag = &$segmentParts[$i];
+            $tag = &$this->segmentParts[$i];
+           
+            error_log('11111111111111'.$tag);
             if (
                     strpos($tag ,'<Tab')!== false ||
                     strpos($tag ,'<NL')!== false ||
                     strpos($tag ,'<NU')!== false ||
-                    strpos($tag ,'<Tag pos=\"Point\"')!== false 
+                    strpos($tag ,'<Tag pos="Point"')!== false 
                 ){
+                error_log('222222222222'.$tag);
                 if(preg_match('"<([^ ]*) "s', $tag, $matches)!==1){
                     trigger_error('Tagname not found, something went wrong: '.$tag);
                 }
@@ -441,12 +444,10 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
             //check for undefined tags
             $part = &$this->segmentParts[$i];
             if (strpos($part ,'<')!== false){
-                ob_start();
-                var_dump($this->segmentParts);
-                error_log(ob_get_clean());
                 trigger_error('In the segmentPart '.$part.' a tag has been found.');
             }
             $i++;
+            $part = &$this->segmentParts[$i];
             if (strpos($part ,'<Tag')!== false){
                 trigger_error('In the segmentPart '.$part.' a "Tag"-tag has been found, which not has been covered so far.');
             }
