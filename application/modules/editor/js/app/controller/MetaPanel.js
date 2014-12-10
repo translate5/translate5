@@ -72,30 +72,34 @@ Ext.define('Editor.controller.MetaPanel', {
   }],
   hideLeftRight: false,
   init : function() {
-    this.control({
+      var me = this;
+      me.control({
       '#metapanel #cancelSegmentBtn' : {
-        click : this.cancel
+        click : me.cancel
       },
       '#metapanel #saveSegmentBtn' : {
-        click : this.save
+        click : me.save
       },
       '#metapanel #saveNextSegmentBtn' : {
-        click : this.saveNext
+        click : me.saveNext
       },
       '#metapanel #savePreviousSegmentBtn' : {
-        click : this.savePrevious
+        click : me.savePrevious
       },
       '#metapanel #goAlternateLeftBtn' : {
-          click : this.goToAlternate
+          click : me.goToAlternate
       },
       '#metapanel #goAlternateRightBtn' : {
-          click : this.goToAlternate
+          click : me.goToAlternate
       },
       '#metapanel' : {
-          show : this.layout
+          show : me.layout
+      },
+      'segmentsHtmleditor': {
+          afteriniteditor: me.initEditor
       },
       '#segmentgrid': {
-          afterrender: this.initEditPluginHandler
+          afterrender: me.initEditPluginHandler
       }
     });
   },
@@ -119,6 +123,20 @@ Ext.define('Editor.controller.MetaPanel', {
     
       me.getLeftBtn().setVisible(multiEdit && ! useChangeAlikes);
       me.getRightBtn().setVisible(multiEdit && ! useChangeAlikes);
+  },
+  /**
+   * binds strg + enter as save segment combination
+   * @param editor
+   */
+  initEditor: function(editor){
+      var me = this,
+          keyev = Ext.EventManager.useKeyDown ? 'keydown' : 'keypress';
+      Ext.EventManager.on(editor.getDoc(), keyev, function(e){
+          console.log(e.ctrlKey,e.getKey(),e.ENTER);
+          if(e.ctrlKey && e.getKey() == e.ENTER) {
+              me.saveNext();
+          }
+      });
   },
   /**
    * Handler für save Button
