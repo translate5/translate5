@@ -51,6 +51,11 @@ class editor_Models_Segment_Iterator implements Iterator {
     protected $segment;
     
     /**
+     * @var boolean
+     */
+    protected $isEmpty = false;
+    
+    /**
      * @param string $taskGuid
      */
     public function __construct($taskGuid) {
@@ -95,7 +100,12 @@ class editor_Models_Segment_Iterator implements Iterator {
      */
     public function rewind() {
         $this->segment = ZfExtended_Factory::get('editor_Models_Segment');
-        $this->segment->loadFirst($this->taskGuid);
+        try {
+            $this->segment->loadFirst($this->taskGuid);
+        }
+        catch(ZfExtended_Models_Entity_NotFoundException $noSegments) {
+            $this->isEmpty = true;
+        }
     }
     
     /**
@@ -104,5 +114,9 @@ class editor_Models_Segment_Iterator implements Iterator {
      */
     public function valid() {
         return !!$this->segment && ($this->key() > 0);
+    }
+    
+    public function isEmpty() {
+        return $this->isEmpty;
     }
 }

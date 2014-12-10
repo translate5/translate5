@@ -67,6 +67,10 @@ class editor_Plugins_LockSegmentsBasedOnConfig_Worker extends ZfExtended_Worker_
             $return = $md->getAdapter()->query($query);
             $rows = $return->fetchAll();
             
+            if (empty($rows)) {
+                return;
+            }
+            
             $segment = ZfExtended_Factory::get('editor_Models_Segment');
             /* @var $meta editor_Models_Segment */
             $sg = $segment->db;
