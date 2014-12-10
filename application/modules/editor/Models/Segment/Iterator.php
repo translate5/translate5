@@ -102,6 +102,7 @@ class editor_Models_Segment_Iterator implements Iterator {
         $this->segment = ZfExtended_Factory::get('editor_Models_Segment');
         try {
             $this->segment->loadFirst($this->taskGuid);
+            $this->isEmpty = false;
         }
         catch(ZfExtended_Models_Entity_NotFoundException $noSegments) {
             $this->isEmpty = true;
