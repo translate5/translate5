@@ -41,3 +41,5 @@ INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`
 ('runtimeOptions.termTagger.segmentsPerCall', 1, 'plugin', 'termtagger', '20', '20', '', 'integer', 'Maximal number of segments the TermTagger will process in one step'),
 ('runtimeOptions.termTagger.timeOut.tbxParsing', 1, 'plugin', 'termtagger', '120', '120', '', 'integer', 'connection timeout when parsing tbx'),
 ('runtimeOptions.termTagger.timeOut.segmentTagging', 1, 'plugin', 'termtagger', '60', '60', '', 'integer', 'connection timeout when tagging segments');
+UPDATE  `Zf_configuration` SET  `default` =  '500',`value` =  '500' WHERE  `Zf_configuration`.`name` ='runtimeOptions.termTagger.timeOut.tbxParsing';
+UPDATE  `Zf_configuration` SET  `default` =  '500',`value` =  '500' WHERE  `Zf_configuration`.`name` ='runtimeOptions.termTagger.timeOut.segmentTagging';
