@@ -318,14 +318,12 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         for($i = 1; $i < $this->segmentPartsCount; $i++) {
             $tag = &$this->segmentParts[$i];
            
-            error_log('11111111111111'.$tag);
             if (
                     strpos($tag ,'<Tab')!== false ||
                     strpos($tag ,'<NL')!== false ||
                     strpos($tag ,'<NU')!== false ||
                     strpos($tag ,'<Tag pos="Point"')!== false 
                 ){
-                error_log('222222222222'.$tag);
                 if(preg_match('"<([^ ]*) "s', $tag, $matches)!==1){
                     trigger_error('Tagname not found, something went wrong: '.$tag);
                 }
