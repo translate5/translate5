@@ -186,6 +186,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   wfMeta = rec.getWorkflowMetaData(),
                   allStates = me.prepareStates(wfMeta);
 
+              if(rec.isImporting()) {
+                  return rec.get('state'); //FIXME better output here with fixing worker error handling
+              }
               if(rec.isLocked()) {
                   meta.tdAttr = 'data-qtip="' + Ext.String.format(me.strings.lockedBy, rec.get('lockingUsername'))+'"';
                   return me.strings.locked;
