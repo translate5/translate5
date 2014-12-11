@@ -72,6 +72,8 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
     const SEGMENT_STATE_UNTAGGED = 'untagged';
     const SEGMENT_STATE_INPROGRESS = 'inprogress';
     const SEGMENT_STATE_TAGGED = 'tagged';
+    const SEGMENT_STATE_DEFECT = 'defect';
+    const SEGMENT_STATE_RETAG = 'retag';
     //const SEGMENT_STATE_TARGETNOTFOUND = 'targetnotfound';
     
     /**

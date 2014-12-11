@@ -109,43 +109,47 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
      */
     public function work() {
         $segmentIds = $this->loadUntaggedSegmentIds($this->workerModel->getTaskGuid());
-        
+
         if (empty($segmentIds)) {
             return false;
         }
-        
+
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($this->workerModel->getTaskGuid());
-        
+
         $serverCommunication = $this->fillServerCommunication($task, $segmentIds);
         /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
-        
+
         $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
         /* @var $termTagger editor_Plugins_TermTagger_Service */
         if (!$this->checkTermTaggerTbx($this->workerModel->getSlot(), $serverCommunication->tbxFile)) {
             return false;
         }
-            
+
         $result = $termTagger->tagterms($this->workerModel->getSlot(), $serverCommunication);
-        
+
         // on error return false and store original untagged data
         if (empty($result)) {
-            return false;
+            $this->setSegmentsToRetag($task, $segmentIds);
+            $toreturn = false;
         }
-        
-        $this->saveSegments($task, $result->segments);
-        
-        // initialize an new worker-queue-entry
+        else {
+            $this->saveSegments($task, $result->segments);
+            $toreturn = true;
+        }
+
+        // to initialize an new worker-queue-entry
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
         /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
+
         if (!$worker->init($this->workerModel->getTaskGuid(), array('resourcePool' => 'import'))) {
             $this->log('TermTaggerImport-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }
-        //$worker->queue(ZfExtended_Models_Worker::STATE_WAITING);
-        
-        return true;
+        $worker->queue(ZfExtended_Models_Worker::STATE_WAITING);
+
+        return $toreturn;
     }
     
     /**
@@ -166,8 +170,8 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
                     ->from(array('segment' => $dbName), 'segment.id')
                     ->joinLeft(array('meta' => $dbName.'_meta'), 'segment.id = meta.segmentId', array())
                     ->where('segment.taskGuid = ?', $taskGuid)
-                    ->where('meta.termtagState IS NULL OR meta.termtagState NOT IN (?)',
-                            array($this::SEGMENT_STATE_TAGGED, $this::SEGMENT_STATE_INPROGRESS)) // later there may will be a state 'targetnotfound'
+                    ->where('meta.termtagState IS NULL OR meta.termtagState IN (?)',
+                            array($this::SEGMENT_STATE_UNTAGGED)) // later there may will be a state 'targetnotfound'
                     ->order('segment.id')
                     ->limit($limit);
         $segmentIds = $db->fetchAll($sql)->toArray();
@@ -228,10 +232,9 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         
         $responses = $this->groupResponseById($segments);
         
+        $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segment editor_Models_Segment */
         foreach ($responses as $segmentId => $responseGroup) {
-        
-            $segment = ZfExtended_Factory::get('editor_Models_Segment');
-            /* @var $segment editor_Models_Segment */
             $segment->load($segmentId);
         
             $segment->set($this->sourceFieldName, $responseGroup[0]->source);
@@ -251,8 +254,27 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         }
     }
     
-    private function setSegmentsPerhapsDefect() {
+    /**
+     * sets the meta TermtagState of the given segment ids to SEGMENT_STATE_RETAG
+     * @param editor_Models_Task $task
+     * @param array $segments
+     */
+    private function setSegmentsToRetag(editor_Models_Task $task, array $segments) {
+        $ids = array_map(function($seg){
+            return $seg['id'];
+        }, $segments);
         
+        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+        /* @var $meta editor_Models_Segment_Meta */
+        foreach ($ids as $segmentId) {
+            try {
+                $meta->loadBySegmentId($segmentId);
+            } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+                $meta->init(array('taskGuid' => $task->getTaskGuid(), 'segmentId' => $segmentId));
+            }
+            $meta->setTermtagState($this::SEGMENT_STATE_RETAG);
+            $meta->save();
+        }
     }
     
     /**
