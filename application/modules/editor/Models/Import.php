@@ -232,8 +232,9 @@ class editor_Models_Import {
     
     /**
      * Callback Method for the $setToOpenWorker
-     * @param unknown $taskGuid
-     * @param unknown $parameters
+     * @param string $taskGuid
+     * @param array $parameters
+     * @return boolean
      */
     public function setTaskToOpen($taskGuid, array $parameters) {
         $task = ZfExtended_Factory::get('editor_Models_Task');
@@ -244,6 +245,7 @@ class editor_Models_Import {
         
         $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         $eventManager->trigger('importCompleted', $this, array('task' => $task));
+        return true;
     }
     
     /**

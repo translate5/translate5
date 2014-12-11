@@ -4,19 +4,19 @@
 2014-11-21 - New Features:
             TRANSLATE-317: Smaller width for alternative columns
 
-2014-05-11 - Bugfixes:
+2014-11-05 - Bugfixes:
             TRANSLATE-197: Fixed: Changing a user state in a ended task throws an exception
             TRANSLATE-321: Fixed: Meaningless error message if relais and proofread data are not aligned properly
             TRANSLATE-320: Fixed: Reopening a bug does not recreate the materialized view of a task
             TRANSLATE-316: Translated: check untranslated GUI strings
             Code Clean Up: removed old preloadImages code
 
-2014-05-11 - New Features:
+2014-11-05 - New Features:
             TRANSLATE-284: allow import-file format "*.XLF" for new IBM-XLIFF import
             TRANSLATE-318: Hiding the string [META] as columns header in translate5 GUI
             TRANSLATE-285: Skinning mechanism improvements: localize-able branding in editor
 
-2014-05-11 - Bugfixes:
+2014-11-05 - Bugfixes:
             TRANSLATE-315: wrong content on generated XML after finishing a task
             TRANSLATE-314: SQL update error on changing user state with missing segment view
             TRANSLATE-281: After import a new task a version conflict is thrown when trying to add an user
