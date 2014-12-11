@@ -132,7 +132,6 @@ Ext.define('Editor.controller.MetaPanel', {
       var me = this,
           keyev = Ext.EventManager.useKeyDown ? 'keydown' : 'keypress';
       Ext.EventManager.on(editor.getDoc(), keyev, function(e){
-          console.log(e.ctrlKey,e.getKey(),e.ENTER);
           if(e.ctrlKey && e.getKey() == e.ENTER) {
               me.saveNext();
           }
