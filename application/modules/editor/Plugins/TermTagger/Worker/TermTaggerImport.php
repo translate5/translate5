@@ -108,15 +108,21 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
-        $segmentIds = $this->loadUntaggedSegmentIds($this->workerModel->getTaskGuid());
+        $taskGuid = $this->workerModel->getTaskGuid();
+        $segmentIds = $this->loadUntaggedSegmentIds($taskGuid);
 
+        $state = self::SEGMENT_STATE_RETAG;
         if (empty($segmentIds)) {
-            return false;
+            $segmentIds = $this->loadNextRetagSegmentId($taskGuid);
+            $state = self::SEGMENT_STATE_DEFECT;
+            if(empty($segmentIds)) {
+                return false;
+            }
         }
 
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($this->workerModel->getTaskGuid());
+        $task->loadByTaskGuid($taskGuid);
 
         $serverCommunication = $this->fillServerCommunication($task, $segmentIds);
         /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
@@ -129,9 +135,9 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
 
         $result = $termTagger->tagterms($this->workerModel->getSlot(), $serverCommunication);
 
-        // on error return false and store original untagged data
+        // on error return false, store segment untagged, but mark it as defect / to be retagged
         if (empty($result)) {
-            $this->setSegmentsToRetag($task, $segmentIds);
+            $this->setTermtagState($task, $segmentIds, $state);
             $toreturn = false;
         }
         else {
@@ -143,7 +149,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
         /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
 
-        if (!$worker->init($this->workerModel->getTaskGuid(), array('resourcePool' => 'import'))) {
+        if (!$worker->init($taskGuid, array('resourcePool' => 'import'))) {
             $this->log('TermTaggerImport-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }
@@ -162,21 +168,46 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         $config = Zend_Registry::get('config');
         $limit = $config->runtimeOptions->termTagger->segmentsPerCall;
         
-        // get list of untagged segments
         $db = ZfExtended_Factory::get('editor_Models_Db_Segments');
-        $dbName = $db->info($db::NAME);
         /* @var $db editor_Models_Db_Segments */
-        $sql = $db->select()
-                    ->from(array('segment' => $dbName), 'segment.id')
-                    ->joinLeft(array('meta' => $dbName.'_meta'), 'segment.id = meta.segmentId', array())
-                    ->where('segment.taskGuid = ?', $taskGuid)
-                    ->where('meta.termtagState IS NULL OR meta.termtagState IN (?)',
+        $select = $this->getNextSegmentSelect($db, $taskGuid);
+        $sql = $select->where('meta.termtagState IS NULL OR meta.termtagState IN (?)',
                             array($this::SEGMENT_STATE_UNTAGGED)) // later there may will be a state 'targetnotfound'
                     ->order('segment.id')
                     ->limit($limit);
-        $segmentIds = $db->fetchAll($sql)->toArray();
-        
-        return $segmentIds;
+        return $db->fetchAll($sql)->toArray();
+    }
+    
+    /**
+     * Loads a list with the next segmentId where terms are marked as to be "retag"ged
+     * returns only one segment since this segments has to be single tagged
+     * 
+     * @param string $taskGuid
+     * @return array
+     */
+    private function loadNextRetagSegmentId($taskGuid) {
+        // get list of untagged segments
+        $db = ZfExtended_Factory::get('editor_Models_Db_Segments');
+        /* @var $db editor_Models_Db_Segments */
+        $select = $this->getNextSegmentSelect($db, $taskGuid);
+        $sql = $select->where('meta.termtagState = ?',$this::SEGMENT_STATE_RETAG)
+                    ->limit(1);
+        return $db->fetchAll($sql)->toArray();
+    }
+    
+    /**
+     * Helper function
+     * @param editor_Models_Db_Segments $db
+     * @param string $taskGuid
+     * @return Zend_Db_Table_Select
+     */
+    private function getNextSegmentSelect(editor_Models_Db_Segments $db, $taskGuid) {
+        $dbName = $db->info($db::NAME);
+        /* @var $db editor_Models_Db_Segments */
+        return $db->select()
+                    ->from(array('segment' => $dbName), 'segment.id')
+                    ->joinLeft(array('meta' => $dbName.'_meta'), 'segment.id = meta.segmentId', array())
+                    ->where('segment.taskGuid = ?', $taskGuid);
     }
     
     /**
@@ -258,8 +289,9 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
      * sets the meta TermtagState of the given segment ids to SEGMENT_STATE_RETAG
      * @param editor_Models_Task $task
      * @param array $segments
+     * @param string $state
      */
-    private function setSegmentsToRetag(editor_Models_Task $task, array $segments) {
+    private function setTermtagState(editor_Models_Task $task, array $segments, $state) {
         $ids = array_map(function($seg){
             return $seg['id'];
         }, $segments);
@@ -272,7 +304,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
             } catch (ZfExtended_Models_Entity_NotFoundException $e) {
                 $meta->init(array('taskGuid' => $task->getTaskGuid(), 'segmentId' => $segmentId));
             }
-            $meta->setTermtagState($this::SEGMENT_STATE_RETAG);
+            $meta->setTermtagState($state);
             $meta->save();
         }
     }

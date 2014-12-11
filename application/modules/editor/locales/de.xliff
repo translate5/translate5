@@ -137,7 +137,7 @@
 <trans-unit id='U3BlaWNoZXJu'><source>Speichern</source><target>Speichern</target></trans-unit>
 <trans-unit id='U2VnbWVudC1NZXRhZGF0ZW4='><source>Segment-Metadaten</source><target>Segment-Metadaten</target></trans-unit>
 <trans-unit id='VGVybWlub2xvZ2ll'><source>Terminologie</source><target>Terminologie</target></trans-unit>
-<trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgw7ZmZm5lbg=='><source>Speichern und nächstes öffnen</source><target>Speichern und nächstes öffnen</target></trans-unit>
+<trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgw7ZmZm5lbiAoU1RSRyArIEVOVEVSKQ=='><source>Speichern und nächstes öffnen (STRG + ENTER)</source><target>Speichern und nächstes öffnen (STRG + ENTER)</target></trans-unit>
 <trans-unit id='U3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIMO2ZmZuZW4='><source>Speichern und vorheriges öffnen</source><target>Speichern und vorheriges öffnen</target></trans-unit>
 <trans-unit id='RW5kZSBkZXIgU2VnbWVudGUgZXJyZWljaHQh'><source>Ende der Segmente erreicht!</source><target>Ende der Segmente erreicht!</target></trans-unit>
 <trans-unit id='QmVnaW5uIGRlciBTZWdtZW50ZSBlcnJlaWNodCE='><source>Beginn der Segmente erreicht!</source><target>Beginn der Segmente erreicht!</target></trans-unit>

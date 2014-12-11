@@ -225,7 +225,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerLoader */
         $worker->init($taskGuid, array('task' => $task));
         //run the worker to send it to the termtagger
-        return $worker->run();
+        return $worker->run(false);
     }
     
 }
