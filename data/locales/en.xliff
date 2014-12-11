@@ -1131,9 +1131,9 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Ergonomic</source>
                 <target>Ergonomic</target>
             </trans-unit>
-            <trans-unit id="U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgw7ZmZm5lbg==">
-                <source>Speichern und nächstes öffnen</source>
-                <target>Save and open next</target>
+            <trans-unit id="U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgw7ZmZm5lbiAoU1RSRyArIEVOVEVSKQ==">
+                <source>Speichern und nächstes öffnen (STRG + ENTER)</source>
+                <target>Save and open next (CTRL + ENTER)</target>
             </trans-unit>
             <trans-unit id="U3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIMO2ZmZuZW4=">
                 <source>Speichern und vorheriges öffnen</source>
