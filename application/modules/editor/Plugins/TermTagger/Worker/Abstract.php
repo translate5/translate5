@@ -37,7 +37,7 @@
  * Trait for "TermTagger"
  * used as shared-code-base for the differen TermTaggerWorker.
  */
-trait editor_Plugins_TermTagger_Worker_TermTaggerTrait {
+abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Worker_Abstract {
     
     /**
      * overwrites $this->workerModel->maxLifetime
@@ -69,10 +69,12 @@ trait editor_Plugins_TermTagger_Worker_TermTaggerTrait {
      * Values for termtagging segment-states
      * @var array(strings)
      */
-    public static $SEGMENT_STATE_UNTAGGED = 'untagged';
-    public static $SEGMENT_STATE_INPROGRESS = 'inprogress';
-    public static $SEGMENT_STATE_TAGGED = 'tagged';
-    //public static $SEGMENT_STATE_TARGETNOTFOUND = 'targetnotfound';
+    const SEGMENT_STATE_UNTAGGED = 'untagged';
+    const SEGMENT_STATE_INPROGRESS = 'inprogress';
+    const SEGMENT_STATE_TAGGED = 'tagged';
+    const SEGMENT_STATE_DEFECT = 'defect';
+    const SEGMENT_STATE_RETAG = 'retag';
+    //const SEGMENT_STATE_TARGETNOTFOUND = 'targetnotfound';
     
     /**
      * Stores the init-paramters from the initial call

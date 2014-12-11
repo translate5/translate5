@@ -54,6 +54,24 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
      */
     protected $translate;
     
+    /**
+     * 
+     This is to be able to start a worker as a developer indepently through the browser
+     
+     public function startworkerAction() {
+     
+        $this->_helper->viewRenderer->setNoRender();
+        $taskGuid = $this->getParam('taskGuid');
+        $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
+        
+        // init worker and queue it
+        if (!$worker->init($taskGuid, array('resourcePool' => 'import'))) {
+            $this->log('TermTaggerImport-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
+            return false;
+        }
+        $worker->queue();
+    }
+    */
     public function indexAction() {
         $this->session = new Zend_Session_Namespace();
         $this->_helper->layout->disableLayout();

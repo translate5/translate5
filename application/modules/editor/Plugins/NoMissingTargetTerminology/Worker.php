@@ -42,8 +42,8 @@ class editor_Plugins_NoMissingTargetTerminology_Worker extends ZfExtended_Worker
         return empty($parameters);
     } 
     /**
-     * 
-     * @param string $taskGuid
+     * (non-PHPdoc)
+     * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
         $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
@@ -71,5 +71,6 @@ class editor_Plugins_NoMissingTargetTerminology_Worker extends ZfExtended_Worker
         
         $md->getAdapter()->query($insert);
         //@todo: check task data not up2date after new insert of task when assigning user
+        return true;
     }
 }

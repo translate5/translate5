@@ -606,12 +606,22 @@ class editor_Models_Import {
      * @throws Zend_Exception
      */
     protected function validateImportFolders(){
+        $error = '';
         if(!is_dir($this->_importFolder)){
-        	throw new Zend_Exception('Der übergebene importRootFolder '.$this->_importFolder.' existiert nicht.');
+            $error .= 'Der übergebene importRootFolder '.$this->_importFolder.' existiert nicht.';
         }
-        if(!is_dir($this->getProofReadDir())){
-        	throw new Zend_Exception('Der übergebene ProofReadFolder '.$this->getProofReadDir().' existiert nicht.');
+        if(!is_dir($this->getProofReadDir()) || empty(glob($this->getProofReadDir().'/*'))){
+            $error .= 'Der übergebene ProofReadFolder '.$this->getProofReadDir().' existiert nicht oder ist leer.';
         }
+        
+        if (empty($error)) {
+            return;
+        }
+        
+        $messages = Zend_Registry::get('rest_messages');
+        /* @var $messages ZfExtended_Models_Messages */
+        $messages->addError($error); // @fixme: rest-message does not work here !??!
+        throw new Zend_Exception($error);
     }
 
     protected function syncFileOrder() {

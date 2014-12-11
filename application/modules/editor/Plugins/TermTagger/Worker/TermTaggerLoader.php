@@ -36,11 +36,7 @@
 /**
  * editor_Plugins_TermTagger_Worker_TermTaggerLoader Class
  */
-class editor_Plugins_TermTagger_Worker_TermTaggerLoader extends ZfExtended_Worker_Abstract {
-    
-    use editor_Plugins_TermTagger_Worker_TermTaggerTrait;
-    
-    
+class editor_Plugins_TermTagger_Worker_TermTaggerLoader extends editor_Plugins_TermTagger_Worker_Abstract {
     /**
      * Special Paramters:
      * 

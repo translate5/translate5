@@ -316,14 +316,15 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
      */
     protected function parseDefinedSingleTags(){
         for($i = 1; $i < $this->segmentPartsCount; $i++) {
-            $tag = &$segmentParts[$i];
+            $tag = &$this->segmentParts[$i];
+           
             if (
                     strpos($tag ,'<Tab')!== false ||
                     strpos($tag ,'<NL')!== false ||
                     strpos($tag ,'<NU')!== false ||
-                    strpos($tag ,'<Tag pos=\"Point\"')!== false 
+                    strpos($tag ,'<Tag pos="Point"')!== false 
                 ){
-                if(preg_match('"<([^ ]*) "s', $tag, $matches)!==1){
+                if(preg_match('"^<([^ >]*)"s', $tag, $matches)!==1){
                     trigger_error('Tagname not found, something went wrong: '.$tag);
                 }
                 $tagName = $matches[1];
@@ -364,8 +365,11 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     
     protected function createTag($tag, $shortTagIdent, $tagName, $tagType, $tagText) {
         $fileNameHash = md5($tagText);
+        if(strpos($tagText, '<')||strpos($tagText, '"')){
+            $tagText = htmlspecialchars($tagText, ENT_XML1);
+        }
         $p = $this->getTagParams($tag, $shortTagIdent, $tagName, $fileNameHash, $tagText);
-        $tag = $this->$tagType->getHtmlTag($p);
+        $tag = $this->_leftTag->getHtmlTag($p);
         $this->$tagType->createAndSaveIfNotExists($tagText, $fileNameHash);
         $this->_tagCount++;
         return $tag;
@@ -441,12 +445,10 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
             //check for undefined tags
             $part = &$this->segmentParts[$i];
             if (strpos($part ,'<')!== false){
-                ob_start();
-                var_dump($this->segmentParts);
-                error_log(ob_get_clean());
                 trigger_error('In the segmentPart '.$part.' a tag has been found.');
             }
             $i++;
+            $part = &$this->segmentParts[$i];
             if (strpos($part ,'<Tag')!== false){
                 trigger_error('In the segmentPart '.$part.' a "Tag"-tag has been found, which not has been covered so far.');
             }

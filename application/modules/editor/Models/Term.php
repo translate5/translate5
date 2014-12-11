@@ -142,7 +142,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $targetFieldName = $fieldManager->getEditIndex($fieldManager->getFirstTargetName());
         $targetText = $segment->get($targetFieldName);
         
-        $getTermIdRegEx = '/<div.*?id="(term_.*?)".*?>/';
+        $getTermIdRegEx = '/<div.*?data-tbxid="(term_.*?)".*?>/';
         preg_match_all($getTermIdRegEx, $sourceText, $sourceMatches, PREG_SET_ORDER);
         preg_match_all($getTermIdRegEx, $targetText, $targetMatches, PREG_SET_ORDER);
         
