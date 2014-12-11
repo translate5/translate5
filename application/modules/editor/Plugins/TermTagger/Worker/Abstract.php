@@ -37,7 +37,7 @@
  * Trait for "TermTagger"
  * used as shared-code-base for the differen TermTaggerWorker.
  */
-trait editor_Plugins_TermTagger_Worker_TermTaggerTrait {
+abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Worker_Abstract {
     
     /**
      * overwrites $this->workerModel->maxLifetime

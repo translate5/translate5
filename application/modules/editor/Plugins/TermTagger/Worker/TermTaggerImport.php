@@ -36,11 +36,7 @@
 /**
  * editor_Plugins_TermTagger_Worker_TermTaggerImport Class
  */
-class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worker_Abstract {
-    
-    use editor_Plugins_TermTagger_Worker_TermTaggerTrait;
-    
-    
+class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_TermTagger_Worker_Abstract {
     /**
      * 
      * @var editor_Plugins_TermTagger_Service_ServerCommunication
@@ -147,7 +143,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
             $this->log('TermTaggerImport-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }
-        $worker->queue(ZfExtended_Models_Worker::STATE_WAITING);
+        //$worker->queue(ZfExtended_Models_Worker::STATE_WAITING);
         
         return true;
     }
@@ -171,7 +167,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
                     ->joinLeft(array('meta' => $dbName.'_meta'), 'segment.id = meta.segmentId', array())
                     ->where('segment.taskGuid = ?', $taskGuid)
                     ->where('meta.termtagState IS NULL OR meta.termtagState NOT IN (?)',
-                            array($this::$SEGMENT_STATE_TAGGED, $this::$SEGMENT_STATE_INPROGRESS)) // later there may will be a state 'targetnotfound'
+                            array($this::SEGMENT_STATE_TAGGED, $this::SEGMENT_STATE_INPROGRESS)) // later there may will be a state 'targetnotfound'
                     ->order('segment.id')
                     ->limit($limit);
         $segmentIds = $db->fetchAll($sql)->toArray();
@@ -202,7 +198,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
             $segment = ZfExtended_Factory::get('editor_Models_Segment');
             /* @var $segment editor_Models_Segment */
             $segment->load($segmentId);
-            $segment->meta()->setTermtagState($this::$SEGMENT_STATE_INPROGRESS);
+            $segment->meta()->setTermtagState($this::SEGMENT_STATE_INPROGRESS);
             $segment->meta()->save();
             
             $sourceText = $segment->get($this->sourceFieldName);
@@ -250,9 +246,13 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends ZfExtended_Worke
         
             $segment->save();
         
-            $segment->meta()->setTermtagState($this::$SEGMENT_STATE_TAGGED);
+            $segment->meta()->setTermtagState($this::SEGMENT_STATE_TAGGED);
             $segment->meta()->save();
         }
+    }
+    
+    private function setSegmentsPerhapsDefect() {
+        
     }
     
     /**
