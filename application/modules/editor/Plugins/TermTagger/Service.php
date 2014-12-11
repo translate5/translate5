@@ -253,7 +253,7 @@ class editor_Plugins_TermTagger_Service {
         if(!$this->wasSuccessfull()) {
             $msg = 'TermTagger HTTP Status was: '.$this->getLastStatus();
             $msg .= "\n URL: ".$httpClient->getUri(true)."\n\nRequested Data: ";
-            $msg .= print_r($serverCommunication,true)."\n\nPlain Server Response: ";
+            $msg .= print_r($data,true)."\n\nPlain Server Response: ";
             $msg .= print_r($response,true);
             $this->log->logError('Result of Tagging a Term was not OK!', $msg);
             return null;
