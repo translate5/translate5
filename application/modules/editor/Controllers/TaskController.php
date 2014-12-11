@@ -742,7 +742,7 @@ class editor_TaskController extends ZfExtended_RestController {
         // disable layout and view
         $this->view->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
-        header('Content-Type: application/zip');
+        header('Content-Type: application/zip', TRUE);
         header('Content-Disposition: attachment; filename="'.$this->entity->getTasknameForDownload($suffix).'"');
         readfile($zipFile);
         exit;

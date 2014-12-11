@@ -65,7 +65,7 @@ class Editor_ReferencefileController extends editor_Controllers_EditorrestContro
         header('Expires: 0');
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
         header('Pragma: public');
-        header("Content-Type: ".$this->getMime($file));
+        header("Content-Type: ".$this->getMime($file), TRUE);
         flush();
         readfile($file);
         exit;
