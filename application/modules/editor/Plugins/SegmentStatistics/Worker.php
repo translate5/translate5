@@ -53,7 +53,7 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
         $data = ZfExtended_Factory::get('editor_Models_Segment_Iterator', array($this->taskGuid));
         /* @var $data editor_Models_Segment_Iterator */
         if ($data->isEmpty()) {
-            return;
+            return false;
         }
         
         $sfm = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
@@ -83,6 +83,7 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
             }
         }
         $this->writeToDisk();
+        return true;
     }
     
     /**
