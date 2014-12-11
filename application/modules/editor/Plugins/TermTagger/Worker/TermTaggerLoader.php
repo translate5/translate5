@@ -83,7 +83,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerLoader extends editor_Plugins_T
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::run()
      */
-    public function run($calculateSlot) {
+    public function run($calculateSlot=false) {
         return parent::run($calculateSlot);
     }
     
