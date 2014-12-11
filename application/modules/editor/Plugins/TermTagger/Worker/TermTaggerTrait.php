@@ -69,10 +69,10 @@ trait editor_Plugins_TermTagger_Worker_TermTaggerTrait {
      * Values for termtagging segment-states
      * @var array(strings)
      */
-    public static $SEGMENT_STATE_UNTAGGED = 'untagged';
-    public static $SEGMENT_STATE_INPROGRESS = 'inprogress';
-    public static $SEGMENT_STATE_TAGGED = 'tagged';
-    //public static $SEGMENT_STATE_TARGETNOTFOUND = 'targetnotfound';
+    const SEGMENT_STATE_UNTAGGED = 'untagged';
+    const SEGMENT_STATE_INPROGRESS = 'inprogress';
+    const SEGMENT_STATE_TAGGED = 'tagged';
+    //const SEGMENT_STATE_TARGETNOTFOUND = 'targetnotfound';
     
     /**
      * Stores the init-paramters from the initial call
