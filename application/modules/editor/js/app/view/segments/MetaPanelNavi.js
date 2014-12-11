@@ -64,7 +64,7 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
     //Item Strings:
     item_cancel: '#UT#Abbrechen',
     item_save: '#UT#Speichern',
-    item_saveAndNext: '#UT#Speichern und nächstes öffnen',
+    item_saveAndNext: '#UT#Speichern und nächstes öffnen (STRG + ENTER)',
     item_saveAndPrevious: '#UT#Speichern und vorheriges öffnen',
     item_alternateLeft: '#UT#Vorherige Spalte editieren',
     item_alternateRight: '#UT#Nächste Spalte editieren',
