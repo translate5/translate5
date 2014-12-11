@@ -577,12 +577,7 @@
 <trans-unit id='V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIFRCWCBEYXRlbiBmw7xyIGRhcyBUZXJtVGFnZ2luZw=='><source>Wählen Sie die zu importierenden TBX Daten für das TermTagging</source><target>Wählen Sie die zu importierenden TBX Daten für das TermTagging</target></trans-unit>
 <trans-unit id='VEJYIERhdGVpwrkgwrI='><source>TBX Datei¹ ²</source><target>TBX Datei¹ ²</target></trans-unit>
 <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRCWCBEYXRlaSE='><source>Bitte verwenden Sie eine TBX Datei!</source><target>Bitte verwenden Sie eine TBX Datei!</target></trans-unit>
-
-<trans-unit id="PGIgc3R5bGU9ImNvbG9yOiNmZjAwMDA7Ij5OZXU6PC9iPiBTaWUga8O2bm5lbiBudW4gbmViZW4gWklQIGF1Y2ggZGlyZWt0IFNETFhMSUZGLCBvcGVuVE0yLVhMSUZGIG9kZXIgQ1NWIERhdGVpZW4gYmVudXR6ZW4hIDxhIHRhcmdldD0iX2JsYW5rIiBocmVmPSJ7MH0vaW5kZXgvdXNhZ2Ujc2luZ2xlLWltcG9ydCI+TWVociBJbmZvPC9hPi4=">
-  <source><b style="color:#ff0000;">Neu:</b> Sie können nun neben ZIP auch direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage#single-import">Mehr Info</a>.</source>
-  <target><b style="color:#ff0000;">Neu:</b> Sie können nun neben ZIP auch direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage#single-import">Mehr Info</a>.</target>
-</trans-unit>
-
+<trans-unit id="PGIgc3R5bGU9ImNvbG9yOiNmZjAwMDA7Ij5OZXU6PC9iPiBTaWUga8O2bm5lbiBudW4gbmViZW4gWklQIGF1Y2ggZGlyZWt0IFNETFhMSUZGLCBvcGVuVE0yLVhMSUZGIG9kZXIgQ1NWIERhdGVpZW4gYmVudXR6ZW4hIDxhIHRhcmdldD0iX2JsYW5rIiBocmVmPSJ7MH0vaW5kZXgvdXNhZ2Ujc2luZ2xlLWltcG9ydCI+TWVociBJbmZvPC9hPi4="><source><b style="color:#ff0000;">Neu:</b> Sie können nun neben ZIP auch direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage#single-import">Mehr Info</a>.</source><target><b style="color:#ff0000;">Neu:</b> Sie können nun neben ZIP auch direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage#single-import">Mehr Info</a>.</target></trans-unit>
 <trans-unit id='wrIgc2VwYXJhdGUgVEJYIG51ciBiZWltIEltcG9ydCBlaW5lciBTRExYTElGRiBEYXRlaSBtw7ZnbGljaC4='><source>² separate TBX nur beim Import einer SDLXLIFF Datei möglich.</source><target>² separate TBX nur beim Import einer SDLXLIFF Datei möglich.</target></trans-unit>
 <trans-unit id='U3RhbmRhcmQgQWJsYXVmcGxhbg=='><source>Standard Ablaufplan</source><target>Standard Ablaufplan</target></trans-unit>
 <trans-unit id='VGVzdCBXb3JrZmxvdw=='><source>Test Workflow</source><target>Test Workflow</target></trans-unit>
@@ -687,6 +682,19 @@ Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-M
 <trans-unit id='TmljaHQgZ2VzZXR6dA=='><source>Nicht gesetzt</source><target>Nicht gesetzt</target></trans-unit>
 <trans-unit id='ezB9OiBlZGl0aWVyYmFy'><source>{0}: editierbar</source><target>{0}: editierbar</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSAiezB9IiB2b2xsc3TDpG5kaWcgaW1wb3J0aWVydA=='><source>Aufgabe "{0}" vollständig importiert</source><target>Aufgabe "{0}" vollständig importiert</target></trans-unit>
+<trans-unit id='QW53ZW5kdW5nc2ZlaGxlcg=='><source>Anwendungsfehler</source><target>Anwendungsfehler</target></trans-unit>
+<trans-unit id='V2lyIGJpdHRlbiB1bSBFbnRzY2h1bGRpZ3VuZyBmw7xyIGRpZSBhdWZnZXRyZXRlbmUgU3TDtnJ1bmch'><source>Wir bitten um Entschuldigung für die aufgetretene Störung!</source><target>Wir bitten um Entschuldigung für die aufgetretene Störung!</target></trans-unit>
+<trans-unit id='VW5zZXJlIEFkbWluaXN0cmF0b3JlbiB3ZXJkZW4gYXV0b21hdGlzY2ggYmVuYWNocmljaHRpZ3QgdW5kIHdlcmRlbiBzaWNoIHVtZ2VoZW5kIG1pdCBJaG5lbiBpbiBWZXJiaW5kdW5nIHNldHplbi4='><source>Unsere Administratoren werden automatisch benachrichtigt und werden sich umgehend mit Ihnen in Verbindung setzen.</source><target>Unsere Administratoren werden automatisch benachrichtigt und werden sich umgehend mit Ihnen in Verbindung setzen.</target></trans-unit>
+<trans-unit id='U29sbHRlIGlubmVyaGFsYiBkZXMgbsOkY2hzdGVuIEFyYmVpdHN0YWdzIGtlaW5lIEtvbnRha3RhdWZuYWhtZSBlcmZvbGd0IHNlaW4sIGxpZWd0IGVpbmUgYWxsZ2VtZWluZSBTdMO2cnVuZyB2b3IsIGRpZSBkaWUgYXV0b21hdGlzY2hlIEJlbmFjaHJpY2h0aWd1bmcgdW5zZXJlciBBZG1pbmlzdHJhdG9yZW4gdmVyaGluZGVydC4gQml0dGUgYmVuYWNocmljaHRpZ2VuIFNpZSB1bnMgZGFubiBtw7ZnbGljaHN0IHVtZ2VoZW5kIHVudGVyIGRlbiBmb2xnZW5kZW4gS29udGFrdGRhdGVuOg=='><source>Sollte innerhalb des nächsten Arbeitstags keine Kontaktaufnahme erfolgt sein, liegt eine allgemeine Störung vor, die die automatische Benachrichtigung unserer Administratoren verhindert. Bitte benachrichtigen Sie uns dann möglichst umgehend unter den folgenden Kontaktdaten:</source><target>Sollte innerhalb des nächsten Arbeitstags keine Kontaktaufnahme erfolgt sein, liegt eine allgemeine Störung vor, die die automatische Benachrichtigung unserer Administratoren verhindert. Bitte benachrichtigen Sie uns dann möglichst umgehend unter den folgenden Kontaktdaten:</target></trans-unit>
+<trans-unit id='VGVsZWZvbjo='><source>Telefon:</source><target>Telefon:</target></trans-unit>
+<trans-unit id='RS1NYWlsOg=='><source>E-Mail:</source><target>E-Mail:</target></trans-unit>
+<trans-unit id='UG9ydHVnaWVzaXNjaCAoRVUp'><source>Portugiesisch (EU)</source><target>Portugiesisch (EU)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2g='><source>Arabisch</source><target>Arabisch</target></trans-unit>
+<trans-unit id='RnJhbnrDtnNpc2NoKEJlbGdpZW4p'><source>Französisch(Belgien)</source><target>Französisch(Belgien)</target></trans-unit>
+<trans-unit id='SGF1c3Nh'><source>Haussa</source><target>Haussa</target></trans-unit>
+<trans-unit id='SGVicsOkaXNjaA=='><source>Hebräisch</source><target>Hebräisch</target></trans-unit>
+<trans-unit id='U2VyYm8tS3JvYXRpc2No'><source>Serbo-Kroatisch</source><target>Serbo-Kroatisch</target></trans-unit>
+<trans-unit id='VXJkdQ=='><source>Urdu</source><target>Urdu</target></trans-unit>
   </body>
  </file>
 </xliff>
