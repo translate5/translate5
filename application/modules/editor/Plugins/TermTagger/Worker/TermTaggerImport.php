@@ -232,7 +232,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         foreach ($segmentIds as $segmentId) {
             $segment = ZfExtended_Factory::get('editor_Models_Segment');
             /* @var $segment editor_Models_Segment */
-            $segment->load($segmentId);
+            $segment->load($segmentId['id']);
             $segment->meta()->setTermtagState($this::SEGMENT_STATE_INPROGRESS);
             $segment->meta()->save();
             
