@@ -1,5 +1,6 @@
 client-specific
 application/config/installation.ini
+data/editorImportedTasks/*
 /nbproject/
 .buildpath
 .project
