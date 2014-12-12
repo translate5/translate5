@@ -46,6 +46,15 @@
 class editor_Plugins_SegmentStatistics_Bootstrap extends ZfExtended_Plugin_Abstract {
     public function init() {
         $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'));
+        //$this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImportCleanup'));
+    }
+    
+    /**
+     * handler for event: editor_Models_Import#afterImport
+     * @param $event Zend_EventManager_Event
+     */
+    public function handleAfterImportCleanup(Zend_EventManager_Event $event) {
+        $this->callWorker($event->getParam('task'), 'editor_Plugins_SegmentStatistics_CleanUpWorker');
     }
     
     /**
@@ -53,10 +62,11 @@ class editor_Plugins_SegmentStatistics_Bootstrap extends ZfExtended_Plugin_Abstr
      * @param $event Zend_EventManager_Event
      */
     public function handleAfterImport(Zend_EventManager_Event $event) {
-        $task = $event->getParam('task');
-        /* @var $task editor_Models_Task */
-        
-        $worker = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Worker');
+        $this->callWorker($event->getParam('task'), 'editor_Plugins_SegmentStatistics_Worker');
+    }
+    
+    protected function callWorker(editor_Models_Task $task, $worker) {
+        $worker = ZfExtended_Factory::get('');
         /* @var $worker editor_Plugins_SegmentStatistics_Worker */
         $worker->init($task->getTaskGuid());
         $worker->queue();

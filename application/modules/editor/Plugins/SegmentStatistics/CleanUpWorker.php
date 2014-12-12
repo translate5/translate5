@@ -34,9 +34,10 @@
  END LICENSE AND COPYRIGHT 
  */
 /**
- * editor_Plugins_SegmentStatistics_Worker Class
+ * Since Statistics are mostly only important for editable segments, the plugin provides this worker,
+ * which deletes all statistics for non editable segments.
  */
-class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract {
+class editor_Plugins_SegmentStatistics_CleanUpWorker extends ZfExtended_Worker_Abstract {
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
@@ -50,38 +51,26 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
-        $data = ZfExtended_Factory::get('editor_Models_Segment_Iterator', array($this->taskGuid));
-        /* @var $data editor_Models_Segment_Iterator */
-        if ($data->isEmpty()) {
-            return false;
-        }
-        
-        $sfm = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
-        /* @var $sfm editor_Models_SegmentFieldManager */
-        $sfm->initFields($this->taskGuid);
-        
-        $fields = $sfm->getFieldList();
-        $termNotFoundRegEx = '#<div[^>]+class="[^"]*((term[^"]*transNotFound)|(transNotFound[^"]*term))[^"]*"[^>]*>#';
-        
         $stat = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_Statistics');
         /* @var $stat editor_Plugins_SegmentStatistics_Models_Statistics */
-        //walk over segments and fields and get and store statistics data
-        foreach($data as $segment) {
-            foreach($fields as $field) {
-                $fieldName = $field->name;
-                $segmentContent = $segment->getDataObject()->$fieldName;
-                $stat->init();
-                $stat->setTaskGuid($this->taskGuid);
-                $stat->setSegmentId($segment->getId());
-                $stat->setFieldName($fieldName);
-                $stat->setFieldType($field->type);
-                $stat->setFileId($segment->getFileId());
-                $stat->setCharCount(mb_strlen(strip_tags($segmentContent)));
-                $count = preg_match_all($termNotFoundRegEx, $segmentContent, $matches);
-                $stat->setTermNotFound($count);
-                $stat->save();
-            }
-        }
+        $db = $stat->db;
+        
+        $segDb = ZfExtended_Factory::get('editor_Models_Db_Segments');
+        /* @var $segDb editor_Models_Db_Segments */
+        
+        $select = $segDb->select()
+            ->from($segDb, array('id'))
+            ->where('taskGuid = ?', $this->taskGuid)
+            ->where('editable = 0');
+
+        $table = $db->info($db::NAME);
+        $adapter = $db->getAdapter();
+        
+        $delete = 'DELETE FROM '.$table;
+        $delete .= ' WHERE '.$adapter->quoteInto('taskGuid = ?', $this->taskGuid);
+        $delete .= ' AND segmentId IN ('.$select.')'; 
+        
+        $adapter->query($delete);
         $this->writeToDisk();
         return true;
     }
