@@ -44,6 +44,8 @@
 /**
  * Segment Entity Objekt
  * 
+ * @method integer getId() getId()
+ * @method void setId() setId(integer $id)
  * @method integer getAutoStateId() getAutoStateId()
  * @method void setAutoStateId() setAutoStateId(integer $id)
  * @method integer getWorkflowStepNr() getWorkflowStepNr()
@@ -77,7 +79,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     protected $segmentdata     = array();
     
     /**
-     * @var editor_Models_Task_Meta
+     * @var editor_Models_Segment_Meta
      */
     protected $meta;
 
@@ -874,10 +876,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return editor_Models_Segment_Meta
      */
     public function meta() {
-        if(!empty($this->meta)) {
+        if(empty($this->meta)) {
+            $this->meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+        }
+        elseif($this->getId() == $this->meta->getSegmentId()) {
             return $this->meta;
         }
-        $this->meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
         try {
             $this->meta->loadBySegmentId($this->getId());
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
