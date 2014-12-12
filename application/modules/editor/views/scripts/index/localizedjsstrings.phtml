@@ -36,7 +36,7 @@
 
 $this->translate->setJsonEncode(true);
 //Datei muss als Javascript ausgespielt werden.
-  header('Content-Type: text/javascript');
+  header('Content-Type: text/javascript', TRUE);
 
   //mehrfachverwendete Strings:
   $yes = $this->translate->_('Ja');

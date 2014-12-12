@@ -247,7 +247,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
 
     public function termsAction() {
         //REST Default Controller Settings umgehen um wieder View Scripte zu verwenden:
-        $this->getResponse()->setHeader('Content-Type', 'text/html');
+        $this->getResponse()->setHeader('Content-Type', 'text/html', TRUE);
         $this->_helper->viewRenderer->setNoRender(false);
 
         //Erstellung und Setzen der Nutzdaten:
