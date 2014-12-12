@@ -83,8 +83,8 @@ class editor_Plugins_TermTagger_Worker_TermTaggerLoader extends editor_Plugins_T
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::run()
      */
-    public function run() {
-        return parent::run();
+    public function run($slot = false) {
+        return parent::run($slot);
     }
     
     /**
@@ -116,6 +116,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerLoader extends editor_Plugins_T
         //get TBX hash from DB, if set
         $hash = $task->meta()->getTbxHash();
         if(!empty($hash) && !$this->data['fetchIds']) {
+            //error_log(__CLASS__.' -> '.__FUNCTION__.'; RELOAD $url: '.$url.'; $hash: '.$hash.'; $tbxData: '.print_r($tbxData, TRUE));
             $service->open($url, $hash, $tbxData);
             return true;
         }
@@ -125,6 +126,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerLoader extends editor_Plugins_T
         $task->meta()->setTbxHash($hash);
         $task->meta()->save();
         
+        //error_log(__CLASS__.' -> '.__FUNCTION__.'; $url: '.$url.'; $hash: '.$hash.'; $tbxData: '.print_r($tbxData, TRUE));
         $result = $service->openFetchIds($url, $hash, $tbxData);
         
         if(empty($result)) {

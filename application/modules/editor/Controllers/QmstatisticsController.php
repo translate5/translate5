@@ -59,7 +59,7 @@ class Editor_QmstatisticsController extends ZfExtended_RestController {
             $taskname = $task->getTasknameForDownload(' - '.$this->getFieldType($taskGuid).'.xml');
             
             header('Content-disposition: attachment; filename="'.$taskname.'"');
-            header('Content-type: "text/xml"; charset="utf8"');
+            header('Content-type: "text/xml"; charset="utf8"', TRUE);
         }
         else{
             $session = new Zend_Session_Namespace();

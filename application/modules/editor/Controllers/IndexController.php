@@ -377,7 +377,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     }
     
     public function localizedjsstringsAction() {
-      $this->getResponse()->setHeader('Content-Type', 'text/javascript');
+      $this->getResponse()->setHeader('Content-Type', 'text/javascript', TRUE);
       $this->session = new Zend_Session_Namespace();
       
       $this->view->frontendControllers = $this->getFrontendControllers();

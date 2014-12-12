@@ -226,7 +226,7 @@ abstract class editor_ImageTag {
      */
     public function directOutput() {
         /* Output the image with headers */
-        header('Content-type: image/png');
+        header('Content-type: image/png', TRUE);
         imagepng($this->image, NULL, 9);
     }
 

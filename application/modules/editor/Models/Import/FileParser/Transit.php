@@ -369,7 +369,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
             $tagText = htmlspecialchars($tagText, ENT_XML1);
         }
         $p = $this->getTagParams($tag, $shortTagIdent, $tagName, $fileNameHash, $tagText);
-        $tag = $this->_leftTag->getHtmlTag($p);
+        $tag = $this->$tagType->getHtmlTag($p);
         $this->$tagType->createAndSaveIfNotExists($tagText, $fileNameHash);
         $this->_tagCount++;
         return $tag;

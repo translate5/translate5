@@ -36,7 +36,7 @@
 
 $this->translate->setJsonEncode(true);
 //Datei muss als Javascript ausgespielt werden.
-  header('Content-Type: text/javascript');
+  header('Content-Type: text/javascript', TRUE);
 
   //mehrfachverwendete Strings:
   $yes = $this->translate->_('Ja');
@@ -231,7 +231,7 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.segments.MetaPanelNavi.prototype.item_cancel = '<?php echo $this->translate->_('Abbrechen');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_save = '<?php echo $this->translate->_('Speichern');?>';
 
-    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNext = '<?php echo $this->translate->_('Speichern und nächstes öffnen');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNext = '<?php echo $this->translate->_('Speichern und nächstes öffnen (STRG + ENTER)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_saveAndPrevious = '<?php echo $this->translate->_('Speichern und vorheriges öffnen');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_alternateLeft = '<?php echo $this->translate->_('Vorherige Spalte editieren');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_alternateRight = '<?php echo $this->translate->_('Nächste Spalte editieren');?>';
