@@ -65,29 +65,17 @@ class editor_Plugins_LockSegmentsBasedOnConfig_Worker extends ZfExtended_Worker_
             //if empty, nothing should be locked based on meta
             return false;
         }
-        $query = $md->getAdapter()->quoteInto('SELECT segmentId FROM `'.$metaTable.'` WHERE taskGuid = ?', $this->taskGuid );
-        $query .= ' and (('.join(') or (', $orWhere).'))';
-        $return = $md->getAdapter()->query($query);
-        $rows = $return->fetchAll();
-        
-        if (empty($rows)) {
-            return;
-        }
+        $subselect = $md->getAdapter()->quoteInto('SELECT segmentId FROM `'.$metaTable.'` WHERE taskGuid = ?', $this->taskGuid );
+        $subselect .= ' and (('.join(') or (', $orWhere).'))';
         
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $meta editor_Models_Segment */
         $sg = $segment->db;
         $sgTable = $sg->info($sg::NAME);
         
-
-        $segmentUpdateWhere = array();
-        foreach ($rows as $key => $row) {
-            $segmentUpdateWhere[] = 'id = '.$row["segmentId"];
-        }
         $query = $sg->getAdapter()->quoteInto('UPDATE `'.$sgTable.'` SET  `editable` = 0, autoStateId = '.
                 editor_Models_SegmentAutoStates::BLOCKED.' WHERE taskGuid = ?', $this->taskGuid );
-        $joinSegmentUpdateWhere = ' and (('.join(') or (', $segmentUpdateWhere).'))';
-        $query .= $joinSegmentUpdateWhere;
+        $query .= ' and id in ('.$subselect.')';
         $sg->getAdapter()->query($query);
         
         $segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
@@ -96,7 +84,7 @@ class editor_Plugins_LockSegmentsBasedOnConfig_Worker extends ZfExtended_Worker_
         $mv = $segmentFieldManager->getView();
         $query = $sg->getAdapter()->quoteInto('UPDATE `'.$mv->getName().'` SET  `editable` = 0, autoStateId = '.
                 editor_Models_SegmentAutoStates::BLOCKED.' WHERE taskGuid = ?', $this->taskGuid );
-        $query .= $joinSegmentUpdateWhere;
+        $query .= ' and id in ('.$subselect.')';
 
         $sg->getAdapter()->query($query);
         return true;
