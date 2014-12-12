@@ -296,6 +296,37 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         $this->parseWhitespace();
         return implode('', $this->segmentParts);
     }
+    
+    /**
+     * protects whitespace inside a segment with a tag
+     *
+     * @param string $segment
+     * @param integer $count optional, variable passed by reference stores the replacement count
+     * @return string $segment
+     */
+    protected function parseSegmentProtectWhitespace($segment, &$count = 0) {
+        $segment = parent::parseSegmentProtectWhitespace($segment, $count);
+        $res = preg_replace_callback(
+                array(
+                    '"\x{0009}"u', //Hex UTF-8 bytes or codepoint of horizontal tab
+                    '"\x{000B}"u', //Hex UTF-8 bytes or codepoint of vertical tab
+                    '"\x{000C}"u', //Hex UTF-8 bytes or codepoint of page feed
+                    '"\x{0085}"u', //Hex UTF-8 bytes or codepoint of control sign for next line
+                    '"\x{00A0}"u', //Hex UTF-8 bytes or codepoint of protected space
+                    '"\x{1680}"u', //Hex UTF-8 bytes or codepoint of Ogam space
+                    '"\x{180E}"u', //Hex UTF-8 bytes or codepoint of mongol vocal divider
+                    '"\x{202F}"u', //Hex UTF-8 bytes or codepoint of small protected space
+                    '"\x{205F}"u', //Hex UTF-8 bytes or codepoint of middle mathematical space
+                    '"\x{3000}"u', //Hex UTF-8 bytes or codepoint of ideographic space
+                    '"[\x{2000}-\x{200A}]"u', //Hex UTF-8 bytes or codepoint of eleven different small spaces, Haarspatium and em space
+                    ), //Hex UTF-8 bytes 	E2 80 9C//von mssql nicht vertragen
+                        function ($match) {
+                            return '<space ts="' . implode(',', unpack('H*', $match[0])) . '"/>';
+                        }, 
+            $segment, -1, $replaceCount);
+        $count += $replaceCount;
+        return $res;
+    }
     /**
      * 
      * @param string $tag
@@ -445,7 +476,9 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
             //check for undefined tags
             $part = &$this->segmentParts[$i];
             if (strpos($part ,'<')!== false){
-                trigger_error('In the segmentPart '.$part.' a tag has been found.');
+                if(strpos(str_replace('<space ', '', $part), '<')){//our whitespace-tags are still allowed
+                    trigger_error('In the segmentPart '.$part.' a tag has been found.');
+                }
             }
             $i++;
             $part = &$this->segmentParts[$i];
