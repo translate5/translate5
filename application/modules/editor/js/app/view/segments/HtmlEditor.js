@@ -126,7 +126,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   getDocMarkup: function() {
     var me = this,
-        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'/css/htmleditor.css?v=10" />'; //disable Img resizing
+        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'/css/htmleditor.css?v=11" />'; //disable Img resizing
         //ursprünglich wurde ein body style height gesetzt. Das führte aber zu Problemen beim wechsel zwischen den unterschiedlich großen Segmente, daher wurde die Höhe entfernt.
     return Ext.String.format('<html><head><style type="text/css">body{border:0;margin:0;padding:{0}px;}</style>{1}</head><body style="font-size:9pt;line-height:14px;"></body></html>', me.iframePad, additionalCss);
   },
@@ -180,6 +180,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     shortTagContent;
     
     Ext.each(rootnode.childNodes, function(item){
+      var termFoundCls;
       if(Ext.isTextNode(item)){
         var text = item.data.replace(new RegExp(Editor.TRANSTILDE, "g"), ' ');
         me.lastSegmentContentWithoutTags.push(text);
@@ -192,7 +193,12 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       }
       // Span für Terminologie
       if(item.tagName == 'DIV' && /(^|[\s])term([\s]|$)/.test(item.className)){
-        me.result.push(Ext.String.format('<span class="{0}" title="{1}">', item.className, item.title));
+        termFoundCls = item.className
+        if(me.fieldTypeToEdit) {
+            var replacement = me.fieldTypeToEdit+'-$1';
+            termFoundCls = termFoundCls.replace(/(transFound|transNotFound)/, replacement);
+        }
+        me.result.push(Ext.String.format('<span class="{0}" title="{1}">', termFoundCls, item.title));
         me.replaceTagToImage(item);
         me.result.push('</span>');
         return;
