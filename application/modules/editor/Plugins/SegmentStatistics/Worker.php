@@ -76,7 +76,7 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
                 $stat->setFieldName($fieldName);
                 $stat->setFieldType($field->type);
                 $stat->setFileId($segment->getFileId());
-                $stat->setCharCount(mb_strlen(strip_tags($segmentContent)));
+                $stat->setCharCount(mb_strlen(strip_tags(preg_replace('"<span.*?</span>"','',$segmentContent))));
                 $count = preg_match_all($termNotFoundRegEx, $segmentContent, $matches);
                 $stat->setTermNotFound($count);
                 $stat->save();
