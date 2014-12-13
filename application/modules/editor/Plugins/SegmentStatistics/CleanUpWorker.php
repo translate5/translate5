@@ -37,15 +37,8 @@
  * Since Statistics are mostly only important for editable segments, the plugin provides this worker,
  * which deletes all statistics for non editable segments.
  */
-class editor_Plugins_SegmentStatistics_CleanUpWorker extends ZfExtended_Worker_Abstract {
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = array()) {
-        return empty($parameters);
-    } 
-    
+class editor_Plugins_SegmentStatistics_CleanUpWorker extends editor_Plugins_SegmentStatistics_Worker {
+
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::work()
@@ -73,70 +66,5 @@ class editor_Plugins_SegmentStatistics_CleanUpWorker extends ZfExtended_Worker_A
         $adapter->query($delete);
         $this->writeToDisk();
         return true;
-    }
-    
-    /**
-     * Method to write statistics to task data directory
-     */
-    protected function writeToDisk() {
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($this->taskGuid);
-        
-        $statistics = $task->getStatistics();
-                
-        $stat = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_Statistics');
-        /* @var $stat editor_Plugins_SegmentStatistics_Models_Statistics */
-        
-        $statistics->files = $stat->getSummary($this->taskGuid);
-        
-        $xml = new SimpleXMLElement('<statistics/>');
-        $xml->addChild('taskGuid', $this->taskGuid);
-        $xml->addChild('taskName', $statistics->taskName);
-        $files = $xml->addChild('files');
-        
-        $taskFieldsStat = array();
-        
-        $lastFileId = 0;
-        $lastField = null;
-        foreach($statistics->files as $fileStat) {
-            //implement next file:
-            if($lastFileId != $fileStat['fileId']) {
-                $file = $files->addChild('file');
-                $file->addChild('fileName', $fileStat['fileName']);
-                $file->addChild('fileId', $fileStat['fileId']);
-                $fields = $file->addChild('fields');
-                $lastFileId = $fileStat['fileId'];
-            }
-
-            //calculate statistics per field for whole task
-            $fieldName = $fileStat['fieldName'];
-            settype($taskFieldsStat[$fieldName], 'array');
-            settype($taskFieldsStat[$fieldName]['taskCharCount'], 'integer');
-            settype($taskFieldsStat[$fieldName]['taskTermNotFound'], 'integer');
-            $taskFieldsStat[$fieldName]['taskCharCount'] += $fileStat['charCount'];
-            $taskFieldsStat[$fieldName]['taskTermNotFound'] += $fileStat['termNotFoundCount'];
-            
-            $field = $fields->addChild('field');
-            $field->addChild('fieldName', $fieldName);
-            $field->addChild('charCount', $fileStat['charCount']);
-            $field->addChild('termNotFoundCount', $fileStat['termNotFoundCount']);
-            $field->addChild('segmentsPerFile', $fileStat['segmentsPerFile']);
-        }
-        
-        $xml->addChild('segmentCount', $statistics->segmentCount);
-        
-        //add the statistics per field for whole task
-        foreach($taskFieldsStat as $fieldName => $fieldStat) {
-            $fields = $xml->addChild('fields');
-            $field = $fields->addChild('field');
-            $field->addChild('fieldName', $fieldName);
-            foreach($fieldStat as $key => $value) {
-                $field->addChild($key, $value);
-            }
-        }
-        
-        $filename = $task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.'segmentstatistics.xml';
-        $xml->asXML($filename);
     }
 }

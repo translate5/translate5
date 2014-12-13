@@ -487,13 +487,16 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * returns the segment count of the given taskGuid
      * @param string $taskGuid
+     * @param boolean $editable
      * @return integer the segment count
      */
-    public function count($taskGuid) {
+    public function count($taskGuid,$onlyEditable=false) {
         $s = $this->db->select()
             ->from($this->db, array('cnt' => 'COUNT(id)'))
             ->where('taskGuid = ?', $taskGuid);
-
+        if($onlyEditable){
+            $s->where('editable = 1');
+        }
         $row = $this->db->fetchRow($s);
         return $row->cnt;
     }

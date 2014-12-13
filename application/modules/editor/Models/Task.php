@@ -615,6 +615,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */
         $result->segmentCount = $segment->count($this->getTaskGuid());
+        $result->segmentCountEditable = $segment->count($this->getTaskGuid(),true);
         return $result;
     }
     
