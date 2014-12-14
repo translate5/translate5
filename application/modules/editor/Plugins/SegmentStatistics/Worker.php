@@ -67,6 +67,7 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
         /* @var $stat editor_Plugins_SegmentStatistics_Models_Statistics */
         //walk over segments and fields and get and store statistics data
         foreach($data as $segment) {
+            /* @var $segment editor_Models_Segment */
             foreach($fields as $field) {
                 $fieldName = $field->name;
                 $segmentContent = $segment->getDataObject()->$fieldName;
@@ -76,7 +77,7 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
                 $stat->setFieldName($fieldName);
                 $stat->setFieldType($field->type);
                 $stat->setFileId($segment->getFileId());
-                $stat->setCharCount(mb_strlen(strip_tags(preg_replace('"<span.*?</span>"','',$segmentContent))));
+                $stat->setCharCount(mb_strlen($segment->stripTags($segmentContent)));
                 $count = preg_match_all($termNotFoundRegEx, $segmentContent, $matches);
                 $stat->setTermNotFound($count);
                 $stat->save();
