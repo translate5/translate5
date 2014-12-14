@@ -165,10 +165,10 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $task->loadByTaskGuid($taskGuid);
         
         // stop if task has no terminologie
-        if (!$task->getTerminologie()) {
+        if (!$task->getTerminologie()||!$segment->isDataModified()) {
             return;
         }
-        
+
         $serverCommunication = $this->fillServerCommunication($task, $segment);
         /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
         

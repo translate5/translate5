@@ -119,6 +119,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
 
         $this->entity->setUserGuid($sessionUser->data->userGuid);
         $this->entity->setUserName($sessionUser->data->userName);
+        $this->entity->restoreNotModfied();
         
         //@todo do this with events
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');

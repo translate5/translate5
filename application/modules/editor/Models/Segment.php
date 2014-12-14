@@ -82,6 +82,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @var editor_Models_Segment_Meta
      */
     protected $meta;
+    
+    protected $isDataModified;
 
     /**
      * init the internal segment field and the DB object
@@ -188,6 +190,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return boolean
      */
     public function isDataModified($typeFilter = null) {
+        if(!is_null($this->isDataModified)){
+            return $this->isDataModified;
+        }
+        $this->isDataModified = false;
         foreach ($this->segmentdata as $data) {
             $field = $this->segmentFieldManager->getByName($data->name);
             $isEditable = $field->editable;
@@ -195,18 +201,40 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
                 continue;
             }
             if($this->stripTags($data->edited) !== $this->stripTags($data->original)) {
-                return true;
+                $this->isDataModified = true;
             }
         }
-        return false;
+        return $this->isDataModified;
+    }
+    /**
+     * restores segments with content not changed by the user to the original
+     * (which contains termTags - this way no new termTagging is necessary, since
+     * GUI removes termTags onSave)
+     */
+    public function restoreNotModfied() {
+        if($this->isDataModified()){
+            return;
+        }
+        foreach ($this->segmentdata as &$data) {
+            $field = $this->segmentFieldManager->getByName($data->name);
+            $isEditable = $field->editable;
+            if(!$isEditable) {
+                continue;
+            }
+            $data->edited = $data->original;
+        }
     }
     /**
      * strips all tags including tag description
      * 
      * @param string $segmentContent
+     * @param boolean $htmlEntityDecode if _all_ html-entities should be decoded
      * @return string $segmentContent
      */
-    public function stripTags($segmentContent) {
+    public function stripTags($segmentContent,$htmlEntityDecode = true) {
+        if($htmlEntityDecode){
+            $segmentContent = html_entity_decode($segmentContent, ENT_QUOTES | ENT_XHTML);
+        }
         return strip_tags(preg_replace('"<span.*?</span>"','',$segmentContent));
     }
     
