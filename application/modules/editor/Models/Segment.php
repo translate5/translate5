@@ -185,6 +185,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * Loops over all data fields and checks if at least one of them was changed (compare by original and edited content)
      * @param string $typeFilter optional, checks only data fields of given type
+     * @return boolean
      */
     public function isDataModified($typeFilter = null) {
         foreach ($this->segmentdata as $data) {
@@ -193,11 +194,20 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             if(!$isEditable || !empty($typeFilter) && $data->type !== $typeFilter) {
                 continue;
             }
-            if($data->edited !== $data->original) {
+            if($this->stripTags($data->edited) !== $this->stripTags($data->original)) {
                 return true;
             }
         }
         return false;
+    }
+    /**
+     * strips all tags including tag description
+     * 
+     * @param string $segmentContent
+     * @return string $segmentContent
+     */
+    public function stripTags($segmentContent) {
+        return strip_tags(preg_replace('"<span.*?</span>"','',$segmentContent));
     }
     
     /**
