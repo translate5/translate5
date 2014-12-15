@@ -37,13 +37,7 @@
 /**
  * Initial Class of Plugin "TermTagger"
  */
-class editor_Plugins_TermTagger_Bootstrap {
-    
-    /**
-     * @var Zend_EventManager_StaticEventManager
-     */
-    protected $staticEvents = false;
-    
+class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
     /**
      * @var ZfExtended_Log
      */
@@ -63,7 +57,7 @@ class editor_Plugins_TermTagger_Bootstrap {
     
     
     
-    public function __construct() {
+    public function init() {
         $this->log = ZfExtended_Factory::get('ZfExtended_Log', array(false));
 
         if(!$this->assertConfig()) {
@@ -71,12 +65,11 @@ class editor_Plugins_TermTagger_Bootstrap {
         }
         
         // event-listeners
-        $this->staticEvents = Zend_EventManager_StaticEventManager::getInstance();
-        $this->staticEvents->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterTaskImport'),100);
-        $this->staticEvents->attach('editor_Models_Import_MetaData', 'importMetaData', array($this, 'handleImportMeta'));
-        $this->staticEvents->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndex'));
-        $this->staticEvents->attach('editor_Workflow_Default', array('doView', 'doEdit'), array($this, 'handleAfterTaskOpen'));
-        $this->staticEvents->attach('Editor_SegmentController', 'beforePutSave', array($this, 'handleBeforePutSave'));
+        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterTaskImport'),100);
+        $this->eventManager->attach('editor_Models_Import_MetaData', 'importMetaData', array($this, 'handleImportMeta'));
+        $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndex'));
+        $this->eventManager->attach('editor_Workflow_Default', array('doView', 'doEdit'), array($this, 'handleAfterTaskOpen'));
+        $this->eventManager->attach('Editor_SegmentController', 'beforePutSave', array($this, 'handleBeforePutSave'));
     }
     
     /**
@@ -172,10 +165,10 @@ class editor_Plugins_TermTagger_Bootstrap {
         $task->loadByTaskGuid($taskGuid);
         
         // stop if task has no terminologie
-        if (!$task->getTerminologie()) {
+        if (!$task->getTerminologie()||!$segment->isDataModified()) {
             return;
         }
-        
+
         $serverCommunication = $this->fillServerCommunication($task, $segment);
         /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
         

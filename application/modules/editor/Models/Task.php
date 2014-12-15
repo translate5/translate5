@@ -615,6 +615,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */
         $result->segmentCount = $segment->count($this->getTaskGuid());
+        $result->segmentCountEditable = $segment->count($this->getTaskGuid(),true);
         return $result;
     }
     
@@ -623,10 +624,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return editor_Models_Task_Meta
      */
     public function meta() {
-        if(!empty($this->meta)) {
+        if(empty($this->meta)) {
+            $this->meta = ZfExtended_Factory::get('editor_Models_Task_Meta');
+        }
+        elseif($this->getTaskGuid() == $this->meta->getTaskGuid()) {
             return $this->meta;
         }
-        $this->meta = ZfExtended_Factory::get('editor_Models_Task_Meta');
         try {
             $this->meta->loadByTaskGuid($this->getTaskGuid());
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {

@@ -67,6 +67,7 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
         /* @var $stat editor_Plugins_SegmentStatistics_Models_Statistics */
         //walk over segments and fields and get and store statistics data
         foreach($data as $segment) {
+            /* @var $segment editor_Models_Segment */
             foreach($fields as $field) {
                 $fieldName = $field->name;
                 $segmentContent = $segment->getDataObject()->$fieldName;
@@ -76,7 +77,7 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
                 $stat->setFieldName($fieldName);
                 $stat->setFieldType($field->type);
                 $stat->setFileId($segment->getFileId());
-                $stat->setCharCount(mb_strlen(strip_tags($segmentContent)));
+                $stat->setCharCount(mb_strlen($segment->stripTags($segmentContent)));
                 $count = preg_match_all($termNotFoundRegEx, $segmentContent, $matches);
                 $stat->setTermNotFound($count);
                 $stat->save();
@@ -85,7 +86,7 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
         $this->writeToDisk();
         return true;
     }
-    
+        
     /**
      * Method to write statistics to task data directory
      */
@@ -136,10 +137,11 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
         }
         
         $xml->addChild('segmentCount', $statistics->segmentCount);
+        $xml->addChild('segmentCountEditable', $statistics->segmentCountEditable);
         
         //add the statistics per field for whole task
+        $fields = $xml->addChild('fields');
         foreach($taskFieldsStat as $fieldName => $fieldStat) {
-            $fields = $xml->addChild('fields');
             $field = $fields->addChild('field');
             $field->addChild('fieldName', $fieldName);
             foreach($fieldStat as $key => $value) {

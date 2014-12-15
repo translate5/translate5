@@ -44,6 +44,8 @@
 /**
  * Segment Entity Objekt
  * 
+ * @method integer getId() getId()
+ * @method void setId() setId(integer $id)
  * @method integer getAutoStateId() getAutoStateId()
  * @method void setAutoStateId() setAutoStateId(integer $id)
  * @method integer getWorkflowStepNr() getWorkflowStepNr()
@@ -77,9 +79,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     protected $segmentdata     = array();
     
     /**
-     * @var editor_Models_Task_Meta
+     * @var editor_Models_Segment_Meta
      */
     protected $meta;
+    
+    protected $isDataModified;
 
     /**
      * init the internal segment field and the DB object
@@ -183,19 +187,55 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * Loops over all data fields and checks if at least one of them was changed (compare by original and edited content)
      * @param string $typeFilter optional, checks only data fields of given type
+     * @return boolean
      */
     public function isDataModified($typeFilter = null) {
+        if(!is_null($this->isDataModified)){
+            return $this->isDataModified;
+        }
+        $this->isDataModified = false;
         foreach ($this->segmentdata as $data) {
             $field = $this->segmentFieldManager->getByName($data->name);
             $isEditable = $field->editable;
             if(!$isEditable || !empty($typeFilter) && $data->type !== $typeFilter) {
                 continue;
             }
-            if($data->edited !== $data->original) {
-                return true;
+            if($this->stripTags($data->edited) !== $this->stripTags($data->original)) {
+                $this->isDataModified = true;
             }
         }
-        return false;
+        return $this->isDataModified;
+    }
+    /**
+     * restores segments with content not changed by the user to the original
+     * (which contains termTags - this way no new termTagging is necessary, since
+     * GUI removes termTags onSave)
+     */
+    public function restoreNotModfied() {
+        if($this->isDataModified()){
+            return;
+        }
+        foreach ($this->segmentdata as &$data) {
+            $field = $this->segmentFieldManager->getByName($data->name);
+            $isEditable = $field->editable;
+            if(!$isEditable) {
+                continue;
+            }
+            $data->edited = $data->original;
+        }
+    }
+    /**
+     * strips all tags including tag description
+     * 
+     * @param string $segmentContent
+     * @param boolean $htmlEntityDecode if _all_ html-entities should be decoded
+     * @return string $segmentContent
+     */
+    public function stripTags($segmentContent,$htmlEntityDecode = true) {
+        if($htmlEntityDecode){
+            $segmentContent = html_entity_decode($segmentContent, ENT_QUOTES | ENT_XHTML);
+        }
+        return strip_tags(preg_replace('"<span.*?</span>"','',$segmentContent));
     }
     
     /**
@@ -485,13 +525,16 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * returns the segment count of the given taskGuid
      * @param string $taskGuid
+     * @param boolean $editable
      * @return integer the segment count
      */
-    public function count($taskGuid) {
+    public function count($taskGuid,$onlyEditable=false) {
         $s = $this->db->select()
             ->from($this->db, array('cnt' => 'COUNT(id)'))
             ->where('taskGuid = ?', $taskGuid);
-
+        if($onlyEditable){
+            $s->where('editable = 1');
+        }
         $row = $this->db->fetchRow($s);
         return $row->cnt;
     }
@@ -874,10 +917,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return editor_Models_Segment_Meta
      */
     public function meta() {
-        if(!empty($this->meta)) {
+        if(empty($this->meta)) {
+            $this->meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+        }
+        elseif($this->getId() == $this->meta->getSegmentId()) {
             return $this->meta;
         }
-        $this->meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
         try {
             $this->meta->loadBySegmentId($this->getId());
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {

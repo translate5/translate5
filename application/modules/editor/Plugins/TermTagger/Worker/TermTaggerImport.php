@@ -170,12 +170,44 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         
         $db = ZfExtended_Factory::get('editor_Models_Db_Segments');
         /* @var $db editor_Models_Db_Segments */
+        $dbName = $db->info($db::NAME);
+        
+        $dbMeta = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
+        /* @var $dbMeta editor_Models_Db_SegmentMeta */
+        $dbMetaName = $dbMeta->info($dbMeta::NAME);
+        
+        $dbWorker = ZfExtended_Factory::get('ZfExtended_Models_Db_Worker');
+        /* @var $dbWorker ZfExtended_Models_Db_Worker */
+        $dbWorkerName = $dbWorker->info($dbWorker::NAME);
+        
+        $dbSegmentField = ZfExtended_Factory::get('editor_Models_Db_SegmentField');
+        /* @var $dbSegmentField editor_Models_Db_SegmentField */
+        $dbSegmentFieldName = $dbSegmentField->info($dbSegmentField::NAME);
+        
+        $dbSegmentData = ZfExtended_Factory::get('editor_Models_Db_SegmentData');
+        /* @var $dbSegmentField editor_Models_Db_SegmentData */
+        $dbSegmentDataName = $dbSegmentData->info($dbSegmentData::NAME);
+        
+        $db->getAdapter()->query("lock tables `".$dbMetaName."` WRITE, ".$dbWorkerName." WRITE, ".$dbName." WRITE, ".$dbSegmentFieldName." WRITE, ".$dbSegmentDataName." WRITE");
+        
+        
         $select = $this->getNextSegmentSelect($db, $taskGuid);
-        $sql = $select->where('meta.termtagState IS NULL OR meta.termtagState IN (?)',
+        $sql = $select->where($dbMetaName.'.termtagState IS NULL OR '.$dbMetaName.'.termtagState IN (?)',
                             array($this::SEGMENT_STATE_UNTAGGED)) // later there may will be a state 'targetnotfound'
-                    ->order('segment.id')
+                    ->order($dbName.'.id')
                     ->limit($limit);
-        return $db->fetchAll($sql)->toArray();
+        $segmentIds = $db->fetchAll($sql)->toArray();
+        
+        foreach ($segmentIds as $segmentId) {
+            $segment = ZfExtended_Factory::get('editor_Models_Segment');
+            /* @var $segment editor_Models_Segment */
+            $segment->load($segmentId['id']);
+            $segment->meta()->setTermtagState($this::SEGMENT_STATE_INPROGRESS);
+            $segment->meta()->save();
+        }
+        $db->getAdapter()->query('unlock tables');
+        
+        return $segmentIds;
     }
     
     /**
@@ -189,8 +221,11 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         // get list of untagged segments
         $db = ZfExtended_Factory::get('editor_Models_Db_Segments');
         /* @var $db editor_Models_Db_Segments */
+        $dbMeta = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
+        /* @var $dbMeta editor_Models_Db_SegmentMeta */
+        $dbMetaName = $dbMeta->info($dbMeta::NAME);
         $select = $this->getNextSegmentSelect($db, $taskGuid);
-        $sql = $select->where('meta.termtagState = ?',$this::SEGMENT_STATE_RETAG)
+        $sql = $select->where($dbMetaName.'.termtagState = ?',$this::SEGMENT_STATE_RETAG)
                     ->limit(1);
         return $db->fetchAll($sql)->toArray();
     }
@@ -205,9 +240,9 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         $dbName = $db->info($db::NAME);
         /* @var $db editor_Models_Db_Segments */
         return $db->select()
-                    ->from(array('segment' => $dbName), 'segment.id')
-                    ->joinLeft(array('meta' => $dbName.'_meta'), 'segment.id = meta.segmentId', array())
-                    ->where('segment.taskGuid = ?', $taskGuid);
+                    ->from($dbName, $dbName.'.id')
+                    ->joinLeft($dbName.'_meta', $dbName.'.id = '.$dbName.'_meta'.'.segmentId', array())
+                    ->where($dbName.'.taskGuid = ?', $taskGuid);
     }
     
     /**
@@ -232,9 +267,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         foreach ($segmentIds as $segmentId) {
             $segment = ZfExtended_Factory::get('editor_Models_Segment');
             /* @var $segment editor_Models_Segment */
-            $segment->load($segmentId);
-            $segment->meta()->setTermtagState($this::SEGMENT_STATE_INPROGRESS);
-            $segment->meta()->save();
+            $segment->load($segmentId['id']);
             
             $sourceText = $segment->get($this->sourceFieldName);
             

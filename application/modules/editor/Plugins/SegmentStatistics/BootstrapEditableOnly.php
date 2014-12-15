@@ -42,24 +42,24 @@
  */
 /**
  * Plugin Bootstrap for Segment Statistics Plugin
+ * Creates Statistics for editable segments only!
  */
-class editor_Plugins_SegmentStatistics_Bootstrap extends ZfExtended_Plugin_Abstract {
+class editor_Plugins_SegmentStatistics_BootstrapEditableOnly extends editor_Plugins_SegmentStatistics_Bootstrap {
+    /**
+     * (non-PHPdoc)
+     * @see editor_Plugins_SegmentStatistics_Bootstrap::init()
+     */
     public function init() {
-        $this->blocks('editor_Plugins_SegmentStatistics_BootstrapEditableOnly');
+        $this->blocks('editor_Plugins_SegmentStatistics_Bootstrap');
         $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'));
+        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImportCleanup'), -11000);
     }
     
     /**
      * handler for event: editor_Models_Import#afterImport
      * @param $event Zend_EventManager_Event
      */
-    public function handleAfterImport(Zend_EventManager_Event $event) {
-        $this->callWorker($event->getParam('task'), 'editor_Plugins_SegmentStatistics_Worker');
-    }
-    
-    protected function callWorker(editor_Models_Task $task, $worker) {
-        $worker = ZfExtended_Factory::get($worker);
-        $worker->init($task->getTaskGuid());
-        $worker->queue();
+    public function handleAfterImportCleanup(Zend_EventManager_Event $event) {
+        $this->callWorker($event->getParam('task'), 'editor_Plugins_SegmentStatistics_CleanUpWorker');
     }
 }

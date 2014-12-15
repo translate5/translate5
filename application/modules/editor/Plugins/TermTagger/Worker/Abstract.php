@@ -81,8 +81,24 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
      * @var array
      */
     protected $data = false;
-    
-    
+    /**
+     * @todo forking should be transfered to ZfExtended_Worker_Abstract to make it usable for other workers.
+     * it should be based on maxParallelProcesses instead of just having one running worker per slot and maxParallelProcesses=1 as currently - but one slot for each termTagger instance. All termTagger instances should run in the same slot but maxParallelProcesses should be set to the number of termTagger-instances
+     * @param string $state
+     */
+    public function queue($state = NULL) {
+        $availableSlots = $this->getAvailableSlots();
+        $resourceName = self::$praefixResourceName.$this->resourcePool;
+        $usedSlots = $this->workerModel->getListSlotsCount($resourceName);
+        
+        // all slotes in use
+        $workerCountToStart = count($availableSlots)*1.2-count($usedSlots);
+        
+        for($i=0;$i<=$workerCountToStart;$i++){
+            parent::queue($state);
+            $this->init($this->workerModel->getTaskGuid(), array('resourcePool' => $this->resourcePool));
+        }
+    }
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::calculateDirectSlot()
@@ -113,21 +129,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         $resourceName = self::$praefixResourceName.$resourcePool;
         
         // detect defined slots for the resourcePool
-        $config = Zend_Registry::get('config');
-        $url = $config->runtimeOptions->termTagger->url;
-        switch ($resourcePool) {
-            case 'gui':
-                $availableSlots = $url->gui->toArray();
-                break;
-            
-            case 'import':
-                $availableSlots = $url->import->toArray();
-                break;
-            
-            case 'default':
-                $availableSlots = $url->default->toArray();
-                break;
-        }
+        $availableSlots = $this->getAvailableSlots();
         // no slots for this resourcePool defined
         if (empty($availableSlots) && $resourcePool != 'default') {
             // calculate slot from default resourcePool
@@ -164,7 +166,28 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         $return = array('resource' => $resourceName, 'slot' => $availableSlots[array_rand($availableSlots)]);
         return $return;
     }
-    
+    /**
+     * 
+     * @return array
+     */
+    protected function getAvailableSlots() {
+        $config = Zend_Registry::get('config');
+        $url = $config->runtimeOptions->termTagger->url;
+        switch ($this->resourcePool) {
+            case 'gui':
+                $return = $url->gui->toArray();
+            
+            case 'import':
+                $return =$url->import->toArray();
+            
+            case 'default':
+                $return =$url->default->toArray();
+        }
+        if(empty($return)){
+            trigger_error('There have to be available slots!');
+        }
+        return $return;
+    }
     
     /**
      * @param editor_Models_Task $task

@@ -33,33 +33,38 @@
  
  END LICENSE AND COPYRIGHT 
  */
-
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
- * Plugin Bootstrap for Segment Statistics Plugin
+ * Since Statistics are mostly only important for editable segments, the plugin provides this worker,
+ * which deletes all statistics for non editable segments.
  */
-class editor_Plugins_SegmentStatistics_Bootstrap extends ZfExtended_Plugin_Abstract {
-    public function init() {
-        $this->blocks('editor_Plugins_SegmentStatistics_BootstrapEditableOnly');
-        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'));
-    }
-    
+class editor_Plugins_SegmentStatistics_CleanUpWorker extends editor_Plugins_SegmentStatistics_Worker {
+
     /**
-     * handler for event: editor_Models_Import#afterImport
-     * @param $event Zend_EventManager_Event
+     * (non-PHPdoc)
+     * @see ZfExtended_Worker_Abstract::work()
      */
-    public function handleAfterImport(Zend_EventManager_Event $event) {
-        $this->callWorker($event->getParam('task'), 'editor_Plugins_SegmentStatistics_Worker');
-    }
-    
-    protected function callWorker(editor_Models_Task $task, $worker) {
-        $worker = ZfExtended_Factory::get($worker);
-        $worker->init($task->getTaskGuid());
-        $worker->queue();
+    public function work() {
+        $stat = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_Statistics');
+        /* @var $stat editor_Plugins_SegmentStatistics_Models_Statistics */
+        $db = $stat->db;
+        
+        $segDb = ZfExtended_Factory::get('editor_Models_Db_Segments');
+        /* @var $segDb editor_Models_Db_Segments */
+        
+        $select = $segDb->select()
+            ->from($segDb, array('id'))
+            ->where('taskGuid = ?', $this->taskGuid)
+            ->where('editable = 0');
+
+        $table = $db->info($db::NAME);
+        $adapter = $db->getAdapter();
+        
+        $delete = 'DELETE FROM '.$table;
+        $delete .= ' WHERE '.$adapter->quoteInto('taskGuid = ?', $this->taskGuid);
+        $delete .= ' AND segmentId IN ('.$select.')'; 
+        
+        $adapter->query($delete);
+        $this->writeToDisk();
+        return true;
     }
 }
