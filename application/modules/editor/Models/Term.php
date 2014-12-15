@@ -215,15 +215,23 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     /**
      * 
      * @param string $mid
-     * @return type
+     * @param string $taskGuid
+     * @return Zend_Db_Table_Row_Abstract | null
      */
-    protected function loadByMid(string $mid) {
-        $s = $this->db->getAdapter()->select()
-        ->from(array('t' => 'LEK_terms'))
-        ->where('t.mid = ?', $taskGuid);
-        return $this->row = $this->db->getAdapter()->fetchRow($s);
+    public function loadByMid(string $mid,string $taskGuid) {
+        $s = $this->db->select(false);
+        $db = $this->db;
+        $s->from($this->db);
+        $s->where('taskGuid = ?', $taskGuid)->where('mid = ?', $mid);
+        
+        
+        $this->row = $this->db->fetchRow($s);
+        if(empty($this->row)){
+            $this->notFound('#select', $s->assemble());
+        }
+        return $this->row;
     }
-
+    
     /**
      * Sortiert die Terme innerhalb der Termgruppen:
      * @param array $termGroups

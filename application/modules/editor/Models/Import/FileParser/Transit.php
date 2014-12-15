@@ -203,9 +203,9 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
             $this->log->logError('Die Datei ' . $this->_fileName . ' enthielt keine übersetzungsrelevanten Segmente!');
         }
         
-        //TODO: prüfen, ob lockedForRefMat und notTranslated (sowohl mit Status in transit als auch durch leeres Zielsegment, aber nicht Quellsegment) korrekt gesperrt werden; Export: schreiben von Quellsegmenten prüfen; prüfen, was sonst noch geprüft werden muss
+        //TODO: prüfen, ob lockedForRefMat und notTranslated (sowohl mit Status in transit als auch durch leeres Zielsegment, aber nicht Quellsegment) korrekt gesperrt werden; prüfen, was sonst noch geprüft werden muss
         
-        //@TODO: test isEvenLanguagePair, whitespace, mehrere Dateien, überall bei trigger_error E_USER_ERROR setzen
+        //@TODO: test isEvenLanguagePair
     }
     
     /**
