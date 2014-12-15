@@ -146,17 +146,18 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
             }
           
             $sourceText = $this->getSegmentContent($segId, editor_Models_SegmentField::TYPE_SOURCE);
-            $sourceSeg->setText($sourceText);
+            if(!empty($sourceText)){
+                $sourceSeg->setText($sourceText);
+            }
 
             $targetText = $this->getSegmentContent($segId, editor_Models_SegmentField::TYPE_TARGET);
             $targetSeg->setText($targetText);
             
             $this->setSegmentInfoField($targetSeg, $segId);
-            
         }
         $this->sourceDOM->save();
         $this->_exportFile = $this->targetDOM->getAsString();
-        //@TODO: setzen des Infofelds, ; prüfen ob im Transit Änderungen und Tags und Infofeld korrekt drin sind - Infofeld auch mit Umlauten und Termen
+        //@TODO: setzen der Zielterme des Infofelds, ; prüfen ob im Transit Änderungen und Tags und Infofeld korrekt drin sind - Infofeld auch mit Umlauten und Termen
     }
     /**
      * 
@@ -168,8 +169,57 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
             return;
         }
         $infoFieldContent = $this->translate->_('###RefMat-Update ');
-        $segmentModel = $this->getSegment($segId);
+        $segment = $this->getSegment($segId);
         
+        $infoFieldContent = $this->infoFieldAddDate($infoFieldContent);
+        $infoFieldContent = $this->infoFieldAddStatus($infoFieldContent,$segment);
+        $infoFieldContent = $this->infoFieldAddTerms($infoFieldContent,$segment);
+        
+        $transitSegment->setInfo($infoFieldContent);
+    }
+    
+    protected function infoFieldAddTerms(string $infoFieldContent,editor_Models_Segment $segment) {
+        if((int)$this->config->runtimeOptions->plugins->transit->writeInfoField->termsWithoutTranslation === 1){
+           $termModel = ZfExtended_Factory::get('editor_Models_Term');
+            /* @var $termModel editor_Models_Term */
+           //<div class="term admittedTerm" id="term_193_es-ES_1-6" title="Spanischer Beschreibungstexttest">tamiz de cepillos rotativos</div>
+            $getTransNotFoundTermIdRegEx = '#<div.*?(class=".*?((term.*?transNotFound)|(transNotFound.*?term)).*?".*?data-tbxid="(.*?)".*?>)|(data-tbxid="(.*?)".*?class=".*?((term.*?transNotFound)|(transNotFound.*?term)).*?".*?>)#';
+
+            $sourceOrigText = $segment->getFieldOriginal(editor_Models_SegmentField::TYPE_SOURCE);
+            preg_match_all($getTransNotFoundTermIdRegEx, $sourceOrigText, $matches);
+            $sourceTermMids = $matches[5];
+            $sourceTerms = array();
+            $targetTerms = array();
+            $taskGuid = $this->_task->getTaskGuid();
+            $targetLang = $this->_task->getTargetLang();
+            foreach ($sourceTermMids as $mid) {
+                $termModel->loadByMid($mid,$taskGuid);
+                $sourceTerms[] = $termModel->getTerm();
+                $targetTermsSourceTerm = $termModel->getTermEntryTermsByTaskGuidTermIdLangId($taskGuid, $termModel->getId(),$targetLang);
+                foreach ($targetTermsSourceTerm as $t) {
+                    $targetTerms[] = $t['term'];
+                }
+            }
+            $infoFieldContent .= '; '.$this->translate->_('QuellTerme').': '.  join(', ', $sourceTerms).'; '.$this->translate->_('ZielTerme').': '.  join(', ', $targetTerms).';';
+       }
+        return $infoFieldContent;
+    }
+    
+    protected function infoFieldAddStatus(string $infoFieldContent,editor_Models_Segment $segment) {
+        if((int)$this->config->runtimeOptions->plugins->transit->writeInfoField->manualStatus === 1){
+            $stateId = $segment->getStateId();
+            if(empty($stateId)){
+                $state = 'NO_QUALITY_STATE_SET_BY_USER';
+            }
+            else{
+                $state = $this->config->runtimeOptions->segments->stateFlags->$stateId;
+            }
+            $infoFieldContent .= ' '.$state;
+        }
+        return $infoFieldContent;
+    }
+    
+    protected function infoFieldAddDate(string $infoFieldContent) {
         if((int)$this->config->runtimeOptions->plugins->transit->writeInfoField->exportDate === 1){
             $session = new Zend_Session_Namespace();
             if(preg_match('"^de"i', $session->locale === 1)){
@@ -179,28 +229,7 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
                 $infoFieldContent .= date("Y-m-d").':';
             }
         }
-        if((int)$this->config->runtimeOptions->plugins->transit->writeInfoField->manualStatus === 1){
-            $termModel = ZfExtended_Factory::get('editor_Models_Term');
-            /* @var $termModel editor_Models_Term */
-            $stateId = $segmentModel->getStateId();
-            $state = $this->config->runtimeOptions->segments->stateFlags->$stateId;
-            $infoFieldContent .= ' '.$state;
-        }
-       if((int)$this->config->runtimeOptions->plugins->transit->writeInfoField->termsWithoutTranslation === 1){
-           //<div class="term admittedTerm" id="term_193_es-ES_1-6" title="Spanischer Beschreibungstexttest">tamiz de cepillos rotativos</div>
-            $getTransNotFoundTermIdRegEx = '#<div.*?(class=".*?((term.*?transNotFound)|(transNotFound.*?term)).*?".*?data-tbxid="(.*?)".*?>)|(data-tbxid="(.*?)".*?class=".*?((term.*?transNotFound)|(transNotFound.*?term)).*?".*?>)#';
-
-            $sourceOrigText = $segmentModel->getFieldOriginal(editor_Models_SegmentField::TYPE_SOURCE);
-            preg_match_all($getTransNotFoundTermIdRegEx, $sourceOrigText, $matches);
-            $sourceTermMids = $matches[5];
-            $sourceTerms = array();
-            foreach ($sourceTermMids as $mid) {
-                $termModel->loadByMid($mid);
-                $sourceTerms[] = $termModel->getTerm();
-            }
-            $infoFieldContent .= '; '.$this->translate->_('QuellTerme').': '.  join(', ', $sourceTerms).'; '.$this->translate->_('ZielTerme').';';
-       }
-       $transitSegment->setInfo($infoFieldContent);
+        return $infoFieldContent;
     }
     
     public function saveFile() {
@@ -272,6 +301,21 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
     protected function parseSegment($segment) {
         //the following line is only necessary, since transit does not support MQM-tags. It can be removed, if this changes. Same is true for the comment in tasks.phtml 
         $segment = preg_replace('"<img[^>]*>"','', $segment);
-        return parent::parseSegment($segment);
+        $segment = parent::parseSegment($segment);
+        //at this moment there should be no other div-tags any more
+        if($this->shouldTermTaggingBeRemoved()){
+            $segment = str_replace('</div>', '', $segment);
+            $segment = preg_replace('"<div .*?>"', '', $segment);
+        }
+        return $segment;
+    }
+    /**
+     * overwrite, because recreation makes no sense. parseSegment simply keeps them, if necessary
+     * @param string $segment
+     * @param boolean $removeTermTags, default = true
+     * @return string $segment
+     */
+    protected function recreateTermTags($segment, $removeTermTags=true) {
+        return $segment;
     }
 }

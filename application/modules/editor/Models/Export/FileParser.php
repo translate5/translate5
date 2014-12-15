@@ -193,14 +193,11 @@ abstract class editor_Models_Export_FileParser {
      * @return string
      */
     protected function getSegmentContent($segmentId, $field) {
-        $removeTaggingOnExport = $this->config->runtimeOptions->termTagger->removeTaggingOnExport;
         $this->_segmentEntity = $segment = $this->getSegment($segmentId);
         
         $edited = (string) $segment->getFieldEdited($field);
         
-        $removeTermTags = $this->_diff ? $removeTaggingOnExport->diffExport : $removeTaggingOnExport->normalExport;
-        
-        $edited = $this->recreateTermTags($edited,(boolean)$removeTermTags);
+        $edited = $this->recreateTermTags($edited, $this->shouldTermTaggingBeRemoved());
         $edited = $this->parseSegment($edited);
 
         if(!$this->_diff){
@@ -220,6 +217,11 @@ abstract class editor_Models_Export_FileParser {
         return $this->unprotectWhitespace($diffed);
     }
     
+    protected function shouldTermTaggingBeRemoved() {
+        $removeTaggingOnExport = $this->config->runtimeOptions->termTagger->removeTaggingOnExport;
+        $return = $this->_diff ? $removeTaggingOnExport->diffExport : $removeTaggingOnExport->normalExport;
+        return (boolean)$return;
+    }
     /**
      * loads the segment to the given Id, caches a limited count of segments internally 
      * to prevent loading again while switching between fields
