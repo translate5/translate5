@@ -190,6 +190,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         
         $db->getAdapter()->query("lock tables `".$dbMetaName."` WRITE, ".$dbWorkerName." WRITE, ".$dbName." WRITE, ".$dbSegmentFieldName." WRITE, ".$dbSegmentDataName." WRITE");
         
+        //TODO TRANSLATE-351 - The "inprogress" setting can be improved as described in the issue!
         
         $select = $this->getNextSegmentSelect($db, $taskGuid);
         $sql = $select->where($dbMetaName.'.termtagState IS NULL OR '.$dbMetaName.'.termtagState IN (?)',
