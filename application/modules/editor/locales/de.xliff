@@ -137,7 +137,7 @@
 <trans-unit id='U3BlaWNoZXJu'><source>Speichern</source><target>Speichern</target></trans-unit>
 <trans-unit id='U2VnbWVudC1NZXRhZGF0ZW4='><source>Segment-Metadaten</source><target>Segment-Metadaten</target></trans-unit>
 <trans-unit id='VGVybWlub2xvZ2ll'><source>Terminologie</source><target>Terminologie</target></trans-unit>
-<trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgw7ZmZm5lbiAoU1RSRyArIEVOVEVSKQ=='><source>Speichern und nächstes öffnen (STRG + ENTER)</source><target>Speichern und nächstes öffnen (STRG + ENTER)</target></trans-unit>
+<trans-unit id="U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgw7ZmZm5lbg=="><source>Speichern und nächstes öffnen</source><target>Speichern und nächstes öffnen</target></trans-unit>
 <trans-unit id='U3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIMO2ZmZuZW4='><source>Speichern und vorheriges öffnen</source><target>Speichern und vorheriges öffnen</target></trans-unit>
 <trans-unit id='RW5kZSBkZXIgU2VnbWVudGUgZXJyZWljaHQh'><source>Ende der Segmente erreicht!</source><target>Ende der Segmente erreicht!</target></trans-unit>
 <trans-unit id='QmVnaW5uIGRlciBTZWdtZW50ZSBlcnJlaWNodCE='><source>Beginn der Segmente erreicht!</source><target>Beginn der Segmente erreicht!</target></trans-unit>
@@ -682,19 +682,7 @@ Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-M
 <trans-unit id='TmljaHQgZ2VzZXR6dA=='><source>Nicht gesetzt</source><target>Nicht gesetzt</target></trans-unit>
 <trans-unit id='ezB9OiBlZGl0aWVyYmFy'><source>{0}: editierbar</source><target>{0}: editierbar</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSAiezB9IiB2b2xsc3TDpG5kaWcgaW1wb3J0aWVydA=='><source>Aufgabe "{0}" vollständig importiert</source><target>Aufgabe "{0}" vollständig importiert</target></trans-unit>
-<trans-unit id='QW53ZW5kdW5nc2ZlaGxlcg=='><source>Anwendungsfehler</source><target>Anwendungsfehler</target></trans-unit>
-<trans-unit id='V2lyIGJpdHRlbiB1bSBFbnRzY2h1bGRpZ3VuZyBmw7xyIGRpZSBhdWZnZXRyZXRlbmUgU3TDtnJ1bmch'><source>Wir bitten um Entschuldigung für die aufgetretene Störung!</source><target>Wir bitten um Entschuldigung für die aufgetretene Störung!</target></trans-unit>
-<trans-unit id='VW5zZXJlIEFkbWluaXN0cmF0b3JlbiB3ZXJkZW4gYXV0b21hdGlzY2ggYmVuYWNocmljaHRpZ3QgdW5kIHdlcmRlbiBzaWNoIHVtZ2VoZW5kIG1pdCBJaG5lbiBpbiBWZXJiaW5kdW5nIHNldHplbi4='><source>Unsere Administratoren werden automatisch benachrichtigt und werden sich umgehend mit Ihnen in Verbindung setzen.</source><target>Unsere Administratoren werden automatisch benachrichtigt und werden sich umgehend mit Ihnen in Verbindung setzen.</target></trans-unit>
-<trans-unit id='U29sbHRlIGlubmVyaGFsYiBkZXMgbsOkY2hzdGVuIEFyYmVpdHN0YWdzIGtlaW5lIEtvbnRha3RhdWZuYWhtZSBlcmZvbGd0IHNlaW4sIGxpZWd0IGVpbmUgYWxsZ2VtZWluZSBTdMO2cnVuZyB2b3IsIGRpZSBkaWUgYXV0b21hdGlzY2hlIEJlbmFjaHJpY2h0aWd1bmcgdW5zZXJlciBBZG1pbmlzdHJhdG9yZW4gdmVyaGluZGVydC4gQml0dGUgYmVuYWNocmljaHRpZ2VuIFNpZSB1bnMgZGFubiBtw7ZnbGljaHN0IHVtZ2VoZW5kIHVudGVyIGRlbiBmb2xnZW5kZW4gS29udGFrdGRhdGVuOg=='><source>Sollte innerhalb des nächsten Arbeitstags keine Kontaktaufnahme erfolgt sein, liegt eine allgemeine Störung vor, die die automatische Benachrichtigung unserer Administratoren verhindert. Bitte benachrichtigen Sie uns dann möglichst umgehend unter den folgenden Kontaktdaten:</source><target>Sollte innerhalb des nächsten Arbeitstags keine Kontaktaufnahme erfolgt sein, liegt eine allgemeine Störung vor, die die automatische Benachrichtigung unserer Administratoren verhindert. Bitte benachrichtigen Sie uns dann möglichst umgehend unter den folgenden Kontaktdaten:</target></trans-unit>
-<trans-unit id='VGVsZWZvbjo='><source>Telefon:</source><target>Telefon:</target></trans-unit>
-<trans-unit id='RS1NYWlsOg=='><source>E-Mail:</source><target>E-Mail:</target></trans-unit>
-<trans-unit id='UG9ydHVnaWVzaXNjaCAoRVUp'><source>Portugiesisch (EU)</source><target>Portugiesisch (EU)</target></trans-unit>
-<trans-unit id='QXJhYmlzY2g='><source>Arabisch</source><target>Arabisch</target></trans-unit>
-<trans-unit id='RnJhbnrDtnNpc2NoKEJlbGdpZW4p'><source>Französisch(Belgien)</source><target>Französisch(Belgien)</target></trans-unit>
-<trans-unit id='SGF1c3Nh'><source>Haussa</source><target>Haussa</target></trans-unit>
-<trans-unit id='SGVicsOkaXNjaA=='><source>Hebräisch</source><target>Hebräisch</target></trans-unit>
-<trans-unit id='U2VyYm8tS3JvYXRpc2No'><source>Serbo-Kroatisch</source><target>Serbo-Kroatisch</target></trans-unit>
-<trans-unit id='VXJkdQ=='><source>Urdu</source><target>Urdu</target></trans-unit>
+<trans-unit id='RGVyIFNlcnZlciBiZW7DtnRpZ3QgenUgbGFuZ2UgdW0gYXVmIGVpbmUgQW5mcmFnZSB6dSBhbnR3b3J0ZW4uIEJpdHRlIHZlcnN1Y2hlbiBTaWUgZXMgZXJuZXV0Lg=='><source>Der Server benötigt zu lange um auf eine Anfrage zu antworten. Bitte versuchen Sie es erneut.</source><target>Der Server benötigt zu lange um auf eine Anfrage zu antworten. Bitte versuchen Sie es erneut.</target></trans-unit>
   </body>
  </file>
 </xliff>

@@ -147,6 +147,7 @@ Ext.define('Editor.controller.Localizer', {
         "409": '<?php echo $this->translate->_('Ihre Daten konnten nicht gespeichert werden, beim Speichern kam es zu einem Konflikt!');?>',
         title: '<?php echo $this->translate->_('Fehler');?>',
         text: '<?php echo $this->translate->_('Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!');?>',
+        timeout: '<?php echo $this->translate->_('Der Server benötigt zu lange um auf eine Anfrage zu antworten. Bitte versuchen Sie es erneut.');?>',
         serverMsg: '<?php echo $this->translate->_('<br />Meldung vom Server: <i>{0} {1}</i>');?>'
     };
 
@@ -231,7 +232,7 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.segments.MetaPanelNavi.prototype.item_cancel = '<?php echo $this->translate->_('Abbrechen');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_save = '<?php echo $this->translate->_('Speichern');?>';
 
-    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNext = '<?php echo $this->translate->_('Speichern und nächstes öffnen (STRG + ENTER)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNext = '<?php echo $this->translate->_('Speichern und nächstes öffnen');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_saveAndPrevious = '<?php echo $this->translate->_('Speichern und vorheriges öffnen');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_alternateLeft = '<?php echo $this->translate->_('Vorherige Spalte editieren');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_alternateRight = '<?php echo $this->translate->_('Nächste Spalte editieren');?>';
