@@ -53,6 +53,7 @@ Ext.define('Editor.controller.ServerException', {
         "409": '#UT#Ihre Daten konnten nicht gespeichert werden, beim Speichern kam es zu einem Konflikt!',
         title: '#UT#Fehler',
         text: '#UT#Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!',
+        timeout: '#UT#Der Server benötigt zu lange um auf eine Anfrage zu antworten. Bitte versuchen Sie es erneut.',
         serverMsg: '#UT#<br />Meldung vom Server: <i>{0} {1}</i>'
     },
     /**
@@ -104,12 +105,16 @@ Ext.define('Editor.controller.ServerException', {
                 return json.errors[0]._errorMessage;
             },
             appendServerMsg = function(msg) {
+                var serverMsg = getServerMsg();
+                if(serverMsg == 'unknown') {
+                    return msg;
+                }
                 return msg + tpl.apply(['', getServerMsg()]);
             };
         
         switch(status) {
             case -1:
-                Ext.Msg.alert(str.title, appendServerMsg(text));
+                Ext.Msg.alert(str.title, appendServerMsg(str.timeout));
                 return;
             case 403: //Forbidden: authenticated, but not allowed to see the specific resource 
             //@todo remove this specific 405 handler with TRANSLATE-94
