@@ -95,9 +95,10 @@ Ext.define('Editor.controller.MetaPanel', {
       '#metapanel' : {
           show : me.layout
       },
-      'segmentsHtmleditor': {
-          afteriniteditor: me.initEditor
-      },
+      //disabled ctrl enter since this produces errors in the save chain
+      //'segmentsHtmleditor': {
+      //    afteriniteditor: me.initEditor
+      //},
       '#segmentgrid': {
           afterrender: me.initEditPluginHandler
       }
