@@ -687,6 +687,7 @@ Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-M
 <trans-unit id='TmljaHQgZ2VzZXR6dA=='><source>Nicht gesetzt</source><target>Nicht gesetzt</target></trans-unit>
 <trans-unit id='ezB9OiBlZGl0aWVyYmFy'><source>{0}: editierbar</source><target>{0}: editierbar</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSAiezB9IiB2b2xsc3TDpG5kaWcgaW1wb3J0aWVydA=='><source>Aufgabe "{0}" vollständig importiert</source><target>Aufgabe "{0}" vollständig importiert</target></trans-unit>
+<trans-unit id='RGVyIFNlcnZlciBiZW7DtnRpZ3QgenUgbGFuZ2UgdW0gYXVmIGVpbmUgQW5mcmFnZSB6dSBhbnR3b3J0ZW4uIEJpdHRlIHZlcnN1Y2hlbiBTaWUgZXMgZXJuZXV0Lg=='><source>Der Server benötigt zu lange um auf eine Anfrage zu antworten. Bitte versuchen Sie es erneut.</source><target>Der Server benötigt zu lange um auf eine Anfrage zu antworten. Bitte versuchen Sie es erneut.</target></trans-unit>
   </body>
  </file>
 </xliff>
