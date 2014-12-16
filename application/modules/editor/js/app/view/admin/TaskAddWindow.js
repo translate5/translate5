@@ -138,7 +138,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     regex: /\.tbx$/i,
                     regexText: me.strings.importTbxType,
                     allowBlank: true,
-                    disabled: true,
                     toolTip: me.strings.importTbxTip,
                     fieldLabel: me.strings.importTbxLabel
                 },{

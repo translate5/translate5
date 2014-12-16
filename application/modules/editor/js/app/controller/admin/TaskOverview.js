@@ -253,11 +253,27 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       }
   },
   handleChangeImportFile: function(field, val){
-      var name = this.getTaskAddForm().down('textfield[name=taskName]');
+      var name = this.getTaskAddForm().down('textfield[name=taskName]'),
+          srcLang = this.getTaskAddForm().down('combo[name=sourceLang]'),
+          targetLang = this.getTaskAddForm().down('combo[name=targetLang]'),
+          langs = val.match(/-([a-zA-Z]{2,3})-([a-zA-Z]{2,3})\.[^.]+$/);
       if(name.getValue() == '') {
           name.setValue(val.replace(/\.[^.]+$/, ''));
       }
-      this.getTbxField().setDisabled(! /\.sdlxliff$/i.test(val));
+      //simple algorithmus to get the language from the filename
+      if(langs && langs.length == 3) {
+          var srcStore = srcLang.store,
+              targetStore = targetLang.store,
+              srcIdx = srcStore.find('label', '('+langs[1]+')', 0, true, true),
+              targetIdx = targetStore.find('label', '('+langs[2]+')', 0, true, true);
+          
+          if(srcIdx >= 0) {
+              srcLang.setValue(srcStore.getAt(srcIdx).get('id'));
+          }
+          if(targetIdx >= 0) {
+              targetLang.setValue(targetStore.getAt(targetIdx).get('id'));
+          }
+      }
   },
   /**
    * Inits the loaded task and the segment grid read only if necessary
