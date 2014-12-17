@@ -394,7 +394,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               me.savingHide();
               me.getAdminTasksStore().load();
               me.handleTaskCancel();
-              me.handleTaskPreferences(task);
           },
           failure: function(form, submit) {
               me.savingHide();
