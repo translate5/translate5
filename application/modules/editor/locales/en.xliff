@@ -1058,10 +1058,6 @@
 	<source>Der Task kann nicht abgeschlossen werden, da nicht alle Segmente einen Status gesetzt haben. Bitte verwenden Sie die Filterfunktion um die betroffenen Segmente zu finden.</source>
 	<target>The task can not be finished, because some segments do not have a status set. Please use the segment filter to get the affected segments.</target>
       </trans-unit>
-      <trans-unit id='RGllIG5hY2hmb2xnZW5kZW4gVGFncyB3dXJkZW4gYmVpbSBFZGl0aWVyZW4gZ2Vsw7ZzY2h0LCBkYXMgU2VnbWVudCBrYW5uIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbi4gVmVyc3VjaGVuIFNpZSBtaXQgZGVyIFLDvGNrZ8OkbmdpZ2Z1bmt0aW9uIFNUUkctWiBkaWUgVGFncyB3aWVkZXJoZXJ6dXN0ZWxsZW4uIDxiciAvPkZlaGxlbmRlIFRhZ3M6'>
-	<source>Die nachfolgenden Tags wurden beim Editieren gelöscht, das Segment kann nicht gespeichert werden. Versuchen Sie mit der Rückgängigfunktion STRG-Z die Tags wiederherzustellen. <br />Fehlende Tags:</source>
-	<target>The following tags were deleted while editing the segment. Therefore the segment cannot be saved. Please try to recreate the tags by using the undo functionality with CTRL-Z.<br />Missing tags:</target>
-	</trans-unit>
 	<trans-unit id='RGllIG5hY2hmb2xnZW5kZW4gVGFncyB3dXJkZW4gYmVpbSBFZGl0aWVyZW4gZHVwbGl6aWVydCwgZGFzIFNlZ21lbnQga2FubiBuaWNodCBnZXNwZWljaGVydCB3ZXJkZW4uIEzDtnNjaGVuIFNpZSBkaWUgZHVwbGl6aWVydGVuIFRhZ3MuIDxiciAvPkR1cGxpemllcnRlIFRhZ3M6'>
 	  <source>Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:</source>
 	  <target>The following tags were duplicated while editing the segment. Therefore the segment cannot be saved. Please delete the duplicated tags. <br />Duplicated tags:</target>
@@ -1082,6 +1078,7 @@
 	  <source>Die Anfrage über das Internet an den Server dauerte zu lange. Dies kann an Ihrer Internetverbindung oder an einer Überlastung des Servers liegen. Bitte versuchen Sie es erneut.</source>
 	  <target> The query over the Internet to the server took too long. This may be because of your internet connection or a server overload. Please try again.</target>
 	</trans-unit>
+        <trans-unit id='RGllIG5hY2hmb2xnZW5kZW4gVGFncyB3dXJkZW4gYmVpbSBFZGl0aWVyZW4gZ2Vsw7ZzY2h0LCBkYXMgU2VnbWVudCBrYW5uIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbi4gPGJyIC8+PGJyIC8+VmVyc3VjaGVuIFNpZSBtaXQgZGVyIFLDvGNrZ8OkbmdpZ2Z1bmt0aW9uIFNUUkctWiBkaWUgVGFncyB3aWVkZXJoZXJ6dXN0ZWxsZW4uIDxiciAvPjxiciAvPkFsdGVybmF0aXYga8O2bm5lbiBTaWUgYXVjaCBkaWUgQmVhcmJlaXR1bmcgZGVzIFNlZ21lbnRzIGR1cmNoIEtsaWNrIGF1ZiAiQWJicmVjaGVuIiBiZWVuZGVuIHVuZCBkYXMgU2VnbWVudCBuZXUgenVyIEJlYXJiZWl0dW5nIMO2ZmZuZW4uPGJyIC8+PGJyIC8+RmVobGVuZGUgVGFnczo='><source>Die nachfolgenden Tags wurden beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Versuchen Sie mit der Rückgängigfunktion STRG-Z die Tags wiederherzustellen. <br /><br />Alternativ können Sie auch die Bearbeitung des Segments durch Klick auf "Abbrechen" beenden und das Segment neu zur Bearbeitung öffnen.<br /><br />Fehlende Tags:</source><target>The following tags have been deleted during editing, the segment can not be saved. <br />Try to restore the tags by using the Undo function CTRL-Z. <br /> Alternatively, you can also stop the processing of the segment by clicking on "Cancel" and reopen the segment for processing. <br /> Missing Tags:</target></trans-unit>
     </body>
   </file>
 </xliff>

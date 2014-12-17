@@ -133,8 +133,6 @@ class editor_Models_Converter_XmlSegmentList {
     protected function initConvertionData() {
         $task = $this->task;
         
-        $this->exportParser = ZfExtended_Factory::get('editor_Models_Export_FileParser_Sdlxliff', array(0, false, $task));
-        
         /**
          * define autostates
          */
@@ -190,6 +188,7 @@ class editor_Models_Converter_XmlSegmentList {
         if(empty($segmentsOfFile)) {
             return;
         }
+        $this->exportParser = ZfExtended_Factory::get('editor_Models_Export_FileParser_Sdlxliff', array(0, false, $this->task, $filename));
         $file = '<file original="%1$s" source-language="%2$s" target-language="%3$s" xml:space="preserve">';
         $this->result[] = sprintf($file, htmlspecialchars($filename), $this->data['sourceLang'], $this->data['targetLang']);
         $this->result[] = '<body>';

@@ -577,12 +577,7 @@
 <trans-unit id='V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIFRCWCBEYXRlbiBmw7xyIGRhcyBUZXJtVGFnZ2luZw=='><source>Wählen Sie die zu importierenden TBX Daten für das TermTagging</source><target>Wählen Sie die zu importierenden TBX Daten für das TermTagging</target></trans-unit>
 <trans-unit id='VEJYIERhdGVpwrkgwrI='><source>TBX Datei¹ ²</source><target>TBX Datei¹ ²</target></trans-unit>
 <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRCWCBEYXRlaSE='><source>Bitte verwenden Sie eine TBX Datei!</source><target>Bitte verwenden Sie eine TBX Datei!</target></trans-unit>
-
-<trans-unit id="PGIgc3R5bGU9ImNvbG9yOiNmZjAwMDA7Ij5OZXU6PC9iPiBTaWUga8O2bm5lbiBudW4gbmViZW4gWklQIGF1Y2ggZGlyZWt0IFNETFhMSUZGLCBvcGVuVE0yLVhMSUZGIG9kZXIgQ1NWIERhdGVpZW4gYmVudXR6ZW4hIDxhIHRhcmdldD0iX2JsYW5rIiBocmVmPSJ7MH0vaW5kZXgvdXNhZ2Ujc2luZ2xlLWltcG9ydCI+TWVociBJbmZvPC9hPi4=">
-  <source><b style="color:#ff0000;">Neu:</b> Sie können nun neben ZIP auch direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage#single-import">Mehr Info</a>.</source>
-  <target><b style="color:#ff0000;">Neu:</b> Sie können nun neben ZIP auch direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage#single-import">Mehr Info</a>.</target>
-</trans-unit>
-
+<trans-unit id="PGIgc3R5bGU9ImNvbG9yOiNmZjAwMDA7Ij5OZXU6PC9iPiBTaWUga8O2bm5lbiBudW4gbmViZW4gWklQIGF1Y2ggZGlyZWt0IFNETFhMSUZGLCBvcGVuVE0yLVhMSUZGIG9kZXIgQ1NWIERhdGVpZW4gYmVudXR6ZW4hIDxhIHRhcmdldD0iX2JsYW5rIiBocmVmPSJ7MH0vaW5kZXgvdXNhZ2Ujc2luZ2xlLWltcG9ydCI+TWVociBJbmZvPC9hPi4="><source><b style="color:#ff0000;">Neu:</b> Sie können nun neben ZIP auch direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage#single-import">Mehr Info</a>.</source><target><b style="color:#ff0000;">Neu:</b> Sie können nun neben ZIP auch direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage#single-import">Mehr Info</a>.</target></trans-unit>
 <trans-unit id='wrIgc2VwYXJhdGUgVEJYIG51ciBiZWltIEltcG9ydCBlaW5lciBTRExYTElGRiBEYXRlaSBtw7ZnbGljaC4='><source>² separate TBX nur beim Import einer SDLXLIFF Datei möglich.</source><target>² separate TBX nur beim Import einer SDLXLIFF Datei möglich.</target></trans-unit>
 <trans-unit id='U3RhbmRhcmQgQWJsYXVmcGxhbg=='><source>Standard Ablaufplan</source><target>Standard Ablaufplan</target></trans-unit>
 <trans-unit id='VGVzdCBXb3JrZmxvdw=='><source>Test Workflow</source><target>Test Workflow</target></trans-unit>
