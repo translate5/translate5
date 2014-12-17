@@ -53,7 +53,7 @@ Ext.define('Editor.controller.ServerException', {
         "409": '#UT#Ihre Daten konnten nicht gespeichert werden, beim Speichern kam es zu einem Konflikt!',
         title: '#UT#Fehler',
         text: '#UT#Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!',
-        timeout: '#UT#Der Server benötigt zu lange um auf eine Anfrage zu antworten. Bitte versuchen Sie es erneut.',
+        timeout: '#UT#Die Anfrage über das Internet an den Server dauerte zu lange. Dies kann an Ihrer Internetverbindung oder an einer Überlastung des Servers liegen. Bitte versuchen Sie es erneut.',
         serverMsg: '#UT#<br />Meldung vom Server: <i>{0} {1}</i>'
     },
     /**
