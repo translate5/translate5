@@ -100,7 +100,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
             $workerCountToStart = count($this->getAvailableSlots());
         }
         
-        for($i=0;$i<$workerCountToStart;$i++){error_log('hier: '.$workerCountToStart);
+        for($i=0;$i<$workerCountToStart;$i++){
             parent::queue($state);
             $this->init($this->workerModel->getTaskGuid(), array('resourcePool' => $this->resourcePool));
         }
