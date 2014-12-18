@@ -87,14 +87,20 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
      * @param string $state
      */
     public function queue($state = NULL) {
-        $availableSlots = $this->getAvailableSlots();
         $resourceName = self::$praefixResourceName.$this->resourcePool;
         $usedSlots = $this->workerModel->getListSlotsCount($resourceName);
         
-        // all slotes in use
-        $workerCountToStart = count($availableSlots)*1.2-count($usedSlots);
+        $workerCountToStart = 0;
+        foreach ($usedSlots as $slot) {
+            if($slot['count']<=1){
+                $workerCountToStart++;
+            }
+        }
+        if(empty($usedSlots)){
+            $workerCountToStart = count($this->getAvailableSlots());
+        }
         
-        for($i=0;$i<=$workerCountToStart;$i++){
+        for($i=0;$i<$workerCountToStart;$i++){error_log('hier: '.$workerCountToStart);
             parent::queue($state);
             $this->init($this->workerModel->getTaskGuid(), array('resourcePool' => $this->resourcePool));
         }
