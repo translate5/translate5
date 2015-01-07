@@ -516,7 +516,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     
     protected function parseWsTags(){
         for($i = 1; $i < $this->segmentPartsCount; $i++) {
-            $tag = &$segmentParts[$i];
+            $tag = &$this->segmentParts[$i];
             if (strpos($tag ,'<WS')!== false){
                 $shortTagIdent = $this->shortTagIdent++;
                 $tagName = 'WS';
