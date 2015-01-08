@@ -36,7 +36,6 @@
 #changealike-grid .x-grid-row .segment-tag-column .x-grid-cell-inner,
 #segment-grid .x-grid-row .x-grid-cell .x-grid-cell-inner {
   white-space: normal;
-  width: 250px;
 }
 #segment-grid .editing-disabled {
   color:#acacac;
@@ -286,7 +285,7 @@ table.task-users td.username,
 table.task-users td.state {font-weight:bold;}
 table.task-users td.state {padding-right:0;}
 
-/*own heck column*/
+/*own check column*/
 .grid-ownchecker {
     background-color: transparent;
     height: 14px;
