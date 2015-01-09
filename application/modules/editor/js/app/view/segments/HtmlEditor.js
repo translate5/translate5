@@ -96,29 +96,29 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 	  this.fireEvent('afterinitframedoc', this);
   },
   initEditor: function() {
-	  var me = this, 
-	  	body = me.getEditorBody(),
-	  	id;
-	  if(!body){
-		  //if body does not exists, the browser (mostly IE) is not ready so call again a little more deffered as the default 10ms
-		  if(!me.deferred){
-                      me.deferred = 0;
-                  }
-                  me.deferred = me.deferred + 150; //prevent endless loops
-                  if(me.deferred < 15000){
-                      Ext.defer(me.initEditor, 150, me);
-                      return;
-                  }
-	  }
-          me.deferred = 0;
-	  me.callParent(arguments);
-	  body = Ext.get(body),
-	  id = body.id;
-	  //the editor body cache entry (and so all the handlers) are removed by the GarbageCollector, so disable GC for the body:
-	  Ext.cache[id].skipGarbageCollection = true;
-	  //track the created body id to enable GC again on editorDomCleanUp
-	  me.bodyGenId = id;
-	  me.fireEvent('afteriniteditor', me);
+      var me = this, 
+          body = me.getEditorBody(),
+          id;
+      if(!body || body.tagName != 'BODY'){
+          //if body does not exists, the browser (mostly IE) is not ready so call again a little more deffered as the default 10ms
+          if(!me.deferred){
+              me.deferred = 0;
+          }
+          me.deferred = me.deferred + 150; //prevent endless loops
+          if(me.deferred < 15000){
+              Ext.defer(me.initEditor, 150, me);
+              return;
+          }
+      }
+      me.deferred = 0;
+      me.callParent(arguments);
+      body = Ext.get(body),
+      id = body.id;
+      //the editor body cache entry (and so all the handlers) are removed by the GarbageCollector, so disable GC for the body:
+      Ext.cache[id].skipGarbageCollection = true;
+      //track the created body id to enable GC again on editorDomCleanUp
+      me.bodyGenId = id;
+      me.fireEvent('afteriniteditor', me);
   },
   /**
    * Überschreibt die Methode um den Editor Iframe mit eigenem CSS ausstatten
