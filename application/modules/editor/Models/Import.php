@@ -719,6 +719,7 @@ class editor_Models_Import {
         
         foreach($langFields as $key => $lang) {
             $langInst = ZfExtended_Factory::get('editor_Models_Languages');
+            /* @var $langInst editor_Models_Languages */
             if(empty($lang) || !$langInst->loadLang($lang, $type)) {
                 //null setzen wenn Sprache nicht gefunden. Das triggert einen Fehler in der validateParams dieser Klasse
                 $langInst = null;
