@@ -86,8 +86,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         ));
         $this->front->getRouter()->addRoute('restDefault', $restRoute);
 
-        //FIXME this should be an ZfExtended_Controller_RestLikeRoute, changing this here, means to rework the output in the controller
-        $filemapRoute = new Zend_Controller_Router_Route(
+        $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/filemap/*',
             array(
                 'module' => 'editor',
@@ -105,7 +104,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ));
         $this->front->getRouter()->addRoute('authUser', $authUserRoute);
 
-        $termsRoute = new Zend_Controller_Router_Route(
+        $termsRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/terms/*',
             array(
                 'module' => 'editor',
@@ -114,7 +113,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ));
         $this->front->getRouter()->addRoute('terms', $termsRoute);
 
-        $exportRoute = new Zend_Controller_Router_Route(
+        $exportRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/task/export/*',
             array(
                 'module' => 'editor',
