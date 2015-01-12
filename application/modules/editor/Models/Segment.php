@@ -476,6 +476,43 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         return $this->_loadByTaskGuid($taskGuid);
     }
     
+    //FIXME theoritsch immer nur wenn offset == 0 von Haus aus!
+    /**
+     * returns the first and the last segment of the actual filtered request
+     * @param string $taskGuid
+     * @return [editor_Models_Segment] with index first and index last
+     */
+    public function getBorderSegments($taskGuid){
+        //save original offset and limit
+        $offset = $this->offset;
+        $limit = $this->limit;
+        
+        //save original offset and limit
+        $this->offset = 0;
+        $this->limit = 1;
+        
+        //fetch the first segment in list
+        $first = $this->loadByTaskGuid($taskGuid);
+        
+        //fetch the last segment in list
+        $this->filter->swapSortDirection();
+        $last = $this->loadByTaskGuid($taskGuid);
+        $this->filter->swapSortDirection();
+        
+        //restore original values
+        $this->offset = $offset;
+        $this->limit = $limit;
+        
+        $result = array();
+        if(!empty($last) && isset($last[0])) {
+            $result['last'] = $last[0];
+        }
+        if(!empty($first) && isset($first[0])) {
+            $result['first'] = $first[0];
+        }
+        return $result;
+    }
+    
     /**
      * Loads the first segment of the given taskGuid.
      * The found segment is stored internally (like load).
