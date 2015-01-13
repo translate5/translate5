@@ -47,8 +47,14 @@
 Ext.define('Editor.store.Segments', {
   extend : 'Ext.data.Store',
   model: 'Editor.model.Segment',
-  pageSize: 100,
+  pageSize: 200,
   buffered: true,
   remoteSort: true,
-  autoLoad: false
+  autoLoad: false,
+  getFirstSegmentId: function() {
+      return this.proxy.reader.firstSegmentId;
+  },
+  getLastSegmentId: function() {
+      return this.proxy.reader.lastSegmentId;
+  }
 });

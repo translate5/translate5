@@ -75,6 +75,16 @@ Editor.model._Segment = function(fields) {
             url: Editor.data.restpath+'segment',
             reader : {
                 root: 'rows',
+                //intercept readRecords method to set segments meta info only on store reads, not on plain model reads
+                readRecords: function(data) {
+                    if(data && data.firstSegmentId) {
+                        this.firstSegmentId = data.firstSegmentId;
+                    }
+                    if(data && data.lastSegmentId) {
+                        this.lastSegmentId = data.lastSegmentId;
+                    }
+                    return this.self.prototype.readRecords.apply(this, arguments);
+                },
                 type : 'json'
             },
             writer: {

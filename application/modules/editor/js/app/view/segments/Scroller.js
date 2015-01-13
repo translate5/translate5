@@ -51,9 +51,9 @@ Ext.define('Editor.view.segments.Scroller', {
     extend: 'Ext.grid.PagingScroller',
     alias: 'widget.editorgridscroller',
     lastRequestedRowIndex: -1,
-    percentageFromEdge: 0.35,
+    percentageFromEdge: 0.4,
     scrollToLoadBuffer: 200,
-    chunkSize: 100,
+    chunkSize: 200,
     //rowHeight wird als fester Wert gesetzt
     rowHeight: 15,
     snapIncrement: 10,

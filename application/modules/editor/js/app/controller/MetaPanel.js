@@ -48,8 +48,9 @@ Ext.define('Editor.controller.MetaPanel', {
   extend : 'Ext.app.Controller',
   requires: ['Editor.view.qmsubsegments.AddFlagFieldset'],
   messages: {
-    gridEndReached: 'Ende der Segmente erreicht!',
-    gridStartReached: 'Start der Segmente erreicht!'
+    segmentNotBuffered: '#UT#Das angeforderte Segment liegt noch nicht im Zwischenspeicher. Bitte scrollen Sie manuell weiter!',
+    gridEndReached: '#UT#Ende der Segmente erreicht!',
+    gridStartReached: '#UT#Start der Segmente erreicht!'
   },
   refs : [{
     ref : 'metaPanel',
@@ -176,11 +177,18 @@ Ext.define('Editor.controller.MetaPanel', {
           selModel = grid.getSelectionModel(),
           ed = me.getEditPlugin(),
           rec = ed.openedRecord,
+          isBorderReached = false,
           store = grid.store,
           lastColumnIdx = 0,
           newRec = store.getAt(store.indexOf(rec) + rowIdxChange);
       while(newRec && !newRec.get('editable')) {
           newRec = store.getAt(store.indexOf(newRec) + rowIdxChange);
+      }
+      if(rowIdxChange > 0) {
+          isBorderReached = rec.get('id') == store.getLastSegmentId();
+      }
+      else {
+          isBorderReached = rec.get('id') == store.getFirstSegmentId();
       }
       Ext.Array.each(grid.columns, function(col, idx) {
           if(col.dataIndex == ed.editor.getEditedField()) {
@@ -190,15 +198,17 @@ Ext.define('Editor.controller.MetaPanel', {
       me.fireEvent('saveSegment', {
           scope: me,
           segmentUsageFinished: function(){
-              if(newRec !== undefined){
+              if(isBorderReached) {
+                  Editor.MessageBox.addInfo(errorText);
+              } else if(newRec !== undefined){
                   //editing by selection handler must be disabled, otherwise saveChainStart will be triggered twice
                   ed.disableEditBySelect = true;
                   selModel.select(newRec);
                   Ext.defer(ed.startEdit, 100, ed, [newRec, lastColumnIdx]); //defer reduces problems with editorDomCleanUp see comment on Bug 38
                   ed.disableEditBySelect = false;
               }
-              else{
-                  Editor.MessageBox.addInfo(errorText);
+              else {
+                  Editor.MessageBox.addInfo(me.messages.segmentNotBuffered);
               }
           }
       });
