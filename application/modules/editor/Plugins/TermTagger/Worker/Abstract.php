@@ -97,7 +97,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
             }
         }
         if(empty($usedSlots)){
-            $workerCountToStart = count($this->getAvailableSlots());
+            $workerCountToStart = count($this->getAvailableSlots($this->resourcePool));
         }
         
         for($i=0;$i<$workerCountToStart;$i++){
@@ -110,8 +110,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
      * @see ZfExtended_Worker_Abstract::calculateDirectSlot()
      */
     protected function calculateDirectSlot() {
-        //return array('resource' => 'TermTagger_default', 'slot' => 'Termtagger.local/index.php');
-        return $this->calculateSlot('default');
+        return $this->calculateSlot($this->resourcePool);
     }
     
     /**
@@ -119,7 +118,6 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
      * @see ZfExtended_Worker_Abstract::calculateQueuedSlot()
      */
     protected function calculateQueuedSlot() {
-        //return array('resource' => 'TermTagger_default', 'slot' => 'TermTaggerSlot_'.rand(1, 3).'.local/index.php');
         return $this->calculateSlot($this->resourcePool);
     }
     
@@ -135,12 +133,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         $resourceName = self::$praefixResourceName.$resourcePool;
         
         // detect defined slots for the resourcePool
-        $availableSlots = $this->getAvailableSlots();
-        // no slots for this resourcePool defined
-        if (empty($availableSlots) && $resourcePool != 'default') {
-            // calculate slot from default resourcePool
-            return $this->calculateSlot('default');
-        }
+        $availableSlots = $this->getAvailableSlots($resourcePool);
         
         $usedSlots = $this->workerModel->getListSlotsCount($resourceName);
         
@@ -176,22 +169,35 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
      * 
      * @return array
      */
-    protected function getAvailableSlots() {
+    protected function getAvailableSlots($resourcePool = 'default') {
         $config = Zend_Registry::get('config');
         $url = $config->runtimeOptions->termTagger->url;
-        switch ($this->resourcePool) {
+        
+        switch ($resourcePool) {
             case 'gui':
                 $return = $url->gui->toArray();
+                break;
             
             case 'import':
-                $return =$url->import->toArray();
+                $return = $url->import->toArray();
+                break;
             
             case 'default':
-                $return =$url->default->toArray();
+            default:
+                $return = $url->default->toArray();
+                break;
         }
-        if(empty($return)){
-            trigger_error('There have to be available slots!');
+        
+        // no slots for this resourcePool defined
+        if (empty($return) && $resourcePool != 'default') {
+            // calculate slot from default resourcePool
+            return $this->getAvailableSlots();
         }
+        
+        if(empty($return)) {
+            trigger_error(__CLASS__.'->'.__FUNCTION__.'; There have to be available slots!');
+        }
+        
         return $return;
     }
     
