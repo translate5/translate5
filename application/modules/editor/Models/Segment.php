@@ -491,6 +491,14 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->offset = 0;
         $this->limit = 1;
         
+        //only editable segments may be considered
+        $filter = new stdClass();
+        $filter->type = 'numeric';
+        $filter->comparison = 'eq';
+        $filter->value = 1;
+        $filter->field = 'editable';
+        $this->filter->addFilter($filter);
+        
         //fetch the first segment in list
         $first = $this->loadByTaskGuid($taskGuid);
         
