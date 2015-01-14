@@ -608,7 +608,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $userTaskAssoc->loadByParams($userGuid,$taskGuid);
             $isPmOverride = (boolean) $userTaskAssoc->getIsPmOverride();
         }
-        catch(ZfExtended_NotFoundException $e) {
+        catch(ZfExtended_Models_Entity_NotFoundException $e) {
             if(! $isEditAllTasks){
                 throw $e;
             }
