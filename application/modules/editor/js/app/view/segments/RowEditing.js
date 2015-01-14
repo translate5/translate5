@@ -67,6 +67,10 @@ Ext.define('Editor.view.segments.RowEditing', {
             view = me.view,
             headerCt = grid.headerCt;
 
+        //re enable scrolling after editing (disable is in overriden method startEdit):
+        me.on('edit', this.enableScrolling, this);
+        me.on('canceledit', this.enableScrolling, this);
+        
         //override: Eigene RowEditor Klasse anstatt Ext RowEditor:
         return Ext.create('Editor.view.segments.RowEditor', {
             autoCancel: me.autoCancel,
@@ -94,19 +98,36 @@ Ext.define('Editor.view.segments.RowEditing', {
      * @returns booelean|void
      */
     startEdit: function(record, columnHeader) {
+        var me = this,
+            started = false;
         //to prevent race-conditions, check if there isalready an openedRecord and if yes show an error (see RowEditor.js function completeEdit for more information)
-        if(this.openedRecord !== null){
-            Editor.MessageBox.addError(this.messages.previousSegmentNotSaved,' Das Segment konnte nicht zum Bearbeiten geöffnet werden, da das vorherige Segment noch nicht korrekt gespeichert wurde. Im folgenden der Debug-Werte: this.openedRecord.internalId: ' + this.openedRecord.internalId + ' record.internalId: ' + record.internalId);
+        if(me.openedRecord !== null){
+            Editor.MessageBox.addError(me.messages.previousSegmentNotSaved,' Das Segment konnte nicht zum Bearbeiten geöffnet werden, da das vorherige Segment noch nicht korrekt gespeichert wurde. Im folgenden der Debug-Werte: this.openedRecord.internalId: ' + this.openedRecord.internalId + ' record.internalId: ' + record.internalId);
             return false;
         }
-        if(this.editingAllowed && record.get('editable')){
+        if(me.editingAllowed && record.get('editable')){
             if(record.get('matchRate') == 100 && Editor.data.enable100pEditWarning){
-                Editor.MessageBox.addInfo(this.messages.edit100pWarning, 1.4);
+                Editor.MessageBox.addInfo(me.messages.edit100pWarning, 1.4);
             }
-            this.openedRecord = record;
-            return this.callParent(arguments);
+            me.openedRecord = record;
+            started = me.callParent(arguments);
+            if(started !== false) {
+                me.disableScrolling();
+            }
+            return started;
         }
         return false;
+    },
+    
+    enableScrolling: function() {
+        if(this.grid.verticalScroller) {
+            this.grid.verticalScroller.enable();
+        }
+    },
+    disableScrolling: function() {
+        if(this.grid.verticalScroller) {
+            this.grid.verticalScroller.disable();
+        }
     },
     
     /**

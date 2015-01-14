@@ -204,7 +204,7 @@ Ext.define('Editor.controller.MetaPanel', {
                   //editing by selection handler must be disabled, otherwise saveChainStart will be triggered twice
                   ed.disableEditBySelect = true;
                   selModel.select(newRec);
-                  Ext.defer(ed.startEdit, 100, ed, [newRec, lastColumnIdx]); //defer reduces problems with editorDomCleanUp see comment on Bug 38
+                  Ext.defer(ed.startEdit, 300, ed, [newRec, lastColumnIdx]); //defer reduces problems with editorDomCleanUp see comment on Bug 38
                   ed.disableEditBySelect = false;
               }
               else {

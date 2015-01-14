@@ -154,7 +154,7 @@ Ext.define('Editor.controller.Segments', {
   loadSegments: function() {
       this.handleFilterChange(); //load filemap
       //initiales Laden des Stores:
-      this.getSegmentsStore().guaranteeRange(0, 99);
+      this.getSegmentsStore().guaranteeRange(0, 199);
   },
   clearSegments: function() {
       var store = this.getSegmentsStore();
