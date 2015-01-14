@@ -236,13 +236,13 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.segments.MetaPanelNavi.prototype.item_saveAndPrevious = '<?php echo $this->translate->_('Speichern und vorheriges öffnen');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_alternateLeft = '<?php echo $this->translate->_('Vorherige Spalte editieren');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_alternateRight = '<?php echo $this->translate->_('Nächste Spalte editieren');?>';
-  	
-  	Editor.view.segments.MetaPanel.prototype.messages = {
-            segmentNotBuffered: '<?php echo $this->translate->_('Das angeforderte Segment liegt noch nicht im Zwischenspeicher. Bitte scrollen Sie manuell weiter!');?>',
-            gridEndReached: '<?php echo $this->translate->_('Ende der Segmente erreicht!');?>',
-            gridStartReached: '<?php echo $this->translate->_('Beginn der Segmente erreicht!');?>'
-        };
-        
+
+    Editor.controller.MetaPanel.prototype.messages = {
+        segmentNotBuffered: '<?php echo $this->translate->_('Das angeforderte Segment liegt noch nicht im Zwischenspeicher. Bitte scrollen Sie manuell weiter!');?>',
+        gridEndReached: '<?php echo $this->translate->_('Ende der Segmente erreicht!');?>',
+        gridStartReached: '<?php echo $this->translate->_('Beginn der Segmente erreicht!');?>'
+    };
+
     Editor.view.segments.RowEditor.prototype.messages = {
         segmentNotSavedUserMessage: '<?php echo $this->translate->_('Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank! <br/><br/>Gerade bearbeiteter Text war:<br/><br/>');?>',
         cantSaveEmptySegment: '<?php echo $this->translate->_('Das Segment kann nicht ohne Inhalt gespeichert werden!');?>'
