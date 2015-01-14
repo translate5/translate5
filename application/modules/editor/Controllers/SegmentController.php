@@ -93,6 +93,13 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $session = new Zend_Session_Namespace();
         $this->view->rows = $this->entity->loadByTaskGuid($session->taskGuid);
         $this->view->total = $this->entity->getTotalCountByTaskGuid($session->taskGuid);
+        $borderSegments = $this->entity->getBorderSegments($session->taskGuid);
+        if(!empty($borderSegments['first'])) {
+            $this->view->firstSegmentId = $borderSegments['first']['id'];
+        }
+        if(!empty($borderSegments['last'])) {
+            $this->view->lastSegmentId = $borderSegments['last']['id'];
+        }
     }
 
     public function putAction() {
@@ -105,6 +112,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
 
         $this->decodePutData();
         //set the editing durations for time tracking into the segment object
+        settype($this->data->durations, 'object');
         $this->entity->setTimeTrackData($this->data->durations);
         $this->convertQmId();
 
