@@ -141,20 +141,6 @@ class editor_Plugins_TermTagger_Service {
     }
     
     /**
-     * Load a tbx-file $tbxFilePath to the TermTagger-server behind $url where $tbxHash is a unic id for this tbx-file.
-     * In addition to the function $this->open() this function returns the tbx-files with ids added to the xml-structur
-     *  
-     * @param string $url url of the TermTagger-Server
-     * @param string $tbxHash TBX hash
-     * @param string $tbxData TBX data 
-     * 
-     * @return Zend_Http_Response|false
-     */
-    public function openFetchIds(string $url, string $tbxHash, string $tbxData) {
-        return $this->_open($url, $tbxHash, $tbxData, array('addIds' => true));
-    }
-    
-    /**
      * sends an open request to the termtagger
      * @param string $url
      * @param string $tbxHash

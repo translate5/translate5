@@ -105,6 +105,8 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
             $this->init($this->workerModel->getTaskGuid(), array('resourcePool' => $this->resourcePool));
         }
     }
+    
+    
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::calculateDirectSlot()
@@ -112,6 +114,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
     protected function calculateDirectSlot() {
         return $this->calculateSlot($this->resourcePool);
     }
+    
     
     /**
      * (non-PHPdoc) 
@@ -165,6 +168,8 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         $return = array('resource' => $resourceName, 'slot' => $availableSlots[array_rand($availableSlots)]);
         return $return;
     }
+    
+    
     /**
      * 
      * @return array
@@ -201,6 +206,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         return $return;
     }
     
+    
     /**
      * @param editor_Models_Task $task
      * @return SplFileInfo
@@ -208,28 +214,6 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
     protected function getTbxFilename(editor_Models_Task $task) {
         return new SplFileInfo(editor_Models_Import_TermListParser_Tbx::getTbxPath($task));
     }
-    
-    /**
-     * checks if the needed TBX file exists, otherwise recreate if from DB
-     * @param editor_Models_Task $task
-     * @param SplFileInfo $tbxPath
-     */
-    protected function assertTbxExists(editor_Models_Task $task, SplFileInfo $tbxPath) {
-        if($tbxPath->isReadable()) {
-            return file_get_contents($tbxPath);
-        }
-        //after recreation we need to fetch the IDs!
-        $this->data['fetchIds'] = true;
-        
-        //fallback for recreation of TBX file:
-        $term = ZfExtended_Factory::get('editor_Models_Term');
-        /* @var $term editor_Models_Term */
-        
-        $export = ZfExtended_Factory::get('editor_Models_Export_Terminology_Tbx');
-        /* @var $export editor_Models_Export_Terminology_Tbx */
-        return $term->export($task, $export);
-    }
-    
     
     /**
      * Checks if tbx-file with hash $tbxHash is loaded on the TermTagger-server behind $url.
@@ -240,10 +224,10 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
      *
      * @return boolean true if tbx-file is loaded on the TermTagger-server
      */
-    protected function checkTermTaggerTbx($url, $tbxHash) {
+    protected function checkTermTaggerTbx($url, &$tbxHash) {
         $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
         /* @var $termTagger editor_Plugins_TermTagger_Service */
-    
+        
         // test if tbx-file is already loaded
         if ($termTagger->ping($url, $tbxHash)) {
             return true;
@@ -255,14 +239,21 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
-    
-        $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerLoader');
-        /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerLoader */
-        $worker->init($taskGuid, array('task' => $task));
-        //run the worker to send it to the termtagger
-        $slot = array();
-        $slot = array('resource' => 'TermTagger_default', 'slot' => $url);
-        return $worker->run($slot);
+        
+        $tbxPath = $this->getTbxFilename($task);
+        $tbxParser = ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
+        /* @var $tbxParser editor_Models_Import_TermListParser_Tbx */
+        $tbxData = $tbxParser->assertTbxExists($task, new SplFileInfo($tbxPath));
+        $tbxHash = $task->meta()->getTbxHash();
+        
+        $service = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
+        /* @var $service editor_Plugins_TermTagger_Service */
+        if(!$service->open($url, $tbxHash, $tbxData)) {
+            $this->log->logError(__CLASS__.' -> '.__FUNCTION__.'; Terminology disabled because tbx can not be loaded to the TermTagger-server.');
+            return false;
+        }
+        
+        return true;
     }
     
 }

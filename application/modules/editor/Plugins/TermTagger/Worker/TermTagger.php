@@ -37,24 +37,27 @@
  * editor_Plugins_TermTagger_Worker_TermTagger Class
  */
 class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTagger_Worker_Abstract {
+
+
     /**
      * Special Paramters:
-     * 
+     *
      * $parameters['resourcePool']
      * sets the resourcePool for slot-calculation depending on the context.
      * Possible values are all values out of $this->allowedResourcePool
-     * 
-     * 
+     *
+     *
      * On very first init:
      * seperate data from parameters which are needed while processing queued-worker.
      * All informations which are only relevant in 'normal processing (not queued)'
      * are not needed to be saved in DB worker-table (aka not send to parent::init as $parameters)
-     * 
+     *
      * ATTENTION:
      * for queued-operating $parameters saved in parent::init MUST have all necessary paramters
      * to call this init function again on instanceByModel
-     * 
+     *
      * (non-PHPdoc)
+     *
      * @see ZfExtended_Worker_Abstract::init()
      */
     public function init($taskGuid = NULL, $parameters = array()) {
@@ -75,10 +78,11 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTag
         
         return parent::init($taskGuid, $parametersToSave);
     }
-    
-    
+
+
     /**
      * (non-PHPdoc)
+     *
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
@@ -87,20 +91,22 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTag
             return false;
         }
         return true;
-    } 
-    
-    
+    }
+
+
     /**
      * (non-PHPdoc)
+     *
      * @see ZfExtended_Worker_Abstract::run()
      */
     public function run() {
         return parent::run();
     }
-    
-    
+
+
     /**
      * (non-PHPdoc)
+     *
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
@@ -120,15 +126,16 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTag
         /* @var $termTagger editor_Plugins_TermTagger_Service */
         
         if (!$this->checkTermTaggerTbx($this->workerModel->getSlot(), $serverCommunication->tbxFile)) {
+            $this->log('TermTagger-Error in ', __CLASS__.' -> '.__FUNCTION__.'; TermTagger-Server could not load tbx-File: '.$serverCommunication->tbxFile);
             return false;
         }
-            
+        
         $result = $termTagger->tagterms($this->workerModel->getSlot(), $serverCommunication);
         
         // on error return false and store original untagged data
-        if(empty($result)) {
+        if (empty($result)) {
             return false;
-        }        
+        }
         $this->result = $result->segments;
         return true;
     }

@@ -130,6 +130,8 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
         /* @var $termTagger editor_Plugins_TermTagger_Service */
         if (!$this->checkTermTaggerTbx($this->workerModel->getSlot(), $serverCommunication->tbxFile)) {
+            $this->log( 'TermTaggerImport-Error in ', __CLASS__.' -> '.__FUNCTION__.
+                        '; TermTagger-Server could not load tbx-File: '.$serverCommunication->tbxFile);
             return false;
         }
 
@@ -150,7 +152,8 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
 
         if (!$worker->init($taskGuid, array('resourcePool' => 'import'))) {
-            $this->log('TermTaggerImport-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
+            $this->log( 'TermTaggerImport-Error in ', __CLASS__.' -> '.__FUNCTION__.
+                        '; Worker could not be initialized');
             return false;
         }
         $worker->queue(ZfExtended_Models_Worker::STATE_WAITING);
