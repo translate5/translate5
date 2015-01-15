@@ -244,13 +244,19 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return string $segmentContent
      */
     public function stripTermTags($segmentContent) {
-        $seg = qp('<div id="root">'.$segmentContent.'</div>', NULL, array('format_output' => false));
+        try {
+            $seg = qp('<div id="root">'.$segmentContent.'</div>', NULL, array('format_output' => false));
         
-        foreach ($seg->find('div.term') as $element){
-            $element->replaceWith($element->innerHTML());
+            foreach ($seg->find('div.term') as $element){
+                $element->replaceWith($element->innerHTML());
+            }
+            $seg = $seg->find('div#root');
+            $segmentContent = $seg->innerHTML();
+        } catch (Exception $exc) {
+            $log = new ZfExtended_Log();
+            $log->logError('Notice: No valid HTML in translate5 segment '.$exc->getTraceAsString());
         }
-        $seg = $seg->find('div#root');
-        return $seg->innerHTML();
+        return $segmentContent;
     }
     
     /**
