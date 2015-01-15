@@ -200,7 +200,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             if(!$isEditable || !empty($typeFilter) && $data->type !== $typeFilter) {
                 continue;
             }
-            if($this->stripTags($data->edited) !== $this->stripTags($data->original)) {
+            if($this->stripTermTags($data->edited) !== $this->stripTermTags($data->original)) {
                 $this->isDataModified = true;
             }
         }
@@ -236,6 +236,21 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             $segmentContent = html_entity_decode($segmentContent, ENT_QUOTES | ENT_XHTML);
         }
         return strip_tags(preg_replace('"<span.*?</span>"','',$segmentContent));
+    }
+    /**
+     * strips all tags including tag description
+     * 
+     * @param string $segmentContent
+     * @return string $segmentContent
+     */
+    public function stripTermTags($segmentContent) {
+        $seg = qp('<div id="root">'.$segmentContent.'</div>', NULL, array('format_output' => false));
+        
+        foreach ($seg->find('div.term') as $element){
+            $element->replaceWith($element->innerHTML());
+        }
+        $seg = $seg->find('div#root');
+        return $seg->innerHTML();
     }
     
     /**
