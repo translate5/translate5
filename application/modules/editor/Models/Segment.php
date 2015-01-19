@@ -476,9 +476,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         return $this->_loadByTaskGuid($taskGuid);
     }
     
-    //FIXME theoritsch immer nur wenn offset == 0 von Haus aus!
     /**
-     * returns the first and the last segment of the actual filtered request
+     * returns the first and the last EDITABLE segment of the actual filtered request
      * @param string $taskGuid
      * @return [editor_Models_Segment] with index first and index last
      */
