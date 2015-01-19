@@ -51,9 +51,11 @@ Ext.define('Editor.store.Segments', {
   buffered: true,
   remoteSort: true,
   autoLoad: false,
+  //first editable segment! 
   getFirstSegmentId: function() {
       return this.proxy.reader.firstSegmentId;
   },
+  //last editable segment! 
   getLastSegmentId: function() {
       return this.proxy.reader.lastSegmentId;
   }
