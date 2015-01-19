@@ -39,13 +39,13 @@ if(empty($this->termGroups)) {
     return;
 }
 ?>
-<table>
-    <tr>
-        <th><?php echo $this->translate->_('In Quelle:'); ?></th>
-        <th><?php echo $this->translate->_('In Ziel:'); ?></th>
-    </tr>
+<div class="term-box">
 <?php
     $i = 0;
+    $this->termGroups = array_merge(array_values($this->termGroups), array_values($this->termGroups));
+    error_log(print_r($this->termGroups,1));
+    $this->termGroups[0][0]->term = 'Mercedes-Benz e una marca tedesca di automobili con una lunga traditione';
+    $this->termGroups[0][1]->term = 'MercedesBenzisteine-deutscheAutomarkemitlangerTradition';
     foreach($this->termGroups as $termGroup) {
         $target = array();
         $source = array();
@@ -97,15 +97,15 @@ if(empty($this->termGroups)) {
             }
         }
 ?>
-        <tr class="<?php echo ($i++ % 2 == 0)?'even':'odd'; ?>">
-            <td>
+        <div class="term-group <?php echo ($i++ % 2 == 0)?'even':'odd'; ?>">
+            <div class="source-terms">
                 <?php echo join("<br />\n", $source); ?>
-            </td>
-            <td>
+            </div>
+            <div class="target-terms">
                 <?php echo join("<br />\n", $target); ?>
-            </td>
-        </tr>
+            </div>
+        </div>
 <?php
     }
 ?>
-</table>
+</div>
