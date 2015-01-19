@@ -54,6 +54,11 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
 {
     protected $front;
     
+    public function __construct($application) {
+        require_once APPLICATION_PATH . DIRECTORY_SEPARATOR.'..'. DIRECTORY_SEPARATOR.'library'. DIRECTORY_SEPARATOR.'querypath'. DIRECTORY_SEPARATOR.'src'. DIRECTORY_SEPARATOR.'qp.php';
+        parent::__construct($application);
+    }
+    
     
     public function _initController()
     {

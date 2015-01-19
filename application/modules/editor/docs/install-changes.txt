@@ -1,5 +1,7 @@
 ### this file holds all changes and necessary configs needed for updates
 ### newest changes on top
+2015-01-15 - TRANSLATE-391: short-tag generation on import creates invalid html:
+            => manually execute 055-editor-mysql-TRANSLATE-391.php
 
 2014-11-21 - New Features:
             TRANSLATE-317: Smaller width for alternative columns

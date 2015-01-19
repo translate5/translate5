@@ -59,7 +59,7 @@ class editor_ImageTag_Single extends editor_ImageTag {
    */
   public function getHtmlTag(array $parameters) {
       $parameters['type'] = 'single';
-      $parameters['shortTag'] = '&lt;'.$parameters['shortTag'].'/&gt';
+      $parameters['shortTag'] = '&lt;'.$parameters['shortTag'].'/&gt;';
       return parent::getHtmlTag($parameters);
   }
 }

@@ -143,9 +143,21 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         'deprecatedTerm' => editor_Models_Term::STAT_DEPRECATED,
         'supersededTerm' => editor_Models_Term::STAT_SUPERSEDED,
     );
-
+    
     protected $timer;
-
+    
+    /**
+     * Will be set in first <termEntry> of the tbx-file.
+     * Detects if ids should be added to the terms or not 
+     * @var boolean
+     */
+    protected $addIds = true;
+    
+    protected $counterTermEntry = 0;
+    protected $counterTerm = 0;
+    protected $counterTig = 0;
+    
+    
     const TERM_INSERT_BLOCKSIZE = 15;
 
     public function __construct() {
@@ -183,25 +195,29 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
      * @param editor_Models_Languages $targetLang
      */
     protected function importOneTbx(SplFileInfo $file, editor_Models_Task $task, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang){
+        
         if(! $file->isReadable()){
             throw new Zend_Exception($file.' is not Readable!');
         }
         $this->task = $task;
 
         $start = microtime(true);
-        $tbxRegisteredInServer = $this->insertIdsInTbx($file->getPathname());
-        $this->task->setTerminologie((boolean)$tbxRegisteredInServer); 
+        //$tbxRegisteredInServer = $this->insertIdsInTbx($file->getPathname());
+        //$this->task->setTerminologie((boolean)$tbxRegisteredInServer);
+        $this->task->setTerminologie(1);
+        
         $after_insert = microtime(true);
-        if(!$tbxRegisteredInServer) {
-            return;
-        }
+        //if(!$tbxRegisteredInServer) {
+        //    return;
+        //}
 
         //languages welche aus dem TBX importiert werden sollen
         $this->languages[$sourceLang->getId()] = $this->normalizeLanguage($sourceLang->getRfc5646());
         $this->languages[$targetLang->getId()] = $this->normalizeLanguage($targetLang->getRfc5646());
 
         $this->xml = new XmlReader();
-        $this->xml->open(self::getTbxPath($task));
+        //$this->xml->open(self::getTbxPath($task));
+        $this->xml->open($file->getPathname());
 
         //Bis zum ersten TermEntry springen und alle TermEntries verarbeiten.
         while($this->fastForwardTo('termEntry')) {
@@ -219,31 +235,45 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             }
         }
         $this->xml->close();
+        
+        $this->assertTbxExists($this->task, new SplFileInfo(self::getTbxPath($this->task)));
     }
-
+    
     /**
-     * Fügt mittels der openTMS-Java-Bibliothek bei termEntry-, tig- und term-Tags id-Attribute mit eindeutigen Werten hinzu, sofern noch nicht vorhanden
-     *
-     * - wird eine Metadatendatei vor dem eigentlichen Import noch durch ein
-     *   externes Tool verändert, wird die Originaldatei erweitert um die Endung
-     *   ".orig" abgelegt und die veränderte Metadatei unter ihrem ursprünglichen
-     *   Namen gespeichert. Diese Methode löscht alle veränderten Metadateien
-     *   und benennt die ".orig"-Dateien um zu ihrem ursprünglichen Namen.
-     *
-     * @param string $filePath
-     * @return boolean
+     * checks if the needed TBX file exists, otherwise recreate if from DB
+     * @param editor_Models_Task $task
+     * @param SplFileInfo $tbxPath
      */
-    protected function insertIdsInTbx($filePath) {
-        $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerLoader');
-        /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerLoader */
-        $worker->init($this->task->getTaskGuid(), array('task' => $this->task));
+    public function assertTbxExists(editor_Models_Task $task, SplFileInfo $tbxPath) {
+        if($tbxPath->isReadable()) {
+            return file_get_contents($tbxPath);
+        }
+        //after recreation we need to fetch the IDs!
+        //$this->data['fetchIds'] = true;
         
-        //prepare the uploaded file as base TBX file
-        rename($filePath, self::getTbxPath($this->task));
+        //fallback for recreation of TBX file:
+        $term = ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $term editor_Models_Term */
         
-        //run the worker to send it to the termtagger
-        return $worker->run();
+        $export = ZfExtended_Factory::get('editor_Models_Export_Terminology_Tbx');
+        /* @var $export editor_Models_Export_Terminology_Tbx */
+        
+        $tbxData = $term->export($task, $export);
+        
+        $meta = $task->meta();
+        //ensure existence of the tbxHash field
+        $meta->addMeta('tbxHash', $meta::META_TYPE_STRING, null, 'Contains the MD5 hash of the original imported TBX file before adding IDs', 36);
+        
+        $hash = md5($tbxData);
+        $meta->setTbxHash($hash);
+        $meta->save();
+        
+        
+        file_put_contents($tbxPath, $tbxData);
+        
+        return $tbxData;
     }
+    
     
     /**
      * returns the path to the archived TBX file
@@ -252,7 +282,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     public static function getTbxPath(editor_Models_Task $task) {
         return $task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.self::TBX_ARCHIV_NAME;
     }
-
+    
+    
     /**
      * bewegt den Zeiger durch den Datenstrom bis zum ersten Tag mit dem angegebenen Namen
      * Gibt zurück ob ein entsprechender Tag gefunden wurde.
@@ -273,7 +304,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         }
 
         //Term Entry ID ablegen
-        $this->actualTermEntry = $this->xml->getAttribute('id');
+        $this->actualTermEntry = $this->getIdTermEntry();            
+        
         if(empty($this->actualTermEntry)) {
             $this->log('termEntry Tag without an ID found and ignored!');
             return;
@@ -285,6 +317,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             switch($this->xml->name) {
                 case 'langSet':
                     $start = microtime(true);
+                    $this->counterTig = 0;
                     $this->handleLanguage();
                     $this->timer->langSet += (microtime(true) - $start);
                     break;
@@ -408,9 +441,10 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         if(empty($this->termInsertBuffer)) {
             return;
         }
-        /* @var $termTable editor_Models_Db_Terms */
+        
         $termTable = ZfExtended_Factory::get('editor_Models_Db_Terms');
-
+        /* @var $termTable editor_Models_Db_Terms */
+        
         $firstTerm = reset($this->termInsertBuffer);
         $sql = $termTable->getInsertSql(array_keys($firstTerm));
         $db = $termTable->getAdapter();
@@ -423,6 +457,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
           }
           $queryVals[] = '(' . implode(',', $row) . ')';
         }
+        
         $db->query($query . implode(',', $queryVals));
         $this->termInsertBuffer = array();
     }
@@ -453,8 +488,11 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         if(!$this->isStartTag()){
             return;
         }
-        $this->actualTig['mid'] = $this->xml->getAttribute('id');
-        $this->actualTig['term'] = $this->xml->readString();
+        
+        $this->actualTig['mid'] = $this->getIdTerm();
+        
+        //$this->actualTig['term'] = $this->xml->readString();
+        $this->actualTig['term'] = $this->xml->readInnerXml();
     }
 
     /**
@@ -523,4 +561,33 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     public function cleanup() {
         //nothing to do
     }
+    
+    private function getIdTermEntry () {
+        // detect on first call if IDs should be added
+        if ($this->counterTermEntry == 0 && $this->addIds) {
+            if (!empty($this->xml->getAttribute('id'))) {
+                $this->addIds = false;
+            }
+        }
+        
+        if ($this->addIds == false) {
+            return $this->xml->getAttribute('id');
+        }
+        
+        return 'termEntry_'.str_pad(++$this->counterTermEntry, 2, '0', STR_PAD_LEFT);
+    }
+
+    private function getIdTerm () {
+        
+        if ($this->addIds == false) {
+            return $this->xml->getAttribute('id');
+        }
+        
+        $tempReturn =   'term_'.str_pad($this->counterTermEntry, 2, '0', STR_PAD_LEFT)
+                        .'_'.++$this->counterTig.'_'.$this->actualLang
+                        .'_1' // ??? what means this const number ???
+                        .'_'.str_pad(++$this->counterTerm, 5, '0', STR_PAD_LEFT);
+        return $tempReturn;
+    }
+    
 }
