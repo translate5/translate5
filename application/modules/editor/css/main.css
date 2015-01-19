@@ -122,12 +122,16 @@
 /* END - Headpanel */
 
 /*Terminologie:*/
-.metaTermPanel table {width:100%;}
-.metaTermPanel table th {padding-bottom: 3px;text-align:left;vertical-align: top;}
-.metaTermPanel table td {padding-top: 2px;padding-bottom: 3px;text-align:left;vertical-align: top;}
-.metaTermPanel table tr.even td {background-color:#eaf1fb;}
-.metaTermPanel span.used {font-weight:bold;}
+.metaTermPanel .term-group {padding:2px 0px; text-align:left;vertical-align: top;}
+.metaTermPanel .term-group > div {padding: 2px 1px;}
+.metaTermPanel .term-group > div.target-terms {padding-left: 14px;}
+.metaTermPanel .target-terms {border-top:1px dotted #BFC2C2;}
+
+.x-form-cb-label-after {white-space: normal;}
+
+.metaTermPanel .even {background-color:#eaf1fb;border-top:1px solid #99bce8;border-bottom:1px solid #99bce8;}
 .metaTermPanel img {vertical-align: top;margin-right:2px;}
+.metaTermPanel span.used {font-weight:bold;}
 
 /* Term Tags, der folgende Code ist im HtmlEditor body css redundant vorhanden. Ebenso im Helper View_Helper_WorkflowNotifyHtmlMailSegmentList */
 .segment-tag-column div.x-grid-cell-inner div.term,

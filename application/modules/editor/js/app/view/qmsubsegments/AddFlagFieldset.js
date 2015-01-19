@@ -47,6 +47,7 @@ Ext.define('Editor.view.qmsubsegments.AddFlagFieldset', {
 	extend : 'Ext.form.FieldSet',
 	alias : 'widget.qmSubsegmentsFlagFieldset',
 	title : "QM Subsegmente",
+	collapsible: true,
 	strings: {
 		severityLabel: '##UT##Gewichtung',
 		commentLabel: '##UT##Kommentar',
