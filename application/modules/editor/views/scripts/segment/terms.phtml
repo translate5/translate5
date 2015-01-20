@@ -42,10 +42,6 @@ if(empty($this->termGroups)) {
 <div class="term-box">
 <?php
     $i = 0;
-    $this->termGroups = array_merge(array_values($this->termGroups), array_values($this->termGroups));
-    error_log(print_r($this->termGroups,1));
-    $this->termGroups[0][0]->term = 'Mercedes-Benz e una marca tedesca di automobili con una lunga traditione';
-    $this->termGroups[0][1]->term = 'MercedesBenzisteine-deutscheAutomarkemitlangerTradition';
     foreach($this->termGroups as $termGroup) {
         $target = array();
         $source = array();
