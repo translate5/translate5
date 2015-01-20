@@ -8,6 +8,3 @@
         path = public/modules/editor
         url = git@bitbucket.com:mittagqi/translate5GUIApplication.git
 
-[submodule "library/querypath"]
-	path = library/querypath
-	url = git@bitbucket.org:marcmittag/querypath.git
