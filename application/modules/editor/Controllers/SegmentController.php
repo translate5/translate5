@@ -94,6 +94,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->view->rows = $this->entity->loadByTaskGuid($session->taskGuid);
         $this->view->total = $this->entity->getTotalCountByTaskGuid($session->taskGuid);
         $borderSegments = $this->entity->getBorderSegments($session->taskGuid);
+        //editable segments only!
         if(!empty($borderSegments['first'])) {
             $this->view->firstSegmentId = $borderSegments['first']['id'];
         }

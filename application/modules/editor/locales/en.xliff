@@ -761,10 +761,16 @@
         <source>Wählen Sie die zu importierenden TBX Daten für das TermTagging</source>
         <target>Please choose the TBX data to be imported for the term tagging</target>
       </trans-unit>
-      <trans-unit id='VEJYIERhdGVpwrkgwrI='>
-        <source>TBX Datei¹ ²</source>
-        <target>TBX file¹ ²</target>
+      <trans-unit id='VEJYIERhdGVpwrI='>
+        <source>TBX Datei²</source>
+        <target>TBX file²</target>
       </trans-unit>
+      <trans-unit id='wrIgRWluZSBUQlggRGF0ZWkgaXN0IG9wdGlvbmFsLiBFaW5lIFRCWCBEYXRlaSBpbSBUQlgtQ29yZSBGb3JtYXQgd2lyZCBiZW7DtnRpZ3QgdW0gVGVybWlub2xvZ2llIGF1c3p1emVpY2huZW4u'>
+        <source>² Eine TBX Datei ist optional. Eine TBX Datei im TBX-Core Format wird benötigt um Terminologie auszuzeichnen.</source>
+        <target>² A TBX file is optional. You need a TBX-file in TBX-Core format to mark terminology in your bilingual files.</target>
+      </trans-unit>
+      
+      
       <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRCWCBEYXRlaSE='>
         <source>Bitte verwenden Sie eine TBX Datei!</source>
         <target>Please use a TBX file!</target>
@@ -775,11 +781,6 @@
         <target><b style="color:#ff0000;">New:</b> You can now also use SDLXLIFF, openTM2-XLIFF or CSV files directly! <a target="_blank" href="{0}/index/usage#single-import">More information</a>.</target>
       </trans-unit>      
       
-      
-      <trans-unit id='wrIgc2VwYXJhdGUgVEJYIG51ciBiZWltIEltcG9ydCBlaW5lciBTRExYTElGRiBEYXRlaSBtw7ZnbGljaC4='>
-        <source>² separate TBX nur beim Import einer SDLXLIFF Datei möglich.</source>
-        <target>² extra TBX file only available for SDLXLIFF import.</target>
-      </trans-unit>
       <trans-unit id='QW5mcmFnZSBrYW5uIG5pY2h0IGFremVwdGllcnQgd2VyZGVuIQ=='>
         <source>Anfrage kann nicht akzeptiert werden!</source>
         <target>Request to the server could not be accepted!</target>
