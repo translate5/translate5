@@ -200,17 +200,9 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             throw new Zend_Exception($file.' is not Readable!');
         }
         $this->task = $task;
-
-        $start = microtime(true);
-        //$tbxRegisteredInServer = $this->insertIdsInTbx($file->getPathname());
-        //$this->task->setTerminologie((boolean)$tbxRegisteredInServer);
+        
         $this->task->setTerminologie(1);
         
-        $after_insert = microtime(true);
-        //if(!$tbxRegisteredInServer) {
-        //    return;
-        //}
-
         //languages welche aus dem TBX importiert werden sollen
         $this->languages[$sourceLang->getId()] = $this->normalizeLanguage($sourceLang->getRfc5646());
         $this->languages[$targetLang->getId()] = $this->normalizeLanguage($targetLang->getRfc5646());

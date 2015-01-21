@@ -240,6 +240,10 @@ class editor_Models_Import {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
+        
+        if ($task->getState() != $task::STATE_IMPORT) {
+            return false;
+        }
         $task->setState($task::STATE_OPEN);
         $task->save();
         
