@@ -387,10 +387,28 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
-        $task->setState($task::STATE_ERROR);
-        $task->save();
+        //$task->setState($task::STATE_ERROR);
+        //$task->save();
         
-        $this->log->logError('TermTagger-Import defect Segments', __CLASS__.' -> '.__FUNCTION__.'; $taskGuid: '.$taskGuid.'; $defectSegments: '.print_r($defectSegments, true));
+        $msg = 'While importing Task "'.$task->getTaskName().'" with $taskGuid: '.$taskGuid
+                .' the following Segments where marked as defect:'."\n";
+        //$msg .= '  $defectSegments: '.print_r($defectSegments, true);
+        foreach ($defectSegments as $defectsegment) {
+            $segment = ZfExtended_Factory::get('editor_Models_Segment');
+            /* @var $segment editor_Models_Segment */
+            $segment->load($defectsegment['id']);
+            
+            $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+            /* @var $fieldManager editor_Models_SegmentFieldManager */
+            $fieldManager->initFields($taskGuid);
+            $segmentFields = $fieldManager->getFieldList();
+            $sourceFieldName = $fieldManager->getFirstSourceName();
+            
+            $msg .= '- # '.$segment->getSegmentNrInTask().'; Source-Text: '.strip_tags($segment->get($sourceFieldName))."\n";
+        }
+                
+        
+        $this->log->logError('TermTagger-Import defect Segments ', __CLASS__.' -> '.__FUNCTION__."\n". $msg);
     }
     
 }
