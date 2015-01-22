@@ -89,7 +89,7 @@ $db = @new mysqli($dbhost, $dbuser, $dbpwd, $dbname, $dbport, $dbsocket);
 if ($db->connect_error) {
     die('Connect Error (' . $db->connect_errno . ') '. $db->connect_error."\n");
 }
-/*$res = $db->query("update LEK_segment_data set original = replace(original, '&gt;', '_____transGTersetzungTilde_______'),edited = replace(edited, '&gt;', '_____transGTersetzungTilde_______')");
+$res = $db->query("update LEK_segment_data set original = replace(original, '&gt;', '_____transGTersetzungTilde_______'),edited = replace(edited, '&gt;', '_____transGTersetzungTilde_______')");
 
 $res = $db->query("update LEK_segment_data set original = replace(original, '&gt', '&gt;'),edited = replace(edited, '&gt', '&gt;')");
 
@@ -102,7 +102,7 @@ $res = $db->query("update LEK_segment_history_data set edited = replace(edited, 
 
 $res = $db->query("update LEK_segment_history_data set edited = replace(edited, '_____transGTersetzungTilde_______','&gt;')");
 
-*/
+
 $res = $db->query("show tables from translate5 like '%LEK_segment_view_%';");
 
 /* @var $res mysqli_result */
@@ -110,9 +110,6 @@ $res = $db->query("show tables from translate5 like '%LEK_segment_view_%';");
  * loop through the fetched foldertree entries, convert them, and save it back to the DB.
  */
 while($row = $res->fetch_array()) {
-    ob_start();
-    var_dump($row);
-    error_log(ob_get_clean());
     $table = $row[0];
     $db->query("update ".$table." set source = replace(source, '&gt;', '_____transGTersetzungTilde_______'),target = replace(target, '&gt;', '_____transGTersetzungTilde_______'),targetEdit = replace(targetEdit, '&gt;', '_____transGTersetzungTilde_______')");
     $db->query("update ".$table." set relais = replace(relais, '&gt;', '_____transGTersetzungTilde_______')");
