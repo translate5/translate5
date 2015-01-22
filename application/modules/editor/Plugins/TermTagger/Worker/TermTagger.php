@@ -125,12 +125,16 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTag
         $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
         /* @var $termTagger editor_Plugins_TermTagger_Service */
         
-        if (!$this->checkTermTaggerTbx($this->workerModel->getSlot(), $serverCommunication->tbxFile)) {
-            $this->log('TermTagger-Error in ', __CLASS__.' -> '.__FUNCTION__.'; TermTagger-Server could not load tbx-File: '.$serverCommunication->tbxFile);
-            return false;
+        try {
+            if (!$this->checkTermTaggerTbx($this->workerModel->getSlot(), $serverCommunication->tbxFile)) {
+                return false;
+            }
+            $result = $termTagger->tagterms($this->workerModel->getSlot(), $serverCommunication);
         }
-        
-        $result = $termTagger->tagterms($this->workerModel->getSlot(), $serverCommunication);
+        catch(editor_Plugins_TermTagger_Exception_Abstract $exception) {
+            $result = '';
+            $this->log->logException($exception);
+        }
         
         // on error return false and store original untagged data
         if (empty($result)) {

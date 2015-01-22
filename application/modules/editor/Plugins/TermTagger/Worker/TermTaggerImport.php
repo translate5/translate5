@@ -48,6 +48,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
      * @var string
      */
     private $sourceFieldName = '';
+        
     
     
     
@@ -110,55 +111,60 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
     public function work() {
         $taskGuid = $this->workerModel->getTaskGuid();
         $segmentIds = $this->loadUntaggedSegmentIds($taskGuid);
-
-        $state = self::SEGMENT_STATE_RETAG;
+        
         if (empty($segmentIds)) {
             $segmentIds = $this->loadNextRetagSegmentId($taskGuid);
             $state = self::SEGMENT_STATE_DEFECT;
             if(empty($segmentIds)) {
+                $this->reportDefectSegments($taskGuid);
                 return false;
             }
         }
-
+        
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
-
+        
         $serverCommunication = $this->fillServerCommunication($task, $segmentIds);
         /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
-
+        
         $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
         /* @var $termTagger editor_Plugins_TermTagger_Service */
-        if (!$this->checkTermTaggerTbx($this->workerModel->getSlot(), $serverCommunication->tbxFile)) {
-            $this->log( 'TermTaggerImport-Error in ', __CLASS__.' -> '.__FUNCTION__.
-                        '; TermTagger-Server could not load tbx-File: '.$serverCommunication->tbxFile);
-            return false;
-        }
-
-        $result = $termTagger->tagterms($this->workerModel->getSlot(), $serverCommunication);
-
-        // on error return false, store segment untagged, but mark it as defect / to be retagged
-        if (empty($result)) {
-            $this->setTermtagState($task, $segmentIds, $state);
-            $toreturn = false;
-        }
-        else {
+        
+        try {
+            if (!$this->checkTermTaggerTbx($this->workerModel->getSlot(), $serverCommunication->tbxFile)) {
+                $result = '';
+            }
+            $result = $termTagger->tagterms($this->workerModel->getSlot(), $serverCommunication);
             $this->saveSegments($task, $result->segments);
-            $toreturn = true;
         }
-
-        // to initialize an new worker-queue-entry
+        catch(editor_Plugins_TermTagger_Exception_Malfunction $e) {
+            if (empty($state)) {
+                $state = self::SEGMENT_STATE_RETAG;
+            }
+            $this->setTermtagState($task, $segmentIds, $state);
+        }
+        catch(editor_Plugins_TermTagger_Exception_Abstract $exception) {
+            $this->setTermtagState($task, $segmentIds, self::SEGMENT_STATE_UNTAGGED);
+            $this->log->logException($exception);
+            sleep(60);
+        }
+        
+        // initialize an new worker-queue-entry to continue 'chained'-import-process
+        $this->createNewWorkerChainEntry($taskGuid);
+    }
+    
+    
+    private function createNewWorkerChainEntry($taskGuid) {
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
         /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
-
+        
         if (!$worker->init($taskGuid, array('resourcePool' => 'import'))) {
-            $this->log( 'TermTaggerImport-Error in ', __CLASS__.' -> '.__FUNCTION__.
-                        '; Worker could not be initialized');
+            $this->log->logError('TermTaggerImport-Error on new worker init()'
+                                , __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }
         $worker->queue(ZfExtended_Models_Worker::STATE_WAITING);
-
-        return $toreturn;
     }
     
     /**
@@ -197,7 +203,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         
         $select = $this->getNextSegmentSelect($db, $taskGuid);
         $sql = $select->where($dbMetaName.'.termtagState IS NULL OR '.$dbMetaName.'.termtagState IN (?)',
-                            array($this::SEGMENT_STATE_UNTAGGED)) // later there may will be a state 'targetnotfound'
+                            array($this::SEGMENT_STATE_UNTAGGED)) //, $this::SEGMENT_STATE_RETAG)) // later there may will be a state 'targetnotfound'
                     ->order($dbName.'.id')
                     ->limit($limit);
         $segmentIds = $db->fetchAll($sql)->toArray();
@@ -361,6 +367,30 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         }
         
         return $return;
+    }
+    
+    private function reportDefectSegments($taskGuid) {
+        // get list of defect segments
+        $db = ZfExtended_Factory::get('editor_Models_Db_Segments');
+        /* @var $db editor_Models_Db_Segments */
+        $dbMeta = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
+        /* @var $dbMeta editor_Models_Db_SegmentMeta */
+        $dbMetaName = $dbMeta->info($dbMeta::NAME);
+        $select = $this->getNextSegmentSelect($db, $taskGuid);
+        $sql = $select->where($dbMetaName.'.termtagState = ?',$this::SEGMENT_STATE_DEFECT);
+        $defectSegments = $db->fetchAll($sql)->toArray();
+        
+        if (empty($defectSegments)) {
+            return;
+        }
+        
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        $task->setState($task::STATE_ERROR);
+        $task->save();
+        
+        $this->log->logError('TermTagger-Import defect Segments', __CLASS__.' -> '.__FUNCTION__.'; $taskGuid: '.$taskGuid.'; $defectSegments: '.print_r($defectSegments, true));
     }
     
 }

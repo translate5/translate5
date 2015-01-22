@@ -90,6 +90,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         $resourceName = self::$praefixResourceName.$this->resourcePool;
         $usedSlots = $this->workerModel->getListSlotsCount($resourceName);
         
+        
         $workerCountToStart = 0;
         foreach ($usedSlots as $slot) {
             if($slot['count']<=1){
@@ -138,7 +139,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         // detect defined slots for the resourcePool
         $availableSlots = $this->getAvailableSlots($resourcePool);
         
-        $usedSlots = $this->workerModel->getListSlotsCount($resourceName);
+        $usedSlots = $this->workerModel->getListSlotsCount($resourceName, $availableSlots);
         
         // all slotes in use
         if (count($usedSlots) == count($availableSlots)) {
@@ -249,8 +250,8 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         $service = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
         /* @var $service editor_Plugins_TermTagger_Service */
         if(!$service->open($url, $tbxHash, $tbxData)) {
-            $this->log->logError(__CLASS__.' -> '.__FUNCTION__.'; Terminology disabled because tbx can not be loaded to the TermTagger-server.');
-            return false;
+            //$this->log->logError(__CLASS__.' -> '.__FUNCTION__.'; Terminology disabled because tbx can not be loaded to the TermTagger-server.');
+            throw new editor_Plugins_TermTagger_Exception_Open(__CLASS__.' -> '.__FUNCTION__.'; Terminology disabled because tbx can not be loaded to the TermTagger-server.');
         }
         
         return true;

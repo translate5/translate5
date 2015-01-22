@@ -197,10 +197,8 @@ class editor_Plugins_TermTagger_Service {
         } catch(Exception $httpException) {
             //logging the send data is irrelevant here, since we are logging communication errors, not termtagger server errors!
             $msg = 'Method: '.$method.'; URL was: '.$client->getUri(true).'; Message was: '.$httpException->getMessage();
-            $this->log->logError('Exception in communication with termtagger in '.__CLASS__, $msg);
-            $this->log->logException($httpException);
+            throw new editor_Plugins_TermTagger_Exception_Request($msg);
         }
-        return false;
     }
     
     /**
@@ -231,23 +229,17 @@ class editor_Plugins_TermTagger_Service {
         $httpClient->setConfig(array('timeout' => (integer)$this->config->timeOut->segmentTagging));
         $response = $this->sendRequest($httpClient, $httpClient::POST);
         
-        if(!$response) {
-            //was exception => already logged
-            return null;
-        }
-        
         if(!$this->wasSuccessfull()) {
             $msg = 'TermTagger HTTP Status was: '.$this->getLastStatus();
             $msg .= "\n URL: ".$httpClient->getUri(true)."\n\nRequested Data: ";
             $msg .= print_r($data,true)."\n\nPlain Server Response: ";
             $msg .= print_r($response,true);
-            $this->log->logError('Result of Tagging a Term was not OK!', $msg);
-            return null;
+            throw new editor_Plugins_TermTagger_Exception_Malfunction($msg);
         }
         
         $response = $this->decodeServiceResult($response);
         if (!$response) {
-            return NULL;
+            throw new editor_Plugins_TermTagger_Exception_Request('Error on decodeServiceResult in '.__CLASS__.'->'.__FUNCTION__);
         }
         
         $response = $this->decodeSegments($response);
