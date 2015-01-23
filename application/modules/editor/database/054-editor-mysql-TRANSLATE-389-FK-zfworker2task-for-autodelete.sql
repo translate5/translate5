@@ -34,4 +34,4 @@
 --  */
 -- 
 
-ALTER TABLE `zf_worker` ADD CONSTRAINT `zf_worker_ibfk_1` FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE;
+ALTER TABLE `Zf_worker` ADD CONSTRAINT `zf_worker_ibfk_1` FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE;
