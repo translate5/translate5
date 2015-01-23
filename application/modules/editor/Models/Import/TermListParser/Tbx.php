@@ -148,10 +148,17 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     
     /**
      * Will be set in first <termEntry> of the tbx-file.
+     * Detects if ids should be added to the termEntries or not 
+     * @var boolean
+     */
+    protected $addTermEntryIds = true;
+    
+    /**
+     * Will be set in first <term> of the tbx-file.
      * Detects if ids should be added to the terms or not 
      * @var boolean
      */
-    protected $addIds = true;
+    protected $addTermIds = true;
     
     protected $counterTermEntry = 0;
     protected $counterTerm = 0;
@@ -467,7 +474,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             return;
         }
         if(empty($this->actualTig) || empty($this->actualTig['mid'])){
-            $this->log('tig Tag ohne relevanten Inhalt oder ohne term tag id Attribut! Wird ignoriert.');
+            //$this->log('tig Tag ohne relevanten Inhalt oder ohne term tag id Attribut! Wird ignoriert.');
+            $this->log('tig-tag without relevant content or without attribut id. tip-tag will be ignored.');
             return;
         }
         $this->actualTermsInLangSet[$this->actualTig['mid']] = $this->actualTig;
@@ -556,13 +564,13 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     
     private function getIdTermEntry () {
         // detect on first call if IDs should be added
-        if ($this->counterTermEntry == 0 && $this->addIds) {
+        if ($this->counterTermEntry == 0 && $this->addTermEntryIds) {
             if (!empty($this->xml->getAttribute('id'))) {
-                $this->addIds = false;
+                $this->addTermEntryIds = false;
             }
         }
         
-        if ($this->addIds == false) {
+        if ($this->addTermEntryIds == false) {
             return $this->xml->getAttribute('id');
         }
         
@@ -570,8 +578,15 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     }
 
     private function getIdTerm () {
+        // detect on first call if IDs should be added
+        if ($this->counterTerm == 0 && $this->addTermIds) {
+            if (!empty($this->xml->getAttribute('id'))) {
+                $this->addTermIds = false;
+            }
+        }
         
-        if ($this->addIds == false) {
+        
+        if ($this->addTermIds == false) {
             return $this->xml->getAttribute('id');
         }
         
