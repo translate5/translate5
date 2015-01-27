@@ -72,6 +72,8 @@ Ext.define('Editor.controller.MetaPanel', {
     selector : '#segmentgrid'
   }],
   hideLeftRight: false,
+  calledSaveMethod:false,
+  
   init : function() {
       var me = this;
       me.control({
@@ -156,6 +158,7 @@ Ext.define('Editor.controller.MetaPanel', {
    * @return {Boolean} true if there is a next segment, false otherwise
    */
   saveNext: function() {
+      this.calledSaveMethod = this.saveNext;
       return this.saveOtherRow(1, this.messages.gridEndReached);
   },
   /**
@@ -163,6 +166,7 @@ Ext.define('Editor.controller.MetaPanel', {
    * @return {Boolean} true if there is a next segment, false otherwise
    */
   savePrevious: function() {
+      this.calledSaveMethod = this.savePrevious;
       return this.saveOtherRow(-1, this.messages.gridStartReached);
   },
   /**

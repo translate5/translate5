@@ -65,10 +65,13 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   isTagOrderClean: true,
   missingContentTags: [],
   duplicatedContentTags: [],
+  checkForErrors: true,
   
   strings: {
 	  errorTitle: '#UT# Fehler bei der Segment Validierung!',
 	  tagOrderErrorText: '#UT# Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
+	  correctErrorsText: '#UT# Fehler beheben',
+	  saveAnyway: '#UT# Trotzdem speichern',
 	  tagMissingText: '#UT# Die nachfolgenden Tags wurden beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Versuchen Sie mit der Rückgängigfunktion STRG-Z die Tags wiederherzustellen. <br /><br />Alternativ können Sie auch die Bearbeitung des Segments durch Klick auf "Abbrechen" beenden und das Segment neu zur Bearbeitung öffnen.<br /><br />Fehlende Tags:',
 	  tagDuplicatedText: '#UT# Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:',
 	  tagRemovedText: '#UT# Es wurden Tags mit fehlendem Partner entfernt!'
@@ -80,6 +83,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   initComponent: function() {
     var me = this;
     me.viewModesController = Editor.controller.ViewModes;
+    me.metaPanelController = Editor.app.getController('MetaPanel');
+    me.segmentsController = Editor.app.getController('Segments');
     me.imageTemplate = new Ext.Template([
       '<img id="'+me.idPrefix+'{key}" class="{type}" title="{text}" alt="{text}" src="{path}"/>'
     ]);
@@ -343,8 +348,37 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   isDuplicateSaveTag: function(img) {
       return img.tagName == 'IMG' && img.className && /duplicatesavecheck/.test(img.className);
   },
+  handleSaveWithErrors: function(msg){
+      var me = this;
+      var MB = Ext.create('Ext.window.MessageBox', {
+            buttonText:{                        
+                yes: me.strings.correctErrorsText,
+                no: me.strings.saveAnyway
+            }
+        });
+
+        MB.confirm(me.strings.errorTitle,msg,
+            function(btn){
+                var me = this;
+                if(btn != 'yes') {
+                    me.checkForErrors = false;
+                    if(me.metaPanelController.calledSaveMethod){
+                        me.metaPanelController.calledSaveMethod();
+                        return;
+                    }
+                    me.segmentsController.saveChainStart();
+                }
+                me.metaPanelController.calledSaveMethod = false;
+            },me);
+  },
   hasAndDisplayErrors: function() {
       var me = this;
+      if(!this.checkForErrors){
+          this.metaPanelController.calledSaveMethod = false;
+          this.checkForErrors = true;
+          return false;
+      }
+      
       if(me.missingContentTags.length > 0 || me.duplicatedContentTags.length > 0){
           var msg = '', 
               todo = [['missingContentTags', 'tagMissingText'],['duplicatedContentTags','tagDuplicatedText']];
@@ -357,15 +391,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                   msg += '<br /><br />';
               }
           }
-          Ext.Msg.alert(this.strings.errorTitle, msg, function() {
-              me.deferFocus();
-          });
+          me.handleSaveWithErrors(msg);
           return true;
       }
       if(!me.isTagOrderClean){
-          Ext.Msg.alert(me.strings.errorTitle, me.strings.tagOrderErrorText);
+          me.handleSaveWithErrors(me.strings.tagOrderErrorText);
           return true;
       }
+      this.metaPanelController.calledSaveMethod = false;
       return false;
   },
   /**
