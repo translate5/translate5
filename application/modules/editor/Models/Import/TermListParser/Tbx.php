@@ -301,7 +301,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         if(!$this->isStartTag()) {
             return; // END Tag => raus
         }
-
+        
+        // check if aktu termEntry is empty self-closing tag
+        if ($this->xml->isEmptyElement) {
+            return;
+        }
+        
         //Term Entry ID ablegen
         $this->actualTermEntry = $this->getIdTermEntry();            
         
