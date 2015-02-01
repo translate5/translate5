@@ -1080,6 +1080,14 @@
 	  <target> The query over the Internet to the server took too long. This may be because of your internet connection or a server overload. Please try again.</target>
 	</trans-unit>
         <trans-unit id='RGllIG5hY2hmb2xnZW5kZW4gVGFncyB3dXJkZW4gYmVpbSBFZGl0aWVyZW4gZ2Vsw7ZzY2h0LCBkYXMgU2VnbWVudCBrYW5uIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbi4gPGJyIC8+PGJyIC8+VmVyc3VjaGVuIFNpZSBtaXQgZGVyIFLDvGNrZ8OkbmdpZ2Z1bmt0aW9uIFNUUkctWiBkaWUgVGFncyB3aWVkZXJoZXJ6dXN0ZWxsZW4uIDxiciAvPjxiciAvPkFsdGVybmF0aXYga8O2bm5lbiBTaWUgYXVjaCBkaWUgQmVhcmJlaXR1bmcgZGVzIFNlZ21lbnRzIGR1cmNoIEtsaWNrIGF1ZiAiQWJicmVjaGVuIiBiZWVuZGVuIHVuZCBkYXMgU2VnbWVudCBuZXUgenVyIEJlYXJiZWl0dW5nIMO2ZmZuZW4uPGJyIC8+PGJyIC8+RmVobGVuZGUgVGFnczo='><source>Die nachfolgenden Tags wurden beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Versuchen Sie mit der Rückgängigfunktion STRG-Z die Tags wiederherzustellen. <br /><br />Alternativ können Sie auch die Bearbeitung des Segments durch Klick auf "Abbrechen" beenden und das Segment neu zur Bearbeitung öffnen.<br /><br />Fehlende Tags:</source><target>The following tags have been deleted during editing, the segment can not be saved. <br />Try to restore the tags by using the Undo function CTRL-Z. <br /> Alternatively, you can also stop the processing of the segment by clicking on "Cancel" and reopen the segment for processing. <br /> Missing Tags:</target></trans-unit>
+        <trans-unit id='RmVobGVyIGJlaGViZW4='>
+	  <source>Fehler beheben</source>
+	  <target>Correct errors</target>
+	</trans-unit>
+        <trans-unit id='VHJvdHpkZW0gc3BlaWNoZXJu'>
+	  <source>Trotzdem speichern</source>
+	  <target>Save anyway</target>
+	</trans-unit>
     </body>
   </file>
 </xliff>
