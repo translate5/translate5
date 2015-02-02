@@ -356,9 +356,16 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             $this->actualLang = null;
             $this->actualTermsInLangSet = array();
         }
+        
         if(! $this->isStartTag()) {
             return; // END oder anderer Tag => raus
         }
+        
+        // check if aktu langSet is empty self-closing tag
+        if ($this->xml->isEmptyElement) {
+            return;
+        }
+        
         $this->actualLang = $this->xml->getAttribute('xml:lang');
         if(empty($this->actualLang)) {
             $this->actualLang = $this->xml->getAttribute('lang');
@@ -478,6 +485,11 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         if(!$this->isEndTag()){
             return;
         }
+        // check if aktu tig is empty self-closing tag
+        if ($this->xml->isEmptyElement) {
+            return;
+        }
+        
         if(empty($this->actualTig) || empty($this->actualTig['mid'])){
             //$this->log('tig Tag ohne relevanten Inhalt oder ohne term tag id Attribut! Wird ignoriert.');
             $this->log('tig-tag without relevant content or without attribut id. tip-tag will be ignored.');
@@ -493,6 +505,11 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         if(!$this->isStartTag()){
             return;
         }
+        // check if aktu term is empty self-closing tag
+        if ($this->xml->isEmptyElement) {
+            return;
+        }
+        
         
         $this->actualTig['mid'] = $this->getIdTerm();
         
