@@ -141,6 +141,7 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTag
             return false;
         }
         $this->result = $result->segments;
+        $this->result = $this->markTransFound($this->result);
         return true;
     }
 }

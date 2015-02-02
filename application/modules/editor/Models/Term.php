@@ -111,7 +111,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         /* @var $segment editor_Models_Segment */
         $segment->load($segmentId);
         
-        $termIds = $this->getTermIdsFromTaskSegment($task, $segment);
+        $termIds = $this->getTermMidsFromTaskSegment($task, $segment);
         
         if(empty($termIds)) {
             return array();
@@ -125,7 +125,33 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         return $this->sortTerms($result);
     }
     
-    private function getTermIdsFromTaskSegment(editor_Models_Task $task, editor_Models_Segment $segment) {
+    /**
+     * Returns term-informations for $segmentId in $taskGuid.
+     * Includes assoziated terms corresponding to the tagged terms
+     * 
+     * @param string $mid
+     * @param array $languageIds 1-dim array with languageIds|default empty array; 
+     *          if passed only terms with the passed languageIds are returned
+     * @return 2-dim array (get term of first row like return[0]['term'])
+     */
+    public function getAllTermsOfGroupByMid(string $taskGuid, string $mid, $languageIds = array()) {
+        $sub = "select groupId from LEK_terms where mid = ?";
+        $sub = $this->db->getAdapter()->quoteInto($sub, $mid).'and taskGuid = ?';
+        $sub = $this->db->getAdapter()->quoteInto($sub, $taskGuid);
+        $query = "select * from LEK_terms WHERE groupId = (".$sub.")";
+        if(count($languageIds)>0){
+             $or = 'language = ?';
+             $orArr = array();
+             foreach ($languageIds as $id) {
+                $orArr[] = $this->db->getAdapter()->quoteInto($or, $id);
+             }
+             $query .= ' and ('.  implode(' or ', $orArr).')';
+         }
+        
+        return $this->db->getAdapter()->fetchAll($query);
+    }
+    
+    protected function getTermMidsFromTaskSegment(editor_Models_Task $task, editor_Models_Segment $segment) {
         
         $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         /* @var $fieldManager editor_Models_SegmentFieldManager */
@@ -155,6 +181,16 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         return $termIds;
     }
     
+    /**
+     * 
+     * @param string $seg
+     * @return type array values are the mids of the terms in the string
+     */
+    public function getTermMidsFromSegment(string $seg) {
+        $getTermIdRegEx = '/<div.*?data-tbxid="(term_.*?)".*?>/';
+        preg_match_all($getTermIdRegEx, $seg, $matches);
+        return $matches[1];
+    }
     /**
      * Returns a multidimensional array.
      * 1. level: keys: groupId, values: array of terms grouped by groupId
