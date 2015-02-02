@@ -33,10 +33,6 @@
  
  END LICENSE AND COPYRIGHT 
  */
-/**
- * Trait for "TermTagger"
- * used as shared-code-base for the differen TermTaggerWorker.
- */
 abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Worker_Abstract {
     
     /**
@@ -82,6 +78,28 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
      */
     protected $data = false;
     /**
+     *
+     * @var editor_Models_Term 
+     */
+    protected $termModel;
+    /**
+     *
+     * @var editor_Models_Task
+     */
+    protected $task;
+
+
+    public function init($taskGuid = NULL, $parameters = array()) {
+        $return = parent::init($taskGuid, $parameters);
+        $this->termModel = ZfExtended_Factory::get('editor_Models_Term');
+
+        $taskGuid = $this->workerModel->getTaskGuid();
+        $this->task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $this->task->loadByTaskGuid($taskGuid);
+        return $return;
+    }
+    /**
      * @todo forking should be transfered to ZfExtended_Worker_Abstract to make it usable for other workers.
      * it should be based on maxParallelProcesses instead of just having one running worker per slot and maxParallelProcesses=1 as currently - but one slot for each termTagger instance. All termTagger instances should run in the same slot but maxParallelProcesses should be set to the number of termTagger-instances
      * @param string $state
@@ -106,8 +124,78 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
             $this->init($this->workerModel->getTaskGuid(), array('resourcePool' => $this->resourcePool));
         }
     }
-    
-    
+    /**
+     * marks terms in the source with transFound, if translation is present in the target
+     * and with transNotFound if not. A translation which is of type
+     * editor_Models_Term::STAT_DEPRECATED or editor_Models_Term::STAT_SUPERSEDED
+     * is handled as transNotFound
+     * 
+     * @param array $segments array of stdClass. example: array(object(stdClass)#529 (4) {
+      ["field"]=>
+      string(10) "targetEdit"
+      ["id"]=>
+      string(7) "4596006"
+      ["source"]=>
+      string(35) "Die neue VORTEILE Motorenbroschüre"
+      ["target"]=>
+      string(149) "Il nuovo dépliant PRODUCT INFO <div title="" class="term admittedTerm transNotFound stemmed" data-tbxid="term_00_1_IT_1_08795">motori</div>"),
+       another object, ...
+     * 
+     * @return stdClass $segments
+    }
+     */
+    protected function markTransFound(array $segments) {
+        foreach ($segments as &$seg) {
+            //remove potentially incorrect transFound or transNotFound as inserted by termtagger
+            $seg->source = preg_replace('" ?transN?o?t?Found ?"', ' ', $seg->source);
+            $seg->target = preg_replace('" ?transN?o?t?Found ?"', ' ', $seg->target);
+
+            $sourceMids = $this->termModel->getTermMidsFromSegment($seg->source);
+            $targetMids = $this->termModel->getTermMidsFromSegment($seg->target);
+            $toMarkMemory = array();
+            foreach ($sourceMids as $sourceMid) {
+                $groupedTerms = $this->termModel->getAllTermsOfGroupByMid($this->task->getTaskGuid(),$sourceMid, array($this->task->getTargetLang()));
+                $transFound = (isset($toMarkMemory[$sourceMid]))?$toMarkMemory[$sourceMid]:0;
+                foreach ($groupedTerms as $groupedTerm) {
+                    $targetMidsKey = array_search($groupedTerm['mid'], $targetMids);
+                    if($targetMidsKey!==false){
+                        $transFound++;
+                        unset($targetMids[$targetMidsKey]);
+                    }
+                }
+                $toMarkMemory[$sourceMid] = $transFound;
+            }
+            foreach ($toMarkMemory as $sourceMid => $transFound) {
+                $seg->source = $this->insertTransFoundInSegmentClass($seg->source, $sourceMid, $transFound);
+            }
+        }
+        return $segments;
+    }
+    /**
+     * insert the css-class transFound or transNotFound into css-class of the term-div tag with the corresponding mid
+     * @param string $seg
+     * @param string $mid
+     * @param boolean $transFound
+     * @return string
+     */
+    protected function insertTransFoundInSegmentClass(string $seg,string $mid, integer $transFound) {
+        $rCallback = function($matches)use(&$seg,&$transFound){
+            foreach ($matches as $match) {
+                $cssClassToInsert = ($transFound>0)?'transFound':'transNotFound';
+                $transFound--;
+                $modifiedMatch = $match;
+                if(strpos($modifiedMatch, ' class=')===false){
+                    $modifiedMatch = str_replace('<div', '<div class=""', $modifiedMatch);
+                }
+                $modifiedMatch = preg_replace('/( class="[^"]*)"/', '\\1 '.$cssClassToInsert.'"', $modifiedMatch);
+                $seg = str_replace($match, $modifiedMatch, $seg);
+            }
+        };
+        
+        preg_replace_callback('/<div[^>]*data-tbxid="'.$mid.'"[^>]*>/', $rCallback, $seg);
+        return $seg;
+    }
+
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::calculateDirectSlot()
@@ -209,11 +297,10 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
     
     
     /**
-     * @param editor_Models_Task $task
      * @return SplFileInfo
      */
-    protected function getTbxFilename(editor_Models_Task $task) {
-        return new SplFileInfo(editor_Models_Import_TermListParser_Tbx::getTbxPath($task));
+    protected function getTbxFilename() {
+        return new SplFileInfo(editor_Models_Import_TermListParser_Tbx::getTbxPath($this->task));
     }
     
     /**
@@ -234,18 +321,12 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
             return true;
         }
         
-        $taskGuid = $this->workerModel->getTaskGuid();
-        
         // try to load tbx-file to the TermTagger-server
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
-        
-        $tbxPath = $this->getTbxFilename($task);
+        $tbxPath = $this->getTbxFilename($this->task);
         $tbxParser = ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
         /* @var $tbxParser editor_Models_Import_TermListParser_Tbx */
-        $tbxData = $tbxParser->assertTbxExists($task, new SplFileInfo($tbxPath));
-        $tbxHash = $task->meta()->getTbxHash();
+        $tbxData = $tbxParser->assertTbxExists($this->task, new SplFileInfo($tbxPath));
+        $tbxHash = $this->task->meta()->getTbxHash();
         
         $service = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
         /* @var $service editor_Plugins_TermTagger_Service */

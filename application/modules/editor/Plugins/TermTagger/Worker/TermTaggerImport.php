@@ -113,7 +113,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         $segmentIds = $this->loadUntaggedSegmentIds($taskGuid);
         
         if (empty($segmentIds)) {
-            $segmentIds = $this->loadNextRetagSegmentId($taskGuid);
+            $segmentIds = $this->loadNextRetagSegmentId();
             $state = self::SEGMENT_STATE_DEFECT;
             if(empty($segmentIds)) {
                 $this->reportDefectSegments($taskGuid);
@@ -121,11 +121,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
             }
         }
         
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
-        
-        $serverCommunication = $this->fillServerCommunication($task, $segmentIds);
+        $serverCommunication = $this->fillServerCommunication($segmentIds);
         /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
         
         $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
@@ -136,16 +132,17 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
                 $result = '';
             }
             $result = $termTagger->tagterms($this->workerModel->getSlot(), $serverCommunication);
-            $this->saveSegments($task, $result->segments);
+            $result->segments = $this->markTransFound($result->segments);
+            $this->saveSegments($result->segments);
         }
         catch(editor_Plugins_TermTagger_Exception_Malfunction $e) {
             if (empty($state)) {
                 $state = self::SEGMENT_STATE_RETAG;
             }
-            $this->setTermtagState($task, $segmentIds, $state);
+            $this->setTermtagState($segmentIds, $state);
         }
         catch(editor_Plugins_TermTagger_Exception_Abstract $exception) {
-            $this->setTermtagState($task, $segmentIds, self::SEGMENT_STATE_UNTAGGED);
+            $this->setTermtagState($segmentIds, self::SEGMENT_STATE_UNTAGGED);
             $this->log->logException($exception);
             sleep(60);
         }
@@ -201,7 +198,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         
         //TODO TRANSLATE-351 - The "inprogress" setting can be improved as described in the issue!
         
-        $select = $this->getNextSegmentSelect($db, $taskGuid);
+        $select = $this->getNextSegmentSelect($db);
         $sql = $select->where($dbMetaName.'.termtagState IS NULL OR '.$dbMetaName.'.termtagState IN (?)',
                             array($this::SEGMENT_STATE_UNTAGGED)) //, $this::SEGMENT_STATE_RETAG)) // later there may will be a state 'targetnotfound'
                     ->order($dbName.'.id')
@@ -227,14 +224,14 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
      * @param string $taskGuid
      * @return array
      */
-    private function loadNextRetagSegmentId($taskGuid) {
+    private function loadNextRetagSegmentId() {
         // get list of untagged segments
         $db = ZfExtended_Factory::get('editor_Models_Db_Segments');
         /* @var $db editor_Models_Db_Segments */
         $dbMeta = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
         /* @var $dbMeta editor_Models_Db_SegmentMeta */
         $dbMetaName = $dbMeta->info($dbMeta::NAME);
-        $select = $this->getNextSegmentSelect($db, $taskGuid);
+        $select = $this->getNextSegmentSelect($db);
         $sql = $select->where($dbMetaName.'.termtagState = ?',$this::SEGMENT_STATE_RETAG)
                     ->limit(1);
         return $db->fetchAll($sql)->toArray();
@@ -246,26 +243,25 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
      * @param string $taskGuid
      * @return Zend_Db_Table_Select
      */
-    private function getNextSegmentSelect(editor_Models_Db_Segments $db, $taskGuid) {
+    private function getNextSegmentSelect(editor_Models_Db_Segments $db) {
         $dbName = $db->info($db::NAME);
         /* @var $db editor_Models_Db_Segments */
         return $db->select()
                     ->from($dbName, $dbName.'.id')
                     ->joinLeft($dbName.'_meta', $dbName.'.id = '.$dbName.'_meta'.'.segmentId', array())
-                    ->where($dbName.'.taskGuid = ?', $taskGuid);
+                    ->where($dbName.'.taskGuid = ?', $this->workerModel->getTaskGuid());
     }
     
     /**
      * Creates a ServerCommunication-Object initialized with $task
      * inclusive all field of alls segments provided in $segmentIds
      * 
-     * @param editor_Models_Task $task
      * @param array $segmentIds
      * @return editor_Plugins_TermTagger_Service_ServerCommunication
      */
-    private function fillServerCommunication (editor_Models_Task $task, array $segmentIds) {
+    private function fillServerCommunication (array $segmentIds) {
         
-        $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication', array($task));
+        $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication', array($this->task));
         /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
         
         $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
@@ -296,10 +292,9 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
     /**
      * Save TermTagged-segments for $task povided in $segments
      * 
-     * @param editor_Models_Task $task
      * @param unknown $segments
      */
-    private function saveSegments(editor_Models_Task $task, $segments) {
+    private function saveSegments($segments) {
         $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         /* @var $fieldManager editor_Models_SegmentFieldManager */
         $fieldManager->initFields($this->workerModel->getTaskGuid());
@@ -312,7 +307,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
             $segment->load($segmentId);
         
             $segment->set($this->sourceFieldName, $responseGroup[0]->source);
-            if ($task->getEnableSourceEditing()) {
+            if ($this->task->getEnableSourceEditing()) {
                 $segment->set($fieldManager->getEditIndex($this->sourceFieldName), $responseGroup[0]->source);
             }
         
@@ -334,7 +329,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
      * @param array $segments
      * @param string $state
      */
-    private function setTermtagState(editor_Models_Task $task, array $segments, $state) {
+    private function setTermtagState(array $segments, $state) {
         $ids = array_map(function($seg){
             return $seg['id'];
         }, $segments);
@@ -345,7 +340,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
             try {
                 $meta->loadBySegmentId($segmentId);
             } catch (ZfExtended_Models_Entity_NotFoundException $e) {
-                $meta->init(array('taskGuid' => $task->getTaskGuid(), 'segmentId' => $segmentId));
+                $meta->init(array('taskGuid' => $this->task->getTaskGuid(), 'segmentId' => $segmentId));
             }
             $meta->setTermtagState($state);
             $meta->save();
@@ -376,7 +371,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         $dbMeta = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
         /* @var $dbMeta editor_Models_Db_SegmentMeta */
         $dbMetaName = $dbMeta->info($dbMeta::NAME);
-        $select = $this->getNextSegmentSelect($db, $taskGuid);
+        $select = $this->getNextSegmentSelect($db);
         $sql = $select->where($dbMetaName.'.termtagState = ?',$this::SEGMENT_STATE_DEFECT);
         $defectSegments = $db->fetchAll($sql)->toArray();
         
@@ -384,13 +379,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
             return;
         }
         
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
-        //$task->setState($task::STATE_ERROR);
-        //$task->save();
-        
-        $msg = 'While importing Task "'.$task->getTaskName().'" with $taskGuid: '.$taskGuid
+        $msg = 'While importing Task "'.$this->task->getTaskName().'" with $taskGuid: '.$taskGuid
                 .' the following Segments where marked as defect:'."\n";
         //$msg .= '  $defectSegments: '.print_r($defectSegments, true);
         foreach ($defectSegments as $defectsegment) {

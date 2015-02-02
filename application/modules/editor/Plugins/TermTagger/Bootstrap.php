@@ -119,7 +119,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         
         // init worker and queue it
         if (!$worker->init($task->getTaskGuid(), array('resourcePool' => 'import'))) {
-            $this->log('TermTaggerImport-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
+            $this->log->logError('TermTaggerImport-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }
         $worker->queue();
@@ -175,7 +175,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTagger');
         /* @var $worker editor_Plugins_TermTagger_Worker_TermTagger */
         if (!$worker->init($taskGuid, array('serverCommunication' => $serverCommunication, 'resourcePool' => 'gui'))) {
-            $this->log('TermTagger-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
+            $this->log->logError('TermTagger-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }
         

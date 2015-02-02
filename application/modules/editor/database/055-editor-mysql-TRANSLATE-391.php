@@ -103,7 +103,7 @@ $res = $db->query("update LEK_segment_history_data set edited = replace(edited, 
 $res = $db->query("update LEK_segment_history_data set edited = replace(edited, '_____transGTersetzungTilde_______','&gt;')");
 
 
-$res = $db->query("show tables from translate5 like '%LEK_segment_view_%';");
+$res = $db->query("show tables from ".$dbname." like '%LEK_segment_view_%';");
 
 /* @var $res mysqli_result */
 /**
