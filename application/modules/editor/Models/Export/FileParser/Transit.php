@@ -193,11 +193,17 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
             $taskGuid = $this->_task->getTaskGuid();
             $targetLang = $this->_task->getTargetLang();
             foreach ($sourceTermMids as $mid) {
-                $termModel->loadByMid($mid,$taskGuid);
-                $sourceTerms[] = $termModel->getTerm();
-                $targetTermsSourceTerm = $termModel->getTermEntryTermsByTaskGuidTermIdLangId($taskGuid, $termModel->getId(),$targetLang);
-                foreach ($targetTermsSourceTerm as $t) {
-                    $targetTerms[] = $t['term'];
+                try {
+                    $termModel->loadByMid($mid,$taskGuid);
+                    $sourceTerms[] = $termModel->getTerm();
+                    $targetTermsSourceTerm = $termModel->getTermEntryTermsByTaskGuidTermIdLangId($taskGuid, $termModel->getId(),$targetLang);
+                    foreach ($targetTermsSourceTerm as $t) {
+                        $targetTerms[] = $t['term'];
+                    }
+                } catch (ZfExtended_Models_Entity_NotFoundException $exc) {
+                    $log = ZfExtended_Factory::get('ZfExtended_Log');
+                    /* @var $log ZfExtended_Log */
+                    $log->logError('term has not been found in Database, which should be there. Export continues. '.$exc->getTraceAsString());
                 }
             }
             $infoFieldContent .= '; '.$this->translate->_('QuellTerme').': '.  join(', ', $sourceTerms).'; '.$this->translate->_('ZielTerme').': '.  join(', ', $targetTerms).';';
