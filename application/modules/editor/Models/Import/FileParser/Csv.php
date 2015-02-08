@@ -77,6 +77,8 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      */
     protected $_enclosure;
     
+    
+    
     public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task) {
         ini_set('auto_detect_line_endings', true);//to tell php to respect mac-lineendings
         parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $sourceLang, $targetLang, $task);
@@ -265,6 +267,10 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      * @return string $segment
      */
     protected function parseSegment($segment,$isSource){
+        // TRANSLATE-411: special segment parsing is injected here, replaces normal csv parsing..
+        $segment =  $this->parseSegmentTagged($segment,$isSource);
+        // END TRANSLATE-411: special...
+        
         $count = 0;
         $segment = $this->parseSegmentProtectWhitespace($segment, $count);
         
@@ -280,11 +286,139 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
           '#<space ts="[^"]*"/>#',
         );
         
-        //set data neede by $this->whitespaceTagReplacer
+        //set data needed by $this->whitespaceTagReplacer
         $this->shortTagIdent = 1;
         $this->_segment = $segment;
+        $segment = preg_replace_callback($search, array($this,'whitespaceTagReplacer'), $segment);
         
-        return preg_replace_callback($search, array($this,'whitespaceTagReplacer'), $segment);
+        return $segment;
+    }
+    
+    private function parseSegmentTagged($segment,$isSource) {
+        
+        if (strpos($segment, '<')=== false) {
+            return $segment;
+        }
+        
+        try {
+            $tempXml = qp('<?xml version="1.0"?><segment>'.$segment.'</segment>', NULL, array('format_output' => false));
+        }
+        catch (Exception $e) {
+            error_log(__CLASS__.' -> '.__FUNCTION__.'; TODO: replace all tags as single tags !!!'.$e->getMessage());
+            return strip_tags($segment);
+        }
+        
+        // mark single- or paired-tags and fill _tagMapping array
+        $tagCounter = 1;
+        foreach ($tempXml->find('segment *') as $element) {
+            $this->_tagMapping[$tagCounter] = array();
+            
+            $tagType = 'singleTag';
+            $tagText = '<'.$element->tag().'>';
+            $this->_tagMapping[$tagCounter]['name'] = $element->tag();
+            $this->_tagMapping[$tagCounter]['text'] = htmlentities($tagText, ENT_QUOTES, 'utf-8');
+            $this->_tagMapping[$tagCounter]['imgText'] = $tagText;
+            
+            if (!empty($element->innerXml())) {
+                $tagType = 'pairedTag';
+                $eptText = '</'.$element->tag().'>';
+                $this->_tagMapping[$tagCounter]['eptName'] = $element->tag();
+                $this->_tagMapping[$tagCounter]['eptText'] = htmlentities($eptText, ENT_QUOTES, 'utf-8');
+                $this->_tagMapping[$tagCounter]['imgEptText'] = $eptText;
+            }
+            $element->wrap('<'.$tagType.'_'.$tagCounter++.' data-tagname="'.$element->tag().'" />');
+        }
+        $tempReturn = $tempXml->find('segment')->innerXml();
+        
+        // replace single-tags
+        $tempReturn = $this->parseReplaceSingleTags($tempReturn);
+        // replace left-(opening-)tags
+        $tempReturn = $this->parseReplaceLeftTags($tempReturn);
+        // replace right-(closing-)-tags
+        $tempReturn = $this->parseReplaceRightTags($tempReturn);
+        
+        return $tempReturn;
+    }
+    
+    /**
+     * Replace all special marked single-tags in $text.
+     * 
+     * @param string $text
+     * @return string
+     */
+    private function parseReplaceSingleTags($text) {
+        if (preg_match_all('/<singleTag_([0-9]+).*?data-tagname="([^"]*)"[^>]*>(<[^>]+>)<\/singleTag_[0-9]+>/ims', $text, $matches, PREG_SET_ORDER)) {
+            
+            foreach ($matches as $match) {
+                $tagId = $match[1];
+                $tagName = $match[2];
+                $tag = $match[3];
+                
+                $this->_tagMapping[$tagId]['text'] = htmlentities($tag, ENT_QUOTES, 'utf-8');
+                $this->_tagMapping[$tagId]['imgText'] = $tag;
+                $fileNameHash = md5($this->_tagMapping[$tagId]['imgText']);
+                
+                $p = $this->getTagParams($tag, $tagId, $tagId, $fileNameHash, $this->encodeTagsForDisplay($tag));
+                $replace = $this->_singleTag->getHtmlTag($p);
+                $text = str_replace($match[0], $replace, $text);
+                
+                $this->_singleTag->createAndSaveIfNotExists($this->_tagMapping[$tagId]['imgText'], $fileNameHash);
+            }
+        }
+        return $text;
+    }
+    
+    /**
+     * Replace all special marked left-tags in $text.
+     * 
+     * @param string $text
+     * @return string
+     */
+    private function parseReplaceLeftTags($text) {
+        if (preg_match_all('/<pairedTag_([0-9]+).*?data-tagname="([^"]*)"[^>]*>(<[^>]+>)/ims', $text, $matches, PREG_SET_ORDER)) {
+            
+            foreach ($matches as $match) {
+                $tagId = $match[1];
+                $tagName = $match[2];
+                $tag = $match[3];
+                
+                $this->_tagMapping[$tagId]['text'] = htmlentities($tag, ENT_QUOTES, 'utf-8');
+                $this->_tagMapping[$tagId]['imgText'] = $tag;
+                $fileNameHash = md5($this->_tagMapping[$tagId]['imgText']);
+                
+                $p = $this->getTagParams($tag, $tagId, $tagId, $fileNameHash, $this->encodeTagsForDisplay($tag));
+                $replace = $this->_leftTag->getHtmlTag($p);
+                $text = str_replace($match[0], $replace, $text);
+                
+                $this->_leftTag->createAndSaveIfNotExists($this->_tagMapping[$tagId]['imgText'], $fileNameHash);
+            }
+        }
+        return $text;
+    }
+    
+    /**
+     * Replace all special marked right-tags in $text.
+     * 
+     * @param string $text
+     * @return string
+     */
+    private function parseReplaceRightTags($text) {
+        if (preg_match_all('/(<[^>]+>)<\/pairedTag_([0-9]+)>/ims', $text, $matches, PREG_SET_ORDER)) {
+            
+            foreach ($matches as $match) {
+                $tagId = $match[2];
+                $tagName = $this->_tagMapping[$tagId]['eptName'];
+                $tag = $match[1];
+                $fileNameHash = md5($this->_tagMapping[$tagId]['imgEptText']);
+                
+                $p = $this->getTagParams($tag, $tagId, $tagId, $fileNameHash, $this->encodeTagsForDisplay($tag));
+                $replace = $this->_rightTag->getHtmlTag($p);
+                $text = str_replace($match[0], $replace, $text);
+                
+                $this->_rightTag->createAndSaveIfNotExists($this->_tagMapping[$tagId]['imgEptText'], $fileNameHash);
+            }
+        }
+        return $text;
     }
     
     /**

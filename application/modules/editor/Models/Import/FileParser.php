@@ -351,6 +351,17 @@ abstract class editor_Models_Import_FileParser {
     }
     
     /**
+     * encodes special chars to entities for display in title-Attributs and text of tags in the segments
+     * because studio sometimes writes tags in the description of tags (i.e. in locked tags)
+     *
+     * @param string text
+     * @return string text
+     */
+    protected function encodeTagsForDisplay($text) {
+        return str_replace(array('"',"'",'<','>'),array('&quot;','&#39;','&lt;','&gt;'),$text);
+    }
+    
+    /**
      * Hilfsfunktion für parseSegment: Verpackung verschiedener Strings zur Zwischenspeicherung als HTML-Klassenname im JS
      *
      * @param string $tag enthält den Tag als String

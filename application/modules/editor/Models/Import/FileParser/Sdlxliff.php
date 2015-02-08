@@ -731,7 +731,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     }
 
     /**
-     * parsing von left-Tags für parseSegment (öffnenden Tags)
+     * parsing von single-Tags für parseSegment (selfclosing oder placeholder Tags)
      *
      * @param editor_Models_Import_FileParser_Sdlxliff_parseSegmentData $data enthält alle für das Segmentparsen wichtigen Daten
      * @return editor_Models_Import_FileParser_Sdlxliff_parseSegmentData  $data enthält alle für das Segmentparsen wichtigen Daten
@@ -769,15 +769,5 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         return $data;
     }
     
-    /**
-     * encodes special chars to entities for display in title-Attributs and text of tags in the segments
-     * because studio sometimes writes tags in the description of tags (i.e. in locked tags)
-     *
-     * @param string text
-     * @return string text
-     */
-    protected function encodeTagsForDisplay($text) {
-        return str_replace(array('"',"'",'<','>'),array('&quot;','&#39;','&lt;','&gt;'),$text);
-    }
 
 }
