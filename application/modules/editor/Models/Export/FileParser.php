@@ -301,7 +301,13 @@ abstract class editor_Models_Export_FileParser {
         $count = count($segmentArr);
         for ($i = 1; $i < $count;) {
             $j = $i + 2;
-            $segmentArr[$i] = '<' . pack('H*', $segmentArr[$i + 1]) .'>';
+            // detect if single-tag is regex-tag, if not capsule result with brackets (= normal behavior)
+            $isRegexTag = $segmentArr[$i+2] == "regex";
+            $segmentArr[$i] = pack('H*', $segmentArr[$i + 1]);
+            if (!$isRegexTag) {
+                $segmentArr[$i] = '<' . $segmentArr[$i] .'>';
+            }
+            
             unset($segmentArr[$j]);
             unset($segmentArr[$i + 1]);
             $i = $i + 4;

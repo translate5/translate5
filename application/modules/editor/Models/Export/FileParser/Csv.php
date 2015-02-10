@@ -74,7 +74,14 @@ class editor_Models_Export_FileParser_Csv extends editor_Models_Export_FileParse
 
     protected function parseSegment($segment){
         $segment = $this->convertQmTags2XliffFormat($segment);
-        return htmlspecialchars_decode(parent::parseSegment($segment));
+        $segment = parent::parseSegment($segment);
+        $segment = $this->recodeTagsFromDisplay($segment);
+        
+        return $segment;
+    }
+    
+    protected function recodeTagsFromDisplay($text) {
+        return str_replace(array('&quot;','&#39;'), array('"',"'") ,$text);
     }
     
     /**

@@ -85,6 +85,11 @@ class editor_Models_Import_MetaData {
     public $tbxFilterRegex = '/\.tbx$/i';
     
     /**
+     * @var string
+     */
+    public $filenameTaskTemplate = 'task-template.xml';
+    
+    /**
      * contains a key for each imported meta data
      * @var array
      */
@@ -108,7 +113,8 @@ class editor_Models_Import_MetaData {
     public function import(editor_Models_Task $task, string $importPath) {
         $this->task = $task;
         $this->importPath = $importPath;
-
+        
+        $this->importTaskTemplateXml();
         $this->importTbx();
         $this->importQmFlagXmlFile();
     }
@@ -159,6 +165,25 @@ class editor_Models_Import_MetaData {
     }
 
     /**
+     * import task-template.xml file
+     * if exist save it to Zend_Registry::get('taskTemplate');
+     */
+    protected function importTaskTemplateXml() {
+        Zend_Registry::set('taskTemplate', array());
+        $templateFilename = $this->importPath.'/'.$this->filenameTaskTemplate;
+        
+        if (file_exists($templateFilename)) {
+            try {
+                $config = new Zend_Config_Xml($templateFilename);
+                Zend_Registry::set('taskTemplate', $config);
+            }
+            catch (Exception $e) {
+                throw new Exception('.. invalid '.$this->filenameTaskTemplate.' detected at '.__CLASS__.' -> '.__FUNCTION__);
+            }
+        }
+    }
+
+     /**
      * Importiert die übergebenen TBX Files
      * @todo Import mehrere TBX Dateien ist aktuell ungestestet!
      */
@@ -177,7 +202,7 @@ class editor_Models_Import_MetaData {
         $this->hasMetaData[] = self::META_TBX;
     }
 
-    /**
+   /**
      * Räumt nach den abgeschlossenen Importvorgängen auf.
      */
     public function cleanup() {
