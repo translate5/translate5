@@ -522,7 +522,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         }
         
         $mask = function ($matches) {
-            return '<regex data="'.base64_encode($matches[0]).'" />';
+            return '<regex data="'.base64_encode($matches[0]).'"/>';
         };
         
         //replace only on real text
@@ -571,7 +571,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             return $tempReturn;
         };
         
-        $text = preg_replace_callback('/<regex data="([^"]*)" \/>/', $replacer, $text);
+        $text = preg_replace_callback('/<regex data="([^"]*)"\/>/', $replacer, $text);
         
         return $text;
     }
