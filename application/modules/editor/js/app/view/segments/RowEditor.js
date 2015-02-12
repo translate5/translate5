@@ -292,9 +292,13 @@ Ext.define('Editor.view.segments.RowEditor', {
             hasToSwap = false,
             fieldToDisable = null;
         
+        if(col.segmentField) {
+            me.mainEditor.fieldTypeToEdit = col.segmentField.get('type');
+        }
         //if user clicked on a not content column open default dataindex (also if it is a content column but not editable)
         if(!col.segmentField || !col.segmentField.get('editable')) {
             toEdit = firstTarget;
+            me.mainEditor.fieldTypeToEdit = Editor.model.segment.Field.prototype.TYPE_TARGET;
         }
         //if its the readonly column take the edit one
         else if(col instanceof Editor.view.segments.column.Content) {

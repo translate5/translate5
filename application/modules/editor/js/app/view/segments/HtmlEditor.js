@@ -63,10 +63,17 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   enableLinks : false,
   enableFont : false,
   isTagOrderClean: true,
+  missingContentTags: [],
+  duplicatedContentTags: [],
+  checkForErrors: true,
   
   strings: {
 	  errorTitle: '#UT# Fehler bei der Segment Validierung!',
 	  tagOrderErrorText: '#UT# Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
+	  correctErrorsText: '#UT# Fehler beheben',
+	  saveAnyway: '#UT# Trotzdem speichern',
+	  tagMissingText: '#UT# Die nachfolgenden Tags wurden beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Versuchen Sie mit der Rückgängigfunktion STRG-Z die Tags wiederherzustellen. <br /><br />Alternativ können Sie auch die Bearbeitung des Segments durch Klick auf "Abbrechen" beenden und das Segment neu zur Bearbeitung öffnen.<br /><br />Fehlende Tags:',
+	  tagDuplicatedText: '#UT# Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:',
 	  tagRemovedText: '#UT# Es wurden Tags mit fehlendem Partner entfernt!'
   },
 
@@ -76,6 +83,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   initComponent: function() {
     var me = this;
     me.viewModesController = Editor.controller.ViewModes;
+    me.metaPanelController = Editor.app.getController('MetaPanel');
+    me.segmentsController = Editor.app.getController('Segments');
     me.imageTemplate = new Ext.Template([
       '<img id="'+me.idPrefix+'{key}" class="{type}" title="{text}" alt="{text}" src="{path}"/>'
     ]);
@@ -92,29 +101,29 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 	  this.fireEvent('afterinitframedoc', this);
   },
   initEditor: function() {
-	  var me = this, 
-	  	body = me.getEditorBody(),
-	  	id;
-	  if(!body){
-		  //if body does not exists, the browser (mostly IE) is not ready so call again a little more deffered as the default 10ms
-		  if(!me.deferred){
-                      me.deferred = 0;
-                  }
-                  me.deferred = me.deferred + 150; //prevent endless loops
-                  if(me.deferred < 15000){
-                      Ext.defer(me.initEditor, 150, me);
-                      return;
-                  }
-	  }
-          me.deferred = 0;
-	  me.callParent(arguments);
-	  body = Ext.get(body),
-	  id = body.id;
-	  //the editor body cache entry (and so all the handlers) are removed by the GarbageCollector, so disable GC for the body:
-	  Ext.cache[id].skipGarbageCollection = true;
-	  //track the created body id to enable GC again on editorDomCleanUp
-	  me.bodyGenId = id;
-	  me.fireEvent('afteriniteditor', me);
+      var me = this, 
+          body = me.getEditorBody(),
+          id;
+      if(!body || body.tagName != 'BODY'){
+          //if body does not exists, the browser (mostly IE) is not ready so call again a little more deffered as the default 10ms
+          if(!me.deferred){
+              me.deferred = 0;
+          }
+          me.deferred = me.deferred + 150; //prevent endless loops
+          if(me.deferred < 15000){
+              Ext.defer(me.initEditor, 150, me);
+              return;
+          }
+      }
+      me.deferred = 0;
+      me.callParent(arguments);
+      body = Ext.get(body),
+      id = body.id;
+      //the editor body cache entry (and so all the handlers) are removed by the GarbageCollector, so disable GC for the body:
+      Ext.cache[id].skipGarbageCollection = true;
+      //track the created body id to enable GC again on editorDomCleanUp
+      me.bodyGenId = id;
+      me.fireEvent('afteriniteditor', me);
   },
   /**
    * Überschreibt die Methode um den Editor Iframe mit eigenem CSS ausstatten
@@ -122,7 +131,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   getDocMarkup: function() {
     var me = this,
-        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'/css/htmleditor.css?v=10" />'; //disable Img resizing
+        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'/css/htmleditor.css?v=11" />'; //disable Img resizing
         //ursprünglich wurde ein body style height gesetzt. Das führte aber zu Problemen beim wechsel zwischen den unterschiedlich großen Segmente, daher wurde die Höhe entfernt.
     return Ext.String.format('<html><head><style type="text/css">body{border:0;margin:0;padding:{0}px;}</style>{1}</head><body style="font-size:9pt;line-height:14px;"></body></html>', me.iframePad, additionalCss);
   },
@@ -176,6 +185,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     shortTagContent;
     
     Ext.each(rootnode.childNodes, function(item){
+      var termFoundCls;
       if(Ext.isTextNode(item)){
         var text = item.data.replace(new RegExp(Editor.TRANSTILDE, "g"), ' ');
         me.lastSegmentContentWithoutTags.push(text);
@@ -188,7 +198,12 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       }
       // Span für Terminologie
       if(item.tagName == 'DIV' && /(^|[\s])term([\s]|$)/.test(item.className)){
-        me.result.push(Ext.String.format('<span class="{0}" title="{1}">', item.className, item.title));
+        termFoundCls = item.className
+        if(me.fieldTypeToEdit) {
+            var replacement = me.fieldTypeToEdit+'-$1';
+            termFoundCls = termFoundCls.replace(/(transFound|transNotFound)/, replacement);
+        }
+        me.result.push(Ext.String.format('<span class="{0}" title="{1}">', termFoundCls, item.title));
         me.replaceTagToImage(item);
         me.result.push('</span>');
         return;
@@ -333,12 +348,58 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   isDuplicateSaveTag: function(img) {
       return img.tagName == 'IMG' && img.className && /duplicatesavecheck/.test(img.className);
   },
+  handleSaveWithErrors: function(msg){
+      var me = this;
+      var MB = Ext.create('Ext.window.MessageBox', {
+            buttonText:{                        
+                yes: me.strings.correctErrorsText,
+                no: me.strings.saveAnyway
+            }
+        });
+
+        MB.confirm(me.strings.errorTitle,msg,
+            function(btn){
+                var me = this;
+                if(btn != 'yes') {
+                    me.checkForErrors = false;
+                    if(me.metaPanelController.calledSaveMethod){
+                        me.metaPanelController.calledSaveMethod();
+                        return;
+                    }
+                    me.segmentsController.saveChainStart();
+                }
+                me.metaPanelController.calledSaveMethod = false;
+            },me);
+  },
   hasAndDisplayErrors: function() {
-	 if(!this.isTagOrderClean){
-		 Ext.Msg.alert(this.strings.errorTitle, this.strings.tagOrderErrorText);
-		 return true;
-	 }
-	 return false;
+      var me = this;
+      if(!this.checkForErrors){
+          this.metaPanelController.calledSaveMethod = false;
+          this.checkForErrors = true;
+          return false;
+      }
+      
+      if(me.missingContentTags.length > 0 || me.duplicatedContentTags.length > 0){
+          var msg = '', 
+              todo = [['missingContentTags', 'tagMissingText'],['duplicatedContentTags','tagDuplicatedText']];
+          for(var i = 0;i<todo.length;i++) {
+              if(me[todo[i][0]].length > 0) {
+                  msg += me.strings[todo[i][1]];
+                  Ext.each(me[todo[i][0]], function(tag) {
+                      msg += '<img src="'+tag.shortPath+'"> ';
+                  })
+                  msg += '<br /><br />';
+              }
+          }
+          me.handleSaveWithErrors(msg);
+          return true;
+      }
+      if(!me.isTagOrderClean){
+          me.handleSaveWithErrors(me.strings.tagOrderErrorText);
+          return true;
+      }
+      this.metaPanelController.calledSaveMethod = false;
+      return false;
   },
   /**
    * check and fix tags
@@ -347,11 +408,39 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   checkTags: function(node) {
 	  var nodelist = node.getElementsByTagName('img');
 	  this.fixDuplicateImgIds(nodelist);
+	  if(!this.checkContentTags(nodelist)) {
+	      return; //no more checks if missing tags found
+	  }
 	  this.removeOrphanedTags(nodelist);
 	  this.checkTagOrder(nodelist);
   },
   /**
-   * Tag Order Check
+   * returns true if all tags are OK
+   * @param {Array} nodelist
+   * @return {Boolean}
+   */
+  checkContentTags: function(nodelist) {
+      var me = this,
+          foundIds = [];
+      me.missingContentTags = [];
+      me.duplicatedContentTags = [];
+      Ext.each(nodelist, function(img) {
+          if(Ext.Array.contains(foundIds, img.id)) {
+              me.duplicatedContentTags.push(me.markupImages[img.id.replace(new RegExp('^'+me.idPrefix), '')]);
+          }
+          else {
+              foundIds.push(img.id);
+          }
+      });
+      Ext.Object.each(this.markupImages, function(key, item){
+          if(!Ext.Array.contains(foundIds, me.idPrefix+key)) {
+              me.missingContentTags.push(item);
+          }
+      });
+      return me.missingContentTags.length == 0 && me.duplicatedContentTags.length == 0;
+  },
+  /**
+   * Tag Order Check (MQM and content tags)
    * assumes that img tag contains an id with substring "-open" or "-close"
    * ids starting with "remove" are ignored, because they are marked to be removed by removeOrphanedTags   
    * @param {Array} nodelist
@@ -376,7 +465,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 	  this.isTagOrderClean = clean;
   },
   /**
-   * Fixes duplicate img ids in the opened editor on unmarkup
+   * Fixes duplicate img ids in the opened editor on unmarkup (MQM tags)
    * Works with <img> tags with the following specifications: 
    * IMG needs an id Attribute. Assuming that the id contains the strings "-open" or "-close". The rest of the id string is identical.
    * Needs also an attribute "data-seq" which is containing the plain ID of the tag pair.
@@ -450,6 +539,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   },
   
   /**
+   * removes orphaned tags (MQM only)
    * assuming same id for open and close tag. Each Tag ID contains the string "-open" or "-close"
    * prepends "remove-" to the id of an orphaned tag
    * @see fixDuplicateImgIds

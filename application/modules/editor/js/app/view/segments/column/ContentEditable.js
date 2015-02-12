@@ -71,9 +71,12 @@ Ext.define('Editor.view.segments.column.ContentEditable', {
       Ext.applyIf(conf, {
           dataIndex: field + 'Edit',
           itemId: field + 'EditColumn',
-          tdCls: 'editable segment-tag-column'
+          tdCls: 'editable segment-tag-column'+this.getTypeCls(conf.segmentField)
       });
       this.callParent(arguments);
+  },
+  getTypeCls: function(field) {
+      return ' type-'+field.get('type');
   },
   initComponent: function() {
   //disable ergo mode on source column
@@ -96,7 +99,7 @@ Ext.define('Editor.view.segments.column.ContentEditable', {
       }
       this.field = Ext.create('widget.displayfield',{
           name: this.dataIndex,
-          fieldCls: 'x-form-display-field segment-tag-container'
+          fieldCls: 'x-form-display-field segment-tag-container'+me.getTypeCls(me.segmentField)
       });
       return this.field;
   } 

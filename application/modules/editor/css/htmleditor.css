@@ -39,7 +39,7 @@ body.hide-tag img{display:none;}
 img {width: auto !important;height: 14px !important; vertical-align:middle;cursor: pointer;}
 img.duplicatesavecheck {width:0 !important;height:0 !important;display:none;}
 span.term {background:transparent;border-bottom:1px solid #0000ff;}
-span.transNotFound {border-bottom-color:#ff0000;}
+span.source-transNotFound {border-bottom-color:#ff0000;}
 span.notRecommended,
 span.supersededTerm,
 span.deprecatedTerm {border-bottom:none;background-color:#fa51ff;}

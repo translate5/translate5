@@ -47,7 +47,13 @@ Ext.data.Connection.disableCaching = false;
 Ext.data.JsonP.disableCaching = false;
 Ext.data.proxy.Server.prototype.noCache = false;
 Ext.Ajax.disableCaching = false;
-Ext.Ajax.timeout = 120000; //2minutes
+
+Ext.override(Ext.data.Connection, {
+    timeout: 60000
+});
+Ext.Ajax.timeout = 60000;
+Ext.override(Ext.data.proxy.Ajax, { timeout: 60000 });
+Ext.override(Ext.form.action.Action, { timeout: 60 });
 
 /**
  * enables the ability to set a optional menuOffset in menus

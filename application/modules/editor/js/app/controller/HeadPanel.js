@@ -205,7 +205,9 @@ Ext.define('Editor.controller.HeadPanel', {
 
       if(task) {
           menu.down('#finishBtn').setVisible(user.isAllowed('editorFinishTask', task));
-          menu.down('#closeBtn').setVisible(user.isAllowed('editorEndTask', task));
+          //since closing a task from within a opened task triggers version errors, 
+          //we disable this unused simply disable this unused feature
+          //menu.down('#closeBtn').setVisible(user.isAllowed('editorEndTask', task));
       }
   }
 });

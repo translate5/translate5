@@ -78,6 +78,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       "delete":       {title: "#UT#Aufgabe komplett löschen?", msg: "#UT#Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?"}
   },
   strings: {
+      taskImported: '#UT#Aufgabe "{0}" vollständig importiert',
       taskOpening: '#UT#Aufgabe wird im Editor geöffnet...',
       taskFinishing: '#UT#Aufgabe wird abgeschlossen...',
       taskUnFinishing: '#UT#Aufgabe wird abgeschlossen...',
@@ -118,6 +119,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
       Editor.app.on('adminViewportClosed', me.clearTasks, me);
       Editor.app.on('editorViewportOpened', me.handleInitEditor, me);
+      
+      me.getAdminTasksStore().on('load', me.startCheckImportStates, me);
 
       me.control({
           'headPanel toolbar#top-menu' : {
@@ -214,12 +217,63 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   loadTasks: function() {
       this.getAdminTasksStore().load();
   },
+  startCheckImportStates: function(store) {
+      if(!this.checkImportStateTask) {
+          this.checkImportStateTask = {
+                  run: this.checkImportState,
+                  scope: this,
+                  interval: 10000
+          };
+      }
+      Ext.TaskManager.start(this.checkImportStateTask);
+  },
+  /**
+   * Checks if all actually loaded tasks are imported completly
+   */
+  checkImportState: function() {
+      var me = this, 
+          tasks = me.getAdminTasksStore(),
+          foundImporting = 0,
+          taskReloaded = function(rec) {
+              if(!rec.isImporting()) {
+                  Editor.MessageBox.addSuccess(Ext.String.format(me.strings.taskImported, rec.get('taskName')));
+              }
+          };
+      tasks.each(function(task){
+          if(!task.isImporting()){
+              return;
+          }
+          task.reload({
+              success: taskReloaded
+          });
+          foundImporting++;
+      });
+      if(foundImporting == 0) {
+          Ext.TaskManager.stop(this.checkImportStateTask);
+      }
+  },
   handleChangeImportFile: function(field, val){
-      var name = this.getTaskAddForm().down('textfield[name=taskName]');
+      var name = this.getTaskAddForm().down('textfield[name=taskName]'),
+          srcLang = this.getTaskAddForm().down('combo[name=sourceLang]'),
+          targetLang = this.getTaskAddForm().down('combo[name=targetLang]'),
+          langs = val.match(/-([a-zA-Z]{2,3})-([a-zA-Z]{2,3})\.[^.]+$/);
       if(name.getValue() == '') {
           name.setValue(val.replace(/\.[^.]+$/, ''));
       }
-      this.getTbxField().setDisabled(! /\.sdlxliff$/i.test(val));
+      //simple algorithmus to get the language from the filename
+      if(langs && langs.length == 3) {
+          var srcStore = srcLang.store,
+              targetStore = targetLang.store,
+              srcIdx = srcStore.find('label', '('+langs[1]+')', 0, true, true),
+              targetIdx = targetStore.find('label', '('+langs[2]+')', 0, true, true);
+          
+          if(srcIdx >= 0) {
+              srcLang.setValue(srcStore.getAt(srcIdx).get('id'));
+          }
+          if(targetIdx >= 0) {
+              targetLang.setValue(targetStore.getAt(targetIdx).get('id'));
+          }
+      }
   },
   /**
    * Inits the loaded task and the segment grid read only if necessary
@@ -340,7 +394,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               me.savingHide();
               me.getAdminTasksStore().load();
               me.handleTaskCancel();
-              me.handleTaskPreferences(task);
           },
           failure: function(form, submit) {
               me.savingHide();
@@ -415,7 +468,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       var app = Editor.app;
       return {
           success: app.unmask,
-          failure: app.unmask
+          failure: function(rec, op){
+              var recs = op.getRecords(),
+                  task = recs && recs[0] || false;
+              task && task.reject();
+              app.unmask();
+          }
       };
   },
   

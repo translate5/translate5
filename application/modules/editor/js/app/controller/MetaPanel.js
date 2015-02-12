@@ -48,8 +48,9 @@ Ext.define('Editor.controller.MetaPanel', {
   extend : 'Ext.app.Controller',
   requires: ['Editor.view.qmsubsegments.AddFlagFieldset'],
   messages: {
-    gridEndReached: 'Ende der Segmente erreicht!',
-    gridStartReached: 'Start der Segmente erreicht!'
+    segmentNotBuffered: '#UT#Das angeforderte Segment liegt noch nicht im Zwischenspeicher. Bitte scrollen Sie manuell weiter!',
+    gridEndReached: '#UT#Ende der Segmente erreicht!',
+    gridStartReached: '#UT#Start der Segmente erreicht!'
   },
   refs : [{
     ref : 'metaPanel',
@@ -71,31 +72,38 @@ Ext.define('Editor.controller.MetaPanel', {
     selector : '#segmentgrid'
   }],
   hideLeftRight: false,
+  calledSaveMethod:false,
+  
   init : function() {
-    this.control({
+      var me = this;
+      me.control({
       '#metapanel #cancelSegmentBtn' : {
-        click : this.cancel
+        click : me.cancel
       },
       '#metapanel #saveSegmentBtn' : {
-        click : this.save
+        click : me.save
       },
       '#metapanel #saveNextSegmentBtn' : {
-        click : this.saveNext
+        click : me.saveNext
       },
       '#metapanel #savePreviousSegmentBtn' : {
-        click : this.savePrevious
+        click : me.savePrevious
       },
       '#metapanel #goAlternateLeftBtn' : {
-          click : this.goToAlternate
+          click : me.goToAlternate
       },
       '#metapanel #goAlternateRightBtn' : {
-          click : this.goToAlternate
+          click : me.goToAlternate
       },
       '#metapanel' : {
-          show : this.layout
+          show : me.layout
       },
+      //disabled ctrl enter since this produces errors in the save chain
+      //'segmentsHtmleditor': {
+      //    afteriniteditor: me.initEditor
+      //},
       '#segmentgrid': {
-          afterrender: this.initEditPluginHandler
+          afterrender: me.initEditPluginHandler
       }
     });
   },
@@ -121,6 +129,19 @@ Ext.define('Editor.controller.MetaPanel', {
       me.getRightBtn().setVisible(multiEdit && ! useChangeAlikes);
   },
   /**
+   * binds strg + enter as save segment combination
+   * @param editor
+   */
+  initEditor: function(editor){
+      var me = this,
+          keyev = Ext.EventManager.useKeyDown ? 'keydown' : 'keypress';
+      Ext.EventManager.on(editor.getDoc(), keyev, function(e){
+          if(e.ctrlKey && e.getKey() == e.ENTER) {
+              me.saveNext();
+          }
+      });
+  },
+  /**
    * Handler für save Button
    */
   layout: function() {
@@ -137,6 +158,7 @@ Ext.define('Editor.controller.MetaPanel', {
    * @return {Boolean} true if there is a next segment, false otherwise
    */
   saveNext: function() {
+      this.calledSaveMethod = this.saveNext;
       return this.saveOtherRow(1, this.messages.gridEndReached);
   },
   /**
@@ -144,6 +166,7 @@ Ext.define('Editor.controller.MetaPanel', {
    * @return {Boolean} true if there is a next segment, false otherwise
    */
   savePrevious: function() {
+      this.calledSaveMethod = this.savePrevious;
       return this.saveOtherRow(-1, this.messages.gridStartReached);
   },
   /**
@@ -158,11 +181,18 @@ Ext.define('Editor.controller.MetaPanel', {
           selModel = grid.getSelectionModel(),
           ed = me.getEditPlugin(),
           rec = ed.openedRecord,
+          isBorderReached = false,
           store = grid.store,
           lastColumnIdx = 0,
           newRec = store.getAt(store.indexOf(rec) + rowIdxChange);
       while(newRec && !newRec.get('editable')) {
           newRec = store.getAt(store.indexOf(newRec) + rowIdxChange);
+      }
+      if(rowIdxChange > 0) {
+          isBorderReached = rec.get('id') == store.getLastSegmentId();
+      }
+      else {
+          isBorderReached = rec.get('id') == store.getFirstSegmentId();
       }
       Ext.Array.each(grid.columns, function(col, idx) {
           if(col.dataIndex == ed.editor.getEditedField()) {
@@ -172,15 +202,17 @@ Ext.define('Editor.controller.MetaPanel', {
       me.fireEvent('saveSegment', {
           scope: me,
           segmentUsageFinished: function(){
-              if(newRec !== undefined){
+              if(isBorderReached) {
+                  Editor.MessageBox.addInfo(errorText);
+              } else if(newRec !== undefined){
                   //editing by selection handler must be disabled, otherwise saveChainStart will be triggered twice
                   ed.disableEditBySelect = true;
                   selModel.select(newRec);
-                  Ext.defer(ed.startEdit, 100, ed, [newRec, lastColumnIdx]); //defer reduces problems with editorDomCleanUp see comment on Bug 38
+                  Ext.defer(ed.startEdit, 300, ed, [newRec, lastColumnIdx]); //defer reduces problems with editorDomCleanUp see comment on Bug 38
                   ed.disableEditBySelect = false;
               }
-              else{
-                  Editor.MessageBox.addInfo(errorText);
+              else {
+                  Editor.MessageBox.addInfo(me.messages.segmentNotBuffered);
               }
           }
       });

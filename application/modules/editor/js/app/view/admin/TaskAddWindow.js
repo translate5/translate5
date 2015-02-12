@@ -44,7 +44,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         importUploadType: '#UT#Bitte verwenden Sie eine ZIP, CSV oder SDLXLIFF Datei!',
         importTbxTip: '#UT#Wählen Sie die zu importierenden TBX Daten für das TermTagging',
         importTbxTipDis: '#UT#Wählen Sie die zu importierenden TBX Daten für das TermTagging',
-        importTbxLabel: '#UT#TBX Datei¹²',
+        importTbxLabel: '#UT#TBX Datei²',
         importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!',
         importNews: '#UT#<b style="color:#ff0000;">Neu:</b> Sie können nun direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage">Mehr Info</a>.',
         
@@ -62,7 +62,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         fullMatchLabel: '#UT#100% Matches sind editierbar',
         sourceEditLabel: '#UT#Ausgangstext ist editierbar',
         bottomInfo: '#UT# ¹ Diese Angaben / Daten werden für den Import zwingend benötigt.',
-        bottomInfo2: '#UT# ² separate TBX nur beim Import einer SDLXLIFF Datei möglich.',
+        bottomInfo2: '#UT# ² Eine TBX Datei ist optional. Eine TBX Datei im TBX-Core Format wird benötigt um Terminology auszuzeichnen.',
         feedbackText: "#UT# Fehler beim Import!",
         feedbackTip: '#UT#Fehler beim Import: Bitte wenden Sie sich an den Support!',
         addBtn: '#UT#Task hinzufügen',
@@ -138,7 +138,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     regex: /\.tbx$/i,
                     regexText: me.strings.importTbxType,
                     allowBlank: true,
-                    disabled: true,
                     toolTip: me.strings.importTbxTip,
                     fieldLabel: me.strings.importTbxLabel
                 },{

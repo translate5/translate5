@@ -51,9 +51,9 @@ Ext.define('Editor.view.segments.Scroller', {
     extend: 'Ext.grid.PagingScroller',
     alias: 'widget.editorgridscroller',
     lastRequestedRowIndex: -1,
-    percentageFromEdge: 0.35,
+    percentageFromEdge: 0.4,
     scrollToLoadBuffer: 200,
-    chunkSize: 100,
+    chunkSize: 200,
     //rowHeight wird als fester Wert gesetzt
     rowHeight: 15,
     snapIncrement: 10,
@@ -116,6 +116,10 @@ Ext.define('Editor.view.segments.Scroller', {
           activePrefetch = me.activePrefetch;
           //Ende der Änderungen
 
+      if(me.isDisabled()) {
+          return;
+      }
+      
       me.visibleStart = visibleStart;
       me.visibleEnd = visibleEnd;
 
@@ -136,7 +140,6 @@ Ext.define('Editor.view.segments.Scroller', {
               }
               store.guaranteeRange(totalCount - pageSize, totalCount - 1);
           // Out of range, need to reset the current data set
-  //ExtJS: } else if (visibleStart < guaranteedStart || visibleEnd > guaranteedEnd) {
           } else if ((visibleStart >= 0 && visibleStart <= guaranteedStart) || visibleEnd > guaranteedEnd) {
               panel.editingPlugin.beforeRangeChange();
               if (store.rangeSatisfied(requestStart, requestEnd)) {
@@ -333,6 +336,11 @@ Ext.define('Editor.view.segments.Scroller', {
             width: 1,
             height: height
         };
+    },
+    setScrollTop: function(scrollTop) {
+        if(!this.isDisabled()) {
+            this.callParent(arguments);
+        }
     },
     /**
      * Setzt die Position des View Elements des Segment Grids

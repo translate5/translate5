@@ -55,12 +55,13 @@ Ext.define('Editor.view.admin.task.GridFilter', {
         user_state_waiting: '#UT#wartend',
         user_state_finished: '#UT#abgeschlossen',
         task_state_end: '#UT#beendet',
+        task_state_import: '#UT#beendet',
         locked: '#UT#in Arbeit',
         forMe: '#UT#für mich '
     },
     
     //we must have here an own ordered list of states to be filtered 
-    stateFilterOrder: ['user_state_open','user_state_waiting','user_state_finished','locked', 'task_state_end'],
+    stateFilterOrder: ['user_state_open','user_state_waiting','user_state_finished','locked', 'task_state_end', 'task_state_import'],
 
     constructor: function(config) {
         var me = this;

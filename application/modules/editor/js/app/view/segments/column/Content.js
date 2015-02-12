@@ -57,22 +57,36 @@ Ext.define('Editor.view.segments.column.Content', {
   width: 250,
   resizable: false,
   fixed: true,
-  editor: {
-      xtype: 'displayfield',
-      fieldCls: 'x-form-display-field segment-tag-container'
-  },
   constructor: function(conf) {
       var field = conf.fieldName;
       Ext.applyIf(conf, {
           dataIndex: field,
           itemId: field + 'Column',
-          tdCls: 'segment-tag-column'
+          tdCls: 'segment-tag-column'+this.getTypeCls(conf.segmentField)
       });
       this.callParent(arguments);
+  },
+  getTypeCls: function(field) {
+      return ' type-'+field.get('type');
   },
   initComponent: function() {
     var me = this;
     me.initBaseMixin();
     me.callParent(arguments);
-  }
+  },
+  /**
+   * internal method to create a display field
+   * @returns {Editor.view.segments.HtmlEditor}
+   */
+  getEditor: function() {
+      var me = this;
+      if(this.field){
+          return this.field;
+      }
+      this.field = Ext.create('widget.displayfield',{
+          name: this.dataIndex,
+          fieldCls: 'x-form-display-field segment-tag-container'+me.getTypeCls(me.segmentField)
+      });
+      return this.field;
+  } 
 });

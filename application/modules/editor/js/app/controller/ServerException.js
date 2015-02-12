@@ -53,6 +53,7 @@ Ext.define('Editor.controller.ServerException', {
         "409": '#UT#Ihre Daten konnten nicht gespeichert werden, beim Speichern kam es zu einem Konflikt!',
         title: '#UT#Fehler',
         text: '#UT#Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!',
+        timeout: '#UT#Die Anfrage über das Internet an den Server dauerte zu lange. Dies kann an Ihrer Internetverbindung oder an einer Überlastung des Servers liegen. Bitte versuchen Sie es erneut.',
         serverMsg: '#UT#<br />Meldung vom Server: <i>{0} {1}</i>'
     },
     /**
@@ -99,14 +100,21 @@ Ext.define('Editor.controller.ServerException', {
             respText = response && response.responseText || '{"errors": [{"_errorMessage": "unknown"}]}',
             tpl = new Ext.Template(str.serverMsg),
             action = response && response.request && response.request.options.action,
+            getServerMsg = function() {
+                var json = Ext.JSON.decode(respText);
+                return json.errors[0]._errorMessage;
+            },
             appendServerMsg = function(msg) {
-                respText = Ext.JSON.decode(respText);
-                return  msg + tpl.apply(['', respText.errors[0]._errorMessage]);
+                var serverMsg = getServerMsg();
+                if(serverMsg == 'unknown') {
+                    return msg;
+                }
+                return msg + tpl.apply(['', getServerMsg()]);
             };
         
         switch(status) {
             case -1:
-                Ext.Msg.alert(str.title, appendServerMsg(text));
+                Ext.Msg.alert(str.title, appendServerMsg(str.timeout));
                 return;
             case 403: //Forbidden: authenticated, but not allowed to see the specific resource 
             //@todo remove this specific 405 handler with TRANSLATE-94
@@ -146,7 +154,7 @@ Ext.define('Editor.controller.ServerException', {
                 Editor.MessageBox.addError(appendServerMsg(str["409"]));
                 return;
             case 406: //Not Acceptable: show message from server
-                Editor.MessageBox.addError(appendServerMsg(str["406"]));
+                Editor.MessageBox.addError(getServerMsg());
                 return;
         }
         Ext.Msg.alert(str.title, text+tpl.apply([status, statusText]));

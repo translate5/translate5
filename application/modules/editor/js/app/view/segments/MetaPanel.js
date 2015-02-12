@@ -60,7 +60,6 @@ Ext.define('Editor.view.segments.MetaPanel', {
     
     initComponent: function() {
       var me = this;
-      //Editor.data.segments.showStatus = false;
       Ext.applyIf(me, {
         items: [
           {
@@ -70,17 +69,19 @@ Ext.define('Editor.view.segments.MetaPanel', {
             items: [{
                   xtype: 'fieldset',
                   itemId: 'metaTerms',
+                  collapsible: true,
                   title: me.item_metaTerms_title,
+                  anchor: '100%',
                   items: [
                     {
+                        autoScroll: true,
                       xtype: 'panel',
                       itemId: 'metaTermPanel',
                       cls: 'metaTermPanel',
                       loader: {
                         url: Editor.data.restpath+'segment/terms',
                         renderer: 'html'
-                      },
-                      anchor: '100%'
+                      }
                     }
                   ]
               },
@@ -88,11 +89,15 @@ Ext.define('Editor.view.segments.MetaPanel', {
                 xtype: 'fieldset',
                 itemId: 'metaQm',
                 defaultType: 'radio',
+                collapsible: true,
+                hideable: Editor.data.segments.showQM, 
+                hidden:  !Editor.data.segments.showQM,
                 title: me.item_metaQm_title
               },
               {
                 xtype: 'fieldset',
                 itemId: 'metaStates',
+                collapsible: true,
                 defaultType: 'radio',
                 hideable: Editor.data.segments.showStatus, 
                 hidden:  !Editor.data.segments.showStatus,
@@ -117,6 +122,7 @@ Ext.define('Editor.view.segments.MetaPanel', {
       Ext.each(flags, function(item){
         stati.add({
           name: 'stateId',
+          anchor: '100%',
           inputValue: item.id,
           boxLabel: item.label
         });
@@ -133,6 +139,7 @@ Ext.define('Editor.view.segments.MetaPanel', {
         qm.add({
           xtype: 'checkbox',
           name: 'qmId', 
+          anchor: '100%',
           inputValue: item.id,
           boxLabel: item.label
         });

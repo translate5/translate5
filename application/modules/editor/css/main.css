@@ -36,7 +36,6 @@
 #changealike-grid .x-grid-row .segment-tag-column .x-grid-cell-inner,
 #segment-grid .x-grid-row .x-grid-cell .x-grid-cell-inner {
   white-space: normal;
-  width: 250px;
 }
 #segment-grid .editing-disabled {
   color:#acacac;
@@ -130,19 +129,23 @@
 /* END - Headpanel */
 
 /*Terminologie:*/
-.metaTermPanel table {width:100%;}
-.metaTermPanel table th {padding-bottom: 3px;text-align:left;vertical-align: top;}
-.metaTermPanel table td {padding-top: 2px;padding-bottom: 3px;text-align:left;vertical-align: top;}
-.metaTermPanel table tr.even td {background-color:#eaf1fb;}
-.metaTermPanel span.used {font-weight:bold;}
+.metaTermPanel .term-group {padding:2px 0px; text-align:left;vertical-align: top;}
+.metaTermPanel .term-group > div {padding: 2px 1px;}
+.metaTermPanel .term-group > div.target-terms {padding-left: 14px;}
+.metaTermPanel .target-terms {border-top:1px dotted #BFC2C2;}
+
+.x-form-cb-label-after {white-space: normal;}
+
+.metaTermPanel .even {background-color:#eaf1fb;border-top:1px solid #99bce8;border-bottom:1px solid #99bce8;}
 .metaTermPanel img {vertical-align: top;margin-right:2px;}
+.metaTermPanel span.used {font-weight:bold;}
 
 /* Term Tags, der folgende Code ist im HtmlEditor body css redundant vorhanden. Ebenso im Helper View_Helper_WorkflowNotifyHtmlMailSegmentList */
 .segment-tag-column div.x-grid-cell-inner div.term,
 .segment-tag-container div.term {background:transparent;border-bottom:1px solid #0000ff;}
 
-.segment-tag-column div.x-grid-cell-inner div.transNotFound,
-.segment-tag-container div.transNotFound {border-bottom-color:#ff0000;}
+.segment-tag-column.type-source div.x-grid-cell-inner div.transNotFound,
+.segment-tag-container.type-source div.transNotFound {border-bottom-color:#ff0000;}
 
 .segment-tag-column div.x-grid-cell-inner div.notRecommended,
 .segment-tag-container div.notRecommended,
@@ -182,6 +185,7 @@ background-color: #EAF1FB;
 /*messagebox*/
 .app-msg .x-icon-text {padding-left:20px;background:no-repeat left center;} 
 .app-msg .icon-status-error {background-image: url("../images/exclamation.png");}
+.app-msg .icon-status-warning {background-image: url("../images/error.png");}
 .app-msg .icon-status-notice {background-image: url("../images/information.png");}
 .app-msg .icon-status-ok {background-image: url("../images/tick.png");}
 
@@ -292,7 +296,7 @@ table.task-users td.username,
 table.task-users td.state {font-weight:bold;}
 table.task-users td.state {padding-right:0;}
 
-/*own heck column*/
+/*own check column*/
 .grid-ownchecker {
     background-color: transparent;
     height: 14px;
@@ -311,9 +315,11 @@ tr.end td div.x-grid-checkheader,
 tr.finished td div.x-grid-checkheader {opacity:0.3;display: block;overflow: hidden;text-indent: 100%;white-space: nowrap;}
 tr.end td div {text-decoration: line-through;}
 tr.no-users td div {color:#ff0000;}
+tr.import td div {color:#ff9900;}
 
 /* Task Grid Actions */
-.adminTaskGrid tr img {display:none;}
+.adminTaskGrid tr img,
+.adminTaskGrid tr.import td img.x-action-col-icon {display:none;}
 .adminTaskGrid tr.editorOpenTask .ico-task-open {background-image: url("../images/page_view.png");display:inline;}
 .adminTaskGrid tr.editorEditTask .ico-task-edit {background-image: url("../images/page_edit.png");display:inline;}
 .x-menu .ico-task-finish,

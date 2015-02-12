@@ -154,7 +154,7 @@ Ext.define('Editor.controller.Segments', {
   loadSegments: function() {
       this.handleFilterChange(); //load filemap
       //initiales Laden des Stores:
-      this.getSegmentsStore().guaranteeRange(0, 99);
+      this.getSegmentsStore().guaranteeRange(0, 199);
   },
   clearSegments: function() {
       var store = this.getSegmentsStore();
@@ -477,6 +477,8 @@ Ext.define('Editor.controller.Segments', {
           me.saveChainEnd();
           return;
       }
+      //show other messages on the segment:
+      Editor.MessageBox.addByOperation(operation);
       //show save segment success message 
       Editor.MessageBox.addSuccess(me.messages.segmentSaved);
       //invoking change alike handling:
