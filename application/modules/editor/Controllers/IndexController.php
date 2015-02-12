@@ -54,6 +54,24 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
      */
     protected $translate;
     
+    /**
+     * 
+     This is to be able to start a worker as a developer indepently through the browser
+     
+     public function startworkerAction() {
+     
+        $this->_helper->viewRenderer->setNoRender();
+        $taskGuid = $this->getParam('taskGuid');
+        $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
+        
+        // init worker and queue it
+        if (!$worker->init($taskGuid, array('resourcePool' => 'import'))) {
+            $this->log('TermTaggerImport-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
+            return false;
+        }
+        $worker->queue();
+    }
+    */
     public function indexAction() {
         $this->session = new Zend_Session_Namespace();
         $this->_helper->layout->disableLayout();
@@ -116,8 +134,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       }
       
       $this->setJsSegmentFlags('segments.qualityFlags', $rop->segments->qualityFlags->toArray());
-      $this->setJsSegmentFlags('segments.stateFlags', $rop->segments->stateFlags->toArray());
+      $manualStates = $rop->segments->stateFlags->toArray();
+      $manualStates[0] = $this->translate->_('Nicht gesetzt');
+      $this->setJsSegmentFlags('segments.stateFlags', $manualStates);
       $this->view->Php2JsVars()->set('segments.showStatus', (boolean)$rop->segments->showStatus);
+      $this->view->Php2JsVars()->set('segments.showQM', (boolean)$rop->segments->showQM);
       $states = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
       /* @var $states editor_Models_SegmentAutoStates */
       $this->setJsSegmentFlags('segments.autoStateFlags', $states->getLabelMap());
@@ -357,7 +378,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     }
     
     public function localizedjsstringsAction() {
-      $this->getResponse()->setHeader('Content-Type', 'text/javascript');
+      $this->getResponse()->setHeader('Content-Type', 'text/javascript', TRUE);
       $this->session = new Zend_Session_Namespace();
       
       $this->view->frontendControllers = $this->getFrontendControllers();

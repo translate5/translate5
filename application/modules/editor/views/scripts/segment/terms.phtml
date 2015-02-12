@@ -39,11 +39,7 @@ if(empty($this->termGroups)) {
     return;
 }
 ?>
-<table>
-    <tr>
-        <th><?php echo $this->translate->_('In Quelle:'); ?></th>
-        <th><?php echo $this->translate->_('In Ziel:'); ?></th>
-    </tr>
+<div class="term-box">
 <?php
     $i = 0;
     foreach($this->termGroups as $termGroup) {
@@ -85,6 +81,10 @@ if(empty($this->termGroups)) {
                 $class[] = 'transfound';
             }
             $itemStr .= sprintf('<span class="%3$s" title="%2$s">%1$s</span>', $term->term, $term->definition, join(' ', $class));
+            if(!empty($term->definition)){
+                $src = $this->publicModulePath.'/images/information-small-white.png';
+                $itemStr .= sprintf(' <img src="%1$s" alt="%2$s" title="%2$s"/>', $src, $term->definition);
+            }
             if($term->isSource) {
                 $source[] = $itemStr;
             }
@@ -93,15 +93,15 @@ if(empty($this->termGroups)) {
             }
         }
 ?>
-        <tr class="<?php echo ($i++ % 2 == 0)?'even':'odd'; ?>">
-            <td>
+        <div class="term-group <?php echo ($i++ % 2 == 0)?'even':'odd'; ?>">
+            <div class="source-terms">
                 <?php echo join("<br />\n", $source); ?>
-            </td>
-            <td>
+            </div>
+            <div class="target-terms">
                 <?php echo join("<br />\n", $target); ?>
-            </td>
-        </tr>
+            </div>
+        </div>
 <?php
     }
 ?>
-</table>
+</div>

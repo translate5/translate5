@@ -36,7 +36,7 @@
 
 $this->translate->setJsonEncode(true);
 //Datei muss als Javascript ausgespielt werden.
-  header('Content-Type: text/javascript');
+  header('Content-Type: text/javascript', TRUE);
 
   //mehrfachverwendete Strings:
   $yes = $this->translate->_('Ja');
@@ -147,6 +147,7 @@ Ext.define('Editor.controller.Localizer', {
         "409": '<?php echo $this->translate->_('Ihre Daten konnten nicht gespeichert werden, beim Speichern kam es zu einem Konflikt!');?>',
         title: '<?php echo $this->translate->_('Fehler');?>',
         text: '<?php echo $this->translate->_('Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!');?>',
+        timeout: '<?php echo $this->translate->_('Die Anfrage über das Internet an den Server dauerte zu lange. Dies kann an Ihrer Internetverbindung oder an einer Überlastung des Servers liegen. Bitte versuchen Sie es erneut.');?>',
         serverMsg: '<?php echo $this->translate->_('<br />Meldung vom Server: <i>{0} {1}</i>');?>'
     };
 
@@ -235,12 +236,13 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.segments.MetaPanelNavi.prototype.item_saveAndPrevious = '<?php echo $this->translate->_('Speichern und vorheriges öffnen');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_alternateLeft = '<?php echo $this->translate->_('Vorherige Spalte editieren');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_alternateRight = '<?php echo $this->translate->_('Nächste Spalte editieren');?>';
-  	
-  	Editor.view.segments.MetaPanel.prototype.messages = {
-            gridEndReached: '<?php echo $this->translate->_('Ende der Segmente erreicht!');?>',
-            gridStartReached: '<?php echo $this->translate->_('Beginn der Segmente erreicht!');?>'
-        };
-        
+
+    Editor.controller.MetaPanel.prototype.messages = {
+        segmentNotBuffered: '<?php echo $this->translate->_('Das angeforderte Segment liegt noch nicht im Zwischenspeicher. Bitte scrollen Sie manuell weiter!');?>',
+        gridEndReached: '<?php echo $this->translate->_('Ende der Segmente erreicht!');?>',
+        gridStartReached: '<?php echo $this->translate->_('Beginn der Segmente erreicht!');?>'
+    };
+
     Editor.view.segments.RowEditor.prototype.messages = {
         segmentNotSavedUserMessage: '<?php echo $this->translate->_('Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank! <br/><br/>Gerade bearbeiteter Text war:<br/><br/>');?>',
         cantSaveEmptySegment: '<?php echo $this->translate->_('Das Segment kann nicht ohne Inhalt gespeichert werden!');?>'
@@ -296,18 +298,25 @@ Ext.define('Editor.controller.Localizer', {
         user_state_waiting: '<?php echo $this->translate->_('wartend');?>',
         user_state_finished: '<?php echo $this->translate->_('abgeschlossen');?>',
         task_state_end: '<?php echo $this->translate->_('beendet');?>',
+        task_state_import: '<?php echo $this->translate->_('import');?>',
         forMe: '<?php echo $this->translate->_('für mich ');?>'
     };
         
 	Editor.view.segments.HtmlEditor.prototype.strings = {
 		errorTitle: '<?php echo $this->translate->_('Fehler bei der Segment Validierung!');?>',
+		correctErrorsText: '<?php echo $this->translate->_('Fehler beheben');?>',
+		saveAnyway: '<?php echo $this->translate->_('Trotzdem speichern');?>',
 		tagOrderErrorText: '<?php echo $this->translate->_('Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).');?>',
+		tagMissingText: '<?php echo $this->translate->_('Die nachfolgenden Tags wurden beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Versuchen Sie mit der Rückgängigfunktion STRG-Z die Tags wiederherzustellen. <br /><br />Alternativ können Sie auch die Bearbeitung des Segments durch Klick auf "Abbrechen" beenden und das Segment neu zur Bearbeitung öffnen.<br /><br />Fehlende Tags:');?>',
+		tagDuplicatedText: '<?php echo $this->translate->_('Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:');?>',
 		tagRemovedText: '<?php echo $this->translate->_('Es wurden Tags mit fehlendem Partner entfernt!');?>'
 	};
 	
 	Editor.MessageBox.prototype.titles = {
 		ok: '<?php echo $this->translate->_('Ok!');?>',
 		error: '<?php echo $this->translate->_('Fehler!');?>',
+		directError: '<?php echo $this->translate->_('Es ist ein Fehler aufgetreten!');?>',
+		warning: '<?php echo $this->translate->_('Warnung!');?>',
 		notice: '<?php echo $this->translate->_('Hinweis!');?>'
 	};
 
@@ -343,6 +352,7 @@ Ext.define('Editor.controller.Localizer', {
     };
 
     Editor.controller.admin.TaskOverview.prototype.strings = {
+        taskImported: '<?php echo $this->translate->_('Aufgabe "{0}" vollständig importiert');?>',
         taskOpening: '<?php echo $this->translate->_('Aufgabe wird im Editor geöffnet...');?>',
         taskFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen...');?>',
         taskUnFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen...');?>',
@@ -403,7 +413,7 @@ Ext.define('Editor.controller.Localizer', {
         importUploadLabel: '<?php echo $this->translate->_('Import Datei¹');?>',
         importUploadType: '<?php echo $this->translate->_('Bitte verwenden Sie eine ZIP, CSV oder SDLXLIFF Datei!');?>',
         importTbxTip: '<?php echo $this->translate->_('Wählen Sie die zu importierenden TBX Daten für das TermTagging');?>',
-        importTbxLabel: '<?php echo $this->translate->_('TBX Datei¹ ²');?>',
+        importTbxLabel: '<?php echo $this->translate->_('TBX Datei²');?>',
         importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>',
         importNews: '<?php echo $this->translate->_('<b style="color:#ff0000;">Neu:</b> Sie können nun neben ZIP auch direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage#single-import">Mehr Info</a>.');?>',
         taskNrLabel: '<?php echo $this->translate->_('Auftragsnummer');?>',
@@ -421,7 +431,7 @@ Ext.define('Editor.controller.Localizer', {
         orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
         sourceEditLabel: '<?php echo $this->translate->_('Ausgangstext ist editierbar');?>',
         bottomInfo: '<?php echo $this->translate->_('¹ Diese Angaben / Daten werden für den Import zwingend benötigt.');?>',
-        bottomInfo2: '<?php echo $this->translate->_('² separate TBX nur beim Import einer SDLXLIFF Datei möglich.');?>',
+        bottomInfo2: '<?php echo $this->translate->_('² Eine TBX Datei ist optional. Eine TBX Datei im TBX-Core Format wird benötigt um Terminologie auszuzeichnen.');?>',
         feedbackText: '<?php echo $this->translate->_('Fehler beim Import!');?>',
         feedbackTip: '<?php echo $this->translate->_('Fehler beim Import: Bitte wenden Sie sich an den Support!');?>',
         addBtn: '<?php echo $this->translate->_('Aufgabe hinzufügen');?>',

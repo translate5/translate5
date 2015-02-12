@@ -91,10 +91,12 @@
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';
     const STATE_END = 'end';
+    const STATE_IMPORT = 'import';
+    const STATE_ERROR = 'error';
     
     const ASSOC_TABLE_ALIAS = 'tua';
     const TABLE_ALIAS = 't';
-    
+
     protected $dbInstanceClass = 'editor_Models_Db_Task';
     protected $validatorInstanceClass = 'editor_Models_Validator_Task';
 
@@ -103,7 +105,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @var integer
      */
     protected $qmFlagId = 0;
-    
+
+    /**
+     * @var editor_Models_Task_Meta
+     */
+    protected $meta;
+
     /**
      * loads the task to the given guid
      * @param guid $taskGuid
@@ -554,8 +561,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         return $row['locked'];
     }
-    
     /**
+    
      * checks if the given taskGuid is used by any user
      * @param string $taskGuid
      */
@@ -564,6 +571,14 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         $used = $tua->loadUsed($taskGuid);
         return !empty($used);
+    }
+    
+    /**
+     * returns true if current task is in state import
+     * @return boolean
+     */
+    public function isImporting() {
+        return $this->getState() == self::STATE_IMPORT;
     }
     
     /**
@@ -591,9 +606,36 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * Deep Cloning of the internal data object
+     * generates a statistics summary to the given task
      */
-    public function __clone() {
-        $this->row = clone $this->row;
+    public function getStatistics() {
+        $result = new stdClass();
+        $result->taskGuid = $this->getTaskGuid();
+        $result->taskName = $this->getTaskName();
+        $result->wordCount = $this->getWordCount();
+        $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segment editor_Models_Segment */
+        $result->segmentCount = $segment->count($this->getTaskGuid());
+        $result->segmentCountEditable = $segment->count($this->getTaskGuid(),true);
+        return $result;
+    }
+    
+    /**
+     * convenient method to get the task meta data
+     * @return editor_Models_Task_Meta
+     */
+    public function meta() {
+        if(empty($this->meta)) {
+            $this->meta = ZfExtended_Factory::get('editor_Models_Task_Meta');
+        }
+        elseif($this->getTaskGuid() == $this->meta->getTaskGuid()) {
+            return $this->meta;
+        }
+        try {
+            $this->meta->loadByTaskGuid($this->getTaskGuid());
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            $this->meta->init(array('taskGuid' => $this->getTaskGuid()));
+        }
+        return $this->meta;
     }
 }

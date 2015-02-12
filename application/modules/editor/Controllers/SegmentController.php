@@ -51,7 +51,29 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     protected $_filterTypeMap = array(
         array('qmId' => array('list' => 'listAsString'))
     );
-
+    
+    /**
+     * @var ZfExtended_EventManager
+     */
+    protected $events = false;
+    
+    
+    /**
+     * Initialize event-trigger.
+     * 
+     * For more Information see definition of parent-class
+     * 
+     * @param Zend_Controller_Request_Abstract $request
+     * @param Zend_Controller_Response_Abstract $response
+     * @param array $invokeArgs
+     */
+    public function __construct(Zend_Controller_Request_Abstract $request, Zend_Controller_Response_Abstract $response, array $invokeArgs = array())
+    {
+        parent::__construct($request, $response);
+        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
+    }
+    
+    
     protected function afterTaskGuidCheck() {
         $sfm = $this->initSegmentFieldManager($this->session->taskGuid);
         $this->_sortColMap = $sfm->getSortColMap();
@@ -71,6 +93,14 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $session = new Zend_Session_Namespace();
         $this->view->rows = $this->entity->loadByTaskGuid($session->taskGuid);
         $this->view->total = $this->entity->getTotalCountByTaskGuid($session->taskGuid);
+        $borderSegments = $this->entity->getBorderSegments($session->taskGuid);
+        //editable segments only!
+        if(!empty($borderSegments['first'])) {
+            $this->view->firstSegmentId = $borderSegments['first']['id'];
+        }
+        if(!empty($borderSegments['last'])) {
+            $this->view->lastSegmentId = $borderSegments['last']['id'];
+        }
     }
 
     public function putAction() {
@@ -83,6 +113,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
 
         $this->decodePutData();
         //set the editing durations for time tracking into the segment object
+        settype($this->data->durations, 'object');
         $this->entity->setTimeTrackData($this->data->durations);
         $this->convertQmId();
 
@@ -97,6 +128,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
 
         $this->entity->setUserGuid($sessionUser->data->userGuid);
         $this->entity->setUserName($sessionUser->data->userName);
+        $this->entity->restoreNotModfied();
         
         //@todo do this with events
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
@@ -114,10 +146,11 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         foreach($allowedAlternatesToChange as $field) {
             if($this->entity->isModified($field)) {
                 $this->entity->updateQmSubSegments($field);
-                $this->entity->recreateTermTags($field, strpos($field, editor_Models_SegmentField::TYPE_SOURCE) === 0);
             }
         }
-
+        
+        $this->events->trigger("beforePutSave", $this, array('model' => $this->entity));
+        
         $this->entity->save();
         $this->view->rows = $this->entity->getDataObject();
     }
@@ -224,7 +257,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
 
     public function termsAction() {
         //REST Default Controller Settings umgehen um wieder View Scripte zu verwenden:
-        $this->getResponse()->setHeader('Content-Type', 'text/html');
+        $this->getResponse()->setHeader('Content-Type', 'text/html', TRUE);
         $this->_helper->viewRenderer->setNoRender(false);
 
         //Erstellung und Setzen der Nutzdaten:

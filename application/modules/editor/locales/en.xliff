@@ -761,10 +761,16 @@
         <source>Wählen Sie die zu importierenden TBX Daten für das TermTagging</source>
         <target>Please choose the TBX data to be imported for the term tagging</target>
       </trans-unit>
-      <trans-unit id='VEJYIERhdGVpwrkgwrI='>
-        <source>TBX Datei¹ ²</source>
-        <target>TBX file¹ ²</target>
+      <trans-unit id='VEJYIERhdGVpwrI='>
+        <source>TBX Datei²</source>
+        <target>TBX file²</target>
       </trans-unit>
+      <trans-unit id='wrIgRWluZSBUQlggRGF0ZWkgaXN0IG9wdGlvbmFsLiBFaW5lIFRCWCBEYXRlaSBpbSBUQlgtQ29yZSBGb3JtYXQgd2lyZCBiZW7DtnRpZ3QgdW0gVGVybWlub2xvZ2llIGF1c3p1emVpY2huZW4u'>
+        <source>² Eine TBX Datei ist optional. Eine TBX Datei im TBX-Core Format wird benötigt um Terminologie auszuzeichnen.</source>
+        <target>² A TBX file is optional. You need a TBX-file in TBX-Core format to mark terminology in your bilingual files.</target>
+      </trans-unit>
+      
+      
       <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRCWCBEYXRlaSE='>
         <source>Bitte verwenden Sie eine TBX Datei!</source>
         <target>Please use a TBX file!</target>
@@ -775,11 +781,6 @@
         <target><b style="color:#ff0000;">New:</b> You can now also use SDLXLIFF, openTM2-XLIFF or CSV files directly! <a target="_blank" href="{0}/index/usage#single-import">More information</a>.</target>
       </trans-unit>      
       
-      
-      <trans-unit id='wrIgc2VwYXJhdGUgVEJYIG51ciBiZWltIEltcG9ydCBlaW5lciBTRExYTElGRiBEYXRlaSBtw7ZnbGljaC4='>
-        <source>² separate TBX nur beim Import einer SDLXLIFF Datei möglich.</source>
-        <target>² extra TBX file only available for SDLXLIFF import.</target>
-      </trans-unit>
       <trans-unit id='QW5mcmFnZSBrYW5uIG5pY2h0IGFremVwdGllcnQgd2VyZGVuIQ=='>
         <source>Anfrage kann nicht akzeptiert werden!</source>
         <target>Request to the server could not be accepted!</target>
@@ -990,7 +991,7 @@
       </trans-unit>
       <trans-unit id='S29tbWVudGFyZSB6dW0gYWt0dWVsbGVuIFNlZ21lbnQ='>
 	<source>Kommentare zum aktuellen Segment</source>
-	<target>Comments to the actual segment</target>
+	<target>Comments for the current segment</target>
       </trans-unit>
       <trans-unit id='S29tbWVudGFyIG5ldQ=='>
 	<source>Kommentar neu</source>
@@ -1054,6 +1055,40 @@
       </trans-unit>
       <trans-unit id='cXVlbGxl'><source>quelle</source><target>source</target></trans-unit>
       <trans-unit id='ZWRpdGllcmJhcg=='><source>editierbar</source><target>editable</target></trans-unit>
+      <trans-unit id='aW1wb3J0'><source>import</source><target>import</target></trans-unit>
+      <trans-unit id='RGVyIFRhc2sga2FubiBuaWNodCBhYmdlc2NobG9zc2VuIHdlcmRlbiwgZGEgbmljaHQgYWxsZSBTZWdtZW50ZSBlaW5lbiBTdGF0dXMgZ2VzZXR6dCBoYWJlbi4gQml0dGUgdmVyd2VuZGVuIFNpZSBkaWUgRmlsdGVyZnVua3Rpb24gdW0gZGllIGJldHJvZmZlbmVuIFNlZ21lbnRlIHp1IGZpbmRlbi4='>
+	<source>Der Task kann nicht abgeschlossen werden, da nicht alle Segmente einen Status gesetzt haben. Bitte verwenden Sie die Filterfunktion um die betroffenen Segmente zu finden.</source>
+	<target>The task can not be finished, because some segments do not have a status set. Please use the segment filter to get the affected segments.</target>
+      </trans-unit>
+	<trans-unit id='RGllIG5hY2hmb2xnZW5kZW4gVGFncyB3dXJkZW4gYmVpbSBFZGl0aWVyZW4gZHVwbGl6aWVydCwgZGFzIFNlZ21lbnQga2FubiBuaWNodCBnZXNwZWljaGVydCB3ZXJkZW4uIEzDtnNjaGVuIFNpZSBkaWUgZHVwbGl6aWVydGVuIFRhZ3MuIDxiciAvPkR1cGxpemllcnRlIFRhZ3M6'>
+	  <source>Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:</source>
+	  <target>The following tags were duplicated while editing the segment. Therefore the segment cannot be saved. Please delete the duplicated tags. <br />Duplicated tags:</target>
+	</trans-unit>
+	<trans-unit id='V2FybnVuZyE='>
+	  <source>Warnung!</source>
+	  <target>Warning!</target>
+	</trans-unit>
+	<trans-unit id='VGVybWUgZGVzIHp1bGV0enQgYmVhcmJlaXRldGVuIFNlZ21lbnRzIGtvbm50ZW4gbmljaHQgYXVzZ2V6ZWljaG5ldCB3ZXJkZW4u'>
+	  <source>Terme des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.</source>
+	  <target>The term tagger could not tag the terminology in the last edited segment!</target>
+	</trans-unit>
+	<trans-unit id='QXVmZ2FiZSAiezB9IiB2b2xsc3TDpG5kaWcgaW1wb3J0aWVydA=='>
+	  <source>Aufgabe "{0}" vollständig importiert</source>
+	  <target>Import of Task "{0}" completed!</target>
+	</trans-unit>
+	<trans-unit id='RGllIEFuZnJhZ2Ugw7xiZXIgZGFzIEludGVybmV0IGFuIGRlbiBTZXJ2ZXIgZGF1ZXJ0ZSB6dSBsYW5nZS4gRGllcyBrYW5uIGFuIElocmVyIEludGVybmV0dmVyYmluZHVuZyBvZGVyIGFuIGVpbmVyIMOcYmVybGFzdHVuZyBkZXMgU2VydmVycyBsaWVnZW4uIEJpdHRlIHZlcnN1Y2hlbiBTaWUgZXMgZXJuZXV0Lg=='>
+	  <source>Die Anfrage über das Internet an den Server dauerte zu lange. Dies kann an Ihrer Internetverbindung oder an einer Überlastung des Servers liegen. Bitte versuchen Sie es erneut.</source>
+	  <target> The query over the Internet to the server took too long. This may be because of your internet connection or a server overload. Please try again.</target>
+	</trans-unit>
+        <trans-unit id='RGllIG5hY2hmb2xnZW5kZW4gVGFncyB3dXJkZW4gYmVpbSBFZGl0aWVyZW4gZ2Vsw7ZzY2h0LCBkYXMgU2VnbWVudCBrYW5uIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbi4gPGJyIC8+PGJyIC8+VmVyc3VjaGVuIFNpZSBtaXQgZGVyIFLDvGNrZ8OkbmdpZ2Z1bmt0aW9uIFNUUkctWiBkaWUgVGFncyB3aWVkZXJoZXJ6dXN0ZWxsZW4uIDxiciAvPjxiciAvPkFsdGVybmF0aXYga8O2bm5lbiBTaWUgYXVjaCBkaWUgQmVhcmJlaXR1bmcgZGVzIFNlZ21lbnRzIGR1cmNoIEtsaWNrIGF1ZiAiQWJicmVjaGVuIiBiZWVuZGVuIHVuZCBkYXMgU2VnbWVudCBuZXUgenVyIEJlYXJiZWl0dW5nIMO2ZmZuZW4uPGJyIC8+PGJyIC8+RmVobGVuZGUgVGFnczo='><source>Die nachfolgenden Tags wurden beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Versuchen Sie mit der Rückgängigfunktion STRG-Z die Tags wiederherzustellen. <br /><br />Alternativ können Sie auch die Bearbeitung des Segments durch Klick auf "Abbrechen" beenden und das Segment neu zur Bearbeitung öffnen.<br /><br />Fehlende Tags:</source><target>The following tags have been deleted during editing, the segment can not be saved. <br />Try to restore the tags by using the Undo function CTRL-Z. <br /> Alternatively, you can also stop the processing of the segment by clicking on "Cancel" and reopen the segment for processing. <br /> Missing Tags:</target></trans-unit>
+        <trans-unit id='RmVobGVyIGJlaGViZW4='>
+	  <source>Fehler beheben</source>
+	  <target>Correct errors</target>
+	</trans-unit>
+        <trans-unit id='VHJvdHpkZW0gc3BlaWNoZXJu'>
+	  <source>Trotzdem speichern</source>
+	  <target>Save anyway</target>
+	</trans-unit>
     </body>
   </file>
 </xliff>

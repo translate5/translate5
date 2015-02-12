@@ -134,18 +134,13 @@ class editor_Models_Import_UploadProcessor {
                 $args = array($importInfo['importUpload']['tmp_name']);
             break;
             case self::TYPE_SDLXLIFF:
-                $dp = 'editor_Models_Import_DataProvider_SingleUploads';
-                $args = array(
-                    array($importInfo['importUpload']), //proofReads
-                );
-                $args = $this->handleTbx($args);
-            break;
             case self::TYPE_CSV:
             case self::TYPE_XLF:
                 $dp = 'editor_Models_Import_DataProvider_SingleUploads';
                 $args = array(
                     array($importInfo['importUpload']), //proofReads
                 );
+                $args = $this->handleTbx($args);
             break;
             
             

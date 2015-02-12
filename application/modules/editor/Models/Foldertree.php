@@ -44,6 +44,10 @@
  * Foldertree Object Instanz wie in der Applikation benötigt
  */
 class editor_Models_Foldertree extends ZfExtended_Models_Entity_Abstract {
+    
+    const TYPE_DIR = 'dir';
+    const TYPE_FILE = 'file';
+    
   protected $dbInstanceClass = 'editor_Models_Db_Foldertree';
   
   protected $objectTree = null;
@@ -141,7 +145,7 @@ class editor_Models_Foldertree extends ZfExtended_Models_Entity_Abstract {
    */
   public function getPaths(string $taskGuid, string $type){
       $this->_paths = array();
-      if($type !== 'dir' and $type !== 'file'){
+      if($type !== self::TYPE_DIR and $type !== self::TYPE_FILE){
           throw new Zend_Exception('$type hatte den nicht erlaubten Wert '.$type);
       }
       $this->loadByTaskGuid($taskGuid);

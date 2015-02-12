@@ -73,11 +73,18 @@ class editor_Models_Import_DataProvider_ZippedUrl extends editor_Models_Import_D
         		'timeout' => 30));
         $response = $client->request();
         if (!$response->isSuccessful()) {
-        	throw new Zend_Exception('Es konnte keine Zip Datei zu Task ' . $this->task->getTaskGuid() . ' heruntergeladen werden!');
+            $e = new ZfExtended_Exception();
+            $m = "No zip-file found for task %!".
+                        "\nRequested URL: %s".
+                        "\nHttp-Status-Code: %s".
+                        "\nHttp-Message: %s";
+            $m = sprintf($m,  $this->task->getTaskGuid(), $this->zipUrl,$response->getStatus(),$response->getMessage());
+            $e->setMessage($m,false);
+            throw $e;
         }
         //im Folgenden werden 0 byte Große Dateien ebenfalls als Fehler betrachtet
         if (!file_put_contents($this->importZip, $response->getBody())) {
-        	throw new Zend_Exception('Zip Datei zu Task ' . $this->task->getTaskGuid() . ' konnte nicht lokal zwischengespeichert werden! Pfad: '.$this->importZip);
+        	throw new Zend_Exception('Zip-file of the task ' . $this->task->getTaskGuid() . ' could not be saved! Path: '.$this->importZip);
         }
     }
     

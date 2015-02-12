@@ -297,7 +297,6 @@ abstract class editor_Models_Import_FileParser {
         
     
     public function addSegmentProcessor(editor_Models_Import_SegmentProcessor $proc){
-        //error_log(get_class($proc));
         $this->segmentProcessor[] = $proc;
     }
     
@@ -546,8 +545,8 @@ abstract class editor_Models_Import_FileParser {
     }
     
     /**
-     * Sets $this->_editSegment, $this->_matchRateSegment and $this->_autopropagated
-     * and $this->_pretransSegment and $this->_autoStateId for the segment currently worked on
+     * Sets $this->_matchRateSegment and $this->_autopropagated
+     * for the segment currently worked on
      * @param mixed transunit
      */
     abstract protected function setSegmentAttribs($transunit);

@@ -369,6 +369,10 @@ class editor_TaskController extends ZfExtended_RestController {
     public function putAction() {
         $this->entity->load($this->_getParam('id'));
         
+        if($this->entity->isImporting()) {
+            throw new ZfExtended_Models_Entity_NoAccessException();
+        }
+        
         $taskguid = $this->entity->getTaskGuid();
         
         $oldTask = clone $this->entity;
@@ -396,10 +400,8 @@ class editor_TaskController extends ZfExtended_RestController {
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
         
-        
-        //the following methods check internally what to do 
+        //opening a task must be done before all workflow "do" calls which triggers some events
         $this->openAndLock();
-        $this->closeAndUnlock();
         
         $this->workflow->doWithTask($oldTask, $this->entity);
         
@@ -407,7 +409,11 @@ class editor_TaskController extends ZfExtended_RestController {
             editor_Models_LogTask::createWithUserGuid($taskguid, $this->entity->getState(), $this->user->data->userGuid);
         }
         
+        //updateUserState does also call workflow "do" methods!
         $this->updateUserState($this->user->data->userGuid);
+        
+        //closing a task must be done after all workflow "do" calls which triggers some events
+        $this->closeAndUnlock();
         
         $this->entity->save();
         $obj = $this->entity->getDataObject();
@@ -558,7 +564,9 @@ class editor_TaskController extends ZfExtended_RestController {
         $task = $this->entity;
         $hasState = !empty($this->data->userState);
         $isEnding = isset($this->data->state) && $this->data->state == $task::STATE_END;
-        if($hasState && $this->data->userState == $workflow::STATE_EDIT && $isEnding) {
+        $resetToOpen = $hasState && $this->data->userState == $workflow::STATE_EDIT && $isEnding;
+        if($resetToOpen) {
+            //This state change will be saved at the end of this method.
             $this->data->userState = $workflow::STATE_OPEN;
         }
         if(!$isEnding && (!$hasState || !in_array($this->data->userState, $closingStates))){
@@ -571,13 +579,19 @@ class editor_TaskController extends ZfExtended_RestController {
             }
         }
         $this->entity->unregisterInSession();
+        
+        if($resetToOpen) {
+            $this->updateUserState($this->user->data->userGuid, true);
+        }
     }
     
     /**
      * Updates the transferred User Assoc State to the given userGuid (normally the current user)
+     * Per Default all state changes trigger something in the workflow. In some circumstances this should be disabled.
      * @param string $userGuid
+     * @param boolean $disableWorkflowEvents optional, defaults to false
      */
-    protected function updateUserState(string $userGuid) {
+    protected function updateUserState(string $userGuid, $disableWorkflowEvents = false) {
         if(empty($this->data->userState)) {
             return;
         }
@@ -594,7 +608,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $userTaskAssoc->loadByParams($userGuid,$taskGuid);
             $isPmOverride = (boolean) $userTaskAssoc->getIsPmOverride();
         }
-        catch(ZfExtended_NotFoundException $e) {
+        catch(ZfExtended_Models_Entity_NotFoundException $e) {
             if(! $isEditAllTasks){
                 throw $e;
             }
@@ -626,9 +640,14 @@ class editor_TaskController extends ZfExtended_RestController {
             $userTaskAssoc->setState($this->data->userState);
         }
         
+        if(!$disableWorkflowEvents) {
+            $this->workflow->triggerBeforeEvents($oldUserTaskAssoc, $userTaskAssoc);
+        }
         $userTaskAssoc->save();
         
-        $this->workflow->doWithUserAssoc($oldUserTaskAssoc, $userTaskAssoc);
+        if(!$disableWorkflowEvents) {
+            $this->workflow->doWithUserAssoc($oldUserTaskAssoc, $userTaskAssoc);
+        }
         
         if($oldUserTaskAssoc->getState() != $this->data->userState){
             editor_Models_LogTask::createWithUserGuid($taskGuid, $this->data->userState, $this->user->data->userGuid);
@@ -680,11 +699,24 @@ class editor_TaskController extends ZfExtended_RestController {
         unset($this->view->rows->qmSubsegmentFlags);
     }
     
+    public function deleteAction() {
+        $this->entity->load($this->_getParam('id'));
+        if($this->entity->isImporting()) {
+            throw new ZfExtended_Models_Entity_NoAccessException();
+        }
+        return parent::deleteAction();
+    }
+    
     /**
      * does the export as zip file.
      */
     public function exportAction() {
         parent::getAction();
+        
+        if($this->entity->isImporting()) {
+            throw new ZfExtended_Models_Entity_NoAccessException();
+        }
+        
         $diff = (boolean)$this->getRequest()->getParam('diff');
 
         $export = ZfExtended_Factory::get('editor_Models_Export');
@@ -710,7 +742,7 @@ class editor_TaskController extends ZfExtended_RestController {
         // disable layout and view
         $this->view->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
-        header('Content-Type: application/zip');
+        header('Content-Type: application/zip', TRUE);
         header('Content-Disposition: attachment; filename="'.$this->entity->getTasknameForDownload($suffix).'"');
         readfile($zipFile);
         exit;

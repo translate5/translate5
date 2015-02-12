@@ -34,29 +34,16 @@
  END LICENSE AND COPYRIGHT 
  */
 
-/**#@+
+/**#@+ 
  * @author Marc Mittag
  * @package editor
  * @version 1.0
  *
-
-/**
- * Kapselt den Import der Meta Daten zu einem Projekt.
- * - sucht selbstständig nach MetaDaten im Projekt
- * - importiert die gefundenen MetaDaten
  */
-abstract class editor_Models_Import_TermListParser implements editor_Models_Import_IMetaDataImporter {
-    /**
-     * abstrakte Methode um den Term Import Vorgang anzustoßen
-     * @param SplFileInfo $file
-     * @param string $taskGuid
-     * @param editor_Models_Languages $sourceLang
-     * @param editor_Models_Languages $targetLang
-     */
-    abstract function import(SplFileInfo $file, string $taskGuid, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang);
-
-    /**
-     * abstrakte Methode welche durch MetaData am Ende des Imports aufgerufen wird (z.B. um tmp Dateien zu löschen)
-     */
-    abstract function cleanup();
+/**
+ * Default Db Model for Plugin SegmentStatistics
+ */
+class editor_Plugins_SegmentStatistics_Models_Db_Statistics extends Zend_Db_Table_Abstract {
+    protected $_name    = 'LEK_plugin_segmentstatistics';
+    public $_primary = 'id';
 }

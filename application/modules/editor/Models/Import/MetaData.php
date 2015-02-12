@@ -49,7 +49,6 @@
  * dass MetaDaten durch Dateinamen = taskGuid definiert sind, ist absofort hinfällig. Bei TBX Dateien soll einfach die erste TBX im Verzeichnis verwendet werden.
  */
 class editor_Models_Import_MetaData {
-    const META_TBX = 'tbx';
     const META_QMFLAGS = 'qmflags';
 
     /**
@@ -79,10 +78,6 @@ class editor_Models_Import_MetaData {
      * @var array
      */
     protected $cache = array();
-    /**
-     * @var string
-     */
-    public $tbxFilterRegex = '/\.tbx$/i';
     
     /**
      * @var string
@@ -106,7 +101,26 @@ class editor_Models_Import_MetaData {
     }
 
     /**
-     * intiiert die Suche nach und dann den import von MetaDaten zum Projekt
+     * @return editor_Models_Languages
+     */
+    public function getSourceLang() {
+        return $this->sourceLang;
+    }
+    /**
+     * @return editor_Models_Languages
+     */
+    public function getTargetLang() {
+        return $this->targetLang;
+    }
+    /**
+     * @return string
+     */
+    public function getImportPath() {
+        return $this->importPath;
+    }
+    
+    /**
+     * initiiert die Suche nach und dann den import von MetaDaten zum Projekt
      * @param editor_Models_Task $task
      * @param string $importPath
      */
@@ -115,8 +129,20 @@ class editor_Models_Import_MetaData {
         $this->importPath = $importPath;
         
         $this->importTaskTemplateXml();
-        $this->importTbx();
-        $this->importQmFlagXmlFile();
+        
+        $events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
+        /* @var $events ZfExtended_EventManager */
+        $events->trigger('importMetaData', $this, array(
+                'task' => $task, 'metaImporter' => $this
+        ));
+        
+        //Meta Data import from Core Features, currently XML for MQM: 
+        $this->addImporter(ZfExtended_Factory::get('editor_Models_Import_QmSubsegments'));
+        
+        foreach($this->importers as $importer) {
+            /* @var $import editor_Models_Import_IMetaDataImporter */
+            $importer->import($task, $this);
+        }
     }
 
     /**
@@ -152,19 +178,6 @@ class editor_Models_Import_MetaData {
     }
 
     /**
-     * imports the XML file with the defined QM subsegment types
-     */
-    protected function importQmFlagXmlFile() {
-        $importer = ZfExtended_Factory::get('editor_Models_Import_QmSubsegments');
-        /* @var $importer editor_Models_Import_QmSubsegments */
-        $importer->importFromXml($this->task,$this->importPath);
-        $this->importers[] = $importer;
-        if($importer->hasTaskSpecific()) {
-            $this->hasMetaData[] = self::META_QMFLAGS;
-        }
-    }
-
-    /**
      * import task-template.xml file
      * if exist save it to Zend_Registry::get('taskTemplate');
      */
@@ -184,38 +197,19 @@ class editor_Models_Import_MetaData {
     }
 
      /**
-     * Importiert die übergebenen TBX Files
-     * @todo Import mehrere TBX Dateien ist aktuell ungestestet!
+     * adds a given importer to the internal importer list for further standardized processing
+     * @param editor_Models_Import_IMetaDataImporter $importer
      */
-    protected function importTbx() {
-        $tbxfiles = $this->getMetaFileToImport($this->tbxFilterRegex);
-        if(empty($tbxfiles)){
-            return;
-        }
-        $importer = ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
-        /* @var $importer editor_Models_Import_TermListParser_Tbx */
-        foreach($tbxfiles as $file) {
-            /* @var $file SplFileInfo */
-            $importer->import($file, $this->task->getTaskGuid(), $this->sourceLang, $this->targetLang);
-        }
+    public function addImporter(editor_Models_Import_IMetaDataImporter $importer) {
         $this->importers[] = $importer;
-        $this->hasMetaData[] = self::META_TBX;
     }
 
-   /**
+    /**
      * Räumt nach den abgeschlossenen Importvorgängen auf.
      */
     public function cleanup() {
         foreach($this->importers as $importer){
             $importer->cleanup();
         }
-    }
-    
-    /**
-     * Checks if the given type of meta data was imported
-     * @param string $type Valid types are alle META_* constants of this class
-     */
-    public function hasMetaData($type) {
-        return in_array($type, $this->hasMetaData);
     }
 }

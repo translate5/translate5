@@ -64,7 +64,8 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
     {
         $this->front = Zend_Controller_Front::getInstance();
     }
-
+    
+    
     public function _initREST()
     {
         $this->front->setRequest(new REST_Controller_Request_Http);
@@ -80,16 +81,17 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $restContexts = new REST_Controller_Action_Helper_RestContexts();
         Zend_Controller_Action_HelperBroker::addHelper($restContexts);
     }
-
+    
+    
     public function _initRestRoutes()
     {
         $restRoute = new Zend_Rest_Route($this->front, array(), array(
-            'editor' => array('file', 'segment', 'alikesegment', 'referencefile', 'qmstatistics', 'comment', 'task', 'user', 'taskuserassoc', 'segmentfield','workflowuserpref'),
+            'editor' => array(  'file', 'segment', 'alikesegment', 'referencefile', 'qmstatistics', 'comment',
+                                'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker'),
         ));
         $this->front->getRouter()->addRoute('restDefault', $restRoute);
 
-        //FIXME this should be an ZfExtended_Controller_RestLikeRoute, changing this here, means to rework the output in the controller
-        $filemapRoute = new Zend_Controller_Router_Route(
+        $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/filemap/*',
             array(
                 'module' => 'editor',
@@ -107,7 +109,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ));
         $this->front->getRouter()->addRoute('authUser', $authUserRoute);
 
-        $termsRoute = new Zend_Controller_Router_Route(
+        $termsRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/terms/*',
             array(
                 'module' => 'editor',
@@ -116,7 +118,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ));
         $this->front->getRouter()->addRoute('terms', $termsRoute);
 
-        $exportRoute = new Zend_Controller_Router_Route(
+        $exportRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/task/export/*',
             array(
                 'module' => 'editor',
@@ -124,8 +126,27 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'export'
             ));
         $this->front->getRouter()->addRoute('export', $exportRoute);
+        
+        $taskStat = new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/statistics/*',
+            array(
+                'module' => 'editor',
+                'controller' => 'task',
+                'action' => 'statistics'
+            ));
+        $this->front->getRouter()->addRoute('taskStat', $taskStat);
+        
+        $workerRoute = new ZfExtended_Controller_RestLikeRoute(
+            'editor/worker/queue/*',
+            array(
+                'module' => 'editor',
+                'controller' => 'worker',
+                'action' => 'queue'
+            ));
+        $this->front->getRouter()->addRoute('queue', $workerRoute);
     }
-
+    
+    
     public function _initOtherRoutes()
     {
         $localizedJsRoute = new Zend_Controller_Router_Route(

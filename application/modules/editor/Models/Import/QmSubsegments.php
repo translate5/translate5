@@ -48,7 +48,15 @@
      * Flag containing info if qm subsegment import uses a task specific xml file
      * @var boolean
      */
-    protected $hasTaskSpecific = false;
+    protected $hasTaskSpecific = true;
+    
+    /**
+     * (non-PHPdoc)
+     * @see editor_Models_Import_IMetaDataImporter::import()
+     */
+    public function import(editor_Models_Task $task, editor_Models_Import_MetaData $meta) {
+        $this->importFromXml($task, $meta->getImportPath());
+    }
     
     /**
      * imports the configured qmFlagXmlFile, store it in the internal JSON tree in qmSubsegmentFlags 
@@ -67,12 +75,18 @@
                 $config->runtimeOptions->editor->qmFlagXmlFileName;
         if(!file_exists($qmFlagXmlFile) || ! is_readable($qmFlagXmlFile)) {
             //if task-specific file does not exist, take the standard one
-            $qmFlagXmlFile = APPLICATION_PATH.DIRECTORY_SEPARATOR.'..'.
-                DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.
+            $appDir = APPLICATION_PATH.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR;
+            $publicPartialPath = 'public'.DIRECTORY_SEPARATOR.
                 $config->runtimeOptions->editor->qmFlagXmlFileDir.
                 DIRECTORY_SEPARATOR.
                 $config->runtimeOptions->editor->qmFlagXmlFileName;
-            $this->hasTaskSpecific = true;
+            $publicPath = $appDir.$publicPartialPath;
+            $clientSpecificPath = $appDir.'client-specific'.DIRECTORY_SEPARATOR.$publicPartialPath;
+            $qmFlagXmlFile = $publicPath;
+            if(file_exists($clientSpecificPath) &&  is_readable($clientSpecificPath)) {
+                $qmFlagXmlFile = $clientSpecificPath;
+            }
+            $this->hasTaskSpecific = false;
         }
         if(!file_exists($qmFlagXmlFile) || ! is_readable($qmFlagXmlFile)) {
             throw new Zend_Exception('qmFlagXmlFile not found or not readable! runtimeOptions.editor.qmFlagXmlFile was: "'.$qmFlagXmlFile.'"');

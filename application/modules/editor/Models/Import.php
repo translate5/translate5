@@ -156,6 +156,11 @@ class editor_Models_Import {
      * @var (int) / boolean
      */
     private $wordCount = 0;
+    
+    /**
+     * @var ZfExtended_EventManager
+     */
+    protected $events = false;
 
     /**
      * Konstruktor
@@ -164,6 +169,7 @@ class editor_Models_Import {
         $this->gh = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('General');
         $this->_localEncoded = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('LocalEncoded');
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
     }
     
     /**
@@ -205,13 +211,45 @@ class editor_Models_Import {
         //call import Methods:
         $this->importWithCollectableErrors();
         
-        $mdi = $this->metaDataImporter;
-        $this->task->setTerminologie($mdi->hasMetaData($mdi::META_TBX));
         //saving task twice is the simplest way to do this. has meta data is only available after import.
         $this->task->save();
         
         //call post import Methods:
         $dataProvider->postImportHandler();
+        //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
+        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
+        $eventManager->trigger('afterImport', $this, array('task' => $this->task));
+        
+        //we set and configure a general worker to set the open state of the task, after all other work
+        $setToOpenWorker = ZfExtended_Factory::get('ZfExtended_Worker_Callback');
+        /* @var $setToOpenWorker ZfExtended_Worker_Callback */
+        $setToOpenWorker->init($this->task->getTaskGuid(), array(
+                'class' => get_class($this), 
+                'callback' => 'setTaskToOpen')
+        );
+        $setToOpenWorker->queue();
+    }
+    
+    /**
+     * Callback Method for the $setToOpenWorker
+     * @param string $taskGuid
+     * @param array $parameters
+     * @return boolean
+     */
+    public function setTaskToOpen($taskGuid, array $parameters) {
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        
+        if ($task->getState() != $task::STATE_IMPORT) {
+            return false;
+        }
+        $task->setState($task::STATE_OPEN);
+        $task->save();
+        
+        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
+        $eventManager->trigger('importCompleted', $this, array('task' => $task));
+        return true;
     }
     
     /**
@@ -222,8 +260,8 @@ class editor_Models_Import {
         Zend_Registry::set('errorCollect', $this->isCheckRun);
         
         $this->importMetaData(); //Im MetaData Importer die TMX Geschichte integrieren
+        $this->events->trigger("beforeDirectoryParsing", $this,array('importFolder'=>$this->_importFolder));
         $this->saveDirTrees();
-        $this->termTagFiles();
         $this->importFiles();
         $this->syncFileOrder();
         $this->removeMetaDataTmpFiles();
@@ -265,7 +303,6 @@ class editor_Models_Import {
     
     /**
      * Importiert die Relais Dateien eines Tasks, welche noch nicht importiert wurde. 
-     * Stößt bei Bedarf auch die Erzeugung per openTMS an
      * 
      */
     public function importAndGenerateRelaisFiles() {
@@ -281,12 +318,6 @@ class editor_Models_Import {
         $this->_filePaths = $tree->checkAndGetRelaisFiles($this->_importFolder);
         
         $tree->save();
-        
-        $tagger = ZfExtended_Factory::get('editor_Models_Import_InvokeTermTagger',array($this->_filePaths,$this->_importFolder));
-        /* @var $tagger editor_Models_Import_InvokeTermTagger */
-        $tagger->saveTermTagFileList();
-        $tagger->removeTermTags();
-        $tagger->deleteTermTagFileList();
         
         $this->importRelaisFiles($tree);
     }
@@ -345,7 +376,6 @@ class editor_Models_Import {
             $parser->parseFile();
             $this->countWords($parser->getWordCount());
             $this->_imagesInTask = array_merge($this->_imagesInTask,$parser->getTagImageNames());
-            $this->removeTaggedFile($params[0]); //$params[0] => abs Path to File
         }
         if ($this->task->getWordCount() == 0) {
             $this->task->setWordCount($this->wordCount);
@@ -436,17 +466,6 @@ class editor_Models_Import {
         );
     }
     
-    /**
-     * löscht das temporäre File, das durch den Tagger getaggt wurde
-     *
-     * @param string $pathLocalEncoded Pfad zur eigentlich importierten Datei in Filesystemcodierung
-     */
-    protected function removeTaggedFile($pathLocalEncoded){
-        if(file_exists($pathLocalEncoded.'.untagged')){
-            unlink($pathLocalEncoded);
-            rename($pathLocalEncoded.'.untagged',$pathLocalEncoded);
-        }
-    }
     /**
      * - liest den Directory-Tree aus
      * - speichert ihn in der DB als Objekt (LEK_foldertree) und flach durch Befüllung von LEK_files
@@ -559,18 +578,6 @@ class editor_Models_Import {
         return $this->task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.$config->runtimeOptions->import->referenceDirectory;
     }
     
-       /**
-     * parses all files in the import dir to the termTagger
-     *
-     * - first removes 
-     * - Caution: at the moment the termTagger only parses sdlxliff
-     */
-    protected function termTagFiles(){
-        $tagger = ZfExtended_Factory::get('editor_Models_Import_InvokeTermTagger',array($this->_filePaths,$this->_importFolder,$this->metaDataImporter));
-        /* @var $tagger editor_Models_Import_InvokeTermTagger */
-        $tagger->termTagFiles($this->_sourceLang,$this->_targetLang);
-    }
-    
     /**
      * validiert / filtert die Get-Werte
      * @throws Zend_Exception
@@ -603,12 +610,22 @@ class editor_Models_Import {
      * @throws Zend_Exception
      */
     protected function validateImportFolders(){
+        $error = '';
         if(!is_dir($this->_importFolder)){
-        	throw new Zend_Exception('Der übergebene importRootFolder '.$this->_importFolder.' existiert nicht.');
+            $error .= 'Der übergebene importRootFolder '.$this->_importFolder.' existiert nicht.';
         }
-        if(!is_dir($this->getProofReadDir())){
-        	throw new Zend_Exception('Der übergebene ProofReadFolder '.$this->getProofReadDir().' existiert nicht.');
+        if(!is_dir($this->getProofReadDir()) || empty(glob($this->getProofReadDir().'/*'))){
+            $error .= 'Der übergebene ProofReadFolder '.$this->getProofReadDir().' existiert nicht oder ist leer.';
         }
+        
+        if (empty($error)) {
+            return;
+        }
+        
+        $messages = Zend_Registry::get('rest_messages');
+        /* @var $messages ZfExtended_Models_Messages */
+        $messages->addError($error); // @fixme: rest-message does not work here !??!
+        throw new Zend_Exception($error);
     }
 
     protected function syncFileOrder() {
@@ -706,6 +723,7 @@ class editor_Models_Import {
         
         foreach($langFields as $key => $lang) {
             $langInst = ZfExtended_Factory::get('editor_Models_Languages');
+            /* @var $langInst editor_Models_Languages */
             if(empty($lang) || !$langInst->loadLang($lang, $type)) {
                 //null setzen wenn Sprache nicht gefunden. Das triggert einen Fehler in der validateParams dieser Klasse
                 $langInst = null;

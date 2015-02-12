@@ -44,6 +44,9 @@
 /**
  * Segment Entity Objekt
  * 
+ * @method integer getId() getId()
+ * @method void setId() setId(integer $id)
+ * @method integer getSegmentNrInTask() getSegmentNrInTask()
  * @method integer getAutoStateId() getAutoStateId()
  * @method void setAutoStateId() setAutoStateId(integer $id)
  * @method integer getWorkflowStepNr() getWorkflowStepNr()
@@ -76,6 +79,13 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     protected $segmentdata     = array();
     
+    /**
+     * @var editor_Models_Segment_Meta
+     */
+    protected $meta;
+    
+    protected $isDataModified;
+
     /**
      * init the internal segment field and the DB object
      */
@@ -134,7 +144,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * (non-PHPdoc)
      * @see ZfExtended_Models_Entity_Abstract::set()
      */
-    protected function set($name, $value) {
+    public function set($name, $value) {
         $loc = $this->segmentFieldManager->getDataLocationByKey($name);
         if($loc !== false) {
             if(empty($this->segmentdata[$loc['field']])) {
@@ -151,7 +161,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * (non-PHPdoc)
      * @see ZfExtended_Models_Entity_Abstract::get()
      */
-    protected function get($name) {
+    public function get($name) {
         $loc = $this->segmentFieldManager->getDataLocationByKey($name);
         if($loc !== false) {
             //if we have a missing index here, that means, 
@@ -178,19 +188,76 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * Loops over all data fields and checks if at least one of them was changed (compare by original and edited content)
      * @param string $typeFilter optional, checks only data fields of given type
+     * @return boolean
      */
     public function isDataModified($typeFilter = null) {
+        if(!is_null($this->isDataModified)){
+            return $this->isDataModified;
+        }
+        $this->isDataModified = false;
         foreach ($this->segmentdata as $data) {
             $field = $this->segmentFieldManager->getByName($data->name);
             $isEditable = $field->editable;
             if(!$isEditable || !empty($typeFilter) && $data->type !== $typeFilter) {
                 continue;
             }
-            if($data->edited !== $data->original) {
-                return true;
+            if($this->stripTermTags($data->edited) !== $this->stripTermTags($data->original)) {
+                $this->isDataModified = true;
             }
         }
-        return false;
+        return $this->isDataModified;
+    }
+    /**
+     * restores segments with content not changed by the user to the original
+     * (which contains termTags - this way no new termTagging is necessary, since
+     * GUI removes termTags onSave)
+     */
+    public function restoreNotModfied() {
+        if($this->isDataModified()){
+            return;
+        }
+        foreach ($this->segmentdata as &$data) {
+            $field = $this->segmentFieldManager->getByName($data->name);
+            $isEditable = $field->editable;
+            if(!$isEditable) {
+                continue;
+            }
+            $data->edited = $data->original;
+        }
+    }
+    /**
+     * strips all tags including tag description
+     * 
+     * @param string $segmentContent
+     * @param boolean $htmlEntityDecode if _all_ html-entities should be decoded
+     * @return string $segmentContent
+     */
+    public function stripTags($segmentContent,$htmlEntityDecode = true) {
+        if($htmlEntityDecode){
+            $segmentContent = html_entity_decode($segmentContent, ENT_QUOTES | ENT_XHTML);
+        }
+        return strip_tags(preg_replace('"<span.*?</span>"','',$segmentContent));
+    }
+    /**
+     * strips all tags including tag description
+     * 
+     * @param string $segmentContent
+     * @return string $segmentContent
+     */
+    public function stripTermTags($segmentContent) {
+        try {
+            $seg = qp('<div id="root">'.$segmentContent.'</div>', NULL, array('format_output' => false));
+        
+            foreach ($seg->find('div.term') as $element){
+                $element->replaceWith($element->innerHTML());
+            }
+            $seg = $seg->find('div#root');
+            $segmentContent = $seg->innerHTML();
+        } catch (Exception $exc) {
+            $log = new ZfExtended_Log();
+            $log->logError('Notice: No valid HTML in translate5 segment '.$exc->getTraceAsString());
+        }
+        return $segmentContent;
     }
     
     /**
@@ -404,7 +471,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         return $this->segmentdata[$field]->edited;
     }
-
+    
     /**
      * returns a list with editable dataindex
      * @return array
@@ -416,7 +483,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * Load segments by taskGuid.
      * @param string $taskGuid
-     * @param boolean $loadSourceEdited
      * @return array
      */
     public function loadByTaskGuid($taskGuid) {
@@ -430,6 +496,113 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->segmentFieldManager->initFields($taskGuid);
         $this->segmentFieldManager->getView()->create();
         return $this->_loadByTaskGuid($taskGuid);
+    }
+    
+    /**
+     * returns the first and the last EDITABLE segment of the actual filtered request
+     * @param string $taskGuid
+     * @return [editor_Models_Segment] with index first and index last
+     */
+    public function getBorderSegments($taskGuid){
+        //save original offset and limit
+        $offset = $this->offset;
+        $limit = $this->limit;
+        
+        //save original offset and limit
+        $this->offset = 0;
+        $this->limit = 1;
+        
+        //only editable segments may be considered
+        $filter = new stdClass();
+        $filter->type = 'numeric';
+        $filter->comparison = 'eq';
+        $filter->value = 1;
+        $filter->field = 'editable';
+        $this->filter->addFilter($filter);
+        
+        //fetch the first segment in list
+        $first = $this->loadByTaskGuid($taskGuid);
+        
+        //fetch the last segment in list
+        $this->filter->swapSortDirection();
+        $last = $this->loadByTaskGuid($taskGuid);
+        $this->filter->swapSortDirection();
+        
+        //restore original values
+        $this->offset = $offset;
+        $this->limit = $limit;
+        
+        $result = array();
+        if(!empty($last) && isset($last[0])) {
+            $result['last'] = $last[0];
+        }
+        if(!empty($first) && isset($first[0])) {
+            $result['first'] = $first[0];
+        }
+        return $result;
+    }
+    
+    /**
+     * Loads the first segment of the given taskGuid.
+     * The found segment is stored internally (like load).
+     * First Segment is defined as the segment with the lowest id of the task
+     * 
+     * @param string $taskGuid
+     * @return editor_Models_Segment
+     */
+    public function loadFirst($taskGuid) {
+        $this->segmentFieldManager->initFields($taskGuid);
+        $this->reInitDb($taskGuid);
+        //ensure that view exists (does nothing if already):
+        $this->segmentFieldManager->getView()->create();
+
+        $seg = $this->loadNext($taskGuid, 0);
+        
+        if(empty($seg)) {
+            $this->notFound('first segment of task', $taskGuid);
+        }
+        return $seg;
+    }
+    
+    /**
+     * Loads the next segment after the given id from the given taskGuid
+     * next is defined as the segment with the next higher segmentId
+     * This method assumes that segmentFieldManager was already loaded internally
+     * @param string $taskGuid
+     * @param integer $id
+     * @return editor_Models_Segment | null if no next found
+     */
+    public function loadNext($taskGuid, $id) {
+        $s = $this->db->select()
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('id > ?', $id)
+            ->order('id ASC')
+            ->limit(1);
+
+        $row = $this->db->fetchRow($s);
+        if(empty($row)) {
+            return null;
+        }
+        $this->row = $row;
+        $this->initData($this->getId());
+        return $this;
+    }
+    
+    /**
+     * returns the segment count of the given taskGuid
+     * @param string $taskGuid
+     * @param boolean $editable
+     * @return integer the segment count
+     */
+    public function count($taskGuid,$onlyEditable=false) {
+        $s = $this->db->select()
+            ->from($this->db, array('cnt' => 'COUNT(id)'))
+            ->where('taskGuid = ?', $taskGuid);
+        if($onlyEditable){
+            $s->where('editable = 1');
+        }
+        $row = $this->db->fetchRow($s);
+        return $row->cnt;
     }
     
     /**
@@ -470,7 +643,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
          */
         $s->from($this->db, $cols);
         $s->where('taskGuid = ?', $taskGuid);
-
+        
         return parent::loadFilterdCustom($s);
     }
     
@@ -696,18 +869,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * recreates the term markup in the data field with the given dataindex
-     * @param string $dataindex dataindex of the segment field to be processed
-     * @param boolean $useSource optional, default false, if true terms of source column are used (instead of target)
-     */
-    public function recreateTermTags($dataindex, $useSource = false) {
-        $termTag = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
-        /* @var $termTag editor_Models_Segment_TermTag */
-        $withTerms = $termTag->recreate($this->getId(), $this->get($dataindex), $useSource);
-        $this->set($dataindex, $withTerms);
-    }
-
-    /**
      * Updates - if enabled - the QM Sub Segments with correct IDs in the given String and stores it with the given Method in the entity
      * @param string $field
      */
@@ -815,5 +976,24 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             }
         }
         return $result;
+    }
+    
+    /**
+     * convenient method to get the task meta data
+     * @return editor_Models_Segment_Meta
+     */
+    public function meta() {
+        if(empty($this->meta)) {
+            $this->meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+        }
+        elseif($this->getId() == $this->meta->getSegmentId()) {
+            return $this->meta;
+        }
+        try {
+            $this->meta->loadBySegmentId($this->getId());
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            $this->meta->init(array('taskGuid' => $this->getTaskGuid(), 'segmentId' => $this->getId()));
+        }
+        return $this->meta;
     }
 }

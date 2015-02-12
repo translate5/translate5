@@ -312,8 +312,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     }
 
     /**
-     * Sets $this->_editSegment, $this->_matchRateSegment and $this->_autopropagated
-     * and $this->_pretransSegment and $this->_autoStateId for the segment currently worked on
+     * Sets $this->_matchRateSegment and $this->_autopropagated
+     * for the segment currently worked on
      *
      * @param string transunit
      */
@@ -556,7 +556,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         if (strpos($segment, '<')=== false) {
             return $segment;
         }
-        $data = new editor_Models_Import_FileParser_Sdlxliff_ParseSegmentData();
+        $data = ZfExtended_Factory::get('editor_Models_Import_FileParser_Sdlxliff_ParseSegmentData');
         $data->segment = preg_split('"(<[^>]*>)"', $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
         $data->segmentCount = count($data->segment);
         $openCountInTerm = 0;
@@ -651,7 +651,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      */
     protected function getTermTagDataWhileParsingSegment($data,$isSource) {
          $tag = $data->segment[$data->currentTermIndex];
-         $termTagData = new editor_Models_TermTagData();
+         $termTagData = ZfExtended_Factory::get('editor_Models_TermTagData');
          $termTagData->mid = preg_replace('"<.* mid=\"([^\"]*)\".*>"', '\\1', $tag);
          $termTagData->transFound = (strpos($tag, 'transNotFound')!== false?false:true);
          $termTagData->status = preg_replace('"<.* mtype=\"x-term-([^\"-]*)-trans[^\"]*\".*>"', '\\1', $tag);
