@@ -601,6 +601,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         //nothing to do
     }
     
+    /**
+     * Generates a unic id for a termEntry-element.
+     * If autoIds is set to false and there is an id in the tbx-file this id is used
+     * 
+     * @return string
+     */
     private function getIdTermEntry () {
         // detect on first call if IDs should be added
         if ($this->counterTermEntry == 0 && $this->addTermEntryIds) {
@@ -618,6 +624,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         return 'termEntry_'.str_pad($this->counterTermEntry, 7, '0', STR_PAD_LEFT);
     }
     
+    /**
+     * Generates a unic id for a tig-element.
+     * If autoIds is set to false and there is an id in the tbx-file this id is used
+     * 
+     * @return string
+     */
     private function getIdTig () {
         // detect on first call if IDs should be added
         if ($this->counterTig == 0 && $this->addTigIds) {
@@ -640,6 +652,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         return $tempReturn;
     }
     
+    /**
+     * Generates a unic id for a term-element.
+     * If autoIds is set to false and there is an id in the tbx-file this id is used
+     * 
+     * @return string
+     */
     private function getIdTerm () {
         // detect on first call if IDs should be added
         if ($this->counterTerm == 0 && $this->addTermIds) {
