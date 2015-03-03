@@ -151,24 +151,36 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         return $this->db->getAdapter()->fetchAll($query);
     }
     
+    /**
+     * returns all term mids of the given segment in a multidimensional array.
+     * First level contains source or target (the fieldname)
+     * Second level contains a list of arrays with the found mids and div tags,
+     *   the div tag is needed for transfound check 
+     * @param editor_Models_Task $task
+     * @param editor_Models_Segment $segment
+     * @return array
+     */
     protected function getTermMidsFromTaskSegment(editor_Models_Task $task, editor_Models_Segment $segment) {
         
         $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         /* @var $fieldManager editor_Models_SegmentFieldManager */
         $fieldManager->initFields($task->getTaskGuid());
         
-        $sourceFieldName = $fieldManager->getFirstSourceName();
-        $sourceText = $segment->get($sourceFieldName);
-        
+        //Currently only terminology is shown in the first fields see also TRANSLATE-461
         if ($task->getEnableSourceEditing()) {
             $sourceFieldName = $fieldManager->getEditIndex($fieldManager->getFirstSourceName());
+            $sourceText = $segment->get($sourceFieldName);
+        }
+        else {
+            $sourceFieldName = $fieldManager->getFirstSourceName();
             $sourceText = $segment->get($sourceFieldName);
         }
         
         $targetFieldName = $fieldManager->getEditIndex($fieldManager->getFirstTargetName());
         $targetText = $segment->get($targetFieldName);
         
-        $getTermIdRegEx = '/<div.*?data-tbxid="(term_.*?)".*?>/';
+        //tbxid should be sufficient as distinct identifier of term tags
+        $getTermIdRegEx = '/<div[^>]+data-tbxid="([^"]*)"[^>]*>/';
         preg_match_all($getTermIdRegEx, $sourceText, $sourceMatches, PREG_SET_ORDER);
         preg_match_all($getTermIdRegEx, $targetText, $targetMatches, PREG_SET_ORDER);
         
@@ -176,18 +188,15 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             return array();
         }
         
-        $termIds = array('source' => $sourceMatches, 'target' => $targetMatches);
-        
-        return $termIds;
+        return array('source' => $sourceMatches, 'target' => $targetMatches);
     }
     
     /**
-     * 
      * @param string $seg
      * @return type array values are the mids of the terms in the string
      */
     public function getTermMidsFromSegment(string $seg) {
-        $getTermIdRegEx = '/<div.*?data-tbxid="(term_.*?)".*?>/';
+        $getTermIdRegEx = '/<div[^>]+data-tbxid="([^"]*)"[^>]*>/';
         preg_match_all($getTermIdRegEx, $seg, $matches);
         return $matches[1];
     }
@@ -200,11 +209,11 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * 
      * @param string $taskGuid unic id of current task
      * @param array $termIds as 2-dimensional array('source' => array(), 'target' => array())
-     * @parma $sourceLang
+     * @param $sourceLang
      * 
      * @return array
      */
-    protected function getSortedTermGroups($taskGuid, array $termIds,  $sourceLang) {
+    protected function getSortedTermGroups($taskGuid, array $termIds, $sourceLang) {
         $sourceIds = array();
         $targetIds = array();
         $transFoundSearch = array();
