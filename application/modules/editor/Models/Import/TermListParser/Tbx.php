@@ -69,7 +69,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
      */
     protected $actualTermEntry;
 
-    /**
+   /**
      * Language string ID des aktuell bearbeiteten langSet Tags
      * @var string
      */
@@ -146,6 +146,14 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     
     protected $timer;
     
+    
+    /**
+     * If set to true, all IDs (termEntry, tig, term) are set automatically
+     * If set to false (not recomended at this moment) IDs will be quessed from the submitted tbx-file 
+     * @var boolean
+     */
+    protected $autoIds = true;
+    
     /**
      * Will be set in first <termEntry> of the tbx-file.
      * Detects if ids should be added to the termEntries or not 
@@ -154,15 +162,25 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     protected $addTermEntryIds = true;
     
     /**
+     * Will be set in first <tig> of the tbx-file.
+     * Detects if ids should be added to the terms or not 
+     * @var boolean
+     */
+    protected $addTigIds = true;
+    
+    /**
      * Will be set in first <term> of the tbx-file.
      * Detects if ids should be added to the terms or not 
      * @var boolean
      */
     protected $addTermIds = true;
     
+    
     protected $counterTermEntry = 0;
-    protected $counterTerm = 0;
     protected $counterTig = 0;
+    protected $counterTigInLangSet = 0;
+    protected $counterTerm = 0;
+    protected $counterTermInTig = 0;
     
     
     const TERM_INSERT_BLOCKSIZE = 15;
@@ -295,7 +313,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     }
 
     /**
-     * termEntry Element verarbeiten
+     * handle termEntry element
      */
     protected function handleTermEntry() {
         if(!$this->isStartTag()) {
@@ -307,7 +325,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             return;
         }
         
-        //Term Entry ID ablegen
+        // save actual termEntryId
         $this->actualTermEntry = $this->getIdTermEntry();            
         
         if(empty($this->actualTermEntry)) {
@@ -315,18 +333,18 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             return;
         }
         
-        //alles was kein termEntry ist verarbeiten.
-        //Wenn ein termEntry erreicht wird, ist das das EndTag des aktuellen Term Entries
+        // handle all inner elements of termEntry
         while($this->xml->read() && $this->xml->name !== 'termEntry') {
             switch($this->xml->name) {
                 case 'langSet':
                     $start = microtime(true);
-                    $this->counterTig = 0;
+                    $this->counterTigInLangSet = 0;
                     $this->handleLanguage();
                     $this->timer->langSet += (microtime(true) - $start);
                     break;
                 case 'tig':
                     $start = microtime(true);
+                    $this->counterTermInTig = 0;
                     $this->handleTig();
                     $this->timer->tig += (microtime(true) - $start);
                     break;
@@ -480,6 +498,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     protected function handleTig() {
         if($this->isStartTag()){
             $this->actualTig = array('mid' => null, 'term' => null, 'status' => null, 'definition' => null);
+            $this->actualTig['tigId'] = $this->getIdTig();
             return;
         }
         if(!$this->isEndTag()){
@@ -512,8 +531,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         
         
         $this->actualTig['mid'] = $this->getIdTerm();
-        
-        //$this->actualTig['term'] = $this->xml->readString();
         $this->actualTig['term'] = $this->xml->readInnerXml();
     }
 
@@ -587,7 +604,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     private function getIdTermEntry () {
         // detect on first call if IDs should be added
         if ($this->counterTermEntry == 0 && $this->addTermEntryIds) {
-            if (!empty($this->xml->getAttribute('id'))) {
+            if (!$this->autoIds && !empty($this->xml->getAttribute('id'))) {
                 $this->addTermEntryIds = false;
             }
         }
@@ -596,26 +613,53 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             return $this->xml->getAttribute('id');
         }
         
-        return 'termEntry_'.str_pad(++$this->counterTermEntry, 2, '0', STR_PAD_LEFT);
+        $this->counterTermEntry += 1;
+        
+        return 'termEntry_'.str_pad($this->counterTermEntry, 7, '0', STR_PAD_LEFT);
     }
-
-    private function getIdTerm () {
+    
+    private function getIdTig () {
         // detect on first call if IDs should be added
-        if ($this->counterTerm == 0 && $this->addTermIds) {
-            if (!empty($this->xml->getAttribute('id'))) {
-                $this->addTermIds = false;
+        if ($this->counterTig == 0 && $this->addTigIds) {
+            if (!$this->autoIds && !empty($this->xml->getAttribute('id'))) {
+                $this->addTigIds = false;
             }
         }
         
+        if ($this->addTigIds == false) {
+            return $this->xml->getAttribute('id');
+        }
+        
+        $this->counterTigInLangSet += 1;
+        $this->counterTig += 1;
+        
+        $tempReturn =   'tig_'.str_pad($this->counterTermEntry, 7, '0', STR_PAD_LEFT)
+                        .'_'.str_pad($this->counterTigInLangSet, 3, '0', STR_PAD_LEFT)
+                        .'_'.str_pad($this->counterTig, 7, '0', STR_PAD_LEFT)
+                        .'_'.$this->actualLang;
+        return $tempReturn;
+    }
+    
+    private function getIdTerm () {
+        // detect on first call if IDs should be added
+        if ($this->counterTerm == 0 && $this->addTermIds) {
+            if (!$this->autoIds && !empty($this->xml->getAttribute('id'))) {
+                $this->addTermIds = false;
+            }
+        }
         
         if ($this->addTermIds == false) {
             return $this->xml->getAttribute('id');
         }
         
-        $tempReturn =   'term_'.str_pad($this->counterTermEntry, 2, '0', STR_PAD_LEFT)
-                        .'_'.++$this->counterTig.'_'.$this->actualLang
-                        .'_1' // ??? what means this const number ???
-                        .'_'.str_pad(++$this->counterTerm, 5, '0', STR_PAD_LEFT);
+        $this->counterTermInTig += 1;
+        $this->counterTerm += 1;
+        
+        $tempReturn =   'term_'.str_pad($this->counterTermEntry, 7, '0', STR_PAD_LEFT)
+                        .'_'.str_pad($this->counterTigInLangSet, 3, '0', STR_PAD_LEFT)
+                        .'_'.$this->actualLang
+                        .'_'.str_pad($this->counterTermInTig, 3, '0', STR_PAD_LEFT)
+                        .'_'.str_pad($this->counterTerm, 7, '0', STR_PAD_LEFT);
         return $tempReturn;
     }
     
