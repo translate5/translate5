@@ -604,13 +604,13 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     /**
      * Generates a unic id for a termEntry-element.
      * If autoIds is set to false and there is an id in the tbx-file this id is used
-     * 
+     *
      * @return string
      */
-    private function getIdTermEntry () {
+    private function getIdTermEntry() {
         // detect on first call if IDs should be added
         if ($this->counterTermEntry == 0 && $this->addTermEntryIds) {
-            if (!$this->autoIds && !empty($this->xml->getAttribute('id'))) {
+            if (! $this->autoIds && ! empty($this->xml->getAttribute('id'))) {
                 $this->addTermEntryIds = false;
             }
         }
@@ -619,21 +619,22 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             return $this->xml->getAttribute('id');
         }
         
-        $this->counterTermEntry += 1;
+        $this->counterTermEntry++;
         
-        return 'termEntry_'.str_pad($this->counterTermEntry, 7, '0', STR_PAD_LEFT);
+        return 'termEntry_' . str_pad($this->counterTermEntry, 7, '0', STR_PAD_LEFT);
     }
-    
+
+
     /**
      * Generates a unic id for a tig-element.
      * If autoIds is set to false and there is an id in the tbx-file this id is used
-     * 
+     *
      * @return string
      */
-    private function getIdTig () {
+    private function getIdTig() {
         // detect on first call if IDs should be added
         if ($this->counterTig == 0 && $this->addTigIds) {
-            if (!$this->autoIds && !empty($this->xml->getAttribute('id'))) {
+            if (! $this->autoIds && ! empty($this->xml->getAttribute('id'))) {
                 $this->addTigIds = false;
             }
         }
@@ -642,26 +643,28 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             return $this->xml->getAttribute('id');
         }
         
-        $this->counterTigInLangSet += 1;
-        $this->counterTig += 1;
+        $this->counterTigInLangSet++;
+        $this->counterTig++;
         
-        $tempReturn =   'tig_'.str_pad($this->counterTermEntry, 7, '0', STR_PAD_LEFT)
-                        .'_'.str_pad($this->counterTigInLangSet, 3, '0', STR_PAD_LEFT)
-                        .'_'.str_pad($this->counterTig, 7, '0', STR_PAD_LEFT)
-                        .'_'.$this->actualLang;
-        return $tempReturn;
+        $tempId = 'tig'
+                  .'_'.str_pad($this->counterTermEntry, 7, '0', STR_PAD_LEFT)
+                  .'_'.str_pad($this->counterTigInLangSet, 3, '0', STR_PAD_LEFT)
+                  .'_'.str_pad($this->counterTig, 7, '0', STR_PAD_LEFT)
+                  .'_'.$this->actualLang;
+        return $tempId;
     }
-    
+
+
     /**
      * Generates a unic id for a term-element.
      * If autoIds is set to false and there is an id in the tbx-file this id is used
-     * 
+     *
      * @return string
      */
-    private function getIdTerm () {
+    private function getIdTerm() {
         // detect on first call if IDs should be added
         if ($this->counterTerm == 0 && $this->addTermIds) {
-            if (!$this->autoIds && !empty($this->xml->getAttribute('id'))) {
+            if (! $this->autoIds && ! empty($this->xml->getAttribute('id'))) {
                 $this->addTermIds = false;
             }
         }
@@ -670,15 +673,16 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             return $this->xml->getAttribute('id');
         }
         
-        $this->counterTermInTig += 1;
-        $this->counterTerm += 1;
+        $this->counterTermInTig++;
+        $this->counterTerm++;
         
-        $tempReturn =   'term_'.str_pad($this->counterTermEntry, 7, '0', STR_PAD_LEFT)
-                        .'_'.str_pad($this->counterTigInLangSet, 3, '0', STR_PAD_LEFT)
-                        .'_'.$this->actualLang
-                        .'_'.str_pad($this->counterTermInTig, 3, '0', STR_PAD_LEFT)
-                        .'_'.str_pad($this->counterTerm, 7, '0', STR_PAD_LEFT);
-        return $tempReturn;
+        $tempId = 'term'
+                  .'_'.str_pad($this->counterTermEntry, 7, '0', STR_PAD_LEFT)
+                  .'_'.str_pad($this->counterTigInLangSet, 3, '0', STR_PAD_LEFT)
+                  .'_'.$this->actualLang
+                  .'_'.str_pad($this->counterTermInTig, 3, '0', STR_PAD_LEFT)
+                  .'_'.str_pad($this->counterTerm, 7, '0', STR_PAD_LEFT);
+        return $tempId;
     }
     
 }
