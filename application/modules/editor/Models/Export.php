@@ -158,6 +158,20 @@ class editor_Models_Export {
     }
     
     /**
+     * returns a fileparser for the given task and filename
+     * @param editor_Models_Task $task
+     * @param string $filename
+     * @return editor_Models_Import_FileParser
+     */
+    public function getFileParserForXmlList(editor_Models_Task $task, $filename) {
+        $this->task = $task;
+        $this->taskGuid = $task->getTaskGuid();
+        $this->optionDiff = false;
+        return $this->getFileParser(0, $filename);
+        return $this->getFileParser(0, $filename.'.sdlxliff');
+    }
+    
+    /**
      * exports the task as zipfile export.zip in the taskData
      * returns the path to the generated Zip File
      * @return string

@@ -97,6 +97,13 @@ abstract class editor_Models_Export_FileParser {
      * @var ZfExtended_Zendoverwrites_Translate
      */
     protected $translate;
+    
+    /**
+     * Disables the MQM Export if needed
+     * @var boolean
+     */
+    protected $disableMqmExport = false;
+    
     /**
      * 
      * @param integer $fileId
@@ -326,6 +333,14 @@ abstract class editor_Models_Export_FileParser {
         if($count==1) return $segment;
         $i = 1;
         
+        //if disabled we return the segment content without mqm
+        if($this->disableMqmExport) {
+            for (; $i < $count; $i=$i+2) {//the uneven numbers are the tags
+                $split[$i] = ''; //remove mqm tag
+            }
+            return implode('', $split);
+        }
+        
         $check = function($type,$content,$input,$empty = true){
             if($empty && $content == ''){
                 trigger_error($type.' had been emtpy when extracting from qm-subsegment-tag.',E_USER_ERROR);
@@ -416,11 +431,12 @@ abstract class editor_Models_Export_FileParser {
     }
     
     /**
-     * Exports a single segment content 
+     * Exports a single segment content, without MQM support!
      * @param string $segment
      * @return string
      */
     public function exportSingleSegmentContent($segment) {
+        $this->disableMqmExport = true;
         return $this->recreateTermTags($this->parseSegment($segment));
     }
     

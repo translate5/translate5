@@ -176,7 +176,8 @@ class editor_Models_Converter_XmlSegmentList {
         $this->result[] = '<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dx="http://www.interoperability-now.org/schema" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-doc-1_0_extensions.xsd" dx:version="1.4" xmlns:translate5="http://www.translate5.net/" '.$taskname.'>';
         $this->result[] = '<!-- attention: currently the usage of g- and x-tags in this doc is not completely in line with the xliff:doc-spec. This will change, when resources for this issue will be assigned -->';
         $this->result[] = '<!-- attention: we know, that the structure of this document is not complete regarding xliff:doc-spec. This will change, when resources for this issue will be assigned -->';
-        $this->result[] = '<!-- attention: regarding internal tags the source and the target-content are in the same format as the contents of the original source formats would have been. For SDLXLIFF this means: No mqm-Tags; Terms marked with <mrk type="x-term-...">-Tags; Internal Tags marked with g- and x-tags; For CSV this means: No internal tags except mqm-tags -->';
+        $this->result[] = '<!-- attention: regarding internal tags the source and the target-content are in the same format as the contents of the original source formats would have been. For SDLXLIFF this means: No mqm-Tags; Terms marked with <mrk type="x-term-...">-Tags; Internal Tags marked with g- and x-tags; For CSV this means: all content is exported as it comes from CSV, this can result in invalid XLIFF! -->';
+        $this->result[] = '<!-- attention: MQM Tags are not exported at all! -->';
     }
     
     /**
@@ -188,7 +189,9 @@ class editor_Models_Converter_XmlSegmentList {
         if(empty($segmentsOfFile)) {
             return;
         }
-        $this->exportParser = ZfExtended_Factory::get('editor_Models_Export_FileParser_Sdlxliff', array(0, false, $this->task, $filename));
+        $export = ZfExtended_Factory::get('editor_Models_Export');
+        /* @var $export editor_Models_Export */
+        $this->exportParser = $export->getFileParserForXmlList($this->task, $filename);
         $file = '<file original="%1$s" source-language="%2$s" target-language="%3$s" xml:space="preserve">';
         $this->result[] = sprintf($file, htmlspecialchars($filename), $this->data['sourceLang'], $this->data['targetLang']);
         $this->result[] = '<body>';
