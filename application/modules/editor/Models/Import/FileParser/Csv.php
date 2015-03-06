@@ -117,15 +117,18 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         // check taskTemplate for options (check if tag-protection or regExes-protection is set)
         $taskConfig = Zend_Registry::get('taskTemplate');
         $className = __CLASS__;
-        if (!isset($taskConfig->import->fileparser->$className)) {
+        
+        $fpConf = $taskConfig->import->fileparser;
+        if (!isset($fpConf->$className)) {
             return;
         }
         
-        if (isset($taskConfig->import->fileparser->$className->options->protectTags)) {
-            $this->tagProtection = $taskConfig->import->fileparser->$className->options->protectTags;
+        $options = $fpConf->$className->options;
+        if (isset($options->protectTags)) {
+            $this->tagProtection = $options->protectTags;
         }
-        if (isset($taskConfig->import->fileparser->$className->options->regexes->regex)) {
-            $this->addReplaceRegularExpression($taskConfig->import->fileparser->$className->options->regexes->regex->toArray());
+        if (isset($options->regexes->regex)) {
+            $this->addReplaceRegularExpression($options->regexes->regex->toArray());
         }
     }
     
@@ -143,7 +146,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
                 $log = ZfExtended_Factory::get('ZfExtended_Log');
                 /* @var $log ZfExtended_Log */
                 $message = (__CLASS__.' -> '.__FUNCTION__.'; CSV-import: invalid regularExpression '.$regEx);
-                $log->logError('invalaid regular expression', $message);
+                $log->logError('invalid regular expression', $message);
                 continue;
             }
             $this->replaceRegularExpressions[] = $regEx;
