@@ -118,12 +118,11 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         $taskConfig = Zend_Registry::get('taskTemplate');
         $className = __CLASS__;
         
-        $fpConf = $taskConfig->import->fileparser;
-        if (!isset($fpConf->$className)) {
+        if (!isset($taskConfig->import->fileparser->$className)) {
             return;
         }
+        $options = $taskConfig->import->fileparser->$className->options;
         
-        $options = $fpConf->$className->options;
         if (isset($options->protectTags)) {
             $this->tagProtection = $options->protectTags;
         }
@@ -133,7 +132,6 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     }
     
     protected function addReplaceRegularExpression (array $regExes) {
-        
         if (empty($regExes)) {
             return;
         }
