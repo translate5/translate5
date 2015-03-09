@@ -240,8 +240,9 @@ abstract class editor_Models_Export_FileParser {
             return $this->segmentCache[$segmentId];
         }
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        $segment->load($segmentId);
         /* @var $segment editor_Models_Segment */
-        $this->segmentCache[$segmentId] = $segment->load($segmentId);
+        $this->segmentCache[$segmentId] = $segment;
         //we keep a max of 50 segments, this should be enough
         if(count($this->segmentCache) > 50) {
             reset($this->segmentCache);
