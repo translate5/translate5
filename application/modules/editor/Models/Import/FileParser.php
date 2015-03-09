@@ -324,9 +324,9 @@ abstract class editor_Models_Import_FileParser {
           "\r"
         );
         $replace = array(
-          '<hardReturn />',
-          '<softReturn />',
-          '<macReturn />'
+          '<hardReturn/>',
+          '<softReturn/>',
+          '<macReturn/>'
         );
         $i = 0;
         foreach($split as $idx => $chunk) {

@@ -448,9 +448,9 @@ abstract class editor_Models_Export_FileParser {
      */
     protected function unprotectWhitespace($content) {
         $search = array(
-          '<hardReturn />',
-          '<softReturn />',
-          '<macReturn />'
+          '<hardReturn/>',
+          '<softReturn/>',
+          '<macReturn/>'
         );
         $replace = array(
           "\r\n",  

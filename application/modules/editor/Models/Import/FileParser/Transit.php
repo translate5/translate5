@@ -453,9 +453,9 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     protected function parseWhitespace() {
         //@TODO: This should be removed here and in other fileParsers and moved to parent fileParser- antipattern. This must be done after merge in master due to things already done at this part there
         $search = array(
-                '#<hardReturn />#',
-                '#<softReturn />#',
-                '#<macReturn />#',
+                '#<hardReturn/>#',
+                '#<softReturn/>#',
+                '#<macReturn/>#',
                 '#<space ts="[^"]*"/>#',
         );
         for($i = 0; $i < $this->segmentPartsCount; $i++) {

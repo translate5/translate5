@@ -353,9 +353,9 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         
         //In CSV we have to directly replace our whitespace tags with their HTML replacement
         $search = array(
-            '#<hardReturn />#',
-            '#<softReturn />#',
-            '#<macReturn />#',
+            '#<hardReturn/>#',
+            '#<softReturn/>#',
+            '#<macReturn/>#',
             '#<space ts="[^"]*"/>#'
         );
         
