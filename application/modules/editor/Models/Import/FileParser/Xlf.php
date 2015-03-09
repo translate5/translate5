@@ -289,9 +289,9 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             {
                 // Other replacement
                 $search = array(
-                        '#<hardReturn />#',
-                        '#<softReturn />#',
-                        '#<macReturn />#',
+                        '#<hardReturn/>#',
+                        '#<softReturn/>#',
+                        '#<macReturn/>#',
                         '#<space ts="[^"]*"/>#',
                 );
                 
