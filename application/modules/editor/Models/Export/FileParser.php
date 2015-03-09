@@ -410,6 +410,11 @@ abstract class editor_Models_Export_FileParser {
             $isRegexTag = $segmentArr[$i+2] == "regex";
             $segmentArr[$i] = pack('H*', $segmentArr[$i + 1]);
             if (!$isRegexTag) {
+                //the following search and replace is needed for TRANSLATE-464
+                //backwards compatibility of already imported tasks
+                $search = array('hardReturn /','softReturn /','macReturn /');
+                $replace = array('hardReturn/','softReturn/','macReturn/');
+                $segmentArr[$i] = str_replace($search, $replace, $segmentArr[$i]);
                 $segmentArr[$i] = '<' . $segmentArr[$i] .'>';
             }
             
