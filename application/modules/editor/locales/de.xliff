@@ -713,6 +713,7 @@ Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-M
 <trans-unit id='VHJvdHpkZW0gc3BlaWNoZXJu'><source>Trotzdem speichern</source><target>Trotzdem speichern</target></trans-unit>
 <trans-unit id='QWNjdXJlZWVlZWVlYWN5'><source>Accureeeeeeeacy</source><target>Accureeeeeeeacy</target></trans-unit>
 <trans-unit id='RmlsZSAnJXZhbHVlJScgd2FzIG5vdCB1cGxvYWRlZA=='><source>File '%value%' was not uploaded</source><target>File '%value%' was not uploaded</target></trans-unit>
+<trans-unit id='JyV2YWx1ZSUnIGRvZXMgbm90IG1hdGNoIHRoZSBleHBlY3RlZCBzdHJ1Y3R1cmUgZm9yIGEgRE5TIGhvc3RuYW1l'><source>'%value%' does not match the expected structure for a DNS hostname</source><target>'%value%' does not match the expected structure for a DNS hostname</target></trans-unit>
   </body>
  </file>
 </xliff>
