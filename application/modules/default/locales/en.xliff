@@ -51,6 +51,10 @@
   <source>Ein spezieller Dank geht an <a href="http://www.logrus.ru/" target="_blank">Logrus International</a> für die fortwährende Förderung von Open Source Software in der Übersetzungsbranche.</source>
   <target>A special thank you to <a href="http://www.logrus.ru/" target="_blank">Logrus International</a> for their ongoing promotion of Open Source Software in the Language Industry.</target>
 </trans-unit>
+<trans-unit id='Qml0dGUgc3RhcnRlbiBTaWUgenVuw6RjaHN0IGRlbiBvcGVuVE1TdGVybVRhZ2dlciB2aWEgV2luZG93cyBTdGFydCBNZW7DvC4gU29uc3Qgd2lyZCBkaWUgKGFrdGl2aWVydGUpIEF1c3plaWNobnVuZyB2b24gVGVybWlub2xvZ2llIG5pY2h0IGZ1bmt0aW9uaWVyZW4gdW5kIHp1IEZlaGxlcm4gZsO8aHJlbi4='>
+  <source>Bitte starten Sie zunächst den openTMStermTagger via Windows Start Menü. Sonst wird die (aktivierte) Auszeichnung von Terminologie nicht funktionieren und zu Fehlern führen.</source>
+  <target>Please start openTMStermTagger via Windows Start Menu. Otherwhise the (currently active) tagging of terminology will lead to errors.</target>
+</trans-unit>
         </body>
     </file>
 <!-- ids are base64-encoded --></xliff>
