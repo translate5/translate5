@@ -32,8 +32,8 @@
              with FLOSS exceptions (see floss-exception.txt and ux-exception.txt at the root level)
  
  END LICENSE AND COPYRIGHT
- 
-  
+ */
+/**
   README: 
   This script converts the paths of referencefiles in the database as described in TRANSLATE-217.
   The script is to be used in commandline, and has to be called like that:
