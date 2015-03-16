@@ -1,3 +1,10 @@
+--  /*
+--  START LICENSE AND COPYRIGHT
+--
+--  WILL BE REPLACED!
+--
+--  END LICENSE AND COPYRIGHT 
+--  */
 delete from Zf_configuration where name = 'runtimeOptions.termTagger.javaExec';
 delete from Zf_configuration where name = 'runtimeOptions.termTagger.dir';
 
