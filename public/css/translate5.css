@@ -60,7 +60,7 @@ h2{font-size:1.2em;}
     color: red;
 }
 #header {height:150px;}
-#header h1 {height:150px;background: url(../images/logo_t5_2013.png?v=3) no-repeat left top #ffffff;padding:0;margin:0;}
+#header h1 {height:150px;background: url(../images/logo_t5_2015.png?v=1) no-repeat left top #ffffff;padding:0;margin:0;}
 #header h1 span {display:none;}
 h1 {font-size: 17px;}
 th {text-align:left;}
@@ -77,6 +77,7 @@ th {text-align:left;}
 #footer {border-top:1px solid #e8a33c;padding:1em;}
 
 #content .main {width:500px;float:left;}
+#content hr {border-style:solid;border-color:#e8a33c;border-width:1px 0px 0px 0px;margin:20px 0px;}
 #content .sidebar{width:200px;margin-left:540px;}
 #content .sidebar .teaser {padding:5px;border:1px solid #efefef;margin-bottom:10px;}
 #content .sidebar p,#content .sidebar h2 {margin-top:0;}
