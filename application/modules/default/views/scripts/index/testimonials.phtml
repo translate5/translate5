@@ -1,0 +1,107 @@
+<?php
+ /*
+ START LICENSE AND COPYRIGHT
+ 
+ This file is part of Translate5 Editor PHP Serverside and build on Zend Framework
+ 
+ Copyright (c) 2013 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ÄTT) MittagQI.com
+
+ This file may be used under the terms of the GNU General Public License version 3.0
+ as published by the Free Software Foundation and appearing in the file gpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU General Public License version 3.0 requirements will be met:
+ http://www.gnu.org/copyleft/gpl.html.
+
+ For this file you are allowed to make use of the same FLOSS exceptions to the GNU 
+ General Public License version 3.0 as specified by Sencha for Ext Js. 
+ Please be aware, that Marc Mittag / MittagQI take no warranty  for any legal issue, 
+ that may arise, if you use these FLOSS exceptions and recommend  to stick to GPL 3. 
+ For further information regarding this topic please see the attached license.txt
+ of this software package.
+ 
+ MittagQI would be open to release translate5 under EPL or LGPL also, if this could be
+ brought in accordance with the ExtJs license scheme. You are welcome to support us
+ with legal support, if you are interested in this.
+ 
+ 
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU General Public License version 3.0 http://www.gnu.org/copyleft/gpl.html
+             with FLOSS exceptions (see floss-exception.txt and ux-exception.txt at the root level)
+ 
+ END LICENSE AND COPYRIGHT 
+ */
+
+/**#@+
+ * @author Marc Mittag
+ * @package trantlate5
+ * @version 0.7
+ *
+ */
+$session = new Zend_Session_Namespace();
+?>
+<h1>Testimonials</h1>
+<p>In English language only.</p>
+
+<div class="main">
+<p>
+    beo uses translate5 for proofreading and editing in its quality assurance processes for translations, 
+    as well as for translator evaluation using the feedback and error assessment function. 
+    Our clients use translate5 via our beoSphere portal in approval processes, 
+    for evaluation and for adapting certain documents to their target markets.
+</p>
+<p>
+This is all achieved at no extra cost, online and in an environment which is perfectly adjusted to the task. 
+With translate5, we can turn arduous side tasks into a valuable service.
+</p>
+
+<p>
+(Michael Schneider, beo Gesellschaft für Sprachen und Technologie mbH)</p>
+</p>
+<hr/>
+<p>
+    itl uses translate5
+</p>
+<p>
+    itl has been using the editing portal translate5 for two years. 
+    The main area of use is in client-side editing of our translations in the respective markets.
+</p>
+<p>
+    This client editing is the last step of the process before publication and 
+    often caused a disproportionately large workload before we introduced translate5. 
+    The editors made comments on the translations in the PDF files in a very individual way. 
+    In addition, the corrections then had to be manually transferred into the 
+    respective translation memory through copy and paste, which was extremely time-consuming and sometimes led to translation errors.
+</p>
+<p>
+    translate5 allows us to partially automate this process. Errors are virtually eliminated and the editors now have to comply much more closely with the clearly defined specifications. Together with our translation management system [i]-flow and the client portal [i]-gate, we can offer our clients a free and efficient solution for editing from which everyone can benefit.
+</p>
+<p>(Peter Kreitmeier, itl AG)</p>
+<hr/>
+<p>
+    translate5 is a perfect match for our post-editing processes. 
+    It is a well-adapted user interface, independent from other translation tools, 
+    with enhanced tagging functionality to better retrain and optimize MT machinery after post-editing. 
+    The terminology functions and the many ways of displaying content lead to maximum support for the post-editors. 
+    An interface to translation memories is all that is missing to make translate5 the perfect post-editing client.
+</p>
+<p>(Maxim Khalilov, bmmt GmbH)</p>
+</div>
+<div class="sidebar">
+    <div class="teaser">
+        <h2><?php echo $this->translate->_('Infos zu translate5 auf MittagQI.com'); ?></h2>
+        <ul>
+            <li><a href="http://www.mittagqi.com/translate5/features" target="_blank"><?php echo $this->translate->_('Features'); ?></a></li>
+            <li><a href="http://www.mittagqi.com/translate5/customizing" target="_blank"><?php echo $this->translate->_('Entwicklung'); ?></a></li>
+            <li><a href="http://www.mittagqi.com/translate5/installations-hosting" target="_blank"><?php echo $this->translate->_('Installationen &amp; Hosting'); ?></a></li>
+            <li><a href="http://www.mittagqi.com/translate5/maintenance-contract" target="_blank"><?php echo $this->translate->_('Support &amp; Updates'); ?></a></li>
+            <li><a href="http://www.mittagqi.com/newsletter" target="_blank"><?php echo $this->translate->_('Newsletter'); ?></a></li>
+        </ul>
+    </div>
+    <?php
+    echo $this->render('index/betanotice.phtml');
+    ?>
+</div>
+<div class="clear">&nbsp;</div>
