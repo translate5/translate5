@@ -47,14 +47,14 @@ UPDATE  `Zf_configuration` SET  `default` =  '["http://localhost:9001","http://l
 UPDATE  `Zf_configuration` SET  `default` =  '["http://localhost:9003"]' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.url.gui";
 -- UPDATE  `Zf_configuration` SET  `value` =  '["http://localhost:9003"]' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.url.gui";
 
-UPDATE  `translate5`.`Zf_configuration` SET  `default` =  '50' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.segmentsPerCall";
+UPDATE  `Zf_configuration` SET  `default` =  '50' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.segmentsPerCall";
 
--- UPDATE  `translate5`.`Zf_configuration` SET  `value` =  '50' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.segmentsPerCall";
+-- UPDATE  `Zf_configuration` SET  `value` =  '50' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.segmentsPerCall";
 
-UPDATE  `translate5`.`Zf_configuration` SET  `default` =  '1000' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.tbxParsing";
+UPDATE  `Zf_configuration` SET  `default` =  '1000' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.tbxParsing";
 
--- UPDATE  `translate5`.`Zf_configuration` SET  `value` =  '1000' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.tbxParsing";
+-- UPDATE  `Zf_configuration` SET  `value` =  '1000' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.tbxParsing";
 
-UPDATE  `translate5`.`Zf_configuration` SET  `default` =  '1000' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.segmentTagging";
+UPDATE  `Zf_configuration` SET  `default` =  '1000' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.segmentTagging";
 
--- UPDATE  `translate5`.`Zf_configuration` SET  `value` =  '1000' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.segmentTagging";
+-- UPDATE  `Zf_configuration` SET  `value` =  '1000' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.segmentTagging";
