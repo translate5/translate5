@@ -43,6 +43,8 @@
 /**
  * Plugin Bootstrap for Segment Statistics Plugin
  * Creates Statistics for editable segments only!
+ * 
+ * WARNING: statistics of non editable segments are deleted!!!!
  */
 class editor_Plugins_SegmentStatistics_BootstrapEditableOnly extends editor_Plugins_SegmentStatistics_Bootstrap {
     /**
@@ -53,6 +55,8 @@ class editor_Plugins_SegmentStatistics_BootstrapEditableOnly extends editor_Plug
         $this->blocks('editor_Plugins_SegmentStatistics_Bootstrap');
         $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'));
         $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImportCleanup'), -11000);
+        $this->eventManager->attach('editor_Models_Export', 'afterExport', array($this, 'handleAfterExport'));
+        $this->eventManager->attach('editor_Models_Export', 'afterExport', array($this, 'handleAfterExportCleanup'), -11000);
     }
     
     /**
@@ -60,6 +64,14 @@ class editor_Plugins_SegmentStatistics_BootstrapEditableOnly extends editor_Plug
      * @param $event Zend_EventManager_Event
      */
     public function handleAfterImportCleanup(Zend_EventManager_Event $event) {
-        $this->callWorker($event->getParam('task'), 'editor_Plugins_SegmentStatistics_CleanUpWorker');
+        $this->callWorker($event->getParam('task'), 'editor_Plugins_SegmentStatistics_CleanUpWorker', editor_Plugins_SegmentStatistics_CleanUpWorker::TYPE_IMPORT);
+    }
+    
+    /**
+     * handler for event: editor_Models_Export#afterExport
+     * @param $event Zend_EventManager_Event
+     */
+    public function handleAfterExportCleanup(Zend_EventManager_Event $event) {
+        $this->callWorker($event->getParam('task'), 'editor_Plugins_SegmentStatistics_CleanUpWorker', editor_Plugins_SegmentStatistics_CleanUpWorker::TYPE_EXPORT);
     }
 }
