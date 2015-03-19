@@ -51,6 +51,8 @@ class editor_Plugins_SegmentStatistics_CleanUpWorker extends editor_Plugins_Segm
         $segDb = ZfExtended_Factory::get('editor_Models_Db_Segments');
         /* @var $segDb editor_Models_Db_Segments */
         
+        $this->setType();
+        
         $select = $segDb->select()
             ->from($segDb, array('id'))
             ->where('taskGuid = ?', $this->taskGuid)
@@ -61,6 +63,7 @@ class editor_Plugins_SegmentStatistics_CleanUpWorker extends editor_Plugins_Segm
         
         $delete = 'DELETE FROM '.$table;
         $delete .= ' WHERE '.$adapter->quoteInto('taskGuid = ?', $this->taskGuid);
+        $delete .= ' AND '.$adapter->quoteInto('type = ?', $this->type);
         $delete .= ' AND segmentId IN ('.$select.')'; 
         
         $adapter->query($delete);

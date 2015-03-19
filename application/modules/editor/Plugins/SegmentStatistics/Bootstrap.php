@@ -47,6 +47,7 @@ class editor_Plugins_SegmentStatistics_Bootstrap extends ZfExtended_Plugin_Abstr
     public function init() {
         $this->blocks('editor_Plugins_SegmentStatistics_BootstrapEditableOnly');
         $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'));
+        $this->eventManager->attach('editor_Models_Export', 'afterExport', array($this, 'handleAfterExport'));
     }
     
     /**
@@ -54,12 +55,25 @@ class editor_Plugins_SegmentStatistics_Bootstrap extends ZfExtended_Plugin_Abstr
      * @param $event Zend_EventManager_Event
      */
     public function handleAfterImport(Zend_EventManager_Event $event) {
-        $this->callWorker($event->getParam('task'), 'editor_Plugins_SegmentStatistics_Worker');
+        $this->callWorker($event->getParam('task'), 'editor_Plugins_SegmentStatistics_Worker', editor_Plugins_SegmentStatistics_Worker::TYPE_IMPORT);
+    }
+    /**
+     * handler for event: editor_Models_Export#afterExport
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleAfterExport(Zend_EventManager_Event $event) {
+        $this->callWorker($event->getParam('task'), 'editor_Plugins_SegmentStatistics_Worker', editor_Plugins_SegmentStatistics_Worker::TYPE_EXPORT);
     }
     
-    protected function callWorker(editor_Models_Task $task, $worker) {
+    /**
+     * @param editor_Models_Task $task
+     * @param string $worker worker class name
+     * @param string $type im- or export
+     */
+    protected function callWorker(editor_Models_Task $task, $worker, $type) {
         $worker = ZfExtended_Factory::get($worker);
-        $worker->init($task->getTaskGuid());
+        /* @var $worker editor_Plugins_SegmentStatistics_Worker */
+        $worker->init($task->getTaskGuid(), array('type' => $type));
         $worker->queue();
     }
 }

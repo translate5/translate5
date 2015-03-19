@@ -325,7 +325,7 @@ class editor_Models_SegmentFieldManager {
     }
     
     /**
-     * returns the editable Data Index to a given field name, false if field does not exists or is not editable!
+     * returns the editable Data Index to a given field name, false if field does not exists!
      * @param string $name
      * @return string|false
      */

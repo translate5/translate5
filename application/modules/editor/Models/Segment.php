@@ -996,4 +996,25 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         return $this->meta;
     }
+    
+    /**
+     * returns the statistics summary for the given taskGuid
+     * @param string $taskGuid
+     * @return array id => fileId, value => segmentsPerFile count
+     */
+    public function calculateSummary($taskGuid) {
+        $cols = array('fileId', 'segmentsPerFile' => 'COUNT(id)');
+        $s = $this->db->select()
+            ->from($this->db, $cols)
+            ->where('taskGuid = ?', $taskGuid)
+            ->group('fileId');
+        $rows = $this->db->fetchAll($s);
+        
+        $result = array();
+        foreach($rows as $row) {
+            $result[$row->fileId] = $row->segmentsPerFile;
+        }
+        return $result;
+    }
+    
 }
