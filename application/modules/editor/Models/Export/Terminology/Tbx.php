@@ -106,7 +106,7 @@ class editor_Models_Export_Terminology_Tbx implements editor_Models_Export_Termi
         $head = $this->tbx->addChild('martifHeader');
         $fileDesc = $head->addChild('fileDesc');
         $sourceDesc = $fileDesc->addChild('sourceDesc');
-        $sourceDesc->addChild('p', 'TBX recovered from Translate5 DB '.date('Y-m-d H:i:s'));
+        $sourceDesc->addChild('p', 'TBX recovered from Translate5 DB');
         $text = $this->tbx->addChild('text');
         return $text->addChild('body');
     }
