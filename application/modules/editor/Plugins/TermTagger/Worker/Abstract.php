@@ -145,6 +145,11 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
     }
      */
     protected function markTransFound(array $segments) {
+        //TODO: this config and return can be removed after finishing the initial big transit project
+        $config = Zend_Registry::get('config');
+        if(!empty($config->runtimeOptions->termTagger->markTransFoundLegacy)) {
+            return $segments;
+        }
         foreach ($segments as &$seg) {
             //remove potentially incorrect transFound or transNotFound as inserted by termtagger
             $seg->source = preg_replace('" ?transN?o?t?Found ?"', ' ', $seg->source);
