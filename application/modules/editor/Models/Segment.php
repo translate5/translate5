@@ -246,12 +246,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     public function stripTermTags($segmentContent) {
         try {
-            $seg = qp('<div id="root">'.$segmentContent.'</div>', NULL, array('format_output' => false));
-        
+            $seg = qp('<div>'.$segmentContent.'</div>', NULL, array('format_output' => false));
+            /* @var $seg QueryPath\\DOMQuery */
             foreach ($seg->find('div.term') as $element){
                 $element->replaceWith($element->innerHTML());
             }
-            $seg = $seg->find('div#root');
+            $seg = $seg->top();
             $segmentContent = $seg->innerHTML();
         } catch (Exception $exc) {
             $log = new ZfExtended_Log();
