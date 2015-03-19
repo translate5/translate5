@@ -40,17 +40,9 @@
  * @version 1.0
  */
 
-/* TODO: !!!
- * 
- * ??? wie Import abbrechen ???
- * exit; geht nicht, da ja bei einer ZIP-Verabreitung die restlichen Dateien nicht berücksichtigt werden.
- * return in parse() stoppt lediglich den Import der Segmente. Die Datei und damit der Task bleibt trotzdem bestehen.
- * 
- */
 
 /**
- * Enthält Methoden zum Fileparsing für den Import von IBM-XLIFF-Dateien
- *
+ * Fileparsing for import of IBM-XLIFF files
  *
  */
 class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParser
@@ -61,7 +53,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     
     
     /**
-     * Initiert Tagmapping
+     * Init tagmapping
      */
     public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task)
     {
@@ -83,9 +75,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     }
     
     /**
-     * Adds the ibm-xlif specific tagmappings
-     * 
-     * 
+     * Adds the ibm-xliff specific tagmappings
+     * There exist just one: "ph"
      */
     private function addXlfTagMappings()
     {
@@ -98,9 +89,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     
     
     /**
-     * übernimmt das eigentliche FileParsing
-     *
-     * - ruft untergeordnete Methoden für das Fileparsing auf, wie extractSegment, setSegmentAttribs
+     * Global parsing method.
+     * Calls sub-methods to do the job.
      */
     protected function parse()
     {
@@ -108,21 +98,22 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         
         if (strpos($this->_origFileUnicodeProtected, $this->ibmXliffNeedle) === false)
         {
-            /* @var $log ZfExtended_Log */
             $msg = 'Die Datei ' . $this->_fileName . ' ist keine gültige IBM-Xliff Datei! ('.$this->ibmXliffNeedle.' nicht enthalten)';
             $log = ZfExtended_Factory::get('ZfExtended_Log');
+            /* @var $log ZfExtended_Log */
             $log->logError($msg);
             return;
         } 
         
-        //gibt die Verschachtelungstiefe der <group>-Tags an
+        // contains depth of <group>-tags
         $groupLevel = 0;
-        //array, in dem die Verschachtelungstiefe der Group-Tags in Relation zu ihrer
-        //Einstellung des translate-Defaults festgehalten wird
-        //der Default wird auf true gesetzt
+        // array, in dem die Verschachtelungstiefe der Group-Tags in Relation zu ihrer
+        // Einstellung des translate-Defaults festgehalten wird
+        // der Default wird auf true gesetzt
+        // ??? what does this mean (in english) ???
         $translateGroupLevels = array($groupLevel - 1 => true);
         
-        // TRANSLATE-284 SBE: Unterteilung in Gruppen bei IBM-XLIFF eigentlich nicht vorhanden, da es aber nicht stört verbleibt es hier.
+        // TRANSLATE-284: Separation in groups does not exist in ibm-xliff. While it does not interfere, it stays here for analogie to sdl-xliff import. 
         $groups = explode('<group', $this->_origFileUnicodeProtected);
         $counterTrans = 0;
         
@@ -190,13 +181,13 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     
     
     /**
-     * Extrahiert aus einem durch parseFile erzeugten Code-Schnipsel mit genau einer trans-unit 
-     * Quell- und Zielsegmente
+     * sub-method of parse();
+     * extract source- and target-segment from a trans-unit element
+     * adn saves this segements into databse
      *
-     * - speichert die Segmente in der Datenbank
      * @param array $transUnit
-     * @return array $transUnit enthält anstelle der Segmente die Replacement-Tags <lekSourceSeg id=""/> und <lekTargetSeg id=""/>
-     *         wobei die id die ID des Segments in der Tabelle Segments darstellt
+     * @return array $transUnit contains replacement-tags <lekSourceSeg id=""/> and <lekTargetSeg id=""/>
+     *          instead of the original segment content. attribut id contains the is of db-table LEK_segments
      */
     protected function extractSegment($transUnit)
     {
@@ -225,12 +216,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     }
     
     /**
-     * Extrahiert aus einem durch parseFile erzeugten Code-Schnipsel mit genau einer trans-unit
-     * den WordCount, also die Anzahl an Wörtern welche im Tag <count> hinterlegt ist.
+     * sub-method of parse();
+     * detects wordcount in a trans-unit element.
+     * sums up wordcount for the whole file in $this->wordCount
      * 
-     * Diese Anzahl wird dann in der privaten Variablen $this->wordCount aufsummiert.
-     * 
-     * Beispiel: <count count-type="word count" unit="word">13</count>
+     * Sample of wordcount provided by a trans-unit: <count count-type="word count" unit="word">13</count>
      *
      * @param array $transUnit
      */
@@ -242,12 +232,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     
     
     /**
-     * Konvertiert in einem Segment (bereits ohne umschließende Tags) die PH-Tags für ExtJs
-     *
+     * sub-method of extractSegment();
+     * convert ph-tags to ExtJs-compatible tags in a segment
      *
      * @param string $segment
-     * @return string $segment enthält anstelle der Tags die vom JS benötigten Replacement-Tags
-     *         wobei die id die ID des Segments in der Tabelle Segments darstellt
+     * @return string $segment with replaced (ExtJs-compatible) tags
      */
     protected function parseSegment($segment, $isSource)
     {

@@ -41,7 +41,7 @@
  *
 
 /**
- * Export for Xlf uses same parser as for Sdlxliff
+ * Export for Xlf uses same parser as Sdlxliff
  */
 
 class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParser_Sdlxliff
