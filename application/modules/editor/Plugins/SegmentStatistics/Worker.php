@@ -169,7 +169,6 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
         }
         
         $filename = $task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.$this->getFileName();
-        $filename = '/tmp/foo.xml';
         $xml->asXML($filename);
     }
     

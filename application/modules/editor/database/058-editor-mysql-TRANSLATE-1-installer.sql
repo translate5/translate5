@@ -33,28 +33,28 @@
 --  END LICENSE AND COPYRIGHT 
 --  */
 -- 
-UPDATE `Zf_configuration` SET  `default` =  'modules/editor/ThirdParty/Open_Sans/OpenSans-Regular.ttf' WHERE  `Zf_configuration`.`name` ='runtimeOptions.imageTag.fontFilePath';
-UPDATE  `Zf_configuration` SET  `description` =  'must be true type font - relative path to application folder' WHERE  `Zf_configuration`.`name` ='runtimeOptions.imageTag.fontFilePath';
-UPDATE `Zf_configuration` SET  `default` =  '0' WHERE  `Zf_configuration`.`name` ='runtimeOptions.termTagger.fuzzy';
-update Zf_configuration set default = "9" where name = "runtimeOptions.editor.columns.widthFactorHeader";
+UPDATE `Zf_configuration` SET `default` =  'modules/editor/ThirdParty/Open_Sans/OpenSans-Regular.ttf' WHERE  `Zf_configuration`.`name` ='runtimeOptions.imageTag.fontFilePath';
+UPDATE `Zf_configuration` SET `description` =  'must be true type font - relative path to application folder' WHERE  `Zf_configuration`.`name` ='runtimeOptions.imageTag.fontFilePath';
+UPDATE `Zf_configuration` SET `default` =  '0' WHERE  `Zf_configuration`.`name` ='runtimeOptions.termTagger.fuzzy';
+UPDATE `Zf_configuration` SET `default` = "9" where name = "runtimeOptions.editor.columns.widthFactorHeader";
 
-UPDATE  `Zf_configuration` SET  `default` = '["editor_Plugins_NoMissingTargetTerminology_Bootstrap","editor_Plugins_Transit_Bootstrap","editor_Plugins_SegmentStatistics_BootstrapEditableOnly","editor_Plugins_TermTagger_Bootstrap"]' WHERE  `Zf_configuration`.`name` ="runtimeOptions.plugins.active";
+UPDATE  `Zf_configuration` SET  `default` = '["editor_Plugins_NoMissingTargetTerminology_Bootstrap","editor_Plugins_Transit_Bootstrap","editor_Plugins_SegmentStatistics_Bootstrap","editor_Plugins_TermTagger_Bootstrap"]' WHERE  `Zf_configuration`.`name` ="runtimeOptions.plugins.active";
 
 UPDATE  `Zf_configuration` SET  `default` =  '["http://localhost:9001","http://localhost:9002"]' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.url.default";
-UPDATE  `Zf_configuration` SET  `value` =  '["http://localhost:9001","http://localhost:9002"]' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.url.default";
+-- UPDATE  `Zf_configuration` SET  `value` =  '["http://localhost:9001","http://localhost:9002"]' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.url.default";
 UPDATE  `Zf_configuration` SET  `default` =  '["http://localhost:9001","http://localhost:9002"]' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.url.import";
-UPDATE  `Zf_configuration` SET  `value` =  '["http://localhost:9001","http://localhost:9002"]' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.url.import";
+-- UPDATE  `Zf_configuration` SET  `value` =  '["http://localhost:9001","http://localhost:9002"]' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.url.import";
 UPDATE  `Zf_configuration` SET  `default` =  '["http://localhost:9003"]' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.url.gui";
-UPDATE  `Zf_configuration` SET  `value` =  '["http://localhost:9003"]' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.url.gui";
+-- UPDATE  `Zf_configuration` SET  `value` =  '["http://localhost:9003"]' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.url.gui";
 
-UPDATE  `translate5`.`Zf_configuration` SET  `default` =  '50' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.segmentsPerCall";
+UPDATE  `Zf_configuration` SET  `default` =  '50' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.segmentsPerCall";
 
-UPDATE  `translate5`.`Zf_configuration` SET  `value` =  '50' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.segmentsPerCall";
+-- UPDATE  `Zf_configuration` SET  `value` =  '50' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.segmentsPerCall";
 
-UPDATE  `translate5`.`Zf_configuration` SET  `default` =  '1000' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.tbxParsing";
+UPDATE  `Zf_configuration` SET  `default` =  '1000' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.tbxParsing";
 
-UPDATE  `translate5`.`Zf_configuration` SET  `value` =  '1000' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.tbxParsing";
+-- UPDATE  `Zf_configuration` SET  `value` =  '1000' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.tbxParsing";
 
-UPDATE  `translate5`.`Zf_configuration` SET  `default` =  '1000' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.segmentTagging";
+UPDATE  `Zf_configuration` SET  `default` =  '1000' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.segmentTagging";
 
-UPDATE  `translate5`.`Zf_configuration` SET  `value` =  '1000' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.segmentTagging";
+-- UPDATE  `Zf_configuration` SET  `value` =  '1000' WHERE  `Zf_configuration`.`name` ="runtimeOptions.termTagger.segmentTagging";
