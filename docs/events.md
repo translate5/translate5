@@ -61,6 +61,9 @@ defined in `/library/ZfExtended/Controllers/Action.php`  will trigger an event o
 - **importCompleted** is fired after all import plugins were run, defines the end of import. Parameter: 'task' => editor_Models_Task
 - **beforeDirectoryParsing** is fired before directory parsing of proofread file. Parameter: 'importFolder' => string
 
+### editor_Models_Export
+- **afterExport** is fired after exporting the data to a folder on the disk, also on ZIP export. Parameter: 'task' => editor_Models_Task
+
 ##Handmade events
 Handmade events are spezial events wich are defined direct in the code. No automatic definition is used while trigger.
 
