@@ -1,0 +1,9 @@
+--  /*
+--  START LICENSE AND COPYRIGHT
+--
+--  WILL BE REPLACED!
+--
+--  END LICENSE AND COPYRIGHT 
+--  */
+
+ALTER TABLE `LEK_terms` CHANGE COLUMN `definition` `definition` TEXT NULL DEFAULT NULL;
