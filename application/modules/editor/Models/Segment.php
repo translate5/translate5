@@ -49,6 +49,7 @@
  * @method integer getSegmentNrInTask() getSegmentNrInTask()
  * @method integer getAutoStateId() getAutoStateId()
  * @method void setAutoStateId() setAutoStateId(integer $id)
+ * @method integer getEditable() getEditable()
  * @method integer getWorkflowStepNr() getWorkflowStepNr()
  * @method void setWorkflowStepNr() setWorkflowStepNr(integer $stepNr)
  * @method string getWorkflowStep() getWorkflowStep()
