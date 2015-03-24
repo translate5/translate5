@@ -94,8 +94,24 @@ Ext.define('Editor.controller.HeadPanel', {
           },
           '#tasksMenu menu' : {
               click: me.tasksMenuDispatcher
+          },
+          '#segmentgrid #headPanelUp' : {
+              click: me.headPanelToggle
+          },
+          '#segmentgrid #headPanelDown' : {
+              click: me.headPanelToggle
           }
       });
+  },
+  headPanelToggle: function(tool) {
+      this.getHeadPanel().setVisible(tool.type == 'down');
+      if(tool.itemId == 'headPanelUp') {
+          tool.ownerCt.down('#headPanelDown').show();
+      }
+      else {
+          tool.ownerCt.down('#headPanelUp').show();
+      }
+      tool.hide();
   },
   /**
    * shows the sub components needed by the editor (hide others)

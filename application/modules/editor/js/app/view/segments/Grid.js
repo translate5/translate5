@@ -70,6 +70,19 @@ Ext.define('Editor.view.segments.Grid', {
     id: 'segment-grid',
   
     title: 'Segmentliste und Editor',
+    
+    tools: [
+        {
+            type: 'up',
+            itemId: 'headPanelUp'
+        },
+        {
+            type: 'down',
+            hidden: true,
+            itemId: 'headPanelDown'
+        }
+    ],
+    
     title_readonly: '#UT#Segmentliste und Editor - [LESEMODUS]',
 
     //Item Strings: 
