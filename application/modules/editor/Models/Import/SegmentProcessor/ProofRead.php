@@ -192,7 +192,7 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
         $sql = array();
         foreach($terms2save as $term){
             $lang = ($term->isSource)?$this->sourceLang:$this->targetLang;
-            $relTerms = $termModel->getTermEntryTermsByTaskGuidTermIdLangId($this->taskGuid, $term->id,$lang->getId());
+            $relTerms = $termModel->getTermGroupEntries($this->taskGuid, $term->id,$lang->getId());
 
             foreach ($relTerms as $relTerm) {
                 if(isset($saved[$relTerm['id']])){
@@ -210,7 +210,7 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
             }
             //and now the corresponding lang (source or target) to get also target-terms not existent in the target segment and vice versa
             $lang = ($term->isSource)?$this->targetLang:$this->sourceLang;
-            $relTerms = $termModel->getTermEntryTermsByTaskGuidTermIdLangId($this->taskGuid,$term->id,$lang->getId());
+            $relTerms = $termModel->getTermGroupEntries($this->taskGuid,$term->id,$lang->getId());
             foreach ($relTerms as $relTerm) {
                 if(isset($saved[$relTerm['id']])){
                     if($term->id == $relTerm['id']){

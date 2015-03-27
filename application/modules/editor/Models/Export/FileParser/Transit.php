@@ -41,6 +41,8 @@
  */
 
 /**
+ * @see readme.md in the transit plugin directory!
+ * 
  * Parsed mit editor_Models_Import_FileParser_Transit geparste Dateien für den Export
  */
 class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileParser {
@@ -173,44 +175,134 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
         $infoFieldContent = $this->translate->_('###RefMat-Update ');
         $segment = $this->getSegment($segId);
         
+        //fill only edited (and therefore editable) segments
+        if(! $segment->getEditable()) {
+            return;
+        }
         $infoFieldContent = $this->infoFieldAddDate($infoFieldContent);
         $infoFieldContent = $this->infoFieldAddStatus($infoFieldContent,$segment);
         $infoFieldContent = $this->infoFieldAddTerms($infoFieldContent,$segment);
-        
         $transitSegment->setInfo($infoFieldContent);
     }
     
-    protected function infoFieldAddTerms(string $infoFieldContent,editor_Models_Segment $segment) {
-        if((int)$this->config->runtimeOptions->plugins->transit->writeInfoField->termsWithoutTranslation === 1){
-           $termModel = ZfExtended_Factory::get('editor_Models_Term');
-            /* @var $termModel editor_Models_Term */
-           //<div class="term admittedTerm" id="term_193_es-ES_1-6" title="Spanischer Beschreibungstexttest">tamiz de cepillos rotativos</div>
-            $getTransNotFoundTermIdRegEx = '#<div.*?(class=".*?((term.*?transNotFound)|(transNotFound.*?term)).*?".*?data-tbxid="(.*?)".*?>)|(data-tbxid="(.*?)".*?class=".*?((term.*?transNotFound)|(transNotFound.*?term)).*?".*?>)#';
+    /**
+     * Add the changed terminology to the notice string, for Details see TRANSLATE-477
+     * @param string $infoFieldContent
+     * @param editor_Models_Segment $segment
+     * @return string
+     */
+    protected function infoFieldAddTerms(string $infoFieldContent, editor_Models_Segment $segment) {
+        if((int)$this->config->runtimeOptions->plugins->transit->writeInfoField->termsWithoutTranslation !== 1){
+            return $infoFieldContent;
+        }
+        $taskGuid = $this->_task->getTaskGuid();
+        $targetLang = $this->_task->getTargetLang();
+        $termModel = ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $termModel editor_Models_Term */
+        //<div class="term admittedTerm" id="term_193_es-ES_1-6" title="Spanischer Beschreibungstexttest">tamiz de cepillos rotativos</div>
 
-            $sourceOrigText = $segment->getFieldOriginal(editor_Models_SegmentField::TYPE_SOURCE);
-            preg_match_all($getTransNotFoundTermIdRegEx, $sourceOrigText, $matches);
-            $sourceTermMids = $matches[5];
-            $sourceTerms = array();
-            $targetTerms = array();
-            $taskGuid = $this->_task->getTaskGuid();
-            $targetLang = $this->_task->getTargetLang();
-            foreach ($sourceTermMids as $mid) {
-                try {
-                    $termModel->loadByMid($mid,$taskGuid);
-                    $sourceTerms[] = $termModel->getTerm();
-                    $targetTermsSourceTerm = $termModel->getTermEntryTermsByTaskGuidTermIdLangId($taskGuid, $termModel->getId(),$targetLang);
-                    foreach ($targetTermsSourceTerm as $t) {
-                        $targetTerms[] = $t['term'];
-                    }
-                } catch (ZfExtended_Models_Entity_NotFoundException $exc) {
-                    $log = ZfExtended_Factory::get('ZfExtended_Log');
-                    /* @var $log ZfExtended_Log */
-                    $log->logError('term has not been found in Database, which should be there. Export continues. '.$exc->getTraceAsString());
+        $sourceOrigText = $segment->getFieldOriginal(editor_Models_SegmentField::TYPE_SOURCE);
+        //fetch all terms found in source
+        $sourceTermMids = $termModel->getTermInfosFromSegment($sourceOrigText);
+        $targetTerms = array();
+        
+        //fetch terms from target orig
+        $targetOrig = $segment->getFieldOriginal(editor_Models_SegmentField::TYPE_TARGET);
+        $targetOrigTermMids = $termModel->getTermMidsFromSegment($targetOrig);
+        
+        //fetch terms from target edited
+        $targetEdited = $segment->getFieldEdited(editor_Models_SegmentField::TYPE_TARGET);
+        $targetEditedTermMids = $termModel->getTermMidsFromSegment($targetEdited);
+        
+        $sourceTermsToTrack = array();
+        $targetTermsToTrack = array();
+        
+        //we have to select only terms, which were transNotFound at import time
+        //and are now transFound at export time, that means: the associated targetTermMids 
+        //of one term in source is not found in $targetOrigTermMids (transNotFound at import),
+        //but is found in $targetEditedTermMids (transFound at export)
+        foreach ($sourceTermMids as $mid => $termFlags) {
+            //$mid => 1
+            $targetTerms = $this->getTermGroupEntries($termModel, $mid, $taskGuid, $targetLang);
+            if(empty($targetTerms)) {
+                //no target terms found
+                continue;
+            }
+            $foundAtImport = array();
+            $foundAtExport = array();
+            $foundAtExportMids = array();
+            foreach($targetTerms as $targetTerm) {
+                //capture mids found at import time
+                if(in_array($targetTerm['mid'], $targetOrigTermMids)) {
+                    $foundAtImport[] = $targetTerm;
+                }
+                //capture mids found at export time
+                if(in_array($targetTerm['mid'], $targetEditedTermMids)) {
+                    $foundAtExport[] = $targetTerm;
+                    $foundAtExportMids[] = $targetTerm['mid'];
                 }
             }
-            $infoFieldContent .= '; '.$this->translate->_('QuellTerme').': '.  join(', ', $sourceTerms).'; '.$this->translate->_('ZielTerme').': '.  join(', ', $targetTerms).';';
-       }
+            //if source term changed from transNotFound at import
+            //to transFound on export, this segments has to be tracked:
+            if(empty($foundAtImport) && !empty($foundAtExport)) {
+                $sourceTermsToTrack[] = $termModel->getTerm();
+                //track only the target term which exists in the target:
+                foreach($targetTerms as $targetTerm) {
+                    if(in_array($targetTerm['mid'], $foundAtExportMids)) {
+                        $targetTermsToTrack[] = $targetTerm['term'];
+                    }
+                }
+            }
+            $this->logFoundMismatch($segment, $mid, $termFlags, $targetTerms, $foundAtExport);
+        }
+        if(!empty($sourceTermsToTrack) || !empty($targetTermsToTrack)) {
+            $infoFieldContent .= '; '.$this->translate->_('QuellTerme').': '.  join(', ', $sourceTermsToTrack).'; '.$this->translate->_('ZielTerme').': '.  join(', ', $targetTermsToTrack).';';
+        }
         return $infoFieldContent;
+    }
+    
+    /**
+     * returns the term group of one mid and one language
+     * @param editor_Models_Term $termModel
+     * @param string $mid
+     * @param string $taskGuid
+     * @param int $targetLang
+     * @return array empty array if nothing found
+     */
+    protected function getTermGroupEntries($termModel, $mid, $taskGuid, $targetLang) {
+        try {
+            $termModel->loadByMid($mid, $taskGuid);
+            return $termModel->getTermGroupEntries($taskGuid, $termModel->getId(), $targetLang);
+        } catch (ZfExtended_Models_Entity_NotFoundException $exc) {
+            $log = ZfExtended_Factory::get('ZfExtended_Log');
+            /* @var $log ZfExtended_Log */
+            $log->logError('term has not been found in Database, which should be there. Export continues. '.__FILE__.': '.__LINE__);
+        }
+        return array();
+    }
+    
+    /**
+     * This methods logs the case if a source term is tagged as termNotFound,
+     *   but an associated target term exists and vice versa 
+     * @param editor_Models_Segment $segment
+     * @param boolean $foundAtExport
+     * @param array $termFlags
+     * @param array $targetTerms
+     * @param array $foundAtExport
+     */
+    protected function logFoundMismatch(editor_Models_Segment $segment, $mid, array $termFlags, array $targetTerms, array $foundAtExport) {
+        $transFound = in_array('transFound', $termFlags);
+        $transNotFound = in_array('transNotFound', $termFlags);
+        $targetTerms = array_map(function($item){return $item['mid'];}, $targetTerms);
+        $foundAtExport = !empty($foundAtExport);//if array not empty, we have found something
+        if($foundAtExport && $transNotFound || !$foundAtExport && $transFound) {
+            $log = ZfExtended_Factory::get('ZfExtended_Log');
+            /* @var $log ZfExtended_Log */
+            $msg = 'Source Term with mid '.$mid.' was marked as '.($foundAtExport?'transNotFound':'transFound');
+            $msg .= ' but should be '.($foundAtExport?'transFound':'transNotFound').' Targets: '.join(', ',$targetTerms);
+            $msg .= ' Segment: '.print_r($segment->getDataObject(),1)."\n in ".__FILE__.': '.__LINE__;
+            $log->logError($msg);
+        }
     }
     
     protected function infoFieldAddStatus(string $infoFieldContent,editor_Models_Segment $segment) {
@@ -227,15 +319,36 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
         return $infoFieldContent;
     }
     
+    /**
+     * Adds a date string to the infoFieldContent String, only if enabled
+     * @param string $infoFieldContent
+     * @return string
+     */
     protected function infoFieldAddDate(string $infoFieldContent) {
-        if((int)$this->config->runtimeOptions->plugins->transit->writeInfoField->exportDate === 1){
-            $session = new Zend_Session_Namespace();
-            if(preg_match('"^de"i', $session->locale === 1)){
-                $infoFieldContent .= date("d.m.Y").':';
-            }
-            else{
-                $infoFieldContent .= date("Y-m-d").':';
-            }
+        //if no transit plugin config exists, exit
+        if(!isset($this->config->runtimeOptions->plugins->transit)) {
+            return $infoFieldContent;
+        }
+        $transitConfig = $this->config->runtimeOptions->plugins->transit;
+        
+        //if config is disabled, exit
+        if((int)$transitConfig->writeInfoField->exportDate !== 1){
+            return $infoFieldContent;
+        }
+        
+        //use configured value or if empty now()
+        if(empty($transitConfig->writeInfoField->exportDateValue)){
+            $date = time();
+        }
+        else {
+            $date = strtotime($transitConfig->writeInfoField->exportDateValue);
+        }
+        $session = new Zend_Session_Namespace();
+        if(preg_match('"^de"i', $session->locale) === 1){
+            $infoFieldContent .= date("d.m.Y", $date).':';
+        }
+        else{
+            $infoFieldContent .= date("Y-m-d", $date).':';
         }
         return $infoFieldContent;
     }

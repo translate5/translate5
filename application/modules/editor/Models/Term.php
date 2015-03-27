@@ -66,13 +66,13 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Terms';
 
     /**
-     * Gibt für eine übergebene termId die mit dem zugehörigen Termentry assozierten Terme zurück. 
+     * returns for a termId the associated termentries by group 
      * @param string $taskGuid
      * @param string $termId
      * @param int $langId
      * @return array
      */
-    public function getTermEntryTermsByTaskGuidTermIdLangId($taskGuid, $termId,$langId) {
+    public function getTermGroupEntries($taskGuid, $termId,$langId) {
         $s1 = $this->db->getAdapter()->select()
         ->from(array('t1' => 'LEK_terms'),
                 array('t1.groupId'))
@@ -196,10 +196,32 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @return type array values are the mids of the terms in the string
      */
     public function getTermMidsFromSegment(string $seg) {
-        $getTermIdRegEx = '/<div[^>]+data-tbxid="([^"]*)"[^>]*>/';
-        preg_match_all($getTermIdRegEx, $seg, $matches);
-        return $matches[1];
+        return array_keys($this->getTermInfosFromSegment($seg));
     }
+    
+    /**
+     * returns mids and term flags (css classes) found in a string
+     * @param string $seg
+     * @return array key is the mid, value is an array of term flags (css classes)
+     */
+    public function getTermInfosFromSegment(string $seg) {
+        $getTermRegEx = '/<div[^>]+((class="([^"]*)"[^>]+data-tbxid="([^"]*)")|(data-tbxid="([^"]*)"[^>]+class="([^"]*)"))[^>]*>/';
+        
+        preg_match_all($getTermRegEx, $seg, $matches, PREG_SET_ORDER);
+        $result = array();
+        foreach($matches as $match) {
+            //class before data-tbxid
+            if(empty($match[5])) {
+                $result[$match[4]] = explode(' ', $match[3]);
+            }
+            //data-tbxid before class 
+            else {
+                $result[$match[6]] = explode(' ', $match[7]);
+            }
+        }
+        return $result;
+    }
+    
     /**
      * Returns a multidimensional array.
      * 1. level: keys: groupId, values: array of terms grouped by groupId
