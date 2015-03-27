@@ -34,17 +34,15 @@
  END LICENSE AND COPYRIGHT 
  */
 
-/* * #@+
+/** #@+
  * @author Marc Mittag
  * @package editor
  * @version 1.0
- * 
-
-  /**
- * Enthält Methoden zum Fileparsing für den Export
- *
  */
 
+/**
+ * Enthält Methoden zum Fileparsing für den Export
+ */
 abstract class editor_Models_Export_FileParser {
     /**
      * @var string

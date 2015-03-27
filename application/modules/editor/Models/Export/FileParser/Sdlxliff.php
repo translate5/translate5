@@ -34,16 +34,15 @@
  END LICENSE AND COPYRIGHT 
  */
 
-/* * #@+
+/** #@+
  * @author Marc Mittag
  * @package editor
  * @version 1.0
- *
-
-  /**
- * Parsed mit editor_Models_Import_FileParser_Sdlxliff geparste Dateien für den Export
  */
 
+/**
+ * Parsed mit editor_Models_Import_FileParser_Sdlxliff geparste Dateien für den Export
+ */
 class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_FileParser {
     /**
      * @var string Klassenname des Difftaggers
