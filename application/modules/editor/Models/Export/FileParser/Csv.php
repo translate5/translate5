@@ -34,16 +34,15 @@
  END LICENSE AND COPYRIGHT 
  */
 
-/* * #@+
+/** #@+
  * @author Marc Mittag
  * @package editor
  * @version 1.0
- *
-
-  /**
- * Parses files parsed with mit editor_Models_Import_FileParser_Csv for the export
  */
 
+/**
+ * Parses files parsed with mit editor_Models_Import_FileParser_Csv for the export
+ */
 class editor_Models_Export_FileParser_Csv extends editor_Models_Export_FileParser {
     /**
      * @var string classname of difftagger
