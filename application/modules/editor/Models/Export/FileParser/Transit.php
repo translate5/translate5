@@ -34,16 +34,17 @@
  END LICENSE AND COPYRIGHT 
  */
 
-/* * #@+
+/** #@+
  * @author Marc Mittag
  * @package editor
  * @version 1.0
- *
-
-  /**
- * Parsed mit editor_Models_Import_FileParser_Transit geparste Dateien für den Export
  */
 
+/**
+ * @see readme.md in the transit plugin directory!
+ * 
+ * Parsed mit editor_Models_Import_FileParser_Transit geparste Dateien für den Export
+ */
 class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileParser {
     
     use editor_Plugins_Transit_TraitParse;
@@ -226,6 +227,7 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
             }
             $foundAtImport = array();
             $foundAtExport = array();
+            $foundAtExportMids = array();
             foreach($targetTerms as $targetTerm) {
                 //capture mids found at import time
                 if(in_array($targetTerm['mid'], $targetOrigTermMids)) {
@@ -234,19 +236,23 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
                 //capture mids found at export time
                 if(in_array($targetTerm['mid'], $targetEditedTermMids)) {
                     $foundAtExport[] = $targetTerm;
+                    $foundAtExportMids[] = $targetTerm['mid'];
                 }
             }
             //if source term changed from transNotFound at import
             //to transFound on export, this segments has to be tracked:
             if(empty($foundAtImport) && !empty($foundAtExport)) {
                 $sourceTermsToTrack[] = $termModel->getTerm();
-                $targetTermsToTrack = array_merge($targetTermsToTrack, array_map(function($item){
-                    return $item['term'];
-                }, $targetTerms));
+                //track only the target term which exists in the target:
+                foreach($targetTerms as $targetTerm) {
+                    if(in_array($targetTerm['mid'], $foundAtExportMids)) {
+                        $targetTermsToTrack[] = $targetTerm['term'];
+                    }
+                }
             }
             $this->logFoundMismatch($segment, $mid, $termFlags, $targetTerms, $foundAtExport);
         }
-        if(!empty($sourceTermsToTrack) && !empty($targetTermsToTrack)) {
+        if(!empty($sourceTermsToTrack) || !empty($targetTermsToTrack)) {
             $infoFieldContent .= '; '.$this->translate->_('QuellTerme').': '.  join(', ', $sourceTermsToTrack).'; '.$this->translate->_('ZielTerme').': '.  join(', ', $targetTermsToTrack).';';
         }
         return $infoFieldContent;
