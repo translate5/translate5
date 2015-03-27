@@ -34,20 +34,21 @@
  END LICENSE AND COPYRIGHT 
  */
 
-/* * #@+
+/** #@+
  * @author Marc Mittag
  * @package editor
  * @version 1.0
- *
-
-  /**
- * Parsed mit editor_Models_Import_FileParser_Transit geparste Dateien für den Export
  */
 
+/**
+ * Parsed mit editor_Models_Import_FileParser_Transit geparste Dateien für den Export
+ */
 class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileParser {
-    
     use editor_Plugins_Transit_TraitParse;
+    
     /**
+     * Since a DiffTagger class must be given, even if not available for this File Type, 
+     * Diff tagging is disabled in the constructor.
      * @var string Klassenname des Difftaggers
      */
     protected $_classNameDifftagger = 'editor_Models_Export_DiffTagger_Csv';
@@ -83,7 +84,8 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
     protected $currentId;
 
     public function __construct(integer $fileId, boolean $diff,editor_Models_Task $task,string $path) {
-        parent::__construct($fileId, $diff,$task,$path);
+        //Since no difftagger is available for transit, diff is disabled here:
+        parent::__construct($fileId, false, $task, $path);
         $this->targetFileName = basename($path);
         //stand: herausfinden von source-namen anhand des path und speichern der source-Datei im exportfolder
     }
