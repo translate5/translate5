@@ -65,6 +65,14 @@
 class editor_Plugins_SegmentStatistics_Models_Statistics extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Plugins_SegmentStatistics_Models_Db_Statistics';
     
+    protected $columnsToGet = array(
+        'colsAll' => array('fileId', 'fieldName', 'charCount' => 'SUM(charCount)', 'termFoundCount' => 'SUM(termFound)', 'segmentsPerFile' => 'COUNT(id)'),
+        'colsFound' => array('fileId', 'fieldName', 'charFoundCount' => 'SUM(charCount)', 'termFoundCount' => 'SUM(termFound)', 'segmentsPerFileFound' => 'COUNT(id)'),
+        'colsNotFound' => array('fileId', 'fieldName', 'charNotFoundCount' => 'SUM(charCount)', 'termNotFoundCount' => 'SUM(termNotFound)', 'segmentsPerFileNotFound' => 'COUNT(id)'),
+        'targetColsFound' => array('stat.fileId', 'targetCharFoundCount' => 'SUM(stat.charCount)', 'targetSegmentsPerFileFound' => 'COUNT(stat.id)'),
+        'targetColsNotFound' => array('stat.fileId', 'targetCharNotFoundCount' => 'SUM(stat.charCount)', 'targetSegmentsPerFileNotFound' => 'COUNT(stat.id)'),
+    );
+    
     /**
      * returns the statistics summary for the given taskGuid and type
      * @param string $taskGuid
@@ -77,39 +85,49 @@ class editor_Plugins_SegmentStatistics_Models_Statistics extends ZfExtended_Mode
         
         $select = function($cols, $where = null) use ($db, $taskGuid, $type) {
             $s = $db->select()
-                ->from($db, $cols)
-                ->where('taskGuid = ?', $taskGuid)
-                ->where('type = ?', $type)
-                ->group('fileId')
-                ->group('fieldName');
+                ->from(array('stat' => $db->info($db::NAME)), $cols)
+                ->where('stat.taskGuid = ?', $taskGuid)
+                ->where('stat.type = ?', $type)
+                ->group('stat.fileId')
+                ->group('stat.fieldName');
             if(!empty($where)) {
                 $s->where($where);
             }
             return $s;
         };
         
-        $colsAll = array('fileId', 'fieldName', 'charCount' => 'SUM(charCount)', 
-                    'termFoundCount' => 'SUM(termFound)', 'segmentsPerFile' => 'COUNT(id)');
-        $rowsAll = $this->db->fetchAll($select($colsAll));
+        $rowsAll = $this->db->fetchAll($select($this->columnsToGet['colsAll']));
+        $rowsTermFound = $this->db->fetchAll($select($this->columnsToGet['colsFound'], 'termFound > 0'));
+        $rowsTermNotFound = $this->db->fetchAll($select($this->columnsToGet['colsNotFound'], 'termNotFound > 0'));
+        //gets the target found statistics only to segments where the source contains termNotFounds
         
-        $colsFound = array('fileId', 'fieldName', 'charFoundCount' => 'SUM(charCount)', 
-                    'termFoundCount' => 'SUM(termFound)', 'segmentsPerFileFound' => 'COUNT(id)');
-        $rowsTermFound = $this->db->fetchAll($select($colsFound, 'termFound > 0'));
+        $s = $select($this->columnsToGet['targetColsFound'], 'sourceStat.termFound > 0 AND sourceStat.fieldName = "source" AND stat.fieldName = "target"')
+            ->where('sourceStat.type = ?', $type)
+            ->join(array('sourceStat' => $db->info($db::NAME)), 'sourceStat.segmentId = stat.segmentId', array());
+        $targetRowsTermFound = $this->db->fetchAll($s);
         
-        $colsNotFound = array('fileId', 'fieldName', 'charNotFoundCount' => 'SUM(charCount)',
-                    'termNotFoundCount' => 'SUM(termNotFound)', 'segmentsPerFileNotFound' => 'COUNT(id)');
-        $rowsTermNotFound = $this->db->fetchAll($select($colsNotFound, 'termNotFound > 0'));
-        $rows = array_merge($rowsAll->toArray(), $rowsTermFound->toArray(), $rowsTermNotFound->toArray());
-        
+        //gets the target notFound statistics only to segments where the source contains termNotFounds
+
+        $s = $select($this->columnsToGet['targetColsNotFound'], 'sourceStat.termNotFound > 0 AND sourceStat.fieldName = "source" AND stat.fieldName = "target"')
+            ->where('sourceStat.type = ?', $type)
+            ->join(array('sourceStat' => $db->info($db::NAME)), 'sourceStat.segmentId = stat.segmentId', array());
+        $targetRowsTermNotFound = $this->db->fetchAll($s);
+
+        $rows = array_merge($rowsAll->toArray(), $rowsTermFound->toArray(), $rowsTermNotFound->toArray(), $targetRowsTermFound->toArray(), $targetRowsTermNotFound->toArray());
+
         $merged = array();
         $result = array();
         foreach($rows as $stat) {
+            if(empty($stat['fieldName'])) {
+                $stat['fieldName'] = 'source'; //fallback for above joined data
+            }
             settype($result[$stat['fileId']], 'array');
             settype($result[$stat['fileId']][$stat['fieldName']], 'array');
             $stat['fileName'] = $files[$stat['fileId']];
             $result[$stat['fileId']][$stat['fieldName']] = array_merge($stat, $result[$stat['fileId']][$stat['fieldName']]);
             $merged[$stat['fileId'].'#'.$stat['fieldName']] = $result[$stat['fileId']][$stat['fieldName']];
         }
+        
         return array_values($merged);
     }
     

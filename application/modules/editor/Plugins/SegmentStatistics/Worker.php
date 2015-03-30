@@ -210,17 +210,36 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
             $taskFieldsStat[$fieldName]['taskTermFoundCount'] += $fileStat['termFoundCount'];
             $taskFieldsStat[$fieldName]['taskTermNotFoundCount'] += $fileStat['termNotFoundCount'];
             
+            
             $field = $fields->addChild('field');
             $field->addChild('fieldName', $fieldName);
             $field->addChild('charFoundCount', $fileStat['charFoundCount']);
             $field->addChild('charNotFoundCount', $fileStat['charNotFoundCount']);
             $field->addChild('termFoundCount', $fileStat['termFoundCount']);
             $field->addChild('termNotFoundCount', $fileStat['termNotFoundCount']);
+            $field->addChild('segmentsPerFile', $fileStat['segmentsPerFile']);
             $field->addChild('segmentsPerFileFound', $fileStat['segmentsPerFileFound']);
             $field->addChild('segmentsPerFileNotFound', $fileStat['segmentsPerFileNotFound']);
+            if($fieldName == 'source') {
+                settype($fileStat['targetCharFoundCount'],'integer');
+                settype($fileStat['targetCharNotFoundCount'],'integer');
+                settype($fileStat['targetSegmentsPerFileFound'],'integer');
+                settype($fileStat['targetSegmentsPerFileNotFound'],'integer');
+                settype($taskFieldsStat[$fieldName]['taskTargetCharFoundCount'], 'integer');
+                settype($taskFieldsStat[$fieldName]['taskTargetCharNotFoundCount'], 'integer');
+                settype($taskFieldsStat[$fieldName]['taskTargetTermFoundCount'], 'integer');
+                settype($taskFieldsStat[$fieldName]['taskTargetTermNotFoundCount'], 'integer');
+                $taskFieldsStat[$fieldName]['taskTargetCharFoundCount'] += $fileStat['targetCharFoundCount'];
+                $taskFieldsStat[$fieldName]['taskTargetCharNotFoundCount'] += $fileStat['targetCharNotFoundCount'];
+                $taskFieldsStat[$fieldName]['taskTargetTermFoundCount'] += $fileStat['targetSegmentsPerFileFound'];
+                $taskFieldsStat[$fieldName]['taskTargetTermNotFoundCount'] += $fileStat['targetSegmentsPerFileNotFound'];
+                //<!-- only targets to sources with transNotFounds are counted: --> 
+                $field->addChild('targetCharFoundCount', $fileStat['targetCharFoundCount']);
+                $field->addChild('targetCharNotFoundCount', $fileStat['targetCharNotFoundCount']);
+                $field->addChild('targetSegmentsPerFileFound', $fileStat['targetSegmentsPerFileFound']);
+                $field->addChild('targetSegmentsPerFileNotFound', $fileStat['targetSegmentsPerFileNotFound']);
+            }
         }
-        
-
         
         //add the statistics per field for whole task
         $fields = $xml->addChild('fields');
