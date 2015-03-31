@@ -47,8 +47,8 @@
 class editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap extends ZfExtended_Plugin_Abstract {
     
     public function init() {
-        //priority -10000 in order to always allow other plugins to modify meta-data before locking runs
-        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'), -10000);
+        //priority -9000 in order to always allow other plugins to modify meta-data before locking runs
+        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'), -9000);
     }
     
     /**

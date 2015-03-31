@@ -46,8 +46,9 @@
 class editor_Plugins_SegmentStatistics_Bootstrap extends ZfExtended_Plugin_Abstract {
     public function init() {
         $this->blocks('editor_Plugins_SegmentStatistics_BootstrapEditableOnly');
-        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'));
-        $this->eventManager->attach('editor_Models_Export', 'afterExport', array($this, 'handleAfterExport'));
+        //priority -10000 in order to always allow other plugins to modify meta-data before statistic runs
+        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'), -10000);
+        $this->eventManager->attach('editor_Models_Export', 'afterExport', array($this, 'handleAfterExport'), -10000);
     }
     
     /**
