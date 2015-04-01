@@ -37,36 +37,15 @@
  * Since Statistics are mostly only important for editable segments, the plugin provides this worker,
  * which deletes all statistics for non editable segments.
  */
-class editor_Plugins_SegmentStatistics_CleanUpWorker extends editor_Plugins_SegmentStatistics_Worker {
+class editor_Plugins_SegmentStatistics_WriteStatisticsWorker extends editor_Plugins_SegmentStatistics_Worker {
 
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
-        $stat = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_Statistics');
-        /* @var $stat editor_Plugins_SegmentStatistics_Models_Statistics */
-        $db = $stat->db;
-        
-        $segDb = ZfExtended_Factory::get('editor_Models_Db_Segments');
-        /* @var $segDb editor_Models_Db_Segments */
-        
         $this->setType();
-        
-        $select = $segDb->select()
-            ->from($segDb, array('id'))
-            ->where('taskGuid = ?', $this->taskGuid)
-            ->where('editable = 0');
-
-        $table = $db->info($db::NAME);
-        $adapter = $db->getAdapter();
-        
-        $delete = 'DELETE FROM '.$table;
-        $delete .= ' WHERE '.$adapter->quoteInto('taskGuid = ?', $this->taskGuid);
-        $delete .= ' AND '.$adapter->quoteInto('type = ?', $this->type);
-        $delete .= ' AND segmentId IN ('.$select.')'; 
-        
-        $adapter->query($delete);
+        $this->writeToDisk();
         return true;
     }
 }

@@ -53,10 +53,12 @@ class editor_Plugins_SegmentStatistics_BootstrapEditableOnly extends editor_Plug
      */
     public function init() {
         $this->blocks('editor_Plugins_SegmentStatistics_Bootstrap');
-        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'), -10000);
+        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImportCreateStat'), -90);
         $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImportCleanup'), -11000);
+        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleImportWriteStat'), -12000);
         $this->eventManager->attach('editor_Models_Export', 'afterExport', array($this, 'handleAfterExport'), -10000);
         $this->eventManager->attach('editor_Models_Export', 'afterExport', array($this, 'handleAfterExportCleanup'), -11000);
+        $this->eventManager->attach('editor_Models_Export', 'afterExport', array($this, 'handleExportWriteStat'), -12000);
     }
     
     /**

@@ -46,17 +46,26 @@
 class editor_Plugins_SegmentStatistics_Bootstrap extends ZfExtended_Plugin_Abstract {
     public function init() {
         $this->blocks('editor_Plugins_SegmentStatistics_BootstrapEditableOnly');
-        //priority -10000 in order to always allow other plugins to modify meta-data before statistic runs
-        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'), -10000);
+        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImportCreateStat'), -90);
+        //priority -10000 in order to always allow other plugins to modify meta-data before writer runs
+        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleImportWriteStat'), -10000);
         $this->eventManager->attach('editor_Models_Export', 'afterExport', array($this, 'handleAfterExport'), -10000);
+        $this->eventManager->attach('editor_Models_Export', 'afterExport', array($this, 'handleExportWriteStat'), -10010);
     }
     
     /**
      * handler for event: editor_Models_Import#afterImport
      * @param $event Zend_EventManager_Event
      */
-    public function handleAfterImport(Zend_EventManager_Event $event) {
+    public function handleAfterImportCreateStat(Zend_EventManager_Event $event) {
         $this->callWorker($event->getParam('task'), 'editor_Plugins_SegmentStatistics_Worker', editor_Plugins_SegmentStatistics_Worker::TYPE_IMPORT);
+    }
+    /**
+     * handler for event: editor_Models_Import#afterImport
+     * @param $event Zend_EventManager_Event
+     */
+    public function handleImportWriteStat(Zend_EventManager_Event $event) {
+        $this->callWorker($event->getParam('task'), 'editor_Plugins_SegmentStatistics_WriteStatisticsWorker', editor_Plugins_SegmentStatistics_Worker::TYPE_IMPORT);
     }
     /**
      * handler for event: editor_Models_Export#afterExport
@@ -64,6 +73,13 @@ class editor_Plugins_SegmentStatistics_Bootstrap extends ZfExtended_Plugin_Abstr
      */
     public function handleAfterExport(Zend_EventManager_Event $event) {
         $this->callWorker($event->getParam('task'), 'editor_Plugins_SegmentStatistics_Worker', editor_Plugins_SegmentStatistics_Worker::TYPE_EXPORT);
+    }
+    /**
+     * handler for event: editor_Models_Export#afterExport
+     * @param $event Zend_EventManager_Event
+     */
+    public function handleExportWriteStat(Zend_EventManager_Event $event) {
+        $this->callWorker($event->getParam('task'), 'editor_Plugins_SegmentStatistics_WriteStatisticsWorker', editor_Plugins_SegmentStatistics_Worker::TYPE_EXPORT);
     }
     
     /**

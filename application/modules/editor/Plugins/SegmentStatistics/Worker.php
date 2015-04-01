@@ -106,8 +106,6 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
         //regenerate missing import Stats if needed:
         //copy exports nach import, wo es kein import passend zum export gibt!
         $stat->regenerateImportStats($this->taskGuid);
-        
-        $this->writeToDisk();
         return true;
     }
     
