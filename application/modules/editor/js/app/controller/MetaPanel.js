@@ -68,6 +68,9 @@ Ext.define('Editor.controller.MetaPanel', {
       ref : 'navi',
       selector : '#metapanel #naviToolbar'
   },{
+      ref : 'segmentMeta',
+      selector : '#metapanel .segmentsMetapanel'
+  },{
     ref : 'segmentGrid',
     selector : '#segmentgrid'
   }],
@@ -151,7 +154,10 @@ Ext.define('Editor.controller.MetaPanel', {
    * Handler für save Button
    */
   save: function() {
-    this.fireEvent('saveSegment');
+      var me = this;
+      if(me.record && me.record.get('editable')) {
+          me.fireEvent('saveSegment');
+      }
   },
   /**
    * Handler for saveNext Button
@@ -185,6 +191,9 @@ Ext.define('Editor.controller.MetaPanel', {
           store = grid.store,
           lastColumnIdx = 0,
           newRec = store.getAt(store.indexOf(rec) + rowIdxChange);
+      if(!rec || !rec.get('editable')) {
+          return false;
+      }
       while(newRec && !newRec.get('editable')) {
           newRec = store.getAt(store.indexOf(newRec) + rowIdxChange);
       }
@@ -238,7 +247,21 @@ Ext.define('Editor.controller.MetaPanel', {
     //bindStore(me.record.terms());
     me.loadRecord(me.record);
     //FIXME here doLayout???
+    me.getNavi().enable();
+    me.getSegmentMeta().show();
     mp.show();
+  },
+  /**
+   * opens metapanel for readonly segments
+   * @param {Editor.model.Segment} record
+   */
+  openReadonly: function(record) {
+      var me = this,
+      mp = me.getMetaPanel();
+      me.record = record;
+      me.getNavi().disable();
+      me.getSegmentMeta().hide();
+      mp.show();
   },
   /**
    * lädt die konkreten record ins Meta Panel 

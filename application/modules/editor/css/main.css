@@ -219,6 +219,10 @@ background-color: #EAF1FB;
 #segment-grid .x-grid-row-selected.editing-disabled .comments-field .x-grid-cell-inner img.add {
     display:none;
 }
+#segment-grid.comments-for-locked-segments .x-grid-row-selected.editing-disabled .comments-field .x-grid-cell-inner img.add {
+    display:block;
+}
+
 .comments-grid .x-action-col-cell img {height:16px;width:16px;cursor: pointer;}
 .ico-comment-add {background-image: url("../images/comment_add.png");}
 .ico-comment-edit {background-image: url("../images/comment_edit.png");}

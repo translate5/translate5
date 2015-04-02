@@ -84,7 +84,7 @@ Ext.define('Editor.view.ViewPortEditor', {
                       dock: 'top'
                   }],
                   items: [{
-                      xtype: 'segments.metapanel'
+                      xtype: 'segmentsMetapanel'
                   },{
                       xtype: 'commentWindow'
                   }]

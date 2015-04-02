@@ -45,7 +45,7 @@
  * @initalGenerated
  */
 Ext.define('Editor.view.segments.MetaPanel', {
-    alias: 'widget.segments.metapanel',
+    alias: 'widget.segmentsMetapanel',
     extend: 'Ext.panel.Panel',
 
     bodyPadding: 10,

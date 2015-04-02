@@ -138,6 +138,10 @@ Ext.define('Editor.view.segments.Grid', {
             fields = Editor.data.task.segmentFields(),
             userPref = Editor.data.task.userPrefs().first(),
             fieldList = [];
+
+        if(Editor.app.authenticatedUser.isAllowed('editorCommentsForLockedSegments')) {
+            me.addCls('comments-for-locked-segments');
+        } 
         
         this.store = Ext.create('Editor.store.Segments',{
             storeId: 'Segments'

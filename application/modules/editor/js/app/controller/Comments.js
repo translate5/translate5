@@ -85,6 +85,7 @@ Ext.define('Editor.controller.Comments', {
               expand: me.expandWindow
           },
           '#segmentgrid' : {
+              itemdblclick: me.handleCommentsColumnDblClick,
               itemclick: me.handleCommentsColumnClick,
               afterrender: me.initEditPluginHandler
           },
@@ -281,6 +282,12 @@ Ext.define('Editor.controller.Comments', {
       }
   },
   /**
+   * returns true if comments are enabled also for locked Segments
+   */
+  isEnabledForLocked: function() {
+      return Editor.app.authenticatedUser.isAllowed('editorCommentsForLockedSegments');
+  },
+  /**
    * handle clicks on the comment column of the grid.
    * For handling only selected rows we have to use the img as clicktarget. 
    *   Native way would be checking the select state of column. But this is not sufficient, 
@@ -290,11 +297,46 @@ Ext.define('Editor.controller.Comments', {
       var me = this,
           ed = me.getSegmentGrid().editingPlugin,
           add = ev.getTarget('img.add'),
-          edit = ev.getTarget('img.edit');
-      if(add || edit) {
-          ed.startEdit(rec, view.getHeaderAtIndex(0));
-          me.handleEditorCommentBtn();
+          edit = ev.getTarget('img.edit'),
+          mpController = Editor.app.getController('MetaPanel');
+      me.record = null;
+      me.getCommentWindow().collapse();
+      
+      if(!rec.get('editable') && !me.isEnabledForLocked()) {
+          return;
       }
+      
+      if(add || edit) {
+          if(rec.get('editable')) {
+              ed.startEdit(rec, view.getHeaderAtIndex(0));
+          }
+          else {
+              me.record = rec;
+              mpController.openReadonly(rec);
+          }
+          me.handleEditorCommentBtn();
+          return;
+      }
+      //close metapanel if clicking single on a row, and the previous row was not editable
+      if(!ed.openedRecord) {
+          mpController.cancelEdit();
+      }
+  },
+  /**
+   * Opens comment column for not editable segments on dblclick on comments column
+   */
+  handleCommentsColumnDblClick: function (view, rec, tr, idx, ev) {
+      var me = this,
+          isCommentsCol = ev.getTarget('td.comments-field'),
+          isForced = me.isEnabledForLocked();
+      
+      if(rec.get('editable') || !isCommentsCol || !isForced) {
+          return;
+      }
+      me.record = rec;
+      me.getCommentWindow().collapse();
+      Editor.app.getController('MetaPanel').openReadonly(rec);
+      me.getCommentWindow().expand();
   },
   /**
    * handles starting the segment editor
@@ -327,7 +369,7 @@ Ext.define('Editor.controller.Comments', {
    */
   expandWindow: function(pan) {
       var me = this,
-          rec = me.getEditPlugin().openedRecord,
+          rec = me.getEditPlugin().openedRecord || me.record,
           id = rec && rec.get('id'),
           box = me.getCommentContainer(),
           form = me.getCommentForm();
@@ -409,6 +451,10 @@ Ext.define('Editor.controller.Comments', {
                   stateid = me.getAutoStateDisplay(),
                   ed = me.getRowEditor(),
                   origRec = me.getSegmentsStore().getById(segId);
+              //if no origRec is given, do nothing here.
+              if(!origRec) {
+                  return;
+              }
               //we cant update the complete segment, since this would overwrite unsaved 
               //changes the user has made in the opened segment
               origRec.beginEdit();
