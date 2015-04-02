@@ -241,24 +241,57 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     /**
      * strips all tags including tag description
+     * FIXME WARNING do not use this method other than it is used currently
+     * @see therefore TRANSLATE-487
      * 
      * @param string $segmentContent
      * @return string $segmentContent
      */
     public function stripTermTags($segmentContent) {
         try {
-            $seg = qp('<div>'.$segmentContent.'</div>', NULL, array('format_output' => false));
+            $options = array(
+                    'format_output' => false,
+                    'encoding' => 'utf-8',
+                    'convert_to_encoding' => 'utf-8',
+                    'convert_from_encoding' => 'utf-8',
+                    'ignore_parser_warnings' => true,
+            );
+            $seg = qp('<div id="root">'.$segmentContent.'</div>', NULL, $options);
             /* @var $seg QueryPath\\DOMQuery */
+            //advise libxml not to throw exceptions, but collect warnings and errors internally:
+            libxml_use_internal_errors(true);
             foreach ($seg->find('div.term') as $element){
                 $element->replaceWith($element->innerHTML());
             }
-            $seg = $seg->top();
+            $this->collectLibXmlErrors();
+            $seg = $seg->find('div#root');
             $segmentContent = $seg->innerHTML();
         } catch (Exception $exc) {
             $log = new ZfExtended_Log();
             $log->logError('Notice: No valid HTML in translate5 segment '.$exc->getTraceAsString());
+            //TODO log $exc in verbose debug level
         }
         return $segmentContent;
+    }
+    
+    /**
+     * using the find method of querypath implies to create an internal clone of the DOM node, 
+     * which then throws an duplicate id error which is completly nonsense at this place, so we filter them out. 
+     */
+    protected function collectLibXmlErrors() {
+        $otherErrors = array();
+        foreach(libxml_get_errors() as $error) {
+            $msg = $error->message;
+            //Example error message: "ID NL-8-df250b2156c434f3390392d09b1c9563 already defined"
+            if(strpos(trim($msg), 'ID ') === 0 && strpos(strrev(trim($msg)), strrev(' already defined')) === 0) {
+                continue;
+            }
+            $otherErrors[] = $error;
+        }
+        libxml_clear_errors();
+        if(!empty($otherErrors)) {
+            throw new Exception("Collected LIBXML errors: ".print_r($otherErrors, 1));
+        }
     }
     
     /**
