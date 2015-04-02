@@ -273,7 +273,9 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
         } catch (ZfExtended_Models_Entity_NotFoundException $exc) {
             $log = ZfExtended_Factory::get('ZfExtended_Log');
             /* @var $log ZfExtended_Log */
-            $log->logError('term has not been found in Database, which should be there. Export continues. '.__FILE__.': '.__LINE__);
+            $msg = 'term has not been found in Database, which should be there. TaskGuid: '.$taskGuid;
+            $msg .= '; Mid: '.$mid.'; Export continues. '.__FILE__.': '.__LINE__;
+            $log->logError($msg);
         }
         return array();
     }
