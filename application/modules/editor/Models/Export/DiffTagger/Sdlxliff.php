@@ -85,12 +85,18 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
      */
     public function diffSegment($target, $edited, $changeTimestamp, $userName) {
         
+        $escapedGTagsTarget = array();
+        $escapedGTagsEdited = array();
+        
         $this->_changeTimestamp = $changeTimestamp;
         $this->_userName = $userName;
 
         $targetArr = $this->tagBreakUp($target);
         $editedArr = $this->tagBreakUp($edited);
 
+        $targetArr = $this->escapeSingleGTags($targetArr, $escapedGTagsTarget);
+        $editedArr = $this->escapeSingleGTags($editedArr, $escapedGTagsEdited);
+        
         $targetArr = $this->replacePairGTagsTarget($targetArr);
         $editedArr = $this->replacePairGTagsEdited($editedArr);
 
@@ -131,9 +137,45 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
                 return '<mrk '.pack('H*', $match[1]); }, $diffRes);
         $diffRes = preg_replace('"</g id=\"___mrkTag___[^\"]+\""', '</mrk', $diffRes);
         $diffRes = preg_replace('"</g id=\"[^\"]+\""', '</g', $diffRes);
-        return implode('', $diffRes);
+        $edited = implode('', $diffRes);
+        return $this->restoreSingleGTags($edited, $escapedGTagsEdited);
     }
 
+    /**
+     * restores all tags escaped by escapeSingleGTags
+     * 
+     * @param array $segment
+     * @param array $escapedIds
+     * @return array $segment
+     */
+    protected function restoreSingleGTags($segment,$escapedIds){
+        foreach($escapedIds as $id){
+            $insId = mb_substr($id,0,  mb_strlen($id)-4);
+            $segment = preg_replace('"(<)x([^>]*id=)\"'.$id.'(\"[^>]*/>)"s','\\1g\\2"'.$insId.'\\3', $segment);
+        }
+        return $segment;
+    }
+    /**
+     * converts all single (self-closing) g-tags to a x-tag to work around problems in diff-tagging
+     * must be used after tagBreakUp
+     * 
+     * @param array $segment
+     * @param array $escapedIds
+     * @return array $segment
+     */
+    protected function escapeSingleGTags($segment,&$escapedIds){
+        $regex = '"(.*<)g([^>]*id=\")([^\"]*)(\"[^>]*/>.*)"s';
+        if(count(preg_grep($regex, $segment))==0){
+            return $segment;
+        }
+        foreach($segment as $part){
+            if(preg_match($regex, $part)){
+                $escapedIds[] = preg_replace($regex,'\\3_esc', $part);
+            }
+        }
+        return preg_replace($regex,'\\1x\\2\\3_esc\\4', $segment);
+    }
+    
     /**
      * joins for the diff the tags, which mark a term and all words within to one
      * string to avoid invalid xml after the diff (and it makes sense anyway, cause
