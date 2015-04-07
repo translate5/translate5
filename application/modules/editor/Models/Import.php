@@ -123,11 +123,6 @@ class editor_Models_Import {
     protected $gh;
 
     /**
-     * @var string Definiert, welcher Pfadtrenner bei java-Aufruf auf der command-line innerhalb des Parameters -cp gesetzt wird (Linux ":" Windows ";")
-     */
-    protected $javaPathSep = ':';
-    
-    /**
      * 
      * @var boolean
      */

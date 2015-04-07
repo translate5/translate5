@@ -120,11 +120,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     protected $processedLanguages = array();
 
     /**
-     * @var string Definiert, welcher Pfadtrenner bei java-Aufruf auf der command-line innerhalb des Parameters -cp gesetzt wird (Linux ":" Windows ";")
-     */
-    protected $javaPathSep = ':';
-
-    /**
      * Um den Durchsatz beim Speichern der Terme zu erhöhen, werde diese zwischengespeichert und en block in die DB gelegt.
      * @var array
      */
