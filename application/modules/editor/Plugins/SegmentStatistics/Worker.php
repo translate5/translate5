@@ -225,12 +225,12 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
                 settype($fileStat['targetSegmentsPerFileNotFound'],'integer');
                 settype($taskFieldsStat[$fieldName]['taskTargetCharFoundCount'], 'integer');
                 settype($taskFieldsStat[$fieldName]['taskTargetCharNotFoundCount'], 'integer');
-                settype($taskFieldsStat[$fieldName]['taskTargetTermFoundCount'], 'integer');
-                settype($taskFieldsStat[$fieldName]['taskTargetTermNotFoundCount'], 'integer');
+                settype($taskFieldsStat[$fieldName]['taskTargetSegmentsPerFileFound'], 'integer');
+                settype($taskFieldsStat[$fieldName]['taskTargetSegmentsPerFileNotFound'], 'integer');
                 $taskFieldsStat[$fieldName]['taskTargetCharFoundCount'] += $fileStat['targetCharFoundCount'];
                 $taskFieldsStat[$fieldName]['taskTargetCharNotFoundCount'] += $fileStat['targetCharNotFoundCount'];
-                $taskFieldsStat[$fieldName]['taskTargetTermFoundCount'] += $fileStat['targetSegmentsPerFileFound'];
-                $taskFieldsStat[$fieldName]['taskTargetTermNotFoundCount'] += $fileStat['targetSegmentsPerFileNotFound'];
+                $taskFieldsStat[$fieldName]['taskTargetSegmentsPerFileFound'] += $fileStat['targetSegmentsPerFileFound'];
+                $taskFieldsStat[$fieldName]['taskTargetSegmentsPerFileNotFound'] += $fileStat['targetSegmentsPerFileNotFound'];
                 //<!-- only targets to sources with transNotFounds are counted: --> 
                 $field->addChild('targetCharFoundCount', $fileStat['targetCharFoundCount']);
                 $field->addChild('targetCharNotFoundCount', $fileStat['targetCharNotFoundCount']);
