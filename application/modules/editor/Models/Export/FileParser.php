@@ -57,7 +57,7 @@ abstract class editor_Models_Export_FileParser {
      */
     protected $_fileId = NULL;
     /**
-     * @var editor_Models_Db_Segments aktuell bearbeitetes Segment
+     * @var editor_Models_Segment aktuell bearbeitetes Segment
      */
     protected $_segmentEntity = NULL;
     /**

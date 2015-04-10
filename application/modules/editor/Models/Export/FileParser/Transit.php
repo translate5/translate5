@@ -137,6 +137,7 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
         }
         $sourceSegs = $this->sourceDOM->getSegments();
         $targetSegs = $this->targetDOM->getSegments();
+        $exportOnlyEditable = $this->config->runtimeOptions->plugins->transit->exportOnlyEditable;
         foreach ($targetSegs as $segId => &$targetSeg) {
             $sourceSeg = $sourceSegs[$segId];
             $sourceOrigText = $sourceSeg->getText();
@@ -147,6 +148,12 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
             }
           
             $sourceText = $this->getSegmentContent($segId, editor_Models_SegmentField::TYPE_SOURCE);
+            
+            if($exportOnlyEditable && !$this->_segmentEntity->isEditable()) {
+                $this->setSegmentInfoField($targetSeg, $segId);
+                continue;
+            }
+            
             if(!empty($sourceText)){
                 $sourceSeg->setText($sourceText);
             }

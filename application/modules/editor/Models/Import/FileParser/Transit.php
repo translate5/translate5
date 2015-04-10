@@ -315,6 +315,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
                     '"\x{00A0}"u', //Hex UTF-8 bytes or codepoint of protected space
                     '"\x{1680}"u', //Hex UTF-8 bytes or codepoint of Ogam space
                     '"\x{180E}"u', //Hex UTF-8 bytes or codepoint of mongol vocal divider
+                    '"\x{2028}"u', //Hex UTF-8 bytes or codepoint of line separator
                     '"\x{202F}"u', //Hex UTF-8 bytes or codepoint of small protected space
                     '"\x{205F}"u', //Hex UTF-8 bytes or codepoint of middle mathematical space
                     '"\x{3000}"u', //Hex UTF-8 bytes or codepoint of ideographic space
