@@ -134,8 +134,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
      * @param $event Zend_EventManager_Event
      */
     public function handleAfterIndex(Zend_EventManager_Event $event) {
-        $params = $event->getParams();
-        $view = $params[0];
+        $view = $event->getParam('view');
         
         $config = Zend_Registry::get('config');
         $termTaggerSegmentsPerCall = $config->runtimeOptions->termTagger->segmentsPerCall;

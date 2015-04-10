@@ -40,6 +40,12 @@
 class editor_Plugins_Debug_Bootstrap extends ZfExtended_Plugin_Abstract {
     public function init() {
         $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'));
+        $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndexAction'));
+    }
+    
+    public function handleAfterIndexAction(Zend_EventManager_Event $event) {
+        $view = $event->getParam('view');
+        $view->Php2JsVars()->set('debug.showTaskGuid', '1'); //shows taskGuid in GUI
     }
     
     /**
