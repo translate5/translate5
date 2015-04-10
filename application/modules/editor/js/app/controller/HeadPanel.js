@@ -121,6 +121,7 @@ Ext.define('Editor.controller.HeadPanel', {
           data = {
               user: Editor.app.authenticatedUser.data,
               task: Editor.data.task.data,
+              showTaskGuid: Editor.data.debug && Editor.data.debug.showTaskGuid,
               taskLabel: hp.strings.task,
               userLabel: hp.strings.loggedinAs,
               loginLabel: hp.strings.loginName,
@@ -138,6 +139,7 @@ Ext.define('Editor.controller.HeadPanel', {
       hp.down('#infoPanel').update({
           user: Editor.app.authenticatedUser.data,
           task: null,
+          showTaskGuid: false,
           taskLabel: hp.strings.task,
           userLabel: hp.strings.loggedinAs,
           loginLabel: hp.strings.loginName
