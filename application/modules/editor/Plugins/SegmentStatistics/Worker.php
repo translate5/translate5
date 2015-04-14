@@ -89,7 +89,7 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
                 $stat->setFieldType($field->type);
                 $stat->setType($this->type);
                 $stat->setFileId($segment->getFileId());
-                $stat->setCharCount(mb_strlen($segment->stripTags($segmentContent)));
+                $stat->setCharCount($segment->charCount($segmentContent));
                 $count = preg_match_all($termNotFoundRegEx, $segmentContent, $matches);
                 $stat->setTermNotFound($count);
                 $count = preg_match_all($termFoundRegEx, $segmentContent, $matches);

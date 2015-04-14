@@ -221,18 +221,26 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
     }
     /**
-     * strips all tags including tag description
-     * 
+     * strips all tags including internal tag content
      * @param string $segmentContent
-     * @param boolean $htmlEntityDecode if _all_ html-entities should be decoded
      * @return string $segmentContent
      */
-    public function stripTags($segmentContent,$htmlEntityDecode = true) {
-        if($htmlEntityDecode){
-            $segmentContent = html_entity_decode($segmentContent, ENT_QUOTES | ENT_XHTML);
-        }
-        return strip_tags(preg_replace('"<span.*?</span>"','',$segmentContent));
+    public function stripTags($segmentContent) {
+        return strip_tags(preg_replace('#<span[^>]*>[^<]*<\/span>#','',$segmentContent));
     }
+    
+    /**
+     * dedicated method to count chars of given segment content
+     * does a htmlentitydecode, so that 5 char "&amp;" is converted to one char "&" for counting 
+     * @param string $segmentContent
+     * @return integer
+     */
+    public function charCount($segmentContent) {
+        $segmentContent = $this->stripTags($segmentContent);
+        $segmentContent = html_entity_decode($segmentContent, ENT_QUOTES | ENT_XHTML);
+        return mb_strlen($segmentContent);
+    }
+    
     /**
      * strips all tags including tag description
      * FIXME WARNING do not use this method other than it is used currently
