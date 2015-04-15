@@ -453,11 +453,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     }
 
     /**
-     * Um den Durchsatz zuz erhöhen werden die Terme Blockweise gesammelt und dann eingefügt.
+     * The Terms are added in blocks, not as single inserts
+     * @return Zend_Db_Statement_Pdo | null
      */
     protected function saveTermEntityToDb() {
         if(empty($this->termInsertBuffer)) {
-            return;
+            return null;
         }
         
         $termTable = ZfExtended_Factory::get('editor_Models_Db_Terms');
@@ -476,8 +477,9 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
           $queryVals[] = '(' . implode(',', $row) . ')';
         }
         
-        $db->query($query . implode(',', $queryVals));
+        $res = $db->query($query . implode(',', $queryVals));
         $this->termInsertBuffer = array();
+        return $res;
     }
 
     /**
@@ -499,8 +501,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         }
         
         if(empty($this->actualTig) || empty($this->actualTig['mid'])){
-            //$this->log('tig Tag ohne relevanten Inhalt oder ohne term tag id Attribut! Wird ignoriert.');
-            $this->log('tig-tag without relevant content or without attribut id. tip-tag will be ignored.');
+            $this->log('tig-tag without relevant content or without attribut id. tig-tag will be ignored.');
             return;
         }
         $this->actualTermsInLangSet[$this->actualTig['mid']] = $this->actualTig;
