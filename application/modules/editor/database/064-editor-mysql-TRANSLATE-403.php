@@ -49,7 +49,12 @@ $task = ZfExtended_Factory::get('editor_Models_Task');
 /* @var $task editor_Models_Task */
 $tasks = $task->loadAll();
 $config = Zend_Registry::get('config');
-$toProcess = $config->runtimeOptions->translate403->toArray();
+if(isset($config->runtimeOptions->translate403)) {
+    $toProcess = $config->runtimeOptions->translate403->toArray();
+}
+else {
+    $toProcess = null;
+}
 
 $termFormatter = function ($term) {
     return $term['mid'].' - '.$term['term'];
