@@ -110,14 +110,14 @@ class editor_Plugins_TermTagger_Service {
      * If $tbxHash is given, check if Server has loaded the tbx-file with the id $tbxHash.
      * 
      * @param string $url url of the TermTagger-Server
-     * @param string tbxHash unic id for a tbx-file
+     * @param string tbxHash unique id for a tbx-file
      * 
      * @return boolean True if ping was succesfull
      */
-    public function ping(string $url, $tbxHash = null) {
+    public function ping(string $url, $tbxHash = false) {
         $httpClient = $this->getHttpClient($url.'/termTagger/tbxFile/'.$tbxHash);
         $response = $this->sendRequest($httpClient, $httpClient::HEAD);
-        return ($response && ($tbxHash && $this->wasSuccessfull() || !$tbxHash && $this->getLastStatus() == 404));
+        return ($response && (($tbxHash !== false && $this->wasSuccessfull()) || ($tbxHash === false && $this->getLastStatus() == 404)));
     }
     
     

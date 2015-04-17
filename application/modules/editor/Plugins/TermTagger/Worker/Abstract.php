@@ -307,8 +307,8 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
      * Checks if tbx-file with hash $tbxHash is loaded on the TermTagger-server behind $url.
      * If not already loaded, tries to load the tbx-file from the task.
      *
-     * @param unknown $url the TermTagger-server-url
-     * @param unknown $tbxHash unic id of the tbx-file
+     * @param string $url the TermTagger-server-url
+     * @param string $tbxHash unique id of the tbx-file
      *
      * @return boolean true if tbx-file is loaded on the TermTagger-server
      */
