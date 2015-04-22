@@ -68,12 +68,6 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
         $this->minFuzzyStringLength = (integer)$taggerConfig->minFuzzyStringLength;
         
         $this->targetStringMatch = 0;
-        foreach ($taggerConfig->targetStringMatch as  $targetLangOnlyStringMatch) {
-            if($this->targetLang === $targetLangOnlyStringMatch){
-                $this->targetStringMatch = 1;
-            }
-        }
-        
         if (!$task) {
             return;
         }
@@ -86,6 +80,7 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
         $this->sourceLang = $langModel->getRfc5646();
         $langModel->load($task->getTargetLang());
         $this->targetLang = $langModel->getRfc5646();
+        $this->targetStringMatch = (int) in_array($this->targetLang, $taggerConfig->targetStringMatch->toArray(), true);
     } 
     
     /**
