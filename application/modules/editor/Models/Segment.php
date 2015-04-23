@@ -316,10 +316,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $history = ZfExtended_Factory::get('editor_Models_SegmentHistory');
         /* @var $history editor_Models_SegmentHistory */
         $history->setSegmentFieldManager($this->segmentFieldManager);
+        
+        $history->setSegmentId($this->getId());
 
         $fields = array('taskGuid', 'userGuid', 'userName', 'timestamp', 'editable', 'pretrans', 'qmId', 'stateId', 'autoStateId', 'workflowStep', 'workflowStepNr');
         $fields = array_merge($fields, $this->segmentFieldManager->getEditableDataIndexList());
-        $history->setSegmentId($this->getId());
 
         foreach ($fields as $field) {
             $history->__call('set' . ucfirst($field), array($this->get($field)));
