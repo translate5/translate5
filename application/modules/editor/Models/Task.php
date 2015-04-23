@@ -104,6 +104,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @var editor_Models_Task_Meta
      */
     protected $meta;
+    
+    /**
+     * @var string
+     */
+    protected $taskDataPath;
 
     /**
      * loads the task to the given guid
@@ -121,6 +126,15 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         //load implies loading one Row, so use only the first row
         $this->row = $row;
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_Models_Entity_Abstract::init()
+     */
+    public function init(array $data = null) {
+        parent::init($data);
+        $this->taskDataPath = null;
     }
     
     /**
