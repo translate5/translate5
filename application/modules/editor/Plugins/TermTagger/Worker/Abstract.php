@@ -103,7 +103,6 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         $resourceName = self::$praefixResourceName.$this->resourcePool;
         $usedSlots = $this->workerModel->getListSlotsCount($resourceName);
         
-        
         $workerCountToStart = 0;
         foreach ($usedSlots as $slot) {
             if($slot['count']<=1){
@@ -114,9 +113,10 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
             $workerCountToStart = count($this->getAvailableSlots($this->resourcePool));
         }
         
+        parent::queue($state);
         for($i=0;$i<$workerCountToStart;$i++){
+            $this->init($this->workerModel->getTaskGuid(), $this->workerModel->getParameters());
             parent::queue($state);
-            $this->init($this->workerModel->getTaskGuid(), array('resourcePool' => $this->resourcePool));
         }
     }
     /**
