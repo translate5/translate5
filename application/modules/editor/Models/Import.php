@@ -611,9 +611,11 @@ class editor_Models_Import {
             return;
         }
         
-        $messages = Zend_Registry::get('rest_messages');
-        /* @var $messages ZfExtended_Models_Messages */
-        $messages->addError($error); // @fixme: rest-message does not work here !??!
+        if(Zend_Registry::isRegistered('rest_messages')) {
+            $messages = Zend_Registry::get('rest_messages');
+            /* @var $messages ZfExtended_Models_Messages */
+            $messages->addError($error);
+        }
         throw new Zend_Exception($error);
     }
 
