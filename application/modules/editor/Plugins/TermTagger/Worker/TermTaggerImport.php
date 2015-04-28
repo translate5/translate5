@@ -205,7 +205,6 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
     private function loadUntaggedSegmentIds($taskGuid) {
         $config = Zend_Registry::get('config');
         $limit = $config->runtimeOptions->termTagger->segmentsPerCall;
-        $limit = 1;
         
         $db = ZfExtended_Factory::get('editor_Models_Db_Segments');
         /* @var $db editor_Models_Db_Segments */

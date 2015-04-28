@@ -113,7 +113,6 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
             $workerCountToStart = count($this->getAvailableSlots($this->resourcePool));
         }
         
-        parent::queue($state);
         for($i=0;$i<$workerCountToStart;$i++){
             $this->init($this->workerModel->getTaskGuid(), $this->workerModel->getParameters());
             parent::queue($state);
@@ -291,6 +290,9 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         if(empty($return)) {
             trigger_error(__CLASS__.'->'.__FUNCTION__.'; There have to be available slots!');
         }
+        
+        //TODO test if it is possible to work here with a factor 1.5 or so!
+        $this->maxParallelProcesses = count($return);
         
         return $return;
     }
