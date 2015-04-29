@@ -112,7 +112,11 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         if(empty($usedSlots)){
             $workerCountToStart = count($this->getAvailableSlots($this->resourcePool));
         }
-        
+
+        //TODO the generation of $workerCountToStart is slightly intransparent
+        //     we had the case that no worker was added at all.
+        //     so the following max 1 was added
+        $workerCountToStart = max(1, $workerCountToStart);
         for($i=0;$i<$workerCountToStart;$i++){
             $this->init($this->workerModel->getTaskGuid(), $this->workerModel->getParameters());
             parent::queue($state);
