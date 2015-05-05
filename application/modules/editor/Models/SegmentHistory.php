@@ -83,10 +83,11 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
         if(empty($this->historydata[$loc['field']])) {
             $db = ZfExtended_Factory::get('editor_Models_Db_SegmentsHistoryData');
             /* @var $db editor_Models_Db_SegmentsHistoryData */
-            
             $this->historydata[$loc['field']] = $db->createRow(array(
                             'name' => $loc['field'],
                             'segmentHistoryId' => $this->getId(),
+                            'segmentId' => $this->getSegmentId(),
+                            'taskGuid' => $this->getTaskGuid(),
                             'edited' => $value,
                             ));
         }
@@ -103,13 +104,13 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
      */
     protected function get($name) {
         $loc = $this->segmentFieldManager->getDataLocationByKey($name);
+        if($loc === false) {
+            return parent::get($name);
+        }
         if(empty($this->historydata[$loc['field']])) {
             return null;
         }
-        if($loc !== false) {
-            return $this->historydata[$loc['field']]->__get('edited');
-        }
-        return parent::get($name);
+        return $this->historydata[$loc['field']]->__get('edited');
     }
     
     /**

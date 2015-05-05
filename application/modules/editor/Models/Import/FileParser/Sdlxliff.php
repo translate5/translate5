@@ -164,7 +164,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                 strpos($this->_origFile, 'mtype="x-sdl-deleted"')!== false or 
                 strpos($this->_origFile, '<rev-defs>')!== false) {
             trigger_error('There are change Markers in the sdlxliff-file "'.
-                    $this->_fileName.
+                    $this->_fileName.' Task: '.$this->task->getTaskName().' ('.$this->task->getTaskGuid().') '.
                     '". Please clear them first and then try to check in the file again.',
                     E_USER_ERROR);
         }

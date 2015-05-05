@@ -103,7 +103,6 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         $resourceName = self::$praefixResourceName.$this->resourcePool;
         $usedSlots = $this->workerModel->getListSlotsCount($resourceName);
         
-        
         $workerCountToStart = 0;
         foreach ($usedSlots as $slot) {
             if($slot['count']<=1){
@@ -115,8 +114,8 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         }
         
         for($i=0;$i<$workerCountToStart;$i++){
+            $this->init($this->workerModel->getTaskGuid(), $this->workerModel->getParameters());
             parent::queue($state);
-            $this->init($this->workerModel->getTaskGuid(), array('resourcePool' => $this->resourcePool));
         }
     }
     /**
@@ -291,6 +290,9 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         if(empty($return)) {
             trigger_error(__CLASS__.'->'.__FUNCTION__.'; There have to be available slots!');
         }
+        
+        //TODO test if it is possible to work here with a factor 1.5 or so!
+        $this->maxParallelProcesses = count($return);
         
         return $return;
     }

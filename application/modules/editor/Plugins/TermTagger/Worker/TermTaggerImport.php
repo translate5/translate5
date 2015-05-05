@@ -45,7 +45,18 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
     private $sourceFieldName = '';
         
     
+    /**
+     * Flag to use the target original field for tagging instead edited
+     * @var boolean
+     */
+    private $useTargetOriginal = false;
     
+    /**
+     * Flag to keep target original field untouched, must be disabled for import (default false)
+     * Must be enabled for (true) for retagging segments!
+     * @var boolean
+     */
+    private $keepTargetOriginal = false;
     
     /**
      * Special Paramters:
@@ -54,6 +65,13 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
      * sets the resourcePool for slot-calculation depending on the context.
      * Possible values are all values out of $this->allowedResourcePool
      * 
+     * $parameters['useTargetOriginal']
+     * set to true to use the target original field instead of the target edited field 
+     * default is false
+     * 
+     * $parameters['keepTargetOriginal']
+     * set to true to leave the target original field unmodified!
+     * default is false, since not needed for import, but for retagging of segments 
      * 
      * On very first init:
      * seperate data from parameters which are needed while processing queued-worker.
@@ -77,9 +95,28 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
             }
         }
         
+        $this->useTargetOriginal = !empty($parameters['useTargetOriginal']);
+        $this->keepTargetOriginal = !empty($parameters['keepTargetOriginal']);
+        
+        if($this->useTargetOriginal) {
+            $parametersToSave['useTargetOriginal'] = true;
+        }
+        if($this->keepTargetOriginal) {
+            $parametersToSave['keepTargetOriginal'] = true;
+        }
+        
         return parent::init($taskGuid, $parametersToSave);
     }
     
+    /**
+     * Method for CallBack Workers to reset the termtag state
+     * @param unknown $taskGuid
+     */
+    public function resetTermtagState($taskGuid) {
+        $segMetaDb = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
+        /* @var $segMetaDb editor_Models_Db_SegmentMeta */
+        $segMetaDb->update(array('termtagState' => self::SEGMENT_STATE_UNTAGGED), array('taskGuid = ?' => $taskGuid));
+    }
     
     /**
      * (non-PHPdoc)
@@ -151,7 +188,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
         /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
         
-        if (!$worker->init($taskGuid, array('resourcePool' => 'import'))) {
+        if (!$worker->init($taskGuid, $this->workerModel->getParameters())) {
             $this->log->logError('TermTaggerImport-Error on new worker init()'
                                 , __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
@@ -276,8 +313,8 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
                 if($field->type != editor_Models_SegmentField::TYPE_TARGET || !$field->editable) {
                     continue;
                 }
-                
-                $serverCommunication->addSegment($segment->getId(), $field->name, $sourceText, $segment->getTargetEdit());
+                $targetText = $this->useTargetOriginal ? $segment->getTarget() : $segment->getTargetEdit();
+                $serverCommunication->addSegment($segment->getId(), $field->name, $sourceText, $targetText);
             }
         }
         
@@ -307,8 +344,12 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
             }
         
             foreach ($responseGroup as $response) {
-                $segment->set($response->field, $response->target);
-                $segment->set($fieldManager->getEditIndex($response->field), $response->target);
+                if(! $this->keepTargetOriginal) {
+                    $segment->set($response->field, $response->target);
+                }
+                if(! $this->useTargetOriginal) {
+                    $segment->set($fieldManager->getEditIndex($response->field), $response->target);
+                }
             }
         
             $segment->save();
@@ -394,5 +435,4 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         
         $this->log->logError('TermTagger-Import defect Segments ', __CLASS__.' -> '.__FUNCTION__."\n". $msg);
     }
-    
 }
