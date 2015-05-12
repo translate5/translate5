@@ -196,6 +196,7 @@ Diese Email wurde automatisch generiert. Please do not reply to this email.</tar
 <trans-unit id='VW5zZXJlIEFkbWluaXN0cmF0b3JlbiB3ZXJkZW4gw7xiZXIgZGVuIEZlaGxlciBhdXRvbWF0aXNjaCBiZW5hY2hyaWNodGlndC4gRmFsbHMgd2VpdGVyZSBGcmFnZW4gb2RlciBVbmtsYXJoZWl0ZW4gYmVzdGVoZW4sIHdlbmRlbiBTaWUgc2ljaCBiaXR0ZSBhbiBkZW4gU3VwcG9ydC4='><source>Unsere Administratoren werden über den Fehler automatisch benachrichtigt. Falls weitere Fragen oder Unklarheiten bestehen, wenden Sie sich bitte an den Support.</source><target>Unsere Administratoren werden über den Fehler automatisch benachrichtigt. Falls weitere Fragen oder Unklarheiten bestehen, wenden Sie sich bitte an den Support.</target></trans-unit>
 <trans-unit id='U3VwcG9ydCBFLU1haWw6'><source>Support E-Mail:</source><target>Support E-Mail:</target></trans-unit>
 <trans-unit id='VGVzdGltb25pYWxz'><source>Testimonials</source><target>Testimonials</target></trans-unit>
+<trans-unit id='RGV2ZWxvcGVycw=='><source>Developers</source><target>Developers</target></trans-unit>
   </body>
  </file>
 </xliff>
