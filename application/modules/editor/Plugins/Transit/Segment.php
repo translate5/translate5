@@ -150,6 +150,7 @@ class editor_Plugins_Transit_Segment{
     }
 
     public function setInfo($infotext){
+        $this->addInfoPartIfNotExists();
         return $this->setPart(self::PART_INFO, editor_Plugins_Transit_File::enc2ucs($infotext), true);
     }
 
@@ -428,6 +429,30 @@ class editor_Plugins_Transit_Segment{
         
         // write the new data into the desired part
         $segment_parts[$tempKey + 1] = $newpartdata;
+        $this->data = implode("", $segment_parts);
+        $this->isChanged = true;
+        
+        return true;
+    }
+    /**
+     * 
+     * @return boolean
+     */
+    private function addInfoPartIfNotExists(){
+        if(strpos($this->data, self::PART_INFO)!==false){
+            return false;
+        }
+        $segment_parts = preg_split("/" . self::PART_SPLIT . "/", $this->data, - 1, PREG_SPLIT_DELIM_CAPTURE);
+        
+        if(strpos($this->data, self::PART_STATUS)!==false){
+            array_splice($segment_parts, 3, 0, self::PART_INFO);
+            array_splice($segment_parts, 4, 0, '');
+        }
+        else {
+            array_splice($segment_parts, 1, 0, self::PART_INFO);
+            array_splice($segment_parts, 2, 0, '');
+        }
+           
         $this->data = implode("", $segment_parts);
         $this->isChanged = true;
         
