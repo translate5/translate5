@@ -49,12 +49,20 @@ Ext.define('Editor.view.ViewPort', {
                     type: 'fit'
                 },
                 items: [{
-                    xtype: 'adminTaskGrid'
+                    xtype: me.getInitialView()
                 }]
             }];
         Ext.applyIf(me, {
             items: items
         });
         me.callParent(arguments);
+    },
+    getInitialView: function() {
+        var hash = window.location.hash,
+            found = hash.match('initialView/([a-zA-Z0-9]+)');
+        if(found && found[1]) {
+            return found[1];
+        }
+        return 'adminTaskGrid';
     }
   });

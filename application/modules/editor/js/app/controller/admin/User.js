@@ -117,13 +117,16 @@ Ext.define('Editor.controller.admin.User', {
   initMainMenu: function() {
       var toolbar = this.getHeadToolBar(),
           insertIdx = 1,
-          logout = this.getLogoutButton();
+          logout = this.getLogoutButton(),
+          grid = this.getUserGrid();
+
       if(logout) {
           insertIdx = toolbar.items.indexOf(logout) + 1;
       }
       toolbar.insert(insertIdx, {
           itemId: 'user-admin-btn',
           xtype: 'button',
+          hidden: grid && grid.isVisible(),
           text: this.strings.openUserAdminBtn
       });
   },

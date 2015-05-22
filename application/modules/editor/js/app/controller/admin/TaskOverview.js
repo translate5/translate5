@@ -160,14 +160,15 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   initMainMenu: function() {
       var toolbar = this.getHeadToolBar(),
           insertIdx = 1,
-          logout = this.getLogoutButton();
+          logout = this.getLogoutButton(),
+          grid = this.getTaskGrid();
       if(logout) {
           insertIdx = toolbar.items.indexOf(logout) + 1;
       }
       toolbar.insert(insertIdx, {
           itemId: 'task-admin-btn',
           xtype: 'button',
-          hidden: true,
+          hidden: grid && grid.isVisible(),
           text: this.strings.openTaskAdminBtn
       });
   },
@@ -199,7 +200,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       }
       else {
           me.getCenterRegion().add({
-              xtype: 'adminTaskGrid'
+              xtype: 'adminTaskGrid',
+              height: '100%'
           });
           me.handleAfterShow();
       }
