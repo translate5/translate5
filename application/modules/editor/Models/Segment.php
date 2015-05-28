@@ -79,7 +79,17 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     protected $meta;
     
-    protected $isDataModified;
+    /**
+     * cached is modified info
+     * @var boolean
+     */
+    protected $isDataModifiedAgainstOriginal = null;
+    
+    /**
+     * cached is modified info
+     * @var boolean
+     */
+    protected $isDataModified = null;
 
     /**
      * init the internal segment field and the DB object
@@ -181,9 +191,31 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * Loops over all data fields and checks if at least one of them was changed (compare by original and edited content)
+     * Loops over all data fields and checks if at least one of them was changed at all,
+     * that means: compare original and edited content
      * @param string $typeFilter optional, checks only data fields of given type
      * @return boolean
+     */
+    public function isDataModifiedAgainstOriginal($typeFilter = null) {
+        if(!is_null($this->isDataModifiedAgainstOriginal)){
+            return $this->isDataModifiedAgainstOriginal;
+        }
+        $this->isDataModifiedAgainstOriginal = false;
+        foreach ($this->segmentdata as $data) {
+            $field = $this->segmentFieldManager->getByName($data->name);
+            $isEditable = $field->editable;
+            if(!$isEditable || !empty($typeFilter) && $data->type !== $typeFilter) {
+                continue;
+            }
+            if($this->stripTermTags($data->edited) !== $this->stripTermTags($data->original)) {
+                $this->isDataModifiedAgainstOriginal = true;
+            }
+        }
+        return $this->isDataModifiedAgainstOriginal;
+    }
+    
+    /**
+     * Checks if segment data is changed in this entity, compared against last loaded content
      */
     public function isDataModified($typeFilter = null) {
         if(!is_null($this->isDataModified)){
@@ -193,15 +225,18 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         foreach ($this->segmentdata as $data) {
             $field = $this->segmentFieldManager->getByName($data->name);
             $isEditable = $field->editable;
-            if(!$isEditable || !empty($typeFilter) && $data->type !== $typeFilter) {
+            $fieldName = $this->segmentFieldManager->getEditIndex($data->name);
+            $edited = $this->isModified($fieldName);
+            if(!$isEditable || !$edited || !empty($typeFilter) && $data->type !== $typeFilter) {
                 continue;
             }
-            if($this->stripTermTags($data->edited) !== $this->stripTermTags($data->original)) {
+            if($this->stripTermTags($data->edited) !== $this->stripTermTags($this->getOldValue($fieldName))) {
                 $this->isDataModified = true;
             }
         }
         return $this->isDataModified;
     }
+    
     /**
      * restores segments with content not changed by the user to the original
      * (which contains termTags - this way no new termTagging is necessary, since
@@ -217,7 +252,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             if(!$isEditable) {
                 continue;
             }
-            $data->edited = $data->original;
+            $fieldName = $this->segmentFieldManager->getEditIndex($data->name);
+            $data->edited = $this->getOldValue($fieldName);
         }
     }
     /**
