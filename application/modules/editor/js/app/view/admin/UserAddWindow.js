@@ -108,6 +108,14 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                     defaults: defaults,
                     title: me.strings.userInfo,
                     items:[{
+                        xtype: 'radiogroup',
+                        fieldLabel: me.strings.genderLabel,
+                        columns: 1,
+                        items: [
+                                {boxLabel: me.strings.genderFemale, name: 'gender', inputValue: 'f'},
+                                {boxLabel: me.strings.genderMale, name: 'gender', inputValue: 'm'}
+                                ]
+                    },{
                         xtype: 'fieldcontainer',
                         fieldLabel: me.strings.nameLabel,
                         toolTip: me.strings.nameTip,
@@ -135,14 +143,6 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                             emptyText: me.strings.surNameLabel,
                             allowBlank: false
                         }]
-                    },{
-                        xtype: 'radiogroup',
-                        fieldLabel: me.strings.genderLabel,
-                        columns: 1,
-                        items: [
-                            {boxLabel: me.strings.genderFemale, name: 'gender', inputValue: 'f'},
-                            {boxLabel: me.strings.genderMale, name: 'gender', inputValue: 'm'}
-                        ]
                     },{
                         xtype: 'textfield',
                         name: 'email',
