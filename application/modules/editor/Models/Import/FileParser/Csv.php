@@ -318,9 +318,6 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     
     
     /**
-     * extracts tags and converts terms of the segment 
-     * 
-     * - for csv currently does nothing, since tags and terms are not supported
      *
      * @param mixed $segment
      * @param boolean isSource

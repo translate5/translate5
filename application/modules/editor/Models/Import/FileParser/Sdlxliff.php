@@ -98,19 +98,10 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $this->addSldxliffTagMappings();
         parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $sourceLang, $targetLang, $task);
         $this->checkForSdlChangeMarker();
-        $this->removeEmtpyXmlns();
         $this->protectUnicodeSpecialChars();
         $this->prepareTagMapping();
     }
 
-    /**
-     * Entfernt vom TermTagger eingefügte leerer xmlns-Attribute
-     */
-    protected function removeEmtpyXmlns() {
-        $this->_origFile = preg_replace('"(\s*)xmlns=\"\"\s*"s', '\\1', $this->_origFile);
-    }
-    
-    
     /**
      * Adds the sdlxliff specific tagmappings
      * Mapping von tagId zu Name und anzuzeigendem Text fuer den Nutzer
@@ -553,35 +544,13 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $data = ZfExtended_Factory::get('editor_Models_Import_FileParser_Sdlxliff_ParseSegmentData');
         $data->segment = preg_split('"(<[^>]*>)"', $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
         $data->segmentCount = count($data->segment);
-        $openCountInTerm = 0;
 
         //parse nur die ungeraden Arrayelemente, den dies sind die Rückgaben von PREG_SPLIT_DELIM_CAPTURE
         for ($data->i = 1; $data->i < $data->segmentCount; $data->i++) {
             if (preg_match('"^<[^/].*[^/]>$"', $data->segment[$data->i]) > 0) {//öffnender Tag (left-tag)
-                if (strpos($data->segment[$data->i], 'mtype="x-term')!== false) {//der öffnende Tag leitet einen Term ein
-                    //per Definition erzeugt der Term-Tagger keinen Term innerhalb eines bereits
-                    //ausgezeichneten Terms. Auch müssen alle innerhalb eines
-                    //ausgezeichneten Terms geöffneten Tags innerhalb dieses Terms
-                    //wieder geschlossen werden
-                    $openCountInTerm++;
-                    $data->currentTermIndex = $data->i;
-                }
-                else {
-                    $data = $this->parseLeftTag($data);
-                    if(!is_null($data->currentTermIndex))$openCountInTerm++;
-                }
+                $data = $this->parseLeftTag($data);
             } elseif (preg_match('"^</"', $data->segment[$data->i]) > 0) {//schließender Tag (right-tag)
-                if($openCountInTerm === 1 and $data->segment[$data->i] === '</mrk>' and !is_null($data->currentTermIndex)){
-                    $data = $this->parseSegmentReplaceTermSlicesByHtmlTermString($data,$isSource);
-                    $openCountInTerm = 0;
-                    $data->currentTermIndex = NULL;
-                }
-                else{
-                    if(!is_null($data->currentTermIndex)){
-                        $openCountInTerm--;
-                    }
                     $data = $this->parseRightTag($data);
-                }
             } else {//in sich geschlossener Tag (single-tag)
                 $data = $this->parseSingleTag($data);
             }
@@ -589,82 +558,6 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             $this->_tagCount++;
         }
         return implode('', $data->segment);
-    }
-
-    /**
-     * ersetzt alle Array-Indizes von $data->segment, die sich innerhalb des Term-Tags
-     * befinden, der mit $data->segment[$data->currentTermIndex] startet durch einen
-     * einzigen Index, der bereits den gesamten Termtag mit allen in ihm enthaltenen
-     * normalen Tags enthält
-     *
-     * - vorausgesetzt wird strpos($data->segment[$data->i], 'mtype="x-term') !== false
-     * - befüllt auch $this->_terms2save mit mit editor_Models_TermTagData-Objekten als Werten
-     *   mittels $this->getTermTagDataWhileParsingSegment()
-     *
-     * @param editor_Models_Import_FileParser_Sdlxliff_ParseSegmentData $data
-     * @param boolean isSource
-     * @return editor_Models_Import_FileParser_Sdlxliff_ParseSegmentData $data
-     */
-    protected function parseSegmentReplaceTermSlicesByHtmlTermString($data,$isSource) {
-        $termTagData = $this->getTermTagDataWhileParsingSegment($data, $isSource);
-        $term = array();
-        $termStart = $data->currentTermIndex+1;
-        $openCount = 0;//counts open term-tags
-        for ($k = $termStart; $k < $data->segmentCount; $k++) {
-            $term[] = $data->segment[$k];//füge Text hinzu
-            unset($data->segment[$k]);
-            $k++; //gehe zum nächsten Tag
-            if(strpos($data->segment[$k], '<mrk') !== false){
-                if(strpos($data->segment[$k], 'x-term') !== false){
-                    trigger_error('Term-Tag inside of Term-Tag - this is not supported so far' .
-                            $data->segment[$data->currentTermIndex], E_USER_ERROR);
-                }
-                $openCount++;
-            } elseif ($data->segment[$k]=== '</mrk>') {
-                if($openCount == 0){
-                    unset($data->segment[$k]);
-                    $termTagData->term = implode('', $term);
-                    $this->_terms2save[] = $termTagData;
-                    $data->segment[$data->currentTermIndex] = $this->segmentTermTag->getGeneratedTermTag($termTagData);
-                    return $data;
-                }
-                $openCount--;
-            }
-            $term[] = $data->segment[$k];//füge hinzu
-            unset($data->segment[$k]);
-        }
-        trigger_error('kein schließender </mrk>-Tag gefunden. Aktueller Term-Tag:  ' .
-                            $data->segment[$data->currentTermIndex], E_USER_ERROR);
-    }
-
-    /**
-     * Befüllt ein editor_Models_TermTagData-Objekt abgesehen von ->term
-     * @param editor_Models_Import_FileParser_Sdlxliff_ParseSegmentData $data
-     * @param boolean isSource
-     * @return editor_Models_TermTagData $termTagData
-     */
-    protected function getTermTagDataWhileParsingSegment($data,$isSource) {
-         $tag = $data->segment[$data->currentTermIndex];
-         $termTagData = ZfExtended_Factory::get('editor_Models_TermTagData');
-         $termTagData->mid = preg_replace('"<.* mid=\"([^\"]*)\".*>"', '\\1', $tag);
-         $termTagData->transFound = (strpos($tag, 'transNotFound')!== false?false:true);
-         $termTagData->status = preg_replace('"<.* mtype=\"x-term-([^\"-]*)-trans[^\"]*\".*>"', '\\1', $tag);
-         $termTagData->used = true;
-         $termTagData->projectTerminstanceId = $this->_projectTerminstanceId;
-         $this->_projectTerminstanceId++;
-         $termTagData->isSource = $isSource;
-         if(!isset($this->_terms[$termTagData->mid])){
-             $term = ZfExtended_Factory::get('editor_Models_Term');
-             /* @var $term editor_Models_Term */
-             $s = $term->db->select();
-             $s->where('mid = ?',$termTagData->mid)
-               ->where('taskGuid = ?',$this->_taskGuid);
-             $term->loadRowBySelect($s);
-             $this->_terms[$termTagData->mid] = $term;
-         }
-         $termTagData->id = $this->_terms[$termTagData->mid]->getId();
-         $termTagData->definition = $this->_terms[$termTagData->mid]->getDefinition();
-         return $termTagData;
     }
 
     /**
@@ -709,7 +602,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      */
     protected function parseRightTag($data) {
         if(empty($data->openTags[$data->openCounter])){
-            trigger_error('Schließender Tag ohne einen öffnenden gefunden. Aktuelle Segment Mid: '.$this->_mid.'. Aktueller Term-Tag:  ' .join('', $data->segment), E_USER_ERROR);
+            trigger_error('Schließender Tag ohne einen öffnenden gefunden. Aktuelle Segment Mid: '.$this->_mid.'. Aktueller Tag:  ' .join('', $data->segment), E_USER_ERROR);
         }
         $openTag = $data->openTags[$data->openCounter];
         $mappedTag = $this->_tagMapping[$openTag['tagId']];
