@@ -96,23 +96,25 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
     }
     /**
      * @todo forking should be transfered to ZfExtended_Worker_Abstract to make it usable for other workers.
-     * it should be based on maxParallelProcesses instead of just having one running worker per slot and maxParallelProcesses=1 as currently - but one slot for each termTagger instance. All termTagger instances should run in the same slot but maxParallelProcesses should be set to the number of termTagger-instances
+     * it should be based on maxParallelProcesses instead of just having one running worker per slot. maxParallelProcesses is ignored so far.
      * @param string $state
      */
     public function queue($state = NULL) {
         $resourceName = self::$praefixResourceName.$this->resourcePool;
-        $usedSlots = $this->workerModel->getListSlotsCount($resourceName);
         
         $workerCountToStart = 0;
-        foreach ($usedSlots as $slot) {
-            if($slot['count']<=1){
-                $workerCountToStart++;
-            }
+
+        $usedSlots = count($this->workerModel->getListSlotsCount($resourceName));
+               
+        $availableWorkerSlots = count($this->getAvailableSlots($this->resourcePool));
+        
+        while(($usedSlots+$workerCountToStart)<($availableWorkerSlots+1)){
+            $workerCountToStart++;
         }
         if(empty($usedSlots)){
             $workerCountToStart = count($this->getAvailableSlots($this->resourcePool));
         }
-        
+
         for($i=0;$i<$workerCountToStart;$i++){
             $this->init($this->workerModel->getTaskGuid(), $this->workerModel->getParameters());
             parent::queue($state);
@@ -290,9 +292,6 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         if(empty($return)) {
             trigger_error(__CLASS__.'->'.__FUNCTION__.'; There have to be available slots!');
         }
-        
-        //TODO test if it is possible to work here with a factor 1.5 or so!
-        $this->maxParallelProcesses = count($return);
         
         return $return;
     }
