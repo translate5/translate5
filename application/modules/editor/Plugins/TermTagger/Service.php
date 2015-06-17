@@ -242,8 +242,6 @@ class editor_Plugins_TermTagger_Service {
     }
     
     private function encodeSegments(editor_Plugins_TermTagger_Service_ServerCommunication $data) {
-        $matchContentRegExp = '/<div[^>]+class="(open|close|single).*?".*?\/div>/is';
-        
         foreach ($data->segments as & $segment) {
             $segment->source = $this->encodeText($segment->source);
             $segment->target = $this->encodeText($segment->target);
@@ -288,7 +286,6 @@ class editor_Plugins_TermTagger_Service {
         if (empty($this->replacedTagsNeedles)) {
             return $text;
         }
-        $textOriginal = $text;
         $text = str_replace($this->replacedTagsNeedles, $this->replacedTagsReplacements, $text);
         
         return $text;
