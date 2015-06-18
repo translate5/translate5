@@ -97,6 +97,10 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
     }
     
     public function handleAfterTaskImport(Zend_EventManager_Event $event) {
+        $config = Zend_Registry::get('config');
+        $c = $config->runtimeOptions->termTagger->switchOn->import;
+        if((boolean)$c === false)
+            return;
         $task = $event->getParam('task');
         /* @var $task editor_Models_Task */
         if (!$task->getTerminologie()) {
@@ -149,6 +153,11 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
      * Re-TermTag the (modified) segment-text.
      */
     public function handleBeforePutSave(Zend_EventManager_Event $event) {
+        $config = Zend_Registry::get('config');
+        $c = $config->runtimeOptions->termTagger->switchOn->GUI;
+        if((boolean)$c === false)
+            return;
+        
         $segment = $event->getParam('model');
         /* @var $segment editor_Models_Segment */
         $taskGuid = $segment->getTaskGuid();
