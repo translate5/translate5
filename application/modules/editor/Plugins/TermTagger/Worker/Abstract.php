@@ -54,7 +54,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
      * Praefix for workers resource-name
      * @var string
     */
-    private static $praefixResourceName = 'TermTagger_';
+    protected static $praefixResourceName = 'TermTagger_';
     
     /**
      * Values for termtagging segment-states
@@ -100,11 +100,9 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
      * @param string $state
      */
     public function queue($state = NULL) {
-        $resourceName = self::$praefixResourceName.$this->resourcePool;
-        
         $workerCountToStart = 0;
 
-        $usedSlots = count($this->workerModel->getListSlotsCount($resourceName));
+        $usedSlots = count($this->workerModel->getListSlotsCount(self::$resourceName));
                
         $availableWorkerSlots = count($this->getAvailableSlots($this->resourcePool));
         
@@ -223,17 +221,15 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
      * @return array('resource' => resourceName, 'slot' => slotName)
      */
     private function calculateSlot($resourcePool = 'default') {
-        $resourceName = self::$praefixResourceName.$resourcePool;
-        
         // detect defined slots for the resourcePool
         $availableSlots = $this->getAvailableSlots($resourcePool);
         
-        $usedSlots = $this->workerModel->getListSlotsCount($resourceName, $availableSlots);
+        $usedSlots = $this->workerModel->getListSlotsCount(self::$resourceName, $availableSlots);
         
         // all slotes in use
         if (count($usedSlots) == count($availableSlots)) {
             // take first slot in list of usedSlots which is the one with the min. number of counts
-            $return = array('resource' => $resourceName, 'slot' => $usedSlots[0]['slot']);
+            $return = array('resource' => self::$resourceName, 'slot' => $usedSlots[0]['slot']);
             return $return;
         }
         
@@ -250,12 +246,12 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
             }
             $unusedSlots = array_values($unusedSlots);
             
-            $return = array('resource' => $resourceName, 'slot' => $unusedSlots[array_rand($unusedSlots)]);
+            $return = array('resource' => self::$resourceName, 'slot' => $unusedSlots[array_rand($unusedSlots)]);
             return $return;
         }
         
         // no slot in use
-        $return = array('resource' => $resourceName, 'slot' => $availableSlots[array_rand($availableSlots)]);
+        $return = array('resource' => self::$resourceName, 'slot' => $availableSlots[array_rand($availableSlots)]);
         return $return;
     }
     

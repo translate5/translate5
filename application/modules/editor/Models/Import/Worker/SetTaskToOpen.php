@@ -29,18 +29,41 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Since Statistics are mostly only important for editable segments, the plugin provides this worker,
- * which deletes all statistics for non editable segments.
+ * This class provides a general Worker which can be configured with a callback method which.
+ * This class is designed for simple workers which dont need a own full blown worker class.
+ * 
+ * The following parameters are needed: 
+ * class → the class which should be instanced on work. Classes with Constructor Parameters are currently not supported!
+ * method → the class method which is called on work. The method receives the taskguid and the whole parameters array.
+ * 
+ * Be careful: This class can not be used in worker_dependencies !
  */
-class editor_Plugins_SegmentStatistics_WriteStatisticsWorker extends editor_Plugins_SegmentStatistics_Worker {
+class editor_Models_Import_Worker_SetTaskToOpen extends ZfExtended_Worker_Abstract {
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_Worker_Abstract::validateParameters()
+     */
+    protected function validateParameters($parameters = array()) {
+        return empty($parameters);
+    }
     
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
-        $this->setType();
-        $this->writeToDisk();
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($this->taskGuid);
+        
+        if ($task->getState() != $task::STATE_IMPORT) {
+            return false;
+        }
+        $task->setState($task::STATE_OPEN);
+        $task->save();
+        
+        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
+        $eventManager->trigger('importCompleted', $this, array('task' => $task));
         return true;
     }
 }

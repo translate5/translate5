@@ -58,20 +58,11 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTag
     public function init($taskGuid = NULL, $parameters = array()) {
         $this->data = $parameters;
         
-        $parametersToSave = array();
-        
-        if (isset($parameters['resourcePool'])) {
-            if (in_array($parameters['resourcePool'], self::$allowedResourcePools)) {
-                $this->resourcePool = $parameters['resourcePool'];
-                $parametersToSave['resourcePool'] = $this->resourcePool;
-            }
-        }
-        
         if (isset($parameters['serverCommunication'])) {
-            $parametersToSave['serverCommunication'] = $parameters['serverCommunication'];
+            $this->parametersToSave['serverCommunication'] = $parameters['serverCommunication'];
         }
         
-        return parent::init($taskGuid, $parametersToSave);
+        return parent::init($taskGuid, $this->parametersToSave);
     }
 
 

@@ -29,6 +29,10 @@ END LICENSE AND COPYRIGHT
 */
 
 class editor_Plugins_NoMissingTargetTerminology_Worker extends ZfExtended_Worker_Abstract{
+    protected $workerChainDependency = array(
+        'editor_Plugins_TermTagger_Worker_TermTaggerImport',
+        'editor_Plugins_SegmentStatistics_Worker'
+        );
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
