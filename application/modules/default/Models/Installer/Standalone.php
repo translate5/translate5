@@ -79,6 +79,9 @@ class Models_Installer_Standalone {
         $saInstaller->initApplication();
         $saInstaller->postInstallation();
         $saInstaller->updateDb();
+        $saInstaller->log('Translate5 installation / update done.');
+        $saInstaller->log('Please visit http://'.$this->hostname.'/ to enjoy Translate5.');
+        $saInstaller->log('In case of errors on installation / update please contact support@translate5.net');
     }
     
     /**
