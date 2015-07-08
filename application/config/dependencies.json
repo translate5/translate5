@@ -15,7 +15,7 @@
         "label": "translate5 DB init",
         "url": "RELEASE:translate5-DB-init.zip",
         "target": "dbinit/",
-        "md5": "e07ffbfec54159a87f223bd6075062de"
+        "md5": "140f2d92d4222f573bd3a916b2946578"
     },{
         "name": "horde_text_diff",
         "label": "Horde Text Diff 2.0.1",
