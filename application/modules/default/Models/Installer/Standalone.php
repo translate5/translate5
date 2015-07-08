@@ -80,7 +80,9 @@ class Models_Installer_Standalone {
         $saInstaller->postInstallation();
         $saInstaller->updateDb();
         $saInstaller->log('Translate5 installation / update done.');
-        $saInstaller->log('Please visit http://'.$this->hostname.'/ to enjoy Translate5.');
+        if(!empty($saInstaller->hostname)) {
+            $saInstaller->log('Please visit http://'.$saInstaller->hostname.'/ to enjoy Translate5.');
+        }
         $saInstaller->log('In case of errors on installation / update please contact support@translate5.net');
     }
     
