@@ -145,8 +145,8 @@ class Models_Installer_Standalone {
      * prompting the user for the DB credentials
      */
     protected function promptDbCredentials() {
-        $this->log('Please enter the MySQL database settings, ');
-        $this->log('the database must created with the command: ');
+        $this->log('Please enter the MySQL database settings, the database must already exist.');
+        $this->log('Default character set must be utf8. This can be done for example with the following command: ');
         $this->log('  CREATE DATABASE IF NOT EXISTS `translate5` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;'."\n");
         
         foreach($this->dbCredentials as $key => $default) {
@@ -179,7 +179,7 @@ class Models_Installer_Standalone {
      * @return boolean
      */
     protected function initDb() {
-        $this->log('Creating the database base layout...');
+        $this->log("\nCreating the database base layout...");
         $dbInit = $this->currentWorkingDir.'/'.self::DB_INIT;
         $exec = empty($this->dbCredentials['executable']) ? self::MYSQL_BIN : $this->dbCredentials['executable'];
         
@@ -219,9 +219,9 @@ class Models_Installer_Standalone {
         
         $bytes = file_put_contents($this->currentWorkingDir.self::INSTALL_INI, join("\n",$content));
         if($bytes > 0) {
-            $this->log('DB Config successfully stored in '.self::INSTALL_INI."!\n");
+            $this->log("\nDB Config successfully stored in .".self::INSTALL_INI."!\n");
         } else {
-            $this->log('DB Config could NOT be stored in '.self::INSTALL_INI."!\n");
+            $this->log("\nDB Config could NOT be stored in .".self::INSTALL_INI."!\n");
         }
         return ($bytes > 0);
     }
@@ -234,7 +234,7 @@ class Models_Installer_Standalone {
         
         $dbupdater = ZfExtended_Factory::get('ZfExtended_Models_Installer_DbUpdater');
         /* @var $dbupdater ZfExtended_Models_Installer_DbUpdater */
-        $dbupdater->importAll();
+        $stat = $dbupdater->importAll();
         
         $errors = $dbupdater->getErrors();
         if(!empty($errors)) {
@@ -242,10 +242,7 @@ class Models_Installer_Standalone {
             return;
         }
         
-        $new = $dbupdater->getNewFiles();
-        $mod = $dbupdater->getModifiedFiles();
-        
-        $this->log("DB Update OK\n  New statement files: ".count($new)."\n  Modified statement files: ".count($mod)."\n");
+        $this->log("DB Update OK\n  New statement files: ".$stat['new']."\n  Modified statement files: ".$stat['modified']."\n");
     }
     
     /**
