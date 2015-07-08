@@ -1,61 +1,64 @@
 {
-    "md5hashtable": "http://www.translate5.net/downloads/md5hashtable",
+    "channels": {
+        "RELEASE": "http://www.translate5.net/downloads-dev/"
+    },
+    "md5hashtable": "RELEASE:md5hashtable",
     "application": {
         "name": "translate5",
         "label": "Translate5 X.Y.Z",
-        "url": "http://www.translate5.net/downloads/translate5-new.zip",
+        "url": "RELEASE:translate5-new.zip",
         "version": "x.Y.Z",
         "md5": "fc3aae953911f0d66d99b7cc1cc5f520"
     },
     "dependencies": [{
         "name": "translate5-DB-init",
         "label": "translate5 DB init",
-        "url": "http://www.translate5.net/downloads/translate5-DB-init.zip",
+        "url": "RELEASE:translate5-DB-init.zip",
         "target": "dbinit/",
         "md5": "e07ffbfec54159a87f223bd6075062de"
     },{
         "name": "horde_text_diff",
         "label": "Horde Text Diff 2.0.1",
-        "url": "http://www.translate5.net/downloads/Horde_Text_Diff-2.0.1.zip",
+        "url": "RELEASE:Horde_Text_Diff-2.0.1.zip",
         "version": "2.0.1",
         "target": "library/Horde_Text_Diff/",
         "md5": "341e0d9447b7466c72683ac808faba90"
     },{
         "name": "zend",
         "label": "PHP Zend 1.12-11",
-        "url": "http://www.translate5.net/downloads/Zend-1.12-11.zip",
+        "url": "RELEASE:Zend-1.12-11.zip",
         "version": "1.12-11",
         "target": "library/zend/",
         "md5": "c65616460c98aed6581ef04202ff049c"
     },{
         "name": "querypath",
         "label": "Querypath 3.0.3",
-        "url": "http://www.translate5.net/downloads/querypath-3.0.3.zip",
+        "url": "RELEASE:querypath-3.0.3.zip",
         "version": "3.0.3",
         "target": "library/querypath/",
         "md5": "4df759ee4f66c01c6b442749db840621"
     },{
         "name": "Open_Sans",
         "label": "Open Sans Fonts",
-        "url": "http://www.translate5.net/downloads/Open_Sans.zip",
+        "url": "RELEASE:Open_Sans.zip",
         "target": "application/modules/editor/ThirdParty/Open_Sans/",
         "md5": "e80dd595ccb85f648f47c6b4eec8f2ae"
     },{
         "name": "termtagger",
         "label": "OpenTMS TermTagger",
-        "url": "http://www.translate5.net/downloads/openTMStermTagger.zip",
+        "url": "RELEASE:openTMStermTagger.zip",
         "target": "application/modules/editor/ThirdParty/XliffTermTagger/",
         "md5": "d7d809d46b42495efc8cf9155ff10f1d"
     },{
         "name": "phpexcel",
         "label": "PHPExcel 1.8.0",
-        "url": "http://www.translate5.net/downloads/PHPExcel.zip",
+        "url": "RELEASE:PHPExcel.zip",
         "target": "library/ZfExtended/ThirdParty/PHPExcel/",
         "md5": "b6e41635ea87ec9b7173dc9294dfa873"
     },{
         "name": "extjs-4",
         "label": "ExtJS 4.0.7",
-        "url": "http://www.translate5.net/downloads/ext-4.0.7.zip",
+        "url": "RELEASE:ext-4.0.7.zip",
         "target": "public/ext-4.0.7",
         "md5": "1a5dc245c9953aa456195df5c0f1c74e"
     }]
