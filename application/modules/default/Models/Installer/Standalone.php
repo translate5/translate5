@@ -64,7 +64,7 @@ class Models_Installer_Standalone {
             'database' => 'translate5',
     );
     
-    protected $hostname = 'localhost';
+    protected $hostname = 'translate5.local';
     
     /**
      * Options: 
@@ -174,14 +174,13 @@ class Models_Installer_Standalone {
      */
     protected function promptHostname() {
         $prompt = "\nPlease enter the hostname of the virtual host which will serve Translate5";
-        $prompt .= ' (default: localhost): ';
+        $prompt .= ' (default: translate5.local): ';
         $value = readline($prompt);
-        $this->hostname = empty($value) ? 'localhost' : $value;
+        $this->hostname = empty($value) ? 'translate5.local' : $value;
     }
     
     /**
      * Applies the DbInit.sql
-     * @return boolean
      */
     protected function initDb() {
         $this->log("\nCreating the database base layout...");
@@ -194,15 +193,12 @@ class Models_Installer_Standalone {
         $db->password = $this->dbCredentials['password'];
         $db->dbname = $this->dbCredentials['database'];
         
-        $cmd = ZfExtended_Models_Installer_DbUpdater::makeDbCommand($exec, $db);
-        $call = sprintf($cmd, escapeshellarg($dbInit));
-        exec($call, $output, $result);
-        if($result > 0) {
-            $this->log('Error on Importing '.self::DB_INIT.' file. Called command: '.$call.".\n".'Result of Command: '.print_r($output,1));
-            return false;
+        $dbupdater = new ZfExtended_Models_Installer_DbUpdater();
+        if(!$dbupdater->executeSqlFile($exec, $db, $dbInit, $output)) {
+            $this->log('Error on Importing '.self::DB_INIT.' file, stopping installation. Called command: '.$exec.".\n".'Result of Command: '.print_r($output,1));
+            exit;
         }
         $this->log('Translate5 tables created.');
-        return true;
     }
     
     /**
