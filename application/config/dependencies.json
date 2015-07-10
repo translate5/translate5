@@ -14,7 +14,7 @@
         "label": "translate5 DB init",
         "url": "RELEASE:translate5-DB-init.zip",
         "target": "dbinit/",
-        "md5": "140f2d92d4222f573bd3a916b2946578"
+        "md5": "9adbddec64c4c371f41b12f539af3a6d"
     },{
         "name": "horde_text_diff",
         "label": "Horde Text Diff 2.0.1",
@@ -47,7 +47,7 @@
         "label": "OpenTMS TermTagger",
         "url": "RELEASE:openTMStermTagger.zip",
         "target": "application/modules/editor/ThirdParty/XliffTermTagger/",
-        "md5": "d7d809d46b42495efc8cf9155ff10f1d"
+        "md5": "b102f2077cf3c5522d5ef68f82e24662"
     },{
         "name": "phpexcel",
         "label": "PHPExcel 1.8.0",
