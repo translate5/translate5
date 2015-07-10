@@ -7,8 +7,7 @@
         "name": "translate5",
         "label": "Translate5 X.Y.Z",
         "url": "RELEASE:translate5.zip",
-        "version": "x.Y.Z",
-        "md5": "fc3aae953911f0d66d99b7cc1cc5f520"
+        "version": "x.Y.Z"
     },
     "dependencies": [{
         "name": "translate5-DB-init",
