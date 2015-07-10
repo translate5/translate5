@@ -79,11 +79,7 @@ class Models_Installer_Standalone {
         $saInstaller->initApplication();
         $saInstaller->postInstallation();
         $saInstaller->updateDb();
-        $saInstaller->log('Translate5 installation / update done.');
-        if(!empty($saInstaller->hostname)) {
-            $saInstaller->log('Please visit http://'.$saInstaller->hostname.'/ to enjoy Translate5.');
-        }
-        $saInstaller->log('In case of errors on installation / update please contact support@translate5.net');
+        $saInstaller->done();
     }
     
     /**
@@ -217,6 +213,7 @@ class Models_Installer_Standalone {
         }
         $content[] = '';
         $content[] = 'resources.mail.defaultFrom.email = support@translate5.net';
+        $content[] = 'runtimeOptions.sendMailDisabled = 1';
         
         $bytes = file_put_contents($this->currentWorkingDir.self::INSTALL_INI, join("\n",$content));
         if($bytes > 0) {
@@ -262,6 +259,16 @@ class Models_Installer_Standalone {
         $index = ZfExtended_BaseIndex::getInstance();
         $index->initApplication()->bootstrap();
         $index->addModuleOptions('default');
+    }
+    
+    protected function done() {
+        $this->log("\nTranslate5 installation / update done.\n");
+        if(!empty($this->hostname)) {
+            $this->log("\nPlease visit http://".$this->hostname."/ to enjoy Translate5.\n");
+            $this->log("For informations how to set up openTMSTermTagger or enable the application to send E-Mails, see http://confluence.translate5.net.\n\n");
+        }
+        $this->log('In case of errors on installation / update please visit http://confluence.translate5.net'."\n");
+        $this->log('or contact support@translate5.net');
     }
     
     protected function log($msg) {
