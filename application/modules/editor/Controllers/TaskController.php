@@ -314,18 +314,6 @@ class editor_TaskController extends ZfExtended_RestController {
      * @throws Exception
      */
     protected function processUploadedFile() {
-        /* 
-        //auskommentiert, da Serverabsturz bei inetsolutions, Zweck war die Sicherstellugn dass immer nur ein Import zur gleichen Zeit läuft.
-        $config = Zend_Registry::get('config');
-        $flagFile = $config->resources->cachemanager->zfExtended->backend->options->cache_dir.'/importRunning';
-        while(file_exists($flagFile)){
-            if(time()-filemtime($flagFile)>3600){
-                unlink($flagFile);
-            }
-            sleep(1);
-        }
-        file_put_contents($flagFile, $this->getGuid());
-        */
         $p = (object) $this->_request->getParams();
         
         $import = ZfExtended_Factory::get('editor_Models_Import');
