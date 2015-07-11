@@ -314,8 +314,6 @@ class editor_TaskController extends ZfExtended_RestController {
      * @throws Exception
      */
     protected function processUploadedFile() {
-        $p = (object) $this->_request->getParams();
-        
         $import = ZfExtended_Factory::get('editor_Models_Import');
         /* @var $import editor_Models_Import */
         $import->setEdit100PercentMatches((bool) $this->entity->getEdit100PercentMatch());
