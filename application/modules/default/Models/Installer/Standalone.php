@@ -268,7 +268,7 @@ class Models_Installer_Standalone {
             $this->log("For informations how to set up openTMSTermTagger or enable the application to send E-Mails, see http://confluence.translate5.net.\n\n");
         }
         $this->log('In case of errors on installation / update please visit http://confluence.translate5.net'."\n");
-        $this->log('or contact support@translate5.net');
+        $this->log('or post a message in translate5 user group, which is linked from http://www.translate5.net/index/usage/.');
     }
     
     protected function log($msg) {
