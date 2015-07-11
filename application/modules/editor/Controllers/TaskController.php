@@ -336,8 +336,6 @@ class editor_TaskController extends ZfExtended_RestController {
             $import->handleImportException($e, $dp);
             throw $e;
         }
-        #auskommentiert, da Serverabsturz bei inetsolutions
-        //if(file_exists($flagFile))unlink($flagFile);
     }
     
     /**
