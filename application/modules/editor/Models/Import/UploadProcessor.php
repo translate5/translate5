@@ -41,6 +41,7 @@ class editor_Models_Import_UploadProcessor {
     const TYPE_SDLXLIFF = 'sdlxliff';
     const TYPE_XLF = 'xlf';
     const TYPE_CSV = 'csv';
+    const TYPE_TESTCASE = 'testcase';
     
     /**
      * valid upload types, extension and mime combination.
@@ -51,6 +52,7 @@ class editor_Models_Import_UploadProcessor {
         self::TYPE_ZIP => 'application/zip',
         self::TYPE_SDLXLIFF => 'application/xml',
         self::TYPE_XLF => 'application/xml',
+        self::TYPE_TESTCASE => 'application/xml',
         self::TYPE_CSV => 'text/plain',
     );
     
@@ -80,7 +82,7 @@ class editor_Models_Import_UploadProcessor {
     public function initAndValidate() {
         
         //mandatory upload file
-        $importInfo = $this->upload->getFileInfo('importUpload');
+            $importInfo = $this->upload->getFileInfo('importUpload');
         
         $type = $this->checkAndGetImportType($importInfo);
         $this->initDataProvider($type, $importInfo);
@@ -122,7 +124,7 @@ class editor_Models_Import_UploadProcessor {
      * @param string $type
      * @param array $importInfo
      */
-    protected function initDataProvider($type, $importInfo) {
+    public function initDataProvider($type, $importInfo) {
         switch ($type) {
             case self::TYPE_ZIP:
                 $dp = 'editor_Models_Import_DataProvider_Zip';
@@ -131,11 +133,30 @@ class editor_Models_Import_UploadProcessor {
             case self::TYPE_SDLXLIFF:
             case self::TYPE_CSV:
             case self::TYPE_XLF:
+                $args = $this->handleSingleUpload($importInfo);
+            break;
+            case self::TYPE_TESTCASE:
                 $dp = 'editor_Models_Import_DataProvider_SingleUploads';
                 $args = array(
                     array($importInfo['importUpload']), //proofReads
                 );
                 $args = $this->handleTbx($args);
+                try {
+                   $offlineTestcase = Zend_Registry::get('offlineTestcase');
+                } catch (Exception $exc) {
+                    $offlineTestcase = false;
+                }
+                if($offlineTestcase===true){
+                    $args = array(
+                        array($importInfo['importUpload']), //proofReads
+                        array(), // relais files
+                        array(), // reference files
+                        $importInfo['importTbx'], //tbx
+                    );
+                }
+                else{
+                    $args = $this->handleSingleUpload($importInfo);
+                }
             break;
             
             
@@ -143,6 +164,13 @@ class editor_Models_Import_UploadProcessor {
         $this->dataProvider = ZfExtended_Factory::get($dp, $args);
     }
     
+    protected function handleSingleUpload($importInfo) {
+        $dp = 'editor_Models_Import_DataProvider_SingleUploads';
+        $args = array(
+            array($importInfo['importUpload']), //proofReads
+        );
+        return $this->handleTbx($args);
+    }
     /**
      * returns the configured dataprovider
      * @return editor_Models_Import_DataProvider_Abstract

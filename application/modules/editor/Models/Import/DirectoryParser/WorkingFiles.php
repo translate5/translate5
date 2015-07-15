@@ -51,7 +51,7 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
    *   It is added by editor_Transit_PluginBootstrap
    * @var array
    */
-  protected $_importExtensionList = array('sdlxliff','xlf','csv','transit');
+  protected $_importExtensionList = array('sdlxliff','xlf','csv','transit','testcase');
   
   /**
    * RootNode Container

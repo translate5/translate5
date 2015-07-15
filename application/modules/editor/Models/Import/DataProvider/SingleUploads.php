@@ -119,7 +119,7 @@ class editor_Models_Import_DataProvider_SingleUploads  extends editor_Models_Imp
         $target = $this->importFolder.DIRECTORY_SEPARATOR;
         $name = $target.DIRECTORY_SEPARATOR.$this->tbx['name'];
         if(!move_uploaded_file($this->tbx['tmp_name'], $name)) {
-            $this->handleCannotMove($this->tbx['name'], $target);
+            $this->handleCannotMove($this->tbx, $target);
         }
     }
     
@@ -137,19 +137,29 @@ class editor_Models_Import_DataProvider_SingleUploads  extends editor_Models_Imp
         foreach($files as $file) {
             $name = $target.DIRECTORY_SEPARATOR.$file['name'];
             if(!move_uploaded_file($file['tmp_name'], $name)) {
-                $this->handleCannotMove($file['name'], $target);
+                $this->handleCannotMove($file, $target);
             }
         }
     }
     
     /**
      * reusable exception thrower
-     * @param string $file
+     * @param array $file
      * @param string $target
      * @throws ZfExtended_Exception
      */
     protected function handleCannotMove($file, $target) {
-        throw new ZfExtended_Exception('Uploaded file '.$file.' cannot be moved to '.$target);
+        try {
+            $offlineTestcase = Zend_Registry::get('offlineTestcase');
+        } catch (Exception $exc) {
+            $offlineTestcase = false;
+        }
+        if($offlineTestcase===true){
+            if(\copy($file['tmp_name'], $target.'/'.$file['name'])) {
+                return;
+            }
+        }
+        throw new ZfExtended_Exception('Uploaded file '.$file['name'].' cannot be moved to '.$target);
     }
     
     /**
