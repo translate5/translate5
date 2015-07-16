@@ -1,0 +1,3 @@
+echo "Please note: This file is made to update an installation based on translate5-windows-installer.exe. If you did a manual windows install of translate5, you may need to adjust the paths to your php.exe and mysql.exe"
+"c:\xampp\php\php.exe" -r "require_once('application/modules/default/Models/Installer/Standalone.php'); Models_Installer_Standalone::mainLinux(array('mysql_bin' => 'c:\xampp\mysql\bin\mysql.exe'));"
+pause
