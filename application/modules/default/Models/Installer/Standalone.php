@@ -47,7 +47,12 @@ class Models_Installer_Standalone {
     const DB_INIT = '/dbinit/DbInit.sql';
     const ZEND_LIB = '/library/zend';
     const MYSQL_BIN = '/usr/bin/mysql';
-    
+    const OS_UNKNOWN = 1;
+    const OS_WIN = 2;
+    const OS_LINUX = 3;
+    const OS_OSX = 4;
+    const HOSTNAME_WIN = 'localhost';
+    const HOSTNAME_LINUX = 'translate5.local';
     /**
      * @var string
      */
@@ -64,8 +69,8 @@ class Models_Installer_Standalone {
             'database' => 'translate5',
     );
     
-    protected $hostname = 'translate5.local';
-    
+    protected $hostname;
+
     /**
      * Options: 
      * mysql_bin => path to mysql binary
@@ -91,6 +96,14 @@ class Models_Installer_Standalone {
         require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/Downloader.php';
         require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/Dependencies.php';
         require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/DbUpdater.php';
+        $this->setHostname();
+    }
+    
+    protected function setHostname() {
+        $this->hostname = self::HOSTNAME_LINUX;
+        if($this->getOS()===  self::OS_WIN){
+            $this->hostname = self::HOSTNAME_WIN;
+        }
     }
     
     public function processDependencies() {
@@ -160,19 +173,51 @@ class Models_Installer_Standalone {
                 $prompt .= ' (default: '.$default.')';
             }
             $prompt .= ': ';
-            $value = readline($prompt);
+            $value = $this->prompt($prompt);
             $this->dbCredentials[$key] = empty($value) ? $default : $value;
         }
     }
     
     /**
+     * @return int
+     */
+    static public function getOS() {
+        switch (true) {
+            case stristr(PHP_OS, 'DAR'): return self::OS_OSX;
+            case stristr(PHP_OS, 'WIN'): return self::OS_WIN;
+            case stristr(PHP_OS, 'LINUX'): return self::OS_LINUX;
+            default : return self::OS_UNKNOWN;
+        }
+    }
+    
+    protected function prompt($message = 'prompt: ', $hidden = false) {
+        if (PHP_SAPI !== 'cli') {
+            return false;
+        }
+        echo $message;
+        $ret = 
+            $hidden
+            ? exec(
+                PHP_OS === 'WINNT' || PHP_OS === 'WIN32'
+                ? __DIR__ . '\prompt_win.bat'
+                : 'read -s PW; echo $PW'
+            )
+            : rtrim(fgets(STDIN), PHP_EOL)
+        ;
+        if ($hidden) {
+            echo PHP_EOL;
+        }
+        return $ret;
+    }
+
+    /**
      * prompt the user for the hostname, since this config is needed in the DbConfig
      */
     protected function promptHostname() {
         $prompt = "\nPlease enter the hostname of the virtual host which will serve Translate5";
-        $prompt .= ' (default: translate5.local): ';
-        $value = readline($prompt);
-        $this->hostname = empty($value) ? 'translate5.local' : $value;
+        $prompt .= ' (default: '.$this->hostname.'): ';
+        $value = $this->prompt($prompt);
+        $this->hostname = empty($value) ? $this->hostname : $value;
     }
     
     /**
@@ -268,7 +313,7 @@ class Models_Installer_Standalone {
             $this->log("For informations how to set up openTMSTermTagger or enable the application to send E-Mails, see http://confluence.translate5.net.\n\n");
         }
         $this->log('In case of errors on installation / update please visit http://confluence.translate5.net'."\n");
-        $this->log('or contact support@translate5.net');
+        $this->log('or post a message in translate5 user group, which is linked from http://www.translate5.net/index/usage/.');
     }
     
     protected function log($msg) {
