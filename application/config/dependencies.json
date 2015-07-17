@@ -5,61 +5,51 @@
     "md5hashtable": "RELEASE:md5hashtable",
     "application": {
         "name": "translate5",
-        "label": "Translate5 X.Y.Z",
-        "url": "RELEASE:translate5.zip",
-        "version": "x.Y.Z",
-        "md5": "53e60efb5ccaa8fafcf62017aa6a2494"
+        "label": "Translate5 - latest version",
+        "url": "RELEASE:translate5.zip"
     },
     "dependencies": [{
         "name": "translate5-DB-init",
         "label": "translate5 DB init",
         "url": "RELEASE:translate5-DB-init.zip",
-        "target": "dbinit/",
-        "md5": "9adbddec64c4c371f41b12f539af3a6d"
+        "target": "dbinit/"
     },{
         "name": "horde_text_diff",
         "label": "Horde Text Diff 2.0.1",
         "url": "RELEASE:Horde_Text_Diff-2.0.1.zip",
         "version": "2.0.1",
-        "target": "library/Horde_Text_Diff/",
-        "md5": "341e0d9447b7466c72683ac808faba90"
+        "target": "library/Horde_Text_Diff/"
     },{
         "name": "zend",
         "label": "PHP Zend 1.12-11",
         "url": "RELEASE:Zend-1.12-11.zip",
         "version": "1.12-11",
-        "target": "library/zend/",
-        "md5": "c65616460c98aed6581ef04202ff049c"
+        "target": "library/zend/"
     },{
         "name": "querypath",
         "label": "Querypath 3.0.3",
         "url": "RELEASE:querypath-3.0.3.zip",
         "version": "3.0.3",
-        "target": "library/querypath/",
-        "md5": "4df759ee4f66c01c6b442749db840621"
+        "target": "library/querypath/"
     },{
         "name": "Open_Sans",
         "label": "Open Sans Fonts",
         "url": "RELEASE:Open_Sans.zip",
-        "target": "application/modules/editor/ThirdParty/Open_Sans/",
-        "md5": "e80dd595ccb85f648f47c6b4eec8f2ae"
+        "target": "application/modules/editor/ThirdParty/Open_Sans/"
     },{
         "name": "termtagger",
         "label": "OpenTMS TermTagger",
         "url": "RELEASE:openTMStermTagger.zip",
-        "target": "application/modules/editor/ThirdParty/XliffTermTagger/",
-        "md5": "b102f2077cf3c5522d5ef68f82e24662"
+        "target": "application/modules/editor/ThirdParty/XliffTermTagger/"
     },{
         "name": "phpexcel",
         "label": "PHPExcel 1.8.0",
         "url": "RELEASE:PHPExcel.zip",
-        "target": "library/ZfExtended/ThirdParty/PHPExcel/",
-        "md5": "b6e41635ea87ec9b7173dc9294dfa873"
+        "target": "library/ZfExtended/ThirdParty/PHPExcel/"
     },{
         "name": "extjs-4",
         "label": "ExtJS 4.0.7",
         "url": "RELEASE:ext-4.0.7.zip",
-        "target": "public/ext-4.0.7",
-        "md5": "1a5dc245c9953aa456195df5c0f1c74e"
+        "target": "public/ext-4.0.7"
     }]
 }
