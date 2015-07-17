@@ -44,6 +44,8 @@
  */
 class Models_Installer_Standalone {
     const INSTALL_INI = '/application/config/installation.ini';
+    const CLIENT_SPECIFIC_INSTALL = '/client-specific-installation';
+    const CLIENT_SPECIFIC = '/client-specific';
     const DB_INIT = '/dbinit/DbInit.sql';
     const ZEND_LIB = '/library/zend';
     const MYSQL_BIN = '/usr/bin/mysql';
@@ -129,6 +131,22 @@ class Models_Installer_Standalone {
         $this->initDb();
         $this->createInstallationIni();
         $this->promptHostname();
+        $this->moveClientSpecific();
+    }
+    
+    /**
+     * inits on new installations the client specific directories
+     */
+    protected function moveClientSpecific() {
+        $source = $this->currentWorkingDir.self::CLIENT_SPECIFIC_INSTALL;
+        $target = $this->currentWorkingDir.self::CLIENT_SPECIFIC;
+        //ignoring errors here, since already exisiting directories should not be moved
+        if(file_exists($source.'/public')){
+            @rename($source.'/public', $this->currentWorkingDir.'/public'.self::CLIENT_SPECIFIC);
+        }
+        if(file_exists($source)){
+            @rename($source, $this->currentWorkingDir.self::CLIENT_SPECIFIC);
+        }
     }
     
     /**
