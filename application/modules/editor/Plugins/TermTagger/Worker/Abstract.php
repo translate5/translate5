@@ -149,8 +149,8 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
             $seg->source = preg_replace('" ?transN?o?t?Found ?"', ' ', $seg->source);
             $seg->target = preg_replace('" ?transN?o?t?Found ?"', ' ', $seg->target);
 
-            $sourceMids = $this->termModel->getTermMidsFromSegment($seg->source);
-            $targetMids = $this->termModel->getTermMidsFromSegment($seg->target);
+            $sourceMids = $this->termModel->getTermMidsFromSegment($seg->source,false);
+            $targetMids = $this->termModel->getTermMidsFromSegment($seg->target,false);
             $toMarkMemory = array();
             foreach ($sourceMids as $sourceMid) {
                 $groupedTerms = $this->termModel->getAllTermsOfGroupByMid($this->task->getTaskGuid(),$sourceMid, array($this->task->getTargetLang()));
@@ -187,7 +187,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
                     $modifiedMatch = str_replace('<div', '<div class=""', $modifiedMatch);
                 }
                 $modifiedMatch = preg_replace('/( class="[^"]*)"/', '\\1 '.$cssClassToInsert.'"', $modifiedMatch);
-                $seg = str_replace($match, $modifiedMatch, $seg);
+                $seg = preg_replace('/'.$match.'/', $modifiedMatch, $seg, 1);
             }
         };
         

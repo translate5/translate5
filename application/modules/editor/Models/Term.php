@@ -187,10 +187,16 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * @param string $seg
+     * @param boolean $unify if true: Only one entry for identical mids in the return array
      * @return type array values are the mids of the terms in the string
      */
-    public function getTermMidsFromSegment(string $seg) {
-        return array_keys($this->getTermInfosFromSegment($seg));
+    public function getTermMidsFromSegment(string $seg,$unify=true) {
+        if($unify)
+            return array_keys($this->getTermInfosFromSegment($seg));
+        
+        $getTermIdRegEx = '/<div.*?data-tbxid="(term_.*?)".*?>/';
+        preg_match_all($getTermIdRegEx, $seg, $matches);
+        return $matches[1];
     }
     
     /**
