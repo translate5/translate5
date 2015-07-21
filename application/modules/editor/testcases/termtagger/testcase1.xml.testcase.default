@@ -11,5 +11,4 @@
             <target>Regolazione della  <div title="" class="term admittedTerm exact" data-tbxid="xyz">pompa dell'olio</div> in funzione del fabbisogno</target>
         </expectedOutput>
     </assertion>
-    <failure message="Term with single quote not recognized"/>
 </testcase>

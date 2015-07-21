@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="Kombiinstrument" creator="beo/MittagQI" mandatory="yes" sourceLang="DE" targetLang="EN" tbxPath="beo-reallive-DE-EN.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description></description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>oder dem AMG Kombiinstrument mit</source>
+            <target>or the AMG instrument cluster with </target>
+        </input>
+        <expectedOutput>
+            <source>oder dem AMG <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Kombiinstrument</div> mit</source>
+            <target>or the AMG <div title="" class="term admittedTerm exact" data-tbxid="xyz">instrument cluster</div> with </target>
+        </expectedOutput>
+    </assertion>
+</testcase>

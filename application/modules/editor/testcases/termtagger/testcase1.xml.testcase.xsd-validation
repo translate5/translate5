@@ -149,5 +149,4 @@ cfb0b5f8ccae71824d6eaeed9d5efb2c" class="full">&lt;/a&gt;</span>
                 </div>no</target>
         </expectedOutput>
     </assertion>
-    <failure message="Terminus mit einfachem Anführungszeichen wurde nicht erkannt"/>
 </testcase>
