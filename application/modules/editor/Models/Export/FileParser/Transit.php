@@ -201,7 +201,12 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
 
         $sourceOrigText = $segment->getFieldOriginal(editor_Models_SegmentField::TYPE_SOURCE);
         //fetch all terms found in source
-        $sourceTermMids = $termModel->getTermInfosFromSegment($sourceOrigText);
+        $sourceTermsUsed = $termModel->getTermInfosFromSegment($sourceOrigText);
+        $sourceTermMids = array();
+        foreach($sourceTermsUsed as $termInfo) {
+            $sourceTermMids[$termInfo['mid']] = $termInfo['classes'];
+        }
+        
         $targetTerms = array();
         
         //fetch terms from target orig
