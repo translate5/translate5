@@ -51,6 +51,11 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
     protected $testIterator;
     /**
      *
+     * @var string
+     */
+    protected $errorColor = 'red';
+    /**
+     *
      * @var boolean
      */
     protected $isFirstTest = true;
@@ -83,38 +88,50 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
     
     protected function loopThroughTestXmlFiles() {
         while ($file = $this->getNextTestXml()) {
-            echo "<h2>Test ".$file->getFilename()."</h2>";
-            if(!$this->runTests($file,  $this->testcasePreparation)){
+            $resultPreparation = $this->runTests($file,  $this->testcasePreparation);
+            if(!$resultPreparation->wasSuccessful()){
+                $this->echoResults($resultPreparation,$file);
                 echo '<p style="color:red"><b>There have been errors in Test-Preperation. Main test not started.</b></p>';
                 continue;
             }
-            if($this->runTests($file,  $this->testcase)){
-                echo '<p style="color:green"><b>Test passed</b></p>';
-                continue;
-            }
-            $messagesProperty = $this->testcase->getProperty('messages');
-            $messages = $messagesProperty->getValue();
-            if(count($messages)>0){
-                echo "<p><b>Further information regarding this test:</b></p><ul>";
-                foreach ($messages as $message) {
-                    echo "<li>".$message."</li>";
-                }
-                echo "</ul>";
-            }
+            
+            $result = $this->runTests($file,  $this->testcase);
+            $this->echoResults($result,$file);
         }
     }
     
-    protected function runTests(\SplFileInfo $file, \ReflectionClass $class) {
-        $initMethod = $class->getMethod('init');
-        $initMethod->invoke(null,$file);
-        $testsuite = new PHPUnit_Framework_TestSuite($class);
-
-        /* @var $testsuite PHPUnit_Framework_TestSuite */
-        $result = $testsuite->run();
+    /**
+     * 
+     * @param PHPUnit_Framework_TestResult $result
+     * @return boolean
+     */
+    protected function echoResults(PHPUnit_Framework_TestResult $result,\SplFileInfo $file) {
+        echo "<h2>".$file->getFilename()."/ ".$this->testcase->getProperty('name')->getValue()."</h2>";
+        echo "<h3>Description: ".$this->testcase->getProperty('description')->getValue()."</h3>";
+            
         /* @var $result PHPUnit_Framework_TestResult */
         $errors = $result->errors();
-        if(count($errors)>0){
-            echo '<p style="color:red">There have been errors in the execution. Test '.$file->getFilename().' could not run.</p><ol style="color:red">';
+        $failures = $result->failures();
+        
+        $errorCount = count($errors);
+        $failureCount = count($failures);
+        
+        if($errorCount === 0 && $failureCount === 0){
+            echo '<p style="color:green"><b>Test passed</b></p>';
+            return true;
+        }
+        
+        if(!$this->testcase->getProperty('mandatory')->getValue()){
+            $this->errorColor = 'orange';
+            echo '<p style="color:'.$this->errorColor.'"><b>Nice to have (not mandatory)</b></p>';
+        }
+        else{
+            $this->errorColor = 'red';
+            echo '<p style="color:'.$this->errorColor.'"><b>Test is mandatory</b></p>';
+        }
+
+        if($errorCount>0){
+            echo '<p style="color:'.$this->errorColor.'">There have been errors in the execution. Test '.$file->getFilename().' could not run.</p><ol style="color:'.$this->errorColor.'">';
             foreach ($errors as $key => $error ) {
                 /* @var $failure PHPUnit_Framework_TestFailure */
                 echo '<li>'.$error->exceptionMessage().'</li>';
@@ -123,9 +140,9 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
             return false;
         }
 
-        $failures = $result->failures();
-        if(count($failures)>0){
-            echo '<p style="color:red">Main Test failed.</p><ol style="color:red">';
+        
+        if($failureCount>0){
+            echo '<p style="color:'.$this->errorColor.'">Main Test failed.</p><ol style="color:'.$this->errorColor.'">';
             foreach ($failures as $key => $failure ) {
                 /* @var $failure PHPUnit_Framework_TestFailure */
                 echo '<li>'.$failure->exceptionMessage().'</li>';
@@ -134,6 +151,20 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
             return false;
         }
         return true;
+    }
+    /**
+     * 
+     * @param \SplFileInfo $file
+     * @param \ReflectionClass $class
+     * @return $result PHPUnit_Framework_TestResult 
+     */
+    protected function runTests(\SplFileInfo $file, \ReflectionClass $class) {
+        $initMethod = $class->getMethod('init');
+        $initMethod->invoke(null,$file);
+        $testsuite = new PHPUnit_Framework_TestSuite($class);
+
+        /* @var $testsuite PHPUnit_Framework_TestSuite */
+        return $testsuite->run();
     }
     
     /**

@@ -83,6 +83,21 @@ abstract class editor_Test_Termtagger_Abstract extends \ZfExtended_Testcase{
      */
     protected static $assertion;
     /**
+     * the description of the test
+     * @var string
+     */
+    public static $description;
+    /**
+     * the name of the test
+     * @var string
+     */
+    public static $name;
+    /**
+     * if the test is mandatory or not
+     * @var boolean
+     */
+    public static $mandatory = true;
+    /**
      * the source string that is expected to be retrieved by the termtagger
      * @var string
      */
@@ -121,16 +136,9 @@ abstract class editor_Test_Termtagger_Abstract extends \ZfExtended_Testcase{
         self::$testcaseSchema = self::$testSuitePath.'/'.  self::$testcaseSchemaFileName;
     }
     
-    protected static function setMessages() {
-        self::$messages = array();
-        $failureMessage = self::$qpTest->find('testcase > failure');
-        self::$messages[] = 'Mandatory test: '.self::$qpTest->attr('mandatory');
-        foreach ($failureMessage as $message) {
-            self::$messages[] = 'Failure message: '.$message->attr('message');
-        }
-    }
-
     protected static function setTestResources() {
+        self::$qpTest = qp(self::$testfilePath, ':root',array('format_output'=> false, 'encoding'=>'UTF-8','use_parser'=>'xml'));
+
         $language = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $language editor_Models_Languages */
         
@@ -151,5 +159,10 @@ abstract class editor_Test_Termtagger_Abstract extends \ZfExtended_Testcase{
         self::$tbxFile = new SplFileInfo(self::$testfile->getPath().'/'.self::$qpTest->attr('tbxPath'));
         self::$tbxData = file_get_contents(self::$tbxFile->getPathname());
         self::$tbxHash = md5(self::$tbxData);
+        
+        $description = self::$qpTest->find('testcase > description');
+        self::$description = $description->innerHTML();
+        self::$mandatory = (self::$qpTest->attr('mandatory')==='yes')?true:false;
+        self::$name = self::$qpTest->attr('name');
     }
 }

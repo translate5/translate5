@@ -58,7 +58,6 @@ class editor_Test_Termtagger_Preparation extends editor_Test_Termtagger_Abstract
      * @depends testValidatecase
      */
     public function testValidatecasesettings() {
-        self::$qpTest = qp(self::$testfilePath, ':root',array('encoding'=>'UTF-8','use_parser'=>'xml'));
         self::setTestResources();
         $mandatory = strtolower(self::$qpTest->attr('mandatory'));
         self::$qpTest->attr('mandatory', $mandatory);

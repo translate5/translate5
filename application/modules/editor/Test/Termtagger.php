@@ -44,7 +44,6 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract{
 
     public static function setUpBeforeClass(){
         parent::setUpBeforeClass();
-        self::$qpTest = qp(self::$testfilePath, ':root',array('encoding'=>'UTF-8','use_parser'=>'xml'));
         self::setTestResources();
         self::setTaskValues();
         self::addTask();
@@ -195,7 +194,6 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract{
         }
     }
     public static function tearDownAfterClass() {
-        self::setMessages();
         parent::tearDownAfterClass();
         self::$testTask->delete();
     }
