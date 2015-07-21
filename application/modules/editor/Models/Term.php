@@ -186,19 +186,14 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * returns all term mids from given segment content (allows and returns also duplicated mids)
      * @param string $seg
-     * @param boolean $unify if true: Only one entry for identical mids in the return array
      * @return type array values are the mids of the terms in the string
      */
-    public function getTermMidsFromSegment(string $seg, $unify=true) {
-        $result = array_map(function($item) {
+    public function getTermMidsFromSegment(string $seg) {
+        return array_map(function($item) {
             return $item['mid'];
         }, $this->getTermInfosFromSegment($seg));
-        
-        if($unify) {
-            return array_unique($result);
-        }
-        return $result;
     }
     
     /**

@@ -149,8 +149,8 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
             $seg->source = preg_replace('" ?transN?o?t?Found ?"', ' ', $seg->source);
             $seg->target = preg_replace('" ?transN?o?t?Found ?"', ' ', $seg->target);
 
-            $sourceMids = $this->termModel->getTermMidsFromSegment($seg->source,false);
-            $targetMids = $this->termModel->getTermMidsFromSegment($seg->target,false);
+            $sourceMids = $this->termModel->getTermMidsFromSegment($seg->source);
+            $targetMids = $this->termModel->getTermMidsFromSegment($seg->target);
             $toMarkMemory = array();
             foreach ($sourceMids as $sourceMid) {
                 $groupedTerms = $this->termModel->getAllTermsOfGroupByMid($this->task->getTaskGuid(),$sourceMid, array($this->task->getTargetLang()));

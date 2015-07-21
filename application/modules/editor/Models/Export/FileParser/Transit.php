@@ -211,11 +211,11 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
         
         //fetch terms from target orig
         $targetOrig = $segment->getFieldOriginal(editor_Models_SegmentField::TYPE_TARGET);
-        $targetOrigTermMids = $termModel->getTermMidsFromSegment($targetOrig);
+        $targetOrigTermMids = array_unique($termModel->getTermMidsFromSegment($targetOrig));
         
         //fetch terms from target edited
         $targetEdited = $segment->getFieldEdited(editor_Models_SegmentField::TYPE_TARGET);
-        $targetEditedTermMids = $termModel->getTermMidsFromSegment($targetEdited);
+        $targetEditedTermMids = array_unique($termModel->getTermMidsFromSegment($targetEdited));
         
         $sourceTermsToTrack = array();
         $targetTermsToTrack = array();
