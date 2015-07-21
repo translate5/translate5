@@ -63,8 +63,8 @@ class editor_Plugins_SegmentStatistics_Models_Statistics extends ZfExtended_Mode
         'colsAll' => array('fileId', 'fieldName', 'charCount' => 'SUM(charCount)', 'termFoundCount' => 'SUM(termFound)', 'segmentsPerFile' => 'COUNT(id)'),
         'colsFound' => array('fileId', 'fieldName', 'charFoundCount' => 'SUM(charCount)', 'termFoundCount' => 'SUM(termFound)', 'segmentsPerFileFound' => 'COUNT(id)'),
         'colsNotFound' => array('fileId', 'fieldName', 'charNotFoundCount' => 'SUM(charCount)', 'termNotFoundCount' => 'SUM(termNotFound)', 'segmentsPerFileNotFound' => 'COUNT(id)'),
-        'targetColsFound' => array('stat.fileId', 'targetCharFoundCount' => 'SUM(stat.charCount)', 'targetSegmentsPerFileFound' => 'COUNT(stat.id)'),
-        'targetColsNotFound' => array('stat.fileId', 'targetCharNotFoundCount' => 'SUM(stat.charCount)', 'targetSegmentsPerFileNotFound' => 'COUNT(stat.id)'),
+        'targetColsFound' => array('stat.fileId', 'targetCharFoundCount' => 'SUM(stat.charCount)', 'targetWordFoundCount' => 'SUM(stat.wordCount)', 'targetSegmentsPerFileFound' => 'COUNT(stat.id)'),
+        'targetColsNotFound' => array('stat.fileId', 'targetCharNotFoundCount' => 'SUM(stat.charCount)', 'targetWordNotFoundCount' => 'SUM(stat.wordCount)', 'targetSegmentsPerFileNotFound' => 'COUNT(stat.id)'),
     );
     
     /**
@@ -126,6 +126,37 @@ class editor_Plugins_SegmentStatistics_Models_Statistics extends ZfExtended_Mode
     }
     
     /**
+     * returns the term[Not]Found counts grouped by segment states and fileIds
+     * @param string $taskGuid
+     * @param string $type
+     * @return array
+     */
+    public function calculateStatsByState($taskGuid, $type) {
+        $db = $this->db;
+        $segments = ZfExtended_Factory::get('editor_Models_Db_Segments');
+        /* @var $segments editor_Models_Db_Segments */
+        $s = $db->select()
+            ->from(array('p' => $db->info($db::NAME)), array('s.fileId', 's.stateId'))
+            ->join(array('s' => $segments->info($db::NAME)), 's.id = p.segmentId', array('foundSum' => 'sum(p.termFound)' , 'notFoundSum' => 'sum(p.termNotFound)'))
+            ->where('s.taskGuid = ?', $taskGuid)
+            ->where('p.type = ?', $type)
+            ->where('p.fieldType = ?', 'source')
+            ->group('s.fileId')
+            ->group('s.stateId');
+        $s->setIntegrityCheck(false);
+        $rowset = $this->db->fetchAll($s);
+        $res = array();
+        foreach($rowset as $row) {
+            settype($res[$row->fileId], 'array');
+            $res[$row->fileId][$row->stateId] = array(
+                'foundSum' => $row->foundSum,
+                'notFoundSum' => $row->notFoundSum,
+            );
+        }
+        return $res;
+    }
+    
+    /**
      * deletes the statistics to the given taskGuid and type
      * @param string $taskGuid
      * @param string $type
@@ -156,6 +187,9 @@ class editor_Plugins_SegmentStatistics_Models_Statistics extends ZfExtended_Mode
      * The Plugin editor_Plugins_SegmentStatistics_BootstrapEditableOnly deleted the import statistics
      * Since we need them again for export statistics, we have to regenerate them. 
      * This is possible because only locked segment stats were deleted, therefore nothing was changed in this segments.
+     * 
+     * TODO This method can be removed after all live projects are not affected anymore by BootstrapEditableOnly
+     * 
      * @param string $taskGuid
      */
     public function regenerateImportStats($taskGuid) {

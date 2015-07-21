@@ -617,6 +617,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * generates a statistics summary to the given task
+     * @return stdClass
      */
     public function getStatistics() {
         $result = new stdClass();
