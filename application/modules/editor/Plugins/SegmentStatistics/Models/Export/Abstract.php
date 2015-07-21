@@ -53,18 +53,12 @@ abstract class editor_Plugins_SegmentStatistics_Models_Export_Abstract {
     /**
      * @var string
      */
-    protected $pluginPath;
-    
-    /**
-     * @var string
-     */
     protected $statistics;
     
     public function init(editor_Models_Task $task, stdClass $statistics, array $workerParams) {
         $this->task = $task;
         $this->taskGuid = $task->getTaskGuid();
         $this->type = $workerParams['type'];
-        $this->pluginPath = $workerParams['pluginPath'];
         //prevent internal restructuring to destruct other algorithms:
         $this->statistics = clone $statistics; 
     }
