@@ -239,6 +239,42 @@
                </tig>
             </langSet>
          </termEntry>
+         <termEntry id="X_2132">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Verkleidung</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>trim</term>
+               </tig>
+            </langSet>
+         </termEntry>
+         <termEntry id="X_2133">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Laderaum</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>load compartment</term>
+               </tig>
+            </langSet>
+         </termEntry>
+         <termEntry id="X_2134">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Laderaumverkleidung</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>load compartment trim</term>
+               </tig>
+            </langSet>
+         </termEntry>
       </body>
       <back>
 </back>

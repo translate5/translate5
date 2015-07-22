@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testcase name="singleTagBetween2wordsOfATerm" creator="MittagQI" mandatory="yes" sourceLang="DE" targetLang="ES" tbxPath="MittagQI-Standard-Testcases-DE-ES.tbx" sourceStringMatch="0" targetStringMatch="0">
+<testcase name="singleTagBetween2wordsOfATerm" creator="MittagQI" mandatory="no" sourceLang="DE" targetLang="ES" tbxPath="MittagQI-Standard-Testcases-DE-ES.tbx" sourceStringMatch="0" targetStringMatch="0">
     <description>A single tag is positioned between 2 words of a multi-word term</description>
     <assertion type="assertOutputEquals">
         <input>
