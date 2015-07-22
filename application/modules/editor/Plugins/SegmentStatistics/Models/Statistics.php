@@ -60,11 +60,42 @@ class editor_Plugins_SegmentStatistics_Models_Statistics extends ZfExtended_Mode
     protected $dbInstanceClass = 'editor_Plugins_SegmentStatistics_Models_Db_Statistics';
     
     protected $columnsToGet = array(
-        'colsAll' => array('stat.fileId', 'stat.fieldName', 'charCount' => 'SUM(stat.charCount)', 'termFoundCount' => 'SUM(stat.termFound)', 'segmentsPerFile' => 'COUNT(stat.id)'),
-        'colsFound' => array('stat.fileId', 'stat.fieldName', 'charFoundCount' => 'SUM(stat.charCount)', 'termFoundCount' => 'SUM(stat.termFound)', 'segmentsPerFileFound' => 'COUNT(stat.id)'),
-        'colsNotFound' => array('stat.fileId', 'stat.fieldName', 'charNotFoundCount' => 'SUM(stat.charCount)', 'termNotFoundCount' => 'SUM(stat.termNotFound)', 'segmentsPerFileNotFound' => 'COUNT(stat.id)'),
-        'targetColsFound' => array('stat.fileId', 'targetCharFoundCount' => 'SUM(stat.charCount)', 'targetWordFoundCount' => 'SUM(stat.wordCount)', 'targetSegmentsPerFileFound' => 'COUNT(stat.id)'),
-        'targetColsNotFound' => array('stat.fileId', 'targetCharNotFoundCount' => 'SUM(stat.charCount)', 'targetWordNotFoundCount' => 'SUM(stat.wordCount)', 'targetSegmentsPerFileNotFound' => 'COUNT(stat.id)'),
+        'colsAll' => array(
+                'stat.fileId', 
+                'stat.fieldName', 
+                'charCount' => 'SUM(stat.charCount)', 
+                'wordCount' => 'SUM(stat.wordCount)', 
+                'termFoundCount' => 'SUM(stat.termFound)', 
+                'segmentsPerFile' => 'COUNT(stat.id)',
+        ),
+        'colsFound' => array(
+                'stat.fileId', 
+                'stat.fieldName', 
+                'charFoundCount' => 'SUM(stat.charCount)', 
+                'wordFoundCount' => 'SUM(stat.wordCount)', 
+                'termFoundCount' => 'SUM(stat.termFound)', 
+                'segmentsPerFileFound' => 'COUNT(stat.id)',
+        ),
+        'colsNotFound' => array(
+                'stat.fileId', 
+                'stat.fieldName', 
+                'charNotFoundCount' => 'SUM(stat.charCount)',
+                'wordNotFoundCount' => 'SUM(stat.wordCount)', 
+                'termNotFoundCount' => 'SUM(stat.termNotFound)', 
+                'segmentsPerFileNotFound' => 'COUNT(stat.id)',
+        ),
+        'targetColsFound' => array(
+                'stat.fileId', 
+                'targetCharFoundCount' => 'SUM(stat.charCount)', 
+                'targetWordFoundCount' => 'SUM(stat.wordCount)', 
+                'targetSegmentsPerFileFound' => 'COUNT(stat.id)',
+        ),
+        'targetColsNotFound' => array(
+                'stat.fileId', 
+                'targetCharNotFoundCount' => 'SUM(stat.charCount)', 
+                'targetWordNotFoundCount' => 'SUM(stat.wordCount)', 
+                'targetSegmentsPerFileNotFound' => 'COUNT(stat.id)',
+        ),
     );
     
     /**
@@ -125,7 +156,6 @@ class editor_Plugins_SegmentStatistics_Models_Statistics extends ZfExtended_Mode
             $result[$stat['fileId']][$stat['fieldName']] = array_merge($stat, $result[$stat['fileId']][$stat['fieldName']]);
             $merged[$stat['fileId'].'#'.$stat['fieldName']] = $result[$stat['fileId']][$stat['fieldName']];
         }
-        
         return array_values($merged);
     }
     

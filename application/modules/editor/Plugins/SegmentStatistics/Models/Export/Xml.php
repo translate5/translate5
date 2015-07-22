@@ -101,6 +101,8 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xml extends editor_Plugins_
         $field->addChild('fieldName', $fieldName);
         $field->addChild('charFoundCount', $fileStat['charFoundCount']);
         $field->addChild('charNotFoundCount', $fileStat['charNotFoundCount']);
+        $field->addChild('wordFoundCount', $fileStat['wordFoundCount']);
+        $field->addChild('wordNotFoundCount', $fileStat['wordNotFoundCount']);
         $field->addChild('termFoundCount', $fileStat['termFoundCount']);
         $field->addChild('termNotFoundCount', $fileStat['termNotFoundCount']);
         $field->addChild('segmentsPerFile', $fileStat['segmentsPerFile']);
