@@ -34,7 +34,8 @@ require_once('ZfExtended/ThirdParty/PHPExcel/PHPExcel.php');
  * Default Model for Plugin SegmentStatistics
  */
 class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_SegmentStatistics_Models_Export_Abstract {
-    const FILE_SUFFIX='.xls';
+    const FILE_SUFFIX='.xlsx';
+    const TPL_PREFIX='STAT.';
     
     /**
      * Most of stats affect source field only, so define it here:
@@ -113,11 +114,7 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
      */
     public function writeToDisk(string $filename) {
         $w = new PHPExcel_Writer_Excel2007($this->xls);
-        $w->save($filename.'.xlsx');
-        
-        $w = new PHPExcel_Writer_CSV($this->xls);
-        $w->save("foo.csv");
-        error_log(str_replace("\n", "\n\n", file_get_contents("foo.csv")));
+        $w->save($filename.self::FILE_SUFFIX);
     }
     
     protected function fillSheetOverview() {
@@ -146,9 +143,17 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
         $i = $tplRow + 1; // start after tpl row
         foreach($this->data as $file) {
             $sheet->insertNewRowBefore($i);
-            foreach($masterValues as $col => $master) {
-                $v = isset($file[$master]) ? $file[$master] : $master;
-                $sheet->setCellValue($col.$i, $v);
+            foreach($masterValues as $col => $tpl) {
+                $isTpl = (strpos($tpl, self::TPL_PREFIX) === 0);
+                if(!$isTpl) {
+                    $sheet->setCellValue($col.$i, $tpl);
+                    continue;
+                }
+                $tpl = substr($tpl, strlen(self::TPL_PREFIX));
+                if(isset($file[$tpl])) {
+                    $sheet->setCellValue($col.$i, $file[$tpl]);
+                }
+                //if nothing at all leave column empty
             }
             $i++;
         }
