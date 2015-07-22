@@ -37,16 +37,22 @@ CREATE TABLE `LEK_plugin_segmentstatistic_terms` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `taskGuid` varchar(38) NOT NULL COMMENT 'Foreign Key to LEK_task',
   `mid` varchar(60) NOT NULL COMMENT 'Foreign Key to LEK_terms',
+  `segmentId` int(11) NOT NULL COMMENT 'Segment ID, no FK needed',
+  `fieldName` varchar(120) NOT NULL COMMENT 'Segment ID, no FK needed',
   `term` varchar(19000) NOT NULL COMMENT 'Term Content',
   `notFoundCount` int(11) NOT NULL DEFAULT 0 COMMENT 'count of this term not found',
   `foundCount` int(11) NOT NULL DEFAULT 0 COMMENT 'count of this term found',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `termPerTask` (`taskGuid`, `mid`),
+  UNIQUE KEY `termPerTask` (`taskGuid`, `mid`, `segmentId`, `fieldName`),
   CONSTRAINT FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES 
 ('runtimeOptions.plugins.SegmentStatistics.xlsTemplateExport', 1, 'editor', 'plugins', 'modules/editor/Plugins/SegmentStatistics/templates/export-template.xlsx', 'modules/editor/Plugins/SegmentStatistics/templates/export-template.xlsx', null, 'absolutepath', 'Path to the XLSX export template. Path can be absolute or relative to application directory.'),
 ('runtimeOptions.plugins.SegmentStatistics.xlsTemplateImport', 1, 'editor', 'plugins', 'modules/editor/Plugins/SegmentStatistics/templates/import-template.xlsx', 'modules/editor/Plugins/SegmentStatistics/templates/import-template.xlsx', null, 'absolutepath', 'Path to the XLSX import template. Path can be absolute or relative to application directory.');
+
+INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES 
+('runtimeOptions.plugins.SegmentStatistics.metaToIgnore.transitLockedForRefMat', 1, 'editor', 'plugins', '0', '0', null, 'boolean', 'decides, if segments with metadata "transitLockedForRefMat" will be ignored by this plugin.')
+ON DUPLICATE KEY UPDATE `name`=`name`;
 
 

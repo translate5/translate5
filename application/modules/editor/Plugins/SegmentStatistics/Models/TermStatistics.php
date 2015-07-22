@@ -58,51 +58,31 @@ class editor_Plugins_SegmentStatistics_Models_TermStatistics extends ZfExtended_
     protected $dbInstanceClass = 'editor_Plugins_SegmentStatistics_Models_Db_TermStatistics';
     
     /**
-     * Increases or initializes the found counter of the given term
-     * @param string $taskGuid
-     * @param integer $mid
-     * @param string $term
-     */
-    public function incTermFound($taskGuid, $mid, $term) {
-        $this->incTerm(func_get_args(), self::COUNT_FOUND);
-    }
-    
-    /**
-     * Increases or initializes the notFound counter of the given term
-     * @param string $taskGuid
-     * @param integer $mid
-     * @param string $term
-     */
-    public function incTermNotFound($taskGuid, $mid, $term) {
-        $this->incTerm(func_get_args(), self::COUNT_NOT_FOUND);
-    }
-
-    /**
-     * increases the given termCounter
-     * @param array $params
-     * @param string $colToInc
-     */
-    protected function incTerm(array $params, $colToInc) {
-        $db = $this->db;
-        $sql = 'INSERT INTO '.$db->info($db::NAME).' (taskGuid, mid, term, '.$colToInc.') VALUES (?, ?, ?, 1) ';
-        $sql .= ' ON DUPLICATE KEY UPDATE '.$colToInc.' = '.$colToInc.'+1';
-        $db->getAdapter()->query($sql, $data);
-    }
-    
-    /**
-     * Loads the term stats for one task, ordered by foundCount
+     * Loads the term stats for one task, ordered by foundCount and filterd by SegmentMetaJoin
      * @param string $taskGuid
      * @return multitype:
      */
-    public function loadByTaskGuid($taskGuid) {
+    public function loadTermSums($taskGuid, $fieldName) {
         $s = $this->db->select(false);
         $db = $this->db;
-        $cols = $this->db->info($db::COLS);
 
-        $s->from($this->db, $cols);
-        $s->where('taskGuid = ?', $taskGuid);
-        $s->order('foundCount DESC');
-        return parent::loadFilterdCustom($s);
+        $cols = array(
+            'ts.term',
+            'ts.mid',
+            'foundSum' => 'sum(ts.foundCount)',
+            'notFoundSum' => 'sum(ts.notFoundCount)',
+        );
+        $s->from(array('ts' => $db->info($db::NAME)), $cols)
+        ->where('ts.taskGuid = ?', $taskGuid)
+        ->where('ts.fieldName = ?', $fieldName)
+        ->group('ts.mid')
+        ->order('foundSum DESC');
+        
+        $meta = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_SegmentMetaJoin');
+        /* @var $meta editor_Plugins_SegmentStatistics_Models_SegmentMetaJoin */
+        $meta->setTarget('ts');
+        $s = $meta->segmentsMetaJoin($s, $taskGuid);
+        return $db->fetchAll($s)->toArray();
     }
     
     /**

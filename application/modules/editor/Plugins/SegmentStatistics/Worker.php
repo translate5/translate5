@@ -73,6 +73,21 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
     protected $termContent = array();
     
     /**
+     * @var editor_Plugins_SegmentStatistics_Models_Statistics
+     */
+    protected $stat;
+    
+    /**
+     * @var editor_Plugins_SegmentStatistics_Models_TermStatistics
+     */
+    protected $termStat;
+    
+    public function __construct() {
+        parent::__construct();
+        $this->stat = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_Statistics');
+    }
+    
+    /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
@@ -95,6 +110,9 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
             return false;
         }
         
+        $this->term = ZfExtended_Factory::get('editor_Models_Term');
+        $this->termStat = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_TermStatistics');
+        
         $this->setType();
         $this->prepareIfExport();
         
@@ -104,38 +122,21 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
         
         $fields = $sfm->getFieldList();
         
-        $this->term = ZfExtended_Factory::get('editor_Models_Term');
-        
-        $stat = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_Statistics');
-        /* @var $stat editor_Plugins_SegmentStatistics_Models_Statistics */
         //walk over segments and fields and get and store statistics data
         foreach($data as $segment) {
             /* @var $segment editor_Models_Segment */
             foreach($fields as $field) {
                 $segmentContent = $this->getSegmentContent($sfm, $segment, $field);
-                $stat->init();
-                $stat->setTaskGuid($this->taskGuid);
-                $stat->setSegmentId($segment->getId());
-                $stat->setFieldName($field->name);//always the name without "Edit"!
-                $stat->setFieldType($field->type);
-                $stat->setType($this->type);
-                $stat->setFileId($segment->getFileId());
-                $stat->setCharCount($segment->charCount($segmentContent));
-                $stat->setWordCount($segment->wordCount($segmentContent));
-                
                 $termCount = $this->termCounter($segmentContent, $field->name);
-  
-                $stat->setTermNotFound($termCount['notFound']);
-                $stat->setTermFound($termCount['found']);
                 
-                $stat->save();
+                $this->storeSegmentStats($segment, $segmentContent, $field, $termCount);
+                $this->storeTermStats($segment, $field->name, $termCount);
             }
         }
-        $this->storeTermStats();
         
         //regenerate missing import Stats if needed:
         //copy exports nach import, wo es kein import passend zum export gibt!
-        $stat->regenerateImportStats($this->taskGuid);
+        $this->stat->regenerateImportStats($this->taskGuid);
         return true;
     }
     
@@ -147,28 +148,20 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
      */
     protected function termCounter($segmentContent, $fieldName) {
         $termCount = array(
-            'found' => 0,
-            'notFound' => 0,
+            'found' => array(),
+            'notFound' => array(),
         );
         
         $termInfo = $this->term->getTermInfosFromSegment($segmentContent);
         
         foreach($termInfo as $term) {
-            //for Term stat, we count source terms only:
-            if($fieldName == 'source') {
-                $this->findTermContent($term['mid']);
-            }
-            
-            settype($this->termFoundCounter[$term['mid']], 'integer');
-            settype($this->termNotFoundCounter[$term['mid']], 'integer');
-            if(in_array('transNotFound', $term['classes'])) {
-                $termCount['notFound']++;
-                $this->termNotFoundCounter[$term['mid']]++;
-            } else {
-                $termCount['found']++;
-                $this->termFoundCounter[$term['mid']]++;
-            }
+            $this->findTermContent($term['mid']);
+            settype($termCount['found'][$term['mid']], 'integer');
+            settype($termCount['notFound'][$term['mid']], 'integer');
+            $idx = in_array('transNotFound', $term['classes']) ? 'notFound' : 'found';
+            $termCount[$idx][$term['mid']]++;
         }
+        
         return $termCount;
     }
     
@@ -191,22 +184,47 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
     }
     
     /**
-     * Stores the term usage in the DB
+     * Stores the segment stats in the DB
+     * @param editor_Models_Segment $segment
+     * @param string $segmentContent
+     * @param Zend_Db_Table_Row $field
+     * @param array $termCount
      */
-    protected function storeTermStats() {
-        $termStat = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_TermStatistics');
-        /* @var $termStat editor_Plugins_SegmentStatistics_Models_TermStatistics */
+    protected function storeSegmentStats(editor_Models_Segment $segment, $segmentContent, Zend_Db_Table_Row $field, array $termCount) {
+        $stat = $this->stat;
+        $stat->init();
+        $stat->setTaskGuid($this->taskGuid);
+        $stat->setSegmentId($segment->getId());
+        $stat->setFieldName($field->name);//always the name without "Edit"!
+        $stat->setFieldType($field->type);
+        $stat->setType($this->type);
+        $stat->setFileId($segment->getFileId());
+        $stat->setCharCount($segment->charCount($segmentContent));
+        $stat->setWordCount($segment->wordCount($segmentContent));
+        $stat->setTermNotFound(array_sum($termCount['notFound']));
+        $stat->setTermFound(array_sum($termCount['found']));
+        $stat->save();
+    }
+    
+    /**
+     * Stores the term usage in the DB (on export only!)
+     */
+    protected function storeTermStats(editor_Models_Segment $segment, $fieldName, $termCount) {
+        if($this->type !== self::TYPE_EXPORT) {
+            return;
+        }
         //since the term stat are generated on export only, they have to be deleted and regenerated on each export:
-        $termStat->deleteByTask($this->taskGuid);
-        foreach($this->termContent as $mid => $term) {
-            $termStat->init(array(
+        foreach($termCount['found'] as $mid => $found) {
+            $this->termStat->init(array(
                 'taskGuid' => $this->taskGuid,
                 'mid' => $mid,
-                'term' => $term,
-                'notFoundCount' => $this->termNotFoundCounter[$mid],
-                'foundCount' => $this->termFoundCounter[$mid],
+                'segmentId' => $segment->getId(),
+                'fieldName' => $fieldName,
+                'term' => $this->termContent[$mid],
+                'notFoundCount' => $termCount['notFound'][$mid],
+                'foundCount' => $found,
             ));
-            $termStat->save();
+            $this->termStat->save();
         }
     }
     
@@ -238,9 +256,8 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
         if($this->type != self::TYPE_EXPORT) {
             return;
         }
-        $stat = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_Statistics');
-        /* @var $stat editor_Plugins_SegmentStatistics_Models_Statistics */
-        $stat->deleteType($this->taskGuid, self::TYPE_EXPORT);
+        $this->stat->deleteType($this->taskGuid, self::TYPE_EXPORT);
+        $this->termStat->deleteByTask($this->taskGuid);
     }
         
     /**
@@ -284,11 +301,8 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
      * @return array
      */
     protected function getFileStatistics($type) {
-        $stat = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_Statistics');
-        /* @var $stat editor_Plugins_SegmentStatistics_Models_Statistics */
-        $files = $stat->calculateSummary($this->taskGuid, $type);
-        
-        $statByState = $stat->calculateStatsByState($this->taskGuid, $type);
+        $files = $this->stat->calculateSummary($this->taskGuid, $type);
+        $statByState = $this->stat->calculateStatsByState($this->taskGuid, $type);
         
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */

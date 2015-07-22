@@ -35,6 +35,12 @@ require_once('ZfExtended/ThirdParty/PHPExcel/PHPExcel.php');
  */
 class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_SegmentStatistics_Models_Export_Abstract {
     const FILE_SUFFIX='.xls';
+    
+    /**
+     * Most of stats affect source field only, so define it here:
+     * @var string
+     */
+    const FIELD_SOURCE='source';
 
     /**
      * converted statistics data
@@ -88,7 +94,7 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
                     $target[$newKey] = $value;
                     continue;
                 }
-                if($file['fieldName'] != 'source') {
+                if($file['fieldName'] != self::FIELD_SOURCE) {
                     continue;
                 }
                 foreach($value as $state => $stats) {
@@ -155,14 +161,14 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
     protected function fillSheetTermStat() {
         $termStat = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_TermStatistics');
         /* @var $termStat editor_Plugins_SegmentStatistics_Models_TermStatistics */
-        $stats = $termStat->loadByTaskGuid($this->taskGuid);
+        $stats = $termStat->loadTermSums($this->taskGuid, self::FIELD_SOURCE);
         
         $sheet = $this->xls->setActiveSheetIndex(2);
         $i = 2;
         foreach ($stats as $stat) {
             $sheet->setCellValue('A'.$i, $stat['term']);
-            $sheet->setCellValue('B'.$i, $stat['foundCount']);
-            $sheet->setCellValue('C'.$i++, $stat['notFoundCount']);
+            $sheet->setCellValue('B'.$i, $stat['foundSum']);
+            $sheet->setCellValue('C'.$i++, $stat['notFoundSum']);
         }
     }
 }

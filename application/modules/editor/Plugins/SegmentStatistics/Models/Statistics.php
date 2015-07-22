@@ -60,9 +60,9 @@ class editor_Plugins_SegmentStatistics_Models_Statistics extends ZfExtended_Mode
     protected $dbInstanceClass = 'editor_Plugins_SegmentStatistics_Models_Db_Statistics';
     
     protected $columnsToGet = array(
-        'colsAll' => array('fileId', 'fieldName', 'charCount' => 'SUM(charCount)', 'termFoundCount' => 'SUM(termFound)', 'segmentsPerFile' => 'COUNT(id)'),
-        'colsFound' => array('fileId', 'fieldName', 'charFoundCount' => 'SUM(charCount)', 'termFoundCount' => 'SUM(termFound)', 'segmentsPerFileFound' => 'COUNT(id)'),
-        'colsNotFound' => array('fileId', 'fieldName', 'charNotFoundCount' => 'SUM(charCount)', 'termNotFoundCount' => 'SUM(termNotFound)', 'segmentsPerFileNotFound' => 'COUNT(id)'),
+        'colsAll' => array('stat.fileId', 'stat.fieldName', 'charCount' => 'SUM(stat.charCount)', 'termFoundCount' => 'SUM(stat.termFound)', 'segmentsPerFile' => 'COUNT(stat.id)'),
+        'colsFound' => array('stat.fileId', 'stat.fieldName', 'charFoundCount' => 'SUM(stat.charCount)', 'termFoundCount' => 'SUM(stat.termFound)', 'segmentsPerFileFound' => 'COUNT(stat.id)'),
+        'colsNotFound' => array('stat.fileId', 'stat.fieldName', 'charNotFoundCount' => 'SUM(stat.charCount)', 'termNotFoundCount' => 'SUM(stat.termNotFound)', 'segmentsPerFileNotFound' => 'COUNT(stat.id)'),
         'targetColsFound' => array('stat.fileId', 'targetCharFoundCount' => 'SUM(stat.charCount)', 'targetWordFoundCount' => 'SUM(stat.wordCount)', 'targetSegmentsPerFileFound' => 'COUNT(stat.id)'),
         'targetColsNotFound' => array('stat.fileId', 'targetCharNotFoundCount' => 'SUM(stat.charCount)', 'targetWordNotFoundCount' => 'SUM(stat.wordCount)', 'targetSegmentsPerFileNotFound' => 'COUNT(stat.id)'),
     );
@@ -77,7 +77,11 @@ class editor_Plugins_SegmentStatistics_Models_Statistics extends ZfExtended_Mode
         $files = $this->getFiles($taskGuid);
         $db = $this->db;
         
-        $select = function($cols, $where = null) use ($db, $taskGuid, $type) {
+        $meta = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_SegmentMetaJoin');
+        /* @var $meta editor_Plugins_SegmentStatistics_Models_SegmentMetaJoin */
+        $meta->setTarget('stat');
+        
+        $select = function($cols, $where = null) use ($db, $taskGuid, $type, $meta) {
             $s = $db->select()
                 ->from(array('stat' => $db->info($db::NAME)), $cols)
                 ->where('stat.taskGuid = ?', $taskGuid)
@@ -87,7 +91,7 @@ class editor_Plugins_SegmentStatistics_Models_Statistics extends ZfExtended_Mode
             if(!empty($where)) {
                 $s->where($where);
             }
-            return $s;
+            return $meta->segmentsMetaJoin($s, $taskGuid);
         };
         
         $rowsAll = $this->db->fetchAll($select($this->columnsToGet['colsAll']));
@@ -135,14 +139,20 @@ class editor_Plugins_SegmentStatistics_Models_Statistics extends ZfExtended_Mode
         $db = $this->db;
         $segments = ZfExtended_Factory::get('editor_Models_Db_Segments');
         /* @var $segments editor_Models_Db_Segments */
+        
+        $meta = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_SegmentMetaJoin');
+        /* @var $meta editor_Plugins_SegmentStatistics_Models_SegmentMetaJoin */
+        $meta->setTarget('p');
+        
         $s = $db->select()
-            ->from(array('p' => $db->info($db::NAME)), array('s.fileId', 's.stateId'))
-            ->join(array('s' => $segments->info($db::NAME)), 's.id = p.segmentId', array('foundSum' => 'sum(p.termFound)' , 'notFoundSum' => 'sum(p.termNotFound)'))
+            ->from(array('p' => $db->info($db::NAME)), array('foundSum' => 'sum(p.termFound)' , 'notFoundSum' => 'sum(p.termNotFound)'))
+            ->join(array('s' => $segments->info($db::NAME)), 's.id = p.segmentId', array('s.fileId', 's.stateId'))
             ->where('s.taskGuid = ?', $taskGuid)
             ->where('p.type = ?', $type)
             ->where('p.fieldType = ?', 'source')
             ->group('s.fileId')
             ->group('s.stateId');
+        $meta->segmentsMetaJoin($s, $taskGuid);
         $s->setIntegrityCheck(false);
         $rowset = $this->db->fetchAll($s);
         $res = array();
