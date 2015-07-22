@@ -319,6 +319,8 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
     
     protected function initTaskFieldsStat(& $fileStat, $type) {
         $fieldName = $fileStat['fieldName'];
+        settype($fileStat['segmentsPerFileFound'], 'integer');
+        settype($fileStat['segmentsPerFileNotFound'], 'integer');
         settype($this->taskFieldsStat[$type], 'array');
         settype($this->taskFieldsStat[$type][$fieldName], 'array');
         
