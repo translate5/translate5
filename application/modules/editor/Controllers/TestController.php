@@ -56,9 +56,9 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
     protected $errorColor = 'red';
     /**
      *
-     * @var boolean
+     * @var array collects which xml failed and which succeeded
      */
-    protected $isFirstTest = true;
+    protected $xmlResultSummary = array();
     public function init() {
         parent::init();
         $class = ucfirst($this->getRequest()->getActionName());
@@ -84,6 +84,7 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
     
     public function termtaggerAction() {
         $this->loopThroughTestXmlFiles();
+        $this->echoResultSummary();
     }
     
     protected function loopThroughTestXmlFiles() {
@@ -97,9 +98,16 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
             
             $result = $this->runTests($file,  $this->testcase);
             $this->echoResults($result,$file);
+            $this->xmlResultSummary[$file->getFilename()]=  $this->errorColor;
         }
     }
     
+    protected function echoResultSummary() {
+        echo "<h2>Summary of Results</h2>";
+        foreach ($this->xmlResultSummary as $filename => $color) {
+            echo '<b style="color: '.$color.'">'.$filename.'</b><br>';
+        }
+    }
     /**
      * 
      * @param PHPUnit_Framework_TestResult $result
@@ -117,7 +125,8 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
         $failureCount = count($failures);
         
         if($errorCount === 0 && $failureCount === 0){
-            echo '<p style="color:green"><b>Test passed</b></p>';
+            $this->errorColor = 'green';
+            echo '<p style="color:'.$this->errorColor.'"><b>Test passed</b></p>';
             return true;
         }
         
