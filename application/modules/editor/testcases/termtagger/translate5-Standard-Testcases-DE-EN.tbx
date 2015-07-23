@@ -16,121 +16,143 @@
    <text>
       <body>
 
-         <termEntry id="X_4216">
+         <termEntry id="X_5937">
             <langSet xml:lang="DE">
                <tig>
-                  <term>Sport</term>
+                  <term>Leder Nappa</term>
                </tig>
             </langSet>
             <langSet xml:lang="EN">
                <tig>
-                  <term>Sport</term>
+                  <term>nappa leather</term>
                </tig>
             </langSet>
          </termEntry>
 
-         <termEntry id="X_1954">
+         <termEntry id="X_2121">
             <langSet xml:lang="DE">
                <tig>
-                  <term>Kombiinstrument</term>
+                  <term>schwarz</term>
                </tig>
             </langSet>
             <langSet xml:lang="EN">
                <tig>
-                  <term>instrument cluster</term>
+                  <term>black</term>
+               </tig>
+            </langSet>
+         </termEntry>
+         
+         <termEntry id="X_2125">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Fahrerseite</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>driver's side</term>
+               </tig>
+            </langSet>
+         </termEntry>
+         
+         <termEntry id="X_2126">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Fahrersitz</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>driver's seat</term>
+               </tig>
+            </langSet>
+         </termEntry>
+         
+         <termEntry id="X_2127">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Fahrzeug</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>vehicle</term>
+               </tig>
+            </langSet>
+         </termEntry>
+         
+         <termEntry id="X_2128">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>CD/DVD-Laufwerk</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>CD/DVD drive</term>
+               </tig>
+            </langSet>
+         </termEntry>
+         
+         <termEntry id="X_2129">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Audio</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>audio</term>
+               </tig>
+            </langSet>
+         </termEntry>
+         
+         <termEntry id="X_2130">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>CDI</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>CDI</term>
                </tig>
             </langSet>
          </termEntry>
 
-
-         <termEntry id="X_2077">
+         <termEntry id="X_2132">
             <langSet xml:lang="DE">
                <tig>
-                  <term>CLS</term>
+                  <term>Verkleidung</term>
                </tig>
             </langSet>
             <langSet xml:lang="EN">
                <tig>
-                  <term>CLS</term>
+                  <term>trim</term>
                </tig>
             </langSet>
          </termEntry>
-
-         <termEntry id="X_2078">
+         <termEntry id="X_2133">
             <langSet xml:lang="DE">
                <tig>
-                  <term>CL</term>
+                  <term>Laderaum</term>
                </tig>
             </langSet>
             <langSet xml:lang="EN">
                <tig>
-                  <term>CL</term>
+                  <term>load compartment</term>
                </tig>
             </langSet>
          </termEntry>
-
-         <termEntry id="X_2122">
+         <termEntry id="X_2134">
             <langSet xml:lang="DE">
                <tig>
-                  <term>rot</term>
+                  <term>Laderaumverkleidung</term>
                </tig>
             </langSet>
             <langSet xml:lang="EN">
                <tig>
-                  <term>red</term>
-               </tig>
-            </langSet>
-         </termEntry>
-         
-         
-         <termEntry id="X_2123">
-            <langSet xml:lang="DE">
-               <tig>
-                  <term>ESP® Kurvendynamik-Assistent</term>
-               </tig>
-            </langSet>
-            <langSet xml:lang="EN">
-               <tig>
-                  <term>ESP® Curve Dynamic Assist</term>
-               </tig>
-            </langSet>
-         </termEntry>
-         
-         <termEntry id="X_2124">
-            <langSet xml:lang="DE">
-               <tig>
-                  <term>Ansteuerung</term>
-               </tig>
-            </langSet>
-            <langSet xml:lang="EN">
-               <tig>
-                  <term>actuation</term>
-               </tig>
-            </langSet>
-         </termEntry>
-         
-         <termEntry id="X_2124x">
-            <langSet xml:lang="DE">
-               <tig>
-                  <term>Stellglied</term>
-               </tig>
-            </langSet>
-            <langSet xml:lang="EN">
-               <tig>
-                  <term>actuator</term>
-               </tig>
-            </langSet>
-         </termEntry>
-         
-         <termEntry id="X_2131">
-            <langSet xml:lang="DE">
-               <tig>
-                  <term>Rohbau</term>
-               </tig>
-            </langSet>
-            <langSet xml:lang="EN">
-               <tig>
-                  <term>bodyshell</term>
+                  <term>load compartment trim</term>
                </tig>
             </langSet>
          </termEntry>

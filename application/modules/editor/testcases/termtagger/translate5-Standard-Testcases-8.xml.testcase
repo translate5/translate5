@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="twoTermsInPairedTag" creator="MittagQI" mandatory="yes" sourceLang="DE" targetLang="ES" tbxPath="translate5-Standard-Testcases-DE-ES.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>2 terms directly inside a paired tag - nothing else</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source><div class="open 672069643d22313322"><span title="&lt;i&gt;" class="short">&lt;6&gt;</span><span id="13-7-3c4abf728013d2a85b9fd0e44dbc2353" class="full">&lt;i&gt;</span></div>Drehbürstensieb Haus<div class="close 2f67"><span title="&lt;/i&gt;" class="short">&lt;/6&gt;</span><span id="13-8-c03218cf3bc4a3370b8bfd1af3b870c9" class="full">&lt;/i&gt;</span></div></source>
+            <target><div class="open 672069643d22313222"><span title="&lt;i&gt;" class="short">&lt;3&gt;</span><span id="12-30-3c4abf728013d2a85b9fd0e44dbc2353" class="full">&lt;i&gt;</span></div>Tamiz de cepillos rotativos casa<div class="close 2f67"><span title="&lt;/i&gt;" class="short">&lt;/3&gt;</span><span id="12-31-c03218cf3bc4a3370b8bfd1af3b870c9" class="full">&lt;/i&gt;</span></div></target>
+        </input>
+        <expectedOutput>
+            <source><div class="open 672069643d22313322"><span title="&lt;i&gt;" class="short">&lt;6&gt;</span><span id="13-7-3c4abf728013d2a85b9fd0e44dbc2353" class="full">&lt;i&gt;</span></div><div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Drehbürstensieb</div> <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Haus</div><div class="close 2f67"><span title="&lt;/i&gt;" class="short">&lt;/6&gt;</span><span id="13-8-c03218cf3bc4a3370b8bfd1af3b870c9" class="full">&lt;/i&gt;</span></div></source>
+            <target><div class="open 672069643d22313222"><span title="&lt;i&gt;" class="short">&lt;3&gt;</span><span id="12-30-3c4abf728013d2a85b9fd0e44dbc2353" class="full">&lt;i&gt;</span></div><div title="" class="term admittedTerm exact" data-tbxid="term_0000001_001_es-ES_001_0000003">Tamiz de cepillos rotativos</div> <div title="" class="term admittedTerm exact" data-tbxid="term_0000003_001_es-ES_001_0000008">casa</div><div class="close 2f67"><span title="&lt;/i&gt;" class="short">&lt;/3&gt;</span><span id="12-31-c03218cf3bc4a3370b8bfd1af3b870c9" class="full">&lt;/i&gt;</span></div></target>
+        </expectedOutput>
+    </assertion>
+</testcase>

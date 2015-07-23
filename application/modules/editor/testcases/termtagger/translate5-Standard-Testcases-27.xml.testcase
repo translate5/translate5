@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="3LetterAbreviation" creator="beo/MittagQI" mandatory="yes" sourceLang="DE" targetLang="EN" tbxPath="translate5-Standard-Testcases-DE-EN.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>An abbreviation of three letters must be recognized.</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>A 180 CDI</source>
+            <target>A 180 CDI</target>
+        </input>
+        <expectedOutput>
+            <source>A 180 <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">CDI</div></source>
+            <target>A 180 <div title="" class="term admittedTerm exact" data-tbxid="xyz">CDI</div></target>
+        </expectedOutput>
+    </assertion>
+</testcase>
