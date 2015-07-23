@@ -83,6 +83,7 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
     }
     
     public function termtaggerAction() {
+        echo "<h1>TermTagger Tests; ".  date('Y-m-d h:m:s')."</h1>";
         $this->loopThroughTestXmlFiles();
         $this->echoResultSummary();
     }
