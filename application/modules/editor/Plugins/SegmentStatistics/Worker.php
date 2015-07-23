@@ -290,6 +290,9 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
         
         $filename = $task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.$this->getFileName();
         if($filtered) {
+            //overwrite segment counts with filtered values
+            $statistics->segmentCount = $this->stat->calculateSegmentCountFiltered($this->taskGuid);
+            $statistics->segmentCountEditable = $this->stat->calculateSegmentCountFiltered($this->taskGuid, true);
             $filename .= '-filtered';
         }
         

@@ -224,6 +224,31 @@ class editor_Plugins_SegmentStatistics_Models_Statistics extends ZfExtended_Mode
     }
     
     /**
+     * returns the segment count of the given taskGuid
+     * @param string $taskGuid
+     * @param boolean $editable
+     * @return integer the segment count
+     */
+    public function calculateSegmentCountFiltered($taskGuid, $onlyEditable=false) {
+        $meta = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_SegmentMetaJoin');
+        /* @var $meta editor_Plugins_SegmentStatistics_Models_SegmentMetaJoin */
+        $meta->setTarget('seg');
+        $meta->setSegmentIdColumn('id');
+        
+        $db = ZfExtended_Factory::get('editor_Models_Db_Segments');
+        /* @var $db editor_Models_Db_Segments */
+        $s = $db->select()
+            ->from(array('seg' => $db->info($db::NAME)), array('segCount' => 'COUNT(seg.id)'))
+            ->where('seg.taskGuid = ?', $taskGuid);
+        if($onlyEditable){
+            $s->where('seg.editable = 1');
+        }
+        $meta->segmentsMetaJoin($s, $taskGuid);
+        $row = $this->db->fetchRow($s);
+        return $row->segCount;
+    }
+    
+    /**
      * The Plugin editor_Plugins_SegmentStatistics_BootstrapEditableOnly deleted the import statistics
      * Since we need them again for export statistics, we have to regenerate them. 
      * This is possible because only locked segment stats were deleted, therefore nothing was changed in this segments.
