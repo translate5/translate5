@@ -41,6 +41,7 @@ class editor_Plugins_SegmentStatistics_WriteStatisticsWorker extends editor_Plug
     public function work() {
         $this->setType();
         $this->writeToDisk();
+        $this->writeToDisk(true); //generated stats a second time, with data filtered by config
         return true;
     }
 }

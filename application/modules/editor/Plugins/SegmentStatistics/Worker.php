@@ -130,7 +130,7 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
                 $termCount = $this->termCounter($segmentContent, $field->name);
                 
                 $this->storeSegmentStats($segment, $segmentContent, $field, $termCount);
-                $this->storeTermStats($segment, $field->name, $termCount);
+                $this->storeTermStats($segment, $field, $termCount);
             }
         }
         
@@ -208,19 +208,21 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
     
     /**
      * Stores the term usage in the DB (on export only!)
+     * @param editor_Models_Segment $segment
+     * @param Zend_Db_Table_Row $field
+     * @param array $termCount
      */
-    protected function storeTermStats(editor_Models_Segment $segment, $fieldName, $termCount) {
-        if($this->type !== self::TYPE_EXPORT) {
-            return;
-        }
+    protected function storeTermStats(editor_Models_Segment $segment, Zend_Db_Table_Row $field, array $termCount) {
         //since the term stat are generated on export only, they have to be deleted and regenerated on each export:
         foreach($termCount['found'] as $mid => $found) {
             $this->termStat->init(array(
                 'taskGuid' => $this->taskGuid,
                 'mid' => $mid,
                 'segmentId' => $segment->getId(),
-                'fieldName' => $fieldName,
+                'fieldName' => $field->name,
+                'fieldType' => $field->type,
                 'term' => $this->termContent[$mid],
+                'type' => $this->type,
                 'notFoundCount' => $termCount['notFound'][$mid],
                 'foundCount' => $found,
             ));
@@ -257,16 +259,22 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
             return;
         }
         $this->stat->deleteType($this->taskGuid, self::TYPE_EXPORT);
-        $this->termStat->deleteByTask($this->taskGuid);
+        $this->termStat->deleteType($this->taskGuid, self::TYPE_EXPORT);
     }
         
     /**
      * Method to write statistics to task data directory
+     * parameter decides if configured filter should be used or not
+     * @param boolean $filtered
      */
-    protected function writeToDisk() {
+    protected function writeToDisk($filtered = false) {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($this->taskGuid);
+        
+        $this->taskFieldsStat = array();
+        
+        editor_Plugins_SegmentStatistics_Models_SegmentMetaJoin::setEnabled($filtered);
         
         $statistics = $task->getStatistics();
         
@@ -281,12 +289,14 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
         $statistics->taskFields = $this->taskFieldsStat;
         
         $filename = $task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.$this->getFileName();
+        if($filtered) {
+            $filename .= '-filtered';
+        }
         
         $exporters = array(
                 'editor_Plugins_SegmentStatistics_Models_Export_Xml',
                 'editor_Plugins_SegmentStatistics_Models_Export_Xls',
         );
-        
         foreach ($exporters as $cls) {
             $exporter = ZfExtended_Factory::get($cls);
             /* @var $exporter editor_Plugins_SegmentStatistics_Models_Export_Abstract */
@@ -372,6 +382,9 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
     protected function getFileName() {
         if($this->type == self::TYPE_IMPORT) {
             return 'segmentstatistics-import';
+        }
+        if(ZfExtended_Debug::hasLevel('plugin', 'SegmentStatistics')) {
+            return 'segmentstatistics-export';
         }
         return 'segmentstatistics-export-'.date('Y-m-d-H-i');
     }

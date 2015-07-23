@@ -45,10 +45,57 @@ class editor_Plugins_SegmentStatistics_Models_SegmentMetaJoin {
     protected $tableAlias = 'target';
     protected $segIdCol = 'segmentId';
 
+    /**
+     * @var array
+     */
+    protected $metaToIgnore = array();
+    
+    /**
+     * @var boolean
+     */
+    protected static $enabled = true;
+    
+    public function __construct() {
+        $this->initFilterConditions();
+    }
+    
+    /**
+     * Since this class is used at multiple places it can be completly disabled in a static manner
+     * @param boolean $enabled
+     */
+    public static function setEnabled($enabled = true) {
+        self::$enabled = $enabled;
+    }
+    
+    protected function initFilterConditions() {
+        $config = Zend_Registry::get('config');
+        $metaToIgnore = $config->runtimeOptions->plugins->SegmentStatistics->metaToIgnore;
+        foreach($metaToIgnore as $metadata => $val){
+            if($val){
+                $this->metaToIgnore[]= $metadata;
+            }
+        }
+    }
+    
+    /**
+     * @return boolean
+     */
+    protected function hasFilterConditions() {
+        return !empty($this->metaToIgnore);
+    }
+    
+    /**
+     * sets the target table alias for the table to be joined
+     * @param string $targetTableAlias
+     */
     public function setTarget($targetTableAlias) {
         $this->tableAlias = $targetTableAlias;
     }
     
+    /**
+     * sets the segment id column name of the table to be joined
+     * @param string $colName
+     */
     public function setSegmentIdColumn($colName) {
         $this->segIdCol = $colName;
     }
@@ -60,6 +107,9 @@ class editor_Plugins_SegmentStatistics_Models_SegmentMetaJoin {
      * @return Zend_Db_Table_Select
      */
     public function segmentsMetaJoin(Zend_Db_Table_Select $s, $taskGuid) {
+        if(!self::$enabled || !$this->hasFilterConditions()) {
+            return $s;
+        }
         $segMeta = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
         /* @var $segMeta editor_Models_Db_SegmentMeta */
         
@@ -76,15 +126,10 @@ class editor_Plugins_SegmentStatistics_Models_SegmentMetaJoin {
      * @return Zend_Db_Table_Select
      */
     protected function addFilterCondition(Zend_Db_Table_Select $s) {
-        $config = Zend_Registry::get('config');
-        
-        $metaToIgnore = $config->runtimeOptions->plugins->SegmentStatistics->metaToIgnore;
-        foreach($metaToIgnore as $metadate => $val){
-            if($val){
-                //Since the filter includes all segments not having the meta value, 
-                //we have to select all 0 values
-                $s->where(self::META_ALIAS.'.'.$val.' = ?', 0);
-            }
+        foreach($this->metaToIgnore as $metadata){
+            //Since the filter includes all segments not having the meta value, 
+            //we have to select all 0 values
+            $s->where(self::META_ALIAS.'.'.$metadata.' = ?', 0);
         }
         return $s;
     }
