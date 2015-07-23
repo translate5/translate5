@@ -134,8 +134,9 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
      * Uses a given row of a given Sheet as template and adds new rows with the defined values
      * @param integer $tplRow
      * @param integer $sheetIdx
+     * @param integer $sumRow Row Index where the sum formulas has to be fixed
      */
-    protected function fillByTemplate($tplRow, $sheetIdx){
+    protected function fillByTemplate($tplRow, $sheetIdx, $sumRow = 4){
         $sheet = $this->xls->setActiveSheetIndex($sheetIdx);
         $maxColumn = $sheet->getHighestColumn($tplRow);
         $maxColumn++;
@@ -146,8 +147,10 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
         }
         
         $i = $tplRow + 1; // start after tpl row
+        $inserted = 0;
         foreach($this->data as $file) {
             $sheet->insertNewRowBefore($i);
+            $inserted++;
             foreach($masterValues as $col => $tpl) {
                 $isTpl = (strpos($tpl, self::TPL_PREFIX) === 0);
                 if(!$isTpl) {
@@ -163,6 +166,14 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
             $i++;
         }
         $sheet->removeRow($tplRow);
+        
+        //correct sum values in sum line
+        foreach($masterValues as $col => $tpl) {
+            $i = $sumRow + $inserted - 1;
+            $cell = $sheet->getCell($col.$i);
+            $sum = preg_replace('/^(=SUM\([A-Z]+[0-9]+:[A-Z]+)[0-9]+\)/', '${1}'.($i-1).')', $cell->getValue());
+            $cell->setValue($sum);
+        }
     }
     
     /**
