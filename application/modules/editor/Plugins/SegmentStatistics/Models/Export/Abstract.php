@@ -55,12 +55,18 @@ abstract class editor_Plugins_SegmentStatistics_Models_Export_Abstract {
      */
     protected $statistics;
     
+    /**
+     * @var boolean
+     */
+    protected $debug = false;
+    
     public function init(editor_Models_Task $task, stdClass $statistics, array $workerParams) {
         $this->task = $task;
         $this->taskGuid = $task->getTaskGuid();
         $this->type = $workerParams['type'];
         //prevent internal restructuring to destruct other algorithms:
         $this->statistics = clone $statistics; 
+        $this->debug = ZfExtended_Debug::hasLevel('plugin', 'SegmentStatistics');
     }
     
     /**

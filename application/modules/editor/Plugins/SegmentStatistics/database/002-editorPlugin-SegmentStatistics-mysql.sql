@@ -38,12 +38,14 @@ CREATE TABLE `LEK_plugin_segmentstatistic_terms` (
   `taskGuid` varchar(38) NOT NULL COMMENT 'Foreign Key to LEK_task',
   `mid` varchar(60) NOT NULL COMMENT 'Foreign Key to LEK_terms',
   `segmentId` int(11) NOT NULL COMMENT 'Segment ID, no FK needed',
-  `fieldName` varchar(120) NOT NULL COMMENT 'Segment ID, no FK needed',
+  `fieldName` varchar(120) NOT NULL COMMENT 'name of the segment field',
+  `fieldType` varchar(120) NOT NULL COMMENT 'type of the segment field',  
   `term` varchar(19000) NOT NULL COMMENT 'Term Content',
   `notFoundCount` int(11) NOT NULL DEFAULT 0 COMMENT 'count of this term not found',
   `foundCount` int(11) NOT NULL DEFAULT 0 COMMENT 'count of this term found',
+  `type` enum('import','export') DEFAULT 'import',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `termPerTask` (`taskGuid`, `mid`, `segmentId`, `fieldName`),
+  UNIQUE KEY `termPerTask` (`mid`, `segmentId`, `fieldName`, `type`),
   CONSTRAINT FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 

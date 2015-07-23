@@ -62,7 +62,7 @@ class editor_Plugins_SegmentStatistics_Models_TermStatistics extends ZfExtended_
      * @param string $taskGuid
      * @return multitype:
      */
-    public function loadTermSums($taskGuid, $fieldName) {
+    public function loadTermSums($taskGuid, $fieldName, $type) {
         $s = $this->db->select(false);
         $db = $this->db;
 
@@ -75,6 +75,7 @@ class editor_Plugins_SegmentStatistics_Models_TermStatistics extends ZfExtended_
         $s->from(array('ts' => $db->info($db::NAME)), $cols)
         ->where('ts.taskGuid = ?', $taskGuid)
         ->where('ts.fieldName = ?', $fieldName)
+        ->where('ts.type = ?', $type)
         ->group('ts.mid')
         ->order('foundSum DESC');
         
@@ -86,10 +87,11 @@ class editor_Plugins_SegmentStatistics_Models_TermStatistics extends ZfExtended_
     }
     
     /**
-     * deletes the statistics to the given taskGuid
+     * deletes the statistics to the given taskGuid and type
      * @param string $taskGuid
+     * @param string $type
      */
-    public function deleteByTask($taskGuid) {
-        $this->db->delete(array('taskGuid = ?' => $taskGuid));
+    public function deleteType($taskGuid, $type) {
+        $this->db->delete(array('taskGuid = ?' => $taskGuid, 'type = ?' => $type));
     }
 }

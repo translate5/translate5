@@ -53,7 +53,24 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xml extends editor_Plugins_
             $this->addTypeSpecificXml($xml->addChild('import'), $this->statistics, self::TYPE_IMPORT);
             $this->addTypeSpecificXml($xml->addChild('export'), $this->statistics, self::TYPE_EXPORT);
         }
-        $xml->asXML($filename.self::FILE_SUFFIX);
+        $file = $filename.self::FILE_SUFFIX;
+        $xml->asXML($file);
+        $this->debugFormatXml($file);
+    }
+    
+    /**
+     * converts the saved xml to a formatted XML file if debug for SegmentStatistics is enabled
+     * @param string $file
+     */
+    protected function debugFormatXml($file) {
+        if(!$this->debug) {
+            return;
+        }
+        $dom = new DOMDocument;
+        $dom->preserveWhiteSpace = FALSE;
+        $dom->load($file);
+        $dom->formatOutput = TRUE;
+        $dom->save($file);
     }
     
     protected function addTypeSpecificXml(SimpleXMLElement $xml, $statistics, $type) {

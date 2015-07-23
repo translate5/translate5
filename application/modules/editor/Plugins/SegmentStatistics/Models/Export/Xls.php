@@ -115,6 +115,11 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
     public function writeToDisk(string $filename) {
         $w = new PHPExcel_Writer_Excel2007($this->xls);
         $w->save($filename.self::FILE_SUFFIX);
+        
+        if($this->debug) {
+            $w = new PHPExcel_Writer_CSV($this->xls);
+            $w->save($filename.'.csv');
+        }
     }
     
     protected function fillSheetOverview() {
@@ -166,7 +171,7 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
     protected function fillSheetTermStat() {
         $termStat = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_TermStatistics');
         /* @var $termStat editor_Plugins_SegmentStatistics_Models_TermStatistics */
-        $stats = $termStat->loadTermSums($this->taskGuid, self::FIELD_SOURCE);
+        $stats = $termStat->loadTermSums($this->taskGuid, self::FIELD_SOURCE, $this->type);
         
         $sheet = $this->xls->setActiveSheetIndex(2);
         $i = 2;
