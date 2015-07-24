@@ -85,6 +85,13 @@ class editor_Plugins_SegmentStatistics_Models_SegmentMetaJoin {
     }
     
     /**
+     * @return array
+     */
+    public function getFilterConditions() {
+        return $this->metaToIgnore;
+    }
+    
+    /**
      * sets the target table alias for the table to be joined
      * @param string $targetTableAlias
      */

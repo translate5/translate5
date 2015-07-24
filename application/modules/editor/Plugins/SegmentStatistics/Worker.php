@@ -274,19 +274,26 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
         
         $this->taskFieldsStat = array();
         
-        editor_Plugins_SegmentStatistics_Models_SegmentMetaJoin::setEnabled($filtered);
+        
+        $metaJoin = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_SegmentMetaJoin');
+        /* @var $metaJoin editor_Plugins_SegmentStatistics_Models_SegmentMetaJoin */
+        
+        $metaJoin::setEnabled($filtered);
         
         $statistics = $task->getStatistics();
-        
-        if($this->type == self::TYPE_IMPORT) {
-            $statistics->filesImport = $this->getFileStatistics(self::TYPE_IMPORT);
+        if($filtered) {
+            $statistics->filtered = $metaJoin->getFilterConditions();
         }
         else {
-            $statistics->filesImport = $this->getFileStatistics(self::TYPE_IMPORT);
-            $statistics->filesExport = $this->getFileStatistics(self::TYPE_EXPORT);
+            $statistics->filtered = array();
         }
         
-        $statistics->taskFields = $this->taskFieldsStat;
+        //If we try to create a filtered stat without filters we dont create it
+        if($filtered && empty($statistics->filtered)) {
+            return;
+        }
+        
+        $this->fillStatistics($statistics);
         
         $filename = $task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.$this->getFileName();
         if($filtered) {
@@ -296,6 +303,30 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
             $filename .= '-filtered';
         }
         
+        $this->export($task, $statistics, $filename);
+    }
+    
+    /**
+     * @param stdClass $statistics
+     */
+    protected function fillStatistics($statistics) {
+        if($this->type == self::TYPE_IMPORT) {
+            $statistics->filesImport = $this->getFileStatistics(self::TYPE_IMPORT);
+        }
+        else {
+            $statistics->filesImport = $this->getFileStatistics(self::TYPE_IMPORT);
+            $statistics->filesExport = $this->getFileStatistics(self::TYPE_EXPORT);
+        }
+        
+        $statistics->taskFields = $this->taskFieldsStat;
+    }
+    
+    /**
+     * @param editor_Models_Task $task
+     * @param stdClass $statistics
+     * @param string $filename
+     */
+    protected function export(editor_Models_Task $task, stdClass $statistics, $filename) {
         $exporters = array(
                 'editor_Plugins_SegmentStatistics_Models_Export_Xml',
                 'editor_Plugins_SegmentStatistics_Models_Export_Xls',

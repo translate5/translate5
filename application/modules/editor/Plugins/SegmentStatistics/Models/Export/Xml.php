@@ -43,6 +43,7 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xml extends editor_Plugins_
         $xml = new SimpleXMLElement('<statistics/>');
         $xml->addChild('taskGuid', $this->taskGuid);
         $xml->addChild('taskName', $this->statistics->taskName);
+        $this->addFiltered($xml);
         $xml->addChild('segmentCount', $this->statistics->segmentCount);
         $xml->addChild('segmentCountEditable', $this->statistics->segmentCountEditable);
         
@@ -56,6 +57,20 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xml extends editor_Plugins_
         $file = $filename.self::FILE_SUFFIX;
         $xml->asXML($file);
         $this->debugFormatXml($file);
+    }
+    
+    /**
+     * Adds the configured filters to the XML
+     * @param SimpleXMLElement $xml
+     */
+    protected function addFiltered(SimpleXMLElement $xml) {
+        $filtered = $xml->addChild('filtered');
+        if(empty($this->statistics->filtered)){
+            return;
+        }
+        foreach($this->statistics->filtered as $filter) {
+            $filtered->addChild('filter', $filter);
+        }
     }
     
     /**
