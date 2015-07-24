@@ -1,0 +1,9 @@
+[application]
+resources.db.params.host = "DBHOSTNAME"
+resources.db.params.username = "DBUSERNAME"
+resources.db.params.password = "DBPASSWORD"
+resources.db.params.dbname = "DBNAME"
+
+resources.mail.defaultFrom.name = Service MittagQI
+resources.mail.defaultFrom.email = yourEmailAdress@mittagqi.com
+
