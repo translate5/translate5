@@ -51,8 +51,19 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
     public function __construct($application) {
         require_once APPLICATION_PATH . '/../library/querypath/src/qp.php';
         parent::__construct($application);
+        
+        //Binding the worker clean up to the after import event, since import
+        // is currently the main use case for workers
+        $eventManager = Zend_EventManager_StaticEventManager::getInstance();
+        /* @var $eventManager Zend_EventManager_StaticEventManager */
+        $eventManager->attach('editor_Models_Import', 'afterImport', function(){
+            $worker = ZfExtended_Factory::get('ZfExtended_Worker_GarbageCleaner');
+            /* @var $worker ZfExtended_Worker_GarbageCleaner */
+            $worker->init();
+            $worker->queue();
+        }, 0);
+        
     }
-    
     
     public function _initController()
     {
