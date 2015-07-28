@@ -118,6 +118,8 @@ Ext.application({
     window.onbeforeunload = Ext.bind(me.onBeforeUnload, me);
     me.authenticatedUser = Ext.create('Editor.model.admin.User', Editor.data.app.user);
     me[Editor.data.app.initMethod]();
+    
+    Editor.MessageBox.showInitialMessages();
   },
   //Handler für CRQ 92 warnOnClose
   onBeforeUnload: function(e) {

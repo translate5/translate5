@@ -93,6 +93,15 @@ Ext.define('Editor.MessageBox',{
         Editor.MessageBox.instance = new Editor.MessageBox();
       }
       return Editor.MessageBox.instance; 
+    },
+    showInitialMessages: function() {
+        var msgs = Editor.data.messageBox && Editor.data.messageBox.initialMessages;
+        if(!msgs || msgs.length == 0) {
+            return;
+        }
+        Ext.each(msgs, function(msg){
+            Editor.MessageBox.addInfo(msg);
+        });
     }
   },
   constructor: function(config) {
