@@ -38,4 +38,4 @@ UPDATE  `Zf_configuration` SET
 `name` =  'runtimeOptions.content.mainMenu',
 `value` = '[{"/":"Startseite"},{"/login":"translate5 Demo"},{"/index/usage":"User infos"},  {"/index/source":"Developers"}, {"/index/newsletter":"Newsletter"}, {"/index/testimonials":"Testimonials"}, {"/index/download":"Download"}]',
 `default` = '[{"/":"Startseite"},{"/login":"translate5 Demo"},{"/index/usage":"User infos"},  {"/index/source":"Developers"}, {"/index/newsletter":"Newsletter"}, {"/index/testimonials":"Testimonials"}, {"/index/download":"Download"}]',
-`description` = 'list of menu-entries for the logged out status of translate5. Other view scripts will lead to 404 in logged out status, even if they exist' where name = 'runtimeOptions.content.viewTemplatesAllowed';
+`description` = 'list of menu-entries for the logged out status of translate5. Other view scripts will lead to 404 in logged out status, even if they exist' where name = 'runtimeOptions.content.mainMenu';
