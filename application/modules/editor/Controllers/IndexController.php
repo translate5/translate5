@@ -91,7 +91,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     protected function checkForUpdates() {
         $downloader = ZfExtended_Factory::get('ZfExtended_Models_Installer_Downloader', array(APPLICATION_PATH.'/..'));
         /* @var $downloader ZfExtended_Models_Installer_Downloader */
-        if(!$downloader->applicationIsUptodate()) {
+        
+        $userSession = new Zend_Session_Namespace('user');
+        $acl = ZfExtended_Acl::getInstance();
+        /* @var $acl ZfExtended_Acl */
+        
+        $isAllowed = $acl->isInAllowedRoles($userSession->data->roles,'getUpdateNotification');
+        if($isAllowed && !$downloader->applicationIsUptodate()) {
             $msgBoxConf = $this->view->Php2JsVars()->get('messageBox');
             settype($msgBoxConf->initialMessages, 'array');
             $msg = 'Eine neue Version von Translate5 ist verfügbar. Bitte benutzen Sie das Installations und Update Script um die aktuellste Version zu installieren.';
