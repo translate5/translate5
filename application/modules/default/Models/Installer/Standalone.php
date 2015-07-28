@@ -73,6 +73,8 @@ class Models_Installer_Standalone {
     );
     
     protected $hostname;
+    
+    protected $isInstallation = false;
 
     /**
      * Options: 
@@ -123,6 +125,7 @@ class Models_Installer_Standalone {
         if(file_exists($this->currentWorkingDir.self::INSTALL_INI)){
             return;
         }
+        $this->isInstallation = true;
         $this->logSection('Translate5 Installation');
         
         if(is_array($options) && isset($options['mysql_bin']) && $options['mysql_bin'] != self::MYSQL_BIN) {
@@ -154,6 +157,9 @@ class Models_Installer_Standalone {
      * This are installation step which must be called after initApplication
      */
     protected function postInstallation() {
+        if(!$this->isInstallation){
+            return;
+        }
         if(!empty($this->hostname)) {
             $config = Zend_Registry::get('config');
             $db = Zend_Db::factory($config->resources->db);
