@@ -10,7 +10,7 @@ Testing openTMStermTagger
 
 - The test will look for files with the ending ".testcase" in the folder /application/modules/editor/testcases/termtagger
 
-- These testcase-files are automatically validated against termtaggerTestCaseSchema.xsd. Please see the testcase-folder for example-files.
+- These testcase-files are automatically validated against termtaggerTestCaseSchema.xsd. Please see the testcase-folder for example-files (e. g. testcase1.xml.testcase.default shows an example; the TBX-files for each testcase are referenced in the testcase-file with a path relative to the testcase-file).
 
 - For each testcase-file the test will launch a new PHPUnit-Testsuite
 

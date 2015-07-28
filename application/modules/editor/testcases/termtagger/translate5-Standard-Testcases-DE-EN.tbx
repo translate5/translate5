@@ -185,7 +185,73 @@
                     </tig>
                 </langSet>
             </termEntry>
+
+         <termEntry id="X_233">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>AKS</term>
+               </tig>
+               <tig>
+                  <term>Automatisches Kupplungs-System</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="en-GB">
+               <tig>
+                  <term>automatic clutch system</term>
+               </tig>
+               <tig>
+                  <term>AKS</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_233_2">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>AKSE</term>
+               </tig>
+               <tig>
+                  <term>Automatische Kindersitz-Erkennung</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="en-GB">
+               <tig>
+                  <term>AKSE</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_1019">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>CL</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="en-GB">
+               <tig>
+                  <term>CL</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_1020">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>CLS</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="en-GB">
+               <tig>
+                  <term>CLS</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+
+
+
         </body>
+
         <back>
         </back>
 

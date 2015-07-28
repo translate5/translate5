@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <testcase name="severalTermsInTermentry" creator="beo/MittagQI" mandatory="yes" sourceLang="DE" targetLang="EN" tbxPath="translate5-Standard-Testcases-DE-EN.tbx" sourceStringMatch="0" targetStringMatch="0">
-    <description>If there are several terms in a termentry, all of them must be matched, regardless of their TBX-position and normativeAuthorization.</description>
+    <description>If there are several terms in a termentry, all of them must be matched, regardless of their position inside the termEntry and their normativeAuthorization.</description>
     <assertion type="assertOutputEquals">
         <input>
             <source>Viele Geschenke und Gaben sind eine gute Ergänzung des Mitbringsels.</source>
