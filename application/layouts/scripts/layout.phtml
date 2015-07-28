@@ -47,6 +47,9 @@
  *   im Viewhelper View_Helper_DisableBodyLayout deaktiviert werden
  */
 $config = Zend_Registry::get('config');
+/* @var $config Zend_Config */
+$menu  = $config->runtimeOptions->content->mainMenu;
+
 echo $this->doctype() ?>
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
@@ -59,19 +62,20 @@ echo $this->doctype() ?>
     </head>
     <body>
         <div id="header">
-            <h1><span><?php echo $this->translate->_('translate5'); ?></span></h1>
-            <div id="language-selector-box"><?php echo $this->layout()->languageSelector; ?></div>
+            <img src="/images/translate5.png?v=1" alt="<?php echo $this->translate->_('translate5'); ?>">
+            <div id="slogan">open source web-based proofreading &amp; postediting</div>
         </div>
         <div id="menu">
             
         <ul>
-            <li><a href="/"><?php echo $this->translate->_('Startseite'); ?></a></li>
-            <li><a href="/login"><?php echo $this->translate->_('Demoversion'); ?></a></li>
-            <li><a href="/index/usage/"><?php echo $this->translate->_('User infos'); ?></a></li>
-            <li><a href="/index/testimonials/"><?php echo $this->translate->_('Testimonials'); ?></a></li>
-            <li><a href="/index/download/">Download</a></li>
-            <li><a href="/index/source"><?php echo $this->translate->_('Developers'); ?></a></li>
-            <li><a href="/index/newsletter"><?php echo $this->translate->_('Newsletter'); ?></a></li>
+            <?php
+            foreach ($menu as $item) {
+                $item = (array)$item;
+                $item = each($item);
+                $class = ($item['key']===$_SERVER['REQUEST_URI'])?' class="active"':'';
+                echo '<li><a href="'.$item['key'].'"'.$class.'>'.$this->translate->_($item['value']).'</a></li>';
+            }
+            ?>
             <li class="clear">&nbsp;</li>
         </ul>
         </div>

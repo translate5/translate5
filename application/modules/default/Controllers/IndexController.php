@@ -40,11 +40,12 @@
  * @version 0.7
  *
  */
-
+require_once'ControllerMixIns.php';
 /**
  * Stellt Methoden bereit, die translate5 grundsätzlich als Stand Alone-Anwendung verfügbar machen
  */
 class IndexController extends ZfExtended_Controllers_Action {
+    use ControllerMixIns;
     /**
      * @var boolean projectImported Projekt ist importiert
      */
@@ -54,22 +55,6 @@ class IndexController extends ZfExtended_Controllers_Action {
         parent::init();
         $this->setProjectImported();
         $this->view->languageSelector();
-    }
-
-    public function __call($method, $args)
-    {
-        $tmp_viewName = substr_replace($method, "", -strlen("Action"));
-        $config = Zend_Registry::get('config');
-        $allowed = $config->runtimeOptions->content->viewTemplatesAllowed;
-        if(empty($allowed)) {
-            return;
-        }
-        
-        $tmp_allowedViews = $allowed->toArray();
-        if (!in_array($tmp_viewName, $tmp_allowedViews)){
-            throw new ZfExtended_NotFoundException();
-        }
-        $this->render($tmp_viewName);
     }
 
     /**

@@ -40,12 +40,14 @@
  * @version 1.0
  *
  */
+require_once'ControllerMixIns.php';
 /**
  * Klasse der Nutzermethoden
  *
  *
  */
 class LoginController extends ZfExtended_Controllers_Login {
+    use ControllerMixIns;
     public function init(){
         parent::init();
         $this->view->languageSelector();
