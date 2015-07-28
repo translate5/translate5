@@ -15,41 +15,77 @@
         "target": "dbinit/"
     },{
         "name": "horde_text_diff",
-        "label": "Horde Text Diff 2.0.1",
+        "label": "Horde Text Diff",
         "url": "RELEASE:Horde_Text_Diff-2.0.1.zip",
         "version": "2.0.1",
-        "target": "library/Horde_Text_Diff/"
+        "target": "library/Horde_Text_Diff/",
+        "licenses": [{
+            "uses": "the Horde Text Diff library",
+            "license": "LGPL",
+            "relpath": "docs/third-party-licenses/Horde_Text_Diff-2.0.1.license.txt"
+        }]
     },{
         "name": "zend",
-        "label": "PHP Zend 1.12-11",
+        "label": "PHP Zend",
         "url": "RELEASE:Zend-1.12-11.zip",
         "version": "1.12-11",
         "target": "library/zend/"
     },{
         "name": "querypath",
-        "label": "Querypath 3.0.3",
+        "label": "QueryPath",
         "url": "RELEASE:querypath-3.0.3.zip",
         "version": "3.0.3",
-        "target": "library/querypath/"
+        "target": "library/querypath/",
+        "licenses": [{
+            "uses": "the QueryPath library",
+            "license": "LGPL",
+            "relpath": "docs/third-party-licenses/querypath-3.0.3.license.txt"
+        }]
     },{
         "name": "Open_Sans",
         "label": "Open Sans Fonts",
         "url": "RELEASE:Open_Sans.zip",
-        "target": "application/modules/editor/ThirdParty/Open_Sans/"
+        "target": "application/modules/editor/ThirdParty/Open_Sans/",
+        "licenses": [{
+            "uses": "the Open Sans font",
+            "license": "Apache License 2.0",
+            "relpath": "docs/third-party-licenses/Open_Sans-license.txt"
+        }]
     },{
         "name": "termtagger",
-        "label": "OpenTMS TermTagger",
+        "label": "openTMS TermTagger",
         "url": "RELEASE:openTMStermTagger.zip",
-        "target": "application/modules/editor/ThirdParty/XliffTermTagger/"
+        "target": "application/modules/editor/ThirdParty/XliffTermTagger/",
+        "licenses": [{
+            "uses": "the openTMS TermTagger",
+            "license": "Apache License 2.0",
+            "relpath": "docs/third-party-licenses/openTMStermTagger-license.txt"
+        },{
+            "label": "openTMS TermTagger libraries",
+            "license": "CDDL 1.1",
+            "relpath": "docs/third-party-licenses/CDDL-license.txt",
+            "agreement": "Grizzly project and others license agreement description: Some of the libraries openTMS TermTagger builds on are licensed under the CDDL license. Please read the following license agreement and accept it for these libraries (like the Grizzly project and others). Which library uses which license is listed in the openTMS TermTagger installation directory which you will find in your translate5 application directory beneath\n\n  application/modules/editor/ThirdParty/XliffTermTagger/\n\n after installation. You must accept the terms of this agreement for these components by typing \"y\" before continuing with the installation."
+        }]
     },{
         "name": "phpexcel",
-        "label": "PHPExcel 1.8.0",
+        "label": "PHPExcel",
+        "version": "1.8.0",
         "url": "RELEASE:PHPExcel.zip",
-        "target": "library/ZfExtended/ThirdParty/PHPExcel/"
+        "target": "library/ZfExtended/ThirdParty/PHPExcel/",
+        "licenses": [{
+            "license": "LGPL",
+            "relpath": "docs/third-party-licenses/PHPExcel-1.8.0.license.txt"
+        }]
     },{
         "name": "extjs-4",
-        "label": "ExtJS 4.0.7",
+        "label": "ExtJS",
+        "version": "4.0.7",
         "url": "RELEASE:ext-4.0.7.zip",
-        "target": "public/ext-4.0.7"
+        "target": "public/ext-4.0.7",
+        "licenses": [{
+            "uses": "ExtJS",
+            "license": "GPL 3.0",
+            "relpath": "docs/third-party-licenses/ExtJs-license.txt"
+        }]
     }]
 }
