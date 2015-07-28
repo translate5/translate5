@@ -85,6 +85,18 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         }
 
         $this->setJsVarsInView();
+        $this->checkForUpdates();
+    }
+    
+    protected function checkForUpdates() {
+        $downloader = ZfExtended_Factory::get('ZfExtended_Models_Installer_Downloader', array(APPLICATION_PATH.'/..'));
+        /* @var $downloader ZfExtended_Models_Installer_Downloader */
+        if(!$downloader->applicationIsUptodate()) {
+            $msgBoxConf = $this->view->Php2JsVars()->get('messageBox');
+            settype($msgBoxConf->initialMessages, 'array');
+            $msg = 'Eine neue Version von Translate5 ist verfügbar. Bitte benutzen Sie das Installations und Update Script um die aktuellste Version zu installieren.';
+            $msgBoxConf->initialMessages[] = $this->translate->_($msg);
+        }
     }
 
     /**
