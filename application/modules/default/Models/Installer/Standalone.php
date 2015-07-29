@@ -248,6 +248,8 @@ class Models_Installer_Standalone {
         if (PHP_SAPI !== 'cli') {
             return false;
         }
+        //first flush STDIN
+        rtrim(fgets(STDIN), PHP_EOL);
         echo $message;
         $ret = 
             $hidden
