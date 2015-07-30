@@ -62,14 +62,13 @@ echo $this->doctype() ?>
     </head>
     <body>
         <div id="header">
-            <img src="/images/translate5.png?v=1" alt="<?php echo $this->translate->_('translate5'); ?>">
+            <img src="/images/translate5.png?v=1" alt="<?php echo 'translate5'; ?>">
             <div id="slogan">open source web-based proofreading &amp; postediting</div>
         </div>
         <div id="menu">
             
         <ul>
             <?php
-            settype($menu, 'array');
             foreach ($menu as $item) {
                 $item = (array)$item;
                 $item = each($item);
@@ -87,11 +86,10 @@ echo $this->doctype() ?>
             <?php
                 /* @var $this Zend_View */
                 if(!isset($this->impressum)){
-                    ?><a href="/index/impressum">Impressum</a> | <?php
+                    ?><a href="/index/impressum">Imprint</a> | <?php
                 }
-                echo $this->translate->_('Bei Fragen zu translate5:');
             ?>
-            <a href="mailto:support@translate5.net">support@translate5.net</a>
+            <a href="https://groups.yahoo.com/neo/groups/translate5/info" target="_blank">Ask a question about translate5</a>
         </div>
      </body>
 </html>

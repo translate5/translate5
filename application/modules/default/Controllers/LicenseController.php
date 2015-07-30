@@ -36,34 +36,54 @@
 
 /**#@+
  * @author Marc Mittag
- * @package trantlate5
- * @version 0.7
+ * @package translate5
+ * @version 1.0
  *
  */
-?>
-<h1><?php echo $this->translate->_('translate5 Projekt lektorieren'); ?></h1>
-<div class="main" style="float:none;">
-<?php
-if(count($this->form->getErrorMessages())>0){ ?>
-    <h2 class="errors"><?php echo $this->translate->_('Fehler im Formular'); ?></h2>
-    <ul class="errors">
-    <?php
-    foreach ($this->form->getErrorMessages() as $message) {
-        ?><li><?php echo $message; ?></li><?php
+/**
+ * Klasse der Nutzermethoden
+ *
+ *
+ */
+class LicenseController extends ZfExtended_Controllers_Action {
+    public function init(){
+        parent::init();
     }
-    ?>
-    </ul>
-    <?php
+    
+    protected function getForm() {
+        $form = new Zend_Form;
+
+        $form->setAction('/license/accept')->setMethod('post');
+        $form->setAttrib('id', 'acceptLicense');
+        $accept = new Zend_Form_Element_Checkbox('accept');
+        $accept->setRequired(true);
+        $accept->setDescription('Yes, I accept the above AGPLv3 license for translate5.');
+        $validator = new Zend_Validate_Between(array('min'=>1,'max'=>1,'inclusive'=>true));
+        $validator->setMessage('Please accept the license');
+        $accept->addValidator($validator);
+        $form->addElement($accept);
+        $form->addElement('submit', 'download', array('label' => 'Download'));
+        return $form;
+    }
+    
+    public function acceptAction() {
+        $form = $this->getForm();
+        $this->view->form = $form;
+        if (!$this->getRequest()->isPost()) {
+            return;
+        }
+        ob_start();
+        var_dump($form->isValid($_POST));
+        error_log(ob_get_clean());
+        if (!$form->isValid($_POST)) {
+            return;
+        }
+        ob_clean();
+        $file_url = 'http://www.translate5.net/downloads/translate5.zip';
+        header('Content-Type: application/octet-stream');
+        header("Content-Transfer-Encoding: Binary");
+        header("Content-disposition: attachment; filename=\"" . basename($file_url) . "\"");
+        readfile($file_url);
+        exit;
+    }
 }
-?>
-<p><?php echo $this->translate->_('Bitte geben Sie den Benutzernamen ein, der als Benutzer bei lektorierten Segmenten eingetragen werden soll:'); ?></p>
-<?php echo $this->form;?>
-</div>
-<?php
-  return;
-?>
-<div class="sidebar">
-    <p><?php
-        //echo $this->translate->_('');
-    ?></p>
-</div>

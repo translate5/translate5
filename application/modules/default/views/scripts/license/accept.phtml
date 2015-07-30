@@ -35,11 +35,16 @@
  */
 
 ?>
-<h1><?php echo $this->translate->_('Import erfolgreich'); ?></h1>
-<p><?php echo $this->translate->_('Das Projekt wurde erfolgreich importiert, ihre Optionen:'); ?></p>
-<ul style="list-style-type: none;">
-    <li><a href="/index/edit/taskGuid/<?php echo $this->taskGuid; ?>"><?php echo $this->translate->_('weiter zum Lektorat des Projektes &#187;'); ?></a></li>
-    <li><?php echo $this->translate->_('oder'); ?></li>
-    <li><a href="/index/tasks/"><?php echo $this->translate->_('&#171; zurück zur Projektübersicht'); ?></a></li>
-</ul>
-<?php
+    <div class="main">
+    <h1>Download translate5 installation package</h1>
+        <p>
+            Please read carefully the GNU AFFERO GENERAL PUBLIC LICENSE Version&nbsp;3 (AGPLv3) for translate5
+        </p>
+        <iframe src="http://www.translate5.net/agpl3-license.txt" width="600px">
+            <p>Your browser does not support iframes.</p>
+          </iframe>
+          <?php
+          echo $this->form;
+?>          
+    </div>
+    <div class="clear">&nbsp;</div>

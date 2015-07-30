@@ -42,10 +42,12 @@
  */
 $session = new Zend_Session_Namespace();
 ?>
-<h1>Testimonials</h1>
-<p>In English language only.</p>
-
 <div class="main">
+<h1>Testimonials</h1>
+<p>I started my project at the beginning of April and now I can say that the results have been really positive. I congratulate you for your work with the application, since its intuitive interface and usability along with the flexibility of MQM and the good description of its error issues let me learn a lot about error annotation. Also, I think that the possibility to edit the source text, add comments or mark the words that form the error is a value added. In my opinion, however, the best characteristic of translate5 is that the user may select the error issues which allows him/her to adapt the annotation to the needs of the project.
+</p>
+<p>(Julia Mercader Alarcón)</p>
+<hr/>
 <p>
     beo uses translate5 for proofreading and editing in its quality assurance processes for translations, 
     as well as for translator evaluation using the feedback and error assessment function. 
@@ -88,20 +90,5 @@ With translate5, we can turn arduous side tasks into a valuable service.
     An interface to translation memories is all that is missing to make translate5 the perfect post-editing client.
 </p>
 <p>(Maxim Khalilov, bmmt GmbH)</p>
-</div>
-<div class="sidebar">
-    <div class="teaser">
-        <h2><?php echo $this->translate->_('Infos zu translate5 auf MittagQI.com'); ?></h2>
-        <ul>
-            <li><a href="http://www.mittagqi.com/translate5/features" target="_blank"><?php echo $this->translate->_('Features'); ?></a></li>
-            <li><a href="http://www.mittagqi.com/translate5/customizing" target="_blank"><?php echo $this->translate->_('Entwicklung'); ?></a></li>
-            <li><a href="http://www.mittagqi.com/translate5/installations-hosting" target="_blank"><?php echo $this->translate->_('Installationen &amp; Hosting'); ?></a></li>
-            <li><a href="http://www.mittagqi.com/translate5/maintenance-contract" target="_blank"><?php echo $this->translate->_('Support &amp; Updates'); ?></a></li>
-            <li><a href="http://www.mittagqi.com/newsletter" target="_blank"><?php echo $this->translate->_('Newsletter'); ?></a></li>
-        </ul>
-    </div>
-    <?php
-    echo $this->render('index/betanotice.phtml');
-    ?>
 </div>
 <div class="clear">&nbsp;</div>

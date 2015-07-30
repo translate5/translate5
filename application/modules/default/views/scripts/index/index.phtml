@@ -42,52 +42,32 @@
  */
 $session = new Zend_Session_Namespace();
 ?>
-<h1><?php echo $this->translate->_("translate5 - Open-Source-Lektorat
-    für den Browser"); ?></h1>
-
 <div class="main">
-    <p><?php echo $this->translate->_('Mit translate5 können Sie SDLXLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.'); ?></p>
+<h1>Welcome to translate5 project</h1>
 
-<p><?php echo $this->translate->_('translate5 bietet modernstes desktopartiges Arbeiten im Browser mit vielen interessanten, teilweise einzigartigen Features.'); ?></p> 
-
-<p><?php echo $this->translate->_('translate5 ist Open Source und damit kostenlose Software.'); ?></p>
-<p><?php echo $this->translate->_('<strong><a href="http://www.mittagqi.com/translate5/features/" target="_blank">Eine umfassende Featureliste</a></strong> und weitere Informationen zu translate5 finden Sie auf <a href="http://www.mittagqi.com/translate5/" target="_blank">www.mittagqi.com</a>.'); ?></p>
-    <p><a class="start-button" href="/login/"><?php echo $this->translate->_('Demoversion starten'); ?></a></p>
-     <h2><?php echo $this->translate->_('Unterstützung der Entwicklung von translate5'); ?></h2>
-<p><?php echo $this->translate->_('Unser großer Dank geht an die folgenden Unternehmen und Organisationen. Sie finanzieren die Features, die sie von translate5 erwarten.'); ?></p>
-<p><?php echo $this->translate->_('Sie ermöglichen so dieses Projekt!'); ?></p>
-<p><?php echo $this->translate->_('Vielen Dank dafür!'); ?></p>
-<h3><?php echo $this->translate->_('Hauptunterstützer von translate5'); ?></h3>
-<ul>
-    <li><a href="http://www.beo-doc.de/" target="_blank">beo Gesellschaft für Sprachen und Technologie mbH</a></li>
-    <li><a href="http://www.dfki.de/" target="_blank">DFKI Deutsches Forschungszentrum für Künstliche Intelligenz GmbH</a></li>
-    <li><a href="http://www.itl.eu/" target="_blank">itl Institut für technische Literatur AG</a></li>
-</ul>
-
-<h3><?php echo $this->translate->_('Unterstützer ausgewählter Features'); ?></h3>
-<ul>
-    <li><a href="http://xtra-services.com/" target="_blank">XTRA Translation Services</a></li>
-    <li><a href="http://www.textform.com/" target="_blank">text&amp;form</a></li>
-    <li><a href="http://www.oneword.de/" target="_blank">oneword GmbH</a></li>
-</ul>
-
-<h3><?php echo $this->translate->_('Unterstützung von Open Source'); ?></h3>
-<p><?php echo $this->translate->_('Ein spezieller Dank geht an <a href="http://www.logrus.ru/" target="_blank">Logrus International</a> für die fortwährende Förderung von Open Source Software in der Übersetzungsbranche.'); ?></p>
+    <h2>translate5 mission</h2>
+    <p>translate5 is Open Source software, developed for the language industry through the input and support of the language industry. Please read <a href="/index/mission">translate5 mission statement</a> for more information.</p>
+    <h2>Engage in translate5</h2>
+    <p>translate5 exists and is developed through its community - as <a href="/index/usage">user</a>, <a href="/index/developer">developer</a> or supporter of the development. Be part of it.</p>
+    <h2>Professional usage</h2>    
+    <p>For professional usage you can rely on <a href="http://www.mittagqi.com/" target="_blank">MittagQI (translate5 development lead)</a> as <a href="http://www.mittagqi.com/en/translate5/maintenance-contract" target="_blank">support</a> and/or <a href="http://www.mittagqi.com/en/translate5/installations-hosting" target="_blank">software as a service provider</a>. And maybe other companies in the future.</p><br>
+    <h2>Have fun with translate5!</h2>
 </div>
 <div class="sidebar">
     <div class="teaser">
-        <h2><?php echo $this->translate->_('Infos zu translate5 auf MittagQI.com'); ?></h2>
-        <ul>
-            <li><a href="http://www.mittagqi.com/translate5/features" target="_blank"><?php echo $this->translate->_('Features'); ?></a></li>
-            <li><a href="http://www.mittagqi.com/translate5/customizing" target="_blank"><?php echo $this->translate->_('Entwicklung'); ?></a></li>
-            <li><a href="http://www.mittagqi.com/translate5/installations-hosting" target="_blank"><?php echo $this->translate->_('Installationen &amp; Hosting'); ?></a></li>
-            <li><a href="http://www.mittagqi.com/translate5/maintenance-contract" target="_blank"><?php echo $this->translate->_('Support &amp; Updates'); ?></a></li>
-            <li><a href="http://www.mittagqi.com/newsletter" target="_blank"><?php echo $this->translate->_('Newsletter'); ?></a></li>
-        </ul>
+        <h3>Main supporters</h3>
+    <a href="http://www.beo-doc.de/" target="_blank"><img src="/images/supporters/beo-logo.jpg" style="width:100px;" alt="beo Gesellschaft für Sprachen und Technologie mbH"></a>
+    <a href="http://www.dfki.de/" target="_blank"><img src="/images/supporters/dfki-logo.jpg"  style="width:150px;" alt="DFKI Deutsches Forschungszentrum für Künstliche Intelligenz GmbH"></a>
+    <a href="http://www.mittagqi.com/" target="_blank"><img src="/images/supporters/mittagqi-logo.png"  style="width:100px;"></a>
+    <a href="http://www.itl.eu/" target="_blank"><img src="/images/supporters/itl-logo.jpg"  style="width:100px;" alt="itl Institut für technische Literatur AG"></a>
+     <h3>Supporters of selected features</h3>
+     <a href="http://xtra-services.com/" target="_blank">XTRA Translation Services</a><br><br>
+    <a href="http://www.textform.com/" target="_blank">text&amp;form</a><br><br>
+    <a href="http://www.oneword.de/" target="_blank">oneword GmbH</a>
+     <h3>Individual supporters</h3>
+     <a href="http://www.mccosh.de/" target="_blank">Daniel Mc Cosh</a><br><br>
+     Peter Bourgonje<br><span class="thankyou">(Moses support)</span><br>
     </div>
-    <?php
-    echo $this->render('index/testdataSidebar.phtml');
-    echo $this->render('index/betanotice.phtml');
-    ?>
+    
 </div>
 <div class="clear">&nbsp;</div>
