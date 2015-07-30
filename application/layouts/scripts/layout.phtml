@@ -69,6 +69,7 @@ echo $this->doctype() ?>
             
         <ul>
             <?php
+            settype($menu, 'array');
             foreach ($menu as $item) {
                 $item = (array)$item;
                 $item = each($item);
