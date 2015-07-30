@@ -54,8 +54,8 @@ a:hover{
 h1,h2{
     margin: 1em 0 0.5em;
 }
-h1{font-size:1.4em;}
-h2{font-size:1.2em;}
+h1{font-size:130%;}
+h2,h3{font-size:110%;}
 .errors {
     color: red;
 }
