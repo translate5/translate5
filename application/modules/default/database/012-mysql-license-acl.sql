@@ -33,7 +33,7 @@
 --  END LICENSE AND COPYRIGHT 
 --  */
 -- 
-INSERT INTO  `translate5`.`Zf_acl_rules` (
+INSERT INTO  `Zf_acl_rules` (
 `id` ,
 `module` ,
 `role` ,
