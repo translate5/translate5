@@ -200,7 +200,6 @@ class Models_Installer_Standalone {
             }
             $prompt .= ': ';
             $value = $this->prompt($prompt);
-            echo "You entered ".$value."\n";
             $this->dbCredentials[$key] = empty($value) ? $default : $value;
         }
         
