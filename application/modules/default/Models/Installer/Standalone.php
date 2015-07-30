@@ -75,7 +75,7 @@ class Models_Installer_Standalone {
     protected $hostname;
     
     protected $isInstallation = false;
-
+    
     /**
      * Options: 
      * mysql_bin => path to mysql binary
@@ -131,7 +131,7 @@ class Models_Installer_Standalone {
         if(is_array($options) && isset($options['mysql_bin']) && $options['mysql_bin'] != self::MYSQL_BIN) {
             $this->dbCredentials['executable'] = $options['mysql_bin'];
         }
-        $this->promptDbCredentials();
+        while(! $this->promptDbCredentials());
         $this->initDb();
         $this->createInstallationIni();
         $this->promptHostname();
@@ -144,12 +144,13 @@ class Models_Installer_Standalone {
     protected function moveClientSpecific() {
         $source = $this->currentWorkingDir.self::CLIENT_SPECIFIC_INSTALL;
         $target = $this->currentWorkingDir.self::CLIENT_SPECIFIC;
+        $targetPub = $this->currentWorkingDir.'/public'.self::CLIENT_SPECIFIC;
         //ignoring errors here, since already exisiting directories should not be moved
-        if(file_exists($source.'/public')){
-            @rename($source.'/public', $this->currentWorkingDir.'/public'.self::CLIENT_SPECIFIC);
+        if(file_exists($source.'/public') && !file_exists($targetPub)){
+            rename($source.'/public', $targetPub);
         }
-        if(file_exists($source)){
-            @rename($source, $this->currentWorkingDir.self::CLIENT_SPECIFIC);
+        if(file_exists($source) && !file_exists($target)){
+            rename($source, $target);
         }
     }
     
@@ -201,6 +202,16 @@ class Models_Installer_Standalone {
             $value = $this->prompt($prompt);
             $this->dbCredentials[$key] = empty($value) ? $default : $value;
         }
+        
+        echo PHP_EOL.PHP_EOL.'Confirm the given DB Credentials:'.PHP_EOL.PHP_EOL;
+        foreach($this->dbCredentials as $key => $value) {
+            //executable is determined by the surrounding bash script
+            if($key == 'executable') {
+                 continue;
+            }
+            echo $key.': '.$value.PHP_EOL;
+        }
+        return 'y' === strtolower($this->prompt(PHP_EOL.'Confirm the entered data with "y", press any other key to reenter DB credentials.'.PHP_EOL));
     }
     
     /**
