@@ -29,19 +29,50 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Since Statistics are mostly only important for editable segments, the plugin provides this worker,
- * which deletes all statistics for non editable segments.
+ * Abstract File Writer for Plugin SegmentStatistics
  */
-class editor_Plugins_SegmentStatistics_WriteStatisticsWorker extends editor_Plugins_SegmentStatistics_Worker {
+abstract class editor_Plugins_SegmentStatistics_Models_Export_Abstract {
+    const TYPE_IMPORT = 'import';
+    const TYPE_EXPORT = 'export';
     
     /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::work()
+     * @var editor_Models_Task
      */
-    public function work() {
-        $this->setType();
-        $this->writeToDisk();
-        $this->writeToDisk(true); //generated stats a second time, with data filtered by config
-        return true;
+    protected $task;
+    
+    /**
+     * @var string
+     */
+    protected $taskGuid;
+    
+    /**
+     * @var string
+     */
+    protected $type;
+    
+    /**
+     * @var string
+     */
+    protected $statistics;
+    
+    /**
+     * @var boolean
+     */
+    protected $debug = false;
+    
+    public function init(editor_Models_Task $task, stdClass $statistics, array $workerParams) {
+        $this->task = $task;
+        $this->taskGuid = $task->getTaskGuid();
+        $this->type = $workerParams['type'];
+        //prevent internal restructuring to destruct other algorithms:
+        $this->statistics = clone $statistics; 
+        $this->debug = ZfExtended_Debug::hasLevel('plugin', 'SegmentStatistics');
     }
+    
+    /**
+     * Writes the Statistics in the given Format to the disk
+     * Filename without suffix, suffix is appended by this method
+     * @param string $filename
+     */
+    abstract public function writeToDisk(string $filename);
 }
