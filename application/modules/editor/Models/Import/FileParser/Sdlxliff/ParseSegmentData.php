@@ -38,7 +38,7 @@ END LICENSE AND COPYRIGHT
  * Kapselt die Daten für das Parsing eines sdlxliffsegments
  */
 class editor_Models_Import_FileParser_Sdlxliff_ParseSegmentData {
-    public $segment,$i, $segmentCount, $currentTermIndex; 
+    public $segment,$i, $segmentCount; 
     public $j = 1; //zähler der Tags innerhalb eines Segments (öffnende und zugehörige schließende erhalten die gleiche Zahl)
     public $openCounter = 0;
     public $openTags = array();

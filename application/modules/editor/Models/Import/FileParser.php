@@ -128,33 +128,6 @@ abstract class editor_Models_Import_FileParser {
     protected $_singleTag = NULL;
 
     /**
-     * @var int innerhalb eines Importprojekts für jede Terminstanz (ein
-     *          ausgezeichneter Term in einem Segment) eindeutige ID, die bei
-     *          jedem Term hochgezählt werden muss
-     *
-     */
-    protected $_projectTerminstanceId = 0;
-
-    /**
-     * @var array enthält alle bereits während des Imports aus der DB ausgelesenen Terme
-     *            der im Dokument enthaltenen Terme im Format array(mid => editor_Models_Term)
-     *            die mid entspricht der mid des terms aus dem sdlxliff
-     *
-     */
-    protected $_terms = array();
-
-    /**
-     * @var editor_Models_Segment_TermTag
-     */
-    protected $segmentTermTag;
-    
-    /**
-     * @var array terms2save ein Array mit editor_Models_TermTagData-Objekten als Werten, das
-     *           während des Parsings eines Segments befüllt, danach genutzt und wieder geleert wird usw.
-     */
-    public $_terms2save = array();
-
-    /**
      * @var editor_Models_Languages Entity Instanz der Sprache
      */
     protected $_sourceLang = NULL;
@@ -220,7 +193,6 @@ abstract class editor_Models_Import_FileParser {
         $this->_leftTag = ZfExtended_Factory::get('editor_ImageTag_Left');
         $this->_rightTag = ZfExtended_Factory::get('editor_ImageTag_Right');
         $this->_singleTag = ZfExtended_Factory::get('editor_ImageTag_Single');
-        $this->segmentTermTag = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
         $this->_sourceLang = $sourceLang;
         $this->_targetLang = $targetLang;
         $this->task = $task;
@@ -450,7 +422,7 @@ abstract class editor_Models_Import_FileParser {
     }
     
     /**
-     * Speichert das Segment und die zugehörigen Terme in die Datenbank
+     * Speichert das Segment in die Datenbank
      *
      * @param mixed transunit
      * @return integer segmentId
@@ -529,15 +501,6 @@ abstract class editor_Models_Import_FileParser {
         return false;
     }
 
-    /**
-     * Gibt die Terme des aktuellen Segments zurück und leert die zurückgegebene interne Liste
-     */
-    public function getAndCleanTerms() {
-        $result = $this->_terms2save;
-        $this->_terms2save = array();
-        return $result;
-    }
-    
     /**
      * Sets $this->_matchRateSegment and $this->_autopropagated
      * for the segment currently worked on

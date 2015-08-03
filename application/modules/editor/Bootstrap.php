@@ -51,8 +51,19 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
     public function __construct($application) {
         require_once APPLICATION_PATH . '/../library/querypath/src/qp.php';
         parent::__construct($application);
+        
+        //Binding the worker clean up to the after import event, since import
+        // is currently the main use case for workers
+        $eventManager = Zend_EventManager_StaticEventManager::getInstance();
+        /* @var $eventManager Zend_EventManager_StaticEventManager */
+        $eventManager->attach('editor_Models_Import', 'afterImport', function(){
+            $worker = ZfExtended_Factory::get('ZfExtended_Worker_GarbageCleaner');
+            /* @var $worker ZfExtended_Worker_GarbageCleaner */
+            $worker->init();
+            $worker->queue();
+        }, 0);
+        
     }
-    
     
     public function _initController()
     {
@@ -83,7 +94,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             'editor' => array(  'file', 'segment', 'alikesegment', 'referencefile', 'qmstatistics', 'comment',
                                 'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker'),
         ));
-        $this->front->getRouter()->addRoute('restDefault', $restRoute);
+        $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
 
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/filemap/*',
@@ -92,7 +103,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'controller' => 'segment',
                 'action' => 'filemap'
             ));
-        $this->front->getRouter()->addRoute('filemap', $filemapRoute);
+        $this->front->getRouter()->addRoute('editorFilemap', $filemapRoute);
 
         $authUserRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/user/authenticated/*',
@@ -101,7 +112,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'controller' => 'user',
                 'action' => 'authenticated'
             ));
-        $this->front->getRouter()->addRoute('authUser', $authUserRoute);
+        $this->front->getRouter()->addRoute('editorAuthUser', $authUserRoute);
 
         $termsRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/terms/*',
@@ -110,7 +121,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'controller' => 'segment',
                 'action' => 'terms'
             ));
-        $this->front->getRouter()->addRoute('terms', $termsRoute);
+        $this->front->getRouter()->addRoute('editorTerms', $termsRoute);
 
         $exportRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/task/export/*',
@@ -119,7 +130,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'controller' => 'task',
                 'action' => 'export'
             ));
-        $this->front->getRouter()->addRoute('export', $exportRoute);
+        $this->front->getRouter()->addRoute('editorExport', $exportRoute);
         
         $taskStat = new ZfExtended_Controller_RestLikeRoute(
             'editor/task/statistics/*',
@@ -128,7 +139,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'controller' => 'task',
                 'action' => 'statistics'
             ));
-        $this->front->getRouter()->addRoute('taskStat', $taskStat);
+        $this->front->getRouter()->addRoute('editorTaskStat', $taskStat);
         
         $workerRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/worker/queue/*',
@@ -137,7 +148,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'controller' => 'worker',
                 'action' => 'queue'
             ));
-        $this->front->getRouter()->addRoute('queue', $workerRoute);
+        $this->front->getRouter()->addRoute('editorQueue', $workerRoute);
     }
     
     
@@ -150,6 +161,6 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'controller' => 'index',
                 'action' => 'localizedjsstrings'
             ));
-        $this->front->getRouter()->addRoute('localizedJs', $localizedJsRoute);
+        $this->front->getRouter()->addRoute('editorLocalizedJs', $localizedJsRoute);
     }
 }

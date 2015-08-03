@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  * which deletes all statistics for non editable segments.
  */
 class editor_Plugins_SegmentStatistics_WriteStatisticsWorker extends editor_Plugins_SegmentStatistics_Worker {
-
+    
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::work()

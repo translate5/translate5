@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="ESP® Kurvendynamik-Assistent and tag included" creator="beo/MittagQI" mandatory="no" sourceLang="DE" targetLang="EN" tbxPath="beo-reallive-DE-EN.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>"ESP® Kurvendynamik-Assistent" should be tagged, even if there is a tag inside the term</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>ESP® <div class="single 782069643d2231343722202f"><span class="short" title="tag">&lt;1/&gt;</span><span id="147-71-d0fbfc097c4fdbc0bc02e10243bd60fe" class="full">tag</span></div>Kurvendynamik-Assistent</source>
+            <target>ESP® Dynamic Cornering Assist</target>
+        </input>
+        <expectedOutput>
+            <source><div title="" class="term admittedTerm exact transNotFound" data-tbxid="xyz">ESP® <div class="single 782069643d2231343722202f"><span class="short" title="tag">&lt;1/&gt;</span><span id="147-71-d0fbfc097c4fdbc0bc02e10243bd60fe" class="full">tag</span></div>Kurvendynamik-Assistent</div></source>
+            <target>ESP® Dynamic Cornering Assist</target>
+        </expectedOutput>
+    </assertion>
+</testcase>

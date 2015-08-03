@@ -57,6 +57,8 @@ END LICENSE AND COPYRIGHT
  * @method void setLockingUser() setLockingUser(string $guid)
  * @method string getPmGuid() getPmGuid()
  * @method void setPmGuid() setPmGuid(string $guid)
+ * @method string getPmName() getPmName()
+ * @method void setPmName() setPmName(string $guid)
  * @method string getState() getState()
  * @method void setState() setState(string $state)
  * @method string getWorkflow() getWorkflow()

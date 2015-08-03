@@ -714,6 +714,12 @@ Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-M
 <trans-unit id='QWNjdXJlZWVlZWVlYWN5'><source>Accureeeeeeeacy</source><target>Accureeeeeeeacy</target></trans-unit>
 <trans-unit id='RmlsZSAnJXZhbHVlJScgd2FzIG5vdCB1cGxvYWRlZA=='><source>File '%value%' was not uploaded</source><target>File '%value%' was not uploaded</target></trans-unit>
 <trans-unit id='JyV2YWx1ZSUnIGRvZXMgbm90IG1hdGNoIHRoZSBleHBlY3RlZCBzdHJ1Y3R1cmUgZm9yIGEgRE5TIGhvc3RuYW1l'><source>'%value%' does not match the expected structure for a DNS hostname</source><target>'%value%' does not match the expected structure for a DNS hostname</target></trans-unit>
+<trans-unit id='QWxsZSBLYXRlZ29yaWVu'><source>Alle Kategorien</source><target>Alle Kategorien</target></trans-unit>
+<trans-unit id='dGVzdA=='><source>test</source><target>test</target></trans-unit>
+<trans-unit id='a3Vyeg=='><source>kurz</source><target>kurz</target></trans-unit>
+<trans-unit id='bGFuZ2xhbmdsYW5nbGFuZ2xhbmdsYW5nbGFuZw=='><source>langlanglanglanglanglanglang</source><target>langlanglanglanglanglanglang</target></trans-unit>
+<trans-unit id='IyMjUmVmTWF0LVVwZGF0ZSA='><source>###RefMat-Update </source><target>###RefMat-Update </target></trans-unit>
+<trans-unit id='RWluZSBuZXVlIFZlcnNpb24gdm9uIFRyYW5zbGF0ZTUgaXN0IHZlcmbDvGdiYXIuIEJpdHRlIGJlbnV0emVuIFNpZSBkYXMgSW5zdGFsbGF0aW9ucyB1bmQgVXBkYXRlIFNjcmlwdCB1bSBkaWUgYWt0dWVsbHN0ZSBWZXJzaW9uIHp1IGluc3RhbGxpZXJlbi4='><source>Eine neue Version von Translate5 ist verfügbar. Bitte benutzen Sie das Installations und Update Script um die aktuellste Version zu installieren.</source><target>Eine neue Version von Translate5 ist verfügbar. Bitte benutzen Sie das Installations und Update Script um die aktuellste Version zu installieren.</target></trans-unit>
   </body>
  </file>
 </xliff>

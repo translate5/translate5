@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="Rohbau" creator="beo/MittagQI" mandatory="yes" sourceLang="DE" targetLang="EN" tbxPath="beo-reallive-DE-EN.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description></description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>Der komplette Rohbau wiegt nur 256 kg</source>
+            <target>The entire bodyshell weighs only 256 kg</target>
+        </input>
+        <expectedOutput>
+            <source>Der komplette <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Rohbau</div> wiegt nur 256 kg</source>
+            <target>The entire <div title="" class="term admittedTerm exact" data-tbxid="xyz">bodyshell</div> weighs only 256 kg</target>
+        </expectedOutput>
+    </assertion>
+</testcase>

@@ -184,7 +184,21 @@ abstract class editor_Models_Export_FileParser {
     protected function preProcessReplacement($attributes) {
         return $attributes;
     }
-    
+    /**
+     * the browser adds non-breaking-spaces instead of normal spaces, if the user
+     * types more than one space directly after eachother. For the GUI this
+     * makes sense, because this way the whitespace can be presented in the 
+     * correct visual form to the user (normal spaces would be shown as one
+     * space in HTML). For the export they have to be reconverted to normal 
+     * spaces
+     * 
+     * @param integer $segmentId
+     * @param string $segment
+     * @return string $segment
+     */
+    protected function revertNonBreakingSpaces($segment){
+        return preg_replace('"\\\\u00a0"',' ',$segment);;
+    }
     /**
      * returns the segment content for the given segmentId and field. Adds optional diff markup, and handles tags.
      * @param integer $segmentId
@@ -198,7 +212,7 @@ abstract class editor_Models_Export_FileParser {
         
         $edited = $this->recreateTermTags($edited, $this->shouldTermTaggingBeRemoved());
         $edited = $this->parseSegment($edited);
-
+        $edited = $this->revertNonBreakingSpaces($edited);
         if(!$this->_diff){
             return $this->unprotectWhitespace($edited);
         }

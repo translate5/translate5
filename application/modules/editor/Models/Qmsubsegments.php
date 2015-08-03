@@ -62,7 +62,6 @@ class editor_Models_Qmsubsegments extends ZfExtended_Models_Entity_Abstract {
       * @return string $segment
       */
     public function updateQmSubSegments(string $segment, integer $segmentId, string $field) {
-        $segment = str_replace("\xc2\xa0",' ',$segment);
         $sArr = $this->splitSegment($segment);
         $count = count($sArr);
         $openTags = array();

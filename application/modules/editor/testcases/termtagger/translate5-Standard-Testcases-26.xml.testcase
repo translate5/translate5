@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="MultiWordTermPreferation" creator="beo/MittagQI" mandatory="yes" sourceLang="DE" targetLang="EN" tbxPath="translate5-Standard-Testcases-DE-EN.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>Multi-word terms are preferred: If a multi-word term is in the TBX and its components are part of the TBX as terms in their own right, the multi-word term gets tagged.</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>Die Verkleidung des Laderaums ist die Laderaumverkleidung.</source>
+            <target>The trim of the load compartment is the load compartment trim.</target>
+        </input>
+        <expectedOutput>
+            <source>Die <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Verkleidung</div> des <div title="" class="term admittedTerm stemmed transFound" data-tbxid="xyz">Laderaums</div> ist die <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Laderaumverkleidung</div>.</source>
+            <target>The <div title="" class="term admittedTerm exact" data-tbxid="xyz">trim</div> of the <div title="" class="term admittedTerm exact" data-tbxid="xyz">load compartment</div> is the <div title="" class="term admittedTerm exact" data-tbxid="xyz">load compartment trim</div>.</target>
+        </expectedOutput>
+    </assertion>
+</testcase>

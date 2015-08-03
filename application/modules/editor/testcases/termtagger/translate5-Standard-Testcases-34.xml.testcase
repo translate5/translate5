@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="preferredOutOfSeveralTermsInTermentry" creator="beo/MittagQI" mandatory="yes" sourceLang="DE" targetLang="EN" tbxPath="translate5-Standard-Testcases-DE-EN.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>If there are several terms in a termentry, the preferred term must be matched, regardless of its TBX-position.</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>Die Geschenke sind schön.</source>
+            <target>The gifts are nice.</target>
+        </input>
+        <expectedOutput>
+            <source>Die <div title="" class="term preferredTerm stemmed transFound" data-tbxid="xyz">Geschenke</div> sind schön.</source>
+            <target>The <div title="" class="term preferredTerm stemmed" data-tbxid="xyz">gifts</div> are nice.</target>
+        </expectedOutput>
+    </assertion>
+</testcase>

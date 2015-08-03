@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="CLS" creator="beo/MittagQI" mandatory="yes" sourceLang="DE" targetLang="EN" tbxPath="beo-reallive-DE-EN.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description></description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>Das Interieur des CLS 63 AMG S-Modells</source>
+            <target>The interior of the CLS 63 AMG S-Model</target>
+        </input>
+        <expectedOutput>
+            <source>Das Interieur des <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">CLS</div> 63 AMG S-Modells</source>
+            <target>The interior of the <div title="" class="term admittedTerm exact" data-tbxid="xyz">CLS</div> 63 AMG S-Model</target>
+        </expectedOutput>
+    </assertion>
+</testcase>

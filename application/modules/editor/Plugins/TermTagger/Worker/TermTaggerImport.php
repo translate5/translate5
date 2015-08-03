@@ -86,12 +86,10 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
      * @see ZfExtended_Worker_Abstract::init()
      */
     public function init($taskGuid = NULL, $parameters = array()) {
-        $parametersToSave = array();
-        
         if (isset($parameters['resourcePool'])) {
             if (in_array($parameters['resourcePool'], self::$allowedResourcePools)) {
                 $this->resourcePool = $parameters['resourcePool'];
-                $parametersToSave['resourcePool'] = $this->resourcePool;
+                $this->parametersToSave['resourcePool'] = $this->resourcePool;
             }
         }
         
@@ -99,13 +97,13 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         $this->keepTargetOriginal = !empty($parameters['keepTargetOriginal']);
         
         if($this->useTargetOriginal) {
-            $parametersToSave['useTargetOriginal'] = true;
+            $this->parametersToSave['useTargetOriginal'] = true;
         }
         if($this->keepTargetOriginal) {
-            $parametersToSave['keepTargetOriginal'] = true;
+            $this->parametersToSave['keepTargetOriginal'] = true;
         }
         
-        return parent::init($taskGuid, $parametersToSave);
+        return parent::init($taskGuid, $this->parametersToSave);
     }
     
     /**
@@ -193,7 +191,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
                                 , __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }
-        $worker->queue(ZfExtended_Models_Worker::STATE_WAITING);
+        $worker->queue();
     }
     
     /**

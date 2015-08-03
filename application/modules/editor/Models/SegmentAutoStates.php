@@ -234,7 +234,7 @@ class editor_Models_SegmentAutoStates {
      * @param editor_Models_TaskUserAssoc $tua
      */
     public function calculateSegmentState(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua) {
-        $isModified = $segment->isDataModified();
+        $isModified = $segment->isDataModifiedAgainstOriginal();
         
         $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
         /* @var $workflow editor_Workflow_Abstract */

@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE martif SYSTEM "TBXcoreStructV02.dtd">
+<martif type="TBX" xml:lang="en">
+
+   <martifHeader>
+      <fileDesc>
+         <titleStmt>
+            <title>Transit NXT TermStar export file</title>
+         </titleStmt>
+         <publicationStmt>
+            <p/>
+         </publicationStmt>
+         <sourceDesc>
+            <p>TermStar dictionary</p>
+         </sourceDesc> 
+
+      </fileDesc>
+   </martifHeader>
+
+   <text>
+      <body>
+
+         <termEntry id="X_5937">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Drehzahlanforderung</term>
+                  <descrip type="Definition">Def: Vorgang, bei dem das Steuergerät Motor vom Drehzahlsensor die Motordrehzahl abfragt.</descrip>
+               </tig>
+            </langSet>
+            <langSet xml:lang="IT">
+               <tig>
+                  <term>richiesta regime</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_4216">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Öldruck</term>
+                  <descrip type="Definition">Def: Durch die Ölpumpe erzeugter Druck. Der Öldruck dient der ausreichenden Versorgung aller zu schmierenden Stellen mit Öl, z. B. im Verbrennungsmotor mit Motoröl.</descrip>
+               </tig>
+            </langSet>
+            <langSet xml:lang="IT">
+               <tig>
+                  <term>pressione dell'olio</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_1954">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Ölpumpe</term>
+                  <descrip type="Definition">Def: Bauteil, das Öl aus einem Ölvorrat ansaugt, in einen Ölkreislauf fördert und meist über Druck transportiert.</descrip>
+               </tig>
+            </langSet>
+            <langSet xml:lang="IT">
+               <tig>
+                  <term>pompa dell'olio</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+
+         <termEntry id="X_2077">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Wasserpumpe</term>
+                  <descrip type="Definition">Def: Pumpe zur Förderung von Wasser z. B. bei Toilettenanlagen oder Bordküchen.</descrip>
+               </tig>
+            </langSet>
+            <langSet xml:lang="IT">
+               <tig>
+                  <term>pompa dell'acqua</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_2121">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Lenkung</term>
+                  <descrip type="Definition">Def: Vorrichtung, die durch das Einschlagen (Schwenken) der Vorderräder, eine vom Fahrer gewünschte Fahrtrichtungsänderung ausführt.</descrip>
+               </tig>
+            </langSet>
+            <langSet xml:lang="IT">
+               <tig>
+                  <term>sterzo</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+      </body>
+
+      <back>
+</back>
+
+   </text>
+</martif>

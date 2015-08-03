@@ -54,7 +54,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
      * Praefix for workers resource-name
      * @var string
     */
-    private static $praefixResourceName = 'TermTagger_';
+    protected static $praefixResourceName = 'TermTagger_';
     
     /**
      * Values for termtagging segment-states
@@ -96,27 +96,23 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
     }
     /**
      * @todo forking should be transfered to ZfExtended_Worker_Abstract to make it usable for other workers.
-     * it should be based on maxParallelProcesses instead of just having one running worker per slot and maxParallelProcesses=1 as currently - but one slot for each termTagger instance. All termTagger instances should run in the same slot but maxParallelProcesses should be set to the number of termTagger-instances
+     * it should be based on maxParallelProcesses instead of just having one running worker per slot. maxParallelProcesses is ignored so far.
      * @param string $state
      */
     public function queue($state = NULL) {
-        $resourceName = self::$praefixResourceName.$this->resourcePool;
-        $usedSlots = $this->workerModel->getListSlotsCount($resourceName);
-        
         $workerCountToStart = 0;
-        foreach ($usedSlots as $slot) {
-            if($slot['count']<=1){
-                $workerCountToStart++;
-            }
+
+        $usedSlots = count($this->workerModel->getListSlotsCount(self::$resourceName));
+               
+        $availableWorkerSlots = count($this->getAvailableSlots($this->resourcePool));
+        
+        while(($usedSlots+$workerCountToStart)<($availableWorkerSlots+1)){
+            $workerCountToStart++;
         }
         if(empty($usedSlots)){
             $workerCountToStart = count($this->getAvailableSlots($this->resourcePool));
         }
 
-        //TODO the generation of $workerCountToStart is slightly intransparent
-        //     we had the case that no worker was added at all.
-        //     so the following max 1 was added
-        $workerCountToStart = max(1, $workerCountToStart);
         for($i=0;$i<$workerCountToStart;$i++){
             $this->init($this->workerModel->getTaskGuid(), $this->workerModel->getParameters());
             parent::queue($state);
@@ -153,8 +149,8 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
             $seg->source = preg_replace('" ?transN?o?t?Found ?"', ' ', $seg->source);
             $seg->target = preg_replace('" ?transN?o?t?Found ?"', ' ', $seg->target);
 
-            $sourceMids = $this->termModel->getTermMidsFromSegment($seg->source);
-            $targetMids = $this->termModel->getTermMidsFromSegment($seg->target);
+            $sourceMids = $this->termModel->getTermMidsFromSegment($seg->source,false);
+            $targetMids = $this->termModel->getTermMidsFromSegment($seg->target,false);
             $toMarkMemory = array();
             foreach ($sourceMids as $sourceMid) {
                 $groupedTerms = $this->termModel->getAllTermsOfGroupByMid($this->task->getTaskGuid(),$sourceMid, array($this->task->getTargetLang()));
@@ -191,7 +187,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
                     $modifiedMatch = str_replace('<div', '<div class=""', $modifiedMatch);
                 }
                 $modifiedMatch = preg_replace('/( class="[^"]*)"/', '\\1 '.$cssClassToInsert.'"', $modifiedMatch);
-                $seg = str_replace($match, $modifiedMatch, $seg);
+                $seg = preg_replace('/'.$match.'/', $modifiedMatch, $seg, 1);
             }
         };
         
@@ -225,17 +221,15 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
      * @return array('resource' => resourceName, 'slot' => slotName)
      */
     private function calculateSlot($resourcePool = 'default') {
-        $resourceName = self::$praefixResourceName.$resourcePool;
-        
         // detect defined slots for the resourcePool
         $availableSlots = $this->getAvailableSlots($resourcePool);
         
-        $usedSlots = $this->workerModel->getListSlotsCount($resourceName, $availableSlots);
+        $usedSlots = $this->workerModel->getListSlotsCount(self::$resourceName, $availableSlots);
         
         // all slotes in use
         if (count($usedSlots) == count($availableSlots)) {
             // take first slot in list of usedSlots which is the one with the min. number of counts
-            $return = array('resource' => $resourceName, 'slot' => $usedSlots[0]['slot']);
+            $return = array('resource' => self::$resourceName, 'slot' => $usedSlots[0]['slot']);
             return $return;
         }
         
@@ -252,12 +246,12 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
             }
             $unusedSlots = array_values($unusedSlots);
             
-            $return = array('resource' => $resourceName, 'slot' => $unusedSlots[array_rand($unusedSlots)]);
+            $return = array('resource' => self::$resourceName, 'slot' => $unusedSlots[array_rand($unusedSlots)]);
             return $return;
         }
         
         // no slot in use
-        $return = array('resource' => $resourceName, 'slot' => $availableSlots[array_rand($availableSlots)]);
+        $return = array('resource' => self::$resourceName, 'slot' => $availableSlots[array_rand($availableSlots)]);
         return $return;
     }
     
@@ -294,9 +288,6 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         if(empty($return)) {
             trigger_error(__CLASS__.'->'.__FUNCTION__.'; There have to be available slots!');
         }
-        
-        //TODO test if it is possible to work here with a factor 1.5 or so!
-        $this->maxParallelProcesses = count($return);
         
         return $return;
     }

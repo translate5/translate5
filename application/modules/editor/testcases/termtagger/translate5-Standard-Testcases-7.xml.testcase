@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="stemmedTermWithInPairedTag" creator="MittagQI" mandatory="yes" sourceLang="DE" targetLang="ES" tbxPath="translate5-Standard-Testcases-DE-ES.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>A stemmed term directly inside a paired tag - nothing else</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source><div class="open 672069643d22313222"><span title="&lt;i&gt;" class="short">&lt;3&gt;</span><span id="12-3-3c4abf728013d2a85b9fd0e44dbc2353" class="full">&lt;i&gt;</span></div>Drehbürstensiebes<div class="close 2f67"><span title="&lt;/i&gt;" class="short">&lt;/3&gt;</span><span id="12-4-c03218cf3bc4a3370b8bfd1af3b870c9" class="full">&lt;/i&gt;</span></div></source>
+            <target><div class="open 672069643d22313222"><span title="&lt;i&gt;" class="short">&lt;1&gt;</span><span id="12-27-3c4abf728013d2a85b9fd0e44dbc2353" class="full">&lt;i&gt;</span></div>Tamiz de cepillos rotativos<div class="close 2f67"><span title="&lt;/i&gt;" class="short">&lt;/1&gt;</span><span id="12-28-c03218cf3bc4a3370b8bfd1af3b870c9" class="full">&lt;/i&gt;</span></div></target>
+        </input>
+        <expectedOutput>
+            <source><div class="open 672069643d22313222"><span title="&lt;i&gt;" class="short">&lt;3&gt;</span><span id="12-3-3c4abf728013d2a85b9fd0e44dbc2353" class="full">&lt;i&gt;</span></div><div title="" class="term admittedTerm stemmed transFound" data-tbxid="term_0000001_001_de-DE_001_0000001">Drehbürstensiebes</div><div class="close 2f67"><span title="&lt;/i&gt;" class="short">&lt;/3&gt;</span><span id="12-4-c03218cf3bc4a3370b8bfd1af3b870c9" class="full">&lt;/i&gt;</span></div></source>
+            <target><div class="open 672069643d22313222"><span title="&lt;i&gt;" class="short">&lt;1&gt;</span><span id="12-27-3c4abf728013d2a85b9fd0e44dbc2353" class="full">&lt;i&gt;</span></div><div title="" class="term admittedTerm exact" data-tbxid="term_0000001_001_de-DE_001_0000001">Tamiz de cepillos rotativos</div><div class="close 2f67"><span title="&lt;/i&gt;" class="short">&lt;/1&gt;</span><span id="12-28-c03218cf3bc4a3370b8bfd1af3b870c9" class="full">&lt;/i&gt;</span></div></target>
+        </expectedOutput>
+    </assertion>
+</testcase>

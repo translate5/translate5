@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="formulas-[Fe(CN)6]3" creator="MittagQI" mandatory="yes" sourceLang="DE" targetLang="ES" tbxPath="translate5-Standard-Testcases-DE-ES.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>Test formulas: [Fe(CN)6]3</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>[Fe(CN)6]3</source>
+            <target>[Fe(CN)6]3</target>
+        </input>
+        <expectedOutput>
+            <source><div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">[Fe(CN)6]3</div></source>
+            <target><div title="" class="term admittedTerm exact" data-tbxid="xyz">[Fe(CN)6]3</div></target>
+        </expectedOutput>
+    </assertion>
+</testcase>
