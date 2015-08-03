@@ -90,6 +90,8 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
                 $stat->setType($this->type);
                 $stat->setFileId($segment->getFileId());
                 $stat->setCharCount($segment->charCount($segmentContent));
+                //warning: the term[Not]Found info for target fields is nonsense, 
+                //since transFound info in target is optional! 
                 $count = preg_match_all($termNotFoundRegEx, $segmentContent, $matches);
                 $stat->setTermNotFound($count);
                 $count = preg_match_all($termFoundRegEx, $segmentContent, $matches);
