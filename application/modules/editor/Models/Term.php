@@ -186,23 +186,20 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * returns all term mids from given segment content (allows and returns also duplicated mids)
      * @param string $seg
-     * @param boolean $unify if true: Only one entry for identical mids in the return array
      * @return type array values are the mids of the terms in the string
      */
-    public function getTermMidsFromSegment(string $seg,$unify=true) {
-        if($unify)
-            return array_keys($this->getTermInfosFromSegment($seg));
-        
-        $getTermIdRegEx = '/<div.*?data-tbxid="(term_.*?)".*?>/';
-        preg_match_all($getTermIdRegEx, $seg, $matches);
-        return $matches[1];
+    public function getTermMidsFromSegment(string $seg) {
+        return array_map(function($item) {
+            return $item['mid'];
+        }, $this->getTermInfosFromSegment($seg));
     }
     
     /**
      * returns mids and term flags (css classes) found in a string
      * @param string $seg
-     * @return array key is the mid, value is an array of term flags (css classes)
+     * @return array 2D Array, first level are found terms, second level has key mid and key classes
      */
     public function getTermInfosFromSegment(string $seg) {
         $getTermRegEx = '/<div[^>]+((class="([^"]*)"[^>]+data-tbxid="([^"]*)")|(data-tbxid="([^"]*)"[^>]+class="([^"]*)"))[^>]*>/';
@@ -212,12 +209,15 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         foreach($matches as $match) {
             //class before data-tbxid
             if(empty($match[5])) {
-                $result[$match[4]] = explode(' ', $match[3]);
+                $mid = $match[4];
+                $classes = $match[3];
             }
             //data-tbxid before class 
             else {
-                $result[$match[6]] = explode(' ', $match[7]);
+                $mid = $match[6];
+                $classes = $match[7];
             }
+            $result[] = array('mid' => $mid,'classes' => explode(' ', $classes));
         }
         return $result;
     }

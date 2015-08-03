@@ -272,9 +272,29 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return integer
      */
     public function charCount($segmentContent) {
-        $segmentContent = $this->stripTags($segmentContent);
-        $segmentContent = html_entity_decode($segmentContent, ENT_QUOTES | ENT_XHTML);
-        return mb_strlen($segmentContent);
+        return mb_strlen($this->prepareForCount($segmentContent));
+    }
+    
+    /**
+     * Counts words; word boundary is used as defined in runtimeOptions.editor.export.wordBreakUpRegex
+     * @param string $segmentContent
+     * @return integer
+     */
+    public function wordCount($segmentContent) {
+        $config = Zend_Registry::get('config');
+        $regexWordBreak = $config->runtimeOptions->editor->export->wordBreakUpRegex;
+        
+        $words = preg_split($regexWordBreak, $this->prepareForCount($segmentContent), NULL, PREG_SPLIT_NO_EMPTY);
+        return count($words);
+    }
+    
+    /**
+     * Strips tags and reconverts html entities so that several count operations can be performed.
+     * @param string $text
+     * @return string
+     */
+    protected function prepareForCount($text) {
+        return html_entity_decode($this->stripTags($text), ENT_QUOTES | ENT_XHTML);
     }
     
     /**
