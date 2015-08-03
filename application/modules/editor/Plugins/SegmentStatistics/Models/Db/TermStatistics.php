@@ -28,20 +28,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Since Statistics are mostly only important for editable segments, the plugin provides this worker,
- * which deletes all statistics for non editable segments.
+/**#@+ 
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
  */
-class editor_Plugins_SegmentStatistics_WriteStatisticsWorker extends editor_Plugins_SegmentStatistics_Worker {
-    
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::work()
-     */
-    public function work() {
-        $this->setType();
-        $this->writeToDisk();
-        $this->writeToDisk(true); //generated stats a second time, with data filtered by config
-        return true;
-    }
+/**
+ * Default Db Model for Plugin SegmentStatistics
+ */
+class editor_Plugins_SegmentStatistics_Models_Db_TermStatistics extends Zend_Db_Table_Abstract {
+    protected $_name    = 'LEK_plugin_segmentstatistic_terms';
+    public $_primary = 'id';
 }
