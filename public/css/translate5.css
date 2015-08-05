@@ -61,7 +61,7 @@ h2,h3{font-size:110%;}
 }
 #header {margin:0;padding:0;}
 #header img {width: 150px; margin:0;padding:19px 0 0 19px;}
-#header #slogan {display: inline;font-size: 19px; position: relative; top: -37px; left: 100px;}
+#header #slogan {display: inline-block;font-size: 19px; position: relative; top: -37px; left: 100px;}
 th {text-align:left;}
 
 #menu{padding-top:17px;padding-bottom:27px;position:relative;}
