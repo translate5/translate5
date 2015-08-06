@@ -69,6 +69,7 @@ class editor_Plugins_SegmentStatistics_Models_TermStatistics extends ZfExtended_
         $cols = array(
             'ts.term',
             'ts.mid',
+            'ts.fileId',
             'foundSum' => 'sum(ts.foundCount)',
             'notFoundSum' => 'sum(ts.notFoundCount)',
         );
@@ -77,6 +78,8 @@ class editor_Plugins_SegmentStatistics_Models_TermStatistics extends ZfExtended_
         ->where('ts.fieldName = ?', $fieldName)
         ->where('ts.type = ?', $type)
         ->group('ts.mid')
+        ->group('ts.fileId')
+        ->order('ts.fileId ASC')
         ->order('foundSum DESC');
         
         $meta = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_SegmentMetaJoin');
