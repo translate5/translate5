@@ -118,7 +118,8 @@ class editor_Plugins_SegmentStatistics_Models_Statistics extends ZfExtended_Mode
                 ->where('stat.taskGuid = ?', $taskGuid)
                 ->where('stat.type = ?', $type)
                 ->group('stat.fileId')
-                ->group('stat.fieldName');
+                ->group('stat.fieldName')
+                ->order('fileId ASC');
             if(!empty($where)) {
                 $s->where($where);
             }

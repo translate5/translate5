@@ -219,6 +219,7 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
                 'taskGuid' => $this->taskGuid,
                 'mid' => $mid,
                 'segmentId' => $segment->getId(),
+                'fileId' => $segment->getFileId(),
                 'fieldName' => $field->name,
                 'fieldType' => $field->type,
                 'term' => $this->termContent[$mid],
