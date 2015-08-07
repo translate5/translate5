@@ -36,6 +36,7 @@ require_once('ZfExtended/ThirdParty/PHPExcel/PHPExcel.php');
 class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_SegmentStatistics_Models_Export_Abstract {
     const FILE_SUFFIX='.xlsx';
     const TPL_PREFIX='STAT.';
+    const TPL_ROW = 3;
     
     /**
      * Most of stats affect source field only, so define it here:
@@ -53,6 +54,12 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
      * @var PHPExcel
      */
     protected $xls;
+    
+    /**
+     * Mapping of fileId to Sheetname
+     * @var array
+     */
+    protected $sheetNames = array();
     
     public function init(editor_Models_Task $task, stdClass $statistics, array $workerParams) {
         parent::init($task, $statistics, $workerParams);
@@ -79,6 +86,8 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
     }
     
     protected function convertToJsonStyleIndex(array $files, string $type) {
+        $i = 0;
+        $lastFileId = -1;
         foreach($files as $file) {
             $id = $file['fileId'];
             settype($this->data[$id], 'array');
@@ -86,6 +95,10 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
             $target['fileId'] = $file['fileId'];
             $target['fileName'] = $file['fileName'];
             $target['segmentsPerFile'] = $file['segmentsPerFile'];
+            if($type == $this->type && $lastFileId != $file['fileId']) {
+                $this->sheetNames[$file['fileId']] = self::TPL_ROW + $i++;
+            }
+            $lastFileId = $file['fileId'];
             unset($file['fileId']);
             unset($file['fileName']);
             unset($file['segmentsPerFile']);
@@ -123,11 +136,11 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
     }
     
     protected function fillSheetOverview() {
-        $this->fillByTemplate(3, 0);
+        $this->fillByTemplate(self::TPL_ROW, 0);
     }
     
     protected function fillSheetSummary() {
-        $this->fillByTemplate(3, 1);
+        $this->fillByTemplate(self::TPL_ROW, 1);
     }
     
     /**
@@ -184,9 +197,42 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
         /* @var $termStat editor_Plugins_SegmentStatistics_Models_TermStatistics */
         $stats = $termStat->loadTermSums($this->taskGuid, self::FIELD_SOURCE, $this->type);
         
-        $sheet = $this->xls->setActiveSheetIndex(2);
+        $idx = 2;
+        $sheet = $this->xls->setActiveSheetIndex($idx);
+        $sheet->setTitle('Termini Zusammenfassung');
+        $overviewSum = array();
+        $oldFileId = -1;
+        foreach($stats as $stat){
+            //add new sheet if per file
+            if($stat['fileId'] != $oldFileId) {
+                $file = ZfExtended_Factory::get('editor_Models_File');
+                /* @var $file editor_Models_File */
+                $file->load($stat['fileId']);
+                $newSheet = $sheet->copy();
+                $newSheet->setTitle((string) $this->sheetNames[$stat['fileId']]);
+                $this->xls->addSheet($newSheet, $idx++);
+                $i = 2;
+            }
+            
+            //sum up all values for overview sheet
+            if(empty($overviewSum[$stat['mid']])) {
+                $overviewSum[$stat['mid']] = $stat;
+            }
+            else {
+                $overviewSum[$stat['mid']]['foundSum'] += $stat['foundSum'];
+                $overviewSum[$stat['mid']]['notFoundSum'] += $stat['notFoundSum'];
+            }
+            
+            $newSheet->setCellValue('A'.$i, $stat['term']);
+            $newSheet->setCellValue('B'.$i, $stat['foundSum']);
+            $newSheet->setCellValue('C'.$i++, $stat['notFoundSum']);
+            $oldFileId = $stat['fileId'];
+        }
+        
+        //Add overall sum to last temr sheet
+        $sheet = $this->xls->setActiveSheetIndex($idx);
         $i = 2;
-        foreach ($stats as $stat) {
+        foreach ($overviewSum as $stat) {
             $sheet->setCellValue('A'.$i, $stat['term']);
             $sheet->setCellValue('B'.$i, $stat['foundSum']);
             $sheet->setCellValue('C'.$i++, $stat['notFoundSum']);

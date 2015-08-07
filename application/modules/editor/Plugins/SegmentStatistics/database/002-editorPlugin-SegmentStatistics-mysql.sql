@@ -47,7 +47,7 @@ CREATE TABLE `LEK_plugin_segmentstatistic_terms` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `termPerTask` (`mid`, `segmentId`, `fieldName`, `type`),
   CONSTRAINT FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES 
 ('runtimeOptions.plugins.SegmentStatistics.xlsTemplateExport', 1, 'editor', 'plugins', 'modules/editor/Plugins/SegmentStatistics/templates/export-template.xlsx', 'modules/editor/Plugins/SegmentStatistics/templates/export-template.xlsx', null, 'absolutepath', 'Path to the XLSX export template. Path can be absolute or relative to application directory.'),
