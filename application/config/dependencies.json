@@ -69,12 +69,12 @@
     },{
         "name": "phpexcel",
         "label": "PHPExcel",
-        "version": "1.8.0",
+        "version": "1.8.1",
         "url": "RELEASE:PHPExcel.zip",
         "target": "library/ZfExtended/ThirdParty/PHPExcel/",
         "licenses": [{
             "license": "LGPL",
-            "relpath": "docs/third-party-licenses/PHPExcel-1.8.0.license.txt"
+            "relpath": "docs/third-party-licenses/PHPExcel-1.8.1.license.txt"
         }]
     },{
         "name": "extjs-4",
