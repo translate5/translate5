@@ -76,9 +76,9 @@ class editor_Test_Termtagger_Preparation extends editor_Test_Termtagger_Abstract
                 self::$testfilePath.' does not contain a valid value for "targetStringMatch".');
         
         $this->assertNotNull(self::$sourceLangEntity,'The testfile '.self::$testfilePath.
-                ' does not a valid for sourceLang, which is known to the executing translate5 instance.');
+                ' does not have a valid value for sourceLang - one that is known to the executing translate5 instance.');
         $this->assertNotNull(self::$targetLangEntity,'The testfile '.self::$testfilePath.
-                ' does not a valid for targetLang, which is known to the executing translate5 instance.');
+                ' does not have a valid value for targetLang - one that is known to the executing translate5 instance.');
         
         $tbxFilePath = self::$testfile->getPath().'/'.self::$qpTest->attr('tbxPath');
         $this->assertFileExists($tbxFilePath, 'For the testfile '.self::$testfilePath.
