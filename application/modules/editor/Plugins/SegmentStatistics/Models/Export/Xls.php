@@ -61,6 +61,11 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
      */
     protected $sheetNames = array();
     
+    /**
+     * @var array
+     */
+    protected $overviewSum = array();
+    
     public function init(editor_Models_Task $task, stdClass $statistics, array $workerParams) {
         parent::init($task, $statistics, $workerParams);
         
@@ -132,6 +137,8 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
         if($this->debug) {
             $w = new PHPExcel_Writer_CSV($this->xls);
             $w->save($filename.'.csv');
+            $taskName = $this->task->getTaskName().' ('.$this->taskGuid.")";
+            error_log("Statistics ".basename($filename).self::FILE_SUFFIX." for task ".$taskName." written.");
         }
     }
     
@@ -199,28 +206,35 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
         
         $idx = 2;
         $sheet = $this->xls->setActiveSheetIndex($idx);
-        $sheet->setTitle('Termini Zusammenfassung');
-        $overviewSum = array();
-        $oldFileId = -1;
+        $fileCount = count($this->sheetNames);
+        if($fileCount > 1) {
+            $maxFileNr = ($fileCount-1+self::TPL_ROW);
+            $sheet->setTitle(self::TPL_ROW.' bis '.$maxFileNr);
+        }
+        else {
+            $sheet->setTitle(self::TPL_ROW);
+        }
+        $this->overviewSum = array();
+        if($fileCount > 1) {
+            $oldFileId = -1;
+        }
+        else {
+            //This prevents the over sheets to be created
+            $oldFileId = $stats[0]['fileId'];
+        }
         foreach($stats as $stat){
             //add new sheet if per file
             if($stat['fileId'] != $oldFileId) {
-                $file = ZfExtended_Factory::get('editor_Models_File');
-                /* @var $file editor_Models_File */
-                $file->load($stat['fileId']);
                 $newSheet = $sheet->copy();
                 $newSheet->setTitle((string) $this->sheetNames[$stat['fileId']]);
                 $this->xls->addSheet($newSheet, $idx++);
                 $i = 2;
             }
             
-            //sum up all values for overview sheet
-            if(empty($overviewSum[$stat['mid']])) {
-                $overviewSum[$stat['mid']] = $stat;
-            }
-            else {
-                $overviewSum[$stat['mid']]['foundSum'] += $stat['foundSum'];
-                $overviewSum[$stat['mid']]['notFoundSum'] += $stat['notFoundSum'];
+            $this->sumUp($stat);
+            
+            if($fileCount == 1) {
+                continue;
             }
             
             $newSheet->setCellValue('A'.$i, $stat['term']);
@@ -229,13 +243,27 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
             $oldFileId = $stat['fileId'];
         }
         
-        //Add overall sum to last temr sheet
+        //Add overall sum to last term sheet (if only one file exists, this is the only sheet to be created)
         $sheet = $this->xls->setActiveSheetIndex($idx);
         $i = 2;
-        foreach ($overviewSum as $stat) {
+        foreach ($this->overviewSum as $stat) {
             $sheet->setCellValue('A'.$i, $stat['term']);
             $sheet->setCellValue('B'.$i, $stat['foundSum']);
             $sheet->setCellValue('C'.$i++, $stat['notFoundSum']);
+        }
+    }
+    
+    /**
+     * sum up all values for overview sheet
+     * @param array $stat
+     */
+    protected function sumUp(array $stat) {
+        if(empty($this->overviewSum[$stat['mid']])) {
+            $this->overviewSum[$stat['mid']] = $stat;
+        }
+        else {
+            $this->overviewSum[$stat['mid']]['foundSum'] += $stat['foundSum'];
+            $this->overviewSum[$stat['mid']]['notFoundSum'] += $stat['notFoundSum'];
         }
     }
 }
