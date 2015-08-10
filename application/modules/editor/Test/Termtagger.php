@@ -47,6 +47,7 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract{
         self::setTestResources();
         self::setTaskValues();
         self::addTask();
+        self::waitTaskReady();
         self::loadTaggedSegmentFromDb();
     }
     
@@ -120,6 +121,18 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract{
         return self::$testTask;
     }
     
+    protected static function waitTaskReady(){
+        $count = 0;
+        while ($count<30 && self::$testTask->getState() !=='open') {
+            sleep(1);
+            self::$testTask->load(self::$testTask->getId());
+            $count++;
+        }
+        if($count>29){
+            self::assertTrue(false,'Importing of testcase took to long. Something is wrong. Please check.');
+        }
+    }
+
     protected static function loadTaggedSegmentFromDb() {
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */

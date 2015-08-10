@@ -83,7 +83,7 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
     }
     
     public function termtaggerAction() {
-        echo "<h1>TermTagger Tests; ".  date('Y-m-d H:m:s')."</h1>";
+        echo "<h1>TermTagger Tests; ".  date(DATE_RFC2822)."</h1>";
         $this->loopThroughTestXmlFiles();
         $this->echoResultSummary();
     }
@@ -104,6 +104,7 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
     }
     
     protected function echoResultSummary() {
+        ksort($this->xmlResultSummary, SORT_NATURAL);
         echo "<h2>Summary of Results</h2>";
         foreach ($this->xmlResultSummary as $filename => $color) {
             echo '<b style="color: '.$color.'">'.$filename.'</b><br>';

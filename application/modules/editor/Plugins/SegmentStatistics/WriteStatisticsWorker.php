@@ -29,8 +29,6 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Since Statistics are mostly only important for editable segments, the plugin provides this worker,
- * which deletes all statistics for non editable segments.
  */
 class editor_Plugins_SegmentStatistics_WriteStatisticsWorker extends editor_Plugins_SegmentStatistics_Worker {
     
