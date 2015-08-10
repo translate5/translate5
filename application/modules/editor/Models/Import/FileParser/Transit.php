@@ -391,7 +391,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     
     protected function createTag($tag, $shortTagIdent, $tagName, $tagType, $tagText) {
         $fileNameHash = md5($tagText);
-        if(strpos($tagText, '<')||strpos($tagText, '"')){
+        if(strpos($tagText, '<') !== false ||strpos($tagText, '"') !== false){
             $tagText = htmlspecialchars($tagText, ENT_XML1);
         }
         $p = $this->getTagParams($tag, $shortTagIdent, $tagName, $fileNameHash, $tagText);
@@ -471,7 +471,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
             //check for undefined tags
             $part = &$this->segmentParts[$i];
             if (strpos($part ,'<')!== false){
-                if(strpos(str_replace('<space ', '', $part), '<')){//our whitespace-tags are still allowed
+                if(strpos(str_replace('<space ', '', $part), '<') !== false){//our whitespace-tags are still allowed
                     trigger_error('In the segmentPart '.$part.' a tag has been found.');
                 }
             }
