@@ -93,6 +93,9 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
             return;
         }
         
+        $sourceMeta = $sfm->getByName(editor_Models_SegmentField::TYPE_SOURCE);
+        $isSourceEditable = ($sourceMeta !== false && $sourceMeta->editable == 1);
+        
         $getter = 'get'.$editField;
         $setter = 'set'.$editField;
         
@@ -146,6 +149,11 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                     $entity->{$setter}($this->entity->{$getter}());
                 }
                 $entity->updateToSort($editField);
+                
+                // take over source original only for non editing source, see therefore TRANSLATE-549
+                if(!$isSourceEditable) {
+                    $entity->setSource($this->entity->getSource());
+                }
                 
                 $entity->setQmId((string) $this->entity->getQmId());
                 if(!is_null($this->entity->getStateId())) {
