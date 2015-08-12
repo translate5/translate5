@@ -7,7 +7,7 @@
             <target>in black nappa leather/Alcantara®</target>
         </input>
         <expectedOutput>
-            <source>in <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Leder Nappa</div> schwarz/Alcantara®</source>
+            <source>in <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Leder Nappa</div> <div title="" class="term admittedTerm exact" data-tbxid="xyz">schwarz</div>/Alcantara®</source>
             <target>in <div title="" class="term admittedTerm exact" data-tbxid="xyz">black</div> <div title="" class="term admittedTerm exact" data-tbxid="xyz">nappa leather</div>/Alcantara®</target>
         </expectedOutput>
     </assertion>

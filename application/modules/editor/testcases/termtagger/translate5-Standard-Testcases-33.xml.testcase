@@ -8,7 +8,7 @@
         </input>
         <expectedOutput>
             <source>Viele <div title="" class="term preferredTerm stemmed transFound" data-tbxid="xyz">Geschenke</div> und <div title="" class="term admittedTerm stemmed transFound" data-tbxid="xyz">Gaben</div> sind eine gute Ergänzung des <div title="" class="term deprecatedTerm stemmed transFound" data-tbxid="xyz">Mitbringsels</div>.</source>
-            <target>Many <div title="" class="term preferredTerm stemmed" data-tbxid="xyz">gifts</div> and <div title="" class="term admittedTerm stemmed" data-tbxid="xyz">rewards</div> are a good complement of <div title="" class="term deprecatedTerm stemmed" data-tbxid="xyz">offers</div></target>
+            <target>Many <div title="" class="term preferredTerm stemmed" data-tbxid="xyz">gifts</div> and <div title="" class="term admittedTerm stemmed" data-tbxid="xyz">rewards</div> are a good complement of <div title="" class="term deprecatedTerm stemmed" data-tbxid="xyz">offers</div>.</target>
         </expectedOutput>
     </assertion>
 </testcase>

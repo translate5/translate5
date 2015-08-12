@@ -4,11 +4,11 @@
     <assertion type="assertOutputEquals">
         <input>
             <source>AKSE steht für "automatische Kindersitzerkennung". AKS steht für "Automatisches Kupplungs-System".</source>
-            <target>AKSE means "...", AKS means "automatic clutch system".</target>
+            <target>AKSE means "AKSE", AKS means "automatic clutch system".</target>
         </input>
         <expectedOutput>
             <source><div title="" class="term admittedTerm exact transFound" data-tbxid="X_233_2">AKSE</div> steht für "automatische Kindersitzerkennung". <div title="" class="term admittedTerm exact transFound" data-tbxid="X_233">AKS</div> steht für "Automatisches Kupplungs-System".</source>
-            <target><div title="" class="term admittedTerm exact" data-tbxid="X_233_2">AKSE</div> means "...", <div title="" class="term admittedTerm exact" data-tbxid="X_233">AKS</div> means "automatic clutch system".</target>
+            <target><div title="" class="term admittedTerm exact" data-tbxid="X_233_2">AKSE</div> means "AKSE", <div title="" class="term admittedTerm exact" data-tbxid="X_233">AKS</div> means "automatic clutch system".</target>
         </expectedOutput>
     </assertion>
 </testcase>
