@@ -7,7 +7,7 @@
             <target>AcM.G.</target>
         </input>
         <expectedOutput>
-            <source><div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">AcM.G</div>.</source>
+            <source><div title="" class="term preferredTerm exact transFound" data-tbxid="xyz">AcM.G</div>.</source>
             <target><div title="" class="term admittedTerm exact" data-tbxid="xyz">AcM.G</div>.</target>
         </expectedOutput>
     </assertion>
