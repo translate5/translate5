@@ -186,6 +186,11 @@ class editor_Plugins_TermTagger_Service {
         $this->lastStatus = false;
         try {
             $result = $client->request($method);
+            if(ZfExtended_Debug::hasLevel('plugin', 'TermTagger')) {
+                $rand = rand();
+                error_log("TermTagger Request (id: $rand): ".print_r($client->getLastRequest(),1));
+                error_log("TermTagger Answer (to id $rand): ".print_r($result->getRawBody(),1));
+            }
             $this->lastStatus = $result->getStatus();
             return $result;
         } catch(Exception $httpException) {
