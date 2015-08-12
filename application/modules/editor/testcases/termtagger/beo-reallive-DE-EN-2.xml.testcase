@@ -4,11 +4,11 @@
     <assertion type="assertOutputEquals">
         <input>
             <source>noch mehr Spaß am Sport und Sinn für das Besondere</source>
-            <target>an even greater sense of sport and a touch of the exceptional</target>
+            <target>an even greater sense of sportiness and a touch of the exceptional</target>
         </input>
         <expectedOutput>
             <source>noch mehr Spaß am <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Sport</div> und Sinn für das Besondere</source>
-            <target>an even greater sense of <div title="" class="term admittedTerm exact" data-tbxid="xyz">sport</div> and a touch of the exceptional</target>
+            <target>an even greater sense of sportiness and a touch of the exceptional</target>
         </expectedOutput>
     </assertion>
 </testcase>
