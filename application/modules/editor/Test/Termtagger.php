@@ -123,12 +123,12 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract{
     
     protected static function waitTaskReady(){
         $count = 0;
-        while ($count<30 && self::$testTask->getState() !=='open') {
+        while ($count<100 && self::$testTask->getState() !=='open') {
             sleep(1);
             self::$testTask->load(self::$testTask->getId());
             $count++;
         }
-        if($count>29){
+        if($count>99){
             self::assertTrue(false,'Importing of testcase took to long. Something is wrong. Please check.');
         }
     }
