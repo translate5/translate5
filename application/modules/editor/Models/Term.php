@@ -129,20 +129,18 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @return 2-dim array (get term of first row like return[0]['term'])
      */
     public function getAllTermsOfGroupByMid(string $taskGuid, string $mid, $languageIds = array()) {
-        $sub = "select groupId from LEK_terms where mid = ?";
-        $sub = $this->db->getAdapter()->quoteInto($sub, $mid).'and taskGuid = ?';
-        $sub = $this->db->getAdapter()->quoteInto($sub, $taskGuid);
-        $query = "select * from LEK_terms WHERE groupId = (".$sub.")";
-        if(count($languageIds)>0){
-             $or = 'language = ?';
-             $orArr = array();
-             foreach ($languageIds as $id) {
-                $orArr[] = $this->db->getAdapter()->quoteInto($or, $id);
-             }
-             $query .= ' and ('.  implode(' or ', $orArr).')';
-         }
-        
-        return $this->db->getAdapter()->fetchAll($query);
+        $db = $this->db;
+        $s = $db->select()
+            ->from(array('t1' => $db->info($db::NAME)))
+            ->join(array('t2' => $db->info($db::NAME)), 't1.groupId = t2.groupId', '')
+            ->where('t1.taskGuid = ?', $taskGuid)
+            ->where('t2.taskGuid = ?', $taskGuid)
+            ->where('t2.mid = ?', $mid);
+        $s->setIntegrityCheck(false);
+        if(!empty($languageIds)) {
+            $s->where('t1.language in (?)', $languageIds);
+        }
+        return $db->fetchAll($s)->toArray();
     }
     
     /**
