@@ -82,6 +82,11 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
      * @var editor_Models_Task
      */
     protected $task;
+    
+    /**
+     * @var array
+     */
+    protected $groupCounter = array();
 
 
     public function init($taskGuid = NULL, $parameters = array()) {
@@ -144,6 +149,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         if(!empty($config->runtimeOptions->termTagger->markTransFoundLegacy)) {
             return $segments;
         }
+        $taskGuid = $this->task->getTaskGuid();
         foreach ($segments as &$seg) {
             //remove potentially incorrect transFound or transNotFound as inserted by termtagger
             $seg->source = preg_replace('" ?transN?o?t?Found ?"', ' ', $seg->source);
@@ -152,9 +158,12 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
             $sourceMids = $this->termModel->getTermMidsFromSegment($seg->source);
             $targetMids = $this->termModel->getTermMidsFromSegment($seg->target);
             $toMarkMemory = array();
+            $this->groupCounter = array();
             foreach ($sourceMids as $sourceMid) {
-                $groupedTerms = $this->termModel->getAllTermsOfGroupByMid($this->task->getTaskGuid(),$sourceMid, array($this->task->getTargetLang()));
-                $transFound = (isset($toMarkMemory[$sourceMid]))?$toMarkMemory[$sourceMid]:0;
+                $this->termModel->loadByMid($sourceMid, $taskGuid);
+                $groupId = $this->termModel->getGroupId();
+                $groupedTerms = $this->termModel->getAllTermsOfGroupByMid($taskGuid,$sourceMid, array($this->task->getTargetLang()));
+                $transFound = (isset($this->groupCounter[$groupId]))?$this->groupCounter[$groupId]:0;
                 foreach ($groupedTerms as $groupedTerm) {
                     $targetMidsKey = array_search($groupedTerm['mid'], $targetMids);
                     if($targetMidsKey!==false){
@@ -162,10 +171,11 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
                         unset($targetMids[$targetMidsKey]);
                     }
                 }
-                $toMarkMemory[$sourceMid] = $transFound;
+                $toMarkMemory[$sourceMid] = $groupId;
+                $this->groupCounter[$groupId] = $transFound;
             }
-            foreach ($toMarkMemory as $sourceMid => $transFound) {
-                $seg->source = $this->insertTransFoundInSegmentClass($seg->source, $sourceMid, $transFound);
+            foreach ($toMarkMemory as $sourceMid => $groupId) {
+                $seg->source = $this->insertTransFoundInSegmentClass($seg->source, $sourceMid, $groupId);
             }
         }
         return $segments;
@@ -174,10 +184,12 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
      * insert the css-class transFound or transNotFound into css-class of the term-div tag with the corresponding mid
      * @param string $seg
      * @param string $mid
-     * @param boolean $transFound
+     * @param $groupId
      * @return string
      */
-    protected function insertTransFoundInSegmentClass(string $seg,string $mid, integer $transFound) {
+    protected function insertTransFoundInSegmentClass(string $seg,string $mid, $groupId) {
+        settype($this->groupCounter[$groupId], 'integer');
+        $transFound =& $this->groupCounter[$groupId];
         $rCallback = function($matches)use(&$seg,&$transFound){
             foreach ($matches as $match) {
                 $cssClassToInsert = ($transFound>0)?'transFound':'transNotFound';
