@@ -204,6 +204,10 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
         /* @var $termStat editor_Plugins_SegmentStatistics_Models_TermStatistics */
         $stats = $termStat->loadTermSums($this->taskGuid, self::FIELD_SOURCE, $this->type);
         
+        if(empty($stats)) {
+            return;
+        }
+        
         $idx = 2;
         $sheet = $this->xls->setActiveSheetIndex($idx);
         $fileCount = count($this->sheetNames);
