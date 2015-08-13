@@ -403,12 +403,14 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
         $taskGuid = $this->_task->getTaskGuid();
         /* @var $segment editor_Models_Segment */
         if(is_null($this->currentId)){
-            $seg = $segment->loadFirst($taskGuid);
+            //since FileParser instance is recreated per file, we have to give the fileid
+            $seg = $segment->loadFirst($taskGuid, $this->_fileId);
             $this->currentId = $seg->getId();
             $this->segmentCache[$segId] = $seg;
         }
         else{
-            $seg = $segment->loadNext($taskGuid,$this->currentId);
+            //since FileParser instance is recreated per file, we have to give the fileid
+            $seg = $segment->loadNext($taskGuid,$this->currentId, $this->_fileId);
             $this->currentId = $seg->getId();
             $this->segmentCache[$segId] = $seg;
         }

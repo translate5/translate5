@@ -641,15 +641,16 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * First Segment is defined as the segment with the lowest id of the task
      * 
      * @param string $taskGuid
+     * @param integer $fileId optional, loads first file of given fileId in task
      * @return editor_Models_Segment
      */
-    public function loadFirst($taskGuid) {
+    public function loadFirst($taskGuid, $fileId = null) {
         $this->segmentFieldManager->initFields($taskGuid);
         $this->reInitDb($taskGuid);
         //ensure that view exists (does nothing if already):
         $this->segmentFieldManager->getView()->create();
 
-        $seg = $this->loadNext($taskGuid, 0);
+        $seg = $this->loadNext($taskGuid, 0, $fileId);
         
         if(empty($seg)) {
             $this->notFound('first segment of task', $taskGuid);
@@ -663,15 +664,20 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * This method assumes that segmentFieldManager was already loaded internally
      * @param string $taskGuid
      * @param integer $id
+     * @param integer $fileId optional, loads first file of given fileId in task
      * @return editor_Models_Segment | null if no next found
      */
-    public function loadNext($taskGuid, $id) {
+    public function loadNext($taskGuid, $id, $fileId = null) {
         $s = $this->db->select()
             ->where('taskGuid = ?', $taskGuid)
             ->where('id > ?', $id)
             ->order('id ASC')
             ->limit(1);
 
+        if(!empty($fileId)) {
+            $s->where('fileId = ?', $fileId);
+        }
+        
         $row = $this->db->fetchRow($s);
         if(empty($row)) {
             return null;
