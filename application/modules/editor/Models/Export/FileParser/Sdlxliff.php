@@ -110,6 +110,9 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
             $j = $i + 2;
             //$segmentArr[$i] = '<' . pack('H*', $segmentArr[$i + 1]) .'">';
             $segmentArr[$i] = $rebuildTag($segmentArr[$i], $segmentArr[$j], $segmentArr[$i + 1]);
+            $search = array('hardReturn /','softReturn /','macReturn /');
+            $replace = array('hardReturn/','softReturn/','macReturn/');
+            $segmentArr[$i] = str_replace($search, $replace, $segmentArr[$i]);
             unset($segmentArr[$j]);
             unset($segmentArr[$i + 1]);
             $i = $i + 4;
