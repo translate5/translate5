@@ -132,6 +132,9 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
      */
     public function writeToDisk(string $filename) {
         $w = new PHPExcel_Writer_Excel2007($this->xls);
+        //enabling this, see TRANSLATE-544
+        // if we got bad write performance we can disable it again!
+        $w->setPreCalculateFormulas(true);
         $w->save($filename.self::FILE_SUFFIX);
         
         if($this->debug) {
