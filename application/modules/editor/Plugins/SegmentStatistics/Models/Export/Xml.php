@@ -119,6 +119,9 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xml extends editor_Plugins_
         
         //add the statistics per field for whole task
         $fields = $xml->addChild('fields');
+        if(empty($statistics->taskFields[$type])) {
+            return;
+        }
         foreach($statistics->taskFields[$type] as $fieldName => $fieldStat) {
             $field = $fields->addChild('field');
             $field->addChild('fieldName', $fieldName);
