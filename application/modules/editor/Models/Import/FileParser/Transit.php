@@ -405,13 +405,16 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
      * @param string $segment
      */
     protected function splitSegment(string $segment) {
-        $splitByAndInsert = function ($tagStart,$regex,$i){
+        $splitByAndInsert = function ($tagStart,$regex,$i) use ($segment){
             if (strpos($this->segmentParts[$i] ,$tagStart)!== false){//this is to save performance
                 $parts = preg_split($regex, $this->segmentParts[$i], NULL, PREG_SPLIT_DELIM_CAPTURE);
                 if(count($parts)>1){
                     array_splice($this->segmentParts, $i, 1, $parts);
                     $this->segmentPartsCount = count($this->segmentParts);
                     return;
+                }
+                if(ZfExtended_Debug::hasLevel('import', 'transit')) {
+                    error_log('Segment tags could not be parsed, TaskGuid: '.$this->task->getTaskGuid().' Segment content: '.$segment);
                 }
                 trigger_error('If tagName is present, parts should always be bigger than 1');
             }
@@ -426,10 +429,10 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
             $splitByAndInsert('</SubSeg>','"(</SubSeg>[^~]*?~)"s',$i);
             $splitByAndInsert('<Tag','"(<Tag [^>]*?>[^~]*?~)"s',$i);
             $splitByAndInsert('<FontTag','"(<FontTag [^>]*?>.*?</FontTag>)"s',$i);
-            $splitByAndInsert('<WS','"(<WS [^>]*?/>)"s',$i);
             $splitByAndInsert('<NL','"(<NL[^>]*?>.*?</NL>)"s',$i);
             $splitByAndInsert('<NU','"(<NU[^>]*?>.*?</NU>)"s',$i);
             $splitByAndInsert('<Tab','"(<Tab[^>]*?>.*?</Tab>)"s',$i);
+            $splitByAndInsert('<WS','"(<WS [^>]*?/>)"s',$i);
             $i++;
         }
         $this->segmentParts = str_replace( array('~','__TranSiT_TRANSTiLde__'),array('</Tag>','~'), $this->segmentParts);
