@@ -125,7 +125,7 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
      * but instead use beo-transit-classes to write changed segments
      */
     protected function parse(){
-        if(!$this->isEvenLanguagePair()){
+        if(!$this->isEvenLanguagePair($this->_task->getTaskGuid(), $this->sourcePath, $this->path)){
             $this->_exportFile = $this->targetDOM->getAsString();
             return;
         }
