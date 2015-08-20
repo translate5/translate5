@@ -76,13 +76,18 @@ class editor_Models_Import_TermListParser_TbxReimportMissing extends editor_Mode
     
     public function importMissing(editor_Models_Task $task){
         $this->term = ZfExtended_Factory::get('editor_Models_Term');
-        $sourceLang = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $sourceLang editor_Models_Languages */
-        $sourceLang->load($task->getSourceLang());
         
-        $targetLang = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $sourceLang editor_Models_Languages */
-        $targetLang->load($task->getTargetLang());
+        try {
+            $sourceLang = ZfExtended_Factory::get('editor_Models_Languages');
+            /* @var $sourceLang editor_Models_Languages */
+            $sourceLang->load($task->getSourceLang());
+            
+            $targetLang = ZfExtended_Factory::get('editor_Models_Languages');
+            /* @var $sourceLang editor_Models_Languages */
+            $targetLang->load($task->getTargetLang());
+        } catch(ZfExtended_Models_Entity_NotFoundException $e){
+            return false;
+        }
         
         $tbx = new SplFileInfo(self::getTbxPath($task));
         if(!$tbx->isReadable()) {
