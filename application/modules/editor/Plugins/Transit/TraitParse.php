@@ -48,13 +48,19 @@ trait editor_Plugins_Transit_TraitParse {
     
     /**
      * checks if number of source and target-segments match - and logs it if not
+     * @param string $taskGuid
+     * @param string $source source file path
+     * @param string $target target file path 
      * @return boolean
      */
-    protected function isEvenLanguagePair() {
+    protected function isEvenLanguagePair($taskGuid, $source, $target) {
         if ($this->sourceDOM->getSegmentCount() === $this->targetDOM->getSegmentCount()){
             return true;
         }
-        $msg = "The number of segments of source- and target-files are not identical. LanguagePair can not be parsed properly. Path to targetFile is ".$path;
+        $msg = "The number of segments of source- and target-files are not identical. ";
+        $msg .= "Transit LanguagePair can not be parsed properly. TaskGuid: ".$taskGuid." ";
+        $msg .= "SourcePath: ".$source." ";
+        $msg .= "TargetPath: ".$target." ";
         $this->log->logError($msg);
         return false;
     }

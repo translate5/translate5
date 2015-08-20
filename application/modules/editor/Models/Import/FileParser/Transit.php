@@ -171,7 +171,8 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     protected function parse(){
         $counterTrans = 0;
         $this->setSkeletonfile();
-        if(!$this->isEvenLanguagePair()){
+        if(!$this->isEvenLanguagePair($this->_taskGuid, $this->sourcePath, $this->_path)){
+            trigger_error("The number of segments of source- and target-files are not identical");
             return;
         }
         $sourceSegs = $this->sourceDOM->getSegments();
@@ -198,8 +199,6 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         }
         
         //TODO: prüfen, ob lockedForRefMat und notTranslated (sowohl mit Status in transit als auch durch leeres Zielsegment, aber nicht Quellsegment) korrekt gesperrt werden; prüfen, was sonst noch geprüft werden muss
-        
-        //@TODO: test isEvenLanguagePair
     }
     
     /**
