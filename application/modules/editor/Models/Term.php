@@ -58,6 +58,8 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     );
 
     protected $dbInstanceClass = 'editor_Models_Db_Terms';
+    
+    protected static $groupIdCache = array();
 
     /**
      * returns for a termId the associated termentries by group 
@@ -77,6 +79,28 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         ->where('t2.taskGuid = ?', $taskGuid)
         ->where('t2.language = ? and t2.groupId = ('.$s1->assemble().')', $langId);
         return $this->db->getAdapter()->fetchAll($s2);
+    }
+    
+    /**
+     * returns an array with groupId and term to a given mid
+     * @param string $mid
+     * @param string $taskGuid
+     * @return array
+     */
+    public function getTermAndGroupIdToMid($mid, $taskGuid) {
+        if(!empty(self::$groupIdCache[$mid])) {
+            return self::$groupIdCache[$mid];
+        }
+        $select = $this->db->select()
+        ->from($this->db, array('groupId', 'term'))
+        ->where('taskGuid = ?', $taskGuid)
+        ->where('mid = ?', $mid);
+        $res = $this->db->fetchRow($select);
+        if(empty($res)) {
+            return $res;
+        }
+        self::$groupIdCache[$mid] = $res;
+        return $res->toArray();
     }
     
     
