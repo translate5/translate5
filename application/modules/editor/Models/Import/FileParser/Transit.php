@@ -413,10 +413,10 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
                     $this->segmentPartsCount = count($this->segmentParts);
                     return;
                 }
-                if(ZfExtended_Debug::hasLevel('import', 'transit')) {
+                if(ZfExtended_Debug::hasLevel('plugin', 'transit')) {
                     error_log('Segment tags could not be parsed, TaskGuid: '.$this->task->getTaskGuid().' Segment content: '.$segment);
                 }
-                trigger_error('If tagName is present, parts should always be bigger than 1');
+                trigger_error('If tagName is present, parts should always be bigger than 1)');
             }
         };
 

@@ -113,7 +113,7 @@ class editor_Models_Export_FileParser_TransitInfoField {
         $this->config = $config;
         $this->segment = $segment;
         $this->translate = $translate;
-        $this->debug = ZfExtended_Debug::hasLevel('export', 'transit');
+        $this->debug = ZfExtended_Debug::hasLevel('plugin', 'transit');
     }
     
     /**
@@ -126,7 +126,7 @@ class editor_Models_Export_FileParser_TransitInfoField {
         $this->infoFieldAddDate();
         $this->infoFieldAddStatus();
         $this->infoFieldAddTerms();
-        if(ZfExtended_Debug::hasLevel('export', 'transit', 2)) {
+        if(ZfExtended_Debug::hasLevel('plugin', 'transit', 2)) {
             $id = $this->segment->getId();
             $mid = $this->segment->getMid();
             error_log("Add Transit Info to Segment Id: ".$id." Mid: ".$mid." Info: ".$this->transitInfoString);
@@ -340,22 +340,44 @@ class editor_Models_Export_FileParser_TransitInfoField {
     protected function logFoundMismatch() {
         foreach($this->sourceGidsStatCount as $gid => $stat){
             $foundInSource = empty($stat['transFound']) ? 0 : $stat['transFound'];
+            $notFoundInSource = empty($stat['transNotFound']) ? 0 : $stat['transNotFound'];
             $foundInTarget = empty($this->targetGidsCount[self::TARGET_TYPE_EDITED][$gid]) ? 0 : $this->targetGidsCount[self::TARGET_TYPE_EDITED][$gid];
-            if($foundInSource !== $foundInTarget){
-                $log = ZfExtended_Factory::get('ZfExtended_Log');
-                /* @var $log ZfExtended_Log */
-                $msg = 'Count of transFound source terms with gid '.$gid.' is '.$foundInSource.' but count in target edited is '.$foundInTarget;
-                if($this->debug) {
-                    $log->logError($msg);
-                    $msg .= ' Source Terms: '.print_r($this->gidTermsSource[$gid],1);
-                    $msg .= ' Target Terms: '.print_r($this->gidTermsTarget[$gid],1);
-                    $msg .= ' Segment: '.print_r($this->segment->getDataObject(),1)."\n in ".__FILE__.': '.__LINE__;
-                    error_log($msg);
-                } else {
-                    $msg .= ' These values should be equal. Enable level 2 debugging for transit plugin and reexport to get more infos in error log.';
-                    $log->logError($msg);
-                }
+            if(ZfExtended_Debug::hasLevel('plugin', 'transit', 4)){
+                //STRICT Mode (with many false positives because in target may more terms as in source):
+                //strict mode exists because it can reveal issues with the termtagger 
+                $error = $foundInTarget !== $foundInSource;
             }
+            else {
+                //DEFAULT: more terms in target as found in source is allowed, but only if corresponding notFounds are 0
+                $error = $notFoundInSource == 0 && $foundInSource > $foundInTarget || $notFoundInSource > 0 && $foundInSource !== $foundInTarget;
+            }
+            if(!$error){
+                continue;
+            }
+            $log = ZfExtended_Factory::get('ZfExtended_Log');
+            /* @var $log ZfExtended_Log */
+            $msg = 'Count of transFound source terms with gid '.$gid.' is '.$foundInSource.' but count in target edited is '.$foundInTarget;
+            if(!$this->debug) {
+                $msg .= ' These values should be equal. Enable debugging for export.transit and reexport to get more infos in error log.';
+                $msg .= ' TaskGuid: '.$this->task->getTaskGuid();
+                $log->logError($msg);
+                continue;
+            }
+            $log->logError($msg);
+            if(isset($this->gidTermsSource[$gid])) {
+                $msg .= ' Source Terms: '.print_r($this->gidTermsSource[$gid],1);
+            }
+            else {
+                $msg .= ' Source Terms: empty';
+            }
+            if(isset($this->gidTermsTarget[$gid])) {
+                $msg .= ' Target Terms: '.print_r($this->gidTermsTarget[$gid],1);
+            }
+            else {
+                $msg .= ' Target Terms: empty';
+            }
+            $msg .= ' Segment: '.print_r($this->segment->getDataObject(),1)."\n in ".__FILE__.': '.__LINE__;
+            error_log($msg);
         }
     }
 }
