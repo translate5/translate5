@@ -84,12 +84,16 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
     
     public function termtaggerAction() {
         echo "<h1>TermTagger Tests; ".  date(DATE_RFC2822)."</h1>";
-        $this->loopThroughTestXmlFiles();
+        $this->loopThroughTestXmlFiles($this->getParam('filter', null));
         $this->echoResultSummary();
     }
     
-    protected function loopThroughTestXmlFiles() {
+    protected function loopThroughTestXmlFiles($filter = null) {
         while ($file = $this->getNextTestXml()) {
+            if(!empty($filter) && strpos(basename($file), $filter) === false) {
+                continue;
+            }
+            
             $resultPreparation = $this->runTests($file,  $this->testcasePreparation);
             if(!$resultPreparation->wasSuccessful()){
                 $this->echoResults($resultPreparation,$file);
