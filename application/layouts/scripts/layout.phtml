@@ -69,11 +69,13 @@ echo $this->doctype() ?>
             
         <ul>
             <?php
-            foreach ($menu as $item) {
-                $item = (array)$item;
-                $item = each($item);
-                $class = ($item['key']===$_SERVER['REQUEST_URI'])?' class="active"':'';
-                echo '<li><a href="'.$item['key'].'"'.$class.'>'.$this->translate->_($item['value']).'</a></li>';
+            if(!is_null($menu)){
+                foreach ($menu as $item) {
+                    $item = (array)$item;
+                    $item = each($item);
+                    $class = ($item['key']===$_SERVER['REQUEST_URI'])?' class="active"':'';
+                    echo '<li><a href="'.$item['key'].'"'.$class.'>'.$this->translate->_($item['value']).'</a></li>';
+                }
             }
             ?>
             <li class="clear">&nbsp;</li>
