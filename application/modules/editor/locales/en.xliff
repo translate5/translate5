@@ -1147,6 +1147,14 @@
   <source>Eine neue Version von Translate5 ist verfügbar. Bitte benutzen Sie das Installations und Update Script um die aktuellste Version zu installieren.</source>
   <target>A new version of Translate5 is now available. Please use the install and update script to download and install the latest version.</target>
 </trans-unit>
+  <trans-unit id='PGI+PGk+w5xiZXJzY2hyZWliZSBaaWVsdGV4dCBtaXQ6PC9pPjwvYj4g'>
+    <source><b><i>Überschreibe Zieltext mit:</i></b> </source>
+    <target><b><i>Overwrite target with:</i></b> </target>
+  </trans-unit>
+  <trans-unit id='PGI+PGk+w5xiZXJzY2hyZWliZSBRdWVsbHRleHQgbWl0OjwvaT48L2I+IA=='>
+    <source><b><i>Überschreibe Quelltext mit:</i></b> </source>
+    <target><b><i>Overwrite source with:</i></b> </target>
+  </trans-unit>
     </body>
   </file>
 </xliff>

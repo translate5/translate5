@@ -42,6 +42,11 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
     protected $entityClass = 'editor_Models_Segment';
 
     /**
+     * @var boolean
+     */
+    protected $isSourceEditable = false;
+    
+    /**
      * @var editor_Models_Segment
      */
     protected $entity;
@@ -76,28 +81,25 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
     public function putAction() {
         $session = new Zend_Session_Namespace();
         $editedSegmentId = (int)$this->_getParam('id');
-        $fieldToProcess = (string)$this->_getParam('process');
-        $editField = $fieldToProcess.'Edit';
-        $duration = new stdClass();
-        $duration->$editField = (int)$this->_getParam('duration');
 
         $wfh = $this->_helper->workflow;
         /* @var $wfh ZfExtended_Controller_Helper_Workflow */
         $wfh->checkWorkflowWriteable();
 
         $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($session->taskGuid);
-        $fieldMeta = $sfm->getByName($fieldToProcess);
-        $isRelais = ($fieldMeta !== false && $fieldMeta->type == editor_Models_SegmentField::TYPE_RELAIS);
         //Only default Layout and therefore no relais can be processed:
-        if(!$sfm->isDefaultLayout() || $isRelais) {
+        if(!$sfm->isDefaultLayout()) {
             return;
         }
         
         $sourceMeta = $sfm->getByName(editor_Models_SegmentField::TYPE_SOURCE);
-        $isSourceEditable = ($sourceMeta !== false && $sourceMeta->editable == 1);
+        $this->isSourceEditable = ($sourceMeta !== false && $sourceMeta->editable == 1);
+
+        $duration = new stdClass();
         
-        $getter = 'get'.$editField;
-        $setter = 'set'.$editField;
+        $this->fieldLoop(function($field, $editField, $getter, $setter) use ($duration){
+            $duration->$editField = (int)$this->_getParam('duration');
+        });
         
         $this->entity->load($editedSegmentId);
         
@@ -108,10 +110,15 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         
         $config = Zend_Registry::get('config');
         if($config->runtimeOptions->editor->enableQmSubSegments) {
-            $qmSubsegmentAlikes = ZfExtended_Factory::get('editor_Models_QmsubsegmentAlikes');
-            /* @var $qmSubsegmentAlikes editor_Models_QmsubsegmentAlikes */
-            $qmSubsegmentAlikes->parseSegment($this->entity->{$getter}(), $editedSegmentId);
+            $qmSubsegmentAlikes = $this->fieldLoop(function($field, $editField, $getter, $setter) use ($editedSegmentId){
+                $qmSubsegmentAlikes = ZfExtended_Factory::get('editor_Models_QmsubsegmentAlikes');
+                /* @var $qmSubsegmentAlikesSource editor_Models_QmsubsegmentAlikes */
+                $qmSubsegmentAlikes->parseSegment($this->entity->{$getter}(), $editedSegmentId);
+                return $qmSubsegmentAlikes;
+            });
         }
+        
+        error_log("XHERE".print_r($qmSubsegmentAlikes,1));
         
         $states = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
         /* @var $states editor_Models_SegmentAutoStates */
@@ -141,17 +148,22 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                     continue;
                 }
 
-                //Entity befüllen:
-                if($config->runtimeOptions->editor->enableQmSubSegments) {
-                    $entity->{$setter}($qmSubsegmentAlikes->cloneAndUpdate($id, $fieldToProcess));
-                }
-                else {
-                    $entity->{$setter}($this->entity->{$getter}());
-                }
-                $entity->updateToSort($editField);
+                
+                $this->fieldLoop(function($field, $editField, $getter, $setter) use ($id, $entity, $config, $qmSubsegmentAlikes){
+                    //Entity befüllen:
+                    if($config->runtimeOptions->editor->enableQmSubSegments) {
+                        $entity->{$setter}($qmSubsegmentAlikes[$field]->cloneAndUpdate($id, $field));
+                    }
+                    else {
+                        $entity->{$setter}($this->entity->{$getter}());
+                    }
+                    $entity->updateToSort($editField);
+                });
+                
                 
                 // take over source original only for non editing source, see therefore TRANSLATE-549
-                if(!$isSourceEditable) {
+                // if source is editable, content (term trans[Not]Found) is changed in the editable field not in the original
+                if(!$this->isSourceEditable) {
                     $entity->setSource($this->entity->getSource());
                 }
                 
@@ -187,6 +199,22 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         //numerisches Array für korrekten JSON Export
         $this->view->rows = array_values($result); 
         $this->view->total = count($result);
+    }
+    
+    /**
+     * Applies the given Closure for each editable segment field 
+     * (currently only source and target! Since ChangeAlikes are deactivated for alternatives)
+     * Closure Parameters: $field, $editField, $getter, $setter → 'target', 'targetEdit', 'getTargetEdit', 'setTargetEdit'
+     * 
+     * @param Closure $callback
+     */
+    protected function fieldLoop(Closure $callback) {
+        $result = array();
+        if($this->isSourceEditable) {
+            $result['source'] = $callback('source', 'sourceEdit', 'getSourceEdit', 'setSourceEdit');
+        }
+        $result['target'] = $callback('target', 'targetEdit', 'getTargetEdit', 'setTargetEdit');
+        return $result;
     }
 
     public function indexAction(){

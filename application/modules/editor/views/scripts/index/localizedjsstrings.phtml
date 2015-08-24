@@ -251,7 +251,8 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.ui.changealike.Window.prototype.item_saveBtn = '<?php echo $this->translate->_('Änderungen übernehmen');?>';
   	Editor.view.changealike.Window.prototype.items_help = <?php echo json_encode($this->translate->_('Hilfe:'));?>;
   	Editor.view.changealike.Window.prototype.items_segmentData = <?php echo json_encode('{edited}{addition}'); ?>;
-  	Editor.view.changealike.Window.prototype.additionSourceEdition = '<?php echo $this->translate->_('Achtung: Der Ausgangstext wird überschrieben!');?>';
+  	Editor.view.changealike.Window.prototype.overwriteSource = '<?php echo $this->translate->_('<b><i>Überschreibe Quelltext mit:</i></b> ');?>';
+  	Editor.view.changealike.Window.prototype.overwriteTarget = '<?php echo $this->translate->_('<b><i>Überschreibe Zieltext mit:</i></b> ');?>';
 
   	Editor.view.ui.changealike.Grid.prototype.item_segmentNrInTaskColumn = '<?php echo $this->translate->_('Nr.');?>';
   	Editor.view.ui.changealike.Grid.prototype.item_sourceColumn = '<?php echo $this->translate->_('Quelle');?>';
