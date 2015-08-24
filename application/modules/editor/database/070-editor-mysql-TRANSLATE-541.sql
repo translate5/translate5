@@ -27,8 +27,8 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-UPDATE  `Zf_configuration` SET  `default` = '["editor_Plugins_NoMissingTargetTerminology_Bootstrap","editor_Plugins_Transit_Bootstrap","editor_Plugins_SegmentStatistics_Bootstrap","editor_Plugins_TermTagger_Bootstrap"]' WHERE  `Zf_configuration`.`name` ='runtimeOptions.plugins.active';
+update `Zf_configuration` set `value` = replace(`value`, "editor_Plugins_SegmentStatistics_BootstrapEditableOnly", "editor_Plugins_SegmentStatistics_Bootstrap") 
+where name = 'runtimeOptions.plugins.active' and `value` like '%editor_Plugins_SegmentStatistics_BootstrapEditableOnly%';
 
-/*the value has to be changed, because by default all segments should be counted*/
-
-UPDATE  `Zf_configuration` SET  `value` = '["editor_Plugins_NoMissingTargetTerminology_Bootstrap","editor_Plugins_Transit_Bootstrap","editor_Plugins_SegmentStatistics_Bootstrap","editor_Plugins_TermTagger_Bootstrap"]' WHERE  `Zf_configuration`.`name` ='runtimeOptions.plugins.active';
+update `Zf_configuration` set `default` = replace(`default`, "editor_Plugins_SegmentStatistics_BootstrapEditableOnly", "editor_Plugins_SegmentStatistics_Bootstrap") 
+where name = 'runtimeOptions.plugins.active' and `default` like '%editor_Plugins_SegmentStatistics_BootstrapEditableOnly%';
