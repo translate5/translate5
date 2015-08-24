@@ -45,7 +45,8 @@ Ext.define('Editor.view.changealike.Window', {
   //Item Strings:
   items_segmentData: ['<h1>aktuell bearbeitetes Segment</h1>',
                '{edited}'],
-  additionSourceEdition: 'Achtung: Der Ausgangstext wird überschrieben!',
+  overwriteSource: '<b><i>#UT#Überschreibe Quelltext mit:</i></b> ',
+  overwriteTarget: '<b><i>#UT#Überschreibe Zieltext mit:</i></b> ',
   items_help: 'Hilfe:',
   loadingMask: null,
   loadedAlikes: null,
@@ -55,7 +56,6 @@ Ext.define('Editor.view.changealike.Window', {
   }],
   id: 'change-alike-window',
   openedFor: null,
-  sourceEdited: null,
   initComponent: function() {
     var me = this;
     me.items_segmentData = Ext.create('Ext.XTemplate', me.items_segmentData);
@@ -73,9 +73,8 @@ Ext.define('Editor.view.changealike.Window', {
   },
   /**
    * @param {Editor.model.Segment} rec
-   * @param {Boolean} sourceEdited
    */
-  show: function(rec, sourceEdited) {
+  show: function(rec) {
       //@todo SourceMatch Filterung im WDHE
       //und entsprechende Spalten im WDHE Grid ausblenden.
       //Editor.data.task.get('enableSourceEditing');
@@ -83,11 +82,10 @@ Ext.define('Editor.view.changealike.Window', {
           grid = me.down('.gridpanel'),
           id = rec.get('id');
       me.openedFor = id;
-      me.sourceEdited = sourceEdited;
       me.callParent();
-      me.updateInfoText(rec, sourceEdited);
+      me.updateInfoText(rec);
       if(me.loadedAlikes) {
-          grid.setAlikes(me.filterAlikes(me.loadedAlikes));
+          grid.setAlikes(me.loadedAlikes);
       }
       else {
           // setting a loading mask for the window / grid is not possible. 
@@ -97,11 +95,6 @@ Ext.define('Editor.view.changealike.Window', {
           me.down('toolbar').disable();
       }
       me.loadedAlikes = false; //reset flag after usage
-      Ext.Array.each(grid.columns, function(col){
-          if(col.dataIndex == 'targetMatch' || col.dataIndex == 'sourceMatch') {
-              col.setVisible(!sourceEdited);
-          }
-      });
   },
   /**
    * @param {Integer} id
@@ -112,41 +105,27 @@ Ext.define('Editor.view.changealike.Window', {
           grid = me.down('.gridpanel');
       me.loadedAlikes = alikes;
       if(grid.rendered){
-          grid.setAlikes(me.filterAlikes(alikes));
+          grid.setAlikes(alikes);
       }
       me.setLoading(false);
       me.loadingMask.hide();
       me.down('toolbar').enable();
   },
   /**
-   * Filters the alikes as needed by sourceEditing (if enabled)
-   * @param {Array} alikes
-   * @returns {Array}
-   */
-  filterAlikes: function(alikes) {
-      var me = this, 
-          result = [];
-      Ext.Array.each(alikes, function(rec){
-          //if source editing return only alikes with source matched = true 
-          if(me.sourceEdited && !rec.get('sourceMatch')) {
-              return;
-          }
-          result.push(rec);
-      });
-      return result;
-  },
-  /**
    * updates the text shown about the loaded segment in the Change Alike Editor
    * @param {Editor.model.Segment} segmentRecord
-   * @param {Boolean} sourceEdited
    */
-  updateInfoText: function(segmentRecord, sourceEdited) {
-      var edited = sourceEdited ? 'sourceEdit' : 'targetEdit';
-          addition = sourceEdited ? '<p class="changealike-info-text">'+this.additionSourceEdition+'</p>' : '';
+  updateInfoText: function(segmentRecord) {
+      var sourceEdit = segmentRecord.get('sourceEdit'),
+          targetEdit = segmentRecord.get('targetEdit');
 
+      if(sourceEdit) {
+          targetEdit = this.overwriteSource+sourceEdit+'<br style="margin-bottom:5px;"/>'+this.overwriteSource+targetEdit;
+      }
+      
       this.down('#infoText').update({
-          edited: segmentRecord.get(edited),
-          addition: addition,
+          edited: targetEdit,
+          addition: '',
           id: segmentRecord.get('id'),
           autoStateId: segmentRecord.get('autoStateId')
       });

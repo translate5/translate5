@@ -139,6 +139,7 @@ END LICENSE AND COPYRIGHT
 .segment-tag-column div.x-grid-cell-inner div.term,
 .segment-tag-container div.term {background:transparent;border-bottom:1px solid #0000ff;}
 
+#change-alike-window div.transNotFound,
 .segment-tag-column.type-source div.x-grid-cell-inner div.transNotFound,
 .segment-tag-container.type-source div.transNotFound {border-bottom-color:#ff0000;}
 

@@ -81,7 +81,6 @@ Ext.define('Editor.controller.ChangeAlike', {
   window: null,
   alikeSegmentsUrl: '',
   actualRecord: null,
-  isSourceEditing: null,
   timeTracking: null,
   isDisabled: false,
   callbackToSaveChain: Ext.emptyFn,
@@ -225,7 +224,6 @@ Ext.define('Editor.controller.ChangeAlike', {
           rec = context.record;
       me.callbackToSaveChain = finalCallback;
       me.actualRecord = rec;
-      me.isSourceEditing = me.getSourceEditing();
       me.saveIsRunning = true;
       if(me.isDisabled || me.isManualProcessingDisabled() || me.noAlikes()) {
           me.fireEvent('segmentUsageFinished', me);
@@ -238,26 +236,25 @@ Ext.define('Editor.controller.ChangeAlike', {
       }
       //manualProcessing:
       me.timeTracking = new Date(); // starting the time tracking
-      me.window.show(rec, me.isSourceEditing);
+      me.window.show(rec);
   },
   /**
    * @return boolean true, if no alikes are present
    */
   noAlikes: function() {
       var me = this;
-      me.isSourceEditing = me.getSourceEditing();
-      me.allAlikes = me.getAllAlikeIds(me.isSourceEditing);
+      me.allAlikes = me.getAllAlikeIds();
       if(Ext.isEmpty(me.allAlikes)) {
           return true;
       }
       return false;
   },
   /**
-   * checks if we are editing the source column or target
+   * checks if source editing is enabled
    * @returns {Boolean}
    */
   getSourceEditing: function() {
-      return this.getEditPlugin().editor.columnToEdit == "sourceEdit";
+      return Editor.data.task.get('enableSourceEditing');
   },
   /**
    * Startet das Speichern der Wiederholungen. Wird je nach Einstellung automatisch oder manuell getriggert.
@@ -274,11 +271,13 @@ Ext.define('Editor.controller.ChangeAlike', {
       editable: 0,
       autoStateId: 999
     };
-    if(me.isSourceEditing) {
+    if(me.getSourceEditing()) {
         data.sourceEdit = rec.data.sourceEdit;
-    }else {
-        data.targetEdit = rec.data.targetEdit;
     }
+    else {
+        data.source = rec.data.source;
+    }
+    data.targetEdit = rec.data.targetEdit;
     me.alikesToProcess = me.getAlikesToProcess();
     me.calculateUsedTime();
     
@@ -347,7 +346,6 @@ Ext.define('Editor.controller.ChangeAlike', {
       url: me.alikeSegmentsUrl+'/'+id,
       method: 'put',
       params: {
-          process: me.isSourceEditing ? 'source' : 'target',
           "duration": me.timeTracking,
           "alikes[]": alikes
       },
@@ -362,24 +360,19 @@ Ext.define('Editor.controller.ChangeAlike', {
    */
   getAlikesToProcess: function() {
       var me = this, 
-          allIds = me.getAllAlikeIds(me.isSourceEditing);
+          allIds = me.getAllAlikeIds();
       if(me.isAutoProcessing()){
           return allIds;
       }
       return me.getSelectedAlikeIds(allIds);
   },
   /**
-   * returns an array with all alike ids (filtered by sourceEditing)
-   * @param {Boolean} sourceEditing
+   * returns an array with all alike ids
    * @returns {Array}
    */
-  getAllAlikeIds: function(sourceEditing) {
+  getAllAlikeIds: function() {
     var result = [];
     Ext.Array.each(this.fetchedAlikes, function(rec){
-        //if source editing return only alikes with source matched = true 
-        if(sourceEditing && !rec.get('sourceMatch')) {
-            return;
-        }
         result.push(rec.get('id'));
     });
     return result;
