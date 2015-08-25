@@ -120,7 +120,7 @@ Ext.define('Editor.view.changealike.Window', {
           targetEdit = segmentRecord.get('targetEdit');
 
       if(sourceEdit) {
-          targetEdit = this.overwriteSource+sourceEdit+'<br style="margin-bottom:5px;"/>'+this.overwriteSource+targetEdit;
+          targetEdit = this.overwriteSource+sourceEdit+'<br style="margin-bottom:5px;"/>'+this.overwriteTarget+targetEdit;
       }
       
       this.down('#infoText').update({
