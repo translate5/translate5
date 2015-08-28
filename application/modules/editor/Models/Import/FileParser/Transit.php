@@ -40,7 +40,8 @@ END LICENSE AND COPYRIGHT
  * Difference to other importers: We do not use placeholders in skeleton-files
  * due to the way beo transit-classes work (they always generate the whole file
  * from a DOM on save)
- *
+ * 
+ * this assumes, that there are no nested internal tags in transit
  *
  */
 class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileParser{
@@ -83,21 +84,21 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     protected $log;
     
     /**
-     * used for parsing of a segment
-     * @var array 
-     */
-    protected $segmentParts = array();
-    
-    /**
-     * used for parsing of a segment
-     * @var integer
-     */
-    protected $segmentPartsCount = 0;
-    /**
      * used for parsing of a segment; is the Nr. a tag is marked with in the Javascript view
      * @var integer
      */
     protected $shortTagIdent = 1;
+    /**
+     * used for assigning beginning tags to ending tags
+     * @var array
+     */
+    protected $beginINumbers = array();
+    /**
+     * used for assigning beginning tags to ending tags
+     * @var array
+     */
+    protected $endINumbers = array();
+        
     /**
      * used for parsing of a segment; endTags contains information about endTags found in a segment
      * @var array 
@@ -108,6 +109,16 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
      * @var editor_Models_Segment_Meta
      */
     protected $meta;
+    /**
+     *
+     * @var array
+     */
+    protected $whitespaceSearch = array(
+                '#<hardReturn/>#',
+                '#<softReturn/>#',
+                '#<macReturn/>#',
+                '#<space ts="[^"]*"/>#',
+        );
 
     /**
      * 
@@ -270,24 +281,12 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         $this->endTags = array();
         $this->shortTagIdent = 1;
         
-        $this->splitSegment($segment);
+        $segment = $this->parseTags($segment);
         
-        $this->parseWsTags();
-        
-        $this->parseSubSegs();
-        
-        $this->parseDefinedSingleTags();
-        
-        $this->parseEndTags('Tag');
-        $this->parseBeginTags('Tag');
-        
-        $this->parseEndTags('FontTag');
-        $this->parseBeginTags('FontTag');
-        
-        $this->checkForUndefinedTags();
-        
-        $this->parseWhitespace();
-        return implode('', $this->segmentParts);
+        $segment = $this->parseWhitespace($segment);
+        $this->checkForUndefinedTags($segment);
+
+        return $segment;
     }
     
     /**
@@ -334,64 +333,60 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         }
         return (int)$matches[1];
     }
-    /**
-     * single tags parsed by this method: NL, NU and "Tag pos="Point"
-     * 
-     * new tags should also be added to containsOnlyTagsOrEmpty
-     */
-    protected function parseDefinedSingleTags(){
-        for($i = 1; $i < $this->segmentPartsCount; $i++) {
-            $tag = &$this->segmentParts[$i];
-           
-            if (
-                    strpos($tag ,'<Tab')!== false ||
-                    strpos($tag ,'<NL')!== false ||
-                    strpos($tag ,'<NU')!== false ||
-                    strpos($tag ,'<Tag pos="Point"')!== false 
-                ){
-                if(preg_match('"^<([^ >]*)"s', $tag, $matches)!==1){
-                    trigger_error('Tagname not found, something went wrong: '.$tag);
-                }
-                $tagName = $matches[1];
-                $shortTagIdent = $this->shortTagIdent++;
-                $tagText = $this->getTagText($tag, $tagName);
-                $tagType = '_singleTag';
-                $tag = $this->createTag($tag, $shortTagIdent, $tagName, $tagType, $tagText);
-            }
-            $i++;
-        }
-    }
-    protected function parseSubSegs(){
-        $subSegFound = false;
-        for($i = 1; $i < $this->segmentPartsCount; $i++) {
-            $tag = &$segmentParts[$i];
-            if (preg_match('"<SubSeg[^>/]*?>"s',$tag)=== 1){
+    protected function parseSubSegs($tagString){
+        $protect = function($string) {
+            return str_replace(array('~','</SubSeg>','µ','<SubSeg'), array('__TranSiT_TRANSTiLde__','~','__TranSiT_TRANSPiI__','µ'), $string);
+        };
+        $unprotect = function($string) {
+            return str_replace( array('~','__TranSiT_TRANSTiLde__','µ','__TranSiT_TRANSPiI__'),array('</SubSeg>','~','<SubSeg','µ'), $string);
+        };
+        
+        $tagString = $protect($tagString);
+        $parts = preg_split('"([^~]*?µ[^>/]*?>)([^~]*?)(~[^~µ]*)"s', $tagString, NULL, PREG_SPLIT_DELIM_CAPTURE);
+        $count = count($parts);
+        $shortTagIdentOld = false;
+        for($i = 0; $i < $count; $i++) {
+            $tag = &$parts[$i];
+            /*ob_start();
+            echo "xxxxxx";
+            var_dump($tag);
+            error_log(ob_get_clean());*/
+            if (preg_match('"µ[^>/]*?>"s',$tag)=== 1){
+                #error_log('starting subseg');
                 $tagName = 'SubSeg';
                 $shortTagIdent = $this->shortTagIdent++;
                 $tagText = 'SubSeg';
                 $tagType = '_leftTag';
-                $tag = $this->createTag($tag, $shortTagIdent, $tagName, $tagType, $tagText);
-                $subSegFound = $i;
+                $tag = $this->createTag($unprotect($tag), $shortTagIdent, $tagName, $tagType, $tagText);
             }
-            
-            if ($subSegFound && $subSegFound != $i && strpos($tag ,'<SubSeg')!== false){
-                trigger_error('we do not support nested SubSegs so far');
-            }
-            if (strpos($tag,'</SubSeg>')!== false){
+            elseif (strpos($tag, '~')!==false){
+                #error_log('ending subseg');
+                if(!isset($shortTagIdent)||$shortTagIdent === $shortTagIdentOld){
+                    trigger_error('In the file '.$this->sourcePath.' a closing SubSeg has been found before a corresponding opening SubSeg');
+                }
+                $shortTagIdentOld = $shortTagIdent;
                 $tagName = 'SubSeg';
-                $shortTagIdent = $this->shortTagIdent++;
                 $tagText = 'SubSeg';
                 $tagType = '_rightTag';
-                $tag = $this->createTag($tag, $shortTagIdent, $tagName, $tagType, $tagText);
+                $tag = $this->createTag($unprotect($tag), $shortTagIdent, $tagName, $tagType, $tagText);
             }
-            $i++;
+            else{
+                #error_log('subSeg: '.$tag);
+                $tag = $protect($this->parseTags($unprotect($tag)));
+            }
         }
+        /*
+        ob_start();
+        var_dump($parts);
+        error_log(ob_get_clean());*/
+        $tagString = implode('', $parts);
+        return $unprotect($tagString);
     }
     
     protected function createTag($tag, $shortTagIdent, $tagName, $tagType, $tagText) {
         $fileNameHash = md5($tagText);
         if(strpos($tagText, '<') !== false ||strpos($tagText, '"') !== false){
-            $tagText = htmlspecialchars($tagText, ENT_XML1);
+            $tagText = htmlspecialchars($tagText, ENT_QUOTES | ENT_XML1);
         }
         $p = $this->getTagParams($tag, $shortTagIdent, $tagName, $fileNameHash, $tagText);
         $tag = $this->$tagType->getHtmlTag($p);
@@ -401,41 +396,98 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     }
     /**
      * new tags should also be added to containsOnlyTagsOrEmpty
+     * this assumes, that there are no nested internal tags in transit
      * 
      * @param string $segment
      */
-    protected function splitSegment(string $segment) {
-        $splitByAndInsert = function ($tagStart,$regex,$i) use ($segment){
-            if (strpos($this->segmentParts[$i] ,$tagStart)!== false){//this is to save performance
-                $parts = preg_split($regex, $this->segmentParts[$i], NULL, PREG_SPLIT_DELIM_CAPTURE);
-                if(count($parts)>1){
-                    array_splice($this->segmentParts, $i, 1, $parts);
-                    $this->segmentPartsCount = count($this->segmentParts);
-                    return;
-                }
-                if(ZfExtended_Debug::hasLevel('plugin', 'transit')) {
-                    error_log('Segment tags could not be parsed, TaskGuid: '.$this->task->getTaskGuid().' Segment content: '.$segment);
-                }
-                trigger_error('If tagName is present, parts should always be bigger than 1)');
-            }
-        };
-
-        $this->segmentParts = array($segment);
-        $this->segmentPartsCount = 1;
-        $this->segmentParts = str_replace(array('~','</Tag>'), array('__TranSiT_TRANSTiLde__','~'), $this->segmentParts);
+    protected function parseTags(string $segment) {
+        $qp = qp('<root>'.$segment.'</root>', ':root',array('format_output'=> false, 'encoding'=>'UTF-8','use_parser'=>'xml'));
+        /* @var $qp \QueryPath\DOMQuery */
+        $this->parsePairedTag($qp, 'Tag');
+        $this->parsePairedTag($qp, 'FontTag');
+        $this->parseSingleTag($qp, 'NL');
+        $this->parseSingleTag($qp, 'NU');
+        $this->parseSingleTag($qp, 'Tab');
+        $this->parseSingleTag($qp, 'WS');
+        $this->parseSingleTag($qp, 'UC');
         
-        for($i = 0; $i < $this->segmentPartsCount; $i++) {
-            $splitByAndInsert('<SubSeg>','"(<Tag [^>]*?>[^~]*?<SubSeg[^>/]*?>)"s',$i);
-            $splitByAndInsert('</SubSeg>','"(</SubSeg>[^~]*?~)"s',$i);
-            $splitByAndInsert('<Tag','"(<Tag [^>]*?>[^~]*?~)"s',$i);
-            $splitByAndInsert('<FontTag','"(<FontTag [^>]*?>.*?</FontTag>)"s',$i);
-            $splitByAndInsert('<NL','"(<NL[^>]*?>.*?</NL>)"s',$i);
-            $splitByAndInsert('<NU','"(<NU[^>]*?>.*?</NU>)"s',$i);
-            $splitByAndInsert('<Tab','"(<Tab[^>]*?>.*?</Tab>)"s',$i);
-            $splitByAndInsert('<WS','"(<WS [^>]*?/>)"s',$i);
-            $i++;
+        return $qp->innerXML();
+    }
+    /**
+     * 
+     * @param \QueryPath\DOMQuery $qp
+     * @param string $tagName
+     */
+    protected function parseSingleTag(\QueryPath\DOMQuery $qp, string $tagName) {
+        $tagTags = $qp->find('root > '.$tagName);
+        foreach ($tagTags->get(NULL, TRUE) as $tagTag) {
+            $this->createSingleTag($tagTag,$tagName);
         }
-        $this->segmentParts = str_replace( array('~','__TranSiT_TRANSTiLde__'),array('</Tag>','~'), $this->segmentParts);
+    }
+    
+    protected function createSingleTag(DOMElement $tag,string $tagName) {
+        $tagString = $tag->ownerDocument->saveXML($tag);
+        #error_log('tagstring '.$tagString);
+        $tagText = $this->getTagText($tagString, $tagName);
+        $tagType = '_singleTag';
+        $tagString = $this->createTag($tagString, $this->shortTagIdent++, $tagName, $tagType, $tagText);
+        $this->replaceDOMElementWithXML($tagString, $tag);
+    }
+    
+    protected function replaceDOMElementWithXML(string $xml,  DOMElement $element) {
+        $dom = $element->ownerDocument;
+        $f = $dom->createDocumentFragment();
+        $f->appendXML($xml);
+        $dom->documentElement->replaceChild($f, $element);        
+    }
+    /**
+     * 
+     * @param \QueryPath\DOMQuery $qp
+     * @param string $tagName
+     */
+    protected function parsePairedTag(\QueryPath\DOMQuery $qp, string $tagName) {
+        $tagTags = $qp->find('root > '.$tagName);
+        foreach ($tagTags->get(NULL, TRUE) as $tagTag) {
+            /* @var $tagTag DOMElement */
+            $pos = $tagTag->getAttribute('pos');
+            if($tagTag->hasAttribute('i')){
+                if($pos === 'Begin'){
+                    $this->beginINumbers[$tagTag->getAttribute('i')] = false;
+                }
+                if($pos === 'End'){
+                    $this->endINumbers[$tagTag->getAttribute('i')] = false;
+                }
+            }
+        }
+        foreach ($tagTags->get(NULL, TRUE) as $tagTag) {
+            /* @var $tagTag DOMElement */
+            $pos = $tagTag->getAttribute('pos');
+            $tagString = $tagTag->ownerDocument->saveXML($tagTag);
+            #error_log('tagstring '.$tagString);
+            $i = false;
+            if($tagTag->hasAttribute('i')){
+                $i = $tagTag->getAttribute('i');
+            }
+            if(strpos($tagString, '<SubSeg')!==false && strpos($tagString, '</SubSeg>')!==false){//the strpos insures, that <SubSeg/>-tags (without content) are not handled as SubSeg
+                #error_log('SubSeg found');
+                $tagString = $this->parseSubSegs($tagString);
+                if($tagTag->hasAttribute('i')){
+                    unset($this->beginINumbers[$i]);
+                    unset($this->endINumbers[$i]);
+                }
+            }
+            elseif ($pos === 'Point') {
+                $this->createSingleTag($tagTag,$tagName);
+                continue;
+            }
+            elseif($pos ==='Begin'){
+                $tagString = $this->parseBeginTags($tagName, $tagString,$i);
+            }
+            elseif($pos ==='End'){
+                $tagString = $this->parseEndTags($tagName, $tagString,$i);
+            }
+            $this->replaceDOMElementWithXML($tagString, $tagTag);
+        }
     }
     /**
      * 
@@ -447,100 +499,57 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         return preg_replace('"<'.$tagName.' .*?>(.*?)</'.$tagName.'>"', '\\1', $tag);
     }
     
-    protected function parseWhitespace() {
+    protected function parseWhitespace(string $segment) {
         //@TODO: This should be removed here and in other fileParsers and moved to parent fileParser- antipattern. This must be done after merge in master due to things already done at this part there
-        $search = array(
-                '#<hardReturn/>#',
-                '#<softReturn/>#',
-                '#<macReturn/>#',
-                '#<space ts="[^"]*"/>#',
-        );
-        for($i = 0; $i < $this->segmentPartsCount; $i++) {
-            //set data needed by $this->whitespaceTagReplacer
-            $this->_segment = $this->segmentParts[$i];
-            $this->segmentParts[$i] = preg_replace_callback($search, array($this,'whitespaceTagReplacer'), $this->segmentParts[$i]);
-            $i++;
-        }
+        $this->_segment = $segment;
+        return preg_replace_callback($this->whitespaceSearch, array($this,'whitespaceTagReplacer'), $segment );
     }
     /**
-     * checks if there are any tags not covered by splitSegment or "Tag"-Tags or
+     * checks if there are any tags not covered by parseTags or "Tag"-Tags or
      * "FontTag"-Tags not covered by their methods. Thus has to be placed before
      * parseWhitespace() and after all other tag-parsing methods 
      */
-    protected function checkForUndefinedTags(){
-        //parse only even array-elements, because in those there should be no tags
-        for($i = 0; $i < $this->segmentPartsCount; $i++) {
-            //check for undefined tags
-            $part = &$this->segmentParts[$i];
-            if (strpos($part ,'<')!== false){
-                if(strpos(str_replace('<space ', '', $part), '<') !== false){//our whitespace-tags are still allowed
-                    trigger_error('In the segmentPart '.$part.' a tag has been found.');
-                }
-            }
-            $i++;
-            $part = &$this->segmentParts[$i];
-            if (strpos($part ,'<Tag')!== false){
-                trigger_error('In the segmentPart '.$part.' a "Tag"-tag has been found, which not has been covered so far.');
-            }
-            if (strpos($part ,'<FontTag')!== false){
-                trigger_error('In the segmentPart '.$part.' a "FontTag"-tag has been found, which not has been covered so far.');
-            }
+    protected function checkForUndefinedTags(string $segment){
+        $segment = preg_replace('/<div[^>]+class="(open|close|single).*?".*?\/div>/is', '', $segment);
+        if (strpos($segment ,'<')!== false){
+            trigger_error('In the file '.$this->sourcePath.' in the segment '.$segment.' an undefined tag has been found.');
         }
     }
     /**
      * 
      * @param string $tagName
      */
-    protected function parseEndTags(string $tagName){
-        //parse only uneven array-elements, because those are the tags
-        for($i = 1; $i < $this->segmentPartsCount; $i++) {
-            $tag = &$this->segmentParts[$i];
-            if (strpos($tag ,'<'.$tagName.' pos="End"')!== false){
-                $tagType = '_rightTag';
-                $tagNr = $this->getTransitTagNr($tag);
-                if(!$tagNr){
-                    $tagType = '_singleTag';
-                }
-                else{
-                    $this->endTags[$this->shortTagIdent] = $tagNr;
-                }
-                $tagText = $this->getTagText($tag, $tagName);
-                $tag = $this->createTag($tag, $this->shortTagIdent++, $tagName, $tagType, $tagText);
-            }
-            $i++;
+    protected function parseEndTags(string $tagName, string $tag,$transitTagNr){
+        $tagType = '_rightTag';
+        if(!$transitTagNr){
+            $tagType = '_singleTag';
         }
+        $shortTagIdent = $this->getShortTagIdent($transitTagNr);
+        $tagText = $this->getTagText($tag, $tagName);
+        $tag = $this->createTag($tag, $shortTagIdent, $tagName, $tagType, $tagText);
+        return $tag;
     }
     
-    protected function parseWsTags(){
-        for($i = 1; $i < $this->segmentPartsCount; $i++) {
-            $tag = &$this->segmentParts[$i];
-            if (strpos($tag ,'<WS')!== false){
-                $shortTagIdent = $this->shortTagIdent++;
-                $tagName = 'WS';
-                $tagText = 'WS';
-                $tagType = '_singleTag';
-                $tag = $this->createTag($tag, $shortTagIdent, $tagName, $tagType, $tagText);
+    protected function getShortTagIdent($transitTagNr) {
+        if($transitTagNr && isset($this->beginINumbers[$transitTagNr])
+                && isset($this->endINumbers[$transitTagNr])){
+            if(!$this->beginINumbers[$transitTagNr]||!$this->endINumbers[$transitTagNr]){
+                $this->beginINumbers[$transitTagNr] = $this->shortTagIdent++;
+                $this->endINumbers[$transitTagNr] = $this->beginINumbers[$transitTagNr];
             }
-            $i++;
+            return $this->beginINumbers[$transitTagNr];
         }
+        return $this->shortTagIdent++;
+//@todo        auch sicherstellen, dass nicht end oder begin-tags mit dem selben i vorkommen
     }
-        
-    protected function parseBeginTags(string $tagName) {
-        //parse nur die ungeraden Arrayelemente, den dies sind die Rückgaben von PREG_SPLIT_DELIM_CAPTURE
-        for($i = 1; $i < $this->segmentPartsCount; $i++) {
-            $tag = &$this->segmentParts[$i];
-            if (strpos($tag ,'<'.$tagName.' pos="Begin"')!== false){
-                $tagType = '_leftTag';
-                $transitTagNr = $this->getTransitTagNr($tag);
-                $shortTagIdent = array_search($transitTagNr, $this->endTags);
-                if($shortTagIdent === false){
-                    $tagType = '_singleTag';
-                    $shortTagIdent = $this->shortTagIdent++;
-                }
-                $tagText = $this->getTagText($tag, $tagName);
-                $tag = $this->createTag($tag, $shortTagIdent, $tagName, $tagType, $tagText);
-            }
-            $i++;
+    protected function parseBeginTags(string $tagName, string $tag,$transitTagNr) {
+        $tagType = '_leftTag';
+        if(!$transitTagNr){
+            $tagType = '_singleTag';
         }
+        $shortTagIdent = $this->getShortTagIdent($transitTagNr);
+        $tagText = $this->getTagText($tag, $tagName);
+        $tag = $this->createTag($tag, $shortTagIdent, $tagName, $tagType, $tagText);
+        return $tag;
     }
 }
