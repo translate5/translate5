@@ -104,9 +104,12 @@ class editor_Plugins_Transit_File{
             throw new Zend_Exception("Transit-Body von $filename ist beschädigt/ungültig.");
         }
         
-        if ($this->getSegmentCount() == 0){
+        /* we do not need this here, has the editor_Models_Import_FileParser_Transit
+         * takes care of this
+         * 
+         * if ($this->getSegmentCount() == 0){
                 throw new Zend_Exception("Datei $filename enthält keine Segmente.");
-        }
+        }*/
         return (true);
     
     } // end of function "open"
@@ -127,10 +130,7 @@ class editor_Plugins_Transit_File{
     
     private function getNodeList($query){
         $nodes = $this->file_xpath->query($query);
-        if ($nodes->length > 0){
-            return $nodes;
-        }
-        return FALSE;
+        return $nodes;
     }
     
     /**
@@ -185,9 +185,6 @@ class editor_Plugins_Transit_File{
         }
         
         $nodes_segment = $this->getNodeList("//Seg");
-        if ($nodes_segment->length == 0){
-            return FALSE;
-        }
         
         foreach ( $nodes_segment as $node_segment ){
             if (! $this->segmentAdd($node_segment)){
