@@ -107,49 +107,6 @@ class IndexController extends ZfExtended_Controllers_Action {
         );
     }
 
-    public function checkconfigAction() {
-        echo "<h2>application agency loaded: </h2>".APPLICATION_AGENCY.'<br />';
-        echo "<h2>loaded INI config files:</h2>".join("<br/>\n", ZfExtended_BaseIndex::getInstance()->applicationInis).'<br />';
-        
-        echo "<h2>tests</h2>";
-        $this->_helper->layout->disableLayout();
-        $this->_helper->viewRenderer->setNoRender();
-        exit;
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $test = $config->runtimeOptions->imageTag->fontFilePath;
-        
-        if(! file_exists($test)){
-            echo 'ERROR "'.$test.'" does not exist!';
-            return;
-        }
-        if(! is_file($test)){
-            echo 'ERROR "'.$test.'" is not a File!';
-            return;
-        }
-        if(! is_readable($test)){
-            echo 'ERROR "'.$test.'" is not readable!';
-            return;
-        }
-        echo 'OK '.$test.' is a readable File!<br />';
-
-        $test = $config->runtimeOptions->termTagger->dir;
-        if(! file_exists($test)){
-            echo 'ERROR "'.$test.'" does not exist!';
-            return;
-        }
-        if(! is_dir($test)){
-            echo 'ERROR "'.$test.'" is not a Dir!';
-            return;
-        }
-        if(! is_readable($test)){
-            echo 'ERROR "'.$test.'" is not readable!';
-            return;
-        }
-        echo 'OK '.$test.' is a readable File!<br />';
-        exit;
-    }
-
     public function impressumAction(){
         $this->view->impressum = true;
     }
