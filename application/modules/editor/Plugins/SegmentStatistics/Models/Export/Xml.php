@@ -99,7 +99,7 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xml extends editor_Plugins_
             //implement next file:
             if($lastFileId != $fileStat['fileId']) {
                 $file = $files->addChild('file');
-                $file->addChild('fileName', $fileStat['fileName']);
+                $file->addChild('fileName', htmlentities($fileStat['fileName'],ENT_XML1));
                 $file->addChild('fileId', $fileStat['fileId']);
                 $fields = $file->addChild('fields');
                 $lastFileId = $fileStat['fileId'];
