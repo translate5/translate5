@@ -160,13 +160,13 @@ class editor_Plugins_Transit_File{
             if ($segment->isChanged()){
                 $node_segment->setAttribute("Data", $segment->getData());
                 $node_segment->nodeValue = "";
-                $text = $segment->getText();
-                if(empty($text)){
+                $text = (string)$segment->getText();
+                if($text === ''){
                     $node_segment->textContent = '';
                 }
                 else{
                     $newTextXML = $this->file->createDocumentFragment();
-                    $newTextXML->appendXML($segment->getText());
+                    $newTextXML->appendXML($text);
                     $node_segment->appendChild($newTextXML);
                 }
             }
