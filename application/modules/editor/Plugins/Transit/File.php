@@ -337,6 +337,9 @@ class editor_Plugins_Transit_File{
 
         $matchExpression = '(<Tag .*?>)(.*?)(<\/Tag>)';
         $file = mb_ereg_replace_callback($this->MBEncode($matchExpression), $callbackTagcontent, $file);
+
+        $matchExpression = '(<Tab .*?>)(.*?)(<\/Tab>)';
+        $file = mb_ereg_replace_callback($this->MBEncode($matchExpression), $callbackTagcontent, $file);
         $matchExpression = '(<Seg .*?>)(.*?)(<\/Seg>)';
         $file = mb_ereg_replace_callback($this->MBEncode($matchExpression), $callbackTagcontent, $file);
 
