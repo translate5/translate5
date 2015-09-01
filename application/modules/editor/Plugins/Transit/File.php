@@ -343,6 +343,10 @@ class editor_Plugins_Transit_File{
         
         $matchExpression = '(<Tab .*?>)(.*?)(<\/Tab>)';
         $file = mb_ereg_replace_callback($this->MBEncode($matchExpression), $callbackTagcontent, $file);
+        
+        $matchExpression = '(<NU .*?>)(.*?)(<\/NU>)';
+        $file = mb_ereg_replace_callback($this->MBEncode($matchExpression), $callbackTagcontent, $file);
+
         $matchExpression = '(<Seg .*?>)(.*?)(<\/Seg>)';
         $file = mb_ereg_replace_callback($this->MBEncode($matchExpression), $callbackTagcontent, $file);
 
