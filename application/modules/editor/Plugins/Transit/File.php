@@ -349,9 +349,9 @@ class editor_Plugins_Transit_File{
 
         $matchExpression = '(<Seg .*?>)(.*?)(<\/Seg>)';
         $file = mb_ereg_replace_callback($this->MBEncode($matchExpression), $callbackTagcontent, $file);
-
-        $file = mb_ereg_replace('<Seg .*?\/>', '<Seg></Seg>', $file);
         
+        $file = mb_ereg_replace('<Seg (.*?)\/>', '<Seg>\\1</Seg>', $file);
+        $file = mb_ereg_replace('<SubSeg (.*?)\/>', '<SubSeg>\\1</SubSeg>', $file);
         //convert whitespace between segments back to \r\n
         $file = mb_ereg_replace($this->MBEncode(">\n<"),$this->MBEncode(">\r\n<"), $file);
         return  mb_ereg_replace($this->MBEncode("\n$"),$this->MBEncode("\r\n"), $file);
