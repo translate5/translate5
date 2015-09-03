@@ -64,6 +64,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       noUsers: '#UT#Keine Benutzer zugeordnet!',
       locked: '#UT#in Arbeit',
       lockedBy: '#UT#Bearbeitet und Gesperrt durch {0}',
+      lockedSystem: '#UT#Durch das System gesperrt mit dem Status \'{0}\'',
       addTask: '#UT#Aufgabe hinzufügen',
       addTaskTip: '#UT#Eine neue Aufgabe hinzufügen.',
       reloadBtn: '#UT#Aktualisieren',
@@ -100,19 +101,22 @@ Ext.define('Editor.view.admin.TaskGrid', {
           if(task.isLocked()) {
               res.push('locked');
           }
-          if(task.isOpenable()) {
+          if(task.isCustomState()) {
+              res.push('customeState');
+          }
+          if(task.isOpenable() && !task.isCustomState()) {
               res.push('openable');
           }
-          if(task.isReadOnly()) {
+          if(task.isReadOnly() && !task.isCustomState()) {
               res.push('readonly');
           }
-          if(task.isImporting()) {
+          if(task.isImporting() && !task.isCustomState()) {
               res.push('import');
           }
-          if(task.isEnded()) {
+          if(task.isEnded() && !task.isCustomState()) {
               res.push('end');
           }
-          if(task.isFinished() || task.isWaiting()) {
+          if((task.isFinished() || task.isWaiting()) && !task.isCustomState()) {
               res.push('finished');
           }
           if(task.get('userCount') == 0) {
@@ -184,6 +188,10 @@ Ext.define('Editor.view.admin.TaskGrid', {
 
               if(rec.isImporting()) {
                   return rec.get('state'); //FIXME better output here with fixing worker error handling
+              }
+              if(rec.isLocked() && rec.isCustomState()) {
+                  meta.tdAttr = 'data-qtip="' + Ext.String.format(me.strings.lockedSystem, rec.get('state'))+'"';
+                  return me.strings.locked;
               }
               if(rec.isLocked()) {
                   meta.tdAttr = 'data-qtip="' + Ext.String.format(me.strings.lockedBy, rec.get('lockingUsername'))+'"';

@@ -131,6 +131,15 @@ Ext.define('Editor.model.admin.Task', {
       return !!this.get('locked') && this.get('lockingUser') != Editor.app.authenticatedUser.get('userGuid');
   },
   /**
+   * returns if task is not in a known state, known are: open, end, import
+   * unknown state means in general something is happening with the task, the state itself gives info what this is.
+   * In consequence tasks with an unknown state are like import not usable.
+   * @return {Boolean}
+   */
+  isCustomState: function() {
+      return this.get('state') !== 'open' && this.get('state') !== 'end' && this.get('state') !== 'import';
+  },
+  /**
    * must consider also the old value (temporary set to open / edit)
    * @returns {Boolean}
    */

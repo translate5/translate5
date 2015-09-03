@@ -316,9 +316,11 @@ tr.finished td div.x-grid-checkheader {opacity:0.3;display: block;overflow: hidd
 tr.end td div {text-decoration: line-through;}
 tr.no-users td div {color:#ff0000;}
 tr.import td div {color:#ff9900;}
+tr.customeState td div {font-style: italic;}
 
 /* Task Grid Actions */
 .adminTaskGrid tr img,
+.adminTaskGrid tr.customeState td img.x-action-col-icon,
 .adminTaskGrid tr.import td img.x-action-col-icon {display:none;}
 .adminTaskGrid tr.editorOpenTask .ico-task-open {background-image: url("../images/page_view.png");display:inline;}
 .adminTaskGrid tr.editorEditTask .ico-task-edit {background-image: url("../images/page_edit.png");display:inline;}
