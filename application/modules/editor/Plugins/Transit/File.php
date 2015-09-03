@@ -104,9 +104,12 @@ class editor_Plugins_Transit_File{
             throw new Zend_Exception("Transit-Body von $filename ist beschädigt/ungültig.");
         }
         
-        if ($this->getSegmentCount() == 0){
+        /* we do not need this here, has the editor_Models_Import_FileParser_Transit
+         * takes care of this
+         * 
+         * if ($this->getSegmentCount() == 0){
                 throw new Zend_Exception("Datei $filename enthält keine Segmente.");
-        }
+        }*/
         return (true);
     
     } // end of function "open"
@@ -127,10 +130,7 @@ class editor_Plugins_Transit_File{
     
     private function getNodeList($query){
         $nodes = $this->file_xpath->query($query);
-        if ($nodes->length > 0){
-            return $nodes;
-        }
-        return FALSE;
+        return $nodes;
     }
     
     /**
@@ -160,13 +160,13 @@ class editor_Plugins_Transit_File{
             if ($segment->isChanged()){
                 $node_segment->setAttribute("Data", $segment->getData());
                 $node_segment->nodeValue = "";
-                $text = $segment->getText();
-                if(empty($text)){
+                $text = (string)$segment->getText();
+                if($text === ''){
                     $node_segment->textContent = '';
                 }
                 else{
                     $newTextXML = $this->file->createDocumentFragment();
-                    $newTextXML->appendXML($segment->getText());
+                    $newTextXML->appendXML($text);
                     $node_segment->appendChild($newTextXML);
                 }
             }
@@ -185,9 +185,6 @@ class editor_Plugins_Transit_File{
         }
         
         $nodes_segment = $this->getNodeList("//Seg");
-        if ($nodes_segment->length == 0){
-            return FALSE;
-        }
         
         foreach ( $nodes_segment as $node_segment ){
             if (! $this->segmentAdd($node_segment)){
@@ -340,13 +337,24 @@ class editor_Plugins_Transit_File{
 
         $matchExpression = '(<Tag .*?>)(.*?)(<\/Tag>)';
         $file = mb_ereg_replace_callback($this->MBEncode($matchExpression), $callbackTagcontent, $file);
-        $matchExpression = '(<Seg .*?>)(.*?)(<\/Seg>)';
+        
+        $matchExpression = '(<FontTag .*?>)(.*?)(<\/FontTag>)';
+        $file = mb_ereg_replace_callback($this->MBEncode($matchExpression), $callbackTagcontent, $file);
+        
+        $matchExpression = '(<Tab .*?>)(.*?)(<\/Tab>)';
+        $file = mb_ereg_replace_callback($this->MBEncode($matchExpression), $callbackTagcontent, $file);
+        
+        $matchExpression = '(<NU .*?>)(.*?)(<\/NU>)';
         $file = mb_ereg_replace_callback($this->MBEncode($matchExpression), $callbackTagcontent, $file);
 
-        $file = mb_ereg_replace('<Seg .*?\/>', '<Seg></Seg>', $file);
+        $matchExpression = '(<Seg .*?>)(.*?)(<\/Seg>)';
+        $file = mb_ereg_replace_callback($this->MBEncode($matchExpression), $callbackTagcontent, $file);
         
+        $file = mb_ereg_replace('<Seg (.*?)\/>', '<Seg>\\1</Seg>', $file);
+        $file = mb_ereg_replace('<SubSeg (.*?)\/>', '<SubSeg>\\1</SubSeg>', $file);
         //convert whitespace between segments back to \r\n
-        return mb_ereg_replace($this->MBEncode(">\n<"),$this->MBEncode(">\r\n<"), $file);
+        $file = mb_ereg_replace($this->MBEncode(">\n<"),$this->MBEncode(">\r\n<"), $file);
+        return  mb_ereg_replace($this->MBEncode("\n$"),$this->MBEncode("\r\n"), $file);
     }
 
     protected function MBEncode($text){

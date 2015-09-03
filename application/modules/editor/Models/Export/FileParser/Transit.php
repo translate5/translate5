@@ -133,7 +133,9 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
         $targetSegs = $this->targetDOM->getSegments();
         $exportOnlyEditable = $this->config->runtimeOptions->plugins->transit->exportOnlyEditable;
         foreach ($targetSegs as $segId => &$targetSeg) {
+            /* @var $targetSeg editor_Plugins_Transit_Segment */
             $sourceSeg = $sourceSegs[$segId];
+            /* @var $sourceSeg editor_Plugins_Transit_Segment */
             $sourceOrigText = $sourceSeg->getText();
             $targetOrigText = $targetSeg->getText();
             //skip segments, which contain only tags
