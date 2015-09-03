@@ -310,7 +310,7 @@ abstract class editor_Workflow_Abstract {
                 throw new ZfExtended_NotAuthenticatedException("Cannot authenticate the system user!");
             }
             //set session user data with system user
-            $this->authenticatedUserModel->setUserSessionNamespaceWithoutPwCheck('system');
+            $this->authenticatedUserModel->setUserSessionNamespaceWithoutPwCheck(ZfExtended_Models_User::SYSTEM_LOGIN);
         }
         $this->authenticatedUserModel->loadByGuid($userSession->data->userGuid);
         $this->authenticatedUser = $userSession->data;

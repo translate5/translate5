@@ -82,7 +82,7 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract{
         $pm = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $pm ZfExtended_Models_User */
         $s = $pm->db->select();
-        $s->where('login = ?', 'system');
+        $s->where('login = ?', ZfExtended_Models_User::SYSTEM_LOGIN);
         $pm->loadRowBySelect($s);
         self::$testTask->setPmGuid($pm->getUserGuid());
         self::$testTask->setPmName($pm->getUsernameLong());

@@ -28,18 +28,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+ 
+/**#@+
  * @author Marc Mittag
  * @package editor
  * @version 1.0
- * 
- */
-/**
- * Klasse zum Zugriff auf die Tabelle mit Namen des Klassennamens (in lower case)
- * 
  *
  */
-class editor_Models_Db_Internaltags extends Zend_Db_Table_Abstract {
-    protected $_name    = 'LEK_internaltags';
-    public $_primary = 'id';
+/**
+ */
+interface editor_Plugins_ArchiveTaskBeforeDelete_Archiver_Interface {
+    public function archive(string $targetDirectory, editor_Models_Task $task);
 }
