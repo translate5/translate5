@@ -81,7 +81,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_Archive {
         catch(Exception $exceptionOnArchiving) {
             //do nothing here, unlock task first
         }
-        error_log("UNLOCK: ".$task->unlock());
+        $task->unlock();
         $task->setState($oldState);
         $task->save();
         if(!empty($exceptionOnArchiving)) {
