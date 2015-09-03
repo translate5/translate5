@@ -54,6 +54,7 @@ echo $this->Php2JsVars();
                 disableCaching : true
             });
             Ext.Loader.setPath('Ext.ux', Editor.data.uxFolder);
+            Ext.Loader.setPath('Editor.plugins', Editor.data.pluginFolder);
             Ext.Loader.setPath('Editor', Editor.data.appFolder);
 
             Ext.Ajax.defaultHeaders = {

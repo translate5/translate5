@@ -130,6 +130,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('restpath', APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/');
       $this->view->Php2JsVars()->set('moduleFolder', $this->view->publicModulePath.'/');
       $this->view->Php2JsVars()->set('appFolder', $this->view->publicModulePath.'/js/app');
+      $this->view->Php2JsVars()->set('pluginFolder', $this->view->publicModulePath.'/js/plugins');
       $extJs = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
             'ExtJs'
         );
