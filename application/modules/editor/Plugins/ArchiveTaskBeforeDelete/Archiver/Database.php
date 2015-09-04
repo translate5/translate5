@@ -51,7 +51,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_Archiver_Database implements editor
         /* @var $tables editor_Plugins_ArchiveTaskBeforeDelete_DbTables */
         $tableList = $tables->getArchiveListFor($task->getTaskGuid());
         foreach ($tableList as $table => $params) {
-            if(!$this->dumpDataAndStructure($targetDirectory, $table, $params, $output)) {
+            if(!$this->dumpDataAndStructure($targetDirectory, $table, $params, $task->getTaskGuid())) {
                 throw new ZfExtended_Exception('While archiving task '.$task->getTaskGuid().' the following table could not be dumped: '.$table);
             }
         }
@@ -62,13 +62,13 @@ class editor_Plugins_ArchiveTaskBeforeDelete_Archiver_Database implements editor
      * @param string $targetDirectory
      * @param string $table
      * @param string $params
-     * @param array $output
+     * @param string $taskGuid
      * @return boolean
      */
-    protected function dumpDataAndStructure($targetDirectory, $table, $params, &$output) {
+    protected function dumpDataAndStructure($targetDirectory, $table, $params, $taskGuid) {
         $ds = DIRECTORY_SEPARATOR;
         $this->ensureSqlDirectoriesExist($targetDirectory);
-        
+        $output = null;
         $config = Zend_Registry::get('config');
         $db = $config->resources->db->params;
         
@@ -76,6 +76,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_Archiver_Database implements editor
         $callData = sprintf($this->makeSqlCmd($db, true), $this->prepareArgs($params), $this->prepareArgs($table), $this->prepareArgs($fileData));
         exec($callData, $output, $resultData);
         $this->log('Calling '.$callData.($resultData === 0 ? ' with no errors.':' results in '.file_get_contents($fileData)));
+        $this->fixTaskState($taskGuid, $table, $fileData);
         
         $fileStructure = $targetDirectory.$ds.self::DIR_SQL_STRUCTURE.$ds.$table.'.sql'; 
         $callStructure = sprintf($this->makeSqlCmd($db, false), '', $this->prepareArgs($table), $this->prepareArgs($fileStructure));
@@ -85,6 +86,21 @@ class editor_Plugins_ArchiveTaskBeforeDelete_Archiver_Database implements editor
         return $result === 0 && $resultData === 0;
     }
 
+    /**
+     * adds an update statement to the LEK_task table to fix the task state
+     * @param unknown $taskGuid
+     * @param unknown $table
+     * @param unknown $file
+     */
+    protected function fixTaskState($taskGuid, $table, $file) {
+        if($table !== 'LEK_task') {
+            return;
+        }
+        $taskData = file_get_contents($file);
+        $result = preg_replace('/^UNLOCK TABLES;$/m', "UPDATE `LEK_task` set state = 'open', locked = null WHERE taskGuid = '".$taskGuid."';\nUNLOCK TABLES;", $taskData);
+        file_put_contents($file, $result);
+    }
+    
     /**
      * Does a escapeshellarg for strings and arrays, later one are concatenated
      * @param mixed $params
