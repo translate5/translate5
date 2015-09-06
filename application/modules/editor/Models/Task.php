@@ -410,7 +410,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         
         if(!$this->lock(NOW_ISO, true)) {
-            throw new ZfExtended_Models_Entity_Conflict();
+            //@todo: needs to be solved, since delete on task-import-error throws
+            //this exception and covers the real one
+            //throw new ZfExtended_Models_Entity_Conflict();
         }
         
         //delete the generated views for this task
