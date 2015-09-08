@@ -132,7 +132,8 @@ Ext.define('Editor.view.segments.Grid', {
             firstTargetFound = false,
             fields = Editor.data.task.segmentFields(),
             userPref = Editor.data.task.userPrefs().first(),
-            fieldList = [];
+            fieldList = [],
+            fieldClsList;
 
         if(Editor.app.authenticatedUser.isAllowed('editorCommentsForLockedSegments')) {
             me.addCls('comments-for-locked-segments');
@@ -363,6 +364,13 @@ Ext.define('Editor.view.segments.Grid', {
             }]
         });
         me.callParent(arguments);
+        
+        fieldClsList = me.query('.contentEditableColumn').concat(me.query('.contentColumn'));
+        Ext.Array.each(fieldClsList, function(item, idx){
+            fieldClsList[idx] = '#segment-grid .x-grid-row .x-grid-cell-'+item.itemId+' .x-grid-cell-inner { width: '+item.width+'px; }';
+        });
+        Ext.util.CSS.removeStyleSheet('segment-content-width-definition');
+        Ext.util.CSS.createStyleSheet(fieldClsList.join("\n"),'segment-content-width-definition');
     },
     selectOrFocus: function(localRowIndex) {
         var sm = this.getSelectionModel();

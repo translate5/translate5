@@ -178,7 +178,7 @@ Ext.define('Editor.controller.ViewModes', {
       scroller.setRowHeight(height);
   },
   /**
-   * saves the default values of the default view mode in order to restore them after leavinig economic mode
+   * saves the default values of the default view mode in order to restore them after leaving economic mode
    */
   setVisibleElements: function(){
       var me = this;

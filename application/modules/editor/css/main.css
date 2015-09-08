@@ -32,6 +32,13 @@ END LICENSE AND COPYRIGHT
 #segment-grid .x-grid-row .x-grid-cell .x-grid-cell-inner {
   white-space: normal;
 }
+
+/* this default width is needed, see TRANSLATE-563 */
+#changealike-grid .x-grid-row .segment-tag-column .x-grid-cell-inner,
+#segment-grid .x-grid-row .segment-tag-column .x-grid-cell-inner {
+  width: 250px;
+}
+
 #segment-grid .editing-disabled {
   color:#acacac;
 }
