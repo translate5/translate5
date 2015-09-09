@@ -61,6 +61,7 @@ class editor_Models_Import_Worker_SetTaskToOpen extends ZfExtended_Worker_Abstra
         }
         $task->setState($task::STATE_OPEN);
         $task->save();
+        $task->unlock();
         
         $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         $eventManager->trigger('importCompleted', $this, array('task' => $task));

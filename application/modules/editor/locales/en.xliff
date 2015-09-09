@@ -1155,6 +1155,14 @@
     <source><b><i>Überschreibe Quelltext mit:</i></b> </source>
     <target><b><i>Overwrite source with:</i></b> </target>
   </trans-unit>
+  <trans-unit id='RHVyY2ggZGFzIFN5c3RlbSBnZXNwZXJydCBtaXQgZGVtIFN0YXR1cyAnezB9Jw=='>
+    <source>Durch das System gesperrt mit dem Status '{0}'</source>
+    <target>Locked by the system with state '{0}'</target>
+  </trans-unit>
+  <trans-unit id='RGllIEF1ZmdhYmUgaXN0IGR1cmNoIGVpbmVuIEJlbnV0emVyIGdlc3BlcnJ0'>
+    <source>Die Aufgabe ist durch einen Benutzer gesperrt</source>
+    <target>The task is locked by a user</target>
+  </trans-unit>
     </body>
   </file>
 </xliff>

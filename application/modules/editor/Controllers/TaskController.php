@@ -348,9 +348,7 @@ class editor_TaskController extends ZfExtended_RestController {
     public function putAction() {
         $this->entity->load($this->_getParam('id'));
         
-        if($this->entity->isImporting()) {
-            throw new ZfExtended_Models_Entity_NoAccessException();
-        }
+        $this->checkStateAllowsActions();
         
         $taskguid = $this->entity->getTaskGuid();
         
@@ -680,9 +678,7 @@ class editor_TaskController extends ZfExtended_RestController {
     
     public function deleteAction() {
         $this->entity->load($this->_getParam('id'));
-        if($this->entity->isImporting()) {
-            throw new ZfExtended_Models_Entity_NoAccessException();
-        }
+        $this->checkStateAllowsActions();
         return parent::deleteAction();
     }
     
@@ -692,9 +688,7 @@ class editor_TaskController extends ZfExtended_RestController {
     public function exportAction() {
         parent::getAction();
         
-        if($this->entity->isImporting()) {
-            throw new ZfExtended_Models_Entity_NoAccessException();
-        }
+        $this->checkStateAllowsActions();
         
         $diff = (boolean)$this->getRequest()->getParam('diff');
 
@@ -735,5 +729,14 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     protected function isAllowed($ressource) {
         return $this->acl->isInAllowedRoles($this->user->data->roles, $ressource);
+    }
+    
+    /**
+     * @throws ZfExtended_Models_Entity_Conflict
+     */
+    protected function checkStateAllowsActions() {
+        if($this->entity->isExclusiveState() && $this->entity->isLocked($this->entity->getTaskGuid())) {
+            throw new ZfExtended_Models_Entity_Conflict('Der aktuelle Status der Aufgabe verbietet diese Aktion!');
+        }
     }
 }

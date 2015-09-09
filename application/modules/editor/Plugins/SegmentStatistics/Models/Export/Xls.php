@@ -253,6 +253,7 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
         //Add overall sum to last term sheet (if only one file exists, this is the only sheet to be created)
         $sheet = $this->xls->setActiveSheetIndex($idx);
         $i = 2;
+        //TODO here introducing sorting if ordered by client
         foreach ($this->overviewSum as $stat) {
             $sheet->setCellValue('A'.$i, $stat['term']);
             $sheet->setCellValue('B'.$i, $stat['foundSum']);

@@ -1,0 +1,180 @@
+<?php
+/*
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2015 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3.0 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+
+ There is a plugin exception available for use with this release of translate5 for
+ open source applications that are distributed under a license other than AGPL:
+ Please see Open Source License Exception for Development of Plugins for translate5
+ http://www.translate5.net/plugin-exception.txt or as plugin-exception.txt in the root
+ folder of translate5.
+  
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execptions
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
+
+/**#@+
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
+ */
+/**
+ */
+class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
+    
+    //TODO
+    //'Sonderbehandlung' => 'LEK_segment_views
+    
+    //  → mysqldump mit --where zur Einschränkung, im Where Statement kann ein subselect verwendet werden, allerdings nur mit --single-transaction, z.B.:
+    //mysqldump -h mittagqi -u root -p icorrectT5 LEK_segments2terms --single-transaction --where="segmentId in (select id from LEK_segments where taskGuid = '{35f7268b-6cc1-4dd6-9a76-46e1b81dbd40}')" 
+    
+    /**
+     * Here are defined all Editor tables, and how to deal with them on using the archiver:
+     * false → means do not archive the table at all (since it has no correlation with the task at all)
+     * true → backup the whole table (currently only useful for Zf_dbversion)
+     * 'taskGuid' → use the default taskGuid where clause
+     * any other string → is used as parameter for mysqldump, {TASKGUID} is later replaced with the taskGuid to be archived
+     * @var array
+     * 
+     * FIXME es fehlen z.B: die Zf_configuration für ein Testing des Nicht Vergessen features → Blödsinn, die Zf_conf is per se nicht dabei!
+     */
+    protected $tables = array(
+            'LEK_comments' => 'taskGuid',
+            'LEK_files' => 'taskGuid',
+            'LEK_foldertree' => 'taskGuid',
+            'LEK_languages' => false,
+            'LEK_plugin_segmentstatistic_terms' => 'taskGuid',
+            'LEK_plugin_segmentstatistics' => 'taskGuid',
+            'LEK_qmsubsegments' => 'taskGuid',
+            'LEK_segment_data' => 'taskGuid',
+            'LEK_segment_field' => 'taskGuid',
+            'LEK_segment_history' => 'taskGuid',
+            'LEK_segment_history_data' => 'taskGuid',
+            'LEK_segment_durations' => false, //is a view based on already dumped tables
+            'LEK_segments' => 'taskGuid',
+            'LEK_segments_meta' => 'taskGuid',
+            'LEK_skeletonfiles' => array('--single-transaction', "--where=fileId in (select id from LEK_files where taskGuid = '{TASKGUID}')"),
+            'LEK_task' => 'taskGuid',
+            'LEK_taskUserAssoc' => 'taskGuid',
+            'LEK_task_log' => 'taskGuid',
+            'LEK_task_meta' => 'taskGuid',
+            'LEK_terms' => 'taskGuid',
+            'LEK_workflow_log' => 'taskGuid',
+            'LEK_workflow_userpref' => 'taskGuid',
+            'Zf_dbversion' => true
+    );
+    
+    /**
+     * This method is intended to be called directly from CLI, in the build scripts of translate5.
+     * So it is ensured, that no new LEK table (relating to tasks) is forgotten in the archive plugin
+     * @return boolean
+     */
+    public function checkMissingInList($projectRoot, $zendLib) {
+        $this->initCliRuntime($projectRoot, $zendLib);
+        
+        $config = Zend_Registry::get('config');
+        $db = Zend_Db::factory($config->resources->db);
+        
+        $filtered = array_filter($db->listTables(), function($table){
+            if(preg_match('/LEK_segment_view_[a-z0-9]{32}/', $table)) {
+                return false;
+            }
+            return strpos($table, 'LEK_') === 0;
+        });
+        
+        $filtered[] = 'Zf_dbversion';
+        
+        $configuredTables = array_keys($this->tables);
+        $addedToSystem = array_diff($filtered, $configuredTables);  //gib die vom ersten die nicht im zweiten
+        $missingInSystem = array_diff($configuredTables, $filtered);  //gib die vom ersten die nicht im zweiten
+        
+        if(empty($addedToSystem) && empty($missingInSystem)){
+            exit(0); //since used as CLI use CLI exit codes here, 0 is true, other than 0 is error
+        }
+        
+        if(!empty($addedToSystem)) {
+            echo 'The following DB tables are not listed in '.__CLASS__.PHP_EOL;
+            print_r($addedToSystem);
+        }
+        if(!empty($missingInSystem)) {
+            echo 'The following DB tables are not in the DB but listed in '.__CLASS__.PHP_EOL;
+            echo 'Did you forgot to apply the tables to your local DB?'.PHP_EOL;
+            print_r($missingInSystem);
+        }
+        exit(1); //since used as CLI use CLI exit codes here, 0 is true, other than 0 is error
+    }
+    
+    /**
+     * Used to init the translate5 eco system
+     * 
+     * @TODO for futural tests integrated in build this method should be placed more reusable
+     * 
+     * @param string $projectRoot path to the project installation directory
+     * @param string $zendLib path to the zend library
+     */
+    protected function initCliRuntime($projectRoot, $zendLib) {
+        //presetting Zend include path, get from outside!
+        $path = get_include_path();
+        set_include_path($projectRoot.PATH_SEPARATOR.$path.PATH_SEPARATOR.$zendLib);
+        
+        $_SERVER['REQUEST_URI'] = '/';
+        $_SERVER['SERVER_NAME'] = 'localhost';
+        $_SERVER['HTTP_HOST'] = 'localhost';
+        define('APPLICATION_PATH', $projectRoot.DIRECTORY_SEPARATOR.'application');
+        define('APPLICATION_ENV', 'application');
+
+        require_once 'Zend/Session.php';
+        Zend_Session::$_unitTestEnabled = true;
+        require_once 'library/ZfExtended/BaseIndex.php';
+        $index = ZfExtended_BaseIndex::getInstance();
+        $index->initApplication()->bootstrap();
+        $index->addModuleOptions('default');
+    }
+    
+    /**
+     * returns an array with table names and 
+     * @param string $taskGuid
+     * @return multitype:string mixed
+     */
+    public function getArchiveListFor($taskGuid) {
+        $result = array();
+        $replaceTaskGuid = function($whatToDo) use ($taskGuid) {
+            return str_replace('{TASKGUID}', $taskGuid, $whatToDo);
+        };
+        foreach($this->tables as $table => $whatToDo) {
+            if($whatToDo === false) {
+                continue;
+            }
+            if($whatToDo === true) {
+                $result[$table] = '';
+                continue;
+            }
+            if($whatToDo === 'taskGuid') {
+                $result[$table] = '--where=taskGuid = \''.$taskGuid.'\'';
+                continue;
+            }
+            if(is_array($whatToDo)) {
+                $result[$table] = array_map($replaceTaskGuid, $whatToDo);
+                continue;
+            }
+            $result[$table] = $replaceTaskGuid($whatToDo);
+        }
+        return $result;
+    }
+}

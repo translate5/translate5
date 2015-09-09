@@ -193,6 +193,7 @@ class editor_Models_Import {
         }
         $this->task->setReferenceFiles($this->hasReferenceFiles());
         $this->task->save(); //Task erst Speichern wenn die obigen validates und checks durch sind.
+        $this->task->lock(NOW_ISO, true); //locks the task
         
         
         $this->segmentFieldManager->initFields($this->task->getTaskGuid());

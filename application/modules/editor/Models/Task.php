@@ -92,6 +92,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     const ASSOC_TABLE_ALIAS = 'tua';
     const TABLE_ALIAS = 't';
+    
+    const INTERNAL_LOCK = '*translate5InternalLock*';
 
     protected $dbInstanceClass = 'editor_Models_Db_Task';
     protected $validatorInstanceClass = 'editor_Models_Validator_Task';
@@ -407,6 +409,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             throw $e; 
         }
         
+        if(!$this->lock(NOW_ISO, true)) {
+            //@todo: needs to be solved, since delete on task-import-error throws
+            //this exception and covers the real one
+            //throw new ZfExtended_Models_Entity_Conflict();
+        }
+        
         //delete the generated views for this task
         $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView', array($taskGuid));
         /* @var $mv editor_Models_Segment_MaterializedView */
@@ -498,6 +506,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      */
     public function cleanupLockedJobs() {
         $validSessionIds = ZfExtended_Models_Db_Session::GET_VALID_SESSIONS_SQL;
+        //this gives us the possibility to define session independant locks:
+        $validSessionIds .= ' union select \''.self::INTERNAL_LOCK.'\' internalSessionUniqId';
         $where = 'not locked is null and (lockedInternalSessionUniqId not in ('.$validSessionIds.') or lockedInternalSessionUniqId is null)';
         $toUnlock = $this->db->fetchAll($this->db->select()->where($where))->toArray();
         $this->db->update(array('lockingUser' => null, 'locked' => null, 'lockedInternalSessionUniqId' => null), $where);
@@ -509,26 +519,32 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * sets a locked-timestamp in LEK_task for the task, if locked column is null
      * 
      * @param string $datetime
+     * @param boolean $sessionIndependant optional, default false. If true the lock is session independant, and must therefore revoked manually! 
      * @return boolean
      * @throws Zend_Exception if something went wrong
      */
-    public function lock(string $datetime) {
-        $user = new Zend_Session_Namespace('user');
-        $rowsUpdated = $this->db->update(array('locked'=>  $datetime), 
-                array('taskGuid = ? and locked is null'=>$this->getTaskGuid()));
-        if($rowsUpdated===0){
-            return !is_null($this->getLocked()) && $this->getLockingUser() == $user->data->userGuid;//already locked by this same user
+    public function lock(string $datetime, $sessionIndependant = false) {
+        if($sessionIndependant) {
+            $userGuid = ZfExtended_Models_User::SYSTEM_GUID;
+            $sessionId = self::INTERNAL_LOCK;
         }
-        if($rowsUpdated===1){
+        else {
+            $user = new Zend_Session_Namespace('user');
+            $userGuid = $user->data->userGuid;
             $session = new Zend_Session_Namespace();
-            $this->setLockedInternalSessionUniqId($session->internalSessionUniqId);
-            $this->setLockingUser($user->data->userGuid);
-            $this->save();
-            return true;
+            $sessionId = $session->internalSessionUniqId;
         }
-        throw new Zend_Exception(
-                'More then 1 row updated when setLocked in LEK_task. Number or rows updated for task '.
-            $this->getTaskGuid().' : '.$rowsUpdated);
+        $update = array(
+            'locked' => $datetime,
+            'lockingUser' => $userGuid,
+            'lockedInternalSessionUniqId' => $sessionId,
+        );
+        $where = array('taskGuid = ? and locked is null'=>$this->getTaskGuid());
+        $rowsUpdated = $this->db->update($update, $where);
+        if($rowsUpdated === 0){
+            return !is_null($this->getLocked()) && $this->getLockingUser() == $userGuid;//already locked by this same user
+        }
+        return true;
     }
     
     /**
@@ -539,18 +555,15 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @throws Zend_Exception if something went wrong
      */
     public function unlock() {
-        $rowsUpdated = $this->db->update(array('locked'=>  NULL), 
-                array('taskGuid = ? and locked is not null'=> $this->getTaskGuid()));
-        if($rowsUpdated===0)return false;
-        if($rowsUpdated===1){
-            $this->setLockedInternalSessionUniqId(null);
-            $this->setLockingUser(null);
-            $this->save();
-            return true;
-        }
-        throw new Zend_Exception('More then 1 row updated when unlock', 
-                'Number or rows updated for task '.
-            $this->getTaskGuid().' : '.$rowsUpdated);
+        $update = array(
+            'locked' => NULL,
+            'lockedInternalSessionUniqId' => NULL,
+            'lockingUser' => NULL,
+        );
+        $where = array('taskGuid = ? and locked is not null'=>$this->getTaskGuid());
+        
+        //check how many rows are updated
+        return $this->db->update($update, $where) !== 0;
     }
     
     /**
@@ -584,11 +597,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * returns true if current task is in state import
+     * returns true if current task is in an exclusive state (like import)
      * @return boolean
      */
-    public function isImporting() {
-        return $this->getState() == self::STATE_IMPORT;
+    public function isExclusiveState() {
+        $nonExclusiveStates = array(self::STATE_OPEN, self::STATE_OPEN);
+        return !in_array($this->getState(), $nonExclusiveStates);
     }
     
     /**
