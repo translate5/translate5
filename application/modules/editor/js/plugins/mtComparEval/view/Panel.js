@@ -37,9 +37,19 @@ END LICENSE AND COPYRIGHT
  * @class Editor.plugins.pluginFeasibilityTest.view.Panel
  * @extends Ext.panel.Panel
  */
-Ext.define('Editor.plugins.pluginFeasibilityTest.view.Panel', {
+Ext.define('Editor.plugins.mtComparEval.view.Panel', {
     extend : 'Ext.panel.Panel',
-    alias : 'widget.pluginFeasibilityTestPanel',
-    title : 'Test Panel',
-    html: 'This is a ordinary Panel to demonstrate how to use plugins in the translate5 GUI.'
+    alias : 'widget.mtComparEvalPanel',
+    title : 'MT-ComparEval',
+    frame: true,
+    padding: 10,
+    items:[{
+        xtype: 'container',
+        html: 'Task not sent yet to MT-ComparEval',
+        itemId: 'resultBox'
+    },{
+        xtype: 'button',
+        itemId: 'sendto',
+        text: 'Send Task to MT-ComparEval'
+    }]
 });

@@ -38,24 +38,120 @@ END LICENSE AND COPYRIGHT
  * @class Editor.controller.Preferences
  * @extends Ext.app.Controller
  */
-Ext.define('Editor.plugins.pluginFeasibilityTest.controller.Controller', {
+Ext.define('Editor.plugins.mtComparEval.controller.Controller', {
   extend : 'Ext.app.Controller',
-  views: ['Editor.plugins.pluginFeasibilityTest.view.Panel'],
+  views: ['Editor.plugins.mtComparEval.view.Panel'],
+  models: ['Editor.plugins.mtComparEval.model.Taskmeta'],
   refs: [{
       ref: 'taskTabs',
       selector: '.adminTaskPreferencesWindow > .tabpanel'
+  },{
+      ref: 'resultBox',
+      selector: '.mtComparEvalPanel #resultBox'
+  },{
+      ref: 'startButton',
+      selector: '.mtComparEvalPanel button#sendto'
   }],
   init : function() {
     this.control({
-      '.adminTaskPreferencesWindow': {
-        render: this.onParentRender
-      }
+        '.adminTaskPreferencesWindow': {
+            render: this.onParentRender//,
+            //close: this.onParentClose
+        },
+        '.adminTaskPreferencesWindow .mtComparEvalPanel button#sendto': {
+            click: this.handleStartButton
+        }
     });
+    
+  },
+  handleStartButton: function() {
+      var me = this;
+      me.meta.set('mtCompareEvalState', me.meta.STATE_IMPORTING);
+      me.meta.setDirty();
+      me.meta.save({
+          success: function() {
+              me.startWaitingForImport();
+          },
+          failure: function() {
+              me.showResult('Could not sent Task to MT-ComparEval, try again!');
+          }
+      });
+  },
+  onParentClose: function() {
+      if(this.checkImportState) {
+          Ext.TaskManager.stop(this.checkImportStateTask);
+      }
   },
   /**
-   * inject the plugin tab
+   * Checks if all actually loaded tasks are imported completly
    */
-  onParentRender: function() {
-      this.getTaskTabs().add({xtype: 'pluginFeasibilityTestPanel'});
+  checkImportState: function() {
+      var me = this, 
+          metaReloaded = function(rec) {
+              if(rec.isImporting()) {
+                  return;
+              }
+              me.showImportedMessage(rec);
+              me.getResultBox().down('.progressbar').destroy();
+              Ext.TaskManager.stop(me.checkImportStateTask);
+          };
+      me.meta.reload({
+          success: metaReloaded
+      });
+  },
+  showImportedMessage: function(rec) {
+      var me = this, 
+          msg = 'MT-ComparEval has imported translate5 Task "{0}" as experiment nr {1}.<br /><br /><a href="{2}" target="_blank">open results in MT-ComparEval</a><br /><br />';
+      me.showResult(Ext.String.format(msg, me.actualTask.get('taskName'), rec.get('mtCompareEvalId'), rec.get('mtCompareURL')));
+      me.getStartButton().setText('Resend Task to MT-ComparEval');
+      me.getStartButton().enable();
+  },
+  /**
+   * 
+   */
+  startWaitingForImport: function() {
+      var me = this;
+      me.showResult('');
+      me.getResultBox().add({
+          xtype: 'progressbar',
+          width:250
+      }).wait({
+          interval: 1000,
+          text: 'Importing Task in MT-ComparEval!'
+      });
+      me.getStartButton().disable();
+      if(!this.checkImportStateTask) {
+          this.checkImportStateTask = {
+              run: this.checkImportState,
+              scope: this,
+              interval: 10000
+          };
+      }
+      Ext.TaskManager.start(this.checkImportStateTask);
+  },
+  showResult: function(msg) {
+      this.getResultBox().update(msg);
+  },
+  /**
+   * inject the plugin tab and load the task meta data set
+   */
+  onParentRender: function(window) {
+      var me = this;
+      me.actualTask = window.actualTask;
+      me.meta = Editor.plugins.mtComparEval.model.Taskmeta.load(me.actualTask.get('taskGuid'), {
+          success: function(rec) {
+              me.meta = rec;
+              if(rec.isImporting()) {
+                  me.startWaitingForImport();
+              }
+              if(rec.isImported()) {
+                  me.showImportedMessage(rec);
+              }
+          },
+          failure: function() {
+              me.showResult('Could not load MT-ComparEval information for this task!');
+          }
+      });
+      this.getTaskTabs().add({xtype: 'mtComparEvalPanel', actualTask: me.actualTask});
   }
 });
