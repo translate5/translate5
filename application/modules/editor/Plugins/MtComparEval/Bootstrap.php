@@ -42,6 +42,12 @@ class editor_Plugins_MtComparEval_Bootstrap extends ZfExtended_Plugin_Abstract {
     const STATE_IMPORTED = 'imported';
     const STATE_IMPORTING = 'importing';
     
+    /**
+     * Contains the Plugin Path relativ to APPLICATION_PATH or absolut if not under APPLICATION_PATH
+     * @var array
+     */
+    protected $frontendControllers = array('Editor.plugins.mtComparEval.controller.Controller');
+    
     public function init() {
         $this->eventManager->attach('editor_TaskmetaController', 'beforeSetDataInEntity', array($this, 'startExportTo'));
         $this->eventManager->attach('editor_TaskmetaController', 'afterGetAction', array($this, 'injectUrl'));

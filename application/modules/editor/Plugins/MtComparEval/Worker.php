@@ -37,6 +37,11 @@ class editor_Plugins_MtComparEval_Worker extends ZfExtended_Worker_Abstract {
     protected $fields;
     
     /**
+     * @var editor_Models_SegmentFieldManager
+     */
+    protected $sfm;
+    
+    /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
@@ -55,41 +60,30 @@ class editor_Plugins_MtComparEval_Worker extends ZfExtended_Worker_Abstract {
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
-        $data = ZfExtended_Factory::get('editor_Models_Segment_Iterator', array($this->taskGuid));
-        /* @var $data editor_Models_Segment_Iterator */
-        if ($data->isEmpty()) {
+        $this->sfm = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        $this->sfm->initFields($this->taskGuid);
+        
+        $this->initFields();
+        if(!$this->initData()) {
             return false;
         }
         
-        $sfm = $this->initFields();
-        
-        //walk over segments and fields and get segments data
-        foreach($data as $segment) {
-            /* @var $segment editor_Models_Segment */
-            foreach($this->fields as $field) {
-                $fieldName = $field->name;
-                if($fieldName != 'source' && $fieldName != 'target') {
-                    $fieldName = $sfm->getEditIndex($fieldName);
-                }
-                $this->data[$field->name][] = strip_tags($segment->getDataObject()->$fieldName);
-            }
-        }
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($this->taskGuid);
         
-        $reimport = $task->meta()->getMtCompareEvalId() > 0;
-
         $plugin = Zend_Registry::get('PluginManager')->get(__CLASS__);
         /* @var $plugin editor_Plugins_MtComparEval_Bootstrap */
         
-        if(!$reimport) {
-            $id = $this->addExperiment($task, $plugin);
-            if($id === false) {
-                return false;
-            }
-        } else {
-            //$this->deleteTasks($id, $task, $plugin);
+        //trigger a reimport, that means the experiment has to be deleted before
+        $experimentId = $task->meta()->getMtCompareEvalId();
+        if($experimentId > 0) {
+            $this->deleteExperiment($experimentId, $task, $plugin);
+        }
+        
+        $id = $this->addExperiment($task, $plugin);
+        if($id === false) {
+            return false;
         }
         $this->addTasks($id, $task, $plugin);
         
@@ -102,15 +96,34 @@ class editor_Plugins_MtComparEval_Worker extends ZfExtended_Worker_Abstract {
     }
     
     protected function initFields() {
-        $sfm = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
-        /* @var $sfm editor_Models_SegmentFieldManager */
-        $sfm->initFields($this->taskGuid);
-        
-        $this->fields = $sfm->getFieldList();
+        $this->fields = $this->sfm->getFieldList();
         foreach($this->fields as $field) {
             $this->data[$field->name] = array();
         }
-        return $sfm;
+    }
+    
+    /**
+     * walk over segments and fields and store segments data internally in the right format and order
+     * @return boolean
+     */
+    protected function initData() {
+        $data = ZfExtended_Factory::get('editor_Models_Segment_Iterator', array($this->taskGuid));
+        /* @var $data editor_Models_Segment_Iterator */
+        if ($data->isEmpty()) {
+            return false;
+        }
+        //walk over segments and fields and get segments data
+        foreach($data as $segment) {
+            /* @var $segment editor_Models_Segment */
+            foreach($this->fields as $field) {
+                $fieldName = $field->name;
+                if($fieldName != 'source' && $fieldName != 'target') {
+                    $fieldName = $this->sfm->getEditIndex($fieldName);
+                }
+                $this->data[$field->name][] = strip_tags($segment->getDataObject()->$fieldName);
+            }
+        }
+        return true;
     }
     
     /**
@@ -143,6 +156,25 @@ class editor_Plugins_MtComparEval_Worker extends ZfExtended_Worker_Abstract {
         $task->meta()->save();
         
         return $result->experiment_id;
+    }
+    
+    /**
+     * removes an experiment in MT-ComparEval
+     * @param integer $id
+     * @param editor_Models_Task $task
+     * @param editor_Plugins_MtComparEval_Bootstrap $plugin
+     * @return boolean
+     */
+    protected function deleteExperiment($id, editor_Models_Task $task, editor_Plugins_MtComparEval_Bootstrap $plugin) {
+        $http = new Zend_Http_Client();
+        //curl -X POST -F "name=experiment name" -F "description=description" -F "source=@source.txt" -F "reference=@reference.txt" http://localhost:8080/api/experiments/upload	
+        $http->setUri($plugin->getMtUri('/api/experiments/delete/'.$id));
+        $request = $http->request('GET');
+        $this->log(__CLASS__.' request to '.$http->getUri(true).' for task '.$task->getTaskGuid().' was '.$request->getStatus().' with response '.$request->getBody());
+        $task->meta()->setMtCompareEvalId(0);
+        $task->meta()->setMtCompareEvalStart(null);
+        $task->meta()->save();
+        return true;
     }
     
     /**

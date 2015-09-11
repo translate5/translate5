@@ -272,8 +272,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             'Preferences', 'MetaPanel', 'Fileorder', 'Localizer',
             'ChangeAlike', 'Comments');
         
-        //FIXME This should be done / come from the PHP plugin Bootstrap some how
-        $controllers[] = 'Editor.plugins.mtComparEval.controller.Controller';
+        $pm = Zend_Registry::get('PluginManager');
+        $pluginFrontendControllers = $pm->getActiveFrontendControllers();
+        if(!empty($pluginFrontendControllers)) {
+            $controllers = array_merge($controllers, $pluginFrontendControllers);
+        }
         
         if($acl->isInAllowedRoles($userSession->data->roles,'headPanelFrontendController')){
             $controllers[] = 'HeadPanel';
