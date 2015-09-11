@@ -91,8 +91,9 @@ Ext.define('Editor.plugins.mtComparEval.controller.Controller', {
               if(rec.isImporting()) {
                   return;
               }
+              var bar = me.getResultBox().down('.progressbar');
               me.showImportedMessage(rec);
-              me.getResultBox().down('.progressbar').destroy();
+              bar && bar.destroy();
               Ext.TaskManager.stop(me.checkImportStateTask);
           };
       me.meta.reload({
