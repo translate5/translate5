@@ -28,4 +28,8 @@
 -- */
 
 
-DELETE FROM `Zf_configuration` WHERE `name` = 'runtimeOptions.plugins.MTCompareEval.url';
+DELETE FROM `Zf_configuration` WHERE `name` = 'runtimeOptions.plugins.MtComparEval.url';
+
+ALTER TABLE `LEK_task_meta` DROP COLUMN mtCompareEvalState;
+ALTER TABLE `LEK_task_meta` DROP COLUMN mtCompareEvalId;
+ALTER TABLE `LEK_task_meta` DROP COLUMN mtCompareEvalStart;

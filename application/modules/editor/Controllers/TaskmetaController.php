@@ -29,9 +29,59 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- *
+ * Task Meta Controller supports so far only PUT and GET.
+ * DELETE and POST makes no sense, since a task meta entry is defined per task. So creation and deletion is coupled to the task
+ * index Action could make sense, but currently not.
  */
 class editor_TaskmetaController extends ZfExtended_RestController {
-
     protected $entityClass = 'editor_Models_Task_Meta';
+    
+    /**
+     * Instance of the Entity
+     * @var editor_Models_Task_Meta
+     */
+    protected $entity;
+    
+    /**
+     * encapsulating the entity load for simpler overwritting purposes
+     */
+    protected function entityLoad() {
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($this->_getParam('id'));
+        //using the meta() method instead a direct meta::loadByTaskGuid ensures that a empty taskmeta instance is given, also if nothing exists in DB
+        $this->entity = $task->meta(); 
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::decodePutData()
+     */
+    protected function decodePutData() {
+        parent::decodePutData();
+        //taskGuid may not be overwritten by frontend
+        unset($this->data->taskGuid);
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::postAction()
+     */
+    public function postAction() {
+        throw new BadMethodCallException('Task Meta data supports only PUT and GET Action');
+    }
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::postAction()
+     */
+    public function indexAction() {
+        $this->postAction();
+    }
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::postAction()
+     */
+    public function deleteAction() {
+        $this->postAction();
+    }
 }

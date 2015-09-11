@@ -273,7 +273,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             'ChangeAlike', 'Comments');
         
         //FIXME This should be done / come from the PHP plugin Bootstrap some how
-        $controllers[] = 'Editor.plugins.pluginFeasibilityTest.controller.Controller';
+        $controllers[] = 'Editor.plugins.mtComparEval.controller.Controller';
         
         if($acl->isInAllowedRoles($userSession->data->roles,'headPanelFrontendController')){
             $controllers[] = 'HeadPanel';

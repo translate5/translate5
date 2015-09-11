@@ -43,4 +43,13 @@ class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     public function loadBySegmentId($id) {
         return $this->loadRow('segmentId = ?', $id);
     }
+    
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_Models_Entity_MetaAbstract::initEmptyRowset()
+     */
+    public function initEmptyRowset(){
+        //currently not implemented for segment meta, see task meta for usage and what to implement
+        // for segments meta add also segment id to initial row set
+    }
 }
