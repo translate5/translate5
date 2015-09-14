@@ -118,8 +118,6 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
             });
         }
         
-        error_log("XHERE".print_r($qmSubsegmentAlikes,1));
-        
         $states = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
         /* @var $states editor_Models_SegmentAutoStates */
         
