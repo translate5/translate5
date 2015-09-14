@@ -56,7 +56,7 @@ Ext.define('Editor.plugins.mtComparEval.controller.Controller', {
     this.control({
         '.adminTaskPreferencesWindow': {
             render: this.onParentRender//,
-            //close: this.onParentClose
+            //close: this.onParentClose  //FIXME reenable this method!
         },
         '.adminTaskPreferencesWindow .mtComparEvalPanel button#sendto': {
             click: this.handleStartButton
@@ -68,12 +68,16 @@ Ext.define('Editor.plugins.mtComparEval.controller.Controller', {
       var me = this;
       me.meta.set('mtCompareEvalState', me.meta.STATE_IMPORTING);
       me.meta.setDirty();
+      me.showWaitingForImport();
       me.meta.save({
           success: function() {
               me.startWaitingForImport();
           },
           failure: function() {
+              var bar = me.getResultBox().down('.progressbar');
+              bar && bar.destroy();
               me.showResult('Could not sent Task to MT-ComparEval, try again!');
+              me.getStartButton().enable();
           }
       });
   },
@@ -91,7 +95,8 @@ Ext.define('Editor.plugins.mtComparEval.controller.Controller', {
               if(rec.isImporting()) {
                   return;
               }
-              var bar = me.getResultBox().down('.progressbar');
+              var box = me.getResultBox(),
+                  bar = box ? box.down('.progressbar') : false;
               me.showImportedMessage(rec);
               bar && bar.destroy();
               Ext.TaskManager.stop(me.checkImportStateTask);
@@ -107,10 +112,7 @@ Ext.define('Editor.plugins.mtComparEval.controller.Controller', {
       me.getStartButton().setText('Resend Task to MT-ComparEval');
       me.getStartButton().enable();
   },
-  /**
-   * 
-   */
-  startWaitingForImport: function() {
+  showWaitingForImport: function() {
       var me = this;
       me.showResult('');
       me.getResultBox().add({
@@ -121,14 +123,17 @@ Ext.define('Editor.plugins.mtComparEval.controller.Controller', {
           text: 'Importing Task in MT-ComparEval!'
       });
       me.getStartButton().disable();
-      if(!this.checkImportStateTask) {
-          this.checkImportStateTask = {
-              run: this.checkImportState,
-              scope: this,
-              interval: 10000
+  },
+  startWaitingForImport: function() {
+      var me = this;
+      if(!me.checkImportStateTask) {
+          me.checkImportStateTask = {
+                  run: me.checkImportState,
+                  scope: me,
+                  interval: 10000
           };
       }
-      Ext.TaskManager.start(this.checkImportStateTask);
+      Ext.TaskManager.start(me.checkImportStateTask);
   },
   showResult: function(msg) {
       this.getResultBox().update(msg);
@@ -143,6 +148,7 @@ Ext.define('Editor.plugins.mtComparEval.controller.Controller', {
           success: function(rec) {
               me.meta = rec;
               if(rec.isImporting()) {
+                  me.showWaitingForImport();
                   me.startWaitingForImport();
               }
               if(rec.isImported()) {
