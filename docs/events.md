@@ -25,6 +25,11 @@ defined in `/library/ZfExtended/Controllers/Action.php`  will trigger an event o
 ###RestController-Events
  - **before&lt;Controllername&gt;Action** with the following parameters:
    - entity: $this->entity
+ - **afterSetDataInEntity** with the following parameters:
+   - entity: $this->entity
+ - **beforeSetDataInEntity** with the following parameters:
+   - entity: $this->entity
+   - data: $this->data
  - **after&lt;Controllername&gt;Action** with the following parameters:
    - entity: $this->entity
    - view: $this->view
@@ -87,11 +92,13 @@ Example:
     
     public function _construct()
     {
-    	$this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));    }
+    	$this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
+    }
     
     public function doSomething()
     {
-    	$this->events->trigger("eventName", $this, array('model' => $this, 'moreParam' => $moreParams));    }
+    	$this->events->trigger("eventName", $this, array('model' => $this, 'moreParam' => $moreParams));
+    }
     
 
 
@@ -119,7 +126,8 @@ Example:
 		// do something on event "eventName" with parameters send within event-trigger
 		$model = $event->getParam('model');
 		/* @var $model nameOfTheModelClass */ // to trigger IDE
-		$moreParams = $event->getParam('moreParams');	}
+		$moreParams = $event->getParam('moreParams');
+	}
     
 ## Trigger and Listen in one class
 If you use two different class-variables $events and $staticEvents you can combine event-triggering and event-listening in one class without problems.
