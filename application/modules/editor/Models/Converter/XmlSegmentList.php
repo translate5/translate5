@@ -81,11 +81,25 @@ class editor_Models_Converter_XmlSegmentList {
      */
     protected $sfm;
     
+    /**
+     * @var editor_Models_Export_DiffTagger_Sdlxliff
+     */
+    protected $differ;
+    
+    /**
+     * @var boolean
+     */
+    protected $createDiffAltTrans;
+    
     public function __construct(){
-        $session = new Zend_Session_Namespace();
-        $this->stateFlags = $session->runtimeOptions->segments->stateFlags->toArray();
-        $this->qualityFlags = $session->runtimeOptions->segments->qualityFlags->toArray();
-        $this->saveXmlToFile = (boolean) $session->runtimeOptions->saveXmlToFile;
+        $config = Zend_Registry::get('config');
+        $this->stateFlags = $config->runtimeOptions->segments->stateFlags->toArray();
+        $this->qualityFlags = $config->runtimeOptions->segments->qualityFlags->toArray();
+        $this->saveXmlToFile = (boolean) $config->runtimeOptions->editor->notification->saveXmlToFile;
+        $this->createDiffAltTrans = (boolean) $config->runtimeOptions->editor->notification->includeDiff;
+        if($this->createDiffAltTrans){
+            $this->differ = ZfExtended_Factory::get('editor_Models_Export_DiffTagger_Sdlxliff');
+        }
         
         $this->comment = ZfExtended_Factory::get('editor_Models_Comment');
     }
@@ -167,10 +181,21 @@ class editor_Models_Converter_XmlSegmentList {
      * Helper function to create the XML Header
      */
     protected function createXmlHeader() {
-        $taskname = 'translate5:taskname="'.htmlspecialchars($this->task->getTaskName()).'"';
-        $this->result[] = '<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dx="http://www.interoperability-now.org/schema" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-doc-1_0_extensions.xsd" dx:version="1.4" xmlns:translate5="http://www.translate5.net/" '.$taskname.'>';
+        $headParams = array('xliff', 'version="1.2"');
+        $headParams[] = 'xmlns="urn:oasis:names:tc:xliff:document:1.2"';
+        $headParams[] = 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"';
+        $headParams[] = 'xmlns:dx="http://www.interoperability-now.org/schema"';
+        if($this->createDiffAltTrans) {
+            $headParams[] = 'xmlns:sdl="http://sdl.com/FileTypes/SdlXliff/1.0"';
+        }
+        $headParams[] = 'xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-doc-1_0_extensions.xsd"';
+        $headParams[] = 'dx:version="1.4"';
+        $headParams[] = 'xmlns:translate5="http://www.translate5.net/"';
+        $headParams[] = 'translate5:taskname="'.htmlspecialchars($this->task->getTaskName()).'"';
+        $this->result[] = '<'.join(' ', $headParams).'>';
+        
+        $this->result[] = '<!-- attention: this format should be refactored to xliff 2.x. It will be, as soon as some one volunteers to do or donates funding for it -->';
         $this->result[] = '<!-- attention: currently the usage of g- and x-tags in this doc is not completely in line with the xliff:doc-spec. This will change, when resources for this issue will be assigned -->';
-        $this->result[] = '<!-- attention: we know, that the structure of this document is not complete regarding xliff:doc-spec. This will change, when resources for this issue will be assigned -->';
         $this->result[] = '<!-- attention: regarding internal tags the source and the target-content are in the same format as the contents of the original source formats would have been. For SDLXLIFF this means: No mqm-Tags; Terms marked with <mrk type="x-term-...">-Tags; Internal Tags marked with g- and x-tags; For CSV this means: all content is exported as it comes from CSV, this can result in invalid XLIFF! -->';
         $this->result[] = '<!-- attention: MQM Tags are not exported at all! -->';
     }
@@ -257,18 +282,40 @@ class editor_Models_Converter_XmlSegmentList {
         if($field->type != editor_Models_SegmentField::TYPE_TARGET) {
             return;
         }
+        
+        
+        $lang = $this->data['targetLang'];
         if($this->data['firstTarget'] == $field->name) {
             $matchRate = number_format($segment['matchRate'], 1, '.', '');
-            $target = $this->prepareText($segment[$this->sfm->getEditIndex($this->data['firstTarget'])]);
-            $this->result[] = '<target dx:match-quality="'.$matchRate.'">'.$target.'</target>';
-            $this->result[] = '<alt-trans dx:origin-shorttext="'.$field->label.'" alttranstype="previous-version">';
-            $target = $this->prepareText($segment[$field->name]);
+            $targetEdit = $this->prepareText($segment[$this->sfm->getEditIndex($this->data['firstTarget'])]);
+            $this->result[] = '<target dx:match-quality="'.$matchRate.'">'.$targetEdit.'</target>';
+            $targetOriginal = $this->prepareText($segment[$field->name]);
+            //add previous version of target as alt trans
+            $this->addAltTransToResult($targetOriginal, $lang, $field->label, 'previous-version');
         }
         else {
-            $this->result[] = '<alt-trans dx:origin-shorttext="'.$field->label.'">';
-            $target = $this->prepareText($segment[$this->sfm->getEditIndex($field->name)]);
+            //add alternatives
+            $targetEdit = $this->prepareText($segment[$this->sfm->getEditIndex($field->name)]);
+            $this->addAltTransToResult($targetEdit, $lang, $field->label);
+            if($this->createDiffAltTrans){
+                $targetOriginal = $this->prepareText($segment[$field->name]);
+            }
         }
-        $this->result[] = '<target xml:lang="'.$this->data['targetLang'].'">'.$target.'</target></alt-trans>';
+        $this->addDiffToResult($targetEdit, $targetOriginal, $field, $segment);
+    }
+    
+    protected function addAltTransToResult($targetText, $lang, $label, $type = null) {
+        $alttranstype = empty($type) ? '' : ' alttranstype="'.$type.'"';
+        $this->result[] = '<alt-trans dx:origin-shorttext="'.$label.'"'.$alttranstype.'>';
+        $this->result[] = '<target xml:lang="'.$lang.'">'.$targetText.'</target></alt-trans>';
+    }
+    
+    protected function addDiffToResult($targetEdit, $targetOriginal, Zend_Db_Table_Row $field, $segment) {
+        if(!$this->createDiffAltTrans){
+            return;
+        }
+        $diffResult = $this->differ->diffSegment($targetOriginal, $targetEdit, $segment['timestamp'], $segment['userName']);
+        $this->addAltTransToResult($diffResult, $this->data['targetLang'], $field->label.'-diff', 'reference');
     }
     
     /**

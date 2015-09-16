@@ -222,7 +222,7 @@ abstract class editor_Models_Export_FileParser {
         $original = $this->parseSegment($original);
         
         $diffed = $this->_diffTagger->diffSegment(
-                $original, 
+                $original,
                 $edited,
                 $segment->getTimestamp(),
                 $segment->getUserName());
@@ -272,7 +272,7 @@ abstract class editor_Models_Export_FileParser {
      * @return string $segment
      */
     protected function recreateTermTags($segment, $removeTermTags=true) {
-        $segmentArr = preg_split('/<div\s*class="term([^"]+)"\s+id="([^"]+)-\d+"[^>]*>/s', $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
+        $segmentArr = preg_split('/<div[^>]+class="term([^"]+)"\s+data-tbxid="([^"]+)"[^>]*>/s', $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
         
         $cssClassFilter = function($input) {
             return($input !== 'transFound' && $input !== 'transNotFound');
@@ -449,7 +449,7 @@ abstract class editor_Models_Export_FileParser {
      */
     public function exportSingleSegmentContent($segment) {
         $this->disableMqmExport = true;
-        return $this->recreateTermTags($this->parseSegment($segment));
+        return $this->revertNonBreakingSpaces($this->recreateTermTags($this->parseSegment($segment)));
     }
     
     /**
@@ -462,12 +462,18 @@ abstract class editor_Models_Export_FileParser {
         $search = array(
           '<hardReturn/>',
           '<softReturn/>',
-          '<macReturn/>'
+          '<macReturn/>',
+          '<hardReturn />',
+          '<softReturn />',
+          '<macReturn />',
         );
         $replace = array(
           "\r\n",  
           "\n",  
-          "\r"
+          "\r",
+          "\r\n",  
+          "\n",  
+          "\r",
         );
         $content = str_replace($search, $replace, $content);
         return preg_replace_callback('"<space ts=\"([A-Fa-f0-9]*)\"/>"', function ($match) {

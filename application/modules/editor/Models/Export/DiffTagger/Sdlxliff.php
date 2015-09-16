@@ -64,10 +64,6 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
      */
     protected $_userName = NULL;
 
-    public function __construct() {
-        parent::__construct();
-    }
-
     /**
      * zeichnet ein einzelnes Segment aus
      *

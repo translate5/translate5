@@ -166,7 +166,6 @@ class editor_Models_Export {
         $this->taskGuid = $task->getTaskGuid();
         $this->optionDiff = false;
         return $this->getFileParser(0, $filename);
-        return $this->getFileParser(0, $filename.'.sdlxliff');
     }
     
     /**

@@ -766,7 +766,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->segmentFieldManager->initFields($taskGuid);
         $this->reInitDb($taskGuid);
         
-        $fields = array('id', 'mid', 'segmentNrInTask', 'stateId', 'autoStateId', 'matchRate', 'qmId', 'comments', 'fileId');
+        $fields = array('id', 'mid', 'segmentNrInTask', 'stateId', 'autoStateId', 'matchRate', 'qmId', 'comments', 'fileId', 'userName', 'timestamp');
         $fields = array_merge($fields, $this->segmentFieldManager->getDataIndexList());
         
         $this->initDefaultSort();
