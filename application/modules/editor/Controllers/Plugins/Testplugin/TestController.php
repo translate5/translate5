@@ -28,28 +28,18 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Entity Model for segment meta data
- * @method integer getId() getId()
- * @method void setId() setId(integer $id)
- * @method string getTaskGuid() getTaskGuid()
- * @method void setTaskGuid() setTaskGuid(string $guid)
- * @method string getSegmentId() getSegmentId()
- * @method void setSegmentId() setSegmentId(integer $id)
+/**#@+ 
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ * 
  */
-class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
-    protected $dbInstanceClass = 'editor_Models_Db_SegmentMeta';
+class editor_Plugins_Testplugin_TestController extends ZfExtended_Controllers_Action  {
     
-    public function loadBySegmentId($id) {
-        return $this->loadRow('segmentId = ?', $id);
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Models_Entity_MetaAbstract::initEmptyRowset()
-     */
-    public function initEmptyRowset(){
-        //currently not implemented for segment meta, see task meta for usage and what to implement
-        // for segments meta add also segment id to initial row set
+    public function demoAction() {
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender();
+        echo "Hello world!";
     }
 }
+

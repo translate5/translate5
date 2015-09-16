@@ -44,13 +44,7 @@ END LICENSE AND COPYRIGHT
  * languageInfo in ZendRegistry transitLangInf
  * 
  */
-class editor_Plugins_Transit_Bootstrap {
-    
-    /**
-     * @var Zend_EventManager_StaticEventManager
-     */
-    protected $staticEvents = false;
-    
+class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract {
     /**
      *
      * @var string
@@ -68,12 +62,11 @@ class editor_Plugins_Transit_Bootstrap {
      */
     protected $langInfo;
 
-    public function __construct() {
+    public function init() {
         $config = Zend_Registry::get('config');
         // event-listeners
-        $this->staticEvents = Zend_EventManager_StaticEventManager::getInstance();
-        $this->staticEvents->attach('editor_Models_Import', 'beforeDirectoryParsing', array($this, 'handleTransitImportPreparation'));
-        $this->staticEvents->attach('editor_Models_Import_DataProvider_Abstract', 'beforeArchiveImportedData', array($this, 'handleTransitImportCleanup'));
+        $this->eventManager->attach('editor_Models_Import', 'beforeDirectoryParsing', array($this, 'handleTransitImportPreparation'));
+        $this->eventManager->attach('editor_Models_Import_DataProvider_Abstract', 'beforeArchiveImportedData', array($this, 'handleTransitImportCleanup'));
         // end of event-listeners
         $this->proofReadDirName = $config->runtimeOptions->import->proofReadDirectory;
         $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');

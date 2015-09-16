@@ -41,4 +41,22 @@ class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     public function loadByTaskGuid($taskGuid) {
         return $this->loadRow('taskGuid = ?', $taskGuid);
     }
+    
+    /**
+     * Adds an empty meta data rowset to the DB.
+     */
+    public function initEmptyRowset(){
+        $db = new $this->dbInstanceClass;
+        /* @var $db Zend_Db_Table_Abstract */
+        try {
+            $db->insert(array('taskGuid' => $this->getTaskGuid()));
+        }
+        catch(Zend_Db_Statement_Exception $e) {
+            $m = $e->getMessage();
+            //"duplicate entry" errors are ignored. 
+            if(strpos($m,'SQLSTATE') !== 0 || stripos($m,'Duplicate entry') === false) {
+                throw $e;
+            }
+        }
+    }
 }
