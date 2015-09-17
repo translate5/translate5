@@ -150,6 +150,10 @@ END LICENSE AND COPYRIGHT
 .segment-tag-column.type-source div.x-grid-cell-inner div.transNotFound,
 .segment-tag-container.type-source div.transNotFound {border-bottom-color:#ff0000;}
 
+#change-alike-window div.transNotDefined,
+.segment-tag-column.type-source div.x-grid-cell-inner div.transNotDefined,
+.segment-tag-container.type-source div.transNotDefined {border-bottom-color:#623425;}
+
 .segment-tag-column div.x-grid-cell-inner div.notRecommended,
 .segment-tag-container div.notRecommended,
 .segment-tag-column div.x-grid-cell-inner div.supersededTerm,

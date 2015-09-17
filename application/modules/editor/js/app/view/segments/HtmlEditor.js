@@ -196,7 +196,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         termFoundCls = item.className
         if(me.fieldTypeToEdit) {
             var replacement = me.fieldTypeToEdit+'-$1';
-            termFoundCls = termFoundCls.replace(/(transFound|transNotFound)/, replacement);
+            termFoundCls = termFoundCls.replace(/(transFound|transNotFound|transNotDefined)/, replacement);
         }
         me.result.push(Ext.String.format('<span class="{0}" title="{1}">', termFoundCls, item.title));
         me.replaceTagToImage(item);
