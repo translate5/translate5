@@ -108,7 +108,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
             return sprintf($result, $title, 'border-bottom-color:#ff0000;');
         }
         if(in_array('transNotDefined', $cls)) {
-            return sprintf($result, $title, 'border-bottom-color:#623425;');
+            return sprintf($result, $title, 'border-bottom-color:#8F4C36;');
         }
         if(in_array('term', $cls)) {
             return sprintf($result, $title, 'background:transparent;border-bottom:1px solid #0000ff;');
