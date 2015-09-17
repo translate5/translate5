@@ -87,6 +87,11 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
      * @var array
      */
     protected $groupCounter = array();
+    
+    /**
+     * @var array
+     */
+    protected $notPresentInTbxTarget = array();
 
 
     public function init($taskGuid = NULL, $parameters = array()) {
@@ -162,7 +167,10 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
             foreach ($sourceMids as $sourceMid) {
                 $this->termModel->loadByMid($sourceMid, $taskGuid);
                 $groupId = $this->termModel->getGroupId();
-                $groupedTerms = $this->termModel->getAllTermsOfGroupByMid($taskGuid,$sourceMid, array($this->task->getTargetLang()));
+                $groupedTerms = $this->termModel->getAllTermsOfGroup($taskGuid, $groupId, array($this->task->getTargetLang()));
+                if(empty($groupedTerms)) {
+                    $this->notPresentInTbxTarget[$groupId] = true;
+                }
                 $transFound = (isset($this->groupCounter[$groupId]))?$this->groupCounter[$groupId]:0;
                 foreach ($groupedTerms as $groupedTerm) {
                     $targetMidsKey = array_search($groupedTerm['mid'], $targetMids);
@@ -190,9 +198,16 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
     protected function insertTransFoundInSegmentClass(string $seg,string $mid, $groupId) {
         settype($this->groupCounter[$groupId], 'integer');
         $transFound =& $this->groupCounter[$groupId];
-        $rCallback = function($matches)use(&$seg,&$transFound){
+        $presentInTbxTarget = empty($this->notPresentInTbxTarget[$groupId]);
+        $rCallback = function($matches) use (&$seg, &$transFound, $presentInTbxTarget){
             foreach ($matches as $match) {
-                $cssClassToInsert = ($transFound>0)?'transFound':'transNotFound';
+                if($presentInTbxTarget) {
+                    $cssClassToInsert = ($transFound>0)?'transFound':'transNotFound';
+                }
+                else {
+                    $cssClassToInsert = 'transNotDefined';
+                }
+                
                 $transFound--;
                 $modifiedMatch = $match;
                 if(strpos($modifiedMatch, ' class=')===false){

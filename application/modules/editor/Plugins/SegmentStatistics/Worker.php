@@ -158,7 +158,13 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
             $this->findTermContent($term['mid']);
             settype($termCount['found'][$term['mid']], 'integer');
             settype($termCount['notFound'][$term['mid']], 'integer');
-            $idx = in_array('transNotFound', $term['classes']) ? 'notFound' : 'found';
+            if(in_array('transNotFound', $term['classes'])) {
+                $idx = 'notFound';
+            } elseif (in_array('transFound', $term['classes'])) {
+                $idx = 'found';
+            } else {
+                continue;
+            }
             $termCount[$idx][$term['mid']]++;
         }
         

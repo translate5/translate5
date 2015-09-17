@@ -309,7 +309,7 @@ abstract class editor_Models_Export_FileParser {
             }
             if(!$removeTermTags){
                 $cssClasses = explode(' ', trim($segmentArr[$i]));
-                //@todo actually were removing the trans[Not]Found info. 
+                //@todo currently were removing the trans[Not]Found info. 
                 //it would be better to set it for source segments by checking the target if the term exists  
                 $segmentArr[$i] = join('-', array_filter($cssClasses, $cssClassFilter));
                 $segmentArr[$i] = '<mrk mtype="x-term-' . $segmentArr[$i] . '" mid="' . $segmentArr[$i + 1] . '">';

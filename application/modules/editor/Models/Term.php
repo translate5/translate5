@@ -147,6 +147,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * Returns term-informations for $segmentId in $taskGuid.
      * Includes assoziated terms corresponding to the tagged terms
      * 
+     * @param string $taskGuid
      * @param string $mid
      * @param array $languageIds 1-dim array with languageIds|default empty array; 
      *          if passed only terms with the passed languageIds are returned
@@ -163,6 +164,26 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $s->setIntegrityCheck(false);
         if(!empty($languageIds)) {
             $s->where('t1.language in (?)', $languageIds);
+        }
+        return $db->fetchAll($s)->toArray();
+    }
+    
+    /**
+     * Returns term-informations for a given group id
+     * 
+     * @param string $taskGuid
+     * @param string $groupid
+     * @param array $languageIds 1-dim array with languageIds|default empty array; 
+     *          if passed only terms with the passed languageIds are returned
+     * @return 2-dim array (get term of first row like return[0]['term'])
+     */
+    public function getAllTermsOfGroup(string $taskGuid, string $groupid, $languageIds = array()) {
+        $db = $this->db;
+        $s = $db->select()
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('groupId = ?', $groupid);
+        if(!empty($languageIds)) {
+            $s->where('language in (?)', $languageIds);
         }
         return $db->fetchAll($s)->toArray();
     }
@@ -292,7 +313,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             $term->isSource = in_array($term->language, array($sourceLang));
             $term->transFound = false;
             if ($term->used) {
-                $term->transFound = preg_match('/class=".*?transFound.*?"/', $transFoundSearch[$term->mid]);
+                $term->transFound = preg_match('/class="[^"]*transFound[^"]*"/', $transFoundSearch[$term->mid]);
             }
             
             $termGroups[$term->groupId][] = $term;
