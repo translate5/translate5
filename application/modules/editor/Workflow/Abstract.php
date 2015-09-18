@@ -217,6 +217,7 @@ abstract class editor_Workflow_Abstract {
     
     
     public function __construct() {
+        $this->debug = ZfExtended_Debug::getLevel('core', 'workflow');
         $this->loadAuthenticatedUser();
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
     }
