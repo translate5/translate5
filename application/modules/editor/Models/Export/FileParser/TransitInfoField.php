@@ -271,6 +271,7 @@ class editor_Models_Export_FileParser_TransitInfoField {
         $log = ZfExtended_Factory::get('ZfExtended_Log');
         /* @var $log ZfExtended_Log */
         //Error Info: Reason can be a wrong given target language, Fix: reimport with correct target languages according to TBX
+        $taskGuid = $this->task->getTaskGuid();
         $msg = 'term has not been found in Database, which should be there (Wrong target language given?). TaskGuid: '.$taskGuid;
         $msg .= '; Mid: '.$mid.'; Export continues. '.__FILE__.': '.__LINE__;
         $log->logError($msg);

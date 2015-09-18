@@ -230,10 +230,13 @@ abstract class editor_Models_Export_FileParser {
         return $this->unprotectWhitespace($diffed);
     }
     
+    /**
+     * @return boolean
+     */
     protected function shouldTermTaggingBeRemoved() {
-        $removeTaggingOnExport = $this->config->runtimeOptions->termTagger->removeTaggingOnExport;
-        $return = $this->_diff ? $removeTaggingOnExport->diffExport : $removeTaggingOnExport->normalExport;
-        return (boolean)$return;
+        $exportTermTags = $this->config->runtimeOptions->termTagger->exportTermTags;
+        $exportTermTags = $this->_diff ? $exportTermTags->diffExport : $exportTermTags->normalExport;
+        return !$exportTermTags;
     }
     /**
      * loads the segment to the given Id, caches a limited count of segments internally 
@@ -309,7 +312,7 @@ abstract class editor_Models_Export_FileParser {
             }
             if(!$removeTermTags){
                 $cssClasses = explode(' ', trim($segmentArr[$i]));
-                //@todo actually were removing the trans[Not]Found info. 
+                //@todo currently were removing the trans[Not]Found info. 
                 //it would be better to set it for source segments by checking the target if the term exists  
                 $segmentArr[$i] = join('-', array_filter($cssClasses, $cssClassFilter));
                 $segmentArr[$i] = '<mrk mtype="x-term-' . $segmentArr[$i] . '" mid="' . $segmentArr[$i + 1] . '">';
