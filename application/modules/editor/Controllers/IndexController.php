@@ -127,10 +127,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     protected function setJsVarsInView() {
         $rop = $this->session->runtimeOptions;
         
-      $this->view->Php2JsVars()->set('restpath', APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/');
+        $restPath = APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';
+      $this->view->Php2JsVars()->set('restpath', $restPath);
       $this->view->Php2JsVars()->set('moduleFolder', $this->view->publicModulePath.'/');
       $this->view->Php2JsVars()->set('appFolder', $this->view->publicModulePath.'/js/app');
-      $this->view->Php2JsVars()->set('pluginFolder', $this->view->publicModulePath.'/js/plugins');
+      $this->view->Php2JsVars()->set('pluginFolder', $restPath.'plugins/js');
       $extJs = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
             'ExtJs'
         );
@@ -409,6 +410,45 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     public function wdhehelpAction() {
         $this->_helper->layout->disableLayout();
         //$this->_helper->viewRenderer->setNoRender();
+    }
+
+    /**
+     * To prevent LFI attacks load existing Plugin JS filenames and use them as whitelist
+     * Currently this Method is not reusable, its only for JS.
+     */
+    public function pluginjsAction() {
+        $slash = '/';
+        // get requested file from router
+        $js = explode($slash, $this->getParam(1)); 
+        //pluginname is alpha characters only so check this for security reasons
+        //ucfirst is needed, since in JS packages start per convention with lowercase, Plugins in PHP with uppercase! 
+        $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($js))); 
+        if(empty($plugin)) {
+            throw new ZfExtended_NotFoundException();
+        }
+        //get the plugin instance to the key
+        $pm = Zend_Registry::get('PluginManager');
+        /* @var $pm ZfExtended_Plugin_Manager */
+        $plugin = $pm->get($plugin);
+        /* @var $plugin ZfExtended_Plugin_Abstract */
+        if(empty($plugin)) {
+            throw new ZfExtended_NotFoundException();
+        }
+        //get public files of the plugin to make a whitelist check of the file string from userland
+        $allowedFiles = $plugin->getPublicFiles('js', $absolutePath);
+        $file = join($slash, $js);
+        if(!in_array($file, $allowedFiles)) {
+            throw new ZfExtended_NotFoundException();
+        }
+        //concat the absPath from above with filepath
+        $wholePath = $absolutePath.'/'.$file;
+        if(!file_exists($wholePath)){
+            throw new ZfExtended_NotFoundException();
+        }
+        //currently this method is fixed to JS:
+        header('Content-Type: text/javascript');
+        readfile($wholePath);
+        exit;
     }
 }
 

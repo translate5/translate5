@@ -162,5 +162,14 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'localizedjsstrings'
             ));
         $this->front->getRouter()->addRoute('editorLocalizedJs', $localizedJsRoute);
+        
+        $pluginJs = new Zend_Controller_Router_Route_Regex(
+            'editor/plugins/js/([a-z0-9_\-./]*)',
+            array(
+                'module' => 'editor',
+                'controller' => 'index',
+                'action' => 'pluginjs'
+            ));
+        $this->front->getRouter()->addRoute('editorPluginJs', $pluginJs);
     }
 }
