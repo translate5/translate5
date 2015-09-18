@@ -55,8 +55,8 @@ Ext.define('Editor.plugins.mtComparEval.controller.Controller', {
   init : function() {
     this.control({
         '.adminTaskPreferencesWindow': {
-            render: this.onParentRender//,
-            //close: this.onParentClose  //FIXME reenable this method!
+            render: this.onParentRender,
+            close: this.onParentClose
         },
         '.adminTaskPreferencesWindow .mtComparEvalPanel button#sendto': {
             click: this.handleStartButton
@@ -82,8 +82,9 @@ Ext.define('Editor.plugins.mtComparEval.controller.Controller', {
       });
   },
   onParentClose: function() {
-      if(this.checkImportState) {
+      if(this.checkImportStateTask) {
           Ext.TaskManager.stop(this.checkImportStateTask);
+          delete this.checkImportStateTask;
       }
   },
   /**
@@ -100,6 +101,7 @@ Ext.define('Editor.plugins.mtComparEval.controller.Controller', {
               me.showImportedMessage(rec);
               bar && bar.destroy();
               Ext.TaskManager.stop(me.checkImportStateTask);
+              delete me.checkImportStateTask;
           };
       me.meta.reload({
           success: metaReloaded
@@ -126,6 +128,9 @@ Ext.define('Editor.plugins.mtComparEval.controller.Controller', {
   },
   startWaitingForImport: function() {
       var me = this;
+      if(!me.getResultBox()) {
+          return;
+      }
       if(!me.checkImportStateTask) {
           me.checkImportStateTask = {
                   run: me.checkImportState,
