@@ -230,10 +230,13 @@ abstract class editor_Models_Export_FileParser {
         return $this->unprotectWhitespace($diffed);
     }
     
+    /**
+     * @return boolean
+     */
     protected function shouldTermTaggingBeRemoved() {
-        $removeTaggingOnExport = $this->config->runtimeOptions->termTagger->removeTaggingOnExport;
-        $return = $this->_diff ? $removeTaggingOnExport->diffExport : $removeTaggingOnExport->normalExport;
-        return (boolean)$return;
+        $exportTermTags = $this->config->runtimeOptions->termTagger->exportTermTags;
+        $exportTermTags = $this->_diff ? $exportTermTags->diffExport : $exportTermTags->normalExport;
+        return !$exportTermTags;
     }
     /**
      * loads the segment to the given Id, caches a limited count of segments internally 
