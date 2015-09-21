@@ -64,6 +64,8 @@ class editor_Plugins_ArchiveTaskBeforeDelete_Archiver_DataDirectory implements e
             )
         );
         
+        $this->addReadme($taskRoot);
+        
         if(!$filter->filter($taskRoot)){
             unlink($tempnam);
             throw new ZfExtended_Exception('Could not create export-zip of task '.$taskGuid.'.');
@@ -76,6 +78,14 @@ class editor_Plugins_ArchiveTaskBeforeDelete_Archiver_DataDirectory implements e
         $this->check($taskRoot, $taskGuid, $archiveZipName);
         
         return $archiveZipName;
+    }
+    
+    /**
+     * Adds a readme file with the confluence link how to reimport the created archive
+     * @param string $taskRoot
+     */
+    protected function addReadme($taskRoot) {
+        file_put_contents($taskRoot.'/readme.txt', 'For reimport / usage of this archive in translate5 see http://confluence.translate5.net/display/TPLO/ArchiveTaskBeforeDelete'."\n");
     }
     
     /**

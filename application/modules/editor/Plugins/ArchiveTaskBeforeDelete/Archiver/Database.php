@@ -107,6 +107,12 @@ class editor_Plugins_ArchiveTaskBeforeDelete_Archiver_Database implements editor
      * @return string
      */
     protected function prepareArgs($params) {
+        //empty parameters are mentioned to be ignored completly on commandline
+        //passing null to escapeshellarg will result in an empty parameter,
+        //which triggers mysql_dump to dump always the first table of the database in addition to the desired table!
+        if(empty($params)){
+            return '';
+        }
         if(is_array($params)) {
             return join(' ', array_map('escapeshellarg', $params));
         }
