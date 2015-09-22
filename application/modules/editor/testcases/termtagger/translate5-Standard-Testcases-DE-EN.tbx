@@ -247,6 +247,33 @@
             </langSet>
          </termEntry>
 
+         <termEntry id="X_1021">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>haus</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="en-GB">
+               <tig>
+                  <term>house</term>
+               </tig>
+            </langSet>
+
+         <termEntry id="X_1021">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Terminus</term>
+                  <termNote type="normativeAuthorization">preferredTerm</termNote>
+               </tig>
+            </langSet>
+            <langSet xml:lang="en-GB">
+               <tig>
+                  <term>term</term>
+                  <termNote type="normativeAuthorization">preferredTerm</termNote>
+               </tig>
+            </langSet>
+         </termEntry>
+
 
 
 
