@@ -766,6 +766,10 @@ Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-M
 <trans-unit id='SW5zdGFsbGF0aW9u'><source>Installation</source><target>Installation</target></trans-unit>
 <trans-unit id='RGV2ZWxvcGVycw=='><source>Developers</source><target>Developers</target></trans-unit>
 <trans-unit id='VGVzdGltb25pYWxz'><source>Testimonials</source><target>Testimonials</target></trans-unit>
+<trans-unit id='Zm9vMQ=='><source>foo1</source><target>foo1</target></trans-unit>
+<trans-unit id='U3BhbHRlIEE='><source>Spalte A</source><target>Spalte A</target></trans-unit>
+<trans-unit id='WmllbCAy'><source>Ziel 2</source><target>Ziel 2</target></trans-unit>
+<trans-unit id='Tm9jaCBlaW4gWmllbA=='><source>Noch ein Ziel</source><target>Noch ein Ziel</target></trans-unit>
   </body>
  </file>
 </xliff>
