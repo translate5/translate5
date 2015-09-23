@@ -677,9 +677,12 @@ class editor_TaskController extends ZfExtended_RestController {
     }
     
     public function deleteAction() {
-        $this->entity->load($this->_getParam('id'));
+        $this->entityLoad();
         $this->checkStateAllowsActions();
-        return parent::deleteAction();
+        $this->processClientReferenceVersion();
+        $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array($this->entity));
+        /* @var $remover editor_Models_Task_Remover */
+        $remover->remove();
     }
     
     /**

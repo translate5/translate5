@@ -208,6 +208,9 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract{
     }
     public static function tearDownAfterClass() {
         parent::tearDownAfterClass();
-        self::$testTask->delete();
+        
+        $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array(self::$testTask));
+        /* @var $remover editor_Models_Task_Remover */
+        $remover->removeForced();
     }
 }

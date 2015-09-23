@@ -83,6 +83,7 @@ END LICENSE AND COPYRIGHT
  * @method void setEdit100PercentMatch() setEdit100PercentMatch(boolean $flag)
  * @method string getQmSubsegmentFlags() getQmSubsegmentFlags() get Original Flags from DB
  * @method void setQmSubsegmentFlags() setQmSubsegmentFlags(string $flags) set Original Flags in DB
+ * @method void delete() delete() see editor_Models_Task_Remover for complete task removal
  */
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';
@@ -356,80 +357,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         	return $this->taskDataPath = $taskData;
         }
         throw new Zend_Exception('TaskData Directory is not writeable:  "'.$taskData->getPathname().'".');
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Models_Entity_Abstract::delete()
-     */
-    public function delete() {
-        $this->preDelete();
-        
-        //also delete files on default delete
-        $taskPath = (string)$this->getAbsoluteTaskDataPath();
-        if(is_dir($taskPath)){
-            /* @var $recursivedircleaner ZfExtended_Controller_Helper_Recursivedircleaner */
-            $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-                'Recursivedircleaner'
-            );
-            $recursivedircleaner->delete($taskPath);
-        }
-        
-        parent::delete();
-    }
-
-    /**
-     * delete the whole task, but keep the imported files (for debugging purposes)
-     */
-    public function deleteButKeepFiles() {
-        $this->preDelete();
-        parent::delete();
-    }
-    
-    /**
-     * internal function with stuff to be excecuted before deleting a task
-     */
-    protected function preDelete() {
-        //@todo ask marc if logging tables should also be deleted (no constraint is set)
-        $taskGuid = $this->getTaskGuid();
-        if(empty($taskGuid)) {
-            return;
-        }
-        
-        $e = new ZfExtended_BadMethodCallException();
-        $e->setLogging(false);
-        
-        if($this->isUsed($taskGuid)) {
-            $e->setMessage("Die Aufgabe wird von einem Benutzer benutzt", true);
-            throw $e;
-        }
-        
-        if($this->isLocked($taskGuid)) {
-            $e->setMessage("Die Aufgabe ist durch einen Benutzer gesperrt", true);
-            throw $e; 
-        }
-        
-        if(!$this->lock(NOW_ISO, true)) {
-            //@todo: needs to be solved, since delete on task-import-error throws
-            //this exception and covers the real one
-            //throw new ZfExtended_Models_Entity_Conflict();
-        }
-        
-        //delete the generated views for this task
-        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView', array($taskGuid));
-        /* @var $mv editor_Models_Segment_MaterializedView */
-        $mv->drop();
-        
-        //An der Segment und Files Tabelle hängen mehrere Abhängigkeiten,
-        //daher diese manuell löschen vorher um DB Last durch Table Locks zu verringern.
-        $segmentTable = ZfExtended_Factory::get('editor_Models_Db_Segments');
-        $segmentTable->delete(array('taskGuid = ?' => $taskGuid));
-        
-        $termTable = ZfExtended_Factory::get('editor_Models_Db_Terms');
-        $termTable->delete(array('taskGuid = ?' => $taskGuid));
-        
-        $filesTable = ZfExtended_Factory::get('editor_Models_Db_Files');
-        $filesTable->delete(array('taskGuid = ?' => $taskGuid));
     }
     
     /**

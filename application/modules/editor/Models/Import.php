@@ -195,7 +195,6 @@ class editor_Models_Import {
         $this->task->save(); //Task erst Speichern wenn die obigen validates und checks durch sind.
         $this->task->lock(NOW_ISO, true); //locks the task
         
-        
         $this->segmentFieldManager->initFields($this->task->getTaskGuid());
         
         //call import Methods:
@@ -250,18 +249,17 @@ class editor_Models_Import {
         
         $log = ZfExtended_Factory::get('ZfExtended_Log');
         /* @var $log ZfExtended_Log */
-        $msg = 'More information see in the next exception email!';
+        $msg = "\nImport Exception: ".$e."\n";
         if(!$deleteFiles) {
-            $msg = "\n".'The imported data is kept in '.$config->runtimeOptions->dir->taskData;
+            $msg .= "\n".'The imported data is kept in '.$config->runtimeOptions->dir->taskData;
         }
         $log->logError('Exception while importing task '.$this->task->getTaskGuid(), $msg);
         
+        $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array($this->task));
+        /* @var $remover editor_Models_Task_Remover */
+        $remover->removeForced($deleteFiles);
         if($deleteFiles) {
-            $this->task->delete();
             $dataProvider->handleImportException($e);
-        }
-        else {
-            $this->task->deleteButKeepFiles();
         }
     }
     
@@ -295,13 +293,6 @@ class editor_Models_Import {
         }
     }
     
-    /**
-     * löscht alle Daten des aktuell im Importer geladenen Tasks aus der DB
-     */
-    public function deleteTask() {
-        $this->task->delete();
-    }
-
     /**
      * Methode zum Anstoßen verschiedener Meta Daten Imports zum Laufenende Import
      */
