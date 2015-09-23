@@ -258,6 +258,7 @@
                   <term>house</term>
                </tig>
             </langSet>
+         </termEntry>
 
          <termEntry id="X_1021">
             <langSet xml:lang="DE">
@@ -273,10 +274,6 @@
                </tig>
             </langSet>
          </termEntry>
-
-
-
-
         </body>
 
         <back>
