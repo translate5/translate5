@@ -23,7 +23,7 @@
                         <termNote type="normativeAuthorization">preferredTerm</termNote>
                     </tig>
                 </langSet>
-                <langSet lang="KR">
+                <langSet lang="KO">
                     <tig>
                         <term>데이터시트</term>
                         <termNote type="normativeAuthorization">preferredTerm</termNote>
@@ -38,7 +38,7 @@
                         <termNote type="normativeAuthorization">preferredTerm</termNote>
                     </tig>
                 </langSet>
-                <langSet lang="KR">
+                <langSet lang="KO">
                     <tig>
                         <term>정확</term>
                         <termNote type="normativeAuthorization">preferredTerm</termNote>

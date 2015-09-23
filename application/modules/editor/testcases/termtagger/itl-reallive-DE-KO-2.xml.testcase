@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testcase name="stringMatchTermWithinWord" creator="itl/MittagQI" mandatory="yes" sourceLang="DE" targetLang="KR" tbxPath="itl-reallive-DE-KR.tbx" sourceStringMatch="0" targetStringMatch="1">
-    <description>in targetStringMatch-Languages (e.g. JP, ZH, KR) a term must be matched, even if it resides inside a word (usual word boundaries are irrelevant, except tags</description>
+<testcase name="stringMatchTermWithinWord" creator="itl/MittagQI" mandatory="yes" sourceLang="DE" targetLang="KO" tbxPath="itl-reallive-DE-KO.tbx" sourceStringMatch="0" targetStringMatch="1">
+    <description>in targetStringMatch-Languages (e.g. JP, ZH, KO) a term must be matched, even if it resides inside a word (usual word boundaries are irrelevant, except tags</description>
     <assertion type="assertOutputEquals">
         <input>
             <source>genau das liefern</source>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testcase name="specialCharsTargetStringMatch" creator="itl/MittagQI" mandatory="yes" sourceLang="DE" targetLang="KR" tbxPath="itl-reallive-DE-KR.tbx" sourceStringMatch="0" targetStringMatch="1">
+<testcase name="specialCharsTargetStringMatch" creator="itl/MittagQI" mandatory="yes" sourceLang="DE" targetLang="KO" tbxPath="itl-reallive-DE-KO.tbx" sourceStringMatch="0" targetStringMatch="1">
     <description>Match term in targetStringMatch-language, beside that directly a special char „ or “ exists / be able to tag segments with these chars</description>
     <assertion type="assertOutputEquals">
         <input>

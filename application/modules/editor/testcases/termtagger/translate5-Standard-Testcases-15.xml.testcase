@@ -7,7 +7,7 @@
             <target>Tamiz de cepillos<div class="single 782069643d223422202f"><span title="&lt;br/&gt;" class="short">&lt;1/&gt;</span><span id="4-2-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div>rotativos.</target>
         </input>
         <expectedOutput>
-            <source><div title="" class="term admittedTerm lowercased transFound" data-tbxid="term_0000001_001_de-DE_001_0000001">Tolles<div class="single 782069643d223422202f"><span title="&lt;br/&gt;" class="short">&lt;1/&gt;</span><span id="4-1-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div>Drehbürstensieb</div>.</source>
+            <source><div title="" class="term admittedTerm lowercase transFound" data-tbxid="term_0000001_001_de-DE_001_0000001">Tolles<div class="single 782069643d223422202f"><span title="&lt;br/&gt;" class="short">&lt;1/&gt;</span><span id="4-1-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div>Drehbürstensieb</div>.</source>
             <target><div title="" class="term admittedTerm exact" data-tbxid="term_0000001_001_es-ES_001_0000003">Tamiz de cepillos<div class="single 782069643d223422202f"><span title="&lt;br/&gt;" class="short">&lt;1/&gt;</span><span id="4-2-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div>rotativos</div>.</target>
         </expectedOutput>
     </assertion>
