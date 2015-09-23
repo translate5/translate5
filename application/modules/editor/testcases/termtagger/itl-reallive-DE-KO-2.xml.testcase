@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="stringMatchTermWithinWord" creator="itl/MittagQI" mandatory="yes" sourceLang="DE" targetLang="KO" tbxPath="itl-reallive-DE-KO.tbx" sourceStringMatch="0" targetStringMatch="1">
+    <description>in targetStringMatch-Languages (e.g. JP, ZH, KO) a term must be matched, even if it resides inside a word (usual word boundaries are irrelevant, except tags</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>genau das liefern</source>
+            <target>는 정확히 고</target>
+        </input>
+        <expectedOutput>
+            <source><div title="" class="term preferredTerm exact transFound" data-tbxid="xyz">genau</div> das liefern</source>
+            <target>는 <div title="" class="term preferredTerm exact" data-tbxid="xyz">정확</div>히 고</target>
+        </expectedOutput>
+    </assertion>
+</testcase>
