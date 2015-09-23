@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="2 terms only separated by a single space" creator="MittagQI" mandatory="yes" sourceLang="DE" targetLang="EN" tbxPath="translate5-Standard-Testcases-DE-EN.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>2 terms only separated by a single space must both be tagged</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>Hier passt was nicht mit dem Terminus Haus</source>
+            <target>My house has a term</target>
+        </input>
+        <expectedOutput>
+            <source>Hier passt was nicht mit dem <div title="" class="term preferredTerm exact transFound" data-tbxid="">Terminus</div> <div title="" class="term admittedTerm lowercase transFound" data-tbxid="">Haus</div></source>
+            <target>My <div title="" class="term admittedTerm exact" data-tbxid="">house</div> has a <div title="" class="term preferredTerm exact" data-tbxid="">term</div></target>
+        </expectedOutput>
+    </assertion>
+</testcase>
