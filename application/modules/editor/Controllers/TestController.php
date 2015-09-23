@@ -61,9 +61,12 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
     protected $xmlResultSummary = array();
     public function init() {
         parent::init();
-        $class = ucfirst($this->getRequest()->getActionName());
         $this->_helper->viewRenderer->setNoRender();
         $this->_helper->layout->disableLayout();
+    }
+    
+    public function termtaggerAction() {
+        $class = ucfirst($this->getRequest()->getActionName());
         $this->testcase = new ReflectionClass('editor_Test_'.$class);
         $testcaseProperties = $this->testcase->getDefaultProperties();
         $parentTestFolderAbsolutePath = APPLICATION_PATH.'/../'.$testcaseProperties['parentTestFolderRelativePath'];
@@ -80,12 +83,15 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
         
         
         $this->testIterator = new RecursiveDirectoryIterator($testSuitePath,FilesystemIterator::CURRENT_AS_FILEINFO|FilesystemIterator::SKIP_DOTS);
-    }
-    
-    public function termtaggerAction() {
+        
         echo "<h1>TermTagger Tests; ".  date(DATE_RFC2822)."</h1>";
         $this->loopThroughTestXmlFiles($this->getParam('filter', null));
         $this->echoResultSummary();
+    }
+    
+    public function editorAction() {
+        echo "<h1>Editor Tests; ".  date(DATE_RFC2822)."</h1>";
+        print_r(get_include_path());
     }
     
     protected function loopThroughTestXmlFiles($filter = null) {

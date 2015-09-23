@@ -35,7 +35,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 
-abstract class editor_Test_Termtagger_Abstract extends \ZfExtended_Testcase{
+abstract class editor_Test_Termtagger_Abstract extends \editor_Test_Testcase {
     public static $parentTestFolderRelativePath = 'application/modules/editor/testcases';
 
     /**

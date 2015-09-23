@@ -35,6 +35,9 @@ END LICENSE AND COPYRIGHT
  *
  */
 
+/**
+ * Tests / validates the Testcase described in the .testcase XML file
+ */
 class editor_Test_Termtagger_Preparation extends editor_Test_Termtagger_Abstract{
 
     /**
