@@ -51,5 +51,22 @@ Ext.define('Editor.plugins.mtComparEval.view.Panel', {
         xtype: 'button',
         itemId: 'sendto',
         text: 'Send Task to MT-ComparEval'
+    },{
+        xtype: 'container',
+        html: '<h2>Usage</h2>\
+            MT-ComparEval is a third-party tool integrated in translate5 as a plug-in.<br />\
+            <br />\
+            MT-ComparEval is a tool for comparison and evaluation of machine<br />\
+            translations. It allows users to compare translations according to<br />\
+            several criteria.<br />\
+            <br />\
+            To use MT-ComparEval in combination with translate5, you need a<br />\
+            translate5-task with at least 3 different different translations for the<br />\
+            same source. The first translation is handled as reference language in<br />\
+            MT-ComparEval and all following translations as output of different<br />\
+            MT-engines.<br />\
+            <br />\
+            Please search <a href="http://confluence.translate5.net">http://confluence.translate5.net</a> for information on<br />\
+            importing multi-column CSV-files and the MT-ComparEval plug-in.'
     }]
 });
