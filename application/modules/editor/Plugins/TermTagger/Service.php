@@ -74,6 +74,14 @@ class editor_Plugins_TermTagger_Service {
     }
     
     /**
+     * returns the configured TermTagger URLs
+     * @return array
+     */
+    public function getConfiguredUrls() {
+        return $this->config->url->toArray();
+    }
+    
+    /**
      * returns the HTTP Status of the last request 
      * @return integer
      */
@@ -99,7 +107,12 @@ class editor_Plugins_TermTagger_Service {
      */
     public function testServerUrl(string $url) {
         $httpClient = $this->getHttpClient($url.'/termTagger');
-        $response = $this->sendRequest($httpClient, $httpClient::GET);
+        try {
+            $response = $this->sendRequest($httpClient, $httpClient::GET);
+        }
+        catch(editor_Plugins_TermTagger_Exception_Request $e) {
+            return false;
+        }
         
         // $url is OK if status == 200 AND string 'TermTagger Server' is in the response-body
         return $response && $this->wasSuccessfull() && strpos($response->getBody(), 'TermTagger Server') !== false;
