@@ -85,7 +85,11 @@ class editor_Models_Languages extends ZfExtended_Models_Entity_Abstract {
     protected function loader($lang, $field) {
         $s = $this->db->select();
         $s->where('lower('.$field.') = ?',strtolower($lang));
-        return $this->row = $this->db->fetchRow($s);
+        $this->row = $this->db->fetchRow($s);
+        if(empty($this->row)){
+            $this->notFound('#by'.ucfirst($field), $lang);
+        }
+        return $this->row;
     }
 
     /**
