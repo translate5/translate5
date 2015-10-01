@@ -28,27 +28,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-abstract class editor_Test_Testcase extends \ZfExtended_Test_Testcase {
-    public static $parentTestFolderRelativePath = 'data/testcases';
-    public static $parentTestFolderAbsolutePath;
-    public static $testSuitePath;
-    /**
-     * @var editor_Models_Task
-     */
-    protected static $testTask;
-    /**
-     * @var array
-     */
-    public static $messages = array();
-    /**
-     * 
-     * @param type $name
-     * @param array $data
-     * @param type $dataName
-     */
-
-    public static function setUpBeforeClass() {
-        self::$testTask = ZfExtended_Factory::get('editor_Models_Task');
-        parent::setUpBeforeClass();
-    }
+/**
+ * Wrapper for ZfExtended_ConfigController
+ * else RestRoutes, ACL authentication, etc. will not work (must be adapted for default module of each project)
+ */
+class editor_ConfigController extends ZfExtended_ConfigController {
+    
 }
