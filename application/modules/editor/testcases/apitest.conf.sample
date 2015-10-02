@@ -1,0 +1,18 @@
+#
+# Please change the following values to your needs
+#
+
+#the root directory of the translate5 installation to test
+APPLICATION_ROOT=/mnt/mittagqi/www/www.translate5.net/
+
+#the directory of zend (needed explicit)
+ZEND=/var/www/zend/
+
+# the API URL of the installation to test (including rundir and trailing slash!)
+API_URL="http://translate5.localdev/"
+
+# the data task data directory as configured in the application
+DATA_DIR="../data/editorImportedTasks"
+
+# the logout path as configured in DB
+LOGOUT_PATH=login/logout/
