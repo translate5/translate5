@@ -35,7 +35,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 
-class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract{
+class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
     /**
      *
      * @var string

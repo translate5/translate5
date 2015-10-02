@@ -133,7 +133,7 @@ abstract class editor_Workflow_Abstract {
     protected $latestWorkflowLogEntry;
     
     /**
-     * enables / disables debugging (logging)
+     * enables / disables debugging (logging), can be enabled by setting runtimeOptions.debug.core.workflow = 1 in installation.ini
      * 0 => disabled
      * 1 => log called handler methods (logging must be manually implemented in the handler methods by usage of $this->doDebug)
      * 2 => log also $this
@@ -624,6 +624,7 @@ abstract class editor_Workflow_Abstract {
      * @param editor_Models_TaskUserAssoc $newTua
      */
     public function doWithUserAssoc(editor_Models_TaskUserAssoc $oldTua, editor_Models_TaskUserAssoc $newTua) {
+        $this->doDebug(__FUNCTION__);
         $this->oldTaskUserAssoc = $oldTua;
         $this->newTaskUserAssoc = $newTua;
         
@@ -734,6 +735,7 @@ abstract class editor_Workflow_Abstract {
      * evaluates the role and states of the User Task Association and calls the matching handlers:
      */
     protected function doFinish() {
+        $this->doDebug(__FUNCTION__);
         $userTaskAssoc = $this->newTaskUserAssoc;
         $stat = $userTaskAssoc->getUsageStat();
         $allFinished = true;

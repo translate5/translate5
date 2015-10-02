@@ -724,6 +724,52 @@ Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-M
 <trans-unit id='PGI+PGk+w5xiZXJzY2hyZWliZSBaaWVsdGV4dCBtaXQ6PC9pPjwvYj4g'><source><b><i>Überschreibe Zieltext mit:</i></b> </source><target><b><i>Überschreibe Zieltext mit:</i></b> </target></trans-unit>
 <trans-unit id='RHVyY2ggZGFzIFN5c3RlbSBnZXNwZXJydCBtaXQgZGVtIFN0YXR1cyAnezB9Jw=='><source>Durch das System gesperrt mit dem Status '{0}'</source><target>Durch das System gesperrt mit dem Status '{0}'</target></trans-unit>
 <trans-unit id='RGllIEF1ZmdhYmUgaXN0IGR1cmNoIGVpbmVuIEJlbnV0emVyIGdlc3BlcnJ0'><source>Die Aufgabe ist durch einen Benutzer gesperrt</source><target>Die Aufgabe ist durch einen Benutzer gesperrt</target></trans-unit>
+<trans-unit id='RWlud2FuZGZyZWkgbWl0IGxhbmdlbSBUZXh0IHp3ZWNrcyBVbWJydWNoIGRhbmFjaCwgZGFzc211c3MgZG9jaCBhdWNoIGhpZXIgc2VpbiE='><source>Einwandfrei mit langem Text zwecks Umbruch danach, dassmuss doch auch hier sein!</source><target>Einwandfrei mit langem Text zwecks Umbruch danach, dassmuss doch auch hier sein!</target></trans-unit>
+<trans-unit id='U3RhdHVzIDEgd2l0aCB2ZXJ5IGxvbmcgbGluZXMgdG8gdGVzdCBUUkFOU0xBVEUtMzk2IHdyYXBwaW5nIG9mIGxvbmcgc3RhdGVz'><source>Status 1 with very long lines to test TRANSLATE-396 wrapping of long states</source><target>Status 1 with very long lines to test TRANSLATE-396 wrapping of long states</target></trans-unit>
+<trans-unit id='U3RhdHVzIDIgZGFzIGlzdCBlaW4gdG9sbGVzIGRpbmcgaGllciBsYW5nZSB3ZXJ0ZSBlaW56dWdlYmVu'><source>Status 2 das ist ein tolles ding hier lange werte einzugeben</source><target>Status 2 das ist ein tolles ding hier lange werte einzugeben</target></trans-unit>
+<trans-unit id='U3RhdHVzIDMgZGFzIGlzdCBlaW4gdG9sbGVzIGRpbmcgaGllciBsYW5nZSB3ZXJ0ZSBlaW56dWdlYmVu'><source>Status 3 das ist ein tolles ding hier lange werte einzugeben</source><target>Status 3 das ist ein tolles ding hier lange werte einzugeben</target></trans-unit>
+<trans-unit id='U3RhdHVzIDQgZGFzIGlzdCBlaW4gdG9sbGVzIGRpbmcgaGllciBsYW5nZSB3ZXJ0ZSBlaW56dWdlYmVu'><source>Status 4 das ist ein tolles ding hier lange werte einzugeben</source><target>Status 4 das ist ein tolles ding hier lange werte einzugeben</target></trans-unit>
+<trans-unit id='U3RhdHVzIDUgZGFzIGlzdCBlaW4gdG9sbGVzIGRpbmcgaGllciBsYW5nZSB3ZXJ0ZSBlaW56dWdlYmVu'><source>Status 5 das ist ein tolles ding hier lange werte einzugeben</source><target>Status 5 das ist ein tolles ding hier lange werte einzugeben</target></trans-unit>
+<trans-unit id='U3RhdHVzIDYgZGFzIGlzdCBlaW4gdG9sbGVzIGRpbmcgaGllciBsYW5nZSB3ZXJ0ZSBlaW56dWdlYmVu'><source>Status 6 das ist ein tolles ding hier lange werte einzugeben</source><target>Status 6 das ist ein tolles ding hier lange werte einzugeben</target></trans-unit>
+<trans-unit id='U3RhdHVzIDcgZGFzIGlzdCBlaW4gdG9sbGVzIGRpbmcgaGllciBsYW5nZSB3ZXJ0ZSBlaW56dWdlYmVu'><source>Status 7 das ist ein tolles ding hier lange werte einzugeben</source><target>Status 7 das ist ein tolles ding hier lange werte einzugeben</target></trans-unit>
+<trans-unit id='U3RhdHVzIDggZGFzIGlzdCBlaW4gdG9sbGVzIGRpbmcgaGllciBsYW5nZSB3ZXJ0ZSBlaW56dWdlYmVu'><source>Status 8 das ist ein tolles ding hier lange werte einzugeben</source><target>Status 8 das ist ein tolles ding hier lange werte einzugeben</target></trans-unit>
+<trans-unit id='U3RhdHVzIDkgZGFzIGlzdCBlaW4gdG9sbGVzIGRpbmcgaGllciBsYW5nZSB3ZXJ0ZSBlaW56dWdlYmVu'><source>Status 9 das ist ein tolles ding hier lange werte einzugeben</source><target>Status 9 das ist ein tolles ding hier lange werte einzugeben</target></trans-unit>
+<trans-unit id='U3RhdHVzIDEwIGRhcyBpc3QgZWluIHRvbGxlcyBkaW5nIGhpZXIgbGFuZ2Ugd2VydGUgZWluenVnZWJlbg=='><source>Status 10 das ist ein tolles ding hier lange werte einzugeben</source><target>Status 10 das ist ein tolles ding hier lange werte einzugeben</target></trans-unit>
+<trans-unit id='U3RhdHVzIDExIGRhcyBpc3QgZWluIHRvbGxlcyBkaW5nIGhpZXIgbGFuZ2Ugd2VydGUgZWluenVnZWJlbg=='><source>Status 11 das ist ein tolles ding hier lange werte einzugeben</source><target>Status 11 das ist ein tolles ding hier lange werte einzugeben</target></trans-unit>
+<trans-unit id='S29yZWFuaXNjaCAy'><source>Koreanisch 2</source><target>Koreanisch 2</target></trans-unit>
+<trans-unit id='UmVmZXJlbmNl'><source>Reference</source><target>Reference</target></trans-unit>
+<trans-unit id='QmFiYmVsZmlzaA=='><source>Babbelfish</source><target>Babbelfish</target></trans-unit>
+<trans-unit id='T25saW5lLVRyYW5zbGF0b3IuY29t'><source>Online-Translator.com</source><target>Online-Translator.com</target></trans-unit>
+<trans-unit id='aWQ='><source>id</source><target>id</target></trans-unit>
+<trans-unit id='c2VnbWVudE5ySW5UYXNr'><source>segmentNrInTask</source><target>segmentNrInTask</target></trans-unit>
+<trans-unit id='ZmlsZUlk'><source>fileId</source><target>fileId</target></trans-unit>
+<trans-unit id='ZWRpdGVk'><source>edited</source><target>edited</target></trans-unit>
+<trans-unit id='dXNlckd1aWQ='><source>userGuid</source><target>userGuid</target></trans-unit>
+<trans-unit id='dXNlck5hbWU='><source>userName</source><target>userName</target></trans-unit>
+<trans-unit id='dGFza0d1aWQ='><source>taskGuid</source><target>taskGuid</target></trans-unit>
+<trans-unit id='dGltZXN0YW1w'><source>timestamp</source><target>timestamp</target></trans-unit>
+<trans-unit id='ZWRpdGFibGU='><source>editable</source><target>editable</target></trans-unit>
+<trans-unit id='cHJldHJhbnM='><source>pretrans</source><target>pretrans</target></trans-unit>
+<trans-unit id='bWF0Y2hSYXRl'><source>matchRate</source><target>matchRate</target></trans-unit>
+<trans-unit id='cW1JZA=='><source>qmId</source><target>qmId</target></trans-unit>
+<trans-unit id='c3RhdGVJZA=='><source>stateId</source><target>stateId</target></trans-unit>
+<trans-unit id='YXV0b1N0YXRlSWQ='><source>autoStateId</source><target>autoStateId</target></trans-unit>
+<trans-unit id='ZmlsZU9yZGVy'><source>fileOrder</source><target>fileOrder</target></trans-unit>
+<trans-unit id='c291cmNlRWRpdGVk'><source>sourceEdited</source><target>sourceEdited</target></trans-unit>
+<trans-unit id='Y29tbWVudHM='><source>comments</source><target>comments</target></trans-unit>
+<trans-unit id='d29ya2Zsb3dTdGVwTnI='><source>workflowStepNr</source><target>workflowStepNr</target></trans-unit>
+<trans-unit id='d29ya2Zsb3dTdGVw'><source>workflowStep</source><target>workflowStep</target></trans-unit>
+<trans-unit id='V2VsY29tZQ=='><source>Welcome</source><target>Welcome</target></trans-unit>
+<trans-unit id='TWlzc2lvbg=='><source>Mission</source><target>Mission</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRlNSBEZW1v'><source>translate5 Demo</source><target>translate5 Demo</target></trans-unit>
+<trans-unit id='VXNhZ2UgJmFtcDsgZG9jdW1lbnRhdGlvbg=='><source>Usage &amp; documentation</source><target>Usage &amp; documentation</target></trans-unit>
+<trans-unit id='SW5zdGFsbGF0aW9u'><source>Installation</source><target>Installation</target></trans-unit>
+<trans-unit id='RGV2ZWxvcGVycw=='><source>Developers</source><target>Developers</target></trans-unit>
+<trans-unit id='VGVzdGltb25pYWxz'><source>Testimonials</source><target>Testimonials</target></trans-unit>
+<trans-unit id='Zm9vMQ=='><source>foo1</source><target>foo1</target></trans-unit>
+<trans-unit id='U3BhbHRlIEE='><source>Spalte A</source><target>Spalte A</target></trans-unit>
+<trans-unit id='WmllbCAy'><source>Ziel 2</source><target>Ziel 2</target></trans-unit>
+<trans-unit id='Tm9jaCBlaW4gWmllbA=='><source>Noch ein Ziel</source><target>Noch ein Ziel</target></trans-unit>
   </body>
  </file>
 </xliff>

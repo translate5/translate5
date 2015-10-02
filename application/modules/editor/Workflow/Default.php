@@ -38,8 +38,6 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      */
     const WORKFLOW_ID = 'default';
     
-    protected $debug = 0;
-    
     protected $isCron = false;
     
     public function __construct() {

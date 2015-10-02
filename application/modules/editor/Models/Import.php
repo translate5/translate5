@@ -667,12 +667,12 @@ class editor_Models_Import {
 
     /**
      * Setzt die zu importierende Quell und Zielsprache, das Format der Sprach IDs wird über den Parameter $type festgelegt
-     * @param string $source
-     * @param string $target
-     * @param string $relais Relaissprache, kann null/leer sein wenn es keine Relaissprache gibt
+     * @param mixed $source
+     * @param mixed $target
+     * @param mixed $relais Relaissprache, kann null/leer sein wenn es keine Relaissprache gibt
      * @param string $type
      */
-    public function setLanguages(string $source, string $target, $relais, $type = editor_Models_Languages::LANG_TYPE_RFC5646) {
+    public function setLanguages($source, $target, $relais, $type = editor_Models_Languages::LANG_TYPE_RFC5646) {
         $this->_sourceLangValue = $source;
         $this->_targetLangValue = $target;
         $this->_relaisLangValue = $relais;

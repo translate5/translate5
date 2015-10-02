@@ -289,6 +289,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $pm->init((array)$this->user->data);
         $this->data['pmName'] = $pm->getUsernameLong();
         $this->processClientReferenceVersion();
+        $this->convertToLanguageIds();
         $this->setDataInEntity();
         $this->entity->createTaskGuidIfNeeded();
         
@@ -333,6 +334,30 @@ class editor_TaskController extends ZfExtended_RestController {
         catch (Exception $e) {
             $import->handleImportException($e, $dp);
             throw $e;
+        }
+    }
+    
+    /**
+     * Since numeric IDs aren't really sexy to be used for languages in API, TaskController can also deal with rfc5646 strings
+     * Not found / invalid languages are converted to 0, this gives an error on import
+     */
+    protected function convertToLanguageIds() {
+        $langFields = array('sourceLang', 'targetLang', 'relaisLang');
+        foreach($langFields as $lang) {
+            //ignoring if already integer like value or empty
+            if(empty($this->data[$lang]) || (int)$this->data[$lang] > 0) {
+                continue;
+            }
+            $language = ZfExtended_Factory::get('editor_Models_Languages');
+            /* @var $language editor_Models_Languages */
+            try {
+                $language->loadByRfc5646($this->data[$lang]);
+            }
+            catch(ZfExtended_Models_Entity_NotFoundException $e) {
+                $this->data[$lang] = 0;
+                continue;
+            }
+            $this->data[$lang] = $language->getId();
         }
     }
     
@@ -571,6 +596,10 @@ class editor_TaskController extends ZfExtended_RestController {
     protected function updateUserState(string $userGuid, $disableWorkflowEvents = false) {
         if(empty($this->data->userState)) {
             return;
+        }
+
+        if(!in_array($this->data->userState, $this->workflow->getStates())) {
+            throw new ZfExtended_Models_Entity_NotAcceptableException('Given UserState '.$this->data->userState.' does not exist.');
         }
         
         $isEditAllTasks = $this->isAllowed('editAllTasks');
