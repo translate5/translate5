@@ -89,7 +89,7 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         //get the changes file
         $path = $this->api()->getTaskDataDirectory();
         $foundChangeFiles = glob($path.'changes*.xliff');
-        $this->assertNotEmpty($foundChangeFiles);
+        $this->assertNotEmpty($foundChangeFiles, 'No changes*.xliff file was written for taskGuid: '.$task->taskGuid);
         $foundChangeFile = end($foundChangeFiles);
         $this->assertFileExists($foundChangeFile);
         
