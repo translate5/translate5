@@ -113,6 +113,7 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
     public static function tearDownAfterClass() {
         $task = self::$api->getTask();
         //open task for whole testcase
+        self::$api->login('testmanager');
         self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
     }
 }
