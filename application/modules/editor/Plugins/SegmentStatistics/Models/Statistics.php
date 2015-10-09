@@ -101,7 +101,7 @@ class editor_Plugins_SegmentStatistics_Models_Statistics extends ZfExtended_Mode
     /**
      * returns the statistics summary for the given taskGuid and type
      * @param string $taskGuid
-     * @param string $type
+     * @param string $type (import or export)
      * @return array
      */
     public function calculateSummary($taskGuid, $type) {
