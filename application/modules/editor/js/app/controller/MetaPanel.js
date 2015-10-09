@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -97,9 +96,9 @@ Ext.define('Editor.controller.MetaPanel', {
           show : me.layout
       },
       //disabled ctrl enter since this produces errors in the save chain
-      //'segmentsHtmleditor': {
-      //    afteriniteditor: me.initEditor
-      //},
+      'segmentsHtmleditor': {
+          afteriniteditor: me.initEditor
+      },
       '#segmentgrid': {
           afterrender: me.initEditPluginHandler
       }
@@ -133,7 +132,24 @@ Ext.define('Editor.controller.MetaPanel', {
   initEditor: function(editor){
       var me = this,
           keyev = Ext.EventManager.useKeyDown ? 'keydown' : 'keypress';
+
+      Ext.EventManager.on(editor.getDoc(), 'copy', function(e){
+          console.log('COPY', (e.browserEvent || e).clipboardData.getData('text/plain'));//, window.clipboardData.getData('Text'));
+      });
+
+      Ext.EventManager.on(editor.getDoc(), 'paste', function(e){
+          console.log('PASTE', (e.browserEvent || e).clipboardData.getData('text/plain'));//, window.clipboardData.getData('Text'));
+      });
+
+      Ext.EventManager.on(editor.getDoc(), 'selectstart', function(e){
+          console.log('START');
+      });
+      
+      Ext.EventManager.on(editor.getDoc(), 'selectionchange', function(e){
+          console.log('SELECTION');
+      });
       Ext.EventManager.on(editor.getDoc(), keyev, function(e){
+          console.log("KEY",e.getKey());
           if(e.ctrlKey && e.getKey() == e.ENTER) {
               me.saveNext();
           }
