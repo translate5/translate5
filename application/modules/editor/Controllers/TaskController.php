@@ -174,6 +174,10 @@ class editor_TaskController extends ZfExtended_RestController {
             return $item['taskGuid'];
         },$rows);
         
+        $file = ZfExtended_Factory::get('editor_Models_File');
+        /* @var $file editor_Models_File */
+        $fileCount = $file->getFileCountPerTasks($taskGuids);
+        
         $userAssocInfos = array();
         $allAssocInfos = $this->getUserAssocInfos($taskGuids, $userAssocInfos);
         
@@ -188,6 +192,7 @@ class editor_TaskController extends ZfExtended_RestController {
             unset($row['qmSubsegmentFlags']);
             
             $this->addUserInfos($row, $row['taskGuid'], $userAssocInfos, $allAssocInfos);
+            $row['fileCount'] = empty($fileCount[$row['taskGuid']]) ? 0 : $fileCount[$row['taskGuid']];
         }
         return $rows;
     }

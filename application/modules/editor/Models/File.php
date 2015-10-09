@@ -36,7 +36,7 @@ END LICENSE AND COPYRIGHT
  */
 /**
  * Foldertree Object Instanz wie in der Applikation benötigt
- * 
+ *
  * @method void setId() setId(integer $id)
  * @method void setTaskGuid() setTaskGuid(string $guid)
  * @method void setFileName() setFileName(string $name)
@@ -53,13 +53,35 @@ END LICENSE AND COPYRIGHT
  * @method integer getFileOrder() getFileOrder()
  */
 class editor_Models_File extends ZfExtended_Models_Entity_Abstract {
-  protected $dbInstanceClass = 'editor_Models_Db_Files';
-
-  /**
-   * remove dummy directory entries
-   * @param array $idList
-   */
-  public function cleanupDirectoryIncrements(array $idList) {
-    $this->db->delete('`id` in ('.join(',', $idList).')');
-  }
+    protected $dbInstanceClass = 'editor_Models_Db_Files';
+    
+    /**
+     * remove dummy directory entries
+     * @param array $idList
+     */
+    public function cleanupDirectoryIncrements(array $idList) {
+        $this->db->delete('`id` in ('.join(',', $idList).')');
+    }
+    
+    /**
+     * @param array $taskGuids
+     * @return array taskGuid => cnt
+     */
+    public function getFileCountPerTasks(array $taskGuids) {
+        if(empty($taskGuids)) {
+            return array();
+        }
+        
+        $s = $this->db->select()
+        ->from($this->db, array('cnt' => 'count(id)', 'taskGuid'))
+        ->where('taskGuid in (?)', $taskGuids)
+        ->group('taskGuid');
+        
+        $keys = array();
+        $values = array_map(function($item) use (&$keys){
+            $keys[] = $item['taskGuid'];
+            return $item['cnt'];
+        }, $this->db->fetchAll($s)->toArray());
+        return array_combine($keys, $values);
+    }
 }
