@@ -109,6 +109,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         $result = array();
         
         $config = Zend_Registry::get('config');
+        $qmSubsegmentAlikes = array();
         if($config->runtimeOptions->editor->enableQmSubSegments) {
             $qmSubsegmentAlikes = $this->fieldLoop(function($field, $editField, $getter, $setter) use ($editedSegmentId){
                 $qmSubsegmentAlikes = ZfExtended_Factory::get('editor_Models_QmsubsegmentAlikes');
@@ -205,6 +206,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
      * Closure Parameters: $field, $editField, $getter, $setter → 'target', 'targetEdit', 'getTargetEdit', 'setTargetEdit'
      * 
      * @param Closure $callback
+     * @return array
      */
     protected function fieldLoop(Closure $callback) {
         $result = array();
