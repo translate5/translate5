@@ -177,7 +177,12 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
             foreach($masterValues as $col => $tpl) {
                 $isTpl = (strpos($tpl, self::TPL_PREFIX) === 0);
                 if(!$isTpl) {
-                    $sheet->setCellValue($col.$i, $tpl);
+                    if(substr($tpl, 0, 1) === '=') {
+                        $sheet->setCellValueExplicit($col.$i, $this->fixFormulaRow($tpl, $i), PHPExcel_Cell_DataType::TYPE_FORMULA);
+                    }
+                    else {
+                        $sheet->setCellValue($col.$i, $tpl);
+                    }
                     continue;
                 }
                 $tpl = substr($tpl, strlen(self::TPL_PREFIX));
@@ -197,6 +202,18 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
             $sum = preg_replace('/^(=SUM\([A-Z]+[0-9]+:[A-Z]+)[0-9]+\)/', '${1}'.($i-1).')', $cell->getValue());
             $cell->setValue($sum);
         }
+    }
+    
+    /**
+     * changes the row number of a given spreadsheet forumla to the current row number
+     * @param string $columnContent
+     * @return string
+     */
+    protected function fixFormulaRow($columnContent, $row) {
+        if(substr($columnContent, 0, 1) !== '=') {
+            return $columnContent;
+        }
+        return preg_replace('/([^a-zA-Z][a-zA-Z]{1,2})[0-9]+/', '${1}'.$row, $columnContent);
     }
     
     /**
@@ -253,7 +270,11 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
         //Add overall sum to last term sheet (if only one file exists, this is the only sheet to be created)
         $sheet = $this->xls->setActiveSheetIndex($idx);
         $i = 2;
-        //TODO here introducing sorting if ordered by client
+        
+        uasort($this->overviewSum, function($a, $b){
+            return ($b['foundSum'] - $a['foundSum']);
+        });
+        
         foreach ($this->overviewSum as $stat) {
             $sheet->setCellValue('A'.$i, $stat['term']);
             $sheet->setCellValue('B'.$i, $stat['foundSum']);
