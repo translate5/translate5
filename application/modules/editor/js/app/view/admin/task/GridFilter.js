@@ -69,7 +69,7 @@ Ext.define('Editor.view.admin.task.GridFilter', {
     getFilterForGridFeature: function() {
         var relaisLanguages = Ext.Array.clone(Editor.data.languages),
             msg = this.strings,
-            states = [];
+            states = [], result;
         
         //we're hardcoding the state filter options order, all other (unordered) workflow states are added below
         Ext.Array.each(this.stateFilterOrder, function(state){
@@ -90,7 +90,7 @@ Ext.define('Editor.view.admin.task.GridFilter', {
         
         relaisLanguages.unshift([0, this.noRelaisLang]);
         
-        return [{
+        result = [{
             dataIndex: 'taskNr'
         },{
             dataIndex: 'taskName'
@@ -144,5 +144,16 @@ Ext.define('Editor.view.admin.task.GridFilter', {
             type: 'boolean',
             dataIndex: 'enableSourceEditing'
         }];
+        
+        if(Editor.data.debug && Editor.data.debug.showTaskGuid) {
+            result.unshift({
+                type: 'numeric',
+                dataIndex: 'id'
+            },{
+                dataIndex: 'taskGuid'
+            });
+        }
+        
+        return result;
     }
 });

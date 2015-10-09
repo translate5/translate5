@@ -59,6 +59,7 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'pmGuid', type: 'string'},
     {name: 'pmName', type: 'string'},
     {name: 'wordCount', type: 'integer'},
+    {name: 'fileCount', type: 'integer', persist: false},
     {name: 'targetDeliveryDate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
     {name: 'realDeliveryDate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
     {name: 'referenceFiles', type: 'boolean'},

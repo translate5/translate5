@@ -51,6 +51,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       users: '#UT#Benutzer',
       wordCount: '#UT#Wörter',
       wordCountTT: '#UT#Anzahl Wörter',
+      fileCount: '#UT#Dateien',
       targetDeliveryDate: '#UT#Lieferdatum (soll)',
       realDeliveryDate: '#UT#Lieferdatum (ist)',
       referenceFiles: '#UT#Referenzdateien',
@@ -231,6 +232,14 @@ Ext.define('Editor.view.admin.TaskGrid', {
           format: '0',
           text: me.text_cols.wordCount
       },{
+          xtype: 'numbercolumn',
+          width: 70,
+          dataIndex: 'fileCount',
+          hidden: true,
+          sortable: false,
+          format: '0',
+          text: me.text_cols.fileCount
+      },{
           xtype: 'gridcolumn',
           width: 110,
           cls: 'source-lang',
@@ -351,6 +360,20 @@ Ext.define('Editor.view.admin.TaskGrid', {
             displayInfo: true
         }]
     });
+    
+    if(Editor.data.debug && Editor.data.debug.showTaskGuid) {
+        me.columns.unshift({
+            xtype: 'gridcolumn',
+            width: 60,
+            dataIndex: 'id',
+            text: 'id'
+        },{
+            xtype: 'gridcolumn',
+            width: 240,
+            dataIndex: 'taskGuid',
+            text: 'taskGuid'
+        });
+    }
 
     me.callParent(arguments);
     actions = me.down('.taskActionColumn');
