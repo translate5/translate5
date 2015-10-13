@@ -145,14 +145,14 @@ class Models_Installer_Standalone {
      * See this as a workaround and not as a final solution.
      */
     protected function cleanUpDeletedFiles() {
-        $deleteList = dirname(__FILE__).'/filestoBeDeleted.txt';
+        $deleteList = dirname(__FILE__).'/filesToBeDeleted.txt';
         $toDeleteList = file($deleteList);
         foreach($toDeleteList as $toDelete) {
             //ignore comments
             if(strpos(trim($toDelete), '#') === 0){
                 continue;
             }
-            $file = new SplFileInfo($this->currentWorkingDir.$toDelete);
+            $file = new SplFileInfo($this->currentWorkingDir.trim($toDelete));
             if($file->isFile() && $file->isReadable()) {
                 unlink($file);
             }
