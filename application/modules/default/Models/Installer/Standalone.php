@@ -136,6 +136,26 @@ class Models_Installer_Standalone {
         $this->createInstallationIni();
         $this->promptHostname();
         $this->moveClientSpecific();
+        
+        $this->cleanUpDeletedFiles();
+    }
+    
+    /**
+     * Our ZIP based installation and update process can't deal with file deletions, 
+     * so this has currently to be done manually in this method.
+     * See this as a workaround and not as a final solution.
+     */
+    protected function cleanUpDeletedFiles() {
+        $toDeleteList = array(
+            'library/ZfExtended/Controllers/RestController.php',
+            'application/modules/editor/ThirdParty/XliffTermTagger/termtaggerrestservice.jar',
+        );
+        foreach($toDeleteList as $toDelete) {
+            $file = new SplFileObject($this->currentWorkingDir.$toDelete);
+            if($file->isFile() && $file->isWritable()) {
+                unlink($file);
+            }
+        }
     }
     
     /**
