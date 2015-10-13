@@ -86,6 +86,7 @@ class Models_Installer_Standalone {
         $saInstaller->processDependencies();
         $saInstaller->addZendToIncludePath();
         $saInstaller->installation($options);//checks internally if steps are already done
+        $saInstaller->cleanUpDeletedFiles(); //must be before initApplication!
         $saInstaller->initApplication();
         $saInstaller->postInstallation();
         $saInstaller->updateDb();
@@ -136,8 +137,6 @@ class Models_Installer_Standalone {
         $this->createInstallationIni();
         $this->promptHostname();
         $this->moveClientSpecific();
-        
-        $this->cleanUpDeletedFiles();
     }
     
     /**
@@ -146,13 +145,14 @@ class Models_Installer_Standalone {
      * See this as a workaround and not as a final solution.
      */
     protected function cleanUpDeletedFiles() {
+        //leading slash is needed!
         $toDeleteList = array(
-            'library/ZfExtended/Controllers/RestController.php',
-            'application/modules/editor/ThirdParty/XliffTermTagger/termtaggerrestservice.jar',
+            '/library/ZfExtended/Controllers/RestController.php',
+            '/application/modules/editor/ThirdParty/XliffTermTagger/termtaggerrestservice.jar',
         );
         foreach($toDeleteList as $toDelete) {
-            $file = new SplFileObject($this->currentWorkingDir.$toDelete);
-            if($file->isFile() && $file->isWritable()) {
+            $file = new SplFileInfo($this->currentWorkingDir.$toDelete);
+            if($file->isFile() && $file->isReadable()) {
                 unlink($file);
             }
         }
