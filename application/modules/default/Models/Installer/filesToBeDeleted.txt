@@ -1,0 +1,6 @@
+#
+# this file contains file paths relative to application root with files to be deleted!
+# leading slash is needed! Can contain only files!
+#
+/library/ZfExtended/Controllers/RestController.php
+/application/modules/editor/ThirdParty/XliffTermTagger/termtaggerrestservice.jar

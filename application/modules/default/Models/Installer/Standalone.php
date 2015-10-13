@@ -145,12 +145,13 @@ class Models_Installer_Standalone {
      * See this as a workaround and not as a final solution.
      */
     protected function cleanUpDeletedFiles() {
-        //leading slash is needed!
-        $toDeleteList = array(
-            '/library/ZfExtended/Controllers/RestController.php',
-            '/application/modules/editor/ThirdParty/XliffTermTagger/termtaggerrestservice.jar',
-        );
+        $deleteList = dirname(__FILE__).'/filestoBeDeleted.txt';
+        $toDeleteList = file($deleteList);
         foreach($toDeleteList as $toDelete) {
+            //ignore comments
+            if(strpos(trim($toDelete), '#') === 0){
+                continue;
+            }
             $file = new SplFileInfo($this->currentWorkingDir.$toDelete);
             if($file->isFile() && $file->isReadable()) {
                 unlink($file);
