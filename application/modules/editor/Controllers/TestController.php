@@ -59,6 +59,12 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
      * @var array collects which xml failed and which succeeded
      */
     protected $xmlResultSummary = array();
+    
+    /**
+     * @var string
+     */
+    protected $testSuitePath;
+    
     public function init() {
         parent::init();
         $this->_helper->viewRenderer->setNoRender();
@@ -70,9 +76,9 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
         $this->testcase = new ReflectionClass('editor_Test_'.$class);
         $testcaseProperties = $this->testcase->getDefaultProperties();
         $parentTestFolderAbsolutePath = APPLICATION_PATH.'/../'.$testcaseProperties['parentTestFolderRelativePath'];
-        $testSuitePath = $parentTestFolderAbsolutePath.'/'.$testcaseProperties['testSuiteFolderName'];
+        $this->testSuitePath = $parentTestFolderAbsolutePath.'/'.$testcaseProperties['testSuiteFolderName'];
         $this->testcase->setStaticPropertyValue('parentTestFolderAbsolutePath', $parentTestFolderAbsolutePath);
-        $this->testcase->setStaticPropertyValue('testSuitePath', $testSuitePath);
+        $this->testcase->setStaticPropertyValue('testSuitePath', $this->testSuitePath);
         
         $this->testcasePreparation = new ReflectionClass('editor_Test_'.$class.'_Preparation');
         $testcasePreparationProperties = $this->testcasePreparation->getDefaultProperties();
@@ -81,17 +87,91 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
         $this->testcasePreparation->setStaticPropertyValue('parentTestFolderAbsolutePath', $parentTestFolderAbsolutePath);
         $this->testcasePreparation->setStaticPropertyValue('testSuitePath', $testSuitePath);
         
-        
         $this->testIterator = new RecursiveDirectoryIterator($testSuitePath,FilesystemIterator::CURRENT_AS_FILEINFO|FilesystemIterator::SKIP_DOTS);
         
+        ob_clean(); //remove bin/env php call
         echo "<h1>TermTagger Tests; ".  date(DATE_RFC2822)."</h1>";
+        $this->printTermtaggerSummary();
+        $this->firstResults = ob_get_clean();
+        
         $this->loopThroughTestXmlFiles($this->getParam('filter', null));
         $this->echoResultSummary();
     }
     
-    public function editorAction() {
-        echo "<h1>Editor Tests; ".  date(DATE_RFC2822)."</h1>";
-        print_r(get_include_path());
+    /**
+     * Checks if the configured termTaggers are running and have the assumed version.
+     * The assumed version is stored in the file testcases/ACTIONPASSED/TermTaggerServerVersion.htm as plain string direct copied from http://termtagger:9001:termTagger
+     */
+    protected function printTermtaggerSummary() {
+        echo '<h2>Tested TermTagger(s)</h2>';
+        $termtaggers = Zend_Registry::get('PluginManager')->get('TermTagger')->termtaggerState();
+        $taggerUsage = array();
+        foreach($termtaggers->configured as $type => $taggers){
+            foreach ($taggers as $tagger) {
+                if(!isset($taggerUsage[$tagger])) {
+                    $taggerUsage[$tagger] = array($type);
+                }
+                else {
+                    $taggerUsage[$tagger][] = $type;
+                }
+            }
+        }
+        $versionFile = $this->testSuitePath.'/TermTaggerServerVersion.htm';
+        if(!file_exists($versionFile)) {
+            echo '<p style="color:red;">No TermTagger Version locally given for comparsion with running termtaggers!</p>';
+        }
+        echo '<ul>';
+        $versionToCheck = file_get_contents($versionFile);
+        $success = true;
+        foreach($taggerUsage as $tagger => $usage) {
+            $success = $this->checkOneTagger($termtaggers, $tagger, $usage, $versionToCheck) && $success;
+        }
+        if($success) {
+            $this->xmlResultSummary['All TermTaggers are running in the correct version!'] = 'green';
+        }
+        else {
+            $this->xmlResultSummary['Errors in TermTagger run and version check!'] = 'red';
+        }
+        echo '</ul>';
+    }
+    
+    /**
+     * convert termtagger version output in a printable form
+     * @param string $output
+     * @return string
+     */
+    protected function sanitizeTermTaggerOutput($output){
+        $output = preg_replace('/^.*?<b>/', '<b style="">', $output); //empty style prevents first br addition
+        return str_replace('<b>', '<br /><b>', strip_tags($output, '<b></b>'));
+    }
+    
+    /**
+     * checks version and runstate of one termtagger
+     * @param stdClass $termtaggers
+     * @param string $tagger
+     * @param array $usage
+     * @param string $versionToCheck
+     * @return boolean
+     */
+    protected function checkOneTagger($termtaggers, $tagger, $usage, $versionToCheck) {
+        $running = isset($termtaggers->running[$tagger]) && $termtaggers->running[$tagger];
+        $version = $versionToCheck === $termtaggers->version[$tagger];
+        $color = (($running && $version) ? 'green' : 'red');
+        echo '<li style="color:'.$color.';">'.$tagger.' configured as '.join(';', $usage);
+        if(!$running) {
+            echo ' <b>is NOT running</b>.</li>';
+            return false; //no version check needed afterwards
+        }
+        echo ' is running ';
+        if($version){
+            echo ' and version is OK.</li>';
+            return true;
+        }
+        echo ' and <b>version is NOT OK</b>.';
+        echo ' <h3>Version Received:</h3> '.$this->sanitizeTermTaggerOutput($termtaggers->version[$tagger]);
+        echo ' <h3>Version Expected:</h3> '.$this->sanitizeTermTaggerOutput($versionToCheck);
+        echo '</li>';
+        return false;
     }
     
     protected function loopThroughTestXmlFiles($filter = null) {
@@ -101,9 +181,14 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
             }
             
             $resultPreparation = $this->runTests($file,  $this->testcasePreparation);
+            //runTests seams to kill the output from before, so we have to catch it and output it here!
+            echo $this->firstResults;
+            $this->firstResults = '';
+            
             if(!$resultPreparation->wasSuccessful()){
                 $this->echoResults($resultPreparation,$file);
                 echo '<p style="color:red"><b>There have been errors in Test-Preperation. Main test not started.</b></p>';
+                $this->xmlResultSummary[$file->getFilename()]='red';
                 continue;
             }
             
@@ -117,7 +202,7 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
         ksort($this->xmlResultSummary, SORT_NATURAL);
         echo "<h2>Summary of Results</h2>";
         foreach ($this->xmlResultSummary as $filename => $color) {
-            echo '<b style="color: '.$color.'">'.$filename.'</b><br>';
+            echo '<a href="#'.$filename.'"><b style="color: '.$color.'">'.$filename.'</b></a><br>';
         }
     }
     /**
@@ -126,7 +211,7 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
      * @return boolean
      */
     protected function echoResults(PHPUnit_Framework_TestResult $result,\SplFileInfo $file) {
-        echo "<h2>".$file->getFilename()."/ ".$this->testcase->getProperty('name')->getValue()."</h2>";
+        echo '<a name="'.$file->getFilename().'"><h2>'.$file->getFilename()."/ ".$this->testcase->getProperty('name')->getValue()."</h2></a>";
         echo "<h3>Description: ".$this->testcase->getProperty('description')->getValue()."</h3>";
             
         /* @var $result PHPUnit_Framework_TestResult */

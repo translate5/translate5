@@ -105,8 +105,9 @@ class editor_Plugins_TermTagger_Service {
      * 
      * @return boolean true if there is a TermTagger-Server behind $url 
      */
-    public function testServerUrl(string $url) {
+    public function testServerUrl(string $url, &$version = null) {
         $httpClient = $this->getHttpClient($url.'/termTagger');
+        $httpClient->setHeaders('accept', 'text/html');
         try {
             $response = $this->sendRequest($httpClient, $httpClient::GET);
         }
@@ -114,6 +115,7 @@ class editor_Plugins_TermTagger_Service {
             return false;
         }
         
+        $version = $response->getBody();
         // $url is OK if status == 200 AND string 'TermTagger Server' is in the response-body
         return $response && $this->wasSuccessfull() && strpos($response->getBody(), 'TermTagger Server') !== false;
     }

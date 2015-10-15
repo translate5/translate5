@@ -8,6 +8,12 @@ Testing openTMStermTagger
     -- you need to call the URI http://translate5URI/editor/test/termtagger
     -- you need at least one termTagger configured as GUI-termTagger in Zf_configuration
 
+- Before starting the testcases, ALL configured termtaggers are tested for run state and correct termtagger version.
+  The assumed version info is stored in the file 
+    testcases/termtagger/TermTaggerServerVersion.htm 
+  as plain string direct copied from http://termtagger:9001:termTagger output.
+  If the version does not match, the following tests are running anyway but with a big warning ahead.
+
 - The test will look for files with the ending ".testcase" in the folder /application/modules/editor/testcases/termtagger
 
 - These testcase-files are automatically validated against termtaggerTestCaseSchema.xsd. Please see the testcase-folder for example-files (e. g. testcase1.xml.testcase.default shows an example; the TBX-files for each testcase are referenced in the testcase-file with a path relative to the testcase-file).

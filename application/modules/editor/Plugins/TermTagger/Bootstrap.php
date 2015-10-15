@@ -64,7 +64,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndex'));
         $this->eventManager->attach('editor_Workflow_Default', array('doView', 'doEdit'), array($this, 'handleAfterTaskOpen'));
         $this->eventManager->attach('Editor_SegmentController', 'beforePutSave', array($this, 'handleBeforePutSave'));
-        $this->eventManager->attach('Editor_IndexController', 'afterApplicationstateAction', array($this, 'termtaggerState'));
+        $this->eventManager->attach('Editor_IndexController', 'afterApplicationstateAction', array($this, 'termtaggerStateHandler'));
     }
     
     /**
@@ -256,20 +256,26 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         return $serverCommunication;
     }
     
-    public function termtaggerState(Zend_EventManager_Event $event) {
+    public function termtaggerStateHandler(Zend_EventManager_Event $event) {
+        $view = $event->getParam('view');
+        $view->applicationstate->termtagger = $this->termtaggerState();
+    }
+    
+    public function termtaggerState() {
         $termtagger = new stdClass();
         $ttService = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
         /* @var $ttService editor_Plugins_TermTagger_Service */
         $termtagger->configured = $ttService->getConfiguredUrls();
-        $view = $event->getParam('view');
         $allUrls = array_unique(call_user_func_array('array_merge', (array)$termtagger->configured));
         $running = array();
+        $version = array();
         $termtagger->runningAll = true;
         foreach($allUrls as $url) {
-            $running[$url] = $ttService->testServerUrl($url);
+            $running[$url] = $ttService->testServerUrl($url, $version[$url]);
             $termtagger->runningAll = $running[$url] && $termtagger->runningAll;
         }
         $termtagger->running = $running;
-        $view->applicationstate->termtagger = $termtagger;
+        $termtagger->version = $version;
+        return $termtagger;
     }
 }
