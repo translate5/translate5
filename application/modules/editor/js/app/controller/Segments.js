@@ -159,12 +159,15 @@ Ext.define('Editor.controller.Segments', {
       delete store.guaranteedEnd;
       store.removeAll();
   },
-  refreshGridView: function() {
-    this.getSegmentGrid().getView().refresh();
-    var newTotal = this.getSegmentsStore().totalCount;
+  updateFilteredCountDisplay: function(newTotal) {
     var btn_text = this.getSegmentGrid().item_clearSortAndFilterBtn;
     btn_text = Ext.String.format('{0} ({1})', btn_text, newTotal);
     this.getResetFilterBtn().setText(btn_text);
+  },
+  refreshGridView: function() {
+    this.getSegmentGrid().getView().refresh();
+    var newTotal = this.getSegmentsStore().totalCount;
+    this.updateFilteredCountDisplay(newTotal);
   },
   /**
    * geöffnete Segmente werden bei der Wahl eines anderen Segments gespeichert
@@ -255,9 +258,7 @@ Ext.define('Editor.controller.Segments', {
    * @param {Boolean} forced
    */
   styleResetFilterButton: function(filterFeature){
-      var btn_text = this.getSegmentGrid().item_clearSortAndFilterBtn;
-      btn_text = Ext.String.format('{0} (...)', btn_text);
-      this.getResetFilterBtn().setText(btn_text);
+      this.updateFilteredCountDisplay('...');
       var cls = 'activated',
           btn = this.getResetFilterBtn(),
           initialActive = filterFeature.filters.length == 0 && filterFeature.initialActive.length > 0;
