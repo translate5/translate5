@@ -101,9 +101,9 @@ Ext.define('Editor.controller.Segments', {
   }],
   init : function() {
       var me = this, 
-          mpCtrl = me.application.getController('MetaPanel'),
+          edCtrl = me.application.getController('Editor'),
           caCtrl = me.application.getController('ChangeAlike');
-      mpCtrl.on('saveSegment', me.saveChainStart, me);
+      edCtrl.on('saveSegment', me.saveChainStart, me);
       //called after load of cahnge alikes to a segment
       caCtrl.on('fetchChangeAlikes', me.onFetchChangeAlikes, me);
       //called after currently loaded segment data is not used anymore by the save chain / change alike handling
