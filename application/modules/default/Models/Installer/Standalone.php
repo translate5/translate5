@@ -55,6 +55,7 @@ class Models_Installer_Standalone {
     const OS_OSX = 4;
     const HOSTNAME_WIN = 'localhost';
     const HOSTNAME_LINUX = 'translate5.local';
+    
     /**
      * @var string
      */
@@ -74,7 +75,7 @@ class Models_Installer_Standalone {
     protected $hostname;
     
     protected $isInstallation = false;
-
+    
     /**
      * Options: 
      * mysql_bin => path to mysql binary
@@ -85,6 +86,7 @@ class Models_Installer_Standalone {
         $saInstaller->processDependencies();
         $saInstaller->addZendToIncludePath();
         $saInstaller->installation($options);//checks internally if steps are already done
+        $saInstaller->cleanUpDeletedFiles(); //must be before initApplication!
         $saInstaller->initApplication();
         $saInstaller->postInstallation();
         $saInstaller->updateDb();
@@ -97,6 +99,7 @@ class Models_Installer_Standalone {
     public function __construct($currentWorkingDir) {
         $this->currentWorkingDir = $currentWorkingDir;
         //requiering the following hardcoded since, autoloader must be downloaded with Zend Package
+        require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/License.php';
         require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/Downloader.php';
         require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/Dependencies.php';
         require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/DbUpdater.php';
@@ -113,10 +116,9 @@ class Models_Installer_Standalone {
     public function processDependencies() {
         $this->logSection('Checking server for updates and packages:');
         $downloader = new ZfExtended_Models_Installer_Downloader($this->currentWorkingDir);
-        $dependencies = $this->currentWorkingDir.'/application/config/dependencies.json';
-        $installedDeps = $this->currentWorkingDir.'/application/config/dependencies-installed.json';
-        $downloader->initDependencies($dependencies, $installedDeps);
-        $downloader->pull(true);
+        $depsToAccept = $downloader->pullApplication();
+        $this->acceptLicenses($depsToAccept);
+        $downloader->pullDependencies(true);
     }
     
     public function installation(array $options = null) {
@@ -130,11 +132,31 @@ class Models_Installer_Standalone {
         if(is_array($options) && isset($options['mysql_bin']) && $options['mysql_bin'] != self::MYSQL_BIN) {
             $this->dbCredentials['executable'] = $options['mysql_bin'];
         }
-        $this->promptDbCredentials();
+        while(! $this->promptDbCredentials());
         $this->initDb();
         $this->createInstallationIni();
         $this->promptHostname();
         $this->moveClientSpecific();
+    }
+    
+    /**
+     * Our ZIP based installation and update process can't deal with file deletions, 
+     * so this has currently to be done manually in this method.
+     * See this as a workaround and not as a final solution.
+     */
+    protected function cleanUpDeletedFiles() {
+        $deleteList = dirname(__FILE__).'/filesToBeDeleted.txt';
+        $toDeleteList = file($deleteList);
+        foreach($toDeleteList as $toDelete) {
+            //ignore comments
+            if(strpos(trim($toDelete), '#') === 0){
+                continue;
+            }
+            $file = new SplFileInfo($this->currentWorkingDir.trim($toDelete));
+            if($file->isFile() && $file->isReadable()) {
+                unlink($file);
+            }
+        }
     }
     
     /**
@@ -143,12 +165,13 @@ class Models_Installer_Standalone {
     protected function moveClientSpecific() {
         $source = $this->currentWorkingDir.self::CLIENT_SPECIFIC_INSTALL;
         $target = $this->currentWorkingDir.self::CLIENT_SPECIFIC;
+        $targetPub = $this->currentWorkingDir.'/public'.self::CLIENT_SPECIFIC;
         //ignoring errors here, since already exisiting directories should not be moved
-        if(file_exists($source.'/public')){
-            @rename($source.'/public', $this->currentWorkingDir.'/public'.self::CLIENT_SPECIFIC);
+        if(file_exists($source.'/public') && !file_exists($targetPub)){
+            rename($source.'/public', $targetPub);
         }
-        if(file_exists($source)){
-            @rename($source, $this->currentWorkingDir.self::CLIENT_SPECIFIC);
+        if(file_exists($source) && !file_exists($target)){
+            rename($source, $target);
         }
     }
     
@@ -199,6 +222,45 @@ class Models_Installer_Standalone {
             $prompt .= ': ';
             $value = $this->prompt($prompt);
             $this->dbCredentials[$key] = empty($value) ? $default : $value;
+        }
+        
+        echo PHP_EOL.PHP_EOL.'Confirm the given DB Credentials:'.PHP_EOL.PHP_EOL;
+        foreach($this->dbCredentials as $key => $value) {
+            //executable is determined by the surrounding bash script
+            if($key == 'executable') {
+                 continue;
+            }
+            echo $key.': '.$value.PHP_EOL;
+        }
+        return 'y' === strtolower($this->prompt(PHP_EOL.'Confirm the entered data with "y", press any other key to reenter DB credentials.'.PHP_EOL));
+    }
+    
+    /**
+     * prompts for all new licenses to be accepted
+     * @param array $depsToAccept
+     */
+    protected function acceptLicenses(array $depsToAccept) {
+        $first = true;
+        foreach($depsToAccept as $dep) {
+            $licenses = ZfExtended_Models_Installer_License::create($dep);
+            foreach ($licenses as $license){
+                if($first) {
+                    $this->logSection('Third party library license agreements:', '-');
+                    $first = false;
+                }
+                if(!$license->checkFileExistance()) {
+                    echo 'WARNING: configured license file not found!'.PHP_EOL;
+                }
+                $read = '';
+                do {
+                    echo $license->getAgreementTitle().PHP_EOL.PHP_EOL;
+                    $read = strtolower($this->prompt($license->getAgreementText().PHP_EOL.PHP_EOL.'  y or n: '));
+                } while ($read != 'n' && $read != 'y');
+                if($read == 'n') {
+                    die(PHP_EOL.'You have to accept all third party licenses in order to install Translate5.'.PHP_EOL);
+                }
+                echo PHP_EOL.PHP_EOL;
+            }
         }
     }
     
@@ -344,8 +406,8 @@ class Models_Installer_Standalone {
         echo $msg."\n";
     }
     
-    protected function logSection($msg) {
+    protected function logSection($msg, $lineChar = '=') {
         echo "\n".$msg."\n";
-        echo str_pad('', strlen($msg), '=')."\n\n";
+        echo str_pad('', strlen($msg), $lineChar)."\n\n";
     }
 }

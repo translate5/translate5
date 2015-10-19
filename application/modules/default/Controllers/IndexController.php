@@ -40,11 +40,12 @@
  * @version 0.7
  *
  */
-
+require_once'ControllerMixIns.php';
 /**
  * Stellt Methoden bereit, die translate5 grundsätzlich als Stand Alone-Anwendung verfügbar machen
  */
 class IndexController extends ZfExtended_Controllers_Action {
+    use ControllerMixIns;
     /**
      * @var boolean projectImported Projekt ist importiert
      */
@@ -54,22 +55,6 @@ class IndexController extends ZfExtended_Controllers_Action {
         parent::init();
         $this->setProjectImported();
         $this->view->languageSelector();
-    }
-
-    public function __call($method, $args)
-    {
-        $tmp_viewName = substr_replace($method, "", -strlen("Action"));
-        $config = Zend_Registry::get('config');
-        $allowed = $config->runtimeOptions->content->viewTemplatesAllowed;
-        if(empty($allowed)) {
-            return;
-        }
-        
-        $tmp_allowedViews = $allowed->toArray();
-        if (!in_array($tmp_viewName, $tmp_allowedViews)){
-            throw new ZfExtended_NotFoundException();
-        }
-        $this->render($tmp_viewName);
     }
 
     /**
@@ -120,49 +105,6 @@ class IndexController extends ZfExtended_Controllers_Action {
             // 48 bits for "node"
             mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff )
         );
-    }
-
-    public function checkconfigAction() {
-        echo "<h2>application agency loaded: </h2>".APPLICATION_AGENCY.'<br />';
-        echo "<h2>loaded INI config files:</h2>".join("<br/>\n", ZfExtended_BaseIndex::getInstance()->applicationInis).'<br />';
-        
-        echo "<h2>tests</h2>";
-        $this->_helper->layout->disableLayout();
-        $this->_helper->viewRenderer->setNoRender();
-        exit;
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $test = $config->runtimeOptions->imageTag->fontFilePath;
-        
-        if(! file_exists($test)){
-            echo 'ERROR "'.$test.'" does not exist!';
-            return;
-        }
-        if(! is_file($test)){
-            echo 'ERROR "'.$test.'" is not a File!';
-            return;
-        }
-        if(! is_readable($test)){
-            echo 'ERROR "'.$test.'" is not readable!';
-            return;
-        }
-        echo 'OK '.$test.' is a readable File!<br />';
-
-        $test = $config->runtimeOptions->termTagger->dir;
-        if(! file_exists($test)){
-            echo 'ERROR "'.$test.'" does not exist!';
-            return;
-        }
-        if(! is_dir($test)){
-            echo 'ERROR "'.$test.'" is not a Dir!';
-            return;
-        }
-        if(! is_readable($test)){
-            echo 'ERROR "'.$test.'" is not readable!';
-            return;
-        }
-        echo 'OK '.$test.' is a readable File!<br />';
-        exit;
     }
 
     public function impressumAction(){

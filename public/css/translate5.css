@@ -36,7 +36,7 @@
 /*allgemeines css*/
 body{
     font-family: tahoma,verdana,helvetica,sans-serif;
-    font-size: 12px;
+    font-size: 17px;
     padding:0;margin:0;
     background: #ffffff;
 }
@@ -44,8 +44,8 @@ a,a:active{
     color: black;
 }
 a:hover{
-    color: #e8a33c;
-    text-decoration: underline;
+    color: #00adef;
+    text-decoration: none;
 }
 #content {
     margin: 1em;
@@ -54,33 +54,36 @@ a:hover{
 h1,h2{
     margin: 1em 0 0.5em;
 }
-h1{font-size:1.4em;}
-h2{font-size:1.2em;}
+h1{font-size:130%;}
+h2,h3{font-size:110%;}
 .errors {
     color: red;
 }
-#header {height:150px;}
-#header h1 {height:150px;background: url(../images/logo_t5_2015.png?v=1) no-repeat left top #ffffff;padding:0;margin:0;}
-#header h1 span {display:none;}
-h1 {font-size: 17px;}
+#header {margin:0;padding:0;}
+#header img {width: 150px; margin:0;padding:19px 0 0 19px;}
+#header #slogan {display: inline-block;font-size: 19px; position: relative; top: -37px; left: 100px;}
 th {text-align:left;}
 
-#menu{padding-top:20px;padding-bottom:20px;position:relative;}
-#menu a {text-decoration: none;padding:5px 15px;line-height:20px;font-size:14px;display:block;border-right:1px solid #efefef;}
-#menu a:hover {text-decoration: underline;color:#000000;background-color:#f3f3f3;}
-#menu ul {list-style-type: none;height:30px;margin:0;padding:0;border-style:solid;border-color:#e8a33c;border-width:1px 0px 1px 0px;}
+#menu{padding-top:17px;padding-bottom:27px;position:relative;}
+#menu a {text-decoration: none;margin: 1px 0;padding:4px 15px;line-height:20px;font-size:14px;display:block;border-right:1px solid #d7e8ef; text-transform: lowercase; }
+#menu a:hover, #menu a.active {text-decoration: none;color:#000000;margin: 0;padding:5px 15px; color: #00adef;}
+#menu ul {list-style-type: none;height:30px;margin:0 10px;padding:0;border-style:solid;border-color:#00adef;border-width:1px 0px 1px 0px;}
 #menu ul li {float:left;}
 #menu ul li.clear {float:none;clear:both;height:1px;line-height:1px;font-size:1px;}
 
-#language-selector-box {position: absolute; top: 50px; left: 500px;}
+#footer {border-top:1px solid #00adef;padding:1em;margin:0 10px;}
 
-#footer {border-top:1px solid #e8a33c;padding:1em;}
 
+#content h1 {margin-top:0;}
 #content .main {width:500px;float:left;}
-#content hr {border-style:solid;border-color:#e8a33c;border-width:1px 0px 0px 0px;margin:20px 0px;}
-#content .sidebar{width:200px;margin-left:540px;}
-#content .sidebar .teaser {padding:5px;border:1px solid #efefef;margin-bottom:10px;}
-#content .sidebar p,#content .sidebar h2 {margin-top:0;}
+#content hr {border-style:solid;border-color:#00adef;border-width:1px 0px 0px 0px;margin:20px 0px;}
+#content .sidebar{width:325px;margin-left:540px;}
+#content .sidebar .teaser {padding:5px;border:1px solid #d7e8ef;margin-bottom:10px;}
+#content .sidebar .teaser a {text-decoration: none; color: #00adef;}
+#content .sidebar .teaser a:hover {text-decoration: underline;}
+#content .sidebar .teaser h3:first-child{margin-top:0;}
+#content .sidebar .teaser .thankyou{font-size: smaller;}
+#content .sidebar img {display: block; margin: 0 0 10px 0; padding:0; border: none;}
 #content .clear{clear:both;}
 #content .start-button{
 	 display:block;
@@ -110,3 +113,8 @@ th {text-align:left;}
 #locale-label {display: none;}
 #locale-element{margin: 0;padding: 2px 15px;}
 /* orange #e8a33c grau #cbcbcb */
+
+/* translate5 download page*/
+form#acceptLicense .description { float:right;position:relative;left:-52px;margin-top:0;}
+form#acceptLicense dd {margin: 0;}
+form#acceptLicense ul.errors {list-style-type: none;padding:0; margin:0 0 -10px 36px;position:relative;top:-18px;}

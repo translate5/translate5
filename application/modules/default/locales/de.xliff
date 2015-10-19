@@ -198,6 +198,11 @@ Diese Email wurde automatisch generiert. Please do not reply to this email.</tar
 <trans-unit id='VGVzdGltb25pYWxz'><source>Testimonials</source><target>Testimonials</target></trans-unit>
 <trans-unit id='RGV2ZWxvcGVycw=='><source>Developers</source><target>Developers</target></trans-unit>
 <trans-unit id='VXNlciBpbmZvcw=='><source>User infos</source><target>User infos</target></trans-unit>
+<trans-unit id='V2VsY29tZQ=='><source>Welcome</source><target>Welcome</target></trans-unit>
+<trans-unit id='TWlzc2lvbg=='><source>Mission</source><target>Mission</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRlNSBEZW1v'><source>translate5 Demo</source><target>translate5 Demo</target></trans-unit>
+<trans-unit id='VXNhZ2UgJmFtcDsgZG9jdW1lbnRhdGlvbg=='><source>Usage &amp; documentation</source><target>Usage &amp; documentation</target></trans-unit>
+<trans-unit id='SW5zdGFsbGF0aW9u'><source>Installation</source><target>Installation</target></trans-unit>
   </body>
  </file>
 </xliff>

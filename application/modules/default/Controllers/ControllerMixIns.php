@@ -34,11 +34,39 @@
  END LICENSE AND COPYRIGHT 
  */
 
-/**#@+
+/** #@+
  * @author Marc Mittag
- * @package trantlate5
- * @version 0.7
+ * @package translate5
+ * @version 1.0
  *
  */
-?>
-<h1><?php echo $this->translate->_('translate5 Export'); ?></h1>
+
+trait ControllerMixIns  {
+
+    public function __call($method, $args){
+        $controller = $this->_request->getControllerName();
+        $action = $this->_request->getActionName();
+        $url = "/".$controller."/".$action;
+        $config = Zend_Registry::get('config');
+        $menu = $config->runtimeOptions->content->mainMenu;
+        
+        if(empty($menu)) {
+            return;
+        }
+        $found = false;
+        foreach ($menu as $item) {
+            $item = (array)$item;
+            $item = each($item);
+            $found = ($item['key']===$_SERVER['REQUEST_URI'])?true:false;
+            if($found){
+                break;
+            }
+        }
+        if (!$found){
+            throw new ZfExtended_NotFoundException();
+        }
+        $actionMethod = $action.'Action';
+        $this->render($action);
+    }
+}
+

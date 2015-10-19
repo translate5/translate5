@@ -33,110 +33,22 @@
  
  END LICENSE AND COPYRIGHT 
  */
-
-$config = Zend_Registry::get('config');
-$pathToQMFile =  '/'.$config->runtimeOptions->editor->qmFlagXmlFileDir.'/'.
-        $config->runtimeOptions->editor->qmFlagXmlFileName;
 ?>
-<h1>translate5 user information</h1>
-
 <div class="main">
-    <p>English language only</p>
-    
-    <h2>translate5 Yahoo user group</h2>
-    <p>Any questions regarding usage or development of translate5 can be asked in <a href="https://groups.yahoo.com/neo/groups/translate5/info" target="_blank">translate5 Yahoo user group</a>. Please read the documentation before you ask.</p>
-    
-    <h2>translate5 feature documentation</h2>
-    <p>The <a href="http://confluence.translate5.net/display/TFD" target="_blank">translate5 feature documentation</a> is addressed to everyone who wants to know more about translate5.</p>
-
+    <h1>translate5 usage &amp; documentation</h1>
+    <p><a href="http://confluence.translate5.net/" target="_blank">translate5 Confluence</a> is where translate5 developers and users collaborate and share knowledge. </p>
+    <p>In <a href="http://confluence.translate5.net/" target="_blank">translate5 Confluence</a> you'll find all usage and documentation related information about translate5.</p>
+    <h2>Most important translate5 Confluence spaces for usage</h2>
+    <ul><li><a href="http://confluence.translate5.net/display/BUS" target="_blank">Installation and update</a></li>
+    <li><a href="http://confluence.translate5.net/display/BUS" target="_blank">Basic usage</a></li>
+        <li><a href="http://confluence.translate5.net/display/TFD" target="_blank">Feature documentation</a></li>
+    </ul>
+    <h2>Post questions in translate5 Yahoo mailing list</h2>
+    <p><b>Before you ask a question at <a href="https://groups.yahoo.com/neo/groups/translate5/info" target="_blank">translate5 Yahoo mailing list</a>:</b></p>
+    <p>Please check carefully:
+    <ul>
+        <li>Is my question answered in <a href="http://confluence.translate5.net/" target="_blank">translate5 Confluence</a>?</li>
+        <li>Has my question already been asked in the <a href="https://groups.yahoo.com/neo/groups/translate5/info" target="_blank">translate5 Yahoo mailing list</a>?</li>
+    </ul></p>
 </div>
 <div class="clear">&nbsp;</div>
-<h1><?php echo $this->translate->_('Informationen zur Bedienung'); ?></h1>
-<div class="usage-info">
-    <p><?php echo $this->translate->_('Diese translate5 Demoversion ist öffentlich, alle hochgeladenen Projekte können von jedem eingesehen und exportiert werden!'); ?></p>
-<?php echo $this->render('index/testdataSidebar.phtml'); ?>
-
-<h2><a name="import"><?php echo $this->translate->_('Zip-Datei mit Import Daten'); ?></a></h2>
-<p><?php echo $this->translate->_('Bitte verwenden Sie nur ASCII-Zeichen in Datei- oder Verzeichnisnamen und keine Sonderzeichen oder Umlaute. Das Zip-Format übermittelt keine Informationen, in welcher Codierung Ihr Betriebssystem Datei- oder Verzeichnisnamen gespeichert hat. Aufgrund dieses Mangels des ZIP-Standards kann translate5 Nicht-ASCII-Zeichen nicht fehlerfrei auslesen. Einzige Ausnahme: Ihr Dateisystem speichert Dateinamen in der UTF-8-Kodierung, wie Linux-Systeme dies tun.'); ?></p>
-
-<h3><?php echo $this->translate->_('proofRead: Verzeichnis mit zu lektorierenden Dateien'); ?></h3>
-<p><?php echo $this->translate->_('Die Zip-Datei muss ein Verzeichnis "proofRead" enthalten, welches mehrere SDLXLIFF, openTM2-XLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV-, openTM2-XLIFF- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.'); ?></p>
-<h3><?php echo $this->translate->_('Struktur von CSV-Dateien (falls als Lektoratsquelle verwendet)'); ?></h3>
-<p><?php echo $this->translate->_('CSV-Dateien müssen mindestens drei Spalten enthalten. Eine Spalte muss den Spaltenkopf "mid" enthalten und eine eindeutige ID je CSV-Zeile enthalten. Eine weitere Spalte muss den Spaltenkopf "quelle" enthalten und die Quellsprache enthalten. Alle weiteren Spalten mit Spaltenköpfen werden als Zielsprachenspalten behandelt und importiert. Dabei ist der Spaltenkopfname frei wählbar. Spalten ohne befüllten Spaltenkopf in der CSV-Datei werden beim Import ignoriert. Spaltentrenner der CSV ist ein Komma &quot;,&quot;, Texterkennungszeichen ein doppeltes Anführungszeichen (&quot;). Die Spaltenkopfnamen der ID-Spalte (per default mid) und der Quellsprachen-Spalte (per default quelle) sowie der Spaltentrenner und das Texterkennungszeichen können in der Systemkonfiguration von translate5 installationsspezifisch überschrieben werden. Zeilentrenner der CSV ist ein Linux-, Mac- oder Windowszeilenumbruch. Codierung der CSV-Datei kann utf-8, iso-8859-1 oder windows-1252 sein. Die CSV-Datei wird in der selben Codierung exportiert, in der sie beim Import vorlag (Achtung: Bei einer Übersetzung in Nicht-Westeuropäische Sprachen sollte daher utf-8 bereits als Importcodierung gewählt werden).'); ?></p>
-<h3><?php echo $this->translate->_('Verzeichnisstruktur beim Export'); ?></h3>
-<p><?php echo $this->translate->_('Beim Export wird die gleiche Datei und Verzeichnisstruktur in Form einer Zip-Datei wieder ausgespielt'); ?></p>
-<h3><?php echo $this->translate->_('TBX-Datei zur Auszeichnung von Terminologie'); ?></h3>
-<p><?php echo $this->translate->_('Die TBX-Datei kann beliebig viele Sprachen enthalten. Sie muss mindestens die zwei Sprachen enthalten, die beim Aufgabenimport als Quell- und Zielsprachen ausgewählt werden. Die TBX Datei darf sich in keinem Unterverzeichnis befinden, sonst wird Sie nicht importiert. Befinden sich mehrere TBX Dateien in der Zip-Datei, so wird nach alphabetischer Sortierung die erste TBX Datei verwendet.'); ?><p>
-<h3><?php echo $this->translate->_('Relaissprache zur Verfügung stellen'); ?></h3>
-<p><?php echo $this->translate->_('Versteht der Lektor die Ausgangssprache nicht kann ihm eine Relaissprache zur Verfügung gestellt werden, die er versteht (z. B. Englisch). Dazu muss das zu lektorierende Dokument strukturgleich als Englischübersetzung vorliegen. Dieses oder diese strukturgleichen Dokumente werden im optionalen Verzeichnis "relais" zur Verfügung gestellt. Dabei muss die Dateistruktur identisch zu den Inhalten im "proofRead" Verzeichnis sein.'); ?></p>
-<h3><?php echo $this->translate->_('Referenzdateien zur Verfügung stellen'); ?></h3>
-<p><?php echo $this->translate->_('Das optionale Verzeichnis "referenceFiles" kann eine beliebige Dateistruktur enthalten, welche als Referenzdateien importiert werden.'); ?></p>
-<h3><?php echo $this->translate->_('XML-Datei zur Konfiguration der QM-Subsegment-Kriterien'); ?></h3>
-<p><?php $out = $this->translate->_('Die optionale XML-Datei zur Konfiguration der QM-Subsegment-Kriterien bestimmt, welche QM-Subsegment Fehlerkategorien während des Lektorats zur Verfügung stehen. Eine übergebene Datei muss im Format der Standarddatei entsprechen, welche %shier als Bespiel heruntergeladen werden kann%s. Wird keine Datei übergeben, wird die Standard-Datei verwendet. '); ?></p>
-<p><?php 
-printf($out,'<a href="'.$pathToQMFile.'" target="_blank">','</a>');
-?></p>
-<p><?php echo $this->translate->_('<b>Beispielhafter Inhalt einer Zip Datei: </b>'); ?></p>
-<pre>
-<?php echo $config->runtimeOptions->editor->qmFlagXmlFileName; ?>  => <?php 
-$out = $this->translate->_('Optionale XML-Datei zur Konfiguration der QM-Subsegment Kriterien (Beispiel <a href="%s" target="_blank">siehe hier</a>).');
-printf($out,$pathToQMFile); ?> 
-proofRead/                => <?php echo $this->translate->_('Dieses Verzeichnis ist zwingend nötig, und beinhaltet die zu lektorierenden Dateien.'); ?> 
-proofRead/test.sdlxliff
-relais/                   => <?php echo $this->translate->_('Dieses Verzeichnis ist optional, muss wenn vorhanden die gleiche Dateistruktur wie "proofRead" aufweisen'); ?> 
-relais/test.sdlxliff
-term.tbx                  => <?php echo $this->translate->_('optionale TBX Datei mit Termen, die erste gefunden TBX Datei wird verwendet'); ?> 
-referenceFiles/           => <?php echo $this->translate->_('optionales Verzeichnis mit Referenzdateien'); ?> 
-referenceFiles/Referenz.pdf
-</pre>
-
-<h2><a name="single-import"><?php echo $this->translate->_('Import von einzelnen SDLXLIFF, openTM2-XLIFF oder CSV Dateien'); ?></a></h2>
-<p><?php echo $this->translate->_('Soll nur eine einzelne CSV, openTM2-XLIFF oder SDLXLIFF Datei ins Projekt importiert werden, so kann diese auch direkt hochgeladen werden. Die Erstellung einer ZIP Datei ist so nicht nötig.'); ?></p>
-<p><?php echo $this->translate->_('Handelt es sich um eine SDLXLIFF Datei, so kann zusätzlich eine TBX Datei mit Terminologie ausgewählt werden.'); ?></p>
-</div>
-
-
-<h2><?php echo $this->translate->_('Hinweise zum Lektorat'); ?><a name="lektorat"></a></h2>
-<img src="/images/screen-fuer-web.jpg" alt="<?php echo $this->translate->_('Screenshot Lektorat'); ?>"/>
-<table class="usage-info">
-<tbody>
-<tr>
-<td><strong><?php echo $this->translate->_('Dateiübersicht'); ?></strong>
-<ul>
-<li><?php echo $this->translate->_('Beliebig verkleiner- und vergrößerbar'); ?></li>
-<li><?php echo $this->translate->_('Dateireihenfolge sortierbar'); ?></li>
-<li><?php echo $this->translate->_('Klick auf Datei springt zum ersten Segment'); ?></li>
-</ul>
-</td>
-<td><strong><?php echo $this->translate->_('Filter'); ?></strong>
-<ul>
-<li><?php echo $this->translate->_('Alle Spalten filter- und sortierbar'); ?></li>
-<li><?php echo $this->translate->_('Filter mehrerer Spalten kombinierbar'); ?></li>
-<li><?php echo $this->translate->_('Ermöglicht flexibles Review'); ?></li>
-</ul>
-</td>
-<td><strong><?php echo $this->translate->_('Terminologie im Segment'); ?></strong>
-<ul>
-<li><?php echo $this->translate->_('Blau unterstrichen: Term und Übersetzung vorhanden'); ?></li>
-<li><?php echo $this->translate->_('Rot unterstrichen: Term fehlt in Übersetzung'); ?></li>
-<li><?php echo $this->translate->_('Violett hinterlegt: Verwendeter Term ist verbotene Benennung'); ?></li>
-</ul>
-</td>
-<td><strong><?php echo $this->translate->_('Autostatus'); ?></strong>
-<ul>
-<li><?php echo $this->translate->_('Wird bei Speichern des Segments automatisch gesetzt'); ?></li>
-<li><?php echo $this->translate->_('Häkchen: Wurde lektoriert'); ?></li>
-<li><?php echo $this->translate->_('Zahnrad: Automatisch angepasste Wiederholung'); ?></li>
-</ul>
-</td>
-<td><strong><?php echo $this->translate->_('Segment-Metadaten'); ?></strong>
-<ul>
-<li><?php echo $this->translate->_('Zeigen die Werte des aktuellen Segments'); ?></li>
-<li><?php echo $this->translate->_('Terminologie enthält auch nicht im Segment verwendete Terme eines verwendeten Begriffs'); ?></li>
-<li><?php echo $this->translate->_('Wählbare Werte für "QM" und "Status" sind pro Installation frei konfigurierbar'); ?></li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-
