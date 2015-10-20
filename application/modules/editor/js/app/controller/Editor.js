@@ -49,7 +49,6 @@ Ext.define('Editor.controller.Editor', {
     ref : 'segmentGrid',
     selector : '#segmentgrid'
   }],
-  hideLeftRight: false,
   calledSaveMethod:false,
   
   init : function() {
@@ -62,7 +61,8 @@ Ext.define('Editor.controller.Editor', {
         click : me.save
       },
       '#metapanel #saveNextSegmentBtn' : {
-        click : me.saveNext
+        //click : me.saveNext
+        click : me.saveNextByAutoStatus
       },
       '#metapanel #savePreviousSegmentBtn' : {
         click : me.savePrevious
@@ -93,6 +93,10 @@ Ext.define('Editor.controller.Editor', {
   initEditor: function(editor){
       var me = this,
           keyev = Ext.EventManager.useKeyDown ? 'keydown' : 'keypress';
+      
+      
+      console.log(editor.getDoc());
+      
 
       Ext.EventManager.on(editor.getDoc(), 'copy', function(e){
           console.log('COPY', (e.browserEvent || e).clipboardData.getData('text/plain'));//, window.clipboardData.getData('Text'));
@@ -142,12 +146,34 @@ Ext.define('Editor.controller.Editor', {
       return this.saveOtherRow(-1, this.messages.gridStartReached);
   },
   /**
+   * Handler for saveNext Button
+   * @return {Boolean} true if there is a next segment, false otherwise
+   */
+  saveNextByAutoStatus: function() {
+      this.calledSaveMethod = this.saveNext;
+      return this.saveOtherRow(1, this.messages.gridEndReached, function(rec) {
+          return rec.get('matchRate') > 0;
+      });
+  },
+  /**
+   * Handler for savePrevious Button
+   * @return {Boolean} true if there is a next segment, false otherwise
+   */
+  savePreviousByAutoStatus: function() {
+      this.calledSaveMethod = this.savePrevious;
+      return this.saveOtherRow(-1, this.messages.gridStartReached, function(rec) {
+          console.log("savePreviousByAutoStatus", rec);
+          return true;
+      });
+  },
+  /**
    * save and go to other row
    * @param {Integer} rowIdxChange positive or negative integer value to choose the index of the next row
    * @param {String} errorText
+   * @param {Function} isEditable optional, function which consumes a segment record, returns true if segment should be opened, false if not
    * @return {Boolean} true if there is a next segment, false otherwise
    */
-  saveOtherRow: function(rowIdxChange, errorText) {
+  saveOtherRow: function(rowIdxChange, errorText, isEditable) {
       var me = this,
           grid = me.getSegmentGrid(),
           selModel = grid.getSelectionModel(),
@@ -157,10 +183,12 @@ Ext.define('Editor.controller.Editor', {
           store = grid.store,
           lastColumnIdx = 0,
           newRec = store.getAt(store.indexOf(rec) + rowIdxChange);
+      isEditable = (Ext.isFunction(isEditable) ? isEditable : function(){ return true; });
       if(!rec || !rec.get('editable')) {
           return false;
       }
-      while(newRec && !newRec.get('editable')) {
+      //checking always for segments editable flag + custom isEditable  
+      while(newRec && (!newRec.get('editable') || !isEditable(newRec))) {
           newRec = store.getAt(store.indexOf(newRec) + rowIdxChange);
       }
       if(rowIdxChange > 0) {
@@ -201,7 +229,6 @@ Ext.define('Editor.controller.Editor', {
   },
   /**
    * Move the editor about one editable field
-   * @hint segment navigation
    */
   goToAlternate: function(btn, ev) {
     var me = this,
@@ -243,7 +270,6 @@ Ext.define('Editor.controller.Editor', {
   /**
    * returns the visible columns and which column has actually the editor
    * @return {Object}
-   * @hint segment navigation
    */
   getColInfo: function() {
     var me = this,
@@ -271,5 +297,15 @@ Ext.define('Editor.controller.Editor', {
       columns: columns,
       foundIdx: foundIdx
     };
+  },
+  /**
+   * returns true if given next Segment should be edited or not, decision by workflow autostatus
+   * @return {Boolean}
+   */
+  filterAutoStatus: function(nextRecord) {
+      //Save segment-row, change auto-status and open next below with initial autostatus
+      //for the current workflow-step (or an auto-status previous to the initial autostatus for this workflow-step) in the current filter set; 
+      //new button necessary
+      //like initial filter for wf step?
   }
 });
