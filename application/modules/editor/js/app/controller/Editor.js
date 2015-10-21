@@ -125,8 +125,18 @@ Ext.define('Editor.controller.Editor', {
           scope: me,
           fn: me.saveNextByAutoStatus
       }, {
+          key: [49, 50, 51, 52, 53, 54, 55, 56, 57],
+          ctrl: true,
+          alt: true,
+          scope: me,
+          fn: function(key){
+              var param = Number(key) - 48;
+              me.fireEvent('changeState', param);
+          }
+      }, {
           key: Ext.EventObject.ESC,
-          fn: function(){ alert("ESC was pressed"); }
+          scope: me,
+          fn: me.cancel
       }, {
           key: "N",
           ctrl:true,
