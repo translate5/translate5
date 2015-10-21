@@ -170,6 +170,9 @@ Ext.define('Editor.controller.MetaPanel', {
     //close the metapanel
     me.cancelEdit();
   },
+   /**
+    * @param {Ext.Number} param
+   */
   changeState: function(param) {
     var me = this,
         mp = me.getMetaPanel(),

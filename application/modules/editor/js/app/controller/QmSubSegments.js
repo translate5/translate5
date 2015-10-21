@@ -70,8 +70,11 @@ Ext.define('Editor.controller.QmSubSegments', {
     },
     
     init : function() {
-        var me = this;
+        var me = this,
+          edCtrl = me.application.getController('Editor');
         me.useAlternateInsertion = Ext.isIE;
+        
+        edCtrl.on('assignMQMTag', me.handleAddQmFlagKey, me);
         
         //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
         Editor.app.on('editorViewportOpened', me.handleInitEditor, me);
@@ -220,6 +223,23 @@ Ext.define('Editor.controller.QmSubSegments', {
         sev.reset();
         commentField.reset();
         me.addQmFlagHistory(menuitem);
+    },
+    /**
+     * Inserts the QM Issue Tag in the Editor by key shortcut, displays popup if nothing selected
+     * @param key
+     */
+    handleAddQmFlagKey: function(key) {
+        if ((Number(key) < 1) || (Number(key) > 20))
+        {
+          return;
+        }
+      
+        var me = this;
+                
+        if(! me.addQmFlagToEditor(String(key), '', '')) {
+            Ext.Msg.alert(me.strings.emptySelTitle, me.strings.emptySelText);
+            return;
+        }
     },
     /**
      * Inserts the QM Issue IMG Tags around the text selection in the editor 

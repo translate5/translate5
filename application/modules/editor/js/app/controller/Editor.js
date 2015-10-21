@@ -138,10 +138,46 @@ Ext.define('Editor.controller.Editor', {
           scope: me,
           fn: me.cancel
       }, {
+          key: Ext.EventObject.LEFT,
+          ctrl:true,
+          scope: me,
+          fn: me.goToAlternate
+      }, {
+          key: Ext.EventObject.RIGHT,
+          ctrl:true,
+          scope: me,
+          fn: me.goToAlternate
+      }, {
+          key: [48, 49, 50, 51, 52, 53, 54, 55, 56, 57],
+          alt: true,
+          shift:false,
+          scope: me,
+          fn: function(key){
+              var param = Number(key) - 48;
+              if (param == 0)
+              {
+                param = 10;
+              }
+              me.fireEvent('assignMQMTag', param);
+          }
+       }, {
+          key: [48, 49, 50, 51, 52, 53, 54, 55, 56, 57],
+          alt: true,
+          shift:true,
+          scope: me,
+          fn: function(key){
+              var param = (Number(key) - 48) + 10;
+              if (param == 10)
+              {
+                param = 20;
+              }
+              me.fireEvent('assignMQMTag', param);
+          }
+      }, {
           key: "N",
           ctrl:true,
           shift:true,
-          fn: function(){ alert("CTRL+SHIFT+N was pressed"); }
+          fn: function(){ me.fireEvent('openComments'); }
       }]);
   },
   /**
