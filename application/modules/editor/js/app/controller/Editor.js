@@ -61,8 +61,7 @@ Ext.define('Editor.controller.Editor', {
         click : me.save
       },
       '#metapanel #saveNextSegmentBtn' : {
-        //click : me.saveNext
-        click : me.saveNextByAutoStatus
+        click : me.saveNext
       },
       '#metapanel #savePreviousSegmentBtn' : {
         click : me.savePrevious
@@ -91,14 +90,10 @@ Ext.define('Editor.controller.Editor', {
    * @param editor
    */
   initEditor: function(editor){
-    debugger;  
       var me = this,
+          f = function() {},
           keyev = Ext.EventManager.useKeyDown ? 'keydown' : 'keypress';
       
-      
-      console.log(editor.getDoc());
-      
-
       /*Ext.EventManager.on(editor.getDoc(), 'copy', function(e){
           console.log('COPY', (e.browserEvent || e).clipboardData.getData('text/plain'));//, window.clipboardData.getData('Text'));
       });
@@ -115,31 +110,26 @@ Ext.define('Editor.controller.Editor', {
           console.log('SELECTION');
       });*/
       
+      f.prototype = Ext.Element.prototype;
+      docEl = new f();
+      docEl.dom = editor.getDoc();
       
-      //Ext.EventManager.on(editor.getDoc(), keyev, function(e){
-          //console.log("KEY",e.getKey());
-          //if(e.ctrlKey && e.getKey() == e.ENTER) {
-              //me.saveNext();
-         // }
-      //});
-      
-      console.log("HERE", editor, editor.getDoc());
-      var map = new Ext.util.KeyMap(
-	editor.getDoc(),
-	[
-	  {                
-	    key: Ext.EventObject.ESC,
-	    fn: function(){ alert("ESC was pressed"); }
-	  },
-	  {                
-	    key: "N",
-	    ctrl:true,
-	    shift:true,
-	    fn: function(){ alert("CTRL+SHIFT+N was pressed"); }
-	  }
-	]
-      );
-      
+      var map = new Ext.util.KeyMap(docEl, [{
+          key: [10,13],
+          fn: me.saveNext
+      }, {
+          key: [10,13],
+          alt: true,
+          fn: me.saveNextByAutoStatus
+      }, {
+          key: Ext.EventObject.ESC,
+          fn: function(){ alert("ESC was pressed"); }
+      }, {
+          key: "N",
+          ctrl:true,
+          shift:true,
+          fn: function(){ alert("CTRL+SHIFT+N was pressed"); }
+      }]);
   },
   /**
    * Handler für save Button
