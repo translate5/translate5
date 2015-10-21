@@ -91,8 +91,7 @@ Ext.define('Editor.controller.Editor', {
    */
   initEditor: function(editor){
       var me = this,
-          f = function() {},
-          keyev = Ext.EventManager.useKeyDown ? 'keydown' : 'keypress';
+          f = function() {};
       
       /*Ext.EventManager.on(editor.getDoc(), 'copy', function(e){
           console.log('COPY', (e.browserEvent || e).clipboardData.getData('text/plain'));//, window.clipboardData.getData('Text'));
@@ -116,10 +115,14 @@ Ext.define('Editor.controller.Editor', {
       
       var map = new Ext.util.KeyMap(docEl, [{
           key: [10,13],
+          ctrl: true,
+          scope: me,
           fn: me.saveNext
       }, {
           key: [10,13],
+          ctrl: true,
           alt: true,
+          scope: me,
           fn: me.saveNextByAutoStatus
       }, {
           key: Ext.EventObject.ESC,
