@@ -174,11 +174,13 @@ Ext.define('Editor.controller.MetaPanel', {
     var me = this,
         mp = me.getMetaPanel(),
         statBoxes = mp.query('#metaStates .radio');
+    index = 1;
     Ext.each(statBoxes, function(box){
-      if (box.inputValue == param)
+      if (index == param)
       {
         box.setValue(true);
       }
+      index++;
     });
 
   },  
