@@ -65,8 +65,6 @@ Ext.define('Editor.controller.MetaPanel', {
     ref : 'segmentGrid',
     selector : '#segmentgrid'
   }],
-  hideLeftRight: false,
-  calledSaveMethod:false,
   
   init : function() {
       var me = this;
