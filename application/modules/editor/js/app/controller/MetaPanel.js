@@ -89,7 +89,10 @@ Ext.define('Editor.controller.MetaPanel', {
   initEditPluginHandler: function() {
       var me = this, 
           multiEdit = me.getSegmentGrid().query('.contentEditableColumn').length > 1,
-          useChangeAlikes = Editor.app.authenticatedUser.isAllowed('useChangeAlikes', Editor.data.task);
+          useChangeAlikes = Editor.app.authenticatedUser.isAllowed('useChangeAlikes', Editor.data.task),
+          edCtrl = me.application.getController('Editor');
+          
+      edCtrl.on('changeState', me.changeState, me);
 
     //Diese Events können erst in onlauch gebunden werden, in init existiert das Plugin noch nicht
       me.getEditPlugin().on('beforeedit', me.startEdit, me);
@@ -169,6 +172,18 @@ Ext.define('Editor.controller.MetaPanel', {
     //close the metapanel
     me.cancelEdit();
   },
+  changeState: function(param) {
+    var me = this,
+        mp = me.getMetaPanel(),
+        statBoxes = mp.query('#metaStates .radio');
+    Ext.each(statBoxes, function(box){
+      if (box.inputValue == param)
+      {
+        box.setValue(true);
+      }
+    });
+
+  },  
   /**
    * Editor.view.segments.RowEditing canceledit handler
    * @hint metapanel
