@@ -173,16 +173,13 @@ Ext.define('Editor.controller.MetaPanel', {
   changeState: function(param) {
     var me = this,
         mp = me.getMetaPanel(),
+        index = 1,
         statBoxes = mp.query('#metaStates .radio');
-    index = 1;
     Ext.each(statBoxes, function(box){
-      if (index == param)
-      {
+      if (index++ == param){
         box.setValue(true);
       }
-      index++;
     });
-
   },  
   /**
    * Editor.view.segments.RowEditing canceledit handler
