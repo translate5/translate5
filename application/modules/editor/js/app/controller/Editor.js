@@ -110,26 +110,26 @@ Ext.define('Editor.controller.Editor', {
           console.log('SELECTION');
       });*/
       
-      f.prototype = Ext.Element.prototype;
-      docEl = new f();
-      docEl.dom = editor.getDoc();
-      
-      var map = new Ext.util.KeyMap(docEl, [{
-          key: [10,13],
-          fn: me.saveNext
-      }, {
-          key: [10,13],
-          alt: true,
-          fn: me.saveNextByAutoStatus
-      }, {
-          key: Ext.EventObject.ESC,
-          fn: function(){ alert("ESC was pressed"); }
-      }, {
-          key: "N",
-          ctrl:true,
-          shift:true,
-          fn: function(){ alert("CTRL+SHIFT+N was pressed"); }
-      }]);
+    Ext.EventManager.on(editor.getDoc(), keyev, function(e)
+      {
+          console.log("KEY",e.getKey());
+          if (e.ctrlKey && e.getKey() == e.ENTER)
+          {
+              console.log("CTRL+ENTER");
+              me.saveNext();
+          }
+          else if (e.getKey() == e.ESC)
+          {
+              console.log("ESC");
+              me.cancel();
+          }
+          else if (e.ctrlKey && e.altKey && Ext.Array.contains([49, 50, 51, 52, 53, 54, 55, 56, 57], e.getKey()))
+          {
+              var param = Number(e.getKey()) - 48;
+              console.log("CTRL+ALT+"+param);
+              me.fireEvent('changeState', param);
+          }
+      });
   },
   /**
    * Handler für save Button
