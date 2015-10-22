@@ -128,7 +128,7 @@ Ext.define('Editor.controller.QmSubSegments', {
      * generates the config menu tree for QM Flag Menu
      * @returns
      */
-	getMenuConfig: function() {
+    getMenuConfig: function() {
 		Editor.qmFlagTypeCache = {};
 		var me = this,
 			cache = Editor.qmFlagTypeCache,
@@ -203,6 +203,53 @@ Ext.define('Editor.controller.QmSubSegments', {
         this.getWindow().show();
     },
     /**
+     * Inserts the QM Issue Tag in the Editor by key shortcut, displays popup if nothing selected
+     * @param key
+     */
+    handleAddQmFlagKey: function(key) {
+        var me = this,
+            found = false,
+            menuitem = null;
+        
+        for (var i = 0; i < me.menuConfig.length; i++)
+        {
+          if (me.menuConfig[i].qmid == key)
+          {
+            found = true;
+            menuitem = me.menuConfig[i];
+            break;
+          }
+          if (!found && me.menuConfig[i].menu)
+          {
+            for (var j = 0; j < me.menuConfig[i].menu.items.length; j++)
+            {
+              if (me.menuConfig[i].menu.items[j].qmid == key)
+              {
+                found = true;
+                menuitem = me.menuConfig[i].menu.items[j];
+                break;
+              }
+              if (!found && me.menuConfig[i].menu.items[j].menu)
+              {
+                for (var k = 0; k < me.menuConfig[i].menu.items[j].menu.items.length; k++)
+                {
+                  if (me.menuConfig[i].menu.items[j].menu.items[k].qmid == key)
+                  {
+                    found = true;
+                    menuitem = me.menuConfig[i].menu.items[j].menu.items[k];
+                    break;
+                  }
+                }
+              }
+            }
+          }
+        }
+        if (found)
+        {
+          me.handleAddQmFlagClick(menuitem);
+        }
+    },
+    /**
      * Inserts the QM Issue Tag in the Editor, displays popup if nothing selected
      * @param menuitem
      */
@@ -223,23 +270,6 @@ Ext.define('Editor.controller.QmSubSegments', {
         sev.reset();
         commentField.reset();
         me.addQmFlagHistory(menuitem);
-    },
-    /**
-     * Inserts the QM Issue Tag in the Editor by key shortcut, displays popup if nothing selected
-     * @param key
-     */
-    handleAddQmFlagKey: function(key) {
-        if ((Number(key) < 1) || (Number(key) > 20))
-        {
-          return;
-        }
-      
-        var me = this;
-                
-        if(! me.addQmFlagToEditor(String(key), '', '')) {
-            Ext.Msg.alert(me.strings.emptySelTitle, me.strings.emptySelText);
-            return;
-        }
     },
     /**
      * Inserts the QM Issue IMG Tags around the text selection in the editor 

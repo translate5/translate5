@@ -141,12 +141,12 @@ Ext.define('Editor.controller.Editor', {
           key: Ext.EventObject.LEFT,
           ctrl:true,
           scope: me,
-          fn: me.goToAlternate
+          fn: me.goToLeft
       }, {
           key: Ext.EventObject.RIGHT,
           ctrl:true,
           scope: me,
-          fn: me.goToAlternate
+          fn: me.goToRight
       }, {
           key: [48, 49, 50, 51, 52, 53, 54, 55, 56, 57],
           alt: true,
@@ -290,9 +290,9 @@ Ext.define('Editor.controller.Editor', {
   /**
    * Move the editor about one editable field
    */
-  goToAlternate: function(btn, ev) {
+  goToCustom: function(direction, saveAndChange) {
+    alert(direction);
     var me = this,
-        direction = (btn.itemId == 'goAlternateLeftBtn' ? -1 : 1),
         info = me.getColInfo(),
         idx = info && info.foundIdx,
         cols = info && info.columns,
@@ -307,25 +307,51 @@ Ext.define('Editor.controller.Editor', {
     while(newRec && !newRec.get('editable')) {
         newRec = store.getAt(store.indexOf(newRec) + direction);
     }
-    
-    if(cols[idx + direction]) {
-      info.plug.editor.changeColumnToEdit(cols[idx + direction]);
-      return;
+    if (saveAndChange)
+    {
+      if(cols[idx + direction]) {
+        info.plug.editor.changeColumnToEdit(cols[idx + direction]);
+        return;
+      }
+      if(direction > 0) {
+          //goto next segment and first col
+          if(newRec) {
+              info.plug.editor.changeColumnToEdit(cols[0]);
+          }
+          me.saveNext();
+      }
+      else {
+          //goto prev segment and last col
+          if(newRec) {
+              info.plug.editor.changeColumnToEdit(cols[cols.length - 1]);
+          }
+          me.savePrevious();
+      }
     }
-    if(direction > 0) {
-        //goto next segment and first col
-        if(newRec) {
-            info.plug.editor.changeColumnToEdit(cols[0]);
-        }
-        me.saveNext();
-    }
-    else {
-        //goto prev segment and last col
-        if(newRec) {
-            info.plug.editor.changeColumnToEdit(cols[cols.length - 1]);
-        }
-        me.savePrevious();
-    }
+  },
+  /**
+   * Move the editor about one editable field
+   */
+  goToAlternate: function(btn, ev) {
+    var me = this,
+        direction = (btn.itemId == 'goAlternateLeftBtn' ? -1 : 1);
+    me.goToCustom(direction, true);    
+  },
+  /**
+   * Move the editor about one editable field left
+   */
+  goToLeft: function() {
+    var me = this,
+        direction = -1;
+    me.goToCustom(direction, false);    
+  },
+  /**
+   * Move the editor about one editable field right
+   */
+  goToRight: function() {
+    var me = this,
+        direction = 1;
+    me.goToCustom(direction, false);    
   },
   /**
    * returns the visible columns and which column has actually the editor
