@@ -160,13 +160,45 @@ Ext.define('Editor.controller.Editor', {
           ctrl:true,
           scope: me,
           fn: me.goToRight
+      }, /*{
+          key: Ext.EventObject.UP,
+          ctrl:true,
+          scope: me,
+          fn: me.goToUpperByWorkflowNoSave
+      }, {
+          key: Ext.EventObject.DOWN,
+          ctrl:true,
+          scope: me,
+          fn: me.goToLowerByWorkflowNoSave
+      },*/ {
+          key: Ext.EventObject.UP,
+          ctrl:true,
+          alt: true,
+          scope: me,
+          fn: function(key, e){
+              e.preventDefault();
+              e.stopEvent();
+              me.goToUpperNoSave();
+          }
+      }, {
+          key: Ext.EventObject.DOWN,
+          ctrl:true,
+          alt: true,
+          scope: me,
+          fn: function(key, e){
+              e.preventDefault();
+              e.stopEvent();
+              me.goToLowerNoSave();
+          }
       }, {
           key: decDigits,
           ctrl: false,
           alt: true,
           shift:false,
           scope: me,
-          fn: function(key){
+          fn: function(key, e){
+              e.preventDefault();
+              e.stopEvent();
               var param = Number(key) - 48;
               if (param == 0)
               {
@@ -180,7 +212,9 @@ Ext.define('Editor.controller.Editor', {
           alt: true,
           shift:true,
           scope: me,
-          fn: function(key){
+          fn: function(key, e){
+              e.preventDefault();
+              e.stopEvent();
               var param = (Number(key) - 48) + 10;
               if (param == 10)
               {
@@ -189,10 +223,15 @@ Ext.define('Editor.controller.Editor', {
               me.fireEvent('assignMQMTag', param);
           }
       }, {
+          // Angel Naydenov 22.10.2015: This shortcut cannot be captured in Chrome
           key: "N",
           ctrl:true,
           shift:true,
-          fn: function(){ me.fireEvent('openComments'); }
+          fn: function(key, e){
+              e.preventDefault();
+              e.stopEvent();
+              me.fireEvent('openComments');
+          }
       }]);
   },
   /**
@@ -209,7 +248,7 @@ Ext.define('Editor.controller.Editor', {
    * @param {Integer} direction of moving
    * @return {Boolean} true if there is a next segment, false otherwise
    */
-  moveToAdjacentHoriz: function(direction) {
+  moveToAdjacentRow: function(direction) {
       var me = this,
           grid = me.getSegmentGrid(),
           selModel = grid.getSelectionModel(),
@@ -228,9 +267,25 @@ Ext.define('Editor.controller.Editor', {
    * Moves to the next row without saving current record
    * @return {Boolean} true if there is a next segment, false otherwise
    */
+  goToLowerNoSave: function() {
+      var me = this;
+      me.moveToAdjacentRow(1);
+  },
+  /**
+   * Moves to the next row without saving current record
+   * @return {Boolean} true if there is a next segment, false otherwise
+   */
+  goToUpperNoSave: function() {
+      var me = this;
+      me.moveToAdjacentRow(-1);
+  },
+  /**
+   * Moves to the next row without saving current record
+   * @return {Boolean} true if there is a next segment, false otherwise
+   */
   moveNext: function() {
       var me = this;
-      return me.moveToAdjacentHoriz(1);
+      return me.moveToAdjacentRow(1);
   },
   /**
    * Moves to the previous row without saving current record
@@ -238,7 +293,7 @@ Ext.define('Editor.controller.Editor', {
    */
   movePrevious: function() {
       var me = this;
-      return me.moveToAdjacentHoriz(-1);
+      return me.moveToAdjacentRow(-1);
   },
   /**
    * Handler for saveNext Button
