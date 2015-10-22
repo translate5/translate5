@@ -291,7 +291,6 @@ Ext.define('Editor.controller.Editor', {
    * Move the editor about one editable field
    */
   goToCustom: function(direction, saveAndChange) {
-    alert(direction);
     var me = this,
         info = me.getColInfo(),
         idx = info && info.foundIdx,
