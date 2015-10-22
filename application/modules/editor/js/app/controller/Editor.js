@@ -91,7 +91,8 @@ Ext.define('Editor.controller.Editor', {
    */
   initEditor: function(editor){
       var me = this,
-          f = function() {};
+          f = function() {},
+          decDigits = [48, 49, 50, 51, 52, 53, 54, 55, 56, 57];
       
       /*Ext.EventManager.on(editor.getDoc(), 'copy', function(e){
           console.log('COPY', (e.browserEvent || e).clipboardData.getData('text/plain'));//, window.clipboardData.getData('Text'));
@@ -148,7 +149,7 @@ Ext.define('Editor.controller.Editor', {
           scope: me,
           fn: me.goToRight
       }, {
-          key: [48, 49, 50, 51, 52, 53, 54, 55, 56, 57],
+          key: decDigits,
           alt: true,
           shift:false,
           scope: me,
@@ -161,7 +162,7 @@ Ext.define('Editor.controller.Editor', {
               me.fireEvent('assignMQMTag', param);
           }
        }, {
-          key: [48, 49, 50, 51, 52, 53, 54, 55, 56, 57],
+          key: decDigits,
           alt: true,
           shift:true,
           scope: me,
@@ -188,6 +189,42 @@ Ext.define('Editor.controller.Editor', {
       if(me.record && me.record.get('editable')) {
           me.fireEvent('saveSegment');
       }
+  },
+  /**
+   * Moves to the next or previous row without saving current record
+   * @param {Integer} direction of moving
+   * @return {Boolean} true if there is a next segment, false otherwise
+   */
+  moveToAdjacentHoriz: function(direction) {
+      var me = this,
+          grid = me.getSegmentGrid(),
+          selModel = grid.getSelectionModel(),
+          ed = me.getEditPlugin(),
+          ret = this.moveToOtherRow(direction);
+      
+      //editing by selection handler must be disabled, otherwise saveChainStart will be triggered twice
+      ed.disableEditBySelect = true;
+      selModel.select(ret.newRec);
+      Ext.defer(ed.startEdit, 300, ed, [ret.newRec, ret.lastColumnIdx]); //defer reduces problems with editorDomCleanUp see comment on Bug 38
+      ed.disableEditBySelect = false;
+      me.cancel();
+      return ret.existsNextSegment;
+  },
+  /**
+   * Moves to the next row without saving current record
+   * @return {Boolean} true if there is a next segment, false otherwise
+   */
+  moveNext: function() {
+      var me = this;
+      return me.moveToAdjacentHoriz(1);
+  },
+  /**
+   * Moves to the previous row without saving current record
+   * @return {Boolean} true if there is a next segment, false otherwise
+   */
+  movePrevious: function() {
+      var me = this;
+      return me.moveToAdjacentHoriz(-1);
   },
   /**
    * Handler for saveNext Button
@@ -227,6 +264,47 @@ Ext.define('Editor.controller.Editor', {
       });
   },
   /**
+   * go to other row
+   * @param {Integer} rowIdxChange positive or negative integer value to choose the index of the next row
+   * @param {Function} isEditable optional, function which consumes a segment record, returns true if segment should be opened, false if not
+   * @return {Object} to be used by saveOtherRow
+   */
+  moveToOtherRow: function(rowIdxChange, isEditable) {
+      var me = this,
+          grid = me.getSegmentGrid(),
+          selModel = grid.getSelectionModel(),
+          ed = me.getEditPlugin(),
+          store = grid.store,
+          rec = ed.openedRecord,
+          ret = {
+            'existsNextSegment': false,
+            'isBorderReached'  : false,
+            'lastColumnIdx'    : 0,
+            'newRec'           : store.getAt(store.indexOf(rec) + rowIdxChange)
+          };
+      isEditable = (Ext.isFunction(isEditable) ? isEditable : function(){ return true; });
+      if(!rec || !rec.get('editable')) {
+          return ret;
+      }
+      //checking always for segments editable flag + custom isEditable  
+      while(ret.newRec && (!ret.newRec.get('editable') || !isEditable(ret.newRec))) {
+          ret.newRec = store.getAt(store.indexOf(ret.newRec) + rowIdxChange);
+      }
+      if(rowIdxChange > 0) {
+          ret.isBorderReached = rec.get('id') == store.getLastSegmentId();
+      }
+      else {
+          ret.isBorderReached = rec.get('id') == store.getFirstSegmentId();
+      }
+      Ext.Array.each(grid.columns, function(col, idx) {
+          if(col.dataIndex == ed.editor.getEditedField()) {
+              ret.lastColumnIdx = idx;
+          }
+      });
+      ret.existsNextSegment = (ret.newRec !== undefined);
+      return ret;
+  },
+  /**
    * save and go to other row
    * @param {Integer} rowIdxChange positive or negative integer value to choose the index of the next row
    * @param {String} errorText
@@ -238,40 +316,18 @@ Ext.define('Editor.controller.Editor', {
           grid = me.getSegmentGrid(),
           selModel = grid.getSelectionModel(),
           ed = me.getEditPlugin(),
-          rec = ed.openedRecord,
-          isBorderReached = false,
-          store = grid.store,
-          lastColumnIdx = 0,
-          newRec = store.getAt(store.indexOf(rec) + rowIdxChange);
-      isEditable = (Ext.isFunction(isEditable) ? isEditable : function(){ return true; });
-      if(!rec || !rec.get('editable')) {
-          return false;
-      }
-      //checking always for segments editable flag + custom isEditable  
-      while(newRec && (!newRec.get('editable') || !isEditable(newRec))) {
-          newRec = store.getAt(store.indexOf(newRec) + rowIdxChange);
-      }
-      if(rowIdxChange > 0) {
-          isBorderReached = rec.get('id') == store.getLastSegmentId();
-      }
-      else {
-          isBorderReached = rec.get('id') == store.getFirstSegmentId();
-      }
-      Ext.Array.each(grid.columns, function(col, idx) {
-          if(col.dataIndex == ed.editor.getEditedField()) {
-              lastColumnIdx = idx;
-          }
-      });
+          ret = me.moveToOtherRow(rowIdxChange, isEditable);
+          
       me.fireEvent('saveSegment', {
           scope: me,
           segmentUsageFinished: function(){
-              if(isBorderReached) {
+              if(ret.isBorderReached) {
                   Editor.MessageBox.addInfo(errorText);
-              } else if(newRec !== undefined){
+              } else if(ret.existsNextSegment){
                   //editing by selection handler must be disabled, otherwise saveChainStart will be triggered twice
                   ed.disableEditBySelect = true;
-                  selModel.select(newRec);
-                  Ext.defer(ed.startEdit, 300, ed, [newRec, lastColumnIdx]); //defer reduces problems with editorDomCleanUp see comment on Bug 38
+                  selModel.select(ret.newRec);
+                  Ext.defer(ed.startEdit, 300, ed, [ret.newRec, ret.lastColumnIdx]); //defer reduces problems with editorDomCleanUp see comment on Bug 38
                   ed.disableEditBySelect = false;
               }
               else {
@@ -279,7 +335,7 @@ Ext.define('Editor.controller.Editor', {
               }
           }
       });
-      return (newRec !== undefined);
+      return ret.existsNextSegment;
   },
   /**
    * Handler für cancel Button
@@ -319,6 +375,10 @@ Ext.define('Editor.controller.Editor', {
         {
           me.saveNext();
         }
+        else
+        {
+          me.moveNext();
+        }
     }
     else {
         //goto prev segment and last col
@@ -328,6 +388,10 @@ Ext.define('Editor.controller.Editor', {
         if (saveRecord)
         {
           me.savePrevious();
+        }
+        else
+        {
+          me.movePrevious();
         }
     }
   },
@@ -345,7 +409,7 @@ Ext.define('Editor.controller.Editor', {
   goToLeft: function() {
     var me = this,
         direction = -1;
-    me.goToCustom(direction, false);    
+    me.goToCustom(direction, true);    
   },
   /**
    * Move the editor about one editable field right
@@ -353,7 +417,7 @@ Ext.define('Editor.controller.Editor', {
   goToRight: function() {
     var me = this,
         direction = 1;
-    me.goToCustom(direction, false);    
+    me.goToCustom(direction, true);    
   },
   /**
    * returns the visible columns and which column has actually the editor

@@ -203,50 +203,41 @@ Ext.define('Editor.controller.QmSubSegments', {
         this.getWindow().show();
     },
     /**
+     * Recursively gets menuitem by it qmid
+     * @param {Array} menuitems
+     * @param {Integer} qmid
+     */
+    getMenuitemByQmId: function(menuitems, qmid) {
+        var me = this,
+            todo = [];
+        for (var i = 0; i < menuitems.length; i++)
+        {
+            if (menuitems[i].qmid == qmid)
+            {
+                return menuitems[i];
+            }
+            if (menuitems[i].menu)
+            {
+                for (var j = 0; j < menuitems[i].menu.items.length; j++)
+                {
+                    todo.push(menuitems[i].menu.items[j]);
+                }
+            }
+        }
+        return me.getMenuitemByQmId(todo, qmid);
+    },
+    /**
      * Inserts the QM Issue Tag in the Editor by key shortcut, displays popup if nothing selected
      * @param key
      */
     handleAddQmFlagKey: function(key) {
         var me = this,
             found = false,
-            menuitem = null;
+            menuitem = me.getMenuitemByQmId(me.menuConfig, key);
         
-        for (var i = 0; i < me.menuConfig.length; i++)
+        if (menuitem)
         {
-          if (me.menuConfig[i].qmid == key)
-          {
-            found = true;
-            menuitem = me.menuConfig[i];
-            break;
-          }
-          if (!found && me.menuConfig[i].menu)
-          {
-            for (var j = 0; j < me.menuConfig[i].menu.items.length; j++)
-            {
-              if (me.menuConfig[i].menu.items[j].qmid == key)
-              {
-                found = true;
-                menuitem = me.menuConfig[i].menu.items[j];
-                break;
-              }
-              if (!found && me.menuConfig[i].menu.items[j].menu)
-              {
-                for (var k = 0; k < me.menuConfig[i].menu.items[j].menu.items.length; k++)
-                {
-                  if (me.menuConfig[i].menu.items[j].menu.items[k].qmid == key)
-                  {
-                    found = true;
-                    menuitem = me.menuConfig[i].menu.items[j].menu.items[k];
-                    break;
-                  }
-                }
-              }
-            }
-          }
-        }
-        if (found)
-        {
-          me.handleAddQmFlagClick(menuitem);
+            me.handleAddQmFlagClick(menuitem);
         }
     },
     /**
@@ -351,9 +342,10 @@ Ext.define('Editor.controller.QmSubSegments', {
      * @param {Ext.menu.Item} menuitem
      */
     addQmFlagHistory: function(menuitem) {
-    	if(!menuitem.parentMenu.parentMenu) {
-    		return; //ignore first level and history menu entries
-    	}
+        // Angel Naydenov 22.10.2015: this statement generates js error, there is no parentMenu property in menuitem
+    	//if(!menuitem.parentMenu.parentMenu) {
+    	//	return; //ignore first level and history menu entries
+    	//}
     	var me = this,
     	id = menuitem.qmid,
     	toremove,

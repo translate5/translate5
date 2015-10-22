@@ -171,6 +171,7 @@ Ext.define('Editor.controller.MetaPanel', {
     me.cancelEdit();
   },
    /**
+    * Changes the state box by keyboard shortcut instead of mouseclick
     * @param {Ext.Number} param
    */
   changeState: function(param) {
