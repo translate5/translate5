@@ -110,6 +110,17 @@ Ext.define('Editor.controller.Editor', {
           console.log('SELECTION');
       });*/
       
+      // Angel Naydenov 22.10.2015: I excluded keymap version and returned this one, because with keymap BOTH assignMQMTag and changeState are fired
+      Ext.EventManager.on(editor.getDoc(), 'keydown', function(e)
+      {
+          if (e.ctrlKey && e.altKey && Ext.Array.contains([49, 50, 51, 52, 53, 54, 55, 56, 57], e.getKey()))
+          {
+              var param = Number(e.getKey()) - 48;
+              console.log("CTRL+ALT+"+param);
+              me.fireEvent('changeState', param);
+          }
+      });
+      
       f.prototype = Ext.Element.prototype;
       docEl = new f();
       docEl.dom = editor.getDoc();
@@ -125,16 +136,17 @@ Ext.define('Editor.controller.Editor', {
           alt: true,
           scope: me,
           fn: me.saveNextByAutoStatus
-      }, {
+      }, /*{
           key: [49, 50, 51, 52, 53, 54, 55, 56, 57],
           ctrl: true,
           alt: true,
+          shift:false,
           scope: me,
           fn: function(key){
               var param = Number(key) - 48;
               me.fireEvent('changeState', param);
           }
-      }, {
+      },*/ {
           key: Ext.EventObject.ESC,
           scope: me,
           fn: me.cancel
@@ -150,6 +162,7 @@ Ext.define('Editor.controller.Editor', {
           fn: me.goToRight
       }, {
           key: decDigits,
+          ctrl: false,
           alt: true,
           shift:false,
           scope: me,
@@ -163,6 +176,7 @@ Ext.define('Editor.controller.Editor', {
           }
        }, {
           key: decDigits,
+          ctrl: false,
           alt: true,
           shift:true,
           scope: me,
