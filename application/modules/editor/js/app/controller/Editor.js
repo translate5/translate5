@@ -290,7 +290,7 @@ Ext.define('Editor.controller.Editor', {
   /**
    * Move the editor about one editable field
    */
-  goToCustom: function(direction, saveAndChange) {
+  goToCustom: function(direction, saveRecord) {
     var me = this,
         info = me.getColInfo(),
         idx = info && info.foundIdx,
@@ -306,26 +306,29 @@ Ext.define('Editor.controller.Editor', {
     while(newRec && !newRec.get('editable')) {
         newRec = store.getAt(store.indexOf(newRec) + direction);
     }
-    if (saveAndChange)
-    {
-      if(cols[idx + direction]) {
-        info.plug.editor.changeColumnToEdit(cols[idx + direction]);
-        return;
-      }
-      if(direction > 0) {
-          //goto next segment and first col
-          if(newRec) {
-              info.plug.editor.changeColumnToEdit(cols[0]);
-          }
+    if(cols[idx + direction]) {
+      info.plug.editor.changeColumnToEdit(cols[idx + direction]);
+      return;
+    }
+    if(direction > 0) {
+        //goto next segment and first col
+        if(newRec) {
+            info.plug.editor.changeColumnToEdit(cols[0]);
+        }
+        if (saveRecord)
+        {
           me.saveNext();
-      }
-      else {
-          //goto prev segment and last col
-          if(newRec) {
-              info.plug.editor.changeColumnToEdit(cols[cols.length - 1]);
-          }
+        }
+    }
+    else {
+        //goto prev segment and last col
+        if(newRec) {
+            info.plug.editor.changeColumnToEdit(cols[cols.length - 1]);
+        }
+        if (saveRecord)
+        {
           me.savePrevious();
-      }
+        }
     }
   },
   /**
