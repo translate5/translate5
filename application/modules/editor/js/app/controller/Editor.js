@@ -364,12 +364,8 @@ Ext.define('Editor.controller.Editor', {
       if (filterByWorkflowStep)
       {
           //console.log(rec.get('workflowStep'));
-          //console.log(ret.newRec.get('workflowStep'));
-          //console.log((ret.newRec.get('workflowStep') == rec.get('workflowStep')));
-          //checking always for segments editable flag + custom isEditable  
           while (ret.newRec)
           {
-              //console.log(">>> "+ret.newRec.get('workflowStep'));
               if (ret.newRec.get('workflowStep') == rec.get('workflowStep'))
               {
                   if (ret.newRec.get('editable') || isEditable(ret.newRec))
@@ -385,7 +381,6 @@ Ext.define('Editor.controller.Editor', {
           //checking always for segments editable flag + custom isEditable  
           while (ret.newRec && (!ret.newRec.get('editable') || !isEditable(ret.newRec)))
           {
-              console.log("}}} "+ret.newRec.get('workflowStep'));
               ret.newRec = store.getAt(store.indexOf(ret.newRec) + rowIdxChange);
           }
       }
