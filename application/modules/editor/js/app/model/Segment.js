@@ -124,6 +124,7 @@ Editor.model._Segment([
     {name: 'editable', type: 'boolean'},
     {name: 'autoStateId', type: 'int'},
     {name: 'workflowStep', type: 'string'},
+    {name: 'workflowStepNr', type: 'integer', persist: false},
     {name: 'matchRate', type: 'int'},
     //{name: 'terms', type: 'string'},
     {name: 'durations', defaultValue: {}}, //we are using an object here
