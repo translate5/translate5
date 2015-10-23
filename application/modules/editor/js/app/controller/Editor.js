@@ -72,6 +72,12 @@ Ext.define('Editor.controller.Editor', {
       '#metapanel #goAlternateRightBtn' : {
           click : me.goToAlternate
       },
+      '#metapanel #goToLowerByWorkflowNoSaveBtn' : {
+          click : me.goToLowerByWorkflowNoSave
+      },
+      '#metapanel #goToUpperByWorkflowNoSaveBtn' : {
+          click : me.goToUpperByWorkflowNoSave
+      },
       //disabled ctrl enter since this produces errors in the save chain
       'segmentsHtmleditor': {
           afteriniteditor: me.initEditor

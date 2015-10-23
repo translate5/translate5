@@ -120,6 +120,34 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
               icon: Editor.data.moduleFolder+'images/arrow_right.png',
               iconAlign: 'right',
               tooltip: me.item_alternateRight
+          },
+          {
+            xtype: 'button',
+            itemId: 'goToLowerByWorkflowNoSaveBtn',
+            icon: Editor.data.moduleFolder+'images/arrow_down_filtered_nosave.png',
+            iconAlign: 'right',
+            tooltip: me.item_saveAndNext
+          },
+          {
+            xtype: 'button',
+            itemId: 'goToUpperByWorkflowNoSaveBtn',
+            icon: Editor.data.moduleFolder+'images/arrow_up_filtered_nosave.png ',
+            iconAlign: 'right',
+            tooltip: me.item_saveAndNext
+          },
+          {
+            xtype: 'button',
+            itemId: 'goToLowerByWorkflowNoSaveBtn',
+            icon: Editor.data.moduleFolder+'images/arrow_down_nosave.png',
+            iconAlign: 'right',
+            tooltip: me.item_saveAndNext
+          },
+          {
+            xtype: 'button',
+            itemId: 'goToUpperByWorkflowNoSaveBtn',
+            icon: Editor.data.moduleFolder+'images/arrow_up_nosave.png ',
+            iconAlign: 'right',
+            tooltip: me.item_saveAndNext
           }
         ]
       });

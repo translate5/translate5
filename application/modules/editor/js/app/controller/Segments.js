@@ -132,6 +132,8 @@ Ext.define('Editor.controller.Segments', {
               //@todo should be replaced with Event Domains after update to ExtJS >4.2
               me.getSegmentsStore().on('load', me.invalidatePager, me);
               me.getSegmentsStore().on('load', me.refreshGridView, me);
+              
+              // TUK
           },
         selectionchange: me.handleSegmentSelectionChange,
         columnhide: me.handleColumnVisibility,
