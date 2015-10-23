@@ -209,22 +209,20 @@ Ext.define('Editor.controller.QmSubSegments', {
      */
     getMenuitemByQmId: function(menuitems, qmid) {
         var me = this,
-            todo = [];
-        for (var i = 0; i < menuitems.length; i++)
-        {
-            if (menuitems[i].qmid == qmid)
-            {
+            result = null;
+        for (var i = 0; i < menuitems.length; i++) {
+            if (menuitems[i].qmid == qmid) {
                 return menuitems[i];
             }
-            if (menuitems[i].menu)
-            {
-                for (var j = 0; j < menuitems[i].menu.items.length; j++)
-                {
-                    todo.push(menuitems[i].menu.items[j]);
-                }
+            if(!menuitems[i].menu || menuitems[i].menu.items.length == 0){
+                continue;
+            }
+            result = me.getMenuitemByQmId(menuitems[i].menu.items, qmid);
+            if(result) {
+                break;
             }
         }
-        return me.getMenuitemByQmId(todo, qmid);
+        return result;
     },
     /**
      * Inserts the QM Issue Tag in the Editor by key shortcut, displays popup if nothing selected
