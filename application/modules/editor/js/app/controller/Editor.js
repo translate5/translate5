@@ -135,13 +135,13 @@ Ext.define('Editor.controller.Editor', {
           ctrl: true,
           alt: false,
           scope: me,
-          fn: me.saveNext
+          fn: me.saveNextByWorkflow
       }, {
           key: [10,13],
           ctrl: true,
           alt: true,
           scope: me,
-          fn: me.saveNextByWorkflow
+          fn: me.saveNext
       }, {
           key: decDigits.slice(1),
           ctrl: true,
