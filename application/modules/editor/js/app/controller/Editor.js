@@ -111,6 +111,8 @@ Ext.define('Editor.controller.Editor', {
       });*/
       
       // Angel Naydenov 22.10.2015: I excluded keymap version and returned this one, because with keymap BOTH assignMQMTag and changeState are fired
+          
+          /*
       Ext.EventManager.on(editor.getDoc(), 'keydown', function(e)
       {
           //console.log(e.getKey());
@@ -122,6 +124,8 @@ Ext.define('Editor.controller.Editor', {
           }
       });
       
+      */
+      
       f.prototype = Ext.Element.prototype;
       docEl = new f();
       docEl.dom = editor.getDoc();
@@ -129,6 +133,7 @@ Ext.define('Editor.controller.Editor', {
       var map = new Ext.util.KeyMap(docEl, [{
           key: [10,13],
           ctrl: true,
+          alt: false,
           scope: me,
           fn: me.saveNext
       }, {
@@ -137,8 +142,8 @@ Ext.define('Editor.controller.Editor', {
           alt: true,
           scope: me,
           fn: me.saveNextByAutoStatus
-      }, /*{
-          key: [49, 50, 51, 52, 53, 54, 55, 56, 57],
+      }, {
+          key: decDigits.slice(1),
           ctrl: true,
           alt: true,
           shift:false,
@@ -147,7 +152,7 @@ Ext.define('Editor.controller.Editor', {
               var param = Number(key) - 48;
               me.fireEvent('changeState', param);
           }
-      },*/ {
+      }, {
           key: Ext.EventObject.ESC,
           scope: me,
           fn: me.cancel
