@@ -115,10 +115,11 @@ Ext.define('Editor.controller.Editor', {
           /*
       Ext.EventManager.on(editor.getDoc(), 'keydown', function(e)
       {
+          //console.log(e.getKey());
           if (e.ctrlKey && e.altKey && Ext.Array.contains([49, 50, 51, 52, 53, 54, 55, 56, 57], e.getKey()))
           {
               var param = Number(e.getKey()) - 48;
-              console.log("CTRL+ALT+"+param);
+              //console.log("CTRL+ALT+"+param);
               me.fireEvent('changeState', param);
           }
       });
@@ -165,17 +166,19 @@ Ext.define('Editor.controller.Editor', {
           ctrl:true,
           scope: me,
           fn: me.goToRight
-      }, /*{
+      }, {
           key: Ext.EventObject.UP,
           ctrl:true,
+          alt:false,
           scope: me,
           fn: me.goToUpperByWorkflowNoSave
       }, {
           key: Ext.EventObject.DOWN,
           ctrl:true,
+          alt:false,
           scope: me,
           fn: me.goToLowerByWorkflowNoSave
-      },*/ {
+      }, {
           key: Ext.EventObject.UP,
           ctrl:true,
           alt: true,
@@ -253,12 +256,14 @@ Ext.define('Editor.controller.Editor', {
    * @param {Integer} direction of moving
    * @return {Boolean} true if there is a next segment, false otherwise
    */
-  moveToAdjacentRow: function(direction) {
+  moveToAdjacentRow: function(direction, filterByWorkflowStep) {
       var me = this,
           grid = me.getSegmentGrid(),
           selModel = grid.getSelectionModel(),
           ed = me.getEditPlugin(),
-          ret = this.moveToOtherRow(direction);
+          ret = null;
+      
+      ret = this.moveToOtherRow(direction, filterByWorkflowStep, null);
       
       //editing by selection handler must be disabled, otherwise saveChainStart will be triggered twice
       ed.disableEditBySelect = true;
@@ -274,7 +279,7 @@ Ext.define('Editor.controller.Editor', {
    */
   goToLowerNoSave: function() {
       var me = this;
-      me.moveToAdjacentRow(1);
+      me.moveToAdjacentRow(1, false);
   },
   /**
    * Moves to the next row without saving current record
@@ -282,23 +287,23 @@ Ext.define('Editor.controller.Editor', {
    */
   goToUpperNoSave: function() {
       var me = this;
-      me.moveToAdjacentRow(-1);
+      me.moveToAdjacentRow(-1, false);
   },
   /**
-   * Moves to the next row without saving current record
+   * Moves to the next row with the same workflow value without saving current record
    * @return {Boolean} true if there is a next segment, false otherwise
    */
-  moveNext: function() {
+  goToLowerByWorkflowNoSave: function() {
       var me = this;
-      return me.moveToAdjacentRow(1);
+      return me.moveToAdjacentRow(1, true);
   },
   /**
-   * Moves to the previous row without saving current record
+   * Moves to the previous row with the same workflow value without saving current record
    * @return {Boolean} true if there is a next segment, false otherwise
    */
-  movePrevious: function() {
+  goToUpperByWorkflowNoSave: function() {
       var me = this;
-      return me.moveToAdjacentRow(-1);
+      return me.moveToAdjacentRow(-1, true);
   },
   /**
    * Handler for saveNext Button
@@ -340,10 +345,11 @@ Ext.define('Editor.controller.Editor', {
   /**
    * go to other row
    * @param {Integer} rowIdxChange positive or negative integer value to choose the index of the next row
+   * @param {Boolean} filterByWorkflowStep
    * @param {Function} isEditable optional, function which consumes a segment record, returns true if segment should be opened, false if not
    * @return {Object} to be used by saveOtherRow
    */
-  moveToOtherRow: function(rowIdxChange, isEditable) {
+  moveToOtherRow: function(rowIdxChange, filterByWorkflowStep, isEditable) {
       var me = this,
           grid = me.getSegmentGrid(),
           selModel = grid.getSelectionModel(),
@@ -360,9 +366,33 @@ Ext.define('Editor.controller.Editor', {
       if(!rec || !rec.get('editable')) {
           return ret;
       }
-      //checking always for segments editable flag + custom isEditable  
-      while(ret.newRec && (!ret.newRec.get('editable') || !isEditable(ret.newRec))) {
-          ret.newRec = store.getAt(store.indexOf(ret.newRec) + rowIdxChange);
+      if (filterByWorkflowStep)
+      {
+          //console.log(rec.get('workflowStep'));
+          //console.log(ret.newRec.get('workflowStep'));
+          //console.log((ret.newRec.get('workflowStep') == rec.get('workflowStep')));
+          //checking always for segments editable flag + custom isEditable  
+          while (ret.newRec)
+          {
+              //console.log(">>> "+ret.newRec.get('workflowStep'));
+              if (ret.newRec.get('workflowStep') == rec.get('workflowStep'))
+              {
+                  if (ret.newRec.get('editable') || isEditable(ret.newRec))
+                  {
+                      break;
+                  }
+              }
+              ret.newRec = store.getAt(store.indexOf(ret.newRec) + rowIdxChange);
+          }
+      }
+      else
+      {
+          //checking always for segments editable flag + custom isEditable  
+          while (ret.newRec && (!ret.newRec.get('editable') || !isEditable(ret.newRec)))
+          {
+              console.log("}}} "+ret.newRec.get('workflowStep'));
+              ret.newRec = store.getAt(store.indexOf(ret.newRec) + rowIdxChange);
+          }
       }
       if(rowIdxChange > 0) {
           ret.isBorderReached = rec.get('id') == store.getLastSegmentId();
@@ -390,7 +420,7 @@ Ext.define('Editor.controller.Editor', {
           grid = me.getSegmentGrid(),
           selModel = grid.getSelectionModel(),
           ed = me.getEditPlugin(),
-          ret = me.moveToOtherRow(rowIdxChange, isEditable);
+          ret = me.moveToOtherRow(rowIdxChange, false, isEditable);
           
       me.fireEvent('saveSegment', {
           scope: me,
@@ -451,7 +481,7 @@ Ext.define('Editor.controller.Editor', {
         }
         else
         {
-          me.moveNext();
+          me.goToLowerNoSave();
         }
     }
     else {
@@ -465,7 +495,7 @@ Ext.define('Editor.controller.Editor', {
         }
         else
         {
-          me.movePrevious();
+          me.goToUpperNoSave();
         }
     }
   },
