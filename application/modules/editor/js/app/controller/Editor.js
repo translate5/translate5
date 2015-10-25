@@ -475,6 +475,7 @@ Ext.define('Editor.controller.Editor', {
       info.plug.editor.changeColumnToEdit(cols[idx + direction]);
       return;
     }
+    me.fireEvent('saveUnsavedComments');
     if(direction > 0) {
         //goto next segment and first col
         if(newRec) {

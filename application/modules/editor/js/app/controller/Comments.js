@@ -112,6 +112,7 @@ Ext.define('Editor.controller.Comments', {
           edCtrl = me.application.getController('Editor');
           
       edCtrl.on('openComments', me.handleEditorCommentBtn, me);
+      edCtrl.on('saveUnsavedComments', me.handleCommentSave, me);
       
     //Diese Events können erst in onlauch gebunden werden, in init existiert das Plugin noch nicht
       me.getEditPlugin().on('beforeedit', me.onStartEdit, me);
