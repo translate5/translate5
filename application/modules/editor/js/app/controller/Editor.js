@@ -78,6 +78,15 @@ Ext.define('Editor.controller.Editor', {
       '#metapanel #goToUpperByWorkflowNoSaveBtn' : {
           click : me.goToUpperByWorkflowNoSave
       },
+      '#metapanel #goToLowerNoSaveBtn' : {
+          click : me.goToLowerNoSave
+      },
+      '#metapanel #goToUpperNoSaveBtn' : {
+          click : me.goToUpperNoSave
+      },
+      '#metapanel #saveNextByWorkflowBtn' : {
+          click : me.saveNextByWorkflow
+      },
       //disabled ctrl enter since this produces errors in the save chain
       'segmentsHtmleditor': {
           afteriniteditor: me.initEditor
@@ -260,25 +269,44 @@ Ext.define('Editor.controller.Editor', {
       }
   },
   /**
+   * Cleaning up after editing segment
+   * @param {Object} return data from moveToOtherRow
+   */
+  cleanupAfterRowEdit: function(ret) {
+      var me = this,
+          grid = me.getSegmentGrid(),
+          selModel = grid.getSelectionModel(),
+          ed = me.getEditPlugin();
+
+      if (ret.isBorderReached)
+      {
+            Editor.MessageBox.addInfo(ret.errorText);
+      }
+      else if (ret.existsNextSegment)
+      {
+            //editing by selection handler must be disabled, otherwise saveChainStart will be triggered twice
+            ed.disableEditBySelect = true;
+            selModel.select(ret.newRec);
+            Ext.defer(ed.startEdit, 300, ed, [ret.newRec, ret.lastColumnIdx]); //defer reduces problems with editorDomCleanUp see comment on Bug 38
+            ed.disableEditBySelect = false;
+            me.cancel();
+      }
+      else
+      {
+         Editor.MessageBox.addInfo(me.messages.segmentNotBuffered);
+      }
+  },
+  /**
    * Moves to the next or previous row without saving current record
    * @param {Integer} direction of moving
    * @return {Boolean} true if there is a next segment, false otherwise
    */
-  moveToAdjacentRow: function(direction, isEditable) {
+  moveToAdjacentRow: function(direction, errorText, isEditable) {
       var me = this,
-          grid = me.getSegmentGrid(),
-          selModel = grid.getSelectionModel(),
-          ed = me.getEditPlugin(),
           ret = null;
       
-      ret = this.moveToOtherRow(direction, isEditable);
-      
-      //editing by selection handler must be disabled, otherwise saveChainStart will be triggered twice
-      ed.disableEditBySelect = true;
-      selModel.select(ret.newRec);
-      Ext.defer(ed.startEdit, 300, ed, [ret.newRec, ret.lastColumnIdx]); //defer reduces problems with editorDomCleanUp see comment on Bug 38
-      ed.disableEditBySelect = false;
-      me.cancel();
+      ret = this.moveToOtherRow(direction, errorText, isEditable);
+      me.cleanupAfterRowEdit(ret);
       return ret.existsNextSegment;
   },
   /**
@@ -287,7 +315,7 @@ Ext.define('Editor.controller.Editor', {
    */
   goToLowerNoSave: function() {
       var me = this;
-      me.moveToAdjacentRow(1);
+      me.moveToAdjacentRow(1, this.messages.gridEndReached);
   },
   /**
    * Moves to the next row without saving current record
@@ -295,7 +323,7 @@ Ext.define('Editor.controller.Editor', {
    */
   goToUpperNoSave: function() {
       var me = this;
-      me.moveToAdjacentRow(-1);
+      me.moveToAdjacentRow(-1, this.messages.gridStartReached);
   },
   /**
    * Moves to the next row with the same workflow value without saving current record
@@ -303,7 +331,7 @@ Ext.define('Editor.controller.Editor', {
    */
   goToLowerByWorkflowNoSave: function() {
       var me = this;
-      return me.moveToAdjacentRow(1, this.workflowStepFilter);
+      return me.moveToAdjacentRow(1, this.messages.gridEndReached, this.workflowStepFilter);
   },
   /**
    * Moves to the previous row with the same workflow value without saving current record
@@ -311,7 +339,7 @@ Ext.define('Editor.controller.Editor', {
    */
   goToUpperByWorkflowNoSave: function() {
       var me = this;
-      return me.moveToAdjacentRow(-1, this.workflowStepFilter);
+      return me.moveToAdjacentRow(-1, this.messages.gridStartReached, this.workflowStepFilter);
   },
   /**
    * Handler for saveNext Button
@@ -359,7 +387,7 @@ Ext.define('Editor.controller.Editor', {
    * @param {Function} isEditable optional, function which consumes a segment record, returns true if segment should be opened, false if not
    * @return {Object} to be used by saveOtherRow
    */
-  moveToOtherRow: function(rowIdxChange, isEditable) {
+  moveToOtherRow: function(rowIdxChange, errorText, isEditable) {
       var me = this,
           grid = me.getSegmentGrid(),
           selModel = grid.getSelectionModel(),
@@ -367,6 +395,7 @@ Ext.define('Editor.controller.Editor', {
           store = grid.store,
           rec = ed.openedRecord,
           ret = {
+            'errorText'        : errorText,
             'existsNextSegment': false,
             'isBorderReached'  : false,
             'lastColumnIdx'    : 0,
@@ -407,23 +436,12 @@ Ext.define('Editor.controller.Editor', {
           grid = me.getSegmentGrid(),
           selModel = grid.getSelectionModel(),
           ed = me.getEditPlugin(),
-          ret = me.moveToOtherRow(rowIdxChange, isEditable);
+          ret = me.moveToOtherRow(rowIdxChange, errorText, isEditable);
           
       me.fireEvent('saveSegment', {
           scope: me,
           segmentUsageFinished: function(){
-              if(ret.isBorderReached) {
-                  Editor.MessageBox.addInfo(errorText);
-              } else if(ret.existsNextSegment){
-                  //editing by selection handler must be disabled, otherwise saveChainStart will be triggered twice
-                  ed.disableEditBySelect = true;
-                  selModel.select(ret.newRec);
-                  Ext.defer(ed.startEdit, 300, ed, [ret.newRec, ret.lastColumnIdx]); //defer reduces problems with editorDomCleanUp see comment on Bug 38
-                  ed.disableEditBySelect = false;
-              }
-              else {
-                  Editor.MessageBox.addInfo(me.messages.segmentNotBuffered);
-              }
+              me.cleanupAfterRowEdit(ret);
           }
       });
       return ret.existsNextSegment;

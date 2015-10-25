@@ -126,28 +126,35 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
             itemId: 'goToLowerByWorkflowNoSaveBtn',
             icon: Editor.data.moduleFolder+'images/arrow_down_filtered_nosave.png',
             iconAlign: 'right',
-            tooltip: me.item_saveAndNext
+            tooltip: ''//me.item_saveAndNext
           },
           {
             xtype: 'button',
             itemId: 'goToUpperByWorkflowNoSaveBtn',
             icon: Editor.data.moduleFolder+'images/arrow_up_filtered_nosave.png ',
             iconAlign: 'right',
-            tooltip: me.item_saveAndNext
+            tooltip: ''//me.item_saveAndNext
           },
           {
             xtype: 'button',
-            itemId: 'goToLowerByWorkflowNoSaveBtn',
+            itemId: 'goToLowerNoSaveBtn',
             icon: Editor.data.moduleFolder+'images/arrow_down_nosave.png',
             iconAlign: 'right',
-            tooltip: me.item_saveAndNext
+            tooltip: ''//me.item_saveAndNext
           },
           {
             xtype: 'button',
-            itemId: 'goToUpperByWorkflowNoSaveBtn',
+            itemId: 'goToUpperNoSaveBtn',
             icon: Editor.data.moduleFolder+'images/arrow_up_nosave.png ',
             iconAlign: 'right',
-            tooltip: me.item_saveAndNext
+            tooltip: ''//me.item_saveAndNext
+          },
+          {
+            xtype: 'button',
+            itemId: 'saveNextByWorkflowBtn',
+            icon: Editor.data.moduleFolder+'images/arrow_down_filtered.png',
+            iconAlign: 'right',
+            tooltip: ''//me.item_saveAndNext
           }
         ]
       });
