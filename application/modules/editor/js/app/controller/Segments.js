@@ -155,6 +155,7 @@ Ext.define('Editor.controller.Segments', {
         alt: false,
         scope: this,
         fn: function(key, e){
+            //console.log('ENTER');
             e.preventDefault();
             e.stopEvent();
             
@@ -166,20 +167,27 @@ Ext.define('Editor.controller.Segments', {
                 cols = grid.query('.contentEditableColumn:not([hidden])'),
                 sel = [];
             
-            
+            //console.log('AFTER VARS');
             if (ed.openedRecord === null)
             {
+                //console.log('IF1 START');
                 if (!selModel.hasSelection())
                 {
+                    //console.log('IF2 START');
                     grid.selectOrFocus(0);
+                    //console.log('IF2 END');
                 }
                 sel = selModel.getSelection();
                 ed.startEdit(sel[0], cols[0]);
+                //console.log('IF1 END');
             }
             else
             {
+                //console.log('ELSE START');
                 ed.editor.mainEditor.deferFocus();
+                //console.log('ELSE END');
             }
+            //console.log('EXIT');
         }
     }]);
   },

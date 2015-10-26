@@ -157,6 +157,11 @@ Ext.define('Editor.controller.Comments', {
               comment: form.getForm().getValues().comment,
               modified: now
           };
+          
+      if (rec === null)
+      {
+          return;    
+      }
       
       if(rec.phantom) {
           data.created = now;
