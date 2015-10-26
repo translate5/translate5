@@ -142,20 +142,32 @@ Ext.define('Editor.controller.Segments', {
                       e.preventDefault();
                       e.stopEvent();
                       
-                      var sm = me.getSegmentGrid().getSelectionModel(),
-                          columns = [],
-                          gri = null,
-                          plu = null,
-                          ed = null;
-                      if (!sm.hasSelection())
+                      console.log('From Segments');
+                      var me = this,
+                          edCtrl = me.application.getController('Editor'),
+                          info = edCtrl.getColInfo(), // Uncaught TypeError: Cannot read property 'getEditedField' of undefined (controller/Editor.js:581)
+                          grid = me.getSegmentGrid(),
+                          selModel = grid.getSelectionModel(),
+                          ed = edCtrl.getEditPlugin(),
+                          cols = info && info.columns,
+                          rec = null,
+                          sel = [];
+                      
+                      
+                      if (ed.openedRecord === null)
                       {
-                          me.scrollOrFocus(0);
+                          if (!selModel.hasSelection())
+                          {
+                              me.scrollOrFocus(0);
+                          }
+                          sel = selModel.getSelection();
+                          rec = sel[0];
+                          ed.startEdit(rec, cols[0]);
                       }
-                      gri = me.getSegmentGrid();
-                      columns = gri.query('.contentEditableColumn:not([hidden])');
-                      plu =  gri.editingPlugin;
-                      ed = plu.initEditor();
-                      ed.changeColumnToEdit(columns[0]);
+                      else
+                      {
+                          ed.focusEditor(); // Uncaught TypeError: Cannot read property 'deferFocus' of undefined (view/segments/RowEditing.js:86)
+                      }
                   }
               }]);
           },

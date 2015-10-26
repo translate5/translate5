@@ -271,7 +271,27 @@ Ext.define('Editor.controller.Editor', {
    * Handler for F2 key press when segment open
    */
   onKeyPressF2: function() {
-      alert('here 2');
+      
+    console.log('From Editor');
+    var me = this,
+        info = me.getColInfo(),
+        grid = me.getSegmentGrid(),
+        selModel = grid.getSelectionModel(),
+        ed = me.getEditPlugin(),
+        cols = info && info.columns,
+        rec = ed.openedRecord,
+        sel = [];
+          
+    if (rec === null)
+    {
+        if (!selModel.hasSelection())
+        {
+            me.scrollOrFocus(0);
+        }
+        sel = selModel.getSelection();
+        rec = sel[0];
+        ed.startEdit(rec, cols[0]);
+    }
   },
   /**
    * Handler für save Button
