@@ -66,7 +66,6 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             'LEK_segment_field' => 'taskGuid',
             'LEK_segment_history' => 'taskGuid',
             'LEK_segment_history_data' => 'taskGuid',
-            'LEK_segment_durations' => false, //is a view based on already dumped tables
             'LEK_segments' => 'taskGuid',
             'LEK_segments_meta' => 'taskGuid',
             'LEK_skeletonfiles' => array('--single-transaction', "--where=fileId in (select id from LEK_files where taskGuid = '{TASKGUID}')"),
