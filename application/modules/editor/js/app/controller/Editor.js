@@ -108,7 +108,7 @@ Ext.define('Editor.controller.Editor', {
       var me = this,
           f = function() {},
           decDigits = [48, 49, 50, 51, 52, 53, 54, 55, 56, 57];
-      
+          
       /*Ext.EventManager.on(editor.getDoc(), 'copy', function(e){
           console.log('COPY', (e.browserEvent || e).clipboardData.getData('text/plain'));//, window.clipboardData.getData('Text'));
       });
@@ -246,6 +246,16 @@ Ext.define('Editor.controller.Editor', {
               me.fireEvent('assignMQMTag', param);
           }
       }, {
+          key: Ext.EventObject.F2,
+          ctrl: false,
+          alt: false,
+          scope: me,
+          fn: function(key, e){
+              e.preventDefault();
+              e.stopEvent();
+              me.onKeyPressF2();
+          }
+       }, {
           // Angel Naydenov 22.10.2015: This shortcut cannot be captured in Chrome
           key: "N",
           ctrl:true,
@@ -256,6 +266,12 @@ Ext.define('Editor.controller.Editor', {
               me.fireEvent('openComments');
           }
       }]);
+  },
+ /**
+   * Handler for F2 key press when segment open
+   */
+  onKeyPressF2: function() {
+      alert('here 2');
   },
   /**
    * Handler für save Button

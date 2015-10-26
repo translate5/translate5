@@ -133,7 +133,31 @@ Ext.define('Editor.controller.Segments', {
               me.getSegmentsStore().on('load', me.invalidatePager, me);
               me.getSegmentsStore().on('load', me.refreshGridView, me);
               
-              // TUK
+              var map = new Ext.util.KeyMap(Ext.getDoc(), [{
+                  key: Ext.EventObject.F2,
+                  ctrl: false,
+                  alt: false,
+                  scope: me,
+                  fn: function(key, e){
+                      e.preventDefault();
+                      e.stopEvent();
+                      
+                      var sm = me.getSegmentGrid().getSelectionModel(),
+                          columns = [],
+                          gri = null,
+                          plu = null,
+                          ed = null;
+                      if (!sm.hasSelection())
+                      {
+                          me.scrollOrFocus(0);
+                      }
+                      gri = me.getSegmentGrid();
+                      columns = gri.query('.contentEditableColumn:not([hidden])');
+                      plu =  gri.editingPlugin;
+                      ed = plu.initEditor();
+                      ed.changeColumnToEdit(columns[0]);
+                  }
+              }]);
           },
         selectionchange: me.handleSegmentSelectionChange,
         columnhide: me.handleColumnVisibility,
