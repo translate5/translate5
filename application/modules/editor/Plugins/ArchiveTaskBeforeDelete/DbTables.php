@@ -82,11 +82,14 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
     /**
      * This method is intended to be called directly from CLI, in the build scripts of translate5.
      * So it is ensured, that no new LEK table (relating to tasks) is forgotten in the archive plugin
-     * @return boolean
      */
-    public function checkMissingInList($projectRoot, $zendLib) {
-        $this->initCliRuntime($projectRoot, $zendLib);
-        
+    public static function runFromCLI($projectRoot, $zendLib) {
+        self::initCliRuntime($projectRoot, $zendLib);
+        $instance = ZfExtended_Factory::get(__CLASS__);
+        $instance->checkMissingInList();
+    }
+    
+    protected function checkMissingInList() {
         $config = Zend_Registry::get('config');
         $db = Zend_Db::factory($config->resources->db);
         
@@ -127,7 +130,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
      * @param string $projectRoot path to the project installation directory
      * @param string $zendLib path to the zend library
      */
-    protected function initCliRuntime($projectRoot, $zendLib) {
+    protected static function initCliRuntime($projectRoot, $zendLib) {
         //presetting Zend include path, get from outside!
         $path = get_include_path();
         set_include_path($projectRoot.PATH_SEPARATOR.$path.PATH_SEPARATOR.$zendLib);
