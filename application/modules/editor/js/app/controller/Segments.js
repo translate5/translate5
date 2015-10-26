@@ -133,44 +133,8 @@ Ext.define('Editor.controller.Segments', {
               me.getSegmentsStore().on('load', me.invalidatePager, me);
               me.getSegmentsStore().on('load', me.refreshGridView, me);
               
-              var map = new Ext.util.KeyMap(Ext.getDoc(), [{
-                  key: Ext.EventObject.F2,
-                  ctrl: false,
-                  alt: false,
-                  scope: me,
-                  fn: function(key, e){
-                      e.preventDefault();
-                      e.stopEvent();
-                      
-                      console.log('From Segments');
-                      var me = this,
-                          edCtrl = me.application.getController('Editor'),
-                          info = edCtrl.getColInfo(), // Uncaught TypeError: Cannot read property 'getEditedField' of undefined (controller/Editor.js:581)
-                          grid = me.getSegmentGrid(),
-                          selModel = grid.getSelectionModel(),
-                          ed = edCtrl.getEditPlugin(),
-                          cols = info && info.columns,
-                          rec = null,
-                          sel = [];
-                      
-                      
-                      if (ed.openedRecord === null)
-                      {
-                          if (!selModel.hasSelection())
-                          {
-                              me.scrollOrFocus(0);
-                          }
-                          sel = selModel.getSelection();
-                          rec = sel[0];
-                          ed.startEdit(rec, cols[0]);
-                      }
-                      else
-                      {
-                          ed.focusEditor(); // Uncaught TypeError: Cannot read property 'deferFocus' of undefined (view/segments/RowEditing.js:86)
-                      }
-                  }
-              }]);
-          },
+              me.handleF2KeyPress();
+        },
         selectionchange: me.handleSegmentSelectionChange,
         columnhide: me.handleColumnVisibility,
         columnshow: me.handleColumnVisibility,
@@ -183,6 +147,41 @@ Ext.define('Editor.controller.Segments', {
         click: me.clearSortAndFilter
       }
     });
+  },
+  handleF2KeyPress: function() {
+      var map = new Ext.util.KeyMap(Ext.getDoc(), [{
+        key: Ext.EventObject.F2,
+        ctrl: false,
+        alt: false,
+        scope: this,
+        fn: function(key, e){
+            e.preventDefault();
+            e.stopEvent();
+            
+            var me = this,
+                edCtrl = me.application.getController('Editor'),
+                grid = me.getSegmentGrid(),
+                selModel = grid.getSelectionModel(),
+                ed = edCtrl.getEditPlugin(),
+                cols = grid.query('.contentEditableColumn:not([hidden])'),
+                sel = [];
+            
+            
+            if (ed.openedRecord === null)
+            {
+                if (!selModel.hasSelection())
+                {
+                    grid.selectOrFocus(0);
+                }
+                sel = selModel.getSelection();
+                ed.startEdit(sel[0], cols[0]);
+            }
+            else
+            {
+                ed.editor.mainEditor.deferFocus();
+            }
+        }
+    }]);
   },
   loadSegments: function() {
       this.handleFilterChange(); //load filemap
