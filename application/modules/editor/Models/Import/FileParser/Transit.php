@@ -410,6 +410,8 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         $this->parseSingleTag($qp, 'Tab');
         $this->parseSingleTag($qp, 'WS');
         $this->parseSingleTag($qp, 'UC');
+        $this->parseSingleTag($qp, 'SegHiB');
+        $this->parseSingleTag($qp, 'SegHiE');
         
         return $qp->innerXML();
     }
