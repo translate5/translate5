@@ -178,6 +178,7 @@ class editor_Models_Import {
         if(is_null($this->_taskGuid)){
             throw new Zend_Exception('taskGuid not set - please set using $this->setTask');
         }
+        Zend_Registry::set('affected_taskGuid', $this->_taskGuid); //for TRANSLATE-600 only
         
         //pre import methods:
         $this->validateParams();
