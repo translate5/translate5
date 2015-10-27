@@ -112,30 +112,21 @@ Ext.define('Editor.view.segments.Grid', {
         blockRefresh: true,
         getRowClass: function(record, rowIndex, rowParams, store){
             var newClass = '',
-                isLastInFile = false,
+                isFirstInFile = false,
                 nextRec = null;
-                
             // only on non sorted list we mark last file segments
             if (store.sorters.length == 0)
             {
-                // if this is the last segment in list, it is the last in file too
-                if (record.get('id') == store.getLastSegmentId())
+                if (this.firstFileId && this.firstFileId != record.get('fileId'))
                 {
-                    isLastInFile = true;
+                    isFirstInFile = true;
                 }
-                else
-                {
-                    nextRec = store.getAt(rowIndex + 1);
-                    if (nextRec && (nextRec.get('fileId') != record.get('fileId')))
-                    {
-                        isLastInFile = true;
-                    }
-                }
+                this.firstFileId = record.get('fileId');
             }
             
-            if (isLastInFile)
+            if (isFirstInFile)
             {
-                newClass += ' segment-last-in-file';
+                newClass += ' first-in-file';
             }
             if (!record.get('editable'))
             {
