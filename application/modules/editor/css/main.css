@@ -362,3 +362,5 @@ tr.customeState td div {font-style: italic;}
 .not-editable .ico-user-reset-pw {display:none;}
 
 .x-action-col-cell img{height:16px;width:16px;margin-right:2px;cursor: pointer;}
+
+#segment-grid .last-in-file  {border-bottom-style: solid; border-bottom-width: 3px; border-bottom-color: red; background-color:#FF80DF !important;}
