@@ -80,7 +80,13 @@ class editor_Plugins_Transit_File{
         $this->file->preserveWhiteSpace = true;
         $this->file->substituteEntities = false;
         
-        if (! $this->file->loadXML($file)){
+        try {
+            $res = $this->file->loadXML($file, LIBXML_PARSEHUGE);
+        }
+        catch (Exception $e) {
+            throw new Zend_Exception( "file $filename produces the following error on opening as XML: ".$e->getMessage());
+        }
+        if (!$res){
             throw new Zend_Exception( "file $filename could not be loaded as xml document.");
         }
         
