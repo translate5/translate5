@@ -329,6 +329,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             $msg = 'Notice: No valid HTML in translate5 segment';
             if(ZfExtended_Debug::hasLevel('core', 'Segment')){
                 $msg .= (string) $exc;
+                $msg .= "\n#".$segmentContent."#\n";
             }
             $log->logError($msg);
         }
