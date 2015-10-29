@@ -124,7 +124,7 @@ Ext.define('Editor.view.segments.Grid', {
                 this.firstFileId = record.get('fileId');
             }
             
-            if (isFirstInFile)
+            if (isFirstInFile && (rowIndex > 0)) // don't mark the first row of the grid
             {
                 newClass += ' first-in-file';
             }
