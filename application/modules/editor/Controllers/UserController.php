@@ -47,10 +47,6 @@ class Editor_UserController extends ZfExtended_UserController {
         /* @var $task_user_assoc editor_Models_TaskUserAssoc */
         $task_users = $task_user_assoc->deleteByUserguid($this->entity->getUserGuid());
         
-        $segment_user_assoc = ZfExtended_Factory::get('editor_Models_SegmentUserAssoc');
-        /* @var $segment_user_assoc editor_Models_SegmentUserAssoc */
-        $segment_users = $segment_user_assoc->deleteByUserGuid($this->entity->getUserGuid());
-        
         $this->entity->delete();
     }
 }
