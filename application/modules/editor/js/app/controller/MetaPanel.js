@@ -75,6 +75,9 @@ Ext.define('Editor.controller.MetaPanel', {
   init : function() {
       var me = this;
       me.control({
+      '#metapanel #watchSegmentBtn' : {
+        click : me.toggleWatchSegment
+      },
       '#metapanel #cancelSegmentBtn' : {
         click : me.cancel
       },
@@ -144,6 +147,24 @@ Ext.define('Editor.controller.MetaPanel', {
    */
   layout: function() {
     this.getNavi().doLayout(); //FIXME noch was anderes layouten?
+  },
+  /**
+   * Handler for watchSegmentBtn
+   * @param button
+   * @param pressed
+   */
+  toggleWatchSegment: function(button, pressed) {
+      var me = this,
+          navi = me.getNavi();
+          
+      if (button.pressed)
+      {
+         button.setTooltip(navi.item_stopWatchingSegment); 
+      }
+      else
+      {
+          button.setTooltip(navi.item_startWatchingSegment); 
+      }
   },
   /**
    * Handler für save Button
@@ -235,14 +256,28 @@ Ext.define('Editor.controller.MetaPanel', {
   startEdit: function(context) {
     var me = this,
         mp = me.getMetaPanel(),
-        segmentId = context.record.get('id');
+        segmentId = context.record.get('id'),
+        isWatched = Boolean(context.record.get('segmentUserAssocId')),
+        segmentUserAssocId = context.record.get('segmentUserAssocId'),
+        navi = me.getNavi(),
+        but = Ext.getCmp('watchSegmentBtn');
+        
+    but.toggle(isWatched, true);
+    if (isWatched)
+    {
+        but.setTooltip(navi.item_stopWatchingSegment);    
+    }
+    else
+    {
+        but.setTooltip(navi.item_startWatchingSegment);    
+    }
     
     me.record = context.record;
     me.getMetaTermPanel().getLoader().load({params: {id: segmentId}});
     //bindStore(me.record.terms());
     me.loadRecord(me.record);
     //FIXME here doLayout???
-    me.getNavi().enable();
+    navi.enable();
     me.getSegmentMeta().show();
     mp.show();
   },

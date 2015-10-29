@@ -129,5 +129,7 @@ Editor.model._Segment([
     {name: 'durations', defaultValue: {}}, //we are using an object here
     {name: 'comments', type: 'string', persist: false},
     {name: 'qmId', type: 'string'},
-    {name: 'stateId', type: 'int'}
+    {name: 'stateId', type: 'int'},
+    {name: 'isWatched', type: 'boolean'},
+    {name: 'segmentUserAssocId', type: 'int'}
 ]);
