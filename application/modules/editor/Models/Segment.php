@@ -326,8 +326,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             $segmentContent = $seg->innerHTML();
         } catch (Exception $exc) {
             $log = new ZfExtended_Log();
-            $log->logError('Notice: No valid HTML in translate5 segment '.$exc->getTraceAsString());
-            //TODO log $exc in verbose debug level
+            $msg = 'Notice: No valid HTML in translate5 segment';
+            if(ZfExtended_Debug::hasLevel('core', 'Segment')){
+                $msg .= (string) $exc;
+            }
+            $log->logError($msg);
         }
         return $segmentContent;
     }
