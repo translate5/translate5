@@ -726,6 +726,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->reInitDb($taskGuid);
         
         $this->initDefaultSort();
+       
+        $db_join = ZfExtended_Factory::get('editor_Models_Db_SegmentUserAssoc');
 
         $s = $this->db->select(false);
         $db = $this->db;
@@ -740,8 +742,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
                     });
         }
          */
-        $s->from($this->db, $cols);
+        $s->from(array('s' => $db->info($db::NAME)), $cols);
+        $s->joinLeft(array('sua' => $db_join->info($db_join::NAME)), 'sua.segment_id = s.id', array('isWatched'));
         $s->where('taskGuid = ?', $taskGuid);
+        $s->setIntegrityCheck(false);
         
         return parent::loadFilterdCustom($s);
     }
