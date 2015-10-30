@@ -113,6 +113,8 @@ Ext.define('Editor.controller.Segments', {
       me.getStore('Files').on('write', me.reloadGrid, me);
       Editor.app.on('editorViewportClosed', me.clearSegments, me);
 
+      me.initKeymap();
+      
       me.control({
       '#segmentgrid .headercontainer' : {
         sortchange: me.scrollGridToTop
@@ -132,8 +134,6 @@ Ext.define('Editor.controller.Segments', {
               //@todo should be replaced with Event Domains after update to ExtJS >4.2
               me.getSegmentsStore().on('load', me.invalidatePager, me);
               me.getSegmentsStore().on('load', me.refreshGridView, me);
-              
-              me.handleF2KeyPress();
         },
         selectionchange: me.handleSegmentSelectionChange,
         columnhide: me.handleColumnVisibility,
@@ -148,48 +148,70 @@ Ext.define('Editor.controller.Segments', {
       }
     });
   },
-  handleF2KeyPress: function() {
-      var map = new Ext.util.KeyMap(Ext.getDoc(), [{
-        key: Ext.EventObject.F2,
-        ctrl: false,
-        alt: false,
-        scope: this,
-        fn: function(key, e){
-            //console.log('ENTER');
-            e.preventDefault();
-            e.stopEvent();
-            
-            var me = this,
-                edCtrl = me.application.getController('Editor'),
-                grid = me.getSegmentGrid(),
-                selModel = grid.getSelectionModel(),
-                ed = edCtrl.getEditPlugin(),
-                cols = grid.query('.contentEditableColumn:not([hidden])'),
-                sel = [];
-            
-            //console.log('AFTER VARS');
-            if (ed.openedRecord === null)
-            {
-                //console.log('IF1 START');
-                if (!selModel.hasSelection())
-                {
-                    //console.log('IF2 START');
-                    grid.selectOrFocus(0);
-                    //console.log('IF2 END');
-                }
-                sel = selModel.getSelection();
-                ed.startEdit(sel[0], cols[0]);
-                //console.log('IF1 END');
-            }
-            else
-            {
-                //console.log('ELSE START');
-                ed.editor.mainEditor.deferFocus();
-                //console.log('ELSE END');
-            }
-            //console.log('EXIT');
-        }
-    }]);
+  initKeymap: function() {
+      new Ext.util.KeyMap(Ext.getDoc(), [{
+          key: Ext.EventObject.F2,
+          ctrl: false,
+          alt: false,
+          scope: this,
+          fn: this.handleF2KeyPress
+      },{
+          // Angel Naydenov 22.10.2015: This shortcut cannot be captured in Chrome
+          key: "N",
+          ctrl:true,
+          shift:true,
+          scope: this,
+          fn: this.handleAddCommentKey
+      }]);
+  },
+  handleAddCommentKey: function(key, e) {
+      var me = this,
+          grid = me.getSegmentGrid(),
+          selModel = grid && grid.getSelectionModel();
+
+      e.preventDefault();
+      e.stopEvent();
+      
+      if(!grid){
+          return;
+      }
+      
+      if (selModel.hasSelection()) {
+          var selectedRecord = selModel.getLastSelected(),
+              node = grid.view.getNode(selectedRecord),
+              imgs = Ext.get(node).query('.comments-field img.add,.comments-field img.edit', false);
+          Ext.each(imgs, function(img) {
+              img.click();
+          });
+      }
+  },
+  handleF2KeyPress: function(key, e) {
+      var me = this,
+          grid = me.getSegmentGrid();
+
+      e.preventDefault();
+      e.stopEvent();
+      
+      if(!grid){
+          return;
+      }
+      
+      var edCtrl = me.application.getController('Editor'),
+          ed = edCtrl.getEditPlugin(),
+          selModel = grid.getSelectionModel();
+          cols = grid.query('.contentEditableColumn:not([hidden])'),
+          sel = [];
+    
+      if (ed.openedRecord === null) {
+          if (!selModel.hasSelection()) {
+            grid.selectOrFocus(0);
+          }
+          sel = selModel.getSelection();
+          ed.startEdit(sel[0], cols[0]);
+      }
+      else {
+        ed.editor.mainEditor.deferFocus();
+      }
   },
   loadSegments: function() {
       this.handleFilterChange(); //load filemap

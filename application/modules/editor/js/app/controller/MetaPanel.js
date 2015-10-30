@@ -92,7 +92,7 @@ Ext.define('Editor.controller.MetaPanel', {
           
       edCtrl.on('changeState', me.changeState, me);
 
-    //Diese Events können erst in onlauch gebunden werden, in init existiert das Plugin noch nicht
+    //This events must be bound after rendering the segmentgrid, because before the editing plugin does not exist!
       me.getEditPlugin().on('beforeedit', me.startEdit, me);
       me.getEditPlugin().on('canceledit', me.cancelEdit, me);
       me.getEditPlugin().on('edit', me.saveEdit, me);
