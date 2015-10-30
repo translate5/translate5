@@ -59,10 +59,15 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
     //Item Strings:
     item_cancel: '#UT#Abbrechen',
     item_save: '#UT#Speichern',
-    item_saveAndNext: '#UT#Speichern und nächstes öffnen (STRG + ENTER)',
-    item_saveAndPrevious: '#UT#Speichern und vorheriges öffnen',
-    item_alternateLeft: '#UT#Vorherige Spalte editieren',
-    item_alternateRight: '#UT#Nächste Spalte editieren',
+    item_saveAndNext: '#UT#Speichern und nächstes Segment öffnen (STRG + ALT + ENTER)',
+    item_saveAndNextFiltered: '#UT#Speichern und nächstes Segment im Workflow öffnen (STRG + ENTER)',
+    item_saveAndPrevious: '#UT#Speichern und vorheriges Segment öffnen',
+    item_alternateLeft: '#UT#Vorherige Spalte editieren (STRG + ←)',
+    item_alternateRight: '#UT#Nächste Spalte editieren (STRG + →)',
+    item_next: '#UT#Nicht speichern und nächstes Segment öffnen (STRG + ALT + ↓)',
+    item_nextFiltered: '#UT#Nicht speichern und nächstes Segment im Workflow öffnen (STRG + ↓)',
+    item_prev: '#UT#Nicht speichern und vorheriges Segment öffnen (STRG + ALT + ↑)',
+    item_prevFiltered: '#UT#Nicht speichern und vorheriges Segment im Workflow öffnen (STRG + ↑)',
     initComponent: function() {
       var me = this,
           fields = Editor.data.task.segmentFields(),
@@ -126,35 +131,35 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
             itemId: 'goToLowerByWorkflowNoSaveBtn',
             icon: Editor.data.moduleFolder+'images/arrow_down_filtered_nosave.png',
             iconAlign: 'right',
-            tooltip: ''//me.item_saveAndNext
+            tooltip: me.item_nextFiltered
           },
           {
             xtype: 'button',
             itemId: 'goToUpperByWorkflowNoSaveBtn',
             icon: Editor.data.moduleFolder+'images/arrow_up_filtered_nosave.png ',
             iconAlign: 'right',
-            tooltip: ''//me.item_saveAndNext
+            tooltip: me.item_prevFiltered
           },
           {
             xtype: 'button',
             itemId: 'goToLowerNoSaveBtn',
             icon: Editor.data.moduleFolder+'images/arrow_down_nosave.png',
             iconAlign: 'right',
-            tooltip: ''//me.item_saveAndNext
+            tooltip: me.item_next
           },
           {
             xtype: 'button',
             itemId: 'goToUpperNoSaveBtn',
             icon: Editor.data.moduleFolder+'images/arrow_up_nosave.png ',
             iconAlign: 'right',
-            tooltip: ''//me.item_saveAndNext
+            tooltip: me.item_prev
           },
           {
             xtype: 'button',
             itemId: 'saveNextByWorkflowBtn',
             icon: Editor.data.moduleFolder+'images/arrow_down_filtered.png',
             iconAlign: 'right',
-            tooltip: ''//me.item_saveAndNext
+            tooltip: me.item_saveAndNextFiltered
           }
         ]
       });
