@@ -50,7 +50,7 @@ Ext.define('Editor.controller.Editor', {
     selector : '#segmentgrid'
   }],
   calledSaveMethod:false,
-  
+  isEditing: false,
   init : function() {
       var me = this;
       me.control({
@@ -87,11 +87,22 @@ Ext.define('Editor.controller.Editor', {
       '#metapanel #saveNextByWorkflowBtn' : {
           click : me.saveNextByWorkflow
       },
-      //disabled ctrl enter since this produces errors in the save chain
       'segmentsHtmleditor': {
           afteriniteditor: me.initEditor
+      },
+      '#segmentgrid': {
+          afterrender: me.initEditPluginHandler
       }
     });
+  },
+  /**
+   * track isEditing state 
+   */
+  initEditPluginHandler: function () {
+      var me = this;
+      me.getEditPlugin().on('beforeedit', function(){me.isEditing = true;});
+      me.getEditPlugin().on('canceledit', function(){me.isEditing = false;});
+      me.getEditPlugin().on('edit', function(){me.isEditing = false;})
   },
   /**
    * Gibt die RowEditing Instanz des Grids zurück
@@ -108,38 +119,6 @@ Ext.define('Editor.controller.Editor', {
       var me = this,
           f = function() {},
           decDigits = [48, 49, 50, 51, 52, 53, 54, 55, 56, 57];
-          
-      /*Ext.EventManager.on(editor.getDoc(), 'copy', function(e){
-          console.log('COPY', (e.browserEvent || e).clipboardData.getData('text/plain'));//, window.clipboardData.getData('Text'));
-      });
-
-      Ext.EventManager.on(editor.getDoc(), 'paste', function(e){
-          console.log('PASTE', (e.browserEvent || e).clipboardData.getData('text/plain'));//, window.clipboardData.getData('Text'));
-      });
-
-      Ext.EventManager.on(editor.getDoc(), 'selectstart', function(e){
-          console.log('START');
-      });
-      
-      Ext.EventManager.on(editor.getDoc(), 'selectionchange', function(e){
-          console.log('SELECTION');
-      });*/
-      
-      // Angel Naydenov 22.10.2015: I excluded keymap version and returned this one, because with keymap BOTH assignMQMTag and changeState are fired
-          
-          /*
-      Ext.EventManager.on(editor.getDoc(), 'keydown', function(e)
-      {
-          //console.log(e.getKey());
-          if (e.ctrlKey && e.altKey && Ext.Array.contains([49, 50, 51, 52, 53, 54, 55, 56, 57], e.getKey()))
-          {
-              var param = Number(e.getKey()) - 48;
-              //console.log("CTRL+ALT+"+param);
-              me.fireEvent('changeState', param);
-          }
-      });
-      
-      */
       
       f.prototype = Ext.Element.prototype;
       docEl = new f();
@@ -236,6 +215,9 @@ Ext.define('Editor.controller.Editor', {
           shift:true,
           scope: me,
           fn: function(key, e){
+              if(!me.isEditing) {
+                  return;
+              }
               e.preventDefault();
               e.stopEvent();
               var param = (Number(key) - 48) + 10;
@@ -258,13 +240,13 @@ Ext.define('Editor.controller.Editor', {
       }]);
   },
   /**
-   * Handler für save Button
+   * Handler for save Button
    */
   save: function() {
       var me = this,
           ed = me.getEditPlugin(),
           rec = ed.openedRecord;
-      if(rec && rec.get('editable')) {
+      if(me.isEditing &&rec && rec.get('editable')) {
           me.fireEvent('saveSegment');
       }
   },
@@ -305,6 +287,10 @@ Ext.define('Editor.controller.Editor', {
       var me = this,
           ret = null;
       
+      if(!me.isEditing) {
+          return;
+      }
+
       ret = this.moveToOtherRow(direction, errorText, isEditable);
       me.cleanupAfterRowEdit(ret);
       return ret.existsNextSegment;
@@ -346,6 +332,9 @@ Ext.define('Editor.controller.Editor', {
    * @return {Boolean} true if there is a next segment, false otherwise
    */
   saveNext: function() {
+      if(!this.isEditing) {
+          return;
+      }
       this.calledSaveMethod = this.saveNext;
       return this.saveOtherRow(1, this.messages.gridEndReached);
   },
@@ -354,6 +343,9 @@ Ext.define('Editor.controller.Editor', {
    * @return {Boolean} true if there is a next segment, false otherwise
    */
   savePrevious: function() {
+      if(!this.isEditing) {
+          return;
+      }
       this.calledSaveMethod = this.savePrevious;
       return this.saveOtherRow(-1, this.messages.gridStartReached);
   },
@@ -362,6 +354,9 @@ Ext.define('Editor.controller.Editor', {
    * @return {Boolean} true if there is a next segment, false otherwise
    */
   saveNextByWorkflow: function() {
+      if(!this.isEditing) {
+          return;
+      }
       this.calledSaveMethod = this.saveNext;
       return this.saveOtherRow(1, this.messages.gridEndReached, this.workflowStepFilter);
   },
@@ -370,6 +365,9 @@ Ext.define('Editor.controller.Editor', {
    * @return {Boolean} true if there is a next segment, false otherwise
    */
   savePreviousByWorkflow: function() {
+      if(!this.isEditing) {
+          return;
+      }
       this.calledSaveMethod = this.savePrevious;
       return this.saveOtherRow(-1, this.messages.gridStartReached, this.workflowStepFilter);
   },
@@ -519,6 +517,9 @@ Ext.define('Editor.controller.Editor', {
   goToLeft: function() {
     var me = this,
         direction = -1;
+    if(!me.isEditing) {
+        return;
+    }
     me.goToCustom(direction, true);    
   },
   /**
@@ -527,6 +528,9 @@ Ext.define('Editor.controller.Editor', {
   goToRight: function() {
     var me = this,
         direction = 1;
+    if(!me.isEditing) {
+        return;
+    }
     me.goToCustom(direction, true);    
   },
   /**
