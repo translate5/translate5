@@ -973,14 +973,6 @@
 	<source>In Feld: {0}</source>
 	<target>In field: {0}</target>
       </trans-unit>
-      <trans-unit id='Vm9yaGVyaWdlIFNwYWx0ZSBlZGl0aWVyZW4='>
-	<source>Vorherige Spalte editieren</source>
-	<target>edit previous column</target>
-      </trans-unit>
-      <trans-unit id='TsOkY2hzdGUgU3BhbHRlIGVkaXRpZXJlbg=='>
-	<source>Nächste Spalte editieren</source>
-	<target>edit next column</target>
-      </trans-unit>
       <trans-unit id='RGFzIFNlZ21lbnQga2FubiBuaWNodCBvaG5lIEluaGFsdCBnZXNwZWljaGVydCB3ZXJkZW4h'>
 	<source>Das Segment kann nicht ohne Inhalt gespeichert werden!</source>
 	<target>The segment could not be saved without content!</target>
@@ -1163,6 +1155,42 @@
     <source>Die Aufgabe ist durch einen Benutzer gesperrt</source>
     <target>The task is locked by a user</target>
   </trans-unit>
+<trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgQUxUICsgRU5URVIp'>
+  <source>Speichern und nächstes Segment öffnen (STRG + ALT + ENTER)</source>
+  <target>Save and open next segment (CTRL + ALT + ENTER)</target>
+</trans-unit>
+<trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCBpbSBXb3JrZmxvdyDDtmZmbmVuIChTVFJHICsgRU5URVIp'>
+  <source>Speichern und nächstes Segment im Workflow öffnen (STRG + ENTER)</source>
+  <target>Save and open next segment in workflow (CTRL + ENTER)</target>
+</trans-unit>
+<trans-unit id='U3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgw7ZmZm5lbg=='>
+  <source>Speichern und vorheriges Segment öffnen</source>
+  <target>Save and open previous segment</target>
+</trans-unit>
+<trans-unit id='Vm9yaGVyaWdlIFNwYWx0ZSBlZGl0aWVyZW4gKFNUUkcgKyDihpAp'>
+  <source>Vorherige Spalte editieren (STRG + ←)</source>
+  <target>Edit previous column (CTRL + ←)</target>
+</trans-unit>
+<trans-unit id='TsOkY2hzdGUgU3BhbHRlIGVkaXRpZXJlbiAoU1RSRyArIOKGkik='>
+  <source>Nächste Spalte editieren (STRG + →)</source>
+  <target>Edit next column (CTRL + →)</target>
+</trans-unit>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgQUxUICsg4oaTKQ=='>
+  <source>Nicht speichern und nächstes Segment öffnen (STRG + ALT + ↓)</source>
+  <target>Don't save and open next segment (CTRL + ALT + ↓)</target>
+</trans-unit>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCBpbSBXb3JrZmxvdyDDtmZmbmVuIChTVFJHICsg4oaTKQ=='>
+  <source>Nicht speichern und nächstes Segment im Workflow öffnen (STRG + ↓)</source>
+  <target>Don't save and open next segment in workflow (CTRL + ↓)</target>
+</trans-unit>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgw7ZmZm5lbiAoU1RSRyArIEFMVCArIOKGkSk='>
+  <source>Nicht speichern und vorheriges Segment öffnen (STRG + ALT + ↑)</source>
+  <target>Don't save and open previous segment (CTRL + ALT + ↑)</target>
+</trans-unit>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgaW0gV29ya2Zsb3cgw7ZmZm5lbiAoU1RSRyArIOKGkSk='>
+  <source>Nicht speichern und vorheriges Segment im Workflow öffnen (STRG + ↑)</source>
+  <target>Don't save and open previous segment in workflow (CTRL + ↑)</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

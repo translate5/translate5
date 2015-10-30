@@ -226,10 +226,15 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.segments.MetaPanelNavi.prototype.item_cancel = '<?php echo $this->translate->_('Abbrechen');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_save = '<?php echo $this->translate->_('Speichern');?>';
 
-    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNext = '<?php echo $this->translate->_('Speichern und nächstes öffnen');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndPrevious = '<?php echo $this->translate->_('Speichern und vorheriges öffnen');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_alternateLeft = '<?php echo $this->translate->_('Vorherige Spalte editieren');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_alternateRight = '<?php echo $this->translate->_('Nächste Spalte editieren');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNext = '<?php echo $this->translate->_('Speichern und nächstes Segment öffnen (STRG + ALT + ENTER)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNextFiltered = '<?php echo $this->translate->_('Speichern und nächstes Segment im Workflow öffnen (STRG + ENTER)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndPrevious = '<?php echo $this->translate->_('Speichern und vorheriges Segment öffnen');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_alternateLeft = '<?php echo $this->translate->_('Vorherige Spalte editieren (STRG + ←)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_alternateRight = '<?php echo $this->translate->_('Nächste Spalte editieren (STRG + →)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_next = '<?php echo $this->translate->_('Nicht speichern und nächstes Segment öffnen (STRG + ALT + ↓)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_nextFiltered = '<?php echo $this->translate->_('Nicht speichern und nächstes Segment im Workflow öffnen (STRG + ↓)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_prev = '<?php echo $this->translate->_('Nicht speichern und vorheriges Segment öffnen (STRG + ALT + ↑)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_prevFiltered = '<?php echo $this->translate->_('Nicht speichern und vorheriges Segment im Workflow öffnen (STRG + ↑)');?>';
 
     Editor.controller.Editor.prototype.messages = {
         segmentNotBuffered: '<?php echo $this->translate->_('Das angeforderte Segment liegt noch nicht im Zwischenspeicher. Bitte scrollen Sie manuell weiter!');?>',
