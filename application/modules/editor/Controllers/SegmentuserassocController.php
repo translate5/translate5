@@ -28,7 +28,35 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class Editor_SegmentUserAssocController extends editor_Controllers_EditorrestController {
+class Editor_SegmentuserassocController extends editor_Controllers_EditorrestController {
 
-
+    protected $entityClass = 'editor_Models_SegmentUserAssoc';
+    
+    /**
+     * @var editor_Models_SegmentUserAssoc
+     */
+    protected $entity;
+    
+    public function deleteAction() {
+        $id = (int) $this->_getParam('segmentUserAssocId');
+        $this->entity->load($id);
+        $this->entity->delete();
+    }
+    
+    public function postAction() {
+        $session = new Zend_Session_Namespace();
+        $sessionUser = new Zend_Session_Namespace('user');
+        $userGuid = $sessionUser->data->userGuid;
+        $now = date('Y-m-d H:i:s');
+        $this->entity->init();
+        $this->entity->setModified($now);
+        $this->entity->setCreated($now);
+        $this->entity->setTaskGuid($session->taskGuid);
+        $this->entity->setUserGuid($userGuid);
+        $this->decodePutData();
+        $this->checkSegmentTaskGuid($this->data->segmentId);
+        $this->entity->validate();
+        $this->entity->save();
+        $this->view->rows = $this->entity->getDataObject();
+    }
 }

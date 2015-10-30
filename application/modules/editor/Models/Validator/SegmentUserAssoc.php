@@ -41,6 +41,5 @@ class editor_Models_Validator_SegmentUserAssoc extends ZfExtended_Models_Validat
         $this->addValidator('segment_id', 'int');
         $this->addValidator('userGuid', 'guid');
         $this->addValidator('taskGuid', 'guid');
-        $this->addValidator('isWatched', 'boolean');
     }
 }
