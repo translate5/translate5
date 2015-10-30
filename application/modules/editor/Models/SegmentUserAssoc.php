@@ -39,9 +39,10 @@ END LICENSE AND COPYRIGHT
  * @method integer getId() getId()
  * @method string getSegmentId() getSegmentId()
  * @method string getUserGuid() getUserGuid()
- * @method void setId() setId(integer $id)
- * @method void setSegmentId() setSegmentId(string $segment_id)
+ * @method string getTaskGuid() getTaskGuid()
+ * @method void setSegmentId() setSegmentId(string $segmentId)
  * @method void setUserGuid() setUserGuid(string $userGuid)
+ * @method void setTaskGuid() setTaskGuid(string $taskGuid)
  */
 class editor_Models_SegmentUserAssoc extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_SegmentUserAssoc';
@@ -49,12 +50,12 @@ class editor_Models_SegmentUserAssoc extends ZfExtended_Models_Entity_Abstract {
 
     
     /**
-     * returns all users to the segment_id of the given SegmentUserAssoc
-     * @param integer $segment_id
+     * returns all users to the segmentId of the given SegmentUserAssoc
+     * @param integer $segmentId
      * @return [array] list with user arrays
      */
-    public function getUsersOfSegment($segment_id){
-        $this->setSegmentId($segment_id);
+    public function getUsersOfSegment($segmentId){
+        $this->setSegmentId($segmentId);
         return $this->loadAllUsers();
     }
     
@@ -74,13 +75,13 @@ class editor_Models_SegmentUserAssoc extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * loads all users to the given segment_id
-     * @param guid $segment_id
+     * loads all users to the given segmentId
+     * @param guid $segmentId
      * @return array|null
      */
-    public function loadBySegmentId(string $segment_id){
+    public function loadBySegmentId(string $segmentId){
         try {
-            $s = $this->db->select()->where('segment_id = ?', $segment_id);
+            $s = $this->db->select()->where('segmentId = ?', $segmentId);
             return $this->db->fetchAll($s)->toArray();
         } catch (Exception $e) {
             $this->notFound('NotFound after other Error', $e);
@@ -114,7 +115,7 @@ class editor_Models_SegmentUserAssoc extends ZfExtended_Models_Entity_Abstract {
         try {
             if(count($list)===0)
                 return array();
-            $s = $this->db->select()->where('segment_id in (?)', $list);
+            $s = $this->db->select()->where('segmentId in (?)', $list);
             return $this->db->fetchAll($s)->toArray();
         } catch (Exception $e) {
             $this->notFound('NotFound after other Error', $e);
@@ -126,20 +127,20 @@ class editor_Models_SegmentUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * loads one SegmentUserAssoc Instance by given params.
      * 
      * @param string $userGuid
-     * @param string $segment_id
+     * @param string $segmentId
      * @return array
      */
-    public function loadByParams(string $userGuid, $segment_id) {
+    public function loadByParams(string $userGuid, $segmentId) {
         try {
             $s = $this->db->select()
                 ->where('userGuid = ?', $userGuid)
-                ->where('segment_id = ?', $segment_id);
+                ->where('segmentId = ?', $segmentId);
             $row = $this->db->fetchRow($s);
         } catch (Exception $e) {
             $this->notFound('NotFound after other Error', $e);
         }
         if (!$row) {
-            $this->notFound(__CLASS__ . '#segment_id + userGuid', $segment_id.' + '.$userGuid);
+            $this->notFound(__CLASS__ . '#segmentId + userGuid', $segmentId.' + '.$userGuid);
         }
         //load implies loading one Row, so use only the first row
         $this->row = $row;
@@ -157,18 +158,18 @@ class editor_Models_SegmentUserAssoc extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * @param int $segment_id
+     * @param int $segmentId
      * @return int
      */
-    public function getTotalCountBySegmentId($segment_id) {
+    public function getTotalCountBySegmentId($segmentId) {
         $s = $this->db->select();
-        $s->where('segment_id = ?', $segment_id);
+        $s->where('segmentId = ?', $segmentId);
         return parent::computeTotalCount($s);
     }
     
     /**
-     * returns a list with users to the actually loaded segment_id
-     * @param string $segment_id
+     * returns a list with users to the actually loaded segmentId
+     * @param string $segmentId
      * @return array
      */
     public function loadAllUsers() {
@@ -177,7 +178,7 @@ class editor_Models_SegmentUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $s = $user->db->select()
         ->from(array('u' => $user->db->info($db::NAME)))
         ->join(array('tua' => $db->info($db::NAME)), 'tua.userGuid = u.userGuid', array())
-        ->where('tua.segment_id = ?', $this->getSegmentId());
+        ->where('tua.segmentId = ?', $this->getSegmentId());
         return $user->db->fetchAll($s)->toArray();
     }
     
@@ -200,43 +201,6 @@ class editor_Models_SegmentUserAssoc extends ZfExtended_Models_Entity_Abstract {
             $this->filter->addSort('login');
         }
         return $this->loadFilterdCustom($s);
-    }
-    
-
-    /**
-     * deletes the actual loaded assoc
-     */
-    public function delete() {
-        $this->db->delete(array(
-            'id = ?' => $this->getId(),
-            'segment_id = ?' => $this->getSegmentId(),
-            'userGuid = ?' => $this->getUserGuid(),
-        ));
-        $this->init();
-    }
-
-    /**
-     * deletes all assoc entries for this userGuid
-     * @param string $userGuid
-     */
-    public function deleteByUserGuid($userGuid) {
-        $list = $this->loadByUserGuid($userGuid);
-        foreach($list as $assoc) {
-            $this->init($assoc);
-            $this->delete();
-        }
-    }
-    
-    /**
-     * deletes all assoc entries for this segment_id
-     * @param string $segment_id
-     */
-    public function deleteBySegmentId($segment_id) {
-        $list = $this->loadBySegmentId($segment_id);
-        foreach($list as $assoc) {
-            $this->init($assoc);
-            $this->delete();
-        }
     }
     
 }

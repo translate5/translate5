@@ -38,8 +38,10 @@ class editor_Models_Validator_SegmentUserAssoc extends ZfExtended_Models_Validat
         /* @var $workflow editor_Workflow_Abstract */
         //comment = string, without length contrain. No validator needed / possible
         $this->addValidator('id', 'int');
-        $this->addValidator('segment_id', 'int');
+        $this->addValidator('segmentId', 'int');
         $this->addValidator('userGuid', 'guid');
         $this->addValidator('taskGuid', 'guid');
+        $this->addValidator('created', 'date', array('Y-m-d H:i:s'));
+        $this->addValidator('modified', 'date', array('Y-m-d H:i:s'));
     }
 }

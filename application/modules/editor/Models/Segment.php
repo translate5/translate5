@@ -743,7 +743,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
          */
         $s->from(array('s' => $db->info($db::NAME)), $cols);
-        $s->joinLeft(array('sua' => $db_join->info($db_join::NAME)), 'sua.segment_id = s.id', array('isWatched', 'id AS segmentUserAssocId'));
+        $s->joinLeft(array('sua' => $db_join->info($db_join::NAME)), 'sua.segmentId = s.id', array('isWatched', 'id AS segmentUserAssocId'));
         $s->where('s.taskGuid = ?', $taskGuid);
         $s->setIntegrityCheck(false);
         

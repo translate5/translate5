@@ -38,7 +38,7 @@ class Editor_SegmentuserassocController extends editor_Controllers_EditorrestCon
     protected $entity;
     
     public function deleteAction() {
-        $id = (int) $this->_getParam('segmentUserAssocId');
+        $id = (int) $this->_getParam('id');
         $this->entity->load($id);
         $this->entity->delete();
     }
@@ -55,8 +55,24 @@ class Editor_SegmentuserassocController extends editor_Controllers_EditorrestCon
         $this->entity->setUserGuid($userGuid);
         $this->decodePutData();
         $this->checkSegmentTaskGuid($this->data->segmentId);
+        $this->entity->setSegmentId($this->data->segmentId);
         $this->entity->validate();
         $this->entity->save();
         $this->view->rows = $this->entity->getDataObject();
+    }
+    
+    /**
+     * compares the taskGuid of the desired segment and the actually loaded taskGuid
+     * @param integer $segmentId
+     * @throws ZfExtended_Models_Entity_NoAccessException
+     */
+    protected function checkSegmentTaskGuid(integer $segmentId) {
+        $session = new Zend_Session_Namespace();
+        $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segment editor_Models_Segment */
+        $segment->load($segmentId);
+        if ($session->taskGuid !== $segment->getTaskGuid()) {
+            throw new ZfExtended_Models_Entity_NoAccessException();
+        }
     }
 }

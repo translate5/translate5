@@ -30,20 +30,20 @@
 DROP TABLE IF EXISTS `LEK_segment_user_assoc`;
 CREATE TABLE `LEK_segment_user_assoc` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `segment_id` int(11) NOT NULL,
+  `segmentId` int(11) NOT NULL,
   `userGuid` varchar(38) NOT NULL,
   `taskGuid` varchar(38) NOT NULL,
   `isWatched` int(1) NOT NULL DEFAULT '1',
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modified` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `segment_user` (`segment_id`,`userGuid`),
+  UNIQUE KEY `segment_user` (`segmentId`,`userGuid`),
   KEY `userGuid` (`userGuid`),
-  KEY `segment_id` (`segment_id`)
+  KEY `segmentId` (`segmentId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE `LEK_segment_user_assoc`
   ADD CONSTRAINT `Zf_users_FK` FOREIGN KEY (`userGuid`) REFERENCES `Zf_users` (`userGuid`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `LEK_segments_FK` FOREIGN KEY (`segment_id`) REFERENCES `LEK_segments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `LEK_segments_FK` FOREIGN KEY (`segmentId`) REFERENCES `LEK_segments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 INSERT INTO `Zf_acl_rules` VALUES(NULL, 'editor', 'editor', 'editor_segmentuserassoc', 'all');
