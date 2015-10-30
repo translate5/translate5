@@ -153,7 +153,46 @@ Ext.define('Editor.controller.MetaPanel', {
    * @param button
    * @param pressed
    */
-  toggleWatchSegment: function(button, pressed) {
+  toggleWatchSegment: function(but, pressed) {
+      var me = this,
+        model = me.getModel('SegmentUserAssoc');
+        segmentId = me.record.get('id'),
+        isWatched = Boolean(me.record.get('isWatched')),
+        segmentUserAssocId = me.record.get('segmentUserAssocId'),
+        navi = me.getNavi(),
+        tooltip = (isWatched) ? navi.item_stopWatchingSegment : navi.item_startWatchingSegment;
+    
+    if (isWatched)
+    {
+        
+    }
+    else
+    {
+        // model i undefined !? why???
+        model.set('segmentId', segmentId);
+        model.save({
+            success: function(rec, op) {
+                var s1 = '';
+                for (var n1 in rec)
+                {
+                    s1 += '\n'+n1+': '+rec[n1];    
+                }
+                var s2 = '';
+                for (var n2 in op)
+                {
+                    s2 += '\n'+n2+': '+op[n2];    
+                }
+                console.log(s1);
+                console.log('========');
+                console.log(s2);
+            }
+        });
+    }
+        
+    but.toggle(isWatched, true);
+    but.setTooltip(tooltip);
+      
+      
       var me = this,
           navi = me.getNavi();
           
@@ -257,20 +296,14 @@ Ext.define('Editor.controller.MetaPanel', {
     var me = this,
         mp = me.getMetaPanel(),
         segmentId = context.record.get('id'),
-        isWatched = Boolean(context.record.get('segmentUserAssocId')),
+        isWatched = Boolean(context.record.get('isWatched')),
         segmentUserAssocId = context.record.get('segmentUserAssocId'),
         navi = me.getNavi(),
-        but = Ext.getCmp('watchSegmentBtn');
+        but = Ext.getCmp('watchSegmentBtn'),
+        tooltip = (isWatched) ? navi.item_stopWatchingSegment : navi.item_startWatchingSegment;
         
     but.toggle(isWatched, true);
-    if (isWatched)
-    {
-        but.setTooltip(navi.item_stopWatchingSegment);    
-    }
-    else
-    {
-        but.setTooltip(navi.item_startWatchingSegment);    
-    }
+    but.setTooltip(tooltip);
     
     me.record = context.record;
     me.getMetaTermPanel().getLoader().load({params: {id: segmentId}});

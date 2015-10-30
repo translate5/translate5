@@ -78,7 +78,7 @@ Editor.DATE_ISO_FORMAT = 'Y-m-d H:i:s';
 
 Ext.application({
   name : 'Editor',
-  models : [ 'File', 'Segment', 'admin.User' ],
+  models : [ 'File', 'Segment', 'admin.User'],
   stores : [ 'Files', 'Segments', 'AlikeSegments' ],
   requires: ['Editor.view.ViewPortEditor', Editor.data.app.viewport, 'Editor.model.ModelOverride'],
   controllers: Editor.data.app.controllers,

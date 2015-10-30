@@ -42,13 +42,17 @@ Ext.define('Editor.model.SegmentUserAssoc', {
   extend: 'Ext.data.Model',
   fields: [
     {name: 'id', type: 'int'},
-    {name: 'segment_id', type: 'int'},
-    {name: 'userGuid', type: 'string'}
+    {name: 'segmentId', type: 'int'}
   ],
+  id: 'modelSegmentUserAssoc',
   idProperty: 'id',
   proxy : {
     type : 'rest',
-    url: Editor.data.restpath+'segmentUserAssoc',
+    url: Editor.data.restpath+'segmentuserassoc',
+    reader : {
+      root: 'rows',
+      type : 'json'
+    },
     writer: {
       encode: true,
       root: 'data',
