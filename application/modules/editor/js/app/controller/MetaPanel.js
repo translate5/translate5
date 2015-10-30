@@ -155,55 +155,44 @@ Ext.define('Editor.controller.MetaPanel', {
    */
   toggleWatchSegment: function(but, pressed) {
       var me = this,
-        model = me.getModel('SegmentUserAssoc');
+        model = Ext.create('Editor.model.SegmentUserAssoc');
         segmentId = me.record.get('id'),
         isWatched = Boolean(me.record.get('isWatched')),
         segmentUserAssocId = me.record.get('segmentUserAssocId'),
-        navi = me.getNavi(),
-        tooltip = (isWatched) ? navi.item_stopWatchingSegment : navi.item_startWatchingSegment;
+        navi = me.getNavi();
     
     if (isWatched)
     {
-        
-    }
-    else
-    {
-        // model i undefined !? why???
-        model.set('segmentId', segmentId);
-        model.save({
+        model.set('id', segmentUserAssocId);
+        model.destroy({
             success: function(rec, op) {
-                var s1 = '';
-                for (var n1 in rec)
-                {
-                    s1 += '\n'+n1+': '+rec[n1];    
-                }
-                var s2 = '';
-                for (var n2 in op)
-                {
-                    s2 += '\n'+n2+': '+op[n2];    
-                }
-                console.log(s1);
-                console.log('========');
-                console.log(s2);
+                me.record.set('isWatched', false);
+                me.record.set('segmentUserAssocId', null);
+                but.setTooltip(navi.item_startWatchingSegment);
+                but.toggle(false, true);
+            },
+            failure: function(rec, op) {
+                but.setTooltip(navi.item_stopWatchingSegment);
+                but.toggle(true, true);
             }
         });
     }
-        
-    but.toggle(isWatched, true);
-    but.setTooltip(tooltip);
-      
-      
-      var me = this,
-          navi = me.getNavi();
-          
-      if (button.pressed)
-      {
-         button.setTooltip(navi.item_stopWatchingSegment); 
-      }
-      else
-      {
-          button.setTooltip(navi.item_startWatchingSegment); 
-      }
+    else
+    {
+        model.set('segmentId', segmentId);
+        model.save({
+            success: function(rec, op) {
+                me.record.set('isWatched', true);
+                me.record.set('segmentUserAssocId', rec.data['id']);
+                but.setTooltip(navi.item_stopWatchingSegment);
+                but.toggle(true, true);
+            },
+            failure: function(rec, op) {
+                but.setTooltip(navi.item_startWatchingSegment);
+                but.toggle(false, true);
+            }
+        });
+    }
   },
   /**
    * Handler für save Button

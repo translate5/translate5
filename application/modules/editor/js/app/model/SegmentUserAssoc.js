@@ -44,8 +44,6 @@ Ext.define('Editor.model.SegmentUserAssoc', {
     {name: 'id', type: 'int'},
     {name: 'segmentId', type: 'int'}
   ],
-  id: 'modelSegmentUserAssoc',
-  idProperty: 'id',
   proxy : {
     type : 'rest',
     url: Editor.data.restpath+'segmentuserassoc',
