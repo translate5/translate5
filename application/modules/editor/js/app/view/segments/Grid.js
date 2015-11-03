@@ -54,7 +54,8 @@ Ext.define('Editor.view.segments.Grid', {
         'Editor.view.segments.column.UserName',
         'Editor.view.segments.column.Comments',
         'Editor.view.segments.column.WorkflowStep',
-        'Editor.view.segments.column.Editable'
+        'Editor.view.segments.column.Editable',
+        'Editor.view.segments.column.IsWatched'
     ],
     alias: 'widget.segments.grid',
     stateful: false,
@@ -91,6 +92,7 @@ Ext.define('Editor.view.segments.Grid', {
     item_qmsummaryBtn: '#UT#QM-Subsegment-Statistik',
     item_optionsTagBtn: '#UT#Einstellungen',
     item_clearSortAndFilterBtn: '#UT#Sortierung und Filter zurücksetzen',
+    item_watchListFilterBtn: '#UT#Merkliste',
     column_edited: '#UT#bearbeibar',
     
     column_edited_icon: '{0} <img src="{1}" class="icon-editable" alt="{2}" title="{3}">',
@@ -274,6 +276,9 @@ Ext.define('Editor.view.segments.Grid', {
         },{
             xtype: 'editableColumn',
             itemId: 'editableColumn'
+        },{
+            xtype: 'iswatchedColumn',
+            itemId: 'iswatchedColumn'
         }]);
     
         Ext.applyIf(me, {
@@ -346,6 +351,11 @@ Ext.define('Editor.view.segments.Grid', {
                     itemId: 'clearSortAndFilterBtn',
                     cls: 'clearSortAndFilterBtn',
                     text: me.item_clearSortAndFilterBtn
+                },{
+                    xtype: 'button',
+                    itemId: 'watchListFilterBtn',
+                    cls: 'watchListFilterBtn',
+                    text: me.item_watchListFilterBtn
                 },{
                     xtype: 'tbseparator',
                     hidden: !Editor.data.task.hasQmSub()

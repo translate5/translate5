@@ -138,6 +138,12 @@ Ext.define('Editor.view.segments.GridFilter', {
                 yesText: boolProto.noText, 
                 noText: boolProto.yesText,
                 dataIndex: 'editable'
+            },{
+                type: 'boolean',
+                defaultValue : false,
+                yesText: boolProto.noText, 
+                noText: boolProto.yesText,
+                dataIndex: 'isWatched'
             }];
         Editor.data.task.segmentFields().each(function(rec) {
             if(!rec.isTarget() || ! userPref.isNonEditableColumnDisabled()) {

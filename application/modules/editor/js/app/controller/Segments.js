@@ -74,7 +74,8 @@ Ext.define('Editor.controller.Segments', {
     segmentSaved: 'Das Segment wurde gespeichert!',
     sortCleared: 'Die gewählte Sortierung der Segmente wurde zurückgesetzt!',
     segmentNotSaved: '#UT# Das zuletzt geöffnete Segment (Nr. {0}) konnte nicht gespeichert werden!',
-    noSegmentToFilter: 'Kein Segment dieser Datei entspricht den Filterkriterien'
+    noSegmentToFilter: 'Kein Segment dieser Datei entspricht den Filterkriterien',
+    otherFiltersActive: '#UT#ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Merkliste sichtbar sind'
   },
   /**
    * Cache der Zuordnung fileId => Grid Index des ersten Segments der Datei.
@@ -98,6 +99,9 @@ Ext.define('Editor.controller.Segments', {
   },{
       ref : 'resetFilterBtn',
       selector : '#clearSortAndFilterBtn'
+  },{
+      ref : 'watchListFilterBtn',
+      selector : '#watchListFilterBtn'
   }],
   init : function() {
       var me = this, 
@@ -141,8 +145,11 @@ Ext.define('Editor.controller.Segments', {
       '#fileorderTree': {
         selectionchange: me.handleFileSelectionChange
       },
-      '#clearSortAndFilterBtn': {
+      '#clearSmap = json.rortAndFilterBtn': {
         click: me.clearSortAndFilter
+      },
+      '#watchListFilterBtn': {
+        click: me.watchListFilter
       }
     });
   },
@@ -203,6 +210,39 @@ Ext.define('Editor.controller.Segments', {
     }
     else {
       me.getSegmentsStore().loadPage(1);
+    }
+    me.scrollGridToTop();
+  },
+  /**
+   * Toggle filtering by watch list.
+   */
+  watchListFilter: function() {
+    var me = this, 
+        filters = me.getSegmentGrid().filters.filters.items,
+        filtersData = me.getSegmentGrid().filters.filters.getFilterData(),
+        cls = 'activated',
+        btn = me.getWatchListFilterBtn();
+
+    for (var i = 0; i < filters.length; i++)
+    {
+        if (filters[i].dataIndex == 'isWatched')
+        {
+            if (filters[i].active === true)
+            {
+                filters[i].setActive(false);
+                btn.removeCls(cls);
+            }
+            else
+            {
+                if (filtersData.length > 0)
+                {
+                    Editor.MessageBox.addSuccess(me.messages.otherFiltersActive);
+                }
+                filters[i].setActive(true);
+                filters[i].setValue(true);
+                btn.addCls(cls);
+            }
+        }
     }
     me.scrollGridToTop();
   },
