@@ -52,7 +52,7 @@ Ext.define('Editor.view.ui.segments.column.IsWatched', {
   width: 90,
   dataIndex: 'isWatched',
   hidden: true,
-  text: 'Watched',
+  text: 'Watch',
 
   initComponent: function() {
     var me = this;

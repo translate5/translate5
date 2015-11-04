@@ -145,7 +145,7 @@ Ext.define('Editor.controller.Segments', {
       '#fileorderTree': {
         selectionchange: me.handleFileSelectionChange
       },
-      '#clearSmap = json.rortAndFilterBtn': {
+      '#clearSortAndFilterBtn': {
         click: me.clearSortAndFilter
       },
       '#watchListFilterBtn': {
@@ -219,7 +219,7 @@ Ext.define('Editor.controller.Segments', {
   watchListFilter: function() {
     var me = this, 
         filters = me.getSegmentGrid().filters.filters.items,
-        filtersData = me.getSegmentGrid().filters.filters.getFilterData(),
+        filtersData = this.getSegmentGrid().filters.getFilterData(),
         cls = 'activated',
         btn = me.getWatchListFilterBtn();
 
@@ -301,12 +301,14 @@ Ext.define('Editor.controller.Segments', {
       this.updateFilteredCountDisplay('...');
       var cls = 'activated',
           btn = this.getResetFilterBtn(),
+          btnWatchList = this.getWatchListFilterBtn(),
           initialActive = filterFeature.filters.length == 0 && filterFeature.initialActive.length > 0;
       if(initialActive || filterFeature.getFilterData().length > 0){
           btn.addCls(cls);
       }
       else {
           btn.removeCls(cls);
+          btnWatchList.removeCls(cls);
       }
       btn.ownerCt.doLayout();
   },

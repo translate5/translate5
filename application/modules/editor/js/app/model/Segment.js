@@ -130,6 +130,6 @@ Editor.model._Segment([
     {name: 'comments', type: 'string', persist: false},
     {name: 'qmId', type: 'string'},
     {name: 'stateId', type: 'int'},
-    {name: 'isWatched', type: 'boolean', defaultValue: false},
+    {name: 'isWatched', type: 'boolean'},
     {name: 'segmentUserAssocId', type: 'int'}
 ]);

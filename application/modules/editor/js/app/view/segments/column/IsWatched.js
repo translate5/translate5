@@ -48,5 +48,13 @@ Ext.define('Editor.view.segments.column.IsWatched', {
     var me = this;
     me.initBaseMixin();
     me.callParent(arguments);
+  },
+  
+  renderer: function(value,t,record){
+      if(value)
+      {
+          return '<img src="'+Editor.data.moduleFolder+'/images/tick.png" alt="ticked"/>'
+      }
+      return '';
   }
 });
