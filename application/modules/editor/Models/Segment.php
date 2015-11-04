@@ -541,6 +541,17 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     public function getDataObject() {
         $res = parent::getDataObject();
         $this->segmentFieldManager->mergeData($this->segmentdata, $res);
+        $segmentUserAssoc = ZfExtended_Factory::get('editor_Models_SegmentUserAssoc');
+        try {
+            $assoc = $segmentUserAssoc->loadByParams($res->userGuid, $res->id);
+            $res->isWatched = true;
+            $res->segmentUserAssocId = $assoc['id'];
+        }
+        catch(ZfExtended_Models_Entity_NotFoundException $e)
+        {
+            $res->isWatched = null;
+            $res->segmentUserAssocId = null;
+        }
         return $res;
     }
 
@@ -671,7 +682,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return editor_Models_Segment | null if no next found
      */
     public function loadNext($taskGuid, $id, $fileId = null) {
-        $s = $this->_db_select('*')
+        $s = $this->_db_select()
             ->where('s.taskGuid = ?', $taskGuid)
             ->where('s.id > ?', $id)
             ->order('s.id ASC')
@@ -745,17 +756,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $s->where('s.taskGuid = ?', $taskGuid);
         return parent::loadFilterdCustom($s);
     }
-    
-
-    /**
-     * @param $taskguid
-     * @return int
-     */
-    public function getTotalCountByTaskGuid($taskguid) {
-        $s = $this->db->select();
-        $s->where('taskGuid = ?', $taskguid);
-        return parent::computeTotalCount($s);
-    }
 
     /**
      * Loads segments by a specific workflowStep, fetch only specific fields.
@@ -789,7 +789,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * returns db select joined with segment_user_assoc table
      *
      */
-    private function _db_select($cols)
+    private function _db_select($cols = array())
     {
         $db_join = ZfExtended_Factory::get('editor_Models_Db_SegmentUserAssoc');
         $db = $this->db;
