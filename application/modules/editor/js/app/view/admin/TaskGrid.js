@@ -376,7 +376,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
     }
 
     me.callParent(arguments);
-    actions = me.down('.taskActionColumn');
+    actions = me.down('taskActionColumn');
     if(actions && actions.items.length > 0) {
         me.availableActions = Ext.Array.map(actions.items, function(item) {
             return item.isAllowedFor;
