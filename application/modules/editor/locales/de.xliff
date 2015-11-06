@@ -766,7 +766,6 @@ Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-M
 <trans-unit id='U3BhbHRlIEE='><source>Spalte A</source><target>Spalte A</target></trans-unit>
 <trans-unit id='WmllbCAy'><source>Ziel 2</source><target>Ziel 2</target></trans-unit>
 <trans-unit id='Tm9jaCBlaW4gWmllbA=='><source>Noch ein Ziel</source><target>Noch ein Ziel</target></trans-unit>
-
 <trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgQUxUICsgRU5URVIp'><source>Speichern und nächstes Segment öffnen (STRG + ALT + ENTER)</source><target>Speichern und nächstes Segment öffnen (STRG + ALT + ENTER)</target></trans-unit>
 <trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCBpbSBXb3JrZmxvdyDDtmZmbmVuIChTVFJHICsgRU5URVIp'><source>Speichern und nächstes Segment im Workflow öffnen (STRG + ENTER)</source><target>Speichern und nächstes Segment im Workflow öffnen (STRG + ENTER)</target></trans-unit>
 <trans-unit id='U3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgw7ZmZm5lbg=='><source>Speichern und vorheriges Segment öffnen</source><target>Speichern und vorheriges Segment öffnen</target></trans-unit>
@@ -776,7 +775,7 @@ Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-M
 <trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCBpbSBXb3JrZmxvdyDDtmZmbmVuIChTVFJHICsg4oaTKQ=='><source>Nicht speichern und nächstes Segment im Workflow öffnen (STRG + ↓)</source><target>Nicht speichern und nächstes Segment im Workflow öffnen (STRG + ↓)</target></trans-unit>
 <trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgw7ZmZm5lbiAoU1RSRyArIEFMVCArIOKGkSk='><source>Nicht speichern und vorheriges Segment öffnen (STRG + ALT + ↑)</source><target>Nicht speichern und vorheriges Segment öffnen (STRG + ALT + ↑)</target></trans-unit>
 <trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgaW0gV29ya2Zsb3cgw7ZmZm5lbiAoU1RSRyArIOKGkSk='><source>Nicht speichern und vorheriges Segment im Workflow öffnen (STRG + ↑)</source><target>Nicht speichern und vorheriges Segment im Workflow öffnen (STRG + ↑)</target></trans-unit>
-
+<trans-unit id='RGVtIGF1c2dld8OkaGx0ZW4gU2VnbWVudCBlaW5lbiBLb21tZW50YXIgaGluenVmw7xnZW4uIChTVFJHLVNISUZULU4p'><source>Dem ausgewählten Segment einen Kommentar hinzufügen. (STRG-SHIFT-N)</source><target>Dem ausgewählten Segment einen Kommentar hinzufügen. (STRG-SHIFT-N)</target></trans-unit>
   </body>
  </file>
 </xliff>
