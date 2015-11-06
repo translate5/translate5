@@ -56,12 +56,12 @@ Ext.define('Editor.model.AlikeSegment', {
     type : 'rest',
     url: Editor.data.restpath+'alikesegment',
     reader : {
-      root: 'rows',
+      rootProperty: 'rows',
       type : 'json'
     },
     writer: {
       encode: true,
-      root: 'data',
+      rootProperty: 'data',
       writeAllFields: false
     }
   }

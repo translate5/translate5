@@ -54,12 +54,12 @@ Ext.define('Editor.model.admin.User', {
     type : 'rest',
     url: Editor.data.restpath+'user',
     reader : {
-      root: 'rows',
-      type : 'json'
+        rootProperty: 'rows',
+        type : 'json'
     },
     writer: {
       encode: true,
-      root: 'data',
+      rootProperty: 'data',
       writeAllFields: false
     }
   },

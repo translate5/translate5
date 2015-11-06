@@ -72,12 +72,12 @@ Ext.define('Editor.model.admin.task.UserPref', {
     type : 'rest',
     url: Editor.data.restpath+'workflowuserpref',
     reader : {
-      root: 'rows',
+      rootProperty: 'rows',
       type : 'json'
     },
     writer: {
       encode: true,
-      root: 'data',
+      rootProperty: 'data',
       writeAllFields: false
     }
   }

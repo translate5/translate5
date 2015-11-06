@@ -46,7 +46,7 @@ Ext.define('Editor.model.File', {
     {name: 'parentId', type: 'int'},
     {name: 'href', type: 'string', convert: function(v) {
         //relative path fix since browser url does not always end with "/"
-        if(v.length > 0) {
+        if(v && v.length > 0) {
             return Editor.data.restpath+v;
         }
         return v;
@@ -61,7 +61,7 @@ Ext.define('Editor.model.File', {
     url: Editor.data.restpath+'file',
     writer: {
       encode: true,
-      root: 'data'
+      rootProperty: 'data'
     }
   }
 });

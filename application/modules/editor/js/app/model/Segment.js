@@ -69,7 +69,7 @@ Editor.model._Segment = function(fields) {
             type : 'rest',
             url: Editor.data.restpath+'segment',
             reader : {
-                root: 'rows',
+                rootProperty: 'rows',
                 //intercept readRecords method to set segments meta info only on store reads, not on plain model reads
                 readRecords: function(data) {
                     if(data && data.firstSegmentId) {
@@ -86,7 +86,7 @@ Editor.model._Segment = function(fields) {
             },
             writer: {
                 encode: true,
-                root: 'data',
+                rootProperty: 'data',
                 writeAllFields: false
             }
         },

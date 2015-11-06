@@ -88,12 +88,12 @@ Ext.define('Editor.model.admin.Task', {
     type : 'rest',
     url: Editor.data.restpath+'task',
     reader : {
-      root: 'rows',
+      rootProperty: 'rows',
       type : 'json'
     },
     writer: {
       encode: true,
-      root: 'data',
+      rootProperty: 'data',
       writeAllFields: false
     }
   },

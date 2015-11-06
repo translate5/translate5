@@ -59,12 +59,12 @@ Ext.define('Editor.model.admin.TaskUserAssoc', {
     type : 'rest',
     url: Editor.data.restpath+'taskuserassoc',
     reader : {
-      root: 'rows',
+      rootProperty: 'rows',
       type : 'json'
     },
     writer: {
       encode: true,
-      root: 'data',
+      rootProperty: 'data',
       writeAllFields: false
     }
   }

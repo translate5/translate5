@@ -54,12 +54,12 @@ Ext.define('Editor.model.Comment', {
     type : 'rest',
     url: Editor.data.restpath+'comment',
     reader : {
-      root: 'rows',
+      rootProperty: 'rows',
       type : 'json'
     },
     writer: {
       encode: true,
-      root: 'data',
+      rootProperty: 'data',
       writeAllFields: false
     }
   }
