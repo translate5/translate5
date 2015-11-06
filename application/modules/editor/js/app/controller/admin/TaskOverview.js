@@ -87,29 +87,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   init : function() {
       var me = this;
       
-      me.addEvents(
-              /**
-               * @event taskCreated
-               * @param {Ext.form.Panel} form
-               * @param {Ext.action.Submit} submit
-               * Fires after a task has successfully created
-               */
-              'taskCreated',
-              
-              /**
-               * @event handleTaskPreferences
-               * @param {Editor.model.admin.Task} task
-               * Fires after the User has clicked on the icon to edit the Task Preferences
-               */
-              'handleTaskPreferences',
-              
-              /**
-               * @event handleTaskChangeUserAssoc
-               * @param {Editor.model.admin.Task} task
-               * Fires after the User has clicked on the button / cell to edit the Task User Assoc
-               */
-              'handleTaskChangeUserAssoc'
-      );
       
       //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
       Editor.app.on('adminViewportClosed', me.clearTasks, me);
@@ -153,6 +130,28 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           }
       });
   },
+    //***********************************************************************************
+    //Begin Events
+    //***********************************************************************************
+    /**
+     * @event taskCreated
+     * @param {Ext.form.Panel} form
+     * @param {Ext.action.Submit} submit
+     * Fires after a task has successfully created
+     */
+    /**
+     * @event handleTaskPreferences
+     * @param {Editor.model.admin.Task} task
+     * Fires after the User has clicked on the icon to edit the Task Preferences
+     */
+    /**
+     * @event handleTaskChangeUserAssoc
+     * @param {Editor.model.admin.Task} task
+     * Fires after the User has clicked on the button / cell to edit the Task User Assoc
+     */
+    //***********************************************************************************
+    //End Events
+    //***********************************************************************************
   /**
    * injects the task menu into the main menu
    */
