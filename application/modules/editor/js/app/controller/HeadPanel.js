@@ -64,14 +64,6 @@ Ext.define('Editor.controller.HeadPanel', {
   init : function() {
       var me = this;
       
-      this.addEvents(
-              /**
-               * @event taskUpdated
-               * @param {Editor.model.admin.Task} task
-               * Fires after a task has successfully updated / saved
-               */
-              'taskUpdated'
-      );
       
       //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
       Editor.app.on('editorViewportOpened', me.handleInitEditor, me);
@@ -98,6 +90,17 @@ Ext.define('Editor.controller.HeadPanel', {
           }
       });
   },
+  //***********************************************************************************
+  //Begin Events
+  //***********************************************************************************
+  /**
+   * @event taskUpdated
+   * @param {Editor.model.admin.Task} task
+   * Fires after a task has successfully updated / saved
+   */
+  //***********************************************************************************
+  //End Events
+  //***********************************************************************************
   headPanelToggle: function(tool) {
       this.getHeadPanel().setVisible(tool.type == 'down');
       if(tool.itemId == 'headPanelUp') {
