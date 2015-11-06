@@ -27,7 +27,6 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
 /**
  * Editor.controller.admin.TaskOverview encapsulates the Task Overview functionality
  * @class Editor.controller.admin.TaskOverview
