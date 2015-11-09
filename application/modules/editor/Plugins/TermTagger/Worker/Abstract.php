@@ -341,7 +341,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         /* @var $termTagger editor_Plugins_TermTagger_Service */
         
         // test if tbx-file is already loaded
-        if ($termTagger->ping($url, $tbxHash)) {
+        if (!empty($tbxHash) && $termTagger->ping($url, $tbxHash)) {
             return true;
         }
         
@@ -351,6 +351,10 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         /* @var $tbxParser editor_Models_Import_TermListParser_Tbx */
         $tbxData = $tbxParser->assertTbxExists($this->task, new SplFileInfo($tbxPath));
         $tbxHash = $this->task->meta()->getTbxHash();
+        
+        if(empty($tbxHash)) {
+            throw new editor_Plugins_TermTagger_Exception_Open(__CLASS__.' -> '.__FUNCTION__.'; Terminology disabled because TBX hash is empty!');
+        }
         
         $service = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
         /* @var $service editor_Plugins_TermTagger_Service */

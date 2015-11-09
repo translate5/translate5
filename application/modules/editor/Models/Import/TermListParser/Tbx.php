@@ -171,6 +171,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     protected $counterTerm = 0;
     protected $counterTermInTig = 0;
     
+    /**
+     * internal flag
+     * @var boolean
+     */
+    protected $forceOnImport = false;
+    
     
     const TERM_INSERT_BLOCKSIZE = 15;
 
@@ -242,7 +248,9 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         }
         $this->xml->close();
         
+        $this->forceOnImport = true;
         $this->assertTbxExists($this->task, new SplFileInfo(self::getTbxPath($this->task)));
+        $this->forceOnImport = false;
     }
     
     /**
@@ -251,7 +259,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
      * @param SplFileInfo $tbxPath
      */
     public function assertTbxExists(editor_Models_Task $task, SplFileInfo $tbxPath) {
-        if($tbxPath->isReadable()) {
+        if(!$this->forceOnImport && $tbxPath->isReadable()) {
             return file_get_contents($tbxPath);
         }
         //after recreation we need to fetch the IDs!
