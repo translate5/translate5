@@ -175,7 +175,7 @@ END LICENSE AND COPYRIGHT
 }
 
 /* Fix for TRANSLATE-237 recheck on ExtJS update */
-.x-tip .x-tip-body {white-space: nowrap;}
+/*.x-tip .x-tip-body {white-space: nowrap;}*/
  /* END Fix for TRANSLATE-237 recheck on ExtJS update */
 
 /*qmsummary*/

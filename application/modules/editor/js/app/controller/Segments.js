@@ -113,8 +113,6 @@ Ext.define('Editor.controller.Segments', {
       me.getStore('Files').on('write', me.reloadGrid, me);
       Editor.app.on('editorViewportClosed', me.clearSegments, me);
 
-      me.initKeymap();
-      
       me.control({
       '#segmentgrid .headercontainer' : {
         sortchange: me.scrollGridToTop
