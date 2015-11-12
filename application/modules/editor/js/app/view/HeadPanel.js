@@ -37,6 +37,10 @@ Ext.define('Editor.view.HeadPanel', {
     alias: 'widget.headPanel',
     region: 'north',
     id: 'head-panel',
+    height: 150,
+    layout: {
+        type: 'fit'
+    },
     strings: {
         task: '#UT#Aufgabe',
         logout: '#UT# Abmelden',
