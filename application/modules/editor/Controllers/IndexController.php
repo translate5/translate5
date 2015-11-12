@@ -76,6 +76,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
           );
         $this->view->extJsCss = $extJs->getCssPath();
         $this->view->extJsBasepath = $extJs->getHttpPath();
+        
+        //FIXME is coming from DB, for easy switching of branches do ExtJS switch in PHP for the moment:
+        $this->view->extJsBasepath = str_replace('4.0.7', '6.0.0', $this->view->extJsBasepath);
+        
+        $this->view->buildType = 'development';
+        
         $this->view->publicModulePath = APPLICATION_RUNDIR.'/modules/'.Zend_Registry::get('module');
         $this->view->locale = $this->session->locale;
 
@@ -269,6 +275,28 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         $ed = $this->session->runtimeOptions->editor;
         
+        //ext6 update single controller testcode
+        $controllers = array();
+        //$controllers[] = 'ServerException';
+        //$controllers[] = 'ViewModes';
+        //$controllers[] = 'Segments';
+        //$controllers[] = 'Preferences';
+        //$controllers[] = 'MetaPanel';
+        //$controllers[] = 'Fileorder';
+        //$controllers[] = 'Localizer';
+        //$controllers[] = 'ChangeAlike';
+        //$controllers[] = 'Comments';
+        //without plugins!!!
+        $controllers[] = 'HeadPanel';
+        //$controllers[] = 'UserPreferences';
+        //$controllers[] = 'QmSubSegments';
+        $controllers[] = 'admin.TaskOverview';
+        $controllers[] = 'admin.TaskPreferences';
+        //$controllers[] = 'admin.TaskUserAssoc';
+        //$controllers[] = 'admin.User';
+        return $controllers;
+        
+        //original code
         $controllers = array('ServerException', 'ViewModes', 'Segments', 
             'Preferences', 'MetaPanel', 'Fileorder', 'Localizer',
             'ChangeAlike', 'Comments');
