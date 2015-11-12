@@ -146,7 +146,7 @@ Ext.define('Editor.model.admin.Task', {
    */
   isFinished: function() {
       var me = this, finish = me.USER_STATE_FINISH;
-      return me.modified.userState == finish || me.get('userState') == finish;
+      return me.modified && me.modified.userState == finish || me.get('userState') == finish;
   },
   /**
    * must consider also the old value (temporary set to open / edit)
@@ -154,7 +154,7 @@ Ext.define('Editor.model.admin.Task', {
    */
   isWaiting: function() {
       var me = this, wait = me.USER_STATE_WAITING;
-      return me.modified.userState == wait || me.get('userState') == wait;
+      return me.modified && me.modified.userState == wait || me.get('userState') == wait;
   },
   /**
    * edit or view state implies currently, that a saving request of the task is running,
