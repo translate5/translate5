@@ -288,14 +288,14 @@ body.loading {background: url("../images/loading_ico.gif") center 100px no-repea
 .adminTaskGrid .x-grid-header-ct .target-lang.ux-filtered-column span,
 .adminTaskGrid .x-grid-header-ct .source-lang.ux-filtered-column span {background:url("../images/funnel-small.png") no-repeat 33px 0px;}
 
-.adminTaskGrid .x-grid-header-ct .task-users span.x-column-header-text,
-.adminTaskGrid .x-grid-header-ct .ref-files span.x-column-header-text,
-.adminTaskGrid .x-grid-header-ct .terminologie span.x-column-header-text,
-.adminTaskGrid .x-grid-header-ct .fullMatchEdit span.x-column-header-text,
-.adminTaskGrid .x-grid-header-ct .source-edit span.x-column-header-text,
-.adminTaskGrid .x-grid-header-ct .source-lang span.x-column-header-text,
-.adminTaskGrid .x-grid-header-ct .target-lang span.x-column-header-text,
-.adminTaskGrid .x-grid-header-ct .relais-lang span.x-column-header-text{
+.adminTaskGrid .x-grid-header-ct .task-users span.x-column-header-text-inner,
+.adminTaskGrid .x-grid-header-ct .ref-files span.x-column-header-text-inner,
+.adminTaskGrid .x-grid-header-ct .terminologie span.x-column-header-text-inner,
+.adminTaskGrid .x-grid-header-ct .fullMatchEdit span.x-column-header-text-inner,
+.adminTaskGrid .x-grid-header-ct .source-edit span.x-column-header-text-inner,
+.adminTaskGrid .x-grid-header-ct .source-lang span.x-column-header-text-inner,
+.adminTaskGrid .x-grid-header-ct .target-lang span.x-column-header-text-inner,
+.adminTaskGrid .x-grid-header-ct .relais-lang span.x-column-header-text-inner{
     display: block;
     overflow: hidden;
     text-indent: 100%;
@@ -330,24 +330,24 @@ tr.import td div {color:#ff9900;}
 tr.customeState td div {font-style: italic;}
 
 /* Task Grid Actions */
-.adminTaskGrid tr img,
-.adminTaskGrid tr.customeState td img.x-action-col-icon,
-.adminTaskGrid tr.import td img.x-action-col-icon {display:none;}
-.adminTaskGrid tr.editorOpenTask .ico-task-open {background-image: url("../images/page_view.png");display:inline;}
-.adminTaskGrid tr.editorEditTask .ico-task-edit {background-image: url("../images/page_edit.png");display:inline;}
+.adminTaskGrid tr .x-action-col-icon,
+.adminTaskGrid tr.customeState td .x-action-col-icon,
+.adminTaskGrid tr.import td .x-action-col-icon {display:none;}
+.adminTaskGrid tr.editorOpenTask .ico-task-open {background-image: url("../images/page_view.png");display:inline-block;}
+.adminTaskGrid tr.editorEditTask .ico-task-edit {background-image: url("../images/page_edit.png");display:inline-block;}
 .x-menu .ico-task-finish,
-.adminTaskGrid tr.editorFinishTask .ico-task-finish {background-image: url("../images/tick.png");display:inline;}
-.adminTaskGrid tr.editorUnfinishTask .ico-task-unfinish {background-image: url("../images/tick_back.png");display:inline;}
-.adminTaskGrid tr.editorFinishAllTask .ico-task-finish-all {background-image: url("../images/group_tick.png");display:inline;}
-.adminTaskGrid tr.editorUnfinishAllTask .ico-task-unfinish-all {background-image: url("../images/group_tick_back.png");display:inline;}
+.adminTaskGrid tr.editorFinishTask .ico-task-finish {background-image: url("../images/tick.png");display:inline-block;}
+.adminTaskGrid tr.editorUnfinishTask .ico-task-unfinish {background-image: url("../images/tick_back.png");display:inline-block;}
+.adminTaskGrid tr.editorFinishAllTask .ico-task-finish-all {background-image: url("../images/group_tick.png");display:inline-block;}
+.adminTaskGrid tr.editorUnfinishAllTask .ico-task-unfinish-all {background-image: url("../images/group_tick_back.png");display:inline-block;}
 .x-menu .ico-task-end,
-.adminTaskGrid tr.editorEndTask .ico-task-end {background-image: url("../images/control_stop.png");display:inline;}
-.adminTaskGrid tr.editorChangeUserAssocTask .ico-task-change-user-assoc {background-image: url("../images/group.png");display:inline;}
-.adminTaskGrid tr.editorPreferencesTask .ico-task-preferences {background-image: url("../images/page_gear.png");display:inline;}
-.adminTaskGrid tr.editorReopenTask .ico-task-reopen {background-image: url("../images/control_start.png");display:inline;}
-.adminTaskGrid tr.editorDeleteTask .ico-task-delete {background-image: url("../images/page_delete.png");display:inline;}
-.adminTaskGrid tr.editorShowexportmenuTask .ico-task-showexportmenu {background-image: url("../images/database_go.png");display:inline;}
-.adminTaskGrid tr.pending img {display:none !important;}
+.adminTaskGrid tr.editorEndTask .ico-task-end {background-image: url("../images/control_stop.png");display:inline-block;}
+.adminTaskGrid tr.editorChangeUserAssocTask .ico-task-change-user-assoc {background-image: url("../images/group.png");display:inline-block;}
+.adminTaskGrid tr.editorPreferencesTask .ico-task-preferences {background-image: url("../images/page_gear.png");display:inline-block;}
+.adminTaskGrid tr.editorReopenTask .ico-task-reopen {background-image: url("../images/control_start.png");display:inline-block;}
+.adminTaskGrid tr.editorDeleteTask .ico-task-delete {background-image: url("../images/page_delete.png");display:inline-block;}
+.adminTaskGrid tr.editorShowexportmenuTask .ico-task-showexportmenu {background-image: url("../images/database_go.png");display:inline-block;}
+.adminTaskGrid tr.pending .x-action-col-icon {display:none !important;}
 .adminTaskGrid tr.pending td.state div {background: url("../images/loading_ico.gif") no-repeat 6px center;}
 
 /* User Admin */
