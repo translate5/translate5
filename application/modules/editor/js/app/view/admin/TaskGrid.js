@@ -30,7 +30,8 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.view.admin.TaskGrid', {
   extend: 'Ext.grid.Panel',
-  requires: ['Editor.view.admin.TaskActionColumn', 'Editor.view.GridHeaderToolTip','Editor.view.CheckColumn', 'Editor.view.admin.task.GridFilter'],
+  //requires: ['Editor.view.admin.TaskActionColumn', 'Editor.view.GridHeaderToolTip','Editor.view.CheckColumn', 'Editor.view.admin.task.GridFilter'],
+  requires: ['Editor.view.admin.TaskActionColumn', 'Editor.view.GridHeaderToolTip','Editor.view.CheckColumn'],
   alias: 'widget.adminTaskGrid',
   itemId: 'adminTaskGrid',
   cls: 'adminTaskGrid',
@@ -72,9 +73,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
       reloadBtnTip: '#UT#Aufgabenliste vom Server aktualisieren.'
   },
   store: 'admin.Tasks',
-  features: [{
-    ftype: 'adminTaskGridFilter'
-  }],
+  //features: [{
+    //ftype: 'adminTaskGridFilter'
+  //}],
   viewConfig: {
       /**
        * returns a specific row css class
@@ -169,212 +170,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
             }
     );
     me.userStore = Ext.getStore('admin.Users');
-    
-    Ext.applyIf(me, {
-      languageStore: Ext.StoreMgr.get('admin.Languages'),
-      columns: [{
-          text: me.text_cols.taskActions,
-          menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter
-          xtype: 'taskActionColumn',
-          sortable: false
-      },{
-          xtype: 'gridcolumn',
-          width: 70,
-          dataIndex: 'state',
-          tdCls: 'state',
-          renderer: function(v, meta, rec) {
-              var userState = rec.get('userState'),
-                  wfMeta = rec.getWorkflowMetaData(),
-                  allStates = me.prepareStates(wfMeta);
-
-              if(rec.isImporting()) {
-                  return rec.get('state'); //FIXME better output here with fixing worker error handling
-              }
-              if(rec.isLocked() && rec.isCustomState()) {
-                  meta.tdAttr = 'data-qtip="' + Ext.String.format(me.strings.lockedSystem, rec.get('state'))+'"';
-                  return me.strings.locked;
-              }
-              if(rec.isLocked()) {
-                  meta.tdAttr = 'data-qtip="' + Ext.String.format(me.strings.lockedBy, rec.get('lockingUsername'))+'"';
-                  return me.strings.locked;
-              }
-              if(rec.isEnded()) {
-                  meta.tdAttr = 'data-qtip="' + me.strings.ended +'"';
-                  return me.strings.ended;
-              }
-              if(!userState || userState.length == 0) {
-                  //if we got only v here, the state should be handled like locked or ended above
-                  v = allStates[v] ? allStates[v] : v;
-                  meta.tdAttr = 'data-qtip="' + v +'"';
-                  return v; 
-              }
-              //if no global state is applicable, use userState instead
-              meta.tdAttr = 'data-qtip="' + allStates[userState] +'"';
-              return allStates[userState];
-          },
-          text: me.text_cols.state,
-          sortable: false
-      },{
-          xtype: 'gridcolumn',
-          width: 220,
-          dataIndex: 'taskName',
-          text: me.text_cols.taskName
-      },{
-          xtype: 'gridcolumn',
-          width: 110,
-          dataIndex: 'taskNr',
-          tdCls: 'taskNr',
-          text: me.text_cols.taskNr
-      },{
-          xtype: 'numbercolumn',
-          width: 70,
-          dataIndex: 'wordCount',
-          format: '0',
-          text: me.text_cols.wordCount
-      },{
-          xtype: 'numbercolumn',
-          width: 70,
-          dataIndex: 'fileCount',
-          hidden: true,
-          sortable: false,
-          format: '0',
-          text: me.text_cols.fileCount
-      },{
-          xtype: 'gridcolumn',
-          width: 110,
-          cls: 'source-lang',
-          renderer: me.langRenderer,
-          dataIndex: 'sourceLang',
-          tooltip: me.text_cols.sourceLang,
-          text: me.text_cols.sourceLang,
-          sortable: false
-      },{
-          xtype: 'gridcolumn',
-          width: 110,
-          cls: 'relais-lang',
-          renderer: me.langRenderer,
-          dataIndex: 'relaisLang',
-          tooltip: me.text_cols.relaisLang,
-          text: me.text_cols.relaisLang,
-          sortable: false
-      },{
-          xtype: 'gridcolumn',
-          width: 110,
-          cls: 'target-lang',
-          renderer: me.langRenderer,
-          dataIndex: 'targetLang',
-          tooltip: me.text_cols.targetLang,
-          text: me.text_cols.targetLang,
-          sortable: false
-      },{
-          xtype: 'owncheckcolumn',
-          cls: 'ref-files',
-          width: 45,
-          dataIndex: 'referenceFiles',
-          tooltip: me.text_cols.referenceFiles,
-          text: me.text_cols.referenceFiles
-      },{
-          xtype: 'owncheckcolumn',
-          width: 45,
-          cls: 'terminologie',
-          dataIndex: 'terminologie',
-          tooltip: me.text_cols.terminologie,
-          text: me.text_cols.terminologie
-      },{
-          xtype: 'gridcolumn',
-          width: 45,
-          renderer: function(v, meta, rec){
-              if(v == 0) {
-                  return '<b>'+v+' !</b>';
-              }
-              return v;
-          },
-          tdCls: 'task-users',
-          cls: 'task-users',
-          dataIndex: 'userCount',
-          tooltip: me.text_cols.users,
-          text: me.text_cols.users
-      },{
-          xtype: 'gridcolumn',
-          width: 135,
-          dataIndex: 'pmName',
-          renderer: function(v, meta) {
-              meta.tdAttr = 'data-qtip="' + v + '"';
-              return v;
-          },
-          text: me.text_cols.pmGuid
-      },{
-          xtype: 'datecolumn',
-          width: 100,
-          dataIndex: 'orderdate',
-          text: me.text_cols.orderdate
-      },{
-          xtype: 'datecolumn',
-          width: 120,
-          dataIndex: 'targetDeliveryDate',
-          text: me.text_cols.targetDeliveryDate
-      },{
-          xtype: 'datecolumn',
-          width: 120,
-          dataIndex: 'realDeliveryDate',
-          text: me.text_cols.realDeliveryDate
-      },{
-          xtype: 'owncheckcolumn',
-          width: 45,
-          cls: 'fullMatchEdit',
-          hidden: true,
-          dataIndex: 'edit100PercentMatch',
-          tooltip: me.text_cols.fullMatchEdit,
-          text: me.text_cols.fullMatchEdit
-      },{
-          xtype: 'owncheckcolumn',
-          hidden: ! Editor.data.enableSourceEditing,
-          hideable: Editor.data.enableSourceEditing,
-          width: 55,
-          cls: 'source-edit',
-          dataIndex: 'enableSourceEditing',
-          tooltip: me.text_cols.enableSourceEditing,
-          text: me.text_cols.enableSourceEditing
-      }],
-      dockedItems: [{
-          xtype: 'toolbar',
-          dock: 'top',
-          items: [{
-              xtype: 'button',
-              iconCls: 'ico-task-add',
-              itemId: 'add-task-btn',
-              text: me.strings.addTask,
-              hidden: ! Editor.app.authenticatedUser.isAllowed('editorAddTask'),
-              tooltip: me.strings.addTaskTip
-          },{
-              xtype: 'button',
-              iconCls: 'ico-refresh',
-              itemId: 'reload-task-btn',
-              text: me.strings.reloadBtn,
-              tooltip: me.strings.reloadBtnTip
-          }]
-        },{
-            xtype: 'pagingtoolbar',
-            store: 'admin.Tasks',
-            dock: 'bottom',
-            displayInfo: true
-        }]
-    });
-    
-    if(Editor.data.debug && Editor.data.debug.showTaskGuid) {
-        me.columns.unshift({
-            xtype: 'gridcolumn',
-            width: 60,
-            dataIndex: 'id',
-            text: 'id'
-        },{
-            xtype: 'gridcolumn',
-            width: 240,
-            dataIndex: 'taskGuid',
-            text: 'taskGuid'
-        });
-    }
-
     me.callParent(arguments);
     actions = me.down('taskActionColumn');
     if(actions && actions.items.length > 0) {
@@ -388,6 +183,217 @@ Ext.define('Editor.view.admin.TaskGrid', {
     this.view.on('afterrender', function(){
         me.tooltip = me.createToolTip();
     });
+  },
+  initConfig: function(instanceConfig) {
+      var me = this,
+          config = {
+          languageStore: Ext.StoreMgr.get('admin.Languages'),
+          columns: [{
+              text: me.text_cols.taskActions,
+              menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter
+              xtype: 'taskActionColumn',
+              sortable: false
+          },{
+              xtype: 'gridcolumn',
+              width: 70,
+              dataIndex: 'state',
+              tdCls: 'state',
+              renderer: function(v, meta, rec) {
+                  var userState = rec.get('userState'),
+                      wfMeta = rec.getWorkflowMetaData(),
+                      allStates = me.prepareStates(wfMeta);
+
+                  if(rec.isImporting()) {
+                      return rec.get('state'); //FIXME better output here with fixing worker error handling
+                  }
+                  if(rec.isLocked() && rec.isCustomState()) {
+                      meta.tdAttr = 'data-qtip="' + Ext.String.format(me.strings.lockedSystem, rec.get('state'))+'"';
+                      return me.strings.locked;
+                  }
+                  if(rec.isLocked()) {
+                      meta.tdAttr = 'data-qtip="' + Ext.String.format(me.strings.lockedBy, rec.get('lockingUsername'))+'"';
+                      return me.strings.locked;
+                  }
+                  if(rec.isEnded()) {
+                      meta.tdAttr = 'data-qtip="' + me.strings.ended +'"';
+                      return me.strings.ended;
+                  }
+                  if(!userState || userState.length == 0) {
+                      //if we got only v here, the state should be handled like locked or ended above
+                      v = allStates[v] ? allStates[v] : v;
+                      meta.tdAttr = 'data-qtip="' + v +'"';
+                      return v; 
+                  }
+                  //if no global state is applicable, use userState instead
+                  meta.tdAttr = 'data-qtip="' + allStates[userState] +'"';
+                  return allStates[userState];
+              },
+              text: me.text_cols.state,
+              sortable: false
+          },{
+              xtype: 'gridcolumn',
+              width: 220,
+              dataIndex: 'taskName',
+              text: me.text_cols.taskName
+          },{
+              xtype: 'gridcolumn',
+              width: 110,
+              dataIndex: 'taskNr',
+              tdCls: 'taskNr',
+              text: me.text_cols.taskNr
+          },{
+              xtype: 'numbercolumn',
+              width: 70,
+              dataIndex: 'wordCount',
+              format: '0',
+              text: me.text_cols.wordCount
+          },{
+              xtype: 'numbercolumn',
+              width: 70,
+              dataIndex: 'fileCount',
+              hidden: true,
+              sortable: false,
+              format: '0',
+              text: me.text_cols.fileCount
+          },{
+              xtype: 'gridcolumn',
+              width: 110,
+              cls: 'source-lang',
+              renderer: me.langRenderer,
+              dataIndex: 'sourceLang',
+              tooltip: me.text_cols.sourceLang,
+              text: me.text_cols.sourceLang,
+              sortable: false
+          },{
+              xtype: 'gridcolumn',
+              width: 110,
+              cls: 'relais-lang',
+              renderer: me.langRenderer,
+              dataIndex: 'relaisLang',
+              tooltip: me.text_cols.relaisLang,
+              text: me.text_cols.relaisLang,
+              sortable: false
+          },{
+              xtype: 'gridcolumn',
+              width: 110,
+              cls: 'target-lang',
+              renderer: me.langRenderer,
+              dataIndex: 'targetLang',
+              tooltip: me.text_cols.targetLang,
+              text: me.text_cols.targetLang,
+              sortable: false
+          },{
+              xtype: 'owncheckcolumn',
+              cls: 'ref-files',
+              width: 45,
+              dataIndex: 'referenceFiles',
+              tooltip: me.text_cols.referenceFiles,
+              text: me.text_cols.referenceFiles
+          },{
+              xtype: 'owncheckcolumn',
+              width: 45,
+              cls: 'terminologie',
+              dataIndex: 'terminologie',
+              tooltip: me.text_cols.terminologie,
+              text: me.text_cols.terminologie
+          },{
+              xtype: 'gridcolumn',
+              width: 45,
+              renderer: function(v, meta, rec){
+                  if(v == 0) {
+                      return '<b>'+v+' !</b>';
+                  }
+                  return v;
+              },
+              tdCls: 'task-users',
+              cls: 'task-users',
+              dataIndex: 'userCount',
+              tooltip: me.text_cols.users,
+              text: me.text_cols.users
+          },{
+              xtype: 'gridcolumn',
+              width: 135,
+              dataIndex: 'pmName',
+              renderer: function(v, meta) {
+                  meta.tdAttr = 'data-qtip="' + v + '"';
+                  return v;
+              },
+              text: me.text_cols.pmGuid
+          },{
+              xtype: 'datecolumn',
+              width: 100,
+              dataIndex: 'orderdate',
+              text: me.text_cols.orderdate
+          },{
+              xtype: 'datecolumn',
+              width: 120,
+              dataIndex: 'targetDeliveryDate',
+              text: me.text_cols.targetDeliveryDate
+          },{
+              xtype: 'datecolumn',
+              width: 120,
+              dataIndex: 'realDeliveryDate',
+              text: me.text_cols.realDeliveryDate
+          },{
+              xtype: 'owncheckcolumn',
+              width: 45,
+              cls: 'fullMatchEdit',
+              hidden: true,
+              dataIndex: 'edit100PercentMatch',
+              tooltip: me.text_cols.fullMatchEdit,
+              text: me.text_cols.fullMatchEdit
+          },{
+              xtype: 'owncheckcolumn',
+              hidden: ! Editor.data.enableSourceEditing,
+              hideable: Editor.data.enableSourceEditing,
+              width: 55,
+              cls: 'source-edit',
+              dataIndex: 'enableSourceEditing',
+              tooltip: me.text_cols.enableSourceEditing,
+              text: me.text_cols.enableSourceEditing
+          }],
+          dockedItems: [{
+              xtype: 'toolbar',
+              dock: 'top',
+              items: [{
+                  xtype: 'button',
+                  iconCls: 'ico-task-add',
+                  itemId: 'add-task-btn',
+                  text: me.strings.addTask,
+                  hidden: ! Editor.app.authenticatedUser.isAllowed('editorAddTask'),
+                  tooltip: me.strings.addTaskTip
+              },{
+                  xtype: 'button',
+                  iconCls: 'ico-refresh',
+                  itemId: 'reload-task-btn',
+                  text: me.strings.reloadBtn,
+                  tooltip: me.strings.reloadBtnTip
+              }]
+            },{
+                xtype: 'pagingtoolbar',
+                store: 'admin.Tasks',
+                dock: 'bottom',
+                displayInfo: true
+            }]
+        };
+        
+        if(Editor.data.debug && Editor.data.debug.showTaskGuid) {
+            config.columns.unshift({
+                xtype: 'gridcolumn',
+                width: 60,
+                dataIndex: 'id',
+                text: 'id'
+            },{
+                xtype: 'gridcolumn',
+                width: 240,
+                dataIndex: 'taskGuid',
+                text: 'taskGuid'
+            });
+        }
+        if (instanceConfig) {
+            me.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
   },
   /**
    * prepares (merges) the states, and cache it internally
