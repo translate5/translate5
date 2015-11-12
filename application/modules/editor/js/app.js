@@ -75,51 +75,48 @@ Ext.override(Ext.app.Application, {
 });
 
 Editor.DATE_ISO_FORMAT = 'Y-m-d H:i:s';
-
+/**
+ * @event editorViewportClosed
+ * Fires after the editor viewport was destroyed and before the other viewport is created.
+ */
+/**
+ * @event adminViewportClosed
+ * Fires after the admin viewport was destroyed and before the other viewport is created.
+ */
+/**
+ * @event editorViewportOpened
+ * Fires after the editor viewport was opened by the app (nothing to do with ext rendered or show).
+ */
+/**
+ * @event adminViewportOpened
+ * Fires after the admin viewport was opened by the app (nothing to do with ext rendered or show).
+ */
 Ext.application({
   name : 'Editor',
   models : [ 'File', 'Segment', 'admin.User' ],
   stores : [ 'Files', 'Segments', 'AlikeSegments' ],
-  requires: ['Editor.view.ViewPortEditor', Editor.data.app.viewport, 'Editor.model.ModelOverride'],
+  requires: ['Editor.view.ViewPort', Editor.data.app.viewport, 'Editor.model.ModelOverride'],
   controllers: Editor.data.app.controllers,
   beforeUnloadCalled : false,//stellt sicher, dass aufgrund von Wechselwirkungen bei einem per JS aus einem anderen Fenster heraus getriggerten window.close die unload-Frage nicht zweimal kommt
   appFolder : Editor.data.appFolder,
   viewport: null,
+  init: function() {
+      //enable json in our REST interface
+      Ext.Ajax.setDefaultHeaders({
+          'Accept': 'application/json'
+      });
+      this.callParent(arguments);
+  },
   launch : function() {
       var me = this;
-      this.addEvents(
-          /**
-           * @event editorViewportClosed
-           * Fires after the editor viewport was destroyed and before the other viewport is created.
-           */
-          'editorViewportClosed',
-          
-          /**
-           * @event adminViewportClosed
-           * Fires after the admin viewport was destroyed and before the other viewport is created.
-           */
-          'adminViewportClosed',
-          
-          /**
-           * @event editorViewportOpened
-           * Fires after the editor viewport was opened by the app (nothing to do with ext rendered or show).
-           */
-          'editorViewportOpened',
-          
-          /**
-           * @event adminViewportOpened
-           * Fires after the admin viewport was opened by the app (nothing to do with ext rendered or show).
-           */
-          'adminViewportOpened'
-      );
-      
     Ext.QuickTips.init();
     //Anbindung des Handlers für CRQ 92 warnOnClose
     window.onbeforeunload = Ext.bind(me.onBeforeUnload, me);
     me.authenticatedUser = Ext.create('Editor.model.admin.User', Editor.data.app.user);
     me[Editor.data.app.initMethod]();
     
-    Editor.MessageBox.showInitialMessages();
+    //ext6 deactivated until refactoring:
+    //Editor.MessageBox.showInitialMessages();
   },
   //Handler für CRQ 92 warnOnClose
   onBeforeUnload: function(e) {
