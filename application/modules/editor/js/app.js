@@ -115,8 +115,7 @@ Ext.application({
     me.authenticatedUser = Ext.create('Editor.model.admin.User', Editor.data.app.user);
     me[Editor.data.app.initMethod]();
     
-    //ext6 deactivated until refactoring:
-    //Editor.MessageBox.showInitialMessages();
+    Editor.MessageBox.showInitialMessages();
   },
   //Handler für CRQ 92 warnOnClose
   onBeforeUnload: function(e) {
