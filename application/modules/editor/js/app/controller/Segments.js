@@ -135,7 +135,6 @@ Ext.define('Editor.controller.Segments', {
               
               me.handleF2KeyPress();
               me.disableAltPlusNumberKeySeq();
-              me.disableCtrlPageUpDownKeySeq();
         },
         selectionchange: me.handleSegmentSelectionChange,
         columnhide: me.handleColumnVisibility,
@@ -149,17 +148,6 @@ Ext.define('Editor.controller.Segments', {
         click: me.clearSortAndFilter
       }
     });
-  },
-  disableCtrlPageUpDownKeySeq: function() {
-      var map = new Ext.util.KeyMap(Ext.getDoc(), [{
-          key: [Ext.EventObject.PAGE_UP, Ext.EventObject.PAGE_DOWN, Ext.EventObject.NUM_THREE, Ext.EventObject.NUM_NINE],
-          ctrl: true,
-          scope: this,
-          fn: function(key, e){
-              e.preventDefault();
-              e.stopEvent();
-          }
-    }]);
   },
   disableAltPlusNumberKeySeq: function() {
       var map = new Ext.util.KeyMap(Ext.getDoc(), [{
