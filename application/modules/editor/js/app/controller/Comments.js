@@ -483,8 +483,23 @@ Ext.define('Editor.controller.Comments', {
    * Handles the click on the button in the comment displayfield
    */
   handleEditorCommentBtn: function() {
-      var me = this;
-      me.getCommentWindow().expand();
+      var me = this,
+          win = me.getCommentWindow(),
+          form = me.getCommentForm(),
+          area = form.down('textarea');
+      if (win.collapsed)
+      {
+          win.expand();
+      }
+      else
+      {
+          // Angel Naydenov 12.11.2015: this not work :-(
+          if (area.rendered && area.isVisible())
+          {
+              area.selectText();
+              area.focus(false, 500);
+          }
+      }
   },
   /**
    * updates the tooltip in the comment displayfield

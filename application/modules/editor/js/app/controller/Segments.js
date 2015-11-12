@@ -134,6 +134,10 @@ Ext.define('Editor.controller.Segments', {
               //@todo should be replaced with Event Domains after update to ExtJS >4.2
               me.getSegmentsStore().on('load', me.invalidatePager, me);
               me.getSegmentsStore().on('load', me.refreshGridView, me);
+              
+              me.handleF2KeyPress();
+              me.disableAltPlusNumberKeySeq();
+              me.disableCtrlPageUpDownKeySeq();
         },
         selectionchange: me.handleSegmentSelectionChange,
         columnhide: me.handleColumnVisibility,
@@ -148,70 +152,64 @@ Ext.define('Editor.controller.Segments', {
       }
     });
   },
-  initKeymap: function() {
-      new Ext.util.KeyMap(Ext.getDoc(), [{
-          key: Ext.EventObject.F2,
-          ctrl: false,
-          alt: false,
+  disableCtrlPageUpDownKeySeq: function() {
+      var map = new Ext.util.KeyMap(Ext.getDoc(), [{
+          key: [Ext.EventObject.PAGE_UP, Ext.EventObject.PAGE_DOWN, Ext.EventObject.NUM_THREE, Ext.EventObject.NUM_NINE],
+          ctrl: true,
           scope: this,
-          fn: this.handleF2KeyPress
-      },{
-          // Angel Naydenov 22.10.2015: This shortcut cannot be captured in Chrome
-          key: "N",
-          ctrl:true,
-          shift:true,
-          scope: this,
-          fn: this.handleAddCommentKey
-      }]);
-  },
-  handleAddCommentKey: function(key, e) {
-      var me = this,
-          grid = me.getSegmentGrid(),
-          selModel = grid && grid.getSelectionModel();
-
-      e.preventDefault();
-      e.stopEvent();
-      
-      if(!grid){
-          return;
-      }
-      
-      if (selModel.hasSelection()) {
-          var selectedRecord = selModel.getLastSelected(),
-              node = grid.view.getNode(selectedRecord),
-              imgs = Ext.get(node).query('.comments-field img.add,.comments-field img.edit', false);
-          Ext.each(imgs, function(img) {
-              img.click();
-          });
-      }
-  },
-  handleF2KeyPress: function(key, e) {
-      var me = this,
-          grid = me.getSegmentGrid();
-
-      e.preventDefault();
-      e.stopEvent();
-      
-      if(!grid){
-          return;
-      }
-      
-      var edCtrl = me.application.getController('Editor'),
-          ed = edCtrl.getEditPlugin(),
-          selModel = grid.getSelectionModel();
-          cols = grid.query('.contentEditableColumn:not([hidden])'),
-          sel = [];
-    
-      if (ed.openedRecord === null) {
-          if (!selModel.hasSelection()) {
-            grid.selectOrFocus(0);
+          fn: function(key, e){
+              e.preventDefault();
+              e.stopEvent();
           }
-          sel = selModel.getSelection();
-          ed.startEdit(sel[0], cols[0]);
-      }
-      else {
-        ed.editor.mainEditor.deferFocus();
-      }
+    }]);
+  },
+  disableAltPlusNumberKeySeq: function() {
+      var map = new Ext.util.KeyMap(Ext.getDoc(), [{
+          key: [48, 49, 50, 51, 52, 53, 54, 55, 56, 57],
+          ctrl: false,
+          alt: true,
+          shift:false,
+          scope: this,
+          fn: function(key, e){
+              e.preventDefault();
+              e.stopEvent();
+          }
+    }]);
+  },
+  handleF2KeyPress: function() {
+      var map = new Ext.util.KeyMap(Ext.getDoc(), [{
+        key: Ext.EventObject.F2,
+        ctrl: false,
+        alt: false,
+        scope: this,
+        fn: function(key, e){
+            //console.log('ENTER');
+            e.preventDefault();
+            e.stopEvent();
+            
+            var me = this,
+                edCtrl = me.application.getController('Editor'),
+                grid = me.getSegmentGrid(),
+                selModel = grid.getSelectionModel(),
+                ed = edCtrl.getEditPlugin(),
+                cols = grid.query('.contentEditableColumn:not([hidden])'),
+                sel = [];
+            
+            if (ed.openedRecord === null)
+            {
+                if (!selModel.hasSelection())
+                {
+                    grid.selectOrFocus(edCtrl.getNextEditableSegmentOffset(0));
+                }
+                sel = selModel.getSelection();
+                ed.startEdit(sel[0], cols[0]);
+            }
+            else
+            {
+                ed.editor.mainEditor.deferFocus();
+            }
+        }
+    }]);
   },
   loadSegments: function() {
       this.handleFilterChange(); //load filemap

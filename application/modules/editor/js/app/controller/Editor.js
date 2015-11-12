@@ -153,21 +153,23 @@ Ext.define('Editor.controller.Editor', {
       }, {
           key: Ext.EventObject.LEFT,
           ctrl:true,
+          alt: true,
           scope: me,
           fn: me.goToLeft
       }, {
           key: Ext.EventObject.RIGHT,
           ctrl:true,
+          alt: true,
           scope: me,
           fn: me.goToRight
       }, {
-          key: Ext.EventObject.UP,
+          key: Ext.EventObject.PAGE_UP,
           ctrl:true,
           alt:false,
           scope: me,
           fn: me.goToUpperByWorkflowNoSave
       }, {
-          key: Ext.EventObject.DOWN,
+          key: Ext.EventObject.PAGE_DOWN,
           ctrl:true,
           alt:false,
           scope: me,
@@ -228,10 +230,9 @@ Ext.define('Editor.controller.Editor', {
               me.fireEvent('assignMQMTag', param);
           }
       }, {
-          // Angel Naydenov 22.10.2015: This shortcut cannot be captured in Chrome
-          key: "N",
+          key: "C",
           ctrl:true,
-          shift:true,
+          alt:true,
           fn: function(key, e){
               e.preventDefault();
               e.stopEvent();
@@ -315,16 +316,20 @@ Ext.define('Editor.controller.Editor', {
    * Moves to the next row with the same workflow value without saving current record
    * @return {Boolean} true if there is a next segment, false otherwise
    */
-  goToLowerByWorkflowNoSave: function() {
+  goToLowerByWorkflowNoSave: function(key, e) {
       var me = this;
+      e.preventDefault();
+      e.stopEvent();
       return me.moveToAdjacentRow(1, this.messages.gridEndReached, this.workflowStepFilter);
   },
   /**
    * Moves to the previous row with the same workflow value without saving current record
    * @return {Boolean} true if there is a next segment, false otherwise
    */
-  goToUpperByWorkflowNoSave: function() {
+  goToUpperByWorkflowNoSave: function(key, e) {
       var me = this;
+      e.preventDefault();
+      e.stopEvent();
       return me.moveToAdjacentRow(-1, this.messages.gridStartReached, this.workflowStepFilter);
   },
   /**
@@ -378,6 +383,30 @@ Ext.define('Editor.controller.Editor', {
       //our filtering stuff
       var stepNr = newRec.get('workflowStepNr');
       return stepNr == 0 || stepNr < Editor.data.task.get('workflowStep');
+  },
+  /**
+   * Gets the next editable segment offset relative to param offset
+   * @param integer offset
+   **/
+  getNextEditableSegmentOffset: function(offset, isEditable) {
+      var me = this,
+      grid = me.getSegmentGrid(),
+      store = grid.store,
+      origOffset = offset,
+      rec = store.getAt(offset);
+      
+      isEditable = (Ext.isFunction(isEditable) ? isEditable : function(){ return true; });
+      do
+      {
+          if (rec && rec.get('editable') && isEditable(rec))
+          {
+              return offset;
+          }
+          offset++;
+          rec = store.getAt(offset);
+      } while (rec);
+      // no editable segment
+      return origOffset;
   },
   /**
    * go to other row
@@ -514,24 +543,28 @@ Ext.define('Editor.controller.Editor', {
   /**
    * Move the editor about one editable field left
    */
-  goToLeft: function() {
+  goToLeft: function(key, e) {
     var me = this,
         direction = -1;
     if(!me.isEditing) {
         return;
     }
-    me.goToCustom(direction, true);    
+    e.preventDefault();
+    e.stopEvent();
+    me.goToCustom(direction, true);
   },
   /**
    * Move the editor about one editable field right
    */
-  goToRight: function() {
+  goToRight: function(key, e) {
     var me = this,
         direction = 1;
     if(!me.isEditing) {
         return;
     }
-    me.goToCustom(direction, true);    
+    e.preventDefault();
+    e.stopEvent();
+    me.goToCustom(direction, true);
   },
   /**
    * returns the visible columns and which column has actually the editor
