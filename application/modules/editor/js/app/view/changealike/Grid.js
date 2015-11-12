@@ -39,14 +39,14 @@ END LICENSE AND COPYRIGHT
  * @extends Editor.view.ui.changealike.Grid
  */
 Ext.define('Editor.view.changealike.Grid', {
-  requires: ['Editor.view.changealike.GridFilter'],
+  //requires: ['Editor.view.changealike.GridFilter'],
   extend: 'Editor.view.ui.changealike.Grid',
   alias: 'widget.changealikeGrid',
   store: 'AlikeSegments',
   id: 'changealike-grid',
-  features: [{
-    ftype: 'alikeGridFilter'
-  }],
+  //features: [{
+    //ftype: 'alikeGridFilter'
+  //}],
   /**
    * sets and displays the records given as loaded operation, does also selectAll items
    * @param {Editor.model.AlikeSegment} records

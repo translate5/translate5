@@ -69,7 +69,8 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.controller.Segments', {
   extend : 'Ext.app.Controller',
   stores: ['Segments'],
-  views: ['segments.Scroller', 'segments.RowEditing', 'segments.HtmlEditor', 'segments.GridFilter'],
+  //views: ['segments.Scroller', 'segments.RowEditing', 'segments.HtmlEditor', 'segments.GridFilter'],
+  views: ['segments.RowEditing', 'segments.HtmlEditor'],
   messages: {
     segmentSaved: 'Das Segment wurde gespeichert!',
     sortCleared: 'Die gewählte Sortierung der Segmente wurde zurückgesetzt!',
@@ -99,6 +100,62 @@ Ext.define('Editor.controller.Segments', {
       ref : 'resetFilterBtn',
       selector : '#clearSortAndFilterBtn'
   }],
+  listen: {
+      global: { //FIXME ext6 can be moved to a controller??? or remains in global?
+          editorViewportClosed: 'clearSegments'
+      },
+      controller: {
+          'MetaPanel': {
+              saveSegment: 'saveChainStart'
+          },
+          'ChangeAlike': {
+              //called after load of cahnge alikes to a segment
+              fetchChangeAlikes: 'onFetchChangeAlikes',
+              //called after currently loaded segment data is not used anymore by the save chain / change alike handling
+              segmentUsageFinished: 'onSegmentUsageFinished'
+          }
+      },
+      component: {
+          '#segmentgrid .headercontainer' : {
+              sortchange: 'scrollGridToTop'
+          },
+          '#segmentgrid .gridview' : {
+              beforerefresh: 'editorDomCleanUp'
+          },
+          '#segmentgrid' : {
+              afterrender: function(grid) {
+                  var me = this,
+                      ro = Editor.data.task && Editor.data.task.isReadOnly();
+                  grid.setTitle(ro ? grid.title_readonly : grid.title);
+                  //FIXME ext6 disabled because of missing filters!
+                  //me.styleResetFilterButton(grid.filters);
+                  
+                  //moved the store handler into after grid render, because of 
+                  //the fluent reconfiguration of the model and late instanciation of the store.
+                  //@todo should be replaced with Event Domains after update to ExtJS >4.2
+                  //FIXME ext6 perhaps not possible to migrate to event domains, perhaps not needed anymore at all!
+                  me.getSegmentsStore().on('load', me.invalidatePager, me);
+                  me.getSegmentsStore().on('load', me.refreshGridView, me);
+              },
+              selectionchange: 'handleSegmentSelectionChange',
+              columnhide: 'handleColumnVisibility',
+              columnshow: 'handleColumnVisibility',
+              filterupdate: 'handleFilterChange'
+          },
+          '#fileorderTree': {
+              selectionchange: 'handleFileSelectionChange'
+          },
+          '#clearSortAndFilterBtn': {
+              click: 'clearSortAndFilter'
+          }
+      },
+      store: {
+          'Files': {
+              write: 'reloadGrid'
+          }
+      }
+  },
+  /* FIXME START ext6 deactivated and migrated to listener object, keeping for debugging reference until update is done! 
   init : function() {
       var me = this, 
           mpCtrl = me.application.getController('MetaPanel'),
@@ -146,10 +203,12 @@ Ext.define('Editor.controller.Segments', {
       }
     });
   },
+    /* FIXME END ext6 deactivated and migrated to listener object, keeping for debugging reference until update is done! */
   loadSegments: function() {
       this.handleFilterChange(); //load filemap
       //initiales Laden des Stores:
-      this.getSegmentsStore().guaranteeRange(0, 199);
+      //FIXME ext6: disabled because is done in another way now!
+      //this.getSegmentsStore().guaranteeRange(0, 199);
   },
   clearSegments: function() {
       var store = this.getSegmentsStore();
@@ -162,7 +221,8 @@ Ext.define('Editor.controller.Segments', {
   updateFilteredCountDisplay: function(newTotal) {
     var btn_text = this.getSegmentGrid().item_clearSortAndFilterBtn;
     btn_text = Ext.String.format('{0} ({1})', btn_text, newTotal);
-    this.getResetFilterBtn().setText(btn_text);
+    //FIXME ext6 commented out since not found
+    //this.getResetFilterBtn().setText(btn_text);
   },
   refreshGridView: function() {
     this.getSegmentGrid().getView().refresh();
@@ -232,6 +292,8 @@ Ext.define('Editor.controller.Segments', {
    * @return void
    */
   handleFilterChange: function(filterFeature) {
+      //FIXME ext6 disabled because of missing filters and changed store structure!
+      return;
       var me = this,
           params = filterFeature ? filterFeature.buildQuery(filterFeature.getFilterData()) : '';
           

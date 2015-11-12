@@ -205,7 +205,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       }
   },
   handleInitEditor: function() {
-      this.getHeadToolBar().down('#task-admin-btn').hide();
+      console.log('Editor.controller.admin.TaskOverview::handleInitEditor');
+      //FIXME ext6 missing toolbar
+      //this.getHeadToolBar().down('#task-admin-btn').hide();
   },
   clearTasks: function() {
       this.getAdminTasksStore().removeAll();

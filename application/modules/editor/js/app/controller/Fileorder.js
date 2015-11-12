@@ -67,12 +67,14 @@ Ext.define('Editor.controller.Fileorder', {
   loadFileTree: function() {
       this.getFilesStore().load({
           manualLoaded: true,
+          scope: this.getFilesStore(),
           callback: function() {
               this.getRootNode().expand();
           }
       });
       this.getReferenceFilesStore().load({
           manualLoaded: true,
+          scope: this.getReferenceFilesStore(),
           callback: function() {
               this.getRootNode().expand();
           }

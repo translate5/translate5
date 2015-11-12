@@ -98,6 +98,7 @@ Ext.define('Editor.model.admin.Task', {
     }
   },
   /**
+   * FIXME ext6 update, recheck the following usage of "modified" field, since this was changed in ext6
    * 1. ensures that entityVersion is always send to the server!
    * 2. ensures that the userState is send to the server, after setting it to the same value and is therefore normally not modified.
    * ExtJS sends per default only modified fields, this can lead to errors here.
@@ -108,6 +109,9 @@ Ext.define('Editor.model.admin.Task', {
    */
   set: function(field, value) {
       var res = this.callParent(arguments);
+      if(!this.modified) {
+          this.modified = {}; //FIXME workaround for ext6, since not defined anymore by default
+      }
       if(field == 'userState' && !this.modified.userState) {
           this.modified.userState = value;
       }

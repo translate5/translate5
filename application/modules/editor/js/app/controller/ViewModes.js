@@ -207,25 +207,29 @@ Ext.define('Editor.controller.ViewModes', {
    */
   editMode: function(calledOnInit) {
     var me = this;
-    me.getViewModeMenu().hideMenu();
-    me.getSegmentGrid().removeCls(me.self.MODE_ERGONOMIC);
-    if(me.self.isErgonomicMode()){
-        me.showNonErgonomicElements();
-    }
-    me.getShortTagBtn().toggle(true);
-    me.showShortTags();
-    me.getHideTagBtn().disable();
+    //FIXME ext6 missing ViewModes
+    //me.getViewModeMenu().hideMenu();
+    //me.getSegmentGrid().removeCls(me.self.MODE_ERGONOMIC);
+    //if(me.self.isErgonomicMode()){
+    //    me.showNonErgonomicElements();
+    //}
+    //me.getShortTagBtn().toggle(true);
+    //me.showShortTags();
+    //me.getHideTagBtn().disable();
     if(calledOnInit === true) {
         // is needed to initilize the grid filters (createFilters method) correctly:
-        me.getSegmentGrid().headerCt.getMenu(); 
+        //FIXME ext6 missing filters
+        //me.getSegmentGrid().headerCt.getMenu(); 
     }
     else {
         Ext.Array.each(me.getHideColumns(), function(col){
             col.show();
         });
     }
-    me.getSegmentGrid().editingPlugin.enable();
-    me.self.setViewMode(me.self.MODE_EDIT);
+    //FIXME ext6 missing plugin
+    //me.getSegmentGrid().editingPlugin.enable();
+    //FIXME ext6 missing ViewModes
+    //me.self.setViewMode(me.self.MODE_EDIT);
   },
   /**
    * activates the ergonomic mode of the grid (source and edit-column enlarged, all other columns hidden; file-area hidden)

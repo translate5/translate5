@@ -115,15 +115,17 @@ Ext.define('Editor.controller.HeadPanel', {
    * shows the sub components needed by the editor (hide others)
    */
   handleInitEditor: function() {
+      //FIXME ext6 disable this method because of to much errors
+      return;
       var hp = this.getHeadPanel(),
           data = {
               user: Editor.app.authenticatedUser.data,
               task: Editor.data.task.data,
               showTaskGuid: Editor.data.debug && Editor.data.debug.showTaskGuid,
-              taskLabel: hp.strings.task,
-              userLabel: hp.strings.loggedinAs,
-              loginLabel: hp.strings.loginName,
-              readonlyLabel: hp.strings.readonly,
+              taskLabel: 'FIXME #UT# texts', //FIXME ext6 hp.strings.task,
+              userLabel: 'FIXME #UT# texts', //FIXME ext6 hp.strings.loggedinAs,
+              loginLabel: 'FIXME #UT# texts', //FIXME ext6 hp.strings.loginName,
+              readonlyLabel: 'FIXME #UT# texts', //FIXME ext6 hp.strings.readonly,
               isReadonly: Editor.data.task.isReadOnly()
           };
       hp.down('#infoPanel').update(data);
