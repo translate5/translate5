@@ -279,7 +279,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $controllers = array();
         //$controllers[] = 'ServerException';
         //$controllers[] = 'ViewModes';
-        //$controllers[] = 'Segments';
+        $controllers[] = 'Segments';
         //$controllers[] = 'Preferences';
         //$controllers[] = 'MetaPanel';
         //$controllers[] = 'Fileorder';
