@@ -430,8 +430,10 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       var me = this,
           t = ev.getTarget(),
           f = t.className.match(/ico-task-([^ ]+)/),
-          camelRe = Ext.Element.camelRe,
-          camelFn = Ext.Element.camelReplaceFn,
+          camelRe = /(-[a-z])/gi,
+          camelFn = function(m, a) {
+              return a.charAt(1).toUpperCase();
+          },
           actionIdx = ((f && f[1]) ? f[1] : "not-existing"),
           //build camelized action out of icon css class:
           action = ('handleTask-'+actionIdx).replace(camelRe, camelFn),

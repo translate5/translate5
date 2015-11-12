@@ -34,9 +34,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.view.ViewPort', {
     extend: 'Ext.container.Viewport',
-    layout: {
-        type: 'border'
-    },
+    layout: 'border',
     initComponent: function() {
         var me = this,
             items = [{
