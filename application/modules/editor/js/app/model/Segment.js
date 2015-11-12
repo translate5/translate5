@@ -38,97 +38,93 @@ END LICENSE AND COPYRIGHT
  * @class Editor.model.Segment
  * @extends Ext.data.Model
  * @param {Array|Ext.data.Store} Segment Field Definitions. As Array: ready to use field config. As Store: segment fields store!
- * 
- * redefinition algorithm tested in 4.0.7 and 4.2
  */
-if(!Editor.model) {
-    Editor.model = {};
-}
-Editor.model._Segment = function(fields) {
-    if(fields instanceof Ext.data.Store) {
-        var newFields = [];
-        fields.each(function(rec) {
-            newFields.push({name: rec.get('name'), type: 'string'});
-            if(rec.get('editable')) {
-                newFields.push({name: rec.get('name')+'Edit', type: 'string'});
-            }
-        });
-        fields = Ext.Array.merge(Editor.model._Segment.defaultFields, newFields);
-    }
-    else {
-        Editor.model._Segment.defaultFields = fields;
-    }
-    Ext.define('Editor.model.Segment', {
-        statics: {
-            redefine: Editor.model._Segment
-        },
-        extend: 'Ext.data.Model',
-        fields: fields,
-        idProperty: 'id',
-        proxy : {
-            type : 'rest',
-            url: Editor.data.restpath+'segment',
-            reader : {
-                rootProperty: 'rows',
-                //FIXME ext6 update: the readRecords method can not be overriden!
-                //intercept readRecords method to set segments meta info only on store reads, not on plain model reads
-                FIXMEreadRecords: function(data) {
-                    if(data && data.firstSegmentId) {
-                        //first editiable segment, not first at all!
-                        this.firstSegmentId = data.firstSegmentId;
+Ext.define('Editor.model.Segment', {
+    statics: {
+        redefine: function(fluentFields) {
+            var me = this,
+                newFields = [];
+            if(fluentFields instanceof Ext.data.Store) {
+                fluentFields.each(function(rec) {
+                    newFields.push({name: rec.get('name'), type: 'string'});
+                    if(rec.get('editable')) {
+                        newFields.push({name: rec.get('name')+'Edit', type: 'string'});
                     }
-                    if(data && data.lastSegmentId) {
-                        //last editiable segment, not first at all!
-                        this.lastSegmentId = data.lastSegmentId;
-                    }
-                    return this.self.prototype.readRecords.apply(this, arguments);
-                },
-                type : 'json'
-            },
-            writer: {
-                encode: true,
-                rootProperty: 'data',
-                writeAllFields: false
+                });
+                fluentFields = newFields;
             }
-        },
-        /**
-         * konvertiert die serverseitig als string gespeicherte QM Liste in ein Array
-         * @returns Integer[]
-         */
-        getQmAsArray: function (){
-            return Ext.Array.map(this.get('qmId').replace(/^[;]+|[;]+$/g, '').split(';'), function(item){
-                return parseInt(item);
+            console.log("Editor.model.Segment::redefine → BEFORE", fluentFields);
+            me.replaceFields(fluentFields, me.previousFluentFields);
+            console.log("Editor.model.Segment::redefine → AFTER", fluentFields);
+            me.previousFluentFields = fluentFields.map(function(item){
+                return item.name;
             });
-        },
-        /**
-         * konvertiert ein Array mit QmIds zurück in das serverseitig benötigte String Format
-         * @param {Integer[]} qmArray
-         */
-        setQmFromArray: function (qmArray){
-            if(qmArray.length > 0){
-                this.set('qmId', ';'+qmArray.sort().join(';')+';');
-            }
-            else {
-                this.set('qmId', '');
-            }
+            console.log("Editor.model.Segment::redefine → END", me.previousFluentFields);
         }
-    });
-};
-
-//default fields:
-Editor.model._Segment([
-    {name: 'id', type: 'int'},
-    {name: 'fileId', type: 'int'},
-    {name: 'segmentNrInTask', type: 'int'},
-    {name: 'userName', type: 'string'},
-    {name: 'timestamp', type: 'date'},
-    {name: 'editable', type: 'boolean'},
-    {name: 'autoStateId', type: 'int'},
-    {name: 'workflowStep', type: 'string'},
-    {name: 'matchRate', type: 'int'},
-    //{name: 'terms', type: 'string'},
-    {name: 'durations', defaultValue: {}}, //we are using an object here
-    {name: 'comments', type: 'string', persist: false},
-    {name: 'qmId', type: 'string'},
-    {name: 'stateId', type: 'int'}
-]);
+    },
+    extend: 'Ext.data.Model',
+    fields: [
+        {name: 'id', type: 'int'},
+        {name: 'fileId', type: 'int'},
+        {name: 'segmentNrInTask', type: 'int'},
+        {name: 'userName', type: 'string'},
+        {name: 'timestamp', type: 'date'},
+        {name: 'editable', type: 'boolean'},
+        {name: 'autoStateId', type: 'int'},
+        {name: 'workflowStep', type: 'string'},
+        {name: 'matchRate', type: 'int'},
+        //{name: 'terms', type: 'string'},
+        {name: 'durations', defaultValue: {}}, //we are using an object here
+        {name: 'comments', type: 'string', persist: false},
+        {name: 'qmId', type: 'string'},
+        {name: 'stateId', type: 'int'}
+    ],
+    idProperty: 'id',
+    proxy : {
+        type : 'rest',
+        url: Editor.data.restpath+'segment',
+        reader : {
+            rootProperty: 'rows',
+            //FIXME ext6 update: the readRecords method can not be overriden!
+            //intercept readRecords method to set segments meta info only on store reads, not on plain model reads
+            FIXMEreadRecords: function(data) {
+                if(data && data.firstSegmentId) {
+                    //first editiable segment, not first at all!
+                    this.firstSegmentId = data.firstSegmentId;
+                }
+                if(data && data.lastSegmentId) {
+                    //last editiable segment, not first at all!
+                    this.lastSegmentId = data.lastSegmentId;
+                }
+                return this.self.prototype.readRecords.apply(this, arguments);
+            },
+            type : 'json'
+        },
+        writer: {
+            encode: true,
+            rootProperty: 'data',
+            writeAllFields: false
+        }
+    },
+    /**
+     * konvertiert die serverseitig als string gespeicherte QM Liste in ein Array
+     * @returns Integer[]
+     */
+    getQmAsArray: function (){
+        return Ext.Array.map(this.get('qmId').replace(/^[;]+|[;]+$/g, '').split(';'), function(item){
+            return parseInt(item);
+        });
+    },
+    /**
+     * konvertiert ein Array mit QmIds zurück in das serverseitig benötigte String Format
+     * @param {Integer[]} qmArray
+     */
+    setQmFromArray: function (qmArray){
+        if(qmArray.length > 0){
+            this.set('qmId', ';'+qmArray.sort().join(';')+';');
+        }
+        else {
+            this.set('qmId', '');
+        }
+    }
+});
