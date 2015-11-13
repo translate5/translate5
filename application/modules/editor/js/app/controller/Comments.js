@@ -110,9 +110,10 @@ Ext.define('Editor.controller.Comments', {
   initEditPluginHandler: function() {
       var me = this;
     //Diese Events können erst in onlauch gebunden werden, in init existiert das Plugin noch nicht
-      me.getEditPlugin().on('beforeedit', me.onStartEdit, me);
-      me.getEditPlugin().on('canceledit', me.cancelEdit, me);
-      me.getEditPlugin().on('edit', me.cancelEdit, me);
+    //FIXME ext6 disabled
+      //me.getEditPlugin().on('beforeedit', me.onStartEdit, me);
+      //me.getEditPlugin().on('canceledit', me.cancelEdit, me);
+      //me.getEditPlugin().on('edit', me.cancelEdit, me);
   },
   cancelEdit: function() {
       this.handleAddComment();

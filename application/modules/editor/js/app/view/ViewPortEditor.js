@@ -41,11 +41,11 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.ViewPortEditor', {
     extend: 'Ext.container.Viewport',
     requires: [
-      //'Editor.view.fileorder.Tree',
-      //'Editor.view.fileorder.ReferenceTree',
-      //'Editor.view.segments.Grid'//,
-      //'Editor.view.segments.MetaPanelNavi',
-      //'Editor.view.segments.MetaPanel'
+      'Editor.view.fileorder.Tree',
+      'Editor.view.fileorder.ReferenceTree',
+      'Editor.view.segments.Grid',
+      'Editor.view.segments.MetaPanelNavi',
+      'Editor.view.segments.MetaPanel'
     ],
 
     layout: {
@@ -75,23 +75,19 @@ Ext.define('Editor.view.ViewPortEditor', {
                   itemId: 'metapanel',
                   layout: {type:'accordion'},
                   dockedItems: [{
-                      //xtype: 'metapanelNavi',
-                      xtype: 'panel',
+                      xtype: 'metapanelNavi',
                       dock: 'top'
                   }],
                   items: [{
-                      //xtype: 'segmentsMetapanel'
-                      xtype: 'panel'
+                      xtype: 'segmentsMetapanel'
                   },{
-                      //xtype: 'commentWindow'
-                      xtype: 'panel'
+                      xtype: 'commentWindow'
                   }]
               }],
               width: 260
           },{
               region: 'center',
-              //xtype: 'segments.grid',
-              xtype: 'panel',
+              xtype: 'segments.grid',
               itemId: 'segmentgrid'
           },{
               xtype: 'panel',
@@ -105,11 +101,9 @@ Ext.define('Editor.view.ViewPortEditor', {
               region: 'west',
               itemId: 'filepanel',
               items: [{
-                  xtype: 'panel'
-                //xtype: 'fileorder.tree'
+                  xtype: 'fileorder.tree'
               },{
-                  xtype: 'panel'
-                //xtype: 'referenceFileTree'
+                  xtype: 'referenceFileTree'
               }]
           }];
       Ext.applyIf(me, {
@@ -119,8 +113,7 @@ Ext.define('Editor.view.ViewPortEditor', {
     },
     getNorth: function() {
         return {
-            //xtype: 'headPanel',
-            xtype: 'panel',
+            xtype: 'headPanel',
             region: 'north'
         };
     }

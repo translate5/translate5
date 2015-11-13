@@ -94,7 +94,7 @@ Editor.DATE_ISO_FORMAT = 'Y-m-d H:i:s';
 Ext.application({
   name : 'Editor',
   models : [ 'File', 'Segment', 'admin.User' ],
-  stores : [ 'Files', 'Segments', 'AlikeSegments' ],
+  stores : [ 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments' ],
   requires: ['Editor.view.ViewPort', Editor.data.app.viewport, 'Editor.model.ModelOverride'],
   controllers: Editor.data.app.controllers,
   beforeUnloadCalled : false,//stellt sicher, dass aufgrund von Wechselwirkungen bei einem per JS aus einem anderen Fenster heraus getriggerten window.close die unload-Frage nicht zweimal kommt

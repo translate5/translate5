@@ -38,7 +38,7 @@ Ext.define('Editor.view.comments.Grid', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.commentsGrid',
   cls: 'comments-grid',
-  store: 'Comments',
+  store: 'segmentComments',
   text_edited: '#UT#bearbeitet',
   text_edit: '#UT#Bearbeiten',
   text_delete: '#UT#Löschen',
