@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 */
 
 Ext.define('Editor.view.admin.task.WorkflowStepFilter', {
-  extend: 'Ext.ux.grid.filter.ListFilter',
+  extend: 'Ext.grid.filters.filter.List',
   alias: 'gridfilter.workflowStep',
   constructor: function(config) {
       var me = this,

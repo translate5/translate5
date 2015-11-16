@@ -34,6 +34,13 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  *
  */
+             /**
+              * FIXME formatting!
+              * @event afterEditorMoved
+              * @param {String} toEdit the dataIndex of the actual edited column
+              * @param {Editor.view.segments.RowEditor} editor the rowEditor instance
+              * Fires after the html maineditor was moved to another column
+              */
 /**
  * @class Editor.view.segments.RowEditor
  * @extends Ext.grid.RowEditor
@@ -64,15 +71,6 @@ Ext.define('Editor.view.segments.RowEditor', {
         });
         me.mainEditor = me.add(new Editor.view.segments.HtmlEditor());
         
-        this.addEvents(
-             /**
-              * @event afterEditorMoved
-              * @param {String} toEdit the dataIndex of the actual edited column
-              * @param {Editor.view.segments.RowEditor} editor the rowEditor instance
-              * Fires after the html maineditor was moved to another column
-              */
-            'afterEditorMoved'
-        );
     },
     
     /**

@@ -27,6 +27,7 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+
 /**
  * Editor.controller.admin.TaskOverview encapsulates the Task Overview functionality
  * @class Editor.controller.admin.TaskOverview
@@ -86,7 +87,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },
   init : function() {
       var me = this;
-      
       
       //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
       Editor.app.on('adminViewportClosed', me.clearTasks, me);

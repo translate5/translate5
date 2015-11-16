@@ -38,20 +38,20 @@ END LICENSE AND COPYRIGHT
  * Editor.view.segments.GridFilter definiert zum einen die Filter für das Segment Grid. 
  * Zum anderen werden einige Methoden des Orginal Filters für Bugfixing überschrieben. 
  * @class Editor.view.segments.GridFilter
- * @extends Ext.ux.grid.FiltersFeature
+ * @extends Ext.grid.filters.Filters
  */
 Ext.define('Editor.view.segments.GridFilter', {
-  extend: 'Ext.ux.grid.FiltersFeature',
+  extend: 'Ext.grid.filters.Filters',
   alias: 'feature.editorGridFilter',
   requires: [
-             'Ext.ux.grid.FiltersFeature',
-             'Ext.ux.grid.menu.ListMenu',
-             'Ext.ux.grid.menu.RangeMenu',
-             'Ext.ux.grid.filter.BooleanFilter',
-             'Ext.ux.grid.filter.DateFilter',
-             'Ext.ux.grid.filter.ListFilter',
-             'Ext.ux.grid.filter.NumericFilter',
-             'Ext.ux.grid.filter.StringFilter',
+             'Ext.grid.filters.Filters',
+             //'Ext.ux.grid.menu.ListMenu',
+             //'Ext.ux.grid.menu.RangeMenu',
+             'Ext.grid.filters.filter.Boolean',
+             'Ext.grid.filters.filter.Date',
+             'Ext.grid.filters.filter.List',
+             'Ext.grid.filters.filter.Number',
+             'Ext.grid.filters.filter.String',
              'Editor.view.admin.task.WorkflowStepFilter'
              ],
   constructor: function(config) {
@@ -151,7 +151,7 @@ Ext.define('Editor.view.segments.GridFilter', {
   }
 }, function(){
     //initiere die Fixes für diverse Ext 3 Bugs in den Filtern
-    Ext.override(Ext.ux.grid.FiltersFeature, {
+    Ext.override(Ext.grid.filters.Filters, {
         //The following override fixes http://www.sencha.com/forum/showthread.php?131042
         onBeforeLoad: function(store, operations) {
           if(! operations){

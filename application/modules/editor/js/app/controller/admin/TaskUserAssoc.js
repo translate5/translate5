@@ -33,6 +33,26 @@ END LICENSE AND COPYRIGHT
  * @class Editor.controller.admin.TaskUserAssoc
  * @extends Ext.app.Controller
  */
+
+
+              /**
+               * FIXME formatting
+               * @event addUserAssoc
+               * @param {Editor.controller.admin.TaskUserAssoc} me
+               * @param {Editor.model.admin.TaskUserAssoc} rec
+               * @param {Editor.store.admin.TaskUserAssocs} store
+               * Fires after a task user assoc entry was successfully created
+               */
+              
+              /**
+               * @event removeUserAssoc
+               * @param {Editor.controller.admin.TaskUserAssoc} me
+               * @param {Editor.model.admin.TaskUserAssoc} toDel
+               * @param {Editor.store.admin.TaskUserAssocs} assoc
+               * Fires after a task user assoc entry was successfully deleted
+               */
+
+
 Ext.define('Editor.controller.admin.TaskUserAssoc', {
   extend : 'Ext.app.Controller',
   models: ['admin.TaskUserAssoc','admin.Task','admin.task.UserPref'],
@@ -65,26 +85,6 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
   init : function() {
       var me = this;
 
-      me.addEvents(
-              /**
-               * @event addUserAssoc
-               * @param {Editor.controller.admin.TaskUserAssoc} me
-               * @param {Editor.model.admin.TaskUserAssoc} rec
-               * @param {Editor.store.admin.TaskUserAssocs} store
-               * Fires after a task user assoc entry was successfully created
-               */
-              'addUserAssoc',
-              
-              /**
-               * @event removeUserAssoc
-               * @param {Editor.controller.admin.TaskUserAssoc} me
-               * @param {Editor.model.admin.TaskUserAssoc} toDel
-               * @param {Editor.store.admin.TaskUserAssocs} assoc
-               * Fires after a task user assoc entry was successfully deleted
-               */
-              'removeUserAssoc'
-      );
-      
       if(!Editor.controller.admin.TaskPreferences) {
           //controller.TaskPreferences is somekind of parent controller of controller.TaskUserAssoc so it must be loaded!
           Ext.Error.raise('TaskPreferences controller must be loaded!');

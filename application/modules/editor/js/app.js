@@ -67,12 +67,12 @@ Ext.override(Ext.menu.Item, {
     }
 });
 
-Ext.override(Ext.app.Application, {
+/*Ext.override(Ext.app.Application, {
     constructor: function() {
         Editor.app = this; //@todo remove after upgrade to extjs > 4.1.3
         this.callOverridden(arguments);
     }
-});
+});*/
 
 Editor.DATE_ISO_FORMAT = 'Y-m-d H:i:s';
 /**
@@ -109,6 +109,7 @@ Ext.application({
   },
   launch : function() {
       var me = this;
+      
     Ext.QuickTips.init();
     //Anbindung des Handlers für CRQ 92 warnOnClose
     window.onbeforeunload = Ext.bind(me.onBeforeUnload, me);

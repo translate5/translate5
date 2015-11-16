@@ -36,14 +36,14 @@ END LICENSE AND COPYRIGHT
  */
 /**
  * @class Editor.view.segments.Scroller
- * @extends Ext.grid.PagingScroller
+ * @extends Ext.grid.Scroller
  * 
  * Erweitert bzw. passt den Orginal Endless Scroller an die lokalen Gegebenheiten an:
  * - Das Orginal kann nur mit Zeilen gleicher Höhe umgehen
  * - 
  */
 Ext.define('Editor.view.segments.Scroller', {
-    extend: 'Ext.grid.PagingScroller',
+    extend: 'Ext.grid.Scroller',
     alias: 'widget.editorgridscroller',
     lastRequestedRowIndex: -1,
     percentageFromEdge: 0.4,

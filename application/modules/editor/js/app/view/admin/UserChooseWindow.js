@@ -55,7 +55,7 @@ Ext.define('Editor.view.admin.UserChooseWindow', {
                     type : 'rest',
                     url: Editor.data.restpath+'user/',
                     reader : {
-                        root: 'rows',
+                        rootProperty: 'rows',
                         type : 'json'
                     }
                 }

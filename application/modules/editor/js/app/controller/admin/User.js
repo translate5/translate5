@@ -33,6 +33,16 @@ END LICENSE AND COPYRIGHT
  * @class Editor.controller.admin.User
  * @extends Ext.app.Controller
  */
+
+
+             /**
+               * FIXME formatting
+               * @event userCreated
+               * @param {Ext.form.Panel} form
+               * Fires after a user has successfully created
+               */
+
+
 Ext.define('Editor.controller.admin.User', {
   extend : 'Ext.app.Controller',
   models: ['admin.User'],
@@ -68,14 +78,6 @@ Ext.define('Editor.controller.admin.User', {
   },
   init : function() {
       var me = this;
-      this.addEvents(
-              /**
-               * @event userCreated
-               * @param {Ext.form.Panel} form
-               * Fires after a user has successfully created
-               */
-              'userCreated'
-      );
       
       //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
       Editor.app.on('adminViewportClosed', me.clearUsers, me);
