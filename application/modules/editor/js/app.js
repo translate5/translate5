@@ -75,22 +75,7 @@ Ext.override(Ext.menu.Item, {
 });*/
 
 Editor.DATE_ISO_FORMAT = 'Y-m-d H:i:s';
-/**
- * @event editorViewportClosed
- * Fires after the editor viewport was destroyed and before the other viewport is created.
- */
-/**
- * @event adminViewportClosed
- * Fires after the admin viewport was destroyed and before the other viewport is created.
- */
-/**
- * @event editorViewportOpened
- * Fires after the editor viewport was opened by the app (nothing to do with ext rendered or show).
- */
-/**
- * @event adminViewportOpened
- * Fires after the admin viewport was opened by the app (nothing to do with ext rendered or show).
- */
+
 Ext.application({
   name : 'Editor',
   models : [ 'File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field' ],
@@ -100,6 +85,28 @@ Ext.application({
   beforeUnloadCalled : false,//stellt sicher, dass aufgrund von Wechselwirkungen bei einem per JS aus einem anderen Fenster heraus getriggerten window.close die unload-Frage nicht zweimal kommt
   appFolder : Editor.data.appFolder,
   viewport: null,
+    //***********************************************************************************
+    //Begin Events
+    //***********************************************************************************
+    /**
+     * @event editorViewportClosed
+     * Fires after the editor viewport was destroyed and before the other viewport is created.
+     */
+    /**
+     * @event adminViewportClosed
+     * Fires after the admin viewport was destroyed and before the other viewport is created.
+     */
+    /**
+     * @event editorViewportOpened
+     * Fires after the editor viewport was opened by the app (nothing to do with ext rendered or show).
+     */
+    /**
+     * @event adminViewportOpened
+     * Fires after the admin viewport was opened by the app (nothing to do with ext rendered or show).
+     */
+    //***********************************************************************************
+    //End Events
+    //***********************************************************************************
   init: function() {
       //enable json in our REST interface
       Ext.Ajax.setDefaultHeaders({

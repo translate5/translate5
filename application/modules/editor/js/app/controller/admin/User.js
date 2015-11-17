@@ -33,16 +33,6 @@ END LICENSE AND COPYRIGHT
  * @class Editor.controller.admin.User
  * @extends Ext.app.Controller
  */
-
-
-             /**
-               * FIXME formatting
-               * @event userCreated
-               * @param {Ext.form.Panel} form
-               * Fires after a user has successfully created
-               */
-
-
 Ext.define('Editor.controller.admin.User', {
   extend : 'Ext.app.Controller',
   models: ['admin.User'],
@@ -76,6 +66,17 @@ Ext.define('Editor.controller.admin.User', {
       openUserAdminBtn: "#UT#Benutzerverwaltung",
       userAdded: '#UT#Der Benutzer "{0}" wurde erfolgreich erstellt.'
   },
+  //***********************************************************************************
+  //Begin Events
+  //***********************************************************************************
+  /**
+   * @event userCreated
+   * @param {Ext.form.Panel} form
+   * Fires after a user has successfully created
+   */
+  //***********************************************************************************
+  //End Events
+  //***********************************************************************************
   init : function() {
       var me = this;
       

@@ -27,17 +27,6 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
-
-              /**
-               * FIXME formatting
-               * @event confirmDelete
-               * @param {Ext.form.Panel} grid
-               * @param {Editor.model.admin.task.UserPref[]} toDelete
-               * @param {Ext.button.Button} btn
-               */
-
-
 Ext.define('Editor.view.admin.task.UserPrefsGrid', {
     extend: 'Ext.grid.Panel',
     alias: 'widget.editorAdminTaskUserPrefsGrid',
@@ -62,7 +51,18 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
     viewConfig: {
         loadMask: false
     },
-
+    //***********************************************************************************
+    //Begin Events
+    //***********************************************************************************
+    /**
+     * @event confirmDelete
+     * @param {Ext.form.Panel} grid
+     * @param {Editor.model.admin.task.UserPref[]} toDelete
+     * @param {Ext.button.Button} btn
+     */
+    //***********************************************************************************
+    //End Events
+    //***********************************************************************************
     initComponent: function() {
         var me = this,
             userStore = Ext.StoreMgr.get('admin.TaskUserAssocs');

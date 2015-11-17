@@ -34,13 +34,6 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  *
  */
-             /**
-              * FIXME formatting!
-              * @event afterEditorMoved
-              * @param {String} toEdit the dataIndex of the actual edited column
-              * @param {Editor.view.segments.RowEditor} editor the rowEditor instance
-              * Fires after the html maineditor was moved to another column
-              */
 /**
  * @class Editor.view.segments.RowEditor
  * @extends Ext.grid.RowEditor
@@ -62,7 +55,18 @@ Ext.define('Editor.view.segments.RowEditor', {
         segmentNotSavedUserMessage: 'Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank!',
         cantSaveEmptySegment: '#UT#Das Segment kann nicht ohne Inhalt gespeichert werden!'
     },
-    
+    //***********************************************************************************
+    //Begin Events
+    //***********************************************************************************
+    /**
+     * @event afterEditorMoved
+     * @param {String} toEdit the dataIndex of the actual edited column
+     * @param {Editor.view.segments.RowEditor} editor the rowEditor instance
+     * Fires after the html maineditor was moved to another column
+     */
+    //***********************************************************************************
+    //End Events
+    //***********************************************************************************
     initComponent: function() {
         var me = this;
         me.callParent(arguments);

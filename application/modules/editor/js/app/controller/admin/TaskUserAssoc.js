@@ -33,26 +33,6 @@ END LICENSE AND COPYRIGHT
  * @class Editor.controller.admin.TaskUserAssoc
  * @extends Ext.app.Controller
  */
-
-
-              /**
-               * FIXME formatting
-               * @event addUserAssoc
-               * @param {Editor.controller.admin.TaskUserAssoc} me
-               * @param {Editor.model.admin.TaskUserAssoc} rec
-               * @param {Editor.store.admin.TaskUserAssocs} store
-               * Fires after a task user assoc entry was successfully created
-               */
-              
-              /**
-               * @event removeUserAssoc
-               * @param {Editor.controller.admin.TaskUserAssoc} me
-               * @param {Editor.model.admin.TaskUserAssoc} toDel
-               * @param {Editor.store.admin.TaskUserAssocs} assoc
-               * Fires after a task user assoc entry was successfully deleted
-               */
-
-
 Ext.define('Editor.controller.admin.TaskUserAssoc', {
   extend : 'Ext.app.Controller',
   models: ['admin.TaskUserAssoc','admin.Task','admin.task.UserPref'],
@@ -82,6 +62,27 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       assocDeleted: '#UT#Eintrag gelöscht!',
       assocSaveError: '#UT#Fehler beim Speichern der Änderungen!'
   },
+  //***********************************************************************************
+  //Begin Events
+  //***********************************************************************************
+  /**
+   * @event addUserAssoc
+   * @param {Editor.controller.admin.TaskUserAssoc} me
+   * @param {Editor.model.admin.TaskUserAssoc} rec
+   * @param {Editor.store.admin.TaskUserAssocs} store
+   * Fires after a task user assoc entry was successfully created
+   */
+  
+  /**
+   * @event removeUserAssoc
+   * @param {Editor.controller.admin.TaskUserAssoc} me
+   * @param {Editor.model.admin.TaskUserAssoc} toDel
+   * @param {Editor.store.admin.TaskUserAssocs} assoc
+   * Fires after a task user assoc entry was successfully deleted
+   */
+  //***********************************************************************************
+  //End Events
+  //***********************************************************************************
   init : function() {
       var me = this;
 

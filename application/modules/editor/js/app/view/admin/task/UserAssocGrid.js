@@ -27,17 +27,6 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
-
-         /**
-           * FIXME formatting
-           * @event confirmDelete
-           * @param {Ext.form.Panel} grid
-           * @param {Editor.model.admin.task.UserPref[]} toDelete
-           * @param {Ext.button.Button} btn
-           */
-
-
 Ext.define('Editor.view.admin.task.UserAssocGrid', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.adminTaskUserAssocGrid',
@@ -64,6 +53,18 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
   //features: [{
     //ftype: 'editorGridFilter'
   //}],
+  //***********************************************************************************
+  //Begin Events
+  //***********************************************************************************
+  /**
+   * @event confirmDelete
+   * @param {Ext.form.Panel} grid
+   * @param {Editor.model.admin.task.UserPref[]} toDelete
+   * @param {Ext.button.Button} btn
+   */
+  //***********************************************************************************
+  //End Events
+  //***********************************************************************************
   initComponent: function() {
     var me = this,
         wf = me.actualTask.getWorkflowMetaData();
