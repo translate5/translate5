@@ -40,10 +40,9 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.data.Store
  */
 Ext.define('Editor.store.Segments', {
-  extend : 'Ext.data.Store',
+  extend : 'Ext.data.BufferedStore',
   model: 'Editor.model.Segment',
   pageSize: 200,
-  buffered: true,
   remoteSort: true,
   autoLoad: false,
   //first editable segment! 

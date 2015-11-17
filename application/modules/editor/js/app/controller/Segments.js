@@ -206,9 +206,8 @@ Ext.define('Editor.controller.Segments', {
     /* FIXME END ext6 deactivated and migrated to listener object, keeping for debugging reference until update is done! */
   loadSegments: function() {
       this.handleFilterChange(); //load filemap
-      //initiales Laden des Stores:
-      //FIXME ext6: disabled because is done in another way now!
-      //this.getSegmentsStore().guaranteeRange(0, 199);
+      //initial store load:
+      this.getSegmentsStore().loadPage(1);
   },
   clearSegments: function() {
       var store = this.getSegmentsStore();

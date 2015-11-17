@@ -38,6 +38,8 @@ END LICENSE AND COPYRIGHT
  * @class Editor.view.segments.Scroller
  * @extends Ext.grid.Scroller
  * 
+ * FIXME ext6 this class is obsolete! Keeping for code reference till the end of the refactoring!
+ *
  * Erweitert bzw. passt den Orginal Endless Scroller an die lokalen Gegebenheiten an:
  * - Das Orginal kann nur mit Zeilen gleicher Höhe umgehen
  * - 
@@ -57,6 +59,7 @@ Ext.define('Editor.view.segments.Scroller', {
     enableSelectOrFocus: false,
     notPreFetched: true,
     initComponent: function() {
+      console.log("DEPRECATED, is this called?");
       this.on({
         beforerender: this.hijackFocusRow,
         single: true,

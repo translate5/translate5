@@ -101,15 +101,16 @@ Ext.define('Editor.view.segments.Grid', {
     //features: [{
         //ftype: 'editorGridFilter'
     //}],
-    //eigener X-Type für den Scroller
-    verticalScrollerType: 'editorgridscroller',
-    invalidateScrollerOnRefresh: false,
+    //FIXME ext6 disable own vertical scroller:
+    //X-Type for own vertical scroller
+    //verticalScrollerType: 'editorgridscroller',
+    //FIXME ext6 disable this setting: invalidateScrollerOnRefresh: false,
     //Einbindung des eigenen Editor Plugins
     /**
      * Config Parameter für die {Ext.grid.View} des Grids
      */
     viewConfig: {
-        blockRefresh: true,
+        //FIXME ext6 blockRefresh: true,
         getRowClass: function(record, rowIndex, rowParams, store){
             if(record.get('editable')){
                 return "";
@@ -118,12 +119,14 @@ Ext.define('Editor.view.segments.Grid', {
         }
     },
     constructor: function() {
+        /* FIXME ext6 todo
         this.plugins = [
             Ext.create('Editor.view.segments.RowEditing', {
                 clicksToMoveEditor: 1,
                 autoCancel: false
             })
         ];
+        */
         this.callParent(arguments);
     },
     initComponent: function() {
@@ -381,39 +384,4 @@ Ext.define('Editor.view.segments.Grid', {
             sm.select(localRowIndex);
         }
     }
-  /**
-   *code which tries to get the roweditor behave on reconfigure of the grid - does not work with ext 4.0.7 so far. Trial-code
-   * This code can be removed after upgrade to >4.1.1a - should be fixed there. See http://stackoverflow.com/questions/11963870/using-ext-grid-panel-reconfigure-breaks-the-grids-rowediting-plugin
-   * @event reconfigure
-   * Fires after a reconfigure.
-   * @param {Ext.grid.Panel} this
-   * @param {Ext.data.Store} store The store that was passed to the {@link #method-reconfigure} method
-   * @param {Object[]} columns The column configs that were passed to the {@link #method-reconfigure} method
-
-    onReconfigure: function (grid, store, columnConfigs) {
-        var columns = grid.headerCt.getGridColumns(),
-            rowEditingPlugin = grid.editingPlugin,
-            me = this;
-        //
-        // Re-attached the 'getField' and 'setField' extension methods to each column
-        //
-        rowEditingPlugin.initFieldAccessors(columns);
-    
-        //
-        // Re-create the actual editor (the UI component within the 'RowEditing' plugin itself)
-        //
-        // 1. Destroy and make sure we aren't holding a reference to it.
-        //
-        Ext.destroy(rowEditingPlugin.editor);
-        rowEditingPlugin.editor = null;
-        //
-        // 2. This method has some lazy load logic built into it and will initialize a new row editor.
-        //
-        me.editor = rowEditingPlugin.getEditor();
-        /*rowEditingPlugin.initEditor();
-        Ext.Array.each(columns, function(col){
-            me.editor.setField(col);
-        },me);
-        me.editor = rowEditingPlugin.getEditor();
-    }*/
 });
