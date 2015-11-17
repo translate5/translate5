@@ -384,6 +384,10 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $oldTask = clone $this->entity;
         $this->decodePutData();
+        //was formerly in JS: if a userState is transfered, then entityVersion has to be ignored!
+        if(!empty($this->data->userState)) {
+            unset($this->data->entityVersion);
+        }
         if(isset($this->data->enableSourceEditing)){
             $this->data->enableSourceEditing = (boolean)$this->data->enableSourceEditing;
         }
@@ -494,6 +498,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $userPref->loadByTaskUserAndStep($taskguid, $wf::WORKFLOW_ID, $this->user->data->userGuid, $row['userStep']);
             $row['segmentFields'] = $fields->loadByUserPref($userPref);
         }
+        
         $row['userPrefs'] = array($userPref->getDataObject());
         
         //$row['segmentFields'] = $fields->loadByCurrentUser($taskguid);
