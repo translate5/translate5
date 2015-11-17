@@ -236,7 +236,7 @@ Ext.define('Editor.controller.ViewModes', {
    */
   ergonomicMode: function() {
     var me = this;
-    me.getViewModeMenu().hideMenu();
+    //FIXME ext6 me.getViewModeMenu().hideMenu();
     if(me.self.isViewMode()){
         me.editMode();
     }

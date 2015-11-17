@@ -67,25 +67,25 @@ Ext.define('Editor.view.comments.Grid', {
     
     Ext.applyIf(me, {
       columns: [
-                {
-                    xtype: 'gridcolumn',
-                    dataIndex: 'comment',
-                    flex: 1,
-                    itemId: 'commentColumn',
-                    renderer: function(v, meta, rec) {
-                        var modified = Ext.Date.format(rec.get('modified'), Editor.DATE_ISO_FORMAT),
-                            created = Ext.Date.format(rec.get('created'), Editor.DATE_ISO_FORMAT),
-                            data = {
-                                content: v,
-                                isMod: (created !== modified),
-                                created: created,
-                                modified: modified,
-                                label: me.text_edited,
-                                author: rec.get('userName')
-                            };
-                        return me.commentTpl.apply(data);
-                    }
-                },
+        {
+            xtype: 'gridcolumn',
+            dataIndex: 'comment',
+            flex: 1,
+            itemId: 'commentColumn',
+            renderer: function(v, meta, rec) {
+                var modified = Ext.Date.format(rec.get('modified'), Editor.DATE_ISO_FORMAT),
+                    created = Ext.Date.format(rec.get('created'), Editor.DATE_ISO_FORMAT),
+                    data = {
+                        content: v,
+                        isMod: (created !== modified),
+                        created: created,
+                        modified: modified,
+                        label: me.text_edited,
+                        author: rec.get('userName')
+                    };
+                return me.commentTpl.apply(data);
+            }
+        },
         {
             xtype: 'actioncolumn',
             width: 60,

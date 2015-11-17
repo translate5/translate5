@@ -30,13 +30,12 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.view.admin.TaskGrid', {
   extend: 'Ext.grid.Panel',
-  //requires: ['Editor.view.admin.TaskActionColumn', 'Editor.view.GridHeaderToolTip','Editor.view.CheckColumn', 'Editor.view.admin.task.GridFilter'],
-  requires: ['Editor.view.admin.TaskActionColumn', 'Editor.view.GridHeaderToolTip','Editor.view.CheckColumn'],
+  requires: ['Editor.view.admin.TaskActionColumn', 'Editor.view.GridHeaderToolTip','Editor.view.CheckColumn'/*, 'Editor.view.admin.task.GridFilter'*/],
   alias: 'widget.adminTaskGrid',
   itemId: 'adminTaskGrid',
   cls: 'adminTaskGrid',
   title: '#UT#Aufgabenübersicht',
-  plugins: ['headertooltip'],
+  plugins: ['headertooltip', 'gridfilters'],
   layout: {
       type: 'fit'
   },
@@ -186,6 +185,40 @@ Ext.define('Editor.view.admin.TaskGrid', {
   },
   initConfig: function(instanceConfig) {
       var me = this,
+          states = [],
+          config,
+          msg = {
+              user_state_open: '#UT#offen',
+              user_state_waiting: '#UT#wartend',
+              user_state_finished: '#UT#abgeschlossen',
+              task_state_end: '#UT#beendet',
+              task_state_import: '#UT#beendet',
+              locked: '#UT#in Arbeit',
+              forMe: '#UT#für mich '
+          },
+          //we must have here an own ordered list of states to be filtered 
+          stateFilterOrder = ['user_state_open','user_state_waiting','user_state_finished','locked', 'task_state_end', 'task_state_import'],
+          relaisLanguages = Ext.Array.clone(Editor.data.languages);
+          
+          //we're hardcoding the state filter options order, all other (unordered) workflow states are added below
+          Ext.Array.each(stateFilterOrder, function(state){
+              if(msg[state]) {
+                  states.push([state, msg[state]]);
+              }
+          });
+        
+          //adding additional, not ordered states
+          Ext.Object.each(Editor.data.app.workflows, function(key, workflow){
+              Ext.Object.each(workflow.states, function(key, value){
+                  var state = 'user_state_'+key;
+                  if(!msg[state]) {
+                      states.push([state, msg.forMe+' '+value]);
+                  }
+              });
+          });
+        
+          relaisLanguages.unshift([0, this.noRelaisLang]);
+          
           config = {
           languageStore: Ext.StoreMgr.get('admin.Languages'),
           columns: [{
@@ -197,6 +230,11 @@ Ext.define('Editor.view.admin.TaskGrid', {
               xtype: 'gridcolumn',
               width: 70,
               dataIndex: 'state',
+              filter: {
+                  type: 'list',
+                  options: states,
+                  phpMode: false
+              },
               tdCls: 'state',
               renderer: function(v, meta, rec) {
                   var userState = rec.get('userState'),
@@ -234,23 +272,35 @@ Ext.define('Editor.view.admin.TaskGrid', {
               xtype: 'gridcolumn',
               width: 220,
               dataIndex: 'taskName',
+              filter: {
+                  type: 'string'
+              },
               text: me.text_cols.taskName
           },{
               xtype: 'gridcolumn',
               width: 110,
               dataIndex: 'taskNr',
+              filter: {
+                  type: 'string'
+              },
               tdCls: 'taskNr',
               text: me.text_cols.taskNr
           },{
               xtype: 'numbercolumn',
               width: 70,
               dataIndex: 'wordCount',
+              filter: {
+                  type: 'numeric'
+              },
               format: '0',
               text: me.text_cols.wordCount
           },{
               xtype: 'numbercolumn',
               width: 70,
               dataIndex: 'fileCount',
+              filter: {
+                  type: 'numeric'
+              },
               hidden: true,
               sortable: false,
               format: '0',
@@ -261,6 +311,11 @@ Ext.define('Editor.view.admin.TaskGrid', {
               cls: 'source-lang',
               renderer: me.langRenderer,
               dataIndex: 'sourceLang',
+              filter: {
+                  type: 'list',
+                  options: Editor.data.languages,
+                  phpMode: false
+              },
               tooltip: me.text_cols.sourceLang,
               text: me.text_cols.sourceLang,
               sortable: false
@@ -270,6 +325,11 @@ Ext.define('Editor.view.admin.TaskGrid', {
               cls: 'relais-lang',
               renderer: me.langRenderer,
               dataIndex: 'relaisLang',
+              filter: {
+                  type: 'list',
+                  options: relaisLanguages,
+                  phpMode: false
+              },
               tooltip: me.text_cols.relaisLang,
               text: me.text_cols.relaisLang,
               sortable: false
@@ -279,6 +339,11 @@ Ext.define('Editor.view.admin.TaskGrid', {
               cls: 'target-lang',
               renderer: me.langRenderer,
               dataIndex: 'targetLang',
+              filter: {
+                  type: 'list',
+                  options: Editor.data.languages,
+                  phpMode: false
+              },
               tooltip: me.text_cols.targetLang,
               text: me.text_cols.targetLang,
               sortable: false
@@ -287,6 +352,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
               cls: 'ref-files',
               width: 45,
               dataIndex: 'referenceFiles',
+              filter: {
+                  type: 'boolean'
+              },
               tooltip: me.text_cols.referenceFiles,
               text: me.text_cols.referenceFiles
           },{
@@ -294,6 +362,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
               width: 45,
               cls: 'terminologie',
               dataIndex: 'terminologie',
+              filter: {
+                  type: 'boolean'
+              },
               tooltip: me.text_cols.terminologie,
               text: me.text_cols.terminologie
           },{
@@ -308,12 +379,18 @@ Ext.define('Editor.view.admin.TaskGrid', {
               tdCls: 'task-users',
               cls: 'task-users',
               dataIndex: 'userCount',
+              filter: {
+                  type: 'numeric'
+              },
               tooltip: me.text_cols.users,
               text: me.text_cols.users
           },{
               xtype: 'gridcolumn',
               width: 135,
               dataIndex: 'pmName',
+              filter: {
+                  type: 'string'
+              },
               renderer: function(v, meta) {
                   meta.tdAttr = 'data-qtip="' + v + '"';
                   return v;
@@ -323,16 +400,25 @@ Ext.define('Editor.view.admin.TaskGrid', {
               xtype: 'datecolumn',
               width: 100,
               dataIndex: 'orderdate',
+              filter: {
+                  type: 'date'
+              },
               text: me.text_cols.orderdate
           },{
               xtype: 'datecolumn',
               width: 120,
               dataIndex: 'targetDeliveryDate',
+              filter: {
+                  type: 'date'
+              },
               text: me.text_cols.targetDeliveryDate
           },{
               xtype: 'datecolumn',
               width: 120,
               dataIndex: 'realDeliveryDate',
+              filter: {
+                  type: 'date'
+              },
               text: me.text_cols.realDeliveryDate
           },{
               xtype: 'owncheckcolumn',
@@ -340,6 +426,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
               cls: 'fullMatchEdit',
               hidden: true,
               dataIndex: 'edit100PercentMatch',
+              filter: {
+                  type: 'boolean'
+              },
               tooltip: me.text_cols.fullMatchEdit,
               text: me.text_cols.fullMatchEdit
           },{
@@ -349,6 +438,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
               width: 55,
               cls: 'source-edit',
               dataIndex: 'enableSourceEditing',
+              filter: {
+                  type: 'boolean'
+              },
               tooltip: me.text_cols.enableSourceEditing,
               text: me.text_cols.enableSourceEditing
           }],
@@ -382,11 +474,17 @@ Ext.define('Editor.view.admin.TaskGrid', {
                 xtype: 'gridcolumn',
                 width: 60,
                 dataIndex: 'id',
+                filter: {
+                    type: 'numeric'
+                },
                 text: 'id'
             },{
                 xtype: 'gridcolumn',
                 width: 240,
                 dataIndex: 'taskGuid',
+                filter: {
+                    type: 'string'
+                },
                 text: 'taskGuid'
             });
         }
