@@ -93,7 +93,7 @@ Editor.DATE_ISO_FORMAT = 'Y-m-d H:i:s';
  */
 Ext.application({
   name : 'Editor',
-  models : [ 'File', 'Segment', 'admin.User' ],
+  models : [ 'File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field' ],
   stores : [ 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments' ],
   requires: ['Editor.view.ViewPort', Editor.data.app.viewport, 'Editor.model.ModelOverride'],
   controllers: Editor.data.app.controllers,
@@ -177,11 +177,18 @@ Ext.application({
    * Used to open a task directly without administration panel
    */
   openTaskDirect: function(){
-      task = Editor.model.admin.Task.create(Editor.data.task);
-      task.set('userState',Editor.data.app.initState);
-      task.save({
-          scope: this,
-          success: this.openEditor
+      var me = this;
+      Editor.model.admin.Task.load(Editor.data.task.id, {
+          success: function(task) {
+              task.set('userState',Editor.data.app.initState);
+              task.save({
+                  scope: me,
+                  success: me.openEditor
+              });
+          },
+          failure: function() {
+              //FIXME doing nothing here? since in previous version in put failure also nothing was done!
+          }
       });
   },
   /**

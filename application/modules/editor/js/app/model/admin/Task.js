@@ -45,7 +45,7 @@ Ext.define('Editor.model.admin.Task', {
   fields: [
     {name: 'id', type: 'int'},
     {name: 'taskGuid', type: 'string'},
-    {name: 'entityVersion', type: 'integer'},
+    {name: 'entityVersion', type: 'integer', critical: true},
     {name: 'taskNr', type: 'string'},
     {name: 'taskName', type: 'string'},
     {name: 'sourceLang', type: 'string'},
@@ -70,7 +70,9 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'qmSubEnabled', type: 'boolean'},
     {name: 'qmSubFlags', type: 'auto'},
     {name: 'qmSubSeverities', type: 'auto'},
-    {name: 'userState', type: 'string'},
+    {name: 'userState', type: 'string', isEqual: function() {
+      return false;
+    }},
     {name: 'userRole', type: 'string', persist: false},
     {name: 'isUsed', type: 'boolean', persist: false}, //actually not used, so no isUsed method
     {name: 'userStep', type: 'string', persist: false},
@@ -79,9 +81,12 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'defaultSegmentLayout', type: 'boolean', persist: false}
   ],
   hasMany: [{
-      model: 'Editor.model.segment.Field', name: 'segmentFields'
+      model: 'Editor.model.segment.Field',
+      foreignKey: 'taskGuid',
+      name: 'segmentFields'
   },{
-      model: 'Editor.model.admin.task.UserPref', name: 'userPrefs'
+      model: 'Editor.model.admin.task.UserPref', 
+      name: 'userPrefs'
   }],
   idProperty: 'id',
   proxy : {
@@ -99,6 +104,7 @@ Ext.define('Editor.model.admin.Task', {
   },
   /**
    * FIXME ext6 update, recheck the following usage of "modified" field, since this was changed in ext6
+   * → trying to use "critical" for userState and entityVersion instead of this method!
    * 1. ensures that entityVersion is always send to the server!
    * 2. ensures that the userState is send to the server, after setting it to the same value and is therefore normally not modified.
    * ExtJS sends per default only modified fields, this can lead to errors here.
@@ -107,7 +113,7 @@ Ext.define('Editor.model.admin.Task', {
    * @param {String} field
    * @param {String} value
    */
-  set: function(field, value) {
+  FIXME_REMOVE_ME_set: function(field, value) {
       var res = this.callParent(arguments);
       if(!this.modified) {
           this.modified = {}; //FIXME workaround for ext6, since not defined anymore by default
@@ -116,7 +122,7 @@ Ext.define('Editor.model.admin.Task', {
           this.modified.userState = value;
       }
       //FIXME: should we do this in a general way? would be difficulty since exceptions like userState etc
-      if(field != 'userState' && field != 'entityVersion' && this.modified.entityVersion === undefined) {
+      if(Ext.isString(field) && field != 'userState' && field != 'entityVersion' && this.modified.entityVersion === undefined) {
           this.modified.entityVersion = this.data.entityVersion;
       }
       return res; 
