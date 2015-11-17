@@ -63,5 +63,14 @@ Ext.define('Editor.model.File', {
       encode: true,
       rootProperty: 'data'
     }
+  },
+  constructor: function() {
+    this.callParent(arguments);
+    //enabling loading indexAction for id === 0
+    Ext.override(this.getProxy(), {
+      isValidId: function(id) {
+        return id || id > 0;
+      }
+    });
   }
 });

@@ -50,8 +50,8 @@ Ext.define('Editor.store.ReferenceFiles', {
       }
   },
   root: {
-    text: '__untranslated__Referenz-Dateien',
-    id: '0',
+    text: '#UT#Referenz-Dateien',
+    id: 0,
     expanded: false
   },
   folderSort: false,
@@ -59,6 +59,15 @@ Ext.define('Editor.store.ReferenceFiles', {
   proxy : {
     type : 'rest',
     url: Editor.data.restpath+'referencefile'
+  },
+  constructor: function() {
+      this.callParent(arguments);
+      //enabling loading indexAction for id === 0
+      Ext.override(this.getProxy(), {
+          isValidId: function(id) {
+              return id || id > 0;
+          }
+      });
   }
   /*,
   sorters: [{

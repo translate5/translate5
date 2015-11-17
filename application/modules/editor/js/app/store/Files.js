@@ -50,8 +50,8 @@ Ext.define('Editor.store.Files', {
       }
   },
   root: {
-    text: '__untranslated__Dateien',
-    id: '0',
+    text: '#UT#Dateien',
+    id: 0,
     expanded: false
   },
   folderSort: false,
