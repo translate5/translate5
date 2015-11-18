@@ -44,6 +44,12 @@ Ext.define('Editor.view.segments.column.State', {
   alias: 'widget.stateColumn',
   mixins: ['Editor.view.segments.column.BaseMixin'],
   stateData: {},
+  filter: {
+      type: 'list',
+      labelField: 'label',
+      phpMode: false,
+      options: Editor.data.segments.stateFlags
+  },
   
   initComponent: function() {
     var me = this;

@@ -46,6 +46,9 @@ Ext.define('Editor.view.segments.column.SegmentNrInTask', {
   isErgonomicVisible: true,
   isErgonomicSetWidth: true,
   ergonomicWidth: 111,
+  filter: {
+      type: 'numeric'
+  },
   initComponent: function() {
     var me = this;
     me.callParent(arguments);

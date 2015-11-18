@@ -43,6 +43,9 @@ Ext.define('Editor.view.segments.column.Editable', {
   extend: 'Editor.view.ui.segments.column.Editable',
   alias: 'widget.editableColumn',
   mixins: ['Editor.view.segments.column.BaseMixin'],
+  filter: {
+       type: 'boolean'
+  },
   editor: {
     xtype: 'displayfield',
     cls: 'editable',

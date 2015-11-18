@@ -48,12 +48,22 @@ Ext.define('Editor.view.segments.column.AutoState', {
   isErgonomicVisible: true,
   imgTpl: new Ext.Template('<img class="autoState-{0}" src="'+Editor.data.moduleFolder+'images/autoStateFlags-{0}.png" alt="{1}" title="{1}"/>'),
   stateLabels: [],
+  filter: null,
   initComponent: function() {
-    var me = this;
+    var me = this,
+        autoStates = Ext.Array.filter(Editor.data.segments.autoStateFlags, function(item) {
+                return item.id != 999;
+            });
     me.scope = me; //so that renderer can access this object instead the whole grid.
     Ext.each(Editor.data.segments.autoStateFlags, function(item){
         me.stateLabels[item.id] = item.label;
     });
+    me.filter = {
+        type: 'list',
+        labelField: 'label',
+        phpMode: false,
+        options: autoStates
+    };
     me.callParent(arguments);
   },
   /**

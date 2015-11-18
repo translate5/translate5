@@ -56,6 +56,7 @@ Ext.define('Editor.view.segments.Grid', {
         'Editor.view.segments.column.WorkflowStep',
         'Editor.view.segments.column.Editable'
     ],
+    plugins: ['gridfilters'],
     alias: 'widget.segments.grid',
     stateful: false,
     

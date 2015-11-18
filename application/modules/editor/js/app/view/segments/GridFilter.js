@@ -101,43 +101,43 @@ Ext.define('Editor.view.segments.GridFilter', {
             boolProto = Ext.ux.grid.filter.BooleanFilter.prototype,
             fields = [{
                 type: 'numeric',
-                dataIndex: 'segmentNrInTask'
+                dataIndex: 'segmentNrInTask' // DONE
             },{
                 type: 'list',
-                dataIndex: 'stateId',
+                dataIndex: 'stateId', // DONE
                 labelField: 'label',
                 phpMode: false,
                 options: Editor.data.segments.stateFlags
             },{
                 type: 'list',
-                dataIndex: 'qmId',
+                dataIndex: 'qmId', // DONE
                 labelField: 'label',
                 phpMode: false,
                 options: Editor.data.segments.qualityFlags
             },{
-                type: 'string',
+                type: 'string', // DONE
                 dataIndex: 'comments'
             },{
                 type: 'numeric',
-                dataIndex: 'matchRate'
+                dataIndex: 'matchRate' // DONE
             },{
                 type: 'list',
-                dataIndex: 'autoStateId',
+                dataIndex: 'autoStateId', // DONE
                 labelField: 'label',
                 phpMode: false,
                 options: autoStates
             },{
                 type: 'workflowStep',
-                dataIndex: 'workflowStep'
+                dataIndex: 'workflowStep' // DONE
             },{
                 type: 'string',
-                dataIndex: 'userName'
+                dataIndex: 'userName' // DONE
             },{
                 type: 'boolean',
                 //wording in frontend is not editable but locked, so the yes/no buttons has to be changed:
                 yesText: boolProto.noText, 
                 noText: boolProto.yesText,
-                dataIndex: 'editable'
+                dataIndex: 'editable' // DONE
             }];
         Editor.data.task.segmentFields().each(function(rec) {
             if(!rec.isTarget() || ! userPref.isNonEditableColumnDisabled()) {

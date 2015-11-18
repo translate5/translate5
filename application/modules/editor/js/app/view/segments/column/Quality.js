@@ -43,7 +43,13 @@ Ext.define('Editor.view.segments.column.Quality', {
   extend: 'Editor.view.ui.segments.column.Quality',
   alias: 'widget.qualityColumn',
   mixins: ['Editor.view.segments.column.BaseMixin'],
-  
+  filter: {
+      type: 'list',
+      labelField: 'label',
+      phpMode: false,
+      options: Editor.data.segments.qualityFlags
+  },
+
   initComponent: function() {
     var me = this;
     me.initBaseMixin();

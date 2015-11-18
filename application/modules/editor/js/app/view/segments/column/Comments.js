@@ -42,6 +42,9 @@ Ext.define('Editor.view.segments.column.Comments', {
     alias: 'widget.commentsColumn',
     mixins: ['Editor.view.segments.column.BaseMixin'],
     dataIndex: 'comments',
+    filter: {
+        type: 'string'
+    },
     text: '#UT#Kommentare',
     text_morecomments: '#UT#({0} weitere Kommentare)',
     text_morecomment: '#UT#({0} weiterer Kommentar)',

@@ -44,6 +44,9 @@ Ext.define('Editor.view.segments.column.WorkflowStep', {
     dataIndex: 'workflowStep',
     text: '#UT#bearbeitet bei',
     tdCls: 'workflowStep-field',
+    filter: {
+        type: 'string'
+    },
     hidden: true,
     initComponent: function() {
         var me = this;

@@ -43,6 +43,9 @@ Ext.define('Editor.view.segments.column.Matchrate', {
   extend: 'Editor.view.ui.segments.column.Matchrate',
   alias: 'widget.matchrateColumn',
   mixins: ['Editor.view.segments.column.BaseMixin'],
+  filter: {
+      type: 'numeric'
+  },
 
   initComponent: function() {
     var me = this;

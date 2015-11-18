@@ -43,6 +43,9 @@ Ext.define('Editor.view.segments.column.UserName', {
   extend: 'Editor.view.ui.segments.column.UserName',
   alias: 'widget.usernameColumn',
   mixins: ['Editor.view.segments.column.BaseMixin'],
+  filter: {
+      type: 'string'
+  },
 
   initComponent: function() {
     var me = this;
