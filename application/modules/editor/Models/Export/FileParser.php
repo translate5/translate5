@@ -452,7 +452,7 @@ abstract class editor_Models_Export_FileParser {
      */
     public function exportSingleSegmentContent($segment) {
         $this->disableMqmExport = true;
-        return $this->revertNonBreakingSpaces($this->recreateTermTags($this->parseSegment($segment)));
+        return $this->unprotectWhitespace($this->revertNonBreakingSpaces($this->recreateTermTags($this->parseSegment($segment))));
     }
     
     /**
