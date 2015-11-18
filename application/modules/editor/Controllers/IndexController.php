@@ -80,6 +80,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         //FIXME is coming from DB, for easy switching of branches do ExtJS switch in PHP for the moment:
         $this->view->extJsBasepath = str_replace('4.0.7', '6.0.0', $this->view->extJsBasepath);
         
+        $this->view->buildType = 'fiddle';
         $this->view->buildType = 'development';
         
         $this->view->publicModulePath = APPLICATION_RUNDIR.'/modules/'.Zend_Registry::get('module');
@@ -233,6 +234,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             $task->loadByTaskGuid($this->session->taskGuid);
             $taskData = $task->getDataObject();
             unset($taskData->qmSubsegmentFlags);
+            
             $php2js->set('task', $taskData);
             $openState = $this->session->taskOpenState ? 
                     $this->session->taskOpenState : 
@@ -275,7 +277,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         $ed = $this->session->runtimeOptions->editor;
         
-        //ext6 update single controller testcode
+        //FIXME ext6 update single controller testcode
         $controllers = array();
         //$controllers[] = 'ServerException';
         //$controllers[] = 'ViewModes';
@@ -288,12 +290,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $controllers[] = 'Comments';
         //without plugins!!!
         $controllers[] = 'HeadPanel';
-        //$controllers[] = 'UserPreferences';
+        $controllers[] = 'UserPreferences';
         //$controllers[] = 'QmSubSegments';
         $controllers[] = 'admin.TaskOverview';
         $controllers[] = 'admin.TaskPreferences';
-        //$controllers[] = 'admin.TaskUserAssoc';
-        //$controllers[] = 'admin.User';
+        $controllers[] = 'admin.TaskUserAssoc';
+        $controllers[] = 'admin.User';
         return $controllers;
         
         //original code
