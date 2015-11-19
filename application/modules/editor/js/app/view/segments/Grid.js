@@ -43,7 +43,6 @@ Ext.define('Editor.view.segments.Grid', {
     extend: 'Ext.grid.Panel',
     requires: [
         'Editor.view.segments.RowEditing',
-        //'Editor.view.segments.GridFilter',
         'Editor.view.segments.column.Content',
         'Editor.view.segments.column.ContentEditable',
         'Editor.view.segments.column.SegmentNrInTask',
@@ -99,9 +98,6 @@ Ext.define('Editor.view.segments.Grid', {
     columnMap:{},
     stateData: {},
     qualityData: {},
-    //features: [{
-        //ftype: 'editorGridFilter'
-    //}],
     //FIXME ext6 disable own vertical scroller:
     //X-Type for own vertical scroller
     //verticalScrollerType: 'editorgridscroller',

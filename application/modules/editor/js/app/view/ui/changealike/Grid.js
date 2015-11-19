@@ -62,12 +62,18 @@ Ext.define('Editor.view.ui.changealike.Grid', {
       columns: [
         {
           dataIndex: 'segmentNrInTask',
+          filter: {
+              type: 'numeric'
+          },
           text: me.item_segmentNrInTaskColumn,
           width: 50
         },
         {
           xtype: 'gridcolumn',
           dataIndex: 'source',
+          filter: {
+              type: 'string'
+          },
           tdCls: 'alike-source-field segment-tag-column',
           width: 250, 
           renderer: function(value, metaData, record) {
@@ -81,6 +87,9 @@ Ext.define('Editor.view.ui.changealike.Grid', {
         {
           xtype: 'gridcolumn',
           dataIndex: 'target',
+          filter: {
+              type: 'string'
+          },
           tdCls: 'alike-target-field segment-tag-column',
           width: 250,
           renderer: function(value, metaData, record) {
@@ -94,18 +103,27 @@ Ext.define('Editor.view.ui.changealike.Grid', {
         {
           xtype: 'booleancolumn',
           dataIndex: 'infilter',
+          filter: {
+              type: 'boolean'
+          },
           width: 180,
           text: me.item_filterColumn
         },
         {
           xtype: 'booleancolumn',
           dataIndex: 'sourceMatch',
+          filter: {
+              type: 'boolean'
+          },
           width: 90, 
           text: me.item_sourceMatchColumn
         },
         {
           xtype: 'booleancolumn',
           dataIndex: 'targetMatch',
+          filter: {
+              type: 'boolean'
+          },
           width: 80, 
           text: me.item_targetMatchColumn
         }
