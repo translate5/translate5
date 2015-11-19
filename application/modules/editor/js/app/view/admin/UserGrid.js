@@ -32,6 +32,7 @@ Ext.define('Editor.view.admin.UserGrid', {
   extend: 'Ext.grid.Panel',
   requires: 'Editor.view.CheckColumn',
   alias: 'widget.adminUserGrid',
+  plugins: ['gridfilters'],
   itemId: 'adminUserGrid',
   cls: 'adminUserGrid',
   title: '#UT#Benutzerübersicht',
@@ -59,10 +60,6 @@ Ext.define('Editor.view.admin.UserGrid', {
       reloadBtnTip: '#UT#Benutzerliste vom Server aktualisieren.'
   },
   store: 'admin.Users',
-  //TODO define filters for the user grid!
-  //features: [{
-    //ftype: 'editorGridFilter'
-  //}],
   viewConfig: {
       /**
        * returns a specific row css class
@@ -86,16 +83,25 @@ Ext.define('Editor.view.admin.UserGrid', {
           xtype: 'gridcolumn',
           width: 100,
           dataIndex: 'login',
+          filter: {
+              type: 'string'
+          },
           text: me.text_cols.login
       },{
           xtype: 'gridcolumn',
           width: 100,
           dataIndex: 'firstName',
+          filter: {
+              type: 'string'
+          },
           text: me.text_cols.firstName
       },{
           xtype: 'gridcolumn',
           width: 100,
           dataIndex: 'surName',
+          filter: {
+              type: 'string'
+          },
           text: me.text_cols.surName
       },{
           xtype: 'gridcolumn',
@@ -107,11 +113,22 @@ Ext.define('Editor.view.admin.UserGrid', {
               return '&nbsp;';
           },
           dataIndex: 'gender',
+          filter: {
+            type: 'list',
+            options: [
+                ['m', me.strings.gender_male],
+                ['f', me.strings.gender_female]
+            ],
+            phpMode: false
+         },
           text: me.text_cols.gender
       },{
           xtype: 'gridcolumn',
           width: 120,
           dataIndex: 'email',
+          filter: {
+              type: 'string'
+          },
           text: me.text_cols.email
       },{
           xtype: 'gridcolumn',
@@ -121,6 +138,9 @@ Ext.define('Editor.view.admin.UserGrid', {
               return Ext.Array.map(v.split(','), function(item){
                   return Editor.data.app.roles[item] || item;
               }).join(', ');
+          },
+          filter: {
+              type: 'string'
           },
           text: me.text_cols.roles
       },{

@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.view.admin.TaskGrid', {
   extend: 'Ext.grid.Panel',
-  requires: ['Editor.view.admin.TaskActionColumn', 'Editor.view.GridHeaderToolTip','Editor.view.CheckColumn'/*, 'Editor.view.admin.task.GridFilter'*/],
+  requires: ['Editor.view.admin.TaskActionColumn', 'Editor.view.GridHeaderToolTip','Editor.view.CheckColumn'],
   alias: 'widget.adminTaskGrid',
   itemId: 'adminTaskGrid',
   cls: 'adminTaskGrid',
@@ -72,9 +72,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
       reloadBtnTip: '#UT#Aufgabenliste vom Server aktualisieren.'
   },
   store: 'admin.Tasks',
-  //features: [{
-    //ftype: 'adminTaskGridFilter'
-  //}],
   viewConfig: {
       /**
        * returns a specific row css class

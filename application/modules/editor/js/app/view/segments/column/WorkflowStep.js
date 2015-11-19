@@ -40,12 +40,13 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.segments.column.WorkflowStep', {
     extend: 'Ext.grid.column.Column',
     alias: 'widget.workflowStepColumn',
+    requires: ['Editor.view.admin.task.WorkflowStepFilter'],
     mixins: ['Editor.view.segments.column.BaseMixin'],
     dataIndex: 'workflowStep',
     text: '#UT#bearbeitet bei',
     tdCls: 'workflowStep-field',
     filter: {
-        type: 'string'
+        type: 'workflowStep'
     },
     hidden: true,
     initComponent: function() {

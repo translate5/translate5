@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.UserChooseWindow', {
     extend : 'Ext.window.Window',
     alias : 'widget.adminUserChooseWindow',
-    requires: ['Editor.view.admin.user.ChooserGridFilter'],
+    plugins: ['gridfilters'],
     itemId : 'adminUserChooseWindow',
     title : '#UT#Einen oder mehrere Benutzer auswählen',
     strings: {
@@ -86,22 +86,34 @@ Ext.define('Editor.view.admin.UserChooseWindow', {
                     xtype: 'gridcolumn',
                     width: 100,
                     text: me.strings.loginCol,
-                    dataIndex: 'login'
+                    dataIndex: 'login',
+                    filter: {
+                        type: 'string'
+                    }
                 },{
                     xtype: 'gridcolumn',
                     text: me.strings.surNameCol,
                     width: 100,
-                    dataIndex: 'surName'
+                    dataIndex: 'surName',
+                    filter: {
+                        type: 'string'
+                    }
                 },{
                     xtype: 'gridcolumn',
                     text: me.strings.firstNameCol,
                     width: 100,
-                    dataIndex: 'firstName'
+                    dataIndex: 'firstName',
+                    filter: {
+                        type: 'string'
+                    }
                 },{
                     text: me.strings.emailCol,
                     xtype: 'gridcolumn',
                     width: 160,
-                    dataIndex: 'email'
+                    dataIndex: 'email',
+                    filter: {
+                        type: 'string'
+                    }
                 }]
             }],
             dockedItems : [{

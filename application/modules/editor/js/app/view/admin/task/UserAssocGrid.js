@@ -50,9 +50,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
       loadMask: false
   },
   store: 'admin.TaskUserAssocs',
-  //features: [{
-    //ftype: 'editorGridFilter'
-  //}],
+  plugins: ['gridfilters'],
   //***********************************************************************************
   //Begin Events
   //***********************************************************************************
@@ -76,6 +74,9 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
           dataIndex: 'login',
           renderer: function(v, meta, rec) {
               return rec.get('surName')+', '+rec.get('firstName')+' ('+v+')';
+          },
+          filter: {
+              type: 'string'
           },
           text: me.strings.userGuidCol
       },{
