@@ -48,59 +48,63 @@ Ext.define('Editor.view.preferences.UserWindow', {
         cancelBtn: '#UT#Abbrechen'
     },
     layout: 'fit',
-    initComponent: function() {
-        var me = this;
-        Ext.applyIf(me, {
-            items: [{
-                xtype: 'form',
-                frame: true,
-                ui: 'default-framed',
-                bodyPadding: 10,
-                items:[{
-                    xtype: 'fieldset',
-                    title: me.strings.editPassword,
-                    defaultType: 'textfield',
-                    defaults: {
-                        labelWidth: 160,
-                        inputType: 'password',
-                        minLength: 8,
-                        allowBlank: false,
-                        anchor: '100%'
+
+    initConfig: function(instanceConfig) {
+        var me = this,
+            config = {
+                items: [{
+                    xtype: 'form',
+                    frame: true,
+                    ui: 'default-framed',
+                    bodyPadding: 10,
+                    items:[{
+                        xtype: 'fieldset',
+                        title: me.strings.editPassword,
+                        defaultType: 'textfield',
+                        defaults: {
+                            labelWidth: 160,
+                            inputType: 'password',
+                            minLength: 8,
+                            allowBlank: false,
+                            anchor: '100%'
+                        },
+                        items: [{
+                            name: 'passwd',
+                            fieldLabel: me.strings.password
+                        },{
+                            name: 'passwd_check',
+                            validator: function(value) {
+                                var pwd = this.previousSibling('[name=passwd]');
+                                return (value === pwd.getValue()) ? true : me.strings.passwordMisMatch;
+                            },
+                            fieldLabel: me.strings.password_check
+                        }]
+                    }]
+                }],
+                dockedItems: [{
+                    xtype: 'toolbar',
+                    ui: 'footer',
+                    dock: 'bottom',
+                    layout: {
+                        pack: 'end',
+                        type: 'hbox'
                     },
                     items: [{
-                        name: 'passwd',
-                        fieldLabel: me.strings.password
+                        xtype: 'button',
+                        itemId: 'saveBtn',
+                        iconCls: 'ico-setting-save',
+                        text: me.strings.saveBtn
                     },{
-                        name: 'passwd_check',
-                        validator: function(value) {
-                            var pwd = this.previousSibling('[name=passwd]');
-                            return (value === pwd.getValue()) ? true : me.strings.passwordMisMatch;
-                        },
-                        fieldLabel: me.strings.password_check
+                        xtype: 'button',
+                        itemId: 'cancelBtn',
+                        iconCls: 'ico-cancel',
+                        text: me.strings.cancelBtn
                     }]
                 }]
-            }],
-            dockedItems: [{
-                xtype: 'toolbar',
-                ui: 'footer',
-                dock: 'bottom',
-                layout: {
-                    pack: 'end',
-                    type: 'hbox'
-                },
-                items: [{
-                    xtype: 'button',
-                    itemId: 'saveBtn',
-                    iconCls: 'ico-setting-save',
-                    text: me.strings.saveBtn
-                },{
-                    xtype: 'button',
-                    itemId: 'cancelBtn',
-                    iconCls: 'ico-cancel',
-                    text: me.strings.cancelBtn
-                }]
-            }]
-        });
-        me.callParent(arguments);
+            };
+        if (instanceConfig) {
+            me.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
     }
 });
