@@ -286,10 +286,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * @param string $forced optional, default false. if true cleanup also taskUserAssocs with validSessionsIds, only usable with given taskGuid!
      */
     public function cleanupLocked($taskGuid = null, $forced = false) {
-        try {
-            $this->_cleanupLocked($taskGuid, $forced);
-        }
-        catch (Zend_Db_Statement_Exception $e) {
+        $handler = function($e) {
             if(strpos($e->getMessage(), 'Serialization failure: 1213 Deadlock found when trying to get lock;') !== false) {
                 $log = new ZfExtended_Log();
                 $msg = 'Notice: SQL Deadlock detected in taskUserAssoc cleanupLocked method';
@@ -297,7 +294,15 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
                 return;
             }
             throw $e;
-            
+        };
+        try {
+            $this->_cleanupLocked($taskGuid, $forced);
+        }
+        catch (PDOException $e) {
+            $handler($e);
+        }
+        catch (Zend_Db_Statement_Exception $e) {
+            $handler($e);
         }
     }
     
