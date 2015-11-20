@@ -42,31 +42,31 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
   views: ['Editor.view.admin.task.PreferencesWindow', 'Editor.view.admin.task.UserAssocGrid','Editor.view.admin.task.Preferences'],
   refs : [{
       ref: 'prefGrid',
-      selector: '.editorAdminTaskUserPrefsGrid'
+      selector: 'editorAdminTaskUserPrefsGrid'
   },{
       ref: 'editInfo',
-      selector: '.editorAdminTaskPreferences #editInfoOverlay'
+      selector: 'editorAdminTaskPreferences #editInfoOverlay'
   },{
       ref: 'prefWindow',
-      selector: '.adminTaskPreferencesWindow'
+      selector: 'adminTaskPreferencesWindow'
   },{
       ref: 'prefForm',
-      selector: '.editorAdminTaskUserPrefsForm'
+      selector: 'editorAdminTaskUserPrefsForm'
   },{
       ref: 'wfStepCombo',
-      selector: '.editorAdminTaskUserPrefsForm .combobox[name="workflowStep"]'
+      selector: 'editorAdminTaskUserPrefsForm combobox[name="workflowStep"]'
   },{
       ref: 'usersCombo',
-      selector: '.editorAdminTaskUserPrefsForm .combobox[name="userGuid"]'
+      selector: 'editorAdminTaskUserPrefsForm combobox[name="userGuid"]'
   },{
       ref: 'deleteBtn',
-      selector: '.editorAdminTaskUserPrefsGrid #userPrefDelete'
+      selector: 'editorAdminTaskUserPrefsGrid #userPrefDelete'
   },{
       ref: 'addBtn',
-      selector: '.editorAdminTaskUserPrefsGrid #userPrefAdd'
+      selector: 'editorAdminTaskUserPrefsGrid #userPrefAdd'
   },{
       ref: 'taskWorkflow',
-      selector: '.editorAdminTaskPreferences #taskWorkflow'
+      selector: 'editorAdminTaskPreferences #taskWorkflow'
   }],
   strings: {
       taskWorkflowSaved: '#UT#Änderung des Workflows der Aufgabe gespeichert!',
@@ -91,39 +91,39 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       Editor.app.on('adminViewportClosed', me.clearStores, me);
 
       me.control({
-          '.editorAdminTaskPreferences #taskWorkflow': {
+          'editorAdminTaskPreferences #taskWorkflow': {
               change: me.changeWorkflow
           },
-          '.adminTaskPreferencesWindow #close-btn': {
+          'adminTaskPreferencesWindow #close-btn': {
               click: me.handleCloseWindow
           },
-          '.editorAdminTaskUserPrefsForm #alternates .checkboxgroup': {
+          'editorAdminTaskUserPrefsForm #alternates checkboxgroup': {
               beforerender: me.prepareAlternates
           },
-          '.editorAdminTaskUserPrefsForm .combobox[name="workflowStep"]': {
+          'editorAdminTaskUserPrefsForm combobox[name="workflowStep"]': {
               change: me.comboChange
           },
-          '.editorAdminTaskUserPrefsForm': {
+          'editorAdminTaskUserPrefsForm': {
               beforerender: me.setActualTaskInCmp
           },
-          '.editorAdminTaskUserPrefsGrid': {
+          'editorAdminTaskUserPrefsGrid': {
               beforerender: me.setActualTaskInCmp,
               confirmDelete: me.handleDeleteConfirmClick,
               selectionchange: me.handleAssocSelection
           },
-          '.editorAdminTaskUserPrefsGrid #userPrefReload': {
+          'editorAdminTaskUserPrefsGrid #userPrefReload': {
               click: me.handleReload
           },
           '#adminTaskUserAssocGrid #reload-btn': {
               click: me.handleReload
           },
-          '.editorAdminTaskUserPrefsGrid #userPrefAdd': {
+          'editorAdminTaskUserPrefsGrid #userPrefAdd': {
               click: me.handleAddClick
           },
-          '.editorAdminTaskUserPrefsForm #cancelBtn': {
+          'editorAdminTaskUserPrefsForm #cancelBtn': {
               click: me.clickCancel
           },
-          '.editorAdminTaskUserPrefsForm #saveBtn': {
+          'editorAdminTaskUserPrefsForm #saveBtn': {
               click: me.clickSave
           }
       });
@@ -274,7 +274,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           defaultPref = userPrefs.getDefaultFor(task.get('workflow')),
           form = me.getPrefForm();
       form.show();
-      form.down('.combobox[name="workflowStep"]').setDisabled(false);
+      form.down('combobox[name="workflowStep"]').setDisabled(false);
       me.getEditInfo().hide();
       rec = Ext.create(Editor.model.admin.task.UserPref, {
           fields: fields,
@@ -460,7 +460,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           form.getForm().reset();
           return;
       }
-      form.down('.combobox[name="workflowStep"]').setDisabled(rec.isDefault());
+      form.down('combobox[name="workflowStep"]').setDisabled(rec.isDefault());
       me.getUsersCombo().setDisabled(rec.isDefault());
       me.updateWorkflowSteps(rec);
       form.loadRecord(rec, me.FOR_ALL);

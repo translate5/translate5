@@ -61,6 +61,7 @@ Ext.define('Editor.view.ViewPortEditor', {
           items = [me.getNorth(), {
               xtype: 'panel',
               region: 'east',
+              title: '&nbsp;', // here there must be a titile (otherwise warning appear), but the titile must be invisible
               collapsible: true,
               layout: 'fit',
               animCollapse: !Ext.isIE, //BugID 3

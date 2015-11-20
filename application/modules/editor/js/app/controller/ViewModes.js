@@ -67,22 +67,22 @@ Ext.define('Editor.controller.ViewModes', {
   init : function() {
       var me = this;
       me.control({
-          '.gridpanel #viewModeBtn' : {
+          'gridpanel #viewModeBtn' : {
               click : me.viewMode
           },
-          '.gridpanel #editModeBtn' : {
+          'gridpanel #editModeBtn' : {
               click : me.editMode
           },
-          '.gridpanel #ergonomicModeBtn' : {
+          'gridpanel #ergonomicModeBtn' : {
               click : me.ergonomicMode
           },
-          '.gridpanel #hideTagBtn' : {
+          'gridpanel #hideTagBtn' : {
               click : me.hideTags
           },
-          '.gridpanel #fullTagBtn' : {
+          'gridpanel #fullTagBtn' : {
               click : me.showFullTags
           },
-          '.gridpanel #shortTagBtn' : {
+          'gridpanel #shortTagBtn' : {
               click : me.showShortTags
           },
           'segmentsHtmleditor': {
@@ -197,7 +197,7 @@ Ext.define('Editor.controller.ViewModes', {
    * @return [Editor.view.segment.ContentColumn]
    */
   getHideColumns: function() {
-      var cols = this.getSegmentGrid().query('.contentColumn');
+      var cols = this.getSegmentGrid().query('contentColumn');
       return Ext.Array.filter(cols, function(col) {
           return col.segmentField.get('editable');
       });

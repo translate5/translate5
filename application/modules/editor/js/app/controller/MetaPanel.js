@@ -64,7 +64,7 @@ Ext.define('Editor.controller.MetaPanel', {
       selector : '#metapanel #naviToolbar'
   },{
       ref : 'segmentMeta',
-      selector : '#metapanel .segmentsMetapanel'
+      selector : '#metapanel segmentsMetapanel'
   },{
     ref : 'segmentGrid',
     selector : '#segmentgrid'
@@ -267,8 +267,8 @@ Ext.define('Editor.controller.MetaPanel', {
         mp = me.getMetaPanel(),
         form = mp.down('#metaInfoForm'),
         values = record.getQmAsArray(),
-        qmBoxes = mp.query('#metaQm .checkbox');
-    statBoxes = mp.query('#metaStates .radio');
+        qmBoxes = mp.query('#metaQm checkbox');
+    statBoxes = mp.query('#metaStates radio');
     Ext.each(statBoxes, function(box){
       box.setValue(false);
     });
@@ -284,7 +284,7 @@ Ext.define('Editor.controller.MetaPanel', {
     var me = this,
         mp = me.getMetaPanel(),
         form = mp.down('#metaInfoForm'),
-        qmBoxes = mp.query('#metaQm .checkbox'),
+        qmBoxes = mp.query('#metaQm checkbox'),
         quality = [];
     Ext.each(qmBoxes, function(box){box.getValue() && quality.push(box.inputValue);});
     me.record.set('stateId', form.getValues().stateId);
@@ -345,7 +345,7 @@ Ext.define('Editor.controller.MetaPanel', {
   getColInfo: function() {
     var me = this,
         plug = me.getEditPlugin(),
-        columns = me.getSegmentGrid().query('.contentEditableColumn:not([hidden])'),
+        columns = me.getSegmentGrid().query('contentEditableColumn:not([hidden])'),
         foundIdx = false,
         current = plug.editor.getEditedField();
     

@@ -79,7 +79,7 @@ Ext.define('Editor.view.changealike.Window', {
       //und entsprechende Spalten im WDHE Grid ausblenden.
       //Editor.data.task.get('enableSourceEditing');
       var me = this,
-          grid = me.down('.gridpanel'),
+          grid = me.down('gridpanel'),
           id = rec.get('id');
       me.openedFor = id;
       me.callParent();
@@ -102,7 +102,7 @@ Ext.define('Editor.view.changealike.Window', {
    */
   setAlikes: function(id, alikes) {
       var me = this, 
-          grid = me.down('.gridpanel');
+          grid = me.down('gridpanel');
       me.loadedAlikes = alikes;
       if(grid.rendered){
           grid.setAlikes(alikes);

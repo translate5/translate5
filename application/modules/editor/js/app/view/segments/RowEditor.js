@@ -240,7 +240,7 @@ Ext.define('Editor.view.segments.RowEditor', {
         var me = this,
             oldIdx = me.columnToEdit,
             rec = me.context.record,
-            oldField = me.query('.displayfield[name="'+oldIdx+'"]');
+            oldField = me.query('displayfield[name="'+oldIdx+'"]');
         if(oldIdx == column.dataIndex) {
             //column did not change
             return;

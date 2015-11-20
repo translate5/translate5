@@ -51,7 +51,7 @@ Ext.define('Editor.controller.UserPreferences', {
         selector : 'headPanel #top-menu'
     },{
         ref : 'form',
-        selector : '#preferencesUserWindow .form'
+        selector : '#preferencesUserWindow form'
     }],
     init : function() {
         var me = this;

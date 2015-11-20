@@ -56,7 +56,7 @@ Ext.define('Editor.controller.Preferences', {
       selector : '#segmentgrid'
   },{
     ref : 'form',
-    selector : '#preferencesWindow .form'
+    selector : '#preferencesWindow form'
   }],
   init : function() {
     this.control({
@@ -85,7 +85,7 @@ Ext.define('Editor.controller.Preferences', {
     //disable change alike settings if a segment is currently opened. 
     // If not a user would be able to change the change alike behaviour, 
     // while alikes are already loaded or not loaded. This would lead to bugs.
-    this.getForm().down('.radiogroup').setDisabled(this.getSegmentGrid().editingPlugin.openedRecord !== null);
+    this.getForm().down('radiogroup').setDisabled(this.getSegmentGrid().editingPlugin.openedRecord !== null);
     this.window.show();
   },
   /**

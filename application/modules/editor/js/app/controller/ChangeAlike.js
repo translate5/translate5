@@ -92,7 +92,7 @@ Ext.define('Editor.controller.ChangeAlike', {
     selector : '#changealikeWindow'
   },{
     ref : 'alikeGrid',
-    selector : '#changealikeWindow .gridpanel'
+    selector : '#changealikeWindow gridpanel'
   },{
     ref : 'optionsBtn',
     selector : '#segmentgrid #optionsBtn'

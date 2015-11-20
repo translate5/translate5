@@ -283,7 +283,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       if(task.isReadOnly() || ! this.isAllowed('editorEditTask', task)) {
           //readonly:
           grid.down('#viewModeMenu').hide();
-          sep = grid.down('#viewModeMenu').nextNode('.tbseparator');
+          sep = grid.down('#viewModeMenu').nextNode('tbseparator');
           sep && sep.hide();
           vm && vm.viewMode(true); //true means called on init
       }

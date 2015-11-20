@@ -116,10 +116,10 @@ Ext.define('Editor.controller.Segments', {
           }
       },
       component: {
-          '#segmentgrid .headercontainer' : {
+          '#segmentgrid headercontainer' : {
               sortchange: 'scrollGridToTop'
           },
-          '#segmentgrid .gridview' : {
+          '#segmentgrid gridview' : {
               beforerefresh: 'editorDomCleanUp'
           },
           '#segmentgrid' : {
@@ -171,10 +171,10 @@ Ext.define('Editor.controller.Segments', {
       Editor.app.on('editorViewportClosed', me.clearSegments, me);
 
       me.control({
-      '#segmentgrid .headercontainer' : {
+      '#segmentgrid headercontainer' : {
         sortchange: me.scrollGridToTop
       },
-      '#segmentgrid .gridview' : {
+      '#segmentgrid gridview' : {
         beforerefresh: me.editorDomCleanUp
       },
       '#segmentgrid' : {
