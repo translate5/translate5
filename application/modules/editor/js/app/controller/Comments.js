@@ -64,10 +64,10 @@ Ext.define('Editor.controller.Comments', {
     selector: '#commentForm'
   },{
       ref: 'autoStateDisplay',
-      selector: '#roweditor .displayfield[name=autoStateId]'
+      selector: '#roweditor displayfield[name=autoStateId]'
   },{
       ref: 'commentDisplay',
-      selector: '#roweditor .displayfield[name=comments]'
+      selector: '#roweditor displayfield[name=comments]'
   }],
   activeComment: null,
   loadedSegmentId: null,
@@ -87,16 +87,16 @@ Ext.define('Editor.controller.Comments', {
           '#roweditor': {
               afterEditorMoved: me.onEditorMoved
           },
-          '#roweditor .displayfield[name=comments]': {
+          '#roweditor displayfield[name=comments]': {
               change: me.updateEditorComment
           },
           '#editorCommentBtn' : {
               click: me.handleEditorCommentBtn
           },
-          '#commentWindow .actioncolumn' : {
+          '#commentWindow actioncolumn' : {
               click: me.handleGridAction
           },
-          '#commentWindow .grid' : {
+          '#commentWindow grid' : {
               itemdblclick: me.handleGridDblClick
           },
           '#commentWindow #saveBtn' : {

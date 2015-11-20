@@ -45,6 +45,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.segments.HtmlEditor', {
   extend: 'Ext.form.field.HtmlEditor',
   alias: 'widget.segmentsHtmleditor',
+  requires: ['Editor.controller.ViewModes'],
   markupImages: null,
   //prefix der img Tag ids im HTML Editor
   idPrefix: 'tag-image-',

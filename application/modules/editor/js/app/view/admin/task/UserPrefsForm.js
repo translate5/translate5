@@ -170,8 +170,8 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
             workflowStep: rec.get('workflowStep') || FOR_ALL,
             userGuid: rec.get('userGuid') || FOR_ALL
         });
-        wfLabel = me.down('.combobox[name="workflowStep"]').getRawValue();
-        userLabel = me.down('.combobox[name="userGuid"]').getRawValue();
+        wfLabel = me.down('combobox[name="workflowStep"]').getRawValue();
+        userLabel = me.down('combobox[name="userGuid"]').getRawValue();
         me.setTitle(rec.phantom ? me.title_add : Ext.String.format(me.title_edit, wfLabel, userLabel));
     }
 });

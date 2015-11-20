@@ -365,7 +365,7 @@ Ext.define('Editor.view.segments.Grid', {
         });
         me.callParent(arguments);
         
-        fieldClsList = me.query('.contentEditableColumn').concat(me.query('.contentColumn'));
+        fieldClsList = me.query('contentEditableColumn').concat(me.query('contentColumn'));
         Ext.Array.each(fieldClsList, function(item, idx){
             fieldClsList[idx] = '#segment-grid .x-grid-row .x-grid-cell-'+item.itemId+' .x-grid-cell-inner { width: '+item.width+'px; }';
         });

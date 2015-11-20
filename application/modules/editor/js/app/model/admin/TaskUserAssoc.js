@@ -48,12 +48,12 @@ Ext.define('Editor.model.admin.TaskUserAssoc', {
     {name: 'state', type: 'string'},
     {name: 'role', type: 'string'}
   ],
-  validations: [
-      {type: 'presence', field: 'taskGuid'},
-      {type: 'presence', field: 'userGuid'}//,
-      //FIXME make me dynamic? {type: 'inclusion', field: 'state', list: Ext.Object.getKeys(Editor.data.app.utStates)},
-      //FIXME make me dynamic? {type: 'inclusion', field: 'role', list: Ext.Object.getKeys(Editor.data.app.utRoles)}
-  ],
+  validators: {
+      taskGuid: 'presence',
+      userGuid: 'presence'//,
+      //FIXME make me dynamic? state: {type: 'inclusion', list: Ext.Object.getKeys(Editor.data.app.utStates)},
+      //FIXME make me dynamic? role: {type: 'inclusion', list: Ext.Object.getKeys(Editor.data.app.utRoles)}
+  },
   idProperty: 'id',
   proxy : {
     type : 'rest',

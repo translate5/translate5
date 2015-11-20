@@ -46,13 +46,13 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       selector: '#adminTaskUserAssocGrid'
   },{
       ref: 'userAssoc',
-      selector: '.adminTaskUserAssoc'
+      selector: 'adminTaskUserAssoc'
   },{
       ref: 'userAssocForm',
-      selector: '.adminTaskUserAssoc .form'
+      selector: 'adminTaskUserAssoc form'
   },{
       ref: 'editInfo',
-      selector: '.adminTaskUserAssoc #editInfoOverlay'
+      selector: 'adminTaskUserAssoc #editInfoOverlay'
   },{
       ref: 'prefWindow',
       selector: '#adminTaskPreferencesWindow'
@@ -103,13 +103,13 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           '#adminTaskUserAssocGrid #add-user-btn': {
               click: me.handleAddUser
           },
-          '.adminTaskUserAssoc .combo[name="role"]': {
+          'adminTaskUserAssoc combo[name="role"]': {
               change: me.initState
           },
-          '.adminTaskUserAssoc #save-assoc-btn': {
+          'adminTaskUserAssoc #save-assoc-btn': {
               click: me.handleSaveAssoc
           },
-          '.adminTaskUserAssoc #cancel-assoc-btn': {
+          'adminTaskUserAssoc #cancel-assoc-btn': {
               click: me.handleCancel
           }
       });
@@ -247,7 +247,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       var me = this,
           form = me.getUserAssocForm(),
           task = Editor.model.admin.Task.prototype,
-          stateCombo = form.down('.combo[name="state"]'),
+          stateCombo = form.down('combo[name="state"]'),
           newState = task.USER_STATE_OPEN,
           rec = form.getRecord(),
           isChanged = stateCombo.getValue() != rec.get('state');

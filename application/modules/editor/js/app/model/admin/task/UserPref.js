@@ -45,15 +45,15 @@ Ext.define('Editor.model.admin.task.UserPref', {
     {name: 'userGuid', type: 'string'},
     {name: 'fields', type: 'string'}
   ],
-  validations: [
-      {type: 'presence', field: 'taskGuid'},
-      {type: 'presence', field: 'workflow'},
-      {type: 'inclusion', field: 'visibility', list: ['show','hide','disable']},
-      {type: 'inclusion', field: 'workflow', list: Ext.Object.getKeys(Editor.data.app.workflows)}
+  validators: {
+      taskGuid: 'presence',
+      workflow: 'presence',
+      visibility: {type: 'inclusion', list: ['show','hide','disable']}
       //FIXME can we do this out of segmentfields dynamically?
       //if yes, than we can move the visibility flags to CONSTs
-      //{type: 'inclusion', field: 'fields', list: Ext.Object.getKeys(Editor.data.app.utRoles)}
-  ],
+      //workflow: {type: 'inclusion, list: Ext.Object.getKeys(Editor.data.app.workflows)},
+      //fields: {type: 'inclusion', list: Ext.Object.getKeys(Editor.data.app.utRoles)}
+  },
   idProperty: 'id',
   /**
    * is the Default entry if userGuid and workflowStep are empty

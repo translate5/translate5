@@ -152,7 +152,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
    */
   loadUsers: function() {
       var me = this,
-          user = me.down('.combo[name="userGuid"]'),
+          user = me.down('combo[name="userGuid"]'),
       store = user.store;
       store.clearFilter(true);
       if(!me.excludeLogins || me.excludeLogins.length == 0) {
@@ -173,8 +173,8 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
   loadRecord: function(rec) {
       var me = this,
           edit = !rec.phantom,
-          form = me.down('.form'),
-          user = me.down('.combo[name="userGuid"]');
+          form = me.down('form'),
+          user = me.down('combo[name="userGuid"]');
       form.loadRecord(rec);
       if(edit) {
           form.setTitle(Ext.String.format(me.strings.formTitleEdit, rec.get('longUserName')));
