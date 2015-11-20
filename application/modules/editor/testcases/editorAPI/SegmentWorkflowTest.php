@@ -17,7 +17,7 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         self::assertLogin('testmanager');
         $appState = self::assertTermTagger();
         self::assertNotContains('editor_Plugins_ManualStatusCheck_Bootstrap', $appState->pluginsLoaded, 'Plugin ManualStatusCheck may not be activated for this test case!');
-        $api->addImportFile('editorAPI/MainTest/simple-en-de.zip');
+        $api->addImportFile('editorAPI/SegmentWorkflowTest/simple-en-de.zip');
         $api->import($task);
         
         //FIXME improve this test by using two lector users to test after all finish with multiple users
@@ -65,7 +65,7 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
         
         $segToTest = $segments[6];
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'Apache 2.x auf Unix-Systemen', $segToTest->id);
+        $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'Apache 2.x\u00a0 auf Unix-Systemen', $segToTest->id);
         $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
         
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');

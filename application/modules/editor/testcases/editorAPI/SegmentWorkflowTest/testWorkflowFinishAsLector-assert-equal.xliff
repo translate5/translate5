@@ -19,12 +19,12 @@
 </trans-unit>
 
 <trans-unit id="7" translate5:autostateId="1" translate5:autostateText="reviewed">
-<source>Apache 2.x on Unix systems</source>
-<target dx:match-quality="0.0">Apache 2.x auf Unix-Systemen</target>
+<source>Apache 2.x  on Unix systems</source>
+<target dx:match-quality="0.0">Apache 2.x  auf Unix-Systemen</target>
 <alt-trans dx:origin-shorttext="Zieltext" alttranstype="previous-version">
 <target xml:lang="de"></target></alt-trans>
 <alt-trans dx:origin-shorttext="Zieltext-diff" alttranstype="reference">
-<target xml:lang="de"><mrk mtype="x-sdl-added" sdl:revid="460dd477-a7fa-4568-aa8c-2e92179e25f3">Apache 2.x auf Unix-Systemen</mrk></target></alt-trans>
+<target xml:lang="de"><mrk mtype="x-sdl-added" sdl:revid="460dd477-a7fa-4568-aa8c-2e92179e25f3">Apache 2.x  auf Unix-Systemen</mrk></target></alt-trans>
 <state stateid="0"></state>
 <dx:qa-hits></dx:qa-hits>
 </trans-unit>
