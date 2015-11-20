@@ -359,15 +359,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * This Fix is better as in {Editor.view.changealike.Window} because of useing body as LoadMask el.
    */
   savingShow: function() {
-      var win = this.getTaskAddWindow();
-      if(!win.loadingMask) {
-          win.loadingMask = new Ext.LoadMask(Ext.getBody(), {store: false});
-      }
-      win.loadingMask.show();
+      console.log('Editor.controller.admin.TaskOverview::savingShow');
+      this.getTaskAddWindow().mask(Ext.view.AbstractView.prototype.loadingText);
   },
   savingHide: function() {
-      var win = this.getTaskAddWindow();
-      win.loadingMask.hide();
+      console.log('Editor.controller.admin.TaskOverview::savingHide');
+      this.getTaskAddWindow().unmask();
   },
   /**
    * is called after clicking save task, starts the upload / form submit

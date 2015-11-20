@@ -54,6 +54,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         relaisLangTip: '#UT#Relaissprache (Angabe notwendig sofern Relaisdaten vorhanden)',
         relaisLangLabel: '#UT#Relaissprache',
         numberFieldLabel: '#UT#Anzahl Wörter',
+        orderdate: '#UT#Bestelldatum',
         targetDeliveryLabel: '#UT#Lieferdatum',
         fullMatchLabel: '#UT#100% Matches sind editierbar',
         sourceEditLabel: '#UT#Ausgangstext ist editierbar',
@@ -68,7 +69,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     width : 550,
     loadingMask: null,
     modal : true,
-    initComponent : function() {
+
+    initConfig: function(instanceConfig) {
         var me = this,
             langCombo = {
                 xtype: 'combo',
@@ -78,8 +80,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                 queryMode: 'local',
                 store: 'admin.Languages',
                 valueField: 'id'
-            };
-        Ext.applyIf(me, {
+            },
+            config = {
             items : [{
                 xtype: 'form',
                 padding: 5,
@@ -202,8 +204,11 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     text : me.strings.cancelBtn
                 }]
             }]
-        });
+        };
 
-        me.callParent(arguments);
+        if (instanceConfig) {
+            me.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
     }
 });
