@@ -296,6 +296,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $controllers[] = 'admin.TaskPreferences';
         $controllers[] = 'admin.TaskUserAssoc';
         $controllers[] = 'admin.User';
+        $controllers[] = 'Editor.controller.ServerException';
         return $controllers;
         
         //original code
