@@ -71,9 +71,10 @@ Ext.define('Editor.view.admin.UserAddWindow', {
     loadingMask: null,
     modal : true,
     layout:'fit',
-    initComponent : function() {
+    initConfig : function(instanceConfig) {
         var me = this,
             roles = [],
+            config = {},
             defaults = {
                 labelWidth: 160,
                 anchor: '100%'
@@ -97,7 +98,7 @@ Ext.define('Editor.view.admin.UserAddWindow', {
             });
         });
         
-        Ext.applyIf(me, {
+        config = {
             items : [{
                 xtype: 'form',
                 padding: 5,
@@ -251,13 +252,16 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                     text : me.strings.cancelBtn
                 }]
             }]
-        });
+        };
         
         if(me.editMode) {
             me.title = me.titleEdit;
         }
 
-        me.callParent(arguments);
+        if (instanceConfig) {
+            me.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
     },
     /**
      * merge and save the checked roles into the hidden roles field
