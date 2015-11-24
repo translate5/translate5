@@ -270,7 +270,6 @@ Ext.define('Editor.controller.admin.User', {
       rec.reject();
       basic.updateRecord(rec);
       
-      me.savingShow();
       rec.save({
           //using the callback method here (instead failure & success) disables the default server exception
           callback: function(rec, op) {
@@ -292,7 +291,6 @@ Ext.define('Editor.controller.admin.User', {
           success: function() {
               var user = rec.get('surName')+', '+rec.get('firstName')+' ('+rec.get('login')+')',
                   msg = win.editMode ? me.strings.userSaved : me.strings.userAdded;
-              me.savingHide();
               win.close();
               me.getAdminUsersStore().load();
               Editor.MessageBox.addSuccess(Ext.String.format(msg, user));

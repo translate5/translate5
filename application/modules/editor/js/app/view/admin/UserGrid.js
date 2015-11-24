@@ -73,12 +73,12 @@ Ext.define('Editor.view.admin.UserGrid', {
           return '';
       }
   },
-  initComponent: function() {
+  initConfig: function(instanceConfig) {
     var me = this,
         itemFilter = function(item){
             return Editor.app.authenticatedUser.isAllowed(item.isAllowedFor);
-        };
-    Ext.applyIf(me, {
+        },
+    config = {
       columns: [{
           xtype: 'gridcolumn',
           width: 100,
@@ -183,8 +183,11 @@ Ext.define('Editor.view.admin.UserGrid', {
           dock: 'bottom',
           displayInfo: true
       }]
-    });
+    };
 
-    me.callParent(arguments);
+    if (instanceConfig) {
+        me.getConfigurator().merge(me, config, instanceConfig);
+    }
+    return me.callParent([config]);
   }
 });

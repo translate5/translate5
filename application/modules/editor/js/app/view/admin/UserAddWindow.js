@@ -71,6 +71,14 @@ Ext.define('Editor.view.admin.UserAddWindow', {
     loadingMask: null,
     modal : true,
     layout:'fit',
+    initComponent: function() {
+        var me = this;
+        
+        me.callParent(arguments);
+        me.on('beforeshow', function(){
+            me.down('fieldset#passwords').setDisablePasswords(true);
+        });
+    },
     initConfig : function(instanceConfig) {
         var me = this,
             roles = [],
@@ -85,10 +93,6 @@ Ext.define('Editor.view.admin.UserAddWindow', {
             bottomInfo.push(me.strings.bottomPwInfo);
         }
 
-        me.on('beforeshow', function(){
-            me.down('fieldset#passwords').setDisablePasswords(true);
-        });
-        
         Ext.Object.each(Editor.data.app.roles, function(key, value) {
             roles.push({
                 boxLabel: value, 
@@ -282,6 +286,7 @@ Ext.define('Editor.view.admin.UserAddWindow', {
      */
     loadRecord: function(record) {
         var roles = record.get('roles').split(',');
+        console.log(this.down('form'));
         this.down('form').loadRecord(record);
         Ext.Array.forEach(this.query('#rolesGroup checkbox'), function(item) {
             item.setValue(Ext.Array.indexOf(roles, item.initialConfig.value) >= 0);
