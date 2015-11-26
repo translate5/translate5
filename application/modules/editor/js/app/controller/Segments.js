@@ -407,7 +407,7 @@ Ext.define('Editor.controller.Segments', {
    */
   editorDomCleanUp: function() {
     if(this.getSegmentGrid().editingPlugin){
-      this.getSegmentGrid().editingPlugin.editorDomCleanUp();
+      //this.getSegmentGrid().editingPlugin.editorDomCleanUp();
     }
   },
   /**

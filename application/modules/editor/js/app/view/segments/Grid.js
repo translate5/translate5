@@ -117,14 +117,12 @@ Ext.define('Editor.view.segments.Grid', {
         }
     },
     constructor: function() {
-        /* FIXME ext6 todo
         this.plugins = [
-            Ext.create('Editor.view.segments.RowEditing', {
+            Ext.create('Editor.view.segments.RowEditingNew', {
                 clicksToMoveEditor: 1,
                 autoCancel: false
             })
         ];
-        */
         this.callParent(arguments);
     },
     initComponent: function() {

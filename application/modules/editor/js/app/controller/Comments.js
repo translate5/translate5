@@ -119,7 +119,12 @@ Ext.define('Editor.controller.Comments', {
       this.handleAddComment();
   },
   getEditPlugin: function() {
-      return this.getSegmentGrid().editingPlugin;
+      var me = this,
+          grid, ed;
+          
+      grid = me.getSegmentGrid();
+      ed = grid.editingPlugin;
+      return ed;
   },
   /**
    * clean up the loaded comments.
@@ -291,7 +296,7 @@ Ext.define('Editor.controller.Comments', {
    */
   handleCommentsColumnClick: function(view, rec, tr, idx, ev) {
       var me = this,
-          ed = me.getSegmentGrid().editingPlugin,
+          ed = me.getEditPlugin(),
           add = ev.getTarget('img.add'),
           edit = ev.getTarget('img.edit'),
           mpController = Editor.app.getController('MetaPanel');

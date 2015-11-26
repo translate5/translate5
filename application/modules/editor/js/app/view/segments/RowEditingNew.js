@@ -5,6 +5,6 @@ Ext.define('Editor.view.segments.RowEditingNew', {
         'Editor.view.segments.RowEditorNew'
     ],
     initEditor: function() {
-        return new Ext.grid.RowEditorNew(this.initEditorConfig());
+        return new Editor.view.segments.RowEditorNew(this.initEditorConfig());
     }
 });
