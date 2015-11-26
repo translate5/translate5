@@ -354,7 +354,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         /* @var $service editor_Plugins_TermTagger_Service */
         
         try {
-            $service->open($url, $tbxHash, $tbxData."X");
+            $service->open($url, $tbxHash, $tbxData);
         }
         catch (editor_Plugins_TermTagger_Exception_Abstract $e) {
             $e->setMessage('TermTagger '.$url.' (task '.$this->taskGuid.' could not load TBX! Reason: '."\n".$e->getMessage(), false);
