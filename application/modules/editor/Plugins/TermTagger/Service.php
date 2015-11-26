@@ -178,7 +178,7 @@ class editor_Plugins_TermTagger_Service {
         if(!$this->wasSuccessfull()) {
             $msg = 'TermTagger HTTP Status was: '.$this->getLastStatus();
             $msg .= "\n URL: ".$httpClient->getUri(true);
-            $this->log->logError('Result of opening a TBX was not OK! More details in error log.', $msg);
+            $this->log->logError('Opening a TBX in termtagger '.$url.' was not successfull! More details in error log.', $msg);
             $msg .= "\n\nPlain Server Response: ".print_r($response,true);
             $msg .= "\n\nRequested Data: ".print_r($serverCommunication,true);
             error_log($msg);
