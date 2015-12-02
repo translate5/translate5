@@ -79,16 +79,16 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
         items: [
           {
             xtype: 'button',
-            itemId: 'cancelSegmentBtn',
-            tooltip: me.item_cancel,
-            icon: Editor.data.moduleFolder+'images/cross.png',
+            itemId: 'saveSegmentBtn',
+            tooltip: me.item_save,
+            icon: Editor.data.moduleFolder+'images/tick.png',
             iconAlign: 'right'
           },
           {
             xtype: 'button',
-            itemId: 'saveSegmentBtn',
-            tooltip: me.item_save,
-            icon: Editor.data.moduleFolder+'images/tick.png',
+            itemId: 'cancelSegmentBtn',
+            tooltip: me.item_cancel,
+            icon: Editor.data.moduleFolder+'images/cross.png',
             iconAlign: 'right'
           },
           {
