@@ -55,14 +55,6 @@ Ext.define('Editor.view.segments.RowEditingNew', {
             grid = me.grid,
             view = me.view,
             headerCt = grid.headerCt,
-            btns = [
-                'saveBtnText',
-                'cancelBtnText',
-                'errorsText',
-                'dirtyText'
-            ],
-            b,
-            bLen = btns.length,
             cfg = {
                 autoCancel: me.autoCancel,
                 errorSummary: me.errorSummary,
@@ -74,14 +66,7 @@ Ext.define('Editor.view.segments.RowEditingNew', {
                 // keep a reference..
                 editingPlugin: me,
                 renderTo: view.el
-            },
-            item;
-        for (b = 0; b < bLen; b++) {
-            item = btns[b];
-            if (Ext.isDefined(me[item])) {
-                cfg[item] = me[item];
-            }
-        }
+            };
         return cfg;
     },
     initEditor: function() {
