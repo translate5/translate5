@@ -122,6 +122,11 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         $states = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
         /* @var $states editor_Models_SegmentAutoStates */
         
+        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        $userGuid = (new Zend_Session_Namespace('user'))->data->userGuid;
+        $tua->loadByParams($userGuid, $session->taskGuid);
+        
         $alikeCount = count($ids);
         foreach($ids as $id) {
             $id = (int) $id;
@@ -174,7 +179,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 $entity->setUserGuid($this->entity->getUserGuid());
                 $entity->setWorkflowStep($this->entity->getWorkflowStep());
                 $entity->setWorkflowStepNr($this->entity->getWorkflowStepNr());
-                $entity->setAutoStateId($states->calculateAlikeState($this->entity->getAutoStateId()));
+                $entity->setAutoStateId($states->calculateAlikeState($entity, $tua));
                 
                 $entity->validate();
                 $history->save();

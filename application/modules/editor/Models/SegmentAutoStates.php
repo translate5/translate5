@@ -192,11 +192,15 @@ class editor_Models_SegmentAutoStates {
     
     /**
      * returns the state to use for Alikesegments
-     * @param integer $originalState The AutoStateId of the master segment which is copied to the alike segments
+     * 
+     * @param editor_Models_Segment $segment
+     * @param editor_Models_TaskUserAssoc $tua
      * @return integer
      */
-    public function calculateAlikeState($originalState) {
-        switch ($originalState) {
+    public function calculateAlikeState(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua) {
+        $calculatedState = $this->calculateSegmentState($segment, $tua);
+        error_log(print_r($calculatedState,1));
+        switch ($calculatedState) {
             case self::REVIEWED:
                 return self::REVIEWED_AUTO;
             case self::REVIEWED_UNCHANGED:
