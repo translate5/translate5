@@ -66,6 +66,8 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
      */
     protected $overviewSum = array();
     
+    protected $allowFileWorksheets = true;
+    
     public function init(editor_Models_Task $task, stdClass $statistics, array $workerParams) {
         parent::init($task, $statistics, $workerParams);
         
@@ -82,6 +84,8 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
         else {
             $tpl = $config->xlsTemplateExport;
         }
+        
+        $this->allowFileWorksheets = ($this->statistics->fileCount <= $config->disableFileWorksheetCount);
         
         $this->xls = PHPExcel_IOFactory::load($tpl);
         $this->fillSheetOverview();
@@ -246,9 +250,10 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
             //This prevents the over sheets to be created
             $oldFileId = $stats[0]['fileId'];
         }
+        
         foreach($stats as $stat){
             //add new sheet if per file
-            if($stat['fileId'] != $oldFileId) {
+            if($this->allowFileWorksheets && $stat['fileId'] != $oldFileId) {
                 $newSheet = $sheet->copy();
                 $newSheet->setTitle((string) $this->sheetNames[$stat['fileId']]);
                 $this->xls->addSheet($newSheet, $idx++);
@@ -261,9 +266,11 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
                 continue;
             }
             
-            $newSheet->setCellValue('A'.$i, $stat['term']);
-            $newSheet->setCellValue('B'.$i, $stat['foundSum']);
-            $newSheet->setCellValue('C'.$i++, $stat['notFoundSum']);
+            if($this->allowFileWorksheets) {
+                $newSheet->setCellValue('A'.$i, $stat['term']);
+                $newSheet->setCellValue('B'.$i, $stat['foundSum']);
+                $newSheet->setCellValue('C'.$i++, $stat['notFoundSum']);
+            }
             $oldFileId = $stat['fileId'];
         }
         

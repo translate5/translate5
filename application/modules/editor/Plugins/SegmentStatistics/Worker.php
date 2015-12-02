@@ -82,6 +82,12 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
      */
     protected $termStat;
     
+    /**
+     * internal file counter
+     * @var integer
+     */
+    protected $fileCount = 0;
+    
     public function __construct() {
         parent::__construct();
         $this->stat = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_Statistics');
@@ -324,7 +330,7 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
             $statistics->filesImport = $this->getFileStatistics(self::TYPE_IMPORT);
             $statistics->filesExport = $this->getFileStatistics(self::TYPE_EXPORT);
         }
-        
+        $statistics->fileCount = $this->fileCount;
         $statistics->taskFields = $this->taskFieldsStat;
     }
     
@@ -352,7 +358,7 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
      * @return array
      */
     protected function getFileStatistics($type) {
-        $files = $this->stat->calculateSummary($this->taskGuid, $type);
+        $files = $this->stat->calculateSummary($this->taskGuid, $type, $this->fileCount);
         $statByState = $this->stat->calculateStatsByState($this->taskGuid, $type);
         
         $segment = ZfExtended_Factory::get('editor_Models_Segment');

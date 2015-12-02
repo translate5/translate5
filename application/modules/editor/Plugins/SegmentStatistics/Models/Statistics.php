@@ -102,10 +102,13 @@ class editor_Plugins_SegmentStatistics_Models_Statistics extends ZfExtended_Mode
      * returns the statistics summary for the given taskGuid and type
      * @param string $taskGuid
      * @param string $type (import or export)
+     * @param integer &$fileCount returned by reference
      * @return array
      */
-    public function calculateSummary($taskGuid, $type) {
+    public function calculateSummary($taskGuid, $type, &$fileCount = 0) {
         $files = $this->getFiles($taskGuid);
+        $fileCount = count($files);
+        
         $db = $this->db;
         
         $meta = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_SegmentMetaJoin');
