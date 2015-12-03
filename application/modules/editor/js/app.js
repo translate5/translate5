@@ -86,7 +86,8 @@ Ext.application({
   appFolder : Editor.data.appFolder,
   viewport: null,
   launch : function() {
-      var me = this;
+      var me = this,
+          viewSize = Ext.getBody().getViewSize();
       this.addEvents(
           /**
            * @event editorViewportClosed
@@ -120,6 +121,21 @@ Ext.application({
     me[Editor.data.app.initMethod]();
     
     Editor.MessageBox.showInitialMessages();
+    
+    //Logs the users userAgent and screen size for usability improvements:
+    Ext.Ajax.request({
+        url: Editor.data.pathToRunDir+'/editor/index/logbrowsertype',
+        method: 'post',
+        params: {
+            appVersion: navigator.appVersion,
+            userAgent: navigator.userAgent,
+            browserName: navigator.appName,
+            maxHeight: window.screen.availHeight,
+            maxWidth: window.screen.availWidth,
+            usedHeight: viewSize.height,
+            usedWidth: viewSize.width
+        }
+    });
   },
   //Handler für CRQ 92 warnOnClose
   onBeforeUnload: function(e) {
