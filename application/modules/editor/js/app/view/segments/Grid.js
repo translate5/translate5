@@ -163,6 +163,10 @@ Ext.define('Editor.view.segments.Grid', {
                 return steps[v] ? steps[v] : v;
             },
             width: 140
+        },{
+            xtype: 'autoStateColumn',
+            itemId: 'autoStateColumn',
+            width: 82
         }]);
         
         //conv store data to an array
@@ -243,6 +247,10 @@ Ext.define('Editor.view.segments.Grid', {
             xtype: 'commentsColumn',
             itemId: 'commentsColumn',
             width: 200
+        },{
+            xtype: 'matchrateColumn',
+            itemId: 'matchrateColumn',
+            width: 82
         }]);
     
         if(Editor.data.segments.showStatus){
@@ -260,14 +268,6 @@ Ext.define('Editor.view.segments.Grid', {
         }
     
         columns.push.apply(columns, [{
-            xtype: 'matchrateColumn',
-            itemId: 'matchrateColumn',
-            width: 82
-        },{
-            xtype: 'autoStateColumn',
-            itemId: 'autoStateColumn',
-            width: 82
-        },{
             xtype: 'usernameColumn',
             itemId: 'usernameColumn',
             width: 122
