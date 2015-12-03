@@ -1068,8 +1068,8 @@
 	  <source>Warnung!</source>
 	  <target>Warning!</target>
 	</trans-unit>
-	<trans-unit id='VGVybWUgZGVzIHp1bGV0enQgYmVhcmJlaXRldGVuIFNlZ21lbnRzIGtvbm50ZW4gbmljaHQgYXVzZ2V6ZWljaG5ldCB3ZXJkZW4u'>
-	  <source>Terme des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.</source>
+	<trans-unit id='VGVybWluaSBkZXMgenVsZXR6dCBiZWFyYmVpdGV0ZW4gU2VnbWVudHMga29ubnRlbiBuaWNodCBhdXNnZXplaWNobmV0IHdlcmRlbi4='>
+	  <source>Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.</source>
 	  <target>The term tagger could not tag the terminology in the last edited segment!</target>
 	</trans-unit>
 	<trans-unit id='QXVmZ2FiZSAiezB9IiB2b2xsc3TDpG5kaWcgaW1wb3J0aWVydA=='>

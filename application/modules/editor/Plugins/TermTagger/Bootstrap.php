@@ -185,7 +185,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         if (!$worker->run()) {
             $messages = Zend_Registry::get('rest_messages');
             /* @var $messages ZfExtended_Models_Messages */
-            $messages->addError('Terme des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.');
+            $messages->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.');
             return false;
         }
         
