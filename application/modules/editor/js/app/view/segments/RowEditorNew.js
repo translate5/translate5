@@ -528,7 +528,38 @@ Ext.define('Editor.view.segments.RowEditorNew', {
     },
     
     onViewScroll: function(){
-        
+         /*var me = this,
+            viewEl = me.editingPlugin.view.el,
+            scrollingView = me.scrollingView,
+            scrollTop  = scrollingView.getScrollY(),
+            scrollLeft = scrollingView.getScrollX(),
+            scrollTopChanged = scrollTop !== me.lastScrollTop,
+            row;
+
+        me.lastScrollTop  = scrollTop;
+        me.lastScrollLeft = scrollLeft;
+        if (me.isVisible()) {
+            row = Ext.getDom(me.context.row);
+
+            // Only reposition if the row is in the DOM (buffered rendering may mean the context row is not there)
+            if (row && viewEl.contains(row)) {
+                if (scrollTopChanged) {
+
+                    // The row element in the context may be stale due to buffered rendering removing out-of-view rows, then re-inserting newly rendered ones
+                    me.context.row = row;
+                    me.reposition(null, true);
+                    if ((me.tooltip && me.tooltip.isVisible()) || me.hiddenTip) {
+                        me.repositionTip();
+                    }
+
+                    me.syncEditorClip();
+                }
+            }
+            // If row is NOT in the DOM, ensure the editor is out of sight
+            else {
+                me.setLocalY(-400);
+            }
+        }*/
     },
     
     calculateEditorTop: function(rowTop) {
@@ -1352,7 +1383,63 @@ Ext.define('Editor.view.segments.RowEditorNew', {
 
         return '<ul class="' + Ext.baseCSSPrefix + 'list-plain">' + errors.join('') + '</ul>';
     },
-
+    
+    /**
+     * saves the Editor Content into the loaded record
+     * @returns {Boolean}
+     */
+    saveMainEditorContent: function(record) {
+        var me = this,
+            //der replace aufruf entfernt vom Editor automatisch hinzugefügte unsichtbare Zeichen, 
+            //und verhindert so, dass der Record nicht als modified markiert wird, wenn am Inhalt eigentlich nichts verändert wurde
+            newValue = Ext.String.trim(me.mainEditor.getValueAndUnMarkup()).replace(/\u200B/g, '');
+            
+        //check, if the context delivers really the correct record, because through some issues in reallive data 
+        //rose the idea, that there might exist special race conditions, where
+        //the context.record is not the record of the newValue
+        if(me.editingPlugin.openedRecord === null || me.editingPlugin.openedRecord.internalId != record.internalId ){
+            Editor.MessageBox.addError(me.messages.segmentNotSavedUserMessage + newValue,' Das Segment konnte nicht gespeichert werden. Im folgenden der Debug-Werte: ' + newValue + 'me.editingPlugin.openedRecord.internalId: ' + me.editingPlugin.openedRecord.internalId + ' record.internalId: ' + record.internalId);
+            me.editingPlugin.openedRecord = null;
+            return false;
+        }
+        
+        if(newValue.length == 0 && record.get(me.columnToEdit).length > 0) {
+            Editor.MessageBox.addError(me.messages.cantSaveEmptySegment);
+            return false;
+        }
+        
+        if(me.mainEditor.hasAndDisplayErrors()) {
+            return false;
+        }
+        me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
+        record.beginEdit();
+        record.set(me.columnToEdit, newValue);
+        record.set('autoStateId', 999);
+        record.endEdit(true); //silent = true → dont notify the store. if notifiying the store we get a "grid jumps to top problem" with left right navi
+        return true;
+    },
+    /**
+     * repositions the grid view so that, the mainEditor is visible after change the editing column
+     */
+    repositionHorizontally: function () {
+        var me = this, 
+            gridReg = me.editingPlugin.grid.getView().getEl().getRegion(),
+            offset,
+            edReg = me.mainEditor.getEl().getRegion();
+        
+        if(gridReg.contains(edReg)) {
+            return;
+        }
+        
+        if(edReg.right > gridReg.right) {
+            offset = -1 * gridReg.getOutOfBoundOffsetX(edReg.right) + 10;
+            me.editingPlugin.grid.horizontalScroller.scrollByDeltaX(offset);
+        }
+        else {
+            offset = -1 * gridReg.getOutOfBoundOffsetX(edReg.x) - 10;
+            me.editingPlugin.grid.horizontalScroller.scrollByDeltaX(offset);
+        }
+    },
     createErrorListItem: function(e, name) {
         e = name ? name + ': ' + e : e;
         return '<li class="' + this.errorCls + '">' + e + '</li>';

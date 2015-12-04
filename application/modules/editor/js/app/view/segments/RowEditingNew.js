@@ -65,6 +65,7 @@ Ext.define('Editor.view.segments.RowEditingNew', {
                 },
                 // keep a reference..
                 editingPlugin: me,
+                view: view,
                 renderTo: view.el
             };
         return cfg;

@@ -48,6 +48,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   markupImages: null,
   //prefix der img Tag ids im HTML Editor
   idPrefix: 'tag-image-',
+  requires: [
+      'Editor.view.segments.HtmlEditorLayout'
+  ],
+  componentLayout: 'htmleditorlayout',
 
   //Konfiguration der parent Klasse
   enableFormat: false,
