@@ -42,7 +42,8 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.segments.Grid', {
     extend: 'Ext.grid.Panel',
     requires: [
-        'Editor.view.segments.RowEditing',
+        //'Editor.view.segments.RowEditing',
+        'Editor.view.segments.RowEditingNew',
         'Editor.view.segments.column.Content',
         'Editor.view.segments.column.ContentEditable',
         'Editor.view.segments.column.SegmentNrInTask',
@@ -116,14 +117,12 @@ Ext.define('Editor.view.segments.Grid', {
         }
     },
     constructor: function() {
-        /* FIXME ext6 todo
         this.plugins = [
-            Ext.create('Editor.view.segments.RowEditing', {
+            Ext.create('Editor.view.segments.RowEditingNew', {
                 clicksToMoveEditor: 1,
                 autoCancel: false
             })
         ];
-        */
         this.callParent(arguments);
     },
     initComponent: function() {

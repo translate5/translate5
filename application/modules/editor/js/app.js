@@ -51,6 +51,19 @@ Ext.override(Ext.data.proxy.Ajax, { timeout: 60000 });
 Ext.override(Ext.form.action.Action, { timeout: 60 });
 
 /**
+ * 
+ * fixing for this bug: https://www.sencha.com/forum/showthread.php?288898-W-targetCls-is-missing.-This-may-mean-that-getTargetEl()-is-being-overridden-but-no/page3
+ * 
+ * */
+Ext.define('Ext.overrides.layout.container.Container', {
+  override: 'Ext.layout.container.Container',
+
+  notifyOwner: function() {
+    this.owner.afterLayout(this);
+  }
+});
+
+/**
  * enables the ability to set a optional menuOffset in menus
  * @todo this override must be revalidated on extjs update
  */

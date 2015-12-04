@@ -71,9 +71,18 @@ Ext.define('Editor.view.admin.UserAddWindow', {
     loadingMask: null,
     modal : true,
     layout:'fit',
-    initComponent : function() {
+    initComponent: function() {
+        var me = this;
+        
+        me.callParent(arguments);
+        me.on('beforeshow', function(){
+            me.down('fieldset#passwords').setDisablePasswords(true);
+        });
+    },
+    initConfig : function(instanceConfig) {
         var me = this,
             roles = [],
+            config = {},
             defaults = {
                 labelWidth: 160,
                 anchor: '100%'
@@ -84,10 +93,6 @@ Ext.define('Editor.view.admin.UserAddWindow', {
             bottomInfo.push(me.strings.bottomPwInfo);
         }
 
-        me.on('beforeshow', function(){
-            me.down('fieldset#passwords').setDisablePasswords(true);
-        });
-        
         Ext.Object.each(Editor.data.app.roles, function(key, value) {
             roles.push({
                 boxLabel: value, 
@@ -97,7 +102,7 @@ Ext.define('Editor.view.admin.UserAddWindow', {
             });
         });
         
-        Ext.applyIf(me, {
+        config = {
             items : [{
                 xtype: 'form',
                 padding: 5,
@@ -251,13 +256,16 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                     text : me.strings.cancelBtn
                 }]
             }]
-        });
+        };
         
         if(me.editMode) {
             me.title = me.titleEdit;
         }
 
-        me.callParent(arguments);
+        if (instanceConfig) {
+            me.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
     },
     /**
      * merge and save the checked roles into the hidden roles field
@@ -278,6 +286,7 @@ Ext.define('Editor.view.admin.UserAddWindow', {
      */
     loadRecord: function(record) {
         var roles = record.get('roles').split(',');
+        console.log(this.down('form'));
         this.down('form').loadRecord(record);
         Ext.Array.forEach(this.query('#rolesGroup checkbox'), function(item) {
             item.setValue(Ext.Array.indexOf(roles, item.initialConfig.value) >= 0);
