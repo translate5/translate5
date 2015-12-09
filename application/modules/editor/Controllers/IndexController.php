@@ -283,7 +283,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $controllers[] = 'ViewModes';
         $controllers[] = 'Segments';
         //$controllers[] = 'Preferences';
-        //$controllers[] = 'MetaPanel';
+        $controllers[] = 'MetaPanel';
         $controllers[] = 'Fileorder';
         //$controllers[] = 'Localizer';
         //$controllers[] = 'ChangeAlike';
