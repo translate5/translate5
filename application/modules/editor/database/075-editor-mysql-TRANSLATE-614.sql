@@ -30,7 +30,7 @@
 
 CREATE TABLE `LEK_browser_log` (
   `id` integer (11) DEFAULT NULL AUTO_INCREMENT,
-  `datetime` datetime NOT NULL DEFAULT NOW(),
+  `datetime` datetime NULL DEFAULT NULL,
   `login` varchar(255) DEFAULT NULL COMMENT 'user login',
   `userGuid` varchar(38) DEFAULT NULL COMMENT 'userguid',
   `appVersion` varchar(255) DEFAULT NULL COMMENT 'used browser version (navigator.appVersion)',
