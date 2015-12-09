@@ -25,7 +25,6 @@ Ext.define('Editor.view.segments.HtmlEditorLayout', {
         }
         this.callParent(arguments);
 
-        //ownerContext.toolbarContext  = ownerContext.context.getCmp(owner.toolbar);
         ownerContext.inputCmpContext = ownerContext.context.getCmp(owner.inputCmp);
         ownerContext.bodyCellContext = ownerContext.getEl('bodyEl');
         ownerContext.textAreaContext = ownerContext.getEl('textareaEl');

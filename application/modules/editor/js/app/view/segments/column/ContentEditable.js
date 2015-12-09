@@ -61,6 +61,9 @@ Ext.define('Editor.view.segments.column.ContentEditable', {
   filter: {
     type: 'string'
   },
+  editor: {
+      xtype: 'segmentsHtmleditor'
+  },
   constructor: function(conf) {
       var field = conf.fieldName;
       Ext.applyIf(conf, {
@@ -83,7 +86,7 @@ Ext.define('Editor.view.segments.column.ContentEditable', {
    * interne Methode, wird zur Erzeugung der Editor Instanz einer Spalte verwendet
    * @returns {Editor.view.segments.HtmlEditor}
    */
-  getEditor: function() {
+  getEditorDisabled: function() {
       var me = this;
       if(this.field){
           return this.field;
