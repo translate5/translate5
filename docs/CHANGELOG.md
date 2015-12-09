@@ -2,6 +2,9 @@
 All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 
+## [2.3.101] - 2015-12-09
+fix for older MySQL installations in SQL code introduced by TRANSLATE-614
+
 ## [2.3.100] - 2015-12-09
 ### Added
 TRANSLATE-614: JS-based serverside Log of Browser-Version of the user
