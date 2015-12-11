@@ -68,7 +68,7 @@ if(empty($this->termGroups)) {
                     $title = $this->translate->_('Unbekannter Term Status');
             }
             $itemStr = sprintf('<img src="%1$s" alt="%2$s" title="%2$s"/>', $src, $title);
-            $class = array($term->status);
+            $class = array('term', $term->status);
             if($term->used){
                 $class[] = 'used';
             }
