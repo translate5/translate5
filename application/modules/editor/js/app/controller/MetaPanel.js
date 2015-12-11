@@ -100,6 +100,9 @@ Ext.define('Editor.controller.MetaPanel', {
       //'segmentsHtmleditor': {
       //    afteriniteditor: me.initEditor
       //},
+      '#metapanel #metaTermPanel': {
+          afterrender: me.initMetaTermHandler
+      },
       '#segmentgrid': {
           afterrender: me.initEditPluginHandler
       }
@@ -125,6 +128,27 @@ Ext.define('Editor.controller.MetaPanel', {
     
       me.getLeftBtn().setVisible(multiEdit && ! useChangeAlikes);
       me.getRightBtn().setVisible(multiEdit && ! useChangeAlikes);
+  },
+  initMetaTermHandler: function() {
+      Ext.EventManager.on(this.getMetaTermPanel().getEl(), 'click', function(e, span){
+          if(! Ext.DomQuery.is(span, 'span.term')) {
+              return;
+          }
+          var range;
+          e.stopPropagation();
+          e.preventDefault();
+          if (document.selection) {
+              document.selection.empty();
+              range = document.body.createTextRange();
+              range.moveToElementText(span);
+              range.select();
+          } else if (window.getSelection) {
+              window.getSelection().removeAllRanges();
+              range = document.createRange();
+              range.selectNode(span);
+              window.getSelection().addRange(range);
+          }
+      });
   },
   /**
    * binds strg + enter as save segment combination
