@@ -31,5 +31,8 @@
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES ('runtimeOptions.plugins.SegmentStatistics.maxParallelWorkers', 1, 'editor', 'plugins', 3, 3, '', 'integer', 'Max parallel running statistic workers');
 
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
+VALUES ('runtimeOptions.plugins.SegmentStatistics.createFilteredOnly', 1, 'editor', 'plugins', 0, 0, '', 'boolean', 'If enabled only the filtered file set of statistics are created. If disabled all are generated.');
+
 
 

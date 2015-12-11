@@ -28,3 +28,4 @@
 -- */
 
 DELETE FROM Zf_configuration WHERE name = 'runtimeOptions.plugins.SegmentStatistics.maxParallelWorkers';
+DELETE FROM Zf_configuration WHERE name = 'runtimeOptions.plugins.SegmentStatistics.createFilteredOnly';

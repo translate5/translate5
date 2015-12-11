@@ -38,7 +38,10 @@ class editor_Plugins_SegmentStatistics_WriteStatisticsWorker extends editor_Plug
      */
     public function work() {
         $this->setType();
-        $this->writeToDisk();
+        $config = Zend_Registry::get('config');
+        if(!$config->runtimeOptions->plugins->SegmentStatistics->createFilteredOnly){
+            $this->writeToDisk();
+        }
         $this->writeToDisk(true); //generated stats a second time, with data filtered by config
         return true;
     }
