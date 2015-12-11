@@ -121,7 +121,6 @@ Ext.define('Editor.controller.MetaPanel', {
       me.getEditPlugin().on('beforeedit', me.startEdit, me);
       me.getEditPlugin().on('canceledit', me.cancelEdit, me);
       me.getEditPlugin().on('edit', me.saveEdit, me);
-      me.getEditPlugin().on('canCompleteEdit', me.canCompleteEdit, me);
     
       me.getLeftBtn().setVisible(multiEdit && ! useChangeAlikes);
       me.getRightBtn().setVisible(multiEdit && ! useChangeAlikes);
@@ -143,7 +142,7 @@ Ext.define('Editor.controller.MetaPanel', {
    * Handler für save Button
    */
   layout: function() {
-    this.getNavi().doLayout(); //FIXME noch was anderes layouten?
+    //this.getNavi().doLayout(); //FIXME noch was anderes layouten?
   },
   /**
    * Handler für save Button
@@ -230,14 +229,14 @@ Ext.define('Editor.controller.MetaPanel', {
   },
   /**
    * Editor.view.segments.RowEditing beforeedit handler, initiert das MetaPanel mit den Daten
-   * @param {Object} context
+   * @param {Object} editingPlugin
    */
-  startEdit: function(context) {
+  startEdit: function(editingPlugin) {
     var me = this,
         mp = me.getMetaPanel(),
-        segmentId = context.record.get('id');
+        segmentId = editingPlugin.openedRecord.get('id');
     
-    me.record = context.record;
+    me.record = editingPlugin.openedRecord;
     me.getMetaTermPanel().getLoader().load({params: {id: segmentId}});
     //bindStore(me.record.terms());
     me.loadRecord(me.record);

@@ -35,12 +35,12 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.view.segments.RowEditingNew
+ * @class Editor.view.segments.Translate5RowEditing
  * @extends Ext.grid.plugin.RowEditing
  */
-Ext.define('Editor.view.segments.RowEditingNew', {
+Ext.define('Editor.view.segments.Translate5RowEditing', {
     extend: 'Ext.grid.plugin.RowEditing',
-    alias: 'plugin.segments.roweditingnew',
+    alias: 'plugin.segments.translate5rowediting',
     editingAllowed: true,
     openedRecord: null,
     messages: {
@@ -48,7 +48,7 @@ Ext.define('Editor.view.segments.RowEditingNew', {
         edit100pWarning: '#UT#Achtung, Sie editieren einen 100% Match!'
     },
     requires: [
-        'Editor.view.segments.RowEditorNew'
+        'Editor.view.segments.Translate5RowEditor'
     ],
     initEditorConfig: function() {
         var me = this,
@@ -60,20 +60,15 @@ Ext.define('Editor.view.segments.RowEditingNew', {
                 errorSummary: me.errorSummary,
                 fields: headerCt.getGridColumns(),
                 hidden: true,
-                listeners: {
-                    show: this.focusEditor
-                },
                 // keep a reference..
                 editingPlugin: me,
+                view: view,
                 renderTo: view.el
             };
         return cfg;
     },
     initEditor: function() {
-        return new Editor.view.segments.RowEditorNew(this.initEditorConfig());
-    },
-    focusEditor: function() {
-        this.mainEditor.deferFocus();
+        return new Editor.view.segments.Translate5RowEditor(this.initEditorConfig());
     },
      /**
      * Erweitert die Orginalmethode um die "editingAllowed" Prüfung

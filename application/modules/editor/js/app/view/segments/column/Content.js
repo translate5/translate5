@@ -73,7 +73,7 @@ Ext.define('Editor.view.segments.column.Content', {
    * internal method to create a display field
    * @returns {Editor.view.segments.HtmlEditor}
    */
-  getEditor: function() {
+  getEditorDisabled: function() {
       var me = this;
       if(this.field){
           return this.field;
