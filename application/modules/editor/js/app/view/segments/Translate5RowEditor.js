@@ -657,7 +657,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         if (column.getEditor) {
 
             // Get a default display field if necessary
-            field = column.getEditor(null, me.getDefaultFieldCfg());
+            field = column.getEditor(null, me.getDefaultFieldCfg(column));
 
             if (column.align === 'right') {
                 field.fieldStyle = 'text-align:right';
@@ -685,15 +685,19 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         }
     },
     
-    getDefaultFieldCfg: function() {
-        return {
+    /**
+     * @param {Ext.grid.column.Column} column
+     */
+    getDefaultFieldCfg: function(column) {
+        var specificConf = column.getEditorDefaultConfig ? column.getEditorDefaultConfig() : {};
+        return Ext.applyIf({
             xtype: 'displayfield',
             // Override Field's implementation so that the default display fields will not return values. This is done because
             // the display field will pick up column renderers from the grid.
             getModelData: function() {
                 return null;
             }
-        };
+        }, specificConf);
     },
 
     loadRecord: function(record) {

@@ -86,19 +86,11 @@ Ext.define('Editor.view.segments.column.ContentEditable', {
    * interne Methode, wird zur Erzeugung der Editor Instanz einer Spalte verwendet
    * @returns {Editor.view.segments.HtmlEditor}
    */
-  getEditorDisabled: function() {
+  getEditorDefaultConfig: function() {
       var me = this;
-      if(this.field){
-          return this.field;
-      }
-      //ensure that we have only one Editor in the application, created for the first target column
-      if(me.segmentField.isTarget() && !me.self.firstTarget || (me.self.firstTarget == me.dataIndex)) {
-          me.self.firstTarget = me.dataIndex;
-      }
-      this.field = Ext.create('widget.displayfield',{
+      return {
           name: this.dataIndex,
           fieldCls: 'x-form-display-field segment-tag-container'+me.getTypeCls(me.segmentField)
-      });
-      return this.field;
+      };
   } 
 });

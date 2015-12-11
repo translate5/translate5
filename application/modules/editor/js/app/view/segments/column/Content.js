@@ -73,15 +73,11 @@ Ext.define('Editor.view.segments.column.Content', {
    * internal method to create a display field
    * @returns {Editor.view.segments.HtmlEditor}
    */
-  getEditorDisabled: function() {
+  getEditorDefaultConfig: function() {
       var me = this;
-      if(this.field){
-          return this.field;
-      }
-      this.field = Ext.create('widget.displayfield',{
+      return {
           name: this.dataIndex,
           fieldCls: 'x-form-display-field segment-tag-container'+me.getTypeCls(me.segmentField)
-      });
-      return this.field;
+      };
   } 
 });
