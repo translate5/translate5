@@ -29,20 +29,37 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
+ * This class provides a general Worker which can be configured with a callback method which.
+ * This class is designed for simple workers which dont need a own full blown worker class.
+ * 
+ * The following parameters are needed: 
+ * class → the class which should be instanced on work. Classes with Constructor Parameters are currently not supported!
+ * method → the class method which is called on work. The method receives the taskguid and the whole parameters array.
+ * 
+ * Be careful: This class can not be used in worker_dependencies !
  */
-class editor_Plugins_SegmentStatistics_WriteStatisticsWorker extends editor_Plugins_SegmentStatistics_Worker {
+class editor_Models_Export_ExportedWorker extends ZfExtended_Worker_Abstract {
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_Worker_Abstract::validateParameters()
+     */
+    protected function validateParameters($parameters = array()) {
+        return empty($parameters);
+    }
     
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
-        $this->setType();
-        $config = Zend_Registry::get('config');
-        if(!$config->runtimeOptions->plugins->SegmentStatistics->createFilteredOnly){
-            $this->writeToDisk();
-        }
-        $this->writeToDisk(true); //generated stats a second time, with data filtered by config
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($this->taskGuid);
+        
+        //no unlocking or so here, since task locking on export and should be reworked so that a lockjing is not necessary anymore.
+        
+        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
+        $eventManager->trigger('exportCompleted', $this, array('task' => $task));
         return true;
     }
 }

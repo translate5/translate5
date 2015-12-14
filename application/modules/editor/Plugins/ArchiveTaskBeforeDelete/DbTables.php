@@ -51,10 +51,9 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
      * 'taskGuid' → use the default taskGuid where clause
      * any other string → is used as parameter for mysqldump, {TASKGUID} is later replaced with the taskGuid to be archived
      * @var array
-     * 
-     * FIXME es fehlen z.B: die Zf_configuration für ein Testing des Nicht Vergessen features → Blödsinn, die Zf_conf is per se nicht dabei!
      */
     protected $tables = array(
+            'LEK_browser_log' => false,
             'LEK_comments' => 'taskGuid',
             'LEK_files' => 'taskGuid',
             'LEK_foldertree' => 'taskGuid',

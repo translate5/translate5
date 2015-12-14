@@ -27,18 +27,5 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-
-CREATE TABLE `LEK_browser_log` (
-  `id` integer (11) DEFAULT NULL AUTO_INCREMENT,
-  `datetime` datetime NULL DEFAULT NULL,
-  `login` varchar(255) DEFAULT NULL COMMENT 'user login',
-  `userGuid` varchar(38) DEFAULT NULL COMMENT 'userguid',
-  `appVersion` varchar(255) DEFAULT NULL COMMENT 'used browser version (navigator.appVersion)',
-  `userAgent` varchar(255) DEFAULT NULL COMMENT 'used userAgent (navigator.userAgent)',
-  `browserName` varchar(255) DEFAULT NULL COMMENT 'used browser (navigator.browserName)',
-  `maxWidth` integer (11) DEFAULT NULL COMMENT 'screen width',
-  `maxHeight` integer (11) DEFAULT NULL COMMENT 'screen height',
-  `usedWidth` integer (11) DEFAULT NULL COMMENT 'used window width',
-  `usedHeight` integer (11) DEFAULT NULL COMMENT 'used window height',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+DELETE FROM Zf_configuration WHERE name = 'runtimeOptions.plugins.SegmentStatistics.maxParallelWorkers';
+DELETE FROM Zf_configuration WHERE name = 'runtimeOptions.plugins.SegmentStatistics.createFilteredOnly';

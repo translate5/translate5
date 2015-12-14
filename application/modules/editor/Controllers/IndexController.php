@@ -107,6 +107,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $log = ZfExtended_Factory::get('editor_Models_BrowserLog');
         /* @var $log editor_Models_BrowserLog */
         
+        $log->setDatetime(NOW_ISO);
         $log->setLogin($userSession->data->login);
         $log->setUserGuid($userSession->data->userGuid);
         $log->setAppVersion($_POST['appVersion']);
