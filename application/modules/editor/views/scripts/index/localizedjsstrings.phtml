@@ -125,6 +125,7 @@ Ext.define('Editor.controller.Localizer', {
       segmentSaved: '<?php echo $this->translate->_('Das Segment wurde gespeichert!');?>',
       sortCleared: '<?php echo $this->translate->_('Die gewählte Sortierung der Segmente wurde zurückgesetzt!');?>',
       segmentNotSaved: '<?php echo $this->translate->_('Das zuletzt geöffnete Segment (Nr. {0}) konnte nicht gespeichert werden!');?>',
+      otherFiltersActive: '<?php echo $this->translate->_('ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Merkliste sichtbar sind');?>',
       noSegmentToFilter: '<?php echo $this->translate->_('Kein Segment dieser Datei entspricht den Filterkriterien');?>'
     };
 
@@ -166,6 +167,7 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.segments.Grid.prototype.item_qmsummaryBtn = '<?php echo $this->translate->_('QM Subsegment Statistik');?>',
   	Editor.view.segments.Grid.prototype.item_optionsTagBtn = '<?php echo $this->translate->_('Einstellungen');?>',
   	Editor.view.segments.Grid.prototype.item_clearSortAndFilterBtn = '<?php echo $this->translate->_('Sortierung / Filterung zurücksetzen');?>',
+  	Editor.view.segments.Grid.prototype.item_watchListFilterBtn = '<?php echo $this->translate->_('Merkliste');?>',
   	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>',
 
   	Editor.view.ui.segments.column.Quality.prototype.text = '<?php echo $this->translate->_('QM');?>';
@@ -226,6 +228,8 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.segments.MetaPanelNavi.prototype.item_cancel = '<?php echo $this->translate->_('Abbrechen');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_save = '<?php echo $this->translate->_('Speichern');?>';
 
+    Editor.view.segments.MetaPanelNavi.prototype.item_startWatchingSegment = '<?php echo $this->translate->_('Überwachung starten Segment');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_stopWatchingSegment = '<?php echo $this->translate->_('Nicht mehr beobachten Segment');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNext = '<?php echo $this->translate->_('Speichern und nächstes öffnen');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_saveAndPrevious = '<?php echo $this->translate->_('Speichern und vorheriges öffnen');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_alternateLeft = '<?php echo $this->translate->_('Vorherige Spalte editieren');?>';

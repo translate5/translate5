@@ -28,25 +28,20 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class Editor_UserController extends ZfExtended_UserController {
+class editor_Models_Validator_SegmentUserAssoc extends ZfExtended_Models_Validator_Abstract {
 
     /**
-     * (non-PHPdoc)
-     * @see ZfExtended_RestController::deleteAction()
+     * Validators for Segment User Assoc Entity
      */
-    public function deleteAction() {
-        $this->entity->load($this->_getParam('id'));
-        $this->checkIsEditable();
-        
-        /**
-         * @todo check if this is still necessary, if not the whole function can be removed.
-         * Here all entries in TaskUserAssoc are deleted "manually".
-         * Normally this should happen automatically on database-level via foreign key and cascading delete.
-         */
-        $task_user_assoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $task_user_assoc editor_Models_TaskUserAssoc */
-        $task_users = $task_user_assoc->deleteByUserguid($this->entity->getUserGuid());
-        
-        $this->entity->delete();
+    protected function defineValidators() {
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
+        /* @var $workflow editor_Workflow_Abstract */
+        //comment = string, without length contrain. No validator needed / possible
+        $this->addValidator('id', 'int');
+        $this->addValidator('segmentId', 'int');
+        $this->addValidator('userGuid', 'guid');
+        $this->addValidator('taskGuid', 'guid');
+        $this->addValidator('created', 'date', array('Y-m-d H:i:s'));
+        $this->addValidator('modified', 'date', array('Y-m-d H:i:s'));
     }
 }

@@ -86,7 +86,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     public function indexAction() {
         $session = new Zend_Session_Namespace();
         $this->view->rows = $this->entity->loadByTaskGuid($session->taskGuid);
-        $this->view->total = $this->entity->getTotalCountByTaskGuid($session->taskGuid);
+        $this->view->total = count($this->view->rows);
         $borderSegments = $this->entity->getBorderSegments($session->taskGuid);
         //editable segments only!
         if(!empty($borderSegments['first'])) {
