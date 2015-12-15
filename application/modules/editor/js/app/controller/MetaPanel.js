@@ -75,6 +75,9 @@ Ext.define('Editor.controller.MetaPanel', {
   init : function() {
       var me = this;
       me.control({
+      '#metapanel #watchSegmentBtn' : {
+        click : me.toggleWatchSegment
+      },
       '#metapanel #cancelSegmentBtn' : {
         click : me.cancel
       },
@@ -170,6 +173,52 @@ Ext.define('Editor.controller.MetaPanel', {
     this.getNavi().doLayout(); //FIXME noch was anderes layouten?
   },
   /**
+   * Handler for watchSegmentBtn
+   * @param button
+   * @param pressed
+   */
+  toggleWatchSegment: function(but, pressed) {
+      var me = this,
+        model = Ext.create('Editor.model.SegmentUserAssoc');
+        segmentId = me.record.get('id'),
+        isWatched = Boolean(me.record.get('isWatched')),
+        segmentUserAssocId = me.record.get('segmentUserAssocId'),
+        navi = me.getNavi();
+    
+    if (isWatched)
+    {
+        model.set('id', segmentUserAssocId);
+        model.destroy({
+            success: function(rec, op) {
+                me.record.set('isWatched', false);
+                me.record.set('segmentUserAssocId', null);
+                but.setTooltip(navi.item_startWatchingSegment);
+                but.toggle(false, true);
+            },
+            failure: function(rec, op) {
+                but.setTooltip(navi.item_stopWatchingSegment);
+                but.toggle(true, true);
+            }
+        });
+    }
+    else
+    {
+        model.set('segmentId', segmentId);
+        model.save({
+            success: function(rec, op) {
+                me.record.set('isWatched', true);
+                me.record.set('segmentUserAssocId', rec.data['id']);
+                but.setTooltip(navi.item_stopWatchingSegment);
+                but.toggle(true, true);
+            },
+            failure: function(rec, op) {
+                but.setTooltip(navi.item_startWatchingSegment);
+                but.toggle(false, true);
+            }
+        });
+    }
+  },
+  /**
    * Handler für save Button
    */
   save: function() {
@@ -259,14 +308,22 @@ Ext.define('Editor.controller.MetaPanel', {
   startEdit: function(context) {
     var me = this,
         mp = me.getMetaPanel(),
-        segmentId = context.record.get('id');
+        segmentId = context.record.get('id'),
+        isWatched = Boolean(context.record.get('isWatched')),
+        segmentUserAssocId = context.record.get('segmentUserAssocId'),
+        navi = me.getNavi(),
+        but = Ext.getCmp('watchSegmentBtn'),
+        tooltip = (isWatched) ? navi.item_stopWatchingSegment : navi.item_startWatchingSegment;
+        
+    but.toggle(isWatched, true);
+    but.setTooltip(tooltip);
     
     me.record = context.record;
     me.getMetaTermPanel().getLoader().load({params: {id: segmentId}});
     //bindStore(me.record.terms());
     me.loadRecord(me.record);
     //FIXME here doLayout???
-    me.getNavi().enable();
+    navi.enable();
     me.getSegmentMeta().show();
     mp.show();
   },

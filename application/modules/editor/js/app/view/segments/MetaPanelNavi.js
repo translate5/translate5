@@ -57,6 +57,8 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
     //title: 'Segment-Metadaten',
 
     //Item Strings:
+    item_startWatchingSegment: '#UT#Überwachung starten Segment',
+    item_stopWatchingSegment: '#UT#Nicht mehr beobachten Segment',
     item_cancel: '#UT#Abbrechen',
     item_save: '#UT#Speichern',
     item_saveAndNext: '#UT#Speichern und nächstes öffnen (STRG + ENTER)',
@@ -78,6 +80,15 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
       Ext.applyIf(me, {
         items: [
           {
+            xtype: 'button',
+            itemId: 'watchSegmentBtn',
+            id: 'watchSegmentBtn',
+            icon: Editor.data.moduleFolder+'images/star.png',
+            enableToggle: true,
+            iconAlign: 'right'
+          },
+          { xtype: 'tbseparator' },
+          { 
             xtype: 'button',
             itemId: 'saveSegmentBtn',
             tooltip: me.item_save,
