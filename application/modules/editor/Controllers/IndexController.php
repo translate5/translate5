@@ -286,7 +286,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $controllers[] = 'MetaPanel';
         $controllers[] = 'Fileorder';
         //$controllers[] = 'Localizer';
-        //$controllers[] = 'ChangeAlike';
+        $controllers[] = 'ChangeAlike';
         $controllers[] = 'Comments';
         //without plugins!!!
         $controllers[] = 'HeadPanel';
