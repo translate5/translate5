@@ -89,8 +89,6 @@ class editor_Plugins_SegmentStatistics_Worker extends ZfExtended_Worker_Abstract
     protected $fileCount = 0;
     
     public function __construct() {
-        $config = Zend_Registry::get('config');
-        $this->maxParallelProcesses = $config->runtimeOptions->plugins->SegmentStatistics->maxParallelWorkers;
         parent::__construct();
         $this->stat = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_Statistics');
     }
