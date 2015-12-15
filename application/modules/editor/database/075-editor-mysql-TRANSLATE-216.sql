@@ -27,7 +27,6 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-DROP TABLE IF EXISTS `LEK_segment_user_assoc`;
 CREATE TABLE `LEK_segment_user_assoc` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `segmentId` int(11) NOT NULL,
