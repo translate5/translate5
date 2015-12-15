@@ -29,14 +29,14 @@
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES
- ('runtimeOptions.worker.editor_Models_Export_ExportedWorker.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of worker type as named in config.'),
-('runtimeOptions.worker.editor_Models_Import_Worker_SetTaskToOpen.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of worker type as named in config'),
-('runtimeOptions.worker.editor_Plugins_MtComparEval_Worker.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of worker type as named in config'),
-('runtimeOptions.worker.editor_Plugins_MtComparEval_CheckStateWorker.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of worker type as named in config'),
-('runtimeOptions.worker.editor_Plugins_LockSegmentsBasedOnConfig_Worker.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of worker type as named in config'),
-('runtimeOptions.worker.editor_Plugins_SegmentStatistics_Worker.maxParallelWorkers', 1, 'editor', 'worker', 3, 3, '', 'integer', 'Max parallel running workers of worker type as named in config'),
-('runtimeOptions.worker.editor_Plugins_SegmentStatistics_WriteStatisticsWorker.maxParallelWorkers', 1, 'editor', 'worker', 3, 3, '', 'integer', 'Max parallel running workers of worker type as named in config'),
-('runtimeOptions.worker.editor_Plugins_NoMissingTargetTerminology_Worker.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of worker type as named in config'),
-('runtimeOptions.worker.editor_Plugins_TermTagger_Worker_TermTagger.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of worker type as named in config'),
-('runtimeOptions.worker.editor_Plugins_TermTagger_Worker_TermTaggerImport.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of worker type as named in config'),
-('runtimeOptions.worker.ZfExtended_Worker_Callback.maxParallelWorkers', 1, 'app', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of worker type as named in config');
+ ('runtimeOptions.worker.editor_Models_Export_ExportedWorker.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of the export completed notification worker.'),
+('runtimeOptions.worker.editor_Models_Import_Worker_SetTaskToOpen.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of the Import completed notification worker'),
+('runtimeOptions.worker.editor_Plugins_MtComparEval_Worker.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of the MtComparEval communication worker'),
+('runtimeOptions.worker.editor_Plugins_MtComparEval_CheckStateWorker.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of MtComparEval check state worker'),
+('runtimeOptions.worker.editor_Plugins_LockSegmentsBasedOnConfig_Worker.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of the LockSegmentsBasedOnConfig plugin worker'),
+('runtimeOptions.worker.editor_Plugins_SegmentStatistics_Worker.maxParallelWorkers', 1, 'editor', 'worker', 3, 3, '', 'integer', 'Max parallel running workers of the SegmentStatistics creation worker'),
+('runtimeOptions.worker.editor_Plugins_SegmentStatistics_WriteStatisticsWorker.maxParallelWorkers', 1, 'editor', 'worker', 3, 3, '', 'integer', 'Max parallel running workers of the SegmentStatistics writer worker'),
+('runtimeOptions.worker.editor_Plugins_NoMissingTargetTerminology_Worker.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of the NoMissingTargetTerminology plugin worker'),
+('runtimeOptions.worker.editor_Plugins_TermTagger_Worker_TermTagger.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of the termTagger worker for GUI tagging'),
+('runtimeOptions.worker.editor_Plugins_TermTagger_Worker_TermTaggerImport.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of the termTagger import worker'),
+('runtimeOptions.worker.ZfExtended_Worker_Callback.maxParallelWorkers', 1, 'app', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of the generic callback worker');
