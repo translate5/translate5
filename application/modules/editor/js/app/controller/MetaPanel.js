@@ -47,6 +47,7 @@ Ext.define('Editor.controller.MetaPanel', {
     gridEndReached: '#UT#Ende der Segmente erreicht!',
     gridStartReached: '#UT#Start der Segmente erreicht!'
   },
+  id: 'metapanelcontroller',
   refs : [{
     ref : 'metaPanel',
     selector : '#metapanel'
@@ -197,11 +198,12 @@ Ext.define('Editor.controller.MetaPanel', {
       else {
           isBorderReached = rec.get('id') == store.getFirstSegmentId();
       }
+      /* FIXME This code we must use when the single editor is implemented (Angel Naydenov 10.12.2015)
       Ext.Array.each(grid.columns, function(col, idx) {
           if(col.dataIndex == ed.editor.getEditedField()) {
               lastColumnIdx = idx;
           }
-      });
+      });*/
       me.fireEvent('saveSegment', {
           scope: me,
           segmentUsageFinished: function(){
@@ -289,7 +291,7 @@ Ext.define('Editor.controller.MetaPanel', {
     me.record.set('stateId', form.getValues().stateId);
     me.record.setQmFromArray(quality);
     //close the metapanel
-    me.cancelEdit();
+    mp.hide();
   },
   /**
    * Editor.view.segments.RowEditing canceledit handler

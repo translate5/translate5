@@ -62,8 +62,7 @@ Ext.define('Editor.view.segments.Translate5RowEditing', {
                 hidden: true,
                 // keep a reference..
                 editingPlugin: me,
-                view: view,
-                renderTo: view.el
+                view: view
             };
         return cfg;
     },

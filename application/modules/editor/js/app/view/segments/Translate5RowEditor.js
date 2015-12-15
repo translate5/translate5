@@ -304,10 +304,20 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
     },
     
     onViewScroll: function(){
-        //var me = this,
-            //wrapEl = me.wrapEl;
-        //me.reposition(null, true);
-        //wrapEl.setLocalY(50);
+        var me = this,
+            viewEl = me.editingPlugin.view.el,
+            scrollingView = me.scrollingView,
+            scrollTop  = scrollingView.getScrollY(),
+            scrollLeft = scrollingView.getScrollX(),
+            scrollLeftChanged = scrollLeft !== me.lastScrollLeft;
+
+        me.lastScrollTop  = scrollTop;
+        me.lastScrollLeft = scrollLeft;
+        if (scrollLeftChanged)
+        {
+            me.reposition();
+            me.syncEditorClip();
+        }
     },
 
     onColumnResize: function(column, width) {
@@ -503,28 +513,31 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
 
     reposition: function(animateConfig, fromScrollHandler) {
         var me = this,
+            view = me.view,
             context = me.context,
             row = context && context.row,
             yOffset = 0,
             wrapEl = me.wrapEl,
-            rowTop,
+            rowTop = 0,
             localY,
-            deltaY,
+            deltaY = 0,
             afterPosition;
 
         // Position this editor if the context row is rendered (buffered rendering may mean that it's not in the DOM at all)
-        if (row && Ext.isElement(row)) {
+        if (row && Ext.isElement(row)) 
+        {
 
-            deltaY = me.getScrollDelta();
+            //deltaY = me.getScrollDelta();
 
             if (!me.editingPlugin.grid.rowLines) { 
                 // When the grid does not have rowLines we add a bottom border to the previous
                 // row when the row is focused, but subtract the border width from the 
                 // top padding to keep the row from changing size.  This adjusts the top offset
                 // of the cell edtor to account for the added border.
-                yOffset = -parseInt(Ext.fly(row).first().getStyle('border-bottom-width'), 10);
+                //yOffset = -parseInt(Ext.fly(row).first().getStyle('border-bottom-width'), 10);
             }
-            rowTop = me.calculateLocalRowTop(row);
+            //rowTop = me.calculateLocalRowTop(row);
+            //yOffset = view.getScrollY();
             localY = me.calculateEditorTop(rowTop) + yOffset;
 
             // If not being called from scroll handler...
@@ -533,9 +546,9 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
             // organize an afterPosition handler which will bring it into view and focus the correct input field
             if (!fromScrollHandler) {
                 afterPosition = function() {
-                    if (deltaY) {
+                    /*if (deltaY) {
                         me.scrollingViewEl.scrollBy(0, deltaY, true);
-                    }
+                    }*/
                     me.focusColumnField(context.column);
                 };
             }
@@ -555,6 +568,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
                 }, animateConfig));
             } else {
                 wrapEl.setLocalY(localY);
+                wrapEl.setLocalX(-me.lastScrollLeft);
                 if (afterPosition) {
                     afterPosition();
                 }
@@ -608,10 +622,9 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
             context = me.context,
             row = Ext.get(context.row),
             grid = me.editingPlugin.grid,
-            viewHeight = grid.getHeight(),
-            rowHeight = row.getHeight();
+            viewHeight = grid.getHeight();
             
-        return (viewHeight / 2) - (rowHeight / 2);
+        return (viewHeight / 2);
     },
 
     getClientWidth: function() {
@@ -866,6 +879,8 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         // Otherwise, just allow resumption, and the show will update the layout.
         Ext.resumeLayouts(alreadyVisible);
         if (alreadyVisible) {
+            me.setEditorHeight();
+            me.setEditorWidth();
             me.reposition(true);
         } else {
             // We need to make sure that the target row is visible in the grid view. For
@@ -934,7 +949,9 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
             length = items.length,
             i;
 
-        me.hide();
+        me.editingPlugin.openedRecord = null;
+            
+            me.hide();
         form.clearInvalid();
 
         // temporarily suspend events on form fields before reseting the form to prevent the fields' change events from firing
@@ -959,16 +976,22 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
 
         form.updateRecord(me.context.record);
         me.hide();
+        me.previousRecord = me.editingPlugin.openedRecord;
+        me.editingPlugin.openedRecord = null;
         return true;
     },
-
-    onShow: function() {
+    setEditorHeight: function() {
+        var me = this,
+            context = me.context,
+            row = Ext.get(context.row),
+            rowHeight = row.getHeight();
+            
+        me.setHeight(rowHeight);
+    },
+    setEditorWidth: function() {
         var me = this,
             editingPlugin = me.editingPlugin,
             grid = editingPlugin.grid,
-            context = me.context,
-            row = Ext.get(context.row),
-            rowHeight = row.getHeight(),
             i, columnsWidth = 0;
             
         for (i = 0; i < grid.columns.length; i++)
@@ -978,6 +1001,11 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
                 columnsWidth += grid.columns[i].getWidth();
             }
         }
+        
+        me.setWidth(columnsWidth);
+    },
+    onShow: function() {
+        var me = this;
 
         me.wrapEl.show();
         me.callParent(arguments);
@@ -988,8 +1016,8 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         }
         delete me.needsSyncFieldWidths;
 
-        me.setHeight(rowHeight);
-        me.setWidth(columnsWidth);
+        me.setEditorHeight();
+        me.setEditorWidth();
         me.reposition();
     },
 

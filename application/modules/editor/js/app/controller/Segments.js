@@ -105,10 +105,10 @@ Ext.define('Editor.controller.Segments', {
           editorViewportClosed: 'clearSegments'
       },
       controller: {
-          'MetaPanel': {
+          '#metapanelcontroller': {
               saveSegment: 'saveChainStart'
           },
-          'ChangeAlike': {
+          '#changealikecontroller': {
               //called after load of cahnge alikes to a segment
               fetchChangeAlikes: 'onFetchChangeAlikes',
               //called after currently loaded segment data is not used anymore by the save chain / change alike handling

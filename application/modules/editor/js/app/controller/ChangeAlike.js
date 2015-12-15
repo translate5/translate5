@@ -75,6 +75,7 @@ Ext.define('Editor.controller.ChangeAlike', {
     alikePlural: '#UT#Wiederholungen wurden bearbeitet und gespeichert',
     alikesDisabled: '#UT#Das Projekt enthält alternative Übersetzungen. Der Wiederholungseditor wurde daher deaktiviert.'
   },
+  id: 'changealikecontroller',
   alikesToProcess: null,
   fetchedAlikes: null,
   saveIsRunning: false,
@@ -148,7 +149,7 @@ Ext.define('Editor.controller.ChangeAlike', {
           enabledACL = auth.isAllowed('useChangeAlikes');
           enabled = auth.isAllowed('useChangeAlikes', t);
       //disable the whole settings button, since no other settings are currently available!
-      me.getOptionsBtn().setVisible(enabled);
+      //me.getOptionsBtn().setVisible(enabled);
       me.isDisabled = ! enabled;
       me.getEditPlugin().on('beforeedit', me.handleBeforeEdit, me);
       if(!t.get('defaultSegmentLayout') && enabledACL) {
@@ -166,9 +167,9 @@ Ext.define('Editor.controller.ChangeAlike', {
    * 
    * @param {Ext.grid.plugin.Editing} column
    */
-  handleBeforeEdit: function(context) {
+  handleBeforeEdit: function(editingPlugin) {
     var me = this, 
-        rec = context.record,
+        rec = editingPlugin.openedRecord,
         //id des bearbeiteten Segments
         id = rec.get('id'),
         store = me.getStore('AlikeSegments'),
@@ -184,14 +185,14 @@ Ext.define('Editor.controller.ChangeAlike', {
         segmentsId: id
     });
     
-    me.getSegmentGrid().filters.onBeforeLoad(store, op);
+    // FIXME doesn't work in Ext 6 yet me.getSegmentGrid().filters.onBeforeLoad(store, op);
     //using stores proxy to load and process data
     proxy.url = me.alikeSegmentsUrl+'/'+id;
     op.setStarted();
     me.fireEvent('fetchChangeAlikes', op);
     proxy.read(op, me.handleAlikesRead, me);
   },
-  
+
   /**
    * handle if alikes are successful read
    * @param {Ext.data.Operation} operation
