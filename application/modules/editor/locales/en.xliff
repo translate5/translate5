@@ -1163,6 +1163,22 @@
     <source>Die Aufgabe ist durch einen Benutzer gesperrt</source>
     <target>The task is locked by a user</target>
   </trans-unit>
+  <trans-unit id='QUNIVFVORzogRWluIHdlaXRlcmVyIEZpbHRlciBpc3QgZ2VzZXR6dC4gRXMgaXN0IGRhaGVyIG3DtmdsaWNoLCBkYXNzIG5pY2h0IGFsbGUgU2VnbWVudGUgZGVyIE1lcmtsaXN0ZSBzaWNodGJhciBzaW5k'>
+    <source>ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Merkliste sichtbar sind</source>
+    <target>WARNING: Another filter is set. It is possible, that not all segments of the watchlist are visible</target>
+  </trans-unit>
+  <trans-unit id='TWVya2xpc3Rl'>
+    <source>Merkliste</source>
+    <target>watchlist</target>
+  </trans-unit>
+  <trans-unit id='U2VnbWVudCBhdWYgZGllIE1lcmtsaXN0ZSBzZXR6ZW4='>
+    <source>Segment auf die Merkliste setzen</source>
+    <target>add segment to my watchlist</target>
+  </trans-unit>
+  <trans-unit id='U2VnbWVudCB2b24gZGVyIE1lcmtsaXN0ZSBlbnRmZXJuZW4='>
+    <source>Segment von der Merkliste entfernen</source>
+    <target>remove segment from my watchlist</target>
+  </trans-unit>  
     </body>
   </file>
 </xliff>
