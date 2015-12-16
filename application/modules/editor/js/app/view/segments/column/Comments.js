@@ -45,6 +45,7 @@ Ext.define('Editor.view.segments.column.Comments', {
     text: '#UT#Kommentare',
     text_morecomments: '#UT#({0} weitere Kommentare)',
     text_morecomment: '#UT#({0} weiterer Kommentar)',
+    text_tooltip_icon: '#UT#Dem ausgewählten Segment einen Kommentar hinzufügen. (STRG-SHIFT-N)',
     tdCls: 'comments-field',
     statics: {
         /**
@@ -63,12 +64,13 @@ Ext.define('Editor.view.segments.column.Comments', {
         }
     },
     renderer: function(val, meta, record) {
+        var tip = ' data-qtip="'+Editor.view.segments.column.Comments.prototype.text_tooltip_icon+'"';
         if(!val || val.length == 0) {
-            return '<img class="add" src="'+Ext.BLANK_IMAGE_URL+'">';
+            return '<img class="add" src="'+Ext.BLANK_IMAGE_URL+'"'+tip+'>';
         }
         var value = Ext.String.htmlEncode(val);
         meta.tdAttr = 'data-qtip="'+value+'"';
-        return Editor.view.segments.column.Comments.getFirstComment(val) + '<img class="edit" src="'+Ext.BLANK_IMAGE_URL+'">';
+        return Editor.view.segments.column.Comments.getFirstComment(val) + '<img class="edit" src="'+Ext.BLANK_IMAGE_URL+'"'+tip+'>';
     },
     editor: {
         xtype: 'displayfield',
@@ -80,6 +82,7 @@ Ext.define('Editor.view.segments.column.Comments', {
                 var initTT = null;
                 Ext.widget('button', {
                     iconCls: 'ico-comment-edit',
+                    tooltip: Editor.view.segments.column.Comments.prototype.text_tooltip_icon,
                     itemId: 'editorCommentBtn', 
                     renderTo: field.getEl()
                 });

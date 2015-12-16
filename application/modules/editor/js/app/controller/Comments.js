@@ -106,9 +106,22 @@ Ext.define('Editor.controller.Comments', {
               click: me.handleAddComment
           }
       });
+      
+      var map = new Ext.util.KeyMap(Ext.getDoc(), [{
+          key: [10,13],
+          ctrl: true,
+          alt: false,
+          scope: me,
+          fn: me.handleCommentSave
+      }]);
   },
   initEditPluginHandler: function() {
-      var me = this;
+      var me = this,
+          edCtrl = me.application.getController('Editor');
+          
+      edCtrl.on('openComments', me.handleEditorCommentBtn, me);
+      edCtrl.on('saveUnsavedComments', me.handleCommentSave, me);
+      
     //Diese Events können erst in onlauch gebunden werden, in init existiert das Plugin noch nicht
       me.getEditPlugin().on('beforeedit', me.onStartEdit, me);
       me.getEditPlugin().on('canceledit', me.cancelEdit, me);
@@ -152,6 +165,11 @@ Ext.define('Editor.controller.Comments', {
               comment: form.getForm().getValues().comment,
               modified: now
           };
+          
+      if (rec === null)
+      {
+          return;    
+      }
       
       if(rec.phantom) {
           data.created = now;
@@ -473,8 +491,22 @@ Ext.define('Editor.controller.Comments', {
    * Handles the click on the button in the comment displayfield
    */
   handleEditorCommentBtn: function() {
-      var me = this;
-      me.getCommentWindow().expand();
+      var me = this,
+          win = me.getCommentWindow(),
+          form = me.getCommentForm(),
+          area = form.down('textarea');
+      if (win.collapsed)
+      {
+          win.expand();
+      }
+      else
+      {
+          // Angel Naydenov 12.11.2015: this not work :-(
+          if (area.rendered && area.isVisible())
+          {
+              area.focus(false, 500);
+          }
+      }
   },
   /**
    * updates the tooltip in the comment displayfield

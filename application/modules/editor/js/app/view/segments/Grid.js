@@ -113,10 +113,28 @@ Ext.define('Editor.view.segments.Grid', {
     viewConfig: {
         blockRefresh: true,
         getRowClass: function(record, rowIndex, rowParams, store){
-            if(record.get('editable')){
-                return "";
+            var newClass = '',
+                isFirstInFile = false,
+                nextRec = null;
+            // only on non sorted list we mark last file segments
+            if (store.sorters.length == 0)
+            {
+                if (this.firstFileId && this.firstFileId != record.get('fileId'))
+                {
+                    isFirstInFile = true;
+                }
+                this.firstFileId = record.get('fileId');
             }
-            return "editing-disabled";
+            
+            if (isFirstInFile && (rowIndex > 0)) // don't mark the first row of the grid
+            {
+                newClass += ' first-in-file';
+            }
+            if (!record.get('editable'))
+            {
+                newClass += ' editing-disabled';
+            }
+            return newClass;
         }
     },
     constructor: function() {

@@ -78,7 +78,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   initComponent: function() {
     var me = this;
     me.viewModesController = Editor.controller.ViewModes;
-    me.metaPanelController = Editor.app.getController('MetaPanel');
+    me.metaPanelController = Editor.app.getController('Editor');
     me.segmentsController = Editor.app.getController('Segments');
     me.imageTemplate = new Ext.Template([
       '<img id="'+me.idPrefix+'{key}" class="{type}" title="{text}" alt="{text}" src="{path}"/>'
@@ -346,7 +346,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   handleSaveWithErrors: function(msg){
       var me = this;
       var MB = Ext.create('Ext.window.MessageBox', {
-            buttonText:{                        
+            buttonText:{
                 yes: me.strings.correctErrorsText,
                 no: me.strings.saveAnyway
             }

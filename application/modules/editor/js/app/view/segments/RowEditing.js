@@ -184,6 +184,14 @@ Ext.define('Editor.view.segments.RowEditing', {
         }
       });
       delete me.editor;
+    },
+    /**
+     * change default on enter handler to react only of no CTRL and no ALT was pressed (TRANSLATE-346) 
+     */
+    onEnterKey: function(e) {
+        if(!e.ctrlKey && !e.altKey) {
+            this.callParent(arguments);
+        }
     }
     
 });

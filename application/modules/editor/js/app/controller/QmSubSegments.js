@@ -70,8 +70,11 @@ Ext.define('Editor.controller.QmSubSegments', {
     },
     
     init : function() {
-        var me = this;
+        var me = this,
+          edCtrl = me.application.getController('Editor');
         me.useAlternateInsertion = Ext.isIE;
+        
+        edCtrl.on('assignMQMTag', me.handleAddQmFlagKey, me);
         
         //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
         Editor.app.on('editorViewportOpened', me.handleInitEditor, me);
@@ -125,7 +128,7 @@ Ext.define('Editor.controller.QmSubSegments', {
      * generates the config menu tree for QM Flag Menu
      * @returns
      */
-	getMenuConfig: function() {
+    getMenuConfig: function() {
 		Editor.qmFlagTypeCache = {};
 		var me = this,
 			cache = Editor.qmFlagTypeCache,
@@ -198,6 +201,42 @@ Ext.define('Editor.controller.QmSubSegments', {
      */
     showQmSummary: function() {
         this.getWindow().show();
+    },
+    /**
+     * Recursively gets menuitem by it qmid
+     * @param {Array} menuitems
+     * @param {Integer} qmid
+     */
+    getMenuitemByQmId: function(menuitems, qmid) {
+        var me = this,
+            result = null;
+        for (var i = 0; i < menuitems.length; i++) {
+            if (menuitems[i].qmid == qmid) {
+                return menuitems[i];
+            }
+            if(!menuitems[i].menu || menuitems[i].menu.items.length == 0){
+                continue;
+            }
+            result = me.getMenuitemByQmId(menuitems[i].menu.items, qmid);
+            if(result) {
+                break;
+            }
+        }
+        return result;
+    },
+    /**
+     * Inserts the QM Issue Tag in the Editor by key shortcut, displays popup if nothing selected
+     * @param key
+     */
+    handleAddQmFlagKey: function(key) {
+        var me = this,
+            found = false,
+            menuitem = me.getMenuitemByQmId(me.menuConfig, key);
+        
+        if (menuitem)
+        {
+            me.handleAddQmFlagClick(menuitem);
+        }
     },
     /**
      * Inserts the QM Issue Tag in the Editor, displays popup if nothing selected
@@ -301,9 +340,10 @@ Ext.define('Editor.controller.QmSubSegments', {
      * @param {Ext.menu.Item} menuitem
      */
     addQmFlagHistory: function(menuitem) {
-    	if(!menuitem.parentMenu.parentMenu) {
-    		return; //ignore first level and history menu entries
-    	}
+        // Angel Naydenov 22.10.2015: this statement generates js error, there is no parentMenu property in menuitem
+    	//if(!menuitem.parentMenu.parentMenu) {
+    	//	return; //ignore first level and history menu entries
+    	//}
     	var me = this,
     	id = menuitem.qmid,
     	toremove,

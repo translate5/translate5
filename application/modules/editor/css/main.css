@@ -180,7 +180,7 @@ END LICENSE AND COPYRIGHT
 }
 
 /* Fix for TRANSLATE-237 recheck on ExtJS update */
-.x-tip .x-tip-body {white-space: nowrap;}
+/*.x-tip .x-tip-body {white-space: nowrap;}*/
  /* END Fix for TRANSLATE-237 recheck on ExtJS update */
 
 /*qmsummary*/
@@ -367,3 +367,5 @@ tr.customeState td div {font-style: italic;}
 .not-editable .ico-user-reset-pw {display:none;}
 
 .x-action-col-cell img{height:16px;width:16px;margin-right:2px;cursor: pointer;}
+
+#segment-grid .first-in-file td  {border-top-style: solid; border-top-width: 3px; border-top-color: #99BCE8;}
