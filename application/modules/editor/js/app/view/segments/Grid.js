@@ -352,9 +352,13 @@ Ext.define('Editor.view.segments.Grid', {
                     cls: 'clearSortAndFilterBtn',
                     text: me.item_clearSortAndFilterBtn
                 },{
+                    xtype: 'tbseparator'
+                },{
                     xtype: 'button',
                     itemId: 'watchListFilterBtn',
                     cls: 'watchListFilterBtn',
+                    enableToggle: true,
+                    icon: Editor.data.moduleFolder+'images/star.png',
                     text: me.item_watchListFilterBtn
                 },{
                     xtype: 'tbseparator',

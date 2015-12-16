@@ -57,8 +57,8 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
     //title: 'Segment-Metadaten',
 
     //Item Strings:
-    item_startWatchingSegment: '#UT#Überwachung starten Segment',
-    item_stopWatchingSegment: '#UT#Nicht mehr beobachten Segment',
+    item_startWatchingSegment: '#UT#Segment auf die Merkliste setzen',
+    item_stopWatchingSegment: '#UT#Segment von der Merkliste entfernen',
     item_cancel: '#UT#Abbrechen',
     item_save: '#UT#Speichern',
     item_saveAndNext: '#UT#Speichern und nächstes öffnen (STRG + ENTER)',

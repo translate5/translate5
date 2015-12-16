@@ -108,6 +108,7 @@ Ext.define('Editor.controller.Segments', {
           mpCtrl = me.application.getController('MetaPanel'),
           caCtrl = me.application.getController('ChangeAlike');
       mpCtrl.on('saveSegment', me.saveChainStart, me);
+      mpCtrl.on('watchlistRemoved', me.handleWatchlistRemoved, me);
       //called after load of cahnge alikes to a segment
       caCtrl.on('fetchChangeAlikes', me.onFetchChangeAlikes, me);
       //called after currently loaded segment data is not used anymore by the save chain / change alike handling
@@ -220,31 +221,41 @@ Ext.define('Editor.controller.Segments', {
     var me = this, 
         filters = me.getSegmentGrid().filters.filters.items,
         filtersData = this.getSegmentGrid().filters.getFilterData(),
-        cls = 'activated',
         btn = me.getWatchListFilterBtn();
 
     for (var i = 0; i < filters.length; i++)
     {
-        if (filters[i].dataIndex == 'isWatched')
+        if (filters[i].dataIndex != 'isWatched')
         {
-            if (filters[i].active === true)
-            {
-                filters[i].setActive(false);
-                btn.removeCls(cls);
-            }
-            else
-            {
-                if (filtersData.length > 0)
-                {
-                    Editor.MessageBox.addSuccess(me.messages.otherFiltersActive);
-                }
-                filters[i].setActive(true);
-                filters[i].setValue(true);
-                btn.addCls(cls);
-            }
+            continue;
         }
+        if (filters[i].active === true)
+        {
+            filters[i].setActive(false);
+            btn.toggle(false);
+            continue;
+        }
+        if (filtersData.length > 0)
+        {
+            Editor.MessageBox.addSuccess(me.messages.otherFiltersActive);
+        }
+        filters[i].setActive(true);
+        filters[i].setValue(true);
+        btn.toggle(true);
     }
     me.scrollGridToTop();
+  },
+  /**
+   * removes the segment from the grid if removed from the watchlist and watchlist filter is set
+   */
+  handleWatchlistRemoved: function(rec) {
+      var me = this, 
+          btn = me.getWatchListFilterBtn();
+          store = me.getSegmentsStore();
+      if(!btn.pressed) {
+          return
+      }
+      store.remove(rec);
   },
   /**
    * behandelt die Selektion von Dateien im Dateibaum

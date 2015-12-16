@@ -42,6 +42,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.controller.MetaPanel', {
   extend : 'Ext.app.Controller',
   requires: ['Editor.view.qmsubsegments.AddFlagFieldset'],
+  models: ['SegmentUserAssoc'],
   messages: {
     segmentNotBuffered: '#UT#Das angeforderte Segment liegt noch nicht im Zwischenspeicher. Bitte scrollen Sie manuell weiter!',
     gridEndReached: '#UT#Ende der Segmente erreicht!',
@@ -174,8 +175,8 @@ Ext.define('Editor.controller.MetaPanel', {
   },
   /**
    * Handler for watchSegmentBtn
-   * @param button
-   * @param pressed
+   * @param {Ext.button.Button} button
+   * @param {Boolean} pressed
    */
   toggleWatchSegment: function(but, pressed) {
       var me = this,
@@ -183,38 +184,41 @@ Ext.define('Editor.controller.MetaPanel', {
         segmentId = me.record.get('id'),
         isWatched = Boolean(me.record.get('isWatched')),
         segmentUserAssocId = me.record.get('segmentUserAssocId'),
-        navi = me.getNavi();
+        navi = me.getNavi(),
+        startText = navi.item_startWatchingSegment,
+        stopText = navi.item_stopWatchingSegment,
+        success = function(rec, op) {
+            //isWatched
+            me.record.set('isWatched', !isWatched);
+            me.record.set('segmentUserAssocId', isWatched ? null : rec.data['id']);
+            but.setTooltip(isWatched ? startText : stopText);
+            but.toggle(!isWatched, true);
+            if(op.action == 'create') {
+                me.fireEvent('watchlistAdded', me.record, me, rec);
+            }
+            else {
+                me.fireEvent('watchlistRemoved', me.record, me, rec);
+            }
+        },
+        failure = function(rec, op) {
+            but.setTooltip(isWatched ? stopText : startText);
+            but.toggle(isWatched, true);
+        };
     
     if (isWatched)
     {
         model.set('id', segmentUserAssocId);
         model.destroy({
-            success: function(rec, op) {
-                me.record.set('isWatched', false);
-                me.record.set('segmentUserAssocId', null);
-                but.setTooltip(navi.item_startWatchingSegment);
-                but.toggle(false, true);
-            },
-            failure: function(rec, op) {
-                but.setTooltip(navi.item_stopWatchingSegment);
-                but.toggle(true, true);
-            }
+            success: success,
+            failure: failure
         });
     }
     else
     {
         model.set('segmentId', segmentId);
         model.save({
-            success: function(rec, op) {
-                me.record.set('isWatched', true);
-                me.record.set('segmentUserAssocId', rec.data['id']);
-                but.setTooltip(navi.item_stopWatchingSegment);
-                but.toggle(true, true);
-            },
-            failure: function(rec, op) {
-                but.setTooltip(navi.item_startWatchingSegment);
-                but.toggle(false, true);
-            }
+            success: success,
+            failure: failure
         });
     }
   },
