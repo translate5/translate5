@@ -304,7 +304,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         $controllers = array('ServerException', 'ViewModes', 'Segments', 
             'Preferences', 'MetaPanel', 'Fileorder', 'Localizer',
-            'ChangeAlike', 'Comments');
+            'ChangeAlike', 'Comments', 'Editor');
         
         $pm = Zend_Registry::get('PluginManager');
         $pluginFrontendControllers = $pm->getActiveFrontendControllers();
