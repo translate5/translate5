@@ -60,6 +60,7 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
     item_startWatchingSegment: '#UT#Segment auf die Merkliste setzen',
     item_stopWatchingSegment: '#UT#Segment von der Merkliste entfernen',
     item_cancel: '#UT#Abbrechen',
+    item_reset: '#UT#Segment auf initialen Inhalt zurücksetzen',
     item_save: '#UT#Speichern',
     item_saveAndNext: '#UT#Speichern und nächstes Segment öffnen (STRG + ALT + ENTER)',
     item_saveAndNextFiltered: '#UT#Speichern und nächstes Segment im Workflow öffnen (STRG + ENTER)',
@@ -83,96 +84,112 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
       useHNavArrow = editableCnt > 1;
       
       Ext.applyIf(me, {
-        items: [
-          {
-            xtype: 'button',
-            itemId: 'watchSegmentBtn',
-            id: 'watchSegmentBtn',
-            icon: Editor.data.moduleFolder+'images/star.png',
-            enableToggle: true,
-            iconAlign: 'right'
-          },
-          { xtype: 'tbseparator' },
-          { 
-            xtype: 'button',
-            itemId: 'saveSegmentBtn',
-            tooltip: me.item_save,
-            icon: Editor.data.moduleFolder+'images/tick.png',
-            iconAlign: 'right'
-          },
-          {
-            xtype: 'button',
-            itemId: 'cancelSegmentBtn',
-            tooltip: me.item_cancel,
-            icon: Editor.data.moduleFolder+'images/cross.png',
-            iconAlign: 'right'
-          },
-          {
-            xtype: 'button',
-            itemId: 'savePreviousSegmentBtn',
-            icon: Editor.data.moduleFolder+'images/arrow_up.png',
-            iconAlign: 'right',
-            tooltip: me.item_saveAndPrevious
-          },
-          {
-            xtype: 'button',
-            itemId: 'saveNextSegmentBtn',
-            icon: Editor.data.moduleFolder+'images/arrow_down.png',
-            iconAlign: 'right',
-            tooltip: me.item_saveAndNext
-          },
-          {
-              xtype: 'button',
-              itemId: 'goAlternateLeftBtn',
-              hidden: !useHNavArrow,
-              icon: Editor.data.moduleFolder+'images/arrow_left.png',
-              iconAlign: 'right',
-              tooltip: me.item_alternateLeft
-          },
-          {
-              xtype: 'button',
-              itemId: 'goAlternateRightBtn',
-              hidden: !useHNavArrow,
-              icon: Editor.data.moduleFolder+'images/arrow_right.png',
-              iconAlign: 'right',
-              tooltip: me.item_alternateRight
-          },
-          {
-            xtype: 'button',
-            itemId: 'goToLowerByWorkflowNoSaveBtn',
-            icon: Editor.data.moduleFolder+'images/arrow_down_filtered_nosave.png',
-            iconAlign: 'right',
-            tooltip: me.item_nextFiltered
-          },
-          {
-            xtype: 'button',
-            itemId: 'goToUpperByWorkflowNoSaveBtn',
-            icon: Editor.data.moduleFolder+'images/arrow_up_filtered_nosave.png ',
-            iconAlign: 'right',
-            tooltip: me.item_prevFiltered
-          },
-          {
-            xtype: 'button',
-            itemId: 'goToLowerNoSaveBtn',
-            icon: Editor.data.moduleFolder+'images/arrow_down_nosave.png',
-            iconAlign: 'right',
-            tooltip: me.item_next
-          },
-          {
-            xtype: 'button',
-            itemId: 'goToUpperNoSaveBtn',
-            icon: Editor.data.moduleFolder+'images/arrow_up_nosave.png ',
-            iconAlign: 'right',
-            tooltip: me.item_prev
-          },
-          {
-            xtype: 'button',
-            itemId: 'saveNextByWorkflowBtn',
-            icon: Editor.data.moduleFolder+'images/arrow_down_filtered.png',
-            iconAlign: 'right',
-            tooltip: me.item_saveAndNextFiltered
-          }
-        ]
+        items: [{
+            xtype: 'buttongroup',
+            columns: 3,
+            defaults: {
+                scale: 'small'
+            },
+            items: [{
+                xtype: 'button',
+                itemId: 'saveSegmentBtn',
+                tooltip: me.item_save,
+                icon: Editor.data.moduleFolder+'images/tick.png',
+                iconAlign: 'right'
+            },{
+                xtype: 'button',
+                itemId: 'cancelSegmentBtn',
+                tooltip: me.item_cancel,
+                icon: Editor.data.moduleFolder+'images/cross.png',
+                iconAlign: 'right'
+            },{
+                xtype: 'button',
+                itemId: 'goAlternateLeftBtn',
+                hidden: !useHNavArrow,
+                icon: Editor.data.moduleFolder+'images/arrow_left.png',
+                iconAlign: 'right',
+                tooltip: me.item_alternateLeft
+            },{
+                xtype: 'button',
+                itemId: 'watchSegmentBtn',
+                id: 'watchSegmentBtn',
+                icon: Editor.data.moduleFolder+'images/star.png',
+                enableToggle: true,
+                iconAlign: 'right'
+            },{
+                xtype: 'button',
+                itemId: 'resetSegmentBtn',
+                tooltip: me.item_reset,
+                icon: Editor.data.moduleFolder+'images/arrow_undo.png',
+                iconAlign: 'right'
+            },{
+                xtype: 'button',
+                itemId: 'goAlternateRightBtn',
+                hidden: !useHNavArrow,
+                icon: Editor.data.moduleFolder+'images/arrow_right.png',
+                iconAlign: 'right',
+                tooltip: me.item_alternateRight
+            }]
+        },{
+            xtype: 'buttongroup',
+            columns: 2,
+            defaults: {
+                scale: 'small'
+            },
+            items: [{
+                xtype: 'button',
+                hidden: true
+            },{
+                xtype: 'button',
+                itemId: 'goToUpperByWorkflowNoSaveBtn',
+                icon: Editor.data.moduleFolder+'images/arrow_up_filtered_nosave.png ',
+                iconAlign: 'right',
+                tooltip: me.item_prevFiltered
+            },{
+                xtype: 'button',
+                itemId: 'saveNextByWorkflowBtn',
+                icon: Editor.data.moduleFolder+'images/arrow_down_filtered.png',
+                iconAlign: 'right',
+                tooltip: me.item_saveAndNextFiltered
+            },{
+                xtype: 'button',
+                itemId: 'goToLowerByWorkflowNoSaveBtn',
+                icon: Editor.data.moduleFolder+'images/arrow_down_filtered_nosave.png',
+                iconAlign: 'right',
+                tooltip: me.item_nextFiltered
+            }]
+        },{
+            xtype: 'buttongroup',
+            columns: 2,
+            defaults: {
+                scale: 'small'
+            },
+            items: [{
+                xtype: 'button',
+                itemId: 'savePreviousSegmentBtn',
+                icon: Editor.data.moduleFolder+'images/arrow_up.png',
+                iconAlign: 'right',
+                tooltip: me.item_saveAndPrevious
+            },{
+                xtype: 'button',
+                itemId: 'goToUpperNoSaveBtn',
+                icon: Editor.data.moduleFolder+'images/arrow_up_nosave.png ',
+                iconAlign: 'right',
+                tooltip: me.item_prev
+            },{
+                xtype: 'button',
+                itemId: 'saveNextSegmentBtn',
+                icon: Editor.data.moduleFolder+'images/arrow_down.png',
+                iconAlign: 'right',
+                tooltip: me.item_saveAndNext
+            },{
+                xtype: 'button',
+                itemId: 'goToLowerNoSaveBtn',
+                icon: Editor.data.moduleFolder+'images/arrow_down_nosave.png',
+                iconAlign: 'right',
+                tooltip: me.item_next
+            }]
+        }]
       });
       me.callParent(arguments);
     }

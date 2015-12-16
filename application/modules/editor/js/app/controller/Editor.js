@@ -41,9 +41,10 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.controller.Editor', {
   extend : 'Ext.app.Controller',
   messages: {
-    segmentNotBuffered: '#UT#Das angeforderte Segment liegt noch nicht im Zwischenspeicher. Bitte scrollen Sie manuell weiter!',
-    gridEndReached: '#UT#Ende der Segmente erreicht!',
-    gridStartReached: '#UT#Start der Segmente erreicht!'
+      segmentReset: '#UT#Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.',
+      segmentNotBuffered: '#UT#Das angeforderte Segment liegt noch nicht im Zwischenspeicher. Bitte scrollen Sie manuell weiter!',
+      gridEndReached: '#UT#Ende der Segmente erreicht!',
+      gridStartReached: '#UT#Start der Segmente erreicht!'
   },
   refs : [{
     ref : 'segmentGrid',
@@ -86,6 +87,9 @@ Ext.define('Editor.controller.Editor', {
       },
       '#metapanel #saveNextByWorkflowBtn' : {
           click : me.saveNextByWorkflow
+      },
+      '#metapanel #resetSegmentBtn' : {
+          click : me.resetSegment
       },
       'segmentsHtmleditor': {
           afteriniteditor: me.initEditor
@@ -598,13 +602,15 @@ Ext.define('Editor.controller.Editor', {
     };
   },
   /**
-   * returns true if given next Segment should be edited or not, decision by workflow autostatus
-   * @return {Boolean}
+   * resets the htmleditor content to the original content
    */
-  filterAutoStatus: function(nextRecord) {
-      //Save segment-row, change auto-status and open next below with initial autostatus
-      //for the current workflow-step (or an auto-status previous to the initial autostatus for this workflow-step) in the current filter set; 
-      //new button necessary
-      //like initial filter for wf step?
+  resetSegment: function() {
+      var me = this,
+          plug = me.getEditPlugin(),
+          editor = plug.editor,
+          rec = plug.openedRecord,
+          columnToRead = editor.columnToEdit.replace(/Edit$/, '');
+      Editor.MessageBox.addInfo(me.messages.segmentReset);
+      editor.mainEditor.setValueAndMarkup(rec.get(columnToRead), rec.get('id'), editor.columnToEdit);
   }
 });
