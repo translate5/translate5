@@ -799,6 +799,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $db = $this->db;
         
         $s = $this->db->select(false);
+        $this->filter->setDefaultTable('s');
         $s->from(array('s' => $db->info($db::NAME)), $cols);
         $s->joinLeft(array('sua' => $db_join->info($db_join::NAME)), 'sua.segmentId = s.id', array('isWatched', 'id AS segmentUserAssocId'));
         $s->setIntegrityCheck(false);
@@ -834,8 +835,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
 
     protected function initDefaultSort() {
         if (!empty($this->filter) && !$this->filter->hasSort()) {
-            $this->filter->addSort('s.fileOrder');
-            $this->filter->addSort('s.id');
+            $this->filter->addSort('fileOrder');
+            $this->filter->addSort('id');
         }
     }
 
