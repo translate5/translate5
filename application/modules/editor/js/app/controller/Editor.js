@@ -42,7 +42,7 @@ Ext.define('Editor.controller.Editor', {
   extend : 'Ext.app.Controller',
   messages: {
       segmentReset: '#UT#Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.',
-      segmentNotBuffered: '#UT#Das angeforderte Segment liegt noch nicht im Zwischenspeicher. Bitte scrollen Sie manuell weiter!',
+      segmentNotBuffered: '#UT#Kein passendes Segment vorhanden bzw. im Zwischenspeicher gefunden. Bitte scrollen Sie manuell weiter!',
       gridEndReached: '#UT#Ende der Segmente erreicht!',
       gridStartReached: '#UT#Start der Segmente erreicht!'
   },
