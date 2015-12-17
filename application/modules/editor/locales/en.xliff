@@ -1183,37 +1183,41 @@
   <source>Speichern und vorheriges Segment öffnen</source>
   <target>Save and open previous segment</target>
 </trans-unit>
-<trans-unit id='Vm9yaGVyaWdlIFNwYWx0ZSBlZGl0aWVyZW4gKFNUUkcgKyDihpAp'>
-  <source>Vorherige Spalte editieren (STRG + ←)</source>
-  <target>Edit previous column (CTRL + ←)</target>
-</trans-unit>
-<trans-unit id='TsOkY2hzdGUgU3BhbHRlIGVkaXRpZXJlbiAoU1RSRyArIOKGkik='>
-  <source>Nächste Spalte editieren (STRG + →)</source>
-  <target>Edit next column (CTRL + →)</target>
-</trans-unit>
 <trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgQUxUICsg4oaTKQ=='>
   <source>Nicht speichern und nächstes Segment öffnen (STRG + ALT + ↓)</source>
   <target>Don't save and open next segment (CTRL + ALT + ↓)</target>
-</trans-unit>
-<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCBpbSBXb3JrZmxvdyDDtmZmbmVuIChTVFJHICsg4oaTKQ=='>
-  <source>Nicht speichern und nächstes Segment im Workflow öffnen (STRG + ↓)</source>
-  <target>Don't save and open next segment in workflow (CTRL + ↓)</target>
 </trans-unit>
 <trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgw7ZmZm5lbiAoU1RSRyArIEFMVCArIOKGkSk='>
   <source>Nicht speichern und vorheriges Segment öffnen (STRG + ALT + ↑)</source>
   <target>Don't save and open previous segment (CTRL + ALT + ↑)</target>
 </trans-unit>
-<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgaW0gV29ya2Zsb3cgw7ZmZm5lbiAoU1RSRyArIOKGkSk='>
-  <source>Nicht speichern und vorheriges Segment im Workflow öffnen (STRG + ↑)</source>
-  <target>Don't save and open previous segment in workflow (CTRL + ↑)</target>
+<trans-unit id='S2VpbiBwYXNzZW5kZXMgU2VnbWVudCB2b3JoYW5kZW4gYnp3LiBpbSBad2lzY2hlbnNwZWljaGVyIGdlZnVuZGVuLiBCaXR0ZSBzY3JvbGxlbiBTaWUgbWFudWVsbCB3ZWl0ZXIh'>
+  <source>Kein passendes Segment vorhanden bzw. im Zwischenspeicher gefunden. Bitte scrollen Sie manuell weiter!</source>
+  <target>No applicable segment exists or found in the segment cache. Please scroll down manually!</target>
 </trans-unit>
-<trans-unit id='RGVtIGF1c2dld8OkaGx0ZW4gU2VnbWVudCBlaW5lbiBLb21tZW50YXIgaGluenVmw7xnZW4uIChTVFJHLVNISUZULU4p'>
-  <source>Dem ausgewählten Segment einen Kommentar hinzufügen. (STRG-SHIFT-N)</source>
-  <target>Add a comment to the select segment. (CTRL-SHIFT-N)</target>
+<trans-unit id='RGVtIGF1c2dld8OkaGx0ZW4gU2VnbWVudCBlaW5lbiBLb21tZW50YXIgaGluenVmw7xnZW4uIChTVFJHICsgQUxUICsgYyk='>
+  <source>Dem ausgewählten Segment einen Kommentar hinzufügen. (STRG + ALT + c)</source>
+  <target>Add a comment to the select segment. (CTRL + ALT + c)</target>
 </trans-unit>
-<trans-unit id='RGFzIGFuZ2Vmb3JkZXJ0ZSBTZWdtZW50IGxpZWd0IG5vY2ggbmljaHQgaW0gWndpc2NoZW5zcGVpY2hlci4gQml0dGUgc2Nyb2xsZW4gU2llIG1hbnVlbGwgd2VpdGVyIQ=='>
-  <source>Das angeforderte Segment liegt noch nicht im Zwischenspeicher. Bitte scrollen Sie manuell weiter!</source>
-  <target>The requested segment is not buffered yet. Please scroll down manually!</target>
+<trans-unit id='Vm9yaGVyaWdlIFNwYWx0ZSBlZGl0aWVyZW4gKFNUUkcgKyBBTFQgKyDihpAp'>
+  <source>Vorherige Spalte editieren (STRG + ALT + ←)</source>
+  <target>Edit previous column (CTRL + ALT + ←)</target>
+</trans-unit>
+<trans-unit id='TsOkY2hzdGUgU3BhbHRlIGVkaXRpZXJlbiAoU1RSRyArIEFMVCArIOKGkik='>
+  <source>Nächste Spalte editieren (STRG + ALT + →)</source>
+  <target>Edit next column (CTRL + ALT + →)</target>
+</trans-unit>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCBpbSBXb3JrZmxvdyDDtmZmbmVuIChTVFJHICsgQmlsZCDihpMp'>
+  <source>Nicht speichern und nächstes Segment im Workflow öffnen (STRG + Bild ↓)</source>
+  <target>Don't save and open next segment in workflow (CTRL + page ↓)</target>
+</trans-unit>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgaW0gV29ya2Zsb3cgw7ZmZm5lbiAoU1RSRyArIEJpbGQg4oaRKQ=='>
+  <source>Nicht speichern und vorheriges Segment im Workflow öffnen (STRG + Bild ↑)</source>
+  <target>Don't save and open previous segment in workflow (CTRL + page ↑)</target>
+</trans-unit>
+<trans-unit id='RGFzIFNlZ21lbnQgd3VyZGUgYXVmIGRlbiB1cnNwcsO8bmdsaWNoZW4gWnVzdGFuZCBuYWNoIGRlbSBJbXBvcnQgenVyw7xja2dlc2V0enQu'>
+  <source>Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.</source>
+  <target>The segment content was resetted to the original import state.</target>
 </trans-unit>
     </body>
   </file>
