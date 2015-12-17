@@ -257,38 +257,38 @@ Ext.define('Editor.controller.Editor', {
   },
   /**
    * Cleaning up after editing segment
-   * @param {Object} return data from moveToOtherRow
+   * @param {Object} return data from calculateNextRow
    */
-  cleanupAfterRowEdit: function(ret) {
+  openNextRow: function(ret) {
       var me = this,
           grid = me.getSegmentGrid(),
           selModel = grid.getSelectionModel(),
           ed = me.getEditPlugin();
 
-      if (ret.isBorderReached)
-      {
-            Editor.MessageBox.addInfo(ret.errorText);
-      }
-      else if (ret.existsNextSegment)
-      {
+      if (ret.existsNextSegment) {
             //editing by selection handler must be disabled, otherwise saveChainStart will be triggered twice
             ed.disableEditBySelect = true;
             selModel.select(ret.newRec);
             Ext.defer(ed.startEdit, 300, ed, [ret.newRec, ret.lastColumnIdx]); //defer reduces problems with editorDomCleanUp see comment on Bug 38
             ed.disableEditBySelect = false;
-            me.cancel();
+            return;
       }
-      else
-      {
-         Editor.MessageBox.addInfo(me.messages.segmentNotBuffered);
+      
+      if (ret.isBorderReached) {
+          Editor.MessageBox.addInfo(ret.errorText);
+      }
+      else {
+          Editor.MessageBox.addInfo(me.messages.segmentNotBuffered);
       }
   },
   /**
    * Moves to the next or previous row without saving current record
    * @param {Integer} direction of moving
+   * @param {String} error message if there is no more segment to move the editor
+   * @param {Function} filter function for the workflow step
    * @return {Boolean} true if there is a next segment, false otherwise
    */
-  moveToAdjacentRow: function(direction, errorText, isEditable) {
+  moveToAdjacentRow: function(direction, errorText, filter) {
       var me = this,
           ret = null;
       
@@ -296,8 +296,9 @@ Ext.define('Editor.controller.Editor', {
           return;
       }
 
-      ret = this.moveToOtherRow(direction, errorText, isEditable);
-      me.cleanupAfterRowEdit(ret);
+      ret = this.calculateNextRow(direction, errorText, filter);
+      me.cancel();
+      me.openNextRow(ret);
       return ret.existsNextSegment;
   },
   /**
@@ -415,13 +416,13 @@ Ext.define('Editor.controller.Editor', {
   /**
    * go to other row
    * @param {Integer} rowIdxChange positive or negative integer value to choose the index of the next row
+   * @param {String} error message if no more editable segment found
    * @param {Function} isEditable optional, function which consumes a segment record, returns true if segment should be opened, false if not
    * @return {Object} to be used by saveOtherRow
    */
-  moveToOtherRow: function(rowIdxChange, errorText, isEditable) {
+  calculateNextRow: function(rowIdxChange, errorText, isEditable) {
       var me = this,
           grid = me.getSegmentGrid(),
-          selModel = grid.getSelectionModel(),
           ed = me.getEditPlugin(),
           store = grid.store,
           rec = ed.openedRecord,
@@ -467,12 +468,12 @@ Ext.define('Editor.controller.Editor', {
           grid = me.getSegmentGrid(),
           selModel = grid.getSelectionModel(),
           ed = me.getEditPlugin(),
-          ret = me.moveToOtherRow(rowIdxChange, errorText, isEditable);
+          ret = me.calculateNextRow(rowIdxChange, errorText, isEditable);
           
       me.fireEvent('saveSegment', {
           scope: me,
           segmentUsageFinished: function(){
-              me.cleanupAfterRowEdit(ret);
+              me.openNextRow(ret);
           }
       });
       return ret.existsNextSegment;

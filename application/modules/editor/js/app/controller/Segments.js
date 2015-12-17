@@ -178,7 +178,6 @@ Ext.define('Editor.controller.Segments', {
         alt: false,
         scope: this,
         fn: function(key, e){
-            //console.log('ENTER');
             e.preventDefault();
             e.stopEvent();
             
