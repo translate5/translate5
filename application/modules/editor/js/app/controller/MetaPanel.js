@@ -198,12 +198,11 @@ Ext.define('Editor.controller.MetaPanel', {
       else {
           isBorderReached = rec.get('id') == store.getFirstSegmentId();
       }
-      /* FIXME This code we must use when the single editor is implemented (Angel Naydenov 10.12.2015)
       Ext.Array.each(grid.columns, function(col, idx) {
           if(col.dataIndex == ed.editor.getEditedField()) {
               lastColumnIdx = idx;
           }
-      });*/
+      });
       me.fireEvent('saveSegment', {
           scope: me,
           segmentUsageFinished: function(){
