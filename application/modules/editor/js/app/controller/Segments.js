@@ -249,19 +249,20 @@ Ext.define('Editor.controller.Segments', {
       }
   },
   /**
-   * zurücksetzten der Filter und Sortierungen, Grid wird neu geladen, und zum ersten Segment gescrollt.
+   * reset grid filter and sort, grid will be reloaded and scrolled to top
    */
   clearSortAndFilter: function() {
-    var me = this, 
-    filters = this.getSegmentGrid().filters;
+    var me = this,
+        store = me.getSegmentsStore();
+    filters = me.getSegmentGrid().filters;
     me.resetSegmentSortIntern();
-    me.getSegmentsStore().prefetchData.clear();
-    if(filters.getFilterData().length > 0){
-      //das Neuladen des Stores erfolgt hier durch den clearFilter.
-      me.getSegmentGrid().filters.clearFilters();
+    store.removeAll();
+    if(store.getFilters().length > 0){
+      //reloading of the store is caused by clearFilter call
+      filters.clearFilters();
     }
     else {
-      me.getSegmentsStore().loadPage(1);
+      store.loadPage(1);
     }
     me.scrollGridToTop();
   },
@@ -291,12 +292,10 @@ Ext.define('Editor.controller.Segments', {
    * @return void
    */
   handleFilterChange: function(filterFeature) {
-      //FIXME ext6 disabled because of missing filters and changed store structure!
-      return;
       var me = this,
           params = filterFeature ? filterFeature.buildQuery(filterFeature.getFilterData()) : '';
           
-      me.getSegmentsStore().prefetchData.clear();
+      me.getSegmentsStore().removeAll();
       me.invalidatePagerOnNextLoad();
       filterFeature && me.styleResetFilterButton(filterFeature);
       Ext.Ajax.request({
@@ -370,15 +369,14 @@ Ext.define('Editor.controller.Segments', {
     this.getSegmentGrid().selectOrFocus(rowindex);
   },
   /**
-   * Hilfsfunktion: setzt lediglich den Sorter zurück, führt kein reload etc. pp. aus.
-   * gibt false zurück wenn es keine Sorter zum zurücksetzen gibt, true andernfalls
-   * @return boolean
+   * Helper: resets only the sorters, does no reload and so on
+   * returns false if there are no sorters, true otherwise
+   * @return {Boolean}
    */
   resetSegmentSortIntern: function() {
     if(this.getSegmentsStore().sorters.length == 0){
       return false;
     }
-    this.getSegmentGrid().headerCt.clearOtherSortStates(null, true);
     this.getSegmentsStore().sorters.clear();
     return true;
   },
