@@ -69,14 +69,14 @@ Ext.define('Editor.controller.Fileorder', {
           manualLoaded: true,
           scope: this.getFilesStore(),
           callback: function() {
-              // FIXME Ext6 this.getRootNode().expand(); not exists in ExtJS 6
+              this.getRootNode().expand();
           }
       });
       this.getReferenceFilesStore().load({
           manualLoaded: true,
           scope: this.getReferenceFilesStore(),
           callback: function() {
-              // FIXME Ext6 this.getRootNode().expand(); not exists in ExtJS 6
+              this.getRootNode().expand();
           }
       });
   },
