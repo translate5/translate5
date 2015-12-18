@@ -166,7 +166,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       toolbar.insert(insertIdx, {
           itemId: 'task-admin-btn',
           xtype: 'button',
-          hidden: grid && grid.isVisible(),
+          hidden: true,
           text: this.strings.openTaskAdminBtn
       });
   },
@@ -205,9 +205,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       }
   },
   handleInitEditor: function() {
-      console.log('Editor.controller.admin.TaskOverview::handleInitEditor');
-      //FIXME ext6 missing toolbar
-      //this.getHeadToolBar().down('#task-admin-btn').hide();
+      this.getHeadToolBar().down('#task-admin-btn').hide();
   },
   clearTasks: function() {
       this.getAdminTasksStore().removeAll();
