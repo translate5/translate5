@@ -61,9 +61,6 @@ Ext.define('Editor.view.segments.column.ContentEditable', {
   filter: {
     type: 'string'
   },
-  editor: {
-      xtype: 'segmentsHtmleditor'
-  },
   constructor: function(conf) {
       var field = conf.fieldName;
       Ext.applyIf(conf, {
@@ -81,6 +78,10 @@ Ext.define('Editor.view.segments.column.ContentEditable', {
     var me = this;
     me.initBaseMixin();
     me.callParent(arguments);
+    //ensure that we have only one Editor in the application, created for the first target column
+    if(me.segmentField.isTarget() && !me.self.firstTarget || (me.self.firstTarget == me.dataIndex)) {
+        me.self.firstTarget = me.dataIndex;
+    }
   },
   /**
    * interne Methode, wird zur Erzeugung der Editor Instanz einer Spalte verwendet

@@ -62,14 +62,15 @@ Ext.define('Editor.view.segments.Translate5RowEditing', {
                 hidden: true,
                 // keep a reference..
                 editingPlugin: me,
-                view: view
+                view: view,
+                renderTo: view.el
             };
         return cfg;
     },
     initEditor: function() {
         return new Editor.view.segments.Translate5RowEditor(this.initEditorConfig());
     },
-     /**
+    /**
      * Erweitert die Orginalmethode um die "editingAllowed" Prüfung
      * @param {Editor.model.Segment} record
      * @param {Ext.grid.column.Column/Number} columnHeader The Column object defining the column to be edited, or index of the column.
