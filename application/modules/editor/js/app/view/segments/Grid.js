@@ -117,6 +117,7 @@ Ext.define('Editor.view.segments.Grid', {
     },
     constructor: function() {
         this.plugins = [
+            'gridfilters',
             Ext.create('Editor.view.segments.Translate5RowEditing', {
                 clicksToMoveEditor: 1,
                 autoCancel: false
@@ -280,86 +281,7 @@ Ext.define('Editor.view.segments.Grid', {
         *
         * listeners: {'reconfigure': Ext.bind(this.onReconfigure, this)},
         */
-            columns: columns,
-            viewConfig: {},
-            dockedItems: [{
-                xtype: 'toolbar',
-                dock: 'top',
-                items: [{
-                    xtype: 'button',
-                    text:me.item_viewModesMenu,
-                    itemId: 'viewModeMenu',
-                    menu: {
-                        xtype: 'menu',
-                        items: [{
-                            xtype: 'button',
-                            itemId: 'viewModeBtn',
-                            enableToggle: true,
-                            text: me.item_viewModeBtn,
-                            toggleGroup: 'toggleView',
-                            textAlign: 'left'
-                        },{
-                            xtype: 'button',
-                            itemId: 'editModeBtn',
-                            enableToggle: true,
-                            pressed: true,
-                            text: me.item_editModeBtn,
-                            toggleGroup: 'toggleView',
-                            textAlign: 'left'
-                        },{
-                            xtype: 'button',
-                            itemId: 'ergonomicModeBtn',
-                            enableToggle: true,
-                            text: me.item_ergonomicModeBtn,
-                            toggleGroup: 'toggleView',
-                            textAlign: 'left'
-                        }]
-                    }
-                },{
-                    xtype: 'tbseparator'
-                },{
-                    xtype: 'button',
-                    disabled: true,
-                    itemId: 'hideTagBtn',
-                    enableToggle: true,
-                    text: me.item_hideTagBtn,
-                    toggleGroup: 'tagMode'
-                },{
-                    xtype: 'button',
-                    itemId: 'shortTagBtn',
-                    enableToggle: true,
-                    pressed: true,
-                    text: me.item_shortTagBtn,
-                    toggleGroup: 'tagMode'
-                },{
-                    xtype: 'button',
-                    itemId: 'fullTagBtn',
-                    enableToggle: true,
-                    text: me.item_fullTagBtn,
-                    toggleGroup: 'tagMode'
-                },{
-                    xtype: 'tbseparator'
-                },{
-                    xtype: 'button',
-                    itemId: 'clearSortAndFilterBtn',
-                    cls: 'clearSortAndFilterBtn',
-                    text: me.item_clearSortAndFilterBtn
-                },{
-                    xtype: 'tbseparator',
-                    hidden: !Editor.data.task.hasQmSub()
-                },{
-                    xtype: 'button',
-                    itemId: 'qmsummaryBtn',
-                    text: me.item_qmsummaryBtn,
-                    hidden: !Editor.data.task.hasQmSub()
-                },{
-                    xtype: 'tbfill'
-                },{
-                    xtype: 'button',
-                    itemId: 'optionsBtn',
-                    text: me.item_optionsTagBtn
-                }]
-            }]
+            columns: columns
         });
         me.callParent(arguments);
         
@@ -370,6 +292,96 @@ Ext.define('Editor.view.segments.Grid', {
         Ext.util.CSS.removeStyleSheet('segment-content-width-definition');
         Ext.util.CSS.createStyleSheet(fieldClsList.join("\n"),'segment-content-width-definition');
     },
+    
+    initConfig: function(instanceConfig) {
+            var me = this,
+            config = {
+                viewConfig: {},
+                dockedItems: [{
+                    xtype: 'toolbar',
+                    dock: 'top',
+                    items: [{
+                        xtype: 'button',
+                        text:me.item_viewModesMenu,
+                        itemId: 'viewModeMenu',
+                        menu: {
+                            xtype: 'menu',
+                            items: [{
+                                xtype: 'button',
+                                itemId: 'viewModeBtn',
+                                enableToggle: true,
+                                text: me.item_viewModeBtn,
+                                toggleGroup: 'toggleView',
+                                textAlign: 'left'
+                            },{
+                                xtype: 'button',
+                                itemId: 'editModeBtn',
+                                enableToggle: true,
+                                pressed: true,
+                                text: me.item_editModeBtn,
+                                toggleGroup: 'toggleView',
+                                textAlign: 'left'
+                            },{
+                                xtype: 'button',
+                                itemId: 'ergonomicModeBtn',
+                                enableToggle: true,
+                                text: me.item_ergonomicModeBtn,
+                                toggleGroup: 'toggleView',
+                                textAlign: 'left'
+                            }]
+                        }
+                    },{
+                        xtype: 'tbseparator'
+                    },{
+                        xtype: 'button',
+                        disabled: true,
+                        itemId: 'hideTagBtn',
+                        enableToggle: true,
+                        text: me.item_hideTagBtn,
+                        toggleGroup: 'tagMode'
+                    },{
+                        xtype: 'button',
+                        itemId: 'shortTagBtn',
+                        enableToggle: true,
+                        pressed: true,
+                        text: me.item_shortTagBtn,
+                        toggleGroup: 'tagMode'
+                    },{
+                        xtype: 'button',
+                        itemId: 'fullTagBtn',
+                        enableToggle: true,
+                        text: me.item_fullTagBtn,
+                        toggleGroup: 'tagMode'
+                    },{
+                        xtype: 'tbseparator'
+                    },{
+                        xtype: 'button',
+                        itemId: 'clearSortAndFilterBtn',
+                        cls: 'clearSortAndFilterBtn',
+                        text: me.item_clearSortAndFilterBtn
+                    },{
+                        xtype: 'tbseparator',
+                        hidden: !Editor.data.task.hasQmSub()
+                    },{
+                        xtype: 'button',
+                        itemId: 'qmsummaryBtn',
+                        text: me.item_qmsummaryBtn,
+                        hidden: !Editor.data.task.hasQmSub()
+                    },{
+                        xtype: 'tbfill'
+                    },{
+                        xtype: 'button',
+                        itemId: 'optionsBtn',
+                        text: me.item_optionsTagBtn
+                    }]
+                }]
+            };
+        if (instanceConfig) {
+            me.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
+    },
+    
     selectOrFocus: function(localRowIndex) {
         var sm = this.getSelectionModel();
         if(sm.isSelected(localRowIndex)){
