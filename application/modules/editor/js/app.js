@@ -181,7 +181,6 @@ Ext.application({
       me.viewport.show();
       
       me.getController('Fileorder').loadFileTree();//@todo bei ITL muss der load wiederum automatisch geschehen
-      me.getController('Segments').loadSegments();//@todo bei ITL muss der load wiederum automatisch geschehen
       //vp.doLayout();
       //this.viewport.setLoading(true);
       /*

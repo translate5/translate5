@@ -115,7 +115,7 @@ Ext.define('Editor.controller.MetaPanel', {
   },
   initEditPluginHandler: function() {
       var me = this, 
-          multiEdit = me.getSegmentGrid().query('.contentEditableColumn').length > 1,
+          multiEdit = me.getSegmentGrid().query('contentEditableColumn').length > 1,
           useChangeAlikes = Editor.app.authenticatedUser.isAllowed('useChangeAlikes', Editor.data.task);
 
     //Diese Events können erst in onlauch gebunden werden, in init existiert das Plugin noch nicht

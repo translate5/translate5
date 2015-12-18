@@ -43,6 +43,9 @@ Ext.define('Editor.view.segments.column.Content', {
   extend: 'Ext.grid.column.Column',
   alias: 'widget.contentColumn',
   mixins: ['Editor.view.segments.column.BaseMixin'],
+  filter: {
+      type: 'string'
+  },
   /**
    * @cfg {String} fieldName
    * The name of the segment data field, is processed automatically as dataIndex and so on.
