@@ -55,7 +55,7 @@ Ext.define('Editor.store.Files', {
     expanded: false
   },
   folderSort: false,
-  autoSync: true
+  autoSync: false
   /*,
   sorters: [{
       property: 'text',

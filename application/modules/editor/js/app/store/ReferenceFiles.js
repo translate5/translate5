@@ -55,7 +55,7 @@ Ext.define('Editor.store.ReferenceFiles', {
     expanded: false
   },
   folderSort: false,
-  autoSync: true,
+  autoSync: false,
   proxy : {
     type : 'rest',
     url: Editor.data.restpath+'referencefile'

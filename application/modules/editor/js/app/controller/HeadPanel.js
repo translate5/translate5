@@ -156,6 +156,9 @@ Ext.define('Editor.controller.HeadPanel', {
       var me = this,
           task = Editor.data.task,
           app = Editor.app;
+      if(!item) {
+        return;
+      }
       switch(item.itemId){
           case 'backBtn':
               app.mask(me.strings.taskClosing, task.get('taskName'));
