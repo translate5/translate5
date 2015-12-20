@@ -461,7 +461,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         /* @var $db editor_Models_Db_SegmentData */
 
         $taskGuid = $this->getTaskGuid();
-        $segmentId = new Zend_Db_Expr('('.$this->_db_select(array('id'))
+        $segmentId = new Zend_Db_Expr('('.$this->selectWatchlistJoin(array('id'))
                             ->where('s.taskGuid = ?', $taskGuid)
                             ->where('s.fileId = ?', $fileId)
                             ->where('s.mid = ?', $mid).')');
@@ -686,7 +686,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return editor_Models_Segment | null if no next found
      */
     public function loadNext($taskGuid, $id, $fileId = null) {
-        $s = $this->_db_select()
+        $s = $this->selectWatchlistJoin()
             ->where('s.taskGuid = ?', $taskGuid)
             ->where('s.id > ?', $id)
             ->order('s.id ASC')
@@ -712,7 +712,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return integer the segment count
      */
     public function count($taskGuid,$onlyEditable=false) {
-        $s = $this->_db_select(array('cnt' => 'COUNT(id)'))
+        $s = $this->selectWatchlistJoin(array('cnt' => 'COUNT(s.id)'))
             ->where('s.taskGuid = ?', $taskGuid);
         if($onlyEditable){
             $s->where('s.editable = 1');
@@ -746,7 +746,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
        
         $db = $this->db;
         $cols = $this->db->info($db::COLS);
-        $s = $this->_db_select($cols);
+        $s = $this->selectWatchlistJoin($cols);
 
         /**
          * FIXME reminder for TRANSLATE-113: Filtering out unused cols is needed for TaskManagement Feature (user dependent cols)
@@ -774,7 +774,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $fields = array_merge($fields, $this->segmentFieldManager->getDataIndexList());
         
         $this->initDefaultSort();
-        $s = $this->_db_select($fields);
+        $s = $this->selectWatchlistJoin($fields);
         $s->where('s.taskGuid = ?', $taskGuid)->where('s.workflowStep = ?', $workflowStep);
         return parent::loadFilterdCustom($s);
     }
@@ -793,15 +793,15 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * returns db select joined with segment_user_assoc table
      *
      */
-    private function _db_select($cols = array())
+    protected function selectWatchlistJoin($cols = array())
     {
         $db_join = ZfExtended_Factory::get('editor_Models_Db_SegmentUserAssoc');
         $db = $this->db;
-        
+        $userGuid = $_SESSION['user']['data']->userGuid;
         $s = $this->db->select(false);
         $this->filter->setDefaultTable('s');
         $s->from(array('s' => $db->info($db::NAME)), $cols);
-        $s->joinLeft(array('sua' => $db_join->info($db_join::NAME)), 'sua.segmentId = s.id', array('isWatched', 'id AS segmentUserAssocId'));
+        $s->joinLeft(array('sua' => $db_join->info($db_join::NAME)), 'sua.segmentId = s.id AND sua.userGuid = \''.$userGuid.'\'', array('isWatched', 'id AS segmentUserAssocId'));
         $s->setIntegrityCheck(false);
         return $s;
     }
@@ -814,7 +814,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     public function getFileMap($taskGuid) {
         $this->loadByTaskGuid($taskGuid);
 
-        $s = $this->_db_select('fileId');
+        $s = $this->selectWatchlistJoin('fileId');
         $s->where('s.taskGuid = ?', $taskGuid);
 
         if (!empty($this->filter)) {
@@ -1124,7 +1124,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     public function calculateSummary($taskGuid) {
         $cols = array('fileId', 'segmentsPerFile' => 'COUNT(id)');
-        $s = $this->_db_select($cols)
+        $s = $this->selectWatchlistJoin($cols)
             ->where('s.taskGuid = ?', $taskGuid)
             ->group('s.fileId');
         $rows = $this->db->fetchAll($s);
