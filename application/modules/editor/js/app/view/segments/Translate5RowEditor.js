@@ -363,11 +363,11 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         
         if(edReg.right > gridReg.right) {
             offset = -1 * gridReg.getOutOfBoundOffsetX(edReg.right) + 10;
-            me.editingPlugin.grid.horizontalScroller.scrollByDeltaX(offset);
+            me.editingPlugin.grid.scrollBy(offset, 0, true);
         }
         else {
             offset = -1 * gridReg.getOutOfBoundOffsetX(edReg.x) - 10;
-            me.editingPlugin.grid.horizontalScroller.scrollByDeltaX(offset);
+            me.editingPlugin.grid.scrollBy(offset, 0, true);
         }
     },
     /**
@@ -1100,9 +1100,12 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         }
         
         // From Ext4 begin
-        me.setColumnToEdit(me.context.column);
-        me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit), record.get('id'), me.columnToEdit);
-        me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
+        if (me.setColumnToEdit(me.context.column))
+        {
+            me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit), record.get('id'), me.columnToEdit);
+            me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
+            me.focusContextCell(); // TUKTUK
+        }
         // From Ext4 end
     },
 
