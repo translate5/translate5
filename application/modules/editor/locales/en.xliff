@@ -1219,6 +1219,10 @@
   <source>Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.</source>
   <target>The segment content was resetted to the original import state.</target>
 </trans-unit>
+<trans-unit id='U2VnbWVudCBhdWYgaW5pdGlhbGVuIEluaGFsdCB6dXLDvGNrc2V0emVu'>
+  <source>Segment auf initialen Inhalt zurücksetzen</source>
+  <target>Reset segment to initial content</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

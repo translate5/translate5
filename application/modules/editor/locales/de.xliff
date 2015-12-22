@@ -782,6 +782,7 @@ Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-M
 <trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgaW0gV29ya2Zsb3cgw7ZmZm5lbiAoU1RSRyArIEJpbGQg4oaRKQ=='><source>Nicht speichern und vorheriges Segment im Workflow öffnen (STRG + Bild ↑)</source><target>Nicht speichern und vorheriges Segment im Workflow öffnen (STRG + Bild ↑)</target></trans-unit>
 <trans-unit id='RGFzIFNlZ21lbnQgd3VyZGUgYXVmIGRlbiB1cnNwcsO8bmdsaWNoZW4gWnVzdGFuZCBuYWNoIGRlbSBJbXBvcnQgenVyw7xja2dlc2V0enQu'><source>Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.</source><target>Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.</target></trans-unit>
 <trans-unit id='S2VpbiBwYXNzZW5kZXMgU2VnbWVudCB2b3JoYW5kZW4gYnp3LiBpbSBad2lzY2hlbnNwZWljaGVyIGdlZnVuZGVuLiBCaXR0ZSBzY3JvbGxlbiBTaWUgbWFudWVsbCB3ZWl0ZXIh'><source>Kein passendes Segment vorhanden bzw. im Zwischenspeicher gefunden. Bitte scrollen Sie manuell weiter!</source><target>Kein passendes Segment vorhanden bzw. im Zwischenspeicher gefunden. Bitte scrollen Sie manuell weiter!</target></trans-unit>
+<trans-unit id='U2VnbWVudCBhdWYgaW5pdGlhbGVuIEluaGFsdCB6dXLDvGNrc2V0emVu'><source>Segment auf initialen Inhalt zurücksetzen</source><target>Segment auf initialen Inhalt zurücksetzen</target></trans-unit>
   </body>
  </file>
 </xliff>
