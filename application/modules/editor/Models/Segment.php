@@ -707,15 +707,17 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * returns the segment count of the given taskGuid
+     * filters are not applied since the overall count is needed for statistics
      * @param string $taskGuid
      * @param boolean $editable
      * @return integer the segment count
      */
     public function count($taskGuid,$onlyEditable=false) {
-        $s = $this->selectWatchlistJoin(array('cnt' => 'COUNT(s.id)'))
-            ->where('s.taskGuid = ?', $taskGuid);
+        $s = $this->db->select()
+            ->from($this->db, array('cnt' => 'COUNT(id)'))
+            ->where('taskGuid = ?', $taskGuid);
         if($onlyEditable){
-            $s->where('s.editable = 1');
+            $s->where('editable = 1');
         }
         $row = $this->db->fetchRow($s);
         return $row->cnt;
@@ -821,6 +823,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $userGuid = $_SESSION['user']['data']->userGuid;
         $s = $this->db->select(false);
         $this->filter->setDefaultTable('s');
+        $this->filter->addTableForField('isWatched', 'sua');
         $s->from(array('s' => $db->info($db::NAME)), $cols);
         $s->joinLeft(array('sua' => $db_join->info($db_join::NAME)), 'sua.segmentId = s.id AND sua.userGuid = \''.$userGuid.'\'', array('isWatched', 'id AS segmentUserAssocId'));
         $s->setIntegrityCheck(false);
