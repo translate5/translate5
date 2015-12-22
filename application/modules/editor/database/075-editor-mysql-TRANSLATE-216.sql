@@ -41,8 +41,13 @@ CREATE TABLE `LEK_segment_user_assoc` (
   KEY `segmentId` (`segmentId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE `LEK_segment_user_assoc`
-  ADD CONSTRAINT `Zf_users_FK` FOREIGN KEY (`userGuid`) REFERENCES `Zf_users` (`userGuid`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `LEK_segments_FK` FOREIGN KEY (`segmentId`) REFERENCES `LEK_segments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `LEK_segment_user_assoc` ADD CONSTRAINT `LEK_segments_FK` FOREIGN KEY (`segmentId`) REFERENCES `LEK_segments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+SELECT @usersTable := IFNULL((SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='employee'),'Zf_users');
+SELECT @userGuid := IF(@usersTable = 'employee', 'employeeGUID', 'userGuid');
+SET @query = CONCAT('ALTER TABLE `LEK_segment_user_assoc` ADD CONSTRAINT `Zf_users_FK` FOREIGN KEY (`userGuid`) REFERENCES `', @usersTable, '` (`',@userGuid,'`) ON DELETE CASCADE ON UPDATE CASCADE');
+PREPARE stmt FROM @query; 
+EXECUTE stmt; 
+DEALLOCATE PREPARE stmt;
 
 INSERT INTO `Zf_acl_rules` VALUES(NULL, 'editor', 'editor', 'editor_segmentuserassoc', 'all');
