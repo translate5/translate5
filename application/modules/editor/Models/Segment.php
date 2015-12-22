@@ -760,6 +760,27 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $s->where('s.taskGuid = ?', $taskGuid);
         return parent::loadFilterdCustom($s);
     }
+    
+    public function totalCountByTaskGuid($taskGuid)
+    {
+        $this->segmentFieldManager->initFields($taskGuid);
+        $this->reInitDb($taskGuid);
+        
+        $this->initDefaultSort();
+       
+        $db = $this->db;
+        $cols = $this->db->info($db::COLS);
+        $s = $this->selectWatchlistJoin($cols);
+        $s->where('s.taskGuid = ?', $taskGuid);
+        
+        if (!empty($this->filter))
+        {
+            $this->filter->applyToSelect($s);
+        }
+
+        $res = $this->db->fetchAll($s)->toArray();
+        return count($res);
+    }
 
     /**
      * Loads segments by a specific workflowStep, fetch only specific fields.
