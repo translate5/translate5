@@ -90,6 +90,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @var boolean
      */
     protected $isDataModified = null;
+    
+    /**
+     * enables / disables watchlist (enabling makes only sense if called from Rest indexAction)
+     * @var boolean
+     */
+    protected $watchlistFilterEnabled = false;
 
     /**
      * init the internal segment field and the DB object
@@ -818,16 +824,27 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     protected function selectWatchlistJoin($cols = array())
     {
-        $db_join = ZfExtended_Factory::get('editor_Models_Db_SegmentUserAssoc');
-        $db = $this->db;
-        $userGuid = $_SESSION['user']['data']->userGuid;
         $s = $this->db->select(false);
+        $db = $this->db;
+        $s->from(array('s' => $db->info($db::NAME)), $cols);
+        if(!$this->watchlistFilterEnabled) {
+            return $s;
+        }
+        $db_join = ZfExtended_Factory::get('editor_Models_Db_SegmentUserAssoc');
+        $userGuid = $_SESSION['user']['data']->userGuid;
         $this->filter->setDefaultTable('s');
         $this->filter->addTableForField('isWatched', 'sua');
-        $s->from(array('s' => $db->info($db::NAME)), $cols);
         $s->joinLeft(array('sua' => $db_join->info($db_join::NAME)), 'sua.segmentId = s.id AND sua.userGuid = \''.$userGuid.'\'', array('isWatched', 'id AS segmentUserAssocId'));
         $s->setIntegrityCheck(false);
         return $s;
+    }
+    
+    /**
+     * enables the watchlist filter join
+     * @param boolean $value
+     */
+    public function setEnableWatchlistJoin($value = true) {
+        $this->watchlistFilterEnabled = $value;
     }
 
     /**
