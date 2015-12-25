@@ -467,10 +467,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         /* @var $db editor_Models_Db_SegmentData */
 
         $taskGuid = $this->getTaskGuid();
-        $segmentId = new Zend_Db_Expr('('.$this->selectWatchlistJoin(array('id'))
-                            ->where('s.taskGuid = ?', $taskGuid)
-                            ->where('s.fileId = ?', $fileId)
-                            ->where('s.mid = ?', $mid).')');
+        $s = $this->db->select()->from($this->tableName, array('id'));
+        $s = $this->addWatchlistJoin($s);
+        $segmentId = new Zend_Db_Expr('('.$s
+                            ->where($this->tableName.'.taskGuid = ?', $taskGuid)
+                            ->where($this->tableName.'.fileId = ?', $fileId)
+                            ->where($this->tableName.'.mid = ?', $mid).')');
         
         $data = array(
             'taskGuid' => $taskGuid,
@@ -692,14 +694,15 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return editor_Models_Segment | null if no next found
      */
     public function loadNext($taskGuid, $id, $fileId = null) {
-        $s = $this->selectWatchlistJoin()
-            ->where('s.taskGuid = ?', $taskGuid)
-            ->where('s.id > ?', $id)
-            ->order('s.id ASC')
+        $s = $this->db->select();
+        $s = $this->addWatchlistJoin($s);
+        $s->where($this->tableName.'.taskGuid = ?', $taskGuid)
+            ->where($this->tableName.'.id > ?', $id)
+            ->order($this->tableName.'.id ASC')
             ->limit(1);
 
         if(!empty($fileId)) {
-            $s->where('s.fileId = ?', $fileId);
+            $s->where($this->tableName.'.fileId = ?', $fileId);
         }
         
         $row = $this->db->fetchRow($s);
@@ -752,9 +755,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         
         $this->initDefaultSort();
        
+        $s = $this->db->select(false);
         $db = $this->db;
         $cols = $this->db->info($db::COLS);
-        $s = $this->selectWatchlistJoin($cols);
 
         /**
          * FIXME reminder for TRANSLATE-113: Filtering out unused cols is needed for TaskManagement Feature (user dependent cols)
@@ -765,7 +768,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
                     });
         }
          */
-        $s->where('s.taskGuid = ?', $taskGuid);
+        $s->from($this->db, $cols);
+        $s = $this->addWatchlistJoin($s);
+        $s->where($this->tableName.'.taskGuid = ?', $taskGuid);
         return parent::loadFilterdCustom($s);
     }
     
@@ -778,8 +783,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
        
         $db = $this->db;
         $cols = $this->db->info($db::COLS);
-        $s = $this->selectWatchlistJoin($cols);
-        $s->where('s.taskGuid = ?', $taskGuid);
+        $s = $this->db->select(false);
+        $db = $this->db;
+        $s->from(array($this->tableName => $db->info($db::NAME)), $cols);
+        $s = $this->addWatchlistJoin($s);
+        $s->where($this->tableName.'.taskGuid = ?', $taskGuid);
         
         if (!empty($this->filter))
         {
@@ -803,8 +811,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $fields = array_merge($fields, $this->segmentFieldManager->getDataIndexList());
         
         $this->initDefaultSort();
-        $s = $this->selectWatchlistJoin($fields);
-        $s->where('s.taskGuid = ?', $taskGuid)->where('s.workflowStep = ?', $workflowStep);
+        $s = $this->db->select(false);
+        $db = $this->db;
+        $s->from($this->db, $fields);
+        $s = $this->addWatchlistJoin($s);
+        $s->where($this->tableName.'.taskGuid = ?', $taskGuid)->where($this->tableName.'.workflowStep = ?', $workflowStep);
         return parent::loadFilterdCustom($s);
     }
 
@@ -819,22 +830,19 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     
     /**
      *
-     * returns db select joined with segment_user_assoc table
+     * returns Zend_Db_Table_Select joined with segment_user_assoc table if watchlistFilter is enabled
      *
      */
-    protected function selectWatchlistJoin($cols = array())
+    protected function addWatchlistJoin(Zend_Db_Table_Select $s)
     {
-        $s = $this->db->select(false);
-        $db = $this->db;
-        $s->from(array('s' => $db->info($db::NAME)), $cols);
         if(!$this->watchlistFilterEnabled) {
             return $s;
         }
         $db_join = ZfExtended_Factory::get('editor_Models_Db_SegmentUserAssoc');
         $userGuid = $_SESSION['user']['data']->userGuid;
-        $this->filter->setDefaultTable('s');
+        $this->filter->setDefaultTable($this->tableName);
         $this->filter->addTableForField('isWatched', 'sua');
-        $s->joinLeft(array('sua' => $db_join->info($db_join::NAME)), 'sua.segmentId = s.id AND sua.userGuid = \''.$userGuid.'\'', array('isWatched', 'id AS segmentUserAssocId'));
+        $s->joinLeft(array('sua' => $db_join->info($db_join::NAME)), 'sua.segmentId = '.$this->tableName.'.id AND sua.userGuid = \''.$userGuid.'\'', array('isWatched', 'id AS segmentUserAssocId'));
         $s->setIntegrityCheck(false);
         return $s;
     }
@@ -854,9 +862,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     public function getFileMap($taskGuid) {
         $this->loadByTaskGuid($taskGuid);
-
-        $s = $this->selectWatchlistJoin('fileId');
-        $s->where('s.taskGuid = ?', $taskGuid);
+        $s = $this->db->select()
+                ->from($this->db, 'fileId');
+        $s = $this->addWatchlistJoin($s);
+        $s->where($this->tableName.'.taskGuid = ?', $taskGuid);
 
         if (!empty($this->filter)) {
             $this->filter->applyToSelect($s);
@@ -956,6 +965,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $mv = $this->segmentFieldManager->getView();
         /* @var $mv editor_Models_Segment_MaterializedView */
         $this->db = ZfExtended_Factory::get($this->dbInstanceClass, array(array(), $mv->getName()));
+        $db = $this->db;
+        $this->tableName = $db->info($db::NAME);
     }
 
     /**
@@ -1165,9 +1176,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     public function calculateSummary($taskGuid) {
         $cols = array('fileId', 'segmentsPerFile' => 'COUNT(id)');
-        $s = $this->selectWatchlistJoin($cols)
-            ->where('s.taskGuid = ?', $taskGuid)
-            ->group('s.fileId');
+        $s = $this->db->select()
+            ->from($this->db, $cols);
+        $s = $this->addWatchlistJoin($s);
+        $s->where($this->tableName.'.taskGuid = ?', $taskGuid)
+            ->group($this->tableName.'.fileId');
         $rows = $this->db->fetchAll($s);
         
         $result = array();
