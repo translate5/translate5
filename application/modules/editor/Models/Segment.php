@@ -995,11 +995,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     protected function getIdsAfterFilter(string $segmentsTableName, string $taskGuid) {
         $this->reInitDb($taskGuid);
         $s = $this->db->select()
-                ->from($segmentsTableName, array('id'))
-                ->where('taskGuid = ?', $taskGuid)
+                ->from($segmentsTableName, array('id'));
+        $s = $this->addWatchlistJoin($s);
+        $s->where($this->tableName.'.taskGuid = ?', $taskGuid)
                 //Achtung: die Klammerung von (source = ? or target = ?) beachten!
-                ->where('(sourceMd5 ' . $this->_getSqlTextCompareOp() . ' ?', (string) $this->getSourceMd5())
-                ->orWhere('targetMd5 ' . $this->_getSqlTextCompareOp() . ' ?)', (string) $this->getTargetMd5());
+                ->where('('.$this->tableName.'.sourceMd5 ' . $this->_getSqlTextCompareOp() . ' ?', (string) $this->getSourceMd5())
+                ->orWhere($this->tableName.'.targetMd5 ' . $this->_getSqlTextCompareOp() . ' ?)', (string) $this->getTargetMd5());
         $filteredIds = parent::loadFilterdCustom($s);
         $hasIdFiltered = array();
         foreach ($filteredIds as $ids) {
