@@ -71,6 +71,7 @@ class Editor_FileController extends editor_Controllers_EditorrestController {
   protected function syncSegmentFileOrder($taskGuid) {
     /* @var $segment editor_Models_Segment */
     $segment = ZfExtended_Factory::get('editor_Models_Segment');
+    $segment->setEnableWatchlistJoin();
     $segment->syncFileOrderFromFiles($taskGuid);
   }
   

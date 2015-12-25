@@ -141,6 +141,7 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
         $session = new Zend_Session_Namespace();
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */
+        $segment->setEnableWatchlistJoin();
         $segment->load($segmentId);
         if ($session->taskGuid !== $segment->getTaskGuid()) {
             throw new ZfExtended_Models_Entity_NoAccessException();
