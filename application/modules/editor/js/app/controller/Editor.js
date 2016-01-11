@@ -129,6 +129,16 @@ Ext.define('Editor.controller.Editor', {
       docEl.dom = editor.getDoc();
       
       var map = new Ext.util.KeyMap(docEl, [{
+          key: "S",
+          ctrl:true,
+          alt: false,
+          scope: me,
+          fn: function(key, e){
+              e.preventDefault();
+              e.stopEvent();
+              me.save();
+          }
+      },{
           key: [10,13],
           ctrl: true,
           alt: false,

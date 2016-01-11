@@ -59,9 +59,9 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
     //Item Strings:
     item_startWatchingSegment: '#UT#Segment auf die Merkliste setzen',
     item_stopWatchingSegment: '#UT#Segment von der Merkliste entfernen',
-    item_cancel: '#UT#Abbrechen',
+    item_cancel: '#UT#Abbrechen (ESC)',
     item_reset: '#UT#Segment auf initialen Inhalt zurücksetzen',
-    item_save: '#UT#Speichern',
+    item_save: '#UT#Speichern (STRG + S)',
     item_saveAndNext: '#UT#Speichern und nächstes Segment öffnen (STRG + ALT + ENTER)',
     item_saveAndNextFiltered: '#UT#Speichern und nächstes Segment im Workflow öffnen (STRG + ENTER)',
     item_saveAndPrevious: '#UT#Speichern und vorheriges Segment öffnen',
