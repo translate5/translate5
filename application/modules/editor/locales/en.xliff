@@ -1207,13 +1207,13 @@
   <source>Nächste Spalte editieren (STRG + ALT + →)</source>
   <target>Edit next column (CTRL + ALT + →)</target>
 </trans-unit>
-<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCBpbSBXb3JrZmxvdyDDtmZmbmVuIChTVFJHICsgQmlsZCDihpMp'>
-  <source>Nicht speichern und nächstes Segment im Workflow öffnen (STRG + Bild ↓)</source>
-  <target>Don't save and open next segment in workflow (CTRL + page ↓)</target>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCBpbSBXb3JrZmxvdyDDtmZmbmVuIChBTFQgKyBCaWxkIOKGkyk='>
+  <source>Nicht speichern und nächstes Segment im Workflow öffnen (ALT + Bild ↓)</source>
+  <target>Don't save and open next segment in workflow (ALT + page ↓)</target>
 </trans-unit>
-<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgaW0gV29ya2Zsb3cgw7ZmZm5lbiAoU1RSRyArIEJpbGQg4oaRKQ=='>
-  <source>Nicht speichern und vorheriges Segment im Workflow öffnen (STRG + Bild ↑)</source>
-  <target>Don't save and open previous segment in workflow (CTRL + page ↑)</target>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgaW0gV29ya2Zsb3cgw7ZmZm5lbiAoQUxUICsgQmlsZCDihpEp'>
+  <source>Nicht speichern und vorheriges Segment im Workflow öffnen (ALT + Bild ↑)</source>
+  <target>Don't save and open previous segment in workflow (ALT + page ↑)</target>
 </trans-unit>
 <trans-unit id='RGFzIFNlZ21lbnQgd3VyZGUgYXVmIGRlbiB1cnNwcsO8bmdsaWNoZW4gWnVzdGFuZCBuYWNoIGRlbSBJbXBvcnQgenVyw7xja2dlc2V0enQu'>
   <source>Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.</source>
