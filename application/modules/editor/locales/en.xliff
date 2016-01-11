@@ -1223,6 +1223,14 @@
   <source>Segment auf initialen Inhalt zurücksetzen</source>
   <target>Reset segment to initial content</target>
 </trans-unit>
+<trans-unit id='QWJicmVjaGVuIChFU0Mp'>
+  <source>Abbrechen (ESC)</source>
+  <target>cancel (ESC)</target>
+</trans-unit>
+<trans-unit id='U3BlaWNoZXJuIChTVFJHICsgUyk='>
+  <source>Speichern (STRG + S)</source>
+  <target>save (CTRL + S)</target>
+</trans-unit>
     </body>
   </file>
 </xliff>
