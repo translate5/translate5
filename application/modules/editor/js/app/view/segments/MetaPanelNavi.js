@@ -68,9 +68,9 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
     item_alternateLeft: '#UT#Vorherige Spalte editieren (STRG + ALT + ←)',
     item_alternateRight: '#UT#Nächste Spalte editieren (STRG + ALT + →)',
     item_next: '#UT#Nicht speichern und nächstes Segment öffnen (STRG + ALT + ↓)',
-    item_nextFiltered: '#UT#Nicht speichern und nächstes Segment im Workflow öffnen (STRG + Bild ↓)',
+    item_nextFiltered: '#UT#Nicht speichern und nächstes Segment im Workflow öffnen (ALT + Bild ↓)',
     item_prev: '#UT#Nicht speichern und vorheriges Segment öffnen (STRG + ALT + ↑)',
-    item_prevFiltered: '#UT#Nicht speichern und vorheriges Segment im Workflow öffnen (STRG + Bild ↑)',
+    item_prevFiltered: '#UT#Nicht speichern und vorheriges Segment im Workflow öffnen (ALT + Bild ↑)',
     initComponent: function() {
       var me = this,
           fields = Editor.data.task.segmentFields(),
