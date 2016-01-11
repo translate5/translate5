@@ -135,7 +135,6 @@ Ext.define('Editor.controller.MetaPanel', {
     this.getNavi().doLayout(); //FIXME noch was anderes layouten?
   },
   /**
-<<<<<<< HEAD
    * Handler for watchSegmentBtn
    * @param {Ext.button.Button} button
    * @param {Boolean} pressed
