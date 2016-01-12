@@ -103,10 +103,24 @@ Ext.define('Editor.controller.Editor', {
    * track isEditing state 
    */
   initEditPluginHandler: function () {
-      var me = this;
+      var me = this, map;
       me.getEditPlugin().on('beforeedit', function(){me.isEditing = true;});
       me.getEditPlugin().on('canceledit', function(){me.isEditing = false;});
       me.getEditPlugin().on('edit', function(){me.isEditing = false;})
+      
+      map = new Ext.util.KeyMap(Ext.getDoc(), [{
+          key: "C",
+          ctrl:true,
+          alt:true,
+          fn: function(key, e){
+              e.preventDefault();
+              e.stopEvent();
+              var found = Ext.select('#segment-grid-body .x-grid-row-selected td.comments-field img').first();
+              if(found && (found.hasCls('add') || found.hasCls('edit'))){
+                  found.dom.click();
+              }
+          }
+      }]);
   },
   /**
    * Gibt die RowEditing Instanz des Grids zurück
@@ -128,6 +142,7 @@ Ext.define('Editor.controller.Editor', {
       docEl = new f();
       docEl.dom = editor.getDoc();
       
+      //Editor KeyMap
       var map = new Ext.util.KeyMap(docEl, [{
           key: "S",
           ctrl:true,
@@ -392,12 +407,15 @@ Ext.define('Editor.controller.Editor', {
       return this.saveOtherRow(-1, this.messages.gridStartReached, this.workflowStepFilter);
   },
   /**
-   * returns true if segment was not edited in the current step yet
+   * returns true if segment was not edited by the current role yet
    */
   workflowStepFilter: function(rec, newRec) {
-      //our filtering stuff
-      var stepNr = newRec.get('workflowStepNr');
-      return stepNr == 0 || stepNr < Editor.data.task.get('workflowStep');
+      var role = Editor.data.task.get('userRole') || 'pm',
+          map = Editor.data.segments.roleAutoStateMap;
+      if(!map[role]) {
+          return true;
+      }
+      return map[role].indexOf(newRec.get('autoStateId')) < 0;
   },
   /**
    * Gets the next editable segment offset relative to param offset
