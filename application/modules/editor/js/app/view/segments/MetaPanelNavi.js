@@ -57,14 +57,14 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
     //title: 'Segment-Metadaten',
 
     //Item Strings:
-    item_startWatchingSegment: '#UT#Segment auf die Merkliste setzen',
-    item_stopWatchingSegment: '#UT#Segment von der Merkliste entfernen',
+    item_startWatchingSegment: '#UT#Segment auf die Merkliste setzen (STRG + D)',
+    item_stopWatchingSegment: '#UT#Segment von der Merkliste entfernen (STRG + D)',
     item_cancel: '#UT#Abbrechen (ESC)',
-    item_reset: '#UT#Segment auf initialen Inhalt zurücksetzen',
+    item_reset: '#UT#Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)',
     item_save: '#UT#Speichern (STRG + S)',
     item_saveAndNext: '#UT#Speichern und nächstes Segment öffnen (STRG + ALT + ENTER)',
     item_saveAndNextFiltered: '#UT#Speichern und nächstes Segment im Workflow öffnen (STRG + ENTER)',
-    item_saveAndPrevious: '#UT#Speichern und vorheriges Segment öffnen',
+    item_saveAndPrevious: '#UT#Speichern und vorheriges Segment öffnen (STRG + ALT + SHIFT + ENTER)',
     item_alternateLeft: '#UT#Vorherige Spalte editieren (STRG + ALT + ←)',
     item_alternateRight: '#UT#Nächste Spalte editieren (STRG + ALT + →)',
     item_next: '#UT#Nicht speichern und nächstes Segment öffnen (STRG + ALT + ↓)',

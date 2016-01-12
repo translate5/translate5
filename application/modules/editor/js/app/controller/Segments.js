@@ -138,9 +138,6 @@ Ext.define('Editor.controller.Segments', {
               //@todo should be replaced with Event Domains after update to ExtJS >4.2
               me.getSegmentsStore().on('load', me.invalidatePager, me);
               me.getSegmentsStore().on('load', me.refreshGridView, me);
-              
-              me.handleF2KeyPress();
-              me.disableAltPlusNumberKeySeq();
         },
         selectionchange: me.handleSegmentSelectionChange,
         columnhide: me.handleColumnVisibility,
@@ -157,53 +154,6 @@ Ext.define('Editor.controller.Segments', {
         click: me.watchListFilter
       }
     });
-  },
-  disableAltPlusNumberKeySeq: function() {
-      var map = new Ext.util.KeyMap(Ext.getDoc(), [{
-          key: [48, 49, 50, 51, 52, 53, 54, 55, 56, 57],
-          ctrl: false,
-          alt: true,
-          shift:false,
-          scope: this,
-          fn: function(key, e){
-              e.preventDefault();
-              e.stopEvent();
-          }
-    }]);
-  },
-  handleF2KeyPress: function() {
-      var map = new Ext.util.KeyMap(Ext.getDoc(), [{
-        key: Ext.EventObject.F2,
-        ctrl: false,
-        alt: false,
-        scope: this,
-        fn: function(key, e){
-            e.preventDefault();
-            e.stopEvent();
-            
-            var me = this,
-                edCtrl = me.application.getController('Editor'),
-                grid = me.getSegmentGrid(),
-                selModel = grid.getSelectionModel(),
-                ed = edCtrl.getEditPlugin(),
-                cols = grid.query('.contentEditableColumn:not([hidden])'),
-                sel = [];
-            
-            if (ed.openedRecord === null)
-            {
-                if (!selModel.hasSelection())
-                {
-                    grid.selectOrFocus(edCtrl.getNextEditableSegmentOffset(0));
-                }
-                sel = selModel.getSelection();
-                ed.startEdit(sel[0], cols[0]);
-            }
-            else
-            {
-                ed.editor.mainEditor.deferFocus();
-            }
-        }
-    }]);
   },
   loadSegments: function() {
       this.handleFilterChange(); //load filemap

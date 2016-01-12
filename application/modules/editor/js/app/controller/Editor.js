@@ -49,78 +49,106 @@ Ext.define('Editor.controller.Editor', {
   refs : [{
     ref : 'segmentGrid',
     selector : '#segmentgrid'
+  },{
+      ref : 'navi',
+      selector : '#metapanel #naviToolbar'
   }],
   calledSaveMethod:false,
   isEditing: false,
+  keyMapConfig: null,
   init : function() {
-      var me = this;
+      var me = this,
+          decDigits = [48, 49, 50, 51, 52, 53, 54, 55, 56, 57];
+      
       me.control({
-      '#metapanel #cancelSegmentBtn' : {
-        click : me.cancel
-      },
-      '#metapanel #saveSegmentBtn' : {
-        click : me.save
-      },
-      '#metapanel #saveNextSegmentBtn' : {
-        click : me.saveNext
-      },
-      '#metapanel #savePreviousSegmentBtn' : {
-        click : me.savePrevious
-      },
-      '#metapanel #goAlternateLeftBtn' : {
-          click : me.goToAlternate
-      },
-      '#metapanel #goAlternateRightBtn' : {
-          click : me.goToAlternate
-      },
-      '#metapanel #goToLowerByWorkflowNoSaveBtn' : {
-          click : me.goToLowerByWorkflowNoSave
-      },
-      '#metapanel #goToUpperByWorkflowNoSaveBtn' : {
-          click : me.goToUpperByWorkflowNoSave
-      },
-      '#metapanel #goToLowerNoSaveBtn' : {
-          click : me.goToLowerNoSave
-      },
-      '#metapanel #goToUpperNoSaveBtn' : {
-          click : me.goToUpperNoSave
-      },
-      '#metapanel #saveNextByWorkflowBtn' : {
-          click : me.saveNextByWorkflow
-      },
-      '#metapanel #resetSegmentBtn' : {
-          click : me.resetSegment
-      },
-      'segmentsHtmleditor': {
-          afteriniteditor: me.initEditor
-      },
-      '#segmentgrid': {
-          afterrender: me.initEditPluginHandler
-      }
-    });
+          '#metapanel #watchSegmentBtn' : {
+              click : me.toggleWatchSegment
+          },
+          '#metapanel #cancelSegmentBtn' : {
+              click : me.cancel
+          },
+          '#metapanel #saveSegmentBtn' : {
+              click : me.save
+          },
+          '#metapanel #saveNextSegmentBtn' : {
+              click : me.saveNext
+          },
+          '#metapanel #savePreviousSegmentBtn' : {
+              click : me.savePrevious
+          },
+          '#metapanel #goAlternateLeftBtn' : {
+              click : me.goToAlternate
+          },
+          '#metapanel #goAlternateRightBtn' : {
+              click : me.goToAlternate
+          },
+          '#metapanel #goToLowerByWorkflowNoSaveBtn' : {
+              click : me.goToLowerByWorkflowNoSave
+          },
+          '#metapanel #goToUpperByWorkflowNoSaveBtn' : {
+              click : me.goToUpperByWorkflowNoSave
+          },
+          '#metapanel #goToLowerNoSaveBtn' : {
+              click : me.goToLowerNoSave
+          },
+          '#metapanel #goToUpperNoSaveBtn' : {
+              click : me.goToUpperNoSave
+          },
+          '#metapanel #saveNextByWorkflowBtn' : {
+              click : me.saveNextByWorkflow
+          },
+          '#metapanel #resetSegmentBtn' : {
+              click : me.resetSegment
+          },
+          'segmentsHtmleditor': {
+              afteriniteditor: me.initEditor
+          },
+          '#segmentgrid': {
+              afterrender: me.initEditPluginHandler
+          }
+      });
+      
+      //set the default config
+      me.keyMapConfig = {
+          'ctrl-d':         ["D",{ctrl: true, alt: false}, me.toggleWatchSegment, true],
+          'ctrl-s':         ["S",{ctrl: true, alt: false}, me.save, true],
+          'ctrl-enter':     [[10,13],{ctrl: true, alt: false}, me.saveNextByWorkflow],
+          'ctrl-alt-enter': [[10,13],{ctrl: true, alt: true, shift: false}, me.saveNext],
+          'ctrl-alt-shift-enter': [[10,13],{ctrl: true, alt: true, shift: true}, me.savePrevious],
+          'ctrl-alt-DIGIT': [decDigits.slice(1),{ctrl: true, alt: true, shift: false}, me.handleChangeState],
+          'esc':            [Ext.EventObject.ESC, null, me.cancel],
+          'ctrl-alt-left':  [Ext.EventObject.LEFT,{ctrl: true, alt: true}, me.goToLeft],
+          'ctrl-alt-right': [Ext.EventObject.RIGHT,{ctrl: true, alt: true}, me.goToRight],
+          'alt-pageup':     [Ext.EventObject.PAGE_UP,{ctrl: false, alt: true}, me.goToUpperByWorkflowNoSave],
+          'alt-pagedown':   [Ext.EventObject.PAGE_DOWN,{ctrl: false, alt: true}, me.goToLowerByWorkflowNoSave],
+          'alt-del':        [Ext.EventObject.DELETE,{ctrl: false, alt: true}, me.resetSegment],
+          'ctrl-alt-up':    [Ext.EventObject.UP,{ctrl: true, alt: true}, me.goToUpperNoSave, true],
+          'ctrl-alt-down':  [Ext.EventObject.DOWN,{ctrl: true, alt: true}, me.goToLowerNoSave, true],
+          'ctrl-alt-c':     ["C",{ctrl: true, alt: true}, me.handleOpenComments, true],
+          'alt-DIGIT':      [decDigits,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
+          'F2':             null
+      };
   },
   /**
    * track isEditing state 
    */
   initEditPluginHandler: function () {
-      var me = this, map;
+      var me = this;
       me.getEditPlugin().on('beforeedit', function(){me.isEditing = true;});
       me.getEditPlugin().on('canceledit', function(){me.isEditing = false;});
       me.getEditPlugin().on('edit', function(){me.isEditing = false;})
       
-      map = new Ext.util.KeyMap(Ext.getDoc(), [{
-          key: "C",
-          ctrl:true,
-          alt:true,
-          fn: function(key, e){
+      new Ext.util.KeyMap(Ext.getDoc(), me.getKeyMapConfig({
+          'F2':             [Ext.EventObject.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
+          'ctrl-alt-c':     ["C",{ctrl: true, alt: true}, function(key, e){
               e.preventDefault();
               e.stopEvent();
               var found = Ext.select('#segment-grid-body .x-grid-row-selected td.comments-field img').first();
               if(found && (found.hasCls('add') || found.hasCls('edit'))){
                   found.dom.click();
               }
-          }
-      }]);
+          }],
+      }));
   },
   /**
    * Gibt die RowEditing Instanz des Grids zurück
@@ -130,144 +158,60 @@ Ext.define('Editor.controller.Editor', {
     return this.getSegmentGrid().editingPlugin;
   },
   /**
+   * converts the here used simple keymap config to the fullblown KeyMap config
+   * the simple config contains arrays with the following indizes:
+   * 0: key
+   * 1: special key config
+   * 2: function to be called
+   * 3: boolean, if true prepend event propagation stopper
+   *
+   * @param {Object} overwrite a config object for dedicated overwriting of key bindings
+   */
+  getKeyMapConfig: function(overwrite) {
+      var me = this,
+          conf = [];
+      Ext.Object.each(me.keyMapConfig, function(key, item){
+          //applies if available the overwritten config instead the default one
+          if(overwrite && overwrite[key]) {
+              item = overwrite[key];
+          }
+          if(!item) {
+              return;
+          }
+          //applies the keys config and scope to a fresh conf object
+          var confObj = Ext.applyIf({
+              key: item[0],
+              scope: me
+          }, item[1]);
+          if(item[3]) {
+              //prepends the event propagation stopper
+              confObj.fn = function(key, e) {
+                  e.preventDefault();
+                  e.stopEvent();
+                  item[2].apply(confObj.scope, arguments);
+              }
+          }
+          else {
+              confObj.fn = item[2];
+          }
+          conf.push(confObj);
+      });
+      return conf;
+  },
+  /**
    * binds strg + enter as save segment combination
    * @param editor
    */
   initEditor: function(editor){
       var me = this,
-          f = function() {},
-          decDigits = [48, 49, 50, 51, 52, 53, 54, 55, 56, 57];
+          f = function() {};
+          
       
       f.prototype = Ext.Element.prototype;
       docEl = new f();
       docEl.dom = editor.getDoc();
       
-      //Editor KeyMap
-      var map = new Ext.util.KeyMap(docEl, [{
-          key: "S",
-          ctrl:true,
-          alt: false,
-          scope: me,
-          fn: function(key, e){
-              e.preventDefault();
-              e.stopEvent();
-              me.save();
-          }
-      },{
-          key: [10,13],
-          ctrl: true,
-          alt: false,
-          scope: me,
-          fn: me.saveNextByWorkflow
-      }, {
-          key: [10,13],
-          ctrl: true,
-          alt: true,
-          scope: me,
-          fn: me.saveNext
-      }, {
-          key: decDigits.slice(1),
-          ctrl: true,
-          alt: true,
-          shift:false,
-          scope: me,
-          fn: function(key){
-              var param = Number(key) - 48;
-              me.fireEvent('changeState', param);
-          }
-      }, {
-          key: Ext.EventObject.ESC,
-          scope: me,
-          fn: me.cancel
-      }, {
-          key: Ext.EventObject.LEFT,
-          ctrl:true,
-          alt: true,
-          scope: me,
-          fn: me.goToLeft
-      }, {
-          key: Ext.EventObject.RIGHT,
-          ctrl:true,
-          alt: true,
-          scope: me,
-          fn: me.goToRight
-      }, {
-          key: Ext.EventObject.PAGE_UP,
-          ctrl:false,
-          alt:true,
-          scope: me,
-          fn: me.goToUpperByWorkflowNoSave
-      }, {
-          key: Ext.EventObject.PAGE_DOWN,
-          ctrl:false,
-          alt:true,
-          scope: me,
-          fn: me.goToLowerByWorkflowNoSave
-      }, {
-          key: Ext.EventObject.UP,
-          ctrl:true,
-          alt: true,
-          scope: me,
-          fn: function(key, e){
-              e.preventDefault();
-              e.stopEvent();
-              me.goToUpperNoSave();
-          }
-      }, {
-          key: Ext.EventObject.DOWN,
-          ctrl:true,
-          alt: true,
-          scope: me,
-          fn: function(key, e){
-              e.preventDefault();
-              e.stopEvent();
-              me.goToLowerNoSave();
-          }
-      }, {
-          key: decDigits,
-          ctrl: false,
-          alt: true,
-          shift:false,
-          scope: me,
-          fn: function(key, e){
-              e.preventDefault();
-              e.stopEvent();
-              var param = Number(key) - 48;
-              if (param == 0)
-              {
-                param = 10;
-              }
-              me.fireEvent('assignMQMTag', param);
-          }
-       }, {
-          key: decDigits,
-          ctrl: false,
-          alt: true,
-          shift:true,
-          scope: me,
-          fn: function(key, e){
-              if(!me.isEditing) {
-                  return;
-              }
-              e.preventDefault();
-              e.stopEvent();
-              var param = (Number(key) - 48) + 10;
-              if (param == 10)
-              {
-                param = 20;
-              }
-              me.fireEvent('assignMQMTag', param);
-          }
-      }, {
-          key: "C",
-          ctrl:true,
-          alt:true,
-          fn: function(key, e){
-              e.preventDefault();
-              e.stopEvent();
-              me.fireEvent('openComments');
-          }
-      }]);
+      new Ext.util.KeyMap(docEl, me.getKeyMapConfig());
   },
   /**
    * Handler for save Button
@@ -498,6 +442,8 @@ Ext.define('Editor.controller.Editor', {
           ed = me.getEditPlugin(),
           ret = me.calculateNextRow(rowIdxChange, errorText, isEditable);
           
+      me.fireEvent('saveUnsavedComments');
+      
       me.fireEvent('saveSegment', {
           scope: me,
           segmentUsageFinished: function(){
@@ -511,6 +457,38 @@ Ext.define('Editor.controller.Editor', {
    */
   cancel: function() {
     this.getEditPlugin().cancelEdit();
+  },
+  /**
+   * Handles pressing the keyboard shortcuts for changing the segment state
+   */
+  handleChangeState: function(key) {
+      var param = Number(key) - 48;
+      this.fireEvent('changeState', param);
+  },
+  /**
+   * Handles pressing the comment keyboard shortcut
+   */
+  handleOpenComments: function(key) {
+      this.fireEvent('openComments');
+  },
+  /**
+   * Handles pressing the MQM tag shortcuts, without shift 1-10, with shift 11-20
+   */
+  handleAssignMQMTag: function(key, e) {
+      var me = this;
+      if(!me.isEditing) {
+          return;
+      }
+      e.preventDefault();
+      e.stopEvent();
+      var param = Number(key) - 48;
+      if (param == 0) {
+          param = 10;
+      }
+      if(e.shiftKey) {
+          param = param + 10;
+      }
+      me.fireEvent('assignMQMTag', param);
   },
   /**
    * Move the editor about one editable field
@@ -535,34 +513,28 @@ Ext.define('Editor.controller.Editor', {
       info.plug.editor.changeColumnToEdit(cols[idx + direction]);
       return;
     }
-    me.fireEvent('saveUnsavedComments');
     if(direction > 0) {
         //goto next segment and first col
         if(newRec) {
             info.plug.editor.changeColumnToEdit(cols[0]);
         }
-        if (saveRecord)
-        {
+        if (saveRecord) {
           me.saveNext();
         }
-        else
-        {
+        else {
           me.goToLowerNoSave();
         }
+        return;
+    }
+    //goto prev segment and last col
+    if(newRec) {
+        info.plug.editor.changeColumnToEdit(cols[cols.length - 1]);
+    }
+    if (saveRecord) {
+      me.savePrevious();
     }
     else {
-        //goto prev segment and last col
-        if(newRec) {
-            info.plug.editor.changeColumnToEdit(cols[cols.length - 1]);
-        }
-        if (saveRecord)
-        {
-          me.savePrevious();
-        }
-        else
-        {
-          me.goToUpperNoSave();
-        }
+      me.goToUpperNoSave();
     }
   },
   /**
@@ -641,5 +613,85 @@ Ext.define('Editor.controller.Editor', {
           columnToRead = editor.columnToEdit.replace(/Edit$/, '');
       Editor.MessageBox.addInfo(me.messages.segmentReset);
       editor.mainEditor.setValueAndMarkup(rec.get(columnToRead), rec.get('id'), editor.columnToEdit);
+  },
+  /**
+   * handler for the F2 key
+   */
+  handleF2KeyPress: function() {
+    var me = this,
+        edCtrl = me.application.getController('Editor'),
+        grid = me.getSegmentGrid(),
+        selModel = grid.getSelectionModel(),
+        ed = edCtrl.getEditPlugin(),
+        cols = grid.query('.contentEditableColumn:not([hidden])'),
+        sel = [];
+    
+    if (ed.openedRecord === null)
+    {
+        if (!selModel.hasSelection())
+        {
+            grid.selectOrFocus(edCtrl.getNextEditableSegmentOffset(0));
+        }
+        sel = selModel.getSelection();
+        ed.startEdit(sel[0], cols[0]);
+    }
+    else
+    {
+        ed.editor.mainEditor.deferFocus();
+    }
+  },
+  /**
+   * Handler for watchSegmentBtn
+   * @param {Ext.button.Button} button
+   */
+  toggleWatchSegment: function() {
+      if(!this.isEditing){
+          return;
+      }
+      var me = this,
+          model = Ext.create('Editor.model.SegmentUserAssoc');
+          ed = me.getEditPlugin(),
+          record = ed.openedRecord;
+          segmentId = record.get('id'),
+          isWatched = Boolean(record.get('isWatched')),
+          segmentUserAssocId = record.get('segmentUserAssocId'),
+          navi = me.getNavi(),
+          startText = navi.item_startWatchingSegment,
+          stopText = navi.item_stopWatchingSegment,
+          but = navi.down('#watchSegmentBtn'),
+          success = function(rec, op) {
+              //isWatched
+              record.set('isWatched', !isWatched);
+              record.set('segmentUserAssocId', isWatched ? null : rec.data['id']);
+              but.setTooltip(isWatched ? startText : stopText);
+              but.toggle(!isWatched, true);
+              if(op.action == 'create') {
+                  me.fireEvent('watchlistAdded', record, me, rec);
+              }
+              else {
+                  me.fireEvent('watchlistRemoved', record, me, rec);
+              }
+          },
+          failure = function(rec, op) {
+              but.setTooltip(isWatched ? stopText : startText);
+              but.toggle(isWatched, true);
+          };
+    
+    if (isWatched)
+    {
+        model.set('id', segmentUserAssocId);
+        model.destroy({
+            success: success,
+            failure: failure
+        });
+    }
+    else
+    {
+        model.set('segmentId', segmentId);
+        model.save({
+            success: success,
+            failure: failure
+        });
+    }
   }
 });

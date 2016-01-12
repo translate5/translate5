@@ -106,14 +106,6 @@ Ext.define('Editor.controller.Comments', {
               click: me.handleAddComment
           }
       });
-      
-      var map = new Ext.util.KeyMap(Ext.getDoc(), [{
-          key: [10,13],
-          ctrl: true,
-          alt: false,
-          scope: me,
-          fn: me.handleCommentSave
-      }]);
   },
   initEditPluginHandler: function() {
       var me = this,

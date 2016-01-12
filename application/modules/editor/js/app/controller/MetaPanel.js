@@ -70,9 +70,6 @@ Ext.define('Editor.controller.MetaPanel', {
   init : function() {
       var me = this;
       me.control({
-      '#metapanel #watchSegmentBtn' : {
-        click : me.toggleWatchSegment
-      },
       '#metapanel #metaTermPanel': {
           afterrender: me.initMetaTermHandler
       },
@@ -133,55 +130,6 @@ Ext.define('Editor.controller.MetaPanel', {
    */
   layout: function() {
     this.getNavi().doLayout(); //FIXME noch was anderes layouten?
-  },
-  /**
-   * Handler for watchSegmentBtn
-   * @param {Ext.button.Button} button
-   * @param {Boolean} pressed
-   */
-  toggleWatchSegment: function(but, pressed) {
-      var me = this,
-        model = Ext.create('Editor.model.SegmentUserAssoc');
-        segmentId = me.record.get('id'),
-        isWatched = Boolean(me.record.get('isWatched')),
-        segmentUserAssocId = me.record.get('segmentUserAssocId'),
-        navi = me.getNavi(),
-        startText = navi.item_startWatchingSegment,
-        stopText = navi.item_stopWatchingSegment,
-        success = function(rec, op) {
-            //isWatched
-            me.record.set('isWatched', !isWatched);
-            me.record.set('segmentUserAssocId', isWatched ? null : rec.data['id']);
-            but.setTooltip(isWatched ? startText : stopText);
-            but.toggle(!isWatched, true);
-            if(op.action == 'create') {
-                me.fireEvent('watchlistAdded', me.record, me, rec);
-            }
-            else {
-                me.fireEvent('watchlistRemoved', me.record, me, rec);
-            }
-        },
-        failure = function(rec, op) {
-            but.setTooltip(isWatched ? stopText : startText);
-            but.toggle(isWatched, true);
-        };
-    
-    if (isWatched)
-    {
-        model.set('id', segmentUserAssocId);
-        model.destroy({
-            success: success,
-            failure: failure
-        });
-    }
-    else
-    {
-        model.set('segmentId', segmentId);
-        model.save({
-            success: success,
-            failure: failure
-        });
-    }
   },
   /**
    * Editor.view.segments.RowEditing beforeedit handler, initiert das MetaPanel mit den Daten
