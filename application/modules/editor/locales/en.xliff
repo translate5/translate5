@@ -1163,13 +1163,13 @@
     <source>Merkliste</source>
     <target>watchlist</target>
   </trans-unit>
-  <trans-unit id='U2VnbWVudCBhdWYgZGllIE1lcmtsaXN0ZSBzZXR6ZW4='>
-    <source>Segment auf die Merkliste setzen</source>
-    <target>add segment to my watchlist</target>
+  <trans-unit id='U2VnbWVudCBhdWYgZGllIE1lcmtsaXN0ZSBzZXR6ZW4gKFNUUkcgKyBEKQ=='>
+    <source>Segment auf die Merkliste setzen (STRG + D)</source>
+    <target>add segment to my watchlist (CTRL + D)</target>
   </trans-unit>
-  <trans-unit id='U2VnbWVudCB2b24gZGVyIE1lcmtsaXN0ZSBlbnRmZXJuZW4='>
-    <source>Segment von der Merkliste entfernen</source>
-    <target>remove segment from my watchlist</target>
+  <trans-unit id='U2VnbWVudCB2b24gZGVyIE1lcmtsaXN0ZSBlbnRmZXJuZW4gKFNUUkcgKyBEKQ=='>
+    <source>Segment von der Merkliste entfernen (STRG + D)</source>
+    <target>remove segment from my watchlist (CTRL + D)</target>
   </trans-unit>  
 <trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgQUxUICsgRU5URVIp'>
   <source>Speichern und nächstes Segment öffnen (STRG + ALT + ENTER)</source>
@@ -1179,9 +1179,9 @@
   <source>Speichern und nächstes Segment im Workflow öffnen (STRG + ENTER)</source>
   <target>Save and open next segment in workflow (CTRL + ENTER)</target>
 </trans-unit>
-<trans-unit id='U3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgw7ZmZm5lbg=='>
-  <source>Speichern und vorheriges Segment öffnen</source>
-  <target>Save and open previous segment</target>
+<trans-unit id='U3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgw7ZmZm5lbiAoU1RSRyArIEFMVCArIFNISUZUICsgRU5URVIp'>
+  <source>Speichern und vorheriges Segment öffnen (STRG + ALT + SHIFT + ENTER)</source>
+  <target>Save and open previous segment (CTRL + ALT + SHIFT + ENTER)</target>
 </trans-unit>
 <trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgQUxUICsg4oaTKQ=='>
   <source>Nicht speichern und nächstes Segment öffnen (STRG + ALT + ↓)</source>
@@ -1219,9 +1219,9 @@
   <source>Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.</source>
   <target>The segment content was resetted to the original import state.</target>
 </trans-unit>
-<trans-unit id='U2VnbWVudCBhdWYgaW5pdGlhbGVuIEluaGFsdCB6dXLDvGNrc2V0emVu'>
-  <source>Segment auf initialen Inhalt zurücksetzen</source>
-  <target>Reset segment to initial content</target>
+<trans-unit id='U2VnbWVudCBhdWYgaW5pdGlhbGVuIEluaGFsdCB6dXLDvGNrc2V0emVuIChBTFQgKyBFTlRGKQ=='>
+  <source>Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)</source>
+  <target>Reset segment to initial content (ALT + DEL)</target>
 </trans-unit>
 <trans-unit id='QWJicmVjaGVuIChFU0Mp'>
   <source>Abbrechen (ESC)</source>
