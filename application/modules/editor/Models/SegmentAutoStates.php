@@ -174,19 +174,24 @@ class editor_Models_SegmentAutoStates {
         $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
         /* @var $workflow editor_Workflow_Abstract */
         
-        //if the user is not assigned to the task directly, but he is allowed to edit the user
-        //then the default state would be REVIEWED_PM instead a normal REVIEWED
-        if($this->isEditWithoutAssoc()){
-            $default = self::REVIEWED_PM;
-        }
-        else {
-            $default = self::REVIEWED;
-        }
-        
         return array(
-          'default' => $default, //missing role fallback for "editAllTasks" users
-          $workflow::ROLE_LECTOR => self::REVIEWED,
-          $workflow::ROLE_TRANSLATOR => self::REVIEWED_TRANSLATOR
+          'pm' => array(
+            self::REVIEWED_PM,
+            self::REVIEWED_PM_AUTO,
+            self::REVIEWED_PM_UNCHANGED,
+            self::REVIEWED_PM_UNCHANGED_AUTO,
+          ),
+          $workflow::ROLE_LECTOR => array(
+            self::REVIEWED,
+            self::REVIEWED_AUTO,
+            self::REVIEWED_UNTOUCHED,
+            self::REVIEWED_UNCHANGED,
+            self::REVIEWED_UNCHANGED_AUTO,
+          ),
+          $workflow::ROLE_TRANSLATOR => array(
+            self::REVIEWED_TRANSLATOR,
+            self::REVIEWED_TRANSLATOR_AUTO,
+          )
         );
     }
     
