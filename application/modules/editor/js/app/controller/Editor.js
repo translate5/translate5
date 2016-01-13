@@ -126,7 +126,7 @@ Ext.define('Editor.controller.Editor', {
           'ctrl-alt-down':  [Ext.EventObject.DOWN,{ctrl: true, alt: true}, me.goToLowerNoSave, true],
           'ctrl-alt-c':     ["C",{ctrl: true, alt: true}, me.handleOpenComments, true],
           'alt-DIGIT':      [decDigits,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
-          'F2':             null
+          'F2':             [Ext.EventObject.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true]
       };
   },
   /**
@@ -139,7 +139,6 @@ Ext.define('Editor.controller.Editor', {
       me.getEditPlugin().on('edit', function(){me.isEditing = false;})
       
       new Ext.util.KeyMap(Ext.getDoc(), me.getKeyMapConfig({
-          'F2':             [Ext.EventObject.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
           'ctrl-alt-c':     ["C",{ctrl: true, alt: true}, function(key, e){
               e.preventDefault();
               e.stopEvent();
