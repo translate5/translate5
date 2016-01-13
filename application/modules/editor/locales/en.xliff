@@ -1231,6 +1231,10 @@
   <source>Speichern (STRG + S)</source>
   <target>save (CTRL + S)</target>
 </trans-unit>
+<trans-unit id='U2VnbWVudCBhdWYgZGVuIGF1c2dld8OkaGx0ZW4gU3RhdHVzIHNldHplbiAoU1RSRyArIEFMVCArIHswfSk='>
+  <source>Segment auf den ausgewählten Status setzen (STRG + ALT + {0})</source>
+  <target>Set segment to the choosen state (CTRL + ALT + {0})</target>
+</trans-unit>
     </body>
   </file>
 </xliff>
