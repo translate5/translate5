@@ -66,7 +66,9 @@ Ext.define('Editor.controller.QmSubSegments', {
     }],
     strings: {
     	emptySelText: '##UT##Bitte wählen Sie im Editor ein Subsegment aus!',
-    	emptySelTitle: '##UT##Kein Subsegment ausgewählt.'
+    	emptySelTitle: '##UT##Kein Subsegment ausgewählt.',
+    	buttonTooltip10: '#UT# (ALT+{0})',
+    	buttonTooltip20: '#UT# (ALT+SHIFT+{0})'
     },
     
     init : function() {
@@ -133,7 +135,8 @@ Ext.define('Editor.controller.QmSubSegments', {
 		var me = this,
 			cache = Editor.qmFlagTypeCache,
 		iterate = function(node) {
-			var result;
+			var result, 
+			    text, id;
 			if(Ext.isArray(node)){
 				result = [];
 				Ext.each(node, function(item) {
@@ -141,8 +144,19 @@ Ext.define('Editor.controller.QmSubSegments', {
 				});
 				return result;
 			}
+			
+			text = node.text;
+			if(node.id <= 10) {
+			    id = node.id == 10 ? 0 : node.id;
+			    text += Ext.String.format(me.strings.buttonTooltip10, id);
+			}
+			else if(node.id > 10 && node.id <= 15) {
+			    id = node.id == 15 ? 0 : node.id;
+			    text += Ext.String.format(me.strings.buttonTooltip20, id);
+			}
+			
 			result = {
-				text: node.text,
+				text: text,
 				qmid: node.id,
 				icon: me.getImgTagSrc(node.id, true),
 				qmtype: 'qm-'+node.id,
@@ -340,10 +354,9 @@ Ext.define('Editor.controller.QmSubSegments', {
      * @param {Ext.menu.Item} menuitem
      */
     addQmFlagHistory: function(menuitem) {
-        // Angel Naydenov 22.10.2015: this statement generates js error, there is no parentMenu property in menuitem
-    	//if(!menuitem.parentMenu.parentMenu) {
-    	//	return; //ignore first level and history menu entries
-    	//}
+    	if(menuitem.parentMenu && !menuitem.parentMenu.parentMenu) {
+    		return; //ignore first level and history menu entries
+    	}
     	var me = this,
     	id = menuitem.qmid,
     	toremove,
