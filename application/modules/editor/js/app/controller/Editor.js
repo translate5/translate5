@@ -140,6 +140,11 @@ Ext.define('Editor.controller.Editor', {
       
       new Ext.util.KeyMap(Ext.getDoc(), me.getKeyMapConfig({
           'ctrl-alt-c':     ["C",{ctrl: true, alt: true}, function(key, e){
+              var me = this;
+              if(me.isEditing) {
+                  me.handleOpenComments();
+                  return;
+              }
               e.preventDefault();
               e.stopEvent();
               var found = Ext.select('#segment-grid-body .x-grid-row-selected td.comments-field img').first();
@@ -220,6 +225,7 @@ Ext.define('Editor.controller.Editor', {
           ed = me.getEditPlugin(),
           rec = ed.openedRecord;
       if(me.isEditing &&rec && rec.get('editable')) {
+          me.fireEvent('saveUnsavedComments');
           me.fireEvent('saveSegment');
       }
   },
@@ -605,6 +611,9 @@ Ext.define('Editor.controller.Editor', {
    * resets the htmleditor content to the original content
    */
   resetSegment: function() {
+      if(!this.isEditing) {
+          return;
+      }
       var me = this,
           plug = me.getEditPlugin(),
           editor = plug.editor,
