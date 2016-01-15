@@ -68,13 +68,7 @@ class editor_Models_Export_FileParser_Csv extends editor_Models_Export_FileParse
     protected function parseSegment($segment){
         $segment = $this->convertQmTags2XliffFormat($segment);
         $segment = parent::parseSegment($segment);
-        $segment = $this->recodeTagsFromDisplay($segment);
-        
         return $segment;
-    }
-    
-    protected function recodeTagsFromDisplay($text) {
-        return str_replace(array('&quot;','&#39;'), array('"',"'") ,$text);
     }
     
     /**
@@ -92,6 +86,12 @@ class editor_Models_Export_FileParser_Csv extends editor_Models_Export_FileParse
      */
     protected function getSegmentContent($segmentId, $field) {
         $segment = parent::getSegmentContent($segmentId, $field);
+        //decoding the htmlspecialchars before exporting to CSV
+
+        //TODO if we ever will export other tags in CSV as MQM or fix the MQM comments so that specialchars are allowed there, 
+        //then we must change the decoding here, so that only text nodes are decoded, and not the special chars in the tags too!
+        $segment = htmlspecialchars_decode($segment, ENT_QUOTES);
+        
         return str_replace($this->_enclosure,$this->_enclosure.$this->_enclosure,$segment);
     }
 }

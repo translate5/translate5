@@ -18,6 +18,17 @@
 <dx:qa-hits></dx:qa-hits>
 </trans-unit>
 
+<trans-unit id="5" translate5:autostateId="1" translate5:autostateText="reviewed">
+<source>Installation on Unix systems &amp; umlaut test äöü &lt; &lt;iamnotag&gt;</source>
+<target dx:match-quality="100.0">Installation auf Unix-Systemen &amp; Umlaut Test äöü &lt; &lt;ichbinkeintag&gt; - bearbeitet durch den Testcode</target>
+<alt-trans alttranstype="previous-version" dx:origin-shorttext="Zieltext">
+<target xml:lang="de">Installation auf Unix-Systemen &amp; Umlaut Test äöü &lt; &lt;ichbinkeintag&gt;</target></alt-trans>
+<alt-trans alttranstype="reference" dx:origin-shorttext="Zieltext-diff">
+<target xml:lang="de">Installation auf Unix-Systemen &amp; Umlaut Test äöü &lt; &lt;ichbinkeintag&gt;<mrk mtype="x-sdl-added" sdl:revid="replaced-for-testing"> - bearbeitet durch den Testcode</mrk></target></alt-trans>
+<state stateid="0"/>
+<dx:qa-hits/>
+</trans-unit>
+
 <trans-unit id="7" translate5:autostateId="1" translate5:autostateText="reviewed">
 <source>Apache 2.x  on Unix systems</source>
 <target dx:match-quality="0.0">Apache 2.x  auf Unix-Systemen</target>
