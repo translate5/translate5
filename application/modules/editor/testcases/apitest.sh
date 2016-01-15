@@ -21,8 +21,6 @@ TO_RUN=$1
 else
 TO_RUN="editorAPI"
 fi
-echo $TO_RUN
-echo
 
 #starting test suite:
 phpunit --verbose --include-path $INCLUDES --bootstrap bootstrap.php $TO_RUN
