@@ -184,7 +184,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     shortTagContent;
     
     Ext.each(rootnode.childNodes, function(item){
-      var termFoundCls;
+      var termFoundCls, divItem, spanFull, spanShort;
       if(Ext.isTextNode(item)){
         var text = item.data.replace(new RegExp(Editor.TRANSTILDE, "g"), ' ');
         me.lastSegmentContentWithoutTags.push(text);
@@ -211,10 +211,13 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         return;
       }
       //daten aus den tags holen:
-      data.text = Ext.fly(item).down('span.full').dom.innerHTML.replace(/"/g, '&quot;');
-      data.id = Ext.fly(item).down('span.full').getAttribute('id');
+      divItem = Ext.fly(item);
+      spanFull = divItem.down('span.full');
+      spanShort = divItem.down('span.short');
+      data.text = spanFull.dom.innerHTML.replace(/"/g, '&quot;');
+      data.id = spanFull.getAttribute('id');
       data.md5 = data.id.split('-').pop();
-      shortTagContent = Ext.fly(item).down('span.short').dom.innerHTML;
+      shortTagContent = spanShort.dom.innerHTML;
 	  data.nr = shortTagContent.replace(/[^0-9]/g, '');
       if(shortTagContent.search(/locked/)!==-1){
           data.nr = 'locked'+data.nr;

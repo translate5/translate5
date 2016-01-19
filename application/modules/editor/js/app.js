@@ -49,6 +49,13 @@ Ext.override(Ext.data.Connection, {
 Ext.Ajax.timeout = 60000;
 Ext.override(Ext.data.proxy.Ajax, { timeout: 60000 });
 Ext.override(Ext.form.action.Action, { timeout: 60 });
+/**
+* @property {RegExp}
+* @private
+* Regular expression used for validating identifiers.
+* !!!WARNING!!! This override is made to allow ids starting with a digit. This is due to the bulk of legacy data
+*/
+Ext.validIdRe = /^[a-z0-9_][a-z0-9\-_]*$/i;
 
 /**
  * 

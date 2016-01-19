@@ -417,7 +417,8 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         var me = this,
             //der replace aufruf entfernt vom Editor automatisch hinzugefügte unsichtbare Zeichen, 
             //und verhindert so, dass der Record nicht als modified markiert wird, wenn am Inhalt eigentlich nichts verändert wurde
-            newValue = Ext.String.trim(me.mainEditor.getValueAndUnMarkup()).replace(/\u200B/g, '');
+            //newValue = Ext.String.trim(me.mainEditor.getValueAndUnMarkup()).replace(/\u200B/g, '');
+            newValue = me.mainEditor.getValueAndUnMarkup().replace(/\u200B/g, '');
             
         //check, if the context delivers really the correct record, because through some issues in reallive data 
         //rose the idea, that there might exist special race conditions, where
