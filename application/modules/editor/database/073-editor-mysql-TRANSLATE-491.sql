@@ -26,6 +26,7 @@
 -- 
 -- END LICENSE AND COPYRIGHT
 -- */
+
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES ('runtimeOptions.editor.notification.includeDiff', 1, 'editor', 'system', 1, 1, '', 'boolean', 'defines if the generated xml should also contain an alt trans field with a diff like content of the segment.');
 
