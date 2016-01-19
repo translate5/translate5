@@ -24,3 +24,4 @@ fi
 
 #starting test suite:
 phpunit --verbose --include-path $INCLUDES --bootstrap bootstrap.php $TO_RUN
+exit $?
