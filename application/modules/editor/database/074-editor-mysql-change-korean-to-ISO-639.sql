@@ -26,6 +26,7 @@
 -- 
 -- END LICENSE AND COPYRIGHT
 -- */
+
 UPDATE `LEK_languages` SET `rfc5646` = 'ko' WHERE `LEK_languages`.`langName` = 'Koreanisch';
 
 UPDATE `Zf_configuration` SET `value` = '["zh", "ja", "ko"]' WHERE `Zf_configuration`.`name` = 'runtimeOptions.termTagger.targetStringMatch';

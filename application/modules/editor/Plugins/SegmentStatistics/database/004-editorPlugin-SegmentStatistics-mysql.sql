@@ -27,7 +27,6 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES ('runtimeOptions.plugins.SegmentStatistics.disableFileWorksheetCount', 1, 'editor', 'plugins', 15, 15, '', 'integer', 'If there are more files in the task as configured here, the worksheets per file are disabled, only the summary worksheet is shown');
 
