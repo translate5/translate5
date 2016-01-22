@@ -1,6 +1,8 @@
 ****************
 Testing openTMStermTagger
 ****************
+ATTENTION: For the stemming-tests to succeed, the files exactmatchonly.tbx and stopword.tbx have to be placed in termtaggerDIR/config
+==============
 - Tests are build upon PHPUnit
 - To execute tests, 
     -- you need PHPUnit 4.7 installed as phar-archive, as described at phpunit.de

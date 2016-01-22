@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE martif SYSTEM "TBXcoreStructV02.dtd">
+<martif type="TBX" xml:lang="en">
+
+   <martifHeader>
+      <fileDesc>
+         <titleStmt>
+            <title>Stop Word List</title>
+         </titleStmt>
+      </fileDesc>
+   </martifHeader>
+
+   <text>
+      <body>
+
+         <termEntry>
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>die</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+		 <termEntry id="c2">
+            <langSet xml:lang="DE">
+               <tig id="c2.1">
+                  <term id="c2.1.1">Sie</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+      </body>
+	</text>
+</martif>
