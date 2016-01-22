@@ -27,8 +27,6 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-
-
 INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
 ('runtimeOptions.plugins.ArchiveTaskBeforeDelete.mysqlDumpPath', 1, 'editor', 'plugins', '', '', '', 'string', 'Optional path to the mysqldump executable, if empty the directory to the already configured mysql executable is reused.');
 

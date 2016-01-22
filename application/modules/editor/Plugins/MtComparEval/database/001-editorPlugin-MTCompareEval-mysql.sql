@@ -27,8 +27,6 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-
-
 INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
 ('runtimeOptions.plugins.MtComparEval.url', 1, 'editor', 'plugins', 'http://localhost:8080', 'http://localhost:8080', '', 'string', 'Base URL to the MT-ComparEval Tool, for format see default value');
 

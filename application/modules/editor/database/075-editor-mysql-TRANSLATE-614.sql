@@ -27,7 +27,6 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-
 CREATE TABLE `LEK_browser_log` (
   `id` integer (11) DEFAULT NULL AUTO_INCREMENT,
   `datetime` datetime NULL DEFAULT NULL,

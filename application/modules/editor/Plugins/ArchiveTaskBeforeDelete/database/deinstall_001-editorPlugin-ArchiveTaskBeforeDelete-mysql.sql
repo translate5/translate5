@@ -27,5 +27,4 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-
 DELETE FROM `Zf_configuration` WHERE `name` = 'runtimeOptions.plugins.ArchiveTaskBeforeDelete.mysqlDumpPath';

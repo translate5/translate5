@@ -27,4 +27,4 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
--- DO NOTHING, since script 003 is revoked by deleting whole table which is done in script before
+DO NOTHING, since script 003 is revoked by deleting whole table which is done in script before

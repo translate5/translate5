@@ -27,7 +27,6 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-
 DELETE FROM `Zf_configuration` WHERE `name` = 'runtimeOptions.plugins.MtComparEval.url';
 
 ALTER TABLE `LEK_task_meta` DROP COLUMN mtCompareEvalState;
