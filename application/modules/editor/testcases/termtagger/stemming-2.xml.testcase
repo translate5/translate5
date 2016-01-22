@@ -11,8 +11,8 @@ She is a novel by Stephen King.
 It does not exist.</target>
         </input>
         <expectedOutput>
-            <source>Drücken <div title="" class="term admittedTerm exact transNotFound" data-tbxid="xyz">Sie</div> <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">die</div> Taste A.
-<div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Sie</div> ist ein Roman von Stephen King.
+            <source>Drücken <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Sie</div> <div title="" class="term admittedTerm exact transNotFound" data-tbxid="xyz">die</div> Taste A.
+<div title="" class="term admittedTerm exact transNotFound" data-tbxid="xyz">Sie</div> ist ein Roman von Stephen King.
 Es gibt sie nicht.</source>
             <target>Please press key A.
 <div title="" class="term admittedTerm exact" data-tbxid="xyz">She</div> is a novel by Stephen King.
