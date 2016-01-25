@@ -198,7 +198,7 @@ Ext.define('Editor.controller.MetaPanel', {
       else {
           isBorderReached = rec.get('id') == store.getFirstSegmentId();
       }
-      Ext.Array.each(grid.columns, function(col, idx) {
+     Ext.Array.each(grid.columns, function(col, idx) {
           if(col.dataIndex == ed.editor.getEditedField()) {
               lastColumnIdx = idx;
           }

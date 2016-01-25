@@ -53,9 +53,17 @@ Ext.override(Ext.form.action.Action, { timeout: 60 });
 * @property {RegExp}
 * @private
 * Regular expression used for validating identifiers.
-* !!!WARNING!!! This override is made to allow ids starting with a digit. This is due to the bulk of legacy data
+* !!!WARNING!!! This  and next override is made to allow ids starting with a digit. This is due to the bulk of legacy data
 */
 Ext.validIdRe = /^[a-z0-9_][a-z0-9\-_]*$/i;
+Ext.define('Ext.overrides.dom.Element', {
+    override: 'Ext.dom.Element',
+    
+    constructor: function(dom) {
+        this.validIdRe = Ext.validIdRe;
+        this.callParent(arguments);
+    }
+});
 
 /**
  * 
