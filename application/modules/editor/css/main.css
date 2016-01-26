@@ -67,6 +67,12 @@ END LICENSE AND COPYRIGHT
   line-height:14px;
 }
 
+#segment-grid .x-grid-row-editor .x-form-display-field {
+    text-overflow: initial;
+    white-space: normal;
+    overflow: visible;
+}
+
 #segment-grid .x-grid-cell-inner {
   padding-top:6px;
   padding-bottom:6px;
