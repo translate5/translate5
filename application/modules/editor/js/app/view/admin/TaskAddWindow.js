@@ -116,6 +116,9 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                 }, langCombo),{
                 },Ext.applyIf({
                     name: 'relaisLang',
+                    getSubmitValue: function() {
+                      return this.getValue();
+                    },
                     toolTip: me.strings.relaisLangTip,
                     fieldLabel: me.strings.relaisLangLabel
                 }, langCombo),{

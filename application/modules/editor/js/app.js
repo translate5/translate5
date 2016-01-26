@@ -146,8 +146,8 @@ Ext.application({
       var me = this;
       
     Ext.QuickTips.init();
-    //Anbindung des Handlers für CRQ 92 warnOnClose
-    window.onbeforeunload = Ext.bind(me.onBeforeUnload, me);
+    //FIXME ext6 deactivated the before unload question since this is pain in the ass for reloading often
+    //window.onbeforeunload = Ext.bind(me.onBeforeUnload, me);
     me.authenticatedUser = Ext.create('Editor.model.admin.User', Editor.data.app.user);
     me[Editor.data.app.initMethod]();
     

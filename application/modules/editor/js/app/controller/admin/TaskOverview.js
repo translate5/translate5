@@ -392,7 +392,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               me.savingHide();
               if(submit.failureType == 'server' && submit.result && submit.result.errors && !Ext.isDefined(submit.result.success)) {
                   //all other failures should mark a field invalid
-                  this.getTbxField().setDisabled(true);
                   error.show();
               }
           }
