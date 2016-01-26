@@ -185,6 +185,7 @@ Ext.define('Editor.controller.MetaPanel', {
           isBorderReached = false,
           store = grid.store,
           lastColumnIdx = 0,
+          editedField = ed.editor.getEditedField(),
           newRec = store.getAt(store.indexOf(rec) + rowIdxChange);
       if(!rec || !rec.get('editable')) {
           return false;
@@ -198,8 +199,9 @@ Ext.define('Editor.controller.MetaPanel', {
       else {
           isBorderReached = rec.get('id') == store.getFirstSegmentId();
       }
-     Ext.Array.each(grid.columns, function(col, idx) {
-          if(col.dataIndex == ed.editor.getEditedField()) {
+     Ext.Array.each(grid.getVisibleColumns(), function(col, idx) {
+          editedField = ed.editor.getEditedField();
+          if(col.dataIndex == editedField) {
               lastColumnIdx = idx;
           }
       });
