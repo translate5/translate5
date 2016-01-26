@@ -51,9 +51,7 @@ Ext.define('Editor.model.ModelOverride', {
         config.success = function(rec) {
             Ext.callback(success, scope, arguments);
             me.set(rec.data);
-            me.suspendEvents();
-            me.commit();
-            me.resumeEvents();
+            me.commit(true);
         };
         return me.self.load(me.get(me.idProperty), config);
     },
