@@ -103,6 +103,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       var me = this, 
           body = me.getEditorBody(),
           id;
+
+	  //FIXME: this seems to be fixed in ext6, the same loop exists there in code
       if(!body || body.tagName != 'BODY'){
           //if body does not exists, the browser (mostly IE) is not ready so call again a little more deffered as the default 10ms
           if(!me.deferred){

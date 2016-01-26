@@ -445,14 +445,33 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         return true;
     },
     /**
-     * erweitert die Orginal Methode, setzt den Record zurück.
+     * cancels the editing process
      */
     cancelEdit: function() {
-      var me = this;
-      me.context.record.reject();
-      me.getTimeTrackingData();
-      me.editingPlugin.openedRecord = null;
-      me.callParent(arguments);
+        var me = this,
+            form   = me.getForm(),
+            fields = form.getFields(),
+            items  = fields.items,
+            length = items.length,
+            i;
+      
+        me.context.record.reject();
+        me.getTimeTrackingData();
+        me.editingPlugin.openedRecord = null;
+        
+        me.hide();
+        form.clearInvalid();
+
+        // temporarily suspend events on form fields before reseting the form to prevent the fields' change events from firing
+        for (i = 0; i < length; i++) {
+            items[i].suspendEvents();
+        }
+
+        form.reset();
+
+        for (i = 0; i < length; i++) {
+            items[i].resumeEvents();
+        }
     },
     /**
      * setzt den gekürzten Inhalt des letzten Segments. Muss mit dem "gemarkupten" Content aufgerufen werden um alle Tags zu entfernen. 
@@ -1263,8 +1282,10 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
             context = me.context,
             row = Ext.get(context.row),
             rowHeight = row.getHeight();
-            
-        me.setHeight(rowHeight);
+        
+        //FIXME make delta 20 configurable
+        me.setHeight(rowHeight + 20);
+        me.mainEditor.setHeight(rowHeight + 10);
     },
     setEditorWidth: function() {
         var me = this,
