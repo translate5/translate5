@@ -1101,12 +1101,10 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         }
         
         // From Ext4 begin
-        if (me.setColumnToEdit(me.context.column))
-        {
-            me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit), record.get('id'), me.columnToEdit);
-            me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
-            me.focusContextCell(); // TUKTUK
-        }
+        me.setColumnToEdit(me.context.column);
+        me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit), record.get('id'), me.columnToEdit);
+        me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
+        me.focusContextCell(); // TUKTUK
         // From Ext4 end
     },
 
