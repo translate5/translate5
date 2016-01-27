@@ -318,6 +318,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         }
         me.columnToEdit = toEdit;
         me.columnClicked = col.dataIndex;
+        me.mainEditor.dataIndex = col.dataIndex;
         
         //if isset fieldToDisable the cols get changed in focusContextCell
         me.fieldToDisable = fieldToDisable;
