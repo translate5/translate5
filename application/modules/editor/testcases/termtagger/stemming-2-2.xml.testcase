@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="stopWordsOverwrite2" creator="beo" mandatory="yes" sourceLang="DE" targetLang="EN" tbxPath="DE-EN-stemming.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>Prüft, ob die Überschreibungsregel für die Stoppwortliste funktioniert.</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>
+Sie ist ein Roman von Stephen King.
+Es gibt sie nicht.</source>
+            <target>
+She is a novel by Stephen King.
+It does not exist.</target>
+        </input>
+        <expectedOutput>
+            <source>
+<div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Sie</div> ist ein Roman von Stephen King.
+Es gibt sie nicht.</source>
+            <target>
+<div title="" class="term admittedTerm exact" data-tbxid="xyz">She</div> is a novel by Stephen King.
+It does not exist.</target>
+        </expectedOutput>
+    </assertion>
+</testcase>

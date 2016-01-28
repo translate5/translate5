@@ -59,7 +59,13 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
     protected $_filterTypeMap = array(
                     array('qmId'=>array('list'=>'listAsString'))
     );
-
+    
+    
+    public function init() {
+      parent::init();
+      $this->entity->setEnableWatchlistJoin();
+    }
+    
     /**
      * lädt das Zielsegment, und übergibt die Alikes zu diesem Segment an die View zur JSON Rückgabe
      * @see ZfExtended_RestController::getAction()

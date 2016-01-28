@@ -125,6 +125,7 @@ Ext.define('Editor.controller.Localizer', {
       segmentSaved: '<?php echo $this->translate->_('Das Segment wurde gespeichert!');?>',
       sortCleared: '<?php echo $this->translate->_('Die gewählte Sortierung der Segmente wurde zurückgesetzt!');?>',
       segmentNotSaved: '<?php echo $this->translate->_('Das zuletzt geöffnete Segment (Nr. {0}) konnte nicht gespeichert werden!');?>',
+      otherFiltersActive: '<?php echo $this->translate->_('ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Merkliste sichtbar sind');?>',
       noSegmentToFilter: '<?php echo $this->translate->_('Kein Segment dieser Datei entspricht den Filterkriterien');?>'
     };
 
@@ -166,6 +167,7 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.segments.Grid.prototype.item_qmsummaryBtn = '<?php echo $this->translate->_('QM Subsegment Statistik');?>',
   	Editor.view.segments.Grid.prototype.item_optionsTagBtn = '<?php echo $this->translate->_('Einstellungen');?>',
   	Editor.view.segments.Grid.prototype.item_clearSortAndFilterBtn = '<?php echo $this->translate->_('Sortierung / Filterung zurücksetzen');?>',
+  	Editor.view.segments.Grid.prototype.item_watchListFilterBtn = '<?php echo $this->translate->_('Merkliste');?>',
   	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>',
 
   	Editor.view.ui.segments.column.Quality.prototype.text = '<?php echo $this->translate->_('QM');?>';
@@ -183,6 +185,8 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.segments.column.Comments.prototype.text = '<?php echo $this->translate->_('Kommentare');?>';
   	Editor.view.segments.column.Comments.prototype.text_morecomments = '<?php echo $this->translate->_('({0} weitere Kommentare)');?>';
   	Editor.view.segments.column.Comments.prototype.text_morecomment = '<?php echo $this->translate->_('({0} weiterer Kommentar)');?>';
+  	Editor.view.segments.column.Comments.prototype.text_tooltip_icon = '<?php echo $this->translate->_('Dem ausgewählten Segment einen Kommentar hinzufügen. (STRG + ALT + c)');?>';
+  	
 
   	Editor.view.ui.fileorder.Tree.prototype.title = '<?php echo $this->translate->_('Arbeits-Dateien');?>';
   	Editor.view.fileorder.ReferenceTree.prototype.title = '<?php echo $this->translate->_('Referenz-Dateien');?>';
@@ -205,7 +209,9 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.qmsubsegments.AddFlagFieldset.prototype.title = '<?php echo $this->translate->_('QM Subsegmente');?>';
 	Editor.controller.QmSubSegments.prototype.strings = {
     	emptySelTitle: '<?php echo $this->translate->_('Kein Subsegment ausgewählt.');?>',
-    	emptySelText: '<?php echo $this->translate->_('Bitte wählen Sie im Editor ein Subsegment aus!');?>'
+    	emptySelText: '<?php echo $this->translate->_('Bitte wählen Sie im Editor ein Subsegment aus!');?>',
+    	buttonTooltip10: '<?php echo $this->translate->_(' (ALT+{0})');?>',
+    	buttonTooltip20: '<?php echo $this->translate->_(' (ALT+SHIFT+{0})');?>'
     };
     <?php } ?>
   	Editor.view.ToolTip.prototype.strings = {
@@ -223,16 +229,26 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.segments.MetaPanel.prototype.item_metaQm_title = '<?php echo $this->translate->_('QM');?>';
   	Editor.view.segments.MetaPanel.prototype.item_metaStates_title = '<?php echo $this->translate->_('Status');?>';
   	Editor.view.segments.MetaPanel.prototype.item_metaTerms_title = '<?php echo $this->translate->_('Terminologie');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_cancel = '<?php echo $this->translate->_('Abbrechen');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_save = '<?php echo $this->translate->_('Speichern');?>';
+  	Editor.view.segments.MetaPanel.prototype.item_metaStates_tooltip = '<?php echo $this->translate->_('Segment auf den ausgewählten Status setzen (STRG + ALT + {0})');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_cancel = '<?php echo $this->translate->_('Abbrechen (ESC)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_save = '<?php echo $this->translate->_('Speichern (STRG + S)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_reset = '<?php echo $this->translate->_('Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)');?>';
 
-    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNext = '<?php echo $this->translate->_('Speichern und nächstes öffnen');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndPrevious = '<?php echo $this->translate->_('Speichern und vorheriges öffnen');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_alternateLeft = '<?php echo $this->translate->_('Vorherige Spalte editieren');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_alternateRight = '<?php echo $this->translate->_('Nächste Spalte editieren');?>';
-
-    Editor.controller.MetaPanel.prototype.messages = {
-        segmentNotBuffered: '<?php echo $this->translate->_('Das angeforderte Segment liegt noch nicht im Zwischenspeicher. Bitte scrollen Sie manuell weiter!');?>',
+    Editor.view.segments.MetaPanelNavi.prototype.item_startWatchingSegment = '<?php echo $this->translate->_('Segment auf die Merkliste setzen (STRG + D)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_stopWatchingSegment = '<?php echo $this->translate->_('Segment von der Merkliste entfernen (STRG + D)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNext = '<?php echo $this->translate->_('Speichern und nächstes Segment öffnen (STRG + ALT + ENTER)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNextFiltered = '<?php echo $this->translate->_('Speichern und nächstes Segment im Workflow öffnen (STRG + ENTER)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndPrevious = '<?php echo $this->translate->_('Speichern und vorheriges Segment öffnen (STRG + ALT + SHIFT + ENTER)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_alternateLeft = '<?php echo $this->translate->_('Vorherige Spalte editieren (STRG + ALT + ←)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_alternateRight = '<?php echo $this->translate->_('Nächste Spalte editieren (STRG + ALT + →)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_next = '<?php echo $this->translate->_('Nicht speichern und nächstes Segment öffnen (STRG + ALT + ↓)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_nextFiltered = '<?php echo $this->translate->_('Nicht speichern und nächstes Segment im Workflow öffnen (ALT + Bild ↓)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_prev = '<?php echo $this->translate->_('Nicht speichern und vorheriges Segment öffnen (STRG + ALT + ↑)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_prevFiltered = '<?php echo $this->translate->_('Nicht speichern und vorheriges Segment im Workflow öffnen (ALT + Bild ↑)');?>';
+    
+    Editor.controller.Editor.prototype.messages = {
+        segmentReset: '<?php echo $this->translate->_('Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.');?>',
+        segmentNotBuffered: '<?php echo $this->translate->_('Kein passendes Segment vorhanden bzw. im Zwischenspeicher gefunden. Bitte scrollen Sie manuell weiter!');?>',
         gridEndReached: '<?php echo $this->translate->_('Ende der Segmente erreicht!');?>',
         gridStartReached: '<?php echo $this->translate->_('Beginn der Segmente erreicht!');?>'
     };

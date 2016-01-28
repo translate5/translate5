@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE martif SYSTEM "TBXcoreStructV02.dtd">
+<martif type="TBX" xml:lang="en">
+	<!-- Liste mit Termen, auf die nur mit Exakt matches geprüft wird -->
+   <martifHeader>
+      <fileDesc>
+         <titleStmt>
+            <title>Exact Word Match List</title>
+         </titleStmt>
+      </fileDesc>
+   </martifHeader>
+
+   <text>
+      <body>
+ 
+         <termEntry id="X_2216">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Höhen</term>
+                  <descrip type="definition">Einstellmöglichkeit des Soundsystems. Bezeichnet den Klangparameter für die Audiowiedergabe des oberen Frequenzbereichs.</descrip>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_4841">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Schütz</term>
+                  <descrip type="definition">Elektromechanisches Bauteil zum Schalten des Stromflusses bei hohen Spannungen.</descrip>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_3535">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Wachs</term>
+                  <descrip type="definition">Pflegemittel für Oberflächen. Häufig in Form einer Paste oder Creme, wird benutzt um den Lack des Fahrzeuges zu schützen, z. B. gegen Witterungseinflüsse.</descrip>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_3218">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Plane</term>
+                  <descrip type="definition">Decke aus festem, Wasser abweisendem Material, die zum Schutz verwendet wird. Beispiel: Schutz von Fahrzeugen bei Karosseriereparaturen. Durch die Plane wird eine mögliche Zerstörung der Lack- und Glasflächen verhindert sowie Brandgefahr durch Funkenflug vermieden.</descrip>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_5228">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Härte</term>
+                  <descrip type="definition">Mechanischer Widerstand, den ein Körper dem Eindringen eines anderen, härteren Körpers entgegensetzt. Diese Werkstoffeigenschaft lässt z. B. Rückschlüsse auf den Verschleiß zu.</descrip>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_6853">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Vorgelege</term>
+                  <descrip type="definition">Zusatzgetriebe, das die Umdrehungszahl einer angetriebenen Welle reduziert und das Drehmoment erhöht.</descrip>
+               </tig>
+            </langSet>
+         </termEntry>
+		 
+      </body>
+	</text>
+</martif>

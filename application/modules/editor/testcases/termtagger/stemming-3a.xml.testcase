@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="exactMatchesOnly" creator="beo" mandatory="yes" sourceLang="DE" targetLang="EN" tbxPath="DE-EN-stemming.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>Prüft, ob die ExactMatchesOnly-Liste funktioniert</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>höher hoch hohe Höhen
+Schutz Schütze Schütz
+wachsen Wachs
+planen Planen Plane
+härtesten Härten Härte
+Vorgelegene Vorgelege</source>
+            <target>high higher high treble
+protection shooter contactor
+grow wax
+plan tarpaulins tarpaulin
+hardest hardnesses hardness
+??? reduction gearbox</target>
+        </input>
+        <expectedOutput>
+            <source>höher hoch hohe <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Höhen</div>
+Schutz Schütze <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Schütz</div>
+wachsen <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Wachs</div>
+planen Planen <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Plane</div>
+härtesten Härten <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Härte</div>
+Vorgelegene <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Vorgelege</div></source>
+            <target>high higher high <div title="" class="term admittedTerm exact" data-tbxid="xyz">treble</div>
+protection shooter <div title="" class="term admittedTerm exact" data-tbxid="xyz">contactor</div>
+grow <div title="" class="term admittedTerm exact" data-tbxid="xyz">wax</div>
+plan <div title="" class="term admittedTerm stemmed" data-tbxid="xyz">tarpaulins</div> <div title="" class="term admittedTerm exact" data-tbxid="xyz">tarpaulin</div>
+hardest <div title="" class="term admittedTerm stemmed" data-tbxid="xyz">hardnesses</div> <div title="" class="term admittedTerm exact" data-tbxid="xyz">hardness</div>
+??? <div title="" class="term admittedTerm exact" data-tbxid="xyz">reduction gearbox</div></target>
+        </expectedOutput>
+    </assertion>
+</testcase>
+

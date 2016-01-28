@@ -68,6 +68,11 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     }
     
     
+    public function init() {
+      parent::init();
+      $this->entity->setEnableWatchlistJoin();
+    }
+    
     protected function afterTaskGuidCheck() {
         $sfm = $this->initSegmentFieldManager($this->session->taskGuid);
         $this->_sortColMap = $sfm->getSortColMap();
@@ -86,7 +91,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     public function indexAction() {
         $session = new Zend_Session_Namespace();
         $this->view->rows = $this->entity->loadByTaskGuid($session->taskGuid);
-        $this->view->total = $this->entity->getTotalCountByTaskGuid($session->taskGuid);
+        $this->view->total = $this->entity->totalCountByTaskGuid($session->taskGuid);
         $borderSegments = $this->entity->getBorderSegments($session->taskGuid);
         //editable segments only!
         if(!empty($borderSegments['first'])) {

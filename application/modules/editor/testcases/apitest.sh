@@ -16,5 +16,12 @@ export LOGOUT_PATH=$LOGOUT_PATH
 #single test to test the "things around" (translate5 internal test framework)
 #phpunit --verbose --include-path $INCLUDES --bootstrap bootstrap.php editorAPI/DummyTest.php
 
+if [ -n "$1" ]; then
+TO_RUN=$1
+else
+TO_RUN="editorAPI"
+fi
+
 #starting test suite:
-phpunit --verbose --include-path $INCLUDES --bootstrap bootstrap.php editorAPI
+phpunit --verbose --include-path $INCLUDES --bootstrap bootstrap.php $TO_RUN
+exit $?

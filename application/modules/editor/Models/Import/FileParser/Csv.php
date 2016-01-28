@@ -335,7 +335,8 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         $segment =  $this->parseSegmentProtectTags($segment);
         // add regEx-replacement-protection
         $segment = $this->parseSegmentProtectRegEx($segment);
-        
+        //encodes the html special characters, so that our frontend can deal with them
+        $segment = htmlspecialchars($segment, ENT_COMPAT);
         
         // continue with normal processing
         if($count == 0) {

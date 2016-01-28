@@ -28,25 +28,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class Editor_UserController extends ZfExtended_UserController {
-
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_RestController::deleteAction()
-     */
-    public function deleteAction() {
-        $this->entity->load($this->_getParam('id'));
-        $this->checkIsEditable();
-        
-        /**
-         * @todo check if this is still necessary, if not the whole function can be removed.
-         * Here all entries in TaskUserAssoc are deleted "manually".
-         * Normally this should happen automatically on database-level via foreign key and cascading delete.
-         */
-        $task_user_assoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $task_user_assoc editor_Models_TaskUserAssoc */
-        $task_users = $task_user_assoc->deleteByUserguid($this->entity->getUserGuid());
-        
-        $this->entity->delete();
-    }
+/**#@+
+ * @author Angel Naydenov
+ * @package editor
+ * @version 1.0
+ *
+ */
+/**
+ * A class providing many-to-many connection between users and segments
+ */
+class editor_Models_Db_SegmentUserAssoc extends Zend_Db_Table_Abstract {
+    protected $_name    = 'LEK_segment_user_assoc';
+    public $_primary = 'id';
 }

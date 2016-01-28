@@ -219,6 +219,8 @@ class editor_Models_Segment_MaterializedView {
         $data = $segment->getDataObject();
         $id = $data->id;
         unset($data->id);
+        unset($data->isWatched);
+        unset($data->segmentUserAssocId);
         $db->update((array) $data, array('id = ?' => $id));
     }
     
