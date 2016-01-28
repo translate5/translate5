@@ -493,7 +493,6 @@ Ext.define('Editor.controller.Comments', {
       }
       else
       {
-          // Angel Naydenov 12.11.2015: this not work :-(
           if (area.rendered && area.isVisible())
           {
               area.focus(false, 500);
