@@ -155,9 +155,6 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
      */
     protected function checkOneTagger($termtaggers, $tagger, $usage, $versionToCheck) {
         $running = isset($termtaggers->running[$tagger]) && $termtaggers->running[$tagger];
-        ob_start();
-        var_dump($termtaggers);
-        error_log(ob_get_clean());
         $version = $versionToCheck === $termtaggers->version[$tagger];
         $color = (($running && $version) ? 'green' : 'red');
         echo '<li style="color:'.$color.';">'.$tagger.' configured as '.join(';', $usage);
