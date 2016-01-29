@@ -27,4 +27,4 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-ALTER TABLE  `LEK_task` ADD  `lockLocked` TINYINT( 1 ) NOT NULL DEFAULT  '1' AFTER  `edit100PercentMatch` ;
+ALTER TABLE  `LEK_task` ADD  `lockLocked` TINYINT( 1 ) NOT NULL DEFAULT  '0' AFTER  `edit100PercentMatch` ;
