@@ -116,8 +116,8 @@ class editor_Plugins_TermTagger_Service {
         }
         
         $version = $response->getBody();
-        // $url is OK if status == 200 AND string 'TermTagger Server' is in the response-body
-        return $response && $this->wasSuccessfull() && strpos($response->getBody(), 'TermTagger Server') !== false;
+        // $url is OK if status == 200 AND string 'de.folt.models.applicationmodel.termtagger.TermTaggerRestServer' is in the response-body
+        return $response && $this->wasSuccessfull() && strpos($response->getBody(), 'de.folt.models.applicationmodel.termtagger.TermTaggerRestServer') !== false;
     }
     
     /**
