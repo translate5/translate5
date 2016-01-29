@@ -158,6 +158,8 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
             //remove potentially incorrect transFound or transNotFound as inserted by termtagger
             $seg->source = preg_replace('" ?transN?o?t?Found ?"', ' ', $seg->source);
             $seg->target = preg_replace('" ?transN?o?t?Found ?"', ' ', $seg->target);
+            $seg->source = preg_replace('" transNotDefined ?"', ' ', $seg->source);
+            $seg->target = preg_replace('" transNotDefined ?"', ' ', $seg->target);
 
             $sourceMids = $this->termModel->getTermMidsFromSegment($seg->source);
             $targetMids = $this->termModel->getTermMidsFromSegment($seg->target);
