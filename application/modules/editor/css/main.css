@@ -279,6 +279,7 @@ body.loading {background: url("../images/loading_ico.gif") center 100px no-repea
 /* Alternative Grafiken: lightbulb, report-magnify, book-open ??? */
 .adminTaskGrid .x-grid-header-ct .terminologie > div {background:url("../images/book_find.png") no-repeat 6px 5px;}
 .adminTaskGrid .x-grid-header-ct .fullMatchEdit > div {background:url("../images/fullMatchEdit.png") no-repeat 6px 5px;}
+.adminTaskGrid .x-grid-header-ct .lockLocked > div {background:url("../images/lock_edit.png") no-repeat 6px 5px;}
 .adminTaskGrid .x-grid-header-ct .source-edit > div {background:url("../images/sourceEdit.png") no-repeat 6px 5px;}
 .adminTaskGrid .x-grid-header-ct .relais-lang > div {background:url("../images/relaisLanguage.png") no-repeat 6px 5px;}
 .adminTaskGrid .x-grid-header-ct .source-lang > div {background:url("../images/sourceLanguage.png") no-repeat 6px 5px;}
@@ -297,6 +298,7 @@ body.loading {background: url("../images/loading_ico.gif") center 100px no-repea
 .adminTaskGrid .x-grid-header-ct .ref-files span.x-column-header-text,
 .adminTaskGrid .x-grid-header-ct .terminologie span.x-column-header-text,
 .adminTaskGrid .x-grid-header-ct .fullMatchEdit span.x-column-header-text,
+.adminTaskGrid .x-grid-header-ct .lockLocked span.x-column-header-text,
 .adminTaskGrid .x-grid-header-ct .source-edit span.x-column-header-text,
 .adminTaskGrid .x-grid-header-ct .source-lang span.x-column-header-text,
 .adminTaskGrid .x-grid-header-ct .target-lang span.x-column-header-text,
