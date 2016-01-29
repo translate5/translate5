@@ -65,7 +65,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         addBtn: '#UT#Task hinzufügen',
         cancelBtn: '#UT#Abbrechen'
     },
-    height : 500,
+    height : 520,
     width : 550,
     loadingMask: null,
     modal : true,
