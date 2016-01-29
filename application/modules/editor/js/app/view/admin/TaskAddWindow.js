@@ -56,6 +56,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         numberFieldLabel: '#UT#Anzahl Wörter',
         targetDeliveryLabel: '#UT#Lieferdatum',
         fullMatchLabel: '#UT#100% Matches sind editierbar',
+        lockLockedLabel: '#UT#In importierter Datei gesperrte Segmente sind in translate5 gesperrt',
         sourceEditLabel: '#UT#Ausgangstext ist editierbar',
         bottomInfo: '#UT# ¹ Diese Angaben / Daten werden für den Import zwingend benötigt.',
         bottomInfo2: '#UT# ² Eine TBX Datei ist optional. Eine TBX Datei im TBX-Core Format wird benötigt um Terminology auszuzeichnen.',
@@ -166,6 +167,12 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     inputValue: 1,
                     name: 'edit100PercentMatch',
                     fieldLabel: me.strings.fullMatchLabel
+                },{
+                    xtype: 'checkbox',
+                    inputValue: 1,
+                    name: 'lockLocked',
+                    checked: true,
+                    fieldLabel: me.strings.lockLockedLabel
                 },{
                     xtype: 'container',
                     html: me.strings.bottomInfo+'<br />'+me.strings.bottomInfo2,

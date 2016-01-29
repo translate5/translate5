@@ -57,6 +57,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       referenceFiles: '#UT#Referenzdateien',
       terminologie: '#UT#Terminologie',
       fullMatchEdit: '#UT#100% Matches sind editierbar',
+      lockLocked: '#UT#In importierter Datei gesperrte Segmente sind in translate5 gesperrt',
       orderdate: '#UT#Bestelldatum',
       enableSourceEditing: '#UT#Quellsprache bearbeitbar'
   },
@@ -322,10 +323,16 @@ Ext.define('Editor.view.admin.TaskGrid', {
           xtype: 'owncheckcolumn',
           width: 45,
           cls: 'fullMatchEdit',
-          hidden: true,
           dataIndex: 'edit100PercentMatch',
           tooltip: me.text_cols.fullMatchEdit,
           text: me.text_cols.fullMatchEdit
+      },{
+          xtype: 'owncheckcolumn',
+          width: 45,
+          cls: 'lockLocked',
+          dataIndex: 'lockLocked',
+          tooltip: me.text_cols.lockLocked,
+          text: me.text_cols.lockLocked
       },{
           xtype: 'owncheckcolumn',
           hidden: ! Editor.data.enableSourceEditing,

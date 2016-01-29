@@ -138,6 +138,9 @@ Ext.define('Editor.view.admin.task.GridFilter', {
             type: 'boolean',
             dataIndex: 'edit100PercentMatch'
         },{
+            type: 'boolean',
+            dataIndex: 'lockLocked'
+        },{
             type: 'date',
             dataIndex: 'orderdate'
         },{

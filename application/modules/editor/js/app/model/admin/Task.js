@@ -66,6 +66,7 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'terminologie', type: 'boolean'},
     {name: 'orderdate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
     {name: 'edit100PercentMatch', type: 'boolean'},
+    {name: 'lockLocked', type: 'boolean'},
     {name: 'enableSourceEditing', type: 'boolean'},
     {name: 'qmSubEnabled', type: 'boolean'},
     {name: 'qmSubFlags', type: 'auto'},
