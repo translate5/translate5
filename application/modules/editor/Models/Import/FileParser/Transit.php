@@ -130,8 +130,8 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
      * @param editor_Models_Languages $targetLang
      * @param editor_Models_Task $task
      */
-    public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task){
-        parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $sourceLang, $targetLang, $task);
+    public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, boolean $lockLocked, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task){
+        parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $lockLocked, $sourceLang, $targetLang, $task);
         $this->meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
         $this->meta->addMeta('transitLockedForRefMat', editor_Models_Segment_Meta::META_TYPE_BOOLEAN, 0, 'defines, if segment is marked in transitFile as locked for translation memory use');
         $transitLangInfo = Zend_Registry::get('transitLangInfo');
@@ -261,8 +261,10 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
      */
     protected function setSegmentAttribs($segment){
         //segment-id of transit is used as mid and thus used here
-        $this->_matchRateSegment[$segment->getId()] = (int)$segment->getMatchValue();
-        $this->_autopropagated[$segment->getId()] = false;
+        $id = $segment->getId();
+        $this->_matchRateSegment[$id] = (int)$segment->getMatchValue();
+        $this->_autopropagated[$id] = false;
+        $this->_lockedInFile[$id] = false;
     }
     
     /**
@@ -347,12 +349,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         $shortTagIdentOld = false;
         for($i = 0; $i < $count; $i++) {
             $tag = &$parts[$i];
-            /*ob_start();
-            echo "xxxxxx";
-            var_dump($tag);
-            error_log(ob_get_clean());*/
             if (preg_match('"µ[^>/]*?>"s',$tag)=== 1){
-                #error_log('starting subseg');
                 $tagName = 'SubSeg';
                 $shortTagIdent = $this->shortTagIdent++;
                 $tagText = 'SubSeg';
@@ -360,7 +357,6 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
                 $tag = $this->createTag($unprotect($tag), $shortTagIdent, $tagName, $tagType, $tagText);
             }
             elseif (strpos($tag, '~')!==false){
-                #error_log('ending subseg');
                 if(!isset($shortTagIdent)||$shortTagIdent === $shortTagIdentOld){
                     trigger_error('In the file '.$this->sourcePath.' a closing SubSeg has been found before a corresponding opening SubSeg');
                 }
@@ -371,14 +367,9 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
                 $tag = $this->createTag($unprotect($tag), $shortTagIdent, $tagName, $tagType, $tagText);
             }
             else{
-                #error_log('subSeg: '.$tag);
                 $tag = $protect($this->parseTags($unprotect($tag)));
             }
         }
-        /*
-        ob_start();
-        var_dump($parts);
-        error_log(ob_get_clean());*/
         $tagString = implode('', $parts);
         return $unprotect($tagString);
     }
@@ -429,7 +420,6 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     
     protected function createSingleTag(DOMElement $tag,string $tagName) {
         $tagString = $tag->ownerDocument->saveXML($tag);
-        #error_log('tagstring '.$tagString);
         $tagText = $this->getTagText($tagString, $tagName);
         $tagType = '_singleTag';
         $tagString = $this->createTag($tagString, $this->shortTagIdent++, $tagName, $tagType, $tagText);
@@ -465,13 +455,11 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
             /* @var $tagTag DOMElement */
             $pos = $tagTag->getAttribute('pos');
             $tagString = $tagTag->ownerDocument->saveXML($tagTag);
-            #error_log('tagstring '.$tagString);
             $i = false;
             if($tagTag->hasAttribute('i')){
                 $i = $tagTag->getAttribute('i');
             }
             if(strpos($tagString, '<SubSeg')!==false && strpos($tagString, '</SubSeg>')!==false){//the strpos insures, that <SubSeg/>-tags (without content) are not handled as SubSeg
-                #error_log('SubSeg found');
                 $tagString = $this->parseSubSegs($tagString);
                 if($tagTag->hasAttribute('i')){
                     unset($this->beginINumbers[$i]);

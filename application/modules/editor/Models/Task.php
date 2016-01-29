@@ -81,6 +81,8 @@ END LICENSE AND COPYRIGHT
  * @method void setEnableSourceEditing() setEnableSourceEditing(boolean $flag)
  * @method boolean getEdit100PercentMatch() getEdit100PercentMatch()
  * @method void setEdit100PercentMatch() setEdit100PercentMatch(boolean $flag)
+ * @method boolean getLockLocked() getLockLocked()
+ * @method void setLockLocked() setLockLocked(boolean $flag)
  * @method string getQmSubsegmentFlags() getQmSubsegmentFlags() get Original Flags from DB
  * @method void setQmSubsegmentFlags() setQmSubsegmentFlags(string $flags) set Original Flags in DB
  * @method void delete() delete() see editor_Models_Task_Remover for complete task removal

@@ -95,6 +95,7 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
         self::$testTask->setWordCount(0);
         self::$testTask->setEnableSourceEditing(false);
         self::$testTask->setEdit100PercentMatch(1);
+        self::$testTask->setLockLocked(1);
         self::$testTask->setTerminologie(1);
         self::$testTask->createTaskGuidIfNeeded();
     }    
@@ -184,6 +185,7 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
         $import = ZfExtended_Factory::get('editor_Models_Import');
         /* @var $import editor_Models_Import */
         $import->setEdit100PercentMatches((bool) self::$testTask->getEdit100PercentMatch());
+        $import->setLockLocked((bool) self::$testTask->getLockLocked());
         $import->setUserInfos(self::$testTask->getPmGuid(),  self::$testTask->getPmName());
 
         $import->setLanguages(

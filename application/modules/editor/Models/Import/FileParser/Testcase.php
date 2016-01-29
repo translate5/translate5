@@ -49,8 +49,8 @@ class editor_Models_Import_FileParser_Testcase extends editor_Models_Import_File
     /**
      * Init tagmapping
      */
-    public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task) {
-        parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $sourceLang, $targetLang, $task);
+    public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, boolean $lockLocked, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task) {
+        parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $lockLocked, $sourceLang, $targetLang, $task);
 
         $this->protectUnicodeSpecialChars();
     }
@@ -77,6 +77,7 @@ class editor_Models_Import_FileParser_Testcase extends editor_Models_Import_File
         $id = $this->segmentCount++;
         $this->_matchRateSegment[$id] = 0;
         $this->_autopropagated[$id] = false;
+        $this->_lockedInFile[$id] = false;
         $this->setMid($id);
     }
 

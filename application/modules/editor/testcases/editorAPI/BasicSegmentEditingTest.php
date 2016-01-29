@@ -40,6 +40,7 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
             'sourceLang' => 'en',
             'targetLang' => 'de',
             'edit100PercentMatch' => true,
+            'lockLocked' => 1,
         );
         
         self::assertNeededUsers(); //last authed user is testmanager
@@ -83,12 +84,17 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         $autoStateIds = array_map(function($item){
             return $item->autoStateId;
         }, $segments);
-        $this->assertEquals(array('0','0','0','0','0','0','4'), $autoStateIds);
+        $this->assertEquals(array('0','0','0','3','0','0','4'), $autoStateIds);
         
         foreach($segments as $segment) {
             $this->assertEquals('{00000000-0000-0000-C100-CCDDEE000001}', $segment->userGuid);
             $this->assertEquals('manager test', $segment->userName);
-            $this->assertEquals(1, $segment->editable);
+            if($segment->mid === '4'){
+                $this->assertEquals('0', $segment->editable);
+            }
+            else{
+                $this->assertEquals('1', $segment->editable);
+            }
             $this->assertEmpty($segment->qmId);
             $this->assertEquals(0, $segment->stateId);
             $this->assertEquals(0, $segment->fileOrder);
@@ -160,7 +166,7 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         $autoStateIds = array_map(function($item){
             return $item->autoStateId;
         }, $segments);
-        $this->assertEquals(array('0','0','1','0','0','0','1'), $autoStateIds);
+        $this->assertEquals(array('0','0','1','3','0','0','1'), $autoStateIds);
         
         //bulk check of all workflowStepNr fields
         $workflowStepNr = array_map(function($item){

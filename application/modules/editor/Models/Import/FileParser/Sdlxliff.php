@@ -93,10 +93,10 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     /**
      * Initiert Tagmapping
      */
-    public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task) {
+    public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, boolean $lockLocked, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task) {
         //add sdlxliff tagMapping
         $this->addSldxliffTagMappings();
-        parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $sourceLang, $targetLang, $task);
+        parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $lockLocked, $sourceLang, $targetLang, $task);
         $this->checkForSdlChangeMarker();
         $this->protectUnicodeSpecialChars();
         $this->prepareTagMapping();
@@ -320,6 +320,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                         (int) preg_replace('"^[^><]* percent=\"(\d*)\".*"', '\\1', $transunit[$i]);
                 $this->_autopropagated[$id] = 
                         strpos($transunit[$i], 'origin="auto-propagated"')!==false;
+                $this->_lockedInFile[$id] = 
+                        strpos($transunit[$i], ' locked="true"')!==false;
             }
         } else {
             trigger_error('<sdl:seg wurde kein Mal in der

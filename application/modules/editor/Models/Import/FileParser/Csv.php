@@ -101,9 +101,9 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     
     
     
-    public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task) {
+    public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, boolean $lockLocked, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task) {
         ini_set('auto_detect_line_endings', true);//to tell php to respect mac-lineendings
-        parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $sourceLang, $targetLang, $task);
+        parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $lockLocked, $sourceLang, $targetLang, $task);
         $config = Zend_Registry::get('config');
         $this->_delimiter = $config->runtimeOptions->import->csv->delimiter;
         $this->_enclosure = $config->runtimeOptions->import->csv->enclosure;
@@ -584,6 +584,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     protected function setSegmentAttribs($segment){
         $this->_matchRateSegment[$this->_mid] = 0;
         $this->_autopropagated[$this->_mid] = false;
+        $this->_lockedInFile[$this->_mid] = false;
         $this->_pretransSegment[$this->_mid] = false;
         $this->_editSegment[$this->_mid] = true;
         $this->_autoStateId[$this->_mid] = editor_Models_SegmentAutoStates::TRANSLATED;
