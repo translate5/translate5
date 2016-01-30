@@ -47,10 +47,11 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
   },
   title : '#UT#Benutzer zu Aufgabe zuordnen',
   
-  initComponent: function() {
+  initConfig: function(instanceConfig) {
     var me = this,
-        wf = me.actualTask.getWorkflowMetaData(),
+        wf = me.initialConfig.actualTask.getWorkflowMetaData(),
         states = [],
+        config,
         roles = [];
     Ext.Object.each(wf.states, function(key, state) {
         states.push([key, state]);
@@ -59,11 +60,11 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
         roles.push([key, role]);
     });
     
-    Ext.applyIf(me, {
+    config = {
       items: [{
           xtype: 'adminTaskUserAssocGrid',
           region: 'center',
-          actualTask: me.actualTask
+          actualTask: me.initialConfig.actualTask
       },{
           xtype: 'container',
           region: 'east',
@@ -142,9 +143,12 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
               }]
           }]
       }]
-    });
+    };
 
-    me.callParent(arguments);
+    if (instanceConfig) {
+        me.getConfigurator().merge(me, config, instanceConfig);
+    }
+    return me.callParent([config]);
   },
   /**
    * loads all or all available users into the dropdown, the store is reused to get the username to userguids

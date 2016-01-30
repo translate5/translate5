@@ -55,10 +55,11 @@ Ext.define('Editor.view.ui.changealike.Grid', {
   item_sourceMatchColumn: 'Quell-Treffer', 
   item_targetMatchColumn: 'Ziel-Treffer', 
   
-  initComponent: function() {
-    var me = this;
+  initConfig: function(instanceConfig) {
+    var me = this,
+    config;
 
-    Ext.applyIf(me, {
+    config = {
       columns: [
         {
           dataIndex: 'segmentNrInTask',
@@ -134,8 +135,11 @@ Ext.define('Editor.view.ui.changealike.Grid', {
       selModel: Ext.create('Ext.selection.CheckboxModel', {
         injectCheckbox: 3
       })
-    });
+    };
 
-    me.callParent(arguments);
+    if (instanceConfig) {
+        me.getConfigurator().merge(me, config, instanceConfig);
+    }
+    return me.callParent([config]);
   }
 });

@@ -46,7 +46,7 @@ Ext.define('Editor.view.admin.UserChooseWindow', {
     width : 520,
     layout: 'fit',
     modal : true,
-    initComponent : function() {
+    initConfig : function(instanceConfig) {
         var me = this,
             store = Ext.create('Editor.store.admin.Users', {
                 storeId: 'adminUsersForTask',
@@ -62,6 +62,7 @@ Ext.define('Editor.view.admin.UserChooseWindow', {
             }),
             wf = me.task.getWorkflowMetaData(),
             states = [],
+            config,
             roles = [];
         Ext.Object.each(wf.states, function(key, state) {
             states.push([key, state]);
@@ -74,7 +75,7 @@ Ext.define('Editor.view.admin.UserChooseWindow', {
                 defaultFilter: '[{"field":"login","type":"notInList","value":["'+me.excludeLogins.join('","')+'"]}]'
             };
         }
-        Ext.applyIf(me, {
+        config = {
             items : [{
                 xtype: 'grid',
                 features: [{
@@ -167,8 +168,11 @@ Ext.define('Editor.view.admin.UserChooseWindow', {
                 dock: 'bottom',
                 displayInfo: true
             }]
-        });
+        };
 
-        me.callParent(arguments);
+        if (instanceConfig) {
+            me.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
     }
 });

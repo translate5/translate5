@@ -65,10 +65,11 @@ Ext.define('Editor.view.ui.changealike.Window', {
   item_cancelBtn: 'Keine Änderungen durchführen',
   item_saveBtn: 'Änderungen übernehmen',
 
-  initComponent: function() {
-    var me = this;
+  initConfig: function(instanceConfig) {
+    var me = this,
+    config;
 
-    Ext.applyIf(me, {
+    config = {
       items: [
         {
           xtype: 'container',
@@ -108,8 +109,11 @@ Ext.define('Editor.view.ui.changealike.Window', {
           ]
         }
       ]
-    });
+    };
 
-    me.callParent(arguments);
+    if (instanceConfig) {
+        me.getConfigurator().merge(me, config, instanceConfig);
+    }
+    return me.callParent([config]);
   }
 });

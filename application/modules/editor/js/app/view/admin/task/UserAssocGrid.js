@@ -63,11 +63,12 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
   //***********************************************************************************
   //End Events
   //***********************************************************************************
-  initComponent: function() {
+  initConfig: function(instanceConfig) {
     var me = this,
-        wf = me.actualTask.getWorkflowMetaData();
+        config,
+        wf = me.initialConfig.actualTask.getWorkflowMetaData();
     
-    Ext.applyIf(me, {
+    config = {
       columns: [{
           xtype: 'gridcolumn',
           width: 160,
@@ -127,8 +128,11 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
               text: me.strings.reload
           }]
         }]
-    });
+    };
 
-    me.callParent(arguments);
+    if (instanceConfig) {
+        me.getConfigurator().merge(me, config, instanceConfig);
+    }
+    return me.callParent([config]);
   }
 });

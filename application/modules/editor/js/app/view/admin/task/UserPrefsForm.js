@@ -48,10 +48,11 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
         visDisabled: '#UT#nicht vorhanden'
     },
 
-    initComponent: function() {
-        var me = this;
+    initConfig: function(instanceConfig) {
+        var me = this,
+        config;
 
-        Ext.applyIf(me, {
+        config = {
             items: [
                 {
                     xtype: 'combobox',
@@ -138,9 +139,12 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
                     ]
                 }
             ]
-        });
+        };
 
-        me.callParent(arguments);
+        if (instanceConfig) {
+            me.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
     },
     /**
      * sets the values from the given record into the form

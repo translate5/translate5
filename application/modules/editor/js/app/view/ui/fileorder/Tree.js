@@ -47,10 +47,10 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.view.ui.fileorder.Tree', {
   extend: 'Ext.tree.Panel',
-  initComponent: function() {
-    var me = this;
+  initConfig: function(instanceConfig) {
+    var me = this,
 
-    Ext.applyIf(me, {
+    config = {
       viewConfig: {
         singleSelect: true,
         plugins: [
@@ -59,8 +59,11 @@ Ext.define('Editor.view.ui.fileorder.Tree', {
           })
         ]
       }
-    });
+    };
 
-    me.callParent(arguments);
+    if (instanceConfig) {
+        me.getConfigurator().merge(me, config, instanceConfig);
+    }
+    return me.callParent([config]);
   }
 });

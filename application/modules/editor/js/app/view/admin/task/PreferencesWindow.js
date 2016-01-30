@@ -39,27 +39,27 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
     },
     height : 600,
     width : 800,
-    loadingMask: null,
     layout: 'fit',
     modal : true,
-    initComponent : function() {
+    initConfig : function(instanceConfig) {
         var me = this,
             auth = Editor.app.authenticatedUser,
-            tabs = [];
+            tabs = [],
+            config;
         if(auth.isAllowed('editorChangeUserAssocTask')) {
             tabs.push({
-                actualTask: me.actualTask,
+                actualTask: me.initialConfig.actualTask,
                 xtype: 'adminTaskUserAssoc'
             });
         }
         if(auth.isAllowed('editorUserPrefsTask')) {
             tabs.push({
-                actualTask: me.actualTask,
+                actualTask: me.initialConfig.actualTask,
                 xtype: 'editorAdminTaskPreferences'
             });
         }
-        me.title = Ext.String.format(me.title, me.actualTask.get('taskName'));
-        Ext.applyIf(me, {
+        me.title = Ext.String.format(me.title, me.initialConfig.actualTask.get('taskName'));
+        config = {
             items : [{
                 xtype: 'tabpanel',
                 activeTab: 0,
@@ -79,26 +79,11 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                     text : me.strings.close
                 }]
             }]
-        });
+        };
 
-        me.callParent(arguments);
-    },
-    /**
-     * setting a loading mask for the window / grid is not possible, using savingShow / savingHide instead.
-     * perhaps because of bug for ext-4.0.7 (see http://www.sencha.com/forum/showthread.php?157954)
-     * This Fix is better as in {Editor.view.changealike.Window} because of useing body as LoadMask el.
-     */
-    loadingShow: function() {
-        var me = this;
-        if(!me.loadingMask) {
-            me.loadingMask = new Ext.LoadMask(Ext.getBody(), {store: false});
-            me.on('destroy', function(){
-                me.loadingMask.destroy();
-            });
+        if (instanceConfig) {
+            me.getConfigurator().merge(me, config, instanceConfig);
         }
-        me.loadingMask.show();
+        return me.callParent([config]);
     },
-    loadingHide: function() {
-        this.loadingMask.hide();
-    }
 });

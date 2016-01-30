@@ -44,13 +44,14 @@ Ext.define('Editor.view.admin.task.Preferences', {
     workflow_label: '#UT#Workflow',
     editInfo: '#UT#Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!',
 
-    initComponent: function() {
+    initConfig: function(instanceConfig) {
         var me = this,
+            config,
             workflows = [];
             Ext.Object.each(Editor.data.app.workflows, function(key, item) {
                 workflows.push([item.id, item.label]);
             });
-        Ext.applyIf(me, {
+        config = {
             items: [{
                 xtype: 'editorAdminTaskUserPrefsGrid',
                 region: 'center'
@@ -65,7 +66,7 @@ Ext.define('Editor.view.admin.task.Preferences', {
                     forceSelection: true,
                     editable: false,
                     fieldLabel: me.workflow_label,
-                    value: me.actualTask.get('workflow'),
+                    value: me.initialConfig.actualTask.get('workflow'),
                     store: workflows
                 }]
             },{
@@ -85,8 +86,11 @@ Ext.define('Editor.view.admin.task.Preferences', {
                     hidden: true
                 }]
             }]
-        });
+        };
 
-        me.callParent(arguments);
+        if (instanceConfig) {
+            me.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
     }
 });

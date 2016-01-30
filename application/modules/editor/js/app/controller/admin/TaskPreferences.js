@@ -139,7 +139,8 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           tuas = me.getAdminTaskUserAssocsStore(),
           prefs = me.getAdminTaskUserPrefsStore(),
           used = {},
-          cnt = 0;
+          cnt = 0,
+          addButton;
       me.available = {};
 
       //calculate the already used step / user combinations
@@ -185,7 +186,10 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           }
       });
       //disable the add button if all combinations are reached
-      me.getAddBtn().setDisabled(cnt == 0);
+      addButton = me.getAddBtn();
+      if (addButton) {
+          addButton.setDisabled(cnt == 0);
+      }
       me.updateUsers(me.getPrefForm().getRecord());
   }, 
   /**
@@ -214,7 +218,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           };
       
       me.actualTask = task;
-      me.getPrefWindow().loadingShow();
       
       //userPrefs must be loaded after userAssocs, 
       //so add the load as a callback dynamically, based on the rights 
@@ -224,7 +227,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           tupParams.callback = function() {
               me.calculateAvailableCombinations();
               me.updatePrefsFilter(task.get('workflow'));
-              me.getPrefWindow().loadingHide();
           };
           tuaParams.callback = function() {
               userPrefs.load(tupParams);
@@ -232,7 +234,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       }
       else {
           tuaParams.callback = function() {
-              me.getPrefWindow().loadingHide();
           };
       }
       
@@ -250,9 +251,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           actualTask: task
       });
       win.show();
-      Ext.defer(function(){
-          win.loadingShow(); //deferred because of weired xmask bug in ext 4.0.7
-      },50);
       this.loadAllPreferences(task);
   },
   /**
@@ -298,9 +296,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       var me = this,
           task = me.actualTask;
       Ext.Array.each(records, function(rec){
-          Ext.defer(function(){
-              me.getPrefWindow().loadingShow();
-          },10);//weired xmask extjs bug
           rec.destroyVersioned(task, {
               success: function() {
                   grid.store.remove(rec);
@@ -393,7 +388,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           return;
       }
       me.actualTask.set('workflow', val);
-      me.getPrefWindow().loadingShow();
       me.actualTask.save({
           success: function(rec, op) {
               Editor.MessageBox.addInfo(me.strings.taskWorkflowSaved);
@@ -489,7 +483,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           rec.set('userGuid', null);
       }
       rec.set('workflow', me.getTaskWorkflow().getValue());
-      me.getPrefWindow().loadingShow();
       rec.saveVersioned(me.actualTask, {
           success: function() {
               me.clickCancel();

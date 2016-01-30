@@ -149,7 +149,7 @@ Ext.define('Editor.controller.ChangeAlike', {
           enabledACL = auth.isAllowed('useChangeAlikes');
           enabled = auth.isAllowed('useChangeAlikes', t);
       //disable the whole settings button, since no other settings are currently available!
-      //me.getOptionsBtn().setVisible(enabled);
+      me.getOptionsBtn().setVisible(enabled);
       me.isDisabled = ! enabled;
       me.getEditPlugin().on('beforeedit', me.handleBeforeEdit, me);
       if(!t.get('defaultSegmentLayout') && enabledACL) {

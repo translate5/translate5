@@ -53,10 +53,10 @@ Ext.define('Editor.view.ui.preferences.Window', {
   item_cancelBtn: 'Abbrechen',
   item_saveBtn: 'Speichern',
   
-  initComponent: function() {
-    var me = this;
+  initConfig: function(instanceConfig) {
+    var me = this,
 
-    Ext.applyIf(me, {
+    config = {
       items: [
         {
           xtype: 'form',
@@ -122,8 +122,11 @@ Ext.define('Editor.view.ui.preferences.Window', {
           ]
         }
       ]
-    });
+    };
 
-    me.callParent(arguments);
+    if (instanceConfig) {
+        me.getConfigurator().merge(me, config, instanceConfig);
+    }
+    return me.callParent([config]);
   }
 });

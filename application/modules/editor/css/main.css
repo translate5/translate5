@@ -127,8 +127,9 @@ END LICENSE AND COPYRIGHT
 /* Headpanel - this styles are meant to be overwritten by the customer */
 #head-panel {height: 150px;position:relative;}/* possible to overwrite bg => whole container */
 #head-panel .head-panel-brand {} /* box for html branding */
-#head-panel .head-panel-info-panel {position:absolute;right:20px;top:20px;}
-#head-panel .head-panel-toolbar {position:absolute;right:20px;bottom:20px;width:440px;}
+#head-panel .head-panel-info-panel {position:absolute;right:20px !important;top:20px !important; left: auto !important; width: initial !important }
+.x-autocontainer-outerCt {table-layout: initial !important}
+#head-panel .head-panel-toolbar {position:absolute;right:20px !important;bottom:20px !important;width:440px; left: auto !important; top: 40px !important}
 
 .head-panel-info-panel span.user-label,
 .head-panel-info-panel span.login-label,

@@ -63,11 +63,12 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
     //***********************************************************************************
     //End Events
     //***********************************************************************************
-    initComponent: function() {
+    initConfig: function(instanceConfig) {
         var me = this,
+            config,
             userStore = Ext.StoreMgr.get('admin.TaskUserAssocs');
             
-        Ext.applyIf(me, {
+        config = {
             columns: [
                 {
                     xtype: 'gridcolumn',
@@ -78,7 +79,7 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                         if(v.length == 0) {
                             return me.strings.defaultEntry;
                         }
-                        meta = me.actualTask.getWorkflowMetaData();
+                        meta = me.initialConfig.actualTask.getWorkflowMetaData();
                         return meta.steps[v] || v;
                     }
                 },
@@ -170,8 +171,11 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                     ]
                 }
             ]
-        });
+        };
 
-        me.callParent(arguments);
+        if (instanceConfig) {
+            me.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
     }
 });
