@@ -291,7 +291,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         //without plugins!!!
         $controllers[] = 'HeadPanel';
         $controllers[] = 'UserPreferences';
-        //$controllers[] = 'QmSubSegments';
+        $controllers[] = 'QmSubSegments';
         $controllers[] = 'admin.TaskOverview';
         $controllers[] = 'admin.TaskPreferences';
         $controllers[] = 'admin.TaskUserAssoc';
