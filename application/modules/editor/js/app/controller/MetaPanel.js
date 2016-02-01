@@ -258,7 +258,7 @@ Ext.define('Editor.controller.MetaPanel', {
       me.record = record;
       me.getNavi().disable();
       me.getSegmentMeta().hide();
-      mp.show();
+      mp.enable();
   },
   /**
    * lädt die konkreten record ins Meta Panel 
@@ -292,13 +292,16 @@ Ext.define('Editor.controller.MetaPanel', {
     me.record.set('stateId', form.getValues().stateId);
     me.record.setQmFromArray(quality);
     //close the metapanel
-    mp.hide();
+    mp.disable();
   },
   /**
    * Editor.view.segments.RowEditing canceledit handler
    */
   cancelEdit: function() {
-    this.getMetaPanel().hide();
+    var me = this,
+        mp = me.getMetaPanel();
+        
+    mp.disable();
   },
   /**
    * Move the editor about one editable field

@@ -213,7 +213,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           //wenn die Stores echte Filter bekommt muss der Wert hier miteingebaut werden!
           tuaParams = {
               params: {
-                  filter: '[{"type":"string","value":"'+task.get('taskGuid')+'","field":"taskGuid"}]'
+                  filter: '[{"operator":"like","value":"'+task.get('taskGuid')+'","property":"taskGuid"}]'
               }
           };
       

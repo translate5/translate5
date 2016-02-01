@@ -165,7 +165,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
       else {
           store.load({
               params: {
-                  defaultFilter: '[{"field":"login","type":"notInList","value":["'+me.excludeLogins.join('","')+'"]}]'
+                  defaultFilter: '[{"property":"login","operator":"notInList","value":["'+me.excludeLogins.join('","')+'"]}]'
               }
           });
       }

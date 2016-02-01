@@ -69,7 +69,7 @@ Ext.define('Editor.view.ViewPortEditor', {
                   xtype: 'panel',
                   listeners: {
                       afterrender: function() {
-                          this.hide();
+                          this.disable();
                       }
                   },
                   preventHeader: true,
