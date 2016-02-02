@@ -190,6 +190,19 @@ Ext.define('Editor.controller.ChangeAlike', {
     proxy.url = me.alikeSegmentsUrl+'/'+id;
     op.setStarted();
     me.fireEvent('fetchChangeAlikes', op);
+
+    //default process method cannot deal with empty store and empty resultset (was producing Cannot read property 'clientIdProperty' of undefined)
+    Ext.override(op, {
+        process: function(resultSet) {
+            if(resultSet.getCount() > 0) {
+                this.callParent(arguments);
+            }
+            else {
+                this.setSuccessful(true);
+            }
+        }
+    });
+
     proxy.read(op, me.handleAlikesRead, me);
   },
 

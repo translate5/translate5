@@ -246,7 +246,7 @@ Ext.define('Editor.controller.MetaPanel', {
     //FIXME here doLayout???
     me.getNavi().enable();
     me.getSegmentMeta().show();
-    mp.show();
+    mp.enable();
   },
   /**
    * opens metapanel for readonly segments

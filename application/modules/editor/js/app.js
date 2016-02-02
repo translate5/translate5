@@ -144,7 +144,6 @@ Ext.application({
   },
   launch : function() {
       var me = this;
-      
     Ext.QuickTips.init();
     //FIXME ext6 deactivated the before unload question since this is pain in the ass for reloading often
     //window.onbeforeunload = Ext.bind(me.onBeforeUnload, me);

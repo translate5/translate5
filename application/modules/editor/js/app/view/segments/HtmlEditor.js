@@ -137,6 +137,12 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     return Ext.String.format('<html><head><style type="text/css">body{border:0;margin:0;padding:{0}px;}</style>{1}</head><body style="font-size:9pt;line-height:14px;"></body></html>', me.iframePad, additionalCss);
   },
   /**
+   * overriding default method since under some circumstances this.getWin() returns null which gives an error in original code
+   */
+  getDoc: function() {
+      return this.iframeEl.dom.contentDocument || (this.getWin() && this.getWin().document);
+  },
+  /**
    * Setzt Daten im HtmlEditor und fügt markup hinzu
    * @param value String
    */

@@ -101,7 +101,7 @@ Ext.define('Editor.controller.Segments', {
       selector : '#clearSortAndFilterBtn'
   }],
   listen: {
-      global: { //FIXME ext6 can be moved to a controller??? or remains in global?
+      global: {
           editorViewportClosed: 'clearSegments'
       },
       controller: {
@@ -119,28 +119,20 @@ Ext.define('Editor.controller.Segments', {
           '#segmentgrid headercontainer' : {
               sortchange: 'scrollGridToTop'
           },
-          '#segmentgrid gridview' : {
-              beforerefresh: 'editorDomCleanUp'
-          },
           '#segmentgrid' : {
               afterrender: function(grid) {
                   var me = this,
                       ro = Editor.data.task && Editor.data.task.isReadOnly();
                   grid.setTitle(ro ? grid.title_readonly : grid.title);
-                  //FIXME ext6 disabled because of missing filters!
-                  //me.styleResetFilterButton(grid.filters);
-                  
-                  //moved the store handler into after grid render, because of 
-                  //the fluent reconfiguration of the model and late instanciation of the store.
-                  //@todo should be replaced with Event Domains after update to ExtJS >4.2
-                  //FIXME ext6 perhaps not possible to migrate to event domains, perhaps not needed anymore at all!
-                  me.getSegmentsStore().on('load', me.invalidatePager, me);
-                  me.getSegmentsStore().on('load', me.refreshGridView, me);
+                  me.styleResetFilterButton(grid.store.filters);
+                  grid.store.on('load', me.afterStoreLoad, me);
+                  grid.store.on('filterchange', me.handleFilterChange, me);
+                  grid.store.on('sort', me.handleFilterChange, me);
+                  me.reloadFilemap();
               },
               selectionchange: 'handleSegmentSelectionChange',
               columnhide: 'handleColumnVisibility',
-              columnshow: 'handleColumnVisibility',
-              filterupdate: 'handleFilterChange'
+              columnshow: 'handleColumnVisibility'
           },
           '#fileorderTree': {
               selectionchange: 'handleFileSelectionChange'
@@ -217,19 +209,25 @@ Ext.define('Editor.controller.Segments', {
       delete store.guaranteedEnd;
       store.removeAll();
   },
-  updateFilteredCountDisplay: function(newTotal) {
-    var btn_text = this.getSegmentGrid().item_clearSortAndFilterBtn;
-    btn_text = Ext.String.format('{0} ({1})', btn_text, newTotal);
-    //FIXME ext6 commented out since not found
-    //this.getResetFilterBtn().setText(btn_text);
-  },
-  refreshGridView: function() {
-    this.getSegmentGrid().getView().refresh();
+  /**
+   * handler if segment store was loaded
+   */
+  afterStoreLoad: function() {
     var newTotal = this.getSegmentsStore().totalCount;
     this.updateFilteredCountDisplay(newTotal);
   },
   /**
-   * geöffnete Segmente werden bei der Wahl eines anderen Segments gespeichert
+   * Displays / Updates the segment count in the reset button
+   * @param {Integer} new segment count to be displayed
+   */
+  updateFilteredCountDisplay: function(newTotal) {
+    var btn_text = this.getSegmentGrid().item_clearSortAndFilterBtn;
+    btn_text = Ext.String.format('{0} ({1})', btn_text, newTotal);
+    this.getResetFilterBtn().setText(btn_text);
+  },
+  /**
+   * FIXME check this method
+   * opened segments are saved on segment selection change in grid
    */
   handleSegmentSelectionChange: function() {
       var ed = this.getSegmentGrid().editingPlugin;
@@ -288,16 +286,24 @@ Ext.define('Editor.controller.Segments', {
   /**
    * behandelt die Änderung der Grid Filter:
    * nach einem ändern der Filter muss das mapping zwischen Datei und Startsegmenten neu geladen werden.
-   * @param {Ext.ux.grid.FiltersFeature} filterFeature
+   * @param {Ext.data.Store} store The store.
+   * @param {Ext.util.Filter[]} filters The array of Filter objects.
    * @return void
    */
-  handleFilterChange: function(filterFeature) {
-      var me = this,
-          params = filterFeature ? filterFeature.buildQuery(filterFeature.getFilterData()) : '';
-          
-      me.getSegmentsStore().removeAll();
-      me.invalidatePagerOnNextLoad();
-      filterFeature && me.styleResetFilterButton(filterFeature);
+  handleFilterChange: function(store, filters) {
+      var proxy = store.getProxy(),
+          params = {};
+
+      params[proxy.getFilterParam()] = proxy.encodeFilters(store.getFilters().items);
+      params[proxy.getSortParam()] = proxy.encodeSorters(store.getSorters().items);
+
+      //filterFeature && me.styleResetFilterButton(filterFeature);
+      this.reloadFilemap(params);
+  },
+  reloadFilemap: function(params) {
+      var me = this;
+      params = params || {};
+      console.log("reloadFilemap");
       Ext.Ajax.request({
           url: Editor.data.pathToRunDir+'/editor/segment/filemap',
           method: 'get',
@@ -314,33 +320,20 @@ Ext.define('Editor.controller.Segments', {
   },
   /**
    * updates the style of the reset sort and filter button
-   * @param {Editor.view.segments.GridFilter} filterFeature
+   * @param {Ext.util.FilterCollection} filters
    * @param {Boolean} forced
    */
-  styleResetFilterButton: function(filterFeature){
+  styleResetFilterButton: function(filters){
       this.updateFilteredCountDisplay('...');
       var cls = 'activated',
-          btn = this.getResetFilterBtn(),
-          initialActive = filterFeature.filters.length == 0 && filterFeature.initialActive.length > 0;
-      if(initialActive || filterFeature.getFilterData().length > 0){
+          btn = this.getResetFilterBtn();
+      if(filters.length > 0){
           btn.addCls(cls);
       }
       else {
           btn.removeCls(cls);
       }
-      btn.ownerCt.doLayout();
-  },
-  invalidatePagerOnNextLoad: function() {
-    this._invalidatePagerOnNextLoad = true;
-  },
-  /**
-   * berechnet die Höhe des Scrollers neu
-   */
-  invalidatePager: function() {
-    if(this._invalidatePagerOnNextLoad && this.getSegmentPager()){
-      this._invalidatePagerOnNextLoad = false;
-      this.getSegmentPager().invalidate();
-    }
+      //btn.ownerCt.doLayout();
   },
   /**
    * setzt die Sortierung zurück, springt zum ersten Segment der Datei. Informiert den Benutzer, dass Sortierung zurückgesetzt wurde
@@ -399,14 +392,6 @@ Ext.define('Editor.controller.Segments', {
       return this.getSegmentGrid().editingPlugin.editor.lastSegmentShortInfo;
     }
     return false;
-  },
-  /**
-   * Fix für den Editor Bug, bei dem die inneren Editor Styles verschwinden. Die DOM Struktur des Editors wird zurückgesetzt, wenn sich die DOM Struktur des Grids verändert.
-   */
-  editorDomCleanUp: function() {
-    if(this.getSegmentGrid().editingPlugin){
-      this.getSegmentGrid().editingPlugin.editorDomCleanUp();
-    }
   },
   /**
    * binds the change alike load operation to the save chain
