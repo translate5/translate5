@@ -147,60 +147,9 @@ Ext.define('Editor.controller.Segments', {
           }
       }
   },
-  /* FIXME START ext6 deactivated and migrated to listener object, keeping for debugging reference until update is done! 
-  init : function() {
-      var me = this, 
-          mpCtrl = me.application.getController('MetaPanel'),
-          caCtrl = me.application.getController('ChangeAlike');
-      mpCtrl.on('saveSegment', me.saveChainStart, me);
-      //called after load of cahnge alikes to a segment
-      caCtrl.on('fetchChangeAlikes', me.onFetchChangeAlikes, me);
-      //called after currently loaded segment data is not used anymore by the save chain / change alike handling
-      caCtrl.on('segmentUsageFinished', me.onSegmentUsageFinished, me);
-      
-      //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following event bindings 
-      me.getStore('Files').on('write', me.reloadGrid, me);
-      Editor.app.on('editorViewportClosed', me.clearSegments, me);
-
-      me.control({
-      '#segmentgrid headercontainer' : {
-        sortchange: me.scrollGridToTop
-      },
-      '#segmentgrid gridview' : {
-        beforerefresh: me.editorDomCleanUp
-      },
-      '#segmentgrid' : {
-          afterrender: function(grid) {
-              var me = this,
-                  ro = Editor.data.task && Editor.data.task.isReadOnly();
-              grid.setTitle(ro ? grid.title_readonly : grid.title);
-              me.styleResetFilterButton(grid.filters);
-              
-              //moved the store handler into after grid render, because of 
-              //the fluent reconfiguration of the model and late instanciation of the store.
-              //@todo should be replaced with Event Domains after update to ExtJS >4.2
-              me.getSegmentsStore().on('load', me.invalidatePager, me);
-              me.getSegmentsStore().on('load', me.refreshGridView, me);
-          },
-        selectionchange: me.handleSegmentSelectionChange,
-        columnhide: me.handleColumnVisibility,
-        columnshow: me.handleColumnVisibility,
-        filterupdate: me.handleFilterChange
-      },
-      '#fileorderTree': {
-        selectionchange: me.handleFileSelectionChange
-      },
-      '#clearSortAndFilterBtn': {
-        click: me.clearSortAndFilter
-      }
-    });
-  },
-    /* FIXME END ext6 deactivated and migrated to listener object, keeping for debugging reference until update is done! */
-  loadSegments: function() {
-      this.handleFilterChange(); //load filemap
-      //initial store load:
-      this.getSegmentsStore().loadPage(1);
-  },
+  /**
+   * FIXME check this method
+   */
   clearSegments: function() {
       var store = this.getSegmentsStore();
       store.prefetchData.clear();

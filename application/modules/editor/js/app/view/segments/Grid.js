@@ -98,23 +98,6 @@ Ext.define('Editor.view.segments.Grid', {
     columnMap:{},
     stateData: {},
     qualityData: {},
-    //FIXME ext6 disable own vertical scroller:
-    //X-Type for own vertical scroller
-    //verticalScrollerType: 'editorgridscroller',
-    //FIXME ext6 disable this setting: invalidateScrollerOnRefresh: false,
-    //Einbindung des eigenen Editor Plugins
-    /**
-     * Config Parameter für die {Ext.grid.View} des Grids
-     */
-    viewConfig: {
-        //FIXME ext6 blockRefresh: true,
-        getRowClass: function(record, rowIndex, rowParams, store){
-            if(record.get('editable')){
-                return "";
-            }
-            return "editing-disabled";
-        }
-    },
     constructor: function() {
         this.plugins = [
             'gridfilters',
@@ -296,7 +279,15 @@ Ext.define('Editor.view.segments.Grid', {
     initConfig: function(instanceConfig) {
             var me = this,
             config = {
-                viewConfig: {},
+                viewConfig: {
+                    blockRefresh: true,
+                    getRowClass: function(record, rowIndex, rowParams, store){
+                        if(record.get('editable')){
+                            return "";
+                        }
+                        return "editing-disabled";
+                    }
+                },
                 dockedItems: [{
                     xtype: 'toolbar',
                     dock: 'top',
