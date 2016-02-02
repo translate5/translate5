@@ -35,6 +35,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.controller.admin.TaskOverview', {
   extend : 'Ext.app.Controller',
+  requires: ['Editor.view.admin.ExportMenu'],
   models: ['admin.Task'],
   stores: ['admin.Users', 'admin.Tasks','admin.Languages'],
   views: ['admin.TaskGrid', 'admin.TaskAddWindow'],
