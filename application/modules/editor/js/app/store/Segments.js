@@ -45,6 +45,11 @@ Ext.define('Editor.store.Segments', {
   pageSize: 200,
   remoteSort: true,
   autoLoad: false,
+  listeners: {
+    beforeload: function(){
+      console.trace();
+    }
+  },
   //first editable segment! 
   getFirstSegmentId: function() {
       return this.proxy.reader.firstSegmentId;
