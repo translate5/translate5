@@ -462,8 +462,6 @@ Ext.define('Editor.controller.Comments', {
               origRec.set('autoStateId', rec.get('autoStateId'));
               origRec.set('workflowStep', rec.get('workflowStep'));
               origRec.set('comments', rec.get('comments'));
-              delete origRec.modified.autoStateId;
-              delete origRec.modified.workflowStep;
               origRec.endEdit();
               if(ed && ed.context && me.loadedSegmentId == segId) {
                   //update the context of the editor, because the set comments above changes the grid view
