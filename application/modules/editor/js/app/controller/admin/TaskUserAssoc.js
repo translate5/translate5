@@ -179,7 +179,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           assoc = me.getAdminTaskUserAssocsStore();
       
       Ext.Array.each(toDelete, function(toDel){
-          toDel.destroyVersioned(task, {
+          toDel.eraseVersioned(task, {
               success: function() {
                   assoc.remove(toDel);
                   me.updateUsers(assoc);

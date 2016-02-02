@@ -544,7 +544,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           store = task.store,
           app = Editor.app;
       app.mask(me.strings.taskDestroy, task.get('taskName'));
-      task.destroy({
+      task.erase({
           //callback as empty function to prevent default ServerException handling
           callback: Ext.emptyFn,
           success: function() {

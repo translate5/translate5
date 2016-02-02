@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  * @overrides Ext.data.Model
  * extends the default model with the methods: 
  * Editor.model.ModelOverride::reload(config)
- * Editor.model.ModelOverride::destroyVersioned(version, config)
+ * Editor.model.ModelOverride::eraseVersioned(version, config)
  */
 Ext.define('Editor.model.ModelOverride', {
     override: 'Ext.data.Model',
@@ -74,7 +74,7 @@ Ext.define('Editor.model.ModelOverride', {
      * @param {Object} config object, same as for normal destroy
      * @return {Ext.data.Model}
      */
-    destroyVersioned: function(version, config) {
+    eraseVersioned: function(version, config) {
         var me = this,
             p = me.getProxy(),
             result;
