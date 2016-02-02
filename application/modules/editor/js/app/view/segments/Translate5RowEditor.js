@@ -128,8 +128,10 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
             ];
 
             // keep horizontal position of fields in sync with view's horizontal scroll position
-            lockedCt.getScrollable().addPartner(grid.lockedGrid.view.getScrollable(), 'x');
-            normalCt.getScrollable().addPartner(grid.normalGrid.view.getScrollable(), 'x');
+            //FIXME disabling the addPartner calls, since they are leading to inconsistent scrolling positions.
+            //We have to test the RowEditor if scrolling works well, if yes then we can delete the addPartner calls:
+            //lockedCt.getScrollable().addPartner(grid.lockedGrid.view.getScrollable(), 'x');
+            //normalCt.getScrollable().addPartner(grid.normalGrid.view.getScrollable(), 'x');
         } else {
             // initialize a scroller instance for maintaining horizontal scroll position
             me.setScrollable({
@@ -138,7 +140,9 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
             });
 
             // keep horizontal position of fields in sync with view's horizontal scroll position
-            me.getScrollable().addPartner(grid.view.getScrollable(), 'x');
+            //FIXME disabling the addPartner calls, since they are leading to inconsistent scrolling positions.
+            //We have to test the RowEditor if scrolling works well, if yes then we can delete the addPartner calls:
+            //me.getScrollable().addPartner(grid.view.getScrollable(), 'x');
 
             me.lockedColumnContainer = me.normalColumnContainer = me;
         }
@@ -252,14 +256,15 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         if(!me.saveMainEditorContent(rec)) {
             return; //errors on saving, also do not change
         }
+        //sync content back to the displayfield
         if(oldField && oldField.length > 0) {
             oldField[0].setValue(rec.get(oldIdx));
         }
         if(me.setColumnToEdit(column)) {
             me.mainEditor.setValueAndMarkup(rec.get(me.columnToEdit), rec.get('id'), me.columnToEdit);
             me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
-            me.focusContextCell(); // TUKTUK
         }
+        me.focusContextCell();
     },
     /**
      * Method Implements that we can have multiple editable columns, but only one HtmlEditor Instance
@@ -273,8 +278,8 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
             firstTarget = Editor.view.segments.column.ContentEditable.firstTarget, //is the dataIndex
             toEdit = col.dataIndex,
             hasToSwap = false,
-            fieldToDisable = null;
-        
+            linkedDisplayField = null;
+                    
         if(col.segmentField) {
             me.mainEditor.fieldTypeToEdit = col.segmentField.get('type');
         }
@@ -300,28 +305,25 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
             }
             var vis = me.columns.get(field.id).isVisible();
             if(field.name == toEdit) {
-                field.setVisible(false);
-                me.mainEditor.setVisible(vis);
-                fieldToDisable = field;
-                return;
-            }
-            else if(field.name == me.columnToEdit) {
-                field.setVisible(vis);
+                linkedDisplayField = field;
                 return;
             }
         });
         
         //all editor fields disabled
-        if(!fieldToDisable || !hasToSwap) {
-            me.fieldToDisable = false;
+        //FIXME test the alle fields disabled case (open task readonly?)
+        if(!linkedDisplayField || !hasToSwap) {
+            if(!linkedDisplayField) {
+                me.linkedDisplayField = false;
+            }
             return false;
         }
         me.columnToEdit = toEdit;
         me.columnClicked = col.dataIndex;
         me.mainEditor.dataIndex = col.dataIndex;
         
-        //if isset fieldToDisable the cols get changed in focusContextCell
-        me.fieldToDisable = fieldToDisable;
+        //if isset linkedDisplayField the cols get changed in focusContextCell
+        me.linkedDisplayField = linkedDisplayField;
         return true;
     },
     /**
@@ -330,20 +332,20 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
     // TUK
     focusContextCell: function() {
         var me = this, 
-            posMain, posToEdit,
-            toDis = me.fieldToDisable;
-        
+            toDis = me.linkedDisplayField,
+            pos;
+   
         if(! toDis) {
             me.mainEditor.deferFocus();
             return;
         }
-        posMain = me.items.indexOf(me.mainEditor),
-        posToEdit = me.items.indexOf(toDis);
-        
+
+        pos = toDis.getPosition(true);
+       
         //disable editor if column was also disabled
         me.mainEditor.setWidth(toDis.width);
         //swap position
-        me.move(posMain, posToEdit);
+        me.repositionMainEditor(pos[0]);
         me.repositionHorizontally();
         me.mainEditor.deferFocus();
         me.fireEvent('afterEditorMoved', me.columnToEdit, me);
@@ -353,8 +355,9 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
      * repositions the grid view so that, the mainEditor is visible after change the editing column
      */
     repositionHorizontally: function () {
-        var me = this, 
-            gridReg = me.editingPlugin.grid.getView().getEl().getRegion(),
+        var me = this,
+            view = me.editingPlugin.grid.getView(),
+            gridReg = view.getEl().getRegion(),
             offset,
             edReg = me.mainEditor.getEl().getRegion();
         
@@ -364,11 +367,11 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         
         if(edReg.right > gridReg.right) {
             offset = -1 * gridReg.getOutOfBoundOffsetX(edReg.right) + 10;
-            me.editingPlugin.grid.scrollBy(offset, 0, true);
+            view.scrollBy(offset, 0, true);
         }
         else {
             offset = -1 * gridReg.getOutOfBoundOffsetX(edReg.x) - 10;
-            me.editingPlugin.grid.scrollBy(offset, 0, true);
+            view.scrollBy(offset, 0, true);
         }
     },
     /**
@@ -1261,6 +1264,21 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
             grid.ensureVisible(record);
             me.show();
         }
+        me.focusContextCell();
+    },
+    /**
+     * place the HtmlEditor/MainEditor in the rowEditor over the desired displayfield
+     */
+    repositionMainEditor: function(newX) {
+        var me = this;
+
+        if(newX || newX === 0) {
+            me.editorNewXPosition = newX;
+        }
+        else {
+            newX = me.editorNewXPosition;
+        }
+        me.mainEditor.setPosition(newX, 0);
     },
     focusColumnField: function(column) {
         var field, didFocus;
