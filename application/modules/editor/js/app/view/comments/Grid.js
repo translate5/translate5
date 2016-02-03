@@ -38,7 +38,7 @@ Ext.define('Editor.view.comments.Grid', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.commentsGrid',
   cls: 'comments-grid',
-  store: 'segmentComments',
+  store: 'Comments',
   text_edited: '#UT#bearbeitet',
   text_edit: '#UT#Bearbeiten',
   text_delete: '#UT#Löschen',
@@ -51,8 +51,9 @@ Ext.define('Editor.view.comments.Grid', {
       }
   },
   commentTpl: null,
-  initComponent: function() {
-    var me = this;
+  initConfig: function(instanceConfig) {
+    var me = this,
+    config;
     
     me.commentTpl = new Ext.XTemplate([
        '<div class="comment">',
@@ -65,7 +66,7 @@ Ext.define('Editor.view.comments.Grid', {
        '</div>'
     ]);
     
-    Ext.applyIf(me, {
+    config = {
       columns: [
         {
             xtype: 'gridcolumn',
@@ -98,7 +99,10 @@ Ext.define('Editor.view.comments.Grid', {
             }]
         }
       ]
-    });
-    me.callParent(arguments);
+    };
+    if (instanceConfig) {
+        me.getConfigurator().merge(me, config, instanceConfig);
+    }
+    return me.callParent([config]);
   }
 });

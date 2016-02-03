@@ -42,7 +42,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.store.Comments', {
   extend : 'Ext.data.Store',
   model: 'Editor.model.Comment',
-  storeId: 'segmentComments',
+  storeId: 'Comments',
   remoteFilter: true,
   autoLoad: false,
   autoSync: false,

@@ -84,9 +84,9 @@ Ext.define('Editor.view.comments.Window', { //FIXME move from Window to panel
         area.setValue('');
         area.labelEl && area.labelEl.update(me.item_commentNew+':');
     },
-    initComponent : function() {
-        var me = this;
-        Ext.applyIf(me, {
+    initConfig : function(instanceConfig) {
+        var me = this
+        config = {
             items : [ {
                 xtype : 'container',
                 hidden: true,
@@ -132,8 +132,11 @@ Ext.define('Editor.view.comments.Window', { //FIXME move from Window to panel
                     flex : 1
                 }]
             } ]
-        });
+        };
 
-        me.callParent(arguments);
+        if (instanceConfig) {
+            me.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
     }
 });
