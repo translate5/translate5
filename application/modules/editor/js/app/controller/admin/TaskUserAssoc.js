@@ -206,6 +206,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       if(! form.getForm().isValid()) {
           return;
       }
+      me.getPrefWindow().setLoading(true);
       rec.saveVersioned(task, {
           success: function(savedRec, op) {
               me.handleCancel();
@@ -216,6 +217,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
               }
               task.reload();//reload only the task, not the whole task prefs, should be OK
               Editor.MessageBox.addSuccess(me.messages.assocSave);
+              me.getPrefWindow().setLoading(false);
           },
           failure: function() {
               me.application.getController('admin.TaskPreferences').handleReload();

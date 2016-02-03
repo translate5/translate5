@@ -218,6 +218,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           };
       
       me.actualTask = task;
+      me.getPrefWindow().setLoading(true);
       
       //userPrefs must be loaded after userAssocs, 
       //so add the load as a callback dynamically, based on the rights 
@@ -227,6 +228,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           tupParams.callback = function() {
               me.calculateAvailableCombinations();
               me.updatePrefsFilter(task.get('workflow'));
+              me.getPrefWindow().setLoading(false);
           };
           tuaParams.callback = function() {
               userPrefs.load(tupParams);
@@ -234,6 +236,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       }
       else {
           tuaParams.callback = function() {
+              me.getPrefWindow().setLoading(false);
           };
       }
       
@@ -251,6 +254,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           actualTask: task
       });
       win.show();
+      win.setLoading(true);
       this.loadAllPreferences(task);
   },
   /**
@@ -296,7 +300,8 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       var me = this,
           task = me.actualTask;
       Ext.Array.each(records, function(rec){
-          rec.destroyVersioned(task, {
+          me.getPrefWindow().setLoading(true);
+          rec.eraseVersioned(task, {
               success: function() {
                   grid.store.remove(rec);
                   me.calculateAvailableCombinations();
@@ -388,6 +393,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           return;
       }
       me.actualTask.set('workflow', val);
+      me.getPrefWindow().setLoading(true);
       me.actualTask.save({
           success: function(rec, op) {
               Editor.MessageBox.addInfo(me.strings.taskWorkflowSaved);
