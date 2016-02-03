@@ -41,6 +41,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.store.AlikeSegments', {
   extend : 'Ext.data.Store',
+  storeId: 'AlikeSegments',
   model: 'Editor.model.AlikeSegment',
   autoLoad: false,
   autoSync: false,

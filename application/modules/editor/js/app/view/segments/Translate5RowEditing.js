@@ -112,13 +112,15 @@ Ext.define('Editor.view.segments.Translate5RowEditing', {
         this.callParent(arguments);
     },
     /**
+     * FIXME remove if not missed
+     * 
      * editorDomCleanUp entfernt die komplette (DOM + Komponente) Instanz des Editors. 
      * Die DOM Elemente des Editors befinden sich innerhalb des Grid View Elements. 
      * Dieses wiederrum wird bei einem Range Change neu erstellt. Die Editor Komponente verliert ihre DOM Elemente,
      * es kommt zu komischen Effekten. Mit dieser Methode wird der komplette Editor entfernt, und wird bei einer 
      * erneuten Verwendung komplett neu erstellt.
      */
-    editorDomCleanUp: function() {
+    editorDomCleanUp_obsolete: function() {
       var me = this,
       main,
       columns = me.grid.getView().getGridColumns();

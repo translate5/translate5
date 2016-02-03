@@ -172,47 +172,30 @@ Ext.define('Editor.controller.ChangeAlike', {
         rec = editingPlugin.openedRecord,
         //id des bearbeiteten Segments
         id = rec.get('id'),
-        store = me.getStore('AlikeSegments'),
-        proxy = store.getProxy(),
-        op;
+        store = me.getStore('AlikeSegments');
     
     if(me.isDisabled || me.isManualProcessingDisabled()) {
         return;
     }
     
-    op = new Ext.data.Operation({
-        action: 'read',
-        segmentsId: id
+    store.load({
+        url: me.alikeSegmentsUrl+'/'+id,
+        callback: function(recs, op, success) {
+            success && me.handleAlikesRead(op, id);
+        }
     });
     
     // FIXME doesn't work in Ext 6 yet me.getSegmentGrid().filters.onBeforeLoad(store, op);
     //using stores proxy to load and process data
-    proxy.url = me.alikeSegmentsUrl+'/'+id;
-    op.setStarted();
-    me.fireEvent('fetchChangeAlikes', op);
-
-    //default process method cannot deal with empty store and empty resultset (was producing Cannot read property 'clientIdProperty' of undefined)
-    Ext.override(op, {
-        process: function(resultSet) {
-            if(resultSet.getCount() > 0) {
-                this.callParent(arguments);
-            }
-            else {
-                this.setSuccessful(true);
-            }
-        }
-    });
-
-    proxy.read(op, me.handleAlikesRead, me);
   },
 
   /**
    * handle if alikes are successful read
    * @param {Ext.data.Operation} operation
+   * @param {Integer} id
    */
-  handleAlikesRead: function(operation) {
-      var me = this, 
-          id = operation.segmentsId;
+  handleAlikesRead: function(operation, id) {
+      var me = this 
       
       if(me.isDisabled || ! operation.wasSuccessful()){
           //@todo Meldung machen, dass keine WDHs geholt werden konnten!

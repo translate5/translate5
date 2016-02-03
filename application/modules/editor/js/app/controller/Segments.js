@@ -109,8 +109,6 @@ Ext.define('Editor.controller.Segments', {
               saveSegment: 'saveChainStart'
           },
           '#changealikecontroller': {
-              //called after load of cahnge alikes to a segment
-              fetchChangeAlikes: 'onFetchChangeAlikes',
               //called after currently loaded segment data is not used anymore by the save chain / change alike handling
               segmentUsageFinished: 'onSegmentUsageFinished'
           }
@@ -142,7 +140,11 @@ Ext.define('Editor.controller.Segments', {
           }
       },
       store: {
-          'Files': {
+          '#AlikeSegments': {
+              //called after load of change alikes to a segment
+              beforeload: 'onFetchChangeAlikes'
+          },
+          '#Files': {
               write: 'reloadGrid'
           }
       }
@@ -344,10 +346,11 @@ Ext.define('Editor.controller.Segments', {
   },
   /**
    * binds the change alike load operation to the save chain
-   * @param {Ext.data.Operation} operation
+   * @param {Editor.store.AlikeSegments} store
+   * @param {Ext.data.Operation} op
    */
-  onFetchChangeAlikes: function(operation) {
-      this.changeAlikeOperation = operation;
+  onFetchChangeAlikes: function(store, op) {
+      this.changeAlikeOperation = op;
   },
   /**
    * Method is called on chain end / and by change alikes
