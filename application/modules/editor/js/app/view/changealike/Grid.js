@@ -41,6 +41,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.changealike.Grid', {
   extend: 'Editor.view.ui.changealike.Grid',
   alias: 'widget.changealikeGrid',
+  plugins: ['gridfilters'],
   store: 'AlikeSegments',
   id: 'changealike-grid',
   /**

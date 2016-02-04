@@ -48,7 +48,6 @@ Ext.define('Editor.view.changealike.Window', {
   overwriteSource: '<b><i>#UT#Überschreibe Quelltext mit:</i></b> ',
   overwriteTarget: '<b><i>#UT#Überschreibe Zieltext mit:</i></b> ',
   items_help: 'Hilfe:',
-  loadingMask: null,
   loadedAlikes: null,
   tools: [{
     type:'help',
@@ -61,7 +60,6 @@ Ext.define('Editor.view.changealike.Window', {
     me.items_segmentData = Ext.create('Ext.XTemplate', me.items_segmentData);
     me.items_segmentData.compile();
     me.callParent(arguments);
-    me.loadingMask = new Ext.LoadMask(me, {modal: false, store: false});
     Ext.apply(me.tools[0], {
       tooltip: me.items_help,
       renderData: {
@@ -88,10 +86,7 @@ Ext.define('Editor.view.changealike.Window', {
           grid.setAlikes(me.loadedAlikes);
       }
       else {
-          // setting a loading mask for the window / grid is not possible. 
-          // perhaps because of bug for ext-4.0.7 (see http://www.sencha.com/forum/showthread.php?157954)
-          // after trying different, not working things, we decided to disable the buttons and show a simple text message, without a grey box
-          me.loadingMask.show();
+          me.setLoading(true);
           me.down('toolbar').disable();
       }
       me.loadedAlikes = false; //reset flag after usage
@@ -108,7 +103,6 @@ Ext.define('Editor.view.changealike.Window', {
           grid.setAlikes(alikes);
       }
       me.setLoading(false);
-      me.loadingMask.hide();
       me.down('toolbar').enable();
   },
   /**
