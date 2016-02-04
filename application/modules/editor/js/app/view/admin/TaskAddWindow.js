@@ -78,7 +78,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                 displayField: 'label',
                 forceSelection: true,
                 queryMode: 'local',
-                store: 'admin.Languages',
                 valueField: 'id'
             },
             config = {
@@ -106,12 +105,16 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     name: 'sourceLang',
                     allowBlank: false,
                     toolTip: me.strings.sourceLangTip,
+                    //each combo needs its own store instance, see EXT6UPD-8
+                    store: Ext.create(Editor.store.admin.Languages),
                     fieldLabel: me.strings.sourceLangLabel
                 }, langCombo),{
                 },Ext.applyIf({
                     name: 'targetLang',
                     allowBlank: false,
                     toolTip: me.strings.targetLangTip,
+                    //each combo needs its own store instance, see EXT6UPD-8
+                    store: Ext.create(Editor.store.admin.Languages),
                     fieldLabel: me.strings.targetLangLabel
                 }, langCombo),{
                 },Ext.applyIf({
@@ -119,6 +122,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     getSubmitValue: function() {
                       return this.getValue();
                     },
+                    //each combo needs its own store instance, see EXT6UPD-8
+                    store: Ext.create(Editor.store.admin.Languages),
                     toolTip: me.strings.relaisLangTip,
                     fieldLabel: me.strings.relaisLangLabel
                 }, langCombo),{
