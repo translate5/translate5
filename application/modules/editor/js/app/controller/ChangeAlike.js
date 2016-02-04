@@ -172,21 +172,25 @@ Ext.define('Editor.controller.ChangeAlike', {
         rec = editingPlugin.openedRecord,
         //id des bearbeiteten Segments
         id = rec.get('id'),
-        store = me.getStore('AlikeSegments');
+        store = me.getStore('AlikeSegments'),
+        segmentStore = me.getSegmentGrid().getStore()
+        segmentsProxy = segmentStore.getProxy(),
+        params = {};
     
     if(me.isDisabled || me.isManualProcessingDisabled()) {
         return;
     }
     
+    params[segmentsProxy.getFilterParam()] = segmentsProxy.encodeFilters(segmentStore.getFilters().items);
+    params[segmentsProxy.getSortParam()] = segmentsProxy.encodeSorters(segmentStore.getSorters().items);
+    
     store.load({
         url: me.alikeSegmentsUrl+'/'+id,
+        params: params,
         callback: function(recs, op, success) {
             success && me.handleAlikesRead(op, id);
         }
     });
-    
-    // FIXME doesn't work in Ext 6 yet me.getSegmentGrid().filters.onBeforeLoad(store, op);
-    //using stores proxy to load and process data
   },
 
   /**
