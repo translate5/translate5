@@ -186,8 +186,8 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
         $exportedFile = $path.$task->taskGuid.'/specialCharactersInCSV.csv';
         $this->assertFileExists($exportedFile);
         //compare the result with the expected result
-        $expectedResult = $this->api()->getFileContent($fileToCompare);
-        $this->assertEquals($expectedResult, file_get_contents($exportedFile));
+        $expectedResult = rtrim($this->api()->getFileContent($fileToCompare), "\n");
+        $this->assertEquals($expectedResult, rtrim(file_get_contents($exportedFile), "\n"));
         
         //delete exported file, so that next call can recreate it
         unlink($exportedFile);
