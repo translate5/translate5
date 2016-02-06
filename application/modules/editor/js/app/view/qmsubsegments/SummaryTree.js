@@ -57,6 +57,7 @@ Ext.define('Editor.view.qmsubsegments.SummaryTree', {
         var me = this;
         me.columns = me.getSeverityCols();
         me.callParent(arguments);
+        me.store.load();
     },
     getSeverityCols: function(){
         var me = this;

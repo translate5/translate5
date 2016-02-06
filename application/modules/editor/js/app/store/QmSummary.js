@@ -54,6 +54,10 @@ Ext.define('Editor.store.QmSummary', {
     },
     proxy : {
         type : 'rest',
+        appendId: false,
+        reader: {
+            type : 'json'
+        },
         url: Editor.data.restpath+'qmstatistics'
     },
     constructor: function(config) {

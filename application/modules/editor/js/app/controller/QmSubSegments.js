@@ -64,39 +64,41 @@ Ext.define('Editor.controller.QmSubSegments', {
         ref: 'metaSevCombo',
         selector: '#metapanel combobox[name="qmsubseverity"]'
     }],
+    listen: {
+        global: {
+            editorViewportOpened: 'handleInitEditor'
+        },
+        component: {
+            '#segmentgrid #qmsummaryBtn': {
+                click:'showQmSummary'
+            },
+            '#segmentgrid': {
+                afterrender: 'handleAfterRender'
+            },
+            'qmSubsegmentsFlagFieldset menuitem': {
+                click: 'handleAddQmFlagClick'
+            },
+            '#metaInfoForm': {
+                beforerender: 'initFieldSet'
+            },
+            'segmentsHtmleditor': {
+                afterinitframedoc: 'initIframeDoc',
+                afteriniteditor: 'initEditor'
+            }
+        }
+    },
     strings: {
     	emptySelText: '##UT##Bitte wählen Sie im Editor ein Subsegment aus!',
     	emptySelTitle: '##UT##Kein Subsegment ausgewählt.'
     },
-    
-    init : function() {
+    init: function(app) {
         var me = this;
-        me.useAlternateInsertion = Ext.isIE;
+    },
+    handleAfterRender: function(){
+        var me = this;
         
-        //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
-        Editor.app.on('editorViewportOpened', me.handleInitEditor, me);
-        
-        me.control({
-            '#segmentgrid #qmsummaryBtn': {
-                click: me.showQmSummary
-            },
-            '#segmentgrid': {
-                afterrender: function(){
-                    me.tooltip = Ext.create('Editor.view.ToolTip', {
-                        target: me.getSegmentGrid().getEl()
-                    });
-                }
-            },
-            'qmSubsegmentsFlagFieldset menuitem': {
-                click: me.handleAddQmFlagClick
-            },
-            '#metaInfoForm': {
-                beforerender: me.initFieldSet
-            },
-            'segmentsHtmleditor': {
-                afterinitframedoc: me.initIframeDoc,
-                afteriniteditor: me.initEditor
-            }
+        me.tooltip = Ext.create('Editor.view.ToolTip', {
+            target: me.getSegmentGrid().getEl()
         });
     },
     handleInitEditor: function() {
@@ -173,7 +175,7 @@ Ext.define('Editor.controller.QmSubSegments', {
      * @param editor
      */
     initIframeDoc: function(editor) {
-    	if(this.useAlternateInsertion){
+    	if(Ext.isIE){
 	    	editor.iframeEl.on('beforedeactivate', this.handleEditorBlur, this);    	
 	    	editor.iframeEl.on('focus', this.handleEditorFocus, this);    	
     	}
@@ -233,7 +235,7 @@ Ext.define('Editor.controller.QmSubSegments', {
 		if(!editor.hasSelection() && !this.lastSelectedRangeIE) {
 			return false;
 		}
-		if(this.useAlternateInsertion) {
+		if(Ext.isIE) {
 			this.insertQmFlagsIE(editor,qmid, comment, sev);
 		} else {
 			this.insertQmFlagsH5(editor,qmid, comment, sev);
