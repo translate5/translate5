@@ -84,6 +84,9 @@ Ext.define('Editor.controller.Segments', {
   loadingMaskRequests: 0,
   saveChainMutex: false,
   changeAlikeOperation: null,
+  enableSelectOrFocus: false,
+  lastRequestedRowIndex: -1,
+  defaultRowHeight: 15,
   refs : [{
     ref : 'segmentGrid',
     selector : '#segmentgrid'
@@ -306,11 +309,62 @@ Ext.define('Editor.controller.Segments', {
     Editor.MessageBox.addSuccess(this.messages.sortCleared);
   },
   scrollOrFocus: function(rowindex) {
-    if(this.getSegmentPager()) {
-      this.getSegmentPager().jumpToSegmentRowIndexAndSelect(rowindex);
-      return;
-    }
-    this.getSegmentGrid().selectOrFocus(rowindex);
+      this.jumpToSegmentRowIndexAndSelect(rowindex);
+  },
+  /**
+    * Springt ein Segment an und selektiert es, rowindex bezeichnet die
+    * Position in der kompletten gefilterten und sortierten Ergebnissmenge.
+    * @param {Integer} rowindex
+    */
+  jumpToSegmentRowIndexAndSelect: function(rowindex) {
+        var me = this,
+        grid = me.getSegmentGrid(),
+        segment = me.getRecordByTotalIndex(rowindex);
+        me.enableSelectOrFocus = true;
+
+        me.lastRequestedRowIndex = rowindex;
+        me.jumpToRecordIndex(rowindex);
+        if(segment){
+            me.selectOrFocus(segment);
+        }
+  },
+  /**
+   * Gibt den Segment Record zum gewünschten index in der gesamten Ergebnismenge
+   * @param {Integer} rowindex
+   */
+  getRecordByTotalIndex: function(rowindex) {
+      var me = this,
+          grid = me.getSegmentGrid(),
+          store = grid.store;
+      return store.getAt(store.findBy(function(rec){
+        return (rec.index == rowindex);
+      }));
+  },
+  /**
+   * springt durch verschieben des Scrollers zum gewünschten Segment. 
+   * recordindex bezeichnet den Index des Segments in der gesamten gefilterten
+   *  und sortierten Ergebnissmenge (also nicht nur im aktuellen Range)
+   * @param {Integer} recordindex 
+   */
+  jumpToRecordIndex: function(recordindex){
+      var me = this,
+          grid = me.getSegmentGrid(),
+          table = grid.getView(),
+          options = {focus: true};
+
+      table.bufferedRenderer.scrollTo(recordindex);
+  },
+  /**
+     * Selektiert und fokusiert das gewünschte Segment, localRowIndex bezeichnet
+     * den Index des Segments im aktuell garantierten Range
+     * @param {Integer} localRowIndex
+     */
+    selectOrFocus: function(localRowIndex){
+      if(!this.enableSelectOrFocus){
+        return;
+      }
+      this.enableSelectOrFocus = false;
+      this.getSegmentGrid().selectOrFocus();
   },
   /**
    * Helper: resets only the sorters, does no reload and so on
