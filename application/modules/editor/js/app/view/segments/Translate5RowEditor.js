@@ -66,6 +66,10 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
     //beinhaltet den gekürzten Inhalt des letzten geöffneteten Segments
     lastSegmentShortInfo: '',
     columnToEdit: null,
+    columnToEditOrigHeight: 0,
+    editorExtraHeight: 20,
+    editorFieldExtraHeight: 10,
+    editorShadowsExtraHeight: 4, // see css/translate5.css class .x-grid-row-editor-wrap
     fieldToEdit: null,
     previousRecord: null,
     timeTrackingData: null,
@@ -408,6 +412,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         //the setted durations field is overwritten / cleared by successfull PUT
         rec.set('durations', me.getTimeTrackingData());
 
+        me.restoreEditingRowHeight();
         me.hide();
         me.previousRecord = me.editingPlugin.openedRecord;
         me.editingPlugin.openedRecord = null;
@@ -463,6 +468,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         me.getTimeTrackingData();
         me.editingPlugin.openedRecord = null;
         
+        me.restoreEditingRowHeight();
         me.hide();
         form.clearInvalid();
 
@@ -1300,11 +1306,22 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         var me = this,
             context = me.context,
             row = Ext.get(context.row),
-            rowHeight = row.getHeight();
+            rowHeight = row.getHeight()
+            editorHeight = rowHeight + me.editorExtraHeight,
+            editorFieldHeight = rowHeight + me.editorFieldExtraHeight;
         
-        //FIXME make delta 20 configurable
-        me.setHeight(rowHeight + 20);
-        me.mainEditor.setHeight(rowHeight + 10);
+        me.columnToEditOrigHeight = rowHeight;
+        row.setHeight(editorHeight + me.editorShadowsExtraHeight);
+        me.setHeight(editorHeight);
+        me.mainEditor.setHeight(editorFieldHeight);
+    },
+    restoreEditingRowHeight: function() {
+        var me = this,
+            context = me.context,
+            row = Ext.get(context.row);
+
+        row.setHeight(me.columnToEditOrigHeight);
+        me.columnToEditOrigHeight = 0;
     },
     setEditorWidth: function() {
         var me = this,
