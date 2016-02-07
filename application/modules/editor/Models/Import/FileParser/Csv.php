@@ -84,29 +84,41 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     protected $tagProtection = false;
     
     /**
-     * Array with internal tags.
-     * This tags will not be manipulated by tagProtection
+     * @var array
      */
-    protected $internalTags = array('hardReturn',
-                    'softReturn',
-                    'macReturn',
-                    'space',
-                    'regex'
-    );
+    protected $replaceRegularExpressionsBeforeTagParsing = array();
     
     /**
      * @var array
      */
-    protected $replaceRegularExpressions = array();
+    protected $replaceRegularExpressionsAfterTagParsing = array();
     
+    /**
+     *
+     * @var string special placeholder needed in the loop that protects different kind of strings and tags in csv for the editing process
+     */
+    protected $placeholderCSV = '𓇽𓇽𓇽𓇽𓇽𓇽';
+    /**
+     *
+     * @var string regex describing the structure of translate5 internal tags
+     */
+    protected $regexInternalTags = null;
+    /**
+     *
+     * @var array syntax: array('𓇽𓇽𓇽𓇽𓇽𓇽1' => '<div class="single 73706163652074733d2263326130222f"><span title="<space/>" class="short" id="ext-gen1796">&lt;1/&gt;</span><span id="space-2-b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>');
+     *      explanation: key: the string that is the placeholder for the actual to be protected string
+     *                   value: the to be protected string already converted to a translate5 internal tag
+     */
+    protected $protectedStrings = array();
     
-    
+    protected $html5Tags = array();
+
     public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, boolean $lockLocked, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task) {
         ini_set('auto_detect_line_endings', true);//to tell php to respect mac-lineendings
         parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $lockLocked, $sourceLang, $targetLang, $task);
-        $config = Zend_Registry::get('config');
-        $this->_delimiter = $config->runtimeOptions->import->csv->delimiter;
-        $this->_enclosure = $config->runtimeOptions->import->csv->enclosure;
+        $this->_delimiter = $this->config->runtimeOptions->import->csv->delimiter;
+        $this->_enclosure = $this->config->runtimeOptions->import->csv->enclosure;
+        $this->regexInternalTags = $this->config->runtimeOptions->editor->export->regexInternalTags;
         
         // check taskTemplate for options (check if tag-protection or regExes-protection is set)
         $taskConfig = Zend_Registry::get('taskTemplate');
@@ -119,17 +131,35 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         
         if (isset($options->protectTags)) {
             $this->tagProtection = $options->protectTags;
+            $ds = DIRECTORY_SEPARATOR;
+            $html5TagFile = APPLICATION_PATH.$ds.'modules'.$ds.'editor'.
+                    $ds.'Models'.$ds.'Import'.$ds.'FileParser'.$ds.
+                    'html5-tags.txt';
+            $this->html5Tags = file($html5TagFile, FILE_IGNORE_NEW_LINES);
         }
-        if (isset($options->regexes->regex)) {
-            $this->addReplaceRegularExpression($options->regexes->regex->toArray());
+        if (isset($options->regexes->beforeTagParsing->regex)) {
+            $this->addReplaceRegularExpression($options->regexes->beforeTagParsing->regex,'replaceRegularExpressionsBeforeTagParsing');
+        }
+        if (isset($options->regexes->afterTagParsing->regex)) {
+            $this->addReplaceRegularExpression($options->regexes->afterTagParsing->regex,'replaceRegularExpressionsAfterTagParsing');
         }
     }
-    
-    protected function addReplaceRegularExpression (array $regExes) {
+    /**
+     * 
+     * @param mixed $regExes object or string
+     * @param string $regexArrayName
+     * @return void
+     */
+    protected function addReplaceRegularExpression ($regExes, $regexArrayName) {
         if (empty($regExes)) {
             return;
         }
-        
+        if(is_string($regExes)){
+            $regExes = array($regExes);
+        }
+        else {
+           $regExes = $regExes->toArray();
+        }
         foreach ($regExes as $regEx) {
             try {
                 preg_match($regEx,'hello world !!!');
@@ -141,7 +171,11 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
                 $log->logError('invalid regular expression', $message);
                 continue;
             }
-            $this->replaceRegularExpressions[] = $regEx;
+            if(preg_match($regEx, $this->placeholderCSV)===1){
+                throw new ZfExtended_NotAcceptableException('The regex '.$regEx.' matches the placeholderCSV string '.$this->placeholderCSV.' that is used in the editor_Models_Import_FileParser_Csv class to manage the protection loop. This is not allowed. Please find another solution to protect what you need to protect in your CSV via Regular Expression.');
+            }
+            $regexArray =& $this->$regexArrayName;
+            $regexArray[] = $regEx;
         }
     }
     
@@ -202,8 +236,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         unset ($this->_origFile); //save memory, is not needed anymore.
         
         //check header and column order
-        $config = Zend_Registry::get('config');
-        $csvSettings = $config->runtimeOptions->import->csv->fields->toArray();
+        $csvSettings = $this->config->runtimeOptions->import->csv->fields->toArray();
         //$csvSettings quelle => source, mid => mid
         $header = $this->prepareLine($csv);
         if($header === false) {
@@ -324,25 +357,43 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      * @return string $segment
      */
     protected function parseSegment($segment,$isSource){
+        //check, if $this->placeholderCSV is present in segment - this must lead to error
+        if(strpos($segment, $this->placeholderCSV)!==false){
+            throw new ZfExtended_Exception('The string $this->placeholderCSV ('.$this->placeholderCSV.') had been present in the segment before parsing it. This is not allowed.');
+        }
         $this->segmentTagCounter = 1;
         
         $count = 0;
-        $segment = $this->parseSegmentProtectWhitespace($segment, $count);
-        
-        // mask regExes
-        $segment = $this->parseSegmentMaskRegEx($segment);
-        // add tag-protection
-        $segment =  $this->parseSegmentProtectTags($segment);
-        // add regEx-replacement-protection
-        $segment = $this->parseSegmentProtectRegEx($segment);
-        //encodes the html special characters, so that our frontend can deal with them
-        $segment = htmlspecialchars($segment, ENT_COMPAT);
-        
-        // continue with normal processing
-        if($count == 0) {
-            return $segment;
+        //at first protect MQM - they will be converted to MQM-tags later by MqmParser
+        //for performance reasons only do this, if escaping MQM is necessary for later protections
+        if(strpos($segment, '<mqm:')!==false){
+            $segment = $this->parseSegmentInsertPlaceholders($segment,'#(<mqm:startIssue[^>]+/>)#');
+            $segment = $this->parseSegmentInsertPlaceholders($segment,'#(<mqm:endIssue[^>]+/>)#');
         }
         
+        // protect regExes
+        $segment = $this->parseSegmentRegEx($segment,  $this->replaceRegularExpressionsBeforeTagParsing);
+        // add tag-protection
+        $segment =  $this->parseSegmentProtectTags($segment);
+        // protect regExes
+        $segment = $this->parseSegmentRegEx($segment,  $this->replaceRegularExpressionsAfterTagParsing);
+        
+        $segment = $this->parseSegmentProtectWhitespace($segment, $count);
+        
+        //encodes the html special characters, so that our frontend can deal with them
+        $segment = htmlspecialchars($segment, ENT_NOQUOTES);
+        
+        return $this->parseSegmentReplacePlaceholders($segment);
+    }
+    /**
+     * protects whitespace inside a segment with a tag
+     *
+     * @param string $segment
+     * @param integer $count optional, variable passed by reference stores the replacement count
+     * @return string $segment
+     */
+    protected function parseSegmentProtectWhitespace($segment, &$count = 0) {
+        $segment = parent::parseSegmentProtectWhitespace($segment, $count);
         //In CSV we have to directly replace our whitespace tags with their HTML replacement
         $search = array(
             '#<hardReturn/>#',
@@ -355,10 +406,54 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         $this->shortTagIdent = $this->segmentTagCounter;
         $this->_segment = $segment;
         $segment = preg_replace_callback($search, array($this,'whitespaceTagReplacer'), $segment);
-        
+        $segment = $this->parseSegmentInsertPlaceholders($segment,$this->regexInternalTags);
         return $segment;
     }
     
+    /**
+     * 
+     * @param string $segment
+     * @return string 
+     */
+    protected function parseSegmentReplacePlaceholders($segment){
+        $placeholders = array_keys($this->protectedStrings);
+        $tags = array_values($this->protectedStrings);
+        $this->protectedStrings = array();
+        return str_replace($placeholders, $tags, $segment);
+    }
+    
+    /**
+     * be careful: if regex does not contain a "<", this method will simply return the segment (for performance reasons)
+     * @param string $segment
+     * @param string $tagToReplaceRegex - should contain a regex, that stands for a tag, that should be hidden for parsing reasons by a placeholder.
+     * @return string 
+     */
+    protected function parseSegmentInsertPlaceholders($segment,$tagToReplaceRegex){
+        if(strpos($segment, '<')===false){
+            return $segment;
+        }
+        
+        $str_replace_first = function($search, $replace, $subject) {
+            $pos = strpos($subject, $search);
+            if ($pos !== false) {
+                $subject = substr_replace($subject, $replace, $pos, strlen($search));
+            }
+            return $subject;
+        };
+        
+        
+        preg_match_all($tagToReplaceRegex, $segment, $matches, PREG_PATTERN_ORDER);
+        //"<div\s*class=\"([a-z]*)\s+([gxA-Fa-f0-9]*)\"\s*.*?(?!</div>)<span[^>]*id=\"([^-]*)-.*?(?!</div>).</div>"s
+        $protectedStringCount = count($this->protectedStrings);
+        foreach ($matches[0] as $match) {
+            $placeholder = $this->placeholderCSV.$protectedStringCount;
+            $this->protectedStrings[$placeholder] = $match;
+            $segment = $str_replace_first($match,$placeholder,$segment);
+            $protectedStringCount++;
+        }
+        return $segment;
+    }
+
     private function parseSegmentProtectTags($segment) {
         
         if (strpos($segment, '<')=== false || !$this->tagProtection) {
@@ -369,7 +464,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             $tempXml = qp('<?xml version="1.0"?><segment>'.$segment.'</segment>', NULL, array('format_output' => false));
         }
         catch (Exception $e) {
-            return $this->parseReplaceNotWellformedXML($segment);
+            return $this->parseSegmentProtectInvalidHtml5($segment);
         }
         
         // mark single- or paired-tags
@@ -379,21 +474,40 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
                 $tagType = 'pairedTag';
             }
             
-            // do not wrap internal tags
-            if ($tagType == 'singleTag' && in_array($element->tag(), $this->internalTags)) {
-                continue;
-            }
-            
             $element->wrap('<'.$tagType.'_'.$this->segmentTagCounter++.' data-tagname="'.$element->tag().'" />');
         }
-        $tempReturn = $tempXml->find('segment')->innerXml();
+        $r= $tempXml->find('segment')->innerXml();
         
         // replace single-, left- and right-tags
-        $tempReturn = $this->parseReplaceSingleTags($tempReturn);
-        $tempReturn = $this->parseReplaceLeftTags($tempReturn);
-        $tempReturn = $this->parseReplaceRightTags($tempReturn);
+        $r = $this->parseReplaceSingleTags($r);
+        $r = $this->parseReplaceLeftTags($r);
+        $r = $this->parseReplaceRightTags($r);
         
-        return $tempReturn;
+        return $this->parseSegmentInsertPlaceholders($r,$this->regexInternalTags);
+    }
+
+    private function parseSegmentProtectInvalidHtml5($segment) {
+        $replacer = function ($matches){
+            $tagName = preg_replace('/<[\/]*([^ ]*).*>/i', '$1', $matches[0]);
+            // only replace HTML5 tags
+            if (!in_array($tagName, $this->html5Tags)) {
+                return $matches[0];
+            }
+            $tagId = $this->segmentTagCounter++;
+            $tag = $matches[0];
+            $fileNameHash = md5($tag);
+            
+            $p = $this->getTagParams($tag, $tagId, $tagName, $fileNameHash, $this->encodeTagsForDisplay($tag));
+            $r = $this->_singleTag->getHtmlTag($p);
+            
+            $this->_singleTag->createAndSaveIfNotExists($tag, $fileNameHash);
+            
+            return $r;
+        };
+        
+        $segment = preg_replace_callback('/(<[^><]+>)/is', $replacer, $segment);
+        
+        return $this->parseSegmentInsertPlaceholders($segment,$this->regexInternalTags);
     }
     
     /**
@@ -473,84 +587,24 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     
     
     /**
-     * Replace all tags in $text as single-tags (handling for non-wellformed xml)
-     * 
-     * @param string $text
-     * @return string
-     */
-    private function parseReplaceNotWellformedXML($text) {
-        $tagCounter = & $this->segmentTagCounter;
-        $internalTags = $this->internalTags;
-        $replacer = function ($matches) use (&$tagCounter, $internalTags) {
-            $tagName = preg_replace('/<[\/]*([^ ]*).*>/i', '$1', $matches[0]);
-            // no replacements for internal tags
-            if (in_array($tagName, $this->internalTags)) {
-                return $matches[0];
-            }
-            $tagId = $tagCounter++;
-            $tag = $matches[0];
-            $fileNameHash = md5($tag);
-            
-            $p = $this->getTagParams($tag, $tagId, $tagName, $fileNameHash, $this->encodeTagsForDisplay($tag));
-            $tempReturn = $this->_singleTag->getHtmlTag($p);
-            
-            $this->_singleTag->createAndSaveIfNotExists($tag, $fileNameHash);
-            
-            return $tempReturn;
-        };
-        
-        return preg_replace_callback('/(<[^>]+>)/is', $replacer, $text);
-    }
-    
-    
-    /**
      * Mask all regular expressions $this->replaceRegularExpressions with internal tag <regex ...>
      *
      * @param string $text
+     * @param array $regexToUse $replaceRegularExpressionsBeforeTagParsing | $replaceRegularExpressionsAfterTagParsing
      * @return string
      */
-    private function parseSegmentMaskRegEx($text) {
-        if (empty($this->replaceRegularExpressions)) {
+    private function parseSegmentRegEx($text, &$regexToUse) {
+        if (empty($regexToUse)) {
             return $text;
         }
-        
-        $mask = function ($matches) {
-            return '<regex data="'.base64_encode($matches[0]).'"/>';
-        };
-        
-        //replace only on real text
-        $split = preg_split('#(<[^>]+>)#', $text, null, PREG_SPLIT_DELIM_CAPTURE);
-        $i = 0;
-        foreach($split as &$chunk) {
-            if($i++ % 2 === 1 || strlen($chunk) == 0) {
-                // tag or empty chunks
-                continue; 
+        $mask = function ($matches){
+            $tag = $matches[0];
+            //if there already is a protected string inside this match, don't protect it
+            if(strpos($tag, $this->placeholderCSV)!==false){
+                return $tag;
             }
-            foreach ($this->replaceRegularExpressions as $regEx) {
-                $chunk = preg_replace_callback($regEx, $mask, $chunk);
-            }
-        }
-        
-        return join($split);
-    }
-    /**
-     * Replace all masked regular expressions in $text as single-(regEx-)tags
-     *
-     * @param string $text
-     * @return string
-     */
-    private function parseSegmentProtectRegEx($text) {
-        if (empty($this->replaceRegularExpressions)) {
-            return $text;
-        }
-        
-        $tagCounter = & $this->segmentTagCounter;
-        
-        $replacer = function ($matches) use (&$tagCounter) {
-            $tagId = $tagCounter++;
-            $tag = base64_decode($matches[1]);
+            $tagId = $this->segmentTagCounter++;
             $fileNameHash = md5($tag);
-            
             $p = array(
                 'class' => implode('', unpack('H*', $tag)),
                 'text' => $this->encodeTagsForDisplay($tag),
@@ -558,18 +612,16 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
                 'id' => 'regex-'.$tagId.'-' . $fileNameHash,
             );
             
-            $tempReturn = $this->_singleTag->getHtmlTag($p);
+            $r = $this->_singleTag->getHtmlTag($p);
             $this->_singleTag->createAndSaveIfNotExists($tag, $fileNameHash);
             
-            return $tempReturn;
+            return $r;
         };
-        
-        $text = preg_replace_callback('/<regex data="([^"]*)"\/>/', $replacer, $text);
-        
-        return $text;
+        foreach ($regexToUse as $regEx) {
+            $text = preg_replace_callback($regEx, $mask, $text);
+        }
+        return $this->parseSegmentInsertPlaceholders($text,$this->regexInternalTags);
     }
-    
-    
     
     /**
      * Sets $this->_editSegment, $this->_matchRateSegment and $this->_autopropagated

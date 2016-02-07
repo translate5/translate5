@@ -184,6 +184,11 @@ abstract class editor_Models_Import_FileParser {
     protected $segmentFieldManager;
     
     /**
+     * @var Zend_Config
+     */
+    protected $config;
+    
+    /**
      * @param string $path pfad zur Datei in der Kodierung des Filesystems (also runtimeOptions.fileSystemEncoding)
      * @param string $fileName Dateiname utf-8 kodiert
      * @param integer $fileId
@@ -194,6 +199,7 @@ abstract class editor_Models_Import_FileParser {
      */
     public function __construct(string $path, string $fileName,integer $fileId,
             boolean $edit100PercentMatches, boolean $lockLocked,  editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task){
+        $this->config = Zend_Registry::get('config');
         $this->_origFile = file_get_contents($path);
         $this->_path = $path;
         $this->_fileName = $fileName;

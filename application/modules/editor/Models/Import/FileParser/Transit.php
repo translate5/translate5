@@ -151,8 +151,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
      * and sets the skeletonfile for transit to this file
      */
     protected function setSkeletonfile() {
-        $config = Zend_Registry::get('config');
-        $tmpDir = $config->runtimeOptions->dir->tmp;
+        $tmpDir = $this->config->runtimeOptions->dir->tmp;
         $zipFilePath = $tmpDir.DIRECTORY_SEPARATOR.$this->_fileName.'.zip';
         
         $zip = new ZipArchive();

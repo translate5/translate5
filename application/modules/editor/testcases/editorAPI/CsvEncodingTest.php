@@ -51,7 +51,7 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
         self::assertLogin('testmanager');
         $appState = self::assertTermTagger();
         self::assertNotContains('editor_Plugins_ManualStatusCheck_Bootstrap', $appState->pluginsLoaded, 'Plugin ManualStatusCheck may not be activated for this test case!');
-        $api->addImportFile('editorAPI/CsvEncodingTest/specialCharactersInCSV.csv');
+        $api->addImportFile('editorAPI/CsvEncodingTest/CSV-test.zip');
         $api->import($task);
         
         $api->addUser('testlector');
@@ -107,10 +107,14 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
 
         //check imported segment content against correct encoded strings from CSV in not imported colums 4 and 5
-        $approvalFileContent = $this->api()->getFileContent('specialCharactersInCSV.csv');
+        $approvalFileContent = $this->api()->getFileContentFromZip('CSV-test.zip','proofRead/specialCharactersInCSV.csv');
         $csvRows = explode("\n", $approvalFileContent);
         array_shift($csvRows); //remove headers
         array_shift($csvRows); //remove comments like row without testdata
+        //remove data-seq attribute from segment, because it values change according to db-table-id
+        $removeDataSeq = function($text){
+          return preg_replace('#data-seq="\d+"#', 'data-seq=""', $text);
+        };
         foreach($csvRows as $idx => $row) {
             //ignore last line
             if(empty($row)) {
@@ -118,11 +122,11 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
             }
             $idx++; //compensate comment row removal
             $row = str_getcsv($row);
-            $expectedSource = $row[3];
-            $expectedTarget = $row[4];
-            $this->assertEquals($expectedSource, $segments[$idx]->source);
-            $this->assertEquals($expectedTarget, $segments[$idx]->target);
-            $this->assertEquals($expectedTarget, $segments[$idx]->targetEdit);
+            $expectedSource = $removeDataSeq($row[3]);
+            $expectedTarget = $removeDataSeq($row[4]);
+            $this->assertEquals($expectedSource, $removeDataSeq($segments[$idx]->source));
+            $this->assertEquals($expectedTarget, $removeDataSeq($segments[$idx]->target));
+            $this->assertEquals($expectedTarget, $removeDataSeq($segments[$idx]->targetEdit));
             
             $segToEdit = $segments[$idx];
             $segmentData = $this->api()->prepareSegmentPut('targetEdit', $expectedTarget.' - edited', $segToEdit->id);
@@ -149,9 +153,10 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
         
         //no direct file assert equals possible here, since our diff format contains random sdl:revids
         //this revids has to be replaced before assertEqual
-        $approvalFileContent = $this->api()->replaceChangesXmlContent($this->api()->getFileContent('testCsvEncoding-assert-equal.xliff'));
+        $approvalFileContent = $this->api()->getFileContent('testCsvEncoding-assert-equal.xliff');
         $toCheck = $this->api()->replaceChangesXmlContent(file_get_contents($foundChangeFile));
-        $this->assertXmlStringEqualsXmlString($approvalFileContent, $toCheck);
+        file_put_contents('/home/marcstandard/Schreibtisch/temp/asdf.xml', $toCheck);
+        $this->assertSame($approvalFileContent, $toCheck);
     }
     
     /**
@@ -176,21 +181,14 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
         $this->api()->login('testmanager');
         $this->api()->request($exportUrl);
 
-        //get the export zip
+        //get the exported file content
         $path = $this->api()->getTaskDataDirectory();
-        $this->assertFileExists($path.'export.zip');
-        //unzip it
-        $zip = new ZipArchive();
-        $zip->open($path.'export.zip');
-        $zip->extractTo($path);
-        $exportedFile = $path.$task->taskGuid.'/specialCharactersInCSV.csv';
-        $this->assertFileExists($exportedFile);
-        //compare the result with the expected result
+        $pathToZip = $path.'export.zip';
+        $this->assertFileExists($pathToZip);
+        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/specialCharactersInCSV.csv');
+        //compare it
         $expectedResult = $this->api()->getFileContent($fileToCompare);
-        $this->assertEquals($expectedResult, file_get_contents($exportedFile));
-        
-        //delete exported file, so that next call can recreate it
-        unlink($exportedFile);
+        $this->assertEquals($expectedResult, $exportedFile);
     }
     
     public static function tearDownAfterClass() {

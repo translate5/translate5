@@ -13,7 +13,7 @@
 <alt-trans dx:origin-shorttext="target" alttranstype="previous-version">
 <target xml:lang="de">Text mit einem &amp; Ampersand</target></alt-trans>
 <alt-trans dx:origin-shorttext="target-diff" alttranstype="reference">
-<target xml:lang="de">Text mit einem &amp; Ampersand<mrk mtype="x-sdl-added" sdl:revid="081d9bcb-ec6a-4a3e-926f-fe3e0195ce06"> - edited</mrk></target></alt-trans>
+<target xml:lang="de">Text mit einem &amp; Ampersand<mrk mtype="x-sdl-added" sdl:revid="replaced-for-testing"> - edited</mrk></target></alt-trans>
 <state stateid="0"></state>
 <dx:qa-hits></dx:qa-hits>
 </trans-unit>
@@ -24,7 +24,7 @@
 <alt-trans dx:origin-shorttext="target" alttranstype="previous-version">
 <target xml:lang="de">Text mit zwei &amp; Ampersands &amp;</target></alt-trans>
 <alt-trans dx:origin-shorttext="target-diff" alttranstype="reference">
-<target xml:lang="de">Text mit zwei &amp; Ampersands &amp;<mrk mtype="x-sdl-added" sdl:revid="0fa3f234-14bd-4cf0-a27d-ed69e8f04281"> - edited</mrk></target></alt-trans>
+<target xml:lang="de">Text mit zwei &amp; Ampersands &amp;<mrk mtype="x-sdl-added" sdl:revid="replaced-for-testing"> - edited</mrk></target></alt-trans>
 <state stateid="0"></state>
 <dx:qa-hits></dx:qa-hits>
 </trans-unit>
@@ -35,7 +35,7 @@
 <alt-trans dx:origin-shorttext="target" alttranstype="previous-version">
 <target xml:lang="de">Text mit &gt; größer Zeichen</target></alt-trans>
 <alt-trans dx:origin-shorttext="target-diff" alttranstype="reference">
-<target xml:lang="de">Text mit &gt; größer Zeichen<mrk mtype="x-sdl-added" sdl:revid="cf94b0f0-136e-44f4-b617-15ade4e57641"> - edited</mrk></target></alt-trans>
+<target xml:lang="de">Text mit &gt; größer Zeichen<mrk mtype="x-sdl-added" sdl:revid="replaced-for-testing"> - edited</mrk></target></alt-trans>
 <state stateid="0"></state>
 <dx:qa-hits></dx:qa-hits>
 </trans-unit>
@@ -46,7 +46,7 @@
 <alt-trans dx:origin-shorttext="target" alttranstype="previous-version">
 <target xml:lang="de">Text &lt; mit &gt; größer und kleiner Zeichen</target></alt-trans>
 <alt-trans dx:origin-shorttext="target-diff" alttranstype="reference">
-<target xml:lang="de">Text &lt; mit &gt; größer und kleiner Zeichen<mrk mtype="x-sdl-added" sdl:revid="4d1c4504-32c0-4eb6-bfa4-75cf162f8390"> - edited</mrk></target></alt-trans>
+<target xml:lang="de">Text &lt; mit &gt; größer und kleiner Zeichen<mrk mtype="x-sdl-added" sdl:revid="replaced-for-testing"> - edited</mrk></target></alt-trans>
 <state stateid="0"></state>
 <dx:qa-hits></dx:qa-hits>
 </trans-unit>
@@ -57,7 +57,7 @@
 <alt-trans dx:origin-shorttext="target" alttranstype="previous-version">
 <target xml:lang="de">Text mit größer und kleiner Zeichen als &lt;tag&gt;</target></alt-trans>
 <alt-trans dx:origin-shorttext="target-diff" alttranstype="reference">
-<target xml:lang="de">Text mit größer und kleiner Zeichen als &lt;tag&gt;<mrk mtype="x-sdl-added" sdl:revid="739fc38e-4077-486f-a5cf-c7d9d27dcd4e"> - edited</mrk></target></alt-trans>
+<target xml:lang="de">Text mit größer und kleiner Zeichen als &lt;tag&gt;<mrk mtype="x-sdl-added" sdl:revid="replaced-for-testing"> - edited</mrk></target></alt-trans>
 <state stateid="0"></state>
 <dx:qa-hits></dx:qa-hits>
 </trans-unit>
@@ -68,7 +68,7 @@
 <alt-trans dx:origin-shorttext="target" alttranstype="previous-version">
 <target xml:lang="de">Text mit Sonderzeichen &amp; und Ümlauten äöüß</target></alt-trans>
 <alt-trans dx:origin-shorttext="target-diff" alttranstype="reference">
-<target xml:lang="de">Text mit Sonderzeichen &amp; und Ümlauten äöüß<mrk mtype="x-sdl-added" sdl:revid="390ccc4a-8316-4150-bdd7-20262cdd64ca"> - edited</mrk></target></alt-trans>
+<target xml:lang="de">Text mit Sonderzeichen &amp; und Ümlauten äöüß<mrk mtype="x-sdl-added" sdl:revid="replaced-for-testing"> - edited</mrk></target></alt-trans>
 <state stateid="0"></state>
 <dx:qa-hits></dx:qa-hits>
 </trans-unit>
@@ -79,7 +79,62 @@
 <alt-trans dx:origin-shorttext="target" alttranstype="previous-version">
 <target xml:lang="de">Text "unterschiedlichen" 'Anführungszeichen'</target></alt-trans>
 <alt-trans dx:origin-shorttext="target-diff" alttranstype="reference">
-<target xml:lang="de">Text "unterschiedlichen" 'Anführungszeichen'<mrk mtype="x-sdl-added" sdl:revid="39e4e7bb-3ee5-4fdd-b4af-91653f9f36c5"> - edited</mrk></target></alt-trans>
+<target xml:lang="de">Text "unterschiedlichen" 'Anführungszeichen'<mrk mtype="x-sdl-added" sdl:revid="replaced-for-testing"> - edited</mrk></target></alt-trans>
+<state stateid="0"></state>
+<dx:qa-hits></dx:qa-hits>
+</trans-unit>
+
+<trans-unit id="9" translate5:autostateId="1" translate5:autostateText="reviewed">
+<source>Text mit <a href="http://httpd.apache.org/" class="link external">validem </a>xml</source>
+<target dx:match-quality="0.0">Text with <a href="http://httpd.apache.org/" class="link external">valid </a>xml - edited</target>
+<alt-trans dx:origin-shorttext="target" alttranstype="previous-version">
+<target xml:lang="de">Text with <a href="http://httpd.apache.org/" class="link external">valid </a>xml</target></alt-trans>
+<alt-trans dx:origin-shorttext="target-diff" alttranstype="reference">
+<target xml:lang="de">Text with <a href="http://httpd.apache.org/" class="link external">valid </a>xml<mrk mtype="x-sdl-added" sdl:revid="replaced-for-testing"> - edited</mrk></target></alt-trans>
+<state stateid="0"></state>
+<dx:qa-hits></dx:qa-hits>
+</trans-unit>
+
+<trans-unit id="10" translate5:autostateId="1" translate5:autostateText="reviewed">
+<source>Text mit <a href="http://httpd.apache.org/" class="link external">invalidem HTML5</source>
+<target dx:match-quality="0.0">Text with <a href="http://httpd.apache.org/" class="link external">invalid HTML5 - edited</target>
+<alt-trans dx:origin-shorttext="target" alttranstype="previous-version">
+<target xml:lang="de">Text with <a href="http://httpd.apache.org/" class="link external">invalid HTML5</target></alt-trans>
+<alt-trans dx:origin-shorttext="target-diff" alttranstype="reference">
+<target xml:lang="de">Text with <a href="http://httpd.apache.org/" class="link external">invalid HTML5<mrk mtype="x-sdl-added" sdl:revid="replaced-for-testing"> - edited</mrk></target></alt-trans>
+<state stateid="0"></state>
+<dx:qa-hits></dx:qa-hits>
+</trans-unit>
+
+<trans-unit id="11" translate5:autostateId="1" translate5:autostateText="reviewed">
+<source>Mit den Einstellungen UNIPOL./FIX.SETPT oder BIPOL./FIX.SETPT, kann das setpoint auch über Anschlüssen ausgewählt werden (festes setpoint).</source>
+<target dx:match-quality="0.0">With the settings UNIPOL./FIX.SETPT or BIPOL./FIX.SETPT, the setpoint can also be selected via terminals (fixed setpoint). - edited</target>
+<alt-trans dx:origin-shorttext="target" alttranstype="previous-version">
+<target xml:lang="de">With the settings UNIPOL./FIX.SETPT or BIPOL./FIX.SETPT, the setpoint can also be selected via terminals (fixed setpoint).</target></alt-trans>
+<alt-trans dx:origin-shorttext="target-diff" alttranstype="reference">
+<target xml:lang="de">With the settings UNIPOL./FIX.SETPT or BIPOL./FIX.SETPT, the setpoint can also be selected via terminals (fixed setpoint).<mrk mtype="x-sdl-added" sdl:revid="replaced-for-testing"> - edited</mrk></target></alt-trans>
+<state stateid="0"></state>
+<dx:qa-hits></dx:qa-hits>
+</trans-unit>
+
+<trans-unit id="12" translate5:autostateId="1" translate5:autostateText="reviewed">
+<source>Test regex before       µ       <tag> protection~ &lt;/tag&gt;</source>
+<target dx:match-quality="0.0">Teste regex vor       µ       <tag> Schutz ~ &lt;/tag&gt; - edited</target>
+<alt-trans dx:origin-shorttext="target" alttranstype="previous-version">
+<target xml:lang="de">Teste regex vor       µ       <tag> Schutz ~ &lt;/tag&gt;</target></alt-trans>
+<alt-trans dx:origin-shorttext="target-diff" alttranstype="reference">
+<target xml:lang="de">Teste regex vor       µ       <tag> Schutz ~ &lt;/tag&gt;<mrk mtype="x-sdl-added" sdl:revid="replaced-for-testing"> - edited</mrk></target></alt-trans>
+<state stateid="0"></state>
+<dx:qa-hits></dx:qa-hits>
+</trans-unit>
+
+<trans-unit id="13" translate5:autostateId="1" translate5:autostateText="reviewed">
+<source>Test §regex %after § <tag> protection% </tag></source>
+<target dx:match-quality="0.0">Teste §regex %nach § <tag> Schutz% </tag> - edited</target>
+<alt-trans dx:origin-shorttext="target" alttranstype="previous-version">
+<target xml:lang="de">Teste §regex %nach § <tag> Schutz% </tag></target></alt-trans>
+<alt-trans dx:origin-shorttext="target-diff" alttranstype="reference">
+<target xml:lang="de">Teste §regex %nach § <tag> Schutz% </tag><mrk mtype="x-sdl-added" sdl:revid="replaced-for-testing"> - edited</mrk></target></alt-trans>
 <state stateid="0"></state>
 <dx:qa-hits></dx:qa-hits>
 </trans-unit>
