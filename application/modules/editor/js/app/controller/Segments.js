@@ -487,8 +487,11 @@ Ext.define('Editor.controller.Segments', {
    */
   saveChainSave: function() {
       var me = this,
-          ed = me.getSegmentGrid().editingPlugin,
-          record = ed.context.record;
+          grid = me.getSegmentGrid(),
+          store = grid.store,
+          ed = grid.editingPlugin,
+          record = ed.context.record,
+          recordindex = store.indexOf(record);
       
       //its possible that the editor is already destroyed by editorDomCleanUp, then the save process wouldn't work.
       if(!ed || !ed.editor){
@@ -512,6 +515,7 @@ Ext.define('Editor.controller.Segments', {
       //parameter is the callback to the final save chain call, for later usage in ChangeAlike Handling
       me.fireEvent('afterSaveCall', function(){
           me.saveChainEnd();
+          me.scrollOrFocus(recordindex);
       });
   },
   /**
