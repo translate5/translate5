@@ -333,7 +333,6 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
     /**
      * overrides original focusing with our repositioning of the editor
      */
-    // TUK
     focusContextCell: function() {
         var me = this, 
             toDis = me.linkedDisplayField,
@@ -1137,7 +1136,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         me.setColumnToEdit(me.context.column);
         me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit), record.get('id'), me.columnToEdit);
         me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
-        me.focusContextCell(); // TUKTUK
+        me.focusContextCell();
         // From Ext4 end
     },
 
@@ -1361,7 +1360,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
             
         if (!isOnShow) {
             viewEl.setStyle('padding-top', 'initial');
-            viewEl.setStyle('padding-bottom', 'initial');
+            //viewEl.setStyle('padding-bottom', 'initial');
             return true;
         }
             
@@ -1370,9 +1369,27 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
             viewEl.setStyle('padding-top', padding+'px');
         }
         
-        if (editorBottom < rowBottom) {
+        // this somehow messes the scrolling
+        /*if (editorBottom < rowBottom) {
             padding = rowBottom - editorBottom;
             viewEl.setStyle('padding-bottom', padding+'px');
+        }*/
+    },
+    scrollEditedRowUnderTheEditor: function() {
+        var me = this,
+            editingPlugin = me.editingPlugin,
+            grid = editingPlugin.grid,
+            view = grid.getView(),
+            viewEl = view.getEl(),
+            context = me.context,
+            wrapEl = me.wrapEl,
+            row = Ext.get(context.row),
+            editorTop = me.calculateLocalRowTop(wrapEl),
+            rowTop = me.calculateLocalRowTop(row),
+            scrollDelta = Math.abs(editorTop - rowTop);
+
+        if (scrollDelta != 0) {
+            viewEl.scrollBy(0, scrollDelta, false);
         }
     },
     onShow: function() {
@@ -1391,6 +1408,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         me.setEditorWidth();
         me.reposition();
         me.toggleExtraSpaceToGridBody(true);
+        me.scrollEditedRowUnderTheEditor();
     },
 
     onHide: function() {
