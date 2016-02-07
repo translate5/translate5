@@ -66,7 +66,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
     //beinhaltet den gekürzten Inhalt des letzten geöffneteten Segments
     lastSegmentShortInfo: '',
     columnToEdit: null,
-    columnToEditOrigHeight: 0,
+    rowToEditOrigHeight: 0,
     editorExtraHeight: 20,
     editorFieldExtraHeight: 10,
     editorShadowsExtraHeight: 4, // see css/translate5.css class .x-grid-row-editor-wrap
@@ -982,8 +982,12 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
     // So in a large, scrolled grid, this could be several thousand pixels.
     //
     calculateLocalRowTop: function(row) {
-        var grid = this.editingPlugin.grid;
-        return Ext.fly(row).getOffsetsTo(grid)[1] - grid.el.getBorderWidth('t') + this.lastScrollTop;
+        var me = this,
+            grid = me.editingPlugin.grid,
+            scrollingView = me.scrollingView,
+            scrollTop  = scrollingView.getScrollY();
+            
+        return Ext.fly(row).getOffsetsTo(grid)[1] - grid.el.getBorderWidth('t') + scrollTop;
     },
 
     // Given the top pixel position of a row in the scroll space,
@@ -1306,11 +1310,11 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         var me = this,
             context = me.context,
             row = Ext.get(context.row),
-            rowHeight = row.getHeight()
+            rowHeight = row.getHeight(),
             editorHeight = rowHeight + me.editorExtraHeight,
             editorFieldHeight = rowHeight + me.editorFieldExtraHeight;
         
-        me.columnToEditOrigHeight = rowHeight;
+        me.rowToEditOrigHeight = rowHeight;
         row.setHeight(editorHeight + me.editorShadowsExtraHeight);
         me.setHeight(editorHeight);
         me.mainEditor.setHeight(editorFieldHeight);
@@ -1320,8 +1324,8 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
             context = me.context,
             row = Ext.get(context.row);
 
-        row.setHeight(me.columnToEditOrigHeight);
-        me.columnToEditOrigHeight = 0;
+        row.setHeight(me.rowToEditOrigHeight);
+        me.rowToEditOrigHeight = 0;
     },
     setEditorWidth: function() {
         var me = this,
@@ -1339,6 +1343,38 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         
         me.setWidth(columnsWidth);
     },
+    toggleExtraSpaceToGridBody: function(isOnShow) {
+        var me = this,
+            editingPlugin = me.editingPlugin,
+            grid = editingPlugin.grid,
+            viewEl = grid.getView().getEl(),
+            context = me.context,
+            wrapEl = me.wrapEl,
+            row = Ext.get(context.row),
+            editorTop = me.calculateLocalRowTop(wrapEl),
+            rowTop = me.calculateLocalRowTop(row),
+            editorHeight = me.rowToEditOrigHeight + me.editorExtraHeight + me.editorShadowsExtraHeight,
+            rowHeight = row.getHeight(),
+            editorBottom = editorTop + editorHeight,
+            rowBottom = rowTop + rowHeight,
+            padding = 0;
+            
+        if (!isOnShow) {
+            viewEl.setStyle('padding-top', 'initial');
+            viewEl.setStyle('padding-bottom', 'initial');
+            return true;
+        }
+            
+        if (editorTop > rowTop) {
+            padding = editorTop - rowTop;
+            viewEl.setStyle('padding-top', padding+'px');
+        }
+        
+        if (editorBottom < rowBottom) {
+            padding = rowBottom - editorBottom;
+            viewEl.setStyle('padding-bottom', padding+'px');
+        }
+    },
     onShow: function() {
         var me = this;
 
@@ -1354,6 +1390,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         me.setEditorHeight();
         me.setEditorWidth();
         me.reposition();
+        me.toggleExtraSpaceToGridBody(true);
     },
 
     onHide: function() {
@@ -1361,6 +1398,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
             column,
             focusContext;
 
+        me.toggleExtraSpaceToGridBody(false);
             // Try to push focus into the cell below the active field
         if (me.activeField) {
             column = me.activeField.column;
