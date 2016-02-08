@@ -118,8 +118,3 @@ th {text-align:left;}
 form#acceptLicense .description { float:right;position:relative;left:-52px;margin-top:0;}
 form#acceptLicense dd {margin: 0;}
 form#acceptLicense ul.errors {list-style-type: none;padding:0; margin:0 0 -10px 36px;position:relative;top:-18px;}
-
-.x-grid-row-editor-wrap {
-    box-shadow: inset 0 2px 0px #ffffff, /* inner shadow */
-                      0 2px 5px #000000; /* drop shadow */
-}
