@@ -584,7 +584,7 @@ Ext.define('Editor.controller.Editor', {
   getColInfo: function() {
     var me = this,
         plug = me.getEditPlugin(),
-        columns = me.getSegmentGrid().query('.contentEditableColumn:not([hidden])'),
+        columns = me.getSegmentGrid().query('contentEditableColumn:not([hidden])'),
         foundIdx = false,
         current = plug.editor.getEditedField();
     
@@ -632,7 +632,7 @@ Ext.define('Editor.controller.Editor', {
         grid = me.getSegmentGrid(),
         selModel = grid.getSelectionModel(),
         ed = edCtrl.getEditPlugin(),
-        cols = grid.query('.contentEditableColumn:not([hidden])'),
+        cols = grid.query('contentEditableColumn:not([hidden])'),
         sel = [];
     
     if (ed.openedRecord === null)
