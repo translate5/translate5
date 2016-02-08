@@ -73,6 +73,10 @@ END LICENSE AND COPYRIGHT
     overflow: visible;
 }
 
+.x-grid-row-editor-wrap {
+    box-shadow: 0px 0px 25px 0px rgba(0,0,0,0.75);
+}
+
 #segment-grid .x-grid-cell-inner {
   padding-top:6px;
   padding-bottom:6px;
