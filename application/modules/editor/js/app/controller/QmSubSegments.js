@@ -56,18 +56,17 @@ Ext.define('Editor.controller.QmSubSegments', {
     {
     	ref : 'qmFieldset',
     	selector : 'qmSubsegmentsFlagFieldset' //first menu level
-    },
-    {
+    },{
 	    ref : 'segmentGrid',
 	    selector : '#segmentgrid'
+    },{
+	    ref : 'metaInfoForm',
+	    selector : '#metaInfoForm'
     },{
         ref: 'metaSevCombo',
         selector: '#metapanel combobox[name="qmsubseverity"]'
     }],
     listen: {
-        global: {
-            editorViewportOpened: 'handleInitEditor'
-        },
         component: {
             '#segmentgrid #qmsummaryBtn': {
                 click:'showQmSummary'
@@ -79,7 +78,7 @@ Ext.define('Editor.controller.QmSubSegments', {
                 click: 'handleAddQmFlagClick'
             },
             '#metaInfoForm': {
-                beforerender: 'initFieldSet'
+                afterrender: 'handleInitEditor'
             },
             'segmentsHtmleditor': {
                 afterinitframedoc: 'initIframeDoc',
@@ -91,9 +90,6 @@ Ext.define('Editor.controller.QmSubSegments', {
     	emptySelText: '##UT##Bitte wählen Sie im Editor ein Subsegment aus!',
     	emptySelTitle: '##UT##Kein Subsegment ausgewählt.'
     },
-    init: function(app) {
-        var me = this;
-    },
     handleAfterRender: function(){
         var me = this;
         
@@ -102,6 +98,7 @@ Ext.define('Editor.controller.QmSubSegments', {
         });
     },
     handleInitEditor: function() {
+        this.initFieldSet();
         var combo = this.getMetaSevCombo(),
             sevStore = Ext.create('Ext.data.Store', {
                 fields: ['id', 'text'],
@@ -111,17 +108,17 @@ Ext.define('Editor.controller.QmSubSegments', {
         //bindStore dynamically to combo:
         combo.bindStore(sevStore);
         combo.setValue(sevStore.getAt(0).get('id'));
-        this.menuConfig = this.getMenuConfig();
     },
     /**
      * initialises the QM SubSegment Fieldset in the MetaPanel
      */
-    initFieldSet: function(mpForm) {
+    initFieldSet: function() {
     	if(!Editor.data.task.hasQmSub()){
     		return;
     	}
-    	var pos = mpForm.items.findIndex('itemId', 'metaQm');
-    	mpForm.insert(pos, {xtype: 'qmSubsegmentsFlagFieldset', masterController: this});
+    	var mpForm = this.getMetaInfoForm(),
+    		pos = mpForm.items.findIndex('itemId', 'metaQm');
+    	mpForm.insert(pos, {xtype: 'qmSubsegmentsFlagFieldset', menuConfig: this.getMenuConfig()});
     },
     /**
      * generates the config menu tree for QM Flag Menu
@@ -158,10 +155,6 @@ Ext.define('Editor.controller.QmSubSegments', {
 	                    	if(component.keyNav) {
 	                    		component.keyNav.disable();
 	                    	}
-	                    	// Hide menu and then re-show so that alignment is correct.
-	                    	// see http://stackoverflow.com/questions/6687551/extjs-incorrect-dropdown-menu-alignment
-	                        component.hide();
-	                        component.show();
 	                    }
                 	}
 				};

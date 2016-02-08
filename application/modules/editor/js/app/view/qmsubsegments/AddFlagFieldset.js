@@ -48,19 +48,18 @@ Ext.define('Editor.view.qmsubsegments.AddFlagFieldset', {
 		commentLabel: '##UT##Kommentar',
 		qmAddBtn: '##UT##QM Subsegment hinzufügen'
 	},
-	initComponent : function() {
-		var me = this;
-		Ext.applyIf(me, {
+	initConfig: function(instanceConfig) {
+		var me = this,
+		    config = {
 			items : [{
-				xtype : 'button',
-				text : me.strings.qmAddBtn,
-				margin: '0 0 6 0',
-				menu : {
+				xtype: 'button',
+				text: me.strings.qmAddBtn,
+				//margin: '0 0 0 0',
+				menu: {
+				    xtype: 'menu',
 					bodyCls: 'qmflag-menu',
+					items: instanceConfig.menuConfig,
 					listeners: {
-					    beforerender: function(component) {
-					        component.add(me.masterController.menuConfig);
-					    },
 	                    afterrender: function(component) {
 	                    	if(component.keyNav) {
 	                    		component.keyNav.disable();
@@ -85,7 +84,10 @@ Ext.define('Editor.view.qmsubsegments.AddFlagFieldset', {
 				fieldLabel: me.strings.commentLabel,
 				name: 'qmsubcomment'
 			}]
-		});
-		me.callParent(arguments);
+		};
+        if (instanceConfig) {
+            me.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
 	}
 });
