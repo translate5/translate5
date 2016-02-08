@@ -279,7 +279,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         //FIXME ext6 update single controller testcode
         $controllers = array();
-        //$controllers[] = 'ServerException';
+        $controllers[] = 'ServerException';
         $controllers[] = 'ViewModes';
         $controllers[] = 'Segments';
         $controllers[] = 'Preferences';
