@@ -973,14 +973,6 @@
 	<source>In Feld: {0}</source>
 	<target>In field: {0}</target>
       </trans-unit>
-      <trans-unit id='Vm9yaGVyaWdlIFNwYWx0ZSBlZGl0aWVyZW4='>
-	<source>Vorherige Spalte editieren</source>
-	<target>edit previous column</target>
-      </trans-unit>
-      <trans-unit id='TsOkY2hzdGUgU3BhbHRlIGVkaXRpZXJlbg=='>
-	<source>Nächste Spalte editieren</source>
-	<target>edit next column</target>
-      </trans-unit>
       <trans-unit id='RGFzIFNlZ21lbnQga2FubiBuaWNodCBvaG5lIEluaGFsdCBnZXNwZWljaGVydCB3ZXJkZW4h'>
 	<source>Das Segment kann nicht ohne Inhalt gespeichert werden!</source>
 	<target>The segment could not be saved without content!</target>
@@ -1068,8 +1060,8 @@
 	  <source>Warnung!</source>
 	  <target>Warning!</target>
 	</trans-unit>
-	<trans-unit id='VGVybWUgZGVzIHp1bGV0enQgYmVhcmJlaXRldGVuIFNlZ21lbnRzIGtvbm50ZW4gbmljaHQgYXVzZ2V6ZWljaG5ldCB3ZXJkZW4u'>
-	  <source>Terme des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.</source>
+	<trans-unit id='VGVybWluaSBkZXMgenVsZXR6dCBiZWFyYmVpdGV0ZW4gU2VnbWVudHMga29ubnRlbiBuaWNodCBhdXNnZXplaWNobmV0IHdlcmRlbi4='>
+	  <source>Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.</source>
 	  <target>The term tagger could not tag the terminology in the last edited segment!</target>
 	</trans-unit>
 	<trans-unit id='QXVmZ2FiZSAiezB9IiB2b2xsc3TDpG5kaWcgaW1wb3J0aWVydA=='>
@@ -1080,7 +1072,7 @@
 	  <source>Die Anfrage über das Internet an den Server dauerte zu lange. Dies kann an Ihrer Internetverbindung oder an einer Überlastung des Servers liegen. Bitte versuchen Sie es erneut.</source>
 	  <target> The query over the Internet to the server took too long. This may be because of your internet connection or a server overload. Please try again.</target>
 	</trans-unit>
-        <trans-unit id='RGllIG5hY2hmb2xnZW5kZW4gVGFncyB3dXJkZW4gYmVpbSBFZGl0aWVyZW4gZ2Vsw7ZzY2h0LCBkYXMgU2VnbWVudCBrYW5uIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbi4gPGJyIC8+PGJyIC8+VmVyc3VjaGVuIFNpZSBtaXQgZGVyIFLDvGNrZ8OkbmdpZ2Z1bmt0aW9uIFNUUkctWiBkaWUgVGFncyB3aWVkZXJoZXJ6dXN0ZWxsZW4uIDxiciAvPjxiciAvPkFsdGVybmF0aXYga8O2bm5lbiBTaWUgYXVjaCBkaWUgQmVhcmJlaXR1bmcgZGVzIFNlZ21lbnRzIGR1cmNoIEtsaWNrIGF1ZiAiQWJicmVjaGVuIiBiZWVuZGVuIHVuZCBkYXMgU2VnbWVudCBuZXUgenVyIEJlYXJiZWl0dW5nIMO2ZmZuZW4uPGJyIC8+PGJyIC8+RmVobGVuZGUgVGFnczo='><source>Die nachfolgenden Tags wurden beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Versuchen Sie mit der Rückgängigfunktion STRG-Z die Tags wiederherzustellen. <br /><br />Alternativ können Sie auch die Bearbeitung des Segments durch Klick auf "Abbrechen" beenden und das Segment neu zur Bearbeitung öffnen.<br /><br />Fehlende Tags:</source><target>The following tags have been deleted during editing, the segment can not be saved. <br />Try to restore the tags by using the Undo function CTRL-Z. <br /> Alternatively, you can also stop the processing of the segment by clicking on "Cancel" and reopen the segment for processing. <br /> Missing Tags:</target></trans-unit>
+	<trans-unit id='RGllIG5hY2hmb2xnZW5kZW4gVGFncyB3dXJkZW4gYmVpbSBFZGl0aWVyZW4gZ2Vsw7ZzY2h0LCBkYXMgU2VnbWVudCBrYW5uIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbi4gPGJyIC8+PGJyIC8+VmVyc3VjaGVuIFNpZSBtaXQgZGVyIFLDvGNrZ8OkbmdpZ2Z1bmt0aW9uIFNUUkctWiBkaWUgVGFncyB3aWVkZXJoZXJ6dXN0ZWxsZW4uIDxiciAvPjxiciAvPkFsdGVybmF0aXYga8O2bm5lbiBTaWUgYXVjaCBkaWUgQmVhcmJlaXR1bmcgZGVzIFNlZ21lbnRzIGR1cmNoIEtsaWNrIGF1ZiAiQWJicmVjaGVuIiAoPGltZyBzcmM9Ii4uL21vZHVsZXMvZWRpdG9yL2ltYWdlcy9jcm9zcy5wbmciIC8+IGltIHJlY2h0ZW4gTWVuw7wpIGJlZW5kZW4gdW5kIGRhcyBTZWdtZW50IG5ldSB6dXIgQmVhcmJlaXR1bmcgw7ZmZm5lbi48YnIgLz48YnIgLz5GZWhsZW5kZSBUYWdzOg=='><source>Die nachfolgenden Tags wurden beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Versuchen Sie mit der Rückgängigfunktion STRG-Z die Tags wiederherzustellen. <br /><br />Alternativ können Sie auch die Bearbeitung des Segments durch Klick auf "Abbrechen" (<img src="../modules/editor/images/cross.png" /> im rechten Menü) beenden und das Segment neu zur Bearbeitung öffnen.<br /><br />Fehlende Tags:</source><target>The following tags have been deleted during editing, the segment can not be saved. <br />Try to restore the tags by using the Undo function CTRL-Z. <br /> Alternatively, you can also stop the processing of the segment by clicking on "Cancel" (<img src="../modules/editor/images/cross.png" /> in the menu on the right) and reopen the segment for processing. <br /> Missing Tags:</target></trans-unit>
         <trans-unit id='RmVobGVyIGJlaGViZW4='>
 	  <source>Fehler beheben</source>
 	  <target>Correct errors</target>
@@ -1163,6 +1155,86 @@
     <source>Die Aufgabe ist durch einen Benutzer gesperrt</source>
     <target>The task is locked by a user</target>
   </trans-unit>
+  <trans-unit id='QUNIVFVORzogRWluIHdlaXRlcmVyIEZpbHRlciBpc3QgZ2VzZXR6dC4gRXMgaXN0IGRhaGVyIG3DtmdsaWNoLCBkYXNzIG5pY2h0IGFsbGUgU2VnbWVudGUgZGVyIE1lcmtsaXN0ZSBzaWNodGJhciBzaW5k'>
+    <source>ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Merkliste sichtbar sind</source>
+    <target>WARNING: Another filter is set. It is possible, that not all segments of the watchlist are visible</target>
+  </trans-unit>
+  <trans-unit id='TWVya2xpc3Rl'>
+    <source>Merkliste</source>
+    <target>watchlist</target>
+  </trans-unit>
+  <trans-unit id='U2VnbWVudCBhdWYgZGllIE1lcmtsaXN0ZSBzZXR6ZW4gKFNUUkcgKyBEKQ=='>
+    <source>Segment auf die Merkliste setzen (STRG + D)</source>
+    <target>add segment to my watchlist (CTRL + D)</target>
+  </trans-unit>
+  <trans-unit id='U2VnbWVudCB2b24gZGVyIE1lcmtsaXN0ZSBlbnRmZXJuZW4gKFNUUkcgKyBEKQ=='>
+    <source>Segment von der Merkliste entfernen (STRG + D)</source>
+    <target>remove segment from my watchlist (CTRL + D)</target>
+  </trans-unit>  
+<trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgQUxUICsgRU5URVIp'>
+  <source>Speichern und nächstes Segment öffnen (STRG + ALT + ENTER)</source>
+  <target>Save and open next segment (CTRL + ALT + ENTER)</target>
+</trans-unit>
+<trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCBpbSBXb3JrZmxvdyDDtmZmbmVuIChTVFJHICsgRU5URVIp'>
+  <source>Speichern und nächstes Segment im Workflow öffnen (STRG + ENTER)</source>
+  <target>Save and open next segment in workflow (CTRL + ENTER)</target>
+</trans-unit>
+<trans-unit id='U3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgw7ZmZm5lbiAoU1RSRyArIEFMVCArIFNISUZUICsgRU5URVIp'>
+  <source>Speichern und vorheriges Segment öffnen (STRG + ALT + SHIFT + ENTER)</source>
+  <target>Save and open previous segment (CTRL + ALT + SHIFT + ENTER)</target>
+</trans-unit>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgQUxUICsg4oaTKQ=='>
+  <source>Nicht speichern und nächstes Segment öffnen (STRG + ALT + ↓)</source>
+  <target>Don't save and open next segment (CTRL + ALT + ↓)</target>
+</trans-unit>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgw7ZmZm5lbiAoU1RSRyArIEFMVCArIOKGkSk='>
+  <source>Nicht speichern und vorheriges Segment öffnen (STRG + ALT + ↑)</source>
+  <target>Don't save and open previous segment (CTRL + ALT + ↑)</target>
+</trans-unit>
+<trans-unit id='S2VpbiBwYXNzZW5kZXMgU2VnbWVudCB2b3JoYW5kZW4gYnp3LiBpbSBad2lzY2hlbnNwZWljaGVyIGdlZnVuZGVuLiBCaXR0ZSBzY3JvbGxlbiBTaWUgbWFudWVsbCB3ZWl0ZXIh'>
+  <source>Kein passendes Segment vorhanden bzw. im Zwischenspeicher gefunden. Bitte scrollen Sie manuell weiter!</source>
+  <target>No applicable segment exists or found in the segment cache. Please scroll down manually!</target>
+</trans-unit>
+<trans-unit id='RGVtIGF1c2dld8OkaGx0ZW4gU2VnbWVudCBlaW5lbiBLb21tZW50YXIgaGluenVmw7xnZW4uIChTVFJHICsgQUxUICsgYyk='>
+  <source>Dem ausgewählten Segment einen Kommentar hinzufügen. (STRG + ALT + c)</source>
+  <target>Add a comment to the select segment. (CTRL + ALT + c)</target>
+</trans-unit>
+<trans-unit id='Vm9yaGVyaWdlIFNwYWx0ZSBlZGl0aWVyZW4gKFNUUkcgKyBBTFQgKyDihpAp'>
+  <source>Vorherige Spalte editieren (STRG + ALT + ←)</source>
+  <target>Edit previous column (CTRL + ALT + ←)</target>
+</trans-unit>
+<trans-unit id='TsOkY2hzdGUgU3BhbHRlIGVkaXRpZXJlbiAoU1RSRyArIEFMVCArIOKGkik='>
+  <source>Nächste Spalte editieren (STRG + ALT + →)</source>
+  <target>Edit next column (CTRL + ALT + →)</target>
+</trans-unit>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCBpbSBXb3JrZmxvdyDDtmZmbmVuIChBTFQgKyBCaWxkIOKGkyk='>
+  <source>Nicht speichern und nächstes Segment im Workflow öffnen (ALT + Bild ↓)</source>
+  <target>Don't save and open next segment in workflow (ALT + page ↓)</target>
+</trans-unit>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgaW0gV29ya2Zsb3cgw7ZmZm5lbiAoQUxUICsgQmlsZCDihpEp'>
+  <source>Nicht speichern und vorheriges Segment im Workflow öffnen (ALT + Bild ↑)</source>
+  <target>Don't save and open previous segment in workflow (ALT + page ↑)</target>
+</trans-unit>
+<trans-unit id='RGFzIFNlZ21lbnQgd3VyZGUgYXVmIGRlbiB1cnNwcsO8bmdsaWNoZW4gWnVzdGFuZCBuYWNoIGRlbSBJbXBvcnQgenVyw7xja2dlc2V0enQu'>
+  <source>Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.</source>
+  <target>The segment content was resetted to the original import state.</target>
+</trans-unit>
+<trans-unit id='U2VnbWVudCBhdWYgaW5pdGlhbGVuIEluaGFsdCB6dXLDvGNrc2V0emVuIChBTFQgKyBFTlRGKQ=='>
+  <source>Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)</source>
+  <target>Reset segment to initial content (ALT + DEL)</target>
+</trans-unit>
+<trans-unit id='QWJicmVjaGVuIChFU0Mp'>
+  <source>Abbrechen (ESC)</source>
+  <target>cancel (ESC)</target>
+</trans-unit>
+<trans-unit id='U3BlaWNoZXJuIChTVFJHICsgUyk='>
+  <source>Speichern (STRG + S)</source>
+  <target>save (CTRL + S)</target>
+</trans-unit>
+<trans-unit id='U2VnbWVudCBhdWYgZGVuIGF1c2dld8OkaGx0ZW4gU3RhdHVzIHNldHplbiAoU1RSRyArIEFMVCArIHswfSk='>
+  <source>Segment auf den ausgewählten Status setzen (STRG + ALT + {0})</source>
+  <target>Set segment to the choosen state (CTRL + ALT + {0})</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="stemmingRuleForGerman" creator="beo" mandatory="yes" sourceLang="DE" targetLang="EN" tbxPath="DE-EN-stemming.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>Prüft, ob die folgende Stemming-Regel funktioniert (nur für's Deutsche): "Im Deutschen taggt der TermTagger nie Wörter, die kürzer sind als der in der TBX hinterlegte Terminus."</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>sich sicher
+Rad Räder Radstern
+Luft Lüfte lüften Lüfter
+Start starten Starter</source>
+            <target>oneself safe
+wheel wheels wheel spider
+air airs ventilation fan
+start start starter</target>
+        </input>
+        <expectedOutput>
+            <source>sich <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">sicher</div>
+Rad Räder <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Radstern</div>
+Luft Lüfte <div title="" class="term admittedTerm stemmed transFound" data-tbxid="xyz">lüften</div> <div title="" class="term admittedTerm exact transNotFound" data-tbxid="xyz">Lüfter</div>
+Start <div title="" class="term admittedTerm stemmed transFound" data-tbxid="xyz">starten</div> <div title="" class="term admittedTerm exact transNotFound" data-tbxid="xyz">Starter</div></source>
+            <target>oneself <div title="" class="term admittedTerm exact" data-tbxid="xyz">safe</div>
+wheel wheels <div title="" class="term admittedTerm exact" data-tbxid="xyz">wheel spider</div>
+air airs ventilation <div title="" class="term admittedTerm exact" data-tbxid="xyz">fan</div>
+start start <div title="" class="term admittedTerm exact" data-tbxid="xyz">starter</div></target>
+        </expectedOutput>
+    </assertion>
+</testcase>
+

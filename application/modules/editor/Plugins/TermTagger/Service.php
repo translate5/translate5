@@ -116,8 +116,8 @@ class editor_Plugins_TermTagger_Service {
         }
         
         $version = $response->getBody();
-        // $url is OK if status == 200 AND string 'TermTagger Server' is in the response-body
-        return $response && $this->wasSuccessfull() && strpos($response->getBody(), 'TermTagger Server') !== false;
+        // $url is OK if status == 200 AND string 'de.folt.models.applicationmodel.termtagger.TermTaggerRestServer' is in the response-body
+        return $response && $this->wasSuccessfull() && strpos($response->getBody(), 'de.folt.models.applicationmodel.termtagger.TermTaggerRestServer') !== false;
     }
     
     /**
@@ -142,10 +142,15 @@ class editor_Plugins_TermTagger_Service {
      * @param string $url url of the TermTagger-Server
      * @param string $tbxHash TBX hash
      * @param string $tbxData TBX data 
-     * 
-     * @return Zend_Http_Response|false
+     * @throws editor_Plugins_TermTagger_Exception_Open
+     * @throws editor_Plugins_TermTagger_Exception_Request
+     * @return Zend_Http_Response
      */
     public function open(string $url, string $tbxHash, string $tbxData) {
+        if(empty($tbxHash)) {
+            throw new editor_Plugins_TermTagger_Exception_Open('TBX hash is empty!');
+        }
+        
         return $this->_open($url, $tbxHash, $tbxData);
     }
     
@@ -155,6 +160,8 @@ class editor_Plugins_TermTagger_Service {
      * @param string $tbxHash
      * @param string $tbxData
      * @param array $moreParams
+     * @throws editor_Plugins_TermTagger_Exception_Open
+     * @throws editor_Plugins_TermTagger_Exception_Request
      * @return Zend_Http_Response
      */
     private function _open($url, $tbxHash, $tbxData, $moreParams = array()) {
@@ -171,23 +178,25 @@ class editor_Plugins_TermTagger_Service {
         $httpClient->setConfig(array('timeout' => (integer)$this->config->timeOut->tbxParsing));
         $httpClient->setRawData(json_encode($serverCommunication), 'application/json');
         $response = $this->sendRequest($httpClient, $httpClient::POST);
-        if(!$response) {
-            //was exception => already logged
-            return null;
-        }
         if(!$this->wasSuccessfull()) {
             $msg = 'TermTagger HTTP Status was: '.$this->getLastStatus();
             $msg .= "\n URL: ".$httpClient->getUri(true);
-            $this->log->logError('Result of opening a TBX was not OK! More details in error log.', $msg);
+            $this->log->logError('INFO: Opening a TBX in termtagger '.$url.' was NOT successfull!', $msg."\n\nMore details in error log!\n\n");
             $msg .= "\n\nPlain Server Response: ".print_r($response,true);
             $msg .= "\n\nRequested Data: ".print_r($serverCommunication,true);
             error_log($msg);
-            return null;
+            throw new editor_Plugins_TermTagger_Exception_Open('TermTagger HTTP Result was not successfull!');
         }
         
         $response = $this->decodeServiceResult($response);
         if (!$response) {
-            return NULL;
+            $msg = 'Could not decode TermTagger result!';
+            $msg .= "\n URL: ".$httpClient->getUri(true);
+            $this->log->logError('INFO: Opening a TBX in termtagger '.$url.' has PERHAPS failed!', $msg."\n\nMore details in error log!\n\n");
+            $msg .= "\n\nPlain Server Response: ".print_r($response,true);
+            $msg .= "\n\nRequested Data: ".print_r($serverCommunication,true);
+            error_log($msg);
+            throw new editor_Plugins_TermTagger_Exception_Open('TermTagger HTTP Result could not be decoded!');
         }
         return $response;
     }
@@ -196,7 +205,8 @@ class editor_Plugins_TermTagger_Service {
      * send request method with unified logging
      * @param Zend_Http_Client $client
      * @param string $method
-     * @return Zend_Http_Response | false on error
+     * @throws editor_Plugins_TermTagger_Exception_Request
+     * @return Zend_Http_Response
      */
     protected function sendRequest(Zend_Http_Client $client, $method) {
         $this->lastStatus = false;
@@ -254,7 +264,8 @@ class editor_Plugins_TermTagger_Service {
         
         $response = $this->decodeServiceResult($response);
         if (!$response) {
-            throw new editor_Plugins_TermTagger_Exception_Request('Error on decodeServiceResult in '.__CLASS__.'->'.__FUNCTION__);
+            //processing tagterms 
+            throw new editor_Plugins_TermTagger_Exception_Request('TermTagger : Error on decodeServiceResult');
         }
         
         $response = $this->decodeSegments($response);

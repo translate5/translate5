@@ -288,6 +288,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->data = $this->_getAllParams();
         settype($this->data['wordCount'], 'integer');
         settype($this->data['enableSourceEditing'], 'boolean');
+        settype($this->data['lockLocked'], 'integer');
         $this->data['pmGuid'] = $this->user->data->userGuid;
         $pm = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $pm ZfExtended_Models_User */
@@ -323,6 +324,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $import = ZfExtended_Factory::get('editor_Models_Import');
         /* @var $import editor_Models_Import */
         $import->setEdit100PercentMatches((bool) $this->entity->getEdit100PercentMatch());
+        $import->setLockLocked((bool) $this->entity->getLockLocked());
         $import->setUserInfos($this->user->data->userGuid, $this->user->data->userName);
 
         $import->setLanguages(

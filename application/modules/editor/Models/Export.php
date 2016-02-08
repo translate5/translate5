@@ -101,11 +101,21 @@ class editor_Models_Export {
 
 
     /**
-     * führt den Export aller Dateien eines Task durch
+     * exports a task
      * @param string $exportRootFolder
      * @param boolean $unsetExportRunningStamp, default true
      */
-    public function exportToFolder(string $exportRootFolder,$unsetExportRunningStamp = true) {
+    public function exportToFolder(string $exportRootFolder, $unsetExportRunningStamp = true) {
+        $this->_exportToFolder($exportRootFolder, $unsetExportRunningStamp);
+        $this->startExportedWorker();
+    }
+    
+    /**
+     * internal method to export a task to a folder
+     * @param string $exportRootFolder
+     * @param string $unsetExportRunningStamp
+     */
+    public function _exportToFolder(string $exportRootFolder, $unsetExportRunningStamp) {
         $this->exportFolderExists(true);
         $session = new Zend_Session_Namespace();
         $treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
@@ -181,7 +191,7 @@ class editor_Models_Export {
         if(!file_exists($exportRoot) && !@mkdir($exportRoot, 0777, true)){
             throw new Zend_Exception(sprintf('Temporary Export Folder could not be created! Task: %s Path: %s', $this->taskGuid, $exportRoot));
         }
-        $this->exportToFolder($exportRoot,false);
+        $this->_exportToFolder($exportRoot,false);
         $zipFile = $taskRoot.DIRECTORY_SEPARATOR.'export.zip';
         $filter = ZfExtended_Factory::get('Zend_Filter_Compress',array(
             array(
@@ -200,8 +210,22 @@ class editor_Models_Export {
         );
         $recursivedircleaner->delete($exportRoot);
         $this->unsetExportRunningStamp();
+        
+        $this->startExportedWorker();
+        
         return $zipFile;
     }
+    
+    /**
+     * Starts the final worker which runs after every export related work
+     */
+    protected function startExportedWorker() {
+        $worker = ZfExtended_Factory::get('editor_Models_Export_ExportedWorker');
+        /* @var $worker editor_Models_Export_ExportedWorker */
+        $worker->init($this->task->getTaskGuid());
+        $worker->queue();
+    }
+    
     /**
      * 
      * @param boolean $throwException if folder exists

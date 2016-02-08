@@ -51,10 +51,9 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
      * 'taskGuid' → use the default taskGuid where clause
      * any other string → is used as parameter for mysqldump, {TASKGUID} is later replaced with the taskGuid to be archived
      * @var array
-     * 
-     * FIXME es fehlen z.B: die Zf_configuration für ein Testing des Nicht Vergessen features → Blödsinn, die Zf_conf is per se nicht dabei!
      */
     protected $tables = array(
+            'LEK_browser_log' => false,
             'LEK_comments' => 'taskGuid',
             'LEK_files' => 'taskGuid',
             'LEK_foldertree' => 'taskGuid',
@@ -68,6 +67,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             'LEK_segment_history_data' => 'taskGuid',
             'LEK_segments' => 'taskGuid',
             'LEK_segments_meta' => 'taskGuid',
+            'LEK_segment_user_assoc' => 'taskGuid',
             'LEK_skeletonfiles' => array('--single-transaction', "--where=fileId in (select id from LEK_files where taskGuid = '{TASKGUID}')"),
             'LEK_task' => 'taskGuid',
             'LEK_taskUserAssoc' => 'taskGuid',

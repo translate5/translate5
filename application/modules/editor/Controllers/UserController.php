@@ -43,9 +43,9 @@ class Editor_UserController extends ZfExtended_UserController {
          * Here all entries in TaskUserAssoc are deleted "manually".
          * Normally this should happen automatically on database-level via foreign key and cascading delete.
          */
-        $assoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $assoc editor_Models_TaskUserAssoc */
-        $users = $assoc->deleteByUserguid($this->entity->getUserGuid());
+        $task_user_assoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $task_user_assoc editor_Models_TaskUserAssoc */
+        $task_users = $task_user_assoc->deleteByUserguid($this->entity->getUserGuid());
         
         $this->entity->delete();
     }

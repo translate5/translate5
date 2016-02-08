@@ -87,11 +87,20 @@ class editor_Models_Import {
     protected $_relaisLangValue = NULL;
 
     /**
-     * @var boolean legt für die aktuelle Fileparser-Instanz fest, ob 100-Matches
+     * @var boolean defines for the current fileparser, if 100% matches in orig file 
+     *              will be locked in translate5 as well or not
      *              editiert werden dürfen (true) oder nicht (false)
-     *              Übergabe in URL: false wird bei Übergabe von 0 oder leer-String gesetzt, sonst true
+     *              false if 0 empty string is passed, else true
      */
     public $_edit100PercentMatches = false;
+
+    /**
+     * @var boolean defines for the current fileparser, if segments locked in orig file 
+     *              will be locked in translate5 as well or not
+     *              editiert werden dürfen (true) oder nicht (false)
+     *              false if 0 empty string is passed, else true
+     */
+    public $_lockLocked = false;
     /**
      * @var string import folder, under which the to be imported folder and file hierarchy resides
      */
@@ -416,6 +425,7 @@ class editor_Models_Import {
             $this->gh->basenameLocaleIndependent($path),
             $fileId, 
             $this->_edit100PercentMatches, 
+            $this->_lockLocked, 
             $this->_sourceLang, 
             $this->_targetLang,
             $this->task,
@@ -598,6 +608,13 @@ class editor_Models_Import {
      */
     public function setEdit100PercentMatches(boolean $edit){
         $this->_edit100PercentMatches = $edit;
+    }
+
+    /**
+     * @param boolean $edit
+     */
+    public function setLockLocked(boolean $locked){
+        $this->_lockLocked = $locked;
     }
     /**
      * sets the info/data to the user

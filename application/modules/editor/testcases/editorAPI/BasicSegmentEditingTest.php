@@ -1,4 +1,37 @@
 <?php
+/*
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2015 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3.0 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+
+ There is a plugin exception available for use with this release of translate5 for
+ open source applications that are distributed under a license other than AGPL:
+ Please see Open Source License Exception for Development of Plugins for translate5
+ http://www.translate5.net/plugin-exception.txt or as plugin-exception.txt in the root
+ folder of translate5.
+  
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execptions
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
+
+/**
+ * BasicSegmentEditingTest imports a simple task, checks imported values,
+ * edits segments and checks then the edited ones again on correct content
+ */
 class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
     public static function setUpBeforeClass() {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
@@ -7,6 +40,7 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
             'sourceLang' => 'en',
             'targetLang' => 'de',
             'edit100PercentMatch' => true,
+            'lockLocked' => 1,
         );
         
         self::assertNeededUsers(); //last authed user is testmanager
@@ -50,12 +84,17 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         $autoStateIds = array_map(function($item){
             return $item->autoStateId;
         }, $segments);
-        $this->assertEquals(array('0','0','0','0','0','0','4'), $autoStateIds);
+        $this->assertEquals(array('0','0','0','3','0','0','4'), $autoStateIds);
         
         foreach($segments as $segment) {
             $this->assertEquals('{00000000-0000-0000-C100-CCDDEE000001}', $segment->userGuid);
             $this->assertEquals('manager test', $segment->userName);
-            $this->assertEquals(1, $segment->editable);
+            if($segment->mid === '4'){
+                $this->assertEquals('0', $segment->editable);
+            }
+            else{
+                $this->assertEquals('1', $segment->editable);
+            }
             $this->assertEmpty($segment->qmId);
             $this->assertEquals(0, $segment->stateId);
             $this->assertEquals(0, $segment->fileOrder);
@@ -127,7 +166,7 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         $autoStateIds = array_map(function($item){
             return $item->autoStateId;
         }, $segments);
-        $this->assertEquals(array('0','0','1','0','0','0','1'), $autoStateIds);
+        $this->assertEquals(array('0','0','1','3','0','0','1'), $autoStateIds);
         
         //bulk check of all workflowStepNr fields
         $workflowStepNr = array_map(function($item){
@@ -146,7 +185,6 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
         self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
     }
 }

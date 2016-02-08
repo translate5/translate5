@@ -33,8 +33,11 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_Debug_Bootstrap extends ZfExtended_Plugin_Abstract {
     public function init() {
-        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'));
         $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndexAction'));
+        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'));
+        $this->eventManager->attach('editor_Models_Import_Worker_SetTaskToOpen', 'importCompleted', array($this, 'handleImportCompleted'));
+        $this->eventManager->attach('editor_Models_Export', 'afterExport', array($this, 'handleAfterExport'));
+        $this->eventManager->attach('editor_Models_Export_ExportedWorker', 'exportCompleted', array($this, 'handleExportCompleted'));
     }
     
     public function handleAfterIndexAction(Zend_EventManager_Event $event) {
@@ -50,5 +53,35 @@ class editor_Plugins_Debug_Bootstrap extends ZfExtended_Plugin_Abstract {
         $task = $event->getParam('task');
         /* @var $task editor_Models_Task */
         error_log("Task imported: ".$task->getTaskName().' '.$task->getTaskGuid());
+    }
+    
+    /**
+     * handler for event: editor_Models_Import_Worker_SetTaskToOpen#importCompleted
+     * @param $event Zend_EventManager_Event
+     */
+    public function handleImportCompleted(Zend_EventManager_Event $event) {
+        $task = $event->getParam('task');
+        /* @var $task editor_Models_Task */
+        error_log("Task reopened after import: ".$task->getTaskName().' '.$task->getTaskGuid());
+    }
+    
+    /**
+     * handler for event: editor_Models_Export#afterExport
+     * @param $event Zend_EventManager_Event
+     */
+    public function handleAfterExport(Zend_EventManager_Event $event) {
+        $task = $event->getParam('task');
+        /* @var $task editor_Models_Task */
+        error_log("Task data exported: ".$task->getTaskName().' '.$task->getTaskGuid());
+    }
+    
+    /**
+     * handler for event: editor_Models_Export_ExportedWorker#exportCompleted
+     * @param $event Zend_EventManager_Event
+     */
+    public function handleExportCompleted(Zend_EventManager_Event $event) {
+        $task = $event->getParam('task');
+        /* @var $task editor_Models_Task */
+        error_log("Task exported completly: ".$task->getTaskName().' '.$task->getTaskGuid());
     }
 }

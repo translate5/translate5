@@ -112,13 +112,13 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTag
         /* @var $termTagger editor_Plugins_TermTagger_Service */
         
         try {
-            if (!$this->checkTermTaggerTbx($this->workerModel->getSlot(), $serverCommunication->tbxFile)) {
-                return false;
-            }
+            $this->checkTermTaggerTbx($this->workerModel->getSlot(), $serverCommunication->tbxFile);
             $result = $termTagger->tagterms($this->workerModel->getSlot(), $serverCommunication);
         }
         catch(editor_Plugins_TermTagger_Exception_Abstract $exception) {
             $result = '';
+            $url = $this->workerModel->getSlot();
+            $exception->setMessage('TermTagger '.$url.' (task '.$this->taskGuid.') could not tag segments! Reason: '."\n".$exception->getMessage(), false);
             $this->log->logException($exception);
         }
         

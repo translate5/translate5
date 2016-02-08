@@ -95,6 +95,39 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $this->checkForUpdates();
     }
     
+    /**
+     * Logs the users userAgent and screen size for usability improvements
+     */
+    public function logbrowsertypeAction() {
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender();
+        
+        settype($_POST['appVersion'], 'string');
+        settype($_POST['userAgent'], 'string');
+        settype($_POST['browserName'], 'string');
+        settype($_POST['maxWidth'], 'integer');
+        settype($_POST['maxHeight'], 'integer');
+        settype($_POST['usedWidth'], 'integer');
+        settype($_POST['usedHeight'], 'integer');
+        $userSession = new Zend_Session_Namespace('user');
+        
+        $log = ZfExtended_Factory::get('editor_Models_BrowserLog');
+        /* @var $log editor_Models_BrowserLog */
+        
+        $log->setDatetime(NOW_ISO);
+        $log->setLogin($userSession->data->login);
+        $log->setUserGuid($userSession->data->userGuid);
+        $log->setAppVersion($_POST['appVersion']);
+        $log->setUserAgent($_POST['userAgent']);
+        $log->setBrowserName($_POST['browserName']);
+        $log->setMaxWidth($_POST['maxWidth']);
+        $log->setMaxHeight($_POST['maxHeight']);
+        $log->setUsedWidth($_POST['usedWidth']);
+        $log->setUsedHeight($_POST['usedHeight']);
+        
+        $log->save();
+    }
+    
     protected function checkForUpdates() {
         $downloader = ZfExtended_Factory::get('ZfExtended_Models_Installer_Downloader', array(APPLICATION_PATH.'/..'));
         /* @var $downloader ZfExtended_Models_Installer_Downloader */
@@ -302,7 +335,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         //original code
         $controllers = array('ServerException', 'ViewModes', 'Segments', 
             'Preferences', 'MetaPanel', 'Fileorder', 'Localizer',
-            'ChangeAlike', 'Comments');
+            'ChangeAlike', 'Comments', 'Editor');
         
         $pm = Zend_Registry::get('PluginManager');
         $pluginFrontendControllers = $pm->getActiveFrontendControllers();

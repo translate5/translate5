@@ -158,12 +158,9 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         /* @var $termTagger editor_Plugins_TermTagger_Service */
         
         try {
-            if (!$this->checkTermTaggerTbx($this->workerModel->getSlot(), $serverCommunication->tbxFile)) {
-                $result = '';
-            }
+            $this->checkTermTaggerTbx($this->workerModel->getSlot(), $serverCommunication->tbxFile);
             $result = $termTagger->tagterms($this->workerModel->getSlot(), $serverCommunication);
-            $result->segments = $this->markTransFound($result->segments);
-            $this->saveSegments($result->segments);
+            $this->saveSegments($this->markTransFound($result->segments));
         }
         catch(editor_Plugins_TermTagger_Exception_Malfunction $e) {
             if (empty($state)) {
@@ -173,6 +170,8 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         }
         catch(editor_Plugins_TermTagger_Exception_Abstract $exception) {
             $this->setTermtagState($segmentIds, self::SEGMENT_STATE_UNTAGGED);
+            $url = $this->workerModel->getSlot();
+            $exception->setMessage('TermTagger '.$url.' (task '.$this->taskGuid.') could not tag segments on import! Reason: '."\n".$exception->getMessage(), false);
             $this->log->logException($exception);
             sleep(60);
         }

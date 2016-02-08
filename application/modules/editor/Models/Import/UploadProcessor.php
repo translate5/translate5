@@ -49,11 +49,11 @@ class editor_Models_Import_UploadProcessor {
      * @var array
      */
     protected $validUploadTypes = array(
-        self::TYPE_ZIP => 'application/zip',
-        self::TYPE_SDLXLIFF => 'application/xml',
-        self::TYPE_XLF => 'application/xml',
-        self::TYPE_TESTCASE => 'application/xml',
-        self::TYPE_CSV => 'text/plain',
+        self::TYPE_ZIP => array('application/zip'),
+        self::TYPE_SDLXLIFF => array('application/xml'),
+        self::TYPE_XLF => array('application/xml'),
+        self::TYPE_TESTCASE => array('application/xml'),
+        self::TYPE_CSV => array('text/plain','application/xml','text/html'),//this is due to the fact, that csv-files may contain html or xml fragments. In these cases the php-mime-type extension may recognize them as such.
     );
     
     /**
@@ -101,9 +101,11 @@ class editor_Models_Import_UploadProcessor {
         settype($importName['extension'], 'string');
         $ext = strtolower($importName['extension']);
         $mime = $finfo->file($importFile);
-        
-        if(isset($this->validUploadTypes[$ext]) && $mime == $this->validUploadTypes[$ext]) {
-            return $ext;
+
+        foreach ($this->validUploadTypes[$ext] as $type) {
+            if($mime == $type) {
+                return $ext;
+            }
         }
         
         if(empty($importInfo['importUpload']['size'])) {
@@ -113,7 +115,7 @@ class editor_Models_Import_UploadProcessor {
             $log = ZfExtended_Factory::get('ZfExtended_Log');
             /* @var $log ZfExtended_Log */
             $log->logError('Unknown mime type for extension "'.$ext.'" discovered',
-                            'Someone tried the file extension "'.$ext.'" which should be the mime "'.$this->validUploadTypes[$ext].'" but we got the following mime: "'.$mime.'"');
+                            'Someone tried the file extension "'.$ext.'" which should be one of the mime-types "'.implode(', ',$this->validUploadTypes[$ext]).'" but we got the following mime: "'.$mime.'"');
             $this->addUploadError('noValidUploadFile', $importInfo['importUpload']['name']);
         }
         

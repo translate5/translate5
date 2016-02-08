@@ -171,6 +171,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     protected $counterTerm = 0;
     protected $counterTermInTig = 0;
     
+    /**
+     * internal flag
+     * @var boolean
+     */
+    protected $forceOnImport = false;
+    
     
     const TERM_INSERT_BLOCKSIZE = 15;
 
@@ -211,7 +217,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     protected function importOneTbx(SplFileInfo $file, editor_Models_Task $task, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang){
         
         if(! $file->isReadable()){
-            throw new Zend_Exception($file.' is not Readable!');
+            throw new ZfExtended_Exception($file.' is not Readable!');
         }
         $this->task = $task;
         
@@ -236,13 +242,17 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             array_keys($this->languages),
             array_keys($this->processedLanguages));
         if(!empty($notProcessed)) {
+            $langs = array();
             foreach ($notProcessed as $value) {
-                $this->log('Zur folgenden Sprache wurde kein Terminologie Eintrag aus der TBX Datei gefunden: '.implode('-',$this->languages[$value]));
+                $langs[]= implode('-',$this->languages[$value]);
             }
+            throw new ZfExtended_NotAcceptableException('For the following languages no term has been found in the tbx file: '.implode(', ', $langs));
         }
         $this->xml->close();
         
+        $this->forceOnImport = true;
         $this->assertTbxExists($this->task, new SplFileInfo(self::getTbxPath($this->task)));
+        $this->forceOnImport = false;
     }
     
     /**
@@ -251,7 +261,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
      * @param SplFileInfo $tbxPath
      */
     public function assertTbxExists(editor_Models_Task $task, SplFileInfo $tbxPath) {
-        if($tbxPath->isReadable()) {
+        if(!$this->forceOnImport && $tbxPath->isReadable()) {
             return file_get_contents($tbxPath);
         }
         //after recreation we need to fetch the IDs!

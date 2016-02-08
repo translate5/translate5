@@ -197,7 +197,8 @@ abstract class editor_Models_Export_FileParser {
      * @return string $segment
      */
     protected function revertNonBreakingSpaces($segment){
-        return preg_replace('"\\\\u00a0"',' ',$segment);;
+        //replacing nbsp introduced by browser back to multiple spaces
+        return preg_replace('#\x{00a0}#u',' ',$segment);
     }
     /**
      * returns the segment content for the given segmentId and field. Adds optional diff markup, and handles tags.
@@ -452,7 +453,7 @@ abstract class editor_Models_Export_FileParser {
      */
     public function exportSingleSegmentContent($segment) {
         $this->disableMqmExport = true;
-        return $this->revertNonBreakingSpaces($this->recreateTermTags($this->parseSegment($segment)));
+        return $this->unprotectWhitespace($this->revertNonBreakingSpaces($this->recreateTermTags($this->parseSegment($segment))));
     }
     
     /**

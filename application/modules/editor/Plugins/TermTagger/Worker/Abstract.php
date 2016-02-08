@@ -92,8 +92,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
      * @var array
      */
     protected $notPresentInTbxTarget = array();
-
-
+    
     public function init($taskGuid = NULL, $parameters = array()) {
         $return = parent::init($taskGuid, $parameters);
         $this->termModel = ZfExtended_Factory::get('editor_Models_Term');
@@ -159,6 +158,8 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
             //remove potentially incorrect transFound or transNotFound as inserted by termtagger
             $seg->source = preg_replace('" ?transN?o?t?Found ?"', ' ', $seg->source);
             $seg->target = preg_replace('" ?transN?o?t?Found ?"', ' ', $seg->target);
+            $seg->source = preg_replace('" transNotDefined ?"', ' ', $seg->source);
+            $seg->target = preg_replace('" transNotDefined ?"', ' ', $seg->target);
 
             $sourceMids = $this->termModel->getTermMidsFromSegment($seg->source);
             $targetMids = $this->termModel->getTermMidsFromSegment($seg->target);
@@ -330,19 +331,18 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
     /**
      * Checks if tbx-file with hash $tbxHash is loaded on the TermTagger-server behind $url.
      * If not already loaded, tries to load the tbx-file from the task.
-     *
+     * Throws Exceptions if TBX could not be loaded!
+     * @throws editor_Plugins_TermTagger_Exception_Abstract
      * @param string $url the TermTagger-server-url
      * @param string $tbxHash unique id of the tbx-file
-     *
-     * @return boolean true if tbx-file is loaded on the TermTagger-server
      */
     protected function checkTermTaggerTbx($url, &$tbxHash) {
         $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
         /* @var $termTagger editor_Plugins_TermTagger_Service */
         
         // test if tbx-file is already loaded
-        if ($termTagger->ping($url, $tbxHash)) {
-            return true;
+        if (!empty($tbxHash) && $termTagger->ping($url, $tbxHash)) {
+            return;
         }
         
         // try to load tbx-file to the TermTagger-server
@@ -354,12 +354,14 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         
         $service = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
         /* @var $service editor_Plugins_TermTagger_Service */
-        if(!$service->open($url, $tbxHash, $tbxData)) {
-            //$this->log->logError(__CLASS__.' -> '.__FUNCTION__.'; Terminology disabled because tbx can not be loaded to the TermTagger-server.');
-            throw new editor_Plugins_TermTagger_Exception_Open(__CLASS__.' -> '.__FUNCTION__.'; Terminology disabled because tbx can not be loaded to the TermTagger-server.');
-        }
         
-        return true;
+        try {
+            $service->open($url, $tbxHash, $tbxData);
+        }
+        catch (editor_Plugins_TermTagger_Exception_Abstract $e) {
+            $e->setMessage('TermTagger '.$url.' (task '.$this->taskGuid.' could not load TBX! Reason: '."\n".$e->getMessage(), false);
+            throw $e;
+        }
     }
     
 }

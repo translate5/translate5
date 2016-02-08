@@ -59,6 +59,7 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract 
     $this->addValidator('terminologie', 'int');
     $this->addValidator('orderdate', 'date', array('Y-m-d H:i:s'));
     $this->addValidator('edit100PercentMatch', 'int');
+    $this->addValidator('lockLocked', 'int');
     $this->addValidator('enableSourceEditing', 'boolean');
   }
 }
