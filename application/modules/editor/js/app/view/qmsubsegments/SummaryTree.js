@@ -53,11 +53,17 @@ Ext.define('Editor.view.qmsubsegments.SummaryTree', {
     treepanel_totalTotal: 'Gesamt',
     treepanel_total: 'Summe',
 
-    initComponent: function() {
-        var me = this;
-        me.columns = me.getSeverityCols();
-        me.callParent(arguments);
-        me.store.load();
+    initConfig: function(instanceConfig) {
+        var me = this,
+
+        config = {
+            columns: me.getSeverityCols()
+        };
+
+        if (instanceConfig) {
+            me.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
     },
     getSeverityCols: function(){
         var me = this;

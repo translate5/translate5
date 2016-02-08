@@ -47,11 +47,6 @@ Ext.define('Editor.store.QmSummary', {
     autoSync: false,
     folderSort: true,
     isLoaded: false,
-    listeners: {
-        load: {
-            fn: function(){ this.isLoaded = true; }
-        }
-    },
     proxy : {
         type : 'rest',
         appendId: false,
@@ -59,6 +54,10 @@ Ext.define('Editor.store.QmSummary', {
             type : 'json'
         },
         url: Editor.data.restpath+'qmstatistics'
+    },
+    root: {
+        expanded: true,
+        text: "My Root"
     },
     constructor: function(config) {
         var config = arguments[0] || {};
