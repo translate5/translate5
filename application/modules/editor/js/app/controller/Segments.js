@@ -325,7 +325,32 @@ Ext.define('Editor.controller.Segments', {
         me.lastRequestedRowIndex = rowindex;
         me.jumpToRecordIndex(rowindex);
         if(segment){
+            me.centerSegmentInGrid(segment);
             me.selectOrFocus(segment);
+        }
+  },
+  calcRowTop: function(row) {
+        var me = this,
+            grid = me.getSegmentGrid(),
+            scrollingView = grid.lockable ? grid.normalGrid.view : grid.view,
+            scrollTop = scrollingView.getScrollY();
+            
+        return Ext.fly(row).getOffsetsTo(grid)[1] - grid.el.getBorderWidth('t') + scrollTop;
+  },
+  centerSegmentInGrid: function(segment) {
+      var me = this,
+          grid = me.getSegmentGrid(),
+          scrollingView = grid.lockable ? grid.normalGrid.view : grid.view,
+          scrollingViewEl = scrollingView.el,
+          row = scrollingView.getRow(segment),
+          scrollTop = scrollingView.getScrollY(),
+          viewHeight = grid.getHeight(),
+          editorTop = (viewHeight / 2) + scrollTop,
+          rowTop = me.calcRowTop(row),
+          scrollDelta = Math.abs(editorTop - rowTop);
+
+        if (scrollDelta != 0) {
+            scrollingViewEl.scrollBy(0, scrollDelta, false);
         }
   },
   /**
@@ -335,10 +360,14 @@ Ext.define('Editor.controller.Segments', {
   getRecordByTotalIndex: function(rowindex) {
       var me = this,
           grid = me.getSegmentGrid(),
-          store = grid.store;
-      return store.getAt(store.findBy(function(rec){
-        return (rec.index == rowindex);
-      }));
+          store = grid.store,
+          range = store.getRange(rowindex, (rowindex+1));
+      
+      if (range && range[0])
+      {
+          return range[0];
+      }
+      return null;
   },
   /**
    * springt durch verschieben des Scrollers zum gewünschten Segment. 
@@ -364,7 +393,7 @@ Ext.define('Editor.controller.Segments', {
         return;
       }
       this.enableSelectOrFocus = false;
-      this.getSegmentGrid().selectOrFocus();
+      this.getSegmentGrid().selectOrFocus(localRowIndex);
   },
   /**
    * Helper: resets only the sorters, does no reload and so on
