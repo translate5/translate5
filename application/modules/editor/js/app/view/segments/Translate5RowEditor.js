@@ -69,7 +69,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
     rowToEditOrigHeight: 0,
     editorExtraHeight: 20,
     editorFieldExtraHeight: 10,
-    editorShadowsExtraHeight: 4, // see css/translate5.css class .x-grid-row-editor-wrap
+    editorShadowsExtraHeight: 4, // see css/main.css class .x-grid-row-editor-wrap
     fieldToEdit: null,
     previousRecord: null,
     timeTrackingData: null,
