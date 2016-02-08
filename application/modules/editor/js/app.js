@@ -108,7 +108,7 @@ Ext.application({
   name : 'Editor',
   models : [ 'File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field' ],
   stores : [ 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments' ],
-  requires: ['Editor.view.ViewPort', Editor.data.app.viewport, 'Editor.model.ModelOverride'],
+  requires: ['Editor.view.ViewPortEditor', Editor.data.app.viewport, 'Editor.model.ModelOverride'],
   controllers: Editor.data.app.controllers,
   beforeUnloadCalled : false,//stellt sicher, dass aufgrund von Wechselwirkungen bei einem per JS aus einem anderen Fenster heraus getriggerten window.close die unload-Frage nicht zweimal kommt
   appFolder : Editor.data.appFolder,
@@ -143,7 +143,8 @@ Ext.application({
       this.callParent(arguments);
   },
   launch : function() {
-      var me = this;
+      var me = this,
+      viewSize = Ext.getBody().getViewSize();
     Ext.QuickTips.init();
     //FIXME ext6 deactivated the before unload question since this is pain in the ass for reloading often
     //window.onbeforeunload = Ext.bind(me.onBeforeUnload, me);
@@ -151,6 +152,21 @@ Ext.application({
     me[Editor.data.app.initMethod]();
     
     Editor.MessageBox.showInitialMessages();
+    
+    //Logs the users userAgent and screen size for usability improvements:
+    Ext.Ajax.request({
+        url: Editor.data.pathToRunDir+'/editor/index/logbrowsertype',
+        method: 'post',
+        params: {
+            appVersion: navigator.appVersion,
+            userAgent: navigator.userAgent,
+            browserName: navigator.appName,
+            maxHeight: window.screen.availHeight,
+            maxWidth: window.screen.availWidth,
+            usedHeight: viewSize.height,
+            usedWidth: viewSize.width
+        }
+    });
   },
   //Handler für CRQ 92 warnOnClose
   onBeforeUnload: function(e) {

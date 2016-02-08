@@ -75,7 +75,8 @@ Ext.define('Editor.controller.Segments', {
     segmentSaved: 'Das Segment wurde gespeichert!',
     sortCleared: 'Die gewählte Sortierung der Segmente wurde zurückgesetzt!',
     segmentNotSaved: '#UT# Das zuletzt geöffnete Segment (Nr. {0}) konnte nicht gespeichert werden!',
-    noSegmentToFilter: 'Kein Segment dieser Datei entspricht den Filterkriterien'
+    noSegmentToFilter: 'Kein Segment dieser Datei entspricht den Filterkriterien',
+    otherFiltersActive: '#UT#ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Merkliste sichtbar sind'
   },
   /**
    * Cache der Zuordnung fileId => Grid Index des ersten Segments der Datei.
@@ -102,6 +103,9 @@ Ext.define('Editor.controller.Segments', {
   },{
       ref : 'resetFilterBtn',
       selector : '#clearSortAndFilterBtn'
+  },{
+      ref : 'watchListFilterBtn',
+      selector : '#watchListFilterBtn'
   }],
   listen: {
       global: {
@@ -109,6 +113,9 @@ Ext.define('Editor.controller.Segments', {
       },
       controller: {
           '#metapanelcontroller': {
+              watchlistRemoved: 'handleWatchlistRemoved'
+          },
+          '#editorcontroller': {
               saveSegment: 'saveChainStart'
           },
           '#changealikecontroller': {
@@ -140,6 +147,9 @@ Ext.define('Editor.controller.Segments', {
           },
           '#clearSortAndFilterBtn': {
               click: 'clearSortAndFilter'
+          },
+          '#watchListFilterBtn': {
+              click: 'watchListFilter'
           }
       },
       store: {
@@ -219,6 +229,49 @@ Ext.define('Editor.controller.Segments', {
     me.scrollGridToTop();
   },
   /**
+   * Toggle filtering by watch list.
+   */
+  watchListFilter: function() {
+    var me = this, 
+        filters = me.getSegmentGrid().filters.filters.items,
+        filtersData = this.getSegmentGrid().filters.getFilterData(),
+        btn = me.getWatchListFilterBtn();
+
+    for (var i = 0; i < filters.length; i++)
+    {
+        if (filters[i].dataIndex != 'isWatched')
+        {
+            continue;
+        }
+        if (filters[i].active === true)
+        {
+            filters[i].setActive(false);
+            btn.toggle(false);
+            continue;
+        }
+        if (filtersData.length > 0)
+        {
+            Editor.MessageBox.addSuccess(me.messages.otherFiltersActive);
+        }
+        filters[i].setActive(true);
+        filters[i].setValue(true);
+        btn.toggle(true);
+    }
+    me.scrollGridToTop();
+  },
+  /**
+   * removes the segment from the grid if removed from the watchlist and watchlist filter is set
+   */
+  handleWatchlistRemoved: function(rec) {
+      var me = this, 
+          btn = me.getWatchListFilterBtn();
+          store = me.getSegmentsStore();
+      if(!btn.pressed) {
+          return
+      }
+      store.remove(rec);
+  },
+  /**
    * behandelt die Selektion von Dateien im Dateibaum
    * setzt die Sortierung zurück, springt zum ersten Segment der Datei. Zeigt Fehlermeldung wenn aufgrund des Filters kein passendes Segment vorhanden ist.
    * @param {Ext.selection.Model} sm
@@ -280,12 +333,14 @@ Ext.define('Editor.controller.Segments', {
   styleResetFilterButton: function(filters){
       this.updateFilteredCountDisplay('...');
       var cls = 'activated',
-          btn = this.getResetFilterBtn();
+          btn = this.getResetFilterBtn(),
+          btnWatchList = this.getWatchListFilterBtn();
       if(filters.length > 0){
           btn.addCls(cls);
       }
       else {
           btn.removeCls(cls);
+          btnWatchList.removeCls(cls);
       }
       //btn.ownerCt.doLayout();
   },

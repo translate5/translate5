@@ -71,7 +71,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 	  tagOrderErrorText: '#UT# Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
 	  correctErrorsText: '#UT# Fehler beheben',
 	  saveAnyway: '#UT# Trotzdem speichern',
-	  tagMissingText: '#UT# Die nachfolgenden Tags wurden beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Versuchen Sie mit der Rückgängigfunktion STRG-Z die Tags wiederherzustellen. <br /><br />Alternativ können Sie auch die Bearbeitung des Segments durch Klick auf "Abbrechen" beenden und das Segment neu zur Bearbeitung öffnen.<br /><br />Fehlende Tags:',
+	  tagMissingText: '#UT# Die nachfolgenden Tags wurden beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Versuchen Sie mit der Rückgängigfunktion STRG-Z die Tags wiederherzustellen. <br /><br />Alternativ können Sie auch die Bearbeitung des Segments durch Klick auf "Abbrechen" (<img src="images/cross.png" /> im rechten Menü) beenden und das Segment neu zur Bearbeitung öffnen.<br /><br />Fehlende Tags:',
 	  tagDuplicatedText: '#UT# Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:',
 	  tagRemovedText: '#UT# Es wurden Tags mit fehlendem Partner entfernt!'
   },
@@ -82,7 +82,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   initComponent: function() {
     var me = this;
     me.viewModesController = Editor.controller.ViewModes;
-    me.metaPanelController = Editor.app.getController('MetaPanel');
+    me.metaPanelController = Editor.app.getController('Editor');
     me.segmentsController = Editor.app.getController('Segments');
     me.imageTemplate = new Ext.Template([
       '<img id="'+me.idPrefix+'{key}" class="{type}" title="{text}" alt="{text}" src="{path}"/>'
@@ -361,7 +361,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   handleSaveWithErrors: function(msg){
       var me = this;
       var MB = Ext.create('Ext.window.MessageBox', {
-            buttonText:{                        
+            buttonText:{
                 yes: me.strings.correctErrorsText,
                 no: me.strings.saveAnyway
             }

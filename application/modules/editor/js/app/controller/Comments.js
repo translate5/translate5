@@ -108,7 +108,12 @@ Ext.define('Editor.controller.Comments', {
       });
   },
   initEditPluginHandler: function() {
-      var me = this;
+      var me = this,
+          edCtrl = me.application.getController('Editor');
+          
+      edCtrl.on('openComments', me.handleEditorCommentBtn, me);
+      edCtrl.on('saveUnsavedComments', me.handleCommentSave, me);
+      
     //Diese Events können erst in onlauch gebunden werden, in init existiert das Plugin noch nicht
     //FIXME ext6 disabled
       //me.getEditPlugin().on('beforeedit', me.onStartEdit, me);
@@ -158,6 +163,11 @@ Ext.define('Editor.controller.Comments', {
               comment: form.getForm().getValues().comment,
               modified: now
           };
+          
+      if (rec === null)
+      {
+          return;    
+      }
       
       if(rec.phantom) {
           data.created = now;
@@ -477,8 +487,21 @@ Ext.define('Editor.controller.Comments', {
    * Handles the click on the button in the comment displayfield
    */
   handleEditorCommentBtn: function() {
-      var me = this;
-      me.getCommentWindow().expand();
+      var me = this,
+          win = me.getCommentWindow(),
+          form = me.getCommentForm(),
+          area = form.down('textarea');
+      if (win.collapsed)
+      {
+          win.expand();
+      }
+      else
+      {
+          if (area.rendered && area.isVisible())
+          {
+              area.focus(false, 500);
+          }
+      }
   },
   /**
    * updates the tooltip in the comment displayfield

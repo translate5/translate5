@@ -53,6 +53,7 @@ Ext.define('Editor.view.segments.MetaPanel', {
     item_metaQm_title: '#UT#QM',
     item_metaStates_title: '#UT#Status',
     item_metaTerms_title: '#UT#Terminologie',
+    item_metaStates_tooltip: '#UT#Segment auf den ausgewählten Status setzen (STRG + ALT + {0})',
     
     initComponent: function() {
       var me = this;
@@ -70,7 +71,7 @@ Ext.define('Editor.view.segments.MetaPanel', {
                   anchor: '100%',
                   items: [
                     {
-                        autoScroll: true,
+                      autoScroll: true,
                       xtype: 'panel',
                       itemId: 'metaTermPanel',
                       cls: 'metaTermPanel',
@@ -113,14 +114,16 @@ Ext.define('Editor.view.segments.MetaPanel', {
      */
     addStateFlags: function() {
       var me = this,
-      stati = me.down('#metaStates'),
-      flags = Editor.data.segments.stateFlags;
+          stati = me.down('#metaStates'),
+          flags = Editor.data.segments.stateFlags,
+          counter = 1;
+      
       Ext.each(flags, function(item){
         stati.add({
           name: 'stateId',
           anchor: '100%',
           inputValue: item.id,
-          boxLabel: item.label
+          boxLabel: '<span data-qtip="'+Ext.String.format(me.item_metaStates_tooltip, counter++)+'">'+item.label+'</span>'
         });
       });
     },

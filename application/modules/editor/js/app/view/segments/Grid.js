@@ -53,7 +53,8 @@ Ext.define('Editor.view.segments.Grid', {
         'Editor.view.segments.column.UserName',
         'Editor.view.segments.column.Comments',
         'Editor.view.segments.column.WorkflowStep',
-        'Editor.view.segments.column.Editable'
+        'Editor.view.segments.column.Editable',
+        'Editor.view.segments.column.IsWatched'
     ],
     plugins: ['gridfilters'],
     alias: 'widget.segments.grid',
@@ -91,6 +92,7 @@ Ext.define('Editor.view.segments.Grid', {
     item_qmsummaryBtn: '#UT#QM-Subsegment-Statistik',
     item_optionsTagBtn: '#UT#Einstellungen',
     item_clearSortAndFilterBtn: '#UT#Sortierung und Filter zurücksetzen',
+    item_watchListFilterBtn: '#UT#Merkliste',
     column_edited: '#UT#bearbeibar',
     
     column_edited_icon: '{0} <img src="{1}" class="icon-editable" alt="{2}" title="{3}">',
@@ -145,6 +147,10 @@ Ext.define('Editor.view.segments.Grid', {
                 return steps[v] ? steps[v] : v;
             },
             width: 140
+        },{
+            xtype: 'autoStateColumn',
+            itemId: 'autoStateColumn',
+            width: 82
         }]);
         
         //conv store data to an array
@@ -225,6 +231,10 @@ Ext.define('Editor.view.segments.Grid', {
             xtype: 'commentsColumn',
             itemId: 'commentsColumn',
             width: 200
+        },{
+            xtype: 'matchrateColumn',
+            itemId: 'matchrateColumn',
+            width: 82
         }]);
     
         if(Editor.data.segments.showStatus){
@@ -242,20 +252,15 @@ Ext.define('Editor.view.segments.Grid', {
         }
     
         columns.push.apply(columns, [{
-            xtype: 'matchrateColumn',
-            itemId: 'matchrateColumn',
-            width: 82
-        },{
-            xtype: 'autoStateColumn',
-            itemId: 'autoStateColumn',
-            width: 82
-        },{
             xtype: 'usernameColumn',
             itemId: 'usernameColumn',
             width: 122
         },{
             xtype: 'editableColumn',
             itemId: 'editableColumn'
+        },{
+            xtype: 'iswatchedColumn',
+            itemId: 'iswatchedColumn'
         }]);
     
         Ext.applyIf(me, {
@@ -280,13 +285,27 @@ Ext.define('Editor.view.segments.Grid', {
             var me = this,
             config = {
                 viewConfig: {
-                    blockRefresh: true,
-                    getRowClass: function(record, rowIndex, rowParams, store){
-                        if(record.get('editable')){
-                            return "";
-                        }
-                        return "editing-disabled";
-                    }
+					blockRefresh: true,
+        			getRowClass: function(record, rowIndex, rowParams, store){
+            			var newClass = '',
+                			isFirstInFile = false,
+                			nextRec = null;
+            				// only on non sorted list we mark last file segments
+            			if (store.sorters.length == 0){
+                			if (this.firstFileId && this.firstFileId != record.get('fileId')){
+                    			isFirstInFile = true;
+                			}
+                			this.firstFileId = record.get('fileId');
+            			}
+            			// don't mark the first row of the grid
+            			if (isFirstInFile && (rowIndex > 0)){ {
+                			newClass += ' first-in-file';
+            			}
+            			if (!record.get('editable')) {
+                			newClass += ' editing-disabled';
+            			}
+            			return newClass;
+        			}
                 },
                 dockedItems: [{
                     xtype: 'toolbar',
@@ -351,6 +370,15 @@ Ext.define('Editor.view.segments.Grid', {
                         cls: 'clearSortAndFilterBtn',
                         text: me.item_clearSortAndFilterBtn
                     },{
+                    	xtype: 'tbseparator'
+                	},{
+	                    xtype: 'button',
+    	                itemId: 'watchListFilterBtn',
+        	            cls: 'watchListFilterBtn',
+            	        enableToggle: true,
+                	    icon: Editor.data.moduleFolder+'images/star.png',
+                    	text: me.item_watchListFilterBtn
+                	},{
                         xtype: 'tbseparator',
                         hidden: !Editor.data.task.hasQmSub()
                     },{

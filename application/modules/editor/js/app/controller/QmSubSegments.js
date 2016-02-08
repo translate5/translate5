@@ -67,6 +67,12 @@ Ext.define('Editor.controller.QmSubSegments', {
         selector: '#metapanel combobox[name="qmsubseverity"]'
     }],
     listen: {
+        //FIXME after merge: check correct controller event binding:
+        controller: {
+            '#editorcontroller': {
+            	'assignMQMTag': 'handleAddQmFlagKey'
+            }
+        },
         component: {
             '#segmentgrid #qmsummaryBtn': {
                 click:'showQmSummary'
@@ -88,7 +94,9 @@ Ext.define('Editor.controller.QmSubSegments', {
     },
     strings: {
     	emptySelText: '##UT##Bitte wählen Sie im Editor ein Subsegment aus!',
-    	emptySelTitle: '##UT##Kein Subsegment ausgewählt.'
+    	emptySelTitle: '##UT##Kein Subsegment ausgewählt.',
+    	buttonTooltip10: '#UT# (ALT+{0})',
+    	buttonTooltip20: '#UT# (ALT+SHIFT+{0})'
     },
     handleAfterRender: function(){
         var me = this;
@@ -124,12 +132,13 @@ Ext.define('Editor.controller.QmSubSegments', {
      * generates the config menu tree for QM Flag Menu
      * @returns
      */
-	getMenuConfig: function() {
+    getMenuConfig: function() {
 		Editor.qmFlagTypeCache = {};
 		var me = this,
 			cache = Editor.qmFlagTypeCache,
 		iterate = function(node) {
-			var result;
+			var result, 
+			    text, id;
 			if(Ext.isArray(node)){
 				result = [];
 				Ext.each(node, function(item) {
@@ -137,8 +146,19 @@ Ext.define('Editor.controller.QmSubSegments', {
 				});
 				return result;
 			}
+			
+			text = node.text;
+			if(node.id <= 10) {
+			    id = node.id == 10 ? 0 : node.id;
+			    text += Ext.String.format(me.strings.buttonTooltip10, id);
+			}
+			else if(node.id > 10 && node.id <= 20) {
+			    id = node.id == 20 ? 0 : node.id;
+			    text += Ext.String.format(me.strings.buttonTooltip20, id);
+			}
+			
 			result = {
-				text: node.text,
+				text: text,
 				qmid: node.id,
 				icon: me.getImgTagSrc(node.id, true),
 				qmtype: 'qm-'+node.id,
@@ -195,6 +215,42 @@ Ext.define('Editor.controller.QmSubSegments', {
         this.getWindow().show();
     },
     /**
+     * Recursively gets menuitem by it qmid
+     * @param {Array} menuitems
+     * @param {Integer} qmid
+     */
+    getMenuitemByQmId: function(menuitems, qmid) {
+        var me = this,
+            result = null;
+        for (var i = 0; i < menuitems.length; i++) {
+            if (menuitems[i].qmid == qmid) {
+                return menuitems[i];
+            }
+            if(!menuitems[i].menu || menuitems[i].menu.items.length == 0){
+                continue;
+            }
+            result = me.getMenuitemByQmId(menuitems[i].menu.items, qmid);
+            if(result) {
+                break;
+            }
+        }
+        return result;
+    },
+    /**
+     * Inserts the QM Issue Tag in the Editor by key shortcut, displays popup if nothing selected
+     * @param key
+     */
+    handleAddQmFlagKey: function(key) {
+        var me = this,
+            found = false,
+            menuitem = me.getMenuitemByQmId(me.menuConfig, key);
+        
+        if (menuitem)
+        {
+            me.handleAddQmFlagClick(menuitem);
+        }
+    },
+    /**
      * Inserts the QM Issue Tag in the Editor, displays popup if nothing selected
      * @param menuitem
      */
@@ -203,10 +259,11 @@ Ext.define('Editor.controller.QmSubSegments', {
             sev = me.getQmFieldset().down('combo[name="qmsubseverity"]');
             commentField = me.getQmFieldset().down('textfield[name="qmsubcomment"]'),
             format = Ext.util.Format,
-            comment = format.stripTags(commentField.getValue()).replace(/[<>"']/g,'');
+            comment = format.stripTags(commentField.getValue()).replace(/[<>"'&]/g,'');
             //@todo when we are going to make qm subsegments editable, we should improve the handling of html tags in comments.
             //since TRANSLATE-80 we are stripping the above chars, 
             //because IE did not display the segment content completly with qm subsegments containing these chars
+            //WARNING: if we allow tags and special chars here, we must fix CSV export too! See comment in export/FileParser/Csv.php
                 
         if(! me.addQmFlagToEditor(menuitem.qmid, comment, sev.getValue())) {
             Ext.Msg.alert(me.strings.emptySelTitle, me.strings.emptySelText);
@@ -296,7 +353,7 @@ Ext.define('Editor.controller.QmSubSegments', {
      * @param {Ext.menu.Item} menuitem
      */
     addQmFlagHistory: function(menuitem) {
-    	if(!menuitem.parentMenu.parentMenu) {
+    	if(menuitem.parentMenu && !menuitem.parentMenu.parentMenu) {
     		return; //ignore first level and history menu entries
     	}
     	var me = this,

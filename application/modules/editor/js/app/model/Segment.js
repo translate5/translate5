@@ -72,12 +72,15 @@ Ext.define('Editor.model.Segment', {
         {name: 'editable', type: 'boolean'},
         {name: 'autoStateId', type: 'int'},
         {name: 'workflowStep', type: 'string'},
+        {name: 'workflowStepNr', type: 'integer', persist: false},
         {name: 'matchRate', type: 'int'},
         //{name: 'terms', type: 'string'},
         {name: 'durations', defaultValue: {}}, //we are using an object here
         {name: 'comments', type: 'string', persist: false},
         {name: 'qmId', type: 'string'},
-        {name: 'stateId', type: 'int'}
+        {name: 'stateId', type: 'int'},
+        {name: 'isWatched', type: 'boolean', persist: false},
+        {name: 'segmentUserAssocId', type: 'int', persist: false}
     ],
     idProperty: 'id',
     proxy : {
