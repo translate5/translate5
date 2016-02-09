@@ -426,9 +426,6 @@ Ext.define('Editor.controller.ViewModes', {
                   }
               });
           }
-          else {
-              plug.editorDomCleanUp();
-          }
       }
   }
 });
