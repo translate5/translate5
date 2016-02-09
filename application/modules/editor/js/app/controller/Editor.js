@@ -117,17 +117,17 @@ Ext.define('Editor.controller.Editor', {
           'ctrl-alt-enter': [[10,13],{ctrl: true, alt: true, shift: false}, me.saveNext],
           'ctrl-alt-shift-enter': [[10,13],{ctrl: true, alt: true, shift: true}, me.savePrevious],
           'ctrl-alt-DIGIT': [decDigits.slice(1),{ctrl: true, alt: true, shift: false}, me.handleChangeState],
-          'esc':            [Ext.EventObject.ESC, null, me.cancel],
-          'ctrl-alt-left':  [Ext.EventObject.LEFT,{ctrl: true, alt: true}, me.goToLeft],
-          'ctrl-alt-right': [Ext.EventObject.RIGHT,{ctrl: true, alt: true}, me.goToRight],
-          'alt-pageup':     [Ext.EventObject.PAGE_UP,{ctrl: false, alt: true}, me.goToUpperByWorkflowNoSave],
-          'alt-pagedown':   [Ext.EventObject.PAGE_DOWN,{ctrl: false, alt: true}, me.goToLowerByWorkflowNoSave],
-          'alt-del':        [Ext.EventObject.DELETE,{ctrl: false, alt: true}, me.resetSegment],
-          'ctrl-alt-up':    [Ext.EventObject.UP,{ctrl: true, alt: true}, me.goToUpperNoSave, true],
-          'ctrl-alt-down':  [Ext.EventObject.DOWN,{ctrl: true, alt: true}, me.goToLowerNoSave, true],
+          'esc':            [Ext.EventObjectImpl.ESC, null, me.cancel],
+          'ctrl-alt-left':  [Ext.EventObjectImpl.LEFT,{ctrl: true, alt: true}, me.goToLeft],
+          'ctrl-alt-right': [Ext.EventObjectImpl.RIGHT,{ctrl: true, alt: true}, me.goToRight],
+          'alt-pageup':     [Ext.EventObjectImpl.PAGE_UP,{ctrl: false, alt: true}, me.goToUpperByWorkflowNoSave],
+          'alt-pagedown':   [Ext.EventObjectImpl.PAGE_DOWN,{ctrl: false, alt: true}, me.goToLowerByWorkflowNoSave],
+          'alt-del':        [Ext.EventObjectImpl.DELETE,{ctrl: false, alt: true}, me.resetSegment],
+          'ctrl-alt-up':    [Ext.EventObjectImpl.UP,{ctrl: true, alt: true}, me.goToUpperNoSave, true],
+          'ctrl-alt-down':  [Ext.EventObjectImpl.DOWN,{ctrl: true, alt: true}, me.goToLowerNoSave, true],
           'ctrl-alt-c':     ["C",{ctrl: true, alt: true}, me.handleOpenComments, true],
           'alt-DIGIT':      [decDigits,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
-          'F2':             [Ext.EventObject.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true]
+          'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true]
       };
   },
   /**
@@ -205,7 +205,7 @@ Ext.define('Editor.controller.Editor', {
   },
   /**
    * binds strg + enter as save segment combination
-   * @param editor
+   * @param {Editor.view.segments.HtmlEditor} editor
    */
   initEditor: function(editor){
       var me = this,
@@ -215,8 +215,15 @@ Ext.define('Editor.controller.Editor', {
       f.prototype = Ext.Element.prototype;
       docEl = new f();
       docEl.dom = editor.getDoc();
-      
-      new Ext.util.KeyMap(docEl, me.getKeyMapConfig());
+      console.log(docEl.dom, me.getKeyMapConfig());
+      new Ext.util.KeyMap({
+        target: docEl.dom, 
+        binding: [{
+          key: [10,13],
+          fn: function(){ alert("Return was pressed"); }
+        }]
+        //binding: me.getKeyMapConfig()
+      });
   },
   /**
    * Handler for save Button
