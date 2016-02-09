@@ -285,27 +285,27 @@ Ext.define('Editor.view.segments.Grid', {
             var me = this,
             config = {
                 viewConfig: {
-					blockRefresh: true,
-        			getRowClass: function(record, rowIndex, rowParams, store){
-            			var newClass = '',
-                			isFirstInFile = false,
-                			nextRec = null;
-            				// only on non sorted list we mark last file segments
-            			if (store.sorters.length == 0){
-                			if (this.firstFileId && this.firstFileId != record.get('fileId')){
-                    			isFirstInFile = true;
-                			}
-                			this.firstFileId = record.get('fileId');
-            			}
-            			// don't mark the first row of the grid
-            			if (isFirstInFile && (rowIndex > 0)){ {
-                			newClass += ' first-in-file';
-            			}
-            			if (!record.get('editable')) {
-                			newClass += ' editing-disabled';
-            			}
-            			return newClass;
-        			}
+                    blockRefresh: true,
+                    getRowClass: function(record, rowIndex, rowParams, store){
+                        var newClass = '',
+                            isFirstInFile = false,
+                            nextRec = null;
+                        // only on non sorted list we mark last file segments
+                        if (store.sorters.length == 0){
+                            if (this.firstFileId && this.firstFileId != record.get('fileId')){
+                                isFirstInFile = true;
+                            }
+                            this.firstFileId = record.get('fileId');
+                        }
+                        // don't mark the first row of the grid
+                        if (isFirstInFile && (rowIndex > 0)){
+                            newClass += ' first-in-file';
+                        }
+                        if (!record.get('editable')) {
+                            newClass += ' editing-disabled';
+                        }
+                        return newClass;
+                    }
                 },
                 dockedItems: [{
                     xtype: 'toolbar',
@@ -370,15 +370,15 @@ Ext.define('Editor.view.segments.Grid', {
                         cls: 'clearSortAndFilterBtn',
                         text: me.item_clearSortAndFilterBtn
                     },{
-                    	xtype: 'tbseparator'
-                	},{
-	                    xtype: 'button',
-    	                itemId: 'watchListFilterBtn',
-        	            cls: 'watchListFilterBtn',
-            	        enableToggle: true,
-                	    icon: Editor.data.moduleFolder+'images/star.png',
-                    	text: me.item_watchListFilterBtn
-                	},{
+                        xtype: 'tbseparator'
+                    },{
+                        xtype: 'button',
+                        itemId: 'watchListFilterBtn',
+                        cls: 'watchListFilterBtn',
+                        enableToggle: true,
+                        icon: Editor.data.moduleFolder+'images/star.png',
+                        text: me.item_watchListFilterBtn
+                    },{
                         xtype: 'tbseparator',
                         hidden: !Editor.data.task.hasQmSub()
                     },{
