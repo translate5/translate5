@@ -317,6 +317,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $controllers[] = 'Segments';
         $controllers[] = 'Preferences';
         $controllers[] = 'MetaPanel';
+        $controllers[] = 'Editor';
         $controllers[] = 'Fileorder';
         //$controllers[] = 'Localizer';
         $controllers[] = 'ChangeAlike';
@@ -334,7 +335,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         //original code
         $controllers = array('ServerException', 'ViewModes', 'Segments', 
-            'Preferences', 'MetaPanel', 'Fileorder', 'Localizer',
+            'Preferences', 'MetaPanel', 'Editor', 'Fileorder', 'Localizer',
             'ChangeAlike', 'Comments', 'Editor');
         
         $pm = Zend_Registry::get('PluginManager');
