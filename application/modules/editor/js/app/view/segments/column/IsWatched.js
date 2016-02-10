@@ -49,6 +49,9 @@ Ext.define('Editor.view.segments.column.IsWatched', {
     me.initBaseMixin();
     me.callParent(arguments);
   },
+  filter: {
+      type: 'boolean'
+  },
   
   renderer: function(value,t,record){
       if(value)

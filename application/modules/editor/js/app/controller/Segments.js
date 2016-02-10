@@ -232,31 +232,37 @@ Ext.define('Editor.controller.Segments', {
    * Toggle filtering by watch list.
    */
   watchListFilter: function() {
-    var me = this, 
-        filters = me.getSegmentGrid().filters.filters.items,
-        filtersData = this.getSegmentGrid().filters.getFilterData(),
+    var me = this,
+        grid = me.getSegmentGrid(),
+        gridFilters = grid.filters,
+        filters = gridFilters.store.filters,
         btn = me.getWatchListFilterBtn();
 
-    for (var i = 0; i < filters.length; i++)
-    {
-        if (filters[i].dataIndex != 'isWatched')
+    filters.each(function(filter, index, len){
+        if (filter.getProperty() == 'isWatched')
         {
-            continue;
+            if (filter.getDisabled() === false) // currently enabled so disable it and unclick the button
+            {
+                filter.setDisabled(true);
+                btn.toggle(false);
+            }
+            else // currently disabled so enable it and click the button
+            {
+                filter.setDisabled(false);
+                filter.setValue(true);
+                btn.toggle(true);
+            }
         }
-        if (filters[i].active === true)
+    });
+    filters.each(function(filter, index, len){
+        if (filter.getProperty() != 'isWatched')
         {
-            filters[i].setActive(false);
-            btn.toggle(false);
-            continue;
+            if (filter.getDisabled() === false) // currently enabled at least one more filter
+            {
+                Editor.MessageBox.addSuccess(me.messages.otherFiltersActive);
+            }
         }
-        if (filtersData.length > 0)
-        {
-            Editor.MessageBox.addSuccess(me.messages.otherFiltersActive);
-        }
-        filters[i].setActive(true);
-        filters[i].setValue(true);
-        btn.toggle(true);
-    }
+    });
     me.scrollGridToTop();
   },
   /**
