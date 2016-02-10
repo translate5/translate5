@@ -241,7 +241,7 @@ Ext.define('Editor.controller.admin.User', {
   savingShow: function() {
       var win = this.getUserWindow();
       if(!win.loadingMask) {
-          win.loadingMask = new Ext.LoadMask(Ext.getBody(), {store: false});
+          win.loadingMask = new Ext.LoadMask({target: Ext.getBody().component, store: false});
           win.on('destroy', function(){
               win.loadingMask.destroy();
           });
@@ -269,7 +269,7 @@ Ext.define('Editor.controller.admin.User', {
       //the password will be kept in the model, so reject it here
       rec.reject();
       basic.updateRecord(rec);
-      
+      me.savingShow();
       rec.save({
           //using the callback method here (instead failure & success) disables the default server exception
           callback: function(rec, op) {
@@ -291,6 +291,7 @@ Ext.define('Editor.controller.admin.User', {
           success: function() {
               var user = rec.get('surName')+', '+rec.get('firstName')+' ('+rec.get('login')+')',
                   msg = win.editMode ? me.strings.userSaved : me.strings.userAdded;
+              me.savingHide();
               win.close();
               me.getAdminUsersStore().load();
               Editor.MessageBox.addSuccess(Ext.String.format(msg, user));
