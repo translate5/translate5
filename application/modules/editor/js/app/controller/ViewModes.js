@@ -86,7 +86,7 @@ Ext.define('Editor.controller.ViewModes', {
               click : me.showShortTags
           },
           'segmentsHtmleditor': {
-              afteriniteditor: me.toggleEditorErgonomicMode
+              initialize: me.toggleEditorErgonomicMode
           },
           '#segmentgrid editorgridscroller': {
               beforerender: me.initScroller

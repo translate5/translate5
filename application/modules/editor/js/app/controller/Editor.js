@@ -102,7 +102,7 @@ Ext.define('Editor.controller.Editor', {
               click : me.resetSegment
           },
           'segmentsHtmleditor': {
-              afteriniteditor: me.initEditor
+              initialize: me.initEditor
           },
           '#segmentgrid': {
               afterrender: me.initEditPluginHandler
@@ -209,20 +209,11 @@ Ext.define('Editor.controller.Editor', {
    */
   initEditor: function(editor){
       var me = this,
-          f = function() {};
-          
-      
-      f.prototype = Ext.Element.prototype;
-      docEl = new f();
-      docEl.dom = editor.getDoc();
-      console.log(docEl.dom, me.getKeyMapConfig());
-      new Ext.util.KeyMap({
-        target: docEl.dom, 
-        binding: [{
-          key: [10,13],
-          fn: function(){ alert("Return was pressed"); }
-        }]
-        //binding: me.getKeyMapConfig()
+          docEl = Ext.get(editor.getDoc());
+
+      new Editor.segments.EditorKeyMap({
+        target: docEl,
+        binding: me.getKeyMapConfig()
       });
   },
   /**

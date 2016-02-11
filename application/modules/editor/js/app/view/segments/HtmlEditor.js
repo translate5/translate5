@@ -49,7 +49,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   //prefix der img Tag ids im HTML Editor
   idPrefix: 'tag-image-',
   requires: [
-      'Editor.view.segments.HtmlEditorLayout'
+      'Editor.view.segments.HtmlEditorLayout',
+      'Editor.segments.EditorKeyMap'
   ],
   componentLayout: 'htmleditorlayout',
 
@@ -99,12 +100,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 	  this.callParent(arguments);
 	  this.fireEvent('afterinitframedoc', this);
   },
-  initEditor: function() {
+  //FIXME check if this method is needed anymore: at least skip gc!, afteriniteditor is replaced
+  xinitEditor: function() {
       var me = this, 
           body = me.getEditorBody(),
           id;
 
-	  //FIXME: this seems to be fixed in ext6, the same loop exists there in code
+      //FIXME: this seems to be fixed in ext6, the same loop exists there in code
+      /*
       if(!body || body.tagName != 'BODY'){
           //if body does not exists, the browser (mostly IE) is not ready so call again a little more deffered as the default 10ms
           if(!me.deferred){
@@ -117,13 +120,16 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           }
       }
       me.deferred = 0;
+      */
       me.callParent(arguments);
       body = Ext.get(body),
       id = body.id;
+      //FIXME: add skipGarbageCollection directly to the body instead here by id
       //the editor body cache entry (and so all the handlers) are removed by the GarbageCollector, so disable GC for the body:
       Ext.cache[id].skipGarbageCollection = true;
       //track the created body id to enable GC again on editorDomCleanUp
       me.bodyGenId = id;
+      console.log("FIRE afteriniteditor");
       me.fireEvent('afteriniteditor', me);
   },
   /**
@@ -140,6 +146,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * overriding default method since under some circumstances this.getWin() returns null which gives an error in original code
    */
   getDoc: function() {
+  	  //it is possible that dom is not initialized
+  	  if(!this.iframeEl || !this.iframeEl.dom) {
+  	  	return null;
+  	  }
       return this.iframeEl.dom.contentDocument || (this.getWin() && this.getWin().document);
   },
   /**

@@ -88,7 +88,7 @@ Ext.define('Editor.controller.QmSubSegments', {
             },
             'segmentsHtmleditor': {
                 afterinitframedoc: 'initIframeDoc',
-                afteriniteditor: 'initEditor'
+                initialize: 'initEditor'
             }
         }
     },
@@ -188,25 +188,25 @@ Ext.define('Editor.controller.QmSubSegments', {
      * @param editor
      */
     initIframeDoc: function(editor) {
-    	if(Ext.isIE){
-	    	editor.iframeEl.on('beforedeactivate', this.handleEditorBlur, this);    	
-	    	editor.iframeEl.on('focus', this.handleEditorFocus, this);    	
-    	}
+        if(Ext.isIE){
+            editor.iframeEl.on('beforedeactivate', this.handleEditorBlur, this);    	
+            editor.iframeEl.on('focus', this.handleEditorFocus, this);    	
+        }
     },
     /**
      * initialises ToolTips and other things related to the editors iframe doc body
      * @param editor
      */
     initEditor: function(editor) {
-    	if(this.editorTooltip){
-    		this.editorTooltip.setTarget(editor.getEditorBody());
-    		this.editorTooltip.boundFrame = editor.iframeEl;
-    		return;
-    	}
-    	this.editorTooltip = Ext.create('Editor.view.ToolTip', {
-    		target: editor.getEditorBody(),
-    		boundFrame: editor.iframeEl
-    	});
+        if(this.editorTooltip){
+            this.editorTooltip.setTarget(editor.getEditorBody());
+            this.editorTooltip.boundFrame = editor.iframeEl;
+            return;
+        }
+        this.editorTooltip = Ext.create('Editor.view.ToolTip', {
+            target: editor.getDoc(),
+            boundFrame: editor.iframeEl
+        });
     },
     /**
      * displays the QM Summary Window
