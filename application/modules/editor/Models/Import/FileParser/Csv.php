@@ -454,6 +454,16 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         return $segment;
     }
 
+    /**
+     * (non-PHPdoc)
+     * @see editor_Models_Import_FileParser::getTagParams()
+     * @see TRANSLATE-659
+     */
+    protected function getTagParams($tag, $shortTag, $tagId, $fileNameHash, $text = false) {
+        $this->_tagCount = $shortTag;
+        return parent::getTagParams($tag, $shortTag, $tagId, $fileNameHash, $text);
+    }
+    
     private function parseSegmentProtectTags($segment) {
         
         if (strpos($segment, '<')=== false || !$this->tagProtection) {
