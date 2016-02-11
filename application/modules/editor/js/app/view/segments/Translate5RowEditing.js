@@ -70,6 +70,9 @@ Ext.define('Editor.view.segments.Translate5RowEditing', {
     initEditor: function() {
         return new Editor.view.segments.Translate5RowEditor(this.initEditorConfig());
     },
+    getEditor: function() {
+        return this.editor;
+    },
     /**
      * Erweitert die Orginalmethode um die "editingAllowed" Prüfung
      * @param {Editor.model.Segment} record
@@ -79,6 +82,11 @@ Ext.define('Editor.view.segments.Translate5RowEditing', {
     startEdit: function(record, columnHeader) {
         var me = this,
             started = false;
+            
+        if (!me.editor) {
+            me.editor = me.initEditor();
+        }
+        
         //to prevent race-conditions, check if there isalready an openedRecord and if yes show an error (see RowEditor.js function completeEdit for more information)
         if (me.openedRecord !== null) {
             Editor.MessageBox.addError(me.messages.previousSegmentNotSaved,' Das Segment konnte nicht zum Bearbeiten geöffnet werden, da das vorherige Segment noch nicht korrekt gespeichert wurde. Im folgenden der Debug-Werte: this.openedRecord.internalId: ' + this.openedRecord.internalId + ' record.internalId: ' + record.internalId);
