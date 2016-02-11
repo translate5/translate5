@@ -41,57 +41,68 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.tip.ToolTip
  */
 Ext.define('Editor.view.ToolTip', {
-	extend : 'Ext.tip.ToolTip',
-	//enable own ToolTips only for the following img classes 
-	delegate : 'img.ownttip', // accepts only simple selectors (no commas) so
-	// define a own tooltip class
-	renderTo : Ext.getBody(),
-	strings: {
-		severity: '##UT##Gewichtung'
-	},
-	listeners : {
-		// Change content dynamically depending on which element triggered
-		// the show.
-		beforeshow : function(tip) {
-			var t = tip.triggerElement,
-				fly = Ext.fly(t); 
-			if(fly.hasCls('qmflag')) {
-				this.handleQmFlag(t, tip);
-			}
-			//else if hasClass for other ToolTip Types
-		}
-	},
-	show : function() {
-		var me = this;
-		if (me.targetXY && me.boundFrame) {
-			me.targetXY[0] += me.boundFrame.getX();
-			me.targetXY[1] += me.boundFrame.getY();
-		}
-		return me.callParent(arguments);
-	},
-	onTargetOver: function(e) {
-		e.preventDefault(); //prevent title tags to be shown in IE
-		this.callParent(arguments);
-	},
-	handleQmFlag: function(t, tip) {
-		var me = this, 
-			qmtype,
-			cache = Editor.qmFlagTypeCache,
-			meta = {sevTitle: me.strings.severity};
-		
-		qmtype = t.className.match(/qmflag-([0-9]+)/);
-		if(qmtype && qmtype.length > 1) {
-			meta.cls = t.className.split(' ');
-			meta.sev = Ext.StoreMgr.get('Severities').getById(meta.cls.shift());
-			meta.sev = meta.sev ? meta.sev.get('text') : '';
-			meta.qmid = qmtype[1];
-			meta.comment = Ext.fly(t).getAttribute('data-comment');
-			meta.qmtype = cache[meta.qmid] ? cache[meta.qmid] : 'Unknown Type'; //impossible => untranslated
-		}
-		if(!me.qmflagTpl) {
-			me.qmflagTpl = new Ext.Template('<b>{qmtype}</b><br />{sevTitle}: {sev}<br />{comment}');
-			me.qmflagTpl.compile();
-		}
-		tip.update(me.qmflagTpl.apply(meta));		
-	}
+    extend : 'Ext.tip.ToolTip',
+    //enable own ToolTips only for the following img classes 
+    delegate : 'img.ownttip', // accepts only simple selectors (no commas) so
+    // define a own tooltip class
+    renderTo : Ext.getBody(),
+    strings: {
+        severity: '##UT##Gewichtung'
+    },
+    listeners : {
+        // Change content dynamically depending on which element triggered
+        // the show.
+        beforeshow : function(tip) {
+            var t = tip.triggerElement,
+                fly = Ext.fly(t); 
+            if(fly.hasCls('qmflag')) {
+                this.handleQmFlag(t, tip);
+            }
+            //else if hasClass for other ToolTip Types
+        }
+    },
+    show : function(xy) {
+        var me = this;
+        if (xy && me.boundFrame) {
+            xy[0] += me.boundFrame.getX();
+            xy[1] += me.boundFrame.getY();
+        }
+        return me.callParent([xy]);
+    },
+    onTargetOver: function(e) {
+        e.preventDefault(); //prevent title tags to be shown in IE
+        this.callParent(arguments);
+    },
+    handleQmFlag: function(t, tip) {
+        var me = this, 
+            qmtype,
+            cache = Editor.qmFlagTypeCache,
+            meta = {sevTitle: me.strings.severity};
+
+        qmtype = t.className.match(/qmflag-([0-9]+)/);
+        if(qmtype && qmtype.length > 1) {
+            meta.cls = t.className.split(' ');
+            meta.sev = Ext.StoreMgr.get('Severities').getById(meta.cls.shift());
+            meta.sev = meta.sev ? meta.sev.get('text') : '';
+            meta.qmid = qmtype[1];
+            meta.comment = Ext.fly(t).getAttribute('data-comment');
+            meta.qmtype = cache[meta.qmid] ? cache[meta.qmid] : 'Unknown Type'; //impossible => untranslated
+        }
+        if(!me.qmflagTpl) {
+            me.qmflagTpl = new Ext.Template('<b>{qmtype}</b><br />{sevTitle}: {sev}<br />{comment}');
+            me.qmflagTpl.compile();
+        }
+        tip.update(me.qmflagTpl.apply(meta));		
+    },
+    /**
+     * instead of overriding the whole setTarget method just to add the delegated config
+     * we invoke into the mon method here to inject the parameter directly
+     */
+    mon: function() {
+        var config = arguments[1];
+        if(config && Ext.isObject(config) && config.mouseover && config.mouseout && config.mousemove) {
+            config.delegated = false;
+        }
+        this.callParent(arguments);
+    }
 });
