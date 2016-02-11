@@ -41,6 +41,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.controller.Editor', {
   extend : 'Ext.app.Controller',
+  requires: ['Editor.view.segments.EditorKeyMap'],
   messages: {
       segmentReset: '#UT#Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.',
       segmentNotBuffered: '#UT#Kein passendes Segment vorhanden bzw. im Zwischenspeicher gefunden. Bitte scrollen Sie manuell weiter!',
@@ -211,7 +212,7 @@ Ext.define('Editor.controller.Editor', {
       var me = this,
           docEl = Ext.get(editor.getDoc());
 
-      new Editor.segments.EditorKeyMap({
+      new Editor.view.segments.EditorKeyMap({
         target: docEl,
         binding: me.getKeyMapConfig()
       });

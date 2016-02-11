@@ -34,7 +34,7 @@ END LICENSE AND COPYRIGHT
  * 
  * Own KeyMap implementation which uses handlers without delegation to work in the iframe body of the HtmlEditor
  */
-Ext.define('Editor.segments.EditorKeyMap', {
+Ext.define('Editor.view.segments.EditorKeyMap', {
     extend: 'Ext.util.KeyMap',
     enable: function() {
         var me = this;
