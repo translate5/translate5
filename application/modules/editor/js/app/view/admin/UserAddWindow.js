@@ -68,7 +68,6 @@ Ext.define('Editor.view.admin.UserAddWindow', {
     },
     height : 600,
     width : 500,
-    loadingMask: null,
     modal : true,
     layout:'fit',
     initComponent: function() {

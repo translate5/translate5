@@ -352,18 +352,15 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       this.getTaskAddForm().getForm().reset();
       this.getTaskAddWindow().close();
   },
-  /**
-   * setting a loading mask for the window / grid is not possible, using savingShow / savingHide instead.
-   * perhaps because of bug for ext-4.0.7 (see http://www.sencha.com/forum/showthread.php?157954)
-   * This Fix is better as in {Editor.view.changealike.Window} because of useing body as LoadMask el.
-   */
   savingShow: function() {
-      console.log('Editor.controller.admin.TaskOverview::savingShow');
-      this.getTaskAddWindow().mask(Ext.view.AbstractView.prototype.loadingText);
+      var win = this.getTaskAddWindow();
+      //console.log('Editor.controller.admin.TaskOverview::savingShow');
+      win.setLoading(true);
   },
   savingHide: function() {
-      console.log('Editor.controller.admin.TaskOverview::savingHide');
-      this.getTaskAddWindow().unmask();
+      var win = this.getTaskAddWindow();
+      //console.log('Editor.controller.admin.TaskOverview::savingHide');
+      win.setLoading(false);
   },
   /**
    * is called after clicking save task, starts the upload / form submit

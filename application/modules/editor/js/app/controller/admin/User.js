@@ -233,24 +233,13 @@ Ext.define('Editor.controller.admin.User', {
       this.getUserForm().getForm().reset();
       this.getUserWindow().close();
   },
-  /**
-   * setting a loading mask for the window / grid is not possible, using savingShow / savingHide instead.
-   * perhaps because of bug for ext-4.0.7 (see http://www.sencha.com/forum/showthread.php?157954)
-   * This Fix is better as in {Editor.view.changealike.Window} because of useing body as LoadMask el.
-   */
   savingShow: function() {
       var win = this.getUserWindow();
-      if(!win.loadingMask) {
-          win.loadingMask = new Ext.LoadMask({target: Ext.getBody().component, store: false});
-          win.on('destroy', function(){
-              win.loadingMask.destroy();
-          });
-      }
-      win.loadingMask.show();
+      win.setLoading(true);
   },
   savingHide: function() {
       var win = this.getUserWindow();
-      win.loadingMask.hide();
+      win.setLoading(false);
   },
   /**
    * is called after clicking save user

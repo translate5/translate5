@@ -68,7 +68,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     },
     height : 520,
     width : 550,
-    loadingMask: null,
     modal : true,
 
     initConfig: function(instanceConfig) {
