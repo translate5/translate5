@@ -155,7 +155,6 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
         //this revids has to be replaced before assertEqual
         $approvalFileContent = $this->api()->getFileContent('testCsvEncoding-assert-equal.xliff');
         $toCheck = $this->api()->replaceChangesXmlContent(file_get_contents($foundChangeFile));
-        file_put_contents('/home/marcstandard/Schreibtisch/temp/asdf.xml', $toCheck);
         $this->assertSame($approvalFileContent, $toCheck);
     }
     
@@ -188,7 +187,7 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
         $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/specialCharactersInCSV.csv');
         //compare it
         $expectedResult = $this->api()->getFileContent($fileToCompare);
-        $this->assertEquals($expectedResult, $exportedFile);
+        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile));
     }
     
     public static function tearDownAfterClass() {
