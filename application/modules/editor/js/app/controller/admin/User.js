@@ -216,7 +216,7 @@ Ext.define('Editor.controller.admin.User', {
               Ext.Msg.confirm(msg.confirmResetPwTitle, info, function(btn){
                   if(btn == 'yes') {
                      user.set('passwd',null);
-                     user.setDirty();//necessary, cause sometimes ext does not transfer the null-value in save
+                     // not valid in ExtJS6 .setDirty();//necessary, cause sometimes ext does not transfer the null-value in save
                      user.save();
                   }
               });
