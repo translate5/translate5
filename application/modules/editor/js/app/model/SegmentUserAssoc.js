@@ -46,6 +46,7 @@ Ext.define('Editor.model.SegmentUserAssoc', {
   ],
   proxy : {
     type : 'rest',
+    appendId: false,
     url: Editor.data.restpath+'segmentuserassoc',
     reader : {
       root: 'rows',

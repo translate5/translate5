@@ -72,7 +72,7 @@ Ext.define('Editor.view.admin.UserChooseWindow', {
         });
         if(me.excludeLogins && me.excludeLogins.length > 0) {
             store.getProxy().extraParams = {
-                defaultFilter: '[{"field":"login","type":"notInList","value":["'+me.excludeLogins.join('","')+'"]}]'
+                defaultFilter: '[{"property":"login","type":"notInList","value":["'+me.excludeLogins.join('","')+'"]}]'
             };
         }
         config = {

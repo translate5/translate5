@@ -48,6 +48,7 @@ Ext.define('Editor.controller.Editor', {
       gridEndReached: '#UT#Ende der Segmente erreicht!',
       gridStartReached: '#UT#Start der Segmente erreicht!'
   },
+  id: 'editorcontroller',
   refs : [{
     ref : 'segmentGrid',
     selector : '#segmentgrid'
@@ -657,9 +658,9 @@ Ext.define('Editor.controller.Editor', {
           return;
       }
       var me = this,
-          model = Ext.create('Editor.model.SegmentUserAssoc');
+          model, config,
           ed = me.getEditPlugin(),
-          record = ed.openedRecord;
+          record = ed.openedRecord,
           segmentId = record.get('id'),
           isWatched = Boolean(record.get('isWatched')),
           segmentUserAssocId = record.get('segmentUserAssocId'),
@@ -687,15 +688,19 @@ Ext.define('Editor.controller.Editor', {
     
     if (isWatched)
     {
-        model.set('id', segmentUserAssocId);
-        model.destroy({
+        config = {
+            id: segmentUserAssocId
+        }
+        model = Ext.create('Editor.model.SegmentUserAssoc', config);
+        model.getProxy().setAppendId(true);
+        model.erase({
             success: success,
             failure: failure
         });
     }
     else
     {
-        model.set('segmentId', segmentId);
+        model = Ext.create('Editor.model.SegmentUserAssoc', {'segmentId': segmentId});
         model.save({
             success: success,
             failure: failure

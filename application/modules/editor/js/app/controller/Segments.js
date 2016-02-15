@@ -113,10 +113,11 @@ Ext.define('Editor.controller.Segments', {
       },
       controller: {
           '#metapanelcontroller': {
-              watchlistRemoved: 'handleWatchlistRemoved'
+             
           },
           '#editorcontroller': {
-              saveSegment: 'saveChainStart'
+              saveSegment: 'saveChainStart',
+              watchlistRemoved: 'handleWatchlistRemoved'
           },
           '#changealikecontroller': {
               //called after currently loaded segment data is not used anymore by the save chain / change alike handling
@@ -215,8 +216,9 @@ Ext.define('Editor.controller.Segments', {
    */
   clearSortAndFilter: function() {
     var me = this,
-        store = me.getSegmentsStore();
-    filters = me.getSegmentGrid().filters;
+        store = me.getSegmentsStore(),
+        btn = me.getWatchListFilterBtn(),
+        filters = me.getSegmentGrid().filters;
     me.resetSegmentSortIntern();
     store.removeAll();
     if(store.getFilters().length > 0){
@@ -236,24 +238,32 @@ Ext.define('Editor.controller.Segments', {
         grid = me.getSegmentGrid(),
         gridFilters = grid.filters,
         filters = gridFilters.store.filters,
-        btn = me.getWatchListFilterBtn();
+        btn = me.getWatchListFilterBtn(),
+        found = false,
+        column, columnFilter;
 
     filters.each(function(filter, index, len){
         if (filter.getProperty() == 'isWatched')
         {
-            if (filter.getDisabled() === false) // currently enabled so disable it and unclick the button
-            {
-                filter.setDisabled(true);
-                btn.toggle(false);
-            }
-            else // currently disabled so enable it and click the button
-            {
-                filter.setDisabled(false);
-                filter.setValue(true);
-                btn.toggle(true);
-            }
+            found = true;
         }
     });
+    if (found) {
+        column = grid.columnManager.getHeaderByDataIndex('isWatched');
+        if (column) {
+            columnFilter = column.filter;
+            if (columnFilter && columnFilter.isGridFilter) {
+                columnFilter.setActive(false);
+            }
+        }
+    } else {
+        gridFilters.addFilter({
+            dataIndex: 'isWatched',
+            type: 'boolean',
+            value: true,
+            disabled: false
+        });
+    }
     filters.each(function(filter, index, len){
         if (filter.getProperty() != 'isWatched')
         {
@@ -273,9 +283,10 @@ Ext.define('Editor.controller.Segments', {
           btn = me.getWatchListFilterBtn();
           store = me.getSegmentsStore();
       if(!btn.pressed) {
-          return
+          return;
       }
-      store.remove(rec);
+      // FIXME: how to hide grid row, withowt reloading a grid ???
+      //store.remove(rec);
   },
   /**
    * behandelt die Selektion von Dateien im Dateibaum
@@ -304,8 +315,22 @@ Ext.define('Editor.controller.Segments', {
    * @return void
    */
   handleFilterChange: function(store, filters) {
-      var proxy = store.getProxy(),
+      var me = this,
+          proxy = store.getProxy(),
+          btn = me.getWatchListFilterBtn(),
+          grid = me.getSegmentGrid(),
+          gridFilters = grid.filters,
+          filters = gridFilters.store.filters,
+          found = false,
           params = {};
+          
+      filters.each(function(filter, index, len){
+         if (filter.getProperty() == 'isWatched')
+         {
+             found = true;
+         }
+      });
+      btn.toggle(found);
 
       params[proxy.getFilterParam()] = proxy.encodeFilters(store.getFilters().items);
       params[proxy.getSortParam()] = proxy.encodeSorters(store.getSorters().items);
