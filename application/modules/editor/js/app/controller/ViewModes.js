@@ -422,7 +422,7 @@ Ext.define('Editor.controller.ViewModes', {
               segCtrl.addLoadMask();
               segCtrl.saveChainStart({
                   chainEnd: function() {
-                      plug.editorDomCleanUp();
+                      // obsolete in Ext6 plug.editorDomCleanUp();
                   }
               });
           }
