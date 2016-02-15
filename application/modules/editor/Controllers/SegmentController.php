@@ -146,6 +146,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             if($this->entity->isModified($field)) {
                 $this->entity->updateQmSubSegments($field);
             }
+            $this->entity->correctQmSubSegmentsOverlappedTags($field);
         }
         
         $this->events->trigger("beforePutSave", $this, array('model' => $this->entity));

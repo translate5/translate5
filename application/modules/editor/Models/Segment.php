@@ -1056,6 +1056,18 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $withQm = $qmsubsegments->updateQmSubSegments($this->get($dataindex), (int)$this->getId(), $field['field']);
         $this->set($dataindex, $withQm);
     }
+    
+    /**
+     * Corrects overlapped image tags between which there is no text node
+     *
+     * @param string $dataindex
+     */
+    public function correctQmSubSegmentsOverlappedTags(string $dataindex) {
+        $segment = $this->get($dataindex);
+        $qmsubsegments = ZfExtended_Factory::get('editor_Models_Qmsubsegments');
+        $segment_corrected = $qmsubsegments->correctQmSubSegmentsOverlappedTags($segment);
+        $this->set($dataindex, $segment_corrected);
+    }
 
     /**
      * Bulk updating a specific autoState of a task 

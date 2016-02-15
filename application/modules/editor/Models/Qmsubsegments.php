@@ -131,6 +131,60 @@ class editor_Models_Qmsubsegments extends ZfExtended_Models_Entity_Abstract {
         return implode('', $sArr);
     }
     
+    protected function _getImageTagInfo($tag) {
+        $data = [];
+        $data['id'] = $this->getIdFromImg($tag);
+        $classes = $this->getClsFromImg($tag);
+        $classes = explode(' ', $classes);
+        $data['type'] = (in_array('open', $classes) !== false ? 'open' : 'close');
+        $data['flag'] = '';
+        foreach ($classes as $class) {
+            if (preg_match('/^qmflag-(\d+)$/', $class, $matches)) {
+                $data['flag'] = $matches[1];
+            }
+        }
+        return $data;
+    }
+    
+    /**
+     * Corrects overlapped image tags between which there is no text node
+     *
+     * @param string $segment
+     * @return string $segment_corrected
+     */
+    public function correctQmSubSegmentsOverlappedTags(string $segment) {
+        $sArrSrc = $this->splitSegment($segment);
+        $sArrDst = [];
+        for ($i = 0; $i < count($sArrSrc); $i++) {
+            if (substr($sArrSrc[$i], 0, 5) == '<img ') { //the odd entries contain the img-tags
+                $tag1_info = $this->_getImageTagInfo($sArrSrc[$i]);
+                if (($i + 2) < count($sArrSrc)) { // this is not the last image tag
+                    $tag2_info = $this->_getImageTagInfo($sArrSrc[$i+2]);
+                    if ($sArrSrc[$i+1] == '') { // there is no text node between these tags
+                        // tags are overlapped and with different flags
+                        if (($tag1_info['type'] == 'open') && ($tag2_info['type'] == 'close') && ($tag1_info['flag'] != $tag2_info['flag'])) {
+                            // swap tags
+                            $tag1_save = $sArrSrc[$i];
+                            $sArrSrc[$i] = $sArrSrc[$i+2];
+                            $sArrSrc[$i+2] = $tag1_save;
+                            $sArrDst[] = $sArrSrc[$i];
+                        } else {
+                            $sArrDst[] = $sArrSrc[$i];
+                        }
+                    } else {
+                        $sArrDst[] = $sArrSrc[$i];
+                    }
+                } else { // this is the last image tag
+                    $sArrDst[] = $sArrSrc[$i];
+                }
+            } else { // this is a text node 
+                $sArrDst[] = $sArrSrc[$i];
+            }
+        }
+        $segment_corrected = implode('', $sArrDst);
+        return $segment_corrected;
+    }
+    
     /**
      * splits up the segment along the img tags
      * @param string $segment
