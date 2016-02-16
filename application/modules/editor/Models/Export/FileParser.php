@@ -403,39 +403,29 @@ abstract class editor_Models_Export_FileParser {
         
         $add_image_tag = function($tag, $idref = 0, $data = []) use (&$split_out, $issues, $user, $is_image_tag, $extract, $check) {
             $has_data = (is_array($data) && (count($data) > 0));
-            if ($is_image_tag($tag, 'open') || ($has_data && ($data['type'] == 'open'))) {
-            	$type = 'open';
-            	$id = ($has_data) ? $data['id'] : $extract($tag, 'data-seq',true);
-            	$class = ($has_data) ? $data['class'] : $extract($tag, 'class');
-                $comment = ($has_data) ? $data['comment'] : $extract($tag, 'data-comment', false, false);
-                $severity = ($has_data) ? $data['severity'] : preg_replace('"^\s*([^ ]+) .*$"', '\\1', $class);
-                $check('severity', $severity, $class);
-                $issueId = ($has_data) ? $data['issueId'] : preg_replace('"^.*qmflag-(\d+).*$"', '\\1', $class);
-                $check('issueId', $issueId, $class);
-                $issue = $issues[$issueId];
-                $tag_out = '<mqm:issue xml:id="x'.$id.'"';
+            if (!$has_data) {
+            	$data['type'] = ($is_image_tag($tag, 'open')) ? 'open' : 'close';
+            	if ($data['type'] == 'open') {
+            		$data['id'] = $extract($tag, 'data-seq',true);
+            		$data['class'] = $extract($tag, 'class');
+            		$data['comment'] = $extract($tag, 'data-comment', false, false);
+            		$data['severity'] = preg_replace('"^\s*([^ ]+) .*$"', '\\1', $data['class']);
+            		$check('severity', $data['severity'], $data['class']);
+            		$data['issueId'] = preg_replace('"^.*qmflag-(\d+).*$"', '\\1', $data['class']);
+            		$check('issueId', $data['issueId'], $data['class']);
+            	}
+            }
+            if ($data['type'] == 'open') {
+                $issue = $issues[$data['issueId']];
+                $tag_out = '<mqm:issue xml:id="x'.$data['id'].'"';
                 if ($idref > 0) {
                     $tag_out .= ' idref="x'.$idref.'"';
                 }
-                $tag_out .= ' type="'.$issue.'" severity="'.$severity.'" note="'.$comment.' agent="'.$user.'">';
+                $tag_out .= ' type="'.$issue.'" severity="'.$data['severity'].
+                			'" note="'.$data['comment'].' agent="'.$user.'">';
                 $split_out[] = $tag_out;
-            } elseif ($is_image_tag($tag, 'close') || ($has_data && ($data['type'] == 'close'))) {
-            	$type = 'close';
+            } else {
                 $split_out[] = '</mqm:issue>';
-            }
-            if ($has_data) {
-            	return $data;
-            }
-            $data = ['type' => $type];
-            if ($type == 'open') {
-            	$data = [
-	            	'id' => $id,
-	            	'class' => $class,
-	            	'type' => $type,
-	            	'comment' => $comment,
-	            	'severity' => $severity,
-	            	'issueId' => $issueId
-	            ];
             }
 			return $data;           	
         };
