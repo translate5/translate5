@@ -352,24 +352,15 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       this.getTaskAddForm().getForm().reset();
       this.getTaskAddWindow().close();
   },
-  savingShow: function() {
-      var win = this.getTaskAddWindow();
-      //console.log('Editor.controller.admin.TaskOverview::savingShow');
-      win.setLoading(true);
-  },
-  savingHide: function() {
-      var win = this.getTaskAddWindow();
-      //console.log('Editor.controller.admin.TaskOverview::savingHide');
-      win.setLoading(false);
-  },
   /**
    * is called after clicking save task, starts the upload / form submit
    */
   handleTaskAdd: function() {
       var me = this,
-          error = me.getTaskAddWindow().down('#feedbackBtn');
+          win = me.getTaskAddWindow(),
+          error = win.down('#feedbackBtn');
       error.hide();
-      me.savingShow();
+      win.setLoading(true);
       this.getTaskAddForm().submit({
           //Accept Header of submitted file uploads could not be changed:
           //http://stackoverflow.com/questions/13344082/fileupload-accept-header
@@ -382,12 +373,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           success: function(form, submit) {
               var task = me.getModel('admin.Task').create(submit.result.rows);
               me.fireEvent('taskCreated', task);
-              me.savingHide();
+              win.setLoading(false);
               me.getAdminTasksStore().load();
               me.handleTaskCancel();
           },
           failure: function(form, submit) {
-              me.savingHide();
+              win.setLoading(false);
               if(submit.failureType == 'server' && submit.result && submit.result.errors && !Ext.isDefined(submit.result.success)) {
                   //all other failures should mark a field invalid
                   error.show();
