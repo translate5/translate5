@@ -361,39 +361,121 @@ abstract class editor_Models_Export_FileParser {
             }
         };
         
-        $extract = function($type,$numeric = false,$empty = true)use (&$split,&$i,$check){
+        $extract = function($tag, $type, $numeric = false, $empty = true) use ($check){
             $a = '[^\"]*';
             if($numeric)$a = '\d+';
-            $content = preg_replace('".*'.$type.'=\"('.$a.')\".*"', '\\1', $split[$i]);
-            $check($type,$content,$split[$i],$empty);
+            $content = preg_replace('".*'.$type.'=\"('.$a.')\".*"', '\\1', $tag);
+            $check($type, $content, $tag, $empty);
             return $content;
         };
         
         $issues = $this->_task->getQmSubsegmentIssuesFlat();
         $user = $this->_segmentEntity->getUserName();
         
-        for (; $i < $count; $i=$i+2) {//the uneven numbers are the tags
-            $id = $extract('data-seq',true);
-            $class = $extract('class');
-            $open = (boolean)preg_match('"^(open .*)|(.* open)|(.* open .*)$"', $class);
-            
-            if($open){
-                $comment = $extract('data-comment',false,false);
-                $severity = preg_replace('"^\s*([^ ]+) .*$"', '\\1', $class);
-                $check('severity',$severity,$class);
-                $issueId = preg_replace('"^.*qmflag-(\d+).*$"', '\\1', $class);
-                $check('issueId',$issueId,$class);
-                $issue = $issues[$issueId];
-                
-                $split[$i] = '<mqm:startIssue type="'.$issue.'" severity="'.
-                        $severity.'" note="'.$comment.'" agent="'.$user.
-                        '" id="'.$id.'"/>';
+        $is_image_tag = function($tag, $type = '') use ($extract) {
+            if (substr($tag, 0, 5) != '<img ') {
+            	return false;
             }
-            else{
-                $split[$i] = '<mqm:endIssue id="'.$id.'"/>';
+            if (in_array($type, ['open', 'close'])) {
+            	$class = $extract($tag, 'class');
+            	return (boolean)preg_match('"^('.$type.' .*)|(.* '.$type.')|(.* '.$type.' .*)$"', $class);
+            }
+            return true;
+        };
+
+        $is_overlapped = function($i) use ($split, $is_image_tag) {
+            // at this position is impossible to exist overlapped tags
+            if (($i + 6) >= count($split)) {
+                return false;
+            }
+            return  $is_image_tag($split[$i], 'open') &&
+            	   !$is_image_tag($split[$i+1]) &&
+            		$is_image_tag($split[$i+2], 'open') &&
+            	   !$is_image_tag($split[$i+3]) &&
+            	    $is_image_tag($split[$i+4], 'close') &&
+            	   !$is_image_tag($split[$i+5]) &&
+            	    $is_image_tag($split[$i+6], 'close');
+        };
+        
+        $add_as_is = function($item) use (&$split_out) {
+        	$split_out[] = $item;
+        };
+        
+        $add_image_tag = function($tag, $idref = 0, $data = []) use (&$split_out, $issues, $user, $is_image_tag, $extract, $check) {
+            $has_data = (is_array($data) && (count($data) > 0));
+            if ($is_image_tag($tag, 'open') || ($has_data && ($data['type'] == 'open'))) {
+            	$type = 'open';
+            	$id = ($has_data) ? $data['id'] : $extract($tag, 'data-seq',true);
+            	$class = ($has_data) ? $data['class'] : $extract($tag, 'class');
+                $comment = ($has_data) ? $data['comment'] : $extract($tag, 'data-comment', false, false);
+                $severity = ($has_data) ? $data['severity'] : preg_replace('"^\s*([^ ]+) .*$"', '\\1', $class);
+                $check('severity', $severity, $class);
+                $issueId = ($has_data) ? $data['issueId'] : preg_replace('"^.*qmflag-(\d+).*$"', '\\1', $class);
+                $check('issueId', $issueId, $class);
+                $issue = $issues[$issueId];
+                $tag_out = '<mqm:issue xml:id="x'.$id.'"';
+                if ($idref > 0) {
+                    $tag_out .= ' idref="x'.$idref.'"';
+                }
+                $tag_out .= ' type="'.$issue.'" severity="'.$severity.'" note="'.$comment.' agent="'.$user.'">';
+                $split_out[] = $tag_out;
+            } elseif ($is_image_tag($tag, 'close') || ($has_data && ($data['type'] == 'close'))) {
+            	$type = 'close';
+                $split_out[] = '</mqm:issue>';
+            }
+            if ($has_data) {
+            	return $data;
+            }
+            $data = ['type' => $type];
+            if ($type == 'open') {
+            	$data = [
+	            	'id' => $id,
+	            	'class' => $class,
+	            	'type' => $type,
+	            	'comment' => $comment,
+	            	'severity' => $severity,
+	            	'issueId' => $issueId
+	            ];
+            }
+			return $data;           	
+        };
+        
+        $correct_overlapped = function() use ($split, &$i, $add_image_tag, $add_as_is) {
+        	$data = $add_image_tag($split[$i]); // open
+        	$idref = $data['id'];
+        	$data['id'] += 999;
+        	$i++;
+        	$add_as_is($split[$i]);
+            $i++;
+            $add_image_tag('', 0, ['type' => 'close']); // close
+            $add_image_tag($split[$i]); // open
+            $i++;
+            $add_image_tag('', $idref, $data); // open
+            $add_as_is($split[$i]);
+            $i++;
+            $add_image_tag($split[$i]); // close
+            $i++;
+            $add_as_is($split[$i]);
+            $i++;
+            $add_image_tag($split[$i]); // close
+            $i++;
+        };
+        
+        $split_out = [];
+        for ($i = 0; $i < $count;) {
+            if ($is_image_tag($split[$i])) {
+                if ($is_overlapped($i)) {
+                    $correct_overlapped(); // this procedure increments $i by 7
+                } else {
+                    $add_image_tag($split[$i]);
+                    $i++;
+                }
+            } else {
+                $add_as_is($split[$i]);
+                $i++;
             }
         }
-        return implode('', $split);
+        return implode('', $split_out);
     }
 
     /**
