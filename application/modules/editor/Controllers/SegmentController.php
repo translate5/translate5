@@ -90,15 +90,38 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     
     public function indexAction() {
         $session = new Zend_Session_Namespace();
-        $this->view->rows = $this->entity->loadByTaskGuid($session->taskGuid);
-        $this->view->total = $this->entity->totalCountByTaskGuid($session->taskGuid);
-        $borderSegments = $this->entity->getBorderSegments($session->taskGuid);
+        $taskGuid = $session->taskGuid;
+        $this->view->rows = $this->entity->loadByTaskGuid($taskGuid);
+        $this->view->total = $this->entity->totalCountByTaskGuid($taskGuid);
+        
+        $this->addIsFirstFileInfo($taskGuid);
+        
+        $borderSegments = $this->entity->getBorderSegments($taskGuid);
         //editable segments only!
         if(!empty($borderSegments['first'])) {
             $this->view->firstSegmentId = $borderSegments['first']['id'];
         }
         if(!empty($borderSegments['last'])) {
             $this->view->lastSegmentId = $borderSegments['last']['id'];
+        }
+    }
+    
+    /**
+     * adds the optional is first of file info to the affected segments
+     * @param string $taskGuid
+     */
+    protected function addIsFirstFileInfo(string $taskGuid) {
+        $filemap = $this->entity->getFileMap($taskGuid);
+        foreach($filemap as $rowIndex) {
+            //omit first file
+            if($rowIndex === 0) {
+                continue;
+            }
+            $idx = $rowIndex - $this->offset;
+            if($idx < 0 || empty($this->view->rows[$idx])) {
+                continue;
+            }
+            $this->view->rows[$idx]['isFirstofFile'] = true;
         }
     }
 
