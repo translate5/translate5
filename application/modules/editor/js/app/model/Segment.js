@@ -66,6 +66,7 @@ Ext.define('Editor.model.Segment', {
     fields: [
         {name: 'id', type: 'int'},
         {name: 'fileId', type: 'int'},
+        {name: 'isFirstofFile', type: 'boolean', persist: false, defaultValue: false},
         {name: 'segmentNrInTask', type: 'int'},
         {name: 'userName', type: 'string'},
         {name: 'timestamp', type: 'date'},

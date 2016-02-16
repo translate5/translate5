@@ -285,22 +285,18 @@ Ext.define('Editor.view.segments.Grid', {
             var me = this,
             config = {
                 viewConfig: {
-                    blockRefresh: true,
+                    //blockRefresh: true, //FIXME ext6: is this setting needed?
                     getRowClass: function(record, rowIndex, rowParams, store){
                         var newClass = '',
+                            // only on non sorted list we mark last file segments
+                            isDefaultSort = (store.sorters.length == 0),
                             isFirstInFile = false,
                             nextRec = null;
-                        // only on non sorted list we mark last file segments
-                        if (store.sorters.length == 0){
-                            if (this.firstFileId && this.firstFileId != record.get('fileId')){
-                                isFirstInFile = true;
-                            }
-                            this.firstFileId = record.get('fileId');
-                        }
-                        // don't mark the first row of the grid
-                        if (isFirstInFile && (rowIndex > 0)){
+                        
+                        if (isDefaultSort && record.get('isFirstofFile')){
                             newClass += ' first-in-file';
                         }
+                        me.lastRowIdx = rowIndex;
                         if (!record.get('editable')) {
                             newClass += ' editing-disabled';
                         }
