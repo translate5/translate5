@@ -63,14 +63,18 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
     // from Ext4 begin
     itemId: 'roweditor',
     
+    liveDrag: true,
+    
     //beinhaltet den gekürzten Inhalt des letzten geöffneteten Segments
     lastSegmentShortInfo: '',
     columnToEdit: null,
+    
     rowToEditOrigHeight: 0,
     editorExtraHeight: 20,
     editorFieldExtraHeight: 10,
     editorShadowsExtraHeight: 4, // see css/main.css class .x-grid-row-editor-wrap
     fieldToEdit: null,
+    
     previousRecord: null,
     timeTrackingData: null,
     columns: null,
@@ -97,59 +101,13 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
 
         me.lockable = grid.lockable;
 
-        // Create field containing structure for when editing a lockable grid.
-        if (me.lockable) {
-            me.items = [
-                // Locked columns container shrinkwraps the fields
-                lockedCt = me.lockedColumnContainer = new Container({
-                    id: grid.id + '-locked-editor-cells',
-                    scrollable: {
-                        x: false,
-                        y: false
-                    },
-                    layout: {
-                        type: 'hbox',
-                        align: 'middle'
-                    },
-                    // Locked grid has a border, we must be exactly the same width
-                    margin: '0 1 0 0'
-                }),
+        // initialize a scroller instance for maintaining horizontal scroll position
+        me.setScrollable({
+            x: false,
+            y: false
+        });
 
-                // Normal columns container flexes the remaining RowEditor width
-                normalCt = me.normalColumnContainer = new Container({
-                    // not user scrollable, but needs a Scroller instance for syncing with view
-                    scrollable: {
-                        x: false,
-                        y: false
-                    },
-                    flex: 1,
-                    id: grid.id + '-normal-editor-cells',
-                    layout: {
-                        type: 'hbox',
-                        align: 'middle'
-                    }
-                })
-            ];
-
-            // keep horizontal position of fields in sync with view's horizontal scroll position
-            //FIXME disabling the addPartner calls, since they are leading to inconsistent scrolling positions.
-            //We have to test the RowEditor if scrolling works well, if yes then we can delete the addPartner calls:
-            //lockedCt.getScrollable().addPartner(grid.lockedGrid.view.getScrollable(), 'x');
-            //normalCt.getScrollable().addPartner(grid.normalGrid.view.getScrollable(), 'x');
-        } else {
-            // initialize a scroller instance for maintaining horizontal scroll position
-            me.setScrollable({
-                x: false,
-                y: false
-            });
-
-            // keep horizontal position of fields in sync with view's horizontal scroll position
-            //FIXME disabling the addPartner calls, since they are leading to inconsistent scrolling positions.
-            //We have to test the RowEditor if scrolling works well, if yes then we can delete the addPartner calls:
-            //me.getScrollable().addPartner(grid.view.getScrollable(), 'x');
-
-            me.lockedColumnContainer = me.normalColumnContainer = me;
-        }
+        me.lockedColumnContainer = me.normalColumnContainer = me;
 
         me.callParent();
 
@@ -540,7 +498,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
             grid = me.editingPlugin.grid,
             gridBody = grid.body;
 
-        me.wrapEl.setLocalX(gridBody.getOffsetsTo(grid)[0] + gridBody.getBorderWidth('l') - grid.el.getBorderWidth('l'));
+        //me.wrapEl.setLocalX(gridBody.getOffsetsTo(grid)[0] + gridBody.getBorderWidth('l') - grid.el.getBorderWidth('l'));
         
         me.setWidth(clientWidth);
         if (me.lockable) {
@@ -688,6 +646,20 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
                 this.editingPlugin.cancelEdit();
             }
         }
+    },
+
+    onBoxReady: function() {
+        var me = this,
+            ddConfig = {
+                el: me.el,
+                constrain: true,
+                constrainDelegate: true,
+                constrainTo: me.view.body//,
+                //delegate: '#' + me.header.id
+            };
+
+        me.dd = new Ext.util.ComponentDragger(me, ddConfig);
+        me.relayEvents(me.dd, ['dragstart', 'drag', 'dragend']);
     },
     
     onViewScroll: function(){
@@ -906,7 +878,8 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
             context = me.context,
             row = context && context.row,
             yOffset = 0,
-            wrapEl = me.wrapEl,
+            //wrapEl = me.wrapEl,
+            wrapEl = me.el,
             rowTop = 0,
             localY,
             deltaY = 0,
@@ -1228,19 +1201,20 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         // The show call will update the layout
         Ext.suspendLayouts();
 
-        if (!me.rendered || !wrapEl) {
+//        if (!me.rendered || !wrapEl) {
+        if (!me.rendered) {
             if (!me.rendered)
             {
                 me.width = me.getClientWidth();
                 me.render(grid.el, grid.el.dom.firstChild);
             }
             // The wrapEl is a container for the editor.
-            wrapEl = me.wrapEl = me.el.wrap();
+//            wrapEl = me.wrapEl = me.el.wrap();
             // Change the visibilityMode to offsets so that we get accurate measurements
             // when the roweditor is hidden for laying out things like a TriggerField.
-            wrapEl.setVisibilityMode(3);
+//            wrapEl.setVisibilityMode(3);
 
-            wrapEl.addCls(me._wrapCls);
+//            wrapEl.addCls(me._wrapCls);
             // On first show we need to ensure that we have the scroll positions cached
             me.onViewScroll();
         }
@@ -1348,7 +1322,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
             grid = editingPlugin.grid,
             viewEl = grid.getView().getEl(),
             context = me.context,
-            wrapEl = me.wrapEl,
+            wrapEl = me.el,
             row = Ext.get(context.row),
             editorTop = me.calculateLocalRowTop(wrapEl),
             rowTop = me.calculateLocalRowTop(row),
@@ -1382,7 +1356,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
             view = grid.getView(),
             viewEl = view.getEl(),
             context = me.context,
-            wrapEl = me.wrapEl,
+            wrapEl = me.el,
             row = Ext.get(context.row),
             editorTop = me.calculateLocalRowTop(wrapEl),
             rowTop = me.calculateLocalRowTop(row),
@@ -1395,7 +1369,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
     onShow: function() {
         var me = this;
 
-        me.wrapEl.show();
+        //me.wrapEl.show();
         me.callParent(arguments);
         if (me.needsSyncFieldWidths) {
             me.suspendLayouts();
@@ -1424,7 +1398,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
             focusContext.view.getNavigationModel().setPosition(focusContext);
             me.activeField = null;
         }
-        me.wrapEl.hide();
+        //me.wrapEl.hide();
         me.callParent(arguments);
         if (me.tooltip) {
             me.hideToolTip();
@@ -1432,7 +1406,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
     },
 
     onResize: function(width, height) {
-        this.wrapEl.setSize(width, height);
+        //this.wrapEl.setSize(width, height);
     },
 
     isDirty: function() {
