@@ -69,13 +69,13 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
             'runtimeOptions.import.csv.delimiter' => ',',
             'runtimeOptions.import.csv.enclosure' => '"',
             'runtimeOptions.import.csv.fields.mid' => 'mid',
-            'runtimeOptions.import.csv.fields.source' => 'source',
+            'runtimeOptions.import.csv.fields.source' => 'quelle',
             'runtimeOptions.editor.notification.saveXmlToFile' => 1,
         );
         
         foreach($tests as $name => $value) {
             $config = $this->api()->requestJson('editor/config', 'GET', array(
-                'filter' => '[{"type":"string","value":"'.$name.'","field":"name"}]',
+                'filter' => '[{"type":"string","value":"'.$name.'","property":"name","operator":"like"}]',
             ));
             $this->assertCount(1, $config);
             $this->assertEquals($value, $config[0]->value);
@@ -155,7 +155,7 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
         //this revids has to be replaced before assertEqual
         $approvalFileContent = $this->api()->getFileContent('testCsvEncoding-assert-equal.xliff');
         $toCheck = $this->api()->replaceChangesXmlContent(file_get_contents($foundChangeFile));
-        file_put_contents('/home/marcstandard/Schreibtisch/temp/asdf.xml', $toCheck);
+        //file_put_contents('/home/marcstandard/Schreibtisch/temp/asdf.xml', $toCheck);
         $this->assertSame($approvalFileContent, $toCheck);
     }
     
