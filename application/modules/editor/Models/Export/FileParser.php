@@ -97,6 +97,28 @@ abstract class editor_Models_Export_FileParser {
     protected $disableMqmExport = false;
     
     /**
+     * Set in convertQmTags2XliffFormat() and used by _addXlifQmTag()
+     * 
+     * @var string
+     */
+    private  $_user;
+    
+    
+    /**
+     * Set in convertQmTags2XliffFormat() and used by _addXlifQmTag()
+     * 
+     * @var string[]
+     */
+    private  $_issues;
+    
+    /**
+     * Set in convertQmTags2XliffFormat() and used by _addXlifQmTag()
+     *
+     * @var string[]
+     */
+    private  $_store;
+    
+    /**
      * 
      * @param integer $fileId
      * @param boolean $diff
@@ -329,6 +351,120 @@ abstract class editor_Models_Export_FileParser {
     }
     
     /**
+     * Checks image tag for errors 
+     * 
+     * @param string $type
+     * @param string $content
+     * @param string $input
+     * @param boolean $empty
+     */
+    private function _checkImageTag($type, $content, $input, $empty = true) {
+    	if($empty && $content == ''){
+    		trigger_error($type.' had been emtpy when extracting from qm-subsegment-tag.',E_USER_ERROR);
+    	}
+    	if($content == $input){
+    		#trigger_error($type.' could not be extracted from qm-subsegment-tag.',E_USER_ERROR);
+    	}
+    }
+    
+    /**
+     * Extracts image tag's attribute value and checks it
+     * 
+     * @param string $tag
+     * @param string $type
+     * @param boolean $numeric
+     * @param boolean $empty
+     */
+    private function _getImgTagAttr($tag, $type, $numeric = false, $empty = true) {
+    	$a = '[^\"]*';
+    	if($numeric)$a = '\d+';
+    	$content = preg_replace('".*'.$type.'=\"('.$a.')\".*"', '\\1', $tag);
+    	$this->_checkImageTag($type, $content, $tag, $empty);
+    	return $content;
+    }
+    
+    /**
+     * If $type is not set, checks while the $tag is image tag or no.
+     * If $type is set, it assumes that $tag is image tag, but checks while is 'open' or 'close'
+     * 
+     * @param string $tag
+     * @param string $type
+     * @return boolean
+     */
+    private function _isImageTag($tag, $type = '') {
+    	if (substr($tag, 0, 5) != '<img ') {
+    		return false;
+    	}
+    	if (in_array($type, ['open', 'close'])) {
+    		$class = $this->_getImgTagAttr($tag, 'class');
+    		return (boolean)preg_match('"^('.$type.' .*)|(.* '.$type.')|(.* '.$type.' .*)$"', $class);
+    	}
+    	return true;
+    }
+    
+    private function _addXlifQmTag($tag, $idref = 0, $data = []) {
+    	$has_data = (is_array($data) && (count($data) > 0));
+    	if (!$has_data) {
+    		$data['type'] = ($this->_isImageTag($tag, 'open')) ? 'open' : 'close';
+    		if ($data['type'] == 'open') {
+    			$data['id'] = $this->_getImgTagAttr($tag, 'data-seq',true);
+    			$data['class'] = $this->_getImgTagAttr($tag, 'class');
+    			$data['comment'] = $this->_getImgTagAttr($tag, 'data-comment', false, false);
+    			$data['severity'] = preg_replace('"^\s*([^ ]+) .*$"', '\\1', $data['class']);
+    			$this->_checkImageTag('severity', $data['severity'], $data['class']);
+    			$data['issueId'] = preg_replace('"^.*qmflag-(\d+).*$"', '\\1', $data['class']);
+    			$this->_checkImageTag('issueId', $data['issueId'], $data['class']);
+    		}
+    	}
+    	if ($data['type'] == 'open') {
+    		$issue = $this->_issues[$data['issueId']];
+    		$tag_out = '<mqm:issue xml:id="x'.$data['id'].'"';
+    		if ($idref > 0) {
+    			$tag_out .= ' idref="x'.$idref.'"';
+    		}
+    		$tag_out .= ' type="'.$issue.'" severity="'.$data['severity'].
+    		'" note="'.$data['comment'].' agent="'.$this->_user.'">';
+    		$this->_store[] = $tag_out;
+    	} else {
+    		$this->_store[] = '</mqm:issue>';
+    	}
+    	return $data;
+    }
+    
+    /**
+     * Checks while in the $i position of the $store exist overlapped QM tags
+     * 
+     * @param string[] $store
+     * @param integer $i
+     */
+    protected function _isOverlappedQmTags($store, $i) {
+    	// at this position is impossible to exist overlapped tags
+    	if (($i + 6) >= count($store)) {
+    		return false;
+    	}
+    	// at this position has either nested or overlapped tags 
+    	if ($this->_isImageTag($store[$i], 'open') &&
+	    	!$this->_isImageTag($store[$i+1]) &&
+	    	$this->_isImageTag($store[$i+2], 'open') &&
+	    	!$this->_isImageTag($store[$i+3]) &&
+	    	$this->_isImageTag($store[$i+4], 'close') &&
+	    	!$this->_isImageTag($store[$i+5]) &&
+	    	$this->_isImageTag($store[$i+6], 'close'))
+    	{
+	    	$id1 = $this->_getImgTagAttr($store[$i+2], 'data-seq', true);	
+	    	$id2 = $this->_getImgTagAttr($store[$i+4], 'data-seq', true);
+	    	
+	    	if ($id1 != $id2) {
+	    		// overlapped
+	    		return true;
+	    	}
+	    	// nested
+	    	return false;
+	    }
+	    return false;
+    }
+    
+    /**
      * converts the QM-Subsegment-Tags to xliff-format
      * 
      * @param string $segment
@@ -351,121 +487,33 @@ abstract class editor_Models_Export_FileParser {
             }
             return implode('', $split);
         }
-        
-        $check = function($type,$content,$input,$empty = true){
-            if($empty && $content == ''){
-                trigger_error($type.' had been emtpy when extracting from qm-subsegment-tag.',E_USER_ERROR);
-            }
-            if($content == $input){
-                #trigger_error($type.' could not be extracted from qm-subsegment-tag.',E_USER_ERROR);
-            }
-        };
-        
-        $extract = function($tag, $type, $numeric = false, $empty = true) use ($check){
-            $a = '[^\"]*';
-            if($numeric)$a = '\d+';
-            $content = preg_replace('".*'.$type.'=\"('.$a.')\".*"', '\\1', $tag);
-            $check($type, $content, $tag, $empty);
-            return $content;
-        };
-        
-        $issues = $this->_task->getQmSubsegmentIssuesFlat();
-        $user = $this->_segmentEntity->getUserName();
-        
-        $is_image_tag = function($tag, $type = '') use ($extract) {
-            if (substr($tag, 0, 5) != '<img ') {
-            	return false;
-            }
-            if (in_array($type, ['open', 'close'])) {
-            	$class = $extract($tag, 'class');
-            	return (boolean)preg_match('"^('.$type.' .*)|(.* '.$type.')|(.* '.$type.' .*)$"', $class);
-            }
-            return true;
-        };
 
-        $is_overlapped = function($i) use ($split, $is_image_tag) {
-            // at this position is impossible to exist overlapped tags
-            if (($i + 6) >= count($split)) {
-                return false;
-            }
-            return  $is_image_tag($split[$i], 'open') &&
-            	   !$is_image_tag($split[$i+1]) &&
-            		$is_image_tag($split[$i+2], 'open') &&
-            	   !$is_image_tag($split[$i+3]) &&
-            	    $is_image_tag($split[$i+4], 'close') &&
-            	   !$is_image_tag($split[$i+5]) &&
-            	    $is_image_tag($split[$i+6], 'close');
-        };
+        $this->_issues = $this->_task->getQmSubsegmentIssuesFlat();
+        $this->_user = $this->_segmentEntity->getUserName();
+        $this->_store = [];
         
-        $add_as_is = function($item) use (&$split_out) {
-        	$split_out[] = $item;
-        };
-        
-        $add_image_tag = function($tag, $idref = 0, $data = []) use (&$split_out, $issues, $user, $is_image_tag, $extract, $check) {
-            $has_data = (is_array($data) && (count($data) > 0));
-            if (!$has_data) {
-            	$data['type'] = ($is_image_tag($tag, 'open')) ? 'open' : 'close';
-            	if ($data['type'] == 'open') {
-            		$data['id'] = $extract($tag, 'data-seq',true);
-            		$data['class'] = $extract($tag, 'class');
-            		$data['comment'] = $extract($tag, 'data-comment', false, false);
-            		$data['severity'] = preg_replace('"^\s*([^ ]+) .*$"', '\\1', $data['class']);
-            		$check('severity', $data['severity'], $data['class']);
-            		$data['issueId'] = preg_replace('"^.*qmflag-(\d+).*$"', '\\1', $data['class']);
-            		$check('issueId', $data['issueId'], $data['class']);
-            	}
-            }
-            if ($data['type'] == 'open') {
-                $issue = $issues[$data['issueId']];
-                $tag_out = '<mqm:issue xml:id="x'.$data['id'].'"';
-                if ($idref > 0) {
-                    $tag_out .= ' idref="x'.$idref.'"';
-                }
-                $tag_out .= ' type="'.$issue.'" severity="'.$data['severity'].
-                			'" note="'.$data['comment'].' agent="'.$user.'">';
-                $split_out[] = $tag_out;
-            } else {
-                $split_out[] = '</mqm:issue>';
-            }
-			return $data;           	
-        };
-        
-        $correct_overlapped = function() use ($split, &$i, $add_image_tag, $add_as_is) {
-        	$data = $add_image_tag($split[$i]); // open
-        	$idref = $data['id'];
-        	$data['id'] += 999;
-        	$i++;
-        	$add_as_is($split[$i]);
-            $i++;
-            $add_image_tag('', 0, ['type' => 'close']); // close
-            $add_image_tag($split[$i]); // open
-            $i++;
-            $add_image_tag('', $idref, $data); // open
-            $add_as_is($split[$i]);
-            $i++;
-            $add_image_tag($split[$i]); // close
-            $i++;
-            $add_as_is($split[$i]);
-            $i++;
-            $add_image_tag($split[$i]); // close
-            $i++;
-        };
-        
-        $split_out = [];
         for ($i = 0; $i < $count;) {
-            if ($is_image_tag($split[$i])) {
-                if ($is_overlapped($i)) {
-                    $correct_overlapped(); // this procedure increments $i by 7
-                } else {
-                    $add_image_tag($split[$i]);
-                    $i++;
-                }
+            if ($this->_isImageTag($split[$i])) {
+            	$data = $this->_addXlifQmTag($split[$i]); // open
+            	if ($this->_isOverlappedQmTags($split, $i))
+            	{
+            		$i++;
+	            	$idref = $data['id'];
+	            	$data['id'] += 999;
+	            	$this->_store[] = $split[$i++];
+	            	$this->_addXlifQmTag('', 0, ['type' => 'close']); // close
+	            	$this->_addXlifQmTag($split[$i++]); // open
+	            	$this->_addXlifQmTag('', $idref, $data); // open
+	            	$this->_store[] = $split[$i++];
+	            	$this->_addXlifQmTag($split[$i++]); // close
+	            	$this->_store[] = $split[$i++];
+	            	$this->_addXlifQmTag( $split[$i++]); // close
+            	} else $i++;
             } else {
-                $add_as_is($split[$i]);
-                $i++;
+                $this->_store[] = $split[$i++];
             }
         }
-        return implode('', $split_out);
+        return implode('', $this->_store);
     }
 
     /**
