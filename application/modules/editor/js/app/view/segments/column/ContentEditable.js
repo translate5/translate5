@@ -28,39 +28,18 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
- * @class Editor.view.segments.column.Editor
- * @extends Editor.view.ui.segments.column.Editor
- * @initalGenerated
+ * @class Editor.view.segments.column.ContentEditable
+ * @extends Ext.grid.column.Column
  */
 Ext.define('Editor.view.segments.column.ContentEditable', {
-  extend: 'Ext.grid.column.Column',
+  extend: 'Editor.view.segments.column.Content',
   alias: 'widget.contentEditableColumn',
-  mixins: ['Editor.view.segments.column.BaseMixin'],
   //how is this defined for alternative columns:
   isErgonomicVisible: true,
   //how is this defined for alternative columns:
   isErgonomicSetWidth: true,
-  
-  /**
-   * @cfg {String} fieldName
-   * The name of the segment data field, is processed automatically as dataIndex and so on.
-   * **Required.**
-   */
-  fieldName: null,
-  width: 250,
-  resizable: false,
-  fixed: true,
-  
-  filter: {
-    type: 'string'
-  },
+  isEditableContentColumn: true,
   constructor: function(conf) {
       var field = conf.fieldName;
       Ext.applyIf(conf, {
@@ -70,28 +49,12 @@ Ext.define('Editor.view.segments.column.ContentEditable', {
       });
       this.callParent(arguments);
   },
-  getTypeCls: function(field) {
-      return ' type-'+field.get('type');
-  },
   initComponent: function() {
-  //disable ergo mode on source column
     var me = this;
-    me.initBaseMixin();
     me.callParent(arguments);
     //ensure that we have only one Editor in the application, created for the first target column
     if(me.segmentField.isTarget() && !me.self.firstTarget || (me.self.firstTarget == me.dataIndex)) {
         me.self.firstTarget = me.dataIndex;
     }
-  },
-  /**
-   * interne Methode, wird zur Erzeugung der Editor Instanz einer Spalte verwendet
-   * @returns {Editor.view.segments.HtmlEditor}
-   */
-  getEditorDefaultConfig: function() {
-      var me = this;
-      return {
-          name: this.dataIndex,
-          fieldCls: 'x-form-display-field segment-tag-container'+me.getTypeCls(me.segmentField)
-      };
-  } 
+  }
 });

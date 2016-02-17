@@ -182,6 +182,7 @@ Ext.define('Editor.view.segments.Grid', {
                 width = Math.min(Math.max(width, labelWidth), maxWidth);
                 var col2push = {
                     xtype: 'contentColumn',
+                    grid: me,
                     segmentField: rec,
                     fieldName: name,
                     hidden: !userPref.isNonEditableColumnVisible() && rec.isTarget(),
@@ -207,6 +208,7 @@ Ext.define('Editor.view.segments.Grid', {
                 width = Math.min(Math.max(width, labelWidth), maxWidth);
                 var col2push = {
                     xtype: 'contentEditableColumn',
+                    grid: me,
                     segmentField: rec,
                     fieldName: name,
                     isErgonomicVisible: isErgoVisible,

@@ -55,6 +55,7 @@ Ext.define('Editor.view.segments.column.Content', {
   width: 250,
   resizable: false,
   fixed: true,
+  isContentColumn: true,
   constructor: function(conf) {
       var field = conf.fieldName;
       Ext.applyIf(conf, {
@@ -76,11 +77,19 @@ Ext.define('Editor.view.segments.column.Content', {
    * internal method to create a display field
    * @returns {Editor.view.segments.HtmlEditor}
    */
-  getEditorDefaultConfig: function() {
-      var me = this;
-      return {
-          name: this.dataIndex,
-          fieldCls: 'x-form-display-field segment-tag-container'+me.getTypeCls(me.segmentField)
-      };
-  } 
+  getEditor: function(rec, conf) {
+      var me = this,
+          plug = me.grid.editingPlugin,
+          config = {
+              xtype: 'displayfield',
+              // Override Field's implementation so that the default display fields will not return values. This is done because
+              // the display field will pick up column renderers from the grid.
+              getModelData: function() {
+                  return null;
+              },
+              name: this.dataIndex,
+              fieldCls: 'x-form-display-field segment-tag-container'+me.getTypeCls(me.segmentField)
+          };
+      return plug.getColumnField(me, config);
+  }
 });
