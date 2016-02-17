@@ -130,6 +130,62 @@ class editor_Models_Qmsubsegments extends ZfExtended_Models_Entity_Abstract {
         $this->deleteUnused($segmentId,$qmIdsInSeg, $field);
         return implode('', $sArr);
     }
+    
+    
+    /**
+     * Extracts information from the tag, needed from $this->_areTagsOverlapped()
+     * 
+     * @param string $tag
+     * @return string[]
+     */
+    protected function _getImageTagInfo($tag) {
+    	$data = [];
+    	$data['id'] = $this->getIdFromImg($tag);
+    	$classes = $this->getClsFromImg($tag);
+    	$classes = explode(' ', $classes);
+    	$data['type'] = (in_array('open', $classes) !== false ? 'open' : 'close');
+    	return $data;
+    }
+    
+    /**
+     * Checks while the string is image tag 
+     * 
+     * @param string $tag
+     * @return boolean
+     */
+    protected function _isImageTag($tag) {
+    	if (substr($tag, 0, 5) == '<img ') {
+    		return true;
+    	}
+    	return false;
+    }
+    
+    /**
+     * Check while the two tags are overlapped without any contents between them
+     * 
+     * @param string $tag1
+     * @param string $between
+     * @param string $tag2
+     * @return boolean
+     */
+    protected function _areTagsOverlapped($tag1, $between, $tag2) {
+    	// at least one of the tags is not an image tag
+    	if (!$this->_isImageTag($tag1) || !$this->_isImageTag($tag2)) {
+    		return false;
+    	}
+    	if ($between != '') { // there is some contents between tags
+    		return false;
+    	}
+    	$tag1_info = $this->_getImageTagInfo($tag1);
+    	$tag2_info = $this->_getImageTagInfo($tag2);
+    	if (($tag1_info['type'] == 'open') &&
+    		($tag2_info['type'] == 'close') &&
+    		($tag1_info['id'] != $tag2_info['id'])) {
+    	
+    		return true;
+    	}
+    	return false;
+    }
 
     /**
      * Corrects overlapped image tags between which there is no text node
@@ -139,82 +195,17 @@ class editor_Models_Qmsubsegments extends ZfExtended_Models_Entity_Abstract {
      */
     public function correctQmSubSegmentsOverlappedTags(string $segment) {
     	$sArrSrc = $this->splitSegment($segment);
-    	$sArrDst = [];
-    	
-    	$getImageTagInfo = function($tag) {
-    		$data = [];
-    		$classes = $this->getClsFromImg($tag);
-    		$classes = explode(' ', $classes);
-    		$data['type'] = (in_array('open', $classes) !== false ? 'open' : 'close');
-    		$data['flag'] = '';
-    		foreach ($classes as $class) {
-    			if (preg_match('/^qmflag-(\d+)$/', $class, $matches)) {
-    				$data['flag'] = $matches[1];
-    				break;
-    			}
-    		}
-    		return $data;
-    	};
+    	$count = count($sArrSrc);
     	    	
-    	$isImageTag = function($tag) {
-    		if (substr($tag, 0, 5) == '<img ') {
-    			return true;
-    		}
-    		return false;
-    	};
-    	
-    	$swapImgTags = function() use ($sArrSrc, &$i, &$sArrDst) {
-    		$curr = $sArrSrc[$i];
-    		$next = $sArrSrc[$i+2];
-    		$sArrDst[] = $next;
-    		$i++;
-    		$sArrDst[] = '';
-    		$i++;
-    		$sArrDst[] = $curr;
-    		$i++;
-    	};
-    	
-    	$processEmptyImgTag = function() use ($sArrSrc, &$i, &$sArrDst, $getImageTagInfo, $swapImgTags) {
-    		$tag1_info = $getImageTagInfo($sArrSrc[$i]);
-    		$tag2_info = $getImageTagInfo($sArrSrc[$i+2]);
-    		if (($tag1_info['type'] == 'open') &&
-    			($tag2_info['type'] == 'close') &&
-    			($tag1_info['flag'] != $tag2_info['flag'])) {
-
-    			$swapImgTags();
-    			return;
-    		}
-    		$sArrDst[] = $sArrSrc[$i];
-    		$i++;
-    	};
-    	
-    	$processNotLastImgTag = function() use ($sArrSrc, &$i, &$sArrDst, $processEmptyImgTag) {
-    		if ($sArrSrc[$i+1] == '') { // this image tag is empty
-    			$processEmptyImgTag();
-    			return;
-    		}
-    		$sArrDst[] = $sArrSrc[$i];
-    		$i++;
-    	};
-    	
-    	$processImgTag = function() use ($sArrSrc, &$i, &$sArrDst, $processNotLastImgTag) {
-    		if ((($i + 2) < count($sArrSrc))) { // this is not the last image tag
-    			$processNotLastImgTag();
-    			return;
-    		}
-    		$sArrDst[] = $sArrSrc[$i];
-    		$i++;
-    	};
-    	
-        for ($i = 0; $i < count($sArrSrc);) {
-            if ($isImageTag($sArrSrc[$i])) {
-            	$processImgTag();
-            } else { 
-                $sArrDst[] = $sArrSrc[$i];
-                $i++;
+    	for ($i = 0; $i < $count; $i++) {
+            if ((($i + 2) < $count) && $this->_areTagsOverlapped($sArrSrc[$i], $sArrSrc[$i+1], $sArrSrc[$i+2])) {
+            	// swap overlapped tags
+            	$tag1_save = $sArrSrc[$i];
+            	$sArrSrc[$i] = $sArrSrc[$i+2];
+            	$sArrSrc[$i+2] = $tag1_save;
             }
         }
-        $segment_corrected = implode('', $sArrDst);
+        $segment_corrected = implode('', $sArrSrc);
         return $segment_corrected;
     }
     
