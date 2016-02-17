@@ -73,6 +73,7 @@ Ext.define('Editor.view.ViewPortEditor', {
                       }
                   },
                   preventHeader: true,
+                  border:0,
                   itemId: 'metapanel',
                   layout: {type:'accordion'},
                   dockedItems: [{
