@@ -160,6 +160,34 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id);
         $this->assertSegmentContentToFile('testSegmentEditing-assert-seg7.json', $segment);
         
+        // check correction of overpapped QM Tags (only when there is no contents between them)
+        $segToTest = $segments[6];
+        $tag1_open = '<img class="critical qmflag ownttip open qmflag-19" data-seq="497" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-left.png" />';
+        $tag1_close = '<img class="critical qmflag ownttip close qmflag-19" data-seq="497" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-right.png" />';
+        $tag2_open = '<img class="critical qmflag ownttip open qmflag-4" data-seq="498" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-left.png" />';
+        $tag2_close = '<img class="critical qmflag ownttip close qmflag-4" data-seq="498" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-right.png" />';
+        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $tag1_open.'Apache 2.x'.$tag2_open.$tag1_close.' auf'.$tag2_close.' Unix-Systemen', $segToTest->id);
+        $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        
+        //check direct PUT result
+        $this->assertSegmentContentToFile('testSegmentEditing-assert-seg7-a.json', $segment);
+        
+        //check again with GET fresh from server
+        $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id);
+        $this->assertSegmentContentToFile('testSegmentEditing-assert-seg7-a.json', $segment);
+        
+        // check for overpapped QM Tags with contents between them. They must be not corrected on saving.
+        $segToTest = $segments[6];
+        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $tag1_open.'Apache 2.x'.$tag2_open.' auf'.$tag1_close.' Unix-Systemen'.$tag2_close, $segToTest->id);
+        $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        
+        //check direct PUT result
+        $this->assertSegmentContentToFile('testSegmentEditing-assert-seg7-b.json', $segment);
+        
+        //check again with GET fresh from server
+        $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id);
+        $this->assertSegmentContentToFile('testSegmentEditing-assert-seg7-b.json', $segment);
+        
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
         
         //bulk check of all autoStateId fields
