@@ -43,6 +43,10 @@ Ext.define('Editor.view.segments.Translate5RowEditing', {
     alias: 'plugin.segments.translate5rowediting',
     editingAllowed: true,
     openedRecord: null,
+    statics: {
+        STARTEDIT_MOVEEDITOR: 0,
+        STARTEDIT_SCROLLUNDER: 1
+    },
     messages: {
         previousSegmentNotSaved: 'Das Segment konnte nicht zum Bearbeiten geöffnet werden, da das vorherige Segment noch nicht korrekt seine Speicherung beendet hatte. Bitte versuchen Sie es noch einmal. Sollte es dann noch nicht funktionieren, drücken Sie bitte F5. Vielen Dank!',
         edit100pWarning: '#UT#Achtung, Sie editieren einen 100% Match!'
@@ -80,15 +84,17 @@ Ext.define('Editor.view.segments.Translate5RowEditing', {
      * Erweitert die Orginalmethode um die "editingAllowed" Prüfung
      * @param {Editor.model.Segment} record
      * @param {Ext.grid.column.Column/Number} columnHeader The Column object defining the column to be edited, or index of the column.
+     * @param {Integer} mode, the editor start mode, see the self.STARTEDIT_ constants
      * @returns booelean|void
      */
-    startEdit: function(record, columnHeader) {
+    startEdit: function(record, columnHeader, mode) {
         var me = this,
             started = false;
             
         if (!me.editor) {
             me.editor = me.initEditor();
         }
+        me.editor.setMode(mode);
         
         //to prevent race-conditions, check if there isalready an openedRecord and if yes show an error (see RowEditor.js function completeEdit for more information)
         if (me.openedRecord !== null) {

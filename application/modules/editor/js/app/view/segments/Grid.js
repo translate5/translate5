@@ -398,14 +398,70 @@ Ext.define('Editor.view.segments.Grid', {
         }
         return me.callParent([config]);
     },
-    
-    selectOrFocus: function(localRowIndex) {
-        var sm = this.getSelectionModel();
-        if(sm.isSelected(localRowIndex)){
-            this.getView().focusRow(localRowIndex);
+    /**
+     * Scrolls the view to the segment on the given rowindex 
+     */
+    scrollTo: function(rowindex) {
+        console.clear();
+        console.log("scrollTo");
+        console.trace();
+        var me = this,
+            view = me.getView(),
+            options = {
+                focus: true,
+                //animate: true,
+                callback: function() {
+                    console.log("buffer loaded", arguments);
+                    console.log("BEFORE",view.getScrollY());
+                    //alert("FOO");
+                    //view.el.scrollBy(0, 100, false);
+                    console.log("AFTER",view.getScrollY(), view);
+                    //me.centerSegmentInGrid(segment);
+                    //me.selectOrFocus(segment);
+                }
+            };
+          
+        //FIXME ich erinnere mich dunkel, dass der Schalter doppeltes scrolling durch den Focus verhindern sollte.
+        // wird eventuell nicht mehr benötigt.
+        //me.enableSelectOrFocus = true;
+
+        view.bufferedRenderer.scrollTo(rowindex, options);
+    },
+    calcRowTop: function(row) {
+        var me = this,
+            grid = me.getSegmentGrid(),
+            scrollingView = grid.lockable ? grid.normalGrid.view : grid.view,
+            scrollTop = scrollingView.getScrollY();
+        
+        return Ext.fly(row).getOffsetsTo(grid)[1] - grid.el.getBorderWidth('t') + scrollTop;
+    },
+    centerSegmentInGrid: function(segment) {
+        var me = this,
+            grid = me.getSegmentGrid(),
+            scrollingView = grid.lockable ? grid.normalGrid.view : grid.view,
+            scrollingViewEl = scrollingView.el,
+            row = scrollingView.getRow(segment),
+            scrollTop = scrollingView.getScrollY(),
+            viewHeight = grid.getHeight(),
+            editorTop = (viewHeight / 2) + scrollTop,
+            rowTop = me.calcRowTop(row),
+            scrollDelta = Math.abs(editorTop - rowTop);
+
+        if (scrollDelta != 0) {
+            scrollingViewEl.scrollBy(0, scrollDelta, false);
+        }
+    },
+    /**
+     * selects and give the focus to the segment on the given rowindex
+     */
+    selectOrFocus: function(rowIdx) {
+        var me = this,
+            sm = me.getSelectionModel();
+        if(sm.isSelected(rowIdx)){
+            me.getView().focusRow(rowIdx);
         }
         else {
-            sm.select(localRowIndex);
+            sm.select(rowIdx);
         }
     }
 });

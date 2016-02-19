@@ -85,8 +85,6 @@ Ext.define('Editor.controller.Segments', {
   loadingMaskRequests: 0,
   saveChainMutex: false,
   changeAlikeOperation: null,
-  enableSelectOrFocus: false,
-  lastRequestedRowIndex: -1,
   defaultRowHeight: 15,
   refs : [{
     ref : 'segmentGrid',
@@ -125,9 +123,6 @@ Ext.define('Editor.controller.Segments', {
           }
       },
       component: {
-          '#segmentgrid headercontainer' : {
-              sortchange: 'scrollGridToTop'
-          },
           '#segmentgrid' : {
               afterrender: function(grid) {
                   var me = this,
@@ -159,7 +154,7 @@ Ext.define('Editor.controller.Segments', {
               beforeload: 'onFetchChangeAlikes'
           },
           '#Files': {
-              write: 'reloadGrid'
+              write: 'handleFileStoreWrite'
           }
       }
   },
@@ -219,7 +214,7 @@ Ext.define('Editor.controller.Segments', {
         store = me.getSegmentsStore(),
         btn = me.getWatchListFilterBtn(),
         filters = me.getSegmentGrid().filters;
-    me.resetSegmentSortIntern();
+    me.clearSegmentSort();
     store.removeAll();
     if(store.getFilters().length > 0){
       //reloading of the store is caused by clearFilter call
@@ -228,7 +223,6 @@ Ext.define('Editor.controller.Segments', {
     else {
       store.reload();
     }
-    me.scrollGridToTop();
   },
   /**
    * Toggle filtering by watch list.
@@ -273,7 +267,6 @@ Ext.define('Editor.controller.Segments', {
             }
         }
     });
-    me.scrollGridToTop();
   },
   /**
    * removes the segment from the grid if removed from the watchlist and watchlist filter is set
@@ -301,7 +294,7 @@ Ext.define('Editor.controller.Segments', {
     var me = this,
     selectedFile = selectedRecords[0];
     if(selectedFile && me.filemap[selectedFile.get('id')] !== undefined){
-      this.resetSegmentSortForFileClick(me.filemap[selectedFile.get('id')]);
+      me.resetSegmentSortForFileClick(me.filemap[selectedFile.get('id')]);
     }
     else{
       Editor.MessageBox.addSuccess(me.messages.noSegmentToFilter);
@@ -333,7 +326,6 @@ Ext.define('Editor.controller.Segments', {
       btn.toggle(found);
 
       params[proxy.getFilterParam()] = proxy.encodeFilters(store.getFilters().items);
-      params[proxy.getSortParam()] = proxy.encodeSorters(store.getSorters().items);
 
       //filterFeature && me.styleResetFilterButton(filterFeature);
       this.reloadFilemap(params);
@@ -376,131 +368,49 @@ Ext.define('Editor.controller.Segments', {
       //btn.ownerCt.doLayout();
   },
   /**
-   * setzt die Sortierung zurück, springt zum ersten Segment der Datei. Informiert den Benutzer, dass Sortierung zurückgesetzt wurde
+   * resets the gird sort, jumps to the first segment of the clicked file,
+   * shows a notice to the user that sorting was resetted
    * @param {Integer} rowindex
    */
-  resetSegmentSortForFileClick: function(rowindex) {
-    if(! this.resetSegmentSortIntern()){
-      //keine Sortierung war gesetzt, springe direkt
-    	this.scrollOrFocus(rowindex);
-      return;
-    }
-    this.getSegmentsStore().prefetchData.clear();
-    //anspringen des Zielsegments über einmaligen load Handler:
-      this.getSegmentsStore().on('load', function(){
-          this.scrollOrFocus(rowindex);
-      }, this,{single:true});
-    this.getSegmentsStore().loadPage(1);
-    this.scrollGridToTop();
-    Editor.MessageBox.addSuccess(this.messages.sortCleared);
-  },
-  scrollOrFocus: function(rowindex) {
-      this.jumpToSegmentRowIndexAndSelect(rowindex);
-  },
-  /**
-    * Springt ein Segment an und selektiert es, rowindex bezeichnet die
-    * Position in der kompletten gefilterten und sortierten Ergebnissmenge.
-    * @param {Integer} rowindex
-    */
-  jumpToSegmentRowIndexAndSelect: function(rowindex) {
-        var me = this,
-        grid = me.getSegmentGrid(),
-        segment = me.getRecordByTotalIndex(rowindex);
-        me.enableSelectOrFocus = true;
-
-        me.lastRequestedRowIndex = rowindex;
-        me.jumpToRecordIndex(rowindex);
-        if(segment){
-            me.centerSegmentInGrid(segment);
-            me.selectOrFocus(segment);
-        }
-  },
-  calcRowTop: function(row) {
-        var me = this,
-            grid = me.getSegmentGrid(),
-            scrollingView = grid.lockable ? grid.normalGrid.view : grid.view,
-            scrollTop = scrollingView.getScrollY();
-            
-        return Ext.fly(row).getOffsetsTo(grid)[1] - grid.el.getBorderWidth('t') + scrollTop;
-  },
-  centerSegmentInGrid: function(segment) {
+  resetSegmentSortForFileClick: function(idxToScrollTo) {
+      console.log("resetSegmentSortForFileClick");
       var me = this,
           grid = me.getSegmentGrid(),
-          scrollingView = grid.lockable ? grid.normalGrid.view : grid.view,
-          scrollingViewEl = scrollingView.el,
-          row = scrollingView.getRow(segment),
-          scrollTop = scrollingView.getScrollY(),
-          viewHeight = grid.getHeight(),
-          editorTop = (viewHeight / 2) + scrollTop,
-          rowTop = me.calcRowTop(row),
-          scrollDelta = Math.abs(editorTop - rowTop);
-
-        if (scrollDelta != 0) {
-            scrollingViewEl.scrollBy(0, scrollDelta, false);
-        }
-  },
-  /**
-   * Gibt den Segment Record zum gewünschten index in der gesamten Ergebnismenge
-   * @param {Integer} rowindex
-   */
-  getRecordByTotalIndex: function(rowindex) {
-      var me = this,
-          grid = me.getSegmentGrid(),
-          store = grid.store,
-          range = store.getRange(rowindex, (rowindex+1));
+          store = me.getSegmentsStore();
       
-      if (range && range[0])
-      {
-          return range[0];
+      if(! me.clearSegmentSort()){
+          //no sort to reset, scroll directly
+          grid.scrollTo(idxToScrollTo);
+          return;
       }
-      return null;
-  },
-  /**
-   * springt durch verschieben des Scrollers zum gewünschten Segment. 
-   * recordindex bezeichnet den Index des Segments in der gesamten gefilterten
-   *  und sortierten Ergebnissmenge (also nicht nur im aktuellen Range)
-   * @param {Integer} recordindex 
-   */
-  jumpToRecordIndex: function(recordindex){
-      var me = this,
-          grid = me.getSegmentGrid(),
-          table = grid.getView(),
-          options = {focus: true};
-
-      table.bufferedRenderer.scrollTo(recordindex);
-  },
-  /**
-     * Selektiert und fokusiert das gewünschte Segment, localRowIndex bezeichnet
-     * den Index des Segments im aktuell garantierten Range
-     * @param {Integer} localRowIndex
-     */
-    selectOrFocus: function(localRowIndex){
-      if(!this.enableSelectOrFocus){
-        return;
-      }
-      this.enableSelectOrFocus = false;
-      this.getSegmentGrid().selectOrFocus(localRowIndex);
+      //FIXME here instead store load bind to view.refresh/viewready, since data must exist in view before we can scroll to?
+      store.on('load', function(){
+          grid.scrollTo(idxToScrollTo);
+      }, me,{single:true});
+      store.reload();
+      Editor.MessageBox.addSuccess(me.messages.sortCleared);
   },
   /**
    * Helper: resets only the sorters, does no reload and so on
    * returns false if there are no sorters, true otherwise
    * @return {Boolean}
    */
-  resetSegmentSortIntern: function() {
-    if(this.getSegmentsStore().sorters.length == 0){
+  clearSegmentSort: function() {
+      var me = this, 
+          sorters = me.getSegmentsStore().sorters;
+    if(sorters.length == 0){
       return false;
     }
-    this.getSegmentsStore().sorters.clear();
+    sorters.clear();
     return true;
   },
-  scrollGridToTop: function() {
-    this.getSegmentPager() && this.getSegmentPager().setScrollTop(0);
-  },
-  reloadGrid: function(){
-    this.resetSegmentSortIntern();
-    this.scrollGridToTop();
-    this.getSegmentsStore().loadPage(1);
-    this.handleFilterChange(this.getSegmentGrid().filters);
+  
+  /**
+   * Reloads the segment store and resets the segment sorting after updating the file tree order
+   */
+  handleFileStoreWrite: function(){
+    this.clearSegmentSort();
+    this.getSegmentsStore().reload();
   },
   /**
    * Hilfsfunktion um beim Schließen des Browserfensters das letzte Segment anzuzeigen
@@ -630,7 +540,6 @@ Ext.define('Editor.controller.Segments', {
       //parameter is the callback to the final save chain call, for later usage in ChangeAlike Handling
       me.fireEvent('afterSaveCall', function(){
           me.saveChainEnd();
-          me.scrollOrFocus(recordindex);
       });
   },
   /**

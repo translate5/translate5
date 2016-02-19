@@ -27,45 +27,31 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
  * @class Editor.view.segments.Translate5RowEditor
- * @extends Ext.form.Panel
+ * @extends Ext.grid.RowEditor
  * 
- * erweitert den Orginal Ext Editor um eigene Funktionalität
+ * @TODO rename in RowEditor
+ * This is the RowEditor part of this multi class component.
+ * The original RowEditor is overriden for custom needs (no buttons, our own positioning, no wrapEl)
  */
 Ext.define('Editor.view.segments.Translate5RowEditor', {
     extend: 'Ext.grid.RowEditor',
     alias: 'widget.translate5roweditor',
-
-    // from Ext4 begin
+    requires: [
+        'Editor.view.segments.RowEditorColumnParts'
+    ],
     itemId: 'roweditor',
-    
     liveDrag: true,
-    
-    //beinhaltet den gekürzten Inhalt des letzten geöffneteten Segments
-    lastSegmentShortInfo: '',
-    columnToEdit: null,
-    
     rowToEditOrigHeight: 0,
     editorExtraHeight: 20,
-    editorFieldExtraHeight: 10,
     editorLocalTop: 0,
-    fieldToEdit: null,
+    /**
+     * If set to true, rowEditor remains on its position on startEdit and grid scrolls instead
+     */
+    isScrollUnderMoveMode: false,
     
-    previousRecord: null,
-    timeTrackingData: null,
     columns: null,
-    messages: {
-        segmentNotSavedUserMessage: 'Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank!',
-        cantSaveEmptySegment: '#UT#Das Segment kann nicht ohne Inhalt gespeichert werden!'
-    },
-    // from Ext4 end
 
     initComponent: function() {
         var me = this,
@@ -108,307 +94,22 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         form = me.getForm();
         form.trackResetOnLoad = true;
         form.on('errorchange', me.onErrorChange, me);
-           
-        // From Ext4 begin
-        me.on('render', function(p) {
-            p.body.on('dblclick', me.changeColumnByClick, me);
-        });
-        me.mainEditor = me.add(new Editor.view.segments.HtmlEditor());
-        // From Ext4 end
-    },
-    
-    // From Ext4 begin
-    /**
-     * handles clicking on the displayfields of the roweditor to change the editor position
-     * @param {Ext.Event} ev
-     * @param {DOMNode} target
-     */
-    changeColumnByClick: function(ev, target) {
-        var me = this, 
-            cmp = null;
- 
-        //bubble up to the dom element which is the el of the Component
-        while (target && target.nodeType === 1) {
-            if(/displayfield-[0-9]+/.test(target.id)) {
-                cmp = me.columns.get(target.id);
-                if (cmp) {
-                    break;
-                }
-            }
-            target = target.parentNode;
-        }
-        if(cmp) {
-            me.changeColumnToEdit(cmp);
-        }
-    },
-    /**
-     * changes the maineditor to the given column
-     * @param {Editor.view.segments.column.ContentEditable} column
-     */
-    changeColumnToEdit: function(column) {
-        var me = this,
-            oldIdx = me.columnToEdit,
-            rec = me.context.record,
-            oldField = me.query('displayfield[name="'+oldIdx+'"]');
-        if(oldIdx == column.dataIndex) {
-            //column did not change
-            return;
-        }
-        if(!me.saveMainEditorContent(rec)) {
-            return; //errors on saving, also do not change
-        }
-        //sync content back to the displayfield
-        if(oldField && oldField.length > 0) {
-            oldField[0].setValue(rec.get(oldIdx));
-        }
-        if(me.setColumnToEdit(column)) {
-            me.mainEditor.setValueAndMarkup(rec.get(me.columnToEdit), rec.get('id'), me.columnToEdit);
-            me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
-        }
-        me.focusContextCell();
-    },
-    /**
-     * Method Implements that we can have multiple editable columns, but only one HtmlEditor Instance
-     * This is done by swaping the position of the different field editors
-     *
-     * @param {Ext.grid.column.Column} col
-     * @return {Boolean} returns true if column has changed, false otherwise
-     */
-    setColumnToEdit: function(col) {
-        var me = this,
-            firstTarget = Editor.view.segments.column.ContentEditable.firstTarget, //is the dataIndex
-            toEdit = col.dataIndex,
-            hasToSwap = false,
-            linkedDisplayField = null;
-                    
-        if(col.segmentField) {
-            me.mainEditor.fieldTypeToEdit = col.segmentField.get('type');
-        }
-        //if user clicked on a not content column open default dataindex (also if it is a content column but not editable)
-        if(!col.segmentField || !col.segmentField.get('editable')) {
-            toEdit = firstTarget;
-            me.mainEditor.fieldTypeToEdit = Editor.model.segment.Field.prototype.TYPE_TARGET;
-        }
-        //if its the readonly column take the edit one
-        else if(col.isContentColumn && !col.isEditableContentColumn) {
-            toEdit = col.dataIndex+'Edit';
-        }
-        //no swap if last edited column was the same
-        hasToSwap = me.columnToEdit !== toEdit;
-        if(hasToSwap && me.columnToEdit){
-            me.stopTimeTrack(me.columnToEdit);
-        }
-        me.startTimeTrack(me.toEdit);
-        
-        me.items.each(function(field){
-            if(!me.columns.containsKey(field.id)) {
-                return; //ignore the editor itself, which has no col mapping
-            }
-            var vis = me.columns.get(field.id).isVisible();
-            if(field.name == toEdit) {
-                linkedDisplayField = field;
-                return;
-            }
-        });
-        
-        //all editor fields disabled
-        //FIXME test the alle fields disabled case (open task readonly?)
-        if(!linkedDisplayField || !hasToSwap) {
-            if(!linkedDisplayField) {
-                me.linkedDisplayField = false;
-            }
-            return false;
-        }
-        me.columnToEdit = toEdit;
-        me.columnClicked = col.dataIndex;
-        me.mainEditor.dataIndex = col.dataIndex;
-        
-        //if isset linkedDisplayField the cols get changed in focusContextCell
-        me.linkedDisplayField = linkedDisplayField;
-        return true;
-    },
-    /**
-     * overrides original focusing with our repositioning of the editor
-     */
-    focusContextCell: function() {
-        var me = this, 
-            toDis = me.linkedDisplayField,
-            pos;
-   
-        if(! toDis) {
-            me.mainEditor.deferFocus();
-            return;
-        }
-
-        pos = toDis.getPosition(true);
-       
-        //disable editor if column was also disabled
-        me.mainEditor.setWidth(toDis.width);
-        //swap position
-        me.repositionMainEditor(pos[0]);
-        me.scrollMainEditorHorizontallyInView();
-        me.mainEditor.deferFocus();
-        me.fireEvent('afterEditorMoved', me.columnToEdit, me);
-        return true;
-    },
-    /**
-     * repositions the grid view so that, the mainEditor is visible after change the editing column
-     */
-    scrollMainEditorHorizontallyInView: function () {
-        var me = this,
-            view = me.editingPlugin.grid.getView(),
-            gridReg = view.getEl().getRegion(),
-            offset,
-            edReg = me.mainEditor.getEl().getRegion();
-        
-        if(gridReg.contains(edReg)) {
-            return;
-        }
-        
-        if(edReg.right > gridReg.right) {
-            offset = -1 * gridReg.getOutOfBoundOffsetX(edReg.right) + 10;
-            view.scrollBy(offset, 0, true);
-        }
-        else {
-            offset = -1 * gridReg.getOutOfBoundOffsetX(edReg.x) - 10;
-            view.scrollBy(offset, 0, true);
-        }
-    },
-    /**
-     * reusable method to get info which field is edited by opened editor
-     * returns the dataIndex of the field
-     * @return {String}
-     */
-    getEditedField: function() {
-        return this.columnToEdit;
-    },
-
-    /**
-     * shows / hides the main editor, used as show hide column handler
-     */
-    toggleMainEditor: function(show) {
-        this.mainEditor.setVisible(show);
-    },
-    
-    /**
-     * erweitert die Orginal Methode
-     * @returns {Boolean}
-     */
-    completeEdit: function() {
-        var me = this,
-            rec = me.context.record;
-
-        if(!me.saveMainEditorContent(rec)) {
-            return false;
-        }
-        
-        me.stopTimeTrack(me.columnToEdit);
-        //we have to provide the durations to the change alike handler, 
-        //since the record is available there, we put them into a tmp field,
-        //the setted durations field is overwritten / cleared by successfull PUT
-        rec.set('durations', me.getTimeTrackingData());
-
-        me.restoreEditingRowHeight();
-        me.hide();
-        me.previousRecord = me.editingPlugin.openedRecord;
-        me.editingPlugin.openedRecord = null;
-        return true;
-    },
-    /**
-     * saves the Editor Content into the loaded record
-     * @returns {Boolean}
-     */
-    saveMainEditorContent: function(record) {
-        var me = this,
-            //der replace aufruf entfernt vom Editor automatisch hinzugefügte unsichtbare Zeichen, 
-            //und verhindert so, dass der Record nicht als modified markiert wird, wenn am Inhalt eigentlich nichts verändert wurde
-            //newValue = Ext.String.trim(me.mainEditor.getValueAndUnMarkup()).replace(/\u200B/g, '');
-            newValue = me.mainEditor.getValueAndUnMarkup().replace(/\u200B/g, '');
-            
-        //check, if the context delivers really the correct record, because through some issues in reallive data 
-        //rose the idea, that there might exist special race conditions, where
-        //the context.record is not the record of the newValue
-        if(me.editingPlugin.openedRecord === null || me.editingPlugin.openedRecord.internalId != record.internalId ){
-            Editor.MessageBox.addError(me.messages.segmentNotSavedUserMessage + newValue,' Das Segment konnte nicht gespeichert werden. Im folgenden der Debug-Werte: ' + newValue + 'me.editingPlugin.openedRecord.internalId: ' + me.editingPlugin.openedRecord.internalId + ' record.internalId: ' + record.internalId);
-            me.editingPlugin.openedRecord = null;
-            return false;
-        }
-        
-        if(newValue.length == 0 && record.get(me.columnToEdit).length > 0) {
-            Editor.MessageBox.addError(me.messages.cantSaveEmptySegment);
-            return false;
-        }
-        
-        if(me.mainEditor.hasAndDisplayErrors()) {
-            return false;
-        }
-        me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
-        record.beginEdit();
-        record.set(me.columnToEdit, newValue);
-        record.set('autoStateId', 999);
-        record.endEdit(true); //silent = true → dont notify the store. if notifiying the store we get a "grid jumps to top problem" with left right navi
-        return true;
     },
     /**
      * cancels the editing process
      */
     cancelEdit: function() {
+        console.log("cancelEdit");
         var me = this;
-      
-        me.context.record.reject();
-        me.getTimeTrackingData();
-        me.editingPlugin.openedRecord = null;
         me.restoreEditingRowHeight();
         me.callParent(arguments);
     },
-    /**
-     * setzt den gekürzten Inhalt des letzten Segments. Muss mit dem "gemarkupten" Content aufgerufen werden um alle Tags zu entfernen. 
-     * @param segmentText
-     */
-    setLastSegmentShortInfo: function (segmentText) {
-      this.lastSegmentShortInfo = Ext.String.ellipsis(Ext.util.Format.stripTags(segmentText), 60, true);
+    completeEdit: function() {
+        console.log("completeEdit");
+        var me = this;
+        me.restoreEditingRowHeight();
+        //me.hide();
     },
-    /**
-     * starts tracking the editing time for the given field
-     * @param {String} field
-     */
-    startTimeTrack: function(field) {
-        if(!this.timeTrackingData) {
-            this.timeTrackingData = {};
-        }
-        this.timeTrackingData._start = new Date();
-    },
-    /**
-     * stops and saves the elapsed milliseconds since last startTimeTrack call for the given field
-     * @param {String} field
-     */
-    stopTimeTrack: function(field) {
-        var end = new Date(), 
-            data = this.timeTrackingData,
-            value = data[field],
-            duration;
-        if(!data._start) {
-            return;
-        }
-        duration = end - data._start;
-        delete(data._start);
-        if(value) {
-            duration += value;
-        }
-        data[field] = duration;
-    },
-    /**
-     * resets the tracking information and returns them as a object
-     * @return {Object}
-     */
-    getTimeTrackingData: function() {
-        var result = this.timeTrackingData;
-        delete(result._start);
-        this.timeTrackingData = {};
-        return result;
-    },
-    // From Ext4 end
-
     //
     // Grid listener added when this is rendered.
     // Keep our containing element sized correctly
@@ -442,6 +143,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
                     }
                 },
                 constrainTo: grid.body
+                //constrainTo: me.view.body//,
                 //delegate: '#' + me.header.id
             };
 
@@ -481,8 +183,6 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         }
     },
 
-
-
     insertColumnEditor: function(column) {
         var me = this;
         me.callParent(arguments);
@@ -515,9 +215,12 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
      */
     reposition: function(animateConfig, fromScrollHandler) {
         var me = this;
-        console.log("REPO", me);
+        console.log("REPO", -me.lastScrollLeft, me.editorLocalTop);
         console.trace();
         me.el.setLocalXY(-me.lastScrollLeft, me.editorLocalTop);
+        //TODO if overlapping the scrollbar is a problem, we must rebuild/refactor the syncEditorClip method
+        //perhaps it is easier, roweditor width must be "view size" + scrollLeft
+        //me.syncEditorClip(); 
     },
     
     /**
@@ -552,15 +255,14 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
             afterPosition;
 
         // Position this editor if the context row is rendered (buffered rendering may mean that it's not in the DOM at all)
-        if (row && Ext.isElement(row)) 
-        {
+        if (!me.isScrollUnderMoveMode && row && Ext.isElement(row)) {
             rowTop = Ext.fly(row).getOffsetsTo(grid.body)[1] - grid.el.getBorderWidth('t') + me.lastScrollTop;
             me.editorLocalTop = me.calculateEditorTop(rowTop);
 
             // Get the y position of the row relative to its top-most static parent.
             // offsetTop will be relative to the table, and is incorrect
             // when mixed with certain grid features (e.g., grouping).
-            console.log("INIT", me.editorLocalTop, me.lastScrollTop,me.editorLocalTop + me.lastScrollTop);
+            console.log("INIT");
             me.reposition();
         }
     },
@@ -614,15 +316,6 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         return (viewHeight / 2);
     },
     
-    loadRecord: function(record) {
-        var me = this;
-        me.callParent(arguments);
-        
-        me.setColumnToEdit(me.context.column);
-        me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit), record.get('id'), me.columnToEdit);
-        me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
-    },
-
     //FIXME unklar warum dieses if column dazu.
     XrenderColumnData: function(field, record, activeColumn) {
         var me = this,
@@ -696,20 +389,12 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         // The show call will update the layout
         Ext.suspendLayouts();
 
-//        if (!me.rendered || !wrapEl) {
         if (!me.rendered) {
             if (!me.rendered)
             {
                 me.width = me.getClientWidth();
                 me.render(grid.el, grid.el.dom.firstChild);
             }
-            // The wrapEl is a container for the editor.
-//            wrapEl = me.wrapEl = me.el.wrap();
-            // Change the visibilityMode to offsets so that we get accurate measurements
-            // when the roweditor is hidden for laying out things like a TriggerField.
-//            wrapEl.setVisibilityMode(3);
-
-//            wrapEl.addCls(me._wrapCls);
             // On first show we need to ensure that we have the scroll positions cached
             me.onViewScroll();
         }
@@ -736,7 +421,17 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         } else {
             me.show();
         }
-        me.focusContextCell();
+    },
+    /**
+     * Start editing the specified grid at the specified position.
+     * The valid modes: 
+     * 0: for default positioning
+     * 1: for scroll grid instead move editor
+     * => The values are defined as constants in the RowEditor Plugin
+     * @param {Integer} mode 
+     */
+    setMode: function(mode) {
+        this.isScrollUnderMoveMode = (mode === 1);
     },
     /**
      * just returns the given delta, since buttons are disabled
@@ -746,32 +441,16 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
     syncButtonPosition: function(delta) {
         return delta;
     },
-    /**
-     * place the HtmlEditor/MainEditor in the rowEditor over the desired displayfield
-     */
-    repositionMainEditor: function(newX) {
-        var me = this;
-
-        if(newX || newX === 0) {
-            me.editorNewXPosition = newX;
-        }
-        else {
-            newX = me.editorNewXPosition;
-        }
-        me.mainEditor.setPosition(newX, 0);
-    },
     setEditorHeight: function() {
         var me = this,
             context = me.context,
             row = Ext.get(context.row),
             rowHeight = row.getHeight(),
-            editorHeight = rowHeight + me.editorExtraHeight,
-            editorFieldHeight = rowHeight + me.editorFieldExtraHeight;
+            editorHeight = rowHeight + me.editorExtraHeight;
         
         me.rowToEditOrigHeight = rowHeight;
         row.setHeight(editorHeight);
         me.setHeight(editorHeight);
-        me.mainEditor.setHeight(editorFieldHeight);
     },
     restoreEditingRowHeight: function() {
         var me = this,
