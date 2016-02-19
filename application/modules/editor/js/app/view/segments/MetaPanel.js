@@ -61,6 +61,7 @@ Ext.define('Editor.view.segments.MetaPanel', {
         items: [
           {
             xtype: 'form',
+            border: 0,
             itemId: 'metaInfoForm',
             items: [{
                   xtype: 'fieldset',

@@ -55,7 +55,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
     rowToEditOrigHeight: 0,
     editorExtraHeight: 20,
     editorFieldExtraHeight: 10,
-    editorShadowsExtraHeight: 4, // see css/main.css class .x-grid-row-editor-wrap
+    editorLocalTop: 0,
     fieldToEdit: null,
     
     previousRecord: null,
@@ -430,15 +430,34 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
      */
     onBoxReady: function() {
         var me = this,
+            grid = me.editingPlugin.grid,
             ddConfig = {
                 el: me.el,
                 constrain: true,
                 constrainDelegate: true,
-                constrainTo: me.view.body//,
+                listeners: {
+                    dragend: function() {
+                        console.log("DRAGEND", me.getOffsetsTo(grid.body)[1], me.lastScrollTop, me.getOffsetsTo(grid.body)[1] - me.lastScrollTop);
+                        me.editorLocalTop = me.getOffsetsTo(grid.body)[1];
+                    }
+                },
+                constrainTo: grid.body
                 //delegate: '#' + me.header.id
             };
 
         me.dd = new Ext.util.ComponentDragger(me, ddConfig);
+        //override onDrag so that component can only be moved vertically. 
+        //This would not be needed if we use view body as constrainTo
+        //but we must use grid.body, since view.body will have the height of the available segments,
+        //which is to less if only 2 segments are available by filter for example
+        me.dd.onDrag = function(e) {
+            var me = this,
+                comp = (me.proxy && !me.comp.liveDrag) ? me.proxy : me.comp,
+                offset = me.getOffset(me.constrain || me.constrainDelegate ? 'dragTarget' : null);
+    
+            comp.setPagePosition(me.startPosition[0], me.startPosition[1] + offset[1]);
+        }.bind(me.dd);
+        
         me.relayEvents(me.dd, ['dragstart', 'drag', 'dragend']);
     },
     
@@ -456,7 +475,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
 
         me.lastScrollTop  = scrollTop;
         me.lastScrollLeft = scrollLeft;
-        if (scrollTopChanged)
+        if (scrollTopChanged || scrollLeftChanged)
         {
             me.reposition();
         }
@@ -489,58 +508,65 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         return me.superclass.superclass.getRefItems.apply(me, arguments);
     },
 
+    /**
+     * ensures that the roweditor stays at the initial opened position
+     * @param {} animateConfig
+     * @param {} fromScrollHandler
+     */
     reposition: function(animateConfig, fromScrollHandler) {
+        var me = this;
+        console.log("REPO", me);
+        console.trace();
+        me.el.setLocalXY(-me.lastScrollLeft, me.editorLocalTop);
+    },
+    
+    /**
+     * overriding to remain editor open on view refresh
+     * @param {} view
+     */
+    onViewRefresh: function(view) {
         var me = this,
-            view = me.view,
             context = me.context,
+            row;
+        // Recover our row node after a view refresh
+        if (context && (row = view.getRow(context.record))) {
+            context.row = row;
+            me.reposition();
+            if (me.tooltip && me.tooltip.isVisible()) {
+                me.tooltip.setTarget(context.row);
+            }
+        }
+    },
+    
+    /**
+     * sets the initial position of the roweditor after opening a segment
+     * @param {} animateConfig
+     * @param {} fromScrollHandler
+     */
+    initialPositioning: function(animateConfig, fromScrollHandler){
+        var me = this,
+            context = me.context,
+            grid = me.editingPlugin.grid,
             row = context && context.row,
-            yOffset = 0,
-            //wrapEl = me.wrapEl,
-            wrapEl = me.el,
-            rowTop = 0,
-            localY,
-            deltaY = 0,
+            rowTop,
             afterPosition;
 
         // Position this editor if the context row is rendered (buffered rendering may mean that it's not in the DOM at all)
         if (row && Ext.isElement(row)) 
         {
-            localY = me.calculateEditorTop(rowTop) + yOffset;
-
-            // If not being called from scroll handler...
-            // If the editor's top will end up above the fold
-            // or the bottom will end up below the fold,
-            // organize an afterPosition handler which will bring it into view and focus the correct input field
-            if (!fromScrollHandler) {
-                afterPosition = function() {
-                    me.focusColumnField(context.column);
-                };
-            }
+            rowTop = Ext.fly(row).getOffsetsTo(grid.body)[1] - grid.el.getBorderWidth('t') + me.lastScrollTop;
+            me.editorLocalTop = me.calculateEditorTop(rowTop);
 
             // Get the y position of the row relative to its top-most static parent.
             // offsetTop will be relative to the table, and is incorrect
             // when mixed with certain grid features (e.g., grouping).
-            if (animateConfig) {
-                wrapEl.animate(Ext.applyIf({
-                    to: {
-                        top: localY
-                    },
-                    duration: animateConfig.duration || 125,
-                    callback: afterPosition
-                }, animateConfig));
-            } else {
-                wrapEl.setLocalY(localY + me.lastScrollTop);
-                if (afterPosition) {
-                    afterPosition();
-                }
-            }
+            console.log("INIT", me.editorLocalTop, me.lastScrollTop,me.editorLocalTop + me.lastScrollTop);
+            me.reposition();
         }
     },
 
     /**
-     * @private
-     * Returns the scroll delta required to scroll the context row into view in order to make
-     * the whole of this editor visible.
+     * same as original, expect the button height.
      * @return {Number} the scroll delta. Zero if scrolling is not required.
      */
     getScrollDelta: function() {
@@ -570,19 +596,15 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
     // Calculates the top pixel position of the passed row within the view's scroll space.
     // So in a large, scrolled grid, this could be several thousand pixels.
     //
-    calculateLocalRowTop: function(row) {
-        var me = this,
-            grid = me.editingPlugin.grid,
-            scrollingView = me.scrollingView,
-            scrollTop  = scrollingView.getScrollY();
-            
-        return Ext.fly(row).getOffsetsTo(grid)[1] - grid.el.getBorderWidth('t') + scrollTop;
+    XcalculateLocalRowTop: function(row) {
+        var grid = this.editingPlugin.grid;
+        return Ext.fly(row).getOffsetsTo(grid)[1] - grid.el.getBorderWidth('t') + this.lastScrollTop;
     },
 
     // Given the top pixel position of a row in the scroll space,
     // calculate the editor top position in the view's encapsulating element.
     // This will only ever be in the visible range of the view's element.
-    calculateEditorTop: function(rowTop) {
+    XcalculateEditorTop: function(rowTop) {
         var me = this,
             context = me.context,
             row = Ext.get(context.row),
@@ -723,11 +745,19 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         }
         me.focusContextCell();
     },
-    syncButtonPosition: function() {
-        throw "syncButtonPosition must not be used!";
+    /**
+     * just returns the given delta, since buttons are disabled
+     * @param {} delta
+     * @return {}
+     */
+    syncButtonPosition: function(delta) {
+        return delta;
     },
+    /**
+     * no sync clipping needed since, editor can't be scrolled out, since it is not scrollable
+     */
     syncEditorClip: function() {
-        throw "syncEditorClip must not be used!";
+        //do nothing here
     },
     /**
      * place the HtmlEditor/MainEditor in the rowEditor over the desired displayfield
@@ -752,7 +782,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
             editorFieldHeight = rowHeight + me.editorFieldExtraHeight;
         
         me.rowToEditOrigHeight = rowHeight;
-        row.setHeight(editorHeight + me.editorShadowsExtraHeight);
+        row.setHeight(editorHeight);
         me.setHeight(editorHeight);
         me.mainEditor.setHeight(editorFieldHeight);
     },
@@ -780,24 +810,6 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         
         me.setWidth(columnsWidth);
     },
-    scrollEditedRowUnderTheEditor: function() {
-        console.log("scrollEditedRowUnderTheEditor");
-        var me = this,
-            editingPlugin = me.editingPlugin,
-            grid = editingPlugin.grid,
-            view = grid.getView(),
-            viewEl = view.getEl(),
-            context = me.context,
-            wrapEl = me.el,
-            row = Ext.get(context.row),
-            editorTop = me.calculateLocalRowTop(wrapEl),
-            rowTop = me.calculateLocalRowTop(row),
-            scrollDelta = Math.abs(editorTop - rowTop);
-
-        if (scrollDelta != 0) {
-            viewEl.scrollBy(0, scrollDelta, false);
-        }
-    },
     /**
      * overriden for wrapEl disabling and initial positioning
      */
@@ -815,8 +827,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
 
         me.setEditorHeight();
         me.setEditorWidth();
-        me.reposition();
-        me.scrollEditedRowUnderTheEditor();
+        me.initialPositioning();
     },
 
     /**

@@ -226,7 +226,7 @@ Ext.define('Editor.controller.Segments', {
       filters.clearFilters();
     }
     else {
-      store.loadPage(1);
+      store.reload();
     }
     me.scrollGridToTop();
   },
@@ -352,7 +352,7 @@ Ext.define('Editor.controller.Segments', {
                   return;
               }
               var json = Ext.decode(response.responseText);
-              this.filemap = json.rows;
+              me.filemap = json.rows;
           }
       });
   },
