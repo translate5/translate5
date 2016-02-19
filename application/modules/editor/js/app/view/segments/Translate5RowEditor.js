@@ -246,7 +246,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         me.mainEditor.setWidth(toDis.width);
         //swap position
         me.repositionMainEditor(pos[0]);
-        me.repositionHorizontally();
+        me.scrollMainEditorHorizontallyInView();
         me.mainEditor.deferFocus();
         me.fireEvent('afterEditorMoved', me.columnToEdit, me);
         return true;
@@ -254,7 +254,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
     /**
      * repositions the grid view so that, the mainEditor is visible after change the editing column
      */
-    repositionHorizontally: function () {
+    scrollMainEditorHorizontallyInView: function () {
         var me = this,
             view = me.editingPlugin.grid.getView(),
             gridReg = view.getEl().getRegion(),
@@ -621,7 +621,6 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         me.setColumnToEdit(me.context.column);
         me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit), record.get('id'), me.columnToEdit);
         me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
-        me.focusContextCell();
     },
 
     //FIXME unklar warum dieses if column dazu.
@@ -735,12 +734,6 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
             me.setEditorWidth();
             me.reposition(true);
         } else {
-            // We need to make sure that the target row is visible in the grid view. For
-            // example, a row could be added to the view and then immediately edited. In
-            // this case, we need to ensure that the row is visible in the view before the
-            // editor is shown and is positioned.
-            // See EXTJS-17349.
-            grid.ensureVisible(record);
             me.show();
         }
         me.focusContextCell();
@@ -752,12 +745,6 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
      */
     syncButtonPosition: function(delta) {
         return delta;
-    },
-    /**
-     * no sync clipping needed since, editor can't be scrolled out, since it is not scrollable
-     */
-    syncEditorClip: function() {
-        //do nothing here
     },
     /**
      * place the HtmlEditor/MainEditor in the rowEditor over the desired displayfield
