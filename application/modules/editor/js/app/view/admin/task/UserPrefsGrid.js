@@ -39,6 +39,7 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
         colStep: '#UT#Workflow Schritt',
         colUsername: '#UT#Benutzer',
         colTargets: '#UT#Spalten (vorhanden)',
+        colNotEditContent: '#UT#Cannot Edit Content',
         colAnonymous: '#UT#Anonymisiert',
         colVisibility: '#UT#Sichtbarkeit',
         add: '#UT#Eintrag hinzufügen',
@@ -121,6 +122,11 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                     },
                     dataIndex: 'fields',
                     text: me.strings.colTargets
+                },
+                {
+                    xtype: 'booleancolumn',
+                    dataIndex: 'notEditContent',
+                    text: me.strings.colNotEditContent
                 },
                 {
                     xtype: 'booleancolumn',

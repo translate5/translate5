@@ -280,6 +280,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       me.getEditInfo().hide();
       rec = Ext.create(Editor.model.admin.task.UserPref, {
           fields: fields,
+          notEditContent: defaultPref.get('notEditContent'),
           anonymousCols: defaultPref.get('anonymousCols'),
           visibility: defaultPref.get('visibility'),
           workflow: task.get('workflow'),
