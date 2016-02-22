@@ -79,7 +79,8 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'userStep', type: 'string', persist: false},
     {name: 'users', type: 'auto', persist: false},
     {name: 'userCount', type: 'integer', persist: false},
-    {name: 'defaultSegmentLayout', type: 'boolean', persist: false}
+    {name: 'defaultSegmentLayout', type: 'boolean', persist: false},
+    {name: 'notEditContent', type: 'boolean'}
   ],
   hasMany: [{
       model: 'Editor.model.segment.Field',
