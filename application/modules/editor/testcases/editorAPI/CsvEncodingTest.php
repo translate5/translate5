@@ -115,6 +115,13 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
         $removeDataSeq = function($text){
           return preg_replace('#data-seq="\d+"#', 'data-seq=""', $text);
         };
+        
+        // check for overpapped QM Tags with contents between them. They must be not corrected on saving.
+        $tag1_open = '<img class="critical qmflag ownttip open qmflag-19" data-seq="497" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-left.png" />';
+        $tag1_close = '<img class="critical qmflag ownttip close qmflag-19" data-seq="497" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-right.png" />';
+        $tag2_open = '<img class="critical qmflag ownttip open qmflag-4" data-seq="498" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-left.png" />';
+        $tag2_close = '<img class="critical qmflag ownttip close qmflag-4" data-seq="498" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-right.png" />';
+        
         foreach($csvRows as $idx => $row) {
             //ignore last line
             if(empty($row)) {
@@ -129,7 +136,12 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
             $this->assertEquals($expectedTarget, $removeDataSeq($segments[$idx]->targetEdit));
             
             $segToEdit = $segments[$idx];
-            $segmentData = $this->api()->prepareSegmentPut('targetEdit', $expectedTarget.' - edited', $segToEdit->id);
+            if (preg_match('/^Mit dieser Datei soll/', $segToEdit->targetEdit)) {
+            	$editedData = 'Mit '.$tag1_open.'dieser Datei soll '.$tag2_open.'der Import '.$tag1_close.'spezieller Zeichen'.$tag2_close.' in CSV getestet werden';
+            } else {
+            	$editedData = $expectedTarget.' - edited';
+            }
+            $segmentData = $this->api()->prepareSegmentPut('targetEdit', $editedData, $segToEdit->id);
             $this->api()->requestJson('editor/segment/'.$segToEdit->id, 'PUT', $segmentData);
         }
     }
