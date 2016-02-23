@@ -399,56 +399,82 @@ Ext.define('Editor.view.segments.Grid', {
         return me.callParent([config]);
     },
     /**
-     * Scrolls the view to the segment on the given rowindex 
+     * Scrolls the view to the segment on the given rowindex,
+     * positions the desired segment in the view as defined in targetregion
+     * editor means under the roweditor, if no editor is opened the default is used.
+     * 
+     * @param {Integer} rowindex
+     * @param {String} target, one of "editor", "top", "bottom", "center" (default)
+     * @param {Function} notScrollCallback, callback which will be called, if we are not possible to scroll to the desired position (top/bottom reached)
      */
-    scrollTo: function(rowindex) {
-        console.clear();
-        console.log("scrollTo");
-        console.trace();
+    scrollTo: function(rowindex, target, notScrollCallback) {
         var me = this,
             view = me.getView(),
             options = {
                 focus: true,
-                //animate: true,
-                callback: function() {
-                    console.log("buffer loaded", arguments);
-                    console.log("BEFORE",view.getScrollY());
-                    //alert("FOO");
-                    //view.el.scrollBy(0, 100, false);
-                    console.log("AFTER",view.getScrollY(), view);
-                    //me.centerSegmentInGrid(segment);
-                    //me.selectOrFocus(segment);
-                }
+                animate: false //may not be animated, to place the callback at the correct place 
             };
-          
+        
+        options.callback = function(idx, model, row) {
+            me.selectOrFocus(rowindex);
+            me.positionRowAfterScroll(rowindex, row, target, notScrollCallback);
+        };
+        
+        //console.clear();
+        console.log("scrollTo",rowindex, target);
+        console.trace();
         //FIXME ich erinnere mich dunkel, dass der Schalter doppeltes scrolling durch den Focus verhindern sollte.
         // wird eventuell nicht mehr benötigt.
         //me.enableSelectOrFocus = true;
 
         view.bufferedRenderer.scrollTo(rowindex, options);
     },
-    calcRowTop: function(row) {
+    /**
+     * positions the given row to the given target, for valid targets see scrollTo
+     * @private
+     * @param {Integer} rowindex
+     * @param {HTMLElement} row
+     * @param {String} target
+     * @param {Function} notScrollCallback, callback which will be called, if we are not possible to scroll to the desired position (top/bottom reached)
+     */
+    positionRowAfterScroll: function(rowindex, row, target, notScrollCallback) {
         var me = this,
-            grid = me.getSegmentGrid(),
-            scrollingView = grid.lockable ? grid.normalGrid.view : grid.view,
-            scrollTop = scrollingView.getScrollY();
+            view = me.getView(),
+            editor = me.editingPlugin.editor,
+            rowFly = Ext.fly(row),
+            rowHeight = rowFly.getHeight(),
+            rowTop = rowFly.getOffsetsTo(view)[1],
+            topMargin = 20,
+            viewHeight = view.getHeight(),
+            bottomMargin = 20,
+            deltaY;
         
-        return Ext.fly(row).getOffsetsTo(grid)[1] - grid.el.getBorderWidth('t') + scrollTop;
-    },
-    centerSegmentInGrid: function(segment) {
-        var me = this,
-            grid = me.getSegmentGrid(),
-            scrollingView = grid.lockable ? grid.normalGrid.view : grid.view,
-            scrollingViewEl = scrollingView.el,
-            row = scrollingView.getRow(segment),
-            scrollTop = scrollingView.getScrollY(),
-            viewHeight = grid.getHeight(),
-            editorTop = (viewHeight / 2) + scrollTop,
-            rowTop = me.calcRowTop(row),
-            scrollDelta = Math.abs(editorTop - rowTop);
+        //if no editor exists scroll to center
+        if(target == 'editor' && !editor) {
+            target = 'center';
+        }
 
-        if (scrollDelta != 0) {
-            scrollingViewEl.scrollBy(0, scrollDelta, false);
+        switch (target) {
+            case 'editor':
+                deltaY = rowTop - editor.editorLocalTop;
+                break;
+            case 'top':
+                deltaY = rowTop - topMargin;
+                break;
+            case 'bottom':
+                deltaY = (rowTop + rowHeight) - (viewHeight - bottomMargin);
+                break;
+            case 'center':
+            default:
+                deltaY = (rowTop + rowHeight/2) - viewHeight/2;
+                break;
+        }
+        if(view.el.getScrollTop() + deltaY > 0) {
+            view.el.scrollBy(0, deltaY, true);
+        }
+        else {
+            //FIXME wird das auch getriggert wenn wir am Boden sind? Oder nur am Top?
+            notScrollCallback && notScrollCallback();
         }
     },
     /**

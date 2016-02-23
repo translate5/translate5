@@ -56,6 +56,7 @@ Ext.define('Editor.view.segments.column.Content', {
   resizable: false,
   fixed: true,
   isContentColumn: true,
+  variableRowHeight: true,
   constructor: function(conf) {
       var field = conf.fieldName;
       Ext.applyIf(conf, {

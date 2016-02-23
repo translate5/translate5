@@ -177,8 +177,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
 
         me.lastScrollTop  = scrollTop;
         me.lastScrollLeft = scrollLeft;
-        if (scrollTopChanged || scrollLeftChanged)
-        {
+        if (scrollLeftChanged) {
             me.reposition();
         }
     },
@@ -251,19 +250,30 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
             context = me.context,
             grid = me.editingPlugin.grid,
             row = context && context.row,
+            rowIdx = context && context.rowIdx,
             rowTop,
-            afterPosition;
+            moveEditor;
 
         // Position this editor if the context row is rendered (buffered rendering may mean that it's not in the DOM at all)
-        if (!me.isScrollUnderMoveMode && row && Ext.isElement(row)) {
-            rowTop = Ext.fly(row).getOffsetsTo(grid.body)[1] - grid.el.getBorderWidth('t') + me.lastScrollTop;
-            me.editorLocalTop = me.calculateEditorTop(rowTop);
-
+        if(!row || !Ext.isElement(row)) {
+            return;
+        }
+        moveEditor = function() {
             // Get the y position of the row relative to its top-most static parent.
             // offsetTop will be relative to the table, and is incorrect
             // when mixed with certain grid features (e.g., grouping).
-            console.log("INIT");
+            rowTop = Ext.fly(row).getOffsetsTo(grid.body)[1] - grid.el.getBorderWidth('t') + me.lastScrollTop;
+            me.editorLocalTop = me.calculateEditorTop(rowTop);
             me.reposition();
+        };
+        if (me.isScrollUnderMoveMode) {
+            console.log("INIT TO MOVE", context);
+            //giving the finalScroller as fallback handler to the scroll command
+            grid.scrollTo(rowIdx, 'editor', moveEditor);
+        }
+        else {
+            console.log("INIT");
+            moveEditor();
         }
     },
 
@@ -442,14 +452,22 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         return delta;
     },
     setEditorHeight: function() {
+        console.log("setEditorHeight called");
         var me = this,
             context = me.context,
             row = Ext.get(context.row),
             rowHeight = row.getHeight(),
-            editorHeight = rowHeight + me.editorExtraHeight;
+            editorHeight = rowHeight + me.editorExtraHeight,
+            moveEditor = (me.editorLocalTop + editorHeight) - me.scrollingView.getHeight();
         
         me.rowToEditOrigHeight = rowHeight;
         row.setHeight(editorHeight);
+        //low border of editor is outside of the visible area, then we have to move the editor additionaly
+        if(moveEditor > 0) {
+            me.editorLocalTop -= moveEditor;
+            me.editorLocalTop = Math.max(me.editorLocalTop, 0);
+            me.reposition();
+        }
         me.setHeight(editorHeight);
     },
     restoreEditingRowHeight: function() {
