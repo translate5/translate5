@@ -136,8 +136,8 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
             $this->assertEquals($expectedTarget, $removeDataSeq($segments[$idx]->targetEdit));
             
             $segToEdit = $segments[$idx];
-            if (preg_match('/^Mit dieser Datei soll/', $segToEdit->targetEdit)) {
-            	$editedData = 'Mit '.$tag1_open.'dieser Datei soll '.$tag2_open.'der Import '.$tag1_close.'spezieller Zeichen'.$tag2_close.' in CSV getestet werden';
+            if (preg_match('/Text mit einem/', $segToEdit->targetEdit)) {
+            	$editedData = 'Text '.$tag1_open.'mit einem '.$tag2_open.'&amp; '.$tag1_close.'Ampersand'.$tag2_close;
             } else {
             	$editedData = $expectedTarget.' - edited';
             }
