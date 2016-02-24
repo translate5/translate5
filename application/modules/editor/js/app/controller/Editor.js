@@ -408,7 +408,7 @@ Ext.define('Editor.controller.Editor', {
             'errorText'        : errorText,
             'existsNextSegment': false,
             'isBorderReached'  : false,
-            'lastColumnIdx'    : 0,
+            'lastColumn'       : null,
             'newRec'           : store.getAt(store.indexOf(rec) + rowIdxChange)
           };
       isEditable = (Ext.isFunction(isEditable) ? isEditable : function(){ return true; });
@@ -428,7 +428,7 @@ Ext.define('Editor.controller.Editor', {
       }
       Ext.Array.each(grid.columns, function(col, idx) {
           if(col.dataIndex == ed.editor.getEditedField()) {
-              ret.lastColumnIdx = idx;
+              ret.lastColumn = col;
           }
       });
       ret.existsNextSegment = (ret.newRec !== undefined);
