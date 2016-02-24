@@ -82,12 +82,12 @@ END LICENSE AND COPYRIGHT
   padding-bottom:6px;
 }
 
-.clearSortAndFilterBtn.activated button span{
+.clearSortAndFilterBtn.activated span.x-btn-inner {
   font-weight: bold;
   font-style: italic;
 }
 
-.watchListFilterBtn.activated button span{
+.watchListFilterBtn.activated span.x-btn-inner {
   font-weight: bold;
   font-style: italic;
 }

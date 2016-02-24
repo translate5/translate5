@@ -241,6 +241,13 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
     },
     
     /**
+     * overriding
+     */
+    onViewItemRemove: function() {
+        //do nothing here, since we want to keep the editor also on scrolling through different ranges 
+    },
+    
+    /**
      * sets the initial position of the roweditor after opening a segment
      * @param {} animateConfig
      * @param {} fromScrollHandler

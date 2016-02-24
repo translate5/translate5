@@ -106,12 +106,9 @@ Ext.define('Editor.controller.Segments', {
       selector : '#watchListFilterBtn'
   }],
   listen: {
-      global: {
-          editorViewportClosed: 'clearSegments'
-      },
       controller: {
-          '#metapanelcontroller': {
-             
+          '#Editor.$application': {
+              editorViewportClosed: 'clearSegments'
           },
           '#editorcontroller': {
               saveSegment: 'saveChainStart',
@@ -120,6 +117,9 @@ Ext.define('Editor.controller.Segments', {
           '#changealikecontroller': {
               //called after currently loaded segment data is not used anymore by the save chain / change alike handling
               segmentUsageFinished: 'onSegmentUsageFinished'
+          },
+          '#fileordercontroller': {
+              itemsaved: 'handleFileSaved'
           }
       },
       component: {
@@ -139,7 +139,7 @@ Ext.define('Editor.controller.Segments', {
               columnshow: 'handleColumnVisibility'
           },
           '#fileorderTree': {
-              selectionchange: 'handleFileSelectionChange'
+              itemclick: 'handleFileClick'
           },
           '#clearSortAndFilterBtn': {
               click: 'clearSortAndFilter'
@@ -152,29 +152,38 @@ Ext.define('Editor.controller.Segments', {
           '#AlikeSegments': {
               //called after load of change alikes to a segment
               beforeload: 'onFetchChangeAlikes'
-          },
-          '#Files': {
-              write: 'handleFileStoreWrite'
           }
       }
   },
   /**
-   * FIXME check this method
+   * Should be called on leaving a task, to ensure that on next task store is empty.
    */
   clearSegments: function() {
       var store = this.getSegmentsStore();
-      store.prefetchData.clear();
-      delete store.totalCount;
-      delete store.guaranteedStart;
-      delete store.guaranteedEnd;
-      store.removeAll();
+      store.removeAll(false);
   },
   /**
    * handler if segment store was loaded
    */
   afterStoreLoad: function() {
-    var newTotal = this.getSegmentsStore().totalCount;
-    this.updateFilteredCountDisplay(newTotal);
+      var me = this,
+          store = me.getSegmentsStore(),
+          newTotal = store.totalCount,
+          cls = 'activated',
+          btn = me.getResetFilterBtn(),
+          btnWatchList = me.getWatchListFilterBtn(),
+          filters = store.filters;
+    
+      me.updateFilteredCountDisplay(newTotal);
+    
+    
+      if(filters.length > 0){
+          btn.addCls(cls);
+      }
+      else {
+          btn.removeCls(cls);
+          btnWatchList.removeCls(cls);
+    }
   },
   /**
    * Displays / Updates the segment count in the reset button
@@ -186,21 +195,26 @@ Ext.define('Editor.controller.Segments', {
     this.getResetFilterBtn().setText(btn_text);
   },
   /**
-   * FIXME check this method
+   * FIXME check this method, should be obsolete, since RowEditor save is triggered internally by ARIA crap
    * opened segments are saved on segment selection change in grid
    */
   handleSegmentSelectionChange: function() {
+      return; //FIXME deaktivert, da durch das speichern bei selection change das offene Segment auch beim Klick im Filetree gespeichert wird.
+      //SEE EXT6UPD-44, must be converted to double click. This should already work, by ARIA crap
+      console.log("handleSegmentSelectionChange");
       var ed = this.getSegmentGrid().editingPlugin;
       if(ed && ed.editor && ed.openedRecord && ! ed.disableEditBySelect){
         this.saveChainStart();
       }
   },
   /**
+   * FIXME check me
    * maintains the visibility of the editor on showing/hiding columns
    * @param {Ext.grid.header.Container} head
    * @param {Editor.view.segments.column.Content} col
    */
   handleColumnVisibility: function(head, col) {
+      console.log("handleColumnVisibility");
       var ed = this.getSegmentGrid().editingPlugin;
       if(ed && ed.editor && ed.editor.columnToEdit == col.dataIndex) {
           ed.editor.toggleMainEditor(col.isVisible());
@@ -234,39 +248,33 @@ Ext.define('Editor.controller.Segments', {
         filters = gridFilters.store.filters,
         btn = me.getWatchListFilterBtn(),
         found = false,
-        column, columnFilter;
+        otherFound = false,
+        column;
 
     filters.each(function(filter, index, len){
-        if (filter.getProperty() == 'isWatched')
-        {
-            found = true;
-        }
+        var isWatched = filter.getProperty() == 'isWatched';
+        found = found || isWatched;
+        otherFound = otherFound || !isWatched && filter.getDisabled() === false;
     });
+    //remove watchlist filter
     if (found) {
         column = grid.columnManager.getHeaderByDataIndex('isWatched');
-        if (column) {
-            columnFilter = column.filter;
-            if (columnFilter && columnFilter.isGridFilter) {
-                columnFilter.setActive(false);
-            }
+        if (column && column.filter && column.filter.isGridFilter) {
+            column.filter.setActive(false);
         }
-    } else {
-        gridFilters.addFilter({
-            dataIndex: 'isWatched',
-            type: 'boolean',
-            value: true,
-            disabled: false
-        });
-    }
-    filters.each(function(filter, index, len){
-        if (filter.getProperty() != 'isWatched')
-        {
-            if (filter.getDisabled() === false) // currently enabled at least one more filter
-            {
-                Editor.MessageBox.addSuccess(me.messages.otherFiltersActive);
-            }
-        }
+        return;
+    } 
+    //add watchlist filter
+    gridFilters.addFilter({
+        dataIndex: 'isWatched',
+        type: 'boolean',
+        value: true,
+        disabled: false
     });
+    // currently enabled at least one more filter:
+    if (otherFound) {
+        Editor.MessageBox.addSuccess(me.messages.otherFiltersActive);
+    }
   },
   /**
    * removes the segment from the grid if removed from the watchlist and watchlist filter is set
@@ -278,12 +286,12 @@ Ext.define('Editor.controller.Segments', {
       if(!btn.pressed) {
           return;
       }
-      // FIXME: how to hide grid row, withowt reloading a grid ???
-      //store.remove(rec);
   },
   /**
-   * behandelt die Selektion von Dateien im Dateibaum
-   * setzt die Sortierung zurück, springt zum ersten Segment der Datei. Zeigt Fehlermeldung wenn aufgrund des Filters kein passendes Segment vorhanden ist.
+   * handles the click on a file in the filetree
+   * resets the sorting and jumps to the first segment of the file.
+   * Shows an errormessage if no segment to the file can be shown, caused by filtering.
+   * 
    * @param {Ext.tree.Panel} panel
    * @param {Editor.model.File} fileRecord
    * @param {HTMLNode} node
@@ -305,33 +313,33 @@ Ext.define('Editor.controller.Segments', {
   /**
    * behandelt die Änderung der Grid Filter:
    * nach einem ändern der Filter muss das mapping zwischen Datei und Startsegmenten neu geladen werden.
-   * @param {Ext.data.Store} store The store.
-   * @param {Ext.util.Filter[]} filters The array of Filter objects.
    * @return void
    */
-  handleFilterChange: function(store, filters) {
+  handleFilterChange: function() {
+      console.log("handleFilterChange", arguments);
       var me = this,
-          proxy = store.getProxy(),
-          btn = me.getWatchListFilterBtn(),
           grid = me.getSegmentGrid(),
           gridFilters = grid.filters,
-          filters = gridFilters.store.filters,
+          store = gridFilters.store,
+          filters = store.filters,
+          proxy = store.getProxy(),
+          btn = me.getWatchListFilterBtn(),
           found = false,
           params = {};
           
       filters.each(function(filter, index, len){
-         if (filter.getProperty() == 'isWatched')
-         {
-             found = true;
-         }
+         found = found || (filter.getProperty() == 'isWatched');
       });
       btn.toggle(found);
 
       params[proxy.getFilterParam()] = proxy.encodeFilters(store.getFilters().items);
 
-      //filterFeature && me.styleResetFilterButton(filterFeature);
-      this.reloadFilemap(params);
+      filters && me.styleResetFilterButton(filters);
+      me.reloadFilemap(params);
   },
+  /**
+   * reloads the filemap with the given sort and filter parameters
+   */
   reloadFilemap: function(params) {
       var me = this;
       params = params || {};
@@ -357,17 +365,6 @@ Ext.define('Editor.controller.Segments', {
    */
   styleResetFilterButton: function(filters){
       this.updateFilteredCountDisplay('...');
-      var cls = 'activated',
-          btn = this.getResetFilterBtn(),
-          btnWatchList = this.getWatchListFilterBtn();
-      if(filters.length > 0){
-          btn.addCls(cls);
-      }
-      else {
-          btn.removeCls(cls);
-          btnWatchList.removeCls(cls);
-      }
-      //btn.ownerCt.doLayout();
   },
   /**
    * resets the gird sort, jumps to the first segment of the clicked file,
@@ -385,7 +382,6 @@ Ext.define('Editor.controller.Segments', {
           grid.scrollTo(idxToScrollTo);
           return;
       }
-      //FIXME here instead store load bind to view.refresh/viewready, since data must exist in view before we can scroll to?
       store.on('load', function(){
           grid.scrollTo(idxToScrollTo);
       }, me,{single:true});
@@ -410,9 +406,10 @@ Ext.define('Editor.controller.Segments', {
   /**
    * Reloads the segment store and resets the segment sorting after updating the file tree order
    */
-  handleFileStoreWrite: function(){
-    this.clearSegmentSort();
-    this.getSegmentsStore().reload();
+  handleFileSaved: function(movedItem){
+      this.clearSegmentSort();
+      this.getSegmentsStore().reload();
+      this.handleFilterChange();
   },
   /**
    * Hilfsfunktion um beim Schließen des Browserfensters das letzte Segment anzuzeigen
@@ -450,6 +447,7 @@ Ext.define('Editor.controller.Segments', {
    *    scope: the scope of the given callbacks 
    */
   saveChainStart: function(config) {
+    console.log("saveChainStart");
       var me = this,
           ed = me.getSegmentGrid().editingPlugin;
       config = config || {};
@@ -499,8 +497,10 @@ Ext.define('Editor.controller.Segments', {
       }
       me.addLoadMask();
       
+      //FIXME check if this callback is called!
       //add a callback to complete this completeEdit call after successfull load of the alike segments
       op.handleReadAfterSave = function(){
+          console.log("called op.handleReadAfterSave");
           me.saveChainSave();   //NEXT step in save chain
           me.delLoadMask();
       };

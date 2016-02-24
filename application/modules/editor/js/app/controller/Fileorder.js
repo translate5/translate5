@@ -43,6 +43,7 @@ Ext.define('Editor.controller.Fileorder', {
   extend : 'Ext.app.Controller',
   stores: ['Files','ReferenceFiles'],
   views: ['fileorder.Tree','fileorder.ReferenceTree'],
+  id: 'fileordercontroller',
   refs : [{
     ref : 'fileTree',
     selector : '#fileorderTree'
@@ -94,12 +95,16 @@ Ext.define('Editor.controller.Fileorder', {
       this.getFilesStore().getRootNode().removeAll(false);
       this.getReferenceFilesStore().getRootNode().removeAll(false);
   },
-  handleItemMoved: function() {
-      console.log("handleItemMoved");
-      this.getFilesStore().sync();
+  handleItemMoved: function(nodeItem) {
+      nodeItem.save({
+          success: this.handleItemSaved,
+          scope: this
+      });
+  },
+  handleItemSaved: function(record, operation) {
+      this.fireEvent('itemsaved', record, operation);
   },
   releaseFileSelection: function() {
-      console.log("releaseFileSelection");
       this.getFileTree().getSelectionModel().deselectAll();
   },
   /**
@@ -108,7 +113,6 @@ Ext.define('Editor.controller.Fileorder', {
    * @param {Array} selectedRecords 
    */
   handleSegmentSelectionChange: function(sm, selectedRecords) {
-      console.log("handleSegmentSelectionChange");
     if(selectedRecords.length == 0) {
       return;
     }
