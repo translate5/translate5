@@ -50,31 +50,41 @@ Ext.define('Editor.controller.Fileorder', {
     ref : 'segmentGrid',
     selector : '#segmentgrid'
   }],
-  init : function() {
-      var me = this;
-      //@todo on updating ExtJS to >4.2 use Event Domains and me.listen for the following event bindings 
-      Editor.app.on('editorViewportClosed', me.clearStores, me);
-      me.getStore('Files').on('write', me.releaseFileSelection, me);
-      me.control({
-          '#segmentgrid' : {
-              selectionchange: me.handleSegmentSelectionChange
-          },
-          '#fileorderTree': {
-              itemmove: me.handleItemMoved
+  listen: {
+      controller: {
+          '#Editor.$application': {
+              editorViewportClosed: 'clearStores'
           }
-      });
+      },
+      component: {
+          '#fileorderTree': {
+              itemmove: 'handleItemMoved'
+          },
+          '#segmentgrid': {
+              click: 'handleSegmentSelectionChange'
+          }
+      },
+      store: {
+          '#Files': {
+              write: 'releaseFileSelection'
+          }
+      }
   },
   loadFileTree: function() {
-      this.getFilesStore().load({
+      var me = this,
+          fileStore = me.getFilesStore(),
+          refStore = me.getReferenceFilesStore();
+      fileStore.load({
           manualLoaded: true,
-          scope: this.getFilesStore(),
+          scope: fileStore,
           callback: function() {
               this.getRootNode().expand();
           }
       });
-      this.getReferenceFilesStore().load({
+      
+      refStore.load({
           manualLoaded: true,
-          scope: this.getReferenceFilesStore(),
+          scope: refStore,
           callback: function() {
               this.getRootNode().expand();
           }
@@ -85,10 +95,12 @@ Ext.define('Editor.controller.Fileorder', {
       this.getReferenceFilesStore().getRootNode().removeAll(false);
   },
   handleItemMoved: function() {
-    this.getFilesStore().sync();
+      console.log("handleItemMoved");
+      this.getFilesStore().sync();
   },
   releaseFileSelection: function() {
-    this.getFileTree().getSelectionModel().deselectAll();
+      console.log("releaseFileSelection");
+      this.getFileTree().getSelectionModel().deselectAll();
   },
   /**
    * Handler für das Segment Grid selectionchange event
@@ -96,6 +108,7 @@ Ext.define('Editor.controller.Fileorder', {
    * @param {Array} selectedRecords 
    */
   handleSegmentSelectionChange: function(sm, selectedRecords) {
+      console.log("handleSegmentSelectionChange");
     if(selectedRecords.length == 0) {
       return;
     }

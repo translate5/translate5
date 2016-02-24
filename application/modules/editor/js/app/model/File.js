@@ -43,7 +43,7 @@ Ext.define('Editor.model.File', {
   fields: [
     {name: 'text', type: 'string', mapping: 'filename'}, 
     {name: 'id', type: 'int'},
-    {name: 'parentId', type: 'int'},
+    {name: 'parentId', type: 'int', critical: true},
     {name: 'href', type: 'string', convert: function(v) {
         //relative path fix since browser url does not always end with "/"
         if(v && v.length > 0) {
@@ -53,7 +53,8 @@ Ext.define('Editor.model.File', {
     }},
     'cls',
     {name: 'leaf', type: 'boolean', mapping: 'isFile', defaultValue: false},
-    {name: 'segmentid', type: 'int', defaultValue: 0}
+    {name: 'segmentid', type: 'int', defaultValue: 0},
+    {name: 'index', type: 'int', critical: true}
   ],
   idProperty: 'id',
   proxy : {

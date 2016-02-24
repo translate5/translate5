@@ -284,21 +284,23 @@ Ext.define('Editor.controller.Segments', {
   /**
    * behandelt die Selektion von Dateien im Dateibaum
    * setzt die Sortierung zurück, springt zum ersten Segment der Datei. Zeigt Fehlermeldung wenn aufgrund des Filters kein passendes Segment vorhanden ist.
-   * @param {Ext.selection.Model} sm
-   * @param {Editor.model.Segment[]} selectedRecords
+   * @param {Ext.tree.Panel} panel
+   * @param {Editor.model.File} fileRecord
+   * @param {HTMLNode} node
    */
-  handleFileSelectionChange: function(sm, selectedRecords) {
-    if(selectedRecords.length == 0 || !selectedRecords[0].isLeaf()) {
-      return;
-    }
-    var me = this,
-    selectedFile = selectedRecords[0];
-    if(selectedFile && me.filemap[selectedFile.get('id')] !== undefined){
-      me.resetSegmentSortForFileClick(me.filemap[selectedFile.get('id')]);
-    }
-    else{
-      Editor.MessageBox.addSuccess(me.messages.noSegmentToFilter);
-    }
+  handleFileClick: function(panel, fileRecord, node) {
+      var me = this;
+      if(!fileRecord || !fileRecord.isLeaf()) {
+          return;
+      }
+
+      if(me.filemap[fileRecord.get('id')] !== undefined){
+          console.dir(me.filemap);
+          me.resetSegmentSortForFileClick(me.filemap[fileRecord.get('id')]);
+      }
+      else{
+          Editor.MessageBox.addSuccess(me.messages.noSegmentToFilter);
+      }
   },
   /**
    * behandelt die Änderung der Grid Filter:
