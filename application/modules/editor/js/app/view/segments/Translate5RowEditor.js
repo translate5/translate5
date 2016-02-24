@@ -99,16 +99,14 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
      * cancels the editing process
      */
     cancelEdit: function() {
-        console.log("cancelEdit");
         var me = this;
         me.restoreEditingRowHeight();
         me.callParent(arguments);
     },
     completeEdit: function() {
-        console.log("completeEdit");
         var me = this;
         me.restoreEditingRowHeight();
-        //me.hide();
+        me.hide();
     },
     //
     // Grid listener added when this is rendered.
@@ -118,8 +116,7 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
     onGridResize: function() {
         var me = this,
             clientWidth = me.getClientWidth();
-
-        me.setWidth(clientWidth);
+        //FIXME update clipping width
     },
     
     updateButton: function(valid) {
@@ -214,8 +211,6 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
      */
     reposition: function(animateConfig, fromScrollHandler) {
         var me = this;
-        console.log("REPO", -me.lastScrollLeft, me.editorLocalTop);
-        console.trace();
         me.el.setLocalXY(-me.lastScrollLeft, me.editorLocalTop);
         //TODO if overlapping the scrollbar is a problem, we must rebuild/refactor the syncEditorClip method
         //perhaps it is easier, roweditor width must be "view size" + scrollLeft

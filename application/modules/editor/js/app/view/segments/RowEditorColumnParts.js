@@ -47,9 +47,10 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         segmentNotSavedUserMessage: 'Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank!',
         cantSaveEmptySegment: '#UT#Das Segment kann nicht ohne Inhalt gespeichert werden!'
     },
-
+    listeners: {
+        'afterlayout': 'onAfterLayout'
+    },
     initComponent: function() {
-        console.log("FOOW");
         var me = this;
         me.callParent();
         me.on('render', function(p) {
@@ -168,16 +169,21 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         me.linkedDisplayField = linkedDisplayField;
         return true;
     },
+    onAfterLayout: function() {
+        this.focusContextCell();
+    },
     /**
      * overrides original focusing with our repositioning of the editor
      */
     focusContextCell: function() {
-        console.log("focusContextCell");
-        console.trace();
         var me = this, 
             toDis = me.linkedDisplayField,
             pos;
    
+        if(!me.mainEditor) {
+            return;
+        }
+            
         if(! toDis) {
             me.mainEditor.deferFocus();
             return;
