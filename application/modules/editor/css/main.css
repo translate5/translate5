@@ -71,6 +71,7 @@ END LICENSE AND COPYRIGHT
     text-overflow: initial;
     white-space: normal;
     overflow: visible;
+    cursor: move;
 }
 
 .x-grid-row-editor {

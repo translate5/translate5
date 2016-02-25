@@ -139,9 +139,9 @@ Ext.define('Editor.view.segments.RowEditor', {
                         me.editorLocalTop = me.getOffsetsTo(grid.body)[1];
                     }
                 },
-                constrainTo: grid.body
+                constrainTo: grid.body,
                 //constrainTo: me.view.body//,
-                //delegate: '#' + me.header.id
+                delegate: '.x-form-display-field-body'
             };
 
         me.dd = new Ext.util.ComponentDragger(me, ddConfig);
