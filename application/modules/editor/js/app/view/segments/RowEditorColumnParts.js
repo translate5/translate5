@@ -29,13 +29,13 @@ END LICENSE AND COPYRIGHT
 
 /**
  * @class Editor.view.segments.RowEditorColumnParts
- * @override Editor.view.segments.Translate5RowEditor
+ * @override Editor.view.segments.RowEditor
  * 
  * This is the MainEditor moving/handling part of this multi class component.
  * MainEditor means the HtmlEditor which exists only once and is shared between multiple columns
  */
 Ext.define('Editor.view.segments.RowEditorColumnParts', {
-    override: 'Editor.view.segments.Translate5RowEditor',
+    override: 'Editor.view.segments.RowEditor',
 
     //beinhaltet den gekürzten Inhalt des letzten geöffneteten Segments
     lastSegmentShortInfo: '',

@@ -35,12 +35,12 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.view.segments.Translate5RowEditing
+ * @class Editor.view.segments.RowEditing
  * @extends Ext.grid.plugin.RowEditing
  */
-Ext.define('Editor.view.segments.Translate5RowEditing', {
+Ext.define('Editor.view.segments.RowEditing', {
     extend: 'Ext.grid.plugin.RowEditing',
-    alias: 'plugin.segments.translate5rowediting',
+    alias: 'plugin.segmentrowediting',
     editingAllowed: true,
     openedRecord: null,
     statics: {
@@ -52,7 +52,7 @@ Ext.define('Editor.view.segments.Translate5RowEditing', {
         edit100pWarning: '#UT#Achtung, Sie editieren einen 100% Match!'
     },
     requires: [
-        'Editor.view.segments.Translate5RowEditor'
+        'Editor.view.segments.RowEditor'
     ],
     initEditorConfig: function() {
         var me = this,
@@ -75,7 +75,7 @@ Ext.define('Editor.view.segments.Translate5RowEditing', {
         return cfg;
     },
     initEditor: function() {
-        return new Editor.view.segments.Translate5RowEditor(this.initEditorConfig());
+        return new Editor.view.segments.RowEditor(this.initEditorConfig());
     },
     getEditor: function() {
         return this.editor;

@@ -42,7 +42,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.segments.Grid', {
     extend: 'Ext.grid.Panel',
     requires: [
-        'Editor.view.segments.Translate5RowEditing',
+        'Editor.view.segments.RowEditing',
         'Editor.view.segments.column.Content',
         'Editor.view.segments.column.ContentEditable',
         'Editor.view.segments.column.SegmentNrInTask',
@@ -103,7 +103,7 @@ Ext.define('Editor.view.segments.Grid', {
     constructor: function() {
         this.plugins = [
             'gridfilters',
-            Ext.create('Editor.view.segments.Translate5RowEditing', {
+            Ext.create('Editor.view.segments.RowEditing', {
                 clicksToMoveEditor: 1,
                 autoCancel: false
             })
