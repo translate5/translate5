@@ -64,13 +64,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   isTagOrderClean: true,
   missingContentTags: [],
   duplicatedContentTags: [],
-  checkForErrors: true,
+  disableErrorCheck: false,
   
   strings: {
-	  errorTitle: '#UT# Fehler bei der Segment Validierung!',
 	  tagOrderErrorText: '#UT# Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
-	  correctErrorsText: '#UT# Fehler beheben',
-	  saveAnyway: '#UT# Trotzdem speichern',
 	  tagMissingText: '#UT# Die nachfolgenden Tags wurden beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Versuchen Sie mit der Rückgängigfunktion STRG-Z die Tags wiederherzustellen. <br /><br />Alternativ können Sie auch die Bearbeitung des Segments durch Klick auf "Abbrechen" (<img src="images/cross.png" /> im rechten Menü) beenden und das Segment neu zur Bearbeitung öffnen.<br /><br />Fehlende Tags:',
 	  tagDuplicatedText: '#UT# Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:',
 	  tagRemovedText: '#UT# Es wurden Tags mit fehlendem Partner entfernt!'
@@ -78,6 +75,20 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 
   //hilfsvariable für die "letzte Segment anzeigen" Funktionalität beim Verlassen des Browsers. 
   lastSegmentContentWithoutTags: null,
+  
+  //***********************************************************************************
+  //Begin Events
+  //***********************************************************************************
+  /**
+   * @event contentErrors
+   * @param {Editor.view.segments.HtmlEditor} the htmleditor itself
+   * @param {String} error message
+   * Fires if the content contains tag errors, the result of the handler must be boolean, 
+   * true if saving should be processed, false if not.
+   */
+  //***********************************************************************************
+  //End Events
+  //***********************************************************************************
   
   initComponent: function() {
     var me = this;
@@ -367,34 +378,23 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   isDuplicateSaveTag: function(img) {
       return img.tagName == 'IMG' && img.className && /duplicatesavecheck/.test(img.className);
   },
-  handleSaveWithErrors: function(msg){
-      var me = this;
-      var MB = Ext.create('Ext.window.MessageBox', {
-            buttonText:{
-                yes: me.strings.correctErrorsText,
-                no: me.strings.saveAnyway
-            }
-        });
-
-        MB.confirm(me.strings.errorTitle,msg,
-            function(btn){
-                var me = this;
-                if(btn != 'yes') {
-                    me.checkForErrors = false;
-                    if(me.metaPanelController.calledSaveMethod){
-                        me.metaPanelController.calledSaveMethod();
-                        return;
-                    }
-                    me.segmentsController.saveChainStart();
-                }
-                me.metaPanelController.calledSaveMethod = false;
-            },me);
+  /**
+   * disables the hasAndDisplayErrors method on its next call, used for save and ignore the tag checks
+   */
+  disableContentErrorCheckOnce: function() {
+      this.disableErrorCheck = true;
   },
+  /**
+   * used by the row editor for content validation
+   * @return {Boolean}
+   */
   hasAndDisplayErrors: function() {
       var me = this;
-      if(!this.checkForErrors){
-          this.metaPanelController.calledSaveMethod = false;
-          this.checkForErrors = true;
+      //if we are running a second time into this method triggered by callback, 
+      //  the callback can disable a second error check
+      if(me.disableErrorCheck){
+          me.fireEvent('contentErrors', me, null);
+          me.disableErrorCheck = false;
           return false;
       }
       
@@ -410,14 +410,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                   msg += '<br /><br />';
               }
           }
-          me.handleSaveWithErrors(msg);
+          me.fireEvent('contentErrors', me, msg);
           return true;
       }
       if(!me.isTagOrderClean){
-          me.handleSaveWithErrors(me.strings.tagOrderErrorText);
+          me.fireEvent('contentErrors', me, me.strings.tagOrderErrorText);
           return true;
       }
-      this.metaPanelController.calledSaveMethod = false;
+      me.fireEvent('contentErrors', me, null);
       return false;
   },
   /**

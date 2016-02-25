@@ -46,7 +46,10 @@ Ext.define('Editor.controller.Editor', {
       segmentReset: '#UT#Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.',
       segmentNotBuffered: '#UT#Kein passendes Segment vorhanden bzw. im Zwischenspeicher gefunden. Bitte scrollen Sie manuell weiter!',
       gridEndReached: '#UT#Ende der Segmente erreicht!',
-      gridStartReached: '#UT#Start der Segmente erreicht!'
+      gridStartReached: '#UT#Start der Segmente erreicht!',
+      errorTitle: '#UT# Fehler bei der Segment Validierung!',
+      correctErrorsText: '#UT# Fehler beheben',
+      saveAnyway: '#UT# Trotzdem speichern'
   },
   id: 'editorcontroller',
   refs : [{
@@ -56,60 +59,62 @@ Ext.define('Editor.controller.Editor', {
       ref : 'navi',
       selector : '#metapanel #naviToolbar'
   }],
-  calledSaveMethod:false,
+  lastSaveOtherRowParameter:false,
   isEditing: false,
   keyMapConfig: null,
+  listen: {
+      component: {
+          '#metapanel #watchSegmentBtn' : {
+              click : 'toggleWatchSegment'
+          },
+          '#metapanel #cancelSegmentBtn' : {
+              click : 'cancel'
+          },
+          '#metapanel #saveSegmentBtn' : {
+              click : 'save'
+          },
+          '#metapanel #saveNextSegmentBtn' : {
+              click : 'saveNext'
+          },
+          '#metapanel #savePreviousSegmentBtn' : {
+              click : 'savePrevious'
+          },
+          '#metapanel #goAlternateLeftBtn' : {
+              click : 'goToAlternate'
+          },
+          '#metapanel #goAlternateRightBtn' : {
+              click : 'goToAlternate'
+          },
+          '#metapanel #goToLowerByWorkflowNoSaveBtn' : {
+              click : 'goToLowerByWorkflowNoSave'
+          },
+          '#metapanel #goToUpperByWorkflowNoSaveBtn' : {
+              click : 'goToUpperByWorkflowNoSave'
+          },
+          '#metapanel #goToLowerNoSaveBtn' : {
+              click : 'goToLowerNoSave'
+          },
+          '#metapanel #goToUpperNoSaveBtn' : {
+              click : 'goToUpperNoSave'
+          },
+          '#metapanel #saveNextByWorkflowBtn' : {
+              click : 'saveNextByWorkflow'
+          },
+          '#metapanel #resetSegmentBtn' : {
+              click : 'resetSegment'
+          },
+          'segmentsHtmleditor': {
+              initialize: 'initEditor',
+              contentErrors: 'handleSaveWithErrors'
+          },
+          '#segmentgrid': {
+              afterrender: 'initEditPluginHandler'
+          }
+      }
+  },
   init : function() {
       var me = this,
           decDigits = [48, 49, 50, 51, 52, 53, 54, 55, 56, 57];
-      
-      me.control({
-          '#metapanel #watchSegmentBtn' : {
-              click : me.toggleWatchSegment
-          },
-          '#metapanel #cancelSegmentBtn' : {
-              click : me.cancel
-          },
-          '#metapanel #saveSegmentBtn' : {
-              click : me.save
-          },
-          '#metapanel #saveNextSegmentBtn' : {
-              click : me.saveNext
-          },
-          '#metapanel #savePreviousSegmentBtn' : {
-              click : me.savePrevious
-          },
-          '#metapanel #goAlternateLeftBtn' : {
-              click : me.goToAlternate
-          },
-          '#metapanel #goAlternateRightBtn' : {
-              click : me.goToAlternate
-          },
-          '#metapanel #goToLowerByWorkflowNoSaveBtn' : {
-              click : me.goToLowerByWorkflowNoSave
-          },
-          '#metapanel #goToUpperByWorkflowNoSaveBtn' : {
-              click : me.goToUpperByWorkflowNoSave
-          },
-          '#metapanel #goToLowerNoSaveBtn' : {
-              click : me.goToLowerNoSave
-          },
-          '#metapanel #goToUpperNoSaveBtn' : {
-              click : me.goToUpperNoSave
-          },
-          '#metapanel #saveNextByWorkflowBtn' : {
-              click : me.saveNextByWorkflow
-          },
-          '#metapanel #resetSegmentBtn' : {
-              click : me.resetSegment
-          },
-          'segmentsHtmleditor': {
-              initialize: me.initEditor
-          },
-          '#segmentgrid': {
-              afterrender: me.initEditPluginHandler
-          }
-      });
       
       //set the default config
       me.keyMapConfig = {
@@ -300,7 +305,7 @@ Ext.define('Editor.controller.Editor', {
       var me = this;
       e.preventDefault();
       e.stopEvent();
-      return me.moveToAdjacentRow(1, this.messages.gridEndReached, this.workflowStepFilter);
+      return me.moveToAdjacentRow(1, me.messages.gridEndReached, me.workflowStepFilter);
   },
   /**
    * Moves to the previous row with the same workflow value without saving current record
@@ -310,17 +315,13 @@ Ext.define('Editor.controller.Editor', {
       var me = this;
       e.preventDefault();
       e.stopEvent();
-      return me.moveToAdjacentRow(-1, this.messages.gridStartReached, this.workflowStepFilter);
+      return me.moveToAdjacentRow(-1, me.messages.gridStartReached, me.workflowStepFilter);
   },
   /**
    * Handler for saveNext Button
    * @return {Boolean} true if there is a next segment, false otherwise
    */
   saveNext: function() {
-      if(!this.isEditing) {
-          return;
-      }
-      this.calledSaveMethod = this.saveNext;
       return this.saveOtherRow(1, this.messages.gridEndReached);
   },
   /**
@@ -328,10 +329,6 @@ Ext.define('Editor.controller.Editor', {
    * @return {Boolean} true if there is a next segment, false otherwise
    */
   savePrevious: function() {
-      if(!this.isEditing) {
-          return;
-      }
-      this.calledSaveMethod = this.savePrevious;
       return this.saveOtherRow(-1, this.messages.gridStartReached);
   },
   /**
@@ -339,10 +336,6 @@ Ext.define('Editor.controller.Editor', {
    * @return {Boolean} true if there is a next segment, false otherwise
    */
   saveNextByWorkflow: function() {
-      if(!this.isEditing) {
-          return;
-      }
-      this.calledSaveMethod = this.saveNext;
       return this.saveOtherRow(1, this.messages.gridEndReached, this.workflowStepFilter);
   },
   /**
@@ -350,10 +343,6 @@ Ext.define('Editor.controller.Editor', {
    * @return {Boolean} true if there is a next segment, false otherwise
    */
   savePreviousByWorkflow: function() {
-      if(!this.isEditing) {
-          return;
-      }
-      this.calledSaveMethod = this.savePrevious;
       return this.saveOtherRow(-1, this.messages.gridStartReached, this.workflowStepFilter);
   },
   /**
@@ -447,6 +436,12 @@ Ext.define('Editor.controller.Editor', {
           selModel = grid.getSelectionModel(),
           ed = me.getEditPlugin(),
           ret = me.calculateNextRow(rowIdxChange, errorText, isEditable);
+      
+      if(!me.isEditing) {
+          return;
+      }
+      //store the arguments to recall me on handleSaveWithErrors callback
+      me.lastSaveOtherRowParameter = [rowIdxChange, errorText, isEditable];
           
       me.fireEvent('saveUnsavedComments');
       
@@ -457,6 +452,48 @@ Ext.define('Editor.controller.Editor', {
           }
       });
       return ret.existsNextSegment;
+  },
+  /**
+   * @param {Editor.view.segments.HtmlEditor} editor
+   * @param {String} msg
+   */
+  handleSaveWithErrors: function(editor, msg){
+      var me = this,
+          msgBox;
+      
+      //if there was an empty message we assume that there was no error,
+      //therefore we can delete the last saveOtherRow parameters
+      if(!msg) {
+          me.lastSaveOtherRowParameter = null;
+          return;
+      }
+      
+      msgBox = Ext.create('Ext.window.MessageBox', {
+          buttonText:{
+              yes: me.messages.correctErrorsText,
+              no: me.messages.saveAnyway
+          }
+      });
+      msgBox.confirm(me.messages.errorTitle, msg, function(btn) {
+          if(btn == 'yes') {
+              return;
+          }
+          me.saveAndIgnoreContentErrors();
+      },me);
+  },
+  /**
+   * triggers the save chain but ignoring htmleditor content errors then
+   */
+  saveAndIgnoreContentErrors: function() {
+      //FIXME either make a default save call (see below) or trigger the initial called saveMethod again
+      var me = this,
+          plug = me.getEditPlugin();
+      plug.editor.mainEditor.disableContentErrorCheckOnce();
+      if(me.lastSaveOtherRowParameter){
+          me.saveOtherRow.apply(me, me.lastSaveOtherRowParameter);
+          return;
+      }
+      me.save();
   },
   /**
    * Handler für cancel Button
