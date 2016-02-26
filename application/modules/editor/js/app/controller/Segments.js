@@ -195,19 +195,6 @@ Ext.define('Editor.controller.Segments', {
     this.getResetFilterBtn().setText(btn_text);
   },
   /**
-   * FIXME check this method, should be obsolete, since RowEditor save is triggered internally by ARIA crap
-   * opened segments are saved on segment selection change in grid
-   */
-  handleSegmentSelectionChange: function() {
-      return; //FIXME deaktivert, da durch das speichern bei selection change das offene Segment auch beim Klick im Filetree gespeichert wird.
-      //SEE EXT6UPD-44, must be converted to double click. This should already work, by ARIA crap
-      console.log("handleSegmentSelectionChange");
-      var ed = this.getSegmentGrid().editingPlugin;
-      if(ed && ed.editor && ed.editing && ! ed.disableEditBySelect){
-        this.saveChainStart();
-      }
-  },
-  /**
    * FIXME check me
    * maintains the visibility of the editor on showing/hiding columns
    * @param {Ext.grid.header.Container} head

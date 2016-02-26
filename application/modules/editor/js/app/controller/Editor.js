@@ -267,10 +267,10 @@ Ext.define('Editor.controller.Editor', {
 
       if (ret.existsNextSegment) {
             //editing by selection handler must be disabled, otherwise saveChainStart will be triggered twice
-            ed.disableEditBySelect = true;
             selModel.select(ret.newRec);
-            Ext.defer(ed.startEdit, 300, ed, [ret.newRec, ret.lastColumnIdx]); //defer reduces problems with editorDomCleanUp see comment on Bug 38
-            ed.disableEditBySelect = false;
+            //REMIND here was startEdit defered with 300 millis, is this still needed?
+            ed.startEdit(ret.newRec, ret.lastColumn, ed.self.STARTEDIT_SCROLLUNDER);
+            //FIXME disableEditBySelect needed since, changing to double click?
             return;
       }
       
@@ -505,7 +505,6 @@ Ext.define('Editor.controller.Editor', {
    * triggers the save chain but ignoring htmleditor content errors then
    */
   saveAndIgnoreContentErrors: function() {
-      //FIXME either make a default save call (see below) or trigger the initial called saveMethod again
       var me = this,
           plug = me.getEditPlugin();
       plug.editor.mainEditor.disableContentErrorCheckOnce();
