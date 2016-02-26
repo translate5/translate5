@@ -95,7 +95,7 @@ Ext.define('Editor.view.segments.RowEditing', {
         }
         me.editor.setMode(mode);        
         //to prevent race-conditions, check if there isalready an opened record and if yes show an error (see RowEditor.js function completeEdit for more information)
-        if (me.context.record) {
+        if (me.context && me.context.record) {
             Editor.MessageBox.addError(me.messages.previousSegmentNotSaved,' Das Segment konnte nicht zum Bearbeiten geöffnet werden, da das vorherige Segment noch nicht korrekt gespeichert wurde. Im folgenden der Debug-Werte: this.context.record.internalId: ' + me.context.record.internalId + ' record.internalId: ' + record.internalId);
             return false;
         }
@@ -106,7 +106,12 @@ Ext.define('Editor.view.segments.RowEditing', {
             started = me.callParent(arguments);
             return started;
         }
-        return false;
+    //fixing https://www.sencha.com/forum/showthread.php?309102-ExtJS-6.0.0-RowEditor-Plugin-completeEdit-does-not-set-context-to-null&p=1128826#post1128826
+    cancelEdit: function() {
+        this.callParent(arguments);
+        if(!this.editing) {
+            this.context = null;
+        }
     },
     //fixing https://www.sencha.com/forum/showthread.php?309102-ExtJS-6.0.0-RowEditor-Plugin-completeEdit-does-not-set-context-to-null&p=1128826#post1128826
     completeEdit: function() {

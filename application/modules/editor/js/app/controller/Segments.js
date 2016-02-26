@@ -449,11 +449,13 @@ Ext.define('Editor.controller.Segments', {
   saveChainStart: function(config) {
     console.log("saveChainStart");
       var me = this,
-          ed = me.getSegmentGrid().editingPlugin;
+          ed = me.getSegmentGrid().editingPlugin,
+          record;
+      
       config = config || {};
           
       // No Editor was started.
-      if(! ed.context){
+      if(!ed.editing || ! ed.context){
           return;
       }
 
@@ -464,6 +466,7 @@ Ext.define('Editor.controller.Segments', {
       }
       
       me.saveChainMutex = true;
+      record = ed.context.record;
       ed.completeEdit();
       //if completeEdit fails, the plugin remains editing and the record is not dirty.
       if(ed.editing && !ed.context.record.dirty) {
@@ -479,7 +482,7 @@ Ext.define('Editor.controller.Segments', {
       if(config.segmentUsageFinished && Ext.isFunction(config.segmentUsageFinished)) {
           me.on('segmentUsageFinished', config.segmentUsageFinished, (config.scope || me), {single: true});
       }
-      me.saveChainCheckAlikes(); //NEXT step in save chain
+      me.saveChainCheckAlikes(record); //NEXT step in save chain
   },
   /**
    * checks if changeAlikes are already fetched, 
@@ -487,12 +490,14 @@ Ext.define('Editor.controller.Segments', {
    * @see Editor.controller.ChangeAlike 
    * 
    * next step: saveChainSave
+   * 
+   * @param {Editor.model.Segment} record record to be saved
    */
-  saveChainCheckAlikes: function() {
+  saveChainCheckAlikes: function(record) {
       var me = this,
       op = me.changeAlikeOperation;
       if(!op || !op.isRunning()) {
-          me.saveChainSave(); //NEXT step in save chain
+          me.saveChainSave(record); //NEXT step in save chain
           return;
       }
       me.addLoadMask();
@@ -501,7 +506,7 @@ Ext.define('Editor.controller.Segments', {
       //add a callback to complete this completeEdit call after successfull load of the alike segments
       op.handleReadAfterSave = function(){
           console.log("called op.handleReadAfterSave");
-          me.saveChainSave();   //NEXT step in save chain
+          me.saveChainSave(record);   //NEXT step in save chain
           me.delLoadMask();
       };
   },
@@ -510,15 +515,14 @@ Ext.define('Editor.controller.Segments', {
    * next step if nothing to save: saveChainEnd
    * next step after save: saveChainSaveCallback
    * 
-   * fires the "afterSaveCall" event, the final step saveChainEnd is provided to the event as parameter.
+   * fires the "afterSaveCall" event, the final step saveChainEnd and the record are provided to the event as parameter.
+   * 
+   * @param {Editor.model.Segment} record record to be saved
    */
-  saveChainSave: function() {
+  saveChainSave: function(record) {
       var me = this,
           grid = me.getSegmentGrid(),
-          store = grid.store,
-          ed = grid.editingPlugin,
-          record = ed.context.record,
-          recordindex = store.indexOf(record);
+          ed = grid.editingPlugin;
       
       //its possible that the editor is already destroyed by editorDomCleanUp, then the save process wouldn't work.
       if(!ed || !ed.editor){
@@ -539,10 +543,11 @@ Ext.define('Editor.controller.Segments', {
       });
       me.saveIsRunning = true;
       //fire event to process things after save call is started, like change alike handling
-      //parameter is the callback to the final save chain call, for later usage in ChangeAlike Handling
+      //parameters are the callback to the final save chain call,
+      //for later usage in ChangeAlike Handling and the saved record
       me.fireEvent('afterSaveCall', function(){
           me.saveChainEnd();
-      });
+      }, record);
   },
   /**
    * callback of saving a segment record

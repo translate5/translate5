@@ -329,7 +329,7 @@ Ext.define('Editor.controller.Comments', {
           return;
       }
       //close metapanel if clicking single on a row, and the previous row was not editable
-      if(!ed.openedRecord) {
+      if(!ed.editing || !ed.context.record) {
           mpController.cancelEdit();
       }
   },

@@ -218,13 +218,10 @@ Ext.define('Editor.controller.ChangeAlike', {
    * is invoked by the save chain, directly after starting the save request of the segment
    * @param {Function} finalCallback to return to save chain
    */
-  onAfterSaveCall: function(finalCallback) {
-      var me = this,
-          plug = me.getEditPlugin(),
-          context = plug.context,
-          rec = context.record;
+  onAfterSaveCall: function(finalCallback, record) {
+      var me = this;
       me.callbackToSaveChain = finalCallback;
-      me.actualRecord = rec;
+      me.actualRecord = record;
       me.saveIsRunning = true;
       if(me.isDisabled || me.isManualProcessingDisabled() || me.noAlikes()) {
           me.fireEvent('segmentUsageFinished', me);
@@ -237,7 +234,7 @@ Ext.define('Editor.controller.ChangeAlike', {
       }
       //manualProcessing:
       me.timeTracking = new Date(); // starting the time tracking
-      me.window.show(rec);
+      me.window.show(record);
   },
   /**
    * @return boolean true, if no alikes are present
