@@ -89,23 +89,31 @@ Ext.define('Editor.view.segments.RowEditing', {
     startEdit: function(record, columnHeader, mode) {
         var me = this,
             started = false;
+
+        if(me.fireEvent('beforestartedit', me, [record, columnHeader, mode]) === false) {
+            return false;
+        }
             
         if (!me.editor) {
             me.editor = me.initEditor();
         }
-        me.editor.setMode(mode);        
         //to prevent race-conditions, check if there isalready an opened record and if yes show an error (see RowEditor.js function completeEdit for more information)
         if (me.context && me.context.record) {
             Editor.MessageBox.addError(me.messages.previousSegmentNotSaved,' Das Segment konnte nicht zum Bearbeiten geöffnet werden, da das vorherige Segment noch nicht korrekt gespeichert wurde. Im folgenden der Debug-Werte: this.context.record.internalId: ' + me.context.record.internalId + ' record.internalId: ' + record.internalId);
             return false;
         }
-        if (me.editingAllowed && record.get('editable')) {
-            if (record.get('matchRate') == 100 && Editor.data.enable100pEditWarning) {
-                Editor.MessageBox.addInfo(me.messages.edit100pWarning, 1.4);
-            }
-            started = me.callParent(arguments);
-            return started;
+        if (!me.editingAllowed || !record.get('editable')) {
+            return false;
         }
+        if (record.get('matchRate') == 100 && Editor.data.enable100pEditWarning) {
+            Editor.MessageBox.addInfo(me.messages.edit100pWarning, 1.4);
+        }
+        started = me.callParent(arguments);
+        if(started) {
+            me.editor.setMode(mode);
+        }
+        return started;
+    },
     //fixing https://www.sencha.com/forum/showthread.php?309102-ExtJS-6.0.0-RowEditor-Plugin-completeEdit-does-not-set-context-to-null&p=1128826#post1128826
     cancelEdit: function() {
         this.callParent(arguments);

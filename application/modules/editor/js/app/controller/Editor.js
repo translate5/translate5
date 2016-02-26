@@ -141,10 +141,15 @@ Ext.define('Editor.controller.Editor', {
    * track isEditing state 
    */
   initEditPluginHandler: function () {
-      var me = this;
-      me.getEditPlugin().on('beforeedit', function(){me.isEditing = true;});
-      me.getEditPlugin().on('canceledit', function(){me.isEditing = false;});
-      me.getEditPlugin().on('edit', function(){me.isEditing = false;})
+      var me = this,
+          disableEditing = function(){me.isEditing = false;};
+          
+      me.getEditPlugin().on('beforestartedit', me.handleBeforeStartEdit, me);
+      me.getEditPlugin().on('beforeedit', function(plugin, context){
+          me.isEditing = true;
+      });
+      me.getEditPlugin().on('canceledit', disableEditing);
+      me.getEditPlugin().on('edit', disableEditing)
       
       new Ext.util.KeyMap(Ext.getDoc(), me.getKeyMapConfig({
           'ctrl-alt-c':     ["C",{ctrl: true, alt: true}, function(key, e){
@@ -161,6 +166,21 @@ Ext.define('Editor.controller.Editor', {
               }
           }],
       }));
+  },
+  /**
+   * saves the segment of the already opened editor and restarts startEditing call 
+   */
+  handleBeforeStartEdit: function(plugin, args){
+      if(!plugin.editing) {
+          return true;
+      }
+      this.fireEvent('saveSegment', {
+          scope: this,
+          segmentUsageFinished: function(){
+              plugin.startEdit.apply(plugin, args);
+          }
+      });
+      return false;
   },
   /**
    * Gibt die RowEditing Instanz des Grids zurück
