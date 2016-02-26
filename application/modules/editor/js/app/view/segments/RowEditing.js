@@ -42,7 +42,6 @@ Ext.define('Editor.view.segments.RowEditing', {
     extend: 'Ext.grid.plugin.RowEditing',
     alias: 'plugin.segmentrowediting',
     editingAllowed: true,
-    openedRecord: null,
     statics: {
         STARTEDIT_MOVEEDITOR: 0,
         STARTEDIT_SCROLLUNDER: 1
@@ -94,22 +93,28 @@ Ext.define('Editor.view.segments.RowEditing', {
         if (!me.editor) {
             me.editor = me.initEditor();
         }
-        me.editor.setMode(mode);
-        
-        //to prevent race-conditions, check if there isalready an openedRecord and if yes show an error (see RowEditor.js function completeEdit for more information)
-        if (me.openedRecord !== null) {
-            Editor.MessageBox.addError(me.messages.previousSegmentNotSaved,' Das Segment konnte nicht zum Bearbeiten geöffnet werden, da das vorherige Segment noch nicht korrekt gespeichert wurde. Im folgenden der Debug-Werte: this.openedRecord.internalId: ' + this.openedRecord.internalId + ' record.internalId: ' + record.internalId);
+        me.editor.setMode(mode);        
+        //to prevent race-conditions, check if there isalready an opened record and if yes show an error (see RowEditor.js function completeEdit for more information)
+        if (me.context.record) {
+            Editor.MessageBox.addError(me.messages.previousSegmentNotSaved,' Das Segment konnte nicht zum Bearbeiten geöffnet werden, da das vorherige Segment noch nicht korrekt gespeichert wurde. Im folgenden der Debug-Werte: this.context.record.internalId: ' + me.context.record.internalId + ' record.internalId: ' + record.internalId);
             return false;
         }
         if (me.editingAllowed && record.get('editable')) {
             if (record.get('matchRate') == 100 && Editor.data.enable100pEditWarning) {
                 Editor.MessageBox.addInfo(me.messages.edit100pWarning, 1.4);
             }
-            me.openedRecord = record;
             started = me.callParent(arguments);
             return started;
         }
         return false;
+    },
+    //fixing https://www.sencha.com/forum/showthread.php?309102-ExtJS-6.0.0-RowEditor-Plugin-completeEdit-does-not-set-context-to-null&p=1128826#post1128826
+    completeEdit: function() {
+        this.callParent(arguments);
+        //if editing was successfully finished we should also reset context
+        if(!this.editing) {
+            this.context = null;
+        }
     },
     /**
      * erlaubt das Editieren
@@ -125,7 +130,6 @@ Ext.define('Editor.view.segments.RowEditing', {
     },
     destroy: function() {
         delete this.context;
-        delete this.openedRecord;
         this.callParent(arguments);
     }
 });
