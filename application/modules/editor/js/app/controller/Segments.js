@@ -134,7 +134,6 @@ Ext.define('Editor.controller.Segments', {
                   grid.store.on('sort', me.handleFilterChange, me);
                   me.reloadFilemap();
               },
-              selectionchange: 'handleSegmentSelectionChange',
               columnhide: 'handleColumnVisibility',
               columnshow: 'handleColumnVisibility'
           },
