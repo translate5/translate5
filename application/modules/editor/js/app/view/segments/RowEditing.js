@@ -127,40 +127,5 @@ Ext.define('Editor.view.segments.RowEditing', {
         delete this.context;
         delete this.openedRecord;
         this.callParent(arguments);
-    },
-    /**
-     * FIXME remove if not missed
-     * 
-     * editorDomCleanUp entfernt die komplette (DOM + Komponente) Instanz des Editors. 
-     * Die DOM Elemente des Editors befinden sich innerhalb des Grid View Elements. 
-     * Dieses wiederrum wird bei einem Range Change neu erstellt. Die Editor Komponente verliert ihre DOM Elemente,
-     * es kommt zu komischen Effekten. Mit dieser Methode wird der komplette Editor entfernt, und wird bei einer 
-     * erneuten Verwendung komplett neu erstellt.
-     */
-    editorDomCleanUp_obsolete: function() {
-      var me = this,
-      main,
-      columns = me.grid.getView().getGridColumns();
-      if(! me.editor) {
-          return;
-      }
-      me.editing = false;
-      me.openedRecord = null;
-      main = me.editor.mainEditor;
-      //enable stored editor body id to be deleted by GC:
-      if(main.bodyGenId && Ext.cache[main.bodyGenId]){
-          Ext.cache[main.bodyGenId].skipGarbageCollection = false;
-          delete Ext.cache[me.editor.mainEditor.bodyGenId].skipGarbageCollection;
-      }
-      Ext.destroy(me.editor);
-      Ext.each(columns, function(column) {
-        // in den Columns werden die Componenten zur EditorRow abgelegt. 
-        // Nach einem Range Change bestehen zar noch diese Componenten, aber die zugehörigen Dom Elemente fehlen.
-        if(column.field){
-          column.field.destroy();
-          delete column.field;
-        }
-      });
-      delete me.editor;
     }
 });

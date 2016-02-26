@@ -203,7 +203,7 @@ Ext.define('Editor.controller.Segments', {
       //SEE EXT6UPD-44, must be converted to double click. This should already work, by ARIA crap
       console.log("handleSegmentSelectionChange");
       var ed = this.getSegmentGrid().editingPlugin;
-      if(ed && ed.editor && ed.openedRecord && ! ed.disableEditBySelect){
+      if(ed && ed.editor && ed.editing && ! ed.disableEditBySelect){
         this.saveChainStart();
       }
   },

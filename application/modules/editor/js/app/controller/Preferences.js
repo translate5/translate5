@@ -80,13 +80,14 @@ Ext.define('Editor.controller.Preferences', {
    * zeigt das Preferences Fenster an
    */
   showPreferences: function() {
-    this.window = new Editor.view.preferences.Window;
-    this.getForm().getForm().setValues(Editor.data.preferences);
-    //disable change alike settings if a segment is currently opened. 
-    // If not a user would be able to change the change alike behaviour, 
-    // while alikes are already loaded or not loaded. This would lead to bugs.
-    this.getForm().down('radiogroup').setDisabled(this.getSegmentGrid().editingPlugin.openedRecord !== null);
-    this.window.show();
+      var me = this;
+      me.window = new Editor.view.preferences.Window;
+      me.getForm().getForm().setValues(Editor.data.preferences);
+      //disable change alike settings if a segment is currently opened. 
+      // If not a user would be able to change the change alike behaviour, 
+      // while alikes are already loaded or not loaded. This would lead to bugs.
+      me.getForm().down('radiogroup').setDisabled(me.getSegmentGrid().editingPlugin.editing);
+      me.window.show();
   },
   /**
    * Speichert die Einstellungen und schließt das Fenster

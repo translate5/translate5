@@ -276,7 +276,6 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         var me = this;
         me.context.record.reject();
         me.getTimeTrackingData();
-        me.editingPlugin.openedRecord = null;
         me.callParent(arguments);
     },
     
@@ -301,8 +300,7 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
 
         me.callParent(arguments);
         
-        me.previousRecord = me.editingPlugin.openedRecord;
-        me.editingPlugin.openedRecord = null;
+        me.previousRecord = rec;
         return true;
     },
     
@@ -321,17 +319,24 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
      */
     saveMainEditorContent: function(record) {
         var me = this,
+            plug = me.editingPlugin,
             //der replace aufruf entfernt vom Editor automatisch hinzugefügte unsichtbare Zeichen, 
             //und verhindert so, dass der Record nicht als modified markiert wird, wenn am Inhalt eigentlich nichts verändert wurde
             //newValue = Ext.String.trim(me.mainEditor.getValueAndUnMarkup()).replace(/\u200B/g, '');
-            newValue = me.mainEditor.getValueAndUnMarkup().replace(/\u200B/g, '');
+            newValue = me.mainEditor.getValueAndUnMarkup().replace(/\u200B/g, ''),
+            title, msg;
             
         //check, if the context delivers really the correct record, because through some issues in reallive data 
         //rose the idea, that there might exist special race conditions, where
         //the context.record is not the record of the newValue
-        if(me.editingPlugin.openedRecord === null || me.editingPlugin.openedRecord.internalId != record.internalId ){
-            Editor.MessageBox.addError(me.messages.segmentNotSavedUserMessage + newValue,' Das Segment konnte nicht gespeichert werden. Im folgenden der Debug-Werte: ' + newValue + 'me.editingPlugin.openedRecord.internalId: ' + me.editingPlugin.openedRecord.internalId + ' record.internalId: ' + record.internalId);
-            me.editingPlugin.openedRecord = null;
+        if(!plug.context || !plug.context.record || plug.context.record.internalId != record.internalId ){
+            title = me.messages.segmentNotSavedUserMessage + newValue;
+            msg = ' Das Segment konnte nicht gespeichert werden. Im folgenden der Debug-Werte: ' + newValue;
+            if(plug.context && plug.context.record) {
+                msg += 'me.editingPlugin.context.record.internalId: '+me.editingPlugin.context.record.internalId;
+            }
+            msg += ' record.internalId: ' + record.internalId;
+            Editor.MessageBox.addError(title,msg);
             return false;
         }
         

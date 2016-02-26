@@ -138,12 +138,13 @@ Ext.define('Editor.controller.MetaPanel', {
    * Editor.view.segments.RowEditing beforeedit handler, initiert das MetaPanel mit den Daten
    * @param {Object} editingPlugin
    */
-  startEdit: function(editingPlugin) {
+  startEdit: function(editingPlugin, context) {
     var me = this,
         mp = me.getMetaPanel(),
-        segmentId = editingPlugin.openedRecord.get('id'),
-        isWatched = Boolean(editingPlugin.openedRecord.get('isWatched')),
-        segmentUserAssocId = editingPlugin.openedRecord.get('segmentUserAssocId'),
+        record = context.record,
+        segmentId = record.get('id'),
+        isWatched = Boolean(record.get('isWatched')),
+        segmentUserAssocId = record.get('segmentUserAssocId'),
         navi = me.getNavi(),
         but = Ext.getCmp('watchSegmentBtn'),
         tooltip = (isWatched) ? navi.item_stopWatchingSegment : navi.item_startWatchingSegment;
@@ -151,7 +152,7 @@ Ext.define('Editor.controller.MetaPanel', {
     but.toggle(isWatched, true);
     but.setTooltip(tooltip);
     
-    me.record = editingPlugin.openedRecord;
+    me.record = record;
     me.getMetaTermPanel().getLoader().load({params: {id: segmentId}});
     //bindStore(me.record.terms());
     me.loadRecord(me.record);

@@ -167,9 +167,9 @@ Ext.define('Editor.controller.ChangeAlike', {
    * 
    * @param {Ext.grid.plugin.Editing} column
    */
-  handleBeforeEdit: function(editingPlugin) {
+  handleBeforeEdit: function(editingPlugin, context) {
     var me = this, 
-        rec = editingPlugin.openedRecord,
+        rec = context.record,
         //id des bearbeiteten Segments
         id = rec.get('id'),
         store = me.getStore('AlikeSegments'),

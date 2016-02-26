@@ -380,7 +380,8 @@ Ext.define('Editor.controller.Comments', {
    */
   expandWindow: function(pan) {
       var me = this,
-          rec = me.getEditPlugin().openedRecord || me.record,
+          plug = me.getEditPlugin(),
+          rec = plug.editing && plug.context.record || me.record,
           id = rec && rec.get('id'),
           box = me.getCommentContainer(),
           form = me.getCommentForm();

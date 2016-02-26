@@ -229,7 +229,7 @@ Ext.define('Editor.controller.Editor', {
   save: function() {
       var me = this,
           ed = me.getEditPlugin(),
-          rec = ed.openedRecord;
+          rec = ed.context.record;
       if(me.isEditing &&rec && rec.get('editable')) {
           me.fireEvent('saveUnsavedComments');
           me.fireEvent('saveSegment');
@@ -392,7 +392,7 @@ Ext.define('Editor.controller.Editor', {
           grid = me.getSegmentGrid(),
           ed = me.getEditPlugin(),
           store = grid.store,
-          rec = ed.openedRecord,
+          rec = ed.context.record,
           ret = {
             'errorText'        : errorText,
             'existsNextSegment': false,
@@ -464,7 +464,7 @@ Ext.define('Editor.controller.Editor', {
       //if there was an empty message we assume that there was no error,
       //therefore we can delete the last saveOtherRow parameters
       if(!msg) {
-          me.lastSaveOtherRowParameter = null;
+          me.lastSaveOtherRowParameter = false;
           return;
       }
       
@@ -542,24 +542,26 @@ Ext.define('Editor.controller.Editor', {
         idx = info && info.foundIdx,
         cols = info && info.columns,
         store = me.getSegmentGrid().store,
-        newRec = store.getAt(store.indexOf(me.getEditPlugin().openedRecord) + direction);
+        plug = me.getEditPlugin(),
+        newRec;
     
     if(info === false) {
       return;
     }
+    newRec = store.getAt(store.indexOf(plug.context.record) + direction);
     
     //check if there exists a next/prev row, if not we dont need to move the editor.
     while(newRec && !newRec.get('editable')) {
         newRec = store.getAt(store.indexOf(newRec) + direction);
     }
     if(cols[idx + direction]) {
-      info.plug.editor.changeColumnToEdit(cols[idx + direction]);
+      plug.editor.changeColumnToEdit(cols[idx + direction]);
       return;
     }
     if(direction > 0) {
         //goto next segment and first col
         if(newRec) {
-            info.plug.editor.changeColumnToEdit(cols[0]);
+            plug.editor.changeColumnToEdit(cols[0]);
         }
         if (saveRecord) {
           me.saveNext();
@@ -571,7 +573,7 @@ Ext.define('Editor.controller.Editor', {
     }
     //goto prev segment and last col
     if(newRec) {
-        info.plug.editor.changeColumnToEdit(cols[cols.length - 1]);
+        plug.editor.changeColumnToEdit(cols[cols.length - 1]);
     }
     if (saveRecord) {
       me.savePrevious();
@@ -625,7 +627,7 @@ Ext.define('Editor.controller.Editor', {
         foundIdx = false,
         current = plug.editor.getEditedField();
     
-    if(!plug || !plug.editor) {
+    if(!plug || !plug.editor || !plug.editing) {
         return false;
     }
     
@@ -655,7 +657,7 @@ Ext.define('Editor.controller.Editor', {
       var me = this,
           plug = me.getEditPlugin(),
           editor = plug.editor,
-          rec = plug.openedRecord,
+          rec = plug.context.record,
           columnToRead = editor.columnToEdit.replace(/Edit$/, '');
       Editor.MessageBox.addInfo(me.messages.segmentReset);
       editor.mainEditor.setValueAndMarkup(rec.get(columnToRead), rec.get('id'), editor.columnToEdit);
@@ -672,19 +674,15 @@ Ext.define('Editor.controller.Editor', {
         cols = grid.query('contentEditableColumn:not([hidden])'),
         sel = [];
     
-    if (ed.openedRecord === null)
-    {
-        if (!selModel.hasSelection())
-        {
-            grid.selectOrFocus(edCtrl.getNextEditableSegmentOffset(0));
-        }
-        sel = selModel.getSelection();
-        ed.startEdit(sel[0], cols[0]);
-    }
-    else
-    {
+    if (ed.editing) {
         ed.editor.mainEditor.deferFocus();
+        return;
     }
+    if (!selModel.hasSelection()){
+        grid.selectOrFocus(edCtrl.getNextEditableSegmentOffset(0));
+    }
+    sel = selModel.getSelection();
+    ed.startEdit(sel[0], cols[0]);
   },
   /**
    * Handler for watchSegmentBtn
@@ -697,7 +695,7 @@ Ext.define('Editor.controller.Editor', {
       var me = this,
           model, config,
           ed = me.getEditPlugin(),
-          record = ed.openedRecord,
+          record = ed.context.record,
           segmentId = record.get('id'),
           isWatched = Boolean(record.get('isWatched')),
           segmentUserAssocId = record.get('segmentUserAssocId'),
