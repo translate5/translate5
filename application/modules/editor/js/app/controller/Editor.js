@@ -270,7 +270,6 @@ Ext.define('Editor.controller.Editor', {
             selModel.select(ret.newRec);
             //REMIND here was startEdit defered with 300 millis, is this still needed?
             ed.startEdit(ret.newRec, ret.lastColumn, ed.self.STARTEDIT_SCROLLUNDER);
-            //FIXME disableEditBySelect needed since, changing to double click?
             return;
       }
       
