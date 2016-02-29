@@ -106,7 +106,7 @@ Ext.define('Editor.MessageBox',{
   },
   constructor: function(config) {
     // create the msgBox container.  used for App.setAlert
-    this.msgCt = Ext.core.DomHelper.insertFirst(document.body, {id:'msg-div'}, true);
+    this.msgCt = Ext.core.DomHelper.append(document.body, {id:'msg-div'}, true);
     this.msgCt.setStyle('position', 'absolute');
     this.msgCt.setStyle('z-index', 30000);
     this.msgCt.setWidth(300);
