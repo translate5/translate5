@@ -76,7 +76,8 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
     columns: null,
     messages: {
         segmentNotSavedUserMessage: 'Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank!',
-        cantSaveEmptySegment: '#UT#Das Segment kann nicht ohne Inhalt gespeichert werden!'
+        cantSaveEmptySegment: '#UT#Das Segment kann nicht ohne Inhalt gespeichert werden!',
+        cantEditContents: '#UT#You cannot edit segment content! Please use (Ctrl+Z) to undo changes or cancel editing.'
     },
     // from Ext4 end
 
@@ -426,7 +427,9 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
             //der replace aufruf entfernt vom Editor automatisch hinzugefügte unsichtbare Zeichen, 
             //und verhindert so, dass der Record nicht als modified markiert wird, wenn am Inhalt eigentlich nichts verändert wurde
             //newValue = Ext.String.trim(me.mainEditor.getValueAndUnMarkup()).replace(/\u200B/g, '');
-            newValue = me.mainEditor.getValueAndUnMarkup().replace(/\u200B/g, '');
+            newValue = me.mainEditor.getValueAndUnMarkup().replace(/\u200B/g, ''),
+            oldValue = record.get(me.columnToEdit).replace(/\u200B/g, ''),
+            reMqmTag = /<img[^>]+>/g;
             
         //check, if the context delivers really the correct record, because through some issues in reallive data 
         //rose the idea, that there might exist special race conditions, where
@@ -443,6 +446,10 @@ Ext.define('Editor.view.segments.Translate5RowEditor', {
         }
         
         if(me.mainEditor.hasAndDisplayErrors()) {
+            return false;
+        }
+        if (Editor.data.task.get('notEditContent') && (newValue.replace(reMqmTag, '') != oldValue.replace(reMqmTag, '')) ) {
+            Editor.MessageBox.addError(me.messages.cantEditContents);
             return false;
         }
         me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
