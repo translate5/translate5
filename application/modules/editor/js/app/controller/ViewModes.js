@@ -64,38 +64,32 @@ Ext.define('Editor.controller.ViewModes', {
     ref : 'viewModeMenu',
     selector : '#viewModeMenu'
   }],
-  init : function() {
-      var me = this;
-      me.control({
+  listen: {
+      controller: {
+          '#Editor.$application': {
+              editorViewportClosed: 'clearViewModes'
+          },
+      },
+      component: {
           'gridpanel #viewModeBtn' : {
-              click : me.viewMode
+              click : 'viewMode'
           },
           'gridpanel #editModeBtn' : {
-              click : me.editMode
+              click : 'editMode'
           },
           'gridpanel #ergonomicModeBtn' : {
-              click : me.ergonomicMode
+              click : 'ergonomicMode'
           },
-          'gridpanel #hideTagBtn' : {
-              click : me.hideTags
-          },
-          'gridpanel #fullTagBtn' : {
-              click : me.showFullTags
-          },
-          'gridpanel #shortTagBtn' : {
-              click : me.showShortTags
+          'gridpanel button[toggleGroup="tagMode"]' : {
+              click : 'handleTagButtonClick'
           },
           'segmentsHtmleditor': {
-              initialize: me.toggleEditorErgonomicMode
-          },
-          '#segmentgrid editorgridscroller': {
-              beforerender: me.initScroller
+              initialize: 'toggleEditorErgonomicMode'
           }
-      });
-    
-      //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
-      Editor.app.on('editorViewportClosed', me.clearViewModes, me);
-    
+      }
+  },
+  init : function() {
+      var me = this;
       me.toggleTags(me.self.TAG_SHORT);
   },
   statics: {
@@ -166,10 +160,12 @@ Ext.define('Editor.controller.ViewModes', {
       this.self.filesRegionVisible = true;
   },
   /**
+   * FIXME diese methode wird nicht mehr aufgerufen.
+   * 
    * Initiates the internal used rowHeight of the Segment Grid Scroller
    * @param scroller
    */
-  initScroller: function(scroller) {
+  obsolete_initScroller: function(scroller) {
       if(! scroller){
           return;
       }
@@ -208,18 +204,18 @@ Ext.define('Editor.controller.ViewModes', {
   editMode: function(calledOnInit) {
     var me = this;
     //FIXME ext6 missing ViewModes
-    //me.getViewModeMenu().hideMenu();
-    //me.getSegmentGrid().removeCls(me.self.MODE_ERGONOMIC);
-    //if(me.self.isErgonomicMode()){
-    //    me.showNonErgonomicElements();
-    //}
-    //me.getShortTagBtn().toggle(true);
-    //me.showShortTags();
-    //me.getHideTagBtn().disable();
+    me.getViewModeMenu().hideMenu();
+    me.getSegmentGrid().removeCls(me.self.MODE_ERGONOMIC);
+    if(me.self.isErgonomicMode()){
+        me.showNonErgonomicElements();
+    }
+    me.getShortTagBtn().toggle(true);
+    me.handleTagButtonClick('short');
+    me.getHideTagBtn().disable();
     if(calledOnInit === true) {
         // is needed to initilize the grid filters (createFilters method) correctly:
         //FIXME ext6 missing filters
-        //me.getSegmentGrid().headerCt.getMenu(); 
+        me.getSegmentGrid().headerCt.getMenu(); 
     }
     else {
         Ext.Array.each(me.getHideColumns(), function(col){
@@ -227,41 +223,30 @@ Ext.define('Editor.controller.ViewModes', {
         });
     }
     //FIXME ext6 missing plugin
-    //me.getSegmentGrid().editingPlugin.enable();
+    me.getSegmentGrid().editingPlugin.enable();
     //FIXME ext6 missing ViewModes
-    //me.self.setViewMode(me.self.MODE_EDIT);
+    me.self.setViewMode(me.self.MODE_EDIT);
   },
   /**
    * activates the ergonomic mode of the grid (source and edit-column enlarged, all other columns hidden; file-area hidden)
    */
   ergonomicMode: function() {
     var me = this;
-    //FIXME ext6 me.getViewModeMenu().hideMenu();
+    //FIXME ext6 
+    me.getViewModeMenu().hideMenu();
     if(me.self.isViewMode()){
         me.editMode();
     }
     me.setVisibleElements();
     
-    me.initScroller(me.getSegmentPager());
-    
     me.getFilePanel().collapse();
+    
+    //FIXME grid scroller must be recalculated after entering and leaving ergonomic mode
     
     /* trial to deactivate column-hide-show in ergo-mode because of ext-bug with 
      * horinzontal scrolling after showing of hidden columns. 
      * Does not work due to problems with reconfigure grid and roweditor
      *  in ext 4.0.7. See view/ui/segments/grid.js onReconfigure for more information.
-    me.newColumns = new Array();
-    
-    Ext.Array.each(me.getSegmentGrid().columns, function(col){
-        var conf = col.initialConfig;
-        conf.hideable = false;
-        if(col.itemId != "sourceColumn" && col.itemId != "editorColumn"){
-            conf.hidden = true;
-        }
-        conf.hideable = false;
-        me.newColumns.push(conf);
-    },me);
-    me.getSegmentGrid().reconfigure(me.getStore('Segments'),me.newColumns);
       */
     var widthToRedColWidth = 0;
     Ext.Array.each(me.getSegmentGrid().columns, function(col){
@@ -320,19 +305,19 @@ Ext.define('Editor.controller.ViewModes', {
      }
   },
   /**
-   * aktiviert den Ansichtsmodus des Grids (Editor deaktiviert, Zieltext spalte deaktiviert, Hide Tags möglich)
+   * enables the grid view mode (editor disabled, original target text disabled, hide tags enabled)
    */
   viewMode: function() {
     var me = this, 
     editorPlugin = me.getSegmentGrid().editingPlugin;
     me.application.getController('Segments').saveChainStart();
-    this.getViewModeMenu().hideMenu();
-    this.getSegmentGrid().removeCls(this.self.MODE_ERGONOMIC);
+    me.getViewModeMenu().hideMenu();
+    me.getSegmentGrid().removeCls(this.self.MODE_ERGONOMIC);
     if(me.self.isErgonomicMode()){
         this.showNonErgonomicElements();
     }
     me.getShortTagBtn().toggle(true);
-    me.showShortTags();
+    me.handleTagButtonClick('short');
     me.getHideTagBtn().enable();
     Ext.Array.each(me.getHideColumns(), function(col){
         col.hide();
@@ -357,32 +342,32 @@ Ext.define('Editor.controller.ViewModes', {
             col.setWidth(col.originalWidth);
         }
     });
-    me.initScroller(me.getSegmentPager());
     Ext.util.CSS.removeStyleSheet(me.self.ergonomicStyleId);
   },
   /**
-   * alle Tags verstecken 
+   * Unified tag mode button handler
+   * @param {Ext.Button|String}
    */
-  hideTags : function() {
-    this.toggleTags(this.self.TAG_HIDE);
-  },
-  /**
-   * Full Tags Modus aktivieren
-   */
-  showFullTags : function() {
-    var me = this, editor = me.getActiveEditor();
-    this.toggleTags(this.self.TAG_FULL);
-    editor && editor.showFullTags();
-    me.repositionEditorRow();
-  },
-  /**
-   * Short Tags Modus aktivieren
-   */
-  showShortTags : function() {
-    var me = this, editor = me.getActiveEditor();
-    this.toggleTags(this.self.TAG_SHORT);
-    editor && editor.showShortTags();
-    me.repositionEditorRow();
+  handleTagButtonClick: function(btn) {
+      var me = this,
+          mode = Ext.isString(btn) ? btn : btn.tagMode,
+          editor = me.getActiveEditor();
+      
+      switch(mode) {
+          case 'hide': 
+              me.toggleTags(me.self.TAG_HIDE);
+              break;
+          case 'full': 
+              me.toggleTags(me.self.TAG_FULL);
+              editor && editor.showFullTags();
+              me.repositionEditorRow();
+              break;
+          case 'short': 
+              me.toggleTags(me.self.TAG_SHORT);
+              editor && editor.showShortTags();
+              me.repositionEditorRow();
+              break;
+      }
   },
   getActiveEditor: function() {
     if(! this.getSegmentGrid().editingPlugin.editor){
@@ -391,6 +376,7 @@ Ext.define('Editor.controller.ViewModes', {
     return this.getSegmentGrid().editingPlugin.editor.mainEditor;
   },
   /**
+   * FIXME zuwas für einer repositionierung war der gedacht?
    * Shortcut Funktion zum repositionieren des Editors
    */
   repositionEditorRow: function() {
@@ -410,6 +396,7 @@ Ext.define('Editor.controller.ViewModes', {
     me.self.setMode(mode);
   },
   /**
+   * FIXME needed?
    * used to cleanup the editor before switching the view mode, so the editor gets initialized new
    */
   editorDomCleanUp: function() {
@@ -417,15 +404,9 @@ Ext.define('Editor.controller.ViewModes', {
           editor = me.getActiveEditor(),
           plug = me.getSegmentGrid().editingPlugin,
           segCtrl = me.application.getController('Segments');
-      if(plug){
-          if(plug.openedRecord && editor && editor.rendered) {
-              segCtrl.addLoadMask();
-              segCtrl.saveChainStart({
-                  chainEnd: function() {
-                      // obsolete in Ext6 plug.editorDomCleanUp();
-                  }
-              });
-          }
+      if(plug && plug.editing && editor && editor.rendered) {
+          segCtrl.addLoadMask();
+          segCtrl.saveChainStart();
       }
   }
 });
