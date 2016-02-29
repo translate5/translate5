@@ -42,6 +42,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.segments.Grid', {
     extend: 'Ext.grid.Panel',
     requires: [
+        'Editor.view.segments.grid.Toolbar',
         'Editor.view.segments.RowEditing',
         'Editor.view.segments.column.Content',
         'Editor.view.segments.column.ContentEditable',
@@ -306,91 +307,8 @@ Ext.define('Editor.view.segments.Grid', {
                     }
                 },
                 dockedItems: [{
-                    xtype: 'toolbar',
-                    dock: 'top',
-                    items: [{
-                        xtype: 'button',
-                        text:me.item_viewModesMenu,
-                        itemId: 'viewModeMenu',
-                        menu: {
-                            xtype: 'menu',
-                            items: [{
-                                xtype: 'button',
-                                itemId: 'viewModeBtn',
-                                enableToggle: true,
-                                text: me.item_viewModeBtn,
-                                toggleGroup: 'toggleView',
-                                textAlign: 'left'
-                            },{
-                                xtype: 'button',
-                                itemId: 'editModeBtn',
-                                enableToggle: true,
-                                pressed: true,
-                                text: me.item_editModeBtn,
-                                toggleGroup: 'toggleView',
-                                textAlign: 'left'
-                            },{
-                                xtype: 'button',
-                                itemId: 'ergonomicModeBtn',
-                                enableToggle: true,
-                                text: me.item_ergonomicModeBtn,
-                                toggleGroup: 'toggleView',
-                                textAlign: 'left'
-                            }]
-                        }
-                    },{
-                        xtype: 'tbseparator'
-                    },{
-                        xtype: 'button',
-                        disabled: true,
-                        itemId: 'hideTagBtn',
-                        enableToggle: true,
-                        text: me.item_hideTagBtn,
-                        toggleGroup: 'tagMode'
-                    },{
-                        xtype: 'button',
-                        itemId: 'shortTagBtn',
-                        enableToggle: true,
-                        pressed: true,
-                        text: me.item_shortTagBtn,
-                        toggleGroup: 'tagMode'
-                    },{
-                        xtype: 'button',
-                        itemId: 'fullTagBtn',
-                        enableToggle: true,
-                        text: me.item_fullTagBtn,
-                        toggleGroup: 'tagMode'
-                    },{
-                        xtype: 'tbseparator'
-                    },{
-                        xtype: 'button',
-                        itemId: 'clearSortAndFilterBtn',
-                        cls: 'clearSortAndFilterBtn',
-                        text: me.item_clearSortAndFilterBtn
-                    },{
-                        xtype: 'tbseparator'
-                    },{
-                        xtype: 'button',
-                        itemId: 'watchListFilterBtn',
-                        cls: 'watchListFilterBtn',
-                        enableToggle: true,
-                        icon: Editor.data.moduleFolder+'images/star.png',
-                        text: me.item_watchListFilterBtn
-                    },{
-                        xtype: 'tbseparator',
-                        hidden: !Editor.data.task.hasQmSub()
-                    },{
-                        xtype: 'button',
-                        itemId: 'qmsummaryBtn',
-                        text: me.item_qmsummaryBtn,
-                        hidden: !Editor.data.task.hasQmSub()
-                    },{
-                        xtype: 'tbfill'
-                    },{
-                        xtype: 'button',
-                        itemId: 'optionsBtn',
-                        text: me.item_optionsTagBtn
-                    }]
+                    xtype: 'segmentsToolbar',
+                    dock: 'top'
                 }]
             };
         if (instanceConfig) {
