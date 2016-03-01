@@ -90,6 +90,11 @@ Ext.define('Editor.view.segments.RowEditing', {
         var me = this,
             started = false;
 
+        if (me.context && me.context.record && me.context.record === record) {
+            //startEdit by actionable is called twice because of different events
+            // in this case jump out
+            return false;
+        }
         if(me.fireEvent('beforestartedit', me, [record, columnHeader, mode]) === false) {
             return false;
         }

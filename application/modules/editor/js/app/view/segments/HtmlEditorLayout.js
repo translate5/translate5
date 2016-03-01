@@ -3,14 +3,14 @@
  * @private
  */
 Ext.define('Editor.view.segments.HtmlEditorLayout', {
-    extend: 'Ext.layout.component.field.FieldContainer',
+    extend: 'Ext.layout.component.field.HtmlEditor',
     alias: ['layout.htmleditorlayout'],
 
     type: 'htmleditor',
-    
-    naturalHeight: 150,
-    naturalWidth: 300,
 
+    /**
+     * removing toolbar
+     */
     beginLayout: function(ownerContext) {
         var owner = this.owner,
             dom;
@@ -23,41 +23,13 @@ Ext.define('Editor.view.segments.HtmlEditorLayout', {
             this.lastValue = dom.value;
             dom.value = '';
         }
-        this.callParent(arguments);
+        //don't call the parent beginLayout, because this contains the evil toolbar call
+        this.superclass.superclass.beginLayout.apply(this, arguments);
+
 
         ownerContext.inputCmpContext = ownerContext.context.getCmp(owner.inputCmp);
         ownerContext.bodyCellContext = ownerContext.getEl('bodyEl');
         ownerContext.textAreaContext = ownerContext.getEl('textareaEl');
         ownerContext.iframeContext   = ownerContext.getEl('iframeEl');
-    },
-    
-    beginLayoutCycle: function(ownerContext) {
-        var me = this,
-            widthModel = ownerContext.widthModel,
-            heightModel = ownerContext.heightModel,
-            owner = me.owner,
-            iframeEl = owner.iframeEl,
-            textareaEl = owner.textareaEl,
-            height = (heightModel.natural || heightModel.shrinkWrap) ? me.naturalHeight : '';
-            
-        me.callParent(arguments);
-        if (widthModel.shrinkWrap) {
-            iframeEl.setStyle('width', '');
-            textareaEl.setStyle('width', '');
-        } else if (widthModel.natural) {
-            ownerContext.bodyCellContext.setWidth(me.naturalWidth);
-        }
-        
-        iframeEl.setStyle('height', height);
-        textareaEl.setStyle('height', height);
-    },
-    
-    finishedLayout: function(){
-        var owner = this.owner;
-        
-        this.callParent(arguments);
-        if (Ext.isGecko) {
-            owner.textareaEl.dom.value = this.lastValue;
-        }
     }
 });
