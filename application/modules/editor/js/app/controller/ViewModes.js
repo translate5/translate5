@@ -71,16 +71,10 @@ Ext.define('Editor.controller.ViewModes', {
           },
       },
       component: {
-          'gridpanel #viewModeBtn' : {
-              click : 'viewMode'
+          'gridpanel segmentsToolbar menucheckitem[group="toggleView"]' : {
+              click : 'handleViewMode'
           },
-          'gridpanel #editModeBtn' : {
-              click : 'editMode'
-          },
-          'gridpanel #ergonomicModeBtn' : {
-              click : 'ergonomicMode'
-          },
-          'gridpanel button[toggleGroup="tagMode"]' : {
+          'gridpanel segmentsToolbar button[toggleGroup="tagMode"]' : {
               click : 'handleTagButtonClick'
           },
           'segmentsHtmleditor': {
@@ -184,6 +178,9 @@ Ext.define('Editor.controller.ViewModes', {
       return Ext.Array.filter(cols, function(col) {
           return col.segmentField.get('editable');
       });
+  },
+  handleViewMode: function(item) {
+      this[item.itemId] && this[item.itemId]();
   },
   /**
    * aktiviert den Bearbeitungsmodus des Grids (alle Spalten eingeblendet, editieren möglich, Hide Tags deaktivieren) 

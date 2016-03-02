@@ -685,10 +685,9 @@ Ext.define('Editor.controller.Editor', {
    */
   handleF2KeyPress: function() {
     var me = this,
-        edCtrl = me.application.getController('Editor'),
         grid = me.getSegmentGrid(),
         selModel = grid.getSelectionModel(),
-        ed = edCtrl.getEditPlugin(),
+        ed = me.getEditPlugin(),
         cols = grid.query('contentEditableColumn:not([hidden])'),
         sel = [];
     
@@ -697,7 +696,7 @@ Ext.define('Editor.controller.Editor', {
         return;
     }
     if (!selModel.hasSelection()){
-        grid.selectOrFocus(edCtrl.getNextEditableSegmentOffset(0));
+        grid.selectOrFocus(me.getNextEditableSegmentOffset(0));
     }
     sel = selModel.getSelection();
     ed.startEdit(sel[0], cols[0]);
