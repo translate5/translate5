@@ -81,21 +81,7 @@ Ext.define('Editor.view.segments.Grid', {
     ],
     
     title_readonly: '#UT#Segmentliste und Editor - [LESEMODUS]',
-
-    //Item Strings: 
-    item_viewModesMenu: '#UT#Editormodi',
-    item_viewModeBtn: '#UT#Ansichtsmodus',
-    item_editModeBtn: '#UT#Bearbeitungsmodus',
-    item_ergonomicModeBtn: '#UT#Ergonimic',
-    item_hideTagBtn: '#UT#Tags verbergen',
-    item_shortTagBtn: '#UT#Tag-Kurzansicht',
-    item_fullTagBtn: '#UT#Tag-Vollansicht',
-    item_qmsummaryBtn: '#UT#QM-Subsegment-Statistik',
-    item_optionsTagBtn: '#UT#Einstellungen',
-    item_clearSortAndFilterBtn: '#UT#Sortierung und Filter zurücksetzen',
-    item_watchListFilterBtn: '#UT#Merkliste',
-    column_edited: '#UT#bearbeibar',
-    
+    column_edited: '#UT#bearbeibar',    
     column_edited_icon: '{0} <img src="{1}" class="icon-editable" alt="{2}" title="{3}">',
     
     columnMap:{},

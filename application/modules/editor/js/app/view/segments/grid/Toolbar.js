@@ -65,26 +65,23 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     menu: {
                         xtype: 'menu',
                         items: [{
-                            xtype: 'button',
-                            itemId: 'viewModeBtn',
-                            enableToggle: true,
+                            xtype: 'menucheckitem',
+                            itemId: 'viewMode',
                             text: me.item_viewModeBtn,
-                            toggleGroup: 'toggleView',
+                            group: 'toggleView',
                             textAlign: 'left'
                         },{
-                            xtype: 'button',
-                            itemId: 'editModeBtn',
-                            enableToggle: true,
-                            pressed: true,
+                            xtype: 'menucheckitem',
+                            itemId: 'editMode',
+                            checked: true,
                             text: me.item_editModeBtn,
-                            toggleGroup: 'toggleView',
+                            group: 'toggleView',
                             textAlign: 'left'
                         },{
-                            xtype: 'button',
-                            itemId: 'ergonomicModeBtn',
-                            enableToggle: true,
+                            xtype: 'menucheckitem',
+                            itemId: 'ergonomicMode',
                             text: me.item_ergonomicModeBtn,
-                            toggleGroup: 'toggleView',
+                            group: 'toggleView',
                             textAlign: 'left'
                         }]
                     }
