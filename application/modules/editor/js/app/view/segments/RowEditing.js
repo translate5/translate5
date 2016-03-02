@@ -113,11 +113,8 @@ Ext.define('Editor.view.segments.RowEditing', {
         if (record.get('matchRate') == 100 && Editor.data.enable100pEditWarning) {
             Editor.MessageBox.addInfo(me.messages.edit100pWarning, 1.4);
         }
-        started = me.callParent(arguments);
-        if(started) {
-            me.editor.setMode(mode);
-        }
-        return started;
+        me.editor.setMode(mode);
+        return me.callParent(arguments);
     },
     //fixing https://www.sencha.com/forum/showthread.php?309102-ExtJS-6.0.0-RowEditor-Plugin-completeEdit-does-not-set-context-to-null&p=1128826#post1128826
     cancelEdit: function() {
