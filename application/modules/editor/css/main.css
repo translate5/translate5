@@ -44,7 +44,8 @@ END LICENSE AND COPYRIGHT
 }
 
 .segment-tag-column div.x-grid-cell-inner div,
-.segment-tag-container div {display:inline;background:#39FFA3;}
+.segment-tag-container.x-form-display-field div,
+.segment-tag-container .x-autocontainer-innerCt div {display:inline;background:#39FFA3;}
 
 .x-grid div .x-column-header-trigger {display:block;}
 
