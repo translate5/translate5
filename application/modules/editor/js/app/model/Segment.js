@@ -40,6 +40,7 @@ END LICENSE AND COPYRIGHT
  * @param {Array|Ext.data.Store} Segment Field Definitions. As Array: ready to use field config. As Store: segment fields store!
  */
 Ext.define('Editor.model.Segment', {
+    requires: ['Editor.model.segment.Reader'],
     statics: {
         redefine: function(fluentFields) {
             var me = this,
@@ -53,13 +54,10 @@ Ext.define('Editor.model.Segment', {
                 });
                 fluentFields = newFields;
             }
-            console.log("Editor.model.Segment::redefine → BEFORE", fluentFields);
             me.replaceFields(fluentFields, me.previousFluentFields);
-            console.log("Editor.model.Segment::redefine → AFTER", fluentFields);
             me.previousFluentFields = fluentFields.map(function(item){
                 return item.name;
             });
-            console.log("Editor.model.Segment::redefine → END", me.previousFluentFields);
         }
     },
     extend: 'Ext.data.Model',
@@ -88,21 +86,7 @@ Ext.define('Editor.model.Segment', {
         type : 'rest',
         url: Editor.data.restpath+'segment',
         reader : {
-            rootProperty: 'rows',
-            //FIXME ext6 update: the readRecords method can not be overriden!
-            //intercept readRecords method to set segments meta info only on store reads, not on plain model reads
-            FIXMEreadRecords: function(data) {
-                if(data && data.firstSegmentId) {
-                    //first editiable segment, not first at all!
-                    this.firstSegmentId = data.firstSegmentId;
-                }
-                if(data && data.lastSegmentId) {
-                    //last editiable segment, not first at all!
-                    this.lastSegmentId = data.lastSegmentId;
-                }
-                return this.self.prototype.readRecords.apply(this, arguments);
-            },
-            type : 'json'
+            type : 'segmentjson'
         },
         writer: {
             encode: true,
