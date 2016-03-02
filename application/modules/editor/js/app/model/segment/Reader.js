@@ -52,6 +52,6 @@ Ext.define('Editor.model.segment.Reader', {
             //last editiable segment, not first at all!
             this.lastSegmentId = data.lastSegmentId;
         }
-        return this.callParent([data]);
+        return this.callParent(arguments);
     }
 });
