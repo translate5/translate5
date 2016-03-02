@@ -108,7 +108,7 @@ Ext.define('Editor.controller.MetaPanel', {
       me.getRightBtn().setVisible(multiEdit && ! useChangeAlikes);
   },
   initMetaTermHandler: function() {
-      Ext.EventManager.on(this.getMetaTermPanel().getEl(), 'click', function(e, span){
+      this.getMetaTermPanel().getEl().on('click', function(e, span){
           if(! Ext.DomQuery.is(span, 'span.term')) {
               return;
           }
