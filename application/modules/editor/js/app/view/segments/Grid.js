@@ -374,24 +374,20 @@ Ext.define('Editor.view.segments.Grid', {
 
         switch (target) {
             case 'editor':
-                deltaY = rowTop - editor.editorLocalTop;
+                deltaY = editor.editorLocalTop - rowTop;
                 break;
             case 'top':
-                deltaY = rowTop - topMargin;
+                deltaY = topMargin - rowTop;
                 break;
             case 'bottom':
-                deltaY = (rowTop + rowHeight) - (viewHeight - bottomMargin);
+                deltaY = (viewHeight - bottomMargin) - (rowTop + rowHeight);
                 break;
             case 'center':
             default:
-                deltaY = (rowTop + rowHeight/2) - viewHeight/2;
+                deltaY = viewHeight/2 - (rowTop + rowHeight/2);
                 break;
         }
-        if(view.el.getScrollTop() + deltaY > 0) {
-            view.el.scrollBy(0, deltaY, true);
-        }
-        else {
-            //FIXME wird das auch getriggert wenn wir am Boden sind? Oder nur am Top?
+        if(!view.el.scroll('t', deltaY, true)) {
             notScrollCallback && notScrollCallback();
         }
     },
