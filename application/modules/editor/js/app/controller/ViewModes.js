@@ -176,7 +176,7 @@ Ext.define('Editor.controller.ViewModes', {
   getHideColumns: function() {
       var cols = this.getSegmentGrid().query('contentColumn');
       return Ext.Array.filter(cols, function(col) {
-          return col.segmentField.get('editable');
+          return !col.isEditableContentColumn && col.segmentField.get('editable');
       });
   },
   handleViewMode: function(item) {
@@ -265,7 +265,7 @@ Ext.define('Editor.controller.ViewModes', {
     me.self.setViewMode(me.self.MODE_ERGONOMIC);
     me.getSegmentGrid().view.refresh();
     me.toggleEditorErgonomicMode();
-    me.editorDomCleanUp();
+    me.saveAlreadyOpened();
   },
   /**
    * sets and removes the ergonomic view for the editor
@@ -312,7 +312,7 @@ Ext.define('Editor.controller.ViewModes', {
    */
   showNonErgonomicElements : function() {
     var me = this;
-    me.editorDomCleanUp();
+    me.saveAlreadyOpened();
     Ext.Array.each(me.self.visibleColumns, function(col){
         col.show();
     });
@@ -381,7 +381,7 @@ Ext.define('Editor.controller.ViewModes', {
    * FIXME needed?
    * used to cleanup the editor before switching the view mode, so the editor gets initialized new
    */
-  editorDomCleanUp: function() {
+  saveAlreadyOpened: function() {
       var me = this,
           editor = me.getActiveEditor(),
           plug = me.getSegmentGrid().editingPlugin,
