@@ -150,7 +150,10 @@ Ext.define('Editor.controller.MetaPanel', {
         tooltip = (isWatched) ? navi.item_stopWatchingSegment : navi.item_startWatchingSegment;
         
     but.toggle(isWatched, true);
-    but.setTooltip(tooltip);
+    but.setTooltip({
+        dismissDelay: 0,
+        text: tooltip
+    });
     
     me.record = record;
     me.getMetaTermPanel().getLoader().load({params: {id: segmentId}});
