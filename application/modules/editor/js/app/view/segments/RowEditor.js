@@ -135,7 +135,6 @@ Ext.define('Editor.view.segments.RowEditor', {
                 constrainDelegate: true,
                 listeners: {
                     dragend: function() {
-                        console.log("DRAGEND", me.getOffsetsTo(grid.body)[1], me.lastScrollTop, me.getOffsetsTo(grid.body)[1] - me.lastScrollTop);
                         me.editorLocalTop = me.getOffsetsTo(grid.body)[1];
                     }
                 },
@@ -212,9 +211,7 @@ Ext.define('Editor.view.segments.RowEditor', {
     reposition: function(animateConfig, fromScrollHandler) {
         var me = this;
         me.el.setLocalXY(-me.lastScrollLeft, me.editorLocalTop);
-        //TODO if overlapping the scrollbar is a problem, we must rebuild/refactor the syncEditorClip method
-        //perhaps it is easier, roweditor width must be "view size" + scrollLeft
-        //me.syncEditorClip(); 
+        me.setEditorWidth();
     },
     
     /**
@@ -269,12 +266,10 @@ Ext.define('Editor.view.segments.RowEditor', {
             me.reposition();
         };
         if (me.isScrollUnderMoveMode) {
-            console.log("INIT TO MOVE", context);
             //giving the finalScroller as fallback handler to the scroll command
             grid.scrollTo(rowIdx, 'editor', moveEditor);
         }
         else {
-            console.log("INIT");
             moveEditor();
         }
     },
@@ -304,84 +299,6 @@ Ext.define('Editor.view.segments.RowEditor', {
             }
         }
         return deltaY;
-    },
-
-    //
-    // Calculates the top pixel position of the passed row within the view's scroll space.
-    // So in a large, scrolled grid, this could be several thousand pixels.
-    //
-    XcalculateLocalRowTop: function(row) {
-        var grid = this.editingPlugin.grid;
-        return Ext.fly(row).getOffsetsTo(grid)[1] - grid.el.getBorderWidth('t') + this.lastScrollTop;
-    },
-
-    // Given the top pixel position of a row in the scroll space,
-    // calculate the editor top position in the view's encapsulating element.
-    // This will only ever be in the visible range of the view's element.
-    XcalculateEditorTop: function(rowTop) {
-        var me = this,
-            context = me.context,
-            row = Ext.get(context.row),
-            grid = me.editingPlugin.grid,
-            viewHeight = grid.getHeight();
-            
-        return (viewHeight / 2);
-    },
-    
-    //FIXME unklar warum dieses if column dazu.
-    XrenderColumnData: function(field, record, activeColumn) {
-        var me = this,
-            grid = me.editingPlugin.grid,
-            headerCt = grid.headerCt,
-            view = me.scrollingView,
-            store = view.dataSource,
-            column = activeColumn || field.column,
-            value,
-            renderer,
-            metaData,
-            rowIdx,
-            colIdx,
-            columns,
-            i,
-            scope;
-            
-        if (!column)
-        {
-            columns = grid.columns;
-            for (i = 0; i < columns.length; i++)
-            {
-                if (field.id == columns[i].field.id)
-                {
-                    column = field.column = columns[i];
-                    break;
-                }
-            }
-        }
-        
-        value = record.get(column.dataIndex);
-        renderer = column.editRenderer || column.renderer;
-        scope = (column.usingDefaultRenderer && !column.scope) ? column : column.scope;
-        
-
-        // honor our column's renderer (TemplateHeader sets renderer for us!)
-        if (renderer) {
-            metaData = { tdCls: '', style: '' };
-            rowIdx = store.indexOf(record);
-            colIdx = headerCt.getHeaderIndex(column);
-
-            value = renderer.call(
-                scope || headerCt.ownerCt,
-                value,
-                metaData,
-                record,
-                rowIdx,
-                colIdx,
-                store,
-                view
-            );
-        }
-
-        field.setRawValue(value);
     },
 
     /**
@@ -428,7 +345,6 @@ Ext.define('Editor.view.segments.RowEditor', {
         Ext.resumeLayouts(alreadyVisible);
         if (alreadyVisible) {
             me.setEditorHeight();
-            me.setEditorWidth();
             me.reposition(true);
         } else {
             me.show();
@@ -454,7 +370,6 @@ Ext.define('Editor.view.segments.RowEditor', {
         return delta;
     },
     setEditorHeight: function() {
-        console.log("setEditorHeight called");
         var me = this,
             context = me.context,
             row = Ext.get(context.row),
@@ -480,21 +395,22 @@ Ext.define('Editor.view.segments.RowEditor', {
         row.setHeight(me.rowToEditOrigHeight);
         me.rowToEditOrigHeight = 0;
     },
+    
+    /**
+     * set the editor width to the maximal visible width, 
+     * provides a horizontal clipping of the roweditor.
+     */
     setEditorWidth: function() {
         var me = this,
             editingPlugin = me.editingPlugin,
             grid = editingPlugin.grid,
-            i, columnsWidth = 0;
+            i, columnsWidth = 0,
+            viewEl = me.editingPlugin.view.el,
+            scrollbarWidth = Ext.getScrollbarSize().width;
             
-        for (i = 0; i < grid.columns.length; i++)
-        {
-            if (grid.columns[i].isVisible())
-            {
-                columnsWidth += grid.columns[i].getWidth();
-            }
-        }
-        
-        me.setWidth(columnsWidth);
+        //the internal syncEditorClip makes a top / bottom clipping.
+        //We need instead a clipping at the right.
+        me.setWidth(viewEl.getWidth() + me.lastScrollLeft - scrollbarWidth);
     },
     /**
      * overriden for wrapEl disabling and initial positioning
@@ -538,9 +454,8 @@ Ext.define('Editor.view.segments.RowEditor', {
         }
     },
 
-    onResize: function(width, height) {
-        //FIXME resize element instead of wrapEl?
-        //this.wrapEl.setSize(width, height);
+    onResize: function() {
+        this.setEditorWidth();
     },
 
     beforeDestroy: function(){

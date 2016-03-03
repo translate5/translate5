@@ -76,7 +76,7 @@ END LICENSE AND COPYRIGHT
 }
 
 .x-grid-row-editor {
-    box-shadow: 0px 0px 25px 0px rgba(0,0,0,0.75);
+    box-shadow: -6px 0px 25px 0px rgba(0,0,0,0.75);
 }
 
 #segment-grid .x-grid-cell-inner {

@@ -75,9 +75,6 @@ Ext.define('Editor.controller.MetaPanel', {
       '#metapanel #metaTermPanel': {
           afterrender: me.initMetaTermHandler
       },
-      '#metapanel' : {
-          show : me.layout
-      },
       '#segmentgrid': {
           afterrender: me.initEditPluginHandler
       }
@@ -129,12 +126,6 @@ Ext.define('Editor.controller.MetaPanel', {
       });
   },
   /**
-   * Handler für save Button
-   */
-  layout: function() {
-    //this.getNavi().doLayout(); //FIXME noch was anderes layouten?
-  },
-  /**
    * Editor.view.segments.RowEditing beforeedit handler, initiert das MetaPanel mit den Daten
    * @param {Object} editingPlugin
    */
@@ -159,7 +150,6 @@ Ext.define('Editor.controller.MetaPanel', {
     me.getMetaTermPanel().getLoader().load({params: {id: segmentId}});
     //bindStore(me.record.terms());
     me.loadRecord(me.record);
-    //FIXME here doLayout???
     navi.enable();
     me.getSegmentMeta().show();
     mp.enable();
