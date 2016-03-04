@@ -38,6 +38,8 @@ END LICENSE AND COPYRIGHT
  * Enthält Methoden zum Fileparsing für den Export
  */
 abstract class editor_Models_Export_FileParser {
+    use editor_Models_Export_FileParser_MQMTrait;
+    
     /**
      * @var string
      */
@@ -328,74 +330,6 @@ abstract class editor_Models_Export_FileParser {
         return implode('', $segmentArr);
     }
     
-    /**
-     * converts the QM-Subsegment-Tags to xliff-format
-     * 
-     * @param string $segment
-     * @return string
-     */
-    protected function convertQmTags2XliffFormat($segment){
-        $flags = $this->_task->getQmSubsegmentFlags();
-        if(empty($flags)){
-            return $segment;
-        }
-        $split = preg_split('"(<img[^>]+class=\"[^\"]*qmflag[^\"]*\"[^>]*>)"', $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
-        $count = count($split);
-        if($count==1) return $segment;
-        $i = 1;
-        
-        //if disabled we return the segment content without mqm
-        if($this->disableMqmExport) {
-            for (; $i < $count; $i=$i+2) {//the uneven numbers are the tags
-                $split[$i] = ''; //remove mqm tag
-            }
-            return implode('', $split);
-        }
-        
-        $check = function($type,$content,$input,$empty = true){
-            if($empty && $content == ''){
-                trigger_error($type.' had been emtpy when extracting from qm-subsegment-tag.',E_USER_ERROR);
-            }
-            if($content == $input){
-                #trigger_error($type.' could not be extracted from qm-subsegment-tag.',E_USER_ERROR);
-            }
-        };
-        
-        $extract = function($type,$numeric = false,$empty = true)use (&$split,&$i,$check){
-            $a = '[^\"]*';
-            if($numeric)$a = '\d+';
-            $content = preg_replace('".*'.$type.'=\"('.$a.')\".*"', '\\1', $split[$i]);
-            $check($type,$content,$split[$i],$empty);
-            return $content;
-        };
-        
-        $issues = $this->_task->getQmSubsegmentIssuesFlat();
-        $user = $this->_segmentEntity->getUserName();
-        
-        for (; $i < $count; $i=$i+2) {//the uneven numbers are the tags
-            $id = $extract('data-seq',true);
-            $class = $extract('class');
-            $open = (boolean)preg_match('"^(open .*)|(.* open)|(.* open .*)$"', $class);
-            
-            if($open){
-                $comment = $extract('data-comment',false,false);
-                $severity = preg_replace('"^\s*([^ ]+) .*$"', '\\1', $class);
-                $check('severity',$severity,$class);
-                $issueId = preg_replace('"^.*qmflag-(\d+).*$"', '\\1', $class);
-                $check('issueId',$issueId,$class);
-                $issue = $issues[$issueId];
-                
-                $split[$i] = '<mqm:startIssue type="'.$issue.'" severity="'.
-                        $severity.'" note="'.$comment.'" agent="'.$user.
-                        '" id="'.$id.'"/>';
-            }
-            else{
-                $split[$i] = '<mqm:endIssue id="'.$id.'"/>';
-            }
-        }
-        return implode('', $split);
-    }
-
     /**
      * sets $this->_skeletonFile
      */

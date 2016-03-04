@@ -1043,6 +1043,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
 
     /**
      * Updates - if enabled - the QM Sub Segments with correct IDs in the given String and stores it with the given Method in the entity
+     * Also, corrects overlapped image tags between which there is no text node.
      * @param string $field
      */
     public function updateQmSubSegments(string $dataindex) {
@@ -1054,9 +1055,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $qmsubsegments = ZfExtended_Factory::get('editor_Models_Qmsubsegments');
         /* @var $qmsubsegments editor_Models_Qmsubsegments */
         $withQm = $qmsubsegments->updateQmSubSegments($this->get($dataindex), (int)$this->getId(), $field['field']);
-        $this->set($dataindex, $withQm);
+        $correctedOverlappedTags = $qmsubsegments->correctQmSubSegmentsOverlappedTags($withQm);
+        $this->set($dataindex, $correctedOverlappedTags);
     }
-
+    
     /**
      * Bulk updating a specific autoState of a task 
      * @param string $taskGuid

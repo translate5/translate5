@@ -489,6 +489,7 @@ class editor_TaskController extends ZfExtended_RestController {
         if(!$this->entity->isRegisteredInSession() && $isEditAll || empty($row['userStep'])) {
             $row['segmentFields'] = $fields->loadByTaskGuid($taskguid);
             //the pm sees all, so fix userprefs
+            $userPref->setNotEditContent(false);
             $userPref->setAnonymousCols(false);
             $userPref->setVisibility($userPref::VIS_SHOW);
             $allFields = array_map(function($item) { 
@@ -502,6 +503,7 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         
         $row['userPrefs'] = array($userPref->getDataObject());
+        $row['notEditContent'] = (bool)$row['userPrefs'][0]->notEditContent;
         
         //$row['segmentFields'] = $fields->loadByCurrentUser($taskguid);
         foreach($row['segmentFields'] as $key => &$field) {

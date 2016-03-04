@@ -131,6 +131,84 @@ class editor_Models_Qmsubsegments extends ZfExtended_Models_Entity_Abstract {
         return implode('', $sArr);
     }
     
+    
+    /**
+     * Extracts information from the tag, needed from $this->_areTagsOverlapped()
+     * 
+     * @param string $tag
+     * @return string[]
+     */
+    protected function _getImageTagInfo($tag) {
+    	$data = [];
+    	$data['id'] = $this->getIdFromImg($tag);
+    	$classes = $this->getClsFromImg($tag);
+    	$classes = explode(' ', $classes);
+    	$data['type'] = (in_array('open', $classes) !== false ? 'open' : 'close');
+    	return $data;
+    }
+    
+    /**
+     * Checks while the string is image tag 
+     * 
+     * @param string $tag
+     * @return boolean
+     */
+    protected function _isImageTag($tag) {
+    	if (substr($tag, 0, 5) == '<img ') {
+    		return true;
+    	}
+    	return false;
+    }
+    
+    /**
+     * Check while the two tags are overlapped without any contents between them
+     * 
+     * @param string $tag1
+     * @param string $between
+     * @param string $tag2
+     * @return boolean
+     */
+    protected function _areTagsOverlapped($tag1, $between, $tag2) {
+    	// at least one of the tags is not an image tag
+    	if (!$this->_isImageTag($tag1) || !$this->_isImageTag($tag2)) {
+    		return false;
+    	}
+    	if ($between != '') { // there is some contents between tags
+    		return false;
+    	}
+    	$tag1_info = $this->_getImageTagInfo($tag1);
+    	$tag2_info = $this->_getImageTagInfo($tag2);
+    	if (($tag1_info['type'] == 'open') &&
+    		($tag2_info['type'] == 'close') &&
+    		($tag1_info['id'] != $tag2_info['id'])) {
+    	
+    		return true;
+    	}
+    	return false;
+    }
+
+    /**
+     * Corrects overlapped image tags between which there is no text node
+     *
+     * @param string $segment
+     * @return string $segment_corrected
+     */
+    public function correctQmSubSegmentsOverlappedTags(string $segment) {
+    	$sArrSrc = $this->splitSegment($segment);
+    	$count = count($sArrSrc);
+    	    	
+    	for ($i = 0; $i < $count; $i++) {
+            if ((($i + 2) < $count) && $this->_areTagsOverlapped($sArrSrc[$i], $sArrSrc[$i+1], $sArrSrc[$i+2])) {
+            	// swap overlapped tags
+            	$tag1_save = $sArrSrc[$i];
+            	$sArrSrc[$i] = $sArrSrc[$i+2];
+            	$sArrSrc[$i+2] = $tag1_save;
+            }
+        }
+        $segment_corrected = implode('', $sArrSrc);
+        return $segment_corrected;
+    }
+    
     /**
      * splits up the segment along the img tags
      * @param string $segment

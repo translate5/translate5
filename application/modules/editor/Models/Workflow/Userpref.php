@@ -37,6 +37,8 @@ END LICENSE AND COPYRIGHT
  * @method void setTaskGuid() setTaskGuid(string $taskGuid)
  * @method integer getWorkflowStep() getWorkflowStep()
  * @method void setWorkflowStep() setWorkflowStep(string $step)
+ * @method integer getNotEditContent() getNotEditContent()
+ * @method void setNotEditContent() setNotEditContent(boolean $cannot)
  * @method integer getAnonymousCols() getAnonymousCols()
  * @method void setAnonymousCols() setAnonymousCols(boolean $anon)
  * @method integer getVisibility() getVisibility()
