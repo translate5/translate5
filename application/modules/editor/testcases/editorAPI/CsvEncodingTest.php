@@ -34,6 +34,9 @@ END LICENSE AND COPYRIGHT
  * exported file will then be checked for correct encoded content.
  */
 class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
+    
+    protected static $mqmDataForInsert = 'M<img  class="null qmflag ownttip open qmflag-5" data-seq="1989" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-5-left.png" />it den Einstellungen UNIPOL./FIX.SETPT ode<img  class="critical qmflag ownttip close qmflag-6" data-seq="1985" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-6-right.png" />r BIPO<img  class="critical qmflag ownttip open qmflag-20" data-seq="1990" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-20-left.png" />L./FIX.<img  class="null qmflag ownttip open qmflag-3" data-seq="1991" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-3-left.png" />SETPT<img  class="critical qmflag ownttip open qmflag-10" data-seq="1982" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-10-left.png" />, kann <img  class="null qmflag ownttip open qmflag-3" data-seq="1992" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-3-left.png" />das <img  class="critical qmflag ownttip open qmflag-6" data-seq="1983" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-6-left.png" />setpoint<img  class="critical qmflag ownttip close qmflag-6" data-seq="1983" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-6-right.png" /> au<img  class="critical qmflag ownttip open qmflag-13" data-seq="1986" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-13-left.png" />c<img  class="critical qmflag ownttip open qmflag-18" data-seq="1987" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-18-left.png" />h<img  class="null qmflag ownttip open qmflag-19" data-seq="1988" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-left.png" /> <img  class="null qmflag ownttip close qmflag-3" data-seq="1992" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-3-right.png" /><img  class="critical qmflag ownttip open qmflag-16" data-seq="1984" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-16-left.png" />über<img  class="critical qmflag ownttip close qmflag-10" data-seq="1982" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-10-right.png" /> Anschlüssen<img  class="critical qmflag ownttip close qmflag-16" data-seq="1984" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-16-right.png" /> ausgew<img  class="critical qmflag ownttip close qmflag-13" data-seq="1986" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-13-right.png" />ählt werden (fest<img  class="critical qmflag ownttip close qmflag-18" data-seq="1987" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-18-right.png" />es <img  class="critical qmflag ownttip open qmflag-6" data-seq="1985" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-6-left.png" />se<img  class="null qmflag ownttip close qmflag-3" data-seq="1991" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-3-right.png" /><img  class="critical qmflag ownttip close qmflag-20" data-seq="1990" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-20-right.png" />tpoi<img  class="null qmflag ownttip close qmflag-5" data-seq="1989" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-5-right.png" /><img  class="null qmflag ownttip open qmflag-8" data-seq="1993" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-8-left.png" />nt).<img  class="null qmflag ownttip close qmflag-19" data-seq="1988" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-right.png" /><img  class="null qmflag ownttip close qmflag-8" data-seq="1993" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-8-right.png" />';
+
     /**
      * Setting up the test task by fresh import, adds the lector and translator users
      */
@@ -51,7 +54,8 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
         self::assertLogin('testmanager');
         $appState = self::assertTermTagger();
         self::assertNotContains('editor_Plugins_ManualStatusCheck_Bootstrap', $appState->pluginsLoaded, 'Plugin ManualStatusCheck may not be activated for this test case!');
-        $api->addImportFile('editorAPI/CsvEncodingTest/CSV-test.zip');
+        $zipfile = self::zipTestFiles('editorAPI/CsvEncodingTest/CSV-testfiles','CSV-test.zip');
+        $api->addImportFile($zipfile);
         $api->import($task);
         
         $api->addUser('testlector');
@@ -116,12 +120,6 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
           return preg_replace('#data-seq="\d+"#', 'data-seq=""', $text);
         };
         
-        // check for overpapped QM Tags with contents between them. They must be not corrected on saving.
-        $tag1_open = '<img class="critical qmflag ownttip open qmflag-19" data-seq="497" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-left.png" />';
-        $tag1_close = '<img class="critical qmflag ownttip close qmflag-19" data-seq="497" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-right.png" />';
-        $tag2_open = '<img class="critical qmflag ownttip open qmflag-4" data-seq="498" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-left.png" />';
-        $tag2_close = '<img class="critical qmflag ownttip close qmflag-4" data-seq="498" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-right.png" />';
-        
         foreach($csvRows as $idx => $row) {
             //ignore last line
             if(empty($row)) {
@@ -136,14 +134,18 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
             $this->assertEquals($expectedTarget, $removeDataSeq($segments[$idx]->targetEdit));
             
             $segToEdit = $segments[$idx];
-            if (preg_match('/Text mit einem/', $segToEdit->targetEdit)) {
-            	$editedData = 'Text '.$tag1_open.'mit einem '.$tag2_open.'&amp; '.$tag1_close.'Ampersand'.$tag2_close;
-            } else {
-            	$editedData = $expectedTarget.' - edited';
-            }
+            $editedData = $expectedTarget.' - edited';
             $segmentData = $this->api()->prepareSegmentPut('targetEdit', $editedData, $segToEdit->id);
             $this->api()->requestJson('editor/segment/'.$segToEdit->id, 'PUT', $segmentData);
         }
+        
+        //enter mqms in last row
+        end($csvRows);
+        $idx = key($csvRows);
+        $idx++; //compensate comment row removal
+        $segToEdit = $segments[$idx];
+        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $removeDataSeq(self::$mqmDataForInsert), $segToEdit->id);
+        $this->api()->requestJson('editor/segment/'.$segToEdit->id, 'PUT', $segmentData);
     }
     
     /**
