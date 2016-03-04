@@ -51,58 +51,8 @@ Ext.override(Ext.data.Connection, {
 Ext.Ajax.timeout = 60000;
 Ext.override(Ext.data.proxy.Ajax, { timeout: 60000 });
 Ext.override(Ext.form.action.Action, { timeout: 60 });
-/**
-* @property {RegExp}
-* @private
-* Regular expression used for validating identifiers.
-* !!!WARNING!!! This  and next override is made to allow ids starting with a digit. This is due to the bulk of legacy data
-*/
-Ext.validIdRe = /^[a-z0-9_][a-z0-9\-_]*$/i;
-Ext.define('Ext.overrides.dom.Element', {
-    override: 'Ext.dom.Element',
-    
-    constructor: function(dom) {
-        this.validIdRe = Ext.validIdRe;
-        this.callParent(arguments);
-    }
-});
 
-/**
- * 
- * fixing for this bug: https://www.sencha.com/forum/showthread.php?288898-W-targetCls-is-missing.-This-may-mean-that-getTargetEl()-is-being-overridden-but-no/page3
- * 
- * */
-Ext.define('Ext.overrides.layout.container.Container', {
-  override: 'Ext.layout.container.Container',
-
-  notifyOwner: function() {
-    this.owner.afterLayout(this);
-  }
-});
-
-/**
- * enables the ability to set a optional menuOffset in menus
- * @todo this override must be revalidated on extjs update
- */
-Ext.override(Ext.menu.Item, {
-    deferExpandMenu: function() {
-        var me = this;
-
-        if (!me.menu.rendered || !me.menu.isVisible()) {
-            me.parentMenu.activeChild = me.menu;
-            me.menu.parentItem = me;
-            me.menu.parentMenu = me.menu.ownerCt = me.parentMenu;
-            me.menu.showBy(me, me.menuAlign, me.menuOffset);
-        }
-    }
-});
-
-/*Ext.override(Ext.app.Application, {
-    constructor: function() {
-        Editor.app = this; //@todo remove after upgrade to extjs > 4.1.3
-        this.callOverridden(arguments);
-    }
-});*/
+Ext.Loader.setPath('Editor.controller.Localizer', 'foo');
 
 Editor.DATE_ISO_FORMAT = 'Y-m-d H:i:s';
 
