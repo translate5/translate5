@@ -75,9 +75,9 @@ trait editor_Models_Export_FileParser_MQMTrait {
     protected $_openTagsInLoop = array();
     /**
      * used by _handleOverlap and subroutines
-     * @var int 
+     * @var array
      */
-    protected $_newTagCounter = 0;
+    protected $_newTagCounter = array();
     /**
      * used by _handleOverlap and subroutines
      * @var array 
@@ -180,6 +180,7 @@ trait editor_Models_Export_FileParser_MQMTrait {
                 next($this->_stack);
                 continue;
             }
+            throw new ZfExtended_Exception('MQM img2xml-conversion: This point should never be reached');
         }
     }
 
@@ -405,7 +406,6 @@ trait editor_Models_Export_FileParser_MQMTrait {
      */
     protected function _handleOverlapResolveInitNewTagData() {
         $current = current($this->_stack);
-        $this->_newTagCounter = 0;
         $this->_newCloseTagData = $current['data'];
         $this->_newOpenTagData = $current['data'];
         $this->_newCloseTagData['type'] = 'close';
@@ -415,8 +415,8 @@ trait editor_Models_Export_FileParser_MQMTrait {
     protected function _handleOverlapResolveSetNewTagData() {
         $current = current($this->_stack);
         $curId = $current['data']['id'];
-        $this->_newTagCounter++;
-        $this->_newOpenTagData['id'] = 'overlappingTagId-'.$curId.'_'.$this->_newTagCounter;
+        (isset($this->_newTagCounter[$curId]))?$this->_newTagCounter[$curId]++:$this->_newTagCounter[$curId]=1;
+        $this->_newOpenTagData['id'] = 'overlappingTagId-'.$curId.'_'.$this->_newTagCounter[$curId];
     }
     /**
      * 
@@ -471,7 +471,6 @@ trait editor_Models_Export_FileParser_MQMTrait {
         $this->_stackId2ArrayIndex = array();
         $this->_newOpenTagData = array();
         $this->_newCloseTagData = array();
-        $this->_newTagCounter = 0;
         reset($this->_stack);
     }
 }
