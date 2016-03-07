@@ -93,8 +93,6 @@ Ext.define('Editor.controller.QmSubSegments', {
         }
     },
     strings: {
-    	emptySelText: '##UT##Bitte wählen Sie im Editor ein Subsegment aus!',
-    	emptySelTitle: '##UT##Kein Subsegment ausgewählt.',
     	buttonTooltip10: '#UT# (ALT+{0})',
     	buttonTooltip20: '#UT# (ALT+SHIFT+{0})'
     },
@@ -265,10 +263,7 @@ Ext.define('Editor.controller.QmSubSegments', {
             //because IE did not display the segment content completly with qm subsegments containing these chars
             //WARNING: if we allow tags and special chars here, we must fix CSV export too! See comment in export/FileParser/Csv.php
                 
-        if(! me.addQmFlagToEditor(menuitem.qmid, comment, sev.getValue())) {
-            Ext.Msg.alert(me.strings.emptySelTitle, me.strings.emptySelText);
-            return;
-        }
+        me.addQmFlagToEditor(menuitem.qmid, comment, sev.getValue());
         sev.reset();
         commentField.reset();
         me.addQmFlagHistory(menuitem);
@@ -282,9 +277,6 @@ Ext.define('Editor.controller.QmSubSegments', {
      */
     addQmFlagToEditor: function(qmid, comment, sev){
 		var editor = this.getSegmentGrid().editingPlugin.editor.mainEditor;
-		if(!editor.hasSelection() && !this.lastSelectedRangeIE) {
-			return false;
-		}
 		if(Ext.isIE) {
 			this.insertQmFlagsIE(editor,qmid, comment, sev);
 		} else {
@@ -309,8 +301,8 @@ Ext.define('Editor.controller.QmSubSegments', {
 		close = Ext.DomHelper.createDom(tagDef.close);
 		rangeBegin.collapse(true);
 		rangeEnd.collapse(false);
-		rangeBegin.insertNode(open);
 		rangeEnd.insertNode(close);
+		rangeBegin.insertNode(open);
 		doc.getSelection().removeAllRanges();
     },
     /**
