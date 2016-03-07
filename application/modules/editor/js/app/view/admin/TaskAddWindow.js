@@ -108,16 +108,14 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     //each combo needs its own store instance, see EXT6UPD-8
                     store: Ext.create(Editor.store.admin.Languages),
                     fieldLabel: me.strings.sourceLangLabel
-                }, langCombo),{
-                },Ext.applyIf({
+                }, langCombo),Ext.applyIf({
                     name: 'targetLang',
                     allowBlank: false,
                     toolTip: me.strings.targetLangTip,
                     //each combo needs its own store instance, see EXT6UPD-8
                     store: Ext.create(Editor.store.admin.Languages),
                     fieldLabel: me.strings.targetLangLabel
-                }, langCombo),{
-                },Ext.applyIf({
+                }, langCombo),Ext.applyIf({
                     name: 'relaisLang',
                     getSubmitValue: function() {
                       return this.getValue();
