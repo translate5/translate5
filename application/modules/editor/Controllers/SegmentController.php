@@ -89,21 +89,40 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     }
     
     public function indexAction() {
-        $session = new Zend_Session_Namespace();
-        $taskGuid = $session->taskGuid;
+        $taskGuid = $this->session->taskGuid;
         $this->view->rows = $this->entity->loadByTaskGuid($taskGuid);
         $this->view->total = $this->entity->totalCountByTaskGuid($taskGuid);
         
         $this->addIsFirstFileInfo($taskGuid);
         
-        $borderSegments = $this->entity->getBorderSegments($taskGuid);
-        //editable segments only!
-        if(!empty($borderSegments['first'])) {
-            $this->view->firstSegmentId = $borderSegments['first']['id'];
+        //since we dont use metaData otherwise, we can overwrite it completly:
+        $this->view->metaData = $this->entity->findSurroundingEditables($this->getUsersAutoStateIds(), $this->view->total);
+        $this->view->metaData['page'] = $this->getParam('page');
+    }
+    
+    /**
+     * returns a list of autoStateIds, belonging to the users role in the currently loaded task
+     * is neede for the autostate filter in the frontend 
+     */
+    protected function getUsersAutoStateIds() {
+        $sessionUser = new Zend_Session_Namespace('user');
+        $taskUserAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $taskUserAssoc editor_Models_TaskUserAssoc */
+        $taskUserAssoc->loadByParams($sessionUser->data->userGuid, $this->session->taskGuid);
+        if($taskUserAssoc->getIsPmOverride()) {
+            $userRole = 'pm';
         }
-        if(!empty($borderSegments['last'])) {
-            $this->view->lastSegmentId = $borderSegments['last']['id'];
+        else {
+            $userRole = $taskUserAssoc->getRole();
         }
+        
+        $states = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
+        /* @var $states editor_Models_SegmentAutoStates */
+        $autoStateMap = $states->getRoleToStateMap();
+        if(empty($userRole) || empty($autoStateMap[$userRole])) {
+            return null;
+        }
+        return $autoStateMap[$userRole];
     }
     
     /**
