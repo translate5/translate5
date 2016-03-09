@@ -40,14 +40,26 @@ END LICENSE AND COPYRIGHT
  * @initalGenerated
  */
 Ext.define('Editor.view.fileorder.Tree', {
-  extend: 'Editor.view.ui.fileorder.Tree',
+  extend: 'Ext.tree.Panel',
   alias: 'widget.fileorder.tree',
   itemId: 'fileorderTree',
   cls: 'fileTree',
   store: 'Files',
   rootVisible: false,  
-  initComponent: function() {
-    var me = this;
-    me.callParent(arguments);
+  initConfig: function(instanceConfig) {
+    var me = this,
+        config = {
+          viewConfig: {
+            singleSelect: true,
+            plugins: [
+              Ext.create('Ext.tree.plugin.TreeViewDragDrop')
+            ]
+          }
+        };
+
+    if (instanceConfig) {
+        me.getConfigurator().merge(me, config, instanceConfig);
+    }
+    return me.callParent([config]);
   }
 });

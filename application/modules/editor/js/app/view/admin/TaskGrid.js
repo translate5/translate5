@@ -62,6 +62,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       enableSourceEditing: '#UT#Quellsprache bearbeitbar'
   },
   strings: {
+      noRelaisLang: '#UT#- Ohne Relaissprache -',
       ended: '#UT#beendet',
       noUsers: '#UT#Keine Benutzer zugeordnet!',
       locked: '#UT#in Arbeit',
@@ -71,6 +72,15 @@ Ext.define('Editor.view.admin.TaskGrid', {
       addTaskTip: '#UT#Eine neue Aufgabe hinzufügen.',
       reloadBtn: '#UT#Aktualisieren',
       reloadBtnTip: '#UT#Aufgabenliste vom Server aktualisieren.'
+  },
+  states: {
+      user_state_open: '#UT#offen',
+      user_state_waiting: '#UT#wartend',
+      user_state_finished: '#UT#abgeschlossen',
+      task_state_end: '#UT#beendet',
+      task_state_import: '#UT#beendet',
+      locked: '#UT#in Arbeit',
+      forMe: '#UT#für mich '
   },
   store: 'admin.Tasks',
   viewConfig: {
@@ -185,23 +195,14 @@ Ext.define('Editor.view.admin.TaskGrid', {
       var me = this,
           states = [],
           config,
-          msg = {
-              user_state_open: '#UT#offen',
-              user_state_waiting: '#UT#wartend',
-              user_state_finished: '#UT#abgeschlossen',
-              task_state_end: '#UT#beendet',
-              task_state_import: '#UT#beendet',
-              locked: '#UT#in Arbeit',
-              forMe: '#UT#für mich '
-          },
           //we must have here an own ordered list of states to be filtered 
           stateFilterOrder = ['user_state_open','user_state_waiting','user_state_finished','locked', 'task_state_end', 'task_state_import'],
           relaisLanguages = Ext.Array.clone(Editor.data.languages);
           
           //we're hardcoding the state filter options order, all other (unordered) workflow states are added below
           Ext.Array.each(stateFilterOrder, function(state){
-              if(msg[state]) {
-                  states.push([state, msg[state]]);
+              if(me.states[state]) {
+                  states.push([state, me.states[state]]);
               }
           });
         
@@ -209,13 +210,13 @@ Ext.define('Editor.view.admin.TaskGrid', {
           Ext.Object.each(Editor.data.app.workflows, function(key, workflow){
               Ext.Object.each(workflow.states, function(key, value){
                   var state = 'user_state_'+key;
-                  if(!msg[state]) {
-                      states.push([state, msg.forMe+' '+value]);
+                  if(!me.states[state]) {
+                      states.push([state, me.states.forMe+' '+value]);
                   }
               });
           });
         
-          relaisLanguages.unshift([0, this.noRelaisLang]);
+          relaisLanguages.unshift([0, me.strings.noRelaisLang]);
           
           config = {
           languageStore: Ext.StoreMgr.get('admin.Languages'),
