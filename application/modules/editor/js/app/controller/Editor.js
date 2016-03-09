@@ -75,7 +75,8 @@ Ext.define('Editor.controller.Editor', {
               contentErrors: 'handleSaveWithErrors'
           },
           '#segmentgrid': {
-              afterrender: 'initEditPluginHandler'
+              afterrender: 'initEditPluginHandler',
+              beforeselect: 'handleBeforeSelect'
           }
       }
   },
@@ -102,7 +103,8 @@ Ext.define('Editor.controller.Editor', {
           'ctrl-alt-down':  [Ext.EventObjectImpl.DOWN,{ctrl: true, alt: true}, me.goToLowerNoSave, true],
           'ctrl-alt-c':     ["C",{ctrl: true, alt: true}, me.handleOpenComments, true],
           'alt-DIGIT':      [decDigits,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
-          'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true]
+          'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
+          'pos1':           [Ext.EventObjectImpl.HOME,{ctrl: false, alt: false}, me.handleHomeKeyPress, true]
       };
   },
   /**
@@ -149,6 +151,12 @@ Ext.define('Editor.controller.Editor', {
           }
       });
       return false;
+  },
+  /**
+   * disables selection of readonly segments
+   */
+  handleBeforeSelect: function(sm, record) {
+      return !!record.get('editable');
   },
   /**
    * Gibt die RowEditing Instanz des Grids zurück
@@ -238,22 +246,37 @@ Ext.define('Editor.controller.Editor', {
       var me = this,
           grid = me.getSegmentGrid(),
           selModel = grid.getSelectionModel(),
-          ed = me.getEditPlugin();
-
-      if (ret.existsNextSegment) {
-            //editing by selection handler must be disabled, otherwise saveChainStart will be triggered twice
-            selModel.select(ret.newRec);
-            //REMIND here was startEdit defered with 300 millis, is this still needed?
-            ed.startEdit(ret.newRec, ret.lastColumn, ed.self.STARTEDIT_SCROLLUNDER);
-            return;
-      }
+          ed = me.getEditPlugin(),
+          res;
       
       if (ret.isBorderReached) {
           Editor.MessageBox.addInfo(ret.errorText);
+          return;
       }
-      else {
+
+      //if we have a nextSegment and it is rendered, bring into the view and open it
+      if (ret.existsNextSegment && grid.getView().getNode(ret.newRec)) {
+          res = selModel.select(ret.newRec);
+          //REMIND here was startEdit defered with 300 millis, is this still needed?
+          ed.startEdit(ret.newRec, ret.lastColumn, ed.self.STARTEDIT_SCROLLUNDER);
+          return;
+      }
+
+      if(!ret.existsNextRowIdx) {
           Editor.MessageBox.addInfo(me.messages.segmentNotBuffered);
+          return;
       }
+      
+      //if we only have a rowIndex or it is not rendered, we have to scroll first
+      callback = function() {
+          grid.selectOrFocus(ret.existsNextRowIdx);
+          sel = selModel.getSelection();
+          ed.startEdit(sel[0], ret.lastColumn, ed.self.STARTEDIT_SCROLLUNDER);
+      };
+      grid.scrollTo(ret.existsNextRowIdx, {
+          callback: callback,
+          notScrollCallback: callback
+      });
   },
   /**
    * Moves to the next or previous row without saving current record
@@ -387,27 +410,27 @@ Ext.define('Editor.controller.Editor', {
           ed = me.getEditPlugin(),
           store = grid.store,
           rec = ed.context.record,
+          nextToUseMeta = null,
+          useAutoStateFilter = Ext.isFunction(isEditable),
+          currentIdx = store.indexOf(rec),
+          lastIdx,
           ret = {
             'errorText'        : errorText,
             'existsNextSegment': false,
             'isBorderReached'  : false,
+            'existsNextRowIdx' : false,
             'lastColumn'       : null,
-            'newRec'           : store.getAt(store.indexOf(rec) + rowIdxChange)
+            'newRec'           : store.getAt(currentIdx + rowIdxChange)
           };
-      isEditable = (Ext.isFunction(isEditable) ? isEditable : function(){ return true; });
+      isEditable = (useAutoStateFilter ? isEditable : function(){ return true; });
       if(!rec || !rec.get('editable')) {
           return ret;
       }
       //checking always for segments editable flag + custom isEditable  
       while (ret.newRec && (!ret.newRec.get('editable') || !isEditable(rec, ret.newRec)))
       {
-          ret.newRec = store.getAt(store.indexOf(ret.newRec) + rowIdxChange);
-      }
-      if(rowIdxChange > 0) {
-          ret.isBorderReached = rec.get('id') == store.getLastSegmentId();
-      }
-      else {
-          ret.isBorderReached = rec.get('id') == store.getFirstSegmentId();
+          lastIdx = store.indexOf(ret.newRec) + rowIdxChange;
+          ret.newRec = store.getAt(lastIdx);
       }
       Ext.Array.each(grid.columns, function(col, idx) {
           if(col.dataIndex == ed.editor.getEditedField()) {
@@ -415,6 +438,25 @@ Ext.define('Editor.controller.Editor', {
           }
       });
       ret.existsNextSegment = (ret.newRec !== undefined);
+      if(ret.existsNextSegment) {
+          ret.existsNextRowIdx = lastIdx;
+      }
+
+      //nextToUseMeta contains the next/prev editable in the next/prev page! 
+      //if in current page there are existing prev/next editables, that should be used!
+      if(rowIdxChange > 0) {
+          nextToUseMeta = store.getNextPageEditable(currentIdx, useAutoStateFilter);
+      }
+      else {
+          nextToUseMeta = store.getPrevPageEditable(currentIdx, useAutoStateFilter);
+      }
+      //if next/prev page does not contain any editables anymore, that means that the border is reached.
+      ret.isBorderReached = nextToUseMeta === null;
+
+      //set existsNextRowIdx only if existsNextSegment is false, that means in current page is no usable segment
+      if(!ret.existsNextSegment && !ret.isBorderReached) {
+          ret.existsNextRowIdx = nextToUseMeta.rowIdx;
+      }
       return ret;
   },
   /**
@@ -681,17 +723,42 @@ Ext.define('Editor.controller.Editor', {
         selModel = grid.getSelectionModel(),
         ed = me.getEditPlugin(),
         cols = grid.query('contentEditableColumn:not([hidden])'),
-        sel = [];
+        view = grid.getView(),
+        sel = [],
+        callback;
     
     if (ed.editing) {
         ed.editor.mainEditor.deferFocus();
         return;
     }
-    if (!selModel.hasSelection()){
-        grid.selectOrFocus(me.getNextEditableSegmentOffset(0));
+    
+    if (selModel.hasSelection()){
+        //with selection scroll the selection into the viewport and open it afterwards
+        sel = selModel.getSelection();
+        grid.scrollTo(grid.store.indexOf(sel[0]),{
+            callback: function() {
+                ed.startEdit(sel[0], cols[0]);
+            }
+        });
+    } else {
+        //with no selection, scroll to the first editable select, select it, then open it
+        callback = function() {
+            grid.selectOrFocus(me.getNextEditableSegmentOffset(0));
+            sel = selModel.getSelection();
+            ed.startEdit(sel[0], cols[0]);
+        };
+        grid.scrollTo(me.getNextEditableSegmentOffset(0), {
+            callback: callback,
+            notScrollCallback: callback
+        });
+
     }
-    sel = selModel.getSelection();
-    ed.startEdit(sel[0], cols[0]);
+  },
+  /**
+   * scrolls to the first segment.
+   */
+  handleHomeKeyPress: function() {
+      this.getSegmentGrid().scrollTo(0);
   },
   /**
    * Handler for watchSegmentBtn

@@ -96,6 +96,20 @@ Ext.define('Editor.view.segments.RowEditor', {
         form.on('errorchange', me.onErrorChange, me);
     },
     /**
+     * @override to add onItemAdd handler
+     */
+    afterRender: function() {
+        var me = this,
+            plugin = me.editingPlugin;
+
+        me.callParent(arguments);
+        me.mon(plugin.view, {
+            itemadd: me.onItemAdd,
+            scope: me
+
+        });
+    },
+    /**
      * cancels the editing process
      */
     cancelEdit: function() {
@@ -215,6 +229,7 @@ Ext.define('Editor.view.segments.RowEditor', {
     },
     
     /**
+     * WARNING: why ever this method is not called anymore. Because of the buffered renderer?
      * overriding to remain editor open on view refresh
      * @param {} view
      */
@@ -226,9 +241,24 @@ Ext.define('Editor.view.segments.RowEditor', {
         if (context && (row = view.getRow(context.record))) {
             context.row = row;
             me.reposition();
+
             if (me.tooltip && me.tooltip.isVisible()) {
                 me.tooltip.setTarget(context.row);
             }
+        }
+    },
+    /**
+     * updates the context row node and the editor row height
+     */
+    onItemAdd: function(view) {
+        var me = this,
+            context = me.context,
+            view = me.editingPlugin.view,
+            row;
+        // Recover our row node after a view refresh
+        if (context && (row = view.getRow(context.record))) {
+            context.row = row;
+            me.setEditorHeight();
         }
     },
     
@@ -265,7 +295,10 @@ Ext.define('Editor.view.segments.RowEditor', {
         };
         if (me.isScrollUnderMoveMode) {
             //giving the finalScroller as fallback handler to the scroll command
-            grid.scrollTo(rowIdx, 'editor', moveEditor);
+            grid.scrollTo(rowIdx, {
+                target: 'editor',
+                notScrollCallback: moveEditor
+            });
         }
         else {
             moveEditor();

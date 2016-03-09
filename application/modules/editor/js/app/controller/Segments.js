@@ -302,7 +302,6 @@ Ext.define('Editor.controller.Segments', {
    * @return void
    */
   handleFilterChange: function() {
-      console.log("handleFilterChange", arguments);
       var me = this,
           grid = me.getSegmentGrid(),
           gridFilters = grid.filters,
@@ -329,7 +328,6 @@ Ext.define('Editor.controller.Segments', {
   reloadFilemap: function(params) {
       var me = this;
       params = params || {};
-      console.log("reloadFilemap");
       Ext.Ajax.request({
           url: Editor.data.pathToRunDir+'/editor/segment/filemap',
           method: 'get',
@@ -393,9 +391,12 @@ Ext.define('Editor.controller.Segments', {
    * Reloads the segment store and resets the segment sorting after updating the file tree order
    */
   handleFileSaved: function(movedItem){
-      this.clearSegmentSort();
-      this.getSegmentsStore().reload();
-      this.handleFilterChange();
+      var me = this,
+          store = me.getSegmentsStore();
+      me.clearSegmentSort();
+      store.removeAll();
+      store.reload();
+      me.handleFilterChange();
   },
   /**
    * Hilfsfunktion um beim Schließen des Browserfensters das letzte Segment anzuzeigen

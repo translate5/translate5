@@ -40,7 +40,6 @@ END LICENSE AND COPYRIGHT
  * @param {Array|Ext.data.Store} Segment Field Definitions. As Array: ready to use field config. As Store: segment fields store!
  */
 Ext.define('Editor.model.Segment', {
-    requires: ['Editor.model.segment.Reader'],
     statics: {
         redefine: function(fluentFields) {
             var me = this,
@@ -86,7 +85,8 @@ Ext.define('Editor.model.Segment', {
         type : 'rest',
         url: Editor.data.restpath+'segment',
         reader : {
-            type : 'segmentjson'
+            rootProperty: 'rows',
+            type : 'json'
         },
         writer: {
             encode: true,

@@ -308,10 +308,9 @@ Ext.define('Editor.view.segments.Grid', {
      * editor means under the roweditor, if no editor is opened the default is used.
      * 
      * @param {Integer} rowindex
-     * @param {String} target, one of "editor", "top", "bottom", "center" (default)
-     * @param {Function} notScrollCallback, callback which will be called, if we are not possible to scroll to the desired position (top/bottom reached)
+     * @param {Object} config, for config see positionRowAfterScroll, its completly given to that method
      */
-    scrollTo: function(rowindex, target, notScrollCallback) {
+    scrollTo: function(rowindex, config) {
         var me = this,
             view = me.getView(),
             options = {
@@ -320,16 +319,11 @@ Ext.define('Editor.view.segments.Grid', {
             };
         
         options.callback = function(idx, model, row) {
-            me.selectOrFocus(rowindex);
-            me.positionRowAfterScroll(rowindex, row, target, notScrollCallback);
+            if(model.get('editable')){
+                me.selectOrFocus(rowindex);
+            }
+            me.positionRowAfterScroll(rowindex, row, config);
         };
-        
-        //console.clear();
-        console.log("scrollTo",rowindex, target);
-        console.trace();
-        //FIXME ich erinnere mich dunkel, dass der Schalter doppeltes scrolling durch den Focus verhindern sollte.
-        // wird eventuell nicht mehr benötigt.
-        //me.enableSelectOrFocus = true;
 
         view.bufferedRenderer.scrollTo(rowindex, options);
     },
@@ -338,10 +332,14 @@ Ext.define('Editor.view.segments.Grid', {
      * @private
      * @param {Integer} rowindex
      * @param {HTMLElement} row
-     * @param {String} target
-     * @param {Function} notScrollCallback, callback which will be called, if we are not possible to scroll to the desired position (top/bottom reached)
+     * @param {Object} config
+     * config parameters: 
+     *   target: {String} one of "editor", "top", "bottom", "center" (default), 
+     *   notScrollCallback: {Function} callback which will be called, if we are not possible to scroll to the desired position (top/bottom reached)
+     *   callback: {Function} callback which will be called in every case after final scroll animation
+
      */
-    positionRowAfterScroll: function(rowindex, row, target, notScrollCallback) {
+    positionRowAfterScroll: function(rowindex, row, config) {
         var me = this,
             view = me.getView(),
             editor = me.editingPlugin.editor,
@@ -351,8 +349,14 @@ Ext.define('Editor.view.segments.Grid', {
             topMargin = 20,
             viewHeight = view.getHeight(),
             bottomMargin = 20,
+            config = Ext.applyIf(config || {}, {
+                target: 'editor',
+                notScrollCallback: Ext.emptyFn,
+                callback: Ext.emptyFn
+            }),
+            target = config.target,
             deltaY;
-        
+                    
         //if no editor exists scroll to center
         if(target == 'editor' && !editor) {
             target = 'center';
@@ -373,8 +377,8 @@ Ext.define('Editor.view.segments.Grid', {
                 deltaY = viewHeight/2 - (rowTop + rowHeight/2);
                 break;
         }
-        if(!view.el.scroll('t', deltaY, true)) {
-            notScrollCallback && notScrollCallback();
+        if(!view.el.scroll('t', deltaY, {callback: config.callback})) {
+            config.notScrollCallback();
         }
     },
     /**
