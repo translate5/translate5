@@ -47,18 +47,9 @@
 $extPath = 'ext-6.0.0/build/';
 ?>
 <link rel="stylesheet" type="text/css" href="<?php echo $extPath;?>classic/theme-classic/resources/theme-classic-all.css">
-<!-- TODO
-<link rel="stylesheet" type="text/css" href="modules/erp/ERP/erp.css">
-<link rel="stylesheet" type="text/css" href="modules/erp/ERP/tmue-skin.css">
--->
 
 <!-- <link rel="stylesheet" type="text/css" href="<?php echo $this->extJsCss; ?>"/>  -->
 <link rel="stylesheet" type="text/css" href="<?php echo $extPath; ?>classic/theme-classic/resources/theme-classic-all-debug.css"/>
-<!-- TODO
-<link rel="stylesheet" type="text/css" href="<?php echo $this->extJsBasepath; ?>/examples/ux/grid/css/GridFilters.css" />
-<link rel="stylesheet" type="text/css" href="<?php echo $this->extJsBasepath; ?>/examples/ux/grid/css/RangeMenu.css" />
-<link rel="stylesheet" type="text/css" href="<?php echo $this->extJsBasepath; ?>/examples/ux/css/CheckHeader.css" />
--->
 <link rel="stylesheet" type="text/css" href="<?php echo $this->publicModulePath; ?>/css/main.css?v=7" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/translate5.css?v=7" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/editorAdditions.css?v=7" />
@@ -70,6 +61,9 @@ $extPath = 'ext-6.0.0/build/';
 //Intercept setPath for developing systems, on production all works with above builded code 
 Ext.Loader.setPathIntercepted = Ext.Loader.setPath;
 Ext.Loader.setPath = function() {
+    if(arguments[0] == 'Editor.controller.Localizer') {
+        return Ext.Loader.setPathIntercepted('Editor.controller.Localizer', '<?php echo APPLICATION_RUNDIR; ?>/editor/js/app-localized.js');
+    }
     if(arguments[0] == 'Editor') {
         return Ext.Loader.setPathIntercepted('Editor', 'modules/editor/js/app');
     }

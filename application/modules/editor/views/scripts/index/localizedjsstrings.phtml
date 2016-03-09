@@ -41,84 +41,15 @@ $this->translate->setJsonEncode(true);
       $controller = str_replace('Editor.controller.', '', $controller);
       return in_array($controller, $fcList);
   };
-  
+  $config = Zend_Registry::get('config');
 ?>
 /*
 Editor Translation Files
 */
 Ext.define('Editor.controller.Localizer', {
-	requires: [
-		'Editor.controller.Preferences',
-		'Editor.controller.Segments',
-		'Editor.controller.ServerException',
-		'Editor.controller.ChangeAlike',
-		'Editor.store.Files',
-		'Editor.view.segments.Grid',
-		'Editor.view.ui.segments.column.Quality',
-		'Editor.view.ui.segments.column.Matchrate',
-		'Editor.view.ui.segments.column.Editable',
-		'Editor.view.ui.segments.column.AutoState',
-		'Editor.view.ui.segments.column.State',
-		'Editor.view.ui.segments.column.UserName',
-		'Editor.view.segments.column.WorkflowStep',
-		'Editor.view.segments.column.Comments',
-		'Editor.view.ui.fileorder.Tree',
-		'Editor.view.fileorder.ReferenceTree',
-		'Editor.view.ui.preferences.Window',
-		'Editor.view.segments.MetaPanel',
-		'Editor.view.ui.changealike.Window',
-		'Editor.view.ui.changealike.Grid',
-		'Editor.view.comments.Window',
-		'Editor.view.comments.Grid',
-		'Editor.view.ToolTip',
-		'Editor.view.segments.HtmlEditor',
-                <?php
-                $config = Zend_Registry::get('config');
-                if($config->runtimeOptions->editor->enableQmSubSegments){
-                ?>
-                'Editor.controller.QmSubSegments',
-                'Editor.view.qmsubsegments.Window',
-		'Editor.view.qmsubsegments.AddFlagFieldset',
-    <?php 
-                }
-    //FIXME nextRelease Thomas per PHP if die Sprach Defines für den Admin Bereich (je nach Rolle) einbinden.
-    ?>
-        'Editor.view.admin.TaskGrid',
-        'Editor.view.admin.TaskActionColumn',
-        'Editor.view.admin.ExportMenu',
-        'Editor.controller.admin.TaskUserAssoc',
-        'Editor.controller.admin.TaskOverview',
-        'Editor.view.admin.TaskAddWindow',
-        'Editor.view.admin.task.UserAssoc',
-        'Editor.view.admin.task.UserAssocGrid',
-        'Editor.view.admin.task.PreferencesWindow',
-        'Editor.view.admin.UserChooseWindow',
-<?php
-    if($hasFrontendController('Editor.controller.HeadPanel')){
-?>
-        'Editor.controller.HeadPanel',
-<?php 
-    } 
-    if($hasFrontendController('Editor.controller.admin.User')){
-?>
-        'Editor.controller.admin.User',
-<?php 
-    } 
-    if($hasFrontendController('Editor.controller.admin.TaskPreferences')){
-?>
-        'Editor.view.admin.task.UserPrefsGrid',
-        'Editor.view.admin.task.Preferences',
-<?php 
-    } 
-    //END FIXME nextRelease Thomas per PHP if die Sprach Defines für den Admin Bereich (je nach Rolle) einbinden. Ein Großteil per $hasFrontendController erledigt, einige noch offen.
-    ?>
-		'Editor.MessageBox'
-	],
-	onLaunch: function() {},
+    extend : 'Ext.app.Controller',
 	init: function() {
-	  //Ext Additional:
 	  Ext.view.AbstractView.prototype.loadingText = '<?php echo $this->translate->_('Übertrage Daten...');?>';
-		//Editor:
   	Editor.controller.Preferences.prototype.messages.preferencesSaved = '<?php echo $this->translate->_('Einstellungen für diese Sitzung gespeichert!');?>';
 
   	Editor.controller.Segments.prototype.messages = {
@@ -157,29 +88,27 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.ViewPortEditor.prototype.items_west_title = '<?php echo $this->translate->_('Dateien');?>';
   	Editor.view.segments.Grid.prototype.title = '<?php echo $this->translate->_('Segmentliste und Editor');?>';
   	Editor.view.segments.Grid.prototype.title_readonly = '<?php echo $this->translate->_('Segmentliste und Editor - [LESEMODUS]');?>';
-  	Editor.view.segments.Grid.prototype.item_viewModesMenu = '<?php echo $this->translate->_('Editormodi');?>',
-  	Editor.view.segments.Grid.prototype.item_viewModeBtn = '<?php echo $this->translate->_('Ansicht');?>',
-  	Editor.view.segments.Grid.prototype.item_editModeBtn = '<?php echo $this->translate->_('Bearbeitung');?>',
-  	Editor.view.segments.Grid.prototype.item_ergonomicModeBtn = '<?php echo $this->translate->_('Ergonomic');?>',
-  	Editor.view.segments.Grid.prototype.item_hideTagBtn = '<?php echo $this->translate->_('Tags verbergen');?>',
-  	Editor.view.segments.Grid.prototype.item_shortTagBtn = '<?php echo $this->translate->_('Tag-Kurzansicht');?>',
-  	Editor.view.segments.Grid.prototype.item_fullTagBtn = '<?php echo $this->translate->_('Tag-Vollansicht');?>',
-  	Editor.view.segments.Grid.prototype.item_qmsummaryBtn = '<?php echo $this->translate->_('QM Subsegment Statistik');?>',
-  	Editor.view.segments.Grid.prototype.item_optionsTagBtn = '<?php echo $this->translate->_('Einstellungen');?>',
-  	Editor.view.segments.Grid.prototype.item_clearSortAndFilterBtn = '<?php echo $this->translate->_('Sortierung / Filterung zurücksetzen');?>',
-  	Editor.view.segments.Grid.prototype.item_watchListFilterBtn = '<?php echo $this->translate->_('Merkliste');?>',
-  	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>',
+  	
+  	var gridToolbar = Editor.view.segments.grid.Toolbar.prototype;
+  	gridToolbar.item_viewModesMenu = '<?php echo $this->translate->_('Editormodi');?>';
+  	gridToolbar.item_viewModeBtn = '<?php echo $this->translate->_('Ansicht');?>';
+  	gridToolbar.item_editModeBtn = '<?php echo $this->translate->_('Bearbeitung');?>';
+  	gridToolbar.item_ergonomicModeBtn = '<?php echo $this->translate->_('Ergonomic');?>';
+  	gridToolbar.item_hideTagBtn = '<?php echo $this->translate->_('Tags verbergen');?>';
+  	gridToolbar.item_shortTagBtn = '<?php echo $this->translate->_('Tag-Kurzansicht');?>';
+  	gridToolbar.item_fullTagBtn = '<?php echo $this->translate->_('Tag-Vollansicht');?>';
+  	gridToolbar.item_qmsummaryBtn = '<?php echo $this->translate->_('QM Subsegment Statistik');?>';
+  	gridToolbar.item_optionsTagBtn = '<?php echo $this->translate->_('Einstellungen');?>';
+  	gridToolbar.item_clearSortAndFilterBtn = '<?php echo $this->translate->_('Sortierung / Filterung zurücksetzen');?>';
+  	gridToolbar.item_watchListFilterBtn = '<?php echo $this->translate->_('Merkliste');?>';
+  	
+  	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>';
 
   	Editor.view.ui.segments.column.Quality.prototype.text = '<?php echo $this->translate->_('QM');?>';
   	Editor.view.ui.segments.column.Matchrate.prototype.text = '<?php echo $this->translate->_('Matchrate');?>';
-  	//Editor.view.ui.segments.column.Editor.prototype.text = '<?php echo $this->translate->_('Zieltext überarbeitet');?>';
   	Editor.view.ui.segments.column.Editable.prototype.text = '<?php echo $this->translate->_('Gesperrt');?>';
   	Editor.view.ui.segments.column.AutoState.prototype.text = '<?php echo $this->translate->_('Autostatus');?>';
-  	//Editor.view.ui.segments.column.Source.prototype.text = '<?php echo $this->translate->_('Ausgangstext');?>';
-  	//Editor.view.ui.segments.column.SourceEditor.prototype.text = '<?php echo $this->translate->_('Ausgangstext überarbeitet');?>';
   	Editor.view.ui.segments.column.State.prototype.text = '<?php echo $this->translate->_('Status');?>';
-  	//Editor.view.ui.segments.column.Relais.prototype.text = '<?php echo $this->translate->_('Relais');?>';
-  	//Editor.view.ui.segments.column.Target.prototype.text = '<?php echo $this->translate->_('Zieltext');?>';
   	Editor.view.ui.segments.column.UserName.prototype.text = '<?php echo $this->translate->_('letzter Bearbeiter');?>';
   	Editor.view.segments.column.WorkflowStep.prototype.text = '<?php echo $this->translate->_('bearbeitet bei');?>';
   	Editor.view.segments.column.Comments.prototype.text = '<?php echo $this->translate->_('Kommentare');?>';
@@ -188,7 +117,7 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.segments.column.Comments.prototype.text_tooltip_icon = '<?php echo $this->translate->_('Dem ausgewählten Segment einen Kommentar hinzufügen. (STRG + ALT + c)');?>';
   	
 
-  	Editor.view.ui.fileorder.Tree.prototype.title = '<?php echo $this->translate->_('Arbeits-Dateien');?>';
+  	Editor.view.fileorder.Tree.prototype.title = '<?php echo $this->translate->_('Arbeits-Dateien');?>';
   	Editor.view.fileorder.ReferenceTree.prototype.title = '<?php echo $this->translate->_('Referenz-Dateien');?>';
 
   	Editor.view.ui.preferences.Window.prototype.title = '<?php echo $this->translate->_('Einstellungen');?>';
@@ -287,30 +216,16 @@ Ext.define('Editor.controller.Localizer', {
   	Ext.grid.column.Boolean.prototype.falseText = '<?php echo $no;?>';
   	Ext.grid.column.Boolean.prototype.trueText = '<?php echo $yes;?>';
 
-        Ext.ux.grid.menu.RangeMenu.prototype.menuItemCfgs.emptyText = '<?php echo $this->translate->_('Nummer eingeben...');?>';
-        Ext.ux.grid.menu.RangeMenu.prototype.fieldLabels.gt = '<?php echo $this->translate->_('größer als');?>';
-        Ext.ux.grid.menu.RangeMenu.prototype.fieldLabels.lt = '<?php echo $this->translate->_('kleiner als');?>';
-        Ext.ux.grid.menu.RangeMenu.prototype.fieldLabels.eq = '<?php echo $this->translate->_('ist gleich');?>';
+        Ext.grid.filters.Filters.prototype.menuFilterText = '<?php echo $this->translate->_('Filter');?>';
+        Ext.grid.filters.filter.Number.prototype.emptyText = '<?php echo $this->translate->_('Nummer eingeben...');?>';
+        Ext.grid.filters.filter.String.prototype.emptyText = '<?php echo $this->translate->_('Filtertext eingeben...');?>';
+        Ext.grid.filters.filter.Boolean.prototype.yesText = '<?php echo $yes;?>';
+        Ext.grid.filters.filter.Boolean.prototype.noText = '<?php echo $no;?>';
+        Ext.grid.filters.filter.Date.prototype.config.fields.eq.text = '<?php echo $this->translate->_('am');?>';
+        Ext.grid.filters.filter.Date.prototype.config.fields.gt.text = '<?php echo $this->translate->_('nach');?>';
+        Ext.grid.filters.filter.Date.prototype.config.fields.lt.text = '<?php echo $this->translate->_('bevor');?>';
+        //Ext.grid.filters.filter.DateFilter.prototype.dateFormat = Editor.DATE_ISO_FORMAT;
 
-        Ext.ux.grid.filter.BooleanFilter.prototype.yesText = '<?php echo $yes;?>';
-        Ext.ux.grid.filter.BooleanFilter.prototype.noText = '<?php echo $no;?>';
-        Ext.ux.grid.FiltersFeature.prototype.menuFilterText = '<?php echo $this->translate->_('Filter');?>';
-        Ext.ux.grid.filter.DateFilter.prototype.onText = '<?php echo $this->translate->_('am');?>';
-        Ext.ux.grid.filter.DateFilter.prototype.afterText = '<?php echo $this->translate->_('nach');?>';
-        Ext.ux.grid.filter.DateFilter.prototype.beforeText = '<?php echo $this->translate->_('bevor');?>';
-        Ext.ux.grid.filter.DateFilter.prototype.dateFormat = Editor.DATE_ISO_FORMAT;
-
-    Editor.view.admin.task.GridFilter.prototype.noRelaisLang = '<?php echo $this->translate->_('- Ohne Relaissprache -');?>';
-    Editor.view.admin.task.GridFilter.prototype.strings = {
-        user_state_open: '<?php echo $this->translate->_('offen');?>',
-        locked: '<?php echo $this->translate->_('in Arbeit');?>',
-        user_state_waiting: '<?php echo $this->translate->_('wartend');?>',
-        user_state_finished: '<?php echo $this->translate->_('abgeschlossen');?>',
-        task_state_end: '<?php echo $this->translate->_('beendet');?>',
-        task_state_import: '<?php echo $this->translate->_('import');?>',
-        forMe: '<?php echo $this->translate->_('für mich ');?>'
-    };
-        
 	Editor.view.segments.HtmlEditor.prototype.strings = {
 		errorTitle: '<?php echo $this->translate->_('Fehler bei der Segment Validierung!');?>',
 		correctErrorsText: '<?php echo $this->translate->_('Fehler beheben');?>',
@@ -328,14 +243,6 @@ Ext.define('Editor.controller.Localizer', {
 		warning: '<?php echo $this->translate->_('Warnung!');?>',
 		notice: '<?php echo $this->translate->_('Hinweis!');?>'
 	};
-
-    Editor.store.Files.prototype.root.text = '<?php echo $this->translate->_('Dateien');?>';
-    Ext.getStore('Files').getRootNode().set('text', Editor.store.Files.prototype.root.text);
-    Ext.getStore('Files').getRootNode().commit();
-
-    Editor.store.ReferenceFiles.prototype.root.text = '<?php echo $this->translate->_('Referenz Dateien');?>';
-    Ext.getStore('ReferenceFiles').getRootNode().set('text', Editor.store.ReferenceFiles.prototype.root.text);
-    Ext.getStore('ReferenceFiles').getRootNode().commit();
 
     Editor.view.comments.Grid.prototype.text_edited = '<?php echo $this->translate->_('bearbeitet');?>';
     Editor.view.comments.Grid.prototype.text_edit = '<?php echo $this->translate->_('Bearbeiten');?>';
@@ -385,6 +292,17 @@ Ext.define('Editor.controller.Localizer', {
 
     var tg = Editor.view.admin.TaskGrid.prototype;
     tg.title = '<?php echo $this->translate->_('Aufgabenübersicht');?>';
+    
+    tg.states = {
+        user_state_open: '<?php echo $this->translate->_('offen');?>',
+        locked: '<?php echo $this->translate->_('in Arbeit');?>',
+        user_state_waiting: '<?php echo $this->translate->_('wartend');?>',
+        user_state_finished: '<?php echo $this->translate->_('abgeschlossen');?>',
+        task_state_end: '<?php echo $this->translate->_('beendet');?>',
+        task_state_import: '<?php echo $this->translate->_('import');?>',
+        forMe: '<?php echo $this->translate->_('für mich ');?>'
+    };
+    
     tg.strings = {
       ended: '<?php echo $this->translate->_('beendet');?>',
       noUsers: '<?php echo $this->translate->_('Keine Benutzer zugeordnet!');?>',
@@ -394,7 +312,8 @@ Ext.define('Editor.controller.Localizer', {
       addTask: '<?php echo $this->translate->_('Aufgabe hinzufügen');?>',
       addTaskTip: '<?php echo $this->translate->_('Eine neue Aufgabe hinzufügen.');?>',
       reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
-      reloadBtnTip: '<?php echo $this->translate->_('Aufgabenliste vom Server aktualisieren.');?>'
+      reloadBtnTip: '<?php echo $this->translate->_('Aufgabenliste vom Server aktualisieren.');?>',
+      noRelaisLang: '<?php echo $this->translate->_('- Ohne Relaissprache -');?>'
     };
     
     tg = tg.text_cols;
