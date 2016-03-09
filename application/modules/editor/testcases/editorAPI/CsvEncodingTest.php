@@ -34,6 +34,9 @@ END LICENSE AND COPYRIGHT
  * exported file will then be checked for correct encoded content.
  */
 class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
+    
+    protected static $mqmDataForInsert = 'M<img  class="null qmflag ownttip open qmflag-5" data-seq="1989" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-5-left.png" />it den Einstellungen UNIPOL./FIX.SETPT ode<img  class="critical qmflag ownttip close qmflag-6" data-seq="1985" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-6-right.png" />r BIPO<img  class="critical qmflag ownttip open qmflag-20" data-seq="1990" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-20-left.png" />L./FIX.<img  class="null qmflag ownttip open qmflag-3" data-seq="1991" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-3-left.png" />SETPT<img  class="critical qmflag ownttip open qmflag-10" data-seq="1982" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-10-left.png" />, kann <img  class="null qmflag ownttip open qmflag-3" data-seq="1992" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-3-left.png" />das <img  class="critical qmflag ownttip open qmflag-6" data-seq="1983" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-6-left.png" />setpoint<img  class="critical qmflag ownttip close qmflag-6" data-seq="1983" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-6-right.png" /> au<img  class="critical qmflag ownttip open qmflag-13" data-seq="1986" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-13-left.png" />c<img  class="critical qmflag ownttip open qmflag-18" data-seq="1987" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-18-left.png" />h<img  class="null qmflag ownttip open qmflag-19" data-seq="1988" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-left.png" /> <img  class="null qmflag ownttip close qmflag-3" data-seq="1992" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-3-right.png" /><img  class="critical qmflag ownttip open qmflag-16" data-seq="1984" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-16-left.png" />über<img  class="critical qmflag ownttip close qmflag-10" data-seq="1982" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-10-right.png" /> Anschlüssen<img  class="critical qmflag ownttip close qmflag-16" data-seq="1984" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-16-right.png" /> ausgew<img  class="critical qmflag ownttip close qmflag-13" data-seq="1986" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-13-right.png" />ählt werden (fest<img  class="critical qmflag ownttip close qmflag-18" data-seq="1987" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-18-right.png" />es <img  class="critical qmflag ownttip open qmflag-6" data-seq="1985" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-6-left.png" />se<img  class="null qmflag ownttip close qmflag-3" data-seq="1991" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-3-right.png" /><img  class="critical qmflag ownttip close qmflag-20" data-seq="1990" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-20-right.png" />tpoi<img  class="null qmflag ownttip close qmflag-5" data-seq="1989" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-5-right.png" /><img  class="null qmflag ownttip open qmflag-8" data-seq="1993" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-8-left.png" />nt).<img  class="null qmflag ownttip close qmflag-19" data-seq="1988" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-right.png" /><img  class="null qmflag ownttip close qmflag-8" data-seq="1993" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-8-right.png" />';
+
     /**
      * Setting up the test task by fresh import, adds the lector and translator users
      */
@@ -51,7 +54,8 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
         self::assertLogin('testmanager');
         $appState = self::assertTermTagger();
         self::assertNotContains('editor_Plugins_ManualStatusCheck_Bootstrap', $appState->pluginsLoaded, 'Plugin ManualStatusCheck may not be activated for this test case!');
-        $api->addImportFile('editorAPI/CsvEncodingTest/CSV-test.zip');
+        $zipfile = self::zipTestFiles('editorAPI/CsvEncodingTest/CSV-testfiles','CSV-test.zip');
+        $api->addImportFile($zipfile);
         $api->import($task);
         
         $api->addUser('testlector');
@@ -69,13 +73,13 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
             'runtimeOptions.import.csv.delimiter' => ',',
             'runtimeOptions.import.csv.enclosure' => '"',
             'runtimeOptions.import.csv.fields.mid' => 'mid',
-            'runtimeOptions.import.csv.fields.source' => 'source',
+            'runtimeOptions.import.csv.fields.source' => 'quelle',
             'runtimeOptions.editor.notification.saveXmlToFile' => 1,
         );
         
         foreach($tests as $name => $value) {
             $config = $this->api()->requestJson('editor/config', 'GET', array(
-                'filter' => '[{"type":"string","value":"'.$name.'","field":"name"}]',
+                'filter' => '[{"type":"string","value":"'.$name.'","property":"name","operator":"like"}]',
             ));
             $this->assertCount(1, $config);
             $this->assertEquals($value, $config[0]->value);
@@ -115,6 +119,7 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
         $removeDataSeq = function($text){
           return preg_replace('#data-seq="\d+"#', 'data-seq=""', $text);
         };
+        
         foreach($csvRows as $idx => $row) {
             //ignore last line
             if(empty($row)) {
@@ -129,9 +134,18 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
             $this->assertEquals($expectedTarget, $removeDataSeq($segments[$idx]->targetEdit));
             
             $segToEdit = $segments[$idx];
-            $segmentData = $this->api()->prepareSegmentPut('targetEdit', $expectedTarget.' - edited', $segToEdit->id);
+            $editedData = $expectedTarget.' - edited';
+            $segmentData = $this->api()->prepareSegmentPut('targetEdit', $editedData, $segToEdit->id);
             $this->api()->requestJson('editor/segment/'.$segToEdit->id, 'PUT', $segmentData);
         }
+        
+        //enter mqms in last row
+        end($csvRows);
+        $idx = key($csvRows);
+        $idx++; //compensate comment row removal
+        $segToEdit = $segments[$idx];
+        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $removeDataSeq(self::$mqmDataForInsert), $segToEdit->id);
+        $this->api()->requestJson('editor/segment/'.$segToEdit->id, 'PUT', $segmentData);
     }
     
     /**
@@ -155,7 +169,7 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
         //this revids has to be replaced before assertEqual
         $approvalFileContent = $this->api()->getFileContent('testCsvEncoding-assert-equal.xliff');
         $toCheck = $this->api()->replaceChangesXmlContent(file_get_contents($foundChangeFile));
-        file_put_contents('/home/marcstandard/Schreibtisch/temp/asdf.xml', $toCheck);
+        //file_put_contents('/home/marcstandard/Schreibtisch/temp/asdf.xml', $toCheck);
         $this->assertSame($approvalFileContent, $toCheck);
     }
     
