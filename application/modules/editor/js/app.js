@@ -162,7 +162,6 @@ Ext.application({
       });
       me.viewport.show();
       
-      me.getController('Fileorder').loadFileTree();//@todo bei ITL muss der load wiederum automatisch geschehen
       //vp.doLayout();
       //this.viewport.setLoading(true);
       /*
@@ -173,6 +172,7 @@ Ext.application({
       //disable logout normal Button
       me.beforeUnloadCalled = false;
       me.fireEvent('editorViewportOpened');
+      me.getController('Fileorder').loadFileTree();//@todo bei ITL muss der load wiederum automatisch geschehen
   },
   /**
    * Used to open a task directly without administration panel
