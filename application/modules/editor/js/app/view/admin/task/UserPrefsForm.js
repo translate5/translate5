@@ -39,6 +39,7 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
         fieldStep: '#UT#Workflow Schritt',
         fieldUsername: '#UT#Benutzer',
         fieldTargets: '#UT#vorhandene Spalten',
+        fieldNotEditContent: '#UT#Cannot edit content',
         fieldAnonymous: '#UT#anonymisierte Zieltextspalten',
         fieldVisibility: '#UT#Sichtbarkeit nicht editierbarer Zieltextspalten',
         btnSave: '#UT#Speichern',
@@ -74,6 +75,11 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
                     queryMode: 'local',
                     store: [['','']],//dummy entry to get correct fields
                     fieldLabel: me.strings.fieldUsername
+                },{
+                    xtype: 'checkboxfield',
+                    anchor: '100%',
+                    name: 'notEditContent',
+                    boxLabel: me.strings.fieldNotEditContent
                 },{
                     xtype: 'checkboxfield',
                     anchor: '100%',

@@ -40,6 +40,7 @@ Ext.define('Editor.model.admin.task.UserPref', {
     {name: 'taskGuid', type: 'string'},
     {name: 'workflow', type: 'string'},
     {name: 'workflowStep', type: 'string'},
+    {name: 'notEditContent', type: 'boolean'},
     {name: 'anonymousCols', type: 'boolean'},
     {name: 'visibility', type: 'string'},
     {name: 'userGuid', type: 'string'},
