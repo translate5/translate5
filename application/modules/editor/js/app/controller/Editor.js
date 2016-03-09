@@ -67,41 +67,8 @@ Ext.define('Editor.controller.Editor', {
           '#metapanel #watchSegmentBtn' : {
               click : 'toggleWatchSegment'
           },
-          '#metapanel #cancelSegmentBtn' : {
-              click : 'cancel'
-          },
-          '#metapanel #saveSegmentBtn' : {
-              click : 'save'
-          },
-          '#metapanel #saveNextSegmentBtn' : {
-              click : 'saveNext'
-          },
-          '#metapanel #savePreviousSegmentBtn' : {
-              click : 'savePrevious'
-          },
-          '#metapanel #goAlternateLeftBtn' : {
-              click : 'goToAlternate'
-          },
-          '#metapanel #goAlternateRightBtn' : {
-              click : 'goToAlternate'
-          },
-          '#metapanel #goToLowerByWorkflowNoSaveBtn' : {
-              click : 'goToLowerByWorkflowNoSave'
-          },
-          '#metapanel #goToUpperByWorkflowNoSaveBtn' : {
-              click : 'goToUpperByWorkflowNoSave'
-          },
-          '#metapanel #goToLowerNoSaveBtn' : {
-              click : 'goToLowerNoSave'
-          },
-          '#metapanel #goToUpperNoSaveBtn' : {
-              click : 'goToUpperNoSave'
-          },
-          '#metapanel #saveNextByWorkflowBtn' : {
-              click : 'saveNextByWorkflow'
-          },
-          '#metapanel #resetSegmentBtn' : {
-              click : 'resetSegment'
+          '#metapanel button' : {
+              click : 'buttonClickDispatcher'
           },
           'segmentsHtmleditor': {
               initialize: 'initEditor',
@@ -120,6 +87,7 @@ Ext.define('Editor.controller.Editor', {
       me.keyMapConfig = {
           'ctrl-d':         ["D",{ctrl: true, alt: false}, me.toggleWatchSegment, true],
           'ctrl-s':         ["S",{ctrl: true, alt: false}, me.save, true],
+          'ctrl-g':         ["G",{ctrl: true, alt: false}, me.scrollToSegment, true],
           'ctrl-enter':     [[10,13],{ctrl: true, alt: false}, me.saveNextByWorkflow],
           'ctrl-alt-enter': [[10,13],{ctrl: true, alt: true, shift: false}, me.saveNext],
           'ctrl-alt-shift-enter': [[10,13],{ctrl: true, alt: true, shift: true}, me.savePrevious],
@@ -242,6 +210,13 @@ Ext.define('Editor.controller.Editor', {
         target: docEl,
         binding: me.getKeyMapConfig()
       });
+  },
+  buttonClickDispatcher: function(btn, e) {
+      var me = this,
+          action = btn.itemId && btn.itemId.replace(/Btn$/, '');
+      if(action && Ext.isFunction(me[action])) {
+          me[action](btn, e);
+      }
   },
   /**
    * Handler for save Button
@@ -603,10 +578,14 @@ Ext.define('Editor.controller.Editor', {
   /**
    * Move the editor about one editable field
    */
-  goToAlternate: function(btn, ev) {
-    var me = this,
-        direction = (btn.itemId == 'goAlternateLeftBtn' ? -1 : 1);
-    me.goToCustom(direction, true);    
+  goAlternateRight: function(btn, ev) {
+    this.goToCustom(1, true);
+  },
+  /**
+   * Move the editor about one editable field
+   */
+  goAlternateLeft: function(btn, ev) {
+    this.goToCustom(-1, true);
   },
   /**
    * Move the editor about one editable field left
@@ -665,6 +644,19 @@ Ext.define('Editor.controller.Editor', {
       foundIdx: foundIdx
     };
   },
+  
+  /**
+   * brings the currently opened segment back into the view.
+   */
+  scrollToSegment: function(key, e) {
+      var me = this,
+          plug = me.getEditPlugin();
+      e.preventDefault();
+      e.stopEvent();
+      plug.editor.setMode(plug.self.STARTEDIT_SCROLLUNDER);
+      plug.editor.initialPositioning();
+  },
+  
   /**
    * resets the htmleditor content to the original content
    */

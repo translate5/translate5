@@ -59,6 +59,7 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
     //Item Strings:
     item_startWatchingSegment: '#UT#Segment auf die Merkliste setzen (STRG + D)',
     item_stopWatchingSegment: '#UT#Segment von der Merkliste entfernen (STRG + D)',
+    item_scrollToSegment: '#UT#Zur Bearbeitung geöffnetes Segment wieder in den Sichtbereich bewegen (STRG + D)',
     item_cancel: '#UT#Abbrechen (ESC)',
     item_reset: '#UT#Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)',
     item_save: '#UT#Speichern (STRG + S)',
@@ -89,8 +90,6 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
       });
       useHNavArrow = editableCnt > 1;
       
-      
-      
       Ext.applyIf(me, {
         items: [{
             xtype: 'buttongroup',
@@ -100,23 +99,16 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
             },
             items: [{
                 xtype: 'button',
-                itemId: 'saveSegmentBtn',
+                itemId: 'saveBtn',
                 tooltip: tooltip(me.item_save),
                 icon: Editor.data.moduleFolder+'images/tick.png',
                 iconAlign: 'right'
             },{
                 xtype: 'button',
-                itemId: 'cancelSegmentBtn',
+                itemId: 'cancelBtn',
                 tooltip: tooltip(me.item_cancel),
                 icon: Editor.data.moduleFolder+'images/cross.png',
                 iconAlign: 'right'
-            },{
-                xtype: 'button',
-                itemId: 'goAlternateLeftBtn',
-                hidden: !useHNavArrow,
-                icon: Editor.data.moduleFolder+'images/arrow_left.png',
-                iconAlign: 'right',
-                tooltip: tooltip(me.item_alternateLeft)
             },{
                 xtype: 'button',
                 itemId: 'watchSegmentBtn',
@@ -132,11 +124,10 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
                 iconAlign: 'right'
             },{
                 xtype: 'button',
-                itemId: 'goAlternateRightBtn',
-                hidden: !useHNavArrow,
-                icon: Editor.data.moduleFolder+'images/arrow_right.png',
-                iconAlign: 'right',
-                tooltip: tooltip(me.item_alternateRight)
+                itemId: 'scrollToSegmentBtn',
+                tooltip: "FIXME",//FIXME tooltip(me.item_reset),
+                icon: Editor.data.moduleFolder+'images/scrollTo.png',
+                iconAlign: 'right'
             }]
         },{
             xtype: 'buttongroup',
@@ -145,9 +136,6 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
                 scale: 'small'
             },
             items: [{
-                xtype: 'button',
-                hidden: true
-            },{
                 xtype: 'button',
                 itemId: 'goToUpperByWorkflowNoSaveBtn',
                 icon: Editor.data.moduleFolder+'images/arrow_up_filtered_nosave.png ',
@@ -168,13 +156,13 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
             }]
         },{
             xtype: 'buttongroup',
-            columns: 2,
+            columns: useHNavArrow ? 3 : 2,
             defaults: {
                 scale: 'small'
             },
             items: [{
                 xtype: 'button',
-                itemId: 'savePreviousSegmentBtn',
+                itemId: 'savePreviousBtn',
                 icon: Editor.data.moduleFolder+'images/arrow_up.png',
                 iconAlign: 'right',
                 tooltip: tooltip(me.item_saveAndPrevious)
@@ -186,7 +174,14 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
                 tooltip: tooltip(me.item_prev)
             },{
                 xtype: 'button',
-                itemId: 'saveNextSegmentBtn',
+                itemId: 'goAlternateLeftBtn',
+                hidden: !useHNavArrow,
+                icon: Editor.data.moduleFolder+'images/arrow_left.png',
+                iconAlign: 'right',
+                tooltip: tooltip(me.item_alternateLeft)
+            },{
+                xtype: 'button',
+                itemId: 'saveNextBtn',
                 icon: Editor.data.moduleFolder+'images/arrow_down.png',
                 iconAlign: 'right',
                 tooltip: tooltip(me.item_saveAndNext)
@@ -196,6 +191,13 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
                 icon: Editor.data.moduleFolder+'images/arrow_down_nosave.png',
                 iconAlign: 'right',
                 tooltip: tooltip(me.item_next)
+            },{
+                xtype: 'button',
+                itemId: 'goAlternateRightBtn',
+                hidden: !useHNavArrow,
+                icon: Editor.data.moduleFolder+'images/arrow_right.png',
+                iconAlign: 'right',
+                tooltip: tooltip(me.item_alternateRight)
             }]
         }]
       });

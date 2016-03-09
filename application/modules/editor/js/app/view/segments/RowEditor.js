@@ -241,10 +241,8 @@ Ext.define('Editor.view.segments.RowEditor', {
     
     /**
      * sets the initial position of the roweditor after opening a segment
-     * @param {} animateConfig
-     * @param {} fromScrollHandler
      */
-    initialPositioning: function(animateConfig, fromScrollHandler){
+    initialPositioning: function(){
         var me = this,
             context = me.context,
             grid = me.editingPlugin.grid,
