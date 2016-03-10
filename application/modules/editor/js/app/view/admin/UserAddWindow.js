@@ -102,6 +102,7 @@ Ext.define('Editor.view.admin.UserAddWindow', {
         });
         
         config = {
+            title: me.title, //see EXT6UPD-9
             items : [{
                 xtype: 'form',
                 padding: 5,

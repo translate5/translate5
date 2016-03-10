@@ -79,6 +79,7 @@ Ext.define('Editor.view.admin.UserGrid', {
             return Editor.app.authenticatedUser.isAllowed(item.isAllowedFor);
         },
     config = {
+      title: me.title, //see EXT6UPD-9
       columns: [{
           xtype: 'gridcolumn',
           width: 100,

@@ -29,19 +29,19 @@ END LICENSE AND COPYRIGHT
 */
 
 Ext.define('Editor.view.admin.task.PreferencesWindow', {
-    extend : 'Ext.window.Window',
-    alias : 'widget.adminTaskPreferencesWindow',
+    extend: 'Ext.window.Window',
+    alias: 'widget.adminTaskPreferencesWindow',
     requires: ['Editor.view.admin.task.UserAssoc','Editor.view.admin.task.Preferences'],
-    itemId : 'adminTaskPreferencesWindow',
-    title : '#UT#Einstellungen zu Aufgabe "{0}"',
+    itemId: 'adminTaskPreferencesWindow',
+    title: '#UT#Einstellungen zu Aufgabe "{0}"',
     strings: {
         close: '#UT#Fenster schließen'
     },
-    height : 600,
-    width : 800,
+    height: 600,
+    width: 800,
     layout: 'fit',
-    modal : true,
-    initConfig : function(instanceConfig) {
+    modal: true,
+    initConfig: function(instanceConfig) {
         var me = this,
             auth = Editor.app.authenticatedUser,
             tabs = [],
@@ -58,8 +58,8 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                 xtype: 'editorAdminTaskPreferences'
             });
         }
-        me.title = Ext.String.format(me.title, me.initialConfig.actualTask.get('taskName'));
         config = {
+            title: Ext.String.format(me.title, me.initialConfig.actualTask.get('taskName')),
             items : [{
                 xtype: 'tabpanel',
                 activeTab: 0,

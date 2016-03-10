@@ -47,7 +47,7 @@ Ext.define('Editor.view.qmsubsegments.Window', {
     layout: 'fit',
     itemId: 'qmsummaryWindow',
     width: 1024,
-    title: 'QM Subsegment Statistik',
+    title: '#UT#QM Subsegment Statistik',
     modal: true,
     tab_title_field: '#UT# In Feld: {0}',
 
@@ -71,6 +71,17 @@ Ext.define('Editor.view.qmsubsegments.Window', {
         }
         
         me.callParent(arguments);
+    },
+    initConfig: function(instanceConfig) {
+        var me = this,
+            config = {
+                title: me.title //see EXT6UPD-9
+            };
+        
+        if (instanceConfig) {
+            me.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
     },
     getField: function(field) {
         var me = this;

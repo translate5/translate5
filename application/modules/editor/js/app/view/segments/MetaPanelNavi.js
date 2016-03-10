@@ -54,7 +54,6 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
     //bodyPadding: 10,
     //autoScroll: true,
     //frameHeader: false,
-    //title: 'Segment-Metadaten',
 
     //Item Strings:
     item_startWatchingSegment: '#UT#Segment auf die Merkliste setzen (STRG + D)',

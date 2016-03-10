@@ -52,6 +52,7 @@ Ext.define('Editor.view.preferences.UserWindow', {
     initConfig: function(instanceConfig) {
         var me = this,
             config = {
+                title: me.title, //see EXT6UPD-9
                 items: [{
                     xtype: 'form',
                     frame: true,

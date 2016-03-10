@@ -87,6 +87,7 @@ Ext.define('Editor.view.comments.Window', { //FIXME move from Window to panel
     initConfig : function(instanceConfig) {
         var me = this
         config = {
+                title: me.title, //see EXT6UPD-9
             items : [ {
                 xtype : 'container',
                 hidden: true,

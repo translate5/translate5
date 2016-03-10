@@ -66,7 +66,7 @@ Ext.define('Editor.view.segments.Grid', {
     cls: 'segment-tag-viewer',
     id: 'segment-grid',
   
-    title: 'Segmentliste und Editor',
+    title: '#UT#Segmentliste und Editor',
     
     tools: [
         {
@@ -273,6 +273,7 @@ Ext.define('Editor.view.segments.Grid', {
     initConfig: function(instanceConfig) {
             var me = this,
             config = {
+                title: me.title, //see EXT6UPD-9
                 viewConfig: {
                     //blockRefresh: true, //FIXME ext6: is this setting needed?
                     getRowClass: function(record, rowIndex, rowParams, store){

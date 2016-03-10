@@ -52,6 +52,7 @@ Ext.define('Editor.view.admin.task.Preferences', {
                 workflows.push([item.id, item.label]);
             });
         config = {
+                title: me.title, //see EXT6UPD-9
             items: [{
                 xtype: 'editorAdminTaskUserPrefsGrid',
                 region: 'center'

@@ -153,7 +153,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
   initComponent: function() {
     var me = this,
         actions;
- 
+
     me.userTipTpl = new Ext.XTemplate(
             '<tpl>',
             '<table class="task-users">',
@@ -219,6 +219,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
           relaisLanguages.unshift([0, me.strings.noRelaisLang]);
           
           config = {
+                  title: me.title, //see EXT6UPD-9
           languageStore: Ext.StoreMgr.get('admin.Languages'),
           columns: [{
               text: me.text_cols.taskActions,

@@ -45,7 +45,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
   layout: {
       type: 'border'
   },
-  title : '#UT#Benutzer zu Aufgabe zuordnen',
+  title: '#UT#Benutzer zu Aufgabe zuordnen',
   
   initConfig: function(instanceConfig) {
     var me = this,
@@ -61,6 +61,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
     });
     
     config = {
+      title: me.title, //see EXT6UPD-9
       items: [{
           xtype: 'adminTaskUserAssocGrid',
           region: 'center',

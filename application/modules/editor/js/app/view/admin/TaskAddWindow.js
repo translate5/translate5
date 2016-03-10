@@ -29,11 +29,11 @@ END LICENSE AND COPYRIGHT
 */
 
 Ext.define('Editor.view.admin.TaskAddWindow', {
-    extend : 'Ext.window.Window',
-    alias : 'widget.adminTaskAddWindow',
-    itemId : 'adminTaskAddWindow',
-    cls : 'adminTaskAddWindow',
-    title : '#UT#Aufgabe erstellen',
+    extend: 'Ext.window.Window',
+    alias: 'widget.adminTaskAddWindow',
+    itemId: 'adminTaskAddWindow',
+    cls: 'adminTaskAddWindow',
+    title: '#UT#Aufgabe erstellen',
     strings: {
         importUploadTip: '#UT#Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF; Angabe notwendig)',
         importUploadLabel: '#UT#Import Datei¹',
@@ -81,6 +81,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                 valueField: 'id'
             },
             config = {
+                title: me.title, //see EXT6UPD-9
             items : [{
                 xtype: 'form',
                 padding: 5,

@@ -76,6 +76,7 @@ Ext.define('Editor.view.admin.UserChooseWindow', {
             };
         }
         config = {
+                title: me.title, //see EXT6UPD-9
             items : [{
                 xtype: 'grid',
                 features: [{

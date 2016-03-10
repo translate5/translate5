@@ -47,7 +47,7 @@ Ext.define('Editor.view.segments.MetaPanel', {
     scrollable: 'y',
     frameHeader: false,
     id: 'segment-metadata',
-    title: 'Segment-Metadaten',
+    title: '#UT#Segment-Metadaten',
 
     layout: 'auto',
     
@@ -111,6 +111,17 @@ Ext.define('Editor.view.segments.MetaPanel', {
       me.callParent(arguments);
       me.addQualityFlags();
       me.addStateFlags();
+    },
+    initConfig: function(instanceConfig) {
+        var me = this,
+            config = {
+                title: me.title //see EXT6UPD-9
+            };
+        
+        if (instanceConfig) {
+            me.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
     },
     /**
      * Fügt anhand der php2js Daten die Status Felder hinzu

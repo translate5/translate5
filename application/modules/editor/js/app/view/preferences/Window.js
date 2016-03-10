@@ -40,10 +40,96 @@ END LICENSE AND COPYRIGHT
  * @initalGenerated
  */
 Ext.define('Editor.view.preferences.Window', {
-  extend: 'Editor.view.ui.preferences.Window',
+    extend: 'Ext.window.Window',
 
-  initComponent: function() {
-    var me = this;
-    me.callParent(arguments);
-  }
+    height: 274,
+    itemId: 'preferencesWindow',
+    width: 460,
+    resizable: false, //needed for boxLabel width
+    title: '#UT#Einstellungen',
+    modal: true,
+    
+    //Item Strings:
+    item_radiogroup_fieldLabel: 'Verhalten des Wiederholungseditor',
+    item_alikeBehaviour_always_boxLabel: 'Immer automatisch ersetzen und Status setzen',
+    item_alikeBehaviour_individual_boxLabel: 'Bei jeder Wiederholung einzeln entscheiden',
+    item_alikeBehaviour_never_boxLabel: 'Nie automatisch ersetzen und Status setzen',
+    item_cancelBtn: 'Abbrechen',
+    item_saveBtn: 'Speichern',
+    
+    initConfig: function(instanceConfig) {
+      var me = this,
+      config = {
+        title: me.title, //see EXT6UPD-9
+        items: [
+          {
+            xtype: 'form',
+            frame: true,
+            ui: 'default-framed',
+            bodyPadding: 10,
+            items: [
+              {
+                xtype: 'radiogroup',
+                fieldLabel: this.item_radiogroup_fieldLabel,
+                labelAlign: 'top',
+                columns: 1,
+                anchor: '100%',
+                items: [
+                  {
+                    xtype: 'radiofield',
+                    name: 'alikeBehaviour',
+                    width: 426, //needed for long labels to wrap
+                    boxLabel: this.item_alikeBehaviour_always_boxLabel,
+                    inputValue: 'always'
+                  },
+                  {
+                    xtype: 'radiofield',
+                    name: 'alikeBehaviour',
+                    width: 426, //needed for long labels to wrap
+                    boxLabel: this.item_alikeBehaviour_individual_boxLabel,
+                    inputValue: 'individual'
+                  },
+                  {
+                    xtype: 'radiofield',
+                    name: 'alikeBehaviour',
+                    width: 426, //needed for long labels to wrap
+                    boxLabel: this.item_alikeBehaviour_never_boxLabel,
+                    inputValue: 'never'
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        dockedItems: [
+          {
+            xtype: 'toolbar',
+            ui: 'footer',
+            dock: 'bottom',
+            layout: {
+              pack: 'end',
+              type: 'hbox'
+            },
+            items: [
+              {
+                xtype: 'button',
+                iconCls: 'ico-setting-save',
+                itemId: 'saveBtn',
+                text: this.item_saveBtn
+              },
+              {
+                xtype: 'button',
+                iconCls: 'ico-cancel',
+                itemId: 'cancelBtn',
+                text: this.item_cancelBtn
+              }
+            ]
+          }
+        ]
+      };
+      if (instanceConfig) {
+          me.getConfigurator().merge(me, config, instanceConfig);
+      }
+      return me.callParent([config]);
+    }
 });
