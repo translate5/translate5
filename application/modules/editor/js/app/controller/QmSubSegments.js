@@ -241,7 +241,8 @@ Ext.define('Editor.controller.QmSubSegments', {
     handleAddQmFlagKey: function(key) {
         var me = this,
             found = false,
-            menuitem = me.getMenuitemByQmId(me.menuConfig, key);
+            menuConfig = me.getQmFieldset().menuConfig,
+            menuitem = me.getMenuitemByQmId(menuConfig, key);
         
         if (menuitem)
         {
