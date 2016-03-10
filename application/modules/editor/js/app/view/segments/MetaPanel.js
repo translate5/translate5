@@ -44,11 +44,13 @@ Ext.define('Editor.view.segments.MetaPanel', {
     extend: 'Ext.panel.Panel',
 
     bodyPadding: 10,
-    autoScroll: true,
+    scrollable: 'y',
     frameHeader: false,
     id: 'segment-metadata',
     title: 'Segment-Metadaten',
 
+    layout: 'auto',
+    
     //Item Strings:
     item_metaQm_title: '#UT#QM',
     item_metaStates_title: '#UT#Status',
@@ -73,6 +75,7 @@ Ext.define('Editor.view.segments.MetaPanel', {
                     {
                       autoScroll: true,
                       xtype: 'panel',
+                      border: 0,
                       itemId: 'metaTermPanel',
                       cls: 'metaTermPanel',
                       loader: {

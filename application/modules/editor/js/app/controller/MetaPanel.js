@@ -147,7 +147,12 @@ Ext.define('Editor.controller.MetaPanel', {
     });
     
     me.record = record;
-    me.getMetaTermPanel().getLoader().load({params: {id: segmentId}});
+    me.getMetaTermPanel().getLoader().load({
+      params: {id: segmentId},
+      callback: function() {
+        me.getSegmentMeta().updateLayout();
+      }
+    });
     //bindStore(me.record.terms());
     me.loadRecord(me.record);
     navi.enable();
