@@ -103,5 +103,12 @@ Ext.define('Editor.store.Segments', {
       }
       
       return me.pageMetaData[page] && me.pageMetaData[page][direction];
+  },
+  /**
+   * Buffered Stores are not made to be editable, so we have to rework some needed methods here
+   * @see EXT6UPD-82
+   */
+  afterEdit: function(record, modifiedFieldNames) {
+      this.fireEvent('update', this, record, 'edit', modifiedFieldNames);
   }
 });

@@ -356,7 +356,6 @@ Ext.define('Editor.controller.Segments', {
    * @param {Integer} rowindex
    */
   resetSegmentSortForFileClick: function(idxToScrollTo) {
-      console.log("resetSegmentSortForFileClick");
       var me = this,
           grid = me.getSegmentGrid(),
           store = me.getSegmentsStore();
@@ -434,7 +433,6 @@ Ext.define('Editor.controller.Segments', {
    *    scope: the scope of the given callbacks 
    */
   saveChainStart: function(config) {
-    console.log("saveChainStart");
       var me = this,
           ed = me.getSegmentGrid().editingPlugin,
           record;
@@ -492,7 +490,6 @@ Ext.define('Editor.controller.Segments', {
       //FIXME check if this callback is called!
       //add a callback to complete this completeEdit call after successfull load of the alike segments
       op.handleReadAfterSave = function(){
-          console.log("called op.handleReadAfterSave");
           me.saveChainSave(record);   //NEXT step in save chain
           me.delLoadMask();
       };
