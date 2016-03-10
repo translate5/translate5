@@ -233,8 +233,8 @@ Ext.define('Editor.controller.Comments', {
       var me = this,
           comments = me.getCommentsStore(),
           rec = comments.getAt(rowIdx),
-          del = ev.getTarget('img.ico-comment-delete'),
-          edit = ev.getTarget('img.ico-comment-edit');
+          del = ev.getTarget('div.ico-comment-delete'),
+          edit = ev.getTarget('div.ico-comment-edit');
       if(!rec.get('isEditable')){
           return;
       }

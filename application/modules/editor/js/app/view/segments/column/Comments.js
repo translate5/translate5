@@ -73,17 +73,23 @@ Ext.define('Editor.view.segments.column.Comments', {
         }
         var value = Ext.String.htmlEncode(val);
         meta.tdAttr = 'data-qtip="'+value+'"';
-        return Editor.view.segments.column.Comments.getFirstComment(val) + '<img class="edit" src="'+Ext.BLANK_IMAGE_URL+'"'+tip+'>';
+        return '<img class="edit" src="'+Ext.BLANK_IMAGE_URL+'"'+tip+'>' + Editor.view.segments.column.Comments.getFirstComment(val);
     },
     editor: {
         xtype: 'displayfield',
         getModelData: function() {
             return null;
         },
+        cls: 'editor-comment-display',
         listeners: {
             'afterrender': function(field) {
                 var initTT = null;
                 Ext.widget('button', {
+                    style: {
+                        position: 'absolute',
+                        top: 0,
+                        right: 0
+                    },
                     iconCls: 'ico-comment-edit',
                     tooltip: Editor.view.segments.column.Comments.prototype.text_tooltip_icon,
                     itemId: 'editorCommentBtn', 

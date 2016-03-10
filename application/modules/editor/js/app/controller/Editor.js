@@ -75,8 +75,7 @@ Ext.define('Editor.controller.Editor', {
               contentErrors: 'handleSaveWithErrors'
           },
           '#segmentgrid': {
-              afterrender: 'initEditPluginHandler',
-              beforeselect: 'handleBeforeSelect'
+              afterrender: 'initEditPluginHandler'
           }
       }
   },
@@ -151,12 +150,6 @@ Ext.define('Editor.controller.Editor', {
           }
       });
       return false;
-  },
-  /**
-   * disables selection of readonly segments
-   */
-  handleBeforeSelect: function(sm, record) {
-      return !!record.get('editable');
   },
   /**
    * Gibt die RowEditing Instanz des Grids zurück
