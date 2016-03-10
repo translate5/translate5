@@ -251,7 +251,7 @@ Ext.define('Editor.controller.Comments', {
           }
           var id = rec.get('segmentId');
           rec.store.remove(rec);
-          rec.destroy({
+          rec.erase({
               callback: function(nothing, op) {
                   var errorHandler = Editor.app.getController('ServerException');
                   //reload comments if they are still shown to the user
