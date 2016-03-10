@@ -64,10 +64,10 @@ Ext.define('Editor.controller.Editor', {
   keyMapConfig: null,
   listen: {
       component: {
-          '#metapanel #watchSegmentBtn' : {
+          '#metapanelNavi #watchSegmentBtn' : {
               click : 'toggleWatchSegment'
           },
-          '#metapanel button' : {
+          '#metapanelNavi button' : {
               click : 'buttonClickDispatcher'
           },
           'segmentsHtmleditor': {
