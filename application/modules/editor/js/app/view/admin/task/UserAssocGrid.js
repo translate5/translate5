@@ -65,8 +65,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
   //***********************************************************************************
   initConfig: function(instanceConfig) {
     var me = this,
-        config,
-        wf = me.initialConfig.actualTask.getWorkflowMetaData();
+        config;
     
     config = {
       columns: [{
@@ -85,7 +84,8 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
           width: 90,
           dataIndex: 'role',
           renderer: function(v) {
-              return wf.roles[v];
+              var vm = this.lookupViewModel();
+              return vm.get('workflowMetadata').roles[v];
           },
           text: me.strings.roleCol
       },{
@@ -93,7 +93,8 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
           width: 90,
           dataIndex: 'state',
           renderer: function(v) {
-              return wf.states[v];
+              var vm = this.lookupViewModel();
+              return vm.get('workflowMetadata').states[v];
           },
           text: me.strings.stateCol
       }],

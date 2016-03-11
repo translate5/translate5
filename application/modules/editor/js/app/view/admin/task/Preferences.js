@@ -44,16 +44,16 @@ Ext.define('Editor.view.admin.task.Preferences', {
     workflow_label: '#UT#Workflow',
     editInfo: '#UT#Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!',
 
-    initConfig: function(instanceConfig) {
+    initComponent: function() {
         var me = this,
-            config,
-            workflows = [];
-            Ext.Object.each(Editor.data.app.workflows, function(key, item) {
-                workflows.push([item.id, item.label]);
-            });
-        config = {
-                title: me.title, //see EXT6UPD-9
-            items: [{
+            workflows = [],
+            task = me.lookupViewModel().get('currentTask');
+        
+        Ext.Object.each(Editor.data.app.workflows, function(key, item) {
+            workflows.push([item.id, item.label]);
+        });
+            
+        me.items = [{
                 xtype: 'editorAdminTaskUserPrefsGrid',
                 region: 'center'
             },{
@@ -67,7 +67,7 @@ Ext.define('Editor.view.admin.task.Preferences', {
                     forceSelection: true,
                     editable: false,
                     fieldLabel: me.workflow_label,
-                    value: me.initialConfig.actualTask.get('workflow'),
+                    value: task.get('workflow'),
                     store: workflows
                 }]
             },{
@@ -86,9 +86,14 @@ Ext.define('Editor.view.admin.task.Preferences', {
                     xtype: 'editorAdminTaskUserPrefsForm',
                     hidden: true
                 }]
-            }]
-        };
-
+            }];
+        me.callParent(arguments);
+    },
+    initConfig: function(instanceConfig) {
+        var me = this,
+            config = {
+                title: me.title //see EXT6UPD-9
+            };
         if (instanceConfig) {
             me.getConfigurator().merge(me, config, instanceConfig);
         }

@@ -159,7 +159,8 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
      */
     loadRecord: function(rec, FOR_ALL) {
         var me = this,
-            fields = me.actualTask.segmentFields().collect('name'),
+            task = me.lookupViewModel().get('currentTask'),
+            fields = task.segmentFields().collect('name'),
             checked = rec.get('fields').split(','),
             toSet = {},
             wfLabel,

@@ -104,10 +104,8 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
               change: me.comboChange
           },
           'editorAdminTaskUserPrefsForm': {
-              beforerender: me.setActualTaskInCmp
           },
           'editorAdminTaskUserPrefsGrid': {
-              beforerender: me.setActualTaskInCmp,
               confirmDelete: me.handleDeleteConfirmClick,
               selectionchange: me.handleAssocSelection
           },
@@ -428,19 +426,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
               name: 'fields'
           });
       });
-  },
-  /**
-   * sets a reference of the actual task in the given component
-   * @param {Ext.AbstractComponent} cmp
-   */
-  setActualTaskInCmp: function(cmp) {
-      var me = this,
-          labels = {};
-      cmp.actualTask = me.actualTask;
-      me.actualTask.segmentFields().each(function(field){
-          labels[field.get('name')] = field.get('label');
-      });
-      cmp.fieldLabels = labels;
   },
   clearStores: function() {
       this.getAdminTaskUserPrefsStore().removeAll();

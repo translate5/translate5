@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.view.admin.task.UserAssoc', {
   extend: 'Ext.panel.Panel',
-  requires: ['Editor.view.admin.task.UserAssocGrid'],
+  requires: ['Editor.view.admin.task.UserAssocGrid','Editor.view.admin.task.UserAssocViewModel'],
   alias: 'widget.adminTaskUserAssoc',
   strings: {
       fieldRole: '#UT#Rolle',
@@ -42,6 +42,9 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
       formTitleEdit: '#UT#Bearbeite Benutzer "{0}"',
       editInfo: '#UT#Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!'
   },
+  viewModel: {
+      type: 'taskuserassoc'
+  },
   layout: {
       type: 'border'
   },
@@ -49,23 +52,13 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
   
   initConfig: function(instanceConfig) {
     var me = this,
-        wf = me.initialConfig.actualTask.getWorkflowMetaData(),
-        states = [],
-        config,
-        roles = [];
-    Ext.Object.each(wf.states, function(key, state) {
-        states.push([key, state]);
-    });
-    Ext.Object.each(wf.roles, function(key, role) {
-        roles.push([key, role]);
-    });
-    
+        config;
+
     config = {
       title: me.title, //see EXT6UPD-9
       items: [{
           xtype: 'adminTaskUserAssocGrid',
-          region: 'center',
-          actualTask: me.initialConfig.actualTask
+          region: 'center'
       },{
           xtype: 'container',
           region: 'east',
@@ -91,11 +84,9 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                   listConfig: {
                       loadMask: false
                   },
-                  store: Ext.create('Ext.data.Store', {
-                      model: 'Editor.model.admin.User',
-                      autoLoad: false,
-                      pageSize: 0
-                  }),
+                  bind: {
+                      store: '{users}'
+                  },
                   forceSelection: true,
                   queryMode: 'local',
                   name: 'userGuid',
@@ -111,7 +102,10 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                   queryMode: 'local',
                   name: 'role',
                   fieldLabel: me.strings.fieldRole,
-                  store: roles
+                  valueField: 'id',
+                  bind: {
+                      store: '{roles}'
+                  }
               },{
                   anchor: '100%',
                   xtype: 'combo',
@@ -121,7 +115,10 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                   name: 'state',
                   queryMode: 'local',
                   fieldLabel: me.strings.fieldState,
-                  store: states
+                  valueField: 'id',
+                  bind: {
+                      store: '{states}'
+                  }
               }],
               dockedItems: [{
                   xtype: 'toolbar',
@@ -150,6 +147,23 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
         me.getConfigurator().merge(me, config, instanceConfig);
     }
     return me.callParent([config]);
+  },
+  initComponent: function() {
+      var me = this,
+          vm = me.lookupViewModel(),
+          states = [],
+          roles = [],
+          metaData = vm.get('currentTask').getWorkflowMetaData();
+      
+      Ext.Object.each(metaData.states, function(key, state) {
+          states.push({id: key, text: state});
+      });
+      Ext.Object.each(metaData.roles, function(key, role) {
+          roles.push({id: key, text: role});
+      });
+      vm.set('statesData', states);
+      vm.set('rolesData', roles);
+      me.callParent(arguments);
   },
   /**
    * loads all or all available users into the dropdown, the store is reused to get the username to userguids

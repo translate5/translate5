@@ -76,11 +76,10 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                     dataIndex: 'workflowStep',
                     text: me.strings.colStep,
                     renderer: function(v, meta, rec) {
-                        var meta;
+                        var meta = this.lookupViewModel().get('workflowMetadata');
                         if(v.length == 0) {
                             return me.strings.defaultEntry;
                         }
-                        meta = me.initialConfig.actualTask.getWorkflowMetaData();
                         return meta.steps[v] || v;
                     }
                 },
@@ -106,16 +105,19 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                         var fields = value.split(','),
                             cnt = 0,
                             result = [],
+                            task = this.lookupViewModel().get('currentTask'),
                             visible = 0;
-                        Ext.Object.each(this.fieldLabels, function(k, v){
+                        
+                        task.segmentFields().each(function(field){
                             cnt++;
-                            if(Ext.Array.indexOf(fields, k) >= 0) {
-                                result.push(v);
+                            if(Ext.Array.indexOf(fields, field.get('name')) >= 0) {
+                                result.push(field.get('label'));
                                 visible++;
                             } else {
-                                result.push('<strike>'+v+'</strike>');
+                                result.push('<strike>'+field.get('label')+'</strike>');
                             }
                         });
+                        
                         metaData.tdAttr = 'data-qtip="'+result.join('<br />')+'"';
 
                         return cnt+' ('+visible+')';
