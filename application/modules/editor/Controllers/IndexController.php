@@ -319,7 +319,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $controllers[] = 'MetaPanel';
         $controllers[] = 'Editor';
         $controllers[] = 'Fileorder';
-        //$controllers[] = 'Localizer';
         $controllers[] = 'ChangeAlike';
         $controllers[] = 'Comments';
         //without plugins!!!
@@ -330,7 +329,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $controllers[] = 'admin.TaskPreferences';
         $controllers[] = 'admin.TaskUserAssoc';
         $controllers[] = 'admin.User';
-        $controllers[] = 'ServerException';
         $controllers[] = 'Localizer';
         return $controllers;
         

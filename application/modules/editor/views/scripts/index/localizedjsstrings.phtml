@@ -120,7 +120,7 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.fileorder.Tree.prototype.title = '<?php echo $this->translate->_('Arbeits-Dateien');?>';
   	Editor.view.fileorder.ReferenceTree.prototype.title = '<?php echo $this->translate->_('Referenz-Dateien');?>';
 
-  	Editor.view.ui.preferences.Window.prototype.title = '<?php echo $this->translate->_('Einstellungen');?>';
+  	Editor.view.preferences.Window.prototype.title = '<?php echo $this->translate->_('Einstellungen');?>';
   	<?php
         if($config->runtimeOptions->editor->enableQmSubSegments){
         ?>
@@ -145,12 +145,12 @@ Ext.define('Editor.controller.Localizer', {
 		severity: '<?php echo $this->translate->_('Gewichtung');?>'
 	};
   	
-  	Editor.view.ui.preferences.Window.prototype.item_radiogroup_fieldLabel = '<?php echo $this->translate->_('Verhalten des Wiederholungseditor');?>';
-    Editor.view.ui.preferences.Window.prototype.item_alikeBehaviour_always_boxLabel = '<?php echo $this->translate->_('Immer automatisch ersetzen und Status setzen');?>';
-    Editor.view.ui.preferences.Window.prototype.item_alikeBehaviour_individual_boxLabel = '<?php echo $this->translate->_('Bei jeder Wiederholung einzeln entscheiden');?>';
-    Editor.view.ui.preferences.Window.prototype.item_alikeBehaviour_never_boxLabel = '<?php echo $this->translate->_('Nie automatisch ersetzen und Status setzen');?>';
-    Editor.view.ui.preferences.Window.prototype.item_cancelBtn = '<?php echo $this->translate->_('Abbrechen');?>';
-    Editor.view.ui.preferences.Window.prototype.item_saveBtn = '<?php echo $this->translate->_('Speichern');?>';
+  	Editor.view.preferences.Window.prototype.item_radiogroup_fieldLabel = '<?php echo $this->translate->_('Verhalten des Wiederholungseditor');?>';
+    Editor.view.preferences.Window.prototype.item_alikeBehaviour_always_boxLabel = '<?php echo $this->translate->_('Immer automatisch ersetzen und Status setzen');?>';
+    Editor.view.preferences.Window.prototype.item_alikeBehaviour_individual_boxLabel = '<?php echo $this->translate->_('Bei jeder Wiederholung einzeln entscheiden');?>';
+    Editor.view.preferences.Window.prototype.item_alikeBehaviour_never_boxLabel = '<?php echo $this->translate->_('Nie automatisch ersetzen und Status setzen');?>';
+    Editor.view.preferences.Window.prototype.item_cancelBtn = '<?php echo $this->translate->_('Abbrechen');?>';
+    Editor.view.preferences.Window.prototype.item_saveBtn = '<?php echo $this->translate->_('Speichern');?>';
 
     Editor.view.segments.MetaPanel.prototype.title = '<?php echo $this->translate->_('Segment-Metadaten');?>';
     Editor.view.segments.MetaPanel.prototype.item_metaQm_title = '<?php echo $this->translate->_('QM');?>';
@@ -290,53 +290,53 @@ Ext.define('Editor.controller.Localizer', {
       "delete":       {title: "<?php echo $this->translate->_('Aufgabe komplett löschen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?');?>"}
     };
 
-    var tg = Editor.view.admin.TaskGrid.prototype;
-    tg.title = '<?php echo $this->translate->_('Aufgabenübersicht');?>';
-    
-    tg.states = {
-        user_state_open: '<?php echo $this->translate->_('offen');?>',
-        locked: '<?php echo $this->translate->_('in Arbeit');?>',
-        user_state_waiting: '<?php echo $this->translate->_('wartend');?>',
-        user_state_finished: '<?php echo $this->translate->_('abgeschlossen');?>',
-        task_state_end: '<?php echo $this->translate->_('beendet');?>',
-        task_state_import: '<?php echo $this->translate->_('import');?>',
-        forMe: '<?php echo $this->translate->_('für mich ');?>'
-    };
-    
-    tg.strings = {
-      ended: '<?php echo $this->translate->_('beendet');?>',
-      noUsers: '<?php echo $this->translate->_('Keine Benutzer zugeordnet!');?>',
-      locked: '<?php echo $this->translate->_('in Arbeit');?>',
-      lockedBy: '<?php echo $this->translate->_('Bearbeitet und Gesperrt durch {0}');?>',
-      lockedSystem: '<?php echo $this->translate->_('Durch das System gesperrt mit dem Status \'{0}\'');?>',
-      addTask: '<?php echo $this->translate->_('Aufgabe hinzufügen');?>',
-      addTaskTip: '<?php echo $this->translate->_('Eine neue Aufgabe hinzufügen.');?>',
-      reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
-      reloadBtnTip: '<?php echo $this->translate->_('Aufgabenliste vom Server aktualisieren.');?>',
-      noRelaisLang: '<?php echo $this->translate->_('- Ohne Relaissprache -');?>'
-    };
-    
-    tg = tg.text_cols;
-    tg.taskNr = '<?php echo $this->translate->_('Auftragsnr.');?>';
-    tg.taskName = '<?php echo $this->translate->_('Aufgabenname');?>';
-    tg.taskActions = '<?php echo $this->translate->_('Aktionen');?>';
-    tg.sourceLang = '<?php echo $this->translate->_('Quellsprache');?>';
-    tg.relaisLang = '<?php echo $this->translate->_('Relaissprache');?>';
-    tg.targetLang = '<?php echo $this->translate->_('Zielsprache');?>';
-    tg.state = '<?php echo $this->translate->_('Status');?>';
-    tg.pmGuid = '<?php echo $this->translate->_('Projektmanager');?>';
-    tg.users = '<?php echo $this->translate->_('Benutzer');?>';
-    tg.wordCount = '<?php echo $this->translate->_('Wörter');?>';
-    tg.wordCountTT = '<?php echo $this->translate->_('Anzahl Wörter');?>';
-    tg.fileCount = '<?php echo $this->translate->_('Dateien');?>';
-    tg.targetDeliveryDate = '<?php echo $this->translate->_('Lieferdatum (soll)');?>';
-    tg.realDeliveryDate = '<?php echo $this->translate->_('Lieferdatum (ist)');?>';
-    tg.referenceFiles = '<?php echo $this->translate->_('Referenzdateien');?>';
-    tg.terminologie = '<?php echo $this->translate->_('Terminologie');?>';
-    tg.fullMatchEdit = '<?php echo $this->translate->_('100% Matches sind editierbar');?>';
-    tg.lockLocked = '<?php echo $this->translate->_('In importierter Datei gesperrte Segmente sind in translate5 gesperrt');?>';
-    tg.orderdate = '<?php echo $this->translate->_('Bestelldatum');?>';
-    tg.enableSourceEditing = '<?php echo $this->translate->_('Quellsprache bearbeitbar');?>';
+    Ext.define("Editor.locale.de.view.admin.TaskGrid", {
+        override: "Editor.view.admin.TaskGrid",
+        title: '<?php echo $this->translate->_('Aufgabenübersicht');?>',
+        states: {
+            user_state_open: '<?php echo $this->translate->_('offen');?>',
+            locked: '<?php echo $this->translate->_('in Arbeit');?>',
+            user_state_waiting: '<?php echo $this->translate->_('wartend');?>',
+            user_state_finished: '<?php echo $this->translate->_('abgeschlossen');?>',
+            task_state_end: '<?php echo $this->translate->_('beendet');?>',
+            task_state_import: '<?php echo $this->translate->_('import');?>',
+            forMe: '<?php echo $this->translate->_('für mich ');?>'
+        },
+        strings: {
+            ended: '<?php echo $this->translate->_('beendet');?>',
+            noUsers: '<?php echo $this->translate->_('Keine Benutzer zugeordnet!');?>',
+            locked: '<?php echo $this->translate->_('in Arbeit');?>',
+            lockedBy: '<?php echo $this->translate->_('Bearbeitet und Gesperrt durch {0}');?>',
+            lockedSystem: '<?php echo $this->translate->_('Durch das System gesperrt mit dem Status \'{0}\'');?>',
+            addTask: '<?php echo $this->translate->_('Aufgabe hinzufügen');?>',
+            addTaskTip: '<?php echo $this->translate->_('Eine neue Aufgabe hinzufügen.');?>',
+            reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
+            reloadBtnTip: '<?php echo $this->translate->_('Aufgabenliste vom Server aktualisieren.');?>',
+            noRelaisLang: '<?php echo $this->translate->_('- Ohne Relaissprache -');?>'
+        },
+        text_cols: {
+            taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',
+            taskName: '<?php echo $this->translate->_('Aufgabenname');?>',
+            taskActions: '<?php echo $this->translate->_('Aktionen');?>',
+            sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
+            relaisLang: '<?php echo $this->translate->_('Relaissprache');?>',
+            targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
+            state: '<?php echo $this->translate->_('Status');?>',
+            pmGuid: '<?php echo $this->translate->_('Projektmanager');?>',
+            users: '<?php echo $this->translate->_('Benutzer');?>',
+            wordCount: '<?php echo $this->translate->_('Wörter');?>',
+            wordCountTT: '<?php echo $this->translate->_('Anzahl Wörter');?>',
+            fileCount: '<?php echo $this->translate->_('Dateien');?>',
+            targetDeliveryDate: '<?php echo $this->translate->_('Lieferdatum (soll)');?>',
+            realDeliveryDate: '<?php echo $this->translate->_('Lieferdatum (ist)');?>',
+            referenceFiles: '<?php echo $this->translate->_('Referenzdateien');?>',
+            terminologie: '<?php echo $this->translate->_('Terminologie');?>',
+            fullMatchEdit: '<?php echo $this->translate->_('100% Matches sind editierbar');?>',
+            lockLocked: '<?php echo $this->translate->_('In importierter Datei gesperrte Segmente sind in translate5 gesperrt');?>',
+            orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
+            enableSourceEditing: '<?php echo $this->translate->_('Quellsprache bearbeitbar');?>'
+        }
+    });
     
     Editor.view.admin.TaskAddWindow.prototype.title = '<?php echo $this->translate->_('Aufgabe erstellen');?>';
     Editor.view.admin.TaskAddWindow.prototype.strings = {
@@ -466,11 +466,17 @@ Ext.define('Editor.controller.Localizer', {
     }//END if($hasFrontendController('Editor.controller.HeadPanel'))
     if($hasFrontendController('Editor.controller.UserPreferences')) {
 ?>
+    
     Editor.controller.UserPreferences.prototype.strings = {
         settings: '<?php echo $this->translate->_('Meine Einstellungen');?>',
         pwSave: '<?php echo $this->translate->_('Passwort erfolgreich gespeichert!');?>'
     };
-    Editor.view.preferences.UserWindow.prototype.title = '<?php echo $this->translate->_('Meine Einstellungen');?>';
+    
+    Ext.define("Editor.locale.de.preferences.UserWindow", {
+        override: "Editor.view.preferences.UserWindow",
+        title: '<?php echo $this->translate->_('Meine Einstellungen');?>'
+    });
+    
     Editor.view.preferences.UserWindow.prototype.strings = {
         editPassword: '<?php echo $this->translate->_('Passwort ändern');?>',
         password: '<?php echo $this->translate->_('Passwort');?>',
