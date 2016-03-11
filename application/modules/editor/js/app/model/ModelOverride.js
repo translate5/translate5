@@ -38,24 +38,6 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.model.ModelOverride', {
     override: 'Ext.data.Model',
     /**
-     * reloads a single model instance
-     * @param {Object} config object, same as for load
-     * @return {Ext.data.Model}
-     */
-    reload: function(config) {
-        config = Ext.apply({}, config);
-        var me = this,
-            scope = config.scope || this,
-            success = config.success || Ext.emptyFn;
-        
-        config.success = function(rec) {
-            Ext.callback(success, scope, arguments);
-            me.set(rec.data);
-            me.commit(true);
-        };
-        return me.self.load(me.get(me.idProperty), config);
-    },
-    /**
      * save method with version check: give the entity or version to be compared against
      * @see TRANSLATE-206 for more information
      * @param {Integer}|{Ext.data.Model} version version number or model with version to be compared against on the server

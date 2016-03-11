@@ -215,7 +215,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
                   me.updateUsers(store);
                   me.fireEvent('addUserAssoc', me, rec, store);
               }
-              task.reload();//reload only the task, not the whole task prefs, should be OK
+              task.load();//reload only the task, not the whole task prefs, should be OK
               Editor.MessageBox.addSuccess(me.messages.assocSave);
               me.getPrefWindow().setLoading(false);
           },

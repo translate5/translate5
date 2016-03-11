@@ -240,7 +240,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           if(!task.isImporting()){
               return;
           }
-          task.reload({
+          task.load({
               success: taskReloaded
           });
           foundImporting++;

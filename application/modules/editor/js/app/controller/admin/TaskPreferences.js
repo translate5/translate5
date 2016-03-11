@@ -519,7 +519,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
    */
   handleReload: function() {
       var me = this;
-      me.actualTask.reload({
+      me.actualTask.load({
           success: function(rec) {
               var combo = me.getTaskWorkflow(),
                   wf = rec.get('workflow');
