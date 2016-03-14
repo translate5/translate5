@@ -46,7 +46,7 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
     messages: {
         segmentNotSavedUserMessage: 'Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank!',
         cantSaveEmptySegment: '#UT#Das Segment kann nicht ohne Inhalt gespeichert werden!',
-        cantEditContents: '#UT#Es ist Ihnen nicht erlaubt, den Segmentinhalt zu editieren. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das editieren des Segments ab.'
+        cantEditContents: '#UT#Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.'
     },
     listeners: {
         'afterlayout': 'onAfterLayout'
