@@ -849,6 +849,9 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <b
 %7$s</target></trans-unit>
 <trans-unit id='JXMgLSBiZWFyYmVpdGV0'><source>%s - bearbeitet</source><target>%s - bearbeitet</target></trans-unit>
 <trans-unit id='QXV0b1N0YXR1cw=='><source>AutoStatus</source><target>AutoStatus</target></trans-unit>
+<trans-unit id='RXMgaXN0IElobmVuIG5pY2h0IGVybGF1YnQsIGRlbiBTZWdtZW50aW5oYWx0IHp1IGJlYXJiZWl0ZW4uIEJpdHRlIHZlcndlbmRlbiBTaWUgU1RSRytaIHVtIElocmUgw4RuZGVydW5nZW4genVyw7xja3p1c2V0emVuIG9kZXIgYnJlY2hlbiBTaWUgZGFzIEJlYXJiZWl0ZW4gZGVzIFNlZ21lbnRzIGFiLg=='><source>Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.</source><target>Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.</target></trans-unit>
+<trans-unit id='RmlsdGVydGV4dCBlaW5nZWJlbi4uLg=='><source>Filtertext eingeben...</source><target>Filtertext eingeben...</target></trans-unit>
+<trans-unit id='TnVyIE1RTS10YWdzIGJlYXJiZWl0ZW4='><source>Nur MQM-tags bearbeiten</source><target>Nur MQM-tags bearbeiten</target></trans-unit>
   </body>
  </file>
 </xliff>

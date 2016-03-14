@@ -182,7 +182,8 @@ Ext.define('Editor.controller.Localizer', {
 
     Editor.view.segments.RowEditor.prototype.messages = {
         segmentNotSavedUserMessage: '<?php echo $this->translate->_('Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank! <br/><br/>Gerade bearbeiteter Text war:<br/><br/>');?>',
-        cantSaveEmptySegment: '<?php echo $this->translate->_('Das Segment kann nicht ohne Inhalt gespeichert werden!');?>'
+        cantSaveEmptySegment: '<?php echo $this->translate->_('Das Segment kann nicht ohne Inhalt gespeichert werden!');?>',
+        cantEditContents: '<?php echo $this->translate->_('Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.');?>'
     };
     Editor.view.segments.RowEditing.prototype.messages = {
         previousSegmentNotSaved: '<?php echo $this->translate->_('Das Segment konnte nicht zum Bearbeiten geöffnet werden, da das vorherige Segment noch nicht korrekt seine Speicherung beendet hatte. Bitte versuchen Sie es noch einmal. Sollte es dann noch nicht funktionieren, drücken Sie bitte F5. Vielen Dank!');?>',
@@ -564,6 +565,7 @@ Ext.define('Editor.controller.Localizer', {
         colStep: '<?php echo $this->translate->_('Workflow Schritt');?>',
         colUsername: '<?php echo $this->translate->_('Benutzer');?>',
         colTargets: '<?php echo $this->translate->_('Spalten (vorhanden)');?>',
+        colNotEditContent: '<?php echo $this->translate->_('Nur MQM-tags bearbeiten');?>',
         colAnonymous: '<?php echo $this->translate->_('Anonymisiert');?>',
         colVisibility: '<?php echo $this->translate->_('Sichtbarkeit');?>',
         add: '<?php echo $this->translate->_('Eintrag hinzufügen');?>',
@@ -580,6 +582,7 @@ Ext.define('Editor.controller.Localizer', {
         fieldStep: '<?php echo $this->translate->_('Workflow Schritt');?>',
         fieldUsername: '<?php echo $this->translate->_('Benutzer');?>',
         fieldTargets: '<?php echo $this->translate->_('vorhandene Spalten');?>',
+        fieldNotEditContent: '<?php echo $this->translate->_('Nur MQM-tags bearbeiten');?>',
         fieldAnonymous: '<?php echo $this->translate->_('anonymisierte Zieltextspalten');?>',
         fieldVisibility: '<?php echo $this->translate->_('Sichtbarkeit nicht editierbarer Zieltextspalten');?>',
         btnSave: '<?php echo $this->translate->_('Speichern');?>',
