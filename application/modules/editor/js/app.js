@@ -52,7 +52,8 @@ Ext.Ajax.timeout = 60000;
 Ext.override(Ext.data.proxy.Ajax, { timeout: 60000 });
 Ext.override(Ext.form.action.Action, { timeout: 60 });
 
-Ext.Loader.setPath('Editor.controller.Localizer', 'foo');
+Ext.Loader.setPath('Editor.controller.Localizer', Editor.data.basePath+'/editor/js/app-localized.js');
+Ext.Loader.setPath('Editor.plugins', Editor.data.pluginFolder);
 
 Editor.DATE_ISO_FORMAT = 'Y-m-d H:i:s';
 
