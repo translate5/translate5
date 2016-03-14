@@ -68,12 +68,12 @@ Ext.define('Editor.plugins.mtComparEval.model.Taskmeta', {
     type : 'rest',
     url: Editor.data.restpath+'taskmeta',
     reader : {
-      root: 'rows',
+      rootProperty: 'rows',
       type : 'json'
     },
     writer: {
       encode: true,
-      root: 'data',
+      rootProperty: 'data',
       writeAllFields: false
     }
   }

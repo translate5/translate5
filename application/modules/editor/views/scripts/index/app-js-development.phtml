@@ -58,16 +58,13 @@ $extPath = 'ext-6.0.0/build/';
 <script src="<?php echo $extPath;?>classic/locale/locale-de-debug.js"></script>
 <script src="<?php echo $this->publicModulePath; ?>/js/app/MessageBox.js"></script>
 <script>
-//Intercept setPath for developing systems, on production all works with above builded code 
+//Intercept setPath for developing systems, on production all should work with above builded code 
 Ext.Loader.setPathIntercepted = Ext.Loader.setPath;
-Ext.Loader.setPath = function() {
-    if(arguments[0] == 'Editor.controller.Localizer') {
-        return Ext.Loader.setPathIntercepted('Editor.controller.Localizer', '<?php echo APPLICATION_RUNDIR; ?>/editor/js/app-localized.js');
-    }
-    if(arguments[0] == 'Editor') {
+Ext.Loader.setPath = function(mod, path) {
+    if(mod == 'Editor') {
         return Ext.Loader.setPathIntercepted('Editor', 'modules/editor/js/app');
     }
-    return Ext.Loader.setPathIntercepted(arguments);
+    return Ext.Loader.setPathIntercepted(mod, path);
 };
 
 </script>

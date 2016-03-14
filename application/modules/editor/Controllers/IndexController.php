@@ -169,6 +169,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         $restPath = APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';
       $this->view->Php2JsVars()->set('restpath', $restPath);
+      $this->view->Php2JsVars()->set('basePath', APPLICATION_RUNDIR);
       $this->view->Php2JsVars()->set('moduleFolder', $this->view->publicModulePath.'/');
       $this->view->Php2JsVars()->set('appFolder', $this->view->publicModulePath.'/js/app');
       $this->view->Php2JsVars()->set('pluginFolder', $restPath.'plugins/js');
@@ -310,32 +311,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         $ed = $this->session->runtimeOptions->editor;
         
-        //FIXME ext6 update single controller testcode
-        $controllers = array();
-        $controllers[] = 'ServerException';
-        $controllers[] = 'ViewModes';
-        $controllers[] = 'Segments';
-        $controllers[] = 'Preferences';
-        $controllers[] = 'MetaPanel';
-        $controllers[] = 'Editor';
-        $controllers[] = 'Fileorder';
-        $controllers[] = 'ChangeAlike';
-        $controllers[] = 'Comments';
-        //without plugins!!!
-        $controllers[] = 'HeadPanel';
-        $controllers[] = 'UserPreferences';
-        $controllers[] = 'QmSubSegments';
-        $controllers[] = 'admin.TaskOverview';
-        $controllers[] = 'admin.TaskPreferences';
-        $controllers[] = 'admin.TaskUserAssoc';
-        $controllers[] = 'admin.User';
-        $controllers[] = 'Localizer';
-        return $controllers;
-        
-        //original code
         $controllers = array('ServerException', 'ViewModes', 'Segments', 
-            'Preferences', 'MetaPanel', 'Editor', 'Fileorder', 'Localizer',
-            'ChangeAlike', 'Comments', 'Editor');
+            'Preferences', 'MetaPanel', 'Editor', 'Fileorder',
+            'ChangeAlike', 'Comments');
         
         $pm = Zend_Registry::get('PluginManager');
         $pluginFrontendControllers = $pm->getActiveFrontendControllers();
@@ -361,6 +339,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             $controllers[] = 'admin.TaskUserAssoc';
             $controllers[] = 'admin.User';
         }
+
+        //Localizer must be the last one!
+        $controllers[] = 'Localizer';
         return $controllers;
     }
     
