@@ -171,7 +171,17 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         return true;
     },
     onAfterLayout: function() {
-        this.focusContextCell();
+        var me = this, 
+            toDis = me.linkedDisplayField,
+            pos;
+            
+        if(!me.mainEditor || !toDis) {
+            return;
+        }
+            
+        pos = toDis.getPosition(true);
+        //swap position
+        me.repositionMainEditor(pos[0]);
     },
     /**
      * overrides original focusing with our repositioning of the editor
@@ -215,13 +225,14 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
             return;
         }
         
+        me.isRunningHorizontalScrolling = true;
         if(edReg.right > gridReg.right) {
             offset = -1 * gridReg.getOutOfBoundOffsetX(edReg.right) + 10;
-            view.scrollBy(offset, 0, true);
+            view.scrollBy(offset, 0, false);
         }
         else {
             offset = -1 * gridReg.getOutOfBoundOffsetX(edReg.x) - 10;
-            view.scrollBy(offset, 0, true);
+            view.scrollBy(offset, 0, false);
         }
     },
     setEditorHeight: function() {
@@ -285,7 +296,6 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
      * @returns {Boolean}
      */
     completeEdit: function() {
-        console.trace();
         var me = this,
             rec = me.context.record;
 

@@ -103,7 +103,7 @@ Ext.define('Editor.controller.Editor', {
           'ctrl-alt-c':     ["C",{ctrl: true, alt: true}, me.handleOpenComments, true],
           'alt-DIGIT':      [decDigits,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
           'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
-          'pos1':           [Ext.EventObjectImpl.HOME,{ctrl: false, alt: false}, me.handleHomeKeyPress, true]
+          'pos1':           null //add empty pos1 handler here, so that the overwrite is processed
       };
   },
   /**
@@ -121,6 +121,7 @@ Ext.define('Editor.controller.Editor', {
       me.getEditPlugin().on('edit', disableEditing)
       
       new Ext.util.KeyMap(Ext.getDoc(), me.getKeyMapConfig({
+          'pos1': [Ext.EventObjectImpl.HOME,{ctrl: false, alt: false}, me.handleHomeKeyPress, true],
           'ctrl-alt-c':     ["C",{ctrl: true, alt: true}, function(key, e){
               var me = this;
               if(me.isEditing) {
@@ -133,7 +134,7 @@ Ext.define('Editor.controller.Editor', {
               if(found && (found.hasCls('add') || found.hasCls('edit'))){
                   found.dom.click();
               }
-          }],
+          }]
       }));
   },
   /**
@@ -242,7 +243,7 @@ Ext.define('Editor.controller.Editor', {
           ed = me.getEditPlugin(),
           res;
       
-      if (ret.isBorderReached) {
+      if (!ret.existsNextSegment && ret.isBorderReached) {
           Editor.MessageBox.addInfo(ret.errorText);
           return;
       }
