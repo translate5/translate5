@@ -9,11 +9,11 @@
 
 <trans-unit id="2" translate5:autostateId="1" translate5:autostateText="reviewed">
 <source>Text containing an &amp; ampersand</source>
-<target dx:match-quality="0.0">Text mit einem &amp; Ampersand</target>
+<target dx:match-quality="0.0">Text mit einem &amp; Ampersand - edited</target>
 <alt-trans dx:origin-shorttext="target" alttranstype="previous-version">
 <target xml:lang="de">Text mit einem &amp; Ampersand</target></alt-trans>
 <alt-trans dx:origin-shorttext="target-diff" alttranstype="reference">
-<target xml:lang="de">Text mit einem &amp; Ampersand</target></alt-trans>
+<target xml:lang="de">Text mit einem &amp; Ampersand<mrk mtype="x-sdl-added" sdl:revid="replaced-for-testing"> - edited</mrk></target></alt-trans>
 <state stateid="0"></state>
 <dx:qa-hits></dx:qa-hits>
 </trans-unit>
