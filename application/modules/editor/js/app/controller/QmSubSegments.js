@@ -67,7 +67,6 @@ Ext.define('Editor.controller.QmSubSegments', {
         selector: '#metapanel combobox[name="qmsubseverity"]'
     }],
     listen: {
-        //FIXME after merge: check correct controller event binding:
         controller: {
             '#editorcontroller': {
             	'assignMQMTag': 'handleAddQmFlagKey'

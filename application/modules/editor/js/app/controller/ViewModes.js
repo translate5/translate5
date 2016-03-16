@@ -221,8 +221,6 @@ Ext.define('Editor.controller.ViewModes', {
     
     me.getFilePanel().collapse();
     
-    //FIXME grid scroller must be recalculated after entering and leaving ergonomic mode
-    
     /* trial to deactivate column-hide-show in ergo-mode because of ext-bug with 
      * horinzontal scrolling after showing of hidden columns. 
      * Does not work due to problems with reconfigure grid and roweditor
@@ -378,8 +376,7 @@ Ext.define('Editor.controller.ViewModes', {
     me.self.setMode(mode);
   },
   /**
-   * FIXME needed?
-   * used to cleanup the editor before switching the view mode, so the editor gets initialized new
+   * saving a segment on switching view mode
    */
   saveAlreadyOpened: function() {
       var me = this,

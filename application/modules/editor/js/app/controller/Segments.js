@@ -194,13 +194,11 @@ Ext.define('Editor.controller.Segments', {
     this.getResetFilterBtn().setText(btn_text);
   },
   /**
-   * FIXME check me
    * maintains the visibility of the editor on showing/hiding columns
    * @param {Ext.grid.header.Container} head
    * @param {Editor.view.segments.column.Content} col
    */
   handleColumnVisibility: function(head, col) {
-      console.log("handleColumnVisibility");
       var ed = this.getSegmentGrid().editingPlugin;
       if(ed && ed.editor && ed.editor.columnToEdit == col.dataIndex) {
           ed.editor.toggleMainEditor(col.isVisible());
@@ -487,7 +485,6 @@ Ext.define('Editor.controller.Segments', {
       }
       me.addLoadMask();
       
-      //FIXME check if this callback is called!
       //add a callback to complete this completeEdit call after successfull load of the alike segments
       op.handleReadAfterSave = function(){
           me.saveChainSave(record);   //NEXT step in save chain

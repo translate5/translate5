@@ -670,7 +670,6 @@ Ext.define('Editor.controller.Editor', {
       }
     });
     if(foundIdx === false) {
-      Ext.Error.raise('current dataIndex not found in visible columns!');
       return false;
     }
 

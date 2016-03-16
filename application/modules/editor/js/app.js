@@ -99,8 +99,7 @@ Ext.application({
       var me = this,
       viewSize = Ext.getBody().getViewSize();
     Ext.QuickTips.init();
-    //FIXME ext6 deactivated the before unload question since this is pain in the ass for reloading often
-    //window.onbeforeunload = Ext.bind(me.onBeforeUnload, me);
+    window.onbeforeunload = Ext.bind(me.onBeforeUnload, me);
     me.authenticatedUser = Ext.create('Editor.model.admin.User', Editor.data.app.user);
     me[Editor.data.app.initMethod]();
     
@@ -187,9 +186,6 @@ Ext.application({
                   scope: me,
                   success: me.openEditor
               });
-          },
-          failure: function() {
-              //FIXME doing nothing here? since in previous version in put failure also nothing was done!
           }
       });
   },

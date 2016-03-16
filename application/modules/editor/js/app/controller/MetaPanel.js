@@ -69,17 +69,22 @@ Ext.define('Editor.controller.MetaPanel', {
     selector : '#segmentgrid'
   }],
   
-  init : function() {
-      var me = this;
-      me.control({
-      '#metapanel #metaTermPanel': {
-          afterrender: me.initMetaTermHandler
+  listen: {
+      component: {
+          '#metapanel #metaTermPanel': {
+              afterrender: 'initMetaTermHandler'
+          },
+          '#segmentgrid': {
+              afterrender: 'initEditPluginHandler'
+          }
       },
-      '#segmentgrid': {
-          afterrender: me.initEditPluginHandler
+      controller: {
+          '#editorcontroller': {
+              changeState: 'changeState'
+          }
       }
-    });
   },
+  
   /**
    * Gibt die RowEditing Instanz des Grids zurück
    * @returns Editor.view.segments.RowEditing
@@ -90,11 +95,7 @@ Ext.define('Editor.controller.MetaPanel', {
   initEditPluginHandler: function() {
       var me = this, 
           multiEdit = me.getSegmentGrid().query('contentEditableColumn').length > 1,
-          useChangeAlikes = Editor.app.authenticatedUser.isAllowed('useChangeAlikes', Editor.data.task),
-          edCtrl = me.application.getController('Editor');
-          
-      edCtrl.on('changeState', me.changeState, me);
-      //FIXME after merge: check if edCtrl can be done as controller domain listener
+          useChangeAlikes = Editor.app.authenticatedUser.isAllowed('useChangeAlikes', Editor.data.task);
 
     //This events must be bound after rendering the segmentgrid, because before the editing plugin does not exist!
       me.getEditPlugin().on('beforeedit', me.startEdit, me);
@@ -213,7 +214,7 @@ Ext.define('Editor.controller.MetaPanel', {
     var me = this,
         mp = me.getMetaPanel(),
         index = 1,
-        statBoxes = mp.query('#metaStates .radio');
+        statBoxes = mp.query('#metaStates radio');
     Ext.each(statBoxes, function(box){
       if (index++ == param){
         box.setValue(true);

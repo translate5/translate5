@@ -35,15 +35,14 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.view.changealike.Window
- * @extends Editor.view.ui.changealike.Window
+ * @class Editor.view.comments.Panel
  */
-Ext.define('Editor.view.comments.Window', { //FIXME move from Window to panel
+Ext.define('Editor.view.comments.Panel', {
     extend : 'Ext.panel.Panel',
-    alias : 'widget.commentWindow',  //FIXME move from Window to panel
+    alias : 'widget.commentPanel',
     requires : [ 'Editor.view.comments.Grid' ],
     title : '#UT#Kommentare zum aktuellen Segment',
-    itemId : 'commentWindow',
+    itemId : 'commentPanel',
     layout: 'fit',
     item_cancelBtn : '#UT#Abbrechen',
     item_saveBtn : '#UT#Speichern',

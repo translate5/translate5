@@ -275,7 +275,6 @@ Ext.define('Editor.view.segments.Grid', {
             config = {
                 title: me.title, //see EXT6UPD-9
                 viewConfig: {
-                    //blockRefresh: true, //FIXME ext6: is this setting needed?
                     getRowClass: function(record, rowIndex, rowParams, store){
                         var newClass = '',
                             // only on non sorted list we mark last file segments

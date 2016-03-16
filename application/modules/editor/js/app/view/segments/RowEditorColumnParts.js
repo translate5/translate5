@@ -148,14 +148,13 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
                 return; //ignore the editor itself, which has no col mapping
             }
             var vis = me.columns.get(field.id).isVisible();
-            if(field.name == toEdit) {
+            if(field.name == toEdit && vis) {
                 linkedDisplayField = field;
                 return;
             }
         });
-        
+
         //all editor fields disabled
-        //FIXME test the alle fields disabled case (open task readonly?)
         if(!linkedDisplayField || !hasToSwap) {
             if(!linkedDisplayField) {
                 me.linkedDisplayField = false;
@@ -208,6 +207,7 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         me.repositionMainEditor(pos[0]);
         me.scrollMainEditorHorizontallyInView();
         me.mainEditor.deferFocus();
+        me.mainEditor.setVisible(toDis.isVisible());
         me.fireEvent('afterEditorMoved', me.columnToEdit, me);
         return true;
     },

@@ -43,19 +43,19 @@ Ext.define('Editor.controller.Comments', {
   extend : 'Ext.app.Controller',
   models: ['Segment'],
   stores: ['Comments', 'Segments'],
-  views: ['comments.Window'],
+  views: ['comments.Panel'],
   refs : [{
     ref : 'segmentGrid',
     selector : '#segmentgrid'
   },{
       ref : 'saveBtn',
-      selector : '#commentWindow #saveBtn'
+      selector : '#commentPanel #saveBtn'
   },{
-    ref: 'commentWindow',
-    selector: '#commentWindow'
+    ref: 'commentPanel',
+    selector: '#commentPanel'
   },{
       ref: 'commentContainer',
-      selector: '#commentWindow #commentContainer'
+      selector: '#commentPanel #commentContainer'
   },{
       ref: 'rowEditor',
       selector: '#roweditor'
@@ -76,7 +76,7 @@ Ext.define('Editor.controller.Comments', {
       //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following event bindings 
       Editor.app.on('editorViewportClosed', me.clearComments, me);
       me.control({
-          '#commentWindow' : {
+          '#commentPanel' : {
               expand: me.expandWindow
           },
           '#segmentgrid' : {
@@ -93,16 +93,16 @@ Ext.define('Editor.controller.Comments', {
           '#editorCommentBtn' : {
               click: me.handleEditorCommentBtn
           },
-          '#commentWindow actioncolumn' : {
+          '#commentPanel actioncolumn' : {
               click: me.handleGridAction
           },
-          '#commentWindow grid' : {
+          '#commentPanel grid' : {
               itemdblclick: me.handleGridDblClick
           },
-          '#commentWindow #saveBtn' : {
+          '#commentPanel #saveBtn' : {
               click: me.handleCommentSave
           },
-          '#commentWindow #cancelBtn' : {
+          '#commentPanel #cancelBtn' : {
               click: me.handleAddComment
           }
       });
@@ -191,7 +191,7 @@ Ext.define('Editor.controller.Comments', {
               var errorHandler = Editor.app.getController('ServerException');
               me.handleAddComment();
               //enabling the collapsed form gives a visual misbehaviour, so enable it by a own flag on expand
-              me.getCommentWindow().collapsed || form.enable();
+              me.getCommentPanel().collapsed || form.enable();
               form._enabled = true;
               btn.setIconCls('');
               if(op.wasSuccessful()) {
@@ -224,7 +224,7 @@ Ext.define('Editor.controller.Comments', {
       rec.phantom = true;
       me.activeComment = rec;
       me.loadComment(rec);
-      me.getCommentWindow().cancel();
+      me.getCommentPanel().cancel();
   },
   /**
    * Handles the action column clicks
@@ -245,7 +245,7 @@ Ext.define('Editor.controller.Comments', {
       if(!del) {
           return;
       }
-      me.getCommentWindow().showDeleteConfirm(function(btn){
+      me.getCommentPanel().showDeleteConfirm(function(btn){
           if(btn != 'yes') {
               return;
           }
@@ -283,8 +283,8 @@ Ext.define('Editor.controller.Comments', {
           return;
       }
       me.activeComment = rec;
-      me.getCommentWindow().setComment(rec.get('comment'));
-      if(me.getCommentWindow().collapsed) {
+      me.getCommentPanel().setComment(rec.get('comment'));
+      if(me.getCommentPanel().collapsed) {
           return; //collapsed no select / focus needed
       }
       if(area.rendered && area.isVisible()) {
@@ -311,7 +311,7 @@ Ext.define('Editor.controller.Comments', {
           edit = ev.getTarget('img.edit'),
           mpController = Editor.app.getController('MetaPanel');
       me.record = null;
-      me.getCommentWindow().collapse();
+      me.getCommentPanel().collapse();
       
       if(!rec.get('editable') && !me.isEnabledForLocked()) {
           return;
@@ -345,9 +345,9 @@ Ext.define('Editor.controller.Comments', {
           return;
       }
       me.record = rec;
-      me.getCommentWindow().collapse();
+      me.getCommentPanel().collapse();
       Editor.app.getController('MetaPanel').openReadonly(rec);
-      me.getCommentWindow().expand();
+      me.getCommentPanel().expand();
   },
   /**
    * handles starting the segment editor
@@ -356,8 +356,8 @@ Ext.define('Editor.controller.Comments', {
    */
   onEditorMoved: function(toEdit, editor) {
       var me = this;
-      if(editor.columnClicked == 'comments' && me.getCommentWindow().collapsed) {
-          me.getCommentWindow().expand();
+      if(editor.columnClicked == 'comments' && me.getCommentPanel().collapsed) {
+          me.getCommentPanel().expand();
       }
   },
   /**
@@ -368,8 +368,8 @@ Ext.define('Editor.controller.Comments', {
       var me = this,
           isOnStartEdit = context.field && !context.isPanel;
             //opens the commentpanel if the editor was started by clicking on the comment column 
-      if(isOnStartEdit && context.field == 'comments' && me.getCommentWindow().collapsed) {
-          me.getCommentWindow().expand();
+      if(isOnStartEdit && context.field == 'comments' && me.getCommentPanel().collapsed) {
+          me.getCommentPanel().expand();
           return;
       }
       me.expandWindow();
@@ -412,7 +412,7 @@ Ext.define('Editor.controller.Comments', {
           id = rec.get('id');
       
       me.clearComments();
-      if(me.getCommentWindow().collapsed) {
+      if(me.getCommentPanel().collapsed) {
           return; //collapsed no data load needed
       }
       
@@ -489,7 +489,7 @@ Ext.define('Editor.controller.Comments', {
    */
   handleEditorCommentBtn: function() {
       var me = this,
-          win = me.getCommentWindow(),
+          win = me.getCommentPanel(),
           form = me.getCommentForm(),
           area = form.down('textarea');
       if (win.collapsed)

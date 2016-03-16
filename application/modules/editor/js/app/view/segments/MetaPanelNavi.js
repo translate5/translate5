@@ -58,7 +58,7 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
     //Item Strings:
     item_startWatchingSegment: '#UT#Segment auf die Merkliste setzen (STRG + D)',
     item_stopWatchingSegment: '#UT#Segment von der Merkliste entfernen (STRG + D)',
-    item_scrollToSegment: '#UT#Zur Bearbeitung geöffnetes Segment wieder in den Sichtbereich bewegen (STRG + D)',
+    item_scrollToSegment: '#UT#Zur Bearbeitung geöffnetes Segment wieder in den Sichtbereich bewegen (STRG + G)',
     item_cancel: '#UT#Abbrechen (ESC)',
     item_reset: '#UT#Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)',
     item_save: '#UT#Speichern (STRG + S)',
@@ -124,7 +124,7 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
             },{
                 xtype: 'button',
                 itemId: 'scrollToSegmentBtn',
-                tooltip: "FIXME",//FIXME tooltip(me.item_reset),
+                tooltip: tooltip(me.item_scrollToSegment),
                 icon: Editor.data.moduleFolder+'images/scrollTo.png',
                 iconAlign: 'right'
             }]

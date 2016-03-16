@@ -83,7 +83,7 @@ Ext.define('Editor.view.ViewPortEditor', {
                   items: [{
                       xtype: 'segmentsMetapanel'
                   },{
-                      xtype: 'commentWindow'
+                      xtype: 'commentPanel'
                   }]
               }],
               width: 260
