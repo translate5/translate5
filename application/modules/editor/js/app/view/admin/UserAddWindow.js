@@ -286,7 +286,6 @@ Ext.define('Editor.view.admin.UserAddWindow', {
      */
     loadRecord: function(record) {
         var roles = record.get('roles').split(',');
-        console.log(this.down('form'));
         this.down('form').loadRecord(record);
         Ext.Array.forEach(this.query('#rolesGroup checkbox'), function(item) {
             item.setValue(Ext.Array.indexOf(roles, item.initialConfig.value) >= 0);

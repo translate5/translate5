@@ -287,7 +287,6 @@ Ext.define('Editor.controller.Segments', {
       }
 
       if(me.filemap[fileRecord.get('id')] !== undefined){
-          console.dir(me.filemap);
           me.resetSegmentSortForFileClick(me.filemap[fileRecord.get('id')]);
       }
       else{

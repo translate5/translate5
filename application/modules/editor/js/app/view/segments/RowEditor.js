@@ -31,7 +31,6 @@ END LICENSE AND COPYRIGHT
  * @class Editor.view.segments.RowEditor
  * @extends Ext.grid.RowEditor
  * 
- * @TODO rename in RowEditor
  * This is the RowEditor part of this multi class component.
  * The original RowEditor is overriden for custom needs (no buttons, our own positioning, no wrapEl)
  */
@@ -130,7 +129,7 @@ Ext.define('Editor.view.segments.RowEditor', {
     onGridResize: function() {
         var me = this,
             clientWidth = me.getClientWidth();
-        //FIXME update clipping width
+        me.setEditorWidth();
     },
     
     updateButton: function(valid) {

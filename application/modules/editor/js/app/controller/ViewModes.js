@@ -356,7 +356,6 @@ Ext.define('Editor.controller.ViewModes', {
     return this.getSegmentGrid().editingPlugin.editor.mainEditor;
   },
   /**
-   * FIXME zuwas für einer repositionierung war der gedacht?
    * Shortcut Funktion zum repositionieren des Editors
    */
   repositionEditorRow: function() {

@@ -69,7 +69,6 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         var me = this, 
             cmp = null;
  
-        //FIXME use fields instead of columns here? Then we can remove the columns filling
         //bubble up to the dom element which is the el of the Component
         while (target && target.nodeType === 1) {
             if(/displayfield-[0-9]+/.test(target.id)) {

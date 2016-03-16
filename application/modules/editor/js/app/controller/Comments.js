@@ -114,11 +114,10 @@ Ext.define('Editor.controller.Comments', {
       edCtrl.on('openComments', me.handleEditorCommentBtn, me);
       edCtrl.on('saveUnsavedComments', me.handleCommentSave, me);
       
-    //Diese Events können erst in onlauch gebunden werden, in init existiert das Plugin noch nicht
-    //FIXME ext6 disabled
-      //me.getEditPlugin().on('beforeedit', me.onStartEdit, me);
-      //me.getEditPlugin().on('canceledit', me.cancelEdit, me);
-      //me.getEditPlugin().on('edit', me.cancelEdit, me);
+      //Diese Events können erst in onlauch gebunden werden, in init existiert das Plugin noch nicht
+      me.getEditPlugin().on('beforeedit', me.onStartEdit, me);
+      me.getEditPlugin().on('canceledit', me.cancelEdit, me);
+      me.getEditPlugin().on('edit', me.cancelEdit, me);
   },
   cancelEdit: function() {
       this.handleAddComment();
@@ -364,11 +363,11 @@ Ext.define('Editor.controller.Comments', {
    * handles starting the segment editor
    * @param {Object} context
    */
-  onStartEdit: function(context) {
-      var me = this,
-          isOnStartEdit = context.field && !context.isPanel;
-            //opens the commentpanel if the editor was started by clicking on the comment column 
-      if(isOnStartEdit && context.field == 'comments' && me.getCommentPanel().collapsed) {
+  onStartEdit: function(plug, context) {
+      var me = this;
+
+      //opens the commentpanel if the editor was started by clicking on the comment column
+      if(context.field && context.field == 'comments' && me.getCommentPanel().collapsed) {
           me.getCommentPanel().expand();
           return;
       }
