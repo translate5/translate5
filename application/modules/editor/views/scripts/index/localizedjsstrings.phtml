@@ -250,16 +250,19 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.comments.Grid.prototype.text_edit = '<?php echo $this->translate->_('Bearbeiten');?>';
     Editor.view.comments.Grid.prototype.text_delete = '<?php echo $this->translate->_('Löschen');?>';
 
-    Editor.view.comments.Window.prototype.title = '<?php echo $this->translate->_('Kommentare zum aktuellen Segment');?>';
-    Editor.view.comments.Window.prototype.item_cancelBtn = '<?php echo $this->translate->_('Abbrechen');?>';
-    Editor.view.comments.Window.prototype.item_saveBtn = '<?php echo $this->translate->_('Speichern');?>';
-    Editor.view.comments.Window.prototype.item_closeBtn = '<?php echo $this->translate->_('Schließen');?>';
-    Editor.view.comments.Window.prototype.item_commentNew = '<?php echo $this->translate->_('Kommentar neu');?>';
-    Editor.view.comments.Window.prototype.item_commentEdit = '<?php echo $this->translate->_('Kommentar bearbeiten');?>';
+    Ext.define("Editor.locale.de.view.comments.Panel", {
+        override: "Editor.view.comments.Panel",
+        title: '<?php echo $this->translate->_('Kommentare zum aktuellen Segment');?>',
+        item_cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
+        item_saveBtn: '<?php echo $this->translate->_('Speichern');?>',
+        item_closeBtn: '<?php echo $this->translate->_('Schließen');?>',
+        item_commentNew: '<?php echo $this->translate->_('Kommentar neu');?>',
+        item_commentEdit: '<?php echo $this->translate->_('Kommentar bearbeiten');?>',
+        item_addComment: '<?php echo $this->translate->_('Neuer Kommentar');?>',
+        delete_confirm_title: '<?php echo $this->translate->_('Löschen des Kommentars bestätigen');?>',
+        delete_confirm_msg: '<?php echo $this->translate->_('Soll der Kommentar wirklich gelöscht werden?');?>'
+    });
     
-    Editor.view.comments.Window.prototype.item_addComment = '<?php echo $this->translate->_('Neuer Kommentar');?>';
-    Editor.view.comments.Window.prototype.delete_confirm_title = '<?php echo $this->translate->_('Löschen des Kommentars bestätigen');?>';
-    Editor.view.comments.Window.prototype.delete_confirm_msg = '<?php echo $this->translate->_('Soll der Kommentar wirklich gelöscht werden?');?>';
     <?php 
     //FIXME nextRelease Thomas per PHP if die Sprach Defines für den Admin Bereich (je nach Rolle) einbinden.
     ?>
