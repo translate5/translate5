@@ -75,14 +75,7 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
             'runtimeOptions.import.csv.fields.source' => 'quelle',
             'runtimeOptions.editor.notification.saveXmlToFile' => 1,
         );
-        
-        foreach($tests as $name => $value) {
-            $config = $this->api()->requestJson('editor/config', 'GET', array(
-                'filter' => '[{"type":"string","value":"'.$name.'","property":"name","operator":"like"}]',
-            ));
-            $this->assertCount(1, $config);
-            $this->assertEquals($value, $config[0]->value);
-        }
+        self::$api->testConfig($tests);
     }
     
     

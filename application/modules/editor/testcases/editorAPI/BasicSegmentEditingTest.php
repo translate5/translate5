@@ -45,7 +45,11 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
-        self::assertTermTagger();
+        $appState = self::assertTermTagger();
+        
+        self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig may not be activated for this test case!');
+        self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology may not be activated for this test case!');
+        
         $api->addImportFile('editorAPI/MainTest/simple-en-de.zip');
         $api->import($task);
         
