@@ -1248,6 +1248,15 @@
   <source>Nur MQM-tags bearbeiten</source>
   <target>Edit only MQM-tags</target>
 </trans-unit>
+<trans-unit id='RGllIEF1ZmdhYmUgd2lyZCB2b24gZWluZW0gQmVudXR6ZXIgYmVudXR6dA=='>
+  <source>Die Aufgabe wird von einem Benutzer benutzt</source>
+  <target>The task is in use by another user</target>
+</trans-unit>
+<trans-unit id='WnVyIEJlYXJiZWl0dW5nIGdlw7ZmZm5ldGVzIFNlZ21lbnQgd2llZGVyIGluIGRlbiBTaWNodGJlcmVpY2ggYmV3ZWdlbiAoU1RSRyArIEcp'>
+  <source>Zur Bearbeitung geöffnetes Segment wieder in den Sichtbereich bewegen (STRG + G)</source>
+  <target>Reposition opened segment back into the viewport (CTRL-G)</target>
+</trans-unit>
+
     </body>
   </file>
 </xliff>
