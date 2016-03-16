@@ -110,6 +110,10 @@ Ext.define('Editor.controller.ServerException', {
         
         switch(status) {
             case -1:
+                //if the XHR was aborted, do nothing here, since this is "wanted" behaviour
+                if(response.aborted) {
+                    return;
+                }
                 Ext.Msg.alert(str.title, appendServerMsg(str.timeout));
                 return;
             case 403: //Forbidden: authenticated, but not allowed to see the specific resource 
