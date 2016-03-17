@@ -139,6 +139,7 @@ Ext.define('Editor.controller.HeadPanel', {
           user: Editor.app.authenticatedUser.data,
           task: null,
           showTaskGuid: false,
+          version: Editor.data.debug && Editor.data.debug.version + ' (ext '+Ext.getVersion().version+')',
           taskLabel: hp.strings.task,
           userLabel: hp.strings.loggedinAs,
           loginLabel: hp.strings.loginName
