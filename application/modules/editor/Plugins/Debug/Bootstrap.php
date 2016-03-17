@@ -43,6 +43,15 @@ class editor_Plugins_Debug_Bootstrap extends ZfExtended_Plugin_Abstract {
     public function handleAfterIndexAction(Zend_EventManager_Event $event) {
         $view = $event->getParam('view');
         $view->Php2JsVars()->set('debug.showTaskGuid', '1'); //shows taskGuid in GUI
+        
+        $versionFile = APPLICATION_PATH.'../version';
+        if(file_exists($versionFile)) {
+            $version = file_get_contents($versionFile);
+        }
+        else {
+            $version = 'development';
+        }
+        $view->Php2JsVars()->set('debug.version', $version);
     }
     
     /**

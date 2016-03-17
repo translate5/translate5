@@ -176,7 +176,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $extJs = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
             'ExtJs'
         );
-      $this->view->Php2JsVars()->set('uxFolder', $extJs->getHttpPath().'/examples/ux');
       $this->view->Php2JsVars()->set('pathToHeaderFile', $rop->headerOptions->pathToHeaderFile);
       
       $disabledList = $rop->segments->disabledFields->toArray();
