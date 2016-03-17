@@ -35,7 +35,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * Own Tooltip, bindable to iframes per per boundFrame option
+ * Own Tooltip, bindable to iframes per boundFrame option
  * 
  * @class Editor.view.ToolTip
  * @extends Ext.tip.ToolTip
@@ -47,7 +47,7 @@ Ext.define('Editor.view.ToolTip', {
     // define a own tooltip class
     renderTo : Ext.getBody(),
     strings: {
-        severity: '##UT##Gewichtung'
+        severity: '#UT#Gewichtung'
     },
     listeners : {
         // Change content dynamically depending on which element triggered

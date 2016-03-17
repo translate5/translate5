@@ -83,6 +83,7 @@ Ext.define('Editor.view.segments.column.Content', {
           plug = me.grid.editingPlugin,
           config = {
               xtype: 'displayfield',
+              isContentColumn: true,
               // Override Field's implementation so that the default display fields will not return values. This is done because
               // the display field will pick up column renderers from the grid.
               getModelData: function() {

@@ -49,6 +49,8 @@ Ext.define('Editor.controller.Editor', {
       gridStartReached: '#UT#Start der Segmente erreicht!',
       errorTitle: '#UT# Fehler bei der Segment Validierung!',
       correctErrorsText: '#UT# Fehler beheben',
+      editorMoveTitle: '#UT#Verschiebbarer Editor',
+      editorMove: '#UT#Der Segmenteditor kann mit der Maus beliebig positioniert werden. <br />Dazu lediglich den Segmenteditor anklicken und dann verschieben.',
       saveAnyway: '#UT# Trotzdem speichern'
   },
   id: 'editorcontroller',
@@ -73,6 +75,9 @@ Ext.define('Editor.controller.Editor', {
           'segmentsHtmleditor': {
               initialize: 'initEditor',
               contentErrors: 'handleSaveWithErrors'
+          },
+          'roweditor displayfield[isContentColumn!=true]': {
+              afterrender: 'initMoveToolTip'
           },
           '#segmentgrid': {
               afterrender: 'initEditPluginHandler'
@@ -136,6 +141,17 @@ Ext.define('Editor.controller.Editor', {
               }
           }]
       }));
+  },
+  /**
+   * initializes the roweditor moveable tooltip
+   */
+  initMoveToolTip: function(displayfield){
+      var me = this;
+      Ext.tip.QuickTipManager.register({
+          target: displayfield.getId()+'-bodyEl', 
+          title: me.messages.editorMoveTitle,
+          text: me.messages.editorMove
+      });
   },
   /**
    * saves the segment of the already opened editor and restarts startEditing call 
