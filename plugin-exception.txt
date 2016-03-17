@@ -1,0 +1,83 @@
+Exception for Development of Plugins for translate5 - Version 1.0, March 5th, 2015
+
+====================
+Exception Intent
+====================
+We want people who build plugins for translate5 to be able to publicly distribute them under less restrictive license terms, even though version 3 of the GNU AFFERO GENERAL PUBLIC LICENSE (the “AGPL”) may require them to be licensed under the AGPL.
+
+This Exception does not grant usage or distribution of translate5 or any translate5 component under a license other than the AGPL and cannot be applied to end-user applications. 
+
+Caution: If you develop a plugin, which uses the Javascript components of translate5, you will also have to respect the license of the ExtJs library (as used by translate5) and which is released under GPL version 3. For the ExtJs library a ExtJs-ux-exception.txt document exists, which grants similar exceptions to software developers for ExtJs as this document grants them. You find the ExtJs-ux-exception.txt in the same folder as this document. If not, you can obtain a copy at http://www.sencha.com/products/ux-exception.php.
+
+====================
+Terms and Conditions
+====================
+---------------------
+Definitions
+---------------------
+Terms used, but not defined, herein shall have the meaning provided in the AGPL.
+“Code” means source code for translate5, the ZfExtended library (as used by translate5) or translate5 plugin*
+“Modification” means a visual change or enhancement made to the code or a part of it by means of modifying the standard functionality or visual appearance of translate5.
+
+*“Plugin” means Code which uses the translate5 plugin mechanisms as documented in translate5.
+
+---------------------
+Additional Grants
+---------------------
+As a special exception to the terms and conditions of version 3.0 of the AGPL:
+
+You are free to distribute a Plugin licensed under one or more of the licenses listed below in section 5 ("Open Source License List"), as long as:
+
+- Your Plugin does not contain any Code or modified Code from translate5.
+
+- You do not distribute translate5, as a whole or in part, with your Plugin. Optionally, you should include instructions for developers using your Plugin explaining how to obtain translate5.
+
+- You include PROMINENT notice in EVERY location you display the license information for your Plugin that it uses translate5, that translate5 is distributed under the terms of the AGPL v3 and you must include a link to http://www.translate5.net/license.txt
+
+- Your Plugin is distributed subject to one of the FLOSS licenses listed below, and is accompanied by the complete corresponding machine-readable source code on the same medium and under the same FLOSS license as the Plugin
+
+- Your Plugin can reasonably be considered to be adding to or modifying standard functionality of translate5 for software development purposes and does not constitute an independent and separate application in itself.
+
+---------------------
+Applicability
+---------------------
+This exception applies to translate5 1.0 or later released under the AGPL that contains a conspicuous notice saying that Plugins built for translate5 by using the translate5 plugin mechanisms may be distributed under the terms of this Exception and that translate5 is subject to the terms of the AGPL v3.
+
+This Exception can in no way be considered to grant rights to use or distribute translate5 under any license other than the AGPL v3.
+
+---------------------
+Termination
+---------------------
+If you fail to comply with any of the terms in this Exception then all rights granted to you herein are void and your rights immediately revert back to those granted in the AGPL v3.
+
+---------------------
+Open Source License List
+---------------------
+License name	Version(s)/Copyright Date
+Academic Free License	2.0
+Apache Software License	2.0
+Apple Public Source License	2.0
+Artistic license	From Perl 5.8.0
+BSD license	“July 22 1999”
+Common Development and Distribution License (CDDL)	1.0
+Common Public License	1.0
+Eclipse Public License	1.0
+Educational Community License	2.0
+European Union Public License (EUPL)	1.1
+GNU General Public License (GPL)	2.0
+GNU Library or “Lesser” General Public License (LGPL)	3.0
+Jabber Open Source License	1.0
+MIT License (As listed in file MIT-License.txt)	-
+Mozilla Public License (MPL)	1.0/1.1/2.0
+Open Software License	2.0
+OpenSSL license (with original SSLeay license)	“2003” (“1998”)
+PHP License	3.0
+Python license (CNRI Python License)	-
+Python Software Foundation License	2.1.1
+Sleepycat License	“1999”
+University of Illinois/NCSA Open Source License	-
+W3C License	“2001”
+X11 License	“2001”
+Zimbra Public License	1.3
+Zlib/libpng License	-
+Zope Public License	2.0
