@@ -27,59 +27,24 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
-?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=8"/>
-        <title><?php echo $this->translate->_('translate5'); ?></title>
-        <link rel="shortcut icon" href="<?php echo $this->pathToIMAGES; ?>/favicon.ico" type="image/x-icon"/>
-        <link rel="stylesheet" type="text/css" href="<?php echo $this->extJsCss; ?>"/>
-        <link rel="stylesheet" type="text/css" href="<?php echo $this->extJsBasepath; ?>/examples/ux/grid/css/GridFilters.css" />
-        <link rel="stylesheet" type="text/css" href="<?php echo $this->extJsBasepath; ?>/examples/ux/grid/css/RangeMenu.css" />
-        <link rel="stylesheet" type="text/css" href="<?php echo $this->extJsBasepath; ?>/examples/ux/css/CheckHeader.css" />
-        <link rel="stylesheet" type="text/css" href="<?php echo $this->publicModulePath; ?>/css/main.css?v=7" />
-        <script type="text/javascript" src="<?php echo $this->extJsBasepath; ?>/ext-all-debug.js"></script>
-  <script type="text/javascript" src="<?php echo $this->extJsBasepath; ?>/locale/ext-lang-<?php echo $this->locale;?>.js"></script>
-        <script type="text/javascript" src="<?php echo $this->publicModulePath; ?>/js/app/MessageBox.js"></script>
-        <script type="text/javascript">
-            Ext.ns('Editor.data');
-            Editor.TRANSTILDE = '~@#!WS~';
-<?php
-echo $this->Php2JsVars();
-?>;
-            Ext.Loader.setConfig({
-                enabled : true,
-                disableCaching : true
-            });
-            Ext.Loader.setPath('Ext.ux', Editor.data.uxFolder);
-            Ext.Loader.setPath('Editor.plugins', Editor.data.pluginFolder);
-            Ext.Loader.setPath('Editor', Editor.data.appFolder);
-
-            Ext.Ajax.defaultHeaders = {
-                'Accept': 'application/json'
-            };
-            Ext.override(Ext.data.Store, {
-                //The following override fixes
-                //http://www.sencha.com/forum/showthread.php?163733-4.0.7-inconsistent-beforeload-handler-calling-in-store&p=695927
-                //this bug has several issues in our grid handling.
-                unmask: function() {
-                    this.callOverridden();
-                    this.masked = false;
-                }
-            });
-        </script>
-        <script type="text/javascript" src="<?php echo APPLICATION_RUNDIR; ?>/editor/js/app-localized.js"></script>
-        <script type="text/javascript" src="<?php echo $this->publicModulePath; ?>/js/app.js"></script>
-        <?php
-        echo $this->headLink();
-        ?>
-
-    </head>
-    <body class="loading">
-        <div id="OwnTestContent"></div>
-        <div id="editor-viewport"></div>
-        <div id="imagePreload"></div>
-    </body>
+?><!DOCTYPE HTML>
+<html manifest="" lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="shortcut icon" href="<?php echo $this->pathToIMAGES; ?>/favicon.ico" type="image/x-icon"/>
+    <title><?php echo $this->translate->_('translate5'); ?></title>
+    <script>
+    Editor = {};
+    <?php
+    echo $this->Php2JsVars();
+    ?>;
+    Editor.TRANSTILDE = '~@#!WS~';
+    </script>
+    <?php
+        echo $this->render('index/app-js-'.$this->buildType.'.phtml');
+    ?>
+</head>
+<body>
+</body>
 </html>

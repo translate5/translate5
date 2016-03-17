@@ -45,21 +45,21 @@ Ext.define('Editor.plugins.mtComparEval.controller.Controller', {
   models: ['Editor.plugins.mtComparEval.model.Taskmeta'],
   refs: [{
       ref: 'taskTabs',
-      selector: '.adminTaskPreferencesWindow > .tabpanel'
+      selector: 'adminTaskPreferencesWindow > tabpanel'
   },{
       ref: 'resultBox',
-      selector: '.mtComparEvalPanel #resultBox'
+      selector: 'mtComparEvalPanel #resultBox'
   },{
       ref: 'startButton',
-      selector: '.mtComparEvalPanel button#sendto'
+      selector: 'mtComparEvalPanel button#sendto'
   }],
   init : function() {
     this.control({
-        '.adminTaskPreferencesWindow': {
+        'adminTaskPreferencesWindow': {
             render: this.onParentRender,
             close: this.onParentClose
         },
-        '.adminTaskPreferencesWindow .mtComparEvalPanel button#sendto': {
+        'adminTaskPreferencesWindow mtComparEvalPanel button#sendto': {
             click: this.handleStartButton
         }
     });
@@ -68,14 +68,13 @@ Ext.define('Editor.plugins.mtComparEval.controller.Controller', {
   handleStartButton: function() {
       var me = this;
       me.meta.set('mtCompareEvalState', me.meta.STATE_IMPORTING);
-      me.meta.setDirty();
       me.showWaitingForImport();
       me.meta.save({
           success: function() {
               me.startWaitingForImport();
           },
           failure: function() {
-              var bar = me.getResultBox().down('.progressbar');
+              var bar = me.getResultBox().down('progressbar');
               bar && bar.destroy();
               me.showResult('Could not sent Task to MT-ComparEval, try again!');
               me.getStartButton().enable();
@@ -104,7 +103,7 @@ Ext.define('Editor.plugins.mtComparEval.controller.Controller', {
               Ext.TaskManager.stop(me.checkImportStateTask);
               delete me.checkImportStateTask;
           };
-      me.meta.reload({
+      me.meta.load({
           success: metaReloaded
       });
   },

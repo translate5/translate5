@@ -619,46 +619,20 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * returns the first and the last EDITABLE segment of the actual filtered request
-     * @param string $taskGuid
-     * @return [editor_Models_Segment] with index first and index last
+     * @param array $autoStateIds a list of autoStates where the prev/next page segments are additionaly compared to
+     * @param integer $total
+     * @return array
      */
-    public function getBorderSegments($taskGuid){
-        //save original offset and limit
-        $offset = $this->offset;
-        $limit = $this->limit;
+    public function findSurroundingEditables(array $autoStateIds, integer $total) {
+        //not really nice, but creating the basic select in Segment entity provides all filter where statements 
+        $s = $this->db->select()
+            ->from($this->db, array('id', 'editable', 'autoStateId', 'segmentNrInTask'));
+        $s = $this->addWatchlistJoin($s);
+        $s = $this->filter->applyToSelect($s);
         
-        //save original offset and limit
-        $this->offset = 0;
-        $this->limit = 1;
-        
-        //only editable segments may be considered
-        $filter = new stdClass();
-        $filter->type = 'numeric';
-        $filter->comparison = 'eq';
-        $filter->value = 1;
-        $filter->field = 'editable';
-        $this->filter->addFilter($filter);
-        
-        //fetch the first segment in list
-        $first = $this->loadByTaskGuid($taskGuid);
-        
-        //fetch the last segment in list
-        $this->filter->swapSortDirection();
-        $last = $this->loadByTaskGuid($taskGuid);
-        $this->filter->swapSortDirection();
-        
-        //restore original values
-        $this->offset = $offset;
-        $this->limit = $limit;
-        
-        $result = array();
-        if(!empty($last) && isset($last[0])) {
-            $result['last'] = $last[0];
-        }
-        if(!empty($first) && isset($first[0])) {
-            $result['first'] = $first[0];
-        }
-        return $result;
+        $finder = ZfExtended_Factory::get('editor_Models_Segment_EditablesFinder', array($this->db->getAdapter(), $s));
+        /* @var $finder editor_Models_Segment_EditablesFinder */
+        return $finder->find($this->offset, $this->limit, $autoStateIds, $total);
     }
     
     /**
@@ -1043,6 +1017,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
 
     /**
      * Updates - if enabled - the QM Sub Segments with correct IDs in the given String and stores it with the given Method in the entity
+     * Also, corrects overlapped image tags between which there is no text node.
      * @param string $field
      */
     public function updateQmSubSegments(string $dataindex) {
@@ -1054,9 +1029,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $qmsubsegments = ZfExtended_Factory::get('editor_Models_Qmsubsegments');
         /* @var $qmsubsegments editor_Models_Qmsubsegments */
         $withQm = $qmsubsegments->updateQmSubSegments($this->get($dataindex), (int)$this->getId(), $field['field']);
-        $this->set($dataindex, $withQm);
+        $correctedOverlappedTags = $qmsubsegments->correctQmSubSegmentsOverlappedTags($withQm);
+        $this->set($dataindex, $correctedOverlappedTags);
     }
-
+    
     /**
      * Bulk updating a specific autoState of a task 
      * @param string $taskGuid

@@ -186,6 +186,7 @@ class editor_Workflow_Manager {
             $userPref->setWorkflowStep(null); //default entry
             $userPref->setUserGuid(null);     //default entry
             $userPref->setAnonymousCols($wfconf->$key && $wfconf->$key->anonymousColumns);
+            $userPref->setNotEditContent(false);
             $userPref->setFields(join(',', $fields));
             $vis = $wfconf->$key && $wfconf->$key->visibility || 'show';
             $userPref->setVisibility($vis);

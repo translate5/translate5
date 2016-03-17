@@ -1072,8 +1072,11 @@
 	  <source>Die Anfrage über das Internet an den Server dauerte zu lange. Dies kann an Ihrer Internetverbindung oder an einer Überlastung des Servers liegen. Bitte versuchen Sie es erneut.</source>
 	  <target> The query over the Internet to the server took too long. This may be because of your internet connection or a server overload. Please try again.</target>
 	</trans-unit>
-	<trans-unit id='RGllIG5hY2hmb2xnZW5kZW4gVGFncyB3dXJkZW4gYmVpbSBFZGl0aWVyZW4gZ2Vsw7ZzY2h0LCBkYXMgU2VnbWVudCBrYW5uIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbi4gPGJyIC8+PGJyIC8+VmVyc3VjaGVuIFNpZSBtaXQgZGVyIFLDvGNrZ8OkbmdpZ2Z1bmt0aW9uIFNUUkctWiBkaWUgVGFncyB3aWVkZXJoZXJ6dXN0ZWxsZW4uIDxiciAvPjxiciAvPkFsdGVybmF0aXYga8O2bm5lbiBTaWUgYXVjaCBkaWUgQmVhcmJlaXR1bmcgZGVzIFNlZ21lbnRzIGR1cmNoIEtsaWNrIGF1ZiAiQWJicmVjaGVuIiAoPGltZyBzcmM9Ii4uL21vZHVsZXMvZWRpdG9yL2ltYWdlcy9jcm9zcy5wbmciIC8+IGltIHJlY2h0ZW4gTWVuw7wpIGJlZW5kZW4gdW5kIGRhcyBTZWdtZW50IG5ldSB6dXIgQmVhcmJlaXR1bmcgw7ZmZm5lbi48YnIgLz48YnIgLz5GZWhsZW5kZSBUYWdzOg=='><source>Die nachfolgenden Tags wurden beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Versuchen Sie mit der Rückgängigfunktion STRG-Z die Tags wiederherzustellen. <br /><br />Alternativ können Sie auch die Bearbeitung des Segments durch Klick auf "Abbrechen" (<img src="../modules/editor/images/cross.png" /> im rechten Menü) beenden und das Segment neu zur Bearbeitung öffnen.<br /><br />Fehlende Tags:</source><target>The following tags have been deleted during editing, the segment can not be saved. <br />Try to restore the tags by using the Undo function CTRL-Z. <br /> Alternatively, you can also stop the processing of the segment by clicking on "Cancel" (<img src="../modules/editor/images/cross.png" /> in the menu on the right) and reopen the segment for processing. <br /> Missing Tags:</target></trans-unit>
-        <trans-unit id='RmVobGVyIGJlaGViZW4='>
+	<trans-unit id='RGllIG5hY2hmb2xnZW5kZW4gVGFncyB3dXJkZW4gYmVpbSBFZGl0aWVyZW4gZ2Vsw7ZzY2h0LCBkYXMgU2VnbWVudCBrYW5uIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbi4gPGJyIC8+VmVyc3VjaGVuIFNpZSBtaXQgZGVyIFLDvGNrZ8OkbmdpZ2Z1bmt0aW9uIFNUUkctWiBkaWUgVGFncyB3aWVkZXJoZXJ6dXN0ZWxsZW4uIDxiciAvPkFsdGVybmF0aXYga8O2bm5lbiBTaWUgYXVjaCBkaWUgQmVhcmJlaXR1bmcgZGVzIFNlZ21lbnRzIGR1cmNoIEtsaWNrIGF1ZiAiQWJicmVjaGVuIiAoPGltZyBzcmM9Ii4uL21vZHVsZXMvZWRpdG9yL2ltYWdlcy9jcm9zcy5wbmciIC8+IGltIHJlY2h0ZW4gTWVuw7wpIGJlZW5kZW4gdW5kIGRhcyBTZWdtZW50IG5ldSB6dXIgQmVhcmJlaXR1bmcgw7ZmZm5lbi48YnIgLz5GZWhsZW5kZSBUYWdzOg=='>
+	  <source>Die nachfolgenden Tags wurden beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br />Versuchen Sie mit der Rückgängigfunktion STRG-Z die Tags wiederherzustellen. <br />Alternativ können Sie auch die Bearbeitung des Segments durch Klick auf "Abbrechen" (<img src="../modules/editor/images/cross.png" /> im rechten Menü) beenden und das Segment neu zur Bearbeitung öffnen.<br />Fehlende Tags:</source>
+	  <target>The following tags have been deleted during editing, the segment can not be saved. <br />Try to restore the tags by using the Undo function CTRL-Z. <br /> Alternatively, you can also stop the processing of the segment by clicking on "Cancel" (<img src="../modules/editor/images/cross.png" /> in the menu on the right) and reopen the segment for processing. <br /> Missing Tags:</target>
+	</trans-unit>
+	<trans-unit id='RmVobGVyIGJlaGViZW4='>
 	  <source>Fehler beheben</source>
 	  <target>Correct errors</target>
 	</trans-unit>
@@ -1234,6 +1237,35 @@
 <trans-unit id='U2VnbWVudCBhdWYgZGVuIGF1c2dld8OkaGx0ZW4gU3RhdHVzIHNldHplbiAoU1RSRyArIEFMVCArIHswfSk='>
   <source>Segment auf den ausgewählten Status setzen (STRG + ALT + {0})</source>
   <target>Set segment to the choosen state (CTRL + ALT + {0})</target>
+</trans-unit>
+
+<trans-unit id='RXMgaXN0IElobmVuIG5pY2h0IGVybGF1YnQsIGRlbiBTZWdtZW50aW5oYWx0IHp1IGJlYXJiZWl0ZW4uIEJpdHRlIHZlcndlbmRlbiBTaWUgU1RSRytaIHVtIElocmUgw4RuZGVydW5nZW4genVyw7xja3p1c2V0emVuIG9kZXIgYnJlY2hlbiBTaWUgZGFzIEJlYXJiZWl0ZW4gZGVzIFNlZ21lbnRzIGFiLg=='>
+  <source>Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.</source>
+  <target>You are not allowed to edit segment content. Please use CTRL-Z to redo your changes or cancel editing at all.</target>
+</trans-unit>
+<trans-unit id='RmlsdGVydGV4dCBlaW5nZWJlbi4uLg=='>
+  <source>Filtertext eingeben...</source>
+  <target>Enter filtering text...</target>
+</trans-unit>
+<trans-unit id='TnVyIE1RTS10YWdzIGJlYXJiZWl0ZW4='>
+  <source>Nur MQM-tags bearbeiten</source>
+  <target>Edit only MQM-tags</target>
+</trans-unit>
+<trans-unit id='RGllIEF1ZmdhYmUgd2lyZCB2b24gZWluZW0gQmVudXR6ZXIgYmVudXR6dA=='>
+  <source>Die Aufgabe wird von einem Benutzer benutzt</source>
+  <target>The task is in use by another user</target>
+</trans-unit>
+<trans-unit id='WnVyIEJlYXJiZWl0dW5nIGdlw7ZmZm5ldGVzIFNlZ21lbnQgd2llZGVyIGluIGRlbiBTaWNodGJlcmVpY2ggYmV3ZWdlbiAoU1RSRyArIEcp'>
+  <source>Zur Bearbeitung geöffnetes Segment wieder in den Sichtbereich bewegen (STRG + G)</source>
+  <target>Reposition opened segment back into the viewport (CTRL-G)</target>
+</trans-unit>
+<trans-unit id='VmVyc2NoaWViYmFyZXIgRWRpdG9y'>
+  <source>Verschiebbarer Editor</source>
+  <target>Moveable Editor</target>
+</trans-unit>
+<trans-unit id='RGVyIFNlZ21lbnRlZGl0b3Iga2FubiBtaXQgZGVyIE1hdXMgYmVsaWViaWcgcG9zaXRpb25pZXJ0IHdlcmRlbi4gPGJyIC8+RGF6dSBsZWRpZ2xpY2ggZGVuIFNlZ21lbnRlZGl0b3IgYW5rbGlja2VuIHVuZCBkYW5uIHZlcnNjaGllYmVuLg=='>
+  <source>Der Segmenteditor kann mit der Maus beliebig positioniert werden. <br />Dazu lediglich den Segmenteditor anklicken und dann verschieben.</source>
+  <target>The segmenteditor can be freely positioned with the mouse. <br />Just click on the segmenteditor and move it.</target>
 </trans-unit>
     </body>
   </file>

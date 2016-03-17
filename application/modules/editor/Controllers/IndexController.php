@@ -76,6 +76,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
           );
         $this->view->extJsCss = $extJs->getCssPath();
         $this->view->extJsBasepath = $extJs->getHttpPath();
+        
+        //FIXME is coming from DB, for easy switching of branches do ExtJS switch in PHP for the moment:
+        $this->view->extJsBasepath = str_replace('4.0.7', '6.0.0', $this->view->extJsBasepath);
+        
+        $this->view->buildType = 'fiddle';
+        $this->view->buildType = 'development';
+        
         $this->view->publicModulePath = APPLICATION_RUNDIR.'/modules/'.Zend_Registry::get('module');
         $this->view->locale = $this->session->locale;
 
@@ -162,6 +169,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         $restPath = APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';
       $this->view->Php2JsVars()->set('restpath', $restPath);
+      $this->view->Php2JsVars()->set('basePath', APPLICATION_RUNDIR);
       $this->view->Php2JsVars()->set('moduleFolder', $this->view->publicModulePath.'/');
       $this->view->Php2JsVars()->set('appFolder', $this->view->publicModulePath.'/js/app');
       $this->view->Php2JsVars()->set('pluginFolder', $restPath.'plugins/js');
@@ -260,6 +268,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             $task->loadByTaskGuid($this->session->taskGuid);
             $taskData = $task->getDataObject();
             unset($taskData->qmSubsegmentFlags);
+            
             $php2js->set('task', $taskData);
             $openState = $this->session->taskOpenState ? 
                     $this->session->taskOpenState : 
@@ -303,8 +312,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $ed = $this->session->runtimeOptions->editor;
         
         $controllers = array('ServerException', 'ViewModes', 'Segments', 
-            'Preferences', 'MetaPanel', 'Fileorder', 'Localizer',
-            'ChangeAlike', 'Comments', 'Editor');
+            'Preferences', 'MetaPanel', 'Editor', 'Fileorder',
+            'ChangeAlike', 'Comments');
         
         $pm = Zend_Registry::get('PluginManager');
         $pluginFrontendControllers = $pm->getActiveFrontendControllers();
@@ -330,6 +339,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             $controllers[] = 'admin.TaskUserAssoc';
             $controllers[] = 'admin.User';
         }
+
+        //Localizer must be the last one!
+        $controllers[] = 'Localizer';
         return $controllers;
     }
     

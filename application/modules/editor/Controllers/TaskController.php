@@ -386,6 +386,10 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $oldTask = clone $this->entity;
         $this->decodePutData();
+        //was formerly in JS: if a userState is transfered, then entityVersion has to be ignored!
+        if(!empty($this->data->userState)) {
+            unset($this->data->entityVersion);
+        }
         if(isset($this->data->enableSourceEditing)){
             $this->data->enableSourceEditing = (boolean)$this->data->enableSourceEditing;
         }
@@ -485,6 +489,7 @@ class editor_TaskController extends ZfExtended_RestController {
         if(!$this->entity->isRegisteredInSession() && $isEditAll || empty($row['userStep'])) {
             $row['segmentFields'] = $fields->loadByTaskGuid($taskguid);
             //the pm sees all, so fix userprefs
+            $userPref->setNotEditContent(false);
             $userPref->setAnonymousCols(false);
             $userPref->setVisibility($userPref::VIS_SHOW);
             $allFields = array_map(function($item) { 
@@ -496,7 +501,9 @@ class editor_TaskController extends ZfExtended_RestController {
             $userPref->loadByTaskUserAndStep($taskguid, $wf::WORKFLOW_ID, $this->user->data->userGuid, $row['userStep']);
             $row['segmentFields'] = $fields->loadByUserPref($userPref);
         }
+        
         $row['userPrefs'] = array($userPref->getDataObject());
+        $row['notEditContent'] = (bool)$row['userPrefs'][0]->notEditContent;
         
         //$row['segmentFields'] = $fields->loadByCurrentUser($taskguid);
         foreach($row['segmentFields'] as $key => &$field) {

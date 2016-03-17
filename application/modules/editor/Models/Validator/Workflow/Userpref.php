@@ -50,6 +50,7 @@ class editor_Models_Validator_Workflow_Userpref extends ZfExtended_Models_Valida
     protected function defineValidators() {
         $this->addValidator('id', 'int');
         $this->addValidator('taskGuid', 'guid');
+        $this->addValidator('notEditContent', 'boolean');
         $this->addValidator('anonymousCols', 'boolean');
         $visibilities = array(
             editor_Models_Workflow_Userpref::VIS_SHOW,

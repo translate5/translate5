@@ -89,16 +89,58 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     }
     
     public function indexAction() {
-        $session = new Zend_Session_Namespace();
-        $this->view->rows = $this->entity->loadByTaskGuid($session->taskGuid);
-        $this->view->total = $this->entity->totalCountByTaskGuid($session->taskGuid);
-        $borderSegments = $this->entity->getBorderSegments($session->taskGuid);
-        //editable segments only!
-        if(!empty($borderSegments['first'])) {
-            $this->view->firstSegmentId = $borderSegments['first']['id'];
+        $taskGuid = $this->session->taskGuid;
+        $this->view->rows = $this->entity->loadByTaskGuid($taskGuid);
+        $this->view->total = $this->entity->totalCountByTaskGuid($taskGuid);
+        
+        $this->addIsFirstFileInfo($taskGuid);
+        
+        //since we dont use metaData otherwise, we can overwrite it completly:
+        $this->view->metaData = $this->entity->findSurroundingEditables($this->getUsersAutoStateIds(), $this->view->total);
+        $this->view->metaData['page'] = $this->getParam('page');
+    }
+    
+    /**
+     * returns a list of autoStateIds, belonging to the users role in the currently loaded task
+     * is neede for the autostate filter in the frontend 
+     */
+    protected function getUsersAutoStateIds() {
+        $sessionUser = new Zend_Session_Namespace('user');
+        $taskUserAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $taskUserAssoc editor_Models_TaskUserAssoc */
+        $taskUserAssoc->loadByParams($sessionUser->data->userGuid, $this->session->taskGuid);
+        if($taskUserAssoc->getIsPmOverride()) {
+            $userRole = 'pm';
         }
-        if(!empty($borderSegments['last'])) {
-            $this->view->lastSegmentId = $borderSegments['last']['id'];
+        else {
+            $userRole = $taskUserAssoc->getRole();
+        }
+        
+        $states = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
+        /* @var $states editor_Models_SegmentAutoStates */
+        $autoStateMap = $states->getRoleToStateMap();
+        if(empty($userRole) || empty($autoStateMap[$userRole])) {
+            return null;
+        }
+        return $autoStateMap[$userRole];
+    }
+    
+    /**
+     * adds the optional is first of file info to the affected segments
+     * @param string $taskGuid
+     */
+    protected function addIsFirstFileInfo(string $taskGuid) {
+        $filemap = $this->entity->getFileMap($taskGuid);
+        foreach($filemap as $rowIndex) {
+            //omit first file
+            if($rowIndex === 0) {
+                continue;
+            }
+            $idx = $rowIndex - $this->offset;
+            if($idx < 0 || empty($this->view->rows[$idx])) {
+                continue;
+            }
+            $this->view->rows[$idx]['isFirstofFile'] = true;
         }
     }
 

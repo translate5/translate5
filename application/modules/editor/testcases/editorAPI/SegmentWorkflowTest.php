@@ -65,7 +65,7 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
      */
     public function testSaveXmlToFile() {
         $config = $this->api()->requestJson('editor/config', 'GET', array(
-            'filter' => '[{"type":"string","value":"runtimeOptions.editor.notification.saveXmlToFile","field":"name"}]',
+            'filter' => '[{"type":"string","value":"runtimeOptions.editor.notification.saveXmlToFile","property":"name","operator":"like"}]',
         ));
         $this->assertCount(1, $config);
         $this->assertEquals(1, $config[0]->value);
