@@ -3,6 +3,24 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.4.0] - 2016-03-17
+### Added
+TRANSLATE-586: Allow user only to add MQM-tags, but not to edit the content
+TRANSLATE-631: ExtJs 6 Update, including new features:
+  - decoupling segment editor from the grid
+  - segment editor can be moved vertically
+  - the opened segment stays open, regardless where the other segments are scrolled
+  - Navi Button to scroll back to the opened segment
+TRANSLATE-598: Show count of filtered segments in GUI
+
+### Changed
+TRANSLATE-659: Multiple tags of the same type are producing DomQuery warnings
+TRANSLATE-218: enable MQM for empty strings / missing content
+TRANSLATE-578: Change MQM-syntax in exported CSV
+TRANSLATE-622: Change order of the save and cancel button in the meta panel
+TRANSLATE-654: Improve tag protection and regex-based protection in CSV files
+TRANSLATE-653: Stop import, if TBX-file is given but does not contain entries for one of the selected languages
+
 ## [2.3.103] - 2016-02-04
 ### Added
 TRANSLATE-576: Added Keyboard shortcuts for most common actions
