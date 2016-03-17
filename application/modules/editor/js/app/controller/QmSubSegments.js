@@ -113,6 +113,7 @@ Ext.define('Editor.controller.QmSubSegments', {
         //bindStore dynamically to combo:
         combo.bindStore(sevStore);
         combo.setValue(sevStore.getAt(0).get('id'));
+        combo.resetOriginalValue();
     },
     /**
      * initialises the QM SubSegment Fieldset in the MetaPanel

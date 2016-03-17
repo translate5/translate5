@@ -69,7 +69,7 @@ Ext.define('Editor.view.qmsubsegments.AddFlagFieldset', {
                 	}
 				}
 			},{
-				xtype: 'combobox',
+				xtype: 'combo',
 				anchor: '100%',
 				name: 'qmsubseverity',
 				queryMode: 'local',
