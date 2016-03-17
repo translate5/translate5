@@ -35,8 +35,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 Ext.Loader.setConfig({
-  enabled: true,
-  disableCaching: false
+  enabled: true
 });
 Ext.data.Connection.disableCaching = false;
 Ext.data.JsonP.disableCaching = false;
