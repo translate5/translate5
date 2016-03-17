@@ -174,12 +174,32 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.segments.MetaPanelNavi.prototype.item_prev = '<?php echo $this->translate->_('Nicht speichern und vorheriges Segment öffnen (STRG + ALT + ↑)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_prevFiltered = '<?php echo $this->translate->_('Nicht speichern und vorheriges Segment im Workflow öffnen (ALT + Bild ↑)');?>';
     
-    Editor.controller.Editor.prototype.messages = {
-        segmentReset: '<?php echo $this->translate->_('Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.');?>',
-        segmentNotBuffered: '<?php echo $this->translate->_('Kein passendes Segment vorhanden bzw. im Zwischenspeicher gefunden. Bitte scrollen Sie manuell weiter!');?>',
-        gridEndReached: '<?php echo $this->translate->_('Ende der Segmente erreicht!');?>',
-        gridStartReached: '<?php echo $this->translate->_('Beginn der Segmente erreicht!');?>'
-    };
+   
+   Ext.define("Editor.locale.de.controller.Editor", {
+        override: "Editor.controller.Editor",
+        messages: {
+            segmentReset: '<?php echo $this->translate->_('Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.');?>',
+            segmentNotBuffered: '<?php echo $this->translate->_('Kein passendes Segment vorhanden bzw. im Zwischenspeicher gefunden. Bitte scrollen Sie manuell weiter!');?>',
+            gridEndReached: '<?php echo $this->translate->_('Ende der Segmente erreicht!');?>',
+            gridStartReached: '<?php echo $this->translate->_('Beginn der Segmente erreicht!');?>',
+            errorTitle: '<?php echo $this->translate->_('Fehler bei der Segment Validierung!');?>',
+            correctErrorsText: '<?php echo $this->translate->_('Fehler beheben');?>',
+            saveAnyway: '<?php echo $this->translate->_('Trotzdem speichern');?>',
+            editorMoveTitle: '<?php echo $this->translate->_('Verschiebbarer Editor');?>',
+            editorMove: '<?php echo $this->translate->_('Der Segmenteditor kann mit der Maus beliebig positioniert werden. <br />Dazu lediglich den Segmenteditor anklicken und dann verschieben.');?>',
+        }
+    });
+
+    Ext.define("Editor.locale.de.view.segments.HtmlEditor", {
+        override: "Editor.view.segments.HtmlEditor",
+        strings: {
+            tagOrderErrorText: '<?php echo $this->translate->_('Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).');?>',
+            tagMissingText: '<?php echo $this->translate->_('Die nachfolgenden Tags wurden beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br />Versuchen Sie mit der Rückgängigfunktion STRG-Z die Tags wiederherzustellen. <br />Alternativ können Sie auch die Bearbeitung des Segments durch Klick auf "Abbrechen" (<img src="../modules/editor/images/cross.png" /> im rechten Menü) beenden und das Segment neu zur Bearbeitung öffnen.<br />Fehlende Tags:');?>',
+            tagDuplicatedText: '<?php echo $this->translate->_('Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:');?>',
+            tagRemovedText: '<?php echo $this->translate->_('Es wurden Tags mit fehlendem Partner entfernt!');?>'
+        }
+    });
+    
 
     Editor.view.segments.RowEditor.prototype.messages = {
         segmentNotSavedUserMessage: '<?php echo $this->translate->_('Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank! <br/><br/>Gerade bearbeiteter Text war:<br/><br/>');?>',
@@ -228,16 +248,6 @@ Ext.define('Editor.controller.Localizer', {
         Ext.grid.filters.filter.Date.prototype.config.fields.lt.text = '<?php echo $this->translate->_('bevor');?>';
         //Ext.grid.filters.filter.DateFilter.prototype.dateFormat = Editor.DATE_ISO_FORMAT;
 
-	Editor.view.segments.HtmlEditor.prototype.strings = {
-		errorTitle: '<?php echo $this->translate->_('Fehler bei der Segment Validierung!');?>',
-		correctErrorsText: '<?php echo $this->translate->_('Fehler beheben');?>',
-		saveAnyway: '<?php echo $this->translate->_('Trotzdem speichern');?>',
-		tagOrderErrorText: '<?php echo $this->translate->_('Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).');?>',
-		tagMissingText: '<?php echo $this->translate->_('Die nachfolgenden Tags wurden beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Versuchen Sie mit der Rückgängigfunktion STRG-Z die Tags wiederherzustellen. <br /><br />Alternativ können Sie auch die Bearbeitung des Segments durch Klick auf "Abbrechen" (<img src="../modules/editor/images/cross.png" /> im rechten Menü) beenden und das Segment neu zur Bearbeitung öffnen.<br /><br />Fehlende Tags:');?>',
-		tagDuplicatedText: '<?php echo $this->translate->_('Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:');?>',
-		tagRemovedText: '<?php echo $this->translate->_('Es wurden Tags mit fehlendem Partner entfernt!');?>'
-	};
-	
 	Editor.MessageBox.prototype.titles = {
 		ok: '<?php echo $this->translate->_('Ok!');?>',
 		error: '<?php echo $this->translate->_('Fehler!');?>',
