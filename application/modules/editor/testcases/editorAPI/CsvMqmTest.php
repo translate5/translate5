@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  * The test task will be edited and exported. The generated changes.xml and 
  * exported file will then be checked for correct encoded content.
  */
-class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
+class CsvMqmTest extends \ZfExtended_Test_ApiTestcase {
     const CSV_TARGET = 'target is coming from test edit';
     
     protected $testData = array(
@@ -162,6 +162,7 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
      * @depends testEditingSegmentWithMqm
      */
     public function testExport() {
+        $this->markTestIncomplete("test in draft mode, has to be completed!");
         $task = $this->api()->getTask();
         //start task export 
         $this->checkExport($task, 'editor/task/export/id/'.$task->id, 'cascadingMqm-export-assert-equal.csv');
