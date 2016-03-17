@@ -1,6 +1,6 @@
 {
     "channels": {
-        "RELEASE": "http://www.translate5.net/downloads-test/",
+        "RELEASE": "http://www.translate5.net/downloads/"
     },
     "md5hashtable": "RELEASE:md5hashtable",
     "application": {
