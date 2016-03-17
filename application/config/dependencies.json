@@ -1,6 +1,6 @@
 {
     "channels": {
-        "RELEASE": "http://www.translate5.net/downloads/"
+        "RELEASE": "http://www.translate5.net/downloads-test/",
     },
     "md5hashtable": "RELEASE:md5hashtable",
     "application": {
@@ -77,15 +77,15 @@
             "relpath": "docs/third-party-licenses/PHPExcel-1.8.1.license.txt"
         }]
     },{
-        "name": "extjs-4",
+        "name": "extjs-6",
         "label": "ExtJS",
-        "version": "4.0.7",
-        "url": "RELEASE:ext-4.0.7.zip",
-        "target": "public/ext-4.0.7",
+        "version": "6.0.0",
+        "url": "RELEASE:ext-6.0.0-gpl.zip",
+        "target": "public/ext-6.0.0",
         "licenses": [{
             "uses": "ExtJS",
             "license": "GPL 3.0",
-            "relpath": "docs/third-party-licenses/ExtJs-license.txt"
+            "relpath": "docs/third-party-licenses/ExtJs6-license.txt"
         }]
     }]
 }
