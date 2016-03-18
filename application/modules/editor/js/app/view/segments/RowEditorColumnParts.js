@@ -226,11 +226,11 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         
         me.isRunningHorizontalScrolling = true;
         if(edReg.right > gridReg.right) {
-            offset = -1 * gridReg.getOutOfBoundOffsetX(edReg.right) + 10;
+            offset = -1 * gridReg.getOutOfBoundOffsetX(edReg.right) + 30;
             view.scrollBy(offset, 0, false);
         }
         else {
-            offset = -1 * gridReg.getOutOfBoundOffsetX(edReg.x) - 10;
+            offset = -1 * gridReg.getOutOfBoundOffsetX(edReg.x) - 20;
             view.scrollBy(offset, 0, false);
         }
     },
