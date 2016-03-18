@@ -39,9 +39,7 @@ class CsvMqmTest extends \ZfExtended_Test_ApiTestcase {
     protected $testData = array(
         'M',
         '<n-o#5#1989>',
-        'it den Einstellungen UNIPOL./FIX.SETPT ode',
-        '<c-c#6#1985>',
-        'r BIPO',
+        'it den Einstellungen UNIPOL./FIX.SETPT oder BIPO',
         '<c-o#1#1990>',
         'L./FIX.',
         '<n-o#3#1991>',
@@ -70,9 +68,7 @@ class CsvMqmTest extends \ZfExtended_Test_ApiTestcase {
         '<c-c#13#1986>',
         'ählt werden (fest',
         '<c-c#18#1987>',
-        'es ',
-        '<c-o#6#1985>',
-        'se',
+        'es se',
         '<n-c#3#1991>',
         '<c-c#1#1990>',
         'tpoi',
@@ -101,7 +97,7 @@ class CsvMqmTest extends \ZfExtended_Test_ApiTestcase {
         $appState = self::assertTermTagger();
         self::assertNotContains('editor_Plugins_ManualStatusCheck_Bootstrap', $appState->pluginsLoaded, 'Plugin ManualStatusCheck may not be activated for this test case!');
         
-        $api->addImportPlain("mid,quelle,target\n".'1,"source not needed here","'.self::CSV_TARGET.'"');
+        $api->addImportPlain("mid,quelle,target\n".'1,"source not needed here","'.self::CSV_TARGET.'"'."\n".'2,"zeile 2","row 2"');
         $api->import($task);
     }
     
@@ -138,12 +134,47 @@ class CsvMqmTest extends \ZfExtended_Test_ApiTestcase {
         //asserts that our content was imported properly
         $this->assertEquals(self::CSV_TARGET, $segToEdit->targetEdit);
 
+        $editedData = $this->compileMqmTags($this->testData);
+        
+        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $editedData, $segToEdit->id);
+        $this->api()->requestJson('editor/segment/'.$segToEdit->id, 'PUT', $segmentData);
+        
+        //editing second segment
+        $segToEdit = $segments[1];
+        
+        $test2 = array(
+                'nice',
+                '<c-c#6#1>', //wrong open close order!
+                'test',
+                '<c-o#3#2>',
+                'data',
+                '<c-o#3#3>', //overlapping here
+                'to',
+                '<c-c#3#2>', //and here
+                'test',
+                '<c-o#6#1>', //wrong open close order!
+                'wrong',
+                '<c-c#3#3>',
+                'order'
+        );
+        
+        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $this->compileMqmTags($test2), $segToEdit->id);
+        $this->api()->requestJson('editor/segment/'.$segToEdit->id, 'PUT', $segmentData);
+    }
+    
+    /**
+     * In our above testdata the mqm img tags were replaced for better readability
+     * this method creates the img tags out of the meta annotation
+     * @param array $data
+     * @return string
+     */
+    protected function compileMqmTags(array $data) {
         //replacing img tags for better readability!
         $severity = array('c' => 'critical', 'n' => 'null');
         $tags = array('o' => 'open', 'c' => 'close');
         $dir = array('o' => 'left', 'c' => 'right');
         
-        $editedData = join('', array_map(function($tag) use ($severity, $tags, $dir){
+        return join('', array_map(function($tag) use ($severity, $tags, $dir){
             return preg_replace_callback('/<([a-z])-([a-z])#([0-9]+)#([0-9]+)>/', function ($hit) use ($severity, $tags, $dir) {
                 $type = $hit[3];
                 $id = $hit[4];
@@ -151,10 +182,7 @@ class CsvMqmTest extends \ZfExtended_Test_ApiTestcase {
                 $img = '/modules/editor/images/imageTags/qmsubsegment-'.$type.'-'.$dir[$hit[2]].'.png';
                 return sprintf('<img  class="%s" data-seq="ext-%s" data-comment="" src="%s" />', $css, $id, $img);
             }, $tag);
-        }, $this->testData));
-        
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $editedData, $segToEdit->id);
-        $this->api()->requestJson('editor/segment/'.$segToEdit->id, 'PUT', $segmentData);
+        }, $data));
     }
     
     /**
@@ -162,7 +190,6 @@ class CsvMqmTest extends \ZfExtended_Test_ApiTestcase {
      * @depends testEditingSegmentWithMqm
      */
     public function testExport() {
-        $this->markTestIncomplete("test in draft mode, has to be completed!");
         $task = $this->api()->getTask();
         //start task export 
         $this->checkExport($task, 'editor/task/export/id/'.$task->id, 'cascadingMqm-export-assert-equal.csv');
@@ -177,7 +204,6 @@ class CsvMqmTest extends \ZfExtended_Test_ApiTestcase {
      * @param string $fileToCompare
      */
     protected function checkExport(stdClass $task, $exportUrl, $fileToCompare) {
-        $this->api()->login('testmanager');
         $this->api()->request($exportUrl);
 
         //get the exported file content
@@ -187,12 +213,48 @@ class CsvMqmTest extends \ZfExtended_Test_ApiTestcase {
         $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/apiTest.csv');
         //compare it
         $expectedResult = $this->api()->getFileContent($fileToCompare);
-        $this->assertEquals($expectedResult, $exportedFile);
+        
+        //since the mqm ids are generated on each test run differently, 
+        //we have to replace them, by a unified counter, so that we can compare both files. 
+        //Just replacing the ids with a fixed text is no solution, since we can not recognize nesting errors then.
+        $idReplacer = function($matches) use (&$foundIds){
+            //since matches array is not filled up on first matches, 
+            //we just have to check from the highest to the lowest key
+            if(!empty($matches[4])){
+                $id = $matches[4];
+                $box = 'idref=""%s""';
+            }
+            elseif(!empty($matches[2])){
+                $id = $matches[2];
+                $box = 'xml:id=""xoverlappingTagId-%s_'.$matches[3].'""';
+            }
+            elseif(!empty($matches[1])){
+                $id = $matches[1];
+                $box = 'xml:id=""x%s""';
+            }
+            else {
+                error_log(print_r($matches,1));
+            }
+            $key = array_search($id, $foundIds, true);
+            if($key === false) {
+                $key = count($foundIds);
+                $foundIds[] = $id;
+            }
+            return sprintf($box, $key);
+        };
+        $regex = '/xml:id=""x([0-9]+)""|xml:id=""xoverlappingTagId-([0-9]+)_([0-9]+)""|idref=""([0-9]+)""/';
+        
+        $foundIds = array();
+        $expectedResult = preg_replace_callback($regex, $idReplacer, $expectedResult);
+        $foundIds = array();
+        $exportedFile = preg_replace_callback($regex, $idReplacer, $exportedFile);
+        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to '.$fileToCompare);
     }
     
     public static function tearDownAfterClass() {
         $task = self::$api->getTask();
-        self::$api->login('testmanager');
+        self::$api->login('testlector'); //logout testmanager to close task
+        self::$api->login('testmanager'); //login again to delete
         self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
     }
 }
