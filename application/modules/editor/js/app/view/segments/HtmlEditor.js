@@ -574,7 +574,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   setImagePath: function(target){
     var me = this;
     me.getEditorBody().className = '';
-    Ext.each(Ext.query('img', me.getEditorBody()), function(item){
+    Ext.each(Ext.query('img', true, me.getEditorBody()), function(item){
       var markupImage;
       if(markupImage = me.getMarkupImage(item.id)){
         item.src = markupImage[target];

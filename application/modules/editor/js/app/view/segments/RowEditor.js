@@ -403,7 +403,7 @@ Ext.define('Editor.view.segments.RowEditor', {
         var me = this,
             context = me.context,
             row = Ext.get(context.row),
-            rowHeight = row.getHeight(),
+            rowHeight = row.setHeight(null) && row.getHeight(), //force recalculation on each call
             editorHeight = rowHeight + me.editorExtraHeight,
             moveEditor = (me.editorLocalTop + editorHeight) - me.scrollingView.getHeight();
         
@@ -422,7 +422,8 @@ Ext.define('Editor.view.segments.RowEditor', {
             context = me.context,
             row = Ext.get(context.row);
 
-        row.setHeight(me.rowToEditOrigHeight);
+        //setting to null triggers auto calculation again (which was the default before editing)
+        row.setHeight(null);
         me.rowToEditOrigHeight = 0;
     },
     
