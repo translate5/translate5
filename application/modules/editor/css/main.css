@@ -56,7 +56,14 @@ END LICENSE AND COPYRIGHT
 .segment-tag-container .x-autocontainer-innerCt div.close,
 .segment-tag-container .x-autocontainer-innerCt div.single {display:inline;background:#39FFA3;}
 
-.x-grid div .x-column-header-trigger {display:block;}
+/* force showing the column header drop down arrow */
+.x-column-header-trigger {
+	display:block;
+    width: 14px;
+    cursor: pointer;
+    background: transparent url(../../../ext-6.0.0/build/classic/theme-classic/resources/images/grid/grid3-hd-btn.gif) no-repeat 0 center;
+}
+
 
 #segment-grid div.x-grid-cell-inner div.open span {} /* Grafik Style für open Tag*/
 #segment-grid div.x-grid-cell-inner div.close span {} /* Grafik Style für close Tag*/
