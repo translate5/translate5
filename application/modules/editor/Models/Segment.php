@@ -623,16 +623,149 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @param integer $total
      * @return array
      */
-    public function findSurroundingEditables(array $autoStateIds, integer $total) {
-        //not really nice, but creating the basic select in Segment entity provides all filter where statements 
-        $s = $this->db->select()
-            ->from($this->db, array('id', 'editable', 'autoStateId', 'segmentNrInTask'));
-        $s = $this->addWatchlistJoin($s);
-        $s = $this->filter->applyToSelect($s);
+    public function findSurroundingEditables(integer $segmentId, $next, array $autoStateIds = null) {
+        $this->load($segmentId);
+        $this->reInitDb($this->getTaskGuid());
         
-        $finder = ZfExtended_Factory::get('editor_Models_Segment_EditablesFinder', array($this->db->getAdapter(), $s));
-        /* @var $finder editor_Models_Segment_EditablesFinder */
-        return $finder->find($this->offset, $this->limit, $autoStateIds, $total);
+        //this may be called only once:
+        if(empty($this->alreadyDone)) {
+            $this->initDefaultSort();
+            $this->alreadyDone = true;
+        }
+        
+        $table = (string)$this->db;
+        $filterInner = clone $this->filter;
+        $filterInner->setDefaultTable($table);
+        $filterOuter = clone $this->filter;
+        $filterOuter->setDefaultTable('list');
+        
+        $outerSql = $this->db->select()
+            ->from(array('list' => $this->db), new Zend_Db_Expr('if(count(pos.id), count(list.id), null) AS cnt'));
+        $origTable = $this->tableName;
+        $this->tableName = 'list';
+        $outerSql = $this->addWatchlistJoin($outerSql);
+        $this->tableName = $origTable;
+        
+        if(!empty($autoStateIds)) {
+            $filterInner->addFilter((object)[
+                'field' => 'autoStateId',
+                'type' => 'notInList',
+                'value' => $autoStateIds,
+            ]);
+        }
+        $filterInner->addFilter((object)[
+            'field' => 'editable',
+            'value' => 1,
+            'type' => 'boolean',
+        ]);
+        
+        // remove id field, since this is added internally
+        $sortParameter = $this->filter->getSort();
+        $fieldsToSelect = array();
+        foreach($sortParameter as $id => $sort) {
+            $fieldsToSelect[] = $sort->property;
+            if($sort->property !== 'id'){
+                unset($sortParameter[$id]); 
+            }
+        }
+        
+        $innerSql = $this->db->select()
+            ->from($this->db, $fieldsToSelect)
+            ->limit(1);
+        $innerSql = $this->addWatchlistJoin($innerSql);
+        $innerSql = $filterInner->applyToSelect($innerSql);
+        
+        foreach($sortParameter as $sort) {
+            $isAsc = strtolower($sort->direction) === 'asc';
+            $prop = $this->filter->mapSort($sort->property); //mapSort adds also a table, this is not needed here!
+            $prop = explode('.', $prop);
+            $prop = end($prop);
+            $value = $this->get($prop);
+            
+            //if we ever will have multiple sort parameters, this should work out of the box
+            /*
+                INNER WHERE
+                ASC NEXT     sortField > currentSortValue || sortField = currentSortValue && idField > currentIdValue
+                DESC NEXT    sortField < currentSortValue || sortField = currentSortValue && idField > currentIdValue
+                ASC PREV     sortField < currentSortValue || sortField = currentSortValue && idField < currentIdValue
+                DESC PREV    sortField > currentSortValue || sortField = currentSortValue && idField < currentIdValue
+            */
+                $idComparator = $next ? '>' : '<';
+                $comparator = ($isAsc xor $next) ? '<' : '>';
+                //id comparator depends only on prev/next, since order for id is always ASC!
+                $f = $table.'.`'.$prop.'` ';
+                $innerSql->where('('.$f.$comparator.' ?', $value);
+                $innerSql->orWhere('('.$f.'= ?', $value);
+                $innerSql->where($f.$comparator.' ? ))', $this->getId());
+                
+            /*
+                OUTER WHERE
+                ASC NEXT/PREV   sortField < innerSortValue || sortField = innerSortValue && idField < innerIdValue
+                DESC NEXT/PREV  sortField > innerSortValue || sortField = innerSortValue && idField > innerIdValue
+            */
+                //id comparator depends only on prev/next, since order for id is always ASC!
+                $comparator = $isAsc ? '<' : '>';
+                $where = 'list.`%1$s` %2$s pos.`%1$s`';
+                $outerSql->where('('.sprintf($where, $prop, $comparator));
+                $outerSql->orWhere('('.sprintf($where, $prop, ' = '));
+                $outerSql->where(sprintf($where, 'id', $comparator).'))');
+        }
+        
+        $outerSql->from(array('pos' => $innerSql), null);
+        $filterOuter->applyToSelect($outerSql);
+
+        //debug sql:
+        file_put_contents('/tmp/foo.sql', $outerSql);
+        //exec('sqlformat --reindent --keywords upper --identifiers lower /tmp/foo.sql', $out);
+        exec('sqlformat --reindent --keywords upper /tmp/foo.sql', $out);
+        error_log("\n".join("\n", $out));
+        //return;
+        
+        /*
+         * This is the expected result, where the result is sorted after matchrate, 
+         * and the segment to compare has a matchRate of 20 and id 923695
+            SELECT count(n.id) FROM `VIEW` n,(
+                SELECT `matchRate`,`id` 
+                FROM `VIEW` 
+                WHERE `matchRate` >= '20'  → this depends on the set sort, >= for ASC, <= for DESC and on the search direction
+                AND id > '923695'          → for ID we assume always > for search next and < for search prev, independant of sort direction
+                AND autoStateId not in (0,4)   → here add editable and autoState filter 
+                ORDER BY `matchRate` ASC ,id ASC 
+                LIMIT 1
+            ) pos 
+            where (n.matchRate <= pos.matchRate 
+                  OR (n.matchRate = pos.matchRate AND n.id < pos.id))  
+            ORDER BY n.`matchRate` ASC ,n.id ASC
+            
+            Beide Mengen nach der watchlist filtern
+            
+            the matchrate and id values are depending on the current segment, from where to look
+            
+            For prev/next and asc/desc this results in the following where statements:
+            where X_ values are the current segments values, and P_ the values of the next/prev segment
+            
+            INNER                               OUTER
+            ASC NEXT                            ASC NEXT/PREV
+            F > X_F || F = X_F && ID > X_ID     F < P_F || F = P_F && ID < P_ID
+            
+            DESC NEXT                           DESC NEXT/PREV
+            F < X_F || F = X_F && ID > X_ID     F > P_F || F = P_F && ID > P_ID
+            
+            ASC PREV                            
+            F < X_F || F = X_F && ID < X_ID     
+            
+            DESC PREV                           
+            F > X_F || F = X_F && ID < X_ID     
+        */
+        
+        $stmt = $this->db->getAdapter()->query($outerSql);
+        $res = $stmt->fetch();
+        if(empty($res)) {
+            return null;
+        }
+        return $res['cnt'];
+        
+        return $finder->find($this->offset, $this->limit, $autoStateIds, $segmentId);
     }
     
     /**
@@ -860,8 +993,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     protected function initDefaultSort() {
         if (!empty($this->filter) && !$this->filter->hasSort()) {
             $this->filter->addSort('fileOrder');
-            $this->filter->addSort('id');
         }
+        $this->filter->addSort('id'); //add id as second persistent filter
     }
 
     /**

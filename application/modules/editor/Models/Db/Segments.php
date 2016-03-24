@@ -52,4 +52,11 @@ class editor_Models_Db_Segments extends Zend_Db_Table_Abstract {
         $this->_name = $tableName;
         parent::__construct($config);
     }
+    
+    /**
+     * @return string
+     */
+    public function __toString() {
+        return $this->_name;
+    }
 }

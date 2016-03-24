@@ -94,10 +94,19 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->view->total = $this->entity->totalCountByTaskGuid($taskGuid);
         
         $this->addIsFirstFileInfo($taskGuid);
-        
+    }
+    
+    public function nextsegmentsAction() {
         //since we dont use metaData otherwise, we can overwrite it completly:
-        $this->view->metaData = $this->entity->findSurroundingEditables($this->getUsersAutoStateIds(), $this->view->total);
-        $this->view->metaData['page'] = $this->getParam('page');
+        $segmentId = (int) $this->_getParam('segmentId'); //hardcoded fake value, just for development
+        $autoStates = $this->getUsersAutoStateIds();
+        $result = array(
+                'next' => $this->entity->findSurroundingEditables($segmentId, true),
+                'prev' => $this->entity->findSurroundingEditables($segmentId, false),
+                'nextFiltered' => $this->entity->findSurroundingEditables($segmentId, true, $autoStates),
+                'prevFiltered' => $this->entity->findSurroundingEditables($segmentId, false, $autoStates),
+        );
+        echo Zend_Json::encode($result, Zend_Json::TYPE_OBJECT);
     }
     
     /**
