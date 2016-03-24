@@ -41,12 +41,13 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.controller.Editor', {
   extend : 'Ext.app.Controller',
-  requires: ['Editor.view.segments.EditorKeyMap'],
+  requires: [
+    'Editor.view.segments.EditorKeyMap',
+    'Editor.controller.editor.PrevNextSegment'
+  ],
   messages: {
       segmentReset: '#UT#Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.',
       segmentNotBuffered: '#UT#Kein passendes Segment vorhanden bzw. im Zwischenspeicher gefunden. Bitte scrollen Sie manuell weiter!',
-      gridEndReached: '#UT#Ende der Segmente erreicht!',
-      gridStartReached: '#UT#Start der Segmente erreicht!',
       errorTitle: '#UT# Fehler bei der Segment Validierung!',
       correctErrorsText: '#UT# Fehler beheben',
       editorMoveTitle: '#UT#Verschiebbarer Editor',
@@ -61,9 +62,9 @@ Ext.define('Editor.controller.Editor', {
       ref : 'navi',
       selector : '#metapanel #naviToolbar'
   }],
-  lastSaveOtherRowParameter:false,
   isEditing: false,
   keyMapConfig: null,
+  prevNextSegment: null,
   listen: {
       component: {
           '#metapanel metapanelNavi #watchSegmentBtn' : {
@@ -110,6 +111,7 @@ Ext.define('Editor.controller.Editor', {
           'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
           'pos1':           null //add empty pos1 handler here, so that the overwrite is processed
       };
+      
   },
   /**
    * track isEditing state 
@@ -119,11 +121,13 @@ Ext.define('Editor.controller.Editor', {
           disableEditing = function(){me.isEditing = false;};
           
       me.getEditPlugin().on('beforestartedit', me.handleBeforeStartEdit, me);
-      me.getEditPlugin().on('beforeedit', function(plugin, context){
-          me.isEditing = true;
-      });
+      me.getEditPlugin().on('beforeedit', me.handleStartEdit, me);
       me.getEditPlugin().on('canceledit', disableEditing);
       me.getEditPlugin().on('edit', disableEditing)
+      
+      me.prevNextSegment = Ext.create('Editor.controller.editor.PrevNextSegment', {
+        editingPlugin: me.getEditPlugin()
+      });
       
       new Ext.util.KeyMap(Ext.getDoc(), me.getKeyMapConfig({
           'pos1': [Ext.EventObjectImpl.HOME,{ctrl: false, alt: false}, me.handleHomeKeyPress, true],
@@ -167,6 +171,11 @@ Ext.define('Editor.controller.Editor', {
           }
       });
       return false;
+  },
+  handleStartEdit: function(plugin, context) {
+    var me = this;
+    me.isEditing = true;
+    me.prevNextSegment.calculateRows(context);//context.record, context.rowIdx
   },
   /**
    * Gibt die RowEditing Instanz des Grids zurück
@@ -249,72 +258,13 @@ Ext.define('Editor.controller.Editor', {
       }
   },
   /**
-   * Cleaning up after editing segment
-   * @param {Object} return data from calculateNextRow
-   */
-  openNextRow: function(ret) {
-      var me = this,
-          grid = me.getSegmentGrid(),
-          selModel = grid.getSelectionModel(),
-          ed = me.getEditPlugin(),
-          res;
-      
-      if (!ret.existsNextSegment && ret.isBorderReached) {
-          Editor.MessageBox.addInfo(ret.errorText);
-          return;
-      }
-
-      //if we have a nextSegment and it is rendered, bring into the view and open it
-      if (ret.existsNextSegment && grid.getView().getNode(ret.newRec)) {
-          res = selModel.select(ret.newRec);
-          //REMIND here was startEdit defered with 300 millis, is this still needed?
-          ed.startEdit(ret.newRec, ret.lastColumn, ed.self.STARTEDIT_SCROLLUNDER);
-          return;
-      }
-
-      if(!ret.existsNextRowIdx) {
-          Editor.MessageBox.addInfo(me.messages.segmentNotBuffered);
-          return;
-      }
-      
-      //if we only have a rowIndex or it is not rendered, we have to scroll first
-      callback = function() {
-          grid.selectOrFocus(ret.existsNextRowIdx);
-          sel = selModel.getSelection();
-          ed.startEdit(sel[0], ret.lastColumn, ed.self.STARTEDIT_SCROLLUNDER);
-      };
-      grid.scrollTo(ret.existsNextRowIdx, {
-          callback: callback,
-          notScrollCallback: callback
-      });
-  },
-  /**
-   * Moves to the next or previous row without saving current record
-   * @param {Integer} direction of moving
-   * @param {String} error message if there is no more segment to move the editor
-   * @param {Function} filter function for the workflow step
-   * @return {Boolean} true if there is a next segment, false otherwise
-   */
-  moveToAdjacentRow: function(direction, errorText, filter) {
-      var me = this,
-          ret = null;
-      
-      if(!me.isEditing) {
-          return;
-      }
-
-      ret = this.calculateNextRow(direction, errorText, filter);
-      me.cancel();
-      me.openNextRow(ret);
-      return ret.existsNextSegment;
-  },
-  /**
    * Moves to the next row without saving current record
    * @return {Boolean} true if there is a next segment, false otherwise
    */
   goToLowerNoSave: function() {
       var me = this;
-      me.moveToAdjacentRow(1, this.messages.gridEndReached);
+      me.prevNextSegment.calcNext()
+      me.moveToAdjacentRow();
   },
   /**
    * Moves to the next row without saving current record
@@ -322,7 +272,8 @@ Ext.define('Editor.controller.Editor', {
    */
   goToUpperNoSave: function() {
       var me = this;
-      me.moveToAdjacentRow(-1, this.messages.gridStartReached);
+      me.prevNextSegment.calcPrev()
+      me.moveToAdjacentRow();
   },
   /**
    * Moves to the next row with the same workflow value without saving current record
@@ -332,7 +283,8 @@ Ext.define('Editor.controller.Editor', {
       var me = this;
       e.preventDefault();
       e.stopEvent();
-      return me.moveToAdjacentRow(1, me.messages.gridEndReached, me.workflowStepFilter);
+      me.prevNextSegment.calcNext(true)
+      me.moveToAdjacentRow();
   },
   /**
    * Moves to the previous row with the same workflow value without saving current record
@@ -342,162 +294,118 @@ Ext.define('Editor.controller.Editor', {
       var me = this;
       e.preventDefault();
       e.stopEvent();
-      return me.moveToAdjacentRow(-1, me.messages.gridStartReached, me.workflowStepFilter);
+      me.prevNextSegment.calcPrev(true)
+      me.moveToAdjacentRow();
+  },
+  /**
+   * Moves to the next or previous row without saving current record
+   * @param {Object} rowMeta meta information of the next/prev segment to be opened
+   * @return {Boolean} true if there is a next segment, false otherwise
+   */
+  moveToAdjacentRow: function() {
+      var me = this;
+      
+      if(!me.isEditing) {
+          return;
+      }
+
+      me.cancel();
+      me.openNextRow();
   },
   /**
    * Handler for saveNext Button
    * @return {Boolean} true if there is a next segment, false otherwise
    */
   saveNext: function() {
-      return this.saveOtherRow(1, this.messages.gridEndReached);
+      this.prevNextSegment.calcNext()
+      this.saveOtherRow();
   },
   /**
    * Handler for savePrevious Button
    * @return {Boolean} true if there is a next segment, false otherwise
    */
   savePrevious: function() {
-      return this.saveOtherRow(-1, this.messages.gridStartReached);
+      this.prevNextSegment.calcPrev()
+      this.saveOtherRow();
   },
   /**
    * Handler for saveNext Button
    * @return {Boolean} true if there is a next segment, false otherwise
    */
   saveNextByWorkflow: function() {
-      return this.saveOtherRow(1, this.messages.gridEndReached, this.workflowStepFilter);
+      this.prevNextSegment.calcNext(true)
+      this.saveOtherRow();
   },
   /**
    * Handler for savePrevious Button
    * @return {Boolean} true if there is a next segment, false otherwise
    */
   savePreviousByWorkflow: function() {
-      return this.saveOtherRow(-1, this.messages.gridStartReached, this.workflowStepFilter);
-  },
-  /**
-   * returns true if segment was not edited by the current role yet
-   */
-  workflowStepFilter: function(rec, newRec) {
-      var role = Editor.data.task.get('userRole') || 'pm',
-          map = Editor.data.segments.roleAutoStateMap;
-      if(!map[role]) {
-          return true;
-      }
-      return map[role].indexOf(newRec.get('autoStateId')) < 0;
-  },
-  /**
-   * Gets the next editable segment offset relative to param offset
-   * @param integer offset
-   **/
-  getNextEditableSegmentOffset: function(offset, isEditable) {
-      var me = this,
-      grid = me.getSegmentGrid(),
-      store = grid.store,
-      origOffset = offset,
-      rec = store.getAt(offset);
-      
-      isEditable = (Ext.isFunction(isEditable) ? isEditable : function(){ return true; });
-      do
-      {
-          if (rec && rec.get('editable') && isEditable(rec))
-          {
-              return offset;
-          }
-          offset++;
-          rec = store.getAt(offset);
-      } while (rec);
-      // no editable segment
-      return origOffset;
-  },
-  /**
-   * go to other row
-   * @param {Integer} rowIdxChange positive or negative integer value to choose the index of the next row
-   * @param {String} error message if no more editable segment found
-   * @param {Function} isEditable optional, function which consumes a segment record, returns true if segment should be opened, false if not
-   * @return {Object} to be used by saveOtherRow
-   */
-  calculateNextRow: function(rowIdxChange, errorText, isEditable) {
-      var me = this,
-          grid = me.getSegmentGrid(),
-          ed = me.getEditPlugin(),
-          store = grid.store,
-          rec = ed.context.record,
-          nextToUseMeta = null,
-          useAutoStateFilter = Ext.isFunction(isEditable),
-          currentIdx = store.indexOf(rec),
-          lastIdx,
-          ret = {
-            'errorText'        : errorText,
-            'existsNextSegment': false,
-            'isBorderReached'  : false,
-            'existsNextRowIdx' : false,
-            'lastColumn'       : null,
-            'newRec'           : store.getAt(currentIdx + rowIdxChange)
-          };
-      isEditable = (useAutoStateFilter ? isEditable : function(){ return true; });
-      if(!rec || !rec.get('editable')) {
-          return ret;
-      }
-      //checking always for segments editable flag + custom isEditable  
-      while (ret.newRec && (!ret.newRec.get('editable') || !isEditable(rec, ret.newRec)))
-      {
-          lastIdx = store.indexOf(ret.newRec) + rowIdxChange;
-          ret.newRec = store.getAt(lastIdx);
-      }
-      Ext.Array.each(grid.columns, function(col, idx) {
-          if(col.dataIndex == ed.editor.getEditedField()) {
-              ret.lastColumn = col;
-          }
-      });
-      ret.existsNextSegment = (ret.newRec !== undefined);
-      if(ret.existsNextSegment) {
-          ret.existsNextRowIdx = lastIdx;
-      }
-
-      //nextToUseMeta contains the next/prev editable in the next/prev page! 
-      //if in current page there are existing prev/next editables, that should be used!
-      if(rowIdxChange > 0) {
-          nextToUseMeta = store.getNextPageEditable(currentIdx, useAutoStateFilter);
-      }
-      else {
-          nextToUseMeta = store.getPrevPageEditable(currentIdx, useAutoStateFilter);
-      }
-      //if next/prev page does not contain any editables anymore, that means that the border is reached.
-      ret.isBorderReached = nextToUseMeta === null;
-
-      //set existsNextRowIdx only if existsNextSegment is false, that means in current page is no usable segment
-      if(!ret.existsNextSegment && !ret.isBorderReached) {
-          ret.existsNextRowIdx = nextToUseMeta.rowIdx;
-      }
-      return ret;
+      this.prevNextSegment.calcPrev(true)
+      this.saveOtherRow();
   },
   /**
    * save and go to other row
-   * @param {Integer} rowIdxChange positive or negative integer value to choose the index of the next row
-   * @param {String} errorText
-   * @param {Function} isEditable optional, function which consumes a segment record, returns true if segment should be opened, false if not
-   * @return {Boolean} true if there is a next segment, false otherwise
    */
-  saveOtherRow: function(rowIdxChange, errorText, isEditable) {
+  saveOtherRow: function() {
       var me = this,
           grid = me.getSegmentGrid(),
           selModel = grid.getSelectionModel(),
-          ed = me.getEditPlugin(),
-          ret = me.calculateNextRow(rowIdxChange, errorText, isEditable);
+          ed = me.getEditPlugin();
       
       if(!me.isEditing) {
           return;
       }
-      //store the arguments to recall me on handleSaveWithErrors callback
-      me.lastSaveOtherRowParameter = [rowIdxChange, errorText, isEditable];
-          
       me.fireEvent('saveUnsavedComments');
       
       me.fireEvent('saveSegment', {
           scope: me,
           segmentUsageFinished: function(){
-              me.openNextRow(ret);
+              me.openNextRow();
           }
       });
-      return ret.existsNextSegment;
+  },
+  /**
+   * Opens a next row, if any
+   * @param {Object} data from getPrevNextRow
+   */
+  openNextRow: function() {
+      var me = this,
+          grid = me.getSegmentGrid(),
+          selModel = grid.getSelectionModel(),
+          ed = me.getEditPlugin()
+          rowMeta = me.prevNextSegment.getCalculated();
+      
+      //if we have a nextSegment and it is rendered, bring into the view and open it
+      if (rowMeta.rec && grid.getView().getNode(rowMeta.rec)) {
+          selModel.select(rowMeta.rec);
+          //REMIND here was startEdit defered with 300 millis, is this still needed?
+          ed.startEdit(rowMeta.rec, rowMeta.lastColumn, ed.self.STARTEDIT_SCROLLUNDER);
+          return;
+      }
+
+      if(Ext.isDefined(rowMeta.idx)) {
+          //if we only have a rowIndex or it is not rendered, we have to scroll first
+          callback = function() {
+              grid.selectOrFocus(rowMeta.idx);
+              sel = selModel.getSelection();
+              ed.startEdit(sel[0], rowMeta.lastColumn, ed.self.STARTEDIT_SCROLLUNDER);
+          };
+          grid.scrollTo(rowMeta.idx, {
+              callback: callback,
+              notScrollCallback: callback
+          });
+          return;
+      }
+      
+      if(rowMeta.isBorderReached) {
+          Editor.MessageBox.addInfo(rowMeta.errorText);
+          return;
+      }
+      
+      if(rowMeta.isLoading) {
+          Editor.MessageBox.addInfo(me.messages.segmentNotBuffered); //FIXME Bedingung überprüfen und neuer Text
+      }
   },
   /**
    * @param {Editor.view.segments.HtmlEditor} editor
@@ -508,9 +416,7 @@ Ext.define('Editor.controller.Editor', {
           msgBox;
       
       //if there was an empty message we assume that there was no error,
-      //therefore we can delete the last saveOtherRow parameters
       if(!msg) {
-          me.lastSaveOtherRowParameter = false;
           return;
       }
       
@@ -534,8 +440,8 @@ Ext.define('Editor.controller.Editor', {
       var me = this,
           plug = me.getEditPlugin();
       plug.editor.mainEditor.disableContentErrorCheckOnce();
-      if(me.lastSaveOtherRowParameter){
-          me.saveOtherRow.apply(me, me.lastSaveOtherRowParameter);
+      if(me.prevNextSegment.getCalculated()){
+          me.saveOtherRow.apply(me);
           return;
       }
       me.save();
@@ -762,6 +668,31 @@ Ext.define('Editor.controller.Editor', {
         });
 
     }
+  },
+  /**
+   * Gets the next editable segment offset relative to param offset
+   * @param integer offset
+   **/
+  getNextEditableSegmentOffset: function(offset, isEditable) {
+    //FIXME diese methode ebenfalls auf die Datenstruktur umstellen
+      var me = this,
+      grid = me.getSegmentGrid(),
+      store = grid.store,
+      origOffset = offset,
+      rec = store.getAt(offset);
+      
+      isEditable = (Ext.isFunction(isEditable) ? isEditable : function(){ return true; });
+      do
+      {
+          if (rec && rec.get('editable') && isEditable(rec))
+          {
+              return offset;
+          }
+          offset++;
+          rec = store.getAt(offset);
+      } while (rec);
+      // no editable segment
+      return origOffset;
   },
   /**
    * scrolls to the first segment.
