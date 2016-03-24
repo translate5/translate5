@@ -803,8 +803,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     public function loadNext($taskGuid, $id, $fileId = null) {
         $s = $this->db->select();
         $s = $this->addWatchlistJoin($s);
-        $s->where($this->tableName.'.taskGuid = ?', $taskGuid)
-            ->where($this->tableName.'.id > ?', $id)
+        $s = $this->addWhereTaskGuid($s, $taskGuid);
+        $s->where($this->tableName.'.id > ?', $id)
             ->order($this->tableName.'.id ASC')
             ->limit(1);
 
@@ -877,32 +877,51 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
          */
         $s->from($this->db, $cols);
         $s = $this->addWatchlistJoin($s);
-        $s->where($this->tableName.'.taskGuid = ?', $taskGuid);
+        $s = $this->addWhereTaskGuid($s, $taskGuid);
+        
         return parent::loadFilterdCustom($s);
     }
     
-    public function totalCountByTaskGuid($taskGuid)
-    {
-        $this->segmentFieldManager->initFields($taskGuid);
-        $this->reInitDb($taskGuid);
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_Models_Entity_Abstract::computeTotalCount()
+     * @param string $taskGuid
+     */
+    public function totalCountByTaskGuid($taskGuid){
+        $s = $this->db->select();
         
-        $this->initDefaultSort();
-       
-        $db = $this->db;
-        $cols = $this->db->info($db::COLS);
-        $s = $this->db->select(false);
-        $db = $this->db;
-        $s->from(array($this->tableName => $db->info($db::NAME)), $cols);
-        $s = $this->addWatchlistJoin($s);
-        $s->where($this->tableName.'.taskGuid = ?', $taskGuid);
         
-        if (!empty($this->filter))
-        {
-            $this->filter->applyToSelect($s);
+        if(!empty($this->filter)) {
+            $this->filter->applyToSelect($s, false);
         }
-
-        $res = $this->db->fetchAll($s)->toArray();
-        return count($res);
+        $name = $this->db->info(Zend_Db_Table_Abstract::NAME);
+        $schema = $this->db->info(Zend_Db_Table_Abstract::SCHEMA);
+        $s->from($name, array('numrows' => 'count(*)'), $schema);
+        
+        //this method does exactly the same as computeTotalCount expect that it adds this both where statements
+        // but this is only possible AFTER the from() call so far!
+        $s = $this->addWhereTaskGuid($s, $taskGuid);
+        $s = $this->addWatchlistJoin($s);
+        
+        $totalCount = $this->db->fetchRow($s)->numrows;
+        $s->reset($s::COLUMNS);
+        $s->reset($s::FROM);
+        return $totalCount;
+    }
+    
+    /**
+     * adds the where taskGuid = ? statement only to the given statement,
+     * if it is needed. Needed means the current table is not the mat view to the taskguid
+     * This "unneeded" where is a performance issue for big tasks. 
+     */
+    protected function addWhereTaskGuid(Zend_Db_Table_Select $s, $taskGuid) {
+        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView', array($taskGuid));
+        /* @var $mv editor_Models_Segment_MaterializedView */
+        
+        if($this->tableName !== $mv->getName()) {
+            $s->where($this->tableName.'.taskGuid = ?', $taskGuid);
+        }
+        return $s;
     }
 
     /**
@@ -922,7 +941,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $db = $this->db;
         $s->from($this->db, $fields);
         $s = $this->addWatchlistJoin($s);
-        $s->where($this->tableName.'.taskGuid = ?', $taskGuid)->where($this->tableName.'.workflowStep = ?', $workflowStep);
+        $s = $this->addWhereTaskGuid($s, $taskGuid);
+        $s->where($this->tableName.'.workflowStep = ?', $workflowStep);
         return parent::loadFilterdCustom($s);
     }
 
@@ -951,14 +971,19 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->filter->addTableForField('isWatched', 'sua');
         $s->joinLeft(array('sua' => $db_join->info($db_join::NAME)), 'sua.segmentId = '.$this->tableName.'.id AND sua.userGuid = \''.$userGuid.'\'', array('isWatched', 'id AS segmentUserAssocId'));
         $s->setIntegrityCheck(false);
+    //error_log($s);
         return $s;
     }
     
     /**
-     * enables the watchlist filter join
-     * @param boolean $value
+     * enables the watchlist filter join, for performance issues only if the user 
+     *   really wants to see the watchlist (isWatched is in the filter list)
+     * @param boolean $value optional, to force enable/disable watchlist
      */
-    public function setEnableWatchlistJoin($value = true) {
+    public function setEnableWatchlistJoin($value = null) {
+        if(is_null($value)) {
+            $value = $this->filter->hasFilter('isWatched');
+        }
         $this->watchlistFilterEnabled = $value;
     }
 
@@ -972,7 +997,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $s = $this->db->select()
                 ->from($this->db, 'fileId');
         $s = $this->addWatchlistJoin($s);
-        $s->where($this->tableName.'.taskGuid = ?', $taskGuid);
+        $s = $this->addWhereTaskGuid($s, $taskGuid);
+        
 
         if (!empty($this->filter)) {
             $this->filter->applyToSelect($s);
@@ -1104,10 +1130,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $s = $this->db->select()
                 ->from($segmentsTableName, array('id'));
         $s = $this->addWatchlistJoin($s);
-        $s->where($this->tableName.'.taskGuid = ?', $taskGuid)
-                //Achtung: die Klammerung von (source = ? or target = ?) beachten!
-                ->where('('.$this->tableName.'.sourceMd5 ' . $this->_getSqlTextCompareOp() . ' ?', (string) $this->getSourceMd5())
-                ->orWhere($this->tableName.'.targetMd5 ' . $this->_getSqlTextCompareOp() . ' ?)', (string) $this->getTargetMd5());
+        $s = $this->addWhereTaskGuid($s, $taskGuid);
+        
+        //Achtung: die Klammerung von (source = ? or target = ?) beachten!
+        $s->where('('.$this->tableName.'.sourceMd5 ' . $this->_getSqlTextCompareOp() . ' ?', (string) $this->getSourceMd5())
+        ->orWhere($this->tableName.'.targetMd5 ' . $this->_getSqlTextCompareOp() . ' ?)', (string) $this->getTargetMd5());
         $filteredIds = parent::loadFilterdCustom($s);
         $hasIdFiltered = array();
         foreach ($filteredIds as $ids) {
@@ -1289,8 +1316,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $s = $this->db->select()
             ->from($this->db, $cols);
         $s = $this->addWatchlistJoin($s);
-        $s->where($this->tableName.'.taskGuid = ?', $taskGuid)
-            ->group($this->tableName.'.fileId');
+        $s = $this->addWhereTaskGuid($s, $taskGuid);
+        $s->group($this->tableName.'.fileId');
         $rows = $this->db->fetchAll($s);
         
         $result = array();
