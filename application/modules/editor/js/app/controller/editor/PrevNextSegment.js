@@ -49,7 +49,6 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
     isLoading: false,
     constructor: function(config) {
         this.editingPlugin = config.editingPlugin;
-        foo = this;
     },
     calcNext: function(filtered){
         var me = this;
@@ -64,6 +63,12 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
     },
     reset: function() {
         this.calculated = null;
+    },
+    handleSortOrFilter: function() {
+        var me = this,
+            plug = me.editingPlugin;
+        me.prev = null;
+        me.next = null;
     },
     /**
      * Gets the next editable segment offset relative to param offset
@@ -97,6 +102,8 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
         me.context = context;
         me.prev = me.calculateRow(-1);
         me.next = me.calculateRow(1);
+        //fetches missing information from server, if needed.
+        me.fetchFromServer();
     },
     /**
      * @param {} rowIdxChange
@@ -144,14 +151,37 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
                 };
             }
         }
-      
+        me.addReusableValues(ret, rowIdxChange, currentIdx);
+        
+        //already loaded meta data is still valid:
         ret.isBorderReached = (newIdx <= 0 || newIdx >= total);
-      
-        if(!ret.isBorderReached && (!ret.nextEditable || !ret.nextEditableFiltered)) {
-            me.fetchFromServer(rec);
-        }
-      
         return ret;
+    },
+    /**
+     * If the already loaded prev/next informations are still valid, we can reuse them
+     * @param {Object} ret
+     * @param {Integer} direction
+     * @param {Integer} currentIdx
+     */
+    addReusableValues: function(ret, direction, currentIdx) {
+        var me = this,
+            loaded = direction > 0 ? me.next : me.prev,
+            //if direction 1
+            //currentIdx < loaded.nextEditable.idx results true 
+            // => loaded.nextEditable.idx - currentIdx > 0
+            
+            //if direction -1
+            //currentIdx > loaded.nextEditable.idx results true 
+            // => -(loaded.nextEditable.idx - currentIdx) > 0
+            isStillValid = loaded && loaded.nextEditable && (direction * (loaded.nextEditable.idx - currentIdx) > 0);
+            isStillValidFiltered = loaded && loaded.nextEditableFiltered && (direction * (loaded.nextEditableFiltered.idx - currentIdx) > 0);
+        
+        if(!ret.nextEditable && isStillValid) {
+            ret.nextEditable = loaded.nextEditable;
+        }
+        if(!ret.nextEditableFiltered && isStillValidFiltered) {
+            ret.nextEditableFiltered = loaded.nextEditableFiltered;
+        }
     },
     /**
      * returns true if segment was not edited by the current role yet
@@ -174,6 +204,7 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
      */
     addCallTimeMeta: function(rowMeta, filtered, errorText) {
         var me = this,
+            rowMeta = rowMeta || {}, //nothing given
             ed = me.editingPlugin,
             grid = ed.grid,
             isBorderReached = rowMeta.isBorderReached,
@@ -193,23 +224,42 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
         rowMeta.isBorderReached = isBorderReached;
         return rowMeta;
     },
-    fetchFromServer: function(rec){
+    fetchFromServer: function(){
         var me = this,
             store = me.editingPlugin.grid.store,
+            rec = me.context.record,
             proxy = store.getProxy(),
             params = {};
             
-        if(me.isLoading) {
-            console.log("MARKED ALREADY FETCHING");
+        if(!rec) {
             return;
         }
-        console.log("START FETCH (TODO)");
+
+        if(me.isLoading && me.isLoading.options.params.segmentId != rec.get('id')) {
+            me.isLoading.abort();
+            me.isLoading = false;
+            return;
+        }
+        //we have to send the flag as integer instead of bool, 
+        //since bool would be recognized as string on server side here
+        if(!me.prev.isBorderReached) {
+            params.prev = me.prev.nextEditable ? 0 : 1;
+            params.prevFiltered = me.prev.nextEditableFiltered ? 0 : 1;
+        }
+        if(!me.next.isBorderReached) {
+            params.next = me.next.nextEditable ? 0 : 1;
+            params.nextFiltered = me.next.nextEditableFiltered ? 0 : 1;
+        }
+        
+        if(!params.prev && !params.prevFiltered && !params.next && !params.nextFiltered) {
+            return;
+        }
         
         params[proxy.getFilterParam()] = proxy.encodeFilters(store.getFilters().items);
         params[proxy.getSortParam()] = proxy.encodeSorters(store.getSorters().items);
         params.segmentId = rec.get('id');
         
-        Ext.Ajax.request({
+        me.isLoading = Ext.Ajax.request({
             url: Editor.data.pathToRunDir+'/editor/segment/nextsegments',
             method: 'post',
             params: params,
@@ -218,12 +268,25 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
                 me.isLoading = false;
             },
             success: function(response){
-                //var json = Ext.decode(response.responseText);
+                var json = Ext.decode(response.responseText),
+                    fields = ['next', 'prev', 'nextFiltered', 'prevFiltered'];
                 me.isLoading = false;
-                console.log(response.responseText);
+                //loop over all results and store them as needed
+                Ext.each(fields, function(field) {
+                    if(!json[field]){
+                        return;
+                    }
+                    var direction = me[field.substr(0,4)],
+                        dataField = "nextEditable";
+                    if(field.length > 4) {
+                        dataField += 'Filtered';
+                    }
+                    //direction points to me.prev or me.next, for dataField see above rowMeta
+                    direction[dataField] = {
+                        idx: json[field]
+                    }
+                });
             }
         });
-        
-        me.isLoading = true;
     }
 });

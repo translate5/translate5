@@ -118,16 +118,21 @@ Ext.define('Editor.controller.Editor', {
    */
   initEditPluginHandler: function () {
       var me = this,
+          plug = me.getEditPlugin(),
           disableEditing = function(){me.isEditing = false;};
           
-      me.getEditPlugin().on('beforestartedit', me.handleBeforeStartEdit, me);
-      me.getEditPlugin().on('beforeedit', me.handleStartEdit, me);
-      me.getEditPlugin().on('canceledit', disableEditing);
-      me.getEditPlugin().on('edit', disableEditing)
+      plug.on('beforestartedit', me.handleBeforeStartEdit, me);
+      plug.on('beforeedit', me.handleStartEdit, me);
+      plug.on('canceledit', disableEditing);
+      plug.on('edit', disableEditing)
       
       me.prevNextSegment = Ext.create('Editor.controller.editor.PrevNextSegment', {
-        editingPlugin: me.getEditPlugin()
+        editingPlugin: plug
       });
+      
+      //reset the store next/prev information if data changed
+      me.getSegmentGrid().store.on('filterchange', me.prevNextSegment.handleSortOrFilter, me.prevNextSegment);
+      me.getSegmentGrid().store.on('sort', me.prevNextSegment.handleSortOrFilter, me.prevNextSegment);
       
       new Ext.util.KeyMap(Ext.getDoc(), me.getKeyMapConfig({
           'pos1': [Ext.EventObjectImpl.HOME,{ctrl: false, alt: false}, me.handleHomeKeyPress, true],
