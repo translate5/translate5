@@ -154,7 +154,7 @@ class editor_Models_Segment_EditablesFinder {
         if(empty($res)) {
             return null;
         }
-        return $res['cnt'];
+        return (int) $res['cnt'];
     }
     
     /**

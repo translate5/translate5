@@ -100,15 +100,27 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     public function nextsegmentsAction() {
         //since we dont use metaData otherwise, we can overwrite it completly:
         $segmentId = (int) $this->_getParam('segmentId'); //hardcoded fake value, just for development
-        $autoStates = $this->getUsersAutoStateIds();
+        if($this->_getParam('nextFiltered', false) || $this->_getParam('prevFiltered', false)){
+            $autoStates = $this->getUsersAutoStateIds();
+        }
         $this->entity->load($segmentId);
-        $result = array(
-                'next' => $this->entity->findSurroundingEditables(true),
-                'prev' => $this->entity->findSurroundingEditables(false),
-                'nextFiltered' => $this->entity->findSurroundingEditables(true, $autoStates),
-                'prevFiltered' => $this->entity->findSurroundingEditables(false, $autoStates),
-        );
-        echo Zend_Json::encode($result, Zend_Json::TYPE_OBJECT);
+        $result = array();
+        
+        //load only the requested editable segment
+        if($this->_getParam('next', false)) {
+            $result['next'] = $this->entity->findSurroundingEditables(true);
+        }
+        if($this->_getParam('prev', false)) {
+            $result['prev'] = $this->entity->findSurroundingEditables(false);
+        }
+        if($this->_getParam('nextFiltered', false)) {
+            $result['nextFiltered'] = $this->entity->findSurroundingEditables(true, $autoStates);
+        }
+        if($this->_getParam('prevFiltered', false)) {
+            $result['prevFiltered'] = $this->entity->findSurroundingEditables(false, $autoStates);
+        }
+        error_log(print_r($result,1));
+        echo Zend_Json::encode((object)$result, Zend_Json::TYPE_OBJECT);
     }
     
     /**
