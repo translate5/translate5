@@ -36,177 +36,226 @@ END LICENSE AND COPYRIGHT
  */
 
 /**
- * Segment Entity Objekt
+ * This is the expected SQL, where the result is sorted after matchrate, 
+ * and the segment to compare has a matchRate of 20 and id 923695
+    SELECT count(n.id) FROM `VIEW` n,(
+        SELECT `matchRate`,`id` 
+        FROM `VIEW` 
+        WHERE `matchRate` >= '20'  → this depends on the set sort, >= for ASC, <= for DESC and on the search direction
+        AND id > '923695'          → for ID we assume always > for search next and < for search prev, independant of sort direction
+        AND autoStateId not in (0,4)   → here add editable and autoState filter 
+        ORDER BY `matchRate` ASC ,id ASC 
+        LIMIT 1
+    ) pos 
+    where (n.matchRate <= pos.matchRate 
+          OR (n.matchRate = pos.matchRate AND n.id < pos.id))  
+    ORDER BY n.`matchRate` ASC ,n.id ASC
+    
+    Beide Mengen nach der watchlist filtern
+    
+    the matchrate and id values are depending on the current segment, from where to look
+    
+    For prev/next and asc/desc this results in the following where statements:
+    where X_ values are the current segments values, and P_ the values of the next/prev segment
+    
+    INNER                               OUTER
+    ASC NEXT                            ASC NEXT/PREV
+    F > X_F || F = X_F && ID > X_ID     F < P_F || F = P_F && ID < P_ID
+    
+    DESC NEXT                           DESC NEXT/PREV
+    F < X_F || F = X_F && ID > X_ID     F > P_F || F = P_F && ID > P_ID
+    
+    ASC PREV                            
+    F < X_F || F = X_F && ID < X_ID     
+    
+    DESC PREV                           
+    F > X_F || F = X_F && ID < X_ID     
+ *
  */
 class editor_Models_Segment_EditablesFinder {
-    const LIMIT_INCREASE = 400;
-    
     /**
-     * @var Zend_Db_Table_Select
+     * @var editor_Models_Segment
      */
-    protected $basicSelect;
+    protected $segment = null;
     
     /**
-     * @var Zend_Db_Adapter_Abstract
+     * filter instances used for inner and outer SQL
+     * @var ZfExtended_Models_Filter
      */
-    protected $db;
+    protected $filterInner;
+    protected $filterOuter;
     
     /**
-     * is true if we have also to look for the first editable, false if not
-     * @var boolean
-     */
-    protected $findFirst = true;
-    
-    /**
-     * suffix "Filtered" means filtered by autostate 
+     * sort parameters which are added as sort and filter conditions
      * @var array
      */
-    protected $foundEditables = array(
-            'firstRow' => null,
-            'prevRow' => null,
-            'nextRow' => null,
-            'firstRowFiltered' => null,
-            'prevRowFiltered' => null,
-            'nextRowFiltered' => null,
-    );
+    protected $sortParameter;
     
     /**
-     * the original requested row offset
-     * @var integer
+     * sort parameters which are added as sort and filter conditions
+     * @var array
      */
-    protected $offset;
+    protected $fieldsToSelect;
+    
     
     /**
-     * the original requested row limit
-     * @var integer
+     * @param editor_Models_Segment $segment
      */
-    protected $limit;
-    
-    /**
-     * @param Zend_Db_Adapter_Abstract $db
-     * @param Zend_Db_Table_Select $s
-     */
-    public function __construct(Zend_Db_Adapter_Abstract $db, Zend_Db_Table_Select $s) {
-        $this->db = $db;
-        $this->basicSelect = $s;
-    }
-    
-    /**
-     * calculcates the next/prev editable segments and return the segment informations as array
-     * @param integer $offset
-     * @param integer $limit
-     * @param array $autoStateIds
-     * @param integer $total
-     * @return array
-     */
-    public function find(integer $offset, integer $limit, array $autoStateIds, integer $total) {
-        //find first only if initial offset was 0
-        $this->findFirst = $offset === 0; 
-        $this->offset = $offset;
-        $this->limit = $limit;
+    public function __construct(editor_Models_Segment $segment) {
+        $this->segment = $segment;
         
-        //increase our affected segments window
-        $limit = (int) ($limit + 2 * self::LIMIT_INCREASE); //increase the limit about 400 segments in every direction
-        $offsetCurrent = (int) max($offset - self::LIMIT_INCREASE, 0); //decrease the offset to search in the 400 segments before
+        $this->filterInner = clone $this->segment->getFilter();
+        $this->filterInner->setDefaultTable((string) $this->segment->db);
         
-        //first fetch returns -400 segments before current page and +400 after current page
-        $firstFetch = $this->fetchEditables($offsetCurrent, $limit);
-        $this->processEditables($firstFetch);
-        $this->processEditables($firstFetch, $autoStateIds);
+        $this->filterOuter = clone $this->segment->getFilter();
+        $this->filterOuter->setDefaultTable('list');
         
-        //all further fetch calls, has only to be done, if there are remaining segments
-        
-        //initial prevOffset calculation for == 0 exclusion
-        $prevOffset = $offsetCurrent;
-        while($prevOffset > 0 && $this->hasMissingPrev()) {
-            $prevOffset = max($prevOffset - $limit, 0);
-            $fetch = $this->fetchEditables($prevOffset, $limit);
-            $this->processEditables($fetch);
-            $this->processEditables($fetch, $autoStateIds);
+        // remove id field, since this is added internally
+        $this->sortParameter = $this->segment->getFilter()->getSort();
+        $this->fieldsToSelect = array();
+        foreach($this->sortParameter as $id => $sort) {
+            $this->fieldsToSelect[] = $sort->property;
+            if($sort->property !== 'id'){
+                unset($this->sortParameter[$id]); 
+            }
         }
-        
-        //setting current as nextOffset, current + limit > total are already fetched, so no entry in loop is needed
-        $nextOffset = $offsetCurrent;
-        while($this->hasMissingNext() && (($nextOffset + $limit) < $total)) {
-            $nextOffset = $nextOffset + $limit;
-            $fetch = $this->fetchEditables($nextOffset, $limit);
-            $this->processEditables($fetch);
-            $this->processEditables($fetch, $autoStateIds);
-        }
-        return $this->foundEditables;
     }
+    
     /**
-     * each fetch has the same DB cost (performance, duration) as a the same plain select
-     * returns 
-     * @param unknown $offset
-     * @param unknown $limit
-     */
-    protected function fetchEditables($offset, $limit) {
-        //since we can't add our rowidx variable with Zend methods, 
-        //  we produce our basic select and add the rowidx with string operations then
-        //  should produce something like this:
-        //    select rowidx, id, autoStateId from (
-        //      select @rank := @rank + 1 rowidx, id, editable 
-        //      from (select @rank:= 0) ranker, LEK_segment_view_63a4c234c7dae7ec9bbf408f018f8dfe
-        //      where matchrate > 0 order by autoStateId limit 0,1000 ) segments 
-        //    where editable = 1 order by rowidx'; 
-        
-        $assembledSql = $this->basicSelect->assemble();
-        
-        //add rowidx field
-        $assembledSql = str_ireplace('^SELECT', 'SELECT @rowidx := @rowidx + 1 rowidx, ', '^'.$assembledSql);
-        
-        //add rowidx init table
-        $assembledSql = str_ireplace(' from ', ' FROM (select @rowidx:= 0) idxer, ', $assembledSql);
-        
-        //add surrounding select to get only the editable ones and the rowidx
-        $assembledSql = 'select rowidx, id, autoStateId from ('.$assembledSql.' limit ';
-        $assembledSql .= $offset.','.$limit.') segments where editable = 1 order by rowidx';
-        
-        return $this->db->query($assembledSql)->fetchAll(Zend_Db::FETCH_OBJ);
-    }
-    /**
+     * calculcates the next/prev editable segment and return the segment position as integer and null if there is no next/prev segment
      * 
-     * @param array $rows
-     * @param array $autoStatesToIgnore
+     * @param editor_Models_Segment $this
+     * @param boolean $next
+     * @param array $autoStateIds
+     * @return NULL|integer
      */
-    protected function processEditables(array $rows, array $autoStatesToIgnore = array()) {
-        $useAutoStateFilter = !empty($autoStatesToIgnore);
-        $suffix = $useAutoStateFilter ? 'Filtered' : '';
-        foreach($rows as $row) {
-            if($useAutoStateFilter && in_array($row->autoStateId, $autoStatesToIgnore)){
-                continue;
-            }
-            //don't overwrite already found editables
-            $prevNotFound = $this->foundEditables['prevRow'.$suffix] === null;
-            if($row->rowidx < $this->offset && $prevNotFound){
-                $this->foundEditables['prevRow'.$suffix] = $row;
-            }
-            $firstNotFound = $this->foundEditables['firstRow'.$suffix] === null;
-            if($this->findFirst && $row->rowidx >= $this->offset && $firstNotFound){
-                $this->foundEditables['firstRow'.$suffix] = $row;
-            }
-            $nextNotFound = $this->foundEditables['nextRow'.$suffix] === null;
-            if($row->rowidx > ($this->offset + $this->limit) && $nextNotFound){
-                $this->foundEditables['nextRow'.$suffix] = $row;
-                return;
-            }
-            //if everything found, then return out of loop
-            if(!($prevNotFound || ($this->findFirst && $firstNotFound) || $nextNotFound)) {
-                return;
-            }
+    public function find(boolean $next, array $autoStateIds = null) {
+        $outerSql = $this->getOuterSql();
+
+        $this->prepareInnerFilter($autoStateIds);
+        $innerSql = $this->getInnerSql();
+        
+        foreach($this->sortParameter as $sort) {
+            $isAsc = strtolower($sort->direction) === 'asc';
+            $prop = $this->getSortProperty($sort);
+
+            //if we ever will have multiple sort parameters, this should work out of the box because of the loop
+            $this->addSortInner($innerSql, $prop, $next, $isAsc);
+            $this->addSortOuter($outerSql, $prop, $isAsc);
         }
+        
+        $outerSql->from(array('pos' => $innerSql), null);
+        $this->filterOuter->applyToSelect($outerSql);
+
+        $this->debug($outerSql);
+        
+        $stmt = $this->segment->db->getAdapter()->query($outerSql);
+        $res = $stmt->fetch();
+        if(empty($res)) {
+            return null;
+        }
+        return $res['cnt'];
     }
+    
     /**
-     * returns true if there are missing editables in "previous" direction
+     * adds the where statement to the inner SELECT, the SQL differs for the following cases:
+        ASC NEXT     sortField > currentSortValue || sortField = currentSortValue && idField > currentIdValue
+        DESC NEXT    sortField < currentSortValue || sortField = currentSortValue && idField > currentIdValue
+        ASC PREV     sortField < currentSortValue || sortField = currentSortValue && idField < currentIdValue
+        DESC PREV    sortField > currentSortValue || sortField = currentSortValue && idField < currentIdValue
+     * @param unknown $sql
+     * @param unknown $prop
+     * @param unknown $next
+     * @param unknown $isAsc
      */
-    protected function hasMissingPrev() {
-        return $this->foundEditables['prevRow'] === null || $this->foundEditables['prevRowFiltered'] === null;
+    protected function addSortInner(Zend_Db_Table_Select $sql, string $prop, boolean $next, boolean $isAsc) {
+        $value = $this->segment->get($prop);
+            
+        $idComparator = $next ? '>' : '<';
+        $comparator = ($isAsc xor $next) ? '<' : '>';
+        //id comparator depends only on prev/next, since order for id is always ASC!
+        $f = $this->segment->db.'.`'.$prop.'` ';
+        $sql->where('('.$f.$comparator.' ?', $value);
+        $sql->orWhere('('.$f.'= ?', $value);
+        $sql->where($f.$comparator.' ? ))', $this->segment->getId());
     }
+    
     /**
-     * returns true if there are missing editables in "next" direction
+     * adds the where statement to the outer select, the SQL differs for the following cases: 
+                ASC NEXT/PREV   sortField < innerSortValue || sortField = innerSortValue && idField < innerIdValue
+                DESC NEXT/PREV  sortField > innerSortValue || sortField = innerSortValue && idField > innerIdValue
+     * @param Zend_Db_Table_Select $sql
+     * @param string $prop
+     * @param boolean $isAsc
      */
-    protected function hasMissingNext() {
-        return $this->foundEditables['nextRow'] === null || $this->foundEditables['nextRowFiltered'] === null;
+    protected function addSortOuter(Zend_Db_Table_Select $sql, string $prop, boolean $isAsc) {
+        //id comparator depends only on prev/next, since order for id is always ASC!
+        $comparator = $isAsc ? '<' : '>';
+        $where = 'list.`%1$s` %2$s pos.`%1$s`';
+        $sql->where('('.sprintf($where, $prop, $comparator));
+        $sql->orWhere('('.sprintf($where, $prop, ' = '));
+        $sql->where(sprintf($where, 'id', $comparator).'))');
+    }
+    
+    /**
+     * prepares the outer SQL and returns it
+     * @return Zend_Db_Table_Select
+     */
+    protected function getOuterSql() {
+        $outerSql = $this->segment->db->select()
+            ->from(array('list' => $this->segment->db), new Zend_Db_Expr('if(count(pos.id), count(list.id), null) AS cnt'));
+        return $this->segment->addWatchlistJoin($outerSql, 'list');
+    }
+    
+    /**
+     * prepares the inner SQL and returns it
+     * @return Zend_Db_Table_Select
+     */
+    protected function getInnerSql() {
+        $innerSql = $this->segment->db->select()
+            ->from($this->segment->db, $this->fieldsToSelect)
+            ->limit(1);
+        $innerSql = $this->segment->addWatchlistJoin($innerSql);
+        return $this->filterInner->applyToSelect($innerSql);
+    }
+    
+    /**
+     * prepares the inner filter: adds the filterung condition for only editable and if provided the filter for specific autostates 
+     * @param array $autoStateIds
+     */
+    protected function prepareInnerFilter(array $autoStateIds = null) {
+        if(!empty($autoStateIds)) {
+            $this->filterInner->addFilter((object)[
+                'field' => 'autoStateId',
+                'type' => 'notInList',
+                'value' => $autoStateIds,
+            ]);
+        }
+        $this->filterInner->addFilter((object)[
+            'field' => 'editable',
+            'value' => 1,
+            'type' => 'boolean',
+        ]);
+    }
+    
+    /**
+     * prepares and returns the sort property to be used
+     * @param stdClass $sort
+     * @return string
+     */
+    protected function getSortProperty(stdClass $sort) {
+        //mapSort adds also a table, this is not needed here!
+        $prop = $this->segment->getFilter()->mapSort($sort->property); 
+        $prop = explode('.', $prop);
+        return end($prop);
+    }
+    
+    protected function debug() {
+        return;
+        //debug sql:
+        file_put_contents('/tmp/foo.sql', $outerSql);
+        //exec('sqlformat --reindent --keywords upper --identifiers lower /tmp/foo.sql', $out);
+        exec('sqlformat --reindent --keywords upper /tmp/foo.sql', $out);
+        error_log("\n".join("\n", $out));
     }
 }

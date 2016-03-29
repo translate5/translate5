@@ -93,6 +93,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->view->rows = $this->entity->loadByTaskGuid($taskGuid);
         $this->view->total = $this->entity->totalCountByTaskGuid($taskGuid);
         
+        $this->addFirstEditable();
         $this->addIsFirstFileInfo($taskGuid);
     }
     
@@ -100,11 +101,12 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         //since we dont use metaData otherwise, we can overwrite it completly:
         $segmentId = (int) $this->_getParam('segmentId'); //hardcoded fake value, just for development
         $autoStates = $this->getUsersAutoStateIds();
+        $this->entity->load($segmentId);
         $result = array(
-                'next' => $this->entity->findSurroundingEditables($segmentId, true),
-                'prev' => $this->entity->findSurroundingEditables($segmentId, false),
-                'nextFiltered' => $this->entity->findSurroundingEditables($segmentId, true, $autoStates),
-                'prevFiltered' => $this->entity->findSurroundingEditables($segmentId, false, $autoStates),
+                'next' => $this->entity->findSurroundingEditables(true),
+                'prev' => $this->entity->findSurroundingEditables(false),
+                'nextFiltered' => $this->entity->findSurroundingEditables(true, $autoStates),
+                'prevFiltered' => $this->entity->findSurroundingEditables(false, $autoStates),
         );
         echo Zend_Json::encode($result, Zend_Json::TYPE_OBJECT);
     }
@@ -151,6 +153,25 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             }
             $this->view->rows[$idx]['isFirstofFile'] = true;
         }
+    }
+    
+    /**
+     * Adds the first editable segments rowindex for f2 usage in the frontend
+     */
+    protected function addFirstEditable() {
+        //needed only on first page 
+        if($this->offset > 0) {
+            return;
+        }
+        //loop over the loaded segments, if there is an editable use that
+        foreach($this->view->rows as $idx => $segment) {
+            if($segment['editable']) {
+                $this->view->firstEditable = $idx;
+                return;
+            }
+        }
+        $this->entity->init($segment);
+        $this->view->firstEditable = $this->entity->findSurroundingEditables(true);
     }
 
     public function putAction() {
