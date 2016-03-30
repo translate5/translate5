@@ -257,10 +257,12 @@ background-color: #EAF1FB;
 #segment-grid .x-grid-item-selected .comments-field .x-grid-cell-inner img.add {
     background-image: url("../images/comment_add.png");
 }
-#segment-grid .x-grid-item-selected.editing-disabled .comments-field .x-grid-cell-inner img.add {
+#segment-grid .x-grid-item-selected .editing-disabled .comments-field img.edit,
+#segment-grid .x-grid-item-selected .editing-disabled .comments-field img.add {
     display:none;
 }
-#segment-grid.comments-for-locked-segments .x-grid-item-selected.editing-disabled .comments-field .x-grid-cell-inner img.add {
+#segment-grid.comments-for-locked-segments .x-grid-item-selected .editing-disabled .comments-field img.edit,
+#segment-grid.comments-for-locked-segments .x-grid-item-selected .editing-disabled .comments-field img.add {
     display:block;
 }
 

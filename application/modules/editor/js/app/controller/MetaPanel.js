@@ -168,9 +168,9 @@ Ext.define('Editor.controller.MetaPanel', {
       var me = this,
       mp = me.getMetaPanel();
       me.record = record;
-      me.getNavi().disable();
       me.getSegmentMeta().hide();
       mp.enable();
+      me.getNavi().disable();
   },
   /**
    * lädt die konkreten record ins Meta Panel 
