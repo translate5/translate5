@@ -179,7 +179,10 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.controller.Editor",
         messages: {
             segmentReset: '<?php echo $this->translate->_('Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.');?>',
-            segmentNotBuffered: '<?php echo $this->translate->_('Kein passendes Segment vorhanden bzw. im Zwischenspeicher gefunden. Bitte scrollen Sie manuell weiter!');?>',
+            segmentNotBuffered: '<?php echo $this->translate->_('Das nächste / vorherige Segment wird noch geladen, bitte versuchen Sie es erneut.');?>',
+            segmentsChanged: '<?php echo $this->translate->_('Die Sortierung bzw. Filterung wurde geändert, es kann kein nächstes / vorheriges Segment ausgewählt werden.');?>',
+            f2FirstOpened: '<?php echo $this->translate->_('Das erste bearbeitbare Segment wurde geöffnet, da kein anderes Segment ausgewählt war.');?>',
+            f2Readonly: '<?php echo $this->translate->_('Das ausgewählte Segment ist nicht bearbeitbar!');?>',
             errorTitle: '<?php echo $this->translate->_('Fehler bei der Segment Validierung!');?>',
             correctErrorsText: '<?php echo $this->translate->_('Fehler beheben');?>',
             saveAnyway: '<?php echo $this->translate->_('Trotzdem speichern');?>',
@@ -191,8 +194,10 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.controller.editor.PrevNextSegment", {
         override: "Editor.controller.editor.PrevNextSegment",
         strings: {
-            gridEndReached: '<?php echo $this->translate->_('Ende der Segmente erreicht!');?>',
-            gridStartReached: '<?php echo $this->translate->_('Beginn der Segmente erreicht!');?>'
+            gridEndReached: '<?php echo $this->translate->_('Kein weiteres Segment bearbeitbar!');?>',
+            gridStartReached: '<?php echo $this->translate->_('Kein vorheriges Segment bearbeitbar!');?>',
+            gridEndReachedFiltered: '<?php echo $this->translate->_('Kein weiteres Segment im Workflow bearbeitbar!');?>',
+            gridStartReachedFiltered: '<?php echo $this->translate->_('Kein vorheriges Segment im Workflow bearbeitbar!');?>'
         }
     });
 

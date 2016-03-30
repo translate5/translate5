@@ -1194,10 +1194,6 @@
   <source>Nicht speichern und vorheriges Segment öffnen (STRG + ALT + ↑)</source>
   <target>Don't save and open previous segment (CTRL + ALT + ↑)</target>
 </trans-unit>
-<trans-unit id='S2VpbiBwYXNzZW5kZXMgU2VnbWVudCB2b3JoYW5kZW4gYnp3LiBpbSBad2lzY2hlbnNwZWljaGVyIGdlZnVuZGVuLiBCaXR0ZSBzY3JvbGxlbiBTaWUgbWFudWVsbCB3ZWl0ZXIh'>
-  <source>Kein passendes Segment vorhanden bzw. im Zwischenspeicher gefunden. Bitte scrollen Sie manuell weiter!</source>
-  <target>No applicable segment exists or found in the segment cache. Please scroll down manually!</target>
-</trans-unit>
 <trans-unit id='RGVtIGF1c2dld8OkaGx0ZW4gU2VnbWVudCBlaW5lbiBLb21tZW50YXIgaGluenVmw7xnZW4uIChTVFJHICsgQUxUICsgYyk='>
   <source>Dem ausgewählten Segment einen Kommentar hinzufügen. (STRG + ALT + c)</source>
   <target>Add a comment to the select segment. (CTRL + ALT + c)</target>
@@ -1266,6 +1262,38 @@
 <trans-unit id='RGVyIFNlZ21lbnRlZGl0b3Iga2FubiBtaXQgZGVyIE1hdXMgYmVsaWViaWcgcG9zaXRpb25pZXJ0IHdlcmRlbi4gPGJyIC8+RGF6dSBsZWRpZ2xpY2ggZGVuIFNlZ21lbnRlZGl0b3IgYW5rbGlja2VuIHVuZCBkYW5uIHZlcnNjaGllYmVuLg=='>
   <source>Der Segmenteditor kann mit der Maus beliebig positioniert werden. <br />Dazu lediglich den Segmenteditor anklicken und dann verschieben.</source>
   <target>The segmenteditor can be freely positioned with the mouse. <br />Just click on the segmenteditor and move it.</target>
+</trans-unit>
+<trans-unit id='RGFzIG7DpGNoc3RlIC8gdm9yaGVyaWdlIFNlZ21lbnQgd2lyZCBub2NoIGdlbGFkZW4sIGJpdHRlIHZlcnN1Y2hlbiBTaWUgZXMgZXJuZXV0Lg=='>
+  <source>Das nächste / vorherige Segment wird noch geladen, bitte versuchen Sie es erneut.</source>
+  <target>The previous / next segment is still loading, please try again.</target>
+</trans-unit>
+<trans-unit id='RGllIFNvcnRpZXJ1bmcgYnp3LiBGaWx0ZXJ1bmcgd3VyZGUgZ2XDpG5kZXJ0LCBlcyBrYW5uIGtlaW4gbsOkY2hzdGVzIC8gdm9yaGVyaWdlcyBTZWdtZW50IGF1c2dld8OkaGx0IHdlcmRlbi4='>
+  <source>Die Sortierung bzw. Filterung wurde geändert, es kann kein nächstes / vorheriges Segment ausgewählt werden.</source>
+  <target>The segment sort or filter was changed, a next / previous segment can not be selected.</target>
+</trans-unit>
+<trans-unit id='RGFzIGVyc3RlIGJlYXJiZWl0YmFyZSBTZWdtZW50IHd1cmRlIGdlw7ZmZm5ldCwgZGEga2VpbiBhbmRlcmVzIFNlZ21lbnQgYXVzZ2V3w6RobHQgd2FyLg=='>
+  <source>Das erste bearbeitbare Segment wurde geöffnet, da kein anderes Segment ausgewählt war.</source>
+  <target>The first editable segment was opened for editing, no other segment was selected.</target>
+</trans-unit>
+<trans-unit id='RGFzIGF1c2dld8OkaGx0ZSBTZWdtZW50IGlzdCBuaWNodCBiZWFyYmVpdGJhciE='>
+  <source>Das ausgewählte Segment ist nicht bearbeitbar!</source>
+  <target>The selected segment is not editable!</target>
+</trans-unit>
+<trans-unit id='S2VpbiB3ZWl0ZXJlcyBTZWdtZW50IGJlYXJiZWl0YmFyIQ=='>
+  <source>Kein weiteres Segment bearbeitbar!</source>
+  <target>No more segment is editable!</target>
+</trans-unit>
+<trans-unit id='S2VpbiB2b3JoZXJpZ2VzIFNlZ21lbnQgYmVhcmJlaXRiYXIh'>
+  <source>Kein vorheriges Segment bearbeitbar!</source>
+  <target>No previous segment is editable!</target>
+</trans-unit>
+<trans-unit id='S2VpbiB3ZWl0ZXJlcyBTZWdtZW50IGltIFdvcmtmbG93IGJlYXJiZWl0YmFyIQ=='>
+  <source>Kein weiteres Segment im Workflow bearbeitbar!</source>
+  <target>No more segment in the workflow is editable!</target>
+</trans-unit>
+<trans-unit id='S2VpbiB2b3JoZXJpZ2VzIFNlZ21lbnQgaW0gV29ya2Zsb3cgYmVhcmJlaXRiYXIh'>
+  <source>Kein vorheriges Segment im Workflow bearbeitbar!</source>
+  <target>No previous segment in the workflow is editable!</target>
 </trans-unit>
     </body>
   </file>

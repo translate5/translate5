@@ -98,7 +98,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     }
     
     public function nextsegmentsAction() {
-        //since we dont use metaData otherwise, we can overwrite it completly:
         $segmentId = (int) $this->_getParam('segmentId'); //hardcoded fake value, just for development
         if($this->_getParam('nextFiltered', false) || $this->_getParam('prevFiltered', false)){
             $autoStates = $this->getUsersAutoStateIds();
@@ -119,7 +118,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         if($this->_getParam('prevFiltered', false)) {
             $result['prevFiltered'] = $this->entity->findSurroundingEditables(false, $autoStates);
         }
-        error_log(print_r($result,1));
         echo Zend_Json::encode((object)$result, Zend_Json::TYPE_OBJECT);
     }
     
@@ -175,15 +173,18 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         if($this->offset > 0) {
             return;
         }
+        //since we dont use metaData otherwise, we can overwrite it completly:
+        $this->view->metaData = new stdClass();
+        
         //loop over the loaded segments, if there is an editable use that
         foreach($this->view->rows as $idx => $segment) {
             if($segment['editable']) {
-                $this->view->firstEditable = $idx;
+                $this->view->metaData->firstEditable = $idx;
                 return;
             }
         }
         $this->entity->init($segment);
-        $this->view->firstEditable = $this->entity->findSurroundingEditables(true);
+        $this->view->metaData->firstEditable = $this->entity->findSurroundingEditables(true);
     }
 
     public function putAction() {
