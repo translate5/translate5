@@ -210,8 +210,10 @@ Ext.define('Editor.controller.Segments', {
   clearSortAndFilter: function() {
     var me = this,
         store = me.getSegmentsStore(),
+        grid = me.getSegmentGrid(),
         btn = me.getWatchListFilterBtn(),
         filters = me.getSegmentGrid().filters;
+    grid.selModel.deselectAll();
     me.clearSegmentSort();
     store.removeAll();
     if(store.getFilters().length > 0){

@@ -79,6 +79,15 @@ Ext.define('Editor.view.segments.RowEditing', {
     getEditor: function() {
         return this.editor;
     },
+    activateCell: function() {
+        var me = this,
+            result;
+        
+        me.editByCellActivation = true;
+        result = me.callParent(arguments);
+        me.editByCellActivation = false;
+        return result;
+    },
     /**
      * Erweitert die Orginalmethode um die "editingAllowed" Prüfung
      * @param {Editor.model.Segment} record

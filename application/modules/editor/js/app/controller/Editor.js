@@ -47,7 +47,10 @@ Ext.define('Editor.controller.Editor', {
   ],
   messages: {
       segmentReset: '#UT#Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.',
-      segmentNotBuffered: '#UT#Kein passendes Segment vorhanden bzw. im Zwischenspeicher gefunden. Bitte scrollen Sie manuell weiter!',
+      segmentNotBuffered: '#UT#Das nächste / vorherige Segment wird noch geladen, bitte versuchen Sie es erneut.',
+      segmentsChanged: '#UT#Die Sortierung bzw. Filterung wurde geändert, es kann kein nächstes / vorheriges Segment ausgewählt werden.',
+      f2FirstOpened: '#UT#Das erste bearbeitbare Segment wurde geöffnet, da kein anderes Segment ausgewählt war.',
+      f2Readonly: '#UT#Das ausgewählte Segment ist nicht bearbeitbar!',
       errorTitle: '#UT# Fehler bei der Segment Validierung!',
       correctErrorsText: '#UT# Fehler beheben',
       editorMoveTitle: '#UT#Verschiebbarer Editor',
@@ -167,6 +170,10 @@ Ext.define('Editor.controller.Editor', {
    */
   handleBeforeStartEdit: function(plugin, args){
       if(!plugin.editing) {
+          //if editing is started by enter or F2 on a selected row:
+          if(plugin.editByCellActivation && !args[0].get('editable')){
+              Editor.MessageBox.addInfo(this.messages.f2Readonly);
+          }
           return true;
       }
       this.fireEvent('saveSegment', {
@@ -409,7 +416,10 @@ Ext.define('Editor.controller.Editor', {
       }
       
       if(rowMeta.isLoading) {
-          Editor.MessageBox.addInfo(me.messages.segmentNotBuffered); //FIXME Bedingung überprüfen und neuer Text
+          Editor.MessageBox.addInfo(me.messages.segmentNotBuffered);
+      }
+      else {
+          Editor.MessageBox.addInfo(me.messages.segmentsChanged);
       }
   },
   /**
@@ -645,6 +655,7 @@ Ext.define('Editor.controller.Editor', {
         cols = grid.query('contentEditableColumn:not([hidden])'),
         view = grid.getView(),
         sel = [],
+        firstEditableRow = grid.store.getFirsteditableRow(),
         callback;
     
     if (ed.editing) {
@@ -661,43 +672,18 @@ Ext.define('Editor.controller.Editor', {
             }
         });
     } else {
+        Editor.MessageBox.addInfo(me.messages.f2FirstOpened);
         //with no selection, scroll to the first editable select, select it, then open it
         callback = function() {
-            grid.selectOrFocus(me.getNextEditableSegmentOffset(0));
+            grid.selectOrFocus(firstEditableRow);
             sel = selModel.getSelection();
             ed.startEdit(sel[0], cols[0]);
         };
-        grid.scrollTo(me.getNextEditableSegmentOffset(0), {
+        grid.scrollTo(firstEditableRow, {
             callback: callback,
             notScrollCallback: callback
         });
-
     }
-  },
-  /**
-   * Gets the next editable segment offset relative to param offset
-   * @param integer offset
-   **/
-  getNextEditableSegmentOffset: function(offset, isEditable) {
-    //FIXME diese methode ebenfalls auf die Datenstruktur umstellen
-      var me = this,
-      grid = me.getSegmentGrid(),
-      store = grid.store,
-      origOffset = offset,
-      rec = store.getAt(offset);
-      
-      isEditable = (Ext.isFunction(isEditable) ? isEditable : function(){ return true; });
-      do
-      {
-          if (rec && rec.get('editable') && isEditable(rec))
-          {
-              return offset;
-          }
-          offset++;
-          rec = store.getAt(offset);
-      } while (rec);
-      // no editable segment
-      return origOffset;
   },
   /**
    * scrolls to the first segment.

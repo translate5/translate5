@@ -45,9 +45,6 @@ Ext.define('Editor.store.Segments', {
   pageSize: 200,
   remoteSort: true,
   autoLoad: false,
-  pageMetaData: [],
-  lastEditable: null,
-  lastEditableFiltered: null,
   firstEditableRow: null,
   constructor: function() {
       var me = this;
@@ -56,53 +53,16 @@ Ext.define('Editor.store.Segments', {
       me.on('clear', me.resetMeta, me);
   },
   resetMeta: function() {
-      this.pageMetaData = [];
-      this.lastEditable = null;
-      this.lastEditableFiltered = null;
       this.firstEditableRow = null;
   },
   handleMetachange: function(proxy, meta) {
-      var me = this;
-      if(meta.page === 1 && meta.firstRow) {
-          me.firstEditableRow = meta;
+            var me = this;
+      if(meta.hasOwnProperty('firstEditable')) {
+          me.firstEditableRow = meta.firstEditable;
       }
-      //on adding a trailing page, assume that page is containing the last editable segments
-      if(!me.pageMetaData[meta.page]) {
-          if(meta.prevRow) {
-              me.lastEditable = meta.prevRow;
-          }
-          if(meta.prevRowFiltered) {
-              me.lastEditableFiltered = meta.prevRowFiltered;
-          }
-      }
-      me.pageMetaData[meta.page] = meta;
   },
-  /**
-   * @see getOtherEditable
-   */
-  getPrevPageEditable: function(rowIdx, filtered) {
-      return this.getOtherEditable('prevRow', rowIdx, filtered);
-  },
-  /**
-   * @see getOtherEditable
-   */
-  getNextPageEditable: function(rowIdx, filtered) {
-      return this.getOtherEditable('nextRow', rowIdx, filtered);
-  },
-  /**
-   * returns previous/next editable segment, if filtered == true, consider autostatefiltered segments only
-   * @param direction {String} direction use getPrevEditable / getNextEditable, this methods are setting the direction automatically
-   * @param rowIdx {Integer} rowindex from where shall be searched for next / prev segment
-   * @param filtered {Boolean} true if autostatefilter should be used
-   */
-  getOtherEditable: function(direction, rowIdx, filtered) {
-      var me = this,
-          page = me.getPageFromRecordIndex(rowIdx);
-      if(filtered) {
-          direction = direction + 'Filtered';
-      }
-      
-      return me.pageMetaData[page] && me.pageMetaData[page][direction];
+  getFirsteditableRow: function() {
+      return this.firstEditableRow;
   },
   /**
    * Buffered Stores are not made to be editable, so we have to rework some needed methods here

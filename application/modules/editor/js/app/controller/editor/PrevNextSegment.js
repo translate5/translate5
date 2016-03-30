@@ -43,8 +43,10 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
     calculated: null,
     context: null,
     strings: {
-        gridEndReached: '#UT#Ende der Segmente erreicht!',
-        gridStartReached: '#UT#Start der Segmente erreicht!'
+        gridEndReached: '#UT#Kein weiteres Segment bearbeitbar!',
+        gridStartReached: '#UT#Kein vorheriges Segment bearbeitbar!',
+        gridEndReachedFiltered: '#UT#Kein weiteres Segment im Workflow bearbeitbar!',
+        gridStartReachedFiltered: '#UT#Kein vorheriges Segment im Workflow bearbeitbar!'
     },
     isLoading: false,
     constructor: function(config) {
@@ -52,11 +54,13 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
     },
     calcNext: function(filtered){
         var me = this;
-        me.calculated = me.addCallTimeMeta(me.next, filtered, me.strings.gridEndReached);
+            msg = filtered ? me.strings.gridEndReachedFiltered : me.strings.gridEndReached;
+        me.calculated = me.addCallTimeMeta(me.next, filtered, msg);
     },
     calcPrev: function(filtered){
-        var me = this;
-        me.calculated = me.addCallTimeMeta(me.prev, filtered, me.strings.gridStartReached);
+        var me = this,
+            msg = filtered ? me.strings.gridStartReachedFiltered : me.strings.gridStartReached;
+        me.calculated = me.addCallTimeMeta(me.prev, filtered, msg);
     },
     getCalculated: function() {
         return this.calculated;
@@ -69,29 +73,6 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
             plug = me.editingPlugin;
         me.prev = null;
         me.next = null;
-    },
-    /**
-     * Gets the next editable segment offset relative to param offset
-     * @param integer offset
-     */
-    getNextEditableSegmentOffset: function(offset, isEditable) {
-        //FIXME diese methode ebenfalls auf die Datenstruktur umstellen
-        var me = this,
-            grid = me.getSegmentGrid(),
-            store = grid.store,
-            origOffset = offset,
-            rec = store.getAt(offset);
-      
-        isEditable = (Ext.isFunction(isEditable) ? isEditable : function(){ return true; });
-        do {
-            if (rec && rec.get('editable') && isEditable(rec)) {
-                return offset;
-            }
-            offset++;
-            rec = store.getAt(offset);
-        } while (rec);
-        // no editable segment
-        return origOffset;
     },
     /**
      * calculates the prev/next available segments relative to the currently opened segment
@@ -220,7 +201,7 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
             }
         });
         rowMeta.errorText = errorText;
-        rowMeta.isLoading = me.isLoading;
+        rowMeta.isLoading = !!me.isLoading;
         rowMeta.isBorderReached = isBorderReached;
         return rowMeta;
     },
