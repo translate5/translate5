@@ -141,11 +141,9 @@ Ext.define('Editor.controller.Editor', {
        * disable the column show / hide menu while editing a segment (EXT6UPD-85)
        */
       Ext.override(me.getSegmentGrid().getHeaderContainer(), {
-          getColumnMenu: function() {
-              if(plug.editing) {
-                  return null;
-              }
-              return this.callParent(arguments);
+          beforeMenuShow: function(menu) {
+              this.callParent([menu]);
+              menu.down('#columnItem').setDisabled(plug.editing);
           }
       });
       
