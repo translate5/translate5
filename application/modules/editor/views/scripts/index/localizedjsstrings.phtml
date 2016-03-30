@@ -284,37 +284,39 @@ Ext.define('Editor.controller.Localizer', {
         delete_confirm_msg: '<?php echo $this->translate->_('Soll der Kommentar wirklich gelöscht werden?');?>'
     });
     
-    <?php 
-    //FIXME nextRelease Thomas per PHP if die Sprach Defines für den Admin Bereich (je nach Rolle) einbinden.
-    ?>
-    Editor.controller.admin.TaskUserAssoc.prototype.messages = {
-      assocSave: '<?php echo $this->translate->_('Eintrag gespeichert!');?>',
-      assocDeleted: '<?php echo $this->translate->_('Eintrag gelöscht!');?>',
-      assocSaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>'
-    };
+    Ext.define("Editor.locale.de.controller.admin.TaskUserAssoc", {
+        override: "Editor.controller.admin.TaskUserAssoc",
+        messages: {
+            assocSave: '<?php echo $this->translate->_('Eintrag gespeichert!');?>',
+            assocDeleted: '<?php echo $this->translate->_('Eintrag gelöscht!');?>',
+            assocSaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>'
+        }
+    });
 
-    Editor.controller.admin.TaskOverview.prototype.strings = {
-        taskImported: '<?php echo $this->translate->_('Aufgabe "{0}" vollständig importiert');?>',
-        taskOpening: '<?php echo $this->translate->_('Aufgabe wird im Editor geöffnet...');?>',
-        taskFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen...');?>',
-        taskUnFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen...');?>',
-        taskReopen: '<?php echo $this->translate->_('Aufgabe wird wieder eröffnet...');?>',
-        taskEnding: '<?php echo $this->translate->_('Aufgabe wird beendet...');?>',
-        taskDestroy: '<?php echo $this->translate->_('Aufgabe wird gelöscht...');?>',
-        taskNotDestroyed: '<?php echo $this->translate->_('Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!');?>',
-        forcedReadOnly: '<?php echo $this->translate->_('Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!');?>',
-        openTaskAdminBtn: '<?php echo $this->translate->_('Aufgabenübersicht');?>'
-    };
-
-    Editor.controller.admin.TaskOverview.prototype.confirmStrings = {
-      "finish":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>"},
-      "unfinish":     {title: "<?php echo $this->translate->_('Aufgabe wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich wieder öffnen?');?>"},
-      "finish-all":   {title: "<?php echo $this->translate->_('Aufgabe für alle Nutzer abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer abschließen?');?>"},
-      "unfinish-all": {title: "<?php echo $this->translate->_('Aufgabe für alle Nutzer wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer wieder öffnen?');?>"},
-      "end":          {title: "<?php echo $this->translate->_('Aufgabe endgültig beenden?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer endgültig beenden?');?>"},
-      "reopen":       {title: "<?php echo $this->translate->_('Beendete Aufgabe wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die beendete Aufgabe wirklich wieder öffnen?');?>"},
-      "delete":       {title: "<?php echo $this->translate->_('Aufgabe komplett löschen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?');?>"}
-    };
+    Ext.define("Editor.locale.de.controller.admin.TaskOverview", {
+        override: "Editor.controller.admin.TaskOverview",
+        strings: {
+            taskImported: '<?php echo $this->translate->_('Aufgabe "{0}" vollständig importiert');?>',
+            taskOpening: '<?php echo $this->translate->_('Aufgabe wird im Editor geöffnet...');?>',
+            taskFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen...');?>',
+            taskUnFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen...');?>',
+            taskReopen: '<?php echo $this->translate->_('Aufgabe wird wieder eröffnet...');?>',
+            taskEnding: '<?php echo $this->translate->_('Aufgabe wird beendet...');?>',
+            taskDestroy: '<?php echo $this->translate->_('Aufgabe wird gelöscht...');?>',
+            taskNotDestroyed: '<?php echo $this->translate->_('Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!');?>',
+            forcedReadOnly: '<?php echo $this->translate->_('Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!');?>',
+            openTaskAdminBtn: '<?php echo $this->translate->_('Aufgabenübersicht');?>'
+        },
+        confirmStrings: {
+            "finish":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>"},
+            "unfinish":     {title: "<?php echo $this->translate->_('Aufgabe wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich wieder öffnen?');?>"},
+            "finish-all":   {title: "<?php echo $this->translate->_('Aufgabe für alle Nutzer abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer abschließen?');?>"},
+            "unfinish-all": {title: "<?php echo $this->translate->_('Aufgabe für alle Nutzer wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer wieder öffnen?');?>"},
+            "end":          {title: "<?php echo $this->translate->_('Aufgabe endgültig beenden?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer endgültig beenden?');?>"},
+            "reopen":       {title: "<?php echo $this->translate->_('Beendete Aufgabe wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die beendete Aufgabe wirklich wieder öffnen?');?>"},
+            "delete":       {title: "<?php echo $this->translate->_('Aufgabe komplett löschen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?');?>"}
+        }
+    });
 
     Ext.define("Editor.locale.de.view.admin.TaskGrid", {
         override: "Editor.view.admin.TaskGrid",
@@ -364,101 +366,121 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
     
-    Editor.view.admin.TaskAddWindow.prototype.title = '<?php echo $this->translate->_('Aufgabe erstellen');?>';
-    Editor.view.admin.TaskAddWindow.prototype.strings = {
-        importUploadTip: '<?php echo $this->translate->_('Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, openTM2-XLIFF; Angabe notwendig)');?>',
-        importUploadLabel: '<?php echo $this->translate->_('Import Datei¹');?>',
-        importUploadType: '<?php echo $this->translate->_('Bitte verwenden Sie eine ZIP, CSV oder SDLXLIFF Datei!');?>',
-        importTbxTip: '<?php echo $this->translate->_('Wählen Sie die zu importierenden TBX Daten für das TermTagging');?>',
-        importTbxLabel: '<?php echo $this->translate->_('TBX Datei²');?>',
-        importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>',
-        importNews: '<?php echo $this->translate->_('<b style="color:#ff0000;">Neu:</b> Sie können nun neben ZIP auch direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage#single-import">Mehr Info</a>.');?>',
-        taskNrLabel: '<?php echo $this->translate->_('Auftragsnummer');?>',
-        taskNameTip: '<?php echo $this->translate->_('Projektname (frei wählbar, Angabe notwendig)');?>',
-        taskNameLabel: '<?php echo $this->translate->_('Projektname¹');?>',
-        sourceLangTip: '<?php echo $this->translate->_('Quellsprache des Projektes (Angabe notwendig)');?>',
-        sourceLangLabel: '<?php echo $this->translate->_('Quellsprache¹');?>',
-        targetLangTip: '<?php echo $this->translate->_('Zielsprache des Projektes (Angabe notwendig)');?>',
-        targetLangLabel: '<?php echo $this->translate->_('Zielsprache¹');?>',
-        relaisLangTip: '<?php echo $this->translate->_('Relaissprache (Angabe notwendig sofern Relaisdaten vorhanden)');?>',
-        relaisLangLabel: '<?php echo $this->translate->_('Relaissprache');?>',
-        numberFieldLabel: '<?php echo $this->translate->_('Anzahl Wörter');?>',
-        targetDeliveryLabel: '<?php echo $this->translate->_('Lieferdatum');?>',
-        fullMatchLabel: '<?php echo $this->translate->_('100% Matches sind editierbar');?>',
-        lockLockedLabel: '<?php echo $this->translate->_('In importierter Datei gesperrte Segmente sind in translate5 gesperrt');?>',
-        orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
-        sourceEditLabel: '<?php echo $this->translate->_('Ausgangstext ist editierbar');?>',
-        bottomInfo: '<?php echo $this->translate->_('¹ Diese Angaben / Daten werden für den Import zwingend benötigt.');?>',
-        bottomInfo2: '<?php echo $this->translate->_('² Eine TBX Datei ist optional. Eine TBX Datei im TBX-Core Format wird benötigt um Terminologie auszuzeichnen.');?>',
-        feedbackText: '<?php echo $this->translate->_('Fehler beim Import!');?>',
-        feedbackTip: '<?php echo $this->translate->_('Fehler beim Import: Bitte wenden Sie sich an den Support!');?>',
-        addBtn: '<?php echo $this->translate->_('Aufgabe hinzufügen');?>',
-        cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>'
-    };
+    Ext.define("Editor.locale.de.view.admin.TaskAddWindow", {
+        override: "Editor.view.admin.TaskAddWindow",
+        title: '<?php echo $this->translate->_('Aufgabe erstellen');?>',
+        strings: {
+            importUploadTip: '<?php echo $this->translate->_('Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, openTM2-XLIFF; Angabe notwendig)');?>',
+            importUploadLabel: '<?php echo $this->translate->_('Import Datei¹');?>',
+            importUploadType: '<?php echo $this->translate->_('Bitte verwenden Sie eine ZIP, CSV oder SDLXLIFF Datei!');?>',
+            importTbxTip: '<?php echo $this->translate->_('Wählen Sie die zu importierenden TBX Daten für das TermTagging');?>',
+            importTbxLabel: '<?php echo $this->translate->_('TBX Datei²');?>',
+            importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>',
+            importNews: '<?php echo $this->translate->_('<b style="color:#ff0000;">Neu:</b> Sie können nun neben ZIP auch direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage#single-import">Mehr Info</a>.');?>',
+            taskNrLabel: '<?php echo $this->translate->_('Auftragsnummer');?>',
+            taskNameTip: '<?php echo $this->translate->_('Projektname (frei wählbar, Angabe notwendig)');?>',
+            taskNameLabel: '<?php echo $this->translate->_('Projektname¹');?>',
+            sourceLangTip: '<?php echo $this->translate->_('Quellsprache des Projektes (Angabe notwendig)');?>',
+            sourceLangLabel: '<?php echo $this->translate->_('Quellsprache¹');?>',
+            targetLangTip: '<?php echo $this->translate->_('Zielsprache des Projektes (Angabe notwendig)');?>',
+            targetLangLabel: '<?php echo $this->translate->_('Zielsprache¹');?>',
+            relaisLangTip: '<?php echo $this->translate->_('Relaissprache (Angabe notwendig sofern Relaisdaten vorhanden)');?>',
+            relaisLangLabel: '<?php echo $this->translate->_('Relaissprache');?>',
+            numberFieldLabel: '<?php echo $this->translate->_('Anzahl Wörter');?>',
+            targetDeliveryLabel: '<?php echo $this->translate->_('Lieferdatum');?>',
+            fullMatchLabel: '<?php echo $this->translate->_('100% Matches sind editierbar');?>',
+            lockLockedLabel: '<?php echo $this->translate->_('In importierter Datei gesperrte Segmente sind in translate5 gesperrt');?>',
+            orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
+            sourceEditLabel: '<?php echo $this->translate->_('Ausgangstext ist editierbar');?>',
+            bottomInfo: '<?php echo $this->translate->_('¹ Diese Angaben / Daten werden für den Import zwingend benötigt.');?>',
+            bottomInfo2: '<?php echo $this->translate->_('² Eine TBX Datei ist optional. Eine TBX Datei im TBX-Core Format wird benötigt um Terminologie auszuzeichnen.');?>',
+            feedbackText: '<?php echo $this->translate->_('Fehler beim Import!');?>',
+            feedbackTip: '<?php echo $this->translate->_('Fehler beim Import: Bitte wenden Sie sich an den Support!');?>',
+            addBtn: '<?php echo $this->translate->_('Aufgabe hinzufügen');?>',
+            cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>'
+        }
+    });
     
-    Editor.view.admin.TaskActionColumn.prototype.messages = {
-      actionOpen: '<?php echo $this->translate->_('Aufgabe öffnen (nur Lesemodus)');?>',
-      actionEdit: '<?php echo $this->translate->_('Aufgabe bearbeiten');?>',
-      actionFinish: '<?php echo $this->translate->_('Aufgabe abschließen');?>',
-      actionUnFinish: '<?php echo $this->translate->_('Aufgabe wieder öffnen');?>',
-      actionFinishAll: '<?php echo $this->translate->_('Aufgabe für alle Benutzer abschließen');?>',
-      actionUnFinishAll: '<?php echo $this->translate->_('Aufgabe für alle Benutzer wieder öffnen');?>',
-      actionEnd: '<?php echo $this->translate->_('Aufgabe komplett beenden');?>',
-      actionDelete: '<?php echo $this->translate->_('Aufgabe komplett löschen');?>',
-      assocUser: '<?php echo $this->translate->_('Benutzer der Aufgabe zuweisen');?>', //FIXME remove me!
-      taskPrefs: '<?php echo $this->translate->_('Aufgabenspezifische Einstellungen');?>',
-      actionReOpen: '<?php echo $this->translate->_('beendete Aufgabe wieder öffnen');?>',
-      exp: '<?php echo $this->translate->_('Exportoptionen');?>'
-    };
+    Ext.define("Editor.locale.de.view.admin.TaskActionColumn", {
+        override: "Editor.view.admin.TaskActionColumn",
+        messages: {
+            actionOpen: '<?php echo $this->translate->_('Aufgabe öffnen (nur Lesemodus)');?>',
+            actionEdit: '<?php echo $this->translate->_('Aufgabe bearbeiten');?>',
+            actionFinish: '<?php echo $this->translate->_('Aufgabe abschließen');?>',
+            actionUnFinish: '<?php echo $this->translate->_('Aufgabe wieder öffnen');?>',
+            actionFinishAll: '<?php echo $this->translate->_('Aufgabe für alle Benutzer abschließen');?>',
+            actionUnFinishAll: '<?php echo $this->translate->_('Aufgabe für alle Benutzer wieder öffnen');?>',
+            actionEnd: '<?php echo $this->translate->_('Aufgabe komplett beenden');?>',
+            actionDelete: '<?php echo $this->translate->_('Aufgabe komplett löschen');?>',
+            assocUser: '<?php echo $this->translate->_('Benutzer der Aufgabe zuweisen');?>', //FIXME remove me!
+            taskPrefs: '<?php echo $this->translate->_('Aufgabenspezifische Einstellungen');?>',
+            actionReOpen: '<?php echo $this->translate->_('beendete Aufgabe wieder öffnen');?>',
+            exp: '<?php echo $this->translate->_('Exportoptionen');?>'
+        }
+    });
     
-    Editor.view.admin.ExportMenu.prototype.messages = {
-      exportDef: '<?php echo $this->translate->_('exportieren');?>',
-      exportDiff: '<?php echo $this->translate->_('exportieren mit Änderungshistorie');?>',
-      exportQmField: '<?php echo $this->translate->_('Export QM-Statistik (XML) für Feld: {0}');?>'
-    };
+    Ext.define("Editor.locale.de.view.admin.ExportMenu", {
+        override: "Editor.view.admin.ExportMenu",
+        messages: {
+            exportDef: '<?php echo $this->translate->_('exportieren');?>',
+            exportDiff: '<?php echo $this->translate->_('exportieren mit Änderungshistorie');?>',
+            exportQmField: '<?php echo $this->translate->_('Export QM-Statistik (XML) für Feld: {0}');?>'
+        }
+    });
     
-    Editor.view.admin.task.PreferencesWindow.prototype.title = '<?php echo $this->translate->_('Einstellungen zu Aufgabe "{0}"');?>';
-    Editor.view.admin.task.PreferencesWindow.prototype.strings = {
-        close: '<?php echo $this->translate->_('Fenster schließen');?>'
-    };
+    Ext.define("Editor.locale.de.view.admin.task.PreferencesWindow", {
+        override: "Editor.view.admin.task.PreferencesWindow",
+        title: '<?php echo $this->translate->_('Einstellungen zu Aufgabe "{0}"');?>',
+        strings: {
+            close: '<?php echo $this->translate->_('Fenster schließen');?>'
+        }
+    });
     
-    Editor.view.admin.task.UserAssoc.prototype.title = '<?php echo $this->translate->_('Benutzer zu Aufgabe zuordnen');?>';
-    Editor.view.admin.task.UserAssoc.prototype.strings = {
-      fieldRole: '<?php echo $this->translate->_('Rolle');?>',
-      fieldState: '<?php echo $this->translate->_('Status');?>',
-      fieldUser: '<?php echo $this->translate->_('Benutzer');?>',
-      btnSave: '<?php echo $this->translate->_('Speichern');?>',
-      btnCancel: '<?php echo $this->translate->_('Abbrechen');?>',
-      formTitleAdd: '<?php echo $this->translate->_('Benutzerzuweisung hinzufügen:');?>',
-      formTitleEdit: '<?php echo $this->translate->_('Bearbeite Benutzer "{0}"');?>',
-      editInfo: '<?php echo $this->translate->_('Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!');?>'
-    };
+    Ext.define("Editor.locale.de.view.admin.task.UserAssoc", {
+        override: "Editor.view.admin.task.UserAssoc",
+        title: '<?php echo $this->translate->_('Benutzer zu Aufgabe zuordnen');?>',
+        strings: {
+            fieldRole: '<?php echo $this->translate->_('Rolle');?>',
+            fieldState: '<?php echo $this->translate->_('Status');?>',
+            fieldUser: '<?php echo $this->translate->_('Benutzer');?>',
+            btnSave: '<?php echo $this->translate->_('Speichern');?>',
+            btnCancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            formTitleAdd: '<?php echo $this->translate->_('Benutzerzuweisung hinzufügen:');?>',
+            formTitleEdit: '<?php echo $this->translate->_('Bearbeite Benutzer "{0}"');?>',
+            editInfo: '<?php echo $this->translate->_('Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!');?>'
+        }
+    });
     
-    Editor.view.admin.task.UserAssocGrid.prototype.strings = {
-      confirmDeleteTitle: '<?php echo $this->translate->_('Eintrag löschen?');?>',
-      confirmDelete: '<?php echo $this->translate->_('Soll dieser Eintrag wirklich gelöscht werden?');?>',
-      userGuidCol: '<?php echo $this->translate->_('Benutzer');?>',
-      roleCol: '<?php echo $this->translate->_('Rolle');?>',
-      stateCol: '<?php echo $this->translate->_('Status');?>',
-      addUser: '<?php echo $this->translate->_('Benutzer hinzufügen');?>',
-      reload: '<?php echo $this->translate->_('Aktualisieren');?>',
-      addUserTip: '<?php echo $this->translate->_('Einen Benutzer dieser Aufgabe zuordnen.');?>',
-      removeUser: '<?php echo $this->translate->_('Benutzer entfernen');?>',
-      removeUserTip: '<?php echo $this->translate->_('Den gewählten Benutzer aus dieser Aufgabe entfernen.');?>',
-      save: '<?php echo $this->translate->_('Änderungen speichern');?>',
-      cancel: '<?php echo $this->translate->_('Abbrechen');?>'
-    };
-    
-    Editor.view.admin.UserChooseWindow.prototype.title = '<?php echo $this->translate->_('Einen oder mehrere Benutzer auswählen');?>';
-    Editor.view.admin.UserChooseWindow.prototype.strings = {
-        loginCol: '<?php echo $this->translate->_('Login');?>',
-        firstNameCol: '<?php echo $this->translate->_('Vorname');?>',
-        surNameCol: '<?php echo $this->translate->_('Nachname');?>',
-        emailCol: '<?php echo $this->translate->_('E-Mail');?>',
-        addBtn: '<?php echo $this->translate->_('Benutzer hinzufügen');?>',
-        cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>'
-    };
-    
+    Ext.define("Editor.locale.de.view.admin.task.UserAssocGrid", {
+        override: "Editor.view.admin.task.UserAssocGrid",
+        strings: {
+            confirmDeleteTitle: '<?php echo $this->translate->_('Eintrag löschen?');?>',
+            confirmDelete: '<?php echo $this->translate->_('Soll dieser Eintrag wirklich gelöscht werden?');?>',
+            userGuidCol: '<?php echo $this->translate->_('Benutzer');?>',
+            roleCol: '<?php echo $this->translate->_('Rolle');?>',
+            stateCol: '<?php echo $this->translate->_('Status');?>',
+            addUser: '<?php echo $this->translate->_('Benutzer hinzufügen');?>',
+            reload: '<?php echo $this->translate->_('Aktualisieren');?>',
+            addUserTip: '<?php echo $this->translate->_('Einen Benutzer dieser Aufgabe zuordnen.');?>',
+            removeUser: '<?php echo $this->translate->_('Benutzer entfernen');?>',
+            removeUserTip: '<?php echo $this->translate->_('Den gewählten Benutzer aus dieser Aufgabe entfernen.');?>',
+            save: '<?php echo $this->translate->_('Änderungen speichern');?>',
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>'
+        }
+    });
+
+    Ext.define("Editor.locale.de.view.admin.UserChooseWindow", {
+        override: "Editor.view.admin.UserChooseWindow",
+        title: '<?php echo $this->translate->_('Einen oder mehrere Benutzer auswählen');?>',
+        strings: {
+            loginCol: '<?php echo $this->translate->_('Login');?>',
+            firstNameCol: '<?php echo $this->translate->_('Vorname');?>',
+            surNameCol: '<?php echo $this->translate->_('Nachname');?>',
+            emailCol: '<?php echo $this->translate->_('E-Mail');?>',
+            addBtn: '<?php echo $this->translate->_('Benutzer hinzufügen');?>',
+            cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>'
+        }
+    });
     
 <?php
     if($hasFrontendController('Editor.controller.HeadPanel')){
