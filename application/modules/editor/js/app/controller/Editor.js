@@ -137,6 +137,18 @@ Ext.define('Editor.controller.Editor', {
       me.getSegmentGrid().store.on('filterchange', me.prevNextSegment.handleSortOrFilter, me.prevNextSegment);
       me.getSegmentGrid().store.on('sort', me.prevNextSegment.handleSortOrFilter, me.prevNextSegment);
       
+      /**
+       * disable the column show / hide menu while editing a segment (EXT6UPD-85)
+       */
+      Ext.override(me.getSegmentGrid().getHeaderContainer(), {
+          getColumnMenu: function() {
+              if(plug.editing) {
+                  return null;
+              }
+              return this.callParent(arguments);
+          }
+      });
+      
       new Ext.util.KeyMap(Ext.getDoc(), me.getKeyMapConfig({
           'pos1': [Ext.EventObjectImpl.HOME,{ctrl: false, alt: false}, me.handleHomeKeyPress, true],
           'ctrl-alt-c':     ["C",{ctrl: true, alt: true}, function(key, e){
