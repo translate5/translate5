@@ -273,7 +273,8 @@ Ext.define('Editor.controller.Editor', {
   save: function() {
       var me = this,
           ed = me.getEditPlugin(),
-          rec = ed.context.record;
+          rec = ed.editing && ed.context.record;
+        
       if(me.isEditing &&rec && rec.get('editable')) {
           me.fireEvent('saveUnsavedComments');
           me.fireEvent('saveSegment');

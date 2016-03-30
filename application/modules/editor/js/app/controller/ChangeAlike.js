@@ -98,29 +98,34 @@ Ext.define('Editor.controller.ChangeAlike', {
     ref : 'optionsBtn',
     selector : '#segmentgrid #optionsBtn'
   }],
-  init : function() {
-      var me = this,
-          segCtrl = me.application.getController('Segments');
-      
-      //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following event bindings
-      Editor.app.on('editorViewportClosed', me.clearAlikeSegments, me);
-      segCtrl.on('afterSaveCall', me.onAfterSaveCall, me);
-      segCtrl.on('saveComplete', me.onSaveComplete, me);
-
-      this.control({
-        '#changealikeWindow #saveBtn' : {
-            click: me.handleSaveChangeAlike
-        },
-        '#changealikeWindow #cancelBtn' : {
-            click: me.handleCancelChangeAlike
-        },
-        '#changealikeWindow tool[type=close]' : {
-            click: me.handleCancelChangeAlike
-        },
-        '#segmentgrid': {
-            afterrender: this.initEditPluginHandler
-        }
-      });
+  listen: {
+      component: {
+          '#changealikeWindow #saveBtn' : {
+              click: 'handleSaveChangeAlike'
+          },
+          '#changealikeWindow' : {
+              show: 'focusButton',
+              onEscape: 'handleCancelChangeAlike'
+          },
+          '#changealikeWindow #cancelBtn' : {
+              click: 'handleCancelChangeAlike'
+          },
+          '#changealikeWindow tool[type=close]' : {
+              click: 'handleCancelChangeAlike'
+          },
+          '#segmentgrid': {
+              afterrender: 'initEditPluginHandler'
+          }
+      },
+      controller: {
+          '#Editor.$application': {
+              editorViewportClosed: 'clearAlikeSegments'
+          },
+          '#segmentscontroller': {
+              afterSaveCall: 'onAfterSaveCall',
+              saveComplete: 'onSaveComplete'
+          }
+      }
   },
   /**
    * Gibt die RowEditing Instanz des Grids zurück
@@ -155,6 +160,9 @@ Ext.define('Editor.controller.ChangeAlike', {
       if(!t.get('defaultSegmentLayout') && enabledACL) {
           Editor.MessageBox.addInfo(this.messages.alikesDisabled, 1.4);
       }
+  },
+  focusButton: function(win) {
+      win.down('#saveBtn').focus(false, 201);
   },
   clearAlikeSegments: function() {
       this.getAlikeSegmentsStore().removeAll();

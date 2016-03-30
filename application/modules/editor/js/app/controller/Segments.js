@@ -82,6 +82,7 @@ Ext.define('Editor.controller.Segments', {
    * Cache der Zuordnung fileId => Grid Index des ersten Segments der Datei.
    */
   filemap: {},
+  id: 'segmentscontroller',
   loadingMaskRequests: 0,
   saveChainMutex: false,
   changeAlikeOperation: null,

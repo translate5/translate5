@@ -69,6 +69,9 @@ Ext.define('Editor.view.changealike.Window', {
       scope: me
     });
   },
+  onEsc: function() {
+      this.fireEvent('onEscape', this);
+  },
   /**
    * @param {Editor.model.Segment} rec
    */
