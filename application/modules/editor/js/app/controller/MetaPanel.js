@@ -156,6 +156,7 @@ Ext.define('Editor.controller.MetaPanel', {
     });
     //bindStore(me.record.terms());
     me.loadRecord(me.record);
+    navi.show();
     navi.enable();
     me.getSegmentMeta().show();
     mp.enable();
@@ -170,7 +171,7 @@ Ext.define('Editor.controller.MetaPanel', {
       me.record = record;
       me.getSegmentMeta().hide();
       mp.enable();
-      me.getNavi().disable();
+      me.getNavi().hide();
   },
   /**
    * lädt die konkreten record ins Meta Panel 
