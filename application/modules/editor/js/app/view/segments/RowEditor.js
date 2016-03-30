@@ -105,8 +105,8 @@ Ext.define('Editor.view.segments.RowEditor', {
         me.mon(plugin.view, {
             itemadd: me.onItemAdd,
             scope: me
-
         });
+        me.onViewScroll(); //initial call to sync scroll state
     },
     /**
      * cancels the editing process
