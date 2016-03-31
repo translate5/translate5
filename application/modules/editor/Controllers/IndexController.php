@@ -39,14 +39,19 @@ END LICENSE AND COPYRIGHT
  */ 
 class Editor_IndexController extends ZfExtended_Controllers_Action {
     /**
-     * FIXME remove session: session is redundant here, since parent class has _session
-     * @var Zend_Session_Namespace
-     */
-    protected $session;
-    /**
      * @var ZfExtended_Zendoverwrites_Translate
      */
     protected $translate;
+    
+    /**
+     * @var Zend_Config
+     */
+    protected $config;
+    
+    public function init() {
+        parent::init();
+        $this->config = Zend_Registry::get('config');
+    }
     
     /**
      * 
@@ -67,24 +72,20 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     }
     */
     public function indexAction() {
-        $this->session = new Zend_Session_Namespace();
         $this->_helper->layout->disableLayout();
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        $this->view->pathToIMAGES = APPLICATION_RUNDIR.$this->session->runtimeOptions->server->pathToIMAGES;
+        $this->view->pathToIMAGES = APPLICATION_RUNDIR.$this->config->runtimeOptions->server->pathToIMAGES;
         $extJs = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
               'ExtJs'
           );
+        /* @var $extJs ZfExtended_Controller_Helper_ExtJs */
         $this->view->extJsCss = $extJs->getCssPath();
         $this->view->extJsBasepath = $extJs->getHttpPath();
         
-        //FIXME is coming from DB, for easy switching of branches do ExtJS switch in PHP for the moment:
-        $this->view->extJsBasepath = str_replace('4.0.7', '6.0.0', $this->view->extJsBasepath);
-        
-        $this->view->buildType = 'fiddle';
         $this->view->buildType = 'development';
         
         $this->view->publicModulePath = APPLICATION_RUNDIR.'/modules/'.Zend_Registry::get('module');
-        $this->view->locale = $this->session->locale;
+        $this->view->locale = $this->_session->locale;
 
         $css = $this->getAdditionalCss();
         foreach($css as $oneCss) {
@@ -150,11 +151,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
      * @return array
      */
     protected function getAdditionalCss() {
-        if(empty($this->session->runtimeOptions->publicAdditions)){
+        $config =Zend_Registry::get('config');
+        if(empty($config->runtimeOptions->publicAdditions)){
             return array();
         }
         /* @var $css Zend_Config */
-        $css = $this->session->runtimeOptions->publicAdditions->css;
+        $css = $config->runtimeOptions->publicAdditions->css;
         if(empty($css)) {
             return array();
         }
@@ -165,7 +167,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     }
     
     protected function setJsVarsInView() {
-        $rop = $this->session->runtimeOptions;
+        $rop = $this->config->runtimeOptions;
         
         $restPath = APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';
       $this->view->Php2JsVars()->set('restpath', $restPath);
@@ -251,12 +253,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $workflow = ZfExtended_Factory::get('editor_Workflow_Default');
         /* @var $workflow editor_Workflow_Default */
         
-        $ed = $this->session->runtimeOptions->editor;
+        $ed = $this->config->runtimeOptions->editor;
         
         $php2js = $this->view->Php2JsVars();
         $php2js->set('app.controllers', $this->getFrontendControllers());
         
-        if(empty($this->session->taskGuid)) {
+        if(empty($this->_session->taskGuid)) {
             $php2js->set('app.initMethod', 'openAdministration');
         }
         else {
@@ -264,13 +266,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             /* @var $task editor_Models_Task */
             //FIXME TRANSLATE-55 if a taskguid remains in the session, 
             //the user will be caught in a zend 404 Screen instead of getting the adminpanel.
-            $task->loadByTaskGuid($this->session->taskGuid);
+            $task->loadByTaskGuid($this->_session->taskGuid);
             $taskData = $task->getDataObject();
             unset($taskData->qmSubsegmentFlags);
             
             $php2js->set('task', $taskData);
-            $openState = $this->session->taskOpenState ? 
-                    $this->session->taskOpenState : 
+            $openState = $this->_session->taskOpenState ? 
+                    $this->_session->taskOpenState : 
                     $workflow::STATE_WAITING; //in doubt read only
             $php2js->set('app.initState', $openState);
             $php2js->set('app.initMethod', 'openEditor');
@@ -308,7 +310,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
         
-        $ed = $this->session->runtimeOptions->editor;
+        $ed = $this->config->runtimeOptions->editor;
         
         $controllers = array('ServerException', 'ViewModes', 'Segments', 
             'Preferences', 'MetaPanel', 'Editor', 'Fileorder',
@@ -408,9 +410,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     
     public function generatesmalltagsAction() {
       set_time_limit(0);
-      $session = new Zend_Session_Namespace();
       $path = array(APPLICATION_PATH, '..', 'public', 
-          $session->runtimeOptions->dir->tagImagesBasePath.'/');
+          $this->config->runtimeOptions->dir->tagImagesBasePath.'/');
       $path = join(DIRECTORY_SEPARATOR, $path);
 
       /* @var $single ImageTag_Single */
@@ -446,9 +447,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     
     public function generateqmsubsegmenttagsAction() {
       set_time_limit(0);
-      $session = new Zend_Session_Namespace();
       $path = array(APPLICATION_PATH, '..', 'public', 
-          $session->runtimeOptions->dir->tagImagesBasePath.'/');
+          $this->config->runtimeOptions->dir->tagImagesBasePath.'/');
       $path = join(DIRECTORY_SEPARATOR, $path);
 
       /* @var $left editor_ImageTag_QmSubSegmentLeft */
@@ -471,11 +471,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     
     public function localizedjsstringsAction() {
       $this->getResponse()->setHeader('Content-Type', 'text/javascript', TRUE);
-      $this->session = new Zend_Session_Namespace();
       
       $this->view->frontendControllers = $this->getFrontendControllers();
       
-      $this->view->appViewport = $this->session->runtimeOptions->editor->initialViewPort;
+      $this->view->appViewport = $this->config->runtimeOptions->editor->initialViewPort;
       $this->_helper->layout->disableLayout();
     }
     

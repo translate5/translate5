@@ -141,9 +141,11 @@ Ext.define('Editor.controller.Localizer', {
     	buttonTooltip20: '<?php echo $this->translate->_(' (ALT+SHIFT+{0})');?>'
     };
     <?php } ?>
-  	Editor.view.ToolTip.prototype.strings = {
-		severity: '<?php echo $this->translate->_('Gewichtung');?>'
-	};
+    
+    Ext.define("Editor.locale.de.view.ToolTip", {
+        override: "Editor.view.ToolTip",
+        severity: '<?php echo $this->translate->_('Gewichtung');?>'
+    });
   	
   	Editor.view.preferences.Window.prototype.item_radiogroup_fieldLabel = '<?php echo $this->translate->_('Verhalten des Wiederholungseditor');?>';
     Editor.view.preferences.Window.prototype.item_alikeBehaviour_always_boxLabel = '<?php echo $this->translate->_('Immer automatisch ersetzen und Status setzen');?>';

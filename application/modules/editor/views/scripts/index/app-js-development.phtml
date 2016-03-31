@@ -37,25 +37,20 @@
 /**
  * ExtJS file inclusion explanation:
  * This index file loads:
- * - The Erp Application as single files, unmerged
- * - ExtJS 5.1.1, unmerged, debug
+ * - The Translate5 Editor Application as single files, unmerged
+ * - ExtJS 6.0.0, unmerged, debug
  * - For ExtJS as provided by Sencha Architect, unmerged, use the following:
     <link rel="stylesheet" type="text/css" href="modules/erp/ERP/bootstrap.css">
     <script src="modules/erp/ERP/ext/build/ext-all-debug.js"></script>
     <script src="modules/erp/ERP/ext/packages/ext-locale/build/ext-locale-de-debug.js"></script>
  */
-$extPath = 'ext-6.0.0/build/';
 ?>
-<link rel="stylesheet" type="text/css" href="<?php echo $extPath;?>classic/theme-classic/resources/theme-classic-all.css">
 
-<!-- <link rel="stylesheet" type="text/css" href="<?php echo $this->extJsCss; ?>"/>  -->
-<link rel="stylesheet" type="text/css" href="<?php echo $extPath; ?>classic/theme-classic/resources/theme-classic-all-debug.css"/>
+<link rel="stylesheet" type="text/css" href="<?php echo $this->extJsCss; ?>"/>
 <link rel="stylesheet" type="text/css" href="<?php echo $this->publicModulePath; ?>/css/main.css?v=7" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/translate5.css?v=7" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/editorAdditions.css?v=7" />
 
-<script src="<?php echo $extPath;?>ext-all-debug.js"></script>
-<script src="<?php echo $extPath;?>classic/locale/locale-de-debug.js"></script>
+<script src="<?php echo $this->extJsBasepath;?>build/ext-all-debug.js"></script>
+<script src="<?php echo $this->extJsBasepath;?>build/classic/locale/locale-de-debug.js"></script>
 <script src="<?php echo $this->publicModulePath; ?>/js/app/MessageBox.js"></script>
 <script>
 //Intercept setPath for developing systems, on production all should work with above builded code 
