@@ -169,8 +169,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      * Adds the first editable segments rowindex for f2 usage in the frontend
      */
     protected function addFirstEditable() {
-        //needed only on first page 
-        if($this->offset > 0) {
+        //needed only on first page and if we have rows 
+        if($this->offset > 0 || empty($this->view->rows)) {
             return;
         }
         //since we dont use metaData otherwise, we can overwrite it completly:
