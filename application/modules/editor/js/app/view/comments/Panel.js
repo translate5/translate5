@@ -89,7 +89,6 @@ Ext.define('Editor.view.comments.Panel', {
                 title: me.title, //see EXT6UPD-9
             items : [ {
                 xtype : 'container',
-                hidden: true,
                 itemId: 'commentContainer',
                 layout: {
                     align: 'stretch',

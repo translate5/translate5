@@ -390,10 +390,8 @@ Ext.define('Editor.controller.Comments', {
           form.enable();
       }
       if(!id) {
-          box.hide();
           return;
       }
-      box.show();
       //jump out here if comments already loaded for this segment.
       if(me.loadedSegmentId && me.loadedSegmentId == id) {
           return;
