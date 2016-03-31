@@ -213,39 +213,15 @@ Ext.define('Editor.controller.QmSubSegments', {
         this.getWindow().show();
     },
     /**
-     * Recursively gets menuitem by it qmid
-     * @param {Array} menuitems
-     * @param {Integer} qmid
-     */
-    getMenuitemByQmId: function(menuitems, qmid) {
-        var me = this,
-            result = null;
-        for (var i = 0; i < menuitems.length; i++) {
-            if (menuitems[i].qmid == qmid) {
-                return menuitems[i];
-            }
-            if(!menuitems[i].menu || menuitems[i].menu.items.length == 0){
-                continue;
-            }
-            result = me.getMenuitemByQmId(menuitems[i].menu.items, qmid);
-            if(result) {
-                break;
-            }
-        }
-        return result;
-    },
-    /**
      * Inserts the QM Issue Tag in the Editor by key shortcut, displays popup if nothing selected
      * @param key
      */
     handleAddQmFlagKey: function(key) {
         var me = this,
             found = false,
-            menuConfig = me.getQmFieldset().menuConfig,
-            menuitem = me.getMenuitemByQmId(menuConfig, key);
+            menuitem = me.getQmFieldset().down('menuitem[qmid='+key+']');
         
-        if (menuitem)
-        {
+        if (menuitem) {
             me.handleAddQmFlagClick(menuitem);
         }
     },
@@ -295,16 +271,18 @@ Ext.define('Editor.controller.QmSubSegments', {
      */
     insertQmFlagsH5: function(editor, qmid, comment, sev){
 		var doc = editor.getDoc(),
-		rangeBegin = doc.getSelection().getRangeAt(0),
-		rangeEnd = rangeBegin.cloneRange(),
-		tagDef = this.getImgTagDomConfig(qmid, comment, sev),
-		open = Ext.DomHelper.createDom(tagDef.open),
-		close = Ext.DomHelper.createDom(tagDef.close);
+			rangeBegin = doc.getSelection().getRangeAt(0),
+			rangeEnd = rangeBegin.cloneRange(),
+			tagDef = this.getImgTagDomConfig(qmid, comment, sev),
+			open = Ext.DomHelper.createDom(tagDef.open),
+			close = Ext.DomHelper.createDom(tagDef.close);
 		rangeBegin.collapse(true);
 		rangeEnd.collapse(false);
 		rangeEnd.insertNode(close);
 		rangeBegin.insertNode(open);
 		doc.getSelection().removeAllRanges();
+		rangeEnd.collapse(false);
+		doc.getSelection().addRange(rangeEnd);
     },
     /**
      * generates a Dom Config Object with the to image tags 
