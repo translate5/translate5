@@ -371,6 +371,7 @@ Ext.define('Editor.controller.Comments', {
           me.getCommentPanel().expand();
           return;
       }
+      me.record = context.record;
       me.expandWindow();
   },
   /**
