@@ -669,6 +669,10 @@ Ext.define('Editor.controller.Editor', {
         firstEditableRow = grid.store.getFirsteditableRow(),
         callback;
     
+    if(Ext.isEmpty(firstEditableRow)) {
+        return;
+    }
+
     if (ed.editing) {
         ed.editor.mainEditor.deferFocus();
         return;
