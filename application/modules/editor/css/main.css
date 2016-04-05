@@ -62,6 +62,7 @@ END LICENSE AND COPYRIGHT
     width: 14px;
     cursor: pointer;
     background: transparent url(../../../ext-6.0.0/build/classic/theme-classic/resources/images/grid/grid3-hd-btn.gif) no-repeat 0 center;
+    z-index:10; /* EXT6UPD-106 */
 }
 
 
