@@ -419,6 +419,6 @@ Ext.define('Editor.controller.QmSubSegments', {
 	 * @returns {Boolean}
 	 */
     isEmptySelectionIE: function(sel){
-    	return sel.type.toLowerCase() != 'none';
+    	return sel.type && sel.type.toLowerCase() != 'none';
     }
 });
