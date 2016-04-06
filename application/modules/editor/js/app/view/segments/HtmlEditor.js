@@ -143,6 +143,26 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       me.setValue(me.markup(value)+checkTag);
   },
   /**
+   * Fixing focus issues EXT6UPD-105
+   */
+  privates: {
+      getFocusEl: function() {
+          return Ext.fly(this.getEditorBody());
+      }
+  },
+  /**
+   * Fixing focus issues EXT6UPD-105
+   */
+  pushValue: function() {
+      this.callParent();
+      //do toggle on off not only on gecko, but also on IE
+      if(!Ext.isGecko && Ext.isIE11) {
+          this.setDesignMode(false);  //toggle off first
+          this.setDesignMode(true);
+      }
+  },
+  
+  /**
    * Holt Daten aus dem HtmlEditor und entfernt das markup
    * @return String
    */
