@@ -3,6 +3,10 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.4.6] - 2016-04-06
+### Changed
+TRANSLATE-631: ExtJs 6 Update, several fixes
+
 ## [2.4.5] - 2016-03-17
 ### Added
 TRANSLATE-586: Allow user only to add MQM-tags, but not to edit the content
