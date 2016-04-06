@@ -3,8 +3,8 @@ RewriteEngine On
 #RewriteRule ^v-[0-9]\.[0-9]\.[0-9]/(.*)$ $1 [NC,L]
 
 #fixing missing ext-6 images for < IE10; toolbar-footer-bg does not exist at all!
-RewriteCond %{REQUEST_FILENAME} !-f 
 RewriteRule ^(ext-6\..\../build)/classic/theme-(classic|gray)/(resources/images/toolbar/toolbar-footer-bg.gif) /$1/welcome/css/blank.gif [NC,L]
+RewriteRule ^(ext-6\..\../build)/classic/theme-(classic|gray)/(resources/images/menu/menu-item-default-active-bg.gif) /$1/welcome/css/blank.gif [NC,L]
 
 #fixing missing ext-6 images for < IE10
 RewriteCond %{REQUEST_FILENAME} !-f 
