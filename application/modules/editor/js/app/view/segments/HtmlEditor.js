@@ -130,6 +130,20 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   	  }
       return this.iframeEl.dom.contentDocument || (this.getWin() && this.getWin().document);
   },
+    
+  /**
+   * reintroduce our body tag check here, 
+   * we have to wait with editor initialzation until body tag is ready
+   */
+  getEditorBody: function() {
+      var doc = this.getDoc(),
+          body = doc.body || doc.documentElement;
+      if(body && body.tagName == 'BODY'){
+          return body;
+      }
+      return false;
+  },
+  
   /**
    * Setzt Daten im HtmlEditor und fügt markup hinzu
    * @param value String
