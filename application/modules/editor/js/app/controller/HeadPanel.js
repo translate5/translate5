@@ -121,6 +121,7 @@ Ext.define('Editor.controller.HeadPanel', {
               task: Editor.data.task.data,
               showTaskGuid: Editor.data.debug && Editor.data.debug.showTaskGuid,
               version: Editor.data.debug && Editor.data.debug.version + ' (ext '+Ext.getVersion().version+')',
+              browser: Editor.data.debug && Ext.browser.identity,
               taskLabel: hp.strings.task,
               userLabel: hp.strings.loggedinAs,
               loginLabel: hp.strings.loginName,
@@ -140,6 +141,7 @@ Ext.define('Editor.controller.HeadPanel', {
           task: null,
           showTaskGuid: false,
           version: Editor.data.debug && Editor.data.debug.version + ' (ext '+Ext.getVersion().version+')',
+          browser: Editor.data.debug && Ext.browser.identity,
           taskLabel: hp.strings.task,
           userLabel: hp.strings.loggedinAs,
           loginLabel: hp.strings.loginName

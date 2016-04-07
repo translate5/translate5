@@ -69,6 +69,9 @@ Ext.define('Editor.view.HeadPanel', {
                   '</tpl>',
                   '<tpl if="version">',
                   '<div class="info-line"><span class="task-label">Version:</span> <span class="task-name">{version}</span></div>',
+                  '</tpl>',
+                  '<tpl if="browser">',
+                  '<div class="info-line"><span class="task-label">Browser:</span> <span class="task-name">{browser}</span></div>',
                   '</tpl>'
                   ],
     initComponent: function() {
