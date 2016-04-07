@@ -862,13 +862,18 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     public function getFileMap($taskGuid) {
+        //use loadByTaskGuid to initialize segmentfields and MV and so on
+        //set limit = 1 to load only one record and not all records, latter one can leak memory
+        $this->limit = 1;
         $this->loadByTaskGuid($taskGuid);
+        
         $s = $this->db->select()
-                ->from($this->db, 'fileId');
+                ->from($this->db, array('cnt' => 'count(`'.$this->db.'`.id)', 'fileId'));
         $s = $this->addWatchlistJoin($s);
         $s = $this->addWhereTaskGuid($s, $taskGuid);
         
-
+        $s->group('fileId');
+        
         if (!empty($this->filter)) {
             $this->filter->applyToSelect($s);
         }
@@ -877,10 +882,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $result = array();
         $dbResult = $this->db->fetchAll($s)->toArray();
         foreach ($dbResult as $row) {
-            if (!isset($result[$row['fileId']])) {
-                $result[$row['fileId']] = $rowindex;
-            }
-            $rowindex++;
+            $result[$row['fileId']] = $rowindex;
+            $rowindex += $row['cnt'];
         }
         return $result;
     }
