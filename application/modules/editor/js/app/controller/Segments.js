@@ -82,6 +82,7 @@ Ext.define('Editor.controller.Segments', {
    * Cache der Zuordnung fileId => Grid Index des ersten Segments der Datei.
    */
   filemap: {},
+  lastFileMapParams: null,
   id: 'segmentscontroller',
   loadingMaskRequests: 0,
   saveChainMutex: false,
@@ -161,6 +162,8 @@ Ext.define('Editor.controller.Segments', {
   clearSegments: function() {
       var store = this.getSegmentsStore();
       store.removeAll(false);
+      this.fileMap = {};
+      this.lastFileMapParams = null;
   },
   /**
    * handler if segment store was loaded
@@ -326,8 +329,15 @@ Ext.define('Editor.controller.Segments', {
    * reloads the filemap with the given sort and filter parameters
    */
   reloadFilemap: function(params) {
-      var me = this;
-      params = params || {};
+      var me = this,
+          encoded;
+      params = params || {filter: "[]"};
+      encoded = Ext.Object.toQueryString(params);
+      if(me.lastFileMapParams === encoded) {
+        //we don't need to fetch the filemap again, since filters did not change
+        return;
+      }
+      me.lastFileMapParams = encoded;
       Ext.Ajax.request({
           url: Editor.data.pathToRunDir+'/editor/segment/filemap',
           method: 'get',
@@ -395,6 +405,7 @@ Ext.define('Editor.controller.Segments', {
       me.clearSegmentSort();
       store.removeAll();
       store.reload();
+      me.lastFileMapParams = null; //set to null to force reload
       me.handleFilterChange();
   },
   /**
