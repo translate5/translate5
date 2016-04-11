@@ -93,6 +93,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->view->rows = $this->entity->loadByTaskGuid($taskGuid);
         $this->view->total = $this->entity->totalCountByTaskGuid($taskGuid);
         
+        $this->addIsWatchedFlag();
         $this->addFirstEditable();
         $this->addIsFirstFileInfo($taskGuid);
     }
@@ -185,6 +186,35 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         }
         $this->entity->init($segment);
         $this->view->metaData->firstEditable = $this->entity->findSurroundingEditables(true);
+    }
+    
+    /**
+     * For performance Reasons we are calculating the isWatched info this way.
+     * A table join is only done if we are filtering for isWatched, 
+     * since the this join is very expensive on large data tasks
+     */
+    protected function addIsWatchedFlag() {
+        if($this->entity->getEnableWatchlistJoin()) {
+            return;
+        }
+        //get all segment IDs to be returned
+        $ids = array_map(function($seg){
+            return $seg['id'];
+        }, $this->view->rows);
+        
+        $assoc = ZfExtended_Factory::get('editor_Models_SegmentUserAssoc');
+        /* @var $assoc editor_Models_SegmentUserAssoc */
+        
+        $sessionUser = new Zend_Session_Namespace('user');
+        $watched = $assoc->loadIsWatched($ids, $sessionUser->data->userGuid);
+        $watchedById = array();
+        array_map(function($assoc) use (&$watchedById){
+            $watchedById[$assoc['segmentId']] = true;
+        }, $watched);
+        
+        foreach($this->view->rows as &$row) {
+            $row['isWatched'] = !empty($watchedById[$row['id']]);
+        }
     }
 
     public function putAction() {

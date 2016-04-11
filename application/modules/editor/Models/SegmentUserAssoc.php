@@ -112,10 +112,33 @@ class editor_Models_SegmentUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     public function loadBySegmentIdList(array $list) {
+        if(empty($list)) {
+            return array();
+        }
         try {
-            if(count($list)===0)
-                return array();
-            $s = $this->db->select()->where('segmentId in (?)', $list);
+            $s = $this->db->select()
+                ->where('segmentId in (?)', $list);
+            return $this->db->fetchAll($s)->toArray();
+        } catch (Exception $e) {
+            $this->notFound('NotFound after other Error', $e);
+        }
+        return null;
+    }
+    
+    /**
+     * Loads all association entries to the given segmentIds to the given user which are watched
+     * @param array $segmentIds
+     * @param string $userGuid
+     */
+    public function loadIsWatched(array $segmentIds, $userGuid) {
+        if(empty($segmentIds)) {
+            return array();
+        }
+        try {
+            $s = $this->db->select()
+                ->where('segmentId in (?)', $segmentIds)
+                ->where('isWatched = 1')
+                ->where('userGuid = ?', $userGuid);
             return $this->db->fetchAll($s)->toArray();
         } catch (Exception $e) {
             $this->notFound('NotFound after other Error', $e);

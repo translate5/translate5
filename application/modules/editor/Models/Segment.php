@@ -192,8 +192,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @see ZfExtended_Models_Entity_Abstract::hasField()
      */
     public function hasField($field) {
-        if ($field == 'isWatched')
-        {
+        if ($field == 'isWatched') {
             return true; // for filters
         }
         $loc = $this->segmentFieldManager->getDataLocationByKey($field);
@@ -840,7 +839,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $on = 'sua.segmentId = '.$tableName.'.id AND sua.userGuid = \''.$userGuid.'\'';
         $s->joinLeft(array('sua' => $db_join->info($db_join::NAME)), $on, array('isWatched', 'id AS segmentUserAssocId'));
         $s->setIntegrityCheck(false);
-    //error_log($s);
         return $s;
     }
     
@@ -854,6 +852,14 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             $value = $this->filter->hasFilter('isWatched');
         }
         $this->watchlistFilterEnabled = $value;
+    }
+    
+    /**
+     * returns if the watchlist join should be enabled or not
+     * @return boolean
+     */
+    public function getEnableWatchlistJoin() {
+        return $this->watchlistFilterEnabled;
     }
 
     /**
