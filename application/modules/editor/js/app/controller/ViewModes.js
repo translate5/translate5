@@ -359,8 +359,9 @@ Ext.define('Editor.controller.ViewModes', {
    * Shortcut Funktion zum repositionieren des Editors
    */
   repositionEditorRow: function() {
-    var ed = this.getSegmentGrid().editingPlugin.editor;
-    if(ed){
+    var plug = this.getSegmentGrid().editingPlugin,
+        ed = plug.editor;
+    if(plug.editing && ed){
         ed.reposition();
         ed.setEditorHeight();
     }
