@@ -49,12 +49,12 @@ Ext.define('Editor.model.SegmentUserAssoc', {
     appendId: false,
     url: Editor.data.restpath+'segmentuserassoc',
     reader : {
-      root: 'rows',
+      rootProperty: 'rows',
       type : 'json'
     },
     writer: {
       encode: true,
-      root: 'data',
+      rootProperty: 'data',
       writeAllFields: false
     }
   }
