@@ -86,24 +86,12 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
      * @see ZfExtended_Worker_Abstract::init()
      */
     public function init($taskGuid = NULL, $parameters = array()) {
-        if (isset($parameters['resourcePool'])) {
-            if (in_array($parameters['resourcePool'], self::$allowedResourcePools)) {
-                $this->resourcePool = $parameters['resourcePool'];
-                $this->parametersToSave['resourcePool'] = $this->resourcePool;
-            }
-        }
-        
         $this->useTargetOriginal = !empty($parameters['useTargetOriginal']);
+        $parameters['useTargetOriginal'] = $this->useTargetOriginal;
         $this->keepTargetOriginal = !empty($parameters['keepTargetOriginal']);
+        $parameters['keepTargetOriginal'] = $this->keepTargetOriginal;
         
-        if($this->useTargetOriginal) {
-            $this->parametersToSave['useTargetOriginal'] = true;
-        }
-        if($this->keepTargetOriginal) {
-            $this->parametersToSave['keepTargetOriginal'] = true;
-        }
-        
-        return parent::init($taskGuid, $this->parametersToSave);
+        return parent::init($taskGuid, $parameters);
     }
     
     /**
@@ -118,21 +106,11 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
     
     /**
      * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = array()) {
-        return true;
-    } 
-    
-    
-    /**
-     * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::run()
      */
     public function run() {
         return parent::run();
     }
-    
     
     /**
      * (non-PHPdoc)

@@ -33,7 +33,11 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTagger_Worker_Abstract {
 
-
+    /**
+     * @var editor_Plugins_TermTagger_Service_ServerCommunication 
+     */
+    protected $serverCommunication = null;
+    
     /**
      * Special Paramters:
      *
@@ -56,29 +60,16 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTag
      * @see ZfExtended_Worker_Abstract::init()
      */
     public function init($taskGuid = NULL, $parameters = array()) {
-        $this->data = $parameters;
-        
-        if (isset($parameters['serverCommunication'])) {
-            $this->parametersToSave['serverCommunication'] = $parameters['serverCommunication'];
-        }
-        
-        return parent::init($taskGuid, $this->parametersToSave);
-    }
-
-
-    /**
-     * (non-PHPdoc)
-     *
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = array()) {
+        //since validateParams is checkin it too late, we have to check it here
         if (empty($parameters['serverCommunication'])) {
-            $this->log->logError('Plugin TermTagger paramter validation failed', __CLASS__.' -> '.__FUNCTION__.' can not validate $parameters: '.print_r($parameters, true));
+            $this->log->logError('Plugin TermTagger parameter validation failed, missing serverCommunication', __CLASS__.' -> '.__FUNCTION__.' can not validate $parameters: '.print_r($parameters, true));
             return false;
         }
-        return true;
-    }
+        $this->serverCommunication = $parameters['serverCommunication'];
+        unset($parameters['serverCommunication']); //we don't want and need this in the DB
 
+        return parent::init($taskGuid, $parameters);
+    }
 
     /**
      * (non-PHPdoc)
@@ -89,31 +80,22 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTag
         return parent::run();
     }
 
-
     /**
      * (non-PHPdoc)
      *
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
-        
-        if (empty($this->data)) {
+        if (empty($this->serverCommunication)) {
             return false;
         }
-        
-        if (!isset($this->data['serverCommunication'])) {
-            return false;
-        }
-        
-        $serverCommunication = $this->data['serverCommunication'];
-        /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
         
         $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
         /* @var $termTagger editor_Plugins_TermTagger_Service */
         
         try {
-            $this->checkTermTaggerTbx($this->workerModel->getSlot(), $serverCommunication->tbxFile);
-            $result = $termTagger->tagterms($this->workerModel->getSlot(), $serverCommunication);
+            $this->checkTermTaggerTbx($this->workerModel->getSlot(), $this->serverCommunication->tbxFile);
+            $result = $termTagger->tagterms($this->workerModel->getSlot(), $this->serverCommunication);
         }
         catch(editor_Plugins_TermTagger_Exception_Abstract $exception) {
             $result = '';

@@ -103,6 +103,15 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
         $this->task->loadByTaskGuid($taskGuid);
         return $return;
     }
+    
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_Worker_Abstract::validateParameters()
+     */
+    protected function validateParameters($parameters = array()) {
+        return true;
+    }
+    
     /**
      * @todo forking should be transfered to ZfExtended_Worker_Abstract to make it usable for other workers.
      * it should be based on maxParallelProcesses instead of just having one running worker per slot. maxParallelProcesses is ignored so far.
