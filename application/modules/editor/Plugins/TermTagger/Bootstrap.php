@@ -156,8 +156,9 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
     public function handleBeforePutSave(Zend_EventManager_Event $event) {
         $config = Zend_Registry::get('config');
         $c = $config->runtimeOptions->termTagger->switchOn->GUI;
-        if((boolean)$c === false)
+        if((boolean)$c === false) {
             return;
+        }
         
         $segment = $event->getParam('model');
         /* @var $segment editor_Models_Segment */
@@ -188,7 +189,6 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
             $messages->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.');
             return false;
         }
-        
         $results = $worker->getResult();
         $sourceTextTagged = false;
         foreach ($results as $result) {

@@ -192,6 +192,9 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      * For performance Reasons we are calculating the isWatched info this way.
      * A table join is only done if we are filtering for isWatched, 
      * since the this join is very expensive on large data tasks
+     * 
+     * Since the segment_user_assoc contains currently only the isWatched info,
+     * we merge only the data if isWatched is true.
      */
     protected function addIsWatchedFlag() {
         if($this->entity->getEnableWatchlistJoin()) {
@@ -209,11 +212,14 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $watched = $assoc->loadIsWatched($ids, $sessionUser->data->userGuid);
         $watchedById = array();
         array_map(function($assoc) use (&$watchedById){
-            $watchedById[$assoc['segmentId']] = true;
+            $watchedById[$assoc['segmentId']] = $assoc['id'];
         }, $watched);
         
         foreach($this->view->rows as &$row) {
             $row['isWatched'] = !empty($watchedById[$row['id']]);
+            if($row['isWatched']) {
+                $row['segmentUserAssocId'] = $watchedById[$row['id']];
+            }
         }
     }
 
