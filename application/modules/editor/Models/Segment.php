@@ -895,11 +895,14 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
 
     protected function initDefaultSort() {
-        if (!empty($this->filter) && !$this->filter->hasSort()) {
+        if(empty($this->filter)) {
+            return;
+        }
+        if (!$this->filter->hasSort()) {
             $this->filter->addSort('fileOrder');
         }
         if(!$this->filter->hasSort('id')) {
-            $this->filter->addSort('id'); //add id as second persistent filter
+            $this->filter->addSort('id'); //add id as second permanent filter
         }
     }
 
