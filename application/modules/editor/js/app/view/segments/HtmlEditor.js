@@ -64,13 +64,15 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   isTagOrderClean: true,
   missingContentTags: [],
   duplicatedContentTags: [],
+  contentEdited: false, //is set to true if text content or content tags were modified
   disableErrorCheck: false,
   
   strings: {
 	  tagOrderErrorText: '#UT# Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
 	  tagMissingText: '#UT# Die nachfolgenden Tags wurden beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Versuchen Sie mit der Rückgängigfunktion STRG-Z die Tags wiederherzustellen. <br /><br />Alternativ können Sie auch die Bearbeitung des Segments durch Klick auf "Abbrechen" (<img src="images/cross.png" /> im rechten Menü) beenden und das Segment neu zur Bearbeitung öffnen.<br /><br />Fehlende Tags:',
 	  tagDuplicatedText: '#UT# Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:',
-	  tagRemovedText: '#UT# Es wurden Tags mit fehlendem Partner entfernt!'
+	  tagRemovedText: '#UT# Es wurden Tags mit fehlendem Partner entfernt!',
+      cantEditContents: '#UT#Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.'
   },
 
   //hilfsvariable für die "letzte Segment anzeigen" Funktionalität beim Verlassen des Browsers. 
@@ -182,10 +184,13 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   getValueAndUnMarkup: function(){
     var me = this,
+    	result,
     	body = me.getEditorBody();
     me.lastSegmentContentWithoutTags = [];
     me.checkTags(body);
-    return me.unMarkup(body);
+    result = me.unMarkup(body);
+    me.contentEdited = me.plainContent.join('') !== result.replace(/<img[^>]+>/g, '');
+    return result;
   },
   /**
    * ersetzt die div und spans durch images im string 
@@ -193,10 +198,13 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * @param value String
    */
   markup: function(value) {
-    var me = this;
-    me.result = [],
-    me.markupImages = {},
-    tempNode = document.createElement('DIV');
+    var me = this,
+        tempNode = document.createElement('DIV');
+    me.contentEdited = false;
+    me.result = [];
+    me.plainContent = []; //stores only the text content and content tags for "original content has changed" comparsion
+    me.markupImages = {};
+    
     //tempnode mit inhalt füllen => Browser HTML Parsing
     value = value.replace(/ </g, Editor.TRANSTILDE+'<');
     value = value.replace(/> /g, '>'+Editor.TRANSTILDE);
@@ -219,6 +227,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         var text = item.data.replace(new RegExp(Editor.TRANSTILDE, "g"), ' ');
         me.lastSegmentContentWithoutTags.push(text);
         me.result.push(Ext.htmlEncode(text));
+        me.plainContent.push(Ext.htmlEncode(text));
         return;
       }
       if(item.tagName == 'IMG' && !me.isDuplicateSaveTag(item)){
@@ -290,6 +299,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       }
 
       me.result.push(me.imageTemplate.apply(data));
+      me.plainContent.push(me.markupImages[data.key].html);
     });
   },
   /**
@@ -399,7 +409,13 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           me.disableErrorCheck = false;
           return false;
       }
-      
+
+	  //since this error can't be handled somehow, we don't fire an event but show the message and stop immediatelly
+      if(Editor.data.task.get('notEditContent') && me.contentEdited){
+          Editor.MessageBox.addError(me.strings.cantEditContents);
+          return true;
+      }
+
       if(me.missingContentTags.length > 0 || me.duplicatedContentTags.length > 0){
           var msg = '', 
               todo = [['missingContentTags', 'tagMissingText'],['duplicatedContentTags','tagDuplicatedText']];

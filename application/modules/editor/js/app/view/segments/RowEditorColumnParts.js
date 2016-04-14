@@ -44,9 +44,8 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
     previousRecord: null,
     timeTrackingData: null,
     messages: {
-        segmentNotSavedUserMessage: 'Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank!',
-        cantSaveEmptySegment: '#UT#Das Segment kann nicht ohne Inhalt gespeichert werden!',
-        cantEditContents: '#UT#Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.'
+        segmentNotSavedUserMessage: '#UT#Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank!',
+        cantSaveEmptySegment: '#UT#Das Segment kann nicht ohne Inhalt gespeichert werden!'
     },
     listeners: {
         'afterlayout': 'onAfterLayout'
@@ -334,9 +333,7 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
             //und verhindert so, dass der Record nicht als modified markiert wird, wenn am Inhalt eigentlich nichts verändert wurde
             //newValue = Ext.String.trim(me.mainEditor.getValueAndUnMarkup()).replace(/\u200B/g, '');
             newValue = me.mainEditor.getValueAndUnMarkup().replace(/\u200B/g, ''),
-            title, msg,
-            oldValue = record.get(me.columnToEdit).replace(/\u200B/g, ''),
-            reMqmTag = /<img[^>]+>/g;
+            title, msg;
             
         //check, if the context delivers really the correct record, because through some issues in reallive data 
         //rose the idea, that there might exist special race conditions, where
@@ -358,10 +355,6 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         }
         
         if(me.mainEditor.hasAndDisplayErrors()) {
-            return false;
-        }
-        if (Editor.data.task.get('notEditContent') && (newValue.replace(reMqmTag, '') != oldValue.replace(reMqmTag, '')) ) {
-            Editor.MessageBox.addError(me.messages.cantEditContents);
             return false;
         }
         me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
