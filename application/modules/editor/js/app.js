@@ -172,6 +172,7 @@ Ext.application({
       me.beforeUnloadCalled = false;
       me.fireEvent('editorViewportOpened');
       me.getController('Fileorder').loadFileTree();//@todo bei ITL muss der load wiederum automatisch geschehen
+      me.browserAdvice();
   },
   /**
    * Used to open a task directly without administration panel
@@ -256,5 +257,11 @@ Ext.application({
           form = Ext.DomHelper.append(Ext.getBody(), formSpec);
 
       form.submit();
+  },
+  browserAdvice: function() {
+      if(!Ext.isIE) {
+          return;
+      }
+      Editor.MessageBox.addInfo(this.browserAdviceText);
   }
 });
