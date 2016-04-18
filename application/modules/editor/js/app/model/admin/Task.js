@@ -229,12 +229,14 @@ Ext.define('Editor.model.admin.Task', {
               filter = data.initialGridFilters = {};
           }
           idx = Ext.Array.indexOf(stepChain, step);
-          if(idx > 0 && filter && !filter.editorGridFilter) {
-              filter.editorGridFilter = {
-                  workflowStep: {
-                      value: [stepChain[idx], stepChain[idx - 1]]
-                  }
-              };
+          if(idx > 0 && filter && !filter.segmentgrid) {
+              filter.segmentgrid = [{
+                  type: 'workflowStep',
+                  dataIndex: 'workflowStep',
+                  property: 'workflowStep',
+                  disabled: false,
+                  value: [stepChain[idx], stepChain[idx - 1]]
+              }];
           }
       }
   }

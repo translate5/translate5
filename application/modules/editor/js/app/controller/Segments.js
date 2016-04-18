@@ -92,9 +92,6 @@ Ext.define('Editor.controller.Segments', {
     ref : 'segmentGrid',
     selector : '#segmentgrid'
   },{
-    ref : 'segmentPager',
-    selector : '#segmentgrid editorgridscroller'
-  },{
     ref : 'fileTree',
     selector : '#fileorderTree'
   },{
@@ -128,13 +125,31 @@ Ext.define('Editor.controller.Segments', {
           '#segmentgrid' : {
               afterrender: function(grid) {
                   var me = this,
-                      ro = Editor.data.task && Editor.data.task.isReadOnly();
+                      params = [],
+                      ro = Editor.data.task && Editor.data.task.isReadOnly(),
+                      store = grid.store,
+                      proxy = store.getProxy(),
+                      initialGridFilters = Editor.data.initialGridFilters.segmentgrid;
+
                   grid.setTitle(ro ? grid.title_readonly : grid.title);
                   me.styleResetFilterButton(grid.store.filters);
                   grid.store.on('load', me.afterStoreLoad, me);
                   grid.store.on('filterchange', me.handleFilterChange, me);
                   grid.store.on('sort', me.handleFilterChange, me);
-                  me.reloadFilemap();
+
+                  // add initial filters for this grid
+                  if(initialGridFilters && Ext.isArray(initialGridFilters)) {
+                      Ext.Array.each(initialGridFilters, function(item){
+                          grid.down('gridcolumn[dataIndex="'+item.dataIndex+'"]').show();
+                      });
+                      grid.filters.addFilters(initialGridFilters);
+                      params[proxy.getFilterParam()] = proxy.encodeFilters(store.getFilters().items);
+                      me.reloadFilemap(params);
+                  }
+                  else {
+                    store.attemptLoad();
+                    me.reloadFilemap();
+                  }
               },
               columnhide: 'handleColumnVisibility',
               columnshow: 'handleColumnVisibility'
@@ -203,7 +218,8 @@ Ext.define('Editor.controller.Segments', {
    * @param {Editor.view.segments.column.Content} col
    */
   handleColumnVisibility: function(head, col) {
-      var ed = this.getSegmentGrid().editingPlugin;
+      var grid = this.getSegmentGrid(),
+          ed = grid && grid.editingPlugin;
       if(ed && ed.editor && ed.editor.columnToEdit == col.dataIndex) {
           ed.editor.toggleMainEditor(col.isVisible());
       }
