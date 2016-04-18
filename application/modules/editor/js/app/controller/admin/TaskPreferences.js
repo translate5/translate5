@@ -475,6 +475,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           rec.set('userGuid', null);
       }
       rec.set('workflow', me.getTaskWorkflow().getValue());
+      me.getPrefWindow().setLoading(true);
       rec.saveVersioned(me.actualTask, {
           success: function() {
               me.clickCancel();
