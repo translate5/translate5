@@ -226,15 +226,16 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('columns.maxWidth', (integer)$rop->editor->columns->maxWidth);
       
       /*
-      Format of initial preset grid filters
-      can be used for every grid filter
+      Format of initial preset grid filters, value is given to addFilters
+      can be used for segmentgrid only (other grids has to implement it first)
       initialGridFilters = {
-        FILTER_FTYPE: {
-          FIELD_DATA_INDEX: INITIAL_CONFIG (used with applyIf)
-        }
+        segmentgrid: [{
+          dataIndex: FIELD_DATA_INDEX
+          value: INITIAL_VALUE
+        }]
       }
       example:
-      $this->view->Php2JsVars()->set('initialGridFilters.editorGridFilter.workflowStep', {value: 129});
+      $this->view->Php2JsVars()->set('initialGridFilters.segmentgrid', [{dataIndex: "workflowStep", value: 129}});
       */
       
       $this->setJsAppData();
