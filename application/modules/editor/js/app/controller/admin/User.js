@@ -254,16 +254,15 @@ Ext.define('Editor.controller.admin.User', {
       basic.updateRecord(rec);
       win.setLoading(true);
       rec.save({
-          //using the callback method here (instead failure & success) disables the default server exception
-          callback: function(rec, op) {
+          //prevent default ServerException handling
+          preventDefaultHandler: true,
+          failure: function(rec, op) {
               var error,
+                  errorRes = op.error && op.error.response,
                   errorHandler = Editor.app.getController('ServerException');
-              if(op.success) {
-                  return;
-              }
               win.setLoading(false);
-              if(op.response && op.response.responseText) {
-                  error = Ext.decode(op.response.responseText);
+              if(errorRes && errorRes.responseText) {
+                  error = Ext.decode(errorRes.responseText);
                   if(error.errors && op.error && op.error.status == '400') {
                       basic.markInvalid(error.errors);
                       return;

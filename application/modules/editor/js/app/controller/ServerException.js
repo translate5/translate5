@@ -61,11 +61,12 @@ Ext.define('Editor.controller.ServerException', {
      * @return {Boolean} true if request was successfull, false otherwise
      */
     handleCallback: function(records, operation, success) {
+        var resp = operation.getResponse();
         if(operation.success) {
             return true;
         }
-        if(operation.response) {
-            this.handleException(operation.response);
+        if(resp) {
+            this.handleException(resp);
         }
         else {
             this.handleFailedRequest(operation.error.status, operation.error.statusText);
@@ -179,7 +180,7 @@ function() {
         constructor: function() {
             this.callOverridden(arguments);
             this.on('exception', function(proxy, resp, op){
-                if(op.callback){
+                if(op.preventDefaultHandler){
                     op.response = resp; //Operation does not contain response by default
                 }
                 else {

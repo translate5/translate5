@@ -532,20 +532,22 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           store = task.store,
           app = Editor.app;
       app.mask(me.strings.taskDestroy, task.get('taskName'));
-      task.erase({
-          //callback as empty function to prevent default ServerException handling
-          callback: Ext.emptyFn,
+      task.dropped = true; //doing the drop / erase manually
+      task.save({
+          //prevent default ServerException handling
+          preventDefaultHandler: true,
           success: function() {
               store.load();
               app.unmask();
           },
           failure: function(records, op){
+              task.reject();
               app.unmask();
               if(op.getError().status == '405') {
                   Editor.MessageBox.addError(me.strings.taskNotDestroyed);
               }
               else {
-                  Editor.app.getController('ServerException').handleException(op.response);
+                  Editor.app.getController('ServerException').handleException(op.error.response);
               }
           }
       });

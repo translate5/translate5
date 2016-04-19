@@ -549,6 +549,8 @@ Ext.define('Editor.controller.Segments', {
       
       record.save({
           scope: me,
+          //prevent default ServerException handling
+          preventDefaultHandler: true,
           callback: me.saveChainSaveCallback //NEXT step in save chain
       });
       me.saveIsRunning = true;

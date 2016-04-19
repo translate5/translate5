@@ -195,6 +195,8 @@ Ext.define('Editor.controller.ChangeAlike', {
     store.load({
         url: me.alikeSegmentsUrl+'/'+id,
         params: params,
+        //prevent default ServerException handling
+        preventDefaultHandler: true,
         callback: function(recs, op, success) {
             success && me.handleAlikesRead(op, id);
         }

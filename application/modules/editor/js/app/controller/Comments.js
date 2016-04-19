@@ -186,6 +186,8 @@ Ext.define('Editor.controller.Comments', {
       btn.setIconCls('ico-loading');
       
       rec.save({
+          //prevent default ServerException handling
+          preventDefaultHandler: true,
           callback: function(newrec, op) {
               var errorHandler = Editor.app.getController('ServerException');
               me.handleAddComment();
@@ -251,6 +253,8 @@ Ext.define('Editor.controller.Comments', {
           var id = rec.get('segmentId');
           rec.store.remove(rec);
           rec.erase({
+              //prevent default ServerException handling
+              preventDefaultHandler: true,
               callback: function(nothing, op) {
                   var errorHandler = Editor.app.getController('ServerException');
                   //reload comments if they are still shown to the user

@@ -75,7 +75,7 @@ Ext.define('Editor.MessageBox',{
         if(!operation.success) {
             return; //on a real server error the message is processed by serverexception!
         }
-        var resp = operation.response,
+        var resp = operation.getResponse(),
             json;
         if(!resp || !resp.responseText) {
             return;
