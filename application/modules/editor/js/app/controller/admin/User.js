@@ -199,7 +199,11 @@ Ext.define('Editor.controller.admin.User', {
               info = Ext.String.format(msg.confirmDeleteMsg,user.get('firstName')+' '+user.get('surName'));
               Ext.Msg.confirm(msg.confirmDeleteTitle, info, function(btn){
                   if(btn == 'yes') {
-                      user.erase({
+                      user.dropped = true;
+                      user.save({
+                          failure: function() {
+                              user.reject();
+                          },
                           success: function() {
                               taskStore && taskStore.load();
                               store.remove(user);

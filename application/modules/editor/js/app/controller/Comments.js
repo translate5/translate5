@@ -251,7 +251,6 @@ Ext.define('Editor.controller.Comments', {
               return;
           }
           var id = rec.get('segmentId');
-          rec.store.remove(rec);
           rec.erase({
               //prevent default ServerException handling
               preventDefaultHandler: true,
