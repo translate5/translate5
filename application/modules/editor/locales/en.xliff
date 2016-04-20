@@ -1299,6 +1299,14 @@
   <source>Sie benutzen den Internet Explorer, welcher aus technischer Sicht veraltet ist. <br />Bitte wechseln Sie auf einen moderneren Browser um die Anwendung mit voller Leistung nutzen zu können.</source>
   <target>You are using Internet Explorer, which is outdated from a technological perspective. <br />Please switch to a more modern browser for optimal performance.</target>
 </trans-unit>
+<trans-unit id='RGllIGdld8O8bnNjaHRlIEFrdGlvbiBrYW5uIG5pY2h0IGR1cmNoZ2Vmw7xocnQgd2VyZGVuISBEYXMgYWt0dWVsbCBnZcO2ZmZuZXRlIFNlZ21lbnQgbXVzcyB6dW7DpGNoc3QgZ2VzcGVpY2hlcnQgYnp3LiBnZXNjaGxvc3NlbiB3ZXJkZW4u'>
+  <source>Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.</source>
+  <target>The desired action cannot be processed! The currenlty opened segment has to be saved / closed first.</target>
+</trans-unit>
+<trans-unit id='RGllc2VyIEFubWVsZGVuYW1lIHdpcmQgYmVyZWl0cyB2ZXJ3ZW5kZXQu'>
+  <source>Dieser Anmeldename wird bereits verwendet.</source>
+  <target>This loginname is already in use!</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

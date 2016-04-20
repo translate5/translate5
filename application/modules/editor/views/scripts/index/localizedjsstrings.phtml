@@ -489,18 +489,22 @@ Ext.define('Editor.controller.Localizer', {
 <?php
     if($hasFrontendController('Editor.controller.HeadPanel')){
 ?>
-    Editor.controller.HeadPanel.prototype.strings = {
-        confirmFinish: '<?php echo $this->translate->_('Aufgabe abschließen?');?>', 
-        confirmFinishMsg: '<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>',
-        confirmEnd: '<?php echo $this->translate->_('Aufgabe endgültig beenden?');?>', 
-        confirmEndMsg: '<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer endgültig beenden?');?>',
-        taskClosed: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich verlassen.');?>',
-        taskFinished: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich abgeschlossen.');?>',
-        taskEnded: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich beendet.');?>',
-        taskClosing: '<?php echo $this->translate->_('Aufgabe wird verlassen...');?>',
-        taskFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen und verlassen...');?>',
-        taskEnding: '<?php echo $this->translate->_('Aufgabe wird beendet und verlassen...');?>'
-    };
+    Ext.define("Editor.locale.de.controller.HeadPanel", {
+        override: "Editor.controller.HeadPanel",
+        strings: {
+            confirmFinish: '<?php echo $this->translate->_('Aufgabe abschließen?');?>', 
+            confirmFinishMsg: '<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>',
+            confirmEnd: '<?php echo $this->translate->_('Aufgabe endgültig beenden?');?>', 
+            confirmEndMsg: '<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer endgültig beenden?');?>',
+            taskClosed: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich verlassen.');?>',
+            taskFinished: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich abgeschlossen.');?>',
+            taskEnded: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich beendet.');?>',
+            taskClosing: '<?php echo $this->translate->_('Aufgabe wird verlassen...');?>',
+            taskFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen und verlassen...');?>',
+            taskEnding: '<?php echo $this->translate->_('Aufgabe wird beendet und verlassen...');?>',
+            saveSegmentFirst: '<?php echo $this->translate->_('Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.');?>',
+        }
+    });
     
     Editor.view.HeadPanel.prototype.strings = {
         task: '<?php echo $this->translate->_('Aufgabe');?>',
