@@ -1307,6 +1307,10 @@
   <source>Dieser Anmeldename wird bereits verwendet.</source>
   <target>This loginname is already in use!</target>
 </trans-unit>
+<trans-unit id='RGFzIFNlZ21lbnQga2FubiBuaWNodCBiZWFyYmVpdGV0IHdlcmRlbiwgZGEgZGllIEF1ZmdhYmUgaW0gIm51ciBMZXNlIi0gYnp3LiBBbnNpY2h0c21vZHVzIGlzdC4='>
+  <source>Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lese"- bzw. Ansichtsmodus ist.</source>
+  <target>The segment cannot be edited, because the task is read-only / in view mode.</target>
+</trans-unit>
     </body>
   </file>
 </xliff>
