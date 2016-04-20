@@ -115,7 +115,7 @@ class editor_Models_Segment_EditablesFinder {
         $this->fieldsToSelect = array();
         foreach($this->sortParameter as $id => $sort) {
             $this->fieldsToSelect[] = $sort->property;
-            if($sort->property !== 'id'){
+            if($sort->property === 'id'){
                 unset($this->sortParameter[$id]); 
             }
         }
@@ -132,6 +132,10 @@ class editor_Models_Segment_EditablesFinder {
     public function find(boolean $next, array $autoStateIds = null) {
         $outerSql = $this->getOuterSql();
 
+        //for the inner sort we have to swap the direction for the prev filter
+        if(!$next) {
+            $this->filterInner->swapSortDirection(); 
+        }
         $this->prepareInnerFilter($autoStateIds);
         $innerSql = $this->getInnerSql();
         
@@ -177,7 +181,7 @@ class editor_Models_Segment_EditablesFinder {
         $f = $this->segment->db.'.`'.$prop.'` ';
         $sql->where('('.$f.$comparator.' ?', $value);
         $sql->orWhere('('.$f.'= ?', $value);
-        $sql->where($f.$comparator.' ? ))', $this->segment->getId());
+        $sql->where('id'.$comparator.' ? ))', $this->segment->getId());
     }
     
     /**
@@ -250,7 +254,7 @@ class editor_Models_Segment_EditablesFinder {
         return end($prop);
     }
     
-    protected function debug() {
+    protected function debug($outerSql) {
         return;
         //debug sql:
         file_put_contents('/tmp/foo.sql', $outerSql);
