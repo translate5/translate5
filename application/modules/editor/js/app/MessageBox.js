@@ -55,6 +55,9 @@ Ext.define('Editor.MessageBox',{
     INFO: 'notice',
     addSuccess: function(msg,delayFactor) {
       Editor.MessageBox.getInstance().addMessage(msg, Editor.MessageBox.SUCCESS, delayFactor);
+	},
+    addWarning: function(msg,delayFactor) {
+        Editor.MessageBox.getInstance().addMessage(msg, Editor.MessageBox.WARNING, delayFactor);
     },
     addError: function(msg,msgToServerlog) {
       //Editor.MessageBox.getInstance().addMessage(msg, Editor.MessageBox.ERROR);

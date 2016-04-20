@@ -139,7 +139,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   getEditorBody: function() {
       var doc = this.getDoc(),
-          body = doc.body || doc.documentElement;
+          body = doc && (doc.body || doc.documentElement);
       if(body && body.tagName == 'BODY'){
           return body;
       }

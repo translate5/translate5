@@ -52,8 +52,10 @@ Ext.define('Editor.controller.HeadPanel', {
       taskEnded: '#UT#Aufgabe wurde erfolgreich beendet.',
       taskClosing: '#UT#Aufgabe wird verlassen...',
       taskFinishing: '#UT#Aufgabe wird abgeschlossen und verlassen...',
-      taskEnding: '#UT#Aufgabe wird beendet und verlassen...'
+      taskEnding: '#UT#Aufgabe wird beendet und verlassen...',
+      saveSegmentFirst: '#UT#Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.',
   },
+  editing: false,
   refs:[{
       ref : 'headPanel',
       selector : 'headPanel'
@@ -61,34 +63,39 @@ Ext.define('Editor.controller.HeadPanel', {
       ref: 'tasksMenu',
       selector: '#tasksMenu'
   }],
-  init : function() {
-      var me = this;
-      
-      
-      //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
-      Editor.app.on('editorViewportOpened', me.handleInitEditor, me);
-      Editor.app.on('adminViewportOpened', me.handleInitAdmin, me);
-      
-      me.control({
+  listen: {
+      controller: {
+          '#Editor.$application': {
+              editorViewportOpened: 'handleInitEditor',
+              adminViewportOpened: 'handleInitAdmin'
+          }
+      },
+      component: {
           '#languageSwitch' : {
-              change: me.changeLocale
+              change: 'changeLocale'
           },
           '#logoutSingle' : {
-              click: me.handleLogout
+              click: 'handleLogout'
           },
           '#tasksMenu' : {
-              afterrender: me.handleTasksMenuRender
+              afterrender: 'handleTasksMenuRender'
           },
           '#tasksMenu menu' : {
-              click: me.tasksMenuDispatcher
+              click: 'tasksMenuDispatcher'
           },
           '#segmentgrid #headPanelUp' : {
-              click: me.headPanelToggle
+              click: 'headPanelToggle'
           },
           '#segmentgrid #headPanelDown' : {
-              click: me.headPanelToggle
+              click: 'headPanelToggle'
+          },
+          '#segmentgrid' : {
+              beforeedit: 'startEditing',
+              canceledit: 'endEditing',
+              edit: 'endEditing'
           }
-      });
+      }
+          
   },
   //***********************************************************************************
   //Begin Events
@@ -158,6 +165,10 @@ Ext.define('Editor.controller.HeadPanel', {
       var me = this,
           task = Editor.data.task,
           app = Editor.app;
+      if(me.editing) {
+          Editor.MessageBox.addWarning(me.strings.saveSegmentFirst);
+          return;
+      }
       if(!item) {
         return;
       }
@@ -232,5 +243,11 @@ Ext.define('Editor.controller.HeadPanel', {
           //we disable this unused simply disable this unused feature
           //menu.down('#closeBtn').setVisible(user.isAllowed('editorEndTask', task));
       }
+  },
+  startEditing: function(plugin, context) {
+      this.editing = true;
+  },
+  endEditing: function(plugin, context) {
+      this.editing = false;
   }
 });

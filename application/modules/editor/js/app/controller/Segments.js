@@ -123,34 +123,7 @@ Ext.define('Editor.controller.Segments', {
       },
       component: {
           '#segmentgrid' : {
-              afterrender: function(grid) {
-                  var me = this,
-                      params = [],
-                      ro = Editor.data.task && Editor.data.task.isReadOnly(),
-                      store = grid.store,
-                      proxy = store.getProxy(),
-                      initialGridFilters = Editor.data.initialGridFilters.segmentgrid;
-
-                  grid.setTitle(ro ? grid.title_readonly : grid.title);
-                  me.styleResetFilterButton(grid.store.filters);
-                  grid.store.on('load', me.afterStoreLoad, me);
-                  grid.store.on('filterchange', me.handleFilterChange, me);
-                  grid.store.on('sort', me.handleFilterChange, me);
-
-                  // add initial filters for this grid
-                  if(initialGridFilters && Ext.isArray(initialGridFilters)) {
-                      Ext.Array.each(initialGridFilters, function(item){
-                          grid.down('gridcolumn[dataIndex="'+item.dataIndex+'"]').show();
-                      });
-                      grid.filters.addFilters(initialGridFilters);
-                      params[proxy.getFilterParam()] = proxy.encodeFilters(store.getFilters().items);
-                      me.reloadFilemap(params);
-                  }
-                  else {
-                    store.attemptLoad();
-                    me.reloadFilemap();
-                  }
-              },
+              afterrender: 'gridAfterRender',
               columnhide: 'handleColumnVisibility',
               columnshow: 'handleColumnVisibility'
           },
@@ -211,6 +184,34 @@ Ext.define('Editor.controller.Segments', {
     var btn_text = this.getSegmentGrid().down('segmentsToolbar').item_clearSortAndFilterBtn;
     btn_text = Ext.String.format('{0} ({1})', btn_text, newTotal);
     this.getResetFilterBtn().setText(btn_text);
+  },
+  gridAfterRender: function(grid) {
+      var me = this,
+          params = [],
+          ro = Editor.data.task && Editor.data.task.isReadOnly(),
+          store = grid.store,
+          proxy = store.getProxy(),
+          initialGridFilters = Editor.data.initialGridFilters.segmentgrid;
+
+      grid.setTitle(ro ? grid.title_readonly : grid.title);
+      me.styleResetFilterButton(grid.store.filters);
+      grid.store.on('load', me.afterStoreLoad, me);
+      grid.store.on('filterchange', me.handleFilterChange, me);
+      grid.store.on('sort', me.handleFilterChange, me);
+
+      // add initial filters for this grid
+      if(initialGridFilters && Ext.isArray(initialGridFilters)) {
+          Ext.Array.each(initialGridFilters, function(item){
+              grid.down('gridcolumn[dataIndex="'+item.dataIndex+'"]').show();
+          });
+          grid.filters.addFilters(initialGridFilters);
+          params[proxy.getFilterParam()] = proxy.encodeFilters(store.getFilters().items);
+          me.reloadFilemap(params);
+      }
+      else {
+        store.attemptLoad();
+        me.reloadFilemap();
+      }
   },
   /**
    * maintains the visibility of the editor on showing/hiding columns
