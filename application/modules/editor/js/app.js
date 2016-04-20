@@ -62,7 +62,6 @@ Ext.application({
   stores : [ 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments' ],
   requires: ['Editor.view.ViewPort', Editor.data.app.viewport, 'Editor.model.ModelOverride'],
   controllers: Editor.data.app.controllers,
-  beforeUnloadCalled : false,//stellt sicher, dass aufgrund von Wechselwirkungen bei einem per JS aus einem anderen Fenster heraus getriggerten window.close die unload-Frage nicht zweimal kommt
   appFolder : Editor.data.appFolder,
   viewport: null,
     //***********************************************************************************
@@ -98,7 +97,7 @@ Ext.application({
       var me = this,
       viewSize = Ext.getBody().getViewSize();
     Ext.QuickTips.init();
-    window.onbeforeunload = Ext.bind(me.onBeforeUnload, me);
+
     me.authenticatedUser = Ext.create('Editor.model.admin.User', Editor.data.app.user);
     me[Editor.data.app.initMethod]();
     
@@ -118,20 +117,6 @@ Ext.application({
             usedWidth: viewSize.width
         }
     });
-  },
-  //Handler für CRQ 92 warnOnClose
-  onBeforeUnload: function(e) {
-    if(this.beforeUnloadCalled){ return; }
-    this.beforeUnloadCalled = true;
-    var lastsegment = text = '', event = e || window.event;
-    if(lastsegment = this.getController('Segments').getLastSegmentShortInfo()){
-      text = Ext.String.format(this.beforeUnloadText_1, lastsegment);
-    }
-    text += this.beforeUnloadText_2;
-    if (event) {
-      event.returnValue = text;
-    }
-    return text;
   },
   /**
    * opens the editor with the given Task
@@ -165,11 +150,9 @@ Ext.application({
       //this.viewport.setLoading(true);
       /*
       - destroys all admin components, updates all editor stores. Inits the editor component if needed.
-      - deactivate "onBeforeUnload" through beforeUnloadCalled
        */
       //enable logout split button
       //disable logout normal Button
-      me.beforeUnloadCalled = false;
       me.fireEvent('editorViewportOpened');
       me.getController('Fileorder').loadFileTree();//@todo bei ITL muss der load wiederum automatisch geschehen
       me.browserAdvice();
@@ -215,11 +198,9 @@ Ext.application({
       /*
       - hides all editor components, inits all admin components, stores, etc.
       - empty editor stores
-      - deactivate "onBeforeUnload" through beforeUnloadCalled
       */
       //disable logout split button
       //enable logout normal Button
-      this.beforeUnloadCalled = true;
       me.fireEvent('adminViewportOpened');
   },
   mask: function(msg, title) {
