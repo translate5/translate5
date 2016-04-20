@@ -62,7 +62,7 @@ Ext.define('Editor.controller.Fileorder', {
               itemmove: 'handleItemMoved'
           },
           '#segmentgrid': {
-              click: 'handleSegmentSelectionChange'
+              selectionchange: 'handleSegmentSelectionChange'
           }
       },
       store: {
@@ -116,8 +116,8 @@ Ext.define('Editor.controller.Fileorder', {
     if(selectedRecords.length == 0) {
       return;
     }
-    var selected = selectedRecords[0];
-    var fileNodeToSelectedSegment = this.getFilesStore().getNodeById(selected.get('fileId'));
+    var selected = selectedRecords[0],
+        fileNodeToSelectedSegment = this.getFilesStore().getNodeById(selected.get('fileId'));
     if(fileNodeToSelectedSegment) {
       //Baum an gewünschtem Element ausklappen
       fileNodeToSelectedSegment.bubble(function(node){node.expand();});
