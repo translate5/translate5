@@ -75,7 +75,10 @@ Ext.define('Editor.controller.MetaPanel', {
               afterrender: 'initMetaTermHandler'
           },
           '#segmentgrid': {
-              afterrender: 'initEditPluginHandler'
+              afterrender: 'initEditPluginHandler',
+              beforeedit: 'startEdit',
+              canceledit: 'cancelEdit',
+              edit: 'saveEdit'
           }
       },
       controller: {
@@ -97,11 +100,6 @@ Ext.define('Editor.controller.MetaPanel', {
           multiEdit = me.getSegmentGrid().query('contentEditableColumn').length > 1,
           useChangeAlikes = Editor.app.authenticatedUser.isAllowed('useChangeAlikes', Editor.data.task);
 
-    //This events must be bound after rendering the segmentgrid, because before the editing plugin does not exist!
-      me.getEditPlugin().on('beforeedit', me.startEdit, me);
-      me.getEditPlugin().on('canceledit', me.cancelEdit, me);
-      me.getEditPlugin().on('edit', me.saveEdit, me);
-    
       me.getLeftBtn().setVisible(multiEdit && ! useChangeAlikes);
       me.getRightBtn().setVisible(multiEdit && ! useChangeAlikes);
   },

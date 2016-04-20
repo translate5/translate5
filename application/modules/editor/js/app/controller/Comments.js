@@ -71,53 +71,49 @@ Ext.define('Editor.controller.Comments', {
   }],
   activeComment: null,
   loadedSegmentId: null,
-  init : function() {
-      var me = this;
-      //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following event bindings 
-      Editor.app.on('editorViewportClosed', me.clearComments, me);
-      me.control({
+  listen: {
+      controller: {
+          '#Editor.$application': {
+              editorViewportClosed: 'clearComments'
+          },
+          '#editorcontroller': {
+              openComments: 'handleEditorCommentBtn',
+              saveUnsavedComments: 'handleCommentSave'
+          }
+      },
+      component: {
           '#commentPanel' : {
-              expand: me.expandWindow
+              expand: 'expandWindow'
           },
           '#segmentgrid' : {
-              itemdblclick: me.handleCommentsColumnDblClick,
-              itemclick: me.handleCommentsColumnClick,
-              afterrender: me.initEditPluginHandler
+              itemdblclick: 'handleCommentsColumnDblClick',
+              itemclick: 'handleCommentsColumnClick',
+              beforeedit: 'onStartEdit',
+              canceledit: 'cancelEdit',
+              edit: 'cancelEdit'
           },
           '#roweditor': {
-              afterEditorMoved: me.onEditorMoved
+              afterEditorMoved: 'onEditorMoved'
           },
           '#roweditor displayfield[name=comments]': {
-              change: me.updateEditorComment
+              change: 'updateEditorComment'
           },
           '#editorCommentBtn' : {
-              click: me.handleEditorCommentBtn
+              click: 'handleEditorCommentBtn'
           },
           '#commentPanel actioncolumn' : {
-              click: me.handleGridAction
+              click: 'handleGridAction'
           },
           '#commentPanel grid' : {
-              itemdblclick: me.handleGridDblClick
+              itemdblclick: 'handleGridDblClick'
           },
           '#commentPanel #saveBtn' : {
-              click: me.handleCommentSave
+              click: 'handleCommentSave'
           },
           '#commentPanel #cancelBtn' : {
-              click: me.handleAddComment
+              click: 'handleAddComment'
           }
-      });
-  },
-  initEditPluginHandler: function() {
-      var me = this,
-          edCtrl = me.application.getController('Editor');
-          
-      edCtrl.on('openComments', me.handleEditorCommentBtn, me);
-      edCtrl.on('saveUnsavedComments', me.handleCommentSave, me);
-      
-      //Diese Events können erst in onlauch gebunden werden, in init existiert das Plugin noch nicht
-      me.getEditPlugin().on('beforeedit', me.onStartEdit, me);
-      me.getEditPlugin().on('canceledit', me.cancelEdit, me);
-      me.getEditPlugin().on('edit', me.cancelEdit, me);
+      }
   },
   cancelEdit: function() {
       this.handleAddComment();
