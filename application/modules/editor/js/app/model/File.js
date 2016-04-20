@@ -52,6 +52,7 @@ Ext.define('Editor.model.File', {
         return v;
     }},
     'cls',
+    {name: 'qtip', type: 'string', mapping: 'filename'},
     {name: 'leaf', type: 'boolean', mapping: 'isFile', defaultValue: false},
     {name: 'segmentid', type: 'int', defaultValue: 0},
     {name: 'index', type: 'int', critical: true}
