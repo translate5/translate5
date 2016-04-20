@@ -79,9 +79,13 @@ Ext.define('Editor.controller.ViewModes', {
           },
           'segmentsHtmleditor': {
               initialize: 'toggleEditorErgonomicMode'
+          },
+          '#segmentgrid': {
+              beforestartedit: 'checkModeBeforeEdit'
           }
       }
   },
+  messageIsViewMode: '#UT#Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lese"- bzw. Ansichtsmodus ist.',
   init : function() {
       var me = this;
       me.toggleTags(me.self.TAG_SHORT);
@@ -388,6 +392,12 @@ Ext.define('Editor.controller.ViewModes', {
       if(plug && plug.editing && editor && editor.rendered) {
           segCtrl.addLoadMask();
           segCtrl.saveChainStart();
+      }
+  },
+  checkModeBeforeEdit: function(plugin) {
+      if(this.self.isViewMode()) {
+          Editor.MessageBox.addWarning(this.messageIsViewMode);
+          return false;
       }
   }
 });

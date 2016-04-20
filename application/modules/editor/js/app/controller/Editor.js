@@ -687,12 +687,14 @@ Ext.define('Editor.controller.Editor', {
             }
         });
     } else {
-        Editor.MessageBox.addInfo(me.messages.f2FirstOpened);
         //with no selection, scroll to the first editable select, select it, then open it
         callback = function() {
             grid.selectOrFocus(firstEditableRow);
             sel = selModel.getSelection();
-            ed.startEdit(sel[0], cols[0]);
+            var editStarted = ed.startEdit(sel[0], cols[0]);
+            if(editStarted) {
+              Editor.MessageBox.addInfo(me.messages.f2FirstOpened);
+            }
         };
         grid.scrollTo(firstEditableRow, {
             callback: callback,

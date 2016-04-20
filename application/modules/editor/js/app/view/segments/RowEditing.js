@@ -53,6 +53,14 @@ Ext.define('Editor.view.segments.RowEditing', {
     requires: [
         'Editor.view.segments.RowEditor'
     ],
+    //default ext events + our beforestartedit, check on ext update
+    relayedEvents: [
+        'beforestartedit',
+        'beforeedit',
+        'edit',
+        'validateedit',
+        'canceledit'
+    ],
     initEditorConfig: function() {
         var me = this,
             grid = me.grid,
