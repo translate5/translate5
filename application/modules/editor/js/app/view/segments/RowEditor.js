@@ -437,7 +437,8 @@ Ext.define('Editor.view.segments.RowEditor', {
             grid = editingPlugin.grid,
             i, columnsWidth = 0,
             viewEl = me.editingPlugin.view.el,
-            scrollbarWidth = Ext.getScrollbarSize().width;
+            dom = viewEl.dom,
+            scrollbarWidth = (dom.scrollHeight > dom.clientHeight ? Ext.getScrollbarSize().width : 0);
             
         //the internal syncEditorClip makes a top / bottom clipping.
         //We need instead a clipping at the right.
