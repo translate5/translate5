@@ -191,7 +191,9 @@ Ext.define('Editor.controller.Segments', {
           ro = Editor.data.task && Editor.data.task.isReadOnly(),
           store = grid.store,
           proxy = store.getProxy(),
-          initialGridFilters = Editor.data.initialGridFilters.segmentgrid;
+          initialGridFilters = Editor.data.initialGridFilters;
+
+      initialGridFilters = initialGridFilters && initialGridFilters.segmentgrid;
 
       grid.setTitle(ro ? grid.title_readonly : grid.title);
       me.styleResetFilterButton(grid.store.filters);
@@ -209,6 +211,8 @@ Ext.define('Editor.controller.Segments', {
           me.reloadFilemap(params);
       }
       else {
+        //reset suppressNextFilter to reenable normal filtering (suppressNextFilter needed for initialGridFilters)
+        store.suppressNextFilter = false;
         store.attemptLoad();
         me.reloadFilemap();
       }

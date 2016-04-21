@@ -228,8 +228,11 @@ Ext.define('Editor.model.admin.Task', {
           if(!data.initialGridFilters) {
               filter = data.initialGridFilters = {};
           }
+          filter = data.initialGridFilters; //use filter as reference 
+          //reset workflowstep filters of formerly opened tasks, since initialGridFilters is persistent between tasks!
+          delete filter.segmentgrid;
           idx = Ext.Array.indexOf(stepChain, step);
-          if(idx > 0 && filter && !filter.segmentgrid) {
+          if(idx > 0 && filter) {
               filter.segmentgrid = [{
                   type: 'workflowStep',
                   dataIndex: 'workflowStep',

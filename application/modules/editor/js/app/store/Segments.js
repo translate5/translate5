@@ -45,7 +45,8 @@ Ext.define('Editor.store.Segments', {
   pageSize: 200,
   remoteSort: true,
   autoLoad: false,
-  suppressNextFilter: true, //disable automatic load by filter change on grid render
+  //disable automatic load by filter change on grid render, must be reset to false after first load!
+  suppressNextFilter: true, 
   firstEditableRow: null,
   constructor: function() {
       var me = this;
