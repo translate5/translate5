@@ -324,6 +324,7 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
     
     /**
      * saves the Editor Content into the loaded record
+     * @param {Editor.model.Segment} record
      * @returns {Boolean}
      */
     saveMainEditorContent: function(record) {
@@ -361,7 +362,7 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         record.beginEdit();
         record.set(me.columnToEdit, newValue);
         record.set('autoStateId', 999);
-        record.endEdit(true); //silent = true → dont notify the store. if notifiying the store we get a "grid jumps to top problem" with left right navi
+        record.endEdit();
         return true;
     },
     /**
