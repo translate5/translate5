@@ -88,3 +88,31 @@ Ext.override(Ext.menu.Item, {
     }
 });
 
+
+/**
+ * Fixing EXT6UPD-131 (fixed natively in ext-6.0.1, must be removed then!)
+ */
+Ext.override(Ext.grid.filters.filter.TriFilter, {
+    deactivate: function () {
+        var me = this,
+            filters = me.filter,
+            f, filter, value;
+
+        if (!me.countActiveFilters() || me.preventFilterRemoval) {
+            return;
+        }
+
+        me.preventFilterRemoval = true;
+
+        for (f in filters) {
+            filter = filters[f];
+
+            value = filter.getValue();
+            if (value || value === 0) {
+                me.removeStoreFilter(filter);
+            }
+        }
+
+        me.preventFilterRemoval = false;
+    }
+});
