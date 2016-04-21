@@ -274,7 +274,10 @@ Ext.define('Editor.controller.Editor', {
       var me = this,
           ed = me.getEditPlugin(),
           rec = ed.editing && ed.context.record;
-        
+
+      //since save without moving was triggered, we have to reset the calculated data
+      me.prevNextSegment.reset();
+
       if(me.isEditing &&rec && rec.get('editable')) {
           me.fireEvent('saveUnsavedComments');
           me.fireEvent('saveSegment');
