@@ -34,7 +34,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.model.admin.Task', {
   extend: 'Ext.data.Model',
-  requires: ['Editor.model.segment.Field'],
+  requires: ['Editor.model.segment.Field', 'Editor.model.admin.task.UserPref'],
   //currently we have 3 places to define userStates: IndexController for translation, JS Task Model and PHP TaskUserAssoc Model for programmatic usage
   USER_STATE_OPEN: 'open',
   USER_STATE_EDIT: 'edit',

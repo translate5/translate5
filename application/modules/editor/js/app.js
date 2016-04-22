@@ -142,7 +142,7 @@ Ext.application({
       }
       task.initWorkflow();
       me.viewport = Ext.create(Editor.data.app.viewport, {
-          renderTo : 'editor-viewport' //Ext.getBody()
+          renderTo : Ext.getBody()
       });
       me.viewport.show();
       
@@ -189,7 +189,7 @@ Ext.application({
           Ext.getBody().removeCls('loading');
       }
       me.viewport = Ext.create('Editor.view.ViewPort', {
-          renderTo : 'editor-viewport' //Ext.getBody()
+          renderTo: Ext.getBody()
       });
       me.viewport.show();
       

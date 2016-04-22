@@ -31,16 +31,20 @@ END LICENSE AND COPYRIGHT
 /**
  * @class Editor.view.ViewPortSingle
  * @extends Editor.view.ViewPortEditor
- * 
- * FIXME ITL Bei der Verwendung des ViewPortSingle ist noch offen wie der Segment Store automatisch geladen wird!
  */
 Ext.define('Editor.view.ViewPortSingle', {
     extend: 'Editor.view.ViewPortEditor',
     getNorth: function() {
         return {
+            title: 'Application Logo',
+            header: false,
             xtype: 'panel',
             height: Editor.data.headerOptions.height,
-            html: '<iframe scrolling="no" src="'+Editor.data.pathToRunDir+'/'+Editor.data.pathToHeaderFile+'" width="100%" height="'+Editor.data.headerOptions.height+'px" id="viewportHeader"/>',
+            listeners: {
+                afterRender: function() {
+                    this.setHtml('<iframe scrolling="no" src="'+Editor.data.pathToRunDir+'/'+Editor.data.pathToHeaderFile+'" width="100%" height="'+Editor.data.headerOptions.height+'px" id="viewportHeader"/>');
+                }
+            },
             region: 'north'
         };
     }
