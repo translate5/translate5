@@ -99,8 +99,10 @@ Ext.application({
     Ext.QuickTips.init();
 
     me.authenticatedUser = Ext.create('Editor.model.admin.User', Editor.data.app.user);
-    me[Editor.data.app.initMethod]();
-    
+    if(!Ext.isIE8m) {
+        me[Editor.data.app.initMethod]();
+    }
+    me.browserAdvice();
     Editor.MessageBox.showInitialMessages();
     
     //Logs the users userAgent and screen size for usability improvements:
@@ -155,7 +157,6 @@ Ext.application({
       //disable logout normal Button
       me.fireEvent('editorViewportOpened');
       me.getController('Fileorder').loadFileTree();//@todo bei ITL muss der load wiederum automatisch geschehen
-      me.browserAdvice();
   },
   /**
    * Used to open a task directly without administration panel
@@ -240,9 +241,19 @@ Ext.application({
       form.submit();
   },
   browserAdvice: function() {
-      if(!Ext.isIE) {
+      var me = this;
+      if(Ext.isIE) {
+          Editor.MessageBox.addInfo(me.browserAdviceTextIE, Ext.isIE8m ? -1 : false);
           return;
       }
-      Editor.MessageBox.addInfo(this.browserAdviceText);
+      if(!Editor.data.supportedBrowsers) {
+          return;
+      }
+      Ext.Object.each(Editor.data.supportedBrowsers, function(idx, version) {
+          if(Ext[idx] > 0 && Ext[idx] < version) {
+              Editor.MessageBox.addInfo(me.browserAdviceText);
+              return false;
+          }
+      });
   }
 });

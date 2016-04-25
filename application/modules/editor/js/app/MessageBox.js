@@ -131,7 +131,12 @@ Ext.define('Editor.MessageBox',{
 
       this.msgCt.alignTo(document, 't-t');
       var appendedBox = Ext.core.DomHelper.append(this.msgCt, {style: {visibility: 'hidden'},html:this.buildMessageBox(status, msg)}, true);
-      appendedBox.slideIn('t').animate({duration: (delay)}).ghost("t", {remove:true});
+      if(delay < 0) {
+          appendedBox.slideIn('t');
+      }
+      else {
+          appendedBox.slideIn('t').animate({duration: (delay)}).ghost("t", {remove:true});
+      }
   },
   buildMessageBox : function(status, msg) {
 	  var title = this.titles[status];
