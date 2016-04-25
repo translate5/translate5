@@ -81,7 +81,31 @@ Ext.define('Editor.controller.Localizer', {
     Editor.MessageBox.prototype.self.ERROR = '<?php echo $this->translate->_('error');?>';
     Editor.MessageBox.prototype.self.INFO = '<?php echo $this->translate->_('notice');?>';
 
-    Ext.app.Application.prototype.browserAdviceText = '<?php echo $this->translate->_('Ihr Browser ist nicht mehr aktuell. <br />Bitte wechseln Sie auf einen moderneren Browser um die Anwendung mit voller Leistung nutzen zu können.');?>';
+    <?php
+        //handling application name separatly, since used in different applications
+        $app = $this->translate->_('translate5');
+        //for better readability with line breaks
+        $disclaimer = 'Ihr Browser oder Ihre Browser-Version wird von %1$s nicht offiziell unterstützt.<br /> 
+    Die Anwendung wurde hinsichtlich Funktionalität und Performance in den folgenden Browser offiziell getestet:
+    <ul>
+        <li>Google Chrome ab Version 48</li>
+        <li>Mozilla Firefox ab Version 44</li>
+        <li>Apple Safari ab Version 9</li>
+        <li>Microsoft Internet Explorer Version 9 - 11</li>
+    </ul>
+    Prinzipiell kann %1$s auch mit anderen Browsern bzw. älteren Versionen funktionieren. 
+    Hier kann es aber zu unvorhergesehenen Fehlern kommen. 
+    Potentiell können auch manche Features komplett nicht funktionieren.';
+        
+        //for translated strings without without line breaks:
+        $disclaimer = str_replace("\n", '', $disclaimer);
+    
+        $disclaimer = $this->translate->_($disclaimer);
+        $disclaimer = sprintf($disclaimer, $app); //replacing application name placeholders 
+    ?>
+    
+    Ext.app.Application.prototype.browserAdviceTextTitle = '<?php echo $this->translate->_('Nicht unterstützte Browser-Version');?>';
+    Ext.app.Application.prototype.browserAdviceText = '<?php echo $disclaimer;?>';
     Ext.app.Application.prototype.browserAdviceTextIE = '<?php echo $this->translate->_('Sie benutzen den Internet Explorer, welcher aus technischer Sicht veraltet ist. <br />Bitte wechseln Sie auf einen moderneren Browser um die Anwendung mit voller Leistung nutzen zu können.');?>';
 
     Editor.view.ViewPortEditor.prototype.items_west_title = '<?php echo $this->translate->_('Dateien');?>';
