@@ -241,19 +241,24 @@ Ext.application({
       form.submit();
   },
   browserAdvice: function() {
-      var me = this;
+      var me = this,
+          supportedBrowser = false;
       if(Ext.isIE) {
           Editor.MessageBox.addInfo(me.browserAdviceTextIE, Ext.isIE8m ? -1 : false);
           return;
       }
+      //Feature disabled
       if(!Editor.data.supportedBrowsers) {
           return;
       }
       Ext.Object.each(Editor.data.supportedBrowsers, function(idx, version) {
-          if(Ext[idx] > 0 && Ext[idx] < version) {
-              Editor.MessageBox.addInfo(me.browserAdviceText);
+          if(Ext[idx] >= version) {
+              supportedBrowser = true;
               return false;
           }
       });
+      if(!supportedBrowser) {
+          Ext.MessageBox.alert(me.browserAdviceTextTitle, me.browserAdviceText);
+      }
   }
 });
