@@ -1311,6 +1311,10 @@
   <source>Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lese"- bzw. Ansichtsmodus ist.</source>
   <target>The segment cannot be edited, because the task is read-only / in view mode.</target>
 </trans-unit>
+<trans-unit id='SWhyIEJyb3dzZXIgaXN0IG5pY2h0IG1laHIgYWt0dWVsbC4gPGJyIC8+Qml0dGUgd2VjaHNlbG4gU2llIGF1ZiBlaW5lbiBtb2Rlcm5lcmVuIEJyb3dzZXIgdW0gZGllIEFud2VuZHVuZyBtaXQgdm9sbGVyIExlaXN0dW5nIG51dHplbiB6dSBrw7ZubmVuLg=='>
+  <source>Ihr Browser ist nicht mehr aktuell. <br />Bitte wechseln Sie auf einen moderneren Browser um die Anwendung mit voller Leistung nutzen zu können.</source>
+  <target>Your browser is outdated. <br />Please switch to a more modern browser for optimal performance.</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

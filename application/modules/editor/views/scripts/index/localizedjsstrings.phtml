@@ -81,11 +81,8 @@ Ext.define('Editor.controller.Localizer', {
     Editor.MessageBox.prototype.self.ERROR = '<?php echo $this->translate->_('error');?>';
     Editor.MessageBox.prototype.self.INFO = '<?php echo $this->translate->_('notice');?>';
 
-    Ext.app.Application.prototype.beforeUnloadText_1 = '<?php echo $this->translate->_('Das letzte bearbeitete Segment ist das Segment mit dem Inhalt "{0}". ');?>';
-    Ext.app.Application.prototype.beforeUnloadText_2 = '<?php echo $this->translate->_('Wollen Sie das Lektorat wirklich schließen?');?>';
-    Ext.app.Application.prototype.browserAdviceText = '<?php echo $this->translate->_('Sie benutzen den Internet Explorer, welcher aus technischer Sicht veraltet ist. <br />Bitte wechseln Sie auf einen moderneren Browser um die Anwendung mit voller Leistung nutzen zu können.');?>';
-    //You are using Internet Explorer, which is outdated from a technological perspective. Please switch to a more modern browser for optimal performance.
-
+    Ext.app.Application.prototype.browserAdviceText = '<?php echo $this->translate->_('Ihr Browser ist nicht mehr aktuell. <br />Bitte wechseln Sie auf einen moderneren Browser um die Anwendung mit voller Leistung nutzen zu können.');?>';
+    Ext.app.Application.prototype.browserAdviceTextIE = '<?php echo $this->translate->_('Sie benutzen den Internet Explorer, welcher aus technischer Sicht veraltet ist. <br />Bitte wechseln Sie auf einen moderneren Browser um die Anwendung mit voller Leistung nutzen zu können.');?>';
 
     Editor.view.ViewPortEditor.prototype.items_west_title = '<?php echo $this->translate->_('Dateien');?>';
   	Editor.view.segments.Grid.prototype.title = '<?php echo $this->translate->_('Segmentliste und Editor');?>';
