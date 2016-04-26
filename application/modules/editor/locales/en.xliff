@@ -1295,9 +1295,10 @@
   <source>Kein vorheriges Segment im Workflow bearbeitbar!</source>
   <target>No previous segment in the workflow is editable!</target>
 </trans-unit>
-<trans-unit id='U2llIGJlbnV0emVuIGRlbiBJbnRlcm5ldCBFeHBsb3Jlciwgd2VsY2hlciBhdXMgdGVjaG5pc2NoZXIgU2ljaHQgdmVyYWx0ZXQgaXN0LiA8YnIgLz5CaXR0ZSB3ZWNoc2VsbiBTaWUgYXVmIGVpbmVuIG1vZGVybmVyZW4gQnJvd3NlciB1bSBkaWUgQW53ZW5kdW5nIG1pdCB2b2xsZXIgTGVpc3R1bmcgbnV0emVuIHp1IGvDtm5uZW4u'>
-  <source>Sie benutzen den Internet Explorer, welcher aus technischer Sicht veraltet ist. <br />Bitte wechseln Sie auf einen moderneren Browser um die Anwendung mit voller Leistung nutzen zu können.</source>
-  <target>You are using Internet Explorer, which is outdated from a technological perspective. <br />Please switch to a more modern browser for optimal performance.</target>
+<trans-unit id='SGlud2VpcyE='><source>Hinweis!</source><target>Note!</target></trans-unit>
+<trans-unit id='U2llIGJlbnV0emVuIGVpbmUgdmVyYWx0ZXRlIFZlcnNpb24gdm9uIEludGVybmV0IEV4cGxvcmVyLiA8YnIgLz5CaXR0ZSB3ZWNoc2VsbiBTaWUgYXVmIGVpbmVuIG1vZGVybmVyZW4gQnJvd3NlciB1bSBkaWUgQW53ZW5kdW5nIG1pdCB2b2xsZXIgTGVpc3R1bmcgbnV0emVuIHp1IGvDtm5uZW4uIDxiciAvPkFtIGJlc3RlbiBudXR6ZW4gU2llIEdvb2dsZSBDaHJvbWUsIEZpcmVmb3ggb2RlciBTYWZhcmkgLSBuZXVlcmUgSW50ZXJuZXQgRXhwbG9yZXIgVmVyc2lvbmVuIHdlcmRlbiB6d2FyIHVudGVyc3TDvHR6dCwgc2luZCBhYmVyIGViZW5mYWxscyB2ZXJhbHRldCB1bmQgc2VociBsYW5nc2FtLg=='><source>Sie benutzen eine veraltete Version von Internet Explorer. <br />Bitte wechseln Sie auf einen moderneren Browser um die Anwendung mit voller Leistung nutzen zu können. <br />Am besten nutzen Sie Google Chrome, Firefox oder Safari - neuere Internet Explorer Versionen werden zwar unterstützt, sind aber ebenfalls veraltet und sehr langsam.</source>
+Sie benutzen eine veraltete Version von Internet Explorer. <br />Bitte wechseln Sie auf einen moderneren Browser um die Anwendung mit voller Leistung nutzen zu können. <br />Am besten nutzen Sie Google Chrome, Firefox oder Safari - neuere Internet Explorer Versionen werden zwar unterstützt, sind aber ebenfalls veraltet und sehr langsam.
+  <target>You are using an outdated Internet Explorer version. <br />Please switch to a modern browser for optimal performance and feature usage.<br />For best results we propose Google Chrome, Firefox or Safari - new Internet Explorer versions are supported, but are also outdated and very slow.</target>
 </trans-unit>
 <trans-unit id='RGllIGdld8O8bnNjaHRlIEFrdGlvbiBrYW5uIG5pY2h0IGR1cmNoZ2Vmw7xocnQgd2VyZGVuISBEYXMgYWt0dWVsbCBnZcO2ZmZuZXRlIFNlZ21lbnQgbXVzcyB6dW7DpGNoc3QgZ2VzcGVpY2hlcnQgYnp3LiBnZXNjaGxvc3NlbiB3ZXJkZW4u'>
   <source>Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.</source>
