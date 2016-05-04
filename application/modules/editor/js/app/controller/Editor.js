@@ -49,6 +49,7 @@ Ext.define('Editor.controller.Editor', {
       segmentReset: '#UT#Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.',
       segmentNotBuffered: '#UT#Das nächste / vorherige Segment wird noch geladen, bitte versuchen Sie es erneut.',
       segmentsChanged: '#UT#Die Sortierung bzw. Filterung wurde geändert, es kann kein nächstes / vorheriges Segment ausgewählt werden.',
+      segmentsChangedJump: '#UT#Die Sortierung bzw. Filterung wurde geändert, es kann nicht zum aktuellen Segment zurück gesprungen werden.',
       f2FirstOpened: '#UT#Das erste bearbeitbare Segment wurde geöffnet, da kein anderes Segment ausgewählt war.',
       f2Readonly: '#UT#Das ausgewählte Segment ist nicht bearbeitbar!',
       errorTitle: '#UT# Fehler bei der Segment Validierung!',
@@ -134,8 +135,8 @@ Ext.define('Editor.controller.Editor', {
       });
       
       //reset the store next/prev information if data changed
-      me.getSegmentGrid().store.on('filterchange', me.prevNextSegment.handleSortOrFilter, me.prevNextSegment);
-      me.getSegmentGrid().store.on('sort', me.prevNextSegment.handleSortOrFilter, me.prevNextSegment);
+      me.getSegmentGrid().store.on('filterchange', me.handleSortOrFilter, me);
+      me.getSegmentGrid().store.on('sort', me.handleSortOrFilter, me);
       
       /**
        * disable the column show / hide menu while editing a segment (EXT6UPD-85)
@@ -164,6 +165,17 @@ Ext.define('Editor.controller.Editor', {
           }]
       }));
   },
+  
+  handleSortOrFilter: function() {
+      var me = this,
+          plug = me.getEditPlugin();
+      
+      me.prevNextSegment.handleSortOrFilter();
+      if(plug.editor && plug.editor.context) {
+          plug.editor.context.reordered = true;
+      }
+  },
+  
   /**
    * initializes the roweditor moveable tooltip
    */
@@ -639,6 +651,10 @@ Ext.define('Editor.controller.Editor', {
           plug = me.getEditPlugin();
       e.preventDefault();
       e.stopEvent();
+      if(plug.editor.context.reordered) {
+          Editor.MessageBox.addInfo(me.messages.segmentsChangedJump);
+          return;
+      }
       plug.editor.setMode(plug.self.STARTEDIT_SCROLLUNDER);
       plug.editor.initialPositioning();
   },
