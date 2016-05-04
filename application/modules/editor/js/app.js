@@ -247,7 +247,7 @@ Ext.application({
           Editor.MessageBox.addInfo(me.browserAdviceTextIE, -1);
           return;
       }
-      if(Editor.data.browserAdvice) {
+      if(Ext.isIE && Editor.data.browserAdvice) {
           Editor.MessageBox.addInfo(me.browserAdviceTextIE);
           return;
       }
