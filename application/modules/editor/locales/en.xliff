@@ -1295,10 +1295,6 @@
   <source>Kein vorheriges Segment im Workflow bearbeitbar!</source>
   <target>No previous segment in the workflow is editable!</target>
 </trans-unit>
-<trans-unit id='U2llIGJlbnV0emVuIGRlbiBJbnRlcm5ldCBFeHBsb3Jlciwgd2VsY2hlciBhdXMgdGVjaG5pc2NoZXIgU2ljaHQgdmVyYWx0ZXQgaXN0LiA8YnIgLz5CaXR0ZSB3ZWNoc2VsbiBTaWUgYXVmIGVpbmVuIG1vZGVybmVyZW4gQnJvd3NlciB1bSBkaWUgQW53ZW5kdW5nIG1pdCB2b2xsZXIgTGVpc3R1bmcgbnV0emVuIHp1IGvDtm5uZW4u'>
-  <source>Sie benutzen den Internet Explorer, welcher aus technischer Sicht veraltet ist. <br />Bitte wechseln Sie auf einen moderneren Browser um die Anwendung mit voller Leistung nutzen zu können.</source>
-  <target>You are using Internet Explorer, which is outdated from a technological perspective. <br />Please switch to a more modern browser for optimal performance.</target>
-</trans-unit>
 <trans-unit id='RGllIGdld8O8bnNjaHRlIEFrdGlvbiBrYW5uIG5pY2h0IGR1cmNoZ2Vmw7xocnQgd2VyZGVuISBEYXMgYWt0dWVsbCBnZcO2ZmZuZXRlIFNlZ21lbnQgbXVzcyB6dW7DpGNoc3QgZ2VzcGVpY2hlcnQgYnp3LiBnZXNjaGxvc3NlbiB3ZXJkZW4u'>
   <source>Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.</source>
   <target>The desired action cannot be processed! The currenlty opened segment has to be saved / closed first.</target>
@@ -1323,6 +1319,9 @@
   <source>Die Sortierung bzw. Filterung wurde geändert, es kann nicht zum aktuellen Segment zurück gesprungen werden.</source>
   <target>The segment sort or filter was changed, the currently opened segment can't be scrolled back into the view.</target>
 </trans-unit>
+<trans-unit id='U2llIG51dHplbiBJbnRlcm5ldCBFeHBsb3Jlci4gRGllc2VyIEJyb3dzZXIgd2lyZCB2b24gVmVyc2lvbiA5IGJpcyAxMSB1bnRlcnN0w7x0enQsIGlzdCBhbGxlcmRpbmdzIHNlaHIgbGFuZ3NhbS4gVW0gZGllIEFud2VuZHVuZyBpbiBvcHRpbWFsZXIgUGVyZm9ybWFuY2UgbnV0emVuIHp1IGvDtm5uZW4sIGVtcGZlaGxlbiB3aXIgZGFoZXIgR29vZ2xlIENocm9tZSwgRmlyZWZveCBvZGVyIFNhZmFyaSBhbHMgQnJvd3Nlci4='>
+  <source>Sie nutzen Internet Explorer. Dieser Browser wird von Version 9 bis 11 unterstützt, ist allerdings sehr langsam. Um die Anwendung in optimaler Performance nutzen zu können, empfehlen wir daher Google Chrome, Firefox oder Safari als Browser.</source>
+  <target>You are using the Internet Explorer. This version 9 to 11 of this browser is supported, but the performance is very slow. To use the application in best performance, we recommend the usage of Google Chrome, Firefox or Safari as browser.</target></trans-unit>
     </body>
   </file>
 </xliff>
