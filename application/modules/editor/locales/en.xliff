@@ -1319,6 +1319,10 @@
   <source>Nicht unterstützte Browser-Version</source>
   <target>Unsupported browser-version</target>
 </trans-unit>
+<trans-unit id='RGllIFNvcnRpZXJ1bmcgYnp3LiBGaWx0ZXJ1bmcgd3VyZGUgZ2XDpG5kZXJ0LCBlcyBrYW5uIG5pY2h0IHp1bSBha3R1ZWxsZW4gU2VnbWVudCB6dXLDvGNrIGdlc3BydW5nZW4gd2VyZGVuLg=='>
+  <source>Die Sortierung bzw. Filterung wurde geändert, es kann nicht zum aktuellen Segment zurück gesprungen werden.</source>
+  <target>The segment sort or filter was changed, the currently opened segment can't be scrolled back into the view.</target>
+</trans-unit>
     </body>
   </file>
 </xliff>
