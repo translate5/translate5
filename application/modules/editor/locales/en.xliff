@@ -1295,6 +1295,7 @@
   <source>Kein vorheriges Segment im Workflow bearbeitbar!</source>
   <target>No previous segment in the workflow is editable!</target>
 </trans-unit>
+<trans-unit id='SGlud2VpcyE='><source>Hinweis!</source><target>Note!</target></trans-unit>
 <trans-unit id='RGllIGdld8O8bnNjaHRlIEFrdGlvbiBrYW5uIG5pY2h0IGR1cmNoZ2Vmw7xocnQgd2VyZGVuISBEYXMgYWt0dWVsbCBnZcO2ZmZuZXRlIFNlZ21lbnQgbXVzcyB6dW7DpGNoc3QgZ2VzcGVpY2hlcnQgYnp3LiBnZXNjaGxvc3NlbiB3ZXJkZW4u'>
   <source>Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.</source>
   <target>The desired action cannot be processed! The currenlty opened segment has to be saved / closed first.</target>
