@@ -482,9 +482,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     public function pluginjsAction() {
         $slash = '/';
         // get requested file from router
-        $js = explode($slash, $this->getParam(1)); 
+        $requestPar =$this->getParam(1);
+    	$js = explode($slash, $requestPar); 
         //pluginname is alpha characters only so check this for security reasons
         //ucfirst is needed, since in JS packages start per convention with lowercase, Plugins in PHP with uppercase! 
+        
         $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($js))); 
         if(empty($plugin)) {
             throw new ZfExtended_NotFoundException();

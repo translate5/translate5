@@ -39,25 +39,31 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
      * Contains the Plugin Path relativ to APPLICATION_PATH or absolut if not under APPLICATION_PATH
      * @var array
      */
-    protected $frontendControllers = array('Editor.plugins.TmMtIntegration.controller.Controller');
+    protected $frontendControllers = array('Editor.plugins.TmMtIntegration.controller.Controller',
+    									   'Editor.plugins.TmMtIntegration.controller.TmOverviewController');
     
     public function init() {
         $f = Zend_Registry::get('frontController');
         $f->addControllerDirectory(APPLICATION_PATH.'/'.$this->getPluginPath().'/Controllers', '_plugins');
         
-        //im folgenden zwei testcontroller
+        $restRoute = new Zend_Rest_Route($f, array(), array(
+        		'editor' => array('plugins_tmmtintegration_taskassoc'),
+        ));
+        $f->getRouter()->addRoute('plugins_tmmtintegration_taskassoc', $restRoute);
+        
+         //im folgenden zwei testcontroller
         $rest = new Zend_Controller_Router_Route(
             'editor/js/app-localized.jsx',
             array(
                 'module' => 'editor',
-                'controller' => 'plugin_tmmtintegration_resource',
+                'controller' => 'plugins_tmmtintegration_resource',
                 'action' => 'demo',
             ));
-        $f->getRouter()->addRoute('plugin_tmmtintegration_test', $rest);
+        $f->getRouter()->addRoute('plugins_tmmtintegration_test', $rest);
         
         $restRoute = new Zend_Rest_Route($f, array(), array(
-            'editor' => array('plugin_tmmtintegration_resource'),
+            'editor' => array('plugins_tmmtintegration_resource'),
         ));
-        $f->getRouter()->addRoute('plugin_tmmtintegration_rest', $restRoute);
+        $f->getRouter()->addRoute('plugins_tmmtintegration_rest', $restRoute);
     }
 }
