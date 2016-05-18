@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
  * Resources are no valid Models/Entitys, we support only a generated Resource listing
  * One Resource is one available configured connector, Languages and Title can be customized in the TM Overview List
  */
-class editor_Plugin_TmMtIntegration_ResourceController extends ZfExtended_RestController  {
+class editor_Plugins_TmMtIntegration_ResourceController extends ZfExtended_RestController  {
     public function init() {
         $this->_helper->viewRenderer->setNoRender(true);
         $this->_helper->layout->disableLayout();
