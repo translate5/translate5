@@ -42,8 +42,8 @@ CREATE TABLE `LEK_tmmtintegration_taskassoc` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `tmmtId` int(11) DEFAULT NULL,
   `taskGuid` varchar(38) NOT NULL,
-  CONSTRAINT FOREIGN KEY (`tmmtId`) REFERENCES `LEK_tmmtintegration_tmmt` (`id`) ON DELETE CASCADE
-  CONSTRAINT FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE
+  CONSTRAINT FOREIGN KEY (`tmmtId`) REFERENCES `LEK_tmmtintegration_tmmt` (`id`) ON DELETE CASCADE,
+  CONSTRAINT FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
