@@ -108,27 +108,4 @@ class editor_Plugins_TmMtIntegration_TaskassocController extends ZfExtended_Rest
         //possible way 1: only make PUT calls and use the tmmt ID as entity id for this controller
         //         way 2: don't sync the grid store, but make DELETE and POST calls manually with the tmmtAssoc data
     }
-
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_RestController::postAction()
-     */
-    public function postAction() {
-    	$variable = $this->_request;
-    	$parametri  = $variable->_params;
-        parent::postAction();
-        $this->addUserInfoToResult();
-    }
-    
-    /**
-     * adds the extended userinfo to the resultset
-     */
-    protected function addUserInfoToResult() {
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $user ZfExtended_Models_User */
-        $user->loadByGuid($this->entity->getUserGuid());
-        $this->view->rows->login = $user->getLogin();
-        $this->view->rows->firstName = $user->getFirstName();
-        $this->view->rows->surName = $user->getSurName();
-    }
 }

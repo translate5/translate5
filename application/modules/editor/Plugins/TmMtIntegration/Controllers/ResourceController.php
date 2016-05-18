@@ -54,7 +54,6 @@ class editor_Plugins_TmMtIntegration_ResourceController extends ZfExtended_RestC
             $resultRes->name = $resource->getName();
             $result[] = $resultRes;
         }
-        error_log(print_r($resources,1));
         $this->view->rows = $result;
         $this->view->total = count($result);
     }
