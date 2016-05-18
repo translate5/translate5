@@ -55,9 +55,7 @@ class editor_Plugins_TmMtIntegration_Connector_Moses extends editor_Plugins_TmMt
     protected $targetLanguages;
     
     public function __construct(stdClass $config) {
-        $this->name = "Moses MT - ".$config->title;
-        $this->sourceLanguage = $config->sourceLanguage;
-        $this->targetLanguages = $config->targetLanguages;
+        $this->name = "Moses MT - ".$config->utl;
     }
     
     /**
@@ -75,10 +73,7 @@ class editor_Plugins_TmMtIntegration_Connector_Moses extends editor_Plugins_TmMt
     public static function createForAllResources() {
         //FIXME let me come from config:
         $config = '[{
-                "url": "http://www.translate5.net:8124",
-                "title": "Moses Test Installation",
-                "sourceLanguage": "de",
-                "targetLanguages": ["en"]
+                "url": "http://www.translate5.net:8124"
         }]';
         $config = json_decode($config);
         $result = array();

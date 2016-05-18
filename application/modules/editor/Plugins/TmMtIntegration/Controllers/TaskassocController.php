@@ -51,8 +51,36 @@ class editor_Plugins_TmMtIntegration_TaskassocController extends ZfExtended_Rest
      * @see ZfExtended_RestController::indexAction()
      */
     public function indexAction(){
-        $this->view->rows = $this->entity->loadAll();
-        $this->view->total = $this->entity->getTotalCount();
+        
+        //if filtered for a taskGuid we merge the checked and also the TmMt information 
+        
+        $filter = $this->entity->getFilter();
+        
+        if(!$filter->hasFilter('taskGuid', $taskGuid)) { //handle the rest default case
+            $this->view->rows = $this->entity->loadAll();
+            $this->view->total = $this->entity->getTotalCount();
+            return;
+        }
+        
+        $tmmt = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Models_TmMt');
+        /* @var $tmmt editor_Plugins_TmMtIntegration_Models_TmMt */
+        $allTmmt = $tmmt->loadAll();
+        $allCount = $tmmt->getTotalCount();
+        
+        $assocs = $this->entity->loadAll(); //filtered automaticly by taskGuid
+        //reindex by tmmtId
+        $assocsByTmmtId = array();
+        foreach($assocs as $assoc) {
+            $assocsByTmmtId[$assoc->tmmtId] = $assoc;
+        }
+        
+        foreach($allTmmt as &$tmmt) {
+            $tmmt->checked = !empty($assocsByTmmtId[$tmmt->id]);
+            //FIXME merge / add missing data from asso to tmmt 
+        }
+        
+        $this->view->rows = $allTmmt;
+        $this->view->total = $allCount;
     }
 
     /**
@@ -75,7 +103,10 @@ class editor_Plugins_TmMtIntegration_TaskassocController extends ZfExtended_Rest
      * @see ZfExtended_RestController::putAction()
      */
     public function putAction() {
-      $this->entity->load((int) $this->_getParam('id'));
+        //FIXME
+        //this depends on what Aleks did already
+        //possible way 1: only make PUT calls and use the tmmt ID as entity id for this controller
+        //         way 2: don't sync the grid store, but make DELETE and POST calls manually with the tmmtAssoc data
     }
 
     /**

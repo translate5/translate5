@@ -27,4 +27,25 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
+CREATE TABLE `LEK_tmmtintegration_tmmt` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) DEFAULT NULL,
+  `sourceLang` int(11) DEFAULT NULL,
+  `targetLang` int(11) DEFAULT NULL,
+  `color` varchar(7) DEFAULT NULL,
+  `resourceId` varchar(256) DEFAULT NULL,
+  `resourceType` varchar(256) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `LEK_tmmtintegration_taskassoc` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tmmtId` int(11) DEFAULT NULL,
+  `taskGuid` varchar(38) NOT NULL,
+  CONSTRAINT FOREIGN KEY (`tmmtId`) REFERENCES `LEK_tmmtintegration_tmmt` (`id`) ON DELETE CASCADE
+  CONSTRAINT FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugin_tmmtintegration_tmmt', 'all');
 insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugin_tmmtintegration_resource', 'all');

@@ -32,3 +32,12 @@ WHERE `module` = 'editor' AND
 `role` = 'pm' AND
 `resource` = 'editor_plugin_tmmtintegration_resource' AND
 `right` = 'all';
+
+DELETE FROM Zf_acl_rules 
+WHERE `module` = 'editor' AND
+`role` = 'pm' AND
+`resource` = 'editor_plugin_tmmtintegration_tmmt' AND
+`right` = 'all';
+
+DROP TABLE `LEK_tmmtintegration_tmmt`;
+DROP TABLE `LEK_tmmtintegration_taskassoc`;
