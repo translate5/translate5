@@ -38,6 +38,6 @@ END LICENSE AND COPYRIGHT
  * DB Access for TmMtAssoc
  */
 class editor_Plugins_TmMtIntegration_Models_Db_Taskassoc extends Zend_Db_Table_Abstract {
-    protected $_name = 'LEK_tmmtintegration_tmmt';
+    protected $_name = 'LEK_tmmtintegration_taskassoc';
     public $_primary = 'id';
 }
