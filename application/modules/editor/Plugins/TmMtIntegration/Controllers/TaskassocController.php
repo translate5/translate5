@@ -33,10 +33,10 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_TmMtIntegration_TaskassocController extends ZfExtended_RestController {
 
-    protected $entityClass = 'editor_Plugins_TmMtIntegration_Models_TmMtAssocIntegrationMeta';
+    protected $entityClass = 'editor_Plugins_TmMtIntegration_Models_Taskassoc'; //→ _Taskassoc
 
     /**
-     * @var editor_Plugins_TmMtIntegration_Models_TmMtAssocIntegrationMeta
+     * @var editor_Plugins_TmMtIntegration_Models_Taskassoc
      */
     protected $entity;
     
@@ -46,14 +46,12 @@ class editor_Plugins_TmMtIntegration_TaskassocController extends ZfExtended_Rest
      */
     protected $postBlacklist = array('id');
     
+    
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
      */
     public function indexAction(){
-        
-        //if filtered for a taskGuid we merge the checked and also the TmMt information 
-        
         $filter = $this->entity->getFilter();
         
         if(!$filter->hasFilter('taskGuid', $taskGuid)) { //handle the rest default case

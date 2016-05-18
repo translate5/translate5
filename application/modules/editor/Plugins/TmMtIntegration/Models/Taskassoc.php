@@ -27,8 +27,8 @@ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception
 
 END LICENSE AND COPYRIGHT
 */
-class editor_Plugins_TmMtIntegration_Models_TmMtAssocIntegrationMeta extends ZfExtended_Models_Entity_MetaAbstract {
-	protected $dbInstanceClass = 'editor_Plugins_TmMtIntegration_Models_Db_TmMtAssocMeta';
+class editor_Plugins_TmMtIntegration_Models_Taskassoc extends ZfExtended_Models_Entity_MetaAbstract {
+	protected $dbInstanceClass = 'editor_Plugins_TmMtIntegration_Models_Db_Taskassoc';
 
 	public function loadByTaskGuid($taskGuid) {
 		return $this->loadRow('taskGuid = ?', $taskGuid);
