@@ -73,8 +73,10 @@ class editor_Plugins_TmMtIntegration_TaskassocController extends ZfExtended_Rest
         }
         
         foreach($allTmmt as &$tmmt) {
-            $tmmt->checked = !empty($assocsByTmmtId[$tmmt->id]);
-            //FIXME merge / add missing data from asso to tmmt 
+            $tmmt['checked'] = !empty($assocsByTmmtId[$tmmt['id']]);
+            if($tmmt['checked']) {
+                $tmmt['taskassocid'] = !empty($assocsByTmmtId[$tmmt['id']]['id']);
+            }
         }
         
         $this->view->rows = $allTmmt;
