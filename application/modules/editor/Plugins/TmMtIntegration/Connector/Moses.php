@@ -55,7 +55,7 @@ class editor_Plugins_TmMtIntegration_Connector_Moses extends editor_Plugins_TmMt
     protected $targetLanguages;
     
     public function __construct(stdClass $config) {
-        $this->name = "Moses MT - ".$config->utl;
+        $this->name = "Moses MT - ".$config->url;
     }
     
     /**
