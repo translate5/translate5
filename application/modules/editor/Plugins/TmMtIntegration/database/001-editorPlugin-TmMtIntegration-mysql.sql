@@ -49,3 +49,5 @@ CREATE TABLE `LEK_tmmtintegration_taskassoc` (
 
 insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_tmmtintegration_tmmt', 'all');
 insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_tmmtintegration_resource', 'all');
+insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_tmmtintegration_taskassoc', 'all');
+
