@@ -38,7 +38,6 @@ END LICENSE AND COPYRIGHT
  * DB Access for TmMtAssoc
  */
 class editor_Plugins_TmMtIntegration_Models_Db_Taskassoc extends Zend_Db_Table_Abstract {
-    use ZfExtended_Models_Db_MetaTrait;
-    protected $_name = 'lek_tm_overview';
+    protected $_name = 'LEK_tmmtintegration_tmmt';
     public $_primary = 'id';
 }
