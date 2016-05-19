@@ -27,28 +27,11 @@ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception
 
 END LICENSE AND COPYRIGHT
 */
-class editor_Plugins_TmMtIntegration_Models_Taskassoc extends ZfExtended_Models_Entity_MetaAbstract {
+class editor_Plugins_TmMtIntegration_Models_Taskassoc extends ZfExtended_Models_Entity_Abstract {
 	protected $dbInstanceClass = 'editor_Plugins_TmMtIntegration_Models_Db_Taskassoc';
+	protected $validatorInstanceClass = 'editor_Plugins_TmMtIntegration_Models_Validator_Taskassoc'; //→ here the new validator class
 
 	public function loadByTaskGuid($taskGuid) {
 		return $this->loadRow('taskGuid = ?', $taskGuid);
-	}
-
-	/**
-	 * Adds an empty meta data rowset to the DB.
-	 */
-	public function initEmptyRowset(){
-		$db = new $this->dbInstanceClass;
-		/* @var $db Zend_Db_Table_Abstract */
-		try {
-			$db->insert(array('taskGuid' => $this->getTaskGuid()));
-		}
-		catch(Zend_Db_Statement_Exception $e) {
-			$m = $e->getMessage();
-			//"duplicate entry" errors are ignored.
-			if(strpos($m,'SQLSTATE') !== 0 || stripos($m,'Duplicate entry') === false) {
-				throw $e;
-			}
-		}
 	}
 }

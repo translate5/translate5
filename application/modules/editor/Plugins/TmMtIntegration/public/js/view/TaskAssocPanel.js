@@ -39,10 +39,84 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.panel.Panel
  */
 Ext.define('Editor.plugins.TmMtIntegration.view.TaskAssocPanel', {
-    extend : 'Ext.panel.Panel',
-    alias : 'widget.tmMtIntegrationTaskAssocPanel',
-    title : 'Task Assoc',
-    frame: true,
-    padding: 10,
-    html: "TEST"
+	extend : 'Ext.panel.Panel',
+	alias : 'widget.tmMtIntegrationTaskAssocPanel',
+	cls : 'adminTaskGrid',
+	title : 'Associate TMs to task',
+	frame : true,
+	padding : 10,
+	initConfig : function(instanceConfig) {
+		var me = this,
+		config = {
+			dockedItems : [ {
+				dock : 'bottom',
+				xtype : 'toolbar',
+				frame : false,
+				border : false,
+				items : [ '->', {
+					xtype : 'button',
+					id : 'btnSaveChanges',
+					tooltip : 'Save',
+					text : 'Save TMs',
+					enableToggle : true,
+					pressed : true
+				} ]
+			} ],
+			items : [ {
+				xtype : 'grid',
+				id : 'tmGrid',
+				store : 'Editor.plugins.TmMtIntegration.store.TaskAssocStore',
+				features : [ {
+					id : 'group',
+					ftype : 'groupingsummary',
+					groupHeaderTpl : 'Grouped fields {resourceName}',
+					hideGroupedHeader : true,
+					enableGroupingMenu : false
+				} ],
+				columns : [ {
+					xtype : 'checkcolumn',
+					text : '',
+					dataIndex : 'checked',
+					sortable : true,
+					flex : 10 / 100
+				}, {
+					xtype : 'gridcolumn',
+					text : 'Name',
+					renderer: '', //look in to the ext doc ;)
+					dataIndex : 'name',
+					sortable : true,
+					flex : 40 / 100
+				}, {
+					xtype : 'gridcolumn',
+					text : 'Source Language',
+					cls : 'source-lang',
+					dataIndex : 'sourceLang',
+					renderer : me.langRenderer,
+					sortable : true,
+					flex : 25 / 100,
+				}, {
+					xtype : 'gridcolumn',
+					text : 'Target Language',
+					cls : 'target-lang',
+					dataIndex : 'targetLang',
+					renderer : me.langRenderer,
+					flex : 25 / 100,
+					sortable : true
+				} ]
+			} ],// end of items
+		};
+		if (instanceConfig) {
+			me.getConfigurator().merge(me, config, instanceConfig);
+		}
+		return me.callParent([ config ]);
+	},
+	langRenderer : function(val, md) {
+		var lang = Ext.StoreMgr.get('admin.Languages').getById(val), label;
+		if (lang) {
+			label = lang.get('label');
+			md.tdAttr = 'data-qtip="' + label + '"';
+			return label;
+		}
+		return '';
+	},
 });
