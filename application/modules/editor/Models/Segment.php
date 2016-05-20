@@ -146,6 +146,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         foreach($datas as $data) {
             $this->segmentdata[$data['name']] = $data;
         }
+        $this->isDataModified = null;
+        $this->isDataModifiedAgainstOriginal = null;
     }
 
     /**
