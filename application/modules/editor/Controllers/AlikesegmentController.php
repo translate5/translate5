@@ -158,7 +158,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                     continue;
                 }
 
-                
+                //if source editing = true, then fieldLoop loops also over the source field
                 $this->fieldLoop(function($field, $editField, $getter, $setter) use ($id, $entity, $config, $qmSubsegmentAlikes){
                     //Entity befüllen:
                     if($config->runtimeOptions->editor->enableQmSubSegments) {
@@ -170,13 +170,6 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                     $entity->updateToSort($editField);
                 });
                 
-                
-                // take over source original only for non editing source, see therefore TRANSLATE-549
-                // if source is editable, content (term trans[Not]Found) is changed in the editable field not in the original
-                if(!$this->isSourceEditable) {
-                    $entity->setSource($this->entity->getSource());
-                }
-                
                 $entity->setQmId((string) $this->entity->getQmId());
                 if(!is_null($this->entity->getStateId())) {
                     $entity->setStateId($this->entity->getStateId());
@@ -186,6 +179,13 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 $entity->setWorkflowStep($this->entity->getWorkflowStep());
                 $entity->setWorkflowStepNr($this->entity->getWorkflowStepNr());
                 $entity->setAutoStateId($states->calculateAlikeState($entity, $tua));
+                
+                //is called before save the alike to the DB, after doing all alike data handling (include recalc of the autostate)
+                $this->events->trigger('beforeSaveAlike', $this, array(
+                        'masterSegment' => $this->entity,
+                        'alikeSegment' => $entity,
+                        'isSourceEditable' => $this->isSourceEditable,
+                ));
                 
                 $entity->validate();
                 $history->save();

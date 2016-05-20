@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<martif xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" noNamespaceSchemaLocation="TBXcsV02.xsd" type="TBX" lang="en">
+  <martifHeader>
+    <fileDesc>
+      <sourceDesc>Testdatei TRANSLATE-683</sourceDesc>
+    </fileDesc>
+  </martifHeader>
+  <text>
+    <body>
+      <termEntry>
+        <langSet lang="de">
+          <tig>
+            <term>Quelle</term>
+            <termNote type="normativeAuthorization">preferredTerm</termNote>
+          </tig>
+        </langSet>
+        <langSet lang="en">
+          <tig>
+            <term>source</term>
+            <termNote type="normativeAuthorization">preferredTerm</termNote>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry>
+        <langSet lang="de">
+          <tig>
+            <term>Zieltext</term>
+            <termNote type="normativeAuthorization">preferredTerm</termNote>
+          </tig>
+        </langSet>
+        <langSet lang="en">
+          <tig>
+            <term>targettext</term>
+            <termNote type="normativeAuthorization">preferredTerm</termNote>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry>
+        <langSet lang="de">
+          <descripGrp>
+            <descrip type="Definition">Brauner Term</descrip>
+          </descripGrp>
+          <tig>
+            <term>unterschiedlich</term>
+            <termNote type="normativeAuthorization">preferredTerm</termNote>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry>
+        <langSet lang="en">
+          <descripGrp>
+            <descrip type="Definition">Term to be shown as brown term.</descrip>
+          </descripGrp>
+          <tig>
+            <term>me</term>
+            <termNote type="normativeAuthorization">preferredTerm</termNote>
+          </tig>
+        </langSet>
+      </termEntry>
+    </body>
+  </text>
+</martif>
