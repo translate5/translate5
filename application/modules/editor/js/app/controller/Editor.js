@@ -68,8 +68,15 @@ Ext.define('Editor.controller.Editor', {
   }],
   isEditing: false,
   keyMapConfig: null,
+  editorKeyMap: null,
+  generalKeyMap: null,
   prevNextSegment: null,
   listen: {
+      controller: {
+          '#Editor.$application': {
+              editorViewportClosed: 'clearKeyMaps'
+          }
+      },
       component: {
           '#metapanel metapanelNavi #watchSegmentBtn' : {
               click : 'toggleWatchSegment'
@@ -148,7 +155,7 @@ Ext.define('Editor.controller.Editor', {
           }
       });
       
-      new Ext.util.KeyMap(Ext.getDoc(), me.getKeyMapConfig({
+      me.generalKeyMap = new Ext.util.KeyMap(Ext.getDoc(), me.getKeyMapConfig({
           'pos1': [Ext.EventObjectImpl.HOME,{ctrl: false, alt: false}, me.handleHomeKeyPress, true],
           'ctrl-alt-c':     ["C",{ctrl: true, alt: true}, function(key, e){
               var me = this;
@@ -267,10 +274,22 @@ Ext.define('Editor.controller.Editor', {
       var me = this,
           docEl = Ext.get(editor.getDoc());
 
-      new Editor.view.segments.EditorKeyMap({
+      if(me.editorKeyMap) {
+          me.editorKeyMap.destroy();
+      }
+      me.editorKeyMap = new Editor.view.segments.EditorKeyMap({
         target: docEl,
         binding: me.getKeyMapConfig()
       });
+  },
+  clearKeyMaps: function() {
+      var me = this;
+      if(me.editorKeyMap) {
+          me.editorKeyMap.destroy();
+          me.editorKeyMap = null;
+      }
+      me.generalKeyMap.destroy();
+      me.generalKeyMap = null;
   },
   buttonClickDispatcher: function(btn, e) {
       var me = this,
