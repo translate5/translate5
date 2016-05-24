@@ -39,37 +39,38 @@ END LICENSE AND COPYRIGHT
  * @class Editor.controller.Preferences
  * @extends Ext.app.Controller
  */
-Ext.define('Editor.plugins.TmMtIntegration.controller.Controller', {
+Ext.define('Editor.plugins.TmMtIntegration.controller.TmOverviewController', {
   extend : 'Ext.app.Controller',
-  views: ['Editor.plugins.TmMtIntegration.view.TaskAssocPanel'],
-  models: ['Editor.plugins.TmMtIntegration.model.TaskAssoc'],
-  stores:['Editor.plugins.TmMtIntegration.store.TaskAssocStore'],
-  refs: [{
-      ref: 'taskTabs',
-      selector: 'adminTaskPreferencesWindow > tabpanel'
-  		},
-  		{
-  	      ref: 'tmGrid',
-  	      selector: 'taskTabs #tmGrid'
-  		}
-  		],
+  views: ['Editor.plugins.TmMtIntegration.view.TmOverviewPanel'],
+  //models: ['Editor.plugins.TmMtIntegration.model.TaskAssocMeta'],
+  //stores:['Editor.plugins.TmMtIntegration.store.TaskAssoc'],
+  refs:[{
+		ref: 'tmOverviewGrid',
+		selector: '#tmOverviewGrid'
+	},{
+	      ref: 'centerRegion',
+	      selector: 'viewport container[region="center"]'
+	  },{
+	      ref: 'headToolBar',
+	      selector: 'headPanel toolbar#top-menu'
+	  }
+	],
   listen: {
-	  controller: {
-		  '#taskpreferences': {
-			  'loadPreferences': function(loadParams){
-				  var me = this;
-				  me.getEditorPluginsTmMtIntegrationStoreTaskAssocStoreStore().load(loadParams);
-			  }
-		  }
-	  },
       component: {
-          'adminTaskPreferencesWindow': {
-              render: 'onParentRender'
-          },
-          '#btnSaveChanges': {
+          '#btnTmOverviewWindow': {
               click: 'handleOnButtonClick'
-          }
+          },
+        	'#tmOverviewGrid':{
+        		hide: 'handleAfterHide',
+        		show: 'handleAfterShow',
+        	}  
       }
+  },
+  handleAfterShow: function() {
+      this.getHeadToolBar().down('#btnTmOverviewWindow').hide();
+  },
+  handleAfterHide: function() {
+      this.getHeadToolBar().down('#btnTmOverviewWindow').show();
   },
   /**
    * inject the plugin tab and load the task meta data set
@@ -77,37 +78,38 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.Controller', {
   onParentRender: function(window) {
       var me = this;
       me.actualTask = window.actualTask;
+      /*
+      me.meta = Editor.plugins.TmMtIntegration.model.TaskAssocMeta.load(1, {
+          success: function(rec) {
+        	  alert('success');
+              me.meta = rec;
+          },
+          failure: function() {
+        	  alert('faill');
+              me.showResult('Could not load information!');
+          }
+      });
+      */
       me.getTaskTabs().add({xtype: 'tmMtIntegrationTaskAssocPanel', actualTask: me.actualTask});
   },
   handleOnButtonClick: function(window) {
-	  var me = this;
-      me.getEditorPluginsTmMtIntegrationStoreTaskAssocStoreStore().each(function(record){
-    	if(!record.dirty){
-    		  return;
-    	}
-		Ext.Ajax.request({
-			url:Editor.data.restpath+'plugins_tmmtintegration_taskassoc' + (!record.data.checked ? '/'+record.get('taskassocid'):''),
-			method: record.data.checked ? "POST" : "DELETE",
-			params: record.data.checked ? {
-				data: Ext.JSON.encode({
-					tmmtId: record.get('id'),
-					taskGuid: me.actualTask.get('taskGuid')
-				})
-			} : {} ,
-			success: function(response){ 
-				
-				if(record.data.checked){
-					var resp = Ext.util.JSON.decode(response.responseText);
-					var newId = resp.rows['id'];
-					record.set('taskassocid', newId);
-				}
-				record.commit();
-		        console.log(response.responseText); 
-		    }, 
-		    failure: function(response){ 
-		        console.log(response.responseText); 
-		    } 
-		});
-       }, this);
+      
+      var me = this,
+      	  grid = me.getTmOverviewGrid();
+      
+      me.actualTask = window.actualTask;
+      
+      //grid = me.getTmOverviewGrid();
+      //grid.show();
+      me.getCenterRegion().items.each(function(item){
+          item.hide();
+      });
+      
+      if(grid) {
+          grid.show();
+      }else {									
+    	  me.getCenterRegion().add({xtype: 'TmOverviewGrid'}).show();
+    	  me.handleAfterShow();
+      }
   }
 });

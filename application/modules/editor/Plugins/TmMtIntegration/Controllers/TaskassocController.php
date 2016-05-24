@@ -69,35 +69,19 @@ class editor_Plugins_TmMtIntegration_TaskassocController extends ZfExtended_Rest
         //reindex by tmmtId
         $assocsByTmmtId = array();
         foreach($assocs as $assoc) {
-            $assocsByTmmtId[$assoc->tmmtId] = $assoc;
+            $assocsByTmmtId[$assoc['tmmtId']] = $assoc;
         }
         
         foreach($allTmmt as &$tmmt) {
             $tmmt['checked'] = !empty($assocsByTmmtId[$tmmt['id']]);
             if($tmmt['checked']) {
-                $tmmt['taskassocid'] = !empty($assocsByTmmtId[$tmmt['id']]['id']);
+                $tmmt['taskassocid'] = $assocsByTmmtId[$tmmt['id']]['id'];
             }
         }
         
         $this->view->rows = $allTmmt;
         $this->view->total = $allCount;
     }
-
-    /**
-     * for post requests we have to check the existance of the desired task first!
-     * (non-PHPdoc)
-     * @see ZfExtended_RestController::validate()
-     */
-    protected function validate() {
-        if($this->_request->isPost()) {
-            settype($this->data->taskGuid, 'string');
-            $t = ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $t editor_Models_Task */
-            $t->loadByTaskGuid($this->data->taskGuid);
-        }
-        return parent::validate();
-    }
-
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::putAction()
@@ -107,5 +91,14 @@ class editor_Plugins_TmMtIntegration_TaskassocController extends ZfExtended_Rest
         //this depends on what Aleks did already
         //possible way 1: only make PUT calls and use the tmmt ID as entity id for this controller
         //         way 2: don't sync the grid store, but make DELETE and POST calls manually with the tmmtAssoc data
+    }
+    
+    public function postAction(){
+        parent::postAction();
+    }
+    
+    public function deleteAction(){
+        $this->entityLoad();
+        $this->entity->delete();
     }
 }
