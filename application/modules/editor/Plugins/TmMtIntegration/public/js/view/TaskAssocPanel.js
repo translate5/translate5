@@ -41,6 +41,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.TmMtIntegration.view.TaskAssocPanel', {
 	extend : 'Ext.panel.Panel',
 	alias : 'widget.tmMtIntegrationTaskAssocPanel',
+	requires: ['Editor.view.admin.TaskActionColumn'],
 	cls : 'adminTaskGrid',
 	title : 'Associate TMs to task',
 	frame : true,
@@ -82,7 +83,9 @@ Ext.define('Editor.plugins.TmMtIntegration.view.TaskAssocPanel', {
 				}, {
 					xtype : 'gridcolumn',
 					text : 'Name',
-					renderer: '', //look in to the ext doc ;)
+					renderer: function(value, metaData, record) {
+		        		return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: '+record.data.color+';"></div>'+value;
+		        	},
 					dataIndex : 'name',
 					sortable : true,
 					flex : 40 / 100

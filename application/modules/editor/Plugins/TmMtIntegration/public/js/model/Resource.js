@@ -1,4 +1,4 @@
-<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -28,31 +28,37 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Controller for the Plugin TmMtIntegration configured Tmmt 
+/**#@++
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
  */
-class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestController {
-
-    protected $entityClass = 'editor_Plugins_TmMtIntegration_Models_TmMt';
-
-    /**
-     * @var editor_Plugins_TmMtIntegration_Models_TmMt
-     */
-    protected $entity;
-    
-    public function indexAction(){
-        parent::indexAction();
+/**
+ * @class Editor.plugins.TmMtIntegration.model.Resource
+ * @extends Ext.data.Model
+ */
+Ext.define('Editor.plugins.TmMtIntegration.model.Resource', {
+  extend: 'Ext.data.Model',
+  fields: [
+    {name: 'id', type: 'string'},
+    {name: 'name', type: 'string'},
+    {name: 'filebased', type: 'boolean'},
+    {name: 'resourceType', type: 'string'},
+    {name: 'resourceName', type: 'string'}
+  ],
+  idProperty: 'id',
+  proxy : {
+    type : 'rest',//POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity 
+    url: Editor.data.restpath+'plugins_tmmtintegration_resource', //same as PHP controller name
+    reader : {
+      rootProperty: 'rows',
+      type : 'json'
+    },
+    writer: {
+      encode: true,
+      rootProperty: 'data',
+      writeAllFields: false
     }
-    
-    public function postAction(){
-      $this->entity->init();
-      $this->data = $this->_getAllParams();
-      $this->setDataInEntity($this->postBlacklist);
-      if($this->validate()){
-          $this->entity->save();
-          $this->view->rows = $this->entity->getDataObject();
-          $this->view->success = true;
-      }
-    }
-    
-}
+  }
+});
