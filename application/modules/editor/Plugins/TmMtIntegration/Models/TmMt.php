@@ -29,5 +29,6 @@ END LICENSE AND COPYRIGHT
 */
 class editor_Plugins_TmMtIntegration_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Plugins_TmMtIntegration_Models_Db_TmMt';
+    protected $validatorInstanceClass = 'editor_Plugins_TmMtIntegration_Models_Validator_TmMt';
     
 }

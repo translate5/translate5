@@ -47,10 +47,12 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
         $f->addControllerDirectory(APPLICATION_PATH.'/'.$this->getPluginPath().'/Controllers', '_plugins');
         
         $restRoute = new Zend_Rest_Route($f, array(), array(
-                'editor' => array('plugins_tmmtintegration_taskassoc', 'plugins_tmmtintegration_tmmt'),
+                'editor' => array('plugins_tmmtintegration_taskassoc', 'plugins_tmmtintegration_tmmt', 'plugins_tmmtintegration_resource'),
         ));
         $f->getRouter()->addRoute('plugins_tmmtintegration_restdefault', $restRoute);
         
+        return;
+        //FIXME Thomas documentate and remove
          //im folgenden zwei Beispiel testcontroller
         $rest = new Zend_Controller_Router_Route(
             'editor/js/app-localized.jsx',

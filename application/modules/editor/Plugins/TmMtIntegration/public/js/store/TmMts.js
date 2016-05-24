@@ -1,4 +1,4 @@
-<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -28,31 +28,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Controller for the Plugin TmMtIntegration configured Tmmt 
- */
-class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestController {
-
-    protected $entityClass = 'editor_Plugins_TmMtIntegration_Models_TmMt';
-
-    /**
-     * @var editor_Plugins_TmMtIntegration_Models_TmMt
-     */
-    protected $entity;
-    
-    public function indexAction(){
-        parent::indexAction();
-    }
-    
-    public function postAction(){
-      $this->entity->init();
-      $this->data = $this->_getAllParams();
-      $this->setDataInEntity($this->postBlacklist);
-      if($this->validate()){
-          $this->entity->save();
-          $this->view->rows = $this->entity->getDataObject();
-          $this->view->success = true;
-      }
-    }
-    
-}
+Ext.define('Editor.plugins.TmMtIntegration.store.TmMts', {
+  extend : 'Ext.data.Store',
+  model: 'Editor.plugins.TmMtIntegration.model.TmMt',
+  autoLoad: true
+});

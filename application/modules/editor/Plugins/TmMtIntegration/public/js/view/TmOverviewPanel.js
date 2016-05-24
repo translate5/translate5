@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -35,47 +34,30 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.pluginFeasibilityTest.view.Panel
+ * @class Editor.plugins.TmMtIntegration.view.TmOverviewPanel
  * @extends Ext.panel.Panel
  */
 Ext.define('Editor.plugins.TmMtIntegration.view.TmOverviewPanel', {
     extend : 'Ext.panel.Panel',//'Ext.grid.Panel',
-    requires: 'Editor.view.CheckColumn',
-    alias: 'widget.TmOverviewGrid',
-    //plugins: ['gridfilters'],
-    itemId: 'tmOverviewGrid',
-    cls: 'adminTaskGrid',
+    alias: 'widget.TmOverviewPanel',
+    itemId: 'tmOverviewPanel',
     title: 'TM Overview',
     height: '100%',
     layout: {
         type: 'fit'
     },
-    viewConfig: {
-        /**
-         * returns a specific row css class
-         * @param {Editor.model.admin.User} user
-         * @return {Boolean}
-         */
-        getRowClass: function(user) {
-            if(!user.get('editable')) {
-                return 'not-editable';
-            }
-            return '';
-        }
-    },
     initConfig: function(instanceConfig) {
       var me = this,
-          itemFilter = function(item){
-              return Editor.app.authenticatedUser.isAllowed(item.isAllowedFor);
-          },
       config = {
         	items :[{
         			xtype:'grid',
-			        title: me.title, //see EXT6UPD-9
+        			id:'gridTmOverview',
+        			store : 'Editor.plugins.TmMtIntegration.store.TmMts',
+        			title: me.title, //see EXT6UPD-9
 			        columns: [{
 			            xtype: 'gridcolumn',
 			            width: 100,
-			            dataIndex: 'tmName',
+			            dataIndex: 'name',
 			            filter: {
 			                type: 'string'
 			            },
@@ -83,7 +65,8 @@ Ext.define('Editor.plugins.TmMtIntegration.view.TmOverviewPanel', {
 			        },{
 			            xtype: 'gridcolumn',
 			            width: 100,
-			        	dataIndex: 'sourceLanguage',
+			        	dataIndex: 'sourceLang',
+			        	renderer : me.langRenderer,
 			        	cls: 'source-lang',
 			            filter: {
 			                type: 'string'
@@ -91,7 +74,8 @@ Ext.define('Editor.plugins.TmMtIntegration.view.TmOverviewPanel', {
 			        },{
 			            xtype: 'gridcolumn',
 			            width: 100,
-			            dataIndex: 'destinationLanguage',
+			            dataIndex: 'targetLang',
+			            renderer : me.langRenderer,
 			            cls: 'target-lang',
 			            filter: {
 			                type: 'string'
@@ -100,43 +84,47 @@ Ext.define('Editor.plugins.TmMtIntegration.view.TmOverviewPanel', {
 			            xtype: 'gridcolumn',
 			            width: 100,
 			            dataIndex: 'color',
+						renderer: function(value, metaData, record) {
+			        		return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #'+record.data.color+';"></div>';
+			        	},
 			            text:'Color'
-			        }
-			        ,{ 
-			        	xtype: 'gridcolumn',
-			            width: 100,
-			         	text: 'Edit/Delete',
-			            filter: {
-			                 type: 'string'
-			            }
+			        },{
+			        	xtype: 'actioncolumn',
+			            width: 60,
+			            items: [{
+			                tooltip: 'Edit',
+			                iconCls: 'ico-tm-edit'
+			            },{
+			                tooltip: 'Delete',
+			                iconCls: 'ico-cancel'
+			            }]
 			        },{
 			        	xtype: 'gridcolumn',
 			            width: 100,
 			         	text: 'Resource',
-			            filter: {
+			         	dataIndex: 'resourceType',
+			         	filter: {
 			                 type: 'string'
 			            }
-			        }
-			        ],
+			        }],
 			        dockedItems: [{
 			            xtype: 'toolbar',
 			            dock: 'top',
 			            items: [{
 			                xtype: 'button',
 			                iconCls: 'ico-user-add',
-			                itemId: 'add-user-btn',
+			                itemId: 'btnAddTm',
 			                text: 'Add TM',
 			                hidden: ! Editor.app.authenticatedUser.isAllowed('editorAddUser'), 
 			                tooltip: 'tooltip'
 			            },{
 			                xtype: 'button',
 			                iconCls: 'ico-refresh',
-			                itemId: 'reload-user-btn',
+			                itemId: 'btnRefresh',
 			                text:'Refresh',
 			                tooltip: 'tooltip'
 			            }]
-			        }
-			        ,{
+			        },{
 			            xtype: 'pagingtoolbar',
 			            //store: 'admin.Users',
 			            dock: 'bottom',
@@ -149,5 +137,14 @@ Ext.define('Editor.plugins.TmMtIntegration.view.TmOverviewPanel', {
           me.getConfigurator().merge(me, config, instanceConfig);
       }
       return me.callParent([config]);
-    }
+    },
+    langRenderer : function(val, md) {
+		var lang = Ext.StoreMgr.get('admin.Languages').getById(val), label;
+		if (lang) {
+			label = lang.get('label');
+			md.tdAttr = 'data-qtip="' + label + '"';
+			return label;
+		}
+		return '';
+	},
   });

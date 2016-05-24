@@ -52,6 +52,20 @@ class editor_Plugins_TmMtIntegration_ResourceController extends ZfExtended_RestC
             $resultRes = new stdClass();
             $resultRes->id = get_class($resource).'_'.$i++;
             $resultRes->name = $resource->getName();
+            
+            //
+            //hardcoded
+            //
+            $resultRes->filebased = false;
+            
+            $resultRes->resourceType = get_class($resource);
+            
+            //
+            //hardcoded
+            //
+            $resultRes->resourceName = 'MosesMT';
+            
+            
             $result[] = $resultRes;
         }
         $this->view->rows = $result;

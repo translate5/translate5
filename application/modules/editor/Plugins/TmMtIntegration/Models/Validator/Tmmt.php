@@ -28,31 +28,25 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Controller for the Plugin TmMtIntegration configured Tmmt 
- */
-class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestController {
-
-    protected $entityClass = 'editor_Plugins_TmMtIntegration_Models_TmMt';
+class editor_Plugins_TmMtIntegration_Models_Validator_TmMt extends ZfExtended_Models_Validator_Abstract {
 
     /**
-     * @var editor_Plugins_TmMtIntegration_Models_TmMt
+     * Validators for Task User Assoc Entity
+     * 
      */
-    protected $entity;
-    
-    public function indexAction(){
-        parent::indexAction();
+    protected function defineValidators() {
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
+        /* @var $workflow editor_Workflow_Abstract */
+        //comment = string, without length contrain. No validator needed / possible
+        //$this->addValidator('taskGuid', 'guid');
+        $this->addValidator('id', 'int');
+        $this->addValidator('name', 'stringLength', array('min' => 0, 'max' => 255));
+        $this->addValidator('sourceLang', 'stringLength', array('min' => 0, 'max' => 255));
+        $this->addValidator('targetLang', 'stringLength', array('min' => 0, 'max' => 255));
+        $this->addValidator('color', 'stringLength', array('min' => 0, 'max' => 8));
+        $this->addValidator('resourceId', 'stringLength', array('min' => 0, 'max' => 255));
+        $this->addValidator('resourceName', 'stringLength', array('min' => 0, 'max' => 255));
+        $this->addValidator('resourceType', 'stringLength', array('min' => 0, 'max' => 255));
+        
     }
-    
-    public function postAction(){
-      $this->entity->init();
-      $this->data = $this->_getAllParams();
-      $this->setDataInEntity($this->postBlacklist);
-      if($this->validate()){
-          $this->entity->save();
-          $this->view->rows = $this->entity->getDataObject();
-          $this->view->success = true;
-      }
-    }
-    
 }
