@@ -39,6 +39,9 @@ END LICENSE AND COPYRIGHT
  * Not needed to be instanced as singleton since registered connectors were stored internally in a static member variable
  */
 class editor_Plugins_TmMtIntegration_Services_Manager {
+    const CLS_SERVICE = '_Service';
+    const CLS_CONNECTOR = '_Connector';
+    
     /**
      * The services provided with this plugin are hardcoded:
      * @var array
@@ -57,13 +60,49 @@ class editor_Plugins_TmMtIntegration_Services_Manager {
      * @return [editor_Plugins_TmMtIntegration_Connector_Abstract]
      */
     public function getAllResources() {
-        $connectorResources = array();
+        $serviceResources = array();
         foreach(self::$registeredServices as $service) {
-            $serviceResources = ZfExtended_Factory::get($service.'_Resources');
-            /* @var $serviceResources editor_Plugins_TmMtIntegration_Services_ResourcesAbstract */
-            $connectorResources = array_merge($connectorResources, $serviceResources->getResources());
+            $service = ZfExtended_Factory::get($service.self::CLS_SERVICE);
+            /* @var $serviceResources editor_Plugins_TmMtIntegration_Services_ServiceAbstract */
+            $serviceResources = array_merge($serviceResources, $service->getResources());
         }
-        return $connectorResources;
+        return $serviceResources;
+    }
+    
+    /**
+     * @param string $serviceType
+     * @param string $id
+     * @return editor_Plugins_TmMtIntegration_Models_Resource
+     */
+    public function getResourceById(string $serviceType, string $id) {
+        $this->checkService($serviceType);
+        $resources = ZfExtended_Factory::get($serviceType.self::CLS_SERVICE);
+        /* @var $resources editor_Plugins_TmMtIntegration_Services_ServiceAbstract */
+        return $resources->getResourceById($id);
+    }
+    
+    /**
+     * returns the desired connector, connection to the given resource
+     * @param string $serviceType
+     * @param editor_Plugins_TmMtIntegration_Models_Resource $resource
+     */
+    public function getConnector(string $serviceType, editor_Plugins_TmMtIntegration_Models_Resource $resource) {
+        $this->checkService($serviceType);
+        $connector = ZfExtended_Factory::get($serviceType.self::CLS_CONNECTOR);
+        /* @var $connector editor_Plugins_TmMtIntegration_Connector_Abstract */
+        $connector->connectTo($resource);
+        return $connector;
+    }
+    
+    /**
+     * checks the existance of the given service
+     * @param string $serviceType
+     * @throws ZfExtended_Exception
+     */
+    protected function checkService(string $serviceType) {
+        if(!$this->hasService($serviceType)) {
+            throw new ZfExtended_Exception("Given Service ".$serviceType." is not registered in the Tmmt Service Manager!");
+        }
     }
     
     /**
@@ -75,6 +114,15 @@ class editor_Plugins_TmMtIntegration_Services_Manager {
         self::$registeredServices[] = $namespace;
         self::$registeredServices = array_unique(self::$registeredServices);
         return self::$registeredServices;
+    }
+    
+    /**
+     * returns true if the given service is available
+     * @param string $namespace
+     * @return boolean
+     */
+    public function hasService(string $namespace) {
+        return in_array($namespace, self::$registeredServices);
     }
     
     public function openForTask(editor_Models_Task $task) {

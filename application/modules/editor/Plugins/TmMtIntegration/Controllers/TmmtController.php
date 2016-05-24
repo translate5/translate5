@@ -33,6 +33,8 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestController {
 
+    const FILE_UPLOAD_NAME = 'tmUpload';
+    
     protected $entityClass = 'editor_Plugins_TmMtIntegration_Models_TmMt';
 
     /**
@@ -45,14 +47,46 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
     }
     
     public function postAction(){
-      $this->entity->init();
-      $this->data = $this->_getAllParams();
-      $this->setDataInEntity($this->postBlacklist);
-      if($this->validate()){
-          $this->entity->save();
-          $this->view->rows = $this->entity->getDataObject();
-          $this->view->success = true;
-      }
+        $this->entity->init();
+        $this->data = $this->_getAllParams();
+        $this->setDataInEntity($this->postBlacklist);
+        
+        error_log(print_r($this->entity->getDataObject(),1));
+        $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
+        /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
+        $resource = $manager->getResourceById($this->entity->getResourceType(), $this->entity->getResourceId());
+        if($resource->getFilebased()) {
+            $this->handleFileUpload($manager, $resource);
+        }
+      
+        if($this->validate()){
+            $this->entity->save();
+            $this->view->rows = $this->entity->getDataObject();
+            $this->view->success = true;
+        }
     }
     
+    protected function handleFileUpload(editor_Plugins_TmMtIntegration_Services_Manager $manager, editor_Plugins_TmMtIntegration_Models_Resource $resource) {
+        $upload = new Zend_File_Transfer_Adapter_Http();
+        $upload->isValid(self::FILE_UPLOAD_NAME);
+        //mandatory upload file
+        $importInfo = $upload->getFileInfo(self::FILE_UPLOAD_NAME);
+        $connector = $manager->getConnector($this->entity->getResourceType(), $resource);
+        /* @var $connector editor_Plugins_TmMtIntegration_Services_ConnectorAbstract */
+        if(empty($importInfo['tmUpload']['size'])) {
+            $this->uploadError('Die ausgewählte Datei war leer!');
+        }
+        if(!$connector->addTm($importInfo['tmUpload']['tmp_name'], $this->entity)) {
+            $this->uploadError('Hochgeladene TM Datei konnte nicht hinzugefügt werden.');
+        }
+    }
+    
+    public function uploadError($msg) {
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        /* @var $translate ZfExtended_Zendoverwrites_Translate */;
+        $errors = array('tmUpload' => array($translate->_($msg)));
+        $e = new ZfExtended_ValidateException(print_r($errors, 1));
+        $e->setErrors($errors);
+        throw $e;
+    }
 }

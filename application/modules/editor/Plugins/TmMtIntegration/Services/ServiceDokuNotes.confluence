@@ -16,8 +16,8 @@ h3. ServiceNameSpace_Connector
 * extending editor_Plugins_TmMtIntegration_Services_ConnectorAbstract
 * This class provides the connection and communication to the underlying system
 
-h3. ServiceNameSpace_Resources
-* extending editor_Plugins_TmMtIntegration_Services_ResourcesAbstract
+h3. ServiceNameSpace_Service
+* extending editor_Plugins_TmMtIntegration_Services_ServiceAbstract
 * This class provides a list with the different configured resources provided by one service.
 
 Optional classes:
