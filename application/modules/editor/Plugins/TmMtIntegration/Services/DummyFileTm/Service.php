@@ -35,16 +35,16 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * Moses Connector
+ * Dummy File Upload TM Service Base Class
  */
-class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Resources extends editor_Plugins_TmMtIntegration_Services_ResourcesAbstract {
+class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Service extends editor_Plugins_TmMtIntegration_Services_ServiceAbstract {
     public function __construct() {
         $this->addResource([$this->getServiceNamespace(), 'Dummy Filebased TM', true]); //isfilebased and the only resource
     }
     
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_TmMtIntegration_Services_ResourcesAbstract::getName()
+     * @see editor_Plugins_TmMtIntegration_Services_ServiceAbstract::getName()
      */
     public function getName() {
         return "DummyFile TM";

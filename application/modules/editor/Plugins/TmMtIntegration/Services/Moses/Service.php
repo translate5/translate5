@@ -35,14 +35,14 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * Moses Connector
+ * Moses Service Base Class
  */
-class editor_Plugins_TmMtIntegration_Services_Moses_Resources extends editor_Plugins_TmMtIntegration_Services_ResourcesAbstract {
+class editor_Plugins_TmMtIntegration_Services_Moses_Service extends editor_Plugins_TmMtIntegration_Services_ServiceAbstract {
     protected $resourceClass = 'editor_Plugins_TmMtIntegration_Services_Moses_Resource';
     
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_TmMtIntegration_Services_ResourcesAbstract::getName()
+     * @see editor_Plugins_TmMtIntegration_Services_ServiceAbstract::getName()
      */
     public function getName() {
         return "Moses";

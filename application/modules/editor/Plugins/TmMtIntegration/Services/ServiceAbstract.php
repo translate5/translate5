@@ -38,7 +38,7 @@ END LICENSE AND COPYRIGHT
  * Abstract Base Tmmt Resources manager
  * Not one instance per resource, but one instance providing data to all resources of one service
  */
-abstract class editor_Plugins_TmMtIntegration_Services_ResourcesAbstract {
+abstract class editor_Plugins_TmMtIntegration_Services_ServiceAbstract {
     protected $resourceClass = 'editor_Plugins_TmMtIntegration_Models_Resource';
     
     protected $resources = array();
@@ -71,6 +71,20 @@ abstract class editor_Plugins_TmMtIntegration_Services_ResourcesAbstract {
      */
     public function getResources(){
         return $this->resources;
+    }
+    
+    /**
+     * returns the resource to the given resource id
+     * @param string $id
+     * @return editor_Plugins_TmMtIntegration_Models_Resource|NULL
+     */
+    public function getResourceById(string $id) {
+        foreach ($this->resources as $resource) {
+            if($id === $resource->getId()) {
+                return $resource;
+            }
+        }
+        return null;
     }
     
     /**
