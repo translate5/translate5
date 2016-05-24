@@ -36,7 +36,22 @@ class editor_Plugins_TmMtIntegration_Models_Resource {
     
     protected $filebased = false;
     
-    protected $fieldsForController = array('id', 'name', 'filebased');
+    protected $service;
+    
+    protected $serviceName;
+    
+    /**
+     * index is the fieldname for export values in the controller
+     * value is the internal fieldname / getter
+     * @var unknown
+     */
+    protected $fieldsForController = array(
+            'id' => 'id',
+            'name' => 'name',
+            'resourceName' => 'service',
+            'resourceType' => 'serviceType',
+            'filebased' => 'filebased'
+    );
     
     public function __construct($id, $name, $filebased = false) {
         $this->id = $id;
@@ -50,16 +65,44 @@ class editor_Plugins_TmMtIntegration_Models_Resource {
     
     /**
      * returns the resource name
+     * @return string
      */
     public function getName() {
         return $this->name;
     }
     
     /**
-     * returns the resource name
+     * returns if service is filebased or not
+     * @return boolean
      */
     public function getFilebased() {
         return $this->filebased;
+    }
+    
+    /**
+     * returns the service name
+     * @return string
+     */
+    public function getService() {
+        return $this->service;
+    }
+    
+    /**
+     * returns the service type
+     * @return string
+     */
+    public function getServiceType() {
+        return $this->serviceType;
+    }
+    
+    /**
+     * sets the service type
+     * @param $service
+     * @return string
+     */
+    public function setService(string $name, string $type) {
+        $this->service = $name;
+        $this->serviceType = $type;
     }
     
     /**
@@ -68,8 +111,8 @@ class editor_Plugins_TmMtIntegration_Models_Resource {
      */
     public function getDataObject() {
         $data = new stdClass();
-        foreach($this->fieldsForController as $key) {
-            $method = 'get'.ucfirst($key);
+        foreach($this->fieldsForController as $key => $index) {
+            $method = 'get'.ucfirst($index);
             $data->$key = $this->$method();
         }
         return $data;

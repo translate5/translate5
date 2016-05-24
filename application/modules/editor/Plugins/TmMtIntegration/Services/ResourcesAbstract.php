@@ -49,12 +49,19 @@ abstract class editor_Plugins_TmMtIntegration_Services_ResourcesAbstract {
     abstract public function __construct();
     
     /**
+     * returns the name of this resources / service
+     * @return string
+     */
+    abstract public function getName();
+    
+    /**
      * Creates a new Resource instance and adds it to the interal list
      * @param array $constructorArgs
      */
     protected function addResource(array $constructorArgs) {
         $res = ZfExtended_Factory::get($this->resourceClass, $constructorArgs);
         /* @var $res editor_Plugins_TmMtIntegration_Models_Resource */
+        $res->setService($this->getName(), $this->getServiceNamespace());
         $this->resources[] = $res;
     }
     

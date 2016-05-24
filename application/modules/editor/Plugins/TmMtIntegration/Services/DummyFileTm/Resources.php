@@ -41,4 +41,12 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Resources extends edit
     public function __construct() {
         $this->addResource([$this->getServiceNamespace(), 'Dummy Filebased TM', true]); //isfilebased and the only resource
     }
+    
+    /**
+     * (non-PHPdoc)
+     * @see editor_Plugins_TmMtIntegration_Services_ResourcesAbstract::getName()
+     */
+    public function getName() {
+        return "DummyFile TM";
+    }
 }

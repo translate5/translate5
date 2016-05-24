@@ -40,6 +40,14 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_TmMtIntegration_Services_Moses_Resources extends editor_Plugins_TmMtIntegration_Services_ResourcesAbstract {
     protected $resourceClass = 'editor_Plugins_TmMtIntegration_Services_Moses_Resource';
     
+    /**
+     * (non-PHPdoc)
+     * @see editor_Plugins_TmMtIntegration_Services_ResourcesAbstract::getName()
+     */
+    public function getName() {
+        return "Moses";
+    }
+    
     public function __construct() {
         $config = '[{
                 "url": "http://www.translate5.net:8124"
