@@ -43,16 +43,14 @@ class editor_Plugins_TmMtIntegration_ResourceController extends ZfExtended_RestC
     }
     
     public function indexAction() {
-        $connectorManager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Connector_Manager');
-        /* @var $connectorManager editor_Plugins_TmMtIntegration_Connector_Manager */
-        $resources = $connectorManager->getAllResources();
+        $serviceManager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
+        /* @var $serviceManager editor_Plugins_TmMtIntegration_Services_Manager */
+        $resources = $serviceManager->getAllResources();
         $result = array();
         $i = 0;
         foreach($resources as $resource) {
-            $resultRes = new stdClass();
-            $resultRes->id = get_class($resource).'_'.$i++;
-            $resultRes->name = $resource->getName();
-            $result[] = $resultRes;
+            /* @var $resource editor_Plugins_TmMtIntegration_Models_Resource */
+            $result[] = $resource->getDataObject();
         }
         $this->view->rows = $result;
         $this->view->total = count($result);

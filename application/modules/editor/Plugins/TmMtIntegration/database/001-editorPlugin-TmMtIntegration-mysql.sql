@@ -35,6 +35,7 @@ CREATE TABLE `LEK_tmmtintegration_tmmt` (
   `color` varchar(7) DEFAULT NULL,
   `resourceId` varchar(256) DEFAULT NULL,
   `resourceType` varchar(256) DEFAULT NULL,
+  `resourceName` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

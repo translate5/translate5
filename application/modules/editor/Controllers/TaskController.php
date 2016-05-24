@@ -409,7 +409,7 @@ class editor_TaskController extends ZfExtended_RestController {
            ){
             //if the task was already in session, we must delete it. 
             //If not the user will always receive an error in JS, and would not be able to do anything.
-            $this->entity->unregisterInSession(); //FIXME XXX the changes in the session made by this method is not stored in the session!
+            $this->unregisterTask(); //FIXME XXX the changes in the session made by this method is not stored in the session!
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
         
@@ -564,6 +564,11 @@ class editor_TaskController extends ZfExtended_RestController {
         if($this->isOpenTaskRequest()){
             $this->entity->createMaterializedView();
             $this->entity->registerInSession($this->data->userState);
+            $this->events->trigger("afterTaskOpen", $this, array(
+                'task' => $this->entity, 
+                'view' => $this->view, 
+                'openState' => $this->data->userState)
+            );
         }
     }
     
@@ -594,11 +599,22 @@ class editor_TaskController extends ZfExtended_RestController {
                         ' could not be unlocked by user '.$this->user->data->userGuid);
             }
         }
-        $this->entity->unregisterInSession();
+        $this->unregisterTask();
         
         if($resetToOpen) {
             $this->updateUserState($this->user->data->userGuid, true);
         }
+    }
+    
+    /**
+     * unregisters the task from the session and triggers a afterTaskClosed event
+     */
+    protected function unregisterTask() {
+        $this->entity->unregisterInSession();
+        $this->events->trigger('afterTaskClose', $this, array(
+            'task' => $this->entity, 
+            'view' => $this->view 
+        ));
     }
     
     /**

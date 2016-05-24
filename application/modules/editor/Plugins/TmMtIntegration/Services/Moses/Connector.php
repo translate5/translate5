@@ -37,33 +37,9 @@ END LICENSE AND COPYRIGHT
 /**
  * Moses Connector
  */
-class editor_Plugins_TmMtIntegration_Connector_Moses extends editor_Plugins_TmMtIntegration_Connector_Abstract {
-    /**
-     * The name of the Resource
-     * @var string
-     */
-    protected $name;
-    
-    /**
-     * @var string
-     */
-    protected $sourceLanguage;
-    
-    /**
-     * @var array
-     */
-    protected $targetLanguages;
-    
+class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plugins_TmMtIntegration_Connector_Abstract {
     public function __construct(stdClass $config) {
         $this->name = "Moses MT - ".$config->url;
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see editor_Plugins_TmMtIntegration_Connector_Abstract::getName()
-     */
-    public function getName() {
-        return $this->name;
     }
     
     /**
@@ -83,7 +59,37 @@ class editor_Plugins_TmMtIntegration_Connector_Moses extends editor_Plugins_TmMt
         return $result;
     }
     
+    /**
+     * returns a list with connector instances, one per resource
+     * @return [editor_Plugins_TmMtIntegration_Connector_Moses]
+     */
+    public static function createForResource(string $resourceId) {
+        //FIXME load me come from config according to the resourceId
+        $config = '[{
+                "url": "http://www.translate5.net:8124"
+        }]';
+        $config = json_decode($config);
+        return ZfExtended_Factory::get(__CLASS__, array($config[0]));
+    }
+    
     public function synchronizeTmList() {
         //for Moses do currently nothing
+    }
+    
+    public function open(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
+        error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getResourceName());
+    }
+    
+    public function translate(string $toTranslate) {
+        $rpc = new Zend_XmlRpc_Client("http://www.translate5.net:8124/RPC2");
+        try {
+            
+            $rpc->call('translate', array('text' => 'es ist ein kleines haus'));
+        }
+        catch(Exception $e) {
+            error_log($e);
+        }
+        //error_log("Translate ".$toTranslate);
+        //error_log("Translated ".$toTranslate);
     }
 }

@@ -35,42 +35,48 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * TmMt Connector Manager
- * Not needed to be instanced as singleton since registered connectors were stored internally in a static member variable
+ * Moses Connector
  */
-class editor_Plugins_TmMtIntegration_Connector_Manager {
-    /**
-     * The connectors provided with this plugin are hardcoded:
-     * @var array
-     */
-    static protected $registeredConnectors = array(
-        'editor_Plugins_TmMtIntegration_Connector_Moses',
-    );
-
-    public function getAll() {
-        return self::$registeredConnectors;
-    }
-
-    /**
-     * Creates all configured connector resources
-     * @return [editor_Plugins_TmMtIntegration_Connector_Abstract]
-     */
-    public function getAllResources() {
-        $connectorResources = array();
-        foreach(self::$registeredConnectors as $class) {
-            $connectorResources = array_merge($connectorResources, call_user_func(array($class, 'createForAllResources')));
-        }
-        return $connectorResources;
+class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
+    
+    public function __construct() {
+        $this->name = "Dummy Filebased MT";
     }
     
     /**
-     * With this method more connectors can be added (for example from other Plugins)
-     * @param string $classname
-     * @return array all registered connectors
+     * returns a list with connector instances, one per resource
+     * @return [editor_Plugins_TmMtIntegration_Connector_Moses]
      */
-    public function addConnector($classname) {
-        self::$registeredConnectors[] = $classname;
-        self::$registeredConnectors = array_unique(self::$registeredConnectors);
-        return self::$registeredConnectors;
+    public static function createForAllResources() {
+        return [ZfExtended_Factory::get(__CLASS__)];
+    }
+    
+    /**
+     * returns a list with connector instances, one per resource
+     * @return [editor_Plugins_TmMtIntegration_Connector_Moses]
+     */
+    public static function createForResource(string $resourceId) {
+        return ZfExtended_Factory::get(__CLASS__);
+    }
+    
+    public function synchronizeTmList() {
+        //read file list
+    }
+    
+    public function open(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
+        error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getResourceName());
+    }
+    
+    public function translate(string $toTranslate) {
+        $rpc = new Zend_XmlRpc_Client("http://www.translate5.net:8124/RPC2");
+        try {
+            
+            $rpc->call('translate', array('text' => 'es ist ein kleines haus'));
+        }
+        catch(Exception $e) {
+            error_log($e);
+        }
+        //error_log("Translate ".$toTranslate);
+        //error_log("Translated ".$toTranslate);
     }
 }

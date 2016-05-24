@@ -1,4 +1,4 @@
-
+<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -28,37 +28,50 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
+/**#@+
  * @author Marc Mittag
  * @package editor
  * @version 1.0
  *
  */
 /**
- * Die Einstellungen werden in einem Cookie gespeichert
- * @class Editor.controller.Preferences
- * @extends Ext.app.Controller
+ * Abstract Base Tmmt Resources manager
+ * Not one instance per resource, but one instance providing data to all resources of one service
  */
-Ext.define('Editor.plugins.TmMtIntegration.controller.Controller', {
-  extend : 'Ext.app.Controller',
-  views: ['Editor.plugins.TmMtIntegration.view.TaskAssocPanel'],
-  refs: [{
-      ref: 'taskTabs',
-      selector: 'adminTaskPreferencesWindow > tabpanel'
-  }],
-  listen: {
-      component: {
-          'adminTaskPreferencesWindow': {
-              render: 'onParentRender'
-          }
-      }
-  },
-  /**
-   * inject the plugin tab and load the task meta data set
-   */
-  onParentRender: function(window) {
-      var me = this;
-      me.actualTask = window.actualTask;
-      me.getTaskTabs().add({xtype: 'tmMtIntegrationTaskAssocPanel', actualTask: me.actualTask});
-  }
-});
+abstract class editor_Plugins_TmMtIntegration_Services_ResourcesAbstract {
+    protected $resourceClass = 'editor_Plugins_TmMtIntegration_Models_Resource';
+    
+    protected $resources = array();
+    
+    /**
+     * To be overwritten
+     */
+    abstract public function __construct();
+    
+    /**
+     * Creates a new Resource instance and adds it to the interal list
+     * @param array $constructorArgs
+     */
+    protected function addResource(array $constructorArgs) {
+        $res = ZfExtended_Factory::get($this->resourceClass, $constructorArgs);
+        /* @var $res editor_Plugins_TmMtIntegration_Models_Resource */
+        $this->resources[] = $res;
+    }
+    
+    /**
+     * returns a list with connector instances, one per resource
+     * @return [editor_Plugins_TmMtIntegration_Models_Resource]
+     */
+    public function getResources(){
+        return $this->resources;
+    }
+    
+    /**
+     * returns the service namespace for later invocation
+     */
+    public function getServiceNamespace() {
+        $className = get_class($this);
+        $pos = strrpos($className, '_');
+        return substr($className, 0, $pos);
+    }
+}

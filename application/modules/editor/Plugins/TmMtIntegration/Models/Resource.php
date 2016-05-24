@@ -27,17 +27,51 @@ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception
 
 END LICENSE AND COPYRIGHT
 */
-class editor_Plugins_TmMtIntegration_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = 'editor_Plugins_TmMtIntegration_Models_Db_TmMt';
+class editor_Plugins_TmMtIntegration_Models_Resource {
+    /**
+     * name of the resource
+     * @var string
+     */
+    protected $name;
     
-    public function loadByAssociatedTask(editor_Models_Task $task) {
-        $assocDb = new editor_Plugins_TmMtIntegration_Models_Db_Taskassoc();
-        $assocName = $assocDb->info($assocDb::NAME);
-        $s = $this->db->select()
-            ->from($this->db, '*')
-            //->setIntegrityCheck(false)
-            ->join($assocName, $assocName.'.`tmmtId` = '.$this->db->info($assocDb::NAME).'.`id`', '')
-            ->where($assocName.'.`taskGuid` = ?', $task->getTaskGuid());
-        return $this->db->fetchAll($s)->toArray();
+    protected $filebased = false;
+    
+    protected $fieldsForController = array('id', 'name', 'filebased');
+    
+    public function __construct($id, $name, $filebased = false) {
+        $this->id = $id;
+        $this->name = $name;
+        $this->filebased = $filebased;
+    }
+    
+    public function getId() {
+        return $this->id;
+    }
+    
+    /**
+     * returns the resource name
+     */
+    public function getName() {
+        return $this->name;
+    }
+    
+    /**
+     * returns the resource name
+     */
+    public function getFilebased() {
+        return $this->filebased;
+    }
+    
+    /**
+     * returns the resource as stdClass data object for the ResourceController
+     * @return stdClass
+     */
+    public function getDataObject() {
+        $data = new stdClass();
+        foreach($this->fieldsForController as $key) {
+            $method = 'get'.ucfirst($key);
+            $data->$key = $this->$method();
+        }
+        return $data;
     }
 }

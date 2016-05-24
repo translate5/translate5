@@ -169,7 +169,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             array(
                 'module' => 'editor',
                 'controller' => 'index',
-                'action' => 'localizedjsstrings'
+                'action' => 'localizedjsstrings',
             ));
         $this->front->getRouter()->addRoute('editorLocalizedJs', $localizedJsRoute);
         

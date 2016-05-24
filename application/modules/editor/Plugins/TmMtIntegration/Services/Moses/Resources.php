@@ -1,4 +1,4 @@
-
+<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -28,37 +28,28 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
+/**#@+
  * @author Marc Mittag
  * @package editor
  * @version 1.0
  *
  */
 /**
- * Die Einstellungen werden in einem Cookie gespeichert
- * @class Editor.controller.Preferences
- * @extends Ext.app.Controller
+ * Moses Connector
  */
-Ext.define('Editor.plugins.TmMtIntegration.controller.Controller', {
-  extend : 'Ext.app.Controller',
-  views: ['Editor.plugins.TmMtIntegration.view.TaskAssocPanel'],
-  refs: [{
-      ref: 'taskTabs',
-      selector: 'adminTaskPreferencesWindow > tabpanel'
-  }],
-  listen: {
-      component: {
-          'adminTaskPreferencesWindow': {
-              render: 'onParentRender'
-          }
-      }
-  },
-  /**
-   * inject the plugin tab and load the task meta data set
-   */
-  onParentRender: function(window) {
-      var me = this;
-      me.actualTask = window.actualTask;
-      me.getTaskTabs().add({xtype: 'tmMtIntegrationTaskAssocPanel', actualTask: me.actualTask});
-  }
-});
+class editor_Plugins_TmMtIntegration_Services_Moses_Resources extends editor_Plugins_TmMtIntegration_Services_ResourcesAbstract {
+    protected $resourceClass = 'editor_Plugins_TmMtIntegration_Services_Moses_Resource';
+    
+    public function __construct() {
+        $config = '[{
+                "url": "http://www.translate5.net:8124"
+        }]';
+        $config = json_decode($config);
+        $i = 0;
+        $service = $this->getServiceNamespace();
+        foreach ($config as $resConf) {
+            $id = $service.'_'.$i++;
+            $this->addResource([$id, 'Moses MT', $resConf]);
+        }
+    }
+}

@@ -38,17 +38,53 @@ END LICENSE AND COPYRIGHT
  * Abstract Base Connector
  */
 abstract class editor_Plugins_TmMtIntegration_Connector_Abstract {
+    /**
+     * The name of the Resource
+     * @var string
+     */
+    protected $name;
+    
+    /**
+     * @var string
+     */
+    protected $sourceLanguage;
+    
+    /**
+     * @var array
+     */
+    protected $targetLanguages;
+    
     abstract public function __construct(stdClass $config);
     
     /**
      * returns a list with connector instances, one per resource
      */
-    abstract public static function createForAllResources();
+    public static function createForAllResources(){
+        //must be implemented in the subclass → FIXME bad design
+    }
+    
+    /**
+     * returns one connector instance to a given resource id
+     */
+    public static function createForResource(string $resourceId){
+        //must be implemented in the subclass → FIXME bad design
+    }
+    
     
     abstract public function synchronizeTmList();
     
     /**
      * returns the resource name
      */
-    abstract public function getName();
+    public function getName() {
+        return $this->name;
+    }
+    
+    /**
+     * Opens the desired Resource
+     * @param editor_Plugins_TmMtIntegration_Models_TmMt $tmmt
+     */
+    abstract public function open(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt);
+    
+    abstract public function translate(string $toTranslate);
 }

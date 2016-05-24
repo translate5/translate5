@@ -27,17 +27,23 @@ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception
 
 END LICENSE AND COPYRIGHT
 */
-class editor_Plugins_TmMtIntegration_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = 'editor_Plugins_TmMtIntegration_Models_Db_TmMt';
+class editor_Plugins_TmMtIntegration_Services_Moses_Resource extends editor_Plugins_TmMtIntegration_Models_Resource {
+    /**
+     * Moses instance URL
+     * @var string
+     */
+    protected $url;
     
-    public function loadByAssociatedTask(editor_Models_Task $task) {
-        $assocDb = new editor_Plugins_TmMtIntegration_Models_Db_Taskassoc();
-        $assocName = $assocDb->info($assocDb::NAME);
-        $s = $this->db->select()
-            ->from($this->db, '*')
-            //->setIntegrityCheck(false)
-            ->join($assocName, $assocName.'.`tmmtId` = '.$this->db->info($assocDb::NAME).'.`id`', '')
-            ->where($assocName.'.`taskGuid` = ?', $task->getTaskGuid());
-        return $this->db->fetchAll($s)->toArray();
+    public function __construct(string $id, string $name, stdClass $config) {
+        $this->url = $config->url;
+        parent::__construct($id, $name.' - '.$this->url);
+        $this->filebased = false; //forced to be no filebased
+    }
+    
+    /**
+     * returns the configured URL
+     */
+    public function getUrl() {
+        return $this->url;
     }
 }
