@@ -37,48 +37,22 @@ END LICENSE AND COPYRIGHT
 /**
  * Abstract Base Connector
  */
-abstract class editor_Plugins_TmMtIntegration_Connector_Abstract {
-    /**
-     * The name of the Resource
-     * @var string
-     */
-    protected $name;
+abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
+    protected $resource;
     
-    /**
-     * @var string
-     */
-    protected $sourceLanguage;
-    
-    /**
-     * @var array
-     */
-    protected $targetLanguages;
-    
-    abstract public function __construct(stdClass $config);
-    
-    /**
-     * returns a list with connector instances, one per resource
-     */
-    public static function createForAllResources(){
-        //must be implemented in the subclass → FIXME bad design
+    public function connectTo(editor_Plugins_TmMtIntegration_Models_Resource $resource) {
+        $this->resource = $resource;
     }
     
     /**
-     * returns one connector instance to a given resource id
+     * Adds the given file to the underlying system
+     * @param string $filename
+     * @param editor_Plugins_TmMtIntegration_Models_TmMt $tm
+     * @return boolean
      */
-    public static function createForResource(string $resourceId){
-        //must be implemented in the subclass → FIXME bad design
-    }
-    
+    abstract public function addTm(string $filename, editor_Plugins_TmMtIntegration_Models_TmMt $tm);
     
     abstract public function synchronizeTmList();
-    
-    /**
-     * returns the resource name
-     */
-    public function getName() {
-        return $this->name;
-    }
     
     /**
      * Opens the desired Resource

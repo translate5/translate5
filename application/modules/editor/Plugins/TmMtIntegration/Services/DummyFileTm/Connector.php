@@ -39,24 +39,34 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
     
+    protected $tm;
+    protected $uploadedFile;
+    
     public function __construct() {
-        $this->name = "Dummy Filebased MT";
+        $eventManager = Zend_EventManager_StaticEventManager::getInstance();
+        $eventManager->attach('editor_Plugins_TmMtIntegration_TmmtController', 'afterPostAction', array($this, 'handleAfterTmmtSaved'));
     }
     
     /**
-     * returns a list with connector instances, one per resource
-     * @return [editor_Plugins_TmMtIntegration_Connector_Moses]
+     * (non-PHPdoc)
+     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::addTm()
      */
-    public static function createForAllResources() {
-        return [ZfExtended_Factory::get(__CLASS__)];
+    public function addTm(string $filename, editor_Plugins_TmMtIntegration_Models_TmMt $tm){
+        $this->uploadedFile = $filename;
+        $this->tm = $tm;
+        //do nothing here, since we need the entity ID to save the TM
+        return true;
     }
     
     /**
-     * returns a list with connector instances, one per resource
-     * @return [editor_Plugins_TmMtIntegration_Connector_Moses]
+     * in our dummy file TM the TM can only be saved after the TM is in the DB, since the ID is needed for the filename
      */
-    public static function createForResource(string $resourceId) {
-        return ZfExtended_Factory::get(__CLASS__);
+    public function handleAfterTmmtSaved() {
+        move_uploaded_file($this->uploadedFile, $this->getTmFile($this->tm->getId()));
+    }
+    
+    protected function getTmFile($id) {
+        return APPLICATION_PATH.'/../data/dummyTm_'.$id;
     }
     
     public function synchronizeTmList() {
@@ -65,6 +75,7 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
     
     public function open(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
         error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getResourceName());
+        
     }
     
     public function translate(string $toTranslate) {

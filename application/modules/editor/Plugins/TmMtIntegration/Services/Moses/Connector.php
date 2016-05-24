@@ -38,38 +38,8 @@ END LICENSE AND COPYRIGHT
  * Moses Connector
  */
 class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plugins_TmMtIntegration_Connector_Abstract {
-    public function __construct(stdClass $config) {
-        $this->name = "Moses MT - ".$config->url;
-    }
-    
-    /**
-     * returns a list with connector instances, one per resource
-     * @return [editor_Plugins_TmMtIntegration_Connector_Moses]
-     */
-    public static function createForAllResources() {
-        //FIXME let me come from config:
-        $config = '[{
-                "url": "http://www.translate5.net:8124"
-        }]';
-        $config = json_decode($config);
-        $result = array();
-        foreach($config as $one) {
-            $result[] = ZfExtended_Factory::get(__CLASS__, array($one));
-        }
-        return $result;
-    }
-    
-    /**
-     * returns a list with connector instances, one per resource
-     * @return [editor_Plugins_TmMtIntegration_Connector_Moses]
-     */
-    public static function createForResource(string $resourceId) {
-        //FIXME load me come from config according to the resourceId
-        $config = '[{
-                "url": "http://www.translate5.net:8124"
-        }]';
-        $config = json_decode($config);
-        return ZfExtended_Factory::get(__CLASS__, array($config[0]));
+    public function addTm(string $filename, editor_Plugins_TmMtIntegration_Models_TmMt $tm){
+        throw new BadMethodCallException('This Service is not filebased and cannot handle uploaded files therefore!');
     }
     
     public function synchronizeTmList() {
