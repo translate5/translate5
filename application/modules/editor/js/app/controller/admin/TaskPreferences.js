@@ -76,6 +76,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       forAll: '#UT#für alle'
   },
   actualTask: null,
+  id: 'taskpreferences',
   init : function() {
       var me = this,
           toc = me.application.getController('admin.TaskOverview'),
@@ -240,6 +241,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       
       userAssocs.loadData([],false); //cleanup old contents
       userAssocs.load(tuaParams);
+      me.fireEvent('loadPreferences', tuaParams);
   },
   /**
    * Opens the Preferences to the choosen Task

@@ -365,9 +365,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           //Accept Header of submitted file uploads could not be changed:
           //http://stackoverflow.com/questions/13344082/fileupload-accept-header
           //so use format parameter jsontext here, for jsontext see REST_Controller_Action_Helper_ContextSwitch
-          params: {
+          
+    	  params: {
               format: 'jsontext'
           },
+          
           url: Editor.data.restpath+'task',
           scope: this,
           success: function(form, submit) {
