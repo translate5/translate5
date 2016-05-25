@@ -41,7 +41,8 @@ Ext.define('Editor.plugins.TmMtIntegration.view.TmOverviewPanel', {
     extend : 'Ext.panel.Panel',//'Ext.grid.Panel',
     alias: 'widget.TmOverviewPanel',
     itemId: 'tmOverviewPanel',
-    title: 'TM Overview',
+    title:'Tm Overview',
+    cls:'',
     height: '100%',
     layout: {
         type: 'fit'
@@ -52,6 +53,7 @@ Ext.define('Editor.plugins.TmMtIntegration.view.TmOverviewPanel', {
         	items :[{
         			xtype:'grid',
         			id:'gridTmOverview',
+        			cls:'gridTmOverview',
         			store : 'Editor.plugins.TmMtIntegration.store.TmMts',
         			title: me.title, //see EXT6UPD-9
 			        columns: [{
@@ -96,13 +98,13 @@ Ext.define('Editor.plugins.TmMtIntegration.view.TmOverviewPanel', {
 			                iconCls: 'ico-tm-edit'
 			            },{
 			                tooltip: 'Delete',
-			                iconCls: 'ico-cancel'
+			                iconCls: 'ico-tm-delete'
 			            }]
 			        },{
 			        	xtype: 'gridcolumn',
 			            width: 100,
 			         	text: 'Resource',
-			         	dataIndex: 'resourceType',
+			         	dataIndex: 'resourceName',
 			         	filter: {
 			                 type: 'string'
 			            }
@@ -112,7 +114,7 @@ Ext.define('Editor.plugins.TmMtIntegration.view.TmOverviewPanel', {
 			            dock: 'top',
 			            items: [{
 			                xtype: 'button',
-			                iconCls: 'ico-user-add',
+			                iconCls: 'ico-tm-add',
 			                itemId: 'btnAddTm',
 			                text: 'Add TM',
 			                hidden: ! Editor.app.authenticatedUser.isAllowed('editorAddUser'), 

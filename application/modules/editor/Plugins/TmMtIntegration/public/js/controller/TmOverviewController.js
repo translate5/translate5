@@ -36,7 +36,7 @@ END LICENSE AND COPYRIGHT
  */
 /**
  * Die Einstellungen werden in einem Cookie gespeichert
- * @class Editor.controller.Preferences
+ * @class Editor.controller.TmOverviewController
  * @extends Ext.app.Controller
  */
 Ext.define('Editor.plugins.TmMtIntegration.controller.TmOverviewController', {
@@ -62,6 +62,14 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.TmOverviewController', {
 	  }
 	],
   listen: {
+	  controller: {
+          '#Editor.$application': {
+              editorViewportClosed: 'showButtonTmOverview'
+          },
+          '#Editor.$application':{
+        	  editorViewportOpened:'hideButtonTmOverview'
+          }
+      },
       component: {
           '#btnTmOverviewWindow': {
               click: 'handleOnButtonClick'
@@ -82,6 +90,9 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.TmOverviewController', {
           },
           '#gridTmOverview actioncolumn':{
         	  click:'handleTmGridActionColumnClick'
+          },
+          '#tmOverviewPanel #btnRefresh':{
+        	  click:'handleButtonRefreshClick'
           }
       }
   },
@@ -90,6 +101,12 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.TmOverviewController', {
   },
   handleAfterHide: function() {
       this.getHeadToolBar().down('#btnTmOverviewWindow').show();
+  },
+  hideButtonTmOverview : function(){
+	  this.getHeadToolBar().down('#btnTmOverviewWindow').hide();
+  },
+  showButtonTmOverview : function(){
+	  this.getHeadToolBar().down('#btnTmOverviewWindow').show();
   },
   /**
    * inject the plugin tab and load the task meta data set
@@ -114,7 +131,7 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.TmOverviewController', {
   handleOnButtonClick: function(window) {
       
       var me = this,
-      grid = me.getTmOverviewPanel();
+      panel = me.getTmOverviewPanel();
       
       me.actualTask = window.actualTask;
       
@@ -124,44 +141,78 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.TmOverviewController', {
           item.hide();
       });
       
-      if(grid) {
-          grid.show();
+      if(panel) {
+    	  panel.show();
       }else {									
     	  me.getCenterRegion().add({xtype: 'TmOverviewPanel'}).show();
     	  me.handleAfterShow();
       }
   },
   handleOnAddTmClick : function(){
-      var win = Ext.widget('addTmWindow');
+      var win = Ext.widget('addTmWindow',{editMode: false});
       win.show();
+  },
+  handleButtonRefreshClick : function(){
+	  Ext.getCmp('gridTmOverview').getStore().load();
+      Editor.MessageBox.addSuccess('Success!');
   },
   handleSaveWindowClick:function(){
 	  var me = this;
-
+	  var form = this.getTmForm();
 	  var win = me.getTmWindow();
-	  this.getTmForm().submit({
-          params: {
-              format: 'jsontext'
-          },
-          url: Editor.data.restpath+'plugins_tmmtintegration_tmmt',
-          scope: this,
-          success: function(form, submit) {
-        	  Ext.getCmp('gridTmOverview').getStore().load();
-              win.setLoading(false);
-        	  this.getTmWindow().close();
-          },
-          failure: function(form, submit) {
-              win.setLoading(false);
-              alert('Error');
-          }
-	  });
+	  
+	  if(!form.isValid())
+		  return;
+		  
+	  if(win.editMode){
+		  var f = form.getForm();
+		  var record = form.getRecord();
+		  
+		  record.reject();
+		  f.updateRecord(record);
+		 
+	     record.save({
+		  failure: function() {
+			 alert('fail');
+	      },
+	      success: function() {
+			   Ext.getCmp('gridTmOverview').getStore().load();
+			   win.setLoading(false);
+			   win.close();
+	           Editor.MessageBox.addSuccess('Success!');
+	      }
+		});
+		 return;
+	  }
+	  form.submit({
+				  
+				  //if editMode:
+				  // method = PUT instead of POST // is working the file upload PUR request?
+				  // provide the ID of the record in the URL with /ID
+				  
+			params: {
+			    format: 'jsontext'
+			},
+			url: Editor.data.restpath+'plugins_tmmtintegration_tmmt',
+			scope: this,
+			success: function(form, submit) {
+			   Ext.getCmp('gridTmOverview').getStore().load();
+			   win.setLoading(false);
+			   this.getTmWindow().close();
+			   },
+			failure: function(form, submit) {
+			   win.setLoading(false);
+			   alert('Error');
+			}
+	   });
   },
   handleCancelWindowClick:function(){
 	  this.getTmForm().getForm().reset();
       this.getTmWindow().close();
   },
   handleEditTm : function(view, cell, cellIdx, rec){
-	  var win = Ext.widget('addTmWindow');
+	  var win = Ext.widget('addTmWindow',{editMode: true});
+	  win.loadRecord(rec);
       win.show();
   },
   handleTmGridActionColumnClick:function(view, cell, row, col, ev, evObj) {
@@ -171,7 +222,6 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.TmOverviewController', {
       t = ev.getTarget(),
       msg = me.strings,
       info,
-      taskStore = Ext.StoreMgr.get('admin.Tasks'),
       f = t.className.match(/ico-tm-([^ ]+)/);
   
 	  switch(f && f[1] || '') {
@@ -179,12 +229,8 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.TmOverviewController', {
 	          me.handleEditTm(view,cell,col,selectedRow);
 	          break;
 	      case 'delete':
-	    	  /*
-	          if(!me.isAllowed('editorDeleteUser')) {
-	              return;
-	          }
-	          info = Ext.String.format(msg.confirmDeleteMsg,selectedRow.get('firstName')+' '+selectedRow.get('surName'));
-	          Ext.Msg.confirm(msg.confirmDeleteTitle, info, function(btn){
+	          info = Ext.String.format('Confirm delete ?',selectedRow.get('name'));
+	          Ext.Msg.confirm('Confirm Delete', info, function(btn){
 	              if(btn == 'yes') {
 	            	  selectedRow.dropped = true;
 	            	  selectedRow.save({
@@ -192,13 +238,12 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.TmOverviewController', {
 	                    	  selectedRow.reject();
 	                      },
 	                      success: function() {
-	                          taskStore && taskStore.load();
+	                    	  store && store.load();
 	                          store.remove(selectedRow);
 	                      }
 	                  });
 	              }
 	          });
-	          */
 	          break;
 	  }
   }

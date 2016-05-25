@@ -34,11 +34,11 @@ Ext.define('Editor.plugins.TmMtIntegration.view.AddTmWindow', {
     alias : 'widget.addTmWindow',
     itemId : 'addTmWindow',
     cls : 'addTmWindow',
-    title : 'Add TM',
-    height : 500,
+    height : 300,
     width : 500,
     modal : true,
     layout:'fit',
+    editMode:false,
     initComponent: function() {
         var me = this;
         me.callParent(arguments);
@@ -60,7 +60,7 @@ Ext.define('Editor.plugins.TmMtIntegration.view.AddTmWindow', {
                 anchor: '100%'
             },
         config = {
-            title: me.title, //see EXT6UPD-9
+            title: 'Add TM',
             items : [{
                 xtype: 'form',
                 id:'addTmForm',
@@ -68,13 +68,8 @@ Ext.define('Editor.plugins.TmMtIntegration.view.AddTmWindow', {
                 ui: 'default-frame',
                 defaults: defaults,
                 items: [{
-                    xtype: 'fieldset',
-                    defaults: defaults,
-                    title:'Language',
-                    items:[{
                     	xtype: 'textfield',
                         name: 'name',
-                        id:'name',
                         maxLength: 255,
                         allowBlank: false,
                         toolTip:'Name',
@@ -93,19 +88,17 @@ Ext.define('Editor.plugins.TmMtIntegration.view.AddTmWindow', {
                         //each combo needs its own store instance, see EXT6UPD-8
                         store:Ext.create(Editor.store.admin.Languages),
                         fieldLabel: 'Target Language'
-                    }, langCombo),{
+                    }, langCombo),
+                    {
                         xtype: 'combo',
-                        id:'resourceId',
                         name:'resourceId',
+                        dataIndex:'resourceId',
+                        disabled : instanceConfig.editMode,
                         typeAhead: true,
                         forceSelection: true,
                         queryMode: 'local',
                         listeners: {
-                            select: function(combo, record, index) {
-                            	Ext.getCmp('importUpload').setDisabled(record.get('filebased'));
-                            	Ext.getCmp('resourceType').setValue(record.get('resourceType'));
-                            	Ext.getCmp('resourceName').setValue(record.get('resourceName'));
-                            }
+                            select: me.serviceSelect
                         },
                         valueField: 'id',
                         displayField: 'name',
@@ -114,7 +107,6 @@ Ext.define('Editor.plugins.TmMtIntegration.view.AddTmWindow', {
                     },{
                     	xtype: 'hiddenfield',
                         name: 'resourceType',
-                        id:'resourceType',
                         maxLength: 255,
                         allowBlank: false,
                         toolTip:'Resource Type',
@@ -122,44 +114,27 @@ Ext.define('Editor.plugins.TmMtIntegration.view.AddTmWindow', {
                     },{
                     	xtype: 'hiddenfield',
                         name: 'resourceName',
-                        id:'resourceName',
                         maxLength: 255,
                         allowBlank: false,
                         toolTip:'Resource Name',
                         fieldLabel: 'Resource Name'
-                    }]
-                },{
-                	xtype: 'fieldset',
-                    //defaults: defaults,
-                    title:'Color picker',
-                    items:[{
-                    	xtype:'colorbutton',
-                        name: 'resource',
-                        toolTip: 'Pick Color',
-                        listeners: {
-                            select: function(picker, selColor) {
-                                Ext.getCmp('color').setValue(selColor)
-                            }
-                        }
-                    },{
-                    	xtype: 'textfield',
-                    	name:'color',
-                        id: 'color',
-                        maxLength: 10,
-                        fieldLabel:'Selected Color'
-                    }]
-                },{
-                    xtype: 'filefield',
-                    name: 'importUpload',
-                    id:'importUpload',
-                    regex: /\.(zip|sdlxliff|xlf|csv|testcase)$/i,
-                    regexText: 'Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF; Angabe notwendig)',
-                    allowBlank: false,
-                    toolTip: 'Add File',
-                    disabled:false,
-                    fieldLabel: 'Add File'
-                  }]
-            }],
+	                },{
+	                    xtype: 'colorfield',
+	                    fieldLabel: 'Color Field',
+	                    labelWidth: 160,
+	                    anchor: '100%',
+	                    name: 'color'                	
+	                },{
+	                    xtype: 'filefield',
+	                    name: 'tmUpload',
+	                    //regex: /\.(zip|sdlxliff|xlf|csv|testcase)$/i,
+	                    //regexText: 'Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF; Angabe notwendig)',
+	                    allowBlank: false,
+	                    toolTip: 'Add File',
+	                    disabled:instanceConfig.editMode,
+	                    fieldLabel: 'Add File'
+	                  }]
+	            }],
             dockedItems : [{
                 xtype : 'toolbar',
                 dock : 'bottom',
@@ -189,27 +164,16 @@ Ext.define('Editor.plugins.TmMtIntegration.view.AddTmWindow', {
         return me.callParent([config]);
     },
     /**
-     * merge and save the checked roles into the hidden roles field
-     * @param {Ext.form.field.Checkbox} box
-     * @param {Boolean} checked
-     */
-    roleCheckChange: function(box, checked) {
-        var roles = [],
-            boxes = box.up('#rolesGroup').query('checkbox[checked=true]');
-        Ext.Array.forEach(boxes, function(box){
-            roles.push(box.initialConfig.value);
-        });
-        box.up('form').down('hidden[name="roles"]').setValue(roles.join(','));
-    },
-    /**
      * loads the record into the form, does set the role checkboxes according to the roles value
      * @param record
      */
     loadRecord: function(record) {
-        var roles = record.get('roles').split(',');
         this.down('form').loadRecord(record);
-        Ext.Array.forEach(this.query('#rolesGroup checkbox'), function(item) {
-            item.setValue(Ext.Array.indexOf(roles, item.initialConfig.value) >= 0);
-        });
+    },
+    serviceSelect:function(combo, record, index){
+    	var me = Ext.getCmp('addTmForm');
+    	me.down('filefield').setDisabled(!record.get('filebased'));
+    	me.down('hiddenfield[name="resourceType"]').setValue(record.get('resourceType'));
+    	me.down('hiddenfield[name="resourceName"]').setValue(record.get('resourceName'));
     }
 });

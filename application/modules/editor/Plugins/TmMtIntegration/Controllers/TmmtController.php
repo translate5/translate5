@@ -89,4 +89,10 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
         $e->setErrors($errors);
         throw $e;
     }
+    
+    public function deleteAction(){        
+        $this->entityLoad();
+        //$this->processClientReferenceVersion();
+        $this->entity->delete();
+    }
 }
