@@ -53,7 +53,7 @@ class editor_Plugins_TmMtIntegration_Services_Moses_Service extends editor_Plugi
                 "url": "http://www.translate5.net:8124"
         }]';
         $config = json_decode($config);
-        $i = 0;
+        $i = 1;
         $service = $this->getServiceNamespace();
         foreach ($config as $resConf) {
             $id = $service.'_'.$i++;

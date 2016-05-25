@@ -37,7 +37,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Moses Connector
  */
-class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plugins_TmMtIntegration_Connector_Abstract {
+class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
     public function addTm(string $filename, editor_Plugins_TmMtIntegration_Models_TmMt $tm){
         throw new BadMethodCallException('This Service is not filebased and cannot handle uploaded files therefore!');
     }

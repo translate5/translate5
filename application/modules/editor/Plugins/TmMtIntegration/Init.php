@@ -41,6 +41,7 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
      */
     protected $frontendControllers = array(
         'Editor.plugins.TmMtIntegration.controller.Controller',
+        'Editor.plugins.TmMtIntegration.controller.QueryController',
         'Editor.plugins.TmMtIntegration.controller.TmOverviewController',
     );
     
@@ -59,7 +60,7 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
      * @param Zend_EventManager_Event $event
      */
     public function handleAfterTaskOpen(Zend_EventManager_Event $event) {
-        $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Connector_Manager');
+        $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
         /* @var $manager editor_Plugins_TmMtIntegration_Connector_Manager */
         $manager->openForTask($event->getParam('task'));
     }
@@ -69,7 +70,7 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
      * @param Zend_EventManager_Event $event
      */
     public function handleAfterTaskClose(Zend_EventManager_Event $event) {
-        $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Connector_Manager');
+        $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
         /* @var $manager editor_Plugins_TmMtIntegration_Connector_Manager */
         $manager->closeForTask($event->getParam('task'));
     }
@@ -79,7 +80,11 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
         $f->addControllerDirectory(APPLICATION_PATH.'/'.$this->getPluginPath().'/Controllers', '_plugins');
         
         $restRoute = new Zend_Rest_Route($f, array(), array(
-                'editor' => array('plugins_tmmtintegration_taskassoc', 'plugins_tmmtintegration_tmmt', 'plugins_tmmtintegration_resource'),
+                'editor' => array('plugins_tmmtintegration_taskassoc',
+                                  'plugins_tmmtintegration_tmmt',
+                                  'plugins_tmmtintegration_resource',
+                                  'plugins_tmmtintegration_query',
+                ),
         ));
         $f->getRouter()->addRoute('plugins_tmmtintegration_restdefault', $restRoute);
         
