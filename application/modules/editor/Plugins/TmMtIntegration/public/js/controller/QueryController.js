@@ -64,7 +64,7 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.QueryController', {
                       type: 'query', //query => mtmatch | search => concorance,
                       //segmentId: segment Id for reference, 
                       query: "string to query, if omitted load above segment and get content from there",
-                      tmmtId: 3
+                      tmmtId: 5
                       //taskGuid: me.actualTask.get('taskGuid')
                   })
               },

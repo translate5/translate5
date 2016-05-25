@@ -32,4 +32,5 @@ class editor_Plugins_TmMtIntegration_Models_QueryData {
     public $service;
     public $query;
     public $type;
+    public $tmmtId;
 }

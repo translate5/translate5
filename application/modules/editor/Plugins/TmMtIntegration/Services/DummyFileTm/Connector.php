@@ -36,6 +36,13 @@ END LICENSE AND COPYRIGHT
  */
 /**
  * Moses Connector
+ *
+ * The dummy CSV file must be:
+ * , separated
+ * " as enclosure
+ * "" as escape
+ * This should be the CSV defaults.
+ * The first column must be an id, the second the source and the theird column the target values. Other columns are ignored.
  */
 class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
 
@@ -77,9 +84,8 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
      * (non-PHPdoc)
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::open()
      */
-    public function open(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
-        error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getResourceName());
-
+    public function openForQuery(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
+        $this->tm = $tmmt;
     }
 
     /**
@@ -87,8 +93,32 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::query()
      */
     public function query(string $queryString) {
-        error_log("queried: ".$queryString);
-        $result = array("foo", "bar");
+        $file = new SplFileInfo($this->getTmFile($this->tm->getId()));
+        if(!$file->isFile() || !$file->isReadable()) {
+            throw new ZfExtended_NotFoundException('requested TM file for dummy TM with the tmmtId '.$this->tm->getId().' not found!');
+        }
+
+        $file = $file->openFile();
+
+        $result = array();
+        $i = 0;
+        while($line = $file->fgetcsv(",", '"', '"')) {
+            if($i++ == 0 || empty($line) || empty($line[0]) || empty($line[1])){
+                continue;
+            }
+
+            similar_text(strip_tags($queryString), strip_tags($line[1]), $percent);
+
+            if($percent < 80) {
+                continue;
+            }
+            $data = new stdClass();
+            $data->source = strip_tags($line[1]);
+            $data->target = strip_tags($line[2]);
+            $data->matchrate = $percent;
+            $result[] = $data;
+        }
+
         return $result;
     }
 
@@ -98,5 +128,25 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
      */
     public function search(string $searchString) {
         return $this->query($searchString);
+    }
+
+    //
+    // Abstract Methods, to be implemented but not needed by this type of Service:
+    //
+/**
+     * (non-PHPdoc)
+     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::open()
+     */
+    public function open(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
+        error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getResourceName());
+    }
+
+    /**
+     * (non-PHPdoc)
+     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::close()
+     */
+    public function close(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
+        error_log("Closed Tmmt ".$tmmt->getName().' - '.$tmmt->getResourceName());
+
     }
 }

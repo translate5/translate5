@@ -55,10 +55,23 @@ abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
     abstract public function synchronizeTmList();
 
     /**
-     * Opens the desired Resource
+     * Opens the desired TM on the configured Resource (on task open, not on each request)
      * @param editor_Plugins_TmMtIntegration_Models_TmMt $tmmt
      */
     abstract public function open(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt);
+
+    /**
+     * Closes the desired TM on the configured Resource (on task close, not after each request)
+     * @param editor_Plugins_TmMtIntegration_Models_TmMt $tmmt
+     */
+    abstract public function close(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt);
+
+    /**
+     * opens a tm for a concrete query / search request, called before each request
+     * @param string $queryString
+     * @return array
+     */
+    abstract public function openForQuery(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt);
 
     /**
      * makes a tm / mt / file query to find a match / translation

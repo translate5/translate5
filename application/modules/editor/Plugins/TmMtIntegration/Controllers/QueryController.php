@@ -66,8 +66,13 @@ class editor_Plugins_TmMtIntegration_QueryController extends ZfExtended_RestCont
         //enable getting tasks tmmt workers
     }
 
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::postAction()
+     *
+     * Query POST creates and starts the worker call. As ID the worker ID is delivered.
+     */
     public function postAction() {
-        error_log(print_r($_POST,1));
         $session = new Zend_Session_Namespace();
         $this->decodePutData();
 
@@ -78,6 +83,7 @@ class editor_Plugins_TmMtIntegration_QueryController extends ZfExtended_RestCont
         $workerData = new editor_Plugins_TmMtIntegration_Models_QueryData();
         $workerData->type = $this->data->type;
         $workerData->query = $this->data->query;
+        $workerData->tmmtId = $tmmt->getId();
         $workerData->service = $tmmt->getService();
         $workerData->resourceId = $tmmt->getResourceId();
 
@@ -87,8 +93,13 @@ class editor_Plugins_TmMtIntegration_QueryController extends ZfExtended_RestCont
         //enable posting tmmt workers tasks tmmt workers
         $worker->run();
 
-        //FIXME make the result
-        $this->view->rows = $this->entity->getDataObject();
+        $result = new stdClass();
+        $result->id = $worker->getModel()->getId();
+        $result->state = $worker->getModel()->getState();
+
+        $result->result = $worker->getResult();
+
+        $this->view->rows = $result;
     }
 }
 

@@ -50,6 +50,14 @@ class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plu
         error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getResourceName());
     }
 
+    public function close(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
+        error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getResourceName());
+    }
+
+    public function openForQuery(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
+        error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getResourceName());
+    }
+
     public function query(string $queryString) {
         $rpc = new Zend_XmlRpc_Client("http://www.translate5.net:8124/RPC2");
         try {

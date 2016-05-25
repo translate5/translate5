@@ -36,9 +36,8 @@ class editor_Plugins_TmMtIntegration_Models_Worker extends ZfExtended_Worker_Abs
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        error_log(print_r($parameters,1));
         $workerData = $parameters['workerData'];
-        $toCheck = ['query','resourceId', 'service', 'type'];
+        $toCheck = ['query','resourceId', 'service', 'type', 'tmmtId'];
         foreach($toCheck as $field) {
             if(empty($workerData->$field)) {
                 error_log('Missing Parameter "'.$field.'" in '.__CLASS__);
@@ -58,7 +57,11 @@ class editor_Plugins_TmMtIntegration_Models_Worker extends ZfExtended_Worker_Abs
      * @see ZfExtended_Worker_Abstract::run()
      */
     public function run() {
-        return parent::run();
+        $res = parent::run();
+        if(!empty($this->workerException)) {
+            throw $this->workerException;
+        }
+        return $res;
     }
 
     /**
@@ -77,48 +80,27 @@ class editor_Plugins_TmMtIntegration_Models_Worker extends ZfExtended_Worker_Abs
         $resource = $manager->getResourceById($workerData->service, $workerData->resourceId);
 
         $connector = $manager->getConnector($workerData->service, $resource);
-        /* @var $connector  */
+        /* @var $connector editor_Plugins_TmMtIntegration_Services_ConnectorAbstract */
+
+        $tmmt = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Models_TmMt');
+        /* @var $tmmt editor_Plugins_TmMtIntegration_Models_TmMt */
+        $tmmt->load($workerData->tmmtId);
+
+        //set the tmmt to be queried
+        $connector->openForQuery($tmmt);
 
         switch ($workerData->type) {
             case self::TYPE_QUERY:
-                $connector->query((string) $workerData->query);
+                $this->result = $connector->query((string) $workerData->query);
                 break;
             case self::TYPE_SEARCH:
-                $connector->search((string) $workerData->query);
+                $this->result = $connector->search((string) $workerData->query);
                 break;
             default:
                 $this->log->logError('Wrong connector query type given');
                 return false;
         }
 
-        error_log("WORK");
-        return true;
-
-        if (empty($this->serverCommunication)) {
-            return false;
-        }
-
-        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
-        /* @var $termTagger editor_Plugins_TermTagger_Service */
-
-        try {
-            $this->checkTermTaggerTbx($this->workerModel->getSlot(), $this->serverCommunication->tbxFile);
-            $result = $termTagger->tagterms($this->workerModel->getSlot(), $this->serverCommunication);
-        }
-        catch(editor_Plugins_TermTagger_Exception_Abstract $exception) {
-            $result = '';
-            $url = $this->workerModel->getSlot();
-            $exception->setMessage('TermTagger '.$url.' (task '.$this->taskGuid.') could not tag segments! Reason: '."\n".$exception->getMessage(), false);
-            $this->log->logException($exception);
-        }
-
-        // on error return false and store original untagged data
-        if (empty($result)) {
-            return false;
-        }
-        $this->result = $result->segments;
-        $this->result = $this->markTransFound($this->result);
         return true;
     }
-
 }
