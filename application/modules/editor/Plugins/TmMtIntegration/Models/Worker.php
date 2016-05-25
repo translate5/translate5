@@ -28,6 +28,8 @@ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception
 END LICENSE AND COPYRIGHT
 */
 class editor_Plugins_TmMtIntegration_Models_Worker extends ZfExtended_Worker_Abstract {
+    const TYPE_QUERY = 'query'; //tm match or mt query
+    const TYPE_SEARCH = 'search'; //concordance search
 
     /**
      * (non-PHPdoc)
@@ -35,17 +37,21 @@ class editor_Plugins_TmMtIntegration_Models_Worker extends ZfExtended_Worker_Abs
      */
     protected function validateParameters($parameters = array()) {
         error_log(print_r($parameters,1));
-        if(empty($parameters['query'])) {
-            error_log('Missing Parameter "query" in '.__CLASS__);
-            return false;
+        $workerData = $parameters['workerData'];
+        $toCheck = ['query','resourceId', 'service', 'type'];
+        foreach($toCheck as $field) {
+            if(empty($workerData->$field)) {
+                error_log('Missing Parameter "'.$field.'" in '.__CLASS__);
+                return false;
+            }
         }
-        if(empty($parameters['tmmtId'])) {
-            error_log('Missing Parameter "tmmtId" in '.__CLASS__);
+        if(!in_array($workerData->type, [self::TYPE_QUERY, self::TYPE_SEARCH])) {
+            error_log('Wrong value '.$workerData->type.' for parameter "type" in '.__CLASS__);
             return false;
         }
         return true;
     }
-    
+
     /**
      * (non-PHPdoc)
      *
@@ -61,25 +67,40 @@ class editor_Plugins_TmMtIntegration_Models_Worker extends ZfExtended_Worker_Abs
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
-        
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($this->taskGuid);
-        
+
+        $parameters = $this->workerModel->getParameters();
+        $workerData = $parameters['workerData'];
+        /* @var $workerData editor_Plugins_TmMtIntegration_Models_QueryData */
+
         $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
         /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
-        $manager->getResourceById($serviceType, $id);
-        
+        $resource = $manager->getResourceById($workerData->service, $workerData->resourceId);
+
+        $connector = $manager->getConnector($workerData->service, $resource);
+        /* @var $connector  */
+
+        switch ($workerData->type) {
+            case self::TYPE_QUERY:
+                $connector->query((string) $workerData->query);
+                break;
+            case self::TYPE_SEARCH:
+                $connector->search((string) $workerData->query);
+                break;
+            default:
+                $this->log->logError('Wrong connector query type given');
+                return false;
+        }
+
         error_log("WORK");
         return true;
-        
+
         if (empty($this->serverCommunication)) {
             return false;
         }
-        
+
         $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
         /* @var $termTagger editor_Plugins_TermTagger_Service */
-        
+
         try {
             $this->checkTermTaggerTbx($this->workerModel->getSlot(), $this->serverCommunication->tbxFile);
             $result = $termTagger->tagterms($this->workerModel->getSlot(), $this->serverCommunication);
@@ -90,7 +111,7 @@ class editor_Plugins_TmMtIntegration_Models_Worker extends ZfExtended_Worker_Abs
             $exception->setMessage('TermTagger '.$url.' (task '.$this->taskGuid.') could not tag segments! Reason: '."\n".$exception->getMessage(), false);
             $this->log->logException($exception);
         }
-        
+
         // on error return false and store original untagged data
         if (empty($result)) {
             return false;
@@ -99,5 +120,5 @@ class editor_Plugins_TmMtIntegration_Models_Worker extends ZfExtended_Worker_Abs
         $this->result = $this->markTransFound($this->result);
         return true;
     }
-    
+
 }

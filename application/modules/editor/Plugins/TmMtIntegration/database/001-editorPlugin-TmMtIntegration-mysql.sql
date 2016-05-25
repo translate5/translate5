@@ -51,7 +51,7 @@ CREATE TABLE `LEK_tmmtintegration_taskassoc` (
 insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_tmmtintegration_tmmt', 'all');
 insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_tmmtintegration_resource', 'all');
 insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_tmmtintegration_taskassoc', 'all');
-insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_tmmtintegration_request', 'all');
+insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_tmmtintegration_query', 'all');
 
 INSERT INTO `Zf_configuration` (`id`, `name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES (NULL, 'runtimeOptions.worker.editor_Plugins_TmMtIntegration_Models_Worker.maxParallelWorkers', '1', 'editor', 'worker', '10', '10', '', 'integer', 'Max parallel running workers of TMMT Integeration query worker');

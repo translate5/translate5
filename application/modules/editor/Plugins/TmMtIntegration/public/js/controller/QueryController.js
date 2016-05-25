@@ -61,7 +61,7 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.QueryController', {
               method: "POST",
               params: {
                   data: Ext.JSON.encode({
-                      //type: concordance|mtmatch,
+                      type: 'query', //query => mtmatch | search => concorance,
                       //segmentId: segment Id for reference, 
                       query: "string to query, if omitted load above segment and get content from there",
                       tmmtId: 3

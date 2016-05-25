@@ -3,14 +3,14 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2015 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3.0 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
 
@@ -19,7 +19,7 @@ START LICENSE AND COPYRIGHT
  Please see Open Source License Exception for Development of Plugins for translate5
  http://www.translate5.net/plugin-exception.txt or as plugin-exception.txt in the root
  folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execptions
@@ -38,15 +38,15 @@ END LICENSE AND COPYRIGHT
  * Moses Connector
  */
 class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
-    
+
     protected $tm;
     protected $uploadedFile;
-    
+
     public function __construct() {
         $eventManager = Zend_EventManager_StaticEventManager::getInstance();
         $eventManager->attach('editor_Plugins_TmMtIntegration_TmmtController', 'afterPostAction', array($this, 'handleAfterTmmtSaved'));
     }
-    
+
     /**
      * (non-PHPdoc)
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::addTm()
@@ -57,37 +57,46 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
         //do nothing here, since we need the entity ID to save the TM
         return true;
     }
-    
+
     /**
      * in our dummy file TM the TM can only be saved after the TM is in the DB, since the ID is needed for the filename
      */
     public function handleAfterTmmtSaved() {
         move_uploaded_file($this->uploadedFile, $this->getTmFile($this->tm->getId()));
     }
-    
+
     protected function getTmFile($id) {
         return APPLICATION_PATH.'/../data/dummyTm_'.$id;
     }
-    
+
     public function synchronizeTmList() {
         //read file list
     }
-    
+
+    /**
+     * (non-PHPdoc)
+     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::open()
+     */
     public function open(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
         error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getResourceName());
-        
+
     }
-    
-    public function translate(string $toTranslate) {
-        $rpc = new Zend_XmlRpc_Client("http://www.translate5.net:8124/RPC2");
-        try {
-            
-            $rpc->call('translate', array('text' => 'es ist ein kleines haus'));
-        }
-        catch(Exception $e) {
-            error_log($e);
-        }
-        //error_log("Translate ".$toTranslate);
-        //error_log("Translated ".$toTranslate);
+
+    /**
+     * (non-PHPdoc)
+     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::query()
+     */
+    public function query(string $queryString) {
+        error_log("queried: ".$queryString);
+        $result = array("foo", "bar");
+        return $result;
+    }
+
+    /**
+     * (non-PHPdoc)
+     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::search()
+     */
+    public function search(string $searchString) {
+        return $this->query($searchString);
     }
 }
