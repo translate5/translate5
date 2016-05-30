@@ -68,6 +68,21 @@ Ext.define('Editor.plugins.TmMtIntegration.view.AddTmWindow', {
                 ui: 'default-frame',
                 defaults: defaults,
                 items: [{
+	                	xtype: 'combo',
+	                    name:'resourceId',
+	                    dataIndex:'resourceId',
+	                    disabled : instanceConfig.editMode,
+	                    typeAhead: true,
+	                    forceSelection: true,
+	                    queryMode: 'local',
+	                    listeners: {
+	                        select: me.serviceSelect
+	                    },
+	                    valueField: 'id',
+	                    displayField: 'name',
+	                    store:'Editor.plugins.TmMtIntegration.store.Resources',
+	                    fieldLabel: 'Resource'
+                	},{
                     	xtype: 'textfield',
                         name: 'name',
                         maxLength: 255,
@@ -90,34 +105,17 @@ Ext.define('Editor.plugins.TmMtIntegration.view.AddTmWindow', {
                         fieldLabel: 'Target Language'
                     }, langCombo),
                     {
-                        xtype: 'combo',
-                        name:'resourceId',
-                        dataIndex:'resourceId',
-                        disabled : instanceConfig.editMode,
-                        typeAhead: true,
-                        forceSelection: true,
-                        queryMode: 'local',
-                        listeners: {
-                            select: me.serviceSelect
-                        },
-                        valueField: 'id',
-                        displayField: 'name',
-                        store:'Editor.plugins.TmMtIntegration.store.Resources',
-                        fieldLabel: 'Resources'
+                    	xtype: 'hiddenfield',
+                        name: 'serviceType',
+                        dataIndex: 'serviceType',
+                        maxLength: 255,
+                        allowBlank: false
                     },{
                     	xtype: 'hiddenfield',
-                        name: 'resourceType',
+                        name: 'serviceName',
+                        dataIndex: 'serviceName',
                         maxLength: 255,
-                        allowBlank: false,
-                        toolTip:'Resource Type',
-                        fieldLabel: 'Resource Type'
-                    },{
-                    	xtype: 'hiddenfield',
-                        name: 'resourceName',
-                        maxLength: 255,
-                        allowBlank: false,
-                        toolTip:'Resource Name',
-                        fieldLabel: 'Resource Name'
+                        allowBlank: false
 	                },{
 	                    xtype: 'colorfield',
 	                    fieldLabel: 'Color Field',
@@ -131,7 +129,7 @@ Ext.define('Editor.plugins.TmMtIntegration.view.AddTmWindow', {
 	                    //regexText: 'Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF; Angabe notwendig)',
 	                    allowBlank: false,
 	                    toolTip: 'Add File',
-	                    disabled:instanceConfig.editMode,
+	                    disabled:true,
 	                    fieldLabel: 'Add File'
 	                  }]
 	            }],
@@ -173,7 +171,7 @@ Ext.define('Editor.plugins.TmMtIntegration.view.AddTmWindow', {
     serviceSelect:function(combo, record, index){
     	var me = Ext.getCmp('addTmForm');
     	me.down('filefield').setDisabled(!record.get('filebased'));
-    	me.down('hiddenfield[name="resourceType"]').setValue(record.get('resourceType'));
-    	me.down('hiddenfield[name="resourceName"]').setValue(record.get('resourceName'));
+    	me.down('hiddenfield[name="serviceType"]').setValue(record.get('serviceType'));
+    	me.down('hiddenfield[name="serviceName"]').setValue(record.get('serviceName'));
     }
 });

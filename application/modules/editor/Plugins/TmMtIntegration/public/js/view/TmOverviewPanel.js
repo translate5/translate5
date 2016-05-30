@@ -104,7 +104,7 @@ Ext.define('Editor.plugins.TmMtIntegration.view.TmOverviewPanel', {
 			        	xtype: 'gridcolumn',
 			            width: 100,
 			         	text: 'Resource',
-			         	dataIndex: 'resourceName',
+			         	dataIndex: 'serviceName',
 			         	filter: {
 			                 type: 'string'
 			            }

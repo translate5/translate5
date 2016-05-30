@@ -48,8 +48,8 @@ class editor_Plugins_TmMtIntegration_Models_Resource {
     protected $fieldsForController = array(
             'id' => 'id',
             'name' => 'name',
-            'resourceName' => 'service',
-            'resourceType' => 'serviceType',
+            'serviceName' => 'service',
+            'serviceType' => 'serviceType',
             'filebased' => 'filebased'
     );
     

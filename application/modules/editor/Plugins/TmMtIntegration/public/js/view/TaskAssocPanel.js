@@ -49,20 +49,25 @@ Ext.define('Editor.plugins.TmMtIntegration.view.TaskAssocPanel', {
 	initConfig : function(instanceConfig) {
 		var me = this,
 		config = {
-			dockedItems : [ {
-				dock : 'bottom',
-				xtype : 'toolbar',
-				frame : false,
-				border : false,
-				items : [ '->', {
-					xtype : 'button',
-					id : 'btnSaveChanges',
-					tooltip : 'Save',
-					text : 'Save TMs',
-					enableToggle : true,
-					pressed : true
-				} ]
-			} ],
+				dockedItems : [{
+	                xtype : 'toolbar',
+	                dock : 'bottom',
+	                ui: 'footer',
+	                layout: {
+	                    type: 'hbox',
+	                    pack: 'start'
+	                },
+	                items : [{
+	                    xtype: 'tbfill'
+	                },{
+	                	xtype : 'button',
+						id : 'btnSaveChanges',
+						tooltip : 'Save',
+						text : 'Save TMs',
+						enableToggle : true,
+						pressed : true
+	                }]
+	            }],
 			items : [ {
 				xtype : 'grid',
 				id : 'tmGrid',
@@ -70,7 +75,7 @@ Ext.define('Editor.plugins.TmMtIntegration.view.TaskAssocPanel', {
 				features : [ {
 					id : 'group',
 					ftype : 'groupingsummary',
-					groupHeaderTpl : 'Grouped fields {resourceName}',
+					groupHeaderTpl : 'Service :{name}',
 					hideGroupedHeader : true,
 					enableGroupingMenu : false
 				} ],
@@ -84,7 +89,7 @@ Ext.define('Editor.plugins.TmMtIntegration.view.TaskAssocPanel', {
 					xtype : 'gridcolumn',
 					text : 'Name',
 					renderer: function(value, metaData, record) {
-		        		return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: '+record.data.color+';"></div>'+value;
+		        		return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #'+record.get('color')+';"></div>'+value;
 		        	},
 					dataIndex : 'name',
 					sortable : true,

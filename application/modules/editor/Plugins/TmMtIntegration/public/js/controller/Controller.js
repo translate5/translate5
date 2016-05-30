@@ -81,6 +81,9 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.Controller', {
   },
   handleOnButtonClick: function(window) {
 	  var me = this;
+	  
+  	  var showDialogSuccess = false;
+  	  var showDalogError = false;
       me.getEditorPluginsTmMtIntegrationStoreTaskAssocStoreStore().each(function(record){
     	if(!record.dirty){
     		  return;
@@ -94,20 +97,25 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.Controller', {
 					taskGuid: me.actualTask.get('taskGuid')
 				})
 			} : {} ,
-			success: function(response){ 
-				
+			success: function(response){
 				if(record.data.checked){
 					var resp = Ext.util.JSON.decode(response.responseText);
 					var newId = resp.rows['id'];
 					record.set('taskassocid', newId);
+					showDialogSuccess = true;
 				}
 				record.commit();
-		        console.log(response.responseText); 
-		    }, 
-		    failure: function(response){ 
-		        console.log(response.responseText); 
+		    },
+		    failure: function(response){
+		    	showDalogError = true;
 		    } 
 		});
        }, this);
+      
+      if(showDialogSuccess)
+    	  Editor.MessageBox.addSuccess('Success!');
+      
+      if(showDalogError)
+    	  Editor.MessageBox.addSuccess('Fail!');
   }
 });

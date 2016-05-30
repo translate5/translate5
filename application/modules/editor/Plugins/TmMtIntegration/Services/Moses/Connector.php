@@ -47,15 +47,15 @@ class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plu
     }
 
     public function open(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
-        error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getResourceName());
+        error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getServiceName());
     }
 
     public function close(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
-        error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getResourceName());
+        error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getServiceName());
     }
 
     public function openForQuery(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
-        error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getResourceName());
+        error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getServiceName());
     }
 
     public function query(string $queryString) {

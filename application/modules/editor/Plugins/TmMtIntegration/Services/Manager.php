@@ -129,8 +129,8 @@ class editor_Plugins_TmMtIntegration_Services_Manager {
         error_log('opened '.$task->getTaskName());
         $list = $this->loadAssociatedTmmts($task);
         foreach($list as $one){
-            $resource = $this->getResourceById($one['resourceType'], $one['resourceId']);
-            $connector = $this->getConnector($one['resourceType'], $resource);
+            $resource = $this->getResourceById($one['serviceType'], $one['resourceId']);
+            $connector = $this->getConnector($one['serviceType'], $resource);
             /* @var $connector editor_Plugins_TmMtIntegration_Services_ConnectorAbstract */
             $tmmt = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Models_TmMt');
             /* @var $tmmt editor_Plugins_TmMtIntegration_Models_TmMt */

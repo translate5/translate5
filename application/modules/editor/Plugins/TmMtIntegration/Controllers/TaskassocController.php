@@ -53,34 +53,15 @@ class editor_Plugins_TmMtIntegration_TaskassocController extends ZfExtended_Rest
      */
     public function indexAction(){
         $filter = $this->entity->getFilter();
-        
-        if(!$filter->hasFilter('taskGuid', $taskGuid)) { //handle the rest default case
+        if(!$filter->hasFilter('taskGuid', $taskGuid) || !$filter->hasFilter('sourceLang', $sourceLang) || !$filter->hasFilter('targetLang', $targetLang)) { //handle the rest default case
             $this->view->rows = $this->entity->loadAll();
             $this->view->total = $this->entity->getTotalCount();
             return;
         }
-        
-        $tmmt = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Models_TmMt');
-        /* @var $tmmt editor_Plugins_TmMtIntegration_Models_TmMt */
-        $allTmmt = $tmmt->loadAll();
-        $allCount = $tmmt->getTotalCount();
-        
-        $assocs = $this->entity->loadAll(); //filtered automaticly by taskGuid
-        //reindex by tmmtId
-        $assocsByTmmtId = array();
-        foreach($assocs as $assoc) {
-            $assocsByTmmtId[$assoc['tmmtId']] = $assoc;
-        }
-        
-        foreach($allTmmt as &$tmmt) {
-            $tmmt['checked'] = !empty($assocsByTmmtId[$tmmt['id']]);
-            if($tmmt['checked']) {
-                $tmmt['taskassocid'] = $assocsByTmmtId[$tmmt['id']]['id'];
-            }
-        }
-        
-        $this->view->rows = $allTmmt;
-        $this->view->total = $allCount;
+         
+        $reval = $this->entity->loadByAssociatedTaskAndLanguage($taskGuid->value, $sourceLang->value,$targetLang->value);
+        $this->view->rows = $reval;
+        $this->view->total = count($reval);
     }
     /**
      * (non-PHPdoc)

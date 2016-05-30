@@ -138,7 +138,7 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::open()
      */
     public function open(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
-        error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getResourceName());
+        error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getServiceName());
     }
 
     /**
@@ -146,7 +146,7 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::close()
      */
     public function close(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
-        error_log("Closed Tmmt ".$tmmt->getName().' - '.$tmmt->getResourceName());
+        error_log("Closed Tmmt ".$tmmt->getName().' - '.$tmmt->getServiceName());
 
     }
 }

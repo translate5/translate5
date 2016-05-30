@@ -34,4 +34,18 @@ class editor_Plugins_TmMtIntegration_Models_Taskassoc extends ZfExtended_Models_
 	public function loadByTaskGuid($taskGuid) {
 		return $this->loadRow('taskGuid = ?', $taskGuid);
 	}
+	
+	public function loadByAssociatedTaskAndLanguage($taskGuid,$sourceLang,$targetLang) {
+	    $db = Zend_Db_Table::getDefaultAdapter();
+	    $select = $db->select();
+	    $select->from(array("tmmt" => "LEK_tmmtintegration_tmmt"), array("tmmt.*","ta.id AS taskassocid"))
+	    ->joinLeft(
+	            array("ta"=>"LEK_tmmtintegration_taskassoc"),
+	            "ta.tmmtId = tmmt.id",
+	            array("checked" => "IF(ta.taskGuid = '".$taskGuid."','true','false')"))
+	            ->where('tmmt.sourceLang = ?',$sourceLang)
+	            ->where('tmmt.targetLang = ?',$targetLang);
+	    
+	    return $db->fetchAll($select);
+	}
 }

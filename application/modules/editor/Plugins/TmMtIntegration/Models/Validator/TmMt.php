@@ -45,8 +45,8 @@ class editor_Plugins_TmMtIntegration_Models_Validator_TmMt extends ZfExtended_Mo
         $this->addValidator('targetLang', 'stringLength', array('min' => 0, 'max' => 255));
         $this->addValidator('color', 'stringLength', array('min' => 0, 'max' => 8));
         $this->addValidator('resourceId', 'stringLength', array('min' => 0, 'max' => 255));
-        $this->addValidator('resourceName', 'stringLength', array('min' => 0, 'max' => 255));
-        $this->addValidator('resourceType', 'stringLength', array('min' => 0, 'max' => 255));
+        $this->addValidator('serviceName', 'stringLength', array('min' => 0, 'max' => 255));
+        $this->addValidator('serviceType', 'stringLength', array('min' => 0, 'max' => 255));
         
     }
 }

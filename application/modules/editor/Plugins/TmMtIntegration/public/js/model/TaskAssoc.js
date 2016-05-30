@@ -35,7 +35,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.TmMtIntegration.model.TaskAssocMeta
+ * @class Editor.plugins.TmMtIntegration.model.TaskAssoc
  * @extends Ext.data.Model
  */
 Ext.define('Editor.plugins.TmMtIntegration.model.TaskAssoc', {
@@ -46,9 +46,9 @@ Ext.define('Editor.plugins.TmMtIntegration.model.TaskAssoc', {
     {name: 'sourceLang', type: 'string'},
     {name: 'targetLang', type: 'string'},
     {name: 'color', type: 'string'},
-    {name: 'resourceId', type: 'string'},
-    {name: 'resourceName', type: 'string'},
-    {name: 'resourceType', type: 'string'},
+    {name: 'resourced', type: 'string'},
+    {name: 'serviceName', type: 'string'},
+    {name: 'serviceType', type: 'string'},
     {name: 'checked', type: 'boolean'}
   ],
   idProperty: 'id',

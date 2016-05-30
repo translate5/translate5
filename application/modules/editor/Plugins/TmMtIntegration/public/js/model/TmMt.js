@@ -47,8 +47,8 @@ Ext.define('Editor.plugins.TmMtIntegration.model.TmMt', {
     {name: 'targetLang', type: 'string'},
     {name: 'color', type: 'string'},
     {name: 'resourceId', type: 'string'},
-    {name: 'resourceName', type: 'string'},
-    {name: 'resourceType', type: 'string'}
+    {name: 'serviceName', type: 'string'},
+    {name: 'serviceType', type: 'string'}
   ],
   idProperty: 'id',
   proxy : {

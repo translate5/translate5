@@ -62,9 +62,10 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.QueryController', {
               params: {
                   data: Ext.JSON.encode({
                       type: 'query', //query => mtmatch | search => concorance,
+                      //column for which the search was done (target | source)
                       //segmentId: segment Id for reference, 
-                      query: "string to query, if omitted load above segment and get content from there",
-                      tmmtId: 5
+                      query: "das ist ein testsatz",
+                      tmmtId: 25
                       //taskGuid: me.actualTask.get('taskGuid')
                   })
               },

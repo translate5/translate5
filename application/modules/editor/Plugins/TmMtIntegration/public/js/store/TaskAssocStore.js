@@ -31,6 +31,6 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.TmMtIntegration.store.TaskAssocStore', {
   extend : 'Ext.data.Store',
   model: 'Editor.plugins.TmMtIntegration.model.TaskAssoc',
-  groupField: 'resourceName',
+  groupField: 'serviceName',
   autoLoad: false
 });

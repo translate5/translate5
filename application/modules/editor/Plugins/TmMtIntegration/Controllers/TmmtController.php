@@ -54,7 +54,7 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
         error_log(print_r($this->entity->getDataObject(),1));
         $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
         /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
-        $resource = $manager->getResourceById($this->entity->getResourceType(), $this->entity->getResourceId());
+        $resource = $manager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
         if($resource->getFilebased()) {
             $this->handleFileUpload($manager, $resource);
         }
@@ -71,7 +71,7 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
         $upload->isValid(self::FILE_UPLOAD_NAME);
         //mandatory upload file
         $importInfo = $upload->getFileInfo(self::FILE_UPLOAD_NAME);
-        $connector = $manager->getConnector($this->entity->getResourceType(), $resource);
+        $connector = $manager->getConnector($this->entity->getServiceType(), $resource);
         /* @var $connector editor_Plugins_TmMtIntegration_Services_ConnectorAbstract */
         if(empty($importInfo['tmUpload']['size'])) {
             $this->uploadError('Die ausgewählte Datei war leer!');

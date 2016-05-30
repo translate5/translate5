@@ -43,10 +43,10 @@ END LICENSE AND COPYRIGHT
  * @method void setColor() setColor(string $color)
  * @method string getResourceId() getResourceId()
  * @method void setResourceId() setResourceId(integer $resourceId)
- * @method string getResourceType() getResourceType()
- * @method void setResourceType() setResourceType(string $type)
- * @method string getResourceName() getResourceName()
- * @method void setResourceName() setResourceName(string $resName)
+ * @method string getServiceType() getServiceType()
+ * @method void setServiceType() setServiceType(string $type)
+ * @method string getServiceName() getServiceName()
+ * @method void setServiceName() setServiceName(string $resName)
  */
 class editor_Plugins_TmMtIntegration_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Plugins_TmMtIntegration_Models_Db_TmMt';
@@ -61,37 +61,5 @@ class editor_Plugins_TmMtIntegration_Models_TmMt extends ZfExtended_Models_Entit
             ->join($assocName, $assocName.'.`tmmtId` = '.$this->db->info($assocDb::NAME).'.`id`', '')
             ->where($assocName.'.`taskGuid` = ?', $task->getTaskGuid());
         return $this->db->fetchAll($s)->toArray();
-    }
-    
-    /**
-     * FIXME remove me after renaming resourceType to service
-     * @return string
-     */
-    public function getService() {
-        return $this->getResourceType();
-    }
-    
-    /**
-     * FIXME remove me after renaming resourceType to service
-     * @return string
-     */
-    public function getServiceName() {
-        return $this->getResourceName();
-    }
-    
-    /**
-     * FIXME remove me after renaming resourceType to service
-     * @return string
-     */
-    public function setService($serviceName) {
-        return $this->setResourceType($serviceName);
-    }
-    
-    /**
-     * FIXME remove me after renaming resourceType to service
-     * @return string
-     */
-    public function setServiceName($name) {
-        return $this->setResourceName($name);
     }
 }
