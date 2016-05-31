@@ -168,7 +168,7 @@ Ext.define('Editor.controller.Editor', {
                   me.handleOpenComments();
                   return false;
               }
-              var found = Ext.select('#segment-grid-body .x-grid-row-selected td.comments-field img').first();
+              var found = Ext.select('#segment-grid-body .x-grid-item-selected td.comments-field img').first();
               if(found && (found.hasCls('add') || found.hasCls('edit'))){
                   found.dom.click();
               }
