@@ -43,5 +43,15 @@ Ext.define('Editor.view.segments.EditorKeyMap', {
             me.target.on(me.eventName, me.handleTargetEvent, me, {capture: me.capture, priority: me.priority, delegated: false});
             me.enabled = true;
         }
+    },
+    /**
+     * interceptor to handle the DIGITs prepared by another key kombination 
+     */
+    handleTargetEvent: function(event) {
+        event.isDigitPreparation = false;
+        event.lastWasDigitPreparation = this.lastWasDigitPreparation;
+        var res = this.callParent([event]);
+        this.lastWasDigitPreparation = event.isDigitPreparation;
+        return res;
     }
 });
