@@ -784,7 +784,8 @@ Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-M
 <trans-unit id='U3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgw7ZmZm5lbiAoU1RSRyArIEFMVCArIFNISUZUICsgRU5URVIp'><source>Speichern und vorheriges Segment öffnen (STRG + ALT + SHIFT + ENTER)</source><target>Speichern und vorheriges Segment öffnen (STRG + ALT + SHIFT + ENTER)</target></trans-unit>
 <trans-unit id='IChBTFQrezB9KQ=='><source> (ALT+{0})</source><target> (ALT+{0})</target></trans-unit>
 <trans-unit id='IChBTFQrU0hJRlQrezB9KQ=='><source> (ALT+SHIFT+{0})</source><target> (ALT+SHIFT+{0})</target></trans-unit>
-<trans-unit id='U2VnbWVudCBhdWYgZGVuIGF1c2dld8OkaGx0ZW4gU3RhdHVzIHNldHplbiAoU1RSRyArIEFMVCArIHswfSk='><source>Segment auf den ausgewählten Status setzen (STRG + ALT + {0})</source><target>Segment auf den ausgewählten Status setzen (STRG + ALT + {0})</target></trans-unit>
+<trans-unit id='U2VnbWVudCBhdWYgZGVuIGF1c2dld8OkaGx0ZW4gU3RhdHVzIHNldHplbiAoQUxUICsgUyBkYW5hY2ggezB9KQ=='><source>Segment auf den ausgewählten Status setzen (ALT + S danach {0})</source><target>Segment auf den ausgewählten Status setzen (ALT + S danach {0})</target></trans-unit>
+<trans-unit id='U2VnbWVudCBhdWYgZGVuIGF1c2dld8OkaGx0ZW4gU3RhdHVzIHNldHplbg=='><source>Segment auf den ausgewählten Status setzen</source><target>Segment auf den ausgewählten Status setzen</target></trans-unit>
 <trans-unit id='U3RhdHVzIDQ='><source>Status 4</source><target>Status 4</target></trans-unit>
 <trans-unit id='SW4gaW1wb3J0aWVydGVyIERhdGVpIGdlc3BlcnJ0ZSBTZWdtZW50ZSBzaW5kIGluIHRyYW5zbGF0ZTUgZ2VzcGVycnQ='><source>In importierter Datei gesperrte Segmente sind in translate5 gesperrt</source><target>In importierter Datei gesperrte Segmente sind in translate5 gesperrt</target></trans-unit>
 <trans-unit id='SW52YWxpZCB0eXBlIGdpdmVuLiBTdHJpbmcgb3IgaW50ZWdlciBleHBlY3RlZA=='><source>Invalid type given. String or integer expected</source><target>Invalid type given. String or integer expected</target></trans-unit>

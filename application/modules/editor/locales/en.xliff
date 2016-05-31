@@ -1230,11 +1230,14 @@
   <source>Speichern (STRG + S)</source>
   <target>save (CTRL + S)</target>
 </trans-unit>
-<trans-unit id='U2VnbWVudCBhdWYgZGVuIGF1c2dld8OkaGx0ZW4gU3RhdHVzIHNldHplbiAoU1RSRyArIEFMVCArIHswfSk='>
-  <source>Segment auf den ausgewählten Status setzen (STRG + ALT + {0})</source>
-  <target>Set segment to the choosen state (CTRL + ALT + {0})</target>
+<trans-unit id='U2VnbWVudCBhdWYgZGVuIGF1c2dld8OkaGx0ZW4gU3RhdHVzIHNldHplbiAoQUxUICsgUyBkYW5hY2ggezB9KQ=='>
+  <source>Segment auf den ausgewählten Status setzen (ALT + S danach {0})</source>
+  <target>Set segment to the choosen state (ALT + S after that {0})</target>
 </trans-unit>
-
+<trans-unit id='U2VnbWVudCBhdWYgZGVuIGF1c2dld8OkaGx0ZW4gU3RhdHVzIHNldHplbg=='>
+  <source>Segment auf den ausgewählten Status setzen</source>
+  <target>Set segment to the choosen state</target>
+</trans-unit>
 <trans-unit id='RXMgaXN0IElobmVuIG5pY2h0IGVybGF1YnQsIGRlbiBTZWdtZW50aW5oYWx0IHp1IGJlYXJiZWl0ZW4uIEJpdHRlIHZlcndlbmRlbiBTaWUgU1RSRytaIHVtIElocmUgw4RuZGVydW5nZW4genVyw7xja3p1c2V0emVuIG9kZXIgYnJlY2hlbiBTaWUgZGFzIEJlYXJiZWl0ZW4gZGVzIFNlZ21lbnRzIGFiLg=='>
   <source>Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.</source>
   <target>You are not allowed to edit segment content. Please use CTRL-Z to redo your changes or cancel editing at all.</target>
