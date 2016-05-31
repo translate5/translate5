@@ -1194,9 +1194,9 @@
   <source>Nicht speichern und vorheriges Segment öffnen (STRG + ALT + ↑)</source>
   <target>Don't save and open previous segment (CTRL + ALT + ↑)</target>
 </trans-unit>
-<trans-unit id='RGVtIGF1c2dld8OkaGx0ZW4gU2VnbWVudCBlaW5lbiBLb21tZW50YXIgaGluenVmw7xnZW4uIChTVFJHICsgQUxUICsgYyk='>
-  <source>Dem ausgewählten Segment einen Kommentar hinzufügen. (STRG + ALT + c)</source>
-  <target>Add a comment to the select segment. (CTRL + ALT + c)</target>
+<trans-unit id='RGVtIGF1c2dld8OkaGx0ZW4gU2VnbWVudCBlaW5lbiBLb21tZW50YXIgaGluenVmw7xnZW4uIChBTFQgKyBDKQ=='>
+  <source>Dem ausgewählten Segment einen Kommentar hinzufügen. (ALT + C)</source>
+  <target>Add a comment to the select segment. (ALT + C)</target>
 </trans-unit>
 <trans-unit id='Vm9yaGVyaWdlIFNwYWx0ZSBlZGl0aWVyZW4gKFNUUkcgKyBBTFQgKyDihpAp'>
   <source>Vorherige Spalte editieren (STRG + ALT + ←)</source>
