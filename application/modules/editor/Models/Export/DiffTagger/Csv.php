@@ -55,9 +55,11 @@ class editor_Models_Export_DiffTagger_Csv extends editor_Models_Export_DiffTagge
     }
     
     /**
-     * @var string Regex zur Tagerkennung, bereits mit Delimitern und Modifikatoren
+     * Regular expression for tag and html entity recognition.
+     * @var string
      */
-    protected $_regexTag = '"(<[^<>]*>)"';
+    protected $_regexTag = '/(<[^<>]*>|&[^;]+;)/';
+    
     /**
      * @var array Regexes which define the opening and closing add changemarks
      */
@@ -81,8 +83,9 @@ class editor_Models_Export_DiffTagger_Csv extends editor_Models_Export_DiffTagge
 
         $targetArr = $this->wordBreakUp($targetArr);
         $editedArr = $this->wordBreakUp($editedArr);
-
+        
         $diff = ZfExtended_Factory::get('ZfExtended_Diff');
+        /* @var $diff ZfExtended_Diff */
         $diffRes = $diff->process($targetArr, $editedArr);
         
         
