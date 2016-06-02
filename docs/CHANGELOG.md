@@ -6,7 +6,9 @@ Missing Versions are merged into in the next upper versions, so no extra section
 ## [2.4.9] - 2016-06-02
 ### Changed
 TRANSLATE-678: Diff Export is destroying entities in certain rare cases
-TRANSLATE-670: Keyboard short cut collision under windows CTRL-ALT-number
+TRANSLATE-670: Keyboard short cut collision under windows: 
+                CTRL + ALT + DIGIT changed to ALT + S and then DIGIT
+                CTRL + ALT + C changed ALT + C
 TRANSLATE-631: ExtJS6 Update, fixes (related to keyboard shortcuts)
 TRANSLATE-682: translate5 export contains closing div tags from termtagger: PORTAL-88
 TRANSLATE-683: repetition editor changes the source, even if it is non-editable
