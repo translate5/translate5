@@ -219,7 +219,11 @@ abstract class editor_Models_Export_FileParser {
         
         $edited = (string) $segment->getFieldEdited($field);
         
+        $before = $edited;
+        $edited = $this->protectContentTags($edited);
         $edited = $this->recreateTermTags($edited, $this->shouldTermTaggingBeRemoved());
+        $edited = $this->unprotectContentTags($edited);
+        
         $edited = $this->parseSegment($edited);
         $edited = $this->revertNonBreakingSpaces($edited);
         if(!$this->_diff){
@@ -227,7 +231,9 @@ abstract class editor_Models_Export_FileParser {
         }
         
         $original = (string) $segment->getFieldOriginal($field);
+        $original = $this->protectContentTags($original);
         $original = $this->recreateTermTags($original);
+        $original = $this->unprotectContentTags($original);
         $original = $this->parseSegment($original);
         
         $diffed = $this->_diffTagger->diffSegment(
@@ -312,13 +318,12 @@ abstract class editor_Models_Export_FileParser {
         //FIXME move me to a class const after discussing with Marc if we can remove regexInternalTags completly from DB
         $regex = '#<div\s*class="[a-z]*\s+[gxA-Fa-f0-9]*"\s*.*?(?!</div>)<span[^>]*id="[^-]*-.*?(?!</div>).</div>#s';
         $id = 1;
-        $originalTags = array();
-        $this->originalTags = &$originalTags;
-        return preg_replace_callback($regex, function($match) use ($id, $originalTags) {
+        $this->originalTags = array();
+        return preg_replace_callback($regex, function($match) use (&$id) {
             $placeholder = '<translate5:escaped id="'.$id++.'" />';
-            $originalTags[$placeholder] = $match[0];
+            $this->originalTags[$placeholder] = $match[0];
             return $placeholder;
-        });
+        }, $segment);
     }
     
     /**
@@ -327,9 +332,8 @@ abstract class editor_Models_Export_FileParser {
      * @return string
      */
     protected function unProtectContentTags(string $segment) {
-        $originalTags = $this->originalTags;
-        return preg_replace_callback('#<translate5:escaped id="[0-9]+" />#s', function($match) use ($originalTags) {
-            return $originalTags[$match[0]];
+        return preg_replace_callback('#<translate5:escaped id="[0-9]+" />#s', function($match) {
+            return $this->originalTags[$match[0]];
         }, $segment);
     }
     

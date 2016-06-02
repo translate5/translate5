@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<martif xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" noNamespaceSchemaLocation="TBXcsV02.xsd" type="TBX" lang="en">
+  <martifHeader>
+    <fileDesc>
+      <sourceDesc>Testdatei beoTerm</sourceDesc>
+    </fileDesc>
+  </martifHeader>
+  <text>
+    <body>
+      <termEntry>
+        <langSet lang="de">
+          <descripGrp>
+            <descrip type="Definition">Bezeichnet einen Prozess oder Modul des Apache, welches genutzt wird, bevor der Prozess sich verzweigt. Englischer Begriff, sollte im Deutschen nicht verwendet werden.</descrip>
+          </descripGrp>
+          <tig>
+            <term>prefork</term>
+            <termNote type="normativeAuthorization">supersededTerm</termNote>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry>
+        <langSet lang="en">
+          <tig>
+            <term>MPM-Module</term>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry>
+        <langSet lang="en">
+          <descripGrp>
+            <descrip type="Definition">Apache is the standard webserver and is released as open source under the Apache license.</descrip>
+          </descripGrp>
+          <tig>
+            <term>Apache</term>
+            <termNote type="normativeAuthorization">preferredTerm</termNote>
+          </tig>
+        </langSet>
+	<langSet lang="de">
+          <descripGrp>
+            <descrip type="Definition">Apache ist der standard webserver und ist als open source Software unter der Apache license veröffentlicht.</descrip>
+          </descripGrp>
+          <tig>
+            <term>Apache</term>
+            <termNote type="normativeAuthorization">preferredTerm</termNote>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry>
+	<langSet lang="en">
+          <descripGrp>
+            <descrip type="Definition">SetHandler makes nice things.</descrip>
+          </descripGrp>
+          <tig>
+            <term>SetHandler</term>
+            <termNote type="normativeAuthorization">preferredTerm</termNote>
+          </tig>
+        </langSet>
+        <langSet lang="de">
+          <descripGrp>
+            <descrip type="Definition">SetHandler macht tolle Dinge.</descrip>
+          </descripGrp>
+          <tig>
+            <term>SetHandler</term>
+            <termNote type="normativeAuthorization">preferredTerm</termNote>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry>
+        <langSet lang="de">
+          <tig>
+            <term>empfohlene</term>
+            <termNote type="normativeAuthorization">preferredTerm</termNote>
+          </tig>
+        </langSet>
+        <langSet lang="en">
+          <tig>
+            <term>recommended</term>
+            <termNote type="normativeAuthorization">preferredTerm</termNote>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry>
+        <langSet lang="de">
+          <tig>
+            <term>empfohlene Einstellung</term>
+            <termNote type="normativeAuthorization">preferredTerm</termNote>
+          </tig>
+          <tig>
+            <term>Einstellung</term>
+            <termNote type="normativeAuthorization">supersededTerm</termNote>
+          </tig>
+          <tig>
+            <term>nahegelegte Einstellung</term>
+            <termNote type="normativeAuthorization">admittedTerm</termNote>
+          </tig>
+        </langSet>
+        <langSet lang="en">
+          <tig>
+            <term>recommended setup</term>
+            <termNote type="normativeAuthorization">preferredTerm</termNote>
+          </tig>
+        </langSet>
+      </termEntry>
+    </body>
+  </text>
+</martif>
