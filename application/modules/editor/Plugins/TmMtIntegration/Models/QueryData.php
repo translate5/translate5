@@ -33,4 +33,5 @@ class editor_Plugins_TmMtIntegration_Models_QueryData {
     public $query;
     public $type;
     public $tmmtId;
+    public $segmentId;
 }

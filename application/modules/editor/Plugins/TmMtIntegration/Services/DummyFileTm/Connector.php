@@ -92,12 +92,11 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
      * (non-PHPdoc)
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::query()
      */
-    public function query(string $queryString) {
+    public function query(string $queryString,string $segmentId) {
         $file = new SplFileInfo($this->getTmFile($this->tm->getId()));
         if(!$file->isFile() || !$file->isReadable()) {
             throw new ZfExtended_NotFoundException('requested TM file for dummy TM with the tmmtId '.$this->tm->getId().' not found!');
         }
-
         $file = $file->openFile();
 
         $result = array();
@@ -108,7 +107,6 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
             }
 
             similar_text(strip_tags($queryString), strip_tags($line[1]), $percent);
-
             if($percent < 80) {
                 continue;
             }
@@ -116,6 +114,7 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
             $data->source = strip_tags($line[1]);
             $data->target = strip_tags($line[2]);
             $data->matchrate = $percent;
+            $data->segmentId = $segmentId;
             $result[] = $data;
         }
 

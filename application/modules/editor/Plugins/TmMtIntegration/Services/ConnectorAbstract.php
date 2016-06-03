@@ -75,10 +75,10 @@ abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
 
     /**
      * makes a tm / mt / file query to find a match / translation
-     * @param string $queryString
+     * @param string $queryString , string $segmentId
      * @return array
      */
-    abstract public function query(string $queryString);
+    abstract public function query(string $queryString,string $segmentId);
 
     /**
      * makes a tm / mt / file concordance search

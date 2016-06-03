@@ -56,9 +56,15 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.Controller', {
   listen: {
 	  controller: {
 		  '#taskpreferences': {
-			  'loadPreferences': function(loadParams){
+			  'loadPreferences': function(controller,task){
+			      
+			      tmmtparams = {
+			              params: {
+			                  filter: '[{"operator":"like","value":"'+task.get('taskGuid')+'","property":"taskGuid"}]'
+			              }
+			      };
 				  var me = this;
-				  me.getEditorPluginsTmMtIntegrationStoreTaskAssocStoreStore().load(loadParams);
+				  me.getEditorPluginsTmMtIntegrationStoreTaskAssocStoreStore().load(tmmtparams);
 			  }
 		  }
 	  },

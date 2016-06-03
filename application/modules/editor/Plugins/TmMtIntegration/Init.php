@@ -43,6 +43,7 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
         'Editor.plugins.TmMtIntegration.controller.Controller',
         'Editor.plugins.TmMtIntegration.controller.QueryController',
         'Editor.plugins.TmMtIntegration.controller.TmOverviewController',
+        'Editor.plugins.TmMtIntegration.controller.EditorController',
     );
     
     public function init() {

@@ -126,7 +126,7 @@ class editor_Plugins_TmMtIntegration_Services_Manager {
     }
     
     public function openForTask(editor_Models_Task $task) {
-        error_log('opened '.$task->getTaskName());
+        //error_log('opened '.$task->getTaskName());
         $list = $this->loadAssociatedTmmts($task);
         foreach($list as $one){
             $resource = $this->getResourceById($one['serviceType'], $one['resourceId']);
