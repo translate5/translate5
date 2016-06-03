@@ -41,8 +41,8 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
      */
     protected $frontendControllers = array(
         'pluginMatchResourceTaskassoc' => 'Editor.plugins.TmMtIntegration.controller.Controller',
-        'pluginMatchResourceMatchQuery' => 'Editor.plugins.TmMtIntegration.controller.QueryController',
-        'pluginMatchResourceSearchQuery' => 'Editor.plugins.TmMtIntegration.controller.QueryController',
+        'pluginMatchResourceMatchQuery' => 'Editor.plugins.TmMtIntegration.controller.EditorController',
+        'pluginMatchResourceSearchQuery' => 'Editor.plugins.TmMtIntegration.controller.EditorController',
         'pluginMatchResourceOverview' => 'Editor.plugins.TmMtIntegration.controller.TmOverviewController',
     );
     
@@ -56,7 +56,6 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
                 $result[] = $controller;
             }
         }
-        error_log(print_r($result,1));
         return $result;
     }
     

@@ -58,7 +58,7 @@ class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plu
         error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getServiceName());
     }
 
-    public function query(string $queryString) {
+    public function query(string $queryString,string $segmentId) {
         $rpc = new Zend_XmlRpc_Client("http://www.translate5.net:8124/RPC2");
         try {
 

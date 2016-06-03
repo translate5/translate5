@@ -37,7 +37,7 @@ class editor_Plugins_TmMtIntegration_Models_Worker extends ZfExtended_Worker_Abs
      */
     protected function validateParameters($parameters = array()) {
         $workerData = $parameters['workerData'];
-        $toCheck = ['query','resourceId', 'service', 'type', 'tmmtId'];
+        $toCheck = ['query','resourceId', 'service', 'type', 'tmmtId','segmentId'];
         foreach($toCheck as $field) {
             if(empty($workerData->$field)) {
                 error_log('Missing Parameter "'.$field.'" in '.__CLASS__);
@@ -91,7 +91,7 @@ class editor_Plugins_TmMtIntegration_Models_Worker extends ZfExtended_Worker_Abs
 
         switch ($workerData->type) {
             case self::TYPE_QUERY:
-                $this->result = $connector->query((string) $workerData->query);
+                $this->result = $connector->query((string) $workerData->query,(string) $workerData->segmentId);
                 break;
             case self::TYPE_SEARCH:
                 $this->result = $connector->search((string) $workerData->query);

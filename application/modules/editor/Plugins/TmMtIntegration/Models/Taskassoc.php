@@ -35,17 +35,36 @@ class editor_Plugins_TmMtIntegration_Models_Taskassoc extends ZfExtended_Models_
 		return $this->loadRow('taskGuid = ?', $taskGuid);
 	}
 	
-	public function loadByAssociatedTaskAndLanguage($taskGuid,$sourceLang,$targetLang) {
-	    $db = Zend_Db_Table::getDefaultAdapter();
-	    $select = $db->select();
-	    $select->from(array("tmmt" => "LEK_tmmtintegration_tmmt"), array("tmmt.*","ta.id AS taskassocid"))
+	public function loadByAssociatedTaskAndLanguage($taskGuid) {
+        
+	    $task = ZfExtended_Factory::get('editor_Models_Task');
+	    /* @var $task editor_Models_Task */
+	    $task->loadByTaskGuid((string) $taskGuid);
+	    
+	    $this->filter->deleteFilter("taskGuid");
+	    $this->filter->addFilter((object)[
+	            'field' => 'sourceLang',
+	            'type' =>  'numeric',
+	            'comparison' => 'eq',
+	            'table' => 'tmmt',//only needed for join
+	            'value' => $task->getSourceLang(),
+	    ]);
+	    $this->filter->addFilter((object)[
+	            'field' => 'targetLang',
+	            'table' => 'tmmt',
+	            'comparison' => 'eq',
+	            'type' =>  'numeric',
+	            'value' => $task->getTargetLang(),
+	    ]);
+	    
+	    $db = $this->db;
+	    $s = $db->select()
+	    ->setIntegrityCheck(false)
+	    ->from(array("tmmt" => "LEK_tmmtintegration_tmmt"), array("tmmt.*","ta.id AS taskassocid"))
 	    ->joinLeft(
 	            array("ta"=>"LEK_tmmtintegration_taskassoc"),
 	            "ta.tmmtId = tmmt.id",
-	            array("checked" => "IF(ta.taskGuid = '".$taskGuid."','true','false')"))
-	            ->where('tmmt.sourceLang = ?',$sourceLang)
-	            ->where('tmmt.targetLang = ?',$targetLang);
-	    
-	    return $db->fetchAll($select);
+	            array("checked" => "IF(ta.taskGuid = '".$taskGuid."','true','false')"));
+	    return $this->loadFilterdCustom($s);
 	}
 }

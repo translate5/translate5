@@ -53,13 +53,12 @@ class editor_Plugins_TmMtIntegration_TaskassocController extends ZfExtended_Rest
      */
     public function indexAction(){
         $filter = $this->entity->getFilter();
-        if(!$filter->hasFilter('taskGuid', $taskGuid) || !$filter->hasFilter('sourceLang', $sourceLang) || !$filter->hasFilter('targetLang', $targetLang)) { //handle the rest default case
+        if(!$filter->hasFilter('taskGuid', $taskGuid)) { //handle the rest default case
             $this->view->rows = $this->entity->loadAll();
             $this->view->total = $this->entity->getTotalCount();
             return;
         }
-         
-        $reval = $this->entity->loadByAssociatedTaskAndLanguage($taskGuid->value, $sourceLang->value,$targetLang->value);
+        $reval = $this->entity->loadByAssociatedTaskAndLanguage($taskGuid->value);
         $this->view->rows = $reval;
         $this->view->total = count($reval);
     }

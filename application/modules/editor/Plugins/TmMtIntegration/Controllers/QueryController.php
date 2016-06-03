@@ -86,6 +86,7 @@ class editor_Plugins_TmMtIntegration_QueryController extends ZfExtended_RestCont
         $workerData->tmmtId = $tmmt->getId();
         $workerData->service = $tmmt->getServiceType();
         $workerData->resourceId =$tmmt->getResourceId();
+        $workerData->segmentId  = $this->data->segmentId;
 
         $worker = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Models_Worker');
         /* @var $worker editor_Plugins_TmMtIntegration_Models_Worker */
