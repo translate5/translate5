@@ -93,6 +93,11 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::query()
      */
     public function query(string $queryString,string $segmentId) {
+
+        if(stripos($this->tm->getName(), 'slow') !== false) {
+            sleep(rand(5, 15));
+        }
+        
         $file = new SplFileInfo($this->getTmFile($this->tm->getId()));
         if(!$file->isFile() || !$file->isReadable()) {
             throw new ZfExtended_NotFoundException('requested TM file for dummy TM with the tmmtId '.$this->tm->getId().' not found!');
