@@ -40,10 +40,25 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
      * @var array
      */
     protected $frontendControllers = array(
-        'Editor.plugins.TmMtIntegration.controller.Controller',
-        'Editor.plugins.TmMtIntegration.controller.QueryController',
-        'Editor.plugins.TmMtIntegration.controller.TmOverviewController',
+        'pluginMatchResourceTaskassoc' => 'Editor.plugins.TmMtIntegration.controller.Controller',
+        'pluginMatchResourceMatchQuery' => 'Editor.plugins.TmMtIntegration.controller.QueryController',
+        'pluginMatchResourceSearchQuery' => 'Editor.plugins.TmMtIntegration.controller.QueryController',
+        'pluginMatchResourceOverview' => 'Editor.plugins.TmMtIntegration.controller.TmOverviewController',
     );
+    
+    public function getFrontendControllers() {
+        $result = array();
+        $userSession = new Zend_Session_Namespace('user');
+        $acl = ZfExtended_Acl::getInstance();
+        /* @var $acl ZfExtended_Acl */
+        foreach($this->frontendControllers as $right => $controller) {
+            if($acl->isInAllowedRoles($userSession->data->roles, 'frontend', $right)) {
+                $result[] = $controller;
+            }
+        }
+        error_log(print_r($result,1));
+        return $result;
+    }
     
     public function init() {
         $this->initEvents();
@@ -77,7 +92,8 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
     
     protected function initRoutes() {
         $f = Zend_Registry::get('frontController');
-        $f->addControllerDirectory(APPLICATION_PATH.'/'.$this->getPluginPath().'/Controllers', '_plugins');
+        /* @var $f Zend_Controller_Front */
+        $f->addControllerDirectory(APPLICATION_PATH.'/'.$this->getPluginPath().'/Controllers', '_plugins_'.__CLASS__);
         
         $restRoute = new Zend_Rest_Route($f, array(), array(
                 'editor' => array('plugins_tmmtintegration_taskassoc',

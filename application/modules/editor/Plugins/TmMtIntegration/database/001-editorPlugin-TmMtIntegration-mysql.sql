@@ -52,6 +52,14 @@ insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor
 insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_tmmtintegration_resource', 'all');
 insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_tmmtintegration_taskassoc', 'all');
 insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_tmmtintegration_query', 'all');
+insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'editor', 'editor_plugins_tmmtintegration_query', 'all');
+
+insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'frontend', 'pluginMatchResourceOverview');
+insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'frontend', 'pluginMatchResourcesAddFilebased');
+insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'frontend', 'pluginMatchResourceTaskassoc');
+insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'admin', 'frontend', 'pluginMatchResourcesAddNonFilebased');
+insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'editor', 'frontend', 'pluginMatchResourceMatchQuery');
+insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'editor', 'frontend', 'pluginMatchResourceSearchQuery');
 
 INSERT INTO `Zf_configuration` (`id`, `name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES (NULL, 'runtimeOptions.worker.editor_Plugins_TmMtIntegration_Models_Worker.maxParallelWorkers', '1', 'editor', 'worker', '10', '10', '', 'integer', 'Max parallel running workers of TMMT Integeration query worker');

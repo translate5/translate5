@@ -309,6 +309,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             'ChangeAlike', 'Comments');
         
         $pm = Zend_Registry::get('PluginManager');
+        /* @var $pm ZfExtended_Plugin_Manager */
         $pluginFrontendControllers = $pm->getActiveFrontendControllers();
         if(!empty($pluginFrontendControllers)) {
             $controllers = array_merge($controllers, $pluginFrontendControllers);

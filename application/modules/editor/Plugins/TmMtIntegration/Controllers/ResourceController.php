@@ -48,9 +48,19 @@ class editor_Plugins_TmMtIntegration_ResourceController extends ZfExtended_RestC
         $resources = $serviceManager->getAllResources();
         $result = array();
         $i = 0;
+        
+        $userSession = new Zend_Session_Namespace('user');
+        $acl = ZfExtended_Acl::getInstance();
+        /* @var $acl ZfExtended_Acl */
+        
+        $isAllowedFilebased = $acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'pluginMatchResourcesAddFilebased');
+        $isAllowedNonFilebased = $acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'pluginMatchResourcesAddNonFilebased');
         foreach($resources as $resource) {
             /* @var $resource editor_Plugins_TmMtIntegration_Models_Resource */
-            $result[] = $resource->getDataObject();
+            $isFilebased = $resource->getFilebased();
+            if($isFilebased && $isAllowedFilebased || !$isFilebased && $isAllowedNonFilebased) {
+                $result[] = $resource->getDataObject();
+            }
         }
         $this->view->rows = $result;
         $this->view->total = count($result);

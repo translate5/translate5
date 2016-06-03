@@ -28,22 +28,11 @@
 -- */
 
 DELETE FROM Zf_acl_rules 
-WHERE `module` = 'editor' AND
-`role` = 'pm' AND
-`resource` = 'editor_plugins_tmmtintegration_resource' AND
-`right` = 'all';
+WHERE `module` = 'editor' AND `resource` IN ('editor_plugins_tmmtintegration_query', 'editor_plugins_tmmtintegration_resource','editor_plugins_tmmtintegration_taskassoc','editor_plugins_tmmtintegration_tmmt');
 
 DELETE FROM Zf_acl_rules 
-WHERE `module` = 'editor' AND
-`role` = 'pm' AND
-`resource` = 'editor_plugins_tmmtintegration_taskassoc' AND
-`right` = 'all';
-
-DELETE FROM Zf_acl_rules 
-WHERE `module` = 'editor' AND
-`role` = 'pm' AND
-`resource` = 'editor_plugins_tmmtintegration_tmmt' AND
-`right` = 'all';
+WHERE `module` = 'editor' AND `resource` = 'frontend' AND 
+`right` IN ('pluginMatchResourceOverview','pluginMatchResourcesAddFilebased','pluginMatchResourceTaskassoc','pluginMatchResourcesAddNonFilebased','pluginMatchResourceMatchQuery','pluginMatchResourceSearchQuery');
 
 DROP TABLE `LEK_tmmtintegration_tmmt`;
 DROP TABLE `LEK_tmmtintegration_taskassoc`;
