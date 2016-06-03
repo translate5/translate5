@@ -295,8 +295,8 @@ Ext.define('Editor.view.segments.Grid', {
                 },
                 dockedItems: [{
                     xtype: 'segmentsToolbar',
-                    dock: 'top'
-                }]
+                    dock: 'top',
+                    }]
             };
         if (instanceConfig) {
             me.getConfigurator().merge(me, config, instanceConfig);

@@ -241,7 +241,8 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       
       userAssocs.loadData([],false); //cleanup old contents
       userAssocs.load(tuaParams);
-      me.fireEvent('loadPreferences', tuaParams);
+
+      me.fireEvent('loadPreferences', this, task, me.getPrefWindow());
   },
   /**
    * Opens the Preferences to the choosen Task
