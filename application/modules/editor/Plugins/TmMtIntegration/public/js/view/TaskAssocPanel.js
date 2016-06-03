@@ -23,7 +23,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execptions
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -39,92 +39,92 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.panel.Panel
  */
 Ext.define('Editor.plugins.TmMtIntegration.view.TaskAssocPanel', {
-	extend : 'Ext.panel.Panel',
-	alias : 'widget.tmMtIntegrationTaskAssocPanel',
-	requires: ['Editor.view.admin.TaskActionColumn'],
-	cls : 'adminTaskGrid',
-	title : 'Associate TMs to task',
-	frame : true,
-	padding : 10,
-	initConfig : function(instanceConfig) {
-		var me = this,
-		config = {
-				dockedItems : [{
-	                xtype : 'toolbar',
-	                dock : 'bottom',
-	                ui: 'footer',
-	                layout: {
-	                    type: 'hbox',
-	                    pack: 'start'
-	                },
-	                items : [{
-	                    xtype: 'tbfill'
-	                },{
-	                	xtype : 'button',
-						id : 'btnSaveChanges',
-						tooltip : 'Save',
-						text : 'Save TMs',
-						enableToggle : true,
-						pressed : true
-	                }]
-	            }],
-			items : [ {
-				xtype : 'grid',
-				id : 'tmGrid',
-				store : 'Editor.plugins.TmMtIntegration.store.TaskAssocStore',
-				features : [ {
-					id : 'group',
-					ftype : 'groupingsummary',
-					groupHeaderTpl : 'Service :{name}',
-					hideGroupedHeader : true,
-					enableGroupingMenu : false
-				} ],
-				columns : [ {
-					xtype : 'checkcolumn',
-					text : '',
-					dataIndex : 'checked',
-					sortable : true,
-					flex : 10 / 100
-				}, {
-					xtype : 'gridcolumn',
-					text : 'Name',
-					renderer: function(value, metaData, record) {
-		        		return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #'+record.get('color')+';"></div>'+value;
-		        	},
-					dataIndex : 'name',
-					sortable : true,
-					flex : 40 / 100
-				}, {
-					xtype : 'gridcolumn',
-					text : 'Source Language',
-					cls : 'source-lang',
-					dataIndex : 'sourceLang',
-					renderer : me.langRenderer,
-					sortable : true,
-					flex : 25 / 100,
-				}, {
-					xtype : 'gridcolumn',
-					text : 'Target Language',
-					cls : 'target-lang',
-					dataIndex : 'targetLang',
-					renderer : me.langRenderer,
-					flex : 25 / 100,
-					sortable : true
-				} ]
-			} ],// end of items
-		};
-		if (instanceConfig) {
-			me.getConfigurator().merge(me, config, instanceConfig);
-		}
-		return me.callParent([ config ]);
-	},
-	langRenderer : function(val, md) {
-		var lang = Ext.StoreMgr.get('admin.Languages').getById(val), label;
-		if (lang) {
-			label = lang.get('label');
-			md.tdAttr = 'data-qtip="' + label + '"';
-			return label;
-		}
-		return '';
-	},
+    extend : 'Ext.panel.Panel',
+    alias : 'widget.tmMtIntegrationTaskAssocPanel',
+    requires: ['Editor.view.admin.TaskActionColumn'],
+    cls : 'adminTaskGrid',
+    title : 'Associate TMs to task',
+    frame : true,
+    layout: 'fit',
+    padding : 10,
+    initConfig : function(instanceConfig) {
+        var me = this,
+        config = {
+                dockedItems : [{
+                    xtype : 'toolbar',
+                    dock : 'bottom',
+                    ui: 'footer',
+                    layout: {
+                        type: 'hbox',
+                        pack: 'start'
+                    },
+                    items : [{
+                        xtype: 'tbfill'
+                    },{
+                        xtype : 'button',
+                        id : 'btnSaveChanges',
+                        tooltip : 'Save',
+                        text : 'Save TMs'
+                    }]
+                }],
+            items : [ {
+                xtype : 'grid',
+                id : 'tmTaskAssocGrid',
+                store : 'Editor.plugins.TmMtIntegration.store.TaskAssocStore',
+                emptyText: 'Keine Match Resource in der Sprachkombination des geöffneten Tasks verfügbar.',
+                features : [ {
+                    id : 'group',
+                    ftype : 'grouping',
+                    groupHeaderTpl : 'Service: {name}',
+                    hideGroupedHeader : true,
+                    enableGroupingMenu : false
+                } ],
+                columns : [ {
+                    xtype : 'checkcolumn',
+                    text : '',
+                    dataIndex : 'checked',
+                    sortable : true,
+                    flex : 10 / 100
+                }, {
+                    xtype : 'gridcolumn',
+                    text : 'Name',
+                    renderer: function(value, metaData, record) {
+                        return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #'+record.get('color')+';"></div>'+value;
+                    },
+                    dataIndex : 'name',
+                    sortable : true,
+                    flex : 40 / 100
+                }, {
+                    xtype : 'gridcolumn',
+                    text : 'Source Language',
+                    cls : 'source-lang',
+                    dataIndex : 'sourceLang',
+                    renderer : me.langRenderer,
+                    sortable : true,
+                    flex : 25 / 100,
+                }, {
+                    xtype : 'gridcolumn',
+                    text : 'Target Language',
+                    cls : 'target-lang',
+                    dataIndex : 'targetLang',
+                    renderer : me.langRenderer,
+                    flex : 25 / 100,
+                    sortable : true
+                } ]
+            } ],// end of items
+        };
+        if (instanceConfig) {
+            me.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([ config ]);
+    },
+    langRenderer : function(val, md) {
+        var lang = Ext.StoreMgr.get('admin.Languages').getById(val), label;
+        if (lang) {
+            label = lang.get('label');
+            md.tdAttr = 'data-qtip="' + label + '"';
+            return label;
+        }
+        return '';
+    },
 });

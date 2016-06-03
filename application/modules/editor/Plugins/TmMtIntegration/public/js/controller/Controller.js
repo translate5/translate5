@@ -23,7 +23,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execptions
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -47,33 +47,22 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.Controller', {
   refs: [{
       ref: 'taskTabs',
       selector: 'adminTaskPreferencesWindow > tabpanel'
-  		},
-  		{
-  	      ref: 'tmGrid',
-  	      selector: 'taskTabs #tmGrid'
-  		}
-  		],
+  },{
+      ref: 'grid',
+      selector: 'adminTaskPreferencesWindow > tabpanel #tmTaskAssocGrid'
+  }],
   listen: {
-	  controller: {
-		  '#taskpreferences': {
-			  'loadPreferences': function(controller,task){
-			      
-			      tmmtparams = {
-			              params: {
-			                  filter: '[{"operator":"like","value":"'+task.get('taskGuid')+'","property":"taskGuid"}]'
-			              }
-			      };
-				  var me = this;
-				  me.getEditorPluginsTmMtIntegrationStoreTaskAssocStoreStore().load(tmmtparams);
-			  }
-		  }
-	  },
+      controller: {
+          '#taskpreferences': {
+              'loadPreferences': 'handleLoadPreferences'
+          }
+      },
       component: {
           'adminTaskPreferencesWindow': {
               render: 'onParentRender'
           },
           '#btnSaveChanges': {
-              click: 'handleOnButtonClick'
+              click: 'handleOnSaveButtonClick'
           }
       }
   },
@@ -85,43 +74,46 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.Controller', {
       me.actualTask = window.actualTask;
       me.getTaskTabs().add({xtype: 'tmMtIntegrationTaskAssocPanel', actualTask: me.actualTask});
   },
-  handleOnButtonClick: function(window) {
-	  var me = this;
-	  
-  	  var showDialogSuccess = false;
-  	  var showDalogError = false;
-      me.getEditorPluginsTmMtIntegrationStoreTaskAssocStoreStore().each(function(record){
-    	if(!record.dirty){
-    		  return;
-    	}
-		Ext.Ajax.request({
-			url:Editor.data.restpath+'plugins_tmmtintegration_taskassoc' + (!record.data.checked ? '/'+record.get('taskassocid'):''),
-			method: record.data.checked ? "POST" : "DELETE",
-			params: record.data.checked ? {
-				data: Ext.JSON.encode({
-					tmmtId: record.get('id'),
-					taskGuid: me.actualTask.get('taskGuid')
-				})
-			} : {} ,
-			success: function(response){
-				if(record.data.checked){
-					var resp = Ext.util.JSON.decode(response.responseText);
-					var newId = resp.rows['id'];
-					record.set('taskassocid', newId);
-					showDialogSuccess = true;
-				}
-				record.commit();
-		    },
-		    failure: function(response){
-		    	showDalogError = true;
-		    } 
-		});
-       }, this);
-      
-      if(showDialogSuccess)
-    	  Editor.MessageBox.addSuccess('Success!');
-      
-      if(showDalogError)
-    	  Editor.MessageBox.addSuccess('Fail!');
+  handleLoadPreferences: function(controller,task){
+      var me = this,
+          tmmtparams = {
+              params: {
+                  filter: '[{"operator":"like","value":"'+task.get('taskGuid')+'","property":"taskGuid"}]'
+              }
+          };
+      me.getGrid().store.load(tmmtparams);
+  },
+  handleOnSaveButtonClick: function(window) {
+      var me = this;
+      me.getGrid().store.each(me.saveOneAssocRecord, me);
+  },
+  saveOneAssocRecord: function(record){
+      if(!record.dirty){
+          return;
+      }
+      var me = this,
+          checkedData = {
+          data: Ext.JSON.encode({
+              tmmtId: record.get('id'),
+              taskGuid: me.actualTask.get('taskGuid')
+          })
+      };
+      Ext.Ajax.request({
+          url:Editor.data.restpath+'plugins_tmmtintegration_taskassoc' + (!record.data.checked ? '/'+record.get('taskassocid'):''),
+          method: record.data.checked ? "POST" : "DELETE",
+          params: record.data.checked ? checkedData : {} ,
+          success: function(response){
+              if(record.data.checked){
+                  var resp = Ext.util.JSON.decode(response.responseText),
+                      newId = resp.rows['id'];
+                  record.set('taskassocid', newId);
+                  Editor.MessageBox.addSuccess('Success!');
+              }
+              record.commit();
+          },
+          failure: function(response){
+              Editor.MessageBox.addSuccess('Fail!');
+          } 
+      });
   }
 });
