@@ -116,6 +116,7 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
             $data->source = strip_tags($line[1]);
             $data->target = strip_tags($line[2]);
             $data->matchrate = $percent;
+            $data->attributes = 'Attributes: can be empty when service does not provide attributes. If not empty, then already preformatted for tooltipping!';
             $result[] = $data;
         }
 
