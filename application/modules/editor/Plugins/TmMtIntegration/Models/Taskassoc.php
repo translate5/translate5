@@ -28,43 +28,53 @@ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception
 END LICENSE AND COPYRIGHT
 */
 class editor_Plugins_TmMtIntegration_Models_Taskassoc extends ZfExtended_Models_Entity_Abstract {
-	protected $dbInstanceClass = 'editor_Plugins_TmMtIntegration_Models_Db_Taskassoc';
-	protected $validatorInstanceClass = 'editor_Plugins_TmMtIntegration_Models_Validator_Taskassoc'; //→ here the new validator class
+    protected $dbInstanceClass = 'editor_Plugins_TmMtIntegration_Models_Db_Taskassoc';
+    protected $validatorInstanceClass = 'editor_Plugins_TmMtIntegration_Models_Validator_Taskassoc'; //→ here the new validator class
 
-	public function loadByTaskGuid($taskGuid) {
-		return $this->loadRow('taskGuid = ?', $taskGuid);
-	}
-	
-	public function loadByAssociatedTaskAndLanguage($taskGuid) {
+    public function loadByTaskGuid($taskGuid) {
+        return $this->loadRow('taskGuid = ?', $taskGuid);
+    }
+    
+    public function loadByAssociatedTaskAndLanguage($taskGuid) {
         
-	    $task = ZfExtended_Factory::get('editor_Models_Task');
-	    /* @var $task editor_Models_Task */
-	    $task->loadByTaskGuid((string) $taskGuid);
-	    
-	    $this->filter->deleteFilter("taskGuid");
-	    $this->filter->addFilter((object)[
-	            'field' => 'sourceLang',
-	            'type' =>  'numeric',
-	            'comparison' => 'eq',
-	            'table' => 'tmmt',//only needed for join
-	            'value' => $task->getSourceLang(),
-	    ]);
-	    $this->filter->addFilter((object)[
-	            'field' => 'targetLang',
-	            'table' => 'tmmt',
-	            'comparison' => 'eq',
-	            'type' =>  'numeric',
-	            'value' => $task->getTargetLang(),
-	    ]);
-	    
-	    $db = $this->db;
-	    $s = $db->select()
-	    ->setIntegrityCheck(false)
-	    ->from(array("tmmt" => "LEK_tmmtintegration_tmmt"), array("tmmt.*","ta.id AS taskassocid"))
-	    ->joinLeft(
-	            array("ta"=>"LEK_tmmtintegration_taskassoc"),
-	            "ta.tmmtId = tmmt.id",
-	            array("checked" => "IF(ta.taskGuid = '".$taskGuid."','true','false')"));
-	    return $this->loadFilterdCustom($s);
-	}
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid((string) $taskGuid);
+        
+        $this->filter->addFilter((object)[
+                'field' => 'sourceLang',
+                'type' =>  'numeric',
+                'comparison' => 'eq',
+                'table' => 'tmmt',//only needed for join
+                'value' => $task->getSourceLang(),
+        ]);
+        $this->filter->addFilter((object)[
+                'field' => 'targetLang',
+                'table' => 'tmmt',
+                'comparison' => 'eq',
+                'type' =>  'numeric',
+                'value' => $task->getTargetLang(),
+        ]);
+        
+        $db = $this->db;
+        $s = $db->select()
+        ->setIntegrityCheck(false)
+        ->from(array("tmmt" => "LEK_tmmtintegration_tmmt"), array("tmmt.*","ta.id AS taskassocid"));
+
+        if($this->filter->hasFilter('checked')) {
+            //if checked filter is set, we keep the taskGuid as filter argument,
+            // but remove additional checked filter and checked info 
+            $this->filter->deleteFilter('checked');
+            $checked = '';
+        }
+        else {
+            $this->filter->deleteFilter('taskGuid');
+            $checked = array("checked" => "IF(ta.taskGuid = '".$taskGuid."','true','false')");
+        }
+        
+        $s->joinLeft(
+                array("ta"=>"LEK_tmmtintegration_taskassoc"),
+                "ta.tmmtId = tmmt.id", $checked);
+        return $this->loadFilterdCustom($s);
+    }
 }

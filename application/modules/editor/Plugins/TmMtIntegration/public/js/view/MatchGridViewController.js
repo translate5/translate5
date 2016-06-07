@@ -59,8 +59,8 @@ Ext.define('Editor.plugins.TmMtIntegration.view.MatchGridViewController', {
       var me = this,
       	  taskGuid = Editor.data.task.get('taskGuid'),
       	  prm = {
-	           params: {
-	                filter: '[{"operator":"like","value":"'+taskGuid+'","property":"taskGuid"}]'
+	            params: {
+	                filter: '[{"operator":"like","value":"'+taskGuid+'","property":"taskGuid"},{"operator":"eq","value":true,"property":"checked"}]'
 	            },
 	            callback : me.afterAssocStoreLoad,
 	            scope : me
