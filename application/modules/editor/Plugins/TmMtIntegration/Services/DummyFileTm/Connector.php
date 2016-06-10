@@ -52,6 +52,7 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
     public function __construct() {
         $eventManager = Zend_EventManager_StaticEventManager::getInstance();
         $eventManager->attach('editor_Plugins_TmMtIntegration_TmmtController', 'afterPostAction', array($this, 'handleAfterTmmtSaved'));
+        parent::__construct();
     }
 
     /**
@@ -92,7 +93,7 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
      * (non-PHPdoc)
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::query()
      */
-    public function query(string $queryString,string $segmentId) {
+    public function query(string $queryString) {
 
         if(stripos($this->tm->getName(), 'slow') !== false) {
             sleep(rand(5, 15));
@@ -115,16 +116,12 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
             if($percent < 80) {
                 continue;
             }
-            $data = new stdClass();
-            $data->source = strip_tags($line[1]);
-            $data->target = strip_tags($line[2]);
-            $data->matchrate = $percent;
-            $data->attributes = 'Attributes: can be empty when service does not provide attributes. If not empty, then already preformatted for tooltipping!';
-            $data->segmentId = $segmentId;
-            $result[] = $data;
+            $this->resultList->addResult(strip_tags($line[2]), $percent);
+            $this->resultList->setSource(strip_tags($line[1]));
+            $this->resultList->setAttributes('Attributes: can be empty when service does not provide attributes. If not empty, then already preformatted for tooltipping!');
         }
 
-        return $result;
+        return $this->resultList;
     }
 
     /**

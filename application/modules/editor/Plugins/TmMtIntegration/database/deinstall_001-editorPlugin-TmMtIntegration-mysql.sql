@@ -28,7 +28,7 @@
 -- */
 
 DELETE FROM Zf_acl_rules 
-WHERE `module` = 'editor' AND `resource` IN ('editor_plugins_tmmtintegration_query', 'editor_plugins_tmmtintegration_resource','editor_plugins_tmmtintegration_taskassoc','editor_plugins_tmmtintegration_tmmt');
+WHERE `module` = 'editor' AND `resource` IN ('editor_plugins_tmmtintegration_resource','editor_plugins_tmmtintegration_taskassoc','editor_plugins_tmmtintegration_tmmt');
 
 DELETE FROM Zf_acl_rules 
 WHERE `module` = 'editor' AND `resource` = 'frontend' AND 

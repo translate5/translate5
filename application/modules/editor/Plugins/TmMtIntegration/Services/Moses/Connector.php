@@ -38,6 +38,12 @@ END LICENSE AND COPYRIGHT
  * Moses Connector
  */
 class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
+    /**
+     * We assume that the best MT Match correlate this matchrate
+     * @var integer
+     */
+    const MT_BASE_MATCHRATE = 70;
+    
     public function addTm(string $filename, editor_Plugins_TmMtIntegration_Models_TmMt $tm){
         throw new BadMethodCallException('This Service is not filebased and cannot handle uploaded files therefore!');
     }
@@ -58,19 +64,42 @@ class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plu
         error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getServiceName());
     }
 
-    public function query(string $queryString,string $segmentId) {
+    /**
+     * (non-PHPdoc)
+     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::query()
+     */
+    public function query(string $queryString) {
         $rpc = new Zend_XmlRpc_Client("http://www.translate5.net:8124/RPC2");
+        $proxy = $rpc->getProxy();
+        $params = array(
+                'text' => "es ist ein kleines haus",
+                'align' => 'false',
+                'report-all-factors' => 'false',
+        );
+        
         try {
-
-            $rpc->call('translate', array('text' => 'es ist ein kleines haus'));
+            $res = $proxy->translate($params);
         }
         catch(Exception $e) {
             error_log($e);
         }
-        //error_log("Translate ".$toTranslate);
-        //error_log("Translated ".$toTranslate);
+        
+        
+        $this->resultList->setDefaultSource($queryString);
+        
+        if(!empty($res['text'])){
+            $this->resultList->addResult($res['text'], $this->calculateMatchrate());
+            return $this->resultList;
+        }
+        
+        return [];
     }
-
+    
+    /**
+     */
+    public function processSingleResponse($text) {
+    }
+    
     /**
      * (non-PHPdoc)
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::search()
@@ -78,4 +107,13 @@ class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plu
     public function search(string $searchString) {
         return $this->query($searchString);
     }
+
+    /**
+     * intended to calculate a matchrate out of the MT score
+     * @param string $score
+     */
+    protected function calculateMatchrate($score = null) {
+        return self::MT_BASE_MATCHRATE;
+    }
+    
 }

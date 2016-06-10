@@ -57,6 +57,9 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
         }
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
+        if(!$acl->has('frontend')) {
+            return $result;
+        }
         foreach($this->frontendControllers as $right => $controller) {
             if($acl->isInAllowedRoles($userSession->data->roles, 'frontend', $right)) {
                 $result[] = $controller;
@@ -99,15 +102,34 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
         $f = Zend_Registry::get('frontController');
         /* @var $f Zend_Controller_Front */
         $f->addControllerDirectory(APPLICATION_PATH.'/'.$this->getPluginPath().'/Controllers', '_plugins_'.__CLASS__);
+        $r = $f->getRouter();
         
         $restRoute = new Zend_Rest_Route($f, array(), array(
                 'editor' => array('plugins_tmmtintegration_taskassoc',
                                   'plugins_tmmtintegration_tmmt',
                                   'plugins_tmmtintegration_resource',
-                                  'plugins_tmmtintegration_query',
                 ),
         ));
-        $f->getRouter()->addRoute('plugins_tmmtintegration_restdefault', $restRoute);
+        $r->addRoute('plugins_tmmtintegration_restdefault', $restRoute);
+        
+        $queryRoute = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_tmmtintegration_tmmt/:tmmtId/query',
+            array(
+                'module' => 'editor',
+                'controller' => 'plugins_tmmtintegration_tmmt',
+                'action' => 'query'
+            ));
+        $r->addRoute('plugins_tmmtintegration_query', $queryRoute);
+        
+        $queryRoute = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_tmmtintegration_tmmt/:tmmtid/search',
+            array(
+                'module' => 'editor',
+                'controller' => 'plugins_tmmtintegration_tmmt',
+                'action' => 'search'
+            ));
+        $r->addRoute('plugins_tmmtintegration_search', $queryRoute);
+        
         
         return;
         //FIXME Thomas documentate and remove
@@ -116,8 +138,8 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
             'editor/js/app-localized.jsx',
             array(
                 'module' => 'editor',
-                'controller' => 'plugins_tmmtintegration_resource',
-                'action' => 'demo',
+                'controller' => 'plugins_tmmtintegration_dummy',
+                'action' => 'query',
             ));
         $f->getRouter()->addRoute('plugins_tmmtintegration_test', $rest);
         
