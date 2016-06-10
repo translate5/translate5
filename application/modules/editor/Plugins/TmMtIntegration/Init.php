@@ -44,11 +44,17 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
         'pluginMatchResourceMatchQuery' => 'Editor.plugins.TmMtIntegration.controller.EditorController',
         'pluginMatchResourceSearchQuery' => 'Editor.plugins.TmMtIntegration.controller.EditorController',
         'pluginMatchResourceOverview' => 'Editor.plugins.TmMtIntegration.controller.TmOverviewController',
+        'pluginMatchMatchQuery' => 'Editor.plugins.TmMtIntegration.controller.EditorController',
+        'pluginMatchSearchQuery'=>'Editor.plugins.TmMtIntegration.controller.EditorController',
     );
     
     public function getFrontendControllers() {
+        return array_values($this->frontendControllers);
         $result = array();
         $userSession = new Zend_Session_Namespace('user');
+        if(empty($userSession) || empty($userSession->data)) {
+            return $result;
+        }
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
         foreach($this->frontendControllers as $right => $controller) {
