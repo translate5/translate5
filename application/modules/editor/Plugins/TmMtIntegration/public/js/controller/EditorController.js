@@ -50,15 +50,32 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.EditorController', {
       component: {
           '#segmentgrid': {
               render: 'onEditorGridRender',
-              beforeedit: 'handleSegmentBeginEdit'
+              beforeedit: 'startEditing',
+              canceledit: 'endEditing',
+              edit: 'endEditing'
           }
       }
   },
-  handleSegmentBeginEdit: function(plugin,context) {
-	  this.getMatchgrid().controller.makeQuery(context.record.get('taskGuid'),context.value);
+  init : function() {
+      var me = this;
+      //    toc = me.application.getController('editor.PrevNextSegment');
+      console.log(me);
+      //toc.on('prevnextloaded',me.prevNextLoaded, me);
+  },
+  startEditing: function(plugin,context) {
+	  //FIXME another way to get segmentId ?
+	  this.getMatchgrid().controller.startEditing(context);//(context.record.get('taskGuid'),context.value);
+  },
+  endEditing : function(plugin,context) {
+	  this.getMatchgrid().controller.endEditing();//(context.record.get('taskGuid'),context.value);
   },
   onEditorGridRender: function(grid) {
-      grid.addDocked({xtype: 'tmMtIntegrationTmMtEditorPanel',dock:'bottom'});
+	  if(Editor.app.authenticatedUser.isAllowed('pluginMatchMatchQuery') || Editor.app.authenticatedUser.isAllowed('pluginMatchSearchQuery')){
+		  grid.addDocked({xtype: 'tmMtIntegrationTmMtEditorPanel',dock:'bottom'});
+	  }
+  },
+  prevNextLoaded : function(){
+	  alert('ace');
   }
   /*
   handleInitEditor: function() {

@@ -50,35 +50,75 @@ Ext.define('Editor.plugins.TmMtIntegration.view.EditorPanel', {
 	initConfig : function(instanceConfig) {
 		var me = this,
 		config = {
-			items : [{
-			             title: 'Match panel',
-			             xtype:'tmMtIntegrationMatchGrid'
-			         },
-			         {
-			             title: 'Search panel',
-			             items:[{
-			            	 xtype: 'container',
-			                 anchor: '100%',
-			                 layout:'column',
-			                 items:[{
-			                	 xtype:'textfield',
-			                	 dataIndex:'sourceSearch',
-			                	 emptyText:'Source search...',
-			                	 padding:'10 10 10 10',
-			                 },{
-			                	 xtype:'textfield',
-				            	 dataIndex:'targetSearch',
-				            	 emptyText:'Target search...',
-				            	 padding:'10 10 10 10',
-			                 }]
-			             },{
-			            	 xtype:'tmMtIntegrationEditorPanelSearchGrid'
-			             }]
-			         }],// end of items
+			items : []// end of items
 		};
+		if(Editor.app.authenticatedUser.isAllowed('pluginMatchMatchQuery')) {
+			config.items.push({
+	             title: 'Match panel',
+	             xtype:'tmMtIntegrationMatchGrid'
+	         });
+		}
+		if(Editor.app.authenticatedUser.isAllowed('pluginMatchSearchQuery')) {
+			config.items.push({
+	             title: 'Search panel',
+	             items:[{
+	            	 xtype: 'container',
+	                 anchor: '100%',
+	                 layout:'column',
+	                 items:[{
+	                	 xtype:'textfield',
+	                	 dataIndex:'sourceSearch',
+	                	 emptyText:'Source search...',
+	                	 padding:'10 10 10 10',
+	                 },{
+	                	 xtype:'textfield',
+		            	 dataIndex:'targetSearch',
+		            	 emptyText:'Target search...',
+		            	 padding:'10 10 10 10',
+	                 }]
+	             },{
+	            	 xtype:'tmMtIntegrationEditorPanelSearchGrid'
+	             }]
+	         });
+		}
+		//me.isAllowedMatchQuery(config);
+		//me.isAllowedSearchQuery(config);
 		if (instanceConfig) {
 			me.getConfigurator().merge(me, config, instanceConfig);
 		}
 		return me.callParent([ config ]);
 	},
+	isAllowedMatchQuery:function(config){
+		if(Editor.app.authenticatedUser.isAllowed('pluginMatchMatchQuery')) {
+			config.items.push({
+	             title: 'Match panel',
+	             xtype:'tmMtIntegrationMatchGrid'
+	         });
+		}
+	},
+	isAllowedSearchQuery:function(config){
+		if(Editor.app.authenticatedUser.isAllowed('pluginMatchSearchQuery')) {
+			config.items.push({
+	             title: 'Search panel',
+	             items:[{
+	            	 xtype: 'container',
+	                 anchor: '100%',
+	                 layout:'column',
+	                 items:[{
+	                	 xtype:'textfield',
+	                	 dataIndex:'sourceSearch',
+	                	 emptyText:'Source search...',
+	                	 padding:'10 10 10 10',
+	                 },{
+	                	 xtype:'textfield',
+		            	 dataIndex:'targetSearch',
+		            	 emptyText:'Target search...',
+		            	 padding:'10 10 10 10',
+	                 }]
+	             },{
+	            	 xtype:'tmMtIntegrationEditorPanelSearchGrid'
+	             }]
+	         });
+		}
+	},	
 });

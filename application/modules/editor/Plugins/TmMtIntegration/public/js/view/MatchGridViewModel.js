@@ -63,8 +63,9 @@ Ext.define('Editor.plugins.TmMtIntegration.view.MatchGridViewModel', {
                         pageSize: 200,
                         autoLoad: false,
                         model: 'Editor.plugins.TmMtIntegration.model.EditorQuery',
-                        sorters: {
-                            property: 'id'
+                        sortInfo:{
+                        	property:'matchrate',
+                        	direction:'ASC'
                         }
                     },
                     keyaccounts: me.processKeyaccounts({

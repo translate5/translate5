@@ -59,7 +59,10 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.TmOverviewController', {
 	  },{
 	      ref: 'TmWindow',
 	      selector: '#addTmWindow'
-	  }
+	  },{
+	        ref : 'topMenu',
+	        selector : 'headPanel #top-menu'
+	    }
 	],
   listen: {
 	  controller: {
@@ -93,6 +96,8 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.TmOverviewController', {
           },
           '#tmOverviewPanel #btnRefresh':{
         	  click:'handleButtonRefreshClick'
+          },'headPanel': {
+              afterrender: 'handleRenderHeadPanel'
           }
       }
   },
@@ -110,23 +115,22 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.TmOverviewController', {
   },
   /**
    * inject the plugin tab and load the task meta data set
+   * 		  xtype: 'button',
+		  itemId: 'btnTmOverviewWindow',
+		  text: 'TM Overview',
    */
   onParentRender: function(window) {
       var me = this;
       me.actualTask = window.actualTask;
-      /*
-      me.meta = Editor.plugins.TmMtIntegration.model.TaskAssocMeta.load(1, {
-          success: function(rec) {
-        	  alert('success');
-              me.meta = rec;
-          },
-          failure: function() {
-        	  alert('faill');
-              me.showResult('Could not load information!');
-          }
-      });
-      */
       me.getTaskTabs().add({xtype: 'tmMtIntegrationTaskAssocPanel', actualTask: me.actualTask});
+  },
+  handleRenderHeadPanel: function() {
+      var pos = this.getTopMenu().items.length - 1;
+      this.getTopMenu().insert(pos, {
+          xtype: 'button',
+          itemId: 'btnTmOverviewWindow',
+          text: 'TM Overview'
+      });
   },
   handleOnButtonClick: function(window) {
       

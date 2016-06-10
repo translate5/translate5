@@ -45,16 +45,27 @@ Ext.define('Editor.plugins.TmMtIntegration.view.MatchGridViewController', {
         controller:{
             '#Editor.$application': {
                 editorViewportOpened: 'handleInitEditor'
-      	  }
-        }
+      	  },
+      	}
     },
     assocStore : null,
+    editedSegmentId : -1, //the id of the edited segment
     DELAY_ASSOC_STORE_LOAD_TIME : 2000,
-    cachedResults : new Array(),
-    makeQuery: function(taskGuid, query) {
+    cachedResults :new Array(),
+    startEditing: function(context) {
     	var me = this;
-        me.loadCachedDataIntoGrid();
+    	me.editedSegmentId = context.record.id;
+        me.loadCachedDataIntoGrid(context.record.id);
     },
+    endEditing : function() {
+    	var me = this;
+    	me.editedSegmentId = -1;
+		var str = me.getView().getStore('editorquery');
+		str.removeAll();
+	},
+    testFunc : function() {
+		alert('test');
+	},
     handleInitEditor: function() {
       var me = this,
       	  taskGuid = Editor.data.task.get('taskGuid'),
@@ -76,60 +87,98 @@ Ext.define('Editor.plugins.TmMtIntegration.view.MatchGridViewController', {
 		me.getView().getStore('editorquery').removeAll();
     	
 		var task = new Ext.util.DelayedTask(function(){
-    		var el = segments.getAt(0);
-    	    me.assocStore.each(function(record){
-    	       me.cacheMatchPanelResults(record,el.data.source,taskGuid);//FIXME another way to take source ?  get() ?
-    	    });
+			for(var i=0;i<=10;i++){//cahce for first 11 segments
+	    		var segment = segments.getAt(i);//loop through all segments or n segments and cache the data
+	    		me.cachedResults[segment.get('id')] = {}; 
+	    	    me.assocStore.each(function(record){
+	    	       me.cacheMatchPanelResults(record,segment,taskGuid);
+	    	    });
+			}
     	});
     	task.delay(me.DELAY_ASSOC_STORE_LOAD_TIME);
     },
-    cacheMatchPanelResults:function(record, query,taskGuid){
+    cacheMatchPanelResults:function(tmmt, segment,taskGuid){
     	var me = this;
-        Ext.Ajax.request({
+    	var segmentId = segment.get('id');
+    	var tmmtid = tmmt.get('id');
+    	var dummyObj = {
+    			rows :{
+		    		result :new Array({
+				    			id : '',
+				    			source : 'Loading ...',
+				    			target : 'Loading ...',
+				    			matchrate : '',
+				    			segmentId :'',
+				    			loading :true})
+				    	
+    			}
+    	};
+    	
+    	me.cachedResults[segmentId][tmmtid] = dummyObj;
+
+    	me.sendRequest(segmentId, segment.get('source'), tmmtid, taskGuid); 	
+    },
+    sendRequest : function(segmentId,query,tmmtid,taskGuid) {
+    	var me = this;
+    	Ext.Ajax.request({
             url:Editor.data.restpath+'plugins_tmmtintegration_query',
                 method: "POST",
                 params: {
                     data: Ext.JSON.encode({
                         type: 'query', //query => mtmatch | search => concorance,
                         //column for which the search was done (target | source)
-                        segmentId: 1,//FIXME get from segment
+                        segmentId: segmentId,
                         query: query,
-                        tmmtId: record.get('id'),
+                        tmmtId: tmmtid,
                         taskGuid: taskGuid
                     })
                 },
                 success: function(response){
   				  var resp = Ext.util.JSON.decode(response.responseText);
-  				  if(resp.rows.result){
-  					var record,
-  						segId;
+  				  //console.log(response.responseText);
+  				  if( typeof resp.rows.result !== 'undefined' && resp.rows.result !== null && resp.rows.result.length){
+  					//console.log(resp.rows.result[0].segmentId +"<->"+resp.rows.result[0].tmmtid);
+  					  //me.cachedResults[resp.rows.result[0].segmentId][resp.rows.result[0].tmmtid] = {};
+  					
+  					me.cachedResults[resp.rows.result[0].segmentId][resp.rows.result[0].tmmtid] = resp;
+  					
+  					me.loadCachedDataIntoGrid(resp.rows.result[0].segmentId);
+  					/*var rec,
+  						obj = {};
   					  for(var i=0; i<resp.rows.result.length;i++){
   						  if(resp.rows.result[i].matchrate > 0){
-  							record = Editor.plugins.TmMtIntegration.model.EditorQuery.create(resp.rows.result[i]);
-  							segId = record.get('segmentId');
-		  				  	me.cachedResults.push(
-		  				  			{ 
-		  				  				segId : record
-		  				  			}
-		  				  			);
+  							obj = {};
+  							rec = Editor.plugins.TmMtIntegration.model.EditorQuery.create(resp.rows.result[i]);
+  							obj[rec.get('segmentId')] = rec;
+		  				  	me.cachedResults.push(obj);
   						  }
-  					  }
+  					  }*/
   				  }
                 }, 
                 failure: function(response){ 
                     console.log(response.responseText); 
                 }
         });
-    },
-    loadCachedDataIntoGrid : function() {
-    	var me = this,
-    		segmentId = 1;//FIXME get from segment
+	},
+    loadCachedDataIntoGrid : function(segmentId) {
+    	if(segmentId != this.editedSegmentId)
+    		return;
     	
-		me.getView().getStore('editorquery').removeAll();
-    	
-		for(var i=0; i<me.cachedResults.length;i++){
-			me.getView().getStore('editorquery').add(me.cachedResults[i][segmentId]);
-		}
+    	var me = this;
+		var str = me.getView().getStore('editorquery');
+		str.removeAll();
+    	if(me.cachedResults[segmentId]){
+    		var res =me.cachedResults[segmentId];    		
+	    		me.assocStore.each(function(record){
+	    			var itm = res[record.get('id')];
+	        		
+	    			me.getView().getStore('editorquery').loadRawData(itm.rows.result,true);
+	    			/*
+	    			for(var i =0;i<itm.rows.result.length;i++){
+	        			me.getView().getStore('editorquery').add(Editor.plugins.TmMtIntegration.model.EditorQuery.create(itm.rows.result[i]));
+	        		}*/
+	    			
+	    		});
+    	}
 	}
-
 });
