@@ -95,4 +95,57 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
         //$this->processClientReferenceVersion();
         $this->entity->delete();
     }
+    
+    public function queryAction() {
+        $session = new Zend_Session_Namespace();
+        $query = $this->_getParam('query');
+        $tmmtId = (int) $this->_getParam('tmmtId');
+        
+        $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segment editor_Models_Segment */
+        $segment->load((int) $this->_getParam('segmentId'));
+        
+        //check taskGuid of segment against loaded taskguid for security reasons
+        if ($session->taskGuid !== $segment->getTaskGuid()) {
+            throw new ZfExtended_Models_Entity_NoAccessException();
+        }
+        
+        $this->entity->load($tmmtId);
+
+        $connector = $this->getConnector();
+
+        $result = new stdClass();
+        $result->id = $this->entity->getId();
+        $result->segmentId = $segment->getId(); //return the segmentId back, just for reference
+        
+        //FIXME if empty query, but segmentId given, the load segment first and get source as query from there
+        $result->result = $connector->query($query)->getResult();
+
+        $this->view->rows = $result;
+    }
+    
+    public function searchAction() {
+        
+    }
+    
+   /**
+     * returns the connector to be used
+     * @return editor_Plugins_TmMtIntegration_Services_ConnectorAbstract
+     */
+    public function getConnector() {
+        $tmmt = $this->entity;
+        
+        $service = $tmmt->getServiceType();
+
+        $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
+        /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
+        $resource = $manager->getResourceById($service, $tmmt->getResourceId());
+
+        $connector = $manager->getConnector($service, $resource);
+        /* @var $connector editor_Plugins_TmMtIntegration_Services_ConnectorAbstract */
+
+        //set the tmmt to be queried
+        $connector->openForQuery($tmmt);
+        return $connector;
+    }
 }

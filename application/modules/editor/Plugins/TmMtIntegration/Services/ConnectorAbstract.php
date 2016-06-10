@@ -39,7 +39,21 @@ END LICENSE AND COPYRIGHT
  */
 abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
     protected $resource;
+    
+    /**
+     * Container for the connector results
+     * @var editor_Plugins_TmMtIntegration_Services_ServiceResult
+     */
+    protected $resultList;
 
+    /**
+     * initialises the internal result list
+     */
+    public function __construct() {
+        $this->resultList = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_ServiceResult');
+        /* @var $this->resultList editor_Plugins_TmMtIntegration_Services_ServiceResult */
+    }
+    
     public function connectTo(editor_Plugins_TmMtIntegration_Models_Resource $resource) {
         $this->resource = $resource;
     }
@@ -75,15 +89,21 @@ abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
 
     /**
      * makes a tm / mt / file query to find a match / translation
-     * @param string $queryString , string $segmentId
-     * @return array
+     * returns an array with stdObjects, each stdObject contains the fields: 
+     * 
+     * 
+     * @param string $queryString
+     * @return editor_Plugins_TmMtIntegration_Services_ServiceResult
      */
-    abstract public function query(string $queryString,string $segmentId);
+    abstract public function query(string $queryString);
 
     /**
      * makes a tm / mt / file concordance search
      * @param string $queryString
      * @return array
+     * 
+     * FIXME missing source or target!
+     * 
      */
     abstract public function search(string $searchString);
 }
