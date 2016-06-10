@@ -121,17 +121,12 @@ Ext.define('Editor.plugins.TmMtIntegration.view.MatchGridViewController', {
     sendRequest : function(segmentId,query,tmmtid,taskGuid) {
     	var me = this;
     	Ext.Ajax.request({
-            url:Editor.data.restpath+'plugins_tmmtintegration_query',
-                method: "POST",
+            url:Editor.data.restpath+'plugins_tmmtintegration_tmmt/'+tmmtid+'/query',
+                method: "GET",
                 params: {
-                    data: Ext.JSON.encode({
-                        type: 'query', //query => mtmatch | search => concorance,
-                        //column for which the search was done (target | source)
-                        segmentId: segmentId,
-                        query: query,
-                        tmmtId: tmmtid,
-                        taskGuid: taskGuid
-                    })
+                    //column for which the search was done (target | source)
+                    segmentId: segmentId,
+                    query: query
                 },
                 success: function(response){
   				  var resp = Ext.util.JSON.decode(response.responseText);
@@ -140,9 +135,9 @@ Ext.define('Editor.plugins.TmMtIntegration.view.MatchGridViewController', {
   					//console.log(resp.rows.result[0].segmentId +"<->"+resp.rows.result[0].tmmtid);
   					  //me.cachedResults[resp.rows.result[0].segmentId][resp.rows.result[0].tmmtid] = {};
   					
-  					me.cachedResults[resp.rows.result[0].segmentId][resp.rows.result[0].tmmtid] = resp;
+  					me.cachedResults[segmentId][tmmtid] = resp;
   					
-  					me.loadCachedDataIntoGrid(resp.rows.result[0].segmentId);
+  					me.loadCachedDataIntoGrid(segmentId);
   					/*var rec,
   						obj = {};
   					  for(var i=0; i<resp.rows.result.length;i++){
