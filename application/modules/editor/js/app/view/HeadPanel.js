@@ -105,10 +105,6 @@ Ext.define('Editor.view.HeadPanel', {
                         xtype: 'button',
                         itemId: 'logoutSingle',
                         text: me.strings.logout
-                    },{
-                        xtype: 'button',
-                        itemId: 'btnTmOverviewWindow',
-                        text: 'TM Overview'
                     },
                     {
                         xtype: 'button',
