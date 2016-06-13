@@ -62,9 +62,6 @@ insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor
 insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'editor', 'frontend', 'pluginMatchResourceMatchQuery');
 insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'editor', 'frontend', 'pluginMatchResourceSearchQuery');
 
-insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'editor', 'frontend', 'pluginMatchMatchQuery');
-insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'editor', 'frontend', 'pluginMatchSearchQuery');
- 
 INSERT INTO `Zf_configuration` (`id`, `name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES (NULL, 'runtimeOptions.worker.editor_Plugins_TmMtIntegration_Models_Worker.maxParallelWorkers', '1', 'editor', 'worker', '10', '10', '', 'integer', 'Max parallel running workers of TMMT Integeration query worker');
 

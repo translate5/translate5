@@ -70,9 +70,10 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.EditorController', {
 	  this.getMatchgrid().controller.endEditing();//(context.record.get('taskGuid'),context.value);
   },
   onEditorGridRender: function(grid) {
-	  if(Editor.app.authenticatedUser.isAllowed('pluginMatchMatchQuery') || Editor.app.authenticatedUser.isAllowed('pluginMatchSearchQuery')){
-		  grid.addDocked({xtype: 'tmMtIntegrationTmMtEditorPanel',dock:'bottom'});
-	  }
+      var authUser = Editor.app.authenticatedUser;
+      if(authUser.isAllowed('pluginMatchResourceMatchQuery') || authUser.isAllowed('pluginMatchResourceSearchQuery')){
+          grid.addDocked({xtype: 'tmMtIntegrationTmMtEditorPanel',dock:'bottom'});
+      }
   },
   prevNextLoaded : function(){
 	  alert('ace');

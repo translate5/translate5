@@ -44,8 +44,6 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
         'pluginMatchResourceMatchQuery' => 'Editor.plugins.TmMtIntegration.controller.EditorController',
         'pluginMatchResourceSearchQuery' => 'Editor.plugins.TmMtIntegration.controller.EditorController',
         'pluginMatchResourceOverview' => 'Editor.plugins.TmMtIntegration.controller.TmOverviewController',
-        'pluginMatchMatchQuery' => 'Editor.plugins.TmMtIntegration.controller.EditorController',
-        'pluginMatchSearchQuery'=>'Editor.plugins.TmMtIntegration.controller.EditorController',
     );
     
     public function getFrontendControllers() {

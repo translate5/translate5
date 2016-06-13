@@ -52,13 +52,13 @@ Ext.define('Editor.plugins.TmMtIntegration.view.EditorPanel', {
 		config = {
 			items : []// end of items
 		};
-		if(Editor.app.authenticatedUser.isAllowed('pluginMatchMatchQuery')) {
+		if(Editor.app.authenticatedUser.isAllowed('pluginMatchResourceMatchQuery')) {
 			config.items.push({
 	             title: 'Match panel',
 	             xtype:'tmMtIntegrationMatchGrid'
 	         });
 		}
-		if(Editor.app.authenticatedUser.isAllowed('pluginMatchSearchQuery')) {
+		if(Editor.app.authenticatedUser.isAllowed('pluginMatchResourceSearchQuery')) {
 			config.items.push({
 	             title: 'Search panel',
 	             items:[{
@@ -89,7 +89,7 @@ Ext.define('Editor.plugins.TmMtIntegration.view.EditorPanel', {
 		return me.callParent([ config ]);
 	},
 	isAllowedMatchQuery:function(config){
-		if(Editor.app.authenticatedUser.isAllowed('pluginMatchMatchQuery')) {
+		if(Editor.app.authenticatedUser.isAllowed('pluginMatchResourceMatchQuery')) {
 			config.items.push({
 	             title: 'Match panel',
 	             xtype:'tmMtIntegrationMatchGrid'
@@ -97,7 +97,7 @@ Ext.define('Editor.plugins.TmMtIntegration.view.EditorPanel', {
 		}
 	},
 	isAllowedSearchQuery:function(config){
-		if(Editor.app.authenticatedUser.isAllowed('pluginMatchSearchQuery')) {
+		if(Editor.app.authenticatedUser.isAllowed('pluginMatchResourceSearchQuery')) {
 			config.items.push({
 	             title: 'Search panel',
 	             items:[{
