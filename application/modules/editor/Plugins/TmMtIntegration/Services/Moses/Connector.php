@@ -72,9 +72,10 @@ class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plu
         $rpc = new Zend_XmlRpc_Client("http://www.translate5.net:8124/RPC2");
         $proxy = $rpc->getProxy();
         $params = array(
-                'text' => "es ist ein kleines haus",
-                'align' => 'false',
-                'report-all-factors' => 'false',
+            //for the "es ist ein kleines haus" sample data the requests work only with lower case requests:
+            'text' => strtolower($queryString), //"es ist ein kleines haus",
+            'align' => 'false',
+            'report-all-factors' => 'false',
         );
         
         try {
@@ -83,7 +84,6 @@ class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plu
         catch(Exception $e) {
             error_log($e);
         }
-        
         
         $this->resultList->setDefaultSource($queryString);
         
@@ -96,15 +96,11 @@ class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plu
     }
     
     /**
-     */
-    public function processSingleResponse($text) {
-    }
-    
-    /**
      * (non-PHPdoc)
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::search()
      */
-    public function search(string $searchString) {
+    public function search(string $searchString, $field = 'source') {
+        //since a MT can not be searched in the target language, we just pass the $searchString to the query call
         return $this->query($searchString);
     }
 

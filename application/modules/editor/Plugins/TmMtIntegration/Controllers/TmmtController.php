@@ -51,7 +51,6 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
         $this->data = $this->_getAllParams();
         $this->setDataInEntity($this->postBlacklist);
         
-        error_log(print_r($this->entity->getDataObject(),1));
         $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
         /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
         $resource = $manager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
@@ -96,6 +95,9 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
         $this->entity->delete();
     }
     
+    /**
+     * performs a tmmt query
+     */
     public function queryAction() {
         $session = new Zend_Session_Namespace();
         $query = $this->_getParam('query');
@@ -106,9 +108,8 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
         $segment->load((int) $this->_getParam('segmentId'));
         
         //check taskGuid of segment against loaded taskguid for security reasons
-        if ($session->taskGuid !== $segment->getTaskGuid()) {
-            throw new ZfExtended_Models_Entity_NoAccessException();
-        }
+        //checks if the current task is associated to the tmmt
+        $this->checkTaskAndTmmtAccess($tmmtId, $segment);
         
         $this->entity->load($tmmtId);
 
@@ -124,11 +125,64 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
         $this->view->rows = $result;
     }
     
+    /**
+     * performs a tmmt search
+     */
     public function searchAction() {
+        $session = new Zend_Session_Namespace();
+        $query = $this->_getParam('query');
+        $tmmtId = (int) $this->_getParam('tmmtId');
+        $field = $this->_getParam('field');
         
+        //check provided field
+        if($field !== 'source') {
+            $field == 'target';
+        }
+        
+        //checks if the current task is associated to the tmmt
+        $this->checkTaskAndTmmtAccess($tmmtId);
+        
+        $this->entity->load($tmmtId);
+
+        $connector = $this->getConnector();
+
+        $result = new stdClass();
+        $result->id = $this->entity->getId();
+        
+        $result->result = $connector->search($query, $field)->getResult();
+
+        $this->view->rows = $result;
     }
     
-   /**
+    /**
+     * checks if the given tmmt (and segmentid - optional) is usable by the currently loaded task
+     * @param integer $tmmtId
+     * @param editor_Models_Segment $segment
+     * @throws ZfExtended_Models_Entity_NoAccessException
+     */
+    protected function checkTaskAndTmmtAccess(integer $tmmtId, editor_Models_Segment $segment = null) {
+        $session = new Zend_Session_Namespace();
+        
+        //checks if the queried tmmt is associated to the task:
+        $tmmtTaskAssoc = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Models_Taskassoc');
+        /* @var $tmmtTaskAssoc editor_Plugins_TmMtIntegration_Models_Taskassoc */
+        try {
+            $tmmtTaskAssoc->loadByTaskGuidAndTm($session->taskGuid, $tmmtId);
+        } catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            throw new ZfExtended_Models_Entity_NoAccessException(null, null, $e);
+        }
+        
+        if(is_null($segment)) {
+            return;
+        }
+        
+        //check taskGuid of segment against loaded taskguid for security reasons
+        if ($session->taskGuid !== $segment->getTaskGuid()) {
+            throw new ZfExtended_Models_Entity_NoAccessException();
+        }
+    }
+    
+    /**
      * returns the connector to be used
      * @return editor_Plugins_TmMtIntegration_Services_ConnectorAbstract
      */

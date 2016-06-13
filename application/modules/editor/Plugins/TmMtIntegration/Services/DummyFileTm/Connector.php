@@ -94,7 +94,18 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::query()
      */
     public function query(string $queryString) {
+        return $this->loopData($queryString);
+    }
 
+    /**
+     * (non-PHPdoc)
+     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::search()
+     */
+    public function search(string $searchString, $field = 'source') {
+        return $this->loopData($searchString, $field);
+    }
+    
+    protected function loopData(string $queryString, string $field = null) {
         if(stripos($this->tm->getName(), 'slow') !== false) {
             sleep(rand(5, 15));
         }
@@ -112,24 +123,26 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
                 continue;
             }
 
-            similar_text(strip_tags($queryString), strip_tags($line[1]), $percent);
-            if($percent < 80) {
-                continue;
+            //simulate match query
+            if(empty($field)) {
+                similar_text(strip_tags($queryString), strip_tags($line[1]), $percent);
+                if($percent < 80) {
+                    continue;
+                }
+                $this->resultList->addResult(strip_tags($line[2]), $percent);
+                $this->resultList->setSource(strip_tags($line[1]));
+                $this->resultList->setAttributes('Attributes: can be empty when service does not provide attributes. If not empty, then already preformatted for tooltipping!');
             }
-            $this->resultList->addResult(strip_tags($line[2]), $percent);
-            $this->resultList->setSource(strip_tags($line[1]));
-            $this->resultList->setAttributes('Attributes: can be empty when service does not provide attributes. If not empty, then already preformatted for tooltipping!');
+            else {
+                //simulate search
+                if(stripos($field == 'source' ? $line[1] : $line[2], $queryString) !== false) {
+                    $this->resultList->addResult(strip_tags($line[2]));
+                    $this->resultList->setSource(strip_tags($line[1]));
+                }
+            }
         }
 
         return $this->resultList;
-    }
-
-    /**
-     * (non-PHPdoc)
-     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::search()
-     */
-    public function search(string $searchString) {
-        return $this->query($searchString);
     }
 
     //

@@ -100,10 +100,11 @@ abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
     /**
      * makes a tm / mt / file concordance search
      * @param string $queryString
+     * @param string $field
      * @return array
      * 
      * FIXME missing source or target!
      * 
      */
-    abstract public function search(string $searchString);
+    abstract public function search(string $searchString, $field = 'source');
 }

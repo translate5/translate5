@@ -31,10 +31,49 @@ class editor_Plugins_TmMtIntegration_Models_Taskassoc extends ZfExtended_Models_
     protected $dbInstanceClass = 'editor_Plugins_TmMtIntegration_Models_Db_Taskassoc';
     protected $validatorInstanceClass = 'editor_Plugins_TmMtIntegration_Models_Validator_Taskassoc'; //→ here the new validator class
 
+    /**
+     * loads one assoc entry, returns the loaded row as array
+     * 
+     * @param string $taskGuid
+     * @param integer $tmmtId
+     * @return Ambigous <multitype:, array>
+     */
+    public function loadByTaskGuidAndTm(string $taskGuid, $tmmtId) {
+        try {
+            $s = $this->db->select()
+                ->where('tmmtId = ?', $tmmtId)
+                ->where('taskGuid = ?', $taskGuid);
+            $row = $this->db->fetchRow($s);
+        } catch (Exception $e) {
+            $this->notFound('NotFound after other Error', $e);
+        }
+        if (!$row) {
+            $this->notFound(__CLASS__ . '#taskGuid + tmmtId', $taskGuid.' + '.$tmmtId);
+        }
+        //load implies loading one Row, so use only the first row
+        $this->row = $row;
+        return $this->row->toArray();
+    }
+    
+    /**
+     * loads all associated tmmt's to one taskGuid
+     * @param unknown $taskGuid
+     * @return Ambigous <Zend_Db_Table_Row_Abstract, NULL>
+     */
     public function loadByTaskGuid($taskGuid) {
         return $this->loadRow('taskGuid = ?', $taskGuid);
     }
     
+    /**
+     * returns a list of all available tmmt's for one language combination
+     * The language combination is determined from the task given by taskGuid
+     * If a filter "checked" is set, then only the associated tmmt's to the given task are listed
+     * If the "checked" filter is omitted, all available tmmt's for the language are listed, 
+     *      the boolean field checked provides the info if the tmmt is associated to the task or not 
+     *        
+     * @param string $taskGuid
+     * @return multitype:
+     */
     public function loadByAssociatedTaskAndLanguage($taskGuid) {
         
         $task = ZfExtended_Factory::get('editor_Models_Task');

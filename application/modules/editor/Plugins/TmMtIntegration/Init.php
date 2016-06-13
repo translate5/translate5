@@ -120,7 +120,7 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
         $r->addRoute('plugins_tmmtintegration_query', $queryRoute);
         
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
-            'editor/plugins_tmmtintegration_tmmt/:tmmtid/search',
+            'editor/plugins_tmmtintegration_tmmt/:tmmtId/search',
             array(
                 'module' => 'editor',
                 'controller' => 'plugins_tmmtintegration_tmmt',

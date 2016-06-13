@@ -81,7 +81,7 @@ class editor_Plugins_TmMtIntegration_Services_ServiceResult {
      * @param string $target
      * @param float $matchrate
      */
-    public function addResult($target, $matchrate) {
+    public function addResult($target, $matchrate = 0) {
         $result = new stdClass();
         $result->target = $target;
         $result->matchrate = $matchrate;
