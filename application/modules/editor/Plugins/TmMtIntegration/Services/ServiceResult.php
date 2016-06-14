@@ -72,8 +72,13 @@ class editor_Plugins_TmMtIntegration_Services_ServiceResult {
         $this->lastAdded->source = $source;
     }
     
+    /**
+     * sets the resultlist count total which should be send to the server
+     * How the total is calculated, depends on the service.
+     * @param integer $total
+     */
     public function setTotal($total) {
-        $this->total;
+        $this->total = $total;
     }
     
     /**

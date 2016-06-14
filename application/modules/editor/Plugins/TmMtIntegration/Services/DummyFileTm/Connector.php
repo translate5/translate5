@@ -169,7 +169,16 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
         }
         
         if($this->searchCount > 0) {
-            $this->resultList->setTotal($this->searchCount);
+            //to simulate the OpenTM2 paging behaviour we don't deliver the real total to the GUI
+            // but offset + limit + 1 if there are more available results.
+            // the last page contains then the real total to end paging in the GUI
+            //
+            //relevant algorithms are:
+            // - get data from storage with limit + 1 to see if there are more results
+            //   → but send only limit * results to the GUI not limit + 1
+            // - if count(results) <= limit, that means we are on the last page.
+            // - for total count we use just offset + count(results) and thats it 
+            $this->resultList->setTotal(min($this->searchCount, $this->limit + $this->offset + 1));
         }
 
         return $this->resultList;

@@ -171,7 +171,9 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
         $tmmtTaskAssoc = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Models_Taskassoc');
         /* @var $tmmtTaskAssoc editor_Plugins_TmMtIntegration_Models_Taskassoc */
         try {
-            $tmmtTaskAssoc->loadByTaskGuidAndTm((string) $session->taskGuid, $tmmtId);
+            //for security reasons a service can only be queried when a valid task association exists and this task is loaded
+            // that means the user has also access to the service. If not then not!
+            $tmmtTaskAssoc->loadByTaskGuidAndTm($session->taskGuid, $tmmtId);
         } catch(ZfExtended_Models_Entity_NotFoundException $e) {
             throw new ZfExtended_Models_Entity_NoAccessException(null, null, $e);
         }
