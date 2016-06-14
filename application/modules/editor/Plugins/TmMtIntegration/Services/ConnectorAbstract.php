@@ -101,10 +101,17 @@ abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
      * makes a tm / mt / file concordance search
      * @param string $queryString
      * @param string $field
-     * @return array
-     * 
-     * FIXME missing source or target!
-     * 
+     * @return editor_Plugins_TmMtIntegration_Services_ServiceResult
      */
     abstract public function search(string $searchString, $field = 'source');
+    
+    /**
+     * 
+     * @param integer $page
+     * @param integer $offset
+     * @param integer $limit
+     */
+    public function setPaging($page, $offset, $limit = 20) {
+        //per default do nothing
+    }
 }

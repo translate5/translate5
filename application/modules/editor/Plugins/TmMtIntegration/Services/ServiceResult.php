@@ -40,6 +40,12 @@ class editor_Plugins_TmMtIntegration_Services_ServiceResult {
     protected $lastAdded;
     
     /**
+     * Total results, needed for paging
+     * @var integer
+     */
+    protected $total = null;
+    
+    /**
      * A default source text for the results and a defaultMatchrate can be set
      * The default values are the used as initial value for new added result sets
      * @param string $defaultSource
@@ -66,6 +72,10 @@ class editor_Plugins_TmMtIntegration_Services_ServiceResult {
         $this->lastAdded->source = $source;
     }
     
+    public function setTotal($total) {
+        $this->total;
+    }
+    
     /**
      * Set the source field for the last added result
      * @param string $source
@@ -90,6 +100,17 @@ class editor_Plugins_TmMtIntegration_Services_ServiceResult {
         $this->results[] = $result;
         $this->lastAdded = $result;
         return $result;
+    }
+    
+    /**
+     * returns the stored total value
+     * @return integer
+     */
+    public function getTotal() {
+        if(is_null($this->total)){
+            return count($this->results);
+        }
+        return $this->total;
     }
     
     /**

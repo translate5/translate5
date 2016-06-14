@@ -49,6 +49,20 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
     protected $tm;
     protected $uploadedFile;
 
+    /**
+     * Paging information for search requests
+     * @var integer
+     */
+    protected $page;
+    protected $offset;
+    protected $limit;
+    
+    /**
+     * internal variable to count search results
+     * @var integer
+     */
+    protected $searchCount = 0;
+
     public function __construct() {
         $eventManager = Zend_EventManager_StaticEventManager::getInstance();
         $eventManager->attach('editor_Plugins_TmMtIntegration_TmmtController', 'afterPostAction', array($this, 'handleAfterTmmtSaved'));
@@ -102,9 +116,31 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::search()
      */
     public function search(string $searchString, $field = 'source') {
+        $this->searchCount = 0;
         return $this->loopData($searchString, $field);
     }
     
+    /**
+     * (non-PHPdoc)
+     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::setPaging()
+     */
+    public function setPaging($page, $offset, $limit = 20) {
+        $this->page = (int) $page;
+        $this->offset = (int) $offset;
+        $this->limit = (int) $limit;
+        if(empty($this->limit)) {
+            $this->limit = 20;
+        }
+    }
+    
+    /**
+     * loops through the dummy data and performs a match / search 
+     * 
+     * @param string $queryString
+     * @param string $field
+     * @throws ZfExtended_NotFoundException
+     * @return editor_Plugins_TmMtIntegration_Services_ServiceResult
+     */
     protected function loopData(string $queryString, string $field = null) {
         if(stripos($this->tm->getName(), 'slow') !== false) {
             sleep(rand(5, 15));
@@ -125,30 +161,67 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
 
             //simulate match query
             if(empty($field)) {
-                similar_text(strip_tags($queryString), strip_tags($line[1]), $percent);
-                if($percent < 80) {
-                    continue;
-                }
-                $this->resultList->addResult(strip_tags($line[2]), $percent);
-                $this->resultList->setSource(strip_tags($line[1]));
-                $this->resultList->setAttributes('Attributes: can be empty when service does not provide attributes. If not empty, then already preformatted for tooltipping!');
+                $this->makeMatch($queryString, $line[1], $line[2]);
+                continue;
             }
-            else {
-                //simulate search
-                if(stripos($field == 'source' ? $line[1] : $line[2], $queryString) !== false) {
-                    $this->resultList->addResult(strip_tags($line[2]));
-                    $this->resultList->setSource(strip_tags($line[1]));
-                }
-            }
+            
+            $this->makeSearch($queryString, $line[1], $line[2], $field == 'source');
+        }
+        
+        if($this->searchCount > 0) {
+            $this->resultList->setTotal($this->searchCount);
         }
 
         return $this->resultList;
+    }
+    
+    /**
+     * performs a MT match
+     * @param string $queryString
+     * @param string $source
+     * @param string $target
+     */
+    protected function makeMatch($queryString, $source, $target) {
+        $queryString = strip_tags($queryString);
+        $source = strip_tags($source);
+        $target = strip_tags($target);
+        
+        similar_text($queryString, $source, $percent);
+        if($percent < 80) {
+            return;
+        }
+        $this->resultList->addResult($target, $percent);
+        $this->resultList->setSource($source);
+        $this->resultList->setAttributes('Attributes: can be empty when service does not provide attributes. If not empty, then already preformatted for tooltipping!');
+    }
+    
+    /**
+     * performs a MT search with paging
+     * @param string $queryString
+     * @param string $source
+     * @param string $target
+     * @param boolean $isSource
+     * @param integer $idx
+     */
+    protected function makeSearch($queryString, $source, $target, $isSource) {
+        $isSearchHit = stripos($isSource ? $source : $target, $queryString) !== false;
+        
+        if(! $isSearchHit) {
+            return;
+        }
+        
+        if($this->searchCount >= $this->offset && $this->searchCount < ($this->offset + $this->limit)) {
+            $this->resultList->addResult(strip_tags($target));
+            $this->resultList->setSource(strip_tags($source));
+        }
+        //inc count over all search results for total count
+        $this->searchCount++;
     }
 
     //
     // Abstract Methods, to be implemented but not needed by this type of Service:
     //
-/**
+    /**
      * (non-PHPdoc)
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::open()
      */

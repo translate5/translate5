@@ -89,7 +89,8 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
         throw $e;
     }
     
-    public function deleteAction(){        
+    public function deleteAction(){
+        //FIXME trigger delete in connector / resource also!
         $this->entityLoad();
         //$this->processClientReferenceVersion();
         $this->entity->delete();
@@ -115,14 +116,13 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
 
         $connector = $this->getConnector();
 
-        $result = new stdClass();
-        $result->id = $this->entity->getId();
-        $result->segmentId = $segment->getId(); //return the segmentId back, just for reference
-        
         //FIXME if empty query, but segmentId given, the load segment first and get source as query from there
-        $result->result = $connector->query($query)->getResult();
-
-        $this->view->rows = $result;
+        $result = $connector->query($query);
+        
+        $this->view->segmentId = $segment->getId(); //return the segmentId back, just for reference
+        $this->view->tmmtId = $this->entity->getId();
+        $this->view->total = $result->getTotal();
+        $this->view->rows = $result->getResult();
     }
     
     /**
@@ -133,6 +133,11 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
         $query = $this->_getParam('query');
         $tmmtId = (int) $this->_getParam('tmmtId');
         $field = $this->_getParam('field');
+        
+        //pagin parameters, piped through to the connector
+        $page = $this->_getParam('page', 0);
+        $limit = $this->_getParam('limit', 20);
+        $offset = $this->_getParam('start', 0);
         
         //check provided field
         if($field !== 'source') {
@@ -145,13 +150,12 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
         $this->entity->load($tmmtId);
 
         $connector = $this->getConnector();
-
-        $result = new stdClass();
-        $result->id = $this->entity->getId();
+        $connector->setPaging($page, $offset, $limit);
         
-        $result->result = $connector->search($query, $field)->getResult();
-
-        $this->view->rows = $result;
+        $result = $connector->search($query, $field);
+        $this->view->tmmtId = $this->entity->getId();
+        $this->view->total = $result->getTotal();
+        $this->view->rows = $result->getResult();
     }
     
     /**
@@ -167,7 +171,7 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
         $tmmtTaskAssoc = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Models_Taskassoc');
         /* @var $tmmtTaskAssoc editor_Plugins_TmMtIntegration_Models_Taskassoc */
         try {
-            $tmmtTaskAssoc->loadByTaskGuidAndTm($session->taskGuid, $tmmtId);
+            $tmmtTaskAssoc->loadByTaskGuidAndTm((string) $session->taskGuid, $tmmtId);
         } catch(ZfExtended_Models_Entity_NotFoundException $e) {
             throw new ZfExtended_Models_Entity_NoAccessException(null, null, $e);
         }
