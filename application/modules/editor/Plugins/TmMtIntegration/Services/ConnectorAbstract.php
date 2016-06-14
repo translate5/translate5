@@ -38,7 +38,10 @@ END LICENSE AND COPYRIGHT
  * Abstract Base Connector
  */
 abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
-    protected $resource;
+    /**
+     * @var editor_Plugins_TmMtIntegration_Models_TmMt
+     */
+    protected $tmmt;
     
     /**
      * Container for the connector results
@@ -54,43 +57,41 @@ abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
         /* @var $this->resultList editor_Plugins_TmMtIntegration_Services_ServiceResult */
     }
     
-    public function connectTo(editor_Plugins_TmMtIntegration_Models_Resource $resource) {
-        $this->resource = $resource;
+    /**
+     * Link this Connector Instance to the given Tmmt and its resource
+     * @param editor_Plugins_TmMtIntegration_Models_TmMt $tmmt
+     */
+    public function connectTo(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
+        $this->tmmt = $tmmt;
     }
 
     /**
      * Adds the given file to the underlying system
      * @param string $filename
-     * @param editor_Plugins_TmMtIntegration_Models_TmMt $tm
      * @return boolean
      */
-    abstract public function addTm(string $filename, editor_Plugins_TmMtIntegration_Models_TmMt $tm);
-
-    abstract public function synchronizeTmList();
+    abstract public function addTm(string $filename);
 
     /**
-     * Opens the desired TM on the configured Resource (on task open, not on each request)
+     * Opens the with connectTo given TM on the configured Resource (on task open, not on each request)
      * @param editor_Plugins_TmMtIntegration_Models_TmMt $tmmt
      */
-    abstract public function open(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt);
+    abstract public function open();
+    
+    /**
+     * Updates translations in the connected service
+     * @param editor_Models_Segment $segment
+     */
+    abstract public function update(editor_Models_Segment $segment);
 
     /**
-     * Closes the desired TM on the configured Resource (on task close, not after each request)
-     * @param editor_Plugins_TmMtIntegration_Models_TmMt $tmmt
+     * Closes the connected TM on the configured Resource (on task close, not after each request)
      */
-    abstract public function close(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt);
-
-    /**
-     * opens a tm for a concrete query / search request, called before each request
-     * @param string $queryString
-     * @return array
-     */
-    abstract public function openForQuery(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt);
+    abstract public function close();
 
     /**
      * makes a tm / mt / file query to find a match / translation
      * returns an array with stdObjects, each stdObject contains the fields: 
-     * 
      * 
      * @param string $queryString
      * @return editor_Plugins_TmMtIntegration_Services_ServiceResult

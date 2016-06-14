@@ -44,24 +44,21 @@ class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plu
      */
     const MT_BASE_MATCHRATE = 70;
     
-    public function addTm(string $filename, editor_Plugins_TmMtIntegration_Models_TmMt $tm){
+    public function addTm(string $filename){
         throw new BadMethodCallException('This Service is not filebased and cannot handle uploaded files therefore!');
     }
 
-    public function synchronizeTmList() {
-        //for Moses do currently nothing
+    public function open() {
+        error_log("Opened Tmmt ".$this->tmmt->getName().' - '.$this->tmmt->getServiceName());
     }
 
-    public function open(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
-        error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getServiceName());
+    public function close() {
+        error_log("closed Tmmt ".$this->tmmt->getName().' - '.$this->tmmt->getServiceName());
     }
 
-    public function close(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
-        error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getServiceName());
-    }
-
-    public function openForQuery(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
-        error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getServiceName());
+    public function update(editor_Models_Segment $segment) {
+        //FIXME should be just disabled
+        error_log("update Tmmt ".$this->tmmt->getName().' - '.$this->tmmt->getServiceName());
     }
 
     /**
@@ -69,6 +66,7 @@ class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plu
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::query()
      */
     public function query(string $queryString) {
+        //FIXME let the URL come from $this->tmmt->getResource
         $rpc = new Zend_XmlRpc_Client("http://www.translate5.net:8124/RPC2");
         $proxy = $rpc->getProxy();
         $params = array(

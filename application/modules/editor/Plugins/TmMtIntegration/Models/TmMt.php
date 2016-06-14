@@ -52,14 +52,28 @@ class editor_Plugins_TmMtIntegration_Models_TmMt extends ZfExtended_Models_Entit
     protected $dbInstanceClass = 'editor_Plugins_TmMtIntegration_Models_Db_TmMt';
     protected $validatorInstanceClass = 'editor_Plugins_TmMtIntegration_Models_Validator_TmMt';
     
+    /**
+     * loads the task / tmmt assocs by task
+     * @param editor_Models_Task $task
+     * @return array
+     */
     public function loadByAssociatedTask(editor_Models_Task $task) {
+        return $this->loadByAssociatedTaskGuid($task->getTaskGuid());
+    }
+    
+    /**
+     * loads the task / tmmt assocs by taskguid
+     * @param string $taskGuid
+     * @return array
+     */
+    public function loadByAssociatedTaskGuid(string $taskGuid) {
         $assocDb = new editor_Plugins_TmMtIntegration_Models_Db_Taskassoc();
         $assocName = $assocDb->info($assocDb::NAME);
         $s = $this->db->select()
             ->from($this->db, '*')
             //->setIntegrityCheck(false)
             ->join($assocName, $assocName.'.`tmmtId` = '.$this->db->info($assocDb::NAME).'.`id`', '')
-            ->where($assocName.'.`taskGuid` = ?', $task->getTaskGuid());
+            ->where($assocName.'.`taskGuid` = ?', $taskGuid);
         return $this->db->fetchAll($s)->toArray();
     }
 }

@@ -74,6 +74,7 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
     protected function initEvents() {
         $this->eventManager->attach('editor_TaskController', 'afterTaskOpen', array($this, 'handleAfterTaskOpen'));
         $this->eventManager->attach('editor_TaskController', 'afterTaskClose', array($this, 'handleAfterTaskClose'));
+        $this->eventManager->attach('Editor_SegmentController', 'afterPutAction', array($this, 'handleAfterSegmentPut'));
     }
     
     /**
@@ -82,7 +83,7 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
      */
     public function handleAfterTaskOpen(Zend_EventManager_Event $event) {
         $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
-        /* @var $manager editor_Plugins_TmMtIntegration_Connector_Manager */
+        /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
         $manager->openForTask($event->getParam('task'));
     }
     
@@ -92,8 +93,18 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
      */
     public function handleAfterTaskClose(Zend_EventManager_Event $event) {
         $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
-        /* @var $manager editor_Plugins_TmMtIntegration_Connector_Manager */
+        /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
         $manager->closeForTask($event->getParam('task'));
+    }
+    
+    /**
+     * After a segment is changed we inform the services about that. What they do with this information is the service's problem.
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleAfterSegmentPut(Zend_EventManager_Event $event) {
+        $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
+        /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
+        $manager->updateSegment($event->getParam('entity'));
     }
     
     protected function initRoutes() {

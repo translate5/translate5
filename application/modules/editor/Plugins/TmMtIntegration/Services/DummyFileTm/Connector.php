@@ -73,9 +73,8 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
      * (non-PHPdoc)
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::addTm()
      */
-    public function addTm(string $filename, editor_Plugins_TmMtIntegration_Models_TmMt $tm){
+    public function addTm(string $filename){
         $this->uploadedFile = $filename;
-        $this->tm = $tm;
         //do nothing here, since we need the entity ID to save the TM
         return true;
     }
@@ -84,23 +83,11 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
      * in our dummy file TM the TM can only be saved after the TM is in the DB, since the ID is needed for the filename
      */
     public function handleAfterTmmtSaved() {
-        move_uploaded_file($this->uploadedFile, $this->getTmFile($this->tm->getId()));
+        move_uploaded_file($this->uploadedFile, $this->getTmFile($this->tmmt->getId()));
     }
 
     protected function getTmFile($id) {
         return APPLICATION_PATH.'/../data/dummyTm_'.$id;
-    }
-
-    public function synchronizeTmList() {
-        //read file list
-    }
-
-    /**
-     * (non-PHPdoc)
-     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::open()
-     */
-    public function openForQuery(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
-        $this->tm = $tmmt;
     }
 
     /**
@@ -118,6 +105,11 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
     public function search(string $searchString, $field = 'source') {
         $this->searchCount = 0;
         return $this->loopData($searchString, $field);
+    }
+    
+    public function update(editor_Models_Segment $segment) {
+        //FIXME should be just disabled
+        error_log("update Tmmt ".$this->tmmt->getName().' - '.$this->tmmt->getServiceName().' seg id '.$segment->getId());
     }
     
     /**
@@ -142,13 +134,13 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
      * @return editor_Plugins_TmMtIntegration_Services_ServiceResult
      */
     protected function loopData(string $queryString, string $field = null) {
-        if(stripos($this->tm->getName(), 'slow') !== false) {
+        if(stripos($this->tmmt->getName(), 'slow') !== false) {
             sleep(rand(5, 15));
         }
         
-        $file = new SplFileInfo($this->getTmFile($this->tm->getId()));
+        $file = new SplFileInfo($this->getTmFile($this->tmmt->getId()));
         if(!$file->isFile() || !$file->isReadable()) {
-            throw new ZfExtended_NotFoundException('requested TM file for dummy TM with the tmmtId '.$this->tm->getId().' not found!');
+            throw new ZfExtended_NotFoundException('requested TM file for dummy TM with the tmmtId '.$this->tmmt->getId().' not found!');
         }
         $file = $file->openFile();
 
@@ -234,16 +226,16 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
      * (non-PHPdoc)
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::open()
      */
-    public function open(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
-        error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getServiceName());
+    public function open() {
+        error_log("Opened Tmmt ".$this->tmmt->getName().' - '.$this->tmmt->getServiceName());
     }
 
     /**
      * (non-PHPdoc)
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::close()
      */
-    public function close(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
-        error_log("Closed Tmmt ".$tmmt->getName().' - '.$tmmt->getServiceName());
+    public function close() {
+        error_log("Closed Tmmt ".$this->tmmt->getName().' - '.$this->tmmt->getServiceName());
 
     }
 }

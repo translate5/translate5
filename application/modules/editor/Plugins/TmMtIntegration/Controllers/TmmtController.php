@@ -65,17 +65,17 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
         }
     }
     
-    protected function handleFileUpload(editor_Plugins_TmMtIntegration_Services_Manager $manager, editor_Plugins_TmMtIntegration_Models_Resource $resource) {
+    protected function handleFileUpload(editor_Plugins_TmMtIntegration_Services_Manager $manager) {
         $upload = new Zend_File_Transfer_Adapter_Http();
         $upload->isValid(self::FILE_UPLOAD_NAME);
         //mandatory upload file
         $importInfo = $upload->getFileInfo(self::FILE_UPLOAD_NAME);
-        $connector = $manager->getConnector($this->entity->getServiceType(), $resource);
+        $connector = $manager->getConnector($this->entity);
         /* @var $connector editor_Plugins_TmMtIntegration_Services_ConnectorAbstract */
         if(empty($importInfo['tmUpload']['size'])) {
             $this->uploadError('Die ausgewählte Datei war leer!');
         }
-        if(!$connector->addTm($importInfo['tmUpload']['tmp_name'], $this->entity)) {
+        if(!$connector->addTm($importInfo['tmUpload']['tmp_name'])) {
             $this->uploadError('Hochgeladene TM Datei konnte nicht hinzugefügt werden.');
         }
     }
@@ -193,19 +193,8 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
      * @return editor_Plugins_TmMtIntegration_Services_ConnectorAbstract
      */
     public function getConnector() {
-        $tmmt = $this->entity;
-        
-        $service = $tmmt->getServiceType();
-
         $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
         /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
-        $resource = $manager->getResourceById($service, $tmmt->getResourceId());
-
-        $connector = $manager->getConnector($service, $resource);
-        /* @var $connector editor_Plugins_TmMtIntegration_Services_ConnectorAbstract */
-
-        //set the tmmt to be queried
-        $connector->openForQuery($tmmt);
-        return $connector;
+        return $manager->getConnector($this->entity);
     }
 }
