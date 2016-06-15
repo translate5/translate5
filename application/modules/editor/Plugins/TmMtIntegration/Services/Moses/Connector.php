@@ -63,6 +63,15 @@ class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plu
 
     /**
      * (non-PHPdoc)
+     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::delete()
+     */
+    public function delete() {
+        //FIXME for moses this does nothing and should be just disabled
+        error_log("delete Tmmt ".$this->tmmt->getName().' - '.$this->tmmt->getServiceName());
+    }
+
+    /**
+     * (non-PHPdoc)
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::query()
      */
     public function query(string $queryString) {

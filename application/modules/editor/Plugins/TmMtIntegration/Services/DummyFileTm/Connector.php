@@ -236,6 +236,16 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
      */
     public function close() {
         error_log("Closed Tmmt ".$this->tmmt->getName().' - '.$this->tmmt->getServiceName());
+    }
 
+    /**
+     * (non-PHPdoc)
+     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::delete()
+     */
+    public function delete() {
+        $file = new SplFileInfo($this->getTmFile($this->tmmt->getId()));
+        if($file->isFile()) {
+            unlink($file);
+        }
     }
 }

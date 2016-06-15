@@ -55,7 +55,7 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
         /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
         $resource = $manager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
         if($resource->getFilebased()) {
-            $this->handleFileUpload($manager, $resource);
+            $this->handleFileUpload($manager);
         }
       
         if($this->validate()){
@@ -75,6 +75,9 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
         if(empty($importInfo['tmUpload']['size'])) {
             $this->uploadError('Die ausgewählte Datei war leer!');
         }
+        //setting the TM filename here, but can be overwritten in the connectors addTm method
+        // for example when we get a new name from the service
+        $this->entity->setFileName($importInfo['tmUpload']['name']);
         if(!$connector->addTm($importInfo['tmUpload']['tmp_name'])) {
             $this->uploadError('Hochgeladene TM Datei konnte nicht hinzugefügt werden.');
         }
@@ -92,6 +95,10 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
     public function deleteAction(){
         //FIXME trigger delete in connector / resource also!
         $this->entityLoad();
+        $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
+        /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
+        $connector = $manager->getConnector($this->entity);
+        $connector->delete();
         //$this->processClientReferenceVersion();
         $this->entity->delete();
     }

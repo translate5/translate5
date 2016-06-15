@@ -29,13 +29,14 @@
 
 CREATE TABLE `LEK_tmmtintegration_tmmt` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(30) DEFAULT NULL,
-  `sourceLang` int(11) DEFAULT NULL,
-  `targetLang` int(11) DEFAULT NULL,
-  `color` varchar(7) DEFAULT NULL,
-  `resourceId` varchar(256) DEFAULT NULL,
-  `serviceType` varchar(256) DEFAULT NULL,
-  `serviceName` varchar(256) DEFAULT NULL,
+  `name` varchar(30) DEFAULT NULL COMMENT 'human readable name of the service',
+  `sourceLang` int(11) DEFAULT NULL COMMENT 'source language id',
+  `targetLang` int(11) DEFAULT NULL COMMENT 'target language id',
+  `color` varchar(7) DEFAULT NULL COMMENT 'the hexadecimal colorcode',
+  `resourceId` varchar(256) DEFAULT NULL COMMENT 'the id of the concrete underlying resource',
+  `serviceType` varchar(256) DEFAULT NULL COMMENT 'service type class name',
+  `serviceName` varchar(256) DEFAULT NULL COMMENT 'a human readable service name',
+  `fileName` varchar(1024) DEFAULT NULL COMMENT 'file name for filebased TMs',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

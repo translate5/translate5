@@ -47,6 +47,9 @@ END LICENSE AND COPYRIGHT
  * @method void setServiceType() setServiceType(string $type)
  * @method string getServiceName() getServiceName()
  * @method void setServiceName() setServiceName(string $resName)
+ * @method string getFileName() getFileName()
+ * @method void setFileName() setFileName(string $name)
+ * 
  */
 class editor_Plugins_TmMtIntegration_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Plugins_TmMtIntegration_Models_Db_TmMt';

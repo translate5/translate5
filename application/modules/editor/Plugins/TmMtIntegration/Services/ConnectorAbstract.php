@@ -88,6 +88,11 @@ abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
      * Closes the connected TM on the configured Resource (on task close, not after each request)
      */
     abstract public function close();
+    
+    /**
+     * Deletes the connected TM on the configured Resource
+     */
+    abstract public function delete();
 
     /**
      * makes a tm / mt / file query to find a match / translation
