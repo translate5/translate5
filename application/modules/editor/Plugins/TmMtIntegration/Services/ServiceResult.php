@@ -40,6 +40,11 @@ class editor_Plugins_TmMtIntegration_Services_ServiceResult {
     protected $lastAdded;
     
     /**
+     * @var editor_Plugins_TmMtIntegration_Models_TmMt
+     */
+    protected $tmmt;
+    
+    /**
      * Total results, needed for paging
      * @var integer
      */
@@ -102,6 +107,7 @@ class editor_Plugins_TmMtIntegration_Services_ServiceResult {
         $result->matchrate = $matchrate;
         $result->source = $this->defaultSource;
         $result->attributes = null;
+        $result->tmmtid = $this->tmmt->getId();
         $this->results[] = $result;
         $this->lastAdded = $result;
         return $result;
@@ -124,5 +130,12 @@ class editor_Plugins_TmMtIntegration_Services_ServiceResult {
      */
     public function getResult() {
         return $this->results;
+    }
+    
+    /**
+     * @param editor_Plugins_TmMtIntegration_Models_TmMt $tmmt
+     */
+    public function setTmmt(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt){
+        $this->tmmt = $tmmt;
     }
 }
