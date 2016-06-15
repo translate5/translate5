@@ -133,6 +133,8 @@ Ext.define('Editor.controller.Editor', {
         editingPlugin: plug
       });
       
+      me.relayEvents(me.prevNextSegment, ['prevnextloaded']);
+      
       //reset the store next/prev information if data changed
       me.getSegmentGrid().store.on('filterchange', me.prevNextSegment.handleSortOrFilter, me.prevNextSegment);
       me.getSegmentGrid().store.on('sort', me.prevNextSegment.handleSortOrFilter, me.prevNextSegment);
