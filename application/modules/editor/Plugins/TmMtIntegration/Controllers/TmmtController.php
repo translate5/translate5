@@ -108,7 +108,6 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
      */
     public function queryAction() {
         $session = new Zend_Session_Namespace();
-        $query = $this->_getParam('query');
         $tmmtId = (int) $this->_getParam('tmmtId');
         
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
@@ -123,8 +122,7 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
 
         $connector = $this->getConnector();
 
-        //FIXME if empty query, but segmentId given, the load segment first and get source as query from there
-        $result = $connector->query($query);
+        $result = $connector->query($segment);
         
         $this->view->segmentId = $segment->getId(); //return the segmentId back, just for reference
         $this->view->tmmtId = $this->entity->getId();

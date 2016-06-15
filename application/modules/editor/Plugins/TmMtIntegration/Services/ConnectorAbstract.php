@@ -54,7 +54,14 @@ abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
      */
     public function __construct() {
         $this->resultList = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_ServiceResult');
-        /* @var $this->resultList editor_Plugins_TmMtIntegration_Services_ServiceResult */
+    }
+    
+    /**
+     * Just for logging the called methods
+     * @param string $msg
+     */
+    protected function log($method, $msg = '') {
+        error_log($method." Tmmt ".$this->tmmt->getName().' - '.$this->tmmt->getServiceName().$msg);
     }
     
     /**
@@ -70,38 +77,53 @@ abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
      * @param string $filename
      * @return boolean
      */
-    abstract public function addTm(string $filename);
+    public function addTm(string $filename) {
+        //to be implemented if needed
+        $this->log(__METHOD__, ' filename '.$filename);
+    }
 
     /**
      * Opens the with connectTo given TM on the configured Resource (on task open, not on each request)
      * @param editor_Plugins_TmMtIntegration_Models_TmMt $tmmt
      */
-    abstract public function open();
+    public function open() {
+        //to be implemented if needed
+        $this->log(__METHOD__);
+    }
     
     /**
      * Updates translations in the connected service
      * @param editor_Models_Segment $segment
      */
-    abstract public function update(editor_Models_Segment $segment);
+    public function update(editor_Models_Segment $segment) {
+        //to be implemented if needed
+        $this->log(__METHOD__, ' segment '.$segment->getId());
+    }
 
     /**
      * Closes the connected TM on the configured Resource (on task close, not after each request)
      */
-    abstract public function close();
+    public function close() {
+        //to be implemented if needed
+        $this->log(__METHOD__);
+    }
     
     /**
      * Deletes the connected TM on the configured Resource
      */
-    abstract public function delete();
+    public function delete() {
+        //to be implemented if needed
+        $this->log(__METHOD__);
+    }
 
     /**
      * makes a tm / mt / file query to find a match / translation
      * returns an array with stdObjects, each stdObject contains the fields: 
      * 
-     * @param string $queryString
+     * @param editor_Models_Segment $segment
      * @return editor_Plugins_TmMtIntegration_Services_ServiceResult
      */
-    abstract public function query(string $queryString);
+    abstract public function query(editor_Models_Segment $segment);
 
     /**
      * makes a tm / mt / file concordance search
@@ -118,6 +140,6 @@ abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
      * @param integer $limit
      */
     public function setPaging($page, $offset, $limit = 20) {
-        //per default do nothing
+        //to be implemented if needed
     }
 }

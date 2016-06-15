@@ -94,10 +94,11 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
      * (non-PHPdoc)
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::query()
      */
-    public function query(string $queryString) {
-        return $this->loopData($queryString);
+    public function query(editor_Models_Segment $segment) {
+        $query = $segment->getFieldEdited('source');
+        return $this->loopData($segment->stripTags($query));
     }
-
+    
     /**
      * (non-PHPdoc)
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::search()
@@ -105,11 +106,6 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
     public function search(string $searchString, $field = 'source') {
         $this->searchCount = 0;
         return $this->loopData($searchString, $field);
-    }
-    
-    public function update(editor_Models_Segment $segment) {
-        //FIXME should be just disabled
-        error_log("update Tmmt ".$this->tmmt->getName().' - '.$this->tmmt->getServiceName().' seg id '.$segment->getId());
     }
     
     /**
@@ -217,25 +213,6 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
         }
         //inc count over all search results for total count
         $this->searchCount++;
-    }
-
-    //
-    // Abstract Methods, to be implemented but not needed by this type of Service:
-    //
-    /**
-     * (non-PHPdoc)
-     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::open()
-     */
-    public function open() {
-        error_log("Opened Tmmt ".$this->tmmt->getName().' - '.$this->tmmt->getServiceName());
-    }
-
-    /**
-     * (non-PHPdoc)
-     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::close()
-     */
-    public function close() {
-        error_log("Closed Tmmt ".$this->tmmt->getName().' - '.$this->tmmt->getServiceName());
     }
 
     /**

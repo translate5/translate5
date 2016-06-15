@@ -48,33 +48,13 @@ class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plu
         throw new BadMethodCallException('This Service is not filebased and cannot handle uploaded files therefore!');
     }
 
-    public function open() {
-        error_log("Opened Tmmt ".$this->tmmt->getName().' - '.$this->tmmt->getServiceName());
-    }
-
-    public function close() {
-        error_log("closed Tmmt ".$this->tmmt->getName().' - '.$this->tmmt->getServiceName());
-    }
-
-    public function update(editor_Models_Segment $segment) {
-        //FIXME should be just disabled
-        error_log("update Tmmt ".$this->tmmt->getName().' - '.$this->tmmt->getServiceName());
-    }
-
-    /**
-     * (non-PHPdoc)
-     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::delete()
-     */
-    public function delete() {
-        //FIXME for moses this does nothing and should be just disabled
-        error_log("delete Tmmt ".$this->tmmt->getName().' - '.$this->tmmt->getServiceName());
-    }
-
     /**
      * (non-PHPdoc)
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::query()
      */
-    public function query(string $queryString) {
+    public function query(editor_Models_Segment $segment) {
+        $queryString = $segment->getFieldEdited('source');
+        
         //FIXME let the URL come from $this->tmmt->getResource
         $rpc = new Zend_XmlRpc_Client("http://www.translate5.net:8124/RPC2");
         $proxy = $rpc->getProxy();
