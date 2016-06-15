@@ -49,7 +49,6 @@ Ext.define('Editor.plugins.TmMtIntegration.view.MatchGridViewModel', {
         'Ext.data.field.Integer',
         'Ext.data.field.String'
     ],
-
     data: {
         title: 'Test title bind',
         record: false
@@ -67,6 +66,10 @@ Ext.define('Editor.plugins.TmMtIntegration.view.MatchGridViewModel', {
                         	property:'matchrate',
                         	direction:'ASC'
                         }
+                    },
+                    taskassoc: {
+                        model: 'Editor.plugins.TmMtIntegration.model.TaskAssoc',
+                        autoLoad: false
                     },
                     keyaccounts: me.processKeyaccounts({
                         fields: [

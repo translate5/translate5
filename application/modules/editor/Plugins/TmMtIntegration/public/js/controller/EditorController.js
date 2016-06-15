@@ -45,76 +45,30 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.EditorController', {
   refs:[{
 	   ref: 'matchgrid',
  	   selector: '#matchGrid'
-  }],
+      },{
+          ref : 'segmentGrid',
+          selector:'#segmentgrid'
+      }],
   listen: {
       component: {
           '#segmentgrid': {
-              render: 'onEditorGridRender',
+              render: 'onSegmentGridRender',
               beforeedit: 'startEditing',
               canceledit: 'endEditing',
               edit: 'endEditing'
           }
       }
   },
-  init : function() {
-      var me = this;
-      //    toc = me.application.getController('editor.PrevNextSegment');
-      console.log(me);
-      //toc.on('prevnextloaded',me.prevNextLoaded, me);
-  },
   startEditing: function(plugin,context) {
-	  //FIXME another way to get segmentId ?
 	  this.getMatchgrid().controller.startEditing(context);//(context.record.get('taskGuid'),context.value);
   },
   endEditing : function(plugin,context) {
 	  this.getMatchgrid().controller.endEditing();//(context.record.get('taskGuid'),context.value);
   },
-  onEditorGridRender: function(grid) {
+  onSegmentGridRender: function(grid) {
       var authUser = Editor.app.authenticatedUser;
       if(authUser.isAllowed('pluginMatchResourceMatchQuery') || authUser.isAllowed('pluginMatchResourceSearchQuery')){
           grid.addDocked({xtype: 'tmMtIntegrationTmMtEditorPanel',dock:'bottom'});
       }
-  },
-  prevNextLoaded : function(){
-	  alert('ace');
   }
-  /*
-  handleInitEditor: function() {
-	  //Editor.data.task contains current task
-	  
-	  //this.assocStore = new Ext.data.Store({model: 'Editor.plugins.TmMtIntegration.model.TaskAssoc',});
-	  //this.assocStore.load({params object as in the other controller});
-  },
-  handleSegmentBeginEdit : function(contex){
-      var me = this;
-      
-      this.assocStore.each();
-      
-      Ext.Ajax.request({
-          url:Editor.data.restpath+'plugins_tmmtintegration_query',
-              method: "POST",
-              params: {
-                  data: Ext.JSON.encode({
-                      type: 'query', //query => mtmatch | search => concorance,
-                      //column for which the search was done (target | source)
-                      //segmentId: segment Id for reference, 
-                      query: contex.value,
-                      tmmtId: 25,
-                      taskGuid: contex.record.get('taskGuid')
-                  })
-              },
-              success: function(response){
-				  var resp = Ext.util.JSON.decode(response.responseText);
-				  var newId = resp.rows['id'];
-				  
-				  var record = Editor.plugins.TmMtIntegration.model.EditorQuery.create(resp.rows.result);
-				  
-				  me.getEditorPluginsTmMtIntegrationStoreEditorQueryStore().add(record);
-              }, 
-              failure: function(response){ 
-                  console.log(response.responseText); 
-              } 
-      });
-  }
-  */
 });

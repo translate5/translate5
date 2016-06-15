@@ -42,20 +42,34 @@ Ext.define('Editor.plugins.TmMtIntegration.view.MatchGridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.tmMtIntegrationMatchGrid',
     listen: {
+        store: {
+            '#Segments':{
+                load: 'onSegmentStoreLoad'
+            }
+        },
         controller:{
+            '#editorcontroller': {
+                prevnextloaded :'calculateRows'
+            },
             '#Editor.$application': {
                 editorViewportOpened: 'handleInitEditor'
-      	  },
+      	    },
       	}
     },
     assocStore : null,
+    nextSegment : null,
+    cacheSegmentIndex: new Array(),
+    segmentStack : [],
+    cachedResults : new Ext.util.HashMap(),
     editedSegmentId : -1, //the id of the edited segment
-    DELAY_ASSOC_STORE_LOAD_TIME : 2000,
-    cachedResults :new Array(),
+    firstEditableRow : -1,
     startEditing: function(context) {
     	var me = this;
     	me.editedSegmentId = context.record.id;
         me.loadCachedDataIntoGrid(context.record.id);
+        
+        me.cacheSegmentIndex = new Array();
+        me.cacheSegmentIndex.push(context.rowIdx);
     },
     endEditing : function() {
     	var me = this;
@@ -63,9 +77,11 @@ Ext.define('Editor.plugins.TmMtIntegration.view.MatchGridViewController', {
 		var str = me.getView().getStore('editorquery');
 		str.removeAll();
 	},
-    testFunc : function() {
-		alert('test');
-	},
+    onSegmentStoreLoad: function (store, records) {
+        var me = this,
+            er =store.getFirsteditableRow();
+        me.setFirsEditableRow(er);
+    },
     handleInitEditor: function() {
       var me = this,
       	  taskGuid = Editor.data.task.get('taskGuid'),
@@ -73,31 +89,43 @@ Ext.define('Editor.plugins.TmMtIntegration.view.MatchGridViewController', {
 	            params: {
 	                filter: '[{"operator":"like","value":"'+taskGuid+'","property":"taskGuid"},{"operator":"eq","value":true,"property":"checked"}]'
 	            },
-	            callback : me.afterAssocStoreLoad,
 	            scope : me
 	  };
-  	  this.assocStore = new Ext.data.Store({model: 'Editor.plugins.TmMtIntegration.model.TaskAssoc'});
-  	  this.assocStore.load(prm);
+  	  me.assocStore = this.getStore('taskassoc').load(prm);
     },
-    afterAssocStoreLoad:function(records, operation, success){
-    	var me = this;
-    	var segments = Ext.data.StoreManager.get('Segments'),
-    		taskGuid = Editor.data.task.get('taskGuid');
-    	
-		me.getView().getStore('editorquery').removeAll();
-    	
-		var task = new Ext.util.DelayedTask(function(){
-			for(var i=0;i<=10;i++){//cahce for first 11 segments
-	    		var segment = segments.getAt(i);//loop through all segments or n segments and cache the data
-	    		me.cachedResults[segment.get('id')] = {}; 
-	    	    me.assocStore.each(function(record){
-	    	       me.cacheMatchPanelResults(record,segment,taskGuid);
-	    	    });
-			}
-    	});
-    	task.delay(me.DELAY_ASSOC_STORE_LOAD_TIME);
+    calculateRows : function(controller){
+        var me = this,
+            maxSegments = Editor.data.plugins.MatchResource.preloadedSegments;
+        me.nextSegment = controller.next.nextEditable;
+        if(me.nextSegment){
+            var retval = controller.findNextRows(controller.next.nextEditable.idx,maxSegments);
+            me.cacheSegmentIndex = me.cacheSegmentIndex.concat(retval);
+        }
+        me.checkCacheLength();
+        me.cache();
     },
-    cacheMatchPanelResults:function(tmmt, segment,taskGuid){
+    cache : function(){
+        var me = this,
+        segments = Ext.data.StoreManager.get('Segments');
+    
+        me.getView().getStore('editorquery').removeAll();
+        
+        for(var i=0;i<me.cacheSegmentIndex.length;i++){
+            
+            var segment = segments.getAt(me.cacheSegmentIndex[i]);
+            var segId = segment.get('id');
+            if(me.cachedResults.get(segId)){
+                me.loadCachedDataIntoGrid(segId);
+                continue;
+            }
+            me.cachedResults.add(segId,new Ext.util.HashMap());
+            me.segmentStack.push(segId);
+            me.assocStore.each(function(record){
+               me.cacheMatchPanelResults(record,segment);
+            });
+        }
+    },
+    cacheMatchPanelResults:function(tmmt, segment){
     	var me = this;
     	var segmentId = segment.get('id');
     	var tmmtid = tmmt.get('id');
@@ -108,72 +136,92 @@ Ext.define('Editor.plugins.TmMtIntegration.view.MatchGridViewController', {
 				    			source : 'Loading ...',
 				    			target : 'Loading ...',
 				    			matchrate : '',
+				    			tmmtid: tmmtid,
 				    			segmentId :'',
 				    			loading :true})
 				    	
     			}
     	};
-    	
-    	me.cachedResults[segmentId][tmmtid] = dummyObj;
-
-    	me.sendRequest(segmentId, segment.get('source'), tmmtid, taskGuid); 	
+    	me.cachedResults.get(segmentId).add(tmmtid,dummyObj);
+    	me.loadCachedDataIntoGrid(segmentId);
+    	me.sendRequest(segmentId, segment.get('source'), tmmtid); 	
     },
-    sendRequest : function(segmentId,query,tmmtid,taskGuid) {
+    sendRequest : function(segmentId,query,tmmtid) {
     	var me = this;
     	Ext.Ajax.request({
             url:Editor.data.restpath+'plugins_tmmtintegration_tmmt/'+tmmtid+'/query',
-                method: "GET",
+                method: "POST",
                 params: {
                     //column for which the search was done (target | source)
                     segmentId: segmentId,
                     query: query
                 },
                 success: function(response){
-  				  var resp = Ext.util.JSON.decode(response.responseText);
-  				  //console.log(response.responseText);
-  				  if( typeof resp.rows.result !== 'undefined' && resp.rows.result !== null && resp.rows.result.length){
-  					//console.log(resp.rows.result[0].segmentId +"<->"+resp.rows.result[0].tmmtid);
-  					  //me.cachedResults[resp.rows.result[0].segmentId][resp.rows.result[0].tmmtid] = {};
-  					
-  					me.cachedResults[segmentId][tmmtid] = resp;
-  					
-  					me.loadCachedDataIntoGrid(segmentId);
-  					/*var rec,
-  						obj = {};
-  					  for(var i=0; i<resp.rows.result.length;i++){
-  						  if(resp.rows.result[i].matchrate > 0){
-  							obj = {};
-  							rec = Editor.plugins.TmMtIntegration.model.EditorQuery.create(resp.rows.result[i]);
-  							obj[rec.get('segmentId')] = rec;
-		  				  	me.cachedResults.push(obj);
-  						  }
-  					  }*/
-  				  }
+                    var resp = Ext.util.JSON.decode(response.responseText);
+                    if( typeof resp.rows.result !== 'undefined' && resp.rows.result !== null && resp.rows.result.length){
+                        me.cachedResults.get(segmentId).add(tmmtid,resp);
+                        me.loadCachedDataIntoGrid(segmentId);
+                        return;
+                    }
+                    var noresults = {
+                            rows :{
+                                result :new Array({
+                                    id : '',
+                                    source : 'No results was found',
+                                    target : '',
+                                    matchrate : '',
+                                    tmmtid: tmmtid,
+                                    segmentId :'',
+                                    loading :true})
+                          }
+                  };
+                  me.cachedResults.get(segmentId).add(tmmtid,noresults);
+                  me.loadCachedDataIntoGrid(segmentId);
                 }, 
-                failure: function(response){ 
-                    console.log(response.responseText); 
+                failure: function(response){
+                    //if failure on server side (HTTP 5?? / HTTP 4??), print a nice error message that failure happend on server side
+                    // if we get timeout on the ajax connection, then print a nice timeout message  
+                    var timeOut = {
+                            rows :{
+                                result :new Array({
+                                            id : '',
+                                            source : 'The request to the server is taking too long.',
+                                            target : 'Please try again later.',
+                                            matchrate : '',
+                                            tmmtid: tmmtid,
+                                            segmentId :'',
+                                            loading :true})
+                            }
+                    };
+                    me.cachedResults.get(segmentId).add(tmmtid,timeOut);
+                    me.loadCachedDataIntoGrid(segmentId);
                 }
         });
 	},
     loadCachedDataIntoGrid : function(segmentId) {
     	if(segmentId != this.editedSegmentId)
     		return;
-    	
     	var me = this;
 		var str = me.getView().getStore('editorquery');
 		str.removeAll();
-    	if(me.cachedResults[segmentId]){
-    		var res =me.cachedResults[segmentId];    		
-	    		me.assocStore.each(function(record){
-	    			var itm = res[record.get('id')];
-	        		
-	    			me.getView().getStore('editorquery').loadRawData(itm.rows.result,true);
-	    			/*
-	    			for(var i =0;i<itm.rows.result.length;i++){
-	        			me.getView().getStore('editorquery').add(Editor.plugins.TmMtIntegration.model.EditorQuery.create(itm.rows.result[i]));
-	        		}*/
-	    			
-	    		});
-    	}
-	}
+		if(me.cachedResults.get(segmentId)){
+		    var res =me.cachedResults.get(segmentId);
+		    me.assocStore.each(function(record){
+		        var itm = res.get(record.get('id'));
+		        if(itm)
+		            me.getView().getStore('editorquery').loadRawData(itm.rows.result,true);
+	        });
+	    }
+	},
+	setFirsEditableRow : function(fer) {
+        var me = this;
+        me.cacheSegmentIndex = new Array();
+        me.cacheSegmentIndex.push(fer);
+    },
+    checkCacheLength : function(){
+        var me = this;
+        if(me.segmentStack.length > 10){
+            me.cachedResults.removeAtKey(me.segmentStack.shift());
+        }
+    }
 });

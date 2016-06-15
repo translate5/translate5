@@ -70,6 +70,7 @@ abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
      */
     public function connectTo(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
         $this->tmmt = $tmmt;
+        $this->resultList->setTmmt($tmmt);
     }
 
     /**
