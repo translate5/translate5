@@ -95,8 +95,8 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        $query = $segment->getFieldEdited('source');
-        return $this->loopData($segment->stripTags($query));
+        $queryString = $this->getQueryString($segment);
+        return $this->loopData($segment->stripTags($queryString));
     }
     
     /**

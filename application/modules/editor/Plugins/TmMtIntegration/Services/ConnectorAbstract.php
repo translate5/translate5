@@ -126,6 +126,19 @@ abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
     abstract public function query(editor_Models_Segment $segment);
 
     /**
+     * returns the original or edited source content to be queried, depending on source edit
+     * @param editor_Models_Segment $segment
+     * @return string
+     */
+    protected function getQueryString(editor_Models_Segment $segment) {
+        $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($segment->getTaskGuid());
+        $source = editor_Models_SegmentField::TYPE_SOURCE;
+        $sourceMeta = $sfm->getByName($source);
+        $isSourceEdit = ($sourceMeta !== false && $sourceMeta->editable == 1);
+        return $isSourceEdit ? $segment->getFieldEdited($source) : $segment->getFieldOriginal($source);
+    }
+    
+    /**
      * makes a tm / mt / file concordance search
      * @param string $queryString
      * @param string $field

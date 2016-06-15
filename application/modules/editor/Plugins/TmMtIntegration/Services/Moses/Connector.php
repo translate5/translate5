@@ -53,7 +53,7 @@ class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plu
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        $queryString = $segment->getFieldEdited('source');
+        $queryString = $this->getQueryString($segment);
         
         //FIXME let the URL come from $this->tmmt->getResource
         $rpc = new Zend_XmlRpc_Client("http://www.translate5.net:8124/RPC2");
