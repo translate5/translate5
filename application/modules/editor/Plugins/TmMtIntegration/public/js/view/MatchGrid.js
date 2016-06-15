@@ -66,7 +66,7 @@ Ext.define('Editor.plugins.TmMtIntegration.view.MatchGrid', {
     defaultListenerScope: true,
 	itemId:'matchGrid',
 	initConfig: function(instanceConfig) {
-	    var me = this,
+	    var me = this;
 	    config = {
 	      bind: {
              store: '{editorquery}'
@@ -85,6 +85,12 @@ Ext.define('Editor.plugins.TmMtIntegration.view.MatchGrid', {
 	          xtype: 'gridcolumn',
 	          flex: 10/100,
 	          dataIndex: 'matchrate',
+	          renderer: function(matchrate, meta, record) {
+	              var str =me.getViewModel().getStore('taskassoc').findRecord('id',record.get('tmmtid'));
+	              clr = str.get('color');
+	              meta.tdAttr = 'bgcolor=#"' + clr + '"';
+	              return matchrate;
+	          },
 	          text:'Match Rate'
 	      }]
 	    };

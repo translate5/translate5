@@ -36,3 +36,5 @@ WHERE `module` = 'editor' AND `resource` = 'frontend' AND
 
 DROP TABLE `LEK_tmmtintegration_tmmt`;
 DROP TABLE `LEK_tmmtintegration_taskassoc`;
+
+DELETE FROM Zf_configuration WHERE `name` = 'runtimeOptions.plugins.TmMtIntegration.preloadedTranslationSegments';

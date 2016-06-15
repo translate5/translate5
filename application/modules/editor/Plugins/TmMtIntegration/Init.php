@@ -74,6 +74,11 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
     protected function initEvents() {
         $this->eventManager->attach('editor_TaskController', 'afterTaskOpen', array($this, 'handleAfterTaskOpen'));
         $this->eventManager->attach('editor_TaskController', 'afterTaskClose', array($this, 'handleAfterTaskClose'));
+        $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectUrl'));
+    }
+    public function injectUrl(Zend_EventManager_Event $event) {
+        $view = $event->getParam('view');
+        $view->Php2JsVars()->set('plugins.MatchResource.preloadedSegments', $this->getConfig()->preloadedTranslationSegments);
     }
     
     /**

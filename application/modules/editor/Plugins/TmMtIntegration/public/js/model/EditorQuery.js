@@ -45,6 +45,6 @@ Ext.define('Editor.plugins.TmMtIntegration.model.EditorQuery', {
     {name: 'target', type: 'string'},
     {name: 'matchrate', type: 'string'},
     {name: 'segmentId', type: 'string'},
-    {name: 'loading', type: 'boolean'} //FIXME default value, false
+    {name: 'loading', type: 'boolean'}
   ]
 });
