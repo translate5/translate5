@@ -51,12 +51,11 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
         $this->data = $this->_getAllParams();
         $this->setDataInEntity($this->postBlacklist);
         
-        error_log(print_r($this->entity->getDataObject(),1));
         $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
         /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
         $resource = $manager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
         if($resource->getFilebased()) {
-            $this->handleFileUpload($manager, $resource);
+            $this->handleFileUpload($manager);
         }
       
         if($this->validate()){
@@ -66,17 +65,20 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
         }
     }
     
-    protected function handleFileUpload(editor_Plugins_TmMtIntegration_Services_Manager $manager, editor_Plugins_TmMtIntegration_Models_Resource $resource) {
+    protected function handleFileUpload(editor_Plugins_TmMtIntegration_Services_Manager $manager) {
         $upload = new Zend_File_Transfer_Adapter_Http();
         $upload->isValid(self::FILE_UPLOAD_NAME);
         //mandatory upload file
         $importInfo = $upload->getFileInfo(self::FILE_UPLOAD_NAME);
-        $connector = $manager->getConnector($this->entity->getServiceType(), $resource);
+        $connector = $manager->getConnector($this->entity);
         /* @var $connector editor_Plugins_TmMtIntegration_Services_ConnectorAbstract */
         if(empty($importInfo['tmUpload']['size'])) {
             $this->uploadError('Die ausgewählte Datei war leer!');
         }
-        if(!$connector->addTm($importInfo['tmUpload']['tmp_name'], $this->entity)) {
+        //setting the TM filename here, but can be overwritten in the connectors addTm method
+        // for example when we get a new name from the service
+        $this->entity->setFileName($importInfo['tmUpload']['name']);
+        if(!$connector->addTm($importInfo['tmUpload']['tmp_name'])) {
             $this->uploadError('Hochgeladene TM Datei konnte nicht hinzugefügt werden.');
         }
     }
@@ -90,15 +92,22 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
         throw $e;
     }
     
-    public function deleteAction(){        
+    public function deleteAction(){
+        //FIXME trigger delete in connector / resource also!
         $this->entityLoad();
+        $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
+        /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
+        $connector = $manager->getConnector($this->entity);
+        $connector->delete();
         //$this->processClientReferenceVersion();
         $this->entity->delete();
     }
     
+    /**
+     * performs a tmmt query
+     */
     public function queryAction() {
         $session = new Zend_Session_Namespace();
-        $query = $this->_getParam('query');
         $tmmtId = (int) $this->_getParam('tmmtId');
         
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
@@ -106,46 +115,91 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
         $segment->load((int) $this->_getParam('segmentId'));
         
         //check taskGuid of segment against loaded taskguid for security reasons
-        if ($session->taskGuid !== $segment->getTaskGuid()) {
-            throw new ZfExtended_Models_Entity_NoAccessException();
-        }
+        //checks if the current task is associated to the tmmt
+        $this->checkTaskAndTmmtAccess($tmmtId, $segment);
         
         $this->entity->load($tmmtId);
 
         $connector = $this->getConnector();
 
-        $result = new stdClass();
-        $result->id = $this->entity->getId();
-        $result->segmentId = $segment->getId(); //return the segmentId back, just for reference
+        $result = $connector->query($segment);
         
-        //FIXME if empty query, but segmentId given, the load segment first and get source as query from there
-        $result->result = $connector->query($query)->getResult();
-
-        $this->view->rows = $result;
+        $this->view->segmentId = $segment->getId(); //return the segmentId back, just for reference
+        $this->view->tmmtId = $this->entity->getId();
+        $this->view->total = $result->getTotal();
+        $this->view->rows = $result->getResult();
     }
     
+    /**
+     * performs a tmmt search
+     */
     public function searchAction() {
+        $session = new Zend_Session_Namespace();
+        $query = $this->_getParam('query');
+        $tmmtId = (int) $this->_getParam('tmmtId');
+        $field = $this->_getParam('field');
         
+        //pagin parameters, piped through to the connector
+        $page = $this->_getParam('page', 0);
+        $limit = $this->_getParam('limit', 20);
+        $offset = $this->_getParam('start', 0);
+        
+        //check provided field
+        if($field !== 'source') {
+            $field == 'target';
+        }
+        
+        //checks if the current task is associated to the tmmt
+        $this->checkTaskAndTmmtAccess($tmmtId);
+        
+        $this->entity->load($tmmtId);
+
+        $connector = $this->getConnector();
+        $connector->setPaging($page, $offset, $limit);
+        
+        $result = $connector->search($query, $field);
+        $this->view->tmmtId = $this->entity->getId();
+        $this->view->total = $result->getTotal();
+        $this->view->rows = $result->getResult();
     }
     
-   /**
+    /**
+     * checks if the given tmmt (and segmentid - optional) is usable by the currently loaded task
+     * @param integer $tmmtId
+     * @param editor_Models_Segment $segment
+     * @throws ZfExtended_Models_Entity_NoAccessException
+     */
+    protected function checkTaskAndTmmtAccess(integer $tmmtId, editor_Models_Segment $segment = null) {
+        $session = new Zend_Session_Namespace();
+        
+        //checks if the queried tmmt is associated to the task:
+        $tmmtTaskAssoc = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Models_Taskassoc');
+        /* @var $tmmtTaskAssoc editor_Plugins_TmMtIntegration_Models_Taskassoc */
+        try {
+            //for security reasons a service can only be queried when a valid task association exists and this task is loaded
+            // that means the user has also access to the service. If not then not!
+            $tmmtTaskAssoc->loadByTaskGuidAndTm($session->taskGuid, $tmmtId);
+        } catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            throw new ZfExtended_Models_Entity_NoAccessException(null, null, $e);
+        }
+        
+        if(is_null($segment)) {
+            return;
+        }
+        
+        //check taskGuid of segment against loaded taskguid for security reasons
+        if ($session->taskGuid !== $segment->getTaskGuid()) {
+            throw new ZfExtended_Models_Entity_NoAccessException();
+        }
+    }
+    
+    /**
      * returns the connector to be used
      * @return editor_Plugins_TmMtIntegration_Services_ConnectorAbstract
      */
     public function getConnector() {
-        $tmmt = $this->entity;
-        
-        $service = $tmmt->getServiceType();
-
         $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
         /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
-        $resource = $manager->getResourceById($service, $tmmt->getResourceId());
-
-        $connector = $manager->getConnector($service, $resource);
-        /* @var $connector editor_Plugins_TmMtIntegration_Services_ConnectorAbstract */
-
-        //set the tmmt to be queried
-        $connector->openForQuery($tmmt);
-        return $connector;
+        return $manager->getConnector($this->entity);
     }
 }

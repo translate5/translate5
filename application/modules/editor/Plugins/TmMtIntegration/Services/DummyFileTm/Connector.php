@@ -49,6 +49,20 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
     protected $tm;
     protected $uploadedFile;
 
+    /**
+     * Paging information for search requests
+     * @var integer
+     */
+    protected $page;
+    protected $offset;
+    protected $limit;
+    
+    /**
+     * internal variable to count search results
+     * @var integer
+     */
+    protected $searchCount = 0;
+
     public function __construct() {
         $eventManager = Zend_EventManager_StaticEventManager::getInstance();
         $eventManager->attach('editor_Plugins_TmMtIntegration_TmmtController', 'afterPostAction', array($this, 'handleAfterTmmtSaved'));
@@ -59,9 +73,8 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
      * (non-PHPdoc)
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::addTm()
      */
-    public function addTm(string $filename, editor_Plugins_TmMtIntegration_Models_TmMt $tm){
+    public function addTm(string $filename){
         $this->uploadedFile = $filename;
-        $this->tm = $tm;
         //do nothing here, since we need the entity ID to save the TM
         return true;
     }
@@ -70,38 +83,60 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
      * in our dummy file TM the TM can only be saved after the TM is in the DB, since the ID is needed for the filename
      */
     public function handleAfterTmmtSaved() {
-        move_uploaded_file($this->uploadedFile, $this->getTmFile($this->tm->getId()));
+        move_uploaded_file($this->uploadedFile, $this->getTmFile($this->tmmt->getId()));
     }
 
     protected function getTmFile($id) {
         return APPLICATION_PATH.'/../data/dummyTm_'.$id;
     }
 
-    public function synchronizeTmList() {
-        //read file list
-    }
-
-    /**
-     * (non-PHPdoc)
-     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::open()
-     */
-    public function openForQuery(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
-        $this->tm = $tmmt;
-    }
-
     /**
      * (non-PHPdoc)
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::query()
      */
-    public function query(string $queryString) {
-
-        if(stripos($this->tm->getName(), 'slow') !== false) {
+    public function query(editor_Models_Segment $segment) {
+        $query = $segment->getFieldEdited('source');
+        return $this->loopData($segment->stripTags($query));
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::search()
+     */
+    public function search(string $searchString, $field = 'source') {
+        $this->searchCount = 0;
+        return $this->loopData($searchString, $field);
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::setPaging()
+     */
+    public function setPaging($page, $offset, $limit = 20) {
+        $this->page = (int) $page;
+        $this->offset = (int) $offset;
+        $this->limit = (int) $limit;
+        if(empty($this->limit)) {
+            $this->limit = 20;
+        }
+    }
+    
+    /**
+     * loops through the dummy data and performs a match / search 
+     * 
+     * @param string $queryString
+     * @param string $field
+     * @throws ZfExtended_NotFoundException
+     * @return editor_Plugins_TmMtIntegration_Services_ServiceResult
+     */
+    protected function loopData(string $queryString, string $field = null) {
+        if(stripos($this->tmmt->getName(), 'slow') !== false) {
             sleep(rand(5, 15));
         }
         
-        $file = new SplFileInfo($this->getTmFile($this->tm->getId()));
+        $file = new SplFileInfo($this->getTmFile($this->tmmt->getId()));
         if(!$file->isFile() || !$file->isReadable()) {
-            throw new ZfExtended_NotFoundException('requested TM file for dummy TM with the tmmtId '.$this->tm->getId().' not found!');
+            throw new ZfExtended_NotFoundException('requested TM file for dummy TM with the tmmtId '.$this->tmmt->getId().' not found!');
         }
         $file = $file->openFile();
 
@@ -112,43 +147,82 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
                 continue;
             }
 
-            similar_text(strip_tags($queryString), strip_tags($line[1]), $percent);
-            if($percent < 80) {
+            //simulate match query
+            if(empty($field)) {
+                $this->makeMatch($queryString, $line[1], $line[2]);
                 continue;
             }
-            $this->resultList->addResult(strip_tags($line[2]), $percent);
-            $this->resultList->setSource(strip_tags($line[1]));
-            $this->resultList->setAttributes('Attributes: can be empty when service does not provide attributes. If not empty, then already preformatted for tooltipping!');
+            
+            $this->makeSearch($queryString, $line[1], $line[2], $field == 'source');
+        }
+        
+        if($this->searchCount > 0) {
+            //to simulate the OpenTM2 paging behaviour we don't deliver the real total to the GUI
+            // but offset + limit + 1 if there are more available results.
+            // the last page contains then the real total to end paging in the GUI
+            //
+            //relevant algorithms are:
+            // - get data from storage with limit + 1 to see if there are more results
+            //   → but send only limit * results to the GUI not limit + 1
+            // - if count(results) <= limit, that means we are on the last page.
+            // - for total count we use just offset + count(results) and thats it 
+            $this->resultList->setTotal(min($this->searchCount, $this->limit + $this->offset + 1));
         }
 
         return $this->resultList;
     }
+    
+    /**
+     * performs a MT match
+     * @param string $queryString
+     * @param string $source
+     * @param string $target
+     */
+    protected function makeMatch($queryString, $source, $target) {
+        $queryString = strip_tags($queryString);
+        $source = strip_tags($source);
+        $target = strip_tags($target);
+        
+        similar_text($queryString, $source, $percent);
+        if($percent < 80) {
+            return;
+        }
+        $this->resultList->addResult($target, $percent);
+        $this->resultList->setSource($source);
+        $this->resultList->setAttributes('Attributes: can be empty when service does not provide attributes. If not empty, then already preformatted for tooltipping!');
+    }
+    
+    /**
+     * performs a MT search with paging
+     * @param string $queryString
+     * @param string $source
+     * @param string $target
+     * @param boolean $isSource
+     * @param integer $idx
+     */
+    protected function makeSearch($queryString, $source, $target, $isSource) {
+        $isSearchHit = stripos($isSource ? $source : $target, $queryString) !== false;
+        
+        if(! $isSearchHit) {
+            return;
+        }
+        
+        if($this->searchCount >= $this->offset && $this->searchCount < ($this->offset + $this->limit)) {
+            $this->resultList->addResult(strip_tags($target));
+            $this->resultList->setSource(strip_tags($source));
+        }
+        //inc count over all search results for total count
+        $this->searchCount++;
+    }
 
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::search()
+     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::delete()
      */
-    public function search(string $searchString) {
-        return $this->query($searchString);
-    }
-
-    //
-    // Abstract Methods, to be implemented but not needed by this type of Service:
-    //
-/**
-     * (non-PHPdoc)
-     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::open()
-     */
-    public function open(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
-        error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getServiceName());
-    }
-
-    /**
-     * (non-PHPdoc)
-     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::close()
-     */
-    public function close(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
-        error_log("Closed Tmmt ".$tmmt->getName().' - '.$tmmt->getServiceName());
-
+    public function delete() {
+        $file = new SplFileInfo($this->getTmFile($this->tmmt->getId()));
+        if($file->isFile()) {
+            unlink($file);
+        }
     }
 }

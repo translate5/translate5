@@ -86,11 +86,12 @@ class editor_Plugins_TmMtIntegration_Services_Manager {
      * @param string $serviceType
      * @param editor_Plugins_TmMtIntegration_Models_Resource $resource
      */
-    public function getConnector(string $serviceType, editor_Plugins_TmMtIntegration_Models_Resource $resource) {
+    public function getConnector(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
+        $serviceType = $tmmt->getServiceType();
         $this->checkService($serviceType);
         $connector = ZfExtended_Factory::get($serviceType.self::CLS_CONNECTOR);
-        /* @var $connector editor_Plugins_TmMtIntegration_Connector_Abstract */
-        $connector->connectTo($resource);
+        /* @var $connector editor_Plugins_TmMtIntegration_Services_ConnectorAbstract */
+        $connector->connectTo($tmmt);
         return $connector;
     }
     
@@ -126,26 +127,34 @@ class editor_Plugins_TmMtIntegration_Services_Manager {
     }
     
     public function openForTask(editor_Models_Task $task) {
-        //error_log('opened '.$task->getTaskName());
-        $list = $this->loadAssociatedTmmts($task);
-        foreach($list as $one){
-            $resource = $this->getResourceById($one['serviceType'], $one['resourceId']);
-            $connector = $this->getConnector($one['serviceType'], $resource);
-            /* @var $connector editor_Plugins_TmMtIntegration_Services_ConnectorAbstract */
-            $tmmt = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Models_TmMt');
-            /* @var $tmmt editor_Plugins_TmMtIntegration_Models_TmMt */
-            $tmmt->init($one);
-            $connector->open($tmmt);
-        }
+        $this->visitAllAssociatedTms($task->getTaskGuid(), function(editor_Plugins_TmMtIntegration_Services_ConnectorAbstract $connector){
+            $connector->open();
+        });
     }
     
     public function closeForTask(editor_Models_Task $task) {
-        error_log('closed '.$task->getTaskName());
+        $this->visitAllAssociatedTms($task->getTaskGuid(), function(editor_Plugins_TmMtIntegration_Services_ConnectorAbstract $connector){
+            $connector->close();
+        });
     }
     
-    protected function loadAssociatedTmmts(editor_Models_Task $task) {
+    public function updateSegment(editor_Models_Segment $segment) {
+        $this->visitAllAssociatedTms($segment->getTaskGuid(), function(editor_Plugins_TmMtIntegration_Services_ConnectorAbstract $connector) use ($segment) {
+            $connector->update($segment);
+        });
+    }
+    
+    protected function visitAllAssociatedTms($taskGuid, Closure $todo) {
         $tmmts = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Models_TmMt');
         /* @var $tmmts editor_Plugins_TmMtIntegration_Models_TmMt */
-        return $tmmts->loadByAssociatedTask($task);
+        $list = $tmmts->loadByAssociatedTaskGuid($taskGuid);
+        foreach($list as $one){
+            $tmmt = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Models_TmMt');
+            /* @var $tmmt editor_Plugins_TmMtIntegration_Models_TmMt */
+            $tmmt->init($one);
+            $connector = $this->getConnector($tmmt);
+            /* @var $connector editor_Plugins_TmMtIntegration_Services_ConnectorAbstract */
+            $todo($connector);
+        }
     }
 }

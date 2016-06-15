@@ -39,8 +39,9 @@ END LICENSE AND COPYRIGHT
  * Not one instance per resource, but one instance providing data to all resources of one service
  */
 abstract class editor_Plugins_TmMtIntegration_Services_ServiceAbstract {
-    protected $resourceClass = 'editor_Plugins_TmMtIntegration_Models_Resource';
+    const DEFAULT_COLOR = 'ff0000';
     
+    protected $resourceClass = 'editor_Plugins_TmMtIntegration_Models_Resource';
     protected $resources = array();
     
     /**
@@ -61,7 +62,7 @@ abstract class editor_Plugins_TmMtIntegration_Services_ServiceAbstract {
     protected function addResource(array $constructorArgs) {
         $res = ZfExtended_Factory::get($this->resourceClass, $constructorArgs);
         /* @var $res editor_Plugins_TmMtIntegration_Models_Resource */
-        $res->setService($this->getName(), $this->getServiceNamespace());
+        $res->setService($this->getName(), $this->getServiceNamespace(), static::DEFAULT_COLOR);
         $this->resources[] = $res;
     }
     

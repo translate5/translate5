@@ -38,6 +38,8 @@ END LICENSE AND COPYRIGHT
  * Dummy File Upload TM Service Base Class
  */
 class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Service extends editor_Plugins_TmMtIntegration_Services_ServiceAbstract {
+    const DEFAULT_COLOR = '00ff00';
+    
     public function __construct() {
         $this->addResource([$this->getServiceNamespace(), 'Dummy Filebased TM', true]); //isfilebased and the only resource
     }

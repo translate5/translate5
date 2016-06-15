@@ -38,7 +38,10 @@ END LICENSE AND COPYRIGHT
  * Abstract Base Connector
  */
 abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
-    protected $resource;
+    /**
+     * @var editor_Plugins_TmMtIntegration_Models_TmMt
+     */
+    protected $tmmt;
     
     /**
      * Container for the connector results
@@ -51,59 +54,92 @@ abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
      */
     public function __construct() {
         $this->resultList = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_ServiceResult');
-        /* @var $this->resultList editor_Plugins_TmMtIntegration_Services_ServiceResult */
     }
     
-    public function connectTo(editor_Plugins_TmMtIntegration_Models_Resource $resource) {
-        $this->resource = $resource;
+    /**
+     * Just for logging the called methods
+     * @param string $msg
+     */
+    protected function log($method, $msg = '') {
+        error_log($method." Tmmt ".$this->tmmt->getName().' - '.$this->tmmt->getServiceName().$msg);
+    }
+    
+    /**
+     * Link this Connector Instance to the given Tmmt and its resource
+     * @param editor_Plugins_TmMtIntegration_Models_TmMt $tmmt
+     */
+    public function connectTo(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
+        $this->tmmt = $tmmt;
     }
 
     /**
      * Adds the given file to the underlying system
      * @param string $filename
-     * @param editor_Plugins_TmMtIntegration_Models_TmMt $tm
      * @return boolean
      */
-    abstract public function addTm(string $filename, editor_Plugins_TmMtIntegration_Models_TmMt $tm);
-
-    abstract public function synchronizeTmList();
+    public function addTm(string $filename) {
+        //to be implemented if needed
+        $this->log(__METHOD__, ' filename '.$filename);
+    }
 
     /**
-     * Opens the desired TM on the configured Resource (on task open, not on each request)
+     * Opens the with connectTo given TM on the configured Resource (on task open, not on each request)
      * @param editor_Plugins_TmMtIntegration_Models_TmMt $tmmt
      */
-    abstract public function open(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt);
+    public function open() {
+        //to be implemented if needed
+        $this->log(__METHOD__);
+    }
+    
+    /**
+     * Updates translations in the connected service
+     * @param editor_Models_Segment $segment
+     */
+    public function update(editor_Models_Segment $segment) {
+        //to be implemented if needed
+        $this->log(__METHOD__, ' segment '.$segment->getId());
+    }
 
     /**
-     * Closes the desired TM on the configured Resource (on task close, not after each request)
-     * @param editor_Plugins_TmMtIntegration_Models_TmMt $tmmt
+     * Closes the connected TM on the configured Resource (on task close, not after each request)
      */
-    abstract public function close(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt);
-
+    public function close() {
+        //to be implemented if needed
+        $this->log(__METHOD__);
+    }
+    
     /**
-     * opens a tm for a concrete query / search request, called before each request
-     * @param string $queryString
-     * @return array
+     * Deletes the connected TM on the configured Resource
      */
-    abstract public function openForQuery(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt);
+    public function delete() {
+        //to be implemented if needed
+        $this->log(__METHOD__);
+    }
 
     /**
      * makes a tm / mt / file query to find a match / translation
      * returns an array with stdObjects, each stdObject contains the fields: 
      * 
-     * 
-     * @param string $queryString
+     * @param editor_Models_Segment $segment
      * @return editor_Plugins_TmMtIntegration_Services_ServiceResult
      */
-    abstract public function query(string $queryString);
+    abstract public function query(editor_Models_Segment $segment);
 
     /**
      * makes a tm / mt / file concordance search
      * @param string $queryString
-     * @return array
-     * 
-     * FIXME missing source or target!
-     * 
+     * @param string $field
+     * @return editor_Plugins_TmMtIntegration_Services_ServiceResult
      */
-    abstract public function search(string $searchString);
+    abstract public function search(string $searchString, $field = 'source');
+    
+    /**
+     * 
+     * @param integer $page
+     * @param integer $offset
+     * @param integer $limit
+     */
+    public function setPaging($page, $offset, $limit = 20) {
+        //to be implemented if needed
+    }
 }

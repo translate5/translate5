@@ -75,6 +75,7 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('editor_TaskController', 'afterTaskOpen', array($this, 'handleAfterTaskOpen'));
         $this->eventManager->attach('editor_TaskController', 'afterTaskClose', array($this, 'handleAfterTaskClose'));
         $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectUrl'));
+        $this->eventManager->attach('Editor_SegmentController', 'afterPutAction', array($this, 'handleAfterSegmentPut'));
     }
     public function injectUrl(Zend_EventManager_Event $event) {
         $view = $event->getParam('view');
@@ -87,7 +88,7 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
      */
     public function handleAfterTaskOpen(Zend_EventManager_Event $event) {
         $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
-        /* @var $manager editor_Plugins_TmMtIntegration_Connector_Manager */
+        /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
         $manager->openForTask($event->getParam('task'));
     }
     
@@ -97,8 +98,18 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
      */
     public function handleAfterTaskClose(Zend_EventManager_Event $event) {
         $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
-        /* @var $manager editor_Plugins_TmMtIntegration_Connector_Manager */
+        /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
         $manager->closeForTask($event->getParam('task'));
+    }
+    
+    /**
+     * After a segment is changed we inform the services about that. What they do with this information is the service's problem.
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleAfterSegmentPut(Zend_EventManager_Event $event) {
+        $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
+        /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
+        $manager->updateSegment($event->getParam('entity'));
     }
     
     protected function initRoutes() {
@@ -125,7 +136,7 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
         $r->addRoute('plugins_tmmtintegration_query', $queryRoute);
         
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
-            'editor/plugins_tmmtintegration_tmmt/:tmmtid/search',
+            'editor/plugins_tmmtintegration_tmmt/:tmmtId/search',
             array(
                 'module' => 'editor',
                 'controller' => 'plugins_tmmtintegration_tmmt',

@@ -50,7 +50,8 @@ class editor_Plugins_TmMtIntegration_Models_Resource {
             'name' => 'name',
             'serviceName' => 'service',
             'serviceType' => 'serviceType',
-            'filebased' => 'filebased'
+            'filebased' => 'filebased',
+            'defaultColor' => 'defaultColor',
     );
     
     public function __construct($id, $name, $filebased = false) {
@@ -96,13 +97,23 @@ class editor_Plugins_TmMtIntegration_Models_Resource {
     }
     
     /**
-     * sets the service type
-     * @param $service
+     * returns the service type
      * @return string
      */
-    public function setService(string $name, string $type) {
+    public function getDefaultColor() {
+        return $this->defaultColor;
+    }
+    
+    /**
+     * sets the service type
+     * @param string $name
+     * @param string $type
+     * @param string $defaultColor
+     */
+    public function setService(string $name, string $type, string $defaultColor) {
         $this->service = $name;
         $this->serviceType = $type;
+        $this->defaultColor = $defaultColor;
     }
     
     /**

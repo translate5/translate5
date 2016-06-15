@@ -44,37 +44,25 @@ class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plu
      */
     const MT_BASE_MATCHRATE = 70;
     
-    public function addTm(string $filename, editor_Plugins_TmMtIntegration_Models_TmMt $tm){
+    public function addTm(string $filename){
         throw new BadMethodCallException('This Service is not filebased and cannot handle uploaded files therefore!');
-    }
-
-    public function synchronizeTmList() {
-        //for Moses do currently nothing
-    }
-
-    public function open(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
-        error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getServiceName());
-    }
-
-    public function close(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
-        error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getServiceName());
-    }
-
-    public function openForQuery(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
-        error_log("Opened Tmmt ".$tmmt->getName().' - '.$tmmt->getServiceName());
     }
 
     /**
      * (non-PHPdoc)
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::query()
      */
-    public function query(string $queryString) {
+    public function query(editor_Models_Segment $segment) {
+        $queryString = $segment->getFieldEdited('source');
+        
+        //FIXME let the URL come from $this->tmmt->getResource
         $rpc = new Zend_XmlRpc_Client("http://www.translate5.net:8124/RPC2");
         $proxy = $rpc->getProxy();
         $params = array(
-                'text' => "es ist ein kleines haus",
-                'align' => 'false',
-                'report-all-factors' => 'false',
+            //for the "es ist ein kleines haus" sample data the requests work only with lower case requests:
+            'text' => strtolower($queryString), //"es ist ein kleines haus",
+            'align' => 'false',
+            'report-all-factors' => 'false',
         );
         
         try {
@@ -83,7 +71,6 @@ class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plu
         catch(Exception $e) {
             error_log($e);
         }
-        
         
         $this->resultList->setDefaultSource($queryString);
         
@@ -96,15 +83,11 @@ class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plu
     }
     
     /**
-     */
-    public function processSingleResponse($text) {
-    }
-    
-    /**
      * (non-PHPdoc)
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::search()
      */
-    public function search(string $searchString) {
+    public function search(string $searchString, $field = 'source') {
+        //since a MT can not be searched in the target language, we just pass the $searchString to the query call
         return $this->query($searchString);
     }
 

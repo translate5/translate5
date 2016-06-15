@@ -38,6 +38,9 @@ END LICENSE AND COPYRIGHT
  * Moses Service Base Class
  */
 class editor_Plugins_TmMtIntegration_Services_Moses_Service extends editor_Plugins_TmMtIntegration_Services_ServiceAbstract {
+    const DEFAULT_COLOR = 'ffff00';
+    
+    
     protected $resourceClass = 'editor_Plugins_TmMtIntegration_Services_Moses_Resource';
     
     /**

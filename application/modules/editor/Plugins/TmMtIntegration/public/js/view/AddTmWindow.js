@@ -121,7 +121,7 @@ Ext.define('Editor.plugins.TmMtIntegration.view.AddTmWindow', {
 	                    fieldLabel: 'Color Field',
 	                    labelWidth: 160,
 	                    anchor: '100%',
-	                    name: 'color'                	
+	                    name: 'color'
 	                },{
 	                    xtype: 'filefield',
 	                    name: 'tmUpload',
@@ -173,5 +173,6 @@ Ext.define('Editor.plugins.TmMtIntegration.view.AddTmWindow', {
     	me.down('filefield').setDisabled(!record.get('filebased'));
     	me.down('hiddenfield[name="serviceType"]').setValue(record.get('serviceType'));
     	me.down('hiddenfield[name="serviceName"]').setValue(record.get('serviceName'));
+    	me.down('colorfield[name="color"]').setValue(record.get('defaultColor'));
     }
 });
