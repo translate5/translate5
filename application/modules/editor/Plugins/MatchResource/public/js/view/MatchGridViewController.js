@@ -47,6 +47,11 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                 load: 'onSegmentStoreLoad'
             }
         },
+        component: {
+            '#matchGrid': {
+                itemdblclick: 'chooseMatch'
+            }
+        },
         controller:{
             '#editorcontroller': {
                 prevnextloaded :'calculateRows'
@@ -212,5 +217,8 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
         if(me.segmentStack.length > 10){
             me.cachedResults.removeAtKey(me.segmentStack.shift());
         }
+    },
+    chooseMatch: function(view, record) {
+        this.getView().fireEvent('chooseMatch', record);
     }
 });

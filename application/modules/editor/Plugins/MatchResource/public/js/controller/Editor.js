@@ -43,12 +43,15 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
   views: ['Editor.plugins.MatchResource.view.EditorPanel'],
   models:['Editor.plugins.MatchResource.model.EditorQuery'],
   refs:[{
-	   ref: 'matchgrid',
- 	   selector: '#matchGrid'
-      },{
-          ref : 'segmentGrid',
-          selector:'#segmentgrid'
-      }],
+      ref: 'matchgrid',
+      selector: '#matchGrid'
+  },{
+      ref : 'segmentGrid',
+      selector:'#segmentgrid'
+  },{
+      ref: 'matchrateDisplay',
+      selector: '#roweditor displayfield[name=matchRate]'
+  }],
   listen: {
       component: {
           '#segmentgrid': {
@@ -56,19 +59,38 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
               beforeedit: 'startEditing',
               canceledit: 'endEditing',
               edit: 'endEditing'
+          },
+          '#matchGrid': {
+              chooseMatch: 'setMatchInEditor'
           }
       }
   },
   startEditing: function(plugin,context) {
-	  this.getMatchgrid().controller.startEditing(context);//(context.record.get('taskGuid'),context.value);
+      this.getMatchgrid().controller.startEditing(context);//(context.record.get('taskGuid'),context.value);
   },
   endEditing : function(plugin,context) {
-	  this.getMatchgrid().controller.endEditing();//(context.record.get('taskGuid'),context.value);
+      this.getMatchgrid().controller.endEditing();//(context.record.get('taskGuid'),context.value);
   },
   onSegmentGridRender: function(grid) {
       var authUser = Editor.app.authenticatedUser;
       if(authUser.isAllowed('pluginMatchResourceMatchQuery') || authUser.isAllowed('pluginMatchResourceSearchQuery')){
           grid.addDocked({xtype: 'tmMtIntegrationTmMtEditorPanel',dock:'bottom'});
       }
+  },
+  setMatchInEditor: function(matchRecord) {
+      console.log('setMatchInEditor', matchRecord);
+     
+      var me = this,
+          plug = me.getSegmentGrid().editingPlugin,
+          editor = plug.editor,
+          rec = plug.context.record,
+          matchrate = matchRecord.get('matchrate');
+      
+      if(plug.editing && plug.context.record && rec.get('editable')) {
+          //Editor.MessageBox.addInfo("Show a message on take over content?");
+          editor.mainEditor.setValueAndMarkup(matchRecord.get('target'), rec.get('id'), editor.columnToEdit);
+          rec.set('matchRate', matchrate);
+          me.getMatchrateDisplay().setRawValue(matchrate);
+      } 
   }
 });
