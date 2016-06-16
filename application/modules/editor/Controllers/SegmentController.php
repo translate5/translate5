@@ -99,7 +99,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     }
     
     public function nextsegmentsAction() {
-        $segmentId = (int) $this->_getParam('segmentId'); //hardcoded fake value, just for development
+        $segmentId = (int) $this->_getParam('segmentId');
         if($this->_getParam('nextFiltered', false) || $this->_getParam('prevFiltered', false)){
             $autoStates = $this->getUsersAutoStateIds();
         }
@@ -237,7 +237,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->entity->setTimeTrackData($this->data->durations);
         $this->convertQmId();
 
-        $allowedToChange = array('qmId', 'stateId', 'autoStateId');
+        $allowedToChange = array('qmId', 'stateId', 'autoStateId', 'matchRate', 'matchRateType');
+        
         $allowedAlternatesToChange = $this->entity->getEditableDataIndexList();
         $updateToSort = array_intersect(array_keys((array)$this->data), $allowedAlternatesToChange);
         $this->checkPlausibilityOfPut($allowedAlternatesToChange);

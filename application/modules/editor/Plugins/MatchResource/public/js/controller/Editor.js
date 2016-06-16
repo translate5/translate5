@@ -78,8 +78,6 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       }
   },
   setMatchInEditor: function(matchRecord) {
-      console.log('setMatchInEditor', matchRecord);
-     
       var me = this,
           plug = me.getSegmentGrid().editingPlugin,
           editor = plug.editor,
@@ -90,7 +88,11 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           //Editor.MessageBox.addInfo("Show a message on take over content?");
           editor.mainEditor.setValueAndMarkup(matchRecord.get('target'), rec.get('id'), editor.columnToEdit);
           rec.set('matchRate', matchrate);
+          rec.set('matchRateType', 'mtmatch');
           me.getMatchrateDisplay().setRawValue(matchrate);
+          
+          //wenn default layout dann alles OK, wenn mehrere targets, dann matchrate nicht speichern 
+          // und dafür eine Message analog "wdhe deaktiviert" anzeigen
       } 
   }
 });
