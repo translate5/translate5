@@ -40,10 +40,10 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
      * @var array
      */
     protected $frontendControllers = array(
-        'pluginMatchResourceTaskassoc' => 'Editor.plugins.MatchResource.controller.Controller',
-        'pluginMatchResourceMatchQuery' => 'Editor.plugins.MatchResource.controller.EditorController',
-        'pluginMatchResourceSearchQuery' => 'Editor.plugins.MatchResource.controller.EditorController',
-        'pluginMatchResourceOverview' => 'Editor.plugins.MatchResource.controller.TmOverviewController',
+        'pluginMatchResourceTaskassoc' => 'Editor.plugins.MatchResource.controller.TaskAssoc',
+        'pluginMatchResourceMatchQuery' => 'Editor.plugins.MatchResource.controller.Editor',
+        'pluginMatchResourceSearchQuery' => 'Editor.plugins.MatchResource.controller.Editor',
+        'pluginMatchResourceOverview' => 'Editor.plugins.MatchResource.controller.TmOverview',
     );
     
     public function getFrontendControllers() {
