@@ -126,25 +126,23 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
         }
     },
     cacheMatchPanelResults:function(tmmt, segment){
-    	var me = this;
-    	var segmentId = segment.get('id');
-    	var tmmtid = tmmt.get('id');
-    	var dummyObj = {
-    			rows :{
-		    		result :new Array({
-				    			id : '',
-				    			source : 'Loading ...',
-				    			target : 'Loading ...',
-				    			matchrate : '',
-				    			tmmtid: tmmtid,
-				    			segmentId :'',
-				    			loading :true})
-				    	
-    			}
-    	};
-    	me.cachedResults.get(segmentId).add(tmmtid,dummyObj);
-    	me.loadCachedDataIntoGrid(segmentId);
-    	me.sendRequest(segmentId, segment.get('source'), tmmtid); 	
+        var me = this;
+            segmentId = segment.get('id');
+            tmmtid = tmmt.get('id');
+            dummyObj = {
+                rows: [{
+                    id: '',
+                    source: 'Loading ...',
+                    target: 'Loading ...',
+                    matchrate: '',
+                    tmmtid: tmmtid,
+                    segmentId: '',
+                    loading: true
+                }]
+            };
+        me.cachedResults.get(segmentId).add(tmmtid,dummyObj);
+        me.loadCachedDataIntoGrid(segmentId);
+        me.sendRequest(segmentId, segment.get('source'), tmmtid); 	
     },
     sendRequest : function(segmentId,query,tmmtid) {
     	var me = this;
@@ -158,23 +156,18 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                 },
                 success: function(response){
                     var resp = Ext.util.JSON.decode(response.responseText);
-                    if( typeof resp.rows.result !== 'undefined' && resp.rows.result !== null && resp.rows.result.length){
+                    if(typeof resp.rows !== 'undefined' && resp.rows !== null && resp.rows.length){
                         me.cachedResults.get(segmentId).add(tmmtid,resp);
                         me.loadCachedDataIntoGrid(segmentId);
                         return;
                     }
                     var noresults = {
-                            rows :{
-                                result :new Array({
-                                    id : '',
-                                    source : 'No results was found',
-                                    target : '',
-                                    matchrate : '',
-                                    tmmtid: tmmtid,
-                                    segmentId :'',
-                                    loading :true})
-                          }
-                  };
+                            rows: [{
+                                source: 'No results was found',
+                                tmmtid: tmmtid,
+                                loading: true
+                            }]
+                        };
                   me.cachedResults.get(segmentId).add(tmmtid,noresults);
                   me.loadCachedDataIntoGrid(segmentId);
                 }, 
@@ -182,17 +175,13 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                     //if failure on server side (HTTP 5?? / HTTP 4??), print a nice error message that failure happend on server side
                     // if we get timeout on the ajax connection, then print a nice timeout message  
                     var timeOut = {
-                            rows :{
-                                result :new Array({
-                                            id : '',
-                                            source : 'The request to the server is taking too long.',
-                                            target : 'Please try again later.',
-                                            matchrate : '',
-                                            tmmtid: tmmtid,
-                                            segmentId :'',
-                                            loading :true})
-                            }
-                    };
+                            rows: [{
+                                source: 'The request to the server is taking too long.',
+                                target: 'Please try again later.',
+                                tmmtid: tmmtid,
+                                loading:true
+                            }]
+                        };
                     me.cachedResults.get(segmentId).add(tmmtid,timeOut);
                     me.loadCachedDataIntoGrid(segmentId);
                 }
@@ -209,7 +198,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
 		    me.assocStore.each(function(record){
 		        var itm = res.get(record.get('id'));
 		        if(itm)
-		            me.getView().getStore('editorquery').loadRawData(itm.rows.result,true);
+		            me.getView().getStore('editorquery').loadRawData(itm.rows,true);
 	        });
 	    }
 	},
