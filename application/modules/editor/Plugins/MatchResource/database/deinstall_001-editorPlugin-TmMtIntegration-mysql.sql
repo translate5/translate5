@@ -34,7 +34,7 @@ DELETE FROM Zf_acl_rules
 WHERE `module` = 'editor' AND `resource` = 'frontend' AND 
 `right` IN ('pluginMatchResourceOverview','pluginMatchResourcesAddFilebased','pluginMatchResourceTaskassoc','pluginMatchResourcesAddNonFilebased','pluginMatchResourceMatchQuery','pluginMatchResourceSearchQuery');
 
-DROP TABLE `LEK_tmmtintegration_tmmt`;
 DROP TABLE `LEK_tmmtintegration_taskassoc`;
+DROP TABLE `LEK_tmmtintegration_tmmt`;
 
 DELETE FROM Zf_configuration WHERE `name` = 'runtimeOptions.plugins.TmMtIntegration.preloadedTranslationSegments';
