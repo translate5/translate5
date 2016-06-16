@@ -72,6 +72,8 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
              store: '{editorquery}'
           },
 	      columns: [{
+	          xtype:'rownumberer'
+	      },{
 	          xtype: 'gridcolumn',
 	          flex: 45/100,
 	          dataIndex: 'source',
@@ -89,7 +91,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	              var str =me.getViewModel().getStore('taskassoc').findRecord('id',record.get('tmmtid'));
 	              clr = str.get('color');
 	              meta.tdAttr = 'bgcolor=#"' + clr + '"';
-	              return matchrate;
+	              return "<b>"+matchrate+"</b>";
 	          },
 	          text:'Match Rate'
 	      }]

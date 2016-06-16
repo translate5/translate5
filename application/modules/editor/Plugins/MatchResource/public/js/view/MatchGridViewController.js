@@ -66,7 +66,8 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
     startEditing: function(context) {
     	var me = this;
     	me.editedSegmentId = context.record.id;
-        me.loadCachedDataIntoGrid(context.record.id);
+        
+    	//me.loadCachedDataIntoGrid(context.record.id,-1);
         
         me.cacheSegmentIndex = new Array();
         me.cacheSegmentIndex.push(context.rowIdx);
@@ -101,21 +102,22 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
             var retval = controller.findNextRows(controller.next.nextEditable.idx,maxSegments);
             me.cacheSegmentIndex = me.cacheSegmentIndex.concat(retval);
         }
-        me.checkCacheLength();
+        //me.checkCacheLength();
         me.cache();
     },
     cache : function(){
         var me = this,
         segments = Ext.data.StoreManager.get('Segments');
-    
-        me.getView().getStore('editorquery').removeAll();
         
         for(var i=0;i<me.cacheSegmentIndex.length;i++){
-            
             var segment = segments.getAt(me.cacheSegmentIndex[i]);
             var segId = segment.get('id');
-            if(me.cachedResults.get(segId)){
-                me.loadCachedDataIntoGrid(segId);
+            
+            if(segId == this.editedSegmentId)
+                me.getView().getStore('editorquery').removeAll();
+            
+            if(me.cachedResults.get(segId) && me.cachedResults.get(segId).lenth >0){
+                me.loadCachedDataIntoGrid(segId,-1);
                 continue;
             }
             me.cachedResults.add(segId,new Ext.util.HashMap());
@@ -143,7 +145,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
     			}
     	};
     	me.cachedResults.get(segmentId).add(tmmtid,dummyObj);
-    	me.loadCachedDataIntoGrid(segmentId);
+    	me.loadCachedDataIntoGrid(segmentId,tmmtid);
     	me.sendRequest(segmentId, segment.get('source'), tmmtid); 	
     },
     sendRequest : function(segmentId,query,tmmtid) {
@@ -158,9 +160,13 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                 },
                 success: function(response){
                     var resp = Ext.util.JSON.decode(response.responseText);
+                    
+                    if(segmentId == me.editedSegmentId)
+                        me.getView().getStore('editorquery').remove(me.getView().getStore('editorquery').findRecord('tmmtid',tmmtid));
+                    
                     if( typeof resp.rows.result !== 'undefined' && resp.rows.result !== null && resp.rows.result.length){
                         me.cachedResults.get(segmentId).add(tmmtid,resp);
-                        me.loadCachedDataIntoGrid(segmentId);
+                        me.loadCachedDataIntoGrid(segmentId,tmmtid);
                         return;
                     }
                     var noresults = {
@@ -174,13 +180,18 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                                     segmentId :'',
                                     loading :true})
                           }
-                  };
-                  me.cachedResults.get(segmentId).add(tmmtid,noresults);
-                  me.loadCachedDataIntoGrid(segmentId);
+                    };
+                    me.cachedResults.get(segmentId).add(tmmtid,noresults);
+                    me.loadCachedDataIntoGrid(segmentId,tmmtid);
+                    me.cachedResults.get(segmentId).removeAtKey(tmmtid);
+
                 }, 
                 failure: function(response){
                     //if failure on server side (HTTP 5?? / HTTP 4??), print a nice error message that failure happend on server side
                     // if we get timeout on the ajax connection, then print a nice timeout message  
+                    if(segmentId == me.editedSegmentId)
+                        me.getView().getStore('editorquery').remove(me.getView().getStore('editorquery').findRecord('tmmtid',tmmtid));
+                    
                     var timeOut = {
                             rows :{
                                 result :new Array({
@@ -194,23 +205,27 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                             }
                     };
                     me.cachedResults.get(segmentId).add(tmmtid,timeOut);
-                    me.loadCachedDataIntoGrid(segmentId);
+                    me.loadCachedDataIntoGrid(segmentId,tmmtid);
+                    me.cachedResults.get(segmentId).removeAtKey(tmmtid);
                 }
         });
 	},
-    loadCachedDataIntoGrid : function(segmentId) {
+    loadCachedDataIntoGrid : function(segmentId,tmmtid) {
     	if(segmentId != this.editedSegmentId)
     		return;
     	var me = this;
-		var str = me.getView().getStore('editorquery');
-		str.removeAll();
 		if(me.cachedResults.get(segmentId)){
 		    var res =me.cachedResults.get(segmentId);
-		    me.assocStore.each(function(record){
-		        var itm = res.get(record.get('id'));
-		        if(itm)
-		            me.getView().getStore('editorquery').loadRawData(itm.rows.result,true);
-	        });
+            
+		    if(tmmtid > 0){
+		        me.assocStore.each(function(record){
+                if(res.get(tmmtid))
+                    me.getView().getStore('editorquery').loadRawData(res.get(tmmtid).rows.result,true);
+                }); 
+		        return;
+		    }
+		    if(res.get(tmmtid))
+		        me.getView().getStore('editorquery').loadRawData(res.get(tmmtid).rows.result,true);
 	    }
 	},
 	setFirsEditableRow : function(fer) {
