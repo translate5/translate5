@@ -28,11 +28,11 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * @class Editor.plugins.TmMtIntegration.store.EditorQuery
+ * @class Editor.plugins.MatchResource.store.EditorQuery
  * @extends Ext.data.Store
  */
-Ext.define('Editor.plugins.TmMtIntegration.store.EditorQuery', {
+Ext.define('Editor.plugins.MatchResource.store.EditorQuery', {
 	  extend : 'Ext.data.Store',
-	  model: 'Editor.plugins.TmMtIntegration.model.EditorQuery',
+	  model: 'Editor.plugins.MatchResource.model.EditorQuery',
 	  autoLoad: true
 });

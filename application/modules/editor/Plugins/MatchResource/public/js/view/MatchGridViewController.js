@@ -35,10 +35,10 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.TmMtIntegration.view.MatchGridViewController
+ * @class Editor.plugins.MatchResource.view.MatchGridViewController
  * @extends Ext.app.ViewController
  */
-Ext.define('Editor.plugins.TmMtIntegration.view.MatchGridViewController', {
+Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.tmMtIntegrationMatchGrid',
     listen: {
@@ -149,7 +149,7 @@ Ext.define('Editor.plugins.TmMtIntegration.view.MatchGridViewController', {
     sendRequest : function(segmentId,query,tmmtid) {
     	var me = this;
     	Ext.Ajax.request({
-            url:Editor.data.restpath+'plugins_tmmtintegration_tmmt/'+tmmtid+'/query',
+            url:Editor.data.restpath+'plugins_matchresource_tmmt/'+tmmtid+'/query',
                 method: "POST",
                 params: {
                     //column for which the search was done (target | source)

@@ -35,11 +35,11 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.TmMtIntegration.view.MatchGridViewModel
+ * @class Editor.plugins.MatchResource.view.MatchGridViewModel
  * @extends Ext.app.ViewModel
  */
 
-Ext.define('Editor.plugins.TmMtIntegration.view.MatchGridViewModel', {
+Ext.define('Editor.plugins.MatchResource.view.MatchGridViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.tmMtIntegrationMatchGrid',
 
@@ -61,14 +61,14 @@ Ext.define('Editor.plugins.TmMtIntegration.view.MatchGridViewModel', {
                 	editorquery: {
                         pageSize: 200,
                         autoLoad: false,
-                        model: 'Editor.plugins.TmMtIntegration.model.EditorQuery',
+                        model: 'Editor.plugins.MatchResource.model.EditorQuery',
                         sortInfo:{
                         	property:'matchrate',
                         	direction:'ASC'
                         }
                     },
                     taskassoc: {
-                        model: 'Editor.plugins.TmMtIntegration.model.TaskAssoc',
+                        model: 'Editor.plugins.MatchResource.model.TaskAssoc',
                         autoLoad: false
                     },
                     keyaccounts: me.processKeyaccounts({

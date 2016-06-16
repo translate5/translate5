@@ -28,13 +28,13 @@
 -- */
 
 DELETE FROM Zf_acl_rules 
-WHERE `module` = 'editor' AND `resource` IN ('editor_plugins_tmmtintegration_resource','editor_plugins_tmmtintegration_taskassoc','editor_plugins_tmmtintegration_tmmt');
+WHERE `module` = 'editor' AND `resource` IN ('editor_plugins_matchresource_resource','editor_plugins_matchresource_taskassoc','editor_plugins_matchresource_tmmt');
 
 DELETE FROM Zf_acl_rules 
 WHERE `module` = 'editor' AND `resource` = 'frontend' AND 
 `right` IN ('pluginMatchResourceOverview','pluginMatchResourcesAddFilebased','pluginMatchResourceTaskassoc','pluginMatchResourcesAddNonFilebased','pluginMatchResourceMatchQuery','pluginMatchResourceSearchQuery');
 
-DROP TABLE `LEK_tmmtintegration_taskassoc`;
-DROP TABLE `LEK_tmmtintegration_tmmt`;
+DROP TABLE `LEK_matchresource_taskassoc`;
+DROP TABLE `LEK_matchresource_tmmt`;
 
-DELETE FROM Zf_configuration WHERE `name` = 'runtimeOptions.plugins.TmMtIntegration.preloadedTranslationSegments';
+DELETE FROM Zf_configuration WHERE `name` = 'runtimeOptions.plugins.MatchResource.preloadedTranslationSegments';

@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
  * Resources are no valid Models/Entitys, we support only a generated Resource listing
  * One Resource is one available configured connector, Languages and Title can be customized in the TM Overview List
  */
-class editor_Plugins_TmMtIntegration_ResourceController extends ZfExtended_RestController  {
+class editor_Plugins_MatchResource_ResourceController extends ZfExtended_RestController  {
     
     /**
      * (non-PHPdoc)
@@ -50,8 +50,8 @@ class editor_Plugins_TmMtIntegration_ResourceController extends ZfExtended_RestC
     }
     
     public function indexAction() {
-        $serviceManager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
-        /* @var $serviceManager editor_Plugins_TmMtIntegration_Services_Manager */
+        $serviceManager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
+        /* @var $serviceManager editor_Plugins_MatchResource_Services_Manager */
         $resources = $serviceManager->getAllResources();
         $result = array();
         $i = 0;
@@ -63,7 +63,7 @@ class editor_Plugins_TmMtIntegration_ResourceController extends ZfExtended_RestC
         $isAllowedFilebased = $acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'pluginMatchResourcesAddFilebased');
         $isAllowedNonFilebased = $acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'pluginMatchResourcesAddNonFilebased');
         foreach($resources as $resource) {
-            /* @var $resource editor_Plugins_TmMtIntegration_Models_Resource */
+            /* @var $resource editor_Plugins_MatchResource_Models_Resource */
             $isFilebased = $resource->getFilebased();
             if($isFilebased && $isAllowedFilebased || !$isFilebased && $isAllowedNonFilebased) {
                 $result[] = $resource->getDataObject();

@@ -38,7 +38,7 @@ END LICENSE AND COPYRIGHT
  * @class Editor.plugins.pluginFeasibilityTest.view.Panel
  * @extends Ext.grid.Panel
  */
-Ext.define('Editor.plugins.TmMtIntegration.view.EditorPanelSearchGrid', {
+Ext.define('Editor.plugins.MatchResource.view.EditorPanelSearchGrid', {
 	extend : 'Ext.grid.Panel',
 	alias : 'widget.tmMtIntegrationEditorPanelSearchGrid',
 	itemId:'editorPanelSearchGrid',

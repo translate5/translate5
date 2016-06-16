@@ -37,7 +37,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Moses Connector
  */
-class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
+class editor_Plugins_MatchResource_Services_Moses_Connector extends editor_Plugins_MatchResource_Services_ConnectorAbstract {
     /**
      * We assume that the best MT Match correlate this matchrate
      * @var integer
@@ -50,13 +50,13 @@ class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plu
 
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::query()
+     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::query()
      */
     public function query(editor_Models_Segment $segment) {
         $queryString = $this->getQueryString($segment);
         
         $res = $this->tmmt->getResource();
-        /* @var $res editor_Plugins_TmMtIntegration_Services_Moses_Resource */
+        /* @var $res editor_Plugins_MatchResource_Services_Moses_Resource */
 
         $rpc = new Zend_XmlRpc_Client($res->getUrl());
         $proxy = $rpc->getProxy();
@@ -86,7 +86,7 @@ class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plu
     
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::search()
+     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::search()
      */
     public function search(string $searchString, $field = 'source') {
         //since a MT can not be searched in the target language, we just pass the $searchString to the query call

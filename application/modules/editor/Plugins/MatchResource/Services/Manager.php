@@ -38,7 +38,7 @@ END LICENSE AND COPYRIGHT
  * TmMt Service Manager
  * Not needed to be instanced as singleton since registered connectors were stored internally in a static member variable
  */
-class editor_Plugins_TmMtIntegration_Services_Manager {
+class editor_Plugins_MatchResource_Services_Manager {
     const CLS_SERVICE = '_Service';
     const CLS_CONNECTOR = '_Connector';
     
@@ -47,8 +47,8 @@ class editor_Plugins_TmMtIntegration_Services_Manager {
      * @var array
      */
     static protected $registeredServices = array(
-        'editor_Plugins_TmMtIntegration_Services_Moses',
-        'editor_Plugins_TmMtIntegration_Services_DummyFileTm',
+        'editor_Plugins_MatchResource_Services_Moses',
+        'editor_Plugins_MatchResource_Services_DummyFileTm',
     );
 
     public function getAll() {
@@ -57,13 +57,13 @@ class editor_Plugins_TmMtIntegration_Services_Manager {
 
     /**
      * Creates all configured connector resources
-     * @return [editor_Plugins_TmMtIntegration_Connector_Abstract]
+     * @return [editor_Plugins_MatchResource_Connector_Abstract]
      */
     public function getAllResources() {
         $serviceResources = array();
         foreach(self::$registeredServices as $service) {
             $service = ZfExtended_Factory::get($service.self::CLS_SERVICE);
-            /* @var $serviceResources editor_Plugins_TmMtIntegration_Services_ServiceAbstract */
+            /* @var $serviceResources editor_Plugins_MatchResource_Services_ServiceAbstract */
             $serviceResources = array_merge($serviceResources, $service->getResources());
         }
         return $serviceResources;
@@ -71,35 +71,35 @@ class editor_Plugins_TmMtIntegration_Services_Manager {
     
     /**
      * gets the reosurce to the given tmmt
-     * @param editor_Plugins_TmMtIntegration_Models_TmMt $tmmt
-     * @return editor_Plugins_TmMtIntegration_Models_Resource
+     * @param editor_Plugins_MatchResource_Models_TmMt $tmmt
+     * @return editor_Plugins_MatchResource_Models_Resource
      */
-    public function getResource(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
+    public function getResource(editor_Plugins_MatchResource_Models_TmMt $tmmt) {
         return $this->getResourceById($tmmt->getServiceType(), $tmmt->getResourceId());
     }
     
     /**
      * @param string $serviceType
      * @param string $id
-     * @return editor_Plugins_TmMtIntegration_Models_Resource
+     * @return editor_Plugins_MatchResource_Models_Resource
      */
     public function getResourceById(string $serviceType, string $id) {
         $this->checkService($serviceType);
         $resources = ZfExtended_Factory::get($serviceType.self::CLS_SERVICE);
-        /* @var $resources editor_Plugins_TmMtIntegration_Services_ServiceAbstract */
+        /* @var $resources editor_Plugins_MatchResource_Services_ServiceAbstract */
         return $resources->getResourceById($id);
     }
     
     /**
      * returns the desired connector, connection to the given resource
      * @param string $serviceType
-     * @param editor_Plugins_TmMtIntegration_Models_Resource $resource
+     * @param editor_Plugins_MatchResource_Models_Resource $resource
      */
-    public function getConnector(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
+    public function getConnector(editor_Plugins_MatchResource_Models_TmMt $tmmt) {
         $serviceType = $tmmt->getServiceType();
         $this->checkService($serviceType);
         $connector = ZfExtended_Factory::get($serviceType.self::CLS_CONNECTOR);
-        /* @var $connector editor_Plugins_TmMtIntegration_Services_ConnectorAbstract */
+        /* @var $connector editor_Plugins_MatchResource_Services_ConnectorAbstract */
         $connector->connectTo($tmmt);
         return $connector;
     }
@@ -136,33 +136,33 @@ class editor_Plugins_TmMtIntegration_Services_Manager {
     }
     
     public function openForTask(editor_Models_Task $task) {
-        $this->visitAllAssociatedTms($task->getTaskGuid(), function(editor_Plugins_TmMtIntegration_Services_ConnectorAbstract $connector){
+        $this->visitAllAssociatedTms($task->getTaskGuid(), function(editor_Plugins_MatchResource_Services_ConnectorAbstract $connector){
             $connector->open();
         });
     }
     
     public function closeForTask(editor_Models_Task $task) {
-        $this->visitAllAssociatedTms($task->getTaskGuid(), function(editor_Plugins_TmMtIntegration_Services_ConnectorAbstract $connector){
+        $this->visitAllAssociatedTms($task->getTaskGuid(), function(editor_Plugins_MatchResource_Services_ConnectorAbstract $connector){
             $connector->close();
         });
     }
     
     public function updateSegment(editor_Models_Segment $segment) {
-        $this->visitAllAssociatedTms($segment->getTaskGuid(), function(editor_Plugins_TmMtIntegration_Services_ConnectorAbstract $connector) use ($segment) {
+        $this->visitAllAssociatedTms($segment->getTaskGuid(), function(editor_Plugins_MatchResource_Services_ConnectorAbstract $connector) use ($segment) {
             $connector->update($segment);
         });
     }
     
     protected function visitAllAssociatedTms($taskGuid, Closure $todo) {
-        $tmmts = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Models_TmMt');
-        /* @var $tmmts editor_Plugins_TmMtIntegration_Models_TmMt */
+        $tmmts = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
+        /* @var $tmmts editor_Plugins_MatchResource_Models_TmMt */
         $list = $tmmts->loadByAssociatedTaskGuid($taskGuid);
         foreach($list as $one){
-            $tmmt = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Models_TmMt');
-            /* @var $tmmt editor_Plugins_TmMtIntegration_Models_TmMt */
+            $tmmt = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
+            /* @var $tmmt editor_Plugins_MatchResource_Models_TmMt */
             $tmmt->init($one);
             $connector = $this->getConnector($tmmt);
-            /* @var $connector editor_Plugins_TmMtIntegration_Services_ConnectorAbstract */
+            /* @var $connector editor_Plugins_MatchResource_Services_ConnectorAbstract */
             $todo($connector, $tmmt);
         }
     }

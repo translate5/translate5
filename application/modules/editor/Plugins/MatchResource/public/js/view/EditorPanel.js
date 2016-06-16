@@ -38,11 +38,11 @@ END LICENSE AND COPYRIGHT
  * @class Editor.plugins.pluginFeasibilityTest.view.EditorPanel
  * @extends Ext.panel.Panel
  */
-Ext.define('Editor.plugins.TmMtIntegration.view.EditorPanel', {
+Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
 	extend : 'Ext.tab.Panel',
 	alias : 'widget.tmMtIntegrationTmMtEditorPanel',
-	requires:['Editor.plugins.TmMtIntegration.view.EditorPanelSearchGrid',
-          'Editor.plugins.TmMtIntegration.view.MatchGrid'],
+	requires:['Editor.plugins.MatchResource.view.EditorPanelSearchGrid',
+          'Editor.plugins.MatchResource.view.MatchGrid'],
     activeTab: 0,
     height:350,
     plain: true,

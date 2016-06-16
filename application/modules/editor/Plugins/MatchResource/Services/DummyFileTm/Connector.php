@@ -44,7 +44,7 @@ END LICENSE AND COPYRIGHT
  * This should be the CSV defaults.
  * The first column must be an id, the second the source and the theird column the target values. Other columns are ignored.
  */
-class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
+class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor_Plugins_MatchResource_Services_ConnectorAbstract {
 
     protected $tm;
     protected $uploadedFile;
@@ -65,13 +65,13 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
 
     public function __construct() {
         $eventManager = Zend_EventManager_StaticEventManager::getInstance();
-        $eventManager->attach('editor_Plugins_TmMtIntegration_TmmtController', 'afterPostAction', array($this, 'handleAfterTmmtSaved'));
+        $eventManager->attach('editor_Plugins_MatchResource_TmmtController', 'afterPostAction', array($this, 'handleAfterTmmtSaved'));
         parent::__construct();
     }
 
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::addTm()
+     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::addTm()
      */
     public function addTm(string $filename){
         $this->uploadedFile = $filename;
@@ -98,7 +98,7 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
     
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::query()
+     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::query()
      */
     public function query(editor_Models_Segment $segment) {
         $queryString = $this->getQueryString($segment);
@@ -107,7 +107,7 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
     
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::search()
+     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::search()
      */
     public function search(string $searchString, $field = 'source') {
         $this->searchCount = 0;
@@ -116,7 +116,7 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
     
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::setPaging()
+     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::setPaging()
      */
     public function setPaging($page, $offset, $limit = 20) {
         $this->page = (int) $page;
@@ -133,7 +133,7 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
      * @param string $queryString
      * @param string $field
      * @throws ZfExtended_NotFoundException
-     * @return editor_Plugins_TmMtIntegration_Services_ServiceResult
+     * @return editor_Plugins_MatchResource_Services_ServiceResult
      */
     protected function loopData(string $queryString, string $field = null) {
         if(stripos($this->tmmt->getName(), 'slow') !== false) {
@@ -223,7 +223,7 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
 
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::delete()
+     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::delete()
      */
     public function delete() {
         $file = new SplFileInfo($this->getTmFile($this->tmmt->getId()));

@@ -35,13 +35,13 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.TmMtIntegration.controller.EditorController
+ * @class Editor.plugins.MatchResource.controller.EditorController
  * @extends Ext.app.Controller
  */
-Ext.define('Editor.plugins.TmMtIntegration.controller.EditorController', {
+Ext.define('Editor.plugins.MatchResource.controller.EditorController', {
   extend : 'Ext.app.Controller',
-  views: ['Editor.plugins.TmMtIntegration.view.EditorPanel'],
-  models:['Editor.plugins.TmMtIntegration.model.EditorQuery'],
+  views: ['Editor.plugins.MatchResource.view.EditorPanel'],
+  models:['Editor.plugins.MatchResource.model.EditorQuery'],
   refs:[{
 	   ref: 'matchgrid',
  	   selector: '#matchGrid'

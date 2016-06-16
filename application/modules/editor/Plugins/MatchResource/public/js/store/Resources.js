@@ -32,8 +32,8 @@ END LICENSE AND COPYRIGHT
  * @class Editor.store.admin.AddTmWindowsStore
  * @extends Ext.data.Store
  */
-Ext.define('Editor.plugins.TmMtIntegration.store.Resources', {
+Ext.define('Editor.plugins.MatchResource.store.Resources', {
 	  extend : 'Ext.data.Store',
-	  model: 'Editor.plugins.TmMtIntegration.model.Resource',
+	  model: 'Editor.plugins.MatchResource.model.Resource',
 	  autoLoad: true
 });

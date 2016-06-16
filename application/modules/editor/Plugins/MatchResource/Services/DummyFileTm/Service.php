@@ -37,7 +37,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Dummy File Upload TM Service Base Class
  */
-class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Service extends editor_Plugins_TmMtIntegration_Services_ServiceAbstract {
+class editor_Plugins_MatchResource_Services_DummyFileTm_Service extends editor_Plugins_MatchResource_Services_ServiceAbstract {
     const DEFAULT_COLOR = '00ff00';
     
     public function __construct() {
@@ -46,7 +46,7 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Service extends editor
     
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_TmMtIntegration_Services_ServiceAbstract::getName()
+     * @see editor_Plugins_MatchResource_Services_ServiceAbstract::getName()
      */
     public function getName() {
         return "DummyFile TM";

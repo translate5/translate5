@@ -33,17 +33,17 @@ END LICENSE AND COPYRIGHT
  * 
  * @FIXME Hint: class must be named NOT Bootstrap, otherwise we will get a strange Zend Error
  */
-class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
+class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
     
     /**
      * Contains the Plugin Path relativ to APPLICATION_PATH or absolut if not under APPLICATION_PATH
      * @var array
      */
     protected $frontendControllers = array(
-        'pluginMatchResourceTaskassoc' => 'Editor.plugins.TmMtIntegration.controller.Controller',
-        'pluginMatchResourceMatchQuery' => 'Editor.plugins.TmMtIntegration.controller.EditorController',
-        'pluginMatchResourceSearchQuery' => 'Editor.plugins.TmMtIntegration.controller.EditorController',
-        'pluginMatchResourceOverview' => 'Editor.plugins.TmMtIntegration.controller.TmOverviewController',
+        'pluginMatchResourceTaskassoc' => 'Editor.plugins.MatchResource.controller.Controller',
+        'pluginMatchResourceMatchQuery' => 'Editor.plugins.MatchResource.controller.EditorController',
+        'pluginMatchResourceSearchQuery' => 'Editor.plugins.MatchResource.controller.EditorController',
+        'pluginMatchResourceOverview' => 'Editor.plugins.MatchResource.controller.TmOverviewController',
     );
     
     public function getFrontendControllers() {
@@ -87,8 +87,8 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
      * @param Zend_EventManager_Event $event
      */
     public function handleAfterTaskOpen(Zend_EventManager_Event $event) {
-        $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
-        /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
+        $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
+        /* @var $manager editor_Plugins_MatchResource_Services_Manager */
         $manager->openForTask($event->getParam('task'));
     }
     
@@ -97,8 +97,8 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
      * @param Zend_EventManager_Event $event
      */
     public function handleAfterTaskClose(Zend_EventManager_Event $event) {
-        $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
-        /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
+        $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
+        /* @var $manager editor_Plugins_MatchResource_Services_Manager */
         $manager->closeForTask($event->getParam('task'));
     }
     
@@ -107,8 +107,8 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
      * @param Zend_EventManager_Event $event
      */
     public function handleAfterSegmentPut(Zend_EventManager_Event $event) {
-        $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
-        /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
+        $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
+        /* @var $manager editor_Plugins_MatchResource_Services_Manager */
         $manager->updateSegment($event->getParam('entity'));
     }
     
@@ -119,30 +119,30 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
         $r = $f->getRouter();
         
         $restRoute = new Zend_Rest_Route($f, array(), array(
-                'editor' => array('plugins_tmmtintegration_taskassoc',
-                                  'plugins_tmmtintegration_tmmt',
-                                  'plugins_tmmtintegration_resource',
+                'editor' => array('plugins_matchresource_taskassoc',
+                                  'plugins_matchresource_tmmt',
+                                  'plugins_matchresource_resource',
                 ),
         ));
-        $r->addRoute('plugins_tmmtintegration_restdefault', $restRoute);
+        $r->addRoute('plugins_matchresource_restdefault', $restRoute);
         
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
-            'editor/plugins_tmmtintegration_tmmt/:tmmtId/query',
+            'editor/plugins_matchresource_tmmt/:tmmtId/query',
             array(
                 'module' => 'editor',
-                'controller' => 'plugins_tmmtintegration_tmmt',
+                'controller' => 'plugins_matchresource_tmmt',
                 'action' => 'query'
             ));
-        $r->addRoute('plugins_tmmtintegration_query', $queryRoute);
+        $r->addRoute('plugins_matchresource_query', $queryRoute);
         
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
-            'editor/plugins_tmmtintegration_tmmt/:tmmtId/search',
+            'editor/plugins_matchresource_tmmt/:tmmtId/search',
             array(
                 'module' => 'editor',
-                'controller' => 'plugins_tmmtintegration_tmmt',
+                'controller' => 'plugins_matchresource_tmmt',
                 'action' => 'search'
             ));
-        $r->addRoute('plugins_tmmtintegration_search', $queryRoute);
+        $r->addRoute('plugins_matchresource_search', $queryRoute);
         
         
         return;
@@ -152,14 +152,14 @@ class editor_Plugins_TmMtIntegration_Init extends ZfExtended_Plugin_Abstract {
             'editor/js/app-localized.jsx',
             array(
                 'module' => 'editor',
-                'controller' => 'plugins_tmmtintegration_dummy',
+                'controller' => 'plugins_matchresource_dummy',
                 'action' => 'query',
             ));
-        $f->getRouter()->addRoute('plugins_tmmtintegration_test', $rest);
+        $f->getRouter()->addRoute('plugins_matchresource_test', $rest);
         
         $restRoute = new Zend_Rest_Route($f, array(), array(
-            'editor' => array('plugins_tmmtintegration_resource'),
+            'editor' => array('plugins_matchresource_resource'),
         ));
-        $f->getRouter()->addRoute('plugins_tmmtintegration_rest', $restRoute);
+        $f->getRouter()->addRoute('plugins_matchresource_rest', $restRoute);
     }
 }

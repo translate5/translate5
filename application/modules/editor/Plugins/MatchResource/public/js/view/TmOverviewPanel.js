@@ -34,10 +34,10 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.TmMtIntegration.view.TmOverviewPanel
+ * @class Editor.plugins.MatchResource.view.TmOverviewPanel
  * @extends Ext.panel.Panel
  */
-Ext.define('Editor.plugins.TmMtIntegration.view.TmOverviewPanel', {
+Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
     extend : 'Ext.panel.Panel',//'Ext.grid.Panel',
     alias: 'widget.TmOverviewPanel',
     itemId: 'tmOverviewPanel',
@@ -54,7 +54,7 @@ Ext.define('Editor.plugins.TmMtIntegration.view.TmOverviewPanel', {
         			xtype:'grid',
         			id:'gridTmOverview',
         			cls:'gridTmOverview',
-        			store : 'Editor.plugins.TmMtIntegration.store.TmMts',
+        			store : 'Editor.plugins.MatchResource.store.TmMts',
         			title: me.title, //see EXT6UPD-9
 			        columns: [{
 			            xtype: 'gridcolumn',

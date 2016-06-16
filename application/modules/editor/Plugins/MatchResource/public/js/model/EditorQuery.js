@@ -34,10 +34,10 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.TmMtIntegration.model.Resource
+ * @class Editor.plugins.MatchResource.model.Resource
  * @extends Ext.data.Model
  */
-Ext.define('Editor.plugins.TmMtIntegration.model.EditorQuery', {
+Ext.define('Editor.plugins.MatchResource.model.EditorQuery', {
   extend: 'Ext.data.Model',
   fields: [
     {name: 'id', type: 'string'},

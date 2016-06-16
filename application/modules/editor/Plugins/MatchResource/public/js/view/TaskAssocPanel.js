@@ -38,7 +38,7 @@ END LICENSE AND COPYRIGHT
  * @class Editor.plugins.pluginFeasibilityTest.view.Panel
  * @extends Ext.panel.Panel
  */
-Ext.define('Editor.plugins.TmMtIntegration.view.TaskAssocPanel', {
+Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
     extend : 'Ext.panel.Panel',
     alias : 'widget.tmMtIntegrationTaskAssocPanel',
     requires: ['Editor.view.admin.TaskActionColumn'],
@@ -70,7 +70,7 @@ Ext.define('Editor.plugins.TmMtIntegration.view.TaskAssocPanel', {
             items : [ {
                 xtype : 'grid',
                 id : 'tmTaskAssocGrid',
-                store : 'Editor.plugins.TmMtIntegration.store.TaskAssocStore',
+                store : 'Editor.plugins.MatchResource.store.TaskAssocStore',
                 emptyText: 'Keine Match Resource in der Sprachkombination des geöffneten Tasks verfügbar.',
                 features : [ {
                     id : 'group',

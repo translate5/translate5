@@ -27,7 +27,7 @@ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception
 
 END LICENSE AND COPYRIGHT
 */
-class editor_Plugins_TmMtIntegration_Models_Resource {
+class editor_Plugins_MatchResource_Models_Resource {
     /**
      * name of the resource
      * @var string

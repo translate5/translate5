@@ -27,9 +27,9 @@ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception
 
 END LICENSE AND COPYRIGHT
 */
-class editor_Plugins_TmMtIntegration_Models_Taskassoc extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = 'editor_Plugins_TmMtIntegration_Models_Db_Taskassoc';
-    protected $validatorInstanceClass = 'editor_Plugins_TmMtIntegration_Models_Validator_Taskassoc'; //→ here the new validator class
+class editor_Plugins_MatchResource_Models_Taskassoc extends ZfExtended_Models_Entity_Abstract {
+    protected $dbInstanceClass = 'editor_Plugins_MatchResource_Models_Db_Taskassoc';
+    protected $validatorInstanceClass = 'editor_Plugins_MatchResource_Models_Validator_Taskassoc'; //→ here the new validator class
 
     /**
      * loads one assoc entry, returns the loaded row as array
@@ -98,7 +98,7 @@ class editor_Plugins_TmMtIntegration_Models_Taskassoc extends ZfExtended_Models_
         $db = $this->db;
         $s = $db->select()
         ->setIntegrityCheck(false)
-        ->from(array("tmmt" => "LEK_tmmtintegration_tmmt"), array("tmmt.*","ta.id AS taskassocid"));
+        ->from(array("tmmt" => "LEK_matchresource_tmmt"), array("tmmt.*","ta.id AS taskassocid"));
 
         if($this->filter->hasFilter('checked')) {
             //if checked filter is set, we keep the taskGuid as filter argument,
@@ -112,7 +112,7 @@ class editor_Plugins_TmMtIntegration_Models_Taskassoc extends ZfExtended_Models_
         }
         
         $s->joinLeft(
-                array("ta"=>"LEK_tmmtintegration_taskassoc"),
+                array("ta"=>"LEK_matchresource_taskassoc"),
                 "ta.tmmtId = tmmt.id", $checked);
         return $this->loadFilterdCustom($s);
     }

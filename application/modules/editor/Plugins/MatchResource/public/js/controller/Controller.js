@@ -39,11 +39,11 @@ END LICENSE AND COPYRIGHT
  * @class Editor.controller.Preferences
  * @extends Ext.app.Controller
  */
-Ext.define('Editor.plugins.TmMtIntegration.controller.Controller', {
+Ext.define('Editor.plugins.MatchResource.controller.Controller', {
   extend : 'Ext.app.Controller',
-  views: ['Editor.plugins.TmMtIntegration.view.TaskAssocPanel'],
-  models: ['Editor.plugins.TmMtIntegration.model.TaskAssoc'],
-  stores:['Editor.plugins.TmMtIntegration.store.TaskAssocStore'],
+  views: ['Editor.plugins.MatchResource.view.TaskAssocPanel'],
+  models: ['Editor.plugins.MatchResource.model.TaskAssoc'],
+  stores:['Editor.plugins.MatchResource.store.TaskAssocStore'],
   refs: [{
       ref: 'taskTabs',
       selector: 'adminTaskPreferencesWindow > tabpanel'
@@ -99,7 +99,7 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.Controller', {
           })
       };
       Ext.Ajax.request({
-          url:Editor.data.restpath+'plugins_tmmtintegration_taskassoc' + (!record.data.checked ? '/'+record.get('taskassocid'):''),
+          url:Editor.data.restpath+'plugins_matchresource_taskassoc' + (!record.data.checked ? '/'+record.get('taskassocid'):''),
           method: record.data.checked ? "POST" : "DELETE",
           params: record.data.checked ? checkedData : {} ,
           success: function(response){

@@ -35,15 +35,15 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.TmMtIntegration.view.MatchGrid
+ * @class Editor.plugins.MatchResource.view.MatchGrid
  * @extends Ext.grid.Panel
  */
-Ext.define('Editor.plugins.TmMtIntegration.view.MatchGrid', {
+Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	extend : 'Ext.grid.Panel',
 	alias : 'widget.tmMtIntegrationMatchGrid',
 	requires: [
-	           'Editor.plugins.TmMtIntegration.view.MatchGridViewController',
-	           'Editor.plugins.TmMtIntegration.view.MatchGridViewModel',
+	           'Editor.plugins.MatchResource.view.MatchGridViewController',
+	           'Editor.plugins.MatchResource.view.MatchGridViewModel',
 	           'Ext.grid.filters.filter.String',
 	           'Ext.grid.filters.filter.List',
 	           'Ext.grid.column.Number',
@@ -57,7 +57,7 @@ Ext.define('Editor.plugins.TmMtIntegration.view.MatchGrid', {
 	           'Ext.toolbar.Toolbar'
 	],
 	stores:[
-		'Editor.plugins.TmMtIntegration.store.TaskAssocStore'
+		'Editor.plugins.MatchResource.store.TaskAssocStore'
 	],
     controller: 'tmMtIntegrationMatchGrid',
     viewModel: {

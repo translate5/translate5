@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
  * Container class for one single service result
  * Main Intention of this class, provide a unified response format for the different services.
  */
-class editor_Plugins_TmMtIntegration_Services_ServiceResult {
+class editor_Plugins_MatchResource_Services_ServiceResult {
     protected $defaultSource = '';
     protected $defaultMatchrate;
     
@@ -40,7 +40,7 @@ class editor_Plugins_TmMtIntegration_Services_ServiceResult {
     protected $lastAdded;
     
     /**
-     * @var editor_Plugins_TmMtIntegration_Models_TmMt
+     * @var editor_Plugins_MatchResource_Models_TmMt
      */
     protected $tmmt;
     
@@ -133,9 +133,9 @@ class editor_Plugins_TmMtIntegration_Services_ServiceResult {
     }
     
     /**
-     * @param editor_Plugins_TmMtIntegration_Models_TmMt $tmmt
+     * @param editor_Plugins_MatchResource_Models_TmMt $tmmt
      */
-    public function setTmmt(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt){
+    public function setTmmt(editor_Plugins_MatchResource_Models_TmMt $tmmt){
         $this->tmmt = $tmmt;
     }
 }

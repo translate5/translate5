@@ -28,7 +28,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.plugins.TmMtIntegration.view.AddTmWindow', {
+Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
     extend : 'Ext.window.Window',
     requires: ['Ext.ux.colorpick.Button'],
     alias : 'widget.addTmWindow',
@@ -80,7 +80,7 @@ Ext.define('Editor.plugins.TmMtIntegration.view.AddTmWindow', {
 	                    },
 	                    valueField: 'id',
 	                    displayField: 'name',
-	                    store:'Editor.plugins.TmMtIntegration.store.Resources',
+	                    store:'Editor.plugins.MatchResource.store.Resources',
 	                    fieldLabel: 'Resource'
                 	},{
                     	xtype: 'textfield',

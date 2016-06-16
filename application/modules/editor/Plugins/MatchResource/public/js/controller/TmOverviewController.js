@@ -39,11 +39,11 @@ END LICENSE AND COPYRIGHT
  * @class Editor.controller.TmOverviewController
  * @extends Ext.app.Controller
  */
-Ext.define('Editor.plugins.TmMtIntegration.controller.TmOverviewController', {
+Ext.define('Editor.plugins.MatchResource.controller.TmOverviewController', {
     extend : 'Ext.app.Controller',
-    views: ['Editor.plugins.TmMtIntegration.view.TmOverviewPanel','Editor.plugins.TmMtIntegration.view.AddTmWindow'],
-    models: ['Editor.plugins.TmMtIntegration.model.Resource','Editor.plugins.TmMtIntegration.model.TmMt'],
-    stores:['Editor.plugins.TmMtIntegration.store.Resources','Editor.plugins.TmMtIntegration.store.TmMts'],
+    views: ['Editor.plugins.MatchResource.view.TmOverviewPanel','Editor.plugins.MatchResource.view.AddTmWindow'],
+    models: ['Editor.plugins.MatchResource.model.Resource','Editor.plugins.MatchResource.model.TmMt'],
+    stores:['Editor.plugins.MatchResource.store.Resources','Editor.plugins.MatchResource.store.TmMts'],
     refs:[{
         ref: 'tmOverviewPanel',
         selector: '#tmOverviewPanel'
@@ -154,7 +154,7 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.TmOverviewController', {
     },
     handleButtonRefreshClick : function(){
         Ext.getCmp('gridTmOverview').getStore().load();
-        this.getEditorPluginsTmMtIntegrationStoreResourcesStore().load();
+        this.getEditorPluginsMatchResourceStoreResourcesStore().load();
         Editor.MessageBox.addSuccess('Success!');
     },
     handleSaveWindowClick:function(){
@@ -192,7 +192,7 @@ Ext.define('Editor.plugins.TmMtIntegration.controller.TmOverviewController', {
             params: {
                 format: 'jsontext'
             },
-            url: Editor.data.restpath+'plugins_tmmtintegration_tmmt',
+            url: Editor.data.restpath+'plugins_matchresource_tmmt',
             scope: this,
             success: function(form, submit) {
                 Ext.getCmp('gridTmOverview').getStore().load();

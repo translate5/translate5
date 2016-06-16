@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
 /**
  * DB Access for TmMt Entity
  */
-class editor_Plugins_TmMtIntegration_Models_Db_TmMt extends Zend_Db_Table_Abstract {
-    protected $_name = 'LEK_tmmtintegration_tmmt';
+class editor_Plugins_MatchResource_Models_Db_TmMt extends Zend_Db_Table_Abstract {
+    protected $_name = 'LEK_matchresource_tmmt';
     public $_primary = 'id';
 }

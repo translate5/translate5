@@ -37,15 +37,15 @@ END LICENSE AND COPYRIGHT
 /**
  * Abstract Base Connector
  */
-abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
+abstract class editor_Plugins_MatchResource_Services_ConnectorAbstract {
     /**
-     * @var editor_Plugins_TmMtIntegration_Models_TmMt
+     * @var editor_Plugins_MatchResource_Models_TmMt
      */
     protected $tmmt;
     
     /**
      * Container for the connector results
-     * @var editor_Plugins_TmMtIntegration_Services_ServiceResult
+     * @var editor_Plugins_MatchResource_Services_ServiceResult
      */
     protected $resultList;
 
@@ -53,7 +53,7 @@ abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
      * initialises the internal result list
      */
     public function __construct() {
-        $this->resultList = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_ServiceResult');
+        $this->resultList = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_ServiceResult');
     }
     
     /**
@@ -66,9 +66,9 @@ abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
     
     /**
      * Link this Connector Instance to the given Tmmt and its resource
-     * @param editor_Plugins_TmMtIntegration_Models_TmMt $tmmt
+     * @param editor_Plugins_MatchResource_Models_TmMt $tmmt
      */
-    public function connectTo(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
+    public function connectTo(editor_Plugins_MatchResource_Models_TmMt $tmmt) {
         $this->tmmt = $tmmt;
         $this->resultList->setTmmt($tmmt);
     }
@@ -85,7 +85,7 @@ abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
 
     /**
      * Opens the with connectTo given TM on the configured Resource (on task open, not on each request)
-     * @param editor_Plugins_TmMtIntegration_Models_TmMt $tmmt
+     * @param editor_Plugins_MatchResource_Models_TmMt $tmmt
      */
     public function open() {
         //to be implemented if needed
@@ -123,7 +123,7 @@ abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
      * returns an array with stdObjects, each stdObject contains the fields: 
      * 
      * @param editor_Models_Segment $segment
-     * @return editor_Plugins_TmMtIntegration_Services_ServiceResult
+     * @return editor_Plugins_MatchResource_Services_ServiceResult
      */
     abstract public function query(editor_Models_Segment $segment);
 
@@ -144,7 +144,7 @@ abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
      * makes a tm / mt / file concordance search
      * @param string $queryString
      * @param string $field
-     * @return editor_Plugins_TmMtIntegration_Services_ServiceResult
+     * @return editor_Plugins_MatchResource_Services_ServiceResult
      */
     abstract public function search(string $searchString, $field = 'source');
     

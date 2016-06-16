@@ -28,8 +28,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.plugins.TmMtIntegration.store.TmMts', {
+Ext.define('Editor.plugins.MatchResource.store.TmMts', {
   extend : 'Ext.data.Store',
-  model: 'Editor.plugins.TmMtIntegration.model.TmMt',
+  model: 'Editor.plugins.MatchResource.model.TmMt',
   autoLoad: true
 });

@@ -29,16 +29,16 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Controller for the Plugin TmMtIntegration configured Tmmt 
+ * Controller for the Plugin MatchResource configured Tmmt 
  */
-class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestController {
+class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestController {
 
     const FILE_UPLOAD_NAME = 'tmUpload';
     
-    protected $entityClass = 'editor_Plugins_TmMtIntegration_Models_TmMt';
+    protected $entityClass = 'editor_Plugins_MatchResource_Models_TmMt';
 
     /**
-     * @var editor_Plugins_TmMtIntegration_Models_TmMt
+     * @var editor_Plugins_MatchResource_Models_TmMt
      */
     protected $entity;
     
@@ -51,8 +51,8 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
         $this->data = $this->_getAllParams();
         $this->setDataInEntity($this->postBlacklist);
         
-        $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
-        /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
+        $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
+        /* @var $manager editor_Plugins_MatchResource_Services_Manager */
         $resource = $manager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
         if($resource->getFilebased()) {
             $this->handleFileUpload($manager);
@@ -65,13 +65,13 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
         }
     }
     
-    protected function handleFileUpload(editor_Plugins_TmMtIntegration_Services_Manager $manager) {
+    protected function handleFileUpload(editor_Plugins_MatchResource_Services_Manager $manager) {
         $upload = new Zend_File_Transfer_Adapter_Http();
         $upload->isValid(self::FILE_UPLOAD_NAME);
         //mandatory upload file
         $importInfo = $upload->getFileInfo(self::FILE_UPLOAD_NAME);
         $connector = $manager->getConnector($this->entity);
-        /* @var $connector editor_Plugins_TmMtIntegration_Services_ConnectorAbstract */
+        /* @var $connector editor_Plugins_MatchResource_Services_ConnectorAbstract */
         if(empty($importInfo['tmUpload']['size'])) {
             $this->uploadError('Die ausgewählte Datei war leer!');
         }
@@ -95,8 +95,8 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
     public function deleteAction(){
         //FIXME trigger delete in connector / resource also!
         $this->entityLoad();
-        $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
-        /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
+        $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
+        /* @var $manager editor_Plugins_MatchResource_Services_Manager */
         $connector = $manager->getConnector($this->entity);
         $connector->delete();
         //$this->processClientReferenceVersion();
@@ -173,8 +173,8 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
         $session = new Zend_Session_Namespace();
         
         //checks if the queried tmmt is associated to the task:
-        $tmmtTaskAssoc = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Models_Taskassoc');
-        /* @var $tmmtTaskAssoc editor_Plugins_TmMtIntegration_Models_Taskassoc */
+        $tmmtTaskAssoc = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_Taskassoc');
+        /* @var $tmmtTaskAssoc editor_Plugins_MatchResource_Models_Taskassoc */
         try {
             //for security reasons a service can only be queried when a valid task association exists and this task is loaded
             // that means the user has also access to the service. If not then not!
@@ -195,11 +195,11 @@ class editor_Plugins_TmMtIntegration_TmmtController extends ZfExtended_RestContr
     
     /**
      * returns the connector to be used
-     * @return editor_Plugins_TmMtIntegration_Services_ConnectorAbstract
+     * @return editor_Plugins_MatchResource_Services_ConnectorAbstract
      */
     public function getConnector() {
-        $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
-        /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
+        $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
+        /* @var $manager editor_Plugins_MatchResource_Services_Manager */
         return $manager->getConnector($this->entity);
     }
 }

@@ -38,10 +38,10 @@ END LICENSE AND COPYRIGHT
  * Abstract Base Tmmt Resources manager
  * Not one instance per resource, but one instance providing data to all resources of one service
  */
-abstract class editor_Plugins_TmMtIntegration_Services_ServiceAbstract {
+abstract class editor_Plugins_MatchResource_Services_ServiceAbstract {
     const DEFAULT_COLOR = 'ff0000';
     
-    protected $resourceClass = 'editor_Plugins_TmMtIntegration_Models_Resource';
+    protected $resourceClass = 'editor_Plugins_MatchResource_Models_Resource';
     protected $resources = array();
     
     /**
@@ -61,14 +61,14 @@ abstract class editor_Plugins_TmMtIntegration_Services_ServiceAbstract {
      */
     protected function addResource(array $constructorArgs) {
         $res = ZfExtended_Factory::get($this->resourceClass, $constructorArgs);
-        /* @var $res editor_Plugins_TmMtIntegration_Models_Resource */
+        /* @var $res editor_Plugins_MatchResource_Models_Resource */
         $res->setService($this->getName(), $this->getServiceNamespace(), static::DEFAULT_COLOR);
         $this->resources[] = $res;
     }
     
     /**
      * returns a list with connector instances, one per resource
-     * @return [editor_Plugins_TmMtIntegration_Models_Resource]
+     * @return [editor_Plugins_MatchResource_Models_Resource]
      */
     public function getResources(){
         return $this->resources;
@@ -77,7 +77,7 @@ abstract class editor_Plugins_TmMtIntegration_Services_ServiceAbstract {
     /**
      * returns the resource to the given resource id
      * @param string $id
-     * @return editor_Plugins_TmMtIntegration_Models_Resource|NULL
+     * @return editor_Plugins_MatchResource_Models_Resource|NULL
      */
     public function getResourceById(string $id) {
         foreach ($this->resources as $resource) {

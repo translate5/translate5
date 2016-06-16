@@ -27,7 +27,7 @@ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception
 
 END LICENSE AND COPYRIGHT
 */
-class editor_Plugins_TmMtIntegration_Services_Moses_Resource extends editor_Plugins_TmMtIntegration_Models_Resource {
+class editor_Plugins_MatchResource_Services_Moses_Resource extends editor_Plugins_MatchResource_Models_Resource {
     /**
      * Moses instance URL
      * @var string

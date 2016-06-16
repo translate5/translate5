@@ -51,9 +51,9 @@ END LICENSE AND COPYRIGHT
  * @method void setFileName() setFileName(string $name)
  * 
  */
-class editor_Plugins_TmMtIntegration_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = 'editor_Plugins_TmMtIntegration_Models_Db_TmMt';
-    protected $validatorInstanceClass = 'editor_Plugins_TmMtIntegration_Models_Validator_TmMt';
+class editor_Plugins_MatchResource_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
+    protected $dbInstanceClass = 'editor_Plugins_MatchResource_Models_Db_TmMt';
+    protected $validatorInstanceClass = 'editor_Plugins_MatchResource_Models_Validator_TmMt';
     
     /**
      * loads the task / tmmt assocs by task
@@ -70,7 +70,7 @@ class editor_Plugins_TmMtIntegration_Models_TmMt extends ZfExtended_Models_Entit
      * @return array
      */
     public function loadByAssociatedTaskGuid(string $taskGuid) {
-        $assocDb = new editor_Plugins_TmMtIntegration_Models_Db_Taskassoc();
+        $assocDb = new editor_Plugins_MatchResource_Models_Db_Taskassoc();
         $assocName = $assocDb->info($assocDb::NAME);
         $s = $this->db->select()
             ->from($this->db, '*')
@@ -82,11 +82,11 @@ class editor_Plugins_TmMtIntegration_Models_TmMt extends ZfExtended_Models_Entit
     
     /**
      * returns the resource used by this tmmt instance
-     * @return editor_Plugins_TmMtIntegration_Models_Resource
+     * @return editor_Plugins_MatchResource_Models_Resource
      */
     public function getResource() {
-        $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
-        /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
+        $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
+        /* @var $manager editor_Plugins_MatchResource_Services_Manager */
         $res = $manager->getResource($this);
         if(empty($res)) {
             $log = ZfExtended_Factory::get('ZfExtended_Log');

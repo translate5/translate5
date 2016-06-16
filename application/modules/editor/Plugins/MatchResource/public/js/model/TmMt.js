@@ -35,10 +35,10 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.TmMtIntegration.model.TmMt
+ * @class Editor.plugins.MatchResource.model.TmMt
  * @extends Ext.data.Model
  */
-Ext.define('Editor.plugins.TmMtIntegration.model.TmMt', {
+Ext.define('Editor.plugins.MatchResource.model.TmMt', {
   extend: 'Ext.data.Model',
   fields: [
     {name: 'id', type: 'int'},
@@ -53,7 +53,7 @@ Ext.define('Editor.plugins.TmMtIntegration.model.TmMt', {
   idProperty: 'id',
   proxy : {
     type : 'rest',//POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity 
-    url: Editor.data.restpath+'plugins_tmmtintegration_tmmt', //same as PHP controller name
+    url: Editor.data.restpath+'plugins_matchresource_tmmt', //same as PHP controller name
     reader : {
       rootProperty: 'rows',
       type : 'json'

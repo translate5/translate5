@@ -29,14 +29,14 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Controller for the Plugin TmMtIntegration Associations
+ * Controller for the Plugin MatchResource Associations
  */
-class editor_Plugins_TmMtIntegration_TaskassocController extends ZfExtended_RestController {
+class editor_Plugins_MatchResource_TaskassocController extends ZfExtended_RestController {
 
-    protected $entityClass = 'editor_Plugins_TmMtIntegration_Models_Taskassoc'; //→ _Taskassoc
+    protected $entityClass = 'editor_Plugins_MatchResource_Models_Taskassoc'; //→ _Taskassoc
 
     /**
-     * @var editor_Plugins_TmMtIntegration_Models_Taskassoc
+     * @var editor_Plugins_MatchResource_Models_Taskassoc
      */
     protected $entity;
     

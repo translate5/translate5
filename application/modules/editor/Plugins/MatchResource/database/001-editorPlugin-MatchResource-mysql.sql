@@ -27,7 +27,7 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-CREATE TABLE `LEK_tmmtintegration_tmmt` (
+CREATE TABLE `LEK_matchresource_tmmt` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) DEFAULT NULL COMMENT 'human readable name of the service',
   `sourceLang` int(11) DEFAULT NULL COMMENT 'source language id',
@@ -40,21 +40,21 @@ CREATE TABLE `LEK_tmmtintegration_tmmt` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `LEK_tmmtintegration_taskassoc` (
+CREATE TABLE `LEK_matchresource_taskassoc` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `tmmtId` int(11) DEFAULT NULL,
   `taskGuid` varchar(38) NOT NULL,
-  CONSTRAINT FOREIGN KEY (`tmmtId`) REFERENCES `LEK_tmmtintegration_tmmt` (`id`) ON DELETE CASCADE,
+  CONSTRAINT FOREIGN KEY (`tmmtId`) REFERENCES `LEK_matchresource_tmmt` (`id`) ON DELETE CASCADE,
   CONSTRAINT FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_tmmtintegration_tmmt', 'all');
-insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_tmmtintegration_resource', 'all');
-insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_tmmtintegration_taskassoc', 'all');
-insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_tmmtintegration_query', 'all');
-insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'editor', 'editor_plugins_tmmtintegration_tmmt', 'search');
-insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'editor', 'editor_plugins_tmmtintegration_tmmt', 'query');
+insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_matchresource_tmmt', 'all');
+insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_matchresource_resource', 'all');
+insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_matchresource_taskassoc', 'all');
+insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_matchresource_query', 'all');
+insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'editor', 'editor_plugins_matchresource_tmmt', 'search');
+insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'editor', 'editor_plugins_matchresource_tmmt', 'query');
 
 insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'frontend', 'pluginMatchResourceOverview');
 insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'frontend', 'pluginMatchResourcesAddFilebased');
@@ -64,4 +64,4 @@ insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor
 insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'editor', 'frontend', 'pluginMatchResourceSearchQuery');
 
 INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
-('runtimeOptions.plugins.TmMtIntegration.preloadedTranslationSegments', 1, 'editor', 'plugins', 3, 3, '', 'integer', 'Number of preloadet(cached) tmmt segments');
+('runtimeOptions.plugins.MatchResource.preloadedTranslationSegments', 1, 'editor', 'plugins', 3, 3, '', 'integer', 'Number of preloadet(cached) tmmt segments');
