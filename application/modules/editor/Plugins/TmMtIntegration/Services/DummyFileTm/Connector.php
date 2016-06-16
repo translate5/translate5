@@ -90,6 +90,12 @@ class editor_Plugins_TmMtIntegration_Services_DummyFileTm_Connector extends edit
         return APPLICATION_PATH.'/../data/dummyTm_'.$id;
     }
 
+    public function update() {
+        $messages = Zend_Registry::get('rest_messages');
+        /* @var $messages ZfExtended_Models_Messages */
+        $messages->addError('This is just to inform you, that the TM is not updated and the udpate handler is only for demonstration invoked.');
+    }
+    
     /**
      * (non-PHPdoc)
      * @see editor_Plugins_TmMtIntegration_Services_ConnectorAbstract::query()

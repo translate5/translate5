@@ -94,6 +94,7 @@ abstract class editor_Plugins_TmMtIntegration_Services_ConnectorAbstract {
     
     /**
      * Updates translations in the connected service
+     * for returning error messages to the GUI use rest_messages
      * @param editor_Models_Segment $segment
      */
     public function update(editor_Models_Segment $segment) {

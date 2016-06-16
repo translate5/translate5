@@ -70,6 +70,15 @@ class editor_Plugins_TmMtIntegration_Services_Manager {
     }
     
     /**
+     * gets the reosurce to the given tmmt
+     * @param editor_Plugins_TmMtIntegration_Models_TmMt $tmmt
+     * @return editor_Plugins_TmMtIntegration_Models_Resource
+     */
+    public function getResource(editor_Plugins_TmMtIntegration_Models_TmMt $tmmt) {
+        return $this->getResourceById($tmmt->getServiceType(), $tmmt->getResourceId());
+    }
+    
+    /**
      * @param string $serviceType
      * @param string $id
      * @return editor_Plugins_TmMtIntegration_Models_Resource
@@ -154,7 +163,7 @@ class editor_Plugins_TmMtIntegration_Services_Manager {
             $tmmt->init($one);
             $connector = $this->getConnector($tmmt);
             /* @var $connector editor_Plugins_TmMtIntegration_Services_ConnectorAbstract */
-            $todo($connector);
+            $todo($connector, $tmmt);
         }
     }
 }

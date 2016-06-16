@@ -53,9 +53,9 @@ class editor_Plugins_TmMtIntegration_Services_Moses_Service extends editor_Plugi
     
     public function __construct() {
         $config = '[{
-                "url": "http://www.translate5.net:8124"
+                "url": "http://www.translate5.net:8124/RPC2"
         },{
-                "url": "http://www.example.com:1234"
+                "url": "http://www.translate5.net:8124/RPC2"
         }]';
         $config = json_decode($config);
         $i = 1;

@@ -33,6 +33,13 @@ END LICENSE AND COPYRIGHT
  * One Resource is one available configured connector, Languages and Title can be customized in the TM Overview List
  */
 class editor_Plugins_TmMtIntegration_ResourceController extends ZfExtended_RestController  {
+    
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::init()
+     * 
+     * copied the init method, parent can not be used, since no real entity is used here
+     */
     public function init() {
         $this->_helper->viewRenderer->setNoRender(true);
         $this->_helper->layout->disableLayout();

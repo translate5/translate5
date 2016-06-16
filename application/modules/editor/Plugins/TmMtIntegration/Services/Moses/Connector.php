@@ -55,8 +55,10 @@ class editor_Plugins_TmMtIntegration_Services_Moses_Connector extends editor_Plu
     public function query(editor_Models_Segment $segment) {
         $queryString = $this->getQueryString($segment);
         
-        //FIXME let the URL come from $this->tmmt->getResource
-        $rpc = new Zend_XmlRpc_Client("http://www.translate5.net:8124/RPC2");
+        $res = $this->tmmt->getResource();
+        /* @var $res editor_Plugins_TmMtIntegration_Services_Moses_Resource */
+
+        $rpc = new Zend_XmlRpc_Client($res->getUrl());
         $proxy = $rpc->getProxy();
         $params = array(
             //for the "es ist ein kleines haus" sample data the requests work only with lower case requests:

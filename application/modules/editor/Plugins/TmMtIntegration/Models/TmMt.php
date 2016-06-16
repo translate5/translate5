@@ -79,4 +79,23 @@ class editor_Plugins_TmMtIntegration_Models_TmMt extends ZfExtended_Models_Entit
             ->where($assocName.'.`taskGuid` = ?', $taskGuid);
         return $this->db->fetchAll($s)->toArray();
     }
+    
+    /**
+     * returns the resource used by this tmmt instance
+     * @return editor_Plugins_TmMtIntegration_Models_Resource
+     */
+    public function getResource() {
+        $manager = ZfExtended_Factory::get('editor_Plugins_TmMtIntegration_Services_Manager');
+        /* @var $manager editor_Plugins_TmMtIntegration_Services_Manager */
+        $res = $manager->getResource($this);
+        if(empty($res)) {
+            $log = ZfExtended_Factory::get('ZfExtended_Log');
+            /* @var $log ZfExtended_Log */
+            $msg = 'Configured MatchResource Resource not found for Tmmt '.$this->getName().' with ID '.$this->getId().' the resource id was: '.$this->getResourceId();
+            $msg .= "\n".'Maybe the resource config of the underlying Match Resource Service was changed / removed.';
+            $log->logError('Configured MatchResource Resource not found', $msg);
+            throw new ZfExtended_Models_Entity_NotFoundException('Die ursprünglich konfigurierte TM / MT Resource ist nicht mehr vorhanden!');
+        }
+        return $res;
+    }
 }
