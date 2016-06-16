@@ -36,10 +36,10 @@ END LICENSE AND COPYRIGHT
  */
 /**
  * Die Einstellungen werden in einem Cookie gespeichert
- * @class Editor.controller.Preferences
+ * @class Editor.plugins.MatchResource.controller.TaskAssoc
  * @extends Ext.app.Controller
  */
-Ext.define('Editor.plugins.MatchResource.controller.Controller', {
+Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
   extend : 'Ext.app.Controller',
   views: ['Editor.plugins.MatchResource.view.TaskAssocPanel'],
   models: ['Editor.plugins.MatchResource.model.TaskAssoc'],

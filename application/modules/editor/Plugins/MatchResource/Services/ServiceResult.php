@@ -54,10 +54,10 @@ class editor_Plugins_MatchResource_Services_ServiceResult {
      * A default source text for the results and a defaultMatchrate can be set
      * The default values are the used as initial value for new added result sets
      * @param string $defaultSource
-     * @param number $defaultMatchrate
+     * @param integer $defaultMatchrate
      */
     public function __construct($defaultSource = '', $defaultMatchrate = 0) {
-        $this->defaultMatchrate = $defaultMatchrate;
+        $this->defaultMatchrate = (int) $defaultMatchrate;
         $this->defaultSource = $defaultSource;
     }
     
@@ -99,12 +99,12 @@ class editor_Plugins_MatchResource_Services_ServiceResult {
      * All additonal data can be provided by 
      * 
      * @param string $target
-     * @param float $matchrate
+     * @param integer $matchrate
      */
     public function addResult($target, $matchrate = 0) {
         $result = new stdClass();
         $result->target = $target;
-        $result->matchrate = $matchrate;
+        $result->matchrate = (int) $matchrate;
         $result->source = $this->defaultSource;
         $result->attributes = null;
         $result->tmmtid = $this->tmmt->getId();

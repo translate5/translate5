@@ -36,10 +36,10 @@ END LICENSE AND COPYRIGHT
  */
 /**
  * Die Einstellungen werden in einem Cookie gespeichert
- * @class Editor.controller.TmOverviewController
+ * @class Editor.controller.TmOverview
  * @extends Ext.app.Controller
  */
-Ext.define('Editor.plugins.MatchResource.controller.TmOverviewController', {
+Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
     extend : 'Ext.app.Controller',
     views: ['Editor.plugins.MatchResource.view.TmOverviewPanel','Editor.plugins.MatchResource.view.AddTmWindow'],
     models: ['Editor.plugins.MatchResource.model.Resource','Editor.plugins.MatchResource.model.TmMt'],
