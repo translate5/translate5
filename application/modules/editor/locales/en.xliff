@@ -1318,6 +1318,13 @@
   <source>Nicht unterstützte Browser-Version</source>
   <target>Unsupported browser-version</target>
 </trans-unit>
+
+<trans-unit id='IChBTFQrezB9KQ=='><source> (ALT+{0})</source><target> (ALT+{0})</target></trans-unit>
+<trans-unit id='IChBTFQrU0hJRlQrezB9KQ=='><source> (ALT+SHIFT+{0})</source><target> (ALT+SHIFT+{0})</target></trans-unit>
+<trans-unit id='SW4gaW1wb3J0aWVydGVyIERhdGVpIGdlc3BlcnJ0ZSBTZWdtZW50ZSBzaW5kIGluIHRyYW5zbGF0ZTUgZ2VzcGVycnQ='>
+  <source>In importierter Datei gesperrte Segmente sind in translate5 gesperrt</source>
+  <target>Locked segments in the imported file are also locked in translate5</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

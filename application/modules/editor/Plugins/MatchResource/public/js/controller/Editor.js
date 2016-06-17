@@ -52,6 +52,8 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       ref: 'matchrateDisplay',
       selector: '#roweditor displayfield[name=matchRate]'
   }],
+  msgDisabledMatchRate: '#UT#Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.',
+
   listen: {
       component: {
           '#segmentgrid': {
@@ -63,6 +65,20 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           '#matchGrid': {
               chooseMatch: 'setMatchInEditor'
           }
+      },
+      controller: {
+          '#Editor.$application': {
+              editorViewportOpened: 'afterInitEditor'
+          },
+          '#editorcontroller': {
+              beforeKeyMapUsage: 'handleEditorKeyMapUsage'
+          }
+      }
+  },
+  afterInitEditor: function() {
+      var task = Editor.data.task;
+      if(!task.get('defaultSegmentLayout')){
+          Editor.MessageBox.addInfo(this.msgDisabledMatchRate, 1.4);
       }
   },
   startEditing: function(plugin,context) {
@@ -77,19 +93,39 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           grid.addDocked({xtype: 'tmMtIntegrationTmMtEditorPanel',dock:'bottom'});
       }
   },
+  handleEditorKeyMapUsage: function(cont, area, mapOverwrite) {
+      var me = this;
+      
+      cont.keyMapConfig['ctrl-DIGIT'] = [cont.DEC_DIGITS,{ctrl: true, alt: false},function(key) {
+          if(!me.getMatchgrid() || !me.getMatchgrid().isVisible()) {
+              return;
+          }
+          var toUse = Number(key) - 49,
+              store = me.getMatchgrid().store,
+              matchRecord = store.getAt(toUse);
+          if(matchRecord) {
+              me.setMatchInEditor(matchRecord);
+          }
+      }, true];
+  },
   setMatchInEditor: function(matchRecord) {
-      console.log('setMatchInEditor', matchRecord);
-     
       var me = this,
           plug = me.getSegmentGrid().editingPlugin,
           editor = plug.editor,
+          task = Editor.data.task,
           rec = plug.context.record,
           matchrate = matchRecord.get('matchrate');
+      
+      //we dont support the matchrate saving for tasks with alternatives:
+      if(!task.get('defaultSegmentLayout')) {
+          return;
+      }
       
       if(plug.editing && plug.context.record && rec.get('editable')) {
           //Editor.MessageBox.addInfo("Show a message on take over content?");
           editor.mainEditor.setValueAndMarkup(matchRecord.get('target'), rec.get('id'), editor.columnToEdit);
           rec.set('matchRate', matchrate);
+          rec.set('matchRateType', 'matchresourceusage'); 
           me.getMatchrateDisplay().setRawValue(matchrate);
       } 
   }

@@ -48,6 +48,19 @@ Editor Translation Files
 */
 Ext.define('Editor.controller.Localizer', {
     extend : 'Ext.app.Controller',
+    
+    statics: {
+        pluginTranslationInit: {},
+        addPluginInit: function(name, callback) {
+            this.pluginTranslationInit[name] = callback;
+        },
+    },
+    initPluginTranslations: function() {
+        var me = this;
+        Ext.Object.each(this.self.pluginTranslationInit, function(key, callback){
+            callback.call(me);
+        });
+    },
 	init: function() {
 	  Ext.view.AbstractView.prototype.loadingText = '<?php echo $this->translate->_('Übertrage Daten...');?>';
   	Editor.controller.Preferences.prototype.messages.preferencesSaved = '<?php echo $this->translate->_('Einstellungen für diese Sitzung gespeichert!');?>';
@@ -686,7 +699,14 @@ Ext.define('Editor.controller.Localizer', {
 <?php 
     }; //if($hasFrontendController('Editor.controller.admin.TaskPreferences')){ 
 ?>
+    this.initPluginTranslations();
   }
 });
 <?php
+
+$paths = $this->pluginLocale()->getLocalePaths();
+foreach($paths as $path) {
+    require $path;
+}
+
 exit;

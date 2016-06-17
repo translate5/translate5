@@ -61,6 +61,7 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         $this->addValidator('userName', 'stringLength', array('min' => 0, 'max' => 255)); //es wird kein assoc Array benötigt, aber so ist besser lesbar
         $this->addValidator('taskGuid', 'guid');
         $this->addValidator('matchRate', 'between', array('min' => 0, 'max' => 100));
+        $this->addValidator('matchRateType', 'stringLength', array('min' => 0, 'max' => 60));
         $this->addValidator('workflowStepNr', 'int');
         
         $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
