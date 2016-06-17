@@ -69,6 +69,9 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       controller: {
           '#Editor.$application': {
               editorViewportOpened: 'afterInitEditor'
+          },
+          '#editorcontroller': {
+              beforeKeyMapUsage: 'handleEditorKeyMapUsage'
           }
       }
   },
@@ -90,6 +93,21 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           grid.addDocked({xtype: 'tmMtIntegrationTmMtEditorPanel',dock:'bottom'});
       }
   },
+  handleEditorKeyMapUsage: function(cont, area, mapOverwrite) {
+      var me = this;
+      
+      cont.keyMapConfig['ctrl-DIGIT'] = [cont.DEC_DIGITS,{ctrl: true, alt: false},function(key) {
+          if(!me.getMatchgrid() || !me.getMatchgrid().isVisible()) {
+              return;
+          }
+          var toUse = Number(key) - 49,
+              store = me.getMatchgrid().store,
+              matchRecord = store.getAt(toUse);
+          if(matchRecord) {
+              me.setMatchInEditor(matchRecord);
+          }
+      }, true];
+  },
   setMatchInEditor: function(matchRecord) {
       var me = this,
           plug = me.getSegmentGrid().editingPlugin,
@@ -107,7 +125,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           //Editor.MessageBox.addInfo("Show a message on take over content?");
           editor.mainEditor.setValueAndMarkup(matchRecord.get('target'), rec.get('id'), editor.columnToEdit);
           rec.set('matchRate', matchrate);
-          rec.set('matchRateType', 'mtmatch');
+          rec.set('matchRateType', 'matchresourceusage'); 
           me.getMatchrateDisplay().setRawValue(matchrate);
       } 
   }
