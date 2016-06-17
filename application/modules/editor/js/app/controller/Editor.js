@@ -58,6 +58,7 @@ Ext.define('Editor.controller.Editor', {
       saveAnyway: '#UT# Trotzdem speichern'
   },
   id: 'editorcontroller',
+  DEC_DIGITS: [48, 49, 50, 51, 52, 53, 54, 55, 56, 57],
   refs : [{
     ref : 'segmentGrid',
     selector : '#segmentgrid'
@@ -89,8 +90,7 @@ Ext.define('Editor.controller.Editor', {
       }
   },
   init : function() {
-      var me = this,
-          decDigits = [48, 49, 50, 51, 52, 53, 54, 55, 56, 57];
+      var me = this;
       
       //set the default config
       me.keyMapConfig = {
@@ -100,7 +100,7 @@ Ext.define('Editor.controller.Editor', {
           'ctrl-enter':     [[10,13],{ctrl: true, alt: false}, me.saveNextByWorkflow],
           'ctrl-alt-enter': [[10,13],{ctrl: true, alt: true, shift: false}, me.saveNext],
           'ctrl-alt-shift-enter': [[10,13],{ctrl: true, alt: true, shift: true}, me.savePrevious],
-          'ctrl-alt-DIGIT': [decDigits.slice(1),{ctrl: true, alt: true, shift: false}, me.handleChangeState],
+          'ctrl-alt-DIGIT': [me.DEC_DIGITS.slice(1),{ctrl: true, alt: true, shift: false}, me.handleChangeState],
           'esc':            [Ext.EventObjectImpl.ESC, null, me.cancel],
           'ctrl-alt-left':  [Ext.EventObjectImpl.LEFT,{ctrl: true, alt: true}, me.goToLeft],
           'ctrl-alt-right': [Ext.EventObjectImpl.RIGHT,{ctrl: true, alt: true}, me.goToRight],
@@ -110,7 +110,7 @@ Ext.define('Editor.controller.Editor', {
           'ctrl-alt-up':    [Ext.EventObjectImpl.UP,{ctrl: true, alt: true}, me.goToUpperNoSave, true],
           'ctrl-alt-down':  [Ext.EventObjectImpl.DOWN,{ctrl: true, alt: true}, me.goToLowerNoSave, true],
           'ctrl-alt-c':     ["C",{ctrl: true, alt: true}, me.handleOpenComments, true],
-          'alt-DIGIT':      [decDigits,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
+          'alt-DIGIT':      [me.DEC_DIGITS,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
           'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
           'pos1':           null //add empty pos1 handler here, so that the overwrite is processed
       };
@@ -149,7 +149,7 @@ Ext.define('Editor.controller.Editor', {
           }
       });
       
-      new Ext.util.KeyMap(Ext.getDoc(), me.getKeyMapConfig({
+      new Ext.util.KeyMap(Ext.getDoc(), me.getKeyMapConfig('application', {
           'pos1': [Ext.EventObjectImpl.HOME,{ctrl: false, alt: false}, me.handleHomeKeyPress, true],
           'ctrl-alt-c':     ["C",{ctrl: true, alt: true}, function(key, e){
               var me = this;
@@ -216,11 +216,23 @@ Ext.define('Editor.controller.Editor', {
    * 2: function to be called
    * 3: boolean, if true prepend event propagation stopper
    *
+   * @param {String} area, a speakable name where the config is used. 
+   *    Just passed to the keyMapConfig event to determine there if the event should be processed or not
    * @param {Object} overwrite a config object for dedicated overwriting of key bindings
    */
-  getKeyMapConfig: function(overwrite) {
+  getKeyMapConfig: function(area, overwrite) {
       var me = this,
-          conf = [];
+          conf = [],
+          overwrite = overwrite || {};
+      
+      /*
+       * event beforeKeyMapUsage parameters:
+       * @param {Editor.controller.Editor} 
+       * @param {String} area, the area describes where the keymap shall be used.  
+       * @param {Object} overwrite, the object with overwrite definitions 
+       */
+      me.fireEvent('beforeKeyMapUsage', this, area, overwrite);
+      
       Ext.Object.each(me.keyMapConfig, function(key, item){
           //applies if available the overwritten config instead the default one
           if(overwrite && overwrite[key]) {
