@@ -46,6 +46,8 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
         'pluginMatchResourceOverview' => 'Editor.plugins.MatchResource.controller.TmOverview',
     );
     
+    protected $localePath = 'locales';
+    
     public function getFrontendControllers() {
         return array_values($this->frontendControllers);
         $result = array();
@@ -76,10 +78,16 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('editor_TaskController', 'afterTaskClose', array($this, 'handleAfterTaskClose'));
         $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectUrl'));
         $this->eventManager->attach('Editor_SegmentController', 'afterPutAction', array($this, 'handleAfterSegmentPut'));
+        $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
     }
     public function injectUrl(Zend_EventManager_Event $event) {
         $view = $event->getParam('view');
         $view->Php2JsVars()->set('plugins.MatchResource.preloadedSegments', $this->getConfig()->preloadedTranslationSegments);
+    }
+    
+    public function initJsTranslations(Zend_EventManager_Event $event) {
+        $view = $event->getParam('view');
+        $view->pluginLocale()->add($this, 'views/localizedjsstrings.phtml');
     }
     
     /**

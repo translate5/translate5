@@ -52,6 +52,8 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       ref: 'matchrateDisplay',
       selector: '#roweditor displayfield[name=matchRate]'
   }],
+  msgDisabledMatchRate: '#UT#Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.',
+
   listen: {
       component: {
           '#segmentgrid': {
@@ -63,6 +65,17 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           '#matchGrid': {
               chooseMatch: 'setMatchInEditor'
           }
+      },
+      controller: {
+          '#Editor.$application': {
+              editorViewportOpened: 'afterInitEditor'
+          }
+      }
+  },
+  afterInitEditor: function() {
+      var task = Editor.data.task;
+      if(!task.get('defaultSegmentLayout')){
+          Editor.MessageBox.addInfo(this.msgDisabledMatchRate, 1.4);
       }
   },
   startEditing: function(plugin,context) {
@@ -81,8 +94,14 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       var me = this,
           plug = me.getSegmentGrid().editingPlugin,
           editor = plug.editor,
+          task = Editor.data.task,
           rec = plug.context.record,
           matchrate = matchRecord.get('matchrate');
+      
+      //we dont support the matchrate saving for tasks with alternatives:
+      if(!task.get('defaultSegmentLayout')) {
+          return;
+      }
       
       if(plug.editing && plug.context.record && rec.get('editable')) {
           //Editor.MessageBox.addInfo("Show a message on take over content?");
@@ -90,9 +109,6 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           rec.set('matchRate', matchrate);
           rec.set('matchRateType', 'mtmatch');
           me.getMatchrateDisplay().setRawValue(matchrate);
-          
-          //wenn default layout dann alles OK, wenn mehrere targets, dann matchrate nicht speichern 
-          // und dafür eine Message analog "wdhe deaktiviert" anzeigen
       } 
   }
 });
