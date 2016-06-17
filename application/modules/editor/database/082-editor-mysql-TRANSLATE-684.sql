@@ -30,7 +30,7 @@
 ALTER TABLE `LEK_segments` 
 ADD COLUMN `matchRateType` VARCHAR(60) DEFAULT 'import' AFTER `matchRate`;
 
-ALTER TABLE `icorrectT5Dev`.`LEK_segment_history` 
+ALTER TABLE `LEK_segment_history` 
 ADD COLUMN `matchRate` INT(11) DEFAULT 0 AFTER `workflowStep`, 
 ADD COLUMN `matchRateType` VARCHAR(60) DEFAULT 'import' AFTER `matchRate`;
 
