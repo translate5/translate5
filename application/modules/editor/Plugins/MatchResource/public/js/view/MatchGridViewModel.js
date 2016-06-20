@@ -62,56 +62,26 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewModel', {
                         pageSize: 200,
                         autoLoad: false,
                         model: 'Editor.plugins.MatchResource.model.EditorQuery',
-                        sortInfo:{
-                        	property:'matchrate',
-                        	direction:'ASC'
-                        }
+                        /*
+                        sorters: [{
+                            XXXsorterFn: function(record1, record2) {
+                                
+                            },
+                            property : 'matchrate',
+                            direction: 'ASC'
+                                
+                        }],
+                        */
                     },
                     taskassoc: {
                         model: 'Editor.plugins.MatchResource.model.TaskAssoc',
                         autoLoad: false
-                    },
-                    keyaccounts: me.processKeyaccounts({
-                        fields: [
-                            {
-                                type: 'int',
-                                name: 'id'
-                            },
-                            {
-                                type: 'string',
-                                name: 'name'
-                            }
-                        ]
-                    }),
-                    taxsets: me.processTaxsets({
-                        fields: [
-                            {
-                                type: 'int',
-                                name: 'id'
-                            },
-                            {
-                                type: 'string',
-                                name: 'text'
-                            }
-                        ]
-                    })
+                    }
                 }
             };
         if (instanceConfig) {
             me.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
-    },
-
-    processKeyaccounts: function(config) {
-        //config.data = Ext.Array.clone(Erp.data.customers.keyaccounts);
-        //config.data.unshift({id: null, name: '- Kein Keyaccount -'});
-        return config;
-    },
-
-    processTaxsets: function(config) {
-        //config.data = Erp.data.customers.taxsets;
-        return config;
     }
-
 });

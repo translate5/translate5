@@ -32,8 +32,27 @@ END LICENSE AND COPYRIGHT
 ?>
   
   Editor.controller.Localizer.addPluginInit('matchResource', function() {
+  
+  
     Ext.define("Editor.locale.plugins.MatchResource.controller.Editor", {
         override: "Editor.plugins.MatchResource.controller.Editor",
         msgDisabledMatchRate: '<?php echo $this->translate->_('Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.');?>'
+    });
+    Ext.define("Editor.locale.plugins.MatchResource.view.MatchGridViewController", {
+        override: "Editor.plugins.MatchResource.view.MatchGridViewController",
+        strings: {
+            serverErrorMsgDefault: '<?php echo $this->translate->_('Die Anfrage an die Match Resource dauerte zu lange.');?>',
+            serverErrorMsg500:'<?php echo $this->translate->_('Die Anfrage führte zu einem Fehler im angefragten Dienst.');?>',
+        	serverErrorMsg408:'<?php echo $this->translate->_('Request Timeout');?>',
+        }
+    });
+    Ext.define("Editor.locale.plugins.MatchResource.view.EditorPanel", {
+        override: "Editor.plugins.MatchResource.view.EditorPanel",
+        strings: {
+            searchTitle: '<?php echo $this->translate->_('Konkordanzsuche');?>',
+            matchTitle:'<?php echo $this->translate->_('Match Ergebnisse');?>',
+        	sourceEmptyText:'<?php echo $this->translate->_('Quelltextsuche');?>',
+        	targetEmptyText:'<?php echo $this->translate->_('Zieltextsuche');?>',
+        }
     });
   });

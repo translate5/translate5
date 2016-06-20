@@ -41,6 +41,11 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.tmMtIntegrationMatchGrid',
+    strings: {
+        serverErrorMsgDefault : '#UT#Die Anfrage an die Match Resource dauerte zu lange.',
+        serverErrorMsg500: '#UT#Die Anfrage führte zu einem Fehler im angefragten Dienst.',
+        serverErrorMsg408: '#UT#Die Anfrage an die Match Resource dauerte zu lange.'
+    },
     listen: {
         store: {
             '#Segments':{
@@ -68,6 +73,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
     cachedResults : new Ext.util.HashMap(),
     editedSegmentId : -1, //the id of the edited segment
     firstEditableRow : -1,
+    NUMBER_OF_CHACHED_SEGMENTS:10,
     startEditing: function(context) {
     	var me = this;
     	me.editedSegmentId = context.record.id;
@@ -107,7 +113,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
             var retval = controller.findNextRows(controller.next.nextEditable.idx,maxSegments);
             me.cacheSegmentIndex = me.cacheSegmentIndex.concat(retval);
         }
-        //me.checkCacheLength();
+        me.checkCacheLength();
         me.cache();
     },
     cache : function(){
@@ -121,8 +127,8 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
             if(segId == this.editedSegmentId)
                 me.getView().getStore('editorquery').removeAll();
             
-            if(me.cachedResults.get(segId) && me.cachedResults.get(segId).lenth >0){
-                me.loadCachedDataIntoGrid(segId,-1);
+            if(me.cachedResults.get(segId)){
+                me.loadCachedDataIntoGrid(segId,-1,segment.get('source'));
                 continue;
             }
             me.cachedResults.add(segId,new Ext.util.HashMap());
@@ -149,9 +155,27 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
             };
         me.cachedResults.get(segmentId).add(tmmtid,dummyObj);
         me.loadCachedDataIntoGrid(segmentId,tmmtid);
-        me.sendRequest(segmentId, segment.get('source'), tmmtid); 	
+        me.sendRequest(segmentId, segment.get('source'), tmmtid);
     },
-    sendRequest : function(segmentId,query,tmmtid) {
+    cacheSingleMatchPanelResults: function(tmmt,segmentId,query){
+        var me = this;
+        tmmtid = tmmt.get('id');
+        dummyObj = {
+            rows: [{
+                id: '',
+                source: 'Loading ...',
+                target: 'Loading ...',
+                matchrate: '',
+                tmmtid: tmmtid,
+                segmentId: '',
+                loading: true
+            }]
+        };
+        me.cachedResults.get(segmentId).add(tmmtid,dummyObj);
+        me.loadCachedDataIntoGrid(segmentId,tmmtid);
+        me.sendRequest(segmentId, query, tmmtid);
+    },
+    sendRequest: function(segmentId,query,tmmtid) {
     	var me = this;
     	Ext.Ajax.request({
             url:Editor.data.restpath+'plugins_matchresource_tmmt/'+tmmtid+'/query',
@@ -162,56 +186,29 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                     query: query
                 },
                 success: function(response){
-                    var resp = Ext.util.JSON.decode(response.responseText); 
-                    if(segmentId == me.editedSegmentId){
-                        me.getView().getStore('editorquery').remove(me.getView().getStore('editorquery').findRecord('tmmtid',tmmtid));
-                    }
-                    if(typeof resp.rows !== 'undefined' && resp.rows !== null && resp.rows.length){
-                        me.cachedResults.get(segmentId).add(tmmtid,resp);
-                        me.loadCachedDataIntoGrid(segmentId,tmmtid);
-                        return;
-                    }
-                    var noresults = {
-                            rows: [{
-                                source: 'No results was found',
-                                tmmtid: tmmtid,
-                                loading: true
-                            }]
-                        };
-                    me.cachedResults.get(segmentId).add(tmmtid,noresults);
-                    me.loadCachedDataIntoGrid(segmentId,tmmtid);
-                    me.cachedResults.get(segmentId).removeAtKey(tmmtid);
+                    me.handleRequestSucces(me, response, segmentId, tmmtid);
                 }, 
                 failure: function(response){
                     //if failure on server side (HTTP 5?? / HTTP 4??), print a nice error message that failure happend on server side
                     // if we get timeout on the ajax connection, then print a nice timeout message  
-                    if(segmentId == me.editedSegmentId)
-                        me.getView().getStore('editorquery').remove(me.getView().getStore('editorquery').findRecord('tmmtid',tmmtid));
-                    
-                    var timeOut = {
-                            rows: [{
-                                source: 'The request to the server is taking too long.',
-                                target: 'Please try again later.',
-                                tmmtid: tmmtid,
-                                loading:true
-                            }]
-                        };
-                    me.cachedResults.get(segmentId).add(tmmtid,timeOut);
-                    me.loadCachedDataIntoGrid(segmentId,tmmtid);
-                    me.cachedResults.get(segmentId).removeAtKey(tmmtid);
+                    me.handleRequestFailure(me, response, segmentId, tmmtid);
                 }
         });
 	},
-    loadCachedDataIntoGrid : function(segmentId,tmmtid) {
+    loadCachedDataIntoGrid: function(segmentId,tmmtid,query) {
     	if(segmentId != this.editedSegmentId)
     		return;
     	var me = this;
 		if(me.cachedResults.get(segmentId)){
 		    var res =me.cachedResults.get(segmentId);
-		    if(tmmtid > 0){
+		    if(tmmtid < 0){
 		        me.assocStore.each(function(record){
-                if(res.get(tmmtid))
-                    me.getView().getStore('editorquery').loadRawData(res.get(tmmtid).rows,true);
+                    if(res.get(record.get('id'))){//FIXME thomas rename tmmtid -> record id
+                        var rcd =res.get(record.get('id')).rows;
+                        me.getView().getStore('editorquery').loadRawData(rcd,true);
+                    }else{
+                        me.cacheSingleMatchPanelResults(record,segmentId,query);
+                    }
                 }); 
 		        return;
 		    }
@@ -225,12 +222,67 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
         me.cacheSegmentIndex.push(fer);
     },
     checkCacheLength : function(){
-        var me = this;
-        if(me.segmentStack.length > 10){
-            me.cachedResults.removeAtKey(me.segmentStack.shift());
+        var me = this,
+            diff=me.segmentStack.length - me.NUMBER_OF_CHACHED_SEGMENTS;
+        if(diff > 0){
+            for(var t=0;t<diff;t++){
+                me.cachedResults.removeAtKey(me.segmentStack.shift());
+            }
         }
     },
     chooseMatch: function(view, record) {
         this.getView().fireEvent('chooseMatch', record);
+    },
+    handleRequestSucces : function(controller,response,segmentId,tmmtid,query){
+        var me = controller;
+        var resp = Ext.util.JSON.decode(response.responseText); 
+        if(segmentId == me.editedSegmentId){
+            me.getView().getStore('editorquery').remove(me.getView().getStore('editorquery').findRecord('tmmtid',tmmtid));
+        }
+        if(typeof resp.rows !== 'undefined' && resp.rows !== null && resp.rows.length){
+            me.cachedResults.get(segmentId).add(tmmtid,resp);
+            me.loadCachedDataIntoGrid(segmentId,tmmtid);
+            return;
+        }
+        var noresults = {
+                rows: [{
+                    source: 'No results was found',
+                    tmmtid: tmmtid,
+                    loading: true
+                }]
+            };
+        me.cachedResults.get(segmentId).add(tmmtid,noresults);
+        me.loadCachedDataIntoGrid(segmentId,tmmtid,query);
+        me.cachedResults.get(segmentId).removeAtKey(tmmtid);
+    },
+    handleRequestFailure : function(controller,response,segmentId,tmmtid){
+        var me = controller;
+        if(segmentId == me.editedSegmentId)
+            me.getView().getStore('editorquery').remove(me.getView().getStore('editorquery').findRecord('tmmtid',tmmtid));
+        
+        var respStatusMsg = me.strings.serverErrorMsgDefault;
+        switch(response.status){
+            case -1:
+                respStatusMsg = me.strings.serverErrorMsgDefault;
+                break;
+            case 408:
+                respStatusMsg = me.strings.serverErrorMsg408;
+                break;
+            case 500:
+                respStatusMsg = me.strings.serverErrorMsg500;
+                break;
+        }
+        
+        var timeOut = {
+                rows: [{
+                    source: respStatusMsg,
+                    target: '',
+                    tmmtid: tmmtid,
+                    loading:true
+                }]
+            };
+        me.cachedResults.get(segmentId).add(tmmtid,timeOut);
+        me.loadCachedDataIntoGrid(segmentId,tmmtid);
+        me.cachedResults.get(segmentId).removeAtKey(tmmtid);
     }
 });

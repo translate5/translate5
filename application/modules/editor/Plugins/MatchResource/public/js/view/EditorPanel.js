@@ -43,6 +43,12 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
 	alias : 'widget.tmMtIntegrationTmMtEditorPanel',
 	requires:['Editor.plugins.MatchResource.view.EditorPanelSearchGrid',
           'Editor.plugins.MatchResource.view.MatchGrid'],
+    strings: {
+        searchTitle: '#UT#Konkordanzsuche',
+        matchTitle:'#UT#Match Ergebnisse',
+        sourceEmptyText:'#UT#Quelltextsuche',
+        targetEmptyText:'#UT#Zieltextsuche'
+    },
     activeTab: 0,
     height:350,
     plain: true,
@@ -52,37 +58,8 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
 		config = {
 			items : []// end of items
 		};
-		if(Editor.app.authenticatedUser.isAllowed('pluginMatchResourceMatchQuery')) {
-			config.items.push({
-	             title: 'Match panel',
-	             xtype:'tmMtIntegrationMatchGrid'
-	         });
-		}
-		if(Editor.app.authenticatedUser.isAllowed('pluginMatchResourceSearchQuery')) {
-			config.items.push({
-	             title: 'Search panel',
-	             items:[{
-	            	 xtype: 'container',
-	                 anchor: '100%',
-	                 layout:'column',
-	                 items:[{
-	                	 xtype:'textfield',
-	                	 dataIndex:'sourceSearch',
-	                	 emptyText:'Source search...',
-	                	 padding:'10 10 10 10',
-	                 },{
-	                	 xtype:'textfield',
-		            	 dataIndex:'targetSearch',
-		            	 emptyText:'Target search...',
-		            	 padding:'10 10 10 10',
-	                 }]
-	             },{
-	            	 xtype:'tmMtIntegrationEditorPanelSearchGrid'
-	             }]
-	         });
-		}
-		//me.isAllowedMatchQuery(config);
-		//me.isAllowedSearchQuery(config);
+		me.isAllowedMatchQuery(config);
+		me.isAllowedSearchQuery(config);
 		if (instanceConfig) {
 			me.getConfigurator().merge(me, config, instanceConfig);
 		}
@@ -91,7 +68,7 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
 	isAllowedMatchQuery:function(config){
 		if(Editor.app.authenticatedUser.isAllowed('pluginMatchResourceMatchQuery')) {
 			config.items.push({
-	             title: 'Match panel',
+	             title: this.strings.matchTitle,
 	             xtype:'tmMtIntegrationMatchGrid'
 	         });
 		}
@@ -99,7 +76,7 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
 	isAllowedSearchQuery:function(config){
 		if(Editor.app.authenticatedUser.isAllowed('pluginMatchResourceSearchQuery')) {
 			config.items.push({
-	             title: 'Search panel',
+	             title: this.strings.searchTitle,
 	             items:[{
 	            	 xtype: 'container',
 	                 anchor: '100%',
@@ -107,12 +84,12 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
 	                 items:[{
 	                	 xtype:'textfield',
 	                	 dataIndex:'sourceSearch',
-	                	 emptyText:'Source search...',
+	                	 emptyText:this.strings.sourceEmptyText,
 	                	 padding:'10 10 10 10',
 	                 },{
 	                	 xtype:'textfield',
 		            	 dataIndex:'targetSearch',
-		            	 emptyText:'Target search...',
+		            	 emptyText:this.strings.targetEmptyText,
 		            	 padding:'10 10 10 10',
 	                 }]
 	             },{
