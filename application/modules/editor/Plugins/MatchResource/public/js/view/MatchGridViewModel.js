@@ -63,7 +63,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewModel', {
                         model: 'Editor.plugins.MatchResource.model.EditorQuery',
                         sorters: [{
                             property: 'matchrate',
-                            direction: 'ASC'
+                            direction: 'DESC'
                         }]
                     },
                     taskassoc: {
