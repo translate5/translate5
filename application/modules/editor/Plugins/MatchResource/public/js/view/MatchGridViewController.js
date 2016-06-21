@@ -190,7 +190,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                 }, 
                 failure: function(response){
                     //if failure on server side (HTTP 5?? / HTTP 4??), print a nice error message that failure happend on server side
-                    // if we get timeout on the ajax connection, then print a nice timeout message  
+                    // if we get timeout on the ajax connection, then print a nice timeout message
                     me.handleRequestFailure(me, response, segmentId, tmmtid);
                 }
         });
@@ -203,17 +203,18 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
 		    var res =me.cachedResults.get(segmentId);
 		    if(tmmtid < 0){
 		        me.assocStore.each(function(record){
-                    if(res.get(record.get('id'))){//FIXME thomas rename tmmtid -> record id
+                    if(res.get(record.get('id'))){
                         var rcd =res.get(record.get('id')).rows;
                         me.getView().getStore('editorquery').loadRawData(rcd,true);
                     }else{
                         me.cacheSingleMatchPanelResults(record,segmentId,query);
                     }
-                }); 
+                });
 		        return;
 		    }
-		    if(res.get(tmmtid))
+		    if(res.get(tmmtid)){
 		        me.getView().getStore('editorquery').loadRawData(res.get(tmmtid).rows,true);
+		    }
 	    }
 	},
 	setFirsEditableRow : function(fer) {
@@ -257,9 +258,9 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
     },
     handleRequestFailure : function(controller,response,segmentId,tmmtid){
         var me = controller;
-        if(segmentId == me.editedSegmentId)
+        if(segmentId == me.editedSegmentId){
             me.getView().getStore('editorquery').remove(me.getView().getStore('editorquery').findRecord('tmmtid',tmmtid));
-        
+        }
         var respStatusMsg = me.strings.serverErrorMsgDefault;
         switch(response.status){
             case -1:

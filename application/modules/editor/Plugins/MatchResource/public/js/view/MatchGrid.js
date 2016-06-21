@@ -94,7 +94,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	              var str =me.getViewModel().getStore('taskassoc').findRecord('id',record.get('tmmtid'));
 	              clr = str.get('color');
 	              meta.tdAttr = 'bgcolor="' + clr + '"';
-	              return "<b>"+matchrate+"</b>";
+	              return "<b>"+(matchrate > 0 ? matchrate : '')+"</b>";
 	          },
 	          text:'Match Rate'
 	      }]

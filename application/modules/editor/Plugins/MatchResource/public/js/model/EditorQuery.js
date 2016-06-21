@@ -43,7 +43,7 @@ Ext.define('Editor.plugins.MatchResource.model.EditorQuery', {
     {name: 'id', type: 'string'},
     {name: 'source', type: 'string'},
     {name: 'target', type: 'string'},
-    {name: 'matchrate', type: 'string'},
+    {name: 'matchrate', type: 'integer'},
     {name: 'segmentId', type: 'string'},
     {name: 'loading', type: 'boolean'}
   ]

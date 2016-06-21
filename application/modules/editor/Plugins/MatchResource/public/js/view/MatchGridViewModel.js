@@ -53,7 +53,6 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewModel', {
         title: 'Test title bind',
         record: false
     },
-
     initConfig: function(instanceConfig) {
         var me = this,
             config = {
@@ -62,16 +61,10 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewModel', {
                         pageSize: 200,
                         autoLoad: false,
                         model: 'Editor.plugins.MatchResource.model.EditorQuery',
-                        /*
                         sorters: [{
-                            XXXsorterFn: function(record1, record2) {
-                                
-                            },
-                            property : 'matchrate',
+                            property: 'matchrate',
                             direction: 'ASC'
-                                
-                        }],
-                        */
+                        }]
                     },
                     taskassoc: {
                         model: 'Editor.plugins.MatchResource.model.TaskAssoc',
