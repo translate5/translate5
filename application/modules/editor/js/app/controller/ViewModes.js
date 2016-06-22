@@ -211,6 +211,7 @@ Ext.define('Editor.controller.ViewModes', {
         });
     }
     me.getSegmentGrid().editingPlugin.enable();
+    me.fireEvent('viewModeChanged',me);
   },
   /**
    * activates the ergonomic mode of the grid (source and edit-column enlarged, all other columns hidden; file-area hidden)
@@ -268,6 +269,7 @@ Ext.define('Editor.controller.ViewModes', {
     me.getSegmentGrid().view.refresh();
     me.toggleEditorErgonomicMode();
     me.saveAlreadyOpened();
+    me.fireEvent('viewModeChanged',me);
   },
   /**
    * sets and removes the ergonomic view for the editor
@@ -308,6 +310,7 @@ Ext.define('Editor.controller.ViewModes', {
         col.hide();
     });
     editorPlugin.disable();
+    me.fireEvent('viewModeChanged',me);
   },
   /**
    * show or expand all columns and areas not needed in ergonomic mode, which have been visible before
