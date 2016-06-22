@@ -51,6 +51,9 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
   },{
       ref: 'matchrateDisplay',
       selector: '#roweditor displayfield[name=matchRate]'
+  },{
+      ref : 'editorPanel',
+      selector:'#tmMtIntegrationTmMtEditorPanel'
   }],
   msgDisabledMatchRate: '#UT#Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.',
 
@@ -72,6 +75,9 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           },
           '#editorcontroller': {
               beforeKeyMapUsage: 'handleEditorKeyMapUsage'
+          },
+          '#ViewModes':{
+              viewModeChanged:'viewModeChangeEvent'
           }
       }
   },
@@ -89,7 +95,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
   },
   onSegmentGridRender: function(grid) {
       var authUser = Editor.app.authenticatedUser;
-      if(authUser.isAllowed('pluginMatchResourceMatchQuery') || authUser.isAllowed('pluginMatchResourceSearchQuery')){
+      if(!Editor.data.task.isReadOnly() && (authUser.isAllowed('pluginMatchResourceMatchQuery') || authUser.isAllowed('pluginMatchResourceSearchQuery'))){
           grid.addDocked({xtype: 'tmMtIntegrationTmMtEditorPanel',dock:'bottom'});
       }
   },
@@ -128,5 +134,20 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           rec.set('matchRateType', 'matchresourceusage'); 
           me.getMatchrateDisplay().setRawValue(matchrate);
       } 
+  },
+  viewModeChangeEvent : function(controller){
+      var me = this;
+      //isViewMode
+      //isErgonomicMode
+      //isEditMode
+      if(controller.self.isViewMode()){
+          if(this.getEditorPanel()){
+              this.getEditorPanel().hide();
+          }
+          return;
+      }
+      if(this.getEditorPanel()){
+          this.getEditorPanel().show();
+      }
   }
 });

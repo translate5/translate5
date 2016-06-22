@@ -49,6 +49,7 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
         sourceEmptyText:'#UT#Quelltextsuche',
         targetEmptyText:'#UT#Zieltextsuche'
     },
+    itemId:'tmMtIntegrationTmMtEditorPanel',
     activeTab: 0,
     height:350,
     plain: true,
