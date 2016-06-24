@@ -65,11 +65,13 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewModel', {
                             property: 'matchrate',
                             direction: 'DESC'
                         }]
-                    },
+                    }
+                    /*
                     taskassoc: {
                         model: 'Editor.plugins.MatchResource.model.TaskAssoc',
                         autoLoad: false
                     }
+                    */
                 }
             };
         if (instanceConfig) {

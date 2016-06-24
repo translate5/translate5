@@ -46,6 +46,10 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
         serverErrorMsg500: '#UT#Die Anfrage führte zu einem Fehler im angefragten Dienst.',
         serverErrorMsg408: '#UT#Die Anfrage an die Match Resource dauerte zu lange.'
     },
+    refs:[{
+        ref: 'matchgrid',
+        selector: '#matchGrid'
+    }],
     listen: {
         store: {
             '#Segments':{
@@ -62,8 +66,8 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                 prevnextloaded :'calculateRows'
             },
             '#Editor.$application': {
-                editorViewportOpened: 'handleInitEditor'
-      	    },
+                editorViewportOpened: 'handleInitEditor'//FIXME the event is not fiered (maybe becouse the view controller is init after the event ?)
+      	    }
       	}
     },
     assocStore : null,
@@ -86,24 +90,16 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
     endEditing : function() {
     	var me = this;
     	me.editedSegmentId = -1;
-		var str = me.getView().getStore('editorquery');
-		str.removeAll();
+    	me.getView().getStore('editorquery').removeAll();
 	},
     onSegmentStoreLoad: function (store, records) {
         var me = this,
             er =store.getFirsteditableRow();
         me.setFirsEditableRow(er);
+        me.assocStore = me.getView().assocStore;
     },
     handleInitEditor: function() {
-      var me = this,
-      	  taskGuid = Editor.data.task.get('taskGuid'),
-      	  prm = {
-	            params: {
-	                filter: '[{"operator":"like","value":"'+taskGuid+'","property":"taskGuid"},{"operator":"eq","value":true,"property":"checked"}]'
-	            },
-	            scope : me
-	  };
-  	  me.assocStore = this.getStore('taskassoc').load(prm);
+        
     },
     calculateRows : function(controller){
         var me = this,

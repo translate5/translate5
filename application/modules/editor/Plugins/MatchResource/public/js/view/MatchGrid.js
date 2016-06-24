@@ -65,6 +65,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
     },
     defaultListenerScope: true,
 	itemId:'matchGrid',
+	assocStore : [],
 	viewConfig: {
 	    enableTextSelection: true
 	},
@@ -91,7 +92,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	          flex: 10/100,
 	          dataIndex: 'matchrate',
 	          renderer: function(matchrate, meta, record) {
-	              var str =me.getViewModel().getStore('taskassoc').findRecord('id',record.get('tmmtid'));
+	              var str =me.assocStore.findRecord('id',record.get('tmmtid'));
 	              clr = str.get('color');
 	              meta.tdAttr = 'bgcolor="' + clr + '"';
 	              return "<b>"+(matchrate > 0 ? matchrate : '')+"</b>";
@@ -99,7 +100,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	          text:'Match Rate'
 	      }]
 	    };
-
+	    me.assocStore = instanceConfig.assocStore;
 	    if (instanceConfig) {
 	        me.getConfigurator().merge(me, config, instanceConfig);
 	    }

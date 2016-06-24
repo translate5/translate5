@@ -56,7 +56,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       selector:'#tmMtIntegrationTmMtEditorPanel'
   }],
   msgDisabledMatchRate: '#UT#Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.',
-
+  assocStore : null,
   listen: {
       component: {
           '#segmentgrid': {
@@ -88,15 +88,22 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       }
   },
   startEditing: function(plugin,context) {
-      this.getMatchgrid().controller.startEditing(context);//(context.record.get('taskGuid'),context.value);
+      var me=this;
+      if(me.assocStore.totalCount > 0){
+          me.getMatchgrid().controller.startEditing(context);//(context.record.get('taskGuid'),context.value);
+      }
   },
   endEditing : function(plugin,context) {
-      this.getMatchgrid().controller.endEditing();//(context.record.get('taskGuid'),context.value);
+      var me=this;
+      if(me.assocStore.totalCount > 0){
+          me.getMatchgrid().controller.endEditing();//(context.record.get('taskGuid'),context.value);
+      }
   },
   onSegmentGridRender: function(grid) {
+      var me=this;
       var authUser = Editor.app.authenticatedUser;
       if(!Editor.data.task.isReadOnly() && (authUser.isAllowed('pluginMatchResourceMatchQuery') || authUser.isAllowed('pluginMatchResourceSearchQuery'))){
-          grid.addDocked({xtype: 'tmMtIntegrationTmMtEditorPanel',dock:'bottom'});
+          me.checkAssocStore(grid);
       }
   },
   handleEditorKeyMapUsage: function(cont, area, mapOverwrite) {
@@ -149,5 +156,28 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       if(this.getEditorPanel()){
           this.getEditorPanel().show();
       }
+  },
+  checkAssocStore: function(grid){
+      var me=this
+      taskGuid = Editor.data.task.get('taskGuid'),
+      prm = {
+            params: {
+                filter: '[{"operator":"like","value":"'+taskGuid+'","property":"taskGuid"},{"operator":"eq","value":true,"property":"checked"}]'
+            },
+            callback:function(){
+                if(me.assocStore.totalCount > 0){
+                    grid.addDocked({
+                        xtype: 'tmMtIntegrationTmMtEditorPanel',
+                        dock:'bottom',
+                        assocStore:me.assocStore,
+                    });
+                }
+            },
+            scope : me
+      };
+      me.assocStore = Ext.create('Ext.data.Store', {
+          model: 'Editor.plugins.MatchResource.model.TaskAssoc'
+      }),
+      me.assocStore.load(prm);
   }
 });
