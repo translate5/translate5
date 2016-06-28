@@ -76,8 +76,15 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
              store: '{editorquery}'
           },
 	      columns: [{
-	          xtype:'rownumberer'
-	      },{
+	          xtype:'rownumberer',
+	          dataIndex: 'state',
+              renderer: function(state, meta, record) {
+                  if(state == "loaded"){
+                      return meta.rowIndex + 1;
+                  }
+                  return "";
+              },
+          },{
 	          xtype: 'gridcolumn',
 	          flex: 45/100,
 	          dataIndex: 'source',

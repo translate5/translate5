@@ -81,6 +81,13 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           }
       }
   },
+  SERVER_STATUS_STATE: {
+      LOADED:'loaded',
+      LOADING: 'loading',
+      NORESULT: 'noresult',
+      SERVERERROR:'servererror',
+      CLIENTTIMEOUT:'clienttimeout'
+  },
   afterInitEditor: function() {
       var task = Editor.data.task;
       if(!task.get('defaultSegmentLayout')){
@@ -129,6 +136,9 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           rec = plug.context.record,
           matchrate = matchRecord.get('matchrate');
       
+      if(matchRecord.get('state')!=me.SERVER_STATUS_STATE.LOADED){
+          return;
+      }
       //we dont support the matchrate saving for tasks with alternatives:
       if(!task.get('defaultSegmentLayout')) {
           return;

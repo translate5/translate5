@@ -70,6 +70,13 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
       	    }
       	}
     },
+    SERVER_STATUS_STATE: {
+        LOADED:'loaded',
+        LOADING: 'loading',
+        NORESULT: 'noresult',
+        SERVERERROR:'servererror',
+        CLIENTTIMEOUT:'clienttimeout'
+    },
     assocStore : null,
     nextSegment : null,
     cacheSegmentIndex: new Array(),
@@ -146,7 +153,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                     matchrate: '',
                     tmmtid: tmmtid,
                     segmentId: '',
-                    loading: true
+                    state: me.SERVER_STATUS_STATE.LOADING
                 }]
             };
         me.cachedResults.get(segmentId).add(tmmtid,dummyObj);
@@ -164,7 +171,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                 matchrate: '',
                 tmmtid: tmmtid,
                 segmentId: '',
-                loading: true
+                state:  me.SERVER_STATUS_STATE.LOADING
             }]
         };
         me.cachedResults.get(segmentId).add(tmmtid,dummyObj);
@@ -245,7 +252,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                 rows: [{
                     source: 'No results was found',
                     tmmtid: tmmtid,
-                    loading: true
+                    state:  me.SERVER_STATUS_STATE.NORESULT
                 }]
             };
         me.cachedResults.get(segmentId).add(tmmtid,noresults);
@@ -258,12 +265,14 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
             me.getView().getStore('editorquery').remove(me.getView().getStore('editorquery').findRecord('tmmtid',tmmtid));
         }
         var respStatusMsg = me.strings.serverErrorMsgDefault;
+        var strState =  me.SERVER_STATUS_STATE.SERVERERROR;
         switch(response.status){
             case -1:
                 respStatusMsg = me.strings.serverErrorMsgDefault;
                 break;
             case 408:
                 respStatusMsg = me.strings.serverErrorMsg408;
+                strState =  me.SERVER_STATUS_STATE.CLIENTTIMEOUT;
                 break;
             case 500:
                 respStatusMsg = me.strings.serverErrorMsg500;
@@ -275,7 +284,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                     source: respStatusMsg,
                     target: '',
                     tmmtid: tmmtid,
-                    loading:true
+                    state: strState
                 }]
             };
         me.cachedResults.get(segmentId).add(tmmtid,timeOut);

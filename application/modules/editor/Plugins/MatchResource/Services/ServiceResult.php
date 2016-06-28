@@ -108,6 +108,10 @@ class editor_Plugins_MatchResource_Services_ServiceResult {
         $result->source = $this->defaultSource;
         $result->attributes = null;
         $result->tmmtid = $this->tmmt->getId();
+        
+        if($matchrate >= 70){
+            $result->state = "loaded";
+        }
         $this->results[] = $result;
         $this->lastAdded = $result;
         return $result;
