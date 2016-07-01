@@ -153,7 +153,11 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                     matchrate: '',
                     tmmtid: tmmtid,
                     segmentId: '',
-                    state: me.SERVER_STATUS_STATE.LOADING
+                    state: me.SERVER_STATUS_STATE.LOADING,
+                    created:null,
+                    creator:'',
+                    lastEdited:null,
+                    lastEditor:''
                 }]
             };
         me.cachedResults.get(segmentId).add(tmmtid,dummyObj);
@@ -171,7 +175,11 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                 matchrate: '',
                 tmmtid: tmmtid,
                 segmentId: '',
-                state:  me.SERVER_STATUS_STATE.LOADING
+                state:  me.SERVER_STATUS_STATE.LOADING,
+                created:null,
+                creator:'',
+                lastEdited:null,
+                lastEditor:''
             }]
         };
         me.cachedResults.get(segmentId).add(tmmtid,dummyObj);
@@ -252,7 +260,11 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                 rows: [{
                     source: 'No results was found',
                     tmmtid: tmmtid,
-                    state:  me.SERVER_STATUS_STATE.NORESULT
+                    state:  me.SERVER_STATUS_STATE.NORESULT,
+                    created:null,
+                    creator:'',
+                    lastEdited:null,
+                    lastEditor:''
                 }]
             };
         me.cachedResults.get(segmentId).add(tmmtid,noresults);
@@ -284,7 +296,11 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                     source: respStatusMsg,
                     target: '',
                     tmmtid: tmmtid,
-                    state: strState
+                    state: strState,
+                    created:null,
+                    creator:'',
+                    lastEdited:null,
+                    lastEditor:''
                 }]
             };
         me.cachedResults.get(segmentId).add(tmmtid,timeOut);

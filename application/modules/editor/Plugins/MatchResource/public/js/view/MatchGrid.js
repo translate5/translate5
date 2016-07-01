@@ -56,6 +56,12 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	           'Ext.button.Button',
 	           'Ext.toolbar.Toolbar'
 	],
+	strings: {
+        tooltipMsg : '#UT#Diesen Match in das geöffnete Segment übernehmen.',
+        atributeTooltipMsg : '#UT#Attributes:',
+        lastEditTooltipMsg : '#UT#Last Edit:',
+        createdTooltipMsg : '#UT#Created:'
+    },
 	stores:[
 		'Editor.plugins.MatchResource.store.TaskAssocStore'
 	],
@@ -65,6 +71,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
     },
     defaultListenerScope: true,
 	itemId:'matchGrid',
+	cls:'matchGrid',
 	assocStore : [],
 	viewConfig: {
 	    enableTextSelection: true
@@ -76,10 +83,15 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
              store: '{editorquery}'
           },
 	      columns: [{
-	          xtype:'rownumberer',
+	          xtype:'gridcolumn',
+	          flex: 10/100,
 	          dataIndex: 'state',
-              renderer: function(state, meta, record) {
-                  if(state == "loaded"){
+              renderer: function(val, meta, record) {
+                  if(val == "loaded"){
+                      meta.tdAttr = 'data-qtip="'+me.strings.atributeTooltipMsg+' <br/> '+
+                                                  me.strings.lastEditTooltipMsg+' '+record.get('lastEditor')+' '+Ext.Date.format(record.get('lastEdited'), 'd/m/Y')+' <br/> '+
+                                                  me.strings.createdTooltipMsg+' '+record.get('creator')+' '+Ext.Date.format(record.get('created'), 'd/m/Y')+' <br/> "';
+                      meta.tdCls  = meta.tdCls  + ' rowindex';
                       return meta.rowIndex + 1;
                   }
                   return "";
@@ -100,8 +112,11 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	          dataIndex: 'matchrate',
 	          renderer: function(matchrate, meta, record) {
 	              var str =me.assocStore.findRecord('id',record.get('tmmtid'));
+	              if(matchrate > 0){
+	                  meta.tdAttr += 'data-qtip="'+str.get('serviceName')+' </br> STRG - '+(meta.rowIndex + 1)+': '+me.strings.tooltipMsg+'"';
+	              }
 	              clr = str.get('color');
-	              meta.tdAttr = 'bgcolor="' + clr + '"';
+	              meta.tdAttr += 'bgcolor="' + clr + '"';
 	              return "<b>"+(matchrate > 0 ? matchrate : '')+"</b>";
 	          },
 	          text:'Match Rate'

@@ -55,4 +55,13 @@ END LICENSE AND COPYRIGHT
         	targetEmptyText:'<?php echo $this->translate->_('Zieltextsuche');?>',
         }
     });
+    Ext.define("Editor.locale.plugins.MatchResource.view.MatchGrid", {
+        override: "Editor.plugins.MatchResource.view.MatchGrid",
+        strings: {
+            tooltipMsg: '<?php echo $this->translate->_('Diesen Match in das geöffnete Segment übernehmen.');?>',
+            atributeTooltipMsg: '<?php echo $this->translate->_('Attributes:');?>',
+            lastEditTooltipMsg: '<?php echo $this->translate->_('Last Edit:');?>',
+            createdTooltipMsg: '<?php echo $this->translate->_('Created:');?>',
+        }
+    });
   });

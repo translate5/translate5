@@ -45,6 +45,10 @@ Ext.define('Editor.plugins.MatchResource.model.EditorQuery', {
     {name: 'target', type: 'string'},
     {name: 'matchrate', type: 'integer'},
     {name: 'segmentId', type: 'string'},
-    {name: 'state', type: 'string'}
+    {name: 'state', type: 'string'},
+    {name: 'created', type: "date", dateFormat: 'd/m/Y' },
+    {name: 'creator', type: 'string'},
+    {name: 'lastEdited', type: "date", dateFormat: 'd/m/Y' },
+    {name: 'lastEditor', type: 'string'}
   ]
 });

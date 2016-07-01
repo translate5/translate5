@@ -109,9 +109,12 @@ class editor_Plugins_MatchResource_Services_ServiceResult {
         $result->attributes = null;
         $result->tmmtid = $this->tmmt->getId();
         
-        if($matchrate >= 70){
-            $result->state = "loaded";
-        }
+        $result->state = "loaded";
+        $result->created = "25/06/2016";
+        $result->creator = "Aleksandar Mitrev";
+        $result->lastEdited = "25/06/2016";
+        $result->lastEditor = "Marc Mittag";
+        
         $this->results[] = $result;
         $this->lastAdded = $result;
         return $result;
