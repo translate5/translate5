@@ -60,13 +60,16 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
   listen: {
       component: {
           '#segmentgrid': {
-              render: 'onSegmentGridRender',
+              //render: 'onSegmentGridRender',
               beforeedit: 'startEditing',
               canceledit: 'endEditing',
               edit: 'endEditing'
           },
           '#matchGrid': {
               chooseMatch: 'setMatchInEditor'
+          },
+          '#centarpanel':{
+              afterrender:'centarPanelAfterRender'
           }
       },
       controller: {
@@ -106,11 +109,18 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           me.getMatchgrid().controller.endEditing();//(context.record.get('taskGuid'),context.value);
       }
   },
-  onSegmentGridRender: function(grid) {
+  //onSegmentGridRender: function(grid) {
+      //var me=this;
+      //var authUser = Editor.app.authenticatedUser;
+      //if(!Editor.data.task.isReadOnly() && (authUser.isAllowed('pluginMatchResourceMatchQuery') || authUser.isAllowed('pluginMatchResourceSearchQuery'))){
+      //    me.checkAssocStore(grid);
+     // }
+  //},
+  centarPanelAfterRender: function(comp){
       var me=this;
       var authUser = Editor.app.authenticatedUser;
       if(!Editor.data.task.isReadOnly() && (authUser.isAllowed('pluginMatchResourceMatchQuery') || authUser.isAllowed('pluginMatchResourceSearchQuery'))){
-          me.checkAssocStore(grid);
+          me.checkAssocStore(comp);
       }
   },
   handleEditorKeyMapUsage: function(cont, area, mapOverwrite) {
@@ -157,17 +167,15 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       //isViewMode
       //isErgonomicMode
       //isEditMode
-      if(controller.self.isViewMode()){
-          if(this.getEditorPanel()){
-              this.getEditorPanel().hide();
-          }
+      if(controller.self.isViewMode() && this.getEditorPanel()){
+          this.getEditorPanel().hide();
           return;
       }
       if(this.getEditorPanel()){
           this.getEditorPanel().show();
       }
   },
-  checkAssocStore: function(grid){
+  checkAssocStore: function(comp){
       var me=this
       taskGuid = Editor.data.task.get('taskGuid'),
       prm = {
@@ -176,10 +184,20 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
             },
             callback:function(){
                 if(me.assocStore.totalCount > 0){
-                    grid.addDocked({
+                    /*grid.addDocked({
                         xtype: 'tmMtIntegrationTmMtEditorPanel',
                         dock:'bottom',
                         assocStore:me.assocStore,
+                    });
+                    */
+                    comp.addDocked({
+                        xtype: 'panel',
+                        layout: 'fit',
+                        dock: 'bottom',
+                        items:[{
+                            xtype: 'tmMtIntegrationTmMtEditorPanel',
+                            assocStore:me.assocStore,
+                        }]
                     });
                 }
             },

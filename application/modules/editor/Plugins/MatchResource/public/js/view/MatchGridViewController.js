@@ -67,7 +67,10 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
             },
             '#Editor.$application': {
                 editorViewportOpened: 'handleInitEditor'//FIXME the event is not fiered (maybe becouse the view controller is init after the event ?)
-      	    }
+      	    },
+            '#ViewModes':{
+                viewModeChanged:'viewModeChangeEvent'//FIXME it is beter to hook up on this event or define a boolen variable in Editor
+            }
       	}
     },
     SERVER_STATUS_STATE: {
@@ -85,6 +88,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
     editedSegmentId : -1, //the id of the edited segment
     firstEditableRow : -1,
     NUMBER_OF_CHACHED_SEGMENTS:10,
+    ergonomicMode : false,
     startEditing: function(context) {
     	var me = this;
     	me.editedSegmentId = context.record.id;
@@ -118,6 +122,17 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
         }
         me.checkCacheLength();
         me.cache();
+    },
+    viewModeChangeEvent : function(controller){
+        var me = this;
+        //isViewMode
+        //isErgonomicMode
+        //isEditMode
+        if(controller.self.isErgonomicMode()){
+            this.ergonomicMode = true;
+            return;
+        }
+        this.ergonomicMode = false;
     },
     cache : function(){
         var me = this,
@@ -226,6 +241,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
 		    if(res.get(tmmtid)){
 		        me.getView().getStore('editorquery').loadRawData(res.get(tmmtid).rows,true);
 		    }
+	       me.handleViwMode();
 	    }
 	},
 	setFirsEditableRow : function(fer) {
@@ -306,5 +322,16 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
         me.cachedResults.get(segmentId).add(tmmtid,timeOut);
         me.loadCachedDataIntoGrid(segmentId,tmmtid);
         me.cachedResults.get(segmentId).removeAtKey(tmmtid);
-    }
+    },
+    handleViwMode:function(){
+        if(this.ergonomicMode){
+            Ext.select('.matchGrid .x-grid-row .x-grid-cell').each(function(el){
+                Ext.fly(el).addCls('ergonomic-font');
+            });
+            return;
+        }
+        Ext.select('.matchGrid .x-grid-row .x-grid-cell.ergonomic-font').each(function(el){
+            Ext.fly(el).removeCls('ergonomic-font');
+        });
+    },
 });

@@ -90,8 +90,9 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
                   if(val == "loaded"){
                       meta.tdAttr = 'data-qtip="'+me.strings.atributeTooltipMsg+' <br/> '+
                                                   me.strings.lastEditTooltipMsg+' '+record.get('lastEditor')+' '+Ext.Date.format(record.get('lastEdited'), 'd/m/Y')+' <br/> '+
-                                                  me.strings.createdTooltipMsg+' '+record.get('creator')+' '+Ext.Date.format(record.get('created'), 'd/m/Y')+' <br/> "';
-                      meta.tdCls  = meta.tdCls  + ' rowindex';
+                                                  me.strings.createdTooltipMsg+' '+record.get('creator')+' '+Ext.Date.format(record.get('created'), 'd/m/Y')+' <br/> '+
+                                                  ' </br> STRG - '+(meta.rowIndex + 1)+': '+me.strings.tooltipMsg+'"';
+                      meta.tdCls  = meta.tdCls  + ' info-icon';
                       return meta.rowIndex + 1;
                   }
                   return "";
@@ -113,7 +114,8 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	          renderer: function(matchrate, meta, record) {
 	              var str =me.assocStore.findRecord('id',record.get('tmmtid'));
 	              if(matchrate > 0){
-	                  meta.tdAttr += 'data-qtip="'+str.get('serviceName')+' </br> STRG - '+(meta.rowIndex + 1)+': '+me.strings.tooltipMsg+'"';
+	                  meta.tdAttr += 'data-qtip="'+str.get('serviceName')+'"';
+	                  meta.tdCls  = meta.tdCls  + ' info-icon';
 	              }
 	              clr = str.get('color');
 	              meta.tdAttr += 'bgcolor="' + clr + '"';
