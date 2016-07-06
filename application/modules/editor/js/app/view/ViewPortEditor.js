@@ -88,9 +88,16 @@ Ext.define('Editor.view.ViewPortEditor', {
               }],
               width: 260
           },{
+              xtype: 'panel',
+              itemId:'centarpanel',
+              title: '&nbsp;',
               region: 'center',
-              xtype: 'segments.grid',
-              itemId: 'segmentgrid'
+              layout: 'fit',
+              items:[{
+                  region: 'center',
+                  xtype: 'segments.grid',
+                  itemId: 'segmentgrid'
+              }]
           },{
               xtype: 'panel',
               resizable: true,

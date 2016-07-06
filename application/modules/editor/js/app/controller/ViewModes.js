@@ -262,8 +262,8 @@ Ext.define('Editor.controller.ViewModes', {
         }
     },me);
     //inject css to the head to manipulate the column css, because it is easier than to set inject ergomic class for each column in the dom
-    Ext.util.CSS.createStyleSheet('#segment-grid .x-grid-row .x-grid-cell .x-grid-cell-inner { width: '+me.colWidth+'px; } #segment-grid.ergonomic .x-grid-row .x-grid-cell, #segment-grid.ergonomic .x-grid-row-editor .x-form-display-field {    font-size: 19pt !important;    line-height: 39px;}',me.self.ergonomicStyleId);
-
+    Ext.util.CSS.createStyleSheet('#segment-grid .x-grid-row .x-grid-cell .x-grid-cell-inner { width: '+me.colWidth+'px; }',me.self.ergonomicStyleId);
+    
     me.getSegmentGrid().addCls(me.self.MODE_ERGONOMIC);
     me.self.setViewMode(me.self.MODE_ERGONOMIC);
     me.getSegmentGrid().view.refresh();

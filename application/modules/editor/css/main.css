@@ -78,7 +78,7 @@ END LICENSE AND COPYRIGHT
 #segment-grid span.term {
     text-decoration: underline;
 }
-
+.view-editor-font-size,
 #segment-grid .x-grid-row .x-grid-cell, 
 #segment-grid .x-grid-row-editor .x-form-display-field {
   font-size:9pt !important;
@@ -288,6 +288,10 @@ background-color: #EAF1FB;
 
 #segment-grid.ergonomic .x-grid-row .x-grid-cell.comments-field {font-size:14pt !important;}
 
+.ergonomic-font,
+#segment-grid.ergonomic .x-grid-row .x-grid-cell, 
+#segment-grid.ergonomic .x-grid-row-editor .x-form-display-field {font-size: 19pt !important;line-height: 39px;}
+
 body.mode-view #segment-grid .x-grid-item-selected .comments-field .x-grid-cell-inner img.add, 
 body.mode-view #segment-grid .x-grid-item-selected .comments-field .x-grid-cell-inner img.edit {display:none;}
 
@@ -309,7 +313,7 @@ body.loading {background: url("../images/loading_ico.gif") center 100px no-repea
 .ico-task-back {background-image: url("../images/table_back.png");}
 .adminTaskGrid tr.openable td.taskNr div {text-decoration: underline;cursor: pointer !important;}
 .adminTaskGrid .locked td.state div {padding-left:20px;background:url(../images/information.png) no-repeat left top;}
-.adminTaskGrid td.task-users:hover > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
+.adminTaskGrid tr:hover td.task-users > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
 .adminTaskGrid .x-grid-header-ct .task-users > div {background:url("../images/group.png") no-repeat 6px 5px;}
 .adminTaskGrid .x-grid-header-ct .ref-files > div {background:url("../images/page_attach.png") no-repeat 6px 5px;}
 /* Alternative Grafiken: lightbulb, report-magnify, book-open ??? */
@@ -412,7 +416,10 @@ tr.customeState td div {font-style: italic;}
 .ico-tm-edit {background-image: url("../images/pencil.png");}
 .ico-tm-delete {background-image: url("../images/cross.png");}
 .ico-tm-add {background-image: url("../images/book_add.png");}
-.matchGrid td.rowindex:hover > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
+/*
+.matchGrid .x-grid-item-selected .x-grid-item-over > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
+*/
+.matchGrid tr:hover td.info-icon > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:85% 15%;}
 
 /* Tm Overviw grid */
 .gridTmOverview .x-grid-header-ct .relais-lang > div {background:url("../images/relaisLanguage.png") no-repeat 6px 5px;}
