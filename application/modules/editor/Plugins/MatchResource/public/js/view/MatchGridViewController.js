@@ -330,8 +330,9 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
             });
             return;
         }
-        Ext.select('.matchGrid .x-grid-row .x-grid-cell.ergonomic-font').each(function(el){
+        Ext.select('.matchGrid .x-grid-row .x-grid-cell').each(function(el){
             Ext.fly(el).removeCls('ergonomic-font');
+            Ext.fly(el).addCls('view-editor-font-size');
         });
     },
 });
