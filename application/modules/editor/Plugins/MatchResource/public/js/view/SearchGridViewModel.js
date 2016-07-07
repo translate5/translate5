@@ -1,3 +1,4 @@
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -22,7 +23,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execptions
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -34,26 +35,43 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.MatchResource.model.Resource
- * @extends Ext.data.Model
+ * @class Editor.plugins.MatchResource.view.SearchGridViewModel
+ * @extends Ext.app.ViewModel
  */
-Ext.define('Editor.plugins.MatchResource.model.EditorQuery', {
-  extend: 'Ext.data.Model',
-  fields: [
-    {name: 'id', type: 'string'},
-    {name: 'source', type: 'string'},
-    {name: 'target', type: 'string'},
-    {name: 'matchrate', type: 'integer'},
-    {name: 'segmentId', type: 'string'},
-    {name: 'state', type: 'string'},
-    {name: 'created', type: "date", dateFormat: 'd/m/Y' },
-    {name: 'creator', type: 'string'},
-    {name: 'lastEdited', type: "date", dateFormat: 'd/m/Y' },
-    {name: 'lastEditor', type: 'string'}
-  ],
-  SERVER_STATUS_LOADED:'loaded',
-  SERVER_STATUS_LOADING: 'loading',
-  SERVER_STATUS_NORESULT: 'noresult',
-  SERVER_STATUS_SERVERERROR:'servererror',
-  SERVER_STATUS_CLIENTTIMEOUT:'clienttimeout',
+
+Ext.define('Editor.plugins.MatchResource.view.SearchGridViewModel', {
+    extend: 'Ext.app.ViewModel',
+    alias: 'viewmodel.matchResourceSearchGrid',
+    requires: [
+        'Ext.util.Sorter',
+        'Ext.data.Store',
+        'Ext.data.field.Integer',
+        'Ext.data.field.String'
+    ],
+    data: {
+        title: '',
+        record: false
+    },
+    initConfig: function(instanceConfig) {
+        var me = this,
+            config = {
+                /*
+                stores: {
+                    editorquery: {
+                        pageSize: 200,
+                        autoLoad: false,
+                        model: 'Editor.plugins.MatchResource.model.EditorQuery',
+                        sorters: [{
+                            property: 'matchrate',
+                            direction: 'DESC'
+                        }]
+                    }
+                }
+                */
+            };
+        if (instanceConfig) {
+            me.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
+    }
 });

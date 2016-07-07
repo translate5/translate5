@@ -39,8 +39,8 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.grid.Panel
  */
 Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
-	extend : 'Ext.grid.Panel',
-	alias : 'widget.tmMtIntegrationMatchGrid',
+	extend: 'Ext.grid.Panel',
+	alias: 'widget.matchResourceMatchGrid',
 	requires: [
 	           'Editor.plugins.MatchResource.view.MatchGridViewController',
 	           'Editor.plugins.MatchResource.view.MatchGridViewModel',
@@ -57,22 +57,23 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	           'Ext.toolbar.Toolbar'
 	],
 	strings: {
-        tooltipMsg : '#UT#Diesen Match in das geöffnete Segment übernehmen.',
-        atributeTooltipMsg : '#UT#Attributes:',
-        lastEditTooltipMsg : '#UT#Last Edit:',
-        createdTooltipMsg : '#UT#Created:'
+        tooltipMsg: '#UT#Diesen Match in das geöffnete Segment übernehmen.',
+        atributeTooltipMsg: '#UT#Attributes:',
+        lastEditTooltipMsg: '#UT#Last Edit:',
+        createdTooltipMsg: '#UT#Created:'
     },
 	stores:[
 		'Editor.plugins.MatchResource.store.TaskAssocStore'
 	],
-    controller: 'tmMtIntegrationMatchGrid',
+    controller: 'matchResourceMatchGrid',
     viewModel: {
-        type: 'tmMtIntegrationMatchGrid'
+        type: 'matchResourceMatchGrid'
     },
     defaultListenerScope: true,
 	itemId:'matchGrid',
 	cls:'matchGrid',
-	assocStore : [],
+	assocStore: [],
+	SERVER_STATUS: null,
 	viewConfig: {
 	    enableTextSelection: true
 	},
@@ -87,7 +88,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	          flex: 10/100,
 	          dataIndex: 'state',
               renderer: function(val, meta, record) {
-                  if(val == "loaded"){
+                  if(val == me.SERVER_STATUS.SERVER_STATUS_LOADED){
                       meta.tdAttr = 'data-qtip="'+me.strings.atributeTooltipMsg+' <br/> '+
                                                   me.strings.lastEditTooltipMsg+' '+record.get('lastEditor')+' '+Ext.Date.format(record.get('lastEdited'), 'd/m/Y')+' <br/> '+
                                                   me.strings.createdTooltipMsg+' '+record.get('creator')+' '+Ext.Date.format(record.get('created'), 'd/m/Y')+' <br/> '+
@@ -125,6 +126,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	      }]
 	    };
 	    me.assocStore = instanceConfig.assocStore;
+	    me.SERVER_STATUS=Editor.plugins.MatchResource.model.EditorQuery.prototype;
 	    if (instanceConfig) {
 	        me.getConfigurator().merge(me, config, instanceConfig);
 	    }

@@ -23,7 +23,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execptions
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -35,38 +35,12 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.pluginFeasibilityTest.view.Panel
- * @extends Ext.grid.Panel
+ * @class Editor.plugins.MatchResource.view.SearchGridViewController
+ * @extends Ext.app.ViewController
  */
-Ext.define('Editor.plugins.MatchResource.view.EditorPanelSearchGrid', {
-	extend : 'Ext.grid.Panel',
-	alias : 'widget.tmMtIntegrationEditorPanelSearchGrid',
-	itemId:'editorPanelSearchGrid',
-	assocStore : [],
-	initConfig: function(instanceConfig) {
-	    var me = this,
-	    config = {
-	      columns: [{
-	          xtype: 'gridcolumn',
-	          flex: 33/100,
-	          dataIndex: 'source',
-	          text:'Source'
-	      },{
-	          xtype: 'gridcolumn',
-	          flex: 33/100,
-	          dataIndex: 'target',
-	          text:'Target'
-	      },{
-	          xtype: 'gridcolumn',
-	          flex: 33/100,
-	          dataIndex: 'matchrate',
-	          text:'Match'
-	      }]
-	    };
-	    me.assocStore = instanceConfig.assocStore;
-	    if (instanceConfig) {
-	        me.getConfigurator().merge(me, config, instanceConfig);
-	    }
-	    return me.callParent([config]);
-	  }
+Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.matchResourceSearchGrid',
+    assocStore : null
+    
 });

@@ -41,8 +41,7 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.plugins.MatchResource.view.MatchGridViewModel', {
     extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.tmMtIntegrationMatchGrid',
-
+    alias: 'viewmodel.matchResourceMatchGrid',
     requires: [
         'Ext.util.Sorter',
         'Ext.data.Store',
