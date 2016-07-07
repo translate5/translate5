@@ -33,11 +33,32 @@ END LICENSE AND COPYRIGHT
   
   Editor.controller.Localizer.addPluginInit('matchResource', function() {
   
-  
     Ext.define("Editor.locale.plugins.MatchResource.controller.Editor", {
         override: "Editor.plugins.MatchResource.controller.Editor",
         msgDisabledMatchRate: '<?php echo $this->translate->_('Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.');?>'
     });
+    
+    Ext.define("Editor.locale.plugins.MatchResource.controller.TaskAssoc", {
+        override: "Editor.plugins.MatchResource.controller.TaskAssoc",
+        strings: {
+            assocSave: '<?php echo $this->translate->_('Eintrag gespeichert!');?>',
+            assocDeleted: '<?php echo $this->translate->_('Eintrag gelöscht!');?>',
+            assocSaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.plugins.MatchResource.controller.TmOverview", {
+        override: "Editor.plugins.MatchResource.controller.TmOverview",
+        strings: {
+            matchresource: '<?php echo $this->translate->_('Matchressourcen');?>',
+            deleteConfirm: '<?php echo $this->translate->_('Matchressource endgültig löschen?');?>',
+            deleteConfirmText: '<?php echo $this->translate->_('Soll die gewählte Matchressource "{0}" wirklich endgültig gelöscht werden?');?>',
+            deleted: '<?php echo $this->translate->_('Matchressource gelöscht.');?>',
+            edited: '<?php echo $this->translate->_('Die Matchressource "{0}" wurde erfolgreich geändert.');?>',
+            created: '<?php echo $this->translate->_('Die Matchressource "{0}" wurde erfolgreich erstellt.');?>'
+        }
+    });
+    
     Ext.define("Editor.locale.plugins.MatchResource.view.MatchGridViewController", {
         override: "Editor.plugins.MatchResource.view.MatchGridViewController",
         strings: {
@@ -46,6 +67,7 @@ END LICENSE AND COPYRIGHT
         	serverErrorMsg408:'<?php echo $this->translate->_('Request Timeout');?>',
         }
     });
+    
     Ext.define("Editor.locale.plugins.MatchResource.view.EditorPanel", {
         override: "Editor.plugins.MatchResource.view.EditorPanel",
         strings: {

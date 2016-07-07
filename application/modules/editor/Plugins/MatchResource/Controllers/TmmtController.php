@@ -93,7 +93,6 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
     }
     
     public function deleteAction(){
-        //FIXME trigger delete in connector / resource also!
         $this->entityLoad();
         $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
         /* @var $manager editor_Plugins_MatchResource_Services_Manager */
@@ -132,6 +131,7 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
     
     /**
      * performs a tmmt search
+     * FIXME more docu here! 
      */
     public function searchAction() {
         $session = new Zend_Session_Namespace();

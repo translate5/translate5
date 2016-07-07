@@ -35,7 +35,6 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * Die Einstellungen werden in einem Cookie gespeichert
  * @class Editor.plugins.MatchResource.controller.TaskAssoc
  * @extends Ext.app.Controller
  */
@@ -44,6 +43,11 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
   views: ['Editor.plugins.MatchResource.view.TaskAssocPanel'],
   models: ['Editor.plugins.MatchResource.model.TaskAssoc'],
   stores:['Editor.plugins.MatchResource.store.TaskAssocStore'],
+  strings: {
+      assocSave: '#UT#Eintrag gespeichert!',
+      assocDeleted: '#UT#Eintrag gelöscht!',
+      assocSaveError: '#UT#Fehler beim Speichern der Änderungen!'
+  },
   refs: [{
       ref: 'taskTabs',
       selector: 'adminTaskPreferencesWindow > tabpanel'
@@ -92,6 +96,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
           return;
       }
       var me = this,
+          str = me.strings,
           checkedData = {
           data: Ext.JSON.encode({
               tmmtId: record.get('id'),
@@ -107,12 +112,15 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
                   var resp = Ext.util.JSON.decode(response.responseText),
                       newId = resp.rows['id'];
                   record.set('taskassocid', newId);
-                  Editor.MessageBox.addSuccess('Success!');
+                  Editor.MessageBox.addSuccess(str.assocSave);
+              }
+              else {
+                  Editor.MessageBox.addSuccess(str.assocDeleted);
               }
               record.commit();
           },
           failure: function(response){
-              Editor.MessageBox.addSuccess('Fail!');
+              Editor.MessageBox.addError(str.assocSaveError);
           } 
       });
   }

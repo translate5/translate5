@@ -44,6 +44,14 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
     views: ['Editor.plugins.MatchResource.view.TmOverviewPanel','Editor.plugins.MatchResource.view.AddTmWindow'],
     models: ['Editor.plugins.MatchResource.model.Resource','Editor.plugins.MatchResource.model.TmMt'],
     stores:['Editor.plugins.MatchResource.store.Resources','Editor.plugins.MatchResource.store.TmMts'],
+    strings: {
+        matchresource: '#UT#Matchressourcen',
+        deleteConfirm: '#UT#Matchressource endgültig löschen?',
+        deleteConfirmText: '#UT#Soll die gewählte Matchressource "{0}" wirklich endgültig gelöscht werden?',
+        deleted: '#UT#Matchressource gelöscht.',
+        edited: '#UT#Die Matchressource "{0}" wurde erfolgreich geändert.',
+        created: '#UT#Die Matchressource "{0}" wurde erfolgreich erstellt.',
+    },
     refs:[{
         ref: 'tmOverviewPanel',
         selector: '#tmOverviewPanel'
@@ -129,7 +137,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
         this.getTopMenu().insert(pos, {
             xtype: 'button',
             itemId: 'btnTmOverviewWindow',
-            text: 'TM Overview'
+            text: this.strings.matchresource
         });
     },
     handleOnButtonClick: function(window) {
@@ -155,7 +163,6 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
     handleButtonRefreshClick : function(){
         Ext.getCmp('gridTmOverview').getStore().load();
         this.getEditorPluginsMatchResourceStoreResourcesStore().load();
-        Editor.MessageBox.addSuccess('Success!');
     },
     handleSaveWindowClick:function(){
         var me = this,
@@ -177,10 +184,11 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
                     Editor.app.getController('ServerException').handleException(op.error.response);
                 },
                 success: function() {
+                    var msg = Ext.String.format(me.strings.edited, record.get('name'));
                     Ext.getCmp('gridTmOverview').getStore().load();
                     win.setLoading(false);
                     win.close();
-                    Editor.MessageBox.addSuccess('Success!');
+                    Editor.MessageBox.addSuccess(msg);
                 }
             });
             return;
@@ -193,11 +201,13 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
                 format: 'jsontext'
             },
             url: Editor.data.restpath+'plugins_matchresource_tmmt',
-            scope: this,
+            scope: me,
             success: function(form, submit) {
+                var msg = Ext.String.format(me.strings.created, submit.result.rows.name);
                 Ext.getCmp('gridTmOverview').getStore().load();
                 win.setLoading(false);
-                this.getTmWindow().close();
+                me.getTmWindow().close();
+                Editor.MessageBox.addSuccess(msg);
             },
             failure: function(form, submit) {
                 win.setLoading(false);
@@ -228,8 +238,8 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
                 me.handleEditTm(view,cell,col,selectedRow);
                 break;
             case 'delete':
-                info = Ext.String.format('Confirm delete ?',selectedRow.get('name'));
-                Ext.Msg.confirm('Confirm Delete', info, function(btn){
+                info = Ext.String.format(me.strings.deleteConfirmText, selectedRow.get('name'));
+                Ext.Msg.confirm(me.strings.deleteConfirm, info, function(btn){
                     if(btn !== 'yes') {
                         return;
                     }
@@ -241,6 +251,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
                         success: function() {
                             store && store.load();
                             store.remove(selectedRow);
+                            Editor.MessageBox.addSuccess(me.strings.deleted);
                         }
                     });
                 });
