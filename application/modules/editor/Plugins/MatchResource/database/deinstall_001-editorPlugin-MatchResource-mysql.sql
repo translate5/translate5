@@ -38,3 +38,10 @@ DROP TABLE `LEK_matchresource_taskassoc`;
 DROP TABLE `LEK_matchresource_tmmt`;
 
 DELETE FROM Zf_configuration WHERE `name` = 'runtimeOptions.plugins.MatchResource.preloadedTranslationSegments';
+
+UPDATE `Zf_configuration` SET `value` = REPLACE(`value`, ',"editor/plugins/resources/matchResource/plugin.css"', '') 
+WHERE `name` = 'runtimeOptions.publicAdditions.css';
+UPDATE `Zf_configuration` SET `value` = REPLACE(`value`, '"editor/plugins/resources/matchResource/plugin.css",', '') 
+WHERE `name` = 'runtimeOptions.publicAdditions.css';
+UPDATE `Zf_configuration` SET `value` = REPLACE(`value`, '"editor/plugins/resources/matchResource/plugin.css"', '') 
+WHERE `name` = 'runtimeOptions.publicAdditions.css';

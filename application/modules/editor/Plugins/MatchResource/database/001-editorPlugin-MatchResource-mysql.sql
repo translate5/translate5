@@ -64,3 +64,9 @@ insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor
 
 INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
 ('runtimeOptions.plugins.MatchResource.preloadedTranslationSegments', 1, 'editor', 'plugins', 3, 3, '', 'integer', 'Number of preloadet(cached) tmmt segments');
+
+UPDATE `Zf_configuration` SET `value` = REPLACE(`value`, ']', ',"editor/plugins/resources/matchResource/plugin.css"]') 
+WHERE `name` = 'runtimeOptions.publicAdditions.css' AND `value` != '[]';
+
+UPDATE `Zf_configuration` SET `value` = '["editor/plugins/resources/matchResource/plugin.css"]' 
+WHERE `name` = 'runtimeOptions.publicAdditions.css' AND `value` = '[]';

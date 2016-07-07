@@ -480,16 +480,27 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
      * To prevent LFI attacks load existing Plugin JS filenames and use them as whitelist
      * Currently this Method is not reusable, its only for JS.
      */
-    public function pluginjsAction() {
+    public function pluginpublicAction() {
+        $types = array(
+                'js' => 'text/javascript',
+                'css' => 'text/css',
+                'jpg' => 'image/jpeg',
+                'png' => 'image/png',
+                'gif' => 'image/gif',
+        );
         $slash = '/';
         // get requested file from router
-        $requestPar =$this->getParam(1);
-    	$js = explode($slash, $requestPar); 
+        $requestedType =$this->getParam(1);
+        $requestedFile =$this->getParam(2);
+        $js = explode($slash, $requestedFile);
+        
+        $extension = pathinfo($requestedFile, PATHINFO_EXTENSION);
+        
         //pluginname is alpha characters only so check this for security reasons
         //ucfirst is needed, since in JS packages start per convention with lowercase, Plugins in PHP with uppercase! 
         
         $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($js))); 
-        if(empty($plugin)) {
+        if(empty($plugin) || !in_array($requestedType, array('js', 'resources'))) {
             throw new ZfExtended_NotFoundException();
         }
         //get the plugin instance to the key
@@ -501,7 +512,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             throw new ZfExtended_NotFoundException();
         }
         //get public files of the plugin to make a whitelist check of the file string from userland
-        $allowedFiles = $plugin->getPublicFiles('js', $absolutePath);
+        $allowedFiles = $plugin->getPublicFiles($requestedType, $absolutePath);
         $file = join($slash, $js);
         if(!in_array($file, $allowedFiles)) {
             throw new ZfExtended_NotFoundException();
@@ -512,7 +523,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             throw new ZfExtended_NotFoundException();
         }
         //currently this method is fixed to JS:
-        header('Content-Type: text/javascript');
+        header('Content-Type: '.$types[$extension]);
         readfile($wholePath);
         exit;
     }
