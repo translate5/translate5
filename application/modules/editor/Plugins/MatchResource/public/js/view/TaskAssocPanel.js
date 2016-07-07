@@ -43,14 +43,14 @@ Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
     alias : 'widget.tmMtIntegrationTaskAssocPanel',
     requires: ['Editor.view.admin.TaskActionColumn'],
     cls : 'adminTaskGrid',
-    title: '#UT#Matchressourcen Aufgaben zuweisen',
+    title: '#UT#Matchressourcen zuweisen',
     strings: {
         save: '#UT#Speichern',
         empty: '#UT#Keine Match Resource in der Sprachkombination des geöffneten Tasks verfügbar.',
         groupHeader: '#UT#Dienst: {name}',
-        name: '#UT#Name:',
-        source: '#UT#Quellsprache:',
-        target: '#UT#Zielsprache:'
+        name: '#UT#Name',
+        source: '#UT#Quellsprache',
+        target: '#UT#Zielsprache'
     },
     frame : true,
     layout: 'fit',
@@ -58,23 +58,24 @@ Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
     initConfig : function(instanceConfig) {
         var me = this,
         config = {
-                dockedItems : [{
-                    xtype : 'toolbar',
-                    dock : 'bottom',
-                    ui: 'footer',
-                    layout: {
-                        type: 'hbox',
-                        pack: 'start'
-                    },
-                    items : [{
-                        xtype: 'tbfill'
-                    },{
-                        xtype: 'button',
-                        id: 'btnSaveChanges',
-                        tooltip: me.strings.save,
-                        text: me.strings.save
-                    }]
-                }],
+            title: me.title, //see EXT6UPD-9
+            dockedItems : [{
+                xtype : 'toolbar',
+                dock : 'bottom',
+                ui: 'footer',
+                layout: {
+                    type: 'hbox',
+                    pack: 'start'
+                },
+                items : [{
+                    xtype: 'tbfill'
+                },{
+                    xtype: 'button',
+                    id: 'btnSaveChanges',
+                    tooltip: me.strings.save,
+                    text: me.strings.save
+                }]
+            }],
             items : [ {
                 xtype : 'grid',
                 id : 'tmTaskAssocGrid',
