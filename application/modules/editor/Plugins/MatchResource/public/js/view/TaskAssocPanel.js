@@ -43,7 +43,15 @@ Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
     alias : 'widget.tmMtIntegrationTaskAssocPanel',
     requires: ['Editor.view.admin.TaskActionColumn'],
     cls : 'adminTaskGrid',
-    title : 'Associate TMs to task',
+    title: '#UT#Matchressourcen Aufgaben zuweisen',
+    strings: {
+        save: '#UT#Speichern',
+        empty: '#UT#Keine Match Resource in der Sprachkombination des geöffneten Tasks verfügbar.',
+        groupHeader: '#UT#Dienst: {name}',
+        name: '#UT#Name:',
+        source: '#UT#Quellsprache:',
+        target: '#UT#Zielsprache:'
+    },
     frame : true,
     layout: 'fit',
     padding : 10,
@@ -61,23 +69,23 @@ Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
                     items : [{
                         xtype: 'tbfill'
                     },{
-                        xtype : 'button',
-                        id : 'btnSaveChanges',
-                        tooltip : 'Save',
-                        text : 'Save TMs'
+                        xtype: 'button',
+                        id: 'btnSaveChanges',
+                        tooltip: me.strings.save,
+                        text: me.strings.save
                     }]
                 }],
             items : [ {
                 xtype : 'grid',
                 id : 'tmTaskAssocGrid',
                 store : 'Editor.plugins.MatchResource.store.TaskAssocStore',
-                emptyText: 'Keine Match Resource in der Sprachkombination des geöffneten Tasks verfügbar.',
+                emptyText: me.strings.empty,
                 features : [ {
-                    id : 'group',
-                    ftype : 'grouping',
-                    groupHeaderTpl : 'Service: {name}',
-                    hideGroupedHeader : true,
-                    enableGroupingMenu : false
+                    id: 'group',
+                    ftype: 'grouping',
+                    groupHeaderTpl: me.strings.groupHeader,
+                    hideGroupedHeader: true,
+                    enableGroupingMenu: false
                 } ],
                 columns : [ {
                     xtype : 'checkcolumn',
@@ -86,8 +94,8 @@ Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
                     sortable : true,
                     flex : 10 / 100
                 }, {
-                    xtype : 'gridcolumn',
-                    text : 'Name',
+                    xtype: 'gridcolumn',
+                    text: me.strings.name,
                     renderer: function(value, metaData, record) {
                         return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #'+record.get('color')+';"></div>'+value;
                     },
@@ -96,7 +104,7 @@ Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
                     flex : 40 / 100
                 }, {
                     xtype : 'gridcolumn',
-                    text : 'Source Language',
+                    text : me.strings.source,
                     cls : 'source-lang',
                     dataIndex : 'sourceLang',
                     renderer : me.langRenderer,
@@ -104,7 +112,7 @@ Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
                     flex : 25 / 100,
                 }, {
                     xtype : 'gridcolumn',
-                    text : 'Target Language',
+                    text : me.strings.target,
                     cls : 'target-lang',
                     dataIndex : 'targetLang',
                     renderer : me.langRenderer,

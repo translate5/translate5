@@ -62,9 +62,27 @@ END LICENSE AND COPYRIGHT
     Ext.define("Editor.locale.plugins.MatchResource.view.MatchGridViewController", {
         override: "Editor.plugins.MatchResource.view.MatchGridViewController",
         strings: {
-            serverErrorMsgDefault: '<?php echo $this->translate->_('Die Anfrage an die Match Resource dauerte zu lange.');?>',
+            loading: '<?php echo $this->translate->_('wird geladen...');?>',
+            noresults: '<?php echo $this->translate->_('Es wurden keine Ergebnisse gefunden.');?>',
+            serverErrorMsgDefault: '<?php echo $this->translate->_('Die Anfrage an die Matchressource dauerte zu lange.');?>',
             serverErrorMsg500:'<?php echo $this->translate->_('Die Anfrage führte zu einem Fehler im angefragten Dienst.');?>',
-        	serverErrorMsg408:'<?php echo $this->translate->_('Request Timeout');?>',
+            serverErrorMsg408:'<?php echo $this->translate->_('Die Anfrage an die Matchressource dauerte zu lange.');?>',
+        }
+    });
+    
+    Ext.define("Editor.locale.plugins.MatchResource.view.AddTmWindow", {
+        override: "Editor.plugins.MatchResource.view.AddTmWindow",
+        strings: {
+            add: '<?php echo $this->translate->_('Matchressource hinzufügen');?>',
+            resource: '<?php echo $this->translate->_('Ressource');?>',
+            name: '<?php echo $this->translate->_('Name');?>',
+            source: '<?php echo $this->translate->_('Quellsprache');?>',
+            target: '<?php echo $this->translate->_('Zielsprache');?>',
+            file: '<?php echo $this->translate->_('TM-Datei');?>',
+            color: '<?php echo $this->translate->_('Farbe');?>',
+            colorTooltip: '<?php echo $this->translate->_('Farbe welche für diese Match Resource verwendet wird');?>',
+            save: '<?php echo $this->translate->_('Speichern');?>',
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>'
         }
     });
     
@@ -72,18 +90,58 @@ END LICENSE AND COPYRIGHT
         override: "Editor.plugins.MatchResource.view.EditorPanel",
         strings: {
             searchTitle: '<?php echo $this->translate->_('Konkordanzsuche');?>',
-            matchTitle:'<?php echo $this->translate->_('Match Ergebnisse');?>',
-        	sourceEmptyText:'<?php echo $this->translate->_('Quelltextsuche');?>',
-        	targetEmptyText:'<?php echo $this->translate->_('Zieltextsuche');?>',
+            matchTitle:'<?php echo $this->translate->_('Matchergebnisse');?>',
+            sourceEmptyText:'<?php echo $this->translate->_('Quelltextsuche');?>',
+            targetEmptyText:'<?php echo $this->translate->_('Zieltextsuche');?>'
         }
     });
+    
     Ext.define("Editor.locale.plugins.MatchResource.view.MatchGrid", {
         override: "Editor.plugins.MatchResource.view.MatchGrid",
         strings: {
+            source: '<?php echo $this->translate->_('Quelltext');?>',
+            target: '<?php echo $this->translate->_('Zieltext');?>',
+            source: '<?php echo $this->translate->_('Matchrate');?>',
             tooltipMsg: '<?php echo $this->translate->_('Diesen Match in das geöffnete Segment übernehmen.');?>',
-            atributeTooltipMsg: '<?php echo $this->translate->_('Attributes:');?>',
-            lastEditTooltipMsg: '<?php echo $this->translate->_('Last Edit:');?>',
-            createdTooltipMsg: '<?php echo $this->translate->_('Created:');?>',
+            atributeTooltipMsg: '<?php echo $this->translate->_('Attribute:');?>',
+            lastEditTooltipMsg: '<?php echo $this->translate->_('letzte Änderung:');?>',
+            createdTooltipMsg: '<?php echo $this->translate->_('erstellt:');?>'
         }
     });
-  });
+    
+    Ext.define("Editor.locale.plugins.MatchResource.view.EditorPanelSearchGrid", {
+        override: "Editor.plugins.MatchResource.view.EditorPanelSearchGrid",
+        strings: {
+            source: '<?php echo $this->translate->_('Quelltext');?>',
+            target: '<?php echo $this->translate->_('Zieltext');?>',
+            source: '<?php echo $this->translate->_('Matchrate');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.plugins.MatchResource.view.TaskAssocPanel", {
+        override: "Editor.plugins.MatchResource.view.TaskAssocPanel",
+        title: '<?php echo $this->translate->_('Matchressourcen Aufgaben zuweisen');?>',
+        strings: {
+            save: '<?php echo $this->translate->_('Speichern');?>',
+            empty: '<?php echo $this->translate->_('Keine Match Resource in der Sprachkombination des geöffneten Tasks verfügbar.');?>',
+            groupHeader: '<?php echo $this->translate->_('Dienst: {name}');?>',
+            name: '<?php echo $this->translate->_('Name:');?>',
+            source: '<?php echo $this->translate->_('Quellsprache:');?>',
+            target: '<?php echo $this->translate->_('Zielsprache:');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.plugins.MatchResource.view.TmOverviewPanel", {
+        override: "Editor.plugins.MatchResource.view.TmOverviewPanel",
+        title: '<?php echo $this->translate->_('Matchressourcen');?>',
+        strings: {
+            name: '<?php echo $this->translate->_('Name');?>',
+            edit: '<?php echo $this->translate->_('Bearbeiten');?>',
+            erase: '<?php echo $this->translate->_('Löschen');?>',
+            resource: '<?php echo $this->translate->_('Ressource');?>',
+            refresh: '<?php echo $this->translate->_('Aktualisieren');?>',
+            add: '<?php echo $this->translate->_('add');?>'
+        }
+    });
+    
+});

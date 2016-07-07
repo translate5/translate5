@@ -29,11 +29,23 @@ END LICENSE AND COPYRIGHT
 */
 
 Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
-    extend : 'Ext.window.Window',
+    extend: 'Ext.window.Window',
     requires: ['Ext.ux.colorpick.Button'],
-    alias : 'widget.addTmWindow',
-    itemId : 'addTmWindow',
-    cls : 'addTmWindow',
+    alias: 'widget.addTmWindow',
+    itemId: 'addTmWindow',
+    cls: 'addTmWindow',
+    strings: {
+        add: '#UT#Matchressource hinzufügen',
+        resource: '#UT#Ressource',
+        name: '#UT#Name',
+        source: '#UT#Quellsprache',
+        target: '#UT#Zielsprache',
+        file: '#UT#TM-Datei',
+        color: '#UT#Farbe',
+        colorTooltip: '#UT#Farbe welche für diese Match Resource verwendet wird',
+        save: '#UT#Speichern',
+        cancel: '#UT#Abbrechen'
+    },
     height : 300,
     width : 500,
     modal : true,
@@ -60,7 +72,7 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
                 anchor: '100%'
             },
         config = {
-            title: 'Add TM',
+            title: me.strings.add,
             items : [{
                 xtype: 'form',
                 id:'addTmForm',
@@ -68,71 +80,69 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
                 ui: 'default-frame',
                 defaults: defaults,
                 items: [{
-	                	xtype: 'combo',
-	                    name:'resourceId',
-	                    dataIndex:'resourceId',
-	                    disabled : instanceConfig.editMode,
-	                    typeAhead: true,
-	                    forceSelection: true,
-	                    queryMode: 'local',
-	                    listeners: {
-	                        select: me.serviceSelect
-	                    },
-	                    valueField: 'id',
-	                    displayField: 'name',
-	                    store:'Editor.plugins.MatchResource.store.Resources',
-	                    fieldLabel: 'Resource'
-                	},{
-                    	xtype: 'textfield',
-                        name: 'name',
-                        maxLength: 255,
-                        allowBlank: false,
-                        toolTip:'Name',
-                        fieldLabel: 'Name'
-                    },Ext.applyIf({
-                        name: 'sourceLang',
-                        allowBlank: false,
-                        toolTip: 'Source Language',
-                        //each combo needs its own store instance, see EXT6UPD-8
-                        store: Ext.create(Editor.store.admin.Languages),
-                        fieldLabel:'Source Language'
-                    }, langCombo),Ext.applyIf({
-                        name: 'targetLang',
-                        allowBlank: false,
-                        toolTip: 'Target Language',
-                        //each combo needs its own store instance, see EXT6UPD-8
-                        store:Ext.create(Editor.store.admin.Languages),
-                        fieldLabel: 'Target Language'
-                    }, langCombo),
-                    {
-                    	xtype: 'hiddenfield',
-                        name: 'serviceType',
-                        dataIndex: 'serviceType',
-                        maxLength: 255,
-                        allowBlank: false
-                    },{
-                    	xtype: 'hiddenfield',
-                        name: 'serviceName',
-                        dataIndex: 'serviceName',
-                        maxLength: 255,
-                        allowBlank: false
-	                },{
-	                    xtype: 'colorfield',
-	                    fieldLabel: 'Color Field',
-	                    labelWidth: 160,
-	                    anchor: '100%',
-	                    name: 'color'
-	                },{
-	                    xtype: 'filefield',
-	                    name: 'tmUpload',
-	                    //regex: /\.(zip|sdlxliff|xlf|csv|testcase)$/i,
-	                    //regexText: 'Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF; Angabe notwendig)',
-	                    allowBlank: false,
-	                    toolTip: 'Add File',
-	                    disabled:true,
-	                    fieldLabel: 'Add File'
-	                  }]
-	            }],
+                    xtype: 'combo',
+                    name:'resourceId',
+                    dataIndex:'resourceId',
+                    disabled: instanceConfig.editMode,
+                    typeAhead: true,
+                    forceSelection: true,
+                    queryMode: 'local',
+                    listeners: {
+                        select: me.serviceSelect
+                    },
+                    valueField: 'id',
+                    displayField: 'name',
+                    store:'Editor.plugins.MatchResource.store.Resources',
+                    fieldLabel: me.strings.resource
+                },{
+                    xtype: 'textfield',
+                    name: 'name',
+                    maxLength: 255,
+                    allowBlank: false,
+                    toolTip:'Name',
+                    fieldLabel: me.strings.name
+                },Ext.applyIf({
+                    name: 'sourceLang',
+                    allowBlank: false,
+                    toolTip: me.strings.source,
+                    //each combo needs its own store instance, see EXT6UPD-8
+                    store: Ext.create(Editor.store.admin.Languages),
+                    fieldLabel: me.strings.source
+                }, langCombo),Ext.applyIf({
+                    name: 'targetLang',
+                    allowBlank: false,
+                    toolTip: me.strings.target,
+                    //each combo needs its own store instance, see EXT6UPD-8
+                    store:Ext.create(Editor.store.admin.Languages),
+                    fieldLabel: me.strings.target
+                }, langCombo),{
+                    xtype: 'hiddenfield',
+                    name: 'serviceType',
+                    dataIndex: 'serviceType',
+                    maxLength: 255,
+                    allowBlank: false
+                },{
+                    xtype: 'hiddenfield',
+                    name: 'serviceName',
+                    dataIndex: 'serviceName',
+                    maxLength: 255,
+                    allowBlank: false
+                },{
+                    xtype: 'colorfield',
+                    fieldLabel: me.strings.color,
+                    toolTip: me.strings.colorTooltip, 
+                    labelWidth: 160,
+                    anchor: '100%',
+                    name: 'color'
+                },{
+                    xtype: 'filefield',
+                    name: 'tmUpload',
+                    allowBlank: false,
+                    toolTip: me.strings.file,
+                    disabled:true,
+                    fieldLabel: me.strings.file
+                }]
+            }],
             dockedItems : [{
                 xtype : 'toolbar',
                 dock : 'bottom',
@@ -144,15 +154,15 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
                 items : [{
                     xtype: 'tbfill'
                 },{
-                    xtype : 'button',
-                    iconCls :'ico-user-save',
-                    itemId : 'save-tm-btn',
-                    text : 'Save TM'
+                    xtype: 'button',
+                    iconCls:'ico-user-save',
+                    itemId: 'save-tm-btn',
+                    text: me.strings.save
                 }, {
                     xtype : 'button',
                     iconCls : 'ico-cancel',
                     itemId : 'cancel-tm-btn',
-                    text : 'Cancel'
+                    text : me.strings.cancel
                 }]
             }]
         };
@@ -169,10 +179,10 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
         this.down('form').loadRecord(record);
     },
     serviceSelect:function(combo, record, index){
-    	var me = Ext.getCmp('addTmForm');
-    	me.down('filefield').setDisabled(!record.get('filebased'));
-    	me.down('hiddenfield[name="serviceType"]').setValue(record.get('serviceType'));
-    	me.down('hiddenfield[name="serviceName"]').setValue(record.get('serviceName'));
-    	me.down('colorfield[name="color"]').setValue(record.get('defaultColor'));
+        var me = Ext.getCmp('addTmForm');
+        me.down('filefield').setDisabled(!record.get('filebased'));
+        me.down('hiddenfield[name="serviceType"]').setValue(record.get('serviceType'));
+        me.down('hiddenfield[name="serviceName"]').setValue(record.get('serviceName'));
+        me.down('colorfield[name="color"]').setValue(record.get('defaultColor'));
     }
 });

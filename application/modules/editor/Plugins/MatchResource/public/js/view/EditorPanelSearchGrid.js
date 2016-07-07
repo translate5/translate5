@@ -43,6 +43,11 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanelSearchGrid', {
 	alias : 'widget.tmMtIntegrationEditorPanelSearchGrid',
 	itemId:'editorPanelSearchGrid',
 	assocStore : [],
+	strings: {
+	    source: '#UT#Quelltext',
+	    target: '#UT#Zieltext',
+	    match: '#UT#Matchrate'
+	},
 	initConfig: function(instanceConfig) {
 	    var me = this,
 	    config = {
@@ -50,17 +55,17 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanelSearchGrid', {
 	          xtype: 'gridcolumn',
 	          flex: 33/100,
 	          dataIndex: 'source',
-	          text:'Source'
+	          text: me.strings.source
 	      },{
 	          xtype: 'gridcolumn',
 	          flex: 33/100,
 	          dataIndex: 'target',
-	          text:'Target'
+	          text: me.strings.target
 	      },{
 	          xtype: 'gridcolumn',
 	          flex: 33/100,
 	          dataIndex: 'matchrate',
-	          text:'Match'
+	          text: me.strings.match
 	      }]
 	    };
 	    me.assocStore = instanceConfig.assocStore;

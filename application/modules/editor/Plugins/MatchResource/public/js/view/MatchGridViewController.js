@@ -42,9 +42,11 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.tmMtIntegrationMatchGrid',
     strings: {
-        serverErrorMsgDefault : '#UT#Die Anfrage an die Match Resource dauerte zu lange.',
+        loading: '#UT#wird geladen...',
+        noresults: '#UT#Es wurden keine Ergebnisse gefunden.',
+        serverErrorMsgDefault: '#UT#Die Anfrage an die Matchressource dauerte zu lange.',
         serverErrorMsg500: '#UT#Die Anfrage führte zu einem Fehler im angefragten Dienst.',
-        serverErrorMsg408: '#UT#Die Anfrage an die Match Resource dauerte zu lange.'
+        serverErrorMsg408: '#UT#Die Anfrage an die Matchressource dauerte zu lange.'
     },
     refs:[{
         ref: 'matchgrid',
@@ -163,8 +165,8 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
             dummyObj = {
                 rows: [{
                     id: '',
-                    source: 'Loading ...',
-                    target: 'Loading ...',
+                    source: me.strings.loading,
+                    target: me.strings.loading,
                     matchrate: '',
                     tmmtid: tmmtid,
                     segmentId: '',
@@ -185,8 +187,8 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
         dummyObj = {
             rows: [{
                 id: '',
-                source: 'Loading ...',
-                target: 'Loading ...',
+                source: me.strings.loading,
+                target: me.strings.loading,
                 matchrate: '',
                 tmmtid: tmmtid,
                 segmentId: '',
@@ -274,7 +276,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
         }
         var noresults = {
                 rows: [{
-                    source: 'No results was found',
+                    source: me.strings.noresults,
                     tmmtid: tmmtid,
                     state:  me.SERVER_STATUS_STATE.NORESULT,
                     created:null,

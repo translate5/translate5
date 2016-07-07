@@ -41,7 +41,15 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
     extend : 'Ext.panel.Panel',//'Ext.grid.Panel',
     alias: 'widget.TmOverviewPanel',
     itemId: 'tmOverviewPanel',
-    title:'Tm Overview',
+    title:'#UT#Matchressourcen',
+    strings: {
+        name: '#UT#Name',
+        edit: '#UT#Bearbeiten',
+        erase: '#UT#Löschen',
+        resource: '#UT#Ressource',
+        refresh: '#UT#Aktualisieren',
+        add: '#UT#hinzufügen',
+    },
     cls:'',
     height: '100%',
     layout: {
@@ -63,7 +71,7 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
 			            filter: {
 			                type: 'string'
 			            },
-			            text: 'TM Name'
+			            text: me.strings.name
 			        },{
 			            xtype: 'gridcolumn',
 			            width: 100,
@@ -94,16 +102,16 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
 			        	xtype: 'actioncolumn',
 			            width: 60,
 			            items: [{
-			                tooltip: 'Edit',
+			                tooltip: me.strings.edit,
 			                iconCls: 'ico-tm-edit'
 			            },{
-			                tooltip: 'Delete',
+			                tooltip: me.strings.erase,
 			                iconCls: 'ico-tm-delete'
 			            }]
 			        },{
 			        	xtype: 'gridcolumn',
 			            width: 100,
-			         	text: 'Resource',
+			         	text: me.strings.resource,
 			         	dataIndex: 'serviceName',
 			         	filter: {
 			                 type: 'string'
@@ -116,15 +124,15 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
 			                xtype: 'button',
 			                iconCls: 'ico-tm-add',
 			                itemId: 'btnAddTm',
-			                text: 'Add TM',
+			                text: me.strings.add,
 			                hidden: ! Editor.app.authenticatedUser.isAllowed('editorAddUser'), 
-			                tooltip: 'tooltip'
+			                tooltip: me.strings.add
 			            },{
 			                xtype: 'button',
 			                iconCls: 'ico-refresh',
 			                itemId: 'btnRefresh',
-			                text:'Refresh',
-			                tooltip: 'tooltip'
+			                text: me.strings.refresh,
+			                tooltip: me.strings.refresh
 			            }]
 			        },{
 			            xtype: 'pagingtoolbar',

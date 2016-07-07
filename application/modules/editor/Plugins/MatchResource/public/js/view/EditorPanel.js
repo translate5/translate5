@@ -45,7 +45,7 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
 	          'Editor.plugins.MatchResource.view.MatchGrid'],
     strings: {
         searchTitle: '#UT#Konkordanzsuche',
-        matchTitle:'#UT#Match Ergebnisse',
+        matchTitle:'#UT#Matchergebnisse',
         sourceEmptyText:'#UT#Quelltextsuche',
         targetEmptyText:'#UT#Zieltextsuche'
     },

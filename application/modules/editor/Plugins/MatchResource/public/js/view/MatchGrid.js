@@ -57,10 +57,13 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	           'Ext.toolbar.Toolbar'
 	],
 	strings: {
+        source: '#UT#Quelltext',
+        target: '#UT#Zieltext',
+        match: '#UT#Matchrate',
         tooltipMsg : '#UT#Diesen Match in das geöffnete Segment übernehmen.',
-        atributeTooltipMsg : '#UT#Attributes:',
-        lastEditTooltipMsg : '#UT#Last Edit:',
-        createdTooltipMsg : '#UT#Created:'
+        atributeTooltipMsg : '#UT#Attribute:',
+        lastEditTooltipMsg : '#UT#letzte Änderung:',
+        createdTooltipMsg : '#UT#erstellt:'
     },
 	stores:[
 		'Editor.plugins.MatchResource.store.TaskAssocStore'
@@ -101,12 +104,12 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	          xtype: 'gridcolumn',
 	          flex: 45/100,
 	          dataIndex: 'source',
-	          text:'Source'
+	          text: me.strings.source
 	      },{
 	          xtype: 'gridcolumn',
 	          flex: 45/100,
 	          dataIndex: 'target',
-	          text:'Target'
+	          text: me.strings.target
 	      },{
 	          xtype: 'gridcolumn',
 	          flex: 10/100,
@@ -121,7 +124,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	              meta.tdAttr += 'bgcolor="' + clr + '"';
 	              return "<b>"+(matchrate > 0 ? matchrate : '')+"</b>";
 	          },
-	          text:'Match Rate'
+	          text: me.strings.match
 	      }]
 	    };
 	    me.assocStore = instanceConfig.assocStore;
