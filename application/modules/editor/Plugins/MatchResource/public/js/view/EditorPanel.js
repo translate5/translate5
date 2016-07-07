@@ -39,9 +39,9 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.panel.Panel
  */
 Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
-	extend : 'Ext.tab.Panel',
-	alias : 'widget.tmMtIntegrationTmMtEditorPanel',
-	requires:['Editor.plugins.MatchResource.view.EditorPanelSearchGrid',
+	extend: 'Ext.tab.Panel',
+	alias: 'widget.matchResourceEditorPanel',
+	requires:['Editor.plugins.MatchResource.view.SearchGrid',
 	          'Editor.plugins.MatchResource.view.MatchGrid'],
     strings: {
         searchTitle: '#UT#Konkordanzsuche',
@@ -49,15 +49,15 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
         sourceEmptyText:'#UT#Quelltextsuche',
         targetEmptyText:'#UT#Zieltextsuche'
     },
-    itemId:'tmMtIntegrationTmMtEditorPanel',
+    itemId:'matchResourceEditorPanel',
     activeTab: 0,
     height:350,
     plain: true,
-    collapsible :true,
-	initConfig : function(instanceConfig) {
+    collapsible:true,
+	initConfig: function(instanceConfig) {
 		var me = this,
 		config = {
-			items : []// end of items
+			items: []// end of items
 		};
 		me.isAllowedMatchQuery(config,instanceConfig);
 		me.isAllowedSearchQuery(config,instanceConfig);
@@ -70,7 +70,7 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
 		if(Editor.app.authenticatedUser.isAllowed('pluginMatchResourceMatchQuery')) {
 			config.items.push({
 	             title: this.strings.matchTitle,
-	             xtype:'tmMtIntegrationMatchGrid',
+	             xtype:'matchResourceMatchGrid',
 	             assocStore:instanceConfig.assocStore,
 	         });
 		}
@@ -95,7 +95,7 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
 		            	 padding:'10 10 10 10',
 	                 }]
 	             },{
-	            	 xtype:'tmMtIntegrationEditorPanelSearchGrid',
+	            	 xtype:'matchResourceSearchGrid',
 	            	 assocStore:instanceConfig.assocStore,
 	             }]
 	         });

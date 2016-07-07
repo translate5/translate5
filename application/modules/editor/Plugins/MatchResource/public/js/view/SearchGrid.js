@@ -1,3 +1,4 @@
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -34,26 +35,51 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.MatchResource.model.Resource
- * @extends Ext.data.Model
+ * @class Editor.plugins.MatchResource.view.SearchGrid
+ * @extends Ext.grid.Panel
  */
-Ext.define('Editor.plugins.MatchResource.model.EditorQuery', {
-  extend: 'Ext.data.Model',
-  fields: [
-    {name: 'id', type: 'string'},
-    {name: 'source', type: 'string'},
-    {name: 'target', type: 'string'},
-    {name: 'matchrate', type: 'integer'},
-    {name: 'segmentId', type: 'string'},
-    {name: 'state', type: 'string'},
-    {name: 'created', type: "date", dateFormat: 'd/m/Y' },
-    {name: 'creator', type: 'string'},
-    {name: 'lastEdited', type: "date", dateFormat: 'd/m/Y' },
-    {name: 'lastEditor', type: 'string'}
-  ],
-  SERVER_STATUS_LOADED:'loaded',
-  SERVER_STATUS_LOADING: 'loading',
-  SERVER_STATUS_NORESULT: 'noresult',
-  SERVER_STATUS_SERVERERROR:'servererror',
-  SERVER_STATUS_CLIENTTIMEOUT:'clienttimeout',
+Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
+	extend : 'Ext.grid.Panel',
+	requires: [
+	           'Editor.plugins.MatchResource.view.SearchGridViewController',
+	           'Editor.plugins.MatchResource.view.SearchGridViewModel'
+	           ],
+	alias : 'widget.matchResourceSearchGrid',
+    controller: 'matchResourceSearchGrid',
+    viewModel: {
+        type: 'matchResourceSearchGrid'
+    },
+	itemId:'searchGrid',
+	assocStore : [],
+	strings: {
+	    source: '#UT#Quelltext',
+	    target: '#UT#Zieltext',
+	    match: '#UT#Matchrate'
+	},
+	initConfig: function(instanceConfig) {
+	    var me = this,
+	    config = {
+	      columns: [{
+	          xtype: 'gridcolumn',
+	          flex: 33/100,
+	          dataIndex: 'source',
+	          text: me.strings.source
+	      },{
+	          xtype: 'gridcolumn',
+	          flex: 33/100,
+	          dataIndex: 'target',
+	          text: me.strings.target
+	      },{
+	          xtype: 'gridcolumn',
+	          flex: 33/100,
+	          dataIndex: 'matchrate',
+	          text: me.strings.match
+	      }]
+	    };
+	    me.assocStore = instanceConfig.assocStore;
+	    if (instanceConfig) {
+	        me.getConfigurator().merge(me, config, instanceConfig);
+	    }
+	    return me.callParent([config]);
+	  }
 });

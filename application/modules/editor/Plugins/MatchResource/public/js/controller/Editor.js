@@ -39,24 +39,22 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.app.Controller
  */
 Ext.define('Editor.plugins.MatchResource.controller.Editor', {
-  extend : 'Ext.app.Controller',
+  extend: 'Ext.app.Controller',
   views: ['Editor.plugins.MatchResource.view.EditorPanel'],
   models:['Editor.plugins.MatchResource.model.EditorQuery'],
   refs:[{
       ref: 'matchgrid',
       selector: '#matchGrid'
   },{
-      ref : 'segmentGrid',
+      ref: 'segmentGrid',
       selector:'#segmentgrid'
   },{
       ref: 'matchrateDisplay',
       selector: '#roweditor displayfield[name=matchRate]'
   },{
-      ref : 'editorPanel',
-      selector:'#tmMtIntegrationTmMtEditorPanel'
+      ref: 'editorPanel',
+      selector:'#matchResourceEditorPanel'
   }],
-  msgDisabledMatchRate: '#UT#Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.',
-  assocStore : null,
   listen: {
       component: {
           '#segmentgrid': {
@@ -68,8 +66,8 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           '#matchGrid': {
               chooseMatch: 'setMatchInEditor'
           },
-          '#centarpanel':{
-              afterrender:'centarPanelAfterRender'
+          '#centerpanel':{
+              afterrender:'centerPanelAfterRender'
           }
       },
       controller: {
@@ -84,13 +82,9 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           }
       }
   },
-  SERVER_STATUS_STATE: {
-      LOADED:'loaded',
-      LOADING: 'loading',
-      NORESULT: 'noresult',
-      SERVERERROR:'servererror',
-      CLIENTTIMEOUT:'clienttimeout'
-  },
+  msgDisabledMatchRate: '#UT#Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.',
+  assocStore: null,
+  SERVER_STATUS: null,//initialized after centar panel is rendered
   afterInitEditor: function() {
       var task = Editor.data.task;
       if(!task.get('defaultSegmentLayout')){
@@ -99,13 +93,13 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
   },
   startEditing: function(plugin,context) {
       var me=this;
-      if(me.assocStore.totalCount > 0){
+      if(me.getAssocStoreCount() > 0){
           me.getMatchgrid().controller.startEditing(context);//(context.record.get('taskGuid'),context.value);
       }
   },
-  endEditing : function(plugin,context) {
+  endEditing: function(plugin,context) {
       var me=this;
-      if(me.assocStore.totalCount > 0){
+      if(me.getAssocStoreCount() > 0){
           me.getMatchgrid().controller.endEditing();//(context.record.get('taskGuid'),context.value);
       }
   },
@@ -116,12 +110,13 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       //    me.checkAssocStore(grid);
      // }
   //},
-  centarPanelAfterRender: function(comp){
-      var me=this;
-      var authUser = Editor.app.authenticatedUser;
+  centerPanelAfterRender: function(comp){
+      var me=this,
+          authUser = Editor.app.authenticatedUser;
       if(!Editor.data.task.isReadOnly() && (authUser.isAllowed('pluginMatchResourceMatchQuery') || authUser.isAllowed('pluginMatchResourceSearchQuery'))){
           me.checkAssocStore(comp);
       }
+      me.SERVER_STATUS = Editor.plugins.MatchResource.model.EditorQuery.prototype;
   },
   handleEditorKeyMapUsage: function(cont, area, mapOverwrite) {
       var me = this;
@@ -146,7 +141,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           rec = plug.context.record,
           matchrate = matchRecord.get('matchrate');
       
-      if(matchRecord.get('state')!=me.SERVER_STATUS_STATE.LOADED){
+      if(matchRecord.get('state')!=me.SERVER_STATUS.SERVER_STATUS_LOADED){
           return;
       }
       //we dont support the matchrate saving for tasks with alternatives:
@@ -162,7 +157,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           me.getMatchrateDisplay().setRawValue(matchrate);
       } 
   },
-  viewModeChangeEvent : function(controller){
+  viewModeChangeEvent: function(controller){
       var me = this;
       //isViewMode
       //isErgonomicMode
@@ -183,29 +178,30 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
                 filter: '[{"operator":"like","value":"'+taskGuid+'","property":"taskGuid"},{"operator":"eq","value":true,"property":"checked"}]'
             },
             callback:function(){
-                if(me.assocStore.totalCount > 0){
-                    /*grid.addDocked({
-                        xtype: 'tmMtIntegrationTmMtEditorPanel',
-                        dock:'bottom',
-                        assocStore:me.assocStore,
-                    });
-                    */
+                if(me.getAssocStoreCount() > 0){
                     comp.addDocked({
                         xtype: 'panel',
                         layout: 'fit',
                         dock: 'bottom',
                         items:[{
-                            xtype: 'tmMtIntegrationTmMtEditorPanel',
+                            xtype: 'matchResourceEditorPanel',
                             assocStore:me.assocStore,
                         }]
                     });
                 }
             },
-            scope : me
+            scope: me
       };
       me.assocStore = Ext.create('Ext.data.Store', {
           model: 'Editor.plugins.MatchResource.model.TaskAssoc'
       }),
       me.assocStore.load(prm);
+  },
+  getAssocStoreCount: function(){
+      var me=this;
+      if(me.assocStore){
+          return me.assocStore.totalCount;
+      }
+      return 0;
   }
 });
