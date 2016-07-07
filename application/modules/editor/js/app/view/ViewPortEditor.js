@@ -89,7 +89,7 @@ Ext.define('Editor.view.ViewPortEditor', {
               width: 260
           },{
               xtype: 'panel',
-              itemId:'centarpanel',
+              itemId:'centerpanel',
               title: '&nbsp;',
               region: 'center',
               layout: 'fit',
