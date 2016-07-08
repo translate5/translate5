@@ -52,17 +52,14 @@ class editor_Plugins_MatchResource_Services_Moses_Service extends editor_Plugins
     }
     
     public function __construct() {
-        $config = '[{
-                "url": "http://www.translate5.net:8124/RPC2"
-        },{
-                "url": "http://www.translate5.net:8124/RPC2"
-        }]';
-        $config = json_decode($config);
+        $config = Zend_Registry::get('config');
+        /* @var $config Zend_Config */
+        $urls = $config->runtimeOptions->plugins->MatchResource->moses->server;
         $i = 1;
         $service = $this->getServiceNamespace();
-        foreach ($config as $resConf) {
+        foreach ($urls as $url) {
             $id = $service.'_'.$i++;
-            $this->addResource([$id, 'Moses MT', $resConf]);
+            $this->addResource([$id, 'Moses MT', $url]);
         }
     }
 }

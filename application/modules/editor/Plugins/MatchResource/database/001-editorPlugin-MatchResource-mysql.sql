@@ -63,7 +63,13 @@ insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor
 insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'editor', 'frontend', 'pluginMatchResourceSearchQuery');
 
 INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
-('runtimeOptions.plugins.MatchResource.preloadedTranslationSegments', 1, 'editor', 'plugins', 3, 3, '', 'integer', 'Number of preloadet(cached) tmmt segments');
+('runtimeOptions.plugins.MatchResource.preloadedTranslationSegments', 1, 'editor', 'plugins', 3, 3, '', 'integer', 'Number of segments for which matches are preloaded (cached)');
+
+INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
+('runtimeOptions.plugins.MatchResource.moses.server', 1, 'editor', 'plugins', '[]', '[]', '', 'list', 'List of available Moses Server, example: ["http://www.translate5.net:8124/RPC2"]');
+
+INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
+('runtimeOptions.plugins.MatchResource.moses.matchrate', 1, 'editor', 'plugins', '70', '70', '', 'integer', 'Moses MT penalty value, used as default matchrate since in MT no matchrate is available');
 
 UPDATE `Zf_configuration` SET `value` = REPLACE(`value`, ']', ',"editor/plugins/resources/matchResource/plugin.css"]') 
 WHERE `name` = 'runtimeOptions.publicAdditions.css' AND `value` != '[]';

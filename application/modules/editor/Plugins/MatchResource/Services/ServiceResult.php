@@ -33,6 +33,9 @@ END LICENSE AND COPYRIGHT
  * Main Intention of this class, provide a unified response format for the different services.
  */
 class editor_Plugins_MatchResource_Services_ServiceResult {
+    const STATUS_LOADED = 'loaded';
+    const STATUS_SERVERERROR = 'servererror';
+    
     protected $defaultSource = '';
     protected $defaultMatchrate;
     
@@ -100,6 +103,8 @@ class editor_Plugins_MatchResource_Services_ServiceResult {
      * 
      * @param string $target
      * @param integer $matchrate
+     * 
+     * @return stdClass the last added result
      */
     public function addResult($target, $matchrate = 0) {
         $result = new stdClass();
@@ -109,7 +114,9 @@ class editor_Plugins_MatchResource_Services_ServiceResult {
         $result->attributes = null;
         $result->tmmtid = $this->tmmt->getId();
         
-        $result->state = "loaded";
+        $result->state = self::STATUS_LOADED;
+        
+        //FIXME
         $result->created = "25/06/2016";
         $result->creator = "Aleksandar Mitrev";
         $result->lastEdited = "25/06/2016";

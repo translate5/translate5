@@ -34,8 +34,8 @@ class editor_Plugins_MatchResource_Services_Moses_Resource extends editor_Plugin
      */
     protected $url;
     
-    public function __construct(string $id, string $name, stdClass $config) {
-        $this->url = $config->url;
+    public function __construct(string $id, string $name, string $url) {
+        $this->url = $url;
         parent::__construct($id, $name.' - '.$this->url);
         $this->filebased = false; //forced to be no filebased
     }

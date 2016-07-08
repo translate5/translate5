@@ -39,10 +39,17 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_MatchResource_Services_Moses_Connector extends editor_Plugins_MatchResource_Services_ConnectorAbstract {
     /**
-     * We assume that the best MT Match correlate this matchrate
+     * We assume that the best MT Match correlate this matchrate, given by config
      * @var integer
      */
-    const MT_BASE_MATCHRATE = 70;
+    protected $MT_BASE_MATCHRATE;
+
+    public function __construct() {
+        parent::__construct();
+        $config = Zend_Registry::get('config');
+        /* @var $config Zend_Config */
+        $this->MT_BASE_MATCHRATE = $config->runtimeOptions->plugins->MatchResource->moses->matchrate;
+    }
     
     public function addTm(string $filename){
         throw new BadMethodCallException('This Service is not filebased and cannot handle uploaded files therefore!');
@@ -67,12 +74,7 @@ class editor_Plugins_MatchResource_Services_Moses_Connector extends editor_Plugi
             'report-all-factors' => 'false',
         );
         
-        try {
-            $res = $proxy->translate($params);
-        }
-        catch(Exception $e) {
-            error_log($e);
-        }
+        $res = $this->sendToProxy($proxy, $params);
         
         $this->resultList->setDefaultSource($queryString);
         
@@ -82,6 +84,29 @@ class editor_Plugins_MatchResource_Services_Moses_Connector extends editor_Plugi
         }
         
         return [];
+    }
+    
+    /**
+     * encapsulates the call to the proxy, does exception handling
+     */
+    protected function sendToProxy($proxy, $params){
+        try {
+            return $proxy->translate($params);
+        }
+        catch(Exception $e) {
+            //In moses we will get mostly connection errors:
+            $msg = $e->getMessage();
+            if(strpos($msg, 'stream_socket_client(): unable to connect to') === 0){
+                $sepPos = strpos($msg, '; File:');
+                if($sepPos > 0) {
+                    $msg = substr($msg, 0, $sepPos);
+                }
+                $msg = str_replace('^stream_socket_client()', 'Moses Server not reachable', '^'.$msg);
+                throw new ZfExtended_Exception($msg, $e->getCode(), $e);
+            }
+            //on all errors, throw it directly
+            throw $e;
+        }
     }
     
     /**
@@ -98,7 +123,7 @@ class editor_Plugins_MatchResource_Services_Moses_Connector extends editor_Plugi
      * @param string $score
      */
     protected function calculateMatchrate($score = null) {
-        return self::MT_BASE_MATCHRATE;
+        return $this->MT_BASE_MATCHRATE;
     }
     
 }

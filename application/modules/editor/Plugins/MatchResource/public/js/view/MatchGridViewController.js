@@ -165,11 +165,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                     matchrate: '',
                     tmmtid: tmmtid,
                     segmentId: '',
-                    state: me.SERVER_STATUS.SERVER_STATUS_LOADING,
-                    created:null,
-                    creator:'',
-                    lastEdited:null,
-                    lastEditor:''
+                    state: me.SERVER_STATUS.SERVER_STATUS_LOADING
                 }]
             };
         me.cachedResults.get(segmentId).add(tmmtid,dummyObj);
@@ -187,11 +183,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                 matchrate: '',
                 tmmtid: tmmtid,
                 segmentId: '',
-                state:  me.SERVER_STATUS.SERVER_STATUS_LOADING,
-                created:null,
-                creator:'',
-                lastEdited:null,
-                lastEditor:''
+                state:  me.SERVER_STATUS.SERVER_STATUS_LOADING
             }]
         };
         me.cachedResults.get(segmentId).add(tmmtid,dummyObj);
@@ -274,11 +266,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                 rows: [{
                     source: me.strings.noresults,
                     tmmtid: tmmtid,
-                    state:  me.SERVER_STATUS.SERVER_STATUS_NORESULT,
-                    created:null,
-                    creator:'',
-                    lastEdited:null,
-                    lastEditor:''
+                    state:  me.SERVER_STATUS.SERVER_STATUS_NORESULT
                 }]
             };
         me.cachedResults.get(segmentId).add(tmmtid,noresults);
@@ -289,7 +277,9 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
         var me = controller,
             respStatusMsg = me.strings.serverErrorMsgDefault,
             strState =  me.SERVER_STATUS.SERVER_STATUS_SERVERERROR,
-            timeOut = null;
+            targetMsg = '',
+            result = {},
+            json = null;
         if(segmentId == me.editedSegmentId){
             me.getView().getStore('editorquery').remove(me.getView().getStore('editorquery').findRecord('tmmtid',tmmtid));
         }
@@ -302,23 +292,19 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                 strState = me.SERVER_STATUS.SERVER_STATUS_CLIENTTIMEOUT;
                 break;
             case 500:
+                json = Ext.JSON.decode(response.responseText);
+                targetMsg = json.errors[0]._errorMessage;
                 respStatusMsg = me.strings.serverErrorMsg500;
                 break;
         }
         
-        timeOut={
-                rows: [{
-                    source: respStatusMsg,
-                    target: '',
-                    tmmtid: tmmtid,
-                    state: strState,
-                    created:null,
-                    creator:'',
-                    lastEdited:null,
-                    lastEditor:''
-                }]
-            };
-        me.cachedResults.get(segmentId).add(tmmtid,timeOut);
+        result.rows = [{
+            source: respStatusMsg,
+            target: targetMsg,
+            tmmtid: tmmtid,
+            state: strState
+        }];
+        me.cachedResults.get(segmentId).add(tmmtid, result);
         me.loadCachedDataIntoGrid(segmentId,tmmtid);
         me.cachedResults.get(segmentId).removeAtKey(tmmtid);
     },

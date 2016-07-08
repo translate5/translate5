@@ -56,7 +56,8 @@ abstract class editor_Plugins_MatchResource_Services_ServiceAbstract {
     abstract public function getName();
     
     /**
-     * Creates a new Resource instance and adds it to the interal list
+     * Creates a new Resource instance and adds it to the internal list
+     * the given arguments are given as construct parameters to the configured resourceClass
      * @param array $constructorArgs
      */
     protected function addResource(array $constructorArgs) {
