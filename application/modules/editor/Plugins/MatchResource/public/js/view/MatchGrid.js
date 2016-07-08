@@ -78,7 +78,10 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	assocStore: [],
 	SERVER_STATUS: null,
 	viewConfig: {
-	    enableTextSelection: true
+	    enableTextSelection: true,
+	    getRowClass: function(record) {
+	        return 'match-state-'+record.get('state');
+	    }
 	},
 	initConfig: function(instanceConfig) {
 	    var me = this,
@@ -115,6 +118,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	          xtype: 'gridcolumn',
 	          flex: 10/100,
 	          dataIndex: 'matchrate',
+	          tdCls: 'matchrate',
 	          renderer: function(matchrate, meta, record) {
 	              var str =me.assocStore.findRecord('id',record.get('tmmtid'));
 	              if(matchrate > 0){
@@ -123,7 +127,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	              }
 	              clr = str.get('color');
 	              meta.tdAttr += 'bgcolor="' + clr + '"';
-	              return "<b>"+(matchrate > 0 ? matchrate : '')+"</b>";
+	              return "<b>"+(matchrate > 0 ? matchrate : '&nbsp;')+"</b>";
 	          },
 	          text: me.strings.match
 	      }]

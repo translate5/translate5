@@ -7,8 +7,18 @@
 /*
 .matchGrid .x-grid-item-selected .x-grid-item-over > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
 */
-.matchGrid tr:hover td.info-icon > div {background-image:url(images/information.png); background-repeat:no-repeat; background-position:85% 15%;}
+.matchGrid tr.match-state-loaded:hover td.info-icon > div {background-image:url(images/information.png); background-repeat:no-repeat; background-position:85% 15%;}
 
 /* Tm Overviw grid */
 .gridTmOverview .x-grid-header-ct .source-lang > div {background:url("images/sourceLanguage.png") no-repeat 6px 5px;}
 .gridTmOverview .x-grid-header-ct .target-lang > div {background:url("images/targetLanguage.png") no-repeat 6px 5px;}
+
+
+.plugin-match-resource-result-panel .match-state-loading.x-grid-row .matchrate > div {
+    background:url(../../../../modules/editor/images/loading_ico.gif) no-repeat left center;
+}
+
+.plugin-match-resource-result-panel .match-state-clienttimeout.x-grid-row .matchrate > div,
+.plugin-match-resource-result-panel .match-state-servererror.x-grid-row .matchrate > div {
+    background:url(../../../../modules/editor/images/exclamation.png) no-repeat left center;
+}
