@@ -121,17 +121,6 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
     showButtonTmOverview : function(){
         this.getHeadToolBar().down('#btnTmOverviewWindow').show();
     },
-    /**
-     * inject the plugin tab and load the task meta data set
-     *  xtype: 'button',
-        itemId: 'btnTmOverviewWindow',
-        text: 'TM Overview',
-     */
-    onParentRender: function(window) {
-        var me = this;
-        me.actualTask = window.actualTask;
-        me.getTaskTabs().add({xtype: 'tmMtIntegrationTaskAssocPanel', actualTask: me.actualTask});
-    },
     handleRenderHeadPanel: function() {
         var pos = this.getTopMenu().items.length - 1;
         this.getTopMenu().insert(pos, {

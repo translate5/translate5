@@ -40,11 +40,12 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
     extend : 'Ext.panel.Panel',
-    alias : 'widget.tmMtIntegrationTaskAssocPanel',
+    alias : 'widget.matchResourceTaskAssocPanel',
     requires: ['Editor.view.admin.TaskActionColumn'],
     cls : 'adminTaskGrid',
     title: '#UT#Matchressourcen zuweisen',
     strings: {
+        reload: '#UT#Aktualisieren',
         save: '#UT#Speichern',
         empty: '#UT#Keine Match Resource in der Sprachkombination des geöffneten Tasks verfügbar.',
         groupHeader: '#UT#Dienst: {name}',
@@ -68,10 +69,15 @@ Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
                     pack: 'start'
                 },
                 items : [{
+                    iconCls: 'ico-refresh',
+                    xtype: 'button',
+                    itemId: 'btnReload',
+                    text: me.strings.reload
+                },{
                     xtype: 'tbfill'
                 },{
                     xtype: 'button',
-                    id: 'btnSaveChanges',
+                    itemId: 'btnSaveChanges',
                     tooltip: me.strings.save,
                     text: me.strings.save
                 }]

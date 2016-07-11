@@ -42,6 +42,7 @@ Ext.define('Editor.plugins.MatchResource.model.TmMt', {
   extend: 'Ext.data.Model',
   fields: [
     {name: 'id', type: 'int'},
+    {name: 'entityVersion', type: 'integer', critical: true},
     {name: 'name', type: 'string'},
     {name: 'sourceLang', type: 'string'},
     {name: 'targetLang', type: 'string'},

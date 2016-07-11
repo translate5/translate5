@@ -84,7 +84,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
   },
   msgDisabledMatchRate: '#UT#Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.',
   assocStore: null,
-  SERVER_STATUS: null,//initialized after centar panel is rendered
+  SERVER_STATUS: null,//initialized after center panel is rendered
   afterInitEditor: function() {
       var task = Editor.data.task;
       if(!task.get('defaultSegmentLayout')){

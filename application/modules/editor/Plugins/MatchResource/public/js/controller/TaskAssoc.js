@@ -65,8 +65,11 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
           'adminTaskPreferencesWindow': {
               render: 'onParentRender'
           },
-          '#btnSaveChanges': {
+          'matchResourceTaskAssocPanel #btnSaveChanges': {
               click: 'handleOnSaveButtonClick'
+          },
+          'matchResourceTaskAssocPanel #btnReload': {
+              click: 'handleOnReload'
           }
       }
   },
@@ -76,7 +79,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
   onParentRender: function(window) {
       var me = this;
       me.actualTask = window.actualTask;
-      me.getTaskTabs().add({xtype: 'tmMtIntegrationTaskAssocPanel', actualTask: me.actualTask});
+      me.getTaskTabs().add({xtype: 'matchResourceTaskAssocPanel', actualTask: me.actualTask});
   },
   handleLoadPreferences: function(controller,task){
       var me = this,
@@ -91,6 +94,15 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
       var me = this;
       me.getGrid().store.each(me.saveOneAssocRecord, me);
   },
+  handleOnReload: function(window) {
+      var me = this;
+      me.getGrid().store.reload();
+  },
+  /**
+   * currently no easy "subentity" versioning is possible here, because of the bulk (store each) like saving / deleting.
+   * on the other hand no versioning is needed, master entity tmmt does not contain changeable values which affects the taskassoc entity
+   * The taskassocs itself can be handled by plain 404 already deleted and duplicate entry messages.
+   */
   saveOneAssocRecord: function(record){
       if(!record.dirty){
           return;
@@ -120,7 +132,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
               record.commit();
           },
           failure: function(response){
-              Editor.MessageBox.addError(str.assocSaveError);
+              Editor.app.getController('ServerException').handleException(response);
           } 
       });
   }
