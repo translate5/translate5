@@ -47,6 +47,7 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
         edit: '#UT#Bearbeiten',
         erase: '#UT#Löschen',
         resource: '#UT#Ressource',
+        color: '#UT#Farbe',
         refresh: '#UT#Aktualisieren',
         add: '#UT#hinzufügen',
     },
@@ -58,12 +59,12 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
     initConfig: function(instanceConfig) {
       var me = this,
       config = {
+          title: me.title, //see EXT6UPD-9
         	items :[{
         			xtype:'grid',
         			id:'gridTmOverview',
         			cls:'gridTmOverview',
         			store : 'Editor.plugins.MatchResource.store.TmMts',
-        			title: me.title, //see EXT6UPD-9
 			        columns: [{
 			            xtype: 'gridcolumn',
 			            width: 100,
@@ -97,7 +98,7 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
 						renderer: function(value, metaData, record) {
 			        		return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #'+record.data.color+';"></div>';
 			        	},
-			            text:'Color'
+			            text: me.strings.color
 			        },{
 			        	xtype: 'actioncolumn',
 			            width: 60,

@@ -51,6 +51,7 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
     activeTab: 0,
     height:350,
     plain: true,
+    cls: 'plugin-match-resource-result-panel',
     collapsible:true,
 	initConfig: function(instanceConfig) {
 		var me = this,

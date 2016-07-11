@@ -67,18 +67,41 @@ class editor_Plugins_MatchResource_TaskassocController extends ZfExtended_RestCo
      * @see ZfExtended_RestController::putAction()
      */
     public function putAction() {
-        //FIXME
-        //this depends on what Aleks did already
-        //possible way 1: only make PUT calls and use the tmmt ID as entity id for this controller
-        //         way 2: don't sync the grid store, but make DELETE and POST calls manually with the tmmtAssoc data
+       throw new ZfExtended_BadMethodCallException(__CLASS__.'->put');
     }
     
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::postAction()
+     */
     public function postAction(){
-        parent::postAction();
+        try {
+            parent::postAction();
+        }
+        catch(Zend_Db_Statement_Exception $e){
+            $m = $e->getMessage();
+            //duplicate entries are OK, since the user tried to create it
+            if(strpos($m,'SQLSTATE') !== 0 || stripos($m,'Duplicate entry') === false) {
+                throw $e;
+            }
+            //but we have to load and return the already existing duplicate 
+            $this->entity->loadByTaskGuidAndTm($this->data->taskGuid, $this->data->tmmtId);
+            $this->view->rows = $this->entity->getDataObject();
+        }
     }
     
     public function deleteAction(){
-        $this->entityLoad();
-        $this->entity->delete();
+        try {
+            $this->entityLoad();
+            $task = ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $task editor_Models_Task */
+            if($task->isUsed($this->entity->getTaskGuid())) {
+                throw new ZfExtended_VersionConflictException("Die Aufgabe wird bearbeitet, die Matchressource kann daher im Moment nicht gelöscht werden!");
+            }
+            $this->entity->delete();
+        }
+        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            //do nothing since it was already deleted, and thats ok since user tried to delete it
+        }
     }
 }

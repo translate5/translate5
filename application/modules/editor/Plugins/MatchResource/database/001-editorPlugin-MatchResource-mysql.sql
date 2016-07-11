@@ -29,6 +29,7 @@
 
 CREATE TABLE `LEK_matchresource_tmmt` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `entityVersion` int(11) NOT NULL DEFAULT 0 COMMENT 'automatic entity versioning',
   `name` varchar(30) DEFAULT NULL COMMENT 'human readable name of the service',
   `sourceLang` int(11) DEFAULT NULL COMMENT 'source language id',
   `targetLang` int(11) DEFAULT NULL COMMENT 'target language id',
@@ -46,6 +47,7 @@ CREATE TABLE `LEK_matchresource_taskassoc` (
   `taskGuid` varchar(38) NOT NULL,
   CONSTRAINT FOREIGN KEY (`tmmtId`) REFERENCES `LEK_matchresource_tmmt` (`id`) ON DELETE CASCADE,
   CONSTRAINT FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE,
+  UNIQUE KEY (`tmmtId`, `taskGuid`),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -63,10 +65,29 @@ insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor
 insert into Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES ('editor', 'editor', 'frontend', 'pluginMatchResourceSearchQuery');
 
 INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
-('runtimeOptions.plugins.MatchResource.preloadedTranslationSegments', 1, 'editor', 'plugins', 3, 3, '', 'integer', 'Number of preloadet(cached) tmmt segments');
+('runtimeOptions.plugins.MatchResource.preloadedTranslationSegments', 1, 'editor', 'plugins', 3, 3, '', 'integer', 'Number of segments for which matches are preloaded (cached)');
+
+INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
+('runtimeOptions.plugins.MatchResource.moses.server', 1, 'editor', 'plugins', '[]', '[]', '', 'list', 'List of available Moses Server, example: ["http://www.translate5.net:8124/RPC2"]');
+
+INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
+('runtimeOptions.plugins.MatchResource.moses.matchrate', 1, 'editor', 'plugins', '70', '70', '', 'integer', 'Moses MT penalty value, used as default matchrate since in MT no matchrate is available');
 
 UPDATE `Zf_configuration` SET `value` = REPLACE(`value`, ']', ',"editor/plugins/resources/matchResource/plugin.css"]') 
 WHERE `name` = 'runtimeOptions.publicAdditions.css' AND `value` != '[]';
 
 UPDATE `Zf_configuration` SET `value` = '["editor/plugins/resources/matchResource/plugin.css"]' 
 WHERE `name` = 'runtimeOptions.publicAdditions.css' AND `value` = '[]';
+
+
+-- trigger for tmmt versioning
+
+ DELIMITER |
+  CREATE TRIGGER LEK_matchresource_tmmt_versioning BEFORE UPDATE ON LEK_matchresource_tmmt
+      FOR EACH ROW 
+        IF OLD.entityVersion = NEW.entityVersion THEN 
+          SET NEW.entityVersion = OLD.entityVersion + 1;
+        ELSE 
+          CALL raise_version_conflict; 
+        END IF|
+  DELIMITER ;
