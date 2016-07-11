@@ -45,9 +45,7 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
 	          'Editor.plugins.MatchResource.view.MatchGrid'],
     strings: {
         searchTitle: '#UT#Konkordanzsuche',
-        matchTitle:'#UT#Matchergebnisse',
-        sourceEmptyText:'#UT#Quelltextsuche',
-        targetEmptyText:'#UT#Zieltextsuche'
+        matchTitle:'#UT#Matchergebnisse'
     },
     itemId:'matchResourceEditorPanel',
     activeTab: 0,
@@ -80,21 +78,6 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
 			config.items.push({
 	             title: this.strings.searchTitle,
 	             items:[{
-	            	 xtype: 'container',
-	                 anchor: '100%',
-	                 layout:'column',
-	                 items:[{
-	                	 xtype:'textfield',
-	                	 dataIndex:'sourceSearch',
-	                	 emptyText:this.strings.sourceEmptyText,
-	                	 padding:'10 10 10 10',
-	                 },{
-	                	 xtype:'textfield',
-		            	 dataIndex:'targetSearch',
-		            	 emptyText:this.strings.targetEmptyText,
-		            	 padding:'10 10 10 10',
-	                 }]
-	             },{
 	            	 xtype:'matchResourceSearchGrid',
 	            	 assocStore:instanceConfig.assocStore,
 	             }]
