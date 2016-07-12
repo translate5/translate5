@@ -55,7 +55,8 @@ Ext.define('Editor.view.segments.MetaPanel', {
     item_metaQm_title: '#UT#QM',
     item_metaStates_title: '#UT#Status',
     item_metaTerms_title: '#UT#Terminologie',
-    item_metaStates_tooltip: '#UT#Segment auf den ausgewählten Status setzen (STRG + ALT + {0})',
+    item_metaStates_tooltip: '#UT#Segment auf den ausgewählten Status setzen (ALT + S danach {0})',
+    item_metaStates_tooltip_nokey: '#UT#Segment auf den ausgewählten Status setzen',
     
     initComponent: function() {
       var me = this;
@@ -133,11 +134,18 @@ Ext.define('Editor.view.segments.MetaPanel', {
           counter = 1;
       
       Ext.each(flags, function(item){
+          var tooltip; 
+          if(counter < 10) {
+              tooltip = Ext.String.format(me.item_metaStates_tooltip, counter++);
+          }
+          else {
+              tooltip = me.item_metaStates_tooltip_nokey;
+          }
         stati.add({
           name: 'stateId',
           anchor: '100%',
           inputValue: item.id,
-          boxLabel: '<span data-qtip="'+Ext.String.format(me.item_metaStates_tooltip, counter++)+'">'+item.label+'</span>'
+          boxLabel: '<span data-qtip="'+tooltip+'">'+item.label+'</span>'
         });
       });
     },

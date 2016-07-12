@@ -49,6 +49,7 @@ Ext.define('Editor.controller.Editor', {
       segmentReset: '#UT#Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.',
       segmentNotBuffered: '#UT#Das nächste / vorherige Segment wird noch geladen, bitte versuchen Sie es erneut.',
       segmentsChanged: '#UT#Die Sortierung bzw. Filterung wurde geändert, es kann kein nächstes / vorheriges Segment ausgewählt werden.',
+      segmentsChangedJump: '#UT#Die Sortierung bzw. Filterung wurde geändert, es kann nicht zum aktuellen Segment zurück gesprungen werden.',
       f2FirstOpened: '#UT#Das erste bearbeitbare Segment wurde geöffnet, da kein anderes Segment ausgewählt war.',
       f2Readonly: '#UT#Das ausgewählte Segment ist nicht bearbeitbar!',
       errorTitle: '#UT# Fehler bei der Segment Validierung!',
@@ -68,8 +69,15 @@ Ext.define('Editor.controller.Editor', {
   }],
   isEditing: false,
   keyMapConfig: null,
+  editorKeyMap: null,
+  generalKeyMap: null,
   prevNextSegment: null,
   listen: {
+      controller: {
+          '#Editor.$application': {
+              editorViewportClosed: 'clearKeyMaps'
+          }
+      },
       component: {
           '#metapanel metapanelNavi #watchSegmentBtn' : {
               click : 'toggleWatchSegment'
@@ -92,6 +100,10 @@ Ext.define('Editor.controller.Editor', {
   init : function() {
       var me = this;
       
+      Ext.override("Ext.util.KeyMap",{
+          handleTargetEvent: Editor.view.segments.EditorKeyMap.handleTargetEvent
+      });
+      
       //set the default config
       me.keyMapConfig = {
           'ctrl-d':         ["D",{ctrl: true, alt: false}, me.toggleWatchSegment, true],
@@ -100,7 +112,6 @@ Ext.define('Editor.controller.Editor', {
           'ctrl-enter':     [[10,13],{ctrl: true, alt: false}, me.saveNextByWorkflow],
           'ctrl-alt-enter': [[10,13],{ctrl: true, alt: true, shift: false}, me.saveNext],
           'ctrl-alt-shift-enter': [[10,13],{ctrl: true, alt: true, shift: true}, me.savePrevious],
-          'ctrl-alt-DIGIT': [me.DEC_DIGITS.slice(1),{ctrl: true, alt: true, shift: false}, me.handleChangeState],
           'esc':            [Ext.EventObjectImpl.ESC, null, me.cancel],
           'ctrl-alt-left':  [Ext.EventObjectImpl.LEFT,{ctrl: true, alt: true}, me.goToLeft],
           'ctrl-alt-right': [Ext.EventObjectImpl.RIGHT,{ctrl: true, alt: true}, me.goToRight],
@@ -109,12 +120,13 @@ Ext.define('Editor.controller.Editor', {
           'alt-del':        [Ext.EventObjectImpl.DELETE,{ctrl: false, alt: true}, me.resetSegment],
           'ctrl-alt-up':    [Ext.EventObjectImpl.UP,{ctrl: true, alt: true}, me.goToUpperNoSave, true],
           'ctrl-alt-down':  [Ext.EventObjectImpl.DOWN,{ctrl: true, alt: true}, me.goToLowerNoSave, true],
-          'ctrl-alt-c':     ["C",{ctrl: true, alt: true}, me.handleOpenComments, true],
+          'alt-c':          ["C",{ctrl: false, alt: true}, me.handleOpenComments, true],
+          'alt-s':          ["S",{ctrl: false, alt: true}, me.handleDigitPreparation(me.handleChangeState), true],
           'alt-DIGIT':      [me.DEC_DIGITS,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
+          'DIGIT':          [me.DEC_DIGITS,{ctrl: false, alt: false}, me.handleDigit],
           'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
           'pos1':           null //add empty pos1 handler here, so that the overwrite is processed
       };
-      
   },
   /**
    * track isEditing state 
@@ -136,8 +148,8 @@ Ext.define('Editor.controller.Editor', {
       me.relayEvents(me.prevNextSegment, ['prevnextloaded']);
       
       //reset the store next/prev information if data changed
-      me.getSegmentGrid().store.on('filterchange', me.prevNextSegment.handleSortOrFilter, me.prevNextSegment);
-      me.getSegmentGrid().store.on('sort', me.prevNextSegment.handleSortOrFilter, me.prevNextSegment);
+      me.getSegmentGrid().store.on('filterchange', me.handleSortOrFilter, me);
+      me.getSegmentGrid().store.on('sort', me.handleSortOrFilter, me);
       
       /**
        * disable the column show / hide menu while editing a segment (EXT6UPD-85)
@@ -149,23 +161,34 @@ Ext.define('Editor.controller.Editor', {
           }
       });
       
-      new Ext.util.KeyMap(Ext.getDoc(), me.getKeyMapConfig('application', {
+      me.generalKeyMap = new Ext.util.KeyMap(Ext.getDoc(), me.getKeyMapConfig('application', {
           'pos1': [Ext.EventObjectImpl.HOME,{ctrl: false, alt: false}, me.handleHomeKeyPress, true],
-          'ctrl-alt-c':     ["C",{ctrl: true, alt: true}, function(key, e){
+          'alt-c':     ["C",{ctrl: false, alt: true}, function(key, e){
               var me = this;
+              e.stopEvent();
               if(me.isEditing) {
                   me.handleOpenComments();
-                  return;
+                  return false;
               }
-              e.preventDefault();
-              e.stopEvent();
-              var found = Ext.select('#segment-grid-body .x-grid-row-selected td.comments-field img').first();
+              var found = Ext.select('#segment-grid-body .x-grid-item-selected td.comments-field img').first();
               if(found && (found.hasCls('add') || found.hasCls('edit'))){
                   found.dom.click();
               }
+              return false;
           }]
       }));
   },
+  
+  handleSortOrFilter: function() {
+      var me = this,
+          plug = me.getEditPlugin();
+      
+      me.prevNextSegment.handleSortOrFilter();
+      if(plug.editor && plug.editor.context) {
+          plug.editor.context.reordered = true;
+      }
+  },
+  
   /**
    * initializes the roweditor moveable tooltip
    */
@@ -249,7 +272,6 @@ Ext.define('Editor.controller.Editor', {
           if(item[3]) {
               //prepends the event propagation stopper
               confObj.fn = function(key, e) {
-                  e.preventDefault();
                   e.stopEvent();
                   item[2].apply(confObj.scope, arguments);
               }
@@ -269,10 +291,22 @@ Ext.define('Editor.controller.Editor', {
       var me = this,
           docEl = Ext.get(editor.getDoc());
 
-      new Editor.view.segments.EditorKeyMap({
+      if(me.editorKeyMap) {
+          me.editorKeyMap.destroy();
+      }
+      me.editorKeyMap = new Editor.view.segments.EditorKeyMap({
         target: docEl,
         binding: me.getKeyMapConfig()
       });
+  },
+  clearKeyMaps: function() {
+      var me = this;
+      if(me.editorKeyMap) {
+          me.editorKeyMap.destroy();
+          me.editorKeyMap = null;
+      }
+      me.generalKeyMap.destroy();
+      me.generalKeyMap = null;
   },
   buttonClickDispatcher: function(btn, e) {
       var me = this,
@@ -296,6 +330,31 @@ Ext.define('Editor.controller.Editor', {
           me.fireEvent('saveUnsavedComments');
           me.fireEvent('saveSegment');
       }
+  },
+  /**
+   * Special Universal preparation Handler for pressing DIGIT keys
+   * A preparation keyboard shortcut can be defined, for example ALT-S. 
+   * If ALT-S is pressed, then if the next key is a DIGIT the given 
+   * digithandler will be called with the preseed DIGIT.
+   * @param {Function} must be function in the controller scope, since scope parameter is not supported
+   */
+  handleDigitPreparation: function(digithandler) {
+      this.digitHandler = digithandler;
+      return function(key, event) {
+          event.isDigitPreparation = true;
+          event.stopEvent();
+          return false;
+      };
+  },
+  /**
+   * Digit handler, does only something if a DIGIT preparation shortcut was pressed directly before.
+   */
+  handleDigit: function(k, e) {
+      if(e.lastWasDigitPreparation){
+          e.stopEvent();
+          this.digitHandler(k, e);
+          return false;
+      } 
   },
   /**
    * Moves to the next row without saving current record
@@ -498,9 +557,15 @@ Ext.define('Editor.controller.Editor', {
   /**
    * Handles pressing the keyboard shortcuts for changing the segment state
    */
-  handleChangeState: function(key) {
+  handleChangeState: function(key, e) {
       var param = Number(key) - 48;
+      //we ignore 0, since this is no valid state
+      if(param === 0){
+          return false;
+      }
       this.fireEvent('changeState', param);
+      e.stopEvent();
+      return false;
   },
   /**
    * Handles pressing the comment keyboard shortcut
@@ -653,6 +718,10 @@ Ext.define('Editor.controller.Editor', {
           plug = me.getEditPlugin();
       e.preventDefault();
       e.stopEvent();
+      if(plug.editor.context.reordered) {
+          Editor.MessageBox.addInfo(me.messages.segmentsChangedJump);
+          return;
+      }
       plug.editor.setMode(plug.self.STARTEDIT_SCROLLUNDER);
       plug.editor.initialPositioning();
   },

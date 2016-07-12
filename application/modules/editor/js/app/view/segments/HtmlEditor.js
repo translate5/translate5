@@ -159,11 +159,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       me.setValue(me.markup(value)+checkTag);
   },
   /**
-   * Fixing focus issues EXT6UPD-105
+   * Fixing focus issues EXT6UPD-105 and EXT6UPD-137
    */
   privates: {
       getFocusEl: function() {
-          return Ext.fly(this.getEditorBody());
+          return Ext.isGecko ? this.iframeEl : Ext.fly(this.getEditorBody());
       }
   },
   /**

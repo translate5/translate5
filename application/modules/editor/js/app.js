@@ -243,8 +243,12 @@ Ext.application({
   browserAdvice: function() {
       var me = this,
           supportedBrowser = false;
-      if(Ext.isIE) {
-          Editor.MessageBox.addInfo(me.browserAdviceTextIE, Ext.isIE8m ? -1 : false);
+      if(Ext.isIE8m) {
+          Editor.MessageBox.addInfo(me.browserAdviceTextIE, -1);
+          return;
+      }
+      if(Ext.isIE && Editor.data.browserAdvice) {
+          Editor.MessageBox.addInfo(me.browserAdviceTextIE);
           return;
       }
       //Feature disabled
