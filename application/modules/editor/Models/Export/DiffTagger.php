@@ -84,11 +84,13 @@ abstract class editor_Models_Export_DiffTagger {
      * 
      */
     abstract public function diffSegment($target, $edited,$changeTimestamp,$userName);
+    
     /**
      * Zerlegt die Wortteile des segment-Arrays anhand der Wortgrenzen in ein Array,
      * welches auch die Worttrenner als jeweils eigene Arrayelemente enthält
      * 
-     * - parst nur die geraden Arrayelemente, denn dies sind die Wortbestandteile
+     * - parst nur die geraden Arrayelemente, denn dies sind die Wortbestandteile 
+     *   (aber nur weil tagBreakUp davor aufgerufen wurde und sonst das array nicht in der Struktur verändert wurde)
      * 
      * @param array $segment
      * @return array $segment
@@ -97,8 +99,9 @@ abstract class editor_Models_Export_DiffTagger {
         $config = Zend_Registry::get('config');
         $regexWordBreak = $config->runtimeOptions->editor->export->wordBreakUpRegex;
         
-		 //$splitCharaceters = "\s+|(\s[.*()[]:;,'#+=?!$%&\"{}¡]+)|([.*()[]:;,'#+=?!$%&\"{}¡]+\s)|([.*()[]:;,'#+=?!$%&\"{}¡)]+$)|(^[.*()[]:;,'#+=?!$%&\"{}¡]+)";
-        //parse nur die geraden Arrayelemente, denn dies sind die Wortbestandteile
+        //by adding the count($split) and the $i++ only the array entries containing text (no tags) are parsed
+        //this implies that only tagBreakUp may be called before and 
+        // no other array structure manipulating method may be called between tagBreakUp and wordBreakUp!!!
         for ($i = 0; $i < count($segment); $i++) {
             $split = preg_split($regexWordBreak, $segment[$i], NULL, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
             array_splice($segment, $i, 1, $split);
@@ -106,9 +109,12 @@ abstract class editor_Models_Export_DiffTagger {
         }
         return $segment;
     }
+    
     /**
-     * Zerlegt Segmentstring anhand der Wortgrenzen in ein Array,
-     * welches auch die Worttrenner als jeweils eigene Arrayelemente enthält
+     * splits the segment up into HTML tags / entities on one side and plain text on the other side
+     * The order in the array is important for the following wordBreakUp, since there are HTML tags and entities ignored.
+     * Caution: The ignoring is done by the array index calculation there!
+     * So make no array structure changing things between word and tag break up! 
      * 
      * @param string $segment
      * @return array $segment

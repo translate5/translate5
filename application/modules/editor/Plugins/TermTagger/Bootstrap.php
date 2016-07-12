@@ -49,7 +49,10 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
      */
     private $sourceFieldNameOriginal = '';
     
-    
+    /**
+     * @var editor_Plugins_TermTagger_RecalcTransFound
+     */
+    private $markTransFound = null;
     
     public function init() {
         $this->log = ZfExtended_Factory::get('ZfExtended_Log', array(false));
@@ -65,6 +68,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('editor_Workflow_Default', array('doView', 'doEdit'), array($this, 'handleAfterTaskOpen'));
         $this->eventManager->attach('Editor_SegmentController', 'beforePutSave', array($this, 'handleBeforePutSave'));
         $this->eventManager->attach('Editor_IndexController', 'afterApplicationstateAction', array($this, 'termtaggerStateHandler'));
+        $this->eventManager->attach('Editor_AlikesegmentController', 'beforeSaveAlike', array($this, 'handleBeforeSaveAlike'));
     }
     
     /**
@@ -277,5 +281,36 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $termtagger->running = $running;
         $termtagger->version = $version;
         return $termtagger;
+    }
+    
+    /**
+     * When using change alikes, the transFound information in the source has to be changed.
+     * This is done by this handler.
+     * 
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleBeforeSaveAlike(Zend_EventManager_Event $event) {
+        $isSourceEditable = (boolean) $event->getParam('isSourceEditable');
+        $masterSegment = $event->getParam('masterSegment');
+        /* @var $masterSegment editor_Models_Segment */
+        $alikeSegment = $event->getParam('alikeSegment');
+        /* @var $alikeSegment editor_Models_Segment */
+        
+        // take over source original only for non editing source, see therefore TRANSLATE-549
+        // Attention for alikes and if source is editable:
+        //   - the whole content (including term trans[Not]Found info) must be changed in the editable field, 
+        //     this is done in the AlikeController
+        //   - in the original only the transFound infor has to be updated, this is done here
+        
+        //lazy instanciation of markTransFound
+        if(empty($this->markTransFound)) {
+            $task = ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $task editor_Models_Task */
+            $task->loadByTaskGuid($masterSegment->getTaskGuid());
+            $this->markTransFound = ZfExtended_Factory::get('editor_Plugins_TermTagger_RecalcTransFound', array($task));
+        }
+        $sourceOrig = $alikeSegment->getSource();
+        $targetEdit = $alikeSegment->getTargetEdit();
+        $alikeSegment->setSource($this->markTransFound->recalc($sourceOrig, $targetEdit));
     }
 }

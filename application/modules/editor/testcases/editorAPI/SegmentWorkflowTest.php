@@ -54,7 +54,7 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         $api->import($task);
         
         //FIXME improve this test by using two lector users to test after all finish with multiple users
-        
+        $api->reloadTask();
         $api->addUser('testlector');
         $api->reloadTask();
         $api->addUser('testtranslator', 'waiting', 'translator');

@@ -119,7 +119,7 @@ Ext.define('Editor.controller.Localizer', {
     
     Ext.app.Application.prototype.browserAdviceTextTitle = '<?php echo $this->translate->_('Nicht unterstützte Browser-Version');?>';
     Ext.app.Application.prototype.browserAdviceText = '<?php echo $disclaimer;?>';
-    Ext.app.Application.prototype.browserAdviceTextIE = '<?php echo $this->translate->_('Sie benutzen Internet Explorer. <br />Bitte wechseln Sie auf einen moderneren Browser um die Anwendung mit voller Leistung nutzen zu können. <br />Am besten nutzen Sie Google Chrome, Firefox oder Safari - neuere Internet Explorer Versionen werden zwar unterstützt, sind aber ebenfalls veraltet und sehr langsam.');?>';
+    Ext.app.Application.prototype.browserAdviceTextIE = '<?php echo $this->translate->_('Sie nutzen Internet Explorer. Dieser Browser wird von Version 9 bis 11 unterstützt, ist allerdings sehr langsam. Um die Anwendung in optimaler Performance nutzen zu können, empfehlen wir daher Google Chrome, Firefox oder Safari als Browser.');?>';
 
     Editor.view.ViewPortEditor.prototype.items_west_title = '<?php echo $this->translate->_('Dateien');?>';
   	Editor.view.segments.Grid.prototype.title = '<?php echo $this->translate->_('Segmentliste und Editor');?>';
@@ -150,7 +150,7 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.segments.column.Comments.prototype.text = '<?php echo $this->translate->_('Kommentare');?>';
   	Editor.view.segments.column.Comments.prototype.text_morecomments = '<?php echo $this->translate->_('({0} weitere Kommentare)');?>';
   	Editor.view.segments.column.Comments.prototype.text_morecomment = '<?php echo $this->translate->_('({0} weiterer Kommentar)');?>';
-  	Editor.view.segments.column.Comments.prototype.text_tooltip_icon = '<?php echo $this->translate->_('Dem ausgewählten Segment einen Kommentar hinzufügen. (STRG + ALT + c)');?>';
+  	Editor.view.segments.column.Comments.prototype.text_tooltip_icon = '<?php echo $this->translate->_('Dem ausgewählten Segment einen Kommentar hinzufügen. (ALT + C)');?>';
   	
     Ext.define("Editor.locale.de.controller.ViewModes", {
         override: "Editor.controller.ViewModes",
@@ -196,9 +196,10 @@ Ext.define('Editor.controller.Localizer', {
 
     Editor.view.segments.MetaPanel.prototype.title = '<?php echo $this->translate->_('Segment-Metadaten');?>';
     Editor.view.segments.MetaPanel.prototype.item_metaQm_title = '<?php echo $this->translate->_('QM');?>';
-  	Editor.view.segments.MetaPanel.prototype.item_metaStates_title = '<?php echo $this->translate->_('Status');?>';
-  	Editor.view.segments.MetaPanel.prototype.item_metaTerms_title = '<?php echo $this->translate->_('Terminologie');?>';
-  	Editor.view.segments.MetaPanel.prototype.item_metaStates_tooltip = '<?php echo $this->translate->_('Segment auf den ausgewählten Status setzen (STRG + ALT + {0})');?>';
+    Editor.view.segments.MetaPanel.prototype.item_metaStates_title = '<?php echo $this->translate->_('Status');?>';
+    Editor.view.segments.MetaPanel.prototype.item_metaTerms_title = '<?php echo $this->translate->_('Terminologie');?>';
+    Editor.view.segments.MetaPanel.prototype.item_metaStates_tooltip = '<?php echo $this->translate->_('Segment auf den ausgewählten Status setzen (ALT + S danach {0})');?>';
+    Editor.view.segments.MetaPanel.prototype.item_metaStates_tooltip_nokey = '<?php echo $this->translate->_('Segment auf den ausgewählten Status setzen');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_cancel = '<?php echo $this->translate->_('Abbrechen (ESC)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_save = '<?php echo $this->translate->_('Speichern (STRG + S)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_reset = '<?php echo $this->translate->_('Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)');?>';
@@ -223,6 +224,7 @@ Ext.define('Editor.controller.Localizer', {
             segmentReset: '<?php echo $this->translate->_('Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.');?>',
             segmentNotBuffered: '<?php echo $this->translate->_('Das nächste / vorherige Segment wird noch geladen, bitte versuchen Sie es erneut.');?>',
             segmentsChanged: '<?php echo $this->translate->_('Die Sortierung bzw. Filterung wurde geändert, es kann kein nächstes / vorheriges Segment ausgewählt werden.');?>',
+            segmentsChangedJump: '<?php echo $this->translate->_('Die Sortierung bzw. Filterung wurde geändert, es kann nicht zum aktuellen Segment zurück gesprungen werden.');?>',
             f2FirstOpened: '<?php echo $this->translate->_('Das erste bearbeitbare Segment wurde geöffnet, da kein anderes Segment ausgewählt war.');?>',
             f2Readonly: '<?php echo $this->translate->_('Das ausgewählte Segment ist nicht bearbeitbar!');?>',
             errorTitle: '<?php echo $this->translate->_('Fehler bei der Segment Validierung!');?>',
