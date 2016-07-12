@@ -41,7 +41,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.MatchResource.controller.Editor', {
   extend: 'Ext.app.Controller',
   views: ['Editor.plugins.MatchResource.view.EditorPanel'],
-  models:['Editor.plugins.MatchResource.model.EditorQuery'],
+  models:['Editor.plugins.MatchResource.model.EditorQuery','Editor.plugins.MatchResource.model.TaskAssoc'],
   refs:[{
       ref: 'matchgrid',
       selector: '#matchGrid'
