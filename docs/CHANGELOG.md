@@ -3,6 +3,26 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.4.9] - 2016-06-02
+### Changed
+TRANSLATE-678: Diff Export is destroying entities in certain rare cases
+TRANSLATE-670: Keyboard short cut collision under windows: 
+                CTRL + ALT + DIGIT changed to ALT + S and then DIGIT
+                CTRL + ALT + C changed ALT + C
+TRANSLATE-631: ExtJS6 Update, fixes (related to keyboard shortcuts)
+TRANSLATE-682: translate5 export contains closing div tags from termtagger: PORTAL-88
+TRANSLATE-683: repetition editor changes the source, even if it is non-editable
+TRANSLATE-686: Autostate calculation in ChangeAlike handling is wrong in some circumstances
+
+
+## [2.4.8] - 2016-05-06
+### Added
+integrate crowdfunding success in frontpage
+
+### Changed
+TRANSLATE-631: ExtJS6 Update, fixes (IE-warnmessage, errors related to shortcut CTRL-G)
+
+
 ## [2.4.7] - 2016-04-25
 ### Added
 TRANSLATE-679: Notify User about outdated browser
