@@ -67,9 +67,6 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
             '#editorcontroller': {
                 prevnextloaded:'calculateRows'
             },
-            '#Editor.$application': {
-                editorViewportOpened: 'handleInitEditor'//FIXME the event is not fiered (maybe becouse the view controller is init after the event ?)
-      	    },
             '#ViewModes':{
                 viewModeChanged:'viewModeChangeEvent'//FIXME it is beter to hook up on this event or define a boolen variable in Editor
             }
@@ -85,6 +82,18 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
     firstEditableRow: -1,
     NUMBER_OF_CHACHED_SEGMENTS:10,
     ergonomicMode: false,
+    /**
+     * if segment store was already loaded before, we have to set the firstEditableRow in here too
+     */
+    init: function() {
+    	var me = this,
+    		firstEditableRow = Ext.StoreManager.get('Segments').getFirsteditableRow();
+        me.assocStore = me.getView().assocStore;
+        me.SERVER_STATUS=Editor.plugins.MatchResource.model.EditorQuery.prototype;
+		if(firstEditableRow != null) {
+			me.setFirsEditableRow(firstEditableRow);
+		}
+    },
     startEditing: function(context) {
     	var me = this;
     	me.editedSegmentId = context.record.id;
@@ -99,15 +108,13 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
     	me.editedSegmentId = -1;
     	me.getView().getStore('editorquery').removeAll();
 	},
+	/**
+	 * on each segment store load update the firstEditableRow info, needed for match result preloading
+	 */
     onSegmentStoreLoad: function (store, records) {
         var me = this,
             er =store.getFirsteditableRow();
         me.setFirsEditableRow(er);
-        me.assocStore = me.getView().assocStore;
-        me.SERVER_STATUS=Editor.plugins.MatchResource.model.EditorQuery.prototype;
-    },
-    handleInitEditor: function() {
-        
     },
     calculateRows: function(controller){
         var me = this,
@@ -248,6 +255,9 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
             }
         }
     },
+    /**
+     * fires the cooseMatch event when the users chooses one specific match
+     */
     chooseMatch: function(view, record) {
         this.getView().fireEvent('chooseMatch', record);
     },
