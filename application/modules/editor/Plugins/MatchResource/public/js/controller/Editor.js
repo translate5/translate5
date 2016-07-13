@@ -147,7 +147,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           return;
       }
       //we dont support the matchrate saving for tasks with alternatives:
-      if(!task.get('defaultSegmentLayout')) {
+      if(!task.get('defaultSegmentLayout') || editor.isSourceEditing()) {
           return;
       }
       
