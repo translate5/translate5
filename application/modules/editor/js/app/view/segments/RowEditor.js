@@ -94,6 +94,11 @@ Ext.define('Editor.view.segments.RowEditor', {
         form.trackResetOnLoad = true;
         form.on('errorchange', me.onErrorChange, me);
     },
+
+    isSourceEditing: function() {
+        return this.columnToEdit == "sourceEdit";
+    },
+
     /**
      * @override to add onItemAdd handler
      */
