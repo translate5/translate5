@@ -84,6 +84,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       }
   },
   msgDisabledMatchRate: '#UT#Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.',
+  msgDisabledSourceEdit: '#UT#Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.',
   assocStore: null,
   SERVER_STATUS: null,//initialized after center panel is rendered
   afterInitEditor: function() {
@@ -146,10 +147,13 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       if(matchRecord.get('state')!=me.SERVER_STATUS.SERVER_STATUS_LOADED){
           return;
       }
-      //we dont support the matchrate saving for tasks with alternatives:
-      if(!task.get('defaultSegmentLayout') || editor.isSourceEditing()) {
+      
+      //don't take over the match when the source column is edited
+      if(editor.isSourceEditing()) {
+          Editor.MessageBox.addWarning(this.msgDisabledSourceEdit);
           return;
       }
+      
       
       if(plug.editing && rec && rec.get('editable')) {
           //Editor.MessageBox.addInfo("Show a message on take over content?");
@@ -158,9 +162,13 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           contentTags = sc.getContentTags().join('');
                     
           editor.mainEditor.setValueAndMarkup(matchRecord.get('target')+contentTags, rec.get('id'), editor.columnToEdit);
-          rec.set('matchRate', matchrate);
-          rec.set('matchRateType', 'matchresourceusage'); 
-          me.getMatchrateDisplay().setRawValue(matchrate);
+          
+          //we dont support the matchrate saving for tasks with alternatives:
+          if(!task.get('defaultSegmentLayout')) {
+              rec.set('matchRate', matchrate);
+              rec.set('matchRateType', 'matchresourceusage'); 
+              me.getMatchrateDisplay().setRawValue(matchrate);
+          }
       } 
   },
   viewModeChangeEvent: function(controller){
