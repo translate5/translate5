@@ -69,11 +69,11 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
             },
             '#Editor.$application': {
                 editorViewportOpened: 'handleInitEditor'//FIXME the event is not fiered (maybe becouse the view controller is init after the event ?)
-      	    },
+            },
             '#ViewModes':{
                 viewModeChanged:'viewModeChangeEvent'//FIXME it is beter to hook up on this event or define a boolen variable in Editor
             }
-      	}
+        }
     },
     SERVER_STATUS: null,//initialized after the segments stor is loaded
     assocStore: null,
@@ -86,18 +86,16 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
     NUMBER_OF_CHACHED_SEGMENTS:10,
     ergonomicMode: false,
     startEditing: function(context) {
-    	var me = this;
-    	me.editedSegmentId = context.record.id;
-        
-    	//me.loadCachedDataIntoGrid(context.record.id,-1);
-        
+        var me = this;
+        me.editedSegmentId = context.record.id;
+        //me.loadCachedDataIntoGrid(context.record.id,-1);
         me.cacheSegmentIndex = new Array();
         me.cacheSegmentIndex.push(context.rowIdx);
     },
     endEditing: function() {
-    	var me = this;
-    	me.editedSegmentId = -1;
-    	me.getView().getStore('editorquery').removeAll();
+        var me = this;
+        me.editedSegmentId = -1;
+        me.getView().getStore('editorquery').removeAll();
 	},
     onSegmentStoreLoad: function (store, records) {
         var me = this,
@@ -107,7 +105,6 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
         me.SERVER_STATUS=Editor.plugins.MatchResource.model.EditorQuery.prototype;
     },
     handleInitEditor: function() {
-        
     },
     calculateRows: function(controller){
         var me = this,
@@ -134,14 +131,12 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
     cache: function(){
         var me = this,
         segments = Ext.data.StoreManager.get('Segments');
-        
         for(var i=0;i<me.cacheSegmentIndex.length;i++){
             var segment = segments.getAt(me.cacheSegmentIndex[i]),
                 segId = segment.get('id');
-            
-            if(segId == this.editedSegmentId)
+            if(segId == this.editedSegmentId){
                 me.getView().getStore('editorquery').removeAll();
-            
+            }
             if(me.cachedResults.get(segId)){
                 me.loadCachedDataIntoGrid(segId,-1,segment.get('source'));
                 continue;
@@ -191,8 +186,8 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
         me.sendRequest(segmentId, query, tmmtid);
     },
     sendRequest: function(segmentId,query,tmmtid) {
-    	var me = this;
-    	Ext.Ajax.request({
+        var me = this;
+        Ext.Ajax.request({
             url:Editor.data.restpath+'plugins_matchresource_tmmt/'+tmmtid+'/query',
                 method: "POST",
                 params: {
@@ -209,16 +204,16 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                     me.handleRequestFailure(me, response, segmentId, tmmtid);
                 }
         });
-	},
+    },
     loadCachedDataIntoGrid: function(segmentId,tmmtid,query) {
-    	if(segmentId != this.editedSegmentId){
-    		return;
-    	}
-    	var me = this;
-		if(me.cachedResults.get(segmentId)){
-		    var res =me.cachedResults.get(segmentId);
-		    if(tmmtid < 0){
-		        me.assocStore.each(function(record){
+        if(segmentId != this.editedSegmentId){
+            return;
+        }
+        var me = this;
+        if(me.cachedResults.get(segmentId)){
+            var res =me.cachedResults.get(segmentId);
+            if(tmmtid < 0){
+                me.assocStore.each(function(record){
                     if(res.get(record.get('id'))){
                         var rcd =res.get(record.get('id')).rows;
                         me.getView().getStore('editorquery').loadRawData(rcd,true);
@@ -226,15 +221,15 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                         me.cacheSingleMatchPanelResults(record,segmentId,query);
                     }
                 });
-		        return;
-		    }
-		    if(res.get(tmmtid)){
-		        me.getView().getStore('editorquery').loadRawData(res.get(tmmtid).rows,true);
-		    }
-	       me.handleViwMode();
-	    }
-	},
-	setFirsEditableRow: function(fer) {
+                return;
+            }
+            if(res.get(tmmtid)){
+                me.getView().getStore('editorquery').loadRawData(res.get(tmmtid).rows,true);
+            }
+            me.handleViwMode();
+        }
+    },
+    setFirsEditableRow: function(fer) {
         var me = this;
         me.cacheSegmentIndex = new Array();
         me.cacheSegmentIndex.push(fer);

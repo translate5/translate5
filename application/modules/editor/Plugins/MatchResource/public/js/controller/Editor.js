@@ -145,7 +145,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           return;
       }
       //we dont support the matchrate saving for tasks with alternatives:
-      if(!task.get('defaultSegmentLayout')) {
+      if(!task.get('defaultSegmentLayout') || editor.isSourceEditing()) {
           return;
       }
       
@@ -183,6 +183,9 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
                         xtype: 'panel',
                         layout: 'fit',
                         dock: 'bottom',
+                        //resizeHandles: 'n',
+                        collapsible:true,
+                        //resizable: true,
                         items:[{
                             xtype: 'matchResourceEditorPanel',
                             assocStore:me.assocStore,

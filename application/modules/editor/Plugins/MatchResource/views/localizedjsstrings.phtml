@@ -121,7 +121,18 @@ END LICENSE AND COPYRIGHT
         strings: {
             source: '<?php echo $this->translate->_('Quelltext');?>',
             target: '<?php echo $this->translate->_('Zieltext');?>',
-            match: '<?php echo $this->translate->_('Matchrate');?>'
+            match: '<?php echo $this->translate->_('Matchrate');?>',
+            tmresource: '<?php echo $this->translate->_('TM-Ressource');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.plugins.MatchResource.view.SearchResultGrid", {
+        override: "Editor.plugins.MatchResource.view.SearchResultGrid",
+        strings: {
+            source: '<?php echo $this->translate->_('Quelltext');?>',
+            target: '<?php echo $this->translate->_('Zieltext');?>',
+            match: '<?php echo $this->translate->_('Matchrate');?>',
+            tmresource: '<?php echo $this->translate->_('TM-Ressource');?>'
         }
     });
     

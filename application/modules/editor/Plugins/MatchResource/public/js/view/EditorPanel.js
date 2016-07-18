@@ -42,7 +42,8 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
 	extend: 'Ext.tab.Panel',
 	alias: 'widget.matchResourceEditorPanel',
 	requires:['Editor.plugins.MatchResource.view.SearchGrid',
-	          'Editor.plugins.MatchResource.view.MatchGrid'],
+	          'Editor.plugins.MatchResource.view.MatchGrid',
+	          'Editor.plugins.MatchResource.view.SearchResultGrid'],
     strings: {
         searchTitle: '#UT#Konkordanzsuche',
         matchTitle:'#UT#Matchergebnisse'
@@ -52,11 +53,10 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
     height:350,
     plain: true,
     cls: 'plugin-match-resource-result-panel',
-    collapsible:true,
-	initConfig: function(instanceConfig) {
-		var me = this,
-		config = {
-			items: []// end of items
+    initConfig: function(instanceConfig) {
+        var me = this,
+        config = {
+                items: []// end of items
 		};
 		me.isAllowedMatchQuery(config,instanceConfig);
 		me.isAllowedSearchQuery(config,instanceConfig);
