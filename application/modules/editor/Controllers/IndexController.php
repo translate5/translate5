@@ -225,6 +225,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('columns.widthFactorErgonomic', (float)$rop->editor->columns->widthFactorErgonomic);
       $this->view->Php2JsVars()->set('columns.maxWidth', (integer)$rop->editor->columns->maxWidth);
       
+      $this->view->Php2JsVars()->set('browserAdvice', $rop->browserAdvice);
       if($rop->showSupportedBrowsersMsg) {
           $this->view->Php2JsVars()->set('supportedBrowsers', $rop->supportedBrowsers->toArray());
       }

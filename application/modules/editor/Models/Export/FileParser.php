@@ -40,6 +40,8 @@ END LICENSE AND COPYRIGHT
 abstract class editor_Models_Export_FileParser {
     use editor_Models_Export_FileParser_MQMTrait;
     
+    const REGEX_INTERNAL_TAGS = '#<div\s*class="([a-z]*)\s+([gxA-Fa-f0-9]*)"\s*.*?(?!</div>)<span[^>]*id="([^-]*)-.*?(?!</div>).</div>#s';
+    
     /**
      * @var string
      */
@@ -97,6 +99,12 @@ abstract class editor_Models_Export_FileParser {
      * @var boolean
      */
     protected $disableMqmExport = false;
+    
+    /**
+     * Container for content tag protection
+     * @var array
+     */
+    protected $originalTags;
     
     /**
      * 
@@ -213,7 +221,11 @@ abstract class editor_Models_Export_FileParser {
         
         $edited = (string) $segment->getFieldEdited($field);
         
+        $before = $edited;
+        $edited = $this->protectContentTags($edited);
         $edited = $this->recreateTermTags($edited, $this->shouldTermTaggingBeRemoved());
+        $edited = $this->unprotectContentTags($edited);
+        
         $edited = $this->parseSegment($edited);
         $edited = $this->revertNonBreakingSpaces($edited);
         if(!$this->_diff){
@@ -221,7 +233,9 @@ abstract class editor_Models_Export_FileParser {
         }
         
         $original = (string) $segment->getFieldOriginal($field);
+        $original = $this->protectContentTags($original);
         $original = $this->recreateTermTags($original);
+        $original = $this->unprotectContentTags($original);
         $original = $this->parseSegment($original);
         
         $diffed = $this->_diffTagger->diffSegment(
@@ -278,56 +292,49 @@ abstract class editor_Models_Export_FileParser {
      * @return string $segment
      */
     protected function recreateTermTags($segment, $removeTermTags=true) {
-        $segmentArr = preg_split('/<div[^>]+class="term([^"]+)"\s+data-tbxid="([^"]+)"[^>]*>/s', $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
+        $toRemove = array('transFound', 'transNotFound', 'transNotDefined');
         
-        $cssClassFilter = function($input) {
-            return($input !== 'transFound' && $input !== 'transNotFound');
-        };
+        //replace or remove closing tags
+        $closingTag =  $removeTermTags ? '' : '</mrk>';
+        $segment = str_ireplace('</div>', $closingTag, $segment);
         
-        $count = count($segmentArr);
-        $closingTag =  '</mrk>';
-        if($removeTermTags){
-            $closingTag = '';
-        }
-        for ($i = 1; $i < $count; $i = $i + 3) {
-            $tagExpl/* segment aufgespalten an den öffenden Tags */ = explode('<div', $segmentArr[$i + 2]/* segmentteil hinter öffnendem Termtag */);
-            $openTagCount = 0;
-            $tCount = count($tagExpl);
-            for ($j = 0; $j < $tCount; $j++) {
-                $numOfClosedDiv = substr_count($tagExpl[$j], '</div>');
-                $containsOpeningTag = preg_match('"^ class=\""', $tagExpl[$j]) === 1 || false;
-                if ($openTagCount === 0 and
-                        (
-                        ($containsOpeningTag === true and $numOfClosedDiv > 1)
-                        or
-                        ($containsOpeningTag === false and $numOfClosedDiv === 1))) {
-                    $parts = explode('</div>', $tagExpl[$j]); //der letzte </div> muss der schließende mrk-Tag sein, da ja kein div-Tag innerhalb des Term-Tags mehr geöffnet ist
-                    $end = array_pop($parts);
-                    $tagExpl[$j] = implode('</div>', $parts) . $closingTag. $end;
-                    break; //go to the next termtag, because this one is now closed.
-                } elseif (($containsOpeningTag === true and $numOfClosedDiv > 1)
-                        or
-                        ($containsOpeningTag === false and $numOfClosedDiv === 1)) {
-                    $openTagCount--;
-                } elseif ($containsOpeningTag and $numOfClosedDiv === 0) {
-                    $openTagCount++;
-                }
+        $termRegex = '/<div[^>]+class="term([^"]+)"\s+data-tbxid="([^"]+)"[^>]*>/s';
+        return preg_replace_callback($termRegex, function($match) use ($removeTermTags, $toRemove) {
+            if($removeTermTags) {
+                return '';
             }
-            if(!$removeTermTags){
-                $cssClasses = explode(' ', trim($segmentArr[$i]));
-                //@todo currently were removing the trans[Not]Found info. 
-                //it would be better to set it for source segments by checking the target if the term exists  
-                $segmentArr[$i] = join('-', array_filter($cssClasses, $cssClassFilter));
-                $segmentArr[$i] = '<mrk mtype="x-term-' . $segmentArr[$i] . '" mid="' . $segmentArr[$i + 1] . '">';
-            }
-            else{
-                $segmentArr[$i] = '';
-            }
-            $segmentArr[$i] .= implode('<div', $tagExpl);
-            unset($segmentArr[$i + 1]);
-            unset($segmentArr[$i + 2]);
-        }
-        return implode('', $segmentArr);
+            
+            $mid = $match[2];
+            $classes = explode(' ', trim($match[1]));
+            $classes = join('-', array_diff($classes, $toRemove));
+            return '<mrk mtype="x-term-' . $classes . '" mid="' . $mid . '">';
+        }, $segment);
+    }
+    
+    /**
+     * protects the internal tags of one segment, stores the original values in $this->originalTags
+     * @param unknown $segment
+     * @return string
+     */
+    protected function protectContentTags(string $segment) {
+        $id = 1;
+        $this->originalTags = array();
+        return preg_replace_callback(self::REGEX_INTERNAL_TAGS, function($match) use (&$id) {
+            $placeholder = '<translate5:escaped id="'.$id++.'" />';
+            $this->originalTags[$placeholder] = $match[0];
+            return $placeholder;
+        }, $segment);
+    }
+    
+    /**
+     * unprotects / restores the content tags
+     * @param string $segment
+     * @return string
+     */
+    protected function unProtectContentTags(string $segment) {
+        return preg_replace_callback('#<translate5:escaped id="[0-9]+" />#s', function($match) {
+            return $this->originalTags[$match[0]];
+        }, $segment);
     }
     
     /**
@@ -346,7 +353,7 @@ abstract class editor_Models_Export_FileParser {
      * @return string $segment 
      */
     protected function parseSegment($segment) {
-        $segmentArr = preg_split($this->config->runtimeOptions->editor->export->regexInternalTags, $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
+        $segmentArr = preg_split(self::REGEX_INTERNAL_TAGS, $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
         $count = count($segmentArr);
         for ($i = 1; $i < $count;) {
             $j = $i + 2;
@@ -387,7 +394,20 @@ abstract class editor_Models_Export_FileParser {
      */
     public function exportSingleSegmentContent($segment) {
         $this->disableMqmExport = true;
-        return $this->unprotectWhitespace($this->revertNonBreakingSpaces($this->recreateTermTags($this->parseSegment($segment))));
+        
+        //protect content tags to do nasty things with the content and prevent our html like content tags to be damaged
+        $segment = $this->protectContentTags($segment);
+        
+        //do here segment things where contentTags are needed to be protected
+        $segment = $this->recreateTermTags($segment);
+        
+        //unprotect / restore content tags
+        $segment = $this->unprotectContentTags($segment);
+        //FIXME: unprotect tags and final tag replacement in parseSegment can and should be merged
+        
+        $segment = $this->parseSegment($segment);
+        $segment = $this->revertNonBreakingSpaces($segment);
+        return $this->unprotectWhitespace($segment);
     }
     
     /**

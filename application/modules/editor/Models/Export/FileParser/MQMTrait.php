@@ -97,7 +97,7 @@ trait editor_Models_Export_FileParser_MQMTrait {
      * @return string
      */
     protected function convertQmTags2XliffFormat($segment){
-    	$flags = $this->_task->getQmSubsegmentFlags();
+        $flags = $this->_task->getQmSubsegmentFlags();
         if(empty($flags)){
             return $segment;
         }

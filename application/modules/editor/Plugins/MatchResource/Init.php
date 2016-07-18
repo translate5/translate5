@@ -49,7 +49,6 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
     protected $localePath = 'locales';
     
     public function getFrontendControllers() {
-        return array_values($this->frontendControllers);
         $result = array();
         $userSession = new Zend_Session_Namespace('user');
         if(empty($userSession) || empty($userSession->data)) {

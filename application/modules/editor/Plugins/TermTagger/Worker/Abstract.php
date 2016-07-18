@@ -72,35 +72,25 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
      * @var array
      */
     protected $data = false;
+
     /**
-     *
-     * @var editor_Models_Term 
-     */
-    protected $termModel;
-    /**
-     *
      * @var editor_Models_Task
      */
     protected $task;
     
     /**
-     * @var array
+     * @var editor_Plugins_TermTagger_RecalcTransFound
      */
-    protected $groupCounter = array();
-    
-    /**
-     * @var array
-     */
-    protected $notPresentInTbxTarget = array();
+    protected $markTransFound;
     
     public function init($taskGuid = NULL, $parameters = array()) {
         $return = parent::init($taskGuid, $parameters);
-        $this->termModel = ZfExtended_Factory::get('editor_Models_Term');
-
+        
         $taskGuid = $this->workerModel->getTaskGuid();
         $this->task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $this->task->loadByTaskGuid($taskGuid);
+        $this->markTransFound = ZfExtended_Factory::get('editor_Plugins_TermTagger_RecalcTransFound', array($this->task));
         return $return;
     }
     
@@ -157,79 +147,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
     }
      */
     protected function markTransFound(array $segments) {
-        //TODO: this config and return can be removed after finishing the initial big transit project
-        $config = Zend_Registry::get('config');
-        if(!empty($config->runtimeOptions->termTagger->markTransFoundLegacy)) {
-            return $segments;
-        }
-        $taskGuid = $this->task->getTaskGuid();
-        foreach ($segments as &$seg) {
-            //remove potentially incorrect transFound or transNotFound as inserted by termtagger
-            $seg->source = preg_replace('" ?transN?o?t?Found ?"', ' ', $seg->source);
-            $seg->target = preg_replace('" ?transN?o?t?Found ?"', ' ', $seg->target);
-            $seg->source = preg_replace('" transNotDefined ?"', ' ', $seg->source);
-            $seg->target = preg_replace('" transNotDefined ?"', ' ', $seg->target);
-
-            $sourceMids = $this->termModel->getTermMidsFromSegment($seg->source);
-            $targetMids = $this->termModel->getTermMidsFromSegment($seg->target);
-            $toMarkMemory = array();
-            $this->groupCounter = array();
-            foreach ($sourceMids as $sourceMid) {
-                $this->termModel->loadByMid($sourceMid, $taskGuid);
-                $groupId = $this->termModel->getGroupId();
-                $groupedTerms = $this->termModel->getAllTermsOfGroup($taskGuid, $groupId, array($this->task->getTargetLang()));
-                if(empty($groupedTerms)) {
-                    $this->notPresentInTbxTarget[$groupId] = true;
-                }
-                $transFound = (isset($this->groupCounter[$groupId]))?$this->groupCounter[$groupId]:0;
-                foreach ($groupedTerms as $groupedTerm) {
-                    $targetMidsKey = array_search($groupedTerm['mid'], $targetMids);
-                    if($targetMidsKey!==false){
-                        $transFound++;
-                        unset($targetMids[$targetMidsKey]);
-                    }
-                }
-                $toMarkMemory[$sourceMid] = $groupId;
-                $this->groupCounter[$groupId] = $transFound;
-            }
-            foreach ($toMarkMemory as $sourceMid => $groupId) {
-                $seg->source = $this->insertTransFoundInSegmentClass($seg->source, $sourceMid, $groupId);
-            }
-        }
-        return $segments;
-    }
-    /**
-     * insert the css-class transFound or transNotFound into css-class of the term-div tag with the corresponding mid
-     * @param string $seg
-     * @param string $mid
-     * @param $groupId
-     * @return string
-     */
-    protected function insertTransFoundInSegmentClass(string $seg,string $mid, $groupId) {
-        settype($this->groupCounter[$groupId], 'integer');
-        $transFound =& $this->groupCounter[$groupId];
-        $presentInTbxTarget = empty($this->notPresentInTbxTarget[$groupId]);
-        $rCallback = function($matches) use (&$seg, &$transFound, $presentInTbxTarget){
-            foreach ($matches as $match) {
-                if($presentInTbxTarget) {
-                    $cssClassToInsert = ($transFound>0)?'transFound':'transNotFound';
-                }
-                else {
-                    $cssClassToInsert = 'transNotDefined';
-                }
-                
-                $transFound--;
-                $modifiedMatch = $match;
-                if(strpos($modifiedMatch, ' class=')===false){
-                    $modifiedMatch = str_replace('<div', '<div class=""', $modifiedMatch);
-                }
-                $modifiedMatch = preg_replace('/( class="[^"]*)"/', '\\1 '.$cssClassToInsert.'"', $modifiedMatch);
-                $seg = preg_replace('/'.$match.'/', $modifiedMatch, $seg, 1);
-            }
-        };
-        
-        preg_replace_callback('/<div[^>]*data-tbxid="'.$mid.'"[^>]*>/', $rCallback, $seg);
-        return $seg;
+        return $this->markTransFound->recalcList($segments);
     }
 
     /**

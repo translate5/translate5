@@ -49,87 +49,13 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
 
     /**
      * Rekonstruiert in einem Segment die ursprüngliche Form der enthaltenen Tags
-     *
-     * Erwartet werden Tags von der Struktur wie der folgende im Segment:
-     * <div class="single g"><span title="&lt;footnotereference
-     * style=&quot;Footnote Reference&quot; autonumber=&quot;1&quot;/&gt;"
-     * class="short">&lt;1/&gt;</span><span id="ph14-5-5f55ad4870140e4d3e594e0f83870083"
-     *  class="full">&lt;footnotereference style=&quot;Footnote Reference&quot;
-     * autonumber=&quot;1&quot;/&gt;</span></div>
-     *
-     * @param string $segment
-     * @throws Zend_Exception 'Der Tagtyp '.$segment[$i].' ist nicht definiert.'
-     * @return string $segment
-     */
-    protected function parseSegment($segment) {
-        //Baut einen einzelnen Tag in seine Ursprungsform zurück
-        //die folgende Form besteht nur noch, weil vor dem 31.02.2013 importierte 
-        //Projekte noch nicht den gesamten tagContent als CSS-Klasse verpackt mitgegeben 
-        //hatten, sondern je nach Tagart ggf. nur ausgesuchte Teile. Dies ist seit dem anders.
-        //Daher sollten alle Betandsprojekte entfernt sein, kann diese parseSegment durch die nachfolgend auskommentierte ersetzt werden.
-        $rebuildTag = function ($tagType, $tagId, $toPack) {
-                    try {
-                        $tagContent = pack('H*', $toPack);
-                    } catch (Exception $exc) {
-                        $tagContent = $toPack;
-                    }
-                    if ($tagType === 'open') {
-                        if($tagContent === 'g') return '<' . $tagContent . ' id="' . $tagId . '">';
-                        return  '<' . $tagContent .'>';
-                    }
-                    if ($tagType === 'close') {
-                        if($tagContent === 'g') return '</' . $tagContent . '>';
-                        return  '<' . $tagContent .'>';
-                    }
-                    if ($tagType === 'single') {
-                        if ($tagId == 'mrk' || $tagId == 'unicodePrivateUseArea'|| $tagId == "br"|| $tagId == "space"){
-                            if(preg_match('"^mrk"', $tagContent)==0 && 
-                                    preg_match('"^unicodePrivateUseArea"', $tagContent)==0 &&
-                                    preg_match('"^br"', $tagContent)==0 &&
-                                    preg_match('"^space"', $tagContent)==0
-                                    ){
-                                return '<' . $tagId . $tagContent . '>';
-                            }
-                            return  '<' . $tagContent .'>';
-                        }
-                            
-                        if (strpos($tagId, 'locked')!== false){
-                            if(preg_match('"^x"', $tagContent)==0)return '<x' .$tagContent . '>';
-                            return  '<' . $tagContent .'>';
-                        }
-                        if($tagContent === 'g' or $tagContent === 'x') return '<' . $tagContent . ' id="' . $tagId . '" />';
-                        return  '<' . $tagContent .'>';
-                    }
-                    throw new Zend_Exception('Der Tagtyp ' . $tagType . ' ist nicht definiert.');
-                };
-/*@todo nächste Zeile rauswerfen, wenn qm-subsegments im Export korrekt abgebildet werden. Das gleiche gilt für den vermerk in tasks.phtml */
-        $segment = preg_replace('"<img[^>]*>"','', $segment);
-        $segmentArr = preg_split($this->config->runtimeOptions->editor->export->regexInternalTags, $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
-        $count = count($segmentArr);
-        for ($i = 1; $i < $count;) {
-            $j = $i + 2;
-            //$segmentArr[$i] = '<' . pack('H*', $segmentArr[$i + 1]) .'">';
-            $segmentArr[$i] = $rebuildTag($segmentArr[$i], $segmentArr[$j], $segmentArr[$i + 1]);
-            $search = array('hardReturn /','softReturn /','macReturn /');
-            $replace = array('hardReturn/','softReturn/','macReturn/');
-            $segmentArr[$i] = str_replace($search, $replace, $segmentArr[$i]);
-            unset($segmentArr[$j]);
-            unset($segmentArr[$i + 1]);
-            $i = $i + 4;
-        }
-        return implode('', $segmentArr);
-    }
-    
-    /**
-     * @todo sobald keine Altdaten mehr in der DB sind, die vor dem 31.01.2013 importiert wurden,
-     * kann die obige parseSegment Methode durch die folgende komplett ersetzt werden!
      *  
+     */
     protected function parseSegment($segment) {
         //@todo nächste Zeile rauswerfen, wenn qm-subsegments im Export korrekt abgebildet werden. Das gleiche gilt für den vermerk in tasks.phtml 
         $segment = preg_replace('"<img[^>]*>"','', $segment);
         return parent::parseSegment($segment);
     }
-     */
 
     /**
      * Gibt eine zu exportierende Datei bereits korrekt für den Export geparsed zurück

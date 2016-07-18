@@ -1194,9 +1194,9 @@
   <source>Nicht speichern und vorheriges Segment öffnen (STRG + ALT + ↑)</source>
   <target>Don't save and open previous segment (CTRL + ALT + ↑)</target>
 </trans-unit>
-<trans-unit id='RGVtIGF1c2dld8OkaGx0ZW4gU2VnbWVudCBlaW5lbiBLb21tZW50YXIgaGluenVmw7xnZW4uIChTVFJHICsgQUxUICsgYyk='>
-  <source>Dem ausgewählten Segment einen Kommentar hinzufügen. (STRG + ALT + c)</source>
-  <target>Add a comment to the select segment. (CTRL + ALT + c)</target>
+<trans-unit id='RGVtIGF1c2dld8OkaGx0ZW4gU2VnbWVudCBlaW5lbiBLb21tZW50YXIgaGluenVmw7xnZW4uIChBTFQgKyBDKQ=='>
+  <source>Dem ausgewählten Segment einen Kommentar hinzufügen. (ALT + C)</source>
+  <target>Add a comment to the select segment. (ALT + C)</target>
 </trans-unit>
 <trans-unit id='Vm9yaGVyaWdlIFNwYWx0ZSBlZGl0aWVyZW4gKFNUUkcgKyBBTFQgKyDihpAp'>
   <source>Vorherige Spalte editieren (STRG + ALT + ←)</source>
@@ -1230,11 +1230,14 @@
   <source>Speichern (STRG + S)</source>
   <target>save (CTRL + S)</target>
 </trans-unit>
-<trans-unit id='U2VnbWVudCBhdWYgZGVuIGF1c2dld8OkaGx0ZW4gU3RhdHVzIHNldHplbiAoU1RSRyArIEFMVCArIHswfSk='>
-  <source>Segment auf den ausgewählten Status setzen (STRG + ALT + {0})</source>
-  <target>Set segment to the choosen state (CTRL + ALT + {0})</target>
+<trans-unit id='U2VnbWVudCBhdWYgZGVuIGF1c2dld8OkaGx0ZW4gU3RhdHVzIHNldHplbiAoQUxUICsgUyBkYW5hY2ggezB9KQ=='>
+  <source>Segment auf den ausgewählten Status setzen (ALT + S danach {0})</source>
+  <target>Set segment to the choosen state (ALT + S after that {0})</target>
 </trans-unit>
-
+<trans-unit id='U2VnbWVudCBhdWYgZGVuIGF1c2dld8OkaGx0ZW4gU3RhdHVzIHNldHplbg=='>
+  <source>Segment auf den ausgewählten Status setzen</source>
+  <target>Set segment to the choosen state</target>
+</trans-unit>
 <trans-unit id='RXMgaXN0IElobmVuIG5pY2h0IGVybGF1YnQsIGRlbiBTZWdtZW50aW5oYWx0IHp1IGJlYXJiZWl0ZW4uIEJpdHRlIHZlcndlbmRlbiBTaWUgU1RSRytaIHVtIElocmUgw4RuZGVydW5nZW4genVyw7xja3p1c2V0emVuIG9kZXIgYnJlY2hlbiBTaWUgZGFzIEJlYXJiZWl0ZW4gZGVzIFNlZ21lbnRzIGFiLg=='>
   <source>Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.</source>
   <target>You are not allowed to edit segment content. Please use CTRL-Z to redo your changes or cancel editing at all.</target>
@@ -1296,8 +1299,6 @@
   <target>No previous segment in the workflow is editable!</target>
 </trans-unit>
 <trans-unit id='SGlud2VpcyE='><source>Hinweis!</source><target>Note!</target></trans-unit>
-<trans-unit id='U2llIGJlbnV0emVuIEludGVybmV0IEV4cGxvcmVyLiA8YnIgLz5CaXR0ZSB3ZWNoc2VsbiBTaWUgYXVmIGVpbmVuIG1vZGVybmVyZW4gQnJvd3NlciB1bSBkaWUgQW53ZW5kdW5nIG1pdCB2b2xsZXIgTGVpc3R1bmcgbnV0emVuIHp1IGvDtm5uZW4uIDxiciAvPkFtIGJlc3RlbiBudXR6ZW4gU2llIEdvb2dsZSBDaHJvbWUsIEZpcmVmb3ggb2RlciBTYWZhcmkgLSBuZXVlcmUgSW50ZXJuZXQgRXhwbG9yZXIgVmVyc2lvbmVuIHdlcmRlbiB6d2FyIHVudGVyc3TDvHR6dCwgc2luZCBhYmVyIGViZW5mYWxscyB2ZXJhbHRldCB1bmQgc2VociBsYW5nc2FtLg=='><source>Sie benutzen Internet Explorer. <br />Bitte wechseln Sie auf einen moderneren Browser um die Anwendung mit voller Leistung nutzen zu können. <br />Am besten nutzen Sie Google Chrome, Firefox oder Safari - neuere Internet Explorer Versionen werden zwar unterstützt, sind aber ebenfalls veraltet und sehr langsam.</source>  <target>You are using Internet Explorer. <br />Please switch to a modern browser for optimal performance and feature usage.<br />For best results we propose Google Chrome, Firefox or Safari - new Internet Explorer versions are supported, but are also outdated and very slow.</target>
-</trans-unit>
 <trans-unit id='RGllIGdld8O8bnNjaHRlIEFrdGlvbiBrYW5uIG5pY2h0IGR1cmNoZ2Vmw7xocnQgd2VyZGVuISBEYXMgYWt0dWVsbCBnZcO2ZmZuZXRlIFNlZ21lbnQgbXVzcyB6dW7DpGNoc3QgZ2VzcGVpY2hlcnQgYnp3LiBnZXNjaGxvc3NlbiB3ZXJkZW4u'>
   <source>Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.</source>
   <target>The desired action cannot be processed! The currenlty opened segment has to be saved / closed first.</target>
@@ -1318,12 +1319,19 @@
   <source>Nicht unterstützte Browser-Version</source>
   <target>Unsupported browser-version</target>
 </trans-unit>
-
 <trans-unit id='IChBTFQrezB9KQ=='><source> (ALT+{0})</source><target> (ALT+{0})</target></trans-unit>
 <trans-unit id='IChBTFQrU0hJRlQrezB9KQ=='><source> (ALT+SHIFT+{0})</source><target> (ALT+SHIFT+{0})</target></trans-unit>
 <trans-unit id='SW4gaW1wb3J0aWVydGVyIERhdGVpIGdlc3BlcnJ0ZSBTZWdtZW50ZSBzaW5kIGluIHRyYW5zbGF0ZTUgZ2VzcGVycnQ='>
   <source>In importierter Datei gesperrte Segmente sind in translate5 gesperrt</source>
   <target>Locked segments in the imported file are also locked in translate5</target>
+</trans-unit>
+<trans-unit id='RGllIFNvcnRpZXJ1bmcgYnp3LiBGaWx0ZXJ1bmcgd3VyZGUgZ2XDpG5kZXJ0LCBlcyBrYW5uIG5pY2h0IHp1bSBha3R1ZWxsZW4gU2VnbWVudCB6dXLDvGNrIGdlc3BydW5nZW4gd2VyZGVuLg=='>
+  <source>Die Sortierung bzw. Filterung wurde geändert, es kann nicht zum aktuellen Segment zurück gesprungen werden.</source>
+  <target>The segment sort or filter was changed, the currently opened segment can't be scrolled back into the view.</target>
+</trans-unit>
+<trans-unit id='U2llIG51dHplbiBJbnRlcm5ldCBFeHBsb3Jlci4gRGllc2VyIEJyb3dzZXIgd2lyZCB2b24gVmVyc2lvbiA5IGJpcyAxMSB1bnRlcnN0w7x0enQsIGlzdCBhbGxlcmRpbmdzIHNlaHIgbGFuZ3NhbS4gVW0gZGllIEFud2VuZHVuZyBpbiBvcHRpbWFsZXIgUGVyZm9ybWFuY2UgbnV0emVuIHp1IGvDtm5uZW4sIGVtcGZlaGxlbiB3aXIgZGFoZXIgR29vZ2xlIENocm9tZSwgRmlyZWZveCBvZGVyIFNhZmFyaSBhbHMgQnJvd3Nlci4='>
+  <source>Sie nutzen Internet Explorer. Dieser Browser wird von Version 9 bis 11 unterstützt, ist allerdings sehr langsam. Um die Anwendung in optimaler Performance nutzen zu können, empfehlen wir daher Google Chrome, Firefox oder Safari als Browser.</source>
+  <target>You are using the Internet Explorer. This version 9 to 11 of this browser is supported, but the performance is very slow. To use the application in best performance, we recommend the usage of Google Chrome, Firefox or Safari as browser.</target>
 </trans-unit>
     </body>
   </file>

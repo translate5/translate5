@@ -118,7 +118,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $lockLocked, $sourceLang, $targetLang, $task);
         $this->_delimiter = $this->config->runtimeOptions->import->csv->delimiter;
         $this->_enclosure = $this->config->runtimeOptions->import->csv->enclosure;
-        $this->regexInternalTags = $this->config->runtimeOptions->editor->export->regexInternalTags;
+        $this->regexInternalTags = editor_Models_Export_FileParser::REGEX_INTERNAL_TAGS;
         
         // check taskTemplate for options (check if tag-protection or regExes-protection is set)
         $taskConfig = Zend_Registry::get('taskTemplate');
