@@ -56,6 +56,27 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         $segment = preg_replace('"<img[^>]*>"','', $segment);
         return parent::parseSegment($segment);
     }
+ 
+    /**
+     * dedicated to write the match-Rate to the right position in the target format
+     * @param array $file that contains file as array as splitted by parse function
+     * @param integer $i position of current segment in the file array
+     * @return string
+     */
+    protected function writeMatchRate(array $file, integer $i) {
+        $matchRate = $this->_segmentEntity->getMatchRate();
+        $mid = $this->_segmentEntity->getMid();
+        $segPart =& $file[$i+1];
+        //example string
+        //<sdl:seg-defs><sdl:seg id="16" conf="Translated" origin="tm" origin-system="Bosch_Ruoff_de-DE-en-US" percent="100"
+        if(preg_match('#<sdl:seg[^>]* id="'.$mid.'"[^>]*percent="\d+"#', $segPart)===1){
+            //if percent attribute is already defined
+            $segPart = preg_replace('#(<sdl:seg[^>]* id="'.$mid.'"[^>]*percent=)"\d+"#', '\\1"'.$matchRate.'"', $segPart);
+            return $file;
+        }
+        $segPart = preg_replace('#(<sdl:seg[^>]* id="'.$mid.'" *)#', '\\1 percent="'.$matchRate.'" ', $segPart);
+        return $file;
+    }
 
     /**
      * Gibt eine zu exportierende Datei bereits korrekt für den Export geparsed zurück
