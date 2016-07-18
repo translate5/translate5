@@ -75,7 +75,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
         field:null
     },
     SERVER_STATUS: null,//initialized after search grid panel is rendered
-    SHOW_MORE_ICON_LIMIT:2,
+    RESULTS_ROW_LIMIT:2,//the limit of result rows for each 'tmmt'
     searchGridPanelRender: function(){
         var me=this;
         me.assocStore = me.getView().assocStore; 
@@ -117,14 +117,12 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
                 params: {
                     query: me.lastSearch.query,
                     field: me.lastSearch.field,
-                    limit:5
+                    limit:me.RESULTS_ROW_LIMIT + 1
                 },
                 success: function(response){
-                    console.log("success");
                     me.handleRequestSuccess(me, response,tmmtid, me.lastSearch.query);
                 }, 
                 failure: function(response){
-                    console.log("fail");
                     me.handleRequestFailure(me, response, tmmtid);
                 }
         }));
@@ -178,7 +176,8 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
     },
     loadDataIntoGrid: function(resp) {
         var me = this;
-        if(resp.rows && resp.rows.length >= me.SHOW_MORE_ICON_LIMIT){
+        if(resp.rows && resp.rows.length > me.RESULTS_ROW_LIMIT){
+            resp.rows.splice(resp.rows.length-1,1);
             resp.rows[resp.rows.length-1].showMoreIcon= true;
         }
         me.getViewModel().getStore('editorsearch').loadRawData(resp.rows,true);
@@ -213,7 +212,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
         var me=this;
         if(me.executedRequests && me.executedRequests.length>0){
             for(var i=0;i<me.executedRequests.length;i++){
-                me.executedRequests[i].abort();
+                console.log(me.executedRequests[i].abort());
                 console.log("Request aborted!");
             }
             me.executedRequests=[];
