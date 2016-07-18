@@ -163,10 +163,10 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
                     
           editor.mainEditor.setValueAndMarkup(matchRecord.get('target')+contentTags, rec.get('id'), editor.columnToEdit);
           
-          //we dont support the matchrate saving for tasks with alternatives:
-          if(!task.get('defaultSegmentLayout')) {
+          //we don't support the matchrate saving for tasks with alternatives:
+          if(task.get('defaultSegmentLayout')) {
               rec.set('matchRate', matchrate);
-              rec.set('matchRateType', 'matchresourceusage'); 
+              rec.set('matchRateType', Editor.data.plugins.MatchResource.matchrateTypeChangedState); 
               me.getMatchrateDisplay().setRawValue(matchrate);
           }
       } 

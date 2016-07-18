@@ -35,6 +35,12 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
     
+    // set as match rate type when matchrate was changed
+    const MATCH_RATE_TYPE_EDITED = 'matchresourceusage';
+
+    //set by changealike editor
+    const MATCH_RATE_TYPE_EDITED_AUTO = 'matchresourceusageauto';
+    
     /**
      * Contains the Plugin Path relativ to APPLICATION_PATH or absolut if not under APPLICATION_PATH
      * @var array
@@ -75,13 +81,16 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
     protected function initEvents() {
         $this->eventManager->attach('editor_TaskController', 'afterTaskOpen', array($this, 'handleAfterTaskOpen'));
         $this->eventManager->attach('editor_TaskController', 'afterTaskClose', array($this, 'handleAfterTaskClose'));
-        $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectUrl'));
+        $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
         $this->eventManager->attach('Editor_SegmentController', 'afterPutAction', array($this, 'handleAfterSegmentPut'));
         $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
+        $this->eventManager->attach('Editor_AlikesegmentController', 'beforeSaveAlike', array($this, 'handleBeforeSaveAlike'));
     }
-    public function injectUrl(Zend_EventManager_Event $event) {
+    
+    public function injectFrontendConfig(Zend_EventManager_Event $event) {
         $view = $event->getParam('view');
         $view->Php2JsVars()->set('plugins.MatchResource.preloadedSegments', $this->getConfig()->preloadedTranslationSegments);
+        $view->Php2JsVars()->set('plugins.MatchResource.matchrateTypeChangedState', self::MATCH_RATE_TYPE_EDITED);
     }
     
     public function initJsTranslations(Zend_EventManager_Event $event) {
@@ -119,6 +128,25 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
         $manager->updateSegment($event->getParam('entity'));
     }
     
+    /**
+     * When using change alikes, the transFound information in the source has to be changed.
+     * This is done by this handler.
+     * 
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleBeforeSaveAlike(Zend_EventManager_Event $event) {
+        $alikeSegment = $event->getParam('alikeSegment');
+        /* @var $alikeSegment editor_Models_Segment */
+        
+        $type = $alikeSegment->getMatchRateType();
+        if($type === self::MATCH_RATE_TYPE_EDITED) {
+            $alikeSegment->setMatchRateType(self::MATCH_RATE_TYPE_EDITED_AUTO);
+        }
+    }
+    
+    /**
+     * defines all URL routes of this plug-in
+     */
     protected function initRoutes() {
         $f = Zend_Registry::get('frontController');
         /* @var $f Zend_Controller_Front */
@@ -150,23 +178,5 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
                 'action' => 'search'
             ));
         $r->addRoute('plugins_matchresource_search', $queryRoute);
-        
-        
-        return;
-        //FIXME Thomas documentate and remove
-         //im folgenden zwei Beispiel testcontroller
-        $rest = new Zend_Controller_Router_Route(
-            'editor/js/app-localized.jsx',
-            array(
-                'module' => 'editor',
-                'controller' => 'plugins_matchresource_dummy',
-                'action' => 'query',
-            ));
-        $f->getRouter()->addRoute('plugins_matchresource_test', $rest);
-        
-        $restRoute = new Zend_Rest_Route($f, array(), array(
-            'editor' => array('plugins_matchresource_resource'),
-        ));
-        $f->getRouter()->addRoute('plugins_matchresource_rest', $restRoute);
     }
 }

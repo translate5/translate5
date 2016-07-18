@@ -262,7 +262,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         
         $this->entity->validate();
         
-        $history->save();
 
         foreach($allowedAlternatesToChange as $field) {
             if($this->entity->isModified($field)) {
@@ -270,8 +269,11 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             }
         }
         
-        $this->events->trigger("beforePutSave", $this, array('model' => $this->entity));
+        $this->events->trigger("beforePutSave", $this, array('model' => $this->entity, 'history' => $history));
         
+        //saving history directly before normal saving, 
+        // so no exception between can lead to history entries without changing the master segment
+        $history->save();
         $this->entity->save();
         $this->view->rows = $this->entity->getDataObject();
     }
