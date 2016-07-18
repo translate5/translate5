@@ -189,6 +189,9 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
                         xtype: 'panel',
                         layout: 'fit',
                         dock: 'bottom',
+                        //resizeHandles: 'n',
+                        collapsible:true,
+                        //resizable: true,
                         items:[{
                             xtype: 'matchResourceEditorPanel',
                             assocStore:me.assocStore,

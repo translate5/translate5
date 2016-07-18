@@ -41,6 +41,199 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.matchResourceSearchGrid',
-    assocStore : null
-    
+    listen: {
+        component: {
+            '#searchGridPanel textfield[name=source]': {
+                keypress:'sourceSearchTextChange'
+            },
+            '#searchGridPanel textfield[name=target]': {
+                keypress:'targetSearchTextChange'
+            },
+            '#searchGridPanel':{
+                render:'searchGridPanelRender'
+            },
+            '#searchGridGrid actioncolumn':{
+                click:'handleMoreColumnClick'
+            }
+        }
+    },
+    refs:[{
+        ref: 'resultTab',
+        selector:'#searchResultTab'
+    }],
+    strings: {
+        loading: '#UT#wird geladen...',
+        noresults: '#UT#Es wurden keine Ergebnisse gefunden.',
+        serverErrorMsgDefault: '#UT#Die Anfrage an die Matchressource dauerte zu lange.',
+        serverErrorMsg500: '#UT#Die Anfrage führte zu einem Fehler im angefragten Dienst.',
+        serverErrorMsg408: '#UT#Die Anfrage an die Matchressource dauerte zu lange.'
+    },
+    assocStore : null,
+    executedRequests:[],
+    lastSearch: {
+        query:'',
+        field:null
+    },
+    SERVER_STATUS: null,//initialized after search grid panel is rendered
+    RESULTS_ROW_LIMIT:2,//the limit of result rows for each 'tmmt'
+    searchGridPanelRender: function(){
+        var me=this;
+        me.assocStore = me.getView().assocStore; 
+        me.SERVER_STATUS=Editor.plugins.MatchResource.model.EditorQuery.prototype;
+    },
+    sourceSearchTextChange:function(field,event){
+        var me=this;
+        me.enterKeyPres(field, event);
+    },
+    targetSearchTextChange:function(field,event){
+        var me=this;
+        me.enterKeyPres(field, event);
+    },
+    enterKeyPres:function(field,event){
+        var me=this;
+        if (event.getKey() == event.ENTER){
+            me.getViewModel().getStore('editorsearch').removeAll();
+            me.lastSearch.query= field.value;
+            me.lastSearch.field = field.name;
+            me.closeTabs();
+            me.search();
+            me.clearTextField(me.lastSearch.field);
+        }
+    },
+    search:function(){
+        var me=this;
+        if(me.assocStore){
+            me.abortAllRequests();
+            me.assocStore.each(function(record){
+                me.sendRequest(record.get('id'));
+            });
+        }
+    },
+    sendRequest:function(tmmtid){
+        var me = this;
+        me.executedRequests.push(Ext.Ajax.request({
+            url:Editor.data.restpath+'plugins_matchresource_tmmt/'+tmmtid+'/search',
+                method: "POST",
+                params: {
+                    query: me.lastSearch.query,
+                    field: me.lastSearch.field,
+                    limit:me.RESULTS_ROW_LIMIT + 1
+                },
+                success: function(response){
+                    me.handleRequestSuccess(me, response,tmmtid, me.lastSearch.query);
+                }, 
+                failure: function(response){
+                    me.handleRequestFailure(me, response, tmmtid);
+                }
+        }));
+    },
+    handleRequestSuccess: function(controller,response,tmmtid,query){
+        var me = controller,
+            resp = Ext.util.JSON.decode(response.responseText);
+        
+        //me.getView().getStore('editorsearch').remove(me.getView().getStore('editorsearch').findRecord('tmmtid',tmmtid));
+        if(typeof resp.rows !== 'undefined' && resp.rows !== null && resp.rows.length){
+            me.loadDataIntoGrid(resp);
+            return;
+        }
+        var noresults = {
+                rows: [{
+                    source: me.strings.noresults,
+                    tmmtid: tmmtid,
+                    state:  me.SERVER_STATUS.SERVER_STATUS_NORESULT
+                }]
+            };
+        me.loadDataIntoGrid(noresults);
+    },
+    handleRequestFailure: function(controller,response,tmmtid){
+        var me = controller,
+            respStatusMsg = me.strings.serverErrorMsgDefault,
+            strState =  me.SERVER_STATUS.SERVER_STATUS_SERVERERROR,
+            timeOut = null;
+
+
+        switch(response.status){
+            case -1:
+                respStatusMsg = me.strings.serverErrorMsgDefault;
+                break;
+            case 408:
+                respStatusMsg = me.strings.serverErrorMsg408;
+                strState = me.SERVER_STATUS.SERVER_STATUS_CLIENTTIMEOUT;
+                break;
+            case 500:
+                respStatusMsg = me.strings.serverErrorMsg500;
+                break;
+        }
+        timeOut={
+                rows: [{
+                    source: respStatusMsg,
+                    target: '',
+                    tmmtid: tmmtid,
+                    state: strState
+                }]
+            };
+        me.loadDataIntoGrid(timeOut);
+    },
+    loadDataIntoGrid: function(resp) {
+        var me = this;
+        if(resp.rows && resp.rows.length > me.RESULTS_ROW_LIMIT){
+            resp.rows.splice(resp.rows.length-1,1);
+            resp.rows[resp.rows.length-1].showMoreIcon= true;
+        }
+        me.getViewModel().getStore('editorsearch').loadRawData(resp.rows,true);
+    },
+    handleMoreColumnClick: function(view, item, colIndex, rowIndex, e, record, row){
+        var me = this,
+            tabPanel=me.getView().up('tabpanel'),
+            tmmtname =me.assocStore.findRecord('id',record.get('tmmtid')).get('name');
+        
+        if(!record.get('showMoreIcon')){
+            return;
+        }
+        if(tabPanel.down('#searchResultTab-'+record.get('tmmtid'))){ //provide the tmmtid
+            tabPanel.setActiveTab(tabPanel.down('#searchResultTab-'+record.get('tmmtid')));
+            return;
+        }
+        tabPanel.add({
+            xtype:'matchResourceSearchResultGrid',
+            assocStore:me.assocStore,
+            title: tmmtname+" "+"Ergebnisse",
+            closable :true,
+            hidden: false,
+            itemId: 'searchResultTab-'+record.get('tmmtid'),
+            query: me.lastSearch.query,
+            field: me.lastSearch.field,
+            tmmtid:record.get('tmmtid')
+        });
+        
+        tabPanel.setActiveTab(tabPanel.down('#searchResultTab-'+record.get('tmmtid')));
+    },
+    abortAllRequests:function(){
+        var me=this;
+        if(me.executedRequests && me.executedRequests.length>0){
+            for(var i=0;i<me.executedRequests.length;i++){
+                console.log(me.executedRequests[i].abort());
+                console.log("Request aborted!");
+            }
+            me.executedRequests=[];
+        }
+    },
+    clearTextField:function(name){
+        if(name=="source"){
+            Ext.getCmp("targetSearch").setValue("");
+            return;
+        }
+        Ext.getCmp("sourceSearch").setValue(""); 
+    },
+    closeTabs:function(){
+        var me=this,
+            tabPanel=me.getView().up('tabpanel');
+        if(tabPanel.items.getCount()>2){
+            me.assocStore.each(function(record){
+                if(tabPanel.down('#searchResultTab-'+record.get('id'))){
+                    tabPanel.remove(tabPanel.down('#searchResultTab-'+record.get('id')).itemId);
+                }
+            });
+        }
+    }
 });

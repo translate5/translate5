@@ -42,23 +42,21 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
 	extend: 'Ext.tab.Panel',
 	alias: 'widget.matchResourceEditorPanel',
 	requires:['Editor.plugins.MatchResource.view.SearchGrid',
-	          'Editor.plugins.MatchResource.view.MatchGrid'],
+	          'Editor.plugins.MatchResource.view.MatchGrid',
+	          'Editor.plugins.MatchResource.view.SearchResultGrid'],
     strings: {
         searchTitle: '#UT#Konkordanzsuche',
-        matchTitle:'#UT#Matchergebnisse',
-        sourceEmptyText:'#UT#Quelltextsuche',
-        targetEmptyText:'#UT#Zieltextsuche'
+        matchTitle:'#UT#Matchergebnisse'
     },
     itemId:'matchResourceEditorPanel',
     activeTab: 0,
     height:350,
     plain: true,
     cls: 'plugin-match-resource-result-panel',
-    collapsible:true,
-	initConfig: function(instanceConfig) {
-		var me = this,
-		config = {
-			items: []// end of items
+    initConfig: function(instanceConfig) {
+        var me = this,
+        config = {
+                items: []// end of items
 		};
 		me.isAllowedMatchQuery(config,instanceConfig);
 		me.isAllowedSearchQuery(config,instanceConfig);
@@ -81,21 +79,6 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
 			config.items.push({
 	             title: this.strings.searchTitle,
 	             items:[{
-	            	 xtype: 'container',
-	                 anchor: '100%',
-	                 layout:'column',
-	                 items:[{
-	                	 xtype:'textfield',
-	                	 dataIndex:'sourceSearch',
-	                	 emptyText:this.strings.sourceEmptyText,
-	                	 padding:'10 10 10 10',
-	                 },{
-	                	 xtype:'textfield',
-		            	 dataIndex:'targetSearch',
-		            	 emptyText:this.strings.targetEmptyText,
-		            	 padding:'10 10 10 10',
-	                 }]
-	             },{
 	            	 xtype:'matchResourceSearchGrid',
 	            	 assocStore:instanceConfig.assocStore,
 	             }]

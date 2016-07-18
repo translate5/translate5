@@ -4,6 +4,7 @@
 .ico-tm-edit {background-image: url("images/book_edit.png");}
 .ico-tm-delete {background-image: url("images/book_delete.png");}
 .ico-tm-add {background-image: url("images/book_add.png");}
+.ico-tm-information {background-image: url("images/information.png"); background-repeat:no-repeat; background-position:50% 50%;}
 /*
 .matchGrid .x-grid-item-selected .x-grid-item-over > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
 */
