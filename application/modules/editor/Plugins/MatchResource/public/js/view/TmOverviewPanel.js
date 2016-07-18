@@ -49,7 +49,7 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
         resource: '#UT#Ressource',
         color: '#UT#Farbe',
         refresh: '#UT#Aktualisieren',
-        add: '#UT#hinzufügen',
+        add: '#UT#Hinzufügen',
     },
     cls:'',
     height: '100%',
