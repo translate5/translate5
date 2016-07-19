@@ -55,6 +55,9 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
   },{
       ref: 'editorPanel',
       selector:'#matchResourceEditorPanel'
+  },{
+      ref: 'editorViewport',
+      selector:'#editorViewport'
   }],
   listen: {
       component: {
@@ -62,13 +65,11 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
               //render: 'onSegmentGridRender',
               beforeedit: 'startEditing',
               canceledit: 'endEditing',
+              afterrender:'centerPanelAfterRender',
               edit: 'endEditing'
           },
           '#matchGrid': {
               chooseMatch: 'setMatchInEditor'
-          },
-          '#centerpanel':{
-              afterrender:'centerPanelAfterRender'
           }
       },
       controller: {
@@ -112,11 +113,11 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       //    me.checkAssocStore(grid);
      // }
   //},
-  centerPanelAfterRender: function(comp){
+  centerPanelAfterRender: function(){
       var me=this,
           authUser = Editor.app.authenticatedUser;
       if(!Editor.data.task.isReadOnly() && (authUser.isAllowed('pluginMatchResourceMatchQuery') || authUser.isAllowed('pluginMatchResourceSearchQuery'))){
-          me.checkAssocStore(comp);
+          me.checkAssocStore();
       }
       me.SERVER_STATUS = Editor.plugins.MatchResource.model.EditorQuery.prototype;
   },
@@ -184,41 +185,41 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           this.getEditorPanel().show();
       }
   },
-  checkAssocStore: function(comp){
-      var me=this
-      taskGuid = Editor.data.task.get('taskGuid'),
-      prm = {
-            params: {
-                filter: '[{"operator":"like","value":"'+taskGuid+'","property":"taskGuid"},{"operator":"eq","value":true,"property":"checked"}]'
-            },
-            callback:function(){
-                if(me.getAssocStoreCount() > 0){
-                    comp.addDocked({
-                        xtype: 'panel',
-                        layout: 'fit',
-                        dock: 'bottom',
-                        //resizeHandles: 'n',
-                        collapsible:true,
-                        //resizable: true,
-                        items:[{
-                            xtype: 'matchResourceEditorPanel',
-                            assocStore:me.assocStore,
-                        }]
-                    });
-                }
-            },
-            scope: me
-      };
+  checkAssocStore: function(){
+      var me = this
+          taskGuid = Editor.data.task.get('taskGuid'),
+          prm = {
+                params: {
+                    filter: '[{"operator":"like","value":"'+taskGuid+'","property":"taskGuid"},{"operator":"eq","value":true,"property":"checked"}]'
+                },
+                callback:me.addEditorPanelToViewPort,
+                scope: me
+          };
       me.assocStore = Ext.create('Ext.data.Store', {
           model: 'Editor.plugins.MatchResource.model.TaskAssoc'
       }),
       me.assocStore.load(prm);
   },
-  getAssocStoreCount: function(){
-      var me=this;
-      if(me.assocStore){
-          return me.assocStore.totalCount;
+  addEditorPanelToViewPort: function() {
+      var me = this;
+      if(me.getAssocStoreCount() <= 0){
+          return;
       }
-      return 0;
+      me.getEditorViewport().add({
+          xtype: 'matchResourceEditorPanel',
+          layout: 'auto',
+          region: 'south',
+          weight: 5,
+          resizeHandles: 'n',
+          //flex: 0.5, FIXME using this value enables 2/3 1/3 of the grid, but disables resizing. Could be removed after boxready, but what happens then with window resizing?
+          minHeight: 150,
+          collapsible: true,
+          resizable: true,
+          assocStore:me.assocStore
+      });
+  },
+  getAssocStoreCount: function(){
+      var store = this.assocStore;
+      return store ? store.getTotalCount() : 0;
   }
 });

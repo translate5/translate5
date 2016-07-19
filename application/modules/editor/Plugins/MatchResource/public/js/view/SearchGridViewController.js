@@ -52,7 +52,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
             '#searchGridPanel':{
                 render:'searchGridPanelRender'
             },
-            '#searchGridGrid actioncolumn':{
+            '#searchGrid actioncolumn':{
                 click:'handleMoreColumnClick'
             }
         }
@@ -75,7 +75,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
         field:null
     },
     SERVER_STATUS: null,//initialized after search grid panel is rendered
-    RESULTS_ROW_LIMIT:2,//the limit of result rows for each 'tmmt'
+    RESULTS_ROW_LIMIT: 5,//the limit of result rows for each 'tmmt'
     searchGridPanelRender: function(){
         var me=this;
         me.assocStore = me.getView().assocStore; 

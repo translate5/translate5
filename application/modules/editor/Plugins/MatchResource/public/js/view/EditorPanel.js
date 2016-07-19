@@ -53,6 +53,7 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
     itemId:'matchResourceEditorPanel',
     activeTab: 0,
     height:350,
+    layout: 'auto',
     plain: true,
     cls: 'plugin-match-resource-result-panel',
     initConfig: function(instanceConfig) {
