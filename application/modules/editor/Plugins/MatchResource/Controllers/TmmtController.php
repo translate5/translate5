@@ -42,8 +42,58 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
      */
     protected $entity;
     
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::indexAction()
+     * Adds the readonly "filebased" field to the results
+     */
     public function indexAction(){
         parent::indexAction();
+        $serviceManager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
+        /* @var $serviceManager editor_Plugins_MatchResource_Services_Manager */
+        
+        $resources = [];
+        
+        $getResource = function(string $serviceType, string $id) use ($resources, $serviceManager) {
+            if (!empty($resources[$id])) {
+                return $resources[$id];
+            }
+            return $resources[$id] = $serviceManager->getResourceById($serviceType, $id);
+        };
+        
+        foreach($this->view->rows as &$tmmt) {
+            $resource = $getResource($tmmt['serviceType'], $tmmt['resourceId']);
+            $tmmt['filebased'] = empty($resource) ? false : $resource->getFileBased();
+        }
+    }
+    
+    /**
+     * provides the uploaded file in a filebased TM as download
+     */
+    public function downloadAction() {
+        $this->getAction();
+        
+        $serviceManager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
+        /* @var $serviceManager editor_Plugins_MatchResource_Services_Manager */
+        
+        $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
+        
+        if(! $resource->getFilebased()) {
+            throw new ZfExtended_Models_Entity_NotFoundException('Requested tmmt is not filebased!');
+        }
+        
+        $connector = $serviceManager->getConnector($this->entity);
+        
+        
+        
+        // disable layout and view
+        //$this->view->layout()->disableLayout();
+        //$this->_helper->viewRenderer->setNoRender(true);
+        $data = $connector->getTm($mime);
+        header('Content-Type: '.$mime, TRUE);
+        header('Content-Disposition: attachment; filename="'.rawurlencode($this->entity->getFileName()).'"');
+        echo $data;
+        exit;
     }
     
     public function postAction(){

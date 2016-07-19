@@ -178,5 +178,14 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
                 'action' => 'search'
             ));
         $r->addRoute('plugins_matchresource_search', $queryRoute);
+        
+        $queryRoute = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_matchresource_tmmt/:id/download',
+            array(
+                'module' => 'editor',
+                'controller' => 'plugins_matchresource_tmmt',
+                'action' => 'download'
+            ));
+        $r->addRoute('plugins_matchresource_download', $queryRoute);
     }
 }

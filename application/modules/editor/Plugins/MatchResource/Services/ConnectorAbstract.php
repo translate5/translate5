@@ -82,6 +82,16 @@ abstract class editor_Plugins_MatchResource_Services_ConnectorAbstract {
         //to be implemented if needed
         $this->log(__METHOD__, ' filename '.$filename);
     }
+    
+    /**
+     * Gets the TM file content from the underlying system
+     * @param $mime reference which is filled with the mime string of the returned file
+     * @return string
+     */
+    public function getTm(& $mime) {
+        //to be implemented if needed
+        $this->log(__METHOD__, ' filename '.$filename);
+    }
 
     /**
      * Opens the with connectTo given TM on the configured Resource (on task open, not on each request)

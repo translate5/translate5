@@ -78,6 +78,19 @@ class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor
         //do nothing here, since we need the entity ID to save the TM
         return true;
     }
+    
+    /**
+     * (non-PHPdoc)
+     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::getTm()
+     */
+    public function getTm(& $mime) {
+        $file = new SplFileInfo($this->getTmFile($this->tmmt->getId()));
+        if(!$file->isFile() || !$file->isReadable()) {
+            throw new ZfExtended_NotFoundException('requested TM file for dummy TM with the tmmtId '.$this->tmmt->getId().' not found!');
+        }
+        $mime = 'application/csv';
+        return file_get_contents($file);
+    }
 
     /**
      * in our dummy file TM the TM can only be saved after the TM is in the DB, since the ID is needed for the filename
