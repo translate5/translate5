@@ -52,9 +52,8 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
     },
     itemId:'matchResourceEditorPanel',
     activeTab: 0,
-    height:350,
-    layout: 'auto',
-    plain: true,
+    layout: 'fit',
+    plain: false,
     cls: 'plugin-match-resource-result-panel',
     initConfig: function(instanceConfig) {
         var me = this,
@@ -81,10 +80,8 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
 		if(Editor.app.authenticatedUser.isAllowed('pluginMatchResourceSearchQuery')) {
 			config.items.push({
 	             title: this.strings.searchTitle,
-	             items:[{
-	            	 xtype:'matchResourceSearchGrid',
-	            	 assocStore:instanceConfig.assocStore,
-	             }]
+            	 xtype:'matchResourceSearchGrid',
+            	 assocStore:instanceConfig.assocStore
 	         });
 		}
 	},	

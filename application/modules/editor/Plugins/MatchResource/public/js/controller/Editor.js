@@ -207,11 +207,10 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       }
       me.getEditorViewport().add({
           xtype: 'matchResourceEditorPanel',
-          layout: 'auto',
           region: 'south',
           weight: 5,
           resizeHandles: 'n',
-          //flex: 0.5, FIXME using this value enables 2/3 1/3 of the grid, but disables resizing. Could be removed after boxready, but what happens then with window resizing?
+          flex: 0.5, //FIXME using this value enables 2/3 1/3 of the grid, but disables resizing. Could be removed after boxready, but what happens then with window resizing?
           minHeight: 150,
           collapsible: true,
           resizable: true,

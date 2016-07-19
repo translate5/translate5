@@ -56,6 +56,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
     assocStore : [],
     border: false,
     layout: 'fit',
+    scrollable: true,
     strings: {
         source: '#UT#Quelltext',
         target: '#UT#Zieltext',
@@ -67,7 +68,6 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
     initConfig: function(instanceConfig) {
         var me = this,
             config = {
-                //height:'100%',
                 columns: [{
                     xtype: 'gridcolumn',
                     flex: 33/100,
@@ -109,7 +109,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
                     items:[{
                         xtype:'textfield',
                         id:'sourceSearch',
-                        //width: '31%',
+                        width: '31%',
                         name:'source',
                         enableKeyEvents: true,
                         emptyText:me.strings.sourceEmptyText,
@@ -117,7 +117,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
                     },{
                         xtype:'textfield',
                         id:'targetSearch',
-                        //width: '31%',
+                        width: '31%',
                         name:'target',
                         enableKeyEvents: true,
                         emptyText:me.strings.targetEmptyText,
