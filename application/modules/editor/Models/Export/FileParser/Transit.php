@@ -158,6 +158,8 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
             $targetSeg->setText($targetText);
             
             $this->setSegmentInfoField($targetSeg, $segId);
+            
+            $targetSeg->setMatchValue($this->_segmentEntity->getMatchRate());
         }
         $this->sourceDOM->save();
         $this->_exportFile = $this->targetDOM->getAsString();

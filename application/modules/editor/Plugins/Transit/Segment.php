@@ -83,6 +83,8 @@ class editor_Plugins_Transit_Segment{
     const STATUS_UNKNOWN = - 1;
     
     const STATUS_MATCHVALUE = "\xEB";
+    const STATUS_MATCHVALUE_VALUE_NOT_SET = '2-233-4-234-6-238-2-245'; //ascii representation of the returned status part of STATUS_MATCHVALUE, if encoded by this->getAsciiValOfString
+    const STATUS_MATCHVALUE_VALUE_SET_ZERO = '10-233-6-234-6-238-21-246-2-245'; //ascii representation of the returned status part of STATUS_MATCHVALUE, if encoded by this->getAsciiValOfString
     const STATUS_EDITOR = "\xEA";
     
     const EXTERNAL = "\xC0\xE8";
@@ -264,6 +266,27 @@ class editor_Plugins_Transit_Segment{
         }
         return 0;
     }
+    
+    public function setMatchValue($value){
+        $partdata = $this->getPart(self::PART_STATUS);
+        if ($partdata){
+            if($this->getAsciiValOfString($partdata) === self::STATUS_MATCHVALUE_VALUE_NOT_SET){
+                $partdata = $this->getByteValOfAsciiRepresetentation(self::STATUS_MATCHVALUE_VALUE_SET_ZERO);
+            }
+            $max = strlen($partdata);
+            for($pos = 1; $pos < $max; $pos++){
+                if (substr($partdata, $pos, 1) == self::STATUS_MATCHVALUE){
+                    $this->setPart(self::PART_STATUS,substr_replace($partdata, chr($value), $pos - 1, 1));
+                    return true;
+                }
+            }
+            $this->setPart(self::PART_STATUS,$partdata.chr($value).self::STATUS_MATCHVALUE);
+            return true;
+        }
+        return FALSE;
+        
+        
+    }
 
     public function getStatusPart($status_part){
         $partdata = $this->getPart(self::PART_STATUS);
@@ -284,11 +307,31 @@ class editor_Plugins_Transit_Segment{
             $max = strlen($partdata);
             for($pos = 1; $pos < $max; $pos++){
                 if (substr($partdata, $pos, 1) == $status_part){
-                    $this->setPart(substr_replace($partdata, chr($value), $pos - 1, 1));
+                    $this->setPart(self::PART_STATUS,substr_replace($partdata, chr($value), $pos - 1, 1));
+                    return true;
                 }
             }
+            $this->setPart(self::PART_STATUS,$partdata.chr($value).$status_part);
+            return true;
         }
         return FALSE;
+    }
+    
+    private function getAsciiValOfString($string) {
+        $asciiArr = array();
+        for($i = 0; $i < strlen($string); $i++){
+           $asciiArr[] = ord($string[$i]);
+        }
+        return implode('-', $asciiArr);
+    }
+    
+    private function getByteValOfAsciiRepresetentation($string) {
+        $byte = '';
+        $arr = explode('-', $string);
+        foreach ($arr as $value) {
+           $byte .= chr($value);
+        }
+        return $byte;
     }
 
     public function getEditBy(){

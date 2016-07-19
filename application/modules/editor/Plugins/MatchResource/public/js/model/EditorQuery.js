@@ -34,7 +34,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.MatchResource.model.Resource
+ * @class Editor.plugins.MatchResource.model.EditorQuery
  * @extends Ext.data.Model
  */
 Ext.define('Editor.plugins.MatchResource.model.EditorQuery', {

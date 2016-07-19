@@ -38,6 +38,26 @@ END LICENSE AND COPYRIGHT
  * Export for Xlf uses same parser as Sdlxliff
  */
 
-class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParser_Sdlxliff
-{
+class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParser_Sdlxliff{
+    /**
+     * dedicated to write the match-Rate to the right position in the target format
+     * @param array $file that contains file as array as splitted by parse function
+     * @param integer $i position of current segment in the file array
+     * @return string
+     */
+    protected function writeMatchRate(array $file, integer $i) {
+        $matchRate = $this->_segmentEntity->getMatchRate();
+        $midArr = explode('_', $this->_segmentEntity->getMid());
+        $mid = $midArr[0];
+        $segPart =& $file[$i-1];
+        //example string
+        //<trans-unit id="3" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="AUTOSUBST" tmgr:matchratio="100">
+        if(preg_match('#<trans-unit[^>]* id="'.$mid.'"[^>]*tmgr:matchratio="\d+"#', $segPart)===1){
+            //if percent attribute is already defined
+            $segPart = preg_replace('#(<trans-unit[^>]* id="'.$mid.'"[^>]*tmgr:matchratio=)"\d+"#', '\\1"'.$matchRate.'"', $segPart);
+            return $file;
+        }
+        $segPart = preg_replace('#(<trans-unit[^>]* id="'.$mid.'" *)#', '\\1 tmgr:matchratio="'.$matchRate.'" ', $segPart);
+        return $file;
+    }
 }

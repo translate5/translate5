@@ -180,6 +180,9 @@ abstract class editor_Models_Export_FileParser {
             }
           
             $file[$i] = $this->getSegmentContent($matches[1], $field);
+            
+            $file = $this->writeMatchRate($file,$i);
+            
             $i = $i + 2;
         }
         $this->_exportFile = implode('', $file);
@@ -194,6 +197,18 @@ abstract class editor_Models_Export_FileParser {
     protected function preProcessReplacement($attributes) {
         return $attributes;
     }
+    
+    /**
+     * dedicated to write the match-Rate to the right position in the target format
+     * for overwriting purposes only
+     * @param array $file that contains file as array as splitted by parse function
+     * @param integer $i position of current segment in the file array
+     * @return string
+     */
+    protected function writeMatchRate(array $file, integer $i) {
+        return $file;
+    }
+    
     /**
      * the browser adds non-breaking-spaces instead of normal spaces, if the user
      * types more than one space directly after eachother. For the GUI this

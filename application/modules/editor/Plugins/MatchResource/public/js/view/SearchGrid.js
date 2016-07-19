@@ -39,7 +39,7 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.grid.Panel
  */
 Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
-	extend : 'Ext.grid.Panel',
+	extend : 'Ext.panel.Panel',
 	requires: [
 	           'Editor.plugins.MatchResource.view.SearchGridViewController',
 	           'Editor.plugins.MatchResource.view.SearchGridViewModel'
@@ -54,26 +54,85 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
 	strings: {
 	    source: '#UT#Quelltext',
 	    target: '#UT#Zieltext',
-	    match: '#UT#Matchrate'
+	    match: '#UT#Matchrate',
+        sourceEmptyText:'#UT#Quelltextsuche',
+        targetEmptyText:'#UT#Zieltextsuche',
+        tmresource:'#UT#TM-Ressource'
 	},
 	initConfig: function(instanceConfig) {
 	    var me = this,
 	    config = {
-	      columns: [{
-	          xtype: 'gridcolumn',
-	          flex: 33/100,
-	          dataIndex: 'source',
-	          text: me.strings.source
+	      items:[{
+              xtype: 'panel',
+              anchor: '100%',
+              layout:'column',
+              itemId:'searchGridPanel',
+              items:[{
+                  xtype:'textfield',
+                  id:'sourceSearch',
+                  name:'source',
+                  enableKeyEvents: true,
+                  emptyText:me.strings.sourceEmptyText,
+                  padding:'10 10 10 10',
+              },{
+                  xtype:'textfield',
+                  id:'targetSearch',
+                  name:'target',
+                  enableKeyEvents: true,
+                  emptyText:me.strings.targetEmptyText,
+                  padding:'10 10 10 10',
+              }]
 	      },{
-	          xtype: 'gridcolumn',
-	          flex: 33/100,
-	          dataIndex: 'target',
-	          text: me.strings.target
-	      },{
-	          xtype: 'gridcolumn',
-	          flex: 33/100,
-	          dataIndex: 'matchrate',
-	          text: me.strings.match
+	          xtype: 'grid',
+	          id:'searchGridGrid',
+	          layout: 'fit',
+	          bind: {
+	              store: '{editorsearch}'
+	          },
+    	      columns: [{
+    	          xtype: 'gridcolumn',
+    	          flex: 33/100,
+    	          dataIndex: 'source',
+    	          text: me.strings.source
+    	      },{
+    	          xtype: 'gridcolumn',
+    	          flex: 33/100,
+    	          dataIndex: 'target',
+    	          text: me.strings.target
+    	      },{
+    	          xtype: 'gridcolumn',
+    	          flex: 33/100,
+    	          dataIndex: 'service',
+    	          renderer: function(val, meta, record) {
+                      var str =me.assocStore.findRecord('id',record.get('tmmtid'));
+                      meta.style="background-color:#"+str.get('color')+" !important;";
+                      return str.get('name')+'-'+str.get('serviceName');
+                  },
+    	          text: me.strings.tmresource
+    	      },{
+                  xtype: 'actioncolumn',
+                  width: 60,
+                  renderer: function(val, meta, record) {
+                      if(record.get('showMoreIcon')){
+                          meta.tdAttr = 'data-qtip="Show more..."';
+                          meta.tdCls  = meta.tdCls  + 'ico-tm-information';
+                      }
+                  }
+    	          /*,
+                  items: [{
+                      tooltip: "Show more...",
+                      iconCls: 'ico-tm-information'
+                  }]
+                  */
+              }]
+	          /*
+              dockedItems: [{
+                  xtype: 'pagingtoolbar',
+                  itemId: 'pagingtoolbar',
+                  dock: 'bottom',
+                  displayInfo: true
+              }]
+              */
 	      }]
 	    };
 	    me.assocStore = instanceConfig.assocStore;

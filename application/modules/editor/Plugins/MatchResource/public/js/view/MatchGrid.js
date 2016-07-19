@@ -131,6 +131,14 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	          },
 	          text: me.strings.match
 	      }]
+         /* ,
+	      dockedItems: [{
+	          xtype: 'pagingtoolbar',
+	          itemId: 'pagingtoolbar',
+	          dock: 'bottom',
+	          displayInfo: true
+	      }]
+	      */
 	    };
 	    me.assocStore = instanceConfig.assocStore;
 	    me.SERVER_STATUS=Editor.plugins.MatchResource.model.EditorQuery.prototype;

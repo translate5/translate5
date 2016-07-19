@@ -165,7 +165,9 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      */
     protected function setSegmentAttribs($transunit)
     {
-        $id = $this->segmentCount++;
+        //build mid from id of segment plus segmentCount, because xlf-file can have more than one file in it with repeatingly the same ids.
+        //mid is unique per imported xliff-file
+        $id = preg_replace('/.* id="(.*?)".*/i', '${1}', $transunit[1]).'_'.$this->segmentCount++;
         $matchRate = (int) preg_replace('/.*tmgr:matchratio="(.*?)".*/i', '${1}', $transunit[1]);
         
         $this->_matchRateSegment[$id] = $matchRate;

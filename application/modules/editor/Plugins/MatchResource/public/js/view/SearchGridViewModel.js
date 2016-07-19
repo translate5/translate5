@@ -55,9 +55,8 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewModel', {
     initConfig: function(instanceConfig) {
         var me = this,
             config = {
-                /*
                 stores: {
-                    editorquery: {
+                    editorsearch: {
                         pageSize: 200,
                         autoLoad: false,
                         model: 'Editor.plugins.MatchResource.model.EditorQuery',
@@ -67,7 +66,6 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewModel', {
                         }]
                     }
                 }
-                */
             };
         if (instanceConfig) {
             me.getConfigurator().merge(me, config, instanceConfig);

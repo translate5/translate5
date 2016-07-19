@@ -70,7 +70,16 @@ END LICENSE AND COPYRIGHT
             serverErrorMsg408:'<?php echo $this->translate->_('Die Anfrage an die Matchressource dauerte zu lange.');?>',
         }
     });
-    
+    Ext.define("Editor.locale.plugins.MatchResource.view.SearchGridViewController", {
+        override: "Editor.plugins.MatchResource.view.SearchGridViewController",
+        strings: {
+            loading: '<?php echo $this->translate->_('wird geladen...');?>',
+            noresults: '<?php echo $this->translate->_('Es wurden keine Ergebnisse gefunden.');?>',
+            serverErrorMsgDefault: '<?php echo $this->translate->_('Die Anfrage an die Matchressource dauerte zu lange.');?>',
+            serverErrorMsg500:'<?php echo $this->translate->_('Die Anfrage führte zu einem Fehler im angefragten Dienst.');?>',
+            serverErrorMsg408:'<?php echo $this->translate->_('Die Anfrage an die Matchressource dauerte zu lange.');?>',
+        }
+    });
     Ext.define("Editor.locale.plugins.MatchResource.view.AddTmWindow", {
         override: "Editor.plugins.MatchResource.view.AddTmWindow",
         strings: {
@@ -115,7 +124,20 @@ END LICENSE AND COPYRIGHT
         strings: {
             source: '<?php echo $this->translate->_('Quelltext');?>',
             target: '<?php echo $this->translate->_('Zieltext');?>',
-            match: '<?php echo $this->translate->_('Matchrate');?>'
+            match: '<?php echo $this->translate->_('Matchrate');?>',
+            tmresource: '<?php echo $this->translate->_('TM-Ressource');?>',
+            sourceEmptyText:'<?php echo $this->translate->_('Quelltextsuche');?>',
+            targetEmptyText:'<?php echo $this->translate->_('Zieltextsuche');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.plugins.MatchResource.view.SearchResultGrid", {
+        override: "Editor.plugins.MatchResource.view.SearchResultGrid",
+        strings: {
+            source: '<?php echo $this->translate->_('Quelltext');?>',
+            target: '<?php echo $this->translate->_('Zieltext');?>',
+            match: '<?php echo $this->translate->_('Matchrate');?>',
+            tmresource: '<?php echo $this->translate->_('TM-Ressource');?>'
         }
     });
     
