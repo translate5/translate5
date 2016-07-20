@@ -234,7 +234,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
             if(res.get(tmmtid)){
                 me.getView().getStore('editorquery').loadRawData(res.get(tmmtid).rows,true);
             }
-            me.handleViwMode();
+            me.handleViewMode();
         }
     },
     setFirsEditableRow: function(fer) {
@@ -314,7 +314,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
         me.loadCachedDataIntoGrid(segmentId,tmmtid);
         me.cachedResults.get(segmentId).removeAtKey(tmmtid);
     },
-    handleViwMode:function(){
+    handleViewMode:function(){
         if(this.ergonomicMode){
             Ext.select('.matchGrid .x-grid-row .x-grid-cell').each(function(el){
                 Ext.fly(el).addCls('ergonomic-font');
