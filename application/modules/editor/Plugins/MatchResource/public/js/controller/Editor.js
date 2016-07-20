@@ -210,8 +210,17 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           region: 'south',
           weight: 5,
           resizeHandles: 'n',
-          flex: 0.5, //FIXME using this value enables 2/3 1/3 of the grid, but disables resizing. Could be removed after boxready, but what happens then with window resizing?
+          // setting segment grid 2/3 and match grid 1/3 of the height
+          flex: 0.5,
+          // minheight remains also for manual resizing
           minHeight: 150,
+          listeners: {
+              //remove the flex value after panel creation, since with flex value set not resizing is allowed
+              boxready: function(panel) {
+                  panel.setFlex(0);
+              }
+          },
+          //collapsing is independant of resizing
           collapsible: true,
           resizable: true,
           assocStore:me.assocStore
