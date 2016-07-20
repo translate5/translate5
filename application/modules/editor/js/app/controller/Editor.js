@@ -718,6 +718,9 @@ Ext.define('Editor.controller.Editor', {
           plug = me.getEditPlugin();
       e.preventDefault();
       e.stopEvent();
+      if(!this.isEditing) {
+          return;
+      }
       if(plug.editor.context.reordered) {
           Editor.MessageBox.addInfo(me.messages.segmentsChangedJump);
           return;
