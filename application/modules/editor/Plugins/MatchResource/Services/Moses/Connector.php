@@ -61,6 +61,8 @@ class editor_Plugins_MatchResource_Services_Moses_Connector extends editor_Plugi
      */
     public function query(editor_Models_Segment $segment) {
         $queryString = $this->getQueryString($segment);
+        //query moses without tags
+        $queryString = $segment->stripTags($queryString);
         
         $res = $this->tmmt->getResource();
         /* @var $res editor_Plugins_MatchResource_Services_Moses_Resource */

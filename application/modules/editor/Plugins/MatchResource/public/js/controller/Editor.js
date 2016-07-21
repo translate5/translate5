@@ -55,6 +55,9 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
   },{
       ref: 'editorPanel',
       selector:'#matchResourceEditorPanel'
+  },{
+      ref: 'editorViewport',
+      selector:'#editorViewport'
   }],
   listen: {
       component: {
@@ -62,13 +65,11 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
               //render: 'onSegmentGridRender',
               beforeedit: 'startEditing',
               canceledit: 'endEditing',
+              afterrender:'centerPanelAfterRender',
               edit: 'endEditing'
           },
           '#matchGrid': {
               chooseMatch: 'setMatchInEditor'
-          },
-          '#centerpanel':{
-              afterrender:'centerPanelAfterRender'
           }
       },
       controller: {
@@ -84,6 +85,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       }
   },
   msgDisabledMatchRate: '#UT#Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.',
+  msgDisabledSourceEdit: '#UT#Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.',
   assocStore: null,
   SERVER_STATUS: null,//initialized after center panel is rendered
   afterInitEditor: function() {
@@ -111,11 +113,11 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       //    me.checkAssocStore(grid);
      // }
   //},
-  centerPanelAfterRender: function(comp){
+  centerPanelAfterRender: function(){
       var me=this,
           authUser = Editor.app.authenticatedUser;
       if(!Editor.data.task.isReadOnly() && (authUser.isAllowed('pluginMatchResourceMatchQuery') || authUser.isAllowed('pluginMatchResourceSearchQuery'))){
-          me.checkAssocStore(comp);
+          me.checkAssocStore();
       }
       me.SERVER_STATUS = Editor.plugins.MatchResource.model.EditorQuery.prototype;
   },
@@ -146,10 +148,13 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       if(matchRecord.get('state')!=me.SERVER_STATUS.SERVER_STATUS_LOADED){
           return;
       }
-      //we dont support the matchrate saving for tasks with alternatives:
-      if(!task.get('defaultSegmentLayout') || editor.isSourceEditing()) {
+      
+      //don't take over the match when the source column is edited
+      if(editor.isSourceEditing()) {
+          Editor.MessageBox.addWarning(this.msgDisabledSourceEdit);
           return;
       }
+      
       
       if(plug.editing && rec && rec.get('editable')) {
           //Editor.MessageBox.addInfo("Show a message on take over content?");
@@ -158,9 +163,13 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           contentTags = sc.getContentTags().join('');
                     
           editor.mainEditor.setValueAndMarkup(matchRecord.get('target')+contentTags, rec.get('id'), editor.columnToEdit);
-          rec.set('matchRate', matchrate);
-          rec.set('matchRateType', 'matchresourceusage'); 
-          me.getMatchrateDisplay().setRawValue(matchrate);
+          
+          //we don't support the matchrate saving for tasks with alternatives:
+          if(task.get('defaultSegmentLayout')) {
+              rec.set('matchRate', matchrate);
+              rec.set('matchRateType', Editor.data.plugins.MatchResource.matchrateTypeChangedState); 
+              me.getMatchrateDisplay().setRawValue(matchrate);
+          }
       } 
   },
   viewModeChangeEvent: function(controller){
@@ -176,41 +185,49 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           this.getEditorPanel().show();
       }
   },
-  checkAssocStore: function(comp){
-      var me=this
-      taskGuid = Editor.data.task.get('taskGuid'),
-      prm = {
-            params: {
-                filter: '[{"operator":"like","value":"'+taskGuid+'","property":"taskGuid"},{"operator":"eq","value":true,"property":"checked"}]'
-            },
-            callback:function(){
-                if(me.getAssocStoreCount() > 0){
-                    comp.addDocked({
-                        xtype: 'panel',
-                        layout: 'fit',
-                        dock: 'bottom',
-                        //resizeHandles: 'n',
-                        collapsible:true,
-                        //resizable: true,
-                        items:[{
-                            xtype: 'matchResourceEditorPanel',
-                            assocStore:me.assocStore,
-                        }]
-                    });
-                }
-            },
-            scope: me
-      };
+  checkAssocStore: function(){
+      var me = this
+          taskGuid = Editor.data.task.get('taskGuid'),
+          prm = {
+                params: {
+                    filter: '[{"operator":"like","value":"'+taskGuid+'","property":"taskGuid"},{"operator":"eq","value":true,"property":"checked"}]'
+                },
+                callback:me.addEditorPanelToViewPort,
+                scope: me
+          };
       me.assocStore = Ext.create('Ext.data.Store', {
           model: 'Editor.plugins.MatchResource.model.TaskAssoc'
       }),
       me.assocStore.load(prm);
   },
-  getAssocStoreCount: function(){
-      var me=this;
-      if(me.assocStore){
-          return me.assocStore.totalCount;
+  addEditorPanelToViewPort: function() {
+      var me = this;
+      if(me.getAssocStoreCount() <= 0){
+          return;
       }
-      return 0;
+      me.getEditorViewport().add({
+          xtype: 'matchResourceEditorPanel',
+          region: 'south',
+          weight: 5,
+          resizeHandles: 'n',
+          // setting segment grid 2/3 and match grid 1/3 of the height
+          flex: 0.5,
+          // minheight remains also for manual resizing
+          minHeight: 150,
+          listeners: {
+              //remove the flex value after panel creation, since with flex value set not resizing is allowed
+              boxready: function(panel) {
+                  panel.setFlex(0);
+              }
+          },
+          //collapsing is independant of resizing
+          collapsible: true,
+          resizable: true,
+          assocStore:me.assocStore
+      });
+  },
+  getAssocStoreCount: function(){
+      var store = this.assocStore;
+      return store ? store.getTotalCount() : 0;
   }
 });

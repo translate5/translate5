@@ -98,7 +98,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
             '#cancel-tm-btn':{
                 click:'handleCancelWindowClick'
             },
-            '#gridTmOverview actioncolumn':{
+            '#tmOverviewPanel actioncolumn':{
                 click:'handleTmGridActionColumnClick'
             },
             '#tmOverviewPanel #btnRefresh':{
@@ -141,7 +141,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
         if(panel) {
             panel.show();
         } else {
-            me.getCenterRegion().add({xtype: 'TmOverviewPanel'}).show();
+            me.getCenterRegion().add({xtype: 'tmOverviewPanel'}).show();
             me.handleAfterShow();
         }
     },
@@ -150,7 +150,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
         win.show();
     },
     handleButtonRefreshClick : function(){
-        Ext.getCmp('gridTmOverview').getStore().load();
+        this.getTmOverviewPanel().getStore().load();
         this.getEditorPluginsMatchResourceStoreResourcesStore().load();
     },
     handleSaveWindowClick:function(){
@@ -170,11 +170,12 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
 
             record.save({
                 failure: function(records, op) {
+                    win.setLoading(false);
                     Editor.app.getController('ServerException').handleException(op.error.response);
                 },
                 success: function() {
                     var msg = Ext.String.format(me.strings.edited, record.get('name'));
-                    Ext.getCmp('gridTmOverview').getStore().load();
+                    this.getTmOverviewPanel().getStore().load();
                     win.setLoading(false);
                     win.close();
                     Editor.MessageBox.addSuccess(msg);
@@ -193,7 +194,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
             scope: me,
             success: function(form, submit) {
                 var msg = Ext.String.format(me.strings.created, submit.result.rows.name);
-                Ext.getCmp('gridTmOverview').getStore().load();
+                this.getTmOverviewPanel().getStore().load();
                 win.setLoading(false);
                 me.getTmWindow().close();
                 Editor.MessageBox.addSuccess(msg);
@@ -216,35 +217,54 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
     handleTmGridActionColumnClick:function(view, cell, row, col, ev, evObj) {
         var me = this,
             store = view.getStore(),
-            selectedRow = store.getAt(row),
-            t = ev.getTarget(),
-            msg = me.strings,
-            info,
-            f = t.className.match(/ico-tm-([^ ]+)/);
+            record = store.getAt(row),
+            f = ev.getTarget().className.match(/ico-tm-([^ ]+)/);
 
         switch(f && f[1] || '') {
             case 'edit':
-                me.handleEditTm(view,cell,col,selectedRow);
+                me.handleEditTm(view,cell,col,record);
+                break;
+            case 'download':
+                me.handleDownloadTm(view,cell,col,record);
                 break;
             case 'delete':
-                info = Ext.String.format(me.strings.deleteConfirmText, selectedRow.get('name'));
-                Ext.Msg.confirm(me.strings.deleteConfirm, info, function(btn){
-                    if(btn !== 'yes') {
-                        return;
-                    }
-                    selectedRow.dropped = true;
-                    selectedRow.save({
-                        failure: function() {
-                            selectedRow.reject();
-                        },
-                        success: function() {
-                            store && store.load();
-                            store.remove(selectedRow);
-                            Editor.MessageBox.addSuccess(me.strings.deleted);
-                        }
-                    });
-                });
+                me.handleDeleteTm(view,cell,col,record);
                 break;
         }
+    },
+    handleDownloadTm : function(view, cell, cellIdx, rec){
+        var proxy = rec.proxy,
+            id = rec.getId(),
+            url = proxy.getUrl();
+
+        if (proxy.getAppendId() && proxy.isValidId(id)) {
+            if (!url.match(proxy.slashRe)) {
+                url += '/';
+            }
+        }
+        url += encodeURIComponent(id);
+        url += '/download';
+        window.open(url);
+    },
+    handleDeleteTm : function(view, cell, cellIdx, rec){
+        var msg = this.strings,
+            store = view.getStore(),
+            info = Ext.String.format(msg.deleteConfirmText, rec.get('name'));
+        Ext.Msg.confirm(msg.deleteConfirm, info, function(btn){
+            if(btn !== 'yes') {
+                return;
+            }
+            rec.dropped = true;
+            rec.save({
+                failure: function() {
+                    rec.reject();
+                },
+                success: function() {
+                    store && store.load();
+                    store.remove(rec);
+                    Editor.MessageBox.addSuccess(msg.deleted);
+                }
+            });
+        });
     }
 });

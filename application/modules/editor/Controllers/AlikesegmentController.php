@@ -178,6 +178,10 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 $entity->setUserGuid($this->entity->getUserGuid());
                 $entity->setWorkflowStep($this->entity->getWorkflowStep());
                 $entity->setWorkflowStepNr($this->entity->getWorkflowStepNr());
+                
+                $entity->setMatchRate($this->entity->getMatchRate());
+                $entity->setMatchRateType($this->entity->getMatchRateType());
+                
                 $entity->setAutoStateId($states->calculateAlikeState($entity, $tua));
                 
                 //is called before save the alike to the DB, after doing all alike data handling (include recalc of the autostate)

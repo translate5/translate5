@@ -48,7 +48,7 @@ Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
         reload: '#UT#Aktualisieren',
         save: '#UT#Speichern',
         empty: '#UT#Keine Match Resource in der Sprachkombination des geöffneten Tasks verfügbar.',
-        groupHeader: '#UT#Dienst: {name}',
+        groupHeader: '#UT#Resource: {name}',
         name: '#UT#Name',
         source: '#UT#Quellsprache',
         target: '#UT#Zielsprache'

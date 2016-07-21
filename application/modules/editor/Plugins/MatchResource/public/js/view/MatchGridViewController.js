@@ -310,7 +310,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
         me.loadCachedDataIntoGrid(segmentId,tmmtid);
         me.cachedResults.get(segmentId).removeAtKey(tmmtid);
     },
-    handleViwMode:function(ergoMode){
+    handleViewMode:function(ergoMode){
         if(ergoMode){
             Ext.select('.searchGrid .x-grid-row .x-grid-cell').each(function(el){
                 Ext.fly(el).addCls('ergonomic-font');

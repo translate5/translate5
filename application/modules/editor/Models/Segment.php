@@ -36,14 +36,42 @@ END LICENSE AND COPYRIGHT
  */
 
 /**
- * Segment Entity Objekt
+ * Segment Entity Object
  * 
  * @method integer getId() getId()
  * @method void setId() setId(integer $id)
- * @method integer getSegmentNrInTask() getSegmentNrInTask()
+ * @method int getSegmentNrInTask() getSegmentNrInTask()
+ * @method void setSegmentNrInTask() setSegmentNrInTask(int $nr)
+ * @method int getFileId() getFileId()
+ * @method void setFileId() setFileId(int $id)
+ * @method string getMid() getMid()
+ * @method void setMid() setMid(string $mid)
+ * @method string getUserGuid() getUserGuid()
+ * @method void setUserGuid() setUserGuid(string $guid)
+ * @method string getUserName() getUserName()
+ * @method void setUserName() setUserName(string $name)
+ * @method string getTaskGuid() getTaskGuid()
+ * @method void setTaskGuid() setTaskGuid(string $guid)
+ * @method int getTimestamp() getTimestamp()
+ * @method void setTimestamp() setTimestamp(int $timestamp)
+ * @method bool getEditable() getEditable()
+ * @method void setEditable() setEditable(bool $editable)
+ * @method bool getPretrans() getPretrans()
+ * @method void setPretrans() setPretrans(bool $pretrans)
+ * @method int getMatchRate() getMatchRate()
+ * @method void setMatchRate() setMatchRate(int $matchrate)
+ * @method string getMatchRateType() getMatchRateType()
+ * @method void setMatchRateType() setMatchRateType(string $type)
+ * @method string getQmId() getQmId()
+ * @method void setQmId() setQmId(string $qmid)
+ * @method int getStateId() getStateId()
+ * @method void setStateId() setStateId(int $id)
  * @method integer getAutoStateId() getAutoStateId()
  * @method void setAutoStateId() setAutoStateId(integer $id)
- * @method integer getEditable() getEditable()
+ * @method int getFileOrder() getFileOrder()
+ * @method void setFileOrder() setFileOrder(int $order)
+ * @method string getComments() getComments()
+ * @method void setComments() setComments(string $comments)
  * @method integer getWorkflowStepNr() getWorkflowStepNr()
  * @method void setWorkflowStepNr() setWorkflowStepNr(integer $stepNr)
  * @method string getWorkflowStep() getWorkflowStep()
@@ -452,7 +480,21 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             $this->segmentdata[] = $row;
         }
     }
-    
+    /**
+     * loads segment entity
+     * @param integer $fileId
+     * @param type $mid
+     */
+    public function loadByFileidMid(integer $fileId, $mid) {
+        $taskGuid = $this->getTaskGuid();
+        $s = $this->db->select()->from($this->tableName, array('id'));
+        $s = $this->addWatchlistJoin($s);
+        $segmentId = new Zend_Db_Expr('('.$s
+                            ->where($this->tableName.'.taskGuid = ?', $taskGuid)
+                            ->where($this->tableName.'.fileId = ?', $fileId)
+                            ->where($this->tableName.'.mid = ?', $mid).')');
+        $this->load($segmentId);
+    }
     /**
      * adds one single field content ([original => TEXT, originalMd5 => HASH]) to a given segment, 
      * identified by MID and fileId. taskGuid MUST be given by setTaskGuid before!
@@ -470,10 +512,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $taskGuid = $this->getTaskGuid();
         $s = $this->db->select()->from($this->tableName, array('id'));
         $s = $this->addWatchlistJoin($s);
-        $segmentId = new Zend_Db_Expr('('.$s
-                            ->where($this->tableName.'.taskGuid = ?', $taskGuid)
-                            ->where($this->tableName.'.fileId = ?', $fileId)
-                            ->where($this->tableName.'.mid = ?', $mid).')');
+        $segmentId = $this->getId();
+        if(is_null($segmentId)){
+            $this->loadByFileidMid($fileId, $mid);
+            $segmentId = $this->getId();
+        }
         
         $data = array(
             'taskGuid' => $taskGuid,

@@ -117,7 +117,6 @@ Ext.define('Editor.plugins.MatchResource.view.SearchResultGrid', {
               xtype: 'gridcolumn',
               flex: 33/100,
               dataIndex: 'service',
-              cellWrap: true,
               renderer: function(val, meta, record) {
                   var str =me.assocStore.findRecord('id',record.get('tmmtid'));
                   meta.tdStyle ="background-color:#"+str.get('color')+" !important;";

@@ -38,110 +38,116 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.panel.Panel
  */
 Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
-    extend : 'Ext.panel.Panel',//'Ext.grid.Panel',
-    alias: 'widget.TmOverviewPanel',
+    extend : 'Ext.grid.Panel',
+    alias: 'widget.tmOverviewPanel',
     itemId: 'tmOverviewPanel',
     title:'#UT#Matchressourcen',
     strings: {
         name: '#UT#Name',
         edit: '#UT#Bearbeiten',
         erase: '#UT#Löschen',
+        download: '#UT#Dateibasiertes TM herunterladen und lokal speichern',
         resource: '#UT#Ressource',
         color: '#UT#Farbe',
         refresh: '#UT#Aktualisieren',
-        add: '#UT#hinzufügen',
+        add: '#UT#Hinzufügen',
     },
-    cls:'',
+    cls:'tmOverviewPanel',
     height: '100%',
     layout: {
         type: 'fit'
     },
     initConfig: function(instanceConfig) {
-      var me = this,
-      config = {
-          title: me.title, //see EXT6UPD-9
-        	items :[{
-        			xtype:'grid',
-        			id:'gridTmOverview',
-        			cls:'gridTmOverview',
-        			store : 'Editor.plugins.MatchResource.store.TmMts',
-			        columns: [{
-			            xtype: 'gridcolumn',
-			            width: 100,
-			            dataIndex: 'name',
-			            filter: {
-			                type: 'string'
-			            },
-			            text: me.strings.name
-			        },{
-			            xtype: 'gridcolumn',
-			            width: 100,
-			        	dataIndex: 'sourceLang',
-			        	renderer : me.langRenderer,
-			        	cls: 'source-lang',
-			            filter: {
-			                type: 'string'
-			            }
-			        },{
-			            xtype: 'gridcolumn',
-			            width: 100,
-			            dataIndex: 'targetLang',
-			            renderer : me.langRenderer,
-			            cls: 'target-lang',
-			            filter: {
-			                type: 'string'
-			            }
-			        },{
-			            xtype: 'gridcolumn',
-			            width: 100,
-			            dataIndex: 'color',
-						renderer: function(value, metaData, record) {
-			        		return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #'+record.data.color+';"></div>';
-			        	},
-			            text: me.strings.color
-			        },{
-			        	xtype: 'actioncolumn',
-			            width: 60,
-			            items: [{
-			                tooltip: me.strings.edit,
-			                iconCls: 'ico-tm-edit'
-			            },{
-			                tooltip: me.strings.erase,
-			                iconCls: 'ico-tm-delete'
-			            }]
-			        },{
-			        	xtype: 'gridcolumn',
-			            width: 100,
-			         	text: me.strings.resource,
-			         	dataIndex: 'serviceName',
-			         	filter: {
-			                 type: 'string'
-			            }
-			        }],
-			        dockedItems: [{
-			            xtype: 'toolbar',
-			            dock: 'top',
-			            items: [{
-			                xtype: 'button',
-			                iconCls: 'ico-tm-add',
-			                itemId: 'btnAddTm',
-			                text: me.strings.add,
-			                hidden: ! Editor.app.authenticatedUser.isAllowed('editorAddUser'), 
-			                tooltip: me.strings.add
-			            },{
-			                xtype: 'button',
-			                iconCls: 'ico-refresh',
-			                itemId: 'btnRefresh',
-			                text: me.strings.refresh,
-			                tooltip: me.strings.refresh
-			            }]
-			        },{
-			            xtype: 'pagingtoolbar',
-			            //store: 'admin.Users',
-			            dock: 'bottom',
-			            displayInfo: true
-			        }]
-        	}]
+        var me = this,
+            config = {
+                title: me.title, //see EXT6UPD-9
+                store : 'Editor.plugins.MatchResource.store.TmMts',
+                viewConfig: {
+                    getRowClass: function(record) {
+                        return record.get('filebased') ? 'match-ressource-filebased' : 'match-ressource-non-filebased';
+                    }
+                },
+                columns: [{
+                    xtype: 'gridcolumn',
+                    width: 100,
+                    dataIndex: 'name',
+                    filter: {
+                        type: 'string'
+                    },
+                    text: me.strings.name
+                },{
+                    xtype: 'gridcolumn',
+                    width: 100,
+                    dataIndex: 'sourceLang',
+                    renderer : me.langRenderer,
+                    cls: 'source-lang',
+                    filter: {
+                        type: 'string'
+                    }
+                },{
+                    xtype: 'gridcolumn',
+                    width: 100,
+                    dataIndex: 'targetLang',
+                    renderer : me.langRenderer,
+                    cls: 'target-lang',
+                    filter: {
+                        type: 'string'
+                    }
+                },{
+                    xtype: 'gridcolumn',
+                    width: 100,
+                    dataIndex: 'color',
+                    renderer: function(value, metaData, record) {
+                        return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #'+record.data.color+';"></div>';
+                    },
+                    text: me.strings.color
+                },{
+                    xtype: 'actioncolumn',
+                    width: 60,
+                    items: [{
+                        tooltip: me.strings.edit,
+                        action: 'edit',
+                        iconCls: 'ico-tm-edit'
+                    },{
+                        tooltip: me.strings.erase,
+                        action: 'delete',
+                        iconCls: 'ico-tm-delete'
+                    },{
+                        tooltip: me.strings.download,
+                        action: 'download',
+                        iconCls: 'ico-tm-download'
+                    }]
+                },{
+                    xtype: 'gridcolumn',
+                    width: 100,
+                    text: me.strings.resource,
+                    dataIndex: 'serviceName',
+                    filter: {
+                        type: 'string'
+                    }
+                }],
+                dockedItems: [{
+                    xtype: 'toolbar',
+                    dock: 'top',
+                    items: [{
+                        xtype: 'button',
+                        iconCls: 'ico-tm-add',
+                        itemId: 'btnAddTm',
+                        text: me.strings.add,
+                        tooltip: me.strings.add
+                    },{
+                        xtype: 'button',
+                        iconCls: 'ico-refresh',
+                        itemId: 'btnRefresh',
+                        text: me.strings.refresh,
+                        tooltip: me.strings.refresh
+                    }]
+                },{
+                    xtype: 'pagingtoolbar',
+                    store: 'Editor.plugins.MatchResource.store.TmMts',
+                    dock: 'bottom',
+                    displayInfo: true
+            }]
       };
 
       if (instanceConfig) {
@@ -150,12 +156,12 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
       return me.callParent([config]);
     },
     langRenderer : function(val, md) {
-		var lang = Ext.StoreMgr.get('admin.Languages').getById(val), label;
-		if (lang) {
-			label = lang.get('label');
-			md.tdAttr = 'data-qtip="' + label + '"';
-			return label;
-		}
-		return '';
-	},
-  });
+        var lang = Ext.StoreMgr.get('admin.Languages').getById(val), label;
+        if (lang) {
+            label = lang.get('label');
+            md.tdAttr = 'data-qtip="' + label + '"';
+            return label;
+        }
+        return '';
+    },
+});
