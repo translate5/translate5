@@ -50,6 +50,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
         type: 'matchResourceSearchGrid'
     },
 	itemId:'searchGrid',
+	cls:'searchGrid',
 	assocStore : [],
 	strings: {
 	    source: '#UT#Quelltext',

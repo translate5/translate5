@@ -130,11 +130,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
         //isViewMode
         //isErgonomicMode
         //isEditMode
-        if(controller.self.isErgonomicMode()){
-            this.ergonomicMode = true;
-            return;
-        }
-        this.ergonomicMode = false;
+        //me.handleViwMode(controller.self.isErgonomicMode());
     },
     cache: function(){
         var me = this,
@@ -213,6 +209,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                 }
         });
     },
+    //FIXME refactor the method
     loadCachedDataIntoGrid: function(segmentId,tmmtid,query) {
         if(segmentId != this.editedSegmentId){
             return;
@@ -234,7 +231,6 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
             if(res.get(tmmtid)){
                 me.getView().getStore('editorquery').loadRawData(res.get(tmmtid).rows,true);
             }
-            me.handleViwMode();
         }
     },
     setFirsEditableRow: function(fer) {
@@ -314,16 +310,16 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
         me.loadCachedDataIntoGrid(segmentId,tmmtid);
         me.cachedResults.get(segmentId).removeAtKey(tmmtid);
     },
-    handleViwMode:function(){
-        if(this.ergonomicMode){
-            Ext.select('.matchGrid .x-grid-row .x-grid-cell').each(function(el){
+    handleViwMode:function(ergoMode){
+        if(ergoMode){
+            Ext.select('.searchGrid .x-grid-row .x-grid-cell').each(function(el){
                 Ext.fly(el).addCls('ergonomic-font');
             });
             return;
         }
-        Ext.select('.matchGrid .x-grid-row .x-grid-cell').each(function(el){
+        Ext.select('.searchGrid .x-grid-row .x-grid-cell').each(function(el){
             Ext.fly(el).removeCls('ergonomic-font');
             Ext.fly(el).addCls('view-editor-font-size');
         });
-    },
+    }
 });
