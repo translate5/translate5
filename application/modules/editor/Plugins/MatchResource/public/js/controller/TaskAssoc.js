@@ -79,7 +79,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
   onParentRender: function(window) {
       var me = this;
       me.actualTask = window.actualTask;
-      me.getTaskTabs().add({xtype: 'matchResourceTaskAssocPanel', actualTask: me.actualTask});
+      me.getTaskTabs().insert(1,{xtype: 'matchResourceTaskAssocPanel', actualTask: me.actualTask});
   },
   handleLoadPreferences: function(controller,task){
       var me = this,

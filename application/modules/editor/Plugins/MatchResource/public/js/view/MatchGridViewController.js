@@ -131,6 +131,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
         //isErgonomicMode
         //isEditMode
         //me.handleViwMode(controller.self.isErgonomicMode());
+        //console.log(me.getView().getStore().refresh());
     },
     cache: function(){
         var me = this,
@@ -209,29 +210,27 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                 }
         });
     },
-    //FIXME refactor the method
     loadCachedDataIntoGrid: function(segmentId,tmmtid,query) {
         if(segmentId != this.editedSegmentId){
             return;
         }
         var me = this;
-        if(me.cachedResults.get(segmentId)){
-            var res =me.cachedResults.get(segmentId);
-            if(tmmtid < 0){
-                me.assocStore.each(function(record){
-                    if(res.get(record.get('id'))){
-                        var rcd =res.get(record.get('id')).rows;
-                        me.getView().getStore('editorquery').loadRawData(rcd,true);
-                    }else{
-                        me.cacheSingleMatchPanelResults(record,segmentId,query);
-                    }
-                });
-                return;
-            }
-            if(res.get(tmmtid)){
-                me.getView().getStore('editorquery').loadRawData(res.get(tmmtid).rows,true);
-            }
+        if(!me.cachedResults.get(segmentId)){
+            return;
         }
+        var res =me.cachedResults.get(segmentId);
+        if(tmmtid > 0 && res.get(tmmtid)){
+            me.getView().getStore('editorquery').loadRawData(res.get(tmmtid).rows,true);
+            return;
+        }
+        me.assocStore.each(function(record){
+            if(res.get(record.get('id'))){
+                var rcd =res.get(record.get('id')).rows;
+                me.getView().getStore('editorquery').loadRawData(rcd,true);
+            }else{
+                me.cacheSingleMatchPanelResults(record,segmentId,query);
+            }
+        });
     },
     setFirsEditableRow: function(fer) {
         var me = this;

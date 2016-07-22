@@ -83,11 +83,17 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	viewConfig: {
 	    enableTextSelection: true,
 	    getRowClass: function(record) {
-	        var result = ['match-state-'+record.get('state')];
-	        if(Editor.getApplication().getController('ViewModes').self.isErgonomicMode()){
-	            result.push('ergonomic-font');
-	        }
-	        return result.join(' ');
+	        var me=this,
+	            result = ['match-state-'+record.get('state')],
+	            viewModesController = Editor.getApplication().getController('ViewModes').self;
+	        
+            if(viewModesController.isErgonomicMode()){
+                result.push('ergonomic-font');
+            }
+            if(viewModesController.isEditMode() || viewModesController.isViewMode()){
+                result.push('view-editor-font-size');
+            }
+            return result.join(' ');
 	    }
 	},
 	initConfig: function(instanceConfig) {
@@ -131,7 +137,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	          renderer: function(matchrate, meta, record) {
 	              var str =me.assocStore.findRecord('id',record.get('tmmtid'));
 	              if(matchrate > 0){
-	                  meta.tdAttr += 'data-qtip="'+str.get('serviceName')+'"';
+	                  meta.tdAttr += 'data-qtip="'+str.get('name')+' ('+str.get('serviceName')+')"';
 	                  meta.tdCls  = meta.tdCls  + ' info-icon';
 	              }
 	              clr = str.get('color');

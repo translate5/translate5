@@ -48,7 +48,8 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
         searchTitle: '#UT#Konkordanzsuche',
         matchTitle:'#UT#Matches',
         sourceEmptyText:'#UT#Quelltextsuche',
-        targetEmptyText:'#UT#Zieltextsuche'
+        targetEmptyText:'#UT#Zieltextsuche',
+        panelTitle:'#UT#Matches und Konkordanz-Suche'
     },
     itemId:'matchResourceEditorPanel',
     activeTab: 0,
@@ -60,6 +61,7 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
         config = {
                 items: []// end of items
 		};
+        me.title=me.strings.panelTitle;
 		me.isAllowedMatchQuery(config,instanceConfig);
 		me.isAllowedSearchQuery(config,instanceConfig);
 		if (instanceConfig) {

@@ -49,10 +49,13 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
             '#searchGridPanel textfield[name=target]': {
                 keypress:'targetSearchTextChange'
             },
+            '#searchGridPanel button[name=btnSubmit]': {
+                click:'handleSubmitButtonClick'
+            },
             '#searchGridPanel':{
                 render:'searchGridPanelRender'
             },
-            '#searchGrid actioncolumn':{
+            '#searchGridPanel actioncolumn':{
                 click:'handleMoreColumnClick'
             }
         },
@@ -79,6 +82,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
         query:'',
         field:null
     },
+    lastActiveField:null,
     SERVER_STATUS: null,//initialized after search grid panel is rendered
     RESULTS_ROW_LIMIT: 5,//the limit of result rows for each 'tmmt'
     searchGridPanelRender: function(){
@@ -89,10 +93,12 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
     sourceSearchTextChange:function(field,event){
         var me=this;
         me.enterKeyPres(field, event);
+        me.lastActiveField = field;
     },
     targetSearchTextChange:function(field,event){
         var me=this;
         me.enterKeyPres(field, event);
+        me.lastActiveField = field;
     },
     enterKeyPres:function(field,event){
         var me=this;
@@ -105,12 +111,25 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
             me.clearTextField(me.lastSearch.field);
         }
     },
+    handleSubmitButtonClick:function(){
+        var me=this;
+        if(me.lastActiveField && me.lastActiveField.value!=""){
+            me.getViewModel().getStore('editorsearch').removeAll();
+            me.lastSearch.query= me.lastActiveField.value;
+            me.lastSearch.field = me.lastActiveField.name;
+            me.closeTabs();
+            me.search();
+            me.clearTextField(me.lastActiveField.name);
+        }
+    },
     viewModeChangeEvent: function(controller){
-        var me = this;
+        var me = this,
+            tabPanel=me.getView().up('tabpanel')
         //isViewMode
         //isErgonomicMode
         //isEditMode
-        //me.handleViwMode(controller.self.isErgonomicMode());
+        me.getView().getView().refresh();
+        tabPanel.getActiveTab().getView().refresh()
     },
     search:function(){
         var me=this;
