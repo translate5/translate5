@@ -81,6 +81,10 @@ abstract class editor_Models_Export_FileParser {
      */
     protected $_task;
     /**
+     * @var string
+     */
+    protected $_taskGuid;
+    /**
      * @var Zend_Config
      */
     protected $config;
@@ -107,6 +111,13 @@ abstract class editor_Models_Export_FileParser {
     protected $originalTags;
     
     /**
+     * each array element contains the comments for one segment
+     * the array-index is set to an ID for the comments
+     * @var array
+     */
+    protected $comments;
+    
+    /**
      * 
      * @param integer $fileId
      * @param boolean $diff
@@ -122,6 +133,7 @@ abstract class editor_Models_Export_FileParser {
         $this->_diffTagger = ZfExtended_Factory::get($this->_classNameDifftagger);
         $this->_diff = $diff;
         $this->_task = $task;
+        $this->_taskGuid = $task->getTaskGuid();
         $this->path = $path;
         $this->config = Zend_Registry::get('config');
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
@@ -183,9 +195,34 @@ abstract class editor_Models_Export_FileParser {
             
             $file = $this->writeMatchRate($file,$i);
             
+            $commentsId = $this->getSegmentComments($matches[1]);
+            
+            if(!empty($commentsId)){
+                $file = $this->writeCommentGuidToSegment($file, $i, $commentsId);
+            }
+
             $i = $i + 2;
         }
         $this->_exportFile = implode('', $file);
+    }
+    
+    /**
+     * for overwriting purposes only
+     * @param array $file
+     * @param integer $i
+     * @param type $id
+     */
+    protected function writeCommentGuidToSegment(array $file, integer $i, $id) {
+    }
+    
+    /**
+     * for setting $this-comments, if needed by the child class
+     * for overwriting purposes only
+     * @param integer $segmentId
+     * @return string $id of comments index in $this->comments | null if no comments exist
+     */
+    protected function getSegmentComments(integer $segmentId) {
+        return null;
     }
     
     /**
