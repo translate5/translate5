@@ -38,6 +38,9 @@ END LICENSE AND COPYRIGHT
  * @class Editor.plugins.MatchResource.view.MatchGrid
  * @extends Ext.grid.Panel
  */
+
+//FIXME move viewConfig with fixed getRowClass into a mixin
+
 Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	extend: 'Ext.grid.Panel',
 	alias: 'widget.matchResourceMatchGrid',
@@ -80,7 +83,11 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	viewConfig: {
 	    enableTextSelection: true,
 	    getRowClass: function(record) {
-	        return 'match-state-'+record.get('state');
+	        var result = ['match-state-'+record.get('state')];
+	        if(Editor.getApplication().getController('ViewModes').self.isErgonomicMode()){
+	            result.push('ergonomic-font');
+	        }
+	        return result.join(' ');
 	    }
 	},
 	initConfig: function(instanceConfig) {

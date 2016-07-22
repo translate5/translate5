@@ -55,6 +55,11 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
             '#searchGrid actioncolumn':{
                 click:'handleMoreColumnClick'
             }
+        },
+        controller:{
+            '#ViewModes':{
+                viewModeChanged:'viewModeChangeEvent'
+            }
         }
     },
     refs:[{
@@ -99,6 +104,13 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
             me.search();
             me.clearTextField(me.lastSearch.field);
         }
+    },
+    viewModeChangeEvent: function(controller){
+        var me = this;
+        //isViewMode
+        //isErgonomicMode
+        //isEditMode
+        //me.handleViwMode(controller.self.isErgonomicMode());
     },
     search:function(){
         var me=this;
@@ -205,14 +217,12 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
             field: me.lastSearch.field,
             tmmtid:record.get('tmmtid')
         });
-        
         tabPanel.setActiveTab(tabPanel.down('#searchResultTab-'+record.get('tmmtid')));
     },
     abortAllRequests:function(){
         var me=this;
         if(me.executedRequests && me.executedRequests.length>0){
             for(var i=0;i<me.executedRequests.length;i++){
-                console.log(me.executedRequests[i].abort());
                 console.log("Request aborted!");
             }
             me.executedRequests=[];
@@ -235,5 +245,17 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
                 }
             });
         }
+    },
+    handleViwMode:function(ergoMode){
+        if(ergoMode){
+            Ext.select('.searchGrid .x-grid-row .x-grid-cell').each(function(el){
+                Ext.fly(el).addCls('ergonomic-font');
+            });
+            return;
+        }
+        Ext.select('.searchGrid .x-grid-row .x-grid-cell').each(function(el){
+            Ext.fly(el).removeCls('ergonomic-font');
+            Ext.fly(el).addCls('view-editor-font-size');
+        });
     }
 });

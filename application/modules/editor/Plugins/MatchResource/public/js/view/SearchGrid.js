@@ -53,6 +53,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
         store: '{editorsearch}'
     },
     itemId:'searchGridPanel',
+    cls:'searchGrid',
     assocStore : [],
     border: false,
     layout: 'fit',
