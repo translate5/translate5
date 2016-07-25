@@ -64,6 +64,7 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         foreach($this->view->rows as &$tmmt) {
             $resource = $getResource($tmmt['serviceType'], $tmmt['resourceId']);
             $tmmt['filebased'] = empty($resource) ? false : $resource->getFileBased();
+            $tmmt['searchable'] = empty($resource) ? false : $resource->getSearchable();
         }
     }
     
