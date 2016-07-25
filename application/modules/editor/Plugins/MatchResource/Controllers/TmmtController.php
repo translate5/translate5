@@ -204,7 +204,11 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         $this->checkTaskAndTmmtAccess($tmmtId);
         
         $this->entity->load($tmmtId);
-
+        
+        if(! $this->entity->getResource()->getSearchable()) {
+            throw new ZfExtended_Models_Entity_NoAccessException('search requests are not allowed on this match resource');
+        }
+        
         $connector = $this->getConnector();
         $connector->setPaging($page, $offset, $limit);
         
