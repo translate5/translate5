@@ -142,8 +142,15 @@ Ext.define('Editor.plugins.MatchResource.view.SearchResultGrid', {
           dockedItems: [{
               xtype: 'pagingtoolbar',
               itemId: 'pagingtoolbar',
-              afterPageText:'...',
               store:store,
+              listeners: {
+                  beforechange:function(el,page,eOpts){
+                      if((store.totalCount % store.pageSize)===0){
+                          this.afterPageText=' ';
+                      }
+                  }
+              },
+              afterPageText:'...',
               dock: 'bottom',
               displayInfo: true
           }]

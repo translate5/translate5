@@ -11,7 +11,7 @@
 /*
 .matchGrid .x-grid-item-selected .x-grid-item-over > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
 */
-.matchGrid tr.match-state-loaded:hover td.info-icon > div {background-image:url(images/show_more.png); background-repeat:no-repeat; background-position:85% 15%;}
+.matchGrid tr.match-state-loaded:hover td.info-icon > div {background-image:url(images/information.png); background-repeat:no-repeat; background-position:85% 15%;}
 
 /* Tm Overviw grid */
 .tmOverviewPanel .x-grid-header-ct .source-lang > div {background:url("images/sourceLanguage.png") no-repeat 6px 5px;}
