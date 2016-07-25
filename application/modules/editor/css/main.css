@@ -290,7 +290,7 @@ background-color: #EAF1FB;
 
 .ergonomic-font,
 #segment-grid.ergonomic .x-grid-row .x-grid-cell, 
-#segment-grid.ergonomic .x-grid-row-editor .x-form-display-field {font-size: 19pt !important;line-height: 39px;}
+#segment-grid.ergonomic .x-grid-row-editor .x-form-display-field {font-size: 14pt !important;line-height: 25px;}
 
 body.mode-view #segment-grid .x-grid-item-selected .comments-field .x-grid-cell-inner img.add, 
 body.mode-view #segment-grid .x-grid-item-selected .comments-field .x-grid-cell-inner img.edit {display:none;}
