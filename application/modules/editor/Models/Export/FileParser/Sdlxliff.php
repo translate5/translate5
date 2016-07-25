@@ -79,9 +79,6 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         if(empty($tags)){
             return null;
         }
-        ob_start();
-        var_dump($tags);
-        error_log(ob_get_clean());
         $guidHelper = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
             'Guid'
         );
