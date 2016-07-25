@@ -130,11 +130,8 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
         //isViewMode
         //isErgonomicMode
         //isEditMode
-        if(controller.self.isErgonomicMode()){
-            this.ergonomicMode = true;
-            return;
-        }
-        this.ergonomicMode = false;
+        //me.handleViwMode(controller.self.isErgonomicMode());
+        //console.log(me.getView().getStore().refresh());
     },
     cache: function(){
         var me = this,
@@ -218,24 +215,22 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
             return;
         }
         var me = this;
-        if(me.cachedResults.get(segmentId)){
-            var res =me.cachedResults.get(segmentId);
-            if(tmmtid < 0){
-                me.assocStore.each(function(record){
-                    if(res.get(record.get('id'))){
-                        var rcd =res.get(record.get('id')).rows;
-                        me.getView().getStore('editorquery').loadRawData(rcd,true);
-                    }else{
-                        me.cacheSingleMatchPanelResults(record,segmentId,query);
-                    }
-                });
-                return;
-            }
-            if(res.get(tmmtid)){
-                me.getView().getStore('editorquery').loadRawData(res.get(tmmtid).rows,true);
-            }
-            me.handleViewMode();
+        if(!me.cachedResults.get(segmentId)){
+            return;
         }
+        var res =me.cachedResults.get(segmentId);
+        if(tmmtid > 0 && res.get(tmmtid)){
+            me.getView().getStore('editorquery').loadRawData(res.get(tmmtid).rows,true);
+            return;
+        }
+        me.assocStore.each(function(record){
+            if(res.get(record.get('id'))){
+                var rcd =res.get(record.get('id')).rows;
+                me.getView().getStore('editorquery').loadRawData(rcd,true);
+            }else{
+                me.cacheSingleMatchPanelResults(record,segmentId,query);
+            }
+        });
     },
     setFirsEditableRow: function(fer) {
         var me = this;
@@ -314,16 +309,16 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
         me.loadCachedDataIntoGrid(segmentId,tmmtid);
         me.cachedResults.get(segmentId).removeAtKey(tmmtid);
     },
-    handleViewMode:function(){
-        if(this.ergonomicMode){
-            Ext.select('.matchGrid .x-grid-row .x-grid-cell').each(function(el){
+    handleViewMode:function(ergoMode){
+        if(ergoMode){
+            Ext.select('.searchGrid .x-grid-row .x-grid-cell').each(function(el){
                 Ext.fly(el).addCls('ergonomic-font');
             });
             return;
         }
-        Ext.select('.matchGrid .x-grid-row .x-grid-cell').each(function(el){
+        Ext.select('.searchGrid .x-grid-row .x-grid-cell').each(function(el){
             Ext.fly(el).removeCls('ergonomic-font');
             Ext.fly(el).addCls('view-editor-font-size');
         });
-    },
+    }
 });

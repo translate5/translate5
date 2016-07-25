@@ -38,6 +38,9 @@ END LICENSE AND COPYRIGHT
  * @class Editor.plugins.MatchResource.view.MatchGrid
  * @extends Ext.grid.Panel
  */
+
+//FIXME move viewConfig with fixed getRowClass into a mixin
+
 Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	extend: 'Ext.grid.Panel',
 	alias: 'widget.matchResourceMatchGrid',
@@ -80,7 +83,17 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	viewConfig: {
 	    enableTextSelection: true,
 	    getRowClass: function(record) {
-	        return 'match-state-'+record.get('state');
+	        var me=this,
+	            result = ['match-state-'+record.get('state')],
+	            viewModesController = Editor.getApplication().getController('ViewModes').self;
+	        
+            if(viewModesController.isErgonomicMode()){
+                result.push('ergonomic-font');
+            }
+            if(viewModesController.isEditMode() || viewModesController.isViewMode()){
+                result.push('view-editor-font-size');
+            }
+            return result.join(' ');
 	    }
 	},
 	initConfig: function(instanceConfig) {
@@ -124,7 +137,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	          renderer: function(matchrate, meta, record) {
 	              var str =me.assocStore.findRecord('id',record.get('tmmtid'));
 	              if(matchrate > 0){
-	                  meta.tdAttr += 'data-qtip="'+str.get('serviceName')+'"';
+	                  meta.tdAttr += 'data-qtip="'+str.get('name')+' ('+str.get('serviceName')+')"';
 	                  meta.tdCls  = meta.tdCls  + ' info-icon';
 	              }
 	              clr = str.get('color');

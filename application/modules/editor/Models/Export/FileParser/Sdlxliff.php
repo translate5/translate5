@@ -56,12 +56,57 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         $segment = preg_replace('"<img[^>]*>"','', $segment);
         return parent::parseSegment($segment);
     }
+    
+    /**
+     * sets $this->comments[$guid] = '<cmt-def id="'.$guid.'"><Comments><Comment severity="Medium" user="userName" date="2016-07-21T19:40:01.80725+02:00" version="1.0">comment content</Comment>...</Comments></cmt-def>';
+     * @param integer $segmentId
+     * @return string $id of comments index in $this->comments | null if no comments exist
+     */
+    protected function getSegmentComments(integer $segmentId){
+        $commentModel = ZfExtended_Factory::get('editor_Models_Comment');
+        /* @var $commentModel editor_Models_Comment */
+        $comments = $commentModel->loadBySegmentAndTaskPlain($segmentId, $this->_taskGuid);
+        
+        $tag = '<Comment severity="Medium" user="%1$s" date="%2$s" version="1.0">%3$s</Comment>';
+        $tags=array();
+        foreach($comments as $comment) {
+            $modifiedObj = new DateTime($comment['modified']);
+            //if the +0200 at the end makes trouble use the following
+            //gmdate('Y-m-d\TH:i:s\Z', $modified->getTimestamp());
+            $modified = $modifiedObj->format($modifiedObj::ATOM);
+            $tags[] = sprintf($tag, htmlspecialchars($comment['userName']), $modified, htmlspecialchars($comment['comment']));
+        }
+        if(empty($tags)){
+            return null;
+        }
+        ob_start();
+        var_dump($tags);
+        error_log(ob_get_clean());
+        $guidHelper = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
+            'Guid'
+        );
+        /* @var $guidHelper ZfExtended_Controller_Helper_Guid */
+        $guid = $guidHelper->create();
+        $this->comments[$guid] = '<cmt-def id="'.$guid.'"><Comments>'.implode('', $tags).'</Comments></cmt-def>';
+        return $guid;
+    }
+
+    /**
+     * @param array $file that contains file as array as splitted by parse function
+     * @param integer $i position of current segment in the file array
+     * @param $id id of the comment(s) inside of $this->comments array
+     * @return array
+     */
+    protected function writeCommentGuidToSegment(array $file, integer $i, $id) {
+        $file[$i] = '<mrk mtype="x-sdl-comment" sdl:cid="'.$id.'">'.$file[$i].'</mrk>';
+        return $file;
+    }
  
     /**
      * dedicated to write the match-Rate to the right position in the target format
      * @param array $file that contains file as array as splitted by parse function
      * @param integer $i position of current segment in the file array
-     * @return string
+     * @return array
      */
     protected function writeMatchRate(array $file, integer $i) {
         $matchRate = $this->_segmentEntity->getMatchRate();
@@ -88,6 +133,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         $this->unProtectUnicodeSpecialChars();
         $this->_exportFile = preg_replace('"(<mrk[^>]*[^/])></mrk>"i', '\\1/>', $this->_exportFile);
         $this->injectRevisions();
+        $this->injectComments();
         return $this->_exportFile;
     }
 
@@ -115,6 +161,25 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         return $revisions;
     }
 
+    /**
+     * 
+     */
+    protected function injectComments() {
+        if(!empty($this->comments)){
+            $commentsAsString = implode('', $this->comments);
+            if (strpos($this->_exportFile, '</cmt-defs>')!== false) {
+                $this->_exportFile = str_replace('</cmt-defs>', $commentsAsString . '</cmt-defs>', $this->_exportFile);
+            } elseif (strpos($this->_exportFile, '</doc-info>')!== false) {
+                $this->_exportFile = str_replace('</doc-info>', '<cmt-defs>' . $commentsAsString . '</cmt-defs></doc-info>', $this->_exportFile);
+            }
+            else {
+                $this->_exportFile = 
+                        preg_replace('"(<xliff[^>]*xmlns:sdl=\")([^\"]*)(\"[^>]*>)"',
+                                '\\1\\2\\3<doc-info xmlns="\\2"><cmt-defs>' . 
+                                $commentsAsString . '</cmt-defs></doc-info>', $this->_exportFile);
+            }
+        }
+    }
     /**
      * Injiziert die Revisionshistorie in den head der sdlxliff-Datei
      */

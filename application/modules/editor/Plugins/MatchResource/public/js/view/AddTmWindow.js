@@ -104,6 +104,7 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
                 },Ext.applyIf({
                     name: 'sourceLang',
                     allowBlank: false,
+                    disabled: instanceConfig.editMode,
                     toolTip: me.strings.source,
                     //each combo needs its own store instance, see EXT6UPD-8
                     store: Ext.create(Editor.store.admin.Languages),
@@ -111,6 +112,7 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
                 }, langCombo),Ext.applyIf({
                     name: 'targetLang',
                     allowBlank: false,
+                    disabled: instanceConfig.editMode,
                     toolTip: me.strings.target,
                     //each combo needs its own store instance, see EXT6UPD-8
                     store:Ext.create(Editor.store.admin.Languages),

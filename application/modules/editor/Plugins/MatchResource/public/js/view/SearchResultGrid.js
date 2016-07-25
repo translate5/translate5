@@ -52,6 +52,21 @@ Ext.define('Editor.plugins.MatchResource.view.SearchResultGrid', {
         target: '#UT#Zieltext',
         match: '#UT#Matchrate'
     },
+    viewConfig: {
+        enableTextSelection: true,
+        getRowClass: function(record) {
+            var me=this,
+            result = ['match-state-'+record.get('state')],
+            viewModesController = Editor.getApplication().getController('ViewModes').self;
+            if(viewModesController.isErgonomicMode()){
+                result.push('ergonomic-font');
+            }
+            if(viewModesController.isEditMode() || viewModesController.isViewMode()){
+                result.push('view-editor-font-size');
+            }
+            return result.join(' ');
+        }
+    },
     initConfig: function(instanceConfig) {
         var me = this,
         store = new Ext.data.Store({
@@ -127,6 +142,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchResultGrid', {
           dockedItems: [{
               xtype: 'pagingtoolbar',
               itemId: 'pagingtoolbar',
+              afterPageText:'...',
               store:store,
               dock: 'bottom',
               displayInfo: true

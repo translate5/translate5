@@ -49,11 +49,19 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
             '#searchGridPanel textfield[name=target]': {
                 keypress:'targetSearchTextChange'
             },
+            '#searchGridPanel button[name=btnSubmit]': {
+                click:'handleSubmitButtonClick'
+            },
             '#searchGridPanel':{
                 render:'searchGridPanelRender'
             },
-            '#searchGrid actioncolumn':{
+            '#searchGridPanel actioncolumn':{
                 click:'handleMoreColumnClick'
+            }
+        },
+        controller:{
+            '#ViewModes':{
+                viewModeChanged:'viewModeChangeEvent'
             }
         }
     },
@@ -74,6 +82,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
         query:'',
         field:null
     },
+    lastActiveField:null,
     SERVER_STATUS: null,//initialized after search grid panel is rendered
     RESULTS_ROW_LIMIT: 5,//the limit of result rows for each 'tmmt'
     searchGridPanelRender: function(){
@@ -84,10 +93,12 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
     sourceSearchTextChange:function(field,event){
         var me=this;
         me.enterKeyPres(field, event);
+        me.lastActiveField = field;
     },
     targetSearchTextChange:function(field,event){
         var me=this;
         me.enterKeyPres(field, event);
+        me.lastActiveField = field;
     },
     enterKeyPres:function(field,event){
         var me=this;
@@ -99,6 +110,26 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
             me.search();
             me.clearTextField(me.lastSearch.field);
         }
+    },
+    handleSubmitButtonClick:function(){
+        var me=this;
+        if(me.lastActiveField && me.lastActiveField.value!=""){
+            me.getViewModel().getStore('editorsearch').removeAll();
+            me.lastSearch.query= me.lastActiveField.value;
+            me.lastSearch.field = me.lastActiveField.name;
+            me.closeTabs();
+            me.search();
+            me.clearTextField(me.lastActiveField.name);
+        }
+    },
+    viewModeChangeEvent: function(controller){
+        var me = this,
+            tabPanel=me.getView().up('tabpanel')
+        //isViewMode
+        //isErgonomicMode
+        //isEditMode
+        me.getView().getView().refresh();
+        tabPanel.getActiveTab().getView().refresh()
     },
     search:function(){
         var me=this;
@@ -205,14 +236,12 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
             field: me.lastSearch.field,
             tmmtid:record.get('tmmtid')
         });
-        
         tabPanel.setActiveTab(tabPanel.down('#searchResultTab-'+record.get('tmmtid')));
     },
     abortAllRequests:function(){
         var me=this;
         if(me.executedRequests && me.executedRequests.length>0){
             for(var i=0;i<me.executedRequests.length;i++){
-                console.log(me.executedRequests[i].abort());
                 console.log("Request aborted!");
             }
             me.executedRequests=[];
@@ -235,5 +264,17 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
                 }
             });
         }
+    },
+    handleViwMode:function(ergoMode){
+        if(ergoMode){
+            Ext.select('.searchGrid .x-grid-row .x-grid-cell').each(function(el){
+                Ext.fly(el).addCls('ergonomic-font');
+            });
+            return;
+        }
+        Ext.select('.searchGrid .x-grid-row .x-grid-cell').each(function(el){
+            Ext.fly(el).removeCls('ergonomic-font');
+            Ext.fly(el).addCls('view-editor-font-size');
+        });
     }
 });

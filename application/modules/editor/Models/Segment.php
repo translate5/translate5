@@ -480,7 +480,21 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             $this->segmentdata[] = $row;
         }
     }
-    
+    /**
+     * loads segment entity
+     * @param integer $fileId
+     * @param type $mid
+     */
+    public function loadByFileidMid(integer $fileId, $mid) {
+        $taskGuid = $this->getTaskGuid();
+        $s = $this->db->select()->from($this->tableName, array('id'));
+        $s = $this->addWatchlistJoin($s);
+        $segmentId = new Zend_Db_Expr('('.$s
+                            ->where($this->tableName.'.taskGuid = ?', $taskGuid)
+                            ->where($this->tableName.'.fileId = ?', $fileId)
+                            ->where($this->tableName.'.mid = ?', $mid).')');
+        $this->load($segmentId);
+    }
     /**
      * adds one single field content ([original => TEXT, originalMd5 => HASH]) to a given segment, 
      * identified by MID and fileId. taskGuid MUST be given by setTaskGuid before!
@@ -498,10 +512,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $taskGuid = $this->getTaskGuid();
         $s = $this->db->select()->from($this->tableName, array('id'));
         $s = $this->addWatchlistJoin($s);
-        $segmentId = new Zend_Db_Expr('('.$s
-                            ->where($this->tableName.'.taskGuid = ?', $taskGuid)
-                            ->where($this->tableName.'.fileId = ?', $fileId)
-                            ->where($this->tableName.'.mid = ?', $mid).')');
+        $segmentId = $this->getId();
+        if(is_null($segmentId)){
+            $this->loadByFileidMid($fileId, $mid);
+            $segmentId = $this->getId();
+        }
         
         $data = array(
             'taskGuid' => $taskGuid,

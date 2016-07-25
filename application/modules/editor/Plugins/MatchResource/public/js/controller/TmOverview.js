@@ -87,7 +87,8 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
             '#tmOverviewPanel':{
                 hide: 'handleAfterHide',
                 show: 'handleAfterShow',
-                celldblclick: 'handleEditTm' 
+                celldblclick: 'handleEditTm',
+                render:'handleTmOverviewPanelRender'
             },
             '#btnAddTm':{
                 click:'handleOnAddTmClick'
@@ -108,6 +109,22 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
                 afterrender: 'handleRenderHeadPanel'
             }
         }
+    },
+    assocStore:null,
+    handleTmOverviewPanelRender: function(){
+        var me = this
+            taskGuid = Editor.data.task.get('taskGuid'),
+            prm = {
+                  params: {
+                      filter: '[{"operator":"like","value":"'+taskGuid+'","property":"taskGuid"},{"operator":"eq","value":true,"property":"checked"}]'
+                  },
+                  callback:me.addEditorPanelToViewPort,
+                  scope: me
+            };
+        me.assocStore = Ext.create('Ext.data.Store', {
+            model: 'Editor.plugins.MatchResource.model.TaskAssoc'
+        }),
+        me.assocStore.load(prm);
     },
     handleAfterShow: function() {
         this.getHeadToolBar().down('#btnTmOverviewWindow').hide();
@@ -175,7 +192,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
                 },
                 success: function() {
                     var msg = Ext.String.format(me.strings.edited, record.get('name'));
-                    this.getTmOverviewPanel().getStore().load();
+                    me.getTmOverviewPanel().getStore().load();
                     win.setLoading(false);
                     win.close();
                     Editor.MessageBox.addSuccess(msg);

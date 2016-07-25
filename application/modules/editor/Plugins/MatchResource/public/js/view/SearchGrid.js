@@ -53,6 +53,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
         store: '{editorsearch}'
     },
     itemId:'searchGridPanel',
+    cls:'searchGrid',
     assocStore : [],
     border: false,
     layout: 'fit',
@@ -63,7 +64,25 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
         match: '#UT#Matchrate',
         sourceEmptyText:'#UT#Quelltextsuche',
         targetEmptyText:'#UT#Zieltextsuche',
-        tmresource:'#UT#TM-Ressource'
+        tmresource:'#UT#TM-Ressource',
+        search:'#UT#Suche',
+        action:'#UT#Aktionen',
+    },
+    viewConfig: {
+        enableTextSelection: true,
+        getRowClass: function(record) {
+            var me=this,
+            result = ['match-state-'+record.get('state')],
+            viewModesController = Editor.getApplication().getController('ViewModes').self;
+            
+            if(viewModesController.isErgonomicMode()){
+                result.push('ergonomic-font');
+            }
+            if(viewModesController.isEditMode() || viewModesController.isViewMode()){
+                result.push('view-editor-font-size');
+            }
+            return result.join(' ');
+        }
     },
     initConfig: function(instanceConfig) {
         var me = this,
@@ -86,7 +105,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
                     dataIndex: 'service',
                     renderer: function(val, meta, record) {
                         var str =me.assocStore.findRecord('id',record.get('tmmtid'));
-                        meta.style="background-color:#"+str.get('color')+" !important;";
+                        meta.tdStyle="background-color:#"+str.get('color')+" !important;";
                         return str.get('name')+'-'+str.get('serviceName');
                     },
                     text: me.strings.tmresource
@@ -96,9 +115,10 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
                     renderer: function(val, meta, record) {
                         if(record.get('showMoreIcon')){
                             meta.tdAttr = 'data-qtip="Show more..."';
-                            meta.tdCls  = meta.tdCls  + 'ico-tm-information';
+                            meta.tdCls  = meta.tdCls  + 'ico-tm-show-more';
                         }
-                    }
+                    },
+                    text: me.strings.action
                 }],
                 dockedItems: [{
                     xtype: 'panel',
@@ -124,6 +144,11 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
                         enableKeyEvents: true,
                         emptyText:me.strings.targetEmptyText,
                         padding:'10 10 10 10',
+                    },{
+                        xtype:'button',
+                        name:'btnSubmit',
+                        text:me.strings.search,
+                        iconCls:'ico-tm-magnifier'
                     }]
                 }]
             };
