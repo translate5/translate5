@@ -38,6 +38,7 @@ class editor_Plugins_MatchResource_Services_Moses_Resource extends editor_Plugin
         $this->url = $url;
         parent::__construct($id, $name.' - '.$this->url);
         $this->filebased = false; //forced to be no filebased
+        $this->searchable = false; //forced to be non searchable
     }
     
     /**

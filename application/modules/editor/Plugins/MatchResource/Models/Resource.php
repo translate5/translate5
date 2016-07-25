@@ -34,7 +34,21 @@ class editor_Plugins_MatchResource_Models_Resource {
      */
     protected $name;
     
+    /**
+     * Flag if this resource is filebased or not
+     * service can set this flag as it needs it. for the case if some new services added in the future
+     * can have filebased resources and non filebased ones at the same time
+     *  
+     * @var boolean
+     */
     protected $filebased = false;
+    
+    /**
+     * Flag if this resource can be triggered for search requests
+     * Must be overridden by class extension
+     * @var boolean
+     */
+    protected $searchable = true;
     
     protected $service;
     
@@ -51,6 +65,7 @@ class editor_Plugins_MatchResource_Models_Resource {
             'serviceName' => 'service',
             'serviceType' => 'serviceType',
             'filebased' => 'filebased',
+            'searchable' => 'searchable',
             'defaultColor' => 'defaultColor',
     );
     
@@ -73,11 +88,19 @@ class editor_Plugins_MatchResource_Models_Resource {
     }
     
     /**
-     * returns if service is filebased or not
+     * returns if resource is filebased or not
      * @return boolean
      */
     public function getFilebased() {
         return $this->filebased;
+    }
+    
+    /**
+     * returns if resource is searchable or not
+     * @return boolean
+     */
+    public function getSearchable() {
+        return $this->searchable;
     }
     
     /**
