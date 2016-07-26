@@ -217,7 +217,9 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           listeners: {
               //remove the flex value after panel creation, since with flex value set not resizing is allowed
               boxready: function(panel) {
+                  var height = panel.getHeight();
                   panel.setFlex(0);
+                  panel.setHeight(height);
               }
           },
           //collapsing is independant of resizing
