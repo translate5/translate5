@@ -34,6 +34,8 @@ DELETE FROM Zf_acl_rules
 WHERE `module` = 'editor' AND `resource` = 'frontend' AND 
 `right` IN ('pluginMatchResourceOverview','pluginMatchResourcesAddFilebased','pluginMatchResourceTaskassoc','pluginMatchResourcesAddNonFilebased','pluginMatchResourceMatchQuery','pluginMatchResourceSearchQuery');
 
+DROP TRIGGER `LEK_matchresource_tmmt_versioning`;
+
 DROP TABLE `LEK_matchresource_taskassoc`;
 DROP TABLE `LEK_matchresource_tmmt`;
 

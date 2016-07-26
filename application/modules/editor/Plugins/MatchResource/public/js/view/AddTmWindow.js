@@ -42,7 +42,7 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
         target: '#UT#Zielsprache',
         file: '#UT#TM-Datei',
         color: '#UT#Farbe',
-        colorTooltip: '#UT#Farbe welche für diese Match Resource verwendet wird',
+        colorTooltip: '#UT#Farbe dieser Matchressource',
         save: '#UT#Speichern',
         cancel: '#UT#Abbrechen'
     },
