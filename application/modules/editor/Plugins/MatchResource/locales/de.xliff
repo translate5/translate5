@@ -8,6 +8,138 @@
       <source>Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.</source>
       <target>Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.</target>
     </trans-unit>
+    <trans-unit id='QmVpbSBCZWFyYmVpdGVuIGRlciBRdWVsbHNwYWx0ZSBrw7ZubmVuIE1hdGNoZXMgbmljaHQgw7xiZXJub21tZW4gd2VyZGVuLg=='>
+      <source>Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.</source>
+      <target>Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.</target>
+    </trans-unit>
+    <trans-unit id='TWF0Y2hyZXNzb3VyY2Vu'>
+      <source>Matchressourcen</source>
+      <target>Matchressourcen</target>
+    </trans-unit>
+    <trans-unit id='TWF0Y2hyZXNzb3VyY2UgZW5kZ8O8bHRpZyBsw7ZzY2hlbj8='>
+      <source>Matchressource endgültig löschen?</source>
+      <target>Matchressource endgültig löschen?</target>
+    </trans-unit>
+    <trans-unit id='U29sbCBkaWUgZ2V3w6RobHRlIE1hdGNocmVzc291cmNlICJ7MH0iIHdpcmtsaWNoIGVuZGfDvGx0aWcgZ2Vsw7ZzY2h0IHdlcmRlbj8='>
+      <source>Soll die gewählte Matchressource "{0}" wirklich endgültig gelöscht werden?</source>
+      <target>Soll die gewählte Matchressource "{0}" wirklich endgültig gelöscht werden?</target>
+    </trans-unit>
+    <trans-unit id='TWF0Y2hyZXNzb3VyY2UgZ2Vsw7ZzY2h0Lg=='>
+      <source>Matchressource gelöscht.</source>
+      <target>Matchressource gelöscht.</target>
+    </trans-unit>
+    <trans-unit id='RGllIE1hdGNocmVzc291cmNlICJ7MH0iIHd1cmRlIGVyZm9sZ3JlaWNoIGdlw6RuZGVydC4='>
+      <source>Die Matchressource "{0}" wurde erfolgreich geändert.</source>
+      <target>Die Matchressource "{0}" wurde erfolgreich geändert.</target>
+    </trans-unit>
+    <trans-unit id='RGllIE1hdGNocmVzc291cmNlICJ7MH0iIHd1cmRlIGVyZm9sZ3JlaWNoIGVyc3RlbGx0Lg=='>
+      <source>Die Matchressource "{0}" wurde erfolgreich erstellt.</source>
+      <target>Die Matchressource "{0}" wurde erfolgreich erstellt.</target>
+    </trans-unit>
+    <trans-unit id='d2lyZCBnZWxhZGVuLi4u'>
+      <source>wird geladen...</source>
+      <target>wird geladen...</target>
+    </trans-unit>
+    <trans-unit id='RXMgd3VyZGVuIGtlaW5lIEVyZ2Vibmlzc2UgZ2VmdW5kZW4u'>
+      <source>Es wurden keine Ergebnisse gefunden.</source>
+      <target>Es wurden keine Ergebnisse gefunden.</target>
+    </trans-unit>
+    <trans-unit id='RGllIEFuZnJhZ2UgYW4gZGllIE1hdGNocmVzc291cmNlIGRhdWVydGUgenUgbGFuZ2Uu'>
+      <source>Die Anfrage an die Matchressource dauerte zu lange.</source>
+      <target>Die Anfrage an die Matchressource dauerte zu lange.</target>
+    </trans-unit>
+    <trans-unit id='RGllIEFuZnJhZ2UgZsO8aHJ0ZSB6dSBlaW5lbSBGZWhsZXIgaW0gYW5nZWZyYWd0ZW4gRGllbnN0Lg=='>
+      <source>Die Anfrage führte zu einem Fehler im angefragten Dienst.</source>
+      <target>Die Anfrage führte zu einem Fehler im angefragten Dienst.</target>
+    </trans-unit>
+    <trans-unit id='TWF0Y2hyZXNzb3VyY2UgaGluenVmw7xnZW4='>
+      <source>Matchressource hinzufügen</source>
+      <target>Matchressource hinzufügen</target>
+    </trans-unit>
+    <trans-unit id='UmVzc291cmNl'>
+      <source>Ressource</source>
+      <target>Ressource</target>
+    </trans-unit>
+    <trans-unit id='TmFtZQ=='>
+      <source>Name</source>
+      <target>Name</target>
+    </trans-unit>
+    <trans-unit id='VE0tRGF0ZWk='>
+      <source>TM-Datei</source>
+      <target>TM-Datei</target>
+    </trans-unit>
+    <trans-unit id='RmFyYmUgZGllc2VyIE1hdGNocmVzc291cmNl'>
+      <source>Farbe dieser Matchressource</source>
+      <target>Farbe dieser Matchressource</target>
+    </trans-unit>
+    <trans-unit id='S29ua29yZGFuenN1Y2hl'>
+      <source>Konkordanzsuche</source>
+      <target>Konkordanzsuche</target>
+    </trans-unit>
+    <trans-unit id='TWF0Y2hlcw=='>
+      <source>Matches</source>
+      <target>Matches</target>
+    </trans-unit>
+    <trans-unit id='UXVlbGx0ZXh0c3VjaGU='>
+      <source>Quelltextsuche</source>
+      <target>Quelltextsuche</target>
+    </trans-unit>
+    <trans-unit id='WmllbHRleHRzdWNoZQ=='>
+      <source>Zieltextsuche</source>
+      <target>Zieltextsuche</target>
+    </trans-unit>
+    <trans-unit id='TWF0Y2hlcyB1bmQgS29ua29yZGFuei1TdWNoZQ=='>
+      <source>Matches und Konkordanz-Suche</source>
+      <target>Matches und Konkordanz-Suche</target>
+    </trans-unit>
+    <trans-unit id='UXVlbGx0ZXh0'>
+      <source>Quelltext</source>
+      <target>Quelltext</target>
+    </trans-unit>
+    <trans-unit id='RGllc2VuIE1hdGNoIGluIGRhcyBnZcO2ZmZuZXRlIFNlZ21lbnQgw7xiZXJuZWhtZW4u'>
+      <source>Diesen Match in das geöffnete Segment übernehmen.</source>
+      <target>Diesen Match in das geöffnete Segment übernehmen.</target>
+    </trans-unit>
+    <trans-unit id='QXR0cmlidXRlOg=='>
+      <source>Attribute:</source>
+      <target>Attribute:</target>
+    </trans-unit>
+    <trans-unit id='bGV0enRlIMOEbmRlcnVuZzo='>
+      <source>letzte Änderung:</source>
+      <target>letzte Änderung:</target>
+    </trans-unit>
+    <trans-unit id='ZXJzdGVsbHQ6'>
+      <source>erstellt:</source>
+      <target>erstellt:</target>
+    </trans-unit>
+    <trans-unit id='VE0tUmVzc291cmNl'>
+      <source>TM-Ressource</source>
+      <target>TM-Ressource</target>
+    </trans-unit>
+    <trans-unit id='U3VjaGU='>
+      <source>Suche</source>
+      <target>Suche</target>
+    </trans-unit>
+    <trans-unit id='TWF0Y2hyZXNzb3VyY2VuIHp1d2Vpc2Vu'>
+      <source>Matchressourcen zuweisen</source>
+      <target>Matchressourcen zuweisen</target>
+    </trans-unit>
+    <trans-unit id='S2VpbmUgTWF0Y2hyZXNzb3VyY2UgaW4gZGVyIFNwcmFjaGtvbWJpbmF0aW9uIGRlcyBnZcO2ZmZuZXRlbiBUYXNrcyB2ZXJmw7xnYmFyLg=='>
+      <source>Keine Matchressource in der Sprachkombination des geöffneten Tasks verfügbar.</source>
+      <target>Keine Matchressource in der Sprachkombination des geöffneten Tasks verfügbar.</target>
+    </trans-unit>
+    <trans-unit id='UmVzc291cmNlOiB7bmFtZX0='>
+      <source>Ressource: {name}</source>
+      <target>Ressource: {name}</target>
+    </trans-unit>
+    <trans-unit id='RGF0ZWliYXNpZXJ0ZXMgVE0gaGVydW50ZXJsYWRlbiB1bmQgbG9rYWwgc3BlaWNoZXJu'>
+      <source>Dateibasiertes TM herunterladen und lokal speichern</source>
+      <target>Dateibasiertes TM herunterladen und lokal speichern</target>
+    </trans-unit>
+    <trans-unit id='SGluenVmw7xnZW4='>
+      <source>Hinzufügen</source>
+      <target>Hinzufügen</target>
+    </trans-unit>    
   </body>
  </file>
 </xliff>
