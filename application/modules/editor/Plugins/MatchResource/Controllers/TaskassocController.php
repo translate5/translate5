@@ -58,7 +58,25 @@ class editor_Plugins_MatchResource_TaskassocController extends ZfExtended_RestCo
             $this->view->total = $this->entity->getTotalCount();
             return;
         }
+        $serviceManager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
+        /* @var $serviceManager editor_Plugins_MatchResource_Services_Manager */
+        
+        $resources = [];
+        
+        $getResource = function(string $serviceType, string $id) use ($resources, $serviceManager) {
+            if (!empty($resources[$id])) {
+                return $resources[$id];
+            }
+            return $resources[$id] = $serviceManager->getResourceById($serviceType, $id);
+        };
+        
         $reval = $this->entity->loadByAssociatedTaskAndLanguage($taskGuid->value);
+        
+        foreach($reval as &$tmmt) {
+            $resource = $getResource($tmmt['serviceType'], $tmmt['resourceId']);
+            $tmmt['searchable'] = empty($resource) ? false : $resource->getSearchable();
+        }
+        
         $this->view->rows = $reval;
         $this->view->total = count($reval);
     }

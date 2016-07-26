@@ -123,32 +123,35 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
                 dockedItems: [{
                     xtype: 'panel',
                     //height: '50px',
-                    layout: {
-                        type: 'hbox',
+                    /*layout: {
+                        type: 'column',
                         align: 'stretch'
                     },
+                    */
+                    layout: 'column',
                     border: false,
+                    padding:'10 10 10 10',
                     items:[{
                         xtype:'textfield',
                         id:'sourceSearch',
                         width: '31%',
                         name:'source',
                         enableKeyEvents: true,
+                        padding:'0 10 0 0',
                         emptyText:me.strings.sourceEmptyText,
-                        padding:'10 10 10 10',
                     },{
                         xtype:'textfield',
                         id:'targetSearch',
                         width: '31%',
                         name:'target',
                         enableKeyEvents: true,
+                        padding:'0 10 0 0',
                         emptyText:me.strings.targetEmptyText,
-                        padding:'10 10 10 10',
                     },{
                         xtype:'button',
                         name:'btnSubmit',
                         text:me.strings.search,
-                        iconCls:'ico-tm-magnifier'
+                        iconCls:'ico-tm-magnifier',
                     }]
                 }]
             };

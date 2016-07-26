@@ -49,7 +49,8 @@ Ext.define('Editor.plugins.MatchResource.model.TmMt', {
     {name: 'color', type: 'string'},
     {name: 'resourceId', type: 'string'},
     {name: 'serviceName', type: 'string'},
-    {name: 'serviceType', type: 'string'}
+    {name: 'serviceType', type: 'string'},
+    {name: 'searchable', type: 'boolean'}
   ],
   idProperty: 'id',
   proxy : {
