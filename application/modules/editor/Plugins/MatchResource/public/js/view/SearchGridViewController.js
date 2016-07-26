@@ -44,10 +44,10 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
     listen: {
         component: {
             '#searchGridPanel textfield[name=source]': {
-                keypress:'sourceSearchTextChange'
+                keypress:'textFieldTextChange'
             },
             '#searchGridPanel textfield[name=target]': {
-                keypress:'targetSearchTextChange'
+                keypress:'textFieldTextChange'
             },
             '#searchGridPanel button[name=btnSubmit]': {
                 click:'handleSubmitButtonClick'
@@ -77,7 +77,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
         serverErrorMsg408: '#UT#Die Anfrage an die Matchressource dauerte zu lange.'
     },
     assocStore : null,
-    executedRequests:[],
+    executedRequests:new Ext.util.HashMap(),
     lastSearch: {
         query:'',
         field:null
@@ -90,12 +90,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
         me.assocStore = me.getView().assocStore; 
         me.SERVER_STATUS=Editor.plugins.MatchResource.model.EditorQuery.prototype;
     },
-    sourceSearchTextChange:function(field,event){
-        var me=this;
-        me.enterKeyPres(field, event);
-        me.lastActiveField = field;
-    },
-    targetSearchTextChange:function(field,event){
+    textFieldTextChange:function(field,event){
         var me=this;
         me.enterKeyPres(field, event);
         me.lastActiveField = field;
@@ -136,13 +131,15 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
         if(me.assocStore){
             me.abortAllRequests();
             me.assocStore.each(function(record){
-                me.sendRequest(record.get('id'));
+                if(record.get('searchable')){
+                    me.sendRequest(record.get('id'));
+                }
             });
         }
     },
     sendRequest:function(tmmtid){
         var me = this;
-        me.executedRequests.push(Ext.Ajax.request({
+        me.executedRequests.add(tmmtid,Ext.Ajax.request({
             url:Editor.data.restpath+'plugins_matchresource_tmmt/'+tmmtid+'/search',
                 method: "POST",
                 params: {
@@ -152,9 +149,11 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
                 },
                 success: function(response){
                     me.handleRequestSuccess(me, response,tmmtid, me.lastSearch.query);
+                    me.executedRequests.removeAtKey(tmmtid);
                 }, 
                 failure: function(response){
                     me.handleRequestFailure(me, response, tmmtid);
+                    me.executedRequests.removeAtKey(tmmtid);
                 }
         }));
     },
@@ -241,10 +240,10 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
     abortAllRequests:function(){
         var me=this;
         if(me.executedRequests && me.executedRequests.length>0){
-            for(var i=0;i<me.executedRequests.length;i++){
-                console.log("Request aborted!");
-            }
-            me.executedRequests=[];
+            me.executedRequests.each(function(key, value, length){
+                console.log(me.executedRequests.get(key).abort());
+                console.log("Request aborted");
+            });
         }
     },
     clearTextField:function(name){
@@ -264,17 +263,5 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
                 }
             });
         }
-    },
-    handleViwMode:function(ergoMode){
-        if(ergoMode){
-            Ext.select('.searchGrid .x-grid-row .x-grid-cell').each(function(el){
-                Ext.fly(el).addCls('ergonomic-font');
-            });
-            return;
-        }
-        Ext.select('.searchGrid .x-grid-row .x-grid-cell').each(function(el){
-            Ext.fly(el).removeCls('ergonomic-font');
-            Ext.fly(el).addCls('view-editor-font-size');
-        });
     }
 });

@@ -308,17 +308,5 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
         me.cachedResults.get(segmentId).add(tmmtid, result);
         me.loadCachedDataIntoGrid(segmentId,tmmtid);
         me.cachedResults.get(segmentId).removeAtKey(tmmtid);
-    },
-    handleViewMode:function(ergoMode){
-        if(ergoMode){
-            Ext.select('.searchGrid .x-grid-row .x-grid-cell').each(function(el){
-                Ext.fly(el).addCls('ergonomic-font');
-            });
-            return;
-        }
-        Ext.select('.searchGrid .x-grid-row .x-grid-cell').each(function(el){
-            Ext.fly(el).removeCls('ergonomic-font');
-            Ext.fly(el).addCls('view-editor-font-size');
-        });
     }
 });

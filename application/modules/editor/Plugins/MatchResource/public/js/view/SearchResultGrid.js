@@ -142,16 +142,36 @@ Ext.define('Editor.plugins.MatchResource.view.SearchResultGrid', {
           dockedItems: [{
               xtype: 'pagingtoolbar',
               itemId: 'pagingtoolbar',
-              afterPageText:'...',
               store:store,
               dock: 'bottom',
               displayInfo: true
           }]
         };
-        me.assocStore = instanceConfig.assocStore;
+        delete instanceConfig.query;
+        delete instanceConfig.field;
+        
+        me.assocStore = instanceConfig.assocSt0ore;
         if (instanceConfig) {
             me.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
+      },
+      initComponent: function() {
+          this.callParent(arguments);
+          Ext.override(this.down('#pagingtoolbar'),{
+              updateInfo: function() {
+                  this.callParent(arguments);
+                  var element = this.child('#afterTextItem'),
+                      pageData =this.getPageData();
+                  if(!element){
+                      return;
+                  }
+                  if(pageData.currentPage === pageData.pageCount){
+                      element.setText(" ");
+                      return;
+                  }
+                  element.setText("...");
+              }
+          });
       }
 });
