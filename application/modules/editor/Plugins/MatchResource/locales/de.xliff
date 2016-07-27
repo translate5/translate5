@@ -72,6 +72,10 @@
       <source>Farbe dieser Matchressource</source>
       <target>Farbe dieser Matchressource</target>
     </trans-unit>
+    <trans-unit id='RmFyYmU='>
+      <source>Farbe</source>
+      <target>Farbe</target>
+    </trans-unit>
     <trans-unit id='S29ua29yZGFuenN1Y2hl'>
       <source>Konkordanzsuche</source>
       <target>Konkordanzsuche</target>
@@ -139,7 +143,11 @@
     <trans-unit id='SGluenVmw7xnZW4='>
       <source>Hinzufügen</source>
       <target>Hinzufügen</target>
-    </trans-unit>    
+    </trans-unit>
+    <trans-unit id='ezB9IEVyZ2Vibmlzc2U='>
+      <source>{0} Ergebnisse</source>
+      <target>{0} Ergebnisse</target>
+    </trans-unit>
   </body>
  </file>
 </xliff>

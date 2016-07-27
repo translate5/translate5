@@ -106,7 +106,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
                     renderer: function(val, meta, record) {
                         var str =me.assocStore.findRecord('id',record.get('tmmtid'));
                         meta.tdStyle="background-color:#"+str.get('color')+" !important;";
-                        return str.get('name')+'-'+str.get('serviceName');
+                        return str.get('name')+' ('+str.get('serviceName')+')';
                     },
                     text: me.strings.tmresource
                 },{
