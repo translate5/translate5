@@ -72,7 +72,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchResultGrid', {
         store = new Ext.data.Store({
             autoLoad: true,
             model: 'Editor.plugins.MatchResource.model.EditorQuery',
-            pageSize:5,//FIXME pageing is set to 5 only for test, need to be 20
+            pageSize:20,
             sorters: [{
                 property: 'service',
                 direction: 'DESC'
@@ -135,7 +135,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchResultGrid', {
               renderer: function(val, meta, record) {
                   var str =me.assocStore.findRecord('id',record.get('tmmtid'));
                   meta.tdStyle ="background-color:#"+str.get('color')+" !important;";
-                  return str.get('name')+'-'+str.get('serviceName');
+                  return str.get('name')+' ('+str.get('serviceName')+')';
               },
               text: me.strings.tmresource
           }],
@@ -144,7 +144,12 @@ Ext.define('Editor.plugins.MatchResource.view.SearchResultGrid', {
               itemId: 'pagingtoolbar',
               store:store,
               dock: 'bottom',
-              displayInfo: true
+              displayInfo: true,
+              listeners: {
+                  afterrender : function() {
+                      this.child('#last').hide();
+                  }
+              }
           }]
         };
         delete instanceConfig.query;

@@ -242,8 +242,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
         var me=this;
         if(me.executedRequests && me.executedRequests.length>0){
             me.executedRequests.each(function(key, value, length){
-                console.log(me.executedRequests.get(key).abort());
-                console.log("Request aborted");
+                    me.executedRequests.get(key).abort();
             });
         }
     },
