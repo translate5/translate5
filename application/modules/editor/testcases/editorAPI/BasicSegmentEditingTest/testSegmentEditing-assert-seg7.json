@@ -22,5 +22,6 @@
   "targetEdit": "Apache 2.x auf Unix-Systemen",
   "targetEditToSort": "Apache 2.x auf Unix-Systemen",
   "isWatched": null,
-  "segmentUserAssocId": null
+  "segmentUserAssocId": null,
+  "matchRateType": "import"
 }

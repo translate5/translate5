@@ -22,5 +22,6 @@
   "targetEdit": "PHP Handbuch",
   "targetEditToSort": "PHP Handbuch",
   "isWatched": null,
-  "segmentUserAssocId": null
+  "segmentUserAssocId": null,
+  "matchRateType": "import"
 }
