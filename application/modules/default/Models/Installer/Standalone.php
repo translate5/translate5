@@ -77,7 +77,8 @@ class Models_Installer_Standalone {
      */
     public static function mainLinux(array $options = null) {
         $saInstaller = new self(getcwd());
-        $saInstaller->processDependencies();
+        //TODO move options parameter to constructor instead of multiple usage
+        $saInstaller->processDependencies($options);
         $saInstaller->addZendToIncludePath();
         $saInstaller->installation($options);//checks internally if steps are already done
         $saInstaller->cleanUpDeletedFiles(); //must be before initApplication!
@@ -107,10 +108,18 @@ class Models_Installer_Standalone {
         }
     }
     
-    public function processDependencies() {
+    public function processDependencies(array $options) {
         $this->logSection('Checking server for updates and packages:');
         $downloader = new ZfExtended_Models_Installer_Downloader($this->currentWorkingDir);
-        $depsToAccept = $downloader->pullApplication();
+        
+        if(isset($options['applicationZipOverride']) && file_exists($options['applicationZipOverride'])) {
+            $zipOverride = $options['applicationZipOverride'];
+        }
+        else {
+            $zipOverride = null;
+        }
+        
+        $depsToAccept = $downloader->pullApplication($zipOverride);
         $this->acceptLicenses($depsToAccept);
         $downloader->pullDependencies(true);
     }
