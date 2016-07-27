@@ -329,7 +329,7 @@ class editor_Models_Converter_XmlSegmentList {
             $modified = new DateTime($comment['modified']);
             //if the +0200 at the end makes trouble use the following
             //gmdate('Y-m-d\TH:i:s\Z', $modified->getTimestamp());
-            $modified = $modified->format($modified::ISO8601);
+            $modified = $modified->format($modified::ATOM);
             $this->result[] = sprintf($note, htmlspecialchars($comment['userName']), $modified, htmlspecialchars($comment['comment']));
         }
     }
