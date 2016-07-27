@@ -3,6 +3,20 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+
+## [2.4.12] - 2016-07-27
+### Added
+TRANSLATE-707: Export comments to sdlxliff
+TRANSLATE-684: adding a matchRateType column
+translate5 Plugins: added support for translations, public files and php controllers
+
+### Changed
+TRANSLATE-706: Check during relais import, if source of relais file is identical to source of to be translated file
+TRANSLATE-689: Files containing empty segments cannot be imported in Transit
+TRANSLATE-701: remove legacy content tag export code
+TRANSLATE-700: Move regexInternalTags from config to class constant 
+
+
 ## [2.4.9] - 2016-06-02
 ### Changed
 TRANSLATE-678: Diff Export is destroying entities in certain rare cases
