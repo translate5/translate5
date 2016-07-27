@@ -55,7 +55,8 @@ Ext.define('Editor.view.segments.Grid', {
         'Editor.view.segments.column.Comments',
         'Editor.view.segments.column.WorkflowStep',
         'Editor.view.segments.column.Editable',
-        'Editor.view.segments.column.IsWatched'
+        'Editor.view.segments.column.IsWatched',
+        'Editor.util.SegmentContent'
     ],
     plugins: ['gridfilters'],
     alias: 'widget.segments.grid',
@@ -295,8 +296,8 @@ Ext.define('Editor.view.segments.Grid', {
                 },
                 dockedItems: [{
                     xtype: 'segmentsToolbar',
-                    dock: 'top'
-                }]
+                    dock: 'top',
+                    }]
             };
         if (instanceConfig) {
             me.getConfigurator().merge(me, config, instanceConfig);

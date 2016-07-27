@@ -443,13 +443,13 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * @param node
    */
   checkTags: function(node) {
-	  var nodelist = node.getElementsByTagName('img');
-	  this.fixDuplicateImgIds(nodelist);
-	  if(!this.checkContentTags(nodelist)) {
-	      return; //no more checks if missing tags found
-	  }
-	  this.removeOrphanedTags(nodelist);
-	  this.checkTagOrder(nodelist);
+      var nodelist = node.getElementsByTagName('img');
+      this.fixDuplicateImgIds(nodelist);
+      if(!this.checkContentTags(nodelist)) {
+          return; //no more checks if missing tags found
+      }
+      this.removeOrphanedTags(nodelist);
+      this.checkTagOrder(nodelist);
   },
   /**
    * returns true if all tags are OK
@@ -614,6 +614,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     if(hasRemoves) {
     	Editor.MessageBox.addInfo(this.strings.tagRemovedText);
     }
+  },
+  /**
+   * returns img tags contained in the currently edited field as img nodelist
+   */
+  getTags: function(compareList) {
+      var me = this,
+          body = me.getEditorBody();
+      return node.getElementsByTagName('img');
   },
   showShortTags: function() {
     this.rendered && this.setImagePath('shortPath');

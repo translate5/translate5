@@ -28,16 +28,48 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-body{box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;cursor:text;font-size:10px;}
-body.ergonomic {font-size:14pt !important; line-height: 25px !important;}
-body.ergonomic img{height: 22px !important;}
-body.hide-tag img{display:none;}
-img {width: auto !important;height: 14px !important; vertical-align:middle;cursor: pointer;}
-img.duplicatesavecheck {width:0 !important;height:0 !important;display:none;}
-span.term {background:transparent;border-bottom:1px solid #0000ff;}
-span.source-transNotFound {border-bottom-color:#ff0000;}
-span.source-transNotDefined {border-bottom-color:#8F4C36;}
-span.notRecommended,
-span.supersededTerm,
-span.deprecatedTerm {border-bottom:none;background-color:#fa51ff;}
-body.fakedsel strong, body.fakedsel b {font-weight:normal;background:#b0b0b0;}
+/**#@++
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
+ */
+/**
+ * @class Editor.util.SegmentContent
+ */
+Ext.define('Editor.util.SegmentContent', {
+    content: '',
+    /**
+     * The given segment content is the base for the operations provided by this method
+     * @param {String} content
+     */
+    constructor: function(content) {
+        this.contentString = content;
+        this.contentAsDom = Ext.dom.Helper.createDom('<div class="faked-body">'+content+'</div>');
+    },
+    /**
+     * returns the content tags as a list of dom nodes
+     * @return [{HTMLDivElement}]
+     */
+    getContentTagNodes: function() {
+        return Ext.dom.Query.select("div.open, div.close, div.single", this.contentAsDom);
+    },
+    /**
+     * returns the content tags as a list of Strings
+     * @return [{String}]
+     */
+    getContentTags: function() {
+        var nodes = this.getContentTagNodes(),
+            detachedDiv = document.createElement("div"),
+            result = [];
+        
+        Ext.Array.each(nodes, function(node) {
+            detachedDiv.innerHTML = '';
+            detachedDiv.appendChild(node);
+            result.push(detachedDiv.innerHTML);
+            node = null;
+        });
+        detachedDiv = null;
+        return result;
+    }
+});

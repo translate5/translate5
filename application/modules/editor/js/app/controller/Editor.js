@@ -59,6 +59,7 @@ Ext.define('Editor.controller.Editor', {
       saveAnyway: '#UT# Trotzdem speichern'
   },
   id: 'editorcontroller',
+  DEC_DIGITS: [48, 49, 50, 51, 52, 53, 54, 55, 56, 57],
   refs : [{
     ref : 'segmentGrid',
     selector : '#segmentgrid'
@@ -97,8 +98,7 @@ Ext.define('Editor.controller.Editor', {
       }
   },
   init : function() {
-      var me = this,
-          decDigits = [48, 49, 50, 51, 52, 53, 54, 55, 56, 57];
+      var me = this;
       
       Ext.override("Ext.util.KeyMap",{
           handleTargetEvent: Editor.view.segments.EditorKeyMap.handleTargetEvent
@@ -122,8 +122,8 @@ Ext.define('Editor.controller.Editor', {
           'ctrl-alt-down':  [Ext.EventObjectImpl.DOWN,{ctrl: true, alt: true}, me.goToLowerNoSave, true],
           'alt-c':          ["C",{ctrl: false, alt: true}, me.handleOpenComments, true],
           'alt-s':          ["S",{ctrl: false, alt: true}, me.handleDigitPreparation(me.handleChangeState), true],
-          'alt-DIGIT':      [decDigits,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
-          'DIGIT':          [decDigits,{ctrl: false, alt: false}, me.handleDigit],
+          'alt-DIGIT':      [me.DEC_DIGITS,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
+          'DIGIT':          [me.DEC_DIGITS,{ctrl: false, alt: false}, me.handleDigit],
           'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
           'pos1':           null //add empty pos1 handler here, so that the overwrite is processed
       };
@@ -145,6 +145,8 @@ Ext.define('Editor.controller.Editor', {
         editingPlugin: plug
       });
       
+      me.relayEvents(me.prevNextSegment, ['prevnextloaded']);
+      
       //reset the store next/prev information if data changed
       me.getSegmentGrid().store.on('filterchange', me.handleSortOrFilter, me);
       me.getSegmentGrid().store.on('sort', me.handleSortOrFilter, me);
@@ -159,7 +161,7 @@ Ext.define('Editor.controller.Editor', {
           }
       });
       
-      me.generalKeyMap = new Ext.util.KeyMap(Ext.getDoc(), me.getKeyMapConfig({
+      me.generalKeyMap = new Ext.util.KeyMap(Ext.getDoc(), me.getKeyMapConfig('application', {
           'pos1': [Ext.EventObjectImpl.HOME,{ctrl: false, alt: false}, me.handleHomeKeyPress, true],
           'alt-c':     ["C",{ctrl: false, alt: true}, function(key, e){
               var me = this;
@@ -237,11 +239,23 @@ Ext.define('Editor.controller.Editor', {
    * 2: function to be called
    * 3: boolean, if true prepend event propagation stopper
    *
+   * @param {String} area, a speakable name where the config is used. 
+   *    Just passed to the keyMapConfig event to determine there if the event should be processed or not
    * @param {Object} overwrite a config object for dedicated overwriting of key bindings
    */
-  getKeyMapConfig: function(overwrite) {
+  getKeyMapConfig: function(area, overwrite) {
       var me = this,
-          conf = [];
+          conf = [],
+          overwrite = overwrite || {};
+      
+      /*
+       * event beforeKeyMapUsage parameters:
+       * @param {Editor.controller.Editor} 
+       * @param {String} area, the area describes where the keymap shall be used.  
+       * @param {Object} overwrite, the object with overwrite definitions 
+       */
+      me.fireEvent('beforeKeyMapUsage', this, area, overwrite);
+      
       Ext.Object.each(me.keyMapConfig, function(key, item){
           //applies if available the overwritten config instead the default one
           if(overwrite && overwrite[key]) {
@@ -704,6 +718,9 @@ Ext.define('Editor.controller.Editor', {
           plug = me.getEditPlugin();
       e.preventDefault();
       e.stopEvent();
+      if(!this.isEditing) {
+          return;
+      }
       if(plug.editor.context.reordered) {
           Editor.MessageBox.addInfo(me.messages.segmentsChangedJump);
           return;

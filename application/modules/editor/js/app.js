@@ -155,7 +155,7 @@ Ext.application({
        */
       //enable logout split button
       //disable logout normal Button
-      me.fireEvent('editorViewportOpened');
+      me.fireEvent('editorViewportOpened',me);
       me.getController('Fileorder').loadFileTree();//@todo bei ITL muss der load wiederum automatisch geschehen
   },
   /**

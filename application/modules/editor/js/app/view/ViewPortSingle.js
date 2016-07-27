@@ -39,6 +39,7 @@ Ext.define('Editor.view.ViewPortSingle', {
             title: 'Application Logo',
             header: false,
             xtype: 'panel',
+            weight: 40,
             height: Editor.data.headerOptions.height,
             listeners: {
                 afterRender: function() {

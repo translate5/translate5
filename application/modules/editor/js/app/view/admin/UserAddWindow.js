@@ -88,7 +88,7 @@ Ext.define('Editor.view.admin.UserAddWindow', {
             },
             bottomInfo = [me.strings.bottomInfo];
         bottomInfo.push(me.strings.bottomRoleInfo);
-        if(!me.editMode) {
+        if(!instanceConfig.editMode) {
             bottomInfo.push(me.strings.bottomPwInfo);
         }
 
@@ -100,7 +100,6 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                 handler: me.roleCheckChange
             });
         });
-        
         config = {
             title: me.title, //see EXT6UPD-9
             items : [{
@@ -195,7 +194,7 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                     items: [{
                         xtype: 'checkbox',
                         hideLabel: true,
-                        boxLabel: me.editMode ? me.strings.editPassword : me.strings.setPassword,
+                        boxLabel: instanceConfig.editMode ? me.strings.editPassword : me.strings.setPassword,
                         style: 'margin-bottom:10px',
                         handler: function(me, checked) {
                             var fieldset = me.ownerCt;
@@ -246,9 +245,9 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                     xtype: 'tbfill'
                 },{
                     xtype : 'button',
-                    iconCls : me.editMode ? 'ico-user-save' : 'ico-user-add',
+                    iconCls : instanceConfig.editMode ? 'ico-user-save' : 'ico-user-add',
                     itemId : 'save-user-btn',
-                    text : me.editMode ? me.strings.saveBtn : me.strings.addBtn
+                    text : instanceConfig.editMode ? me.strings.saveBtn : me.strings.addBtn
                 }, {
                     xtype : 'button',
                     iconCls : 'ico-cancel',
@@ -257,9 +256,11 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                 }]
             }]
         };
-        
-        if(me.editMode) {
-            me.title = me.titleEdit;
+  
+        if(instanceConfig.editMode) {
+            //TODO talk with tomas
+            //me.title = me.titleEdit;
+        	config.title = me.titleEdit;
         }
 
         if (instanceConfig) {

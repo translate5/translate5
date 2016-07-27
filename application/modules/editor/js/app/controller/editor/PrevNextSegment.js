@@ -41,6 +41,7 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
      * @type 
      */
     calculated: null,
+    mixins :['Ext.mixin.Observable'],
     context: null,
     strings: {
         gridEndReached: '#UT#Kein weiteres Segment bearbeitbar!',
@@ -48,9 +49,11 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
         gridEndReachedFiltered: '#UT#Kein weiteres Segment im Workflow bearbeitbar!',
         gridStartReachedFiltered: '#UT#Kein vorheriges Segment im Workflow bearbeitbar!'
     },
+    
     isLoading: false,
     constructor: function(config) {
         this.editingPlugin = config.editingPlugin;
+        this.mixins.observable.constructor.call(this, config);
     },
     calcNext: function(filtered){
         var me = this;
@@ -85,6 +88,9 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
         me.next = me.calculateRow(1);
         //fetches missing information from server, if needed.
         me.fetchFromServer();
+        if(!me.isLoading){
+            me.fireEvent('prevnextloaded', me);
+        }
     },
     /**
      * @param {} rowIdxChange
@@ -136,6 +142,39 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
         
         //already loaded meta data is still valid:
         ret.isBorderReached = (newIdx <= 0 || newIdx >= total);
+        return ret;
+    },
+    findNextRows : function(rowIndex,count){
+        var me = this,
+            store = me.editingPlugin.grid.store,
+            total = store.getTotalCount(),
+            rec = me.context.record,
+            newIdx = rowIndex = store.indexOf(rec),
+            newRec = true,
+            ret = new Array(),
+            counter = 0;
+      
+        //no current record, or current not editable
+        if(!rec || !rec.get('editable')) {
+            return ret;
+        }
+        //checking always for segments editable flag + custom isEditable  
+        while (newRec) {
+            if(counter == count)
+                break;
+            newIdx = newIdx + 1;
+            newRec = store.getAt(newIdx);
+            //no newRec found at all
+            if(!newRec) {
+                break;
+            }
+            //(!newRec.get('editable') || !isEditable(rec, newRec))
+            if(!newRec.get('editable')) {
+                continue;
+            }
+            ret.push(newIdx);
+            counter++;
+        }
         return ret;
     },
     /**
@@ -267,6 +306,8 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
                         idx: json[field]
                     }
                 });
+                console.log('calculateRows 200');
+                me.fireEvent('prevnextloaded',me);
             }
         });
     }

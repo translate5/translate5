@@ -105,7 +105,8 @@ Ext.define('Editor.view.HeadPanel', {
                         xtype: 'button',
                         itemId: 'logoutSingle',
                         text: me.strings.logout
-                    },{
+                    },
+                    {
                         xtype: 'button',
                         text: me.strings.tasks,
                         itemId: 'tasksMenu',
@@ -131,7 +132,8 @@ Ext.define('Editor.view.HeadPanel', {
                                 text: me.strings.endBtn
                             }]
                         }
-                    },{
+                    },
+                    {
                         xtype: 'combo',
                         itemId: 'languageSwitch',
                         width:90,

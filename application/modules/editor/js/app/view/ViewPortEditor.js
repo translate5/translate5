@@ -40,6 +40,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.view.ViewPortEditor', {
     extend: 'Ext.container.Viewport',
+    itemId: 'editorViewport',
     requires: [
       'Editor.view.fileorder.Tree',
       'Editor.view.fileorder.ReferenceTree',
@@ -58,10 +59,31 @@ Ext.define('Editor.view.ViewPortEditor', {
     
     initComponent: function() {
       var me = this,
-          items = [me.getNorth(), {
+          items = [me.getNorth(),{
+              xtype: 'panel',
+              region: 'west',
+              weight: 30,
+              resizable: true,
+              resizeHandles: 'e',
+              title: me.items_west_title,
+              width: 150,
+              collapsible: true,
+              layout: {type:'accordion'},
+              animCollapse: !Ext.isIE, //BugID 3
+              itemId: 'filepanel',
+              items: [{
+                  xtype: 'fileorder.tree'
+              },{
+                  xtype: 'referenceFileTree'
+              }]
+          },{
+              region: 'center',
+              xtype: 'segments.grid',
+              itemId: 'segmentgrid'
+          },{
               xtype: 'panel',
               region: 'east',
-              title: '&nbsp;', // here there must be a title (otherwise warning appear), but the title must be invisible
+              weight: 30,
               collapsible: true,
               layout: 'fit',
               animCollapse: !Ext.isIE, //BugID 3
@@ -87,27 +109,14 @@ Ext.define('Editor.view.ViewPortEditor', {
                   }]
               }],
               width: 260
-          },{
-              region: 'center',
-              xtype: 'segments.grid',
-              itemId: 'segmentgrid'
-          },{
-              xtype: 'panel',
-              resizable: true,
-              resizeHandles: 'e',
-              title: me.items_west_title,
-              width: 150,
-              collapsible: true,
-              layout: {type:'accordion'},
-              animCollapse: !Ext.isIE, //BugID 3
-              region: 'west',
-              itemId: 'filepanel',
-              items: [{
-                  xtype: 'fileorder.tree'
-              },{
-                  xtype: 'referenceFileTree'
-              }]
           }];
+      //},{
+      //example of adding an additional south panel with width 100%, 
+      // as heigher the weight of the region, as "outer" it is rendererd, 
+      // since east and west have weight 30, a panel with lesser weight will be rendered more "inner"  
+      //xtype: 'panel',
+      //weight: 51,
+      //region: 'south'
       Ext.applyIf(me, {
           items: items
       });
@@ -115,6 +124,7 @@ Ext.define('Editor.view.ViewPortEditor', {
     },
     getNorth: function() {
         return {
+            weight: 40,
             xtype: 'headPanel',
             region: 'north'
         };
