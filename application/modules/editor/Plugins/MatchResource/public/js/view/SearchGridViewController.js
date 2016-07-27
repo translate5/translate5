@@ -72,6 +72,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
     strings: {
         loading: '#UT#wird geladen...',
         noresults: '#UT#Es wurden keine Ergebnisse gefunden.',
+        searchResultGridTitle: '#UT#{0} Ergebnisse',
         serverErrorMsgDefault: '#UT#Die Anfrage an die Matchressource dauerte zu lange.',
         serverErrorMsg500: '#UT#Die Anfrage führte zu einem Fehler im angefragten Dienst.',
         serverErrorMsg408: '#UT#Die Anfrage an die Matchressource dauerte zu lange.'
@@ -214,8 +215,8 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
     },
     handleMoreColumnClick: function(view, item, colIndex, rowIndex, e, record, row){
         var me = this,
-            tabPanel=me.getView().up('tabpanel'),
-            tmmtname =me.assocStore.findRecord('id',record.get('tmmtid')).get('name');
+            tabPanel = me.getView().up('tabpanel'),
+            tmmt = me.assocStore.findRecord('id',record.get('tmmtid'));
         
         if(!record.get('showMoreIcon')){
             return;
@@ -227,7 +228,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
         tabPanel.add({
             xtype:'matchResourceSearchResultGrid',
             assocStore:me.assocStore,
-            title: tmmtname+" "+"Ergebnisse",
+            title: Ext.String.format(me.strings.searchResultGridTitle, tmmt.get('name')),
             closable :true,
             hidden: false,
             itemId: 'searchResultTab-'+record.get('tmmtid'),
