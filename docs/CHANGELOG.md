@@ -4,7 +4,7 @@ For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
 
-## [2.4.12] - 2016-07-27
+## [2.4.14] - 2016-07-27
 ### Added
 TRANSLATE-707: Export comments to sdlxliff
 TRANSLATE-684: adding a matchRateType column
