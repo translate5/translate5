@@ -139,7 +139,11 @@
     <trans-unit id='SGluenVmw7xnZW4='>
       <source>Hinzufügen</source>
       <target>add</target>
-    </trans-unit>    
+    </trans-unit>
+    <trans-unit id='ezB9IEVyZ2Vibmlzc2U='>
+      <source>{0} Ergebnisse</source>
+      <target>{0} results</target>
+    </trans-unit>
   </body>
  </file>
 </xliff>
