@@ -70,8 +70,9 @@ class editor_Plugins_MatchResource_Services_Moses_Connector extends editor_Plugi
         $rpc = new Zend_XmlRpc_Client($res->getUrl());
         $proxy = $rpc->getProxy();
         $params = array(
-            //for the "es ist ein kleines haus" sample data the requests work only with lower case requests:
-            'text' => strtolower($queryString), //"es ist ein kleines haus",
+            //for the "es ist ein kleines haus" Moses sample data the requests work only with lower case requests:
+            //see T5DEV-86 escape [] brackets from Moses query for info on next line
+            'text' => str_replace(array('[',']'), array('\[','\]'), $queryString), //"es ist ein kleines haus",
             'align' => 'false',
             'report-all-factors' => 'false',
         );
@@ -81,6 +82,7 @@ class editor_Plugins_MatchResource_Services_Moses_Connector extends editor_Plugi
         $this->resultList->setDefaultSource($queryString);
         
         if(!empty($res['text'])){
+            $res['text'] = str_replace(array('\[','\]'), array('[',']'), $res['text']);
             $this->resultList->addResult($res['text'], $this->calculateMatchrate());
             return $this->resultList;
         }
