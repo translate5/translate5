@@ -51,6 +51,7 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
         color: '#UT#Farbe',
         refresh: '#UT#Aktualisieren',
         add: '#UT#Hinzufügen',
+        noTaskAssigned:'#UT#No task are assigned.'
     },
     cls:'tmOverviewPanel',
     height: '100%',
@@ -124,6 +125,26 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                     dataIndex: 'serviceName',
                     filter: {
                         type: 'string'
+                    }
+                },{
+                    xtype:'gridcolumn',
+                    width: 40,
+                    dataIndex:'taskGuidsList',
+                    tdCls: 'taskGuidsList',
+                    cls: 'taskGuidsList',
+                    renderer: function(v, meta, rec){
+                        if(!v && v.length <1){
+                            meta.tdAttr = 'data-qtip="'+this.strings.noTaskAssigned+'"';
+                            return "";
+                        }
+                        var strservices="";
+                        for(var i=0;i<v.length;i++){
+                            strservices +=' - '+ v[i]+')<br/>';
+                            //meta.tdAttr = 'data-qtip="'+tmmt.name+' ('+tmmt.serviceName+')<br/>"';
+                        }
+                        meta.tdAttr = 'data-qtip="'+strservices+'"';
+                        return v.length;
+                        //meta.tdCls  = meta.tdCls  + ' info-icon';
                     }
                 }],
                 dockedItems: [{

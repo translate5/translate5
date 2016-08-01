@@ -30,7 +30,6 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_MatchResource_Models_Taskassoc extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Plugins_MatchResource_Models_Db_Taskassoc';
     protected $validatorInstanceClass = 'editor_Plugins_MatchResource_Models_Validator_Taskassoc'; //→ here the new validator class
-
     /**
      * loads one assoc entry, returns the loaded row as array
      * 
@@ -115,5 +114,18 @@ class editor_Plugins_MatchResource_Models_Taskassoc extends ZfExtended_Models_En
                 array("ta"=>"LEK_matchresource_taskassoc"),
                 "ta.tmmtId = tmmt.id", $checked);
         return $this->loadFilterdCustom($s);
+    }
+    /**
+     * Returns join between taskassoc table and task table for tmmt's id list
+     * @param array $tmmtids
+     */
+    public function getTaskGuidsForTmmts($tmmtids){
+        $s = $this->db->select()
+        ->from(array("assocs" => "LEK_matchresource_taskassoc"), array("assocs.id","assocs.taskGuid","task.taskName","assocs.tmmtId"))
+        ->setIntegrityCheck(false)
+        ->join(array("task" => "LEK_task"),"assocs.taskGuid = task.taskGuid","")
+        ->where('assocs.tmmtId in (?)', $tmmtids)
+        ->group('assocs.id');
+        return $this->db->fetchAll($s)->toArray();
     }
 }

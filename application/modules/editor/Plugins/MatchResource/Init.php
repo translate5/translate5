@@ -54,6 +54,8 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
     
     protected $localePath = 'locales';
     
+    private $taskassocs = array();
+    
     public function getFrontendControllers() {
         $result = array();
         $userSession = new Zend_Session_Namespace('user');
@@ -81,6 +83,8 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
     protected function initEvents() {
         $this->eventManager->attach('editor_TaskController', 'afterTaskOpen', array($this, 'handleAfterTaskOpen'));
         $this->eventManager->attach('editor_TaskController', 'afterTaskClose', array($this, 'handleAfterTaskClose'));
+        $this->eventManager->attach('editor_TaskController', 'afterIndexAction', array($this, 'handleAfterTaskIndexAction'));
+        $this->eventManager->attach('editor_TaskController', 'afterGetAction', array($this, 'handleAfterTaskGetAction'));
         $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
         $this->eventManager->attach('Editor_SegmentController', 'afterPutAction', array($this, 'handleAfterSegmentPut'));
         $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
@@ -117,7 +121,68 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
         /* @var $manager editor_Plugins_MatchResource_Services_Manager */
         $manager->closeForTask($event->getParam('task'));
     }
-    
+    /***
+     * Handler to add tmmt info to task indexAction
+     * @param Zend_EventManager_Event $event
+     */
+     public function handleAfterTaskIndexAction(Zend_EventManager_Event $event){
+        /*@var $tmmtmodel editor_Plugins_MatchResource_Models_TmMt */
+         $tmmtmodel = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
+         
+         $tmptasks = array_column($event->getParam('view')->rows, 'taskGuid');
+         
+         $resultlist =$tmmtmodel->loadByAssociatedTaskGuidList($tmptasks);
+         if(empty($resultlist)){
+             return;
+         }
+         foreach ($resultlist as $res){
+             if(!isset($this->taskassocs[$res['taskGuid']])){
+                 $this->taskassocs[$res['taskGuid']] = array();
+             }
+             array_push($this->taskassocs[$res['taskGuid']], $res);
+         }
+         foreach($event->getParam('view')->rows as &$tmmt) {
+             if(isset($this->taskassocs[$tmmt['taskGuid']])){
+                 $tmmt['taskassocs'] =$this->taskassocs[$tmmt['taskGuid']];
+             }
+        }
+     }
+     public function handleAfterTaskGetAction(Zend_EventManager_Event $event){
+        /*@var $tmmtmodel editor_Plugins_MatchResource_Models_TmMt */
+         $tmmtmodel = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
+         
+         $taskguids =$event->getParam('view')->rows->taskGuid;
+         
+         $resultlist =$tmmtmodel->loadByAssociatedTaskGuidList(array($taskguids));
+         $event->getParam('view')->rows->taskassocs = array();
+         if(empty($resultlist)){
+             return;
+         }
+         $event->getParam('view')->rows->taskassocs = $resultlist;
+     }
+     
+     private function addTaskAssocArrayToTaskObject(Zend_EventManager_Event $event){
+         /*@var $tmmtmodel editor_Plugins_MatchResource_Models_TmMt */
+         $tmmtmodel = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
+         
+         $taskguids =$event->getParam('view')->rows->taskGuid;
+         
+         $resultlist =$tmmtmodel->loadByAssociatedTaskGuidList($taskguids);
+         if(empty($resultlist)){
+             return;
+         }
+         foreach ($resultlist as $res){
+             if(!isset($this->taskassocs[$res['taskGuid']])){
+                 $this->taskassocs[$res['taskGuid']] = array();
+             }
+             array_push($this->taskassocs[$res['taskGuid']], $res);
+         }
+         foreach($event->getParam('view')->rows as &$tmmt) {
+             if(isset($this->taskassocs[$tmmt['taskGuid']])){
+                 $tmmt['taskassocs'] =$this->taskassocs[$tmmt['taskGuid']];
+             }
+         }
+     }
     /**
      * After a segment is changed we inform the services about that. What they do with this information is the service's problem.
      * @param Zend_EventManager_Event $event

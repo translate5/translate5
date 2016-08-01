@@ -61,11 +61,38 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
             return $resources[$id] = $serviceManager->getResourceById($serviceType, $id);
         };
         
+        /* @var $assocs editor_Plugins_MatchResource_Models_Taskassoc */
+        $assocs = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_Taskassoc');
+        
+        $tmmtids = array();
+        foreach($this->view->rows as $tmmt) {
+            array_push($tmmtids, $tmmt['id']);
+        }
+        
+        $retarray = $assocs->getTaskGuidsForTmmts($tmmtids);
+        
         foreach($this->view->rows as &$tmmt) {
             $resource = $getResource($tmmt['serviceType'], $tmmt['resourceId']);
             $tmmt['filebased'] = empty($resource) ? false : $resource->getFileBased();
             $tmmt['searchable'] = empty($resource) ? false : $resource->getSearchable();
+            if(!empty($retarray)){
+                $tmmt['taskGuidsList'] = $this->findTaskGuid($retarray, $tmmt['id']);
+            }
         }
+    }
+
+    /***
+     * return array with taskName's contained in the input parameter array with same tmmtids 
+     */
+    private function findTaskGuid($assocarray,$tmmtid){
+        $tmparray = array();
+        foreach ($assocarray as $r){
+            if($r['tmmtId'] != $tmmtid){
+                continue;
+            }
+            array_push($tmparray,$r['taskName']);
+        }
+        return $tmparray;
     }
     
     /**

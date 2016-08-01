@@ -180,7 +180,7 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $userAssocInfos = array();
         $allAssocInfos = $this->getUserAssocInfos($taskGuids, $userAssocInfos);
-        
+
         foreach ($rows as &$row) {
             $this->initWorkflow($row['workflow']);
             //adding QM SubSegment Infos to each Task
