@@ -80,6 +80,7 @@ END LICENSE AND COPYRIGHT
  * have a look to your error-log, when the script is done
  * 
  */
+require_once "../application/modules/editor/Controllers/TaskController.php";
 class editor_CheckController extends editor_TaskController {
     /**************************
      * configuration section
