@@ -37,6 +37,7 @@ Ext.define('Editor.store.admin.Users', {
   extend : 'Ext.data.Store',
   model: 'Editor.model.admin.User',
   autoLoad: true,
+  remoteFilter: true,
   remoteSort: true,
   pageSize: 20,
   userGuidName: {},

@@ -124,8 +124,7 @@ Ext.define('Editor.controller.Editor', {
           'alt-s':          ["S",{ctrl: false, alt: true}, me.handleDigitPreparation(me.handleChangeState), true],
           'alt-DIGIT':      [me.DEC_DIGITS,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
           'DIGIT':          [me.DEC_DIGITS,{ctrl: false, alt: false}, me.handleDigit],
-          'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
-          'pos1':           null //add empty pos1 handler here, so that the overwrite is processed
+          'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true]
       };
   },
   /**
@@ -162,7 +161,6 @@ Ext.define('Editor.controller.Editor', {
       });
       
       me.generalKeyMap = new Ext.util.KeyMap(Ext.getDoc(), me.getKeyMapConfig('application', {
-          'pos1': [Ext.EventObjectImpl.HOME,{ctrl: false, alt: false}, me.handleHomeKeyPress, true],
           'alt-c':     ["C",{ctrl: false, alt: true}, function(key, e){
               var me = this;
               e.stopEvent();

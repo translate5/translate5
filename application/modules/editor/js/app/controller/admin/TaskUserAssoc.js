@@ -37,7 +37,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
   extend : 'Ext.app.Controller',
   models: ['admin.TaskUserAssoc','admin.Task','admin.task.UserPref'],
   stores: ['admin.Users', 'admin.TaskUserAssocs'],
-  views: ['admin.task.PreferencesWindow','admin.task.UserAssocGrid','Editor.view.admin.UserChooseWindow'],
+  views: ['admin.task.PreferencesWindow','admin.task.UserAssocGrid'],
   refs : [{
       ref: 'assocDelBtn',
       selector: '#adminTaskUserAssocGrid #remove-user-btn'
