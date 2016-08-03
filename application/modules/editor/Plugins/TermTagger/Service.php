@@ -326,12 +326,12 @@ class editor_Plugins_TermTagger_Service {
     }
     
     private function decodeText($text) {
+        //fix TRANSLATE-713
+        $text = str_replace('term-STAT_NOT_FOUND', 'term STAT_NOT_FOUND', $text);
+        
         if (empty($this->replacedTagsNeedles)) {
             return $text;
         }
-        
-        //fix TRANSLATE-713
-        $text = str_replace('term-STAT_NOT_FOUND', 'term STAT_NOT_FOUND', $text);
         
         $text = preg_replace('"&lt;img class=&quot;content-tag&quot; src=&quot;(\d+)&quot; alt=&quot;TaggingError&quot; /&gt;"', '<img class="content-tag" src="\\1" alt="TaggingError" />', $text);
         $text = str_replace($this->replacedTagsNeedles, $this->replacedTagsReplacements, $text);
