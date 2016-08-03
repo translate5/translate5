@@ -36,7 +36,7 @@ END LICENSE AND COPYRIGHT
  * 
  * @author Marc Mittag
  */
-class editor_Models_Filter_TaskSpecific extends ZfExtended_Models_Filter_ExtJs {
+class editor_Models_Filter_TaskSpecific extends ZfExtended_Models_Filter_ExtJs6 {
     const STATE_LOCKED = 'locked';
     
     const USER_STATE = 'user_state_';
