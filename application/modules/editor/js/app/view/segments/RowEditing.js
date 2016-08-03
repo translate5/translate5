@@ -42,6 +42,8 @@ Ext.define('Editor.view.segments.RowEditing', {
     extend: 'Ext.grid.plugin.RowEditing',
     alias: 'plugin.segmentrowediting',
     editingAllowed: true,
+    clicksToMoveEditor: 2,
+    autoCancel: false,
     statics: {
         STARTEDIT_MOVEEDITOR: 0,
         STARTEDIT_SCROLLUNDER: 1
