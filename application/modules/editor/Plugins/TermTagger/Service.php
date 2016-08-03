@@ -273,6 +273,11 @@ class editor_Plugins_TermTagger_Service {
         return $response;
     }
     
+    /**
+     * replaces our internal tags with a img place holder, since the termtagger can not deal with our tags, but with imgs
+     * @param editor_Plugins_TermTagger_Service_ServerCommunication $data
+     * @return editor_Plugins_TermTagger_Service_ServerCommunication
+     */
     private function encodeSegments(editor_Plugins_TermTagger_Service_ServerCommunication $data) {
         foreach ($data->segments as & $segment) {
             $segment->source = $this->encodeText($segment->source);
@@ -281,8 +286,14 @@ class editor_Plugins_TermTagger_Service {
         
         return $data;
     }
-    
-    private function decodeSegments($data) {
+
+    /**
+     * restores our internal tags from the delivered img tags
+     * 
+     * @param stdClass $data
+     * @return stdClass
+     */
+    private function decodeSegments(stdClass $data) {
         foreach ($data->segments as & $segment) {
             $segment->source = $this->decodeText($segment->source);
             $segment->target = $this->decodeText($segment->target);
@@ -318,6 +329,10 @@ class editor_Plugins_TermTagger_Service {
         if (empty($this->replacedTagsNeedles)) {
             return $text;
         }
+        
+        //fix TRANSLATE-713
+        $text = str_replace('term-STAT_NOT_FOUND', 'term STAT_NOT_FOUND', $text);
+        
         $text = preg_replace('"&lt;img class=&quot;content-tag&quot; src=&quot;(\d+)&quot; alt=&quot;TaggingError&quot; /&gt;"', '<img class="content-tag" src="\\1" alt="TaggingError" />', $text);
         $text = str_replace($this->replacedTagsNeedles, $this->replacedTagsReplacements, $text);
         
