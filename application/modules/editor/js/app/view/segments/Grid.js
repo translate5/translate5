@@ -91,10 +91,7 @@ Ext.define('Editor.view.segments.Grid', {
     constructor: function() {
         this.plugins = [
             'gridfilters',
-            Ext.create('Editor.view.segments.RowEditing', {
-                clicksToMoveEditor: 1,
-                autoCancel: false
-            })
+            Ext.create('Editor.view.segments.RowEditing')
         ];
         this.callParent(arguments);
     },

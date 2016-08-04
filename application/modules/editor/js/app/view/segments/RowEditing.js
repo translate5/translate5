@@ -42,6 +42,8 @@ Ext.define('Editor.view.segments.RowEditing', {
     extend: 'Ext.grid.plugin.RowEditing',
     alias: 'plugin.segmentrowediting',
     editingAllowed: true,
+    clicksToMoveEditor: 2,
+    autoCancel: false,
     statics: {
         STARTEDIT_MOVEEDITOR: 0,
         STARTEDIT_SCROLLUNDER: 1
@@ -90,7 +92,7 @@ Ext.define('Editor.view.segments.RowEditing', {
     activateCell: function() {
         var me = this,
             result;
-        
+
         me.editByCellActivation = true;
         result = me.callParent(arguments);
         me.editByCellActivation = false;
