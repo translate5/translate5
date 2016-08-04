@@ -51,6 +51,7 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
         color: '#UT#Farbe',
         refresh: '#UT#Aktualisieren',
         add: '#UT#Hinzufügen',
+        noTaskAssigned:'#UT#Keine Aufgaben zugewiesen.'
     },
     cls:'tmOverviewPanel',
     height: '100%',
@@ -124,6 +125,26 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                     dataIndex: 'serviceName',
                     filter: {
                         type: 'string'
+                    }
+                },{
+                    xtype:'gridcolumn',
+                    width: 40,
+                    dataIndex:'taskList',
+                    tdCls: 'taskList',
+                    cls: 'taskList',
+                    renderer: function(v, meta, rec){
+                        var tasks = [], i;
+                        
+                        if(!v || v.length == 0){
+                            tasks.push(this.strings.noTaskAssigned);
+                        }
+                        else {
+                            for(i = 0;i<v.length;i++){
+                                tasks.push(v[i]);
+                            }
+                        }
+                        meta.tdAttr = 'data-qtip="'+tasks.join('<br />')+'"';
+                        return v.length;
                     }
                 }],
                 dockedItems: [{

@@ -43,6 +43,11 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
     protected $entity;
     
     /**
+     * @var array
+     */
+    protected $groupedTaskInfo = array();
+    
+    /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
      * Adds the readonly "filebased" field to the results
@@ -61,11 +66,48 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
             return $resources[$id] = $serviceManager->getResourceById($serviceType, $id);
         };
         
+        $this->prepareTaskInfo();
+        
         foreach($this->view->rows as &$tmmt) {
             $resource = $getResource($tmmt['serviceType'], $tmmt['resourceId']);
             $tmmt['filebased'] = empty($resource) ? false : $resource->getFileBased();
             $tmmt['searchable'] = empty($resource) ? false : $resource->getSearchable();
+            $tmmt['taskList'] = $this->getTaskInfos($tmmt['id']);
         }
+    }
+    
+    private function prepareTaskInfo() {
+        /* @var $assocs editor_Plugins_MatchResource_Models_Taskassoc */
+        $assocs = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_Taskassoc');
+        
+        $tmmtids = array_column($this->view->rows, 'id');
+        
+        $taskinfo = $assocs->getTaskInfoForTmmts($tmmtids);
+        if(empty($taskinfo)) {
+            return;
+        }
+        //group array by tmmtid
+        $this->groupedTaskInfo = array();
+        foreach($taskinfo as $one) {
+            if(!isset($this->groupedTaskInfo[$one['tmmtId']])) {
+                $this->groupedTaskInfo[$one['tmmtId']] = array();
+            }
+            $taskToPrint = $one['taskName'];
+            if(!empty($one['taskNr'])) {
+                $taskToPrint .= ' ('.$one['taskNr'].')';
+            }
+            $this->groupedTaskInfo[$one['tmmtId']][] = $taskToPrint;
+        }
+    }
+
+    /***
+     * return array with task info (taskName's) for the given tmmtids 
+     */
+    private function getTaskInfos($tmmtid){
+        if(empty($this->groupedTaskInfo[$tmmtid])) {
+            return null;
+        }
+        return $this->groupedTaskInfo[$tmmtid];
     }
     
     /**
@@ -84,8 +126,6 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         }
         
         $connector = $serviceManager->getConnector($this->entity);
-        
-        
         
         // disable layout and view
         //$this->view->layout()->disableLayout();
@@ -134,7 +174,7 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         }
     }
     
-    public function uploadError($msg) {
+    protected function uploadError($msg) {
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $translate ZfExtended_Zendoverwrites_Translate */;
         $errors = array('tmUpload' => array($translate->_($msg)));
@@ -252,7 +292,7 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
      * returns the connector to be used
      * @return editor_Plugins_MatchResource_Services_ConnectorAbstract
      */
-    public function getConnector() {
+    protected function getConnector() {
         $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
         /* @var $manager editor_Plugins_MatchResource_Services_Manager */
         return $manager->getConnector($this->entity);

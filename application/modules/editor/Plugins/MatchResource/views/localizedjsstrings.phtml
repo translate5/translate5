@@ -35,8 +35,10 @@ END LICENSE AND COPYRIGHT
   
     Ext.define("Editor.locale.plugins.MatchResource.controller.Editor", {
         override: "Editor.plugins.MatchResource.controller.Editor",
-        msgDisabledMatchRate: '<?php echo $this->translate->_('Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.');?>',
-        msgDisabledSourceEdit: '<?php echo $this->translate->_('Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.');?>'
+        strings: {
+            msgDisabledMatchRate: '<?php echo $this->translate->_('Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.');?>',
+            msgDisabledSourceEdit: '<?php echo $this->translate->_('Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.');?>'
+        }
     });
     
     Ext.define("Editor.locale.plugins.MatchResource.controller.TaskAssoc", {
@@ -56,7 +58,8 @@ END LICENSE AND COPYRIGHT
             deleteConfirmText: '<?php echo $this->translate->_('Soll die gewählte Matchressource "{0}" wirklich endgültig gelöscht werden?');?>',
             deleted: '<?php echo $this->translate->_('Matchressource gelöscht.');?>',
             edited: '<?php echo $this->translate->_('Die Matchressource "{0}" wurde erfolgreich geändert.');?>',
-            created: '<?php echo $this->translate->_('Die Matchressource "{0}" wurde erfolgreich erstellt.');?>'
+            created: '<?php echo $this->translate->_('Die Matchressource "{0}" wurde erfolgreich erstellt.');?>',
+            noResourcesAssigned: '<?php echo $this->translate->_('Keine Matchressourcen zugewiesen.');?>'
         }
     });
     
@@ -170,7 +173,8 @@ END LICENSE AND COPYRIGHT
             resource: '<?php echo $this->translate->_('Ressource');?>',
             refresh: '<?php echo $this->translate->_('Aktualisieren');?>',
             color: '<?php echo $this->translate->_('Farbe');?>',
-            add: '<?php echo $this->translate->_('Hinzufügen');?>'
+            add: '<?php echo $this->translate->_('Hinzufügen');?>',
+            noTaskAssigned: '<?php echo $this->translate->_('Keine Aufgaben zugewiesen.');?>'
         }
     });
     

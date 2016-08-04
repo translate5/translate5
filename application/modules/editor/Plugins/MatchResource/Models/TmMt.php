@@ -56,28 +56,28 @@ class editor_Plugins_MatchResource_Models_TmMt extends ZfExtended_Models_Entity_
     protected $validatorInstanceClass = 'editor_Plugins_MatchResource_Models_Validator_TmMt';
     
     /**
-     * loads the task / tmmt assocs by task
-     * @param editor_Models_Task $task
-     * @return array
-     */
-    public function loadByAssociatedTask(editor_Models_Task $task) {
-        return $this->loadByAssociatedTaskGuid($task->getTaskGuid());
-    }
-    
-    /**
-     * loads the task / tmmt assocs by taskguid
+     * loads the task to tmmt assocs by a taskguid
      * @param string $taskGuid
      * @return array
      */
     public function loadByAssociatedTaskGuid(string $taskGuid) {
+        return $this->loadByAssociatedTaskGuidList(array($taskGuid));
+    }
+    
+    /**
+     * loads the task to tmmt assocs by taskguid
+     * @param string $taskGuid
+     * @return array
+     */
+    public function loadByAssociatedTaskGuidList(array $taskGuidList) {
         $assocDb = new editor_Plugins_MatchResource_Models_Db_Taskassoc();
         $assocName = $assocDb->info($assocDb::NAME);
         $s = $this->db->select()
-            ->from($this->db, '*')
-            //->setIntegrityCheck(false)
+            ->from($this->db, array('*',$assocName.'.taskGuid'))
+            ->setIntegrityCheck(false)
             ->join($assocName, $assocName.'.`tmmtId` = '.$this->db->info($assocDb::NAME).'.`id`', '')
-            ->where($assocName.'.`taskGuid` = ?', $taskGuid);
-        return $this->db->fetchAll($s)->toArray();
+            ->where($assocName.'.`taskGuid` in (?)', $taskGuidList);
+        return $this->db->fetchAll($s)->toArray(); 
     }
     
     /**

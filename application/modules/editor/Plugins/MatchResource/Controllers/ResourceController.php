@@ -72,7 +72,6 @@ class editor_Plugins_MatchResource_ResourceController extends ZfExtended_RestCon
         $this->view->rows = $result;
         $this->view->total = count($result);
     }
-    
     public function getAction() {
         throw new ZfExtended_BadMethodCallException(__CLASS__.'->get');
     }
