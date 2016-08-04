@@ -84,14 +84,16 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           }
       }
   },
-  msgDisabledMatchRate: '#UT#Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.',
-  msgDisabledSourceEdit: '#UT#Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.',
+  strings: {
+      msgDisabledMatchRate: '#UT#Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.',
+      msgDisabledSourceEdit: '#UT#Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.',
+  },
   assocStore: null,
   SERVER_STATUS: null,//initialized after center panel is rendered
   afterInitEditor: function() {
       var task = Editor.data.task;
       if(!task.get('defaultSegmentLayout')){
-          Editor.MessageBox.addInfo(this.msgDisabledMatchRate, 1.4);
+          Editor.MessageBox.addInfo(this.strings.msgDisabledMatchRate, 1.4);
       }
   },
   startEditing: function(plugin,context) {
@@ -151,19 +153,14 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       
       //don't take over the match when the source column is edited
       if(editor.isSourceEditing()) {
-          Editor.MessageBox.addWarning(this.msgDisabledSourceEdit);
+          Editor.MessageBox.addWarning(this.strings.msgDisabledSourceEdit);
           return;
       }
-      
-      
       if(plug.editing && rec && rec.get('editable')) {
           //Editor.MessageBox.addInfo("Show a message on take over content?");
-          
           sc = new Editor.util.SegmentContent(rec.get('source'));
           contentTags = sc.getContentTags().join('');
-                    
           editor.mainEditor.setValueAndMarkup(matchRecord.get('target')+contentTags, rec.get('id'), editor.columnToEdit);
-          
           //we don't support the matchrate saving for tasks with alternatives:
           if(task.get('defaultSegmentLayout')) {
               rec.set('matchRate', matchrate);

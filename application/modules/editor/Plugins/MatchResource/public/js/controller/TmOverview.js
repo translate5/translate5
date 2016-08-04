@@ -42,7 +42,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
     extend : 'Ext.app.Controller',
     views: ['Editor.plugins.MatchResource.view.TmOverviewPanel','Editor.plugins.MatchResource.view.AddTmWindow'],
-    models: ['Editor.plugins.MatchResource.model.Resource','Editor.plugins.MatchResource.model.TmMt'],
+    models: ['Editor.model.admin.Task', 'Editor.plugins.MatchResource.model.Resource','Editor.plugins.MatchResource.model.TmMt'],
     stores:['Editor.plugins.MatchResource.store.Resources','Editor.plugins.MatchResource.store.TmMts'],
     strings: {
         matchresource: '#UT#Matchressourcen',
@@ -51,6 +51,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
         deleted: '#UT#Matchressource gelöscht.',
         edited: '#UT#Die Matchressource "{0}" wurde erfolgreich geändert.',
         created: '#UT#Die Matchressource "{0}" wurde erfolgreich erstellt.',
+        noResourcesAssigned: '#UT#Keine Matchressourcen zugewiesen.'
     },
     refs:[{
         ref: 'tmOverviewPanel',
@@ -106,8 +107,17 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
             },
             'headPanel': {
                 afterrender: 'handleRenderHeadPanel'
+            },
+            '#adminTaskGrid': {
+                beforerender:'injectTaskassocColumn'
             }
         }
+    },
+    init: function() {
+        //add the taskassocs field to the task model
+        Editor.model.admin.Task.replaceFields({
+            name: 'taskassocs', type: 'auto', persist: false
+        });
     },
     handleAfterShow: function() {
         this.getHeadToolBar().down('#btnTmOverviewWindow').hide();
@@ -266,5 +276,44 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
                 }
             });
         });
+    },
+    /***
+     * this function will insert the taskassoc column in to the adminTaskGrid
+     */
+    injectTaskassocColumn:function(taskgrid){
+        var me = this,
+            grid = taskgrid.getView().grid,
+            column;
+        
+        if(grid.down('gridcolumn[dataIndex=taskassocs]')){
+            return;
+        }
+        
+        column = Ext.create('Ext.grid.column.Column', {
+            xtype: 'gridcolumn',
+            width: 45,
+            dataIndex:'taskassocs',
+            tdCls: 'taskassocs',
+            sortable: false,
+            cls: 'taskassocs',
+            renderer: function(v, meta, rec){
+                var strservices = [],
+                    i, tmmt;
+                if(!v || v.length == 0){
+                    meta.tdAttr = 'data-qtip="'+me.strings.noResourcesAssigned+'"';
+                    //meta.tdCls  = meta.tdCls  + ' info-icon';
+                    return '';
+                }
+                for(i=0;i<v.length;i++){
+                    tmmt = v[i];
+                    strservices.push(tmmt.name+' ('+tmmt.serviceName+')');
+                    //meta.tdAttr = 'data-qtip="'+tmmt.name+' ('+tmmt.serviceName+')<br/>"';
+                }
+                meta.tdAttr = 'data-qtip="'+strservices.join('<br />')+'"';
+                return v.length;
+            }
+        });
+        grid.headerCt.insert((grid.down('gridcolumn[dataIndex=userCount]').fullColumnIndex + 1), column);//inserting the dynamic column into grid
+        grid.getView().refresh();
     }
 });

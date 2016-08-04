@@ -54,6 +54,9 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
   },{
       ref: 'grid',
       selector: 'adminTaskPreferencesWindow > tabpanel #tmTaskAssocGrid'
+  },{
+      ref: 'adminTaskWindow',
+      selector: 'adminTaskPreferencesWindow'
   }],
   listen: {
       controller: {
@@ -63,7 +66,14 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
       },
       component: {
           'adminTaskPreferencesWindow': {
-              render: 'onParentRender'
+              render: 'onParentRender',
+              beforeclose:function(panel,eOpts){
+                  var me=this;
+                  if(me.requestsCount>0){
+                      return false;
+                  }
+                  panel.setLoading(false);
+              }
           },
           'matchResourceTaskAssocPanel #btnSaveChanges': {
               click: 'handleOnSaveButtonClick'
@@ -73,6 +83,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
           }
       }
   },
+  requestsCount:0,
   /**
    * inject the plugin tab and load the task meta data set
    */
@@ -88,11 +99,15 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
                   filter: '[{"operator":"like","value":"'+task.get('taskGuid')+'","property":"taskGuid"}]'
               }
           };
+      me.getGrid().store.removeAll();
       me.getGrid().store.load(tmmtparams);
   },
   handleOnSaveButtonClick: function(window) {
-      var me = this;
-      me.getGrid().store.each(me.saveOneAssocRecord, me);
+      var me = this,
+          tmpStore = me.getGrid().store;
+      me.getAdminTaskWindow().setLoading(true);
+      me.requestsCount = tmpStore.getCount();
+      tmpStore.each(me.saveOneAssocRecord, me);
   },
   handleOnReload: function(window) {
       var me = this;
@@ -104,11 +119,13 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
    * The taskassocs itself can be handled by plain 404 already deleted and duplicate entry messages.
    */
   saveOneAssocRecord: function(record){
+      var me = this;
       if(!record.dirty){
+          me.requestsCount--;
+          me.hideLoadingMask();
           return;
       }
-      var me = this,
-          str = me.strings,
+      var str = me.strings,
           checkedData = {
           data: Ext.JSON.encode({
               tmmtId: record.get('id'),
@@ -120,6 +137,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
           method: record.data.checked ? "POST" : "DELETE",
           params: record.data.checked ? checkedData : {} ,
           success: function(response){
+              me.requestsCount--;
               if(record.data.checked){
                   var resp = Ext.util.JSON.decode(response.responseText),
                       newId = resp.rows['id'];
@@ -130,10 +148,21 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
                   Editor.MessageBox.addSuccess(str.assocDeleted);
               }
               record.commit();
+              me.hideLoadingMask();
           },
           failure: function(response){
+              me.requestsCount--;
               Editor.app.getController('ServerException').handleException(response);
+              me.hideLoadingMask();
           } 
       });
+  },
+  hideLoadingMask:function(){
+      var me=this;
+      if(me.requestsCount <= 0){
+          var task = me.getAdminTaskWindow().actualTask;
+          me.getAdminTaskWindow().setLoading(false);
+          task.load();
+      }
   }
 });
