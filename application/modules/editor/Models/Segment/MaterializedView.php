@@ -152,6 +152,12 @@ class editor_Models_Segment_MaterializedView {
             if(empty($md[$v]['NULLABLE'])) {
                 $sql .= ' NOT NULL';
             }
+            
+            //searching in our text fields should be searched binary, see TRANSLATE-646 
+            if($v == 'original' || $v == 'edited') {
+                $sql .= ' COLLATE utf8_bin';
+            }
+            
             $addColTpl[$v] = $sql;
         }
         

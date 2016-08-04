@@ -33,6 +33,13 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     protected $entityClass = 'editor_Models_Segment';
 
     /**
+     * overriding filter class to ensure lower case filtering for segment content fields
+     * @var string
+     */
+    protected $filterClass = 'editor_Models_Filter_SegmentSpecific';
+    
+    
+    /**
      * @var editor_Models_Segment
      */
     protected $entity;
@@ -71,6 +78,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     public function init() {
       parent::init();
       $this->entity->setEnableWatchlistJoin();
+      $this->entity->getFilter()->setSegmentFields(array_keys($this->_sortColMap));
     }
     
     protected function afterTaskGuidCheck() {
