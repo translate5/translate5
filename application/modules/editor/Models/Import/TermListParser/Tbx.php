@@ -131,7 +131,18 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         'standardizedTerm' => editor_Models_Term::STAT_STANDARDIZED,
         'deprecatedTerm' => editor_Models_Term::STAT_DEPRECATED,
         'supersededTerm' => editor_Models_Term::STAT_SUPERSEDED,
+            
+        //some more states (uncomplete!), see TRANSLATE-714
+        'proposed' => editor_Models_Term::STAT_PREFERRED,
+        'deprecated' => editor_Models_Term::STAT_DEPRECATED,
+        'admitted' => editor_Models_Term::STAT_ADMITTED,
     );
+    
+    /**
+     * collected term states not listed in statusMap 
+     * @var array
+     */
+    protected $unknownStates = array();
     
     protected $timer;
     
@@ -204,6 +215,10 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             /* @var $file SplFileInfo */
             $this->importOneTbx($file, $task, $meta->getSourceLang(), $meta->getTargetLang());
             break; //we consider only one TBX file!
+        }
+        
+        if(!empty($this->unknownStates)) {
+            $this->log('TBX contains the following unknown term states: '.join(', ', $this->unknownStates));
         }
     }
     
@@ -550,10 +565,13 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
      * @return string
      */
     protected function getMappedStatus($tbxStatus) {
-        if(empty($this->statusMap[$tbxStatus])){
-            return editor_Models_Term::STAT_NOT_FOUND;
+        if(!empty($this->statusMap[$tbxStatus])){
+            return $this->statusMap[$tbxStatus];
         }
-        return $this->statusMap[$tbxStatus];
+        if(!in_array($tbxStatus, $this->unknownStates)) {
+            $this->unknownStates[] = $tbxStatus;
+        }
+        return editor_Models_Term::STAT_NOT_FOUND;
     }
     
     /**
