@@ -70,9 +70,6 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           },
           '#matchGrid': {
               chooseMatch: 'setMatchInEditor'
-          },
-          '#adminTaskGrid': {
-              beforerender:'injectTaskassocColumn'
           }
       },
       controller: {
@@ -88,10 +85,9 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       }
   },
   strings: {
-      noResourcesAssigned: '#UT#No resources are assigned.'
+      msgDisabledMatchRate: '#UT#Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.',
+      msgDisabledSourceEdit: '#UT#Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.',
   },
-  msgDisabledMatchRate: '#UT#Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.',
-  msgDisabledSourceEdit: '#UT#Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.',
   assocStore: null,
   SERVER_STATUS: null,//initialized after center panel is rendered
   afterInitEditor: function() {
@@ -232,36 +228,5 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
   getAssocStoreCount: function(){
       var store = this.assocStore;
       return store ? store.getTotalCount() : 0;
-  },
-  /***
-   * this function will insert the taskassoc column in to the adminTaskGrid
-   */
-  injectTaskassocColumn:function(taskgrid){
-      //FIXME check if comumn exsist
-      var me = this,
-          grid = taskgrid.getView().grid,
-          column = Ext.create('Ext.grid.column.Column', {
-              xtype: 'gridcolumn',
-              width: 45,
-              dataIndex:'taskassocs',
-              tdCls: 'taskassocs',
-              cls: 'taskassocs',
-              renderer: function(v, meta, rec){
-                  if(v && v.length > 0){
-                      var strservices = "";
-                      for(var i=0;i<v.length;i++){
-                          var tmmt = v[i];
-                          strservices +=' - '+ tmmt.name+' ('+tmmt.serviceName+')<br/>';
-                          //meta.tdAttr = 'data-qtip="'+tmmt.name+' ('+tmmt.serviceName+')<br/>"';
-                      }
-                      meta.tdAttr = 'data-qtip="'+strservices+'"';
-                      return v.length;
-                  }
-                  meta.tdAttr = 'data-qtip="'+me.strings.noResourcesAssigned+'"';
-                  //meta.tdCls  = meta.tdCls  + ' info-icon';
-              }
-      });
-      grid.headerCt.insert((grid.down('[dataIndex=userCount]').fullColumnIndex + 1), column);//inserting the dynamic column into grid
-      grid.getView().refresh();
   }
 });

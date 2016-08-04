@@ -119,9 +119,9 @@ class editor_Plugins_MatchResource_Models_Taskassoc extends ZfExtended_Models_En
      * Returns join between taskassoc table and task table for tmmt's id list
      * @param array $tmmtids
      */
-    public function getTaskGuidsForTmmts($tmmtids){
+    public function getTaskInfoForTmmts($tmmtids){
         $s = $this->db->select()
-        ->from(array("assocs" => "LEK_matchresource_taskassoc"), array("assocs.id","assocs.taskGuid","task.taskName","assocs.tmmtId"))
+        ->from(array("assocs" => "LEK_matchresource_taskassoc"), array("assocs.id","assocs.taskGuid","task.taskName","task.taskNr","assocs.tmmtId"))
         ->setIntegrityCheck(false)
         ->join(array("task" => "LEK_task"),"assocs.taskGuid = task.taskGuid","")
         ->where('assocs.tmmtId in (?)', $tmmtids)

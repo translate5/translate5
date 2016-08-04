@@ -56,16 +56,16 @@ class editor_Plugins_MatchResource_Models_TmMt extends ZfExtended_Models_Entity_
     protected $validatorInstanceClass = 'editor_Plugins_MatchResource_Models_Validator_TmMt';
     
     /**
-     * loads the task / tmmt assocs by task
-     * @param editor_Models_Task $task
+     * loads the task to tmmt assocs by a taskguid
+     * @param string $taskGuid
      * @return array
      */
-    public function loadByAssociatedTask(editor_Models_Task $task) {
-        return $this->loadByAssociatedTaskGuid($task->getTaskGuid());
+    public function loadByAssociatedTaskGuid(string $taskGuid) {
+        return $this->loadByAssociatedTaskGuidList(array($taskGuid));
     }
     
     /**
-     * loads the task / tmmt assocs by taskguid
+     * loads the task to tmmt assocs by taskguid
      * @param string $taskGuid
      * @return array
      */
@@ -76,7 +76,6 @@ class editor_Plugins_MatchResource_Models_TmMt extends ZfExtended_Models_Entity_
             ->from($this->db, array('*',$assocName.'.taskGuid'))
             ->setIntegrityCheck(false)
             ->join($assocName, $assocName.'.`tmmtId` = '.$this->db->info($assocDb::NAME).'.`id`', '')
-            //->where($assocName.'.`taskGuid` = ?', $taskGuid);
             ->where($assocName.'.`taskGuid` in (?)', $taskGuidList);
         return $this->db->fetchAll($s)->toArray(); 
     }

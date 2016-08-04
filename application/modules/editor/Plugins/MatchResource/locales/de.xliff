@@ -148,6 +148,14 @@
       <source>{0} Ergebnisse</source>
       <target>{0} Ergebnisse</target>
     </trans-unit>
+    <trans-unit id='S2VpbmUgTWF0Y2hyZXNzb3VyY2VuIHp1Z2V3aWVzZW4u'>
+      <source>Keine Matchressourcen zugewiesen.</source>
+      <target>Keine Matchressourcen zugewiesen.</target>
+    </trans-unit>
+    <trans-unit id='S2VpbmUgQXVmZ2FiZW4genVnZXdpZXNlbi4='>
+      <source>Keine Aufgaben zugewiesen.</source>
+      <target>Keine Aufgaben zugewiesen.</target>
+    </trans-unit>
   </body>
  </file>
 </xliff>

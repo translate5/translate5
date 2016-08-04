@@ -51,7 +51,7 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
         color: '#UT#Farbe',
         refresh: '#UT#Aktualisieren',
         add: '#UT#Hinzufügen',
-        noTaskAssigned:'#UT#No task are assigned.'
+        noTaskAssigned:'#UT#Keine Aufgaben zugewiesen.'
     },
     cls:'tmOverviewPanel',
     height: '100%',
@@ -129,22 +129,22 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                 },{
                     xtype:'gridcolumn',
                     width: 40,
-                    dataIndex:'taskGuidsList',
-                    tdCls: 'taskGuidsList',
-                    cls: 'taskGuidsList',
+                    dataIndex:'taskList',
+                    tdCls: 'taskList',
+                    cls: 'taskList',
                     renderer: function(v, meta, rec){
-                        if(!v && v.length <1){
-                            meta.tdAttr = 'data-qtip="'+this.strings.noTaskAssigned+'"';
-                            return "";
+                        var tasks = [], i;
+                        
+                        if(!v || v.length == 0){
+                            tasks.push(this.strings.noTaskAssigned);
                         }
-                        var strservices="";
-                        for(var i=0;i<v.length;i++){
-                            strservices +=' - '+ v[i]+')<br/>';
-                            //meta.tdAttr = 'data-qtip="'+tmmt.name+' ('+tmmt.serviceName+')<br/>"';
+                        else {
+                            for(i = 0;i<v.length;i++){
+                                tasks.push(v[i]);
+                            }
                         }
-                        meta.tdAttr = 'data-qtip="'+strservices+'"';
+                        meta.tdAttr = 'data-qtip="'+tasks.join('<br />')+'"';
                         return v.length;
-                        //meta.tdCls  = meta.tdCls  + ' info-icon';
                     }
                 }],
                 dockedItems: [{
