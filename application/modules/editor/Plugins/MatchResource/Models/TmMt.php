@@ -69,15 +69,16 @@ class editor_Plugins_MatchResource_Models_TmMt extends ZfExtended_Models_Entity_
      * @param string $taskGuid
      * @return array
      */
-    public function loadByAssociatedTaskGuid(string $taskGuid) {
+    public function loadByAssociatedTaskGuidList(array $taskGuidList) {
         $assocDb = new editor_Plugins_MatchResource_Models_Db_Taskassoc();
         $assocName = $assocDb->info($assocDb::NAME);
         $s = $this->db->select()
-            ->from($this->db, '*')
-            //->setIntegrityCheck(false)
+            ->from($this->db, array('*',$assocName.'.taskGuid'))
+            ->setIntegrityCheck(false)
             ->join($assocName, $assocName.'.`tmmtId` = '.$this->db->info($assocDb::NAME).'.`id`', '')
-            ->where($assocName.'.`taskGuid` = ?', $taskGuid);
-        return $this->db->fetchAll($s)->toArray();
+            //->where($assocName.'.`taskGuid` = ?', $taskGuid);
+            ->where($assocName.'.`taskGuid` in (?)', $taskGuidList);
+        return $this->db->fetchAll($s)->toArray(); 
     }
     
     /**

@@ -156,7 +156,7 @@ class editor_Plugins_MatchResource_Services_Manager {
     protected function visitAllAssociatedTms($taskGuid, Closure $todo) {
         $tmmts = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
         /* @var $tmmts editor_Plugins_MatchResource_Models_TmMt */
-        $list = $tmmts->loadByAssociatedTaskGuid($taskGuid);
+        $list = $tmmts->loadByAssociatedTaskGuid(array($taskGuid));
         foreach($list as $one){
             $tmmt = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
             /* @var $tmmt editor_Plugins_MatchResource_Models_TmMt */

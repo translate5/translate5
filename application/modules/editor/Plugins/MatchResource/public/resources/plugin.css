@@ -26,3 +26,8 @@
 .plugin-match-resource-result-panel .match-state-servererror.x-grid-row .matchrate > div {
     background:url(../../../../modules/editor/images/exclamation.png) no-repeat left center;
 }
+.adminTaskGrid tr:hover td.taskassocs > div {background-image:url(images/information.png); background-repeat:no-repeat; background-position:18px center;}
+.adminTaskGrid .x-grid-header-ct .taskassocs > div {background:url(images/share.png) no-repeat 6px 5px;}
+
+.tmOverviewPanel tr:hover td.taskGuidsList > div {background-image:url(images/information.png); background-repeat:no-repeat; background-position:center;}
+.tmOverviewPanel .x-grid-header-ct .taskGuidsList > div {background:url(images/share.png) no-repeat 6px 5px;}
