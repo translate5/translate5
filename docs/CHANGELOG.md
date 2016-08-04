@@ -3,12 +3,33 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.4.16] - 2016-08-04
+### Added
+TRANSLATE-711: Check-Script for translate-683
+enable application zip override on commandline
+
+### Changed
+TRANSLATE-710: change generated dates in changes.xliff to DateTime::ATOM format
+TRANSLATE-705: Single click leads to opening of segment
+TRANSLATE-712: remote sorting not working in task and user grid
+TRANSLATE-713: JS Error when opening segments with terminology with unknown term status
+
+### Changed - for supporters only
+TRANSLATE-421: Display TM-Assoc in task-Overview panel & Task-Assoc in TM-Overview panel
+               Only available for supporters of the crowdfunding until the crowdfunding is fully financed,
+               see https://www.startnext.com/joined-os-translation-system
+
 
 ## [2.4.14] - 2016-07-27
 ### Added
 TRANSLATE-707: Export comments to sdlxliff
 TRANSLATE-684: adding a matchRateType column
 translate5 Plugins: added support for translations, public files and php controllers
+
+### Added - for supporters only
+TRANSLATE-421: translate5 connects and uses results from third party TM (openTM2) and MT (Moses MT) resources
+               Only available for supporters of the crowdfunding until the crowdfunding is fully financed,
+               see https://www.startnext.com/joined-os-translation-system
 
 ### Changed
 TRANSLATE-706: Check during relais import, if source of relais file is identical to source of to be translated file
