@@ -134,7 +134,7 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         }
     }
     
-    public function uploadError($msg) {
+    protected function uploadError($msg) {
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $translate ZfExtended_Zendoverwrites_Translate */;
         $errors = array('tmUpload' => array($translate->_($msg)));
@@ -252,7 +252,7 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
      * returns the connector to be used
      * @return editor_Plugins_MatchResource_Services_ConnectorAbstract
      */
-    public function getConnector() {
+    protected function getConnector() {
         $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
         /* @var $manager editor_Plugins_MatchResource_Services_Manager */
         return $manager->getConnector($this->entity);
