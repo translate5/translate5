@@ -92,7 +92,7 @@ Ext.define('Editor.view.segments.RowEditing', {
     activateCell: function() {
         var me = this,
             result;
-        
+
         me.editByCellActivation = true;
         result = me.callParent(arguments);
         me.editByCellActivation = false;
