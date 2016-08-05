@@ -113,9 +113,9 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     
     protected $html5Tags = array();
 
-    public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, boolean $lockLocked, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task) {
+    public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task) {
         ini_set('auto_detect_line_endings', true);//to tell php to respect mac-lineendings
-        parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $lockLocked, $sourceLang, $targetLang, $task);
+        parent::__construct($path, $fileName, $fileId, $task);
         $this->_delimiter = $this->config->runtimeOptions->import->csv->delimiter;
         $this->_enclosure = $this->config->runtimeOptions->import->csv->enclosure;
         $this->regexInternalTags = editor_Models_Export_FileParser::REGEX_INTERNAL_TAGS;

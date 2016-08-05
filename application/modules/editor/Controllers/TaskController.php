@@ -323,8 +323,6 @@ class editor_TaskController extends ZfExtended_RestController {
     protected function processUploadedFile() {
         $import = ZfExtended_Factory::get('editor_Models_Import');
         /* @var $import editor_Models_Import */
-        $import->setEdit100PercentMatches((bool) $this->entity->getEdit100PercentMatch());
-        $import->setLockLocked((bool) $this->entity->getLockLocked());
         $import->setUserInfos($this->user->data->userGuid, $this->user->data->userName);
 
         $import->setLanguages(

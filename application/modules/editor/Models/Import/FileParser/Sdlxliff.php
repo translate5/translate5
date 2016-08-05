@@ -93,10 +93,10 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     /**
      * Initiert Tagmapping
      */
-    public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, boolean $lockLocked, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task) {
+    public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task) {
         //add sdlxliff tagMapping
         $this->addSldxliffTagMappings();
-        parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $lockLocked, $sourceLang, $targetLang, $task);
+        parent::__construct($path, $fileName, $fileId, $task);
         $this->checkForSdlChangeMarker();
         $this->protectUnicodeSpecialChars();
         $this->prepareTagMapping();

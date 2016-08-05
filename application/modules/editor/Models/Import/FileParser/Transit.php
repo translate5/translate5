@@ -125,13 +125,10 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
      * @param string $path
      * @param string $fileName
      * @param integer $fileId
-     * @param boolean $edit100PercentMatches
-     * @param editor_Models_Languages $sourceLang
-     * @param editor_Models_Languages $targetLang
      * @param editor_Models_Task $task
      */
-    public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, boolean $lockLocked, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task){
-        parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $lockLocked, $sourceLang, $targetLang, $task);
+    public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task){
+        parent::__construct($path, $fileName, $fileId, $task);
         $this->meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
         $this->meta->addMeta('transitLockedForRefMat', editor_Models_Segment_Meta::META_TYPE_BOOLEAN, 0, 'defines, if segment is marked in transitFile as locked for translation memory use');
         $transitLangInfo = Zend_Registry::get('transitLangInfo');

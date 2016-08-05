@@ -101,15 +101,6 @@ abstract class editor_Models_Import_FileParser {
      *            Struktur: array(Segment-ID => boolean)
      */
     protected $_pretransSegment = array();
-    /**
-     * @var boolean legt für die aktuelle Fileparser-Instanz fest, ob 100-Matches
-     *              editiert werden dürfen (true) oder nicht (false)
-     */
-    public $_edit100PercentMatches = false;
-    /**
-     * @var boolean defines, if segments that are locked for editing in the imported file, but that are visible to the user should be locked in translate5, too
-     */
-    public $_lockLocked = true;
     
     /**
      * defines the GUI representation of internal used tags for masking special characters  
@@ -136,16 +127,6 @@ abstract class editor_Models_Import_FileParser {
      */
     protected $_singleTag = NULL;
 
-    /**
-     * @var editor_Models_Languages Entity Instanz der Sprache
-     */
-    protected $_sourceLang = NULL;
-    
-    /**
-     * @var editor_Models_Languages Entity Instanz der Sprache
-     */
-    protected $_targetLang = NULL;
-    
     /**
      * @var editor_Models_Task
      */
@@ -192,31 +173,22 @@ abstract class editor_Models_Import_FileParser {
      * @param string $path pfad zur Datei in der Kodierung des Filesystems (also runtimeOptions.fileSystemEncoding)
      * @param string $fileName Dateiname utf-8 kodiert
      * @param integer $fileId
-     * @param boolean $edit100PercentMatches
-     * @param editor_Models_Languages $sourceLang
-     * @param editor_Models_Languages $targetLang
-     * @param editor_Models_Task $targetLang
+     * @param editor_Models_Task $task
      */
-    public function __construct(string $path, string $fileName,integer $fileId,
-            boolean $edit100PercentMatches, boolean $lockLocked,  editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task){
+    public function __construct(string $path, string $fileName,integer $fileId, editor_Models_Task $task){
         $this->config = Zend_Registry::get('config');
         $this->_origFile = file_get_contents($path);
         $this->_path = $path;
         $this->_fileName = $fileName;
         $this->_fileId = $fileId;
-        $this->_edit100PercentMatches = $edit100PercentMatches;
-        $this->_lockLocked = $lockLocked;
         $this->_leftTag = ZfExtended_Factory::get('editor_ImageTag_Left');
         $this->_rightTag = ZfExtended_Factory::get('editor_ImageTag_Right');
         $this->_singleTag = ZfExtended_Factory::get('editor_ImageTag_Single');
-        $this->_sourceLang = $sourceLang;
-        $this->_targetLang = $targetLang;
         $this->task = $task;
         $this->_taskGuid = $task->getTaskGuid();
         $this->autoStates = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
         $this->handleEncoding();
     }
-    
     
     /**
      * Prototyp-function for getting word-count while import process.
@@ -546,10 +518,10 @@ abstract class editor_Models_Import_FileParser {
     protected function calculateLocalSegmentAttribs() {
         $matchRate = $this->_matchRateSegment[$this->_mid];
         $isAutoprop = $this->_autopropagated[$this->_mid];
-        $isLocked = $this->_lockedInFile[$this->_mid] && $this->_lockLocked;
+        $isLocked = $this->_lockedInFile[$this->_mid] && (bool) $this->task->getLockLocked();
        
         $isFullMatch = ($matchRate === 100);
-        $isEditable  = (!$isFullMatch || $this->_edit100PercentMatches || $isAutoprop) && !$isLocked;
+        $isEditable  = (!$isFullMatch || (bool) $this->task->getEdit100PercentMatch() || $isAutoprop) && !$isLocked;
         $isTranslated = $this->isTranslated();
         $this->_editSegment[$this->_mid] = $isEditable;
         $this->_pretransSegment[$this->_mid] = $isFullMatch && !$isAutoprop;

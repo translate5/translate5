@@ -94,8 +94,6 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
         self::$testTask->setTargetDeliveryDate(date('Y-m-d H:i:s'));
         self::$testTask->setWordCount(0);
         self::$testTask->setEnableSourceEditing(false);
-        self::$testTask->setEdit100PercentMatch(1);
-        self::$testTask->setLockLocked(1);
         self::$testTask->setTerminologie(1);
         self::$testTask->createTaskGuidIfNeeded();
     }    
