@@ -49,10 +49,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     /**
      * Init tagmapping
      */
-    public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, boolean $lockLocked, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task)
+    public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task)
     {
         $this->addXlfTagMappings();
-        parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $lockLocked, $sourceLang, $targetLang, $task);
+        parent::__construct($path, $fileName, $fileId, $task);
         
         $this->protectUnicodeSpecialChars();
     }
