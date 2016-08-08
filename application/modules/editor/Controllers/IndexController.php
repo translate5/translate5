@@ -195,8 +195,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->setJsSegmentFlags('segments.stateFlags', $manualStates);
       $this->view->Php2JsVars()->set('segments.showStatus', (boolean)$rop->segments->showStatus);
       $this->view->Php2JsVars()->set('segments.showQM', (boolean)$rop->segments->showQM);
-      $states = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
-      /* @var $states editor_Models_SegmentAutoStates */
+      $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
+      /* @var $states editor_Models_Segment_AutoStates */
       $this->setJsSegmentFlags('segments.autoStateFlags', $states->getLabelMap());
       $this->view->Php2JsVars()->set('segments.roleAutoStateMap', $states->getRoleToStateMap());
 

@@ -146,8 +146,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $userRole = $taskUserAssoc->getRole();
         }
         
-        $states = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
-        /* @var $states editor_Models_SegmentAutoStates */
+        $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
+        /* @var $states editor_Models_Segment_AutoStates */
         $autoStateMap = $states->getRoleToStateMap();
         if(empty($userRole) || empty($autoStateMap[$userRole])) {
             return null;

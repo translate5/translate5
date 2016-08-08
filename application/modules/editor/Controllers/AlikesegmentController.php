@@ -125,8 +125,8 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
             });
         }
         
-        $states = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
-        /* @var $states editor_Models_SegmentAutoStates */
+        $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
+        /* @var $states editor_Models_Segment_AutoStates */
         
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */

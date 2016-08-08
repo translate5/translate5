@@ -649,7 +649,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         $this->_lockedInFile[$this->_mid] = false;
         $this->_pretransSegment[$this->_mid] = false;
         $this->_editSegment[$this->_mid] = true;
-        $this->_autoStateId[$this->_mid] = editor_Models_SegmentAutoStates::TRANSLATED;
+        $this->_autoStateId[$this->_mid] = editor_Models_Segment_AutoStates::TRANSLATED;
     }
     /**
      * counterpart of str_getcsv, because there is no php-func like that 

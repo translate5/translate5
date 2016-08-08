@@ -77,8 +77,8 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         $allowedValues[] = 0; //adding "not set" state
         $this->addValidator('stateId', 'inArray', array($allowedValues));
         
-        $states = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
-        /* @var $states editor_Models_SegmentAutoStates */
+        $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
+        /* @var $states editor_Models_Segment_AutoStates */
         $this->addValidator('autoStateId', 'inArray', array($states->getStates()));
     }
   

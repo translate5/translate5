@@ -574,10 +574,10 @@ abstract class editor_Workflow_Abstract {
             $segmentToSave->setWorkflowStep($roles2Step[$tua->getRole()]);
         }
 
-        $autostates = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
+        $autostates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         
         //set the autostate as defined in the given Closure
-        /* @var $autostates editor_Models_SegmentAutoStates */
+        /* @var $autostates editor_Models_Segment_AutoStates */
         $updateStates($autostates, $segmentToSave, $tua);
     }
     

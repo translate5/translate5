@@ -31,10 +31,8 @@ END LICENSE AND COPYRIGHT
 /**
  * Segment Auto States Helper Class
  * This class contains all autoState definitions and all autoState transitions, available by api
- * 
- * FIXME nextReleaseThomas in den workflowordner verschieben und in Abhängigkeit vom defaultworkflow definieren
  */
-class editor_Models_SegmentAutoStates {
+class editor_Models_Segment_AutoStates {
     
     /**
      * "translated" / 'Übersetzt' ehemals 'Nicht lektoriert'

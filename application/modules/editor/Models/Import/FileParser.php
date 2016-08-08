@@ -155,7 +155,7 @@ abstract class editor_Models_Import_FileParser {
     
     /**
      * Auto State Definer
-     * @var editor_Models_SegmentAutoStates
+     * @var editor_Models_Segment_AutoStates
      */
     protected $autoStates;
     
@@ -186,7 +186,7 @@ abstract class editor_Models_Import_FileParser {
         $this->_singleTag = ZfExtended_Factory::get('editor_ImageTag_Single');
         $this->task = $task;
         $this->_taskGuid = $task->getTaskGuid();
-        $this->autoStates = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
+        $this->autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         $this->handleEncoding();
     }
     
@@ -400,6 +400,7 @@ abstract class editor_Models_Import_FileParser {
     
     /**
      * Does the fileparsing
+     * FIXME replace the pre and post parse handlers with events 
      */
     public function parseFile() {
         foreach($this->segmentProcessor as $p) {
@@ -413,6 +414,7 @@ abstract class editor_Models_Import_FileParser {
     
     /**
      * Speichert das Segment in die Datenbank
+     * FIXME replace the post process handlers with events 
      *
      * @param mixed transunit
      * @return integer segmentId

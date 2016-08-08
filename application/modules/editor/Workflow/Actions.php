@@ -59,14 +59,14 @@ class editor_Workflow_Actions {
      * updates all Auto States of this task
      * currently this method supports only updating to REVIEWED_UNTOUCHED and to initial (which is NOT_TRANSLATED and TRANSLATED)
      * @param string $taskGuid
-     * @param string $method method to call in editor_Models_SegmentAutoStates
+     * @param string $method method to call in editor_Models_Segment_AutoStates
      */
     public function updateAutoStates(string $taskGuid, string $method) {
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */
         
-        $states = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
-        /* @var $states editor_Models_SegmentAutoStates */
+        $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
+        /* @var $states editor_Models_Segment_AutoStates */
         
         $states->{$method}($taskGuid, $segment);
     }
