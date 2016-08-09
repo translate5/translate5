@@ -338,7 +338,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             );
         }
 
-        $this->setSegmentAttribs($lineArr); //<< hier kann crap übergeben werden
+        $this->parseSegmentAttributes($lineArr); //<< hier kann crap übergeben werden
         $segmentId = $this->setAndSaveSegmentValues();
         foreach($this->colOrder as $name => $idx) {
             $field = $this->segmentFieldManager->getByName($name);
@@ -634,23 +634,18 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     }
     
     /**
-     * Sets $this->_editSegment, $this->_matchRateSegment and $this->_autopropagated
-     * and $this->_pretransSegment and $this->_autoStateId for the segment currently worked on
-     * 
+     * Sets the segment attributes for the segment currently worked on, uses the system defaults
      * $this->_target and $this->_source must be defined already!
+     * most of the attributes are not defined for CSV and are accordingly presetted
      * 
-     * - as not defined for csv so far, $this->_matchRateSegment is always set to 
-     *   0 and $this->_autopropagated to false
-     * @param mixed transunit
+     * (non-PHPdoc)
+     * @see editor_Models_Import_FileParser::parseSegmentAttributes()
      */
-    protected function setSegmentAttribs($segment){
-        $this->_matchRateSegment[$this->_mid] = 0;
-        $this->_autopropagated[$this->_mid] = false;
-        $this->_lockedInFile[$this->_mid] = false;
-        $this->_pretransSegment[$this->_mid] = false;
-        $this->_editSegment[$this->_mid] = true;
-        $this->_autoStateId[$this->_mid] = editor_Models_Segment_AutoStates::TRANSLATED;
+    protected function parseSegmentAttributes($segment){
+        //just create a segment attributes object with default values
+        $this->createSegmentAttributes($this->_mid);
     }
+    
     /**
      * counterpart of str_getcsv, because there is no php-func like that 
      * (function taken from php.net-comments)

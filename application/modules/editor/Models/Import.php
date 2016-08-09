@@ -170,7 +170,7 @@ class editor_Models_Import {
      */
     public function import(editor_Models_Import_DataProvider_Abstract $dataProvider) {
         if(is_null($this->_taskGuid)){
-            throw new Zend_Exception('taskGuid not set - please set using $this->setTask');
+            throw new Zend_Exception('taskGuid not set - please set using $this->setTask/$this->createTask');
         }
         Zend_Registry::set('affected_taskGuid', $this->_taskGuid); //for TRANSLATE-600 only
         

@@ -71,36 +71,12 @@ abstract class editor_Models_Import_FileParser {
      * @var string mid des aktuellen Segments
      */
     protected $_mid = NULL;
+    
     /**
-     * @var array legt fest, ob das aktuell geparste segment editierbar sein soll
-     *            Struktur: array(Segment-ID => boolean)
+     * contains a SegmentAttributes object (value) per mid (key)
+     * @var [editor_Models_Import_FileParser_SegmentAttributes]
      */
-    protected $_editSegment = array();
-    /**
-     * @var array setzt die autoStateId für die betreffenden Segmente
-     *            Struktur: array(Segment-ID => boolean)
-     */
-    protected $_autoStateId = array();
-    /**
-     * @var array shows if the segment had been autopropagated
-     *            Struktur: array(Segment-ID => boolean)
-     */
-    protected $_autopropagated = array();
-    /**
-     * @var array shows if the segment is locked for editing in original file
-     *            Struktur: array(Segment-ID => boolean)
-     */
-    protected $_lockedInFile = array();
-    /**
-     * @var array Matchwert des aktuell geparsten Segments
-     *            Struktur: array(Segment-ID => Integer)
-     */
-    protected $_matchRateSegment = array();
-    /**
-     * @var array Segment vorübersetzt (true) oder nicht (false)
-     *            Struktur: array(Segment-ID => boolean)
-     */
-    protected $_pretransSegment = array();
+    protected $segmentAttributes = array();
     
     /**
      * defines the GUI representation of internal used tags for masking special characters  
@@ -381,10 +357,8 @@ abstract class editor_Models_Import_FileParser {
     }
     
     /**
-     * übernimmt das eigentliche FileParsing
-     *
-     * - ruft untergeordnete Methoden für das Fileparsing auf, wie extractSegment, setSegmentAttribs
-     *
+     * does the fileparsing
+     * - calls extractSegment, parseSegmentAttributes
      */
     abstract protected function parse();
 
@@ -420,7 +394,7 @@ abstract class editor_Models_Import_FileParser {
      * @return integer segmentId
      */
     protected function setAndSaveSegmentValues(){
-        $this->calculateLocalSegmentAttribs();
+        $this->setCalculatedSegmentAttributes();
         $result = false;
         foreach($this->segmentProcessor as $p) {
             $r = $p->process($this);
@@ -434,6 +408,31 @@ abstract class editor_Models_Import_FileParser {
         return $result;
     }
 
+    /**
+     * creates a new (or returns the already existing) segment attributes object, and stores it internally to the given mid
+     * @param string $forMid
+     * @return editor_Models_Import_FileParser_SegmentAttributes
+     */
+    protected function createSegmentAttributes($forMid) {
+        if(isset($this->segmentAttributes[$forMid])) {
+            return $this->segmentAttributes[$forMid];
+        }
+        $segAttr = ZfExtended_Factory::get('editor_Models_Import_FileParser_SegmentAttributes');
+        /* @var $segAttr editor_Models_Import_FileParser_SegmentAttributes */
+        return $this->segmentAttributes[$forMid] = $segAttr;
+    }
+    
+    /**
+     * returns a already existing segment attributes object
+     * @param string $forMid
+     * @return editor_Models_Import_FileParser_SegmentAttributes
+     */
+    public function getSegmentAttributes($forMid) {
+        //just call the create call, since it does what we want, 
+        //  but the method name is misleading here
+        return $this->createSegmentAttributes($forMid);
+    }
+    
     /**
      * returns a placeholder for reexport the edited content
      * @param integer $segmentId
@@ -494,11 +493,10 @@ abstract class editor_Models_Import_FileParser {
     }
 
     /**
-     * Sets $this->_matchRateSegment and $this->_autopropagated
-     * for the segment currently worked on
+     * parses the current segment data for segment attributes, must call createSegmentAttributes therefore
      * @param mixed transunit
      */
-    abstract protected function setSegmentAttribs($transunit);
+    abstract protected function parseSegmentAttributes($transunit);
     
     /**
      * checks and sets the given MID internally
@@ -514,20 +512,24 @@ abstract class editor_Models_Import_FileParser {
     
     /**
      * calculates and sets segment attributes needed by us, this info doesnt exist directly in the segment. 
-     * These are currently: pretransSegment, editSegment, autoStateId
+     * These are currently: pretrans, editable, autoStateId
      * Parameters are given by the current segment
      */
-    protected function calculateLocalSegmentAttribs() {
-        $matchRate = $this->_matchRateSegment[$this->_mid];
-        $isAutoprop = $this->_autopropagated[$this->_mid];
-        $isLocked = $this->_lockedInFile[$this->_mid] && (bool) $this->task->getLockLocked();
+    protected function setCalculatedSegmentAttributes() {
+        $attributes = $this->getSegmentAttributes($this->_mid);
+        
+        $isAutoprop = $attributes->autopropagated;
+        $isLocked = $attributes->locked && (bool) $this->task->getLockLocked();
        
-        $isFullMatch = ($matchRate === 100);
+        $isFullMatch = ($attributes->matchRate === 100);
         $isEditable  = (!$isFullMatch || (bool) $this->task->getEdit100PercentMatch() || $isAutoprop) && !$isLocked;
         $isTranslated = $this->isTranslated();
-        $this->_editSegment[$this->_mid] = $isEditable;
-        $this->_pretransSegment[$this->_mid] = $isFullMatch && !$isAutoprop;
-        $this->_autoStateId[$this->_mid] = $this->autoStates->calculateImportState($isEditable, $isTranslated);
+        
+        $attributes->editable = $isEditable;
+        $attributes->pretrans = $isFullMatch && !$isAutoprop;
+        $attributes->autoStateId = $this->autoStates->calculateImportState($isEditable, $isTranslated);
+        
+        //FIXME add match rate state converter here! 'import' as default value
     }
     
     /**
@@ -568,46 +570,6 @@ abstract class editor_Models_Import_FileParser {
      */
     abstract protected function parseSegment($segment,$isSource);
 
-    /**
-     * Returns if current segment had been autopropagated
-     * @return boolean
-     */
-    public function getIfAutopropagated() {
-        return $this->_autopropagated[$this->_mid];
-    }
-
-    /**
-     * Gibt die Matchrate des aktuellen Segments zurück
-     * @return integer
-     */
-    public function getMatchRate() {
-        return $this->_matchRateSegment[$this->_mid];
-    }
-    
-    /**
-     * Gibt den EditSegment Status des aktuellen Segments zurück
-     * @return boolean
-     */
-    public function getEditable() {
-        return $this->_editSegment[$this->_mid];
-    }
-    
-    /**
-     * Gibt den EditSegment Status des aktuellen Segments zurück
-     * @return integer
-     */
-    public function getAutoStateId() {
-        return $this->_autoStateId[$this->_mid];
-    }
-    
-    /**
-     * Gibt den EditSegment Status des aktuellen Segments zurück
-     * @return boolean
-     */
-    public function getPretrans() {
-        return (int)$this->_pretransSegment[$this->_mid];
-    }
-    
     /**
      * Gibt die MID des aktuellen Segments zurück
      * @return string

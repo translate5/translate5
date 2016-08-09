@@ -98,12 +98,15 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
         $seg->setTaskGuid($this->taskGuid);
         
         //Segment Spezifische Daten
-        $seg->setMid($parser->getMid()); 
+        $mid = $parser->getMid();
+        $seg->setMid($mid); 
         $seg->setFileId($this->fileId);
-        $seg->setMatchRate($parser->getMatchRate());
-        $seg->setEditable($parser->getEditable());
-        $seg->setAutoStateId($parser->getAutoStateId());
-        $seg->setPretrans($parser->getPretrans());
+        
+        $attributes = $parser->getSegmentAttributes($mid);
+        $seg->setMatchRate($attributes->matchRate);
+        $seg->setEditable($attributes->editable);
+        $seg->setAutoStateId($attributes->editable);
+        $seg->setPretrans($attributes->pretrans);
         
         $this->segmentNrInTask++;
         $seg->setSegmentNrInTask($this->segmentNrInTask);
