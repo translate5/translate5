@@ -176,7 +176,7 @@ Ext.define('Editor.controller.QmSubSegments', {
 			    text += Ext.String.format(me.strings.buttonTooltip10, id);
 			}
 			else if(node.id > 10 && node.id <= 20) {
-			    id = node.id == 20 ? 0 : node.id;
+			    id = node.id == 20 ? 0 : (node.id - 10);
 			    text += Ext.String.format(me.strings.buttonTooltip20, id);
 			}
 			
