@@ -120,6 +120,9 @@ class editor_Plugins_MatchResource_Models_Taskassoc extends ZfExtended_Models_En
      * @param array $tmmtids
      */
     public function getTaskInfoForTmmts($tmmtids){
+        if(empty($tmmtids)) {
+            return [];
+        }
         $s = $this->db->select()
         ->from(array("assocs" => "LEK_matchresource_taskassoc"), array("assocs.id","assocs.taskGuid","task.taskName","task.taskNr","assocs.tmmtId"))
         ->setIntegrityCheck(false)
