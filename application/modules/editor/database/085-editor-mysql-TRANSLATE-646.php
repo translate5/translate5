@@ -30,9 +30,8 @@ END LICENSE AND COPYRIGHT
 
 /**
   README:
-  introduces a new field matchRateType to the segments view tables. 
-  The basic ALTER statements to add it to the plain LEK_segments table is in an own SQL file 
-  
+  Changes the collation for segment text data for issue: 
+    BEOSPHERE-64: Error if Reference file has same name as original file
  */
 set_time_limit(0);
 
