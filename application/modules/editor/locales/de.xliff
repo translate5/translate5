@@ -870,6 +870,10 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <b
 <trans-unit id='TmljaHQgdW50ZXJzdMO8dHp0ZSBCcm93c2VyLVZlcnNpb24='><source>Nicht unterstützte Browser-Version</source><target>Nicht unterstützte Browser-Version</target></trans-unit>
 <trans-unit id='RGllIFNvcnRpZXJ1bmcgYnp3LiBGaWx0ZXJ1bmcgd3VyZGUgZ2XDpG5kZXJ0LCBlcyBrYW5uIG5pY2h0IHp1bSBha3R1ZWxsZW4gU2VnbWVudCB6dXLDvGNrIGdlc3BydW5nZW4gd2VyZGVuLg=='><source>Die Sortierung bzw. Filterung wurde geändert, es kann nicht zum aktuellen Segment zurück gesprungen werden.</source><target>Die Sortierung bzw. Filterung wurde geändert, es kann nicht zum aktuellen Segment zurück gesprungen werden.</target></trans-unit>
 <trans-unit id='U2llIG51dHplbiBJbnRlcm5ldCBFeHBsb3Jlci4gRGllc2VyIEJyb3dzZXIgd2lyZCB2b24gVmVyc2lvbiA5IGJpcyAxMSB1bnRlcnN0w7x0enQsIGlzdCBhbGxlcmRpbmdzIHNlaHIgbGFuZ3NhbS4gVW0gZGllIEFud2VuZHVuZyBpbiBvcHRpbWFsZXIgUGVyZm9ybWFuY2UgbnV0emVuIHp1IGvDtm5uZW4sIGVtcGZlaGxlbiB3aXIgZGFoZXIgR29vZ2xlIENocm9tZSwgRmlyZWZveCBvZGVyIFNhZmFyaSBhbHMgQnJvd3Nlci4='><source>Sie nutzen Internet Explorer. Dieser Browser wird von Version 9 bis 11 unterstützt, ist allerdings sehr langsam. Um die Anwendung in optimaler Performance nutzen zu können, empfehlen wir daher Google Chrome, Firefox oder Safari als Browser.</source><target>Sie nutzen Internet Explorer. Dieser Browser wird von Version 9 bis 11 unterstützt, ist allerdings sehr langsam. Um die Anwendung in optimaler Performance nutzen zu können, empfehlen wir daher Google Chrome, Firefox oder Safari als Browser.</target></trans-unit>
+<trans-unit id='TWF0Y2hyYXRlIFR5cA=='><source>Matchrate Typ</source><target>Matchrate Typ</target></trans-unit>
+<trans-unit id='S2VpbiBXZXJ0IGRlZmluaWVydCE='><source>Kein Wert definiert!</source><target>Kein Wert definiert!</target></trans-unit>
+<trans-unit id='SW1wb3J0aWVydDogezB9'><source>Importiert: {0}</source><target>Importiert: {0}</target></trans-unit>
+<trans-unit id='TmFjaCBCZWFyYmVpdHVuZzogezB9'><source>Nach Bearbeitung: {0}</source><target>Nach Bearbeitung: {0}</target></trans-unit>
   </body>
  </file>
 </xliff>
