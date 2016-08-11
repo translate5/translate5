@@ -277,7 +277,11 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             }
         }
         
-        $this->events->trigger("beforePutSave", $this, array('model' => $this->entity, 'history' => $history));
+        $this->events->trigger("beforePutSave", $this, array(
+                'entity' => $this->entity,
+                'model' => $this->entity, //FIXME model usage is deprecated and should be removed in future (today 2016-08-10) 
+                'history' => $history
+        ));
         
         //saving history directly before normal saving, 
         // so no exception between can lead to history entries without changing the master segment
@@ -398,5 +402,18 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->view->publicModulePath = APPLICATION_RUNDIR . '/modules/' . Zend_Registry::get('module');
         $this->view->termGroups = $terms->getByTaskGuidAndSegment($session->taskGuid, (int) $this->_getParam('id'));
         $this->view->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+    }
+    
+    /**
+     * generates a list of available matchratetypes in this task. Mainly for frontend filtering. 
+     */
+    public function matchratetypesAction() {
+        $sfm = $this->initSegmentFieldManager($this->session->taskGuid);
+        $mv = $sfm->getView();
+        /* @var $mv editor_Models_Segment_MaterializedView */
+        $db = ZfExtended_Factory::get(get_class($this->entity->db), array(array(), $mv->getName()));
+        $sql = $db->select()->from($db, 'matchrateType')->distinct();
+        
+        echo Zend_Json::encode($db->fetchAll($sql)->toArray(), Zend_Json::TYPE_ARRAY);
     }
 }

@@ -114,6 +114,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'nextsegments'
             ));
         $this->front->getRouter()->addRoute('editorNextSegments', $filemapRoute);
+        
+        $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
+            'editor/segment/matchratetypes/*',
+            array(
+                'module' => 'editor',
+                'controller' => 'segment',
+                'action' => 'matchratetypes'
+            ));
+        $this->front->getRouter()->addRoute('editorMatchratetypes', $filemapRoute);
 
         $authUserRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/user/authenticated/*',
