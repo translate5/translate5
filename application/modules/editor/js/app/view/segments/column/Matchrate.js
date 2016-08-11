@@ -36,20 +36,33 @@ END LICENSE AND COPYRIGHT
  */
 /**
  * @class Editor.view.segments.column.Matchrate
- * @extends Editor.view.ui.segments.column.Matchrate
- * @initalGenerated
+ * @extends Ext.grid.column.Column
  */
 Ext.define('Editor.view.segments.column.Matchrate', {
-  extend: 'Editor.view.ui.segments.column.Matchrate',
-  alias: 'widget.matchrateColumn',
-  mixins: ['Editor.view.segments.column.BaseMixin'],
-  filter: {
-      type: 'numeric'
-  },
-
-  initComponent: function() {
-    var me = this;
-    me.initBaseMixin();
-    me.callParent(arguments);
-  }
+    extend: 'Editor.view.segments.column.MatchrateType',
+    alias: 'widget.matchrateColumn',
+    mixins: ['Editor.view.segments.column.BaseMixin'],
+    dataIndex: 'matchRate',
+    text: 'Matchrate',
+    tdCls: 'matchrateColumn',
+    initComponent: function() {
+        var me = this;
+        me.initBaseMixin();
+        me.callParent(arguments);
+    },
+    initConfig: function(instanceConfig) {
+        var me = this,
+            config = {
+                filter: {
+                    type: 'numeric'
+                }
+            };
+        if (instanceConfig) {
+            me.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
+    },
+    renderer: function(value,meta,record) {
+        return value + ' ' + this.callParent([record.get('matchRateType'),meta,record]);
+    }
 });

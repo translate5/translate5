@@ -36,17 +36,19 @@ END LICENSE AND COPYRIGHT
  */
 /**
  * @class Editor.view.segments.column.AutoState
- * @extends Editor.view.ui.segments.column.AutoState
+ * @extends Ext.grid.column.Column
  * @initalGenerated
  */
 Ext.define('Editor.view.segments.column.AutoState', {
-  extend: 'Editor.view.ui.segments.column.AutoState',
+  extend: 'Ext.grid.column.Column',
   alias: 'widget.autoStateColumn',
+  dataIndex: 'autoStateId',
+  text: 'Autostatus',
   isErgonomicVisible: true,
   isErgonomicSetWidth: true,
   ergonomicWidth: 90,
   isErgonomicVisible: true,
-  imgTpl: new Ext.Template('<img class="autoState-{0}" src="'+Editor.data.moduleFolder+'images/autoStateFlags-{0}.png" alt="{1}" title="{1}"/>'),
+  imgTpl: new Ext.Template('<img valign="text-bottom" class="autoState-{0}" src="'+Editor.data.moduleFolder+'images/autoStateFlags-{0}.png?v=1" alt="{1}" title="{1}"/>'),
   stateLabels: [],
   filter: null,
   initComponent: function() {
@@ -58,6 +60,15 @@ Ext.define('Editor.view.segments.column.AutoState', {
     Ext.each(Editor.data.segments.autoStateFlags, function(item){
         me.stateLabels[item.id] = item.label;
     });
+    
+    Ext.each(autoStates, function(item, idx, list){
+        //we have to clone the values, if not we change the originals by reference
+        list[idx] = {
+            id: item.id,
+            label: me.imgTpl.apply([item.id, item.label]) + ' ' +  item.label
+        } 
+    });
+    
     me.filter = {
         type: 'list',
         labelField: 'label',
