@@ -125,6 +125,13 @@ END LICENSE AND COPYRIGHT
 .x-grid-row-alt .x-grid-cell, .x-grid-row-alt .x-grid-rowwrap-div {
   background-color:#eaf1fb;
 }
+
+/*matchRateType*/
+.matchratetype-visible .matchrateColumn img.matchRateType,
+.matchratetype-visible .matchrateColumn img.matchRateEdited {
+    display:none;
+}
+
 #imagePreload {
     display: none
 }

@@ -49,6 +49,7 @@ Ext.define('Editor.view.segments.Grid', {
         'Editor.view.segments.column.SegmentNrInTask',
         'Editor.view.segments.column.State',
         'Editor.view.segments.column.Quality',
+        'Editor.view.segments.column.MatchrateType',
         'Editor.view.segments.column.Matchrate',
         'Editor.view.segments.column.AutoState',
         'Editor.view.segments.column.UserName',
@@ -219,9 +220,10 @@ Ext.define('Editor.view.segments.Grid', {
             itemId: 'commentsColumn',
             width: 200
         },{
-            xtype: 'matchrateColumn',
-            itemId: 'matchrateColumn',
-            width: 82
+            xtype: 'matchrateColumn'
+        },{
+            xtype: 'matchrateTypeColumn',
+            hidden: true
         }]);
     
         if(Editor.data.segments.showStatus){
