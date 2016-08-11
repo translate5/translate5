@@ -146,7 +146,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           rec = plug.context.record,
           sc, contentTags,
           matchrate = matchRecord.get('matchrate');
-      
+
       if(matchRecord.get('state')!=me.SERVER_STATUS.SERVER_STATUS_LOADED){
           return;
       }
@@ -164,7 +164,8 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           //we don't support the matchrate saving for tasks with alternatives:
           if(task.get('defaultSegmentLayout')) {
               rec.set('matchRate', matchrate);
-              rec.set('matchRateType', Editor.data.plugins.MatchResource.matchrateTypeChangedState); 
+              //TODO how to implement a check if user modified the match afterwards to add the "interactive" flag?
+              rec.set('matchRateType', Editor.data.plugins.MatchResource.matchrateTypeChangedState+';tmmtid='+matchRecord.get('tmmtid')); 
               me.getMatchrateDisplay().setRawValue(matchrate);
           }
       } 
