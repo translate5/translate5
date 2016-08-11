@@ -145,7 +145,7 @@ class editor_Models_Converter_XmlSegmentList {
         /**
          * define autostates
          */
-        $autoStates = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
+        $autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         $refl = new ReflectionClass($autoStates);
         $this->data['autostates'] = array_map('strtolower', array_flip($refl->getConstants()));
         

@@ -143,8 +143,8 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
      * @return string
      */
     protected function render() {
-        $states = ZfExtended_Factory::get('editor_Models_SegmentAutoStates');
-        /* @var $states editor_Models_SegmentAutoStates */
+        $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
+        /* @var $states editor_Models_Segment_AutoStates */
         $stateMap = $states->getLabelMap();
         
         

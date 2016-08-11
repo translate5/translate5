@@ -49,10 +49,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     /**
      * Init tagmapping
      */
-    public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, boolean $lockLocked, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task)
+    public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task)
     {
         $this->addXlfTagMappings();
-        parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $lockLocked, $sourceLang, $targetLang, $task);
+        parent::__construct($path, $fileName, $fileId, $task);
         
         $this->protectUnicodeSpecialChars();
     }
@@ -83,11 +83,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     
     
     /**
-     * Global parsing method.
-     * Calls sub-methods to do the job.
+     * (non-PHPdoc)
+     * @see editor_Models_Import_FileParser::parse()
      */
-    protected function parse()
-    {
+    protected function parse() {
         $this->_skeletonFile = $this->_origFileUnicodeProtected;
         
         if (strpos($this->_origFileUnicodeProtected, $this->ibmXliffNeedle) === false)
@@ -142,7 +141,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 if ($translate)
                 {
                     $counterTrans++;
-                    $this->setSegmentAttribs($unit);
+                    $this->parseSegmentAttributes($unit);
                     $this->addupSegmentWordCount($unit);
                     $tempUnitSkeleton = $this->extractSegment($unit);
                     $this->_skeletonFile = str_replace($unit[0], $tempUnitSkeleton, $this->_skeletonFile);
@@ -158,21 +157,19 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     
     
     /**
-     * Sets $this->_matchRateSegment and $this->_autopropagated
-     * for the segment currently worked on
-     *
-     * @param array transunit
+     * (non-PHPdoc)
+     * @see editor_Models_Import_FileParser::parseSegmentAttributes()
      */
-    protected function setSegmentAttribs($transunit)
+    protected function parseSegmentAttributes($transunit)
     {
         //build mid from id of segment plus segmentCount, because xlf-file can have more than one file in it with repeatingly the same ids.
         //mid is unique per imported xliff-file
         $id = preg_replace('/.* id="(.*?)".*/i', '${1}', $transunit[1]).'_'.$this->segmentCount++;
         $matchRate = (int) preg_replace('/.*tmgr:matchratio="(.*?)".*/i', '${1}', $transunit[1]);
         
-        $this->_matchRateSegment[$id] = $matchRate;
-        $this->_autopropagated[$id] = false;
-        $this->_lockedInFile[$id] = false;
+        $attributes = $this->createSegmentAttributes($id);
+        //from XLF we support only the matchRate at the moment, rest is default 
+        $attributes->matchRate = $matchRate;
         $this->setMid($id);
     }
     

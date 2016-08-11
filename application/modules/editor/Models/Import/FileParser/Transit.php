@@ -125,13 +125,10 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
      * @param string $path
      * @param string $fileName
      * @param integer $fileId
-     * @param boolean $edit100PercentMatches
-     * @param editor_Models_Languages $sourceLang
-     * @param editor_Models_Languages $targetLang
      * @param editor_Models_Task $task
      */
-    public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, boolean $lockLocked, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task){
-        parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $lockLocked, $sourceLang, $targetLang, $task);
+    public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task){
+        parent::__construct($path, $fileName, $fileId, $task);
         $this->meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
         $this->meta->addMeta('transitLockedForRefMat', editor_Models_Segment_Meta::META_TYPE_BOOLEAN, 0, 'defines, if segment is marked in transitFile as locked for translation memory use');
         $transitLangInfo = Zend_Registry::get('transitLangInfo');
@@ -173,10 +170,10 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         $this->_skeletonFile = file_get_contents($zipFilePath);
         unlink($zipFilePath);
     }
+    
     /**
-     * übernimmt das eigentliche FileParsing
-     *
-     * - ruft untergeordnete Methoden für das Fileparsing auf, wie extractSegment, setSegmentAttribs
+     * (non-PHPdoc)
+     * @see editor_Models_Import_FileParser::parse()
      */
     protected function parse(){
         $counterTrans = 0;
@@ -195,7 +192,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
                 continue;
             }
             $this->setMid($segId);
-            $this->setSegmentAttribs($seg);
+            $this->parseSegmentAttributes($seg);
             $transUnit = array('source'=>$source,'target'=>$target);
             
             $this->extractSegment($transUnit);
@@ -253,17 +250,16 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     }
     
     /**
-     * Sets $this->_matchRateSegment and $this->_autopropagated
-     * for the segment currently worked on
-     *
+     * (non-PHPdoc)
+     * @see editor_Models_Import_FileParser::parseSegmentAttributes()
+     * 
      * @param editor_Plugins_Transit_Segment $segment
      */
-    protected function setSegmentAttribs($segment){
+    protected function parseSegmentAttributes($segment){
         //segment-id of transit is used as mid and thus used here
-        $id = $segment->getId();
-        $this->_matchRateSegment[$id] = (int)$segment->getMatchValue();
-        $this->_autopropagated[$id] = false;
-        $this->_lockedInFile[$id] = false;
+        $attributes = $this->createSegmentAttributes($segment->getId());
+        //from transit we support only the matchRate at the moment, rest is default 
+        $attributes->matchRate = (int)$segment->getMatchValue();
     }
     
     /**
@@ -334,6 +330,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         }
         return (int)$matches[1];
     }
+    
     protected function parseSubSegs($tagString){
         $protect = function($string) {
             return str_replace(array('~','</SubSeg>','µ','<SubSeg'), array('__TranSiT_TRANSTiLde__','~','__TranSiT_TRANSPiI__','µ'), $string);
@@ -405,6 +402,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         
         return $qp->innerXML();
     }
+    
     /**
      * 
      * @param \QueryPath\DOMQuery $qp
@@ -431,6 +429,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         $f->appendXML($xml);
         $dom->documentElement->replaceChild($f, $element);        
     }
+    
     /**
      * 
      * @param \QueryPath\DOMQuery $qp
@@ -493,6 +492,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         $this->_segment = $segment;
         return preg_replace_callback($this->whitespaceSearch, array($this,'whitespaceTagReplacer'), $segment );
     }
+    
     /**
      * checks if there are any tags not covered by parseTags or "Tag"-Tags or
      * "FontTag"-Tags not covered by their methods. Thus has to be placed before
@@ -504,6 +504,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
             trigger_error('In the file '.$this->sourcePath.' in the segment '.$segment.' an undefined tag has been found.');
         }
     }
+    
     /**
      * 
      * @param string $tagName
@@ -531,6 +532,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         return $this->shortTagIdent++;
 //@todo        auch sicherstellen, dass nicht end oder begin-tags mit dem selben i vorkommen
     }
+    
     protected function parseBeginTags(string $tagName, string $tag,$transitTagNr) {
         $tagType = '_leftTag';
         if(!$transitTagNr){

@@ -49,35 +49,32 @@ class editor_Models_Import_FileParser_Testcase extends editor_Models_Import_File
     /**
      * Init tagmapping
      */
-    public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, boolean $lockLocked, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task) {
-        parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $lockLocked, $sourceLang, $targetLang, $task);
+    public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task) {
+        parent::__construct($path, $fileName, $fileId, $task);
 
         $this->protectUnicodeSpecialChars();
     }
 
     /**
-     * Global parsing method.
-     * Calls sub-methods to do the job.
+     * (non-PHPdoc)
+     * @see editor_Models_Import_FileParser::parse()
      */
     protected function parse() {
         $this->_skeletonFile = $this->_origFileUnicodeProtected;
         $this->qp = qp($this->_skeletonFile, ':root',array('format_output'=> false, 'encoding'=>'UTF-8','use_parser'=>'xml'));
-        $this->setSegmentAttribs('fake - not needed, except for declaration');
+        $this->parseSegmentAttributes('fake - not needed, except for declaration');
         $this->extractSegment('fake - not needed, except for declaration');
         $this->_skeletonFile = $this->qp->xml();
     }
 
     /**
-     * Sets $this->_matchRateSegment and $this->_autopropagated
-     * for the segment currently worked on
-     *
-     * @param array transunit
+     * (non-PHPdoc)
+     * @see editor_Models_Import_FileParser::parseSegmentAttributes()
      */
-    protected function setSegmentAttribs($transunit) {
+    protected function parseSegmentAttributes($transunit) {
         $id = $this->segmentCount++;
-        $this->_matchRateSegment[$id] = 0;
-        $this->_autopropagated[$id] = false;
-        $this->_lockedInFile[$id] = false;
+        //just create a segment attributes object with default values
+        $this->createSegmentAttributes($id);
         $this->setMid($id);
     }
 

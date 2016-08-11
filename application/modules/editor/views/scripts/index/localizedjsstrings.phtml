@@ -143,9 +143,20 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>';
 
   	Editor.view.ui.segments.column.Quality.prototype.text = '<?php echo $this->translate->_('QM');?>';
-  	Editor.view.ui.segments.column.Matchrate.prototype.text = '<?php echo $this->translate->_('Matchrate');?>';
+  	Editor.view.segments.column.Matchrate.prototype.text = '<?php echo $this->translate->_('Matchrate');?>';
+  	
+    Ext.define("Editor.locale.de.view.segments.column.MatchrateType", {
+        override: "Editor.view.segments.column.MatchrateType",
+        text: '<?php echo $this->translate->_('Matchrate Typ');?>',
+        strings: {
+            noValueDefined: '<?php echo $this->translate->_('Kein Wert definiert!');?>',
+            imported: '<?php echo $this->translate->_('Importiert: {0}');?>',
+            edited: '<?php echo $this->translate->_('Nach Bearbeitung: {0}');?>'
+        }
+    });
+  	
   	Editor.view.ui.segments.column.Editable.prototype.text = '<?php echo $this->translate->_('Gesperrt');?>';
-  	Editor.view.ui.segments.column.AutoState.prototype.text = '<?php echo $this->translate->_('Autostatus');?>';
+  	Editor.view.segments.column.AutoState.prototype.text = '<?php echo $this->translate->_('Autostatus');?>';
   	Editor.view.ui.segments.column.State.prototype.text = '<?php echo $this->translate->_('Status');?>';
   	Editor.view.ui.segments.column.UserName.prototype.text = '<?php echo $this->translate->_('letzter Bearbeiter');?>';
   	Editor.view.segments.column.WorkflowStep.prototype.text = '<?php echo $this->translate->_('bearbeitet bei');?>';

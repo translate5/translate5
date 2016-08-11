@@ -93,13 +93,18 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     /**
      * Initiert Tagmapping
      */
-    public function __construct(string $path, string $fileName, integer $fileId, boolean $edit100PercentMatches, boolean $lockLocked, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, editor_Models_Task $task) {
+    public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task) {
         //add sdlxliff tagMapping
         $this->addSldxliffTagMappings();
-        parent::__construct($path, $fileName, $fileId, $edit100PercentMatches, $lockLocked, $sourceLang, $targetLang, $task);
+        parent::__construct($path, $fileName, $fileId, $task);
         $this->checkForSdlChangeMarker();
         $this->protectUnicodeSpecialChars();
         $this->prepareTagMapping();
+        
+        //here would be the right place to set the import map, 
+        // since our values base on sdlxliff values, 
+        // nothing has to be done here at the moment
+        //$this->matchRateType->setImportMap($map);
     }
 
     /**
@@ -228,9 +233,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     }
     
     /**
-     * übernimmt das eigentliche FileParsing
-     *
-     * - ruft untergeordnete Methoden für das Fileparsing auf, wie extractSegment, setSegmentAttribs
+     * (non-PHPdoc)
+     * @see editor_Models_Import_FileParser::parse()
      */
     protected function parse() {
         //benenne <bin-unit-Tags in <group-Tags um, um das Parsing zu vereinfachen
@@ -281,7 +285,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                 $groupLevel = $groupLevel - substr_count($units[$i], '</group>');
                 if ($translate) {
                     $counterTrans++;
-                    $this->setSegmentAttribs($units[$i]);
+                    $this->parseSegmentAttributes($units[$i]);
                     $units[$i] = $this->extractSegment($units[$i]);
                 }
             }
@@ -289,6 +293,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             //erhöhe groupLevel um eins, da jetzt die nächste Gruppe drankommt
             $groupLevel++;
         }
+        
         if ($counterTrans === 0) {
             error_log('Die Datei ' . $this->_fileName . ' enthielt keine übersetzungsrelevanten Segmente!');
         }
@@ -297,35 +302,38 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     }
 
     /**
-     * Sets $this->_matchRateSegment and $this->_autopropagated
-     * for the segment currently worked on
-     *
-     * @param string transunit
+     * (non-PHPdoc)
+     * @see editor_Models_Import_FileParser::parseSegmentAttributes()
      */
-    protected function setSegmentAttribs($transunit) {
+    protected function parseSegmentAttributes($transunit) {
         $transunit = explode('<sdl:seg ', $transunit);
         //falls überhaupt Information zu Matchwerten vorhanden ist
         $count = count($transunit);
-        if ($count >= 1) {
-            if ($count > 1) {
-                $i = 1;
-            } else {
-                $i = 0;
+        if ($count == 0) {
+            $transunit = implode('<sdl:seg ', $transunit);
+            trigger_error('<sdl:seg wurde kein Mal in der folgenden transunit gefunden: ' . $transunit, E_USER_ERROR);
+            return;
+        }
+        $i = $count > 1 ? 1 : 0;
+        for (; $i < $count; $i++) {
+            $id = preg_replace('"^[^<>]*id=\"([^\"]*)\".*"s', '\\1', $transunit[$i]);
+            $id = str_replace(' ', '_x0020_', $id);
+            
+            $attributes = $this->createSegmentAttributes($id);
+            
+            //falls kein percent gefunden wird, ergibt der int-cast 0, was passt
+            $attributes->matchRate = (int) preg_replace('"^[^><]* percent=\"(\d*)\".*"', '\\1', $transunit[$i]);
+
+            //check if there is no origin at all
+            if(strpos($transunit[$i], 'origin="') !== false) {
+                //trimming here, since regex does not remove \n from content
+                //set original value here, conversion to translate5 syntax is done later
+                $attributes->matchRateType = preg_replace('/^[^><]* origin="([^"]*)".*/', '\\1', trim($transunit[$i]));
             }
-            for (; $i < $count; $i++) {
-                $id = preg_replace('"^[^<>]*id=\"([^\"]*)\".*"s', '\\1', $transunit[$i]);
-                $id = str_replace(' ', '_x0020_', $id);
-                //falls kein percent gefunden wird, ergibt der int-cast 0, was passt
-                $this->_matchRateSegment[$id] =
-                        (int) preg_replace('"^[^><]* percent=\"(\d*)\".*"', '\\1', $transunit[$i]);
-                $this->_autopropagated[$id] = 
-                        strpos($transunit[$i], 'origin="auto-propagated"')!==false;
-                $this->_lockedInFile[$id] = 
-                        strpos($transunit[$i], ' locked="true"')!==false;
-            }
-        } else {
-            trigger_error('<sdl:seg wurde kein Mal in der
-                folgenden transunit gefunden: ' . implode('<sdl:seg ', $transunit), E_USER_ERROR);
+            
+            //FIXME can lead to errors if auto-propagated was in nested <sdl:prev-origin tags
+            $attributes->autopropagated = strpos($transunit[$i], 'origin="auto-propagated"') !== false;
+            $attributes->locked = strpos($transunit[$i], ' locked="true"') !== false;
         }
     }
 

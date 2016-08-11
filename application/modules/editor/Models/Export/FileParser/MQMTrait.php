@@ -31,6 +31,7 @@ END LICENSE AND COPYRIGHT
 /**
  * this trait encapsulates all methods of the export fileparser, that deal with MQM-conversion during export
  * 
+ * FIXME should be an own "converter" class, and not just a trait for the export fileparsers. 
  */
 trait editor_Models_Export_FileParser_MQMTrait {
        /**

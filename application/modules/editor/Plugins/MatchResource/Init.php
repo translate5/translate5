@@ -84,6 +84,7 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('editor_TaskController', 'afterIndexAction', array($this, 'handleAfterTaskIndexAction'));
         $this->eventManager->attach('editor_TaskController', 'afterGetAction', array($this, 'handleAfterTaskGetAction'));
         $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
+        $this->eventManager->attach('Editor_SegmentController', 'beforePutSave', array($this, 'handleBeforeSegmentPut'));
         $this->eventManager->attach('Editor_SegmentController', 'afterPutAction', array($this, 'handleAfterSegmentPut'));
         $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
         $this->eventManager->attach('Editor_AlikesegmentController', 'beforeSaveAlike', array($this, 'handleBeforeSaveAlike'));
@@ -148,11 +149,11 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
         }
      }
      
-     /**
-      * adding tmmt data to task getAction
-      * @param Zend_EventManager_Event $event
-      */
-     public function handleAfterTaskGetAction(Zend_EventManager_Event $event){
+    /**
+     * adding tmmt data to task getAction
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleAfterTaskGetAction(Zend_EventManager_Event $event){
         /*@var $tmmtmodel editor_Plugins_MatchResource_Models_TmMt */
          $tmmtmodel = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
          
@@ -164,8 +165,57 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
              return;
          }
          $event->getParam('view')->rows->taskassocs = $resultlist;
-     }
+    }
      
+    /**
+     * Before a segment is saved, the matchrate type has to be fixed to valid value
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleBeforeSegmentPut(Zend_EventManager_Event $event) {
+        $segment = $event->getParam('entity');
+        /* @var $segment editor_Models_Segment */
+        $givenType = $segment->getMatchRateType();
+        
+        //if it was a normal segment edit, without overtaking the match we have to do nothing here
+        if(!$segment->isModified('matchRateType') || strpos($givenType, self::MATCH_RATE_TYPE_EDITED) !== 0) {
+            return;
+        }
+        
+        $matchrateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
+        /* @var $matchrateType editor_Models_Segment_MatchRateType */
+        
+        $unknown = function() use ($matchrateType, $givenType, $segment){
+            $matchrateType->initEdited($matchrateType::TYPE_UNKNOWN, $givenType);
+            $segment->setMatchRateType((string) $matchrateType);
+        };
+        
+        //if it was an invalid type set it to unknown
+        if(! preg_match('/'.self::MATCH_RATE_TYPE_EDITED.';tmmtid=([0-9]+)/', $givenType, $matches)) {
+            $unknown();
+            return;
+        }
+        
+        //load the used TMMT to get more information about it (TM or MT)
+        $tmmtid = $matches[1];
+        $tmmt = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
+        /* @var $tmmt editor_Plugins_MatchResource_Models_TmMt */
+        try {
+            $tmmt->load($tmmtid);
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            $unknown();
+            return;
+        }
+        
+        //set the type
+        $matchrateType->initEdited($tmmt->getResource()->getType());
+        
+        //REMINDER: this would be possible if we would know if the user edited the segment after using the TM
+        //$matchrateType->add($matchrateType::TYPE_INTERACTIVE);
+        
+        //save the type
+        $segment->setMatchRateType((string) $matchrateType);
+    }
+    
     /**
      * After a segment is changed we inform the services about that. What they do with this information is the service's problem.
      * @param Zend_EventManager_Event $event
@@ -187,9 +237,17 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
         /* @var $alikeSegment editor_Models_Segment */
         
         $type = $alikeSegment->getMatchRateType();
-        if($type === self::MATCH_RATE_TYPE_EDITED) {
-            $alikeSegment->setMatchRateType(self::MATCH_RATE_TYPE_EDITED_AUTO);
+        
+        $matchRateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
+        /* @var $matchRateType editor_Models_Segment_MatchRateType */
+        $matchRateType->init($type);
+        
+        if($matchRateType->isEdited()) {
+            $matchRateType->add($matchRateType::TYPE_AUTO_PROPAGATED);
+            $alikeSegment->setMatchRateType((string) $matchRateType);
         }
+        
+        //FIXME here also use matchratetype class to add auto flag
     }
     
     /**

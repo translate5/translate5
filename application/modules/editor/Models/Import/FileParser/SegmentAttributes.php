@@ -29,45 +29,50 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Encapsulates the Default Actions triggered by the Workflow
+ * Segment Attributes
+ * This class is just used as datatype struct in the import fileparser to have IDE completion here
  */
-class editor_Workflow_Actions {
+class editor_Models_Import_FileParser_SegmentAttributes {
     /**
-     *
-     * @var editor_Workflow_Abstract 
+     * the segments matchrate, defaults to 0
+     * @var integer
      */
-    protected $workflow;
-
-    /**
-     * 
-     * @param editor_Workflow_Abstract $workflow
-     */
-    public function __construct(editor_Workflow_Abstract $workflow) {
-        $this->workflow = $workflow;
-    }
-    /**
-     * open all users of the other roles of a task
-     * @param string $role
-     * @param editor_Models_TaskUserAssoc $tua
-     */
-    public function openRole(string $role, editor_Models_TaskUserAssoc $tua) {
-        $wf = $this->workflow;
-        $tua->setStateForRoleAndTask($wf::STATE_OPEN, $role, $tua->getTaskGuid());
-    }
+    public $matchRate = 0;
     
     /**
-     * updates all Auto States of this task
-     * currently this method supports only updating to REVIEWED_UNTOUCHED and to initial (which is NOT_TRANSLATED and TRANSLATED)
-     * @param string $taskGuid
-     * @param string $method method to call in editor_Models_Segment_AutoStates
+     * the segments matchrate type, defaults to 'import'
+     * @var string
      */
-    public function updateAutoStates(string $taskGuid, string $method) {
-        $segment = ZfExtended_Factory::get('editor_Models_Segment');
-        /* @var $segment editor_Models_Segment */
-        
-        $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
-        /* @var $states editor_Models_Segment_AutoStates */
-        
-        $states->{$method}($taskGuid, $segment);
-    }
+    public $matchRateType = 'import'; //FIXME make me to come from MatchRateType class
+    
+    /**
+     * flag if the segments was autopropagated or not, defaults to false
+     * @var boolean
+     */
+    public $autopropagated = false;
+    
+    /**
+     * flag if segment was locked in file
+     * @var boolean
+     */
+    public $locked = false;
+    
+    
+    /**
+     * pretranslated state of the segment, calculated by the fileparser
+     * @var boolean
+     */
+    public $pretrans = false;
+    
+    /**
+     * autostateid of the segment, calculated by the fileparser
+     * @var integer
+     */
+    public $autoStateId;
+    
+    /**
+     * Is the segment editable or not, calculated by the fileparser
+     * @var boolean
+     */
+    public $editable;
 }

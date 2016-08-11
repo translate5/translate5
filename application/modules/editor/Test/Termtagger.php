@@ -184,8 +184,6 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
         
         $import = ZfExtended_Factory::get('editor_Models_Import');
         /* @var $import editor_Models_Import */
-        $import->setEdit100PercentMatches((bool) self::$testTask->getEdit100PercentMatch());
-        $import->setLockLocked((bool) self::$testTask->getLockLocked());
         $import->setUserInfos(self::$testTask->getPmGuid(),  self::$testTask->getPmName());
 
         $import->setLanguages(

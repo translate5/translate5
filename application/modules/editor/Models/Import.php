@@ -87,21 +87,6 @@ class editor_Models_Import {
     protected $_relaisLangValue = NULL;
 
     /**
-     * @var boolean defines for the current fileparser, if 100% matches in orig file 
-     *              will be locked in translate5 as well or not
-     *              editiert werden dürfen (true) oder nicht (false)
-     *              false if 0 empty string is passed, else true
-     */
-    public $_edit100PercentMatches = false;
-
-    /**
-     * @var boolean defines for the current fileparser, if segments locked in orig file 
-     *              will be locked in translate5 as well or not
-     *              editiert werden dürfen (true) oder nicht (false)
-     *              false if 0 empty string is passed, else true
-     */
-    public $_lockLocked = false;
-    /**
      * @var string import folder, under which the to be imported folder and file hierarchy resides
      */
     protected $_importFolder = NULL;
@@ -185,7 +170,7 @@ class editor_Models_Import {
      */
     public function import(editor_Models_Import_DataProvider_Abstract $dataProvider) {
         if(is_null($this->_taskGuid)){
-            throw new Zend_Exception('taskGuid not set - please set using $this->setTask');
+            throw new Zend_Exception('taskGuid not set - please set using $this->setTask/$this->createTask');
         }
         Zend_Registry::set('affected_taskGuid', $this->_taskGuid); //for TRANSLATE-600 only
         
@@ -424,10 +409,6 @@ class editor_Models_Import {
             $this->_importFolder.DIRECTORY_SEPARATOR.$this->_localEncoded->encode($path),
             $this->gh->basenameLocaleIndependent($path),
             $fileId, 
-            $this->_edit100PercentMatches, 
-            $this->_lockLocked, 
-            $this->_sourceLang, 
-            $this->_targetLang,
             $this->task,
         );
     }
@@ -603,19 +584,6 @@ class editor_Models_Import {
         $segment->syncFileOrderFromFiles($this->_taskGuid, true); 
     }
 
-    /**
-     * @param boolean $edit
-     */
-    public function setEdit100PercentMatches(boolean $edit){
-        $this->_edit100PercentMatches = $edit;
-    }
-
-    /**
-     * @param boolean $edit
-     */
-    public function setLockLocked(boolean $locked){
-        $this->_lockLocked = $locked;
-    }
     /**
      * sets the info/data to the user
      * @param string $userguid

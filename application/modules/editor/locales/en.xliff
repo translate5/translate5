@@ -1333,6 +1333,22 @@
   <source>Sie nutzen Internet Explorer. Dieser Browser wird von Version 9 bis 11 unterstützt, ist allerdings sehr langsam. Um die Anwendung in optimaler Performance nutzen zu können, empfehlen wir daher Google Chrome, Firefox oder Safari als Browser.</source>
   <target>You are using the Internet Explorer. This version 9 to 11 of this browser is supported, but the performance is very slow. To use the application in best performance, we recommend the usage of Google Chrome, Firefox or Safari as browser.</target>
 </trans-unit>
+<trans-unit id='TWF0Y2hyYXRlIFR5cA=='>
+  <source>Matchrate Typ</source>
+  <target>Matchrate Type</target>
+</trans-unit>
+<trans-unit id='S2VpbiBXZXJ0IGRlZmluaWVydCE='>
+  <source>Kein Wert definiert!</source>
+  <target>No value defined!</target>
+</trans-unit>
+<trans-unit id='SW1wb3J0aWVydDogezB9'>
+  <source>Importiert: {0}</source>
+  <target>Imported: {0}</target>
+</trans-unit>
+<trans-unit id='TmFjaCBCZWFyYmVpdHVuZzogezB9'>
+  <source>Nach Bearbeitung: {0}</source>
+  <target>After editing: {0}</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

@@ -44,6 +44,12 @@ class editor_Plugins_MatchResource_Models_Resource {
     protected $filebased = false;
     
     /**
+     * Match Type in the sense of the matchrate type
+     * @var string
+     */
+    protected $type = editor_Models_Segment_MatchRateType::TYPE_TM;
+    
+    /**
      * Flag if this resource can be triggered for search requests
      * Must be overridden by class extension
      * @var boolean
@@ -117,6 +123,14 @@ class editor_Plugins_MatchResource_Models_Resource {
      */
     public function getServiceType() {
         return $this->serviceType;
+    }
+
+    /**
+     * returns the match rate type
+     * @return string
+     */
+    public function getType() {
+        return $this->type;
     }
     
     /**
