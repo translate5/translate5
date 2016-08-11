@@ -136,6 +136,12 @@ abstract class editor_Models_Import_FileParser {
     protected $autoStates;
     
     /**
+     * MatchRateType calculator / converter
+     * @var editor_Models_Segment_MatchRateType
+     */
+    protected $matchRateType;
+    
+    /**
      * @var editor_Models_SegmentFieldManager
      */
     protected $segmentFieldManager;
@@ -163,6 +169,7 @@ abstract class editor_Models_Import_FileParser {
         $this->task = $task;
         $this->_taskGuid = $task->getTaskGuid();
         $this->autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
+        $this->matchRateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
         $this->handleEncoding();
     }
     
@@ -529,7 +536,8 @@ abstract class editor_Models_Import_FileParser {
         $attributes->pretrans = $isFullMatch && !$isAutoprop;
         $attributes->autoStateId = $this->autoStates->calculateImportState($isEditable, $isTranslated);
         
-        //FIXME add match rate state converter here! 'import' as default value
+        //if there was a matchRateType from the imported segment, then the original value was stored
+        $attributes->matchRateType = $this->matchRateType->parseImport((string) $attributes->matchRateType, $this->_mid);
     }
     
     /**

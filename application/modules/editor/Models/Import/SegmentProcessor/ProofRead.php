@@ -104,8 +104,9 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
         
         $attributes = $parser->getSegmentAttributes($mid);
         $seg->setMatchRate($attributes->matchRate);
+        $seg->setMatchRateType($attributes->matchRateType);
         $seg->setEditable($attributes->editable);
-        $seg->setAutoStateId($attributes->editable);
+        $seg->setAutoStateId($attributes->autoStateId);
         $seg->setPretrans($attributes->pretrans);
         
         $this->segmentNrInTask++;

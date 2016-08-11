@@ -100,6 +100,11 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $this->checkForSdlChangeMarker();
         $this->protectUnicodeSpecialChars();
         $this->prepareTagMapping();
+        
+        //here would be the right place to set the import map, 
+        // since our values base on sdlxliff values, 
+        // nothing has to be done here at the moment
+        //$this->matchRateType->setImportMap($map);
     }
 
     /**
@@ -319,9 +324,14 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             //falls kein percent gefunden wird, ergibt der int-cast 0, was passt
             $attributes->matchRate = (int) preg_replace('"^[^><]* percent=\"(\d*)\".*"', '\\1', $transunit[$i]);
 
-            //trimming here, since regex does not remove \n from content
-            $attributes->matchRateType = preg_replace('/^[^><]* origin="([^"]*)".*/', '\\1', trim($transunit[$i]));
+            //check if there is no origin at all
+            if(strpos($transunit[$i], 'origin="') !== false) {
+                //trimming here, since regex does not remove \n from content
+                //set original value here, conversion to translate5 syntax is done later
+                $attributes->matchRateType = preg_replace('/^[^><]* origin="([^"]*)".*/', '\\1', trim($transunit[$i]));
+            }
             
+            //FIXME can lead to errors if auto-propagated was in nested <sdl:prev-origin tags
             $attributes->autopropagated = strpos($transunit[$i], 'origin="auto-propagated"') !== false;
             $attributes->locked = strpos($transunit[$i], ' locked="true"') !== false;
         }
