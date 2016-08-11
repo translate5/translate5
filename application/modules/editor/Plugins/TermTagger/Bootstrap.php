@@ -164,7 +164,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
             return;
         }
         
-        $segment = $event->getParam('model');
+        $segment = $event->getParam('entity');
         /* @var $segment editor_Models_Segment */
         $taskGuid = $segment->getTaskGuid();
         
