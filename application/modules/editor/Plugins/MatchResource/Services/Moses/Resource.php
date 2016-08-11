@@ -39,6 +39,7 @@ class editor_Plugins_MatchResource_Services_Moses_Resource extends editor_Plugin
         parent::__construct($id, $name.' - '.$this->url);
         $this->filebased = false; //forced to be no filebased
         $this->searchable = false; //forced to be non searchable
+        $this->type = editor_Models_Segment_MatchRateType::TYPE_MT;
     }
     
     /**
