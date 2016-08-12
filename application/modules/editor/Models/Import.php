@@ -39,93 +39,24 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Import {
     /**
-     * @var string GUID
-     */
-    protected $_taskGuid = NULL;
-    /**
      * @var editor_Models_Task
      */
     protected $task;
-    /**
-     * @var string GUID
-     */
-    protected $_userGuid = NULL;
-    /**
-     * @var string
-     */
-    protected $_userName = NULL;
-    /**
-     * @var array array(fileId => 'filePath',...)
-     */
-    protected $_filePaths = array();
-    /**
-     * @var editor_Models_Languages Entity Instanz der Sprache
-     */
-    protected $_sourceLang = NULL;
-    /**
-     * @var editor_Models_Languages Entity Instanz der Sprache
-     */
-    protected $_targetLang = NULL;
-    /**
-     * @var editor_Models_Languages Entity Instanz der Sprache
-     */
-    protected $_relaisLang = NULL;
-    /**
-     * konkreter angeforderte Quell Sprache (Für Ausgabe bei einem Fehler)
-     * @var mixed
-     */
-    protected $_sourceLangValue = NULL;
-    /**
-     * konkreter angeforderte Ziel Sprache (Für Ausgabe bei einem Fehler)
-     * @var mixed
-     */
-    protected $_targetLangValue = NULL;
-    /**
-     * konkreter angeforderte Relais Sprache (Für Ausgabe bei einem Fehler)
-     * @var mixed
-     */
-    protected $_relaisLangValue = NULL;
-
-    /**
-     * @var string import folder, under which the to be imported folder and file hierarchy resides
-     */
-    protected $_importFolder = NULL;
-    /**
-     * @var array enthält alle images, die mit dem aktuellen Controllerdurchlauf erzeugt wurden als Values
-     */
-    protected $_imagesInTask = array();
+    
     /**
      * @var ZfExtended_Controller_Helper_LocalEncoded
      */
-    protected $_localEncoded = array();
+    protected $_localEncoded;
 
-    protected $_langErrors = array(
-        'source' => 'Die übergebene Quellsprache %s ist ist ungültig.',
-        'target' => 'Die übergebene Zielsprache %s ist ist ungültig.',
-        'relais' => 'Die übergebene Relaissprache %s ist ist ungültig.',
-    );
-    
     /**
      * @var ZfExtended_Controller_Helper_General
      */
     protected $gh;
 
     /**
-     * 
-     * @var boolean
-     */
-    protected $isCheckRun = false;
-
-    /**
      * @var editor_Models_Import_MetaData
      */
     protected $metaDataImporter;
-    
-    /**
-     * Import Data Provider
-     * @var editor_Models_Import_DataProvider_Abstract
-     */
-    protected $dataProvider;
     
     /**
      * shared instance over all parse objects of the segment field manager
@@ -144,7 +75,18 @@ class editor_Models_Import {
      * @var ZfExtended_EventManager
      */
     protected $events = false;
+    
+    /**
+     * @var editor_Models_Import_FileList
+     */
+    protected $filelist;
 
+    /**
+     * 
+     * @var editor_Models_Import_Configuration
+     */
+    protected $importConfig;
+    
     /**
      * Konstruktor
      */
@@ -153,6 +95,8 @@ class editor_Models_Import {
         $this->_localEncoded = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('LocalEncoded');
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
+        
+        $this->importConfig = ZfExtended_Factory::get('editor_Models_Import_Configuration');
     }
     
     /**
@@ -161,7 +105,7 @@ class editor_Models_Import {
      * @param boolean $check optional, per default true 
      */
     public function setCheck($check = true){
-        $this->isCheckRun = $check;
+        $this->importConfig->isCheckRun = $check;
     }
     
     /**
@@ -169,26 +113,43 @@ class editor_Models_Import {
      * @param string $importFolderPath
      */
     public function import(editor_Models_Import_DataProvider_Abstract $dataProvider) {
-        if(is_null($this->_taskGuid)){
+        if(empty($this->task)){
             throw new Zend_Exception('taskGuid not set - please set using $this->setTask/$this->createTask');
         }
-        Zend_Registry::set('affected_taskGuid', $this->_taskGuid); //for TRANSLATE-600 only
+        Zend_Registry::set('affected_taskGuid', $this->task->getTaskGuid()); //for TRANSLATE-600 only
         
         //pre import methods:
-        $this->validateParams();
         $dataProvider->setTask($this->task);
         $dataProvider->checkAndPrepare();
-        $this->_importFolder = $dataProvider->getAbsImportPath();
-        $this->validateImportFolders();
-        if(! $this->hasRelaisLanguage()) {
+        $this->importConfig->importFolder = $dataProvider->getAbsImportPath();
+        
+        //FIXME taskGuid validation needed there?
+        $this->importConfig->isValid($this->task->getTaskGuid());
+        
+        if(! $this->importConfig->hasRelaisLanguage()) {
             //@todo in new rest api and / or new importwizard show ereror, if no relaislang is set, but relais data is given or viceversa (see translate5 featurelist)
             
             //reset given relais language value if no relais data is provided / feature is off
             $this->task->setRelaisLang(0); 
         }
-        $this->task->setReferenceFiles($this->hasReferenceFiles());
+        
         $this->task->save(); //Task erst Speichern wenn die obigen validates und checks durch sind.
         $this->task->lock(NOW_ISO, true); //locks the task
+        
+//FIXME errors until here should result in a error for the GUI
+
+//HERE code from down of here goes completly into the worker. 
+// importConfig is filled and validated above. 
+// The worker receives a serialized version of importConfig, 
+// perhaps we have to make magic methods to destory and load the language instances
+// also bring up the termtagger on the laptop to test the import with termtagging
+// also intersting will be the question how the new import will interact with worker dependencies
+
+        $this->filelist = ZfExtended_Factory::get('editor_Models_Import_FileList', array($this->importConfig, $this->task));
+        
+        //down from here should start the import worker
+        //in the worker again:
+        Zend_Registry::set('affected_taskGuid', $this->task->getTaskGuid()); //for TRANSLATE-600 only
         
         $this->segmentFieldManager->initFields($this->task->getTaskGuid());
         
@@ -215,15 +176,14 @@ class editor_Models_Import {
      */
     protected function importWithCollectableErrors() {
         //should errors stop the import, or should they be logged:
-        Zend_Registry::set('errorCollect', $this->isCheckRun);
+        Zend_Registry::set('errorCollect', $this->importConfig->isCheckRun);
         
-        $this->importMetaData(); //Im MetaData Importer die TMX Geschichte integrieren
-        $this->events->trigger("beforeDirectoryParsing", $this,array('importFolder'=>$this->_importFolder));
-        $this->saveDirTrees();
+        $this->importMetaData();
+        $this->events->trigger("beforeDirectoryParsing", $this,array('importFolder'=>$this->importConfig->importFolder));
         $this->importFiles();
         $this->syncFileOrder();
         $this->removeMetaDataTmpFiles();
-        $this->importAndGenerateRelaisFiles();
+        $this->importRelaisFiles();
         $this->updateSegmentFieldViews();
         
         //disable errorCollecting for post processing
@@ -240,7 +200,7 @@ class editor_Models_Import {
     public function handleImportException(Exception $e, editor_Models_Import_DataProvider_Abstract $dataProvider) {
         $config = Zend_Registry::get('config');
         //delete task but keep taskfolder if configured, on checkRun never keep files
-        $deleteFiles = $this->isCheckRun || !$config->runtimeOptions->import->keepFilesOnError;
+        $deleteFiles = $this->importConfig->isCheckRun || !$config->runtimeOptions->import->keepFilesOnError;
         
         $log = ZfExtended_Factory::get('ZfExtended_Log');
         /* @var $log ZfExtended_Log */
@@ -259,31 +219,10 @@ class editor_Models_Import {
     }
     
     /**
-     * Importiert die Relais Dateien eines Tasks, welche noch nicht importiert wurde. 
-     * 
-     */
-    public function importAndGenerateRelaisFiles() {
-        if(! $this->hasRelaisLanguage()){ 
-            return;
-        }
-        //Da im Durchlauf für die Relais Dateien Relais => Target ist, werden die Sprachen entsprechend geändert: 
-        $this->_targetLang = $this->_relaisLang; 
-        
-        $tree = ZfExtended_Factory::get('editor_Models_RelaisFoldertree');
-        /* @var $tree editor_Models_RelaisFoldertree */
-        $tree->getPaths($this->_taskGuid,'file'); //Aufruf nötig, er initialisiert den Baum
-        $this->_filePaths = $tree->checkAndGetRelaisFiles($this->_importFolder);
-        
-        $tree->save();
-        
-        $this->importRelaisFiles($tree);
-    }
-    
-    /**
      * refreshes / creates the database views for this task
      */
     protected function updateSegmentFieldViews() {
-        if(! $this->isCheckRun) {
+        if(! $this->importConfig->isCheckRun) {
             $this->task->createMaterializedView();
         }
     }
@@ -292,9 +231,9 @@ class editor_Models_Import {
      * Methode zum Anstoßen verschiedener Meta Daten Imports zum Laufenende Import
      */
     protected function importMetaData() {
-        $this->metaDataImporter = ZfExtended_Factory::get('editor_Models_Import_MetaData', array($this->_sourceLang, $this->_targetLang));
+        $this->metaDataImporter = ZfExtended_Factory::get('editor_Models_Import_MetaData', array($this->importConfig));
         /* @var $this->metaDataImporter editor_Models_Import_MetaData */
-        $this->metaDataImporter->import($this->task, $this->_importFolder);
+        $this->metaDataImporter->import($this->task);
     }
 
     /**
@@ -306,16 +245,16 @@ class editor_Models_Import {
 
     /**
      * Importiert die Dateien und erzeugt die Taggrafiken
-     *
-     * - befüllt $this->_imagesInTask
      */
     protected function importFiles(){
+        $filelist = $this->filelist->processProofreadAndReferenceFiles($this->importConfig->getProofReadDir());
+        
         $mqmProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_MqmParser', array($this->task, $this->segmentFieldManager));
-        $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_ProofRead', array($this->task, $this->_sourceLang, $this->_targetLang, $this->_userGuid, $this->_userName));
+        $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_ProofRead', array($this->task, $this->importConfig));
         /* @var $segProc editor_Models_Import_SegmentProcessor_ProofRead */
-        foreach ($this->_filePaths as $fileId => $path) {
-            if($this->isCheckRun){
-                trigger_error('Check of File: '.$this->_importFolder.DIRECTORY_SEPARATOR.$path);
+        foreach ($filelist as $fileId => $path) {
+            if($this->importConfig->isCheckRun){
+                trigger_error('Check of File: '.$this->importConfig->importFolder.DIRECTORY_SEPARATOR.$path);
             }
             $params = $this->getFileparserParams($path, $fileId);
             $parser = $this->getFileParser($path, $params);
@@ -325,16 +264,17 @@ class editor_Models_Import {
             $parser->addSegmentProcessor($segProc);
             $parser->parseFile();
             $this->countWords($parser->getWordCount());
-            $this->_imagesInTask = array_merge($this->_imagesInTask,$parser->getTagImageNames());
         }
         if ($this->task->getWordCount() == 0) {
             $this->task->setWordCount($this->wordCount);
         }
         $mqmProc->handleErrors();
+        
+        $this->task->setReferenceFiles($this->filelist->hasReferenceFiles());
     }
     
     /**
-     * Adds up the number of words of the inported files
+     * Adds up the number of words of the imported files
      * and saves this into the private variable $this->wordCount
      * 
      * If this function is once called with "false", the addup-process will be canceled for the whole import-process
@@ -378,16 +318,19 @@ class editor_Models_Import {
      * Importiert die Relais Dateien
      * @param editor_Models_RelaisFoldertree $tree
      */
-    protected function importRelaisFiles(editor_Models_RelaisFoldertree $tree){
+    protected function importRelaisFiles(){
+        if(! $this->importConfig->hasRelaisLanguage()){ 
+            return;
+        }
+        
+        $relayFiles = $this->filelist->processRelaisFiles();
+        
         $mqmProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_MqmParser', array($this->task, $this->segmentFieldManager));
         $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_Relais', array($this->task, $this->segmentFieldManager));
         /* @var $segProc editor_Models_Import_SegmentProcessor_Relais */
-        foreach ($this->_filePaths as $fileId => $path) {
-            if(!$tree->isFileToImport($path)){
-                continue;
-            }
-            if($this->isCheckRun){
-                    trigger_error('Check of Relais File: '.$this->_importFolder.DIRECTORY_SEPARATOR.$path);
+        foreach ($relayFiles as $fileId => $path) {
+            if($this->importConfig->isCheckRun){
+                    trigger_error('Check of Relais File: '.$this->importConfig->importFolder.DIRECTORY_SEPARATOR.$path);
             }
             $params = $this->getFileparserParams($path, $fileId);
             $parser = $this->getFileParser($path, $params);
@@ -406,182 +349,18 @@ class editor_Models_Import {
      */
     protected function getFileparserParams($path, $fileId) {
         return array(
-            $this->_importFolder.DIRECTORY_SEPARATOR.$this->_localEncoded->encode($path),
+            $this->importConfig->importFolder.DIRECTORY_SEPARATOR.$this->_localEncoded->encode($path),
             $this->gh->basenameLocaleIndependent($path),
             $fileId, 
             $this->task,
         );
     }
     
-    /**
-     * - liest den Directory-Tree aus
-     * - speichert ihn in der DB als Objekt (LEK_foldertree) und flach durch Befüllung von LEK_files
-     * - befüllt $this->_filePaths
-     */
-    protected function saveDirTrees(){
-        $parser = ZfExtended_Factory::get('editor_Models_Import_DirectoryParser_WorkingFiles');
-        /* @var $parser editor_Models_Import_DirectoryParser_WorkingFiles */
-        $tree = $parser->parse($this->getProofReadDir());
-        
-        $treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
-        /* @var $treeDb editor_Models_Foldertree */
-        $treeDb->setTree($tree);
-        if($this->hasReferenceFiles() && !$this->isCheckRun){
-            $treeDb->setReferenceFileTree($this->getReferenceFileTree());
-        }
-        $treeDb->setTaskGuid($this->_taskGuid);
-        $relaisId = $this->hasRelaisLanguage() ? $this->_relaisLang->getId() : 0;
-        $sync = ZfExtended_Factory::get('editor_Models_Foldertree_SyncToFiles', array($treeDb,$this->_sourceLang->getId(),$this->_targetLang->getId(),$relaisId));
-        /* @var $sync editor_Models_Foldertree_SyncToFiles */
-        $sync->recursiveSync();
-        
-        $treeDb->save();
-        $this->_filePaths = $treeDb->getPaths($this->_taskGuid,'file');
-    }
-    
-    /**
-     * Gibt den absoluten Pfad (inkl. Import Root) zum Verzeichnis mit den zu lektorierenden Dateien zurück, berücksichtigt die proofRead bzw. Relaissprachen Config
-     * @param boolean $rel optional, gibt an ob nur der relative Teil des Proof Read Dirs zum Import Root zurückgegeben werden soll  
-     * @return string
-     */
-    protected function getProofReadDir($rel = false) {
-        $config = Zend_Registry::get('config');
-        $prefix = $rel ? '' : $this->_importFolder;
-        $proofReadDir = $config->runtimeOptions->import->proofReadDirectory;
-        return $proofReadDir == '' ? $prefix : $prefix.DIRECTORY_SEPARATOR.$proofReadDir; 
-    }
-    
-    /**
-     * Gibt den absoluten Pfad (inkl. Import Root) zum Verzeichnis mit den Relais Dateien zurück, berücksichtigt die Relaissprachen Config
-     * @param boolean $rel optional, gibt an ob nur der relative Teil des Proof Read Dirs zum Import Root zurückgegeben werden soll  
-     * @return string
-     */
-    protected function getRelaisDir($rel = false) {
-        if(empty($this->_importFolder)){
-            throw new Zend_Exception('internal import folder is not yet set.');
-        }
-        $prefix = $rel ? '' : $this->_importFolder.DIRECTORY_SEPARATOR; 
-        $config = Zend_Registry::get('config');
-        return $prefix.$config->runtimeOptions->import->relaisDirectory;
-    }
-
-    /**
-     * returns if reference files has to be imported
-     * @return boolean
-     */
-    protected function hasReferenceFiles() {
-        $config = Zend_Registry::get('config');
-        //If no ProofRead directory is set, the reference files must be ignored  
-        $proofDir = $config->runtimeOptions->import->proofReadDirectory;
-        $refDir = $config->runtimeOptions->import->referenceDirectory;
-        return !empty($proofDir) && is_dir($this->_importFolder.DIRECTORY_SEPARATOR.$refDir);
-    }
-    
-    /**
-     * Saves the reference files, and generates a file tree out of the reference files folder
-     * returns the Tree as JSON string
-     * @return string
-     */
-    protected function getReferenceFileTree() {
-    	$config = Zend_Registry::get('config');
-    	$refTarget = $this->getAbsReferencePath();
-    	$refDir = $config->runtimeOptions->import->referenceDirectory;
-    	$refAbsDir = $this->_importFolder.DIRECTORY_SEPARATOR.$refDir;
-    	$this->recurseCopy($refAbsDir, $refTarget);
-    
-    	$parser = ZfExtended_Factory::get('editor_Models_Import_DirectoryParser_ReferenceFiles');
-    	/* @var $parser editor_Models_Import_DirectoryParser_ReferenceFiles */
-        return $parser->parse($refTarget);
-    }
-    
-    /**
-     * does a recursive copy of the given directory
-     * @param string $src Source Directory
-     * @param string $dst Destination Directory
-     */
-    protected function recurseCopy(string $src, string $dst) {
-    	$dir = opendir($src);
-    	@mkdir($dst);
-    	$SEP = DIRECTORY_SEPARATOR;
-    	while(false !== ( $file = readdir($dir)) ) {
-    		if ($file == '.' || $file == '..') {
-    		    continue;
-    		}
-			if (is_dir($src.$SEP.$file)) {
-				$this->recurseCopy($src.$SEP.$file, $dst.$SEP.$file);
-			}
-			else {
-				copy($src.$SEP.$file, $dst.$SEP.$file);
-			}
-    	}
-    	closedir($dir);
-    }
-    
-    /**
-     * returns the absolute path to the tasks folder for reference files
-     */
-    protected function getAbsReferencePath() {
-        $config = Zend_Registry::get('config');
-        return $this->task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.$config->runtimeOptions->import->referenceDirectory;
-    }
-    
-    /**
-     * validiert / filtert die Get-Werte
-     * @throws Zend_Exception
-     */
-    protected function validateParams(){
-        $guidValidator = new ZfExtended_Validate_Guid();
-        $validateUsername = new Zend_Validate_Regex('"[A-Za-z0-9 \-]+"');
-        if(!$guidValidator->isValid($this->_taskGuid)){
-            throw new Zend_Exception('Die übergebene taskGuid '.$this->_taskGuid.' ist keine valide GUID.');
-        }
-        if(!$guidValidator->isValid($this->_userGuid)){
-            throw new Zend_Exception('Die übergebene userGuid '.$this->_userGuid.' ist keine valide GUID.');
-        }
-        if(!$validateUsername->isValid($this->_userName)){
-            throw new Zend_Exception('Der übergebene _userName '.$this->_userName.' ist kein valider Username.');
-        }
-        if(is_null($this->_sourceLang)){
-            throw new Zend_Exception(sprintf($this->_langErrors['source'], $this->_sourceLangValue));
-        }
-        if(is_null($this->_targetLang)){
-            throw new Zend_Exception(sprintf($this->_langErrors['target'], $this->_targetLangValue));
-        }
-        if(!empty($this->_relaisLangValue) && is_null($this->_relaisLang)){
-            throw new Zend_Exception(sprintf($this->_langErrors['relais'], $this->_relaisLangValue));
-        }
-    }
-    
-    /**
-     * validiert die nötigen Import Verzeichnisse
-     * @throws Zend_Exception
-     */
-    protected function validateImportFolders(){
-        $error = '';
-        if(!is_dir($this->_importFolder)){
-            $error .= 'Der übergebene importRootFolder '.$this->_importFolder.' existiert nicht.';
-        }
-        if(!is_dir($this->getProofReadDir()) || empty(glob($this->getProofReadDir().'/*'))){
-            $error .= 'Der übergebene ProofReadFolder '.$this->getProofReadDir().' existiert nicht oder ist leer.';
-        }
-        
-        if (empty($error)) {
-            return;
-        }
-        
-        if(Zend_Registry::isRegistered('rest_messages')) {
-            $messages = Zend_Registry::get('rest_messages');
-            /* @var $messages ZfExtended_Models_Messages */
-            $messages->addError($error);
-        }
-        throw new Zend_Exception($error);
-    }
-
     protected function syncFileOrder() {
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */
         //dont update view here, since it is not existing yet!
-        $segment->syncFileOrderFromFiles($this->_taskGuid, true); 
+        $segment->syncFileOrderFromFiles($this->task->getTaskGuid(), true); 
     }
 
     /**
@@ -590,8 +369,8 @@ class editor_Models_Import {
      * @param string $username
      */
     public function setUserInfos(string $userguid, string $username) {
-        $this->_userName = $username;
-        $this->_userGuid = $userguid;
+        $this->importConfig->userName = $username;
+        $this->importConfig->userGuid = $userguid;
     }
 
     /**
@@ -623,11 +402,11 @@ class editor_Models_Import {
         
         $task->setTaskNr($params->taskNr);
         
-        $sourceId = empty($this->_sourceLang) ? 0 : $this->_sourceLang->getId();
+        $sourceId = empty($this->importConfig->sourceLang) ? 0 : $this->importConfig->sourceLang->getId();
         $task->setSourceLang($sourceId);
-        $targetId = empty($this->_targetLang) ? 0 : $this->_targetLang->getId();
+        $targetId = empty($this->importConfig->targetLang) ? 0 : $this->importConfig->targetLang->getId();
         $task->setTargetLang($targetId);
-        $relaisId = empty($this->_relaisLang) ? 0 : $this->_relaisLang->getId();
+        $relaisId = empty($this->importConfig->relaisLang) ? 0 : $this->importConfig->relaisLang->getId();
         $task->setRelaisLang($relaisId);
         
         $task->setWorkflow($params->workflow);
@@ -649,7 +428,6 @@ class editor_Models_Import {
      */
     public function setTask(editor_Models_Task $task) {
         $this->task = $task;
-        $this->_taskGuid = $task->getTaskGuid();
         $this->task->initTaskDataDirectory();
     }
 
@@ -661,27 +439,6 @@ class editor_Models_Import {
      * @param string $type
      */
     public function setLanguages($source, $target, $relais, $type = editor_Models_Languages::LANG_TYPE_RFC5646) {
-        $this->_sourceLangValue = $source;
-        $this->_targetLangValue = $target;
-        $this->_relaisLangValue = $relais;
-        $langFields = array('_sourceLang' => $source, '_targetLang' => $target, '_relaisLang' => $relais);
-        
-        foreach($langFields as $key => $lang) {
-            $langInst = ZfExtended_Factory::get('editor_Models_Languages');
-            /* @var $langInst editor_Models_Languages */
-            if(empty($lang) || !$langInst->loadLang($lang, $type)) {
-                //null setzen wenn Sprache nicht gefunden. Das triggert einen Fehler in der validateParams dieser Klasse
-                $langInst = null;
-            }
-            $this->{$key} = $langInst;
-        }
-    }
-    
-    /**
-     * Gibt an ob eine Relaissprache verwendet werden soll (Anhand des Import Parameters)
-     * @return boolean
-     */
-    protected function hasRelaisLanguage() {
-        return !empty($this->_relaisLang) && is_dir($this->getRelaisDir());
+        $this->importConfig->setLanguages($source, $target, $relais, $type);
     }
 }

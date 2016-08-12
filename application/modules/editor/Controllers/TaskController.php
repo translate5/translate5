@@ -283,7 +283,6 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     public function postAction() {
         $this->entity->init();
-        //FIXME woher kommt der default workflow des tasks beim import???
         //$this->decodePutData(); → not needed, data was set directly out of params because of file upload
         $this->data = $this->_getAllParams();
         settype($this->data['wordCount'], 'integer');
@@ -528,9 +527,6 @@ class editor_TaskController extends ZfExtended_RestController {
      * @param boolean $editOnly if set to true returns true only if its a real editing (not readonly) request
      * @param boolean $viewOnly if set to true returns true only if its a readonly request
      * 
-     * FIXME Diese Methode und die noch nicht existierende isCloseTaskRequest in den Workflow packen und in this->closeAndUnlock integrieren.
-     *          Dabei auch die fehlenden task stati waiting, end,open mit in isCloseTaskRequest integrieren !
-     *           Ebenfalls die STATES nach workflow abstract umziehen, States dokumentieren.
      * @return boolean
      */
     protected function isOpenTaskRequest($editOnly = false,$viewOnly = false) {

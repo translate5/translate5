@@ -40,14 +40,6 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Import_SegmentProcessor {
     /**
-     * @var string GUID
-     */
-    protected $userGuid = NULL;
-    /**
-     * @var string
-     */
-    protected $userName = NULL;
-    /**
      * @var Zend_Db_Adapter_Mysqli
      */
     protected $db = NULL;
@@ -56,34 +48,24 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
      * @var Zend_Config
      */
     protected $taskConf;
+    
+    /**
+     * @var editor_Models_Import_Configuration
+     */
+    protected $importConfig;
+    
     /**
      * @var int
      */
     protected $segmentNrInTask = 0;
     
     /**
-     * @var editor_Models_Languages Entity Instanz der Sprache
-     */
-    protected $sourceLang = null;
-    
-    /**
-     * @var editor_Models_Languages Entity Instanz der Sprache
-     */
-    protected $targetLang = null;
-    
-    /**
      * @param editor_Models_Task $task
-     * @param editor_Models_Languages $sourceLang
-     * @param editor_Models_Languages $targetLang,
-     * @param string $userGuid
-     * @param string $userName
+     * @param editor_Models_Import_Configuration $config
      */
-    public function __construct(editor_Models_Task $task, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang, $userGuid, $userName){
+    public function __construct(editor_Models_Task $task, editor_Models_Import_Configuration $config){
         parent::__construct($task);
-        $this->sourceLang = $sourceLang;
-        $this->targetLang = $targetLang;
-        $this->userGuid = $userGuid;
-        $this->userName = $userName;
+        $this->importConfig = $config;
         $this->db = Zend_Registry::get('db');
         $this->taskConf = $this->task->getAsConfig();
     }
@@ -92,8 +74,8 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
         $seg = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $seg editor_Models_Segment */
         //statische, Task spezifische Daten zum Segment
-        $seg->setUserGuid($this->userGuid);
-        $seg->setUserName($this->userName);
+        $seg->setUserGuid($this->importConfig->userGuid);
+        $seg->setUserName($this->importConfig->userName);
 
         $seg->setTaskGuid($this->taskGuid);
         
