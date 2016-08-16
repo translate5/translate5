@@ -99,4 +99,10 @@ class editor_Models_Import_DataProvider_Zip extends editor_Models_Import_DataPro
 	public function handleImportException(Exception $e) {
 	    $this->removeTempFolder();
 	}
+	
+    public function __sleep() {
+        $parent = parent::__sleep();
+        $parent[] = 'importZip';
+        return $parent;
+    }
 }

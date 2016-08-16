@@ -35,7 +35,7 @@ END LICENSE AND COPYRIGHT
  *
 
 /**
- * Kapselt den Import Mechanismus
+ * Starts an import by gathering all needed data, check and store it, and start an Import Worker
  */
 class editor_Models_Import {
     /**
@@ -44,43 +44,10 @@ class editor_Models_Import {
     protected $task;
     
     /**
-     * @var ZfExtended_Controller_Helper_LocalEncoded
-     */
-    protected $_localEncoded;
-
-    /**
-     * @var ZfExtended_Controller_Helper_General
-     */
-    protected $gh;
-
-    /**
-     * @var editor_Models_Import_MetaData
-     */
-    protected $metaDataImporter;
-    
-    /**
-     * shared instance over all parse objects of the segment field manager
-     * @var editor_Models_SegmentFieldManager
-     */
-    protected $segmentFieldManager;
-    
-    /**
-     * Counter for number of imported words
-     * if set to "false" word-counting will be disabled
-     * @var (int) / boolean
-     */
-    private $wordCount = 0;
-    
-    /**
      * @var ZfExtended_EventManager
      */
-    protected $events = false;
+    protected $events;
     
-    /**
-     * @var editor_Models_Import_FileList
-     */
-    protected $filelist;
-
     /**
      * 
      * @var editor_Models_Import_Configuration
@@ -91,11 +58,8 @@ class editor_Models_Import {
      * Konstruktor
      */
     public function __construct(){
-        $this->gh = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('General');
-        $this->_localEncoded = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('LocalEncoded');
-        $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
-        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
-        
+        //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
+        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         $this->importConfig = ZfExtended_Factory::get('editor_Models_Import_Configuration');
     }
     
@@ -138,32 +102,16 @@ class editor_Models_Import {
         
 //FIXME errors until here should result in a error for the GUI
 
-//HERE code from down of here goes completly into the worker. 
-// importConfig is filled and validated above. 
-// The worker receives a serialized version of importConfig, 
-// perhaps we have to make magic methods to destory and load the language instances
-// also bring up the termtagger on the laptop to test the import with termtagging
-// also intersting will be the question how the new import will interact with worker dependencies
-
-        $this->filelist = ZfExtended_Factory::get('editor_Models_Import_FileList', array($this->importConfig, $this->task));
-        
-        //down from here should start the import worker
-        //in the worker again:
-        Zend_Registry::set('affected_taskGuid', $this->task->getTaskGuid()); //for TRANSLATE-600 only
-        
-        $this->segmentFieldManager->initFields($this->task->getTaskGuid());
-        
-        //call import Methods:
-        $this->importWithCollectableErrors();
-        
-        //saving task twice is the simplest way to do this. has meta data is only available after import.
-        $this->task->save();
-        
-        //call post import Methods:
-        $dataProvider->postImportHandler();
-        //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
-        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
-        $eventManager->trigger('afterImport', $this, array('task' => $this->task));
+        /*
+         * Queue Import Worker
+         */
+        $worker = ZfExtended_Factory::get('editor_Models_Import_Worker');
+        /* @var $worker editor_Models_Import_Worker */
+        $worker->init($this->task->getTaskGuid(), array(
+                'config' => $this->importConfig,
+                'dataProvider' => $dataProvider
+        ));
+        $worker->queue();
         
         $worker = ZfExtended_Factory::get('editor_Models_Import_Worker_SetTaskToOpen');
         /* @var $worker editor_Models_Import_Worker_SetTaskToOpen */
@@ -172,25 +120,20 @@ class editor_Models_Import {
     }
     
     /**
-     * The errors of the import methods called in here, will be collected in check mode
+     * Using this proxy method for triggering the event to keep the legacy code bound to this class instead to the new worker
+     * @param editor_Models_Task $task
      */
-    protected function importWithCollectableErrors() {
-        //should errors stop the import, or should they be logged:
-        Zend_Registry::set('errorCollect', $this->importConfig->isCheckRun);
-        
-        $this->importMetaData();
-        $this->events->trigger("beforeDirectoryParsing", $this,array('importFolder'=>$this->importConfig->importFolder));
-        $this->importFiles();
-        $this->syncFileOrder();
-        $this->removeMetaDataTmpFiles();
-        $this->importRelaisFiles();
-        $this->updateSegmentFieldViews();
-        
-        //disable errorCollecting for post processing
-        Zend_Registry::set('errorCollect', false);
+    public function triggerAfterImport(editor_Models_Task $task) {
+        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
+        /* @var $eventManager ZfExtended_EventManager */
+        $eventManager->trigger('afterImport', $this, array('task' => $task));
     }
     
+    
+    
     /**
+     * FIXME where invoked and how to deal with import workers?
+     * 
      * Handler of Import Exceptions
      * We delete the task from database, the import directory remains on the disk,
      * if runtimeOptions.import.keepFilesOnError is set to true (for developing mainly)
@@ -218,151 +161,6 @@ class editor_Models_Import {
         }
     }
     
-    /**
-     * refreshes / creates the database views for this task
-     */
-    protected function updateSegmentFieldViews() {
-        if(! $this->importConfig->isCheckRun) {
-            $this->task->createMaterializedView();
-        }
-    }
-    
-    /**
-     * Methode zum Anstoßen verschiedener Meta Daten Imports zum Laufenende Import
-     */
-    protected function importMetaData() {
-        $this->metaDataImporter = ZfExtended_Factory::get('editor_Models_Import_MetaData', array($this->importConfig));
-        /* @var $this->metaDataImporter editor_Models_Import_MetaData */
-        $this->metaDataImporter->import($this->task);
-    }
-
-    /**
-     * Löscht temporär während des Imports erzeugte Metadaten
-     */
-    protected function removeMetaDataTmpFiles() {
-        $this->metaDataImporter->cleanup();
-    }
-
-    /**
-     * Importiert die Dateien und erzeugt die Taggrafiken
-     */
-    protected function importFiles(){
-        $filelist = $this->filelist->processProofreadAndReferenceFiles($this->importConfig->getProofReadDir());
-        
-        $mqmProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_MqmParser', array($this->task, $this->segmentFieldManager));
-        $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_ProofRead', array($this->task, $this->importConfig));
-        /* @var $segProc editor_Models_Import_SegmentProcessor_ProofRead */
-        foreach ($filelist as $fileId => $path) {
-            if($this->importConfig->isCheckRun){
-                trigger_error('Check of File: '.$this->importConfig->importFolder.DIRECTORY_SEPARATOR.$path);
-            }
-            $params = $this->getFileparserParams($path, $fileId);
-            $parser = $this->getFileParser($path, $params);
-            /* @var $parser editor_Models_Import_FileParser */
-            $segProc->setSegmentFile($fileId, $params[1]); //$params[1] => filename
-            $parser->addSegmentProcessor($mqmProc);
-            $parser->addSegmentProcessor($segProc);
-            $parser->parseFile();
-            $this->countWords($parser->getWordCount());
-        }
-        if ($this->task->getWordCount() == 0) {
-            $this->task->setWordCount($this->wordCount);
-        }
-        $mqmProc->handleErrors();
-        
-        $this->task->setReferenceFiles($this->filelist->hasReferenceFiles());
-    }
-    
-    /**
-     * Adds up the number of words of the imported files
-     * and saves this into the private variable $this->wordCount
-     * 
-     * If this function is once called with "false", the addup-process will be canceled for the whole import-process
-     * 
-     * @param int or boolean false $count
-     */
-    private function countWords($count)
-    {
-        if ($count === false) {
-            $this->wordCount = false;
-        }
-        
-        if ($this->wordCount !== false) {
-            $this->wordCount += $count;
-        }
-    }
-    /**
-     * decide regarding to the fileextension, which FileParser should be loaded and return it
-     *
-     * @param string $path
-     * @return editor_Models_Import_FileParser
-     * @throws Zend_Exception
-     */
-    protected function getFileParser(string $path,array $params){
-        $ext = preg_replace('".*\.([^.]*)$"i', '\\1', $path);
-        try {
-            $class = 'editor_Models_Import_FileParser_'.  ucfirst(strtolower($ext));
-            $parser = ZfExtended_Factory::get($class,$params);
-            /* var $parser editor_Models_Import_FileParser */
-            $parser->setSegmentFieldManager($this->segmentFieldManager);
-            return $parser;
-        } catch (ReflectionException $e) {
-            if(strpos($e->getMessage(), 'Class '.$class.' does not exist') !== false){
-                throw new Zend_Exception('For the fileextension '.$ext. ' no parser is registered. (Class '.$class.' not found).',0,$e);
-            }
-            throw $e;
-        }
-    }
-    
-    /**
-     * Importiert die Relais Dateien
-     * @param editor_Models_RelaisFoldertree $tree
-     */
-    protected function importRelaisFiles(){
-        if(! $this->importConfig->hasRelaisLanguage()){ 
-            return;
-        }
-        
-        $relayFiles = $this->filelist->processRelaisFiles();
-        
-        $mqmProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_MqmParser', array($this->task, $this->segmentFieldManager));
-        $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_Relais', array($this->task, $this->segmentFieldManager));
-        /* @var $segProc editor_Models_Import_SegmentProcessor_Relais */
-        foreach ($relayFiles as $fileId => $path) {
-            if($this->importConfig->isCheckRun){
-                    trigger_error('Check of Relais File: '.$this->importConfig->importFolder.DIRECTORY_SEPARATOR.$path);
-            }
-            $params = $this->getFileparserParams($path, $fileId);
-            $parser = $this->getFileParser($path, $params);
-            /* @var $parser editor_Models_Import_FileParser */
-            $segProc->setSegmentFile($fileId, $params[1]);  //$params[1] => filename
-            $parser->addSegmentProcessor($mqmProc);
-            $parser->addSegmentProcessor($segProc);
-            $parser->parseFile();
-    	}
-        $mqmProc->handleErrors();
-    }
-    
-    /**
-     * Erzeugt die Parameter für den Fileparser Konstruktor als Array
-     * @return array
-     */
-    protected function getFileparserParams($path, $fileId) {
-        return array(
-            $this->importConfig->importFolder.DIRECTORY_SEPARATOR.$this->_localEncoded->encode($path),
-            $this->gh->basenameLocaleIndependent($path),
-            $fileId, 
-            $this->task,
-        );
-    }
-    
-    protected function syncFileOrder() {
-        $segment = ZfExtended_Factory::get('editor_Models_Segment');
-        /* @var $segment editor_Models_Segment */
-        //dont update view here, since it is not existing yet!
-        $segment->syncFileOrderFromFiles($this->task->getTaskGuid(), true); 
-    }
-
     /**
      * sets the info/data to the user
      * @param string $userguid

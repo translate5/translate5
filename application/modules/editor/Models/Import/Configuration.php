@@ -96,6 +96,12 @@ class editor_Models_Import_Configuration {
     public $userName;
     
     /**
+     * needed internally for de/serialization 
+     * @var string
+     */
+    protected $usedLanguagetype;
+    
+    /**
      * populates the language fields
      * @param mixed $source
      * @param mixed $target
@@ -106,6 +112,8 @@ class editor_Models_Import_Configuration {
         $this->sourceLangValue = $source;
         $this->targetLangValue = $target;
         $this->relaisLangValue = $relais;
+        
+        $this->usedLanguagetype = $type;
         
         $langFields = array('sourceLang' => $source, 'targetLang' => $target, 'relaisLang' => $relais);
         
@@ -218,5 +226,21 @@ class editor_Models_Import_Configuration {
             $messages->addError($error);
         }
         throw new Zend_Exception($error);
+    }
+    
+    /**
+     * after deserialization we have to resurrect the language objects
+     */
+    public function __wakeup() {
+        $this->setLanguages($this->sourceLangValue, $this->targetLangValue, $this->relaisLangValue, $this->usedLanguagetype);
+    }
+    
+    /**
+     * To reduce serialization data we remove the language instances and keep only the scalar values
+     * @return string
+     */
+    public function __sleep() {
+        $this->sourceLang = $this->targetLang = $this->relaisLang = null;
+        return array_keys(get_class_vars(get_class($this)));
     }
 }
