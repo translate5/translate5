@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
  * Contains the Import Worker (the scheduling parts)
  * The import process itself is encapsulated in editor_Models_Import_Worker_Import
  */
-class editor_Models_Import_Worker extends ZfExtended_Worker_Abstract {
+class editor_Models_Import_Worker extends editor_Models_Import_Abstract {
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
@@ -53,9 +53,7 @@ class editor_Models_Import_Worker extends ZfExtended_Worker_Abstract {
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($this->taskGuid);
+        $task = $this->task;
         if ($task->getState() != $task::STATE_IMPORT) {
             return false;
         }
