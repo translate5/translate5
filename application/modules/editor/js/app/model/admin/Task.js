@@ -41,6 +41,7 @@ Ext.define('Editor.model.admin.Task', {
   USER_STATE_VIEW: 'view',
   USER_STATE_WAITING: 'waiting',
   USER_STATE_FINISH: 'finished',
+  STATE_ERROR: 'error',
   STATE_IMPORT: 'import',
   fields: [
     {name: 'id', type: 'int'},
@@ -161,6 +162,13 @@ Ext.define('Editor.model.admin.Task', {
    */
   isImporting: function() {
       return this.get('state') == this.STATE_IMPORT;
+  },
+  /**
+   * returns if task had errors while import
+   * @returns {Boolean}
+   */
+  isErroneous: function() {
+      return this.get('state') == this.STATE_ERROR;
   },
   /**
    * returns if task is openable

@@ -320,6 +320,8 @@ body.loading {background: url("../images/loading_ico.gif") center 100px no-repea
 .ico-task-back {background-image: url("../images/table_back.png");}
 .adminTaskGrid tr.openable td.taskNr div {text-decoration: underline;cursor: pointer !important;}
 .adminTaskGrid .locked td.state div {padding-left:20px;background:url(../images/information.png) no-repeat left top;}
+.adminTaskGrid .error td.state div {padding-left:20px;background:url(../images/exclamation.png) no-repeat left top;}
+.adminTaskGrid .locked.import td.state div {padding-left:6px; background:none;}
 .adminTaskGrid tr:hover td.task-users > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
 .adminTaskGrid .x-grid-header-ct .task-users > div {background:url("../images/group.png") no-repeat 6px 5px;}
 .adminTaskGrid .x-grid-header-ct .ref-files > div {background:url("../images/page_attach.png") no-repeat 6px 5px;}
@@ -379,7 +381,8 @@ tr.finished td div {color:#acacac;}
 tr.end td div.x-grid-checkheader,
 tr.finished td div.x-grid-checkheader {opacity:0.3;display: block;overflow: hidden;text-indent: 100%;white-space: nowrap;}
 tr.end td div {text-decoration: line-through;}
-tr.no-users td div {color:#ff0000;}
+tr.error td div {color:#ff0000;}
+tr.no-users td div {color:#ff00ff;}
 tr.import td div {color:#ff9900;}
 tr.customeState td div {font-style: italic;}
 

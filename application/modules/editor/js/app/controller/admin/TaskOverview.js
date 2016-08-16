@@ -76,6 +76,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },
   strings: {
       taskImported: '#UT#Aufgabe "{0}" vollständig importiert',
+      taskError: '#UT#Die Aufgabe konnte aufgrund von Fehlern nicht importiert werden!',
       taskOpening: '#UT#Aufgabe wird im Editor geöffnet...',
       taskFinishing: '#UT#Aufgabe wird abgeschlossen...',
       taskUnFinishing: '#UT#Aufgabe wird abgeschlossen...',
@@ -232,6 +233,10 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           tasks = me.getAdminTasksStore(),
           foundImporting = 0,
           taskReloaded = function(rec) {
+              if(rec.isErroneous()) {
+                  Editor.MessageBox.addSuccess(Ext.String.format(me.strings.taskError, rec.get('taskName')));
+                  return;
+              }
               if(!rec.isImporting()) {
                   Editor.MessageBox.addSuccess(Ext.String.format(me.strings.taskImported, rec.get('taskName')));
               }

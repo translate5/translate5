@@ -110,6 +110,10 @@ Ext.define('Editor.view.admin.TaskGrid', {
           if(task.isLocked()) {
               res.push('locked');
           }
+          if(task.isErroneous()) {
+              res.push('error');
+              return res.join(' ');
+          }
           if(task.isCustomState()) {
               res.push('customeState');
           }
