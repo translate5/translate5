@@ -874,10 +874,6 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <b
 <trans-unit id='S2VpbiBXZXJ0IGRlZmluaWVydCE='><source>Kein Wert definiert!</source><target>Kein Wert definiert!</target></trans-unit>
 <trans-unit id='SW1wb3J0aWVydDogezB9'><source>Importiert: {0}</source><target>Importiert: {0}</target></trans-unit>
 <trans-unit id='TmFjaCBCZWFyYmVpdHVuZzogezB9'><source>Nach Bearbeitung: {0}</source><target>Nach Bearbeitung: {0}</target></trans-unit>
-<trans-unit id='cXVlc3Rpb24='><source>question</source><target>question</target></trans-unit>
-<trans-unit id='b3B0aW9uIEE='><source>option A</source><target>option A</target></trans-unit>
-<trans-unit id='b3B0aW9uIEI='><source>option B</source><target>option B</target></trans-unit>
-<trans-unit id='JyV2YWx1ZSUnIGlzdCBrZWluZSBHVUlE'><source>'%value%' ist keine GUID</source><target>'%value%' ist keine GUID</target></trans-unit>
   </body>
  </file>
 </xliff>
