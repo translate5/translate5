@@ -66,7 +66,6 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract {
         $config = Zend_Registry::get('config');
         // event-listeners
         $this->eventManager->attach('editor_Models_Import_Worker_Import', 'beforeDirectoryParsing', array($this, 'handleTransitImportPreparation'));
-        //FIXME geht nicht per afterImport event! muss befor DirectoryProvider archiving sein.
         $this->eventManager->attach('editor_Models_Import_Worker_Import', 'importCleanup', array($this, 'handleTransitImportCleanup'), -10);
         // end of event-listeners
         $this->proofReadDirName = $config->runtimeOptions->import->proofReadDirectory;

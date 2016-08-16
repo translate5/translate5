@@ -118,6 +118,16 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     protected $taskDataPath;
 
     /**
+     * When unlocking the task this data array should be useds
+     * @var array
+     */
+    protected $fieldsToUnlock = array(
+        'locked' => NULL,
+        'lockedInternalSessionUniqId' => NULL,
+        'lockingUser' => NULL,
+    );
+    
+    /**
      * loads the task to the given guid
      * @param guid $taskGuid
      */
@@ -484,15 +494,23 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @throws Zend_Exception if something went wrong
      */
     public function unlock() {
-        $update = array(
-            'locked' => NULL,
-            'lockedInternalSessionUniqId' => NULL,
-            'lockingUser' => NULL,
-        );
         $where = array('taskGuid = ? and locked is not null'=>$this->getTaskGuid());
         
         //check how many rows are updated
-        return $this->db->update($update, $where) !== 0;
+        return $this->db->update($this->fieldsToUnlock, $where) !== 0;
+    }
+    
+    /**
+     * marks the task erroneous and unlocks its
+     * @return boolean false if task had not been updated or does not exist, 
+     * @throws Zend_Exception if something went wrong
+     */
+    public function setErroneous() {
+        $data = $this->fieldsToUnlock;
+        $data['state'] = self::STATE_ERROR;
+        $where = array('taskGuid = ?'=>$this->getTaskGuid());
+        //check how many rows are updated
+        return $this->db->update($data, $where) !== 0;
     }
     
     /**

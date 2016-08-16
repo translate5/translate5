@@ -56,7 +56,6 @@ class editor_Models_Import_Worker extends ZfExtended_Worker_Abstract {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($this->taskGuid);
-        
         if ($task->getState() != $task::STATE_IMPORT) {
             return false;
         }
@@ -65,12 +64,24 @@ class editor_Models_Import_Worker extends ZfExtended_Worker_Abstract {
         // The Dataprovider can itself hook on to several import events 
         $parameters = $this->workerModel->getParameters();
         
-        //FIXME here global error handling for the import worker part
-        $import = ZfExtended_Factory::get('editor_Models_Import_Worker_Import');
-        /* @var $import editor_Models_Import_Worker_Import */
-        $import->import($task, $parameters['config']);
-        //FIXME END
-        
-        return true;
+        try {
+            $import = ZfExtended_Factory::get('editor_Models_Import_Worker_Import');
+            /* @var $import editor_Models_Import_Worker_Import */
+            $import->import($task, $parameters['config']);
+            return true;
+        } catch (Exception $e) {
+            $task->setErroneous();
+            //what can happen internally: 
+                //a exception thrown by us or the framework
+                //a notice / warning / error (which should be all converted to a exception)
+                //a error for check run
+                //a fatal
+            //logging of import errors → error message refactoring
+            //visually we have 3 types of error
+            //  task add window remains open
+            //  task remains as import → WHEN THIS?
+            //  task is getting deleted after an error  → WHEN THIS?
+            throw $e; //FIXME throw the original exception or a new import exception with the original referenced? 
+        }
     }
 }

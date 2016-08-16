@@ -93,7 +93,7 @@ class editor_Models_Import_Worker_Import {
     public function import(editor_Models_Task $task, editor_Models_Import_Configuration $importConfig) {
         $this->task = $task;
         $this->importConfig = $importConfig;
-        
+        $importConfig->isValid($task->getTaskGuid());
         $this->filelist = ZfExtended_Factory::get('editor_Models_Import_FileList', array($this->importConfig, $this->task));
         
         //down from here should start the import worker
@@ -107,8 +107,6 @@ class editor_Models_Import_Worker_Import {
         
         //saving task twice is the simplest way to do this. has meta data is only available after import.
         $this->task->save();
-        
-        HERE: importCleanup wird warum auch immer zweimal getriggert!
         $this->events->trigger('importCleanup', $this, array('task' => $task));
         
         $import = ZfExtended_Factory::get('editor_Models_Import');

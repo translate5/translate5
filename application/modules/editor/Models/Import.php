@@ -87,7 +87,6 @@ class editor_Models_Import {
         $dataProvider->checkAndPrepare();
         $this->importConfig->importFolder = $dataProvider->getAbsImportPath();
         
-        //FIXME taskGuid validation needed there?
         $this->importConfig->isValid($this->task->getTaskGuid());
         
         if(! $this->importConfig->hasRelaisLanguage()) {
@@ -99,8 +98,6 @@ class editor_Models_Import {
         
         $this->task->save(); //Task erst Speichern wenn die obigen validates und checks durch sind.
         $this->task->lock(NOW_ISO, true); //locks the task
-        
-//FIXME errors until here should result in a error for the GUI
 
         /*
          * Queue Import Worker
