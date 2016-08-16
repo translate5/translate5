@@ -284,7 +284,7 @@ class editor_TaskController extends ZfExtended_RestController {
     public function postAction() {
         $this->entity->init();
         //$this->decodePutData(); → not needed, data was set directly out of params because of file upload
-        $this->data = $this->_getAllParams();
+        $this->data = $this->getAllParams();
         settype($this->data['wordCount'], 'integer');
         settype($this->data['enableSourceEditing'], 'boolean');
         settype($this->data['lockLocked'], 'integer');
@@ -731,7 +731,10 @@ class editor_TaskController extends ZfExtended_RestController {
     
     public function deleteAction() {
         $this->entityLoad();
-        $this->checkStateAllowsActions();
+        //if task is erroneous then it is also deleteable, regardless of its locking state
+        if(!$this->entity->isErroneous()){
+            $this->checkStateAllowsActions();
+        }
         $this->processClientReferenceVersion();
         $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array($this->entity));
         /* @var $remover editor_Models_Task_Remover */
