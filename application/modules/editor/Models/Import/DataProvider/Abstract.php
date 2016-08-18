@@ -140,7 +140,10 @@ abstract class editor_Models_Import_DataProvider_Abstract {
     public function __wakeup() {
         $eventManager = Zend_EventManager_StaticEventManager::getInstance();
         /* @var $eventManager Zend_EventManager_StaticEventManager */
-        $eventManager->attach('editor_Models_Import_Worker_Import', 'importCleanup', array($this, 'postImportHandler'));
+        //must be called before default cleanup (which has priority 1)
+        $eventManager->attach('editor_Models_Import_Worker_Import', 'importCleanup', array($this, 'postImportHandler'), -100);
+        //FIXME
+        $eventManager->attach('editor_Models_Import_Worker_Import', 'afterImportException', array($this, 'handleImportException'));
         
         //restoring the taskPath as SPLInfo
         $this->taskPath = new SplFileInfo($this->taskPath);

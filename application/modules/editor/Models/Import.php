@@ -38,6 +38,8 @@ END LICENSE AND COPYRIGHT
  * Starts an import by gathering all needed data, check and store it, and start an Import Worker
  */
 class editor_Models_Import {
+    use editor_Models_Import_HandleExceptionTrait;
+    
     /**
      * @var editor_Models_Task
      */
@@ -102,60 +104,31 @@ class editor_Models_Import {
         /*
          * Queue Import Worker
          */
-        $worker = ZfExtended_Factory::get('editor_Models_Import_Worker');
+        $importWorker = ZfExtended_Factory::get('editor_Models_Import_Worker');
         /* @var $worker editor_Models_Import_Worker */
-        $worker->init($this->task->getTaskGuid(), array(
+        $importWorker->init($this->task->getTaskGuid(), array(
                 'config' => $this->importConfig,
                 'dataProvider' => $dataProvider
         ));
-        $worker->queue();
+        $importWorker->queue();
         
         $worker = ZfExtended_Factory::get('editor_Models_Import_Worker_SetTaskToOpen');
         /* @var $worker editor_Models_Import_Worker_SetTaskToOpen */
-        $worker->init($this->task->getTaskGuid());
-        $worker->queue();
+        
+        //queuing this worker when task has errors make no sense, init checks this.
+        if($worker->init($this->task->getTaskGuid())) {
+            $worker->queue(); 
+        }
     }
     
     /**
-     * Using this proxy method for triggering the event to keep the legacy code bound to this class instead to the new worker
+     * Using this proxy method for triggering the event to keep the legacy code bound to this class instead to the new worker class
      * @param editor_Models_Task $task
      */
     public function triggerAfterImport(editor_Models_Task $task) {
         $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         /* @var $eventManager ZfExtended_EventManager */
         $eventManager->trigger('afterImport', $this, array('task' => $task));
-    }
-    
-    
-    
-    /**
-     * FIXME where invoked and how to deal with import workers?
-     * 
-     * Handler of Import Exceptions
-     * We delete the task from database, the import directory remains on the disk,
-     * if runtimeOptions.import.keepFilesOnError is set to true (for developing mainly)
-     * @param Exception $e
-     * @param editor_Models_Import_DataProvider_Abstract $dataProvider
-     */
-    public function handleImportException(Exception $e, editor_Models_Import_DataProvider_Abstract $dataProvider) {
-        $config = Zend_Registry::get('config');
-        //delete task but keep taskfolder if configured, on checkRun never keep files
-        $deleteFiles = $this->importConfig->isCheckRun || !$config->runtimeOptions->import->keepFilesOnError;
-        
-        $log = ZfExtended_Factory::get('ZfExtended_Log');
-        /* @var $log ZfExtended_Log */
-        $msg = "\nImport Exception: ".$e."\n";
-        if(!$deleteFiles) {
-            $msg .= "\n".'The imported data is kept in '.$config->runtimeOptions->dir->taskData;
-        }
-        $log->logError('Exception while importing task '.$this->task->getTaskGuid(), $msg);
-        
-        $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array($this->task));
-        /* @var $remover editor_Models_Task_Remover */
-        $remover->removeForced($deleteFiles);
-        if($deleteFiles) {
-            $dataProvider->handleImportException($e);
-        }
     }
     
     /**

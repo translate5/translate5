@@ -58,6 +58,8 @@ class editor_Models_Import_Worker extends editor_Models_Import_Abstract {
             return false;
         }
         
+        $this->registerShutdown();
+        
         //also containing an instance of the initial dataprovider.
         // The Dataprovider can itself hook on to several import events 
         $parameters = $this->workerModel->getParameters();
@@ -69,17 +71,20 @@ class editor_Models_Import_Worker extends editor_Models_Import_Abstract {
             return true;
         } catch (Exception $e) {
             $task->setErroneous();
-            //what can happen internally: 
-                //a exception thrown by us or the framework
-                //a notice / warning / error (which should be all converted to a exception)
-                //a error for check run
-                //a fatal
-            //logging of import errors → error message refactoring
-            //visually we have 3 types of error
-            //  task add window remains open
-            //  task remains as import → WHEN THIS?
-            //  task is getting deleted after an error  → WHEN THIS?
-            throw $e; //FIXME throw the original exception or a new import exception with the original referenced? 
+            $import->handleImportException($e, $parameters['dataProvider']);
+            throw $e; 
         }
+    }
+    
+    /**
+     * basicly sets the task to be imported to state error when a fatal error happens after the work method
+     */
+    protected function registerShutdown() {
+        register_shutdown_function(function($task) {
+            $error = error_get_last();
+            if(!is_null($error) && ($error['type'] & FATAL_ERRORS_TO_HANDLE)) {
+                $task->setErroneous();
+            }
+        }, $this->task);
     }
 }

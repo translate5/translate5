@@ -32,6 +32,7 @@ END LICENSE AND COPYRIGHT
  * Encapsulates the part of the import logic which is intended to be run in a worker
  */
 class editor_Models_Import_Worker_Import {
+    use editor_Models_Import_HandleExceptionTrait;
     
     /**
      * @var editor_Models_Task
@@ -93,6 +94,7 @@ class editor_Models_Import_Worker_Import {
     public function import(editor_Models_Task $task, editor_Models_Import_Configuration $importConfig) {
         $this->task = $task;
         $this->importConfig = $importConfig;
+        
         $importConfig->isValid($task->getTaskGuid());
         $this->filelist = ZfExtended_Factory::get('editor_Models_Import_FileList', array($this->importConfig, $this->task));
         
@@ -101,7 +103,7 @@ class editor_Models_Import_Worker_Import {
         Zend_Registry::set('affected_taskGuid', $this->task->getTaskGuid()); //for TRANSLATE-600 only
         
         $this->segmentFieldManager->initFields($this->task->getTaskGuid());
-        
+
         //call import Methods:
         $this->importWithCollectableErrors();
         
