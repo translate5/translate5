@@ -28,7 +28,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_Import_Abstract {
+abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_Import_Worker_Abstract {
     
     /**
      * overwrites $this->workerModel->maxLifetime

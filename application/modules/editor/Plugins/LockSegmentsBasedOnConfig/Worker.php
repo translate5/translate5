@@ -28,7 +28,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Plugins_LockSegmentsBasedOnConfig_Worker extends editor_Models_Import_Abstract {
+class editor_Plugins_LockSegmentsBasedOnConfig_Worker extends editor_Models_Import_Worker_Abstract {
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()

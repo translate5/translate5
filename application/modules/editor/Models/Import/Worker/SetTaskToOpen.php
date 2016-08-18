@@ -38,7 +38,7 @@ END LICENSE AND COPYRIGHT
  * 
  * Be careful: This class can not be used in worker_dependencies !
  */
-class editor_Models_Import_Worker_SetTaskToOpen extends editor_Models_Import_Abstract {
+class editor_Models_Import_Worker_SetTaskToOpen extends editor_Models_Import_Worker_Abstract {
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()

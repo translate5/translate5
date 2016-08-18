@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
  * Contains the Import Worker (the scheduling parts)
  * The import process itself is encapsulated in editor_Models_Import_Worker_Import
  */
-abstract class editor_Models_Import_Abstract extends ZfExtended_Worker_Abstract {
+abstract class editor_Models_Import_Worker_Abstract extends ZfExtended_Worker_Abstract {
     /**
      * @var editor_Models_Task
      */
@@ -46,9 +46,10 @@ abstract class editor_Models_Import_Abstract extends ZfExtended_Worker_Abstract 
             return parent::init($taskGuid, $parameters);
         }
         $wm = $this->workerModel;
+        
         if(isset($wm)){
-            $this->workerModel->setState($wm::STATE_DEFUNCT);
-            $this->save();
+            $wm->setState($wm::STATE_DEFUNCT);
+            $wm->save();
         }
         //if no worker model is set, we don't have to call parent / init a worker model,
         // since we don't even need it in the DB when the task already has errors
