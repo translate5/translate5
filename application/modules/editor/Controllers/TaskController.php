@@ -745,32 +745,44 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $diff = (boolean)$this->getRequest()->getParam('diff');
 
-        $export = ZfExtended_Factory::get('editor_Models_Export');
-        /* @var $export editor_Models_Export */
+        $worker = ZfExtended_Factory::get('editor_Models_Export_Worker');
+        /* @var $worker editor_Models_Export_Worker */
+        $zipFile = $worker->initZipExport($this->entity, $diff);
+        $workerId = $worker->queue();
         
-        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        /* @var $translate ZfExtended_Zendoverwrites_Translate */;
+        //FIXME multiple problems here
+        // it is possible that we get the following in DB (implicit ordererd by ID here):
+        //      Export_Worker for ExportReq1
+        //      Export_Worker for ExportReq2 → overwrites the tempExportDir of ExportReq1
+        //      Export_ExportedWorker for ExportReq2 
+        //      Export_ExportedWorker for ExportReq1 → works then with tempExportDir of ExportReq1 instead!
+        // 
+        // If we implement in future export workers which need to work on the temp export data, 
+        //  we have to ensure that each export worker get its own export directory. 
         
-        if(!$export->setTaskToExport($this->entity, $diff)){
-            //@todo: this should show up in JS-Frontend in a nice way
-            echo $translate->_(
-                    'Derzeit läuft bereits ein Export für diesen Task. Bitte versuchen Sie es in einiger Zeit nochmals.');
-            exit;
-        }
-        $zipFile = $export->exportToZip();
+        $worker = ZfExtended_Factory::get('editor_Models_Export_ExportedWorker');
+        /* @var $worker editor_Models_Export_ExportedWorker */
+        $worker->init($this->entity->getTaskGuid());
+        $worker->setBlocking(); //we have to wait for the underlying worker to provide the download
+        $worker->queue($workerId);
+        
         if($diff) {
+            $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+            /* @var $translate ZfExtended_Zendoverwrites_Translate */;
             $suffix = $translate->_(' - mit Aenderungen nachverfolgen.zip');
         }
         else {
             $suffix = '.zip';
         }
-
+        
         // disable layout and view
         $this->view->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
         header('Content-Type: application/zip', TRUE);
         header('Content-Disposition: attachment; filename="'.$this->entity->getTasknameForDownload($suffix).'"');
         readfile($zipFile);
+        //rename file after usage to export.zip to keep backwards compatibility
+        rename($zipFile, dirname($zipFile).DIRECTORY_SEPARATOR.'export.zip');
         exit;
     }
     
@@ -788,7 +800,7 @@ class editor_TaskController extends ZfExtended_RestController {
      * @throws ZfExtended_Models_Entity_Conflict
      */
     protected function checkStateAllowsActions() {
-        if($this->entity->isExclusiveState() && $this->entity->isLocked($this->entity->getTaskGuid())) {
+        if($this->entity->isErroneous() || $this->entity->isExclusiveState() && $this->entity->isLocked($this->entity->getTaskGuid())) {
             throw new ZfExtended_Models_Entity_Conflict('Der aktuelle Status der Aufgabe verbietet diese Aktion!');
         }
     }
