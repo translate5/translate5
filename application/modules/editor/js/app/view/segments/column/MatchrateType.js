@@ -105,7 +105,7 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
         config.filter = {
             type: 'list',
             labelField: 'label',
-            store: {
+            store: new Ext.data.Store({
                 fields: [{
                     name: 'id',
                     mapping: 'matchrateType'
@@ -125,7 +125,7 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
                     }
                 },
                 autoLoad: true
-            }
+            })
         };
         if (instanceConfig) {
             me.getConfigurator().merge(me, config, instanceConfig);
