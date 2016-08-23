@@ -332,13 +332,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $import->setTask($this->entity);
         $dp = $this->upload->getDataProvider();
         
-        try {
-            $import->import($dp);
-        }
-        catch (Exception $e) {
-            $import->handleImportException($e, $dp);
-            throw $e;
-        }
+        $import->import($dp);
     }
     
     /**

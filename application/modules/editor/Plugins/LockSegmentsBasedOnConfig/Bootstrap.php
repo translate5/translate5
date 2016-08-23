@@ -56,6 +56,6 @@ class editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap extends ZfExtended_Plug
         $worker = ZfExtended_Factory::get('editor_Plugins_LockSegmentsBasedOnConfig_Worker');
         /* @var $worker editor_Plugins_LockSegmentsBasedOnConfig_Worker */
         $worker->init($task->getTaskGuid());
-        $worker->queue();
+        $worker->queue($event->getParam('parentWorkerId'));
     }
 }

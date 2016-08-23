@@ -33,3 +33,16 @@ INSERT INTO `Zf_worker_dependencies` (`worker`, `dependency`) VALUES
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES
  ('runtimeOptions.worker.editor_Models_Import_Worker.maxParallelWorkers', 1, 'editor', 'worker', 3, 3, '', 'integer', 'Max parallel running workers of the import worker (file and segment parsing).');
+ 
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
+VALUES
+ ('runtimeOptions.worker.editor_Models_Export_Worker.maxParallelWorkers', 1, 'editor', 'worker', 3, 3, '', 'integer', 'Max parallel running workers of the export worker.');
+ 
+INSERT INTO `Zf_worker_dependencies` (`worker`, `dependency`) VALUES 
+('editor_Models_Export_ExportedWorker', 'editor_Models_Export_Worker'),
+('editor_Plugins_SegmentStatistics_CleanUpWorker', 'editor_Models_Export_Worker'),
+('editor_Plugins_SegmentStatistics_Worker', 'editor_Models_Export_Worker'),
+('editor_Plugins_SegmentStatistics_WriteStatisticsWorker', 'editor_Models_Export_Worker');
+
+ALTER TABLE `LEK_task`
+DROP COLUMN exportRunning;

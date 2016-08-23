@@ -42,11 +42,13 @@ abstract class editor_Models_Import_Worker_Abstract extends ZfExtended_Worker_Ab
         $this->task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $ class */
         $this->task->loadByTaskGuid($taskGuid);
+        
         if(!$this->task->isErroneous()) {
             return parent::init($taskGuid, $parameters);
         }
-        $wm = $this->workerModel;
         
+        //we set the worker to defunct when task has errors
+        $wm = $this->workerModel;
         if(isset($wm)){
             $wm->setState($wm::STATE_DEFUNCT);
             $wm->save();

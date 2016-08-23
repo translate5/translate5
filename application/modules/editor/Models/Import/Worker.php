@@ -68,10 +68,13 @@ class editor_Models_Import_Worker extends editor_Models_Import_Worker_Abstract {
             $import = ZfExtended_Factory::get('editor_Models_Import_Worker_Import');
             /* @var $import editor_Models_Import_Worker_Import */
             $import->import($task, $parameters['config']);
+            
+            $externalImport = ZfExtended_Factory::get('editor_Models_Import');
+            /* @var $externalImport editor_Models_Import */
+            $externalImport->triggerAfterImport($task, (int) $this->workerModel->getId());
             return true;
         } catch (Exception $e) {
             $task->setErroneous();
-            $import->handleImportException($e, $parameters['dataProvider']);
             throw $e; 
         }
     }

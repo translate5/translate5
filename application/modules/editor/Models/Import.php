@@ -38,8 +38,6 @@ END LICENSE AND COPYRIGHT
  * Starts an import by gathering all needed data, check and store it, and start an Import Worker
  */
 class editor_Models_Import {
-    use editor_Models_Import_HandleExceptionTrait;
-    
     /**
      * @var editor_Models_Task
      */
@@ -110,14 +108,14 @@ class editor_Models_Import {
                 'config' => $this->importConfig,
                 'dataProvider' => $dataProvider
         ));
-        $importWorker->queue();
+        $parentId = $importWorker->queue();
         
         $worker = ZfExtended_Factory::get('editor_Models_Import_Worker_SetTaskToOpen');
         /* @var $worker editor_Models_Import_Worker_SetTaskToOpen */
         
         //queuing this worker when task has errors make no sense, init checks this.
         if($worker->init($this->task->getTaskGuid())) {
-            $worker->queue(); 
+            $worker->queue($parentId); 
         }
     }
     
@@ -125,10 +123,10 @@ class editor_Models_Import {
      * Using this proxy method for triggering the event to keep the legacy code bound to this class instead to the new worker class
      * @param editor_Models_Task $task
      */
-    public function triggerAfterImport(editor_Models_Task $task) {
+    public function triggerAfterImport(editor_Models_Task $task, int $parentWorkerId) {
         $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         /* @var $eventManager ZfExtended_EventManager */
-        $eventManager->trigger('afterImport', $this, array('task' => $task));
+        $eventManager->trigger('afterImport', $this, array('task' => $task, 'parentWorkerId' => $parentWorkerId));
     }
     
     /**

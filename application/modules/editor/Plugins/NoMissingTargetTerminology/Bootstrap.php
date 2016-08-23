@@ -56,6 +56,6 @@ class editor_Plugins_NoMissingTargetTerminology_Bootstrap extends ZfExtended_Plu
         $worker = ZfExtended_Factory::get('editor_Plugins_NoMissingTargetTerminology_Worker');
         /* @var $worker editor_Plugins_NoMissingTargetTerminology_Worker */
         $worker->init($task->getTaskGuid());
-        $worker->queue();
+        $worker->queue($event->getParam('parentWorkerId'));
     }
 }

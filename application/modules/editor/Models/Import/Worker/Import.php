@@ -32,8 +32,6 @@ END LICENSE AND COPYRIGHT
  * Encapsulates the part of the import logic which is intended to be run in a worker
  */
 class editor_Models_Import_Worker_Import {
-    use editor_Models_Import_HandleExceptionTrait;
-    
     /**
      * @var editor_Models_Task
      */
@@ -110,10 +108,6 @@ class editor_Models_Import_Worker_Import {
         //saving task twice is the simplest way to do this. has meta data is only available after import.
         $this->task->save();
         $this->events->trigger('importCleanup', $this, array('task' => $task));
-        
-        $import = ZfExtended_Factory::get('editor_Models_Import');
-        /* @var $import editor_Models_Import */
-        $import->triggerAfterImport($task);
     }
     
     /**
