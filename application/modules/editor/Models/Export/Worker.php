@@ -43,7 +43,6 @@ class editor_Models_Export_Worker extends ZfExtended_Worker_Abstract {
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        error_log(print_r($parameters,1));
         if(!isset($parameters['diff']) || !is_bool($parameters['diff'])) {
             return false;
         }
@@ -103,7 +102,8 @@ class editor_Models_Export_Worker extends ZfExtended_Worker_Abstract {
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($this->taskGuid);
         
-        $export = ZfExtended_Factory::get('editor_Models_Export');
+        $exportClass = 'editor_Models_Export';
+        $export = ZfExtended_Factory::get($exportClass);
         /* @var $export editor_Models_Export */
         $export->setTaskToExport($task, $parameters['diff']);
         if(isset($parameters['exportToFolder'])) {
@@ -112,6 +112,9 @@ class editor_Models_Export_Worker extends ZfExtended_Worker_Abstract {
         else {
             $export->exportToZip($parameters['zipFile']);
         }
+        //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
+        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array($exportClass));
+        $eventManager->trigger('afterExport', $this, array('task' => $task, 'parentWorkerId' => $this->workerModel->getId()));
         return true;
     }
 }

@@ -102,9 +102,6 @@ class editor_Models_Export {
             /* @var $parser editor_Models_Export_FileParser */
             $parser->saveFile();
         }
-        //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
-        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
-        $eventManager->trigger('afterExport', $this, array('task' => $this->task));
     }
     
     /**
