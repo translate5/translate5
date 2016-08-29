@@ -83,20 +83,28 @@ class editor_Models_Import {
         Zend_Registry::set('affected_taskGuid', $this->task->getTaskGuid()); //for TRANSLATE-600 only
         
         //pre import methods:
-        $dataProvider->setTask($this->task);
-        $dataProvider->checkAndPrepare();
-        $this->importConfig->importFolder = $dataProvider->getAbsImportPath();
-        
-        $this->importConfig->isValid($this->task->getTaskGuid());
-        
-        if(! $this->importConfig->hasRelaisLanguage()) {
-            //@todo in new rest api and / or new importwizard show ereror, if no relaislang is set, but relais data is given or viceversa (see translate5 featurelist)
+        try {
+            $dataProvider->setTask($this->task);
+            $dataProvider->checkAndPrepare();
+            $this->importConfig->importFolder = $dataProvider->getAbsImportPath();
             
-            //reset given relais language value if no relais data is provided / feature is off
-            $this->task->setRelaisLang(0); 
+            $this->importConfig->isValid($this->task->getTaskGuid());
+            
+            if(! $this->importConfig->hasRelaisLanguage()) {
+                //@todo in new rest api and / or new importwizard show ereror, if no relaislang is set, but relais data is given or viceversa (see translate5 featurelist)
+                
+                //reset given relais language value if no relais data is provided / feature is off
+                $this->task->setRelaisLang(0); 
+            }
+            
+            $this->task->save(); //Task erst Speichern wenn die obigen validates und checks durch sind.
         }
-        
-        $this->task->save(); //Task erst Speichern wenn die obigen validates und checks durch sind.
+        catch (Exception $e) {
+            //the DP exception handler is only needed before we have a valid task in the database, 
+            // after that the clean up is done implicitly by deleting the erroneous task, which is not possible before.
+            $dataProvider->handleImportException($e);
+            throw $e;
+        }
         $this->task->lock(NOW_ISO, true); //locks the task
 
         /*
