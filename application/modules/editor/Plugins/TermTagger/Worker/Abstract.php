@@ -39,6 +39,12 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
     // protected $blockingType = ZfExtended_Worker_Abstract::BLOCK_RESOURCE;
     
     /**
+     * Multiple workers are allowed to run simultaneously per task
+     * @var string
+     */
+    protected $onlyOncePerTask = false;
+    
+    /**
      * resourcePool for the different TermTagger-Operations;
      * Possible Values: $this->allowdResourcePools = array('default', 'gui', 'import');
      * @var string

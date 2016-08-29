@@ -71,7 +71,6 @@ class editor_Models_Export {
      * @param string $exportRootFolder
      */
     public function exportToFolder(string $exportRootFolder) {
-        //FIXME ensure that exportRootFolder is empty!
         $this->_exportToFolder($exportRootFolder);
     }
     
@@ -80,6 +79,14 @@ class editor_Models_Export {
      * @param string $exportRootFolder
      */
     protected function _exportToFolder(string $exportRootFolder) {
+        if(is_dir($exportRootFolder)) {
+            $this->cleaner($exportRootFolder);
+        }
+        
+        if(!file_exists($exportRootFolder) && !@mkdir($exportRootFolder, 0777, true)){
+            throw new Zend_Exception(sprintf('Temporary Export Folder could not be created! Task: %s Path: %s', $this->taskGuid, $exportRootFolder));
+        }
+        
         $session = new Zend_Session_Namespace();
         $treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
         /* @var $treeDb editor_Models_Foldertree */
@@ -145,20 +152,6 @@ class editor_Models_Export {
         $taskRoot = $this->task->getAbsoluteTaskDataPath();
         $exportRoot = $taskRoot.DIRECTORY_SEPARATOR.$this->taskGuid;
         
-        $cleaner = function() use ($exportRoot) {
-            $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-                'Recursivedircleaner'
-            );
-            $recursivedircleaner->delete($exportRoot);
-        };
-        
-        if(is_dir($exportRoot)) {
-            $cleaner();
-        }
-        
-        if(!file_exists($exportRoot) && !@mkdir($exportRoot, 0777, true)){
-            throw new Zend_Exception(sprintf('Temporary Export Folder could not be created! Task: %s Path: %s', $this->taskGuid, $exportRoot));
-        }
         $this->_exportToFolder($exportRoot,false);
         $filter = ZfExtended_Factory::get('Zend_Filter_Compress',array(
             array(
@@ -173,6 +166,13 @@ class editor_Models_Export {
         if(!$filter->filter($exportRoot)){
             throw new Zend_Exception('Could not create export-zip of task '.$this->taskGuid.'.');
         }
-        $cleaner();
+        $this->cleaner($exportRoot);
+    }
+    
+    protected function cleaner($directory) {
+        $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
+            'Recursivedircleaner'
+        );
+        $recursivedircleaner->delete($directory);
     }
 }
