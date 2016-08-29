@@ -44,7 +44,8 @@ class editor_Models_Export_ExportedWorker extends ZfExtended_Worker_Abstract {
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        return empty($parameters);
+        //can contain mixed content
+        return true;
     }
     
     /**
@@ -59,7 +60,7 @@ class editor_Models_Export_ExportedWorker extends ZfExtended_Worker_Abstract {
         //no unlocking or so here, since task locking on export and should be reworked so that a lockjing is not necessary anymore.
         
         $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
-        $eventManager->trigger('exportCompleted', $this, array('task' => $task));
+        $eventManager->trigger('exportCompleted', $this, array('task' => $task, 'parameters' => $this->workerModel->getParameters()));
         return true;
     }
 }

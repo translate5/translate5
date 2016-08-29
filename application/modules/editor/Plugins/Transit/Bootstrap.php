@@ -65,8 +65,8 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract {
     public function init() {
         $config = Zend_Registry::get('config');
         // event-listeners
-        $this->eventManager->attach('editor_Models_Import', 'beforeDirectoryParsing', array($this, 'handleTransitImportPreparation'));
-        $this->eventManager->attach('editor_Models_Import_DataProvider_Abstract', 'beforeArchiveImportedData', array($this, 'handleTransitImportCleanup'));
+        $this->eventManager->attach('editor_Models_Import_Worker_Import', 'beforeDirectoryParsing', array($this, 'handleTransitImportPreparation'));
+        $this->eventManager->attach('editor_Models_Import_Worker_Import', 'importCleanup', array($this, 'handleTransitImportCleanup'), -10);
         // end of event-listeners
         $this->proofReadDirName = $config->runtimeOptions->import->proofReadDirectory;
         $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
@@ -138,21 +138,21 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract {
     }
     
     /**
-     * 
      * @param string $job
      */
     protected function renameTargetFiles($job) {
         $iterator = new DirectoryIterator($this->importFolder.DIRECTORY_SEPARATOR.$this->proofReadDirName);
         /* @var $fileinfo DirectoryIterator */
         foreach ($iterator as $fileinfo) {
-            if($fileinfo->isFile()) {
-                if($fileinfo->getExtension()===$this->langInfo['target'] && $job === 'preparation'){
-                    rename($fileinfo->getPathname(),$fileinfo->getPathname().'.transit');
-                }
-                if($fileinfo->getExtension()==='transit' && $job === 'cleanup'){
-                    rename($fileinfo->getPathname(),  preg_replace('"\.transit$"i', '', $fileinfo->getPathname()));
-                }
-              }
+            if(!$fileinfo->isFile()) {
+                continue;
+            }
+            if($fileinfo->getExtension()===$this->langInfo['target'] && $job === 'preparation'){
+                rename($fileinfo->getPathname(),$fileinfo->getPathname().'.transit');
+            }
+            if($fileinfo->getExtension()==='transit' && $job === 'cleanup'){
+                rename($fileinfo->getPathname(),  preg_replace('"\.transit$"i', '', $fileinfo->getPathname()));
+            }
         }
     }
 }

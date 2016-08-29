@@ -197,14 +197,7 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
         
         $upload->initDataProvider("testcase",$importUpload);
         $dp = $upload->getDataProvider();
-        
-        try {
-            $import->import($dp);
-        }
-        catch (Exception $e) {
-            $import->handleImportException($e, $dp);
-            throw $e;
-        }
+        $import->import($dp);
     }
     public static function tearDownAfterClass() {
         parent::tearDownAfterClass();

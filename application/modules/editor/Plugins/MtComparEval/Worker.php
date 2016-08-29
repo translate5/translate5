@@ -90,7 +90,7 @@ class editor_Plugins_MtComparEval_Worker extends ZfExtended_Worker_Abstract {
         $worker = ZfExtended_Factory::get('editor_Plugins_MtComparEval_CheckStateWorker');
         /* @var $worker editor_Plugins_MtComparEval_CheckStateWorker */
         $worker->init(null);
-        $worker->queue();
+        $worker->queue($this->workerModel->getId());
         
         return true;
     }

@@ -28,7 +28,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Worker_Abstract {
+abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_Import_Worker_Abstract {
     
     /**
      * overwrites $this->workerModel->maxLifetime
@@ -37,6 +37,12 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
     
     // TEST: setting a different blocking-type
     // protected $blockingType = ZfExtended_Worker_Abstract::BLOCK_RESOURCE;
+    
+    /**
+     * Multiple workers are allowed to run simultaneously per task
+     * @var string
+     */
+    protected $onlyOncePerTask = false;
     
     /**
      * resourcePool for the different TermTagger-Operations;
@@ -105,9 +111,12 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
     /**
      * @todo forking should be transfered to ZfExtended_Worker_Abstract to make it usable for other workers.
      * it should be based on maxParallelProcesses instead of just having one running worker per slot. maxParallelProcesses is ignored so far.
+     * @param integer $parentId
      * @param string $state
+     * 
+     * @see ZfExtended_Worker_Abstract::queue()
      */
-    public function queue($state = NULL) {
+    public function queue($parentId = 0, $state = NULL) {
         $workerCountToStart = 0;
 
         $usedSlots = count($this->workerModel->getListSlotsCount(self::$resourceName));
@@ -123,8 +132,9 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends ZfExtended_Work
 
         for($i=0;$i<$workerCountToStart;$i++){
             $this->init($this->workerModel->getTaskGuid(), $this->workerModel->getParameters());
-            parent::queue($state);
+            parent::queue($parentId, $state);
         }
+        return $parentId; //since we can't return multiple ids, we just return the given parent again
     }
     /**
      * marks terms in the source with transFound, if translation is present in the target

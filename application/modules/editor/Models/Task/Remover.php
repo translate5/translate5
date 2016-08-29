@@ -113,7 +113,7 @@ class editor_Models_Task_Remover {
             throw $e;
         }
         
-        if($this->task->isLocked($taskGuid)) {
+        if($this->task->isLocked($taskGuid) && !$this->task->isErroneous()) {
             $e->setMessage("Die Aufgabe ist durch einen Benutzer gesperrt", true);
             throw $e; 
         }
