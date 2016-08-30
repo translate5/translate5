@@ -72,6 +72,12 @@ class editor_Models_Segment_MatchRateType {
     const TYPE_AUTO_ALIGNED = 'auto-aligned';
     
     /**
+     * When the target was in the same document
+     * @var string
+     */
+    const TYPE_DOCUMENT_MATCH = 'document-match';
+    
+    /**
      * When the given matchRateType is unknown (no mapping value found)
      * @var string
      */
