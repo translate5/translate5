@@ -88,7 +88,6 @@ class editor_Models_Import_DataProvider_Zip extends editor_Models_Import_DataPro
 	 * @see editor_Models_Import_DataProvider_Abstract::postImportHandler()
 	 */
 	public function postImportHandler() {
-	    parent::postImportHandler();
 	    $this->removeTempFolder();
 	}
 

@@ -120,10 +120,11 @@ abstract class editor_Models_Import_DataProvider_Abstract {
     }
     
     /**
-     * is called after import process by the import class. 
+     * is bound to importCleanup event after import process by the import class. 
+     * stub method, to be overridden.
      */
     public function postImportHandler() {
-        $this->archiveImportedData();
+        //intentionally empty
     }
     
     /**

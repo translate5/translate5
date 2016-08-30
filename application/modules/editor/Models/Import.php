@@ -86,6 +86,7 @@ class editor_Models_Import {
         try {
             $dataProvider->setTask($this->task);
             $dataProvider->checkAndPrepare();
+            $dataProvider->archiveImportedData();
             $this->importConfig->importFolder = $dataProvider->getAbsImportPath();
             
             $this->importConfig->isValid($this->task->getTaskGuid());
