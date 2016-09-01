@@ -1349,6 +1349,10 @@
   <source>Nach Bearbeitung: {0}</source>
   <target>After editing: {0}</target>
 </trans-unit>
+<trans-unit id='RGllIEF1ZmdhYmUga29ubnRlIGF1ZmdydW5kIHZvbiBGZWhsZXJuIG5pY2h0IGltcG9ydGllcnQgd2VyZGVuIQ=='>
+    <source>Die Aufgabe konnte aufgrund von Fehlern nicht importiert werden!</source>
+    <target>The task could not be imported due to errors!</target>
+</trans-unit>
     </body>
   </file>
 </xliff>
