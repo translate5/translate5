@@ -124,7 +124,7 @@ Ext.define('Editor.controller.admin.User', {
           grid = this.getUserGrid();
 
       if(logout) {
-          insertIdx = toolbar.items.indexOf(logout) + 1;
+          insertIdx = toolbar.items.indexOf(logout) + 2;
       }
       toolbar.insert(insertIdx, {
           itemId: 'user-admin-btn',
@@ -138,6 +138,8 @@ Ext.define('Editor.controller.admin.User', {
    */
   handleAfterShow: function() {
       this.getHeadToolBar().down('#user-admin-btn').hide();
+    //set the value used for displaying the help pages
+      Editor.data.helpSection = 'useroverview';
   },
   /**
    * handle after hide of usergrid
