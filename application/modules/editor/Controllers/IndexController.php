@@ -211,6 +211,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       
       $this->view->Php2JsVars()->set('preferences.alikeBehaviour', $rop->alike->defaultBehaviour);
       $this->view->Php2JsVars()->set('loginUrl', APPLICATION_RUNDIR.$rop->loginUrl);
+      
+      //inject helUrl variable used in frontend
+      $this->view->Php2JsVars()->set('helpUrl',$rop->helpUrl);
+      
       $this->view->Php2JsVars()->set('messageBox.delayFactor', $rop->messageBox->delayFactor);
       
       $this->view->Php2JsVars()->set('headerOptions.height', (int)$rop->headerOptions->height);

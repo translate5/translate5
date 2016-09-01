@@ -121,6 +121,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
     },
     handleAfterShow: function() {
         this.getHeadToolBar().down('#btnTmOverviewWindow').hide();
+        Editor.data.helpSection = 'matchresource';
     },
     handleAfterHide: function() {
         this.getHeadToolBar().down('#btnTmOverviewWindow').show();
@@ -132,7 +133,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
         this.getHeadToolBar().down('#btnTmOverviewWindow').show();
     },
     handleRenderHeadPanel: function() {
-        var pos = this.getTopMenu().items.length - 1;
+        var pos = this.getTopMenu().items.length - 2;
         this.getTopMenu().insert(pos, {
             xtype: 'button',
             itemId: 'btnTmOverviewWindow',
