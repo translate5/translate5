@@ -143,7 +143,7 @@ class editor_Models_Import_Configuration {
      * @return boolean
      */
     public function hasRelaisLanguage() {
-        !empty($this->relaisLang);
+        return !empty($this->relaisLang);
     }
 
     public function isValid($taskGuid) {
