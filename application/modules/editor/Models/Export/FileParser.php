@@ -195,10 +195,12 @@ abstract class editor_Models_Export_FileParser {
             
             $file = $this->writeMatchRate($file,$i);
             
-            $commentsId = $this->getSegmentComments($matches[1]);
-            
-            if(!empty($commentsId)){
-                $file = $this->writeCommentGuidToSegment($file, $i, $commentsId);
+            if($this->config->runtimeOptions->editor->export->exportComments) {
+                $commentsId = $this->getSegmentComments($matches[1]);
+                
+                if(!empty($commentsId)){
+                    $file = $this->writeCommentGuidToSegment($file, $i, $commentsId);
+                }
             }
 
             $i = $i + 2;
