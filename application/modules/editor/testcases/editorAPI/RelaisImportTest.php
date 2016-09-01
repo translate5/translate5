@@ -96,7 +96,6 @@ class RelaisImportTest extends \ZfExtended_Test_ApiTestcase {
         //open task for whole testcase
         self::$api->login('testmanager');
         self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
-        return;
         self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
     }
 }
