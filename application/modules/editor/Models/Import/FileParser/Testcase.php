@@ -93,13 +93,11 @@ class editor_Models_Import_FileParser_Testcase extends editor_Models_Import_File
         $target = $this->qp->find('testcase > assertion > input > target');
 
         $this->segmentData[$sourceName] = array(
-            'original' => $source->innerHTML(),
-            'originalMd5' => md5($source->innerHTML())
+            'original' => $source->innerHTML()
         );
 
         $this->segmentData[$targetName] = array(
-            'original' => $target->innerHTML(),
-            'originalMd5' => md5($target->innerHTML())
+            'original' => $target->innerHTML()
         );
         $segmentId = $this->setAndSaveSegmentValues();
         $tempTargetPlaceholder = $this->getFieldPlaceholder($segmentId, $targetName);
