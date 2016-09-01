@@ -161,6 +161,7 @@ class editor_Models_Import_Worker_Import {
         $filelist = $this->filelist->processProofreadAndReferenceFiles($this->importConfig->getProofReadDir());
         
         $mqmProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_MqmParser', array($this->task, $this->segmentFieldManager));
+        $repHash = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_RepetitionHash', array($this->task, $this->segmentFieldManager));
         $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_ProofRead', array($this->task, $this->importConfig));
         /* @var $segProc editor_Models_Import_SegmentProcessor_ProofRead */
         foreach ($filelist as $fileId => $path) {
@@ -172,6 +173,7 @@ class editor_Models_Import_Worker_Import {
             /* @var $parser editor_Models_Import_FileParser */
             $segProc->setSegmentFile($fileId, $params[1]); //$params[1] => filename
             $parser->addSegmentProcessor($mqmProc);
+            $parser->addSegmentProcessor($repHash);
             $parser->addSegmentProcessor($segProc);
             $parser->parseFile();
             $this->countWords($parser->getWordCount());
@@ -237,6 +239,7 @@ class editor_Models_Import_Worker_Import {
         $relayFiles = $this->filelist->processRelaisFiles();
         
         $mqmProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_MqmParser', array($this->task, $this->segmentFieldManager));
+        $repHash = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_RepetitionHash', array($this->task, $this->segmentFieldManager));
         $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_Relais', array($this->task, $this->segmentFieldManager));
         /* @var $segProc editor_Models_Import_SegmentProcessor_Relais */
         foreach ($relayFiles as $fileId => $path) {
@@ -248,6 +251,7 @@ class editor_Models_Import_Worker_Import {
             /* @var $parser editor_Models_Import_FileParser */
             $segProc->setSegmentFile($fileId, $params[1]);  //$params[1] => filename
             $parser->addSegmentProcessor($mqmProc);
+            $parser->addSegmentProcessor($repHash);
             $parser->addSegmentProcessor($segProc);
             $parser->parseFile();
     	}

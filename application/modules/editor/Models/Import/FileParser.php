@@ -403,7 +403,16 @@ abstract class editor_Models_Import_FileParser {
     protected function setAndSaveSegmentValues(){
         $this->setCalculatedSegmentAttributes();
         $result = false;
+            
+        foreach($this->segmentData as &$field) {
+            //preset the md5 field with the plain string
+            //the different processors have then the ability to modify it
+            //the final segment processor creates then the hash before storing it into the DB
+            $field['originalMd5'] = $field['original'];
+        }
+        
         foreach($this->segmentProcessor as $p) {
+            /* @var $p editor_Models_Import_SegmentProcessor */
             $r = $p->process($this);
             if($r !== false) {
                 $result = $r;
@@ -587,7 +596,7 @@ abstract class editor_Models_Import_FileParser {
     }
 
     /**
-     * returns a reference to the array with alle parsed data fields
+     * returns a reference to the array with all parsed data fields
      * The reference enables the ability to manipulate the parsed data in the segmentprocessors (see MqmParser)
      * @see editor_Models_Import_SegmentProcessor_MqmParser
      */
