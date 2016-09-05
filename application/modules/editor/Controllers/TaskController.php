@@ -283,9 +283,8 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     public function postAction() {
         $this->entity->init();
-        //FIXME woher kommt der default workflow des tasks beim import???
         //$this->decodePutData(); → not needed, data was set directly out of params because of file upload
-        $this->data = $this->_getAllParams();
+        $this->data = $this->getAllParams();
         settype($this->data['wordCount'], 'integer');
         settype($this->data['enableSourceEditing'], 'boolean');
         settype($this->data['lockLocked'], 'integer');
@@ -333,13 +332,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $import->setTask($this->entity);
         $dp = $this->upload->getDataProvider();
         
-        try {
-            $import->import($dp);
-        }
-        catch (Exception $e) {
-            $import->handleImportException($e, $dp);
-            throw $e;
-        }
+        $import->import($dp);
     }
     
     /**
@@ -528,9 +521,6 @@ class editor_TaskController extends ZfExtended_RestController {
      * @param boolean $editOnly if set to true returns true only if its a real editing (not readonly) request
      * @param boolean $viewOnly if set to true returns true only if its a readonly request
      * 
-     * FIXME Diese Methode und die noch nicht existierende isCloseTaskRequest in den Workflow packen und in this->closeAndUnlock integrieren.
-     *          Dabei auch die fehlenden task stati waiting, end,open mit in isCloseTaskRequest integrieren !
-     *           Ebenfalls die STATES nach workflow abstract umziehen, States dokumentieren.
      * @return boolean
      */
     protected function isOpenTaskRequest($editOnly = false,$viewOnly = false) {
@@ -735,7 +725,10 @@ class editor_TaskController extends ZfExtended_RestController {
     
     public function deleteAction() {
         $this->entityLoad();
-        $this->checkStateAllowsActions();
+        //if task is erroneous then it is also deleteable, regardless of its locking state
+        if(!$this->entity->isErroneous()){
+            $this->checkStateAllowsActions();
+        }
         $this->processClientReferenceVersion();
         $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array($this->entity));
         /* @var $remover editor_Models_Task_Remover */
@@ -752,32 +745,46 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $diff = (boolean)$this->getRequest()->getParam('diff');
 
-        $export = ZfExtended_Factory::get('editor_Models_Export');
-        /* @var $export editor_Models_Export */
+        $worker = ZfExtended_Factory::get('editor_Models_Export_Worker');
+        /* @var $worker editor_Models_Export_Worker */
+        $zipFile = $worker->initZipExport($this->entity, $diff);
+        $workerId = $worker->queue();
         
-        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        /* @var $translate ZfExtended_Zendoverwrites_Translate */;
+        //FIXME multiple problems here
+        // it is possible that we get the following in DB (implicit ordererd by ID here):
+        //      Export_Worker for ExportReq1
+        //      Export_Worker for ExportReq2 → overwrites the tempExportDir of ExportReq1
+        //      Export_ExportedWorker for ExportReq2 
+        //      Export_ExportedWorker for ExportReq1 → works then with tempExportDir of ExportReq1 instead!
+        // 
+        // If we implement in future export workers which need to work on the temp export data, 
+        //  we have to ensure that each export worker get its own export directory. 
         
-        if(!$export->setTaskToExport($this->entity, $diff)){
-            //@todo: this should show up in JS-Frontend in a nice way
-            echo $translate->_(
-                    'Derzeit läuft bereits ein Export für diesen Task. Bitte versuchen Sie es in einiger Zeit nochmals.');
-            exit;
-        }
-        $zipFile = $export->exportToZip();
+        $worker = ZfExtended_Factory::get('editor_Models_Export_ExportedWorker');
+        /* @var $worker editor_Models_Export_ExportedWorker */
+        $worker->init($this->entity->getTaskGuid());
+        //TODO for the API usage of translate5 blocking on export makes no sense
+        // better would be a URL to fetch the latest export or so (perhaps using state 202?)
+        $worker->setBlocking(); //we have to wait for the underlying worker to provide the download
+        $worker->queue($workerId);
+        
         if($diff) {
+            $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+            /* @var $translate ZfExtended_Zendoverwrites_Translate */;
             $suffix = $translate->_(' - mit Aenderungen nachverfolgen.zip');
         }
         else {
             $suffix = '.zip';
         }
-
+        
         // disable layout and view
         $this->view->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
         header('Content-Type: application/zip', TRUE);
         header('Content-Disposition: attachment; filename="'.$this->entity->getTasknameForDownload($suffix).'"');
         readfile($zipFile);
+        //rename file after usage to export.zip to keep backwards compatibility
+        rename($zipFile, dirname($zipFile).DIRECTORY_SEPARATOR.'export.zip');
         exit;
     }
     
@@ -795,7 +802,7 @@ class editor_TaskController extends ZfExtended_RestController {
      * @throws ZfExtended_Models_Entity_Conflict
      */
     protected function checkStateAllowsActions() {
-        if($this->entity->isExclusiveState() && $this->entity->isLocked($this->entity->getTaskGuid())) {
+        if($this->entity->isErroneous() || $this->entity->isExclusiveState() && $this->entity->isLocked($this->entity->getTaskGuid())) {
             throw new ZfExtended_Models_Entity_Conflict('Der aktuelle Status der Aufgabe verbietet diese Aktion!');
         }
     }

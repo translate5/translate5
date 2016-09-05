@@ -488,7 +488,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     public function loadByFileidMid(integer $fileId, $mid) {
         $taskGuid = $this->getTaskGuid();
         $s = $this->db->select()->from($this->tableName, array('id'));
-        $s = $this->addWatchlistJoin($s);
         $segmentId = new Zend_Db_Expr('('.$s
                             ->where($this->tableName.'.taskGuid = ?', $taskGuid)
                             ->where($this->tableName.'.fileId = ?', $fileId)
@@ -510,8 +509,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         /* @var $db editor_Models_Db_SegmentData */
 
         $taskGuid = $this->getTaskGuid();
-        $s = $this->db->select()->from($this->tableName, array('id'));
-        $s = $this->addWatchlistJoin($s);
         $segmentId = $this->getId();
         if(is_null($segmentId)){
             $this->loadByFileidMid($fileId, $mid);

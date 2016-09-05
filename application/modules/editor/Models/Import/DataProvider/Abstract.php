@@ -42,6 +42,7 @@ abstract class editor_Models_Import_DataProvider_Abstract {
     protected $task;
     protected $taskPath;
     protected $importFolder;
+    
     /**
      * DataProvider specific Checks (throwing Exceptions) and actions to prepare import data
      */
@@ -119,13 +120,11 @@ abstract class editor_Models_Import_DataProvider_Abstract {
     }
     
     /**
-     * is called after import process by the import class. 
+     * is bound to importCleanup event after import process by the import class. 
+     * stub method, to be overridden.
      */
     public function postImportHandler() {
-        //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
-        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
-        $eventManager->trigger('beforeArchiveImportedData', $this, array());
-        $this->archiveImportedData();
+        //intentionally empty
     }
     
     /**
@@ -133,4 +132,24 @@ abstract class editor_Models_Import_DataProvider_Abstract {
      * To be overridden.
      */
     public function handleImportException(Exception $e) {}
+    
+    /**
+     * magic method to restore events after serialization
+     *  since import is done in a worker, binding the events in __wakeup is sufficient, 
+     *  in __construct this is not needed so far!
+     */
+    public function __wakeup() {
+        $eventManager = Zend_EventManager_StaticEventManager::getInstance();
+        /* @var $eventManager Zend_EventManager_StaticEventManager */
+        //must be called before default cleanup (which has priority 1)
+        $eventManager->attach('editor_Models_Import_Worker_Import', 'importCleanup', array($this, 'postImportHandler'), -100);
+        
+        //restoring the taskPath as SPLInfo
+        $this->taskPath = new SplFileInfo($this->taskPath);
+    }
+    
+    public function __sleep() {
+        $this->taskPath = (string) $this->taskPath;
+        return ['importFolder', 'taskPath'];
+    }
 }

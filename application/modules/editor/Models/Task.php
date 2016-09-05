@@ -484,15 +484,39 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @throws Zend_Exception if something went wrong
      */
     public function unlock() {
-        $update = array(
+        $where = array('taskGuid = ? and locked is not null'=>$this->getTaskGuid());
+        $data = array(
             'locked' => NULL,
             'lockedInternalSessionUniqId' => NULL,
             'lockingUser' => NULL,
         );
-        $where = array('taskGuid = ? and locked is not null'=>$this->getTaskGuid());
-        
         //check how many rows are updated
-        return $this->db->update($update, $where) !== 0;
+        return $this->db->update($data, $where) !== 0;
+    }
+    
+    /**
+     * marks the task erroneous and unlocks its
+     * @return boolean false if task had not been updated or does not exist, 
+     * @throws Zend_Exception if something went wrong
+     */
+    public function setErroneous() {
+        $data = [
+            'state' => self::STATE_ERROR,
+            'locked' => NULL,
+            'lockedInternalSessionUniqId' => NULL,
+            'lockingUser' => NULL
+        ];
+        $where = array('taskGuid = ?'=>$this->getTaskGuid());
+        //check how many rows are updated
+        return $this->db->update($data, $where) !== 0;
+    }
+    
+    /**
+     * returns if tasks has import errors
+     * @return boolean
+     */
+    public function isErroneous() {
+        return $this->getState() == self::STATE_ERROR;
     }
     
     /**

@@ -167,7 +167,6 @@ class editor_Models_Import_DataProvider_SingleUploads  extends editor_Models_Imp
      * @see editor_Models_Import_DataProvider_Abstract::postImportHandler()
      */
     public function postImportHandler() {
-        parent::postImportHandler();
         $this->removeTempFolder();
     }
 

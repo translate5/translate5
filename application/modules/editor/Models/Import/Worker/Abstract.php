@@ -28,34 +28,33 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
- * Plugin Bootstrap for Missing Target Terminology Plugin
- * depends on editor_Plugins_SegmentStatistics_Bootstrap
+ * Contains the Import Worker (the scheduling parts)
+ * The import process itself is encapsulated in editor_Models_Import_Worker_Import
  */
-class editor_Plugins_NoMissingTargetTerminology_Bootstrap extends ZfExtended_Plugin_Abstract {
-    
-    public function init() {
-        $this->dependsOn('editor_Plugins_SegmentStatistics_Bootstrap');
-        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'),-100);
-    }
-    
+abstract class editor_Models_Import_Worker_Abstract extends ZfExtended_Worker_Abstract {
     /**
-     * handler for event: editor_Models_Import#afterImport
-     * @param $event Zend_EventManager_Event
+     * @var editor_Models_Task
      */
-    public function handleAfterImport(Zend_EventManager_Event $event) {
-        $task = $event->getParam('task');
-        /* @var $task editor_Models_Task */
+    protected $task;
+    
+    public function init($taskGuid = NULL, $parameters = array()) {
+        $this->task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $ class */
+        $this->task->loadByTaskGuid($taskGuid);
         
-        $worker = ZfExtended_Factory::get('editor_Plugins_NoMissingTargetTerminology_Worker');
-        /* @var $worker editor_Plugins_NoMissingTargetTerminology_Worker */
-        $worker->init($task->getTaskGuid());
-        $worker->queue($event->getParam('parentWorkerId'));
+        if(!$this->task->isErroneous()) {
+            return parent::init($taskGuid, $parameters);
+        }
+        
+        //we set the worker to defunct when task has errors
+        $wm = $this->workerModel;
+        if(isset($wm)){
+            $wm->setState($wm::STATE_DEFUNCT);
+            $wm->save();
+        }
+        //if no worker model is set, we don't have to call parent / init a worker model,
+        // since we don't even need it in the DB when the task already has errors
+        return false;
     }
 }

@@ -168,7 +168,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
                                 , __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }
-        $worker->queue();
+        $worker->queue($this->workerModel->getParentId());
     }
     
     /**

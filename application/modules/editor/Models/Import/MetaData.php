@@ -49,18 +49,11 @@ class editor_Models_Import_MetaData {
      * @var editor_Models_Task
      */
     protected $task;
+    
     /**
-     * @var string
+     * @var editor_Models_Import_Configuration
      */
-    protected $importPath;
-    /**
-     * @var editor_Models_Languages
-     */
-    protected $sourceLang;
-    /**
-     * @var editor_Models_Languages
-     */
-    protected $targetLang;
+    protected $config;
 
     /**
      * Liste mit den aufgerufenen Importern
@@ -85,42 +78,37 @@ class editor_Models_Import_MetaData {
     protected $hasMetaData = array();
 
     /**
-     * Erhält als Parameter die zu importierenden Sprachen
-     * @param editor_Models_Languages $sourceLang
-     * @param editor_Models_Languages $targetLang
+     * @param editor_Models_Import_Configuration $config
      */
-    public function __construct(editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang){
-        $this->sourceLang = $sourceLang;
-        $this->targetLang = $targetLang;
+    public function __construct(editor_Models_Import_Configuration $config){
+        $this->config = $config;
     }
 
     /**
      * @return editor_Models_Languages
      */
     public function getSourceLang() {
-        return $this->sourceLang;
+        return $this->config->sourceLang;
     }
     /**
      * @return editor_Models_Languages
      */
     public function getTargetLang() {
-        return $this->targetLang;
+        return $this->config->targetLang;
     }
     /**
      * @return string
      */
     public function getImportPath() {
-        return $this->importPath;
+        return $this->config->importFolder;
     }
     
     /**
      * initiiert die Suche nach und dann den import von MetaDaten zum Projekt
      * @param editor_Models_Task $task
-     * @param string $importPath
      */
-    public function import(editor_Models_Task $task, string $importPath) {
+    public function import(editor_Models_Task $task) {
         $this->task = $task;
-        $this->importPath = $importPath;
         
         $this->importTaskTemplateXml();
         
@@ -150,7 +138,7 @@ class editor_Models_Import_MetaData {
         if(isset($this->cache[$filterRegex])){
             return $this->cache[$filterRegex];
         }
-        $directory = new DirectoryIterator($this->importPath);
+        $directory = new DirectoryIterator($this->config->importFolder);
         $it = new RegexIterator($directory, $filterRegex);
         $list = array();
         foreach($it as $file){
@@ -177,7 +165,7 @@ class editor_Models_Import_MetaData {
      */
     protected function importTaskTemplateXml() {
         Zend_Registry::set('taskTemplate', array());
-        $templateFilename = $this->importPath.'/'.$this->filenameTaskTemplate;
+        $templateFilename = $this->config->importFolder.'/'.$this->filenameTaskTemplate;
         
         if (file_exists($templateFilename)) {
             try {

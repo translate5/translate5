@@ -56,67 +56,37 @@ class editor_Models_Export {
     protected $optionDiff;
 
     /**
-     * 
      * @param editor_Models_Task $task
      * @param boolean $diff
-     * @param boolean $setExportRunningStamp, default true
-     * @return boolean
      */
-    public function setTaskToExport(editor_Models_Task $task, boolean $diff, 
-            $setExportRunningStamp = true) {
+    public function setTaskToExport(editor_Models_Task $task, bool $diff) {
         $this->task = $task;
         $this->taskGuid = $task->getTaskGuid();
         Zend_Registry::set('affected_taskGuid', $this->taskGuid); //for TRANSLATE-600 only
         $this->optionDiff = $diff;
-        return (!$this->exportFolderExists() && (!$setExportRunningStamp || $this->setExportRunningStamp()));
     }
-    /**
-     * sets a timestamp in LEK_task for the task, if timestamp column is null
-     * @return boolean
-     * @throws Zend_Exception
-     */
-    protected function setExportRunningStamp() {
-        $rowsUpdated = $this->task->db->update(array('exportRunning'=>  date('Y-m-d H:i:s',time())), 
-                array('taskGuid = ? and exportRunning is null'=>$this->taskGuid));
-        if($rowsUpdated===0)return false;
-        if($rowsUpdated===1)return true;
-        throw new Zend_Exception(
-                'More then 1 row updated when setExportRunningStamp in LEK_task. Number or rows updated for task '.
-            $this->taskGuid.' : '.$rowsUpdated);
-    }
-    /**
-     * unsets a timestamp (sets it to NULL) in LEK_task for the task, if timestamp column is not null
-     * @return boolean
-     * @throws Zend_Exception
-     */
-    protected function unsetExportRunningStamp() {
-        $rowsUpdated = $this->task->db->update(array('exportRunning'=>  NULL), 
-                array('taskGuid = ? and exportRunning is not null'=> $this->taskGuid));
-        if($rowsUpdated===0)return false;
-        if($rowsUpdated===1)return true;
-        throw new Zend_Exception('More then 1 row updated when unsetExportRunningStamp', 
-                'Number or rows updated for task '.
-            $this->taskGuid.' : '.$rowsUpdated);
-    }
-
 
     /**
      * exports a task
      * @param string $exportRootFolder
-     * @param boolean $unsetExportRunningStamp, default true
      */
-    public function exportToFolder(string $exportRootFolder, $unsetExportRunningStamp = true) {
-        $this->_exportToFolder($exportRootFolder, $unsetExportRunningStamp);
-        $this->startExportedWorker();
+    public function exportToFolder(string $exportRootFolder) {
+        $this->_exportToFolder($exportRootFolder);
     }
     
     /**
      * internal method to export a task to a folder
      * @param string $exportRootFolder
-     * @param string $unsetExportRunningStamp
      */
-    public function _exportToFolder(string $exportRootFolder, $unsetExportRunningStamp) {
-        $this->exportFolderExists(true);
+    protected function _exportToFolder(string $exportRootFolder) {
+        if(is_dir($exportRootFolder)) {
+            $this->cleaner($exportRootFolder);
+        }
+        
+        if(!file_exists($exportRootFolder) && !@mkdir($exportRootFolder, 0777, true)){
+            throw new Zend_Exception(sprintf('Temporary Export Folder could not be created! Task: %s Path: %s', $this->taskGuid, $exportRootFolder));
+        }
+        
         $session = new Zend_Session_Namespace();
         $treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
         /* @var $treeDb editor_Models_Foldertree */
@@ -139,12 +109,6 @@ class editor_Models_Export {
             /* @var $parser editor_Models_Export_FileParser */
             $parser->saveFile();
         }
-        if($unsetExportRunningStamp) {
-            $this->unsetExportRunningStamp();
-        }
-        //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
-        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
-        $eventManager->trigger('afterExport', $this, array('task' => $this->task));
     }
     
     /**
@@ -184,62 +148,31 @@ class editor_Models_Export {
      * returns the path to the generated Zip File
      * @return string
      */
-    public function exportToZip() {
-        $this->exportFolderExists(true);
+    public function exportToZip(string $zipFile) {
         $taskRoot = $this->task->getAbsoluteTaskDataPath();
         $exportRoot = $taskRoot.DIRECTORY_SEPARATOR.$this->taskGuid;
-        if(!file_exists($exportRoot) && !@mkdir($exportRoot, 0777, true)){
-            throw new Zend_Exception(sprintf('Temporary Export Folder could not be created! Task: %s Path: %s', $this->taskGuid, $exportRoot));
-        }
+        
         $this->_exportToFolder($exportRoot,false);
-        $zipFile = $taskRoot.DIRECTORY_SEPARATOR.'export.zip';
         $filter = ZfExtended_Factory::get('Zend_Filter_Compress',array(
             array(
                     'adapter' => 'Zip',
                     'options' => array(
                         'archive' => $zipFile
-                    ),
+                    )
                 )
             )
         );
+        /* @var $filter Zend_Filter_Compress */
         if(!$filter->filter($exportRoot)){
             throw new Zend_Exception('Could not create export-zip of task '.$this->taskGuid.'.');
         }
+        $this->cleaner($exportRoot);
+    }
+    
+    protected function cleaner($directory) {
         $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
             'Recursivedircleaner'
         );
-        $recursivedircleaner->delete($exportRoot);
-        $this->unsetExportRunningStamp();
-        
-        $this->startExportedWorker();
-        
-        return $zipFile;
-    }
-    
-    /**
-     * Starts the final worker which runs after every export related work
-     */
-    protected function startExportedWorker() {
-        $worker = ZfExtended_Factory::get('editor_Models_Export_ExportedWorker');
-        /* @var $worker editor_Models_Export_ExportedWorker */
-        $worker->init($this->task->getTaskGuid());
-        $worker->queue();
-    }
-    
-    /**
-     * 
-     * @param boolean $throwException if folder exists
-     * @return boolean
-     */
-    protected function exportFolderExists($throwException = false) {
-        $taskRoot = $this->task->getAbsoluteTaskDataPath();
-        $exportRoot = $taskRoot.DIRECTORY_SEPARATOR.$this->taskGuid;
-        if(file_exists($exportRoot) && count(scandir($exportRoot)) > 2){
-            if($throwException){
-                throw new Zend_Exception(sprintf('Temporary Export Folder already exists! Task: %s Path: %s', $this->taskGuid, $exportRoot));
-            }
-            return true;
-        }
-        return false;
+        $recursivedircleaner->delete($directory);
     }
 }

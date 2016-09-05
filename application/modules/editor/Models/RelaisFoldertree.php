@@ -91,7 +91,9 @@ class editor_Models_RelaisFoldertree extends editor_Models_Foldertree {
         $this->relaisRootPath = $importFolder.DIRECTORY_SEPARATOR.$this->_pathPrefix;
     	$this->getFilePathsNodeVisitor($this->objectTree);
         $this->checkCall = false;
-        return $this->_paths;
+        return array_filter($this->_paths, function($path) {
+            return $this->isFileToImport($path);
+        });
     }
     
     /**
@@ -132,18 +134,10 @@ class editor_Models_RelaisFoldertree extends editor_Models_Foldertree {
     }
     
     /**
-     * Gibt eine Array mit allen Relais File Stati zu den ProofRead Dateien zurück 
-     * @return array
-     */
-    public function getRelaisFileStati() {
-        return $this->relaisFilesStati;
-    }
-    
-    /**
      * @param string $path
      * @return boolean
      */
-    public function isFileToImport(string $path) {
+    protected function isFileToImport(string $path) {
         return isset($this->relaisFilesStati[$path]) &&
             $this->relaisFilesStati[$path] == self::RELAIS_NOT_IMPORTED;  
     }

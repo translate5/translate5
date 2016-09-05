@@ -72,6 +72,12 @@ class editor_Models_Segment_MatchRateType {
     const TYPE_AUTO_ALIGNED = 'auto-aligned';
     
     /**
+     * When the target was in the same document
+     * @var string
+     */
+    const TYPE_DOCUMENT_MATCH = 'document-match';
+    
+    /**
      * When the given matchRateType is unknown (no mapping value found)
      * @var string
      */
@@ -150,10 +156,10 @@ class editor_Models_Segment_MatchRateType {
     /**
      * generates the matchrate type by imported data
      * @param string $importedValue the plain value from 
-     * @param string $mid segment mid for logging purposes only
+     * @param mixed $mid segment mid for logging purposes only
      * @return editor_Models_Segment_MatchRateType
      */
-    public function parseImport(string $importedValue, string $mid){
+    public function parseImport(string $importedValue, $mid){
         $this->data = [self::PREFIX_IMPORT];
         if(empty($importedValue) || $importedValue == self::PREFIX_IMPORT) {
             return $this;
@@ -164,7 +170,7 @@ class editor_Models_Segment_MatchRateType {
         
         if(empty($value) || $this->isValidType($value) === false) {
             //logs the info when a unknown matchrate type:
-            //self::$log->logError('The given matchrate type '.$value.' in Segment MID '.$mid.' is unknown!');
+            self::$log->logError('The given matchrate type '.$value.' in Segment MID '.$mid.' is unknown!');
             $this->data[] = self::TYPE_UNKNOWN;
         }
         $this->data[] = $value;

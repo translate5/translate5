@@ -60,7 +60,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             $worker = ZfExtended_Factory::get('ZfExtended_Worker_GarbageCleaner');
             /* @var $worker ZfExtended_Worker_GarbageCleaner */
             $worker->init();
-            $worker->queue();
+            $worker->queue(); // not parent ID here, since the GarbageCleaner should run without a parent relation
         }, 0);
         
     }
