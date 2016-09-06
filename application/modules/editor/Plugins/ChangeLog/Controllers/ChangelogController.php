@@ -51,9 +51,19 @@ class editor_Plugins_ChangeLog_ChangelogController extends ZfExtended_RestContro
      * @see ZfExtended_RestController::indexAction()
      */
     public function indexAction(){
-        parent::indexAction();
-        $this->view->rows = $this->entity->loadAll();
-        $this->view->total = $this->entity->getTotalCount();
+        $user = new Zend_Session_Namespace('user');
+        $userId = $user->data->id;
+        
+        $changeLogArray = $this->entity->getChangeLogForUser($userId);
+        
+        if(!empty($changeLogArray)){
+	        $lastInsertedid=max(array_column($changeLogArray, 'id'));
+    	    $this->entity->updateChangelogUserInfo($userId, $lastInsertedid);
+	        $this->view->rows = $changeLogArray;
+	        $this->view->total = count($changeLogArray);
+        }
+        
+        //$this->view->rows = $this->entity->loadAll();
     }
     
     private function prepareTaskInfo() {

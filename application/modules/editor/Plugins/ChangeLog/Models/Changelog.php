@@ -41,4 +41,24 @@ class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity
 //    public function loadAll() {
 //        return $this->load(1);
 //    }
+
+    /***
+     * This will return unlisted changelogs for user
+     */
+    public function getChangeLogForUser($userId){
+    	$s = $this->db->select()
+    	->from(array("cl" => "translate5.LEK_change_log"), array("cl.*"))
+    	->setIntegrityCheck(false)
+    	->joinLeft(array("ucl" => "translate5.LEK_user_changelog_info"),"cl.userGroup = ucl.userId","")
+    	->where('IF(ucl.id>=0,cl.id > ucl.changelogId,1=1)')
+    	->where('cl.userGroup=?',$userId);
+    	return $this->db->fetchAll($s)->toArray();
+    }
+    
+    public function updateChangelogUserInfo($userId,$changelogId){
+    	$db = $this->db->getAdapter();
+    	$sql = 'REPLACE INTO LEK_user_changelog_info (userId,changelogId) '.
+    		   'VALUES('.$db->quote($userId, 'INTEGER').','.$db->quote($changelogId, 'INTEGER').')';
+    	$db->query($sql);
+    }
 }
