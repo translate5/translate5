@@ -43,37 +43,43 @@ Ext.define('Editor.plugins.ChangeLog.controller.Changelog', {
   views: ['Editor.plugins.ChangeLog.view.Changelog'],
   models: ['Editor.plugins.ChangeLog.model.Changelog'],
   stores:['Editor.plugins.ChangeLog.store.Changelog'],
+  refs:[{
+      ref: 'ChangeLogWindow',
+      selector: '#changeLogWindow'
+  }],
   listen: {
       component:{
     	'#adminTaskGrid':{
     		render:'addButtonToTaskOverviewToolbar'
     	},
-    	'#changeLogWindow':{
-    		afterrender:'changeLodWindowAfterRender'
+    	'#btnCloseWindow':{
+    		click:'btnCloseWindowClick'
     	}
-      },
-	  controller: {
-          '#Editor.$application': {
-              editorViewportOpened: 'afterInitEditor'
-          }
       }
   },
-  afterInitEditor: function() {
+  init: function(){
+	    var me = this;
+	    var store = me.getEditorPluginsChangeLogStoreChangelogStore();
+	    store.on({
+	        scope: me,
+	        load: me.storeLoadFinished
+	    });
+	    me.callParent(arguments);
+  },
+  storeLoadFinished: function(store, records , successful , operation , eOpts){
+	  if(records && records.length>0){
+		  var win = Ext.widget('changeLogWindow',{changeLogStore: store});
+		  win.show();
+	  }
   },
   addButtonToTaskOverviewToolbar:function(panel,event){
 	  var me=this,
 	  	  pageingToolbar = panel.getComponent('pageingtoolbar');
-	  
-	  
 	  pageingToolbar.add({
 		  xtype:'button',
 	      text: Editor.data.debug && Editor.data.debug.version,
 	      listeners: {
-	          click: function() {
-	              var win = Ext.widget('changeLogWindow',{changeLogStore: me.getEditorPluginsChangeLogStoreChangelogStore()});
-	              win.show();
-	    	      
-	          }
+	          click:me.changeLogButtonClick
 	          //mouseover: function() {
 	        	//  this.setTooltip(Editor.data.debug && Editor.data.debug.version + ' (ext '+Ext.getVersion().version+')');
 	              // set a new config which says we moused over, if not already set
@@ -85,15 +91,26 @@ Ext.define('Editor.plugins.ChangeLog.controller.Changelog', {
 	      }
 	  });
   },
-  changeLodWindowAfterRender:function(window,event){
-	/*  var me=this,
-	  		clgrid=window.down('grid');
-	  clgrid.getStore().load({
-		  scope:this,
-		  callback:function(records, operation, success){
-			  console.log(records);
+  changeLogButtonClick:function(){
+	  var me=this,
+	  	  win,
+	  	  store = Ext.create('Ext.data.Store', {
+	  		  model: 'Editor.plugins.ChangeLog.model.Changelog'
+	  	  });
+	  store.load({
+		  params: {
+              filter: '[{"operator":"=","value":true,"property":"loadAll"}]'
+          },
+          scope: me,
+          callback: function(records, operation, success) {
+        	  if(records && records.length>0){
+        		  win = Ext.widget('changeLogWindow',{changeLogStore: store});
+        		  win.show();
+        	  }
 		  }
-	  });
-	  */
+		});
+  },
+  btnCloseWindowClick:function(){
+	  this.getChangeLogWindow().close();
   }
 });

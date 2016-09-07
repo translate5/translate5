@@ -1,4 +1,6 @@
 <?php
+use QueryPath\CSS\NotImplementedException;
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -46,6 +48,13 @@ class editor_Plugins_ChangeLog_ChangelogController extends ZfExtended_RestContro
      */
     protected $groupedTaskInfo = array();
     
+    private $aclRoleValue = array(
+    		"noRights"=>0,
+    		"basic"=>1,
+    		"editor"=>2,
+    		"pm"=>4,
+    		"admin"=>8
+    );
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
@@ -53,65 +62,47 @@ class editor_Plugins_ChangeLog_ChangelogController extends ZfExtended_RestContro
     public function indexAction(){
         $user = new Zend_Session_Namespace('user');
         $userId = $user->data->id;
+        $userGroup = $this->getUsergroup($user);
+
+        $filter = $this->entity->getFilter();
         
-        $changeLogArray = $this->entity->getChangeLogForUser($userId);
+        if($filter->hasFilter('loadAll', $loadAll)) {//FIXME the filter in frontend is set to a boolean type but here come as numeric
+        	$changeLogArray = $this->entity->getChangelogForUserGroup($userGroup);
+        	$this->view->rows = $changeLogArray;
+        	$this->view->total = count($changeLogArray);
+        	return ;
+        }
+        
+        $changeLogArray = $this->entity->getChangeLogForUser($userId,$userGroup);
         
         if(!empty($changeLogArray)){
 	        $lastInsertedid=max(array_column($changeLogArray, 'id'));
-    	    $this->entity->updateChangelogUserInfo($userId, $lastInsertedid);
+    	    $this->entity->updateChangelogUserInfo($userId, $lastInsertedid,$userGroup);
 	        $this->view->rows = $changeLogArray;
 	        $this->view->total = count($changeLogArray);
         }
-        
-        //$this->view->rows = $this->entity->loadAll();
-    }
-    
-    private function prepareTaskInfo() {
-    	/* @var $assocs editor_Plugins_MatchResource_Models_Taskassoc */
-    	$assocs = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_Taskassoc');
-    
-    	$tmmtids = array_column($this->view->rows, 'id');
-    
-    	$taskinfo = $assocs->getTaskInfoForTmmts($tmmtids);
-    	if(empty($taskinfo)) {
-    		return;
-    	}
-    	//group array by tmmtid
-    	$this->groupedTaskInfo = array();
-    	foreach($taskinfo as $one) {
-    		if(!isset($this->groupedTaskInfo[$one['tmmtId']])) {
-    			$this->groupedTaskInfo[$one['tmmtId']] = array();
-    		}
-    		$taskToPrint = $one['taskName'];
-    		if(!empty($one['taskNr'])) {
-    			$taskToPrint .= ' ('.$one['taskNr'].')';
-    		}
-    		$this->groupedTaskInfo[$one['tmmtId']][] = $taskToPrint;
-    	}
-    }
-    
-    /***
-     * return array with task info (taskName's) for the given tmmtids
-     */
-    private function getTaskInfos($tmmtid){
-    	if(empty($this->groupedTaskInfo[$tmmtid])) {
-    		return null;
-    	}
-    	return $this->groupedTaskInfo[$tmmtid];
     }
     
     public function postAction(){
-    	$this->entity->init();
-    	$this->data = $this->_getAllParams();
-    	$this->setDataInEntity($this->postBlacklist);
-    
+    	throw new NotImplementedException();
     }
 
     
     public function deleteAction(){
-    	$this->entityLoad();
-    	$this->entity->delete();
+    	throw new NotImplementedException();
     }
     
+    /**
+     * Generates usergroupid based on the aclRoles
+     * @param Zend_Session_Namespace('user') $user
+     * @return number
+     */
+    private function getUsergroup($user){
+    	$userGroupId=0;
+    	foreach($user->data->roles as $role) {
+    		$userGroupId+=$this->aclRoleValue[$role];
+    	}
+    	return $userGroupId;
+    }
       
 }

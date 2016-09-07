@@ -40,7 +40,7 @@ class editor_Plugins_ChangeLog_Models_Validator_Changelog extends ZfExtended_Mod
         //comment = string, without length contrain. No validator needed / possible
         //$this->addValidator('taskGuid', 'guid');
         $this->addValidator('id', 'int');
-        $this->addValidator('dateOfChange', 'stringLength', array('min' => 0, 'max' => 11));
+        $this->addValidator('dateOfChange', 'stringLength', array('min' => 0, 'max' => 20));
         $this->addValidator('jiraNumber', 'stringLength', array('min' => 0, 'max' => 255));
         $this->addValidator('title', 'stringLength', array('min' => 0, 'max' => 255));
         $this->addValidator('description', 'stringLength', array('min' => 0, 'max' => 1000000));

@@ -38,27 +38,40 @@ class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity
     
     protected $validatorInstanceClass = 'editor_Plugins_ChangeLog_Models_Validator_Changelog';
     
-//    public function loadAll() {
-//        return $this->load(1);
-//    }
-
     /***
      * This will return unlisted changelogs for user
      */
-    public function getChangeLogForUser($userId){
+    public function getChangeLogForUser($userId,$userGroup){
     	$s = $this->db->select()
     	->from(array("cl" => "translate5.LEK_change_log"), array("cl.*"))
     	->setIntegrityCheck(false)
-    	->joinLeft(array("ucl" => "translate5.LEK_user_changelog_info"),"cl.userGroup = ucl.userId","")
+    	->joinLeft(array("ucl" => "translate5.LEK_user_changelog_info"),"(cl.userGroup = ucl.userGroup AND ucl.userId=".$userId.")","")
     	->where('IF(ucl.id>=0,cl.id > ucl.changelogId,1=1)')
-    	->where('cl.userGroup=?',$userId);
+    	->where('cl.userGroup=?',$userGroup);
     	return $this->db->fetchAll($s)->toArray();
     }
     
-    public function updateChangelogUserInfo($userId,$changelogId){
+    /***
+     * Updates the LEK_user_changelog_info for user to the latest changelogId
+     * @param int $userId
+     * @param int $changelogId
+     * @param int $userGroup
+     */
+    public function updateChangelogUserInfo($userId,$changelogId,$userGroup){
     	$db = $this->db->getAdapter();
-    	$sql = 'REPLACE INTO LEK_user_changelog_info (userId,changelogId) '.
-    		   'VALUES('.$db->quote($userId, 'INTEGER').','.$db->quote($changelogId, 'INTEGER').')';
+    	$sql = 'REPLACE INTO LEK_user_changelog_info (userId,changelogId,userGroup) '.
+    		   'VALUES('.$db->quote($userId, 'INTEGER').','.$db->quote($changelogId, 'INTEGER').','.$db->quote($userGroup, 'INTEGER').')';
     	$db->query($sql);
+    }
+    
+    /***
+     * Loads all changeLog's for userGroup
+     * @param int $userGroup
+     */
+    public function getChangelogForUserGroup($userGroup){
+    	$s = $this->db->select()
+    	->from(array("cl" => "translate5.LEK_change_log"), array("cl.*"))
+    	->where('cl.userGroup=?',$userGroup);
+    	return $this->db->fetchAll($s)->toArray();
     }
 }

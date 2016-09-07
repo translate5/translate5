@@ -33,21 +33,27 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
     alias: 'widget.changeLogWindow',
     itemId: 'changeLogWindow',
     cls: 'changeLogWindow',
-    height : 300,
-    width : 500,
-    modal : true,
+    minHeight : 500,
+    width : 800,
+    autoHeight: true,
+    autoScroll: true,
+    modal: true,
+    header:true,
     layout:'fit',
     strings: {
         date: '#UT#Datum',
         jiranumber: '#UT#Jiranummer',
-        description: '#UT#Beschreibung'
+        description: '#UT#Beschreibung',
+        title:'#UT#Change Log',
+        close:'#UT#Schließen'
     },
     initComponent: function() {
         var me = this;
         me.callParent(arguments);
     },
     initConfig: function(instanceConfig) {
-    	var me=this,
+    	var me=this;
+    	me.title=me.strings.title,
     	config={
 			items:[{
 				xtype: 'grid',
@@ -56,26 +62,47 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
 				columns: [{
 					xtype: 'gridcolumn',
 					dataIndex: 'dateOfChange',
-					text: me.strings.date
+					cellWrap: true,
+					flex: 20 / 100,
+					text: me.strings.date,
+                    renderer: function(val, meta, record) {
+                    	val = Ext.util.Format.date(val, 'm/d/Y');
+                        return val;
+                    },
 				},{
 					xtype: 'gridcolumn',
 					cellWrap: true,
+					flex: 40 / 100,
 					dataIndex: 'jiraNumber',
 					text: me.strings.jiranumber
 				},{
 					xtype: 'gridcolumn',
-					flex: 45 / 100,
+					flex: 40 / 100,
 					cellWrap: true,
 					dataIndex: 'description',
 					text: me.strings.description
 				}],
 				dockedItems:[{
+					xtype: 'toolbar',
+		            flex: 1,
+		            dock: 'bottom',
+		            ui: 'footer',
+		            layout: {
+		                pack: 'end',
+		                type: 'hbox'
+		            },
+		            items:[{
+		                    xtype: 'button',
+		                    text: me.strings.close,
+		                    itemId:'btnCloseWindow',
+		                    iconCls: 'ico-cancel'
+		            }]
+				},{
 					xtype: 'pagingtoolbar',
 					itemId: 'pagingtoolbar',
-					dock: 'bottom',
-					displayInfo: true
+					dock:'bottom',
 				}]
-			} ]
+			}]
 		};
         if (instanceConfig) {
             me.getConfigurator().merge(me, config, instanceConfig);
