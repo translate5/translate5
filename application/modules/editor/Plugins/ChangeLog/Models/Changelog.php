@@ -35,9 +35,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Plugins_ChangeLog_Models_Db_Changelog';
-    
-    protected $validatorInstanceClass = 'editor_Plugins_ChangeLog_Models_Validator_Changelog';
-    
+
     /***
      * This will return unlisted changelogs for user
      */

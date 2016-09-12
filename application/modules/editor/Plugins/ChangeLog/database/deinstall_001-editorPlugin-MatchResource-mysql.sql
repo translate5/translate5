@@ -29,3 +29,6 @@
 
 DELETE FROM Zf_acl_rules 
 WHERE `module` = 'editor' AND `resource` IN ('editor_plugins_changelog_changelog');
+
+DROP TABLE `LEK_change_log`;
+DROP TABLE `LEK_user_changelog_info`;

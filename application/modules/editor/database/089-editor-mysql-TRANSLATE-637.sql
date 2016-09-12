@@ -36,13 +36,3 @@ CREATE TABLE `LEK_change_log` (
   `userGroup` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
-
-
-CREATE TABLE `LEK_user_changelog_info` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `userId` int(11) NOT NULL,
-  `changelogId` int(11) DEFAULT NULL,
-  `userGroup` int(11) NOT NULL,
-  PRIMARY KEY (`userId`),
-  UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8;

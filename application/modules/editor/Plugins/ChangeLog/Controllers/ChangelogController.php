@@ -84,12 +84,12 @@ class editor_Plugins_ChangeLog_ChangelogController extends ZfExtended_RestContro
     }
     
     public function postAction(){
-    	throw new NotImplementedException();
+    	throw new BadMethodCallException();
     }
 
     
     public function deleteAction(){
-    	throw new NotImplementedException();
+    	throw new BadMethodCallException();
     }
     
     /**
