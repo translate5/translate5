@@ -28,48 +28,22 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * @class Editor.view.ViewPort
- * @extends Ext.container.Viewport
- */
-Ext.define('Editor.view.ViewPort', {
-    extend: 'Ext.container.Viewport',
-    requires: ['Editor.view.MntPanel'],
-    layout: 'border',
-    initComponent: function() {
+/*
+	@class Editor.view.MntPanel
+*/
+Ext.define('Editor.view.MntPanel', {
+    extend: 'Ext.panel.Panel',
+    alias: 'widget.MntPanel',
+    initConfig: function(instanceConfig) {
         var me = this,
-            items = [{
-            	xtype: 'panel',
-                region: 'north',
-                itemId:'headerPanelNorth',
-                frame:false,
-                border: false,
-                title:'',
-                items:[{
-                	xtype: 'headPanel',
-                    region: 'south',
-                }]
-            },{
-                region: 'center',
-                xtype: 'container',
-                layout: {
-                    type: 'fit'
-                },
-                items: [{
-                    xtype: me.getInitialView()
-                }]
-            }];
-        Ext.applyIf(me, {
-            items: items
-        });
-        me.callParent(arguments);
-    },
-    getInitialView: function() {
-        var hash = window.location.hash,
-            found = hash.match('initialView/([a-zA-Z0-9]+)');
-        if(found && found[1]) {
-            return found[1];
+            config = {
+        		frame: false,
+        		border: false,
+                html:'<div style="background:transparent;background-color:powderblue;text-align: center; display: flex; justify-content: center;"><h1>MNT will start executing at :'+instanceConfig.executeAt+'</h1></div>',
+            };
+        if (instanceConfig) {
+            me.getConfigurator().merge(me, config, instanceConfig);
         }
-        return 'adminTaskGrid';
+        return me.callParent([config]);
     }
-  });
+});
