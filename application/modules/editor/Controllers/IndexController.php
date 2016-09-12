@@ -215,6 +215,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       //inject helUrl variable used in frontend
       $this->view->Php2JsVars()->set('helpUrl',$rop->helpUrl);
       
+      //maintenance start date
+      $this->view->Php2JsVars()->set('mntStartDate',$rop->mntStartDate);
+      //maintenance warning panel is showed
+      $this->view->Php2JsVars()->set('mntCountdown',$rop->mntCountdown);
+      
       $this->view->Php2JsVars()->set('messageBox.delayFactor', $rop->messageBox->delayFactor);
       
       $this->view->Php2JsVars()->set('headerOptions.height', (int)$rop->headerOptions->height);
@@ -311,7 +316,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         $controllers = array('ServerException', 'ViewModes', 'Segments', 
             'Preferences', 'MetaPanel', 'Editor', 'Fileorder',
-            'ChangeAlike', 'Comments');
+            'ChangeAlike', 'Comments','Mnt');
         
         $pm = Zend_Registry::get('PluginManager');
         /* @var $pm ZfExtended_Plugin_Manager */
