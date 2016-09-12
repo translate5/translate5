@@ -41,7 +41,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.controller.HeadPanel', {
   extend : 'Ext.app.Controller',
-  views: ['HeadPanel'],
+  views: ['HeadPanel','HelpWindow'],
   strings: {
       confirmFinish: "#UT#Aufgabe abschließen?",
       confirmFinishMsg: "#UT#Wollen Sie die Aufgabe wirklich abschließen?",
@@ -93,6 +93,12 @@ Ext.define('Editor.controller.HeadPanel', {
               beforeedit: 'startEditing',
               canceledit: 'endEditing',
               edit: 'endEditing'
+          },
+          '#mainHelpButton':{
+        	click:'mainHelpButtonClick'  
+          },
+          '#helpWindow':{
+        	  beforerender:'helpWindowBeforeRender'
           }
       }
           
@@ -249,5 +255,25 @@ Ext.define('Editor.controller.HeadPanel', {
   },
   endEditing: function(plugin, context) {
       this.editing = false;
+  },
+  mainHelpButtonClick:function(){
+	  var me=this;
+      var win = Ext.widget('helpWindow');
+      win.show();
+  },
+  helpWindowBeforeRender:function(win,event){
+	  var url = Ext.String.format(Editor.data.helpUrl, Editor.data.helpSection);
+	  Ext.Ajax.request({
+          url:url,
+              method: "POST",
+              success: function(response){
+            	Ext.getCmp('helpPreviewContainer').add(Ext.create('Ext.Panel', {
+            		html: response.responseText
+            	}));
+              }, 
+              failure: function(response){
+            	  console.log("response failure");
+              }
+      });
   }
 });

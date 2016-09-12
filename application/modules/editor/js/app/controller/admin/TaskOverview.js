@@ -163,7 +163,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           logout = this.getLogoutButton(),
           grid = this.getTaskGrid();
       if(logout) {
-          insertIdx = toolbar.items.indexOf(logout) + 1;
+          insertIdx = toolbar.items.indexOf(logout) + 2;
       }
       toolbar.insert(insertIdx, {
           itemId: 'task-admin-btn',
@@ -196,6 +196,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       });
       
       if(grid) {
+    	//set the value used for displaying the help pages
+    	  Editor.data.helpSection = 'taskoverview';
           grid.show();
       }
       else {

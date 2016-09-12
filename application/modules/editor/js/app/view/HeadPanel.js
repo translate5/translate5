@@ -50,7 +50,8 @@ Ext.define('Editor.view.HeadPanel', {
         back: '#UT#zurück zur Aufgabenliste',
         finishBtn: '#UT#Aufgabe abschließen',
         endBtn: '#UT#Aufgabe beenden',
-        readonly: '#UT# - [LESEMODUS]'
+        readonly: '#UT# - [LESEMODUS]',
+        help: '#UT#Hilfe'
     },
     infoTpl: [
                   '<div class="info-line"><span class="user-label">{userLabel}:</span> <span class="user-name">{user.firstName} {user.surName}</span></div>',
@@ -105,6 +106,10 @@ Ext.define('Editor.view.HeadPanel', {
                         xtype: 'button',
                         itemId: 'logoutSingle',
                         text: me.strings.logout
+                    },{
+                    	xtype:'button',
+                    	itemId:'mainHelpButton',
+                    	text:me.strings.help
                     },
                     {
                         xtype: 'button',
