@@ -34,14 +34,14 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.view.ViewPort', {
     extend: 'Ext.container.Viewport',
-    requires: ['Editor.view.MntPanel'],
+    requires: ['Editor.view.MaintenancePanel'],
     layout: 'border',
     initComponent: function() {
         var me = this,
             items = [{
             	xtype: 'panel',
                 region: 'north',
-                itemId:'headerPanelNorth',
+                id:'headerPanelNorth',
                 frame:false,
                 border: false,
                 title:'',

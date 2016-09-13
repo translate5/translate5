@@ -31,15 +31,16 @@ END LICENSE AND COPYRIGHT
 /*
 	@class Editor.view.MntPanel
 */
-Ext.define('Editor.view.MntPanel', {
+Ext.define('Editor.view.MaintenancePanel', {
     extend: 'Ext.panel.Panel',
-    alias: 'widget.MntPanel',
+    alias: 'widget.maintenancePanel',
+    id:'maintenancePanel',
     initConfig: function(instanceConfig) {
         var me = this,
             config = {
         		frame: false,
         		border: false,
-                html:'<div style="background:transparent;background-color:powderblue;text-align: center; display: flex; justify-content: center;"><h1>MNT will start executing at :'+instanceConfig.executeAt+'</h1></div>',
+                html:'<div style="background:transparent;background-color:powderblue;text-align: center; display: flex; justify-content: center;"><h1>MNT will start executing at :'+Editor.data.mntStartDate+'</h1></div>',
             };
         if (instanceConfig) {
             me.getConfigurator().merge(me, config, instanceConfig);
