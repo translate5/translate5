@@ -1,6 +1,4 @@
 <?php
-use QueryPath\CSS\NotImplementedException;
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -35,7 +33,6 @@ END LICENSE AND COPYRIGHT
  */
 	  
 class editor_Plugins_ChangeLog_ChangelogController extends ZfExtended_RestController {
-    	//folow the modefy tmmt_model
     protected $entityClass = 'editor_Plugins_ChangeLog_Models_Changelog';
 
     /**
@@ -55,6 +52,7 @@ class editor_Plugins_ChangeLog_ChangelogController extends ZfExtended_RestContro
     		"pm"=>4,
     		"admin"=>8
     );
+    
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()

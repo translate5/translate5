@@ -59,16 +59,7 @@ class editor_Plugins_ChangeLog_Init extends ZfExtended_Plugin_Abstract {
         return $result;
     }
     public function init() {
-        $this->initEvents();
         $this->initRoutes();
-    }
-    
-    protected function initEvents() {
-       
-    }
-    
-    public function injectFrontendConfig(Zend_EventManager_Event $event) {
-       
     }
     
     public function initJsTranslations(Zend_EventManager_Event $event) {

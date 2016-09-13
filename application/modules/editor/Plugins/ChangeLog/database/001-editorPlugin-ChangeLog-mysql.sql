@@ -27,8 +27,17 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-DELETE FROM Zf_acl_rules 
-WHERE `module` = 'editor' AND `resource` IN ('editor_plugins_changelog_changelog');
 
-DROP TABLE `LEK_change_log`;
-DROP TABLE `LEK_user_changelog_info`;
+
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_changelog_changelog', 'all');
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'basic', 'frontend', 'pluginChangeLogChangelog');
+
+
+CREATE TABLE `LEK_user_changelog_info` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `userId` int(11) NOT NULL,
+  `changelogId` int(11) DEFAULT NULL,
+  `userGroup` int(11) NOT NULL,
+  PRIMARY KEY (`userId`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8;
