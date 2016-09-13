@@ -49,7 +49,7 @@ Ext.define('Editor.plugins.ChangeLog.controller.Changelog', {
   }],
   listen: {
       component:{
-    	'#adminTaskGrid':{
+    	'#adminTaskGrid #pageingtoolbar':{
     		render:'addButtonToTaskOverviewToolbar'
     	},
     	'#btnCloseWindow':{
@@ -72,24 +72,15 @@ Ext.define('Editor.plugins.ChangeLog.controller.Changelog', {
 		  win.show();
 	  }
   },
-  addButtonToTaskOverviewToolbar:function(panel,event){
-	  var me=this,
-	  	  pageingToolbar = panel.getComponent('pageingtoolbar');
-	  pageingToolbar.add({
-		  xtype:'button',
-	      text: Editor.data.debug && Editor.data.debug.version,
-	      listeners: {
-	          click:me.changeLogButtonClick
-	          //mouseover: function() {
-	        	//  this.setTooltip(Editor.data.debug && Editor.data.debug.version + ' (ext '+Ext.getVersion().version+')');
-	              // set a new config which says we moused over, if not already set
-//	              if (!this.mousedOver) {
-//	                  this.mousedOver = true;
-//	                  alert('You moused over a button!\n\nI wont do this again.');
-//	              }
-	         // }
-	      }
-	  });
+  addButtonToTaskOverviewToolbar:function(pageingToolbar,event){
+      var me = this;
+      pageingToolbar.add(['-',{
+          xtype:'button',
+          text: Editor.data.debug && Editor.data.debug.version,
+          listeners: {
+              click:me.changeLogButtonClick
+          }
+      }]);
   },
   changeLogButtonClick:function(){
 	  var me=this,
