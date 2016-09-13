@@ -45,12 +45,7 @@ Ext.define('Editor.view.HelpWindow', {
     },
     initConfig : function(instanceConfig) {
         var me = this,
-        config = {
-            items : [{
-            	xtype:'container',
-            	id:'helpPreviewContainer',
-            }]
-        };
+        config = {};
         if (instanceConfig) {
             me.getConfigurator().merge(me, config, instanceConfig);
         }

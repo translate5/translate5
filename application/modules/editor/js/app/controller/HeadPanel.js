@@ -54,6 +54,7 @@ Ext.define('Editor.controller.HeadPanel', {
       taskFinishing: '#UT#Aufgabe wird abgeschlossen und verlassen...',
       taskEnding: '#UT#Aufgabe wird beendet und verlassen...',
       saveSegmentFirst: '#UT#Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.',
+      help: '#UT#Hilfe',
   },
   editing: false,
   refs:[{
@@ -62,6 +63,9 @@ Ext.define('Editor.controller.HeadPanel', {
   },{
       ref: 'tasksMenu',
       selector: '#tasksMenu'
+  },{
+      ref: 'headToolBar',
+      selector: 'headPanel toolbar#top-menu'
   }],
   listen: {
       controller: {
@@ -99,6 +103,9 @@ Ext.define('Editor.controller.HeadPanel', {
           },
           '#helpWindow':{
         	  beforerender:'helpWindowBeforeRender'
+          },
+          'headPanel toolbar#top-menu':{
+        	  beforerender:'headPanelToolbarBeforeRender'
           }
       }
           
@@ -263,6 +270,17 @@ Ext.define('Editor.controller.HeadPanel', {
   },
   helpWindowBeforeRender:function(win,event){
 	  var url = Ext.String.format(Editor.data.helpUrl, Editor.data.helpSection);
+	  
+	  var dynamicPanel = new Ext.Component({
+          loader: {
+             url: url,
+             renderer: 'html',
+             autoLoad: true,
+             scripts: true
+             }
+      });
+	  win.add(dynamicPanel);
+	  /*
 	  Ext.Ajax.request({
           url:url,
               method: "POST",
@@ -274,6 +292,18 @@ Ext.define('Editor.controller.HeadPanel', {
               failure: function(response){
             	  console.log("response failure");
               }
+      });
+      */
+  },
+  headPanelToolbarBeforeRender:function(toolbar){
+	  
+	  if(!Editor.data.helpUrl){
+		  return;
+	  }
+      toolbar.insert(2, {
+      	xtype:'button',
+      	itemId:'mainHelpButton',
+      	text:this.strings.help
       });
   }
 });
