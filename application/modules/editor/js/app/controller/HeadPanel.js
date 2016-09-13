@@ -280,20 +280,6 @@ Ext.define('Editor.controller.HeadPanel', {
              }
       });
 	  win.add(dynamicPanel);
-	  /*
-	  Ext.Ajax.request({
-          url:url,
-              method: "POST",
-              success: function(response){
-            	Ext.getCmp('helpPreviewContainer').add(Ext.create('Ext.Panel', {
-            		html: response.responseText
-            	}));
-              }, 
-              failure: function(response){
-            	  console.log("response failure");
-              }
-      });
-      */
   },
   headPanelToolbarBeforeRender:function(toolbar){
 	  
