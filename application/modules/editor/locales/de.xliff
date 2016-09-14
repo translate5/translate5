@@ -874,6 +874,9 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <b
 <trans-unit id='S2VpbiBXZXJ0IGRlZmluaWVydCE='><source>Kein Wert definiert!</source><target>Kein Wert definiert!</target></trans-unit>
 <trans-unit id='SW1wb3J0aWVydDogezB9'><source>Importiert: {0}</source><target>Importiert: {0}</target></trans-unit>
 <trans-unit id='TmFjaCBCZWFyYmVpdHVuZzogezB9'><source>Nach Bearbeitung: {0}</source><target>Nach Bearbeitung: {0}</target></trans-unit>
+<trans-unit id='RGllIEF1ZmdhYmUga29ubnRlIGF1ZmdydW5kIHZvbiBGZWhsZXJuIG5pY2h0IGltcG9ydGllcnQgd2VyZGVuIQ=='><source>Die Aufgabe konnte aufgrund von Fehlern nicht importiert werden!</source><target>Die Aufgabe konnte aufgrund von Fehlern nicht importiert werden!</target></trans-unit>
+<trans-unit id='S2VpbiBQYXNzd29ydCBhbmdlZ2ViZW4u'><source>Kein Passwort angegeben.</source><target>Kein Passwort angegeben.</target></trans-unit>
+<trans-unit id='S2VpbiBCZW51dHplcm5hbWUgYW5nZWdlYmVuLg=='><source>Kein Benutzername angegeben.</source><target>Kein Benutzername angegeben.</target></trans-unit>
   </body>
  </file>
 </xliff>
