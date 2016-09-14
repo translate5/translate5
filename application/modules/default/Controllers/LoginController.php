@@ -37,19 +37,12 @@ END LICENSE AND COPYRIGHT
 require_once'ControllerMixIns.php';
 /**
  * Klasse der Nutzermethoden
- *
- *
  */
 class LoginController extends ZfExtended_Controllers_Login {
     use ControllerMixIns;
     public function init(){
         parent::init();
         $this->view->languageSelector();
-        $this->_userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
-        $this->_authTableName = 'Zf_users';
-        $this->_identityColumn = 'login';
-        $this->_credentialColumn = 'passwd';
-        $this->_credentialTreatment = 'MD5(?) and roles != "" and roles != "," and roles IS NOT NULL';
         $this->_form   = new ZfExtended_Zendoverwrites_Form('loginIndex.ini');
     }
     
