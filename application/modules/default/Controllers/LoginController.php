@@ -44,7 +44,6 @@ class LoginController extends ZfExtended_Controllers_Login {
         parent::init();
         $this->view->languageSelector();
         $this->_form   = new ZfExtended_Zendoverwrites_Form('loginIndex.ini');
-        $this->_userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
     }
     
     public function indexAction() {
