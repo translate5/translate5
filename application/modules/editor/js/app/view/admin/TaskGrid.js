@@ -476,6 +476,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               }]
             },{
                 xtype: 'pagingtoolbar',
+                itemId:'pageingtoolbar',
                 store: 'admin.Tasks',
                 dock: 'bottom',
                 displayInfo: true
