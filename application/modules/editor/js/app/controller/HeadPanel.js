@@ -82,9 +82,6 @@ Ext.define('Editor.controller.HeadPanel', {
           '#mainHelpButton':{
         	click:'mainHelpButtonClick'  
           },
-          '#helpWindow':{
-        	  beforerender:'helpWindowBeforeRender'
-          },
           'headPanel toolbar#top-menu':{
         	  beforerender:'headPanelToolbarBeforeRender'
           }
@@ -192,32 +189,27 @@ Ext.define('Editor.controller.HeadPanel', {
       }
   },
   mainHelpButtonClick:function(){
-	  var me=this;
-      var win = Ext.widget('helpWindow');
+	  var me=this,
+	      url = Ext.String.format(Editor.data.helpUrl, Editor.data.helpSection),
+	      win = Ext.widget('helpWindow',{
+	          loader:{
+	              url: url,
+	              renderer: 'html',
+	              autoLoad: true,
+	              scripts: true
+	          }
+	      });
       win.show();
   },
-  helpWindowBeforeRender:function(win,event){
-	  var url = Ext.String.format(Editor.data.helpUrl, Editor.data.helpSection);
-	  
-	  var dynamicPanel = new Ext.Component({
-          loader: {
-             url: url,
-             renderer: 'html',
-             autoLoad: true,
-             scripts: true
-             }
-      });
-	  win.add(dynamicPanel);
-  },
   headPanelToolbarBeforeRender:function(toolbar){
-	  
+      var me=this;
 	  if(!Editor.data.helpUrl){
 		  return;
 	  }
       toolbar.insert(2, {
       	xtype:'button',
       	itemId:'mainHelpButton',
-      	text:this.strings.help
+      	text:me.helpBtn
       });
   }
 });
