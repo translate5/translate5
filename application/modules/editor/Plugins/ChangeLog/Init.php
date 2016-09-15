@@ -59,6 +59,7 @@ class editor_Plugins_ChangeLog_Init extends ZfExtended_Plugin_Abstract {
         return $result;
     }
     public function init() {
+        $this->initEvents();
         $this->initRoutes();
     }
     
@@ -67,6 +68,25 @@ class editor_Plugins_ChangeLog_Init extends ZfExtended_Plugin_Abstract {
         $view->pluginLocale()->add($this, 'views/localizedjsstrings.phtml');
     }
     
+    protected function initEvents() {
+     $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
+    }
+    
+    public function injectFrontendConfig(Zend_EventManager_Event $event) {
+        $view = $event->getParam('view');
+        $user = new Zend_Session_Namespace('user');
+        $userId = $user->data->id;
+        /* @var $changelogdb editor_Plugins_ChangeLog_Models_Changelog */
+        $changelogdb = ZfExtended_Factory::get('editor_Plugins_ChangeLog_Models_Changelog');
+        $lastChangeLogId = $changelogdb->getLastChangelogForUserId($userId);
+        
+        $retunrvalue = $changelogdb->moreChangeLogs($lastChangeLogId,$changelogdb->getUsergroup());
+        
+        if(empty($retunrvalue)){
+            $lastChangeLogId = 0;
+        }
+        $view->Php2JsVars()->set('plugins.ChangeLog.lastSeenChangelogId',$lastChangeLogId);
+    }
     
     /**
      * defines all URL routes of this plug-in

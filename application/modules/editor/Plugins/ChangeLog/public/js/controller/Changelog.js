@@ -54,52 +54,53 @@ Ext.define('Editor.plugins.ChangeLog.controller.Changelog', {
     	},
     	'#btnCloseWindow':{
     		click:'btnCloseWindowClick'
+    	},
+    	'#adminTaskGrid #pageingtoolbar #changelogbutton':{
+    	    click:'changeLogButtonClick'
     	}
+    	
       }
   },
   init: function(){
-	    var me = this;
-	    var store = me.getEditorPluginsChangeLogStoreChangelogStore();
-	    store.on({
-	        scope: me,
-	        load: me.storeLoadFinished
-	    });
-	    me.callParent(arguments);
-  },
-  storeLoadFinished: function(store, records , successful , operation , eOpts){
-	  if(records && records.length>0){
-		  var win = Ext.widget('changeLogWindow',{changeLogStore: store});
-		  win.show();
-	  }
+      var me = this,
+          changelogfilter;
+      if(Editor.data.plugins.ChangeLog.lastSeenChangelogId>0){
+          changelogfilter='[{"operator":"gt","value":'+Editor.data.plugins.ChangeLog.lastSeenChangelogId+',"property":"id"}]'; 
+          me.loadChangelogStore(changelogfilter);
+      }
+      if(Editor.data.plugins.ChangeLog.lastSeenChangelogId<0){
+          me.loadChangelogStore(changelogfilter);
+      }
+      me.callParent(arguments);
   },
   addButtonToTaskOverviewToolbar:function(pageingToolbar,event){
       var me = this;
       pageingToolbar.add(['-',{
           xtype:'button',
-          text: Editor.data.debug && Editor.data.debug.version,
-          listeners: {
-              click:me.changeLogButtonClick
-          }
+          itemId:'changelogbutton',
+          text: Editor.data.debug && Editor.data.debug.version
       }]);
   },
   changeLogButtonClick:function(){
-	  var me=this,
-	  	  win,
-	  	  store = Ext.create('Ext.data.Store', {
-	  		  model: 'Editor.plugins.ChangeLog.model.Changelog'
-	  	  });
-	  store.load({
-		  params: {
-              filter: '[{"operator":"=","value":true,"property":"loadAll"}]'
+      var me=this;
+      me.loadChangelogStore('');
+  },
+  loadChangelogStore:function(changelogfilter){
+      var me = this,
+          win,
+          store = me.getEditorPluginsChangeLogStoreChangelogStore();
+      store.load({
+          params: {
+              filter: changelogfilter
           },
           scope: me,
           callback: function(records, operation, success) {
-        	  if(records && records.length>0){
-        		  win = Ext.widget('changeLogWindow',{changeLogStore: store});
-        		  win.show();
-        	  }
-		  }
-		});
+             if(records && records.length>0){
+                 win = Ext.widget('changeLogWindow',{changeLogStore: store});
+                 win.show();
+             }
+          }
+       });
   },
   btnCloseWindowClick:function(){
 	  this.getChangeLogWindow().close();

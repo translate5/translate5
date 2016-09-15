@@ -45,40 +45,33 @@ class editor_Plugins_ChangeLog_ChangelogController extends ZfExtended_RestContro
      */
     protected $groupedTaskInfo = array();
     
-    private $aclRoleValue = array(
-    		"noRights"=>0,
-    		"basic"=>1,
-    		"editor"=>2,
-    		"pm"=>4,
-    		"admin"=>8
-    );
+    //id userGroup issue
+    //1     12      TRANSLATE-XX1 → pm + admins
+    //2     2      TRANSLATE-XX2  → editor only
+    //3     6      TRANSLATE-XX3  → pm + editor
+    
+    //15 & 12;
+    //usersGroups & userGroupTable
+    
+    //Thomas is admin (15) 1 + 2 + 4 + 8
+    //Aleks is pm (7) 1 + 2 + 4
     
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
      */
     public function indexAction(){
+        $results = $this->entity->loadAllForUser($this->entity->getUsergroup());
+        $totalcount =$this->entity->getTotalCount();
         $user = new Zend_Session_Namespace('user');
         $userId = $user->data->id;
-        $userGroup = $this->getUsergroup($user);
-
-        $filter = $this->entity->getFilter();
-        
-        if($filter->hasFilter('loadAll', $loadAll)) {//FIXME the filter in frontend is set to a boolean type but here come as numeric
-        	$changeLogArray = $this->entity->getChangelogForUserGroup($userGroup);
-        	$this->view->rows = $changeLogArray;
-        	$this->view->total = count($changeLogArray);
-        	return ;
+        if(!empty($results)){
+            //update the user_changelog_info table for user with the latest seen changelog
+            $lastInsertedid=max(array_column($results, 'id'));
+            $this->entity->updateChangelogUserInfo($userId, $lastInsertedid);
         }
-        
-        $changeLogArray = $this->entity->getChangeLogForUser($userId,$userGroup);
-        
-        if(!empty($changeLogArray)){
-	        $lastInsertedid=max(array_column($changeLogArray, 'id'));
-    	    $this->entity->updateChangelogUserInfo($userId, $lastInsertedid,$userGroup);
-	        $this->view->rows = $changeLogArray;
-	        $this->view->total = count($changeLogArray);
-        }
+        $this->view->rows = $results;
+        $this->view->total =$totalcount;
     }
     
     public function postAction(){
@@ -89,18 +82,4 @@ class editor_Plugins_ChangeLog_ChangelogController extends ZfExtended_RestContro
     public function deleteAction(){
     	throw new BadMethodCallException();
     }
-    
-    /**
-     * Generates usergroupid based on the aclRoles
-     * @param Zend_Session_Namespace('user') $user
-     * @return number
-     */
-    private function getUsergroup($user){
-    	$userGroupId=0;
-    	foreach($user->data->roles as $role) {
-    		$userGroupId+=$this->aclRoleValue[$role];
-    	}
-    	return $userGroupId;
-    }
-      
 }

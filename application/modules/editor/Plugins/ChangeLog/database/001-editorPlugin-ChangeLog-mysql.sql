@@ -41,3 +41,6 @@ CREATE TABLE `LEK_user_changelog_info` (
   PRIMARY KEY (`userId`),
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8;
+
+ALTER TABLE `translate5`.`LEK_user_changelog_info` 
+DROP COLUMN `userGroup`;

@@ -36,40 +36,65 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Plugins_ChangeLog_Models_Db_Changelog';
 
-    /***
-     * This will return unlisted changelogs for user
-     */
-    public function getChangeLogForUser($userId,$userGroup){
-    	$s = $this->db->select()
-    	->from(array("cl" => "translate5.LEK_change_log"), array("cl.*"))
-    	->setIntegrityCheck(false)
-    	->joinLeft(array("ucl" => "translate5.LEK_user_changelog_info"),"(cl.userGroup = ucl.userGroup AND ucl.userId=".$userId.")","")
-    	->where('IF(ucl.id>=0,cl.id > ucl.changelogId,1=1)')
-    	->where('cl.userGroup=?',$userGroup);
-    	return $this->db->fetchAll($s)->toArray();
+    public function loadAllForUser($userGroupId) {
+        $db = $this->db->getAdapter();
+        //adopt loadAll here with uiserGroup check
+        $s = $this->db->select()->where('translate5.LEK_change_log.userGroup & '.$db->quote($userGroupId, 'INTEGER').'');
+        return $this->loadFilterdCustom($s);
+    }
+    
+    
+    public function moreChangeLogs($lastSeen, $userGroupId){
+        $db = $this->db->getAdapter();
+        $s = $this->db->select()
+                        ->where('translate5.LEK_change_log.id > '.$db->quote($lastSeen, 'INTEGER').'')
+                        ->where('translate5.LEK_change_log.userGroup & '.$db->quote($userGroupId, 'INTEGER').'');
+        return $this->loadFilterdCustom($s);//when there are more changelogs > $lastSeen && ('translate5.LEK_change_log.userGroup & '.$userGroupId.'');
     }
     
     /***
      * Updates the LEK_user_changelog_info for user to the latest changelogId
      * @param int $userId
      * @param int $changelogId
-     * @param int $userGroup
      */
-    public function updateChangelogUserInfo($userId,$changelogId,$userGroup){
+    public function updateChangelogUserInfo($userId,$changelogId){
     	$db = $this->db->getAdapter();
-    	$sql = 'REPLACE INTO LEK_user_changelog_info (userId,changelogId,userGroup) '.
-    		   'VALUES('.$db->quote($userId, 'INTEGER').','.$db->quote($changelogId, 'INTEGER').','.$db->quote($userGroup, 'INTEGER').')';
+    	$sql = 'REPLACE INTO LEK_user_changelog_info (userId,changelogId) '.
+    		   'VALUES('.$db->quote($userId, 'INTEGER').','.$db->quote($changelogId, 'INTEGER').')';
     	$db->query($sql);
     }
     
-    /***
-     * Loads all changeLog's for userGroup
-     * @param int $userGroup
+    public function getLastChangelogForUserId($userId){
+        $s = $this->db->select()
+        ->from(array("cli" => "translate5.LEK_user_changelog_info"), array("cli.changelogId"))
+        ->setIntegrityCheck(false)
+        ->where('cli.userId=?',$userId);
+        
+        $retval=$this->db->fetchAll($s)->toArray();
+        
+        if(empty($retval)){
+            return -1;
+        }
+        
+        return $retval[0]['changelogId'];
+    }
+    /**
+     * Generates usergroupid based on the aclRoles
+     * @return number
      */
-    public function getChangelogForUserGroup($userGroup){
-    	$s = $this->db->select()
-    	->from(array("cl" => "translate5.LEK_change_log"), array("cl.*"))
-    	->where('cl.userGroup=?',$userGroup);
-    	return $this->db->fetchAll($s)->toArray();
+    public function getUsergroup(){
+        $user = new Zend_Session_Namespace('user');
+        $aclRoleValue = array(
+                "noRights"=>0,
+                "basic"=>1,
+                "editor"=>2,
+                "pm"=>4,
+                "admin"=>8
+        );
+        $userGroupId=0;
+        foreach($user->data->roles as $role) {
+                $userGroupId+=$aclRoleValue[$role];
+    	}
+    	return $userGroupId;
     }
 }
