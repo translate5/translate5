@@ -42,12 +42,16 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.controller.HeadPanel', {
   extend : 'Ext.app.Controller',
   views: ['HeadPanel','HelpWindow'],
+  helpBtn: '#UT#Hilfe',
   refs:[{
       ref : 'headPanel',
       selector : 'headPanel'
   },{
       ref: 'tasksMenu',
       selector: '#tasksMenu'
+  },{
+      ref: 'headToolBar',
+      selector: 'headPanel toolbar#top-menu'
   }],
   listen: {
       controller: {
@@ -80,6 +84,9 @@ Ext.define('Editor.controller.HeadPanel', {
           },
           '#helpWindow':{
         	  beforerender:'helpWindowBeforeRender'
+          },
+          'headPanel toolbar#top-menu':{
+        	  beforerender:'headPanelToolbarBeforeRender'
           }
       }
           
@@ -191,17 +198,26 @@ Ext.define('Editor.controller.HeadPanel', {
   },
   helpWindowBeforeRender:function(win,event){
 	  var url = Ext.String.format(Editor.data.helpUrl, Editor.data.helpSection);
-	  Ext.Ajax.request({
-          url:url,
-              method: "POST",
-              success: function(response){
-            	Ext.getCmp('helpPreviewContainer').add(Ext.create('Ext.Panel', {
-            		html: response.responseText
-            	}));
-              }, 
-              failure: function(response){
-            	  console.log("response failure");
-              }
+	  
+	  var dynamicPanel = new Ext.Component({
+          loader: {
+             url: url,
+             renderer: 'html',
+             autoLoad: true,
+             scripts: true
+             }
+      });
+	  win.add(dynamicPanel);
+  },
+  headPanelToolbarBeforeRender:function(toolbar){
+	  
+	  if(!Editor.data.helpUrl){
+		  return;
+	  }
+      toolbar.insert(2, {
+      	xtype:'button',
+      	itemId:'mainHelpButton',
+      	text:this.strings.help
       });
   }
 });

@@ -163,7 +163,10 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           logout = this.getLogoutButton(),
           grid = this.getTaskGrid();
       if(logout) {
-          insertIdx = toolbar.items.indexOf(logout) + 2;
+          insertIdx = toolbar.items.indexOf(logout) + 1;
+      }
+      if(Editor.data.helpUrl){
+    	  insertIdx=insertIdx+1;
       }
       toolbar.insert(insertIdx, {
           itemId: 'task-admin-btn',

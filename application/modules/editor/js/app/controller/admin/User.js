@@ -122,9 +122,11 @@ Ext.define('Editor.controller.admin.User', {
           insertIdx = 1,
           logout = this.getLogoutButton(),
           grid = this.getUserGrid();
-
       if(logout) {
-          insertIdx = toolbar.items.indexOf(logout) + 2;
+          insertIdx = toolbar.items.indexOf(logout) + 1;
+      }
+      if(Editor.data.helpUrl){
+    	  insertIdx=insertIdx+1;
       }
       toolbar.insert(insertIdx, {
           itemId: 'user-admin-btn',
