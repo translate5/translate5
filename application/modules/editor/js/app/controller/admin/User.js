@@ -138,10 +138,11 @@ Ext.define('Editor.controller.admin.User', {
   /**
    * handle after show of usergrid
    */
-  handleAfterShow: function() {
+  handleAfterShow: function(grid) {
       this.getHeadToolBar().down('#user-admin-btn').hide();
     //set the value used for displaying the help pages
       Editor.data.helpSection = 'useroverview';
+      Editor.data.helpSectionTitle = grid.getTitle();
   },
   /**
    * handle after hide of usergrid
@@ -164,10 +165,10 @@ Ext.define('Editor.controller.admin.User', {
           grid.show();
       }
       else {
-          me.getCenterRegion().add({
+          grid = me.getCenterRegion().add({
               xtype: 'adminUserGrid'
           });
-          me.handleAfterShow();
+          me.handleAfterShow(grid);
       }
   },
   handleInitEditor: function() {

@@ -193,6 +193,9 @@ Ext.define('Editor.controller.Segments', {
           proxy = store.getProxy(),
           initialGridFilters = Editor.data.initialGridFilters;
 
+      Editor.data.helpSection = 'editor';
+      Editor.data.helpSectionTitle = grid.getTitle();
+      
       initialGridFilters = initialGridFilters && initialGridFilters.segmentgrid;
 
       grid.setTitle(ro ? grid.title_readonly : grid.title);

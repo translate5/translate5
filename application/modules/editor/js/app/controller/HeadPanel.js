@@ -192,6 +192,7 @@ Ext.define('Editor.controller.HeadPanel', {
 	  var me=this,
 	      url = Ext.String.format(Editor.data.helpUrl, Editor.data.helpSection),
 	      win = Ext.widget('helpWindow',{
+	          title: me.helpBtn + ' - ' + Editor.data.helpSectionTitle,
 	          loader:{
 	              url: url,
 	              renderer: 'html',

@@ -178,8 +178,10 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   /**
    * handle after show of taskgrid
    */
-  handleAfterShow: function() {
+  handleAfterShow: function(grid) {
       this.getHeadToolBar().down('#task-admin-btn').hide();
+      Editor.data.helpSection = 'taskoverview';
+      Editor.data.helpSectionTitle = grid.getTitle();
   },
   /**
    * handle after hide of taskgrid
@@ -199,16 +201,15 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       });
       
       if(grid) {
-    	//set the value used for displaying the help pages
-    	  Editor.data.helpSection = 'taskoverview';
+          //set the value used for displaying the help pages
           grid.show();
       }
       else {
-          me.getCenterRegion().add({
+          grid = me.getCenterRegion().add({
               xtype: 'adminTaskGrid',
               height: '100%'
           });
-          me.handleAfterShow();
+          me.handleAfterShow(grid);
       }
   },
   handleInitEditor: function() {

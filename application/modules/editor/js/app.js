@@ -157,9 +157,6 @@ Ext.application({
       //disable logout normal Button
       me.fireEvent('editorViewportOpened',me);
       me.getController('Fileorder').loadFileTree();//@todo bei ITL muss der load wiederum automatisch geschehen
-      
-      //set the value used for displaying the help pages
-      Editor.data.helpSection = 'editor';
   },
   /**
    * Used to open a task directly without administration panel
@@ -175,15 +172,14 @@ Ext.application({
               });
           }
       });
-      //set the value used for displaying the help pages
-      Editor.data.helpSection = 'editor';
   },
   /**
    * opens the admin viewport
    * firing the editorViewportClosed event
    */
   openAdministration: function() {
-      var me = this;
+      var me = this,
+          initial;
       if(!Editor.controller.admin || ! Editor.controller.admin.TaskOverview) {
           return;
       }
@@ -209,8 +205,9 @@ Ext.application({
       //enable logout normal Button
       me.fireEvent('adminViewportOpened');
       
-    //set the value used for displaying the help pages
-      Editor.data.helpSection = 'index';
+      //set the value used for displaying the help pages
+      initial = me.viewport.down(me.viewport.getInitialView());
+      initial.fireEvent('show', initial);
   },
   mask: function(msg, title) {
       if(!this.appMask) {
