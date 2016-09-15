@@ -295,6 +295,16 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $php2js->set('app.workflows', $wm->getWorkflowData());
         
         $php2js->set('app.userRights', $acl->getFrontendRights($userSession->data->roles));
+        
+        $php2js->set('app.version', $this->getAppVersion());
+    }
+    
+    protected function getAppVersion() {
+        $versionFile = APPLICATION_PATH.'../version';
+        if(file_exists($versionFile)) {
+            return file_get_contents($versionFile);
+        }
+        return 'development';
     }
     
     /**

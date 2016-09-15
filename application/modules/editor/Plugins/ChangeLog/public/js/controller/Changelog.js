@@ -78,7 +78,7 @@ Ext.define('Editor.plugins.ChangeLog.controller.Changelog', {
       pageingToolbar.add(['-',{
           xtype:'button',
           itemId:'changelogbutton',
-          text: Editor.data.debug && Editor.data.debug.version
+          text: Editor.data.app.version
       }]);
   },
   changeLogButtonClick:function(){
