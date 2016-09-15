@@ -42,20 +42,6 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.controller.HeadPanel', {
   extend : 'Ext.app.Controller',
   views: ['HeadPanel','HelpWindow'],
-  strings: {
-      confirmFinish: "#UT#Aufgabe abschließen?",
-      confirmFinishMsg: "#UT#Wollen Sie die Aufgabe wirklich abschließen?",
-      confirmEnd: "#UT#Aufgabe beenden?",
-      confirmEndMsg: "#UT#Wollen Sie die Aufgabe wirklich beenden?",
-      taskClosed: '#UT#Aufgabe wurde erfolgreich verlassen.',
-      taskFinished: '#UT#Aufgabe wurde erfolgreich abgeschlossen.',
-      taskEnded: '#UT#Aufgabe wurde erfolgreich beendet.',
-      taskClosing: '#UT#Aufgabe wird verlassen...',
-      taskFinishing: '#UT#Aufgabe wird abgeschlossen und verlassen...',
-      taskEnding: '#UT#Aufgabe wird beendet und verlassen...',
-      saveSegmentFirst: '#UT#Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.',
-  },
-  editing: false,
   refs:[{
       ref : 'headPanel',
       selector : 'headPanel'
@@ -88,11 +74,6 @@ Ext.define('Editor.controller.HeadPanel', {
           },
           '#segmentgrid #headPanelDown' : {
               click: 'headPanelToggle'
-          },
-          '#segmentgrid' : {
-              beforeedit: 'startEditing',
-              canceledit: 'endEditing',
-              edit: 'endEditing'
           },
           '#mainHelpButton':{
         	click:'mainHelpButtonClick'  
@@ -168,69 +149,25 @@ Ext.define('Editor.controller.HeadPanel', {
       Editor.app.setTranslation(locale);
   },
   tasksMenuDispatcher: function(menu, item) {
-      var me = this,
-          task = Editor.data.task,
-          app = Editor.app;
-      if(me.editing) {
-          Editor.MessageBox.addWarning(me.strings.saveSegmentFirst);
-          return;
-      }
+      var me = this;
       if(!item) {
         return;
       }
       switch(item.itemId){
           case 'backBtn':
-              app.mask(me.strings.taskClosing, task.get('taskName'));
-              task.set('userState','open');
-              task.save({
-                  success: function(rec) {
-                      me.fireEvent('taskUpdated', rec);
-                      Editor.app.openAdministration();
-                      app.unmask();
-                      Editor.MessageBox.addSuccess(me.strings.taskClosed);
-                  },
-                  failure: app.unmask
+              Editor.util.TaskActions.close(function(task, app, strings){
+                  me.fireEvent('taskUpdated', task);
+                  app.openAdministration();
+                  app.unmask();
+                  Editor.MessageBox.addSuccess(strings.taskClosed);
               });
               break;
           case 'finishBtn':
-              if(! Editor.app.authenticatedUser.isAllowed('editorFinishTask')){
-                  break;
-              }
-              Ext.Msg.confirm(me.strings.confirmFinish, me.strings.confirmFinishMsg, function(btn){
-                  if(btn == 'yes') {
-                      app.mask(me.strings.taskFinishing, task.get('taskName'));
-                      task.set('userState','finished');
-                      task.save({
-                          success: function(rec) {
-                              me.fireEvent('taskUpdated', rec);
-                              Editor.app.openAdministration();
-                              app.unmask();
-                              Editor.MessageBox.addSuccess(me.strings.taskFinished);
-                          },
-                          failure: app.unmask
-                      });
-                  }
-              });
-              break;
-          case 'closeBtn':
-              if(! Editor.app.authenticatedUser.isAllowed('editorEndTask')){
-                  break;
-              }
-              Ext.Msg.confirm(me.strings.confirmEnd, me.strings.confirmEndMsg, function(btn){
-                  if(btn == 'yes') {
-                      app.mask(me.strings.taskEnding, task.get('taskName'));
-                      task.set('userState',task.get('userState')); //triggers userState as dirty
-                      task.set('state','end');
-                      task.save({
-                          success: function(rec) {
-                              me.fireEvent('taskUpdated', rec);
-                              Editor.app.openAdministration();
-                              app.unmask();
-                              Editor.MessageBox.addSuccess(me.strings.taskEnded);
-                          },
-                          failure: app.unmask
-                      });
-                  }
+              Editor.util.TaskActions.finish(function(task, app, strings){
+                  me.fireEvent('taskUpdated', task);
+                  app.openAdministration();
+                  app.unmask();
+                  Editor.MessageBox.addSuccess(strings.taskFinished);
               });
               break;
       }
@@ -245,16 +182,7 @@ Ext.define('Editor.controller.HeadPanel', {
 
       if(task) {
           menu.down('#finishBtn').setVisible(user.isAllowed('editorFinishTask', task));
-          //since closing a task from within a opened task triggers version errors, 
-          //we disable this unused simply disable this unused feature
-          //menu.down('#closeBtn').setVisible(user.isAllowed('editorEndTask', task));
       }
-  },
-  startEditing: function(plugin, context) {
-      this.editing = true;
-  },
-  endEditing: function(plugin, context) {
-      this.editing = false;
   },
   mainHelpButtonClick:function(){
 	  var me=this;
