@@ -119,9 +119,10 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
             name: 'taskassocs', type: 'auto', persist: false
         });
     },
-    handleAfterShow: function() {
+    handleAfterShow: function(panel) {
         this.getHeadToolBar().down('#btnTmOverviewWindow').hide();
         Editor.data.helpSection = 'matchresource';
+        Editor.data.helpSectionTitle = panel.getTitle();
     },
     handleAfterHide: function() {
         this.getHeadToolBar().down('#btnTmOverviewWindow').show();
@@ -152,8 +153,8 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
         if(panel) {
             panel.show();
         } else {
-            me.getCenterRegion().add({xtype: 'tmOverviewPanel'}).show();
-            me.handleAfterShow();
+            panel = me.getCenterRegion().add({xtype: 'tmOverviewPanel'}).show();
+            me.handleAfterShow(panel);
         }
     },
     handleOnAddTmClick : function(){
