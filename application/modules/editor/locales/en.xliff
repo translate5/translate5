@@ -1369,6 +1369,22 @@
     <source>Hilfe</source>
     <target>Help</target>
 </trans-unit>
+<trans-unit id='RGF0dW0='>
+    <source>Datum</source>
+    <target>Date</target>
+</trans-unit>
+<trans-unit id='QmVzY2hyZWlidW5n'>
+    <source>Beschreibung</source>
+    <target>Description</target>
+</trans-unit>
+<trans-unit id='QWt0dWVsbGUgw4RuZGVydW5nZW4gYW4gZGVyIEFud2VuZHVuZw=='>
+    <source>Aktuelle Änderungen an der Anwendung</source>
+    <target>Current changes at the application</target>
+</trans-unit>
+<trans-unit id='w4RuZGVydW5nc25yLg=='>
+    <source>Änderungsnr.</source>
+    <target>Change no.</target>
+</trans-unit>
     </body>
   </file>
 </xliff>
