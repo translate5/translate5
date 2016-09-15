@@ -27,6 +27,5 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-INSERT INTO 
-`translate5`.`Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
-VALUES ('runtimeOptions.helpUrl', '1', 'app', 'system', '/help/{0}', '/help/{0}', '', 'string', 'Url for help pages.The second part of the url will show us the help window.Available parameters index,editor,matchresource,taskoverview,useroverview');
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
+VALUES ('runtimeOptions.helpUrl', '1', 'app', 'system', '', '/help/{0}', '', 'string', 'Url for help pages. The placeholder "{0}" will be replaced by one of the following help sections: index, editor, matchresource, taskoverview, useroverview; When the URL is empty, the help buttons are deactivated.');

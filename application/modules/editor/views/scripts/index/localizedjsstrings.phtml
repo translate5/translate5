@@ -556,6 +556,11 @@ Ext.define('Editor.controller.Localizer', {
 <?php
     if($hasFrontendController('Editor.controller.HeadPanel')){
 ?>
+    Ext.define("Editor.locale.de.controller.HeadPanel", {
+        override: "Editor.controller.HeadPanel",
+        helpBtn: '<?php echo $this->translate->_('Hilfe');?>'
+    }); 
+
     Editor.view.HeadPanel.prototype.strings = {
         task: '<?php echo $this->translate->_('Aufgabe');?>',
         logout: '<?php echo $this->translate->_('Abmelden');?>',

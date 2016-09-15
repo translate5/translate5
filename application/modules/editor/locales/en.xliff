@@ -1361,6 +1361,14 @@
     <source>Kein Benutzername angegeben.</source>
     <target>No login given.</target>
 </trans-unit>
+<trans-unit id='RXMgd3VyZGVuIGtlaW5lIFNlZ21lbnRlIHZlcsOkbmRlcnQh'>
+    <source>Es wurden keine Segmente verändert!</source>
+    <target>No segments modified!</target>
+</trans-unit>
+<trans-unit id='SGlsZmU='>
+    <source>Hilfe</source>
+    <target>Help</target>
+</trans-unit>
     </body>
   </file>
 </xliff>
