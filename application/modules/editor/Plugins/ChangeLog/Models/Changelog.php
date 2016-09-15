@@ -39,7 +39,7 @@ class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity
     public function loadAllForUser($userGroupId) {
         $db = $this->db->getAdapter();
         //adopt loadAll here with uiserGroup check
-        $s = $this->db->select()->where('translate5.LEK_change_log.userGroup & '.$db->quote($userGroupId, 'INTEGER').'');
+        $s = $this->db->select()->where('LEK_change_log.userGroup & '.$db->quote($userGroupId, 'INTEGER').'');
         return $this->loadFilterdCustom($s);
     }
     
@@ -47,8 +47,8 @@ class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity
     public function moreChangeLogs($lastSeen, $userGroupId){
         $db = $this->db->getAdapter();
         $s = $this->db->select()
-                        ->where('translate5.LEK_change_log.id > '.$db->quote($lastSeen, 'INTEGER').'')
-                        ->where('translate5.LEK_change_log.userGroup & '.$db->quote($userGroupId, 'INTEGER').'');
+                        ->where('LEK_change_log.id > '.$db->quote($lastSeen, 'INTEGER').'')
+                        ->where('LEK_change_log.userGroup & '.$db->quote($userGroupId, 'INTEGER').'');
         return $this->loadFilterdCustom($s);//when there are more changelogs > $lastSeen && ('translate5.LEK_change_log.userGroup & '.$userGroupId.'');
     }
     
@@ -66,7 +66,7 @@ class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity
     
     public function getLastChangelogForUserId($userId){
         $s = $this->db->select()
-        ->from(array("cli" => "translate5.LEK_user_changelog_info"), array("cli.changelogId"))
+        ->from(array("cli" => "LEK_user_changelog_info"), array("cli.changelogId"))
         ->setIntegrityCheck(false)
         ->where('cli.userId=?',$userId);
         

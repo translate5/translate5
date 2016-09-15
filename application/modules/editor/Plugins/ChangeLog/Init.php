@@ -63,13 +63,14 @@ class editor_Plugins_ChangeLog_Init extends ZfExtended_Plugin_Abstract {
         $this->initRoutes();
     }
     
+    protected function initEvents() {
+        $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
+        $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
+    }
+    
     public function initJsTranslations(Zend_EventManager_Event $event) {
         $view = $event->getParam('view');
         $view->pluginLocale()->add($this, 'views/localizedjsstrings.phtml');
-    }
-    
-    protected function initEvents() {
-     $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
     }
     
     public function injectFrontendConfig(Zend_EventManager_Event $event) {

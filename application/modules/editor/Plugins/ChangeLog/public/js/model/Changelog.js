@@ -41,7 +41,7 @@ Ext.define('Editor.plugins.ChangeLog.model.Changelog', {
   extend: 'Ext.data.Model',
   fields: [
     {name: 'id', type: 'string'},
-    {name: 'dateOfChange', type: 'string' },
+    {name: 'dateOfChange', type: 'date', dateFormat: Editor.DATEONLY_ISO_FORMAT },
     {name: 'jiraNumber', type: 'string'},
     {name: 'title', type: 'string'},
     {name: 'description', type: 'string'},

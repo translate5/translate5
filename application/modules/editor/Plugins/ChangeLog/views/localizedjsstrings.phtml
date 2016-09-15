@@ -30,15 +30,15 @@ END LICENSE AND COPYRIGHT
 
 /* @var $this Zend_View */
 ?>  
-  Editor.controller.Localizer.addPluginInit('changeLog', function() {
-        Ext.define("Editor.locale.plugins.MatchResource.controller.Editor", {
-        override: "Editor.plugins.MatchResource.controller.Editor",
+Editor.controller.Localizer.addPluginInit('changeLog', function() {
+    Ext.define("Editor.locale.plugins.ChangeLog.view.Changelog", {
+        override: "Editor.plugins.ChangeLog.view.Changelog",
         strings: {
             date: '<?php echo $this->translate->_('Datum');?>',
-            jiranumber: '<?php echo $this->translate->_('Jiranummer');?>',
+            jiranumber: '<?php echo $this->translate->_('Änderungsnr.');?>',
             description: '<?php echo $this->translate->_('Beschreibung');?>',
-            title: '<?php echo $this->translate->_('Change Log');?>',
+            title: '<?php echo $this->translate->_('Aktuelle Änderungen an der Anwendung');?>',
             close: '<?php echo $this->translate->_('Schließen');?>'
         }
-    	});
+    });
 });

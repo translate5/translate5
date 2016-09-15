@@ -23,7 +23,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execptions
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -42,9 +42,9 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
     layout:'fit',
     strings: {
         date: '#UT#Datum',
-        jiranumber: '#UT#Jiranummer',
+        jiranumber: '#UT#Änderungsnr.',
         description: '#UT#Beschreibung',
-        title:'#UT#Change Log',
+        title:'#UT#Aktuelle Änderungen an der Anwendung',
         close:'#UT#Schließen'
     },
     initComponent: function() {
@@ -52,58 +52,57 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
         me.callParent(arguments);
     },
     initConfig: function(instanceConfig) {
-    	var me=this;
-    	me.title=me.strings.title,
-    	config={
-			items:[{
-				xtype: 'grid',
-				itemId: 'changeLogGrid',
-				store: instanceConfig.changeLogStore,
-				columns: [{
-					xtype: 'gridcolumn',
-					dataIndex: 'dateOfChange',
-					cellWrap: true,
-					flex: 20 / 100,
-					text: me.strings.date,
-                    renderer: function(val, meta, record) {
-                    	val = Ext.util.Format.date(val, 'm/d/Y');
-                        return val;
+        var me=this;
+        me.title=me.strings.title,
+        config={
+            items:[{
+                xtype: 'grid',
+                itemId: 'changeLogGrid',
+                store: instanceConfig.changeLogStore,
+                columns: [{
+                    xtype: 'datecolumn',
+                    dataIndex: 'dateOfChange',
+                    cellWrap: true,
+                    width: 100,
+                    text: me.strings.date
+                },{
+                    xtype: 'gridcolumn',
+                    cellWrap: true,
+                    width: 150,
+                    dataIndex: 'jiraNumber',
+                    text: me.strings.jiranumber
+                },{
+                    xtype: 'gridcolumn',
+                    flex: 1,
+                    cellWrap: true,
+                    dataIndex: 'description',
+                    text: me.strings.description,
+                    renderer: function(v, meta, rec) {
+                        return '<b>'+rec.get('title')+'</b><br>'+v;
+                    }
+                }],
+                dockedItems:[{
+                    xtype: 'toolbar',
+                    flex: 1,
+                    dock: 'bottom',
+                    ui: 'footer',
+                    layout: {
+                        pack: 'end',
+                        type: 'hbox'
                     },
-				},{
-					xtype: 'gridcolumn',
-					cellWrap: true,
-					flex: 40 / 100,
-					dataIndex: 'jiraNumber',
-					text: me.strings.jiranumber
-				},{
-					xtype: 'gridcolumn',
-					flex: 40 / 100,
-					cellWrap: true,
-					dataIndex: 'description',
-					text: me.strings.description
-				}],
-				dockedItems:[{
-					xtype: 'toolbar',
-		            flex: 1,
-		            dock: 'bottom',
-		            ui: 'footer',
-		            layout: {
-		                pack: 'end',
-		                type: 'hbox'
-		            },
-		            items:[{
-		                    xtype: 'button',
-		                    text: me.strings.close,
-		                    itemId:'btnCloseWindow',
-		                    iconCls: 'ico-cancel'
-		            }]
-				},{
-					xtype: 'pagingtoolbar',
-					itemId: 'pagingtoolbar',
-					dock:'bottom',
-				}]
-			}]
-		};
+                    items:[{
+                            xtype: 'button',
+                            text: me.strings.close,
+                            itemId:'btnCloseWindow',
+                            iconCls: 'ico-cancel'
+                    }]
+                },{
+                    xtype: 'pagingtoolbar',
+                    itemId: 'pagingtoolbar',
+                    dock:'bottom',
+                }]
+            }]
+        };
         if (instanceConfig) {
             me.getConfigurator().merge(me, config, instanceConfig);
         }

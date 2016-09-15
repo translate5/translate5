@@ -874,6 +874,10 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <b
 <trans-unit id='S2VpbiBXZXJ0IGRlZmluaWVydCE='><source>Kein Wert definiert!</source><target>Kein Wert definiert!</target></trans-unit>
 <trans-unit id='SW1wb3J0aWVydDogezB9'><source>Importiert: {0}</source><target>Importiert: {0}</target></trans-unit>
 <trans-unit id='TmFjaCBCZWFyYmVpdHVuZzogezB9'><source>Nach Bearbeitung: {0}</source><target>Nach Bearbeitung: {0}</target></trans-unit>
+<trans-unit id='RGF0dW0='><source>Datum</source><target>Datum</target></trans-unit>
+<trans-unit id='QmVzY2hyZWlidW5n'><source>Beschreibung</source><target>Beschreibung</target></trans-unit>
+<trans-unit id='QWt0dWVsbGUgw4RuZGVydW5nZW4gYW4gZGVyIEFud2VuZHVuZw=='><source>Aktuelle Änderungen an der Anwendung</source><target>Aktuelle Änderungen an der Anwendung</target></trans-unit>
+<trans-unit id='w4RuZGVydW5nc25yLg=='><source>Änderungsnr.</source><target>Änderungsnr.</target></trans-unit>
   </body>
  </file>
 </xliff>

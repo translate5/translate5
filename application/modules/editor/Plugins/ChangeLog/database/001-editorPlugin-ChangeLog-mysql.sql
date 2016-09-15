@@ -28,8 +28,7 @@
 -- */
 
 
-
-INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_changelog_changelog', 'all');
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'basic', 'editor_plugins_changelog_changelog', 'all');
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'basic', 'frontend', 'pluginChangeLogChangelog');
 
 
