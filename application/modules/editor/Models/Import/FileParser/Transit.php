@@ -217,13 +217,11 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         $targetName = $this->segmentFieldManager->getFirstTargetName();
         
         $this->segmentData[$sourceName] = array(
-            'original' => $this->parseSegment($transUnit['source'], true),
-            'originalMd5' => md5($transUnit['source'])
+            'original' => $this->parseSegment($transUnit['source'], true)
         );
         
         $this->segmentData[$targetName] = array(
-            'original' => $this->parseSegment($transUnit['target'], false),
-            'originalMd5' => md5($transUnit['target'])
+            'original' => $this->parseSegment($transUnit['target'], false)
         );
     }
     /**

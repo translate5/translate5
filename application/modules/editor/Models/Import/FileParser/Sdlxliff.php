@@ -454,8 +454,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             // Daher bei SDLXLIFF zunächst kein Rückspeichern der editierten Sources. 
             $sourceName = $this->segmentFieldManager->getFirstSourceName();
             $this->segmentData[$sourceName] = array(
-                     'original' => $this->parseSegment($sourceOrig,true),
-                     'originalMd5' => md5($sourceOrig)
+                     'original' => $this->parseSegment($sourceOrig,true)
             );
 
             //extrahiere das targetsegment
@@ -466,16 +465,14 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                 $afterTargetTag = array_pop($targetExp[1][0][$i]);
                 $targetOrig = implode('</mrk>', $targetExp[1][0][$i]);
                 $this->segmentData[$targetName] = array(
-                     'original' => $this->parseSegment($targetOrig,false),
-                     'originalMd5' => md5($targetOrig)
+                     'original' => $this->parseSegment($targetOrig,false)
                 );
                 
                 $segmentId = $this->setAndSaveSegmentValues();
                 $targetExp[1][0][$i] = $this->getFieldPlaceholder($segmentId, $targetName).'</mrk>'.$afterTargetTag;
             } else {
                 $this->segmentData[$targetName] = array(
-                     'original' => NULL,
-                     'originalMd5' => NULL
+                     'original' => NULL
                 );
                 $segmentId = $this->setAndSaveSegmentValues();
                 $targetExp[1][0][$i] = $this->getFieldPlaceholder($segmentId, $targetName).'</mrk>'.$targetExp[1][0][$i][0];

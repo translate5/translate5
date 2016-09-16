@@ -38,6 +38,7 @@ class editor_Plugins_Debug_Bootstrap extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('editor_Models_Import_Worker_SetTaskToOpen', 'importCompleted', array($this, 'handleImportCompleted'));
         $this->eventManager->attach('editor_Models_Export', 'afterExport', array($this, 'handleAfterExport'));
         $this->eventManager->attach('editor_Models_Export_ExportedWorker', 'exportCompleted', array($this, 'handleExportCompleted'));
+        $this->eventManager->attach('editor_TaskController', 'afterTaskOpen', array($this, 'handleAfterTaskOpen'));
     }
     
     public function handleAfterIndexAction(Zend_EventManager_Event $event) {
@@ -52,7 +53,19 @@ class editor_Plugins_Debug_Bootstrap extends ZfExtended_Plugin_Abstract {
     public function handleAfterImport(Zend_EventManager_Event $event) {
         $task = $event->getParam('task');
         /* @var $task editor_Models_Task */
-        error_log("Task imported: ".$task->getTaskName().' '.$task->getTaskGuid());
+        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView', array($task->getTaskGuid()));
+        error_log("Task imported: ".$task->getTaskName().' '.$task->getTaskGuid().' ('.$mv->getName().')');
+    }
+    
+    /**
+     * handler for event: editor_Models_Import#afterImport
+     * @param $event Zend_EventManager_Event
+     */
+    public function handleAfterTaskOpen(Zend_EventManager_Event $event) {
+        $task = $event->getParam('task');
+        /* @var $task editor_Models_Task */
+        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView', array($task->getTaskGuid()));
+        error_log("Task opened: ".$task->getTaskName().' '.$task->getTaskGuid().' ('.$mv->getName().')');
     }
     
     /**

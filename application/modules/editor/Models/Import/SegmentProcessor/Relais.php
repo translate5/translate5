@@ -56,6 +56,11 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
     protected $relaisField;
     
     /**
+     * @var editor_Models_Segment_InternalTag
+     */
+    protected $tagHelper;
+    
+    /**
      * @param editor_Models_Task $task
      * @param editor_Models_SegmentFieldManager $sfm receive the already inited sfm
      */
@@ -67,6 +72,7 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
         $this->sfm = $sfm;
         $this->segment = ZfExtended_Factory::get('editor_Models_Segment');
         $this->segment->setTaskGuid($task->getTaskGuid());
+        $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
     }
     
     /**
@@ -79,10 +85,18 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
         $target = $this->sfm->getFirstTargetName();
         $mid = $parser->getMid();
         
-        $this->segment->loadByFileidMid($this->fileId, $mid);
+        try {
+            $this->segment->loadByFileidMid($this->fileId, $mid);
+        } catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            $log = ZfExtended_Factory::get('ZfExtended_Log');
+            $log->logError('Source segment to MID of relais file not found.',  'Source segment to MID of relais file not found. Relais segment ignored. FileName: '.$this->fileName.' / mid: '.$parser->getMid());
+            return false;
+        }
         $sourceContent = $this->segment->getFieldOriginal($source);
         
-        if($sourceContent !== $data[$source]["original"]){
+        
+        
+        if(! $this->tagHelper->equalsIdIgnored($sourceContent, $data[$source]["original"])){
             $log = ZfExtended_Factory::get('ZfExtended_Log');
             $log->logError('Source of relais file not identical with source of translated file.',  'Source of relais file is not identical with source of translated file. Relais target is left empty. FileName: '.$this->fileName.' / mid: '.$parser->getMid().' / Source content of translated file: '.$sourceContent.' / Source content of relais file: '.$data[$source]["original"]);
             return false;

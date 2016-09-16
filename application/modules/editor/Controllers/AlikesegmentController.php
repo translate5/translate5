@@ -133,6 +133,9 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         $userGuid = (new Zend_Session_Namespace('user'))->data->userGuid;
         $tua->loadByParams($userGuid, $session->taskGuid);
         
+        $tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        /* @var $tagHelper editor_Models_Segment_InternalTag */
+        
         $alikeCount = count($ids);
         foreach($ids as $id) {
             $id = (int) $id;
@@ -159,14 +162,24 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 }
 
                 //if source editing = true, then fieldLoop loops also over the source field
-                $this->fieldLoop(function($field, $editField, $getter, $setter) use ($id, $entity, $config, $qmSubsegmentAlikes){
+                $this->fieldLoop(function($field, $editField, $getter, $setter) use ($id, $entity, $config, $qmSubsegmentAlikes, $tagHelper){
+                    $getOriginal = 'get'.ucfirst($field);
                     //Entity befüllen:
                     if($config->runtimeOptions->editor->enableQmSubSegments) {
-                        $entity->{$setter}($qmSubsegmentAlikes[$field]->cloneAndUpdate($id, $field));
+                        $segmentContent = $qmSubsegmentAlikes[$field]->cloneAndUpdate($id, $field);
                     }
                     else {
-                        $entity->{$setter}($this->entity->{$getter}());
+                        $segmentContent = $this->entity->{$getter}();
                     }
+                    //replace the masters tags with the original repetition ones
+                    $originalTags = $tagHelper->get($entity->{$getOriginal}());
+                    if(!empty($originalTags)) {
+                        $i = 0;
+                        $segmentContent = $tagHelper->replace($segmentContent, function($foo) use (&$i, $originalTags){
+                            return $originalTags[$i++];
+                        });
+                    }
+                    $entity->{$setter}($segmentContent);
                     $entity->updateToSort($editField);
                 });
                 

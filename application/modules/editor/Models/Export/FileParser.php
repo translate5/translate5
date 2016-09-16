@@ -40,8 +40,6 @@ END LICENSE AND COPYRIGHT
 abstract class editor_Models_Export_FileParser {
     use editor_Models_Export_FileParser_MQMTrait;
     
-    const REGEX_INTERNAL_TAGS = '#<div\s*class="([a-z]*)\s+([gxA-Fa-f0-9]*)"\s*.*?(?!</div>)<span[^>]*id="([^-]*)-.*?(?!</div>).</div>#s';
-    
     /**
      * @var string
      */
@@ -118,6 +116,11 @@ abstract class editor_Models_Export_FileParser {
     protected $comments;
     
     /**
+     * @var editor_Models_Segment_InternalTag
+     */
+    protected $tagHelper;
+    
+    /**
      * 
      * @param integer $fileId
      * @param boolean $diff
@@ -137,6 +140,7 @@ abstract class editor_Models_Export_FileParser {
         $this->path = $path;
         $this->config = Zend_Registry::get('config');
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
     }
 
     /**
@@ -367,17 +371,17 @@ abstract class editor_Models_Export_FileParser {
     
     /**
      * protects the internal tags of one segment, stores the original values in $this->originalTags
-     * @param unknown $segment
+     * @param string $segment
      * @return string
      */
     protected function protectContentTags(string $segment) {
         $id = 1;
         $this->originalTags = array();
-        return preg_replace_callback(self::REGEX_INTERNAL_TAGS, function($match) use (&$id) {
+        return $this->tagHelper->replace($segment, function($match) use (&$id) {
             $placeholder = '<translate5:escaped id="'.$id++.'" />';
             $this->originalTags[$placeholder] = $match[0];
             return $placeholder;
-        }, $segment);
+        });
     }
     
     /**
@@ -407,8 +411,9 @@ abstract class editor_Models_Export_FileParser {
      * @return string $segment 
      */
     protected function parseSegment($segment) {
-        $segmentArr = preg_split(self::REGEX_INTERNAL_TAGS, $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
+        $segmentArr = preg_split(editor_Models_Segment_InternalTag::REGEX_INTERNAL_TAGS, $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
         $count = count($segmentArr);
+        //TODO move this logic into the InternalTag helper and use preg_replace_callback since its easier to understand
         for ($i = 1; $i < $count;) {
             $j = $i + 2;
             // detect if single-tag is regex-tag, if not capsule result with brackets (= normal behavior)
