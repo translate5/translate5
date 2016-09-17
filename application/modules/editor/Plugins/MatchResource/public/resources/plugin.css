@@ -28,6 +28,7 @@
 }
 .adminTaskGrid tr:hover td.taskassocs > div {background-image:url(images/information.png); background-repeat:no-repeat; background-position:18px center;}
 .adminTaskGrid .x-grid-header-ct .taskassocs > div {background:url(images/share.png) no-repeat 6px 5px;}
+.adminTaskGrid .x-grid-header-ct .taskassocs .x-column-header-text-inner {opacity: 0;}
 
 .tmOverviewPanel tr:hover td.taskList > div {background-image:url(images/information.png); background-repeat:no-repeat; background-position:center;}
 .tmOverviewPanel .x-grid-header-ct .taskList > div {background:url(images/share.png) no-repeat 6px 5px;}

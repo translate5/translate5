@@ -130,6 +130,9 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
          $tmmtmodel = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
          
          $taskGuids = array_column($event->getParam('view')->rows, 'taskGuid');
+         if(empty($taskGuids)){
+             return;
+         }
          $taskassocs = array();
          
          $resultlist = $tmmtmodel->loadByAssociatedTaskGuidList($taskGuids);
