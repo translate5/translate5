@@ -28,5 +28,5 @@
 -- */
 
 INSERT INTO `Zf_configuration` (`id`, `name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
-VALUES ('null', 'runtimeOptions.editor.export.exportComments', '1', 'editor', 'export', '1', '1', '', 'boolean', 'if enabled the segment comments were exported into the exported data file (if supported).');
+VALUES (null, 'runtimeOptions.editor.export.exportComments', '1', 'editor', 'export', '1', '1', '', 'boolean', 'if enabled the segment comments were exported into the exported data file (if supported).');
 
