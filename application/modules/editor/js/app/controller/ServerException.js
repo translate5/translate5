@@ -47,6 +47,8 @@ Ext.define('Editor.controller.ServerException', {
         "401_msg": '#UT#Ihre Sitzungsdaten sind abgelaufen. Sie werden nun zur Anmeldeseite weitergeleitet.',
         "406": '#UT#Es ist ein Fehler aufgetreten!',
         "409": '#UT#Ihre Daten konnten nicht gespeichert werden, beim Speichern kam es zu einem Konflikt!',
+        "503_title": '#UT#Maintenance',
+        "503_msg": '#UT#Maintenance is in progres.You will be available to work after the maintenance is finished.',
         title: '#UT#Fehler',
         text: '#UT#Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!',
         timeout: '#UT#Die Anfrage über das Internet an den Server dauerte zu lange. Dies kann an Ihrer Internetverbindung oder an einer Überlastung des Servers liegen. Bitte versuchen Sie es erneut.',
@@ -156,6 +158,16 @@ Ext.define('Editor.controller.ServerException', {
                 return;
             case 406: //Not Acceptable: show message from server
                 Editor.MessageBox.addError(getServerMsg());
+            case 503:
+            	 Ext.MessageBox.show({
+                     title: str["503_title"],
+                     msg: str["503_msg"],
+                     buttons: Ext.MessageBox.OK,
+                     fn: function(){
+                         return me.handleMaintenance();
+                     },
+                     icon: Ext.MessageBox.WARNING
+                 });
                 return;
         }
         Ext.Msg.alert(str.title, text+tpl.apply([status, statusText]));
@@ -165,6 +177,12 @@ Ext.define('Editor.controller.ServerException', {
      */
     handleNotVerified: function(){
         location.href = Editor.data.loginUrl;
+    },
+    /**
+     * Redirect user to the maintenance page
+     */
+    handleMaintenance:function(){
+    	location.href = '/';
     }
 },
 /**
@@ -177,6 +195,27 @@ Ext.define('Editor.controller.ServerException', {
 function() {
     //override Ext.data.proxy.Server
     Ext.data.proxy.Server.override({
+    	afterRequest: function(request,success) {
+    		this.callOverridden(arguments);
+    		var response=request._operation._response;
+    		if(!response){
+    			return;
+    		}
+    		var responseheaders = response.getAllResponseHeaders();
+    		for(var headername in responseheaders) {
+    			if(headername ==='x-translate5-shownotice'){
+    				//var mntpnl = Ext.ComponentQuery.query('panel[itemId=headerPanelNorth]');
+    				var mntpnl=Ext.getCmp('maintenancePanel');
+    				if(mntpnl){
+    					return;
+    				}
+    				Ext.getCmp('headerPanelNorth').add(0,{//FIXME find a better solution!
+    					  xtype:'maintenancePanel',
+    					  region:'north'
+    				});
+    			}
+    		}
+    	},
         constructor: function() {
             this.callOverridden(arguments);
             this.on('exception', function(proxy, resp, op){
@@ -189,4 +228,5 @@ function() {
             });
         }
     });
+    
 });
