@@ -35,12 +35,15 @@ Ext.define('Editor.view.MaintenancePanel', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.maintenancePanel',
     id:'maintenancePanel',
+    maintenanceMessage: '#UT#Achtung! In Kürze wird eine Wartung am System durchgeführt. <br> Translate5 wird zu diesem Zeitpunkt kurzfristig nicht erreichbar sein. <br>Geplanter Zeitpunkt: {0}',
     initConfig: function(instanceConfig) {
         var me = this,
+            date = instanceConfig.maintenanceStartDate ? instanceConfig.maintenanceStartDate : Editor.data.maintenance.startDate,
+            date = Ext.Date.format(new Date(date), Ext.Date.defaultFormat + ' ' + Ext.form.field.Time.prototype.format),
             config = {
         		frame: false,
         		border: false,
-                html:'<div class="maintenanceInfoPanel"><h1>MNT will start executing at :'+(instanceConfig.maintenanceStartDate ?instanceConfig.maintenanceStartDate:Editor.data.maintenance.startDate)+'</h1></div>',
+                html:'<div class="maintenanceInfoPanel"><strong>'+Ext.String.format(me.maintenanceMessage,date)+'</strong></div>',
             };
         if (instanceConfig) {
             me.getConfigurator().merge(me, config, instanceConfig);
