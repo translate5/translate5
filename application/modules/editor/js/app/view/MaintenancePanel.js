@@ -40,7 +40,7 @@ Ext.define('Editor.view.MaintenancePanel', {
             config = {
         		frame: false,
         		border: false,
-                html:'<div style="background:transparent;background-color:powderblue;text-align: center; display: flex; justify-content: center;"><h1>MNT will start executing at :'+Editor.data.mntStartDate+'</h1></div>',
+                html:'<div class="maintenanceInfoPanel"><h1>MNT will start executing at :'+(instanceConfig.maintenanceStartDate ?instanceConfig.maintenanceStartDate:Editor.data.maintenance.startDate)+'</h1></div>',
             };
         if (instanceConfig) {
             me.getConfigurator().merge(me, config, instanceConfig);

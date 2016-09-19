@@ -211,7 +211,8 @@ function() {
     				}
     				Ext.getCmp('headerPanelNorth').add(0,{//FIXME find a better solution!
     					  xtype:'maintenancePanel',
-    					  region:'north'
+    					  region:'north',
+    					  maintenanceStartDate:responseheaders[headername]
     				});
     			}
     		}
