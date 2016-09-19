@@ -1386,8 +1386,8 @@
     <target>Change no.</target>
 </trans-unit>
 <trans-unit id='PHA+QWNodHVuZyEgSW4gS8O8cnplIHdpcmQgZWluZSBXYXJ0dW5nIGFtIFN5c3RlbSBkdXJjaGdlZsO8aHJ0LjwvcD48cD5UcmFuc2xhdGU1IHdpcmQgenUgZGllc2VtIFplaXRwdW5rdCBrdXJ6ZnJpc3RpZyBuaWNodCBlcnJlaWNoYmFyIHNlaW4uPC9wPjxwPkdlcGxhbnRlciBaZWl0cHVua3Q6IHswfTwvcD4='>
-    <source><p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Translate5 wird zu diesem Zeitpunkt kurzfristig nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p><p></source>
-    <target><p>Warning! Maintenance at the system will start shortly.</p><p>Translate5 will not be available in this time.</p><p>Scheduled date: {0}</p><p></target>
+    <source><p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Translate5 wird zu diesem Zeitpunkt kurzfristig nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p></source>
+    <target><p>Warning! Maintenance at the system will start shortly.</p><p>Translate5 will not be available in this time.</p><p>Scheduled date: {0}</p></target>
 </trans-unit>
 <trans-unit id='RXMgbMOkdWZ0IGVpbmUgV2FydHVuZw=='>
     <source>Es läuft eine Wartung</source>
