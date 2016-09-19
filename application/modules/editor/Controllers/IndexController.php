@@ -215,6 +215,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       //inject helUrl variable used in frontend
       $this->view->Php2JsVars()->set('helpUrl',$rop->helpUrl);
       
+      //maintenance start date
+      $this->view->Php2JsVars()->set('mntStartDate',$rop->mntStartDate);
+      //maintenance warning panel is showed
+      $this->view->Php2JsVars()->set('mntCountdown',$rop->mntCountdown);
+      //minutes before the point in time of the update the application is locked for new log-ins
+      $this->view->Php2JsVars()->set('mntLoginBlock',$rop->mntLoginBlock);
+      
       $this->view->Php2JsVars()->set('messageBox.delayFactor', $rop->messageBox->delayFactor);
       
       $this->view->Php2JsVars()->set('headerOptions.height', (int)$rop->headerOptions->height);
