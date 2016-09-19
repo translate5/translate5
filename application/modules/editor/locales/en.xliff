@@ -1385,6 +1385,10 @@
     <source>Änderungsnr.</source>
     <target>Change no.</target>
 </trans-unit>
+<trans-unit id='QWNodHVuZyEgSW4gS8O8cnplIHdpcmQgZWluZSBXYXJ0dW5nIGFtIFN5c3RlbSBkdXJjaGdlZsO8aHJ0LiA8YnIvPiBUcmFuc2xhdGU1IHdpcmQgenUgZGllc2VtIFplaXRwdW5rdCBrdXJ6ZnJpc3RpZyBuaWNodCBlcnJlaWNoYmFyIHNlaW4uIDxici8+R2VwbGFudGVyIFplaXRwdW5rdDogezB9'>
+    <source>Achtung! In Kürze wird eine Wartung am System durchgeführt. <br/> Translate5 wird zu diesem Zeitpunkt kurzfristig nicht erreichbar sein. <br/>Geplanter Zeitpunkt: {0}</source>
+    <target>Warning! Maintenance at the system will start shortly. <br/> Translate5 will not be available in this time. <br/>Scheduled date: {0}</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

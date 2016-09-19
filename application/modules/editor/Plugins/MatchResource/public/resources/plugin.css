@@ -28,7 +28,16 @@
 }
 .adminTaskGrid tr:hover td.taskassocs > div {background-image:url(images/information.png); background-repeat:no-repeat; background-position:18px center;}
 .adminTaskGrid .x-grid-header-ct .taskassocs > div {background:url(images/share.png) no-repeat 6px 5px;}
-.adminTaskGrid .x-grid-header-ct .taskassocs .x-column-header-text-inner {opacity: 0;}
 
 .tmOverviewPanel tr:hover td.taskList > div {background-image:url(images/information.png); background-repeat:no-repeat; background-position:center;}
 .tmOverviewPanel .x-grid-header-ct .taskList > div {background:url(images/share.png) no-repeat 6px 5px;}
+
+.adminTaskGrid .x-grid-header-ct .taskassocs span.x-column-header-text-inner,
+.tmOverviewPanel .x-grid-header-ct .source-lang span.x-column-header-text-inner,
+.tmOverviewPanel .x-grid-header-ct .target-lang span.x-column-header-text-inner,
+.tmOverviewPanel .x-grid-header-ct .taskList span.x-column-header-text-inner{
+    display: block;
+    overflow: hidden;
+    text-indent: 100%;
+    white-space: nowrap;
+}

@@ -44,10 +44,12 @@
     <script src="modules/erp/ERP/ext/build/ext-all-debug.js"></script>
     <script src="modules/erp/ERP/ext/packages/ext-locale/build/ext-locale-de-debug.js"></script>
  */
+
+$version = '?v='.$this->appVersion;
 ?>
 
 <link rel="stylesheet" type="text/css" href="<?php echo $this->extJsCss; ?>"/>
-<link rel="stylesheet" type="text/css" href="<?php echo $this->publicModulePath; ?>/css/main.css?v=7" />
+<link rel="stylesheet" type="text/css" href="<?php echo $this->publicModulePath; ?>/css/main.css<?php echo $version;?>" />
 <link rel="stylesheet" type="text/css" href="<?php echo $this->extJsBasepath;?>/build/packages/ux/classic/classic/resources/ux-all.css"/>
 
 <script src="<?php echo $this->extJsBasepath;?>/build/ext-all-debug.js"></script>
@@ -65,5 +67,5 @@ Ext.Loader.setPath = function(mod, path) {
 };
 
 </script>
-<script src="modules/editor/overrides.js"></script>
-<script src="modules/editor/js/app.js"></script>
+<script src="modules/editor/overrides.js<?php echo $version;?>"></script>
+<script src="modules/editor/js/app.js<?php echo $version;?>"></script>

@@ -717,6 +717,12 @@ Ext.define('Editor.controller.Localizer', {
 <?php 
     }; //if($hasFrontendController('Editor.controller.admin.TaskPreferences')){ 
 ?>
+
+    Ext.define("Editor.locale.de.view.MaintenancePanel", {
+        override: "Editor.view.MaintenancePanel",
+        maintenanceMessage: '<?php echo $this->translate->_('Achtung! In Kürze wird eine Wartung am System durchgeführt. <br/> Translate5 wird zu diesem Zeitpunkt kurzfristig nicht erreichbar sein. <br/>Geplanter Zeitpunkt: {0}');?>' 
+    });
+
     this.initPluginTranslations();
   }
 });

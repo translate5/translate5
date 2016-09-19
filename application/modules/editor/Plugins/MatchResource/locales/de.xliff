@@ -156,6 +156,14 @@
       <source>Keine Aufgaben zugewiesen.</source>
       <target>Keine Aufgaben zugewiesen.</target>
     </trans-unit>
+    <trans-unit id='WnVnZXdpZXNlbmUgTWF0Y2hyZXNzb3VyY2Vu'>
+        <source>Zugewiesene Matchressourcen</source>
+        <target>Zugewiesene Matchressourcen</target>
+    </trans-unit>
+    <trans-unit id='WnVnZXdpZXNlbmUgQXVmZ2FiZW4='>
+        <source>Zugewiesene Aufgaben</source>
+        <target>Zugewiesene Aufgaben</target>
+    </trans-unit>
   </body>
  </file>
 </xliff>

@@ -51,7 +51,10 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
         color: '#UT#Farbe',
         refresh: '#UT#Aktualisieren',
         add: '#UT#Hinzufügen',
-        noTaskAssigned:'#UT#Keine Aufgaben zugewiesen.'
+        noTaskAssigned:'#UT#Keine Aufgaben zugewiesen.',
+        sourceLang: '#UT#Quellsprache',
+        targetLang: '#UT#Zielsprache',
+        taskassocgridcell:'#UT#Zugewiesene Aufgaben'
     },
     cls:'tmOverviewPanel',
     height: '100%',
@@ -84,7 +87,8 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                     cls: 'source-lang',
                     filter: {
                         type: 'string'
-                    }
+                    },
+                    text: me.strings.sourceLang
                 },{
                     xtype: 'gridcolumn',
                     width: 100,
@@ -93,7 +97,8 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                     cls: 'target-lang',
                     filter: {
                         type: 'string'
-                    }
+                    },
+                    text: me.strings.targetLang
                 },{
                     xtype: 'gridcolumn',
                     width: 100,
@@ -132,6 +137,7 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                     dataIndex:'taskList',
                     tdCls: 'taskList',
                     cls: 'taskList',
+                    text: me.strings.taskassocgridcell,
                     renderer: function(v, meta, rec){
                         var tasks = [], i;
                         
