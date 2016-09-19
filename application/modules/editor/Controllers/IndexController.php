@@ -92,6 +92,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
           $this->view->headLink()->appendStylesheet(APPLICATION_RUNDIR."/".$oneCss);
         }
 
+        $this->view->appVersion = $this->getAppVersion();
         $this->setJsVarsInView();
         $this->checkForUpdates();
     }
@@ -303,7 +304,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         $php2js->set('app.userRights', $acl->getFrontendRights($userSession->data->roles));
         
-        $php2js->set('app.version', $this->getAppVersion());
+        $php2js->set('app.version', $this->view->appVersion);
     }
     
     protected function getAppVersion() {
