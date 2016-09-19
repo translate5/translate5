@@ -86,6 +86,8 @@ Ext.define('Editor.controller.Localizer', {
         "405_del_assoc": '<?php echo $this->translate->_('Ein Benutzer konnte nicht aus der Aufgabe entfernt werden, da er die Aufgabe aktuell benutzt.');?>',
         "406": '<?php echo $this->translate->_('Es ist ein Fehler aufgetreten!');?>',
         "409": '<?php echo $this->translate->_('Ihre Daten konnten nicht gespeichert werden, beim Speichern kam es zu einem Konflikt!');?>',
+        "503_title": '<?php echo $this->translate->_('Es läuft eine Wartung');?>',
+        "503_msg": '<?php echo $this->translate->_('Aktuell wird das System gewartet. Sobald die Wartung vorüber ist, können Sie wieder am System arbeiten.');?>',
         title: '<?php echo $this->translate->_('Fehler');?>',
         text: '<?php echo $this->translate->_('Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!');?>',
         timeout: '<?php echo $this->translate->_('Die Anfrage über das Internet an den Server dauerte zu lange. Dies kann an Ihrer Internetverbindung oder an einer Überlastung des Servers liegen. Bitte versuchen Sie es erneut.');?>',
@@ -720,7 +722,7 @@ Ext.define('Editor.controller.Localizer', {
 
     Ext.define("Editor.locale.de.view.MaintenancePanel", {
         override: "Editor.view.MaintenancePanel",
-        maintenanceMessage: '<?php echo $this->translate->_('Achtung! In Kürze wird eine Wartung am System durchgeführt. <br/> Translate5 wird zu diesem Zeitpunkt kurzfristig nicht erreichbar sein. <br/>Geplanter Zeitpunkt: {0}');?>' 
+        maintenanceMessage: '<?php echo $this->translate->_('<p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Translate5 wird zu diesem Zeitpunkt kurzfristig nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p>');?>' 
     });
 
     this.initPluginTranslations();
