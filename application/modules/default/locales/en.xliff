@@ -55,6 +55,10 @@
   <source>Bitte starten Sie zunächst den openTMStermTagger via Windows Start Menü. Sonst wird die (aktivierte) Auszeichnung von Terminologie nicht funktionieren und zu Fehlern führen.</source>
   <target>Please start openTMStermTagger via Windows Start Menu. Otherwise the activated tagging of terminology will lead to errors.</target>
 </trans-unit>
+<trans-unit id='RWluZSBXYXJ0dW5nIHN0ZWh0IHVubWl0dGVsYmFyIGJldm9yLCBTaWUga8O2bm5lbiBzaWNoIGRhaGVyIG5pY2h0IGFubWVsZGVuLiBCaXR0ZSB2ZXJzdWNoZW4gU2llIGVzIGluIEvDvHJ6ZSBlcm5ldXQu'>
+    <source>Eine Wartung steht unmittelbar bevor, Sie können sich daher nicht anmelden. Bitte versuchen Sie es in Kürze erneut.</source>
+    <target>Maintenance will start in a few minutes, login is disabled therefore. Please try again shortly.</target>
+</trans-unit>
         </body>
     </file>
 <!-- ids are base64-encoded --></xliff>
