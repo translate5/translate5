@@ -35,7 +35,7 @@ Ext.define('Editor.view.MaintenancePanel', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.maintenancePanel',
     id:'maintenancePanel',
-    maintenanceMessage: '#UT#Achtung! In Kürze wird eine Wartung am System durchgeführt. <br> Translate5 wird zu diesem Zeitpunkt kurzfristig nicht erreichbar sein. <br>Geplanter Zeitpunkt: {0}',
+    maintenanceMessage: '#UT#<p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Translate5 wird zu diesem Zeitpunkt kurzfristig nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p>',
     initConfig: function(instanceConfig) {
         var me = this,
             date = instanceConfig.maintenanceStartDate ? instanceConfig.maintenanceStartDate : Editor.data.maintenance.startDate,
