@@ -883,6 +883,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <b
 <trans-unit id='QmVzY2hyZWlidW5n'><source>Beschreibung</source><target>Beschreibung</target></trans-unit>
 <trans-unit id='QWt0dWVsbGUgw4RuZGVydW5nZW4gYW4gZGVyIEFud2VuZHVuZw=='><source>Aktuelle Änderungen an der Anwendung</source><target>Aktuelle Änderungen an der Anwendung</target></trans-unit>
 <trans-unit id='w4RuZGVydW5nc25yLg=='><source>Änderungsnr.</source><target>Änderungsnr.</target></trans-unit>
+<trans-unit id='QWNodHVuZyEgSW4gS8O8cnplIHdpcmQgZWluZSBXYXJ0dW5nIGFtIFN5c3RlbSBkdXJjaGdlZsO8aHJ0LiA8YnIvPiBUcmFuc2xhdGU1IHdpcmQgenUgZGllc2VtIFplaXRwdW5rdCBrdXJ6ZnJpc3RpZyBuaWNodCBlcnJlaWNoYmFyIHNlaW4uIDxici8+R2VwbGFudGVyIFplaXRwdW5rdDogezB9'><source>Achtung! In Kürze wird eine Wartung am System durchgeführt. <br/> Translate5 wird zu diesem Zeitpunkt kurzfristig nicht erreichbar sein. <br/>Geplanter Zeitpunkt: {0}</source><target>Achtung! In Kürze wird eine Wartung am System durchgeführt. <br/> Translate5 wird zu diesem Zeitpunkt kurzfristig nicht erreichbar sein. <br/>Geplanter Zeitpunkt: {0}</target></trans-unit>
   </body>
  </file>
 </xliff>
