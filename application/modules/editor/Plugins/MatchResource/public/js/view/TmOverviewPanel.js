@@ -54,7 +54,7 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
         noTaskAssigned:'#UT#Keine Aufgaben zugewiesen.',
         sourceLang: '#UT#Quellsprache',
         targetLang: '#UT#Zielsprache',
-        taskassocgridcell:'#UT#Associated Tasks'
+        taskassocgridcell:'#UT#Zugewiesene Aufgaben'
     },
     cls:'tmOverviewPanel',
     height: '100%',

@@ -52,7 +52,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
         edited: '#UT#Die Matchressource "{0}" wurde erfolgreich geändert.',
         created: '#UT#Die Matchressource "{0}" wurde erfolgreich erstellt.',
         noResourcesAssigned: '#UT#Keine Matchressourcen zugewiesen.',
-        taskassocgridcell:'#UT#Associated Match Resources'
+        taskassocgridcell:'#UT#Zugewiesene Matchressourcen'
     },
     refs:[{
         ref: 'tmOverviewPanel',

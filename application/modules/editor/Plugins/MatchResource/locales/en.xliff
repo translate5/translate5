@@ -156,6 +156,14 @@
       <source>Keine Aufgaben zugewiesen.</source>
       <target>No tasks associated.</target>
     </trans-unit>
+    <trans-unit id='WnVnZXdpZXNlbmUgTWF0Y2hyZXNzb3VyY2Vu'>
+        <source>Zugewiesene Matchressourcen</source>
+        <target>Associated match resources</target>
+    </trans-unit>
+    <trans-unit id='WnVnZXdpZXNlbmUgQXVmZ2FiZW4='>
+        <source>Zugewiesene Aufgaben</source>
+        <target>Associated tasks</target>
+    </trans-unit>
   </body>
  </file>
 </xliff>
