@@ -32,3 +32,7 @@
 
 .tmOverviewPanel tr:hover td.taskList > div {background-image:url(images/information.png); background-repeat:no-repeat; background-position:center;}
 .tmOverviewPanel .x-grid-header-ct .taskList > div {background:url(images/share.png) no-repeat 6px 5px;}
+
+.tmOverviewPanel .x-grid-header-ct .source-lang .x-column-header-text-inner {opacity: 0;}
+.tmOverviewPanel .x-grid-header-ct .target-lang .x-column-header-text-inner {opacity: 0;}
+.tmOverviewPanel .x-grid-header-ct .taskList .x-column-header-text-inner {opacity: 0;}
