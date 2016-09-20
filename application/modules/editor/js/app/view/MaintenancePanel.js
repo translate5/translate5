@@ -43,10 +43,28 @@ Ext.define('Editor.view.MaintenancePanel', {
         		frame: false,
         		border: false,
                 html:'<div class="maintenanceInfoPanel"><strong>'+Ext.String.format(me.maintenanceMessage,date)+'</strong></div>',
+                listeners: {
+                    render: function(c) {
+                        me.isMaintenanceMode();
+                    }
+                }
             };
         if (instanceConfig) {
             me.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
+    },
+    //check on each 'n' seconds if the maintenance is runing
+    isMaintenanceMode:function(){
+        setInterval(function(){
+            Ext.Ajax.request({
+                url:Editor.data.restpath+'/index/applicationState',
+                failure: function(response){
+                    if(response && response.status == 503){
+                        window.location.href = Editor.data.restpath+'/login';
+                    }
+                }
+            });
+      }, 1000);
     }
 });
