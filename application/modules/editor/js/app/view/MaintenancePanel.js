@@ -56,15 +56,18 @@ Ext.define('Editor.view.MaintenancePanel', {
     },
     //check on each 'n' seconds if the maintenance is runing
     isMaintenanceMode:function(){
-        setInterval(function(){
-            Ext.Ajax.request({
-                url:Editor.data.restpath+'/index/applicationState',
-                failure: function(response){
-                    if(response && response.status == 503){
-                        window.location.href = Editor.data.restpath+'/login';
+        Ext.TaskManager.start({
+            run: function() {
+                Ext.Ajax.request({
+                    url:Editor.data.restpath+'/index/applicationState',
+                    failure: function(response){
+                        if(response && response.status == 503){
+                            window.location.href = Editor.data.restpath+'login';
+                        }
                     }
-                }
-            });
-      }, 1000);
+                });
+            },
+            interval: 1000
+          });
     }
 });
