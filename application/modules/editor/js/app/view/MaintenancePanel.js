@@ -34,7 +34,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.MaintenancePanel', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.maintenancePanel',
-    id:'maintenancePanel',
+    itemId:'maintenancePanel',
     maintenanceMessage: '#UT#<p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Translate5 wird zu diesem Zeitpunkt kurzfristig nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p>',
     initConfig: function(instanceConfig) {
         var me = this,
