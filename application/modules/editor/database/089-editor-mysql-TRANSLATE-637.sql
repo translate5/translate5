@@ -31,7 +31,7 @@ CREATE TABLE `LEK_change_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `dateOfChange` date DEFAULT NULL,
   `jiraNumber` varchar(100) DEFAULT NULL,
-  `title` varchar(50) DEFAULT NULL,
+  `title` varchar(256) DEFAULT NULL,
   `description` mediumtext,
   `userGroup` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
