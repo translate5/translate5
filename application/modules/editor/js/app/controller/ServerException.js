@@ -204,14 +204,14 @@ function() {
     		var responseheaders = response.getAllResponseHeaders();
     		for(var headername in responseheaders) {
     			if(headername ==='x-translate5-shownotice'){
-    				//var mntpnl = Ext.ComponentQuery.query('panel[itemId=headerPanelNorth]');
-    				var mntpnl=Ext.getCmp('maintenancePanel');
+    				var mntpnl = Ext.ComponentQuery.query('maintenancePanel');
     				if(mntpnl){
     					return;
     				}
-    				Ext.getCmp('headerPanelNorth').add(0,{//FIXME find a better solution!
+    				Ext.ComponentQuery.query('viewport').add({//FIXME find a better solution!
     					  xtype:'maintenancePanel',
     					  region:'north',
+    					  weight: 123, //play here with the value until the position of the panel is right!
     					  maintenanceStartDate:responseheaders[headername]
     				});
     			}
