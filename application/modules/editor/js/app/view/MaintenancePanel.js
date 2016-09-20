@@ -67,7 +67,7 @@ Ext.define('Editor.view.MaintenancePanel', {
                     }
                 });
             },
-            interval: 1000
+            interval: 5000
           });
     }
 });
