@@ -57,4 +57,12 @@ abstract class editor_Models_Import_Worker_Abstract extends ZfExtended_Worker_Ab
         // since we don't even need it in the DB when the task already has errors
         return false;
     }
+    
+    protected function checkParentDefunc() {
+        $parentsOk = parent::checkParentDefunc();
+        if(!$parentsOk) {
+            $this->task->setErroneous();
+        }
+        return $parentsOk;
+    }
 }
