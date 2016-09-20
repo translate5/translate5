@@ -39,16 +39,8 @@ Ext.define('Editor.view.ViewPort', {
     initComponent: function() {
         var me = this,
             items = [{
-            	xtype: 'panel',
-                region: 'north',
-                id:'headerPanelNorth',
-                frame:false,
-                border: false,
-                title:'',
-                items:[{
-                	xtype: 'headPanel',
-                    region: 'south',
-                }]
+                xtype: 'headPanel',
+                region: 'north'
             },{
                 region: 'center',
                 xtype: 'container',

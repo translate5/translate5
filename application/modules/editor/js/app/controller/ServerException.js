@@ -205,13 +205,17 @@ function() {
     		for(var headername in responseheaders) {
     			if(headername ==='x-translate5-shownotice'){
     				var mntpnl = Ext.ComponentQuery.query('maintenancePanel');
-    				if(mntpnl){
+    				if(!mntpnl || mntpnl.length>0){
     					return;
     				}
-    				Ext.ComponentQuery.query('viewport').add({//FIXME find a better solution!
+    				var viewport =Ext.ComponentQuery.query('viewport');
+    				if(!viewport || viewport.length<1){
+    				    return;
+    				}
+    				viewport[0].add({
     					  xtype:'maintenancePanel',
     					  region:'north',
-    					  weight: 123, //play here with the value until the position of the panel is right!
+    					  weight: 100,
     					  maintenanceStartDate:responseheaders[headername]
     				});
     			}
