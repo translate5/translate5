@@ -151,9 +151,36 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.segments.column.MatchrateType",
         text: '<?php echo $this->translate->_('Matchrate Typ');?>',
         strings: {
-            noValueDefined: '<?php echo $this->translate->_('Kein Wert definiert!');?>',
-            imported: '<?php echo $this->translate->_('Importiert: {0}');?>',
-            edited: '<?php echo $this->translate->_('Nach Bearbeitung: {0}');?>'
+            import: '<?php echo $this->translate->_('{0} (importiert)');?>',
+            edited: '<?php echo $this->translate->_('{0} (translate5)');?>',
+            noTarget: '<?php echo $this->translate->_('Kein Zieltext vorhanden');?>',
+            noValueDefined: '<?php echo $this->translate->_('Keine Information vorhanden');?>',
+            noValueDefinedDesc: '<?php echo $this->translate->_('Das verwendete Übersetzungswerkzeug hat keine Information zur Herkunft des Matches zur Verfügung gestellt.');?>',
+            olddata: '<?php echo $this->translate->_('Keine Information vorhanden');?>',
+            olddataDesc: '<?php echo $this->translate->_('Dieser Task wurde importiert, bevor das Match Rate Typ-Feature implementiert wurde.');?>',
+            type: {
+                "tm": '<?php echo $this->translate->_('TM-Match');?>',
+                "mt": '<?php echo $this->translate->_('MT-Match');?>',
+                "interactive": '<?php echo $this->translate->_('editiert');?>',
+                "source": '<?php echo $this->translate->_('Quelle übernommen');?>',
+                "auto-propagated": '<?php echo $this->translate->_('Wiederholung');?>',
+                "auto-aligned": '<?php echo $this->translate->_('Alignment');?>',
+                "document-match": '<?php echo $this->translate->_('Dokumenten-Match');?>'
+            },
+            importDesc: {
+                "tm": '<?php echo $this->translate->_('Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 aus einem TM übernommen');?>',
+                "mt": '<?php echo $this->translate->_('Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 aus Machine Translation übernommen');?>',
+                "interactive": '<?php echo $this->translate->_('Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 vom Benutzer editiert');?>',
+                "source": '<?php echo $this->translate->_('Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 Quelle vom Benutzer übernommen');?>',
+                "auto-propagated": '<?php echo $this->translate->_('Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 vom Benutzer angepasstes Segment, das automatisch als Wiederholung übernommen wurde (Autopropagation)');?>',
+                "auto-aligned": '<?php echo $this->translate->_('Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 durch ein Alignment erstellte Übersetzung');?>',
+                "document-match": '<?php echo $this->translate->_('Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 vom Benutzer angepasstes Segment, das automatisch als Wiederholung übernommen wurde (Document Match)');?>',
+                "unknown": '<?php echo $this->translate->_('Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 gesetzter Status, der derzeit translate5 unbekannt ist');?>'
+            },
+            editedDesc: {
+                "tm": '<?php echo $this->translate->_('Im Browser aus TM übernommen');?>',
+                "mt": '<?php echo $this->translate->_('Im Browser aus MT übernommen');?>'
+            }
         }
     });
   	
