@@ -62,12 +62,12 @@ Ext.define('Editor.view.MaintenancePanel', {
                     url:Editor.data.restpath+'/index/applicationState',
                     failure: function(response){
                         if(response && response.status == 503){
-                            window.location.href = Editor.data.restpath+'login';
+                            location.href=Editor.data.loginUrl;
                         }
                     }
                 });
             },
-            interval: 5000
+            interval: 10000
           });
     }
 });
