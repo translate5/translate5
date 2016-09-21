@@ -92,8 +92,10 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
     
     public function injectFrontendConfig(Zend_EventManager_Event $event) {
         $view = $event->getParam('view');
+        /* @var $view Zend_View_Interface */
         $view->Php2JsVars()->set('plugins.MatchResource.preloadedSegments', $this->getConfig()->preloadedTranslationSegments);
         $view->Php2JsVars()->set('plugins.MatchResource.matchrateTypeChangedState', self::MATCH_RATE_TYPE_EDITED);
+        $view->headLink()->appendStylesheet(APPLICATION_RUNDIR.'/editor/plugins/resources/matchResource/plugin.css');
     }
     
     public function initJsTranslations(Zend_EventManager_Event $event) {
