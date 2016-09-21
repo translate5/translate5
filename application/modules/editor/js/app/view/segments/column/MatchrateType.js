@@ -47,9 +47,7 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
     text: '#UT#Matchrate Typ',
     tdCls: 'matchrateTypeColumn',
     strings: {
-        noValueDefined: '#UT#Kein Wert definiert!',
-        imported: '#UT#Importiert: {0}',
-        edited: '#UT#Nach Bearbeitung: {0}'
+        //see in localizedjsstrings
     },
     imgTpl: new Ext.XTemplate([
        '<tpl for=".">',
@@ -144,29 +142,57 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
         //data comes valid from server, so no checks here needed
         var me = this,
             value = value && value.split(';') || [],
-            firstType,
+            firstType, useAsLabel,
             prefix = value.shift(),
             isImport = (prefix == 'import'),
-            qtip = function(meta, msg) {
+            mode = isImport ? 'import' : 'edited',
+            translate = function(value) {
+                return me.strings.type[value] || value;
+            },
+            qtip = function(meta, msg, desc) {
+                desc = desc ? '<br>'+desc : '';
                 meta.myLabel = msg; //as ref for the list renderer
-                meta.tdAttr = 'data-qtip="'+msg+'"';
+                meta.tdAttr = 'data-qtip="<b>'+msg+'</b>'+desc+'"';
             };
             
         if(Editor.data.plugins.MatchResource && prefix == Editor.data.plugins.MatchResource.matchrateTypeChangedState) {
             return '...'; //do nothing here since pending save
         }
-            
+        
+        //nothing given, legacy data before introducing matchtype
         if(value.length == 0) {
-            qtip(meta, me.strings.noValueDefined);
+            //no icon and label, only tooltip
+            qtip(meta, me.strings.olddata, me.strings.olddataDesc);
             return '';
         }
-        firstType = value.shift();
-        label = Ext.String.format(isImport ? me.strings.imported : me.strings.edited, firstType);
+        
+        useAsLabel = firstType = value.shift();
+        //empty, when there was no target and matchRate = 0
+        if(firstType == 'empty') {
+            meta.myLabel = me.strings.noTarget;
+            //no icon and label, and no tooltip
+            return '';
+        }
+        //none, when there was no value given in the segment
+        if(firstType == 'none') {
+            qtip(meta, me.strings.noValueDefined, me.strings.noValueDefinedDesc);
+            //no icon and label, only tooltip
+            return '';
+        }
+        //unknown, when the given value is not registered in translate5
+        if(firstType == 'unknown') {
+            useAsLabel = value.shift(); //when unknown remove it to prevent a not found image, the real value is in the next field
+        }
+        
+        //translating and formatting known types 
+        label = Ext.String.format(me.strings[mode], translate(useAsLabel));
         if(value.length > 0) {
             label = label + ' (' + value.join(';') + ')';
         }
-        qtip(meta, label);
+        //using tooltip 
+        qtip(meta, label, me.strings[mode+'Desc'][firstType]);
         value.unshift(firstType);
+        //and image
         return me.imgTpl.apply({types: value, edited: !isImport});
     }
 });
