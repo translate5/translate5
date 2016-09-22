@@ -43,6 +43,7 @@ Ext.define('Editor.plugins.ChangeLog.controller.Changelog', {
   views: ['Editor.plugins.ChangeLog.view.Changelog'],
   models: ['Editor.plugins.ChangeLog.model.Changelog'],
   stores:['Editor.plugins.ChangeLog.store.Changelog'],
+  btnText: '#UT#Änderungsprotokoll der Version ',
   refs:[{
       ref: 'ChangeLogWindow',
       selector: '#changeLogWindow'
@@ -78,7 +79,7 @@ Ext.define('Editor.plugins.ChangeLog.controller.Changelog', {
       pageingToolbar.add(['-',{
           xtype:'button',
           itemId:'changelogbutton',
-          text: Editor.data.app.version
+          text: me.btnText+Editor.data.app.version
       }]);
   },
   changeLogButtonClick:function(){

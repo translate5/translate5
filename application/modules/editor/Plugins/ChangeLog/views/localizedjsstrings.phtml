@@ -31,6 +31,11 @@ END LICENSE AND COPYRIGHT
 /* @var $this Zend_View */
 ?>  
 Editor.controller.Localizer.addPluginInit('changeLog', function() {
+    Ext.define("Editor.locale.plugins.ChangeLog.controller.Changelog", {
+        override: "Editor.plugins.ChangeLog.controller.Changelog",
+        btnText: '<?php echo $this->translate->_('Änderungsprotokoll der Version ');?>'
+    });
+    
     Ext.define("Editor.locale.plugins.ChangeLog.view.Changelog", {
         override: "Editor.plugins.ChangeLog.view.Changelog",
         strings: {
