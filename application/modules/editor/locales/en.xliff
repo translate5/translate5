@@ -752,7 +752,10 @@
         <source>Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, openTM2-XLIFF; Angabe notwendig)</source>
         <target>Select the data to be imported (ZIP, CSV, SDLXLIFF, openTM2-XLIFF;; specifying required)</target>
       </trans-unit>
-      <trans-unit id='SW1wb3J0IERhdGVpwrk='><source>Import Datei¹</source><target>Import Datei¹</target></trans-unit>
+      <trans-unit id='SW1wb3J0IERhdGVpwrk='>
+          <source>Import Datei¹</source>
+          <target>Import Datei¹</target>
+      </trans-unit>
       <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFpJUCwgQ1NWIG9kZXIgU0RMWExJRkYgRGF0ZWkh'>
         <source>Bitte verwenden Sie eine ZIP, CSV oder SDLXLIFF Datei!</source>
         <target>Please use a ZIP, CSV, openTM2-XLIFF oder SDLXLIFF file only!</target>
@@ -1381,6 +1384,99 @@
     <source>Aktuell wird das System gewartet. Sobald die Wartung vorüber ist, können Sie wieder am System arbeiten.</source>
     <target>Maintenance is in progress. When the maintenance is over, you will be able to work again with the system.</target>
 </trans-unit>
+<trans-unit id='ezB9IChpbXBvcnRpZXJ0KQ=='
+    <source>{0} (importiert)</source>
+    <target>{0} (imported)</target>
+</trans-unit>
+<trans-unit id='ezB9ICh0cmFuc2xhdGU1KQ=='>
+    <source>{0} (translate5)</source>
+    <target>{0} (translate5)</target>
+</trans-unit>
+<trans-unit id='S2VpbiBaaWVsdGV4dCB2b3JoYW5kZW4='>
+    <source>Kein Zieltext vorhanden</source>
+    <target>No target-text available</target>
+</trans-unit>
+<trans-unit id='S2VpbmUgSW5mb3JtYXRpb24gdm9yaGFuZGVu'>
+    <source>Keine Information vorhanden</source>
+    <target>No information given</target>
+</trans-unit>
+<trans-unit id='RGFzIHZlcndlbmRldGUgw5xiZXJzZXR6dW5nc3dlcmt6ZXVnIGhhdCBrZWluZSBJbmZvcm1hdGlvbiB6dXIgSGVya3VuZnQgZGVzIE1hdGNoZXMgenVyIFZlcmbDvGd1bmcgZ2VzdGVsbHQu'>
+    <source>Das verwendete Übersetzungswerkzeug hat keine Information zur Herkunft des Matches zur Verfügung gestellt.</source>
+    <target>The previously used translation tool did not provide information to the origin of the match.</target>
+</trans-unit>
+<trans-unit id='RGllc2VyIFRhc2sgd3VyZGUgaW1wb3J0aWVydCwgYmV2b3IgZGFzIE1hdGNoIFJhdGUgVHlwLUZlYXR1cmUgaW1wbGVtZW50aWVydCB3dXJkZS4='>
+    <source>Dieser Task wurde importiert, bevor das Match Rate Typ-Feature implementiert wurde.</source>
+    <target>This task was imported before the match-rate-type feature was implemented.</target>
+</trans-unit>
+<trans-unit id='VE0tTWF0Y2g='>
+    <source>TM-Match</source>
+    <target>TM-Match</target>
+</trans-unit>
+<trans-unit id='TVQtTWF0Y2g='>
+    <source>MT-Match</source>
+    <target>MT-Match</target>
+</trans-unit>
+<trans-unit id='ZWRpdGllcnQ='>
+    <source>editiert</source>
+    <target>edited</target>
+</trans-unit>
+<trans-unit id='UXVlbGxlIMO8YmVybm9tbWVu'>
+    <source>Quelle übernommen</source>
+    <target>Source used</target>
+</trans-unit>
+<trans-unit id='V2llZGVyaG9sdW5n'>
+    <source>Wiederholung</source>
+    <target>Repetition</target>
+</trans-unit>
+<trans-unit id='QWxpZ25tZW50'>
+    <source>Alignment</source>
+    <target>Alignment</target>
+</trans-unit>
+<trans-unit id='RG9rdW1lbnRlbi1NYXRjaA=='>
+    <source>Dokumenten-Match</source>
+    <target>Document-Match</target>
+</trans-unit>
+<trans-unit id='SW0gdXJzcHLDvG5nbGljaGVuIMOcYmVyc2V0enVuZ3N3ZXJremV1ZyBhdcOfZXJoYWxiIHZvbiB0cmFuc2xhdGU1IGF1cyBlaW5lbSBUTSDDvGJlcm5vbW1lbg=='>
+    <source>Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 aus einem TM übernommen</source>
+    <target>In the previously used translation tool (outside of translate5) the target was taken over from a TM</target>
+</trans-unit>
+<trans-unit id='SW0gdXJzcHLDvG5nbGljaGVuIMOcYmVyc2V0enVuZ3N3ZXJremV1ZyBhdcOfZXJoYWxiIHZvbiB0cmFuc2xhdGU1IGF1cyBNYWNoaW5lIFRyYW5zbGF0aW9uIMO8YmVybm9tbWVu'>
+    <source>Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 aus Machine Translation übernommen</source>
+    <target>In the previously used translation tool (outside of translate5) the target was taken over from machine translation</target>
+</trans-unit>
+<trans-unit id='SW0gdXJzcHLDvG5nbGljaGVuIMOcYmVyc2V0enVuZ3N3ZXJremV1ZyBhdcOfZXJoYWxiIHZvbiB0cmFuc2xhdGU1IHZvbSBCZW51dHplciBlZGl0aWVydA=='>
+    <source>Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 vom Benutzer editiert</source>
+    <target>In the previously used translation tool (outside of translate5) the target was edited by a user</target>
+</trans-unit>
+<trans-unit id='SW0gdXJzcHLDvG5nbGljaGVuIMOcYmVyc2V0enVuZ3N3ZXJremV1ZyBhdcOfZXJoYWxiIHZvbiB0cmFuc2xhdGU1IFF1ZWxsZSB2b20gQmVudXR6ZXIgw7xiZXJub21tZW4='>
+    <source>Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 Quelle vom Benutzer übernommen</source>
+    <target>In the previously used translation tool (outside of translate5) the target was taken over from the source</target>
+</trans-unit>
+<trans-unit id='SW0gdXJzcHLDvG5nbGljaGVuIMOcYmVyc2V0enVuZ3N3ZXJremV1ZyBhdcOfZXJoYWxiIHZvbiB0cmFuc2xhdGU1IHZvbSBCZW51dHplciBhbmdlcGFzc3RlcyBTZWdtZW50LCBkYXMgYXV0b21hdGlzY2ggYWxzIFdpZWRlcmhvbHVuZyDDvGJlcm5vbW1lbiB3dXJkZSAoQXV0b3Byb3BhZ2F0aW9uKQ=='>
+    <source>Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 vom Benutzer angepasstes Segment, das automatisch als Wiederholung übernommen wurde (Autopropagation)</source>
+    <target>In the previously used translation tool (outside of translate5) the target was taken over from a repetition (Autopropagation)</target>
+</trans-unit>
+<trans-unit id='SW0gdXJzcHLDvG5nbGljaGVuIMOcYmVyc2V0enVuZ3N3ZXJremV1ZyBhdcOfZXJoYWxiIHZvbiB0cmFuc2xhdGU1IGR1cmNoIGVpbiBBbGlnbm1lbnQgZXJzdGVsbHRlIMOcYmVyc2V0enVuZw=='>
+    <source>Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 durch ein Alignment erstellte Übersetzung</source>
+    <target>In the previously used translation tool (outside of translate5) the target was taken over by Alignment</target>
+</trans-unit>
+<trans-unit id='SW0gdXJzcHLDvG5nbGljaGVuIMOcYmVyc2V0enVuZ3N3ZXJremV1ZyBhdcOfZXJoYWxiIHZvbiB0cmFuc2xhdGU1IHZvbSBCZW51dHplciBhbmdlcGFzc3RlcyBTZWdtZW50LCBkYXMgYXV0b21hdGlzY2ggYWxzIFdpZWRlcmhvbHVuZyDDvGJlcm5vbW1lbiB3dXJkZSAoRG9jdW1lbnQgTWF0Y2gp'>
+    <source>Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 vom Benutzer angepasstes Segment, das automatisch als Wiederholung übernommen wurde (Document Match)</source>
+    <target>In the previously used translation tool (outside of translate5) the target was taken over from a repetition (Document Match)</target>
+</trans-unit>
+<trans-unit id='SW0gdXJzcHLDvG5nbGljaGVuIMOcYmVyc2V0enVuZ3N3ZXJremV1ZyBhdcOfZXJoYWxiIHZvbiB0cmFuc2xhdGU1IGdlc2V0enRlciBTdGF0dXMsIGRlciBkZXJ6ZWl0IHRyYW5zbGF0ZTUgdW5iZWthbm50IGlzdA=='>
+    <source>Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 gesetzter Status, der derzeit translate5 unbekannt ist</source>
+    <target>A type unknown to translate5, set in the previously used translation tool</target>
+</trans-unit>
+<trans-unit id='SW0gQnJvd3NlciBhdXMgVE0gw7xiZXJub21tZW4='>
+    <source>Im Browser aus TM übernommen</source>
+    <target>Taken over in the browser from a TM</target>
+</trans-unit>
+<trans-unit id='SW0gQnJvd3NlciBhdXMgTVQgw7xiZXJub21tZW4='>
+    <source>Im Browser aus MT übernommen</source>
+    <target>Taken over in the browser from a MT</target>
+</trans-unit>
+
     </body>
   </file>
 </xliff>
