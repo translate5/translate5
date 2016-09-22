@@ -35,6 +35,13 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Plugins_ChangeLog_Models_Db_Changelog';
+    protected $aclRoleValue = array(
+        "noRights"=>0,
+        "basic"=>1,
+        "editor"=>2,
+        "pm"=>4,
+        "admin"=>8
+    );
 
     public function loadAllForUser($userGroupId) {
         $db = $this->db->getAdapter();
@@ -83,18 +90,25 @@ class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity
      * @return number
      */
     public function getUsergroup(){
+        $this->checkGroups();
         $user = new Zend_Session_Namespace('user');
-        $aclRoleValue = array(
-                "noRights"=>0,
-                "basic"=>1,
-                "editor"=>2,
-                "pm"=>4,
-                "admin"=>8
-        );
         $userGroupId=0;
         foreach($user->data->roles as $role) {
-                $userGroupId+=$aclRoleValue[$role];
-    	}
-    	return $userGroupId;
+            if(isset($this->aclRoleValue[$role])) {
+                $userGroupId+=$this->aclRoleValue[$role];
+            }
+        }
+        return $userGroupId;
+    }
+    
+    protected function checkGroups() {
+        $aclConfig = ZfExtended_Acl::getInstance()->_aclConfigObject->toArray();
+        $configured = array_values($aclConfig['roles']);
+        $used = array_keys($this->aclRoleValue);
+        sort($used);
+        sort($configured);
+        if($used != $configured) {
+            throw new ZfExtended_Exception('In aclConfig.ini configured roles ('.join(';', $configured).') are not equal to the roles configured in Changelog Model ('.join(';', $used).')');
+        }
     }
 }
