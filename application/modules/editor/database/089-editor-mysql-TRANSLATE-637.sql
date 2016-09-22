@@ -34,5 +34,6 @@ CREATE TABLE `LEK_change_log` (
   `title` varchar(256) DEFAULT NULL,
   `description` mediumtext,
   `userGroup` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `jiraNumberDate_unique` (`dateOfChange`, `jiraNumber`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
