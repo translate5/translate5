@@ -34,5 +34,8 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.ChangeLog.store.Changelog', {
 	  extend : 'Ext.data.Store',
 	  model: 'Editor.plugins.ChangeLog.model.Changelog',
-	  autoLoad: false
+	  remoteSort: true,
+	  remoteFilter: true,
+	  autoLoad: false,
+	  pageSize: 8
 });

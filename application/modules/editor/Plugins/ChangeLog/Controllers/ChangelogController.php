@@ -64,14 +64,18 @@ class editor_Plugins_ChangeLog_ChangelogController extends ZfExtended_RestContro
         //set default sort
         $f = $this->entity->getFilter();
         $f->hasSort() || $f->addSort('dateOfChange', true);//dafault sorting by date
-        $results = $this->entity->loadAllForUser($this->entity->getUsergroup());
-        $totalcount =$this->entity->getTotalCount();
+        $userGroupId=$this->entity->getUsergroup();
+        $results = $this->entity->loadAllForUser($userGroupId);
+        $totalcount =$this->entity->getTotalCount($userGroupId);
         $user = new Zend_Session_Namespace('user');
         $userId = $user->data->id;
         if(!empty($results)){
             //update the user_changelog_info table for user with the latest seen changelog
             $lastInsertedid=max(array_column($results, 'id'));
-            $this->entity->updateChangelogUserInfo($userId, $lastInsertedid);
+            $lastChangelogFromDb=$this->entity->getLastChangelogForUserId($userId);
+            if($lastInsertedid>$lastChangelogFromDb){
+                $this->entity->updateChangelogUserInfo($userId, $lastInsertedid);
+            }
         }
         $this->view->rows = $results;
         $this->view->total =$totalcount;

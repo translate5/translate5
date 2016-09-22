@@ -88,8 +88,8 @@ Ext.define('Editor.plugins.ChangeLog.controller.Changelog', {
   },
   loadChangelogStore:function(changelogfilter){
       var me = this,
-          win,
-          store = me.getEditorPluginsChangeLogStoreChangelogStore();
+          store = me.getEditorPluginsChangeLogStoreChangelogStore(),
+          win = me.getChangeLogWindow() || Ext.widget('changeLogWindow',{changeLogStore: store});
       store.load({
           params: {
               filter: changelogfilter
@@ -97,8 +97,8 @@ Ext.define('Editor.plugins.ChangeLog.controller.Changelog', {
           scope: me,
           callback: function(records, operation, success) {
              if(records && records.length>0){
-                 win = Ext.widget('changeLogWindow',{changeLogStore: store});
                  win.show();
+                 win.down('pagingtoolbar').updateBarInfo();
              }
           }
        });
