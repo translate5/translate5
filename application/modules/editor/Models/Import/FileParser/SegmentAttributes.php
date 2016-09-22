@@ -75,4 +75,10 @@ class editor_Models_Import_FileParser_SegmentAttributes {
      * @var boolean
      */
     public $editable;
+    
+    /**
+     * Stores the info if the segment was translated or not (empty target)
+     * @var boolean
+     */
+    public $isTranslated;
 }

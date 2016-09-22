@@ -544,9 +544,10 @@ abstract class editor_Models_Import_FileParser {
         $attributes->editable = $isEditable;
         $attributes->pretrans = $isFullMatch && !$isAutoprop;
         $attributes->autoStateId = $this->autoStates->calculateImportState($isEditable, $isTranslated);
+        $attributes->isTranslated = $isTranslated;
         
         //if there was a matchRateType from the imported segment, then the original value was stored
-        $attributes->matchRateType = $this->matchRateType->parseImport((string) $attributes->matchRateType, $this->_mid);
+        $attributes->matchRateType = $this->matchRateType->parseImport($attributes, $this->_mid);
     }
     
     /**

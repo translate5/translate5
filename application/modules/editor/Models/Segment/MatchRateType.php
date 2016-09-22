@@ -84,6 +84,18 @@ class editor_Models_Segment_MatchRateType {
     const TYPE_UNKNOWN = 'unknown';
     
     /**
+     * When in the segment no information was given
+     * @var string
+     */
+    const TYPE_NONE = 'none';
+    
+    /**
+     * When the matchrate was 0 and the target = empty
+     * @var string
+     */
+    const TYPE_EMPTY = 'empty';
+    
+    /**
      * Uses as match rate prefix when the value comes from import
      * @var string
      */
@@ -154,14 +166,22 @@ class editor_Models_Segment_MatchRateType {
     }
     
     /**
-     * generates the matchrate type by imported data
-     * @param string $importedValue the plain value from 
+     * generates the matchrate type by imported segment data
+     * @param editor_Models_Import_FileParser_SegmentAttributes $importedValue the plain value from 
      * @param mixed $mid segment mid for logging purposes only
      * @return editor_Models_Segment_MatchRateType
      */
-    public function parseImport(string $importedValue, $mid){
+    public function parseImport(editor_Models_Import_FileParser_SegmentAttributes $attributes, $mid){
+        $importedValue = $attributes->matchRateType;
         $this->data = [self::PREFIX_IMPORT];
+        
+        if(!$attributes->isTranslated && $attributes->matchRate === 0) {
+            $this->data[] = self::TYPE_EMPTY;
+            return $this;
+        }
+        
         if(empty($importedValue) || $importedValue == self::PREFIX_IMPORT) {
+            $this->data[] = self::TYPE_NONE;
             return $this;
         }
         
