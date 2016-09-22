@@ -33,7 +33,7 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
     alias: 'widget.changeLogWindow',
     itemId: 'changeLogWindow',
     cls: 'changeLogWindow',
-    minHeight : 500,
+    height:500,
     width : 800,
     autoHeight: true,
     autoScroll: true,
@@ -46,6 +46,15 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
         description: '#UT#Beschreibung',
         title:'#UT#Aktuelle Änderungen an der Anwendung',
         close:'#UT#Schließen'
+    },
+    listeners: {
+        afterlayout: function() {
+            var height = Ext.getBody().getViewSize().height;
+            if (this.getHeight() > height) {
+                this.setHeight(height);
+            }
+            this.center();
+        }
     },
     initComponent: function() {
         var me = this;
@@ -100,6 +109,7 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
                     xtype: 'pagingtoolbar',
                     itemId: 'pagingtoolbar',
                     dock:'bottom',
+                    store: instanceConfig.changeLogStore,
                 }]
             }]
         };

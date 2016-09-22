@@ -50,6 +50,12 @@ class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity
         return $this->loadFilterdCustom($s);
     }
     
+    public function getTotalCount($userGroupId){
+        $db = $this->db->getAdapter();
+        $s = $this->db->select()->where('LEK_change_log.userGroup & '.$db->quote($userGroupId, 'INTEGER').'');
+        return $this->computeTotalCount($s);
+    }
+    
     
     public function moreChangeLogs($lastSeen, $userGroupId){
         $db = $this->db->getAdapter();
