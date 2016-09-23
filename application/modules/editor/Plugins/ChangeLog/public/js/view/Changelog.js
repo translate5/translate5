@@ -45,7 +45,11 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
         jiranumber: '#UT#Änderungsnr.',
         description: '#UT#Beschreibung',
         title:'#UT#Aktuelle Änderungen an der Anwendung',
-        close:'#UT#Schließen'
+        close:'#UT#Schließen',
+        type:'#UT#Typ',
+        bugfix:'#UT#Bugfix',
+        feature:'#UT#Feature',
+        change:'#UT#Change',
     },
     listeners: {
         afterlayout: function() {
@@ -67,6 +71,7 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
             items:[{
                 xtype: 'grid',
                 itemId: 'changeLogGrid',
+                cls:'changeLogGrid',
                 store: instanceConfig.changeLogStore,
                 columns: [{
                     xtype: 'datecolumn',
@@ -88,6 +93,21 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
                     text: me.strings.description,
                     renderer: function(v, meta, rec) {
                         return '<b>'+rec.get('title')+'</b><br>'+v;
+                    }
+                },{
+                    xtype:'gridcolumn',
+                    dataIndex:'type',
+                    cellWrap: true,
+                    width: 55,
+                    text:me.strings.type,
+                    renderer:function(v,meta,rec){
+                        var type=rec.get('type');
+                        if(!type || type==""){
+                            type="change";
+                        }
+                        meta.tdAttr= 'data-qtip="'+me.strings[type]+'"';
+                        meta.tdCls = meta.tdCls  + ' type-'+type;
+                        return "";
                     }
                 }],
                 dockedItems:[{
