@@ -182,7 +182,7 @@ Ext.define('Editor.controller.ServerException', {
      * Redirect user to the maintenance page
      */
     handleMaintenance:function(){
-        location.href = Editor.data.loginUrl;
+        location.reload();
     }
 },
 /**
