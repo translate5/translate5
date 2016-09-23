@@ -68,9 +68,14 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
                 xtype: 'grid',
                 itemId: 'changeLogGrid',
                 store: instanceConfig.changeLogStore,
+                plugins: ['gridfilters'],
                 columns: [{
                     xtype: 'datecolumn',
                     dataIndex: 'dateOfChange',
+                    filter: {
+                        type: 'date',
+                        dateFormat:Editor.DATEONLY_ISO_FORMAT
+                    },
                     cellWrap: true,
                     width: 100,
                     text: me.strings.date
@@ -79,12 +84,18 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
                     cellWrap: true,
                     width: 150,
                     dataIndex: 'jiraNumber',
+                    filter: {
+                        type: 'string'
+                    },
                     text: me.strings.jiranumber
                 },{
                     xtype: 'gridcolumn',
                     flex: 1,
                     cellWrap: true,
                     dataIndex: 'description',
+                    filter: {
+                        type: 'string'
+                    },
                     text: me.strings.description,
                     renderer: function(v, meta, rec) {
                         return '<b>'+rec.get('title')+'</b><br>'+v;
