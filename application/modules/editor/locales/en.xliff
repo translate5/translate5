@@ -1384,7 +1384,7 @@
     <source>Aktuell wird das System gewartet. Sobald die Wartung vorüber ist, können Sie wieder am System arbeiten.</source>
     <target>Maintenance is in progress. When the maintenance is over, you will be able to work again with the system.</target>
 </trans-unit>
-<trans-unit id='ezB9IChpbXBvcnRpZXJ0KQ=='
+<trans-unit id='ezB9IChpbXBvcnRpZXJ0KQ=='>
     <source>{0} (importiert)</source>
     <target>{0} (imported)</target>
 </trans-unit>
