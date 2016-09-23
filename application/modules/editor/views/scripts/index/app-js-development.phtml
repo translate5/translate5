@@ -54,7 +54,7 @@ $version = '?v='.$this->appVersion;
 
 <script src="<?php echo $this->extJsBasepath;?>/build/ext-all-debug.js"></script>
 <script src="<?php echo $this->extJsBasepath;?>/build/packages/ux/classic/ux.js"></script>
-<script src="<?php echo $this->extJsBasepath;?>/build/classic/locale/locale-de-debug.js"></script>
+<script src="<?php echo $this->extJsBasepath;?>/build/classic/locale/locale-<?php echo $this->locale;?>-debug.js"></script>
 <script src="<?php echo $this->publicModulePath; ?>/js/app/MessageBox.js"></script>
 <script>
 //Intercept setPath for developing systems, on production all should work with above builded code 
