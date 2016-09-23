@@ -32,6 +32,7 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
     extend: 'Ext.window.Window',
     alias: 'widget.changeLogWindow',
     itemId: 'changeLogWindow',
+    requires: ['Editor.plugins.ChangeLog.view.TypeColumn'],
     cls: 'changeLogWindow',
     height:500,
     width : 800,
@@ -49,7 +50,7 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
         type:'#UT#Typ',
         bugfix:'#UT#Bugfix',
         feature:'#UT#Feature',
-        change:'#UT#Change',
+        change:'#UT#Change'
     },
     listeners: {
         afterlayout: function() {
@@ -73,6 +74,7 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
                 itemId: 'changeLogGrid',
                 cls:'changeLogGrid',
                 store: instanceConfig.changeLogStore,
+                strings:me.strings,
                 plugins: ['gridfilters'],
                 columns: [{
                     xtype: 'datecolumn',
@@ -106,20 +108,7 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
                         return '<b>'+rec.get('title')+'</b><br>'+v;
                     }
                 },{
-                    xtype:'gridcolumn',
-                    dataIndex:'type',
-                    cellWrap: true,
-                    width: 55,
-                    text:me.strings.type,
-                    renderer:function(v,meta,rec){
-                        var type=rec.get('type');
-                        if(!type || type==""){
-                            type="change";
-                        }
-                        meta.tdAttr= 'data-qtip="'+me.strings[type]+'"';
-                        meta.tdCls = meta.tdCls  + ' type-'+type;
-                        return "";
-                    }
+                    xtype:'typeColumn'
                 }],
                 dockedItems:[{
                     xtype: 'toolbar',

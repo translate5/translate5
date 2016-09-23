@@ -44,6 +44,14 @@ Editor.controller.Localizer.addPluginInit('changeLog', function() {
             description: '<?php echo $this->translate->_('Beschreibung');?>',
             title: '<?php echo $this->translate->_('Aktuelle Änderungen an der Anwendung');?>',
             close: '<?php echo $this->translate->_('Schließen');?>',
+            bugfix: '<?php echo $this->translate->_('Bugfix');?>',
+            feature: '<?php echo $this->translate->_('Feature');?>',
+            change: '<?php echo $this->translate->_('Change');?>'
+        }
+    });
+    Ext.define("Editor.locale.plugins.ChangeLog.view.TypeColumn", {
+        override: "Editor.plugins.ChangeLog.view.TypeColumn",
+        strings: {
             type: '<?php echo $this->translate->_('Typ');?>',
             bugfix: '<?php echo $this->translate->_('Bugfix');?>',
             feature: '<?php echo $this->translate->_('Feature');?>',
