@@ -75,7 +75,7 @@ Ext.define('Editor.util.TaskActions', {
      * @return {Boolean}
      */
     isEditing: function() {
-        if(Editor.app.getController('Editor').editing) {
+        if(Editor.app.getController('Editor').isEditing) {
             Editor.MessageBox.addWarning(this.strings.saveSegmentFirst);
             return true;
         }
