@@ -27,7 +27,7 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-CREATE TABLE `LEK_change_log` (
+CREATE TABLE IF NOT EXISTS `LEK_change_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `dateOfChange` date DEFAULT NULL,
   `jiraNumber` varchar(100) DEFAULT NULL,
