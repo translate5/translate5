@@ -38,7 +38,7 @@ Ext.define('Editor.view.MaintenancePanel', {
     initConfig: function(instanceConfig) {
         var me = this,
             date = instanceConfig.maintenanceStartDate ? instanceConfig.maintenanceStartDate : Editor.data.maintenance.startDate,
-            date = Ext.Date.format(new Date(date), Ext.Date.defaultFormat + ' ' + Ext.form.field.Time.prototype.format),
+            date = Ext.Date.format(Ext.Date.parse(date, Editor.DATE_ISO_FORMAT), Ext.Date.defaultFormat + ' ' + Ext.form.field.Time.prototype.format),
             config = {
         		frame: false,
         		border: false,
