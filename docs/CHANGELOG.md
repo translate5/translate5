@@ -3,6 +3,32 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.5.1] - 2016-09-27
+###Added
+TRANSLATE-637: Inform users about new features
+TRANSLATE-137: Maintenance Mode
+TRANSLATE-680: Automatic substituations of tags for repetitions
+TRANSLATE-612: User-Authentication via API
+TRANSLATE-664: Integrate separate help area in translate5 editor
+TRANSLATE-684: Introduce match-type column
+TRANSLATE-644: enable editor-only usage in translate5
+TRANSLATE-718: Introduce a config switch to disable comment export (default is to enable export)
+TRANSLATE-625: Switch Task-Import and -export to worker-architecture
+TRANSLATE-621: Implement task status "error"
+
+###Changed
+TRANSLATE-646: search for "füll" is finding the attribute-value "full", that is contained in every internal tag
+TRANSLATE-750: Make API auth default locale configurable
+
+###Bugfixes
+TRANSLATE-725: Filtering status column in task overview throws error
+TRANSLATE-727: Filtering source language column in task overview throws an error
+TRANSLATE-728: Missing column title for match resource column
+several
+TRANSLATE-715: Fix MQM short cut labels
+TRANSLATE-749: session locale fix
+
+
 ## [2.4.16] - 2016-08-04
 ### Added
 TRANSLATE-711: Check-Script for translate-683
