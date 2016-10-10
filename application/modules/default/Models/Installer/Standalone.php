@@ -104,16 +104,16 @@ class Models_Installer_Standalone {
         $saInstaller = new self(getcwd());
         //TODO move options parameter to constructor instead of multiple usage
         $saInstaller->checkEnvironment();
-        //$saInstaller->processDependencies($options);
+        $saInstaller->processDependencies($options);
         $saInstaller->checkMyselfForUpdates();
         $saInstaller->addZendToIncludePath();
-        //$saInstaller->installation($options);//checks internally if steps are already done
-        //$saInstaller->cleanUpDeletedFiles(); //must be before initApplication!
+        $saInstaller->installation($options);//checks internally if steps are already done
+        $saInstaller->cleanUpDeletedFiles(); //must be before initApplication!
         $saInstaller->initApplication();
-        //$saInstaller->postInstallation();
+        $saInstaller->postInstallation();
         $saInstaller->checkDb();
-        //$saInstaller->updateDb();
-        //$saInstaller->done();
+        $saInstaller->updateDb();
+        $saInstaller->done();
     }
     
     /**
