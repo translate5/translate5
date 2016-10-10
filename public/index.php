@@ -32,12 +32,6 @@ END LICENSE AND COPYRIGHT
 if(file_exists('../client-specific/index_prerun.php')) {
     include('../client-specific/index_prerun.php');
 }
-if(false && date('Y-m-d') === '2014-09-08') {
-    header("HTTP/1.1 503 Service Unavailable", true, 503);
-    header("Retry-After: 86400");
-    require('maintenance.html');
-    exit;
-}
 require_once '../library/ZfExtended/BaseIndex.php';
 $index = ZfExtended_BaseIndex::getInstance();
 $index->startApplication();

@@ -51,6 +51,12 @@ class Models_Installer_Standalone {
     const HOSTNAME_LINUX = 'translate5.local';
     
     /**
+     * Increase this value to force a restart of the updater while updating
+     * @var integer
+     */
+    const INSTALLER_VERSION = 1;
+    
+    /**
      * @var string
      */
     protected $currentWorkingDir;
@@ -71,6 +77,25 @@ class Models_Installer_Standalone {
     protected $isInstallation = false;
     
     /**
+     * Stores the md5 hash of this file before downloading the update.
+     * If the hash is changing after downloading the translate5 package this means
+     * updates in the updater itself, so that it has to be restarted! 
+     * @var string
+     */
+    protected $installerHash;
+    
+    /**
+     * contains the called file, the path to this file
+     * @var string
+     */
+    protected $installerFile;
+    
+    /**
+     * @var Models_Installer_PreconditionCheck
+     */
+    protected $preconditonChecker;
+    
+    /**
      * Options: 
      * mysql_bin => path to mysql binary
      * @param array $options
@@ -78,26 +103,31 @@ class Models_Installer_Standalone {
     public static function mainLinux(array $options = null) {
         $saInstaller = new self(getcwd());
         //TODO move options parameter to constructor instead of multiple usage
-        $saInstaller->processDependencies($options);
+        $saInstaller->checkEnvironment();
+        //$saInstaller->processDependencies($options);
+        $saInstaller->checkMyselfForUpdates();
         $saInstaller->addZendToIncludePath();
-        $saInstaller->installation($options);//checks internally if steps are already done
-        $saInstaller->cleanUpDeletedFiles(); //must be before initApplication!
+        //$saInstaller->installation($options);//checks internally if steps are already done
+        //$saInstaller->cleanUpDeletedFiles(); //must be before initApplication!
         $saInstaller->initApplication();
-        $saInstaller->postInstallation();
-        $saInstaller->updateDb();
-        $saInstaller->done();
+        //$saInstaller->postInstallation();
+        $saInstaller->checkDb();
+        //$saInstaller->updateDb();
+        //$saInstaller->done();
     }
     
     /**
      * @param string $currentWorkingDir
      */
-    public function __construct($currentWorkingDir) {
+    protected function __construct($currentWorkingDir) {
         $this->currentWorkingDir = $currentWorkingDir;
         //requiering the following hardcoded since, autoloader must be downloaded with Zend Package
         require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/License.php';
         require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/Downloader.php';
         require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/Dependencies.php';
         require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/DbUpdater.php';
+        require_once $this->currentWorkingDir.'/application/modules/default/Models/Installer/PreconditionCheck.php';
+        $this->preconditonChecker = new Models_Installer_PreconditionCheck();
         $this->setHostname();
     }
     
@@ -108,7 +138,19 @@ class Models_Installer_Standalone {
         }
     }
     
-    public function processDependencies(array $options) {
+    protected function checkEnvironment() {
+        $this->installerFile = __FILE__;
+        $this->installerHash = md5_file($this->installerFile);
+        $this->preconditonChecker->checkEnvironment();
+    }
+    
+    protected function checkMyselfForUpdates() {
+        if($this->installerHash !== md5_file($this->installerFile)) {
+            die("\n\n The translate5 Updater has updated it self, please restart the install-and-update script!\n\n");
+        }
+    }
+    
+    protected function processDependencies(array $options) {
         $this->logSection('Checking server for updates and packages:');
         $downloader = new ZfExtended_Models_Installer_Downloader($this->currentWorkingDir);
         
@@ -124,7 +166,7 @@ class Models_Installer_Standalone {
         $downloader->pullDependencies(true);
     }
     
-    public function installation(array $options = null) {
+    protected function installation(array $options = null) {
         //assume installation success if installation.ini exists!
         if(file_exists($this->currentWorkingDir.self::INSTALL_INI)){
             return;
@@ -358,6 +400,41 @@ class Models_Installer_Standalone {
         return ($bytes > 0);
     }
     
+    protected function checkDb() {
+        $this->preconditonChecker->checkDb();
+        //FIXME
+        /*
+        - ONLY_FULL_GROUP_BY
+- NO_ZERO_IN_DATE
+- NO_ZERO_DATE
+- STRICT_TRANS_TABLES
+- binary logging and user has no SUPER privilege
+*/
+//show variables WHERE Variable_name in ('ONLY_FULL_GROUP_BY', 'NO_ZERO_IN_DATE', 'NO_ZERO_DATE', 'STRICT_TRANS_TABLES', '');
+//show variables WHERE Variable_name in ('LOG_BIN', 'log_bin_trust_function_creators');
+//CREATE TRIGGER updater_super_check BEFORE UPDATE ON Zf_dbversion FOR EACH ROW SET NEW.id = OLD.id;
+//DROP TRIGGER updater_super_check;
+
+            $config = Zend_Registry::get('config');
+            $db = Zend_Db::factory($config->resources->db);
+            try {
+                $db->query("DROP TRIGGER updater_super_check");
+            }
+            catch(Zend_Db_Statement_Exception $e) {
+                $m = $e->getMessage();
+                //SQLSTATE[HY000]: General error: 1419 You do not have the SUPER privilege and binary logging is enabled (you *might* want to use the less safe log_bin_trust_function_creators variable), query was: DROP TRIGGER updater_super_check
+                if(strpos($m, 'Trigger does not exist, query was: DROP TRIGGER updater_super_check')!== false) {
+                    return; //trigger not exist → ALL OK
+                }
+                if(strpos($m, 'You do not have the SUPER privilege and binary logging is enabled')!== false) {
+                    
+                    return; //trigger not exist → ALL OK
+                }
+                print_r($m);
+                //unknown error in db checking: $m
+            }
+    }
+    
     /**
      * Applies all DB alter statement files to the DB
      */
@@ -366,7 +443,7 @@ class Models_Installer_Standalone {
         
         $dbupdater = ZfExtended_Factory::get('ZfExtended_Models_Installer_DbUpdater');
         /* @var $dbupdater ZfExtended_Models_Installer_DbUpdater */
-        $stat = $dbupdater->importAll();
+        $stat = $dbupdater->importAll(true); //FIXME remove this parameter after some time, see comment in importAll method
         
         $errors = $dbupdater->getErrors();
         if(!empty($errors)) {
