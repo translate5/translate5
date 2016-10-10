@@ -402,37 +402,6 @@ class Models_Installer_Standalone {
     
     protected function checkDb() {
         $this->preconditonChecker->checkDb();
-        //FIXME
-        /*
-        - ONLY_FULL_GROUP_BY
-- NO_ZERO_IN_DATE
-- NO_ZERO_DATE
-- STRICT_TRANS_TABLES
-- binary logging and user has no SUPER privilege
-*/
-//show variables WHERE Variable_name in ('ONLY_FULL_GROUP_BY', 'NO_ZERO_IN_DATE', 'NO_ZERO_DATE', 'STRICT_TRANS_TABLES', '');
-//show variables WHERE Variable_name in ('LOG_BIN', 'log_bin_trust_function_creators');
-//CREATE TRIGGER updater_super_check BEFORE UPDATE ON Zf_dbversion FOR EACH ROW SET NEW.id = OLD.id;
-//DROP TRIGGER updater_super_check;
-
-            $config = Zend_Registry::get('config');
-            $db = Zend_Db::factory($config->resources->db);
-            try {
-                $db->query("DROP TRIGGER updater_super_check");
-            }
-            catch(Zend_Db_Statement_Exception $e) {
-                $m = $e->getMessage();
-                //SQLSTATE[HY000]: General error: 1419 You do not have the SUPER privilege and binary logging is enabled (you *might* want to use the less safe log_bin_trust_function_creators variable), query was: DROP TRIGGER updater_super_check
-                if(strpos($m, 'Trigger does not exist, query was: DROP TRIGGER updater_super_check')!== false) {
-                    return; //trigger not exist → ALL OK
-                }
-                if(strpos($m, 'You do not have the SUPER privilege and binary logging is enabled')!== false) {
-                    
-                    return; //trigger not exist → ALL OK
-                }
-                print_r($m);
-                //unknown error in db checking: $m
-            }
     }
     
     /**
