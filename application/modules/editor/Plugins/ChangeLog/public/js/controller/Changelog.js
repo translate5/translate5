@@ -63,8 +63,18 @@ Ext.define('Editor.plugins.ChangeLog.controller.Changelog', {
       }
   },
   init: function(){
+      var me = this;
+      me.callParent(arguments);
+  },
+  addButtonToTaskOverviewToolbar:function(pageingToolbar,event){
       var me = this,
           changelogfilter;
+      pageingToolbar.add(['-',{
+          xtype:'button',
+          itemId:'changelogbutton',
+          text: me.btnText+Editor.data.app.version
+      }]);
+      
       if(Editor.data.plugins.ChangeLog.lastSeenChangelogId>0){
           changelogfilter='[{"operator":"gt","value":'+Editor.data.plugins.ChangeLog.lastSeenChangelogId+',"property":"id"}]'; 
           me.loadChangelogStore(changelogfilter);
@@ -72,15 +82,6 @@ Ext.define('Editor.plugins.ChangeLog.controller.Changelog', {
       if(Editor.data.plugins.ChangeLog.lastSeenChangelogId<0){
           me.loadChangelogStore(changelogfilter);
       }
-      me.callParent(arguments);
-  },
-  addButtonToTaskOverviewToolbar:function(pageingToolbar,event){
-      var me = this;
-      pageingToolbar.add(['-',{
-          xtype:'button',
-          itemId:'changelogbutton',
-          text: me.btnText+Editor.data.app.version
-      }]);
   },
   changeLogButtonClick:function(){
       var me=this;
