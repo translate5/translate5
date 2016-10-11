@@ -30,12 +30,12 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.view.admin.TaskGrid', {
   extend: 'Ext.grid.Panel',
-  requires: ['Editor.view.admin.TaskActionColumn', 'Editor.view.GridHeaderToolTip','Editor.view.CheckColumn'],
+  requires: ['Editor.view.admin.TaskActionColumn','Editor.view.CheckColumn'],
   alias: 'widget.adminTaskGrid',
   itemId: 'adminTaskGrid',
   cls: 'adminTaskGrid',
   title: '#UT#Aufgabenübersicht',
-  plugins: ['headertooltip', 'gridfilters'],
+  plugins: ['gridfilters'],
   layout: {
       type: 'fit'
   },
