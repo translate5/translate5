@@ -33,5 +33,31 @@ END LICENSE AND COPYRIGHT
  * else RestRoutes, ACL authentication, etc. will not work.
  */
 class editor_SessionController extends ZfExtended_SessionController {
-    
+    public function postAction() {
+        if(!parent::postAction()) {
+            return;
+        }
+        settype($this->data->taskGuid, 'string');
+        $taskGuid = $this->getParam('taskGuid', $this->data->taskGuid);
+        
+        //if there is no taskGuid provided, we don't have to load one
+        if(empty($taskGuid)) {
+            return;
+        }
+        
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        
+        $params = ['id' => $task->getId(), 'data' => '{"userState":"edit","id":'.$task->getId().'}'];
+        $this->forward('put', 'task', 'editor', $params);
+        
+        // the static event manager must be used!
+        $events = Zend_EventManager_StaticEventManager::getInstance();
+        $events->attach('editor_TaskController', 'afterPutAction', function(Zend_EventManager_Event $event){
+            //clearing the view vars added in Task::PUT keeps the old content (the session id and token) 
+            $view = $event->getParam('view');
+            $view->clearVars();
+        });
+    }
 }
