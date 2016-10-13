@@ -32,6 +32,7 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
     extend: 'Ext.window.Window',
     alias: 'widget.changeLogWindow',
     itemId: 'changeLogWindow',
+    requires: ['Editor.plugins.ChangeLog.view.TypeColumn'],
     cls: 'changeLogWindow',
     height:500,
     width : 800,
@@ -51,7 +52,7 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
     types: {
         bugfix:'#UT#Bugfix',
         feature:'#UT#Feature',
-        change:'#UT#Change',
+        change:'#UT#Change'
     },
     listeners: {
         afterlayout: function() {
@@ -75,38 +76,37 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
                 itemId: 'changeLogGrid',
                 cls:'changeLogGrid',
                 store: instanceConfig.changeLogStore,
+                strings:me.strings,
+                plugins: ['gridfilters'],
                 columns: [{
                     xtype: 'datecolumn',
                     dataIndex: 'dateOfChange',
+                    filter: {
+                        type: 'date',
+                        dateFormat:Editor.DATEONLY_ISO_FORMAT
+                    },
                     cellWrap: true,
                     width: 100,
                     text: me.strings.date
                 },{
-                    xtype:'gridcolumn',
-                    dataIndex:'type',
-                    cellWrap: true,
-                    width: 50,
-                    text:me.strings.type,
-                    renderer:function(v,meta,rec){
-                        var type=rec.get('type');
-                        if(!type || type==""){
-                            type="change";
-                        }
-                        meta.tdAttr= 'data-qtip="'+me.types[type]+'"';
-                        meta.tdCls = meta.tdCls  + 'type '+type;
-                        return "";
-                    }
+                    xtype:'typecolumn'
                 },{
                     xtype: 'gridcolumn',
                     cellWrap: true,
                     width: 150,
                     dataIndex: 'jiraNumber',
+                    filter: {
+                        type: 'string'
+                    },
                     text: me.strings.jiranumber
                 },{
                     xtype: 'gridcolumn',
                     flex: 1,
                     cellWrap: true,
                     dataIndex: 'description',
+                    filter: {
+                        type: 'string'
+                    },
                     text: me.strings.description,
                     renderer: function(v, meta, rec) {
                         return '<b>'+rec.get('title')+'</b><br>'+v;
