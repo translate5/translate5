@@ -46,7 +46,9 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
         description: '#UT#Beschreibung',
         title:'#UT#Aktuelle Änderungen an der Anwendung',
         close:'#UT#Schließen',
-        type:'#UT#Typ',
+        type:'#UT#Typ'
+    },
+    types: {
         bugfix:'#UT#Bugfix',
         feature:'#UT#Feature',
         change:'#UT#Change',
@@ -80,6 +82,21 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
                     width: 100,
                     text: me.strings.date
                 },{
+                    xtype:'gridcolumn',
+                    dataIndex:'type',
+                    cellWrap: true,
+                    width: 50,
+                    text:me.strings.type,
+                    renderer:function(v,meta,rec){
+                        var type=rec.get('type');
+                        if(!type || type==""){
+                            type="change";
+                        }
+                        meta.tdAttr= 'data-qtip="'+me.types[type]+'"';
+                        meta.tdCls = meta.tdCls  + 'type '+type;
+                        return "";
+                    }
+                },{
                     xtype: 'gridcolumn',
                     cellWrap: true,
                     width: 150,
@@ -93,21 +110,6 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
                     text: me.strings.description,
                     renderer: function(v, meta, rec) {
                         return '<b>'+rec.get('title')+'</b><br>'+v;
-                    }
-                },{
-                    xtype:'gridcolumn',
-                    dataIndex:'type',
-                    cellWrap: true,
-                    width: 55,
-                    text:me.strings.type,
-                    renderer:function(v,meta,rec){
-                        var type=rec.get('type');
-                        if(!type || type==""){
-                            type="change";
-                        }
-                        meta.tdAttr= 'data-qtip="'+me.strings[type]+'"';
-                        meta.tdCls = meta.tdCls  + ' type-'+type;
-                        return "";
                     }
                 }],
                 dockedItems:[{

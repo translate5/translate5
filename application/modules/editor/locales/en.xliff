@@ -1476,7 +1476,22 @@
     <source>Im Browser aus MT übernommen</source>
     <target>Taken over in the browser from a MT</target>
 </trans-unit>
-
+<trans-unit id='VHlw'>
+    <source>Typ</source>
+    <target>Type</target>
+</trans-unit>
+<trans-unit id='QnVnZml4'>
+    <source>Bugfix</source>
+    <target>Bugfix</target>
+</trans-unit>
+<trans-unit id='RmVhdHVyZQ=='>
+    <source>Feature</source>
+    <target>Feature</target>
+</trans-unit>
+<trans-unit id='Q2hhbmdl'>
+    <source>Change</source>
+    <target>Change</target>
+</trans-unit>
     </body>
   </file>
 </xliff>
