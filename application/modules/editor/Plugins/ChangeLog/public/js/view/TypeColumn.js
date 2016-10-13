@@ -41,11 +41,13 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.plugins.ChangeLog.view.TypeColumn', {
   extend: 'Ext.grid.column.Column',
-  alias: 'widget.typeColumn',
+  alias: 'widget.typecolumn',
   dataIndex: 'type',
   filter: null,
   strings: {
-      type:'#UT#Typ',
+      type:'#UT#Typ'
+  },
+  types: {
       bugfix:'#UT#Bugfix',
       feature:'#UT#Feature',
       change:'#UT#Change'
@@ -76,12 +78,13 @@ Ext.define('Editor.plugins.ChangeLog.view.TypeColumn', {
   },
   renderer:function(v,meta,rec){
       var me=this,
+          types = me.down('typecolumn').types,
           type=rec.get('type');
       
       if(!type || type==""){
           type="change";
       }
-      meta.tdAttr= 'data-qtip="'+me.types[type]+'"';
+      meta.tdAttr= 'data-qtip="'+types[type]+'"';
       meta.tdCls = meta.tdCls  + 'type '+type;
       return "";
   }

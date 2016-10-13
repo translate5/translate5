@@ -46,13 +46,7 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
         jiranumber: '#UT#Änderungsnr.',
         description: '#UT#Beschreibung',
         title:'#UT#Aktuelle Änderungen an der Anwendung',
-        close:'#UT#Schließen',
-        type:'#UT#Typ'
-    },
-    types: {
-        bugfix:'#UT#Bugfix',
-        feature:'#UT#Feature',
-        change:'#UT#Change'
+        close:'#UT#Schließen'
     },
     listeners: {
         afterlayout: function() {
