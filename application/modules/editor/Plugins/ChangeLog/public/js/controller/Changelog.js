@@ -80,28 +80,37 @@ Ext.define('Editor.plugins.ChangeLog.controller.Changelog', {
           me.loadChangelogStore(changelogfilter);
       }
       if(Editor.data.plugins.ChangeLog.lastSeenChangelogId<0){
-          me.loadChangelogStore(changelogfilter);
+          me.loadChangelogStore();
       }
   },
   changeLogButtonClick:function(){
       var me=this;
-      me.loadChangelogStore('');
+      me.loadChangelogStore();
   },
-  loadChangelogStore:function(changelogfilter){
+  loadChangelogStore:function(initalFilter){
       var me = this, win,
-          store = me.getEditorPluginsChangeLogStoreChangelogStore();
+          store = me.getEditorPluginsChangeLogStoreChangelogStore(),
+          params = {};
+      if(initalFilter) {
+          params.filter = initalFilter;
+          //disable paging, if we want paging on initial load, 
+          // we have to change the lastInsertedid in PHP (without max then)
+          params.limit = 0; 
+      }
       
-      store.clearFilter();
+      //for window creation the store suppressNextFilter must be set to true, otherwise the rendering with filters would trigger a load
       win = me.getChangeLogWindow() || Ext.widget('changeLogWindow',{changeLogStore: store});
+      //disable the suppressing again after store init, so that filters can process normally
+      store.suppressNextFilter = false;
+      store.clearFilter();
       store.load({
-          params: {
-              filter: changelogfilter
-          },
+          params: params,
           scope: me,
           callback: function(records, operation, success) {
              if(records && records.length>0){
                  win.show();
                  win.down('pagingtoolbar').updateBarInfo();
+                 win.down('pagingtoolbar').setVisible(!initalFilter);
              }
           }
        });

@@ -63,7 +63,8 @@ class editor_Plugins_ChangeLog_ChangelogController extends ZfExtended_RestContro
     public function indexAction(){
         //set default sort
         $f = $this->entity->getFilter();
-        $f->hasSort() || $f->addSort('dateOfChange', true);//dafault sorting by date
+        //default sorting by date
+        $f->hasSort() || $f->addSort('dateOfChange', true);
         $userGroupId=$this->entity->getUsergroup();
         $results = $this->entity->loadAllForUser($userGroupId);
         $totalcount =$this->entity->getTotalCount($userGroupId);
