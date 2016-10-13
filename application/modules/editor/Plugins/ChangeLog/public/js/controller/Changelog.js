@@ -88,9 +88,11 @@ Ext.define('Editor.plugins.ChangeLog.controller.Changelog', {
       me.loadChangelogStore('');
   },
   loadChangelogStore:function(changelogfilter){
-      var me = this,
-          store = me.getEditorPluginsChangeLogStoreChangelogStore(),
-          win = me.getChangeLogWindow() || Ext.widget('changeLogWindow',{changeLogStore: store});
+      var me = this, win,
+          store = me.getEditorPluginsChangeLogStoreChangelogStore();
+      
+      store.clearFilter();
+      win = me.getChangeLogWindow() || Ext.widget('changeLogWindow',{changeLogStore: store});
       store.load({
           params: {
               filter: changelogfilter
