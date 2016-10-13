@@ -1,1 +1,6 @@
 @CHARSET "UTF-8";
+
+.changeLogGrid  td.type {background-repeat:no-repeat; background-position:5px 3px;}
+.changeLogGrid  td.type.feature {background-image:url(images/add.png);}
+.changeLogGrid  td.type.change {background-image:url(images/arrow_refresh.png);}
+.changeLogGrid  td.type.bugfix {background-image:url(images/lightning.png);}

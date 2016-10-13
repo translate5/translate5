@@ -45,7 +45,8 @@ Ext.define('Editor.plugins.ChangeLog.model.Changelog', {
     {name: 'jiraNumber', type: 'string'},
     {name: 'title', type: 'string'},
     {name: 'description', type: 'string'},
-    {name: 'userGroup', type: 'integer'}
+    {name: 'userGroup', type: 'integer'},
+    {name: 'type', type: 'string'}
   ],
 	idProperty: 'id',
 	proxy : {
