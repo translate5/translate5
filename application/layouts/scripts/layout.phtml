@@ -1,34 +1,34 @@
 <?php
 /*
-START LICENSE AND COPYRIGHT
+  START LICENSE AND COPYRIGHT
 
- This file is part of translate5
- 
- Copyright (c) 2013 - 2015 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+  This file is part of translate5
 
- Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+  Copyright (c) 2013 - 2015 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
- This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
- to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3.0 requirements will be met:
- http://www.gnu.org/licenses/agpl.html
+  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
- There is a plugin exception available for use with this release of translate5 for
- open source applications that are distributed under a license other than AGPL:
- Please see Open Source License Exception for Development of Plugins for translate5
- http://www.translate5.net/plugin-exception.txt or as plugin-exception.txt in the root
- folder of translate5.
-  
- @copyright  Marc Mittag, MittagQI - Quality Informatics
- @author     MittagQI - Quality Informatics
- @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execptions
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+  as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+  included in the packaging of this file.  Please review the following information
+  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3.0 requirements will be met:
+  http://www.gnu.org/licenses/agpl.html
 
-END LICENSE AND COPYRIGHT
-*/
+  There is a plugin exception available for use with this release of translate5 for
+  open source applications that are distributed under a license other than AGPL:
+  Please see Open Source License Exception for Development of Plugins for translate5
+  http://www.translate5.net/plugin-exception.txt or as plugin-exception.txt in the root
+  folder of translate5.
 
-/**#@+
+  @copyright  Marc Mittag, MittagQI - Quality Informatics
+  @author     MittagQI - Quality Informatics
+  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execptions
+  http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+  END LICENSE AND COPYRIGHT
+ */
+
+/* * #@+
  * @author Marc Mittag
  * @package portal
  * @version 2.0
@@ -42,50 +42,98 @@ END LICENSE AND COPYRIGHT
  */
 $config = Zend_Registry::get('config');
 /* @var $config Zend_Config */
-$menu  = $config->runtimeOptions->content->mainMenu;
+$menu = $config->runtimeOptions->content->mainMenu;
 
-echo $this->doctype() ?>
+echo $this->doctype()
+?>
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <?php echo $this->headTitle() ?>
-        <?php   echo $this->headMeta() ?>
-        <?php   echo $this->headLink() ?>
+        <?php echo $this->headMeta() ?>
+        <?php echo $this->headLink() ?>
         <?php echo $this->headStyle() ?>
-        <link rel="shortcut icon" href="<?php echo APPLICATION_RUNDIR.$config->runtimeOptions->server->pathToIMAGES; ?>/favicon.ico" type="image/x-icon"/>
-        <?php echo $this->headScript() ?>
+        <link rel="shortcut icon" href="<?php echo APPLICATION_RUNDIR . $config->runtimeOptions->server->pathToIMAGES; ?>/favicon.ico" type="image/x-icon"/>
+<?php echo $this->headScript() ?>
     </head>
     <body>
         <div id="header">
             <img src="/images/translate5.png?v=1" alt="<?php echo 'translate5'; ?>">
-            <div id="slogan">open source web-based <br>proofreading, postediting &amp; translation evaluation environment</div>
+                <div id="slogan">open source web-based translation system<br><small>translation, proofreading, postediting &amp; QA</small></div>
         </div>
         <div id="menu">
-            
-        <ul>
-            <?php
-            if(!is_null($menu)){
-                foreach ($menu as $item) {
-                    $item = (array)$item;
-                    $item = each($item);
-                    $class = ($item['key']===$_SERVER['REQUEST_URI'])?' class="active"':'';
-                    echo '<li><a href="'.$item['key'].'"'.$class.'>'.$this->translate->_($item['value']).'</a></li>';
+
+            <ul>
+                <?php
+                if (!is_null($menu)) {
+                    foreach ($menu as $item) {
+                        $item = (array) $item;
+                        $item = each($item);
+                        $class = ($item['key'] === $_SERVER['REQUEST_URI']) ? ' class="active"' : '';
+                        echo '<li><a href="' . $item['key'] . '"' . $class . '>' . $this->translate->_($item['value']) . '</a></li>';
+                    }
                 }
-            }
-            ?>
-            <li class="clear">&nbsp;</li>
-        </ul>
+                ?>
+                <li class="clear">&nbsp;</li>
+            </ul>
         </div>
         <div id="content">
-            <?php echo $this->layout()->content; ?>
+<?php echo $this->layout()->content; ?>
+            <div class="sidebar">
+                    
+                     <h4 class="important">Crowdfunding Gold Supporters</h4>
+                     <div class="sidebar-line"><a href="http://www.beo-doc.de/" target="_blank"><img class="supporters" src="/images/supporters-small/beo-logo.jpg"></a>
+    <a href="http://www.lexitech.com/" target="_blank"><img class="supporters" src="/images/supporters-small/lexitech-logo.gif"></a>
+        <a href="http://www.supertext.ch/" target="_blank"><img class="supporters" src="/images/supporters-small/supertext-logo.png"></a>
         </div>
-        <div id="footer">
-            <?php
-                /* @var $this Zend_View */
-                if(!isset($this->impressum)){
-                    ?><a href="/index/impressum">Imprint</a> | <?php
-                }
-            ?>
-            <a href="https://groups.yahoo.com/neo/groups/translate5/info" target="_blank">Ask a question about translate5</a>
-        </div>
-     </body>
-</html>
+    <h4 class="important" style="margin-bottom: 7px;">Crowdfunding Silver Supporters</h4>
+    <div class="sidebar-line"><a href="http://www.oneword.de/" target="_blank"><img class="supporters" style="width: 115px; margin-right: 87px;" src="/images/supporters-small/oneword-logo.jpg"></a>
+    <a href="http://www.mt-g.de/" target="_blank"><img class="supporters" src="/images/supporters-small/mt-g-logo.jpg"></a>
+    </div>
+    <h4 class="important" style="margin-top: 0px;">Crowdfunding Bronze Supporters</h4>
+    <div class="sidebar-line"><a href="http://www.iolar.com/" target="_blank"><img class="supporters" src="/images/supporters-small/iolar-logo.png"></a>
+    <a href="http://www.globalese-mt.com/" target="_blank"><img class="supporters" src="/images/supporters-small/globalese-logo.png"></a>
+    <a href="http://www.lucysoftware.com/" target="_blank"><img class="supporters" src="/images/supporters-small/lucy-logo.png"></a>
+    </div>
+    <h4 class="important" style="margin-bottom: 0px;">Crowdfunding Supporter</h4>
+    <a href="http://www.locasoft.com/" target="_blank"><img class="supporters" src="/images/supporters-small/locasoft-logo.jpg"></a>
+    <a href="http://www.yavaway.com/" target="_blank"><img class="supporters" src="/images/supporters-small/yavaway-logo.jpg"></a>
+    <a href="http://www.translationprojex.com/" target="_blank"><img class="supporters" src="/images/supporters-small/translationprojex-logo.png"></a>
+   <p class="small-explanation">A 12th company that wants to stay anonymous at the present supported the crowdfunding.</p>
+                    
+                    
+                    
+                    
+                    <h3 class="important before-small-exception">Permanent supporters</h3>
+                    <p class="small-explanation">SmartSpokes committed itself (without being asked for it!) for a constant, repeating funding. Thank you very much!</p>
+                    <div class="sidebar-line"><a href="http://www.smartspokes.com/" target="_blank"><img src="/images/supporters/smartspokes-logo.png" style="width:91px;" alt="SmartSpokes AG"></a>
+                    </div>                
+                    <h3 class="important before-small-exception">Main supporters</h3>
+                    <p class="small-explanation">These companies supported large shares of the development</p>
+                    <div class="sidebar-line"><a href="http://www.beo-doc.de/" target="_blank"><img src="/images/supporters/beo-logo.jpg" style="width:151px;" alt="beo Gesellschaft für Sprachen und Technologie mbH"></a>
+                    <a href="http://www.itl.eu/" target="_blank"><img src="/images/supporters/itl-logo.png"  style="width:100px; margin-left: 50px;" alt="itl Institut für technische Literatur AG"></a></div>                
+                    <div class="sidebar-line"><a href="http://www.dfki.de/" target="_blank"><img src="/images/supporters/dfki-logo.jpg"  style="width:150px;" alt="DFKI Deutsches Forschungszentrum für Künstliche Intelligenz GmbH"></a>
+                        <a href="http://www.mittagqi.com/" target="_blank"><img src="/images/supporters/mittagqi-logo.png"  style="width: 125px; margin-left: 26px;"></a>
+                    </div>
+                    <h3 class="important">Supporter of selected features</h3>
+                    <a href="http://www.oneword.de/" target="_blank">oneword GmbH</a><br><br>
+                                                            <a href="http://xtra-services.com/" target="_blank">XTRA Translation Services</a><br><br>
+                                                                            <a href="http://www.textform.com/" target="_blank">text&amp;form</a><br><br>
+                                                                                    <h3 class="important">Individual supporters</h3>
+                                                                                    <a href="http://www.mccosh.de/" target="_blank">Daniel Mc Cosh</a><br><br>
+                                                                                            Peter Bourgonje<br><span class="thankyou">(Moses support)</span><br>
+                                                                                                    </div>
+
+                                                                                                    <div class="clear">&nbsp;</div>
+
+                                                                                                    </div>
+                                                                                                    <div id="footer">
+                                                                                                        <?php
+                                                                                                        /* @var $this Zend_View */
+                                                                                                        if (!isset($this->impressum)) {
+                                                                                                            ?><a href="/index/impressum">Imprint</a> | <?php
+                                                                                                        }
+                                                                                                        ?>
+                                                                                                        <a href="mailto:support@translate5.net">Ask a question about translate5</a>
+                                                                                                    </div>
+                                                                                                    </body>
+                                                                                                    </html>

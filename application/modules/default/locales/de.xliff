@@ -209,6 +209,14 @@ Diese Email wurde automatisch generiert. Please do not reply to this email.</tar
 <trans-unit id='RWluZSBXYXJ0dW5nIHN0ZWh0IHVubWl0dGVsYmFyIGJldm9yLCBTaWUga8O2bm5lbiBzaWNoIGRhaGVyIG5pY2h0IGFubWVsZGVuLiBCaXR0ZSB2ZXJzdWNoZW4gU2llIGVzIGluIEvDvHJ6ZSBlcm5ldXQu'><source>Eine Wartung steht unmittelbar bevor, Sie können sich daher nicht anmelden. Bitte versuchen Sie es in Kürze erneut.</source><target>Eine Wartung steht unmittelbar bevor, Sie können sich daher nicht anmelden. Bitte versuchen Sie es in Kürze erneut.</target></trans-unit>
 <trans-unit id='Tm8gdG9rZW4gd2FzIHByb3ZpZGVkIHRvIG1hdGNoIGFnYWluc3Q='><source>No token was provided to match against</source><target>No token was provided to match against</target></trans-unit>
 <trans-unit id='Qml0dGUgbGFkZW4gU2llIGRpZSBMb2dpbi1TZWl0ZSBuZXUsIGdlYmVuIFNpZSBpaHIgUGFzc3dvcnQgZXJuZXV0IGVpbiB1bmQgc2VuZGVuIFNpZSBkYXMgRm9ybXVsYXIgZXJuZXV0IGFiIC0gSWhyIEhhc2gtV2VydCB6dXIgw5xiZXJwcsO8ZnVuZyB2b24gQ3Jvc3MtU2l0ZS1Ta3JpcHRpbmctQXR0YWNrZW4gd2FyIG5pY2h0IGtvcnJla3Qu'><source>Bitte laden Sie die Login-Seite neu, geben Sie ihr Passwort erneut ein und senden Sie das Formular erneut ab - Ihr Hash-Wert zur Überprüfung von Cross-Site-Skripting-Attacken war nicht korrekt.</source><target>Bitte laden Sie die Login-Seite neu, geben Sie ihr Passwort erneut ein und senden Sie das Formular erneut ab - Ihr Hash-Wert zur Überprüfung von Cross-Site-Skripting-Attacken war nicht korrekt.</target></trans-unit>
+<trans-unit id='SW4gS8O8cnplIHdpcmQgZWluZSBTeXN0ZW13YXJ0dW5nIGR1cmNoZ2Vmw7xocnQgd2VyZGVuLiBEaWUgQW53ZW5kdW5nIGlzdCBkYW5uIGbDvHIgZWluaWdlIFplaXQgZ2VzcGVycnQuIERhdHVtIHVuZCBVaHJ6ZWl0IGRlcyBTdGFydHMgZGVyIFN5c3RlbXdhcnR1bmc6ICVz'><source>In Kürze wird eine Systemwartung durchgeführt werden. Die Anwendung ist dann für einige Zeit gesperrt. Datum und Uhrzeit des Starts der Systemwartung: %s</source><target>In Kürze wird eine Systemwartung durchgeführt werden. Die Anwendung ist dann für einige Zeit gesperrt. Datum und Uhrzeit des Starts der Systemwartung: %s</target></trans-unit>
+<trans-unit id='VXNhZ2U='><source>Usage</source><target>Usage</target></trans-unit>
+<trans-unit id='VHJ5IGl0IQ=='><source>Try it!</source><target>Try it!</target></trans-unit>
+<trans-unit id='RGV2ZWxvcGVy'><source>Developer</source><target>Developer</target></trans-unit>
+<trans-unit id='VHJ5IGl0IG9ubGluZSE='><source>Try it online!</source><target>Try it online!</target></trans-unit>
+<trans-unit id='Sm9pbiB0aGUgY29tbXVuaXR5'><source>Join the community</source><target>Join the community</target></trans-unit>
+<trans-unit id='U291cmNlIGNvZGU='><source>Source code</source><target>Source code</target></trans-unit>
+<trans-unit id='U291cmNl'><source>Source</source><target>Source</target></trans-unit>
   </body>
  </file>
 </xliff>

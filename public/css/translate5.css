@@ -62,7 +62,7 @@ h4{font-size:90%;}
 th {text-align:left;}
 
 #menu{padding-top:17px;padding-bottom:27px;position:relative;}
-#menu a {text-decoration: none;margin: 1px 0;padding:4px 15px;line-height:20px;font-size:14px;display:block;border-right:1px solid #d7e8ef; text-transform: lowercase; }
+#menu a {text-decoration: none;margin: 1px 0;padding:4px 15px;line-height:20px;font-size:14px;display:block;border-right:1px solid #d7e8ef; }
 #menu a:hover, #menu a.active {text-decoration: none;color:#000000;margin: 0;padding:5px 15px; color: #00adef;}
 #menu ul {list-style-type: none;height:30px;margin:0 10px;padding:0;border-style:solid;border-color:#00adef;border-width:1px 0px 1px 0px;}
 #menu ul li {float:left;}
@@ -73,40 +73,13 @@ th {text-align:left;}
 .important {color: #00adef;}
 
 #content h1 {margin-top:0;}
-#content .main {width:500px;float:left;}
+#content .main {width:600px;float:left;}
 #content hr {border-style:solid;border-color:#00adef;border-width:1px 0px 0px 0px;margin:20px 0px;}
-#content .sidebar{width:325px;margin-left:540px;}
-#content .sidebar .teaser {padding:5px;border:1px solid #d7e8ef;margin-bottom:10px;}
-#content .sidebar .teaser a {text-decoration: none; color: #00adef;}
-#content .sidebar .teaser a:hover {text-decoration: underline;}
-#content .sidebar .teaser h3:first-child{margin-top:0;}
-#content .sidebar .teaser .thankyou{font-size: smaller;}
-#content .sidebar img {display: block; margin: 0 0 10px 0; padding:0; border: none;}
+
 #content .clear{clear:both;}
-#content .start-button{
-	 display:block;
-	 margin:10px auto;
-	 background:#e8a33c;
-	 border:1px outset #cbcbcb;
-	 font-weight:bold;
-	 font-size:14px;
-	 text-align:center;
-	 line-height:20px;
-	 padding:5px 10px; 
-	 border-radius:5px;
-	 width:200px;
-}
-#content .start-button:hover{
-	border:1px outset #646464;
-	color:#000000;
-}
 
 #content dl.zend_form dt{padding-top:7px;padding-bottom:2px;}
 #content .important-notices li {padding-bottom:3px;}
-#content table.usage-info {width:950px;margin-top:10px;}
-#content .usage-info td {border-right:#efefef 1px solid;vertical-align: top;}
-#content div.usage-info{width:600px;margin-bottom:30px;}
-#content div.usage-info h3{font-size:12px;font-weight:bold;margin:0;padding:0;}
 
 #locale-label {display: none;}
 #locale-element{margin: 0;padding: 2px 15px;}
@@ -124,3 +97,28 @@ form#acceptLicense ul.errors {list-style-type: none;padding:0; margin:0 0 -10px 
 	justify-content: center;
 	padding:5px;
 }
+.login-wrapper {
+    float:left;
+}
+#content .sidebar{width:325px;margin-left:640px;}
+#content .sidebar img {
+    display: inline; 
+    margin: 0 0 10px 0; 
+    padding:0; 
+    border: none; 
+    vertical-align: middle;
+}
+#content .sidebar h3.before-small-exception{
+margin-bottom: 5px;
+}
+#content .sidebar p.small-explanation {
+    font-size: 10px;
+    margin-top: 0px;
+    margin-bottom: 15px;
+}
+
+#content .sidebar img.supporters {
+    width: 91px;
+    margin-right: 9px;
+  }
+  
