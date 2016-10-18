@@ -34,6 +34,7 @@ body{
     font-size: 17px;
     padding:0;margin:0;
     background: #ffffff;
+    line-height: 1.5;
 }
 a,a:active{
     color: black;
