@@ -108,7 +108,7 @@ class editor_Models_Import_Worker_Import {
         //saving task twice is the simplest way to do this. has meta data is only available after import.
         $this->task->save();
         
-        //init default user prefs and call workflow doImport Method
+        //init default user prefs
         $workflowManager = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $workflowManager editor_Workflow_Manager */
         $workflowManager->initDefaultUserPrefs($this->task);
