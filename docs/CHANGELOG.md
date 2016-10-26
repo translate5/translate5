@@ -3,6 +3,27 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [VER] - 2016-10-26
+###Added
+TRANSLATE-726: New Column "type" in ChangeLog Plugin
+TRANSLATE-743: Implement filters in change-log grid
+
+###Changed
+improved worker exception logging
+TRANSLATE-759: Introduce config switch to set application language instead of browser recognition
+TRANSLATE-751: Updater must check for invalid DB settings
+TRANSLATE-612: User-Authentication via API - enable session deletion, login counter
+TRANSLATE-644: enable editor-only usage in translate5 - enable direct task association
+TRANSLATE-750: Make API auth default locale configurable
+
+###Bugfixes
+TRANSLATE-760: The source and target columns are missing sometimes after import for non PM users
+TRANSNET-10: Login and passwd reset page must be also in english
+TRANSLATE-684: Introduce match-type column - fixing tests
+TRANSLATE-745: double tooltip on columns with icon in taskoverview
+TRANSLATE-749: session->locale sollte an dieser Stelle bereits durch LoginController gesetzt sein
+TRANSLATE-753: change-log-window is not translated on initial show
+
 ## [2.5.1] - 2016-09-27
 ###Added
 TRANSLATE-637: Inform users about new features
