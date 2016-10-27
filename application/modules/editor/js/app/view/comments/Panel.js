@@ -134,7 +134,7 @@ Ext.define('Editor.view.comments.Panel', {
         };
 
         if (instanceConfig) {
-            me.getConfigurator().merge(me, config, instanceConfig);
+            me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
     }

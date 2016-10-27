@@ -95,7 +95,7 @@ Ext.define('Editor.view.admin.task.Preferences', {
                 title: me.title //see EXT6UPD-9
             };
         if (instanceConfig) {
-            me.getConfigurator().merge(me, config, instanceConfig);
+            me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
     }
