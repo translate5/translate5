@@ -157,7 +157,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchResultGrid', {
         
         me.assocStore = instanceConfig.assocSt0ore;
         if (instanceConfig) {
-            me.getConfigurator().merge(me, config, instanceConfig);
+            me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
       },

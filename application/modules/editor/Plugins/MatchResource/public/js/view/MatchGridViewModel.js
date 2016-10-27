@@ -74,7 +74,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewModel', {
                 }
             };
         if (instanceConfig) {
-            me.getConfigurator().merge(me, config, instanceConfig);
+            me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
     }

@@ -65,7 +65,7 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
 		me.isAllowedMatchQuery(config,instanceConfig);
 		me.isAllowedSearchQuery(config,instanceConfig);
 		if (instanceConfig) {
-			me.getConfigurator().merge(me, config, instanceConfig);
+			me.self.getConfigurator().merge(me, config, instanceConfig);
 		}
 		return me.callParent([ config ]);
 	},

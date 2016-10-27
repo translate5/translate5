@@ -158,7 +158,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	    me.assocStore = instanceConfig.assocStore;
 	    me.SERVER_STATUS=Editor.plugins.MatchResource.model.EditorQuery.prototype;
 	    if (instanceConfig) {
-	        me.getConfigurator().merge(me, config, instanceConfig);
+	        me.self.getConfigurator().merge(me, config, instanceConfig);
 	    }
 	    return me.callParent([config]);
 	  }
