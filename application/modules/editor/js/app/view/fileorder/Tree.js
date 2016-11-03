@@ -58,7 +58,7 @@ Ext.define('Editor.view.fileorder.Tree', {
         };
 
     if (instanceConfig) {
-        me.getConfigurator().merge(me, config, instanceConfig);
+        me.self.getConfigurator().merge(me, config, instanceConfig);
     }
     return me.callParent([config]);
   }

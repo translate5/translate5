@@ -503,7 +503,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
             });
         }
         if (instanceConfig) {
-            me.getConfigurator().merge(me, config, instanceConfig);
+            me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
   },
