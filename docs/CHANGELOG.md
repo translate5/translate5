@@ -3,6 +3,14 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.5.4] - 2016-11-03
+###Changed
+Content changes in the pages surround the editor
+
+###Bugfixes
+TRANSLATE-758: DbUpdater under Windows can not deal with DB Passwords with special characters
+TRANSLATE-761: Task must be reloaded when switching from state import to open
+
 ## [2.5.2] - 2016-10-26
 ###Added
 TRANSLATE-726: New Column "type" in ChangeLog Plugin
