@@ -66,6 +66,10 @@ class Models_Installer_PreconditionCheck {
     protected function checkPhpVersion() {
         if (version_compare(PHP_VERSION, '5.6.0', '<') || version_compare(PHP_VERSION, '7.0.0', '>=')) {
             $this->errorsEnvironment[] = 'You are using PHP in version '.PHP_VERSION.', translate5 needs a PHP version >= 5.6.0 and < 7.0.0';
+            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                $this->errorsEnvironment[] = 'Please update your xampp package manually or reinstall Translate5 with the latest windows installer from http://www.translate5.net';
+                $this->errorsEnvironment[] = 'Warning: Reinstallation can lead to data loss! Please contact support@translate5.net when you need assistance in data conversion!';
+            }
         }
     }
     
