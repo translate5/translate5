@@ -3,7 +3,7 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
-## [VER] - 2016-10-26
+## [2.5.2] - 2016-10-26
 ###Added
 TRANSLATE-726: New Column "type" in ChangeLog Plugin
 TRANSLATE-743: Implement filters in change-log grid
