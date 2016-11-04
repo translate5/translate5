@@ -3,7 +3,7 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
-## [2.5.5] - 2016-11-03
+## [2.5.6] - 2016-11-04
 ###Changed
 Content changes in the pages surround the editor
 
