@@ -70,6 +70,7 @@ Ext.define('Editor.view.ui.changealike.Window', {
     config;
 
     config = {
+        title: me.title, //see EXT6UPD-9
       items: [
         {
           xtype: 'container',
