@@ -576,8 +576,6 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * @return type
      */
     protected function parseSegmentUnifyInternalTags($segment) {
-        if(strstr($segment, 'mrk')!==false)
-            error_log ('hier: '.$segment);
         $search = array(
             '#(<g [^>]*) +(/>)#',
             '#(<g [^>]*) +(>)#',
@@ -595,8 +593,6 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             '\\1\\2'
         );
         $segment = preg_replace($search, $replace, $segment);
-        if(strstr($segment, 'mrk')!==false)
-            error_log ('hier2: '.$segment);
         return $segment;
     }
 
