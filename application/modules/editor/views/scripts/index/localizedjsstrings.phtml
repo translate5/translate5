@@ -308,9 +308,12 @@ Ext.define('Editor.controller.Localizer', {
         edit100pWarning: '<?php echo $this->translate->_('Achtung, Sie editieren einen 100% Match!');?>'
     };
 
-  	Editor.view.ui.changealike.Window.prototype.title = '<?php echo $this->translate->_('Aktuelles Segment für die folgenden Segmente übernehmen?');?>';
-  	Editor.view.ui.changealike.Window.prototype.item_cancelBtn = '<?php echo $this->translate->_('Keine Änderungen durchführen');?>';
-  	Editor.view.ui.changealike.Window.prototype.item_saveBtn = '<?php echo $this->translate->_('Änderungen übernehmen');?>';
+    Ext.define("Editor.locale.view.ui.changealike.Window", {
+        override: "Editor.view.ui.changealike.Window",
+        title: '<?php echo $this->translate->_('Aktuelles Segment für die folgenden Segmente übernehmen?');?>',
+        item_cancelBtn: '<?php echo $this->translate->_('Keine Änderungen durchführen');?>',
+        item_saveBtn: '<?php echo $this->translate->_('Änderungen übernehmen');?>'
+    });
   	Editor.view.changealike.Window.prototype.items_help = <?php echo json_encode($this->translate->_('Hilfe:'));?>;
   	Editor.view.changealike.Window.prototype.items_segmentData = <?php echo json_encode('{edited}{addition}'); ?>;
   	Editor.view.changealike.Window.prototype.overwriteSource = '<?php echo $this->translate->_('<b><i>Überschreibe Quelltext mit:</i></b> ');?>';
