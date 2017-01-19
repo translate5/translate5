@@ -54,6 +54,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
      */
     protected $tables = array(
             'LEK_browser_log' => false,
+            'LEK_change_log' => false,
             'LEK_comments' => 'taskGuid',
             'LEK_files' => 'taskGuid',
             'LEK_foldertree' => 'taskGuid',
@@ -77,9 +78,10 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             'LEK_task_log' => 'taskGuid',
             'LEK_task_meta' => 'taskGuid',
             'LEK_terms' => 'taskGuid',
+            'LEK_user_changelog_info' => false,
             'LEK_workflow_log' => 'taskGuid',
             'LEK_workflow_userpref' => 'taskGuid',
-            'Zf_dbversion' => true
+            'Zf_dbversion' => true,
     );
     
     /**
