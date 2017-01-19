@@ -206,7 +206,7 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         }, $segments);
         $this->assertEquals(array('0','0','1','0','0','0','1'), $workflowStepNr);
         
-        //bulk check of all autoStateId fields
+        //bulk check of all workflowStep fields
         $workflowStep = array_map(function($item){
             return $item->workflowStep;
         }, $segments);

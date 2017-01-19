@@ -60,9 +60,9 @@ class RelaisImportTest extends \ZfExtended_Test_ApiTestcase {
     }
     
     /**
-     * Test using changealikes by source match
+     * Test if relais columns are containing the expected content
      */
-    public function testAlikeCalculation() {
+    public function testRelaisContent() {
         //get segment list
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
         $segments = array_map(function($segment){

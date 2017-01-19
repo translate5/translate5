@@ -56,6 +56,9 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals('{"errors":[{"id":"login","msg":"Kein Benutzername angegeben."}],"message":"NOT OK","success":false}', $response->getBody());
     }
     
+    /**
+     * Test session API interface with wrong credentials
+     */
     public function testWrongCredentials() {
         $response = $this->api()->request('editor/session', 'POST', ['login' => 'wrongUsername', 'passwd' => 'wrongPassword']);
         $msg403 = '{"errors":[{"_errorMessage":"Keine Zugriffsberechtigung!","_errorCode":403}]}';
@@ -72,6 +75,10 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals($msg403, $response->getBody());
     }
     
+    /**
+     * Test login with correct credentials
+     * Test afterwards if the logout call is working 
+     */
     public function testLogin() {
         $this->api()->login('testlector');
         self::assertLogin('testlector');

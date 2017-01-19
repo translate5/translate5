@@ -30,7 +30,6 @@ END LICENSE AND COPYRIGHT
 
 /**
  * TaskEntityWorkflowTest is currently incomplete, just created as a stub to be implemented
- *
  */
 class TaskEntityWorkflowTest extends \ZfExtended_Test_ApiTestcase {
     public static function setUpBeforeClass() {
