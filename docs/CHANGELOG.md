@@ -3,6 +3,15 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.5.7] - 2017-01-19
+###Bugfixes
+TRANSLATE-767: Changealike Window title was always in german
+TRANSLATE-787: Translate5 editor does not start anymore - on all installed instances
+TRANSLATE-782: Change text in task creation pop-up
+TRANSLATE-781: different white space inside of internal tags leads to failures in relais import
+TRANSLATE-780: id column of LEK_browser_log must not be NULL
+TRANSLATE-768: Db Updater complains about Zf_worker_dependencies is missing
+
 ## [2.5.6] - 2016-11-04
 ###Changed
 Content changes in the pages surround the editor
