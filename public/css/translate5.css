@@ -87,6 +87,7 @@ th {text-align:left;}
 /* orange #e8a33c grau #cbcbcb */
 
 /* translate5 download page*/
+dl.zend_form dd {margin: 0;}
 form#acceptLicense .description { float:right;position:relative;left:-52px;margin-top:0;}
 form#acceptLicense dd {margin: 0;}
 form#acceptLicense ul.errors {list-style-type: none;padding:0; margin:0 0 -10px 36px;position:relative;top:-18px;}
