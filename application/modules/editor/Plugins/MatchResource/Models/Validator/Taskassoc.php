@@ -39,5 +39,6 @@ class editor_Plugins_MatchResource_Models_Validator_Taskassoc extends ZfExtended
         //comment = string, without length contrain. No validator needed / possible
         $this->addValidator('taskGuid', 'guid');
         $this->addValidator('tmmtId', 'int');
+        $this->addValidator('segmentsUpdateable', 'boolean');
     }
 }

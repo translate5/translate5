@@ -80,13 +80,6 @@ class editor_Plugins_MatchResource_TaskassocController extends ZfExtended_RestCo
         $this->view->rows = $reval;
         $this->view->total = count($reval);
     }
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_RestController::putAction()
-     */
-    public function putAction() {
-       throw new ZfExtended_BadMethodCallException(__CLASS__.'->put');
-    }
     
     /**
      * (non-PHPdoc)

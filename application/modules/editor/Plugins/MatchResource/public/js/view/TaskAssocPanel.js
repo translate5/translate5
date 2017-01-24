@@ -49,7 +49,9 @@ Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
         save: '#UT#Speichern',
         empty: '#UT#Keine Match Resource in der Sprachkombination des geöffneten Tasks verfügbar.',
         groupHeader: '#UT#Ressource: {name}',
+        checked: '#UT#Ressource in Aufgabe verwenden',
         name: '#UT#Name',
+        segmentsUpdateable: '#UT#Segmente zurückspeichern',
         source: '#UT#Quellsprache',
         target: '#UT#Zielsprache'
     },
@@ -84,7 +86,7 @@ Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
             }],
             items : [ {
                 xtype : 'grid',
-                id : 'tmTaskAssocGrid',
+                itemId : 'tmTaskAssocGrid',
                 store : 'Editor.plugins.MatchResource.store.TaskAssocStore',
                 emptyText: me.strings.empty,
                 features : [ {
@@ -97,9 +99,17 @@ Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
                 columns : [ {
                     xtype : 'checkcolumn',
                     text : '',
+                    tooltip : me.strings.checked,
                     dataIndex : 'checked',
                     sortable : true,
-                    flex : 10 / 100
+                    width:60,
+                }, {
+                    xtype : 'checkcolumn',
+                    tooltip : me.strings.segmentsUpdateable,
+                    cls: 'segmentsUpdateable',
+                    dataIndex : 'segmentsUpdateable',
+                    sortable : true,
+                    width:60,
                 }, {
                     xtype: 'gridcolumn',
                     text: me.strings.name,
@@ -108,10 +118,10 @@ Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
                     },
                     dataIndex : 'name',
                     sortable : true,
-                    flex : 40 / 100
+                    flex : 50 / 100
                 }, {
                     xtype : 'gridcolumn',
-                    text : me.strings.source,
+                    tooltip : me.strings.source,
                     cls : 'source-lang',
                     dataIndex : 'sourceLang',
                     renderer : me.langRenderer,
@@ -119,7 +129,7 @@ Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
                     flex : 25 / 100,
                 }, {
                     xtype : 'gridcolumn',
-                    text : me.strings.target,
+                    tooltip : me.strings.target,
                     cls : 'target-lang',
                     dataIndex : 'targetLang',
                     renderer : me.langRenderer,

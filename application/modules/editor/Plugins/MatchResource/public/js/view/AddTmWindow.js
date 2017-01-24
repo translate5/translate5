@@ -181,11 +181,15 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
      * @param record
      */
     loadRecord: function(record) {
-        this.down('form').loadRecord(record);
+        var me = this,
+            disableUpload = !record.get('filebased'),
+            filefield = me.down('filefield');
+        me.down('form').loadRecord(record);
+        filefield.setDisabled(disableUpload);
+        filefield.setReadOnly(disableUpload);
     },
     serviceSelect:function(combo, record, index){
         var me = Ext.getCmp('addTmForm');
-        me.down('filefield').setDisabled(!record.get('filebased'));
         me.down('hiddenfield[name="serviceType"]').setValue(record.get('serviceType'));
         me.down('hiddenfield[name="serviceName"]').setValue(record.get('serviceName'));
         me.down('colorfield[name="color"]').setValue(record.get('defaultColor'));

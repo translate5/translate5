@@ -49,7 +49,8 @@ Ext.define('Editor.plugins.MatchResource.model.TaskAssoc', {
     {name: 'resourced', type: 'string'},
     {name: 'serviceName', type: 'string'},
     {name: 'serviceType', type: 'string'},
-    {name: 'checked', type: 'boolean'}
+    {name: 'checked', type: 'boolean'},
+    {name: 'segmentsUpdateable', type: 'boolean'}
   ],
   idProperty: 'id',
   proxy : {
