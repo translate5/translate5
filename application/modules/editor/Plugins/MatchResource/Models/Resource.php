@@ -41,7 +41,7 @@ class editor_Plugins_MatchResource_Models_Resource {
      *  
      * @var boolean
      */
-    protected $filebased = false;
+    protected $filebased = true;
     
     /**
      * Match Type in the sense of the matchrate type
@@ -75,10 +75,16 @@ class editor_Plugins_MatchResource_Models_Resource {
             'defaultColor' => 'defaultColor',
     );
     
-    public function __construct($id, $name, $filebased = false) {
+    /**
+     * Resource URL
+     * @var string
+     */
+    protected $url;
+    
+    public function __construct($id, $name, $url) {
         $this->id = $id;
-        $this->name = $name;
-        $this->filebased = $filebased;
+        $this->name = $name.' - '.$url;
+        $this->url = $url;
     }
     
     public function getId() {
@@ -142,6 +148,22 @@ class editor_Plugins_MatchResource_Models_Resource {
     }
     
     /**
+     * returns true if the resource can deal with the given source language
+     * returns true per default, must be implemented in the service specific resource classes
+     */
+    public function hasSourceLang(editor_Models_Languages $sourceLang) {
+        return true;
+    }
+    
+    /**
+     * returns true if the resource can deal with the given target language
+     * returns true per default, must be implemented in the service specific resource classes
+     */
+    public function hasTargetLang(editor_Models_Languages $targetLang) {
+        return false;
+    }
+    
+    /**
      * sets the service type
      * @param string $name
      * @param string $type
@@ -151,6 +173,13 @@ class editor_Plugins_MatchResource_Models_Resource {
         $this->service = $name;
         $this->serviceType = $type;
         $this->defaultColor = $defaultColor;
+    }
+    
+    /**
+     * returns the configured URL
+     */
+    public function getUrl() {
+        return $this->url;
     }
     
     /**

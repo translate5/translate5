@@ -31,5 +31,11 @@
 INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
 ('runtimeOptions.plugins.MatchResource.opentm2.server', 1, 'editor', 'plugins', '[]', '[]', '', 'list', 'List of available OpenTM2 Server, example: ["http://win.translate5.net:1984/otmmemoryservice/"]');
 
+INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
+('runtimeOptions.plugins.MatchResource.lucylt.server', 1, 'editor', 'plugins', '[]', '[]', '', 'list', 'List of available Lucy LT Servers');
+
+INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
+('runtimeOptions.plugins.MatchResource.lucylt.credentials', 1, 'editor', 'plugins', '[]', '[]', '', 'list', 'List of Lucy LT credentials to the Lucy LT Servers. Each server entry must have one credential entry. One credential entry looks like: "username:password"');
+
 ALTER TABLE `LEK_matchresource_taskassoc` 
 ADD COLUMN `segmentsUpdateable` TINYINT NOT NULL DEFAULT 0 AFTER `taskGuid`;

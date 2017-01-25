@@ -48,6 +48,7 @@ class editor_Plugins_MatchResource_Services_Manager {
      */
     static protected $registeredServices = array(
         'editor_Plugins_MatchResource_Services_Moses',
+        'editor_Plugins_MatchResource_Services_LucyLT',
         'editor_Plugins_MatchResource_Services_DummyFileTm',
     );
 

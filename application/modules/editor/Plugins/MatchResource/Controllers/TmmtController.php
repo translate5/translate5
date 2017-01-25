@@ -105,7 +105,7 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
      */
     private function getTaskInfos($tmmtid){
         if(empty($this->groupedTaskInfo[$tmmtid])) {
-            return null;
+            return [];
         }
         return $this->groupedTaskInfo[$tmmtid];
     }
@@ -139,21 +139,63 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
     
     public function postAction(){
         $this->entity->init();
-        $this->data = $this->_getAllParams();
+        $this->data = $this->getAllParams();
         $this->setDataInEntity($this->postBlacklist);
         
         $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
         /* @var $manager editor_Plugins_MatchResource_Services_Manager */
         $resource = $manager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
+        
         if($resource->getFilebased()) {
             $this->handleFileUpload($manager);
         }
-      
-        if($this->validate()){
+        
+        if($this->validateLanguages($resource) && $this->validate()){
             $this->entity->save();
             $this->view->rows = $this->entity->getDataObject();
             $this->view->success = true;
         }
+    }
+    
+    /**
+     * Validates if choosen languages can be used by the choosen resource
+     * Validates also the existence of the languages in the Lang DB 
+     * @param editor_Plugins_MatchResource_Models_Resource $resource
+     * @return boolean
+     */
+    protected function validateLanguages(editor_Plugins_MatchResource_Models_Resource $resource) {
+        
+        $sourceLang = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $sourceLang editor_Models_Languages */
+        $sourceLang->load($this->entity->getSourceLang());
+        
+        $targetLang = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $targetLang editor_Models_Languages */
+        $targetLang->load($this->entity->getSourceLang());
+        
+        $hasSourceLang = $resource->hasSourceLang($sourceLang);
+        $hasTargetLang = $resource->hasTargetLang($targetLang);
+        
+        //both languages can be dealed by the resource, all OK
+        if($hasSourceLang && $hasTargetLang) {
+            return true;
+        }
+        
+        $errors = [];
+        $t = ZfExtended_Zendoverwrites_Translate::getInstance();
+        /* @var $t ZfExtended_Zendoverwrites_Translate */;;
+        
+        if(!$hasSourceLang) {
+            $errors['sourceLang'] = $t->_('Diese Quellsprache wird von der Ressource nicht unterstützt!');
+        }
+        if(!$hasTargetLang) {
+            $errors['targetLang'] = $t->_('Diese Zielsprache wird von der Ressource nicht unterstützt!');
+        }
+        
+        $e = new ZfExtended_ValidateException();
+        $e->setErrors($errors);
+        $this->handleValidateException($e);
+        return false;
     }
     
     protected function handleFileUpload(editor_Plugins_MatchResource_Services_Manager $manager) {

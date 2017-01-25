@@ -28,3 +28,5 @@
 -- */
 
 DELETE FROM Zf_configuration WHERE `name` = 'runtimeOptions.plugins.MatchResource.opentm2.server';
+DELETE FROM Zf_configuration WHERE `name` = 'runtimeOptions.plugins.MatchResource.lucylt.server';
+DELETE FROM Zf_configuration WHERE `name` = 'runtimeOptions.plugins.MatchResource.lucylt.credentials';

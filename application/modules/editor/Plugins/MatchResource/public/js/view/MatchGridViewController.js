@@ -294,7 +294,15 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                 break;
             case 500:
                 json = Ext.JSON.decode(response.responseText);
-                targetMsg = json.errors[0]._errorMessage;
+                if(json.errors && json.errors[0] && json.errors[0]._errorMessage) {
+                    targetMsg = json.errors[0]._errorMessage;
+                }
+                else if(json.errors && json.errors.message) {
+                    targetMsg = json.errors.message;
+                }
+                else {
+                    targetMsg = response.responseText;
+                }
                 respStatusMsg = me.strings.serverErrorMsg500;
                 break;
         }
