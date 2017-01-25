@@ -74,11 +74,21 @@ abstract class editor_Plugins_MatchResource_Services_ConnectorAbstract {
     }
 
     /**
-     * Adds the given file to the underlying system
+     * Adds the given file to the underlying system on TM creation
      * @param string $filename
      * @return boolean
      */
     public function addTm(string $filename) {
+        //to be implemented if needed
+        $this->log(__METHOD__, ' filename '.$filename);
+    }
+    
+    /**
+     * Adds the given file to the underlying system into an already existing TM
+     * @param string $filename
+     * @return boolean
+     */
+    public function addAdditionalTm(string $filename) {
         //to be implemented if needed
         $this->log(__METHOD__, ' filename '.$filename);
     }

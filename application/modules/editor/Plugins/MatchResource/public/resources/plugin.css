@@ -34,6 +34,7 @@ END LICENSE AND COPYRIGHT
 .ico-tm-add {background-image: url("images/book_add.png");}
 .ico-tm-information {background-image: url("images/information.png"); background-repeat:no-repeat; background-position:50% 50%;}
 .ico-tm-show-more {background-image: url("images/show_more.png"); background-repeat:no-repeat; background-position:50% 50%;}
+.match-ressource-filebased .ico-tm-import {background-image: url("images/book_add.png");}
 .match-ressource-filebased .ico-tm-download {background-image: url("images/book_go.png");}
 .ico-tm-magnifier {background-image: url("images/magnifier.png");!important;}
 /*

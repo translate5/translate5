@@ -51,6 +51,7 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
         color: '#UT#Farbe',
         refresh: '#UT#Aktualisieren',
         add: '#UT#Hinzufügen',
+        import: '#UT#Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen',
         noTaskAssigned:'#UT#Keine Aufgaben zugewiesen.',
         sourceLang: '#UT#Quellsprache',
         targetLang: '#UT#Zielsprache',
@@ -109,7 +110,7 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                     text: me.strings.color
                 },{
                     xtype: 'actioncolumn',
-                    width: 60,
+                    width: 80,
                     items: [{
                         tooltip: me.strings.edit,
                         action: 'edit',
@@ -118,6 +119,10 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                         tooltip: me.strings.erase,
                         action: 'delete',
                         iconCls: 'ico-tm-delete'
+                    },{
+                        tooltip: me.strings.import,
+                        action: 'import',
+                        iconCls: 'ico-tm-import'
                     },{
                         tooltip: me.strings.download,
                         action: 'download',

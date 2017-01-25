@@ -96,6 +96,17 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
     }
     
     /**
+     * {@inheritDoc}
+     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::addTm()
+     */
+    public function addAdditionalTm(string $filename) {
+        //$filename is the real file path of the temp uploaded file on the disk!
+        //$this->tmmt->getFileName() is the original filename of the uploaded file
+        $this->api->import($filename);
+        return true;
+    }
+    
+    /**
      * (non-PHPdoc)
      * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::getTm()
      */

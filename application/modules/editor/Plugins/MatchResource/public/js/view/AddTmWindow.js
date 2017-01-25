@@ -52,7 +52,6 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
     width : 500,
     modal : true,
     layout:'fit',
-    editMode:false,
     initConfig : function(instanceConfig) {
         var me = this,
         langCombo = {
@@ -63,7 +62,6 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
                 queryMode: 'local',
                 valueField: 'id'
             },
-            roles = [],
             config = {},
             defaults = {
                 labelWidth: 160,
@@ -151,7 +149,7 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
                     xtype: 'tbfill'
                 },{
                     xtype: 'button',
-                    iconCls:'ico-user-save',
+                    iconCls:'ico-save',
                     itemId: 'save-tm-btn',
                     text: me.strings.save
                 }, {

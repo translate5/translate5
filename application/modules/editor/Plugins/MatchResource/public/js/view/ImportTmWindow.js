@@ -28,23 +28,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.plugins.MatchResource.view.EditTmWindow', {
+Ext.define('Editor.plugins.MatchResource.view.ImportTmWindow', {
     extend: 'Ext.window.Window',
-    requires: [
-        'Ext.ux.colorpick.Button',
-        'Ext.ux.colorpick.Field'
-    ],
-    alias: 'widget.editTmWindow',
-    itemId: 'editTmWindow',
+    alias: 'widget.importTmWindow',
+    itemId: 'importTmWindow',
     strings: {
-        edit: '#UT#Matchressource hinzufügen',
-        resource: '#UT#Ressource',
-        name: '#UT#Name',
-        source: '#UT#Quellsprache',
-        target: '#UT#Zielsprache',
-        file: '#UT#TM-Datei',
-        color: '#UT#Farbe',
-        colorTooltip: '#UT#Farbe dieser Matchressource',
+        file: '#UT#TMX-Datei',
+        title: '#UT#TMX Datei importieren',
+        importTmx: '#UT#Weitere TM Daten in Form einer TMX Datei importieren und dem bestehenden TM hinzufügen',
         save: '#UT#Speichern',
         cancel: '#UT#Abbrechen'
     },
@@ -54,55 +45,29 @@ Ext.define('Editor.plugins.MatchResource.view.EditTmWindow', {
     layout:'fit',
     initConfig : function(instanceConfig) {
         var me = this,
-        langField = {
-                xtype: 'displayfield',
-                renderer: function(id) {
-                    var store = Ext.getStore('admin.Languages'),
-                        resource = store.getById(id);
-                    return resource ? resource.get('label') : id;
-                }
-            },
             config = {},
             defaults = {
                 labelWidth: 160,
                 anchor: '100%'
             },
         config = {
-            title: me.strings.edit,
+            title: me.strings.title,
             items : [{
                 xtype: 'form',
                 padding: 5,
                 ui: 'default-frame',
                 defaults: defaults,
                 items: [{
-                    xtype: 'displayfield',
-                    name:'resourceId',
-                    renderer: function(id) {
-                        var store = Ext.getStore('Editor.plugins.MatchResource.store.Resources'),
-                            resource = store.getById(id);
-                        return resource ? resource.get('name') : id;
-                    },
-                    fieldLabel: me.strings.resource
+                    ui: 'default-frame',
+                    html: me.strings.importTmx,
+                    padding: 5
                 },{
-                    xtype: 'displayfield',
-                    name: 'name',
-                    toolTip: me.strings.name,
-                    fieldLabel: me.strings.name
-                },Ext.applyIf({
-                    name: 'sourceLang',
-                    toolTip: me.strings.source,
-                    fieldLabel: me.strings.source
-                }, langField),Ext.applyIf({
-                    name: 'targetLang',
-                    toolTip: me.strings.target,
-                    fieldLabel: me.strings.target
-                }, langField),{
-                    xtype: 'colorfield',
-                    fieldLabel: me.strings.color,
-                    toolTip: me.strings.colorTooltip, 
+                    xtype: 'filefield',
+                    fieldLabel: me.strings.file,
+                    toolTip: me.strings.importTmx, 
                     labelWidth: 160,
                     anchor: '100%',
-                    name: 'color'
+                    name: 'tmUpload'
                 }]
             }],
             dockedItems : [{
@@ -134,10 +99,10 @@ Ext.define('Editor.plugins.MatchResource.view.EditTmWindow', {
         return me.callParent([config]);
     },
     /**
-     * loads the record into the form
+     * loads the record into the form, does set the role checkboxes according to the roles value
      * @param record
      */
     loadRecord: function(record) {
-        this.down('form').loadRecord(record);
+        this.tmmtRecord = record;
     }
 });

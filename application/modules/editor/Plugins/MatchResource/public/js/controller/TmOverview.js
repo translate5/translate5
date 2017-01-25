@@ -41,7 +41,12 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
     extend : 'Ext.app.Controller',
-    views: ['Editor.plugins.MatchResource.view.TmOverviewPanel','Editor.plugins.MatchResource.view.AddTmWindow','Editor.plugins.MatchResource.view.EditTmWindow'],
+    views: [
+        'Editor.plugins.MatchResource.view.TmOverviewPanel',
+        'Editor.plugins.MatchResource.view.AddTmWindow',
+        'Editor.plugins.MatchResource.view.ImportTmWindow',
+        'Editor.plugins.MatchResource.view.EditTmWindow'
+    ],
     models: ['Editor.model.admin.Task', 'Editor.plugins.MatchResource.model.Resource','Editor.plugins.MatchResource.model.TmMt'],
     stores:['Editor.plugins.MatchResource.store.Resources','Editor.plugins.MatchResource.store.TmMts'],
     strings: {
@@ -99,6 +104,9 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
             },
             'editTmWindow #save-tm-btn':{
                 click:'handleSaveEditClick'
+            },
+            'importTmWindow #save-tm-btn':{
+                click:'handleSaveImportClick'
             },
             '#cancel-tm-btn':{
                 click:'handleCancelClick'
@@ -228,6 +236,39 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
             }
         });
     },
+    handleSaveImportClick: function(button){
+        var me = this,
+            window = button.up('window'),
+            form = window.down('form'),
+            record = window.tmmtRecord;
+
+        if(!form.isValid()) {
+            return;
+        }
+
+        form.submit({
+            params: {
+                format: 'jsontext'
+            },
+            url: Editor.data.restpath+'plugins_matchresource_tmmt/'+record.get('id')+'/import/',
+            scope: me,
+            success: function(form, submit) {
+                window.setLoading(false);
+                window.close();
+                Editor.MessageBox.addSuccess(window.strings.importSuccess);
+            },
+            failure: function(form, submit) {
+                var res = submit.result;
+                window.setLoading(false);
+                //submit results are always state 200.
+                //If success false and errors is an array, this errors are shown in the form directly,
+                // so we dont need the handleException
+                if(res.success || !Ext.isArray(res.errors) || !res.message || res.message != 'NOT OK') {
+                    Editor.app.getController('ServerException').handleException(submit.response);
+                }
+            }
+        });
+    },
     handleCancelClick: function(button){
         var window = button.up('window');
         window.down('form').getForm().reset();
@@ -235,6 +276,11 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
     },
     handleEditTm : function(view, cell, cellIdx, rec){
         var win = Ext.widget('editTmWindow');
+        win.loadRecord(rec);
+        win.show();
+    },
+    handleImportTm : function(view, cell, cellIdx, rec){
+        var win = Ext.widget('importTmWindow');
         win.loadRecord(rec);
         win.show();
     },
@@ -247,6 +293,9 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
         switch(f && f[1] || '') {
             case 'edit':
                 me.handleEditTm(view,cell,col,record);
+                break;
+            case 'import':
+                me.handleImportTm(view,cell,col,record);
                 break;
             case 'download':
                 me.handleDownloadTm(view,cell,col,record);

@@ -147,7 +147,7 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         $resource = $manager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
         
         if($resource->getFilebased()) {
-            $this->handleFileUpload($manager);
+            $this->handleInitialFileUpload($manager);
         }
         
         if($this->validateLanguages($resource) && $this->validate()){
@@ -155,6 +155,27 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
             $this->view->rows = $this->entity->getDataObject();
             $this->view->success = true;
         }
+    }
+
+    /**
+     * Imports an additional file which is transfered to the desired TMMT
+     */
+    public function importAction(){
+        $this->getAction();
+        
+        $serviceManager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
+        /* @var $serviceManager editor_Plugins_MatchResource_Services_Manager */
+        
+        $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
+        
+        if(!$resource->getFilebased()) {
+            throw new ZfExtended_Models_Entity_NotFoundException('Requested tmmt is not filebased!');
+        }
+        
+        //upload errors are handled in handleAdditionalFileUpload
+        $this->handleAdditionalFileUpload($serviceManager);
+        
+        $this->view->success = true;
     }
     
     /**
@@ -198,22 +219,49 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         return false;
     }
     
-    protected function handleFileUpload(editor_Plugins_MatchResource_Services_Manager $manager) {
+    /**
+     * Uploads a file into the new TMMT
+     * @param editor_Plugins_MatchResource_Services_Manager $manager
+     */
+    protected function handleInitialFileUpload(editor_Plugins_MatchResource_Services_Manager $manager) {
+        $importInfo = $this->handleFileUpload();
+        $connector = $manager->getConnector($this->entity);
+        
+        //setting the TM filename here, but can be overwritten in the connectors addTm method
+        // for example when we get a new name from the service
+        $this->entity->setFileName($importInfo[self::FILE_UPLOAD_NAME]['name']);
+        if(!$connector->addTm($importInfo[self::FILE_UPLOAD_NAME]['tmp_name'])) {
+            $this->uploadError('Hochgeladene TM Datei konnte nicht hinzugefügt werden.');
+        }
+    }
+    
+    /**
+     * Uploads an additional file into the already existing TMMT
+     * @param editor_Plugins_MatchResource_Services_Manager $manager
+     */
+    protected function handleAdditionalFileUpload(editor_Plugins_MatchResource_Services_Manager $manager) {
+        $importInfo = $this->handleFileUpload();
+        $connector = $manager->getConnector($this->entity);
+        
+        if(!$connector->addAdditionalTm($importInfo[self::FILE_UPLOAD_NAME]['tmp_name'])) {
+            $this->uploadError('Hochgeladene TMX Datei konnte nicht hinzugefügt werden.');
+        }
+    }
+    
+    /**
+     * handles the fileupload
+     * @return array meta data about the upload
+     */
+    protected function handleFileUpload() {
         $upload = new Zend_File_Transfer_Adapter_Http();
         $upload->isValid(self::FILE_UPLOAD_NAME);
         //mandatory upload file
         $importInfo = $upload->getFileInfo(self::FILE_UPLOAD_NAME);
-        $connector = $manager->getConnector($this->entity);
         /* @var $connector editor_Plugins_MatchResource_Services_ConnectorAbstract */
-        if(empty($importInfo['tmUpload']['size'])) {
+        if(empty($importInfo[self::FILE_UPLOAD_NAME]['size'])) {
             $this->uploadError('Die ausgewählte Datei war leer!');
         }
-        //setting the TM filename here, but can be overwritten in the connectors addTm method
-        // for example when we get a new name from the service
-        $this->entity->setFileName($importInfo['tmUpload']['name']);
-        if(!$connector->addTm($importInfo['tmUpload']['tmp_name'])) {
-            $this->uploadError('Hochgeladene TM Datei konnte nicht hinzugefügt werden.');
-        }
+        return $importInfo;
     }
     
     protected function uploadError($msg) {
