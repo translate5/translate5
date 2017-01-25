@@ -171,7 +171,7 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         
         $targetLang = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $targetLang editor_Models_Languages */
-        $targetLang->load($this->entity->getSourceLang());
+        $targetLang->load($this->entity->getTargetLang());
         
         $hasSourceLang = $resource->hasSourceLang($sourceLang);
         $hasTargetLang = $resource->hasTargetLang($targetLang);

@@ -31,8 +31,11 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_MatchResource_Services_LucyLT_Resource extends editor_Plugins_MatchResource_Models_Resource {
     
     /**
-     * FIXME to be extended!
      * This array maps our internal rfc5646 language keys to the language keys defined by lucy
+     * 
+     * When adding new languages: 
+     * Currently only "de" language keys are supported as index key, de-DE will not work! 
+     * 
      * @var array
      */
     protected $languageMap = array(
@@ -87,7 +90,7 @@ class editor_Plugins_MatchResource_Services_LucyLT_Resource extends editor_Plugi
     }
     
     /**
-     * checks if the given language is listed in the internal defined languageMap of Lucy Languages
+     * returns the first part of the Rfc5646 language name, can currently not deal with de-DE always uses de
      * @param editor_Models_Languages $lang
      * @return boolean
      */
