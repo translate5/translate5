@@ -85,10 +85,27 @@ END LICENSE AND COPYRIGHT
             serverErrorMsg408:'<?php echo $this->translate->_('Die Anfrage an die Matchressource dauerte zu lange.');?>',
         }
     });
+    
     Ext.define("Editor.locale.plugins.MatchResource.view.AddTmWindow", {
         override: "Editor.plugins.MatchResource.view.AddTmWindow",
         strings: {
             add: '<?php echo $this->translate->_('Matchressource hinzufügen');?>',
+            resource: '<?php echo $this->translate->_('Ressource');?>',
+            name: '<?php echo $this->translate->_('Name');?>',
+            source: '<?php echo $this->translate->_('Quellsprache');?>',
+            target: '<?php echo $this->translate->_('Zielsprache');?>',
+            file: '<?php echo $this->translate->_('TM-Datei');?>',
+            color: '<?php echo $this->translate->_('Farbe');?>',
+            colorTooltip: '<?php echo $this->translate->_('Farbe dieser Matchressource');?>',
+            save: '<?php echo $this->translate->_('Speichern');?>',
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.plugins.MatchResource.view.EditTmWindow", {
+        override: "Editor.plugins.MatchResource.view.EditTmWindow",
+        strings: {
+            edit: '<?php echo $this->translate->_('Matchressource bearbeiten');?>',
             resource: '<?php echo $this->translate->_('Ressource');?>',
             name: '<?php echo $this->translate->_('Name');?>',
             source: '<?php echo $this->translate->_('Quellsprache');?>',
