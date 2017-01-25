@@ -87,7 +87,7 @@ class editor_Plugins_MatchResource_Services_Moses_Connector extends editor_Plugi
             return $this->resultList;
         }
         
-        return [];
+        return []; //FIXME we cannot return an array here editor_Plugins_MatchResource_Services_ServiceResult is expected!
     }
     
     /**

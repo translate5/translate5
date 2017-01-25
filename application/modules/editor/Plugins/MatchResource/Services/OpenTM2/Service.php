@@ -35,26 +35,23 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * Moses Service Base Class
+ * OpenTM2 Service Base Class
  */
-class editor_Plugins_MatchResource_Services_Moses_Service extends editor_Plugins_MatchResource_Services_ServiceAbstract {
-    const DEFAULT_COLOR = 'ffff00';
+class editor_Plugins_MatchResource_Services_OpenTM2_Service extends editor_Plugins_MatchResource_Services_ServiceAbstract {
+    const DEFAULT_COLOR = 'd9241d';
     
-    
-    protected $resourceClass = 'editor_Plugins_MatchResource_Services_Moses_Resource';
+    public function __construct() {
+        $config = Zend_Registry::get('config');
+        /* @var $config Zend_Config */
+        $urls = $config->runtimeOptions->plugins->MatchResource->opentm2->server;
+        $this->addResourceForeachUrl('OpenTM2', $urls->toArray());
+    }
     
     /**
      * (non-PHPdoc)
      * @see editor_Plugins_MatchResource_Services_ServiceAbstract::getName()
      */
     public function getName() {
-        return "Moses";
-    }
-    
-    public function __construct() {
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $urls = $config->runtimeOptions->plugins->MatchResource->moses->server;
-        $this->addResourceForeachUrl('Moses MT', $urls->toArray());
+        return "OpenTM2";
     }
 }

@@ -103,7 +103,7 @@ class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor
         return APPLICATION_PATH.'/../data/dummyTm_'.$id;
     }
 
-    public function update() {
+    public function update(editor_Models_Segment $segment) {
         $messages = Zend_Registry::get('rest_messages');
         /* @var $messages ZfExtended_Models_Messages */
         $messages->addError('This is just to inform you, that the TM is not updated and the udpate handler is only for demonstration invoked.');
