@@ -36,6 +36,8 @@ Ext.define('Editor.plugins.MatchResource.view.ImportTmWindow', {
         file: '#UT#TMX-Datei',
         title: '#UT#TMX Datei importieren',
         importTmx: '#UT#Weitere TM Daten in Form einer TMX Datei importieren und dem bestehenden TM hinzufügen',
+        importTmxType: '#UT#Bitte verwenden Sie eine TMX Datei!',
+        importSuccess: '#UT#Weitere TM Daten erfolgreich importiert!',
         save: '#UT#Speichern',
         cancel: '#UT#Abbrechen'
     },
@@ -65,6 +67,8 @@ Ext.define('Editor.plugins.MatchResource.view.ImportTmWindow', {
                     xtype: 'filefield',
                     fieldLabel: me.strings.file,
                     toolTip: me.strings.importTmx, 
+                    regex: /\.tmx$/i,
+                    regexText: me.strings.importTmxType,
                     labelWidth: 160,
                     anchor: '100%',
                     name: 'tmUpload'
