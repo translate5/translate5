@@ -41,7 +41,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
     extend : 'Ext.app.Controller',
-    views: ['Editor.plugins.MatchResource.view.TmOverviewPanel','Editor.plugins.MatchResource.view.AddTmWindow'],
+    views: ['Editor.plugins.MatchResource.view.TmOverviewPanel','Editor.plugins.MatchResource.view.AddTmWindow','Editor.plugins.MatchResource.view.EditTmWindow'],
     models: ['Editor.model.admin.Task', 'Editor.plugins.MatchResource.model.Resource','Editor.plugins.MatchResource.model.TmMt'],
     stores:['Editor.plugins.MatchResource.store.Resources','Editor.plugins.MatchResource.store.TmMts'],
     strings: {
@@ -64,7 +64,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
         ref: 'headToolBar',
         selector: 'headPanel toolbar#top-menu'
     },{
-        ref: 'TmForm',
+        ref: 'AddTmForm',
         selector: '#addTmWindow form'
     },{
         ref: 'TmWindow',
@@ -94,11 +94,14 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
             '#btnAddTm':{
                 click:'handleOnAddTmClick'
             },
-            '#save-tm-btn':{
-                click:'handleSaveWindowClick'
+            'addTmWindow #save-tm-btn':{
+                click:'handleSaveAddClick'
+            },
+            'editTmWindow #save-tm-btn':{
+                click:'handleSaveEditClick'
             },
             '#cancel-tm-btn':{
-                click:'handleCancelWindowClick'
+                click:'handleCancelClick'
             },
             '#tmOverviewPanel actioncolumn':{
                 click:'handleTmGridActionColumnClick'
@@ -111,6 +114,9 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
             },
             '#adminTaskGrid': {
                 beforerender:'injectTaskassocColumn'
+            },
+            'addTmWindow combo[name="resourceId"]': {
+                select: 'handleResourceChanged'
             }
         }
     },
@@ -159,47 +165,23 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
         }
     },
     handleOnAddTmClick : function(){
-        var win = Ext.widget('addTmWindow',{editMode: false});
+        var win = Ext.widget('addTmWindow');
         win.show();
     },
     handleButtonRefreshClick : function(){
         this.getTmOverviewPanel().getStore().load();
         this.getEditorPluginsMatchResourceStoreResourcesStore().load();
     },
-    handleSaveWindowClick:function(){
+    handleSaveAddClick:function(button){
         var me = this,
-            form = this.getTmForm(),
-            win = me.getTmWindow();
+            window = button.up('window');
+            form = window.down('form');
 
         if(!form.isValid()) {
             return;
         }
 
-        if(win.editMode){
-            var f = form.getForm(),
-                record = form.getRecord();
-            record.reject();
-            f.updateRecord(record);
-
-            record.save({
-                failure: function(records, op) {
-                    win.setLoading(false);
-                    Editor.app.getController('ServerException').handleException(op.error.response);
-                },
-                success: function() {
-                    var msg = Ext.String.format(me.strings.edited, record.get('name'));
-                    me.getTmOverviewPanel().getStore().load();
-                    win.setLoading(false);
-                    win.close();
-                    Editor.MessageBox.addSuccess(msg);
-                }
-            });
-            return;
-        }
         form.submit({
-            //if editMode:
-            // method = PUT instead of POST // is working the file upload PUR request?
-            // provide the ID of the record in the URL with /ID
             params: {
                 format: 'jsontext'
             },
@@ -208,22 +190,51 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
             success: function(form, submit) {
                 var msg = Ext.String.format(me.strings.created, submit.result.rows.name);
                 this.getTmOverviewPanel().getStore().load();
-                win.setLoading(false);
-                me.getTmWindow().close();
+                window.setLoading(false);
+                window.close();
                 Editor.MessageBox.addSuccess(msg);
             },
             failure: function(form, submit) {
-                win.setLoading(false);
-                Editor.app.getController('ServerException').handleException(submit.response);
+                window.setLoading(false);
+                //submit results are always state 200.
+                //If success false and errors is an array, this errors are shown in the form directly,
+                // so we dont need the handleException
+                if(submit.result.success || !Ext.isArray(submit.result.errors)) {
+                    Editor.app.getController('ServerException').handleException(submit.response);
+                }
             }
         });
     },
-    handleCancelWindowClick:function(){
-        this.getTmForm().getForm().reset();
-        this.getTmWindow().close();
+    handleSaveEditClick: function(button){
+        var me = this,
+            window = button.up('window');
+            form = window.down('form'),
+            record = form.getRecord();
+
+        record.reject();
+        f.updateRecord(record);
+
+        record.save({
+            failure: function(records, op) {
+                window.setLoading(false);
+                Editor.app.getController('ServerException').handleException(op.error.response);
+            },
+            success: function() {
+                var msg = Ext.String.format(me.strings.edited, record.get('name'));
+                me.getTmOverviewPanel().getStore().load();
+                window.setLoading(false);
+                window.close();
+                Editor.MessageBox.addSuccess(msg);
+            }
+        });
+    },
+    handleCancelClick: function(button){
+        var window = button.up('window');
+        window.down('form').getForm().reset();
+        window.close();
     },
     handleEditTm : function(view, cell, cellIdx, rec){
-        var win = Ext.widget('addTmWindow',{editMode: true});
+        var win = Ext.widget('editTmWindow');
         win.loadRecord(rec);
         win.show();
     },
@@ -319,5 +330,16 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
         });
         grid.headerCt.insert((grid.down('gridcolumn[dataIndex=userCount]').fullColumnIndex + 1), column);//inserting the dynamic column into grid
         grid.getView().refresh();
+    },
+    handleResourceChanged: function(combo, record, index) {
+        console.log(record.data);
+        var form = this.getAddTmForm().getForm(),
+            disableUpload = !record.get('filebased'),
+            filefield = form.findField('tmUpload');
+        form.findField('serviceType').setValue(record.get('serviceType'));
+        form.findField('serviceName').setValue(record.get('serviceName'));
+        form.findField('color').setValue(record.get('defaultColor'));
+        filefield.setDisabled(disableUpload);
+        filefield.setReadOnly(disableUpload);
     }
 });
