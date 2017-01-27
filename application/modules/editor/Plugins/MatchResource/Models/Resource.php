@@ -150,6 +150,8 @@ class editor_Plugins_MatchResource_Models_Resource {
     /**
      * returns true if the resource can deal with the given source language
      * returns true per default, must be implemented in the service specific resource classes
+     * @param editor_Models_Languages $sourceLang
+     * @return boolean
      */
     public function hasSourceLang(editor_Models_Languages $sourceLang) {
         return true;
@@ -158,9 +160,11 @@ class editor_Plugins_MatchResource_Models_Resource {
     /**
      * returns true if the resource can deal with the given target language
      * returns true per default, must be implemented in the service specific resource classes
+     * @param editor_Models_Languages $targetLang
+     * @return boolean
      */
     public function hasTargetLang(editor_Models_Languages $targetLang) {
-        return false;
+        return true;
     }
     
     /**

@@ -69,7 +69,7 @@ class editor_Plugins_MatchResource_Services_LucyLT_Resource extends editor_Plugi
      * @see editor_Plugins_MatchResource_Models_Resource::hasSourceLang()
      */
     public function hasSourceLang(editor_Models_Languages $sourceLang) {
-        return $this->hasLanguage($sourceLang);
+        return $this->hasLanguage($sourceLang->getRfc5646());
     }
 
     /**
@@ -77,38 +77,40 @@ class editor_Plugins_MatchResource_Services_LucyLT_Resource extends editor_Plugi
      * @see editor_Plugins_MatchResource_Models_Resource::hasTargetLang()
      */
     public function hasTargetLang(editor_Models_Languages $targetLang) {
-        return $this->hasLanguage($targetLang);
+        return $this->hasLanguage($targetLang->getRfc5646());
     }
     
     /**
-     * checks if the given language is listed in the internal defined languageMap of Lucy Languages
-     * @param editor_Models_Languages $lang
+     * checks if the given language key (RFC5646) is listed in the internal defined languageMap of Lucy Languages
+     * @param string $langKey as defined in RFC5646
      * @return boolean
      */
-    protected function hasLanguage(editor_Models_Languages $lang) {
-        return array_key_exists($this->getRfc5646($lang), $this->languageMap);
+    protected function hasLanguage($langKey) {
+        return array_key_exists($this->getRfc5646($langKey), $this->languageMap);
     }
     
     /**
-     * returns the first part of the Rfc5646 language name, can currently not deal with de-DE always uses de
-     * @param editor_Models_Languages $lang
+     * returns the first part of the Rfc5646 language name, 
+     *  since internally in the Lucy Connector we currently 
+     *  can not deal with de-DE and use therefore always de
+     *  
+     * @param string $langKey as defined in RFC5646
      * @return boolean
      */
-    protected function getRfc5646(editor_Models_Languages $lang) {
-        $key = $lang->getRfc5646();
-        $key = explode('-', $key);
+    protected function getRfc5646(string $langKey) {
+        $key = explode('-', $langKey);
         $key = reset($key);
         return strtolower($key);
     }
     
     /**
      * returns the Lucy Language representation for the given language, null if the language is not defined
-     * @param editor_Models_Languages $lang
+     * @param string $langKey as defined in RFC5646
      * @return string|NULL
      */
-    public function getMappedLanguage(editor_Models_Languages $lang) {
-        if($this->hasLanguage($lang)){
-            return $this->languageMap[$this->getRfc5646($lang)];
+    public function getMappedLanguage($langKey) {
+        if($this->hasLanguage($langKey)){
+            return $this->languageMap[$this->getRfc5646($langKey)];
         }
         return null;
     }

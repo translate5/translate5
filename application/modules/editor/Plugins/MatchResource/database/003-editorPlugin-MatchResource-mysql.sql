@@ -39,3 +39,15 @@ INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`
 
 ALTER TABLE `LEK_matchresource_taskassoc` 
 ADD COLUMN `segmentsUpdateable` TINYINT NOT NULL DEFAULT 0 AFTER `taskGuid`;
+
+ALTER TABLE `LEK_matchresource_tmmt` 
+ADD COLUMN `sourceLangRfc5646` VARCHAR(30) NULL DEFAULT NULL COMMENT 'caches the language rfc value, since this value is used more often as the id itself' AFTER `sourceLang`,
+ADD COLUMN `targetLangRfc5646` VARCHAR(30) NULL DEFAULT NULL COMMENT 'caches the language rfc value, since this value is used more often as the id itself' AFTER `targetLang`;
+
+UPDATE `LEK_matchresource_tmmt` tmmt, `LEK_languages` lang 
+SET tmmt.sourceLangRfc5646 = lang.rfc5646 
+WHERE lang.id = tmmt.sourceLang;
+
+UPDATE `LEK_matchresource_tmmt` tmmt, `LEK_languages` lang 
+SET tmmt.targetLangRfc5646 = lang.rfc5646 
+WHERE lang.id = tmmt.targetLang;

@@ -48,6 +48,11 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
     protected $groupedTaskInfo = array();
     
     /**
+     * @var array
+     */
+    protected $uploadErrors = array();
+    
+    /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
      * Adds the readonly "filebased" field to the results
@@ -146,11 +151,17 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         /* @var $manager editor_Plugins_MatchResource_Services_Manager */
         $resource = $manager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
         
+        //validation prefills also the rfc values! So it must be called before the fileupload, 
+        // since there will be communication with the underlying resource which needs the RFC values
+        $validLanguages = $this->validateLanguages($resource);
+        
         if($resource->getFilebased()) {
             $this->handleInitialFileUpload($manager);
+            //when there are errors, we cannot set it to true
+            $validFiles = $this->validateUpload();
         }
         
-        if($this->validateLanguages($resource) && $this->validate()){
+        if($validLanguages && $validFiles && $this->validate()){
             $this->entity->save();
             $this->view->rows = $this->entity->getDataObject();
             $this->view->success = true;
@@ -175,7 +186,8 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         //upload errors are handled in handleAdditionalFileUpload
         $this->handleAdditionalFileUpload($serviceManager);
         
-        $this->view->success = true;
+        //when there are errors, we cannot set it to true
+        $this->view->success = $this->validateUpload();
     }
     
     /**
@@ -196,6 +208,10 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         
         $hasSourceLang = $resource->hasSourceLang($sourceLang);
         $hasTargetLang = $resource->hasTargetLang($targetLang);
+        
+        //cache the RF5646 language key in the TMMT since this value is used more often as our internal ID
+        $this->entity->setSourceLangRfc5646($sourceLang->getRfc5646());
+        $this->entity->setTargetLangRfc5646($targetLang->getRfc5646());
         
         //both languages can be dealed by the resource, all OK
         if($hasSourceLang && $hasTargetLang) {
@@ -230,8 +246,8 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         //setting the TM filename here, but can be overwritten in the connectors addTm method
         // for example when we get a new name from the service
         $this->entity->setFileName($importInfo[self::FILE_UPLOAD_NAME]['name']);
-        if(!$connector->addTm($importInfo[self::FILE_UPLOAD_NAME]['tmp_name'])) {
-            $this->uploadError('Hochgeladene TM Datei konnte nicht hinzugefügt werden.');
+        if(empty($this->uploadErrors) && !$connector->addTm($importInfo[self::FILE_UPLOAD_NAME]['tmp_name'])) {
+            $this->uploadErrors[] = 'Hochgeladene TM Datei konnte nicht hinzugefügt werden.';
         }
     }
     
@@ -243,8 +259,8 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         $importInfo = $this->handleFileUpload();
         $connector = $manager->getConnector($this->entity);
         
-        if(!$connector->addAdditionalTm($importInfo[self::FILE_UPLOAD_NAME]['tmp_name'])) {
-            $this->uploadError('Hochgeladene TMX Datei konnte nicht hinzugefügt werden.');
+        if(empty($this->uploadErrors) && !$connector->addAdditionalTm($importInfo[self::FILE_UPLOAD_NAME]['tmp_name'])) {
+            $this->uploadErrors[] = 'Hochgeladene TMX Datei konnte nicht hinzugefügt werden.';
         }
     }
     
@@ -259,18 +275,31 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         $importInfo = $upload->getFileInfo(self::FILE_UPLOAD_NAME);
         /* @var $connector editor_Plugins_MatchResource_Services_ConnectorAbstract */
         if(empty($importInfo[self::FILE_UPLOAD_NAME]['size'])) {
-            $this->uploadError('Die ausgewählte Datei war leer!');
+            $this->uploadErrors[] = 'Die ausgewählte Datei war leer!';
         }
         return $importInfo;
     }
     
-    protected function uploadError($msg) {
+    /**
+     * translates and transport upload errors to the frontend
+     * @return boolean if there are upload errors false, true otherwise
+     */
+    protected function validateUpload() {
+        if(empty($this->uploadErrors)){
+            return true;
+        }
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $translate ZfExtended_Zendoverwrites_Translate */;
-        $errors = array('tmUpload' => array($translate->_($msg)));
+        $errors = array('tmUpload' => array());
+        
+        foreach($this->uploadErrors as $error) {
+            $errors['tmUpload'][] = $translate->_($error);
+        }
+        
         $e = new ZfExtended_ValidateException(print_r($errors, 1));
         $e->setErrors($errors);
-        throw $e;
+        $this->handleValidateException($e);
+        return false;
     }
     
     public function deleteAction(){

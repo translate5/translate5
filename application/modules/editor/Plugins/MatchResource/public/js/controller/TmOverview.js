@@ -203,12 +203,17 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
                 Editor.MessageBox.addSuccess(msg);
             },
             failure: function(form, submit) {
+                var res = submit.result;
                 window.setLoading(false);
                 //submit results are always state 200.
                 //If success false and errors is an array, this errors are shown in the form directly,
                 // so we dont need the handleException
-                if(submit.result.success || !Ext.isArray(submit.result.errors)) {
+                if(res.success || !Ext.isArray(res.errors)) {
                     Editor.app.getController('ServerException').handleException(submit.response);
+                }
+                if(Ext.isArray(res.errors)) {
+                    form.markInvalid(res.errors);
+                    return;
                 }
             }
         });
@@ -265,6 +270,10 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
                 // so we dont need the handleException
                 if(res.success || !Ext.isArray(res.errors) || !res.message || res.message != 'NOT OK') {
                     Editor.app.getController('ServerException').handleException(submit.response);
+                }
+                if(Ext.isArray(res.errors)) {
+                    form.markInvalid(res.errors);
+                    return;
                 }
             }
         });
@@ -381,7 +390,6 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
         grid.getView().refresh();
     },
     handleResourceChanged: function(combo, record, index) {
-        console.log(record.data);
         var form = this.getAddTmForm().getForm(),
             disableUpload = !record.get('filebased'),
             filefield = form.findField('tmUpload');

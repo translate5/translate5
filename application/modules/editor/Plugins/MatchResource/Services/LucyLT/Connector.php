@@ -173,16 +173,11 @@ class editor_Plugins_MatchResource_Services_LucyLT_Connector extends editor_Plug
         $resource = $this->tmmt->getResource();
         /* @var $resource editor_Plugins_MatchResource_Services_LucyLT_Resource */
         
-        $lang = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $lang editor_Models_Languages */
-        $lang->load($this->tmmt->getSourceLang());
-        
         $result = [
-            'source' => $resource->getMappedLanguage($lang)
+            'source' => $resource->getMappedLanguage($this->tmmt->getSourceLangRfc5646())
         ];
         
-        $lang->load($this->tmmt->getTargetLang());
-        $result['target'] = $resource->getMappedLanguage($lang);
+        $result['target'] = $resource->getMappedLanguage($this->tmmt->getTargetLangRfc5646());
         
         return join('-', $result);
     }
