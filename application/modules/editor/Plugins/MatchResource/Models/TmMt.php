@@ -77,7 +77,7 @@ class editor_Plugins_MatchResource_Models_TmMt extends ZfExtended_Models_Entity_
         $assocDb = new editor_Plugins_MatchResource_Models_Db_Taskassoc();
         $assocName = $assocDb->info($assocDb::NAME);
         $s = $this->db->select()
-            ->from($this->db, array('*',$assocName.'.taskGuid'))
+            ->from($this->db, array('*',$assocName.'.taskGuid', $assocName.'.segmentsUpdateable'))
             ->setIntegrityCheck(false)
             ->join($assocName, $assocName.'.`tmmtId` = '.$this->db->info($assocDb::NAME).'.`id`', '')
             ->where($assocName.'.`taskGuid` in (?)', $taskGuidList);

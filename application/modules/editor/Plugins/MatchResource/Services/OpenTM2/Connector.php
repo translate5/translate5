@@ -89,9 +89,15 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::addTm()
      */
     public function addTm(string $filename) {
+        
+        //FIXME hier die Fehler abfangen wenn es ein TM mit dem selben Namen bereits gibt!
+        
+        //FIXME hier den Zeichen Filter von Gerhard einbauen
+        $this->tmmt->setFileName($this->tmmt->getName());
+        
         //$filename is the real file path of the temp uploaded file on the disk!
         //$this->tmmt->getFileName() is the original filename of the uploaded file
-        $this->api->import($filename);
+        $this->api->createMemory($this->tmmt->getName(), $this->tmmt->getSourceLangRfc5646(), file_get_contents($filename));
         return true;
     }
     
@@ -100,9 +106,10 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::addTm()
      */
     public function addAdditionalTm(string $filename) {
-        //$filename is the real file path of the temp uploaded file on the disk!
-        //$this->tmmt->getFileName() is the original filename of the uploaded file
-        $this->api->import($filename);
+        
+        //FIXME refactor to streaming (for huge files) if possible by underlying HTTP client
+        
+        $this->api->importMemory(file_get_contents($filename));
         return true;
     }
     
@@ -124,7 +131,31 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
     }
 
     public function update(editor_Models_Segment $segment) {
-        $this->api->update($segment);
+        
+        //FIXME implement segmentsUpdateable check from LEK_matchresource_taskassoc
+        // → in Init event handler better?
+        
+        $messages = Zend_Registry::get('rest_messages');
+        /* @var $messages ZfExtended_Models_Messages */
+        if($this->api->update($segment)) {
+            $messages->addNotice('Segment im TM aktualisiert!', 'MatchResource');
+            return;
+        }
+        $errors = $this->api->getErrors();
+        //$messages = Zend_Registry::get('rest_messages');
+        /* @var $messages ZfExtended_Models_Messages */
+        $merged = array();
+        foreach($errors as $key => $error){
+            $merged[] = $key.': '.$error;
+        }
+        $msg = 'Das Segment konnte nicht ins TM gespeichert werden! Bitte kontaktieren Sie Ihren Administrator! Fehler:';
+        $messages->addError($msg, 'MarchResource', null, join("<br>\n", $merged));
+        $log = ZfExtended_Factory::get('ZfExtended_Log');
+        /* @var $log ZfExtended_Log */
+        $msg = 'MatchResource Plugin - could not save segment to TM'." TMMT: \n";
+        $data  = print_r($this->tmmt->getDataObject(),1);
+        $data .= " \nError\n".print_r($errors,1);
+        $log->logError($msg, $data);
     }
     
     /**
@@ -132,9 +163,26 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        error_log(__FUNCTION__);return;
-        $queryString = $this->getQueryString($segment);
-        return $this->loopData($segment->stripTags($queryString));
+        $file = ZfExtended_Factory::get('editor_Models_File');
+        /* @var $file editor_Models_File */
+        $file->load($segment->getFileId());
+        
+        $queryString = $segment->stripTags($this->getQueryString($segment));
+        
+        if($this->api->lookup($segment, $queryString, $file->getFileName())){
+            $result = $this->api->getResult();
+            if((int)$result->NumOfFoundProposals === 0){
+                return $this->resultList; 
+            }
+            foreach($result->FoundProposals as $found) {
+                $this->resultList->addResult($found->Target, $found->Fuzzyness);
+                $this->resultList->setSource($found->Source);
+            }
+            
+            $this->resultList->setTotal($result->NumOfFoundProposals);
+            return $this->resultList; 
+        }
+        throw new ZfExtended_Exception('Errors in receiving data from OpenTM2: '.print_r($this->api->getErrors(),1));
     }
     
     /**
@@ -142,16 +190,33 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::search()
      */
     public function search(string $searchString, $field = 'source') {
-        error_log(__FUNCTION__);return;
-        $this->searchCount = 0;
-        return $this->loopData($searchString, $field);
+        $field = ucfirst($field);
+        //FIXME for paging see Dummy TM connector, there is a hint about OpenTM2
+        
+        if($this->api->search($searchString, ucfirst($field))){
+            $result = $this->api->getResult();
+            $found = $result->FoundProposal;
+            
+            if(empty($found->{$field})){
+                return $this->resultList; 
+            }
+            //[NextSearchPosition] => 
+    
+            $this->resultList->addResult($found->Target);
+            $this->resultList->setSource($found->Source);
+            
+            //FIXME Total Calculation and paging logic differs completly from that what we need!
+            $this->resultList->setTotal(1);
+            return $this->resultList; 
+        }
+        throw new ZfExtended_Exception('Errors in receiving data from OpenTM2: '.print_r($this->api->getErrors(),1));
     }
     
     /**
      * (non-PHPdoc)
      * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::setPaging()
      */
-    public function XXXsetPaging($page, $offset, $limit = 20) {
+    public function setPaging($page, $offset, $limit = 20) {
         $this->page = (int) $page;
         $this->offset = (int) $offset;
         $this->limit = (int) $limit;
@@ -164,7 +229,8 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      * (non-PHPdoc)
      * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::delete()
      */
-    public function XXXdelete() {
+    public function delete() {
+        throw new Exception("IMPLEMENT ME"); //FIXME
         $file = new SplFileInfo($this->getTmFile($this->tmmt->getId()));
         if($file->isFile()) {
             unlink($file);
