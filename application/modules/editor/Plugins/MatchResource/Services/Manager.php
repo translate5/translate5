@@ -150,8 +150,10 @@ class editor_Plugins_MatchResource_Services_Manager {
     }
     
     public function updateSegment(editor_Models_Segment $segment) {
-        $this->visitAllAssociatedTms($segment->getTaskGuid(), function(editor_Plugins_MatchResource_Services_ConnectorAbstract $connector) use ($segment) {
-            $connector->update($segment);
+        $this->visitAllAssociatedTms($segment->getTaskGuid(), function(editor_Plugins_MatchResource_Services_ConnectorAbstract $connector, $tmmt, $assoc) use ($segment) {
+            if(!empty($assoc['segmentsUpdateable'])) {
+                $connector->update($segment);
+            }
         });
     }
     
@@ -165,7 +167,7 @@ class editor_Plugins_MatchResource_Services_Manager {
             $tmmt->init($one);
             $connector = $this->getConnector($tmmt);
             /* @var $connector editor_Plugins_MatchResource_Services_ConnectorAbstract */
-            $todo($connector, $tmmt);
+            $todo($connector, $tmmt, $one);
         }
     }
 }
