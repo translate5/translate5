@@ -74,6 +74,10 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
     }
     
     public function init() {
+        if(ZfExtended_Debug::hasLevel('plugin', 'MatchResource')) {
+            ZfExtended_Factory::addOverwrite('Zend_Http_Client', 'ZfExtended_Zendoverwrites_Http_DebugClient');
+        }
+        
         $this->initEvents();
         $this->initRoutes();
     }

@@ -75,15 +75,10 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         
         $http = $this->getHttp();
         $http->setRawData(json_encode($data), 'application/json');
-        error_log("URL: ".$http->getUri(true));
-        error_log("\n\nDATA: \n".json_encode($data)."\n\n");
         $res = $http->request('POST');
-        
+        return $this->processResponse($res);
         //FIXME REST Error Handling!
         //Im result JSON ist der "name", diesen speichern wir als filename ins TMMT zurück!
-        
-        error_log("Status: ".print_r($res->getStatus(),1));
-        error_log("Raw Body: ".print_r($res->getRawBody(),1));
     }
     
     /**
@@ -99,16 +94,8 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $http = $this->getHttpWithMemory('/import');
         $http->setRawData(json_encode($data), 'application/json');
         
-        error_log("URL: ".$http->getUri(true));
-        error_log("\n\nDATA: \n".json_encode($data)."\n\n");
-        
         $res = $http->request('POST');
-        error_log("Status: ".print_r($res->getStatus(),1));
-        error_log("Raw Body: ".print_r($res->getRawBody(),1));
-        
-        //FIXME REST like error handling!
-        
-        return;
+        return $this->processResponse($res);
     }
     
     
@@ -126,7 +113,8 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
     protected function getHttp($urlSuffix = '') {
         $url = rtrim($this->tmmt->getResource()->getUrl(), '/');
         $urlSuffix = ltrim($urlSuffix, '/');
-        $http = new Zend_Http_Client();
+        $http = ZfExtended_Factory::get('Zend_Http_Client');
+        /* @var $http Zend_Http_Client */
         $http->setUri($url.'/'.$urlSuffix);
         return $http;
     }
@@ -230,8 +218,8 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
 		"DocumentShortName": "",
 		"SourceLanguage": "en-GB",
 		"TargetLanguage": "de-CH",
-		"Type": "Manual",
-		"Match": "ExactSameDoc", //FIXME Wie gehen wir mit dieser Info um?
+		"Type": "Manual", 
+		"Match": "ExactSameDoc", //FIXME Wie gehen wir mit dieser Info um? → Attributes
 		"Author": "THOMAS LAURIA", //FIXME we mappen wir dieses und die nachfolgenden Felder auf unser Frontend?
 		"DateTime": "20170127T150423Z",
 		"Fuzzyness": 100,
@@ -268,17 +256,10 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         
         $http = $this->getHttpWithMemory('concordancesearch');
         $http->setRawData(json_encode($data), 'application/json');
-        error_log("URL: ".$http->getUri(true));
-        error_log("\n\nDATA: \n".json_encode($data)."\n\n");
         $res = $http->request('POST');
         
         //FIXME REST Error Handling!
         //Im result JSON ist der "name", diesen speichern wir als filename ins TMMT zurück!
-        
-        error_log("Status: ".print_r($res->getStatus(),1));
-        error_log("Raw Body: ".print_r($res->getRawBody(),1));
-        
-        
     }
 
     /**
@@ -379,7 +360,8 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         }
         
         //create request
-        $http = new Zend_Http_Client();
+        $http = ZfExtended_Factory::get('Zend_Http_Client');
+        /* @var $http Zend_Http_Client */
         $http->setUri($url);
         $json = json_encode($json);
         $http->setRawData($json, 'application/json');
@@ -395,17 +377,32 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         }
         
         //$http->setFileUpload($filename, $formname);
+        return $this->processResponse($response);
+    }
+    
+    /**
+     * parses and processes the response of OpenTM2, and handles the errors
+     * @param Zend_Http_Response $response
+     * @return boolean
+     */
+    protected function processResponse(Zend_Http_Response $response) {
         $this->response = $response;
         
         //check for HTTP State (REST errors)
         if($response->getStatus() != 200) {
-            $this->error['HTTP'] = $response->getStatus();
+            $error = new stdClass();
+            $error->type = 'HTTP';
+            $error->error = $response->getStatus();
+            $this->error[] = $error;
         }
         $result = json_decode(trim($response->getBody()));
         
         //check for JSON errors
         if(json_last_error() > 0){
-            $this->error['JSON'] = json_last_error_msg();
+            $error = new stdClass();
+            $error->type = 'JSON';
+            $error->error = json_last_error_msg();
+            $this->error[] = $error;
             return false;
         }
         
@@ -413,7 +410,10 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         
         //check for error messages from body
         if($result->ReturnValue > 0) {
-            $this->error[$result->ReturnValue] = $result->ErrorMsg;
+            $error = new stdClass();
+            $error->type = 'Error Nr. '.$result->ReturnValue;
+            $error->error = $result->ErrorMsg;
+            $this->error[] = $error;
         }
         
         return empty($this->error);

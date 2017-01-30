@@ -189,6 +189,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
             return;
         }
 
+        window.setLoading(true);
         form.submit({
             params: {
                 format: 'jsontext'
@@ -213,6 +214,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
                 }
                 if(Ext.isArray(res.errors)) {
                     form.markInvalid(res.errors);
+                    me.showGeneralErrors(res.errors);
                     return;
                 }
             }
@@ -227,6 +229,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
         record.reject();
         f.updateRecord(record);
 
+        window.setLoading(true);
         record.save({
             failure: function(records, op) {
                 window.setLoading(false);
@@ -251,6 +254,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
             return;
         }
 
+        window.setLoading(true);
         form.submit({
             params: {
                 format: 'jsontext'
@@ -266,6 +270,9 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
                 var res = submit.result;
                 window.setLoading(false);
                 //submit results are always state 200.
+                if(res.httpStatus) {
+                    submit.response.status = res.httpStatus;
+                }
                 //If success false and errors is an array, this errors are shown in the form directly,
                 // so we dont need the handleException
                 if(res.success || !Ext.isArray(res.errors) || !res.message || res.message != 'NOT OK') {
@@ -273,10 +280,21 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
                 }
                 if(Ext.isArray(res.errors)) {
                     form.markInvalid(res.errors);
+                    me.showGeneralErrors(res.errors);
                     return;
                 }
             }
         });
+    },
+    /**
+     * Loops over the given error array and shows additional non formfield specfific errors
+     */
+    showGeneralErrors: function (errors){
+        Ext.Array.each(errors, function(item){
+            if(!item.id || item.id == -1) {
+                Editor.MessageBox.getInstance().showDirectError(item.msg, item.data);
+            }
+        })
     },
     handleCancelClick: function(button){
         var window = button.up('window');

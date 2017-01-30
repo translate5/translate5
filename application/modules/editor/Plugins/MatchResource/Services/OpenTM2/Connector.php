@@ -106,11 +106,23 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::addTm()
      */
     public function addAdditionalTm(string $filename) {
-        
         //FIXME refactor to streaming (for huge files) if possible by underlying HTTP client
+        if($this->api->importMemory(file_get_contents($filename))) {
+            return true;
+        }
+        $errors = $this->api->getErrors();
         
-        $this->api->importMemory(file_get_contents($filename));
-        return true;
+        $messages = Zend_Registry::get('rest_messages');
+        /* @var $messages ZfExtended_Models_Messages */
+        $msg = 'Von OpenTM2 gemeldeter Fehler';
+        $messages->addError($msg, 'MatchResource', null, $errors);
+        
+        $log = ZfExtended_Factory::get('ZfExtended_Log');
+        /* @var $log ZfExtended_Log */
+        $msg = 'MatchResource Plugin - could not add TMX data to OpenTM2'." TMMT: \n";
+        $data  = print_r($this->tmmt->getDataObject(),1);
+        $data .= " \nError\n".print_r($errors,1);
+        $log->logError($msg, $data);
     }
     
     /**
@@ -144,12 +156,9 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         $errors = $this->api->getErrors();
         //$messages = Zend_Registry::get('rest_messages');
         /* @var $messages ZfExtended_Models_Messages */
-        $merged = array();
-        foreach($errors as $key => $error){
-            $merged[] = $key.': '.$error;
-        }
-        $msg = 'Das Segment konnte nicht ins TM gespeichert werden! Bitte kontaktieren Sie Ihren Administrator! Fehler:';
-        $messages->addError($msg, 'MarchResource', null, join("<br>\n", $merged));
+
+        $msg = 'Das Segment konnte nicht ins TM gespeichert werden! Bitte kontaktieren Sie Ihren Administrator! <br />Gemeldete Fehler:';
+        $messages->addError($msg, 'MatchResource', null, $errors);
         $log = ZfExtended_Factory::get('ZfExtended_Log');
         /* @var $log ZfExtended_Log */
         $msg = 'MatchResource Plugin - could not save segment to TM'." TMMT: \n";

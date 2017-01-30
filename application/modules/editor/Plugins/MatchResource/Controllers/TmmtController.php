@@ -262,6 +262,10 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         if(empty($this->uploadErrors) && !$connector->addAdditionalTm($importInfo[self::FILE_UPLOAD_NAME]['tmp_name'])) {
             $this->uploadErrors[] = 'Hochgeladene TMX Datei konnte nicht hinzugefügt werden.';
         }
+        
+        
+        //FIXME Upload Fehler direkt durchreichen!
+        
     }
     
     /**
