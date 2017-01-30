@@ -184,7 +184,8 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
                 return $this->resultList; 
             }
             foreach($result->FoundProposals as $found) {
-                $this->resultList->addResult($found->Target, $found->Fuzzyness);
+                $meta = new stdClass();
+                $this->resultList->addResult($found->Target, $found->Fuzzyness, $this->getMetaData($found));
                 $this->resultList->setSource($found->Source);
             }
             
@@ -192,6 +193,35 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
             return $this->resultList; 
         }
         throw new ZfExtended_Exception('Errors in receiving data from OpenTM2: '.print_r($this->api->getErrors(),1));
+    }
+    
+    /**
+     * Helper function to get the metadata which should be shown in the GUI out of a single result
+     * @param stdClass $found
+     * @return stdClass
+     */
+    protected function getMetaData($found) {
+        $nameToShow = [
+            "DocumentName",
+            "DocumentShortName",
+            "Type", 
+            "Match",
+            "Author",
+            "DateTime",
+            "Markup",
+            "Context",
+            "AddInfo",
+        ];
+        $result = [];
+        foreach($nameToShow as $name) {
+            if(property_exists($found, $name)) {
+                $item = new stdClass();
+                $item->name = $name;
+                $item->value = $found->{$name};
+                $result[] = $item;
+            }
+        }
+        return $result;
     }
     
     /**

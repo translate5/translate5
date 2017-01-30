@@ -103,24 +103,20 @@ class editor_Plugins_MatchResource_Services_ServiceResult {
      * 
      * @param string $target
      * @param integer $matchrate
+     * @param array $metaData metadata container
      * 
      * @return stdClass the last added result
      */
-    public function addResult($target, $matchrate = 0) {
+    public function addResult($target, $matchrate = 0, array $metaData = null) {
         $result = new stdClass();
         $result->target = $target;
         $result->matchrate = (int) $matchrate;
         $result->source = $this->defaultSource;
-        $result->attributes = null;
         $result->tmmtid = $this->tmmt->getId();
         
         $result->state = self::STATUS_LOADED;
         
-        //FIXME
-        $result->created = "25/06/2016";
-        $result->creator = "Aleksandar Mitrev";
-        $result->lastEdited = "25/06/2016";
-        $result->lastEditor = "Marc Mittag";
+        $result->metaData = $metaData;
         
         $this->results[] = $result;
         $this->lastAdded = $result;

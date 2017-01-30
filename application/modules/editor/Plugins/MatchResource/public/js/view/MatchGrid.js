@@ -63,6 +63,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
         source: '#UT#Quelltext',
         target: '#UT#Zieltext',
         match: '#UT#Matchrate',
+		ctrl: '#UT#STRG',
         tooltipMsg: '#UT#Diesen Match in das geöffnete Segment übernehmen.',
         atributeTooltipMsg: '#UT#Attribute:',
         lastEditTooltipMsg: '#UT#letzte Änderung:',
@@ -98,6 +99,15 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	},
 	initConfig: function(instanceConfig) {
 	    var me = this,
+			attrTpl = new Ext.XTemplate(
+				'{title} <br/>',
+				'<table class="matchresource-meta-data">',
+				'<tpl for="metaData">',
+				'<tr><th>{name}</th><td>{value}</td></tr>',
+				'</tpl>',
+				'</table>',
+				'<br /> {ctrl} - {idx}: {takeMsg}'
+			),
 	    config = {
 	      bind: {
              store: '{editorquery}'
@@ -107,15 +117,18 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	          flex: 10/100,
 	          dataIndex: 'state',
               renderer: function(val, meta, record) {
-                  if(val == me.SERVER_STATUS.SERVER_STATUS_LOADED){
-                      meta.tdAttr = 'data-qtip="'+me.strings.atributeTooltipMsg+' <br/> '+
-                                                  me.strings.lastEditTooltipMsg+' '+record.get('lastEditor')+' '+Ext.Date.format(record.get('lastEdited'), 'd/m/Y')+' <br/> '+
-                                                  me.strings.createdTooltipMsg+' '+record.get('creator')+' '+Ext.Date.format(record.get('created'), 'd/m/Y')+' <br/> '+
-                                                  ' </br> STRG - '+(meta.rowIndex + 1)+': '+me.strings.tooltipMsg+'"';
-                      meta.tdCls  = meta.tdCls  + ' info-icon';
-                      return meta.rowIndex + 1;
+                  if(val !== me.SERVER_STATUS.SERVER_STATUS_LOADED){
+                  	return "";
                   }
-                  return "";
+					meta.tdAttr = 'data-qtip="'+Ext.String.htmlEncode(attrTpl.applyTemplate({
+						title: me.strings.atributeTooltipMsg,
+						metaData: record.get('metaData'),
+						ctrl: me.strings.ctrl,
+						idx: (meta.rowIndex + 1),
+						takeMsg: me.strings.tooltipMsg
+					}))+'"';
+					meta.tdCls  = meta.tdCls  + ' info-icon';
+					return meta.rowIndex + 1;
               },
           },{
 	          xtype: 'gridcolumn',

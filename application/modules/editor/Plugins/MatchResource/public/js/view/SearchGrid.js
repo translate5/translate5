@@ -62,6 +62,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
         source: '#UT#Quelltext',
         target: '#UT#Zieltext',
         match: '#UT#Matchrate',
+        ctrl: '#UT#STRG',
         sourceEmptyText:'#UT#Quelltextsuche',
         targetEmptyText:'#UT#Zieltextsuche',
         tmresource:'#UT#TM-Ressource',
