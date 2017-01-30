@@ -79,7 +79,7 @@ Ext.define('Editor.MessageBox',{
             return; //on a real server error the message is processed by serverexception!
         }
         var resp = operation.getResponse(),
-            json;
+            json, tpl;
         if(!resp || !resp.responseText) {
             return;
         }
@@ -88,8 +88,27 @@ Ext.define('Editor.MessageBox',{
             return;
         }
         Ext.Array.each(json.errors, function(error){
+            if(error.data) {
+                error.msg = error.msg += Editor.MessageBox.dataTable(error.data);
+            }
             Editor.MessageBox.getInstance().addMessage(error.msg, error.type || Editor.MessageBox.INFO);
         });
+    },
+    /**
+     * converts the given array to a table with errors
+     */
+    dataTable: function(data) {
+        if(!data) {
+            return '';
+        }
+        var tpl = new Ext.XTemplate([
+            '<table>',
+            '<tpl for=".">',
+            '<tr><td>{type}: </td><td>{error}</td></tr>',
+            '</tpl>',
+            '</table>'
+        ]);
+        return tpl.applyTemplate(data);
     },
     getInstance: function() {
       if(!Editor.MessageBox.instance){
@@ -148,8 +167,11 @@ Ext.define('Editor.MessageBox',{
           '</div>'
       ].join('');
   },
-  showDirectError: function(msg) {
+  showDirectError: function(msg, data) {
       var box = Ext.MessageBox;
+      if(data) {
+          msg = msg + Editor.MessageBox.dataTable(data);
+      }
       box.show({
           title: this.titles.directError,
           msg: msg,
