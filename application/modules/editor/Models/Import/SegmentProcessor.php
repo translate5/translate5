@@ -117,6 +117,11 @@ abstract class editor_Models_Import_SegmentProcessor {
         $config = Zend_Registry::get('config');
         $widthFactor = (float)$config->runtimeOptions->editor->columns->widthFactor;
         foreach ($fieldContents as $field => $contents) {
+            //first source and first target are always on the default width!
+            if($field == editor_Models_SegmentField::TYPE_SOURCE || $field == editor_Models_SegmentField::TYPE_TARGET) {
+                continue;
+            }
+            
             if(!is_null($fields2Calculate)){
                 if(!array_key_exists($field, $fields2Calculate)){
                     continue;
@@ -145,6 +150,9 @@ abstract class editor_Models_Import_SegmentProcessor {
         $sfm = $parser->getSegmentFieldManager();
         $fieldList = $sfm->getFieldList();
         foreach ($fieldList as $fieldName => $fieldEntity) {
+            if($fieldName == editor_Models_SegmentField::TYPE_SOURCE || $fieldName == editor_Models_SegmentField::TYPE_TARGET) {
+                $this->fieldWidth[$fieldName] = $maxWidth;
+            }
             if(!isset($this->fieldWidth[$fieldName])){
                 continue;
             }
