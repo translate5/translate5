@@ -55,3 +55,5 @@ WHERE lang.id = tmmt.sourceLang;
 UPDATE `LEK_matchresource_tmmt` tmmt, `LEK_languages` lang 
 SET tmmt.targetLangRfc5646 = lang.rfc5646 
 WHERE lang.id = tmmt.targetLang;
+
+update `Zf_configuration` set `value` = '1', `default` = '1' where name = 'runtimeOptions.plugins.MatchResource.preloadedTranslationSegments';

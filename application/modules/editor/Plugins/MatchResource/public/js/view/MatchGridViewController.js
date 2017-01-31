@@ -77,7 +77,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
     cachedResults: new Ext.util.HashMap(),
     editedSegmentId: -1, //the id of the edited segment
     firstEditableRow: -1,
-    NUMBER_OF_CHACHED_SEGMENTS:10,
+    NUMBER_OF_CHACHED_SEGMENTS:2,
     ergonomicMode: false,
     /**
      * if segment store was already loaded before, we have to set the firstEditableRow in here too
