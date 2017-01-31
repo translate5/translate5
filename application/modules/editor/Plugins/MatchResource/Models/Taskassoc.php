@@ -98,6 +98,8 @@ class editor_Plugins_MatchResource_Models_Taskassoc extends ZfExtended_Models_En
         ]);
         
         $db = $this->db;
+        $adapter = $db->getAdapter();
+        
         $s = $db->select()
         ->setIntegrityCheck(false)
         ->from(array("tmmt" => "LEK_matchresource_tmmt"), array("tmmt.*","ta.id AS taskassocid", "ta.segmentsUpdateable"));
@@ -107,22 +109,24 @@ class editor_Plugins_MatchResource_Models_Taskassoc extends ZfExtended_Models_En
             //if checked filter is set, we keep the taskGuid as filter argument,
             // but remove additional checked filter and checked info 
             $this->filter->deleteFilter('checked');
-            $checked = '';
+            $checkColumns = '';
         }
         else {
             $this->filter->deleteFilter('taskGuid');
-            $checked = array(
+            $checkColumns = [
                 //checked is true when an assoc entry was found
-                "checked" => "IF(ta.taskGuid = '".$taskGuid."','true','false')",
+                "checked" => $adapter->quoteInto('IF(ta.taskGuid = ?,\'true\',\'false\')', $taskGuid),
                 //segmentsUpdateable is true when an assoc entry was found and the real value was true too
-                "segmentsUpdateable" => "IF(ta.taskGuid = '".$taskGuid."',segmentsUpdateable,0)",
-            );
+                "segmentsUpdateable" => $adapter->quoteInto('IF(ta.taskGuid = ?,segmentsUpdateable,0)', $taskGuid),
+            ];
         }
         
-        $s->joinLeft(
-                array("ta"=>"LEK_matchresource_taskassoc"),
-                "ta.tmmtId = tmmt.id", $checked);
-        return $this->loadFilterdCustom($s);
+        $on = $adapter->quoteInto('ta.tmmtId = tmmt.id AND ta.taskGuid = ?', $taskGuid);
+        $s->joinLeft(["ta"=>"LEK_matchresource_taskassoc"], $on, $checkColumns);
+        
+        $x = $this->loadFilterdCustom($s);
+        error_log($s);
+        return $x;
     }
     /**
      * Returns join between taskassoc table and task table for tmmt's id list

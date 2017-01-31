@@ -70,15 +70,15 @@ class editor_Plugins_MatchResource_TaskassocController extends ZfExtended_RestCo
             return $resources[$id] = $serviceManager->getResourceById($serviceType, $id);
         };
         
-        $reval = $this->entity->loadByAssociatedTaskAndLanguage($taskGuid->value);
+        $result = $this->entity->loadByAssociatedTaskAndLanguage($taskGuid->value);
         
-        foreach($reval as &$tmmt) {
+        foreach($result as &$tmmt) {
             $resource = $getResource($tmmt['serviceType'], $tmmt['resourceId']);
             $tmmt['searchable'] = empty($resource) ? false : $resource->getSearchable();
         }
         
-        $this->view->rows = $reval;
-        $this->view->total = count($reval);
+        $this->view->rows = $result;
+        $this->view->total = count($result);
     }
     
     /**
