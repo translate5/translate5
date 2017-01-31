@@ -127,6 +127,8 @@ END LICENSE AND COPYRIGHT
 }
 
 /*matchRateType*/
+.matchratetype-visible .matchrateEdit img.matchRateType,
+.matchratetype-visible .matchrateEdit img.matchRateEdited,
 .matchratetype-visible .matchrateColumn img.matchRateType,
 .matchratetype-visible .matchrateColumn img.matchRateEdited {
     display:none;

@@ -44,7 +44,6 @@ Ext.define('Editor.view.segments.column.Matchrate', {
     mixins: ['Editor.view.segments.column.BaseMixin'],
     dataIndex: 'matchRate',
     text: 'Matchrate',
-    tdCls: 'matchrateColumn',
     initComponent: function() {
         var me = this;
         me.initBaseMixin();
@@ -52,7 +51,18 @@ Ext.define('Editor.view.segments.column.Matchrate', {
     },
     initConfig: function(instanceConfig) {
         var me = this,
+            tdCls = 'matchrateColumn',
             config = {
+                tdCls: tdCls,
+                editor: {
+                    xtype: 'displayfield',
+                    getModelData: function() {
+                        return null;
+                    },
+                    cls: 'matchrateEdit',
+                    ownQuicktip: true,
+                    renderer: me.ownQuicktip(tdCls)
+                },
                 filter: {
                     type: 'numeric'
                 }

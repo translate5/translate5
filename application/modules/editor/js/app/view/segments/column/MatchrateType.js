@@ -45,7 +45,6 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
     dataIndex: 'matchRateType',
     width: 82,
     text: '#UT#Matchrate Typ',
-    tdCls: 'matchrateTypeColumn',
     strings: {
         //see in localizedjsstrings
     },
@@ -98,7 +97,18 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
     },
     initConfig: function(instanceConfig) {
         var me = this,
+            tdCls = 'matchrateTypeColumn',
             config = {
+                tdCls: tdCls,
+                editor: {
+                    xtype: 'displayfield',
+                    getModelData: function() {
+                        return null;
+                    },
+                    cls: 'matchrateTypeEdit',
+                    ownQuicktip: true,
+                    renderer: me.ownQuicktip(tdCls)
+                }
             };
         config.filter = {
             type: 'list',
@@ -130,6 +140,20 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
         }
         return me.callParent([config]);
     },
+    ownQuicktip: function(tdCls) {
+        return function(value, field) {
+            var context = field.ownerCt.context,
+                qtip, cell;
+            if(context && context.row){
+                cell = Ext.fly(context.row).down('td.'+tdCls);
+                if(cell) {
+                    qtip = cell.getAttribute('data-qtip');
+                    field.getEl().dom.setAttribute('data-qtip', qtip);
+                }
+            }
+            return value;
+        }
+    },
     /**
      * renders a nice icon and a tooltip to the matchrate type value
      * @param {Integer} value
@@ -151,7 +175,7 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
             },
             qtip = function(meta, msg, desc) {
                 desc = desc ? '<br>'+desc : '';
-                meta.myLabel = msg; //as ref for the list renderer
+                meta.myLabel = msg; //as ref for the list filter renderer
                 meta.tdAttr = 'data-qtip="<b>'+msg+'</b>'+desc+'"';
             };
             

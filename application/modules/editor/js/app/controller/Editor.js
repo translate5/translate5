@@ -192,6 +192,9 @@ Ext.define('Editor.controller.Editor', {
    */
   initMoveToolTip: function(displayfield){
       var me = this;
+      if(displayfield.ownQuicktip){
+          return;
+      }
       Ext.tip.QuickTipManager.register({
           target: displayfield.getId()+'-bodyEl', 
           title: me.messages.editorMoveTitle,
