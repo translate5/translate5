@@ -79,7 +79,8 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
 		}
 	},
 	isAllowedSearchQuery:function(config,instanceConfig){
-		if(Editor.app.authenticatedUser.isAllowed('pluginMatchResourceSearchQuery')) {
+		var showSearch = instanceConfig.assocStore.find('searchable', true) <= 0;
+		if(showSearch && Editor.app.authenticatedUser.isAllowed('pluginMatchResourceSearchQuery')) {
 			config.items.push({
 	             title: this.strings.searchTitle,
             	 xtype:'matchResourceSearchGrid',
