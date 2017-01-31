@@ -227,7 +227,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
             record = form.getRecord();
 
         record.reject();
-        f.updateRecord(record);
+        form.updateRecord(record);
 
         window.setLoading(true);
         record.save({
