@@ -277,10 +277,10 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::delete()
      */
     public function delete() {
-        throw new Exception("IMPLEMENT ME"); //FIXME
-        $file = new SplFileInfo($this->getTmFile($this->tmmt->getId()));
-        if($file->isFile()) {
-            unlink($file);
-        }
+        $messages = Zend_Registry::get('rest_messages');
+        /* @var $messages ZfExtended_Models_Messages */
+        $messages->addNotice('Implement remote DELETE call!', 'MatchResource');
+        //FIXME
+        return true;
     }
 }

@@ -359,10 +359,11 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
                 failure: function() {
                     rec.reject();
                 },
-                success: function() {
+                success: function(record, operation) {
                     store && store.load();
                     store.remove(rec);
                     Editor.MessageBox.addSuccess(msg.deleted);
+                    Editor.MessageBox.addByOperation(operation);
                 }
             });
         });
