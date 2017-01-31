@@ -37,6 +37,10 @@ INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`
 INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
 ('runtimeOptions.plugins.MatchResource.lucylt.credentials', 1, 'editor', 'plugins', '[]', '[]', '', 'list', 'List of Lucy LT credentials to the Lucy LT Servers. Each server entry must have one credential entry. One credential entry looks like: "username:password"');
 
+INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
+('runtimeOptions.plugins.MatchResource.lucylt.matchrate', 1, 'editor', 'plugins', '80', '80', '', 'integer', 'Lucy LT penalty value, used as default matchrate since in MT no matchrate is available');
+
+
 ALTER TABLE `LEK_matchresource_taskassoc` 
 ADD COLUMN `segmentsUpdateable` TINYINT NOT NULL DEFAULT 0 AFTER `taskGuid`;
 

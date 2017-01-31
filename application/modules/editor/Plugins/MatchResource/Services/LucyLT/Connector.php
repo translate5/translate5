@@ -48,7 +48,7 @@ class editor_Plugins_MatchResource_Services_LucyLT_Connector extends editor_Plug
         parent::__construct();
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
-        $this->MT_BASE_MATCHRATE = $config->runtimeOptions->plugins->MatchResource->moses->matchrate;
+        $this->MT_BASE_MATCHRATE = $config->runtimeOptions->plugins->MatchResource->lucylt->matchrate;
         //FIXME change matchrate!
     }
     
@@ -68,7 +68,8 @@ class editor_Plugins_MatchResource_Services_LucyLT_Connector extends editor_Plug
         $res = $this->tmmt->getResource();
         /* @var $res editor_Plugins_MatchResource_Services_LucyLT_Resource */
 
-        $http = new Zend_Http_Client();
+        $http = ZfExtended_Factory::get('Zend_Http_Client');
+        /* @var $http Zend_Http_Client */
         $auth = explode(':', $res->getCredentials());
         $http->setAuth($auth[0], $auth[1]);
         

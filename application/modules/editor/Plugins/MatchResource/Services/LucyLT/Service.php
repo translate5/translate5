@@ -38,7 +38,7 @@ END LICENSE AND COPYRIGHT
  * Lucy LT Service Base Class
  */
 class editor_Plugins_MatchResource_Services_LucyLT_Service extends editor_Plugins_MatchResource_Services_ServiceAbstract {
-    const DEFAULT_COLOR = 'ffff00';
+    const DEFAULT_COLOR = '1f962e';
     
     
     protected $resourceClass = 'editor_Plugins_MatchResource_Services_LucyLT_Resource';
