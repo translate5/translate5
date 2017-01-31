@@ -194,10 +194,10 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
                 "Source" => $queryString,
                 "Segment" => '', //FIXME can be used after implementing TRANSLATE-793
                 "DocumentName" => $filename, //FIXME für Doku: Pfade möglich mit Backslash, aber bei uns Pfade im JSON, daher vorerst nur Dateinamen
-                //"SourceLanguage" => $this->tmmt->getSourceLangRfc5646(),
-                //"TargetLanguage" => $this->tmmt->getTargetLangRfc5646(),
-                "SourceLanguage" => 'en-UK',
-                "TargetLanguage" => 'de-DE',
+                "SourceLanguage" => $this->tmmt->getSourceLangRfc5646(),
+                "TargetLanguage" => $this->tmmt->getTargetLangRfc5646(),
+                //"SourceLanguage" => 'en-UK',
+                //"TargetLanguage" => 'de-DE',
                 //"Markup" => "OTMXUXLF", //
                 "Markup" => "OTMHTM32", //
                 "Context" => $segment->getMid()// hier MID (Context war gedacht für die Keys (Dialog Nummer) bei übersetzbaren strings in Software)

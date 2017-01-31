@@ -124,9 +124,7 @@ class editor_Plugins_MatchResource_Models_Taskassoc extends ZfExtended_Models_En
         $on = $adapter->quoteInto('ta.tmmtId = tmmt.id AND ta.taskGuid = ?', $taskGuid);
         $s->joinLeft(["ta"=>"LEK_matchresource_taskassoc"], $on, $checkColumns);
         
-        $x = $this->loadFilterdCustom($s);
-        error_log($s);
-        return $x;
+        return $this->loadFilterdCustom($s);
     }
     /**
      * Returns join between taskassoc table and task table for tmmt's id list
