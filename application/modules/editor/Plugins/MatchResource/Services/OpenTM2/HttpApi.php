@@ -409,7 +409,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $this->result = $result;
         
         //check for error messages from body
-        if($result->ReturnValue > 0) {
+        if(!empty($result->ReturnValue) && $result->ReturnValue > 0) {
             $error = new stdClass();
             $error->type = 'Error Nr. '.$result->ReturnValue;
             $error->error = $result->ErrorMsg;

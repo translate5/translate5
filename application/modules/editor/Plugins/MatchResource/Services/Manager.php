@@ -50,7 +50,7 @@ class editor_Plugins_MatchResource_Services_Manager {
         'editor_Plugins_MatchResource_Services_OpenTM2',
         'editor_Plugins_MatchResource_Services_Moses',
         'editor_Plugins_MatchResource_Services_LucyLT',
-        'editor_Plugins_MatchResource_Services_DummyFileTm',
+        //'editor_Plugins_MatchResource_Services_DummyFileTm',
     );
 
     public function getAll() {

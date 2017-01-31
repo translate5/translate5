@@ -160,6 +160,9 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
             //when there are errors, we cannot set it to true
             $validFiles = $this->validateUpload();
         }
+        else {
+            $validFiles = true;
+        }
         
         if($validLanguages && $validFiles && $this->validate()){
             $this->entity->save();
@@ -262,10 +265,6 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         if(empty($this->uploadErrors) && !$connector->addAdditionalTm($importInfo[self::FILE_UPLOAD_NAME]['tmp_name'])) {
             $this->uploadErrors[] = 'Hochgeladene TMX Datei konnte nicht hinzugefügt werden.';
         }
-        
-        
-        //FIXME Upload Fehler direkt durchreichen!
-        
     }
     
     /**

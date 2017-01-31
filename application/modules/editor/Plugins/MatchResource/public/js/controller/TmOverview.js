@@ -292,7 +292,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
     showGeneralErrors: function (errors){
         Ext.Array.each(errors, function(item){
             if(!item.id || item.id == -1) {
-                Editor.MessageBox.getInstance().showDirectError(item.msg, item.data);
+                Editor.MessageBox.getInstance().showDirectError(item.msg || item._errorMessage, item.data);
             }
         })
     },

@@ -97,8 +97,12 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         
         //$filename is the real file path of the temp uploaded file on the disk!
         //$this->tmmt->getFileName() is the original filename of the uploaded file
-        $this->api->createMemory($this->tmmt->getName(), $this->tmmt->getSourceLangRfc5646(), file_get_contents($filename));
-        return true;
+        if($this->api->createMemory($this->tmmt->getName(), $this->tmmt->getSourceLangRfc5646(), file_get_contents($filename))){
+            return true;
+        }
+        $this->handleOpenTm2Error('MatchResource Plugin - could not add TM to OpenTM2'." TMMT: \n");
+        return false;
+        
     }
     
     /**
@@ -110,6 +114,11 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         if($this->api->importMemory(file_get_contents($filename))) {
             return true;
         }
+        $this->handleOpenTm2Error('MatchResource Plugin - could not add TMX data to OpenTM2'." TMMT: \n");
+        return false;
+    }
+    
+    protected function handleOpenTm2Error($logMsg) {
         $errors = $this->api->getErrors();
         
         $messages = Zend_Registry::get('rest_messages');
@@ -119,10 +128,9 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         
         $log = ZfExtended_Factory::get('ZfExtended_Log');
         /* @var $log ZfExtended_Log */
-        $msg = 'MatchResource Plugin - could not add TMX data to OpenTM2'." TMMT: \n";
         $data  = print_r($this->tmmt->getDataObject(),1);
         $data .= " \nError\n".print_r($errors,1);
-        $log->logError($msg, $data);
+        $log->logError($logMsg, $data);
     }
     
     /**
