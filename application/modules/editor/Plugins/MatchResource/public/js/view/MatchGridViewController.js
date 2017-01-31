@@ -66,9 +66,6 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
         controller:{
             '#editorcontroller': {
                 prevnextloaded:'calculateRows'
-            },
-            '#ViewModes':{
-                viewModeChanged:'viewModeChangeEvent'//FIXME it is beter to hook up on this event or define a boolen variable in Editor
             }
         }
     },
@@ -103,6 +100,8 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
     },
     endEditing: function() {
         var me = this;
+        Ext.Array.remove(me.cacheSegmentIndex, me.editedSegmentId);
+        me.cachedResults.removeAtKey(me.editedSegmentId);
         me.editedSegmentId = -1;
         me.getView().getStore('editorquery').removeAll();
 	},
@@ -124,14 +123,6 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
         }
         me.checkCacheLength();
         me.cache();
-    },
-    viewModeChangeEvent: function(controller){
-        var me = this;
-        //isViewMode
-        //isErgonomicMode
-        //isEditMode
-        //me.handleViwMode(controller.self.isErgonomicMode());
-        //console.log(me.getView().getStore().refresh());
     },
     cache: function(){
         var me = this,
