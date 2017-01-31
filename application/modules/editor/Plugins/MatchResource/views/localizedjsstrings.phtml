@@ -204,4 +204,17 @@ END LICENSE AND COPYRIGHT
         }
     });
     
+    Ext.define("Editor.locale.plugins.MatchResource.view.ImportTmWindow", {
+        override: "Editor.plugins.MatchResource.view.ImportTmWindow",
+        title: '<?php echo $this->translate->_('Matchressourcen');?>',
+        strings: {
+            file: '<?php echo $this->translate->_('TMX-Datei');?>',
+            title: '<?php echo $this->translate->_('TMX Datei importieren');?>',
+            importTmx: '<?php echo $this->translate->_('Weitere TM Daten in Form einer TMX Datei importieren und dem bestehenden TM hinzufügen');?>',
+            importTmxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TMX Datei!');?>',
+            importSuccess: '<?php echo $this->translate->_('Weitere TM Daten erfolgreich importiert!');?>',
+            save: '<?php echo $this->translate->_('Speichern');?>',
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>'
+        }
+    });
 });
