@@ -73,7 +73,8 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::open()
      */
     public function open() {
-        $this->api->open();
+        //FIXME dieser call ist zum einen nicht nötig, zum anderen muss abgefangen werden OpenTM2 nicht da ist, da sonst kein Task geöffnet werden kann!
+        //$this->api->open();
     }
     
     /**
