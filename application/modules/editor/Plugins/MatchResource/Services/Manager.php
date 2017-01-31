@@ -150,6 +150,9 @@ class editor_Plugins_MatchResource_Services_Manager {
     }
     
     public function updateSegment(editor_Models_Segment $segment) {
+        if(empty($segment->getTargetEdit())){
+            return;
+        }
         $this->visitAllAssociatedTms($segment->getTaskGuid(), function(editor_Plugins_MatchResource_Services_ConnectorAbstract $connector, $tmmt, $assoc) use ($segment) {
             if(!empty($assoc['segmentsUpdateable'])) {
                 $connector->update($segment);
