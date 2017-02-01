@@ -29,25 +29,14 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * ChangeAlikeTranslate683Test imports a simple task, checks and checks the ChangeAlike Behaviour in combination 
- * with Source Editing and trans[Not]Found mark up.
- * See therefore: 
- * TRANSLATE-683 source original will be overwritten even if Source is not editable, 
- *   and contents are no repetition of each other
- * TRANSLATE-549 fixing Source Editing and Change Alike behaviour
- * TRANSLATE-543 fixing red terms go blue on using change alikes, causing 683
- * 
- * This test also covers:
- * TRANSLATE-686 by testing the autostates
- * 
- * So in conclusion the desired behaviuor is: 
- * Without Source Editing: 
- *   - Segments to be changed with the repetition editor are getting the edited target and the autostates of the master segment
- *   - In Source Original the transFound states are recalculated
- *   
- * With Source Editing: 
- *   - Segments to be changed with the repetition editor are getting the edited target and the edited source and the autostates of the master segment
- *   - In Source Original the transFound states are recalculated
+ * This test covers if the repetition editor can deal with tags inside of segments.
+ * Details are described in TRANSLATE-680: Automatic substituations of tags for repetitions
+ * Behaviour before implementing this issue: 
+ * Identical Segments with tags are not recognized by the repetition editor,
+ *   since the tags are containing IDs which are preventing the recognition.
+ * After implementing this feature: 
+ *   Tag Content and position does not matter, only the tag count must be 
+ *   equal in the segments (and the text of course) to be recognized as repetition.  
  */
 class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
     protected static $useSourceEditing = false;

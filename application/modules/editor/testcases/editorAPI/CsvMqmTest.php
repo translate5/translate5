@@ -29,9 +29,8 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * CsvEncodingTest imports a CSV with several special characters
- * The test task will be edited and exported. The generated changes.xml and 
- * exported file will then be checked for correct encoded content.
+ * CsvMqmTest tests the correct export MQM Tags. 
+ *   Especially the cases of overlapping and misordered MQM tags
  */
 class CsvMqmTest extends \ZfExtended_Test_ApiTestcase {
     const CSV_TARGET = 'target is coming from test edit';
@@ -116,10 +115,7 @@ class CsvMqmTest extends \ZfExtended_Test_ApiTestcase {
     
     
     /**
-     * tests the specialcharacters encoding after import, edits some segments as lector, finish then the task
-     * - checks for correct changes.xliff
-     * - checks if task is open for translator and finished for lector
-     * - modifies also segments with special characters to test encoding in changes.xml
+     * Check imported data and add MQM to the target by editing it
      * @depends testCsvSettings
      */
     public function testEditingSegmentWithMqm() {
@@ -186,7 +182,7 @@ class CsvMqmTest extends \ZfExtended_Test_ApiTestcase {
     }
     
     /**
-     * tests the special characters in the exported data
+     * test if MQM tags are as expected in exported data
      * @depends testEditingSegmentWithMqm
      */
     public function testExport() {

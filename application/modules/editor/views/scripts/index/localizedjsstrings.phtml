@@ -308,9 +308,12 @@ Ext.define('Editor.controller.Localizer', {
         edit100pWarning: '<?php echo $this->translate->_('Achtung, Sie editieren einen 100% Match!');?>'
     };
 
-  	Editor.view.ui.changealike.Window.prototype.title = '<?php echo $this->translate->_('Aktuelles Segment für die folgenden Segmente übernehmen?');?>';
-  	Editor.view.ui.changealike.Window.prototype.item_cancelBtn = '<?php echo $this->translate->_('Keine Änderungen durchführen');?>';
-  	Editor.view.ui.changealike.Window.prototype.item_saveBtn = '<?php echo $this->translate->_('Änderungen übernehmen');?>';
+    Ext.define("Editor.locale.view.ui.changealike.Window", {
+        override: "Editor.view.ui.changealike.Window",
+        title: '<?php echo $this->translate->_('Aktuelles Segment für die folgenden Segmente übernehmen?');?>',
+        item_cancelBtn: '<?php echo $this->translate->_('Keine Änderungen durchführen');?>',
+        item_saveBtn: '<?php echo $this->translate->_('Änderungen übernehmen');?>'
+    });
   	Editor.view.changealike.Window.prototype.items_help = <?php echo json_encode($this->translate->_('Hilfe:'));?>;
   	Editor.view.changealike.Window.prototype.items_segmentData = <?php echo json_encode('{edited}{addition}'); ?>;
   	Editor.view.changealike.Window.prototype.overwriteSource = '<?php echo $this->translate->_('<b><i>Überschreibe Quelltext mit:</i></b> ');?>';
@@ -462,7 +465,7 @@ Ext.define('Editor.controller.Localizer', {
             importTbxTip: '<?php echo $this->translate->_('Wählen Sie die zu importierenden TBX Daten für das TermTagging');?>',
             importTbxLabel: '<?php echo $this->translate->_('TBX Datei²');?>',
             importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>',
-            importNews: '<?php echo $this->translate->_('<b style="color:#ff0000;">Neu:</b> Sie können nun neben ZIP auch direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage#single-import">Mehr Info</a>.');?>',
+            importNews: '<?php echo $this->translate->_('Sie können neben unserem ZIP-Container-Format auch direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">Mehr Info</a>.');?>',
             taskNrLabel: '<?php echo $this->translate->_('Auftragsnummer');?>',
             taskNameTip: '<?php echo $this->translate->_('Projektname (frei wählbar, Angabe notwendig)');?>',
             taskNameLabel: '<?php echo $this->translate->_('Projektname¹');?>',

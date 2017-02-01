@@ -402,7 +402,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         }
         return $this->_tagMapping;
     }
-
+    
     /**
      * Extrahiert aus einem durch parseFile erzeugten Code-Schnipsel mit genau einer trans-unit Quell-
      * und Zielsegmente
@@ -548,6 +548,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         if (strpos($segment, '<')=== false) {
             return $segment;
         }
+        $segment = $this->parseSegmentUnifyInternalTags($segment);
         $data = ZfExtended_Factory::get('editor_Models_Import_FileParser_Sdlxliff_ParseSegmentData');
         $data->segment = preg_split('"(<[^>]*>)"', $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
         $data->segmentCount = count($data->segment);
@@ -565,6 +566,34 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             $this->_tagCount++;
         }
         return implode('', $data->segment);
+    }
+    
+    /**
+     * For reason look at TRANSLATE-781 "different white space inside of internal tags leads to failures in relais import"
+     * http://jira.translate5.net/browse/TRANSLATE-781
+     * 
+     * @param string $segment
+     * @return type
+     */
+    protected function parseSegmentUnifyInternalTags($segment) {
+        $search = array(
+            '#(<g [^>]*) +(/>)#',
+            '#(<g [^>]*) +(>)#',
+            '#(<mrk [^>]*) +(/>)#',
+            '#(<mrk [^>]*) +(>)#',
+            '#(<x [^>]*) +(/>)#',
+            '#(<x [^>]*) +(>)#'
+            );
+        $replace = array(
+            '\\1\\2',
+            '\\1\\2',
+            '\\1\\2',
+            '\\1\\2',
+            '\\1\\2',
+            '\\1\\2'
+        );
+        $segment = preg_replace($search, $replace, $segment);
+        return $segment;
     }
 
     /**

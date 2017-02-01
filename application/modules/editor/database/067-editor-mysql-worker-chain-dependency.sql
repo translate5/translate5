@@ -26,8 +26,7 @@
 -- 
 -- END LICENSE AND COPYRIGHT
 -- */
-
-CREATE TABLE `Zf_worker_dependencies` (
+CREATE TABLE IF NOT EXISTS `Zf_worker_dependencies` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `worker` varchar(100) DEFAULT NULL COMMENT 'the worker class name',
   `dependency` varchar(100) DEFAULT NULL COMMENT 'the worker class name, which is dependent - that means that it should be processes before the worker for the same task',

@@ -60,6 +60,9 @@ class Translate678ExportDiffEntityTest extends \ZfExtended_Test_ApiTestcase {
         $api->import($task);
     }
     
+    /**
+     * edits the segment data with " and ' characters, also changing < to >
+     */
     public function testEditing() {
         $task = $this->api()->getTask();
         //open task for whole testcase
@@ -78,6 +81,7 @@ class Translate678ExportDiffEntityTest extends \ZfExtended_Test_ApiTestcase {
 
     /**
      * tests the special characters in the exported data
+     *   especially the flipped <> chars in the export diff
      * @depends testEditing
      */
     public function testExport() {

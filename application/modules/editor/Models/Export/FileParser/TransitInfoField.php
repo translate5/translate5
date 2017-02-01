@@ -311,7 +311,7 @@ class editor_Models_Export_FileParser_TransitInfoField {
     }
     
     /**
-     * stores trans[Not]Found counts for the the source terms
+     * stores trans[Not]Found counts for the the target terms
      * @param string $target
      * @param string $mid
      */

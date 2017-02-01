@@ -30,7 +30,10 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
     extend: 'Ext.window.Window',
-    requires: ['Ext.ux.colorpick.Button'],
+    requires: [
+        'Ext.ux.colorpick.Button',
+        'Ext.ux.colorpick.Field'
+    ],
     alias: 'widget.addTmWindow',
     itemId: 'addTmWindow',
     cls: 'addTmWindow',

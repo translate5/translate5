@@ -28,7 +28,7 @@
 -- */
 
 CREATE TABLE `LEK_browser_log` (
-  `id` integer (11) DEFAULT NULL AUTO_INCREMENT,
+   `id` int(11) NOT NULL,
   `datetime` datetime NULL DEFAULT NULL,
   `login` varchar(255) DEFAULT NULL COMMENT 'user login',
   `userGuid` varchar(38) DEFAULT NULL COMMENT 'userguid',
@@ -41,3 +41,4 @@ CREATE TABLE `LEK_browser_log` (
   `usedHeight` integer (11) DEFAULT NULL COMMENT 'used window height',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+ALTER TABLE `LEK_browser_log` CHANGE `id` `id` INT(11) NOT NULL AUTO_INCREMENT;
