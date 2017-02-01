@@ -139,11 +139,18 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         /* @var $acl ZfExtended_Acl */
         
         $isAllowed = $acl->isInAllowedRoles($userSession->data->roles,'getUpdateNotification');
-        if($isAllowed && !$downloader->applicationIsUptodate()) {
+        try {
+            if(!$isAllowed || $downloader->applicationIsUptodate()) {
+                return;
+            }
             $msgBoxConf = $this->view->Php2JsVars()->get('messageBox');
             settype($msgBoxConf->initialMessages, 'array');
             $msg = 'Eine neue Version von Translate5 ist verfügbar. Bitte benutzen Sie das Installations und Update Script um die aktuellste Version zu installieren.';
             $msgBoxConf->initialMessages[] = $this->translate->_($msg);
+        } catch (Exception $e) {
+            $log = ZfExtended_Factory::get('ZfExtended_Log');
+            /* @var $log ZfExtended_Log */
+            $log->logError('Latest translate5 version information could not be fetched!', (string) $e);
         }
     }
 
@@ -404,7 +411,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $result = new stdClass();
         $downloader = ZfExtended_Factory::get('ZfExtended_Models_Installer_Downloader', array(APPLICATION_PATH.'/..'));
         /* @var $downloader ZfExtended_Models_Installer_Downloader */
-        $result->isUptodate = $downloader->applicationIsUptodate();
+        try {
+            $result->isUptodate = $downloader->applicationIsUptodate();
+        } catch (Exception $e) {
+            $result->isUptodate = -1;
+        }
         $versionFile = APPLICATION_PATH.'../version';
         if(file_exists($versionFile)) {
             $result->version = file_get_contents($versionFile);
