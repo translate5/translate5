@@ -245,15 +245,26 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
     },
     handleRequestSuccess: function(controller,response,segmentId,tmmtid,query){
         var me = controller,
-            resp = Ext.util.JSON.decode(response.responseText); 
+            resp = Ext.util.JSON.decode(response.responseText),
+            editorquery = me.getView().getStore('editorquery');
+
         if(segmentId == me.editedSegmentId){
-            me.getView().getStore('editorquery').remove(me.getView().getStore('editorquery').findRecord('tmmtid',tmmtid));
+            editorquery.remove(editorquery.findRecord('tmmtid',tmmtid));
         }
+
+        //when saving a segment before the match requests are loaded, 
+        // then the segment is removed already from the cache, 
+        // so there is no way and no need to show data
+        if(!me.cachedResults.get(segmentId)){
+            return;
+        }
+
         if(typeof resp.rows !== 'undefined' && resp.rows !== null && resp.rows.length){
             me.cachedResults.get(segmentId).add(tmmtid,resp);
             me.loadCachedDataIntoGrid(segmentId,tmmtid);
             return;
         }
+        
         var noresults = {
                 rows: [{
                     source: me.strings.noresults,
