@@ -37,7 +37,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Moses Connector
  */
-class editor_Plugins_MatchResource_Services_Moses_Connector extends editor_Plugins_MatchResource_Services_ConnectorAbstract {
+class editor_Plugins_MatchResource_Services_Moses_Connector extends editor_Plugins_MatchResource_Services_Connector_Abstract {
     /**
      * We assume that the best MT Match correlate this matchrate, given by config
      * @var integer
@@ -51,13 +51,9 @@ class editor_Plugins_MatchResource_Services_Moses_Connector extends editor_Plugi
         $this->MT_BASE_MATCHRATE = $config->runtimeOptions->plugins->MatchResource->moses->matchrate;
     }
     
-    public function addTm(string $filename){
-        throw new BadMethodCallException('This Service is not filebased and cannot handle uploaded files therefore!');
-    }
-
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::query()
+     * @see editor_Plugins_MatchResource_Services_Connector_Abstract::query()
      */
     public function query(editor_Models_Segment $segment) {
         $queryString = $this->getQueryString($segment);
@@ -115,7 +111,7 @@ class editor_Plugins_MatchResource_Services_Moses_Connector extends editor_Plugi
     
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::search()
+     * @see editor_Plugins_MatchResource_Services_Connector_Abstract::search()
      */
     public function search(string $searchString, $field = 'source') {
         //since a MT can not be searched in the target language, we just pass the $searchString to the query call

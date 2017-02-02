@@ -101,7 +101,7 @@ class editor_Plugins_MatchResource_Services_Manager {
         $serviceType = $tmmt->getServiceType();
         $this->checkService($serviceType);
         $connector = ZfExtended_Factory::get($serviceType.self::CLS_CONNECTOR);
-        /* @var $connector editor_Plugins_MatchResource_Services_ConnectorAbstract */
+        /* @var $connector editor_Plugins_MatchResource_Services_Connector_Abstract */
         $connector->connectTo($tmmt);
         return $connector;
     }
@@ -138,13 +138,13 @@ class editor_Plugins_MatchResource_Services_Manager {
     }
     
     public function openForTask(editor_Models_Task $task) {
-        $this->visitAllAssociatedTms($task->getTaskGuid(), function(editor_Plugins_MatchResource_Services_ConnectorAbstract $connector){
+        $this->visitAllAssociatedTms($task->getTaskGuid(), function(editor_Plugins_MatchResource_Services_Connector_Abstract $connector){
             $connector->open();
         });
     }
     
     public function closeForTask(editor_Models_Task $task) {
-        $this->visitAllAssociatedTms($task->getTaskGuid(), function(editor_Plugins_MatchResource_Services_ConnectorAbstract $connector){
+        $this->visitAllAssociatedTms($task->getTaskGuid(), function(editor_Plugins_MatchResource_Services_Connector_Abstract $connector){
             $connector->close();
         });
     }
@@ -153,7 +153,7 @@ class editor_Plugins_MatchResource_Services_Manager {
         if(empty($segment->getTargetEdit())){
             return;
         }
-        $this->visitAllAssociatedTms($segment->getTaskGuid(), function(editor_Plugins_MatchResource_Services_ConnectorAbstract $connector, $tmmt, $assoc) use ($segment) {
+        $this->visitAllAssociatedTms($segment->getTaskGuid(), function(editor_Plugins_MatchResource_Services_Connector_Abstract $connector, $tmmt, $assoc) use ($segment) {
             if(!empty($assoc['segmentsUpdateable'])) {
                 $connector->update($segment);
             }
@@ -169,7 +169,7 @@ class editor_Plugins_MatchResource_Services_Manager {
             /* @var $tmmt editor_Plugins_MatchResource_Models_TmMt */
             $tmmt->init($one);
             $connector = $this->getConnector($tmmt);
-            /* @var $connector editor_Plugins_MatchResource_Services_ConnectorAbstract */
+            /* @var $connector editor_Plugins_MatchResource_Services_Connector_Abstract */
             $todo($connector, $tmmt, $one);
         }
     }

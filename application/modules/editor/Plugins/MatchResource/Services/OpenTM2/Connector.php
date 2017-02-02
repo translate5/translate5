@@ -37,7 +37,7 @@ END LICENSE AND COPYRIGHT
 /**
  * OpenTM2 Connector
  */
-class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plugins_MatchResource_Services_ConnectorAbstract {
+class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract {
 
     /**
      * @var editor_Plugins_MatchResource_Services_OpenTM2_HttpApi
@@ -45,22 +45,8 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
     protected $api;
     
     /**
-     * Paging information for search requests
-     * @var integer
-     */
-    protected $page;   // XXX
-    protected $offset; // XXX
-    protected $limit;  // XXX
-    
-    /**
-     * internal variable to count search results
-     * @var integer
-     */
-    protected $searchCount = 0; // XXX
-
-    /**
      * {@inheritDoc}
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::connectTo()
+     * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::connectTo()
      */
     public function connectTo(editor_Plugins_MatchResource_Models_TmMt $tmmt) {
         parent::connectTo($tmmt);
@@ -70,7 +56,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
     
     /**
      * {@inheritDoc}
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::open()
+     * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::open()
      */
     public function open() {
         //FIXME dieser call ist zum einen nicht nötig, zum anderen muss abgefangen werden OpenTM2 nicht da ist, da sonst kein Task geöffnet werden kann!
@@ -79,7 +65,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
     
     /**
      * {@inheritDoc}
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::open()
+     * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::open()
      */
     public function close() {
         $this->api->close();
@@ -87,7 +73,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
     
     /**
      * {@inheritDoc}
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::addTm()
+     * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::addTm()
      */
     public function addTm(string $filename) {
         
@@ -108,7 +94,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
     
     /**
      * {@inheritDoc}
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::addTm()
+     * @see editor_Plugins_MatchResource_Services_Connector_Abstract::addAdditionalTm()
      */
     public function addAdditionalTm(string $filename) {
         //FIXME refactor to streaming (for huge files) if possible by underlying HTTP client
@@ -136,7 +122,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
     
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::getTm()
+     * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::getTm()
      */
     public function getTm(& $mime) {
         $file = new SplFileInfo($this->getTmFile($this->tmmt->getId()));
@@ -152,10 +138,6 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
     }
 
     public function update(editor_Models_Segment $segment) {
-        
-        //FIXME implement segmentsUpdateable check from LEK_matchresource_taskassoc
-        // → in Init event handler better?
-        
         $messages = Zend_Registry::get('rest_messages');
         /* @var $messages ZfExtended_Models_Messages */
         if($this->api->update($segment)) {
@@ -178,7 +160,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
     
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::query()
+     * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::query()
      */
     public function query(editor_Models_Segment $segment) {
         $file = ZfExtended_Factory::get('editor_Models_File');
@@ -235,7 +217,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
     
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::search()
+     * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::search()
      */
     public function search(string $searchString, $field = 'source') {
         $field = ucfirst($field);
@@ -262,7 +244,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
     
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::setPaging()
+     * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::setPaging()
      */
     public function setPaging($page, $offset, $limit = 20) {
         $this->page = (int) $page;
@@ -275,7 +257,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
 
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::delete()
+     * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::delete()
      */
     public function delete() {
         $messages = Zend_Registry::get('rest_messages');

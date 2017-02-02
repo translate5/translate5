@@ -278,7 +278,7 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         $upload->isValid(self::FILE_UPLOAD_NAME);
         //mandatory upload file
         $importInfo = $upload->getFileInfo(self::FILE_UPLOAD_NAME);
-        /* @var $connector editor_Plugins_MatchResource_Services_ConnectorAbstract */
+        /* @var $connector editor_Plugins_MatchResource_Services_Connector_Abstract */
         if(empty($importInfo[self::FILE_UPLOAD_NAME]['size'])) {
             $this->uploadErrors[] = 'Die ausgewählte Datei war leer!';
         }
@@ -414,7 +414,7 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
     
     /**
      * returns the connector to be used
-     * @return editor_Plugins_MatchResource_Services_ConnectorAbstract
+     * @return editor_Plugins_MatchResource_Services_Connector_Abstract
      */
     protected function getConnector() {
         $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');

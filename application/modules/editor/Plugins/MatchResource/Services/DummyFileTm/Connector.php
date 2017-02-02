@@ -44,7 +44,7 @@ END LICENSE AND COPYRIGHT
  * This should be the CSV defaults.
  * The first column must be an id, the second the source and the theird column the target values. Other columns are ignored.
  */
-class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor_Plugins_MatchResource_Services_ConnectorAbstract {
+class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract {
 
     protected $tm;
     protected $uploadedFile;
@@ -71,7 +71,7 @@ class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor
 
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::addTm()
+     * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::addTm()
      */
     public function addTm(string $filename){
         $this->uploadedFile = $filename;
@@ -79,9 +79,13 @@ class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor
         return true;
     }
     
+    public function addAdditionalTm($filename) {
+        
+    }
+    
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::getTm()
+     * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::getTm()
      */
     public function getTm(& $mime) {
         $file = new SplFileInfo($this->getTmFile($this->tmmt->getId()));
@@ -111,7 +115,7 @@ class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor
     
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::query()
+     * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::query()
      */
     public function query(editor_Models_Segment $segment) {
         $queryString = $this->getQueryString($segment);
@@ -120,7 +124,7 @@ class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor
     
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::search()
+     * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::search()
      */
     public function search(string $searchString, $field = 'source') {
         $this->searchCount = 0;
@@ -129,7 +133,7 @@ class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor
     
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::setPaging()
+     * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::setPaging()
      */
     public function setPaging($page, $offset, $limit = 20) {
         $this->page = (int) $page;
@@ -236,7 +240,7 @@ class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor
 
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::delete()
+     * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::delete()
      */
     public function delete() {
         $file = new SplFileInfo($this->getTmFile($this->tmmt->getId()));
