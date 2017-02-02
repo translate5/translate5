@@ -81,11 +81,20 @@ class editor_Plugins_MatchResource_Services_LucyLT_Connector extends editor_Plug
         $params = [
             'inputParams' => [
                     "param" => [[
-                            "@name" => "TRANSLATION_DIRECTION",
+                            "@name"  => "TRANSLATION_DIRECTION",
                             "@value" => $this->getLanguageParameter()
                     ], [
-                            "@name" => "INPUT",
+                            "@name"  => "INPUT",
                             "@value" => $queryString
+                    ], [
+                            "@name"  => "MARK_UNKNOWNS",  //disable unknown translation marking <U[UNKNOWN]> 
+                            "@value" => "0"
+                    ], [
+                            "@name"  => "MARK_ALTERNATIVES", //disable alternative marking, not seen yet
+                            "@value" => "0"
+                    ], [
+                            "@name"  => "CHARSET",
+                            "@value" => "UTF"
                     ]]
             ]
         ];
