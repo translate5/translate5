@@ -35,19 +35,19 @@ class editor_Plugins_MatchResource_Models_Resource {
     protected $name;
     
     /**
-     * Flag if this resource is filebased or not
-     * service can set this flag as it needs it. for the case if some new services added in the future
-     * can have filebased resources and non filebased ones at the same time
-     *  
-     * @var boolean
-     */
-    protected $filebased = true;
-    
-    /**
      * Match Type in the sense of the matchrate type
      * @var string
      */
     protected $type = editor_Models_Segment_MatchRateType::TYPE_TM;
+    
+    /**
+     * Flag if this resource is filebased or not
+     * service can set this flag as it needs it. for the case if some new services added in the future
+     * can have filebased resources and non filebased ones at the same time
+     * Must be overridden by class extension
+     * @var boolean
+     */
+    protected $filebased = true;
     
     /**
      * Flag if this resource can be triggered for search requests
@@ -55,6 +55,13 @@ class editor_Plugins_MatchResource_Models_Resource {
      * @var boolean
      */
     protected $searchable = true;
+    
+    /**
+     * Flag if edited matches can ba saved back to this resource
+     * Must be overridden by class extension
+     * @var boolean
+     */
+    protected $writable = true;
     
     protected $service;
     
@@ -72,6 +79,7 @@ class editor_Plugins_MatchResource_Models_Resource {
             'serviceType' => 'serviceType',
             'filebased' => 'filebased',
             'searchable' => 'searchable',
+            'writable' => 'writable',
             'defaultColor' => 'defaultColor',
     );
     
@@ -113,6 +121,14 @@ class editor_Plugins_MatchResource_Models_Resource {
      */
     public function getSearchable() {
         return $this->searchable;
+    }
+    
+    /**
+     * returns if resource is writable or not
+     * @return boolean
+     */
+    public function getWritable() {
+        return $this->writable;
     }
     
     /**
@@ -197,5 +213,17 @@ class editor_Plugins_MatchResource_Models_Resource {
             $data->$key = $this->$method();
         }
         return $data;
+    }
+    
+    /**
+     * Returns just the resources meta data
+     * @return boolean[]
+     */
+    public function getMetaData() {
+        return [
+            'writable' => $this->writable,
+            'searchable' => $this->searchable,
+            'filebased' => $this->filebased,
+        ];
     }
 }

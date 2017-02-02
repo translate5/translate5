@@ -75,8 +75,10 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         
         foreach($this->view->rows as &$tmmt) {
             $resource = $getResource($tmmt['serviceType'], $tmmt['resourceId']);
-            $tmmt['filebased'] = empty($resource) ? false : $resource->getFileBased();
-            $tmmt['searchable'] = empty($resource) ? false : $resource->getSearchable();
+            /* @var $resource editor_Plugins_MatchResource_Models_Resource */
+            if(!empty($resource)) {
+                $tmmt = array_merge($tmmt, $resource->getMetaData());
+            }
             $tmmt['taskList'] = $this->getTaskInfos($tmmt['id']);
         }
     }

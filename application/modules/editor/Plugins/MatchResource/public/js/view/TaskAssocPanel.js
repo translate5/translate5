@@ -109,6 +109,12 @@ Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
                     cls: 'segmentsUpdateable',
                     dataIndex : 'segmentsUpdateable',
                     sortable : true,
+                    renderer: function(value, meta, record) {
+                        this.disabled = !record.get('writable'); //disable checkbox casually
+                        var res = this.defaultRenderer(value, meta, record);
+                        this.disabled = false; //if disabled remains true, the whole column is not clickable
+                        return res;
+                    },
                     width:60,
                 }, {
                     xtype: 'gridcolumn',
