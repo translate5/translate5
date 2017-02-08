@@ -204,6 +204,14 @@
         <source>Weitere TM Daten erfolgreich importiert!</source>
         <target>Weitere TM Daten erfolgreich importiert!</target>
     </trans-unit>
+    <trans-unit id='VE0vVE1YLURhdGVpIChvcHRpb25hbCk='>
+        <source>TM/TMX-Datei (optional)</source>
+        <target>TM/TMX-Datei (optional)</target>
+    </trans-unit>
+    <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRNIG9kZXIgVE1YIERhdGVpIQ=='>
+        <source>Bitte verwenden Sie eine TM oder TMX Datei!</source>
+        <target>Bitte verwenden Sie eine TM oder TMX Datei!</target>
+    </trans-unit>
   </body>
  </file>
 </xliff>

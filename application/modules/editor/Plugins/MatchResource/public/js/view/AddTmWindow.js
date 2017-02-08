@@ -42,7 +42,8 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
         name: '#UT#Name',
         source: '#UT#Quellsprache',
         target: '#UT#Zielsprache',
-        file: '#UT#TM-Datei',
+        file: '#UT#TM/TMX-Datei (optional)',
+        importTmxType: '#UT#Bitte verwenden Sie eine TM oder TMX Datei!',
         color: '#UT#Farbe',
         colorTooltip: '#UT#Farbe dieser Matchressource',
         save: '#UT#Speichern',
@@ -131,6 +132,8 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
                     name: 'tmUpload',
                     allowBlank: true,
                     toolTip: me.strings.file,
+                    regex: /\.(tm|tmx)$/i,
+                    regexText: me.strings.importTmxType,
                     disabled:true,
                     fieldLabel: me.strings.file
                 }]

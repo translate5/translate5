@@ -38,10 +38,6 @@ END LICENSE AND COPYRIGHT
  * OpenTM2 HTTP Connection API
  */
 class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
-    
-    const DEBUG_HTTP_CALLS = 1;
-    const DEBUG_HTTP_CONTENT = 2;
-    
     /**
      * @var editor_Plugins_MatchResource_Models_TmMt
      */
@@ -59,14 +55,27 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
     
     protected $error = array();
     
-    protected $debug = 3; //FIXME let me come from config
-    
     public function __construct(editor_Plugins_MatchResource_Models_TmMt $tmmt) {
         $this->tmmt = $tmmt;
     }
     
     /**
      * This method creates a new memory.
+     */
+    public function createEmptyMemory($memory, $sourceLanguage) {
+        $data = new stdClass();
+        $data->name = $memory;
+        $data->sourceLang = $sourceLanguage;
+        
+        $http = $this->getHttp();
+        $http->setRawData(json_encode($data), 'application/json');
+        $res = $http->request('POST');
+        return $this->processResponse($res);
+    }
+    
+    /**
+     * This method creates a new memory with TM file
+     * FIXME change this method when OpenTM2 can deal with multipart uploads
      */
     public function createMemory($memory, $sourceLanguage, $tmData) {
         $data = new stdClass();
@@ -77,8 +86,6 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $http->setRawData(json_encode($data), 'application/json');
         $res = $http->request('POST');
         return $this->processResponse($res);
-        //FIXME REST Error Handling!
-        //Im result JSON ist der "name", diesen speichern wir als filename ins TMMT zurück!
     }
     
     /**
@@ -92,6 +99,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $data->tmxData = base64_encode($tmData);
 
         $http = $this->getHttpWithMemory('/import');
+        $http->setConfig(['timeout' => 120]);
         $http->setRawData(json_encode($data), 'application/json');
         
         $res = $http->request('POST');
@@ -101,8 +109,10 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
     
     /**
      * This method deletes a memory.
+     * FIXME Currently old style API
      */
-    public function delete($memory) {
+    public function delete() {
+        return $this->request($this->json(__FUNCTION__));
     }
     
     /**
@@ -193,13 +203,12 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $json->SearchCriteria = [
                 "Source" => $queryString,
                 "Segment" => '', //FIXME can be used after implementing TRANSLATE-793
-                "DocumentName" => $filename, //FIXME für Doku: Pfade möglich mit Backslash, aber bei uns Pfade im JSON, daher vorerst nur Dateinamen
+                "DocumentName" => $filename, //FIXME für Doku: Pfade möglich mit Backslash, aber bei uns komplette Pfade im FileTree JSON, daher vorerst nur Dateinamen
                 "SourceLanguage" => $this->tmmt->getSourceLangRfc5646(),
                 "TargetLanguage" => $this->tmmt->getTargetLangRfc5646(),
                 //"SourceLanguage" => 'en-UK',
                 //"TargetLanguage" => 'de-DE',
-                //"Markup" => "OTMXUXLF", //
-                "Markup" => "OTMHTM32", //
+                "Markup" => "OTMXUXLF", //
                 "Context" => $segment->getMid()// hier MID (Context war gedacht für die Keys (Dialog Nummer) bei übersetzbaren strings in Software)
         ];
         
@@ -219,8 +228,8 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
 		"SourceLanguage": "en-GB",
 		"TargetLanguage": "de-CH",
 		"Type": "Manual", 
-		"Match": "ExactSameDoc", //FIXME Wie gehen wir mit dieser Info um? → Attributes
-		"Author": "THOMAS LAURIA", //FIXME we mappen wir dieses und die nachfolgenden Felder auf unser Frontend?
+		"Match": "ExactSameDoc", //FIXME Wie gehen wir mit dieser Info um? → attributes → doku!
+		"Author": "THOMAS LAURIA", //FIXME we mappen wir dieses und die nachfolgenden Felder auf unser Frontend? → attributes → doku!
 		"DateTime": "20170127T150423Z",
 		"Fuzzyness": 100,
 		"Markup": "OTMHTM32",
@@ -245,6 +254,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $json = $this->json(__FUNCTION__);
         $json->SearchString = $queryString;
         $json->Search = $field;
+        $json->Markup = "OTMXUXLF";
         $json->SearchPosition = $searchPosition;
         return $this->request($json);
         
@@ -259,7 +269,6 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $res = $http->request('POST');
         
         //FIXME REST Error Handling!
-        //Im result JSON ist der "name", diesen speichern wir als filename ins TMMT zurück!
     }
 
     /**
@@ -269,7 +278,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
      * @param editor_Models_Segment $segment
      * @return boolean
      */
-    public function update(editor_Models_Segment $segment) {
+    public function update(editor_Models_Segment $segment, $filename) {
         /* 
          * In:{ "Method":"update", "Memory": "TestMemory", "Proposal": {
          *  "Source": "This is the source text", 
@@ -290,13 +299,13 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $json->Source = $segment->stripTags($segment->getSource());
         $json->Target = $segment->stripTags($segment->getTargetEdit());
         
-        //$json->Segment = $segment->getSegmentNrInTask(); FIXME zuwas?
-        //$json->DocumentName FIXME zuwas?
+        //$json->Segment = $segment->getSegmentNrInTask(); FIXME TRANSLATE-793 must be implemented first, since this ist not segment in task, but segment in file
+        $json->DocumentName = $filename;
         $json->Author = $segment->getUserName();
         $json->DateTime = $this->nowDate();
         
         $json->Type = "Manual";
-        $json->Markup = "OTMHTM32";
+        $json->Markup = "OTMXUXLF"; //FIXME
         
         $lang = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $lang editor_Models_Languages */
@@ -349,15 +358,9 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
      * @return boolean true on success, false on failure
      */
     protected function request(stdClass $json) {
-        $debug = ['OpenTM2 Request'];
         $json->Memory = $this->tmmt->getFileName();
         
         $url = $this->tmmt->getResource()->getUrl();
-        
-        //debug each request
-        if($this->debug & 1 > 0) {
-            $debug[] = __METHOD__.' '.$url;
-        }
         
         //create request
         $http = ZfExtended_Factory::get('Zend_Http_Client');
@@ -366,15 +369,6 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $json = json_encode($json);
         $http->setRawData($json, 'application/json');
         $response = $http->request('PUT');
-        
-        //debug whole content
-        if($this->debug & 2 > 0) {
-            $debug[] = "Sent JSON\n".$json;
-            $debug[] = "HTTP Status:\n".print_r($response->getStatus(),1);
-            $debug[] = "Headers:\n".print_r($response->getHeaders(),1);
-            $debug[] = "RAW Body:\n".print_r(trim($response->getRawBody()),1);
-            error_log(join("\n", $debug));
-        }
         
         //$http->setFileUpload($filename, $formname);
         return $this->processResponse($response);

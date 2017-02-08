@@ -245,13 +245,22 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
      * @param editor_Plugins_MatchResource_Services_Manager $manager
      */
     protected function handleInitialFileUpload(editor_Plugins_MatchResource_Services_Manager $manager) {
-        $importInfo = $this->handleFileUpload();
         $connector = $manager->getConnector($this->entity);
+        /* @var $connector editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract */
+        $importInfo = $this->handleFileUpload($connector);
+        
+        //currently the initial upload is optional
+        // if this will be depending on the resource, 
+        // here would be a good place to implement the check with 
+        //if(!$importInfo && $resource file is mandatory) {
+            //$this->uploadErrors = "dadada"
+        //}
         
         //setting the TM filename here, but can be overwritten in the connectors addTm method
         // for example when we get a new name from the service
         $this->entity->setFileName($importInfo[self::FILE_UPLOAD_NAME]['name']);
-        if(empty($this->uploadErrors) && !$connector->addTm($importInfo[self::FILE_UPLOAD_NAME]['tmp_name'])) {
+        
+        if(empty($this->uploadErrors) && !$connector->addTm($importInfo[self::FILE_UPLOAD_NAME])) {
             $this->uploadErrors[] = 'Hochgeladene TM Datei konnte nicht hinzugefügt werden.';
         }
     }
@@ -261,23 +270,42 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
      * @param editor_Plugins_MatchResource_Services_Manager $manager
      */
     protected function handleAdditionalFileUpload(editor_Plugins_MatchResource_Services_Manager $manager) {
-        $importInfo = $this->handleFileUpload();
         $connector = $manager->getConnector($this->entity);
+        /* @var $connector editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract */
+        $importInfo = $this->handleFileUpload($connector);
         
-        if(empty($this->uploadErrors) && !$connector->addAdditionalTm($importInfo[self::FILE_UPLOAD_NAME]['tmp_name'])) {
+        if(empty($this->uploadErrors) && !$connector->addAdditionalTm($importInfo[self::FILE_UPLOAD_NAME])) {
             $this->uploadErrors[] = 'Hochgeladene TMX Datei konnte nicht hinzugefügt werden.';
         }
     }
     
     /**
      * handles the fileupload
-     * @return array meta data about the upload
+     * @return array|boolean meta data about the upload or false when there was no file 
      */
-    protected function handleFileUpload() {
+    protected function handleFileUpload(editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract $connector) {
         $upload = new Zend_File_Transfer_Adapter_Http();
+        
+        //check if connector / resource can deal with the uploaded file type
+        $validTypes = $connector->getValidFiletypes();
+        $upload->addValidators([
+            new Zend_Validate_File_MimeType(array_values($validTypes)),
+            new Zend_Validate_File_Extension(array_keys($validTypes)),
+        ]);
+        
+        //init validations
         $upload->isValid(self::FILE_UPLOAD_NAME);
-        //mandatory upload file
         $importInfo = $upload->getFileInfo(self::FILE_UPLOAD_NAME);
+        
+        if($importInfo[self::FILE_UPLOAD_NAME]['error'] === UPLOAD_ERR_NO_FILE) {
+            return false;
+        }
+
+        //currently an error means wrong filetype
+        if($upload->hasErrors()) {
+            $this->uploadErrors[] = 'Die ausgewählte Ressource kann Dateien diesen Typs nicht verarbeiten!';
+        }
+        
         /* @var $connector editor_Plugins_MatchResource_Services_Connector_Abstract */
         if(empty($importInfo[self::FILE_UPLOAD_NAME]['size'])) {
             $this->uploadErrors[] = 'Die ausgewählte Datei war leer!';

@@ -41,17 +41,17 @@ abstract class editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract
 
     /**
      * Adds the given file to the underlying system on TM creation
-     * @param string $filename
+     * @param array $fileinfo as given from upload (tmp_name, name, type, size)
      * @return boolean
      */
-    abstract public function addTm(string $filename);
+    abstract public function addTm(array $fileinfo = null);
     
     /**
      * Adds the given file to the underlying system into an already existing TM
-     * @param string $filename
+     * @param array $fileinfo as given from upload (tmp_name, name, type, size)
      * @return boolean
      */
-    abstract public function addAdditionalTm(string $filename);
+    abstract public function addAdditionalTm(array $fileinfo = null);
     
     /**
      * Gets the TM file content from the underlying system
@@ -59,6 +59,13 @@ abstract class editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract
      * @return string
      */
     abstract public function getTm(& $mime);
+    
+    /**
+     * Returns an associative array 
+     *  key: file extension
+     *  value: mimetype
+     */
+    abstract public function getValidFiletypes();
 
     /**
      * Opens the with connectTo given TM on the configured Resource (on task open, not on each request)

@@ -75,19 +75,39 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      * {@inheritDoc}
      * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::addTm()
      */
-    public function addTm(string $filename) {
-        
-        //FIXME hier die Fehler abfangen wenn es ein TM mit dem selben Namen bereits gibt!
-        
+    public function addTm(array $fileinfo = null) {
         //FIXME hier den Zeichen Filter von Gerhard einbauen
-        $this->tmmt->setFileName($this->tmmt->getName());
         
-        //$filename is the real file path of the temp uploaded file on the disk!
-        //$this->tmmt->getFileName() is the original filename of the uploaded file
-        if($this->api->createMemory($this->tmmt->getName(), $this->tmmt->getSourceLangRfc5646(), file_get_contents($filename))){
+        $sourceLang = $this->tmmt->getSourceLangRfc5646(); 
+        
+        $name = $this->filterName($this->tmmt->getName());
+        $this->tmmt->setFileName($name);
+        
+        $noFile = empty($fileinfo);
+        $tmxUpload = !$noFile && $fileinfo['type'] == 'application/xml' && preg_match('/\.tmx$/', $fileinfo['name']);
+        
+        if($noFile || $tmxUpload) {
+            if($this->api->createEmptyMemory($name, $sourceLang)){
+                $this->tmmt->setFileName($this->api->getResult()->name);
+                if(!$tmxUpload) {
+                    return true;
+                }
+            }
+            $this->handleOpenTm2Error('MatchResource Plugin - could not create TM in OpenTM2'." TMMT: \n");
+            return false;
+        }
+        
+        //if initial upload is a TMX file, we have to import it. 
+        if($tmxUpload) {
+            return $this->addAdditionalTm($fileinfo);
+        }
+        
+        //initial upload is a TM file
+        if($this->api->createMemory($name, $sourceLang, file_get_contents($fileinfo['tmp_name']))){
+            $this->tmmt->setFileName($this->api->getResult()->name);
             return true;
         }
-        $this->handleOpenTm2Error('MatchResource Plugin - could not add TM to OpenTM2'." TMMT: \n");
+        $this->handleOpenTm2Error('MatchResource Plugin - could not create prefilled TM in OpenTM2'." TMMT: \n");
         return false;
         
     }
@@ -96,9 +116,9 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      * {@inheritDoc}
      * @see editor_Plugins_MatchResource_Services_Connector_Abstract::addAdditionalTm()
      */
-    public function addAdditionalTm(string $filename) {
+    public function addAdditionalTm(array $fileinfo = null) {
         //FIXME refactor to streaming (for huge files) if possible by underlying HTTP client
-        if($this->api->importMemory(file_get_contents($filename))) {
+        if($this->api->importMemory(file_get_contents($fileinfo['tmp_name']))) {
             return true;
         }
         $this->handleOpenTm2Error('MatchResource Plugin - could not add TMX data to OpenTM2'." TMMT: \n");
@@ -119,6 +139,13 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         $data .= " \nError\n".print_r($errors,1);
         $log->logError($logMsg, $data);
     }
+
+    public function getValidFiletypes() {
+        return [
+            'TM' => 'text/plain', //FIXME enter correct file type
+            'TMX' => 'application/xml',
+        ];
+    }
     
     /**
      * (non-PHPdoc)
@@ -138,9 +165,13 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
     }
 
     public function update(editor_Models_Segment $segment) {
+        $file = ZfExtended_Factory::get('editor_Models_File');
+        /* @var $file editor_Models_File */
+        $file->load($segment->getFileId());
+        
         $messages = Zend_Registry::get('rest_messages');
         /* @var $messages ZfExtended_Models_Messages */
-        if($this->api->update($segment)) {
+        if($this->api->update($segment, $file->getFileName())) {
             $messages->addNotice('Segment im TM aktualisiert!', 'MatchResource');
             return;
         }
@@ -260,10 +291,17 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::delete()
      */
     public function delete() {
-        $messages = Zend_Registry::get('rest_messages');
-        /* @var $messages ZfExtended_Models_Messages */
-        $messages->addNotice('Implement remote DELETE call!', 'MatchResource');
-        //FIXME
-        return true;
+        if(!$this->api->delete()) {
+            throw new ZfExtended_Exception('Errors in receiving data from OpenTM2: '.print_r($this->api->getErrors(),1));
+        }
+    }
+    
+    /**
+     * Replaces not allowed characters with "_" in memory names
+     * @param string $name
+     * @return string
+     */
+    protected function filterName($name){
+        return str_replace("\\/:?*|<>", '_', $name);
     }
 }

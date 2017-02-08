@@ -270,7 +270,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
                 var res = submit.result;
                 window.setLoading(false);
                 //submit results are always state 200.
-                if(res.httpStatus) {
+                if(res && res.httpStatus) {
                     submit.response.status = res.httpStatus;
                 }
                 //If success false and errors is an array, this errors are shown in the form directly,

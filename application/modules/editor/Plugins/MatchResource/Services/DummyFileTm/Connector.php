@@ -73,8 +73,8 @@ class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor
      * (non-PHPdoc)
      * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::addTm()
      */
-    public function addTm(string $filename){
-        $this->uploadedFile = $filename;
+    public function addTm(array $fileinfo){
+        $this->uploadedFile = $fileinfo['tmp_name'];
         //do nothing here, since we need the entity ID to save the TM
         return true;
     }
@@ -166,7 +166,7 @@ class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor
         $result = array();
         $i = 0;
         while($line = $file->fgetcsv(",", '"', '"')) {
-            if($i++ == 0 || empty($line) || empty($line[0]) || empty($line[1])){
+            if($i++ == 0 || empty($line) || empty($line[0]) || empty($line[1]) || empty($line[2])){
                 continue;
             }
 
