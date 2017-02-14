@@ -86,4 +86,30 @@ class editor_Models_Segment_InternalTag {
         };
         return $this->replace($segmentOne, $replacer) === $this->replace($segmentTwo, $replacer);
     }
+    
+    /**
+     * restores the original escaped tag
+     */
+    public function restore(string $segment) {
+        return $this->replace($segment, function($match){
+            $type = $match[1];
+            $data = $match[2];
+            //restore packed data
+            $result = pack('H*', $data);
+            
+            //if single-tag is regex-tag no <> encapsulation is needed
+            if ($type === "regex") {
+                return $result;
+            }
+            
+            //the following search and replace is needed for TRANSLATE-464
+            //backwards compatibility of already imported tasks
+            $search = array('hardReturn /','softReturn /','macReturn /');
+            $replace = array('hardReturn/','softReturn/','macReturn/');
+            $result = str_replace($search, $replace, $result);
+            
+            //the original data is without <> 
+            return '<' . $result .'>';
+        });
+    }
 }
