@@ -36,7 +36,17 @@ END LICENSE AND COPYRIGHT
  * 
  */
 class editor_Models_Segment_InternalTag {
-    const REGEX_INTERNAL_TAGS = '#<div\s*class="([a-z]*)\s+([gxA-Fa-f0-9]*)"\s*.*?(?!</div>)<span[^>]*id="([^-]*)-.*?(?!</div>).</div>#s';
+    
+    /**
+     * match 0: as usual the whole string
+     * match 1: the tag type (single, open, close, regex, space etc.)
+     * match 2: the packed data
+     * match 3: the original id
+     * match 4: the rest of the generated id
+     * 
+     * @var string
+     */
+    const REGEX_INTERNAL_TAGS = '#<div\s*class="([a-z]*)\s+([gxA-Fa-f0-9]*)"\s*.*?(?!</div>)<span[^>]*id="([^-"]*).*?(?!</div>).</div>#s';
     
     /**
      * replaces internal tags with either the callback or the given scalar

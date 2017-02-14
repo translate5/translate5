@@ -332,7 +332,8 @@ abstract class editor_Models_Import_FileParser {
             'class' => $this->parseSegmentGetStorageClass($tag),
             'text' => $text,
             'shortTag' => $shortTag,
-            'id' => $tagId.'-'.$this->_tagCount.'-' . $fileNameHash,
+            'id' => $tagId, //mostly original tag id
+            'filenameHash' => $fileNameHash,
         );
     }
     
