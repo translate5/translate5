@@ -103,7 +103,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     me.imageTemplate.compile();
     me.spanTemplate = new Ext.Template([
       '<span title="{text}" class="short">&lt;{shortTag}&gt;</span>',
-      '<span data-originalid="{id}" data-filename=="{md5}" class="full">{text}</span>'
+      '<span data-originalid="{id}" data-filename="{md5}" class="full">{text}</span>'
     ]);
     me.spanTemplate.compile();
     me.callParent(arguments);
@@ -222,7 +222,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     shortTagContent;
     
     Ext.each(rootnode.childNodes, function(item){
-      var termFoundCls, divItem, spanFull, spanShort;
+      var termFoundCls, divItem, spanFull, spanShort, split;
       if(Ext.isTextNode(item)){
         var text = item.data.replace(new RegExp(Editor.TRANSTILDE, "g"), ' ');
         me.lastSegmentContentWithoutTags.push(text);
@@ -254,16 +254,17 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       spanFull = divItem.down('span.full');
       spanShort = divItem.down('span.short');
       data.text = spanFull.dom.innerHTML.replace(/"/g, '&quot;');
-      data.id = spanFull.getAttribute('id');
+      data.id = spanFull.getAttribute('data-originalid');
       //old way is to use only the id attribute, new way is to use separate data fields
       // both way are currently used!
       if(data.id) {
-          data.md5 = data.id.split('-').pop();
+          //new way
+          data.md5 = spanFull.getAttribute('data-filename');
       }
       else {
-          //new way
-          data.id = spanFull.getAttribute('data-originalid');
-          data.md5 = spanFull.getAttribute('data-filename');
+          split = spanFull.getAttribute('id').split('-');
+          data.id = split.shift();
+          data.md5 = split.pop();
       }
       shortTagContent = spanShort.dom.innerHTML;
 	  data.nr = shortTagContent.replace(/[^0-9]/g, '');
