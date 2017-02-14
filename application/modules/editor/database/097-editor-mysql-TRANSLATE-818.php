@@ -70,7 +70,7 @@ $res = $db->query('SELECT id, taskGuid, name, segmentId, original, edited
               WHERE (edited like "%</span><span id=%" or original like "%</span><span id=%")');
 
 $count = $res->rowCount();
-echo $count.' datasets to be changed!'."\n";
+error_log($count.' datasets to be changed by '.basename(__FILE__));
 
 //prepare update statement
 $stmt = $db->prepare('UPDATE LEK_segment_data set original = :original, edited = :edited where id = :id');
@@ -89,6 +89,7 @@ $replacer = function($subject){
 
 $done = 0;
 $donePercent = 0;
+$percentShown = [];
 while($row = $res->fetchObject()) {
     if(is_null($row->edited)) {
         $edited = $row->edited;
@@ -124,10 +125,13 @@ while($row = $res->fetchObject()) {
     
     //print a nice state
     $percent = 10 * floor(++$done / $count * 10);
-    if($percent % 10 == 0) {
-        echo $percent.'% done ('.$done.' datasets)'."\n"; 
+    if($percent % 10 == 0 && empty($percentShown[$percent])) {
+        $percentShown[$percent] = true;
+        error_log($percent.'% done ('.$done.' datasets)'); 
     }
 }
+
+echo $count." internal tags converted in segment data.\n";
 
 
 // Same loop for history data
@@ -139,10 +143,11 @@ $res = $db->query('SELECT id, edited
 $stmt = $db->prepare('UPDATE LEK_segment_history_data set edited = :edited where id = :id');
 
 $count = $res->rowCount();
-echo $count.' datasets to be changed in history data!'."\n";
+error_log($count.' datasets to be changed in history data!');
 
 $done = 0;
 $donePercent = 0;
+$percentShown = [];
 while($row = $res->fetchObject()) {
     $edited = $replacer($row->edited);
     
@@ -155,9 +160,10 @@ while($row = $res->fetchObject()) {
     
     //print a nice state
     $percent = 10 * floor(++$done / $count * 10);
-    if($percent % 10 == 0) {
-        echo $percent.'% done ('.$done.' history datasets)'."\n"; 
+    if($percent % 10 == 0 && empty($percentShown[$percent])) {
+        $percentShown[$percent] = true;
+        error_log($percent.'% done ('.$done.' history datasets)'); 
     }
 }
 
-echo "All internal tags converted.\n";
+echo $count." internal tags converted in history data.\n";
