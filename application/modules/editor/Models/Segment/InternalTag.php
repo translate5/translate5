@@ -46,7 +46,7 @@ class editor_Models_Segment_InternalTag {
      * 
      * @var string
      */
-    const REGEX_INTERNAL_TAGS = '#<div\s*class="([a-z]*)\s+([gxA-Fa-f0-9]*)"\s*.*?(?!</div>)<span[^>]*id="([^-"]*).*?(?!</div>).</div>#s';
+    const REGEX_INTERNAL_TAGS = '#<div\s*class="([a-z]*)\s+([gxA-Fa-f0-9]*)"\s*.*?(?!</div>)<span[^>]*data-originalid="([^"]*).*?(?!</div>).</div>#s';
     
     /**
      * replaces internal tags with either the callback or the given scalar
