@@ -54,12 +54,19 @@ class editor_Plugins_MatchResource_Services_ServiceResult {
     protected $total = null;
     
     /**
+     * Total results, needed for paging
+     * @var editor_Models_Segment_InternalTag
+     */
+    protected $internalTag;
+    
+    /**
      * A default source text for the results and a defaultMatchrate can be set
      * The default values are the used as initial value for new added result sets
      * @param string $defaultSource
      * @param integer $defaultMatchrate
      */
     public function __construct($defaultSource = '', $defaultMatchrate = 0) {
+        $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->defaultMatchrate = (int) $defaultMatchrate;
         $this->defaultSource = $defaultSource;
     }
@@ -109,7 +116,10 @@ class editor_Plugins_MatchResource_Services_ServiceResult {
      */
     public function addResult($target, $matchrate = 0, array $metaData = null) {
         $result = new stdClass();
-        $result->target = $target;
+        
+        $missingTags = $this->internalTag->diff($this->defaultSource, $target);
+        
+        $result->target = $target.join('', $missingTags);
         $result->matchrate = (int) $matchrate;
         $result->source = $this->defaultSource;
         $result->tmmtid = $this->tmmt->getId();

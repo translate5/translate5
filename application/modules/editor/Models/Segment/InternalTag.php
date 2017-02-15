@@ -122,4 +122,110 @@ class editor_Models_Segment_InternalTag {
             return '<' . $result .'>';
         });
     }
+    
+    /**
+     * converts the given string (mainly the internal tags in the string) into valid xliff tags without content
+     * The third parameter $replaceMap can be used to return a mapping between the inserted xliff tags 
+     *  and the replaced original tags. Warning: it is no usual key => value map, since keys can be duplicated (</g>) tags
+     *  There fore the map is a 2d array: [[</g>, replacement 1],[</g>, replacement 2]] 
+     *  
+     * @param string $segment
+     * @param boolean $removeOther optional, removes per default all other tags (mqm, terms, etc)
+     * @param array &$replaceMap optional, returns by reference a mapping between the inserted xliff tags and the replaced original
+     */
+    public function toXliff(string $segment, $removeOther = true, &$replaceMap = null) {
+        //xliff 1.2 needs an id for ex and bx tags.
+        // matching of bx and ex is done by separate rid, which is filled with the original ID
+        $newid = 1;
+        
+        //if not external map given, we init it internally, although we don't need it
+        if(is_null($replaceMap)) {
+            $replaceMap = [];
+        }
+        
+        $result = $this->replace($segment, function($match) use (&$newid, &$replaceMap){
+            //original id coming from import format
+            $id = $match[3];
+            $type = $match[1];
+            $tag = ['open' => 'bx', 'close' => 'ex', 'single' => 'x'];
+            
+            //as tag id the here generated newid must be used,
+            // since the original $id is coming from imported data, it can happen 
+            // that not unique tags are produced (multiple space tags for example) 
+            // not unique tags are bad for the replaceMap
+            if($type == 'single') {
+                $result = sprintf('<x id="%s"/>', $newid++);
+            }
+            else {
+                //for matching bx and ex tags the original $id is fine
+                $result = sprintf('<%s id="%s" rid="%s"/>', $tag[$type], $newid++, $id);
+            }
+            $replaceMap[$result] = [$result, $match[0]];
+            return $result;
+        });
+        
+        if($removeOther) {
+            $result = strip_tags($result, '<x><x/><bx><bx/><ex><ex/>');
+        }
+        
+        $xml = ZfExtended_Factory::get('editor_Models_Converter_XmlPairer');
+        /* @var $xml editor_Models_Converter_XmlPairer */
+        
+        //remove all other tags, allow <x> <bx> and <ex> 
+        $pairedContent = $xml->pairTags($result);
+        $pairedReplace = $xml->getReplaceList();
+        
+        foreach($replaceMap as $key => &$replaced) {
+            if(!empty($pairedReplace[$key])) {
+                //replace the bx/ex through the g tag in the replace map
+                $replaced[0] = $pairedReplace[$key];
+            }
+        }
+        return $pairedContent;
+    }
+    
+    /**
+     * restores the internal tags into the given string by the given 2d map
+     * @param string $segment
+     * @param array $map not a a key:value map, but a 2d array, since keys can exist multiple times
+     */
+    public function reapply2dMap(string $segment, array $map) {
+        foreach($map as $tupel) {
+            $key = $tupel[0];
+            $value = $tupel[1];
+            //since $key may not be unique, we cannot use str_replace here, str_replace would replace all occurences
+            $pos = mb_strpos($segment, $key);
+            if ($pos !== false) {
+                $segment = substr_replace($segment, $value, $pos, mb_strlen($key));
+            }
+        }
+        return $segment;
+    }
+    
+    /**
+     * Compares the internal tag differences of two strings containing internal tags
+     * The diff is done by the whole tag
+     * 
+     * @param string $segment1 The string to compare from
+     * @param string $segment2 A string to compare against
+     * @return array an array containing all the internal tags from $segment1 that are not present in $segment2
+     */
+    public function diff(string $segment1, string $segment2) {
+        $allMatches1 = $this->get($segment1);
+        $allMatches2 = $this->get($segment2);
+        
+        $result = [];
+        foreach($allMatches1 as $inFirst) {
+            $found = array_search($inFirst, $allMatches2);
+            if($found === false) {
+                //if the tag is not in the second list, we want it as result
+                $result[] = $inFirst;
+            }
+            else {
+                //since the count of the matches is also important we have to delete already found elements here
+                unset($allMatches2[$found]);
+            }
+        }
+        return $result;
+    }
 }

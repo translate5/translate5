@@ -159,8 +159,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       if(plug.editing && rec && rec.get('editable')) {
           //Editor.MessageBox.addInfo("Show a message on take over content?");
           sc = new Editor.util.SegmentContent(rec.get('source'));
-          contentTags = sc.getContentTags().join('');
-          editor.mainEditor.setValueAndMarkup(matchRecord.get('target')+contentTags, rec.get('id'), editor.columnToEdit);
+          editor.mainEditor.setValueAndMarkup(matchRecord.get('target'), rec.get('id'), editor.columnToEdit);
           //we don't support the matchrate saving for tasks with alternatives:
           if(task.get('defaultSegmentLayout')) {
               rec.set('matchRate', matchrate);

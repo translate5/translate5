@@ -278,7 +278,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
      * @param editor_Models_Segment $segment
      * @return boolean
      */
-    public function update(editor_Models_Segment $segment, $filename) {
+    public function update(string $source, string $target, editor_Models_Segment $segment, $filename) {
         /* 
          * In:{ "Method":"update", "Memory": "TestMemory", "Proposal": {
          *  "Source": "This is the source text", 
@@ -296,16 +296,17 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
          */
         //Out: { "ReturnValue":0, "ErrorMsg":"" }
         $json = $this->json(__FUNCTION__);
-        $json->Source = $segment->stripTags($segment->getSource());
-        $json->Target = $segment->stripTags($segment->getTargetEdit());
         
-        //$json->Segment = $segment->getSegmentNrInTask(); FIXME TRANSLATE-793 must be implemented first, since this ist not segment in task, but segment in file
+        $json->Source = $source;
+        $json->Target = $target;
+        
+        //$json->Segment = $segment->getSegmentNrInTask(); FIXME TRANSLATE-793 must be implemented first, since this is not segment in task, but segment in file
         $json->DocumentName = $filename;
         $json->Author = $segment->getUserName();
         $json->DateTime = $this->nowDate();
         
         $json->Type = "Manual";
-        $json->Markup = "OTMXUXLF"; //FIXME
+        $json->Markup = "OTMXUXLF"; //fixed markup table for our XLIFF subset
         
         $lang = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $lang editor_Models_Languages */

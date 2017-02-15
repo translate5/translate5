@@ -122,4 +122,21 @@ abstract class editor_Plugins_MatchResource_Services_Connector_Abstract {
     public function setPaging($page, $offset, $limit = 20) {
         //to be implemented if needed
     }
+    
+    /**
+     * Opens the with connectTo given TM on the configured Resource (on task open, not on each request)
+     * @param editor_Plugins_MatchResource_Models_TmMt $tmmt
+     */
+    public function open() {
+        //to be implemented if needed
+        $this->log(__METHOD__);
+    }
+    
+    /**
+     * Closes the connected TM on the configured Resource (on task close, not after each request)
+     */
+    public function close() {
+        //to be implemented if needed
+        $this->log(__METHOD__);
+    }
 }

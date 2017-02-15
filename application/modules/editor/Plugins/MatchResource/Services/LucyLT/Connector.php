@@ -57,9 +57,49 @@ class editor_Plugins_MatchResource_Services_LucyLT_Connector extends editor_Plug
      */
     public function query(editor_Models_Segment $segment) {
         $queryString = $this->getQueryString($segment);
-        //query lucy without tags
-        $queryString = $segment->stripTags($queryString);
+        $this->resultList->setDefaultSource($queryString);
+
+        $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        /* @var $internalTag editor_Models_Segment_InternalTag */
         
+        $id = 0;
+        $data = [];
+        
+        $queryString = $internalTag->replace($queryString, function($match) use (&$id, &$data){
+            $replacement = '<internalTag id="internal-'.($id++).'"/>';
+            $data[$replacement] = $match[0];
+            return $replacement;
+        });
+        
+        //query lucy with internal tags as HTML only
+        $queryString = strip_tags($queryString, '<internalTag><internalTag/>');
+        $foundResult = $this->rawRequest('<xml>'.$queryString.'</xml>');
+        
+        if($foundResult === false) {
+            return $this->resultList;
+        }
+        
+        //strip xml container
+        $foundResult = trim(strip_tags($foundResult, '<internalTag><internalTag/>'));
+        
+        //FIXME ensure that Lucy returns each internalTag only once
+        //missing tags are fixed by the frontend, but errousnouly duplicated not!
+//FIXME also note down concept to refactor Tag concept in translate5 
+        
+        //restore the internal tags
+        $foundResult = str_replace(array_keys($data), array_values($data), $foundResult, $count);
+        
+        $this->resultList->addResult($foundResult, $this->calculateMatchrate());
+        return $this->resultList;
+    }
+    
+    /**
+     * Sends the plain request to Lucy
+     * @param string $queryString
+     * @throws Exception
+     * @return boolean|string
+     */
+    protected function rawRequest(string $queryString) {
         $res = $this->tmmt->getResource();
         /* @var $res editor_Plugins_MatchResource_Services_LucyLT_Resource */
 
@@ -111,16 +151,10 @@ class editor_Plugins_MatchResource_Services_LucyLT_Connector extends editor_Plug
         foreach($result as $item){
             if($item->{'@name'} == 'OUTPUT') {
                 $foundResult = $item->{'@value'};
-                break;
+                return $foundResult;
             }
         }
-        if(!isset($foundResult)) {
-            return $this->resultList;
-        }
-        
-        $this->resultList->setDefaultSource($queryString);
-        $this->resultList->addResult($foundResult, $this->calculateMatchrate());
-        return $this->resultList;
+        return false;
     }
     
     /* 
@@ -192,8 +226,7 @@ class editor_Plugins_MatchResource_Services_LucyLT_Connector extends editor_Plug
      * @see editor_Plugins_MatchResource_Services_Connector_Abstract::search()
      */
     public function search(string $searchString, $field = 'source') {
-        //since a MT can not be searched in the target language, we just pass the $searchString to the query call
-        return $this->query($searchString);
+        throw new BadMethodCallException("The Lucy LT Connector does not support search requests");
     }
 
     /**

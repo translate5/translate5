@@ -92,12 +92,14 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
                     xtype: 'gridcolumn',
                     flex: 33/100,
                     dataIndex: 'source',
+                    tdCls: 'segment-tag-column',
                     cellWrap: true,
                     text: me.strings.source
                 },{
                     xtype: 'gridcolumn',
                     flex: 33/100,
                     dataIndex: 'target',
+                    tdCls: 'segment-tag-column',
                     cellWrap: true,
                     text: me.strings.target
                 },{

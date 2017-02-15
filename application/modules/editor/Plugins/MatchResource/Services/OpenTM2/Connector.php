@@ -165,16 +165,24 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
     }
 
     public function update(editor_Models_Segment $segment) {
+        $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        /* @var $internalTag editor_Models_Segment_InternalTag */
+        
+        $messages = Zend_Registry::get('rest_messages');
+        /* @var $messages ZfExtended_Models_Messages */
+        
         $file = ZfExtended_Factory::get('editor_Models_File');
         /* @var $file editor_Models_File */
         $file->load($segment->getFileId());
         
-        $messages = Zend_Registry::get('rest_messages');
-        /* @var $messages ZfExtended_Models_Messages */
-        if($this->api->update($segment, $file->getFileName())) {
+        $source = $internalTag->toXliff($this->getQueryString($segment));
+        $target = $internalTag->toXliff($segment->getTargetEdit());
+        
+        if($this->api->update($source, $target, $segment, $file->getFileName())) {
             $messages->addNotice('Segment im TM aktualisiert!', 'MatchResource');
             return;
         }
+        
         $errors = $this->api->getErrors();
         //$messages = Zend_Registry::get('rest_messages');
         /* @var $messages ZfExtended_Models_Messages */
@@ -198,7 +206,15 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         /* @var $file editor_Models_File */
         $file->load($segment->getFileId());
         
-        $queryString = $segment->stripTags($this->getQueryString($segment));
+        //Although we take the source fields from the OpenTM2 answer below
+        // we have to set the default source here to fill the be added internal tags 
+        $this->resultList->setDefaultSource($this->getQueryString($segment));
+        
+        $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        /* @var $internalTag editor_Models_Segment_InternalTag */
+        
+        //$map is returned by reference
+        $queryString = $internalTag->toXliff($this->getQueryString($segment), true, $map);
         
         if($this->api->lookup($segment, $queryString, $file->getFileName())){
             $result = $this->api->getResult();
@@ -207,7 +223,8 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
             }
             foreach($result->FoundProposals as $found) {
                 $meta = new stdClass();
-                $this->resultList->addResult($found->Target, $found->Fuzzyness, $this->getMetaData($found));
+                $target = $internalTag->reapply2dMap($found->Target, $map);
+                $this->resultList->addResult($target, $found->Fuzzyness, $this->getMetaData($found));
                 $this->resultList->setSource($found->Source);
             }
             
