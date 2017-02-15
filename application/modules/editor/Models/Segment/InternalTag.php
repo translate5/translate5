@@ -89,13 +89,13 @@ class editor_Models_Segment_InternalTag {
      */
     public function restore(string $segment) {
         return $this->replace($segment, function($match){
-            $type = $match[1];
+            $id = $match[3];
             $data = $match[2];
             //restore packed data
             $result = pack('H*', $data);
             
             //if single-tag is regex-tag no <> encapsulation is needed
-            if ($type === "regex") {
+            if ($id === "regex") {
                 return $result;
             }
             
