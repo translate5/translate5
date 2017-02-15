@@ -85,19 +85,6 @@ class editor_Models_Segment_InternalTag {
     }
     
     /**
-     * Checks if the two given segment texts are equal, ignores the auto calculated tag IDs therefore
-     * @param unknown $segmentOne
-     * @param unknown $segmentTwo
-     * @return string
-     */
-    public function equalsIdIgnored($segmentOne, $segmentTwo) {
-        $replacer = function($match) {
-            return preg_replace('#<span id="[^"]+"#', '<span id=""', $match[0]);
-        };
-        return $this->replace($segmentOne, $replacer) === $this->replace($segmentTwo, $replacer);
-    }
-    
-    /**
      * restores the original escaped tag
      */
     public function restore(string $segment) {
