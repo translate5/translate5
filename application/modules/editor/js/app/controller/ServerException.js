@@ -97,10 +97,10 @@ Ext.define('Editor.controller.ServerException', {
             _status = status.toString(),
             text = str.text,
             respText = response && response.responseText || '{"errors": [{"_errorMessage": "unknown"}]}',
+            json = Ext.JSON.decode(respText),
             tpl = new Ext.Template(str.serverMsg),
             action = response && response.request && response.request.options.action,
             getServerMsg = function() {
-                var json = Ext.JSON.decode(respText);
                 return json.errors[0]._errorMessage;
             },
             appendServerMsg = function(msg) {
@@ -158,8 +158,13 @@ Ext.define('Editor.controller.ServerException', {
                 return;
             case 406: //Not Acceptable: show message from server
                 Editor.MessageBox.addError(getServerMsg());
+            case 502: //Bad Gateway → the real error is coming from a requested third party system
+                Ext.Array.each(json.errors, function(item){
+                    Editor.MessageBox.getInstance().showDirectError(item.msg, item.data);
+                });
+                return;
             case 503:
-            	 Ext.MessageBox.show({
+                Ext.MessageBox.show({
                      title: str["503_title"],
                      msg: str["503_msg"],
                      buttons: Ext.MessageBox.OK,
