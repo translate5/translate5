@@ -53,16 +53,18 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApiV2 extends editor_Plu
      */
     public function search($queryString, $field, $searchPosition = '') {
         //NEW more restlike interface, is already working.
+        
+        //FIXME implement $searchPosition stuff after fixing OPENTM2-17 and OPENTM2-16
+        
         $data = new stdClass();
         $data->searchString = $queryString;
         $data->searchType = $field;
-        $data->searchPosition = null;
-        
+        //$data->searchPosition = null; Warning searchPosition = null as initial value is currently not working
+        $data->numResults = 2;
+        $data->msSearchAfterNumResults = 100;
         $http = $this->getHttpWithMemory('concordancesearch');
         $http->setRawData(json_encode($data), 'application/json');
-        $res = $http->request('POST');
-        
-        //FIXME REST Error Handling!
+        return $this->processResponse($http->request('POST'));
     }
 
     /**
@@ -98,6 +100,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApiV2 extends editor_Plu
         $json->documentName = $filename;
         $json->author = $segment->getUserName();
         $json->timeStamp = $this->nowDate();
+        $json->context = $segment->getMid();
         
         $json->type = "Manual";
         $json->markupTable = "OTMXUXLF"; //fixed markup table for our XLIFF subset
@@ -112,6 +115,21 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApiV2 extends editor_Plu
         $json->targetLang = $lang->getRfc5646();
         
         $http = $this->getHttpWithMemory('entry');
+        $http->setRawData(json_encode($json), 'application/json');
+        return $this->processResponse($http->request('POST'));
+    }
+    
+    public function lookup(editor_Models_Segment $segment, string $queryString, string $filename) {
+        $json = new stdClass();
+        $json->sourceLang = $this->tmmt->getSourceLangRfc5646();
+        $json->targetLang = $this->tmmt->getTargetLangRfc5646();
+        $json->source = $queryString;
+        $json->documentName = $filename;
+        $json->segmentNumber = ''; //FIXME can be used after implementing TRANSLATE-793
+        $json->markupTable = 'OTMXUXLF'; //FIXME can be used after implementing TRANSLATE-793
+        $json->context = $segment->getMid(); // hier MID (Context war gedacht für die Keys (Dialog Nummer) bei übersetzbaren strings in Software)
+        
+        $http = $this->getHttpWithMemory('fuzzysearch');
         $http->setRawData(json_encode($json), 'application/json');
         return $this->processResponse($http->request('POST'));
     }

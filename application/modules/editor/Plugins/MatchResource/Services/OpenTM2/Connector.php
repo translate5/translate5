@@ -201,11 +201,11 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
             if((int)$result->NumOfFoundProposals === 0){
                 return $this->resultList; 
             }
-            foreach($result->FoundProposals as $found) {
+            foreach($result->results as $found) {
                 $meta = new stdClass();
-                $target = $internalTag->reapply2dMap($found->Target, $map);
-                $this->resultList->addResult($target, $found->Fuzzyness, $this->getMetaData($found));
-                $source = $internalTag->reapply2dMap($found->Source, $map);
+                $target = $internalTag->reapply2dMap($found->target, $map);
+                $this->resultList->addResult($target, $found->matchRate, $this->getMetaData($found));
+                $source = $internalTag->reapply2dMap($found->source, $map);
                 $this->resultList->setSource($source);
             }
             
@@ -222,15 +222,15 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      */
     protected function getMetaData($found) {
         $nameToShow = [
-            "DocumentName",
-            "DocumentShortName",
-            "Type", 
-            "Match",
-            "Author",
-            "DateTime",
-            "Markup",
-            "Context",
-            "AddInfo",
+            "documentName",
+            "documentShortName",
+            "type", 
+            "matchType",
+            "author",
+            "timestamp",
+            "markupTable",
+            "context",
+            "additionalInfo",
         ];
         $result = [];
         foreach($nameToShow as $name) {
@@ -249,23 +249,25 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::search()
      */
     public function search(string $searchString, $field = 'source') {
-        $field = ucfirst($field);
-        //FIXME for paging see Dummy TM connector, there is a hint about OpenTM2
-        
-        if($this->api->search($searchString, ucfirst($field))){
+        if($this->api->search($searchString, $field)){
             $result = $this->api->getResult();
-            $found = $result->FoundProposal;
             
-            if(empty($found->{$field})){
+            if(empty($result) || empty($result->results)){
                 return $this->resultList; 
             }
-            //[NextSearchPosition] => 
-    
-            $this->resultList->addResult($found->Target);
-            $this->resultList->setSource($found->Source);
+            $newSearch = $result->NewSearchPosition;
             
-            //FIXME Total Calculation and paging logic differs completly from that what we need!
-            $this->resultList->setTotal(1);
+            //FIXME implement NextSearchPosition stuff
+            
+            //$found->{$field}
+            $results = $result->results;
+            //[NextSearchPosition] =>
+            foreach($results as $result) {
+                $this->resultList->addResult(strip_tags($result->target));
+                $this->resultList->setSource(strip_tags($result->source));
+            }
+            
+            $this->resultList->setTotal(count($results));
             return $this->resultList; 
         }
         $this->throwBadGateway();
