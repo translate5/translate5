@@ -76,8 +76,6 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::addTm()
      */
     public function addTm(array $fileinfo = null) {
-        //FIXME hier den Zeichen Filter von Gerhard einbauen
-        
         $sourceLang = $this->tmmt->getSourceLangRfc5646(); 
         
         $name = $this->filterName($this->tmmt->getName());
@@ -89,17 +87,14 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         if($noFile || $tmxUpload) {
             if($this->api->createEmptyMemory($name, $sourceLang)){
                 $this->tmmt->setFileName($this->api->getResult()->name);
-                if(!$tmxUpload) {
-                    return true;
+                //if initial upload is a TMX file, we have to import it. 
+                if($tmxUpload) {
+                    return $this->addAdditionalTm($fileinfo);
                 }
+                return true;
             }
             $this->handleOpenTm2Error('MatchResource Plugin - could not create TM in OpenTM2'." TMMT: \n");
             return false;
-        }
-        
-        //if initial upload is a TMX file, we have to import it. 
-        if($tmxUpload) {
-            return $this->addAdditionalTm($fileinfo);
         }
         
         //initial upload is a TM file
@@ -125,21 +120,6 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         return false;
     }
     
-    protected function handleOpenTm2Error($logMsg) {
-        $errors = $this->api->getErrors();
-        
-        $messages = Zend_Registry::get('rest_messages');
-        /* @var $messages ZfExtended_Models_Messages */
-        $msg = 'Von OpenTM2 gemeldeter Fehler';
-        $messages->addError($msg, 'MatchResource', null, $errors);
-        
-        $log = ZfExtended_Factory::get('ZfExtended_Log');
-        /* @var $log ZfExtended_Log */
-        $data  = print_r($this->tmmt->getDataObject(),1);
-        $data .= " \nError\n".print_r($errors,1);
-        $log->logError($logMsg, $data);
-    }
-
     public function getValidFiletypes() {
         return [
             'TM' => 'text/plain', //FIXME enter correct file type
@@ -225,13 +205,14 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
                 $meta = new stdClass();
                 $target = $internalTag->reapply2dMap($found->Target, $map);
                 $this->resultList->addResult($target, $found->Fuzzyness, $this->getMetaData($found));
-                $this->resultList->setSource($found->Source);
+                $source = $internalTag->reapply2dMap($found->Source, $map);
+                $this->resultList->setSource($source);
             }
             
             $this->resultList->setTotal($result->NumOfFoundProposals);
             return $this->resultList; 
         }
-        throw new ZfExtended_Exception('Errors in receiving data from OpenTM2: '.print_r($this->api->getErrors(),1));
+        $this->throwBadGateway();
     }
     
     /**
@@ -287,7 +268,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
             $this->resultList->setTotal(1);
             return $this->resultList; 
         }
-        throw new ZfExtended_Exception('Errors in receiving data from OpenTM2: '.print_r($this->api->getErrors(),1));
+        $this->throwBadGateway();
     }
     
     /**
@@ -309,8 +290,40 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      */
     public function delete() {
         if(!$this->api->delete()) {
-            throw new ZfExtended_Exception('Errors in receiving data from OpenTM2: '.print_r($this->api->getErrors(),1));
+            $this->throwBadGateway();
         }
+    }
+    
+    /**
+     * Throws a ZfExtended_BadGateway exception containing the underlying errors
+     * @throws ZfExtended_BadGateway
+     */
+    protected function throwBadGateway() {
+        $e = new ZfExtended_BadGateway('Die angefragte OpenTM2 Instanz meldete folgenden Fehler:');
+        $e->setOrigin('MatchResource OpenTM2');
+        $e->setErrors($this->api->getErrors());
+        throw $e;
+    }
+    
+    /**
+     * In difference to $this->throwBadGateway this method generates an 400 error 
+     *   which shows additional error information in the frontend
+     *   
+     * @param string $logMsg
+     */
+    protected function handleOpenTm2Error($logMsg) {
+        $errors = $this->api->getErrors();
+        
+        $messages = Zend_Registry::get('rest_messages');
+        /* @var $messages ZfExtended_Models_Messages */
+        $msg = 'Von OpenTM2 gemeldeter Fehler';
+        $messages->addError($msg, 'MatchResource', null, $errors);
+        
+        $log = ZfExtended_Factory::get('ZfExtended_Log');
+        /* @var $log ZfExtended_Log */
+        $data  = print_r($this->tmmt->getDataObject(),1);
+        $data .= " \nError\n".print_r($errors,1);
+        $log->logError($logMsg, $data);
     }
     
     /**

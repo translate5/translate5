@@ -340,7 +340,9 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
         /* @var $manager editor_Plugins_MatchResource_Services_Manager */
         $connector = $manager->getConnector($this->entity);
-        $connector->delete();
+        if($connector instanceof editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract) {
+            $connector->delete();
+        }
         //$this->processClientReferenceVersion();
         $this->entity->delete();
     }

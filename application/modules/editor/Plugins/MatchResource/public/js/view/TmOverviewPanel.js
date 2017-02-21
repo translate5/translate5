@@ -74,7 +74,7 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                 },
                 columns: [{
                     xtype: 'gridcolumn',
-                    width: 100,
+                    width: 150,
                     dataIndex: 'name',
                     filter: {
                         type: 'string'

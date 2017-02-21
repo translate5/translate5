@@ -109,9 +109,10 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
     
     /**
      * This method deletes a memory.
-     * FIXME Currently old style API
      */
     public function delete() {
+        $http = $this->getHttpWithMemory();
+        return $this->processResponse($http->request('DELETE'));
         return $this->request($this->json(__FUNCTION__));
     }
     
@@ -144,18 +145,6 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
     //
     
     
-    /**
-     * This method imports a memory using the internal memory files provided in a ZIP package.
-     */
-    public function importFromPackage() {
-        //In:{ "Method":"importFromPackage", "Memory":"MyTestMemory", "Files":"C:/FileArea/MyTestMemory.ZIP" }  
-        //Out: { "ReturnValue":0, "ErrorMsg":"" } 
-    }
-
-
-    
-
-
     /**
      * This method opens a memory.
      * Note: This method is not required as memories are automatically opened when they are accessed for the first time.
@@ -416,19 +405,29 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
     
     /**
      * Prepare and send the request to OpenTM2
-     * @param stdClass $json
+     * @param string $action
+     * @param stdClass $json optional, the JSON payload
+     * @param string $URLSuffix
      */
-    protected function rest($data, $memory = null, $action = 'POST', $URLSuffix = '') {
-         $http = new Zend_Http_Client();
-         $http->setUri($this->tmmt->getResource()->getUrl());
-         $http->setRawData(json_encode($json), 'application/json');
-         $response = $http->request('PUT');
-         error_log("sent: ".print_r($json,1));
-         error_log("getHeaders: ".print_r($response->getHeaders(),1));
-         error_log("getRawBody: ".print_r($response->getRawBody(),1));
-         error_log("getMessage: ".print_r($response->getMessage(),1));
-         error_log("getBody: ".print_r($response->getBody(),1));
-         //$http->setFileUpload($filename, $formname);
+    protected function rest($action = 'POST', $json = null, $URLSuffix = '/') {
+        $action = strtoupper($action);
+        
+        $http = ZfExtended_Factory::get('Zend_Http_Client');
+        $url = rtrim($this->tmmt->getResource()->getUrl(), '/');
+        if($this->tmmt->getId() > 0){
+            $tmname = urlencode($this->tmmt->getFileName());
+            $url .= '/'.$tmname;
+        }
+        $url .= $URLSuffix;
+        $http->setUri($url);
+        
+        if(!is_null($json) && in_array($action, ['POST', 'PUT']))   {
+            $http->setRawData(json_encode($json), 'application/json');
+        }
+        $response = $http->request($action);
+        
+        //$http->setFileUpload($filename, $formname);
+        return $this->processResponse($response);
     }
     
     /**
