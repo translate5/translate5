@@ -44,5 +44,5 @@ END LICENSE AND COPYRIGHT
  * @method int getId() getId()
  */
 class editor_Models_Languages extends ZfExtended_Languages {
-    
+	protected $dbInstanceClass = 'editor_Models_Db_Languages';
 }
