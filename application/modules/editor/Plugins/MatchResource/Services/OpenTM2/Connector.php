@@ -50,7 +50,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      */
     public function connectTo(editor_Plugins_MatchResource_Models_TmMt $tmmt) {
         parent::connectTo($tmmt);
-        $class = 'editor_Plugins_MatchResource_Services_OpenTM2_HttpApi';
+        $class = 'editor_Plugins_MatchResource_Services_OpenTM2_HttpApiV2';
         $this->api = ZfExtended_Factory::get($class, [$tmmt]);
     }
     

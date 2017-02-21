@@ -111,8 +111,6 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
      * This method deletes a memory.
      */
     public function delete() {
-        $http = $this->getHttpWithMemory();
-        return $this->processResponse($http->request('DELETE'));
         return $this->request($this->json(__FUNCTION__));
     }
     
@@ -246,18 +244,6 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $json->Markup = "OTMXUXLF";
         $json->SearchPosition = $searchPosition;
         return $this->request($json);
-        
-        //NEW more restlike interface, is already working.
-        $data = new stdClass();
-        $data->searchString = $queryString;
-        $data->searchType = $field;
-        $data->searchPosition = null;
-        
-        $http = $this->getHttpWithMemory('concordancesearch');
-        $http->setRawData(json_encode($data), 'application/json');
-        $res = $http->request('POST');
-        
-        //FIXME REST Error Handling!
     }
 
     /**
@@ -345,6 +331,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
     /**
      * Prepare and send the request to OpenTM2
      * @param stdClass $json
+     * @deprecated
      * @return boolean true on success, false on failure
      */
     protected function request(stdClass $json) {
