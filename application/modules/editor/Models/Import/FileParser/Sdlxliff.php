@@ -499,7 +499,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * @return string $id ID des Tags im JS
      */
     protected function parseSegmentGetTagId($tag, $tagName) {
-        if ($tagName == 'unicodePrivateUseArea'||$tagName == 'hardReturn'||$tagName == 'softReturn'||$tagName == 'macReturn'||$tagName == 'space') {
+        $whitespaceTags = ['unicodePrivateUseArea', 'hardReturn' , 'softReturn', 'macReturn', 'space'];
+        if (in_array($tagName, $whitespaceTags)) {
             return $tagName;
         }
         if ($tagName == 'mrk') {
