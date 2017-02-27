@@ -365,7 +365,7 @@ class Models_Installer_Standalone {
         $db->password = $this->dbCredentials['password'];
         $db->dbname = $this->dbCredentials['database'];
         
-        $dbupdater = new ZfExtended_Models_Installer_DbUpdater();
+        $dbupdater = new ZfExtended_Models_Installer_DbUpdater($db, $exec, $this->currentWorkingDir);
         if(!$dbupdater->executeSqlFile($exec, $db, $dbInit, $output)) {
             $this->log('Error on Importing '.self::DB_INIT.' file, stopping installation. Called command: '.$exec.".\n".'Result of Command: '.print_r($output,1));
             exit;
