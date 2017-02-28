@@ -66,7 +66,7 @@ Ext.define('Editor.view.ViewPortEditor', {
               resizable: true,
               resizeHandles: 'e',
               title: me.items_west_title,
-              width: 150,
+              width: 250,
               collapsible: true,
               layout: {type:'accordion'},
               animCollapse: !Ext.isIE, //BugID 3
@@ -83,6 +83,7 @@ Ext.define('Editor.view.ViewPortEditor', {
           },{
               xtype: 'panel',
               region: 'east',
+              width: 330,
               weight: 30,
               collapsible: true,
               layout: 'fit',
@@ -107,8 +108,7 @@ Ext.define('Editor.view.ViewPortEditor', {
                   },{
                       xtype: 'commentPanel'
                   }]
-              }],
-              width: 260
+              }]
           }];
       //},{
       //example of adding an additional south panel with width 100%, 

@@ -75,7 +75,7 @@ Ext.define('Editor.view.admin.task.Preferences', {
                 region: 'east',
                 autoScroll: true,
                 height: 'auto',
-                width: 280,
+                width: 300,
                 items: [{
                     xtype: 'container',
                     itemId: 'editInfoOverlay',

@@ -56,16 +56,6 @@ END LICENSE AND COPYRIGHT
 .segment-tag-container .x-autocontainer-innerCt div.close,
 .segment-tag-container .x-autocontainer-innerCt div.single {display:inline;background:#39FFA3;}
 
-/* force showing the column header drop down arrow */
-.x-column-header-trigger {
-	display:block;
-    width: 14px;
-    cursor: pointer;
-    background: transparent url(../../../ext-6.0.0/build/classic/theme-classic/resources/images/grid/grid3-hd-btn.gif) no-repeat 0 center;
-    z-index:10; /* EXT6UPD-106 */
-}
-
-
 #segment-grid div.x-grid-cell-inner div.open span {} /* Grafik Style für open Tag*/
 #segment-grid div.x-grid-cell-inner div.close span {} /* Grafik Style für close Tag*/
 #segment-grid div.x-grid-cell-inner div.single span {} /* Grafik Style für single Tag*/
@@ -118,13 +108,6 @@ END LICENSE AND COPYRIGHT
   vertical-align: text-bottom;
 }
 
-#segment-grid .x-grid-row-editor .x-panel-body {
-  background: #dfe8f6;
-}
-/*odd rows in leichtem blau anstatt in sehr leichtem grau*/
-.x-grid-row-alt .x-grid-cell, .x-grid-row-alt .x-grid-rowwrap-div {
-  background-color:#eaf1fb;
-}
 
 /*matchRateType*/
 .matchratetype-visible .matchrateEdit img.matchRateType,
@@ -163,7 +146,7 @@ END LICENSE AND COPYRIGHT
 #head-panel .head-panel-brand {} /* box for html branding */
 #head-panel .head-panel-info-panel {position:absolute;right:20px !important;top:20px !important; left: auto !important; width: auto !important; }
 #head-panel .x-autocontainer-outerCt {table-layout: auto !important}
-#head-panel .head-panel-toolbar {position:absolute;right:20px !important;bottom:20px !important;width:440px; left: auto !important; top: 40px !important;}
+#head-panel .head-panel-toolbar {position:absolute;right:20px !important;bottom:20px !important;width:440px; left: auto !important; top: 40px !important;background:transparent;}
 
 .head-panel-info-panel span.user-label,
 .head-panel-info-panel span.login-label,
@@ -179,7 +162,8 @@ END LICENSE AND COPYRIGHT
 
 .x-form-cb-label-after {white-space: normal;}
 
-.metaTermPanel .even {background-color:#eaf1fb;border-top:1px solid #99bce8;border-bottom:1px solid #99bce8;}
+.metaTermPanel .odd {background-color:#f6f6f6;}
+.metaTermPanel .even {background-color:#e5edf4;border-top:1px solid #d0d0d0;border-bottom:1px solid #d0d0d0;}
 .metaTermPanel img {vertical-align: top;margin-right:2px;}
 .metaTermPanel span.used {font-weight:bold;}
 
@@ -211,9 +195,11 @@ END LICENSE AND COPYRIGHT
 .qmflag-menu .x-menu-icon-separator {right:34px;left:auto;}
 
 .qmflag-menu .x-menu-item-arrow {
-    background-image: url("../images/qmmenu-parent.gif");
     right: auto;
     left:0;
+}
+.qmflag-menu .x-menu-item-arrow:before {
+    content: "\f0d9";
 }
 
 /* Fix for TRANSLATE-237 recheck on ExtJS update */
@@ -241,6 +227,11 @@ background-color: #EAF1FB;
 /* filetree */
 .fileTree .x-grid-item-selected .x-grid-cell, .x-grid-item-selected .x-grid-rowwrap-div {
     background-color: #99bce8 !important;
+}
+
+/* font size of HTML Editor */
+.x-html-editor-wrap textarea {
+    font-size:12px;
 }
 
 /*comments column*/
@@ -325,16 +316,16 @@ body.loading {background: url("../images/loading_ico.gif") center 100px no-repea
 .adminTaskGrid .error td.state div {padding-left:20px;background:url(../images/exclamation.png) no-repeat left top;}
 .adminTaskGrid .locked.import td.state div {padding-left:6px; background:none;}
 .adminTaskGrid tr:hover td.task-users > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
-.adminTaskGrid .x-grid-header-ct .task-users > div {background:url("../images/group.png") no-repeat 6px 5px;}
-.adminTaskGrid .x-grid-header-ct .ref-files > div {background:url("../images/page_attach.png") no-repeat 6px 5px;}
+.adminTaskGrid .x-grid-header-ct .task-users > div {background:url("../images/group.png") no-repeat 10px 9px;}
+.adminTaskGrid .x-grid-header-ct .ref-files > div {background:url("../images/page_attach.png") no-repeat 10px 9px;}
 /* Alternative Grafiken: lightbulb, report-magnify, book-open ??? */
-.adminTaskGrid .x-grid-header-ct .terminologie > div {background:url("../images/book_find.png") no-repeat 6px 5px;}
-.adminTaskGrid .x-grid-header-ct .fullMatchEdit > div {background:url("../images/fullMatchEdit.png") no-repeat 6px 5px;}
-.adminTaskGrid .x-grid-header-ct .lockLocked > div {background:url("../images/lock_edit.png") no-repeat 6px 5px;}
-.adminTaskGrid .x-grid-header-ct .source-edit > div {background:url("../images/sourceEdit.png") no-repeat 6px 5px;}
-.adminTaskGrid .x-grid-header-ct .relais-lang > div {background:url("../images/relaisLanguage.png") no-repeat 6px 5px;}
-.adminTaskGrid .x-grid-header-ct .source-lang > div {background:url("../images/sourceLanguage.png") no-repeat 6px 5px;}
-.adminTaskGrid .x-grid-header-ct .target-lang > div {background:url("../images/targetLanguage.png") no-repeat 6px 5px;}
+.adminTaskGrid .x-grid-header-ct .terminologie > div {background:url("../images/book_find.png") no-repeat 10px 9px;}
+.adminTaskGrid .x-grid-header-ct .fullMatchEdit > div {background:url("../images/fullMatchEdit.png") no-repeat 10px 9px;}
+.adminTaskGrid .x-grid-header-ct .lockLocked > div {background:url("../images/lock_edit.png") no-repeat 10px 9px;}
+.adminTaskGrid .x-grid-header-ct .source-edit > div {background:url("../images/sourceEdit.png") no-repeat 10px 9px;}
+.adminTaskGrid .x-grid-header-ct .relais-lang > div {background:url("../images/relaisLanguage.png") no-repeat 10px 9px;}
+.adminTaskGrid .x-grid-header-ct .source-lang > div {background:url("../images/sourceLanguage.png") no-repeat 10px 9px;}
+.adminTaskGrid .x-grid-header-ct .target-lang > div {background:url("../images/targetLanguage.png") no-repeat 10px 9px;}
 
 .adminTaskGrid .x-grid-header-ct .fullMatchEdit.ux-filtered-column span,
 .adminTaskGrid .x-grid-header-ct .terminologie.ux-filtered-column span,
@@ -392,7 +383,7 @@ tr.customeState td div {font-style: italic;}
 .adminTaskGrid tr .x-action-col-icon,
 .adminTaskGrid tr.customeState td .x-action-col-icon,
 .adminTaskGrid tr.error td .x-action-col-icon,
-.adminTaskGrid tr.import td .x-action-col-icon {display:none;}
+.adminTaskGrid tr.import td .x-action-col-icon {display:none;background-repeat:no-repeat;background-position:center;}
 .adminTaskGrid tr.editorOpenTask .ico-task-open {background-image: url("../images/page_view.png");display:inline-block;}
 .adminTaskGrid tr.editorEditTask .ico-task-edit {background-image: url("../images/page_edit.png");display:inline-block;}
 .x-menu .ico-task-finish,
@@ -414,11 +405,11 @@ tr.customeState td div {font-style: italic;}
 /* User Admin */
 .gender-male {background: url("../images/user.png") no-repeat 6px center;}
 .gender-female {background: url("../images/user_female.png") no-repeat 6px center;}
-.ico-user-edit {background-image: url("../images/user_edit.png");}
-.ico-user-save {background-image: url("../images/disk.png");}
-.ico-user-delete {background-image: url("../images/user_delete.png");}
-.ico-user-reset-pw {background-image: url("../images/lock_go.png");}
-.ico-setting-save {background-image: url("../images/disk.png");}
+.ico-user-edit {background: url("../images/user_edit.png") no-repeat center;}
+.ico-user-save {background: url("../images/disk.png") no-repeat center;}
+.ico-user-delete {background: url("../images/user_delete.png") no-repeat center;}
+.ico-user-reset-pw {background: url("../images/lock_go.png") no-repeat center;}
+.ico-setting-save {background: url("../images/disk.png") no-repeat center;}
 .not-editable .ico-user-delete {display:none;}
 .not-editable .ico-user-reset-pw {display:none;}
 
@@ -426,3 +417,135 @@ tr.customeState td div {font-style: italic;}
 
 #segment-grid .first-in-file td  {border-top-style: solid; border-top-width: 3px; border-top-color: #99BCE8;}
 
+
+/* including package ext-theme-classic */
+/* line 2, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-tl {
+  background: transparent no-repeat 0 0; }
+
+/* line 6, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-tc {
+  height: 8px;
+  background: transparent repeat-x 0 0;
+  overflow: hidden; }
+
+/* line 12, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-tr {
+  background: transparent no-repeat right -8px; }
+
+/* line 16, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-ml {
+  background: transparent repeat-y 0;
+  padding-left: 4px;
+  overflow: hidden; }
+
+/* line 22, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-mc {
+  background: repeat-x 0 -16px;
+  padding: 4px 10px; }
+
+/* line 27, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-mc h3 {
+  margin: 0 0 4px 0; }
+
+/* line 31, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-mr {
+  background: transparent repeat-y right;
+  padding-right: 4px;
+  overflow: hidden; }
+
+/* line 37, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-bl {
+  background: transparent no-repeat 0 -16px; }
+
+/* line 41, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-bc {
+  background: transparent repeat-x 0 -8px;
+  height: 8px;
+  overflow: hidden; }
+
+/* line 47, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-br {
+  background: transparent no-repeat right -24px; }
+
+/* line 51, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-tl, .x-box-bl {
+  padding-left: 8px;
+  overflow: hidden; }
+
+/* line 56, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-tr, .x-box-br {
+  padding-right: 8px;
+  overflow: hidden; }
+
+/* line 61, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-tl {
+  background-image: url(resources/corners.gif); }
+
+/* line 65, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-tc {
+  background-image: url(resources/tb.gif); }
+
+/* line 69, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-tr {
+  background-image: url(resources/corners.gif); }
+
+/* line 73, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-ml {
+  background-image: url(resources/l.gif); }
+
+/* line 77, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-mc {
+  background-color: #eee;
+  background-image: url(resources/tb.gif);
+  font-family: "Myriad Pro","Myriad Web","Tahoma","Helvetica","Arial",sans-serif;
+  color: #393939;
+  font-size: 15px; }
+
+/* line 85, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-mc h3 {
+  font-size: 18px;
+  font-weight: bold; }
+
+/* line 90, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-mr {
+  background-image: url(resources/r.gif); }
+
+/* line 94, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-bl {
+  background-image: url(resources/corners.gif); }
+
+/* line 98, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-bc {
+  background-image: url(resources/tb.gif); }
+
+/* line 102, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-br {
+  background-image: url(resources/corners.gif); }
+
+/* line 106, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-blue .x-box-bl, .x-box-blue .x-box-br, .x-box-blue .x-box-tl, .x-box-blue .x-box-tr {
+  background-image: url(resources/corners-blue.gif); }
+
+/* line 110, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-blue .x-box-bc, .x-box-blue .x-box-mc, .x-box-blue .x-box-tc {
+  background-image: url(resources/tb-blue.gif); }
+
+/* line 114, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-blue .x-box-mc {
+  background-color: #c3daf9; }
+
+/* line 118, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-blue .x-box-mc h3 {
+  color: #17385b; }
+
+/* line 122, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-blue .x-box-ml {
+  background-image: url(resources/l-blue.gif); }
+
+/* line 126, ../../../ext-theme-classic/sass/src/dom/Element.scss */
+.x-box-blue .x-box-mr {
+  background-image: url(resources/r-blue.gif); }
+/*
+    END MESSAGEBOX STYLES
+*/

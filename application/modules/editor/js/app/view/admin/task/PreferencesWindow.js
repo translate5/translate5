@@ -41,8 +41,8 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
     strings: {
         close: '#UT#Fenster schließen'
     },
-    height: 600,
-    width: 800,
+    height: 800,
+    width: 1000,
     layout: 'fit',
     modal: true,
     viewModel: {

@@ -125,7 +125,7 @@ Ext.define('Editor.view.admin.UserGrid', {
           text: me.text_cols.gender
       },{
           xtype: 'gridcolumn',
-          width: 120,
+          width: 160,
           dataIndex: 'email',
           filter: {
               type: 'string'
@@ -146,7 +146,7 @@ Ext.define('Editor.view.admin.UserGrid', {
           text: me.text_cols.roles
       },{
           xtype: 'actioncolumn',
-          width: 60,
+          width: 80,
           items: Ext.Array.filter([{
               tooltip: me.strings.actionEdit,
               isAllowedFor: 'editorEditUser',

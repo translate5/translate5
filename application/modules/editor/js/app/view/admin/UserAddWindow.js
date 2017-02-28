@@ -66,8 +66,8 @@ Ext.define('Editor.view.admin.UserAddWindow', {
         saveBtn: '#UT#Benutzer speichern',
         cancelBtn: '#UT#Abbrechen'
     },
-    height : 600,
-    width : 500,
+    height : 720,
+    width : 600,
     modal : true,
     layout:'fit',
     initComponent: function() {
@@ -87,7 +87,6 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                 anchor: '100%'
             },
             bottomInfo = [me.strings.bottomInfo];
-        bottomInfo.push(me.strings.bottomRoleInfo);
         if(!instanceConfig.editMode) {
             bottomInfo.push(me.strings.bottomPwInfo);
         }
@@ -106,6 +105,7 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                 xtype: 'form',
                 padding: 5,
                 ui: 'default-frame',
+                scrollable: 'vertical',
                 defaults: defaults,
                 items: [{
                     xtype: 'fieldset',
@@ -114,7 +114,7 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                     items:[{
                         xtype: 'radiogroup',
                         fieldLabel: me.strings.genderLabel,
-                        columns: 1,
+                        //columns: 1,
                         items: [
                                 {boxLabel: me.strings.genderFemale, name: 'gender', inputValue: 'f'},
                                 {boxLabel: me.strings.genderMale, name: 'gender', inputValue: 'm'}
@@ -174,8 +174,12 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                     },{
                         xtype: 'checkboxgroup',
                         itemId: 'rolesGroup',
-                        fieldLabel: me.strings.rolesLabel,
-                        items: roles
+                        fieldLabel: me.strings.rolesLabel + ' &#8505;',
+                        items: roles,
+                        autoEl: {
+                            tag: 'div',
+                            'data-qtip': Ext.String.htmlEncode(me.strings.bottomRoleInfo)
+                        }
                     }]
                 },{
                     xtype: 'fieldset',
