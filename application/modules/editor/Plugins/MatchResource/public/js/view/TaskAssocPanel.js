@@ -55,7 +55,6 @@ Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
         source: '#UT#Quellsprache',
         target: '#UT#Zielsprache'
     },
-    frame : true,
     padding: 0,
     layout: 'fit',
     initConfig : function(instanceConfig) {

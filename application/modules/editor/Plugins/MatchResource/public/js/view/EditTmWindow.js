@@ -48,7 +48,7 @@ Ext.define('Editor.plugins.MatchResource.view.EditTmWindow', {
         save: '#UT#Speichern',
         cancel: '#UT#Abbrechen'
     },
-    height : 300,
+    height : 360,
     width : 500,
     modal : true,
     layout:'fit',
