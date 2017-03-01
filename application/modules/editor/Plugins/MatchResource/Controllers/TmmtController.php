@@ -153,24 +153,29 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         /* @var $manager editor_Plugins_MatchResource_Services_Manager */
         $resource = $manager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
         
-        //validation prefills also the rfc values! So it must be called before the fileupload, 
+        //validateLanguages prefills also the lang rfc values! So it must be called before the fileupload, 
         // since there will be communication with the underlying resource which needs the RFC values
         $validLanguages = $this->validateLanguages($resource);
+
+        if(!$validLanguages || !$this->validate()){
+            return;
+        }
+        //save first to generate the TMMT id
+        $this->entity->save();
         
         if($resource->getFilebased()) {
             $this->handleInitialFileUpload($manager);
             //when there are errors, we cannot set it to true
-            $validFiles = $this->validateUpload();
-        }
-        else {
-            $validFiles = true;
+            if(!$this->validateUpload()) {
+                $this->entity->delete();
+                return;
+            }
+            //save again to save changes made by the connector
+            $this->entity->save();
         }
         
-        if($validLanguages && $validFiles && $this->validate()){
-            $this->entity->save();
-            $this->view->rows = $this->entity->getDataObject();
-            $this->view->success = true;
-        }
+        $this->view->rows = $this->entity->getDataObject();
+        $this->view->success = true;
     }
 
     /**
@@ -323,10 +328,10 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         }
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $translate ZfExtended_Zendoverwrites_Translate */;
-        $errors = array('tmUpload' => array());
+        $errors = array(self::FILE_UPLOAD_NAME => array());
         
         foreach($this->uploadErrors as $error) {
-            $errors['tmUpload'][] = $translate->_($error);
+            $errors[self::FILE_UPLOAD_NAME][] = $translate->_($error);
         }
         
         $e = new ZfExtended_ValidateException(print_r($errors, 1));

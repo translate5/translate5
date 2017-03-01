@@ -79,7 +79,9 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         $sourceLang = $this->tmmt->getSourceLangRfc5646(); 
         
         $name = $this->filterName($this->tmmt->getName());
-        $this->tmmt->setFileName($name);
+        //to ensure that we get unique TMs Names although of the above stripped content, 
+        // we add the TMMT ID 
+        $this->tmmt->setFileName("ID".$this->tmmt->getId().'-'.$name);
         
         $noFile = empty($fileinfo);
         $tmxUpload = !$noFile && $fileinfo['type'] == 'application/xml' && preg_match('/\.tmx$/', $fileinfo['name']);
@@ -334,6 +336,11 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      * @return string
      */
     protected function filterName($name){
-        return str_replace("\\/:?*|<>", '_', $name);
+        //since we are getting Problems on the OpenTM2 side with non ascii characters in the filenames,
+        // we strip them all. See also OPENTM2-13.
+        $name = iconv('UTF-8', 'ASCII//TRANSLIT', $name);
+        return preg_replace('/[^a-zA-Z0-9 _-]/', '_', $name);
+        //original not allowed string list: 
+        //return str_replace("\\/:?*|<>", '_', $name);
     }
 }
