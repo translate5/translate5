@@ -134,14 +134,14 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	          xtype: 'gridcolumn',
 	          flex: 45/100,
 	          cellWrap: true,
-			  tdCls: 'segment-tag-column',
+			  tdCls: 'segment-tag-column source',
 	          dataIndex: 'source',
 	          text: me.strings.source
 	      },{
 	          xtype: 'gridcolumn',
 	          flex: 45/100,
 	          cellWrap: true,
-			  tdCls: 'segment-tag-column',
+			  tdCls: 'segment-tag-column target',
 	          dataIndex: 'target',
 	          text: me.strings.target
 	      },{

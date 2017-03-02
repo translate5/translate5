@@ -48,10 +48,10 @@ class editor_Plugins_MatchResource_Services_ServiceResult {
     protected $tmmt;
     
     /**
-     * Total results, needed for paging
-     * @var integer
+     * next offset with found data, needed for paging
+     * @var mixed
      */
-    protected $total = null;
+    protected $nextOffset = null;
     
     /**
      * Total results, needed for paging
@@ -92,8 +92,8 @@ class editor_Plugins_MatchResource_Services_ServiceResult {
      * How the total is calculated, depends on the service.
      * @param integer $total
      */
-    public function setTotal($total) {
-        $this->total = $total;
+    public function setNextOffset($offset) {
+        $this->nextOffset = $offset;
     }
     
     /**
@@ -134,14 +134,11 @@ class editor_Plugins_MatchResource_Services_ServiceResult {
     }
     
     /**
-     * returns the stored total value
-     * @return integer
+     * returns the found next offset of the search
+     * @return mixed
      */
-    public function getTotal() {
-        if(is_null($this->total)){
-            return count($this->results);
-        }
-        return $this->total;
+    public function getNextOffset() {
+        return $this->nextOffset;
     }
     
     /**

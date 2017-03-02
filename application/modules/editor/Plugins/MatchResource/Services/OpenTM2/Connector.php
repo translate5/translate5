@@ -40,7 +40,7 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract {
 
     /**
-     * @var editor_Plugins_MatchResource_Services_OpenTM2_HttpApi
+     * @var editor_Plugins_MatchResource_Services_OpenTM2_HttpApiV2
      */
     protected $api;
     
@@ -211,7 +211,6 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
                 $this->resultList->setSource($source);
             }
             
-            $this->resultList->setTotal($result->NumOfFoundProposals);
             return $this->resultList; 
         }
         $this->throwBadGateway();
@@ -250,44 +249,36 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      * (non-PHPdoc)
      * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::search()
      */
-    public function search(string $searchString, $field = 'source') {
-        if($this->api->search($searchString, $field)){
+    public function search(string $searchString, $field = 'source', $offset = null) {
+        if($this->api->search($searchString, $field, $offset)){
             $result = $this->api->getResult();
             
             if(empty($result) || empty($result->results)){
+                $this->resultList->setNextOffset(null);
                 return $this->resultList; 
             }
-            $newSearch = $result->NewSearchPosition;
+            $this->resultList->setNextOffset($result->NewSearchPosition);
+            $results = $result->results;
             
-            //FIXME implement NextSearchPosition stuff
+            $highlight = function($haystack, $doit) use ($searchString) {
+                if(!$doit){
+                    return $haystack;
+                }
+                return preg_replace('/('.preg_quote($searchString, '/').')/i', '<span class="highlight">\1</span>', $haystack);
+            };
             
             //$found->{$field}
-            $results = $result->results;
             //[NextSearchPosition] =>
             foreach($results as $result) {
-                $this->resultList->addResult(strip_tags($result->target));
-                $this->resultList->setSource(strip_tags($result->source));
+                $this->resultList->addResult($highlight(strip_tags($result->target), $field === 'target'));
+                $this->resultList->setSource($highlight(strip_tags($result->source), $field === 'source'));
             }
             
-            $this->resultList->setTotal(count($results));
             return $this->resultList; 
         }
         $this->throwBadGateway();
     }
     
-    /**
-     * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::setPaging()
-     */
-    public function setPaging($page, $offset, $limit = 20) {
-        $this->page = (int) $page;
-        $this->offset = (int) $offset;
-        $this->limit = (int) $limit;
-        if(empty($this->limit)) {
-            $this->limit = 20;
-        }
-    }
-
     /**
      * (non-PHPdoc)
      * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::delete()

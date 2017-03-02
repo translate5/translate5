@@ -375,8 +375,8 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         
         $this->view->segmentId = $segment->getId(); //return the segmentId back, just for reference
         $this->view->tmmtId = $this->entity->getId();
-        $this->view->total = $result->getTotal();
         $this->view->rows = $result->getResult();
+        $this->view->total = count($this->view->rows);
     }
     
     /**
@@ -388,11 +388,7 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         $query = $this->_getParam('query');
         $tmmtId = (int) $this->_getParam('tmmtId');
         $field = $this->_getParam('field');
-        
-        //pagin parameters, piped through to the connector
-        $page = $this->_getParam('page', 0);
-        $limit = $this->_getParam('limit', 20);
-        $offset = $this->_getParam('start', 0);
+        $offset = $this->_getParam('offset', null);
         
         //check provided field
         if($field !== 'source') {
@@ -409,11 +405,9 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         }
         
         $connector = $this->getConnector();
-        $connector->setPaging($page, $offset, $limit);
-        
-        $result = $connector->search($query, $field);
+        $result = $connector->search($query, $field, $offset);
         $this->view->tmmtId = $this->entity->getId();
-        $this->view->total = $result->getTotal();
+        $this->view->nextOffset = $result->getNextOffset();
         $this->view->rows = $result->getResult();
     }
     

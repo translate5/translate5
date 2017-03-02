@@ -133,6 +133,15 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                     width: 100,
                     text: me.strings.resource,
                     dataIndex: 'serviceName',
+                    tdCls: 'serviceName',
+                    renderer: function(v, meta, rec){
+                        var store = Ext.getStore('Editor.plugins.MatchResource.store.Resources'),
+                            resource = store.findRecord('id', rec.get('resourceId'));
+                        if(resource) {
+                            meta.tdAttr = 'data-qtip="'+resource.get('name')+'"';
+                        }
+                        return v;
+                    },
                     filter: {
                         type: 'string'
                     }

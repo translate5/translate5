@@ -51,19 +51,15 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApiV2 extends editor_Plu
      * This method searches the given search string in the proposals contained in a memory. The function returns one proposal per request. The caller has to provide the search position returned by a previous call or an empty search position to start the search at the begin of the memory.
      * Note: Provide the returned search position NewSearchPosition as SearchPosition on subsequenet calls to do a sequential search of the memory.
      */
-    public function search($queryString, $field, $searchPosition = '') {
-        //NEW more restlike interface, is already working.
-        
-        //FIXME implement $searchPosition stuff after fixing OPENTM2-17 and OPENTM2-16
-        
+    public function search($queryString, $field, $searchPosition = null) {
         $data = new stdClass();
         $data->searchString = $queryString;
         $data->searchType = $field;
-        //$data->searchPosition = null; Warning searchPosition = null as initial value is currently not working
-        $data->numResults = 2;
+        $data->searchPosition = $searchPosition;
+        $data->numResults = 5;
         $data->msSearchAfterNumResults = 100;
         $http = $this->getHttpWithMemory('concordancesearch');
-        $http->setRawData(json_encode($data), 'application/json');
+        $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
         return $this->processResponse($http->request('POST'));
     }
 
@@ -115,7 +111,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApiV2 extends editor_Plu
         $json->targetLang = $lang->getRfc5646();
         
         $http = $this->getHttpWithMemory('entry');
-        $http->setRawData(json_encode($json), 'application/json');
+        $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
         return $this->processResponse($http->request('POST'));
     }
     
@@ -130,7 +126,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApiV2 extends editor_Plu
         $json->context = $segment->getMid(); // hier MID (Context war gedacht für die Keys (Dialog Nummer) bei übersetzbaren strings in Software)
         
         $http = $this->getHttpWithMemory('fuzzysearch');
-        $http->setRawData(json_encode($json), 'application/json');
+        $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
         return $this->processResponse($http->request('POST'));
     }
 }

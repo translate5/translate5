@@ -46,15 +46,22 @@ END LICENSE AND COPYRIGHT
 .tmOverviewPanel .x-grid-header-ct .source-lang > div {background:url("images/sourceLanguage.png") no-repeat 10px 9px;}
 .tmOverviewPanel .x-grid-header-ct .target-lang > div {background:url("images/targetLanguage.png") no-repeat 10px 9px;}
 
-
-.plugin-match-resource-result-panel .match-state-loading.x-grid-row .matchrate > div {
-    background:url(../../../../modules/editor/images/loading_ico.gif) no-repeat left center;
+.plugin-match-resource-result-panel .match-state-loading.x-grid-row .source > div,
+.plugin-match-resource-result-panel .match-state-loading.x-grid-row .target > div {
+    background:url(../../../../modules/editor/images/loading_ico.gif) no-repeat 10px center;
+    padding-left:30px;
 }
 
-.plugin-match-resource-result-panel .match-state-clienttimeout.x-grid-row .matchrate > div,
-.plugin-match-resource-result-panel .match-state-servererror.x-grid-row .matchrate > div {
-    background:url(../../../../modules/editor/images/exclamation.png) no-repeat left center;
+.plugin-match-resource-result-panel .match-state-servererror.x-grid-row .source > div {
+    background:url(../../../../modules/editor/images/exclamation.png) no-repeat 10px center;
+    padding-left:30px;
 }
+
+.plugin-match-resource-result-panel .x-grid-row span.highlight {
+    font-weight: bold;
+    font-style: italic;
+}
+
 .adminTaskGrid tr:hover td.taskassocs > div {background-image:url(images/information.png); background-repeat:no-repeat; background-position:18px center;}
 .adminTaskGrid .x-grid-header-ct .taskassocs > div {background:url(images/share.png) no-repeat 10px 9px;}
 .adminTaskGrid .x-grid-header-ct .segmentsUpdateable > div {background:url("images/book_edit.png") no-repeat 10px 9px;}

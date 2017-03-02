@@ -126,22 +126,9 @@ class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor
      * (non-PHPdoc)
      * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::search()
      */
-    public function search(string $searchString, $field = 'source') {
+    public function search(string $searchString, $field = 'source', $offset = null) {
         $this->searchCount = 0;
         return $this->loopData($searchString, $field);
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::setPaging()
-     */
-    public function setPaging($page, $offset, $limit = 20) {
-        $this->page = (int) $page;
-        $this->offset = (int) $offset;
-        $this->limit = (int) $limit;
-        if(empty($this->limit)) {
-            $this->limit = 20;
-        }
     }
     
     /**
@@ -189,7 +176,7 @@ class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor
             //   → but send only limit * results to the GUI not limit + 1
             // - if count(results) <= limit, that means we are on the last page.
             // - for total count we use just offset + count(results) and thats it 
-            $this->resultList->setTotal(min($this->searchCount, $this->limit + $this->offset + 1));
+            $this->resultList->setNextOffset(min($this->searchCount, $this->limit + $this->offset + 1));
         }
 
         return $this->resultList;

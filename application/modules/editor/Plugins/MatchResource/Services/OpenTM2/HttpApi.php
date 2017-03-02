@@ -68,7 +68,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $data->sourceLang = $sourceLanguage;
         
         $http = $this->getHttp();
-        $http->setRawData(json_encode($data), 'application/json');
+        $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
         $res = $http->request('POST');
         return $this->processResponse($res);
     }
@@ -83,7 +83,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $data->sourceLang = $sourceLanguage;
         
         $http = $this->getHttp();
-        $http->setRawData(json_encode($data), 'application/json');
+        $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
         $res = $http->request('POST');
         return $this->processResponse($res);
     }
@@ -100,7 +100,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
 
         $http = $this->getHttpWithMemory('/import');
         $http->setConfig(['timeout' => 120]);
-        $http->setRawData(json_encode($data), 'application/json');
+        $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
         
         $res = $http->request('POST');
         return $this->processResponse($res);
@@ -125,6 +125,8 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $http = ZfExtended_Factory::get('Zend_Http_Client');
         /* @var $http Zend_Http_Client */
         $http->setUri($url.'/'.$urlSuffix);
+        $http->setHeaders('Accept-charset', 'UTF-8');
+        $http->setHeaders('Accept', 'application/json; charset=utf-8');
         return $http;
     }
     
@@ -343,8 +345,9 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $http = ZfExtended_Factory::get('Zend_Http_Client');
         /* @var $http Zend_Http_Client */
         $http->setUri($url);
+        $http->setHeaders('Accept-charset', 'UTF-8');
         $json = json_encode($json);
-        $http->setRawData($json, 'application/json');
+        $http->setRawData($json, 'application/json; charset=utf-8');
         $response = $http->request('PUT');
         
         //$http->setFileUpload($filename, $formname);
@@ -409,7 +412,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $http->setUri($url);
         
         if(!is_null($json) && in_array($action, ['POST', 'PUT']))   {
-            $http->setRawData(json_encode($json), 'application/json');
+            $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
         }
         $response = $http->request($action);
         

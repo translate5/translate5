@@ -225,7 +225,7 @@ class editor_Plugins_MatchResource_Services_LucyLT_Connector extends editor_Plug
      * (non-PHPdoc)
      * @see editor_Plugins_MatchResource_Services_Connector_Abstract::search()
      */
-    public function search(string $searchString, $field = 'source') {
+    public function search(string $searchString, $field = 'source', $offset = null) {
         throw new BadMethodCallException("The Lucy LT Connector does not support search requests");
     }
 

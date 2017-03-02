@@ -111,17 +111,7 @@ abstract class editor_Plugins_MatchResource_Services_Connector_Abstract {
      * @param string $field
      * @return editor_Plugins_MatchResource_Services_ServiceResult
      */
-    abstract public function search(string $searchString, $field = 'source');
-    
-    /**
-     * 
-     * @param integer $page
-     * @param integer $offset
-     * @param integer $limit
-     */
-    public function setPaging($page, $offset, $limit = 20) {
-        //to be implemented if needed
-    }
+    abstract public function search(string $searchString, $field = 'source', $offset = null);
     
     /**
      * Opens the with connectTo given TM on the configured Resource (on task open, not on each request)
