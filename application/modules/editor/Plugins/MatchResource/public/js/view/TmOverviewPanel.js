@@ -51,6 +51,7 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
         color: '#UT#Farbe',
         refresh: '#UT#Aktualisieren',
         add: '#UT#Hinzufügen',
+        import: '#UT#Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen',
         noTaskAssigned:'#UT#Keine Aufgaben zugewiesen.',
         sourceLang: '#UT#Quellsprache',
         targetLang: '#UT#Zielsprache',
@@ -73,7 +74,7 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                 },
                 columns: [{
                     xtype: 'gridcolumn',
-                    width: 100,
+                    width: 150,
                     dataIndex: 'name',
                     filter: {
                         type: 'string'
@@ -109,7 +110,7 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                     text: me.strings.color
                 },{
                     xtype: 'actioncolumn',
-                    width: 60,
+                    width: 80,
                     items: [{
                         tooltip: me.strings.edit,
                         action: 'edit',
@@ -118,6 +119,10 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                         tooltip: me.strings.erase,
                         action: 'delete',
                         iconCls: 'ico-tm-delete'
+                    },{
+                        tooltip: me.strings.import,
+                        action: 'import',
+                        iconCls: 'ico-tm-import'
                     },{
                         tooltip: me.strings.download,
                         action: 'download',
@@ -128,6 +133,15 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                     width: 100,
                     text: me.strings.resource,
                     dataIndex: 'serviceName',
+                    tdCls: 'serviceName',
+                    renderer: function(v, meta, rec){
+                        var store = Ext.getStore('Editor.plugins.MatchResource.store.Resources'),
+                            resource = store.findRecord('id', rec.get('resourceId'));
+                        if(resource) {
+                            meta.tdAttr = 'data-qtip="'+resource.get('name')+'"';
+                        }
+                        return v;
+                    },
                     filter: {
                         type: 'string'
                     }

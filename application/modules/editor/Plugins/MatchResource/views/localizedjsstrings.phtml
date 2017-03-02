@@ -85,10 +85,28 @@ END LICENSE AND COPYRIGHT
             serverErrorMsg408:'<?php echo $this->translate->_('Die Anfrage an die Matchressource dauerte zu lange.');?>',
         }
     });
+    
     Ext.define("Editor.locale.plugins.MatchResource.view.AddTmWindow", {
         override: "Editor.plugins.MatchResource.view.AddTmWindow",
         strings: {
             add: '<?php echo $this->translate->_('Matchressource hinzufügen');?>',
+            resource: '<?php echo $this->translate->_('Ressource');?>',
+            name: '<?php echo $this->translate->_('Name');?>',
+            source: '<?php echo $this->translate->_('Quellsprache');?>',
+            target: '<?php echo $this->translate->_('Zielsprache');?>',
+            file: '<?php echo $this->translate->_('TM/TMX-Datei (optional)');?>',
+            importTmxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TM oder TMX Datei!');?>',
+            color: '<?php echo $this->translate->_('Farbe');?>',
+            colorTooltip: '<?php echo $this->translate->_('Farbe dieser Matchressource');?>',
+            save: '<?php echo $this->translate->_('Speichern');?>',
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.plugins.MatchResource.view.EditTmWindow", {
+        override: "Editor.plugins.MatchResource.view.EditTmWindow",
+        strings: {
+            edit: '<?php echo $this->translate->_('Matchressource bearbeiten');?>',
             resource: '<?php echo $this->translate->_('Ressource');?>',
             name: '<?php echo $this->translate->_('Name');?>',
             source: '<?php echo $this->translate->_('Quellsprache');?>',
@@ -118,6 +136,7 @@ END LICENSE AND COPYRIGHT
             source: '<?php echo $this->translate->_('Quelltext');?>',
             target: '<?php echo $this->translate->_('Zieltext');?>',
             match: '<?php echo $this->translate->_('Matchrate');?>',
+            ctrl: '<?php echo $this->translate->_('STRG');?>',
             tooltipMsg: '<?php echo $this->translate->_('Diesen Match in das geöffnete Segment übernehmen.');?>',
             atributeTooltipMsg: '<?php echo $this->translate->_('Attribute:');?>',
             lastEditTooltipMsg: '<?php echo $this->translate->_('letzte Änderung:');?>',
@@ -131,11 +150,11 @@ END LICENSE AND COPYRIGHT
             source: '<?php echo $this->translate->_('Quelltext');?>',
             target: '<?php echo $this->translate->_('Zieltext');?>',
             match: '<?php echo $this->translate->_('Matchrate');?>',
+            ctrl: '<?php echo $this->translate->_('STRG');?>',
             tmresource: '<?php echo $this->translate->_('TM-Ressource');?>',
             sourceEmptyText:'<?php echo $this->translate->_('Quelltextsuche');?>',
             targetEmptyText:'<?php echo $this->translate->_('Zieltextsuche');?>',
-            search:'<?php echo $this->translate->_('Suche');?>',
-            action:'<?php echo $this->translate->_('Aktionen');?>'
+            search:'<?php echo $this->translate->_('Suche');?>'
         }
     });
     
@@ -157,7 +176,9 @@ END LICENSE AND COPYRIGHT
             save: '<?php echo $this->translate->_('Speichern');?>',
             empty: '<?php echo $this->translate->_('Keine Matchressource in der Sprachkombination des geöffneten Tasks verfügbar.');?>',
             groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>',
+            checked: '<?php echo $this->translate->_('Ressource in Aufgabe verwenden');?>',
             name: '<?php echo $this->translate->_('Name');?>',
+            segmentsUpdateable: '<?php echo $this->translate->_('Segmente zurückspeichern');?>',
             source: '<?php echo $this->translate->_('Quellsprache');?>',
             target: '<?php echo $this->translate->_('Zielsprache');?>'
         }
@@ -175,6 +196,7 @@ END LICENSE AND COPYRIGHT
             refresh: '<?php echo $this->translate->_('Aktualisieren');?>',
             color: '<?php echo $this->translate->_('Farbe');?>',
             add: '<?php echo $this->translate->_('Hinzufügen');?>',
+            import: '<?php echo $this->translate->_('Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen');?>',
             noTaskAssigned: '<?php echo $this->translate->_('Keine Aufgaben zugewiesen.');?>',
             sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
             targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
@@ -182,4 +204,17 @@ END LICENSE AND COPYRIGHT
         }
     });
     
+    Ext.define("Editor.locale.plugins.MatchResource.view.ImportTmWindow", {
+        override: "Editor.plugins.MatchResource.view.ImportTmWindow",
+        title: '<?php echo $this->translate->_('Matchressourcen');?>',
+        strings: {
+            file: '<?php echo $this->translate->_('TMX-Datei');?>',
+            title: '<?php echo $this->translate->_('TMX Datei importieren');?>',
+            importTmx: '<?php echo $this->translate->_('Weitere TM Daten in Form einer TMX Datei importieren und dem bestehenden TM hinzufügen');?>',
+            importTmxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TMX Datei!');?>',
+            importSuccess: '<?php echo $this->translate->_('Weitere TM Daten erfolgreich importiert!');?>',
+            save: '<?php echo $this->translate->_('Speichern');?>',
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>'
+        }
+    });
 });

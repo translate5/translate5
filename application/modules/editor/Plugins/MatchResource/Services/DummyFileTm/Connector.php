@@ -44,7 +44,7 @@ END LICENSE AND COPYRIGHT
  * This should be the CSV defaults.
  * The first column must be an id, the second the source and the theird column the target values. Other columns are ignored.
  */
-class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor_Plugins_MatchResource_Services_ConnectorAbstract {
+class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract {
 
     protected $tm;
     protected $uploadedFile;
@@ -71,17 +71,21 @@ class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor
 
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::addTm()
+     * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::addTm()
      */
-    public function addTm(string $filename){
-        $this->uploadedFile = $filename;
+    public function addTm(array $fileinfo){
+        $this->uploadedFile = $fileinfo['tmp_name'];
         //do nothing here, since we need the entity ID to save the TM
         return true;
     }
     
+    public function addAdditionalTm($filename) {
+        
+    }
+    
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::getTm()
+     * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::getTm()
      */
     public function getTm(& $mime) {
         $file = new SplFileInfo($this->getTmFile($this->tmmt->getId()));
@@ -103,7 +107,7 @@ class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor
         return APPLICATION_PATH.'/../data/dummyTm_'.$id;
     }
 
-    public function update() {
+    public function update(editor_Models_Segment $segment) {
         $messages = Zend_Registry::get('rest_messages');
         /* @var $messages ZfExtended_Models_Messages */
         $messages->addError('This is just to inform you, that the TM is not updated and the udpate handler is only for demonstration invoked.');
@@ -111,7 +115,7 @@ class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor
     
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::query()
+     * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::query()
      */
     public function query(editor_Models_Segment $segment) {
         $queryString = $this->getQueryString($segment);
@@ -120,24 +124,11 @@ class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor
     
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::search()
+     * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::search()
      */
-    public function search(string $searchString, $field = 'source') {
+    public function search(string $searchString, $field = 'source', $offset = null) {
         $this->searchCount = 0;
         return $this->loopData($searchString, $field);
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::setPaging()
-     */
-    public function setPaging($page, $offset, $limit = 20) {
-        $this->page = (int) $page;
-        $this->offset = (int) $offset;
-        $this->limit = (int) $limit;
-        if(empty($this->limit)) {
-            $this->limit = 20;
-        }
     }
     
     /**
@@ -162,7 +153,7 @@ class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor
         $result = array();
         $i = 0;
         while($line = $file->fgetcsv(",", '"', '"')) {
-            if($i++ == 0 || empty($line) || empty($line[0]) || empty($line[1])){
+            if($i++ == 0 || empty($line) || empty($line[0]) || empty($line[1]) || empty($line[2])){
                 continue;
             }
 
@@ -185,7 +176,7 @@ class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor
             //   → but send only limit * results to the GUI not limit + 1
             // - if count(results) <= limit, that means we are on the last page.
             // - for total count we use just offset + count(results) and thats it 
-            $this->resultList->setTotal(min($this->searchCount, $this->limit + $this->offset + 1));
+            $this->resultList->setNextOffset(min($this->searchCount, $this->limit + $this->offset + 1));
         }
 
         return $this->resultList;
@@ -236,7 +227,7 @@ class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor
 
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::delete()
+     * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::delete()
      */
     public function delete() {
         $file = new SplFileInfo($this->getTmFile($this->tmmt->getId()));

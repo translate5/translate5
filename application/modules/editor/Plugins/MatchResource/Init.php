@@ -74,6 +74,10 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
     }
     
     public function init() {
+        if(ZfExtended_Debug::hasLevel('plugin', 'MatchResource')) {
+            ZfExtended_Factory::addOverwrite('Zend_Http_Client', 'ZfExtended_Zendoverwrites_Http_DebugClient');
+        }
+        
         $this->initEvents();
         $this->initRoutes();
     }
@@ -298,5 +302,14 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
                 'action' => 'download'
             ));
         $r->addRoute('plugins_matchresource_download', $queryRoute);
+        
+        $queryRoute = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_matchresource_tmmt/:id/import',
+            array(
+                'module' => 'editor',
+                'controller' => 'plugins_matchresource_tmmt',
+                'action' => 'import'
+            ));
+        $r->addRoute('plugins_matchresource_import', $queryRoute);
     }
 }

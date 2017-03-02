@@ -37,8 +37,12 @@ END LICENSE AND COPYRIGHT
  * @method void setName() setName(string $name)
  * @method string getSourceLang() getSourceLang()
  * @method void setSourceLang() setSourceLang(integer $id)
+ * @method string getSourceLangRfc5646() getSourceLangRfc5646()
+ * @method void setSourceLangRfc5646() setSourceLangRfc5646(string $lang)
  * @method string getTargetLang() getTargetLang()
  * @method void setTargetLang() setTargetLang(integer $id)
+ * @method string getTargetLangRfc5646() getTargetLangRfc5646()
+ * @method void setTargetLangRfc5646() setTargetLangRfc5646(string $lang)
  * @method string getColor() getColor()
  * @method void setColor() setColor(string $color)
  * @method string getResourceId() getResourceId()
@@ -73,7 +77,7 @@ class editor_Plugins_MatchResource_Models_TmMt extends ZfExtended_Models_Entity_
         $assocDb = new editor_Plugins_MatchResource_Models_Db_Taskassoc();
         $assocName = $assocDb->info($assocDb::NAME);
         $s = $this->db->select()
-            ->from($this->db, array('*',$assocName.'.taskGuid'))
+            ->from($this->db, array('*',$assocName.'.taskGuid', $assocName.'.segmentsUpdateable'))
             ->setIntegrityCheck(false)
             ->join($assocName, $assocName.'.`tmmtId` = '.$this->db->info($assocDb::NAME).'.`id`', '')
             ->where($assocName.'.`taskGuid` in (?)', $taskGuidList);

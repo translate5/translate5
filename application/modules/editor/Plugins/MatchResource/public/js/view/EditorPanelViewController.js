@@ -1,4 +1,4 @@
-<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -28,33 +28,47 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
+/**#@++
  * @author Marc Mittag
  * @package editor
  * @version 1.0
  *
  */
 /**
- * Moses Service Base Class
+ * @class Editor.plugins.pluginFeasibilityTest.view.EditorPanel
+ * @extends Ext.panel.Panel
  */
-class editor_Plugins_MatchResource_Services_Moses_Service extends editor_Plugins_MatchResource_Services_ServiceAbstract {
-    const DEFAULT_COLOR = 'ffff00';
-    
-    
-    protected $resourceClass = 'editor_Plugins_MatchResource_Services_Moses_Resource';
-    
+Ext.define('Editor.plugins.MatchResource.view.EditorPanelViewController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.matchResourceEditorPanel',
+    requires: [
+        'Ext.panel.Tool'
+    ],
+    listen: {
+        component: {
+            "matchResourceEditorPanel": {
+                afterrender: 'initTools'
+            }
+        }
+    },
     /**
-     * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_ServiceAbstract::getName()
+     * Create the collapse button directly on the tab bar
      */
-    public function getName() {
-        return "Moses";
+    initTools: function() {
+        var me = this, 
+            view = me.view;
+        Ext.create({
+            xtype: 'tool',
+            type: 'down',
+            callback: function(){
+                view.collapse();
+            },
+            style: {
+                "position": "absolute",
+                "top": "13px",
+                "right": "16px"
+            },
+            renderTo: view.getTabBar().getEl()
+        });
     }
-    
-    public function __construct() {
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $urls = $config->runtimeOptions->plugins->MatchResource->moses->server;
-        $this->addResourceForeachUrl('Moses MT', $urls->toArray());
-    }
-}
+});

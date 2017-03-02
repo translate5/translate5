@@ -62,11 +62,11 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
         source: '#UT#Quelltext',
         target: '#UT#Zieltext',
         match: '#UT#Matchrate',
+        ctrl: '#UT#STRG',
         sourceEmptyText:'#UT#Quelltextsuche',
         targetEmptyText:'#UT#Zieltextsuche',
         tmresource:'#UT#TM-Ressource',
-        search:'#UT#Suche',
-        action:'#UT#Aktionen',
+        search:'#UT#Suche'
     },
     viewConfig: {
         enableTextSelection: true,
@@ -82,6 +82,11 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
                 result.push('view-editor-font-size');
             }
             return result.join(' ');
+        },
+        onScrollEnd: function(x, y) {
+            if(this.getHeight() + y + 10 >= this.el.dom.scrollHeight) {
+                this.fireEvent('scrollbottomreached', this);
+            }
         }
     },
     initConfig: function(instanceConfig) {
@@ -89,36 +94,28 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
             config = {
                 columns: [{
                     xtype: 'gridcolumn',
-                    flex: 33/100,
+                    flex: 2,
                     dataIndex: 'source',
+                    tdCls: 'segment-tag-column source',
                     cellWrap: true,
                     text: me.strings.source
                 },{
                     xtype: 'gridcolumn',
-                    flex: 33/100,
+                    flex: 2,
                     dataIndex: 'target',
+                    tdCls: 'segment-tag-column target',
                     cellWrap: true,
                     text: me.strings.target
                 },{
                     xtype: 'gridcolumn',
-                    flex: 33/100,
+                    flex: 1,
                     dataIndex: 'service',
                     renderer: function(val, meta, record) {
-                        var str =me.assocStore.findRecord('id',record.get('tmmtid'));
+                        var str = me.assocStore.findRecord('id',record.get('tmmtid'));
                         meta.tdStyle="background-color:#"+str.get('color')+" !important;";
                         return str.get('name')+' ('+str.get('serviceName')+')';
                     },
                     text: me.strings.tmresource
-                },{
-                    xtype: 'actioncolumn',
-                    width: 60,
-                    renderer: function(val, meta, record) {
-                        if(record.get('showMoreIcon')){
-                            meta.tdAttr = 'data-qtip="Show more..."';
-                            meta.tdCls  = meta.tdCls  + 'ico-tm-show-more';
-                        }
-                    },
-                    text: me.strings.action
                 }],
                 dockedItems: [{
                     xtype: 'panel',

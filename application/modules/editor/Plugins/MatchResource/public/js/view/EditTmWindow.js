@@ -28,22 +28,21 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
+Ext.define('Editor.plugins.MatchResource.view.EditTmWindow', {
     extend: 'Ext.window.Window',
     requires: [
         'Ext.ux.colorpick.Button',
         'Ext.ux.colorpick.Field'
     ],
-    alias: 'widget.addTmWindow',
-    itemId: 'addTmWindow',
+    alias: 'widget.editTmWindow',
+    itemId: 'editTmWindow',
     strings: {
-        add: '#UT#Matchressource hinzufügen',
+        edit: '#UT#Matchressource hinzufügen',
         resource: '#UT#Ressource',
         name: '#UT#Name',
         source: '#UT#Quellsprache',
         target: '#UT#Zielsprache',
-        file: '#UT#TM/TMX-Datei (optional)',
-        importTmxType: '#UT#Bitte verwenden Sie eine TM oder TMX Datei!',
+        file: '#UT#TM-Datei',
         color: '#UT#Farbe',
         colorTooltip: '#UT#Farbe dieser Matchressource',
         save: '#UT#Speichern',
@@ -55,13 +54,13 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
     layout:'fit',
     initConfig : function(instanceConfig) {
         var me = this,
-        langCombo = {
-                xtype: 'combo',
-                typeAhead: true,
-                displayField: 'label',
-                forceSelection: true,
-                queryMode: 'local',
-                valueField: 'id'
+        langField = {
+                xtype: 'displayfield',
+                renderer: function(id) {
+                    var store = Ext.getStore('admin.Languages'),
+                        resource = store.getById(id);
+                    return resource ? resource.get('label') : id;
+                }
             },
             config = {},
             defaults = {
@@ -69,73 +68,41 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
                 anchor: '100%'
             },
         config = {
-            title: me.strings.add,
+            title: me.strings.edit,
             items : [{
                 xtype: 'form',
                 padding: 5,
                 ui: 'default-frame',
                 defaults: defaults,
                 items: [{
-                    xtype: 'combo',
+                    xtype: 'displayfield',
                     name:'resourceId',
-                    allowBlank: false,
-                    typeAhead: true,
-                    forceSelection: true,
-                    queryMode: 'local',
-                    valueField: 'id',
-                    displayField: 'name',
-                    store:'Editor.plugins.MatchResource.store.Resources',
+                    renderer: function(id) {
+                        var store = Ext.getStore('Editor.plugins.MatchResource.store.Resources'),
+                            resource = store.getById(id);
+                        return resource ? resource.get('name') : id;
+                    },
                     fieldLabel: me.strings.resource
                 },{
-                    //FIXME disable renaming of a TM, since OpenTM2 uses this name to identify the TM
-                    xtype: 'textfield',
+                    xtype: 'displayfield',
                     name: 'name',
-                    maxLength: 255,
-                    allowBlank: false,
-                    toolTip:'Name',
+                    toolTip: me.strings.name,
                     fieldLabel: me.strings.name
                 },Ext.applyIf({
                     name: 'sourceLang',
-                    allowBlank: false,
                     toolTip: me.strings.source,
-                    //each combo needs its own store instance, see EXT6UPD-8
-                    store: Ext.create(Editor.store.admin.Languages),
                     fieldLabel: me.strings.source
-                }, langCombo),Ext.applyIf({
+                }, langField),Ext.applyIf({
                     name: 'targetLang',
-                    allowBlank: false,
                     toolTip: me.strings.target,
-                    //each combo needs its own store instance, see EXT6UPD-8
-                    store:Ext.create(Editor.store.admin.Languages),
                     fieldLabel: me.strings.target
-                }, langCombo),{
-                    xtype: 'hiddenfield',
-                    name: 'serviceType',
-                    dataIndex: 'serviceType',
-                    maxLength: 255,
-                    allowBlank: false
-                },{
-                    xtype: 'hiddenfield',
-                    name: 'serviceName',
-                    dataIndex: 'serviceName',
-                    maxLength: 255,
-                    allowBlank: false
-                },{
+                }, langField),{
                     xtype: 'colorfield',
                     fieldLabel: me.strings.color,
                     toolTip: me.strings.colorTooltip, 
                     labelWidth: 160,
                     anchor: '100%',
                     name: 'color'
-                },{
-                    xtype: 'filefield',
-                    name: 'tmUpload',
-                    allowBlank: true,
-                    toolTip: me.strings.file,
-                    regex: /\.(tm|tmx)$/i,
-                    regexText: me.strings.importTmxType,
-                    disabled:true,
-                    fieldLabel: me.strings.file
                 }]
             }],
             dockedItems : [{
@@ -165,5 +132,12 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
+    },
+    /**
+     * loads the record into the form
+     * @param record
+     */
+    loadRecord: function(record) {
+        this.down('form').loadRecord(record);
     }
 });

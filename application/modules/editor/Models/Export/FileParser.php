@@ -411,28 +411,7 @@ abstract class editor_Models_Export_FileParser {
      * @return string $segment 
      */
     protected function parseSegment($segment) {
-        $segmentArr = preg_split(editor_Models_Segment_InternalTag::REGEX_INTERNAL_TAGS, $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
-        $count = count($segmentArr);
-        //TODO move this logic into the InternalTag helper and use preg_replace_callback since its easier to understand
-        for ($i = 1; $i < $count;) {
-            $j = $i + 2;
-            // detect if single-tag is regex-tag, if not capsule result with brackets (= normal behavior)
-            $isRegexTag = $segmentArr[$i+2] == "regex";
-            $segmentArr[$i] = pack('H*', $segmentArr[$i + 1]);
-            if (!$isRegexTag) {
-                //the following search and replace is needed for TRANSLATE-464
-                //backwards compatibility of already imported tasks
-                $search = array('hardReturn /','softReturn /','macReturn /');
-                $replace = array('hardReturn/','softReturn/','macReturn/');
-                $segmentArr[$i] = str_replace($search, $replace, $segmentArr[$i]);
-                $segmentArr[$i] = '<' . $segmentArr[$i] .'>';
-            }
-            
-            unset($segmentArr[$j]);
-            unset($segmentArr[$i + 1]);
-            $i = $i + 4;
-        }
-        return implode('', $segmentArr);
+        return $this->tagHelper->restore($segment);
     }
     
     /**

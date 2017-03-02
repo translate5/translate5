@@ -35,26 +35,37 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * Moses Service Base Class
+ * Lucy LT Service Base Class
  */
-class editor_Plugins_MatchResource_Services_Moses_Service extends editor_Plugins_MatchResource_Services_ServiceAbstract {
-    const DEFAULT_COLOR = 'ffff00';
+class editor_Plugins_MatchResource_Services_LucyLT_Service extends editor_Plugins_MatchResource_Services_ServiceAbstract {
+    const DEFAULT_COLOR = '1f962e';
     
     
-    protected $resourceClass = 'editor_Plugins_MatchResource_Services_Moses_Resource';
+    protected $resourceClass = 'editor_Plugins_MatchResource_Services_LucyLT_Resource';
     
     /**
      * (non-PHPdoc)
      * @see editor_Plugins_MatchResource_Services_ServiceAbstract::getName()
      */
     public function getName() {
-        return "Moses";
+        return "Lucy LT";
     }
     
     public function __construct() {
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
-        $urls = $config->runtimeOptions->plugins->MatchResource->moses->server;
-        $this->addResourceForeachUrl('Moses MT', $urls->toArray());
+        $urls = $config->runtimeOptions->plugins->MatchResource->lucylt->server->toArray();
+        $credentials = $config->runtimeOptions->plugins->MatchResource->lucylt->credentials->toArray();
+        
+        $i = 1;
+        $service = $this->getServiceNamespace();
+        foreach ($urls as $idx => $url) {
+            //ignore entry when no credentials found (empty check not possible, since empty credentials are valid!)
+            if(!array_key_exists($idx, $credentials)){
+                continue;
+            }
+            $id = $service.'_'.$i++;
+            $this->addResource([$id, 'Lucy LT', $url, $credentials[$idx]]);
+        }
     }
 }

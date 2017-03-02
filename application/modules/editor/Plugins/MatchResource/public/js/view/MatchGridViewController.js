@@ -66,9 +66,6 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
         controller:{
             '#editorcontroller': {
                 prevnextloaded:'calculateRows'
-            },
-            '#ViewModes':{
-                viewModeChanged:'viewModeChangeEvent'//FIXME it is beter to hook up on this event or define a boolen variable in Editor
             }
         }
     },
@@ -103,6 +100,8 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
     },
     endEditing: function() {
         var me = this;
+        Ext.Array.remove(me.cacheSegmentIndex, me.editedSegmentId);
+        me.cachedResults.removeAtKey(me.editedSegmentId);
         me.editedSegmentId = -1;
         me.getView().getStore('editorquery').removeAll();
 	},
@@ -124,14 +123,6 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
         }
         me.checkCacheLength();
         me.cache();
-    },
-    viewModeChangeEvent: function(controller){
-        var me = this;
-        //isViewMode
-        //isErgonomicMode
-        //isEditMode
-        //me.handleViwMode(controller.self.isErgonomicMode());
-        //console.log(me.getView().getStore().refresh());
     },
     cache: function(){
         var me = this,
@@ -254,15 +245,26 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
     },
     handleRequestSuccess: function(controller,response,segmentId,tmmtid,query){
         var me = controller,
-            resp = Ext.util.JSON.decode(response.responseText); 
+            resp = Ext.util.JSON.decode(response.responseText),
+            editorquery = me.getView().getStore('editorquery');
+
         if(segmentId == me.editedSegmentId){
-            me.getView().getStore('editorquery').remove(me.getView().getStore('editorquery').findRecord('tmmtid',tmmtid));
+            editorquery.remove(editorquery.findRecord('tmmtid',tmmtid));
         }
+
+        //when saving a segment before the match requests are loaded, 
+        // then the segment is removed already from the cache, 
+        // so there is no way and no need to show data
+        if(!me.cachedResults.get(segmentId)){
+            return;
+        }
+
         if(typeof resp.rows !== 'undefined' && resp.rows !== null && resp.rows.length){
             me.cachedResults.get(segmentId).add(tmmtid,resp);
             me.loadCachedDataIntoGrid(segmentId,tmmtid);
             return;
         }
+        
         var noresults = {
                 rows: [{
                     source: me.strings.noresults,
@@ -294,7 +296,15 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
                 break;
             case 500:
                 json = Ext.JSON.decode(response.responseText);
-                targetMsg = json.errors[0]._errorMessage;
+                if(json.errors && json.errors[0] && json.errors[0]._errorMessage) {
+                    targetMsg = json.errors[0]._errorMessage;
+                }
+                else if(json.errors && json.errors.message) {
+                    targetMsg = json.errors.message;
+                }
+                else {
+                    targetMsg = response.responseText;
+                }
                 respStatusMsg = me.strings.serverErrorMsg500;
                 break;
         }

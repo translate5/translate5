@@ -35,19 +35,19 @@ class editor_Plugins_MatchResource_Models_Resource {
     protected $name;
     
     /**
-     * Flag if this resource is filebased or not
-     * service can set this flag as it needs it. for the case if some new services added in the future
-     * can have filebased resources and non filebased ones at the same time
-     *  
-     * @var boolean
-     */
-    protected $filebased = false;
-    
-    /**
      * Match Type in the sense of the matchrate type
      * @var string
      */
     protected $type = editor_Models_Segment_MatchRateType::TYPE_TM;
+    
+    /**
+     * Flag if this resource is filebased or not
+     * service can set this flag as it needs it. for the case if some new services added in the future
+     * can have filebased resources and non filebased ones at the same time
+     * Must be overridden by class extension
+     * @var boolean
+     */
+    protected $filebased = true;
     
     /**
      * Flag if this resource can be triggered for search requests
@@ -55,6 +55,13 @@ class editor_Plugins_MatchResource_Models_Resource {
      * @var boolean
      */
     protected $searchable = true;
+    
+    /**
+     * Flag if edited matches can ba saved back to this resource
+     * Must be overridden by class extension
+     * @var boolean
+     */
+    protected $writable = true;
     
     protected $service;
     
@@ -72,13 +79,20 @@ class editor_Plugins_MatchResource_Models_Resource {
             'serviceType' => 'serviceType',
             'filebased' => 'filebased',
             'searchable' => 'searchable',
+            'writable' => 'writable',
             'defaultColor' => 'defaultColor',
     );
     
-    public function __construct($id, $name, $filebased = false) {
+    /**
+     * Resource URL
+     * @var string
+     */
+    protected $url;
+    
+    public function __construct($id, $name, $url) {
         $this->id = $id;
-        $this->name = $name;
-        $this->filebased = $filebased;
+        $this->name = $name.' - '.$url;
+        $this->url = $url;
     }
     
     public function getId() {
@@ -107,6 +121,14 @@ class editor_Plugins_MatchResource_Models_Resource {
      */
     public function getSearchable() {
         return $this->searchable;
+    }
+    
+    /**
+     * returns if resource is writable or not
+     * @return boolean
+     */
+    public function getWritable() {
+        return $this->writable;
     }
     
     /**
@@ -142,6 +164,26 @@ class editor_Plugins_MatchResource_Models_Resource {
     }
     
     /**
+     * returns true if the resource can deal with the given source language
+     * returns true per default, must be implemented in the service specific resource classes
+     * @param editor_Models_Languages $sourceLang
+     * @return boolean
+     */
+    public function hasSourceLang(editor_Models_Languages $sourceLang) {
+        return true;
+    }
+    
+    /**
+     * returns true if the resource can deal with the given target language
+     * returns true per default, must be implemented in the service specific resource classes
+     * @param editor_Models_Languages $targetLang
+     * @return boolean
+     */
+    public function hasTargetLang(editor_Models_Languages $targetLang) {
+        return true;
+    }
+    
+    /**
      * sets the service type
      * @param string $name
      * @param string $type
@@ -151,6 +193,13 @@ class editor_Plugins_MatchResource_Models_Resource {
         $this->service = $name;
         $this->serviceType = $type;
         $this->defaultColor = $defaultColor;
+    }
+    
+    /**
+     * returns the configured URL
+     */
+    public function getUrl() {
+        return $this->url;
     }
     
     /**
@@ -164,5 +213,17 @@ class editor_Plugins_MatchResource_Models_Resource {
             $data->$key = $this->$method();
         }
         return $data;
+    }
+    
+    /**
+     * Returns just the resources meta data
+     * @return boolean[]
+     */
+    public function getMetaData() {
+        return [
+            'writable' => $this->writable,
+            'searchable' => $this->searchable,
+            'filebased' => $this->filebased,
+        ];
     }
 }

@@ -53,10 +53,10 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
                 click:'handleSubmitButtonClick'
             },
             '#searchGridPanel':{
-                render:'searchGridPanelRender'
+                render:'searchGridPanelRender',
             },
-            '#searchGridPanel actioncolumn':{
-                click:'handleMoreColumnClick'
+            '#searchGridPanel tableview':{
+                scrollbottomreached: 'handleScrollBottomReached'
             }
         },
         controller:{
@@ -83,9 +83,9 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
         query:'',
         field:null
     },
+    offset: new Ext.util.HashMap(),
     lastActiveField:null,
     SERVER_STATUS: null,//initialized after search grid panel is rendered
-    RESULTS_ROW_LIMIT: 5,//the limit of result rows for each 'tmmt'
     searchGridPanelRender: function(){
         var me=this;
         me.assocStore = me.getView().assocStore; 
@@ -93,30 +93,27 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
     },
     textFieldTextChange:function(field,event){
         var me=this;
-        me.enterKeyPres(field, event);
-        me.lastActiveField = field;
-    },
-    enterKeyPres:function(field,event){
-        var me=this;
         if (event.getKey() == event.ENTER){
-            me.getViewModel().getStore('editorsearch').removeAll();
-            me.lastSearch.query= field.value;
-            me.lastSearch.field = field.name;
-            me.closeTabs();
-            me.search();
-            me.clearTextField(me.lastSearch.field);
+            me.startSearch(field.value, field.name);
         }
+        me.lastActiveField = field;
     },
     handleSubmitButtonClick:function(){
         var me=this;
         if(me.lastActiveField && me.lastActiveField.value!=""){
-            me.getViewModel().getStore('editorsearch').removeAll();
-            me.lastSearch.query= me.lastActiveField.value;
-            me.lastSearch.field = me.lastActiveField.name;
-            me.closeTabs();
-            me.search();
-            me.clearTextField(me.lastActiveField.name);
+            me.startSearch(me.lastActiveField.value, me.lastActiveField.name);
         }
+    },
+    startSearch: function(querystring, field) {
+        var me = this;
+        if(!querystring) {
+            return;
+        }
+        me.getViewModel().getStore('editorsearch').removeAll();
+        me.lastSearch.query= querystring;
+        me.lastSearch.field = field;
+        me.search();
+        me.clearTextField(field);
     },
     viewModeChangeEvent: function(controller){
         var me = this,
@@ -127,116 +124,180 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
         me.getView().getView().refresh();
         tabPanel.getActiveTab().getView().refresh()
     },
-    search:function(){
-        var me=this;
-        if(me.assocStore){
-            me.abortAllRequests();
-            me.assocStore.each(function(record){
-                if(record.get('searchable')){
-                    me.sendRequest(record.get('id'));
-                }
-            });
+    handleScrollBottomReached: function(){
+        var me = this;
+        if(me.executedRequests.getCount() > 0) {
+            return;
         }
+        me.search(true);
+    },
+    /**
+     * @param {Boolean} [resume] 
+     */
+    search:function(resume){
+        var me=this;
+        if(!me.assocStore){
+            return;
+        }
+        me.abortAllRequests();
+        if(!resume) {
+            me.offset.clear();
+        }
+        me.assocStore.each(function(record){
+            if(record.get('searchable')){
+                me.sendRequest(record.get('id'));
+            }
+        });
     },
     sendRequest:function(tmmtid){
-        var me = this;
+        var me = this,
+            offset = me.offset.get(tmmtid),
+            loadingId;
+
+        //No more results for this TMMT
+        if(offset === null) {
+            return;
+        }
+        //this is the first call, so we have to send null as offset to the server
+        if(offset === undefined) {
+            offset = null;
+        }
+
+
+        loadingId = 'TM-'+tmmtid+'-offset-'+offset;
+        me.loadDataIntoGrid({rows: [{
+            id: loadingId,
+            source: me.strings.loading,
+            target: me.strings.loading,
+            tmmtid: tmmtid,
+            state: me.SERVER_STATUS.SERVER_STATUS_LOADING
+        }]}, true);
+
         me.executedRequests.add(tmmtid,Ext.Ajax.request({
             url:Editor.data.restpath+'plugins_matchresource_tmmt/'+tmmtid+'/search',
                 method: "POST",
+                scope: this,
                 params: {
                     query: me.lastSearch.query,
                     field: me.lastSearch.field,
-                    limit:me.RESULTS_ROW_LIMIT + 1
+                    offset: offset
                 },
                 success: function(response){
-                    me.handleRequestSuccess(me, response,tmmtid, me.lastSearch.query);
+                    me.removeLoadingEntry(loadingId);
+                    me.handleRequestSuccess(response, tmmtid, me.lastSearch.query, offset);
                     me.executedRequests.removeAtKey(tmmtid);
+                    me.continueSearchToFillGrid();
                 }, 
                 failure: function(response){
-                    me.handleRequestFailure(me, response, tmmtid);
+                    me.removeLoadingEntry(loadingId);
+                    me.handleRequestFailure(response, tmmtid);
                     me.executedRequests.removeAtKey(tmmtid);
+                    me.continueSearchToFillGrid();
                 }
         }));
     },
-    handleRequestSuccess: function(controller,response,tmmtid,query){
-        var me = controller,
+    continueSearchToFillGrid: function() {
+        var view = this.getView().getView();
+        if(this.executedRequests.getCount() > 0) {
+            return;
+        }
+        if(view.getHeight() >= view.el.dom.scrollHeight) {
+            this.search(true);
+        }
+    },
+    handleRequestSuccess: function(response, tmmtid, query, offset){
+        var me = this,
             resp = Ext.util.JSON.decode(response.responseText);
-        
+
         //me.getView().getStore('editorsearch').remove(me.getView().getStore('editorsearch').findRecord('tmmtid',tmmtid));
         if(typeof resp.rows !== 'undefined' && resp.rows !== null && resp.rows.length){
+            me.offset.add(tmmtid, resp.nextOffset);
             me.loadDataIntoGrid(resp);
             return;
         }
-        var noresults = {
-                rows: [{
-                    source: me.strings.noresults,
-                    tmmtid: tmmtid,
-                    state:  me.SERVER_STATUS.SERVER_STATUS_NORESULT
-                }]
-            };
-        me.loadDataIntoGrid(noresults);
+
+        //when its a resumed search (with offset) then we don't have to show the "noresult" entry
+        if(offset) {
+            return;
+        }
+
+        //when displaying the noresults text, no more entries exist, set offset to null
+        me.offset.add(tmmtid, null);
+        me.loadDataIntoGrid({rows: [{
+            source: me.strings.noresults,
+            tmmtid: tmmtid,
+            state:  me.SERVER_STATUS.SERVER_STATUS_NORESULT
+        }]});
     },
-    handleRequestFailure: function(controller,response,tmmtid){
-        var me = controller,
-            respStatusMsg = me.strings.serverErrorMsgDefault,
-            strState =  me.SERVER_STATUS.SERVER_STATUS_SERVERERROR,
-            timeOut = null;
+    removeLoadingEntry: function(loadingId) {
+        var me = this,
+            store = me.getView().getStore('editorsearch'),
+            loader = store.getById(loadingId);
 
-
+        //remove dummy loading entry
+        if(loader){
+            //must be silent, otherwise the grid scrolls back to the top
+            store.remove(loader, false, true);
+            me.getView().getView().refreshView();
+        }
+    },
+    handleRequestFailure: function(response,tmmtid){
+        var me = this,
+            errorEntry = {
+                source: me.strings.serverErrorMsgDefault,
+                target: '',
+                tmmtid: tmmtid,
+                state: me.SERVER_STATUS.SERVER_STATUS_SERVERERROR
+            },
+            errors = [errorEntry];
         switch(response.status){
             case -1:
-                respStatusMsg = me.strings.serverErrorMsgDefault;
+                errorEntry.source = me.strings.serverErrorMsgDefault;
                 break;
             case 408:
-                respStatusMsg = me.strings.serverErrorMsg408;
-                strState = me.SERVER_STATUS.SERVER_STATUS_CLIENTTIMEOUT;
+                errorEntry.source = me.strings.serverErrorMsg408;
+                errorEntry.state = me.SERVER_STATUS.SERVER_STATUS_CLIENTTIMEOUT;
                 break;
             case 500:
-                respStatusMsg = me.strings.serverErrorMsg500;
+            case 502:
+                json = Ext.JSON.decode(response.responseText);
+                errorEntry.source = me.strings.serverErrorMsg500;
+                if(json.errors && json.errors[0] && json.errors[0]._errorMessage) {
+                    errorEntry.target = json.errors[0]._errorMessage;
+                }
+                else if(json.errors && json.errors.message) {
+                    //is this code even possible?
+                    errorEntry.target = json.errors.message;
+                }
+                else if(json.errors && json.errors.length > 0) {
+                    errors = [];//remove errorEntry
+                    for(var i = 0;i<json.errors.length;i++){
+                        //create one error entry per error message
+                        errors.push(Ext.applyIf({
+                            source: json.errors[i].msg,
+                            target: Editor.MessageBox.dataTable(json.errors[i].data)
+                        },errorEntry));
+                    }
+                }
+                else {
+                    errorEntry.target = response.responseText;
+                }
                 break;
         }
-        timeOut={
-                rows: [{
-                    source: respStatusMsg,
-                    target: '',
-                    tmmtid: tmmtid,
-                    state: strState
-                }]
-            };
-        me.loadDataIntoGrid(timeOut);
+        me.loadDataIntoGrid({rows: errors});
     },
-    loadDataIntoGrid: function(resp) {
+    /**
+     * @param {Object} resp contains the resultset to be loaded into the store
+     * @param {Boolean} [scrollToBottom] if true, the grid scrolls to the bottom after adding the data
+     */
+    loadDataIntoGrid: function(resp, scrollToBottom) {
         var me = this;
-        if(resp.rows && resp.rows.length > me.RESULTS_ROW_LIMIT){
-            resp.rows.splice(resp.rows.length-1,1);
-            resp.rows[resp.rows.length-1].showMoreIcon= true;
+            view = me.getView(),
+            store = me.getViewModel().getStore('editorsearch');
+        store.loadRawData(resp.rows,true);
+        if(scrollToBottom) {
+            view.ensureVisible(store.last());
         }
-        me.getViewModel().getStore('editorsearch').loadRawData(resp.rows,true);
-    },
-    handleMoreColumnClick: function(view, item, colIndex, rowIndex, e, record, row){
-        var me = this,
-            tabPanel = me.getView().up('tabpanel'),
-            tmmt = me.assocStore.findRecord('id',record.get('tmmtid'));
-        
-        if(!record.get('showMoreIcon')){
-            return;
-        }
-        if(tabPanel.down('#searchResultTab-'+record.get('tmmtid'))){ //provide the tmmtid
-            tabPanel.setActiveTab(tabPanel.down('#searchResultTab-'+record.get('tmmtid')));
-            return;
-        }
-        tabPanel.add({
-            xtype:'matchResourceSearchResultGrid',
-            assocStore:me.assocStore,
-            title: Ext.String.format(me.strings.searchResultGridTitle, tmmt.get('name')),
-            closable :true,
-            hidden: false,
-            itemId: 'searchResultTab-'+record.get('tmmtid'),
-            query: me.lastSearch.query,
-            field: me.lastSearch.field,
-            tmmtid:record.get('tmmtid')
-        });
-        tabPanel.setActiveTab(tabPanel.down('#searchResultTab-'+record.get('tmmtid')));
     },
     abortAllRequests:function(){
         var me=this;
@@ -244,6 +305,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
             me.executedRequests.each(function(key, value, length){
                     me.executedRequests.get(key).abort();
             });
+            me.executedRequests.clear();
         }
     },
     clearTextField:function(name){
@@ -252,16 +314,5 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
             return;
         }
         Ext.getCmp("sourceSearch").setValue(""); 
-    },
-    closeTabs:function(){
-        var me=this,
-            tabPanel=me.getView().up('tabpanel');
-        if(tabPanel.items.getCount()>2){
-            me.assocStore.each(function(record){
-                if(tabPanel.down('#searchResultTab-'+record.get('id'))){
-                    tabPanel.remove(tabPanel.down('#searchResultTab-'+record.get('id')).itemId);
-                }
-            });
-        }
     }
 });

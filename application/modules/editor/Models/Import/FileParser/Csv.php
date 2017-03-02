@@ -422,7 +422,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     }
     
     /**
-     * be careful: if regex does not contain a "<", this method will simply return the segment (for performance reasons)
+     * be careful: if segment does not contain a "<", this method will simply return the segment (for performance reasons)
      * @param string $segment
      * @param string $tagToReplaceRegex - should contain a regex, that stands for a tag, that should be hidden for parsing reasons by a placeholder.
      * @return string 
@@ -618,7 +618,8 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
                 'class' => implode('', unpack('H*', $tag)),
                 'text' => $this->encodeTagsForDisplay($tag),
                 'shortTag' => $tagId,
-                'id' => 'regex-'.$tagId.'-' . $fileNameHash,
+                'id' => 'regex',
+                'filenameHash' => $fileNameHash,
             );
             
             $r = $this->_singleTag->getHtmlTag($p);

@@ -164,6 +164,54 @@
         <source>Zugewiesene Aufgaben</source>
         <target>Zugewiesene Aufgaben</target>
     </trans-unit>
+    <trans-unit id='TWF0Y2hyZXNzb3VyY2UgYmVhcmJlaXRlbg=='>
+        <source>Matchressource bearbeiten</source>
+        <target>Matchressource bearbeiten</target>
+    </trans-unit>
+    <trans-unit id='U1RSRw=='>
+        <source>STRG</source>
+        <target>STRG</target>
+    </trans-unit>
+    <trans-unit id='UmVzc291cmNlIGluIEF1ZmdhYmUgdmVyd2VuZGVu'>
+        <source>Ressource in Aufgabe verwenden</source>
+        <target>Ressource in Aufgabe verwenden</target>
+    </trans-unit>
+    <trans-unit id='U2VnbWVudGUgenVyw7xja3NwZWljaGVybg=='>
+        <source>Segmente zurückspeichern</source>
+        <target>Segmente zurückspeichern</target>
+    </trans-unit>
+    <trans-unit id='V2VpdGVyZSBUTSBEYXRlbiBpbiBGb3JtIGVpbmVyIFRNWCBEYXRlaSBpbXBvcnRpZXJlbiB1bmQgZGVtIFRNIGhpbnp1ZsO8Z2Vu'>
+        <source>Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen</source>
+        <target>Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen</target>
+    </trans-unit>
+    <trans-unit id='VE1YLURhdGVp'>
+        <source>TMX-Datei</source>
+        <target>TMX-Datei</target>
+    </trans-unit>
+    <trans-unit id='VE1YIERhdGVpIGltcG9ydGllcmVu'>
+        <source>TMX Datei importieren</source>
+        <target>TMX Datei importieren</target>
+    </trans-unit>
+    <trans-unit id='V2VpdGVyZSBUTSBEYXRlbiBpbiBGb3JtIGVpbmVyIFRNWCBEYXRlaSBpbXBvcnRpZXJlbiB1bmQgZGVtIGJlc3RlaGVuZGVuIFRNIGhpbnp1ZsO8Z2Vu'>
+        <source>Weitere TM Daten in Form einer TMX Datei importieren und dem bestehenden TM hinzufügen</source>
+        <target>Weitere TM Daten in Form einer TMX Datei importieren und dem bestehenden TM hinzufügen</target>
+    </trans-unit>
+    <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRNWCBEYXRlaSE='>
+        <source>Bitte verwenden Sie eine TMX Datei!</source>
+        <target>Bitte verwenden Sie eine TMX Datei!</target>
+    </trans-unit>
+    <trans-unit id='V2VpdGVyZSBUTSBEYXRlbiBlcmZvbGdyZWljaCBpbXBvcnRpZXJ0IQ=='>
+        <source>Weitere TM Daten erfolgreich importiert!</source>
+        <target>Weitere TM Daten erfolgreich importiert!</target>
+    </trans-unit>
+    <trans-unit id='VE0vVE1YLURhdGVpIChvcHRpb25hbCk='>
+        <source>TM/TMX-Datei (optional)</source>
+        <target>TM/TMX-Datei (optional)</target>
+    </trans-unit>
+    <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRNIG9kZXIgVE1YIERhdGVpIQ=='>
+        <source>Bitte verwenden Sie eine TM oder TMX Datei!</source>
+        <target>Bitte verwenden Sie eine TM oder TMX Datei!</target>
+    </trans-unit>
   </body>
  </file>
 </xliff>

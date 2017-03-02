@@ -80,6 +80,12 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
           },
           'matchResourceTaskAssocPanel #btnReload': {
               click: 'handleOnReload'
+          },
+          '#tmTaskAssocGrid checkcolumn[dataIndex="segmentsUpdateable"]': {
+              checkchange: 'handleSegmentsUpdateableChange'
+          },
+          '#tmTaskAssocGrid checkcolumn[dataIndex="checked"]': {
+              checkchange: 'handleCheckedChange'
           }
       }
   },
@@ -114,6 +120,25 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
       me.getGrid().store.reload();
   },
   /**
+   * uncheck segmentsUpdateable when uncheck whole row, restore segmentsUpdateable if recheck row
+   */
+  handleCheckedChange: function(column, rowIdx, checked){
+      var me = this,
+          record = me.getGrid().store.getAt(rowIdx),
+          oldValue = record.isModified('segmentsUpdateable') && record.getModified('segmentsUpdateable');
+      record.set('segmentsUpdateable', checked && oldValue);
+  },
+  /**
+   * check row when segmentsUpdateable is checked
+   */
+  handleSegmentsUpdateableChange: function(column, rowIdx, checked) {
+      var me = this,
+          record = me.getGrid().store.getAt(rowIdx);
+      if(checked && !record.get('checked')) {
+          record.set('checked', true);
+      }
+  },
+  /**
    * currently no easy "subentity" versioning is possible here, because of the bulk (store each) like saving / deleting.
    * on the other hand no versioning is needed, master entity tmmt does not contain changeable values which affects the taskassoc entity
    * The taskassocs itself can be handled by plain 404 already deleted and duplicate entry messages.
@@ -126,16 +151,27 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
           return;
       }
       var str = me.strings,
-          checkedData = {
-          data: Ext.JSON.encode({
+          params = {},
+          method = 'DELETE',
+          url = Editor.data.restpath+'plugins_matchresource_taskassoc',
+          checkedData = Ext.JSON.encode({
               tmmtId: record.get('id'),
-              taskGuid: me.actualTask.get('taskGuid')
-          })
-      };
+              taskGuid: me.actualTask.get('taskGuid'),
+              segmentsUpdateable: record.get('segmentsUpdateable')
+          });
+
+      if(record.get('checked')) {
+          method = record.get('taskassocid') ? 'PUT' : 'POST';
+          params = {data: checkedData};
+      }
+      if(method != 'POST') {
+          url = url + '/'+record.get('taskassocid');
+      }
+      
       Ext.Ajax.request({
-          url:Editor.data.restpath+'plugins_matchresource_taskassoc' + (!record.data.checked ? '/'+record.get('taskassocid'):''),
-          method: record.data.checked ? "POST" : "DELETE",
-          params: record.data.checked ? checkedData : {} ,
+          url:url,
+          method: method,
+          params: params,
           success: function(response){
               me.requestsCount--;
               if(record.data.checked){
@@ -145,6 +181,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
                   Editor.MessageBox.addSuccess(str.assocSave);
               }
               else {
+                  record.set('taskassocid', 0);
                   Editor.MessageBox.addSuccess(str.assocDeleted);
               }
               record.commit();
