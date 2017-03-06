@@ -40,7 +40,7 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract {
 
     /**
-     * @var editor_Plugins_MatchResource_Services_OpenTM2_HttpApiV2
+     * @var editor_Plugins_MatchResource_Services_OpenTM2_HttpApi
      */
     protected $api;
     
@@ -50,7 +50,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      */
     public function connectTo(editor_Plugins_MatchResource_Models_TmMt $tmmt) {
         parent::connectTo($tmmt);
-        $class = 'editor_Plugins_MatchResource_Services_OpenTM2_HttpApiV2';
+        $class = 'editor_Plugins_MatchResource_Services_OpenTM2_HttpApi';
         $this->api = ZfExtended_Factory::get($class, [$tmmt]);
     }
     
@@ -59,8 +59,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::open()
      */
     public function open() {
-        //FIXME dieser call ist zum einen nicht nötig, zum anderen muss abgefangen werden OpenTM2 nicht da ist, da sonst kein Task geöffnet werden kann!
-        //$this->api->open();
+        //This call is not necessary, since TMs are opened automatically.
     }
     
     /**
@@ -68,7 +67,11 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::open()
      */
     public function close() {
-        $this->api->close();
+    /*
+     * This call deactivated, since openTM2 has a access time based garbage collection
+     * If we close a TM and another Task still uses this TM this bad for performance,
+     *  since the next request to the TM has to reopen it
+     */
     }
     
     /**
@@ -134,12 +137,11 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::getTm()
      */
     public function getTm(& $mime) {
-        $file = new SplFileInfo($this->getTmFile($this->tmmt->getId()));
-        if(!$file->isFile() || !$file->isReadable()) {
-            throw new ZfExtended_NotFoundException('requested TM file for dummy TM with the tmmtId '.$this->tmmt->getId().' not found!');
+        if($this->api->get()) {
+            $mime = 'application/csv';
+            return base64_decode($this->api->getResult()->data);
         }
-        $mime = 'application/csv';
-        return file_get_contents($file);
+        $this->throwBadGateway();
     }
 
     protected function getTmFile($id) {

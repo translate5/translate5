@@ -194,7 +194,7 @@ class editor_Plugins_MatchResource_Services_DummyFileTm_Connector extends editor
         $target = strip_tags($target);
         
         similar_text($queryString, $source, $percent);
-        if($percent < 80) {//FIXME why we need this cheking here ?
+        if($percent < 80) {
             return;
         }
         $this->resultList->addResult($target, $percent);

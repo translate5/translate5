@@ -381,7 +381,12 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
     
     /**
      * performs a tmmt search
-     * FIXME more docu here! 
+     * example URL /editor/plugins_matchresource_tmmt/14/search
+     * additional POST Parameters: 
+     *  query: querystring
+     *  field: source or target
+     *  offset: the offset from where the next search should start
+     * Since the GUI is dynamically loading additional content no traditional paging can be used here
      */
     public function searchAction() {
         $session = new Zend_Session_Namespace();

@@ -71,6 +71,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
     viewConfig: {
         enableTextSelection: true,
         getRowClass: function(record) {
+			//same class generation in MatchGrid!
             var me=this,
             result = ['match-state-'+record.get('state')],
             viewModesController = Editor.getApplication().getController('ViewModes').self;

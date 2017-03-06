@@ -38,9 +38,6 @@ END LICENSE AND COPYRIGHT
  * @class Editor.plugins.MatchResource.view.MatchGrid
  * @extends Ext.grid.Panel
  */
-
-//FIXME move viewConfig with fixed getRowClass into a mixin
-
 Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	extend: 'Ext.grid.Panel',
 	alias: 'widget.matchResourceMatchGrid',
@@ -84,6 +81,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	viewConfig: {
 	    enableTextSelection: true,
 	    getRowClass: function(record) {
+			//same class generation in SearchGrid!
 	        var me=this,
 	            result = ['match-state-'+record.get('state')],
 	            viewModesController = Editor.getApplication().getController('ViewModes').self;

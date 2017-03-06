@@ -82,10 +82,6 @@ class editor_Plugins_MatchResource_Services_LucyLT_Connector extends editor_Plug
         //strip xml container
         $foundResult = trim(strip_tags($foundResult, '<internalTag><internalTag/>'));
         
-        //FIXME ensure that Lucy returns each internalTag only once
-        //missing tags are fixed by the frontend, but errousnouly duplicated not!
-//FIXME also note down concept to refactor Tag concept in translate5 
-        
         //restore the internal tags
         $foundResult = str_replace(array_keys($data), array_values($data), $foundResult, $count);
         

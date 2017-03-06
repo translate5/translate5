@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Initial Class of Plugin "TranslationMemory"
  * 
- * @FIXME Hint: class must be named NOT Bootstrap, otherwise we will get a strange Zend Error
+ * Hint: class must be named NOT Bootstrap, otherwise we will get a strange Zend Error
  */
 class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
     
@@ -255,8 +255,6 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
             $matchRateType->add($matchRateType::TYPE_AUTO_PROPAGATED);
             $alikeSegment->setMatchRateType((string) $matchRateType);
         }
-        
-        //FIXME here also use matchratetype class to add auto flag
     }
     
     /**

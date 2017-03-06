@@ -87,7 +87,6 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
                     store:'Editor.plugins.MatchResource.store.Resources',
                     fieldLabel: me.strings.resource
                 },{
-                    //FIXME disable renaming of a TM, since OpenTM2 uses this name to identify the TM
                     xtype: 'textfield',
                     name: 'name',
                     maxLength: 255,
