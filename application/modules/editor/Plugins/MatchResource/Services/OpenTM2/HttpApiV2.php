@@ -122,7 +122,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApiV2 extends editor_Plu
         $json->source = $queryString;
         $json->documentName = $filename;
         $json->segmentNumber = ''; //FIXME can be used after implementing TRANSLATE-793
-        $json->markupTable = 'OTMXUXLF'; //FIXME can be used after implementing TRANSLATE-793
+        $json->markupTable = 'OTMXUXLF';
         $json->context = $segment->getMid(); // hier MID (Context war gedacht für die Keys (Dialog Nummer) bei übersetzbaren strings in Software)
         
         $http = $this->getHttpWithMemory('fuzzysearch');

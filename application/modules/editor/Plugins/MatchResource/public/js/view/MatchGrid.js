@@ -151,10 +151,8 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	          tdCls: 'matchrate',
 	          renderer: function(matchrate, meta, record) {
 	              var str =me.assocStore.findRecord('id',record.get('tmmtid'));
-	              if(matchrate > 0){
-	                  meta.tdAttr += 'data-qtip="'+str.get('name')+' ('+str.get('serviceName')+')"';
-	                  meta.tdCls  = meta.tdCls  + ' info-icon';
-	              }
+				  meta.tdAttr += 'data-qtip="'+str.get('name')+' ('+str.get('serviceName')+')"';
+				  meta.tdCls  = meta.tdCls  + ' info-icon';
 	              clr = str.get('color');
 	              meta.tdAttr += 'bgcolor="' + clr + '"';
 	              return "<b>"+(matchrate > 0 ? matchrate : '&nbsp;')+"</b>";

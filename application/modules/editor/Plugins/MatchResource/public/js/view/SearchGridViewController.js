@@ -210,7 +210,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
             resp = Ext.util.JSON.decode(response.responseText);
 
         //me.getView().getStore('editorsearch').remove(me.getView().getStore('editorsearch').findRecord('tmmtid',tmmtid));
-        if(typeof resp.rows !== 'undefined' && resp.rows !== null && resp.rows.length){
+        if(resp.rows && resp.rows.length){            
             me.offset.add(tmmtid, resp.nextOffset);
             me.loadDataIntoGrid(resp);
             return;
@@ -218,6 +218,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
 
         //when its a resumed search (with offset) then we don't have to show the "noresult" entry
         if(offset) {
+            me.offset.add(tmmtid, resp.nextOffset);
             return;
         }
 
