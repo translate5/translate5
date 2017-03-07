@@ -55,6 +55,18 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
     
     protected $error = array();
     
+    /**
+     * For logging purposes
+     * @var Zend_Http_Client
+     */
+    protected $http;
+    
+    /**
+     * For logging purposes
+     * @var string
+     */
+    protected $httpMethod;
+    
     public function __construct(editor_Plugins_MatchResource_Models_TmMt $tmmt) {
         $this->tmmt = $tmmt;
     }
@@ -67,9 +79,9 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $data->name = $memory;
         $data->sourceLang = $sourceLanguage;
         
-        $http = $this->getHttp();
+        $http = $this->getHttp('POST');
         $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
-        $res = $http->request('POST');
+        $res = $http->request();
         return $this->processResponse($res);
     }
     
@@ -82,9 +94,9 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $data->name = $memory;
         $data->sourceLang = $sourceLanguage;
         
-        $http = $this->getHttp();
+        $http = $this->getHttp('POST');
         $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
-        $res = $http->request('POST');
+        $res = $http->request();
         return $this->processResponse($res);
     }
     
@@ -98,51 +110,55 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $data = new stdClass();
         $data->tmxData = base64_encode($tmData);
 
-        $http = $this->getHttpWithMemory('/import');
+        $http = $this->getHttpWithMemory('POST', '/import');
         $http->setConfig(['timeout' => 120]);
         $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
         
-        $res = $http->request('POST');
+        $res = $http->request();
         return $this->processResponse($res);
     }
     
     /**
      * prepares a Zend_Http_Client, prefilled with the configured URL + the given REST URL Parts (ID + verbs)
+     * @param string $httpMethod
      * @param string $urlSuffix
      * @return Zend_Http_Client
      */
-    protected function getHttp($urlSuffix = '') {
+    protected function getHttp($method, $urlSuffix = '') {
         $url = rtrim($this->tmmt->getResource()->getUrl(), '/');
         $urlSuffix = ltrim($urlSuffix, '/');
-        $http = ZfExtended_Factory::get('Zend_Http_Client');
+        $this->http = ZfExtended_Factory::get('Zend_Http_Client');
         /* @var $http Zend_Http_Client */
-        $http->setUri($url.'/'.$urlSuffix);
-        $http->setHeaders('Accept-charset', 'UTF-8');
-        $http->setHeaders('Accept', 'application/json; charset=utf-8');
-        return $http;
+        $this->http->setUri($url.'/'.$urlSuffix);
+        $this->http->setMethod($method);
+        $this->httpMethod = $method;
+        $this->http->setHeaders('Accept-charset', 'UTF-8');
+        $this->http->setHeaders('Accept', 'application/json; charset=utf-8');
+        return $this->http;
     }
     
     /**
      * prepares a Zend_Http_Client, prefilled with the configured URL + the Memory Name + additional URL parts
+     * @param string $httpMethod
      * @param string $urlSuffix
      * @return Zend_Http_Client
      */
-    protected function getHttpWithMemory($urlSuffix = '') {
-        return $this->getHttp(urlencode($this->tmmt->getFileName()).'/'.ltrim($urlSuffix, '/'));
+    protected function getHttpWithMemory($method, $urlSuffix = '') {
+        return $this->getHttp($method, urlencode($this->tmmt->getFileName()).'/'.ltrim($urlSuffix, '/'));
     }
     
     
     public function get() {
-        $http = $this->getHttpWithMemory();
-        return $this->processResponse($http->request('GET'));
+        $http = $this->getHttpWithMemory('GET');
+        return $this->processResponse($http->request());
     }
 
 /**
      * This method deletes a memory.
      */
     public function delete() {
-        $http = $this->getHttpWithMemory();
-        return $this->processResponse($http->request('DELETE'));
+        $http = $this->getHttpWithMemory('DELETE');
+        return $this->processResponse($http->request());
     }
     
     /**
@@ -166,9 +182,9 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $json->markupTable = 'OTMXUXLF';
         $json->context = $segment->getMid(); // here MID (context was designed for dialog keys/numbers on translateable strings software)
         
-        $http = $this->getHttpWithMemory('fuzzysearch');
+        $http = $this->getHttpWithMemory('POST', 'fuzzysearch');
         $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
-        return $this->processResponse($http->request('POST'));
+        return $this->processResponse($http->request());
     }
     
     /**
@@ -184,9 +200,9 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $data->searchPosition = $searchPosition;
         $data->numResults = 5;
         $data->msSearchAfterNumResults = 100;
-        $http = $this->getHttpWithMemory('concordancesearch');
+        $http = $this->getHttpWithMemory('POST', 'concordancesearch');
         $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
-        return $this->processResponse($http->request('POST'));
+        return $this->processResponse($http->request());
     }
 
     /**
@@ -236,9 +252,9 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $lang->load($this->tmmt->getTargetLang());
         $json->targetLang = $lang->getRfc5646();
         
-        $http = $this->getHttpWithMemory('entry');
+        $http = $this->getHttpWithMemory('POST', 'entry');
         $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
-        return $this->processResponse($http->request('POST'));
+        return $this->processResponse($http->request());
     }
 
     /**
@@ -247,7 +263,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
     public function getErrors() {
         return $this->error;
     }
-
+    
     /**
      * returns the raw response
      */
@@ -305,12 +321,17 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
      */
     protected function processResponse(Zend_Http_Response $response) {
         $this->response = $response;
+        $validStates = [200, 201];
+        
+        $url = $this->http->getUri(true);
         
         //check for HTTP State (REST errors)
-        if($response->getStatus() != 200) {
+        if(!in_array($response->getStatus(), $validStates)) {
             $error = new stdClass();
             $error->type = 'HTTP';
             $error->error = $response->getStatus();
+            $error->url = $url;
+            $error->method = $this->httpMethod;
             $this->error[] = $error;
         }
         $result = json_decode(trim($response->getBody()));
@@ -320,6 +341,8 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
             $error = new stdClass();
             $error->type = 'JSON';
             $error->error = json_last_error_msg();
+            $error->url = $url;
+            $error->method = $this->httpMethod;
             $this->error[] = $error;
             return false;
         }
@@ -331,37 +354,12 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
             $error = new stdClass();
             $error->type = 'Error Nr. '.$result->ReturnValue;
             $error->error = $result->ErrorMsg;
+            $error->url = $url;
+            $error->method = $this->httpMethod;
             $this->error[] = $error;
         }
         
         return empty($this->error);
-    }
-    
-    /**
-     * Prepare and send the request to OpenTM2
-     * @param string $action
-     * @param stdClass $json optional, the JSON payload
-     * @param string $URLSuffix
-     */
-    protected function rest($action = 'POST', $json = null, $URLSuffix = '/') {
-        $action = strtoupper($action);
-        
-        $http = ZfExtended_Factory::get('Zend_Http_Client');
-        $url = rtrim($this->tmmt->getResource()->getUrl(), '/');
-        if($this->tmmt->getId() > 0){
-            $tmname = urlencode($this->tmmt->getFileName());
-            $url .= '/'.$tmname;
-        }
-        $url .= $URLSuffix;
-        $http->setUri($url);
-        
-        if(!is_null($json) && in_array($action, ['POST', 'PUT']))   {
-            $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
-        }
-        $response = $http->request($action);
-        
-        //$http->setFileUpload($filename, $formname);
-        return $this->processResponse($response);
     }
     
     /**

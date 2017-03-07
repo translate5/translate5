@@ -209,7 +209,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
                 //submit results are always state 200.
                 //If success false and errors is an array, this errors are shown in the form directly,
                 // so we dont need the handleException
-                if(res.success || !Ext.isArray(res.errors)) {
+                if(!res || res.success || !Ext.isArray(res.errors)) {
                     Editor.app.getController('ServerException').handleException(submit.response);
                 }
                 if(Ext.isArray(res.errors)) {
