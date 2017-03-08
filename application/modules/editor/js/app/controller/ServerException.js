@@ -101,6 +101,9 @@ Ext.define('Editor.controller.ServerException', {
             tpl = new Ext.Template(str.serverMsg),
             action = response && response.request && response.request.options.action,
             getServerMsg = function() {
+                if(!json.errors && json.message){
+                    return json.message;
+                }
                 return json.errors[0]._errorMessage;
             },
             appendServerMsg = function(msg) {

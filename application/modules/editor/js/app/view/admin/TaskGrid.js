@@ -434,8 +434,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
               },
               tooltip: me.text_cols.fullMatchEdit,
               text: me.text_cols.fullMatchEdit
-      	  },{
-          	  xtype: 'owncheckcolumn',
+          },{
+              xtype: 'owncheckcolumn',
               width: 45,
               cls: 'lockLocked',
               dataIndex: 'lockLocked',
