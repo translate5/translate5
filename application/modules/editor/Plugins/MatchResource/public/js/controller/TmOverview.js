@@ -57,7 +57,9 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
         edited: '#UT#Die Matchressource "{0}" wurde erfolgreich geändert.',
         created: '#UT#Die Matchressource "{0}" wurde erfolgreich erstellt.',
         noResourcesAssigned: '#UT#Keine Matchressourcen zugewiesen.',
-        taskassocgridcell:'#UT#Zugewiesene Matchressourcen'
+        taskassocgridcell:'#UT#Zugewiesene Matchressourcen',
+        exportTm: '#UT#als TM Datei exportieren',
+        exportTmx: '#UT#als TMX Datei exportieren'
     },
     refs:[{
         ref: 'tmOverviewPanel',
@@ -132,6 +134,9 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
             },
             'addTmWindow combo[name="resourceId"]': {
                 select: 'handleResourceChanged'
+            },
+            'addTmWindow filefield[name="tmUpload"]': {
+                change: 'handleChangeImportFile'
             }
         }
     },
@@ -332,26 +337,39 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
                 me.handleImportTm(view,cell,col,record);
                 break;
             case 'download':
-                me.handleDownloadTm(view,cell,col,record);
+                me.handleDownloadTm(view,cell,col,record, ev);
                 break;
             case 'delete':
                 me.handleDeleteTm(view,cell,col,record);
                 break;
         }
     },
-    handleDownloadTm : function(view, cell, cellIdx, rec){
-        var proxy = rec.proxy,
+    handleDownloadTm : function(view, cell, cellIdx, rec, ev){
+        var me = this,
+            proxy = rec.proxy,
             id = rec.getId(),
-            url = proxy.getUrl();
+            url = proxy.getUrl(),
+            menu;
 
-        if (proxy.getAppendId() && proxy.isValidId(id)) {
-            if (!url.match(proxy.slashRe)) {
-                url += '/';
-            }
+        if (!url.match(proxy.slashRe)) {
+            url += '/';
         }
         url += encodeURIComponent(id);
-        url += '/download';
-        window.open(url);
+
+        menu = Ext.widget('menu', {
+            items: [{
+                itemId: 'exportTm',
+                hrefTarget: '_blank',
+                href: url+'/download.tm',
+                text: me.strings.exportTm
+            },{
+                itemId: 'exportTmx',
+                hrefTarget: '_blank',
+                href: url+'/download.tmx',
+                text : me.strings.exportTmx
+            }]    
+        });
+        menu.showAt(ev.getXY());
     },
     handleDeleteTm : function(view, cell, cellIdx, rec){
         var msg = this.strings,
@@ -424,5 +442,29 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
         form.findField('color').setValue(record.get('defaultColor'));
         filefield.setDisabled(disableUpload);
         filefield.setReadOnly(disableUpload);
+    },
+    handleChangeImportFile: function(field, val){
+        var name = this.getAddTmForm().down('textfield[name=name]'),
+            srcLang = this.getAddTmForm().down('combo[name=sourceLang]'),
+            targetLang = this.getAddTmForm().down('combo[name=targetLang]'),
+            langs = val.match(/-([a-zA-Z]{2,3})-([a-zA-Z]{2,3})\.[^.]+$/);
+
+        if(name.getValue() == '') {
+            name.setValue(val.replace(/\.[^.]+$/, ''));
+        }
+        //simple algorithmus to get the language from the filenam
+        if(langs && langs.length == 3) {
+            var srcStore = srcLang.store,
+                targetStore = targetLang.store,
+                srcIdx = srcStore.find('label', '('+langs[1]+')', 0, true, true),
+                targetIdx = targetStore.find('label', '('+langs[2]+')', 0, true, true);
+
+            if(srcIdx >= 0) {
+                srcLang.setValue(srcStore.getAt(srcIdx).get('id'));
+            }
+            if(targetIdx >= 0) {
+                targetLang.setValue(targetStore.getAt(targetIdx).get('id'));
+            }
+        }
     }
 });

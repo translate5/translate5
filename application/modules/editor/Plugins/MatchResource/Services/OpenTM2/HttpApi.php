@@ -81,22 +81,22 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         
         $http = $this->getHttp('POST');
         $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
-        $res = $http->request();
+        $res = $this->request($http);
         return $this->processResponse($res);
     }
     
     /**
      * This method creates a new memory with TM file
-     * FIXME change this method when OpenTM2 can deal with multipart uploads
      */
     public function createMemory($memory, $sourceLanguage, $tmData) {
         $data = new stdClass();
         $data->name = $memory;
         $data->sourceLang = $sourceLanguage;
+        $data->data = base64_encode($tmData);
         
         $http = $this->getHttp('POST');
         $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
-        $res = $http->request();
+        $res = $this->request($http);
         return $this->processResponse($res);
     }
     
@@ -111,10 +111,10 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $data->tmxData = base64_encode($tmData);
 
         $http = $this->getHttpWithMemory('POST', '/import');
-        $http->setConfig(['timeout' => 120]);
+        $http->setConfig(['timeout' => 1200]);
         $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
         
-        $res = $http->request();
+        $res = $this->request($http);
         return $this->processResponse($res);
     }
     
@@ -147,10 +147,21 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         return $this->getHttp($method, urlencode($this->tmmt->getFileName()).'/'.ltrim($urlSuffix, '/'));
     }
     
-    
-    public function get() {
+    /**
+     * retrieves the TM as TM file
+     * @return boolean
+     */
+    public function get($mime) {
         $http = $this->getHttpWithMemory('GET');
-        return $this->processResponse($http->request());
+        $http->setConfig(['timeout' => 1200]);
+        $http->setHeaders('Accept', $mime);
+        $response = $this->request($http);
+        if($response->getStatus() === 200) {
+            $this->result = $response->getBody();
+            return true;
+        }
+        
+        return $this->processResponse($this->request($http));
     }
 
 /**
@@ -158,7 +169,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
      */
     public function delete() {
         $http = $this->getHttpWithMemory('DELETE');
-        return $this->processResponse($http->request());
+        return $this->processResponse($this->request($http));
     }
     
     /**
@@ -184,7 +195,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         
         $http = $this->getHttpWithMemory('POST', 'fuzzysearch');
         $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
-        return $this->processResponse($http->request());
+        return $this->processResponse($this->request($http));
     }
     
     /**
@@ -202,7 +213,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $data->msSearchAfterNumResults = 100;
         $http = $this->getHttpWithMemory('POST', 'concordancesearch');
         $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
-        return $this->processResponse($http->request());
+        return $this->processResponse($this->request($http));
     }
 
     /**
@@ -254,7 +265,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         
         $http = $this->getHttpWithMemory('POST', 'entry');
         $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
-        return $this->processResponse($http->request());
+        return $this->processResponse($this->request($http));
     }
 
     /**
@@ -291,27 +302,30 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
     }
     
     /**
-     * Prepare and send the request to OpenTM2
-     * @param stdClass $json
-     * @deprecated
-     * @return boolean true on success, false on failure
+     * wraps the http request call to catch connection exceptions
+     * @param Zend_Http_Client $http
+     * @return Zend_Http_Response
      */
-    protected function request(stdClass $json) {
-        $json->Memory = $this->tmmt->getFileName();
+    protected function request(Zend_Http_Client $http) {
+        try {
+            return $http->request();
+        }
+        catch (Zend_Exception $e) {
+            if(strpos($e->getMessage(), 'stream_socket_client(): unable to connect to tcp') !== 0) {
+                throw $e;
+            }
+        }
+        $badGateway = new ZfExtended_BadGateway('Die angefragte OpenTM2 Instanz ist nicht erreichbar', 0, $e);
+        $badGateway->setOrigin('MatchResource OpenTM2');
         
-        $url = $this->tmmt->getResource()->getUrl();
+        $error = new stdClass();
+        $error->type = 'HTTP';
+        $error->error = $e->getMessage();
+        $error->url = $http->getUri(true);
+        $error->method = $this->httpMethod;
         
-        //create request
-        $http = ZfExtended_Factory::get('Zend_Http_Client');
-        /* @var $http Zend_Http_Client */
-        $http->setUri($url);
-        $http->setHeaders('Accept-charset', 'UTF-8');
-        $json = json_encode($json);
-        $http->setRawData($json, 'application/json; charset=utf-8');
-        $response = $http->request('PUT');
-        
-        //$http->setFileUpload($filename, $formname);
-        return $this->processResponse($response);
+        $badGateway->setErrors([$error]);
+        throw $badGateway;
     }
     
     /**

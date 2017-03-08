@@ -81,10 +81,10 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
     public function addTm(array $fileinfo = null) {
         $sourceLang = $this->tmmt->getSourceLangRfc5646(); 
         
-        $name = $this->filterName($this->tmmt->getName());
         //to ensure that we get unique TMs Names although of the above stripped content, 
         // we add the TMMT ID 
-        $this->tmmt->setFileName("ID".$this->tmmt->getId().'-'.$name);
+        $name = "ID".$this->tmmt->getId().'-'.$this->filterName($this->tmmt->getName());
+        $this->tmmt->setFileName($name);
         
         $noFile = empty($fileinfo);
         $tmxUpload = !$noFile && $fileinfo['type'] == 'application/xml' && preg_match('/\.tmx$/', $fileinfo['name']);
@@ -125,9 +125,13 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         return false;
     }
     
+    /**
+     * {@inheritDoc}
+     * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::getValidFiletypes()
+     */
     public function getValidFiletypes() {
         return [
-            'TM' => 'text/plain', //FIXME enter correct file type
+            'TM' => 'application/zip',
             'TMX' => 'application/xml',
         ];
     }
@@ -136,16 +140,11 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      * (non-PHPdoc)
      * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::getTm()
      */
-    public function getTm(& $mime) {
-        if($this->api->get()) {
-            $mime = 'application/csv';
-            return base64_decode($this->api->getResult()->data);
+    public function getTm($mime) {
+        if($this->api->get($mime)) {
+            return $this->api->getResult();
         }
         $this->throwBadGateway();
-    }
-
-    protected function getTmFile($id) {
-        return APPLICATION_PATH.'/../data/dummyTm_'.$id;
     }
 
     public function update(editor_Models_Segment $segment) {

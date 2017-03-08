@@ -55,13 +55,13 @@ abstract class editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract
     
     /**
      * Gets the TM file content from the underlying system
-     * @param $mime reference which is filled with the mime string of the returned file
+     * @param $mime the desired mimetype of the export
      * @return string
      */
-    abstract public function getTm(& $mime);
+    abstract public function getTm($mime);
     
     /**
-     * Returns an associative array 
+     * Returns an associative array of filetypes which can be uploaded to the underlying system
      *  key: file extension
      *  value: mimetype
      */

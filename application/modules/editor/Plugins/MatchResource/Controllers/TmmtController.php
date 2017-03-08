@@ -119,9 +119,20 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
     
     /**
      * provides the uploaded file in a filebased TM as download
+     * 
+     * This method is very opentm2 specific. If we want more generalization: 
+     *  - JS needs to know about the valid export types of the requested TM system
+     *  - The Connector must be able to decide if a given type can be exported or not
+     *    (like for uploads the getValidFiletypes, just for exports there should be a getValidExportTypes)
      */
     public function downloadAction() {
+        //call GET to load entity internally
         $this->getAction();
+        
+        //get type from extension, the part between :ID and extension does not matter
+        $type = $this->getParam('type', '.tm');
+        $type = explode('.', $type);
+        $type = strtoupper(end($type));
         
         $serviceManager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
         /* @var $serviceManager editor_Plugins_MatchResource_Services_Manager */
@@ -133,13 +144,19 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         }
         
         $connector = $serviceManager->getConnector($this->entity);
+        /* @var $connector editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract */
         
-        // disable layout and view
-        //$this->view->layout()->disableLayout();
-        //$this->_helper->viewRenderer->setNoRender(true);
-        $data = $connector->getTm($mime);
-        header('Content-Type: '.$mime, TRUE);
-        header('Content-Disposition: attachment; filename="'.rawurlencode($this->entity->getFileName()).'"');
+        //just reuse importvalidtypes here, nothing other implemented yet 
+        $validExportTypes = $connector->getValidFiletypes();
+        
+        if(empty($validExportTypes[$type])){
+            throw new ZfExtended_NotFoundException('Can not download in format '.$type);
+        }
+        
+        $data = $connector->getTm($validExportTypes[$type]);
+        header('Content-Type: '.$validExportTypes[$type], TRUE);
+        $type = '.'.strtolower($type);
+        header('Content-Disposition: attachment; filename="'.rawurlencode($this->entity->getFileName()).$type.'"');
         echo $data;
         exit;
     }
