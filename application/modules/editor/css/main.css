@@ -417,84 +417,71 @@ tr.customeState td div {font-style: italic;}
 
 #segment-grid .first-in-file td  {border-top-style: solid; border-top-width: 3px; border-top-color: #99BCE8;}
 
+/* Fix T5DEV-147 */
+.x-form-file-wrap .x-form-trigger-wrap-default.x-form-trigger-wrap-invalid .x-form-text {
+    border-color: #cf4c35;
+}
 
 /* including package ext-theme-classic */
-/* line 2, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-tl {
   background: transparent no-repeat 0 0; }
 
-/* line 6, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-tc {
   height: 8px;
   background: transparent repeat-x 0 0;
   overflow: hidden; }
 
-/* line 12, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-tr {
   background: transparent no-repeat right -8px; }
 
-/* line 16, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-ml {
   background: transparent repeat-y 0;
   padding-left: 4px;
   overflow: hidden; }
 
-/* line 22, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-mc {
   background: repeat-x 0 -16px;
   padding: 4px 10px; }
 
-/* line 27, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-mc h3 {
   margin: 0 0 4px 0; }
 
-/* line 31, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-mr {
   background: transparent repeat-y right;
   padding-right: 4px;
   overflow: hidden; }
 
-/* line 37, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-bl {
   background: transparent no-repeat 0 -16px; }
 
-/* line 41, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-bc {
   background: transparent repeat-x 0 -8px;
   height: 8px;
   overflow: hidden; }
 
-/* line 47, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-br {
   background: transparent no-repeat right -24px; }
 
-/* line 51, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-tl, .x-box-bl {
   padding-left: 8px;
   overflow: hidden; }
 
-/* line 56, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-tr, .x-box-br {
   padding-right: 8px;
   overflow: hidden; }
 
-/* line 61, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-tl {
   background-image: url(resources/corners.gif); }
 
-/* line 65, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-tc {
   background-image: url(resources/tb.gif); }
 
-/* line 69, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-tr {
   background-image: url(resources/corners.gif); }
 
-/* line 73, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-ml {
   background-image: url(resources/l.gif); }
 
-/* line 77, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-mc {
   background-color: #eee;
   background-image: url(resources/tb.gif);
@@ -502,48 +489,37 @@ tr.customeState td div {font-style: italic;}
   color: #393939;
   font-size: 15px; }
 
-/* line 85, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-mc h3 {
   font-size: 18px;
   font-weight: bold; }
 
-/* line 90, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-mr {
   background-image: url(resources/r.gif); }
 
-/* line 94, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-bl {
   background-image: url(resources/corners.gif); }
 
-/* line 98, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-bc {
   background-image: url(resources/tb.gif); }
 
-/* line 102, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-br {
   background-image: url(resources/corners.gif); }
 
-/* line 106, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-blue .x-box-bl, .x-box-blue .x-box-br, .x-box-blue .x-box-tl, .x-box-blue .x-box-tr {
   background-image: url(resources/corners-blue.gif); }
 
-/* line 110, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-blue .x-box-bc, .x-box-blue .x-box-mc, .x-box-blue .x-box-tc {
   background-image: url(resources/tb-blue.gif); }
 
-/* line 114, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-blue .x-box-mc {
   background-color: #c3daf9; }
 
-/* line 118, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-blue .x-box-mc h3 {
   color: #17385b; }
 
-/* line 122, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-blue .x-box-ml {
   background-image: url(resources/l-blue.gif); }
 
-/* line 126, ../../../ext-theme-classic/sass/src/dom/Element.scss */
 .x-box-blue .x-box-mr {
   background-image: url(resources/r-blue.gif); }
 /*
