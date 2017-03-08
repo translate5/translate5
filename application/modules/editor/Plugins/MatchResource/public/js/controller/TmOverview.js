@@ -114,6 +114,13 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
             '#tmOverviewPanel actioncolumn':{
                 click:'handleTmGridActionColumnClick'
             },
+            '#tmOverviewPanel pagingtoolbar':{
+                afterrender: function(pagebar){
+                    //fix render issue where the pagecount in the bar is not shown correctly, 
+                    // even though all given pageing data in pagebar is correct. Possible ExtJS Bug
+                    pagebar.onLoad(); 
+                }
+            },
             '#tmOverviewPanel #btnRefresh':{
                 click:'handleButtonRefreshClick'
             },
