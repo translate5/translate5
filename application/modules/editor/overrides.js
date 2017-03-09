@@ -124,6 +124,19 @@ Ext.override(Ext.menu.Item, {
     }
 });
 
+/**
+ * TRANSLATE-834: Triton Theme: Tooltip on columns is missing
+ * All columns should have a tooltip with the same content as the title when nothing other is configured
+ */
+Ext.override(Ext.grid.column.Column, {
+    initConfig: function(config) {
+        if(config.tooltip === undefined) {
+            config.tooltip = Ext.String.htmlEncode(config.text||this.text);
+        }
+        console.log(config.dataIndex);
+        return this.callParent([config]);
+    }
+});
 
 /**
  * Fixing EXT6UPD-131 (fixed natively in ext-6.0.1, must be removed then!)

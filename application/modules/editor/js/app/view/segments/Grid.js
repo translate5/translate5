@@ -199,6 +199,7 @@ Ext.define('Editor.view.segments.Grid', {
                     fieldName: name,
                     isErgonomicVisible: isErgoVisible,
                     isErgonomicSetWidth: true, //currently true for all our affected default fields
+                    tooltip: rec.get('label'),
                     text: label,
                     width: width
                 };
