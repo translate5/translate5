@@ -212,6 +212,14 @@
         <source>Bitte verwenden Sie eine TM oder TMX Datei!</source>
         <target>Please use a TM or TMX file!</target>
     </trans-unit>
+    <trans-unit id='YWxzIFRNIERhdGVpIGV4cG9ydGllcmVu'>
+        <source>als TM Datei exportieren</source>
+        <target>export as TM file</target>
+    </trans-unit>
+    <trans-unit id='YWxzIFRNWCBEYXRlaSBleHBvcnRpZXJlbg=='>
+        <source>als TMX Datei exportieren</source>
+        <target>export as TMX file</target>
+    </trans-unit>
   </body>
  </file>
 </xliff>
