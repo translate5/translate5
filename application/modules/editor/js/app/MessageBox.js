@@ -128,7 +128,7 @@ Ext.define('Editor.MessageBox',{
   },
   constructor: function(config) {
     // create the msgBox container.  used for App.setAlert
-    this.msgCt = Ext.core.DomHelper.append(document.body, {id:'msg-div'}, true);
+    this.msgCt = Ext.dom.Helper.append(document.body, {id:'msg-div'}, true);
     this.msgCt.setStyle('position', 'absolute');
     this.msgCt.setStyle('z-index', 30000);
     this.msgCt.setWidth(300);
@@ -149,14 +149,23 @@ Ext.define('Editor.MessageBox',{
       delay = delay * 1000 * factor;
 
       this.msgCt.alignTo(document, 't-t');
-      var appendedBox = Ext.core.DomHelper.append(this.msgCt, {style: {visibility: 'hidden'},html:this.buildMessageBox(status, msg)}, true);
+      var found, appendedBox = appendedBox = Ext.dom.Helper.append(this.msgCt, {style: {visibility: 'hidden'},html:this.buildMessageBox(status, msg)}, true);
+      this.msgElements.push(appendedBox); 
       if(delay < 0) {
           appendedBox.slideIn('t');
       }
       else {
-          appendedBox.slideIn('t').animate({duration: (delay)}).ghost("t", {remove:true});
+          appendedBox.slideIn('t');
+          setTimeout(function(){
+              appendedBox.dom && appendedBox.ghost("t", {remove:true});
+          }, delay);
+      }
+      if(this.msgElements.length > 3) {
+          found = this.msgElements.shift();
+          found.dom && found.ghost("t", {remove:true});
       }
   },
+  msgElements: [],
   buildMessageBox : function(status, msg) {
 	  var title = this.titles[status];
       return [
