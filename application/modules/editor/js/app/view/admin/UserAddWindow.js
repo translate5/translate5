@@ -66,8 +66,6 @@ Ext.define('Editor.view.admin.UserAddWindow', {
         saveBtn: '#UT#Benutzer speichern',
         cancelBtn: '#UT#Abbrechen'
     },
-    height : 720,
-    width : 600,
     modal : true,
     layout:'fit',
     initComponent: function() {
@@ -101,6 +99,8 @@ Ext.define('Editor.view.admin.UserAddWindow', {
         });
         config = {
             title: me.title, //see EXT6UPD-9
+            height: Math.min(720, parseInt(Ext.getBody().getViewSize().height * 0.8)),
+            width : 600,
             items : [{
                 xtype: 'form',
                 padding: 5,

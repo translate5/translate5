@@ -41,8 +41,6 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
     strings: {
         close: '#UT#Fenster schließen'
     },
-    height: 800,
-    width: 1000,
     layout: 'fit',
     modal: true,
     viewModel: {
@@ -72,6 +70,8 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
             });
         }
         config = {
+            height: Math.min(800, parseInt(Ext.getBody().getViewSize().height * 0.8)),
+            width: 1000,
             title: Ext.String.format(me.title, task.get('taskName')),
             items : [{
                 xtype: 'tabpanel',
