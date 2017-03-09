@@ -190,7 +190,7 @@ Ext.define('Editor.controller.HeadPanel', {
   },
   mainHelpButtonClick:function(){
 	  var me=this,
-	      url = Ext.String.format(Editor.data.helpUrl, Editor.data.helpSection),
+	      url = Ext.String.format(Editor.data.helpUrl, Editor.data.helpSection, Editor.data.locale),
 	      win = Ext.widget('helpWindow',{
 	          title: me.helpBtn + ' - ' + Editor.data.helpSectionTitle,
 	          loader:{
