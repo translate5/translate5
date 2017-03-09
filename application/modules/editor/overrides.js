@@ -133,7 +133,6 @@ Ext.override(Ext.grid.column.Column, {
         if(config.tooltip === undefined) {
             config.tooltip = Ext.String.htmlEncode(config.text||this.text);
         }
-        console.log(config.dataIndex);
         return this.callParent([config]);
     }
 });
