@@ -83,7 +83,12 @@ Ext.define('Editor.controller.HeadPanel', {
         	click:'mainHelpButtonClick'  
           },
           'headPanel toolbar#top-menu':{
-        	  beforerender:'headPanelToolbarBeforeRender'
+        	  beforerender:'headPanelToolbarBeforeRender',
+        	  add: function(toolbar){
+                  if(toolbar.rendered){
+                      toolbar.setWidth(toolbar.getWidth());
+                  }
+              }
           }
       }
           
