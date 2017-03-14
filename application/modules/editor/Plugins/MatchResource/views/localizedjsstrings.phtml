@@ -56,6 +56,8 @@ END LICENSE AND COPYRIGHT
             matchresource: '<?php echo $this->translate->_('Matchressourcen');?>',
             deleteConfirm: '<?php echo $this->translate->_('Matchressource endgültig löschen?');?>',
             deleteConfirmText: '<?php echo $this->translate->_('Soll die gewählte Matchressource "{0}" wirklich endgültig gelöscht werden?');?>',
+            deleteConfirmLocal: '<?php echo $this->translate->_('Matchressource löschen?');?>',
+            deleteConfirmLocalText: '<?php echo $this->translate->_('Soll die gewählte Matchressource "{0}" aus der Liste der hier angezeigten Matchressourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.');?>',
             deleted: '<?php echo $this->translate->_('Matchressource gelöscht.');?>',
             edited: '<?php echo $this->translate->_('Die Matchressource "{0}" wurde erfolgreich geändert.');?>',
             created: '<?php echo $this->translate->_('Die Matchressource "{0}" wurde erfolgreich erstellt.');?>',
@@ -202,6 +204,15 @@ END LICENSE AND COPYRIGHT
             noTaskAssigned: '<?php echo $this->translate->_('Keine Aufgaben zugewiesen.');?>',
             sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
             targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
+            tmmtStatusColumn: '<?php echo $this->translate->_('Status');?>',
+            tmmtStatus: {
+                loading: '<?php echo $this->translate->_('Statusinformationen werden geladen');?>',
+                error: '<?php echo $this->translate->_('Fehler');?>',
+                available: '<?php echo $this->translate->_('verfügbar');?>',
+                unknown: '<?php echo $this->translate->_('unbekannt');?>',
+                noconnection: '<?php echo $this->translate->_('Keine Verbindung!');?>',
+                import: '<?php echo $this->translate->_('importiert');?>'
+            },
             taskassocgridcell: '<?php echo $this->translate->_('Zugewiesene Aufgaben');?>'
         }
     });

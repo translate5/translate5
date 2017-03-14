@@ -71,7 +71,7 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
             return $resources[$id] = $serviceManager->getResourceById($serviceType, $id);
         };
         
-        $this->prepareTaskInfo();
+        $this->prepareTaskInfo(array_column($this->view->rows, 'id'));
         
         foreach($this->view->rows as &$tmmt) {
             $resource = $getResource($tmmt['serviceType'], $tmmt['resourceId']);
@@ -79,32 +79,78 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
             if(!empty($resource)) {
                 $tmmt = array_merge($tmmt, $resource->getMetaData());
             }
+            
+            $tmmtInstance = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_Tmmt');
+            /* @var $tmmtInstance editor_Plugins_MatchResource_Models_Tmmt */
+            $tmmtInstance->init($tmmt);
+            
             $tmmt['taskList'] = $this->getTaskInfos($tmmt['id']);
+            $tmmt['status'] = 'loading';
         }
     }
     
-    private function prepareTaskInfo() {
+    /**
+     * Adds status information to the get request
+     * {@inheritDoc}
+     * @see ZfExtended_RestController::getAction()
+     */
+    public function getAction() {
+        parent::getAction();
+        
+        $serviceManager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
+        /* @var $serviceManager editor_Plugins_MatchResource_Services_Manager */
+        
+        $this->prepareTaskInfo([$this->entity->getId()]);
+        $this->view->rows->taskList = $this->getTaskInfos($this->entity->getId());
+        
+        $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
+        /* @var $resource editor_Plugins_MatchResource_Models_Resource */
+        if(empty($resource)) {
+            $this->view->rows->status = editor_Plugins_MatchResource_Services_Connector_Abstract::STATUS_NOCONNECTION;
+            $this->view->rows->statusInfo = 'Configured resource not found!';
+            return;
+        }
+        $meta = $resource->getMetaData();
+        foreach($meta as $key => $v) {
+            $this->view->rows->{$key} = $v;
+        }
+        
+        $moreInfo = ''; //init as empty string, filled on demand by reference
+        $connector = $serviceManager->getConnector($this->entity);
+        $this->view->rows->status = $connector->getStatus($moreInfo);
+        $this->view->rows->statusInfo = $moreInfo;
+    }
+    
+    private function prepareTaskInfo($tmmtids) {
         /* @var $assocs editor_Plugins_MatchResource_Models_Taskassoc */
         $assocs = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_Taskassoc');
-        
-        $tmmtids = array_column($this->view->rows, 'id');
         
         $taskinfo = $assocs->getTaskInfoForTmmts($tmmtids);
         if(empty($taskinfo)) {
             return;
         }
         //group array by tmmtid
-        $this->groupedTaskInfo = array();
-        foreach($taskinfo as $one) {
-            if(!isset($this->groupedTaskInfo[$one['tmmtId']])) {
-                $this->groupedTaskInfo[$one['tmmtId']] = array();
+        $this->groupedTaskInfo = $this->convertTasknames($taskinfo);
+    }
+    
+    /**
+     * receives a list of task and task assoc data, returns a list of taskNames grouped by tmmt
+     * @param array $taskInfoList
+     * @return string[]
+     */
+    protected function convertTasknames(array $taskInfoList) {
+        $result = [];
+        foreach($taskInfoList as $one) {
+            if(!isset($result[$one['tmmtId']])) {
+                $result[$one['tmmtId']] = array();
             }
             $taskToPrint = $one['taskName'];
             if(!empty($one['taskNr'])) {
                 $taskToPrint .= ' ('.$one['taskNr'].')';
             }
-            $this->groupedTaskInfo[$one['tmmtId']][] = $taskToPrint;
+            $result[$one['tmmtId']][] = $taskToPrint;
         }
+        return $result;
     }
 
     /***
@@ -362,7 +408,8 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
         /* @var $manager editor_Plugins_MatchResource_Services_Manager */
         $connector = $manager->getConnector($this->entity);
-        if($connector instanceof editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract) {
+        $deleteInResource = !$this->getParam('deleteLocally', false);
+        if($deleteInResource && $connector instanceof editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract) {
             $connector->delete();
         }
         //$this->processClientReferenceVersion();

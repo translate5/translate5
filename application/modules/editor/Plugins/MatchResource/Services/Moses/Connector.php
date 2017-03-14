@@ -125,4 +125,35 @@ class editor_Plugins_MatchResource_Services_Moses_Connector extends editor_Plugi
         return $this->MT_BASE_MATCHRATE;
     }
     
+    /**
+     * {@inheritDoc}
+     * @see editor_Plugins_MatchResource_Services_Connector_Abstract::getStatus()
+     */
+    public function getStatus(& $moreInfo){
+        $res = $this->tmmt->getResource();
+        /* @var $res editor_Plugins_MatchResource_Services_Moses_Resource */
+        
+        $http = ZfExtended_Factory::get('Zend_Http_Client');
+        $http->setConfig(['timeout' => 3]);
+        /* @var $http Zend_Http_Client */
+        $http->setUri($res->getUrl());
+        
+        try {
+            $response = $http->request('GET');
+        }catch (Exception $e){
+            $moreInfo = $e->getMessage();
+            $log = ZfExtended_Factory::get('ZfExtended_Log');
+            /* @var $log ZfExtended_Log */
+            $log->logException($e);
+            return self::STATUS_NOCONNECTION;
+        }
+        
+        //making a plain GET request produces a 405 state since it is not allowed.
+        // This is OK, since we want just test the connectivity
+        if($response->getStatus() === 405) {
+            return self::STATUS_AVAILABLE;
+        }
+        $moreInfo = 'The answer received from Moses is not as expected!';
+        return self::STATUS_NOCONNECTION;
+    }
 }

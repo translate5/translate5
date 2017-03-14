@@ -233,4 +233,45 @@ class editor_Plugins_MatchResource_Services_LucyLT_Connector extends editor_Plug
         return $this->MT_BASE_MATCHRATE;
     }
     
+    public function getStatus(& $moreInfo){
+        $res = $this->tmmt->getResource();
+        /* @var $res editor_Plugins_MatchResource_Services_Moses_Resource */
+        
+        $http = ZfExtended_Factory::get('Zend_Http_Client');
+        /* @var $http Zend_Http_Client */
+        
+        $auth = explode(':', $res->getCredentials());
+        $http->setAuth($auth[0], $auth[1]);
+        $http->setConfig(['timeout' => 3]);
+        
+        $url = rtrim($res->getUrl(), '/');
+        $http->setUri($url.'/mtrans/exec');
+        $http->setHeaders('Content-Type: application/json');
+        $http->setHeaders('Accept: application/json');
+        
+        try {
+            $response = $http->request('OPTIONS');
+        }catch (Exception $e){
+            $moreInfo = $e->getMessage();
+            $log = ZfExtended_Factory::get('ZfExtended_Log');
+            /* @var $log ZfExtended_Log */
+            $log->logException($e);
+            return self::STATUS_NOCONNECTION;
+        }
+        
+        $status = $response->getStatus();
+        
+        switch ($status) {
+            case 200:
+                if(strpos($response->getBody(), 'resource path="mtrans/exec"') !== false) {
+                    return self::STATUS_AVAILABLE;
+                };
+                break;
+            case 401:
+                $moreInfo = 'Translate5 can not authenticate itself at the Lucy LT server.';
+                return self::STATUS_NOCONNECTION;
+        }
+        $moreInfo = 'The answer received from the Lucy LT Server is not as expected!';
+        return self::STATUS_NOCONNECTION;
+    }
 }

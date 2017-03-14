@@ -38,6 +38,12 @@ END LICENSE AND COPYRIGHT
  * Abstract Base Connector
  */
 abstract class editor_Plugins_MatchResource_Services_Connector_Abstract {
+    
+    const STATUS_ERROR = 'error';
+    const STATUS_AVAILABLE = 'available';
+    const STATUS_UNKNOWN = 'unknown';
+    const STATUS_NOCONNECTION = 'noconnection';
+    
     /**
      * @var editor_Plugins_MatchResource_Models_TmMt
      */
@@ -112,6 +118,11 @@ abstract class editor_Plugins_MatchResource_Services_Connector_Abstract {
      * @return editor_Plugins_MatchResource_Services_ServiceResult
      */
     abstract public function search(string $searchString, $field = 'source', $offset = null);
+    
+    /**
+     * @return the status of the connected resource and additional information if there is some
+     */
+    abstract public function getStatus(& $moreInfo);
     
     /**
      * Opens the with connectTo given TM on the configured Resource (on task open, not on each request)

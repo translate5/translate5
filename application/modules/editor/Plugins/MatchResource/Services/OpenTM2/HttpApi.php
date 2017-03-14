@@ -161,10 +161,23 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
             return true;
         }
         
+        return $this->processResponse($response);
+    }
+    
+    /**
+     * retrieves the TM as TM file
+     * @return boolean
+     */
+    public function status() {
+        
+        // Hybrid Lösung, wenn Timeout nach X Millisekunden, dann Status neuladen ausm Frontend
+        
+        $http = $this->getHttpWithMemory('GET', '/status');
+        $http->setConfig(['timeout' => 3]);
         return $this->processResponse($this->request($http));
     }
 
-/**
+    /**
      * This method deletes a memory.
      */
     public function delete() {

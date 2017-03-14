@@ -55,6 +55,15 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
         noTaskAssigned:'#UT#Keine Aufgaben zugewiesen.',
         sourceLang: '#UT#Quellsprache',
         targetLang: '#UT#Zielsprache',
+        tmmtStatusColumn: '#UT#Status',
+        tmmtStatus: {
+            loading: '#UT#Statusinformationen werden geladen',
+            error: '#UT#Fehler',
+            available: '#UT#verfügbar',
+            unknown: '#UT#unbekannt',
+            noconnection: '#UT#Keine Verbindung!',
+            import: '#UT#importiert'
+        },
         taskassocgridcell:'#UT#Zugewiesene Aufgaben'
     },
     cls:'tmOverviewPanel',
@@ -69,7 +78,8 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                 store : 'Editor.plugins.MatchResource.store.TmMts',
                 viewConfig: {
                     getRowClass: function(record) {
-                        return record.get('filebased') ? 'match-ressource-filebased' : 'match-ressource-non-filebased';
+                        var cls = record.get('filebased') ? 'match-ressource-filebased' : 'match-ressource-non-filebased';
+                        return cls + ' tmmt-status-'+record.get('status');
                     }
                 },
                 columns: [{
@@ -108,6 +118,36 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                         return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #'+record.data.color+';"></div>';
                     },
                     text: me.strings.color
+                },{
+                    xtype: 'gridcolumn',
+                    width: 160,
+                    text: me.strings.tmmtStatusColumn,
+                    dataIndex: 'status',
+                    renderer: function(value, meta, record) {
+                        var str = me.strings.tmmtStatus,
+                            info = record.get('statusInfo');
+                        if(value === "loading") {
+                            record.load();
+                            meta.tdCls = 'loading';
+                            meta.tdAttr = 'data-qtip="'+str.loading+'"';
+                            return ''; //no string since icon set
+                        }
+                        if(str[value]){
+                            value = str[value];
+                        }
+                        else {
+                            value = str.unknown;
+                        }
+                        if(info) {
+                            meta.tdAttr = 'data-qtip="'+info+'"';
+                            meta.tdCls = 'infoIcon';
+                        }
+                        else {
+                            meta.tdAttr = 'data-qtip=""';
+                        }
+                        return value;
+
+                    }
                 },{
                     xtype: 'actioncolumn',
                     width: 80,

@@ -335,4 +335,51 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         //original not allowed string list: 
         //return str_replace("\\/:?*|<>", '_', $name);
     }
+    
+    /**
+     * {@inheritDoc}
+     * @see editor_Plugins_MatchResource_Services_Connector_Abstract::getStatus()
+     */
+    public function getStatus(& $moreInfo){
+        $name = $this->tmmt->getFileName();
+        if(empty($name)) {
+            $moreInfo = 'The internal stored filename is invalid';
+            return self::STATUS_NOCONNECTION;
+        }
+        try {
+            
+            //FIXME a 404 response from the status call means: 
+            // - OpenTM2 is online
+            // - the requested TM is currently not loaded, so there is no info about the existence
+            // - So we display the STATUS_AVAILABLE instead
+            if($this->api->status()) {
+                $status = $this->api->getResult()->tmxImportStatus;
+                switch($status) {
+                    case 'available':
+                        return self::STATUS_AVAILABLE;
+                    case 'import':
+                        $moreInfo = 'TMX wird importiert, TM kann trotzdem benutzt werden';
+                        return self::STATUS_IMPORT;
+                    case 'error':
+                    case 'failed':
+                        //FIXME change moreInfo or is this captured by the below getErrors?
+                        $moreInfo = $this->api->getResult()->ErrorMsg;
+                        return self::STATUS_ERROR;
+                }
+                $moreInfo = 'original OpenTM2 status '.$status;
+                return self::STATUS_UNKNOWN;
+            }
+            
+            $moreInfo = join("<br/>\n", array_map(function($item) {
+                return $item->type.': '.$item->error;
+            }, $this->api->getErrors()));
+            
+        }catch (Exception $e){
+            $moreInfo = $e->getMessage();
+            $log = ZfExtended_Factory::get('ZfExtended_Log');
+            /* @var $log ZfExtended_Log */
+            //$log->logException($e);
+        }
+        return self::STATUS_NOCONNECTION;
+    }
 }

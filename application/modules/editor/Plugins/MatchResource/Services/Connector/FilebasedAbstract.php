@@ -40,6 +40,11 @@ END LICENSE AND COPYRIGHT
 abstract class editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract extends editor_Plugins_MatchResource_Services_Connector_Abstract {
 
     /**
+     * @var string
+     */
+    const STATUS_IMPORT = 'import';
+    
+    /**
      * Adds the given file to the underlying system on TM creation
      * @param array $fileinfo as given from upload (tmp_name, name, type, size)
      * @return boolean

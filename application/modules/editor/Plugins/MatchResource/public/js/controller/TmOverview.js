@@ -53,6 +53,8 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
         matchresource: '#UT#Matchressourcen',
         deleteConfirm: '#UT#Matchressource endgültig löschen?',
         deleteConfirmText: '#UT#Soll die gewählte Matchressource "{0}" wirklich endgültig gelöscht werden?',
+        deleteConfirmLocal: '#UT#Matchressource löschen?',
+        deleteConfirmLocalText: '#UT#Soll die gewählte Matchressource "{0}" aus der Liste der hier angezeigten Matchressourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.',
         deleted: '#UT#Matchressource gelöscht.',
         edited: '#UT#Die Matchressource "{0}" wurde erfolgreich geändert.',
         created: '#UT#Die Matchressource "{0}" wurde erfolgreich erstellt.',
@@ -138,12 +140,41 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
             'addTmWindow filefield[name="tmUpload"]': {
                 change: 'handleChangeImportFile'
             }
+        },
+        store: {
+            '#Editor.plugins.MatchResource.store.TmMts': {
+                update: 'addRecordToImportCheck'
+            }
         }
     },
+    /**
+     * Internal stack for records to be reloaded because of status import
+     */
+    importingRecords: [],
+    /**
+     * Task to check the records to be imported
+     */
+    checkImportingRecordsTask: null,
     init: function() {
+        var me = this;
         //add the taskassocs field to the task model
         Editor.model.admin.Task.replaceFields({
             name: 'taskassocs', type: 'auto', persist: false
+        });
+
+        //define task to reload importing tasks
+        me.checkImportingRecordsTask = Ext.TaskManager.newTask({
+            run: function(){
+                var rec;
+                while(me.importingRecords.length > 0) {
+                    rec = me.importingRecords.shift();
+                    rec.set('state', rec.STATUS_LOADING);
+                    rec.load();
+                }
+                // stop the task when all records are reloaded
+                me.checkImportingRecordsTask && me.checkImportingRecordsTask.stop();
+            },
+            interval: 5000
         });
     },
     handleAfterShow: function(panel) {
@@ -274,6 +305,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
             url: Editor.data.restpath+'plugins_matchresource_tmmt/'+record.get('id')+'/import/',
             scope: me,
             success: function(form, submit) {
+                record.load();
                 window.setLoading(false);
                 window.close();
                 Editor.MessageBox.addSuccess(window.strings.importSuccess);
@@ -297,6 +329,18 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
                 }
             }
         });
+    },
+    /**
+     * Checks loaded TMMTs and reloads TMMTs with status import periodically
+     * @param {Ext.data.Store} store
+     */
+    addRecordToImportCheck: function(store, record) {
+        var me = this,
+            checkImporting;
+        if(record.get('status') === record.STATUS_IMPORT) {
+            me.importingRecords.push(record);
+            me.checkImportingRecordsTask.start();
+        }
     },
     /**
      * Loops over the given error array and shows additional non formfield specfific errors
@@ -374,13 +418,19 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
     handleDeleteTm : function(view, cell, cellIdx, rec){
         var msg = this.strings,
             store = view.getStore(),
-            info = Ext.String.format(msg.deleteConfirmText, rec.get('name'));
-        Ext.Msg.confirm(msg.deleteConfirm, info, function(btn){
+            noConn = rec.get('status') == rec.STATUS_NOCONNECTION,
+            info = Ext.String.format(noConn ? msg.deleteConfirmLocalText : msg.deleteConfirmText, rec.get('name')),
+            //force local deletion when no connection to resource
+            params = noConn ? {deleteLocally: true} : {};
+
+        
+        Ext.Msg.confirm(noConn ? msg.deleteConfirmLocal : msg.deleteConfirm, info, function(btn){
             if(btn !== 'yes') {
                 return;
             }
-            rec.dropped = true;
+            rec.drop();
             rec.save({
+                params: params,
                 failure: function() {
                     rec.reject();
                 },
