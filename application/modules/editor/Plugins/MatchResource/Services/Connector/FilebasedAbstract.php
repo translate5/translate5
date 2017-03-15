@@ -43,6 +43,7 @@ abstract class editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract
      * @var string
      */
     const STATUS_IMPORT = 'import';
+    const STATUS_NOT_LOADED = 'notloaded';
     
     /**
      * Adds the given file to the underlying system on TM creation

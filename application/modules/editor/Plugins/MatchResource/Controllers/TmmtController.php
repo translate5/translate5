@@ -365,10 +365,13 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         $upload->isValid(self::FILE_UPLOAD_NAME);
         $importInfo = $upload->getFileInfo(self::FILE_UPLOAD_NAME);
         
-        if($importInfo[self::FILE_UPLOAD_NAME]['error'] === UPLOAD_ERR_NO_FILE) {
-            return false;
+        //checking general upload errors
+        $errorNr = $importInfo[self::FILE_UPLOAD_NAME]['error'];
+        if($errorNr !== UPLOAD_ERR_OK) {
+            $this->uploadErrors[] = ZfExtended_FileUploadException::getErrorMessage($errorNr);
+            return $importInfo;
         }
-
+        
         //currently an error means wrong filetype
         if($upload->hasErrors()) {
             $this->uploadErrors[] = 'Die ausgewählte Ressource kann Dateien diesen Typs nicht verarbeiten!';
@@ -412,7 +415,7 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         if($deleteInResource && $connector instanceof editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract) {
             $connector->delete();
         }
-        //$this->processClientReferenceVersion();
+        $this->processClientReferenceVersion();
         $this->entity->delete();
     }
     

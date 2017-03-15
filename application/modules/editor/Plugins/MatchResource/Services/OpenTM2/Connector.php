@@ -346,40 +346,47 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
             $moreInfo = 'The internal stored filename is invalid';
             return self::STATUS_NOCONNECTION;
         }
+        
         try {
-            
-            //FIXME a 404 response from the status call means: 
-            // - OpenTM2 is online
-            // - the requested TM is currently not loaded, so there is no info about the existence
-            // - So we display the STATUS_AVAILABLE instead
-            if($this->api->status()) {
-                $status = $this->api->getResult()->tmxImportStatus;
-                switch($status) {
-                    case 'available':
-                        return self::STATUS_AVAILABLE;
-                    case 'import':
-                        $moreInfo = 'TMX wird importiert, TM kann trotzdem benutzt werden';
-                        return self::STATUS_IMPORT;
-                    case 'error':
-                    case 'failed':
-                        //FIXME change moreInfo or is this captured by the below getErrors?
-                        $moreInfo = $this->api->getResult()->ErrorMsg;
-                        return self::STATUS_ERROR;
-                }
-                $moreInfo = 'original OpenTM2 status '.$status;
-                return self::STATUS_UNKNOWN;
-            }
-            
-            $moreInfo = join("<br/>\n", array_map(function($item) {
-                return $item->type.': '.$item->error;
-            }, $this->api->getErrors()));
-            
+            $apiResult = $this->api->status();
         }catch (Exception $e){
             $moreInfo = $e->getMessage();
             $log = ZfExtended_Factory::get('ZfExtended_Log');
             /* @var $log ZfExtended_Log */
-            //$log->logException($e);
+            $log->logException($e);
+            return self::STATUS_NOCONNECTION;
         }
+        
+        if($apiResult) {
+            $status = $this->api->getResult()->tmxImportStatus;
+            switch($status) {
+                case 'available':
+                    return self::STATUS_AVAILABLE;
+                case 'import':
+                    $moreInfo = 'TMX wird importiert, TM kann trotzdem benutzt werden';
+                    return self::STATUS_IMPORT;
+                case 'error':
+                case 'failed':
+                    $moreInfo = $this->api->getResult()->ErrorMsg;
+                    return self::STATUS_ERROR;
+            }
+            $moreInfo = 'original OpenTM2 status '.$status;
+            return self::STATUS_UNKNOWN;
+        }
+        
+        //a 404 response from the status call means: 
+        // - OpenTM2 is online
+        // - the requested TM is currently not loaded, so there is no info about the existence
+        // - So we display the STATUS_NOT_LOADED instead
+        if($this->api->getResponse()->getStatus() == 404) {
+            $moreInfo = 'Die Ressource ist generell verfügbar, stellt aber keine Informationen über das angefragte TM bereit, da dies nicht geladen ist.';
+            return self::STATUS_NOT_LOADED;
+        }
+        
+        $moreInfo = join("<br/>\n", array_map(function($item) {
+            return $item->type.': '.$item->error;
+        }, $this->api->getErrors()));
+            
         return self::STATUS_NOCONNECTION;
     }
 }

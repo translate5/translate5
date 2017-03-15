@@ -46,6 +46,7 @@ Ext.define('Editor.plugins.MatchResource.model.TmMt', {
   STATUS_UNKNOWN: 'unknown',
   STATUS_NOCONNECTION: 'noconnection',
   STATUS_IMPORT: 'import',
+  STATUS_NOTLOADED: 'notloaded',
   fields: [
     {name: 'id', type: 'int'},
     {name: 'entityVersion', type: 'integer', critical: true},

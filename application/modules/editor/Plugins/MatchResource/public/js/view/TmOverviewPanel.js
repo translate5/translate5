@@ -62,7 +62,8 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
             available: '#UT#verfügbar',
             unknown: '#UT#unbekannt',
             noconnection: '#UT#Keine Verbindung!',
-            import: '#UT#importiert'
+            import: '#UT#importiert',
+            notloaded: '#UT#verfügbar'
         },
         taskassocgridcell:'#UT#Zugewiesene Aufgaben'
     },
