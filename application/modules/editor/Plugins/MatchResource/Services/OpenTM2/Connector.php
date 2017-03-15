@@ -349,11 +349,11 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         
         try {
             $apiResult = $this->api->status();
-        }catch (Exception $e){
+        }catch (ZfExtended_BadGateway $e){
             $moreInfo = $e->getMessage();
             $log = ZfExtended_Factory::get('ZfExtended_Log');
             /* @var $log ZfExtended_Log */
-            $log->logException($e);
+            $log->logError($moreInfo, $this->tmmt->getResource()->getUrl());
             return self::STATUS_NOCONNECTION;
         }
         

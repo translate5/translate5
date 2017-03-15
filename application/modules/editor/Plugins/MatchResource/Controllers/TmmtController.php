@@ -342,6 +342,11 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         /* @var $connector editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract */
         $importInfo = $this->handleFileUpload($connector);
         
+        if(empty($importInfo)){
+            $this->uploadErrors[] = 'Keine Datei hochgeladen!';
+            return;
+        }
+        
         if(empty($this->uploadErrors) && !$connector->addAdditionalTm($importInfo[self::FILE_UPLOAD_NAME])) {
             $this->uploadErrors[] = 'Hochgeladene TMX Datei konnte nicht hinzugefügt werden.';
         }
@@ -367,6 +372,11 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         
         //checking general upload errors
         $errorNr = $importInfo[self::FILE_UPLOAD_NAME]['error'];
+        
+        if($errorNr === UPLOAD_ERR_NO_FILE) {
+            return false;
+        }
+        
         if($errorNr !== UPLOAD_ERR_OK) {
             $this->uploadErrors[] = ZfExtended_FileUploadException::getErrorMessage($errorNr);
             return $importInfo;
