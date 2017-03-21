@@ -83,13 +83,12 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	    getRowClass: function(record) {
 			//same class generation in SearchGrid!
 	        var me=this,
-	            result = ['match-state-'+record.get('state')],
-	            viewModesController = Editor.getApplication().getController('ViewModes').self;
-	        
-            if(viewModesController.isErgonomicMode()){
+	            result = ['match-state-'+record.get('state')];
+				
+            if(me.lookupViewModel().get('viewmodeIsErgonomic')){
                 result.push('ergonomic-font');
             }
-            if(viewModesController.isEditMode() || viewModesController.isViewMode()){
+            else {
                 result.push('view-editor-font-size');
             }
             return result.join(' ');

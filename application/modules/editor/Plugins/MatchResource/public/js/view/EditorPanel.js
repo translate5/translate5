@@ -55,6 +55,9 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
         targetEmptyText:'#UT#Zieltextsuche',
         panelTitle:'#UT#Matches und Konkordanz-Suche'
     },
+    bind: {
+        hidden: '{taskIsReadonly}'
+    },
     itemId:'matchResourceEditorPanel',
     activeTab: 0,
     header: {

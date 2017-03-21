@@ -170,16 +170,18 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       } 
   },
   viewModeChangeEvent: function(controller){
-      var me = this;
-      //isViewMode
-      //isErgonomicMode
-      //isEditMode
-      if(controller.self.isViewMode() && this.getEditorPanel()){
-          this.getEditorPanel().hide();
+      var me = this,
+          vm = me.getEditorViewport().getViewModel();
+
+      if(!me.getEditorPanel()) {
           return;
       }
-      if(this.getEditorPanel()){
-          this.getEditorPanel().show();
+
+      if(vm.get('editorIsReadonly')) {
+          me.getEditorPanel().collapse();
+      }
+      else {
+          me.getEditorPanel().expand();
       }
   },
   checkAssocStore: function(){

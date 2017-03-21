@@ -117,10 +117,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
     },
     viewModeChangeEvent: function(controller){
         var me = this,
-            tabPanel=me.getView().up('tabpanel')
-        //isViewMode
-        //isErgonomicMode
-        //isEditMode
+            tabPanel=me.getView().up('tabpanel');
         me.getView().getView().refresh();
         tabPanel.getActiveTab().getView().refresh()
     },
