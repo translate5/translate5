@@ -289,18 +289,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   initTaskReadMode: function(grid) {
       var vm = this.application.getController('ViewModes'),
           task = Editor.data.task,
-          sep;
-      if(task.isReadOnly() || ! this.isAllowed('editorEditTask', task)) {
-          //readonly:
-          grid.down('#viewModeMenu').hide();
-          sep = grid.down('#viewModeMenu').nextNode('tbseparator');
-          sep && sep.hide();
-          vm && vm.viewMode(true); //true means called on init
-      }
-      else {
-          //show not needed
-          vm && vm.editMode(true); //true means called on init
-      }
+          readonly = task.isReadOnly() || ! this.isAllowed('editorEditTask', task);
+      grid.lookupViewModel().set('taskIsReadonly', readonly);
+      vm && vm.editMode(readonly);
   },
   /**
    * Method Shortcut for convenience

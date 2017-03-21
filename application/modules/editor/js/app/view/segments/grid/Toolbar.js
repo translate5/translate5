@@ -47,7 +47,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_viewModesMenu: '#UT#Editormodi',
     item_viewModeBtn: '#UT#Ansichtsmodus',
     item_editModeBtn: '#UT#Bearbeitungsmodus',
-    item_ergonomicModeBtn: '#UT#Ergonimic',
+    item_ergonomicModeBtn: '#UT#Ergonomic',
+    item_ergonomicModeReadonlyBtn: '#UT#Ergonomic (Ansicht)',
     item_hideTagBtn: '#UT#Tags verbergen',
     item_shortTagBtn: '#UT#Tag-Kurzansicht',
     item_fullTagBtn: '#UT#Tag-Vollansicht',
@@ -55,6 +56,22 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_optionsTagBtn: '#UT#Einstellungen',
     item_clearSortAndFilterBtn: '#UT#Sortierung und Filter zurücksetzen',
     item_watchListFilterBtn: '#UT#Merkliste',
+    viewModel: {
+        formulas: {
+            isNormalEdit: function(get) {
+                return get('viewmodeIsEdit') && !get('editorIsReadonly');
+            },
+            isNormalView: function(get) {
+                return get('viewmodeIsEdit') && get('editorIsReadonly');
+            },
+            isErgoEdit: function(get) {
+                return get('viewmodeIsErgonomic') && !get('editorIsReadonly');
+            },
+            isErgoView: function(get) {
+                return get('viewmodeIsErgonomic') && get('editorIsReadonly');
+            }
+        }
+    },
     initConfig: function(instanceConfig) {
             var me = this,
             config = {
@@ -66,21 +83,53 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         xtype: 'menu',
                         items: [{
                             xtype: 'menucheckitem',
-                            itemId: 'viewMode',
+                            mode:{
+                                type: 'editMode',
+                                readonly: true
+                            },
+                            bind: {
+                                checked: '{isNormalView}'
+                            },
                             text: me.item_viewModeBtn,
                             group: 'toggleView',
                             textAlign: 'left'
                         },{
                             xtype: 'menucheckitem',
-                            itemId: 'editMode',
-                            checked: true,
+                            checked: true, //FIXME must always calculated now! also the visible items! → do this through a view model for the Toolbar
+                            mode:{
+                                type: 'editMode',
+                                readonly: false
+                            },
+                            bind: {
+                                checked: '{isNormalEdit}',
+                                hidden: '{taskIsReadonly}'
+                            },
                             text: me.item_editModeBtn,
                             group: 'toggleView',
                             textAlign: 'left'
                         },{
                             xtype: 'menucheckitem',
-                            itemId: 'ergonomicMode',
+                            mode:{
+                                type: 'ergonomicMode',
+                                readonly: false
+                            },
+                            bind: {
+                                checked: '{isErgoEdit}',
+                                hidden: '{taskIsReadonly}'
+                            },
                             text: me.item_ergonomicModeBtn,
+                            group: 'toggleView',
+                            textAlign: 'left'
+                        },{
+                            xtype: 'menucheckitem',
+                            mode:{
+                                type: 'ergonomicMode',
+                                readonly: true
+                            },
+                            bind: {
+                                checked: '{isErgoView}'
+                            },
+                            text: me.item_ergonomicModeReadonlyBtn,
                             group: 'toggleView',
                             textAlign: 'left'
                         }]
@@ -89,12 +138,14 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     xtype: 'tbseparator'
                 },{
                     xtype: 'button',
-                    disabled: true,
                     itemId: 'hideTagBtn',
                     enableToggle: true,
                     text: me.item_hideTagBtn,
                     tagMode: 'hide',
-                    toggleGroup: 'tagMode'
+                    toggleGroup: 'tagMode',
+                    bind: {
+                        disabled: '{!editorIsReadonly}'
+                    }
                 },{
                     xtype: 'button',
                     itemId: 'shortTagBtn',

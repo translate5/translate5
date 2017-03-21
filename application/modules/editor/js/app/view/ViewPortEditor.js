@@ -42,13 +42,18 @@ Ext.define('Editor.view.ViewPortEditor', {
     extend: 'Ext.container.Viewport',
     itemId: 'editorViewport',
     requires: [
-      'Editor.view.fileorder.Tree',
-      'Editor.view.fileorder.ReferenceTree',
-      'Editor.view.segments.Grid',
-      'Editor.view.segments.MetaPanelNavi',
-      'Editor.view.segments.MetaPanel'
+        'Editor.view.ViewPortEditorViewModel',
+        'Editor.view.fileorder.Tree',
+        'Editor.view.fileorder.ReferenceTree',
+        'Editor.view.segments.Grid',
+        'Editor.view.segments.MetaPanelNavi',
+        'Editor.view.segments.MetaPanel'
     ],
 
+    viewModel: {
+        type: 'viewportEditor'
+    },
+    
     layout: {
       type: 'border'
     },

@@ -43,6 +43,9 @@ Ext.define('Editor.controller.ViewModes', {
   extend : 'Ext.app.Controller',
   stores: ['Segments'],
   refs : [{
+     selector: '#editorViewport',
+     ref: 'viewPort'
+  },{
     ref : 'segmentGrid',
     selector : '#segmentgrid'
   },{
@@ -71,6 +74,9 @@ Ext.define('Editor.controller.ViewModes', {
           },
       },
       component: {
+          '#editorViewport': {
+              boxready: 'handleViewportReady'
+          },
           'gridpanel segmentsToolbar menucheckitem[group="toggleView"]' : {
               click : 'handleViewMode'
           },
@@ -86,44 +92,36 @@ Ext.define('Editor.controller.ViewModes', {
       }
   },
   messageIsViewMode: '#UT#Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lese"- bzw. Ansichtsmodus ist.',
+  /**
+   * Flag when true, editor can not be set into a non readonly mode
+   */
+  readonlyForced: false,
+  visibleColumns: [],
+  filesRegionVisible: true,
   init : function() {
       var me = this;
       me.toggleTags(me.self.TAG_SHORT);
+      
+      
   },
   statics: {
-    ergonomicStyleId: 'ergonomicStyleId',
+    STYLE_BOX_ID: 'ergonomicStyleId',
     
     TAG_FULL : 'full-tag',
     TAG_SHORT : 'short-tag',
     TAG_HIDE : 'hide-tag',
     
-    MODE_VIEW : 'view',
-    MODE_EDIT : 'edit',
-    MODE_ERGONOMIC : 'ergonomic',
+    MODE_EDIT : 'edit',             //normal/small edit mode
+    MODE_ERGONOMIC : 'ergonomic',   //ergonomic/big edit mode
+    CLS_READONLY: 'editor-readonly',
     
     currentTagMode: 'short-tag',
-    currentViewMode: 'edit',
     
     ROW_HEIGHT_ERGONOMIC: 60,
     ROW_HEIGHT_DEFAULT: 15,
     
-    visibleColumns: [],
-    
-    filesRegionVisible: true,
-    
     setMode: function(mode){
         this.currentTagMode = mode; 
-    },
-    setViewMode: function(mode){
-        var me = this,
-            body = Ext.getBody(),
-            modeToCls = function(mode) {
-                return 'mode-'+mode;
-            };
-        
-        body.removeCls(Ext.Array.map([me.MODE_VIEW, me.MODE_EDIT, me.MODE_ERGONOMIC], modeToCls));
-        body.addCls(modeToCls(mode));
-        me.currentViewMode = mode; 
     },
     getMode: function() {
         return this.currentTagMode;
@@ -136,28 +134,63 @@ Ext.define('Editor.controller.ViewModes', {
     },
     isHideTag: function(){
         return (this.currentTagMode == this.TAG_HIDE);
-    },
-    isErgonomicMode: function(){
-        return (this.currentViewMode == this.MODE_ERGONOMIC);
-    },
-    getErgonomicMode: function(){
-        return this.MODE_ERGONOMIC;
-    },
-    isEditMode: function(){
-        return (this.currentViewMode == this.MODE_EDIT);
-    }    ,
-    isViewMode: function(){
-        return (this.currentViewMode == this.MODE_VIEW);
     }
   },
-  onLaunch: function() {
-      var me = this;
-      me.self.setViewMode(me.self.MODE_EDIT); //initial mode is edit
+  handleViewportReady: function(grid) {
+      //start editor in ergonomic mode if configured, respect before setted readonly mode
+      if(Editor.data.app.startViewMode == 'ergonomic') {
+          this.ergonomicMode(grid.lookupViewModel().get('editorIsReadonly'));
+      }
   },
   clearViewModes: function() {
-      this.self.visibleColumns = [];
-      this.self.filesRegionVisible = true;
+      this.visibleColumns = [];
+      this.filesRegionVisible = true;
   },
+    setViewMode: function(mode){
+        var me = this,
+            body = Ext.getBody(),
+            modeToCls = function(mode) {
+                return 'mode-'+mode;
+            };
+        
+        body.removeCls(Ext.Array.map([me.self.MODE_EDIT, me.self.MODE_ERGONOMIC], modeToCls));
+        body.addCls(modeToCls(mode));
+        return me.getViewPort().getViewModel().set('editorViewmode', mode);
+    },
+    getViewMode: function() {
+        return this.getViewPort().getViewModel().get('editorViewmode');
+    },
+    isErgonomicMode: function(){
+        return (this.getViewMode() == this.self.MODE_ERGONOMIC);
+    },
+    isEditMode: function(){
+        return (this.getViewMode() == this.self.MODE_EDIT);
+    },
+    /**
+     * sets the editor to readonly / write mode
+     * returns true when readonly / false if not. 
+     * Since the value can be forced the result of this method must be used after using it
+     */
+    setReadonly: function(readonly) {
+        var me = this,
+            editingPlugin = me.getSegmentGrid().editingPlugin,
+            body = Ext.getBody(),
+            readonly = readonly || me.readonlyForced;
+
+        me.getViewPort().getViewModel().set('editorIsReadonly', readonly);
+        
+        if(readonly) {
+            me.application.getController('Segments').saveChainStart();
+            body.addCls(me.CLS_READONLY);
+            editingPlugin.disable();
+        }
+        else {
+            body.removeCls(me.CLS_READONLY);
+            editingPlugin.enable();
+        }
+
+        return readonly;
+    },
   /**
    * saves the default values of the default view mode in order to restore them after leaving economic mode
    */
@@ -168,10 +201,10 @@ Ext.define('Editor.controller.ViewModes', {
               col.originalWidth = col.getWidth() || col.initialConfig.width || 0;
           }
           if(col.isVisible()){
-            me.self.visibleColumns.push(col);
+            me.visibleColumns.push(col);
           }
       });
-      me.self.filesRegionVisible = !me.getFilePanel().collapsed;
+      me.filesRegionVisible = !me.getFilePanel().collapsed;
   },
   /**
    * returns all ContentColumn instances which should be hidden on view mode (and shown again in edit mode)
@@ -184,91 +217,109 @@ Ext.define('Editor.controller.ViewModes', {
       });
   },
   handleViewMode: function(item) {
-      this[item.itemId] && this[item.itemId]();
+      switch (item.mode.type) {
+          case 'ergonomicMode':
+              this.ergonomicMode(item.mode.readonly);
+              break;
+          case 'editMode':
+          default:
+              this.editMode(item.mode.readonly);
+              break;
+      }
   },
   /**
    * aktiviert den Bearbeitungsmodus des Grids (alle Spalten eingeblendet, editieren möglich, Hide Tags deaktivieren) 
    */
-  editMode: function(calledOnInit) {
+  editMode: function(readonly, calledOnInit) {
     var me = this;
+
+    readonly = me.setReadonly(readonly);
     me.getViewModeMenu().hideMenu();
+    me.getShortTagBtn().toggle(true);
+
+    //editMode und viewMode
     me.getSegmentGrid().removeCls(me.self.MODE_ERGONOMIC);
-    if(me.self.isErgonomicMode()){
+    if(me.isErgonomicMode()){
         me.showNonErgonomicElements();
     }
-    me.getShortTagBtn().toggle(true);
-    me.self.setViewMode(me.self.MODE_EDIT);
+
+    //nur editMode
+    me.setViewMode(me.self.MODE_EDIT);
+
+    //editMode und viewMode
     me.getSegmentGrid().view.refresh();
     me.handleTagButtonClick('short');
-    me.getHideTagBtn().disable();
-    if(calledOnInit === true) {
-        // is needed to initilize the grid filters (createFilters method) correctly:
-        me.getSegmentGrid().headerCt.getMenu(); 
-    }
-    else {
-        Ext.Array.each(me.getHideColumns(), function(col){
-            col.show();
-        });
-    }
-    me.getSegmentGrid().editingPlugin.enable();
+
+    //show/hide target columns, only the targetEdits are visible when readonly
+    Ext.Array.each(me.getHideColumns(), function(col){
+        col.setVisible(!readonly);
+    });
+
     me.fireEvent('viewModeChanged',me);
   },
   /**
    * activates the ergonomic mode of the grid (source and edit-column enlarged, all other columns hidden; file-area hidden)
    */
-  ergonomicMode: function() {
+  ergonomicMode: function(readonly) {
     var me = this;
+
+    readonly = me.setReadonly(readonly);
     me.getViewModeMenu().hideMenu();
-    if(me.self.isViewMode()){
-        me.editMode();
-    }
+    me.getShortTagBtn().toggle(true);
+
+    //ergo only
     me.setVisibleElements();
-    
+
+    //ergo only    
     me.getFilePanel().collapse();
     
-    /* trial to deactivate column-hide-show in ergo-mode because of ext-bug with 
-     * horinzontal scrolling after showing of hidden columns. 
-     * Does not work due to problems with reconfigure grid and roweditor
-     *  in ext 4.0.7. See view/ui/segments/grid.js onReconfigure for more information.
-      */
+    //calculate width of non content columns visible in ergo mode
     var widthToRedColWidth = 0;
     Ext.Array.each(me.getSegmentGrid().columns, function(col){
         if(col.isErgonomicSetWidth && col.isErgonomicVisible && col.ergonomicWidth  !== undefined){
-            if(!col.isHidden()){
-                widthToRedColWidth += col.ergonomicWidth;
+            if(col.isHidden()){
+                return;
             }
+            widthToRedColWidth += col.ergonomicWidth;
         }
     });
-    me.colWidth = (me.getSegmentGrid().getWidth()- widthToRedColWidth - 12)/2;//This is a bit to large
-    // by purpose, because we need a horizontal scrollbar always. Otherwhise 
-    // the horizontal scrollbar will not work when showing hidden columns 
-    // in some cases due to a ext-bug. Might be possible to change on ext-upgrade
+
+    //add width of the scrollbar to the non available width for columns
+    widthToRedColWidth +  Ext.getScrollbarSize().width;
+
+    //content columns width is grid width - 
+    me.colWidth = (me.getSegmentGrid().getWidth()- widthToRedColWidth)/2;
     
     Ext.Array.each(me.getSegmentGrid().columns, function(col){
         if(col.isErgonomicSetWidth){
             col.show();
-            if(col.ergonomicWidth  !== undefined){
-                col.setWidth(col.ergonomicWidth);
+            if(col.ergonomicWidth  === undefined){
+                col.setWidth(me.colWidth);
             }
             else{
-                col.setWidth(me.colWidth);
+                col.setWidth(col.ergonomicWidth);
             }
         }
     });
 
-    Ext.Array.each(me.self.visibleColumns, function(col){
+    Ext.Array.each(me.visibleColumns, function(col){
         if(! col.isErgonomicVisible){
             col.hide();
         }
     },me);
     //inject css to the head to manipulate the column css, because it is easier than to set inject ergomic class for each column in the dom
-    Ext.util.CSS.createStyleSheet('#segment-grid .x-grid-row .x-grid-cell .x-grid-cell-inner { width: '+me.colWidth+'px; }',me.self.ergonomicStyleId);
+    Ext.util.CSS.createStyleSheet('#segment-grid .x-grid-row .x-grid-cell .x-grid-cell-inner { width: '+me.colWidth+'px; }',me.self.STYLE_BOX_ID);
     
+    //ergoOnly, others remove cls
     me.getSegmentGrid().addCls(me.self.MODE_ERGONOMIC);
-    me.self.setViewMode(me.self.MODE_ERGONOMIC);
+
+    //ergoOnly others, with other mode
+    me.setViewMode(me.self.MODE_ERGONOMIC);
     me.getSegmentGrid().view.refresh();
     me.toggleEditorErgonomicMode();
     me.saveAlreadyOpened();
+
+
     me.fireEvent('viewModeChanged',me);
   },
   /**
@@ -284,33 +335,10 @@ Ext.define('Editor.controller.ViewModes', {
      }
      
      body = Ext.fly(editor.getEditorBody());
-     body.removeCls(me.self.getErgonomicMode());
-     if(me.self.isErgonomicMode()){
-        body.addCls(me.self.getErgonomicMode());
+     body.removeCls(me.self.MODE_ERGONOMIC);
+     if(me.isErgonomicMode()){
+        body.addCls(me.self.MODE_ERGONOMIC);
      }
-  },
-  /**
-   * enables the grid view mode (editor disabled, original target text disabled, hide tags enabled)
-   */
-  viewMode: function() {
-    var me = this, 
-    editorPlugin = me.getSegmentGrid().editingPlugin;
-    me.application.getController('Segments').saveChainStart();
-    me.getViewModeMenu().hideMenu();
-    me.getSegmentGrid().removeCls(this.self.MODE_ERGONOMIC);
-    if(me.self.isErgonomicMode()){
-        me.showNonErgonomicElements();
-    }
-    me.getShortTagBtn().toggle(true);
-    me.self.setViewMode(me.self.MODE_VIEW);
-    me.getSegmentGrid().view.refresh();
-    me.handleTagButtonClick('short');
-    me.getHideTagBtn().enable();
-    Ext.Array.each(me.getHideColumns(), function(col){
-        col.hide();
-    });
-    editorPlugin.disable();
-    me.fireEvent('viewModeChanged',me);
   },
   /**
    * show or expand all columns and areas not needed in ergonomic mode, which have been visible before
@@ -318,10 +346,10 @@ Ext.define('Editor.controller.ViewModes', {
   showNonErgonomicElements : function() {
     var me = this;
     me.saveAlreadyOpened();
-    Ext.Array.each(me.self.visibleColumns, function(col){
+    Ext.Array.each(me.visibleColumns, function(col){
         col.show();
     });
-    if(me.self.filesRegionVisible){
+    if(me.filesRegionVisible){
         me.getFilePanel().expand();
     }
     Ext.Array.each(me.getSegmentGrid().columns, function(col){
@@ -329,7 +357,7 @@ Ext.define('Editor.controller.ViewModes', {
             col.setWidth(col.originalWidth);
         }
     });
-    Ext.util.CSS.removeStyleSheet(me.self.ergonomicStyleId);
+    Ext.util.CSS.removeStyleSheet(me.self.STYLE_BOX_ID);
   },
   /**
    * Unified tag mode button handler
@@ -398,7 +426,7 @@ Ext.define('Editor.controller.ViewModes', {
       }
   },
   checkModeBeforeEdit: function(plugin) {
-      if(this.self.isViewMode()) {
+      if(this.getViewPort().getViewModel().get('editorIsReadonly')) {
           Editor.MessageBox.addWarning(this.messageIsViewMode);
           return false;
       }
