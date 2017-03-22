@@ -82,8 +82,14 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         $sourceLang = $this->tmmt->getSourceLangRfc5646(); 
         
         //to ensure that we get unique TMs Names although of the above stripped content, 
-        // we add the TMMT ID 
-        $name = "ID".$this->tmmt->getId().'-'.$this->filterName($this->tmmt->getName());
+        // we add the TMMT ID and a prefix which can be configured per each translate5 instance 
+        $config = Zend_Registry::get('config');
+        /* @var $config Zend_Config */
+        $prefix = $config->runtimeOptions->plugins->MatchResource->opentm2->tmprefix;
+        if(!empty($prefix)) {
+            $prefix .= '-';
+        }
+        $name = $prefix.'ID'.$this->tmmt->getId().'-'.$this->filterName($this->tmmt->getName());
         $this->tmmt->setFileName($name);
         
         $noFile = empty($fileinfo);
