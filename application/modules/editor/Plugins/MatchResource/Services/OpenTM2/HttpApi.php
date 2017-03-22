@@ -219,8 +219,8 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
         $data->searchString = $queryString;
         $data->searchType = $field;
         $data->searchPosition = $searchPosition;
-        $data->numResults = 5;
-        $data->msSearchAfterNumResults = 100;
+        $data->numResults = 20;
+        $data->msSearchAfterNumResults = 250;
         $http = $this->getHttpWithMemory('POST', 'concordancesearch');
         $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
         return $this->processResponse($this->request($http));
