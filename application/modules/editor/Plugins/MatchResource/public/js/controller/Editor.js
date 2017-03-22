@@ -108,13 +108,6 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           me.getMatchgrid().controller.endEditing();//(context.record.get('taskGuid'),context.value);
       }
   },
-  //onSegmentGridRender: function(grid) {
-      //var me=this;
-      //var authUser = Editor.app.authenticatedUser;
-      //if(!Editor.data.task.isReadOnly() && (authUser.isAllowed('pluginMatchResourceMatchQuery') || authUser.isAllowed('pluginMatchResourceSearchQuery'))){
-      //    me.checkAssocStore(grid);
-     // }
-  //},
   centerPanelAfterRender: function(){
       var me=this,
           authUser = Editor.app.authenticatedUser;

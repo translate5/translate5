@@ -207,7 +207,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
         me.getCenterRegion().items.each(function(item){
             item.hide();
         });
-      
+
         if(panel) {
             panel.show();
         } else {
