@@ -66,7 +66,8 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
         sourceEmptyText:'#UT#Quelltextsuche',
         targetEmptyText:'#UT#Zieltextsuche',
         tmresource:'#UT#TM-Ressource',
-        search:'#UT#Suche'
+        search:'#UT#Alle durchsuchen',
+        singleSearch:'#UT#Suche in {0}'
     },
     viewConfig: {
         enableTextSelection: true,
@@ -90,9 +91,26 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
     },
     initConfig: function(instanceConfig) {
         var me = this,
-            config = {
+            config = null,
+            searchItems = [];
+
+        me.assocStore = instanceConfig.assocStore;
+
+        me.assocStore.each(function(rec){
+            if(rec.get('searchable')){
+                searchItems.push({
+                    text: Ext.String.format(me.strings.singleSearch, rec.get('name')+' ('+rec.get('serviceName')+')'),
+                    iconCls: 'coloricon', //css class does not exist, but a value is needed here to trigger the icon rendering
+                    service: rec
+                });
+            }
+        });
+
+        config = {
                 columns: [{
                     xtype: 'gridcolumn',
+                    hideable: false,
+                    sortable: false,
                     flex: 2,
                     dataIndex: 'source',
                     tdCls: 'segment-tag-column source',
@@ -103,11 +121,15 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
                     flex: 2,
                     dataIndex: 'target',
                     tdCls: 'segment-tag-column target',
+                    hideable: false,
+                    sortable: false,
                     cellWrap: true,
                     text: me.strings.target
                 },{
                     xtype: 'gridcolumn',
                     flex: 1,
+                    hideable: false,
+                    sortable: false,
                     dataIndex: 'service',
                     renderer: function(val, meta, record) {
                         var str = me.assocStore.findRecord('id',record.get('tmmtid'));
@@ -118,12 +140,6 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
                 }],
                 dockedItems: [{
                     xtype: 'panel',
-                    //height: '50px',
-                    /*layout: {
-                        type: 'column',
-                        align: 'stretch'
-                    },
-                    */
                     layout: 'column',
                     border: false,
                     padding:'10 10 10 10',
@@ -144,14 +160,17 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
                         padding:'0 10 0 0',
                         emptyText:me.strings.targetEmptyText,
                     },{
-                        xtype:'button',
+                        xtype:'splitbutton',
                         name:'btnSubmit',
                         text:me.strings.search,
                         iconCls:'ico-tm-magnifier',
+                        menu: {
+                            xtype: 'menu',
+                            items: searchItems
+                        }
                     }]
                 }]
             };
-        me.assocStore = instanceConfig.assocStore;
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }

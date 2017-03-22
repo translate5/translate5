@@ -120,9 +120,13 @@
       <source>TM-Ressource</source>
       <target>TM resource</target>
     </trans-unit>
-    <trans-unit id='U3VjaGU='>
-      <source>Suche</source>
-      <target>Search</target>
+    <trans-unit id='QWxsZSBkdXJjaHN1Y2hlbg=='>
+        <source>Alle durchsuchen</source>
+        <target>Search in all</target>
+    </trans-unit>
+    <trans-unit id='U3VjaGUgaW4gezB9'>
+        <source>Suche in {0}</source>
+        <target>Search in {0}</target>
     </trans-unit>
     <trans-unit id='TWF0Y2hyZXNzb3VyY2VuIHp1d2Vpc2Vu'>
       <source>Matchressourcen zuweisen</source>

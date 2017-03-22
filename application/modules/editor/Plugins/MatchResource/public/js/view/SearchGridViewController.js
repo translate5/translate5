@@ -50,7 +50,11 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
                 keypress:'textFieldTextChange'
             },
             '#searchGridPanel button[name=btnSubmit]': {
-                click:'handleSubmitButtonClick'
+                click:'handleSearchAll'
+            },
+            '#searchGridPanel button[name=btnSubmit] menuitem': {
+                click:'handleSearchSingle',
+                afterrender: 'renderSearchItem'
             },
             '#searchGridPanel':{
                 render:'searchGridPanelRender',
@@ -81,7 +85,8 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
     executedRequests:new Ext.util.HashMap(),
     lastSearch: {
         query:'',
-        field:null
+        tmmtid: null,
+        field: null
     },
     offset: new Ext.util.HashMap(),
     lastActiveField:null,
@@ -98,13 +103,27 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
         }
         me.lastActiveField = field;
     },
-    handleSubmitButtonClick:function(){
+    handleSearchAll:function(){
         var me=this;
         if(me.lastActiveField && me.lastActiveField.value!=""){
             me.startSearch(me.lastActiveField.value, me.lastActiveField.name);
         }
     },
-    startSearch: function(querystring, field) {
+    renderSearchItem: function(menuitem) {
+        menuitem.el.select('.coloricon').first().setStyle({backgroundColor: '#'+menuitem.service.get('color')});
+    },
+    handleSearchSingle: function(menuitem) {
+        var me=this;
+        if(me.lastActiveField && me.lastActiveField.value!=""){
+            me.startSearch(me.lastActiveField.value, me.lastActiveField.name, menuitem.service.get('id'));
+        }
+    },
+    /**
+     * @param {String} querystring the string searched for in the TM
+     * @param {String} field source / target
+     * @param {Integer} tmmtid optional, integer to restrict search to this tmmtid, or falsy to search in all tmmts
+     */
+    startSearch: function(querystring, field, tmmtid) {
         var me = this;
         if(!querystring) {
             return;
@@ -112,6 +131,8 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
         me.getViewModel().getStore('editorsearch').removeAll();
         me.lastSearch.query= querystring;
         me.lastSearch.field = field;
+        //needed when searching only one tmmt, otherwise a falsy value
+        me.lastSearch.tmmtid = tmmtid;
         me.search();
         me.clearTextField(field);
     },
@@ -141,7 +162,9 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
             me.offset.clear();
         }
         me.assocStore.each(function(record){
-            if(record.get('searchable')){
+            var searchable = record.get('searchable'),
+                searchInTm = !me.lastSearch.tmmtid || (record.get('id') == me.lastSearch.tmmtid);
+            if(searchable && searchInTm){
                 me.sendRequest(record.get('id'));
             }
         });

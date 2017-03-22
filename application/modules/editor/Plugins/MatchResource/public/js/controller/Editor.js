@@ -112,7 +112,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       var me=this,
           authUser = Editor.app.authenticatedUser;
       if(!Editor.data.task.isReadOnly() && (authUser.isAllowed('pluginMatchResourceMatchQuery') || authUser.isAllowed('pluginMatchResourceSearchQuery'))){
-          me.checkAssocStore();
+          me.loadAssocStore();
       }
       me.SERVER_STATUS = Editor.plugins.MatchResource.model.EditorQuery.prototype;
   },
@@ -177,7 +177,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           me.getEditorPanel().expand();
       }
   },
-  checkAssocStore: function(){
+  loadAssocStore: function(){
       var me = this
           taskGuid = Editor.data.task.get('taskGuid'),
           prm = {

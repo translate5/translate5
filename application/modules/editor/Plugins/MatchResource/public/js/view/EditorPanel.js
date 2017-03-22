@@ -45,8 +45,7 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
     requires:[
         'Editor.plugins.MatchResource.view.EditorPanelViewController',
         'Editor.plugins.MatchResource.view.SearchGrid',
-        'Editor.plugins.MatchResource.view.MatchGrid',
-        'Editor.plugins.MatchResource.view.SearchResultGrid'
+        'Editor.plugins.MatchResource.view.MatchGrid'
     ],
     strings: {
         searchTitle: '#UT#Konkordanzsuche',

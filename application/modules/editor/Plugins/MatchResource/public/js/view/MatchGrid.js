@@ -111,7 +111,9 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
           },
 	      columns: [{
 	          xtype:'gridcolumn',
-	          flex: 10/100,
+	          flex: 1,
+			  hideable: false,
+			  sortable: false,
 	          dataIndex: 'state',
               renderer: function(val, meta, record) {
                   if(val !== me.SERVER_STATUS.SERVER_STATUS_LOADED){
@@ -129,21 +131,27 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
               },
           },{
 	          xtype: 'gridcolumn',
-	          flex: 45/100,
+	          flex: 5,
+			  hideable: false,
+			  sortable: false,
 	          cellWrap: true,
 			  tdCls: 'segment-tag-column source',
 	          dataIndex: 'source',
 	          text: me.strings.source
 	      },{
 	          xtype: 'gridcolumn',
-	          flex: 45/100,
+	          flex: 5,
+			  hideable: false,
+		      sortable: false,
 	          cellWrap: true,
 			  tdCls: 'segment-tag-column target',
 	          dataIndex: 'target',
 	          text: me.strings.target
 	      },{
 	          xtype: 'gridcolumn',
-	          flex: 10/100,
+	          flex: 1,
+			  hideable: false,
+              sortable: false,
 	          dataIndex: 'matchrate',
 	          tdCls: 'matchrate',
 	          renderer: function(matchrate, meta, record) {
