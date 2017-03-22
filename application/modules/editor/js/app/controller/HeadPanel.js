@@ -84,10 +84,13 @@ Ext.define('Editor.controller.HeadPanel', {
           },
           'headPanel toolbar#top-menu':{
         	  beforerender:'headPanelToolbarBeforeRender',
-        	  add: function(toolbar){
-                  if(toolbar.rendered){
-                      toolbar.setWidth(toolbar.getWidth());
-                  }
+        	  add: {
+                  fn: function(toolbar){
+                      if(toolbar.rendered){
+                          toolbar.updateLayout();
+                      }
+                  },
+                  delay: 700
               }
           }
       }
