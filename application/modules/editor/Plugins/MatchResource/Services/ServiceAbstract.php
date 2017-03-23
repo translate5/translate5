@@ -68,6 +68,21 @@ abstract class editor_Plugins_MatchResource_Services_ServiceAbstract {
     }
     
     /**
+     * Adds resource for a given list of URLs
+     * @see addResource
+     * @param string $name
+     * @param array $urls
+     */
+    protected function addResourceForeachUrl(string $name, array $urls) {
+        $i = 1;
+        $service = $this->getServiceNamespace();
+        foreach ($urls as $url) {
+            $id = $service.'_'.$i++;
+            $this->addResource([$id, $name, $url]);
+        }
+    }
+    
+    /**
      * returns a list with connector instances, one per resource
      * @return [editor_Plugins_MatchResource_Models_Resource]
      */

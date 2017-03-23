@@ -56,11 +56,6 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
     protected $relaisField;
     
     /**
-     * @var editor_Models_Segment_InternalTag
-     */
-    protected $tagHelper;
-    
-    /**
      * @param editor_Models_Task $task
      * @param editor_Models_SegmentFieldManager $sfm receive the already inited sfm
      */
@@ -72,7 +67,6 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
         $this->sfm = $sfm;
         $this->segment = ZfExtended_Factory::get('editor_Models_Segment');
         $this->segment->setTaskGuid($task->getTaskGuid());
-        $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
     }
     
     /**
@@ -94,9 +88,8 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
         }
         $sourceContent = $this->segment->getFieldOriginal($source);
         
-        
-        
-        if(! $this->tagHelper->equalsIdIgnored($sourceContent, $data[$source]["original"])){
+        //equal means here, that also the tags must be equal in content and position
+        if($sourceContent !== $data[$source]["original"]){
             $log = ZfExtended_Factory::get('ZfExtended_Log');
             $log->logError('Source of relais file not identical with source of translated file.',  'Source of relais file is not identical with source of translated file. Relais target is left empty. FileName: '.$this->fileName.' / mid: '.$parser->getMid().' / Source content of translated file: '.$sourceContent.' / Source content of relais file: '.$data[$source]["original"]);
             return false;

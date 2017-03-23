@@ -40,6 +40,13 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.plugins.MatchResource.model.TmMt', {
   extend: 'Ext.data.Model',
+  STATUS_LOADING: 'loading',
+  STATUS_ERROR: 'error',
+  STATUS_AVAILABLE: 'available',
+  STATUS_UNKNOWN: 'unknown',
+  STATUS_NOCONNECTION: 'noconnection',
+  STATUS_IMPORT: 'import',
+  STATUS_NOTLOADED: 'notloaded',
   fields: [
     {name: 'id', type: 'int'},
     {name: 'entityVersion', type: 'integer', critical: true},
@@ -48,6 +55,8 @@ Ext.define('Editor.plugins.MatchResource.model.TmMt', {
     {name: 'targetLang', type: 'string'},
     {name: 'color', type: 'string'},
     {name: 'resourceId', type: 'string'},
+    {name: 'status', type: 'string', persist: false},
+    {name: 'statusInfo', type: 'string', persist: false},
     {name: 'serviceName', type: 'string'},
     {name: 'serviceType', type: 'string'},
     {name: 'searchable', type: 'boolean'}

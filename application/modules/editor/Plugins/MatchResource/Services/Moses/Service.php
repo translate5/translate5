@@ -55,11 +55,6 @@ class editor_Plugins_MatchResource_Services_Moses_Service extends editor_Plugins
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
         $urls = $config->runtimeOptions->plugins->MatchResource->moses->server;
-        $i = 1;
-        $service = $this->getServiceNamespace();
-        foreach ($urls as $url) {
-            $id = $service.'_'.$i++;
-            $this->addResource([$id, 'Moses MT', $url]);
-        }
+        $this->addResourceForeachUrl('Moses MT', $urls->toArray());
     }
 }

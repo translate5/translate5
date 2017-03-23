@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Initial Class of Plugin "TranslationMemory"
  * 
- * @FIXME Hint: class must be named NOT Bootstrap, otherwise we will get a strange Zend Error
+ * Hint: class must be named NOT Bootstrap, otherwise we will get a strange Zend Error
  */
 class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
     
@@ -74,6 +74,10 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
     }
     
     public function init() {
+        if(ZfExtended_Debug::hasLevel('plugin', 'MatchResource')) {
+            ZfExtended_Factory::addOverwrite('Zend_Http_Client', 'ZfExtended_Zendoverwrites_Http_DebugClient');
+        }
+        
         $this->initEvents();
         $this->initRoutes();
     }
@@ -251,8 +255,6 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
             $matchRateType->add($matchRateType::TYPE_AUTO_PROPAGATED);
             $alikeSegment->setMatchRateType((string) $matchRateType);
         }
-        
-        //FIXME here also use matchratetype class to add auto flag
     }
     
     /**
@@ -272,6 +274,17 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
         ));
         $r->addRoute('plugins_matchresource_restdefault', $restRoute);
         
+        //WARNING: Order of the route definition is important! 
+        // the catchall like download route must be defined before the more specific query/search routes!
+        $queryRoute = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_matchresource_tmmt/:id/:type',
+            array(
+                'module' => 'editor',
+                'controller' => 'plugins_matchresource_tmmt',
+                'action' => 'download'
+            ));
+        $r->addRoute('plugins_matchresource_download', $queryRoute);
+        
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/plugins_matchresource_tmmt/:tmmtId/query',
             array(
@@ -290,13 +303,15 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
             ));
         $r->addRoute('plugins_matchresource_search', $queryRoute);
         
+        
+        
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
-            'editor/plugins_matchresource_tmmt/:id/download',
+            'editor/plugins_matchresource_tmmt/:id/import',
             array(
                 'module' => 'editor',
                 'controller' => 'plugins_matchresource_tmmt',
-                'action' => 'download'
+                'action' => 'import'
             ));
-        $r->addRoute('plugins_matchresource_download', $queryRoute);
+        $r->addRoute('plugins_matchresource_import', $queryRoute);
     }
 }

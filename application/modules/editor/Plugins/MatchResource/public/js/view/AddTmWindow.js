@@ -36,28 +36,23 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
     ],
     alias: 'widget.addTmWindow',
     itemId: 'addTmWindow',
-    cls: 'addTmWindow',
     strings: {
         add: '#UT#Matchressource hinzufügen',
         resource: '#UT#Ressource',
         name: '#UT#Name',
         source: '#UT#Quellsprache',
         target: '#UT#Zielsprache',
-        file: '#UT#TM-Datei',
+        file: '#UT#TM/TMX-Datei (optional)',
+        importTmxType: '#UT#Bitte verwenden Sie eine TM oder TMX Datei!',
         color: '#UT#Farbe',
         colorTooltip: '#UT#Farbe dieser Matchressource',
         save: '#UT#Speichern',
         cancel: '#UT#Abbrechen'
     },
-    height : 300,
+    height : 360,
     width : 500,
     modal : true,
     layout:'fit',
-    editMode:false,
-    initComponent: function() {
-        var me = this;
-        me.callParent(arguments);
-    },
     initConfig : function(instanceConfig) {
         var me = this,
         langCombo = {
@@ -68,7 +63,6 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
                 queryMode: 'local',
                 valueField: 'id'
             },
-            roles = [],
             config = {},
             defaults = {
                 labelWidth: 160,
@@ -78,21 +72,16 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
             title: me.strings.add,
             items : [{
                 xtype: 'form',
-                id:'addTmForm',
                 padding: 5,
                 ui: 'default-frame',
                 defaults: defaults,
                 items: [{
                     xtype: 'combo',
                     name:'resourceId',
-                    dataIndex:'resourceId',
-                    disabled: instanceConfig.editMode,
+                    allowBlank: false,
                     typeAhead: true,
                     forceSelection: true,
                     queryMode: 'local',
-                    listeners: {
-                        select: me.serviceSelect
-                    },
                     valueField: 'id',
                     displayField: 'name',
                     store:'Editor.plugins.MatchResource.store.Resources',
@@ -107,7 +96,6 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
                 },Ext.applyIf({
                     name: 'sourceLang',
                     allowBlank: false,
-                    disabled: instanceConfig.editMode,
                     toolTip: me.strings.source,
                     //each combo needs its own store instance, see EXT6UPD-8
                     store: Ext.create(Editor.store.admin.Languages),
@@ -115,7 +103,6 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
                 }, langCombo),Ext.applyIf({
                     name: 'targetLang',
                     allowBlank: false,
-                    disabled: instanceConfig.editMode,
                     toolTip: me.strings.target,
                     //each combo needs its own store instance, see EXT6UPD-8
                     store:Ext.create(Editor.store.admin.Languages),
@@ -142,8 +129,10 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
                 },{
                     xtype: 'filefield',
                     name: 'tmUpload',
-                    allowBlank: false,
+                    allowBlank: true,
                     toolTip: me.strings.file,
+                    regex: /\.(tm|tmx)$/i,
+                    regexText: me.strings.importTmxType,
                     disabled:true,
                     fieldLabel: me.strings.file
                 }]
@@ -160,7 +149,7 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
                     xtype: 'tbfill'
                 },{
                     xtype: 'button',
-                    iconCls:'ico-user-save',
+                    iconCls:'ico-save',
                     itemId: 'save-tm-btn',
                     text: me.strings.save
                 }, {
@@ -175,19 +164,5 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
-    },
-    /**
-     * loads the record into the form, does set the role checkboxes according to the roles value
-     * @param record
-     */
-    loadRecord: function(record) {
-        this.down('form').loadRecord(record);
-    },
-    serviceSelect:function(combo, record, index){
-        var me = Ext.getCmp('addTmForm');
-        me.down('filefield').setDisabled(!record.get('filebased'));
-        me.down('hiddenfield[name="serviceType"]').setValue(record.get('serviceType'));
-        me.down('hiddenfield[name="serviceName"]').setValue(record.get('serviceName'));
-        me.down('colorfield[name="color"]').setValue(record.get('defaultColor'));
     }
 });

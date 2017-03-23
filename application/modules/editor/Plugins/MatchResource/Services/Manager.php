@@ -47,8 +47,10 @@ class editor_Plugins_MatchResource_Services_Manager {
      * @var array
      */
     static protected $registeredServices = array(
+        'editor_Plugins_MatchResource_Services_OpenTM2',
         'editor_Plugins_MatchResource_Services_Moses',
-        'editor_Plugins_MatchResource_Services_DummyFileTm',
+        'editor_Plugins_MatchResource_Services_LucyLT',
+        //'editor_Plugins_MatchResource_Services_DummyFileTm',
     );
 
     public function getAll() {
@@ -99,7 +101,7 @@ class editor_Plugins_MatchResource_Services_Manager {
         $serviceType = $tmmt->getServiceType();
         $this->checkService($serviceType);
         $connector = ZfExtended_Factory::get($serviceType.self::CLS_CONNECTOR);
-        /* @var $connector editor_Plugins_MatchResource_Services_ConnectorAbstract */
+        /* @var $connector editor_Plugins_MatchResource_Services_Connector_Abstract */
         $connector->connectTo($tmmt);
         return $connector;
     }
@@ -136,20 +138,25 @@ class editor_Plugins_MatchResource_Services_Manager {
     }
     
     public function openForTask(editor_Models_Task $task) {
-        $this->visitAllAssociatedTms($task->getTaskGuid(), function(editor_Plugins_MatchResource_Services_ConnectorAbstract $connector){
+        $this->visitAllAssociatedTms($task->getTaskGuid(), function(editor_Plugins_MatchResource_Services_Connector_Abstract $connector){
             $connector->open();
         });
     }
     
     public function closeForTask(editor_Models_Task $task) {
-        $this->visitAllAssociatedTms($task->getTaskGuid(), function(editor_Plugins_MatchResource_Services_ConnectorAbstract $connector){
+        $this->visitAllAssociatedTms($task->getTaskGuid(), function(editor_Plugins_MatchResource_Services_Connector_Abstract $connector){
             $connector->close();
         });
     }
     
     public function updateSegment(editor_Models_Segment $segment) {
-        $this->visitAllAssociatedTms($segment->getTaskGuid(), function(editor_Plugins_MatchResource_Services_ConnectorAbstract $connector) use ($segment) {
-            $connector->update($segment);
+        if(empty($segment->getTargetEdit())){
+            return;
+        }
+        $this->visitAllAssociatedTms($segment->getTaskGuid(), function(editor_Plugins_MatchResource_Services_Connector_Abstract $connector, $tmmt, $assoc) use ($segment) {
+            if(!empty($assoc['segmentsUpdateable'])) {
+                $connector->update($segment);
+            }
         });
     }
     
@@ -162,8 +169,8 @@ class editor_Plugins_MatchResource_Services_Manager {
             /* @var $tmmt editor_Plugins_MatchResource_Models_TmMt */
             $tmmt->init($one);
             $connector = $this->getConnector($tmmt);
-            /* @var $connector editor_Plugins_MatchResource_Services_ConnectorAbstract */
-            $todo($connector, $tmmt);
+            /* @var $connector editor_Plugins_MatchResource_Services_Connector_Abstract */
+            $todo($connector, $tmmt, $one);
         }
     }
 }

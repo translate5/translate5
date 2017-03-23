@@ -51,9 +51,20 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
         color: '#UT#Farbe',
         refresh: '#UT#Aktualisieren',
         add: '#UT#Hinzufügen',
+        import: '#UT#Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen',
         noTaskAssigned:'#UT#Keine Aufgaben zugewiesen.',
         sourceLang: '#UT#Quellsprache',
         targetLang: '#UT#Zielsprache',
+        tmmtStatusColumn: '#UT#Status',
+        tmmtStatus: {
+            loading: '#UT#Statusinformationen werden geladen',
+            error: '#UT#Fehler',
+            available: '#UT#verfügbar',
+            unknown: '#UT#unbekannt',
+            noconnection: '#UT#Keine Verbindung!',
+            import: '#UT#importiert',
+            notloaded: '#UT#verfügbar'
+        },
         taskassocgridcell:'#UT#Zugewiesene Aufgaben'
     },
     cls:'tmOverviewPanel',
@@ -68,12 +79,13 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                 store : 'Editor.plugins.MatchResource.store.TmMts',
                 viewConfig: {
                     getRowClass: function(record) {
-                        return record.get('filebased') ? 'match-ressource-filebased' : 'match-ressource-non-filebased';
+                        var cls = record.get('filebased') ? 'match-ressource-filebased' : 'match-ressource-non-filebased';
+                        return cls + ' tmmt-status-'+record.get('status');
                     }
                 },
                 columns: [{
                     xtype: 'gridcolumn',
-                    width: 100,
+                    width: 150,
                     dataIndex: 'name',
                     filter: {
                         type: 'string'
@@ -108,8 +120,38 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                     },
                     text: me.strings.color
                 },{
+                    xtype: 'gridcolumn',
+                    width: 160,
+                    text: me.strings.tmmtStatusColumn,
+                    dataIndex: 'status',
+                    renderer: function(value, meta, record) {
+                        var str = me.strings.tmmtStatus,
+                            info = record.get('statusInfo');
+                        if(value === "loading") {
+                            record.load();
+                            meta.tdCls = 'loading';
+                            meta.tdAttr = 'data-qtip="'+str.loading+'"';
+                            return ''; //no string since icon set
+                        }
+                        if(str[value]){
+                            value = str[value];
+                        }
+                        else {
+                            value = str.unknown;
+                        }
+                        if(info) {
+                            meta.tdAttr = 'data-qtip="'+info+'"';
+                            meta.tdCls = 'infoIcon';
+                        }
+                        else {
+                            meta.tdAttr = 'data-qtip=""';
+                        }
+                        return value;
+
+                    }
+                },{
                     xtype: 'actioncolumn',
-                    width: 60,
+                    width: 80,
                     items: [{
                         tooltip: me.strings.edit,
                         action: 'edit',
@@ -118,6 +160,10 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                         tooltip: me.strings.erase,
                         action: 'delete',
                         iconCls: 'ico-tm-delete'
+                    },{
+                        tooltip: me.strings.import,
+                        action: 'import',
+                        iconCls: 'ico-tm-import'
                     },{
                         tooltip: me.strings.download,
                         action: 'download',
@@ -128,6 +174,15 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                     width: 100,
                     text: me.strings.resource,
                     dataIndex: 'serviceName',
+                    tdCls: 'serviceName',
+                    renderer: function(v, meta, rec){
+                        var store = Ext.getStore('Editor.plugins.MatchResource.store.Resources'),
+                            resource = store.findRecord('id', rec.get('resourceId'));
+                        if(resource) {
+                            meta.tdAttr = 'data-qtip="'+resource.get('name')+'"';
+                        }
+                        return v;
+                    },
                     filter: {
                         type: 'string'
                     }

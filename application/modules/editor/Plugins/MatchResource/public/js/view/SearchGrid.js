@@ -62,72 +62,84 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
         source: '#UT#Quelltext',
         target: '#UT#Zieltext',
         match: '#UT#Matchrate',
+        ctrl: '#UT#STRG',
         sourceEmptyText:'#UT#Quelltextsuche',
         targetEmptyText:'#UT#Zieltextsuche',
         tmresource:'#UT#TM-Ressource',
-        search:'#UT#Suche',
-        action:'#UT#Aktionen',
+        search:'#UT#Alle durchsuchen',
+        singleSearch:'#UT#Suche in {0}'
     },
     viewConfig: {
         enableTextSelection: true,
         getRowClass: function(record) {
+			//same class generation in MatchGrid!
             var me=this,
-            result = ['match-state-'+record.get('state')],
-            viewModesController = Editor.getApplication().getController('ViewModes').self;
+            result = ['match-state-'+record.get('state')];
             
-            if(viewModesController.isErgonomicMode()){
+            if(me.lookupViewModel().get('viewmodeIsErgonomic')){
                 result.push('ergonomic-font');
-            }
-            if(viewModesController.isEditMode() || viewModesController.isViewMode()){
+            } else {
                 result.push('view-editor-font-size');
             }
             return result.join(' ');
+        },
+        onScrollEnd: function(x, y) {
+            if(this.getHeight() + y + 10 >= this.el.dom.scrollHeight) {
+                this.fireEvent('scrollbottomreached', this);
+            }
         }
     },
     initConfig: function(instanceConfig) {
         var me = this,
-            config = {
+            config = null,
+            searchItems = [];
+
+        me.assocStore = instanceConfig.assocStore;
+
+        me.assocStore.each(function(rec){
+            if(rec.get('searchable')){
+                searchItems.push({
+                    text: Ext.String.format(me.strings.singleSearch, rec.get('name')+' ('+rec.get('serviceName')+')'),
+                    iconCls: 'coloricon', //css class does not exist, but a value is needed here to trigger the icon rendering
+                    service: rec
+                });
+            }
+        });
+
+        config = {
                 columns: [{
                     xtype: 'gridcolumn',
-                    flex: 33/100,
+                    hideable: false,
+                    sortable: false,
+                    flex: 2,
                     dataIndex: 'source',
+                    tdCls: 'segment-tag-column source',
                     cellWrap: true,
                     text: me.strings.source
                 },{
                     xtype: 'gridcolumn',
-                    flex: 33/100,
+                    flex: 2,
                     dataIndex: 'target',
+                    tdCls: 'segment-tag-column target',
+                    hideable: false,
+                    sortable: false,
                     cellWrap: true,
                     text: me.strings.target
                 },{
                     xtype: 'gridcolumn',
-                    flex: 33/100,
+                    flex: 1,
+                    hideable: false,
+                    sortable: false,
                     dataIndex: 'service',
                     renderer: function(val, meta, record) {
-                        var str =me.assocStore.findRecord('id',record.get('tmmtid'));
+                        var str = me.assocStore.findRecord('id',record.get('tmmtid'));
                         meta.tdStyle="background-color:#"+str.get('color')+" !important;";
                         return str.get('name')+' ('+str.get('serviceName')+')';
                     },
                     text: me.strings.tmresource
-                },{
-                    xtype: 'actioncolumn',
-                    width: 60,
-                    renderer: function(val, meta, record) {
-                        if(record.get('showMoreIcon')){
-                            meta.tdAttr = 'data-qtip="Show more..."';
-                            meta.tdCls  = meta.tdCls  + 'ico-tm-show-more';
-                        }
-                    },
-                    text: me.strings.action
                 }],
                 dockedItems: [{
                     xtype: 'panel',
-                    //height: '50px',
-                    /*layout: {
-                        type: 'column',
-                        align: 'stretch'
-                    },
-                    */
                     layout: 'column',
                     border: false,
                     padding:'10 10 10 10',
@@ -148,14 +160,17 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
                         padding:'0 10 0 0',
                         emptyText:me.strings.targetEmptyText,
                     },{
-                        xtype:'button',
+                        xtype:'splitbutton',
                         name:'btnSubmit',
                         text:me.strings.search,
                         iconCls:'ico-tm-magnifier',
+                        menu: {
+                            xtype: 'menu',
+                            items: searchItems
+                        }
                     }]
                 }]
             };
-        me.assocStore = instanceConfig.assocStore;
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }

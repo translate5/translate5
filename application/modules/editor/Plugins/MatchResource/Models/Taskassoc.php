@@ -79,6 +79,9 @@ class editor_Plugins_MatchResource_Models_Taskassoc extends ZfExtended_Models_En
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid((string) $taskGuid);
         
+        //this ensures that taskGuid does not contain evil content from userland
+        $taskGuid = $task->getTaskGuid();
+        
         $this->filter->addFilter((object)[
                 'field' => 'sourceLang',
                 'type' =>  'numeric',
@@ -95,24 +98,32 @@ class editor_Plugins_MatchResource_Models_Taskassoc extends ZfExtended_Models_En
         ]);
         
         $db = $this->db;
+        $adapter = $db->getAdapter();
+        
         $s = $db->select()
         ->setIntegrityCheck(false)
-        ->from(array("tmmt" => "LEK_matchresource_tmmt"), array("tmmt.*","ta.id AS taskassocid"));
+        ->from(array("tmmt" => "LEK_matchresource_tmmt"), array("tmmt.*","ta.id AS taskassocid", "ta.segmentsUpdateable"));
 
+        //check filter is set true when editor needs a list of all used TMs/MTs
         if($this->filter->hasFilter('checked')) {
             //if checked filter is set, we keep the taskGuid as filter argument,
             // but remove additional checked filter and checked info 
             $this->filter->deleteFilter('checked');
-            $checked = '';
+            $checkColumns = '';
         }
         else {
             $this->filter->deleteFilter('taskGuid');
-            $checked = array("checked" => "IF(ta.taskGuid = '".$taskGuid."','true','false')");
+            $checkColumns = [
+                //checked is true when an assoc entry was found
+                "checked" => $adapter->quoteInto('IF(ta.taskGuid = ?,\'true\',\'false\')', $taskGuid),
+                //segmentsUpdateable is true when an assoc entry was found and the real value was true too
+                "segmentsUpdateable" => $adapter->quoteInto('IF(ta.taskGuid = ?,segmentsUpdateable,0)', $taskGuid),
+            ];
         }
         
-        $s->joinLeft(
-                array("ta"=>"LEK_matchresource_taskassoc"),
-                "ta.tmmtId = tmmt.id", $checked);
+        $on = $adapter->quoteInto('ta.tmmtId = tmmt.id AND ta.taskGuid = ?', $taskGuid);
+        $s->joinLeft(["ta"=>"LEK_matchresource_taskassoc"], $on, $checkColumns);
+        
         return $this->loadFilterdCustom($s);
     }
     /**

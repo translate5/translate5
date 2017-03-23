@@ -39,11 +39,14 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.panel.Panel
  */
 Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
-	extend: 'Ext.tab.Panel',
-	alias: 'widget.matchResourceEditorPanel',
-	requires:['Editor.plugins.MatchResource.view.SearchGrid',
-	          'Editor.plugins.MatchResource.view.MatchGrid',
-	          'Editor.plugins.MatchResource.view.SearchResultGrid'],
+    extend: 'Ext.tab.Panel',
+    alias: 'widget.matchResourceEditorPanel',
+    controller: 'matchResourceEditorPanel',
+    requires:[
+        'Editor.plugins.MatchResource.view.EditorPanelViewController',
+        'Editor.plugins.MatchResource.view.SearchGrid',
+        'Editor.plugins.MatchResource.view.MatchGrid'
+    ],
     strings: {
         searchTitle: '#UT#Konkordanzsuche',
         matchTitle:'#UT#Matches',
@@ -51,8 +54,14 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
         targetEmptyText:'#UT#Zieltextsuche',
         panelTitle:'#UT#Matches und Konkordanz-Suche'
     },
+    bind: {
+        hidden: '{taskIsReadonly}'
+    },
     itemId:'matchResourceEditorPanel',
     activeTab: 0,
+    header: {
+        hidden: true
+    },
     layout: 'fit',
     plain: false,
     cls: 'plugin-match-resource-result-panel',
@@ -79,7 +88,8 @@ Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
 		}
 	},
 	isAllowedSearchQuery:function(config,instanceConfig){
-		if(Editor.app.authenticatedUser.isAllowed('pluginMatchResourceSearchQuery')) {
+		var showSearch = instanceConfig.assocStore.find('searchable', true) >= 0;
+		if(showSearch && Editor.app.authenticatedUser.isAllowed('pluginMatchResourceSearchQuery')) {
 			config.items.push({
 	             title: this.strings.searchTitle,
             	 xtype:'matchResourceSearchGrid',

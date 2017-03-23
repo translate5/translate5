@@ -70,22 +70,17 @@ class editor_Plugins_MatchResource_TaskassocController extends ZfExtended_RestCo
             return $resources[$id] = $serviceManager->getResourceById($serviceType, $id);
         };
         
-        $reval = $this->entity->loadByAssociatedTaskAndLanguage($taskGuid->value);
+        $result = $this->entity->loadByAssociatedTaskAndLanguage($taskGuid->value);
         
-        foreach($reval as &$tmmt) {
+        foreach($result as &$tmmt) {
             $resource = $getResource($tmmt['serviceType'], $tmmt['resourceId']);
-            $tmmt['searchable'] = empty($resource) ? false : $resource->getSearchable();
+            if(!empty($resource)) {
+                $tmmt = array_merge($tmmt, $resource->getMetaData());
+            }
         }
         
-        $this->view->rows = $reval;
-        $this->view->total = count($reval);
-    }
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_RestController::putAction()
-     */
-    public function putAction() {
-       throw new ZfExtended_BadMethodCallException(__CLASS__.'->put');
+        $this->view->rows = $result;
+        $this->view->total = count($result);
     }
     
     /**
@@ -121,5 +116,26 @@ class editor_Plugins_MatchResource_TaskassocController extends ZfExtended_RestCo
         catch(ZfExtended_Models_Entity_NotFoundException $e) {
             //do nothing since it was already deleted, and thats ok since user tried to delete it
         }
+    }
+    
+    /**
+     * does some prechecking of the data
+     * {@inheritDoc}
+     * @see ZfExtended_RestController::decodePutData()
+     */
+    protected function decodePutData() {
+        parent::decodePutData();
+        $tmmt = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
+        /* @var $tmmt editor_Plugins_MatchResource_Models_TmMt */
+        try{
+            $tmmt->load($this->data->tmmtId);
+        }
+        catch(ZfExtended_NotFoundException $e) {
+            throw new ZfExtended_Conflict('Die gewünschte TMMT Resource gibt es nicht! ID:'.$this->data->tmmtId);
+        }
+        $resource = $tmmt->getResource();
+        
+        //segments can only be updated when resource is writable:
+        $this->data->segmentsUpdateable = $resource->getWritable() && $this->data->segmentsUpdateable;
     }
 }

@@ -40,8 +40,10 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_MatchResource_Services_DummyFileTm_Service extends editor_Plugins_MatchResource_Services_ServiceAbstract {
     const DEFAULT_COLOR = '00ff00';
     
+    protected $resourceClass = 'editor_Plugins_MatchResource_Services_DummyFileTm_Resource';
+    
     public function __construct() {
-        $this->addResource([$this->getServiceNamespace(), 'Dummy Filebased TM', true]); //isfilebased and the only resource
+        $this->addResource([$this->getServiceNamespace(), 'Dummy Filebased TM']); //isfilebased and the only resource
     }
     
     /**

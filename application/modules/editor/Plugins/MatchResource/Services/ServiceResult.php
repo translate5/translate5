@@ -48,10 +48,16 @@ class editor_Plugins_MatchResource_Services_ServiceResult {
     protected $tmmt;
     
     /**
-     * Total results, needed for paging
-     * @var integer
+     * next offset with found data, needed for paging
+     * @var mixed
      */
-    protected $total = null;
+    protected $nextOffset = null;
+    
+    /**
+     * Total results, needed for paging
+     * @var editor_Models_Segment_InternalTag
+     */
+    protected $internalTag;
     
     /**
      * A default source text for the results and a defaultMatchrate can be set
@@ -60,6 +66,7 @@ class editor_Plugins_MatchResource_Services_ServiceResult {
      * @param integer $defaultMatchrate
      */
     public function __construct($defaultSource = '', $defaultMatchrate = 0) {
+        $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->defaultMatchrate = (int) $defaultMatchrate;
         $this->defaultSource = $defaultSource;
     }
@@ -85,8 +92,8 @@ class editor_Plugins_MatchResource_Services_ServiceResult {
      * How the total is calculated, depends on the service.
      * @param integer $total
      */
-    public function setTotal($total) {
-        $this->total = $total;
+    public function setNextOffset($offset) {
+        $this->nextOffset = $offset;
     }
     
     /**
@@ -103,24 +110,23 @@ class editor_Plugins_MatchResource_Services_ServiceResult {
      * 
      * @param string $target
      * @param integer $matchrate
+     * @param array $metaData metadata container
      * 
      * @return stdClass the last added result
      */
-    public function addResult($target, $matchrate = 0) {
+    public function addResult($target, $matchrate = 0, array $metaData = null) {
         $result = new stdClass();
-        $result->target = $target;
+        
+        $missingTags = $this->internalTag->diff($this->defaultSource, $target);
+        
+        $result->target = $target.join('', $missingTags);
         $result->matchrate = (int) $matchrate;
         $result->source = $this->defaultSource;
-        $result->attributes = null;
         $result->tmmtid = $this->tmmt->getId();
         
         $result->state = self::STATUS_LOADED;
         
-        //FIXME
-        $result->created = "25/06/2016";
-        $result->creator = "Aleksandar Mitrev";
-        $result->lastEdited = "25/06/2016";
-        $result->lastEditor = "Marc Mittag";
+        $result->metaData = $metaData;
         
         $this->results[] = $result;
         $this->lastAdded = $result;
@@ -128,14 +134,11 @@ class editor_Plugins_MatchResource_Services_ServiceResult {
     }
     
     /**
-     * returns the stored total value
-     * @return integer
+     * returns the found next offset of the search
+     * @return mixed
      */
-    public function getTotal() {
-        if(is_null($this->total)){
-            return count($this->results);
-        }
-        return $this->total;
+    public function getNextOffset() {
+        return $this->nextOffset;
     }
     
     /**

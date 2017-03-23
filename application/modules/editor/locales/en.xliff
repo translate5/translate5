@@ -1487,7 +1487,14 @@
     <source>Change</source>
     <target>Change</target>
 </trans-unit>
-<trans-unit id='U2llIGvDtm5uZW4gbmViZW4gdW5zZXJlbSBaSVAtQ29udGFpbmVyLUZvcm1hdCBhdWNoIGRpcmVrdCBTRExYTElGRiwgb3BlblRNMi1YTElGRiBvZGVyIENTViBEYXRlaWVuIGJlbnV0emVuLiA8YSB0YXJnZXQ9Il9ibGFuayIgaHJlZj0iaHR0cDovL2NvbmZsdWVuY2UudHJhbnNsYXRlNS5uZXQvZGlzcGxheS9CVVMvQmFzaWMrdXNhZ2UiPk1laHIgSW5mbzwvYT4u'><source>Sie können neben unserem ZIP-Container-Format auch direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">Mehr Info</a>.</source><target>In addition to our ZIP-container format you can also use SDLXLIFF, OpenTM2-XLIFF or CSV files directly. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">Mehr Info</a>.</target></trans-unit>
+<trans-unit id='U2llIGvDtm5uZW4gbmViZW4gdW5zZXJlbSBaSVAtQ29udGFpbmVyLUZvcm1hdCBhdWNoIGRpcmVrdCBTRExYTElGRiwgb3BlblRNMi1YTElGRiBvZGVyIENTViBEYXRlaWVuIGJlbnV0emVuLiA8YSB0YXJnZXQ9Il9ibGFuayIgaHJlZj0iaHR0cDovL2NvbmZsdWVuY2UudHJhbnNsYXRlNS5uZXQvZGlzcGxheS9CVVMvQmFzaWMrdXNhZ2UiPk1laHIgSW5mbzwvYT4u'>
+    <source>Sie können neben unserem ZIP-Container-Format auch direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">Mehr Info</a>.</source>
+    <target>In addition to our ZIP-container format you can also use SDLXLIFF, OpenTM2-XLIFF or CSV files directly. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">Mehr Info</a>.</target>
+</trans-unit>
+<trans-unit id='RXJnb25vbWljIChBbnNpY2h0KQ=='>
+    <source>Ergonomic (Ansicht)</source>
+    <target>Ergonomic (view mode)</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

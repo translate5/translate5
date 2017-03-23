@@ -37,7 +37,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Moses Connector
  */
-class editor_Plugins_MatchResource_Services_Moses_Connector extends editor_Plugins_MatchResource_Services_ConnectorAbstract {
+class editor_Plugins_MatchResource_Services_Moses_Connector extends editor_Plugins_MatchResource_Services_Connector_Abstract {
     /**
      * We assume that the best MT Match correlate this matchrate, given by config
      * @var integer
@@ -51,16 +51,14 @@ class editor_Plugins_MatchResource_Services_Moses_Connector extends editor_Plugi
         $this->MT_BASE_MATCHRATE = $config->runtimeOptions->plugins->MatchResource->moses->matchrate;
     }
     
-    public function addTm(string $filename){
-        throw new BadMethodCallException('This Service is not filebased and cannot handle uploaded files therefore!');
-    }
-
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::query()
+     * @see editor_Plugins_MatchResource_Services_Connector_Abstract::query()
      */
     public function query(editor_Models_Segment $segment) {
         $queryString = $this->getQueryString($segment);
+        $this->resultList->setDefaultSource($queryString);
+        
         //query moses without tags
         $queryString = $segment->stripTags($queryString);
         
@@ -79,15 +77,13 @@ class editor_Plugins_MatchResource_Services_Moses_Connector extends editor_Plugi
         
         $res = $this->sendToProxy($proxy, $params);
         
-        $this->resultList->setDefaultSource($queryString);
-        
         if(!empty($res['text'])){
             $res['text'] = str_replace(array('\[','\]'), array('[',']'), $res['text']);
             $this->resultList->addResult($res['text'], $this->calculateMatchrate());
             return $this->resultList;
         }
         
-        return [];
+        return $this->resultList;
     }
     
     /**
@@ -115,11 +111,10 @@ class editor_Plugins_MatchResource_Services_Moses_Connector extends editor_Plugi
     
     /**
      * (non-PHPdoc)
-     * @see editor_Plugins_MatchResource_Services_ConnectorAbstract::search()
+     * @see editor_Plugins_MatchResource_Services_Connector_Abstract::search()
      */
-    public function search(string $searchString, $field = 'source') {
-        //since a MT can not be searched in the target language, we just pass the $searchString to the query call
-        return $this->query($searchString);
+    public function search(string $searchString, $field = 'source', $offset = null) {
+        throw new BadMethodCallException("The Moses MT Connector does not support search requests");
     }
 
     /**
@@ -130,4 +125,35 @@ class editor_Plugins_MatchResource_Services_Moses_Connector extends editor_Plugi
         return $this->MT_BASE_MATCHRATE;
     }
     
+    /**
+     * {@inheritDoc}
+     * @see editor_Plugins_MatchResource_Services_Connector_Abstract::getStatus()
+     */
+    public function getStatus(& $moreInfo){
+        $res = $this->tmmt->getResource();
+        /* @var $res editor_Plugins_MatchResource_Services_Moses_Resource */
+        
+        $http = ZfExtended_Factory::get('Zend_Http_Client');
+        $http->setConfig(['timeout' => 3]);
+        /* @var $http Zend_Http_Client */
+        $http->setUri($res->getUrl());
+        
+        try {
+            $response = $http->request('GET');
+        }catch (Exception $e){
+            $moreInfo = $e->getMessage();
+            $log = ZfExtended_Factory::get('ZfExtended_Log');
+            /* @var $log ZfExtended_Log */
+            $log->logException($e);
+            return self::STATUS_NOCONNECTION;
+        }
+        
+        //making a plain GET request produces a 405 state since it is not allowed.
+        // This is OK, since we want just test the connectivity
+        if($response->getStatus() === 405) {
+            return self::STATUS_AVAILABLE;
+        }
+        $moreInfo = 'The answer received from Moses is not as expected!';
+        return self::STATUS_NOCONNECTION;
+    }
 }

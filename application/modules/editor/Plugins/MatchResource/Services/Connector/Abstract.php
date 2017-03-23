@@ -37,7 +37,13 @@ END LICENSE AND COPYRIGHT
 /**
  * Abstract Base Connector
  */
-abstract class editor_Plugins_MatchResource_Services_ConnectorAbstract {
+abstract class editor_Plugins_MatchResource_Services_Connector_Abstract {
+    
+    const STATUS_ERROR = 'error';
+    const STATUS_AVAILABLE = 'available';
+    const STATUS_UNKNOWN = 'unknown';
+    const STATUS_NOCONNECTION = 'noconnection';
+    
     /**
      * @var editor_Plugins_MatchResource_Models_TmMt
      */
@@ -74,35 +80,6 @@ abstract class editor_Plugins_MatchResource_Services_ConnectorAbstract {
     }
 
     /**
-     * Adds the given file to the underlying system
-     * @param string $filename
-     * @return boolean
-     */
-    public function addTm(string $filename) {
-        //to be implemented if needed
-        $this->log(__METHOD__, ' filename '.$filename);
-    }
-    
-    /**
-     * Gets the TM file content from the underlying system
-     * @param $mime reference which is filled with the mime string of the returned file
-     * @return string
-     */
-    public function getTm(& $mime) {
-        //to be implemented if needed
-        $this->log(__METHOD__, ' filename '.$filename);
-    }
-
-    /**
-     * Opens the with connectTo given TM on the configured Resource (on task open, not on each request)
-     * @param editor_Plugins_MatchResource_Models_TmMt $tmmt
-     */
-    public function open() {
-        //to be implemented if needed
-        $this->log(__METHOD__);
-    }
-    
-    /**
      * Updates translations in the connected service
      * for returning error messages to the GUI use rest_messages
      * @param editor_Models_Segment $segment
@@ -110,22 +87,6 @@ abstract class editor_Plugins_MatchResource_Services_ConnectorAbstract {
     public function update(editor_Models_Segment $segment) {
         //to be implemented if needed
         $this->log(__METHOD__, ' segment '.$segment->getId());
-    }
-
-    /**
-     * Closes the connected TM on the configured Resource (on task close, not after each request)
-     */
-    public function close() {
-        //to be implemented if needed
-        $this->log(__METHOD__);
-    }
-    
-    /**
-     * Deletes the connected TM on the configured Resource
-     */
-    public function delete() {
-        //to be implemented if needed
-        $this->log(__METHOD__);
     }
 
     /**
@@ -156,15 +117,27 @@ abstract class editor_Plugins_MatchResource_Services_ConnectorAbstract {
      * @param string $field
      * @return editor_Plugins_MatchResource_Services_ServiceResult
      */
-    abstract public function search(string $searchString, $field = 'source');
+    abstract public function search(string $searchString, $field = 'source', $offset = null);
     
     /**
-     * 
-     * @param integer $page
-     * @param integer $offset
-     * @param integer $limit
+     * @return the status of the connected resource and additional information if there is some
      */
-    public function setPaging($page, $offset, $limit = 20) {
+    abstract public function getStatus(& $moreInfo);
+    
+    /**
+     * Opens the with connectTo given TM on the configured Resource (on task open, not on each request)
+     * @param editor_Plugins_MatchResource_Models_TmMt $tmmt
+     */
+    public function open() {
         //to be implemented if needed
+        $this->log(__METHOD__);
+    }
+    
+    /**
+     * Closes the connected TM on the configured Resource (on task close, not after each request)
+     */
+    public function close() {
+        //to be implemented if needed
+        $this->log(__METHOD__);
     }
 }

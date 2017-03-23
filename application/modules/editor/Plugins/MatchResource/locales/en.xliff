@@ -120,9 +120,13 @@
       <source>TM-Ressource</source>
       <target>TM resource</target>
     </trans-unit>
-    <trans-unit id='U3VjaGU='>
-      <source>Suche</source>
-      <target>Search</target>
+    <trans-unit id='QWxsZSBkdXJjaHN1Y2hlbg=='>
+        <source>Alle durchsuchen</source>
+        <target>Search in all</target>
+    </trans-unit>
+    <trans-unit id='U3VjaGUgaW4gezB9'>
+        <source>Suche in {0}</source>
+        <target>Search in {0}</target>
     </trans-unit>
     <trans-unit id='TWF0Y2hyZXNzb3VyY2VuIHp1d2Vpc2Vu'>
       <source>Matchressourcen zuweisen</source>
@@ -163,6 +167,91 @@
     <trans-unit id='WnVnZXdpZXNlbmUgQXVmZ2FiZW4='>
         <source>Zugewiesene Aufgaben</source>
         <target>Associated tasks</target>
+    </trans-unit>
+    <trans-unit id='TWF0Y2hyZXNzb3VyY2UgYmVhcmJlaXRlbg=='>
+        <source>Matchressource bearbeiten</source>
+        <target>edit match resource</target>
+    </trans-unit>
+    <trans-unit id='U1RSRw=='>
+        <source>STRG</source>
+        <target>CTRL</target>
+    </trans-unit>
+    <trans-unit id='UmVzc291cmNlIGluIEF1ZmdhYmUgdmVyd2VuZGVu'>
+        <source>Ressource in Aufgabe verwenden</source>
+        <target>Use resource in task</target>
+    </trans-unit>
+    <trans-unit id='U2VnbWVudGUgenVyw7xja3NwZWljaGVybg=='>
+        <source>Segmente zurückspeichern</source>
+        <target>save back segments to TM</target>
+    </trans-unit>
+    <trans-unit id='V2VpdGVyZSBUTSBEYXRlbiBpbiBGb3JtIGVpbmVyIFRNWCBEYXRlaSBpbXBvcnRpZXJlbiB1bmQgZGVtIFRNIGhpbnp1ZsO8Z2Vu'>
+        <source>Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen</source>
+        <target>Import additional TM data as TMX file and add the data to the TM</target>
+    </trans-unit>
+    <trans-unit id='VE1YLURhdGVp'>
+        <source>TMX-Datei</source>
+        <target>TMX-file</target>
+    </trans-unit>
+    <trans-unit id='VE1YIERhdGVpIGltcG9ydGllcmVu'>
+        <source>TMX Datei importieren</source>
+        <target>TMX file imported</target>
+    </trans-unit>
+    <trans-unit id='V2VpdGVyZSBUTSBEYXRlbiBpbiBGb3JtIGVpbmVyIFRNWCBEYXRlaSBpbXBvcnRpZXJlbiB1bmQgZGVtIGJlc3RlaGVuZGVuIFRNIGhpbnp1ZsO8Z2Vu'>
+        <source>Weitere TM Daten in Form einer TMX Datei importieren und dem bestehenden TM hinzufügen</source>
+        <target>Import additional TM data as TMX file and add the data to the already existing TM</target>
+    </trans-unit>
+    <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRNWCBEYXRlaSE='>
+        <source>Bitte verwenden Sie eine TMX Datei!</source>
+        <target>Please use a TMX file!</target>
+    </trans-unit>
+    <trans-unit id='V2VpdGVyZSBUTSBEYXRlbiBlcmZvbGdyZWljaCBpbXBvcnRpZXJ0IQ=='>
+        <source>Weitere TM Daten erfolgreich importiert!</source>
+        <target>Imported additional TM data successfully!</target>
+    </trans-unit>
+    <trans-unit id='VE0vVE1YLURhdGVpIChvcHRpb25hbCk='>
+        <source>TM/TMX-Datei (optional)</source>
+        <target>TM/TMX-file (optional)</target>
+    </trans-unit>
+    <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRNIG9kZXIgVE1YIERhdGVpIQ=='>
+        <source>Bitte verwenden Sie eine TM oder TMX Datei!</source>
+        <target>Please use a TM or TMX file!</target>
+    </trans-unit>
+    <trans-unit id='YWxzIFRNIERhdGVpIGV4cG9ydGllcmVu'>
+        <source>als TM Datei exportieren</source>
+        <target>export as TM file</target>
+    </trans-unit>
+    <trans-unit id='YWxzIFRNWCBEYXRlaSBleHBvcnRpZXJlbg=='>
+        <source>als TMX Datei exportieren</source>
+        <target>export as TMX file</target>
+    </trans-unit>
+    <trans-unit id='TWF0Y2hyZXNzb3VyY2UgbMO2c2NoZW4/'>
+        <source>Matchressource löschen?</source>
+        <target>Delete match resource?</target>
+    </trans-unit>
+    <trans-unit id='U29sbCBkaWUgZ2V3w6RobHRlIE1hdGNocmVzc291cmNlICJ7MH0iIGF1cyBkZXIgTGlzdGUgZGVyIGhpZXIgYW5nZXplaWd0ZW4gTWF0Y2hyZXNzb3VyY2VuIGdlbMO2c2NodCB3ZXJkZW4/IDxiciAvPiBFcyB3ZXJkZW4ga2VpbmUgRGF0ZW4gaW0gdmVya27DvHBmdGVuIFRNIFN5c3RlbSBnZWzDtnNjaHQsIGRhIGtlaW5lIFZlcmJpbmR1bmcgYmVzdGVodC4='>
+        <source>Soll die gewählte Matchressource "{0}" aus der Liste der hier angezeigten Matchressourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.</source>
+        <target>Do you really want to remove the match resource &quot;{0}&quot; from the here listed match resources? <br /> No data will be deleted in the associated TM system, since there is currently no connection to the TM system.</target>
+        
+    </trans-unit>
+    <trans-unit id='U3RhdHVzaW5mb3JtYXRpb25lbiB3ZXJkZW4gZ2VsYWRlbg=='>
+        <source>Statusinformationen werden geladen</source>
+        <target>Status information is loaded</target>
+    </trans-unit>
+    <trans-unit id='dmVyZsO8Z2Jhcg=='>
+        <source>verfügbar</source>
+        <target>available</target>
+    </trans-unit>
+    <trans-unit id='dW5iZWthbm50'>
+        <source>unbekannt</source>
+        <target>unknown</target>
+    </trans-unit>
+    <trans-unit id='S2VpbmUgVmVyYmluZHVuZyE='>
+        <source>Keine Verbindung!</source>
+        <target>No connection!</target>
+    </trans-unit>
+    <trans-unit id='aW1wb3J0aWVydA=='>
+        <source>importiert</source>
+        <target>imported</target>
     </trans-unit>
   </body>
  </file>

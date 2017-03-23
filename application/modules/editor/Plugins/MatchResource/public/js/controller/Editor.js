@@ -108,18 +108,11 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           me.getMatchgrid().controller.endEditing();//(context.record.get('taskGuid'),context.value);
       }
   },
-  //onSegmentGridRender: function(grid) {
-      //var me=this;
-      //var authUser = Editor.app.authenticatedUser;
-      //if(!Editor.data.task.isReadOnly() && (authUser.isAllowed('pluginMatchResourceMatchQuery') || authUser.isAllowed('pluginMatchResourceSearchQuery'))){
-      //    me.checkAssocStore(grid);
-     // }
-  //},
   centerPanelAfterRender: function(){
       var me=this,
           authUser = Editor.app.authenticatedUser;
       if(!Editor.data.task.isReadOnly() && (authUser.isAllowed('pluginMatchResourceMatchQuery') || authUser.isAllowed('pluginMatchResourceSearchQuery'))){
-          me.checkAssocStore();
+          me.loadAssocStore();
       }
       me.SERVER_STATUS = Editor.plugins.MatchResource.model.EditorQuery.prototype;
   },
@@ -159,8 +152,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       if(plug.editing && rec && rec.get('editable')) {
           //Editor.MessageBox.addInfo("Show a message on take over content?");
           sc = new Editor.util.SegmentContent(rec.get('source'));
-          contentTags = sc.getContentTags().join('');
-          editor.mainEditor.setValueAndMarkup(matchRecord.get('target')+contentTags, rec.get('id'), editor.columnToEdit);
+          editor.mainEditor.setValueAndMarkup(matchRecord.get('target'), rec.get('id'), editor.columnToEdit);
           //we don't support the matchrate saving for tasks with alternatives:
           if(task.get('defaultSegmentLayout')) {
               rec.set('matchRate', matchrate);
@@ -171,19 +163,21 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       } 
   },
   viewModeChangeEvent: function(controller){
-      var me = this;
-      //isViewMode
-      //isErgonomicMode
-      //isEditMode
-      if(controller.self.isViewMode() && this.getEditorPanel()){
-          this.getEditorPanel().hide();
+      var me = this,
+          vm = me.getEditorViewport().getViewModel();
+
+      if(!me.getEditorPanel()) {
           return;
       }
-      if(this.getEditorPanel()){
-          this.getEditorPanel().show();
+
+      if(vm.get('editorIsReadonly')) {
+          me.getEditorPanel().collapse();
+      }
+      else {
+          me.getEditorPanel().expand();
       }
   },
-  checkAssocStore: function(){
+  loadAssocStore: function(){
       var me = this
           taskGuid = Editor.data.task.get('taskGuid'),
           prm = {
