@@ -246,6 +246,9 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
                 $item = new stdClass();
                 $item->name = $name;
                 $item->value = $found->{$name};
+                if($name == 'timestamp') {
+                    $item->value = date('Y-m-d H:i:s T', strtotime($item->value));
+                }
                 $result[] = $item;
             }
         }
