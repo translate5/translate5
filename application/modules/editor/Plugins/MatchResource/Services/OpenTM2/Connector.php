@@ -98,6 +98,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         if($noFile || $tmxUpload) {
             if($this->api->createEmptyMemory($name, $sourceLang)){
                 $this->tmmt->setFileName($this->api->getResult()->name);
+                $this->tmmt->save(); //saving it here makes the TM available even when the TMX import was crashed
                 //if initial upload is a TMX file, we have to import it. 
                 if($tmxUpload) {
                     return $this->addAdditionalTm($fileinfo);

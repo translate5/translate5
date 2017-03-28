@@ -234,6 +234,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
 
         window.setLoading(true);
         form.submit({
+            timeout: 240,
             params: {
                 format: 'jsontext'
             },
@@ -254,6 +255,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
                 // so we dont need the handleException
                 if(!res || res.success || !Ext.isArray(res.errors)) {
                     Editor.app.getController('ServerException').handleException(submit.response);
+                    return;
                 }
                 if(Ext.isArray(res.errors)) {
                     form.markInvalid(res.errors);

@@ -124,6 +124,7 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                     width: 160,
                     text: me.strings.tmmtStatusColumn,
                     dataIndex: 'status',
+                    tdCls: 'status',
                     renderer: function(value, meta, record) {
                         var str = me.strings.tmmtStatus,
                             info = record.get('statusInfo');
