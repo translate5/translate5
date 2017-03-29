@@ -3,6 +3,26 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.5.10] - 2017-03-30
+###Added
+TRANSLATE-807: Change default editor mode to ergonomic mode
+TRANSLATE-796: Enhance concordance search
+TRANSLATE-826: Show only a maximum of MessageBox messages
+TRANSLATE-821: Switch translate5 to Triton theme
+TRANSLATE-502: OpenTM2-Integration into MatchResource Plug-In
+
+###Changed
+TRANSLATE-820: Generalization of Languages model
+TRANSLATE-818: internal tag replace id usage with data-origid and data-filename
+MITTAGQI-30: Update license informations
+
+###Bugfixes
+TRANSLATE-833: Add application locale to the configurable Help URL
+TRANSLATE-839: Ensure right character set of DB import with importer
+TRANSLATE-844: roweditor minimizes its height
+TRANSLATE-758: DbUpdater under Windows can not deal with DB Passwords with special characters
+TRANSLATE-805: show match type tooltip also in row editor
+
 ## [2.5.9] - 2017-01-23
 ###Bugfixes
 fixing an installer issue with already existing tables while installation
