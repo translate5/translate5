@@ -412,6 +412,12 @@ Ext.define('Editor.view.segments.RowEditor', {
             editorHeight = rowHeight + me.editorExtraHeight,
             moveEditor = (me.editorLocalTop + editorHeight) - me.scrollingView.getHeight();
         
+        // when switching tag mode recalculation is triggered, 
+        //  but when the row is not available anymore due grid reload we don't have any height information 
+        //  in this case its better to leave the old height instead of use a rowHeight of 0
+        if(rowHeight === 0 && me.rowToEditOrigHeight > 0) {
+            return;
+        }
         me.rowToEditOrigHeight = rowHeight;
         row.setHeight(editorHeight);
         //low border of editor is outside of the visible area, then we have to move the editor additionaly
@@ -429,6 +435,7 @@ Ext.define('Editor.view.segments.RowEditor', {
 
         //setting to null triggers auto calculation again (which was the default before editing)
         row.setHeight(null);
+        console.log('restoreEditingRowHeight');
         me.rowToEditOrigHeight = 0;
     },
     
