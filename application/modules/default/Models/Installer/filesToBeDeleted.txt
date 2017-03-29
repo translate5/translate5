@@ -4,3 +4,9 @@
 #
 /library/ZfExtended/Controllers/RestController.php
 /application/modules/editor/ThirdParty/XliffTermTagger/termtaggerrestservice.jar
+/application/modules/editor/Plugins/MatchResource/public/js/view/SearchResultGrid.js
+/application/modules/editor/Plugins/MatchResource/Services/ConnectorAbstract.php
+/ExtJs-ux-exception.txt
+/plugin-exception.txt
+/public/ExtJs-ux-exception.txt
+/public/plugin-exception.txt
