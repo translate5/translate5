@@ -243,7 +243,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
             editorquery = me.getView().getStore('editorquery');
 
         if(segmentId == me.editedSegmentId){
-            editorquery.remove(editorquery.findRecord('tmmtid',tmmtid));
+            editorquery.remove([editorquery.findExact('tmmtid',tmmtid)]);
         }
 
         //when saving a segment before the match requests are loaded, 
@@ -276,9 +276,11 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
             strState =  me.SERVER_STATUS.SERVER_STATUS_SERVERERROR,
             targetMsg = '',
             result = {},
+            store = me.getView().getStore('editorquery'),
             json = null;
         if(segmentId == me.editedSegmentId){
-            me.getView().getStore('editorquery').remove(me.getView().getStore('editorquery').findRecord('tmmtid',tmmtid));
+            //removing by index is working as array only!
+            store.remove([store.findExact('tmmtid',tmmtid)]);
         }
         switch(response.status){
             case -1:

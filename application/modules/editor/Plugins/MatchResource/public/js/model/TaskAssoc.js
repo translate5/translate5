@@ -40,7 +40,7 @@ Ext.define('Editor.plugins.MatchResource.model.TaskAssoc', {
     {name: 'sourceLang', type: 'string'},
     {name: 'targetLang', type: 'string'},
     {name: 'color', type: 'string'},
-    {name: 'resourced', type: 'string'},
+    {name: 'resourceId', type: 'string'},
     {name: 'serviceName', type: 'string'},
     {name: 'serviceType', type: 'string'},
     {name: 'checked', type: 'boolean'},

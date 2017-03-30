@@ -126,7 +126,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
                     sortable: false,
                     dataIndex: 'service',
                     renderer: function(val, meta, record) {
-                        var str = me.assocStore.findRecord('id',record.get('tmmtid'));
+                        var str = me.assocStore.getById(record.get('tmmtid'));
                         meta.tdStyle="background-color:#"+str.get('color')+" !important;";
                         return str.get('name')+' ('+str.get('serviceName')+')';
                     },

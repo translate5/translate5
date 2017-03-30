@@ -149,7 +149,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	          dataIndex: 'matchrate',
 	          tdCls: 'matchrate',
 	          renderer: function(matchrate, meta, record) {
-	              var str =me.assocStore.findRecord('id',record.get('tmmtid'));
+	              var str = me.assocStore.getById(record.get('tmmtid'));
 				  meta.tdAttr += 'data-qtip="'+str.get('name')+' ('+str.get('serviceName')+')"';
 				  meta.tdCls  = meta.tdCls  + ' info-icon';
 	              clr = str.get('color');

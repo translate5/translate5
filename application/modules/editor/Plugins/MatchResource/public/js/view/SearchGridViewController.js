@@ -223,7 +223,6 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
         var me = this,
             resp = Ext.util.JSON.decode(response.responseText);
 
-        //me.getView().getStore('editorsearch').remove(me.getView().getStore('editorsearch').findRecord('tmmtid',tmmtid));
         if(resp.rows && resp.rows.length){            
             me.offset.add(tmmtid, resp.nextOffset);
             me.loadDataIntoGrid(resp);
