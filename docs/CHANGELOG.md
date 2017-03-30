@@ -3,7 +3,7 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
-## [2.5.10] - 2017-03-30
+## [2.5.13] - 2017-03-30
 ###Added
 TRANSLATE-807: Change default editor mode to ergonomic mode
 TRANSLATE-796: Enhance concordance search

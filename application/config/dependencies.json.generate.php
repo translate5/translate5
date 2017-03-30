@@ -97,18 +97,18 @@ $dep->dependencies = [[
             "license" => "CDDL 1.1",
             "relpath" => "docs/third-party-licenses/CDDL-license.txt",
             "agreement" => 'Grizzly project and others license agreement description: 
-Some of the libraries openTMS TermTagger builds on are licensed under
-the CDDL license. Please read the following license agreement and 
-accept it for these libraries (like the Grizzly project and others). 
-Which library uses which license is listed in the openTMS TermTagger 
-installation directory which you will find in your translate5 
-application directory beneath
-                
-application/modules/editor/ThirdParty/XliffTermTagger/
+  Some of the libraries openTMS TermTagger builds on are licensed 
+  under the CDDL license. Please read the following license agreement
+  and accept it for these libraries (like the Grizzly project and 
+  others). Which library uses which license is listed in the openTMS 
+  TermTagger installation directory which you will find in your 
+  translate5 application directory beneath
 
-after installation. You must accept the terms of this agreement for 
-these components by typing "y" before continuing with the 
-installation.'
+    application/modules/editor/ThirdParty/XliffTermTagger/
+
+  after installation. You must accept the terms of this agreement for
+  these components by typing "y" before continuing with the 
+  installation.'
         ]]
     ],[
         "name" => "opentm2",
@@ -121,14 +121,15 @@ installation.'
             "license" => "Eclipse Public License 1.0",
             "relpath" => "docs/third-party-licenses/OpenTM2-Community-Edition-license.txt",
             "agreement" => 'translate5 uses {USES}.
-Please read the following license agreement and accept it for OpenTM2.
+  Please read the following license agreement and accept it for 
+  OpenTM2.
 
-  {RELPATH}
+    {RELPATH}
 
-You must accept the terms of this agreement for {LABEL} by typing
-"y" and <ENTER> before continuing with the installation.
-If you type "y", the translate5 installer will download {LABEL} for
-you. 
+  You must accept the terms of this agreement for {LABEL} by typing
+  "y" and <ENTER> before continuing with the installation.
+  If you type "y", the translate5 installer will download {LABEL} 
+  for you. 
 
   !!!!!!!!!!!!! ATTENTION !!!!!!!!!!!!!!!!!!!!!!
     Since {LABEL} is executable only under Microsoft Windows
@@ -137,9 +138,13 @@ you.
 
   The Installation has to be started manually! 
 
-Please stop an already running {LABEL} instance before installing / updating it!
-The downloaded file is located in the folder "OpenTM2-Installer/"
-{SUFFIX}'
+  Please stop an already running {LABEL} instance before 
+  installing / updating it!
+  The downloaded file is located in the folder
+                
+    "OpenTM2-Installer/"
+
+  {SUFFIX}'
         ]]
     ],[
         "name" => "phpexcel",
