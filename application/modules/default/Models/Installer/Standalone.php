@@ -99,7 +99,6 @@ class Models_Installer_Standalone {
         //TODO move options parameter to constructor instead of multiple usage
         $saInstaller->checkEnvironment();
         $saInstaller->processDependencies($options);
-        $saInstaller->checkMyselfForUpdates();
         $saInstaller->addZendToIncludePath();
         $saInstaller->installation($options);//checks internally if steps are already done
         $saInstaller->cleanUpDeletedFiles(); //must be before initApplication!
@@ -156,6 +155,7 @@ class Models_Installer_Standalone {
         }
         
         $depsToAccept = $downloader->pullApplication($zipOverride);
+        $this->checkMyselfForUpdates();
         $this->acceptLicenses($depsToAccept);
         $downloader->pullDependencies(true);
     }
