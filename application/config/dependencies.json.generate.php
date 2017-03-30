@@ -113,7 +113,8 @@ installation.'
     ],[
         "name" => "opentm2",
         "label" => "OpenTM2",
-        "url" => "RELEASE:OpenTM2-Community-Edition-Setup.exe",
+        "url" => "RELEASE:OpenTM2-Community-Edition-Setup.zip",
+        "target" => "OpenTM2-Installer",
         "version" => "1.3.3.9",
         "licenses" => [[
             "uses" => "OpenTM2 Community Edition",
@@ -137,7 +138,7 @@ you.
   The Installation has to be started manually! 
 
 Please stop an already running {LABEL} instance before installing / updating it!
-The downloaded file is located in the folder "downloads/"
+The downloaded file is located in the folder "OpenTM2-Installer/"
 {SUFFIX}'
         ]]
     ],[
