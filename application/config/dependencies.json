@@ -1,6 +1,6 @@
 {
     "channels": {
-        "RELEASE": "http://www.translate5.net/downloads/"
+        "RELEASE": "http:\/\/www.translate5.net\/downloads\/"
     },
     "md5hashtable": "RELEASE:md5hashtable",
     "application": {
@@ -8,95 +8,120 @@
         "label": "Translate5 - latest version",
         "url": "RELEASE:translate5.zip"
     },
-    "dependencies": [{
-        "name": "translate5-DB-init",
-        "label": "translate5 DB init",
-        "url": "RELEASE:translate5-DB-init.zip",
-        "target": "dbinit/"
-    },{
-        "name": "horde_text_diff",
-        "label": "Horde Text Diff",
-        "url": "RELEASE:Horde_Text_Diff-2.0.1.zip",
-        "version": "2.0.1",
-        "target": "library/Horde_Text_Diff/",
-        "licenses": [{
-            "uses": "the Horde Text Diff library",
-            "license": "LGPL",
-            "relpath": "docs/third-party-licenses/Horde_Text_Diff-2.0.1.license.txt"
-        }]
-    },{
-        "name": "zend",
-        "label": "PHP Zend",
-        "url": "RELEASE:Zend-1.12-11.zip",
-        "version": "1.12-11",
-        "target": "library/zend/"
-    },{
-        "name": "querypath",
-        "label": "QueryPath",
-        "url": "RELEASE:querypath-3.0.3.zip",
-        "version": "3.0.3",
-        "target": "library/querypath/",
-        "licenses": [{
-            "uses": "the QueryPath library",
-            "license": "LGPL",
-            "relpath": "docs/third-party-licenses/querypath-3.0.3.license.txt"
-        }]
-    },{
-        "name": "Open_Sans",
-        "label": "Open Sans Fonts",
-        "url": "RELEASE:Open_Sans.zip",
-        "target": "application/modules/editor/ThirdParty/Open_Sans/",
-        "licenses": [{
-            "uses": "the Open Sans font",
-            "license": "Apache License 2.0",
-            "relpath": "docs/third-party-licenses/Open_Sans-license.txt"
-        }]
-    },{
-        "name": "termtagger",
-        "label": "openTMS TermTagger",
-        "url": "RELEASE:openTMStermTagger.zip",
-        "target": "application/modules/editor/ThirdParty/XliffTermTagger/",
-        "licenses": [{
-            "uses": "the openTMS TermTagger",
-            "license": "Apache License 2.0",
-            "relpath": "docs/third-party-licenses/openTMStermTagger-license.txt"
-        },{
-            "label": "openTMS TermTagger libraries",
-            "license": "CDDL 1.1",
-            "relpath": "docs/third-party-licenses/CDDL-license.txt",
-            "agreement": "Grizzly project and others license agreement description: Some of the libraries openTMS TermTagger builds on are licensed under the CDDL license. Please read the following license agreement and accept it for these libraries (like the Grizzly project and others). Which library uses which license is listed in the openTMS TermTagger installation directory which you will find in your translate5 application directory beneath\n\n  application/modules/editor/ThirdParty/XliffTermTagger/\n\n after installation. You must accept the terms of this agreement for these components by typing \"y\" before continuing with the installation."
-        }]
-    },{
-        "name": "opentm2",
-        "label": "OpenTM2",
-        "url": "RELEASE:OpenTM2-Community-Edition-Setup.exe",
-        "version": "1.3.3.9",
-        "licenses": [{
-            "uses": "OpenTM2 Community Edition",
-            "license": "Eclipse Public License 1.0",
-            "relpath": "docs/third-party-licenses/OpenTM2-Community-Edition-license.txt",
-            "agreement": "translate5 uses {USES}. Please read the following license agreement and accept it for {LABEL}.\n\n\n  {RELPATH}\n\n\n  You must accept the terms of this agreement for {LABEL} by typing \"y\" and <ENTER> before continuing with the installation.\n  If you type \"y\", the translate5 installer will download {LABEL} for you. Since OpenTM2 is executable only under Microsoft Windows Operating Systems the installer can only download it for you. \n\n\n The Installation has to be started manually! \n\n Please stop an already running OpenTM2 instance before!\n The downloaded file is located in the folder \"downloads/\" {SUFFIX}"
-        }]
-    },{
-        "name": "phpexcel",
-        "label": "PHPExcel",
-        "version": "1.8.1",
-        "url": "RELEASE:PHPExcel.zip",
-        "target": "library/ZfExtended/ThirdParty/PHPExcel/",
-        "licenses": [{
-            "license": "LGPL",
-            "relpath": "docs/third-party-licenses/PHPExcel-1.8.1.license.txt"
-        }]
-    },{
-        "name": "extjs-6",
-        "label": "ExtJS (Version 6)",
-        "version": "6.0.0",
-        "url": "RELEASE:ext-6.0.0-gpl.zip",
-        "target": "public/ext-6.0.0",
-        "licenses": [{
-            "uses": "ExtJS",
-            "license": "GPL 3.0",
-            "relpath": "docs/third-party-licenses/ExtJs6-license.txt"
-        }]
-    }]
+    "dependencies": [
+        {
+            "name": "translate5-DB-init",
+            "label": "translate5 DB init",
+            "url": "RELEASE:translate5-DB-init.zip",
+            "target": "dbinit\/"
+        },
+        {
+            "name": "horde_text_diff",
+            "label": "Horde Text Diff",
+            "url": "RELEASE:Horde_Text_Diff-2.0.1.zip",
+            "version": "2.0.1",
+            "target": "library\/Horde_Text_Diff\/",
+            "licenses": [
+                {
+                    "uses": "the Horde Text Diff library",
+                    "license": "LGPL",
+                    "relpath": "docs\/third-party-licenses\/Horde_Text_Diff-2.0.1.license.txt"
+                }
+            ]
+        },
+        {
+            "name": "zend",
+            "label": "PHP Zend",
+            "url": "RELEASE:Zend-1.12-11.zip",
+            "version": "1.12-11",
+            "target": "library\/zend\/"
+        },
+        {
+            "name": "querypath",
+            "label": "QueryPath",
+            "url": "RELEASE:querypath-3.0.3.zip",
+            "version": "3.0.3",
+            "target": "library\/querypath\/",
+            "licenses": [
+                {
+                    "uses": "the QueryPath library",
+                    "license": "LGPL",
+                    "relpath": "docs\/third-party-licenses\/querypath-3.0.3.license.txt"
+                }
+            ]
+        },
+        {
+            "name": "Open_Sans",
+            "label": "Open Sans Fonts",
+            "url": "RELEASE:Open_Sans.zip",
+            "target": "application\/modules\/editor\/ThirdParty\/Open_Sans\/",
+            "licenses": [
+                {
+                    "uses": "the Open Sans font",
+                    "license": "Apache License 2.0",
+                    "relpath": "docs\/third-party-licenses\/Open_Sans-license.txt"
+                }
+            ]
+        },
+        {
+            "name": "termtagger",
+            "label": "openTMS TermTagger",
+            "url": "RELEASE:openTMStermTagger.zip",
+            "target": "application\/modules\/editor\/ThirdParty\/XliffTermTagger\/",
+            "licenses": [
+                {
+                    "uses": "the openTMS TermTagger",
+                    "license": "Apache License 2.0",
+                    "relpath": "docs\/third-party-licenses\/openTMStermTagger-license.txt"
+                },
+                {
+                    "label": "openTMS TermTagger libraries",
+                    "license": "CDDL 1.1",
+                    "relpath": "docs\/third-party-licenses\/CDDL-license.txt",
+                    "agreement": "Grizzly project and others license agreement description: \nSome of the libraries openTMS TermTagger builds on are licensed under\nthe CDDL license. Please read the following license agreement and \naccept it for these libraries (like the Grizzly project and others). \nWhich library uses which license is listed in the openTMS TermTagger \ninstallation directory which you will find in your translate5 \napplication directory beneath\n                \napplication\/modules\/editor\/ThirdParty\/XliffTermTagger\/\n\nafter installation. You must accept the terms of this agreement for \nthese components by typing \"y\" before continuing with the \ninstallation."
+                }
+            ]
+        },
+        {
+            "name": "opentm2",
+            "label": "OpenTM2",
+            "url": "RELEASE:OpenTM2-Community-Edition-Setup.exe",
+            "version": "1.3.3.9",
+            "licenses": [
+                {
+                    "uses": "OpenTM2 Community Edition",
+                    "license": "Eclipse Public License 1.0",
+                    "relpath": "docs\/third-party-licenses\/OpenTM2-Community-Edition-license.txt",
+                    "agreement": "translate5 uses {USES}.\nPlease read the following license agreement and accept it for OpenTM2.\n\n  {RELPATH}\n\nYou must accept the terms of this agreement for {LABEL} by typing\n\"y\" and <ENTER> before continuing with the installation.\nIf you type \"y\", the translate5 installer will download {LABEL} for\nyou. \n\n  !!!!!!!!!!!!! ATTENTION !!!!!!!!!!!!!!!!!!!!!!\n    Since {LABEL} is executable only under Microsoft Windows\n    Operating Systems the installer can only download it for you.\n  !!!!!!!!!!!!! ATTENTION !!!!!!!!!!!!!!!!!!!!!!\n\n  The Installation has to be started manually! \n\nPlease stop an already running {LABEL} instance before installing \/ updating it!\nThe downloaded file is located in the folder \"downloads\/\"\n{SUFFIX}"
+                }
+            ]
+        },
+        {
+            "name": "phpexcel",
+            "label": "PHPExcel",
+            "version": "1.8.1",
+            "url": "RELEASE:PHPExcel.zip",
+            "target": "library\/ZfExtended\/ThirdParty\/PHPExcel\/",
+            "licenses": [
+                {
+                    "license": "LGPL",
+                    "relpath": "docs\/third-party-licenses\/PHPExcel-1.8.1.license.txt"
+                }
+            ]
+        },
+        {
+            "name": "extjs-6",
+            "label": "ExtJS (Version 6)",
+            "version": "6.0.0",
+            "url": "RELEASE:ext-6.0.0-gpl.zip",
+            "target": "public\/ext-6.0.0",
+            "licenses": [
+                {
+                    "uses": "ExtJS",
+                    "license": "GPL 3.0",
+                    "relpath": "docs\/third-party-licenses\/ExtJs6-license.txt"
+                }
+            ]
+        }
+    ]
 }
