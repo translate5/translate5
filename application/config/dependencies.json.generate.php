@@ -140,7 +140,7 @@ $dep->dependencies = [[
 
   Please stop an already running {LABEL} instance before 
   installing / updating it!
-  The downloaded file is located in the folder
+  The downloaded file will be located in the folder
                 
     "OpenTM2-Installer/"
 
