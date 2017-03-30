@@ -82,6 +82,8 @@ Ext.define('Editor.controller.HeadPanel', {
                   fn: function(toolbar){
                       if(toolbar.rendered){
                           toolbar.updateLayout();
+                          //just for slow rendering browsers we do this again after one second
+                          setTimeout(toolbar.updateLayout, 1000);
                       }
                   },
                   delay: 700
