@@ -10,3 +10,4 @@
 /plugin-exception.txt
 /public/ExtJs-ux-exception.txt
 /public/plugin-exception.txt
+/application/modules/editor/Plugins/MatchResource/public/.vscode
