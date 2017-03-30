@@ -430,7 +430,6 @@ Ext.define('Editor.view.segments.RowEditor', {
 
         //setting to null triggers auto calculation again (which was the default before editing)
         row.setHeight(null);
-        console.log('restoreEditingRowHeight');
         me.rowToEditOrigHeight = 0;
     },
     
