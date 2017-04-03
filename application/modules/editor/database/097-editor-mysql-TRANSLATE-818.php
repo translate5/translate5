@@ -45,7 +45,7 @@ if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
 $db = Zend_Db_Table::getDefaultAdapter();
 $conf = $db->getConfig();
 $dbname = $conf['dbname'];
-$res = $db->query('show tables from '.$dbname.' like "%LEK_segment_view_%";');
+$res = $db->query('show tables from `'.$dbname.'` like "%LEK_segment_view_%";');
 $views = $res->fetchAll(Zend_Db::FETCH_COLUMN);
 
 $res = $db->query('select taskGuid from LEK_task;');
