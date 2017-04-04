@@ -280,11 +280,11 @@ background-color: #EAF1FB;
 .comments-grid .comment .content {white-space: normal;display:block;}
 .comment .author, .comment .created, .comment .modified {font-size: 7pt; font-style: italic;line-height:10pt;}
 
-#segment-grid.ergonomic .x-grid-row .x-grid-cell.comments-field {font-size:14pt !important;}
+#segment-grid.ergonomic .x-grid-row .x-grid-cell.comments-field {font-size:13pt !important;}
 
 .ergonomic-font,
 #segment-grid.ergonomic .x-grid-row .x-grid-cell, 
-#segment-grid.ergonomic .x-grid-row-editor .x-form-display-field {font-size: 14pt !important;line-height: 25px;}
+#segment-grid.ergonomic .x-grid-row-editor .x-form-display-field {font-size: 13pt !important;line-height: 23px;}
 
 body.editor-readonly #segment-grid .x-grid-item-selected .comments-field .x-grid-cell-inner img.add, 
 body.editor-readonly #segment-grid .x-grid-item-selected .comments-field .x-grid-cell-inner img.edit {display:none;}
