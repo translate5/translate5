@@ -59,21 +59,27 @@ class editor_Plugins_ChangeLog_ChangelogController extends ZfExtended_RestContro
         $f = $this->entity->getFilter();
         //default sorting by date
         $f->hasSort() || $f->addSort('dateOfChange', true);
-        $userGroupId=$this->entity->getUsergroup();
-        $results = $this->entity->loadAllForUser($userGroupId);
-        $totalcount =$this->entity->getTotalCount($userGroupId);
+        
         $user = new Zend_Session_Namespace('user');
-        $userId = $user->data->id;
-        if(!empty($results)){
-            //update the user_changelog_info table for user with the latest seen changelog
-            $lastInsertedid=max(array_column($results, 'id'));
-            $lastChangelogFromDb=$this->entity->getLastChangelogForUserId($userId);
-            if($lastInsertedid>$lastChangelogFromDb){
-                $this->entity->updateChangelogUserInfo($userId, $lastInsertedid);
-            }
+        //user group bit map of the authenticated user
+        $userGroup = $this->entity->getUsergroup($user->data);
+        
+        $results = $this->entity->loadAllForUser($userGroup);
+        $totalcount =$this->entity->getTotalCount($userGroup);
+        
+        //when there are results and the id filter was set, the load was triggered automatically
+        if(!empty($results) && $this->entity->getFilter()->hasFilter('id')){
+            $userId = $user->data->id;
+            //update always the last seen changelog id, since when this page is called,
+            // the user has seen the changelogs, so no calculation of the id or so is needed 
+            $lastSeen = $this->entity->updateChangelogUserInfo($user->data);
+            
+            //since we dont use metaData otherwise, we can overwrite it completly:
+            $this->view->metaData = new stdClass();
+            $this->view->metaData->lastSeenChangelogId = $lastSeen;
         }
         $this->view->rows = $results;
-        $this->view->total =$totalcount;
+        $this->view->total = $totalcount;
     }
     
     public function postAction(){

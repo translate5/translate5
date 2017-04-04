@@ -62,20 +62,24 @@ Ext.define('Editor.plugins.ChangeLog.controller.Changelog', {
   },
   addButtonToTaskOverviewToolbar:function(pageingToolbar,event){
       var me = this,
-          changelogfilter;
+          changelogfilter,
+          lastSeen = Editor.data.plugins.ChangeLog.lastSeenChangelogId;
+      
       pageingToolbar.add(['-',{
           xtype:'button',
           itemId:'changelogbutton',
           text: me.btnText+Editor.data.app.version
       }]);
       
-      if(Editor.data.plugins.ChangeLog.lastSeenChangelogId>0){
-          changelogfilter='[{"operator":"gt","value":'+Editor.data.plugins.ChangeLog.lastSeenChangelogId+',"property":"id"}]'; 
-          me.loadChangelogStore(changelogfilter);
+      
+      // show all changelogs with id bigger than given in last seen
+      // lastSeen > 0 show the bigger (newer) ones
+      // lastSeen < 0 (-1) User opens the application the first time, and gets a list of all changes
+      if(lastSeen !== 0){
+          //when id filter is set, the highest found id is stored as last seen
+          me.loadChangelogStore(lastSeen);
       }
-      if(Editor.data.plugins.ChangeLog.lastSeenChangelogId<0){
-          me.loadChangelogStore();
-      }
+      //lastSeen == 0: User has already seen all available changelogs
   },
   changeLogButtonClick:function(){
       var me=this;
@@ -85,29 +89,27 @@ Ext.define('Editor.plugins.ChangeLog.controller.Changelog', {
       var me = this, win,
           store = me.getEditorPluginsChangeLogStoreChangelogStore(),
           params = {};
-      if(initalFilter) {
-          params.filter = initalFilter;
-          //disable paging, if we want paging on initial load, 
-          // we have to change the lastInsertedid in PHP (without max then)
-          params.limit = 0; 
-      }
       
       //for window creation the store suppressNextFilter must be set to true, otherwise the rendering with filters would trigger a load
       win = me.getChangeLogWindow() || Ext.widget('changeLogWindow',{changeLogStore: store});
       //disable the suppressing again after store init, so that filters can process normally
-      store.suppressNextFilter = false;
+      store.suppressNextFilter = true;
       store.clearFilter();
+      if(initalFilter) {
+          store.filter({
+              "operator":"gt",
+              "value":initalFilter,
+              "property":"id"
+          });
+      }
       store.load({
-          params: params,
-          scope: me,
           callback: function(records, operation, success) {
-             if(records && records.length>0){
-                 win.show();
-                 win.down('pagingtoolbar').updateBarInfo();
-                 win.down('pagingtoolbar').setVisible(!initalFilter);
-             }
+              if(records && records.length>0){
+                  win.show();
+                  win.down('pagingtoolbar').updateBarInfo();
+              }
           }
-       });
+      });
   },
   btnCloseWindowClick:function(){
 	  this.getChangeLogWindow().close();

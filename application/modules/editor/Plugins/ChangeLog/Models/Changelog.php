@@ -28,7 +28,15 @@ END LICENSE AND COPYRIGHT
  * 
  */
 class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity_Abstract {
+    /**
+     * @var string
+     */
     protected $dbInstanceClass = 'editor_Plugins_ChangeLog_Models_Db_Changelog';
+    
+    /**
+     * ACL Map
+     * @var array
+     */
     protected $aclRoleValue = array(
         "noRights"=>0,
         "basic"=>1,
@@ -37,6 +45,11 @@ class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity
         "admin"=>8
     );
 
+    /**
+     * Load all changelog entries for a specific user group
+     * @param integer $userGroupId
+     * @return array
+     */
     public function loadAllForUser($userGroupId) {
         $db = $this->db->getAdapter();
         //adopt loadAll here with uiserGroup check
@@ -44,33 +57,66 @@ class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity
         return $this->loadFilterdCustom($s);
     }
     
+    /**
+     * Get total count of changelog entries for a specific user group
+     * @param integer $userGroupId
+     * @return integer
+     */
     public function getTotalCount($userGroupId){
         $db = $this->db->getAdapter();
         $s = $this->db->select()->where('LEK_change_log.userGroup & '.$db->quote($userGroupId, 'INTEGER').'');
         return $this->computeTotalCount($s);
     }
     
-    
+    /**
+     * Load all changelogs of a specific  
+     * @param integer $lastSeen
+     * @param integer $userGroupId
+     */
     public function moreChangeLogs($lastSeen, $userGroupId){
-        $db = $this->db->getAdapter();
         $s = $this->db->select()
-                        ->where('LEK_change_log.id > '.$db->quote($lastSeen, 'INTEGER').'')
-                        ->where('LEK_change_log.userGroup & '.$db->quote($userGroupId, 'INTEGER').'');
+                        ->where('LEK_change_log.id > ?', $lastSeen, Zend_Db::INT_TYPE)
+                        ->where('LEK_change_log.userGroup & ?', $userGroupId, Zend_Db::INT_TYPE);
         return $this->loadFilterdCustom($s);//when there are more changelogs > $lastSeen && ('translate5.LEK_change_log.userGroup & '.$userGroupId.'');
     }
     
-    /***
-     * Updates the LEK_user_changelog_info for user to the latest changelogId
-     * @param int $userId
-     * @param int $changelogId
+    /**
+     * returns the highest changelog ID, optionally filtered by usergroup
+     * @param integer $userGroup optional
+     * @return integer
      */
-    public function updateChangelogUserInfo($userId,$changelogId){
-    	$db = $this->db->getAdapter();
-    	$sql = 'REPLACE INTO LEK_user_changelog_info (userId,changelogId) '.
-    		   'VALUES('.$db->quote($userId, 'INTEGER').','.$db->quote($changelogId, 'INTEGER').')';
-    	$db->query($sql);
+    protected function maxChangeLogId($userGroup = null) {
+        $db = $this->db;
+        $s = $db->select()
+                    ->from($db->info($db::NAME), ['maxid' => 'MAX(id)']);
+        
+        if(!empty($userGroup)) {
+            $s->where('LEK_change_log.userGroup & ?', $userGroup, Zend_Db::INT_TYPE);
+        }
+        
+        $result = $this->db->fetchAll($s)->toArray();
+        return $result[0]['maxid'];
     }
     
+    /***
+     * Saves to one user which changelog id he has seen last, the saved id is returned
+     * @param int $userId
+     * @param int $changelogId
+     * @return the id on which was updated
+     */
+    public function updateChangelogUserInfo(stdClass $userData){
+        $changelogId = $this->maxChangeLogId($this->getUsergroup($userData));
+        $db = $this->db->getAdapter();
+        $sql = 'REPLACE INTO LEK_user_changelog_info (userId,changelogId) VALUES(?,?)';
+        $db->query($sql, [$userData->id, $changelogId]);
+        return $changelogId;
+    }
+    
+    /**
+     * returns the changelog id which the user has seen the last time, -1 if he never have seen any changelogs before
+     * @param integer $userId
+     * @return integer
+     */
     public function getLastChangelogForUserId($userId){
         $s = $this->db->select()
         ->from(array("cli" => "LEK_user_changelog_info"), array("cli.changelogId"))
@@ -86,10 +132,11 @@ class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity
         return $retval[0]['changelogId'];
     }
     /**
-     * Generates usergroupid based on the aclRoles
-     * @return number
+     * Generates usergroup bit map based on the aclRoles of the user
+     * @param stdClass $userData
+     * @return integer
      */
-    public function getUsergroup(){
+    public function getUsergroup(stdClass $userData){
         $this->checkGroups();
         $user = new Zend_Session_Namespace('user');
         $userGroupId=0;

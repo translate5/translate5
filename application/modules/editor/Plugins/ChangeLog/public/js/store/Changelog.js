@@ -27,10 +27,19 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.data.Store
  */
 Ext.define('Editor.plugins.ChangeLog.store.Changelog', {
-	  extend : 'Ext.data.Store',
-	  model: 'Editor.plugins.ChangeLog.model.Changelog',
-	  remoteSort: true,
-	  remoteFilter: true,
-	  autoLoad: false,
-	  pageSize: 8
+    extend : 'Ext.data.Store',
+    model: 'Editor.plugins.ChangeLog.model.Changelog',
+    remoteSort: true,
+    remoteFilter: true,
+    autoLoad: false,
+    pageSize: 8,
+    constructor: function() {
+        var me = this;
+        me.callParent(arguments);
+        me.proxy.on('metachange', function(proxy, meta){
+            if(meta.hasOwnProperty('lastSeenChangelogId')) {
+                Editor.data.plugins.ChangeLog.lastSeenChangelogId = meta.lastSeenChangelogId;
+            }
+        });
+    }
 });

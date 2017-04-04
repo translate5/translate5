@@ -71,16 +71,19 @@ class editor_Plugins_ChangeLog_Init extends ZfExtended_Plugin_Abstract {
         $view = $event->getParam('view');
         $user = new Zend_Session_Namespace('user');
         $userId = $user->data->id;
-        /* @var $changelogdb editor_Plugins_ChangeLog_Models_Changelog */
         $changelogdb = ZfExtended_Factory::get('editor_Plugins_ChangeLog_Models_Changelog');
+        /* @var $changelogdb editor_Plugins_ChangeLog_Models_Changelog */
+        
+        //-1 when user has not seen any changelogs before
         $lastChangeLogId = $changelogdb->getLastChangelogForUserId($userId);
         
-        $retunrvalue = $changelogdb->moreChangeLogs($lastChangeLogId,$changelogdb->getUsergroup());
+        $result = $changelogdb->moreChangeLogs($lastChangeLogId,$changelogdb->getUsergroup($user->data));
         
-        if(empty($retunrvalue)){
+        if(empty($result)){
+            //when user has seen all new changelogs:
             $lastChangeLogId = 0;
         }
-        $view->Php2JsVars()->set('plugins.ChangeLog.lastSeenChangelogId',$lastChangeLogId);
+        $view->Php2JsVars()->set('plugins.ChangeLog.lastSeenChangelogId', $lastChangeLogId);
         
         $view->headLink()->appendStylesheet(APPLICATION_RUNDIR.'/editor/plugins/resources/changeLog/plugin.css');
     }
