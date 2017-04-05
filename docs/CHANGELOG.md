@@ -3,6 +3,14 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [VER] - 2017-04-05
+###Changed
+TRANSLATE-854: Change font-size in ergo-mode to 13pt
+
+###Bugfixes
+TRANSLATE-849: wrong usage of findRecord in frontend leads to wired errors
+TRANSLATE-853: installer fails with "-" in database name
+
 ## [2.5.14] - 2017-03-30
 ###Added
 TRANSLATE-807: Change default editor mode to ergonomic mode
