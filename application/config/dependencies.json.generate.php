@@ -115,12 +115,12 @@ $dep->dependencies = [[
         "label" => "OpenTM2",
         "url" => "RELEASE:OpenTM2-Community-Edition-Setup.zip",
         "target" => "OpenTM2-Installer",
-        "version" => "1.3.4.1",
+        "version" => "1.3.4.2",
         "licenses" => [[
             "uses" => "OpenTM2 Community Edition",
             "license" => "Eclipse Public License 1.0",
             "relpath" => "docs/third-party-licenses/OpenTM2-Community-Edition-license.txt",
-            "agreement" => 'translate5 uses {USES}.
+            "agreement" => 'translate5 uses {USES} (version {VERSION}).
   Please read the following license agreement and accept it for 
   OpenTM2.
 
