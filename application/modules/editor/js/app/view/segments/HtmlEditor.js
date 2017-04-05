@@ -112,7 +112,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   getDocMarkup: function() {
     var me = this,
-        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'/css/htmleditor.css?v=11" />'; //disable Img resizing
+        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'/css/htmleditor.css?v=12" />'; //disable Img resizing
         //ursprünglich wurde ein body style height gesetzt. Das führte aber zu Problemen beim wechsel zwischen den unterschiedlich großen Segmente, daher wurde die Höhe entfernt.
     return Ext.String.format('<html><head><style type="text/css">body{border:0;margin:0;padding:{0}px;}</style>{1}</head><body style="font-size:12px;line-height:14px;"></body></html>', me.iframePad, additionalCss);
   },
