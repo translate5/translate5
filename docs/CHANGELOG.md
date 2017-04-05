@@ -3,7 +3,7 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
-## [VER] - 2017-04-05
+## [2.5.22] - 2017-04-05
 ###Changed
 TRANSLATE-854: Change font-size in ergo-mode to 13pt
 
