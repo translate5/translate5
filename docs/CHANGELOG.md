@@ -3,6 +3,10 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.5.25] - 2017-04-06
+###Changed
+MITTAGQI-36: Add new license plug-in exception
+
 ## [2.5.24] - 2017-04-05
 ###Bugfixes
 TRANSLATE-850: Task can not be closed when user was logged out in the meantime
