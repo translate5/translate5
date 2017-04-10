@@ -92,6 +92,15 @@ class RelaisImportTest extends \ZfExtended_Test_ApiTestcase {
             '17' => 'Here the alignment is OK again.',
             '18' => 'Here the alignment is OK again 2.',
             '19' => 'Here the alignment is OK again 3.',
+                
+            '19' => 'Here the alignment is OK again 3.',
+            '20' => 'Diese Datei ist Teil der php-online-Dokumentation. Ihre Übersetzung ist durch eine Vorübersetzung entstanden, die auf einem sehr schnell durchgeführten winalign-Project basiert und in keiner Art und Weise dem State of the Art eines Übersetzungsprojekts entspricht. Sein einziger Zweck ist die Erzeugung von Demo-Daten für translate5. ',
+            '21' => 'Apache 2.0 auf Unixsystemen - Manual',
+            '22' => 'PHP Manual',
+            '23' => 'Installation und Konfiguration',
+            '24' => 'Installation auf Unix-Systemen',
+            '25' => 'RELAIS - Apache 1.3.x auf Unix-Systemen',
+            '26' => '',
         ];
         
         $this->assertEquals($expected, $relais, 'Relais columns not filled as expected!');
