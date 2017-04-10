@@ -250,6 +250,7 @@ class CsvMqmTest extends \ZfExtended_Test_ApiTestcase {
         $task = self::$api->getTask();
         self::$api->login('testlector'); //logout testmanager to close task
         self::$api->login('testmanager'); //login again to delete
+        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
         self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
     }
 }

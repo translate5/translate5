@@ -81,7 +81,7 @@ class editor_Models_Import_UploadProcessor {
     public function initAndValidate() {
         
         //mandatory upload file
-            $importInfo = $this->upload->getFileInfo('importUpload');
+        $importInfo = $this->upload->getFileInfo('importUpload');
         
         $type = $this->checkAndGetImportType($importInfo);
         $this->initDataProvider($type, $importInfo);

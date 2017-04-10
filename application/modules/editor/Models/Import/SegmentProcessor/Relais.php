@@ -55,6 +55,23 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
     protected $relaisField;
     
     /**
+     * @var editor_Models_Segment_InternalTag
+     */
+    protected $internalTag;
+    
+    /**
+     * @var Integer
+     */
+    protected $configuredCompareMode = 0;
+    
+    /**
+     * Definitions of the different relais compare mode flags
+     * @var integer
+     */
+    const MODE_IGNORE_TAGS = 1;
+    const MODE_NORMALIZE_ENTITIES = 2;
+    
+    /**
      * @param editor_Models_Task $task
      * @param editor_Models_SegmentFieldManager $sfm receive the already inited sfm
      */
@@ -66,6 +83,14 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
         $this->sfm = $sfm;
         $this->segment = ZfExtended_Factory::get('editor_Models_Segment');
         $this->segment->setTaskGuid($task->getTaskGuid());
+        $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        
+        // preset configured 
+        $config = Zend_Registry::get('config');
+        $modes = $config->runtimeOptions->import->relaisCompareMode;
+        foreach($modes as $mode) {
+            $this->configuredCompareMode += constant('self::MODE_'.$mode);
+        }
     }
     
     /**
@@ -85,10 +110,11 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
             $log->logError('Source segment to MID of relais file not found.',  'Source segment to MID of relais file not found. Relais segment ignored. FileName: '.$this->fileName.' / mid: '.$parser->getMid());
             return false;
         }
-        $sourceContent = $this->segment->getFieldOriginal($source);
+        $sourceContent = $this->normalizeSegmentData($this->segment->getFieldOriginal($source));
+        $relaisContent = $this->normalizeSegmentData($data[$source]["original"]);
         
         //equal means here, that also the tags must be equal in content and position
-        if($sourceContent !== $data[$source]["original"]){
+        if($sourceContent !== $relaisContent){
             $log = ZfExtended_Factory::get('ZfExtended_Log');
             $log->logError('Source of relais file not identical with source of translated file.',  'Source of relais file is not identical with source of translated file. Relais target is left empty. FileName: '.$this->fileName.' / mid: '.$parser->getMid().' / Source content of translated file: '.$sourceContent.' / Source content of relais file: '.$data[$source]["original"]);
             return false;
@@ -103,6 +129,27 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
             $log->logError('Errors in adding relais segment: Source of original segment and source of relais segment are identical, but still original Segment not found in the database!',  'Segment Info:'.$e->getMessage());
         }
         return false;
+    }
+
+    /**
+     * The given segment content is normalized for source / relais source comparsion
+     * Currently all tags are removed (means ignored). To keep word boundaries the tags 
+     * are replaced with whitespace, multiple whitespaces are replaced to a single one
+     * HTML Entities are decoded to enable comparsion of " and &quot; 
+     *  
+     * @param string $segmentContent
+     * @return string
+     */
+    protected function normalizeSegmentData($segmentContent) {
+        if($this->configuredCompareMode & self::MODE_IGNORE_TAGS) {
+            $segmentContent = $this->internalTag->replace($segmentContent, ' ');
+            //trim removes leading / trailing whitespaces added by tag removing
+            $segmentContent = trim(preg_replace('/\s{2,}/', ' ', $segmentContent));
+        }
+        if($this->configuredCompareMode & self::MODE_NORMALIZE_ENTITIES){
+            return html_entity_decode($segmentContent);
+        }
+        return $segmentContent;
     }
       
     /**

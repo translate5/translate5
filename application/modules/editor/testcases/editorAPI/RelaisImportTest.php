@@ -79,12 +79,19 @@ class RelaisImportTest extends \ZfExtended_Test_ApiTestcase {
             '6' => 'RELAIS – Here the alignment is OK again 2.',
             '7' => '',
             '8' => 'RELAIS – Here the alignment is OK again 3.',
-            '9' => 'This is a red house',
-            '10' => 'Here the alignment is OK.',
-            '11' => '',
-            '12' => 'Here the alignment is OK again.',
-            '13' => 'Here the alignment is OK again 2.',
-            '14' => 'Here the alignment is OK again 3.',
+            
+            '9' => 'RELAIS - Segment with ignored and different tags',
+            '10' => 'RELAIS – Segment with ignored and equal tags',
+            '11' => '', //FIXME could not be tested with CSV files since CSV is encoding all entities on import, must be tested with SDLXLIFF
+            '12' => 'RELAIS – Segment with equal entity encoding',
+            '13' => 'RELAIS – Segment with equal entity encoding',
+                
+            '14' => 'This is a red house',
+            '15' => 'Here the alignment is OK.',
+            '16' => '',
+            '17' => 'Here the alignment is OK again.',
+            '18' => 'Here the alignment is OK again 2.',
+            '19' => 'Here the alignment is OK again 3.',
         ];
         
         $this->assertEquals($expected, $relais, 'Relais columns not filled as expected!');

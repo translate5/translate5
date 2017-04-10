@@ -174,6 +174,18 @@ class editor_Models_Import_MetaData {
             catch (Exception $e) {
                 throw new Exception('.. invalid '.$this->filenameTaskTemplate.' detected at '.__CLASS__.' -> '.__FUNCTION__);
             }
+            //WARNING: this is NOT the implementation of TRANSLATE-471!
+            // This code is just a "schmalspur" solution to enable the idea behind TRANSLATE-471 for our API testing  
+            if(isset($config->runtimeOptions)) {
+                $origConfig = Zend_Registry::get('config');
+                /* @var $origConfig Zend_Config */
+                $newConfig = new Zend_Config([], true);
+                $newConfig->merge($origConfig);
+                $newConfig->runtimeOptions = [];
+                $newConfig->runtimeOptions->merge($config->runtimeOptions);
+                $newConfig->setReadOnly();
+                Zend_Registry::set('config', $newConfig);
+            }
         }
     }
 
