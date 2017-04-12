@@ -31,27 +31,15 @@ END LICENSE AND COPYRIGHT
  * Converts a List with Segments to XML
  */
 class editor_Models_Converter_XmlSegmentList {
-    protected static $issueCache = array();
-    protected static $severityCache = array();
     /**
      * @var editor_Models_Task
      */
     protected $task;
     
     /**
-     * @var array
-     */
-    protected $stateFlags;
-    
-    /**
      * @var editor_Models_Export_FileParser_Sdlxliff
      */
     protected $exportParser;
-    
-    /**
-     * @var array
-     */
-    protected $qualityFlags;
     
     /**
      * @var editor_Models_Comment
@@ -90,10 +78,13 @@ class editor_Models_Converter_XmlSegmentList {
      */
     protected $createDiffAltTrans;
     
+    /**
+     * @var editor_Models_Segment_Utility
+     */
+    protected $segmentUtility;
+    
     public function __construct(){
         $config = Zend_Registry::get('config');
-        $this->stateFlags = $config->runtimeOptions->segments->stateFlags->toArray();
-        $this->qualityFlags = $config->runtimeOptions->segments->qualityFlags->toArray();
         $this->saveXmlToFile = (boolean) $config->runtimeOptions->editor->notification->saveXmlToFile;
         $this->createDiffAltTrans = (boolean) $config->runtimeOptions->editor->notification->includeDiff;
         if($this->createDiffAltTrans){
@@ -101,6 +92,7 @@ class editor_Models_Converter_XmlSegmentList {
         }
         
         $this->comment = ZfExtended_Factory::get('editor_Models_Comment');
+        $this->segmentUtility = ZfExtended_Factory::get('editor_Models_Segment_Utility');
     }
     
     /**
@@ -338,8 +330,8 @@ class editor_Models_Converter_XmlSegmentList {
      * @param array $segment
      */
     protected function processStateAndQm(array $segment) {
-        $this->result[] = '<state stateid="'.$segment['stateId'].'">'.$this->convertStateId($segment['stateId']).'</state>';
-        $qms = $this->convertQmIds($segment['qmId']);
+        $this->result[] = '<state stateid="'.$segment['stateId'].'">'.$this->segmentUtility->convertStateId($segment['stateId']).'</state>';
+        $qms = $this->segmentUtility->convertQmIds($segment['qmId']);
         if(empty($qms)) {
             $this->result[] = '<dx:qa-hits></dx:qa-hits>';
         }
@@ -398,116 +390,5 @@ class editor_Models_Converter_XmlSegmentList {
      */
     protected function prepareText($text) {
         return $this->exportParser->exportSingleSegmentContent($text);
-    }
-    
-    /**
-     * break the qm img tags apart and the apply the $resultRenderer to manipulate the tag
-     * $resultRenderer is a Closure and returns the converted string. 
-     * It accepts the following parameters:
-     *     string $tag = original img tag, 
-     *     array $cls css classes, 
-     *     integer $issueId the qm issue id, 
-     *     string $issueName the untranslated qm issue name, 
-     *     string $sev the untranslated sev textual id, 
-     *     string $sevName the untranslated sev string, 
-     *     string $comment the user comment
-     * 
-     * @param editor_Models_Task $task
-     * @param string $text
-     * @param Closure $resultRenderer does the final rendering of the qm tag, Parameters see above
-     */
-    public function convertQmSubsegments(editor_Models_Task $task, $text, Closure $resultRenderer) {
-        $qmSubFlags = $task->getQmSubsegmentFlags();
-        if(empty($qmSubFlags)){
-            return $text;
-        }
-        $this->initCaches($task);
-        $parts = preg_split('#(<img[^>]+>)#i', $text, null, PREG_SPLIT_DELIM_CAPTURE);
-        $tg = $task->getTaskGuid();
-        $severities = array_keys(get_object_vars(self::$severityCache[$tg]));
-        foreach($parts as $idx => $part) {
-            if(! ($idx % 2)) {
-                continue;
-            }
-            //<img  class="critical qmflag ownttip open qmflag-1" data-seq="412" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-1-left.png" />
-            preg_match('#<img[^>]+(class="([^"]*(qmflag-([0-9]+)[^"]*))"[^>]+data-comment="([^"]*)")|(data-comment="([^"]*)"[^>]+class="([^"]*(qmflag-([0-9]+)[^"]*))")[^>]*>#i', $part, $matches);
-            $cnt = count($matches);
-            if($cnt < 6) {
-                $parts[$idx] = $part;
-                continue;
-            }
-            if(count($matches) > 10) {
-                $cls = explode(' ', $matches[8]);
-                $issueId = $matches[10];
-                $comment = $matches[7];
-            }
-            else {
-                $cls = explode(' ', $matches[2]);
-                $issueId = $matches[4];
-                $comment = $matches[5];
-            }
-            
-            $sev = array_intersect($severities, $cls);
-            $sev = reset($sev);
-            $sev = empty($sev) ? 'sevnotfound' : $sev;
-            $sevName = (isset(self::$severityCache[$tg]->$sev) ? self::$severityCache[$tg]->$sev : '');
-            $issueName = (isset(self::$issueCache[$tg][$issueId]) ? self::$issueCache[$tg][$issueId] : '');
-            
-            $parts[$idx] = $resultRenderer($part, $cls, $issueId, $issueName, $sev, $sevName, $comment);
-        }
-        return join('', $parts);
-    }
-    
-    /**
-     * returns the configured value to the given state id
-     * @param string $stateId
-     * @return string
-     */
-    public function convertStateId($stateId) {
-        if(empty($stateId)) {
-            return '';
-        }
-        if(isset($this->stateFlags[$stateId])){
-            return $this->stateFlags[$stateId];
-        }
-        return 'Unknown State '.$stateId;
-    }
-    
-    /**
-     * converts the semicolon separated qmId string into an associative array
-     * key => qmId
-     * value => configured String in the config for this id
-     * @param string $qmIds
-     * @return array
-     */
-    public function convertQmIds($qmIds) {
-        if(empty($qmIds)) {
-            return array();
-        }
-        $qmIds = trim($qmIds, ';');
-        $qmIds = explode(';', $qmIds);
-        $result = array();
-        foreach($qmIds as $qmId) {
-            if(isset($this->qualityFlags[$qmId])){
-                $result[$qmId] = $this->qualityFlags[$qmId];
-                continue;
-            }
-            $result[$qmId] = 'Unknown Qm Id '.$qmId;
-        }
-        return $result;
-    }
-    
-    /**
-     * caches task issues and severities
-     * @param editor_Models_Task $task
-     */
-    protected function initCaches(editor_Models_Task $task) {
-        $tg = $task->getTaskGuid();
-        if(empty(self::$issueCache[$tg])){
-            self::$issueCache[$tg] = $task->getQmSubsegmentIssuesFlat();
-        }
-        if(empty(self::$severityCache[$tg])){
-            self::$severityCache[$tg] = $task->getQmSubsegmentSeverities();
-        }
     }
 }
