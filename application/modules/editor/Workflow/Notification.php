@@ -177,8 +177,8 @@ class editor_Workflow_Notification {
             return;
         }
         if(empty($this->xmlCache[$segmentHash])) {
-            $xmlConverter = ZfExtended_Factory::get('editor_Models_Converter_XmlSegmentList');
-            /* @var $xmlConverter editor_Models_Converter_XmlSegmentList */
+            $xmlConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff');
+            /* @var $xmlConverter editor_Models_Converter_SegmentsToXliff */
             $this->xmlCache[$segmentHash] = $xmlConverter->convert($this->task, $segments);
         }
         

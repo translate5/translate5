@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Converts a List with Segments to XML
  */
-class editor_Models_Converter_XmlSegmentList {
+class editor_Models_Converter_SegmentsToXliff {
     /**
      * @var editor_Models_Task
      */
