@@ -94,23 +94,6 @@ class editor_Models_Segment_QmSubsegments {
     }
     
     /**
-     * replaces internal tags with either the callback or the given scalar
-     * @see preg_replace
-     * @see preg_replace_callback
-     * @param string $segment
-     * @param Closure|string $replacer
-     * @param int $limit optional
-     * @param int $count optional, returns the replace count
-     * @return mixed 
-     */
-    public function replace(string $segment, $replacer, $limit = -1, &$count = null) {
-        if(is_callable($replacer)) {
-            return preg_replace_callback(self::REGEX_INTERNAL_TAGS, $replacer, $segment, $limit, $count);
-        }
-        return preg_replace(self::REGEX_INTERNAL_TAGS, $replacer, $segment, $limit, $count);
-    }
-    
-    /**
      * caches task issues and severities
      * @param editor_Models_Task $task
      */
