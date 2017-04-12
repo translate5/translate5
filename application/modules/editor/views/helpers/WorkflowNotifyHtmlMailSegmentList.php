@@ -154,6 +154,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
         $stateMap = $states->getLabelMap();
         
         $this->subSegmentConverter = ZfExtended_Factory::get('editor_Models_Segment_QmSubsegments');
+        $this->segmentUtility = ZfExtended_Factory::get('editor_Models_Segment_Utility');
         
         $t = $this->view->translate;
         if(empty($this->segments)) {
