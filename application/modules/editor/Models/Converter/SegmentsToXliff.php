@@ -31,13 +31,46 @@ END LICENSE AND COPYRIGHT
  * Converts a List with Segments to XML
  */
 class editor_Models_Converter_SegmentsToXliff {
+    /**
+     * includeDiff                = boolean, enable or disable diff generation, defaults to false
+     * @var string
+     */
     const CONFIG_INCLUDE_DIFF = 'includeDiff';
+    /**
+     * plainInternalTags          = boolean, exports internal tags plain content, 
+     *                              currently only needed for BEO export, defaults to false
+     * @var string
+     */
     const CONFIG_PLAIN_INTERNAL_TAGS = 'plainInternalTags';
+    /**
+     * addRelaisLanguage          = boolean, add relais language target as alt trans (if available), defaults to true
+     * @var string
+     */
     const CONFIG_ADD_RELAIS_LANGUAGE = 'addRelaisLanguage';
+    /**
+     * addComments                = boolean, add comments, defaults to true
+     * @var string
+     */
     const CONFIG_ADD_COMMENTS = 'addComments';
+    /**
+     * addStateAndQm              = boolean, add segment state and QM, defaults to true
+     * @var string
+     */
     const CONFIG_ADD_STATE_QM = 'addStateAndQm';
+    /**
+     * addAlternatives            = boolean, add target alternatives as alt trans, defaults to false
+     * @var string
+     */
     const CONFIG_ADD_ALTERNATIVES = 'addAlternatives';
+    /**
+     * addPreviousVersion         = boolean, add target original as alt trans, defaults to true
+     * @var string
+     */
     const CONFIG_ADD_PREVIOUS_VERSION = 'addPreviousVersion';
+    /**
+     * addDisclaimer              = boolean, add disclaimer that format is not 100% xliff 1.2, defaults to true
+     * @var string
+     */
     const CONFIG_ADD_DISCLAIMER = 'addDisclaimer';
     
     /**
@@ -88,11 +121,21 @@ class editor_Models_Converter_SegmentsToXliff {
     protected $options;
     
     /**
+     * contains a list of the included namespaces in the header
+     * @var array
+     */
+    protected $enabledNamespaces = [];
+    
+    /**
      * Constructor
      * 
      * Supported parameters for $config are
      * - includeDiff                = boolean, enable or disable diff generation, defaults to false
      * FIXME:
+     * 
+     * file > header tag
+hier eigenen translate5 tag mit den internen tags 
+     * 
      * - plainInternalTags          = boolean, exports internal tags plain content, 
      *                                currently only needed for BEO export, defaults to false
      * - addRelaisLanguage          = boolean, add relais language target as alt trans (if available), defaults to true
@@ -223,6 +266,7 @@ class editor_Models_Converter_SegmentsToXliff {
         
         $headParams[] = 'xmlns="urn:oasis:names:tc:xliff:document:1.2"';
         $headParams[] = 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"';
+        $this->enabledNamespaces['xsi'] = 'xsi';
         
         //add DX namespace only if needed 
         $dx = $this->options[self::CONFIG_ADD_RELAIS_LANGUAGE] 
@@ -232,15 +276,18 @@ class editor_Models_Converter_SegmentsToXliff {
                 || $this->options[self::CONFIG_ADD_PREVIOUS_VERSION];
         if($dx) {
             $headParams[] = 'xmlns:dx="http://www.interoperability-now.org/schema"';
+            $this->enabledNamespaces['dx'] = 'dx';
         }
         if($this->options[self::CONFIG_INCLUDE_DIFF]) {
             $headParams[] = 'xmlns:sdl="http://sdl.com/FileTypes/SdlXliff/1.0"';
+            $this->enabledNamespaces['sdl'] = 'sdl';
         }
         $headParams[] = 'xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-doc-1_0_extensions.xsd"';
         if($dx) {
             $headParams[] = 'dx:version="1.4"';
         }
         $headParams[] = 'xmlns:translate5="http://www.translate5.net/"';
+        $this->enabledNamespaces['translate5'] = 'translate5';
         $headParams[] = 'translate5:taskname="'.htmlspecialchars($this->task->getTaskName()).'"';
         $headParams[] = 'translate5:taskguid="'.htmlspecialchars($this->task->getTaskGuid()).'"';
         $this->result[] = '<'.join(' ', $headParams).'>';
@@ -293,6 +340,13 @@ class editor_Models_Converter_SegmentsToXliff {
         //since the mid is only unique in the source file, and we are merging here 
         //several files together, we have to use the segmentNrInTask to achieve uniqueness,
         //instead using the desired MID
+        
+        //FIXME
+        //The native way would to use the MID, but for changes.xliff this is not possible. (see comment above)
+        //For Globalese the MID would be OK, but then we need the segmentId as translate5 namespaced 
+        // additional attribute for reintegration of the pretranslated data
+        // This should be a separate config (include segmentId or not) since for future use this will be really useful
+        
         $this->result[] = "\n".sprintf($segStart, $segment['segmentNrInTask'], $segment['autoStateId'], $autoStateText);
         
         /*
@@ -343,7 +397,13 @@ class editor_Models_Converter_SegmentsToXliff {
         if($this->data['firstTarget'] == $field->name) {
             $matchRate = number_format($segment['matchRate'], 1, '.', '');
             $targetEdit = $this->prepareText($segment[$this->sfm->getEditIndex($this->data['firstTarget'])]);
-            $this->result[] = '<target dx:match-quality="'.$matchRate.'">'.$targetEdit.'</target>';
+            if(empty($this->enabledNamespaces['dx'])){
+                $targetPrefix = '<target>';
+            }
+            else {
+                $targetPrefix = '<target dx:match-quality="'.$matchRate.'">';
+            }
+            $this->result[] = $targetPrefix.$targetEdit.'</target>';
             $targetOriginal = $this->prepareText($segment[$field->name]);
             //add previous version of target as alt trans
             if($this->options[self::CONFIG_ADD_PREVIOUS_VERSION]) {
