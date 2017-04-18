@@ -86,6 +86,7 @@ Ext.define('Editor.view.segments.Grid', {
     column_edited_icon: '{0} <img src="{1}" class="icon-editable" alt="{2}" title="{3}">',
     
     columnMap:{},
+    hasRelaisColumn: false,
     stateData: {},
     qualityData: {},
     constructor: function() {
@@ -136,6 +137,11 @@ Ext.define('Editor.view.segments.Grid', {
             xtype: 'autoStateColumn',
             itemId: 'autoStateColumn',
             width: 82
+        },{
+            xtype: 'matchrateColumn'
+        },{
+            xtype: 'matchrateTypeColumn',
+            hidden: true
         }]);
         
         //conv store data to an array
@@ -157,8 +163,11 @@ Ext.define('Editor.view.segments.Grid', {
                 labelWidth = (label.length) * widthFactorHeader,
                 maxWidth = Editor.data.columns.maxWidth,
                 isEditableTarget = type == rec.TYPE_TARGET && editable,
-                isErgoVisible = !firstTargetFound && isEditableTarget || type == rec.TYPE_SOURCE;
+                isErgoVisible = !firstTargetFound && isEditableTarget || type == rec.TYPE_SOURCE || type == rec.TYPE_RELAIS;
             
+            if(!me.hasRelaisColumn && type == rec.TYPE_RELAIS) {
+                me.hasRelaisColumn = true;
+            }
             
             //stored outside of function and must be set after isErgoVisible!
             firstTargetFound = firstTargetFound || isEditableTarget; 
@@ -219,11 +228,6 @@ Ext.define('Editor.view.segments.Grid', {
             xtype: 'commentsColumn',
             itemId: 'commentsColumn',
             width: 200
-        },{
-            xtype: 'matchrateColumn'
-        },{
-            xtype: 'matchrateTypeColumn',
-            hidden: true
         }]);
     
         if(Editor.data.segments.showStatus){

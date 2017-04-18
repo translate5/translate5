@@ -44,7 +44,7 @@ Ext.define('Editor.view.segments.column.SegmentNrInTask', {
   mixins: ['Editor.view.segments.column.BaseMixin'],
   isErgonomicVisible: true,
   isErgonomicSetWidth: true,
-  ergonomicWidth: 111,
+  ergonomicWidth: 60,
   filter: {
       type: 'numeric'
   },

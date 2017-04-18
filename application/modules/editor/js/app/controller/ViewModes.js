@@ -260,7 +260,9 @@ Ext.define('Editor.controller.ViewModes', {
    * activates the ergonomic mode of the grid (source and edit-column enlarged, all other columns hidden; file-area hidden)
    */
   ergonomicMode: function(readonly) {
-    var me = this;
+    var me = this,
+        grid = me.getSegmentGrid();
+        contentColumns = grid.hasRelaisColumn ? 3 : 2;
 
     readonly = me.setReadonly(readonly);
     me.getViewModeMenu().hideMenu();
@@ -274,7 +276,7 @@ Ext.define('Editor.controller.ViewModes', {
     
     //calculate width of non content columns visible in ergo mode
     var widthToRedColWidth = 0;
-    Ext.Array.each(me.getSegmentGrid().columns, function(col){
+    Ext.Array.each(grid.columns, function(col){
         if(col.isErgonomicSetWidth && col.isErgonomicVisible && col.ergonomicWidth  !== undefined){
             if(col.isHidden()){
                 return;
@@ -287,9 +289,9 @@ Ext.define('Editor.controller.ViewModes', {
     widthToRedColWidth +  Ext.getScrollbarSize().width;
 
     //content columns width is grid width - 
-    me.colWidth = (me.getSegmentGrid().getWidth()- widthToRedColWidth)/2;
+    me.colWidth = (grid.getWidth()- widthToRedColWidth) / contentColumns;
     
-    Ext.Array.each(me.getSegmentGrid().columns, function(col){
+    Ext.Array.each(grid.columns, function(col){
         if(col.isErgonomicSetWidth){
             col.show();
             if(col.ergonomicWidth  === undefined){
@@ -310,11 +312,11 @@ Ext.define('Editor.controller.ViewModes', {
     Ext.util.CSS.createStyleSheet('#segment-grid .x-grid-row .x-grid-cell .x-grid-cell-inner { width: '+me.colWidth+'px; }',me.self.STYLE_BOX_ID);
     
     //ergoOnly, others remove cls
-    me.getSegmentGrid().addCls(me.self.MODE_ERGONOMIC);
+    grid.addCls(me.self.MODE_ERGONOMIC);
 
     //ergoOnly others, with other mode
     me.setViewMode(me.self.MODE_ERGONOMIC);
-    me.getSegmentGrid().view.refresh();
+    grid.view.refresh();
     me.toggleEditorErgonomicMode();
     me.saveAlreadyOpened();
 
