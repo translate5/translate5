@@ -42,6 +42,7 @@ Ext.define('Editor.view.segments.column.Quality', {
   extend: 'Editor.view.ui.segments.column.Quality',
   alias: 'widget.qualityColumn',
   mixins: ['Editor.view.segments.column.BaseMixin'],
+  showInMetaTooltip: true,
   filter: {
       type: 'list',
       labelField: 'label',

@@ -44,6 +44,7 @@ Ext.define('Editor.view.segments.column.WorkflowStep', {
     dataIndex: 'workflowStep',
     text: '#UT#bearbeitet bei',
     tdCls: 'workflowStep-field',
+    showInMetaTooltip: true,
     filter: {
         type: 'workflowStep'
     },

@@ -39,17 +39,84 @@ END LICENSE AND COPYRIGHT
  * @initalGenerated
  */
 Ext.define('Editor.view.segments.column.SegmentNrInTask', {
-  extend: 'Editor.view.ui.segments.column.SegmentNrInTask',
-  alias: 'widget.segmentNrInTaskColumn',
-  mixins: ['Editor.view.segments.column.BaseMixin'],
-  isErgonomicVisible: true,
-  isErgonomicSetWidth: true,
-  ergonomicWidth: 60,
-  filter: {
-      type: 'numeric'
-  },
-  initComponent: function() {
-    var me = this;
-    me.callParent(arguments);
-  }
+    extend: 'Ext.grid.column.Column',
+
+    itemId: '',
+    width: 50,
+    tdCls: 'segmentNrInTask',
+    dataIndex: 'segmentNrInTask',
+    text: 'Nr.',
+    alias: 'widget.segmentNrInTaskColumn',
+    mixins: ['Editor.view.segments.column.BaseMixin'],
+    isErgonomicVisible: true,
+    isErgonomicSetWidth: true,
+    ergonomicWidth: 60,
+    otherRenderers: null,
+    filter: {
+        type: 'numeric'
+    },
+    tableTpl: ['<table>',
+    '<tpl for=".">',
+    '<tr><th>{name}</th><td>{value}</td></tr>',
+    '</tpl></table>'],
+    initComponent: function() {
+        this.scope = this; //so that renderer can access this object instead the whole grid.
+        this.tableTpl = new Ext.XTemplate(this.tableTpl);
+        this.callParent(arguments);
+    },
+    initOtherRenderers: function() {
+        var me = this,
+            grid = me.up('grid');
+
+        me.otherRenderers = {};
+        Ext.Array.each(grid.columns, function(item) {
+            if(!item.showInMetaTooltip) {
+                return;
+            }
+            me.otherRenderers[item.dataIndex] = {
+                name: item.text,
+                renderer: item.renderer
+            };
+        });
+    },
+    editor: {
+        xtype: 'displayfield',
+        getModelData: function() {
+            return null;
+        },
+        ownQuicktip: true,
+        renderer: function(value, field) {
+            var context = field.ownerCt.context,
+                qtip, cell;
+            if(context && context.row){
+                cell = Ext.fly(context.row).down('td.segmentNrInTask');
+                if(cell) {
+                    qtip = cell.getAttribute('data-qtip');
+                    field.getEl().dom.setAttribute('data-qtip', qtip);
+                }
+            }
+            return value;
+        }
+    },
+    renderer: function(v, meta, record) {
+        //TODO this should be done in a native Editor.view.ToolTip implementation to create the ToolTips on the fly. 
+        // Since invocation of ToolTip is bound to QmSubSegments,
+        // the invocation should be changed in a general manner before reusing the general Editor.ToolTip class
+        var me = this,
+            data = [];
+
+        if(!me.otherRenderers) {
+            me.initOtherRenderers();
+        }
+
+        Ext.Object.each(me.otherRenderers, function(id, column){
+            data.push({
+                name: column.name,
+                value: column.renderer ? column.renderer(record.get(id), {}, record) : record.get(id)
+            })
+        })
+
+        meta.tdAttr = 'data-qtip="'+Ext.String.htmlEncode(me.tableTpl.apply(data))+'"';
+        return v;
+    }
 });

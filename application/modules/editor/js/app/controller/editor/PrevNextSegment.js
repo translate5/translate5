@@ -305,7 +305,6 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
                         idx: json[field]
                     }
                 });
-                console.log('calculateRows 200');
                 me.fireEvent('prevnextloaded',me);
             }
         });

@@ -43,6 +43,7 @@ Ext.define('Editor.view.segments.column.State', {
   alias: 'widget.stateColumn',
   mixins: ['Editor.view.segments.column.BaseMixin'],
   stateData: {},
+  showInMetaTooltip: true,
   filter: {
       type: 'list',
       labelField: 'label',

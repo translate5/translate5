@@ -43,6 +43,8 @@ Ext.define('Editor.view.segments.column.IsWatched', {
   alias: 'widget.iswatchedColumn',
   mixins: ['Editor.view.segments.column.BaseMixin'],
 
+  showInMetaTooltip: true,
+
   initComponent: function() {
     var me = this;
     me.initBaseMixin();

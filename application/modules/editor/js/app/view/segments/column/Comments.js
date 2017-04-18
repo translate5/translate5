@@ -44,6 +44,7 @@ Ext.define('Editor.view.segments.column.Comments', {
     filter: {
         type: 'string'
     },
+    showInMetaTooltip: true,
     text: '#UT#Kommentare',
     text_morecomments: '#UT#({0} weitere Kommentare)',
     text_morecomment: '#UT#({0} weiterer Kommentar)',

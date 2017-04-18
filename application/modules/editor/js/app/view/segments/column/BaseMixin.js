@@ -39,6 +39,7 @@ END LICENSE AND COPYRIGHT
  * @class Editor.view.segments.column.BaseMixin
  */
 Ext.define('Editor.view.segments.column.BaseMixin', {
+  showInMetaTooltip: false,
   initBaseMixin: function() {
     var me = this,
     config = Editor.data.segments.column;
