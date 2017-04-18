@@ -57,7 +57,9 @@ Ext.define('Editor.view.segments.column.SegmentNrInTask', {
     },
     tableTpl: ['<table>',
     '<tpl for=".">',
-    '<tr><th>{name}</th><td>{value}</td></tr>',
+        '<tpl if="value">',
+          '<tr><th>{name}</th><td>{value}</td></tr>',
+        '</tpl>',
     '</tpl></table>'],
     initComponent: function() {
         this.scope = this; //so that renderer can access this object instead the whole grid.
