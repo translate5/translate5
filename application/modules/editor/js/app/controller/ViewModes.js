@@ -286,8 +286,8 @@ Ext.define('Editor.controller.ViewModes', {
     });
 
     //add width of the scrollbar to the non available width for columns
-    widthToRedColWidth +  Ext.getScrollbarSize().width;
-
+    widthToRedColWidth += Ext.getScrollbarSize().width;
+    
     //content columns width is grid width - 
     me.colWidth = (grid.getWidth()- widthToRedColWidth) / contentColumns;
     
