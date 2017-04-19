@@ -117,7 +117,7 @@ abstract class editor_Models_Import_SegmentProcessor {
         $widthFactor = (float)$config->runtimeOptions->editor->columns->widthFactor;
         foreach ($fieldContents as $field => $contents) {
             //first source and first target are always on the default width!
-            if($field == editor_Models_SegmentField::TYPE_SOURCE || $field == editor_Models_SegmentField::TYPE_TARGET) {
+            if($this->fieldHasDefaultWidth($field)) {
                 continue;
             }
             
@@ -149,7 +149,7 @@ abstract class editor_Models_Import_SegmentProcessor {
         $sfm = $parser->getSegmentFieldManager();
         $fieldList = $sfm->getFieldList();
         foreach ($fieldList as $fieldName => $fieldEntity) {
-            if($fieldName == editor_Models_SegmentField::TYPE_SOURCE || $fieldName == editor_Models_SegmentField::TYPE_TARGET) {
+            if($this->fieldHasDefaultWidth($fieldName)) {
                 $this->fieldWidth[$fieldName] = $maxWidth;
             }
             if(!isset($this->fieldWidth[$fieldName])){
@@ -169,5 +169,20 @@ abstract class editor_Models_Import_SegmentProcessor {
                 $fieldEntity->save();
             }
         }
+    }
+    
+    /**
+     * returns if the given field should use the max default width or not
+     * @param string $field
+     * @return boolean
+     */
+    protected function fieldHasDefaultWidth(string $field) {
+        switch ($field) {
+            case editor_Models_SegmentField::TYPE_SOURCE;
+            case editor_Models_SegmentField::TYPE_TARGET;
+            case editor_Models_SegmentField::TYPE_RELAIS;
+            return true;
+        }
+        return false;
     }
 }
