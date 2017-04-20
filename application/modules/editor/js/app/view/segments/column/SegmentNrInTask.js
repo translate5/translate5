@@ -75,10 +75,7 @@ Ext.define('Editor.view.segments.column.SegmentNrInTask', {
             if(!item.showInMetaTooltip) {
                 return;
             }
-            me.otherRenderers[item.dataIndex] = {
-                name: item.text,
-                renderer: item.renderer
-            };
+            me.otherRenderers[item.dataIndex] = item;
         });
     },
     editor: {
@@ -112,10 +109,19 @@ Ext.define('Editor.view.segments.column.SegmentNrInTask', {
         }
 
         Ext.Object.each(me.otherRenderers, function(id, column){
-            data.push({
-                name: column.name,
-                value: column.renderer ? column.renderer(record.get(id), {}, record) : record.get(id)
-            })
+            var scope = column.scope || me.up('grid'),
+                obj = {
+                    name: column.text
+                };
+
+            if (column.renderer) {
+                obj.value = column.renderer.apply(scope, [record.get(id), {}, record]);
+            }
+            else {
+                obj.value = record.get(id);
+            }
+            
+            data.push(obj);
         })
 
         meta.tdAttr = 'data-qtip="'+Ext.String.htmlEncode(me.tableTpl.apply(data))+'"';
