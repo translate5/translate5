@@ -120,7 +120,12 @@ Ext.define('Editor.view.segments.column.SegmentNrInTask', {
             else {
                 obj.value = record.get(id);
             }
-            
+
+            if(id == 'comments'){
+                //cleaning up comment add/edit icon
+                obj.value = obj.value.replace(/^<img class="(add|edit)"[^>]+>/, '');
+            }
+
             data.push(obj);
         })
 
