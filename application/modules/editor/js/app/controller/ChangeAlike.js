@@ -352,6 +352,7 @@ Ext.define('Editor.controller.ChangeAlike', {
       toSegmentId: id,
       url: me.alikeSegmentsUrl+'/'+id,
       method: 'put',
+      timeout: 90000,
       params: {
           "duration": me.timeTracking,
           "alikes[]": alikes
