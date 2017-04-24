@@ -3,6 +3,17 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.5.26] - 2017-04-24
+###Added
+TRANSLATE-871: New Tooltip should show segment meta data over segmentNrInTask column
+
+###Changed
+TRANSLATE-823: ignore sdlxliff bookmarks for relais import check
+TRANSLATE-870: Enable MatchRate and Relais column per default in ergonomic mode
+
+###Bugfixes
+TRANSLATE-875: Width of relais column is too small
+
 ## [2.5.25] - 2017-04-06
 ###Changed
 MITTAGQI-36: Add new license plug-in exception
