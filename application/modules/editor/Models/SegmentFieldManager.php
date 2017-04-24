@@ -35,7 +35,7 @@ class editor_Models_SegmentFieldManager {
      * This are the default labels, they are translated on sending the output (in SegmentfieldController)
      */
     const LABEL_SOURCE = 'Ausgangstext';
-    const LABEL_TARGET = 'Zieltext'; 
+    const LABEL_TARGET = 'Zieltext (zur Importzeit)'; 
     const LABEL_RELAIS = 'Relaissprache';
     
     const _MAP_DELIM = '#';
