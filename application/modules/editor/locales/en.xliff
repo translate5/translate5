@@ -1495,6 +1495,10 @@
     <source>Ergonomic (Ansicht)</source>
     <target>Ergonomic (view mode)</target>
 </trans-unit>
+<trans-unit id='WmllbHRleHQgKHp1ciBJbXBvcnR6ZWl0KQ=='>
+    <source>Zieltext (zur Importzeit)</source>
+    <target>target (version on import time)</target>
+</trans-unit>
     </body>
   </file>
 </xliff>
