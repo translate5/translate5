@@ -27,32 +27,33 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-?><!DOCTYPE HTML>
-<html manifest="" lang="en-US">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <link rel="shortcut icon" href="<?php echo $this->pathToIMAGES; ?>/favicon.ico" type="image/x-icon"/>
-    <title><?php echo $this->translate->_('translate5'); ?></title>
-    
-    <?php
-        if($this->enableJsLogger) {
-            echo $this->render('index/jslogger.phtml');
-        }
-    ?>
-    
+/**
+ * This is the default inclusion of therootcause logger in translate5.
+ * To customize it, place a modified copy of this file in the client-specific folder:
+ * APPLICATION_ROOT/client-specific/views/editor/scripts/index/
+ * If the logger should be disabled completly just set in your config:
+ *  
+ *      runtimeOptions.debug.enableJsLogger = 0
+ */
+?>
+    <script src="https://app.therootcause.io/rootcause-full-extjs.js" crossorigin="anonymous"></script>
     <script>
-    Editor = {};
-    <?php
-    echo $this->Php2JsVars();
-    ?>;
-    Editor.TRANSTILDE = '~@#!WS~';
+        (function() {
+            var logger = window.RC && new RC.Logger({
+                applicationId : "1b60154d0a976fff59848a5e5607ac015df89161",
+                captureScreenshot : true,
+                recordUserActions : true,
+                logConsoleOutput : true,
+                logAjaxRequests : true,
+                treatFailedAjaxAsError : false,
+                logResourceLoadFailures : true,
+                autoStart : true,
+                showNotificationOnError : true,
+                showFeedbackButton : true,
+                showErrorDialog : true,
+                maxNbrOfReportedErrors : 1,
+                version : "", // TODO,
+                frameworkVersion : "" // TODO
+            });
+        })();
     </script>
-    <?php
-        echo $this->render('index/app-js-'.$this->buildType.'.phtml');
-        echo $this->headLink();
-    ?>
-</head>
-<body class="loading">
-</body>
-</html>

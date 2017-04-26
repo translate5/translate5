@@ -176,6 +176,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     protected function setJsVarsInView() {
         $rop = $this->config->runtimeOptions;
         
+        $this->view->enableJsLogger = $rop->debug && $rop->debug->enableJsLogger;
+        
         $restPath = APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';
       $this->view->Php2JsVars()->set('restpath', $restPath);
       $this->view->Php2JsVars()->set('basePath', APPLICATION_RUNDIR);
