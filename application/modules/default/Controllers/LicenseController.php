@@ -72,7 +72,7 @@ class LicenseController extends ZfExtended_Controllers_Action {
             return;
         }
         ob_clean();
-        $file_url = 'http://www.translate5.net/downloads/translate5.zip';
+        $file_url = 'https://www.translate5.net/downloads/translate5.zip';
         header('Content-Type: application/octet-stream');
         header("Content-Transfer-Encoding: Binary");
         header("Content-disposition: attachment; filename=\"" . basename($file_url) . "\"");
