@@ -49,6 +49,7 @@ Ext.define('Editor.view.segments.EditorKeyMap', {
     handleTargetEvent: function(event) {
         event.isDigitPreparation = false;
         event.lastWasDigitPreparation = this.lastWasDigitPreparation;
+        console.log("PROCESSED");
         var res = this.callParent([event]);
         this.lastWasDigitPreparation = event.isDigitPreparation;
         return res;
