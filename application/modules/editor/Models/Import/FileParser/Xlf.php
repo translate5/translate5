@@ -189,7 +189,19 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $targetName = $this->segmentFieldManager->getFirstTargetName();
         
         $temp_source = preg_replace('/.*<source.*?>(.*)<\/source>.*/is', '${1}', $transUnit[2]);
-        $temp_target = preg_replace('/.*<target.*?>(.*)<\/target>.*/is', '${1}', $transUnit[2]);
+        
+        //this solves TRANSLATE-880: XLF: Copy source to target, if target is empty or does not exist 
+        $temp_target = $temp_source;
+        
+        //this first if is also needed for TRANSLATE-880
+        if(strpos($transUnit[2], '<target') !== false ||  preg_match('#<target[^>]*></target>#', $transUnit[2])){            
+            $temp_target = preg_replace('/.*<target.*?>(.*)<\/target>.*/is', '${1}', $transUnit[2]);
+        }
+        //this solves TRANSLATE-879: sdlxliff and XLF import does not work with missing target
+        elseif(strpos($transUnit[2], '<target') === false){
+            $transUnit[0] = str_replace('</source>', "</source>\r\n        <target></target>", $transUnit[0]);
+            $transUnit[2] = str_replace('</source>', "</source>\r\n        <target></target>", $transUnit[2]);
+        }
         
         $this->segmentData[$sourceName] = array(
             'original' => $this->parseSegment($temp_source, true)
