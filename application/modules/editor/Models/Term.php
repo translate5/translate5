@@ -34,6 +34,9 @@ END LICENSE AND COPYRIGHT
  */
 /**
  * Term Instanz
+ * 
+ * TODO refactor this class, so that code to deal with the term mark up will be moved in editor_Models_Segment_TermTag
+ * 
  */
 class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     const STAT_PREFERRED = 'preferredTerm';

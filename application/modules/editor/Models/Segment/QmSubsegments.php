@@ -29,6 +29,8 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Segment QmSubsegments Helper Class
+ * TODO convert this class to a "MqmTag" class
+ *  TO BE COMPLETED: There are several more places in translate5 which can make use of this class
  */
 class editor_Models_Segment_QmSubsegments {
     
@@ -91,6 +93,15 @@ class editor_Models_Segment_QmSubsegments {
             $parts[$idx] = $replacer($part, $cls, $issueId, $issueName, $sev, $sevName, $comment);
         }
         return join('', $parts);
+    }
+    
+    /**
+     * removes MQM tags from the given string
+     * @param string $segment
+     * @return string
+     */
+    public function remove(string $segment) {
+        return preg_replace('/<img[^>]+class="[^"]*qmflag[^"]*"[^>]*>/i','', $segment);
     }
     
     /**

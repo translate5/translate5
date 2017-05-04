@@ -29,6 +29,8 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Converts a List with Segments to XML
+ * 
+ * TODO: MQM and Terminology markup export is missing! 
  */
 class editor_Models_Converter_SegmentsToXliff {
     /**
@@ -127,6 +129,22 @@ class editor_Models_Converter_SegmentsToXliff {
     protected $enabledNamespaces = [];
     
     /**
+     * @var array
+     */
+    protected $taghelper;
+    
+    /**
+     * @var current tag map of replaced internal tags with g/x/bx/ex tags
+     */
+    protected $tagMap;
+    
+    /**
+     * id counter for the generated g/x/bx/ex tags
+     * @var integer
+     */
+    protected $tagId = 1;
+    
+    /**
      * Constructor
      * 
      * Supported parameters for $config are
@@ -183,6 +201,10 @@ hier eigenen translate5 tag mit den internen tags
         ];
         foreach($defaultsToTrue as $key){
             $this->options[$key] = !(array_key_exists($key, $config) && empty($config[$key]));
+        }
+        
+        if(! $this->options[self::CONFIG_PLAIN_INTERNAL_TAGS]) {
+            $this->initTagHelper();
         }
     }
     
@@ -315,9 +337,20 @@ hier eigenen translate5 tag mit den internen tags
         $file = '<file original="%1$s" source-language="%2$s" target-language="%3$s" xml:space="preserve" datatype="x-translate5">';
         $this->result[] = sprintf($file, htmlspecialchars($filename), $this->data['sourceLang'], $this->data['targetLang']);
         $this->result[] = '<body>';
-        
+        $fileMapKey = count($this->result);
+        $this->result[] = 'FILE_MAP_PLACEHOLDER';
+
+        $this->tagId = 1; //we start for each file with tag id = 1
+        $this->tagMap = [];
         foreach($segmentsOfFile as $segment) {
             $this->processSegmentsOfFile($segment);
+        }
+        
+        if(!empty($this->tagMap)){
+            $this->result[$fileMapKey] = '<header><translate5:tagmap>'.base64_encode(serialize($this->tagMap)).'</translate5:tagmap></header>';
+        }
+        else {
+            unset($this->result[$fileMapKey]);
         }
         
         $this->result[] = '</body>';
@@ -492,14 +525,38 @@ hier eigenen translate5 tag mit den internen tags
         return $result;
     }
     
-    
-    
     /**
      * prepares segment text parts for xml
      * @param string $text
      * @return string
      */
     protected function prepareText($text) {
-        return $this->exportParser->exportSingleSegmentContent($text);
+        if($this->options[self::CONFIG_PLAIN_INTERNAL_TAGS]) {
+            return $this->exportParser->exportSingleSegmentContent($text);
+        }
+        
+        //if plain internal tags are disabled:
+        // 1. toXliff converts the internal tags to xliff g,bx,ex and x tags
+        // 2. remove term tags
+        // 3. remove MQM tags
+        //TODO Terminology and MQM tags are just removed and not supported by our XLIFF exporter so far!
+        $text = $this->taghelper['internal']->toXliff($text, true, $this->tagMap, $this->tagId);
+        $text = $this->taghelper['term']->remove($text);
+        $text = $this->taghelper['mqm']->remove($text);
+        return $text;
+    }
+    
+    protected function initTagHelper() {
+        if(!empty($this->taghelper)) {
+            return;
+        }
+        $this->taghelper['internal'] = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        /* @var $this->taghelper['internal'] editor_Models_Segment_InternalTag */
+        
+        $this->taghelper['term'] = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
+        /* @var $this->taghelper['term'] editor_Models_Segment_TermTag */
+        
+        $this->taghelper['mqm'] = ZfExtended_Factory::get('editor_Models_Segment_QmSubsegments');
+        /* @var $this->taghelper['mqm'] editor_Models_Segment_QmSubsegments */
     }
 }

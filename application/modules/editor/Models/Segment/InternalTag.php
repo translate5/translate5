@@ -118,11 +118,11 @@ class editor_Models_Segment_InternalTag {
      * @param string $segment
      * @param boolean $removeOther optional, removes per default all other tags (mqm, terms, etc)
      * @param array &$replaceMap optional, returns by reference a mapping between the inserted xliff tags and the replaced original
+     * @param integer &$newid defaults to 1, is given as reference to provide a different startid of the internal tags
      */
-    public function toXliff(string $segment, $removeOther = true, &$replaceMap = null) {
+    public function toXliff(string $segment, $removeOther = true, &$replaceMap = null, &$newid = 1) {
         //xliff 1.2 needs an id for ex and bx tags.
         // matching of bx and ex is done by separate rid, which is filled with the original ID
-        $newid = 1;
         
         //if not external map given, we init it internally, although we don't need it
         if(is_null($replaceMap)) {
@@ -172,6 +172,10 @@ class editor_Models_Segment_InternalTag {
     
     /**
      * restores the internal tags into the given string by the given 2d map
+     * Warning: the reapplying is currently position based! 
+     * That means if the original xliff contained 
+     * → Discuss with Marc!!!!
+     * 
      * @param string $segment
      * @param array $map not a a key:value map, but a 2d array, since keys can exist multiple times
      */

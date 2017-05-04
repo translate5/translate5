@@ -349,6 +349,7 @@ abstract class editor_Models_Export_FileParser {
      * @return string $segment
      */
     protected function recreateTermTags($segment, $removeTermTags=true) {
+        //TODO refactor this method so that editor_Models_Segment_TermTag is used
         $toRemove = array('transFound', 'transNotFound', 'transNotDefined');
         
         //replace or remove closing tags
