@@ -158,7 +158,6 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
     protected function importRemainingFiles() {
         $globFileId = $this->api->getFirstTranslated();
         while($globFileId !== false) {
-            error_log("FOO ".$globFileId);
             if(is_null($globFileId)){
                 $this->logplugin("Waiting for more translated files");
                 sleep(5);
