@@ -28,6 +28,12 @@ END LICENSE AND COPYRIGHT
 */
 
 class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import_Worker_Abstract {
+    
+    /**
+     * @var editor_Models_SegmentFieldManager
+     */
+    protected $segmentFieldManager;
+    
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
@@ -52,6 +58,9 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
             editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_STATE_QM => false,
         ];
         
+        $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        $this->segmentFieldManager->initFields($this->taskGuid);
+        
         $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff', [$xliffConf]);
         /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff */
 
@@ -66,30 +75,81 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
             if($segment->getFileId() != $fileId) {
                 if($fileId > 0) {
                     //file changed, save stored segments as xliff
-                    $this->convertAndPreTranslate($xliffConverter, $oneFileSegments);
+                    $this->convertAndPreTranslate($xliffConverter, $fileId, $oneFileSegments);
                 }
                 
                 //new file
                 $oneFileSegments = [];
-                $fileId = $segment->getFileId();
+                $fileId = (int) $segment->getFileId();
             }
             
             //store segment data for further processing
             $oneFileSegments[] = (array) $segment->getDataObject();
         }
-        
-        //save last stored segments
-        $this->convertAndPreTranslate($xliffConverter, $oneFileSegments);
+        if(!empty($oneFileSegments)) {
+            //save last stored segments
+            $this->convertAndPreTranslate($xliffConverter, $fileId, $oneFileSegments);
+        }
         return true;
     }
     
     /**
      * @param editor_Models_Converter_SegmentsToXliff $xliffConverter
+     * @param integer $fileId
      * @param array $oneFileSegments
      */
-    protected function convertAndPreTranslate(editor_Models_Converter_SegmentsToXliff $xliffConverter, array $oneFileSegments) {
+    protected function convertAndPreTranslate(editor_Models_Converter_SegmentsToXliff $xliffConverter, integer $fileId, array $oneFileSegments) {
         $xliff = $xliffConverter->convert($this->task, $oneFileSegments);
         //FIXME Here am I! Proceed here with communication to Globalese of the XLIFF data
         // See also the FIXMEs in editor_Models_Converter_SegmentsToXliff!
+        
+        
+        //FIXME Aleks communicate to globalese
+        
+        //We assume the xliff is pretranslated right now:
+        $path = $this->storeXlf($fileId, $xliff);
+        // $this->importPretranslated($fileId, $path);
+    }
+    
+    /**
+     * Stores the generated xliff on the disk to import it
+     * @param integer $fileId
+     * @param string $xliff
+     */
+    protected function storeXlf(integer $fileId, string $xliff) {
+        $path = $this->task->getAbsoluteTaskDataPath();
+        $path .= '/GlobalesePreTranslation/';
+        if(!is_dir($path) && !@mkdir($path)) {
+            throw new ZfExtended_Exception("Could not create directory ".$path);
+        }
+        $path .= 'file-'.$fileId.'.xlf';
+        file_put_contents($path, $xliff);
+        return $path;
+    }
+    
+    /**
+     * 
+     * @param unknown $path
+     */
+    protected function importPretranslated(integer $fileId, string $path) {
+        //define FileParser Constructor Parameters:
+        $params = [
+            $path,
+            basename($path),
+            $fileId, 
+            $this->task,
+        ];
+        
+        //start a hardcoded XLF FileParser, since this is the only Format we expect
+        $parser = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf',$params);
+        /* var $parser editor_Models_Import_FileParser_Xlf */
+        $parser->setSegmentFieldManager($this->segmentFieldManager);
+        
+        //add the custom Segment Processor to Update the segments
+        $processor = ZfExtended_Factory::get('editor_Plugins_GlobalesePreTranslation_SegmentUpdateProcessor',[$this->task]);
+        /* @var $processor editor_Plugins_GlobalesePreTranslation_SegmentUpdateProcessor */
+        $parser->addSegmentProcessor($processor);
+        
+        $parser->parseFile();
     }
 }

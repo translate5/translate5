@@ -29,13 +29,13 @@ END LICENSE AND COPYRIGHT
 
 /**
  * converts single paired XML tags into paired tags where possible.
- *  <bx rid="1">foo<ex rid="1">
+ *  <bx rid="1">foo<ex rid="1"> OR <bpt rid="1">foo<ept rid="1">
  * to
  *  <g id="1">foo</g>
  * 
  * More examples and algorithm explanation at the end of the file!
  * 
- * Currently this class is made to pair <bx> and <ex> XLIFF tags, 
+ * Currently this class is made to pair <bpt>/<bx> and <ept>/<ex> XLIFF tags, 
  *  but it should be easily possible to refactor this class in a more general way to use it also for other single tag pairs
  */
 class editor_Models_Converter_XmlPairer {
@@ -55,12 +55,12 @@ class editor_Models_Converter_XmlPairer {
     protected $lastNode = null;
     
     /**
-     * Contains a map with the replaced data key: bx/ex => value: g tag
+     * Contains a map with the replaced data key: bpt/bx / ept/ex => value: g tag
      * @var array
      */
     protected $replaceList = [];
     
-    function pairTags($xmlAllUnpaired) {
+    public function pairTags($xmlAllUnpaired) {
         //split up tags and text in nodes
         $this->nodeList = preg_split('/(<[^>]*>)/i', $xmlAllUnpaired, null, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
         
@@ -128,12 +128,13 @@ class editor_Models_Converter_XmlPairer {
         $rid = $matches[3];
         
         //ignore non paired tags
-        if($tag != 'ex' && $tag != 'bx') {
+        if($tag != 'ex' && $tag != 'bx' && $tag != 'ept' && $tag != 'bpt') {
             return;
         }
         
-        //init node data, $open = $tag == 'bx'
-        $m = new editor_Models_Converter_XmlPairerNode($idx, $tag == 'bx', $rid, $id);
+        //init node data, $open = ($tag == 'bx' || $tag == 'bpt')
+        $opener = ($tag == 'bx' || $tag == 'bpt');
+        $m = new editor_Models_Converter_XmlPairerNode($idx, $opener, $rid, $id);
         
         if($m->isOpener()) {
             //take care of the opener reference
