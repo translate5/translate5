@@ -32,6 +32,9 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_GlobalesePreTranslation_Init extends ZfExtended_Plugin_Abstract {
     public function init() {
+        if(ZfExtended_Debug::hasLevel('plugin', 'GlobalesePreTranslation')) {
+            ZfExtended_Factory::addOverwrite('Zend_Http_Client', 'ZfExtended_Zendoverwrites_Http_DebugClient');
+        }
         $this->log = ZfExtended_Factory::get('ZfExtended_Log', array(false));
 
         // event-listeners

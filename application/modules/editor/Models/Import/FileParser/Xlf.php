@@ -88,7 +88,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     protected function parse() {
         $this->_skeletonFile = $this->_origFileUnicodeProtected;
         
-        if (strpos($this->_origFileUnicodeProtected, $this->ibmXliffNeedle) === false)
+        //FIXME!!!
+        if (false && strpos($this->_origFileUnicodeProtected, $this->ibmXliffNeedle) === false)
         {
             $msg = 'Die Datei ' . $this->_fileName . ' ist keine gültige IBM-Xliff Datei! ('.$this->ibmXliffNeedle.' nicht enthalten)';
             $log = ZfExtended_Factory::get('ZfExtended_Log');
@@ -123,6 +124,12 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $groupLevel++;
                 continue;
             }
+            
+//From Globalese:
+//<trans-unit id="segmentNrInTask">
+//<source>Installation and Configuration</source>
+//<target state="needs-review-translation" state-qualifier="leveraged-mt" translate5:origin="Globalese">Installation und Konfiguration</target>
+//</trans-unit>
             
             foreach($units as &$unit)
             {

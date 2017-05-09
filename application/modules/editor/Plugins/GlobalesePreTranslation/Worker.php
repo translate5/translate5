@@ -35,6 +35,38 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
     protected $segmentFieldManager;
     
     /**
+     * @var editor_Plugins_GlobalesePreTranslation_Connector
+     */
+    protected $api;
+    
+    /**
+     * Globalese Project Id
+     * @var integer
+     */
+    protected $projectId;
+    
+    /**
+     * Map between our fileId and the fileId of Globalese
+     * @var array
+     */
+    protected $fileIdMap = [];
+    
+    /**
+     * Configuration of the xliff converter
+     * @var array
+     */
+    protected $xliffConf = [
+            editor_Models_Converter_SegmentsToXliff::CONFIG_INCLUDE_DIFF => false,
+            editor_Models_Converter_SegmentsToXliff::CONFIG_PLAIN_INTERNAL_TAGS => false,
+            editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_ALTERNATIVES => false,
+            editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_COMMENTS => false,
+            editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_DISCLAIMER => false,
+            editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_PREVIOUS_VERSION => false,
+            editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_RELAIS_LANGUAGE => false,
+            editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_STATE_QM => false,
+    ];
+    
+    /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
@@ -47,21 +79,29 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
-        $xliffConf = [
-            editor_Models_Converter_SegmentsToXliff::CONFIG_INCLUDE_DIFF => false,
-            editor_Models_Converter_SegmentsToXliff::CONFIG_PLAIN_INTERNAL_TAGS => false,
-            editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_ALTERNATIVES => false,
-            editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_COMMENTS => false,
-            editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_DISCLAIMER => false,
-            editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_PREVIOUS_VERSION => false,
-            editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_RELAIS_LANGUAGE => false,
-            editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_STATE_QM => false,
-        ];
-        
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         $this->segmentFieldManager->initFields($this->taskGuid);
         
-        $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff', [$xliffConf]);
+        // we operate only on one project, so one connector instance is enough
+        $this->api = ZfExtended_Factory::get('editor_Plugins_GlobalesePreTranslation_Connector');
+        
+        $this->createGlobaleseProject();
+        $this->processSegments();
+        $this->importRemainingFiles();
+        $this->removeGlobaleseProject();
+        return true;
+    }
+    
+    protected function createGlobaleseProject() {
+        $this->api->createProject($this->task);
+    }
+    
+    protected function removeGlobaleseProject() {
+        $this->api->removeProject();
+    }
+    
+    protected function processSegments() {
+        $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff', [$this->xliffConf]);
         /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff */
 
         //returns an segment iterator where the segments are ordered by segmentid, 
@@ -90,7 +130,6 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
             //save last stored segments
             $this->convertAndPreTranslate($xliffConverter, $fileId, $oneFileSegments);
         }
-        return true;
     }
     
     /**
@@ -100,15 +139,47 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
      */
     protected function convertAndPreTranslate(editor_Models_Converter_SegmentsToXliff $xliffConverter, integer $fileId, array $oneFileSegments) {
         $xliff = $xliffConverter->convert($this->task, $oneFileSegments);
-        //FIXME Here am I! Proceed here with communication to Globalese of the XLIFF data
-        // See also the FIXMEs in editor_Models_Converter_SegmentsToXliff!
+        $this->logplugin('XLIFF generated for file '.$fileId);
+        $globaleseFileId = $this->api->upload($this->getFilename($fileId), $xliff);
+        $this->fileIdMap[$globaleseFileId] = $fileId;
+        $globFileId = $this->api->getFirstTranslated();
+        $this->logplugin('getFirstTranslateable fileId: '.$fileId.' GlobaleseFileId: '.$globFileId);
         
-        
-        //FIXME Aleks communicate to globalese
-        
+        //FIXME check if $globFileId can contain 0 as a valid ID (I dont think so) 
+        // if 0 will be a valid ID then this if must check for not null and not false
+        if($globFileId) {
+            $this->reImportFinished($globFileId);
+        }
+    }
+    
+    /**
+     * import the remaining files
+     */
+    protected function importRemainingFiles() {
+        $globFileId = $this->api->getFirstTranslated();
+        while($globFileId !== false) {
+            error_log("FOO ".$globFileId);
+            if(is_null($globFileId)){
+                $this->logplugin("Waiting for more translated files");
+                sleep(5);
+            } else {
+                $this->reImportFinished($globFileId);
+            }
+            $globFileId = $this->api->getFirstTranslated();
+        } 
+    }
+    
+    /**
+     * get and reimport the given translated xlf
+     */
+    protected function reImportFinished($globFileId) {
+        $translatedXlf = $this->api->getFileContent($globFileId);
+        //FIXME check if it does exist in the map
+        $fileId = $this->fileIdMap[$globFileId];
         //We assume the xliff is pretranslated right now:
-        $path = $this->storeXlf($fileId, $xliff);
-        // $this->importPretranslated($fileId, $path);
+        $path = $this->storeXlf($fileId, $translatedXlf);
+        $this->logplugin("Start reimport of".$path);
+        $this->importPretranslated($fileId, $path);
     }
     
     /**
@@ -122,14 +193,15 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
         if(!is_dir($path) && !@mkdir($path)) {
             throw new ZfExtended_Exception("Could not create directory ".$path);
         }
-        $path .= 'file-'.$fileId.'.xlf';
+        $path .= $this->getFilename($fileId);
         file_put_contents($path, $xliff);
         return $path;
     }
     
     /**
-     * 
-     * @param unknown $path
+     * reimport the pretranslated file
+     * @param integer $fileId
+     * @param string $path
      */
     protected function importPretranslated(integer $fileId, string $path) {
         //define FileParser Constructor Parameters:
@@ -146,10 +218,29 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
         $parser->setSegmentFieldManager($this->segmentFieldManager);
         
         //add the custom Segment Processor to Update the segments
-        $processor = ZfExtended_Factory::get('editor_Plugins_GlobalesePreTranslation_SegmentUpdateProcessor',[$this->task]);
+        $processor = ZfExtended_Factory::get('editor_Plugins_GlobalesePreTranslation_SegmentUpdateProcessor',[$this->task, $this->segmentFieldManager]);
         /* @var $processor editor_Plugins_GlobalesePreTranslation_SegmentUpdateProcessor */
         $parser->addSegmentProcessor($processor);
         
         $parser->parseFile();
+    }
+    
+    /**
+     * returns the file name of the temporary used XLF 
+     * @param integer $fileId
+     * @return string
+     */
+    protected function getFilename($fileId) {
+        return 'file-'.$fileId.'.xlf';
+    }
+    
+    /**
+     * logger method
+     * @param string $msg
+     */
+    protected function logplugin($msg) {
+        if(ZfExtended_Debug::hasLevel('plugin', 'GlobalesePreTranslation')) {
+            error_log('GlobalesePreTranslation: '.$msg);
+        }
     }
 }
