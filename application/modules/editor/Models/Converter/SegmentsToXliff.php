@@ -129,9 +129,19 @@ class editor_Models_Converter_SegmentsToXliff {
     protected $enabledNamespaces = [];
     
     /**
-     * @var array
+     * @var editor_Models_Segment_InternalTag
      */
-    protected $taghelper;
+    protected $taghelperInternal;
+    
+    /**
+     * @var editor_Models_Segment_TermTag
+     */
+    protected $taghelperTerm;
+    
+    /**
+     * @var editor_Models_Segment_QmSubsegments
+     */
+    protected $taghelperMqm;
     
     /**
      * @var current tag map of replaced internal tags with g/x/bx/ex tags
@@ -149,11 +159,6 @@ class editor_Models_Converter_SegmentsToXliff {
      * 
      * Supported parameters for $config are
      * - includeDiff                = boolean, enable or disable diff generation, defaults to false
-     * FIXME:
-     * 
-     * file > header tag
-hier eigenen translate5 tag mit den internen tags 
-     * 
      * - plainInternalTags          = boolean, exports internal tags plain content, 
      *                                currently only needed for BEO export, defaults to false
      * - addRelaisLanguage          = boolean, add relais language target as alt trans (if available), defaults to true
@@ -337,24 +342,47 @@ hier eigenen translate5 tag mit den internen tags
         $file = '<file original="%1$s" source-language="%2$s" target-language="%3$s" xml:space="preserve" datatype="x-translate5">';
         $this->result[] = sprintf($file, htmlspecialchars($filename), $this->data['sourceLang'], $this->data['targetLang']);
         $this->result[] = '<body>';
+        
+        $fileMapKey = $this->prepareTagsStorageInHeader();
+        foreach($segmentsOfFile as $segment) {
+            $this->processSegmentsOfFile($segment);
+        }
+        $this->storeTagsInHeader($fileMapKey);
+        
+        $this->result[] = '</body>';
+        $this->result[] = '</file>';
+    }
+    
+    /**
+     * prepares tag storage in the xliff header - omitted with CONFIG_PLAIN_INTERNAL_TAGS
+     * @return integer the index of the filemap placeholder in the result array
+     */
+    protected function prepareTagsStorageInHeader() {
+        if($this->options[self::CONFIG_PLAIN_INTERNAL_TAGS]) {
+            return null;
+        }
         $fileMapKey = count($this->result);
         $this->result[] = 'FILE_MAP_PLACEHOLDER';
 
         $this->tagId = 1; //we start for each file with tag id = 1
         $this->tagMap = [];
-        foreach($segmentsOfFile as $segment) {
-            $this->processSegmentsOfFile($segment);
-        }
+        return $fileMapKey;
+    }
         
-        if(!empty($this->tagMap)){
-            $this->result[$fileMapKey] = '<header><translate5:tagmap>'.base64_encode(serialize($this->tagMap)).'</translate5:tagmap></header>';
+    /**
+     * stores the content tags in the xliff header - omitted with CONFIG_PLAIN_INTERNAL_TAGS
+     * @param integer $fileMapKey the index of the filemap placeholder in the result array 
+     */
+    protected function storeTagsInHeader($fileMapKey) {
+        if($this->options[self::CONFIG_PLAIN_INTERNAL_TAGS]) {
+            return;
         }
-        else {
+        if(empty($this->tagMap)){
             unset($this->result[$fileMapKey]);
         }
-        
-        $this->result[] = '</body>';
-        $this->result[] = '</file>';
+        else {
+            $this->result[$fileMapKey] = '<header><translate5:tagmap>'.base64_encode(serialize($this->tagMap)).'</translate5:tagmap></header>';
+        }
     }
     
     /**
@@ -362,25 +390,21 @@ hier eigenen translate5 tag mit den internen tags
      * @param array $segment
      */
     protected function processSegmentsOfFile($segment) {
-        $segStart = '<trans-unit id="%1$s" translate5:autostateId="%2$s" translate5:autostateText="%3$s">';
+        $segStart = '<trans-unit id="%1$s" translate5:autostateId="%2$s" translate5:autostateText="%3$s"%4$s>';
         if(isset($this->data['autostates'][$segment['autoStateId']])) {
             $autoStateText =  $this->data['autostates'][$segment['autoStateId']];
         }
         else {
             $autoStateText = 'NOT_FOUND_'.$segment['autoStateId'];
         }
-        //@todo actually we are messing around on creating the xliff file. 
-        //since the mid is only unique in the source file, and we are merging here 
-        //several files together, we have to use the segmentNrInTask to achieve uniqueness,
-        //instead using the desired MID
         
-        //FIXME
-        //The native way would to use the MID, but for changes.xliff this is not possible. (see comment above)
-        //For Globalese the MID would be OK, but then we need the segmentId as translate5 namespaced 
-        // additional attribute for reintegration of the pretranslated data
-        // This should be a separate config (include segmentId or not) since for future use this will be really useful
-        
-        $this->result[] = "\n".sprintf($segStart, $segment['segmentNrInTask'], $segment['autoStateId'], $autoStateText);
+        $additionalAttributes = '';
+        if(!$segment['editable']){
+            $additionalAttributes = ' translate="no"';
+        }
+
+        //segmentNrInTask is the segment id of the generated segment
+        $this->result[] = "\n".sprintf($segStart, $segment['segmentNrInTask'], $segment['autoStateId'], $autoStateText, $additionalAttributes);
         
         /*
          * <!-- attention: regarding internal tags the source and the target-content are in the same format as the contents of the original source formats would have been. For SDLXLIFF this means: No mqm-Tags; Terms marked with <mrk type="x-term-...">-Tags; Internal Tags marked with g- and x-tags; For CSV this means: No internal tags except mqm-tags -->
@@ -431,16 +455,22 @@ hier eigenen translate5 tag mit den internen tags
             $matchRate = number_format($segment['matchRate'], 1, '.', '');
             $targetEdit = $this->prepareText($segment[$this->sfm->getEditIndex($this->data['firstTarget'])]);
             if(empty($this->enabledNamespaces['dx'])){
-                $targetPrefix = '<target>';
+                $targetPrefix = '<target state="%1$s">';
             }
             else {
-                $targetPrefix = '<target dx:match-quality="'.$matchRate.'">';
+                $targetPrefix = '<target state="%1$s" dx:match-quality="'.$matchRate.'">';
             }
-            $this->result[] = $targetPrefix.$targetEdit.'</target>';
-            $targetOriginal = $this->prepareText($segment[$field->name]);
+            if(empty($targetEdit)){
+                $state = 'needs-translation';
+            }
+            else {
+                $state = 'translated';
+            }
+            $this->result[] = sprintf($targetPrefix, $state).$targetEdit.'</target>';
             //add previous version of target as alt trans
             if($this->options[self::CONFIG_ADD_PREVIOUS_VERSION]) {
-                $this->addAltTransToResult($targetOriginal, $lang, $field->label, 'previous-version');
+                //add targetOriginal
+                $this->addAltTransToResult($this->prepareText($segment[$field->name]), $lang, $field->label, 'previous-version');
             }
         }
         else {
@@ -449,12 +479,10 @@ hier eigenen translate5 tag mit den internen tags
             if($this->options[self::CONFIG_ADD_ALTERNATIVES]) {
                 $this->addAltTransToResult($targetEdit, $lang, $field->label);
             }
-            if($this->options[self::CONFIG_INCLUDE_DIFF]){
-                $targetOriginal = $this->prepareText($segment[$field->name]);
-            }
         }
         if($this->options[self::CONFIG_INCLUDE_DIFF]){
-            $this->addDiffToResult($targetEdit, $targetOriginal, $field, $segment);
+            //compare targetEdit and targetOriginal
+            $this->addDiffToResult($targetEdit, $this->prepareText($segment[$field->name]), $field, $segment);
         }
     }
     
@@ -540,23 +568,21 @@ hier eigenen translate5 tag mit den internen tags
         // 2. remove term tags
         // 3. remove MQM tags
         //TODO Terminology and MQM tags are just removed and not supported by our XLIFF exporter so far!
-        $text = $this->taghelper['internal']->toXliff($text, true, $this->tagMap, $this->tagId);
-        $text = $this->taghelper['term']->remove($text);
-        $text = $this->taghelper['mqm']->remove($text);
+        $text = $this->taghelperInternal->toXliff($text, true, $this->tagMap, $this->tagId);
+        $text = $this->taghelperTerm->remove($text);
+        $text = $this->taghelperMqm->remove($text);
         return $text;
     }
     
     protected function initTagHelper() {
-        if(!empty($this->taghelper)) {
-            return;
+        if(empty($this->taghelperInternal)) {
+            $this->taghelperInternal = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         }
-        $this->taghelper['internal'] = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        /* @var $this->taghelper['internal'] editor_Models_Segment_InternalTag */
-        
-        $this->taghelper['term'] = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
-        /* @var $this->taghelper['term'] editor_Models_Segment_TermTag */
-        
-        $this->taghelper['mqm'] = ZfExtended_Factory::get('editor_Models_Segment_QmSubsegments');
-        /* @var $this->taghelper['mqm'] editor_Models_Segment_QmSubsegments */
+        if(empty($this->taghelperTerm)) {
+            $this->taghelperTerm = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
+        }
+        if(empty($this->taghelperMqm)) {
+            $this->taghelperMqm = ZfExtended_Factory::get('editor_Models_Segment_QmSubsegments');
+        }
     }
 }

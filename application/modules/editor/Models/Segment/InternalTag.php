@@ -112,17 +112,17 @@ class editor_Models_Segment_InternalTag {
     /**
      * converts the given string (mainly the internal tags in the string) into valid xliff tags without content
      * The third parameter $replaceMap can be used to return a mapping between the inserted xliff tags 
-     *  and the replaced original tags. Warning: it is no usual key => value map, since keys can be duplicated (</g>) tags
-     *  There fore the map is a 2d array: [[</g>, replacement 1],[</g>, replacement 2]] 
+     *  and the replaced original tags. Warning: it is no usual key => value map, to be compatible with toXliffPaired (details see there)
      *  
      * @param string $segment
      * @param boolean $removeOther optional, removes per default all other tags (mqm, terms, etc)
      * @param array &$replaceMap optional, returns by reference a mapping between the inserted xliff tags and the replaced original
      * @param integer &$newid defaults to 1, is given as reference to provide a different startid of the internal tags
+     * @return string segment with xliff tags
      */
     public function toXliff(string $segment, $removeOther = true, &$replaceMap = null, &$newid = 1) {
-        //xliff 1.2 needs an id for ex and bx tags.
-        // matching of bx and ex is done by separate rid, which is filled with the original ID
+        //xliff 1.2 needs an id for bpt/bx and ept/ex tags.
+        // matching of bpt/bx and ept/ex is done by separate rid, which is filled with the original ID
         
         //if not external map given, we init it internally, although we don't need it
         if(is_null($replaceMap)) {
@@ -133,7 +133,12 @@ class editor_Models_Segment_InternalTag {
             //original id coming from import format
             $id = $match[3];
             $type = $match[1];
-            $tag = ['open' => 'bx', 'close' => 'ex', 'single' => 'x'];
+            $tag = ['open' => 'bpt', 'close' => 'ept', 'single' => 'x'];
+            //xliff tags:
+            // bpt ept → begin and end tag as standalone tags in one segment
+            // bx ex → start and end tag of tag pairs where the tags are distributed to different segments
+            // g tag → direct representation of a tag pair, 
+            //  disadvantage: the closing g tag contains no information about semantic, so for reappling our internal tags a XML parser would be necessary
             
             //as tag id the here generated newid must be used,
             // since the original $id is coming from imported data, it can happen 
@@ -151,9 +156,25 @@ class editor_Models_Segment_InternalTag {
         });
         
         if($removeOther) {
-            $result = strip_tags($result, '<x><x/><bx><bx/><ex><ex/>');
+            return strip_tags($result, '<x><x/><bpt><bpt/><ept><ept/><bx><bx/><ex><ex/>');
         }
-        
+        return $result;
+    }
+
+    /**
+     * converts the given string (mainly the internal tags in the string) into valid xliff tags without content
+     * The third parameter $replaceMap can be used to return a mapping between the inserted xliff tags 
+     *  and the replaced original tags. Warning: it is no usual key => value map, since keys can be duplicated (</g>) tags
+     *  There fore the map is a 2d array: [[</g>, replacement 1],[</g>, replacement 2]] 
+     *  
+     * @param string $segment
+     * @param boolean $removeOther optional, removes per default all other tags (mqm, terms, etc)
+     * @param array &$replaceMap optional, returns by reference a mapping between the inserted xliff tags and the replaced original
+     * @param integer &$newid defaults to 1, is given as reference to provide a different startid of the internal tags
+     * @return string segment with xliff tags
+     */
+    public function toXliffPaired(string $segment, $removeOther = true, &$replaceMap = null, &$newid = 1) {
+        $result = $this->toXliff($segment, $removeOther, $replaceMap, $newid);
         $xml = ZfExtended_Factory::get('editor_Models_Converter_XmlPairer');
         /* @var $xml editor_Models_Converter_XmlPairer */
         
