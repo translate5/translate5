@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.view.admin.TaskAddWindow', {
     extend: 'Ext.window.Window',
+    mixins:['Editor.controller.admin.IWizardCard'],
     alias: 'widget.adminTaskAddWindow',
     itemId: 'adminTaskAddWindow',
     cls: 'adminTaskAddWindow',
@@ -81,133 +82,147 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
             },
             config = {
                 title: me.title, //see EXT6UPD-9
-            items : [{
-                xtype: 'form',
-                padding: 5,
-                ui: 'default-frame',
-                layout: 'hbox',
-                layoutConfig : {
-                    align : 'stretch',
-                },
-                anchor: '100%',
-                items: [{
-                    xtype: 'container',
-                    flex: 1,
-                    layout: 'anchor',
-                    padding: '0 10 0 0',
-                    defaults: {
-                        labelWidth: 200,
-                        anchor: '100%'
-                    },
-                    items: [{
-                        xtype: 'textfield',
-                        name: 'taskName',
-                        maxLength: 255,
-                        allowBlank: false,
-                        toolTip: me.strings.taskNameTip,
-                        fieldLabel: me.strings.taskNameLabel
-                    },{
-                        xtype: 'textfield',
-                        maxLength: 120,
-                        name: 'taskNr',
-                        fieldLabel: me.strings.taskNrLabel
-                    },Ext.applyIf({
-                        name: 'sourceLang',
-                        allowBlank: false,
-                        toolTip: me.strings.sourceLangTip,
-                        //each combo needs its own store instance, see EXT6UPD-8
-                        store: Ext.create(Editor.store.admin.Languages),
-                        fieldLabel: me.strings.sourceLangLabel
-                    }, langCombo),Ext.applyIf({
-                        name: 'targetLang',
-                        allowBlank: false,
-                        toolTip: me.strings.targetLangTip,
-                        //each combo needs its own store instance, see EXT6UPD-8
-                        store: Ext.create(Editor.store.admin.Languages),
-                        fieldLabel: me.strings.targetLangLabel
-                    }, langCombo),Ext.applyIf({
-                        name: 'relaisLang',
-                        getSubmitValue: function() {
-                        return this.getValue();
-                        },
-                        //each combo needs its own store instance, see EXT6UPD-8
-                        store: Ext.create(Editor.store.admin.Languages),
-                        toolTip: me.strings.relaisLangTip,
-                        fieldLabel: me.strings.relaisLangLabel
-                    }, langCombo),{
-                        xtype: 'filefield',
-                        name: 'importUpload',
-                        regex: /\.(zip|sdlxliff|xlf|csv|testcase)$/i,
-                        regexText: me.strings.importUploadType,
-                        allowBlank: false,
-                        toolTip: me.strings.importUploadTip,
-                        fieldLabel: me.strings.importUploadLabel
-                    },{
-                        xtype: 'container',
-                        layout: 'auto',
-                        padding: '0 0 10 0',
-                        html: Ext.String.format(me.strings.importNews, Editor.data.pathToRunDir)
-                    },{
-                        xtype: 'filefield',
-                        name: 'importTbx',
-                        regex: /\.tbx$/i,
-                        regexText: me.strings.importTbxType,
-                        allowBlank: true,
-                        toolTip: me.strings.importTbxTip,
-                        fieldLabel: me.strings.importTbxLabel
-                    }]
-                },{
-                    xtype: 'container',
-                    flex: 1,
-                    layout: 'anchor',
-                    defaults: {
-                        labelWidth: 200,
-                        anchor: '100%'
-                    },
-                    items: [{
-                        xtype: 'datefield',
-                        name: 'orderdate',
-                        submitFormat: Editor.DATE_ISO_FORMAT,
-                        value: new Date(),
-                        fieldLabel: me.strings.orderdate
-                    },{
-                        xtype: 'datefield',
-                        name: 'targetDeliveryDate',
-                        submitFormat: Editor.DATE_ISO_FORMAT,
-                        value: new Date(),
-                        fieldLabel: me.strings.targetDeliveryLabel
-                    },{
-                        xtype: 'numberfield',
-                        name: 'wordCount',
-                        fieldLabel: me.strings.numberFieldLabel
-                    },(Editor.data.enableSourceEditing  ? {
-                        xtype: 'checkbox',
-                        inputValue: 1,
-                        name: 'enableSourceEditing',
-                        fieldLabel: me.strings.sourceEditLabel
-                    } : {
-                        xtype: 'hidden',
-                        value: 0,
-                        name: 'enableSourceEditing'
-                    }),{
-                        xtype: 'checkbox',
-                        inputValue: 1,
-                        name: 'edit100PercentMatch',
-                        fieldLabel: me.strings.fullMatchLabel
-                    },{
-                        xtype: 'checkbox',
-                        inputValue: 1,
-                        name: 'lockLocked',
-                        checked: true,
-                        fieldLabel: me.strings.lockLockedLabel
-                    }]
-                }]
-            },{
-                xtype: 'container',
-                padding: '10',
-                html: me.strings.bottomInfo+'<br />'+me.strings.bottomInfo2,
-                dock : 'bottom'
-            }],
+                layout: 'card',
+                items:[
+                    {
+                        xtype:'panel',
+                        itemId: 'step-1',
+                        items:[{
+                            xtype: 'form',
+                            padding: 5,
+                            ui: 'default-frame',
+                            layout: 'hbox',
+                            layoutConfig : {
+                                align : 'stretch',
+                            },
+                            anchor: '100%',
+                            items: [{
+                                xtype: 'container',
+                                flex: 1,
+                                layout: 'anchor',
+                                padding: '0 10 0 0',
+                                defaults: {
+                                    labelWidth: 200,
+                                    anchor: '100%'
+                                },
+                                items: [{
+                                    xtype: 'textfield',
+                                    name: 'taskName',
+                                    maxLength: 255,
+                                    allowBlank: false,
+                                    toolTip: me.strings.taskNameTip,
+                                    fieldLabel: me.strings.taskNameLabel
+                                },{
+                                    xtype: 'textfield',
+                                    maxLength: 120,
+                                    name: 'taskNr',
+                                    fieldLabel: me.strings.taskNrLabel
+                                },Ext.applyIf({
+                                    name: 'sourceLang',
+                                    allowBlank: false,
+                                    toolTip: me.strings.sourceLangTip,
+                                    //each combo needs its own store instance, see EXT6UPD-8
+                                    store: Ext.create(Editor.store.admin.Languages),
+                                    fieldLabel: me.strings.sourceLangLabel
+                                }, langCombo),Ext.applyIf({
+                                    name: 'targetLang',
+                                    allowBlank: false,
+                                    toolTip: me.strings.targetLangTip,
+                                    //each combo needs its own store instance, see EXT6UPD-8
+                                    store: Ext.create(Editor.store.admin.Languages),
+                                    fieldLabel: me.strings.targetLangLabel
+                                }, langCombo),Ext.applyIf({
+                                    name: 'relaisLang',
+                                    getSubmitValue: function() {
+                                    return this.getValue();
+                                    },
+                                    //each combo needs its own store instance, see EXT6UPD-8
+                                    store: Ext.create(Editor.store.admin.Languages),
+                                    toolTip: me.strings.relaisLangTip,
+                                    fieldLabel: me.strings.relaisLangLabel
+                                }, langCombo),{
+                                    xtype: 'filefield',
+                                    name: 'importUpload',
+                                    regex: /\.(zip|sdlxliff|xlf|csv|testcase)$/i,
+                                    regexText: me.strings.importUploadType,
+                                    allowBlank: false,
+                                    toolTip: me.strings.importUploadTip,
+                                    fieldLabel: me.strings.importUploadLabel
+                                },{
+                                    xtype: 'container',
+                                    layout: 'auto',
+                                    padding: '0 0 10 0',
+                                    html: Ext.String.format(me.strings.importNews, Editor.data.pathToRunDir)
+                                },{
+                                    xtype: 'filefield',
+                                    name: 'importTbx',
+                                    regex: /\.tbx$/i,
+                                    regexText: me.strings.importTbxType,
+                                    allowBlank: true,
+                                    toolTip: me.strings.importTbxTip,
+                                    fieldLabel: me.strings.importTbxLabel
+                                }]
+                            },{
+                                xtype: 'container',
+                                flex: 1,
+                                layout: 'anchor',
+                                defaults: {
+                                    labelWidth: 200,
+                                    anchor: '100%'
+                                },
+                                items: [{
+                                    xtype: 'datefield',
+                                    name: 'orderdate',
+                                    submitFormat: Editor.DATE_ISO_FORMAT,
+                                    value: new Date(),
+                                    fieldLabel: me.strings.orderdate
+                                },{
+                                    xtype: 'datefield',
+                                    name: 'targetDeliveryDate',
+                                    submitFormat: Editor.DATE_ISO_FORMAT,
+                                    value: new Date(),
+                                    fieldLabel: me.strings.targetDeliveryLabel
+                                },{
+                                    xtype: 'numberfield',
+                                    name: 'wordCount',
+                                    fieldLabel: me.strings.numberFieldLabel
+                                },(Editor.data.enableSourceEditing  ? {
+                                    xtype: 'checkbox',
+                                    inputValue: 1,
+                                    name: 'enableSourceEditing',
+                                    fieldLabel: me.strings.sourceEditLabel
+                                } : {
+                                    xtype: 'hidden',
+                                    value: 0,
+                                    name: 'enableSourceEditing'
+                                }),{
+                                    xtype: 'checkbox',
+                                    inputValue: 1,
+                                    name: 'edit100PercentMatch',
+                                    fieldLabel: me.strings.fullMatchLabel
+                                },{
+                                    xtype: 'checkbox',
+                                    inputValue: 1,
+                                    name: 'lockLocked',
+                                    checked: true,
+                                    fieldLabel: me.strings.lockLockedLabel
+                                }]
+                            }]
+                        
+                        },{
+                            xtype: 'container',
+                            padding: '10',
+                            html: me.strings.bottomInfo+'<br />'+me.strings.bottomInfo2,
+                            dock : 'bottom'
+                        }],
+                        triggerNextCard:function(activeItem){
+                            var form = activeItem.down('form');
+                            if(form.isValid()){
+                                activeItem.fireEvent('wizardCardFinished');
+                            }
+                        }
+                    }
+                ],
             dockedItems : [{
                 xtype : 'toolbar',
                 dock : 'bottom',
@@ -230,7 +245,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     xtype : 'button',
                     iconCls : 'ico-task-add',
                     itemId : 'add-task-btn',
-                    text : me.strings.addBtn
+                    text : 'Continue (fixme in the locales)'
                 }, {
                     xtype : 'button',
                     iconCls : 'ico-cancel',
@@ -239,7 +254,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                 }]
             }]
         };
-
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
