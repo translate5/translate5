@@ -31,11 +31,70 @@ END LICENSE AND COPYRIGHT
  * Initial Class of Plugin "GlobalesePreTranslation"
  */
 class editor_Plugins_GlobalesePreTranslation_Init extends ZfExtended_Plugin_Abstract {
+    
+    
+    /**
+     * Contains the Plugin Path relativ to APPLICATION_PATH or absolut if not under APPLICATION_PATH
+     * @var array
+     */
+    protected $frontendControllers = array(
+            'pluginGlobalesePreTranslationGlobalese' => 'Editor.plugins.GlobalesePreTranslation.controller.Globalese'
+    );
+            
+    protected $localePath = 'locales';
+            
     public function init() {
         $this->log = ZfExtended_Factory::get('ZfExtended_Log', array(false));
-
+        $this->initEvents();
+        $this->initRoutes();
+    }
+    
+    
+    public function getFrontendControllers() {
+        $result = array();
+        $userSession = new Zend_Session_Namespace('user');
+        if(empty($userSession) || empty($userSession->data)) {
+            return $result;
+        }
+        $acl = ZfExtended_Acl::getInstance();
+        /* @var $acl ZfExtended_Acl */
+        if(!$acl->has('frontend')) {
+            return $result;
+        }
+        foreach($this->frontendControllers as $right => $controller) {
+            if($acl->isInAllowedRoles($userSession->data->roles, 'frontend', $right)) {
+                $result[] = $controller;
+            }
+        }
+        return $result;
+    }
+    
+    protected function initEvents() {
         // event-listeners
         $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterTaskImport'),10);
+        $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
+    }
+    
+    /**
+     * defines all URL routes of this plug-in
+     */
+    protected function initRoutes() {
+        $f = Zend_Registry::get('frontController');
+        /* @var $f Zend_Controller_Front */
+        $f->addControllerDirectory(APPLICATION_PATH.'/'.$this->getPluginPath().'/Controllers', '_plugins_'.__CLASS__);
+        $r = $f->getRouter();
+        
+        $restRoute = new Zend_Rest_Route($f, array(), array(
+                'editor' => array('plugins_globalesepretranslation_globalese',),
+        ));
+        $r->addRoute('plugins_globalesepretranslation_restdefault', $restRoute);
+    }
+    
+    public function injectFrontendConfig(Zend_EventManager_Event $event) {
+        $view = $event->getParam('view');
+        /* @var $view Zend_View_Interface */
+        $view->Php2JsVars()->set('plugins.GlobalesePreTranslation.api.username', $this->getConfig()->api->username);
+        $view->Php2JsVars()->set('plugins.GlobalesePreTranslation.api.password', $this->getConfig()->api->password);
     }
     
     public function handleAfterTaskImport(Zend_EventManager_Event $event) {
