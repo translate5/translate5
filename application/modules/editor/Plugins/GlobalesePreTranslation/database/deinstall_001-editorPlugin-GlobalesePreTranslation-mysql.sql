@@ -32,3 +32,21 @@ delete from `Zf_worker_dependencies` where `worker` =  'editor_Models_Import_Wor
 
 DELETE FROM `Zf_configuration` 
 WHERE `name` = 'runtimeOptions.worker.editor_Plugins_GlobalesePreTranslation_Worker.maxParallelWorkers';
+
+DELETE FROM `Zf_configuration` 
+WHERE `name` = 'runtimeOptions.plugins.GlobalesePreTranslation.api.username';
+
+DELETE FROM `Zf_configuration` 
+WHERE `name` = 'runtimeOptions.plugins.GlobalesePreTranslation.api.password';
+
+DELETE FROM `Zf_acl_rules` 
+WHERE `right` = 'pluginGlobalesePreTranslationGlobalese' 
+AND `resource` = 'frontend' 
+AND `role` = 'pm'
+AND `module` = 'editor';
+
+DELETE FROM `Zf_acl_rules` 
+WHERE `right` = 'all' 
+AND `resource` = 'editor_plugins_globalesepretranslation_globalese' 
+AND `role` = 'pm'
+AND `module` = 'editor';

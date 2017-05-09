@@ -35,3 +35,13 @@ INSERT INTO  `Zf_worker_dependencies` (`worker`,`dependency`) VALUES
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES
 ('runtimeOptions.worker.editor_Plugins_GlobalesePreTranslation_Worker.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of the Globalese pre-translation worker');
+
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'frontend', 'pluginGlobalesePreTranslationGlobalese');
+
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_globalesepretranslation_globalese', 'all');
+
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES ('runtimeOptions.plugins.GlobalesePreTranslation.api.username', '1', 'editor', 'plugins', '', '', '', 'string', 'Username for Globalese API authentication');
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES ('runtimeOptions.plugins.GlobalesePreTranslation.api.password', '1', 'editor', 'plugins', '', '', '', 'string', 'Password for Globalese API authentication');
+
