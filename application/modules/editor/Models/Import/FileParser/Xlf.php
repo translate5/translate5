@@ -38,9 +38,7 @@ END LICENSE AND COPYRIGHT
  * Fileparsing for import of IBM-XLIFF files
  *
  */
-class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParser
-{
-    private $ibmXliffNeedle = 'xmlns:tmgr="http://www.ibm.com"';
+class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParser {
     private $wordCount = 0;
     private $segmentCount = 1;
     
