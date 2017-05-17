@@ -277,11 +277,21 @@ abstract class editor_Models_Import_FileParser {
             $count += $returnCount;
             
             $replacer = function ($match) {
-                            return ' <space ts="' . implode(',', unpack('H*', $match[1])) . '"/>';
-                        };
+                //depending on the regex use the found spaces (match[1]) or the tabs (match[2]).
+                $content = empty($match[1]) ? $match[2] : $match[1];
+                $result = '<space ts="' . implode(',', unpack('H*', $content)) . '"/>';
+                if(empty($match[2])){
+                    //prepend the remaining whitespace before the space tag. 
+                    // Only the additional spaces are replaced as a tag
+                    // One space must remain in the content
+                    return ' '.$result;
+                }
+                //tab(s) are completly replaced with an tag
+                return $result;
+            };
             
-            //protect multispaces
-            $split[$idx] = preg_replace_callback('" ( +)"', $replacer, $chunk, -1, $spaceCount);
+            //protect multispaces and tabs
+            $split[$idx] = preg_replace_callback('/ ( +)|(\t+)/', $replacer, $chunk, -1, $spaceCount);
             $count += $spaceCount;
         }
         return join($split);
