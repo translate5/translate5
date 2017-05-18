@@ -60,14 +60,53 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.controller.Globalese', {
       }
   },
   onAdminTaskWindowRender:function(window,eOpts){
-      window.insert(1,{
-          xtype:'globaleseAuthPanel',
-          itemId:'step-2'
-      });
+      //all possible buttons
+      //abort
+      //skip,
+      //next
+      //add task
       
-      window.insert(2,{
-          xtype:'globaleseSettingsPanel',
-          itemId:'step-3'
-      });
+      // mixin for all cards 
+      // each card should get a new importtype: preimport, import, postimport
+      
+      //window.insertPreImport()
+      // → looks in window.items for  taskMainCard and get the position insert the given card before taskMainCard
+      //abort → close the whole window
+      //skip, → just go to the next card
+      //next → save and got to the next
+      //add task → here always disabled in this group
+
+      //window.insertImport()
+      // → looks in window.items for  taskUploadCard and get the position insert the given card before taskMainCard
+      //abort → close the whole window
+      //skip, → just go to the next card
+      //next → save and got to the next
+      //add task → only available when all next cards are skipable.
+      
+      //window.insertPostImport()
+      // → just window.add to add the new card at the end
+      //add task is never available, because the task already exists.
+      //abort must be "finish"
+      //add task makes no sense
+      //skip / next as ususal
+      
+      
+      //taskTaddWindow gets view model. which gets formulas for each button visibleity and disable state
+      // as value you set the current card, the above formulas call current card allowSkip etc
+      
+      
+      //taskAddWindow  >  mainCard
+      //vm here        <  vm there
+      
+      var authPanel = {
+          xtype:'globaleseAuthPanel'
+      },
+      settingsPanel = {
+              xtype:'globaleseSettingsPanel'    
+      };
+      window.insertImport(authPanel);
+      
+      window.insertImport(settingsPanel);
+      
   }
 });

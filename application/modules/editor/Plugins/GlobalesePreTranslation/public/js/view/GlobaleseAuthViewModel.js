@@ -27,57 +27,20 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-/**
- * @class Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewController
- * @extends Ext.app.ViewController
- */
-Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettingsViewController', {
-    extend: 'Ext.app.ViewController',
-    alias: 'controller.globaleseSettingsPanel',
+Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewModel', {
+    extend: 'Ext.app.ViewModel',
+    alias: 'viewmodel.globaleseAuthPanel',
+
+    requires: [
+        'Ext.app.bind.Formula'
+    ],
     
-    handleNextCardClick:function(){
-        var me=this,
-            view=me.getView();
-        
-        if(!me.isFieldsValid){
-            return;
+    activeItem: null,
+    
+    formulas: {
+        isAddTaskButton: function(get) {
+            get('activeItem').handleButtons();
         }
-        
-        view.fireEvent('wizardCardFinished');
-    },
-    
-    handleSkipCardClick:function(){
-        var me=this,
-            view=me.getView();
-        view.fireEvent('wizardCardFinished',1);
-    },
-    
-    isFieldsValid:function(winLayout,actuelItem){
-        var fieldsAreValid=true;
-        
-        console.log("validate the combo boxes, if thay are valid finish the card")
-        return fieldsAreValid;
     }
+
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

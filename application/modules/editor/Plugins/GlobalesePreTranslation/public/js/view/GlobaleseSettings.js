@@ -59,11 +59,11 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettings', {
                 },
                 items: [{
                     xtype:'combobox',
-                    itemId:'group',
+                    itemId:'globaleseGroup',
                     fieldLabel:me.strings.groupComboLabel,
                     allowBlank: false,
-                    displayField:'id',
-                    valueField:'value',
+                    displayField:'name',
+                    valueField:'id',
                     emptyText:me.strings.emptyComboText,
                     submitEmptyText:false,
                     allowBlank: false,
@@ -72,11 +72,11 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettings', {
                     queryMode:'local',
                 },{
                     xtype:'combo',
-                    itemId:'engine',
+                    itemId:'globaleseEngine',
                     fieldLabel:me.strings.engineComboLabel,
                     allowBlank: false,
-                    displayField:'id',
-                    valueField:'value',
+                    displayField:'name',
+                    valueField:'id',
                     emptyText:me.strings.emptyComboText,
                     submitEmptyText:false,
                     allowBlank: false,
@@ -85,12 +85,43 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettings', {
                     queryMode:'local',
                 }]
         };
+        
+        me.importType='postimport';
+        
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([ config ]);
     },
+    
     triggerNextCard:function(activeItem){
         this.getController().handleNextCardClick();
+    },
+    
+    triggerSkipCard:function(activeItem){
+        this.getController().handleSkipCardClick();
+    },
+    
+    disableSkipButton:function(){
+        var me = this,
+            win = me.up('window'),
+            winLayout=win.getLayout(),
+            nextStep=winLayout.getNext();
+        
+        if(!nextStep || nextStep.getXType()){
+            return true;
+        }
+    },
+    
+    disableContinueButton:function(){
+        
+    },
+    
+    disableAddButton:function(){
+        return true;
+    },
+    
+    disableCancelButton:function(){
+        
     }
 });
