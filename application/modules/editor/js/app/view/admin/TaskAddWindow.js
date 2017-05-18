@@ -29,10 +29,19 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.view.admin.TaskAddWindow', {
     extend: 'Ext.window.Window',
-    mixins:['Editor.controller.admin.IWizardCard'],
+    requires:[
+        'Editor.view.admin.TaskUpload',
+        'Editor.view.admin.TaskAddWindowViewModel'
+    ],
+    mixins:[
+        'Editor.controller.admin.IWizardCard'
+    ],
     alias: 'widget.adminTaskAddWindow',
     itemId: 'adminTaskAddWindow',
     cls: 'adminTaskAddWindow',
+    viewModel: {
+        type: 'adminTaskAddWindow'
+    },
     title: '#UT#Aufgabe erstellen',
     strings: {
         importUploadTip: '#UT#Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF; Angabe notwendig)',
@@ -70,6 +79,20 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     width : 1000,
     modal : true,
     layout: 'anchor',
+    listeners:{
+      afterrender:function(win){
+          var winLayout=win.getLayout(),
+              vm=win.getViewModel();
+          
+          taskUpload = {
+                  xtype:'taskUpload',
+                  itemId:'taskUploadCard'
+          };
+          win.insertImport(taskUpload);
+          
+          vm.set('activeItem',winLayout.getActiveItem());
+      }  
+    },
     initConfig: function(instanceConfig) {
         var me = this,
             langCombo = {
@@ -86,7 +109,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                 items:[
                     {
                         xtype:'panel',
-                        itemId: 'step-1',
+                        itemId: 'taskMainCard',
                         items:[{
                             xtype: 'form',
                             padding: 5,
@@ -220,6 +243,21 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                             if(form.isValid()){
                                 activeItem.fireEvent('wizardCardFinished');
                             }
+                        },
+                        disableSkipButton:function(get){
+                            return true;
+                        },
+                        
+                        disableContinueButton:function(get){
+                            return false;
+                        },
+                        
+                        disableAddButton:function(get){
+                            return false;
+                        },
+
+                        disableCancelButton:function(get){
+                            return false;
                         }
                     }
                 ],
@@ -244,12 +282,38 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                 },{
                     xtype : 'button',
                     iconCls : 'ico-task-add',
+                    itemId : 'skip-wizard-btn',
+                    bind:{
+                        disabled:'{disableSkipButton}',
+                        visible:'{!disableSkipButton}'
+                    },
+                    text : 'Skip (fixme in the locales)'
+                },{
+                    xtype : 'button',
+                    iconCls : 'ico-task-add',
+                    itemId : 'continue-wizard-btn',
+                    bind:{
+                        disabled:'{disableContinueButton}',
+                        visible:'{!disableContinueButton}'
+                    },
+                    text : 'Next (fixme in the locales)'
+                },{
+                    xtype : 'button',
+                    iconCls : 'ico-task-add',
                     itemId : 'add-task-btn',
-                    text : 'Continue (fixme in the locales)'
+                    bind:{
+                      disabled:'{disableAddButton}',
+                      visible:'{!disableAddButton}'
+                    },
+                    text : me.strings.addBtn
                 }, {
                     xtype : 'button',
                     iconCls : 'ico-cancel',
                     itemId : 'cancel-task-btn',
+                    bind:{
+                        disabled:'{disableCancelButton}',
+                        visible:'{!disableCancelButton}'
+                    },
                     text : me.strings.cancelBtn
                 }]
             }]
@@ -258,5 +322,15 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
+    },
+    insertPreImport:function(card){
+        //find the index and insert the card
+    },
+    insertImport:function(card){
+        //find the index and insert the card
+        this.add(card);
+    },
+    insertPostImport:function(card){
+        //inser the card at the end of the items
     }
 });

@@ -126,6 +126,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           '#adminTaskAddWindow #cancel-task-btn': {
               click: me.handleTaskCancel
           },
+          '#adminTaskAddWindow #continue-wizard-btn': {
+              click: me.handleContinueWizardClick
+          },
+          '#adminTaskAddWindow #skip-wizard-btn': {
+              click: me.handleSkipWizardClick
+          },
           '#adminTaskAddWindow filefield[name=importUpload]': {
               change: me.handleChangeImportFile
           },
@@ -360,11 +366,31 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       this.getTaskAddForm().getForm().reset();
       this.getTaskAddWindow().close();
   },
+
+  handleTaskAdd: function(button) {
+      var me=this,
+          win=me.getTaskAddWindow(),
+          vm=win.getViewModel();
+          winLayout=win.getLayout(),
+          nextStep=win.down('#taskUploadCard');
+      
+      if(me.getTaskAddForm().isValid()){
+          if(nextStep.strings && nextStep.strings.wizardTitle){
+              win.setTitle(nextStep.strings.wizardTitle);
+          }
+          
+          vm.set('activeItem',nextStep);
+          winLayout.setActiveItem(nextStep);
+      }
+      //this.saveTask();
+  },
+  
+  
   /**
    * is called after clicking continue, if there are wizard panels, 
    * then the next available wizard panel is set as active 
    */
-  handleTaskAdd: function(button) {
+  handleContinueWizardClick:function(){
       var me = this,
           win = me.getTaskAddWindow(),
           winLayout=win.getLayout(),
@@ -373,25 +399,49 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       activeItem.triggerNextCard(activeItem);
   },
   
-  onWizardCardFinished:function(){
+  /***
+   * Called when skip button in wizard window is clicked.
+   * The function of this button is to skup the next card group (in the current wizard group, sure if there is one)
+   * 
+   */
+  handleSkipWizardClick:function(){
       var me = this,
           win = me.getTaskAddWindow(),
           winLayout=win.getLayout(),
-          isNextStep=winLayout.getNext();
+          activeItem=winLayout.getActiveItem();
+      
+      activeItem.triggerSkipCard(activeItem);
+  },
   
-      if(!isNextStep){
+  onWizardCardFinished:function(skipCards){
+      var me = this,
+          win = me.getTaskAddWindow(),
+          winLayout=win.getLayout(),
+          nextStep=winLayout.getNext(),
+          vm=win.getViewModel();
+      
+      if(skipCards){
+          for(var i=1;i < skipCards;i++){
+              winLayout.setActiveItem(nextStep);
+              nextStep=winLayout.getNext();
+          }
+      }
+
+      if(!nextStep){
+          //me.handleTaskCancel();
           me.saveTask();
           return;
       }
-      if(isNextStep.strings && isNextStep.strings.wizardTitle){
-          win.setTitle(isNextStep.strings.wizardTitle);
+      if(nextStep.strings && nextStep.strings.wizardTitle){
+          win.setTitle(nextStep.strings.wizardTitle);
       }
-      winLayout.setActiveItem(isNextStep);
+      
+      vm.set('activeItem',nextStep);
+      winLayout.setActiveItem(nextStep);
   },
   
   onWizardCardSkiped:function(){
       alert('save task call');
-      return;
       this.saveTask();
   },
   
@@ -623,7 +673,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               me.fireEvent('taskCreated', task);
               win.setLoading(false);
               me.getAdminTasksStore().load();
-              me.handleTaskCancel();
+              //me.handleTaskCancel();
           },
           failure: function(form, submit) {
               win.setLoading(false);

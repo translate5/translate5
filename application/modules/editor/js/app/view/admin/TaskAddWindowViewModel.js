@@ -27,42 +27,32 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Interface for the Wizard cards
- * 
- * @class Editor.controller.admin.IWizardCard
- */
-Ext.define('Editor.controller.admin.IWizardCard', {
+Ext.define('Editor.view.admin.TaskAddWindowViewModel', {
+    extend: 'Ext.app.ViewModel',
+    alias: 'viewmodel.adminTaskAddWindow',
 
-    /***
-     * There are 3 options for import type:
-     * preimport, import, postimport
-     */
-    importType:"",
+    requires: [
+        'Ext.app.bind.Formula'
+    ],
     
-    /***
-     * Special config for the navifation buttons:skip,next,close,addTask
-     */
-    navigationButtonsConfig:[],
+    activeItem: null,
     
-    triggerNextCard:function(activeItem){
+    formulas: {
+        disableSkipButton:function(get){
+            return get('activeItem').disableSkipButton();
+        },
         
-    },
-    
-    triggerSkipCard:function(activeItem){
+        disableContinueButton:function(get){
+            return get('activeItem').disableContinueButton();
+        },
         
-    },
+        disableAddButton:function(get){
+            return get('activeItem').disableAddButton();
+        },
 
-    disableSkipButton:function(){
-        
-    },
-    disableContinueButton:function(){
-        
-    },
-    disableAddButton:function(){
-        
-    },
-    disableCancelButton:function(){
-        
+        disableCancelButton:function(get){
+            return get('activeItem').disableCancelButton();
+        }
     }
+
 });

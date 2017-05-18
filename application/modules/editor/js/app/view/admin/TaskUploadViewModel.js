@@ -27,42 +27,25 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Interface for the Wizard cards
- * 
- * @class Editor.controller.admin.IWizardCard
- */
-Ext.define('Editor.controller.admin.IWizardCard', {
+Ext.define('Editor.view.admin.TaskUploadViewModel', {
+    extend: 'Ext.app.ViewModel',
+    alias: 'viewmodel.taskUpload',
 
-    /***
-     * There are 3 options for import type:
-     * preimport, import, postimport
-     */
-    importType:"",
+    requires: [
+        'Ext.app.bind.Formula'
+    ],
     
-    /***
-     * Special config for the navifation buttons:skip,next,close,addTask
-     */
-    navigationButtonsConfig:[],
+    activeItem: null,
     
-    triggerNextCard:function(activeItem){
-        
-    },
-    
-    triggerSkipCard:function(activeItem){
-        
-    },
-
-    disableSkipButton:function(){
-        
-    },
-    disableContinueButton:function(){
-        
-    },
-    disableAddButton:function(){
-        
-    },
-    disableCancelButton:function(){
-        
+    formulas: {
+        //FIXME comment: content of the formula functions are some how evaled so it 
+        // should not contain comments and invalid code
+        isAddTaskButton: function(get) {
+            //FIXME here return the result from the hasAddTaskButton
+            //each button shuld contain his own function in each card
+            //so we can decide if the button is visible or not
+            return get('activeItem').hasAddTaskButton();
+        }
     }
+
 });
