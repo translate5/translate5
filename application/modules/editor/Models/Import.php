@@ -116,6 +116,7 @@ class editor_Models_Import {
                 'config' => $this->importConfig,
                 'dataProvider' => $dataProvider
         ));
+
         $parentId = $importWorker->queue();
         
         $worker = ZfExtended_Factory::get('editor_Models_Import_Worker_SetTaskToOpen');

@@ -71,7 +71,10 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        return empty($parameters);
+        if(empty($parameters['group']) || empty($parameters['engine'])) {
+            throw new ZfExtended_Exception('Missing parameters for group or engine');
+        }
+        return true;
     } 
     
     /**
@@ -79,11 +82,20 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
+        //then you can access $this->parameters with your data
+        
+        $params = $this->workerModel->getParameters();
+        //error_log(print_r("session parameters -> ".$this->parameters,1));
+        //FIXME alse the auth parametars are needed (username, apiKey)
+        
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         $this->segmentFieldManager->initFields($this->taskGuid);
         
         // we operate only on one project, so one connector instance is enough
         $this->api = ZfExtended_Factory::get('editor_Plugins_GlobalesePreTranslation_Connector');
+        
+        //FIXME move this before in the worker, or pass it as a parametar
+        $this->api->setAuth('marc@mittagqi.com', '4374334a2891c1f3d8a19279b8a2c73c');
         
         $this->createGlobaleseProject();
         $this->processSegments();

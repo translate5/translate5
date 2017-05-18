@@ -41,7 +41,13 @@ INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('edit
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_globalesepretranslation_globalese', 'all');
 
 
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES ('runtimeOptions.plugins.GlobalesePreTranslation.api.username', '1', 'editor', 'plugins', '', '', '', 'string', 'Username for Globalese API authentication');
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES ('runtimeOptions.plugins.GlobalesePreTranslation.api.username', '1', 'editor', 'plugins', 'marc@mittagqi.com', 'marc@mittagqi.com', '', 'string', 'Username for Globalese API authentication');
 
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES ('runtimeOptions.plugins.GlobalesePreTranslation.api.password', '1', 'editor', 'plugins', '', '', '', 'string', 'Password for Globalese API authentication');
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES ('runtimeOptions.plugins.GlobalesePreTranslation.api.password', '1', 'editor', 'plugins', '5909648d06ba2', '5909648d06ba2', '', 'string', 'Password for Globalese  authentication');
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES ('runtimeOptions.plugins.GlobalesePreTranslation.api.url', '1', 'editor', 'plugins', 'https://translate5.globalese-mt.com/api/v2/', 'https://translate5.globalese-mt.com/api/v2/', '', 'string', 'Url used for Globalese api');
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES ('runtimeOptions.plugins.GlobalesePreTranslation.api.apiKey', '1', 'editor', 'plugins', '4374334a2891c1f3d8a19279b8a2c73c', '4374334a2891c1f3d8a19279b8a2c73c', '', 'string', 'Api key for Globalese authentication');
+
+
 

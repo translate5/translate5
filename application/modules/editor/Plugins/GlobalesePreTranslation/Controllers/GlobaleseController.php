@@ -53,7 +53,45 @@ class editor_Plugins_GlobalesePreTranslation_GlobaleseController extends ZfExten
      * @see ZfExtended_RestController::indexAction()
      */
     public function indexAction(){
-        error_log(print_r("index callll",1));
+        //$connector = ZfExtended_Factory::get('editor_Plugins_GlobalesePreTranslation_Connector');
+        /* @var $connector editor_Plugins_GlobalesePreTranslation_Connector */
+        //$connector->getGroups();
+    }
+    
+    public function groupsAction(){
+        if($this->getParam('data') && $this->getParam('data')!=""){
+            $data = json_decode($this->getParam('data'));
+        }
+        if(!$data){
+            $this->view->rows = "[]";
+            return;
+        }
+        $connector = ZfExtended_Factory::get('editor_Plugins_GlobalesePreTranslation_Connector');
+        $connector->setAuth($data->username,$data->apiKey);
+        
+        /* @var $connector editor_Plugins_GlobalesePreTranslation_Connector */
+        $groups = $connector->getGroups();
+        
+        
+        $this->view->rows = $groups;
+    }
+    
+    public function enginesAction(){
+        if($this->getParam('data') && $this->getParam('data')!=""){
+            $data = json_decode($this->getParam('data'));
+        }
+        if(!$data){
+            $this->view->rows = "[]";
+            return;
+        }
+        $connector = ZfExtended_Factory::get('editor_Plugins_GlobalesePreTranslation_Connector');
+        $connector->setAuth($data->username,$data->apiKey);
+        
+        /* @var $connector editor_Plugins_GlobalesePreTranslation_Connector */
+        $engines = $connector->getEngines();
+        
+        
+        $this->view->rows = $engines;
     }
     
     public function getAction() {
@@ -69,6 +107,19 @@ class editor_Plugins_GlobalesePreTranslation_GlobaleseController extends ZfExten
     }
     
     public function postAction() {
-        throw new ZfExtended_BadMethodCallException(__CLASS__.'->post');
+        $globaleseSession = new Zend_Session_Namespace('GlobalesePreTranslation');
+        if($this->getParam('data') && $this->getParam('data')!=""){
+            $data = json_decode($this->getParam('data'));
+        }
+        if(!$data){
+            return;
+        }
+        $globaleseSession->engine =$data->engine;
+        $globaleseSession->group =$data->group;
+        //new session namespace
+        //save the data from the gui to the session
+        
+        //here you save the posted data into the session
+        //throw new ZfExtended_BadMethodCallException(__CLASS__.'->post');
     }
 }
