@@ -182,7 +182,7 @@ class editor_Models_Segment_InternalTag {
             //since $key may not be unique, we cannot use str_replace here, str_replace would replace all occurences
             $pos = mb_strpos($segment, $key);
             if ($pos !== false) {
-                $segment = substr_replace($segment, $value, $pos, mb_strlen($key));
+                $segment = mb_substr($segment, 0, $pos).$value.mb_substr($segment, $pos + mb_strlen($key));
             }
         }
         return $segment;
