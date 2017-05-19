@@ -111,25 +111,22 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
         //this.nextWizardWindow(winLayout,nextItem);
         //return;
         var me=this,
-            sourceLang='',
-            targetLang='',
-            group='1';
-        
-        var me=this,
             view=me.getView(),
+            sourceLangValue=view.up('window').down('combo[name="sourceLang"]').getValue(),
+            targetLangValue=view.up('window').down('combo[name="targetLang"]').getValue(),
             apiusername=view.down('#apiUsername').getValue(),
             apipassword=view.down('#apiPassword').getValue(),
             globaleseEngine=view.up('window').down('#globaleseEngine'),
-            url = Editor.data.restpath+'plugins_globalesepretranslation_globalese/engines';
-        
-            //str = me.strings,
+            url = Editor.data.restpath+'plugins_globalesepretranslation_globalese/engines',
             params = {},
             method = 'GET',
-            authData = Ext.JSON.encode({
+            paramsData = Ext.JSON.encode({
                 username: apiusername,
                 apiKey: apipassword,
+                sourceLang:sourceLangValue,
+                targetLang:targetLangValue
             }),
-            params = {data: authData};
+            params = {data: paramsData};
         
         Ext.Ajax.request({
             url:url,
@@ -144,10 +141,13 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
                     fields: [
                         {name: 'id', type: 'int'},
                         {name: 'name',  type: 'string'},
+                        {name: 'group',  type: 'int'},
+                        {name: 'source',  type: 'string'},
+                        {name: 'target',  type: 'string'},
+                        {name: 'status',  type: 'string'},
                     ],
                     data : responsData.rows
                 });
-                debugger;
                 globaleseEngine.setStore(engines);
                 //FIXME set the engines to the engines combo
                 view.fireEvent('wizardCardFinished');
@@ -184,10 +184,8 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
             method: 'GET',
             params: params,
             success: function(response){
-                
                 var responseObject = JSON.parse(response.responseText);
                 if(responseObject && responseObject.rows){
-                    
                     var groups = Ext.create('Ext.data.Store', {
                         fields: [
                             {name: 'id', type: 'int'},

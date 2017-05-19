@@ -47,9 +47,11 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettings', {
     mixins:['Editor.controller.admin.IWizardCard'],
     strings:{
         wizardTitle:'#UT#Globalese settings',
+        nextButtonText:'#UT#Add Task',
         groupComboLabel:'#UT#Globalese group',
         engineComboLabel:'#UT#Globalese engine',
-        emptyComboText:'#UT#-- Please select --'
+        emptyComboText:'#UT#-- Please select --',
+        importTaskMessage:'#UT#Your task import is completed. Globalese pretranslation is in progres.',
     },
     initConfig: function(instanceConfig) {
         var me = this,
@@ -70,9 +72,13 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettings', {
                     typeAhead: true,
                     minChars:1,
                     queryMode:'local',
+                    listeners:{
+                        change:'onGlobaleseGroupChange'
+                    }
                 },{
                     xtype:'combo',
                     itemId:'globaleseEngine',
+                    disabled:true,
                     fieldLabel:me.strings.engineComboLabel,
                     allowBlank: false,
                     displayField:'name',
@@ -103,12 +109,13 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettings', {
     },
     
     disableSkipButton:function(){
-        var me = this,
-            win = me.up('window'),
-            winLayout=win.getLayout(),
-            nextStep=winLayout.getNext();
-        
-        if(!nextStep || nextStep.getXType()){
+        var me=this,
+            win=me.up('window'),
+            btnContinue=win.down('#continue-wizard-btn');
+    
+        if(win.isTaskUploadNext()){
+            btnContinue.setIconCls('ico-finish-wizard');
+            btnContinue.setText(me.strings.nextButtonText);
             return true;
         }
     },

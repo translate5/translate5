@@ -51,7 +51,7 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuth', {
     strings:{
         skipPreTranslation:'#UT#Skip Globalese pre-translation',
         username:'#UT#API Username',
-        password:'#UT#API Password',
+        apiKey:'#UT#API Key',
         wizardTitle:'#UT#Globalese authentication'
     },
     initConfig: function(instanceConfig) {
@@ -66,12 +66,9 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuth', {
                         itemId:'apiUsername',
                     },{
                         xtype: 'textfield',
-                        fieldLabel:me.strings.password,
-                        itemId:'apiPassword'
-                    },{
-                        xtype:'checkbox',
-                        itemId:'skipPretranslation',
-                        fieldLabel:me.strings.skipPreTranslation,
+                        fieldLabel:me.strings.apiKey,
+                        itemId:'apiPassword',
+                        width:380
                     }]
             };
         
@@ -100,7 +97,7 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuth', {
     },
     
     disableAddButton:function(){
-        return false;
+        return true;
     },
     
     disableCancelButton:function(){
