@@ -71,8 +71,8 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        if(empty($parameters['group']) || empty($parameters['engine'])) {
-            throw new ZfExtended_Exception('Missing parameters for group or engine');
+        if(empty($parameters['group']) || empty($parameters['engine']) || empty($parameters['apiUsername']) || empty($parameters['apiKey'])) {
+            throw new ZfExtended_Exception('Missing parameters for group,engine,apiUsername or apiKey');
         }
         return true;
     } 
@@ -86,7 +86,6 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
         
         $params = $this->workerModel->getParameters();
         //error_log(print_r("session parameters -> ".$this->parameters,1));
-        //FIXME alse the auth parametars are needed (username, apiKey)
         
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         $this->segmentFieldManager->initFields($this->taskGuid);
@@ -94,11 +93,19 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
         // we operate only on one project, so one connector instance is enough
         $this->api = ZfExtended_Factory::get('editor_Plugins_GlobalesePreTranslation_Connector');
         
-        //FIXME move this before in the worker, or pass it as a parametar
-        $this->api->setAuth('marc@mittagqi.com', '4374334a2891c1f3d8a19279b8a2c73c');
+        $this->api->setAuth($params['apiUsername'], $params['apiKey']);
+        $this->api->setEngine($params['engine']);
+        $this->api->setGroup($params['group']);
+        
+        $langModel = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $langModel editor_Models_Languages */
+        $this->api->setSourceLang($langModel->loadLangRfc5646($this->task->getSourceLang()));
+        
+        $this->api->setTargetLang($langModel->loadLangRfc5646($this->task->getTargetLang()));
         
         $this->createGlobaleseProject();
         $this->processSegments();
+        return true;
         $this->importRemainingFiles();
         $this->removeGlobaleseProject();
         return true;
@@ -152,6 +159,8 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
     protected function convertAndPreTranslate(editor_Models_Converter_SegmentsToXliff $xliffConverter, integer $fileId, array $oneFileSegments) {
         $xliff = $xliffConverter->convert($this->task, $oneFileSegments);
         $this->logplugin('XLIFF generated for file '.$fileId);
+        error_log(print_r($xliff,1));
+        return;
         $globaleseFileId = $this->api->upload($this->getFilename($fileId), $xliff);
         $this->fileIdMap[$globaleseFileId] = $fileId;
         $globFileId = $this->api->getFirstTranslated();

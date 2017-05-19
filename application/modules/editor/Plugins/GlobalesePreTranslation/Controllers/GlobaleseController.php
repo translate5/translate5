@@ -88,8 +88,7 @@ class editor_Plugins_GlobalesePreTranslation_GlobaleseController extends ZfExten
         $connector->setAuth($data->username,$data->apiKey);
         
         /* @var $connector editor_Plugins_GlobalesePreTranslation_Connector */
-        $engines = $connector->getEngines();
-        
+        $engines = $connector->getEngines($data->sourceLang,$data->targetLang);
         
         $this->view->rows = $engines;
     }
@@ -116,6 +115,8 @@ class editor_Plugins_GlobalesePreTranslation_GlobaleseController extends ZfExten
         }
         $globaleseSession->engine =$data->engine;
         $globaleseSession->group =$data->group;
+        $globaleseSession->apiUsername =$data->apiUsername;
+        $globaleseSession->apiKey =$data->apiKey;
         //new session namespace
         //save the data from the gui to the session
         

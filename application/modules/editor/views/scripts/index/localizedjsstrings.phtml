@@ -458,6 +458,7 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.view.admin.TaskAddWindow", {
         override: "Editor.view.admin.TaskAddWindow",
         title: '<?php echo $this->translate->_('Aufgabe erstellen');?>',
+        importTaskMessage:'<?php echo $this->translate->_('#UT#Your task import is completed.');?>',
         strings: {
             importUploadTip: '<?php echo $this->translate->_('Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, openTM2-XLIFF; Angabe notwendig)');?>',
             importUploadLabel: '<?php echo $this->translate->_('Import Datei¹');?>',
@@ -486,6 +487,8 @@ Ext.define('Editor.controller.Localizer', {
             feedbackText: '<?php echo $this->translate->_('Fehler beim Import!');?>',
             feedbackTip: '<?php echo $this->translate->_('Fehler beim Import: Bitte wenden Sie sich an den Support!');?>',
             addBtn: '<?php echo $this->translate->_('Aufgabe hinzufügen');?>',
+            addBtnWizard: '<?php echo $this->translate->_('#UT#Add Task (skip next steps)');?>',
+            btnNextWizard: '<?php echo $this->translate->_('#UT#Next');?>',
             cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>'
         }
     });

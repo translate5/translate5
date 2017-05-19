@@ -121,8 +121,6 @@ class editor_Plugins_GlobalesePreTranslation_Init extends ZfExtended_Plugin_Abst
         
         $globaleseSession = new Zend_Session_Namespace('GlobalesePreTranslation');
         
-        $globaleseSession->group=1;
-        $globaleseSession->engine=101;
         // you will able to acces the session here directly!
         //send the parametars from the session in the workier init method parametar
         $sessionParametars = null;
@@ -136,9 +134,15 @@ class editor_Plugins_GlobalesePreTranslation_Init extends ZfExtended_Plugin_Abst
         ]);
         
         $parentWorkerId = $row->id;
+        $params=[
+                'group'=>$globaleseSession->group,
+                'engine'=>$globaleseSession->engine,
+                'apiUsername'=>$globaleseSession->apiUsername,
+                'apiKey'=>$globaleseSession->apiKey,
+        ];
         
         // init worker and queue it
-        if (!$worker->init($task->getTaskGuid(), ['group'=>$globaleseSession->group,'engine'=>$globaleseSession->engine])) {
+        if (!$worker->init($task->getTaskGuid(), $params)) {
             $this->log->logError('GlobalesePreTranslation-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }

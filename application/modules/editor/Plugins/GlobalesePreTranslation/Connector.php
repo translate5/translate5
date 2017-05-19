@@ -73,6 +73,36 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
      */
     private $globaleseFileIds=[];
     
+    /***
+     * Globalese project user-group
+     * 
+     * @var int
+     */
+    private $group;
+    
+    /***
+     * Globalese project engine
+     * 
+     * @var int
+     */
+    private $engine;
+    
+    /***
+     * Source language as Rfc5646 value 
+     * @var string
+     */
+    private $sourceLang;
+    
+    /***
+     *  Target language as Rfc5646 value 
+     * @var string
+     */
+    private $targetLang;
+    
+    const GLOBALESE_FILESTATUS_OK = 'ok';
+    const GLOBALESE_FILESTATUS_IN_TRANSLATION= 'in_translation';
+    const GLOBALESE_FILESTATUS_ERROR= 'error';
+    
     public function __construct() {
         $this->globaleseConfig= Zend_Registry::get('config')->runtimeOptions->plugins->GlobalesePreTranslation;
         /* @var $config Zend_Config */
@@ -101,10 +131,6 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
      */
     public function createProject(editor_Models_Task $task) {
         $projectname = "Translate5-".$task->getTaskGuid();
-        $sourceLang="en-gb";
-        $targetLang="de-de";
-        $group=1;
-        $engine=1;
         
         $http = $this->getHttpClient();
         $http->setUri($this->apiUrl.'projects');
@@ -113,10 +139,10 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         
         $params = [
                 'name'=>$projectname,
-                'source-language'=>$sourceLang,
-                'target-language'=>$targetLang,
-                'group'=>$group,
-                'engine'=>$engine
+                'source-language'=>$this->getSourceLang(),
+                'target-language'=>$this->getTargetLang(),
+                'group'=>$this->getGroup(),
+                'engine'=>$this->getEngine()
         ];
         
         $http->setRawData(json_encode($params), 'application/json');
@@ -132,12 +158,6 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
             $this->globaleseProjectId = $decode->id;
             return $decode->id;
         }
-        //FIXME this here throws an erro, idk why !!
-        //$langModel = ZfExtended_Factory::get('ZfExtended_Languages');
-        /* @var $langModel ZfExtended_Languages */
-        //$langarray = $langModel->loaderByIds('id',$ids);
-        
-        
         //the project name can be: "Translate5 ".$taskGuid I dont see any need to transfer our real taskname
         //save task internally for getting the languages from
         //save the projectId internally for further processing
@@ -170,6 +190,7 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         
         $fileId = $this->createFile($filename);
         $this->uplodFile($fileId, $xliff);
+        
         $this->translateFile($fileId);
         
         array_push($this->globaleseFileIds, $fileId);
@@ -188,9 +209,6 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
      * 
      */
     private function createFile($filename){
-        $sourceLang="en-gb";
-        $targetLang="de-de";
-        
         $http = $this->getHttpClient();
         $http->setUri($this->apiUrl.'translation-files');
         $http->setHeaders('Content-Type: application/json');
@@ -199,8 +217,8 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         $params = [
                 'project'=>$this->globaleseProjectId,
                 'name'=>$filename,
-                'source-language'=>$sourceLang,
-                'target-language'=>$targetLang
+                'source-language'=>$this->getSourceLang(),
+                'target-language'=>$this->getTargetLang()
         ];
         
         $http->setRawData(json_encode($params), 'application/json');
@@ -223,13 +241,10 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         
         $result=json_decode($result->getBody());
         
-        error_log(print_r("fieldId->(".$fileId.")",1));
-        error_log(print_r($result,1));
-        
         //if(!$result->id){
         //    return null;
        // }
-        //return $result->id;
+        //return $result->id;$targetLang
     }
     
     private function translateFile($fileId){
@@ -238,7 +253,7 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         $result = $http->request('POST');
     }
     
-    private function deleteFile($fieldId){
+    private function deleteFile($fileId){
         $http = $this->getHttpClient();
         $http->setUri($this->apiUrl.'translation-files/'.$fileId);
         $result = $http->request('DELETE');
@@ -252,13 +267,25 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         foreach ($this->globaleseFileIds as $fileId){
             $http = $this->getHttpClient();
             $http->setUri($this->apiUrl.'translation-files/'.$fileId);
-            $result = $http->request('POST');
+            $result = $http->request('GET');
             $decode = json_decode($result->getBody());
+            error_log("Decode");
+            error_log(print_r($decode,1));
+            
+            if($decode->status == self::GLOBALESE_FILESTATUS_ERROR){
+                $this->deleteFile($fileId);
+                return 1;//FIXME
+            }
+            
+            if($decode->status == self::GLOBALESE_FILESTATUS_OK){
+                return $fileId;
+            }
         }
+        return null;
         //FIXME implement me and test me with all possible results
         //loops over all results and logs and deletes files with "failed" status 
         //returns the first found translated fileid, null if none found
-        return $this->dummyFileId;
+        //return $this->dummyFileId;
     }
     
     /**
@@ -268,15 +295,33 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
      * @return string
      */
     public function getFileContent($fileId, $remove = true) {
-        //FIXME implement me
-        $this->dummyFileId = false;
-        return $this->dummyXliff;
+        
+        
+        $http = $this->getHttpClient();
+        $url='translation-files/'.$fileId.'/download';
+        $http->setUri($this->apiUrl.$url);
+        $result = $http->request('GET');
+        
+        if($result->getStatus() != "200") {
+            throw new Exception($result->getBody(), 500);
+        }
+        
+        //FIXME what are we receiving from globalese ?
+        return $result->getBody();
     }
     
-    public function getEngines(){
+    public function getEngines($sourceLang,$targetLang){
+        
+        $langModel = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $langModel editor_Models_Languages */
+        
+        $sourceRfc5646=$langModel->loadLangRfc5646($sourceLang);
+        $targetRfc5646=$langModel->loadLangRfc5646($targetLang);
+        
+        $url='engines/?source='.$sourceRfc5646.'&target='.$targetRfc5646.'&status=ok';
+        
         $http = $this->getHttpClient();
-        //$http->setUri($this->apiUrl.'engines/?source=en&groups=1');
-        $http->setUri($this->apiUrl.'engines/3');
+        $http->setUri($this->apiUrl.$url);
         $http->setHeaders('Content-Type: application/json');
         $http->setHeaders('Accept: application/json');
         $result = $http->request();
@@ -285,17 +330,11 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
             throw new Exception($result->getBody(), 500);
         }
         
-        error_log(print_r("aaaaaaaaaaaaaaaaa",1));
-        error_log(print_r($result->getBody(),1));
-        $result = json_decode($result->getBody());
-        error_log(print_r("bbbbbbbbbbbbbbbbb",1));
-        
-        //$result = json_decode($result->getBody());
         if(json_last_error()) {
             throw new Exception("Error on JSON decode: ".json_last_error_msg(), 500);
         }
         
-        return $result;
+        return json_decode($result->getBody());
     }
     
     public function getGroups(){
@@ -320,5 +359,37 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
     public function setAuth($username,$apiKey){
         $this->username = $username;
         $this->apiKey = $apiKey;
+    }
+    
+    public function setGroup($group){
+        $this->group = $group;
+    }
+    
+    public function getGroup(){
+        return $this->group;
+    }
+    
+    public function setEngine($engine){
+        $this->engine = $engine;
+    }
+    
+    public function getEngine(){
+        return $this->engine;
+    }
+    
+    public function setSourceLang($sourceLang){
+        $this->sourceLang=$sourceLang;
+    }
+    
+    public function getSourceLang(){
+        return $this->sourceLang;
+    }
+    
+    public function setTargetLang($targetLang){
+        $this->targetLang=$targetLang;
+    }
+    
+    public function getTargetLang(){
+        return $this->targetLang;
     }
 }

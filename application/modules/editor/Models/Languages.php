@@ -44,4 +44,13 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Languages extends ZfExtended_Languages {
 	protected $dbInstanceClass = 'editor_Models_Db_Languages';
+	
+	/***
+     * Return language rfc5646 value for given language id
+     * @param int $langId
+     * @return string
+     */
+    public function loadLangRfc5646($langId){
+       return parent::loadLangRfc5646($langId);
+    }
 }
