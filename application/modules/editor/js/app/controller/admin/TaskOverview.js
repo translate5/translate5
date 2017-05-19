@@ -87,7 +87,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       taskDestroy: '#UT#Aufgabe wird gelöscht...',
       taskNotDestroyed : '#UT#Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!',
       forcedReadOnly: '#UT#Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!',
-      openTaskAdminBtn: "#UT#Aufgabenübersicht"
+      openTaskAdminBtn: "#UT#Aufgabenübersicht",
   },
   init : function() {
       var me = this;
@@ -97,7 +97,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       Editor.app.on('editorViewportOpened', me.handleInitEditor, me);
       
       me.getAdminTasksStore().on('load', me.startCheckImportStates, me);
-
+      
       me.control({
           'headPanel toolbar#top-menu' : {
               beforerender: me.initMainMenu
@@ -382,7 +382,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           vm.set('activeItem',nextStep);
           winLayout.setActiveItem(nextStep);
       }
-      //this.saveTask();
   },
   
   
@@ -673,7 +672,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               me.fireEvent('taskCreated', task);
               win.setLoading(false);
               me.getAdminTasksStore().load();
-              //me.handleTaskCancel();
+              me.handleTaskCancel();
+              Editor.MessageBox.addSuccess(win.importTaskMessage,2);
           },
           failure: function(form, submit) {
               win.setLoading(false);

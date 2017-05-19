@@ -310,6 +310,9 @@ body.loading {background: url("../images/loading_ico.gif") center 100px no-repea
 .ico-add {background-image: url("../images/table_row_insert.png");}
 .ico-del {background-image: url("../images/table_row_delete.png");}
 .ico-task-back {background-image: url("../images/table_back.png");}
+.ico-next-wizard {background-image: url("../images/arrow_right.png");}
+.ico-skip-wizard {background-image: url("../images/resultset_last.png");}
+.ico-finish-wizard {background-image: url("../images/accept.png");}
 .adminTaskGrid tr.openable td.taskNr div {text-decoration: underline;cursor: pointer !important;}
 .adminTaskGrid .locked td.state div {padding-left:20px;background:url(../images/information.png) no-repeat left top;}
 .adminTaskGrid .error td.state div {padding-left:20px;background:url(../images/exclamation.png) no-repeat left top;}

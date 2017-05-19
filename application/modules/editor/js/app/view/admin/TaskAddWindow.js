@@ -73,6 +73,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         feedbackText: "#UT# Fehler beim Import!",
         feedbackTip: '#UT#Fehler beim Import: Bitte wenden Sie sich an den Support!',
         addBtn: '#UT#Task hinzufügen',
+        addBtnWizard: '#UT#Add Task (skip next steps)',
+        btnNextWizard:'#UT#Next',
         cancelBtn: '#UT#Abbrechen'
     },
     height : 500,
@@ -83,16 +85,17 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
       afterrender:function(win){
           var winLayout=win.getLayout(),
               vm=win.getViewModel();
-          
           taskUpload = {
                   xtype:'taskUpload',
                   itemId:'taskUploadCard'
           };
           win.insertImport(taskUpload);
-          
           vm.set('activeItem',winLayout.getActiveItem());
-      }  
+      }
     },
+    
+    importTaskMessage:"#UT#Your task import is completed.",
+    
     initConfig: function(instanceConfig) {
         var me = this,
             langCombo = {
@@ -249,10 +252,19 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                         },
                         
                         disableContinueButton:function(get){
-                            return false;
+                            var me=this,
+                                win=me.up('window');
+                            return win.isTaskUploadNext();
                         },
                         
                         disableAddButton:function(get){
+                            var me=this,
+                                win=me.up('window');
+                            
+                            if(!win.isTaskUploadNext()){
+                                win.down('#add-task-btn').setText(win.strings.addBtnWizard);
+                            }
+                            
                             return false;
                         },
 
@@ -281,22 +293,22 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     xtype: 'tbfill'
                 },{
                     xtype : 'button',
-                    iconCls : 'ico-task-add',
+                    iconCls : 'ico-next-wizard',
+                    itemId : 'continue-wizard-btn',
+                    bind:{
+                        disabled:'{disableContinueButton}',
+                        visible:'{!disableContinueButton}'
+                    },
+                    text : me.strings.btnNextWizard
+                },{
+                    xtype : 'button',
+                    iconCls : 'ico-skip-wizard',
                     itemId : 'skip-wizard-btn',
                     bind:{
                         disabled:'{disableSkipButton}',
                         visible:'{!disableSkipButton}'
                     },
                     text : 'Skip (fixme in the locales)'
-                },{
-                    xtype : 'button',
-                    iconCls : 'ico-task-add',
-                    itemId : 'continue-wizard-btn',
-                    bind:{
-                        disabled:'{disableContinueButton}',
-                        visible:'{!disableContinueButton}'
-                    },
-                    text : 'Next (fixme in the locales)'
                 },{
                     xtype : 'button',
                     iconCls : 'ico-task-add',
@@ -318,6 +330,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                 }]
             }]
         };
+        
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
@@ -332,5 +345,11 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     },
     insertPostImport:function(card){
         //inser the card at the end of the items
+    },
+    isTaskUploadNext:function(){
+        var winLayout=this.getLayout(),
+            nextItem=winLayout.getNext();
+        
+        return nextItem.getXType()=="taskUpload";
     }
 });
