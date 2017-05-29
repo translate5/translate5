@@ -11,3 +11,8 @@
 /public/ExtJs-ux-exception.txt
 /public/plugin-exception.txt
 /application/modules/editor/Plugins/MatchResource/public/.vscode
+/data/dummyTm_6
+/data/dummyTm_2
+/data/dummyTm_5
+/data/dummyTm_4
+/data/dummyTm_7
