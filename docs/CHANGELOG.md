@@ -3,6 +3,25 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.5.27] - 2017-05-29
+###Added
+TRANSLATE-871: New Tooltip shows segment meta data over segmentNrInTask column
+TRANSLATE-878: Enable GUI JS logger TheRootCause
+TRANSLATE-877: Make Worker URL separately configurable
+
+###Changed
+TRANSLATE-823: ignore sdlxliff bookmarks for relais import check
+TRANSLATE-870: Enable MatchRate and Relays column per default in ergonomic mode
+TRANSLATE-857: change target column names in the segment grid
+TRANSLATE-880: XLF import: Copy source to target, if target is empty or does not exist
+TRANSLATE-897: changes.xliff generation: alt-trans shorttext for target columns must be changed
+
+###Bugfixes
+TRANSLATE-875: Width of relays column is too small
+TRANSLATE-891: OpenTM2 answer with Unicode characters and internal tags produces invalid HTML in answer
+TRANSLATE-888: Mask tab character in source files with internal tag
+TRANSLATE-879: SDLXliff and XLF import does not work with missing target tags
+
 ## [2.5.26] - 2017-04-24
 ###Added
 TRANSLATE-871: New Tooltip should show segment meta data over segmentNrInTask column
