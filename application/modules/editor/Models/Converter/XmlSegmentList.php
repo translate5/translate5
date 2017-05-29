@@ -285,22 +285,24 @@ class editor_Models_Converter_XmlSegmentList {
         
         $lang = $this->data['targetLang'];
         if($this->data['firstTarget'] == $field->name) {
+            $altTransName = $field->name;
             $matchRate = number_format($segment['matchRate'], 1, '.', '');
             $targetEdit = $this->prepareText($segment[$this->sfm->getEditIndex($this->data['firstTarget'])]);
             $this->result[] = '<target dx:match-quality="'.$matchRate.'">'.$targetEdit.'</target>';
             $targetOriginal = $this->prepareText($segment[$field->name]);
             //add previous version of target as alt trans
-            $this->addAltTransToResult($targetOriginal, $lang, $field->label, 'previous-version');
+            $this->addAltTransToResult($targetOriginal, $lang, $altTransName, 'previous-version');
         }
         else {
             //add alternatives
+            $altTransName = $field->label;
             $targetEdit = $this->prepareText($segment[$this->sfm->getEditIndex($field->name)]);
-            $this->addAltTransToResult($targetEdit, $lang, $field->label);
+            $this->addAltTransToResult($targetEdit, $lang, $altTransName);
             if($this->createDiffAltTrans){
                 $targetOriginal = $this->prepareText($segment[$field->name]);
             }
         }
-        $this->addDiffToResult($targetEdit, $targetOriginal, $field, $segment);
+        $this->addDiffToResult($targetEdit, $targetOriginal, $altTransName, $segment);
     }
     
     protected function addAltTransToResult($targetText, $lang, $label, $type = null) {
@@ -309,12 +311,12 @@ class editor_Models_Converter_XmlSegmentList {
         $this->result[] = '<target xml:lang="'.$lang.'">'.$targetText.'</target></alt-trans>';
     }
     
-    protected function addDiffToResult($targetEdit, $targetOriginal, Zend_Db_Table_Row $field, $segment) {
+    protected function addDiffToResult($targetEdit, $targetOriginal, $label, $segment) {
         if(!$this->createDiffAltTrans){
             return;
         }
         $diffResult = $this->differ->diffSegment($targetOriginal, $targetEdit, $segment['timestamp'], $segment['userName']);
-        $this->addAltTransToResult($diffResult, $this->data['targetLang'], $field->label.'-diff', 'reference');
+        $this->addAltTransToResult($diffResult, $this->data['targetLang'], $label.'-diff', 'reference');
     }
     
     /**
