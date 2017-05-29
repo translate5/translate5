@@ -3,7 +3,7 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
-## [2.5.27] - 2017-05-29
+## [2.5.29] - 2017-05-29
 ###Added
 TRANSLATE-871: New Tooltip shows segment meta data over segmentNrInTask column
 TRANSLATE-878: Enable GUI JS logger TheRootCause
