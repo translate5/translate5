@@ -44,8 +44,9 @@ END LICENSE AND COPYRIGHT
  *
  */
 class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileParser{
-    
     use editor_Plugins_Transit_TraitParse;
+    use editor_Models_Import_FileParser_TagTrait;
+    
     /**
      *
      * @var string

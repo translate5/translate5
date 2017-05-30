@@ -58,6 +58,10 @@ END LICENSE AND COPYRIGHT
  *
  */
 class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_FileParser {
+    use editor_Models_Import_FileParser_TagTrait {
+        getTagParams as protected traitGetTagParams;
+    }
+    
     /**
      * @var array mappt alle Tag-Referenzen im Header der sdlxliff-Datei innerhalb von
      *      <tag-defs><tag></tag></tag-defs> auf die Tags in Segmenten des sdlxliff
@@ -687,7 +691,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * @see editor_Models_Import_FileParser::getTagParams()
      */
     protected function getTagParams($tag, $shortTag, $tagId, $fileNameHash, $text = false) {
-        $data = parent::getTagParams($tag, $shortTag, $tagId, $fileNameHash, $text);
+        $data = $this->traitGetTagParams($tag, $shortTag, $tagId, $fileNameHash, $text);
         $data['text'] = $this->encodeTagsForDisplay($data['text']);
         return $data;
     }

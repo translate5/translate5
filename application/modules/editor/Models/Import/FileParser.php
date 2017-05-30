@@ -78,16 +78,6 @@ abstract class editor_Models_Import_FileParser {
     protected $segmentAttributes = array();
     
     /**
-     * defines the GUI representation of internal used tags for masking special characters  
-     * @var array
-     */
-    protected $_tagMapping = array(
-        'hardReturn' => array('text' => '&lt;hardReturn/&gt;', 'imgText' => '<hardReturn/>'),
-        'softReturn' => array('text' => '&lt;softReturn/&gt;', 'imgText' => '<softReturn/>'),
-        'macReturn' => array('text' => '&lt;macReturn/&gt;', 'imgText' => '<macReturn/>'),
-        'space' => array('text' => '&lt;space/&gt;', 'imgText' => '<space/>'));
-
-    /**
      * @var editor_ImageTag_Left
      */
     protected $_leftTag = NULL;
@@ -211,29 +201,6 @@ abstract class editor_Models_Import_FileParser {
                 }, $this->_origFile);
     }
     
-    /**
-     * callback for replace method in parseSegment
-     * @param array $match
-     * @return string
-     */
-    protected function whitespaceTagReplacer(array $match) {
-        //$replacer = function($match) use ($segment, $shortTagIdent, $map) {
-        $tag = $match[0];
-        $tagName = preg_replace('"<([^/ ]*).*>"', '\\1', $tag);
-        if(!isset($this->_tagMapping[$tagName])) {
-            trigger_error('The used tag ' . $tagName .' is undefined! Segment: '.$this->_segment, E_USER_ERROR);
-        }
-        $fileNameHash = md5($this->_tagMapping[$tagName]['imgText']);
-        
-        //generate the html tag for the editor
-        $p = $this->getTagParams($tag, $this->shortTagIdent++, $tagName, $fileNameHash);
-        $tag = $this->_singleTag->getHtmlTag($p);
-        $this->_singleTag->createAndSaveIfNotExists($this->_tagMapping[$tagName]['imgText'], $fileNameHash);
-        $this->_tagCount++;
-        return $tag;
-    }
-        
-    
     public function addSegmentProcessor(editor_Models_Import_SegmentProcessor $proc){
         $this->segmentProcessor[] = $proc;
     }
@@ -313,27 +280,6 @@ abstract class editor_Models_Import_FileParser {
                     ' has not the structure of a tag.', E_USER_ERROR);
         }
         return implode('', unpack('H*', $tagContent));
-    }
-    
-    /**
-     * returns the parameters for creating the HtmlTags used in the GUI
-     * @param string $tag
-     * @param string $shortTag
-     * @param string $tagId
-     * @param string $fileNameHash
-     * @param string $text
-     */
-    protected function getTagParams($tag, $shortTag, $tagId, $fileNameHash, $text = false) {
-        if($text === false) {
-            $text = $this->_tagMapping[$tagId]['text'];
-        }
-        return array(
-            'class' => $this->parseSegmentGetStorageClass($tag),
-            'text' => $text,
-            'shortTag' => $shortTag,
-            'id' => $tagId, //mostly original tag id
-            'filenameHash' => $fileNameHash,
-        );
     }
     
     /**

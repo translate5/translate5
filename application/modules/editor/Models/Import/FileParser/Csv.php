@@ -40,6 +40,10 @@ END LICENSE AND COPYRIGHT
  *
  */
 class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParser {
+    use editor_Models_Import_FileParser_TagTrait {
+        getTagParams as protected traitGetTagParams;
+    }
+    
     /**
      * string "source" as defined in application.ini column definition
      * @var string
@@ -459,7 +463,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      */
     protected function getTagParams($tag, $shortTag, $tagId, $fileNameHash, $text = false) {
         $this->_tagCount = $shortTag;
-        return parent::getTagParams($tag, $shortTag, $tagId, $fileNameHash, $text);
+        return $this->traitGetTagParams($tag, $shortTag, $tagId, $fileNameHash, $text);
     }
     
     private function parseSegmentProtectTags($segment) {
