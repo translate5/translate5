@@ -119,6 +119,8 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task) {
         ini_set('auto_detect_line_endings', true);//to tell php to respect mac-lineendings
         parent::__construct($path, $fileName, $fileId, $task);
+        $this->initImageTags();
+        
         $this->_delimiter = $this->config->runtimeOptions->import->csv->delimiter;
         $this->_enclosure = $this->config->runtimeOptions->import->csv->enclosure;
         $this->regexInternalTags = editor_Models_Segment_InternalTag::REGEX_INTERNAL_TAGS;

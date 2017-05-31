@@ -100,6 +100,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         //add sdlxliff tagMapping
         $this->addSldxliffTagMappings();
         parent::__construct($path, $fileName, $fileId, $task);
+        $this->initImageTags();
         $this->checkForSdlChangeMarker();
         $this->protectUnicodeSpecialChars();
         $this->prepareTagMapping();

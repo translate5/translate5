@@ -78,21 +78,6 @@ abstract class editor_Models_Import_FileParser {
     protected $segmentAttributes = array();
     
     /**
-     * @var editor_ImageTag_Left
-     */
-    protected $_leftTag = NULL;
-
-    /**
-     * @var editor_ImageTag_Right
-     */
-    protected $_rightTag = NULL;
-
-    /**
-     * @var editor_ImageTag_Single
-     */
-    protected $_singleTag = NULL;
-
-    /**
      * @var editor_Models_Task
      */
     protected $task;
@@ -152,9 +137,6 @@ abstract class editor_Models_Import_FileParser {
         $this->_path = $path;
         $this->_fileName = $fileName;
         $this->_fileId = $fileId;
-        $this->_leftTag = ZfExtended_Factory::get('editor_ImageTag_Left');
-        $this->_rightTag = ZfExtended_Factory::get('editor_ImageTag_Right');
-        $this->_singleTag = ZfExtended_Factory::get('editor_ImageTag_Single');
         $this->task = $task;
         $this->_taskGuid = $task->getTaskGuid();
         $this->autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
@@ -266,39 +248,11 @@ abstract class editor_Models_Import_FileParser {
     }
     
     /**
-     * Hilfsfunktion für parseSegment: Verpackung verschiedener Strings zur Zwischenspeicherung als HTML-Klassenname im JS
-     *
-     * @param string $tag enthält den Tag als String
-     * @param string $tagName enthält den Tagnamen
-     * @param boolean $locked gibt an, ob der übergebene Tag die Referenzierung auf einen gesperrten inline-Text im sdlxliff ist
-     * @return string $id ID des Tags im JS
-     */
-    protected function parseSegmentGetStorageClass($tag) {
-        $tagContent = preg_replace('"^<(.*)>$"', '\\1', $tag);
-        if($tagContent == $tag){
-            trigger_error('The Tag ' . $tag .
-                    ' has not the structure of a tag.', E_USER_ERROR);
-        }
-        return implode('', unpack('H*', $tagContent));
-    }
-    
-    /**
      * returns the internally used SegmentFieldManager
      * @return editor_Models_SegmentFieldManager
      */
     public function getSegmentFieldManager() {
         return $this->segmentFieldManager;
-    }
-    
-    /**
-     * @return array array('tagImageName1.png','tagImageName2.png',...)
-     */
-    public function getTagImageNames() {
-        return array_merge(
-            $this->_leftTag->_imagesInObject,
-            $this->_rightTag->_imagesInObject,
-            $this->_singleTag->_imagesInObject
-            );
     }
     
     /**
@@ -484,12 +438,15 @@ abstract class editor_Models_Import_FileParser {
         $isLocked = $attributes->locked && (bool) $this->task->getLockLocked();
        
         $isFullMatch = ($attributes->matchRate === 100);
-        $isEditable  = (!$isFullMatch || (bool) $this->task->getEdit100PercentMatch() || $isAutoprop) && !$isLocked;
         $isTranslated = $this->isTranslated();
         
-        $attributes->editable = $isEditable;
+        //calculate isEditable only if it was not explicitly set
+        if(!isset($attributes->editable)) {
+            $isEditable  = (!$isFullMatch || (bool) $this->task->getEdit100PercentMatch() || $isAutoprop) && !$isLocked;
+            $attributes->editable = $isEditable;
+        }
         $attributes->pretrans = $isFullMatch && !$isAutoprop;
-        $attributes->autoStateId = $this->autoStates->calculateImportState($isEditable, $isTranslated);
+        $attributes->autoStateId = $this->autoStates->calculateImportState($attributes->editable, $isTranslated);
         $attributes->isTranslated = $isTranslated;
         
         //if there was a matchRateType from the imported segment, then the original value was stored

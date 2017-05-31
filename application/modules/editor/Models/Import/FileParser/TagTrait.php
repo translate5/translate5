@@ -33,6 +33,22 @@ END LICENSE AND COPYRIGHT
  * For refactoring the import process to a better understandable structure some code is moved into traits to keep refactoring steps small! 
  */
 trait editor_Models_Import_FileParser_TagTrait {
+    
+    /**
+     * @var editor_ImageTag_Left
+     */
+    protected $_leftTag = NULL;
+
+    /**
+     * @var editor_ImageTag_Right
+     */
+    protected $_rightTag = NULL;
+
+    /**
+     * @var editor_ImageTag_Single
+     */
+    protected $_singleTag = NULL;
+    
     /**
      * defines the GUI representation of internal used tags for masking special characters  
      * @var array
@@ -42,6 +58,15 @@ trait editor_Models_Import_FileParser_TagTrait {
         'softReturn' => array('text' => '&lt;softReturn/&gt;', 'imgText' => '<softReturn/>'),
         'macReturn' => array('text' => '&lt;macReturn/&gt;', 'imgText' => '<macReturn/>'),
         'space' => array('text' => '&lt;space/&gt;', 'imgText' => '<space/>'));
+
+    /**
+     * to be called in the constructors
+     */
+    protected function initImageTags(){
+        $this->_leftTag = ZfExtended_Factory::get('editor_ImageTag_Left');
+        $this->_rightTag = ZfExtended_Factory::get('editor_ImageTag_Right');
+        $this->_singleTag = ZfExtended_Factory::get('editor_ImageTag_Single');
+    }
 
     /**
      * callback for replace method in parseSegment
@@ -84,5 +109,22 @@ trait editor_Models_Import_FileParser_TagTrait {
             'id' => $tagId, //mostly original tag id
             'filenameHash' => $fileNameHash,
         );
+    }
+    
+    /**
+     * Hilfsfunktion für parseSegment: Verpackung verschiedener Strings zur Zwischenspeicherung als HTML-Klassenname im JS
+     *
+     * @param string $tag enthält den Tag als String
+     * @param string $tagName enthält den Tagnamen
+     * @param boolean $locked gibt an, ob der übergebene Tag die Referenzierung auf einen gesperrten inline-Text im sdlxliff ist
+     * @return string $id ID des Tags im JS
+     */
+    protected function parseSegmentGetStorageClass($tag) {
+        $tagContent = preg_replace('"^<(.*)>$"', '\\1', $tag);
+        if($tagContent == $tag){
+            trigger_error('The Tag ' . $tag .
+                    ' has not the structure of a tag.', E_USER_ERROR);
+        }
+        return implode('', unpack('H*', $tagContent));
     }
 }
