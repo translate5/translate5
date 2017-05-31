@@ -105,9 +105,9 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
         
         $this->createGlobaleseProject();
         $this->processSegments();
-        return true;
         $this->importRemainingFiles();
         $this->removeGlobaleseProject();
+        
         return true;
     }
     
@@ -136,7 +136,6 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
                     //file changed, save stored segments as xliff
                     $this->convertAndPreTranslate($xliffConverter, $fileId, $oneFileSegments);
                 }
-                
                 //new file
                 $oneFileSegments = [];
                 $fileId = (int) $segment->getFileId();
@@ -159,8 +158,6 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
     protected function convertAndPreTranslate(editor_Models_Converter_SegmentsToXliff $xliffConverter, integer $fileId, array $oneFileSegments) {
         $xliff = $xliffConverter->convert($this->task, $oneFileSegments);
         $this->logplugin('XLIFF generated for file '.$fileId);
-        error_log(print_r($xliff,1));
-        return;
         $globaleseFileId = $this->api->upload($this->getFilename($fileId), $xliff);
         $this->fileIdMap[$globaleseFileId] = $fileId;
         $globFileId = $this->api->getFirstTranslated();
@@ -169,7 +166,7 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
         //FIXME check if $globFileId can contain 0 as a valid ID (I dont think so) 
         // if 0 will be a valid ID then this if must check for not null and not false
         if($globFileId) {
-            $this->reImportFinished($globFileId);
+            $this->reImportTranslated($globFileId);
         }
     }
     
@@ -183,16 +180,17 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
                 $this->logplugin("Waiting for more translated files");
                 sleep(5);
             } else {
-                $this->reImportFinished($globFileId);
+                $this->reImportTranslated($globFileId);
             }
             $globFileId = $this->api->getFirstTranslated();
-        } 
+        }
     }
     
     /**
      * get and reimport the given translated xlf
+     * 
      */
-    protected function reImportFinished($globFileId) {
+    protected function reImportTranslated($globFileId) {
         $translatedXlf = $this->api->getFileContent($globFileId);
         //FIXME check if it does exist in the map
         $fileId = $this->fileIdMap[$globFileId];

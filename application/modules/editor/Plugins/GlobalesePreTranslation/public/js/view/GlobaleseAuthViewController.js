@@ -112,11 +112,12 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
         //return;
         var me=this,
             view=me.getView(),
-            sourceLangValue=view.up('window').down('combo[name="sourceLang"]').getValue(),
-            targetLangValue=view.up('window').down('combo[name="targetLang"]').getValue(),
+            window=view.up('window'),
+            sourceLangValue=window.down('combo[name="sourceLang"]').getValue(),
+            targetLangValue=window.down('combo[name="targetLang"]').getValue(),
             apiusername=view.down('#apiUsername').getValue(),
             apipassword=view.down('#apiPassword').getValue(),
-            globaleseEngine=view.up('window').down('#globaleseEngine'),
+            globaleseEngine=window.down('#globaleseEngine'),
             url = Editor.data.restpath+'plugins_globalesepretranslation_globalese/engines',
             params = {},
             method = 'GET',
@@ -151,9 +152,11 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
                 globaleseEngine.setStore(engines);
                 //FIXME set the engines to the engines combo
                 view.fireEvent('wizardCardFinished');
+                window.setLoading(false);
                 return;
             },
             failure: function(response){
+                window.setLoading(false);
                 Editor.MessageBox.addError(me.strings.enginesErrorMsg);
             } 
         });
@@ -165,11 +168,14 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
         
         var me=this,
             view=me.getView(),
+            window=view.up('window'),
             apiusername=view.down('#apiUsername').getValue(),
             apipassword=view.down('#apiPassword').getValue(),
-            globaleseGroup=view.up('window').down('#globaleseGroup'),
+            globaleseGroup=window.down('#globaleseGroup'),
             url = Editor.data.restpath+'plugins_globalesepretranslation_globalese/groups';
         
+            window.setLoading(true);
+            
             //str = me.strings,
             params = {},
             method = 'GET',
@@ -204,6 +210,7 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
                 //view.fireEvent('wizardCardFinished');
             },
             failure: function(response){
+                window.setLoading(false);
                 Editor.MessageBox.addError(me.strings.groupsErrorMsg);
             } 
         });
