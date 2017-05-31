@@ -60,9 +60,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       ref: 'taskAddWindow',
       selector: '#adminTaskAddWindow'
   }],
-  alias: 'controller.taskOverviewController',
-  
-  isCardFinished:false,
   /**
    * Container for translated task handler confirmation strings
    * Deletion of an entry means to disable confirmation.
@@ -131,10 +128,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           },
           '#segmentgrid': {
               afterrender: me.initTaskReadMode
-          },
-          'adminTaskAddWindow panel:not([hidden])': {
-              wizardCardFinished:me.onWizardCardFinished,
-              wizardCardSkiped:me.onWizardCardSkiped
           }
       });
   },
@@ -361,40 +354,41 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       this.getTaskAddWindow().close();
   },
   /**
-   * is called after clicking continue, if there are wizard panels, 
-   * then the next available wizard panel is set as active 
+   * is called after clicking save task, starts the upload / form submit
    */
-  handleTaskAdd: function(button) {
+  handleTaskAdd: function() {
       var me = this,
           win = me.getTaskAddWindow(),
-          winLayout=win.getLayout(),
-          activeItem=winLayout.getActiveItem();
-      
-      activeItem.triggerNextCard(activeItem);
+          error = win.down('#feedbackBtn');
+      error.hide();
+      win.setLoading(true);
+      this.getTaskAddForm().submit({
+          //Accept Header of submitted file uploads could not be changed:
+          //http://stackoverflow.com/questions/13344082/fileupload-accept-header
+          //so use format parameter jsontext here, for jsontext see REST_Controller_Action_Helper_ContextSwitch
+          
+    	  params: {
+              format: 'jsontext'
+          },
+          
+          url: Editor.data.restpath+'task',
+          scope: this,
+          success: function(form, submit) {
+              var task = me.getModel('admin.Task').create(submit.result.rows);
+              me.fireEvent('taskCreated', task);
+              win.setLoading(false);
+              me.getAdminTasksStore().load();
+              me.handleTaskCancel();
+          },
+          failure: function(form, submit) {
+              win.setLoading(false);
+              if(submit.failureType == 'server' && submit.result && submit.result.errors && !Ext.isDefined(submit.result.success)) {
+                  //all other failures should mark a field invalid
+                  error.show();
+              }
+          }
+      });
   },
-  
-  onWizardCardFinished:function(){
-      var me = this,
-          win = me.getTaskAddWindow(),
-          winLayout=win.getLayout(),
-          isNextStep=winLayout.getNext();
-  
-      if(!isNextStep){
-          me.saveTask();
-          return;
-      }
-      if(isNextStep.strings && isNextStep.strings.wizardTitle){
-          win.setTitle(isNextStep.strings.wizardTitle);
-      }
-      winLayout.setActiveItem(isNextStep);
-  },
-  
-  onWizardCardSkiped:function(){
-      alert('save task call');
-      return;
-      this.saveTask();
-  },
-  
   handleTaskAddShow: function() {
       if(!this.isAllowed('editorAddTask')){
           return;
@@ -597,41 +591,5 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    */
   handleTaskChangeUserAssoc: function(task) {
       this.fireEvent('handleTaskChangeUserAssoc', task);
-  },
-  /***
-   * starts the upload / form submit
-   */
-  saveTask:function(){
-      var me = this,
-          win = me.getTaskAddWindow(),
-          error = win.down('#feedbackBtn');
-      error.hide();
-      win.setLoading(true);
-      this.getTaskAddForm().submit({
-          //Accept Header of submitted file uploads could not be changed:
-          //http://stackoverflow.com/questions/13344082/fileupload-accept-header
-          //so use format parameter jsontext here, for jsontext see REST_Controller_Action_Helper_ContextSwitch
-          
-          params: {
-              format: 'jsontext'
-          },
-          
-          url: Editor.data.restpath+'task',
-          scope: this,
-          success: function(form, submit) {
-              var task = me.getModel('admin.Task').create(submit.result.rows);
-              me.fireEvent('taskCreated', task);
-              win.setLoading(false);
-              me.getAdminTasksStore().load();
-              me.handleTaskCancel();
-          },
-          failure: function(form, submit) {
-              win.setLoading(false);
-              if(submit.failureType == 'server' && submit.result && submit.result.errors && !Ext.isDefined(submit.result.success)) {
-                  //all other failures should mark a field invalid
-                  error.show();
-              }
-          }
-      });
   }
 });
