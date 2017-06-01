@@ -41,27 +41,43 @@ Ext.define('Editor.controller.admin.IWizardCard', {
     importType:"",
     
     /***
-     * Special config for the navifation buttons:skip,next,close,addTask
+     * called when next button of the card is clicked
      */
-    navigationButtonsConfig:[],
-    
     triggerNextCard:function(activeItem){
         
     },
     
+    /***
+     * called when skip button of the card is clicked
+     */
     triggerSkipCard:function(activeItem){
         
     },
 
+    /***
+     * if return true, disable the skip button
+     */
     disableSkipButton:function(){
         
     },
+    
+    /***
+     * if return true, disable the continue button
+     */
     disableContinueButton:function(){
         
     },
+    
+    /***
+     * if return true, disable the add button
+     */
     disableAddButton:function(){
         
     },
+    
+    /***
+     * if return true, disable the cancel button
+     */
     disableCancelButton:function(){
         
     }
