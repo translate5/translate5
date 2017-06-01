@@ -302,7 +302,7 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
     private function deleteFile($fileId){
         $url='translation-files/'.$fileId;
         $http = $this->getHttpClient($url);
-        //$result = $http->request('DELETE');
+        $result = $http->request('DELETE');
         
         //remove the file from the local stack
         $key = array_search($fileId, $this->globaleseFileIds);
@@ -341,10 +341,6 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
             }
         }
         return null;
-        //FIXME implement me and test me with all possible results
-        //loops over all results and logs and deletes files with "failed" status 
-        //returns the first found translated fileid, null if none found
-        //return $this->dummyFileId;
     }
     
     /**
