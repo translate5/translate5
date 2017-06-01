@@ -60,6 +60,12 @@ class editor_Models_Converter_XmlPairer {
      */
     protected $replaceList = [];
     
+    /**
+     * Contains a map between opener tag and closer tag (is needed for restoring a whole tagmap)
+     * @var array
+     */
+    protected $pairMap = [];
+    
     public function pairTags($xmlAllUnpaired) {
         //split up tags and text in nodes
         $this->nodeList = preg_split('/(<[^>]*>)/i', $xmlAllUnpaired, null, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
@@ -90,6 +96,7 @@ class editor_Models_Converter_XmlPairer {
             $newOpener = '<g id="'.$opener->id.'">';
             $newCloser = '</g>';
             
+            $this->pairMap[$this->nodeList[$opener->idx]] = $this->nodeList[$closer->idx];
             $this->replaceList[$this->nodeList[$opener->idx]] = $newOpener;
             $this->replaceList[$this->nodeList[$closer->idx]] = $newCloser;
             
@@ -109,6 +116,14 @@ class editor_Models_Converter_XmlPairer {
      */
     public function getReplaceList() {
         return $this->replaceList;
+    }
+    
+    /**
+     * returns a map between bpt/ept paired tags
+     * @return array
+     */
+    public function getPairMap() {
+        return $this->pairMap;
     }
     
     /**

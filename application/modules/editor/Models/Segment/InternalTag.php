@@ -181,11 +181,15 @@ class editor_Models_Segment_InternalTag {
         //remove all other tags, allow <x> <bx> and <ex> 
         $pairedContent = $xml->pairTags($result);
         $pairedReplace = $xml->getReplaceList();
+        $pairMap = $xml->getPairMap();
         
         foreach($replaceMap as $key => &$replaced) {
             if(!empty($pairedReplace[$key])) {
                 //replace the bx/ex through the g tag in the replace map
                 $replaced[0] = $pairedReplace[$key];
+            }
+            if(!empty($pairMap[$key])) {
+                $replaced[2] = $pairMap[$key];
             }
         }
         return $pairedContent;

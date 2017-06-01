@@ -72,7 +72,7 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
      */
     protected function validateParameters($parameters = array()) {
         if(empty($parameters['group']) || empty($parameters['engine']) || empty($parameters['apiUsername']) || empty($parameters['apiKey'])) {
-            throw new ZfExtended_Exception('Missing parameters for group,engine,apiUsername or apiKey');
+            return false;
         }
         return true;
     } 
