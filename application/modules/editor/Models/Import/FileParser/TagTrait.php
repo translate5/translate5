@@ -209,16 +209,15 @@ trait editor_Models_Import_FileParser_TagTrait {
         //replace only on real text
         $textNode = str_replace($this->protectedWhitespaceMap['search'], $this->protectedWhitespaceMap['replace'], $textNode);
         
-        //protect multispaces
-        $textNode = preg_replace_callback('" ( +)"', function ($match) {
+        //protect multispaces and tabs
+        $textNode = preg_replace_callback('/ ( +)|(\t+)/', function ($match) {
             //Pay attention to the leading space on refactoring!
             return ' '.$this->makeInternalSpace($match[1]);
         }, $textNode);
         
-        $res = preg_replace_callback($this->protectedUnicodeList, function ($match) {
+        return preg_replace_callback($this->protectedUnicodeList, function ($match) {
             return $this->makeInternalSpace($match[0]);
-        }, $segment);
-        return $res;
+        }, $textNode);
     }
     
     /**
