@@ -452,6 +452,7 @@ class editor_Models_Converter_SegmentsToXliff {
         
         $lang = $this->data['targetLang'];
         if($this->data['firstTarget'] == $field->name) {
+            $altTransName = $field->name;
             $matchRate = number_format($segment['matchRate'], 1, '.', '');
             $targetEdit = $this->prepareText($segment[$this->sfm->getEditIndex($this->data['firstTarget'])]);
             if(empty($this->enabledNamespaces['dx'])){
@@ -470,19 +471,20 @@ class editor_Models_Converter_SegmentsToXliff {
             //add previous version of target as alt trans
             if($this->options[self::CONFIG_ADD_PREVIOUS_VERSION]) {
                 //add targetOriginal
-                $this->addAltTransToResult($this->prepareText($segment[$field->name]), $lang, $field->label, 'previous-version');
+                $this->addAltTransToResult($this->prepareText($segment[$field->name]), $lang, $altTransName, 'previous-version');
             }
         }
         else {
             //add alternatives
+            $altTransName = $field->label;
             $targetEdit = $this->prepareText($segment[$this->sfm->getEditIndex($field->name)]);
             if($this->options[self::CONFIG_ADD_ALTERNATIVES]) {
-                $this->addAltTransToResult($targetEdit, $lang, $field->label);
+                $this->addAltTransToResult($targetEdit, $lang, $altTransName);
             }
         }
         if($this->options[self::CONFIG_INCLUDE_DIFF]){
             //compare targetEdit and targetOriginal
-            $this->addDiffToResult($targetEdit, $this->prepareText($segment[$field->name]), $field, $segment);
+            $this->addDiffToResult($targetEdit, $this->prepareText($segment[$field->name]), $altTransName, $segment);
         }
     }
     
@@ -492,9 +494,9 @@ class editor_Models_Converter_SegmentsToXliff {
         $this->result[] = '<target xml:lang="'.$lang.'">'.$targetText.'</target></alt-trans>';
     }
     
-    protected function addDiffToResult($targetEdit, $targetOriginal, Zend_Db_Table_Row $field, $segment) {
+    protected function addDiffToResult($targetEdit, $targetOriginal, $label, $segment) {
         $diffResult = $this->differ->diffSegment($targetOriginal, $targetEdit, $segment['timestamp'], $segment['userName']);
-        $this->addAltTransToResult($diffResult, $this->data['targetLang'], $field->label.'-diff', 'reference');
+        $this->addAltTransToResult($diffResult, $this->data['targetLang'], $label.'-diff', 'reference');
     }
     
     /**
@@ -568,7 +570,7 @@ class editor_Models_Converter_SegmentsToXliff {
         // 2. remove term tags
         // 3. remove MQM tags
         //TODO Terminology and MQM tags are just removed and not supported by our XLIFF exporter so far!
-        $text = $this->taghelperInternal->toXliff($text, true, $this->tagMap, $this->tagId);
+        $text = $this->taghelperInternal->toXliffPaired($text, true, $this->tagMap, $this->tagId);
         $text = $this->taghelperTerm->remove($text);
         $text = $this->taghelperMqm->remove($text);
         return $text;
