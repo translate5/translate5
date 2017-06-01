@@ -38,7 +38,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         $task = array(
             'sourceLang' => 'en',
             'targetLang' => 'de',
-            'edit100PercentMatch' => false,
+            'edit100PercentMatch' => true,
             'lockLocked' => 1,
         );
         
@@ -68,20 +68,21 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
      * Testing segment values directly after import
      */
     public function testBasicSegmentValuesAfterImport() {
+        //FIXME get task and test wordcount!!!
         //get segment list
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
         
         $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/XlfImportTest/expectedSegments-new.json", $json);
-        
+        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/XlfImportTest/expectedSegments-new.json", json_encode($data,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent('expectedSegments.json'), $data, 'Imported segments are not as expected!');
     }
     
     public static function tearDownAfterClass() {
         $task = self::$api->getTask();
         //open task for whole testcase
-        self::$api->login('testmanager');
+        self::$api->login('testlector');
         self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
+        self::$api->login('testmanager');
         self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
     }
 }
