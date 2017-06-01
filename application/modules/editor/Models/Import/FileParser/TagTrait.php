@@ -206,6 +206,16 @@ trait editor_Models_Import_FileParser_TagTrait {
      * @param string $textNode should not contain tags, since special characters in the tag content would also be protected then 
      */
     protected function protectWhitespace($textNode) {
+        
+        //FIXME this is not the right place here, but here it is used for all imports.
+        // It is important that we have no entities in our DB but their UTF8 characters instead,
+        // since a XLF export of our segments would not be valid XML with the entities.
+        // And the browsers are converting the entities anyway to UTF8 characters.
+        // Refactor to a better place with TRANSLATE-296
+        // why using this encode(decode) see 
+        //  https://stackoverflow.com/questions/18039765/php-not-have-a-function-for-xml-safe-entity-decode-not-have-some-xml-entity-dec
+        $textNode = htmlentities(html_entity_decode($textNode), ENT_XML1);
+        
         //replace only on real text
         $textNode = str_replace($this->protectedWhitespaceMap['search'], $this->protectedWhitespaceMap['replace'], $textNode);
         
