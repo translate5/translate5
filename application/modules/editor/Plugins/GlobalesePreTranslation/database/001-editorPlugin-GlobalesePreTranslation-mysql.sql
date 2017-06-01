@@ -43,5 +43,7 @@ INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('edit
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES ('runtimeOptions.plugins.GlobalesePreTranslation.api.username', '1', 'editor', 'plugins', '', '', '', 'string', 'Username for Globalese API authentication');
 
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES ('runtimeOptions.plugins.GlobalesePreTranslation.api.password', '1', 'editor', 'plugins', '', '', '', 'string', 'Password for Globalese API authentication');
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES ('runtimeOptions.plugins.GlobalesePreTranslation.api.url', '1', 'editor', 'plugins', 'https://translate5.globalese-mt.com/api/v2/', 'https://translate5.globalese-mt.com/api/v2/', '', 'string', 'Url used for Globalese api');
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES ('runtimeOptions.plugins.GlobalesePreTranslation.api.apiKey', '1', 'editor', 'plugins', '', '', '', 'string', 'Api key for Globalese authentication');
 
