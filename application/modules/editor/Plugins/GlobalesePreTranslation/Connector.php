@@ -208,7 +208,7 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
     public function removeProject() {
         $url='projects/'.$this->globaleseProjectId;
         $http = $this->getHttpClient($url);
-        //$result = $http->request('DELETE');
+        $result = $http->request('DELETE');
     }
     
     /**
