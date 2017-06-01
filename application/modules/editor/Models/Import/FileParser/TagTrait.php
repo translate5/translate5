@@ -33,6 +33,11 @@ END LICENSE AND COPYRIGHT
  * For refactoring the import process to a better understandable structure some code is moved into traits to keep refactoring steps small! 
  */
 trait editor_Models_Import_FileParser_TagTrait {
+    /**
+     * counter for internal tags
+     * @var integer
+     */
+    protected $shortTagIdent = 1;
     
     /**
      * @var editor_ImageTag_Left
@@ -48,6 +53,53 @@ trait editor_Models_Import_FileParser_TagTrait {
      * @var editor_ImageTag_Single
      */
     protected $_singleTag = NULL;
+    
+    /**
+     * Return search and replace map
+     * @var array
+     */
+    protected $protectedWhitespaceMap = [
+        'search' => [
+          "\r\n",  
+          "\n",  
+          "\r"
+        ],
+        'replace' => [
+          '<hardReturn/>',
+          '<softReturn/>',
+          '<macReturn/>'
+        ]
+    ];
+    
+    /**
+     * List of unicode characters to be protected 
+     * @var array
+     */
+    protected $protectedUnicodeList = [
+        '"\x{0009}"u', //Hex UTF-8 bytes or codepoint of horizontal tab
+        '"\x{000B}"u', //Hex UTF-8 bytes or codepoint of vertical tab
+        '"\x{000C}"u', //Hex UTF-8 bytes or codepoint of page feed
+        '"\x{0085}"u', //Hex UTF-8 bytes or codepoint of control sign for next line
+        '"\x{00A0}"u', //Hex UTF-8 bytes or codepoint of protected space
+        '"\x{1680}"u', //Hex UTF-8 bytes or codepoint of Ogam space
+        '"\x{180E}"u', //Hex UTF-8 bytes or codepoint of mongol vocal divider
+        '"\x{2028}"u', //Hex UTF-8 bytes or codepoint of line separator
+        '"\x{202F}"u', //Hex UTF-8 bytes or codepoint of small protected space
+        '"\x{205F}"u', //Hex UTF-8 bytes or codepoint of middle mathematical space
+        '"\x{3000}"u', //Hex UTF-8 bytes or codepoint of ideographic space
+        '"[\x{2000}-\x{200A}]"u', //Hex UTF-8 bytes or codepoint of eleven different small spaces, Haarspatium and em space
+    ]; //Hex UTF-8 bytes 	E2 80 9C//von mssql nicht vertragen
+    
+    /**
+     *
+     * @var array
+     */
+    protected $whitespaceTagList = [
+        '#<hardReturn/>#',
+        '#<softReturn/>#',
+        '#<macReturn/>#',
+        '#<space ts="[^"]*"/>#',
+    ];
     
     /**
      * defines the GUI representation of internal used tags for masking special characters  
@@ -69,25 +121,25 @@ trait editor_Models_Import_FileParser_TagTrait {
     }
 
     /**
-     * callback for replace method in parseSegment
-     * @param array $match
+     * replaces whitespace placeholder tags with internal tags
+     * @param string $segment
      * @return string
      */
-    protected function whitespaceTagReplacer(array $match) {
-        //$replacer = function($match) use ($segment, $shortTagIdent, $map) {
-        $tag = $match[0];
-        $tagName = preg_replace('"<([^/ ]*).*>"', '\\1', $tag);
-        if(!isset($this->_tagMapping[$tagName])) {
-            trigger_error('The used tag ' . $tagName .' is undefined! Segment: '.$this->_segment, E_USER_ERROR);
-        }
-        $fileNameHash = md5($this->_tagMapping[$tagName]['imgText']);
-        
-        //generate the html tag for the editor
-        $p = $this->getTagParams($tag, $this->shortTagIdent++, $tagName, $fileNameHash);
-        $tag = $this->_singleTag->getHtmlTag($p);
-        $this->_singleTag->createAndSaveIfNotExists($this->_tagMapping[$tagName]['imgText'], $fileNameHash);
-        $this->_tagCount++;
-        return $tag;
+    protected function whitespaceTagReplacer($segment) {
+        return preg_replace_callback($this->whitespaceTagList, function($match) use ($segment) {
+            $tag = $match[0];
+            $tagName = preg_replace('"<([^/ ]*).*>"', '\\1', $tag);
+            if(!isset($this->_tagMapping[$tagName])) {
+                trigger_error('The used tag ' . $tagName .' is undefined! Segment: '.$segment, E_USER_ERROR);
+            }
+            $fileNameHash = md5($this->_tagMapping[$tagName]['imgText']);
+            
+            //generate the html tag for the editor
+            $p = $this->getTagParams($tag, $this->shortTagIdent++, $tagName, $fileNameHash);
+            $tag = $this->_singleTag->getHtmlTag($p);
+            $this->_singleTag->createAndSaveIfNotExists($this->_tagMapping[$tagName]['imgText'], $fileNameHash);
+            return $tag;
+        }, $segment);
     }
     
     /**
@@ -126,5 +178,55 @@ trait editor_Models_Import_FileParser_TagTrait {
                     ' has not the structure of a tag.', E_USER_ERROR);
         }
         return implode('', unpack('H*', $tagContent));
+    }
+    
+    /**
+     * protects whitespace inside a segment with a tag
+     *
+     * @param string $segment
+     * @return string $segment
+     */
+    protected function parseSegmentProtectWhitespace($segment) {
+        $split = preg_split('#(<[^>]+>)#', $segment, null, PREG_SPLIT_DELIM_CAPTURE);
+        
+        $i = 0;
+        foreach($split as $idx => $chunk) {
+            if($i++ % 2 === 1 || strlen($chunk) == 0) {
+                //ignore found tags in the content or empty chunks
+                continue; 
+            }
+            
+            $split[$idx] = $this->protectWhitespace($chunk);
+        }
+        return join($split);
+    }
+    
+    /**
+     * protects all whitespace and special characters coming from the import formats
+     * @param string $textNode should not contain tags, since special characters in the tag content would also be protected then 
+     */
+    protected function protectWhitespace($textNode) {
+        //replace only on real text
+        $textNode = str_replace($this->protectedWhitespaceMap['search'], $this->protectedWhitespaceMap['replace'], $textNode);
+        
+        //protect multispaces
+        $textNode = preg_replace_callback('" ( +)"', function ($match) {
+            //Pay attention to the leading space on refactoring!
+            return ' '.$this->makeInternalSpace($match[1]);
+        }, $textNode);
+        
+        $res = preg_replace_callback($this->protectedUnicodeList, function ($match) {
+            return $this->makeInternalSpace($match[0]);
+        }, $segment);
+        return $res;
+    }
+    
+    /**
+     * Creates the internal Space tag
+     * @param string $toBeProtected
+     * @return string
+     */
+    protected function makeInternalSpace($toBeProtected) {
+        return '<space ts="' . implode(',', unpack('H*', $toBeProtected)) . '"/>';
     }
 }

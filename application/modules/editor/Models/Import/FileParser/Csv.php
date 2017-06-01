@@ -42,6 +42,7 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParser {
     use editor_Models_Import_FileParser_TagTrait {
         getTagParams as protected traitGetTagParams;
+        parseSegmentProtectWhitespace as protected traitParseSegmentProtectWhitespace;
     }
     
     /**
@@ -75,11 +76,6 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      * @var string 
      */
     protected $_enclosure;
-    
-    /**
-     * @var integer
-     */
-    protected $segmentTagCounter = 1;
     
     /**
      * @var boolean
@@ -365,9 +361,8 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         if(strpos($segment, $this->placeholderCSV)!==false){
             throw new ZfExtended_Exception('The string $this->placeholderCSV ('.$this->placeholderCSV.') had been present in the segment before parsing it. This is not allowed.');
         }
-        $this->segmentTagCounter = 1;
+        $this->shortTagIdent = 1;
         
-        $count = 0;
         //at first protect MQM - they will be converted to MQM-tags later by MqmParser
         //for performance reasons only do this, if escaping MQM is necessary for later protections
         if(strpos($segment, '<mqm:')!==false){
@@ -382,7 +377,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         // protect regExes
         $segment = $this->parseSegmentRegEx($segment,  $this->replaceRegularExpressionsAfterTagParsing);
         
-        $segment = $this->parseSegmentProtectWhitespace($segment, $count);
+        $segment = $this->parseSegmentProtectWhitespace($segment);
         
         //encodes the html special characters, so that our frontend can deal with them
         $segment = htmlspecialchars($segment, ENT_NOQUOTES);
@@ -393,23 +388,12 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      * protects whitespace inside a segment with a tag
      *
      * @param string $segment
-     * @param integer $count optional, variable passed by reference stores the replacement count
      * @return string $segment
      */
-    protected function parseSegmentProtectWhitespace($segment, &$count = 0) {
-        $segment = parent::parseSegmentProtectWhitespace($segment, $count);
+    protected function parseSegmentProtectWhitespace($segment) {
+        $segment = $this->traitParseSegmentProtectWhitespace($segment);
         //In CSV we have to directly replace our whitespace tags with their HTML replacement
-        $search = array(
-            '#<hardReturn/>#',
-            '#<softReturn/>#',
-            '#<macReturn/>#',
-            '#<space ts="[^"]*"/>#'
-        );
-        
-        //set data needed by $this->whitespaceTagReplacer
-        $this->shortTagIdent = $this->segmentTagCounter;
-        $this->_segment = $segment;
-        $segment = preg_replace_callback($search, array($this,'whitespaceTagReplacer'), $segment);
+        $segment = $this->whitespaceTagReplacer($segment);
         $segment = $this->parseSegmentInsertPlaceholders($segment,$this->regexInternalTags);
         return $segment;
     }
@@ -464,7 +448,6 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      * @see TRANSLATE-659
      */
     protected function getTagParams($tag, $shortTag, $tagId, $fileNameHash, $text = false) {
-        $this->_tagCount = $shortTag;
         return $this->traitGetTagParams($tag, $shortTag, $tagId, $fileNameHash, $text);
     }
     
@@ -488,7 +471,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
                 $tagType = 'pairedTag';
             }
             
-            $element->wrap('<'.$tagType.'_'.$this->segmentTagCounter++.' data-tagname="'.$element->tag().'" />');
+            $element->wrap('<'.$tagType.'_'.$this->shortTagIdent++.' data-tagname="'.$element->tag().'" />');
         }
         $r= $tempXml->find('segment')->innerXml();
         
@@ -507,7 +490,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             if (!in_array($tagName, $this->html5Tags)) {
                 return $matches[0];
             }
-            $tagId = $this->segmentTagCounter++;
+            $tagId = $this->shortTagIdent++;
             $tag = $matches[0];
             $fileNameHash = md5($tag);
             
@@ -617,7 +600,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             if(strpos($tag, $this->placeholderCSV)!==false){
                 return $tag;
             }
-            $tagId = $this->segmentTagCounter++;
+            $tagId = $this->shortTagIdent++;
             $fileNameHash = md5($tag);
             $p = array(
                 'class' => implode('', unpack('H*', $tag)),

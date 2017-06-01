@@ -40,10 +40,6 @@ END LICENSE AND COPYRIGHT
  */
 abstract class editor_Models_Import_FileParser {
     /**
-     * @var integer Counter of tags used in a segment.
-     */
-    protected $_tagCount = 1;
-    /**
      * @var string
      */
     protected $_origFile = NULL;
@@ -194,46 +190,6 @@ abstract class editor_Models_Import_FileParser {
     public function setSegmentFieldManager(editor_Models_SegmentFieldManager $sfm) {
         $this->segmentFieldManager = $sfm;
         $this->initDefaultSegmentFields();
-    }
-    
-    /**
-     * protects whitespace inside a segment with a tag
-     *
-     * @param string $segment
-     * @param integer $count optional, variable passed by reference stores the replacement count
-     * @return string $segment
-     */
-    protected function parseSegmentProtectWhitespace($segment, &$count = 0) {
-        $split = preg_split('#(<[^>]+>)#', $segment, null, PREG_SPLIT_DELIM_CAPTURE);
-        $search = array(
-          "\r\n",  
-          "\n",  
-          "\r"
-        );
-        $replace = array(
-          '<hardReturn/>',
-          '<softReturn/>',
-          '<macReturn/>'
-        );
-        $i = 0;
-        foreach($split as $idx => $chunk) {
-            if($i++ % 2 === 1 || strlen($chunk) == 0) {
-                //ignore found tags in the content or empty chunks
-                continue; 
-            }
-            //replace only on real text
-            $chunk = str_replace($search, $replace, $chunk, $returnCount);
-            $count += $returnCount;
-            
-            $replacer = function ($match) {
-                            return ' <space ts="' . implode(',', unpack('H*', $match[1])) . '"/>';
-                        };
-            
-            //protect multispaces
-            $split[$idx] = preg_replace_callback('" ( +)"', $replacer, $chunk, -1, $spaceCount);
-            $count += $spaceCount;
-        }
-        return join($split);
     }
     
     /**

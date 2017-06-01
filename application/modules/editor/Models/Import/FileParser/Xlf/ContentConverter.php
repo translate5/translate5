@@ -56,12 +56,6 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     protected $innerTag;
     
     /**
-     * counter for internal tags
-     * @var integer
-     */
-    protected $shortTagIdent = 1;
-    
-    /**
      * store the filename of the imported file for debugging reasons
      * @var string
      */
@@ -142,24 +136,9 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     public function handleText($text) {
         //we have to decode entities here, otherwise our generated XLF wont be valid 
         $text = html_entity_decode($text, ENT_XML1);
-        $text = $this->parseSegmentProtectWhitespace($text);
+        $text = $this->protectWhitespace($text);
+        $text = $this->whitespaceTagReplacer($text);
         $this->result[] = $text;
-        
-        //FIXME must be moved into the trait - whitespace unification must be done before! 
-        
-        //FIXME
-        return;
-        // Other replacement
-        $search = array(
-                '#<hardReturn/>#',
-                '#<softReturn/>#',
-                '#<macReturn/>#',
-                '#<space ts="[^"]*"/>#',
-        );
-        
-        //set data needed by $this->whitespaceTagReplacer
-        $this->_segment = $subsegment;
-        $subsegment = preg_replace_callback($search, array($this,'whitespaceTagReplacer'), $subsegment);
     }
     
     public function handlePhTagText($text) {
