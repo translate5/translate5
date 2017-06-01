@@ -58,18 +58,8 @@ class editor_Plugins_GlobalesePreTranslation_Init extends ZfExtended_Plugin_Abst
     }
     
     protected function initEvents() {
-        // event-listeners
-        //$this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterTaskImport'),10);
-        // just access the 
-       
         $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
-        
-        //Confluence example for events
         $this->eventManager->attach('editor_TaskController', 'afterPostAction', array($this, 'handleAfterTaskControllerPostAction'),10);
-        
-        // $sess = new Zend_Session_Namespace('GlobalessePretranslation');
-        // $sess->data = data received from GUI
-        // then save it in task meta (search for examples) 
     }
     
     /**
@@ -121,7 +111,6 @@ class editor_Plugins_GlobalesePreTranslation_Init extends ZfExtended_Plugin_Abst
         
         $globaleseSession = new Zend_Session_Namespace('GlobalesePreTranslation');
         
-        // you will able to acces the session here directly!
         //send the parametars from the session in the workier init method parametar
         $sessionParametars = null;
         

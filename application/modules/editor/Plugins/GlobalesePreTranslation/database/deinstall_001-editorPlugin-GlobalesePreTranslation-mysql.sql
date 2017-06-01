@@ -37,9 +37,6 @@ DELETE FROM `Zf_configuration`
 WHERE `name` = 'runtimeOptions.plugins.GlobalesePreTranslation.api.username';
 
 DELETE FROM `Zf_configuration` 
-WHERE `name` = 'runtimeOptions.plugins.GlobalesePreTranslation.api.password';
-
-DELETE FROM `Zf_configuration` 
 WHERE `name` = 'runtimeOptions.plugins.GlobalesePreTranslation.api.apiKey';
 
 DELETE FROM `Zf_configuration` 
