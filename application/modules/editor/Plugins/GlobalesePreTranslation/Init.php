@@ -59,8 +59,17 @@ class editor_Plugins_GlobalesePreTranslation_Init extends ZfExtended_Plugin_Abst
     
     protected function initEvents() {
         // event-listeners
-        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterTaskImport'),10);
+        //$this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterTaskImport'),10);
+        // just access the 
+       
         $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
+        
+        //Confluence example for events
+        $this->eventManager->attach('editor_TaskController', 'afterPostAction', array($this, 'handleAfterTaskControllerPostAction'),10);
+        
+        // $sess = new Zend_Session_Namespace('GlobalessePretranslation');
+        // $sess->data = data received from GUI
+        // then save it in task meta (search for examples) 
     }
     
     /**
@@ -76,6 +85,25 @@ class editor_Plugins_GlobalesePreTranslation_Init extends ZfExtended_Plugin_Abst
                 'editor' => array('plugins_globalesepretranslation_globalese',),
         ));
         $r->addRoute('plugins_globalesepretranslation_restdefault', $restRoute);
+        
+        $groupsRoute = new ZfExtended_Controller_RestLikeRoute(
+                'editor/plugins_globalesepretranslation_globalese/groups',
+                array(
+                        'module' => 'editor',
+                        'controller' => 'plugins_globalesepretranslation_globalese',
+                        'action' => 'groups'
+                ));
+        $r->addRoute('plugins_globalesepretranslation_groups', $groupsRoute);
+        
+        
+        $enginesRoute = new ZfExtended_Controller_RestLikeRoute(
+                'editor/plugins_globalesepretranslation_globalese/engines',
+                array(
+                        'module' => 'editor',
+                        'controller' => 'plugins_globalesepretranslation_globalese',
+                        'action' => 'engines'
+                ));
+        $r->addRoute('plugins_globalesepretranslation_engines', $enginesRoute);
     }
     
     public function injectFrontendConfig(Zend_EventManager_Event $event) {
@@ -83,19 +111,41 @@ class editor_Plugins_GlobalesePreTranslation_Init extends ZfExtended_Plugin_Abst
         /* @var $view Zend_View_Interface */
         $view->Php2JsVars()->set('plugins.GlobalesePreTranslation.api.username', $this->getConfig()->api->username);
         $view->Php2JsVars()->set('plugins.GlobalesePreTranslation.api.password', $this->getConfig()->api->password);
+        $view->Php2JsVars()->set('plugins.GlobalesePreTranslation.api.apiKey', $this->getConfig()->api->apiKey);
     }
     
-    public function handleAfterTaskImport(Zend_EventManager_Event $event) {
+    
+    public function handleAfterTaskControllerPostAction(Zend_EventManager_Event $event) {
         $worker = ZfExtended_Factory::get('editor_Plugins_GlobalesePreTranslation_Worker');
         /* @var $worker editor_Plugins_GlobalesePreTranslation_Worker */
         
-        $task = $event->getParam('task');
+        $globaleseSession = new Zend_Session_Namespace('GlobalesePreTranslation');
+        
+        // you will able to acces the session here directly!
+        //send the parametars from the session in the workier init method parametar
+        $sessionParametars = null;
+        
+        $task = $event->getParam('entity');
+        
+        $workerDb = new ZfExtended_Models_Db_Worker();
+        $row = $workerDb->fetchRow([
+                'taskGuid = ?' => $task->getTaskGuid(),
+                'worker = ?' => 'editor_Models_Import_Worker',
+        ]);
+        
+        $parentWorkerId = $row->id;
+        $params=[
+                'group'=>$globaleseSession->group,
+                'engine'=>$globaleseSession->engine,
+                'apiUsername'=>$globaleseSession->apiUsername,
+                'apiKey'=>$globaleseSession->apiKey,
+        ];
         
         // init worker and queue it
-        if (!$worker->init($task->getTaskGuid(), [])) {
+        if (!$worker->init($task->getTaskGuid(), $params)) {
             $this->log->logError('GlobalesePreTranslation-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }
-        $worker->queue($event->getParam('parentWorkerId'));
+        $worker->queue($parentWorkerId);
     }
 }

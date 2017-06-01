@@ -40,20 +40,13 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.globaleseAuthPanel',
-    
-/*    listen: {
-        controller: {
-            taskOverviewController:{
-                taskWindowNextClick:'onTaskWindowNextClick'
-            }
-        }
 
-//here listen on the continue button
-//probably i need to fire a event in TaskOverVeiw controller, for the continue click, and then listen on the controller like i did it for taskWindowNextClick 
-//pressing skip button triggers event cardfinished with integer paremter 2
-//pressing next button triggers event cardfinished with integer paremter 1
+    strings:{
+        noEnginesFoundMsg:'#UT#No Globalese translation engine for the current language combination available for your username. Please change the username or skip Globalese pre-translation',
+        noGroupsFoundMsg:'#UT#No groups found for curren user.',
+        groupsErrorMsg:'#UT#Globalese username and password combination is not valid.',
+        enginesErrorMsg:'#UT#Error on engines search.',
     },
-  */
     
     onAuthPanelBeforeRender:function(panel,eOpts){
         this.initFieldDefaultValues();
@@ -65,7 +58,7 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
             username=view.down('#apiUsername'),
             password=view.down('#apiPassword'),
             configUsername=Editor.data.plugins.GlobalesePreTranslation.api.username,
-            configPassword=Editor.data.plugins.GlobalesePreTranslation.api.password;
+            configPassword=Editor.data.plugins.GlobalesePreTranslation.api.apiKey;
         
         if(configUsername && configUsername!=""){
             username.setValue(configUsername);
@@ -82,76 +75,129 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
         var me=this,
             view=me.getView(),
             username=view.down('#apiUsername'),
-            password=view.down('#apiPassword'),
-            skipPretranslation=view.down('#skipPretranslation');
-        
-        if(skipPretranslation.getValue()){
-            view.fireEvent('wizardCardSkiped');
-        }
+            password=view.down('#apiPassword');
         
         if(username.getValue()!="" && password.getValue()!=""){
-            me.getEngine(view);
+            me.getGroups(view);
         }
     },
+    
+    handleSkipCardClick:function(){
+        var me=this,
+            view=me.getView();
+        view.fireEvent('wizardCardFinished',2);
+    },
+    
     /***
      * get the engines for the selected user, and the provided language combination
      */
-    getEngine:function(view){
+    getEngines:function(view){
         //if there are no results, or the auth failed, show info message
         
         //this.nextWizardWindow(winLayout,nextItem);
         //return;
-        
-        var 
-            //str = me.strings,
-            //params = {},
-            //method = 'DELETE',
-            url = Editor.data.restpath+'plugins_globalesepretranslation_globalese';
-            //checkedData = Ext.JSON.encode({
-            //    tmmtId: record.get('id'),
-            //    taskGuid: me.actualTask.get('taskGuid'),
-            //    segmentsUpdateable: record.get('segmentsUpdateable')
-            //});
-    
-        //if(record.get('checked')) {
-        //    method = record.get('taskassocid') ? 'PUT' : 'POST';
-        //    params = {data: checkedData};
-        //}
-        //if(method != 'POST') {
-        //    url = url + '/'+record.get('taskassocid');
-        //}
+        var me=this,
+            view=me.getView(),
+            window=view.up('window'),
+            sourceLangValue=window.down('combo[name="sourceLang"]').getValue(),
+            targetLangValue=window.down('combo[name="targetLang"]').getValue(),
+            apiusername=view.down('#apiUsername').getValue(),
+            apipassword=view.down('#apiPassword').getValue(),
+            globaleseEngine=window.down('#globaleseEngine'),
+            url = Editor.data.restpath+'plugins_globalesepretranslation_globalese/engines',
+            params = {},
+            paramsData = Ext.JSON.encode({
+                username: apiusername,
+                apiKey: apipassword,
+                sourceLang:sourceLangValue,
+                targetLang:targetLangValue
+            }),
+            params = {data: paramsData};
         
         Ext.Ajax.request({
             url:url,
             method: 'GET',
-            //params: {},
+            params: params,
             success: function(response){
-                //this event shuld be fiered after the engines are found, and users also (this here will switch to the last window)
+                var responsData = JSON.parse(response.responseText);
+                if(!responsData){
+                    Editor.MessageBox.addInfo(me.strings.noEnginesFoundMsg, 1.4);
+                }
+                var engines = Ext.create('Ext.data.Store', {
+                    fields: [
+                        {name: 'id', type: 'int'},
+                        {name: 'name',  type: 'string'},
+                        {name: 'group',  type: 'int'},
+                        {name: 'source',  type: 'string'},
+                        {name: 'target',  type: 'string'},
+                        {name: 'status',  type: 'string'},
+                    ],
+                    data : responsData.rows
+                });
+                globaleseEngine.setStore(engines);
                 view.fireEvent('wizardCardFinished');
+                window.setLoading(false);
+                return;
             },
             failure: function(response){
-                console.log('failure',response);
+                window.setLoading(false);
+                Editor.MessageBox.addError(me.strings.enginesErrorMsg);
             } 
         });
     },
     /***
      * get the groups for the selected user
      */
-    getGroups:function(winLayout,nextItem){
-      //if there are no results, or the auth failed, show info message
-    },
-    
-    nextWizardWindow:function(winLayout,nextItem){
-        winLayout.setActiveItem(nextItem);
-    },
-    
-    isSetActive:function(activeItemId,actuelItem){
-        var active = activeItemId.match(/\d+$/)[0],
-            current=actuelItem.match(/\d+$/)[0];
+    getGroups:function(view){
         
-        return active<current;
+        var me=this,
+            view=me.getView(),
+            window=view.up('window'),
+            apiusername=view.down('#apiUsername').getValue(),
+            apipassword=view.down('#apiPassword').getValue(),
+            globaleseGroup=window.down('#globaleseGroup'),
+            url = Editor.data.restpath+'plugins_globalesepretranslation_globalese/groups';
+        
+            window.setLoading(true);
+            
+            //str = me.strings,
+            params = {},
+            authData = Ext.JSON.encode({
+                username: apiusername,
+                apiKey: apipassword,
+            }),
+            params = {data: authData};
+        
+        Ext.Ajax.request({
+            url:url,
+            method: 'GET',
+            params: params,
+            success: function(response){
+                var responseObject = JSON.parse(response.responseText);
+                if(responseObject && responseObject.rows){
+                    var groups = Ext.create('Ext.data.Store', {
+                        fields: [
+                            {name: 'id', type: 'int'},
+                            {name: 'name',  type: 'string'},
+                        ],
+                        data : responseObject.rows
+                    });
+                    globaleseGroup.setStore(groups);
+                    me.getEngines();
+                    return;
+                }
+                
+                Editor.MessageBox.addInfo(me.strings.noGroupsFoundMsg, 1.4);
+                
+                //this event shuld be fiered after the engines are found, and users also (this here will switch to the last window)
+                //view.fireEvent('wizardCardFinished');
+            },
+            failure: function(response){
+                window.setLoading(false);
+                Editor.MessageBox.addError(me.strings.groupsErrorMsg);
+            } 
+        });
     }
-    
 });
 
 

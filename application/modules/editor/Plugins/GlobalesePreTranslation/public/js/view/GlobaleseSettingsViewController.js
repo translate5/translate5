@@ -41,22 +41,78 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettingsViewCon
     extend: 'Ext.app.ViewController',
     alias: 'controller.globaleseSettingsPanel',
     
+    onGlobaleseGroupChange:function(field,newValue,oldValue,eOpts){
+        var me=this,
+            view=me.getView(),
+            globaleseEngine=view.down('#globaleseEngine');
+        if(globaleseEngine.isDisabled()){
+            globaleseEngine.setDisabled(false);
+        }
+        
+        globaleseEngine.setValue(null);
+        
+        globaleseEngine.getStore().filter('group',newValue);
+        
+        if(globaleseEngine.getStore().getCount()==1){
+            globaleseEngine.setValue(globaleseEngine.getStore().getAt(0));
+        }
+    },
+    
     handleNextCardClick:function(){
         var me=this,
             view=me.getView();
-        
-        if(!me.isFieldsValid){
-            return;
-        }
-        
-        view.fireEvent('wizardCardFinished');
+        me.isFieldsValid();
     },
     
-    isFieldsValid:function(winLayout,actuelItem){
-        var fieldsAreValid=true;
+    handleSkipCardClick:function(){
+        var me=this,
+            view=me.getView();
+        view.fireEvent('wizardCardFinished',1);
+    },
+    
+    isFieldsValid:function(){
+        var me=this,
+            view=me.getView(),
+            globaleseEngine=view.down('#globaleseEngine'),
+            globaleseGroup=view.down('#globaleseGroup');
         
-        console.log("validate the combo boxes, if thay are valid finish the card")
-        return fieldsAreValid;
+        if(globaleseEngine.isValid() && globaleseGroup.isValid()){
+            me.saveParamsInSession();
+        }
+    },
+    
+    saveParamsInSession:function(){
+        var me=this,
+            view=me.getView(),
+            win=view.up('window'),
+            apiusername=win.down('#apiUsername').getValue(),
+            apipassword=win.down('#apiPassword').getValue(),
+            globaleseEngine=view.down('#globaleseEngine').getValue(),
+            globaleseGroup=view.down('#globaleseGroup').getValue(),
+            url = Editor.data.restpath+'plugins_globalesepretranslation_globalese';
+        
+            //str = me.strings,
+            params = {},
+            sessionData = Ext.JSON.encode({
+                apiUsername: apiusername,
+                apiKey: apipassword,
+                group:globaleseGroup,
+                engine:globaleseEngine
+            }),
+            params = {data: sessionData};
+        
+        Ext.Ajax.request({
+            url:url,
+            method: 'POST',
+            params: params,
+            success: function(response){
+                win.importTaskMessage=view.strings.importTaskMessage;
+                view.fireEvent('wizardCardFinished');
+            },
+            failure: function(response){
+                console.log(response);
+            } 
+        });
     }
 });
 

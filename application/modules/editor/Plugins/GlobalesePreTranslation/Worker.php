@@ -71,7 +71,10 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        return empty($parameters);
+        if(empty($parameters['group']) || empty($parameters['engine']) || empty($parameters['apiUsername']) || empty($parameters['apiKey'])) {
+            throw new ZfExtended_Exception('Missing parameters for group,engine,apiUsername or apiKey');
+        }
+        return true;
     } 
     
     /**
@@ -79,16 +82,32 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
+        //then you can access $this->parameters with your data
+        
+        $params = $this->workerModel->getParameters();
+        //error_log(print_r("session parameters -> ".$this->parameters,1));
+        
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         $this->segmentFieldManager->initFields($this->taskGuid);
         
         // we operate only on one project, so one connector instance is enough
         $this->api = ZfExtended_Factory::get('editor_Plugins_GlobalesePreTranslation_Connector');
         
+        $this->api->setAuth($params['apiUsername'], $params['apiKey']);
+        $this->api->setEngine($params['engine']);
+        $this->api->setGroup($params['group']);
+        
+        $langModel = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $langModel editor_Models_Languages */
+        $this->api->setSourceLang($langModel->loadLangRfc5646($this->task->getSourceLang()));
+        
+        $this->api->setTargetLang($langModel->loadLangRfc5646($this->task->getTargetLang()));
+        
         $this->createGlobaleseProject();
         $this->processSegments();
         $this->importRemainingFiles();
         $this->removeGlobaleseProject();
+        
         return true;
     }
     
@@ -117,7 +136,6 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
                     //file changed, save stored segments as xliff
                     $this->convertAndPreTranslate($xliffConverter, $fileId, $oneFileSegments);
                 }
-                
                 //new file
                 $oneFileSegments = [];
                 $fileId = (int) $segment->getFileId();
@@ -148,7 +166,7 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
         //FIXME check if $globFileId can contain 0 as a valid ID (I dont think so) 
         // if 0 will be a valid ID then this if must check for not null and not false
         if($globFileId) {
-            $this->reImportFinished($globFileId);
+            $this->reImportTranslated($globFileId);
         }
     }
     
@@ -162,16 +180,17 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
                 $this->logplugin("Waiting for more translated files");
                 sleep(5);
             } else {
-                $this->reImportFinished($globFileId);
+                $this->reImportTranslated($globFileId);
             }
             $globFileId = $this->api->getFirstTranslated();
-        } 
+        }
     }
     
     /**
      * get and reimport the given translated xlf
+     * 
      */
-    protected function reImportFinished($globFileId) {
+    protected function reImportTranslated($globFileId) {
         $translatedXlf = $this->api->getFileContent($globFileId);
         //FIXME check if it does exist in the map
         $fileId = $this->fileIdMap[$globFileId];

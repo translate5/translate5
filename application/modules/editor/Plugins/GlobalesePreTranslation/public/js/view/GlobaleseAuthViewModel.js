@@ -1,4 +1,4 @@
-<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -22,35 +22,25 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-/**
- * Diese Klasse muss mittels factoryOverwrites überschrieben werden,
- * da die Herkunft der Sprachinformationen nicht Teil des Editor-Moduls ist,
- * sondern vom Default-Modul gestellt werden muss.
- *
- * @method string getRfc5646() getRfc5646()
- * @method int getLcid() getLcid()
- * @method int getId() getId()
- */
-class editor_Models_Languages extends ZfExtended_Languages {
-	protected $dbInstanceClass = 'editor_Models_Db_Languages';
-	
-	/***
-     * Return language rfc5646 value for given language id
-     * @param int $langId
-     * @return string
-     */
-    public function loadLangRfc5646($langId){
-       return parent::loadLangRfc5646($langId);
+Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewModel', {
+    extend: 'Ext.app.ViewModel',
+    alias: 'viewmodel.globaleseAuthPanel',
+
+    requires: [
+        'Ext.app.bind.Formula'
+    ],
+    
+    activeItem: null,
+    
+    formulas: {
+        isAddTaskButton: function(get) {
+            get('activeItem').handleButtons();
+        }
     }
-}
+
+});

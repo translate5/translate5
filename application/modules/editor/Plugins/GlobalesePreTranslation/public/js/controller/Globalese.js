@@ -44,13 +44,6 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.controller.Globalese', {
       'Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettings',
       'Editor.view.admin.TaskAddWindow'
       ],
-  //models: ['Editor.plugins.MatchResource.model.EditorQuery','Editor.plugins.MatchResource.model.TaskAssoc'],
-  //requires: ['Editor.util.SegmentContent'],
-  
-  //refs : [{
-  //    ref: 'taskAddWindow',
-  //    selector: '#adminTaskAddWindow'
-  //}],
   
   listen: {
       component: {
@@ -60,14 +53,11 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.controller.Globalese', {
       }
   },
   onAdminTaskWindowRender:function(window,eOpts){
-      window.insert(1,{
-          xtype:'globaleseAuthPanel',
-          itemId:'step-2'
-      });
-      
-      window.insert(2,{
-          xtype:'globaleseSettingsPanel',
-          itemId:'step-3'
+      window.insertImport({
+          xtype:'globaleseAuthPanel'
+      });      
+      window.insertImport({
+              xtype:'globaleseSettingsPanel'    
       });
   }
 });

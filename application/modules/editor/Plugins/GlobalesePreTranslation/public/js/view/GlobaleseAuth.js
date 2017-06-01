@@ -40,47 +40,68 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuth', {
     extend:'Ext.panel.Panel',
     alias: 'widget.globaleseAuthPanel',
+    controller: 'globaleseAuthPanel',
     requires: [
         'Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewController'
     ],
     mixins:['Editor.controller.admin.IWizardCard'],
-    controller: 'globaleseAuthPanel',
     listeners: {
         beforerender: 'onAuthPanelBeforeRender'
     },
     strings:{
         skipPreTranslation:'#UT#Skip Globalese pre-translation',
-        username:'#UT#Username',
-        password:'#UT#Password',
+        username:'#UT#API Username',
+        apiKey:'#UT#API Key',
         wizardTitle:'#UT#Globalese authentication'
     },
     initConfig: function(instanceConfig) {
         var me = this,
-        config = {
-                defaults: {
-                    padding: '20 0 0 20'
-                },
-                items: [{
-                    xtype: 'textfield',
-                    fieldLabel: me.strings.username,
-                    itemId:'apiUsername',
-                },{
-                    xtype: 'textfield',
-                    fieldLabel:me.strings.password,
-                    itemId:'apiPassword'
-                },{
-                    xtype:'checkbox',
-                    itemId:'skipPretranslation',
-                    fieldLabel:me.strings.skipPreTranslation,
-                }]
-        };
+            config = {
+                    defaults: {
+                        padding: '20 0 0 20'
+                    },
+                    items: [{
+                        xtype: 'textfield',
+                        fieldLabel: me.strings.username,
+                        itemId:'apiUsername',
+                    },{
+                        xtype: 'textfield',
+                        fieldLabel:me.strings.apiKey,
+                        itemId:'apiPassword',
+                        width:380
+                    }]
+            };
+        
+        me.importType='postimport';
+        
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([ config ]);
     },
+    
     triggerNextCard:function(activeItem){
         this.getController().handleNextCardClick();
+    },
+    
+    triggerSkipCard:function(activeItem){
+        this.getController().handleSkipCardClick();
+    },
+    
+    disableSkipButton:function(){
+        return false;
+    },
+    
+    disableContinueButton:function(){
+        return false;
+    },
+    
+    disableAddButton:function(){
+        return true;
+    },
+    
+    disableCancelButton:function(){
+        return false;
     }
     
 });
