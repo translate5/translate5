@@ -286,6 +286,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->data = $this->getAllParams();
         settype($this->data['wordCount'], 'integer');
         settype($this->data['enableSourceEditing'], 'integer');
+        settype($this->data['edit100PercentMatch'], 'integer');
         settype($this->data['lockLocked'], 'integer');
         $this->data['pmGuid'] = $this->user->data->userGuid;
         $pm = ZfExtended_Factory::get('ZfExtended_Models_User');
