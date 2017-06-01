@@ -76,6 +76,10 @@ class editor_Plugins_GlobalesePreTranslation_SegmentUpdateProcessor extends edit
         $target = $this->sfm->getFirstTargetName();
         $mid = $parser->getMid(); //this is our segmentNrInTask
         
+        //the XLF import adds the segmentNrInTask to the real mid, since the real mid could not be unique in the XLF
+        $mid = explode('_', $mid);
+        $mid = end($mid);
+        
         try {
             $this->segment->loadBySegmentNrInTask($mid, $this->segment->getTaskGuid());
         } catch(ZfExtended_Models_Entity_NotFoundException $e) {

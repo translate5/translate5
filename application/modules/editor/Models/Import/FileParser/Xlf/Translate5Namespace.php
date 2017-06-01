@@ -35,19 +35,24 @@ END LICENSE AND COPYRIGHT
 
 
 /**
- * XLF Fileparser Add On to parse IBM XLF specific stuff
+ * XLF Fileparser Add On to parse Translate5 XLF specific stuff
  */
-class editor_Models_Import_FileParser_Xlf_TmgrNamespace implements editor_Models_Import_FileParser_Xlf_INamespace{
-    const IBM_XLIFF_NAMESPACE = 'xmlns:tmgr="http://www.ibm.com"';
-
+class editor_Models_Import_FileParser_Xlf_Translate5Namespace implements editor_Models_Import_FileParser_Xlf_INamespace{
+    const TRANSLATE5_XLIFF_NAMESPACE = 'xmlns:translate5="http://www.translate5.net/"';
+    
+    /**
+     * Internal tagmap
+     * @var array
+     */
+    protected $tagMap = [];
+    
     /**
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_INamespace::transunitAttributes()
      */
     public function transunitAttributes(array $attributes, editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes) {
-        //FIXME add match rate infos into our matchRateType field!
-        settype($attributes['tmgr:matchratio'], 'integer');
-        $segmentAttributes->matchRate = $attributes['tmgr:matchratio'];
+        //TODO parse:
+        //trans-unit id="7" translate5:autostateId="4" translate5:autostateText="not_translated">
     }
     
     /**
@@ -55,7 +60,28 @@ class editor_Models_Import_FileParser_Xlf_TmgrNamespace implements editor_Models
      * @see editor_Models_Import_FileParser_Xlf_INamespace::registerParserHandler()
      */
     public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser) {
-        //currently not needed
+        $this->tagMap = [];
+        $xmlparser->registerElement('translate5:tagmap', null, function($tag, $key, $opener) use ($xmlparser){
+            //get the content between the tagmap tags:
+            $storedTags = $xmlparser->getRange($opener['openerKey'] + 1, $key - 1, true);
+            $givenTagMap = unserialize(base64_decode($storedTags));
+            unset($storedTags);
+            $restoreTags = [];
+            foreach($givenTagMap as $bptKey => $data) {
+                $gTag = $data[0];
+                $originalTag = $data[1];
+                //we convert the tagMap to: 
+                // $this->tagMap[<g id="123">] = [<internalOpener>,<internalCloser>];
+                // $this->tagMap[<x id="321">] = <internalSingle>;
+                if(!empty($data[2])) {
+                    $closer = $data[2];
+                    $this->tagMap[$gTag] = [$originalTag, $givenTagMap[$closer][0]];
+                }
+                else {
+                    $this->tagMap[$gTag] = $originalTag;
+                }
+            }
+        });
     }
     
     /**
@@ -63,7 +89,8 @@ class editor_Models_Import_FileParser_Xlf_TmgrNamespace implements editor_Models
      * @see editor_Models_Import_FileParser_Xlf_INamespace::getPairedTag()
      */
     public function getPairedTag($xlfBeginTag, $xlfEndTag){
-        //currently not needed
+        //in the translate5 internal tag map everything is mapped by the opener only:
+        return $this->getSingleTag($xlfBeginTag);
     }
     
     /**
@@ -71,6 +98,9 @@ class editor_Models_Import_FileParser_Xlf_TmgrNamespace implements editor_Models
      * @see editor_Models_Import_FileParser_Xlf_INamespace::getSingleTag()
      */
     public function getSingleTag($xlfTag){
-        //currently not needed
+        if(empty($this->tagMap[$xlfTag])) {
+            return null;
+        }
+        return $this->tagMap[$xlfTag];
     }
 }

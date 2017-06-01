@@ -38,5 +38,30 @@ END LICENSE AND COPYRIGHT
  * XLF Fileparser Add On Interface
  */
 interface editor_Models_Import_FileParser_Xlf_INamespace {
+    /**
+     * Gives the Namespace class the ability to add custom handlers to the xmlparser
+     */
+    public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser);
+    
+    /**
+     * Provides a invocation for parsing custom trans-unit attributes
+     * @param array $attributes
+     * @param editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes
+     */
     public function transunitAttributes(array $attributes, editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes);
+    
+    /**
+     * Returns the Translate5 internal tag pair to the given XLF tag pair (<g>, <ept> etc..) from the internal tagmap stored in translate5 XLF
+     * @param string $xlfBeginTag
+     * @param string $xlfEndTag
+     * @return array the internal tag pair to the given xlf tag pair 
+     */
+    public function getPairedTag($xlfBeginTag, $xlfEndTag);
+    
+    /**
+     * Returns the Translate5 internal single tag to the given XLF single tag (<x>, <it> etc..) from the internal tagmap stored in translate5 XLF
+     * @param string $xlfTag
+     * @return array the internal tag to the given xlf single tag 
+     */
+    public function getSingleTag($xlfTag);
 }

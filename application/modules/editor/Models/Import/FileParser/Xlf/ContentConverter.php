@@ -68,8 +68,12 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     protected $task;
     
     /**
+     * @param array $namespaces
+     * @param editor_Models_Task $task for debugging reasons only
+     * @param string $filename for debugging reasons only
      */
-    public function __construct($namespaces, editor_Models_Task $task, $filename) {
+    public function __construct(editor_Models_Import_FileParser_Xlf_Namespaces $namespaces, editor_Models_Task $task, $filename) {
+        $this->namespaces = $namespaces;
         $this->task = $task;
         $this->filename = $filename;
         $this->initImageTags();
@@ -91,6 +95,9 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             $originalContent = $this->xmlparser->getRange($opener['openerKey'], $key, true);
             $this->result[] = $this->createSingleTag($tag, $this->xmlparser->join($this->innerTag), $originalContent);
         });
+        
+        $this->xmlparser->registerElement('x', null, [$this, 'handleXTag']);
+        $this->xmlparser->registerElement('g', [$this, 'handleGTagOpener'], [$this, 'handleGTagCloser']);
         
         $this->xmlparser->registerElement('', [$this, 'handleUnknown']); // → all other tags
         $this->xmlparser->registerOther([$this, 'handleText']);
@@ -133,16 +140,70 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         return $this->segments;
     }
     
+    /**
+     * default text handler
+     * @param string $text
+     */
     public function handleText($text) {
         //we have to decode entities here, otherwise our generated XLF wont be valid 
-        $text = html_entity_decode($text, ENT_XML1);
         $text = $this->protectWhitespace($text);
         $text = $this->whitespaceTagReplacer($text);
         $this->result[] = $text;
     }
     
+    /**
+     * Inner PH tag text handler
+     * @param string $text
+     */
     public function handlePhTagText($text) {
         $this->innerTag[] = $text;
+    }
+    
+    /**
+     * Handler for X tags
+     * @param string $tag
+     * @param integer $key
+     * @param array $opener
+     */
+    public function handleXTag($tag, $key, $opener) {
+        $single = $this->namespaces->getSingleTag($this->xmlparser->getChunk($key));
+        if(!empty($single)) {
+            $this->result[] = $single;
+        }
+        //FIXME if there is no tagMap result we have to convert the tag to an internal tag
+        //doing stuff like: $this->_singleTag->create($text);
+    }
+    
+    /**
+     * Handler for G tags
+     * @param string $tag
+     * @param integer $key
+     * @param array $opener
+     */
+    public function handleGTagOpener($tag, $attributes, $key) {
+        $result = $this->namespaces->getPairedTag($this->xmlparser->getChunk($key), null);
+        if(!empty($result)) {
+            $this->result[] = $result[0];
+        }
+        //FIXME if there is no tagMap result we have to convert the tag to an internal tag
+        //doing stuff like: $this->_singleTag->create($text);
+    }
+    
+    /**
+     * Handler for G tags
+     * @param string $tag
+     * @param integer $key
+     * @param array $opener
+     */
+    public function handleGTagCloser($tag, $key, $opener) {
+        $opener = $this->xmlparser->getChunk($opener['openerKey']);
+        $closer = $this->xmlparser->getChunk($key);
+        $result = $this->namespaces->getPairedTag($opener, $closer);
+        if(!empty($result)) {
+            $this->result[] = $result[1];
+        }
+        //FIXME if there is no tagMap result we have to convert the tag to an internal tag
+        //doing stuff like: $this->_singleTag->create($text);
     }
     
     /**
@@ -152,6 +213,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     public function handleUnknown($tag) {
         //below tags are given to the content converter, but they are known so far, just not handled by the converter
         switch ($tag) {
+            case 'x': //must also be added here, since handleUnknown is called for the x start tag call (we have only registered a closer) 
+            case 'g': //must also be added here, since handleUnknown is called for the x start tag call (we have only registered a closer) 
             case 'source':
             case 'target':
             case 'seg-source':

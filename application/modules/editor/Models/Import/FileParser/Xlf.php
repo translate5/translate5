@@ -123,6 +123,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $this->registerStructural();
         $this->registerMeta();
         $this->registerContent();
+        $this->namespaces->registerParserHandler($this->xmlparser);
         
         $parser->parse($this->_origFileUnicodeProtected);
         

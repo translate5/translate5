@@ -41,9 +41,13 @@ class editor_Models_Import_FileParser_Xlf_Namespaces implements editor_Models_Im
     protected $namespaces = [];
     
     public function __construct($xliff) {
-        //this code could be improved by moving the following checks into each namespace class and loop through the existing classes
+        //TODO this code could be improved by moving the following checks into each namespace class and loop through the existing classes
+        // instead of hardcoding the checks here
         if (strpos($xliff, editor_Models_Import_FileParser_Xlf_TmgrNamespace::IBM_XLIFF_NAMESPACE) !== false) {
             $this->namespaces['ibm'] = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_TmgrNamespace');
+        } 
+        if (strpos($xliff, editor_Models_Import_FileParser_Xlf_Translate5Namespace::TRANSLATE5_XLIFF_NAMESPACE) !== false) {
+            $this->namespaces['translate5'] = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_Translate5Namespace');
         } 
     }
     
@@ -53,9 +57,40 @@ class editor_Models_Import_FileParser_Xlf_Namespaces implements editor_Models_Im
      * @param editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes
      */
     public function transunitAttributes(array $attributes, editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes) {
-        foreach($this->namespaces as $namespace){
-            /* @var $namespace  editor_Models_Import_FileParser_Xlf_INamespace */
-            $namespace->transunitAttributes($attributes, $segmentAttributes);
+        $this->call(__FUNCTION__, func_get_args());
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see editor_Models_Import_FileParser_Xlf_INamespace::registerParserHandler()
+     */
+    public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser) {
+        $this->call(__FUNCTION__, func_get_args());
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see editor_Models_Import_FileParser_Xlf_INamespace::getPairedTag()
+     */
+    public function getPairedTag($xlfBeginTag, $xlfEndTag){
+        return $this->call(__FUNCTION__, func_get_args());
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see editor_Models_Import_FileParser_Xlf_INamespace::getSingleTag()
+     */
+    public function getSingleTag($xlfTag){
+        return $this->call(__FUNCTION__, func_get_args());
+    }
+    
+    protected function call($function, $arguments) {
+        foreach ($this->namespaces as $namespace){
+            $result = call_user_func_array([$namespace, $function], $arguments);
+            //if one of the callen namespace handlers produces a result, we return this and end the loop
+            if(!empty($result)) {
+                return $result;
+            }
         }
     }
 }
