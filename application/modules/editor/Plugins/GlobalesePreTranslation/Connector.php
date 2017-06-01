@@ -208,7 +208,7 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
     public function removeProject() {
         $url='projects/'.$this->globaleseProjectId;
         $http = $this->getHttpClient($url);
-        $result = $http->request('DELETE');
+        //$result = $http->request('DELETE');
     }
     
     /**
@@ -295,16 +295,16 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
     }
     
     /***
-     * Delete the file on globalese server
+     * Delete the file on globalese server, and removes the file from local stack
      * 
      * @param string $fileId
      */
     private function deleteFile($fileId){
         $url='translation-files/'.$fileId;
         $http = $this->getHttpClient($url);
-        $result = $http->request('DELETE');
+        //$result = $http->request('DELETE');
         
-        //remove the file from the local steck
+        //remove the file from the local stack
         $key = array_search($fileId, $this->globaleseFileIds);
         unset($this->globaleseFileIds[$key]);
     }

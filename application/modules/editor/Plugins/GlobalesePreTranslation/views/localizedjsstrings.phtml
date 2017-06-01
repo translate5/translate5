@@ -39,6 +39,7 @@ Editor.controller.Localizer.addPluginInit('globalesePreTranslation', function() 
             username:'<?php echo $this->translate->_("#UT#Username");?>',
             password:'<?php echo $this->translate->_("#UT#Password");?>',
             wizardTitle:'<?php echo $this->translate->_("#UT#Globalese authentication");?>',
+            apiKey:'<?php echo $this->translate->_("#UT#API Key");?>',
         }
     });
     
@@ -46,9 +47,11 @@ Editor.controller.Localizer.addPluginInit('globalesePreTranslation', function() 
         override: "Editor.plugins.GlobalesePreTranslation.view.GlobaleseSetting",
         strings: {
             wizardTitle:'<?php echo $this->translate->_("#UT#Globalese settings");?>',
+            nextButtonText:'<?php echo $this->translate->_("'#UT#Add Task'");?>',
             groupComboLabel:'<?php echo $this->translate->_("#UT#Globalese group");?>',
             engineComboLabel:'<?php echo $this->translate->_("#UT#Globalese engine");?>',
             emptyComboText:'<?php echo $this->translate->_("#UT#-- Please select --");?>',
+            importTaskMessage:'<?php echo $this->translate->_("#UT#Your task import is completed. Globalese pretranslation is in progres.");?>',
         }
     });
     

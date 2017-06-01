@@ -48,20 +48,6 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
         enginesErrorMsg:'#UT#Error on engines search.',
     },
     
-/*    listen: {
-        controller: {
-            taskOverviewController:{
-                taskWindowNextClick:'onTaskWindowNextClick'
-            }
-        }
-
-//here listen on the continue button
-//probably i need to fire a event in TaskOverVeiw controller, for the continue click, and then listen on the controller like i did it for taskWindowNextClick 
-//pressing skip button triggers event cardfinished with integer paremter 2
-//pressing next button triggers event cardfinished with integer paremter 1
-    },
-  */
-    
     onAuthPanelBeforeRender:function(panel,eOpts){
         this.initFieldDefaultValues();
     },
@@ -120,7 +106,6 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
             globaleseEngine=window.down('#globaleseEngine'),
             url = Editor.data.restpath+'plugins_globalesepretranslation_globalese/engines',
             params = {},
-            method = 'GET',
             paramsData = Ext.JSON.encode({
                 username: apiusername,
                 apiKey: apipassword,
@@ -150,7 +135,6 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
                     data : responsData.rows
                 });
                 globaleseEngine.setStore(engines);
-                //FIXME set the engines to the engines combo
                 view.fireEvent('wizardCardFinished');
                 window.setLoading(false);
                 return;
@@ -178,7 +162,6 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
             
             //str = me.strings,
             params = {},
-            method = 'GET',
             authData = Ext.JSON.encode({
                 username: apiusername,
                 apiKey: apipassword,
