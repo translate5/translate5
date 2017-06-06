@@ -69,25 +69,25 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         //get segment list
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
         
-        $this->assertCount(7, $segments);
+        $this->assertCount(10, $segments);
         
         //bulk check of all pretrans fields
         $pretrans = array_map(function($item){
             return $item->pretrans;
         }, $segments);
-        $this->assertEquals(array(1,1,1,1,1,1,0), $pretrans);
+        $this->assertEquals(array(1,1,1,1,1,1,0,0,0,0), $pretrans);
         
         //bulk check of all pretrans fields
         $matchRates = array_map(function($item){
             return $item->matchRate;
         }, $segments);
-        $this->assertEquals(array('100','100','100','100','100','100','0'), $matchRates);
+        $this->assertEquals(array('100','100','100','100','100','100','0','0','0','0'), $matchRates);
         
         //bulk check of all pretrans fields
         $autoStateIds = array_map(function($item){
             return $item->autoStateId;
         }, $segments);
-        $this->assertEquals(array('0','0','0','3','0','0','4'), $autoStateIds);
+        $this->assertEquals(array('0','0','0','3','0','0','4','4','4','4'), $autoStateIds);
         
         foreach($segments as $segment) {
             $this->assertEquals('{00000000-0000-0000-C100-CCDDEE000001}', $segment->userGuid);
@@ -122,12 +122,12 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals('74d85bd308aa69f558af1a3a9f1f2dae', $firstSegment->targetMd5);
         
         $lastSegment = end($segments);
-        $this->assertEquals(7, $lastSegment->segmentNrInTask);
-        $this->assertEquals(7, $lastSegment->mid);
+        $this->assertEquals(10, $lastSegment->segmentNrInTask);
+        $this->assertEquals(10, $lastSegment->mid);
         
-        $this->assertEquals('<div title="" class="term preferredTerm exact transNotDefined" data-tbxid="term_0000011_001_en_001_0000022">Apache</div> 2.x on Unix systems', $lastSegment->source);
-        $this->assertEquals('7c672e73fab402d8d99addec970a47b6', $lastSegment->sourceMd5);
-        $this->assertEquals('Apache 2.x on Unix systems', $lastSegment->sourceToSort);
+        $this->assertEquals('<div title="" class="term preferredTerm exact transNotDefined" data-tbxid="term_0000011_001_en_001_0000022">Apache</div> 2.x on Unix systems.', $lastSegment->source);
+        $this->assertEquals('3471de7d2538cd261d744f828d9231c5', $lastSegment->sourceMd5);
+        $this->assertEquals('Apache 2.x on Unix systems.', $lastSegment->sourceToSort);
         $this->assertEmpty($lastSegment->target);
         $this->assertEmpty($lastSegment->targetToSort);
         $this->assertEmpty($lastSegment->targetEdit);
@@ -191,32 +191,67 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id);
         $this->assertSegmentContentToFile('testSegmentEditing-assert-seg7-b.json', $segment);
         
+        $segToTest = $segments[7];
+        $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'edited by a test', $segToTest->id);
+        $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        
+        $segToTest = $segments[8];
+        $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'edited also by a test', $segToTest->id);
+        $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        
         
         //bulk check of all autoStateId fields
         $autoStateIds = array_map(function($item){
             return $item->autoStateId;
         }, $segments);
-        $this->assertEquals(array('0','0','1','3','0','0','1'), $autoStateIds);
+        $this->assertEquals(array('0','0','1','3','0','0','1','1','1','4'), $autoStateIds);
         
         //bulk check of all workflowStepNr fields
         $workflowStepNr = array_map(function($item){
             return $item->workflowStepNr;
         }, $segments);
-        $this->assertEquals(array('0','0','1','0','0','0','1'), $workflowStepNr);
+        $this->assertEquals(array('0','0','1','0','0','0','1','1','1','0'), $workflowStepNr);
         
         //bulk check of all workflowStep fields
         $workflowStep = array_map(function($item){
             return $item->workflowStep;
         }, $segments);
-        $this->assertEquals(array('','','lectoring','','','','lectoring'), $workflowStep);
+        $this->assertEquals(array('','','lectoring','','','','lectoring','lectoring','lectoring',''), $workflowStep);
+    }
+    
+    /**
+     * tests the export results
+     * @param stdClass $task
+     * @param string $exportUrl
+     * @param string $fileToCompare
+     */
+    public function testExport() {
+        self::$api->login('testmanager');
+        $task = $this->api()->getTask();
+        //start task export 
+        
+        $this->api()->request('editor/task/export/id/'.$task->id);
+        //$fileToCompare;
+
+        //get the exported file content
+        $path = $this->api()->getTaskDataDirectory();
+        $pathToZip = $path.'export.zip';
+        $this->assertFileExists($pathToZip);
+        
+        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/install-unix.apache2.html.sdlxliff');
+        $expectedResult = $this->api()->getFileContent('export-assert.sdlxliff');
+        
+        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to export-assert.sdlxliff');
     }
     
     public static function tearDownAfterClass() {
         $task = self::$api->getTask();
         //open task for whole testcase
-        self::$api->login('testmanager');
+        self::$api->login('testlector');
         self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
+        self::$api->login('testmanager');
         self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
     }
 }
