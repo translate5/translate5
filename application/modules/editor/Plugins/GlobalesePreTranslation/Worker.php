@@ -102,11 +102,11 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
         $this->api->setSourceLang($langModel->loadLangRfc5646($this->task->getSourceLang()));
         
         $this->api->setTargetLang($langModel->loadLangRfc5646($this->task->getTargetLang()));
+        $this->api->setTask($this->task);
         
         $this->createGlobaleseProject();
         $this->processSegments();
         $this->importRemainingFiles();
-        //FIME new function for error checking
         $this->logErrorFiles();
         $this->removeGlobaleseProject();
         
@@ -114,7 +114,7 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
     }
     
     protected function createGlobaleseProject() {
-        $this->api->createProject($this->task);
+        $this->api->createProject();
     }
     
     protected function removeGlobaleseProject() {
@@ -165,8 +165,6 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
         $globFileId = $this->api->getFirstTranslated();
         $this->logplugin('getFirstTranslateable fileId: '.$fileId.' GlobaleseFileId: '.$globFileId);
         
-        //FIXME check if $globFileId can contain 0 as a valid ID (I dont think so) 
-        // if 0 will be a valid ID then this if must check for not null and not false
         if($globFileId) {
             $this->reImportTranslated($globFileId);
         }
@@ -194,7 +192,7 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
      */
     protected function reImportTranslated($globFileId) {
         $translatedXlf = $this->api->getFileContent($globFileId);
-        if(empty($this->fileIdMap) || !in_array($globFileId, $this->fileIdMap)){
+        if(empty($this->fileIdMap) || !array_key_exists($globFileId, $this->fileIdMap)){
             return;
         }
         $fileId = $this->fileIdMap[$globFileId];
