@@ -92,10 +92,6 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
      * get the engines for the selected user, and the provided language combination
      */
     getEngines:function(view){
-        //if there are no results, or the auth failed, show info message
-        
-        //this.nextWizardWindow(winLayout,nextItem);
-        //return;
         var me=this,
             view=me.getView(),
             window=view.up('window'),
@@ -188,9 +184,6 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
                 }
                 
                 Editor.MessageBox.addInfo(me.strings.noGroupsFoundMsg, 1.4);
-                
-                //this event shuld be fiered after the engines are found, and users also (this here will switch to the last window)
-                //view.fireEvent('wizardCardFinished');
             },
             failure: function(response){
                 window.setLoading(false);

@@ -51,17 +51,9 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettingsViewCon
         
         globaleseEngine.setValue(null);
         
-        globaleseEngine.getStore().filter([
-            {
-                property:'group',
-                value:newValue
-            },
-            {
-                property:'status',
-                value:'on'
-            }
-            ]);
-        
+        //filter engines by group
+        globaleseEngine.getStore().filter([{property:'group',value:newValue}]);
+
         if(globaleseEngine.getStore().getCount()==1){
             globaleseEngine.setValue(globaleseEngine.getStore().getAt(0));
         }
@@ -90,6 +82,9 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettingsViewCon
         }
     },
     
+    /***
+     * saves the auth,engine and group parametars in session so we can use them in back-end
+     */
     saveParamsInSession:function(){
         var me=this,
             view=me.getView(),

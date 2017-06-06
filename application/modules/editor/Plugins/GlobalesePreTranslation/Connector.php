@@ -103,6 +103,13 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
      * Globalese files with errors
      */
     private $filesWithErrors = [];
+    
+    /***
+     * Instance of the current task
+     * 
+     * @var editor_Models_Task
+     */
+    private $m_task;
     /***
      * 
      * Globalese file statuses
@@ -175,11 +182,10 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
     /**
      * Create the project on globalese server.
      * 
-     * @param editor_Models_Task $task
-     * @return integer
+     * @return integer globalese project id
      */
-    public function createProject(editor_Models_Task $task) {
-        $projectname = "Translate5-".$task->getTaskGuid();
+    public function createProject() {
+        $projectname = "Translate5-".$this->getTask()->getTaskGuid();
         
         $http = $this->getHttpClient('projects');
 
@@ -245,7 +251,7 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
             $this->deleteFile($fileId);
             /* @var $erroLog ZfExtended_Log */
             $erroLog= ZfExtended_Factory::get('ZfExtended_Log');
-            $erroLog->logError($ex->getMessage());
+            $erroLog->logError("Error occurred during file upload or translation (taskGuid=".$this->getTask()->getTaskGuid()."),(globalese file id = ".$fileId.")".$ex->getMessage());
         }
         
     }
@@ -327,12 +333,10 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
      * @return mixed fileId of found file, null when there are pending files but non finished, false if there are no more files
      */
     public function getFirstTranslated() {
-        
         $filesCount=count($this->globaleseFileIds);
         if($filesCount<1){
             return false;
         }
-        
         for($i=0;$i<$filesCount;$i++){
             $fileId=$this->globaleseFileIds[$i];
             $url='translation-files/'.$fileId;
@@ -344,6 +348,7 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
             $decode=$this->processResponse($response);
             
             if($decode->status == self::GLOBALESE_FILESTATUS_ERROR){
+                //add the globalese file id for the file that the error occurs
                 $this->filesWithErrors[] = $fileId;
                 $this->deleteFile($fileId);
                 return empty($this->globaleseFileIds) ? false : null;
@@ -361,11 +366,9 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
      * 
      * @param integer $fileId
      * @param boolean $remove default true, if true removes the fetched file immediatelly from Globalese project
-     * @return string
+     * @return string (translated file from globalese as string)
      */
     public function getFileContent($fileId, $remove = true) {
-        
-        
         $url='translation-files/'.$fileId.'/download?state='.self::GLOBALESE_FILESTATUS_TRANSLATED;
         $http = $this->getHttpClient($url);
         $response = $http->request('GET');
@@ -393,7 +396,7 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         $sourceRfc5646=$langModel->loadLangRfc5646($sourceLang);
         $targetRfc5646=$langModel->loadLangRfc5646($targetLang);
         
-        $url='engines/?source='.$sourceRfc5646.'&target='.$targetRfc5646;
+        $url='engines/?source='.$sourceRfc5646.'&target='.$targetRfc5646;//.'&status=ok';
         
         $http = $this->getHttpClient($url);
         $http->setHeaders('Content-Type: application/json');
@@ -401,8 +404,19 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         $response = $http->request('GET');
         
         $result = $this->processResponse($response);
+
+        $retVal = [];
+        if(empty($result)){
+            return $retVal;
+        }
+        //return only the engines with status ok or on
+        foreach ($result as $engine){
+            if($engine->status == "ok" || $engine->status == "on"){
+                $retVal[] = $engine;
+            }
+        }
         
-        return $result;
+        return $retVal;
     }
     
     /***
@@ -459,5 +473,13 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
     
     public function getFilesWithErrors(){
         return $this->filesWithErrors;
+    }
+    
+    public function setTask($task){
+        $this->m_task=$task;
+    }
+    
+    public function getTask(){
+        return $this->m_task;
     }
 }
