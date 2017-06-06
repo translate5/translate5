@@ -106,6 +106,8 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
         $this->createGlobaleseProject();
         $this->processSegments();
         $this->importRemainingFiles();
+        //FIME new function for error checking
+        $this->logErrorFiles();
         $this->removeGlobaleseProject();
         
         return true;
@@ -192,7 +194,9 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
      */
     protected function reImportTranslated($globFileId) {
         $translatedXlf = $this->api->getFileContent($globFileId);
-        //FIXME check if it does exist in the map
+        if(empty($this->fileIdMap) || !in_array($globFileId, $this->fileIdMap)){
+            return;
+        }
         $fileId = $this->fileIdMap[$globFileId];
         //We assume the xliff is pretranslated right now:
         $path = $this->storeXlf($fileId, $translatedXlf);
@@ -259,6 +263,22 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
     protected function logplugin($msg) {
         if(ZfExtended_Debug::hasLevel('plugin', 'GlobalesePreTranslation')) {
             error_log('GlobalesePreTranslation: '.$msg);
+        }
+    }
+    
+    /***
+     * Logs the info about the error files from globalse
+     */
+    protected function logErrorFiles(){
+        $errorFiles = $this->api->getFilesWithErrors();
+        if(empty($errors)){
+            return;
+        }
+        /* @var $erroLog ZfExtended_Log */
+        $erroLog= ZfExtended_Factory::get('ZfExtended_Log');
+        foreach ($errorFiles as $file){
+            $message = "Error occurred during translation of file ";
+            $erroLog->logError($message.$this->fileIdMap[$file]);
         }
     }
 }

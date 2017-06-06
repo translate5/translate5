@@ -51,7 +51,16 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettingsViewCon
         
         globaleseEngine.setValue(null);
         
-        globaleseEngine.getStore().filter('group',newValue);
+        globaleseEngine.getStore().filter([
+            {
+                property:'group',
+                value:newValue
+            },
+            {
+                property:'status',
+                value:'on'
+            }
+            ]);
         
         if(globaleseEngine.getStore().getCount()==1){
             globaleseEngine.setValue(globaleseEngine.getStore().getAt(0));

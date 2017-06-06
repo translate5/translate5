@@ -100,6 +100,10 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
     private $targetLang;
     
     /***
+     * Globalese files with errors
+     */
+    private $filesWithErrors = [];
+    /***
      * 
      * Globalese file statuses
      */
@@ -127,7 +131,6 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         
         $http->setAuth($this->username,$this->apiKey);
         $http->setUri($this->apiUrl.$url);
-        //error_log($http);
         return $http;
     }
     
@@ -137,11 +140,12 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
      * Also the function checks for the invalid decoded json.
      * 
      * @param Zend_Http_Response $response
+     * @param boolean $responseAsXlif true if we expect xlif file as response
      * @throws ZfExtended_BadGateway
      * @throws ZfExtended_Exception
      * @return stdClass|string
      */
-    private function processResponse(Zend_Http_Response $response){
+    private function processResponse(Zend_Http_Response $response,$responseAsXlif=false){
         $validStates = [200, 201];
         
         //check for HTTP State (REST errors)
@@ -149,10 +153,14 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
             throw new ZfExtended_BadGateway($response->getBody(), 500);
         }
         
+        if($responseAsXlif){
+            return $response->getBody();
+        }
+        
         $result = json_decode(trim($response->getBody()));
         
-        //if the response is invalid json, but is a valid response (ex. .xlf file)
-        if(json_last_error() > 0 && trim($response->getBody())!=""){
+        //is valid response with 
+        if(is_array($result) && count($result) < 1){
             return $response->getBody();
         }
         
@@ -190,10 +198,7 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         $response = $http->request('POST');
         
         $responseDecoded = $this->processResponse($response);
-        error_log(print_r("-----------------------CREATE PROJECT START",1));
-        error_log(print_r($responseDecoded,1));
-        error_log(print_r("-----------------------CREATE PROJECT END",1));
-        
+
         if(isset($responseDecoded->id)){
             $this->globaleseProjectId = $responseDecoded->id;
             return $responseDecoded->id;
@@ -225,16 +230,24 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
             throw new ZfExtended_Exception('internal globalese project ID is empty!');
         }
         
-        //creates file in Globalese
-        $fileId = $this->createFile($filename);
-        //uploads file to Globalese
-        $this->uplodFile($fileId, $xliff);
-        //starts translation in Globalese
-        $this->translateFile($fileId);
+        try {
+            //creates file in Globalese
+            $fileId = $this->createFile($filename);
+            //uploads file to Globalese
+            $this->uplodFile($fileId, $xliff);
+            //starts translation in Globalese
+            $this->translateFile($fileId);
+
+            array_push($this->globaleseFileIds, $fileId);
+            
+            return $fileId;
+        } catch (ZfExtended_Exception $ex) {
+            $this->deleteFile($fileId);
+            /* @var $erroLog ZfExtended_Log */
+            $erroLog= ZfExtended_Factory::get('ZfExtended_Log');
+            $erroLog->logError($ex->getMessage());
+        }
         
-        array_push($this->globaleseFileIds, $fileId);
-        
-        return $fileId;
     }
     
     /***
@@ -331,8 +344,8 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
             $decode=$this->processResponse($response);
             
             if($decode->status == self::GLOBALESE_FILESTATUS_ERROR){
+                $this->filesWithErrors[] = $fileId;
                 $this->deleteFile($fileId);
-                //FIXME log this also on our side! For logging load file instance to get the real file name 
                 return empty($this->globaleseFileIds) ? false : null;
             }
             
@@ -357,21 +370,16 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         $http = $this->getHttpClient($url);
         $response = $http->request('GET');
         
-        $result = $this->processResponse($response);
+        $result = $this->processResponse($response,true);
         
         if($remove){
             $this->deleteFile($fileId);
         }
-        error_log(print_r("File content start here : ",1));
-        error_log(print_r($result,1));
-        error_log(print_r("File content ends here : ",1));
-        
         return $result;
     }
     
     /***
-     * Gets the engines for given source and target lang.
-     * All returned engines will be with status ok.
+     * Gets the engines for given source and target language.
      * 
      * @param string $sourceLang
      * @param string $targetLang
@@ -385,7 +393,7 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         $sourceRfc5646=$langModel->loadLangRfc5646($sourceLang);
         $targetRfc5646=$langModel->loadLangRfc5646($targetLang);
         
-        $url='engines/?source='.$sourceRfc5646.'&target='.$targetRfc5646.'&status=ok';
+        $url='engines/?source='.$sourceRfc5646.'&target='.$targetRfc5646;
         
         $http = $this->getHttpClient($url);
         $http->setHeaders('Content-Type: application/json');
@@ -410,11 +418,6 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         $result = $this->processResponse($response);
         
         return $result;
-    }
-    
-    
-    private function logMessage($msg){
-        error_log('GlobalesePreTranslation: '.$msg);
     }
     
     public function setAuth($username,$apiKey){
@@ -452,5 +455,9 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
     
     public function getTargetLang(){
         return $this->targetLang;
+    }
+    
+    public function getFilesWithErrors(){
+        return $this->filesWithErrors;
     }
 }
