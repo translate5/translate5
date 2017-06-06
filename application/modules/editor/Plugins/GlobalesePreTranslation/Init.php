@@ -111,8 +111,10 @@ class editor_Plugins_GlobalesePreTranslation_Init extends ZfExtended_Plugin_Abst
         
         $globaleseSession = new Zend_Session_Namespace('GlobalesePreTranslation');
         
-        //send the parametars from the session in the workier init method parametar
-        $sessionParametars = null;
+        //if the auth parameters are not set or the engine and group, then the globalese translation process should not be started
+        if($globaleseSession->group==null || $globaleseSession->engine==null || $globaleseSession->apiUsername==null || $globaleseSession->apiKey==null ){
+            return;
+        }
         
         $task = $event->getParam('entity');
         
@@ -123,6 +125,7 @@ class editor_Plugins_GlobalesePreTranslation_Init extends ZfExtended_Plugin_Abst
         ]);
         
         $parentWorkerId = $row->id;
+        //send the parametars from the session in the workier init method parametar
         $params=[
                 'group'=>$globaleseSession->group,
                 'engine'=>$globaleseSession->engine,
@@ -136,5 +139,8 @@ class editor_Plugins_GlobalesePreTranslation_Init extends ZfExtended_Plugin_Abst
             return false;
         }
         $worker->queue($parentWorkerId);
+        
+        //destroy the sessing
+        Zend_Session::namespaceUnset('GlobalesePreTranslation');
     }
 }

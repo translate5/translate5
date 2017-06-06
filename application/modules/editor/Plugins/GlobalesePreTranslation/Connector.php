@@ -30,10 +30,6 @@ END LICENSE AND COPYRIGHT
 /**
  * Connector to Globalese
  * One Connector Instance can contain one Globalese Project
- * 
- * FIXME errorhandling: throwing meaningful exceptions here on connection problems should be enough. Test it!
- *       for error handling: either you distinguish here between critical (stops processing in the Worker) or non critical (Worker can proceed) errors
- *       or you always throw here exceptions and you decide in the worker if the exceptions is critical or not
  */
 class editor_Plugins_GlobalesePreTranslation_Connector {
     
@@ -100,6 +96,17 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
     private $targetLang;
     
     /***
+     * Globalese files with errors
+     */
+    private $filesWithErrors = [];
+    
+    /***
+     * Instance of the current task
+     * 
+     * @var editor_Models_Task
+     */
+    private $m_task;
+    /***
      * 
      * Globalese file statuses
      */
@@ -127,7 +134,6 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         
         $http->setAuth($this->username,$this->apiKey);
         $http->setUri($this->apiUrl.$url);
-        //error_log($http);
         return $http;
     }
     
@@ -137,11 +143,12 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
      * Also the function checks for the invalid decoded json.
      * 
      * @param Zend_Http_Response $response
+     * @param boolean $responseAsXlif true if we expect xlif file as response
      * @throws ZfExtended_BadGateway
      * @throws ZfExtended_Exception
      * @return stdClass|string
      */
-    private function processResponse(Zend_Http_Response $response){
+    private function processResponse(Zend_Http_Response $response,$responseAsXlif=false){
         $validStates = [200, 201];
         
         //check for HTTP State (REST errors)
@@ -149,10 +156,14 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
             throw new ZfExtended_BadGateway($response->getBody(), 500);
         }
         
+        if($responseAsXlif){
+            return $response->getBody();
+        }
+        
         $result = json_decode(trim($response->getBody()));
         
-        //if the response is invalid json, but is a valid response (ex. .xlf file)
-        if(json_last_error() > 0 && trim($response->getBody())!=""){
+        //is valid response with 
+        if(is_array($result) && count($result) < 1){
             return $response->getBody();
         }
         
@@ -167,11 +178,10 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
     /**
      * Create the project on globalese server.
      * 
-     * @param editor_Models_Task $task
-     * @return integer
+     * @return integer globalese project id
      */
-    public function createProject(editor_Models_Task $task) {
-        $projectname = "Translate5-".$task->getTaskGuid();
+    public function createProject() {
+        $projectname = "Translate5-".$this->getTask()->getTaskGuid();
         
         $http = $this->getHttpClient('projects');
 
@@ -190,10 +200,7 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         $response = $http->request('POST');
         
         $responseDecoded = $this->processResponse($response);
-        error_log(print_r("-----------------------CREATE PROJECT START",1));
-        error_log(print_r($responseDecoded,1));
-        error_log(print_r("-----------------------CREATE PROJECT END",1));
-        
+
         if(isset($responseDecoded->id)){
             $this->globaleseProjectId = $responseDecoded->id;
             return $responseDecoded->id;
@@ -225,16 +232,24 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
             throw new ZfExtended_Exception('internal globalese project ID is empty!');
         }
         
-        //creates file in Globalese
-        $fileId = $this->createFile($filename);
-        //uploads file to Globalese
-        $this->uplodFile($fileId, $xliff);
-        //starts translation in Globalese
-        $this->translateFile($fileId);
+        try {
+            //creates file in Globalese
+            $fileId = $this->createFile($filename);
+            //uploads file to Globalese
+            $this->uplodFile($fileId, $xliff);
+            //starts translation in Globalese
+            $this->translateFile($fileId);
+
+            array_push($this->globaleseFileIds, $fileId);
+            
+            return $fileId;
+        } catch (ZfExtended_Exception $ex) {
+            $this->deleteFile($fileId);
+            /* @var $erroLog ZfExtended_Log */
+            $erroLog= ZfExtended_Factory::get('ZfExtended_Log');
+            $erroLog->logError("Error occurred during file upload or translation (taskGuid=".$this->getTask()->getTaskGuid()."),(globalese file id = ".$fileId.")".$ex->getMessage());
+        }
         
-        array_push($this->globaleseFileIds, $fileId);
-        
-        return $fileId;
     }
     
     /***
@@ -314,12 +329,10 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
      * @return mixed fileId of found file, null when there are pending files but non finished, false if there are no more files
      */
     public function getFirstTranslated() {
-        
         $filesCount=count($this->globaleseFileIds);
         if($filesCount<1){
             return false;
         }
-        
         for($i=0;$i<$filesCount;$i++){
             $fileId=$this->globaleseFileIds[$i];
             $url='translation-files/'.$fileId;
@@ -331,8 +344,9 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
             $decode=$this->processResponse($response);
             
             if($decode->status == self::GLOBALESE_FILESTATUS_ERROR){
+                //add the globalese file id for the file that the error occurs
+                $this->filesWithErrors[] = $fileId;
                 $this->deleteFile($fileId);
-                //FIXME log this also on our side! For logging load file instance to get the real file name 
                 return empty($this->globaleseFileIds) ? false : null;
             }
             
@@ -348,30 +362,23 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
      * 
      * @param integer $fileId
      * @param boolean $remove default true, if true removes the fetched file immediatelly from Globalese project
-     * @return string
+     * @return string (translated file from globalese as string)
      */
     public function getFileContent($fileId, $remove = true) {
-        
-        
         $url='translation-files/'.$fileId.'/download?state='.self::GLOBALESE_FILESTATUS_TRANSLATED;
         $http = $this->getHttpClient($url);
         $response = $http->request('GET');
         
-        $result = $this->processResponse($response);
+        $result = $this->processResponse($response,true);
         
         if($remove){
             $this->deleteFile($fileId);
         }
-        error_log(print_r("File content start here : ",1));
-        error_log(print_r($result,1));
-        error_log(print_r("File content ends here : ",1));
-        
         return $result;
     }
     
     /***
-     * Gets the engines for given source and target lang.
-     * All returned engines will be with status ok.
+     * Gets the engines for given source and target language.
      * 
      * @param string $sourceLang
      * @param string $targetLang
@@ -385,7 +392,7 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         $sourceRfc5646=$langModel->loadLangRfc5646($sourceLang);
         $targetRfc5646=$langModel->loadLangRfc5646($targetLang);
         
-        $url='engines/?source='.$sourceRfc5646.'&target='.$targetRfc5646.'&status=ok';
+        $url='engines/?source='.$sourceRfc5646.'&target='.$targetRfc5646;//.'&status=ok';
         
         $http = $this->getHttpClient($url);
         $http->setHeaders('Content-Type: application/json');
@@ -393,8 +400,19 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         $response = $http->request('GET');
         
         $result = $this->processResponse($response);
+
+        $retVal = [];
+        if(empty($result)){
+            return $retVal;
+        }
+        //return only the engines with status ok or on
+        foreach ($result as $engine){
+            if($engine->status == "ok" || $engine->status == "on"){
+                $retVal[] = $engine;
+            }
+        }
         
-        return $result;
+        return $retVal;
     }
     
     /***
@@ -410,11 +428,6 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         $result = $this->processResponse($response);
         
         return $result;
-    }
-    
-    
-    private function logMessage($msg){
-        error_log('GlobalesePreTranslation: '.$msg);
     }
     
     public function setAuth($username,$apiKey){
@@ -452,5 +465,17 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
     
     public function getTargetLang(){
         return $this->targetLang;
+    }
+    
+    public function getFilesWithErrors(){
+        return $this->filesWithErrors;
+    }
+    
+    public function setTask($task){
+        $this->m_task=$task;
+    }
+    
+    public function getTask(){
+        return $this->m_task;
     }
 }

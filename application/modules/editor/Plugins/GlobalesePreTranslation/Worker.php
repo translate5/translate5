@@ -85,7 +85,6 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
         //then you can access $this->parameters with your data
         
         $params = $this->workerModel->getParameters();
-        //error_log(print_r("session parameters -> ".$this->parameters,1));
         
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         $this->segmentFieldManager->initFields($this->taskGuid);
@@ -102,17 +101,19 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
         $this->api->setSourceLang($langModel->loadLangRfc5646($this->task->getSourceLang()));
         
         $this->api->setTargetLang($langModel->loadLangRfc5646($this->task->getTargetLang()));
+        $this->api->setTask($this->task);
         
         $this->createGlobaleseProject();
         $this->processSegments();
         $this->importRemainingFiles();
+        $this->logErrorFiles();
         $this->removeGlobaleseProject();
         
         return true;
     }
     
     protected function createGlobaleseProject() {
-        $this->api->createProject($this->task);
+        $this->api->createProject();
     }
     
     protected function removeGlobaleseProject() {
@@ -163,8 +164,6 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
         $globFileId = $this->api->getFirstTranslated();
         $this->logplugin('getFirstTranslateable fileId: '.$fileId.' GlobaleseFileId: '.$globFileId);
         
-        //FIXME check if $globFileId can contain 0 as a valid ID (I dont think so) 
-        // if 0 will be a valid ID then this if must check for not null and not false
         if($globFileId) {
             $this->reImportTranslated($globFileId);
         }
@@ -192,7 +191,9 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
      */
     protected function reImportTranslated($globFileId) {
         $translatedXlf = $this->api->getFileContent($globFileId);
-        //FIXME check if it does exist in the map
+        if(empty($this->fileIdMap) || !array_key_exists($globFileId, $this->fileIdMap)){
+            return;
+        }
         $fileId = $this->fileIdMap[$globFileId];
         //We assume the xliff is pretranslated right now:
         $path = $this->storeXlf($fileId, $translatedXlf);
@@ -259,6 +260,22 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
     protected function logplugin($msg) {
         if(ZfExtended_Debug::hasLevel('plugin', 'GlobalesePreTranslation')) {
             error_log('GlobalesePreTranslation: '.$msg);
+        }
+    }
+    
+    /***
+     * Logs the info about the error files from globalse
+     */
+    protected function logErrorFiles(){
+        $errorFiles = $this->api->getFilesWithErrors();
+        if(empty($errors)){
+            return;
+        }
+        /* @var $erroLog ZfExtended_Log */
+        $erroLog= ZfExtended_Factory::get('ZfExtended_Log');
+        foreach ($errorFiles as $file){
+            $message = "Error occurred during translation of file ";
+            $erroLog->logError($message.$this->fileIdMap[$file]);
         }
     }
 }

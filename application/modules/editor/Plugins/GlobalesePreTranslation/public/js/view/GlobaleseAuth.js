@@ -79,15 +79,15 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuth', {
         }
         return me.callParent([ config ]);
     },
-    
+    //called when next button is clicked
     triggerNextCard:function(activeItem){
         this.getController().handleNextCardClick();
     },
-    
+    //called when skip button is clicked
     triggerSkipCard:function(activeItem){
         this.getController().handleSkipCardClick();
     },
-    
+
     disableSkipButton:function(){
         return false;
     },
