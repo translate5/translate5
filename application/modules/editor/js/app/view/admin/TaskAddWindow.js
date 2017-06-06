@@ -75,7 +75,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         addBtn: '#UT#Task hinzufügen',
         addBtnWizard: '#UT#Add Task (skip next steps)',
         btnNextWizard:'#UT#Next',
-        cancelBtn: '#UT#Abbrechen'
+        cancelBtn: '#UT#Abbrechen',
+        btnSkip:'#UT#Skip',
     },
     height : 500,
     width : 1000,
@@ -308,7 +309,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                         disabled:'{disableSkipButton}',
                         visible:'{!disableSkipButton}'
                     },
-                    text : 'Skip (fixme in the locales)'
+                    text : me.strings.btnSkip
                 },{
                     xtype : 'button',
                     iconCls : 'ico-task-add',
