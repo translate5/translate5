@@ -30,10 +30,6 @@ END LICENSE AND COPYRIGHT
 /**
  * Connector to Globalese
  * One Connector Instance can contain one Globalese Project
- * 
- * FIXME errorhandling: throwing meaningful exceptions here on connection problems should be enough. Test it!
- *       for error handling: either you distinguish here between critical (stops processing in the Worker) or non critical (Worker can proceed) errors
- *       or you always throw here exceptions and you decide in the worker if the exceptions is critical or not
  */
 class editor_Plugins_GlobalesePreTranslation_Connector {
     

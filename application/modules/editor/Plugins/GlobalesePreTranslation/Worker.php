@@ -85,7 +85,6 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
         //then you can access $this->parameters with your data
         
         $params = $this->workerModel->getParameters();
-        //error_log(print_r("session parameters -> ".$this->parameters,1));
         
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         $this->segmentFieldManager->initFields($this->taskGuid);
