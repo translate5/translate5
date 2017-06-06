@@ -74,11 +74,16 @@ class editor_Plugins_GlobalesePreTranslation_SegmentUpdateProcessor extends edit
         $data = $parser->getFieldContents();
         $source = $this->sfm->getFirstSourceName();
         $target = $this->sfm->getFirstTargetName();
-        $mid = $parser->getMid(); //this is our segmentNrInTask
+        $mid = $parser->getMid(); //this is our segmentNrInTask prefixed with the fileid
+        $attributes = $parser->getSegmentAttributes($mid);
         
         //the XLF import adds the segmentNrInTask to the real mid, since the real mid could not be unique in the XLF
         $mid = explode('_', $mid);
         $mid = end($mid);
+        
+        if($attributes->targetState !== 'needs-review-translation') {
+            continue;
+        }
         
         try {
             $this->segment->loadBySegmentNrInTask($mid, $this->segment->getTaskGuid());

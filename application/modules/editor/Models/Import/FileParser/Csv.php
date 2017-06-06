@@ -42,7 +42,6 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParser {
     use editor_Models_Import_FileParser_TagTrait {
         getTagParams as protected traitGetTagParams;
-        parseSegmentProtectWhitespace as protected traitParseSegmentProtectWhitespace;
     }
     
     /**
@@ -379,9 +378,6 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         
         $segment = $this->parseSegmentProtectWhitespace($segment);
         
-        //encodes the html special characters, so that our frontend can deal with them
-        $segment = htmlspecialchars($segment, ENT_NOQUOTES);
-        
         return $this->parseSegmentReplacePlaceholders($segment);
     }
     /**
@@ -391,7 +387,8 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      * @return string $segment
      */
     protected function parseSegmentProtectWhitespace($segment) {
-        $segment = $this->traitParseSegmentProtectWhitespace($segment);
+        //since CSV has escaped all tags before, we can call directly protectWhitespace instead of parseSegmentProtectWhitespace which splits the content up
+        $segment = $this->protectWhitespace($segment);
         //In CSV we have to directly replace our whitespace tags with their HTML replacement
         $segment = $this->whitespaceTagReplacer($segment);
         $segment = $this->parseSegmentInsertPlaceholders($segment,$this->regexInternalTags);

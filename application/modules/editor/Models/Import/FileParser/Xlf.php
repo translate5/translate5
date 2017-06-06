@@ -247,13 +247,16 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         //build mid from id of segment plus segmentCount, because xlf-file can have more than one file in it with repeatingly the same ids.
         // and one trans-unit (where the id comes from) can contain multiple mrk type seg tags, which are all converted into single segments.
         // instead of using mid from the mrk type seg element, the segmentCount as additional ID part is fine.
-        $id = $attributes['id'].'_'.$this->segmentCount++;
+        $id = $attributes['id'].'_'.++$this->segmentCount;
         
         $segmentAttributes = $this->createSegmentAttributes($id);
 
         //process nonxliff attributes
         $this->namespaces->transunitAttributes($attributes, $segmentAttributes);
         $this->setMid($id);
+        if(!empty($this->currentTarget) && !empty($this->currentTarget['openerMeta']['attributes']) && !empty($this->currentTarget['openerMeta']['attributes']['state'])) {
+            $segmentAttributes->targetState = $this->currentTarget['openerMeta']['attributes']['state'];
+        }
         return $segmentAttributes;
     }
     

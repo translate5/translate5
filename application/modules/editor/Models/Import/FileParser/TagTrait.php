@@ -187,7 +187,7 @@ trait editor_Models_Import_FileParser_TagTrait {
      * @return string $segment
      */
     protected function parseSegmentProtectWhitespace($segment) {
-        $split = preg_split('#(<[^>]+>)#', $segment, null, PREG_SPLIT_DELIM_CAPTURE);
+        $split = preg_split('#(<[^\s][^>]+>)#', $segment, null, PREG_SPLIT_DELIM_CAPTURE);
         
         $i = 0;
         foreach($split as $idx => $chunk) {

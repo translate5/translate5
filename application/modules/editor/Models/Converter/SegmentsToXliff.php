@@ -399,7 +399,7 @@ class editor_Models_Converter_SegmentsToXliff {
         }
         
         $additionalAttributes = '';
-        if(!$segment['editable']){
+        if(isset($segment['editable']) && !$segment['editable']){
             $additionalAttributes = ' translate="no"';
         }
 
