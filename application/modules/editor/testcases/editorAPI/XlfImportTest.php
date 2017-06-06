@@ -68,6 +68,10 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
      * Testing segment values directly after import
      */
     public function testBasicSegmentValuesAfterImport() {
+        
+        //FIXME: This test is to be considered incomplete!!!
+        // it must be continued on continuing the XLF import. 
+        
         //FIXME get task and test wordcount!!!
         //get segment list
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
@@ -83,6 +87,6 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         self::$api->login('testlector');
         self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
         self::$api->login('testmanager');
-        //self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
     }
 }
