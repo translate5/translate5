@@ -82,7 +82,7 @@ class RelaisImportTest extends \ZfExtended_Test_ApiTestcase {
             
             '9' => 'RELAIS - Segment with ignored and different tags',
             '10' => 'RELAIS – Segment with ignored and equal tags',
-            '11' => '', //FIXME could not be tested with CSV files since CSV is encoding all entities on import, must be tested with SDLXLIFF
+            '11' => '',
             '12' => 'RELAIS – Segment with equal entity encoding',
             '13' => 'RELAIS – Segment with equal entity encoding',
                 

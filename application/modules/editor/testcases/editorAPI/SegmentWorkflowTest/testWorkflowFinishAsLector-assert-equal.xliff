@@ -9,10 +9,10 @@
 
 <trans-unit id="3" translate5:autostateId="1" translate5:autostateText="reviewed">
 <source>PHP Manual</source>
-<target dx:match-quality="100.0">PHP Handbuch</target>
-<alt-trans dx:origin-shorttext="Zieltext" alttranstype="previous-version">
+<target state="translated" dx:match-quality="100.0">PHP Handbuch</target>
+<alt-trans dx:origin-shorttext="target" alttranstype="previous-version">
 <target xml:lang="de">PHP Manual</target></alt-trans>
-<alt-trans dx:origin-shorttext="Zieltext-diff" alttranstype="reference">
+<alt-trans dx:origin-shorttext="target-diff" alttranstype="reference">
 <target xml:lang="de">PHP <mrk mtype="x-sdl-added" sdl:revid="2a163962-c5a5-42e9-bef4-8ea930266b86">Handbuch</mrk><mrk mtype="x-sdl-deleted" sdl:revid="d36c8540-f873-4b2e-8102-bca83547d6f2">Manual</mrk></target></alt-trans>
 <state stateid="0"></state>
 <dx:qa-hits></dx:qa-hits>
@@ -20,10 +20,10 @@
 
 <trans-unit id="5" translate5:autostateId="1" translate5:autostateText="reviewed">
 <source>Installation on Unix systems &amp; umlaut test äöü &lt; &lt;iamnotag&gt;</source>
-<target dx:match-quality="100.0">Installation auf Unix-Systemen &amp; Umlaut Test äöü &lt; &lt;ichbinkeintag&gt; - bearbeitet durch den Testcode</target>
-<alt-trans alttranstype="previous-version" dx:origin-shorttext="Zieltext">
+<target state="translated" dx:match-quality="100.0">Installation auf Unix-Systemen &amp; Umlaut Test äöü &lt; &lt;ichbinkeintag&gt; - bearbeitet durch den Testcode</target>
+<alt-trans alttranstype="previous-version" dx:origin-shorttext="target">
 <target xml:lang="de">Installation auf Unix-Systemen &amp; Umlaut Test äöü &lt; &lt;ichbinkeintag&gt;</target></alt-trans>
-<alt-trans alttranstype="reference" dx:origin-shorttext="Zieltext-diff">
+<alt-trans alttranstype="reference" dx:origin-shorttext="target-diff">
 <target xml:lang="de">Installation auf Unix-Systemen &amp; Umlaut Test äöü &lt; &lt;ichbinkeintag&gt;<mrk mtype="x-sdl-added" sdl:revid="replaced-for-testing"> - bearbeitet durch den Testcode</mrk></target></alt-trans>
 <state stateid="0"/>
 <dx:qa-hits/>
@@ -31,10 +31,10 @@
 
 <trans-unit id="7" translate5:autostateId="1" translate5:autostateText="reviewed">
 <source>Apache 2.x  on Unix systems</source>
-<target dx:match-quality="0.0">Apache 2.x  auf Unix-Systemen</target>
-<alt-trans dx:origin-shorttext="Zieltext" alttranstype="previous-version">
+<target state="translated" dx:match-quality="0.0">Apache 2.x  auf Unix-Systemen</target>
+<alt-trans dx:origin-shorttext="target" alttranstype="previous-version">
 <target xml:lang="de"></target></alt-trans>
-<alt-trans dx:origin-shorttext="Zieltext-diff" alttranstype="reference">
+<alt-trans dx:origin-shorttext="target-diff" alttranstype="reference">
 <target xml:lang="de"><mrk mtype="x-sdl-added" sdl:revid="460dd477-a7fa-4568-aa8c-2e92179e25f3">Apache 2.x  auf Unix-Systemen</mrk></target></alt-trans>
 <state stateid="0"></state>
 <dx:qa-hits></dx:qa-hits>

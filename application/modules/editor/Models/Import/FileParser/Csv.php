@@ -110,7 +110,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     protected $protectedStrings = array();
     
     protected $html5Tags = array();
-
+    
     public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task) {
         ini_set('auto_detect_line_endings', true);//to tell php to respect mac-lineendings
         parent::__construct($path, $fileName, $fileId, $task);
@@ -388,7 +388,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      */
     protected function parseSegmentProtectWhitespace($segment) {
         //since CSV has escaped all tags before, we can call directly protectWhitespace instead of parseSegmentProtectWhitespace which splits the content up
-        $segment = $this->protectWhitespace($segment);
+        $segment = $this->protectWhitespace($segment, false);
         //In CSV we have to directly replace our whitespace tags with their HTML replacement
         $segment = $this->whitespaceTagReplacer($segment);
         $segment = $this->parseSegmentInsertPlaceholders($segment,$this->regexInternalTags);
