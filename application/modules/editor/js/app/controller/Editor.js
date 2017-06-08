@@ -123,7 +123,8 @@ Ext.define('Editor.controller.Editor', {
           'alt-s':          ["S",{ctrl: false, alt: true}, me.handleDigitPreparation(me.handleChangeState), true],
           'alt-DIGIT':      [me.DEC_DIGITS,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
           'DIGIT':          [me.DEC_DIGITS,{ctrl: false, alt: false}, me.handleDigit],
-          'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true]
+          'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
+          'ctrl-insert': [Ext.EventObjectImpl.INSERT,{ctrl: true, alt: false}, me.copySourceToTarget],
       };
   },
   /**
@@ -790,6 +791,13 @@ Ext.define('Editor.controller.Editor', {
             notScrollCallback: callback
         });
     }
+  },
+  copySourceToTarget: function() {
+      if(!this.isEditing){
+          return;
+      }
+      var plug = this.getEditPlugin();
+      plug.editor.mainEditor.insertMarkup(plug.context.record.get('source'));
   },
   /**
    * scrolls to the first segment.

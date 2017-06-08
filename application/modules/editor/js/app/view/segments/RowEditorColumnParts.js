@@ -37,8 +37,6 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.segments.RowEditorColumnParts', {
     override: 'Editor.view.segments.RowEditor',
 
-    //beinhaltet den gekürzten Inhalt des letzten geöffneteten Segments
-    lastSegmentShortInfo: '',
     columnToEdit: null,
     editorFieldExtraHeight: 10,
     previousRecord: null,
@@ -104,7 +102,6 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         }
         if(me.setColumnToEdit(column)) {
             me.mainEditor.setValueAndMarkup(rec.get(me.columnToEdit), rec.get('id'), me.columnToEdit);
-            me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
         }
         me.focusContextCell();
     },
@@ -319,7 +316,6 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         
         me.setColumnToEdit(me.context.column);
         me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit), record.get('id'), me.columnToEdit);
-        me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
     },
     
     /**
@@ -358,19 +354,11 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         if(me.mainEditor.hasAndDisplayErrors()) {
             return false;
         }
-        me.setLastSegmentShortInfo(me.mainEditor.lastSegmentContentWithoutTags.join(''));
         record.beginEdit();
         record.set(me.columnToEdit, newValue);
         record.set('autoStateId', 999);
         record.endEdit();
         return true;
-    },
-    /**
-     * setzt den gekürzten Inhalt des letzten Segments. Muss mit dem "gemarkupten" Content aufgerufen werden um alle Tags zu entfernen. 
-     * @param segmentText
-     */
-    setLastSegmentShortInfo: function (segmentText) {
-      this.lastSegmentShortInfo = Ext.String.ellipsis(Ext.util.Format.stripTags(segmentText), 60, true);
     },
     /**
      * starts tracking the editing time for the given field
