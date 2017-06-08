@@ -440,7 +440,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },
   
   onWizardCardSkiped:function(){
-      alert('save task call');
       this.saveTask();
   },
   
