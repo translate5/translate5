@@ -109,6 +109,7 @@ class editor_Plugins_GlobalesePreTranslation_SegmentUpdateProcessor extends edit
         try {
             $this->segment->setTarget($updateContent);
             $this->segment->setTargetEdit($updateContent);
+            $this->segment->setMatchRateType('import;mt;globalese');
             $this->segment->save();
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {

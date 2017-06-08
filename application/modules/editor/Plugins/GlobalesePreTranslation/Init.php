@@ -102,6 +102,11 @@ class editor_Plugins_GlobalesePreTranslation_Init extends ZfExtended_Plugin_Abst
         $view->Php2JsVars()->set('plugins.GlobalesePreTranslation.api.username', $this->getConfig()->api->username);
         $view->Php2JsVars()->set('plugins.GlobalesePreTranslation.api.password', $this->getConfig()->api->password);
         $view->Php2JsVars()->set('plugins.GlobalesePreTranslation.api.apiKey', $this->getConfig()->api->apiKey);
+        $alreadyExisting = $view->Php2JsVars()->get('segments')->matchratetypes;
+        $view->Php2JsVars()->set('segments.matchratetypes', array_merge($alreadyExisting, [
+            'globalese' => APPLICATION_RUNDIR.'/editor/plugins/resources/globalesePreTranslation/globalese.png'
+        ]));
+        
     }
     
     /**
