@@ -129,6 +129,7 @@ class editor_Models_Import_Worker_Import {
         $this->removeMetaDataTmpFiles();
         $this->importRelaisFiles();
         $this->updateSegmentFieldViews();
+        $this->calculateEmptyTargets();
         
         //disable errorCollecting for post processing
         Zend_Registry::set('errorCollect', false);
@@ -189,6 +190,12 @@ class editor_Models_Import_Worker_Import {
         $mqmProc->handleErrors();
         
         $this->task->setReferenceFiles($this->filelist->hasReferenceFiles());
+    }
+    
+    protected function calculateEmptyTargets() {
+        $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segment editor_Models_Segment */
+        $this->task->setEmptyTargets($segment->hasEmptyTargetsOnly($this->task->getTaskGuid()));
     }
     
     /**

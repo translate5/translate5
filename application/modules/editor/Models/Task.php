@@ -85,6 +85,8 @@ END LICENSE AND COPYRIGHT
  * @method string getQmSubsegmentFlags() getQmSubsegmentFlags() get Original Flags from DB
  * @method void setQmSubsegmentFlags() setQmSubsegmentFlags(string $flags) set Original Flags in DB
  * @method void delete() delete() see editor_Models_Task_Remover for complete task removal
+ * @method boolean getEmptyTargets() getEmptyTargets()
+ * @method void setEmptyTargets() setEmptyTargets(boolean $emptyTargets)
  */
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';

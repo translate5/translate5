@@ -1266,4 +1266,18 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         return $result;
     }
     
+    /**
+     * returns true if all segments of the given taskGuid have empty original targets at the given moment
+     * @param string $taskGuid
+     * @return boolean
+     */
+    public function hasEmptyTargetsOnly($taskGuid) {
+        $this->segmentFieldManager->initFields($taskGuid);
+        $this->reInitDb($taskGuid);
+        $s = $this->db->select(true)
+            ->columns('count(*) as cnt')
+            ->where('targetMd5 != ?', 'd41d8cd98f00b204e9800998ecf8427e');
+        $x = $this->db->fetchRow($s);
+        return ((int) $x->cnt) == 0;
+    }
 }
