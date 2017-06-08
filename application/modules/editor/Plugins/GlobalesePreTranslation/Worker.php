@@ -236,6 +236,10 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
         /* var $parser editor_Models_Import_FileParser_Xlf */
         $parser->setSegmentFieldManager($this->segmentFieldManager);
         
+        //Since target repetition hash must also be updated, we invoke the corresponding SegmentProcessor here too:
+        $hashProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_RepetitionHash',[$this->task, $this->segmentFieldManager]);
+        $parser->addSegmentProcessor($hashProc);
+        
         //add the custom Segment Processor to Update the segments
         $processor = ZfExtended_Factory::get('editor_Plugins_GlobalesePreTranslation_SegmentUpdateProcessor',[$this->task, $this->segmentFieldManager]);
         /* @var $processor editor_Plugins_GlobalesePreTranslation_SegmentUpdateProcessor */
