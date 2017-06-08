@@ -282,10 +282,9 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         // The here uses data structure is prepared for them, so $this->contentConverter->convert returns an array of segments
         // currently it contains only one segment.
         
-        //if there was no target at all we prefill the target segments with the source content (mainly to get the internal tags)
-        //TODO see TRANSLATE-880: this prefill must be removed when the GUI provides the ability to take over tags
-        if(is_null($this->currentTarget)) {
-            $targetSegments = $sourceSegments;
+        if(is_null($this->currentTarget)){
+            //TODO the following line must be adopted for multiple MRKs:
+            $targetSegments[] = '';
         }
         else {
             //parse the target chunks
@@ -293,6 +292,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $targetSegments = $this->contentConverter->convert($targetChunks);
         }
 
+        
         //check if sub segmentation of the mrk type seg tags was correct:
         $sourceMrkMids = array_keys($sourceSegments);
         $targetMrkMids = array_keys($targetSegments);
@@ -303,11 +303,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         foreach($sourceSegments as $mid => $source) {
             if(!isset($targetSegments[$mid])) {
                 continue; //mrk type seg mids are not matching, logging is done above
-            }
-            //if target is empty, prefill with source:
-            //TODO see TRANSLATE-880: this prefill must be removed when the GUI provides the ability to take over tags
-            if(empty($targetSegments[$mid])) {
-                $targetSegments[$mid] = $source;
             }
             $this->segmentData = array();
             $this->segmentData[$sourceName] = array(
