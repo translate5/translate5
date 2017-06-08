@@ -92,8 +92,6 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettings', {
                 }]
         };
         
-        me.importType='postimport';
-        
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
