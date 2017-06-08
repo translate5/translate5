@@ -50,7 +50,7 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
     imgTpl: new Ext.XTemplate([
        '<tpl for=".">',
            '<tpl for="types">',
-               '<img valign="text-bottom" class="matchRateType type-{.}" src="'+Editor.data.moduleFolder+'images/matchratetypes/{.}.png" alt="{.}"/>',
+               '<img valign="text-bottom" class="matchRateType type-{type}" src="{path}" alt="{type}"/>',
            '</tpl>',
            '<tpl if="edited">',
                '<img valign="text-bottom" class="matchRateEdited" src="'+Editor.data.moduleFolder+'images/pencil.png"/>',
@@ -216,6 +216,19 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
         qtip(meta, label, me.strings[mode+'Desc'][firstType]);
         value.unshift(firstType);
         //and image
+        Ext.Array.each(value, function(val, idx){
+            var path;
+            if(Editor.data.segments.matchratetypes && Editor.data.segments.matchratetypes[val]) {
+                path = Editor.data.segments.matchratetypes[val];
+            }
+            else {
+                path = Editor.data.moduleFolder+'images/matchratetypes/'+val+'.png';
+            }
+            value[idx] = {
+                type: val,
+                path: path
+            };
+        });
         return me.imgTpl.apply({types: value, edited: !isImport});
     }
 });
