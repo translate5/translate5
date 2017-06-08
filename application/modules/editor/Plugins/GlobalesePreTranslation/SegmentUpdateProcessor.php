@@ -82,7 +82,7 @@ class editor_Plugins_GlobalesePreTranslation_SegmentUpdateProcessor extends edit
         $mid = end($mid);
         
         if($attributes->targetState !== 'needs-review-translation') {
-            continue;
+            return;
         }
         
         try {
@@ -92,13 +92,17 @@ class editor_Plugins_GlobalesePreTranslation_SegmentUpdateProcessor extends edit
             $log->logError('Source segment to segmentNrInTask of reimported file not found.',  'Source segment to segmentNrInTask of reimported file not found. Reimported segment ignored. FileName: '.$this->fileName.' / segmentNrInTask: '.$parser->getMid());
             return false;
         }
-        $sourceContent = $this->normalizeSegmentData($this->segment->getFieldOriginal($source));
-        $updateContent = $this->normalizeSegmentData($data[$target]["original"]);
+        $ourSource = $this->normalizeSegmentData($this->segment->getFieldOriginal($source));
+        $theirSource = $this->normalizeSegmentData($data[$source]["original"]);
+        $updateContent = $data[$target]["original"];
+        
+        //FIXME target md5 hash an vorübersetzte Segmente anpassen wenn der task ein translation task TRANSLATE-885 ist
+        // → diese Info auch in den Issue mitaufnehmen!
         
         //equal means here, that also the tags must be equal in content and position
-        if(false && $sourceContent !== $updateContent){
+        if($ourSource !== $theirSource){
             $log = ZfExtended_Factory::get('ZfExtended_Log');
-            $log->logError('Source of reimported file not identical with source of original file.',  'Source of reimported file is not identical with source of original file. Original target is left empty. FileName: '.$this->fileName.' / segmentNrInTask: '.$parser->getMid().' / Source content of original file: '.$sourceContent.' / Source content of reimported file: '.$data[$source]["original"]);
+            $log->logError('Source of reimported file not identical with source of original file.',  'Source of reimported file is not identical with source of original file. Original target is left empty. FileName: '.$this->fileName.' / segmentNrInTask: '.$parser->getMid().' / Source content of original file (all tags stripped!): #'.$ourSource.'# / Source content of reimported file: #'.$theirSource.'#');
             return false;
         }
         
@@ -128,6 +132,6 @@ class editor_Plugins_GlobalesePreTranslation_SegmentUpdateProcessor extends edit
         $segmentContent = $this->internalTag->replace($segmentContent, ' ');
         //trim removes leading / trailing whitespaces added by tag removing
         $segmentContent = trim(preg_replace('/\s{2,}/', ' ', $segmentContent));
-        return html_entity_decode($segmentContent);
+        return html_entity_decode(strip_tags($segmentContent));
     }
 }
