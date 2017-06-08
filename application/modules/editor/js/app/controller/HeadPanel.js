@@ -109,7 +109,13 @@ Ext.define('Editor.controller.HeadPanel', {
   //End Events
   //***********************************************************************************
   headPanelToggle: function(tool) {
-      this.getHeadPanel().setVisible(tool.type == 'down');
+      var hideTarget=this.getHeadPanel();
+      var visualReviewPanel = Ext.ComponentQuery.query('#visualReviewPanel');
+      if(visualReviewPanel){
+          visualReviewPanel = visualReviewPanel[0];
+          hideTarget = visualReviewPanel;
+      }
+      hideTarget.setVisible(tool.type == 'down');
       if(tool.itemId == 'headPanelUp') {
           tool.ownerCt.down('#headPanelDown').show();
       }

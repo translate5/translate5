@@ -46,7 +46,8 @@ Ext.define('Editor.view.ViewPortEditor', {
         'Editor.view.fileorder.ReferenceTree',
         'Editor.view.segments.Grid',
         'Editor.view.segments.MetaPanelNavi',
-        'Editor.view.segments.MetaPanel'
+        'Editor.view.segments.MetaPanel',
+        'Editor.plugins.VisualReview.view.VisualReview'
     ],
 
     viewModel: {
@@ -60,7 +61,6 @@ Ext.define('Editor.view.ViewPortEditor', {
     //Item Strings:
     items_north_title: 'Header',
     items_west_title: '#UT#Dateien',
-    
     initComponent: function() {
       var me = this,
           items = [me.getNorth(),{
@@ -129,8 +129,26 @@ Ext.define('Editor.view.ViewPortEditor', {
     getNorth: function() {
         return {
             weight: 40,
-            xtype: 'headPanel',
-            region: 'north'
+            //height:300,
+            region: 'north',
+            //layout: {
+            //    type: 'vbox',
+            //    align : 'stretch',
+            //    pack  : 'start',
+            //},
+            items:[{
+                xtype:'container',
+                layout: {
+                    type: 'vbox',
+                    align : 'stretch',
+                    pack  : 'start',
+                },
+                items:[{
+                    xtype: 'headPanel'
+                },{
+                    xtype:'visualReviewPanel'
+                }]
+            }]
         };
     }
 });
