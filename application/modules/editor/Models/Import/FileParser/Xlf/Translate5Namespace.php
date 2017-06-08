@@ -75,7 +75,7 @@ class editor_Models_Import_FileParser_Xlf_Translate5Namespace implements editor_
                 // $this->tagMap[<x id="321">] = <internalSingle>;
                 if(!empty($data[2])) {
                     $closer = $data[2];
-                    $this->tagMap[$gTag] = [$originalTag, $givenTagMap[$closer][0]];
+                    $this->tagMap[$gTag] = [$originalTag, $givenTagMap[$closer][1]];
                 }
                 else {
                     $this->tagMap[$gTag] = $originalTag;
@@ -98,6 +98,8 @@ class editor_Models_Import_FileParser_Xlf_Translate5Namespace implements editor_
      * @see editor_Models_Import_FileParser_Xlf_INamespace::getSingleTag()
      */
     public function getSingleTag($xlfTag){
+        //some foreign tools add spaces between the last attribute and the closing />
+        $xlfTag = preg_replace('#"[\s]+/>$#', '"/>', $xlfTag);
         if(empty($this->tagMap[$xlfTag])) {
             return null;
         }
