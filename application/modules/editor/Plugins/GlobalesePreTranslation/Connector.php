@@ -333,8 +333,7 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         if($filesCount<1){
             return false;
         }
-        for($i=0;$i<$filesCount;$i++){
-            $fileId=$this->globaleseFileIds[$i];
+        foreach($this->globaleseFileIds as $fileId) {
             $url='translation-files/'.$fileId;
 
             $http = $this->getHttpClient($url);
