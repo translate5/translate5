@@ -50,8 +50,7 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettings', {
         nextButtonText:'#UT#Importieren',
         groupComboLabel:'#UT#Globalese Benutzergruppe',
         engineComboLabel:'#UT#Globalese engine',
-        emptyComboText:'#UT#Bitte wählen',
-        importTaskMessage:'#UT#Import beendet. Globalese Vorübersetzung läuft.',
+        emptyComboText:'#UT#Bitte wählen'
     },
     initConfig: function(instanceConfig) {
         var me = this,

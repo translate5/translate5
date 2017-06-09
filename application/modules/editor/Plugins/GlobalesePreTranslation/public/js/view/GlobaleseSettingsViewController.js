@@ -110,7 +110,6 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettingsViewCon
             method: 'POST',
             params: params,
             success: function(response){
-                win.importTaskMessage=view.strings.importTaskMessage;
                 view.fireEvent('wizardCardFinished');
             },
             failure: function(response){

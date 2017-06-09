@@ -65,18 +65,19 @@
 		    <target>Bitte wählen</target>
 		</trans-unit>
 		
-		<trans-unit id='SW1wb3J0IGJlZW5kZXQuIEdsb2JhbGVzZSBWb3LDvGJlcnNldHp1bmcgbMOkdWZ0Lg=='>
-		    <source>Import beendet. Globalese Vorübersetzung läuft.</source>
-		    <target>Import beendet. Globalese Vorübersetzung läuft.</target>
-		</trans-unit>
-		
 		<trans-unit id='RGF0ZWllbiB3ZXJkZW4gaG9jaGdlbGFkZW4='>
 		    <source>Dateien werden hochgeladen</source>
 		    <target>Dateien werden hochgeladen</target>
 		</trans-unit>
+		
 		<trans-unit id='U2NobGllw59lbg=='>
 		    <source>Schließen</source>
 		    <target>Schließen</target>
+		</trans-unit>
+		
+		<trans-unit id='TGFkZW4='>
+		    <source>Laden</source>
+		    <target>Laden</target>
 		</trans-unit>
 
     </body>

@@ -65,9 +65,9 @@
 		    <target>Please select</target>
 		</trans-unit>
 		
-		<trans-unit id='SW1wb3J0IGJlZW5kZXQuIEdsb2JhbGVzZSBWb3LDvGJlcnNldHp1bmcgbMOkdWZ0Lg=='>
-		    <source>Import beendet. Globalese Vorübersetzung läuft.</source>
-		    <target>Import completed. Globalese pre-translation running.</target>
+		<trans-unit id='TGFkZW4='>
+		    <source>Laden</source>
+		    <target>Loading</target>
 		</trans-unit>
 		
     </body>

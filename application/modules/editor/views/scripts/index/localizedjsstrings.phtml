@@ -384,7 +384,7 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.controller.admin.TaskOverview", {
         override: "Editor.controller.admin.TaskOverview",
         strings: {
-            taskImported: '<?php echo $this->translate->_('Aufgabe "{0}" vollständig importiert');?>',
+            taskImported: '<?php echo $this->translate->_('Aufgabe "{0}" bereit.');?>',
             taskError: '<?php echo $this->translate->_('Die Aufgabe konnte aufgrund von Fehlern nicht importiert werden!');?>',
             taskOpening: '<?php echo $this->translate->_('Aufgabe wird im Editor geöffnet...');?>',
             taskFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen...');?>',
@@ -394,7 +394,8 @@ Ext.define('Editor.controller.Localizer', {
             taskDestroy: '<?php echo $this->translate->_('Aufgabe wird gelöscht...');?>',
             taskNotDestroyed: '<?php echo $this->translate->_('Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!');?>',
             forcedReadOnly: '<?php echo $this->translate->_('Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!');?>',
-            openTaskAdminBtn: '<?php echo $this->translate->_('Aufgabenübersicht');?>'
+            openTaskAdminBtn: '<?php echo $this->translate->_('Aufgabenübersicht');?>',
+            loadingWindowMessage: '<?php echo $this->translate->_('Dateien werden hochgeladen');?>'
         },
         confirmStrings: {
             "finish":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>"},
@@ -460,7 +461,7 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.view.admin.TaskAddWindow", {
         override: "Editor.view.admin.TaskAddWindow",
         title: '<?php echo $this->translate->_('Aufgabe erstellen');?>',
-        importTaskMessage:'<?php echo $this->translate->_('Import beendet');?>',
+        importTaskMessage:'<?php echo $this->translate->_('Hochladen beendet. Import und Vorbereitung laufen.');?>',
         strings: {
             importUploadTip: '<?php echo $this->translate->_('Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, openTM2-XLIFF; Angabe notwendig)');?>',
             importUploadLabel: '<?php echo $this->translate->_('Import Datei¹');?>',
