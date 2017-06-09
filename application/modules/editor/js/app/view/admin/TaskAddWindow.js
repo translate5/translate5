@@ -72,11 +72,11 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         bottomInfo2: '#UT# ² Eine TBX Datei ist optional. Eine TBX Datei im TBX-Core Format wird benötigt um Terminology auszuzeichnen.',
         feedbackText: "#UT# Fehler beim Import!",
         feedbackTip: '#UT#Fehler beim Import: Bitte wenden Sie sich an den Support!',
-        addBtn: '#UT#Task hinzufügen',
-        addBtnWizard: '#UT#Add Task (skip next steps)',
-        btnNextWizard:'#UT#Next',
+        addBtn: '#UT#Aufgabe Importieren',
+        addBtnWizard: '#UT#Importieren (weitere überspringen)',
+        btnNextWizard:'#UT#Weiter',
         cancelBtn: '#UT#Abbrechen',
-        btnSkip:'#UT#Skip',
+        btnSkip:'#UT#Weiter',
     },
     height : 500,
     width : 1000,
@@ -95,7 +95,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
       }
     },
     
-    importTaskMessage:"#UT#Your task import is completed.",
+    importTaskMessage:"#UT#Import beendet",
     
     initConfig: function(instanceConfig) {
         var me = this,

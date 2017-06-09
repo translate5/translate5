@@ -40,37 +40,12 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.TaskUploadViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.taskUpload',
-    
-    strings:{
-        noEnginesFoundMsg:'#UT#No Globalese translation engine for the current language combination available for your username. Please change the username or skip Globalese pre-translation',
-        noGroupsFoundMsg:'#UT#No groups found for curren user.',
-        groupsErrorMsg:'#UT#Globalese username and password combination is not valid.',
-        enginesErrorMsg:'#UT#Error on engines search.',
-    },
-    
-/*    listen: {
-        controller: {
-            taskOverviewController:{
-                taskWindowNextClick:'onTaskWindowNextClick'
-            }
-        }
 
-//here listen on the continue button
-//probably i need to fire a event in TaskOverVeiw controller, for the continue click, and then listen on the controller like i did it for taskWindowNextClick 
-//pressing skip button triggers event cardfinished with integer paremter 2
-//pressing next button triggers event cardfinished with integer paremter 1
-    },
-  */
-    
     onTaskUploadActivate:function(panel,eOpts){
         var me=this,
             view=me.getView();
         view.fireEvent('wizardCardFinished');
     },
-    
-    onAuthPanelBeforeRender:function(panel,eOpts){
-    },
-
     
     handleNextCardClick:function(){
         var me=this,

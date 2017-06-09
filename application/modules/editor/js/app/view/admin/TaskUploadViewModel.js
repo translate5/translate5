@@ -41,9 +41,6 @@ Ext.define('Editor.view.admin.TaskUploadViewModel', {
         //FIXME comment: content of the formula functions are some how evaled so it 
         // should not contain comments and invalid code
         isAddTaskButton: function(get) {
-            //FIXME here return the result from the hasAddTaskButton
-            //each button shuld contain his own function in each card
-            //so we can decide if the button is visible or not
             return get('activeItem').hasAddTaskButton();
         }
     }
