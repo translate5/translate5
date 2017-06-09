@@ -137,7 +137,7 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
             },
             failure: function(response){
                 window.setLoading(false);
-                Editor.MessageBox.addError(me.strings.enginesErrorMsg);
+                Editor.app.getController('ServerException').handleException(response);
             } 
         });
     },
