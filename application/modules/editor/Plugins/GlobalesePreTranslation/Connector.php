@@ -372,9 +372,14 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         $url='translation-files/'.$fileId.'/download?state='.self::GLOBALESE_FILESTATUS_TRANSLATED;
         $http = $this->getHttpClient($url);
         $response = $http->request('GET');
-        
-        $result = $this->processResponse($response,true);
-        
+        try{
+            $result = $this->processResponse($response,true);
+        } catch (ZfExtended_Exception $ex) {
+            $this->deleteFile($fileId);
+            /* @var $erroLog ZfExtended_Log */
+            $erroLog= ZfExtended_Factory::get('ZfExtended_Log');
+            $erroLog->logError("Error occurred during file download (taskGuid=".$this->getTask()->getTaskGuid()."),(globalese file id = ".$fileId.")".$ex->getMessage());
+        }
         if($remove){
             $this->deleteFile($fileId);
         }
