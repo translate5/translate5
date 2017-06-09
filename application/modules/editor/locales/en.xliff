@@ -1499,6 +1499,30 @@
     <source>Zieltext (zur Importzeit)</source>
     <target>target (version on import time)</target>
 </trans-unit>
+<trans-unit id='QXVmZ2FiZSBJbXBvcnRpZXJlbg=='>
+    <source>Aufgabe Importieren</source>
+    <target>Import</target>
+</trans-unit>
+<trans-unit id='SW1wb3J0aWVyZW4gKHdlaXRlcmUgw7xiZXJzcHJpbmdlbik='>
+    <source>Importieren (weitere überspringen)</source>
+    <target>Import (skip next steps)</target>
+</trans-unit>
+<trans-unit id='V2VpdGVy'>
+    <source>Weiter</source>
+    <target>Next</target>
+</trans-unit>
+<trans-unit id='SW1wb3J0IGJlZW5kZXQ='>
+    <source>Import beendet</source>
+    <target>Import completed</target>
+</trans-unit>
+<trans-unit id='RGF0ZWllbiB3ZXJkZW4gaG9jaGdlbGFkZW4='>
+    <source>Dateien werden hochgeladen</source>
+    <target>Upload in progress</target>
+</trans-unit>
+<trans-unit id='U2NobGllw59lbg=='>
+    <source>Schließen</source>
+    <target>Close</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

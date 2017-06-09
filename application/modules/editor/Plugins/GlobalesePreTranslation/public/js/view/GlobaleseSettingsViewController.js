@@ -114,7 +114,7 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettingsViewCon
                 view.fireEvent('wizardCardFinished');
             },
             failure: function(response){
-                console.log(response);
+                Editor.app.getController('ServerException').handleException(response);
             } 
         });
     }

@@ -149,13 +149,18 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
      * @return stdClass|string
      */
     private function processResponse(Zend_Http_Response $response,$responseAsXlif=false){
-        $validStates = [200, 201];
+        $validStates = [200,201,401];
         
         //check for HTTP State (REST errors)
         if(!in_array($response->getStatus(), $validStates)) {
             throw new ZfExtended_BadGateway($response->getBody(), 500);
         }
         
+        //if the user is unauthorized
+        if($response->getStatus() == 401){
+            throw new ZfExtended_NotAuthenticatedException($response->getBody(),401);
+        }
+            
         if($responseAsXlif){
             return $response->getBody();
         }

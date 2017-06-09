@@ -60,6 +60,12 @@ class editor_Plugins_GlobalesePreTranslation_Init extends ZfExtended_Plugin_Abst
     protected function initEvents() {
         $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
         $this->eventManager->attach('editor_Models_Import', 'importWorkerQueued', array($this, 'handleImportWorkerQueued'));
+        $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
+    }
+    
+    public function initJsTranslations(Zend_EventManager_Event $event) {
+        $view = $event->getParam('view');
+        $view->pluginLocale()->add($this, 'views/localizedjsstrings.phtml');
     }
     
     /**
@@ -143,7 +149,7 @@ class editor_Plugins_GlobalesePreTranslation_Init extends ZfExtended_Plugin_Abst
         }
         $worker->queue($event->getParam('workerId'));
         
-        //destroy the sessing
+        //unset the session namespace
         Zend_Session::namespaceUnset('GlobalesePreTranslation');
     }
 }

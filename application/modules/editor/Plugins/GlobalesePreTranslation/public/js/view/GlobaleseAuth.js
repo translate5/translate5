@@ -49,10 +49,10 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuth', {
         beforerender: 'onAuthPanelBeforeRender'
     },
     strings:{
-        skipPreTranslation:'#UT#Skip Globalese pre-translation',
-        username:'#UT#API Username',
-        apiKey:'#UT#API Key',
-        wizardTitle:'#UT#Globalese authentication'
+        skipPreTranslation:'#UT#Globalese Vorübersetzung überspringen',
+        username:'#UT#Globalese Benutzer',
+        apiKey:'#UT#API Schlüssel',
+        wizardTitle:'#UT#Globalese Authentifizierung'
     },
     initConfig: function(instanceConfig) {
         var me = this,
