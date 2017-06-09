@@ -46,8 +46,7 @@ Ext.define('Editor.view.ViewPortEditor', {
         'Editor.view.fileorder.ReferenceTree',
         'Editor.view.segments.Grid',
         'Editor.view.segments.MetaPanelNavi',
-        'Editor.view.segments.MetaPanel',
-        'Editor.plugins.VisualReview.view.VisualReview'
+        'Editor.view.segments.MetaPanel'
     ],
 
     viewModel: {
@@ -138,6 +137,7 @@ Ext.define('Editor.view.ViewPortEditor', {
             //},
             items:[{
                 xtype:'container',
+                itemId:'northPanelContainer',
                 layout: {
                     type: 'vbox',
                     align : 'stretch',
@@ -145,8 +145,6 @@ Ext.define('Editor.view.ViewPortEditor', {
                 },
                 items:[{
                     xtype: 'headPanel'
-                },{
-                    xtype:'visualReviewPanel'
                 }]
             }]
         };

@@ -273,6 +273,7 @@ Ext.define('Editor.controller.ViewModes', {
 
     //ergo only    
     me.getFilePanel().collapse();
+    console.log("ViewModes filepanel collapse");
     
     //calculate width of non content columns visible in ergo mode
     var widthToRedColWidth = 0;
