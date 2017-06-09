@@ -95,7 +95,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
       }
     },
     
-    importTaskMessage:"#UT#Import beendet",
+    importTaskMessage:"#UT#Hochladen beendet. Import und Vorbereitung laufen.",
     
     initConfig: function(instanceConfig) {
         var me = this,
