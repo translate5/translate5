@@ -76,7 +76,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         addBtnWizard: '#UT#Importieren (weitere überspringen)',
         btnNextWizard:'#UT#Weiter',
         cancelBtn: '#UT#Abbrechen',
-        btnSkip:'#UT#Weiter',
+        btnSkip:'#UT#Importieren (weitere überspringen)',
     },
     height : 500,
     width : 1000,
