@@ -79,7 +79,7 @@ class editor_Plugins_GlobalesePreTranslation_SegmentUpdateProcessor extends edit
         
         //the XLF import adds the segmentNrInTask to the real mid, since the real mid could not be unique in the XLF
         $mid = explode('_', $mid);
-        $mid = end($mid);
+        $mid = reset($mid);
         
         if($attributes->targetState !== 'needs-review-translation') {
             return;
@@ -108,6 +108,7 @@ class editor_Plugins_GlobalesePreTranslation_SegmentUpdateProcessor extends edit
         
         try {
             $this->segment->setTarget($updateContent);
+            $this->segment->setTargetMd5($data[$target]["originalMd5"]);
             $this->segment->setTargetEdit($updateContent);
             $this->segment->setMatchRateType('import;mt;globalese');
             $this->segment->save();

@@ -78,7 +78,7 @@ class editor_Models_Import_SegmentProcessor_RepetitionHash extends editor_Models
         $source = &$allFields[editor_Models_SegmentField::TYPE_SOURCE];
         $target = &$allFields[editor_Models_SegmentField::TYPE_TARGET];
         
-        $sourceTagCount = $this->getCountSourceEdting($source);
+        $sourceTagCount = $this->getCountSourceEditing($source);
         $targetTagCount = $this->hashField($target, $sourceTagCount);
         $this->hashField($source, $targetTagCount);
         return false;
@@ -109,7 +109,7 @@ class editor_Models_Import_SegmentProcessor_RepetitionHash extends editor_Models
      * returns an empty string when source editing is false
      * @return mixed
      */
-    protected function getCountSourceEdting(array $data) {
+    protected function getCountSourceEditing(array $data) {
         if(!$this->isSourceEditing) {
             return '';
         }
