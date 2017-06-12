@@ -53,9 +53,6 @@ class editor_Plugins_GlobalesePreTranslation_GlobaleseController extends ZfExten
      * @see ZfExtended_RestController::indexAction()
      */
     public function indexAction(){
-        //$connector = ZfExtended_Factory::get('editor_Plugins_GlobalesePreTranslation_Connector');
-        /* @var $connector editor_Plugins_GlobalesePreTranslation_Connector */
-        //$connector->getGroups();
     }
     
     public function groupsAction(){
@@ -113,14 +110,10 @@ class editor_Plugins_GlobalesePreTranslation_GlobaleseController extends ZfExten
         if(!$data){
             return;
         }
+        //save the auth and globalese parameters in session
         $globaleseSession->engine =$data->engine;
         $globaleseSession->group =$data->group;
         $globaleseSession->apiUsername =$data->apiUsername;
         $globaleseSession->apiKey =$data->apiKey;
-        //new session namespace
-        //save the data from the gui to the session
-        
-        //here you save the posted data into the session
-        //throw new ZfExtended_BadMethodCallException(__CLASS__.'->post');
     }
 }

@@ -42,10 +42,11 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
     alias: 'controller.globaleseAuthPanel',
 
     strings:{
-        noEnginesFoundMsg:'#UT#No Globalese translation engine for the current language combination available for your username. Please change the username or skip Globalese pre-translation',
-        noGroupsFoundMsg:'#UT#No groups found for curren user.',
-        groupsErrorMsg:'#UT#Globalese username and password combination is not valid.',
-        enginesErrorMsg:'#UT#Error on engines search.',
+        noEnginesFoundMsg:'#UT#Keine Globalese Übersetzungs-Engine verfügbar (für Ihren Globalese Benutzer und Ihre Sprachkombination). Bitte ändern Sie den Benutzer oder überspringen Sie die Vorübersetzung.',
+        noGroupsFoundMsg:'#UT#Keine Globalese Benutzergruppe verfügbar (für Ihren Globalese Benutzer und Ihre Sprachkombination). Bitte ändern Sie den Benutzer oder überspringen Sie die Vorübersetzung.',
+        authErrorMsg:'#UT#Benutzer oder Passwort sind nicht valide.',
+        loadingWindowMessage:"#UT#Laden",
+        
     },
     
     onAuthPanelBeforeRender:function(panel,eOpts){
@@ -137,7 +138,7 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
             },
             failure: function(response){
                 window.setLoading(false);
-                Editor.MessageBox.addError(me.strings.enginesErrorMsg);
+                Editor.app.getController('ServerException').handleException(response);
             } 
         });
     },
@@ -154,9 +155,8 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
             globaleseGroup=window.down('#globaleseGroup'),
             url = Editor.data.restpath+'plugins_globalesepretranslation_globalese/groups';
         
-            window.setLoading(true);
+            window.setLoading(me.strings.loadingWindowMessage);
             
-            //str = me.strings,
             params = {},
             authData = Ext.JSON.encode({
                 username: apiusername,
@@ -187,7 +187,11 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
             },
             failure: function(response){
                 window.setLoading(false);
-                Editor.MessageBox.addError(me.strings.groupsErrorMsg);
+                if(response.status=401){
+                    Editor.MessageBox.addError(me.strings.authErrorMsg);
+                    return;
+                }
+                Editor.app.getController('ServerException').handleException(response);
             } 
         });
     }

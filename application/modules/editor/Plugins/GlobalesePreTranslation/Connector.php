@@ -149,13 +149,18 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
      * @return stdClass|string
      */
     private function processResponse(Zend_Http_Response $response,$responseAsXlif=false){
-        $validStates = [200, 201];
+        $validStates = [200,201,401];
         
         //check for HTTP State (REST errors)
         if(!in_array($response->getStatus(), $validStates)) {
             throw new ZfExtended_BadGateway($response->getBody(), 500);
         }
         
+        //if the user is unauthorized
+        if($response->getStatus() == 401){
+            throw new ZfExtended_NotAuthenticatedException($response->getBody(),401);
+        }
+            
         if($responseAsXlif){
             return $response->getBody();
         }
@@ -367,9 +372,14 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         $url='translation-files/'.$fileId.'/download?state='.self::GLOBALESE_FILESTATUS_TRANSLATED;
         $http = $this->getHttpClient($url);
         $response = $http->request('GET');
-        
-        $result = $this->processResponse($response,true);
-        
+        try{
+            $result = $this->processResponse($response,true);
+        } catch (ZfExtended_Exception $ex) {
+            $this->deleteFile($fileId);
+            /* @var $erroLog ZfExtended_Log */
+            $erroLog= ZfExtended_Factory::get('ZfExtended_Log');
+            $erroLog->logError("Error occurred during file download (taskGuid=".$this->getTask()->getTaskGuid()."),(globalese file id = ".$fileId.")".$ex->getMessage());
+        }
         if($remove){
             $this->deleteFile($fileId);
         }

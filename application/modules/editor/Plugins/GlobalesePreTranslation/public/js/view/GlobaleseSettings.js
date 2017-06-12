@@ -46,12 +46,11 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettings', {
     ],
     mixins:['Editor.controller.admin.IWizardCard'],
     strings:{
-        wizardTitle:'#UT#Globalese settings',
-        nextButtonText:'#UT#Add Task',
-        groupComboLabel:'#UT#Globalese group',
+        wizardTitle:'#UT#Globalese Einstellungen',
+        nextButtonText:'#UT#Importieren',
+        groupComboLabel:'#UT#Globalese Benutzergruppe',
         engineComboLabel:'#UT#Globalese engine',
-        emptyComboText:'#UT#-- Please select --',
-        importTaskMessage:'#UT#Your task import is completed. Globalese pretranslation is in progres.',
+        emptyComboText:'#UT#Bitte wählen'
     },
     initConfig: function(instanceConfig) {
         var me = this,

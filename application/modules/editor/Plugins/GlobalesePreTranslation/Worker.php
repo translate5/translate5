@@ -190,7 +190,10 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
      * 
      */
     protected function reImportTranslated($globFileId) {
-        $translatedXlf = $this->api->getFileContent($globFileId);
+        $translatedXlf = trim($this->api->getFileContent($globFileId));
+        if(empty($translatedXlf)){
+            return;
+        }
         if(empty($this->fileIdMap) || !array_key_exists($globFileId, $this->fileIdMap)){
             return;
         }
