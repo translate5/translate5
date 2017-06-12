@@ -434,17 +434,6 @@ Ext.define('Editor.controller.Segments', {
       me.handleFilterChange();
   },
   /**
-   * Hilfsfunktion um beim Schließen des Browserfensters das letzte Segment anzuzeigen
-   * @returns boolean|string
-   */
-  getLastSegmentShortInfo: function() {
-    var grid = this.getSegmentGrid();
-    if(grid && grid.editingPlugin.editor) {
-      return this.getSegmentGrid().editingPlugin.editor.lastSegmentShortInfo;
-    }
-    return false;
-  },
-  /**
    * binds the change alike load operation to the save chain
    * @param {Editor.store.AlikeSegments} store
    * @param {Ext.data.Operation} op

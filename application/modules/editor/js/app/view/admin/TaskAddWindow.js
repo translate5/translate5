@@ -29,9 +29,19 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.view.admin.TaskAddWindow', {
     extend: 'Ext.window.Window',
+    requires:[
+        'Editor.view.admin.TaskUpload',
+        'Editor.view.admin.TaskAddWindowViewModel'
+    ],
+    mixins:[
+        'Editor.controller.admin.IWizardCard'
+    ],
     alias: 'widget.adminTaskAddWindow',
     itemId: 'adminTaskAddWindow',
     cls: 'adminTaskAddWindow',
+    viewModel: {
+        type: 'adminTaskAddWindow'
+    },
     title: '#UT#Aufgabe erstellen',
     strings: {
         importUploadTip: '#UT#Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF; Angabe notwendig)',
@@ -62,13 +72,31 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         bottomInfo2: '#UT# ² Eine TBX Datei ist optional. Eine TBX Datei im TBX-Core Format wird benötigt um Terminology auszuzeichnen.',
         feedbackText: "#UT# Fehler beim Import!",
         feedbackTip: '#UT#Fehler beim Import: Bitte wenden Sie sich an den Support!',
-        addBtn: '#UT#Task hinzufügen',
-        cancelBtn: '#UT#Abbrechen'
+        addBtn: '#UT#Aufgabe Importieren',
+        addBtnWizard: '#UT#Importieren (weitere überspringen)',
+        btnNextWizard:'#UT#Weiter',
+        cancelBtn: '#UT#Abbrechen',
+        btnSkip:'#UT#Importieren (weitere überspringen)',
     },
     height : 500,
     width : 1000,
     modal : true,
     layout: 'anchor',
+    listeners:{
+      afterrender:function(win){
+          var winLayout=win.getLayout(),
+              vm=win.getViewModel();
+          taskUpload = {
+                  xtype:'taskUpload',
+                  itemId:'taskUploadCard'
+          };
+          win.insertImport(taskUpload);
+          vm.set('activeItem',winLayout.getActiveItem());
+      }
+    },
+    
+    importTaskMessage:"#UT#Hochladen beendet. Import und Vorbereitung laufen.",
+    
     initConfig: function(instanceConfig) {
         var me = this,
             langCombo = {
@@ -81,133 +109,171 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
             },
             config = {
                 title: me.title, //see EXT6UPD-9
-            items : [{
-                xtype: 'form',
-                padding: 5,
-                ui: 'default-frame',
-                layout: 'hbox',
-                layoutConfig : {
-                    align : 'stretch',
-                },
-                anchor: '100%',
-                items: [{
-                    xtype: 'container',
-                    flex: 1,
-                    layout: 'anchor',
-                    padding: '0 10 0 0',
-                    defaults: {
-                        labelWidth: 200,
-                        anchor: '100%'
-                    },
-                    items: [{
-                        xtype: 'textfield',
-                        name: 'taskName',
-                        maxLength: 255,
-                        allowBlank: false,
-                        toolTip: me.strings.taskNameTip,
-                        fieldLabel: me.strings.taskNameLabel
-                    },{
-                        xtype: 'textfield',
-                        maxLength: 120,
-                        name: 'taskNr',
-                        fieldLabel: me.strings.taskNrLabel
-                    },Ext.applyIf({
-                        name: 'sourceLang',
-                        allowBlank: false,
-                        toolTip: me.strings.sourceLangTip,
-                        //each combo needs its own store instance, see EXT6UPD-8
-                        store: Ext.create(Editor.store.admin.Languages),
-                        fieldLabel: me.strings.sourceLangLabel
-                    }, langCombo),Ext.applyIf({
-                        name: 'targetLang',
-                        allowBlank: false,
-                        toolTip: me.strings.targetLangTip,
-                        //each combo needs its own store instance, see EXT6UPD-8
-                        store: Ext.create(Editor.store.admin.Languages),
-                        fieldLabel: me.strings.targetLangLabel
-                    }, langCombo),Ext.applyIf({
-                        name: 'relaisLang',
-                        getSubmitValue: function() {
-                        return this.getValue();
+                layout: 'card',
+                items:[
+                    {
+                        xtype:'panel',
+                        itemId: 'taskMainCard',
+                        items:[{
+                            xtype: 'form',
+                            padding: 5,
+                            ui: 'default-frame',
+                            layout: 'hbox',
+                            layoutConfig : {
+                                align : 'stretch',
+                            },
+                            anchor: '100%',
+                            items: [{
+                                xtype: 'container',
+                                flex: 1,
+                                layout: 'anchor',
+                                padding: '0 10 0 0',
+                                defaults: {
+                                    labelWidth: 200,
+                                    anchor: '100%'
+                                },
+                                items: [{
+                                    xtype: 'textfield',
+                                    name: 'taskName',
+                                    maxLength: 255,
+                                    allowBlank: false,
+                                    toolTip: me.strings.taskNameTip,
+                                    fieldLabel: me.strings.taskNameLabel
+                                },{
+                                    xtype: 'textfield',
+                                    maxLength: 120,
+                                    name: 'taskNr',
+                                    fieldLabel: me.strings.taskNrLabel
+                                },Ext.applyIf({
+                                    name: 'sourceLang',
+                                    allowBlank: false,
+                                    toolTip: me.strings.sourceLangTip,
+                                    //each combo needs its own store instance, see EXT6UPD-8
+                                    store: Ext.create(Editor.store.admin.Languages),
+                                    fieldLabel: me.strings.sourceLangLabel
+                                }, langCombo),Ext.applyIf({
+                                    name: 'targetLang',
+                                    allowBlank: false,
+                                    toolTip: me.strings.targetLangTip,
+                                    //each combo needs its own store instance, see EXT6UPD-8
+                                    store: Ext.create(Editor.store.admin.Languages),
+                                    fieldLabel: me.strings.targetLangLabel
+                                }, langCombo),Ext.applyIf({
+                                    name: 'relaisLang',
+                                    getSubmitValue: function() {
+                                    return this.getValue();
+                                    },
+                                    //each combo needs its own store instance, see EXT6UPD-8
+                                    store: Ext.create(Editor.store.admin.Languages),
+                                    toolTip: me.strings.relaisLangTip,
+                                    fieldLabel: me.strings.relaisLangLabel
+                                }, langCombo),{
+                                    xtype: 'filefield',
+                                    name: 'importUpload',
+                                    regex: /\.(zip|sdlxliff|xlf|csv|testcase)$/i,
+                                    regexText: me.strings.importUploadType,
+                                    allowBlank: false,
+                                    toolTip: me.strings.importUploadTip,
+                                    fieldLabel: me.strings.importUploadLabel
+                                },{
+                                    xtype: 'container',
+                                    layout: 'auto',
+                                    padding: '0 0 10 0',
+                                    html: Ext.String.format(me.strings.importNews, Editor.data.pathToRunDir)
+                                },{
+                                    xtype: 'filefield',
+                                    name: 'importTbx',
+                                    regex: /\.tbx$/i,
+                                    regexText: me.strings.importTbxType,
+                                    allowBlank: true,
+                                    toolTip: me.strings.importTbxTip,
+                                    fieldLabel: me.strings.importTbxLabel
+                                }]
+                            },{
+                                xtype: 'container',
+                                flex: 1,
+                                layout: 'anchor',
+                                defaults: {
+                                    labelWidth: 200,
+                                    anchor: '100%'
+                                },
+                                items: [{
+                                    xtype: 'datefield',
+                                    name: 'orderdate',
+                                    submitFormat: Editor.DATE_ISO_FORMAT,
+                                    value: new Date(),
+                                    fieldLabel: me.strings.orderdate
+                                },{
+                                    xtype: 'datefield',
+                                    name: 'targetDeliveryDate',
+                                    submitFormat: Editor.DATE_ISO_FORMAT,
+                                    value: new Date(),
+                                    fieldLabel: me.strings.targetDeliveryLabel
+                                },{
+                                    xtype: 'numberfield',
+                                    name: 'wordCount',
+                                    fieldLabel: me.strings.numberFieldLabel
+                                },(Editor.data.enableSourceEditing  ? {
+                                    xtype: 'checkbox',
+                                    inputValue: 1,
+                                    name: 'enableSourceEditing',
+                                    fieldLabel: me.strings.sourceEditLabel
+                                } : {
+                                    xtype: 'hidden',
+                                    value: 0,
+                                    name: 'enableSourceEditing'
+                                }),{
+                                    xtype: 'checkbox',
+                                    inputValue: 1,
+                                    name: 'edit100PercentMatch',
+                                    fieldLabel: me.strings.fullMatchLabel
+                                },{
+                                    xtype: 'checkbox',
+                                    inputValue: 1,
+                                    name: 'lockLocked',
+                                    checked: true,
+                                    fieldLabel: me.strings.lockLockedLabel
+                                }]
+                            }]
+                        
+                        },{
+                            xtype: 'container',
+                            padding: '10',
+                            html: me.strings.bottomInfo+'<br />'+me.strings.bottomInfo2,
+                            dock : 'bottom'
+                        }],
+                        triggerNextCard:function(activeItem){
+                            var form = activeItem.down('form');
+                            if(form.isValid()){
+                                activeItem.fireEvent('wizardCardFinished');
+                            }
                         },
-                        //each combo needs its own store instance, see EXT6UPD-8
-                        store: Ext.create(Editor.store.admin.Languages),
-                        toolTip: me.strings.relaisLangTip,
-                        fieldLabel: me.strings.relaisLangLabel
-                    }, langCombo),{
-                        xtype: 'filefield',
-                        name: 'importUpload',
-                        regex: /\.(zip|sdlxliff|xlf|csv|testcase)$/i,
-                        regexText: me.strings.importUploadType,
-                        allowBlank: false,
-                        toolTip: me.strings.importUploadTip,
-                        fieldLabel: me.strings.importUploadLabel
-                    },{
-                        xtype: 'container',
-                        layout: 'auto',
-                        padding: '0 0 10 0',
-                        html: Ext.String.format(me.strings.importNews, Editor.data.pathToRunDir)
-                    },{
-                        xtype: 'filefield',
-                        name: 'importTbx',
-                        regex: /\.tbx$/i,
-                        regexText: me.strings.importTbxType,
-                        allowBlank: true,
-                        toolTip: me.strings.importTbxTip,
-                        fieldLabel: me.strings.importTbxLabel
-                    }]
-                },{
-                    xtype: 'container',
-                    flex: 1,
-                    layout: 'anchor',
-                    defaults: {
-                        labelWidth: 200,
-                        anchor: '100%'
-                    },
-                    items: [{
-                        xtype: 'datefield',
-                        name: 'orderdate',
-                        submitFormat: Editor.DATE_ISO_FORMAT,
-                        value: new Date(),
-                        fieldLabel: me.strings.orderdate
-                    },{
-                        xtype: 'datefield',
-                        name: 'targetDeliveryDate',
-                        submitFormat: Editor.DATE_ISO_FORMAT,
-                        value: new Date(),
-                        fieldLabel: me.strings.targetDeliveryLabel
-                    },{
-                        xtype: 'numberfield',
-                        name: 'wordCount',
-                        fieldLabel: me.strings.numberFieldLabel
-                    },(Editor.data.enableSourceEditing  ? {
-                        xtype: 'checkbox',
-                        inputValue: 1,
-                        name: 'enableSourceEditing',
-                        fieldLabel: me.strings.sourceEditLabel
-                    } : {
-                        xtype: 'hidden',
-                        value: 0,
-                        name: 'enableSourceEditing'
-                    }),{
-                        xtype: 'checkbox',
-                        inputValue: 1,
-                        name: 'edit100PercentMatch',
-                        fieldLabel: me.strings.fullMatchLabel
-                    },{
-                        xtype: 'checkbox',
-                        inputValue: 1,
-                        name: 'lockLocked',
-                        checked: true,
-                        fieldLabel: me.strings.lockLockedLabel
-                    }]
-                }]
-            },{
-                xtype: 'container',
-                padding: '10',
-                html: me.strings.bottomInfo+'<br />'+me.strings.bottomInfo2,
-                dock : 'bottom'
-            }],
+                        disableSkipButton:function(get){
+                            return true;
+                        },
+                        
+                        disableContinueButton:function(get){
+                            var me=this,
+                                win=me.up('window');
+                            return win.isTaskUploadNext();
+                        },
+                        
+                        disableAddButton:function(get){
+                            var me=this,
+                                win=me.up('window');
+                            
+                            if(!win.isTaskUploadNext()){
+                                win.down('#add-task-btn').setText(win.strings.addBtnWizard);
+                            }
+                            
+                            return false;
+                        },
+
+                        disableCancelButton:function(get){
+                            return false;
+                        }
+                    }
+                ],
             dockedItems : [{
                 xtype : 'toolbar',
                 dock : 'bottom',
@@ -228,21 +294,62 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     xtype: 'tbfill'
                 },{
                     xtype : 'button',
+                    iconCls : 'ico-next-wizard',
+                    itemId : 'continue-wizard-btn',
+                    bind:{
+                        disabled:'{disableContinueButton}',
+                        visible:'{!disableContinueButton}'
+                    },
+                    text : me.strings.btnNextWizard
+                },{
+                    xtype : 'button',
+                    iconCls : 'ico-skip-wizard',
+                    itemId : 'skip-wizard-btn',
+                    bind:{
+                        disabled:'{disableSkipButton}',
+                        visible:'{!disableSkipButton}'
+                    },
+                    text : me.strings.btnSkip
+                },{
+                    xtype : 'button',
                     iconCls : 'ico-task-add',
                     itemId : 'add-task-btn',
+                    bind:{
+                      disabled:'{disableAddButton}',
+                      visible:'{!disableAddButton}'
+                    },
                     text : me.strings.addBtn
                 }, {
                     xtype : 'button',
                     iconCls : 'ico-cancel',
                     itemId : 'cancel-task-btn',
+                    bind:{
+                        disabled:'{disableCancelButton}',
+                        visible:'{!disableCancelButton}'
+                    },
                     text : me.strings.cancelBtn
                 }]
             }]
         };
-
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
+    },
+    insertPreImport:function(card){
+        //find the index and insert the card
+    },
+    insertImport:function(card){
+        //find the index and insert the card
+        this.add(card);
+    },
+    insertPostImport:function(card){
+        //inser the card at the end of the items
+    },
+    isTaskUploadNext:function(){
+        var winLayout=this.getLayout(),
+            nextItem=winLayout.getNext();
+        
+        return nextItem.getXType()=="taskUpload";
     }
 });

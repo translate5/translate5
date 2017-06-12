@@ -58,7 +58,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
       fullMatchEdit: '#UT#100% Matches sind editierbar',
       lockLocked: '#UT#In importierter Datei gesperrte Segmente sind in translate5 gesperrt',
       orderdate: '#UT#Bestelldatum',
-      enableSourceEditing: '#UT#Quellsprache bearbeitbar'
+      enableSourceEditing: '#UT#Quellsprache bearbeitbar',
+      emptyTargets: '#UT#Leere Zielsprachen'
   },
   strings: {
       noRelaisLang: '#UT#- Ohne Relaissprache -',
@@ -70,7 +71,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
       addTask: '#UT#Aufgabe hinzufügen',
       addTaskTip: '#UT#Eine neue Aufgabe hinzufügen.',
       reloadBtn: '#UT#Aktualisieren',
-      reloadBtnTip: '#UT#Aufgabenliste vom Server aktualisieren.'
+      reloadBtnTip: '#UT#Aufgabenliste vom Server aktualisieren.',
+      emptyTargets: '#UT#Leere Zielsprachen. Wahr wenn beim Import alle zielsprachlichen Felder leer sind."'
   },
   states: {
       user_state_open: '#UT#offen',
@@ -433,6 +435,16 @@ Ext.define('Editor.view.admin.TaskGrid', {
               },
               tooltip: me.text_cols.fullMatchEdit,
               text: me.text_cols.fullMatchEdit
+          },{
+              xtype: 'owncheckcolumn',
+              width: 45,
+              cls: 'empty-targets',
+              dataIndex: 'emptyTargets',
+              filter: {
+                  type: 'boolean'
+              },
+              tooltip: me.strings.emptyTargets,
+              text: me.text_cols.emptyTargets
           },{
               xtype: 'owncheckcolumn',
               width: 45,

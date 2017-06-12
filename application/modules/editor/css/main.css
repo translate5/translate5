@@ -310,6 +310,9 @@ body.loading {background: url("../images/loading_ico.gif") center 100px no-repea
 .ico-add {background-image: url("../images/table_row_insert.png");}
 .ico-del {background-image: url("../images/table_row_delete.png");}
 .ico-task-back {background-image: url("../images/table_back.png");}
+.ico-next-wizard {background-image: url("../images/arrow_right.png");}
+.ico-skip-wizard {background-image: url("../images/resultset_last.png");}
+.ico-finish-wizard {background-image: url("../images/accept.png");}
 .adminTaskGrid tr.openable td.taskNr div {text-decoration: underline;cursor: pointer !important;}
 .adminTaskGrid .locked td.state div {padding-left:20px;background:url(../images/information.png) no-repeat left top;}
 .adminTaskGrid .error td.state div {padding-left:20px;background:url(../images/exclamation.png) no-repeat left top;}
@@ -325,6 +328,7 @@ body.loading {background: url("../images/loading_ico.gif") center 100px no-repea
 .adminTaskGrid .x-grid-header-ct .relais-lang > div {background:url("../images/relaisLanguage.png") no-repeat 10px 9px;}
 .adminTaskGrid .x-grid-header-ct .source-lang > div {background:url("../images/sourceLanguage.png") no-repeat 10px 9px;}
 .adminTaskGrid .x-grid-header-ct .target-lang > div {background:url("../images/targetLanguage.png") no-repeat 10px 9px;}
+.adminTaskGrid .x-grid-header-ct .empty-targets > div {background:url("../images/emptyTargetLanguage.png") no-repeat 10px 9px;}
 
 .adminTaskGrid .x-grid-header-ct .fullMatchEdit.ux-filtered-column span,
 .adminTaskGrid .x-grid-header-ct .terminologie.ux-filtered-column span,
@@ -343,6 +347,7 @@ body.loading {background: url("../images/loading_ico.gif") center 100px no-repea
 .adminTaskGrid .x-grid-header-ct .source-edit span.x-column-header-text-inner,
 .adminTaskGrid .x-grid-header-ct .source-lang span.x-column-header-text-inner,
 .adminTaskGrid .x-grid-header-ct .target-lang span.x-column-header-text-inner,
+.adminTaskGrid .x-grid-header-ct .empty-targets span.x-column-header-text-inner,
 .adminTaskGrid .x-grid-header-ct .relais-lang span.x-column-header-text-inner{
     display: block;
     overflow: hidden;
