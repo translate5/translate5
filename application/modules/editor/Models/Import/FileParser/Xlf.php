@@ -36,24 +36,68 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Fileparsing for import of IBM-XLIFF files
- *
+ * TODO: 
+ * - can not deal with <mrk type="seg"> subsegments!
+ * - sub tags are also not supported: idea for implementation: 
+ *     instead of adding the sub parser to the ContentConverter add some handlers here and treat the sub content as separate segment
+ *     then replace the sub content with a new internal tag so that the users gets a visual reference to the corresponding segment
+ *     this subreplacement has to be done before the content is passed to the ContentConverter
+ *     
  */
-class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParser
-{
-    private $ibmXliffNeedle = 'xmlns:tmgr="http://www.ibm.com"';
+class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParser {
     private $wordCount = 0;
     private $segmentCount = 1;
     
+    /**
+     * Helper to call namespace specfic parsing stuff 
+     * @var editor_Models_Import_FileParser_Xlf_Namespaces
+     */
+    protected $namespaces;
+    
+    protected $inSource = false;
+    protected $inTarget = false;
+    
+    /**
+     * Stack of the group translate information
+     * @var array
+     */
+    protected $groupTranslate = [];
+    
+    /**
+     * true if the current segment should be processed
+     * false if not
+     * @var boolean
+     */
+    protected $processSegment = true;
+    
+    /**
+     * @var editor_Models_Import_FileParser_XmlParser
+     */
+    protected $xmlparser;
+    
+    protected $currentSource = null;
+    protected $currentTarget = null;
+    
+    /**
+     * @var editor_Models_Import_FileParser_Xlf_ContentConverter
+     */
+    protected $contentConverter = null;
+    
+    /**
+     * @var editor_Models_Segment_InternalTag
+     */
+    protected $internalTag;
     
     /**
      * Init tagmapping
      */
     public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task)
     {
-        $this->addXlfTagMappings();
         parent::__construct($path, $fileName, $fileId, $task);
-        
         $this->protectUnicodeSpecialChars();
+        $this->initNamespaces();
+        $this->contentConverter = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_ContentConverter', [$this->namespaces, $this->task, $fileName]);
+        $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
     }
     
     
@@ -68,158 +112,257 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     }
     
     /**
-     * Adds the ibm-xliff specific tagmappings
-     * There exist just one: "ph"
-     */
-    private function addXlfTagMappings()
-    {
-        $this->_tagMapping['hardReturn']['name'] = 'ph';
-        $this->_tagMapping['softReturn']['name'] = 'ph';
-        $this->_tagMapping['macReturn']['name'] = 'ph';
-        
-        $this->_tagMapping['ph'] = array('name' => 'DummiePH', 'text' => '&lt;DummiePH/&gt;', 'imgText' => '<DummiePH/>');
-    }
-    
-    
-    /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::parse()
      */
     protected function parse() {
-        $this->_skeletonFile = $this->_origFileUnicodeProtected;
+        $this->segmentCount = 0;
+        $this->xmlparser = $parser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
+        /* @var $parser editor_Models_Import_FileParser_XmlParser */
         
-        if (strpos($this->_origFileUnicodeProtected, $this->ibmXliffNeedle) === false)
-        {
-            $msg = 'Die Datei ' . $this->_fileName . ' ist keine gültige IBM-Xliff Datei! ('.$this->ibmXliffNeedle.' nicht enthalten)';
-            $log = ZfExtended_Factory::get('ZfExtended_Log');
-            /* @var $log ZfExtended_Log */
-            $log->logError($msg);
-            return;
-        } 
+        $this->registerStructural();
+        $this->registerMeta();
+        $this->registerContent();
+        $this->namespaces->registerParserHandler($this->xmlparser);
         
-        // contains depth of <group>-tags
-        $groupLevel = 0;
-        // array, in dem die Verschachtelungstiefe der Group-Tags in Relation zu ihrer
-        // Einstellung des translate-Defaults festgehalten wird
-        // der Default wird auf true gesetzt
-        // ??? what does this mean (in english) ???
-        $translateGroupLevels = array($groupLevel - 1 => true);
+        $parser->parse($this->_origFileUnicodeProtected);
         
-        // TRANSLATE-284: Separation in groups does not exist in ibm-xliff. While it does not interfere, it stays here for analogie to sdl-xliff import. 
-        $groups = explode('<group', $this->_origFileUnicodeProtected);
-        $counterTrans = 0;
+        $this->_skeletonFile = (string) $parser;
         
-        foreach ($groups as &$group)
-        {
-            $translateGroupLevels[$groupLevel] = $translateGroupLevels[$groupLevel - 1];
-            
-            $units = array();
-            $match_expression = "/<trans-unit(.*?)>(.*?)<\/trans-unit>/is";
-            preg_match_all($match_expression, $group, $units, PREG_SET_ORDER);
-            $groupLevel = $groupLevel - substr_count($units[0][0], '</group>');
-            
-            if (empty($units))
-            {
-                $groupLevel++;
-                continue;
-            }
-            
-            foreach($units as &$unit)
-            {
-                $translate = $translateGroupLevels[$groupLevel];
-                if (preg_match('/translate="no"/i', $unit[1]))
-                {
-                    $translate = false;
-                }
-                elseif (preg_match('/translate="yes"/i', $unit[1]))
-                {
-                    $translate = true;
-                }
-                
-                $groupLevel = $groupLevel - substr_count($unit[0], '</group>');
-                if ($translate)
-                {
-                    $counterTrans++;
-                    $this->parseSegmentAttributes($unit);
-                    $this->addupSegmentWordCount($unit);
-                    $tempUnitSkeleton = $this->extractSegment($unit);
-                    $this->_skeletonFile = str_replace($unit[0], $tempUnitSkeleton, $this->_skeletonFile);
-                }
-            }
-            $groupLevel++;
-        }
-        
-        if ($counterTrans === 0) {
+        if ($this->segmentCount === 0) {
             error_log('Die Datei ' . $this->_fileName . ' enthielt keine übersetzungsrelevanten Segmente!');
         }
     }
     
+    /**
+     * registers handlers for nodes with meta data
+     */
+    protected function registerMeta() {
+        $this->xmlparser->registerElement('count', function($tag, $attributes, $key){
+            if($this->xmlparser->hasParent('transunit')){
+                $this->addupSegmentWordCount($attributes);
+            }
+        });
+    }
+    
+    /**
+     * registers handlers for source, seg-source and target nodes to be stored for later processing
+     */
+    protected function registerContent() {
+        $source = function($tag, $key, $opener){
+            //if there is already a source coming from seg-source use that and ignore the now parsed source
+            if($tag == 'source' && !empty($this->source) && $this->source['tag'] == 'seg-source'){
+                return;
+            }
+            $this->currentSource = [
+                    'tag' => $tag,
+                    'opener' => $opener['openerKey'],
+                    'closer' => $key,
+                    'openerMeta' => $opener,
+            ];
+        };
+        
+        $this->xmlparser->registerElement('source', null, $source);
+        $this->xmlparser->registerElement('seg-source', null, $source);
+        $this->xmlparser->registerElement('target', null, function($tag, $key, $opener){
+            $this->currentTarget = [
+                    'tag' => $tag,
+                    'opener' => $opener['openerKey'],
+                    'closer' => $key,
+                    'openerMeta' => $opener,
+            ];
+        });
+    }
+
+    /**
+     * registers handlers for structural nodes (group, transunit)
+     */
+    protected function registerStructural() {
+        $this->xmlparser->registerElement('group', function($tag, $attributes, $key){
+            $this->handleGroup($attributes);
+        }, function(){
+            array_pop($this->groupTranslate);
+        });
+        
+        $this->xmlparser->registerElement('trans-unit', function($tag, $attributes, $key){
+            $this->processSegment = $this->isTranslateable($attributes);
+            $this->currentSource = null;
+            $this->currentTarget = null; // set to null to identify if there is no a target at all
+            
+//From Globalese:
+//<trans-unit id="segmentNrInTask">
+//<source>Installation and Configuration</source>
+//<target state="needs-review-translation" state-qualifier="leveraged-mt" translate5:origin="Globalese">Installation und Konfiguration</target>
+//</trans-unit>
+        }, function($tag, $key, $opener) {
+            $this->extractSegment($opener['attributes']);
+            //leaving a transunit means disable segment processing
+            $this->processSegment = false;
+        });
+    }
+    
+    /**
+     * returns true if segment should be translated, considers also surrounding group tags
+     * @param array $transunitAttributes
+     */
+    protected function isTranslateable($transunitAttributes) {
+        if(!empty($transunitAttributes['translate'])) {
+            return $transunitAttributes['translate'] == 'yes';
+        }
+        $reverse = array_reverse($this->groupTranslate);
+        foreach($reverse as $group) {
+            if(is_null($group)) {
+                continue; //if the previous group provided no information, loop up 
+            }
+            return $group;
+        }
+        return true; //if not info given at all: translateable
+    }
+    
+    protected function initNamespaces() {
+        $this->namespaces = ZfExtended_Factory::get("editor_Models_Import_FileParser_Xlf_Namespaces",[$this->_origFileUnicodeProtected]);
+    }
+    
+    /**
+     * Handles a group tag
+     * @param array $attributes
+     */
+    protected function handleGroup(array $attributes) {
+        if(empty($attributes['translate'])) {
+            //we have to add also the groups without an translate attribute 
+            // so that array_pop works correct on close node 
+            $this->groupTranslate[] = null;
+            return;
+        }
+        $this->groupTranslate[] = (strtolower($attributes['translate']) == 'yes');
+    }
     
     /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::parseSegmentAttributes()
      */
-    protected function parseSegmentAttributes($transunit)
+    protected function parseSegmentAttributes($attributes)
     {
+        settype($attributes['id'], 'integer');
         //build mid from id of segment plus segmentCount, because xlf-file can have more than one file in it with repeatingly the same ids.
-        //mid is unique per imported xliff-file
-        $id = preg_replace('/.* id="(.*?)".*/i', '${1}', $transunit[1]).'_'.$this->segmentCount++;
-        $matchRate = (int) preg_replace('/.*tmgr:matchratio="(.*?)".*/i', '${1}', $transunit[1]);
+        // and one trans-unit (where the id comes from) can contain multiple mrk type seg tags, which are all converted into single segments.
+        // instead of using mid from the mrk type seg element, the segmentCount as additional ID part is fine.
+        $id = $attributes['id'].'_'.++$this->segmentCount;
         
-        $attributes = $this->createSegmentAttributes($id);
-        //from XLF we support only the matchRate at the moment, rest is default 
-        $attributes->matchRate = $matchRate;
+        $segmentAttributes = $this->createSegmentAttributes($id);
+
+        //process nonxliff attributes
+        $this->namespaces->transunitAttributes($attributes, $segmentAttributes);
         $this->setMid($id);
+        if(!empty($this->currentTarget) && !empty($this->currentTarget['openerMeta']['attributes']) && !empty($this->currentTarget['openerMeta']['attributes']['state'])) {
+            $segmentAttributes->targetState = $this->currentTarget['openerMeta']['attributes']['state'];
+        }
+        return $segmentAttributes;
     }
-    
     
     /**
      * sub-method of parse();
      * extract source- and target-segment from a trans-unit element
-     * adn saves this segements into databse
+     * and saves this segments into database
      *
-     * @param array $transUnit
+     * @param array $transUnit In this class this are the trans-unit attributes only
      * @return array $transUnit contains replacement-tags <lekSourceSeg id=""/> and <lekTargetSeg id=""/>
-     *          instead of the original segment content. attribut id contains the is of db-table LEK_segments
+     *          instead of the original segment content. attribut id contains the id of db-table LEK_segments
      */
-    protected function extractSegment($transUnit)
-    {
-        $this->segmentData = array();
+    protected function extractSegment($transUnit) {
+        //define the fieldnames where the data should be stored
         $sourceName = $this->segmentFieldManager->getFirstSourceName();
         $targetName = $this->segmentFieldManager->getFirstTargetName();
         
-        $temp_source = preg_replace('/.*<source.*?>(.*)<\/source>.*/is', '${1}', $transUnit[2]);
+        //parse the source chunks
+        $sourceChunks = $this->xmlparser->getRange($this->currentSource['opener'], $this->currentSource['closer']);
+        $sourceSegments = $this->contentConverter->convert($sourceChunks);
         
-        //this solves TRANSLATE-880: XLF: Copy source to target, if target is empty or does not exist 
-        $temp_target = $temp_source;
+        //TODO <mrk type="seg"> subsegments are not supported so far.
+        // The here uses data structure is prepared for them, so $this->contentConverter->convert returns an array of segments
+        // currently it contains only one segment.
         
-        //this first if is also needed for TRANSLATE-880
-        if(strpos($transUnit[2], '<target') !== false ||  preg_match('#<target[^>]*></target>#', $transUnit[2])){            
-            $temp_target = preg_replace('/.*<target.*?>(.*)<\/target>.*/is', '${1}', $transUnit[2]);
+        if(is_null($this->currentTarget)){
+            //TODO the following line must be adopted for multiple MRKs:
+            $targetSegments[] = '';
         }
+        else {
+            //parse the target chunks
+            $targetChunks = $this->xmlparser->getRange($this->currentTarget['opener'], $this->currentTarget['closer']);
+            $targetSegments = $this->contentConverter->convert($targetChunks);
+        }
+
+        
+        //check if sub segmentation of the mrk type seg tags was correct:
+        $sourceMrkMids = array_keys($sourceSegments);
+        $targetMrkMids = array_keys($targetSegments);
+        if($sourceMrkMids !== $targetMrkMids) {
+            //TODO prepared for MRK subsegments. Implement just a logging here, and import below only the segments with matching mrks
+        }
+        
+        foreach($sourceSegments as $mid => $source) {
+            if(!isset($targetSegments[$mid])) {
+                continue; //mrk type seg mids are not matching, logging is done above
+            }
+            $this->segmentData = array();
+            $this->segmentData[$sourceName] = array(
+                'original' => $source
+            );
+        
+            $this->segmentData[$targetName] = array(
+                'original' => $targetSegments[$mid]
+            );
+            
+            //parse attributes for each found segment not only for the whole trans-unit
+            $attributes = $this->parseSegmentAttributes($transUnit);
+            if(!$this->processSegment) {
+                //add also translate="no" segments but readonly
+                $attributes->editable = false;
+            }
+            
+            //if target was given and source contains tags only or is empty, then it will be ignored
+            if(!empty($this->currentTarget) && !$this->hasText($source)) {
+                continue;
+            }
+            $segmentId = $this->setAndSaveSegmentValues();
+            $placeHolder = $this->getFieldPlaceholder($segmentId, $targetName);
+        }
+        
+        if(empty($sourceSegments) || empty($placeHolder)){
+            //this return is needed since MRK implementation is not finished and 
+            // by above hasText the above loop can be ended without providing any $placeHolder
+            return;
+        }
+        
         //this solves TRANSLATE-879: sdlxliff and XLF import does not work with missing target
-        elseif(strpos($transUnit[2], '<target') === false){
-            $transUnit[0] = str_replace('</source>', "</source>\r\n        <target></target>", $transUnit[0]);
-            $transUnit[2] = str_replace('</source>', "</source>\r\n        <target></target>", $transUnit[2]);
+        if(is_null($this->currentTarget)){
+            //TODO add also empty MRK tags not only the empty target node, see also below TODO
+            $this->xmlparser->replaceChunk($this->currentSource['closer'], "</source>\r\n        <target>".$placeHolder.'</target>');
         }
-        
-        $this->segmentData[$sourceName] = array(
-            'original' => $this->parseSegment($temp_source, true)
-        );
-        
-        $this->segmentData[$targetName] = array(
-            'original' => $this->parseSegment($temp_target, false)
-        );
-        $segmentId = $this->setAndSaveSegmentValues();
-        $tempTargetPlaceholder = $this->getFieldPlaceholder($segmentId, $targetName);
-        
-        $temp_return = preg_replace('/(.*)<target(.*?)>.*<\/target>(.*)/is', '${1}<target${2}>'.$tempTargetPlaceholder.'</target>${3}', $transUnit[0]);
-        
-        return $temp_return;
+        else {
+            //clean up target content to empty, we store only our placeholder in the skeleton file
+            $start = $this->currentTarget['opener'] + 1;
+            $length = $this->currentTarget['closer'] - $start;
+            $this->xmlparser->replaceChunk($start, '', $length);
+            $this->xmlparser->replaceChunk($this->currentTarget['closer'], function($index, $oldChunk) use ($placeHolder) {
+                //TODO integrate MRK tags here too. Proposal: clean up target (is done before) store mrks in the above contentConverter and reapply them here
+                return $placeHolder.$oldChunk;
+            });
+        }
     }
     
     /**
-     * sub-method of parse();
+     * returns false if segment content contains only tags
+     * @param string $segmentContent
+     * @return boolean
+     */
+    protected function hasText($segmentContent) {
+        $segmentContent = $this->internalTag->replace($segmentContent, '');
+        $segmentContent = trim(strip_tags($segmentContent));
+        return !empty($segmentContent);
+    }
+    
+    /**
      * detects wordcount in a trans-unit element.
      * sums up wordcount for the whole file in $this->wordCount
      * 
@@ -227,73 +370,19 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      *
      * @param array $transUnit
      */
-    protected function addupSegmentWordCount($transUnit)
-    {
-        $tempCount = preg_replace('/.*<count.*?count-type="word count".*?>(.*)<\/count>.*/is', '${1}', $transUnit[2]);
-        $this->wordCount += $tempCount;
+    protected function addupSegmentWordCount($attributes) {
+        // <count count-type="word count" unit="word">7</count>
+        //TODO: this count-type is not xliff 1.2!!! IBM specific? or 1.1?
+        if($this->processSegment && !empty($attributes['count-type']) && $attributes['count-type'] == 'word count') {
+            $this->wordCount += trim($this->xmlparser->getNextChunk());
+        }
     }
     
-    
     /**
-     * sub-method of extractSegment();
-     * convert ph-tags to ExtJs-compatible tags in a segment
-     *
-     * @param string $segment
-     * @return string $segment with replaced (ExtJs-compatible) tags
+     * {@inheritDoc}
+     * @see editor_Models_Import_FileParser::parseSegment()
      */
-    protected function parseSegment($segment, $isSource)
-    {
-        $segment = $this->parseSegmentProtectWhitespace($segment);
-        
-        if (strpos($segment, '<')=== false) {
-            return $segment;
-        }
-        $data = ZfExtended_Factory::get('editor_Models_Import_FileParser_Sdlxliff_ParseSegmentData');
-        
-        $data->segment = preg_split('/(<ph>.*?<\/ph>.*?)/is', $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
-        
-        $data->segmentCount = count($data->segment);
-        $this->shortTagIdent = 1;
-        
-        foreach($data->segment as &$subsegment)
-        {
-            if (strpos($subsegment, "<ph>") !== false)
-            {
-                $tagName = "ph";
-                if(!isset($this->_tagMapping[$tagName])) {
-                    trigger_error('The used tag ' . $tagName .' is undefined! Segment: '.$this->_segment, E_USER_ERROR);
-                }
-                $temp_content = preg_replace('/<ph.*?>(.*)<\/ph>/is', '${1}', $subsegment);
-                $temp_content = html_entity_decode($temp_content, ENT_QUOTES, 'utf-8');
-                $this->_tagMapping[$tagName]['text'] = htmlentities($temp_content, ENT_QUOTES, 'utf-8');
-                $this->_tagMapping[$tagName]['imgText'] = $temp_content;
-                $fileNameHash = md5($this->_tagMapping[$tagName]['imgText']);
-                
-                //generate the html tag for the editor
-                $p = $this->getTagParams($subsegment, $this->shortTagIdent++, $tagName, $fileNameHash);
-                $tag = $this->_singleTag->getHtmlTag($p);
-                $this->_singleTag->createAndSaveIfNotExists($this->_tagMapping[$tagName]['imgText'], $fileNameHash);
-                $this->_tagCount++;
-                
-                $subsegment = $tag;
-            }
-            else
-            {
-                // Other replacement
-                $search = array(
-                        '#<hardReturn/>#',
-                        '#<softReturn/>#',
-                        '#<macReturn/>#',
-                        '#<space ts="[^"]*"/>#',
-                );
-                
-                //set data needed by $this->whitespaceTagReplacer
-                $this->_segment = $subsegment;
-                
-                $subsegment = preg_replace_callback($search, array($this,'whitespaceTagReplacer'), $subsegment);
-            }
-        }
-        
-        return implode('', $data->segment);
+    protected function parseSegment($segment, $isSource) {
+        //is abstract so must be defined empty since not used!
     }
 }

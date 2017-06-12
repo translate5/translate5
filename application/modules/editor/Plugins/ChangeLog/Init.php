@@ -40,23 +40,9 @@ class editor_Plugins_ChangeLog_Init extends ZfExtended_Plugin_Abstract {
     protected $localePath = 'locales';
     
     public function getFrontendControllers() {
-        $result = array();
-        $userSession = new Zend_Session_Namespace('user');
-        if(empty($userSession) || empty($userSession->data)) {
-            return $result;
-        }
-        $acl = ZfExtended_Acl::getInstance();
-        /* @var $acl ZfExtended_Acl */
-        if(!$acl->has('frontend')) {
-            return $result;
-        }
-        foreach($this->frontendControllers as $right => $controller) {
-            if($acl->isInAllowedRoles($userSession->data->roles, 'frontend', $right)) {
-                $result[] = $controller;
-            }
-        }
-        return $result;
+        return $this->getFrontendControllersFromAcl();
     }
+    
     public function init() {
         $this->initEvents();
         $this->initRoutes();

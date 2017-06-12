@@ -384,7 +384,7 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.controller.admin.TaskOverview", {
         override: "Editor.controller.admin.TaskOverview",
         strings: {
-            taskImported: '<?php echo $this->translate->_('Aufgabe "{0}" vollständig importiert');?>',
+            taskImported: '<?php echo $this->translate->_('Aufgabe "{0}" bereit.');?>',
             taskError: '<?php echo $this->translate->_('Die Aufgabe konnte aufgrund von Fehlern nicht importiert werden!');?>',
             taskOpening: '<?php echo $this->translate->_('Aufgabe wird im Editor geöffnet...');?>',
             taskFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen...');?>',
@@ -394,7 +394,8 @@ Ext.define('Editor.controller.Localizer', {
             taskDestroy: '<?php echo $this->translate->_('Aufgabe wird gelöscht...');?>',
             taskNotDestroyed: '<?php echo $this->translate->_('Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!');?>',
             forcedReadOnly: '<?php echo $this->translate->_('Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!');?>',
-            openTaskAdminBtn: '<?php echo $this->translate->_('Aufgabenübersicht');?>'
+            openTaskAdminBtn: '<?php echo $this->translate->_('Aufgabenübersicht');?>',
+            loadingWindowMessage: '<?php echo $this->translate->_('Dateien werden hochgeladen');?>'
         },
         confirmStrings: {
             "finish":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>"},
@@ -429,7 +430,8 @@ Ext.define('Editor.controller.Localizer', {
             addTaskTip: '<?php echo $this->translate->_('Eine neue Aufgabe hinzufügen.');?>',
             reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
             reloadBtnTip: '<?php echo $this->translate->_('Aufgabenliste vom Server aktualisieren.');?>',
-            noRelaisLang: '<?php echo $this->translate->_('- Ohne Relaissprache -');?>'
+            noRelaisLang: '<?php echo $this->translate->_('- Ohne Relaissprache -');?>',
+            emptyTargets: '<?php echo $this->translate->_('Leere Zielsprachen. Wahr wenn beim Import alle zielsprachlichen Felder leer sind.');?>'
         },
         text_cols: {
             taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',
@@ -451,13 +453,15 @@ Ext.define('Editor.controller.Localizer', {
             fullMatchEdit: '<?php echo $this->translate->_('100% Matches sind editierbar');?>',
             lockLocked: '<?php echo $this->translate->_('In importierter Datei gesperrte Segmente sind in translate5 gesperrt');?>',
             orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
-            enableSourceEditing: '<?php echo $this->translate->_('Quellsprache bearbeitbar');?>'
+            enableSourceEditing: '<?php echo $this->translate->_('Quellsprache bearbeitbar');?>',
+            emptyTargets: '<?php echo $this->translate->_('Leere Zielsprachen');?>'
         }
     });
     
     Ext.define("Editor.locale.de.view.admin.TaskAddWindow", {
         override: "Editor.view.admin.TaskAddWindow",
         title: '<?php echo $this->translate->_('Aufgabe erstellen');?>',
+        importTaskMessage:'<?php echo $this->translate->_('Hochladen beendet. Import und Vorbereitung laufen.');?>',
         strings: {
             importUploadTip: '<?php echo $this->translate->_('Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, openTM2-XLIFF; Angabe notwendig)');?>',
             importUploadLabel: '<?php echo $this->translate->_('Import Datei¹');?>',
@@ -485,8 +489,19 @@ Ext.define('Editor.controller.Localizer', {
             bottomInfo2: '<?php echo $this->translate->_('² Eine TBX Datei ist optional. Eine TBX Datei im TBX-Core Format wird benötigt um Terminologie auszuzeichnen.');?>',
             feedbackText: '<?php echo $this->translate->_('Fehler beim Import!');?>',
             feedbackTip: '<?php echo $this->translate->_('Fehler beim Import: Bitte wenden Sie sich an den Support!');?>',
-            addBtn: '<?php echo $this->translate->_('Aufgabe hinzufügen');?>',
-            cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>'
+            addBtn: '<?php echo $this->translate->_('Aufgabe Importieren');?>',
+            addBtnWizard: '<?php echo $this->translate->_('Importieren (weitere überspringen)');?>',
+            btnNextWizard: '<?php echo $this->translate->_('Weiter');?>',
+            cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
+            btnSkip: '<?php echo $this->translate->_('Importieren (weitere überspringen)');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.view.admin.TaskUpload", {
+        override: "Editor.view.admin.TaskUpload",
+        strings: {
+            wizardTitle: '<?php echo $this->translate->_('Dateien werden hochgeladen');?>',
+            finishButton: '<?php echo $this->translate->_('Schließen');?>',
         }
     });
     

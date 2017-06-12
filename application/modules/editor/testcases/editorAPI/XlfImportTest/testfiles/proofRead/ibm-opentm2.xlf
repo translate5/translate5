@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xliff version="1.1" xmlns="urn:oasis:names:tc:xliff:document:1.1" xmlns:tmgr="http://www.ibm.com">
+  <file datatype="plaintext" original="testfile1.html" source-language="en-US" target-language="de-DE" tool="OpenTM2">
+    <header>
+      <tmgr:properties>
+        <tmgr:folder>TEST_M01</tmgr:folder>
+        <tmgr:markup>IBMUHTM3</tmgr:markup>
+        <tmgr:sourcelang>English(U.S.)</tmgr:sourcelang>
+        <tmgr:targetlang>German(reform)</tmgr:targetlang>
+        <tmgr:shortname>TESTFILE.000</tmgr:shortname>
+        <tmgr:shipment>1</tmgr:shipment>
+      </tmgr:properties>
+    </header>
+    <body>
+      <trans-unit id="1" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="AUTOSUBST" tmgr:matchratio="100">
+        <source>Apache 2.x on Unix systems - Manual</source>
+        <target state="translated">Apache 2.0 auf Unixsystemen - Manual</target>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">6</count>
+        </count-group>
+      </trans-unit>
+      <trans-unit id="2" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="AUTOSUBST" tmgr:matchratio="100">
+        <source>PHP Manual</source>
+        <target state="translated">PHP Manual</target>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">2</count>
+        </count-group>
+      </trans-unit>
+      <trans-unit id="6" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="AUTOSUBST" tmgr:matchratio="100">
+        <source>Test a soft (unix) return
+</source>
+        <target state="translated">Teste einen weichen (Unix) Umbruch
+</target>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">4</count>
+        </count-group>
+      </trans-unit>
+      <trans-unit id="7" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="AUTOSUBST" tmgr:matchratio="100">
+        <source>Test multiple    whitespaces and		tabs</source>
+        <target state="translated">Teste mehrere     Leerzeichen und		Tabs</target>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">3</count>
+        </count-group>
+      </trans-unit>
+      <trans-unit id="7" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="FUZZY" tmgr:matchratio="95">
+        <source>Test that matchratio &lt; 100 is editable</source>
+        <target state="translated">Teste dass eine matchratio &lt; 100 editierbar ist</target>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">3</count>
+        </count-group>
+      </trans-unit>
+      <trans-unit id="8" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="NEW" tmgr:matchratio="0">
+        <source>Test different matchinfos</source>
+        <target state="translated">Teste unterschiedliche matchinfos</target>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">3</count>
+        </count-group>
+      </trans-unit>
+      <trans-unit id="9" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="AUTOSUBST" tmgr:matchratio="100">
+        <source>Test &amp;para; entities &para; and umlauts öäü¶</source>
+        <target state="translated">Teste &amp;para; Entities &para; und Umlaute öäü¶</target>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">5</count>
+        </count-group>
+      </trans-unit>
+      <trans-unit id="10" translate="no" tmgr:segstatus="XLATED" tmgr:matchinfo="FUZZY" tmgr:matchratio="90">
+        <source>This segment should be readonly!</source>
+        <target state="translated">Dieses Segment sollte nicht editierbar sein!</target>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">5</count>
+        </count-group>
+      </trans-unit>
+      <trans-unit id="11" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
+        <source>Test a new translation - no target exists</source>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">7</count>
+        </count-group>
+      </trans-unit>
+      <trans-unit id="12" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
+        <source>Test a new translation - empty target exists</source>
+        <target state="needs-translation"></target>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">7</count>
+        </count-group>
+      </trans-unit>
+      <OFF-trans-unit id="13" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="FUZZY" tmgr:matchratio="80">
+        <source>Test an existing translation. With MRK tags.</source>
+        <seg-source><mrk type="seg" mid="0">Test an existing translation. </mrk><mrk type="seg" mid="1">With MRK tags.</mrk></seg-source>
+        <target state="translated"><mrk type="seg" mid="0">Teste eine vorhandene Übersetzung. </mrk><mrk type="seg" mid="1">Mit MRK Tags.</mrk></target>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">7</count>
+        </count-group>
+      </OFF-trans-unit>
+      <OFF-trans-unit id="14" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="FUZZY" tmgr:matchratio="80">
+        <source>Test an existing translation. With MRK tags and wrong segmentation.</source>
+        <seg-source><mrk type="seg" mid="0">Test an existing translation. </mrk><mrk type="seg" mid="1">With MRK tags and wrong segmentation.</mrk></seg-source>
+        <target state="translated"><mrk type="seg" mid="0">Teste eine vorhandene Übersetzung. Mit MRK Tags und fehlerhafter Segmentierung.</mrk></target>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">10</count>
+        </count-group>
+      </OFF-trans-unit>
+      <OFF-trans-unit id="15" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="FUZZY" tmgr:matchratio="80">
+        <source>Test an existing translation. With MRK tags and wrong segmentation.</source>
+        <seg-source><mrk type="seg" mid="0">Test an existing translation. </mrk><mrk type="seg" mid="1">With MRK tags and wrong segmentation.</mrk></seg-source>
+        <target state="translated"><mrk type="seg" mid="0">Teste eine vorhandene Übersetzung. </mrk><mrk type="seg" mid="1">Mit MRK Tags und </mrk><mrk type="seg" mid="2">fehlerhafter Segmentierung.</mrk></target>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">10</count>
+        </count-group>
+      </OFF-trans-unit>
+      <OFF-trans-unit id="16" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
+        <source>Test an empty translation. With MRK tags. We assume, that the target is always missing in the case of a translation. The case "empty target" without MRK tags must be implemented then when needed.</source>
+        <seg-source><mrk type="seg" mid="0">Test an empty translation. </mrk><mrk type="seg" mid="1">With MRK tags.</mrk><mrk type="seg" mid="2">We assume, that the target is always missing in the case of a translation. The case "empty target" without MRK tags must be implemented then when needed.</mrk></seg-source>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">34</count>
+        </count-group>
+      </OFF-trans-unit>
+      <trans-unit id="17" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="FUZZY" tmgr:matchratio="80">
+        <source><ph>This segment must NOT be imported, since it contains a tag only and is translated! Even if the attribute translate is set to yes.</ph></source>
+        <target><ph>Dieses Segment darf NICHT importiert werden, da es nur tags beinhaltet und übersetzt ist! Auch wenn das Attribut translate auf yes gesetzt ist.</ph></target>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">0</count>
+        </count-group>
+      </trans-unit>
+      <trans-unit id="18" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
+        <source><ph>This segment must be imported so that it will be added to the target and the autostates are set accordingly, regardless that it contains tags only.</ph></source>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">0</count>
+        </count-group>
+      </trans-unit>
+    </body>
+  </file>
+  <file datatype="plaintext" original="testfile2.html" source-language="en-US" target-language="de-DE" tool="OpenTM2">
+    <header>
+      <tmgr:properties>
+        <tmgr:folder>TEST_M01</tmgr:folder>
+        <tmgr:markup>IBMNJDK2</tmgr:markup>
+        <tmgr:sourcelang>English(U.S.)</tmgr:sourcelang>
+        <tmgr:targetlang>German(reform)</tmgr:targetlang>
+        <tmgr:shortname>TESTFILE.001</tmgr:shortname>
+        <tmgr:shipment>1</tmgr:shipment>
+      </tmgr:properties>
+    </header>
+    <body>
+      <trans-unit id="1" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="AUTOSUBST" tmgr:matchratio="100">
+        <source>Test usage of already used id - which is valid!</source>
+        <target state="translated">Teste die Verwendung einer bereits verwendeten ID - was zulässig ist!</target>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">9</count>
+        </count-group>
+      </trans-unit>
+      <trans-unit id="2" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
+        <source><ph>&lt;g css-style=&quot;font-family:'Arial';font-face:'Regular';color:#000000;font-size:20.0pt&quot; ctype=&quot;x-cp-font&quot; id=&quot;5289-19-1-1&quot;&gt;</ph>Testen wir lustige Tags.<ph>&lt;/g&gt;</ph></source>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">5</count>
+        </count-group>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

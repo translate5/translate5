@@ -44,8 +44,9 @@ END LICENSE AND COPYRIGHT
  *
  */
 class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileParser{
-    
     use editor_Plugins_Transit_TraitParse;
+    use editor_Models_Import_FileParser_TagTrait;
+    
     /**
      *
      * @var string
@@ -83,11 +84,6 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     protected $log;
     
     /**
-     * used for parsing of a segment; is the Nr. a tag is marked with in the Javascript view
-     * @var integer
-     */
-    protected $shortTagIdent = 1;
-    /**
      * used for assigning beginning tags to ending tags
      * @var array
      */
@@ -108,16 +104,6 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
      * @var editor_Models_Segment_Meta
      */
     protected $meta;
-    /**
-     *
-     * @var array
-     */
-    protected $whitespaceSearch = array(
-                '#<hardReturn/>#',
-                '#<softReturn/>#',
-                '#<macReturn/>#',
-                '#<space ts="[^"]*"/>#',
-        );
 
     /**
      * 
@@ -128,6 +114,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
      */
     public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task){
         parent::__construct($path, $fileName, $fileId, $task);
+        $this->initImageTags();
         $this->meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
         $this->meta->addMeta('transitLockedForRefMat', editor_Models_Segment_Meta::META_TYPE_BOOLEAN, 0, 'defines, if segment is marked in transitFile as locked for translation memory use');
         $transitLangInfo = Zend_Registry::get('transitLangInfo');
@@ -277,43 +264,12 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         
         $segment = $this->parseTags($segment);
         
-        $segment = $this->parseWhitespace($segment);
+        $segment = $this->whitespaceTagReplacer($segment);
         $this->checkForUndefinedTags($segment);
 
         return $segment;
     }
     
-    /**
-     * protects whitespace inside a segment with a tag
-     *
-     * @param string $segment
-     * @param integer $count optional, variable passed by reference stores the replacement count
-     * @return string $segment
-     */
-    protected function parseSegmentProtectWhitespace($segment, &$count = 0) {
-        $segment = parent::parseSegmentProtectWhitespace($segment, $count);
-        $res = preg_replace_callback(
-                array(
-                    '"\x{0009}"u', //Hex UTF-8 bytes or codepoint of horizontal tab
-                    '"\x{000B}"u', //Hex UTF-8 bytes or codepoint of vertical tab
-                    '"\x{000C}"u', //Hex UTF-8 bytes or codepoint of page feed
-                    '"\x{0085}"u', //Hex UTF-8 bytes or codepoint of control sign for next line
-                    '"\x{00A0}"u', //Hex UTF-8 bytes or codepoint of protected space
-                    '"\x{1680}"u', //Hex UTF-8 bytes or codepoint of Ogam space
-                    '"\x{180E}"u', //Hex UTF-8 bytes or codepoint of mongol vocal divider
-                    '"\x{2028}"u', //Hex UTF-8 bytes or codepoint of line separator
-                    '"\x{202F}"u', //Hex UTF-8 bytes or codepoint of small protected space
-                    '"\x{205F}"u', //Hex UTF-8 bytes or codepoint of middle mathematical space
-                    '"\x{3000}"u', //Hex UTF-8 bytes or codepoint of ideographic space
-                    '"[\x{2000}-\x{200A}]"u', //Hex UTF-8 bytes or codepoint of eleven different small spaces, Haarspatium and em space
-                    ), //Hex UTF-8 bytes 	E2 80 9C//von mssql nicht vertragen
-                        function ($match) {
-                            return '<space ts="' . implode(',', unpack('H*', $match[0])) . '"/>';
-                        }, 
-            $segment, -1, $replaceCount);
-        $count += $replaceCount;
-        return $res;
-    }
     /**
      * 
      * @param string $tag
@@ -375,7 +331,6 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         $p = $this->getTagParams($tag, $shortTagIdent, $tagName, $fileNameHash, $tagText);
         $tag = $this->$tagType->getHtmlTag($p);
         $this->$tagType->createAndSaveIfNotExists($tagText, $fileNameHash);
-        $this->_tagCount++;
         return $tag;
     }
     /**
@@ -484,16 +439,10 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         return preg_replace('"<'.$tagName.' .*?>(.*?)</'.$tagName.'>"', '\\1', $tag);
     }
     
-    protected function parseWhitespace(string $segment) {
-        //@TODO: This should be removed here and in other fileParsers and moved to parent fileParser- antipattern. This must be done after merge in master due to things already done at this part there
-        $this->_segment = $segment;
-        return preg_replace_callback($this->whitespaceSearch, array($this,'whitespaceTagReplacer'), $segment );
-    }
-    
     /**
      * checks if there are any tags not covered by parseTags or "Tag"-Tags or
      * "FontTag"-Tags not covered by their methods. Thus has to be placed before
-     * parseWhitespace() and after all other tag-parsing methods 
+     * whitespaceTagReplacer() and after all other tag-parsing methods 
      */
     protected function checkForUndefinedTags(string $segment){
         $segment = preg_replace('/<div[^>]+class="(open|close|single).*?".*?\/div>/is', '', $segment);

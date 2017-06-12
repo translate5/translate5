@@ -1062,9 +1062,9 @@
 	  <source>Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.</source>
 	  <target>The term tagger could not tag the terminology in the last edited segment!</target>
 	</trans-unit>
-	<trans-unit id='QXVmZ2FiZSAiezB9IiB2b2xsc3TDpG5kaWcgaW1wb3J0aWVydA=='>
-	  <source>Aufgabe "{0}" vollständig importiert</source>
-	  <target>Import of Task "{0}" completed!</target>
+	<trans-unit id='QXVmZ2FiZSAiezB9IiBiZXJlaXQu'>
+	  <source>Aufgabe "{0}" bereit.</source>
+	  <target>Task "{0}" available.</target>
 	</trans-unit>
 	<trans-unit id='RGllIEFuZnJhZ2Ugw7xiZXIgZGFzIEludGVybmV0IGFuIGRlbiBTZXJ2ZXIgZGF1ZXJ0ZSB6dSBsYW5nZS4gRGllcyBrYW5uIGFuIElocmVyIEludGVybmV0dmVyYmluZHVuZyBvZGVyIGFuIGVpbmVyIMOcYmVybGFzdHVuZyBkZXMgU2VydmVycyBsaWVnZW4uIEJpdHRlIHZlcnN1Y2hlbiBTaWUgZXMgZXJuZXV0Lg=='>
 	  <source>Die Anfrage über das Internet an den Server dauerte zu lange. Dies kann an Ihrer Internetverbindung oder an einer Überlastung des Servers liegen. Bitte versuchen Sie es erneut.</source>
@@ -1498,6 +1498,30 @@
 <trans-unit id='WmllbHRleHQgKHp1ciBJbXBvcnR6ZWl0KQ=='>
     <source>Zieltext (zur Importzeit)</source>
     <target>target (version on import time)</target>
+</trans-unit>
+<trans-unit id='QXVmZ2FiZSBJbXBvcnRpZXJlbg=='>
+    <source>Aufgabe Importieren</source>
+    <target>Import</target>
+</trans-unit>
+<trans-unit id='SW1wb3J0aWVyZW4gKHdlaXRlcmUgw7xiZXJzcHJpbmdlbik='>
+    <source>Importieren (weitere überspringen)</source>
+    <target>Import (skip next steps)</target>
+</trans-unit>
+<trans-unit id='V2VpdGVy'>
+    <source>Weiter</source>
+    <target>Next</target>
+</trans-unit>
+<trans-unit id='SG9jaGxhZGVuIGJlZW5kZXQuIEltcG9ydCB1bmQgVm9yYmVyZWl0dW5nIGxhdWZlbi4='>
+    <source>Hochladen beendet. Import und Vorbereitung laufen.</source>
+    <target>File upload completed. Import and job preparation running.</target>
+</trans-unit>
+<trans-unit id='RGF0ZWllbiB3ZXJkZW4gaG9jaGdlbGFkZW4='>
+    <source>Dateien werden hochgeladen</source>
+    <target>Upload in progress</target>
+</trans-unit>
+<trans-unit id='U2NobGllw59lbg=='>
+    <source>Schließen</source>
+    <target>Close</target>
 </trans-unit>
     </body>
   </file>

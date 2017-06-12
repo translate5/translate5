@@ -177,9 +177,19 @@ class editor_Workflow_Notification {
             return;
         }
         if(empty($this->xmlCache[$segmentHash])) {
-            $xmlConverter = ZfExtended_Factory::get('editor_Models_Converter_XmlSegmentList');
-            /* @var $xmlConverter editor_Models_Converter_XmlSegmentList */
-            $this->xmlCache[$segmentHash] = $xmlConverter->convert($this->task, $segments);
+            $config = Zend_Registry::get('config');
+            $xliffConf = [
+                editor_Models_Converter_SegmentsToXliff::CONFIG_INCLUDE_DIFF => (boolean) $config->runtimeOptions->editor->notification->includeDiff,
+                editor_Models_Converter_SegmentsToXliff::CONFIG_PLAIN_INTERNAL_TAGS => true,
+                editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_ALTERNATIVES => true,
+            ];
+            $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff', [$xliffConf]);
+            /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff */
+            $this->xmlCache[$segmentHash] = $xliff = $xliffConverter->convert($this->task, $segments);
+            
+            if((boolean) $config->runtimeOptions->editor->notification->saveXmlToFile) {
+                $this->saveXmlToFile($xliff);
+            }
         }
         
         $attachment = array(
@@ -190,5 +200,23 @@ class editor_Workflow_Notification {
             'filename' => 'changes.xliff',
         );
         $this->mailer->setAttachment(array($attachment));
+    }
+    
+    protected function saveXmlToFile($xml) {
+        $path = $this->task->getAbsoluteTaskDataPath();
+        if(!is_dir($path) || !is_writeable($path)) {
+            error_log('cant write changes.xliff file to path: '.$path);
+            return;
+        }
+        $suffix = '.xliff';
+        $filename = 'changes-'.date('Y-m-d\TH:i:s');
+        $i = 0;
+        $outFile = $path.DIRECTORY_SEPARATOR.$filename.$suffix;
+        while(file_exists($outFile)) {
+            $outFile = $path.DIRECTORY_SEPARATOR.$filename.'-'.($i++).$suffix;
+        }
+        if(file_put_contents($outFile, $xml) == 0) {
+            error_log('Error on writing XML File: '.$outFile);
+        }
     }
 }

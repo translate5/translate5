@@ -116,7 +116,13 @@ class editor_Models_Import {
                 'config' => $this->importConfig,
                 'dataProvider' => $dataProvider
         ));
-        $parentId = $importWorker->queue();
+
+        //prevent the importWorker to be started here. 
+        $parentId = $importWorker->queue(0, NULL, false);
+        
+        //sometimes it is not possbile for additional import workers to be invoked in afterImport, 
+        // for that reason this event exists:
+        $this->events->trigger('importWorkerQueued', $this, ['task' => $this->task, 'workerId' => $parentId]);
         
         $worker = ZfExtended_Factory::get('editor_Models_Import_Worker_SetTaskToOpen');
         /* @var $worker editor_Models_Import_Worker_SetTaskToOpen */

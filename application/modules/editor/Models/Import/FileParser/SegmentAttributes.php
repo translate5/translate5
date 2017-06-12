@@ -80,4 +80,10 @@ class editor_Models_Import_FileParser_SegmentAttributes {
      * @var boolean
      */
     public $isTranslated;
+    
+    /**
+     * Stores some state information about the target segment
+     * @var string
+     */
+    public $targetState; 
 }

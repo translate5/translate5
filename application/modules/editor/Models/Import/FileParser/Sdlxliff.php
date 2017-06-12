@@ -58,6 +58,10 @@ END LICENSE AND COPYRIGHT
  *
  */
 class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_FileParser {
+    use editor_Models_Import_FileParser_TagTrait {
+        getTagParams as protected traitGetTagParams;
+    }
+    
     /**
      * @var array mappt alle Tag-Referenzen im Header der sdlxliff-Datei innerhalb von
      *      <tag-defs><tag></tag></tag-defs> auf die Tags in Segmenten des sdlxliff
@@ -96,6 +100,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         //add sdlxliff tagMapping
         $this->addSldxliffTagMappings();
         parent::__construct($path, $fileName, $fileId, $task);
+        $this->initImageTags();
         $this->checkForSdlChangeMarker();
         $this->protectUnicodeSpecialChars();
         $this->prepareTagMapping();
@@ -197,38 +202,6 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         }
         $this->_tagMapping[$tagId]['imgText'] = html_entity_decode($text, ENT_QUOTES, 'utf-8');
         $this->_tagMapping[$tagId]['text'] = $text;
-    }
-    
-    
-    /**
-     * protects whitespace inside a segment with a tag
-     *
-     * @param string $segment
-     * @param integer $count optional, variable passed by reference stores the replacement count
-     * @return string $segment
-     */
-    protected function parseSegmentProtectWhitespace($segment, &$count = 0) {
-        $segment = parent::parseSegmentProtectWhitespace($segment, $count);
-        $res = preg_replace_callback(
-                array(
-                    '"\x{0009}"u', //Hex UTF-8 bytes or codepoint of horizontal tab
-                    '"\x{000B}"u', //Hex UTF-8 bytes or codepoint of vertical tab
-                    '"\x{000C}"u', //Hex UTF-8 bytes or codepoint of page feed
-                    '"\x{0085}"u', //Hex UTF-8 bytes or codepoint of control sign for next line
-                    '"\x{00A0}"u', //Hex UTF-8 bytes or codepoint of protected space
-                    '"\x{1680}"u', //Hex UTF-8 bytes or codepoint of Ogam space
-                    '"\x{180E}"u', //Hex UTF-8 bytes or codepoint of mongol vocal divider
-                    '"\x{202F}"u', //Hex UTF-8 bytes or codepoint of small protected space
-                    '"\x{205F}"u', //Hex UTF-8 bytes or codepoint of middle mathematical space
-                    '"\x{3000}"u', //Hex UTF-8 bytes or codepoint of ideographic space
-                    '"[\x{2000}-\x{200A}]"u', //Hex UTF-8 bytes or codepoint of eleven different small spaces, Haarspatium and em space
-                    ), //Hex UTF-8 bytes 	E2 80 9C//von mssql nicht vertragen
-                        function ($match) {
-                            return '<space ts="' . implode(',', unpack('H*', $match[0])) . '"/>';
-                        }, 
-            $segment, -1, $replaceCount);
-        $count += $replaceCount;
-        return $res;
     }
     
     /**
@@ -413,12 +386,17 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      *         wobei die id die ID des Segments in der Tabelle Segments darstellt
      */
     protected function extractSegment($transUnit) {
+        //Orig Transunit: '<trans-unit'.$transUnit
+        //if there is no target or an empty target
+        if(strpos($transUnit, '<target') === false) {
+            $source = strpos($transUnit, '<seg-source') === false ? '</source>' : '</seg-source>';
+            $transUnit = str_replace($source, $source.'<target></target>', $transUnit);
+        }
+        
         $this->segmentData = array();
         //extrahiere das Zielsegment
         $targetExp = explode('<target', $transUnit);
         $targetExp[1] = explode('</target>', $targetExp[1]);
-        $targetExp[1][0] = preg_split('"(<mrk[^>]*mtype=\"seg\"[^>]*>)"', $targetExp[1][0], NULL, PREG_SPLIT_DELIM_CAPTURE);
-        $countTargetMrk = count($targetExp[1][0]);
         //extrahiere das Quellsegment
         if (strpos($targetExp[0], '<seg-source')!== false) {
             $sourceExp = $targetExp[0];
@@ -428,8 +406,32 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $sourceExp = explode('<seg-source', $sourceExp);
         $sourceExp[1] = explode('</seg-source>', $sourceExp[1]);
         $sourceExp[1][0] = preg_split('"(<mrk[^>]*mtype=\"seg\"[^>]*>)"', $sourceExp[1][0], NULL, PREG_SPLIT_DELIM_CAPTURE);
-
-        if ($countTargetMrk !== count($sourceExp[1][0])) {
+        $countSourceMrk = count($sourceExp[1][0]);
+        
+        //if the target does not contain any mrk tags, we have to add them empty:
+        if(preg_match('#<target>\s*</target>#', $transUnit)) {
+            $mrkToAdd = [];
+            //get the mrks from the source
+            for ($i = 1; $i < $countSourceMrk; $i = $i+2) {
+                $mrkToAdd[] = $sourceExp[1][0][$i].'</mrk>';
+            }
+            $mrkToAdd = join('', $mrkToAdd);
+            //add them into the transUnit
+            $transUnit = str_replace('</target>', $mrkToAdd.'</target>', $transUnit);
+            //add them also in the already splitted target
+            $targetExp[1][0] = $targetExp[1][0].$mrkToAdd;
+            
+            //get id part of the transunit:
+            $endOfTransUnitStartTag = strpos($transUnit, '>');
+            $id = substr($transUnit, 0, $endOfTransUnitStartTag);
+            $pattern = '#<trans-unit'.preg_quote($id,'#').'>(.*?)</trans-unit>#is';
+            $this->_skeletonFile = preg_replace($pattern, '<trans-unit'.$transUnit, $this->_skeletonFile);
+        }
+        
+        //if target does not exist, we have to get the source mrks first, to add them empty to the target
+        $targetExp[1][0] = preg_split('"(<mrk[^>]*mtype=\"seg\"[^>]*>)"', $targetExp[1][0], NULL, PREG_SPLIT_DELIM_CAPTURE);
+        $countTargetMrk = count($targetExp[1][0]);
+        if ($countTargetMrk !== $countSourceMrk) {
             trigger_error(
                     'Die Anzahl der Zielsegmente entsprach nicht der Zahl der Quellsegmente in der transunit ' .
                     $transUnit, E_USER_ERROR);
@@ -563,7 +565,6 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                 $data = $this->parseSingleTag($data);
             }
             $data->i++; //parse nur die ungeraden Arrayelemente, den dies sind die Rückgaben von PREG_SPLIT_DELIM_CAPTURE
-            $this->_tagCount++;
         }
         return implode('', $data->segment);
     }
@@ -687,7 +688,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * @see editor_Models_Import_FileParser::getTagParams()
      */
     protected function getTagParams($tag, $shortTag, $tagId, $fileNameHash, $text = false) {
-        $data = parent::getTagParams($tag, $shortTag, $tagId, $fileNameHash, $text);
+        $data = $this->traitGetTagParams($tag, $shortTag, $tagId, $fileNameHash, $text);
         $data['text'] = $this->encodeTagsForDisplay($data['text']);
         return $data;
     }

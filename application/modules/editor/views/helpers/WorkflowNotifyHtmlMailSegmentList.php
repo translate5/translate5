@@ -47,10 +47,17 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
     protected $segments;
     
     /**
-     * This var ist initilized lazy
-     * @var editor_Models_Converter_XmlSegmentList
+     * This vars are initialized lazy
+     * @var editor_Models_Segment_Utility
      */
-    protected $xmlConverter;
+    protected $segmentUtility;
+    
+    /**
+     * This vars are initialized lazy
+     * @var editor_Models_Segment_QmSubsegments
+     */
+    protected $subSegmentConverter;
+    
     /**
      * replace the comment HTML Tags with <br>
      * @param string $comments
@@ -134,7 +141,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
             return sprintf($span, $title, $issueId.']');
         };
         
-        return $this->xmlConverter->convertQmSubsegments($this->view->task, $content, $resultRenderer);
+        return $this->subSegmentConverter->replace($this->view->task, $content, $resultRenderer);
     } 
     
     /**
@@ -146,8 +153,8 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
         /* @var $states editor_Models_Segment_AutoStates */
         $stateMap = $states->getLabelMap();
         
-        
-        $this->xmlConverter = ZfExtended_Factory::get('editor_Models_Converter_XmlSegmentList');
+        $this->subSegmentConverter = ZfExtended_Factory::get('editor_Models_Segment_QmSubsegments');
+        $this->segmentUtility = ZfExtended_Factory::get('editor_Models_Segment_Utility');
         
         $t = $this->view->translate;
         if(empty($this->segments)) {
@@ -198,8 +205,8 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
             foreach($fieldsToShow as $fieldName => $field) {
                 $result[] = '<td valign="top">'.$this->prepareSegment($segment[$fieldName]).'</td>';
             }
-            $result[] = '<td valign="top" nowrap="nowrap">'.$t->_($this->xmlConverter->convertStateId($segment['stateId'])).'</td>';
-            $qms = array_map($translateQm, $this->xmlConverter->convertQmIds($segment['qmId']));
+            $result[] = '<td valign="top" nowrap="nowrap">'.$t->_($this->segmentUtility->convertStateId($segment['stateId'])).'</td>';
+            $qms = array_map($translateQm, $this->segmentUtility->convertQmIds($segment['qmId']));
             $result[] = '<td valign="top" nowrap="nowrap">'.join(',<br />', $qms).'</td>';
             $result[] = '<td valign="top">'.$state.'</td>';
             $result[] = '<td valign="top">'.$segment['matchRate'].'%</td>';

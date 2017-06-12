@@ -285,7 +285,8 @@ class editor_TaskController extends ZfExtended_RestController {
         //$this->decodePutData(); → not needed, data was set directly out of params because of file upload
         $this->data = $this->getAllParams();
         settype($this->data['wordCount'], 'integer');
-        settype($this->data['enableSourceEditing'], 'boolean');
+        settype($this->data['enableSourceEditing'], 'integer');
+        settype($this->data['edit100PercentMatch'], 'integer');
         settype($this->data['lockLocked'], 'integer');
         $this->data['pmGuid'] = $this->user->data->userGuid;
         $pm = ZfExtended_Factory::get('ZfExtended_Models_User');

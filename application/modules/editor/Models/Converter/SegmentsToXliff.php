@@ -29,19 +29,56 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Converts a List with Segments to XML
+ * 
+ * TODO: MQM and Terminology markup export is missing! 
  */
-class editor_Models_Converter_XmlSegmentList {
-    protected static $issueCache = array();
-    protected static $severityCache = array();
+class editor_Models_Converter_SegmentsToXliff {
+    /**
+     * includeDiff                = boolean, enable or disable diff generation, defaults to false
+     * @var string
+     */
+    const CONFIG_INCLUDE_DIFF = 'includeDiff';
+    /**
+     * plainInternalTags          = boolean, exports internal tags plain content, 
+     *                              currently only needed for BEO export, defaults to false
+     * @var string
+     */
+    const CONFIG_PLAIN_INTERNAL_TAGS = 'plainInternalTags';
+    /**
+     * addRelaisLanguage          = boolean, add relais language target as alt trans (if available), defaults to true
+     * @var string
+     */
+    const CONFIG_ADD_RELAIS_LANGUAGE = 'addRelaisLanguage';
+    /**
+     * addComments                = boolean, add comments, defaults to true
+     * @var string
+     */
+    const CONFIG_ADD_COMMENTS = 'addComments';
+    /**
+     * addStateAndQm              = boolean, add segment state and QM, defaults to true
+     * @var string
+     */
+    const CONFIG_ADD_STATE_QM = 'addStateAndQm';
+    /**
+     * addAlternatives            = boolean, add target alternatives as alt trans, defaults to false
+     * @var string
+     */
+    const CONFIG_ADD_ALTERNATIVES = 'addAlternatives';
+    /**
+     * addPreviousVersion         = boolean, add target original as alt trans, defaults to true
+     * @var string
+     */
+    const CONFIG_ADD_PREVIOUS_VERSION = 'addPreviousVersion';
+    /**
+     * addDisclaimer              = boolean, add disclaimer that format is not 100% xliff 1.2, defaults to true
+     * @var string
+     */
+    const CONFIG_ADD_DISCLAIMER = 'addDisclaimer';
+    
     /**
      * @var editor_Models_Task
      */
     protected $task;
-    
-    /**
-     * @var array
-     */
-    protected $stateFlags;
     
     /**
      * @var editor_Models_Export_FileParser_Sdlxliff
@@ -49,19 +86,9 @@ class editor_Models_Converter_XmlSegmentList {
     protected $exportParser;
     
     /**
-     * @var array
-     */
-    protected $qualityFlags;
-    
-    /**
      * @var editor_Models_Comment
      */
     protected $comment;
-    
-    /**
-     * @var boolean
-     */
-    protected $saveXmlToFile = true;
     
     /**
      * resulting XML buffer
@@ -83,24 +110,107 @@ class editor_Models_Converter_XmlSegmentList {
     /**
      * @var editor_Models_Export_DiffTagger_Sdlxliff
      */
-    protected $differ;
+    protected $differ = null;
     
     /**
-     * @var boolean
+     * @var editor_Models_Segment_Utility
      */
-    protected $createDiffAltTrans;
+    protected $segmentUtility;
     
-    public function __construct(){
-        $config = Zend_Registry::get('config');
-        $this->stateFlags = $config->runtimeOptions->segments->stateFlags->toArray();
-        $this->qualityFlags = $config->runtimeOptions->segments->qualityFlags->toArray();
-        $this->saveXmlToFile = (boolean) $config->runtimeOptions->editor->notification->saveXmlToFile;
-        $this->createDiffAltTrans = (boolean) $config->runtimeOptions->editor->notification->includeDiff;
-        if($this->createDiffAltTrans){
-            $this->differ = ZfExtended_Factory::get('editor_Models_Export_DiffTagger_Sdlxliff');
-        }
+    /**
+     * @var array
+     */
+    protected $options;
+    
+    /**
+     * contains a list of the included namespaces in the header
+     * @var array
+     */
+    protected $enabledNamespaces = [];
+    
+    /**
+     * @var editor_Models_Segment_InternalTag
+     */
+    protected $taghelperInternal;
+    
+    /**
+     * @var editor_Models_Segment_TermTag
+     */
+    protected $taghelperTerm;
+    
+    /**
+     * @var editor_Models_Segment_QmSubsegments
+     */
+    protected $taghelperMqm;
+    
+    /**
+     * @var current tag map of replaced internal tags with g/x/bx/ex tags
+     */
+    protected $tagMap;
+    
+    /**
+     * id counter for the generated g/x/bx/ex tags
+     * @var integer
+     */
+    protected $tagId = 1;
+    
+    /**
+     * Constructor
+     * 
+     * Supported parameters for $config are
+     * - includeDiff                = boolean, enable or disable diff generation, defaults to false
+     * - plainInternalTags          = boolean, exports internal tags plain content, 
+     *                                currently only needed for BEO export, defaults to false
+     * - addRelaisLanguage          = boolean, add relais language target as alt trans (if available), defaults to true
+     * - addComments                = boolean, add comments, defaults to true
+     * - addStateAndQm              = boolean, add segment state and QM, defaults to true
+     * - addAlternatives            = boolean, add target alternatives as alt trans, defaults to false
+     * - addPreviousVersion         = boolean, add target original as alt trans, defaults to true
+     * - addDisclaimer              = boolean, add disclaimer that format is not 100% xliff 1.2, defaults to true
+     * 
+     * @param array $config
+     */
+    public function __construct(array $config = []){
+        $this->setOptions($config);
         
         $this->comment = ZfExtended_Factory::get('editor_Models_Comment');
+        $this->segmentUtility = ZfExtended_Factory::get('editor_Models_Segment_Utility');
+        $this->differ = ZfExtended_Factory::get('editor_Models_Export_DiffTagger_Sdlxliff');
+    }
+    
+    /**
+     * For the options see the constructor
+     * @see self::__construct
+     * @param array $config
+     */
+    public function setOptions(array $config) {
+        $this->options = $config;
+        
+        //flags defaulting to false
+        $defaultsToFalse = [
+                self::CONFIG_INCLUDE_DIFF, 
+                self::CONFIG_PLAIN_INTERNAL_TAGS, 
+                self::CONFIG_ADD_ALTERNATIVES,
+        ];
+        foreach($defaultsToFalse as $key){
+            settype($this->options[$key], 'bool');
+        }
+        
+        //flags defaulting to true; if nothing given, empty is the falsy check
+        $defaultsToTrue = [
+                self::CONFIG_ADD_RELAIS_LANGUAGE, 
+                self::CONFIG_ADD_COMMENTS, 
+                self::CONFIG_ADD_STATE_QM,
+                self::CONFIG_ADD_PREVIOUS_VERSION,
+                self::CONFIG_ADD_DISCLAIMER,
+        ];
+        foreach($defaultsToTrue as $key){
+            $this->options[$key] = !(array_key_exists($key, $config) && empty($config[$key]));
+        }
+        
+        if(! $this->options[self::CONFIG_PLAIN_INTERNAL_TAGS]) {
+            $this->initTagHelper();
+        }
     }
     
     /**
@@ -129,9 +239,7 @@ class editor_Models_Converter_XmlSegmentList {
         $this->result[] = '</xliff>';
         
         $xml = join("\n", $this->result);
-        if($this->saveXmlToFile) {
-            $this->saveXmlToFile($xml);
-        }
+
         return $xml;
     }
     
@@ -159,7 +267,8 @@ class editor_Models_Converter_XmlSegmentList {
         $this->data['targetLang'] = $lang->getRfc5646();
         
         $this->data['relaisLang'] = $task->getRelaisLang();
-        if(empty($this->data['relaisLang'])){
+        //disable relais export by setting relais lang to false
+        if(empty($this->data['relaisLang']) || !$this->options[self::CONFIG_ADD_RELAIS_LANGUAGE]){
             $this->data['relaisLang'] = false;
         }
         else {
@@ -181,22 +290,41 @@ class editor_Models_Converter_XmlSegmentList {
      */
     protected function createXmlHeader() {
         $headParams = array('xliff', 'version="1.2"');
+        
         $headParams[] = 'xmlns="urn:oasis:names:tc:xliff:document:1.2"';
         $headParams[] = 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"';
-        $headParams[] = 'xmlns:dx="http://www.interoperability-now.org/schema"';
-        if($this->createDiffAltTrans) {
+        $this->enabledNamespaces['xsi'] = 'xsi';
+        
+        //add DX namespace only if needed 
+        $dx = $this->options[self::CONFIG_ADD_RELAIS_LANGUAGE] 
+                || $this->options[self::CONFIG_INCLUDE_DIFF]
+                || $this->options[self::CONFIG_ADD_COMMENTS]
+                || $this->options[self::CONFIG_ADD_ALTERNATIVES]
+                || $this->options[self::CONFIG_ADD_PREVIOUS_VERSION];
+        if($dx) {
+            $headParams[] = 'xmlns:dx="http://www.interoperability-now.org/schema"';
+            $this->enabledNamespaces['dx'] = 'dx';
+        }
+        if($this->options[self::CONFIG_INCLUDE_DIFF]) {
             $headParams[] = 'xmlns:sdl="http://sdl.com/FileTypes/SdlXliff/1.0"';
+            $this->enabledNamespaces['sdl'] = 'sdl';
         }
         $headParams[] = 'xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-doc-1_0_extensions.xsd"';
-        $headParams[] = 'dx:version="1.4"';
+        if($dx) {
+            $headParams[] = 'dx:version="1.4"';
+        }
         $headParams[] = 'xmlns:translate5="http://www.translate5.net/"';
+        $this->enabledNamespaces['translate5'] = 'translate5';
         $headParams[] = 'translate5:taskname="'.htmlspecialchars($this->task->getTaskName()).'"';
+        $headParams[] = 'translate5:taskguid="'.htmlspecialchars($this->task->getTaskGuid()).'"';
         $this->result[] = '<'.join(' ', $headParams).'>';
         
-        $this->result[] = '<!-- attention: this format should be refactored to xliff 2.x. It will be, as soon as some one volunteers to do or donates funding for it -->';
-        $this->result[] = '<!-- attention: currently the usage of g- and x-tags in this doc is not completely in line with the xliff:doc-spec. This will change, when resources for this issue will be assigned -->';
-        $this->result[] = '<!-- attention: regarding internal tags the source and the target-content are in the same format as the contents of the original source formats would have been. For SDLXLIFF this means: No mqm-Tags; Terms marked with <mrk type="x-term-...">-Tags; Internal Tags marked with g- and x-tags; For CSV this means: all content is exported as it comes from CSV, this can result in invalid XLIFF! -->';
-        $this->result[] = '<!-- attention: MQM Tags are not exported at all! -->';
+        if($this->options[self::CONFIG_ADD_DISCLAIMER]) {
+            $this->result[] = '<!-- attention: this format should be refactored to xliff 2.x. It will be, as soon as some one volunteers to do or donates funding for it -->';
+            $this->result[] = '<!-- attention: currently the usage of g- and x-tags in this doc is not completely in line with the xliff:doc-spec. This will change, when resources for this issue will be assigned -->';
+            $this->result[] = '<!-- attention: regarding internal tags the source and the target-content are in the same format as the contents of the original source formats would have been. For SDLXLIFF this means: No mqm-Tags; Terms marked with <mrk type="x-term-...">-Tags; Internal Tags marked with g- and x-tags; For CSV this means: all content is exported as it comes from CSV, this can result in invalid XLIFF! -->';
+            $this->result[] = '<!-- attention: MQM Tags are not exported at all! -->';
+        }
     }
     
     /**
@@ -211,16 +339,50 @@ class editor_Models_Converter_XmlSegmentList {
         $export = ZfExtended_Factory::get('editor_Models_Export');
         /* @var $export editor_Models_Export */
         $this->exportParser = $export->getFileParserForXmlList($this->task, $filename);
-        $file = '<file original="%1$s" source-language="%2$s" target-language="%3$s" xml:space="preserve">';
+        $file = '<file original="%1$s" source-language="%2$s" target-language="%3$s" xml:space="preserve" datatype="x-translate5">';
         $this->result[] = sprintf($file, htmlspecialchars($filename), $this->data['sourceLang'], $this->data['targetLang']);
         $this->result[] = '<body>';
         
+        $fileMapKey = $this->prepareTagsStorageInHeader();
         foreach($segmentsOfFile as $segment) {
             $this->processSegmentsOfFile($segment);
         }
+        $this->storeTagsInHeader($fileMapKey);
         
         $this->result[] = '</body>';
         $this->result[] = '</file>';
+    }
+    
+    /**
+     * prepares tag storage in the xliff header - omitted with CONFIG_PLAIN_INTERNAL_TAGS
+     * @return integer the index of the filemap placeholder in the result array
+     */
+    protected function prepareTagsStorageInHeader() {
+        if($this->options[self::CONFIG_PLAIN_INTERNAL_TAGS]) {
+            return null;
+        }
+        $fileMapKey = count($this->result);
+        $this->result[] = 'FILE_MAP_PLACEHOLDER';
+
+        $this->tagId = 1; //we start for each file with tag id = 1
+        $this->tagMap = [];
+        return $fileMapKey;
+    }
+        
+    /**
+     * stores the content tags in the xliff header - omitted with CONFIG_PLAIN_INTERNAL_TAGS
+     * @param integer $fileMapKey the index of the filemap placeholder in the result array 
+     */
+    protected function storeTagsInHeader($fileMapKey) {
+        if($this->options[self::CONFIG_PLAIN_INTERNAL_TAGS]) {
+            return;
+        }
+        if(empty($this->tagMap)){
+            unset($this->result[$fileMapKey]);
+        }
+        else {
+            $this->result[$fileMapKey] = '<header><translate5:tagmap>'.base64_encode(serialize($this->tagMap)).'</translate5:tagmap></header>';
+        }
     }
     
     /**
@@ -228,18 +390,21 @@ class editor_Models_Converter_XmlSegmentList {
      * @param array $segment
      */
     protected function processSegmentsOfFile($segment) {
-        $segStart = '<trans-unit id="%1$s" translate5:autostateId="%2$s" translate5:autostateText="%3$s">';
+        $segStart = '<trans-unit id="%1$s" translate5:autostateId="%2$s" translate5:autostateText="%3$s"%4$s>';
         if(isset($this->data['autostates'][$segment['autoStateId']])) {
             $autoStateText =  $this->data['autostates'][$segment['autoStateId']];
         }
         else {
             $autoStateText = 'NOT_FOUND_'.$segment['autoStateId'];
         }
-        //@todo actually we are messing around on creating the xliff file. 
-        //since the mid is only unique in the source file, and we are merging here 
-        //several files together, we have to use the segmentNrInTask to achieve uniqueness,
-        //instead using the desired MID
-        $this->result[] = "\n".sprintf($segStart, $segment['segmentNrInTask'], $segment['autoStateId'], $autoStateText);
+        
+        $additionalAttributes = '';
+        if(isset($segment['editable']) && !$segment['editable']){
+            $additionalAttributes = ' translate="no"';
+        }
+
+        //segmentNrInTask is the segment id of the generated segment
+        $this->result[] = "\n".sprintf($segStart, $segment['segmentNrInTask'], $segment['autoStateId'], $autoStateText, $additionalAttributes);
         
         /*
          * <!-- attention: regarding internal tags the source and the target-content are in the same format as the contents of the original source formats would have been. For SDLXLIFF this means: No mqm-Tags; Terms marked with <mrk type="x-term-...">-Tags; Internal Tags marked with g- and x-tags; For CSV this means: No internal tags except mqm-tags -->
@@ -253,11 +418,13 @@ class editor_Models_Converter_XmlSegmentList {
             $this->processSegmentField($field, $segment);
         }
         
-        if(!empty($segment['comments'])) {
+        if(!empty($segment['comments']) && $this->options[self::CONFIG_ADD_COMMENTS]) {
             $this->processComment($segment);
         }
         
-        $this->processStateAndQm($segment);
+        if($this->options[self::CONFIG_ADD_STATE_QM]) {
+            $this->processStateAndQm($segment);
+        }
         
         //$this->result[] = '<autoStateId>'.$segment['autoStateId'].'</autoStateId>';
         //$this->result[] = '<matchRate>'.$segment['matchRate'].'</matchRate>';
@@ -288,21 +455,37 @@ class editor_Models_Converter_XmlSegmentList {
             $altTransName = $field->name;
             $matchRate = number_format($segment['matchRate'], 1, '.', '');
             $targetEdit = $this->prepareText($segment[$this->sfm->getEditIndex($this->data['firstTarget'])]);
-            $this->result[] = '<target dx:match-quality="'.$matchRate.'">'.$targetEdit.'</target>';
-            $targetOriginal = $this->prepareText($segment[$field->name]);
+            if(empty($this->enabledNamespaces['dx'])){
+                $targetPrefix = '<target state="%1$s">';
+            }
+            else {
+                $targetPrefix = '<target state="%1$s" dx:match-quality="'.$matchRate.'">';
+            }
+            if(empty($targetEdit)){
+                $state = 'needs-translation';
+            }
+            else {
+                $state = 'translated';
+            }
+            $this->result[] = sprintf($targetPrefix, $state).$targetEdit.'</target>';
             //add previous version of target as alt trans
-            $this->addAltTransToResult($targetOriginal, $lang, $altTransName, 'previous-version');
+            if($this->options[self::CONFIG_ADD_PREVIOUS_VERSION]) {
+                //add targetOriginal
+                $this->addAltTransToResult($this->prepareText($segment[$field->name]), $lang, $altTransName, 'previous-version');
+            }
         }
         else {
             //add alternatives
             $altTransName = $field->label;
             $targetEdit = $this->prepareText($segment[$this->sfm->getEditIndex($field->name)]);
-            $this->addAltTransToResult($targetEdit, $lang, $altTransName);
-            if($this->createDiffAltTrans){
-                $targetOriginal = $this->prepareText($segment[$field->name]);
+            if($this->options[self::CONFIG_ADD_ALTERNATIVES]) {
+                $this->addAltTransToResult($targetEdit, $lang, $altTransName);
             }
         }
-        $this->addDiffToResult($targetEdit, $targetOriginal, $altTransName, $segment);
+        if($this->options[self::CONFIG_INCLUDE_DIFF]){
+            //compare targetEdit and targetOriginal
+            $this->addDiffToResult($targetEdit, $this->prepareText($segment[$field->name]), $altTransName, $segment);
+        }
     }
     
     protected function addAltTransToResult($targetText, $lang, $label, $type = null) {
@@ -312,9 +495,6 @@ class editor_Models_Converter_XmlSegmentList {
     }
     
     protected function addDiffToResult($targetEdit, $targetOriginal, $label, $segment) {
-        if(!$this->createDiffAltTrans){
-            return;
-        }
         $diffResult = $this->differ->diffSegment($targetOriginal, $targetEdit, $segment['timestamp'], $segment['userName']);
         $this->addAltTransToResult($diffResult, $this->data['targetLang'], $label.'-diff', 'reference');
     }
@@ -340,8 +520,8 @@ class editor_Models_Converter_XmlSegmentList {
      * @param array $segment
      */
     protected function processStateAndQm(array $segment) {
-        $this->result[] = '<state stateid="'.$segment['stateId'].'">'.$this->convertStateId($segment['stateId']).'</state>';
-        $qms = $this->convertQmIds($segment['qmId']);
+        $this->result[] = '<state stateid="'.$segment['stateId'].'">'.$this->segmentUtility->convertStateId($segment['stateId']).'</state>';
+        $qms = $this->segmentUtility->convertQmIds($segment['qmId']);
         if(empty($qms)) {
             $this->result[] = '<dx:qa-hits></dx:qa-hits>';
         }
@@ -375,141 +555,36 @@ class editor_Models_Converter_XmlSegmentList {
         return $result;
     }
     
-    protected function saveXmlToFile($xml) {
-        $path = $this->task->getAbsoluteTaskDataPath();
-        if(!is_dir($path) || !is_writeable($path)) {
-            error_log('cant write changes.xliff file to path: '.$path);
-            return;
-        }
-        $suffix = '.xliff';
-        $filename = 'changes-'.date('Y-m-d\TH:i:s');
-        $i = 0;
-        $outFile = $path.DIRECTORY_SEPARATOR.$filename.$suffix;
-        while(file_exists($outFile)) {
-            $outFile = $path.DIRECTORY_SEPARATOR.$filename.'-'.($i++).$suffix;
-        }
-        if(file_put_contents($outFile, $xml) == 0) {
-            error_log('Error on writing XML File: '.$outFile);
-        }
-    }
-    
     /**
      * prepares segment text parts for xml
      * @param string $text
      * @return string
      */
     protected function prepareText($text) {
-        return $this->exportParser->exportSingleSegmentContent($text);
+        if($this->options[self::CONFIG_PLAIN_INTERNAL_TAGS]) {
+            return $this->exportParser->exportSingleSegmentContent($text);
+        }
+        
+        //if plain internal tags are disabled:
+        // 1. toXliff converts the internal tags to xliff g,bx,ex and x tags
+        // 2. remove term tags
+        // 3. remove MQM tags
+        //TODO Terminology and MQM tags are just removed and not supported by our XLIFF exporter so far!
+        $text = $this->taghelperInternal->toXliffPaired($text, true, $this->tagMap, $this->tagId);
+        $text = $this->taghelperTerm->remove($text);
+        $text = $this->taghelperMqm->remove($text);
+        return $text;
     }
     
-    /**
-     * break the qm img tags apart and the apply the $resultRenderer to manipulate the tag
-     * $resultRenderer is a Closure and returns the converted string. 
-     * It accepts the following parameters:
-     *     string $tag = original img tag, 
-     *     array $cls css classes, 
-     *     integer $issueId the qm issue id, 
-     *     string $issueName the untranslated qm issue name, 
-     *     string $sev the untranslated sev textual id, 
-     *     string $sevName the untranslated sev string, 
-     *     string $comment the user comment
-     * 
-     * @param editor_Models_Task $task
-     * @param string $text
-     * @param Closure $resultRenderer does the final rendering of the qm tag, Parameters see above
-     */
-    public function convertQmSubsegments(editor_Models_Task $task, $text, Closure $resultRenderer) {
-        $qmSubFlags = $task->getQmSubsegmentFlags();
-        if(empty($qmSubFlags)){
-            return $text;
+    protected function initTagHelper() {
+        if(empty($this->taghelperInternal)) {
+            $this->taghelperInternal = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         }
-        $this->initCaches($task);
-        $parts = preg_split('#(<img[^>]+>)#i', $text, null, PREG_SPLIT_DELIM_CAPTURE);
-        $tg = $task->getTaskGuid();
-        $severities = array_keys(get_object_vars(self::$severityCache[$tg]));
-        foreach($parts as $idx => $part) {
-            if(! ($idx % 2)) {
-                continue;
-            }
-            //<img  class="critical qmflag ownttip open qmflag-1" data-seq="412" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-1-left.png" />
-            preg_match('#<img[^>]+(class="([^"]*(qmflag-([0-9]+)[^"]*))"[^>]+data-comment="([^"]*)")|(data-comment="([^"]*)"[^>]+class="([^"]*(qmflag-([0-9]+)[^"]*))")[^>]*>#i', $part, $matches);
-            $cnt = count($matches);
-            if($cnt < 6) {
-                $parts[$idx] = $part;
-                continue;
-            }
-            if(count($matches) > 10) {
-                $cls = explode(' ', $matches[8]);
-                $issueId = $matches[10];
-                $comment = $matches[7];
-            }
-            else {
-                $cls = explode(' ', $matches[2]);
-                $issueId = $matches[4];
-                $comment = $matches[5];
-            }
-            
-            $sev = array_intersect($severities, $cls);
-            $sev = reset($sev);
-            $sev = empty($sev) ? 'sevnotfound' : $sev;
-            $sevName = (isset(self::$severityCache[$tg]->$sev) ? self::$severityCache[$tg]->$sev : '');
-            $issueName = (isset(self::$issueCache[$tg][$issueId]) ? self::$issueCache[$tg][$issueId] : '');
-            
-            $parts[$idx] = $resultRenderer($part, $cls, $issueId, $issueName, $sev, $sevName, $comment);
+        if(empty($this->taghelperTerm)) {
+            $this->taghelperTerm = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
         }
-        return join('', $parts);
-    }
-    
-    /**
-     * returns the configured value to the given state id
-     * @param string $stateId
-     * @return string
-     */
-    public function convertStateId($stateId) {
-        if(empty($stateId)) {
-            return '';
-        }
-        if(isset($this->stateFlags[$stateId])){
-            return $this->stateFlags[$stateId];
-        }
-        return 'Unknown State '.$stateId;
-    }
-    
-    /**
-     * converts the semicolon separated qmId string into an associative array
-     * key => qmId
-     * value => configured String in the config for this id
-     * @param string $qmIds
-     * @return array
-     */
-    public function convertQmIds($qmIds) {
-        if(empty($qmIds)) {
-            return array();
-        }
-        $qmIds = trim($qmIds, ';');
-        $qmIds = explode(';', $qmIds);
-        $result = array();
-        foreach($qmIds as $qmId) {
-            if(isset($this->qualityFlags[$qmId])){
-                $result[$qmId] = $this->qualityFlags[$qmId];
-                continue;
-            }
-            $result[$qmId] = 'Unknown Qm Id '.$qmId;
-        }
-        return $result;
-    }
-    
-    /**
-     * caches task issues and severities
-     * @param editor_Models_Task $task
-     */
-    protected function initCaches(editor_Models_Task $task) {
-        $tg = $task->getTaskGuid();
-        if(empty(self::$issueCache[$tg])){
-            self::$issueCache[$tg] = $task->getQmSubsegmentIssuesFlat();
-        }
-        if(empty(self::$severityCache[$tg])){
-            self::$severityCache[$tg] = $task->getQmSubsegmentSeverities();
+        if(empty($this->taghelperMqm)) {
+            $this->taghelperMqm = ZfExtended_Factory::get('editor_Models_Segment_QmSubsegments');
         }
     }
 }

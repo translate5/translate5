@@ -164,8 +164,8 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         /* @var $file editor_Models_File */
         $file->load($segment->getFileId());
         
-        $source = $internalTag->toXliff($this->getQueryString($segment));
-        $target = $internalTag->toXliff($segment->getTargetEdit());
+        $source = $internalTag->toXliffPaired($this->getQueryString($segment));
+        $target = $internalTag->toXliffPaired($segment->getTargetEdit());
         
         if($this->api->update($source, $target, $segment, $file->getFileName())) {
             $messages->addNotice('Segment im TM aktualisiert!', 'MatchResource');
@@ -203,7 +203,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         /* @var $internalTag editor_Models_Segment_InternalTag */
         
         //$map is returned by reference
-        $queryString = $internalTag->toXliff($this->getQueryString($segment), true, $map);
+        $queryString = $internalTag->toXliffPaired($this->getQueryString($segment), true, $map);
         
         if($this->api->lookup($segment, $queryString, $file->getFileName())){
             $result = $this->api->getResult();

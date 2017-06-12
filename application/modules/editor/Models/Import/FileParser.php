@@ -40,10 +40,6 @@ END LICENSE AND COPYRIGHT
  */
 abstract class editor_Models_Import_FileParser {
     /**
-     * @var integer Counter of tags used in a segment.
-     */
-    protected $_tagCount = 1;
-    /**
      * @var string
      */
     protected $_origFile = NULL;
@@ -77,31 +73,6 @@ abstract class editor_Models_Import_FileParser {
      */
     protected $segmentAttributes = array();
     
-    /**
-     * defines the GUI representation of internal used tags for masking special characters  
-     * @var array
-     */
-    protected $_tagMapping = array(
-        'hardReturn' => array('text' => '&lt;hardReturn/&gt;', 'imgText' => '<hardReturn/>'),
-        'softReturn' => array('text' => '&lt;softReturn/&gt;', 'imgText' => '<softReturn/>'),
-        'macReturn' => array('text' => '&lt;macReturn/&gt;', 'imgText' => '<macReturn/>'),
-        'space' => array('text' => '&lt;space/&gt;', 'imgText' => '<space/>'));
-
-    /**
-     * @var editor_ImageTag_Left
-     */
-    protected $_leftTag = NULL;
-
-    /**
-     * @var editor_ImageTag_Right
-     */
-    protected $_rightTag = NULL;
-
-    /**
-     * @var editor_ImageTag_Single
-     */
-    protected $_singleTag = NULL;
-
     /**
      * @var editor_Models_Task
      */
@@ -162,9 +133,6 @@ abstract class editor_Models_Import_FileParser {
         $this->_path = $path;
         $this->_fileName = $fileName;
         $this->_fileId = $fileId;
-        $this->_leftTag = ZfExtended_Factory::get('editor_ImageTag_Left');
-        $this->_rightTag = ZfExtended_Factory::get('editor_ImageTag_Right');
-        $this->_singleTag = ZfExtended_Factory::get('editor_ImageTag_Single');
         $this->task = $task;
         $this->_taskGuid = $task->getTaskGuid();
         $this->autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
@@ -211,29 +179,6 @@ abstract class editor_Models_Import_FileParser {
                 }, $this->_origFile);
     }
     
-    /**
-     * callback for replace method in parseSegment
-     * @param array $match
-     * @return string
-     */
-    protected function whitespaceTagReplacer(array $match) {
-        //$replacer = function($match) use ($segment, $shortTagIdent, $map) {
-        $tag = $match[0];
-        $tagName = preg_replace('"<([^/ ]*).*>"', '\\1', $tag);
-        if(!isset($this->_tagMapping[$tagName])) {
-            trigger_error('The used tag ' . $tagName .' is undefined! Segment: '.$this->_segment, E_USER_ERROR);
-        }
-        $fileNameHash = md5($this->_tagMapping[$tagName]['imgText']);
-        
-        //generate the html tag for the editor
-        $p = $this->getTagParams($tag, $this->shortTagIdent++, $tagName, $fileNameHash);
-        $tag = $this->_singleTag->getHtmlTag($p);
-        $this->_singleTag->createAndSaveIfNotExists($this->_tagMapping[$tagName]['imgText'], $fileNameHash);
-        $this->_tagCount++;
-        return $tag;
-    }
-        
-    
     public function addSegmentProcessor(editor_Models_Import_SegmentProcessor $proc){
         $this->segmentProcessor[] = $proc;
     }
@@ -248,56 +193,6 @@ abstract class editor_Models_Import_FileParser {
     }
     
     /**
-     * protects whitespace inside a segment with a tag
-     *
-     * @param string $segment
-     * @param integer $count optional, variable passed by reference stores the replacement count
-     * @return string $segment
-     */
-    protected function parseSegmentProtectWhitespace($segment, &$count = 0) {
-        $split = preg_split('#(<[^>]+>)#', $segment, null, PREG_SPLIT_DELIM_CAPTURE);
-        $search = array(
-          "\r\n",  
-          "\n",  
-          "\r"
-        );
-        $replace = array(
-          '<hardReturn/>',
-          '<softReturn/>',
-          '<macReturn/>'
-        );
-        $i = 0;
-        foreach($split as $idx => $chunk) {
-            if($i++ % 2 === 1 || strlen($chunk) == 0) {
-                //ignore found tags in the content or empty chunks
-                continue; 
-            }
-            //replace only on real text
-            $chunk = str_replace($search, $replace, $chunk, $returnCount);
-            $count += $returnCount;
-            
-            $replacer = function ($match) {
-                //depending on the regex use the found spaces (match[1]) or the tabs (match[2]).
-                $content = empty($match[1]) ? $match[2] : $match[1];
-                $result = '<space ts="' . implode(',', unpack('H*', $content)) . '"/>';
-                if(empty($match[2])){
-                    //prepend the remaining whitespace before the space tag. 
-                    // Only the additional spaces are replaced as a tag
-                    // One space must remain in the content
-                    return ' '.$result;
-                }
-                //tab(s) are completly replaced with an tag
-                return $result;
-            };
-            
-            //protect multispaces and tabs
-            $split[$idx] = preg_replace_callback('/ ( +)|(\t+)/', $replacer, $chunk, -1, $spaceCount);
-            $count += $spaceCount;
-        }
-        return join($split);
-    }
-    
-    /**
      * encodes special chars to entities for display in title-Attributs and text of tags in the segments
      * because studio sometimes writes tags in the description of tags (i.e. in locked tags)
      *
@@ -309,60 +204,11 @@ abstract class editor_Models_Import_FileParser {
     }
     
     /**
-     * Hilfsfunktion für parseSegment: Verpackung verschiedener Strings zur Zwischenspeicherung als HTML-Klassenname im JS
-     *
-     * @param string $tag enthält den Tag als String
-     * @param string $tagName enthält den Tagnamen
-     * @param boolean $locked gibt an, ob der übergebene Tag die Referenzierung auf einen gesperrten inline-Text im sdlxliff ist
-     * @return string $id ID des Tags im JS
-     */
-    protected function parseSegmentGetStorageClass($tag) {
-        $tagContent = preg_replace('"^<(.*)>$"', '\\1', $tag);
-        if($tagContent == $tag){
-            trigger_error('The Tag ' . $tag .
-                    ' has not the structure of a tag.', E_USER_ERROR);
-        }
-        return implode('', unpack('H*', $tagContent));
-    }
-    
-    /**
-     * returns the parameters for creating the HtmlTags used in the GUI
-     * @param string $tag
-     * @param string $shortTag
-     * @param string $tagId
-     * @param string $fileNameHash
-     * @param string $text
-     */
-    protected function getTagParams($tag, $shortTag, $tagId, $fileNameHash, $text = false) {
-        if($text === false) {
-            $text = $this->_tagMapping[$tagId]['text'];
-        }
-        return array(
-            'class' => $this->parseSegmentGetStorageClass($tag),
-            'text' => $text,
-            'shortTag' => $shortTag,
-            'id' => $tagId, //mostly original tag id
-            'filenameHash' => $fileNameHash,
-        );
-    }
-    
-    /**
      * returns the internally used SegmentFieldManager
      * @return editor_Models_SegmentFieldManager
      */
     public function getSegmentFieldManager() {
         return $this->segmentFieldManager;
-    }
-    
-    /**
-     * @return array array('tagImageName1.png','tagImageName2.png',...)
-     */
-    public function getTagImageNames() {
-        return array_merge(
-            $this->_leftTag->_imagesInObject,
-            $this->_rightTag->_imagesInObject,
-            $this->_singleTag->_imagesInObject
-            );
     }
     
     /**
@@ -548,12 +394,15 @@ abstract class editor_Models_Import_FileParser {
         $isLocked = $attributes->locked && (bool) $this->task->getLockLocked();
        
         $isFullMatch = ($attributes->matchRate === 100);
-        $isEditable  = (!$isFullMatch || (bool) $this->task->getEdit100PercentMatch() || $isAutoprop) && !$isLocked;
         $isTranslated = $this->isTranslated();
         
-        $attributes->editable = $isEditable;
+        //calculate isEditable only if it was not explicitly set
+        if(!isset($attributes->editable)) {
+            $isEditable  = (!$isFullMatch || (bool) $this->task->getEdit100PercentMatch() || $isAutoprop) && !$isLocked;
+            $attributes->editable = $isEditable;
+        }
         $attributes->pretrans = $isFullMatch && !$isAutoprop;
-        $attributes->autoStateId = $this->autoStates->calculateImportState($isEditable, $isTranslated);
+        $attributes->autoStateId = $this->autoStates->calculateImportState($attributes->editable, $isTranslated);
         $attributes->isTranslated = $isTranslated;
         
         //if there was a matchRateType from the imported segment, then the original value was stored

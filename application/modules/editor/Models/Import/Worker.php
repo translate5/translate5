@@ -68,6 +68,7 @@ class editor_Models_Import_Worker extends editor_Models_Import_Worker_Abstract {
             /* @var $import editor_Models_Import_Worker_Import */
             $import->import($task, $parameters['config']);
             
+            // externalImport just triggers the event aferImport!
             //@see editor_Models_Import::triggerAfterImport
             $externalImport = ZfExtended_Factory::get('editor_Models_Import');
             /* @var $externalImport editor_Models_Import */
