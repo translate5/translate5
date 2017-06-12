@@ -438,7 +438,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
           },{
               xtype: 'owncheckcolumn',
               width: 45,
-              cls: 'emptyTargets',
+              cls: 'empty-targets',
               dataIndex: 'emptyTargets',
               filter: {
                   type: 'boolean'

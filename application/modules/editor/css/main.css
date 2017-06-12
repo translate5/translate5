@@ -328,6 +328,7 @@ body.loading {background: url("../images/loading_ico.gif") center 100px no-repea
 .adminTaskGrid .x-grid-header-ct .relais-lang > div {background:url("../images/relaisLanguage.png") no-repeat 10px 9px;}
 .adminTaskGrid .x-grid-header-ct .source-lang > div {background:url("../images/sourceLanguage.png") no-repeat 10px 9px;}
 .adminTaskGrid .x-grid-header-ct .target-lang > div {background:url("../images/targetLanguage.png") no-repeat 10px 9px;}
+.adminTaskGrid .x-grid-header-ct .empty-targets > div {background:url("../images/emptyTargetLanguage.png") no-repeat 10px 9px;}
 
 .adminTaskGrid .x-grid-header-ct .fullMatchEdit.ux-filtered-column span,
 .adminTaskGrid .x-grid-header-ct .terminologie.ux-filtered-column span,
@@ -346,6 +347,7 @@ body.loading {background: url("../images/loading_ico.gif") center 100px no-repea
 .adminTaskGrid .x-grid-header-ct .source-edit span.x-column-header-text-inner,
 .adminTaskGrid .x-grid-header-ct .source-lang span.x-column-header-text-inner,
 .adminTaskGrid .x-grid-header-ct .target-lang span.x-column-header-text-inner,
+.adminTaskGrid .x-grid-header-ct .empty-targets span.x-column-header-text-inner,
 .adminTaskGrid .x-grid-header-ct .relais-lang span.x-column-header-text-inner{
     display: block;
     overflow: hidden;
