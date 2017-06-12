@@ -42,20 +42,14 @@ class editor_Models_Import_SegmentProcessor_RepetitionHash extends editor_Models
     protected $hasAlternates;
     
     /**
-     * @var boolean
+     * @var editor_Models_Segment_RepetitionHash
      */
-    protected $isSourceEditing;
-    
-    /**
-     * @var editor_Models_Segment_InternalTag
-     */
-    protected $tagHelper;
+    protected $hasher;
     
     public function __construct(editor_Models_Task $task, editor_Models_SegmentFieldManager $sfm) {
         parent::__construct($task);
         $this->hasAlternates = !$sfm->isDefaultLayout();
-        $this->isSourceEditing = (bool) $task->getEnableSourceEditing();
-        $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        $this->hasher = ZfExtended_Factory::get('editor_Models_Segment_RepetitionHash',[$task]);
     }
     
     /**
@@ -66,53 +60,23 @@ class editor_Models_Import_SegmentProcessor_RepetitionHash extends editor_Models
         $allFields = &$parser->getFieldContents();
         if($this->hasAlternates) {
             foreach($allFields as $field => &$data) {
-                $this->hashField($data);
+                $data['originalMd5'] = $this->hasher->hashAlternateTarget($data['originalMd5']);
             }
             return false;
         }
         
         if(isset($allFields[editor_Models_SegmentField::TYPE_RELAIS])) {
-            $this->hashField($allFields[editor_Models_SegmentField::TYPE_RELAIS]);
+            $relais = &$allFields[editor_Models_SegmentField::TYPE_RELAIS];
+            $relais['originalMd5'] = $this->hasher->hashRelais($relais['originalMd5']);
         }
 
         $source = &$allFields[editor_Models_SegmentField::TYPE_SOURCE];
         $target = &$allFields[editor_Models_SegmentField::TYPE_TARGET];
         
-        $sourceTagCount = $this->getCountSourceEditing($source);
-        $targetTagCount = $this->hashField($target, $sourceTagCount);
-        $this->hashField($source, $targetTagCount);
-        return false;
-    }
-    
-    /**
-     * makes the repetition hash out of the given segment data. 
-     * Second optional value is appended to the string before hash generation
-     * returns the count of replaced tags
-     * @param array $data
-     * @param string $additionalValue
-     * @return unknown
-     */
-    protected function hashField(array & $data, $additionalValue = '') {
-        //originalMd5 is prefilled with the original string value and is modified by the other processors.
+        //originalMd5 is prefilled with the original string value and is modified by other processors (for example MQM parser).
         //here it will finally converted to the md5 hash
-        $original = $data['originalMd5'];
-        if(!empty($additionalValue)) {
-            $original .= '#'.$additionalValue;
-        }
-        $original = $this->tagHelper->replace($original, '<internal-tag>', -1, $count);
-        $data['originalMd5'] = md5($original);
-        return $count;
-    }
-    
-    /**
-     * returns the tag count in the given segment data
-     * returns an empty string when source editing is false
-     * @return mixed
-     */
-    protected function getCountSourceEditing(array $data) {
-        if(!$this->isSourceEditing) {
-            return '';
-        }
-        return $this->tagHelper->count($data['original']);
+        $target['originalMd5'] = $this->hasher->hashTarget($target['originalMd5'], $source['original']);
+        $source['originalMd5'] = $this->hasher->hashSource($source['originalMd5'], $target['original']);
+        return false;
     }
 }
