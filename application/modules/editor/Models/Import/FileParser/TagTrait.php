@@ -235,8 +235,18 @@ trait editor_Models_Import_FileParser_TagTrait {
         
         //protect multispaces and tabs
         $textNode = preg_replace_callback('/ ( +)|(\t+)/', function ($match) {
-            //Pay attention to the leading space on refactoring!
-            return ' '.$this->makeInternalSpace($match[1]);
+            //depending on the regex use the found spaces (match[1]) or the tabs (match[2]).
+            $content = empty($match[1]) ? $match[2] : $match[1];
+            $result = $this->makeInternalSpace($content);
+            if(empty($match[2])){
+                //prepend the remaining whitespace before the space tag. 
+                // Only the additional spaces are replaced as a tag
+                // One space must remain in the content
+                //Pay attention to the leading space on refactoring!
+                return ' '.$result;
+            }
+            //tab(s) are completly replaced with an tag
+            return $result;
         }, $textNode);
         
         return preg_replace_callback($this->protectedUnicodeList, function ($match) {
