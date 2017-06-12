@@ -97,6 +97,10 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
             return;
         }
         
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($session->taskGuid);
+        
         $sourceMeta = $sfm->getByName(editor_Models_SegmentField::TYPE_SOURCE);
         $this->isSourceEditable = ($sourceMeta !== false && $sourceMeta->editable == 1);
 
@@ -147,7 +151,13 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 $sourceDiffer = $this->entity->getSourceMd5() !== $entity->getSourceMd5();
                 //entweder die targets sind unterschiedlich, oder im anderen Fall sind beide Targets ein Leerstring => auch der Leerstring Fall ist keine Übereinstimmung
                 $targetDiffer = ($this->entity->getTargetMd5() !== $entity->getTargetMd5()) || (strlen(trim($entity->getTarget())) == 0);
-                if($sourceDiffer && $targetDiffer) {
+                
+                /*
+                 * This is more a hack as a right solution. See TRANSLATE-885 comments for more information!
+                 */
+                $translationException = ($task->getWorkflowStep() == 1 && (bool) $task->getEmptyTargets());
+                
+                if($sourceDiffer && $targetDiffer && !$translationException) {
                     error_log('Falsche Segmente per WDHE bearbeitet: MasterSegment:'.$editedSegmentId.' per PUT übergebene Ids:'.print_r($ids, 1).' IP:'.$_SERVER['REMOTE_ADDR']);
                     continue;
                 }

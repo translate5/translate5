@@ -270,7 +270,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->entity->validate();
         
         //FIXME: Introduced with TRANSLATE-885, but is more a hack as a solution. See Issue comments for more information!
-        $this->updateTargetMd5();
+        $this->updateTargetHashAndOriginal();
 
         foreach($allowedAlternatesToChange as $field) {
             if($this->entity->isModified($field)) {
@@ -292,11 +292,11 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     }
     
     /**
-     * Updates the targetMd5 hash for repetition calculation
+     * Updates the target original and targetMd5 hash for repetition calculation
      * Can be done only in Workflow Step 1 and if all targets were empty on import
      * This is more a hack as a right solution. See TRANSLATE-885 comments for more information!
      */
-    protected function updateTargetMd5() {
+    protected function updateTargetHashAndOriginal() {
         //TODO: also a check is missing, if task has alternate targets or not.
         // With alternates no recalc is needed at all, since no repetition editor can be used 
         $task = ZfExtended_Factory::get('editor_Models_Task');
@@ -306,7 +306,9 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $hasher = ZfExtended_Factory::get('editor_Models_Segment_RepetitionHash', [$task]);
             /* @var $hasher editor_Models_Segment_RepetitionHash */
             $this->entity->setTargetMd5($hasher->hashTarget($this->entity->getTargetEdit(), $this->entity->getSource()));
+            $this->entity->setTarget($this->entity->getTargetEdit());
         }
+        
     }
     
     /**
