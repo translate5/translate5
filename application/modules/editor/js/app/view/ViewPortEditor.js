@@ -128,25 +128,9 @@ Ext.define('Editor.view.ViewPortEditor', {
     getNorth: function() {
         return {
             weight: 40,
-            //height:300,
+            xtype: 'headPanel',
             region: 'north',
-            //layout: {
-            //    type: 'vbox',
-            //    align : 'stretch',
-            //    pack  : 'start',
-            //},
-            items:[{
-                xtype:'container',
-                itemId:'northPanelContainer',
-                layout: {
-                    type: 'vbox',
-                    align : 'stretch',
-                    pack  : 'start',
-                },
-                items:[{
-                    xtype: 'headPanel'
-                }]
-            }]
+            //split:true,
         };
     }
 });
