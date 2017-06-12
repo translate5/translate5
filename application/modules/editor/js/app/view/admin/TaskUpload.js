@@ -46,12 +46,11 @@ Ext.define('Editor.view.admin.TaskUpload', {
     controller:'taskUpload',
     mixins:['Editor.controller.admin.IWizardCard'],
     listeners: {
-        beforerender: 'onAuthPanelBeforeRender',
         activate:'onTaskUploadActivate'
     },
     strings:{
-        wizardTitle:'#UT#After upload wizard',
-        finishButton:'#UT#Finish',
+        wizardTitle:'#UT#Dateien werden hochgeladen',
+        finishButton:'#UT#Schließen',
     },
     
     initConfig: function(instanceConfig) {
@@ -70,7 +69,6 @@ Ext.define('Editor.view.admin.TaskUpload', {
     
     
     disableContinueButton:function(){
-        //if !next -> finish
         var me = this,
             win = me.up('window'),
             winLayout=win.getLayout(),
@@ -83,7 +81,6 @@ Ext.define('Editor.view.admin.TaskUpload', {
     },
 
     disableCancelButton:function(){
-        //if !next -> return true;
         var me = this,
             win = me.up('window'),
             btnCancel=win.down('#cancel-task-btn');

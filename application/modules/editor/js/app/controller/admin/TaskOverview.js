@@ -77,7 +77,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       "delete":       {title: "#UT#Aufgabe komplett löschen?", msg: "#UT#Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?"}
   },
   strings: {
-      taskImported: '#UT#Aufgabe "{0}" vollständig importiert',
+      taskImported: '#UT#Aufgabe "{0}" bereit.',
       taskError: '#UT#Die Aufgabe konnte aufgrund von Fehlern nicht importiert werden!',
       taskOpening: '#UT#Aufgabe wird im Editor geöffnet...',
       taskFinishing: '#UT#Aufgabe wird abgeschlossen...',
@@ -88,6 +88,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       taskNotDestroyed : '#UT#Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!',
       forcedReadOnly: '#UT#Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!',
       openTaskAdminBtn: "#UT#Aufgabenübersicht",
+      loadingWindowMessage:"#UT#Dateien werden hochgeladen",
   },
   init : function() {
       var me = this;
@@ -654,7 +655,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           win = me.getTaskAddWindow(),
           error = win.down('#feedbackBtn');
       error.hide();
-      win.setLoading(true);
+      win.setLoading(me.strings.loadingWindowMessage);
       this.getTaskAddForm().submit({
           //Accept Header of submitted file uploads could not be changed:
           //http://stackoverflow.com/questions/13344082/fileupload-accept-header
