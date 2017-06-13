@@ -298,10 +298,6 @@
                 <source>Einstellungen</source>
                 <target state="needs-review-adaptation">Settings</target>
             </trans-unit>
-            <trans-unit id="U29ydGllcnVuZyAvIEZpbHRlcnVuZyB6dXLDvGNrc2V0emVu">
-                <source>Sortierung / Filterung zur&#xFC;cksetzen</source>
-                <target state="needs-review-adaptation">Reset sorting / filtering</target>
-            </trans-unit>
             <trans-unit id="UU0=">
                 <source>QM</source>
                 <target state="needs-review-adaptation">QM</target>
