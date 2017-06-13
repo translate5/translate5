@@ -57,6 +57,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_clearSortAndFilterBtn: '#UT#Tabelle zurücksetzen',
     item_clearSortAndFilterTooltip: '#UT#Sortierung und Filter zurücksetzen',
     item_watchListFilterBtn: '#UT#Lesezeichen',
+    item_helpTooltip: '#UT#Tastaturkürzel nachschlagen',
     viewModel: {
         formulas: {
             isNormalEdit: function(get) {
@@ -168,7 +169,10 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     xtype: 'button',
                     itemId: 'clearSortAndFilterBtn',
                     cls: 'clearSortAndFilterBtn',
-                    tooltip: me.item_clearSortAndFilterTooltip,
+                    tooltip: {
+                        text: me.item_clearSortAndFilterTooltip,
+                        showDelay: 0
+                    },
                     text: me.item_clearSortAndFilterBtn
                 },{
                     xtype: 'tbseparator'
@@ -186,10 +190,22 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     xtype: 'button',
                     itemId: 'qmsummaryBtn',
                     text: me.item_qmsummaryBtn,
-                    tooltip: me.item_qmsummaryTooltip,
+                    tooltip: {
+                        text: me.item_qmsummaryTooltip,
+                        showDelay: 0
+                    },
                     hidden: !Editor.data.task.hasQmSub()
                 },{
                     xtype: 'tbfill'
+                },{
+                    xtype: 'button',
+                    href: 'http://confluence.translate5.net/display/BUS/Editor+keyboard+shortcuts',
+                    hrefTarget: '_blank',
+                    icon: Editor.data.moduleFolder+'images/help.png',
+                    tooltip: {
+                        text: me.item_helpTooltip,
+                        showDelay: 0
+                    }
                 },{
                     xtype: 'button',
                     itemId: 'optionsBtn',
