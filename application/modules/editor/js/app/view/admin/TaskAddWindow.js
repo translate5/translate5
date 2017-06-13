@@ -52,6 +52,9 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         importTbxLabel: '#UT#TBX Datei²',
         importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!',
         importNews: '#UT#<b style="color:#ff0000;">Neu:</b> Sie können nun direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage">Mehr Info</a>.',
+        importVisualReviewTip:'#UT#Tooltip',
+        importVisualReviewType:'#UT#Please select pdf file',
+        importVisualReviewLabel:'#UT#Visual Review',
         
         taskNrLabel: '#UT#Auftragsnummer',
         taskNameTip: '#UT#Projektname (frei wählbar, Angabe notwendig)',
@@ -188,6 +191,14 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     allowBlank: true,
                                     toolTip: me.strings.importTbxTip,
                                     fieldLabel: me.strings.importTbxLabel
+                    },{
+                        xtype: 'filefield',
+                        name: 'visualReview',
+                        allowBlank: true,
+                        regex: /\.pdf$/i,
+                        toolTip: me.strings.importVisualReviewTip,
+                        regexText: me.strings.importVisualReviewType,
+                        fieldLabel: me.strings.importVisualReviewLabel
                                 }]
                             },{
                                 xtype: 'container',
