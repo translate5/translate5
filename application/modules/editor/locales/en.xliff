@@ -1495,9 +1495,13 @@
     <source>Ergonomic (Ansicht)</source>
     <target>Ergonomic (view mode)</target>
 </trans-unit>
-<trans-unit id='WmllbHRleHQgKHp1ciBJbXBvcnR6ZWl0KQ=='>
-    <source>Zieltext (zur Importzeit)</source>
-    <target>target (version on import time)</target>
+<trans-unit id='KHp1ciBJbXBvcnR6ZWl0KQ=='>
+    <source>(zur Importzeit)</source>
+    <target>(zur Importzeit)</target>
+</trans-unit>
+<trans-unit id='WmllbHRleHQ='>
+    <source>Zieltext</source>
+    <target>Zieltext</target>
 </trans-unit>
 <trans-unit id='QXVmZ2FiZSBJbXBvcnRpZXJlbg=='>
     <source>Aufgabe Importieren</source>
