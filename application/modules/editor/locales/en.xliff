@@ -1156,21 +1156,21 @@
     <source>Die Aufgabe ist durch einen Benutzer gesperrt</source>
     <target>The task is locked by a user</target>
   </trans-unit>
-  <trans-unit id='QUNIVFVORzogRWluIHdlaXRlcmVyIEZpbHRlciBpc3QgZ2VzZXR6dC4gRXMgaXN0IGRhaGVyIG3DtmdsaWNoLCBkYXNzIG5pY2h0IGFsbGUgU2VnbWVudGUgZGVyIE1lcmtsaXN0ZSBzaWNodGJhciBzaW5k'>
-    <source>ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Merkliste sichtbar sind</source>
-    <target>WARNING: Another filter is set. It is possible, that not all segments of the watchlist are visible</target>
+  <trans-unit id='QUNIVFVORzogRWluIHdlaXRlcmVyIEZpbHRlciBpc3QgZ2VzZXR6dC4gRXMgaXN0IGRhaGVyIG3DtmdsaWNoLCBkYXNzIG5pY2h0IGFsbGUgU2VnbWVudGUgZGVyIExlc2V6ZWljaGVubGlzdGUgc2ljaHRiYXIgc2luZA=='>
+    <source>ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Lesezeichenliste sichtbar sind</source>
+    <target>WARNING: Another filter is set. It is possible, that not all bookmarked segments are visible</target>
   </trans-unit>
-  <trans-unit id='TWVya2xpc3Rl'>
-    <source>Merkliste</source>
-    <target>watchlist</target>
+  <trans-unit id='TGVzZXplaWNoZW4'>
+    <source>Lesezeichen</source>
+    <target>bookmarks</target>
   </trans-unit>
-  <trans-unit id='U2VnbWVudCBhdWYgZGllIE1lcmtsaXN0ZSBzZXR6ZW4gKFNUUkcgKyBEKQ=='>
-    <source>Segment auf die Merkliste setzen (STRG + D)</source>
-    <target>add segment to my watchlist (CTRL + D)</target>
+  <trans-unit id='U2VnbWVudCBhdWYgTGVzZXplaWNoZW5saXN0ZSAoU1RSRyArIEQp'>
+    <source>Segment auf Lesezeichenliste (STRG + D)</source>
+    <target>bookmark segment (CTRL + D)</target>
   </trans-unit>
-  <trans-unit id='U2VnbWVudCB2b24gZGVyIE1lcmtsaXN0ZSBlbnRmZXJuZW4gKFNUUkcgKyBEKQ=='>
-    <source>Segment von der Merkliste entfernen (STRG + D)</source>
-    <target>remove segment from my watchlist (CTRL + D)</target>
+  <trans-unit id='U2VnbWVudCB2b24gTGVzZXplaWNoZW5saXN0ZSBlbnRmZXJuZW4gKFNUUkcgKyBEKQ=='>
+    <source>Segment von Lesezeichenliste entfernen (STRG + D)</source>
+    <target>remove segment bookmarks (CTRL + D)</target>
   </trans-unit>  
 <trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgQUxUICsgRU5URVIp'>
   <source>Speichern und nächstes Segment öffnen (STRG + ALT + ENTER)</source>
@@ -1522,6 +1522,14 @@
 <trans-unit id='U2NobGllw59lbg=='>
     <source>Schließen</source>
     <target>Close</target>
+</trans-unit>
+<trans-unit id='TVFN'>
+    <source>MQM</source>
+    <target>MQM</target>
+</trans-unit>
+<trans-unit id='TVFNIFN0YXRpc3Rpaw=='>
+    <source>MQM Statistik</source>
+    <target>MQM statistics</target>
 </trans-unit>
     </body>
   </file>

@@ -70,7 +70,7 @@ Ext.define('Editor.controller.Localizer', {
       segmentSaved: '<?php echo $this->translate->_('Das Segment wurde gespeichert!');?>',
       sortCleared: '<?php echo $this->translate->_('Die gewählte Sortierung der Segmente wurde zurückgesetzt!');?>',
       segmentNotSaved: '<?php echo $this->translate->_('Das zuletzt geöffnete Segment (Nr. {0}) konnte nicht gespeichert werden!');?>',
-      otherFiltersActive: '<?php echo $this->translate->_('ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Merkliste sichtbar sind');?>',
+      otherFiltersActive: '<?php echo $this->translate->_('ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Lesezeichenliste sichtbar sind');?>',
       noSegmentToFilter: '<?php echo $this->translate->_('Kein Segment dieser Datei entspricht den Filterkriterien');?>'
     };
 
@@ -137,10 +137,12 @@ Ext.define('Editor.controller.Localizer', {
   	gridToolbar.item_hideTagBtn = '<?php echo $this->translate->_('Tags verbergen');?>';
   	gridToolbar.item_shortTagBtn = '<?php echo $this->translate->_('Tag-Kurzansicht');?>';
   	gridToolbar.item_fullTagBtn = '<?php echo $this->translate->_('Tag-Vollansicht');?>';
-  	gridToolbar.item_qmsummaryBtn = '<?php echo $this->translate->_('QM Subsegment Statistik');?>';
+  	//gridToolbar.item_qmsummaryBtn = '<?php echo $this->translate->_('QM Subsegment Statistik');?>';
+  	gridToolbar.item_qmsummaryBtn = '<?php echo $this->translate->_('MQM');?>';
+  	gridToolbar.item_qmsummaryTooltip = '<?php echo $this->translate->_('MQM Statistik');?>';
   	gridToolbar.item_optionsTagBtn = '<?php echo $this->translate->_('Einstellungen');?>';
   	gridToolbar.item_clearSortAndFilterBtn = '<?php echo $this->translate->_('Sortierung / Filterung zurücksetzen');?>';
-  	gridToolbar.item_watchListFilterBtn = '<?php echo $this->translate->_('Merkliste');?>';
+  	gridToolbar.item_watchListFilterBtn = '<?php echo $this->translate->_('Lesezeichen');?>';
   	
   	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>';
 
@@ -246,8 +248,8 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.segments.MetaPanelNavi.prototype.item_save = '<?php echo $this->translate->_('Speichern (STRG + S)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_reset = '<?php echo $this->translate->_('Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)');?>';
 
-    Editor.view.segments.MetaPanelNavi.prototype.item_startWatchingSegment = '<?php echo $this->translate->_('Segment auf die Merkliste setzen (STRG + D)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_stopWatchingSegment = '<?php echo $this->translate->_('Segment von der Merkliste entfernen (STRG + D)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_startWatchingSegment = '<?php echo $this->translate->_('Segment auf Lesezeichenliste (STRG + D)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_stopWatchingSegment = '<?php echo $this->translate->_('Segment von Lesezeichenliste entfernen (STRG + D)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_scrollToSegment = '<?php echo $this->translate->_('Zur Bearbeitung geöffnetes Segment wieder in den Sichtbereich bewegen (STRG + G)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNext = '<?php echo $this->translate->_('Speichern und nächstes Segment öffnen (STRG + ALT + ENTER)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNextFiltered = '<?php echo $this->translate->_('Speichern und nächstes Segment im Workflow öffnen (STRG + ENTER)');?>';
