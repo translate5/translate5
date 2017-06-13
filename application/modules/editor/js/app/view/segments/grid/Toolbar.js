@@ -199,6 +199,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     xtype: 'tbfill'
                 },{
                     xtype: 'button',
+                    //FIXME let me come from a config:
                     href: 'http://confluence.translate5.net/display/BUS/Editor+keyboard+shortcuts',
                     hrefTarget: '_blank',
                     icon: Editor.data.moduleFolder+'images/help.png',
