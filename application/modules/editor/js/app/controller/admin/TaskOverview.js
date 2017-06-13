@@ -60,6 +60,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       ref: 'taskAddWindow',
       selector: '#adminTaskAddWindow'
   }],
+  alias: 'controller.taskOverviewController',
+  
+  isCardFinished:false,
   /**
    * Container for translated task handler confirmation strings
    * Deletion of an entry means to disable confirmation.
@@ -135,6 +138,10 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           },
           '#segmentgrid': {
               afterrender: me.initTaskReadMode
+          },
+          'adminTaskAddWindow panel:not([hidden])': {
+              wizardCardFinished:me.onWizardCardFinished,
+              wizardCardSkiped:me.onWizardCardSkiped
           }
       });
   },
@@ -380,7 +387,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   
   
   /**
-   * is called after clicking save task, starts the upload / form submit
+   * is called after clicking continue, if there are wizard panels, 
+   * then the next available wizard panel is set as active 
    */
   handleContinueWizardClick:function(){
       var me = this,
@@ -435,6 +443,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   onWizardCardSkiped:function(){
       this.saveTask();
   },
+  
   handleTaskAddShow: function() {
       if(!this.isAllowed('editorAddTask')){
           return;
