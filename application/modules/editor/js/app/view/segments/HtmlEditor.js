@@ -207,7 +207,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   insertMarkup: function(value) {
       var html = this.markup(value).join(''),
           doc = this.getDoc(),
-          sel, range, frag, node, el;
+          sel, range, frag, node, el, lastNode;
       if (!window.getSelection) {
           //Not supported by your browser message!
           return;
@@ -219,9 +219,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         frag = doc.createDocumentFragment();
         el.innerHTML = html;
         while ((node = el.firstChild)) {
-            frag.appendChild(node);
+            lastNode = frag.appendChild(node);
         }
         range.insertNode(frag);
+        range.setStartAfter(lastNode);
+        range.setEndAfter(lastNode); 
       }
   },
   /**

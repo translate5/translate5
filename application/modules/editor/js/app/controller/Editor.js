@@ -71,6 +71,7 @@ Ext.define('Editor.controller.Editor', {
   editorKeyMap: null,
   generalKeyMap: null,
   prevNextSegment: null,
+  sourceTags: null,
   listen: {
       controller: {
           '#Editor.$application': {
@@ -121,6 +122,7 @@ Ext.define('Editor.controller.Editor', {
           'ctrl-alt-down':  [Ext.EventObjectImpl.DOWN,{ctrl: true, alt: true}, me.goToLowerNoSave, true],
           'alt-c':          ["C",{ctrl: false, alt: true}, me.handleOpenComments, true],
           'alt-s':          ["S",{ctrl: false, alt: true}, me.handleDigitPreparation(me.handleChangeState), true],
+          'ctrl-comma':     [188,{ctrl: true, alt: false}, me.handleDigitPreparation(me.handleInsertTag), true],
           'alt-DIGIT':      [me.DEC_DIGITS,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
           'DIGIT':          [me.DEC_DIGITS,{ctrl: false, alt: false}, me.handleDigit],
           'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
@@ -224,7 +226,49 @@ Ext.define('Editor.controller.Editor', {
     var me = this;
     me.isEditing = true;
     me.prevNextSegment.calculateRows(context);//context.record, context.rowIdx
+    me.getSourceTags(context);
   },
+    getSourceTags: function(context) {
+        var me = this,
+            plug = me.getEditPlugin(),
+            source = context.record.get('source'),
+            tempNode, parse, walkNodes;
+
+        me.sourceTags = [];
+        //do nothing when editing the source field
+        if(/^source/.test(context.column.dataIndex)){
+            return;
+        }
+
+        tempNode = document.createElement('DIV');
+        Ext.fly(tempNode).update(source);
+
+        walkNodes = function(rootNode) {
+            Ext.each(rootNode.childNodes, function(item){
+                if(Ext.isTextNode(item) || item.tagName != 'DIV'){
+                    return;
+                }
+                if(item.tagName == 'DIV' && /(^|[\s])term([\s]|$)/.test(item.className)){
+                    walkNodes(item);
+                    return;
+                }
+                var divItem = Ext.fly(item),
+                    tagNr = divItem.down('span.short').dom.innerHTML.replace(/[^0-9]/g, ''),
+                    tagType = item.className.match(/^(open|single|close)\s/),
+                    //we use a real array starting at 0 for tag 1
+                    idx = tagNr-1;
+                if(!tagType) {
+                    return;
+                }
+                tagType = tagType[1];
+                if(!me.sourceTags[idx]) {
+                    me.sourceTags[idx] = {};
+                }
+                me.sourceTags[idx][plug.editor.mainEditor.idPrefix+tagType+tagNr] = '<div class="'+item.className+'">'+item.innerHTML+'</div>';
+          });
+      };
+      walkNodes(tempNode);
+    },
   /**
    * Gibt die RowEditing Instanz des Grids zurück
    * @returns Editor.view.segments.RowEditing
@@ -793,12 +837,47 @@ Ext.define('Editor.controller.Editor', {
     }
   },
   copySourceToTarget: function() {
-      if(!this.isEditing){
+      var plug = this.getEditPlugin();
+      //do only something when editing targets:
+      if(!this.isEditing || !/^target/.test(plug.editor.columnToEdit)){
           return;
       }
-      var plug = this.getEditPlugin();
       plug.editor.mainEditor.insertMarkup(plug.context.record.get('source'));
   },
+
+    handleInsertTag: function(key, e) {
+        var me = this,
+            plug = this.getEditPlugin(),
+            editor = plug.editor.mainEditor,
+            source = plug.context.record.get('source'),
+            tagIdx = Number(key) - 49, //49 shits tag nr down to 0 for tag 1
+            tempNode, parse;
+
+        //key 0 equals to tadIdx -1 and equals to tag nr 10 (which equals to tagIdx 9)
+        if(tagIdx < 0) {
+            tagIdx = 9;
+        }
+
+        if(e.shiftKey) {
+            tagIdx = tagIdx + 10;
+        }
+            
+        //do only something when editing targets with tags and tag nrs > 1:
+        if(!me.sourceTags || !me.sourceTags[tagIdx]){
+            return;
+        }
+
+        Ext.Object.each(me.sourceTags[tagIdx], function(id, tag){
+            if(editor.getDoc().getElementById(id)){
+                return;
+            }
+            editor.insertMarkup(tag);
+            return false;
+        });
+
+        e.stopEvent();
+        return false;
+    },
   /**
    * scrolls to the first segment.
    */
