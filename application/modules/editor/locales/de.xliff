@@ -922,6 +922,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <b
 <trans-unit id='IFRlc3Q='><source> Test</source><target> Test</target></trans-unit>
 <trans-unit id='TVFN'><source>MQM</source><target>MQM</target></trans-unit>
 <trans-unit id='TVFNIFN0YXRpc3Rpaw=='><source>MQM Statistik</source><target>MQM Statistik</target></trans-unit>
+<trans-unit id='VGFzdGF0dXJrw7xyemVsIG5hY2hzY2hsYWdlbg=='><source>Tastaturkürzel nachschlagen</source><target>Tastaturkürzel nachschlagen</target></trans-unit>
   </body>
  </file>
 </xliff>

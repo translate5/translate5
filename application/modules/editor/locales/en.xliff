@@ -1543,6 +1543,10 @@
     <source>Sortierung / Filterung zurücksetzen</source>
     <target state="needs-review-adaptation">Reset sorting / filtering</target>
 </trans-unit>
+<trans-unit id='VGFzdGF0dXJrw7xyemVsIG5hY2hzY2hsYWdlbg=='>
+    <source>Tastaturkürzel nachschlagen</source>
+    <target>Look up keyboard short-cuts</target>
+</trans-unit>
 
     </body>
   </file>
