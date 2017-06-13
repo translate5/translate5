@@ -51,10 +51,11 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_hideTagBtn: '#UT#Tags verbergen',
     item_shortTagBtn: '#UT#Tag-Kurzansicht',
     item_fullTagBtn: '#UT#Tag-Vollansicht',
-    item_qmsummaryBtn: '#UT#QM-Subsegment-Statistik',
+    item_qmsummaryBtn: '#UT#MQM',
+    item_qmsummaryTooltip: '#UT#MQM Statistik',
     item_optionsTagBtn: '#UT#Einstellungen',
     item_clearSortAndFilterBtn: '#UT#Sortierung und Filter zurücksetzen',
-    item_watchListFilterBtn: '#UT#Merkliste',
+    item_watchListFilterBtn: '#UT#Lesezeichen',
     viewModel: {
         formulas: {
             isNormalEdit: function(get) {
@@ -183,6 +184,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     xtype: 'button',
                     itemId: 'qmsummaryBtn',
                     text: me.item_qmsummaryBtn,
+                    tooltip: me.item_qmsummaryTooltip,
                     hidden: !Editor.data.task.hasQmSub()
                 },{
                     xtype: 'tbfill'

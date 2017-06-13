@@ -75,7 +75,7 @@ Ext.define('Editor.controller.Segments', {
     sortCleared: 'Die gewählte Sortierung der Segmente wurde zurückgesetzt!',
     segmentNotSaved: '#UT# Das zuletzt geöffnete Segment (Nr. {0}) konnte nicht gespeichert werden!',
     noSegmentToFilter: 'Kein Segment dieser Datei entspricht den Filterkriterien',
-    otherFiltersActive: '#UT#ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Merkliste sichtbar sind'
+    otherFiltersActive: '#UT#ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Lesezeichenliste sichtbar sind'
   },
   /**
    * Cache der Zuordnung fileId => Grid Index des ersten Segments der Datei.
