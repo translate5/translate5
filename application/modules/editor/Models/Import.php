@@ -107,6 +107,14 @@ class editor_Models_Import {
         }
         $this->task->lock(NOW_ISO, true); //locks the task
 
+        
+        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
+        /* @var $eventManager ZfExtended_EventManager */
+        $eventManager->trigger('beforeImport', $this, array(
+                'task' => $this->task,
+                'importFolder'=>$this->importConfig->importFolder
+        ));
+        
         /*
          * Queue Import Worker
          */
