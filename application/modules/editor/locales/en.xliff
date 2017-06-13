@@ -1162,7 +1162,7 @@
   </trans-unit>
   <trans-unit id='TGVzZXplaWNoZW4'>
     <source>Lesezeichen</source>
-    <target>bookmarks</target>
+    <target>Bookmarks</target>
   </trans-unit>
   <trans-unit id='U2VnbWVudCBhdWYgTGVzZXplaWNoZW5saXN0ZSAoU1RSRyArIEQp'>
     <source>Segment auf Lesezeichenliste (STRG + D)</source>
@@ -1537,7 +1537,7 @@
 </trans-unit>
 <trans-unit id='VGFiZWxsZSB6dXLDvGNrc2V0emVu'>
     <source>Tabelle zurücksetzen</source>
-    <target>reset grid</target>
+    <target>Reset grid</target>
 </trans-unit>
 <trans-unit id="U29ydGllcnVuZyAvIEZpbHRlcnVuZyB6dXLDvGNrc2V0emVu">
     <source>Sortierung / Filterung zurücksetzen</source>
