@@ -195,7 +195,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                         xtype: 'filefield',
                         name: 'visualReview',
                         allowBlank: true,
-                        regex: /\.pdf$/i,
+                        regex: /\.(htm|html)$/i,
                         toolTip: me.strings.importVisualReviewTip,
                         regexText: me.strings.importVisualReviewType,
                         fieldLabel: me.strings.importVisualReviewLabel

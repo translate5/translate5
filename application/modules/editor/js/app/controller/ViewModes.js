@@ -272,6 +272,7 @@ Ext.define('Editor.controller.ViewModes', {
     me.setVisibleElements();
 
     //ergo only
+    //collapse only if the panel is visible
     if(me.getFilePanel().isVisible()){
         me.getFilePanel().collapse();
     }
