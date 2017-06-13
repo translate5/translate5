@@ -54,7 +54,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_qmsummaryBtn: '#UT#MQM',
     item_qmsummaryTooltip: '#UT#MQM Statistik',
     item_optionsTagBtn: '#UT#Einstellungen',
-    item_clearSortAndFilterBtn: '#UT#Sortierung und Filter zurücksetzen',
+    item_clearSortAndFilterBtn: '#UT#Tabelle zurücksetzen',
+    item_clearSortAndFilterTooltip: '#UT#Sortierung und Filter zurücksetzen',
     item_watchListFilterBtn: '#UT#Lesezeichen',
     viewModel: {
         formulas: {
@@ -167,6 +168,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     xtype: 'button',
                     itemId: 'clearSortAndFilterBtn',
                     cls: 'clearSortAndFilterBtn',
+                    tooltip: me.item_clearSortAndFilterTooltip,
                     text: me.item_clearSortAndFilterBtn
                 },{
                     xtype: 'tbseparator'
