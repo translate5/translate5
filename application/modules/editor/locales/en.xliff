@@ -1531,6 +1531,15 @@
     <source>MQM Statistik</source>
     <target>MQM statistics</target>
 </trans-unit>
+<trans-unit id='VGFiZWxsZSB6dXLDvGNrc2V0emVu'>
+    <source>Tabelle zurücksetzen</source>
+    <target>reset grid</target>
+</trans-unit>
+<trans-unit id="U29ydGllcnVuZyAvIEZpbHRlcnVuZyB6dXLDvGNrc2V0emVu">
+    <source>Sortierung / Filterung zurücksetzen</source>
+    <target state="needs-review-adaptation">Reset sorting / filtering</target>
+</trans-unit>
+
     </body>
   </file>
 </xliff>
