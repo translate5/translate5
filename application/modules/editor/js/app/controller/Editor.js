@@ -53,8 +53,9 @@ Ext.define('Editor.controller.Editor', {
       f2Readonly: '#UT#Das ausgewählte Segment ist nicht bearbeitbar!',
       errorTitle: '#UT# Fehler bei der Segment Validierung!',
       correctErrorsText: '#UT# Fehler beheben',
-      editorMoveTitle: '#UT#Verschiebbarer Editor',
+      editorMoveTitle: '#UT#Verschiebbarer Editor und hilfreiche Tastaturkürzel',
       editorMove: '#UT#Der Segmenteditor kann mit der Maus beliebig positioniert werden. <br />Dazu lediglich den Segmenteditor anklicken und dann verschieben.',
+      takeTagTooltip: '#UT#STRG + EINFG kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.',
       saveAnyway: '#UT# Trotzdem speichern'
   },
   id: 'editorcontroller',
@@ -200,7 +201,7 @@ Ext.define('Editor.controller.Editor', {
       Ext.tip.QuickTipManager.register({
           target: displayfield.getId()+'-bodyEl', 
           title: me.messages.editorMoveTitle,
-          text: me.messages.editorMove
+          text: me.messages.editorMove + '<br /><br />' + me.messages.takeTagTooltip
       });
   },
   /**
@@ -850,7 +851,7 @@ Ext.define('Editor.controller.Editor', {
             plug = this.getEditPlugin(),
             editor = plug.editor.mainEditor,
             source = plug.context.record.get('source'),
-            tagIdx = Number(key) - 49, //49 shits tag nr down to 0 for tag 1
+            tagIdx = Number(key) - 49, //49 shifts tag nr down to 0 for tag 1
             tempNode, parse;
 
         //key 0 equals to tadIdx -1 and equals to tag nr 10 (which equals to tagIdx 9)
