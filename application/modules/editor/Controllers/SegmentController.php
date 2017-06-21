@@ -28,6 +28,9 @@ END LICENSE AND COPYRIGHT
 */
 
 class Editor_SegmentController extends editor_Controllers_EditorrestController {
+    use editor_Models_Import_FileParser_TagTrait {
+        protectWhitespace as protected traitProtectWhitespace;
+    }
 
     protected $entityClass = 'editor_Models_Segment';
 
@@ -249,6 +252,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $allowedAlternatesToChange = $this->entity->getEditableDataIndexList();
         $updateToSort = array_intersect(array_keys((array)$this->data), $allowedAlternatesToChange);
         $this->checkPlausibilityOfPut($allowedAlternatesToChange);
+        $this->sanitizeEditedContent($allowedAlternatesToChange);
         $this->setDataInEntity(array_merge($allowedToChange, $allowedAlternatesToChange), self::SET_DATA_WHITELIST);
         foreach($updateToSort as $toSort) {
             $this->entity->updateToSort($toSort);
@@ -358,6 +362,54 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         throw $e;
     }
    
+    /**
+     * Applies the import whitespace replacing to the edited user by the content
+     * @param array $fieldnames
+     */
+    protected function sanitizeEditedContent(array $fieldnames) {
+        $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        /* @var $internalTag editor_Models_Segment_InternalTag */
+        foreach($this->data as $key => $data) {
+            //consider only changeable datafields:
+            if(! in_array($key, $fieldnames)) {
+                continue;
+            }
+            
+            //since our internal tags are a div span construct with plain content in between, we have to replace them first
+            $i = 0;
+            $map = [];
+            $data = $internalTag->replace($data, function($matches) use ($i, &$map){
+                $replacement = '<internalTag-'.$i++.'/>';
+                $map[$replacement] = $matches[0];
+                return $replacement;
+            });
+            
+            //this method splits the content at tag boundaries, and sanitizes the textNodes only
+            $data = $this->parseSegmentProtectWhitespace($data);
+            //revoke the internaltag replacement
+            $data = str_replace(array_keys($map), array_values($map), $data);
+            
+            //if nothing was changed, everything was OK already
+            if($data === $this->data->{$key}) {
+                return;
+            }
+            $this->restMessages->addWarning('Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!');
+            $this->data->{$key} = $data;
+        }
+    }
+    
+    /**
+     * This method removes the protected characters instead creating internal tags
+     * The user is not allowed to add new internal tags by adding special characters
+     * @param string $textNode
+     * @param string $xmlBased
+     * @return string
+     */
+    protected function protectWhitespace($textNode, $xmlBased = true) {
+        $protected = $this->traitProtectWhitespace($textNode, $xmlBased);
+        return strip_tags($protected);
+    }
+    
     /**
      * checks if current session taskguid matches to loaded segment taskguid
      * @throws ZfExtended_Models_Entity_NoAccessException
