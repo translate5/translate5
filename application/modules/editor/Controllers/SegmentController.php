@@ -295,6 +295,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      * Updates the target original and targetMd5 hash for repetition calculation
      * Can be done only in Workflow Step 1 and if all targets were empty on import
      * This is more a hack as a right solution. See TRANSLATE-885 comments for more information!
+     * See also in AlikesegmenController!
      */
     protected function updateTargetHashAndOriginal() {
         //TODO: also a check is missing, if task has alternate targets or not.
@@ -308,7 +309,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $this->entity->setTargetMd5($hasher->hashTarget($this->entity->getTargetEdit(), $this->entity->getSource()));
             $this->entity->setTarget($this->entity->getTargetEdit());
         }
-        
     }
     
     /**

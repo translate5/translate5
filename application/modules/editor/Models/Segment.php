@@ -418,6 +418,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $history->setSegmentId($this->getId());
 
         $fields = array('taskGuid', 'userGuid', 'userName', 'timestamp', 'editable', 'pretrans', 'qmId', 'stateId', 'autoStateId', 'workflowStep', 'workflowStepNr', 'matchRate', 'matchRateType');
+        //TRANSLATE-885 
+        $fields[] = 'targetMd5';
+        $fields[] = 'target';
         $fields = array_merge($fields, $this->segmentFieldManager->getEditableDataIndexList());
 
         foreach ($fields as $field) {

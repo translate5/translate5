@@ -45,6 +45,22 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
     protected $historydata     = array();
     
     /**
+     * loads the history entries to one segment, DESC sorted by id (creation), can be limited with $limit parameter 
+     * @param integer $id
+     * @param number $limit
+     * @return array
+     */
+    public function loadBySegmentId($id, $limit = 0) {
+        $s = $this->db->select();
+        $s->where('segmentId = ?', $id)
+            ->order('id DESC');
+        if($limit > 0) {
+            $s->limit($limit);
+        }
+        return $this->db->fetchAll($s)->toArray();
+    }
+    
+    /**
      * sets the field manager
      * @param editor_Models_SegmentFieldManager $sfm
      */
@@ -79,6 +95,7 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
         if($loc === false) {
             return parent::set($name, $value);
         }
+        $name = $loc['column'];
         if(empty($this->historydata[$loc['field']])) {
             $db = ZfExtended_Factory::get('editor_Models_Db_SegmentsHistoryData');
             /* @var $db editor_Models_Db_SegmentsHistoryData */
@@ -86,13 +103,10 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
                             'name' => $loc['field'],
                             'segmentHistoryId' => $this->getId(),
                             'segmentId' => $this->getSegmentId(),
-                            'taskGuid' => $this->getTaskGuid(),
-                            'edited' => $value,
+                            'taskGuid' => $this->getTaskGuid()
                             ));
         }
-        else {
-            return $this->historydata[$loc['field']]->__set('edited', $value);
-        }
+        return $this->historydata[$loc['field']]->__set($name, $value);
     }
 
     /**
