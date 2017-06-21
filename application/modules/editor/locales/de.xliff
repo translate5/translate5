@@ -924,6 +924,18 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <b
 <trans-unit id='TVFNIFN0YXRpc3Rpaw=='><source>MQM Statistik</source><target>MQM Statistik</target></trans-unit>
 <trans-unit id='VGFzdGF0dXJrw7xyemVsIG5hY2hzY2hsYWdlbg=='><source>Tastaturkürzel nachschlagen</source><target>Tastaturkürzel nachschlagen</target></trans-unit>
 <trans-unit id='WmllbHRleHQgKHp1ciBJbXBvcnR6ZWl0KQ=='><source>Zieltext (zur Importzeit)</source><target>Zieltext (zur Importzeit)</target></trans-unit>
+<trans-unit id='U1RSRyArIEVJTkZHIGtvcGllcnQgZGVuIGtvbXBsZXR0ZW4gUXVlbGx0ZXh0IGluIGRlbiBaaWVsdGV4dDxiciAvPlNUUkcgKyAsIChLb21tYSkgKyAmZ3Q7TnVtbWVyJmx0OyBrb3BpZXJ0IGRlbiBlbnRzcHJlY2hlbmRlbiBUYWcgaW4gZGVuIFppZWx0ZXh0IChOdWxsIGVudHNwcmljaHQgVGFnIE5yLiAxMCk8YnIgLz5TVFJHICsgU0hJRlQgKyAsIChLb21tYSkgKyAmZ3Q7TnVtbWVyJmx0OyBrb3BpZXJ0IGRpZSBUYWdzIG1pdCBkZW4gTnVtbWVybiAxMSBiaXMgMjAgaW4gZGVuIFppZWx0ZXh0Lg=='>
+    <source>STRG + EINFG kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</source>
+    <target>STRG + EINFG kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</target>
+</trans-unit>
+<trans-unit id='TGVlcmUgWmllbHNwcmFjaGVuLiBXYWhyIHdlbm4gYmVpbSBJbXBvcnQgYWxsZSB6aWVsc3ByYWNobGljaGVuIEZlbGRlciBsZWVyIHNpbmQu'>
+    <source>Leere Zielsprachen. Wahr wenn beim Import alle zielsprachlichen Felder leer sind.</source>
+    <target>Leere Zielsprachen. Wahr wenn beim Import alle zielsprachlichen Felder leer sind.</target>
+</trans-unit>
+<trans-unit id='TGVlcmUgWmllbHNwcmFjaGVu'>
+    <source>Leere Zielsprachen</source>
+    <target>Leere Zielsprachen</target>
+</trans-unit>
   </body>
  </file>
 </xliff>
