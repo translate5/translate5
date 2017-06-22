@@ -936,6 +936,10 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <b
     <source>Leere Zielsprachen</source>
     <target>Leere Zielsprachen</target>
 </trans-unit>
+<trans-unit id='QXVzIGRlbSBTZWdtZW50IHd1cmRlbiBuaWNodCBkYXJzdGVsbGJhcmUgWmVpY2hlbiBlbnRmZXJudCAobWVocmVyZSBMZWVyemVpY2hlbiwgVGFidWxhdG9yZW4sIFplaWxlbnVtYnLDvGNoZSBldGMuKSE='>
+    <source>Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!</source>
+    <target>Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!</target>
+</trans-unit>
   </body>
  </file>
 </xliff>

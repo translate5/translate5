@@ -1571,6 +1571,10 @@
     <source><p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Translate5 wird ab diesem Zeitpunkt für kurze Zeit nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p></source>
     <target><p>Warning! Maintenance will start shortly.</p><p>The application will then be locked for some time.</p><p>Date and time of the maintenance start: {0}</p></target>
 </trans-unit>
+<trans-unit id='QXVzIGRlbSBTZWdtZW50IHd1cmRlbiBuaWNodCBkYXJzdGVsbGJhcmUgWmVpY2hlbiBlbnRmZXJudCAobWVocmVyZSBMZWVyemVpY2hlbiwgVGFidWxhdG9yZW4sIFplaWxlbnVtYnLDvGNoZSBldGMuKSE='>
+    <source>Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!</source>
+    <target>Some non representable characters were removed from the segment (multiple white-spaces, tabs, line-breaks etc.)!</target>
+</trans-unit>
     </body>
   </file>
 </xliff>
