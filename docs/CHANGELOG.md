@@ -10,6 +10,7 @@ TRANSLATE-882: Switch default match resource color from red to a nice green
 ###Bugfixes
 TRANSLATE-845: Calling task export on task without segment view produces an error (with enabled SegmentStatistics Plugin)
 TRANSLATE-904: json syntax error in match resource plugin
+Multiple minor changes/fixes (code comment changes, missing tooltip) 
 
 ## [2.5.30] - 2017-06-13
 ###Added
