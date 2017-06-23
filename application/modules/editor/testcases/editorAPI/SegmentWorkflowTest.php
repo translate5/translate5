@@ -99,12 +99,15 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         
         $segToTest = $segments[6];
         $nbsp = json_decode('"\u00a0"');
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'Apache 2.x'.$nbsp.' auf Unix-Systemen', $segToTest->id);
+        //the first "\u00a0 " (incl. the trailing whitespace) will be replaced by the content sanitizer to a single whitespace
+        //the second single "\u00a0" must result in a single whitespace
+        $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'Apache'.$nbsp.' 2.x'.$nbsp.'auf'.$nbsp.$nbsp.'Unix-Systemen', $segToTest->id);
         $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
         
         //edit a segment with special characters
         $segToTest = $segments[4];
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', "Installation auf Unix-Systemen &amp; Umlaut Test äöü &lt; &lt;ichbinkeintag&gt; - bearbeitet durch den Testcode", $segToTest->id);
+        //multiple normal spaces should also be converted to single spaces
+        $segmentData = $this->api()->prepareSegmentPut('targetEdit', "Installation auf   Unix-Systemen &amp; Umlaut Test äöü &lt; &lt;ichbinkeintag&gt; - bearbeitet durch den Testcode", $segToTest->id);
         $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
         
         
