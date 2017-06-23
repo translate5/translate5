@@ -3,6 +3,14 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.5.31] - 2017-06-23
+###Changed
+TRANSLATE-882: Switch default match resource color from red to a nice green
+
+###Bugfixes
+TRANSLATE-845: Calling task export on task without segment view produces an error (with enabled SegmentStatistics Plugin)
+TRANSLATE-904: json syntax error in match resource plugin
+
 ## [2.5.30] - 2017-06-13
 ###Added
 TRANSLATE-885: fill non-editable target for translation tasks
