@@ -405,7 +405,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->initData($id);
         return $row;
     }
-
+    
+    public function loadByIds(array $ids){
+        $s=$this->db->select()
+        ->where('id IN (?)',$ids);
+        return $this->loadFilterdCustom($s);
+    }
     /**
      * erzeugt ein neues, ungespeichertes SegmentHistory Entity
      * @return editor_Models_SegmentHistory
