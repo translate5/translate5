@@ -1501,11 +1501,11 @@
 </trans-unit>
 <trans-unit id='KHp1ciBJbXBvcnR6ZWl0KQ=='>
     <source>(zur Importzeit)</source>
-    <target>(zur Importzeit)</target>
+    <target>(at time of import)</target>
 </trans-unit>
 <trans-unit id='WmllbHRleHQ='>
     <source>Zieltext</source>
-    <target>Zieltext</target>
+    <target>Target text</target>
 </trans-unit>
 <trans-unit id='QXVmZ2FiZSBJbXBvcnRpZXJlbg=='>
     <source>Aufgabe Importieren</source>
