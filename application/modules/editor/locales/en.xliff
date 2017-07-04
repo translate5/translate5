@@ -1082,10 +1082,6 @@
 	  <source>Trotzdem speichern</source>
 	  <target>Save anyway</target>
 	</trans-unit>
-	<trans-unit id="UU0gU3Vic2VnbWVudGU=">
-	  <source>QM Subsegmente</source>
-	  <target state="needs-review-adaptation">QM Subsegments</target>
-	</trans-unit>
         <trans-unit id='TWl0IHRyYW5zbGF0ZTUga8O2bm5lbiBTaWUgU0RMWExJRkYtIHVuZCBDU1YtRGF0ZWllbiBpbSBCcm93c2VyIGxla3RvcmllcmVuIGxhc3NlbiAtIG9obmUgTGl6ZW56a29zdGVuIC0gYXVmIE9wZW4gU291cmNlLUJhc2lzLg=='><source>Mit translate5 können Sie SDLXLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</source><target>With translate5 you can proofread SDLXLIFF, openTM2-XLIFF and CSV files in the browser - without licensing costs and on open-source basis</target></trans-unit>
 
 <trans-unit id='VW50ZXJzdMO8dHp1bmcgZGVyIEVudHdpY2tsdW5nIHZvbiB0cmFuc2xhdGU1'><source>Unterstützung der Entwicklung von translate5</source><target>Support of translate5 development</target></trans-unit>
@@ -1574,6 +1570,10 @@
 <trans-unit id='QXVzIGRlbSBTZWdtZW50IHd1cmRlbiBuaWNodCBkYXJzdGVsbGJhcmUgWmVpY2hlbiBlbnRmZXJudCAobWVocmVyZSBMZWVyemVpY2hlbiwgVGFidWxhdG9yZW4sIFplaWxlbnVtYnLDvGNoZSBldGMuKSE='>
     <source>Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!</source>
     <target>Some non representable characters were removed from the segment (multiple white-spaces, tabs, line-breaks etc.)!</target>
+</trans-unit>
+<trans-unit id='TVFNIGhpbnp1ZsO8Z2Vu'>
+    <source>MQM hinzufügen</source>
+    <target>add MQM</target>
 </trans-unit>
     </body>
   </file>
