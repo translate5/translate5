@@ -123,7 +123,8 @@ Ext.define('Editor.controller.Editor', {
           'ctrl-alt-down':  [Ext.EventObjectImpl.DOWN,{ctrl: true, alt: true}, me.goToLowerNoSave, true],
           'alt-c':          ["C",{ctrl: false, alt: true}, me.handleOpenComments, true],
           'alt-s':          ["S",{ctrl: false, alt: true}, me.handleDigitPreparation(me.handleChangeState), true],
-          'ctrl-comma':     [188,{ctrl: true, alt: false}, me.handleDigitPreparation(me.handleInsertTag), true],
+          'ctrl-comma':     [188,{ctrl: true, alt: false, shift: false}, me.handleDigitPreparation(me.handleInsertTag), true],
+          'ctrl-shift-comma': [188,{ctrl: true, alt: false, shift: true}, me.handleDigitPreparation(me.handleInsertTagShift), true],
           'alt-DIGIT':      [me.DEC_DIGITS,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
           'DIGIT':          [me.DEC_DIGITS,{ctrl: false, alt: false}, me.handleDigit],
           'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
@@ -386,8 +387,9 @@ Ext.define('Editor.controller.Editor', {
    * @param {Function} must be function in the controller scope, since scope parameter is not supported
    */
   handleDigitPreparation: function(digithandler) {
-      this.digitHandler = digithandler;
+      var me = this;
       return function(key, event) {
+          me.digitHandler = digithandler;
           event.isDigitPreparation = true;
           event.stopEvent();
           return false;
@@ -847,6 +849,10 @@ Ext.define('Editor.controller.Editor', {
       plug.editor.mainEditor.insertMarkup(plug.context.record.get('source'));
   },
 
+    handleInsertTagShift: function(key, e) {
+        e.shiftKey = true; //somehow a hack, but is doing what it should do
+        this.handleInsertTag(key, e);
+    },
     handleInsertTag: function(key, e) {
         var me = this,
             plug = this.getEditPlugin(),
