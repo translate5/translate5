@@ -76,7 +76,7 @@
             </trans-unit>
             <trans-unit id="SW4gZGVyIERlbW92ZXJzaW9uIHNpbmQgYWt0dWVsbCBkaWUgZm9sZ2VuZGVuIFByb2pla3RlIHZvcmhhbmRlbi4=">
                 <source>In der Demoversion sind aktuell die folgenden Projekte vorhanden.</source>
-                <target state="needs-review-adaptation">The following projects are included in the demo version.</target>
+                <target state="needs-review-adaptation">The following tasks are included in the demo version.</target>
             </trans-unit>
             <trans-unit id="V8OkaGxlbiBTaWUgZGFzIFByb2pla3Qgd2VsY2hlcyBTaWUgbGVrdG9yaWVyZW4gb2RlciBleHBvcnRpZXJlbiB3b2xsZW4u">
                 <source>W&#xE4;hlen Sie das Projekt welches Sie lektorieren oder exportieren wollen.</source>
@@ -598,7 +598,7 @@
             </trans-unit>
             <trans-unit id="V8OkaGxlbiBTaWUgei5CLiBiZWltIFByb2pla3RpbXBvcnQgZGllIFNwcmFjaGUgIkVuZ2xpc2NoIChlbikiLCBkYW5uIHdpcmQgYXVzIGRlciBUQlggRGF0ZWkgbGVkaWdsaWNoIGRpZSBUZXJtaW5vbG9naWUgaW4gZGVyIFNwcmFjaGUgImVuIiBpbXBvcnRpZXJ0Lg==">
                 <source>W&#xE4;hlen Sie z.B. beim Projektimport die Sprache "Englisch (en)", dann wird aus der TBX Datei lediglich die Terminologie in der Sprache "en" importiert.</source>
-                <target state="needs-review-adaptation">When importing a project for example, please select the language "English (en)", only the terminology in the language "en" is imported from the TBX file.</target>
+                <target state="needs-review-adaptation">When importing a task for example, please select the language "English (en)", only the terminology in the language "en" is imported from the TBX file.</target>
             </trans-unit>
             <trans-unit id="TmljaHQgYWJlciBkaWUgU3ByYWNoZW4gImVuLVVTIiBvZGVyICJlbi1HQiIu">
                 <source>Nicht aber die Sprachen "en-US" oder "en-GB".</source>
