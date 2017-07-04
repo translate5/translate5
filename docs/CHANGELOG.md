@@ -3,6 +3,18 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.5.32] - 2017-07-04
+###Changed
+TRANSLATE-911: Workflow Notification mails could be too large for underlying mail system
+TRANSLATE-906: translation bug: "Mehr Info" in EN
+TRANSLATE-909: Editor window - change column title "Target text(zur Importzeit)"
+TRANSLATE-894: Copy source to target – FIX
+TRANSLATE-907: Rename QM-Subsegments to MQM in the GUI
+TRANSLATE-818: internal tag replace id usage with data-origid and data-filename - additional migration script
+TRANSLATE-895: Copy individual tags from source to target - ToolTip
+TRANSLATE-885: fill non-editable target for translation tasks - compare targetHash to history
+small fix for empty match rate tooltips showing "null"
+
 ## [2.5.31] - 2017-06-23
 ###Changed
 TRANSLATE-882: Switch default match resource color from red to a nice green
