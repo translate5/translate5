@@ -127,7 +127,8 @@ Ext.define('Editor.controller.Editor', {
           'alt-DIGIT':      [me.DEC_DIGITS,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
           'DIGIT':          [me.DEC_DIGITS,{ctrl: false, alt: false}, me.handleDigit],
           'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
-          'ctrl-insert': [Ext.EventObjectImpl.INSERT,{ctrl: true, alt: false}, me.copySourceToTarget],
+          'ctrl-insert':    [Ext.EventObjectImpl.INSERT,{ctrl: true, alt: false}, me.copySourceToTarget],
+          'ctrl-dot':       [190,{ctrl: true, alt: false}, me.copySourceToTarget] //Mac Alternative key code
       };
   },
   /**
