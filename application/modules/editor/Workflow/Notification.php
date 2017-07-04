@@ -173,11 +173,14 @@ class editor_Workflow_Notification {
      * @param array $segments
      */
     protected function attachXliffSegmentList($segmentHash, array $segments) {
-        if(empty($segments)) {
+        $config = Zend_Registry::get('config');
+        $xlfAttachment = (boolean) $config->runtimeOptions->notification->enableSegmentXlfAttachment;
+        $xlfFile =       (boolean) $config->runtimeOptions->editor->notification->saveXmlToFile;
+        
+        if(empty($segments) || (!$xlfAttachment && !$xlfFile)) {
             return;
         }
         if(empty($this->xmlCache[$segmentHash])) {
-            $config = Zend_Registry::get('config');
             $xliffConf = [
                 editor_Models_Converter_SegmentsToXliff::CONFIG_INCLUDE_DIFF => (boolean) $config->runtimeOptions->editor->notification->includeDiff,
                 editor_Models_Converter_SegmentsToXliff::CONFIG_PLAIN_INTERNAL_TAGS => true,
@@ -187,11 +190,14 @@ class editor_Workflow_Notification {
             /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff */
             $this->xmlCache[$segmentHash] = $xliff = $xliffConverter->convert($this->task, $segments);
             
-            if((boolean) $config->runtimeOptions->editor->notification->saveXmlToFile) {
+            if($xlfFile) {
                 $this->saveXmlToFile($xliff);
             }
         }
         
+        if(!$xlfAttachment) {
+            return;
+        }
         $attachment = array(
             'body' => $this->xmlCache[$segmentHash],
             'mimeType' => Zend_Mime::TYPE_OCTETSTREAM,
