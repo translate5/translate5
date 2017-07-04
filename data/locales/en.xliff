@@ -16,7 +16,7 @@
             </trans-unit>
             <trans-unit id="Qml0dGUgYmVhY2h0ZW4gU2llOiBEaWVzZSB0cmFuc2xhdGU1IERlbW92ZXJzaW9uIGlzdCDDtmZmZW50bGljaCwgYWxsZSBob2NoZ2VsYWRlbmVuIFByb2pla3RlIGvDtm5uZW4gdm9uIGplZGVtIGVpbmdlc2VoZW4gd2VyZGVuLiBFaW4gRXhwb3J0IHNwaWVsdCBhbGxlIGFrdHVlbGwgZWluZ2VjaGVja3RlbiBEYXRlaWVuIGVpbmVzIFByb2pla3RlcyBhdXMu">
                 <source>Bitte beachten Sie: Diese translate5 Demoversion ist &#xF6;ffentlich, alle hochgeladenen Projekte k&#xF6;nnen von jedem eingesehen werden. Ein Export spielt alle aktuell eingecheckten Dateien eines Projektes aus.</source>
-                <target state="needs-review-adaptation">Please note: This translate5 demo version is public, all uploaded projects can be viewed by everybody. An export generates all files in a project that are currently checked in.</target>
+                <target state="needs-review-adaptation">Please note: This translate5 demo version is public, all uploaded tasks can be viewed by everybody. An export generates all files in a task that are currently checked in.</target>
             </trans-unit>
             <trans-unit id="RGVtb3ZlcnNpb24gc3RhcnRlbg==">
                 <source>Demoversion starten</source>
@@ -80,15 +80,15 @@
             </trans-unit>
             <trans-unit id="V8OkaGxlbiBTaWUgZGFzIFByb2pla3Qgd2VsY2hlcyBTaWUgbGVrdG9yaWVyZW4gb2RlciBleHBvcnRpZXJlbiB3b2xsZW4u">
                 <source>W&#xE4;hlen Sie das Projekt welches Sie lektorieren oder exportieren wollen.</source>
-                <target state="needs-review-adaptation">Please select the project that you would like to edit or export.</target>
+                <target state="needs-review-adaptation">Please select the task that you would like to edit or export.</target>
             </trans-unit>
             <trans-unit id="RGVyIEV4cG9ydCBrYW5uIGplIG5hY2ggR3LDtsOfZSBkZXMgUHJvamVrdGVzIGVpbmlnZSBTZWt1bmRlbiBkYXVlcm4u">
                 <source>Der Export kann je nach Gr&#xF6;&#xDF;e des Projektes einige Sekunden dauern.</source>
-                <target state="needs-review-adaptation">The export may take several seconds, depending on the size of the project.</target>
+                <target state="needs-review-adaptation">The export may take several seconds, depending on the size of the task.</target>
             </trans-unit>
             <trans-unit id="UHJvamVrdA==">
                 <source>Projekt</source>
-                <target state="needs-review-adaptation">Project</target>
+                <target state="needs-review-adaptation">Task</target>
             </trans-unit>
             <trans-unit id="QWN0aW9ucw==">
                 <source>Actions</source>
@@ -112,11 +112,11 @@
             </trans-unit>
             <trans-unit id="TmV1ZXMgUHJvamVrdCBhbmxlZ2Vu">
                 <source>Neues Projekt anlegen</source>
-                <target state="needs-review-adaptation">Create new project</target>
+                <target state="needs-review-adaptation">Create new task</target>
             </trans-unit>
             <trans-unit id="TmV1ZSBQcm9qZWt0ZGF0ZW4gaW1wb3J0aWVyZW4=">
                 <source>Neue Projektdaten importieren</source>
-                <target state="needs-review-adaptation">Import new project data</target>
+                <target state="needs-review-adaptation">Import new task data</target>
             </trans-unit>
             <trans-unit id="VGVzdGRhdGVu">
                 <source>Testdaten</source>
@@ -127,12 +127,12 @@
                     <a href="/index/testdata/">hier Testdaten downloaden</a> und als neues Projekt importieren.
                 </source>
                 <target state="needs-review-adaptation">If you do not have any test files available, you can 
-                    <a href="/index/testdata/">download test files here</a> and import as a new project.
+                    <a href="/index/testdata/">download test files here</a> and import as a new task.
                 </target>
             </trans-unit>
             <trans-unit id="dHJhbnNsYXRlNSBQcm9qZWt0IGxla3RvcmllcmVu">
                 <source>translate5 Projekt lektorieren</source>
-                <target state="needs-review-adaptation">Editing a translate5 project</target>
+                <target state="needs-review-adaptation">Editing a translate5 task</target>
             </trans-unit>
             <trans-unit id="Qml0dGUgZ2ViZW4gU2llIGRlbiBCZW51dHplcm5hbWVuIGVpbiwgZGVyIGFscyBCZW51dHplciBiZWkgbGVrdG9yaWVydGVuIFNlZ21lbnRlbiBlaW5nZXRyYWdlbiB3ZXJkZW4gc29sbDo=">
                 <source>Bitte geben Sie den Benutzernamen ein, der als Benutzer bei lektorierten Segmenten eingetragen werden soll:</source>
@@ -490,11 +490,11 @@
             </trans-unit>
             <trans-unit id="SGlud2Vpc2UgenUgZGVuIFByb2pla3QgSW1wb3J0IEVpbnN0ZWxsdW5nZW4=">
                 <source>Hinweise zu den Projekt Import Einstellungen</source>
-                <target state="needs-review-adaptation">Notes on the project import settings</target>
+                <target state="needs-review-adaptation">Notes on the task import settings</target>
             </trans-unit>
             <trans-unit id="RGllc2UgdHJhbnNsYXRlNSBEZW1vdmVyc2lvbiBpc3Qgw7ZmZmVudGxpY2gsIGFsbGUgaG9jaGdlbGFkZW5lbiBQcm9qZWt0ZSBrw7ZubmVuIHZvbiBqZWRlbSBlaW5nZXNlaGVuIHVuZCBleHBvcnRpZXJ0IHdlcmRlbiE=">
                 <source>Diese translate5 Demoversion ist &#xF6;ffentlich, alle hochgeladenen Projekte k&#xF6;nnen von jedem eingesehen und exportiert werden!</source>
-                <target state="needs-review-adaptation">This translate5 demo version is public, all uploaded projects can be viewed and exported by everybody!</target>
+                <target state="needs-review-adaptation">This translate5 demo version is public, all uploaded tasks can be viewed and exported by everybody!</target>
             </trans-unit>
             <trans-unit id="WmlwLURhdGVpIG1pdCBJbXBvcnQgRGF0ZW4=">
                 <source>Zip-Datei mit Import Daten</source>
@@ -570,11 +570,11 @@
             </trans-unit>
             <trans-unit id="UHJvamVrdG5hbWU=">
                 <source>Projektname</source>
-                <target state="needs-review-adaptation">Project name</target>
+                <target state="needs-review-adaptation">Task name</target>
             </trans-unit>
             <trans-unit id="RGVyIFByb2pla3RuYW1lIGlzdCBmcmVpIHfDpGhsYmFyIHVuZCBtdXNzIGdlc2V0enQgc2Vpbi4gRXIgZGllbnQgenVyIElkZW50aWZpemllcnVuZyBkZXMgUHJvamVrdGVzIGluIGRlciBQcm9qZWt0w7xiZXJzaWNodA==">
                 <source>Der Projektname ist frei w&#xE4;hlbar und muss gesetzt sein. Er dient zur Identifizierung des Projektes in der Projekt&#xFC;bersicht</source>
-                <target state="needs-review-adaptation">The project name can be freely selected and must be set. It helps to identify the project in the project overview</target>
+                <target state="needs-review-adaptation">The task name can be freely selected and must be set. It helps to identify the task in the task overview</target>
             </trans-unit>
             <trans-unit id="TmFtZSBkZXMgw5xiZXJzZXR6ZXJz">
                 <source>Name des &#xDC;bersetzers</source>
@@ -698,7 +698,7 @@
             </trans-unit>
             <trans-unit id="Qml0dGUgYmVhY2h0ZW4gU2llOiBEaWVzZSB0cmFuc2xhdGU1IFN0YW5kIEFsb25lIFZlcnNpb24gdW50ZXJzdMO8dHp0IGVpbiBQcm9qZWt0IHBybyBJbnN0YWxsYXRpb24uIERhcyBiZWRldXRldDogQWxsZSBpbXBvcnRpZXJ0ZW4gRGF0ZWllbiB3ZXJkZW4gZ2VtZWluc2FtIGluIGVpbmVtIERhdGVpYmF1bSBsZWt0b3JpZXJ0LiBTaW5kIGJlcmVpdHMgRGF0ZWllbiBlaW5nZWNoZWNrdCwga2FubiBlaW4gd2VpdGVyZXIgQ2hlY2tpbiBlcnN0IGR1cmNoZ2Vmw7xocnQgd2VyZGVuLCB3ZW5uIGRpZXNlIERhdGVpZW4gd2llZGVyIGF1cyB0cmFuc2xhdGU1IGdlbMO2c2NodCBzaW5kLg==">
                 <source>Bitte beachten Sie: Diese translate5 Stand Alone Version unterst&#xFC;tzt ein Projekt pro Installation. Das bedeutet: Alle importierten Dateien werden gemeinsam in einem Dateibaum lektoriert. Sind bereits Dateien eingecheckt, kann ein weiterer Checkin erst durchgef&#xFC;hrt werden, wenn diese Dateien wieder aus translate5 gel&#xF6;scht sind.</source>
-                <target state="needs-review-adaptation">Please note: this translate5 stand alone version supports one project per installation. This means that all files imported are edited together in one file tree. If files are already checked in, a further check-in can only be conducted when these files are deleted again from translate5.</target>
+                <target state="needs-review-adaptation">Please note: this translate5 stand alone version supports one task per installation. This means that all files imported are edited together in one file tree. If files are already checked in, a further check-in can only be conducted when these files are deleted again from translate5.</target>
             </trans-unit>
             <trans-unit id="RGllIFN0YW5kIEFsb25lIFZlcnNpb24gc3RlaHQgaW4gRm9ybSBlaW5lcyBrb21wbGV0dGVuIFhBTVBQIFBha2V0ZXMgenVyIFZlcmbDvGd1bmcuIEJpdHRlIGJlYWNodGVuIFNpZSBkaWUgSW5mb3JtYXRpb25lbiBpbiBkZXIgZWJlbmZhbGxzIHZlcmbDvGdiYXJlbiBQREYgRGF0ZWku">
                 <source>Die Stand Alone Version steht in Form eines kompletten XAMPP Paketes zur Verf&#xFC;gung. Bitte beachten Sie die Informationen in der ebenfalls verf&#xFC;gbaren PDF Datei.</source>
@@ -726,7 +726,7 @@
             </trans-unit>
             <trans-unit id="RmFsbHMgU2llIGtlaW5lIFRlc3RkYXRlbiB6dXIgSGFuZCBoYWJlbiwga8O2bm5lbiBTaWUgZGllIGZvbGdlbmRlbiBaaXAgRGF0ZWllbiBkb3dubG9hZGVuIHVuZCBhbHMgbmV1ZSBQcm9qZWt0ZSBpbXBvcnRpZXJlbjo=">
                 <source>Falls Sie keine Testdaten zur Hand haben, k&#xF6;nnen Sie die folgenden Zip Dateien downloaden und als neue Projekte importieren:</source>
-                <target state="needs-review-adaptation">Should you not have any test files present, you can download the following zip folder and import as a new project:</target>
+                <target state="needs-review-adaptation">Should you not have any test files present, you can download the following zip folder and import as a new task:</target>
             </trans-unit>
             <trans-unit id="KGVpbmZhY2hlIFRlc3RkYXRlbik=">
                 <source>(einfache Testdaten)</source>
@@ -770,7 +770,7 @@
             </trans-unit>
             <trans-unit id="dHJhbnNsYXRlNSAtIG5ldWVzIFByb2pla3QgaW1wb3J0aWVyZW4=">
                 <source>translate5 - neues Projekt importieren</source>
-                <target state="needs-review-adaptation">translate5 - import new project</target>
+                <target state="needs-review-adaptation">translate5 - import new task</target>
             </trans-unit>
             <trans-unit id="V2ljaHRpZ2VyIEhpbndlaXM6">
                 <source>Wichtiger Hinweis:</source>
@@ -798,7 +798,7 @@
             </trans-unit>
             <trans-unit id="UHJvamVrdG5hbWUgKGZyZWkgd8OkaGxiYXIp">
                 <source>Projektname (frei w&#xE4;hlbar)</source>
-                <target state="needs-review-adaptation">Project name (freely selectable)</target>
+                <target state="needs-review-adaptation">Task name (freely selectable)</target>
             </trans-unit>
             <trans-unit id="TmFtZSBkZXMgw5xiZXJzZXR6ZXJzIChmcmVpIHfDpGhsYmFyLCB6dXIgQW56ZWlnZSBpbSBMZWt0b3JhdCk=">
                 <source>Name des &#xDC;bersetzers (frei w&#xE4;hlbar, zur Anzeige im Lektorat)</source>
@@ -826,7 +826,7 @@
             </trans-unit>
             <trans-unit id="UHJvamVrdCBJbXBvcnQ=">
                 <source>Projekt Import</source>
-                <target state="needs-review-adaptation">Project import</target>
+                <target state="needs-review-adaptation">Task import</target>
             </trans-unit>
             <trans-unit id="TGVrdG9yYXQ=">
                 <source>Lektorat</source>
@@ -948,7 +948,7 @@
             </trans-unit>
             <trans-unit id="UHJvamVjdCBuYW1lIChmcmVlbHkgc2VsZWN0YWJsZSk=">
                 <source>Project name (freely selectable)</source>
-                <target>Project name (freely selectable)</target>
+                <target>Task name (freely selectable)</target>
             </trans-unit>
             <trans-unit id="TmFtZSBvZiB0cmFuc2xhdG9yIChmcmVlbHkgc2VsZWN0YWJsZSwgZGlzcGxheWVkIGluIGVkaXRpbmcp">
                 <source>Name of translator (freely selectable, displayed in editing)</source>
@@ -976,7 +976,7 @@
             </trans-unit>
             <trans-unit id="RGFzIFByb2pla3Qgd3VyZGUgZXJmb2xncmVpY2ggaW1wb3J0aWVydCwgaWhyZSBPcHRpb25lbjo=">
                 <source>Das Projekt wurde erfolgreich importiert, ihre Optionen:</source>
-                <target>The project was successfully imported. Your options:</target>
+                <target>The task was successfully imported. Your options:</target>
             </trans-unit>
             <trans-unit id="d2VpdGVyIHp1bSBMZWt0b3JhdCBkZXMgUHJvamVrdGVzICZyYXF1bzs=">
                 <source>weiter zum Lektorat des Projektes &amp;raquo;</source>
@@ -988,7 +988,7 @@
             </trans-unit>
             <trans-unit id="JmxhcXVvOyB6dXLDvGNrIHp1ciBQcm9qZWt0w7xiZXJzaWNodA==">
                 <source>&amp;laquo; zur&#xFC;ck zur Projekt&#xFC;bersicht</source>
-                <target>&amp;laquo; back to the project overview</target>
+                <target>&amp;laquo; back to the task overview</target>
             </trans-unit>
             <trans-unit id="PGI+QmVpc3BpZWxoYWZ0ZXIgSW5oYWx0IGVpbmVyIFppcCBEYXRlaTogPC9iPg==">
                 <source>
@@ -1253,7 +1253,7 @@ E-Mail: service@MittagQI.com</pre>
                     <b>Bitte beachten Sie:</b> Diese translate5 Demoversion ist öffentlich, alle hochgeladenen Projekte können von jedem eingesehen werden. Ein Export spielt alle aktuell eingecheckten Dateien eines Projektes aus.
                 </source>
                 <target>
-                    <b> Please note: </b> This translate5 demo version is public, all uploaded projects can be seen by anyone. An export exports all currently checked-in files of a project.
+                    <b> Please note: </b> This translate5 demo version is public, all uploaded tasks can be seen by anyone. An export exports all currently checked-in files of a task.
                 </target>
             </trans-unit>
             <trans-unit id="PGI+QnJvd2VyLVN1cHBvcnQ6PC9iPiBEaWUgYWt0dWVsbGUgVmVyc2lvbiB1bnRlcnN0w7x0enQgb2ZmaXppZWxsIG5ldWVyZSBWZXJzaW9uZW4gdm9uIEZpcmVmb3gsIENocm9tZSB1bmQgU2FmYXJpLCBzb3dpZSBJbnRlcm5ldCBFeHBsb3JlciA3LCA4LCA5IHVuZCAxMC4=">
@@ -1274,7 +1274,7 @@ E-Mail: service@MittagQI.com</pre>
             </trans-unit>
             <trans-unit id="UHJvamVrdMO8YmVyc2ljaHQ=">
                 <source>Projektübersicht</source>
-                <target>Project Overview</target>
+                <target>Task Overview</target>
             </trans-unit>
             <trans-unit id="dHJhbnNsYXRlNSAtIE9wZW4tU291cmNlLUxla3RvcmF0IGbDvHIgZGVuIEJyb3dzZXI=">
                 <source>translate5 - Open-Source-Lektorat für den Browser</source>
@@ -1434,11 +1434,11 @@ E-Mail: service@MittagQI.com</pre>
 <trans-unit id="V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIERhdGVuIChaSVAsIENTVjsgQW5nYWJlIG5vdHdlbmRpZyk="><source>Wählen Sie die zu importierenden Daten (ZIP, CSV; Angabe notwendig)</source><target>Select the data to be imported (ZIP, CSV, specifying required)</target></trans-unit>
 <trans-unit id="SW1wb3J0IERhdGVpwrk="><source>Import Datei¹</source><target>Import file¹</target></trans-unit>
 <trans-unit id="QXVmdHJhZ3NudW1tZXI="><source>Auftragsnummer</source><target>Order number</target></trans-unit>
-<trans-unit id="UHJvamVrdG5hbWUgKGZyZWkgd8OkaGxiYXIsIEFuZ2FiZSBub3R3ZW5kaWcp"><source>Projektname (frei wählbar, Angabe notwendig)</source><target>Project name (user-selectable, required)</target></trans-unit>
-<trans-unit id="UHJvamVrdG5hbWXCuQ=="><source>Projektname¹</source><target>Project name¹</target></trans-unit>
-<trans-unit id="UXVlbGxzcHJhY2hlIGRlcyBQcm9qZWt0ZXMgKEFuZ2FiZSBub3R3ZW5kaWcp"><source>Quellsprache des Projektes (Angabe notwendig)</source><target>Source language of the project (required)</target></trans-unit>
+<trans-unit id="UHJvamVrdG5hbWUgKGZyZWkgd8OkaGxiYXIsIEFuZ2FiZSBub3R3ZW5kaWcp"><source>Projektname (frei wählbar, Angabe notwendig)</source><target>Task name (user-selectable, required)</target></trans-unit>
+<trans-unit id="UHJvamVrdG5hbWXCuQ=="><source>Projektname¹</source><target>Task name¹</target></trans-unit>
+<trans-unit id="UXVlbGxzcHJhY2hlIGRlcyBQcm9qZWt0ZXMgKEFuZ2FiZSBub3R3ZW5kaWcp"><source>Quellsprache des Projektes (Angabe notwendig)</source><target>Source language of the task (required)</target></trans-unit>
 <trans-unit id="UXVlbGxzcHJhY2hlwrk="><source>Quellsprache¹</source><target>Source language¹</target></trans-unit>
-<trans-unit id="WmllbHNwcmFjaGUgZGVzIFByb2pla3RlcyAoQW5nYWJlIG5vdHdlbmRpZyk="><source>Zielsprache des Projektes (Angabe notwendig)</source><target>Target language of the project (required)</target></trans-unit>
+<trans-unit id="WmllbHNwcmFjaGUgZGVzIFByb2pla3RlcyAoQW5nYWJlIG5vdHdlbmRpZyk="><source>Zielsprache des Projektes (Angabe notwendig)</source><target>Target language of the task (required)</target></trans-unit>
 <trans-unit id="WmllbHNwcmFjaGXCuQ=="><source>Zielsprache¹</source><target>Target language¹</target></trans-unit>
 <trans-unit id="UmVsYWlzc3ByYWNoZSAoQW5nYWJlIG5vdHdlbmRpZyBzb2Zlcm4gUmVsYWlzZGF0ZW4gdm9yaGFuZGVuKQ=="><source>Relaissprache (Angabe notwendig sofern Relaisdaten vorhanden)</source><target>Pivot language (required if pivot data is available)</target></trans-unit>
 <trans-unit id="UmVsYWlzc3ByYWNoZQ=="><source>Relaissprache</source><target>Pivot language</target></trans-unit>
