@@ -662,11 +662,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * Load segments by taskGuid.
      * @param string $taskGuid
+     * @param Closure $callback is called with the select statement as parameter before passing it to loadFilterdCustom Param: Zend_Db_Table_Select
      * @return array
      */
-    public function loadByTaskGuid($taskGuid) {
+    public function loadByTaskGuid($taskGuid, Closure $callback = null) {
         try {
-            return $this->_loadByTaskGuid($taskGuid);
+            return $this->_loadByTaskGuid($taskGuid,$callback);
         }
         catch(Zend_Db_Statement_Exception $e) {
             $this->catchMissingView($e);
@@ -674,7 +675,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         //fallback mechanism for not existing views. If not exists, we are trying to create it.
         $this->segmentFieldManager->initFields($taskGuid);
         $this->segmentFieldManager->getView()->create();
-        return $this->_loadByTaskGuid($taskGuid);
+        return $this->_loadByTaskGuid($taskGuid,$callback);
     }
     
     /**
@@ -779,9 +780,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * encapsulate the load by taskGuid code.
      * @param string $taskGuid
+     * @param Closure $callback is called with the select statement as parameter before passing it to loadFilterdCustom Param: Zend_Db_Table_Select
      * @return array
      */
-    protected function _loadByTaskGuid($taskGuid) {
+    protected function _loadByTaskGuid($taskGuid, Closure $callback = null) {
         $this->segmentFieldManager->initFields($taskGuid);
         $this->reInitDb($taskGuid);
         
@@ -803,6 +805,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $s->from($this->db, $cols);
         $s = $this->addWatchlistJoin($s);
         $s = $this->addWhereTaskGuid($s, $taskGuid);
+        
+        if(!empty($callback)) {
+            $callback($s,$this->tableName);
+        }
         
         return parent::loadFilterdCustom($s);
     }
