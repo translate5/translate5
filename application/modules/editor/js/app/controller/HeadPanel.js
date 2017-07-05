@@ -168,6 +168,7 @@ Ext.define('Editor.controller.HeadPanel', {
       Editor.app.setTranslation(locale);
   },
   tasksMenuDispatcher: function(menu, item) {
+      debugger;
       var me = this;
       if(!item) {
         return;

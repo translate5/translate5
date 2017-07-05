@@ -481,6 +481,8 @@ Ext.define('Editor.controller.ChangeAlike', {
   updateSegment: function(id, data) {
     var store = this.getStore('Segments'),
         rec = store.getById(id);
+    
+    
     if(!rec) {
       if(!store.prefetchData){
           return null;
@@ -497,6 +499,9 @@ Ext.define('Editor.controller.ChangeAlike', {
     rec.set(data);
     rec.endEdit(true);
     rec.commit();
+    
+    this.fireEvent('afterUpdateChangeAlike',rec);
+    
     return rec;
   },
   handleCancelChangeAlike: function() {

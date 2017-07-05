@@ -579,6 +579,14 @@ Ext.define('Editor.controller.Segments', {
       Editor.MessageBox.addByOperation(operation);
       //show save segment success message 
       Editor.MessageBox.addSuccess(me.messages.segmentSaved);
+      
+      //FIXME 
+      //this event is triggered because we are not able to listen(use) the 'saveComplete' event
+      //the 'saveComplete' event is subscribed in 'ChangeAlike' controller, and it is disabled if the manual processing is disabled
+      //we are not able to use the event listener priority because of the extjs bug : https://www.sencha.com/forum/showthread.php?305085-Observable-listener-priority-does-not-work
+      //this bug also exist in extjs 6.2.0
+      me.fireEvent('beforeSaveCall',records);
+      
       //invoking change alike handling:
       if(me.fireEvent('saveComplete')){
           me.saveChainEnd(); //NEXT step in save chain
