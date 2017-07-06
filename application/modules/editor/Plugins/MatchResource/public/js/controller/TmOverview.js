@@ -177,18 +177,18 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
         });
     },
     handleAfterShow: function(panel) {
-        this.getHeadToolBar().down('#btnTmOverviewWindow').hide();
+        this.getHeadToolBar() && this.getHeadToolBar().down('#btnTmOverviewWindow').hide();
         Editor.data.helpSection = 'matchresource';
         Editor.data.helpSectionTitle = panel.getTitle();
     },
     handleAfterHide: function() {
-        this.getHeadToolBar().down('#btnTmOverviewWindow').show();
+        this.getHeadToolBar() && this.getHeadToolBar().down('#btnTmOverviewWindow').show();
     },
     hideButtonTmOverview : function(){
-        this.getHeadToolBar().down('#btnTmOverviewWindow').hide();
+        this.getHeadToolBar() && this.getHeadToolBar().down('#btnTmOverviewWindow').hide();
     },
     showButtonTmOverview : function(){
-        this.getHeadToolBar().down('#btnTmOverviewWindow').show();
+        this.getHeadToolBar() && this.getHeadToolBar().down('#btnTmOverviewWindow').show();
     },
     handleRenderHeadPanel: function() {
         var pos = this.getTopMenu().items.length - 2;
