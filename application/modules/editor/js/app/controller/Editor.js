@@ -42,6 +42,7 @@ Ext.define('Editor.controller.Editor', {
   extend : 'Ext.app.Controller',
   requires: [
     'Editor.view.segments.EditorKeyMap',
+    'Editor.view.segments.ChangeMarkup',
     'Editor.controller.editor.PrevNextSegment'
   ],
   messages: {
@@ -318,14 +319,13 @@ Ext.define('Editor.controller.Editor', {
               scope: me
           }, item[1]);
           if(item[3]) {
+              confObj.defaultEventAction = 'stopEvent';
               //prepends the event propagation stopper
-              confObj.fn = function(key, e) {
-                  e.stopEvent();
-                  item[2].apply(confObj.scope, arguments);
-              }
           }
-          else {
-              confObj.fn = item[2];
+          confObj.fn = function(key, e) {
+              item[2].apply(confObj.scope, arguments);
+              //FIXME Ausnahme für digitHandler definieren, wenn nicht im isDigitPreparation Modus!
+              return false; //stop further key binding processing
           }
           conf.push(confObj);
       });
@@ -344,6 +344,7 @@ Ext.define('Editor.controller.Editor', {
       }
       me.editorKeyMap = new Editor.view.segments.EditorKeyMap({
         target: docEl,
+        changeMarkup: new Editor.view.segments.ChangeMarkup(editor), //FIXME set this config only if changeMarkup is enabled
         binding: me.getKeyMapConfig()
       });
   },
