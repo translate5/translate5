@@ -113,7 +113,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         
         $this->entity->load($editedSegmentId);
         
-        $ids = (array) $this->_getParam('alikes', array());
+        $ids = (array) Zend_Json::decode($this->_getParam('alikes', "[]"));
         /* @var $entity editor_Models_Segment */
         $result = array();
         
