@@ -355,7 +355,7 @@ Ext.define('Editor.controller.ChangeAlike', {
       timeout: 90000,
       params: {
           "duration": me.timeTracking,
-          "alikes[]": alikes
+          "alikes": Ext.JSON.encode(alikes)
       },
       success: me.alikesSaveSuccessHandler,
       failure: me.alikesSaveFailureHandler,
