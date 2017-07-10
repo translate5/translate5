@@ -37,7 +37,7 @@ END LICENSE AND COPYRIGHT
  * OpenTM2 Service Base Class
  */
 class editor_Plugins_MatchResource_Services_OpenTM2_Service extends editor_Plugins_MatchResource_Services_ServiceAbstract {
-    const DEFAULT_COLOR = 'd9241d';
+    const DEFAULT_COLOR = 'aaff7f';
     
     public function __construct() {
         $config = Zend_Registry::get('config');

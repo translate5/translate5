@@ -69,25 +69,25 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         //get segment list
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
         
-        $this->assertCount(10, $segments);
+        $this->assertCount(11, $segments);
         
         //bulk check of all pretrans fields
         $pretrans = array_map(function($item){
             return $item->pretrans;
         }, $segments);
-        $this->assertEquals(array(1,1,1,1,1,1,0,0,0,0), $pretrans);
+        $this->assertEquals(array(1,1,1,1,1,1,0,0,0,0,0), $pretrans);
         
         //bulk check of all pretrans fields
         $matchRates = array_map(function($item){
             return $item->matchRate;
         }, $segments);
-        $this->assertEquals(array('100','100','100','100','100','100','0','0','0','0'), $matchRates);
+        $this->assertEquals(array('100','100','100','100','100','100','0','0','0','0','0'), $matchRates);
         
         //bulk check of all pretrans fields
         $autoStateIds = array_map(function($item){
             return $item->autoStateId;
         }, $segments);
-        $this->assertEquals(array('0','0','0','3','0','0','4','4','4','4'), $autoStateIds);
+        $this->assertEquals(array('0','0','0','3','0','0','4','4','4','4','0'), $autoStateIds);
         
         foreach($segments as $segment) {
             $this->assertEquals('{00000000-0000-0000-C100-CCDDEE000001}', $segment->userGuid);
@@ -121,18 +121,33 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals($firstSegment->targetToSort, $firstSegment->targetEditToSort);
         $this->assertEquals('74d85bd308aa69f558af1a3a9f1f2dae', $firstSegment->targetMd5);
         
-        $lastSegment = end($segments);
-        $this->assertEquals(10, $lastSegment->segmentNrInTask);
-        $this->assertEquals(10, $lastSegment->mid);
+        $tenthSegment = $segments[9];
         
-        $this->assertEquals('<div title="" class="term preferredTerm exact transNotDefined" data-tbxid="term_0000011_001_en_001_0000022">Apache</div> 2.x on Unix systems.', $lastSegment->source);
-        $this->assertEquals('3471de7d2538cd261d744f828d9231c5', $lastSegment->sourceMd5);
-        $this->assertEquals('Apache 2.x on Unix systems.', $lastSegment->sourceToSort);
-        $this->assertEmpty($lastSegment->target);
-        $this->assertEmpty($lastSegment->targetToSort);
-        $this->assertEmpty($lastSegment->targetEdit);
-        $this->assertEmpty($lastSegment->targetEditToSort);
-        $this->assertEquals('d41d8cd98f00b204e9800998ecf8427e', $lastSegment->targetMd5);
+        $this->assertEquals('<div title="" class="term preferredTerm exact transNotDefined" data-tbxid="term_0000011_001_en_001_0000022">Apache</div> 2.x on Unix systems.', $tenthSegment->source);
+        $this->assertEquals('3471de7d2538cd261d744f828d9231c5', $tenthSegment->sourceMd5);
+        $this->assertEquals('Apache 2.x on Unix systems.', $tenthSegment->sourceToSort);
+        $this->assertEmpty($tenthSegment->target);
+        $this->assertEmpty($tenthSegment->targetToSort);
+        $this->assertEmpty($tenthSegment->targetEdit);
+        $this->assertEmpty($tenthSegment->targetEditToSort);
+        $this->assertEquals('d41d8cd98f00b204e9800998ecf8427e', $tenthSegment->targetMd5);
+        
+        $spaceTestSegment = $segments[10];
+        $this->assertEquals(11, $spaceTestSegment->segmentNrInTask);
+        $this->assertEquals(11, $spaceTestSegment->mid);
+        
+        $this->assertEquals('Test multiple <div class="single 73706163652074733d2232303230222f"><span title="&lt;space/&gt;" class="short">&lt;1/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>Spaces<div class="single 73706163652074733d223039222f"><span title="&lt;space/&gt;" class="short">&lt;2/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>and<div class="single 73706163652074733d2230393039222f"><span title="&lt;space/&gt;" class="short">&lt;3/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>tabs <div class="single 73706163652074733d223230222f"><span title="&lt;space/&gt;" class="short">&lt;4/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>in <div class="single 73706163652074733d223039222f"><span title="&lt;space/&gt;" class="short">&lt;5/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>different combinations!', $spaceTestSegment->source);
+        $this->assertEquals('393faa1c977d8ed48fad2941cccd0ec4', $spaceTestSegment->sourceMd5);
+        $this->assertEquals('Test multiple &lt;1/&gt;&lt;sp', $spaceTestSegment->sourceToSort);
+        $this->assertEquals('Teste mehrere <div class="single 73706163652074733d2232303230222f"><span title="&lt;space/&gt;" class="short">&lt;1/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>Leerzeichen<div class="single 73706163652074733d223039222f"><span title="&lt;space/&gt;" class="short">&lt;2/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>und<div class="single 73706163652074733d2230393039222f"><span title="&lt;space/&gt;" class="short">&lt;3/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>Tabulatoren <div class="single 73706163652074733d223230222f"><span title="&lt;space/&gt;" class="short">&lt;4/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>in <div class="single 73706163652074733d223039222f"><span title="&lt;space/&gt;" class="short">&lt;5/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>verschiedenen Kombinationen!', $spaceTestSegment->target);
+        $this->assertEquals('Teste mehrere &lt;1/&gt;&lt;sp', $spaceTestSegment->targetToSort);
+        $this->assertEquals('Teste mehrere <div class="single 73706163652074733d2232303230222f"><span title="&lt;space/&gt;" class="short">&lt;1/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>Leerzeichen<div class="single 73706163652074733d223039222f"><span title="&lt;space/&gt;" class="short">&lt;2/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>und<div class="single 73706163652074733d2230393039222f"><span title="&lt;space/&gt;" class="short">&lt;3/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>Tabulatoren <div class="single 73706163652074733d223230222f"><span title="&lt;space/&gt;" class="short">&lt;4/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>in <div class="single 73706163652074733d223039222f"><span title="&lt;space/&gt;" class="short">&lt;5/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>verschiedenen Kombinationen!', $spaceTestSegment->targetEdit);
+        $this->assertEquals('Teste mehrere &lt;1/&gt;&lt;sp', $spaceTestSegment->targetEditToSort);
+        $this->assertEquals('ad22aff833942adca222e82201e5fcd9', $spaceTestSegment->targetMd5);
+        
+        $lastSegment = end($segments);
+        $this->assertEquals(11, $lastSegment->segmentNrInTask);
+        $this->assertEquals(11, $lastSegment->mid);
     }
     
     public function testSegmentEditing() {
@@ -206,19 +221,19 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         $autoStateIds = array_map(function($item){
             return $item->autoStateId;
         }, $segments);
-        $this->assertEquals(array('0','0','1','3','0','0','1','1','1','4'), $autoStateIds);
+        $this->assertEquals(array('0','0','1','3','0','0','1','1','1','4','0'), $autoStateIds);
         
         //bulk check of all workflowStepNr fields
         $workflowStepNr = array_map(function($item){
             return $item->workflowStepNr;
         }, $segments);
-        $this->assertEquals(array('0','0','1','0','0','0','1','1','1','0'), $workflowStepNr);
+        $this->assertEquals(array('0','0','1','0','0','0','1','1','1','0','0'), $workflowStepNr);
         
         //bulk check of all workflowStep fields
         $workflowStep = array_map(function($item){
             return $item->workflowStep;
         }, $segments);
-        $this->assertEquals(array('','','lectoring','','','','lectoring','lectoring','lectoring',''), $workflowStep);
+        $this->assertEquals(array('','','lectoring','','','','lectoring','lectoring','lectoring','',''), $workflowStep);
     }
     
     /**

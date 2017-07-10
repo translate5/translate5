@@ -78,6 +78,7 @@ class editor_Models_Export {
      * @param string $exportRootFolder
      */
     protected function _exportToFolder(string $exportRootFolder) {
+        umask(0); // needed for samba access
         if(is_dir($exportRootFolder)) {
             $this->cleaner($exportRootFolder);
         }

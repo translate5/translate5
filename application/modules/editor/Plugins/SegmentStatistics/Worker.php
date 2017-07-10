@@ -109,12 +109,12 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Import_Worke
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
+        $this->task->createMaterializedView();
         $data = ZfExtended_Factory::get('editor_Models_Segment_Iterator', array($this->taskGuid));
         /* @var $data editor_Models_Segment_Iterator */
         if ($data->isEmpty()) {
             return false;
         }
-        
         $this->term = ZfExtended_Factory::get('editor_Models_Term');
         $this->termStat = ZfExtended_Factory::get('editor_Plugins_SegmentStatistics_Models_TermStatistics');
         

@@ -99,7 +99,6 @@
 <trans-unit id='VGFncyB2ZXJiZXJnZW4='><source>Tags verbergen</source><target>Tags verbergen</target></trans-unit>
 <trans-unit id='VGFnLUt1cnphbnNpY2h0'><source>Tag-Kurzansicht</source><target>Tag-Kurzansicht</target></trans-unit>
 <trans-unit id='VGFnLVZvbGxhbnNpY2h0'><source>Tag-Vollansicht</source><target>Tag-Vollansicht</target></trans-unit>
-<trans-unit id='UU0gU3Vic2VnbWVudCBTdGF0aXN0aWs='><source>QM Subsegment Statistik</source><target>QM Subsegment Statistik</target></trans-unit>
 <trans-unit id='RWluc3RlbGx1bmdlbg=='><source>Einstellungen</source><target>Einstellungen</target></trans-unit>
 <trans-unit id='U29ydGllcnVuZyAvIEZpbHRlcnVuZyB6dXLDvGNrc2V0emVu'><source>Sortierung / Filterung zurücksetzen</source><target>Sortierung / Filterung zurücksetzen</target></trans-unit>
 <trans-unit id='VGFiZWxsZSB6dXLDvGNrc2V0emVu'><source>Tabelle zurücksetzen</source><target>Tabelle zurücksetzen</target></trans-unit>
@@ -127,8 +126,7 @@
 <trans-unit id='U3VtbWU='><source>Summe</source><target>Summe</target></trans-unit>
 <trans-unit id='R2V3aWNodHVuZw=='><source>Gewichtung</source><target>Gewichtung</target></trans-unit>
 <trans-unit id='S29tbWVudGFy'><source>Kommentar</source><target>Kommentar</target></trans-unit>
-<trans-unit id='UU0gU3Vic2VnbWVudCBoaW56dWbDvGdlbg=='><source>QM Subsegment hinzufügen</source><target>QM Subsegment hinzufügen</target></trans-unit>
-<trans-unit id='UU0gU3Vic2VnbWVudGU='><source>QM Subsegmente</source><target>QM Subsegmente</target></trans-unit>
+<trans-unit id='TVFNIGhpbnp1ZsO8Z2Vu'><source>MQM hinzufügen</source><target>MQM hinzufügen</target></trans-unit>
 <trans-unit id='S2VpbiBTdWJzZWdtZW50IGF1c2dld8OkaGx0Lg=='><source>Kein Subsegment ausgewählt.</source><target>Kein Subsegment ausgewählt.</target></trans-unit>
 <trans-unit id='Qml0dGUgd8OkaGxlbiBTaWUgaW0gRWRpdG9yIGVpbiBTdWJzZWdtZW50IGF1cyE='><source>Bitte wählen Sie im Editor ein Subsegment aus!</source><target>Bitte wählen Sie im Editor ein Subsegment aus!</target></trans-unit>
 <trans-unit id='VmVyaGFsdGVuIGRlcyBXaWVkZXJob2x1bmdzZWRpdG9y'><source>Verhalten des Wiederholungseditor</source><target>Verhalten des Wiederholungseditor</target></trans-unit>
@@ -924,6 +922,22 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <b
 <trans-unit id='TVFNIFN0YXRpc3Rpaw=='><source>MQM Statistik</source><target>MQM Statistik</target></trans-unit>
 <trans-unit id='VGFzdGF0dXJrw7xyemVsIG5hY2hzY2hsYWdlbg=='><source>Tastaturkürzel nachschlagen</source><target>Tastaturkürzel nachschlagen</target></trans-unit>
 <trans-unit id='WmllbHRleHQgKHp1ciBJbXBvcnR6ZWl0KQ=='><source>Zieltext (zur Importzeit)</source><target>Zieltext (zur Importzeit)</target></trans-unit>
+<trans-unit id='U1RSRyArIEVJTkZHIGtvcGllcnQgZGVuIGtvbXBsZXR0ZW4gUXVlbGx0ZXh0IGluIGRlbiBaaWVsdGV4dDxiciAvPlNUUkcgKyAsIChLb21tYSkgKyAmZ3Q7TnVtbWVyJmx0OyBrb3BpZXJ0IGRlbiBlbnRzcHJlY2hlbmRlbiBUYWcgaW4gZGVuIFppZWx0ZXh0IChOdWxsIGVudHNwcmljaHQgVGFnIE5yLiAxMCk8YnIgLz5TVFJHICsgU0hJRlQgKyAsIChLb21tYSkgKyAmZ3Q7TnVtbWVyJmx0OyBrb3BpZXJ0IGRpZSBUYWdzIG1pdCBkZW4gTnVtbWVybiAxMSBiaXMgMjAgaW4gZGVuIFppZWx0ZXh0Lg=='>
+    <source>STRG + EINFG kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</source>
+    <target>STRG + EINFG kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</target>
+</trans-unit>
+<trans-unit id='TGVlcmUgWmllbHNwcmFjaGVuLiBXYWhyIHdlbm4gYmVpbSBJbXBvcnQgYWxsZSB6aWVsc3ByYWNobGljaGVuIEZlbGRlciBsZWVyIHNpbmQu'>
+    <source>Leere Zielsprachen. Wahr wenn beim Import alle zielsprachlichen Felder leer sind.</source>
+    <target>Leere Zielsprachen. Wahr wenn beim Import alle zielsprachlichen Felder leer sind.</target>
+</trans-unit>
+<trans-unit id='TGVlcmUgWmllbHNwcmFjaGVu'>
+    <source>Leere Zielsprachen</source>
+    <target>Leere Zielsprachen</target>
+</trans-unit>
+<trans-unit id='QXVzIGRlbSBTZWdtZW50IHd1cmRlbiBuaWNodCBkYXJzdGVsbGJhcmUgWmVpY2hlbiBlbnRmZXJudCAobWVocmVyZSBMZWVyemVpY2hlbiwgVGFidWxhdG9yZW4sIFplaWxlbnVtYnLDvGNoZSBldGMuKSE='>
+    <source>Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!</source>
+    <target>Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!</target>
+</trans-unit>
   </body>
  </file>
 </xliff>

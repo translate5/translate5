@@ -204,7 +204,7 @@ class editor_Models_Import {
         $config = Zend_Registry::get('config');
         //Task based Source Editing can only be enabled if its allowed in the whole editor instance 
         $enableSourceEditing = (bool) $config->runtimeOptions->import->enableSourceEditing;
-        $task->setEnableSourceEditing(! empty($params->enableSourceEditing) && $enableSourceEditing);
+        $task->setEnableSourceEditing((int) (! empty($params->enableSourceEditing) && $enableSourceEditing));
         $task->validate();
         $this->setTask($task);
         return $task;

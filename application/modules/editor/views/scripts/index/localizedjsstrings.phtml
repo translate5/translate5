@@ -127,7 +127,7 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.ViewPortEditor.prototype.items_west_title = '<?php echo $this->translate->_('Dateien');?>';
   	Editor.view.segments.Grid.prototype.title = '<?php echo $this->translate->_('Segmentliste und Editor');?>';
   	Editor.view.segments.Grid.prototype.title_readonly = '<?php echo $this->translate->_('Segmentliste und Editor - [LESEMODUS]');?>';
-  	Editor.view.segments.Grid.prototype.target_original = '<?php echo $this->translate->_('(zur Importzeit)');?>';
+  	Editor.view.segments.Grid.prototype.target_original = ' <?php echo $this->translate->_('(zur Importzeit)');?>';
   	
   	var gridToolbar = Editor.view.segments.grid.Toolbar.prototype;
   	gridToolbar.item_viewModesMenu = '<?php echo $this->translate->_('Editormodi');?>';
@@ -211,7 +211,7 @@ Ext.define('Editor.controller.Localizer', {
   	<?php
         if($config->runtimeOptions->editor->enableQmSubSegments){
         ?>
-        Editor.view.qmsubsegments.Window.prototype.title = '<?php echo $this->translate->_('QM Subsegment Statistik');?>';
+        Editor.view.qmsubsegments.Window.prototype.title = '<?php echo $this->translate->_('MQM Statistik');?>';
   	Editor.view.qmsubsegments.Window.prototype.tab_title_field = '<?php echo $this->translate->_('In Feld: {0}');?>';
   	Editor.view.qmsubsegments.SummaryTree.prototype.treepanel_text = '<?php echo $this->translate->_('Fehlertyp');?>';
   	Editor.view.qmsubsegments.SummaryTree.prototype.treepanel_totalTotal = '<?php echo $this->translate->_('Gesamt');?>';
@@ -220,9 +220,9 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.qmsubsegments.AddFlagFieldset.prototype.strings = {
 		severityLabel: '<?php echo $this->translate->_('Gewichtung');?>',
 		commentLabel: '<?php echo $this->translate->_('Kommentar');?>',
-		qmAddBtn: '<?php echo $this->translate->_('QM Subsegment hinzufügen');?>'
+		qmAddBtn: '<?php echo $this->translate->_('MQM hinzufügen');?>'
 	};
-  	Editor.view.qmsubsegments.AddFlagFieldset.prototype.title = '<?php echo $this->translate->_('QM Subsegmente');?>';
+  	Editor.view.qmsubsegments.AddFlagFieldset.prototype.title = '<?php echo $this->translate->_('MQM');?>';
 	Editor.controller.QmSubSegments.prototype.strings = {
     	buttonTooltip10: '<?php echo $this->translate->_(' (ALT+{0})');?>',
     	buttonTooltip20: '<?php echo $this->translate->_(' (ALT+SHIFT+{0})');?>'
@@ -277,7 +277,8 @@ Ext.define('Editor.controller.Localizer', {
             errorTitle: '<?php echo $this->translate->_('Fehler bei der Segment Validierung!');?>',
             correctErrorsText: '<?php echo $this->translate->_('Fehler beheben');?>',
             saveAnyway: '<?php echo $this->translate->_('Trotzdem speichern');?>',
-            editorMoveTitle: '<?php echo $this->translate->_('Verschiebbarer Editor');?>',
+            takeTagTooltip: '<?php echo $this->translate->_('STRG + EINFG (alternativ STRG + . (Punkt)) kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.');?>',
+            editorMoveTitle: '<?php echo $this->translate->_('Verschiebbarer Editor und hilfreiche Tastaturkürzel');?>',
             editorMove: '<?php echo $this->translate->_('Der Segmenteditor kann mit der Maus beliebig positioniert werden. <br />Dazu lediglich den Segmenteditor anklicken und dann verschieben.');?>',
         }
     });

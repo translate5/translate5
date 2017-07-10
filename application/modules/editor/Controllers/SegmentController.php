@@ -28,6 +28,9 @@ END LICENSE AND COPYRIGHT
 */
 
 class Editor_SegmentController extends editor_Controllers_EditorrestController {
+    use editor_Models_Import_FileParser_TagTrait {
+        protectWhitespace as protected traitProtectWhitespace;
+    }
 
     protected $entityClass = 'editor_Models_Segment';
 
@@ -266,6 +269,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $allowedAlternatesToChange = $this->entity->getEditableDataIndexList();
         $updateToSort = array_intersect(array_keys((array)$this->data), $allowedAlternatesToChange);
         $this->checkPlausibilityOfPut($allowedAlternatesToChange);
+        $this->sanitizeEditedContent($allowedAlternatesToChange);
         $this->setDataInEntity(array_merge($allowedToChange, $allowedAlternatesToChange), self::SET_DATA_WHITELIST);
         foreach($updateToSort as $toSort) {
             $this->entity->updateToSort($toSort);
@@ -312,6 +316,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      * Updates the target original and targetMd5 hash for repetition calculation
      * Can be done only in Workflow Step 1 and if all targets were empty on import
      * This is more a hack as a right solution. See TRANSLATE-885 comments for more information!
+     * See also in AlikesegmenController!
      */
     protected function updateTargetHashAndOriginal() {
         //TODO: also a check is missing, if task has alternate targets or not.
@@ -325,7 +330,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $this->entity->setTargetMd5($hasher->hashTarget($this->entity->getTargetEdit(), $this->entity->getSource()));
             $this->entity->setTarget($this->entity->getTargetEdit());
         }
-        
     }
     
     /**
@@ -375,6 +379,60 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         throw $e;
     }
    
+    /**
+     * Applies the import whitespace replacing to the edited user by the content
+     * @param array $fieldnames
+     */
+    protected function sanitizeEditedContent(array $fieldnames) {
+        $nbsp = json_decode('"\u00a0"');
+        $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        /* @var $internalTag editor_Models_Segment_InternalTag */
+        foreach($this->data as $key => $data) {
+            //consider only changeable datafields:
+            if(! in_array($key, $fieldnames)) {
+                continue;
+            }
+            
+            //some browsers create nbsp instead of normal whitespaces, since nbsp are removed by the protectWhitespace code below
+            // we convert it to usual whitespaces. If there are multiple ones, they are reduced to one then.
+            // This is so far the desired behavior. No characters escaped as tag by the import should be addable through the editor.
+            $this->data->{$key} = $data = str_replace($nbsp, ' ', $this->data->{$key});
+            
+            //since our internal tags are a div span construct with plain content in between, we have to replace them first
+            $i = 0;
+            $map = [];
+            $data = $internalTag->replace($data, function($matches) use (&$i, &$map){
+                $replacement = '<internalTag-'.$i++.'/>';
+                $map[$replacement] = $matches[0];
+                return $replacement;
+            });
+            
+            //this method splits the content at tag boundaries, and sanitizes the textNodes only
+            $data = $this->parseSegmentProtectWhitespace($data);
+            //revoke the internaltag replacement
+            $data = str_replace(array_keys($map), array_values($map), $data);
+            
+            //if nothing was changed, everything was OK already
+            if($data === $this->data->{$key}) {
+                return;
+            }
+            $this->restMessages->addWarning('Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!');
+            $this->data->{$key} = $data;
+        }
+    }
+    
+    /**
+     * This method removes the protected characters instead creating internal tags
+     * The user is not allowed to add new internal tags by adding special characters
+     * @param string $textNode
+     * @param string $xmlBased
+     * @return string
+     */
+    protected function protectWhitespace($textNode, $xmlBased = true) {
+        $protected = $this->traitProtectWhitespace($textNode, $xmlBased);
+        return strip_tags($protected);
+    }
+    
     /**
      * checks if current session taskguid matches to loaded segment taskguid
      * @throws ZfExtended_Models_Entity_NoAccessException
