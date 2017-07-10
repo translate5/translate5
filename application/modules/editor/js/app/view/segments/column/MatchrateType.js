@@ -147,7 +147,7 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
                 cell = Ext.fly(context.row).down('td.'+tdCls);
                 if(cell) {
                     qtip = cell.getAttribute('data-qtip');
-                    field.getEl().dom.setAttribute('data-qtip', qtip);
+                    field.getEl().dom.setAttribute('data-qtip', qtip ? qtip : '');
                 }
             }
             return value;

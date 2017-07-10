@@ -40,12 +40,12 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.qmsubsegments.AddFlagFieldset', {
 	extend : 'Ext.form.FieldSet',
 	alias : 'widget.qmSubsegmentsFlagFieldset',
-	title : "#UT#QM Subsegmente",
+	title : "#UT#MQM",
 	collapsible: true,
 	strings: {
 		severityLabel: '#UT#Gewichtung',
 		commentLabel: '#UT#Kommentar',
-		qmAddBtn: '#UT#QM Subsegment hinzufügen'
+		qmAddBtn: '#UT#MQM hinzufügen'
 	},
 	initConfig: function(instanceConfig) {
 		var me = this,

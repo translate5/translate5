@@ -53,8 +53,9 @@ Ext.define('Editor.controller.Editor', {
       f2Readonly: '#UT#Das ausgewählte Segment ist nicht bearbeitbar!',
       errorTitle: '#UT# Fehler bei der Segment Validierung!',
       correctErrorsText: '#UT# Fehler beheben',
-      editorMoveTitle: '#UT#Verschiebbarer Editor',
+      editorMoveTitle: '#UT#Verschiebbarer Editor und hilfreiche Tastaturkürzel',
       editorMove: '#UT#Der Segmenteditor kann mit der Maus beliebig positioniert werden. <br />Dazu lediglich den Segmenteditor anklicken und dann verschieben.',
+      takeTagTooltip: '#UT#STRG + EINFG (alternativ STRG + . (Punkt)) kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.',
       saveAnyway: '#UT# Trotzdem speichern'
   },
   id: 'editorcontroller',
@@ -122,11 +123,13 @@ Ext.define('Editor.controller.Editor', {
           'ctrl-alt-down':  [Ext.EventObjectImpl.DOWN,{ctrl: true, alt: true}, me.goToLowerNoSave, true],
           'alt-c':          ["C",{ctrl: false, alt: true}, me.handleOpenComments, true],
           'alt-s':          ["S",{ctrl: false, alt: true}, me.handleDigitPreparation(me.handleChangeState), true],
-          'ctrl-comma':     [188,{ctrl: true, alt: false}, me.handleDigitPreparation(me.handleInsertTag), true],
+          'ctrl-comma':     [188,{ctrl: true, alt: false, shift: false}, me.handleDigitPreparation(me.handleInsertTag), true],
+          'ctrl-shift-comma': [188,{ctrl: true, alt: false, shift: true}, me.handleDigitPreparation(me.handleInsertTagShift), true],
           'alt-DIGIT':      [me.DEC_DIGITS,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
           'DIGIT':          [me.DEC_DIGITS,{ctrl: false, alt: false}, me.handleDigit],
           'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
-          'ctrl-insert': [Ext.EventObjectImpl.INSERT,{ctrl: true, alt: false}, me.copySourceToTarget],
+          'ctrl-insert':    [Ext.EventObjectImpl.INSERT,{ctrl: true, alt: false}, me.copySourceToTarget],
+          'ctrl-dot':       [190,{ctrl: true, alt: false}, me.copySourceToTarget] //Mac Alternative key code
       };
   },
   /**
@@ -200,7 +203,7 @@ Ext.define('Editor.controller.Editor', {
       Ext.tip.QuickTipManager.register({
           target: displayfield.getId()+'-bodyEl', 
           title: me.messages.editorMoveTitle,
-          text: me.messages.editorMove
+          text: me.messages.editorMove + '<br /><br />' + me.messages.takeTagTooltip
       });
   },
   /**
@@ -384,8 +387,9 @@ Ext.define('Editor.controller.Editor', {
    * @param {Function} must be function in the controller scope, since scope parameter is not supported
    */
   handleDigitPreparation: function(digithandler) {
-      this.digitHandler = digithandler;
+      var me = this;
       return function(key, event) {
+          me.digitHandler = digithandler;
           event.isDigitPreparation = true;
           event.stopEvent();
           return false;
@@ -845,12 +849,16 @@ Ext.define('Editor.controller.Editor', {
       plug.editor.mainEditor.insertMarkup(plug.context.record.get('source'));
   },
 
+    handleInsertTagShift: function(key, e) {
+        e.shiftKey = true; //somehow a hack, but is doing what it should do
+        this.handleInsertTag(key, e);
+    },
     handleInsertTag: function(key, e) {
         var me = this,
             plug = this.getEditPlugin(),
             editor = plug.editor.mainEditor,
             source = plug.context.record.get('source'),
-            tagIdx = Number(key) - 49, //49 shits tag nr down to 0 for tag 1
+            tagIdx = Number(key) - 49, //49 shifts tag nr down to 0 for tag 1
             tempNode, parse;
 
         //key 0 equals to tadIdx -1 and equals to tag nr 10 (which equals to tagIdx 9)
