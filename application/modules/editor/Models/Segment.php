@@ -591,8 +591,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     public function save() {
         $oldIdValue = $this->getId();
         $segmentId = parent::save();
-        //FIXME perhaps we have to reload the segment here to get the new entityVersion from DB 
-        // because we dont know if the trigger will update the entity before the new row is fetch
         foreach($this->segmentdata as $data) {
             /* @var $data editor_Models_Db_SegmentDataRow */
             if(empty($data->segmentId)) {
