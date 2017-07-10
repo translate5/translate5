@@ -679,19 +679,32 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * inits and returns the editor_Models_Segment_EditablesFinder
+     * @return editor_Models_Segment_EditablesFinder
+     */
+    protected function initSegmentFinder() {
+        $this->reInitDb($this->getTaskGuid());
+        $this->initDefaultSort();
+        
+        return ZfExtended_Factory::get('editor_Models_Segment_EditablesFinder', array($this));
+    }
+    
+    /**
      * returns the first and the last EDITABLE segment of the actual filtered request
      * @param array $autoStateIds a list of autoStates where the prev/next page segments are additionaly compared to
      * @param integer $total
      * @return array
      */
     public function findSurroundingEditables($next, array $autoStateIds = null) {
-        $this->reInitDb($this->getTaskGuid());
-        $this->initDefaultSort();
-        
-        $finder = ZfExtended_Factory::get('editor_Models_Segment_EditablesFinder', array($this));
-        /* @var $finder editor_Models_Segment_EditablesFinder */
-        
-        return $finder->find($next, $autoStateIds);
+        return $this->initSegmentFinder()->find($next, $autoStateIds);
+    }
+
+    /**
+     * returns the index/position of the current segment into the currently filtered/sorted list of all segments
+     * @return integer|null
+     */
+    public function getIndex() {
+        return $this->initSegmentFinder()->getIndex($this->getId());
     }
     
     /**

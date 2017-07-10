@@ -105,6 +105,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ));
         $this->front->getRouter()->addRoute('editorFilemap', $filemapRoute);
         
+        //must be added before the default RestRoutes 
+        $this->front->getRouter()->addRoute('editorSegmentPosition', new ZfExtended_Controller_RestLikeRoute(
+            'editor/segment/:segmentId/index',
+            array(
+                'module' => 'editor',
+                'controller' => 'segment',
+                'action' => 'position' //different action name since indexAction is alread in use
+            )));
+        
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/nextsegments/*',
             array(

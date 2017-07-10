@@ -161,6 +161,52 @@ class editor_Models_Segment_EditablesFinder {
     }
     
     /**
+     * gets the segment position (grid index) to the given segmentId and the configured filters
+     * returns null if the segment is not in the filtered list 
+     * @param integer $segmentId
+     * @return NULL|number
+     */
+    public function getIndex($segmentId) {
+        $outerSql = $this->getOuterSql();
+        
+        foreach($this->sortParameter as $sort) {
+            $isAsc = strtolower($sort->direction) === 'asc';
+            $prop = $this->getSortProperty($sort);
+
+            //if we ever will have multiple sort parameters, this should work out of the box because of the loop
+            $this->addSortOuter($outerSql, $prop, $isAsc);
+        }
+        
+        $innerSql = $this->segment->db->select()
+            ->from($this->segment->db, $this->fieldsToSelect)
+            ->where('id = ?', $segmentId);
+        $this->filterInner->applyToSelect($innerSql);
+        
+        $outerSql->from(array('pos' => $innerSql), null);
+        $this->filterOuter->applyToSelect($outerSql);
+
+        $this->debug($outerSql);
+        
+        $stmt = $this->segment->db->getAdapter()->query($outerSql);
+        $res = $stmt->fetch();
+        
+        //the above SQL returns null if the desired segment is on first position (produced by the IF in the outer SQL)
+        // it returns also null if the requested segmentId is not in the filtered set of segments.
+        //to find out which of the both cases happened, we have to load the innerSql solely:
+        $foundInFilter = true; //by default we assume that we found something
+        if($res['cnt'] === null) {
+            $stmt = $this->segment->db->getAdapter()->query($innerSql);
+            $foundInFilter = $stmt->fetch(); //if there was a result, we have to return 0 which is done by the (int) cast at the end
+        }
+        
+        //if we got not result at all, or the desired segment was not in the filtered list, we return null
+        if(empty($res) || empty($foundInFilter)) {
+            return null;
+        }
+        return (int) $res['cnt'];
+    }
+    
+    /**
      * adds the where statement to the inner SELECT, the SQL differs for the following cases:
         ASC NEXT     sortField > currentSortValue || sortField = currentSortValue && idField > currentIdValue
         DESC NEXT    sortField < currentSortValue || sortField = currentSortValue && idField > currentIdValue

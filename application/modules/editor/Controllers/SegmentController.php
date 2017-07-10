@@ -111,6 +111,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $autoStates = $this->getUsersAutoStateIds();
         }
         $this->entity->load($segmentId);
+        $this->checkTaskGuidAndEditable();
         $result = array();
         
         //load only the requested editable segment
@@ -127,6 +128,22 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $result['prevFiltered'] = $this->entity->findSurroundingEditables(false, $autoStates);
         }
         echo Zend_Json::encode((object)$result, Zend_Json::TYPE_OBJECT);
+    }
+    
+    /**
+     * returns the index (position) of the requested segment (by segmentId) in the filtered segment list (as it would be given by indexAction)
+     * if index is null, that means the segment is not given in the filtered list
+     */
+    public function positionAction() {
+        $segmentId = (int) $this->_getParam('segmentId');
+        $this->entity->load($segmentId);
+        $this->checkTaskGuidAndEditable();
+        $index = $this->entity->getIndex();
+        if($index === null) {
+            throw new ZfExtended_NotFoundException();
+        }
+        $this->view->segmentId = $segmentId;
+        $this->view->index = $index;
     }
     
     /**
