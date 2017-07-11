@@ -152,10 +152,10 @@ class ChangeAlikeTranslate683Test extends \ZfExtended_Test_ApiTestcase {
         },$alikes);
         
         //save alikes
-        $alikePutData = array('duration' => 777 ); //faked duration value
-        foreach($alikeIds as $k => $v){
-            $alikePutData['alikes['.$k.']'] = $v;
-        }
+        $alikePutData = [
+            'duration' => 777, //faked duration value
+            'alikes' => json_encode($alikeIds)
+        ]; 
         //Alike Data is sent as plain HTTP request parameters not as JSON in data parameter!
         $resp = $this->api()->request('editor/alikesegment/'.$segToTest->id, 'PUT', $alikePutData);
         $foo = $this->api()->decodeJsonResponse($resp);
@@ -232,10 +232,10 @@ class ChangeAlikeTranslate683Test extends \ZfExtended_Test_ApiTestcase {
         },$alikes);
         
         //save alikes
-        $alikePutData = array('duration' => 777 ); //faked duration value
-        foreach($alikeIds as $k => $v){
-            $alikePutData['alikes['.$k.']'] = $v;
-        }
+        $alikePutData = [
+            'duration' => 777, //faked duration value
+            'alikes' => json_encode($alikeIds)
+        ]; 
         //Alike Data is sent as plain HTTP request parameters not as JSON in data parameter!
         $resp = $this->api()->request('editor/alikesegment/'.$segToTest->id, 'PUT', $alikePutData);
         $foo = $this->api()->decodeJsonResponse($resp);

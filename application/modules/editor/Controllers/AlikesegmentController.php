@@ -210,6 +210,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 $this->updateTargetHashAndOriginal($entity, $hasher);
                 
                 $history->save();
+                $entity->setTimestamp(null); //see TRANSLATE-922
                 $entity->save();
             }
             catch (Exception $e) {

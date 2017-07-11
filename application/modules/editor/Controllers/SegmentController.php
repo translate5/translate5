@@ -291,6 +291,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         //saving history directly before normal saving, 
         // so no exception between can lead to history entries without changing the master segment
         $history->save();
+        $this->entity->setTimestamp(null); //see TRANSLATE-922
         $this->entity->save();
         $this->view->rows = $this->entity->getDataObject();
     }
@@ -382,18 +383,13 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $this->data->{$key} = $data = str_replace($nbsp, ' ', $this->data->{$key});
             
             //since our internal tags are a div span construct with plain content in between, we have to replace them first
-            $i = 0;
-            $map = [];
-            $data = $internalTag->replace($data, function($matches) use (&$i, &$map){
-                $replacement = '<internalTag-'.$i++.'/>';
-                $map[$replacement] = $matches[0];
-                return $replacement;
-            });
-            
+            $data = $internalTag->protect($data);
+
             //this method splits the content at tag boundaries, and sanitizes the textNodes only
             $data = $this->parseSegmentProtectWhitespace($data);
+
             //revoke the internaltag replacement
-            $data = str_replace(array_keys($map), array_values($map), $data);
+            $data = $internalTag->unprotect($data);
             
             //if nothing was changed, everything was OK already
             if($data === $this->data->{$key}) {

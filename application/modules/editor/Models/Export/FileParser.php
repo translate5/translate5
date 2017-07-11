@@ -120,6 +120,11 @@ abstract class editor_Models_Export_FileParser {
     protected $tagHelper;
     
     /**
+     * @var editor_Models_Segment_TermTag
+     */
+    protected $termTagHelper;
+    
+    /**
      * 
      * @param integer $fileId
      * @param boolean $diff
@@ -140,6 +145,7 @@ abstract class editor_Models_Export_FileParser {
         $this->config = Zend_Registry::get('config');
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        $this->termTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
     }
 
     /**
@@ -279,9 +285,9 @@ abstract class editor_Models_Export_FileParser {
         $edited = (string) $segment->getFieldEdited($field);
         
         $before = $edited;
-        $edited = $this->protectContentTags($edited);
-        $edited = $this->recreateTermTags($edited, $this->shouldTermTaggingBeRemoved());
-        $edited = $this->unprotectContentTags($edited);
+        $edited = $this->tagHelper->protect($edited);
+        $edited = $this->removeTermTags($edited);
+        $edited = $this->tagHelper->unprotect($edited);
         
         $edited = $this->parseSegment($edited);
         $edited = $this->revertNonBreakingSpaces($edited);
@@ -290,9 +296,9 @@ abstract class editor_Models_Export_FileParser {
         }
         
         $original = (string) $segment->getFieldOriginal($field);
-        $original = $this->protectContentTags($original);
-        $original = $this->recreateTermTags($original);
-        $original = $this->unprotectContentTags($original);
+        $original = $this->tagHelper->protect($original);
+        $original = $this->removeTermTags($original);
+        $original = $this->tagHelper->unprotect($original);
         $original = $this->parseSegment($original);
         
         $diffed = $this->_diffTagger->diffSegment(
@@ -304,14 +310,6 @@ abstract class editor_Models_Export_FileParser {
         return $this->unprotectWhitespace($diffed);
     }
     
-    /**
-     * @return boolean
-     */
-    protected function shouldTermTaggingBeRemoved() {
-        $exportTermTags = $this->config->runtimeOptions->termTagger->exportTermTags;
-        $exportTermTags = $this->_diff ? $exportTermTags->diffExport : $exportTermTags->normalExport;
-        return !$exportTermTags;
-    }
     /**
      * loads the segment to the given Id, caches a limited count of segments internally 
      * to prevent loading again while switching between fields
@@ -348,51 +346,8 @@ abstract class editor_Models_Export_FileParser {
      * @param boolean $removeTermTags, default = true
      * @return string $segment
      */
-    protected function recreateTermTags($segment, $removeTermTags=true) {
-        //TODO refactor this method so that editor_Models_Segment_TermTag is used
-        $toRemove = array('transFound', 'transNotFound', 'transNotDefined');
-        
-        //replace or remove closing tags
-        $closingTag =  $removeTermTags ? '' : '</mrk>';
-        $segment = str_ireplace('</div>', $closingTag, $segment);
-        
-        $termRegex = '/<div[^>]+class="term([^"]+)"\s+data-tbxid="([^"]+)"[^>]*>/s';
-        return preg_replace_callback($termRegex, function($match) use ($removeTermTags, $toRemove) {
-            if($removeTermTags) {
-                return '';
-            }
-            
-            $mid = $match[2];
-            $classes = explode(' ', trim($match[1]));
-            $classes = join('-', array_diff($classes, $toRemove));
-            return '<mrk mtype="x-term-' . $classes . '" mid="' . $mid . '">';
-        }, $segment);
-    }
-    
-    /**
-     * protects the internal tags of one segment, stores the original values in $this->originalTags
-     * @param string $segment
-     * @return string
-     */
-    protected function protectContentTags(string $segment) {
-        $id = 1;
-        $this->originalTags = array();
-        return $this->tagHelper->replace($segment, function($match) use (&$id) {
-            $placeholder = '<translate5:escaped id="'.$id++.'" />';
-            $this->originalTags[$placeholder] = $match[0];
-            return $placeholder;
-        });
-    }
-    
-    /**
-     * unprotects / restores the content tags
-     * @param string $segment
-     * @return string
-     */
-    protected function unProtectContentTags(string $segment) {
-        return preg_replace_callback('#<translate5:escaped id="[0-9]+" />#s', function($match) {
-            return $this->originalTags[$match[0]];
-        }, $segment);
+    protected function removeTermTags($segment) {
+        return $this->termTagHelper->remove($segment);
     }
     
     /**
@@ -427,22 +382,14 @@ abstract class editor_Models_Export_FileParser {
     
     /**
      * Exports a single segment content, without MQM support!
+     * Term Tags remains in the content and are not touched.
+     * 
      * @param string $segment
      * @return string
      */
     public function exportSingleSegmentContent($segment) {
+        //processing of term tags is done after using this method!
         $this->disableMqmExport = true;
-        
-        //protect content tags to do nasty things with the content and prevent our html like content tags to be damaged
-        $segment = $this->protectContentTags($segment);
-        
-        //do here segment things where contentTags are needed to be protected
-        $segment = $this->recreateTermTags($segment);
-        
-        //unprotect / restore content tags
-        $segment = $this->unprotectContentTags($segment);
-        //FIXME: unprotect tags and final tag replacement in parseSegment can and should be merged
-        
         $segment = $this->parseSegment($segment);
         $segment = $this->revertNonBreakingSpaces($segment);
         return $this->unprotectWhitespace($segment);
