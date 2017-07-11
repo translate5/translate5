@@ -48,6 +48,12 @@ class editor_Models_Segment_InternalTag {
     const REGEX_INTERNAL_TAGS = '#<div\s*class="([a-z]*)\s+([gxA-Fa-f0-9]*)"\s*.*?(?!</div>)<span[^>]*data-originalid="([^"]*).*?(?!</div>).</div>#s';
     
     /**
+     * container for the original tags of the internal tag protection
+     * @var array
+     */
+    protected $originalTags;
+    
+    /**
      * replaces internal tags with either the callback or the given scalar
      * @see preg_replace
      * @see preg_replace_callback
@@ -242,5 +248,29 @@ class editor_Models_Segment_InternalTag {
             }
         }
         return $result;
+    }
+    
+    /**
+     * protects the internal tags of one segment
+     * @param string $segment
+     * @return string
+     */
+    public function protect(string $segment) {
+        $id = 1;
+        $this->originalTags = array();
+        return $this->replace($segment, function($match) use (&$id) {
+            $placeholder = '<translate5:escaped id="'.$id++.'" />';
+            $this->originalTags[$placeholder] = $match[0];
+            return $placeholder;
+        });
+    }
+    
+    /**
+     * unprotects / restores the content tags
+     * @param string $segment
+     * @return string
+     */
+    public function unprotect(string $segment) {
+        return str_replace(array_keys($this->originalTags), array_values($this->originalTags), $segment);
     }
 }

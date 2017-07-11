@@ -64,6 +64,7 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
             editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_PREVIOUS_VERSION => false,
             editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_RELAIS_LANGUAGE => false,
             editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_STATE_QM => false,
+            editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_TERMINOLOGY => false,
     ];
     
     /**
