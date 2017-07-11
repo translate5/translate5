@@ -3,6 +3,14 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.5.33] - 2017-07-11
+###Changed
+TRANSLATE-628: Log changed terminology in changes xliff
+
+###Bugfixes
+TRANSLATE-921: Saving ChangeAlikes reaches PHP max_input_vars limit with a very high repetition count
+TRANSLATE-922: Segment timestamp updates only on the first save of a segment
+
 ## [2.5.32] - 2017-07-04
 ###Changed
 TRANSLATE-911: Workflow Notification mails could be too large for underlying mail system
