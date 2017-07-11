@@ -114,6 +114,19 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
     const GLOBALESE_FILESTATUS_TRANSLATED='translated';
     const GLOBALESE_FILESTATUS_IN_TRANSLATION= 'in_translation';
     const GLOBALESE_FILESTATUS_ERROR= 'error';
+
+    /***
+    * Globalese engine statuses used by globalese api to determine if the engine is available for usage
+    */
+    const GLOBALESE_ENGINSTATUS_TRAINED= 'trained';
+    const GLOBALESE_ENGINSTATUS_ON= 'on';
+    
+    /***
+     * Request timeout for the api
+     * 
+     * @var integer
+     */
+    const REQUEST_TIMEOUT_SECONDS = 360;
     
     public function __construct() {
         $this->globaleseConfig= Zend_Registry::get('config')->runtimeOptions->plugins->GlobalesePreTranslation;
@@ -134,6 +147,7 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         
         $http->setAuth($this->username,$this->apiKey);
         $http->setUri($this->apiUrl.$url);
+        $http->setConfig(array('timeout'=>self::REQUEST_TIMEOUT_SECONDS));
         return $http;
     }
     
@@ -248,7 +262,7 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
             array_push($this->globaleseFileIds, $fileId);
             
             return $fileId;
-        } catch (ZfExtended_Exception $ex) {
+        } catch (Exception $ex) {
             $this->deleteFile($fileId);
             /* @var $erroLog ZfExtended_Log */
             $erroLog= ZfExtended_Factory::get('ZfExtended_Log');
@@ -295,7 +309,6 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
     private function uplodFile($fileId,$xliff){
         $url='translation-files/'.$fileId;
         $http = $this->getHttpClient($url);
-        
         $http->setRawData($xliff);
         $response = $http->request('POST');
         
@@ -310,6 +323,7 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         $url='translation-files/'.$fileId.'/translate';
         $http = $this->getHttpClient($url);
         $response = $http->request('POST');
+        
         //logging when the request was not successfull
         $this->processResponse($response);
     }
@@ -416,7 +430,7 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         }
         //return only the engines with status ok or on
         foreach ($result as $engine){
-            if($engine->status == "ok" || $engine->status == "on"){
+            if($engine->status == self::GLOBALESE_ENGINSTATUS_TRAINED || $engine->status ==self::GLOBALESE_ENGINSTATUS_ON){
                 $retVal[] = $engine;
             }
         }
