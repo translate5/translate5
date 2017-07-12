@@ -63,6 +63,11 @@ class Models_Installer_Standalone {
     /**
      * @var array
      */
+    protected $options;
+    
+    /**
+     * @var array
+     */
     protected $dbCredentials = array(
             'host' => 'localhost',
             'username' => 'root',
@@ -100,12 +105,12 @@ class Models_Installer_Standalone {
      * @param array $options
      */
     public static function mainLinux(array $options = null) {
-        $saInstaller = new self(getcwd());
+        $saInstaller = new self(getcwd(), $options);
         //TODO move options parameter to constructor instead of multiple usage
         $saInstaller->checkEnvironment();
-        $saInstaller->processDependencies($options);
+        $saInstaller->processDependencies();
         $saInstaller->addZendToIncludePath();
-        $saInstaller->installation($options);//checks internally if steps are already done
+        $saInstaller->installation();//checks internally if steps are already done
         $saInstaller->cleanUpDeletedFiles(); //must be before initApplication!
         $saInstaller->initApplication();
         $saInstaller->postInstallation();
@@ -116,8 +121,10 @@ class Models_Installer_Standalone {
     
     /**
      * @param string $currentWorkingDir
+     * @param array $options options from outside
      */
-    protected function __construct($currentWorkingDir) {
+    protected function __construct($currentWorkingDir, array $options) {
+        $this->options = $options;
         $this->currentWorkingDir = $currentWorkingDir;
         //requiering the following hardcoded since, autoloader must be downloaded with Zend Package
         require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/License.php';
@@ -137,6 +144,13 @@ class Models_Installer_Standalone {
     }
     
     protected function checkEnvironment() {
+        if(!empty($this->options['updateCheck'])) {
+            $this->addZendToIncludePath();
+            $this->initApplication();
+            $this->preconditonChecker->checkUsers();
+            $this->preconditonChecker->checkWorkers();
+            exit; //exiting here completly after checkrun
+        }
         $this->installerFile = __FILE__;
         $this->installerHash = md5_file($this->installerFile);
         $this->preconditonChecker->checkEnvironment();
@@ -148,7 +162,8 @@ class Models_Installer_Standalone {
         }
     }
     
-    protected function processDependencies(array $options) {
+    protected function processDependencies() {
+        $options = $this->options;
         $this->logSection('Checking server for updates and packages:');
         $downloader = new ZfExtended_Models_Installer_Downloader($this->currentWorkingDir);
         
@@ -165,7 +180,9 @@ class Models_Installer_Standalone {
         $downloader->pullDependencies(true);
     }
     
-    protected function installation(array $options = null) {
+    protected function installation() {
+        $options = $this->options;
+        
         //assume installation success if installation.ini exists!
         if(file_exists($this->currentWorkingDir.self::INSTALL_INI)){
             return;
@@ -438,6 +455,10 @@ class Models_Installer_Standalone {
         $index = ZfExtended_BaseIndex::getInstance();
         $index->initApplication()->bootstrap();
         $index->addModuleOptions('default');
+        
+        //set the hostname to the configured one:
+        $config = Zend_Registry::get('config');
+        $this->hostname = $config->runtimeOptions->server->name;
     }
     
     protected function done() {
