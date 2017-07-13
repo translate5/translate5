@@ -82,7 +82,7 @@ Ext.define('Editor.controller.Segments', {
    */
   filemap: {},
   lastFileMapParams: null,
-  id: 'segmentscontroller',
+  //id: 'segmentscontroller',
   loadingMaskRequests: 0,
   saveChainMutex: false,
   changeAlikeOperation: null,
