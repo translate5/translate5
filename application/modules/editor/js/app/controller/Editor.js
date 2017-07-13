@@ -58,7 +58,6 @@ Ext.define('Editor.controller.Editor', {
       takeTagTooltip: '#UT#STRG + EINFG (alternativ STRG + . (Punkt)) kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.',
       saveAnyway: '#UT# Trotzdem speichern'
   },
-  id: 'editorcontroller',
   DEC_DIGITS: [48, 49, 50, 51, 52, 53, 54, 55, 56, 57],
   refs : [{
     ref : 'segmentGrid',
