@@ -66,6 +66,7 @@ Ext.define('Editor.controller.Editor', {
       ref : 'navi',
       selector : '#metapanel #naviToolbar'
   }],
+  registeredTooltips: [],
   isEditing: false,
   keyMapConfig: null,
   editorKeyMap: null,
@@ -88,6 +89,9 @@ Ext.define('Editor.controller.Editor', {
           'segmentsHtmleditor': {
               initialize: 'initEditor',
               contentErrors: 'handleSaveWithErrors'
+          },
+          'roweditor': {
+              destroy: 'handleDestroyRoweditor'
           },
           'roweditor displayfield[isContentColumn!=true]': {
               afterrender: 'initMoveToolTip'
@@ -195,15 +199,28 @@ Ext.define('Editor.controller.Editor', {
    * initializes the roweditor moveable tooltip
    */
   initMoveToolTip: function(displayfield){
-      var me = this;
+      var me = this,
+          id = displayfield.getId()+'-bodyEl';
       if(displayfield.ownQuicktip){
           return;
       }
+      me.registeredTooltips.push(id);
       Ext.tip.QuickTipManager.register({
-          target: displayfield.getId()+'-bodyEl', 
+          target: id, 
           title: me.messages.editorMoveTitle,
           text: me.messages.editorMove + '<br /><br />' + me.messages.takeTagTooltip
       });
+  },
+  handleDestroyRoweditor: function() {
+      //FIXME needed for Ext 6.2, possibly removable for further ExtJS updates, see T5DEV-172
+      var me = this;
+      if(me.registeredTooltips && me.registeredTooltips.length > 0) {
+          Ext.Array.each(me.registeredTooltips, function(item) {
+              if(Ext.tip.QuickTipManager.tip) {
+                  delete Ext.tip.QuickTipManager.tip.targets[item];
+              }
+          });
+      }
   },
   /**
    * saves the segment of the already opened editor and restarts startEditing call 
