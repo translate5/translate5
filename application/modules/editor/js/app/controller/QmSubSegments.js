@@ -92,7 +92,7 @@ Ext.define('Editor.controller.QmSubSegments', {
     },
     listen: {
         controller: {
-            '#editorcontroller': {
+            '#Editor': {
                 'assignMQMTag': 'handleAddQmFlagKey'
             }
         },

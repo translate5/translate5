@@ -82,7 +82,6 @@ Ext.define('Editor.controller.Segments', {
    */
   filemap: {},
   lastFileMapParams: null,
-  id: 'segmentscontroller',
   loadingMaskRequests: 0,
   saveChainMutex: false,
   changeAlikeOperation: null,
@@ -108,15 +107,15 @@ Ext.define('Editor.controller.Segments', {
           '#Editor.$application': {
               editorViewportClosed: 'clearSegments'
           },
-          '#editorcontroller': {
+          '#Editor': {
               saveSegment: 'saveChainStart',
               watchlistRemoved: 'handleWatchlistRemoved'
           },
-          '#changealikecontroller': {
+          '#ChangeAlike': {
               //called after currently loaded segment data is not used anymore by the save chain / change alike handling
               segmentUsageFinished: 'onSegmentUsageFinished'
           },
-          '#fileordercontroller': {
+          '#Fileorder': {
               itemsaved: 'handleFileSaved'
           }
       },
