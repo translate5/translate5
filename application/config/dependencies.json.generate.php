@@ -180,6 +180,7 @@ $dep->dependencies = [[
         "url" => "RELEASE:PHPExcel.zip",
         "target" => "library/ZfExtended/ThirdParty/PHPExcel/",
         "licenses" => [[
+            "uses" => "PHPExcel",
             "license" => "LGPL",
             "relpath" => "docs/third-party-licenses/PHPExcel-1.8.1.license.txt"
         ]]
