@@ -185,6 +185,7 @@ class editor_Workflow_Notification {
                 editor_Models_Converter_SegmentsToXliff::CONFIG_INCLUDE_DIFF => (boolean) $config->runtimeOptions->editor->notification->includeDiff,
                 editor_Models_Converter_SegmentsToXliff::CONFIG_PLAIN_INTERNAL_TAGS => true,
                 editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_ALTERNATIVES => true,
+                editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_TERMINOLOGY => true,
             ];
             $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff', [$xliffConf]);
             /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff */

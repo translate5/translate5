@@ -241,12 +241,14 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
         $alikes = $this->api()->requestJson('editor/alikesegment/'.$segToTest->id, 'GET');
         
         //save alikes
-        $alikeIds = [];
-        $alikePutData = array('duration' => 777 ); //faked duration value
-        foreach($alikes as $k => $v){
-            $alikeIds[] = $v->id;
-            $alikePutData['alikes['.$k.']'] = $v->id;
-        }
+        $alikeIds = array_map(function($item){
+            return $item->id;
+        },$alikes);
+        
+        $alikePutData = [
+            'duration' => 777, //faked duration value
+            'alikes' => json_encode($alikeIds)
+        ];
         //Alike Data is sent as plain HTTP request parameters not as JSON in data parameter!
         $resp = $this->api()->request('editor/alikesegment/'.$segToTest->id, 'PUT', $alikePutData);
         

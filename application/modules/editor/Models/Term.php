@@ -48,6 +48,18 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     const STAT_SUPERSEDED = 'supersededTerm';
     const STAT_NOT_FOUND = 'STAT_NOT_FOUND'; //Dieser Status ist nicht im Konzept definiert, sondern wird nur intern verwendet!
 
+    const TRANSSTAT_FOUND = 'transFound';
+    const TRANSSTAT_NOT_FOUND = 'transNotFound';
+    const TRANSSTAT_NOT_DEFINED ='transNotDefined';
+    
+    const CSS_TERM_IDENTIFIER = 'term';
+    
+    /**
+     * The above constants are needed in the application as list, since reflection usage is expensive we cache them here:
+     * @var array
+     */
+    protected static $statusCache = [];
+    
     protected $statOrder = array(
         self::STAT_PREFERRED => 1,
         self::STAT_ADMITTED => 2,
@@ -63,6 +75,16 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     
     protected static $groupIdCache = array();
 
+    /**
+     * @var editor_Models_Segment_TermTag
+     */
+    protected $tagHelper;
+    
+    public function __construct() {
+        parent::__construct();
+        $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
+    }
+    
     /**
      * returns for a termId the associated termentries by group 
      * @param string $taskGuid
@@ -247,24 +269,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @return array 2D Array, first level are found terms, second level has key mid and key classes
      */
     public function getTermInfosFromSegment(string $seg) {
-        $getTermRegEx = '/<div[^>]+((class="([^"]*)"[^>]+data-tbxid="([^"]*)")|(data-tbxid="([^"]*)"[^>]+class="([^"]*)"))[^>]*>/';
-        
-        preg_match_all($getTermRegEx, $seg, $matches, PREG_SET_ORDER);
-        $result = array();
-        foreach($matches as $match) {
-            //class before data-tbxid
-            if(empty($match[5])) {
-                $mid = $match[4];
-                $classes = $match[3];
-            }
-            //data-tbxid before class 
-            else {
-                $mid = $match[6];
-                $classes = $match[7];
-            }
-            $result[] = array('mid' => $mid,'classes' => explode(' ', $classes));
-        }
-        return $result;
+        return $this->tagHelper->getInfos($seg);
     }
     
     /**
@@ -454,4 +459,46 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $exporteur->setData($data);
         return $exporteur->export();
     }
+    
+    /**
+     * returns a map CONSTNAME => value of all term status
+     * @return array
+     */
+    static public function getAllStatus() {
+        self::initConstStatus();
+        return self::$statusCache['status'];
+    }
+    
+    /**
+     * returns a map CONSTNAME => value of all translation status
+     * @return array
+     */
+    static public function getAllTransStatus() {
+        self::initConstStatus();
+        return self::$statusCache['translation'];
+    }
+    
+    /**
+     * creates a internal list of the status constants
+     */
+    static protected function initConstStatus() {
+        if(!empty(self::$statusCache)) {
+            return;
+        }
+        self::$statusCache = [
+            'status' => [],
+            'translation' => [],
+        ];
+        $refl = new ReflectionClass(__CLASS__);
+        $constants = $refl->getConstants();
+        foreach($constants as $key => $val) {
+            if(strpos($key, 'STAT_') === 0) {
+                self::$statusCache['status'][$key] = $val;
+            }
+            if(strpos($key, 'TRANSSTAT_') === 0) {
+                self::$statusCache['translation'][$key] = $val;
+            }
+        }
+    }
+    
 }

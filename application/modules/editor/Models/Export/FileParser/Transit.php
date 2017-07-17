@@ -259,21 +259,6 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
     protected function parseSegment($segment) {
         //the following line is only necessary, since transit does not support MQM-tags. It can be removed, if this changes. Same is true for the comment in tasks.phtml 
         $segment = preg_replace('"<img[^>]*>"','', $segment);
-        $segment = parent::parseSegment($segment);
-        //at this moment there should be no other div-tags any more
-        if($this->shouldTermTaggingBeRemoved()){
-            $segment = str_replace('</div>', '', $segment);
-            $segment = preg_replace('"<div .*?>"', '', $segment);
-        }
-        return $segment;
-    }
-    /**
-     * overwrite, because recreation makes no sense. parseSegment simply keeps them, if necessary
-     * @param string $segment
-     * @param boolean $removeTermTags, default = true
-     * @return string $segment
-     */
-    protected function recreateTermTags($segment, $removeTermTags=true) {
-        return $segment;
+        return parent::parseSegment($segment);
     }
 }

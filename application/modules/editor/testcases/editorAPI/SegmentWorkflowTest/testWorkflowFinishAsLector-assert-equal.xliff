@@ -30,7 +30,7 @@
 </trans-unit>
 
 <trans-unit id="7" translate5:autostateId="1" translate5:autostateText="reviewed">
-<source>Apache 2.x  on Unix systems</source>
+<source><mrk mtype="term" translate5:status="preferredTerm" translate5:translated="undefined">Apache</mrk> 2.x  on Unix systems</source>
 <target state="translated" dx:match-quality="0.0">Apache 2.x auf Unix-Systemen</target>
 <alt-trans dx:origin-shorttext="target" alttranstype="previous-version">
 <target xml:lang="de"></target></alt-trans>

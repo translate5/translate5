@@ -76,6 +76,12 @@ class editor_Models_Converter_SegmentsToXliff {
     const CONFIG_ADD_DISCLAIMER = 'addDisclaimer';
     
     /**
+     * addTerminology             = boolean, add existing terminology as mrk tags
+     * @var string
+     */
+    const CONFIG_ADD_TERMINOLOGY = 'addTerminology';
+    
+    /**
      * @var editor_Models_Task
      */
     protected $task;
@@ -190,6 +196,7 @@ class editor_Models_Converter_SegmentsToXliff {
         $defaultsToFalse = [
                 self::CONFIG_INCLUDE_DIFF, 
                 self::CONFIG_PLAIN_INTERNAL_TAGS, 
+                self::CONFIG_ADD_TERMINOLOGY, 
                 self::CONFIG_ADD_ALTERNATIVES,
         ];
         foreach($defaultsToFalse as $key){
@@ -208,7 +215,7 @@ class editor_Models_Converter_SegmentsToXliff {
             $this->options[$key] = !(array_key_exists($key, $config) && empty($config[$key]));
         }
         
-        if(! $this->options[self::CONFIG_PLAIN_INTERNAL_TAGS]) {
+        if(! $this->options[self::CONFIG_PLAIN_INTERNAL_TAGS] || $this->options[self::CONFIG_ADD_TERMINOLOGY]) {
             $this->initTagHelper();
         }
     }
@@ -562,18 +569,49 @@ class editor_Models_Converter_SegmentsToXliff {
      */
     protected function prepareText($text) {
         if($this->options[self::CONFIG_PLAIN_INTERNAL_TAGS]) {
+            $text = $this->handleTerminology($text, true);
             return $this->exportParser->exportSingleSegmentContent($text);
         }
         
         //if plain internal tags are disabled:
         // 1. toXliff converts the internal tags to xliff g,bx,ex and x tags
-        // 2. remove term tags
-        // 3. remove MQM tags
-        //TODO Terminology and MQM tags are just removed and not supported by our XLIFF exporter so far!
+        // 2. remove MQM tags
+        //TODO MQM tags are just removed and not supported by our XLIFF exporter so far!
         $text = $this->taghelperInternal->toXliffPaired($text, true, $this->tagMap, $this->tagId);
-        $text = $this->taghelperTerm->remove($text);
+        $text = $this->handleTerminology($text, false); //internaltag replacment not needed, since already converted
         $text = $this->taghelperMqm->remove($text);
         return $text;
+    }
+    
+    /**
+     */
+    protected function handleTerminology($text, $protectInternalTags) {
+        if(!$this->options[self::CONFIG_ADD_TERMINOLOGY]){
+            return $this->taghelperTerm->remove($text);
+        }
+        $termStatus = editor_Models_Term::getAllStatus();
+        $transStatus = [
+                editor_Models_Term::TRANSSTAT_FOUND => 'found',
+                editor_Models_Term::TRANSSTAT_NOT_FOUND => 'notfound',
+                editor_Models_Term::TRANSSTAT_NOT_DEFINED => 'undefined',
+        ];
+        return $this->taghelperTerm->replace($text, function($wholeMatch, $tbxId, $classes) use ($termStatus, $transStatus) {
+            $status = '';
+            $translation = '';
+            foreach($classes as $class) {
+                if($class == editor_Models_Term::CSS_TERM_IDENTIFIER) {
+                    continue;
+                }
+                if(in_array($class, $termStatus)) {
+                    $status = $class;
+                    continue;
+                }
+                if(!empty($transStatus[$class])) {
+                    $translation = ' translate5:translated="'.$transStatus[$class].'"';
+                }
+            }
+            return '<mrk mtype="term" translate5:status="'.$status.'"'.$translation.'>';
+        }, '</mrk>', $protectInternalTags);
     }
     
     protected function initTagHelper() {
@@ -581,7 +619,7 @@ class editor_Models_Converter_SegmentsToXliff {
             $this->taghelperInternal = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         }
         if(empty($this->taghelperTerm)) {
-            $this->taghelperTerm = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
+            $this->taghelperTerm = ZfExtended_Factory::get('editor_Models_Segment_TermTag',[$this->taghelperInternal]);
         }
         if(empty($this->taghelperMqm)) {
             $this->taghelperMqm = ZfExtended_Factory::get('editor_Models_Segment_QmSubsegments');
