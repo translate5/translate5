@@ -80,9 +80,6 @@ Ext.define('Editor.controller.Editor', {
           }
       },
       component: {
-          '#metapanel metapanelNavi #watchSegmentBtn' : {
-              click : 'toggleWatchSegment'
-          },
           '#metapanel metapanelNavi button' : {
               click : 'buttonClickDispatcher'
           },
@@ -107,7 +104,7 @@ Ext.define('Editor.controller.Editor', {
       
       //set the default config
       me.keyMapConfig = {
-          'ctrl-d':         ["D",{ctrl: true, alt: false}, me.toggleWatchSegment, true],
+          'ctrl-d':         ["D",{ctrl: true, alt: false}, me.watchSegment, true],
           'ctrl-s':         ["S",{ctrl: true, alt: false}, me.save, true],
           'ctrl-g':         ["G",{ctrl: true, alt: false}, me.scrollToSegment, true],
           'ctrl-enter':     [[10,13],{ctrl: true, alt: false}, me.saveNextByWorkflow],
@@ -896,7 +893,7 @@ Ext.define('Editor.controller.Editor', {
    * Handler for watchSegmentBtn
    * @param {Ext.button.Button} button
    */
-  toggleWatchSegment: function() {
+  watchSegment: function() {
       if(!this.isEditing){
           return;
       }

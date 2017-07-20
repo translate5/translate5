@@ -132,7 +132,7 @@ Ext.define('Editor.controller.Segments', {
           '#clearSortAndFilterBtn': {
               click: 'clearSortAndFilter'
           },
-          '#watchListFilterBtn': {
+          'segmentsToolbar #watchListFilterBtn': {
               click: 'watchListFilter'
           }
       },
