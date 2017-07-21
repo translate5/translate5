@@ -240,7 +240,6 @@ Ext.define('Editor.view.comments.PanelViewController', {
     * @param {Ext.panel.Panel} pan
     */
     loadCommentPanel: function(pan) {
-        debugger;
         var me = this,
             plug = me.getEditPlugin(),
             rec = plug.editing && plug.context.record || me.record,
@@ -352,7 +351,6 @@ Ext.define('Editor.view.comments.PanelViewController', {
     },
 
     handleEditorCommentBtnClick:function(){
-        debugger;
         var me = this,
             commentPanel = me.getCommentPanel(),
             form = me.getCommentForm(),

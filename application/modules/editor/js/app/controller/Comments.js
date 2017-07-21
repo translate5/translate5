@@ -94,9 +94,18 @@ Ext.define('Editor.controller.Comments', {
           }
       }
   },
+  
   cancelEdit: function() {
-      this.getCommentPanel().getController().handleAddComment();
+      var me=this,
+          panel =me.getCommentPanel();
+      
+      if(!panel){
+          return;
+      }
+      
+      panel.getController().handleAddComment();
   },
+  
   getEditPlugin: function() {
       var me = this,
           grid, ed;
