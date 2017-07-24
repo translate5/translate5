@@ -1575,6 +1575,190 @@
     <source>MQM hinzufügen</source>
     <target>add MQM</target>
 </trans-unit>
+
+<trans-unit id='JTEkcyAlMiRzLAoKU2llIGVyaGFsdGVuIGRpZXNlIEVtYWlsLCB3ZWlsIElociBLb250byBhdWYgJTMkcyBuZXUgYW5nZWxlZ3Qgb2RlciBJaHIgUGFzc3dvcnQgenVyw7xja2dlc2V0enQgd3VyZGUuIAoKSWhyIEJlbnV0emVybmFtZToKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCiU2JHMKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgpXZW5uIFNpZSBJaHIgS29udG8ga8O8bmZ0aWcgbnV0emVuIG3DtmNodGVuLCBkYW5uIGZvcmRlcm4gU2llIHVudGVyIGRlciBmb2xnZW5kZW4KQWRyZXNzZSBlaW5lIExpbmsgYW4sIHVtIElociBQYXNzd29ydCBuZXUgc2V0emVuIHp1IGvDtm5uZW4uCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KJTMkcyU0JHMKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgpWaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKSWhyIFByb2pla3RtYW5hZ2VtZW50IFRlYW0KJTUkcwoKRGllc2UgRW1haWwgd3VyZGUgYXV0b21hdGlzY2ggZ2VuZXJpZXJ0LiBCaXR0ZSBhbnR3b3J0ZW4gU2llIG5pY2h0IGF1ZiBkaWVzZSBFLU1haWwu'>
+    <source>%1$s %2$s,
+
+Sie erhalten diese Email, weil Ihr Konto auf %3$s neu angelegt oder Ihr Passwort zurückgesetzt wurde. 
+
+Ihr Benutzername:
+------------------------------
+%6$s
+------------------------------
+
+Wenn Sie Ihr Konto künftig nutzen möchten, dann fordern Sie unter der folgenden
+Adresse eine Link an, um Ihr Passwort neu setzen zu können.
+
+------------------------------
+%3$s%4$s
+------------------------------
+
+Vielen Dank und viele Grüße,
+Ihr Projektmanagement Team
+%5$s
+
+Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail.</source>
+<target>%1$s %2$s,
+
+You have received this email, because your account on %3$s was created or your password was reset. 
+
+Your username:
+------------------------------
+%6$s
+------------------------------
+
+If you want to use your account in the future, then please request a link
+to reset your password from the following address.
+
+------------------------------
+%3$s%4$s
+------------------------------
+
+Many thanks and best regards,
+The Project Management team
+%5$s
+
+This e-mail has been generated automatically. Please do not reply to this e-mail.</target>
+</trans-unit>
+<trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgZnJlaWdlZ2ViZW4='>
+    <source>Translate5 - Aufgabe freigegeben</source>
+    <target>Translate5 - task opened</target>
+</trans-unit>
+
+<trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgYWJnZXNjaGxvc3Nlbg=='>
+    <source>Translate5 - Aufgabe abgeschlossen</source>
+    <target>Translate5 - task finished</target>
+</trans-unit>
+
+<trans-unit id='SW0gUHJvamVrdHBvcnRhbCBUcmFuc2xhdGU1IHd1cmRlIGRpZSBBdWZnYWJlIDxiPiUxJHMgLSAlMiRzPC9iPiBkdXJjaCBhbGxlIEJlbnV0emVyIGRlciBSb2xsZSA8aT4lMyRzPC9pPiBhYmdlc2NobG9zc2VuLjxiciAvPg=='>
+    <source>Im Projektportal Translate5 wurde die Aufgabe <b>%1$s - %2$s</b> durch alle Benutzer der Rolle <i>%3$s</i> abgeschlossen.<br /></source>
+    <target>The task <b>%1$s - %2$s</b> was finished by all users of the role <i>%3$s</i> in the task-portal Translate5.<br /></target>
+</trans-unit>
+
+<trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgYXV0b21hdGlzY2ggYWJnZXNjaGxvc3Nlbg=='>
+    <source>Translate5 - Aufgabe automatisch abgeschlossen</source>
+    <target>Translate5 - task finished automatically</target>
+</trans-unit>
+
+<trans-unit id='SW0gUHJvamVrdHBvcnRhbCBUcmFuc2xhdGU1IHd1cmRlIGRpZSBBdWZnYWJlIDxiPiUxJHMgLSAlMiRzPC9iPiBhdWZncnVuZCBlaW5lciBUZXJtaW7DvGJlcnNjaHJlaXR1bmcgYXV0b21hdGlzY2ggZsO8ciBhbGxlIEJlbnV0emVyIGRlciBSb2xsZSA8aT4lMyRzPC9pPiBhYmdlc2NobG9zc2VuLjxiciAvPg=='>
+    <source>Im Projektportal Translate5 wurde die Aufgabe <b>%1$s - %2$s</b> aufgrund einer Terminüberschreitung automatisch für alle Benutzer der Rolle <i>%3$s</i> abgeschlossen.<br /></source>
+    <target>The task <b>%1$s - %2$s</b> was finished due a missed deadline automatically for all users of the role <i>%3$s</i> in the task-portal Translate5.<br /></target>
+</trans-unit>
+
+<trans-unit id='PGJyIC8+CjxiciAvPgpTaWUgZXJyZWljaGVuIGRhcyBQb3J0YWwgdW50ZXI6IDxhIGhyZWY9IiUxJHMiPiUxJHM8L2E+PGJyIC8+CjxiciAvPgo8YnIgLz5WaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKPGJyIC8+SWhyIFByb2pla3RtYW5hZ2VtZW50IFRlYW0KPGJyIC8+JTIkcwo8YnIgLz4KPGJyIC8+RGllc2UgRW1haWwgd3VyZGUgYXV0b21hdGlzY2ggZ2VuZXJpZXJ0LiBCaXR0ZSBhbnR3b3J0ZW4gU2llIG5pY2h0IGF1ZiBkaWVzZSBFLU1haWwh'>
+    <source><br />
+<br />
+Sie erreichen das Portal unter: <a href="%1$s">%1$s</a><br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%2$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source>
+<target><br />
+<br />
+You can access the portal at: <a href="%1$s">%1$s</a><br />
+<br />
+<br />Many thanks and best regards,
+<br />The Project Management team
+<br />%2$s
+<br />
+<br />This e-mail has been generated automatically. Please do not reply to this e-mail.</target>
+</trans-unit>
+
+    <trans-unit id='U2VociBnZWVocnRlciBIZXJy'>
+        <source>Sehr geehrter Herr</source>
+        <target>Dear Mr.</target>
+    </trans-unit>
+
+<trans-unit id='JTEkcyAlMiRzLDxiciAvPgo8YnIgLz4KJTMkczxiciAvPgolNCRzPGJyIC8+CkltIGZvbGdlbmRlbiBkaWUgZ2V0w6R0aWd0ZW4gw4RuZGVydW5nZW4gZGVyIHp1dm9yIGFrdGl2ZW4gQmVudXR6ZXIgZGVyIFJvbGxlIDxiPiU1JHM8L2I+OjxiciAvPgolNiRzCjxociAvPgolNyRz'>
+    <source>%1$s %2$s,<br />
+<br />
+%3$s<br />
+%4$s<br />
+Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <b>%5$s</b>:<br />
+%6$s
+<hr />
+%7$s</source>
+<target>%1$s %2$s,<br />
+<br />
+%3$s<br />
+%4$s<br />
+The changes made by the formerly active user of the role <b>%5$s</b> are listed below:<br />
+%6$s
+<hr />
+%7$s</target>
+</trans-unit>
+
+<trans-unit id='JXMgLSBiZWFyYmVpdGV0'>
+    <source>%s - bearbeitet</source>
+    <target>%s - edited</target>
+</trans-unit>
+<trans-unit id='QXV0b1N0YXR1cw=='>
+    <source>AutoStatus</source>
+    <target>AutoStatus</target>
+</trans-unit>
+<trans-unit id='JTEkcyAlMiRzLAoKSW0gUHJvamVrdHBvcnRhbCBUcmFuc2xhdGU1IHd1cmRlIGRpZSBBdWZnYWJlICU1JHMgLSAlNiRzIGbDvHIgU2llIGZyZWlnZWdlYmVuLgoKU2llIGVycmVpY2hlbiBkYXMgUG9ydGFsIHVudGVyOiAlMyRzCgpWaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKSWhyIFByb2pla3RtYW5hZ2VtZW50IFRlYW0KJTckcwoKRGllc2UgRW1haWwgd3VyZGUgYXV0b21hdGlzY2ggZ2VuZXJpZXJ0LiBCaXR0ZSBhbnR3b3J0ZW4gU2llIG5pY2h0IGF1ZiBkaWVzZSBFLU1haWwh'>
+    <source>%1$s %2$s,
+
+Im Projektportal Translate5 wurde die Aufgabe %5$s - %6$s für Sie freigegeben.
+
+Sie erreichen das Portal unter: %3$s
+
+Vielen Dank und viele Grüße,
+Ihr Projektmanagement Team
+%7$s
+
+Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source>
+<target>%1$s %2$s,
+
+The task %5$s - %6$s was opened for you in the task-portal Translate5.
+
+You can access the portal at: %3$s
+
+Many thanks and best regards,
+The Project Management team
+%7$s
+
+This e-mail has been generated automatically. Please do not reply to this e-mail.</target>
+</trans-unit>
+
+<trans-unit id='JTEkcyAlMiRzLDxiciAvPgo8YnIgLz4KSW0gUHJvamVrdHBvcnRhbCBUcmFuc2xhdGU1IHd1cmRlIGRpZSBBdWZnYWJlIDxiPiU1JHMgLSAlNiRzPC9iPiBmw7xyIFNpZSBmcmVpZ2VnZWJlbi48YnIgLz4KPGJyIC8+CkltIGZvbGdlbmRlbiBkaWUgZ2V0w6R0aWd0ZW4gw4RuZGVydW5nZW4gZGVyIHZvcmhlcmdlaGVuZGVuIExla3RvcmVuOjxiciAvPgolNCRzCjxociAvPgo8YnIgLz4KPGJyIC8+ClNpZSBlcnJlaWNoZW4gZGFzIFBvcnRhbCB1bnRlcjogJTMkczxiciAvPgo8YnIgLz4KPGJyIC8+VmllbGVuIERhbmsgdW5kIHZpZWxlIEdyw7zDn2UsCjxiciAvPklociBQcm9qZWt0bWFuYWdlbWVudCBUZWFtCjxiciAvPiU3JHMKPGJyIC8+CjxiciAvPkRpZXNlIEVtYWlsIHd1cmRlIGF1dG9tYXRpc2NoIGdlbmVyaWVydC4gQml0dGUgYW50d29ydGVuIFNpZSBuaWNodCBhdWYgZGllc2UgRS1NYWlsIQ=='>
+    <source>%1$s %2$s,<br />
+<br />
+Im Projektportal Translate5 wurde die Aufgabe <b>%5$s - %6$s</b> für Sie freigegeben.<br />
+<br />
+Im folgenden die getätigten Änderungen der vorhergehenden Lektoren:<br />
+%4$s
+<hr />
+<br />
+<br />
+Sie erreichen das Portal unter: %3$s<br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%7$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source>
+<target>%1$s %2$s,<br />
+<br />
+The task <b>%5$s - %6$s</b> was opened for You in the task-portal Translate5.<br />
+
+<br />
+The changes made by the preceeding proofreaders are listed below:<br />
+%4$s
+<hr />
+<br />
+<br />
+You can access the portal at: %3$s<br />
+<br />
+<br />Many thanks and best regards,
+<br />The Project Management team
+<br />%7$s
+<br />
+<br />This e-mail has been generated automatically. Please do not reply to this e-mail.</target>
+</trans-unit>
+
     </body>
   </file>
 </xliff>
