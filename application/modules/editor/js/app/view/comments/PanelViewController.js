@@ -235,6 +235,8 @@ Ext.define('Editor.view.comments.PanelViewController', {
         }
     },
 
+    //FIXME move those functions in the Commentcontroller
+    //use this function when expand and collaps is needed, insteed of expand() or collapse() the panel
     /**
     * handles expand of comment panel, reloads store if needed
     * @param {Ext.panel.Panel} pan
@@ -276,6 +278,7 @@ Ext.define('Editor.view.comments.PanelViewController', {
             id = rec.get('id');
         
         me.clearComments();
+        
         if(me.getCommentPanel().collapsed) {
             return; //collapsed no data load needed
         }
@@ -349,7 +352,7 @@ Ext.define('Editor.view.comments.PanelViewController', {
             }
         });
     },
-
+    
     handleEditorCommentBtnClick:function(){
         var me = this,
             commentPanel = me.getCommentPanel(),
@@ -392,13 +395,13 @@ Ext.define('Editor.view.comments.PanelViewController', {
     getSegmentsStore:function(){
         return Ext.getStore('Segments');
     },
-
+    //FIXME get the refs
     getCommentForm:function(){
-        return Ext.ComponentQuery.query('#commentForm')[0];
+        return this.getView().down('form');
     },
 
     getCommentPanel:function(){
-        return Ext.ComponentQuery.query('#commentPanel')[0];
+        return this.getView();
     },
 
     getCommentDisplay:function(){

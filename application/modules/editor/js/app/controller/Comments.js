@@ -190,9 +190,10 @@ Ext.define('Editor.controller.Comments', {
    * @param {Editor.view.segments.RowEditor} editor 
    */
   onEditorMoved: function(toEdit, editor) {
-      var me = this;
-      if(editor.columnClicked == 'comments') {
-          me.getCommentPanel().handleExpand();
+      var me = this,
+          commentPanel = me.getCommentPanel();
+      if(editor.columnClicked == 'comments' && commentPanel) {
+          commentPanel.handleExpand();
           //example to solve the expand problem:
           //make a new method open in the commentPanel
           //this open method just triggers an event "openrequest"

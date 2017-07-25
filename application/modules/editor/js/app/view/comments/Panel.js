@@ -67,7 +67,13 @@ Ext.define('Editor.view.comments.Panel', {
      * @param {Function} callback
      */
     showDeleteConfirm: function(callback) {
-        Ext.Msg.confirm(this.delete_confirm_title, this.delete_confirm_msg, callback);
+        var confirmWin = Ext.create('Ext.window.MessageBox');
+        confirmWin.confirm(this.delete_confirm_title, this.delete_confirm_msg, callback);
+        
+        //we use defere so the messagebox info is always of top
+        Ext.defer(function () {
+            confirmWin.toFront();
+        }, 50);
     },
     //in original Method beforeclose is not captured on escaping with ESC
     onEsc: function(k, e) {
@@ -165,6 +171,7 @@ Ext.define('Editor.view.comments.Panel', {
         var me=this;
 
         if(me.isCollapsable && me.collapsed){
+            //FIXME everything with the expangin inside the comments controoler
             me.expand();
         }
     }
