@@ -138,10 +138,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      * registers handlers for nodes with meta data
      */
     protected function registerMeta() {
-        $this->xmlparser->registerElement('count', function($tag, $attributes, $key){
-            if($this->xmlparser->hasParent('transunit')){
-                $this->addupSegmentWordCount($attributes);
-            }
+        $this->xmlparser->registerElement('trans-unit count', function($tag, $attributes, $key){
+            $this->addupSegmentWordCount($attributes);
         });
     }
     
@@ -162,9 +160,9 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             ];
         };
         
-        $this->xmlparser->registerElement('source', null, $source);
-        $this->xmlparser->registerElement('seg-source', null, $source);
-        $this->xmlparser->registerElement('target', null, function($tag, $key, $opener){
+        $this->xmlparser->registerElement('trans-unit > source', null, $source);
+        $this->xmlparser->registerElement('trans-unit > seg-source', null, $source);
+        $this->xmlparser->registerElement('trans-unit > target', null, function($tag, $key, $opener){
             $this->currentTarget = [
                     'tag' => $tag,
                     'opener' => $opener['openerKey'],

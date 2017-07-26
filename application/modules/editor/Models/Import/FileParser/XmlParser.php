@@ -38,7 +38,7 @@ END LICENSE AND COPYRIGHT
  * XML Fileparser
  */
 class editor_Models_Import_FileParser_XmlParser {
-    const DEFAULT_HANDLER = '';
+    const DEFAULT_HANDLER = '*';
     
     /**
      * contains all xml chunks (xml string split in text and nodes)
@@ -175,15 +175,26 @@ class editor_Models_Import_FileParser_XmlParser {
      * @param string $tag tagname which should be handled, or empty string to handle all other non registered tags
      * @param callable $opener Parameters: string $tag, array $attributes, integer $key, boolean $isSingle
      * @param callable $closer Parameters: string $tag, integer $key, array $opener where opener is an assoc array: ['openerKey' => $key,'tag' => $tag,'attributes' => $attributes]
+     * @return [int] a list of the indizes of the added handlers 
      */
     public function registerElement($tag, callable $opener = null, callable $closer = null) {
-        $tag = $this->normalizeTag($tag);
+        $tag = $this->parseSelector($tag, $filter);
+        if($tag === false) {
+            //see parseSelector for possible selectors!
+            throw new ZfExtended_Exception('The given XLF tag selector could not be parsed: '.$tag);
+        }
+        $result = [];
         if(!empty($opener)) {
-            $this->handlerElementOpener[$tag] = $opener;
+            settype($this->handlerElementOpener[$tag], 'array');
+            $result['opener'] = count($this->handlerElementOpener[$tag]);
+            $this->handlerElementOpener[$tag][] = ['callback' => $opener, 'filter' => $filter];
         }
         if(!empty($closer)) {
-            $this->handlerElementCloser[$tag] = $closer;
+            settype($this->handlerElementCloser[$tag], 'array');
+            $result['closer'] = count($this->handlerElementCloser[$tag]);
+            $this->handlerElementCloser[$tag][] = ['callback' => $closer, 'filter' => $filter];
         }
+        return $result;
     }
     
     /**
@@ -195,19 +206,133 @@ class editor_Models_Import_FileParser_XmlParser {
     }
     
     /**
-     * returns true if the given tag is a parent of the current
-     * @param string $tag
-     * @return boolean
+     * parses the CSS like selector 
+     * currently supported: 
+     *    element                   a simple type selector
+     *    elementA elementB         the descendant selector
+     *    elementA > elementB       the direct descendant selector
+     *    elementA[attr]            attribute existence selector
+     *    elementA[attr=value]      attribute equals selector
+     *    → all other selectors (especially about attributes must be developed as they are needed!
+     
+     * returns the last matched tag as string, needed for our streamed based parsing
+     * 
+     * @param string $tagSelector
+     * @param Closure $filter
+     * @return string
      */
-    public function hasParent($tag) {
-        //FIXME implement me look up in $this->xmlChunks
-        return true;
+    protected function parseSelector($tagSelector, &$filter) {
+        $filter = [];
+        $tagSelector = trim($tagSelector);
+        if($tagSelector === self::DEFAULT_HANDLER) {
+            return $tagSelector;
+        }
+        
+        //regex to get the single selector parts
+        $regex = '/(([-\w_:.]+)(\[[^\]]+])?)([>\s]+)?/';
+        
+        $res = preg_match_all($regex, $tagSelector, $selectorParts, PREG_SET_ORDER );
+        //0 matches or false, both is wrong here
+        if(!$res) {
+            return false;
+        }
+        
+        $selector = end($selectorParts);
+        
+        if(!empty($selector[4])){
+            //after the last tag in the selector, there may not be any operator
+            throw new ZfExtended_Exception('after the last tag there may not be any operator, given selector: '.$tagSelector);
+        }
+        
+        $filter = $selectorParts; //return the selectorparts as referenced variable
+        return $this->normalizeTag($selector[2]);
     }
     
+    /**
+     * normalizes a given tag
+     * @return string
+     */
     protected function normalizeTag($tag) {
         return strtolower($tag);
     }
     
+    /**
+     * checks if the given selector parts are matched by the current XML Stack (including the current Node)
+     * @param array $selectorParts
+     * @return boolean
+     */
+    protected function doesSelectorMatch(array $selectorParts) {
+        if(empty($selectorParts)){
+            return true;
+        }
+        $selector = $this->popSelector($selectorParts);
+        //the operator of the last tag must always be the direct operator since it must match
+        $selector['operator'] = '>';
+        
+        $stackIndex = count($this->xmlStack);
+        while($stackIndex && !empty($selector)) {
+            $node = $this->xmlStack[--$stackIndex];
+            $match = $node['tag'] == $selector['tag'] 
+                && $this->doesAttributesFilterMatch($node['attributes'], $selector['attrFilter']);
+            
+            if($match) {
+                $selector = $this->popSelector($selectorParts);
+                if(empty($selector)) {
+                    //no more selectors, the previous matched, that means return true
+                    return true;
+                }
+                continue; //proceed with next selector and next node in the XML stack
+            }
+            //if it was no match but the direct descendant operator was set this means false
+            // if the direct descendant operator was not set, we can bubble up in the XML Stack
+            if($selector['operator'] == '>') {
+                return false;
+            }
+            //bubble up in the XML Stack, keep the selector
+        }
+        //if we bubbled up without a match, we return false 
+        return false;
+    }
+    
+    /**
+     * converts the result of the preg match to a usable structure 
+     * @param array $selector
+     * @return string[]|null
+     */
+    protected function popSelector(array &$selectorParts) {
+        $selector = array_pop($selectorParts);
+        if(!$selector) {
+            return $selector;
+        }
+        $selector = [
+            'tag' => $this->normalizeTag($selector[2]),
+            'attrFilter' => empty($selector[3]) ? '' : $selector[3],
+            'operator' => empty($selector[4]) ? '' : trim($selector[4]),
+        ];
+        return $selector;
+    }
+    
+    /**
+     * FIXME currently this filter is not implemented and returns always true
+     * checks if the given attribute filter matches the given attributes
+     * @param array $attributes
+     * @param string $filter
+     * @return boolean
+     */
+    protected function doesAttributesFilterMatch(array $attributes, $filter) {
+        //FIXME 
+        //implement tag[attr] attribute existence
+        //implement tag[attr=foo] attribute value equals
+        return true;
+    }
+    
+    /**
+     * Handles a start tag (single tags are a start and an end tag at once)
+     * @param integer $key the tag offset in the node list
+     * @param string $tag the found tag
+     * @param array $attributes the tag attributes
+     * @param boolean $isSingle is true if it is a single tag
+     */
     protected function handleElementStart($key, $tag, $attributes, $isSingle) {
         $tag = $handleTag = $this->normalizeTag($tag);
         $this->log("START#".$tag.'#');
@@ -224,10 +349,20 @@ class editor_Models_Import_FileParser_XmlParser {
             $handleTag = self::DEFAULT_HANDLER;
         }
         
-        call_user_func($this->handlerElementOpener[$handleTag], $tag, $attributes, $key, $isSingle);
+        foreach($this->handlerElementOpener[$handleTag] as $handler) {
+            if($this->doesSelectorMatch($handler['filter'])){
+                call_user_func($handler['callback'], $tag, $attributes, $key, $isSingle);
+            }
+        }
         $this->log("ATTR#".print_r($attributes,1).'#');
     }
     
+    /**
+     * Handles a end tag
+     * @param integer $key the tag offset in the node list
+     * @param string $tag the found tag
+     * @throws ZfExtended_Exception
+     */
     protected function handleElementEnd($key, $tag) {
         $opener = end($this->xmlStack);
         $tag = $handleTag = $this->normalizeTag($tag);
@@ -245,7 +380,11 @@ class editor_Models_Import_FileParser_XmlParser {
             }
             $handleTag = self::DEFAULT_HANDLER;
         }
-        call_user_func($this->handlerElementCloser[$handleTag], $tag, $key, $opener);
+        foreach($this->handlerElementCloser[$handleTag] as $handler) {
+            if($this->doesSelectorMatch($handler['filter'])){
+                call_user_func($handler['callback'], $tag, $key, $opener);
+            }
+        }
         array_pop($this->xmlStack);
     }
     

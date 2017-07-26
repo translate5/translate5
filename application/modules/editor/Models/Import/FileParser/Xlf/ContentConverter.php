@@ -99,7 +99,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $this->xmlparser->registerElement('x', null, [$this, 'handleXTag']);
         $this->xmlparser->registerElement('g', [$this, 'handleGTagOpener'], [$this, 'handleGTagCloser']);
         
-        $this->xmlparser->registerElement('', [$this, 'handleUnknown']); // → all other tags
+        $this->xmlparser->registerElement('*', [$this, 'handleUnknown']); // → all other tags
         $this->xmlparser->registerOther([$this, 'handleText']);
     }
     
