@@ -89,45 +89,53 @@
           <count count-type="word count" unit="word">7</count>
         </count-group>
       </trans-unit>
-      <OFF-trans-unit id="13" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="FUZZY" tmgr:matchratio="80">
+      <trans-unit id="13" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="FUZZY" tmgr:matchratio="80">
         <source>Test an existing translation. With MRK tags.</source>
         <seg-source><mrk type="seg" mid="0">Test an existing translation. </mrk><mrk type="seg" mid="1">With MRK tags.</mrk></seg-source>
         <target state="translated"><mrk type="seg" mid="0">Teste eine vorhandene Übersetzung. </mrk><mrk type="seg" mid="1">Mit MRK Tags.</mrk></target>
         <count-group name="word count">
           <count count-type="word count" unit="word">7</count>
         </count-group>
-      </OFF-trans-unit>
-      <OFF-trans-unit id="14" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="FUZZY" tmgr:matchratio="80">
+      </trans-unit>
+      <trans-unit id="14" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="FUZZY" tmgr:matchratio="80">
         <source>Test an existing translation. With MRK tags and wrong segmentation.</source>
         <seg-source><mrk type="seg" mid="0">Test an existing translation. </mrk><mrk type="seg" mid="1">With MRK tags and wrong segmentation.</mrk></seg-source>
         <target state="translated"><mrk type="seg" mid="0">Teste eine vorhandene Übersetzung. Mit MRK Tags und fehlerhafter Segmentierung.</mrk></target>
         <count-group name="word count">
           <count count-type="word count" unit="word">10</count>
         </count-group>
-      </OFF-trans-unit>
-      <OFF-trans-unit id="15" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="FUZZY" tmgr:matchratio="80">
+      </trans-unit>
+      <trans-unit id="15" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="FUZZY" tmgr:matchratio="80">
         <source>Test an existing translation. With MRK tags and wrong segmentation.</source>
         <seg-source><mrk type="seg" mid="0">Test an existing translation. </mrk><mrk type="seg" mid="1">With MRK tags and wrong segmentation.</mrk></seg-source>
         <target state="translated"><mrk type="seg" mid="0">Teste eine vorhandene Übersetzung. </mrk><mrk type="seg" mid="1">Mit MRK Tags und </mrk><mrk type="seg" mid="2">fehlerhafter Segmentierung.</mrk></target>
         <count-group name="word count">
           <count count-type="word count" unit="word">10</count>
         </count-group>
-      </OFF-trans-unit>
-      <OFF-trans-unit id="16" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
-        <source>Test an empty translation. With MRK tags. We assume, that the target is always missing in the case of a translation. The case "empty target" without MRK tags must be implemented then when needed.</source>
-        <seg-source><mrk type="seg" mid="0">Test an empty translation. </mrk><mrk type="seg" mid="1">With MRK tags.</mrk><mrk type="seg" mid="2">We assume, that the target is always missing in the case of a translation. The case "empty target" without MRK tags must be implemented then when needed.</mrk></seg-source>
+      </trans-unit>
+      <trans-unit id="16" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
+        <source>Test an empty translation. With MRK tags. And missing target.</source>
+        <seg-source><mrk type="seg" mid="0">Test an empty translation. </mrk><mrk type="seg" mid="1">With MRK tags. </mrk><mrk type="seg" mid="2">And missing target.</mrk></seg-source>
         <count-group name="word count">
           <count count-type="word count" unit="word">34</count>
         </count-group>
-      </OFF-trans-unit>
-      <trans-unit id="17" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="FUZZY" tmgr:matchratio="80">
+      </trans-unit>
+      <trans-unit id="17" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
+        <source>Test an empty translation. With MRK tags. And empty target.</source>
+        <seg-source><mrk type="seg" mid="0">Test an empty translation. </mrk><mrk type="seg" mid="1">With MRK tags. </mrk><mrk type="seg" mid="2">And empty target.</mrk></seg-source>
+        <target></target>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">34</count>
+        </count-group>
+      </trans-unit>
+      <trans-unit id="18" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="FUZZY" tmgr:matchratio="80">
         <source><ph>This segment must NOT be imported, since it contains a tag only and is translated! Even if the attribute translate is set to yes.</ph></source>
         <target><ph>Dieses Segment darf NICHT importiert werden, da es nur tags beinhaltet und übersetzt ist! Auch wenn das Attribut translate auf yes gesetzt ist.</ph></target>
         <count-group name="word count">
           <count count-type="word count" unit="word">0</count>
         </count-group>
       </trans-unit>
-      <trans-unit id="18" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
+      <trans-unit id="19" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
         <source><ph>This segment must be imported so that it will be added to the target and the autostates are set accordingly, regardless that it contains tags only.</ph></source>
         <count-group name="word count">
           <count count-type="word count" unit="word">0</count>

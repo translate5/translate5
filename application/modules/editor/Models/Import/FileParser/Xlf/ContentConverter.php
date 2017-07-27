@@ -178,20 +178,12 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * @return array
      */
     public function convert(array $chunks) {
-        $this->segments = [];
         $this->result = [];
         $this->shortTagIdent = 1;
         $this->shortTagNumbers = [];
         $this->xmlparser->parseList($chunks);
         
-        //if there are no mrk type="seg" we have to move the bare result into the returned segments array   
-        if(empty($this->segments) && !empty($this->result)) {
-            $this->segments[] = $this->xmlparser->join($this->result);
-        }
-        
-        //TODO use mrk seg mid as $this->segments index! 
-        
-        return $this->segments;
+        return $this->xmlparser->join($this->result);
     }
     
     /**

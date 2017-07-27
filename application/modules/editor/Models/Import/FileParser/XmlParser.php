@@ -188,29 +188,24 @@ class editor_Models_Import_FileParser_XmlParser {
     /**
      * registers handlers to the given tag type
      * The handlers can be null, if only one of both is needed
-     * @param string $tag tagname which should be handled, or empty string to handle all other non registered tags
+     * @param string $selector tag selector which should be handled, or empty string to handle all other non registered tags
      * @param callable $opener Parameters: string $tag, array $attributes, integer $key, boolean $isSingle
      * @param callable $closer Parameters: string $tag, integer $key, array $opener where opener is an assoc array: ['openerKey' => $key,'tag' => $tag,'attributes' => $attributes]
-     * @return [int] a list of the indizes of the added handlers 
      */
-    protected function registerSingleElement($tag, callable $opener = null, callable $closer = null) {
-        $tag = $this->parseSelector($tag, $filter);
+    protected function registerSingleElement($selector, callable $opener = null, callable $closer = null) {
+        $tag = $this->parseSelector($selector, $filter);
         if($tag === false) {
             //see parseSelector for possible selectors!
-            throw new ZfExtended_Exception('The given XLF tag selector could not be parsed: '.$tag);
+            throw new ZfExtended_Exception('The given XLF tag selector could not be parsed: '.$selector);
         }
-        $result = [];
         if(!empty($opener)) {
             settype($this->handlerElementOpener[$tag], 'array');
-            $result['opener'] = count($this->handlerElementOpener[$tag]);
-            $this->handlerElementOpener[$tag][] = ['callback' => $opener, 'filter' => $filter];
+            $this->handlerElementOpener[$tag][$selector] = ['callback' => $opener, 'filter' => $filter];
         }
         if(!empty($closer)) {
             settype($this->handlerElementCloser[$tag], 'array');
-            $result['closer'] = count($this->handlerElementCloser[$tag]);
-            $this->handlerElementCloser[$tag][] = ['callback' => $closer, 'filter' => $filter];
+            $this->handlerElementCloser[$tag][$selector] = ['callback' => $closer, 'filter' => $filter];
         }
-        return $result;
     }
     
     
