@@ -67,6 +67,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      */
     protected $task;
     
+    protected $shortTagNumbers = [];
+    
     /**
      * @param array $namespaces
      * @param editor_Models_Task $task for debugging reasons only
@@ -87,16 +89,17 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         //since phs may contain only <sub> elements we have to handle text only inside a ph
         // that implies that the handling of <sub> elements is done in the main Xlf Parser and in the ph we get just a placeholder
         // see class description of parent Xlf Parser
-        $this->xmlparser->registerElement('ph', function($tag, $attributes){
+        $this->xmlparser->registerElement('ph,it,bpt,ept', function($tag, $attributes){
             $this->innerTag = [];
-            $this->xmlparser->registerOther([$this, 'handlePhTagText']);
+            $this->xmlparser->registerOther([$this, 'handleContentTagText']);
         }, function($tag, $key, $opener) {
             $this->xmlparser->registerOther([$this, 'handleText']);
             $originalContent = $this->xmlparser->getRange($opener['openerKey'], $key, true);
-            $this->result[] = $this->createSingleTag($tag, $this->xmlparser->join($this->innerTag), $originalContent);
+            $rid = $this->xmlparser->getAttribute($opener['attributes'], 'rid');
+            $this->result[] = $this->createTag($rid, $tag, $originalContent, $this->xmlparser->join($this->innerTag));
         });
         
-        $this->xmlparser->registerElement('x', null, [$this, 'handleXTag']);
+        $this->xmlparser->registerElement('x,bx,ex', null, [$this, 'handleReplacerTag']);
         $this->xmlparser->registerElement('g', [$this, 'handleGTagOpener'], [$this, 'handleGTagCloser']);
         
         $this->xmlparser->registerElement('*', [$this, 'handleUnknown']); // → all other tags
@@ -105,16 +108,66 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     
     /**
      * creates an internal tag out of the given data
-     * @param unknown $text
+     * @param string $rid ID to identify tag pairs (for tagNr calculation)
+     * @param string $type valid types are: single, open, close
+     * @param string $tag
+     * @param string $originalContent this is value which is restored on export
+     * @param string $text optional, this is the tag value which should be shown in the frontend
      * @return string
      */
-    protected function createSingleTag($tag, $text, $originalContent) {
+    protected function createTag($rid, $tag, $originalContent, $text = null) {
+        switch ($tag) {
+            case 'x':
+            case 'ph':
+            case 'it':
+                $type = '_singleTag';
+                $rid = 0;
+                break;
+            case 'bpt':
+            case 'bx':
+                //hier ist die tagNr abhängig davon ob es schon einen Eintrag mit der RID gibt, 
+                // wenn ja nimm den wert von dort
+                // wenn nein increase und setze den Wert unter der RID
+                // Beim g tag ist die RID = 'g-'.$openerKey;
+            case 'g':
+                $type = '_leftTag';
+                break;
+            case 'g-close':
+                $tag = 'g'; //g-close tag is just a hack to distinguish between open and close
+            case 'ept':
+            case 'ex':
+                $type = '_rightTag';
+                break;
+            default:
+                return '<b>Programming Error! invalid tag type used!</b>';
+        }
+        if(empty($text)) {
+            $text = htmlentities($originalContent);
+        }
         $imgText = html_entity_decode($text, ENT_QUOTES, 'utf-8');
         $fileNameHash = md5($imgText);
         //generate the html tag for the editor
-        $p = $this->getTagParams($originalContent, $this->shortTagIdent++, $tag, $fileNameHash, $text);
-        $this->_singleTag->createAndSaveIfNotExists($imgText, $fileNameHash);
-        return $this->_singleTag->getHtmlTag($p);
+        $tagNr = $this->getShortTagNumber($rid);
+        $p = $this->getTagParams($originalContent, $tagNr, $tag, $fileNameHash, $text);
+        $this->{$type}->createAndSaveIfNotExists($imgText, $fileNameHash);
+        return $this->{$type}->getHtmlTag($p);
+    }
+    
+    /**
+     * returns the short tag number to the given rid or creates one
+     * @param string $rid
+     * @return number
+     */
+    protected function getShortTagNumber($rid) {
+        //single tags have an empty rid and must always get a new tagNr
+        if(empty($rid)) {
+            return $this->shortTagIdent++;
+        }
+        //pairedTags have a rid, we have to look it up or to create it
+        if(empty($this->shortTagNumbers[$rid])) {
+            $this->shortTagNumbers[$rid] = $this->shortTagIdent++;
+        }
+        return $this->shortTagNumbers[$rid];
     }
     
     /**
@@ -128,6 +181,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $this->segments = [];
         $this->result = [];
         $this->shortTagIdent = 1;
+        $this->shortTagNumbers = [];
         $this->xmlparser->parseList($chunks);
         
         //if there are no mrk type="seg" we have to move the bare result into the returned segments array   
@@ -155,7 +209,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * Inner PH tag text handler
      * @param string $text
      */
-    public function handlePhTagText($text) {
+    public function handleContentTagText($text) {
         $this->innerTag[] = $text;
     }
     
@@ -165,28 +219,33 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * @param integer $key
      * @param array $opener
      */
-    public function handleXTag($tag, $key, $opener) {
-        $single = $this->namespaces->getSingleTag($this->xmlparser->getChunk($key));
+    public function handleReplacerTag($tag, $key, $opener) {
+        $chunk = $this->xmlparser->getChunk($key);
+        $single = $this->namespaces->getSingleTag($chunk);
         if(!empty($single)) {
             $this->result[] = $single;
+            return;
         }
-        //FIXME if there is no tagMap result we have to convert the tag to an internal tag
-        //doing stuff like: $this->_singleTag->create($text);
+        //returns false if no rid found (default for x tags)
+        $rid = $this->xmlparser->getAttribute($opener['attributes'], 'rid');
+        $this->result[] = $this->createTag($rid, $tag, $chunk);
     }
     
     /**
      * Handler for G tags
      * @param string $tag
+     * @param array $attributes
      * @param integer $key
-     * @param array $opener
      */
     public function handleGTagOpener($tag, $attributes, $key) {
-        $result = $this->namespaces->getPairedTag($this->xmlparser->getChunk($key), null);
+        $chunk = $this->xmlparser->getChunk($key);
+        $result = $this->namespaces->getPairedTag($chunk, null);
         if(!empty($result)) {
             $this->result[] = $result[0];
+            return;
         }
-        //FIXME if there is no tagMap result we have to convert the tag to an internal tag
-        //doing stuff like: $this->_singleTag->create($text);
+        //for gTags we have to fake the RID for tag matching
+        $this->result[] = $this->createTag('g-'.$key, $tag, $chunk);
     }
     
     /**
@@ -196,14 +255,16 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * @param array $opener
      */
     public function handleGTagCloser($tag, $key, $opener) {
-        $opener = $this->xmlparser->getChunk($opener['openerKey']);
+        $openerKey = $opener['openerKey'];
+        $opener = $this->xmlparser->getChunk($openerKey);
         $closer = $this->xmlparser->getChunk($key);
         $result = $this->namespaces->getPairedTag($opener, $closer);
         if(!empty($result)) {
             $this->result[] = $result[1];
+            return;
         }
-        //FIXME if there is no tagMap result we have to convert the tag to an internal tag
-        //doing stuff like: $this->_singleTag->create($text);
+        //to the $rid see handleGTagOpener
+        $this->result[] = $this->createTag('g-'.$openerKey, $tag.'-close', $closer);
     }
     
     /**
@@ -211,10 +272,14 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * @param string $tag
      */
     public function handleUnknown($tag) {
-        //below tags are given to the content converter, but they are known so far, just not handled by the converter
+        //below tags are given to the content converter, 
+        // they are known so far, just not handled by the converter
+        // or they are not intended to be handled since the main action happens in the closer handler not in the opener handler
         switch ($tag) {
-            case 'x': //must also be added here, since handleUnknown is called for the x start tag call (we have only registered a closer) 
-            case 'g': //must also be added here, since handleUnknown is called for the x start tag call (we have only registered a closer) 
+            case 'x':  
+            case 'g': 
+            case 'bx':
+            case 'ex':
             case 'source':
             case 'target':
             case 'seg-source':

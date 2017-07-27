@@ -172,12 +172,28 @@ class editor_Models_Import_FileParser_XmlParser {
     /**
      * registers handlers to the given tag type
      * The handlers can be null, if only one of both is needed
-     * @param string $tag tagname which should be handled, or empty string to handle all other non registered tags
+     * @param string $tag CSS selector like tag definition, see $this->parseSelector
      * @param callable $opener Parameters: string $tag, array $attributes, integer $key, boolean $isSingle
      * @param callable $closer Parameters: string $tag, integer $key, array $opener where opener is an assoc array: ['openerKey' => $key,'tag' => $tag,'attributes' => $attributes]
      * @return [int] a list of the indizes of the added handlers 
      */
     public function registerElement($tag, callable $opener = null, callable $closer = null) {
+        //splits the tag selector into multiple handlers if a , is given
+        $tags = preg_split('/,(?=[^\]])/', $tag);
+        foreach($tags as $tag) {
+            $this->registerSingleElement($tag, $opener, $closer);
+        }
+    }
+    
+    /**
+     * registers handlers to the given tag type
+     * The handlers can be null, if only one of both is needed
+     * @param string $tag tagname which should be handled, or empty string to handle all other non registered tags
+     * @param callable $opener Parameters: string $tag, array $attributes, integer $key, boolean $isSingle
+     * @param callable $closer Parameters: string $tag, integer $key, array $opener where opener is an assoc array: ['openerKey' => $key,'tag' => $tag,'attributes' => $attributes]
+     * @return [int] a list of the indizes of the added handlers 
+     */
+    protected function registerSingleElement($tag, callable $opener = null, callable $closer = null) {
         $tag = $this->parseSelector($tag, $filter);
         if($tag === false) {
             //see parseSelector for possible selectors!
@@ -197,6 +213,7 @@ class editor_Models_Import_FileParser_XmlParser {
         return $result;
     }
     
+    
     /**
      * Warning: parentTag works only of a handler is registered for parentTag
      * @param callable $handler Parameters: $other, $key
@@ -213,7 +230,8 @@ class editor_Models_Import_FileParser_XmlParser {
      *    elementA > elementB       the direct descendant selector
      *    elementA[attr]            attribute existence selector
      *    elementA[attr=value]      attribute equals selector
-     *    → all other selectors (especially about attributes must be developed as they are needed!
+     *    elementA, elementB        splits up the selector at , and uses each expression as one selector
+     *    → all other selectors (especially about attributes must be developed as they are needed!)
      
      * returns the last matched tag as string, needed for our streamed based parsing
      * 
@@ -397,6 +415,20 @@ class editor_Models_Import_FileParser_XmlParser {
     
     protected function log($msg) {
         //error_log($msg);
+    }
+    
+    /**
+     * convenience method to get one attribute of the attributes array, returns the given default if not existent
+     * @param array $attributes
+     * @param string $attribute
+     * @param string $default
+     * @return mixed
+     */
+    public function getAttribute($attributes, $attribute, $default = false) {
+        if(array_key_exists($attribute, $attributes)) {
+            return $attributes[$attribute];
+        }
+        return $default;
     }
     
     /**
