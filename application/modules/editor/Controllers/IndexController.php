@@ -526,6 +526,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
                 'jpg' => 'image/jpeg',
                 'png' => 'image/png',
                 'gif' => 'image/gif',
+                'html'=> 'text/html'
         );
         $slash = '/';
         // get requested file from router
@@ -538,8 +539,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         //pluginname is alpha characters only so check this for security reasons
         //ucfirst is needed, since in JS packages start per convention with lowercase, Plugins in PHP with uppercase! 
         
-        $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($js))); 
-        if(empty($plugin) || !in_array($requestedType, array('js', 'resources'))) {
+        $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($js)));
+        if(empty($plugin)) {
             throw new ZfExtended_NotFoundException();
         }
         //get the plugin instance to the key
@@ -550,9 +551,19 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         if(empty($plugin)) {
             throw new ZfExtended_NotFoundException();
         }
+        
+        $publicFileTypes = $plugin->getPublicFileTypes();
+        
+        if(!in_array($requestedType, $publicFileTypes)) {
+            throw new ZfExtended_NotFoundException();
+        }
+
         //get public files of the plugin to make a whitelist check of the file string from userland
         $allowedFiles = $plugin->getPublicFiles($requestedType, $absolutePath);
         $file = join($slash, $js);
+        if(!$allowedFiles){
+            return;
+        }
         if(!in_array($file, $allowedFiles)) {
             throw new ZfExtended_NotFoundException();
         }
