@@ -68,31 +68,42 @@ Ext.define('Editor.controller.Comments', {
       ref: 'commentDisplay',
       selector: '#roweditor displayfield[name=comments]'
   }],
-  activeComment: null,
-  loadedSegmentId: null,
+  
   listen: {
-      component: {
-          '#segmentgrid' : {
-              itemdblclick: 'handleCommentsColumnDblClick',
-              itemclick: 'handleCommentsColumnClick',
-              beforeedit: 'onStartEdit',
-              canceledit: 'cancelEdit',
-              edit: 'cancelEdit'
-          },
-          '#roweditor': {
-              afterEditorMoved: 'onEditorMoved'
-          },
-          
-          //this remains here, since it does nothing have todo with the panel
-          '#roweditor displayfield[name=comments]': {
-              change: 'updateEditorComment'
-          },
-          
-          //here must be done different stuff, depending if commentspanel is in the window or not
-          '#editorCommentBtn' : {
-              click: 'handleEditorCommentBtn'
-          }
-      }
+        component: {
+            '#segmentgrid' : {
+                itemdblclick: 'handleCommentsColumnDblClick',
+                itemclick: 'handleCommentsColumnClick',
+                beforeedit: 'onStartEdit',
+                canceledit: 'cancelEdit',
+                edit: 'cancelEdit'
+            },
+            '#roweditor': {
+                afterEditorMoved: 'onEditorMoved'
+            },
+            
+            //this remains here, since it does nothing have todo with the panel
+            '#roweditor displayfield[name=comments]': {
+                change: 'updateEditorComment'
+            },
+            
+            //here must be done different stuff, depending if commentspanel is in the window or not
+            '#editorCommentBtn' : {
+                click: 'handleEditorCommentBtn'
+            },
+
+            '#metapanel #commentPanel' : {
+                expand: 'loadCommentPanel'
+            },
+        },
+        controller:{
+            '#Comments':{
+                editorCommentBtnClick:'handleEditorCommentBtnClick'
+            },
+            '#Editor': {
+                openComments: 'handleEditorCommentBtnClick'
+            }
+        }
   },
   
   cancelEdit: function() {
@@ -128,6 +139,7 @@ Ext.define('Editor.controller.Comments', {
   isEnabledForLocked: function() {
       return Editor.app.authenticatedUser.isAllowed('editorCommentsForLockedSegments');
   },
+    
   /**
    * handle clicks on the comment column of the grid.
    * For handling only selected rows we have to use the img as clicktarget. 
@@ -219,7 +231,7 @@ Ext.define('Editor.controller.Comments', {
           return;
       }
       me.record = context.record;
-      commentPanel.getController().loadCommentPanel();
+      me.loadCommentPanel();
   },
 
   /**
@@ -239,7 +251,7 @@ Ext.define('Editor.controller.Comments', {
       
       //if comment store was changed and restored in the meantime, 
       //  we have to add / edit / delete the record again
-      if(type == 'save' && comment !== rec && segId == me.loadedSegmentId) {
+      if(type == 'save' && comment !== rec && segId == me.getLoadedSegmentId) {
           if(comment) {
               comment.set(rec.data);
               comment.commit();
@@ -248,7 +260,7 @@ Ext.define('Editor.controller.Comments', {
               comments.insert(0, rec);
           }
       }
-      if(type == 'destroy' && comment && comment.get('id') == rec.get('id') && segId == me.loadedSegmentId) {
+      if(type == 'destroy' && comment && comment.get('id') == rec.get('id') && segId == me.getLoadedSegmentId) {
           comments.remove(comment);
       }
       
@@ -269,7 +281,7 @@ Ext.define('Editor.controller.Comments', {
               origRec.set('workflowStep', rec.get('workflowStep'));
               origRec.set('comments', rec.get('comments'));
               origRec.endEdit();
-              if(ed && ed.context && me.loadedSegmentId == segId) {
+              if(ed && ed.context && me.getLoadedSegmentId == segId) {
                   //update the context of the editor, because the set comments above changes the grid view
                   ed.context.row = me.getSegmentGrid().getView().getNode(origRec);
                   ed.reposition();
@@ -279,22 +291,115 @@ Ext.define('Editor.controller.Comments', {
           }
       });
   },
+
+    //FIXME move those functions in the Commentcontroller
+    //use this function when expand and collaps is needed, insteed of expand() or collapse() the panel
+    /**
+    * handles expand of comment panel, reloads store if needed
+    * @param {Ext.panel.Panel} pan
+    */
+    loadCommentPanel: function(pan) {
+        var me = this,
+            plug = me.getEditPlugin(),
+            rec = plug.editing && plug.context.record || me.record,
+            id = rec && rec.get('id'),
+            box = me.getCommentContainer(),
+            form = me.getCommentForm();
+            
+        if(!form){
+            return;
+        }
+        
+        if(form._enabled) {
+            form.enable();
+        }
+
+        if(!id) {
+            return;
+        }
+
+        //jump out here if comments already loaded for this segment.
+        if(me.getLoadedSegmentId && me.getLoadedSegmentId == id) {
+            return;
+        }
+        me.openCommentWindow(rec);
+    },
+
+    openCommentWindow: function(rec) {
+        var me = this,
+            form = me.getCommentForm(),
+            area = form.down('textarea'),
+            store = me.getCommentsStore(),
+            id = rec.get('id'),
+            commentPanel=me.getCommentPanel(),
+            panelController = commentPanel.getController();
+        
+        panelController.clearComments();
+        
+        if(commentPanel.collapsed) {
+            return; //collapsed no data load needed
+        }
+        
+        panelController.handleAddComment();
+
+        if(area.rendered && area.isVisible()) {
+            area.selectText();
+            area.focus(false, 500);
+        }
+        
+        store.load({
+            params: {segmentId: id}
+        });
+        panelController.loadedSegmentId = id;
+    },
+
   /**
    * Handles the click on the button in the comment displayfield
    */
   handleEditorCommentBtn: function() {
     this.fireEvent('editorCommentBtnClick');
   },
-  /**
-   * updates the tooltip in the comment displayfield
-   */
-  updateEditorComment: function(field, val) {
-      if(field.tooltip) {
-          field.tooltip.update(val);
-          field.tooltip.setDisabled(!val);
-      }
-      else {
-          field.tooltip = val;
-      }
-  }
+    /**
+     * updates the tooltip in the comment displayfield
+     */
+    updateEditorComment: function(field, val) {
+        if(field.tooltip) {
+            field.tooltip.update(val);
+            field.tooltip.setDisabled(!val);
+        }
+        else {
+            field.tooltip = val;
+        }
+    },
+
+    handleEditorCommentBtnClick:function(){
+        var me = this,
+            commentPanel = me.getCommentPanel(),
+            form = me.getCommentForm(),
+            area = form.down('textarea');
+
+        if(!commentPanel.isCollapsable){
+            return;
+        }
+
+        if (commentPanel.collapsed)
+        {
+            commentPanel.expand();
+        }
+        else
+        {
+            if (area.rendered && area.isVisible())
+            {
+                area.focus(false, 500);
+            }
+        }
+    },
+
+    getLoadedSegmentId:function(){
+        return this.getCommentPanel().getController().loadedSegmentId;
+    },
+
+    getActiveComment:function(){
+        return this.getCommentPanel().getController().activeComment;
+    }
 });

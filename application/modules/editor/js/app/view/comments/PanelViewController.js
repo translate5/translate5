@@ -46,9 +46,6 @@ Ext.define('Editor.view.comments.PanelViewController', {
 
     listen: {
         component: {
-          '#metapanel #commentPanel' : {
-              expand: 'loadCommentPanel'
-          },
           '#commentPanel grid' : {
               itemdblclick: 'handleGridDblClick'
           },
@@ -63,11 +60,7 @@ Ext.define('Editor.view.comments.PanelViewController', {
             '#Editor.$application': {
               editorViewportClosed: 'clearComments'
             },
-            '#Comments':{
-                editorCommentBtnClick:'handleEditorCommentBtnClick'
-            },
             '#Editor': {
-                openComments: 'handleEditorCommentBtnClick',
                 saveUnsavedComments: 'onSaveBtnClick'
             }
         }
@@ -235,66 +228,6 @@ Ext.define('Editor.view.comments.PanelViewController', {
         }
     },
 
-    //FIXME move those functions in the Commentcontroller
-    //use this function when expand and collaps is needed, insteed of expand() or collapse() the panel
-    /**
-    * handles expand of comment panel, reloads store if needed
-    * @param {Ext.panel.Panel} pan
-    */
-    loadCommentPanel: function(pan) {
-        var me = this,
-            plug = me.getEditPlugin(),
-            rec = plug.editing && plug.context.record || me.record,
-            id = rec && rec.get('id'),
-            box = me.getCommentContainer(),
-            form = me.getCommentForm();
-            
-        if(!form){
-            return;
-        }
-        
-        if(form._enabled) {
-            form.enable();
-        }
-        if(!id) {
-            return;
-        }
-        //jump out here if comments already loaded for this segment.
-        if(me.loadedSegmentId && me.loadedSegmentId == id) {
-            return;
-        }
-        me.openCommentWindow(rec);
-    },
-
-    /**
-     * Opens a Commen window to the given Segment Id
-     * @param {Editor.model.Segment} rec
-    */
-    openCommentWindow: function(rec) {
-        var me = this,
-            form = me.getCommentForm(),
-            area = form.down('textarea'),
-            store = me.getCommentsStore(),
-            id = rec.get('id');
-        
-        me.clearComments();
-        
-        if(me.getCommentPanel().collapsed) {
-            return; //collapsed no data load needed
-        }
-        
-        me.handleAddComment();
-        if(area.rendered && area.isVisible()) {
-            area.selectText();
-            area.focus(false, 500);
-        }
-        
-        store.load({
-            params: {segmentId: id}
-        });
-        me.loadedSegmentId = id;
-    },
-
     /**
      * updates the comments column in the grid
      * @param {Editor.model.Comment} rec
@@ -352,30 +285,6 @@ Ext.define('Editor.view.comments.PanelViewController', {
             }
         });
     },
-    
-    handleEditorCommentBtnClick:function(){
-        var me = this,
-            commentPanel = me.getCommentPanel(),
-            form = me.getCommentForm(),
-            area = form.down('textarea');
-
-        if(!commentPanel.isCollapsable){
-            return;
-        }
-
-        if (commentPanel.collapsed)
-        {
-            commentPanel.expand();
-        }
-        else
-        {
-            if (area.rendered && area.isVisible())
-            {
-                area.focus(false, 500);
-            }
-        }
-    },
-
     /**
      * clean up the loaded comments.
     */
