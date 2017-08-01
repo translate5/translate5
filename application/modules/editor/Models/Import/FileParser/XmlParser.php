@@ -62,6 +62,12 @@ class editor_Models_Import_FileParser_XmlParser {
     protected $handlerOther;
     
     /**
+     * if >0 disables the processing of the registered handlers
+     * @var integer
+     */
+    protected $disableHandlerCount = 0;
+    
+    /**
      * walks through the given XML string and fires the registered callbacks for each found node 
      * @param string $xml
      */
@@ -355,6 +361,10 @@ class editor_Models_Import_FileParser_XmlParser {
             'attributes' => $attributes,
         ];
         
+        if($this->disableHandlerCount > 0) {
+            return;
+        }
+        
         if(empty($this->handlerElementOpener[$handleTag])) {
             if(empty($this->handlerElementOpener[self::DEFAULT_HANDLER])){
                 return;
@@ -385,6 +395,13 @@ class editor_Models_Import_FileParser_XmlParser {
             //if you got here because of an XML error: use an external tool like xmllint to get more details!
             throw new ZfExtended_Exception('Invalid XML: expected closing "'.$opener['tag'].'" tag, but got tag "'.$tag.'". Opening tag was: '.print_r($opener,1));
         }
+        if(!empty($opener['disableUntilEndTag'])) {
+            $this->disableHandlerCount--;
+            $this->disableHandlerCount = max($this->disableHandlerCount, 0); //ensure value not to be <0
+        }
+        if($this->disableHandlerCount > 0) {
+            return;
+        }
         
         if(empty($this->handlerElementCloser[$handleTag])) {
             if(empty($this->handlerElementCloser[self::DEFAULT_HANDLER])){
@@ -398,10 +415,13 @@ class editor_Models_Import_FileParser_XmlParser {
                 call_user_func($handler['callback'], $tag, $key, $opener);
             }
         }
-        array_pop($this->xmlStack);
+        $last = array_pop($this->xmlStack);
     }
     
     protected function handleOther($key, $other) {
+        if($this->disableHandlerCount > 0) {
+            return;
+        }
         if(!empty($this->handlerOther)){
             call_user_func($this->handlerOther, $other, $key);
         }
@@ -410,6 +430,15 @@ class editor_Models_Import_FileParser_XmlParser {
     
     protected function log($msg) {
         //error_log($msg);
+    }
+    
+    /**
+     * disables all registered handlers until the end tag of the current node is reached
+     */
+    public function disableHandlersUntilEndtag() {
+        $this->disableHandlerCount++;
+        //sets a marker in the start tag to, which is checked and disabled on the corresponding end tag
+        $this->xmlStack[count($this->xmlStack) - 1]['disableUntilEndTag'] = true;
     }
     
     /**

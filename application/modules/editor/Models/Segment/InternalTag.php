@@ -162,7 +162,7 @@ class editor_Models_Segment_InternalTag {
         });
         
         if($removeOther) {
-            return strip_tags($result, '<x><x/><bpt><bpt/><ept><ept/><bx><bx/><ex><ex/>');
+            return strip_tags($result, '<x><x/><bpt><bpt/><ept><ept/><bx><bx/><ex><ex/><it><it/>');
         }
         return $result;
     }

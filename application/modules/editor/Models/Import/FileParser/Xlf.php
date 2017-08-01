@@ -36,13 +36,6 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Fileparsing for import of IBM-XLIFF files
- * TODO: 
- * - can not deal with <mrk type="seg"> subsegments!
- * - sub tags are also not supported: idea for implementation: 
- *     instead of adding the sub parser to the ContentConverter add some handlers here and treat the sub content as separate segment
- *     then replace the sub content with a new internal tag so that the users gets a visual reference to the corresponding segment
- *     this subreplacement has to be done before the content is passed to the ContentConverter
- *     
  */
 class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParser {
     private $wordCount = 0;
@@ -109,6 +102,25 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     protected $internalTag;
     
     /**
+     * contains the info from where current the source contet originates:
+     * plain <source>, plain <seg-source> or <seg-source><mrk type="seg">
+     * This info is important for preparing empty mrk tags with placeholders
+     * @var integer
+     */
+    protected $sourceOrigin;
+    
+    /**
+     * Defines the importance of the tags containing possible source content
+     * @var array
+     */
+    protected $sourceOriginImportance = [
+        'sub' => 0, //→ no importance, means also no change in the importance
+        'source' => 1,
+        'seg-source' => 2,
+        'mrk' => 3,
+    ];
+    
+    /**
      * Init tagmapping
      */
     public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task) {
@@ -166,26 +178,52 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      * registers handlers for source, seg-source and target nodes to be stored for later processing
      */
     protected function registerContent() {
-        $sourceHandler = function($tag, $key, $opener){
+        $sourceEndHandler = function($tag, $key, $opener){
             $this->handleSourceTag($tag, $key, $opener);
         };
+        
         $sourceTag = 'trans-unit > source, trans-unit > seg-source, trans-unit > seg-source > mrk[type=seg]';
-        $this->xmlparser->registerElement($sourceTag, null, $sourceHandler);
+        $sourceTag .= ', trans-unit > source sub, trans-unit > seg-source sub';
+        
+        $this->xmlparser->registerElement($sourceTag, function($tag){
+            $sourceImportance = $this->compareSourceOrigin($tag);
+            //set the source origin where we are currently
+            $this->setSourceOrigin($tag);
+            
+            //source content with lower importance was set before, remove it 
+            if($sourceImportance > 0){
+                $this->currentSource = [];
+            }
+        }, $sourceEndHandler);
         
         $this->xmlparser->registerElement('trans-unit > target', null, function($tag, $key, $opener){
             $this->currentPlainTarget = $this->getTargetMeta($tag, $key, $opener);
-            if(!empty($this->currentTarget)) {
-                //if there is target content already, this content is coming from mrk tags inside the target, 
-                // so do nothing at the end of the target tag
-                return;
+            foreach($this->currentTarget as $target) {
+                if($target['tag'] == 'mrk'){
+                    //if there is already target content coming from mrk tags inside, 
+                    // do nothing at the end of the main target tag
+                    return;
+                }
             }
-            $this->currentTarget[] = $this->currentPlainTarget;
+            //add the main target tag to the list of processable targets, needed only without mrk tags and if target is not empty
+            if(strlen(trim($this->xmlparser->getRange($opener['openerKey']+1, $key - 1, true)))){
+                $this->currentTarget[$this->calculateMid($opener, false)] = $this->currentPlainTarget;
+            }
         });
-        $this->xmlparser->registerElement('trans-unit > target > mrk[type=seg]', null, function($tag, $key, $opener){
-            $this->currentTarget[] = $this->getTargetMeta($tag, $key, $opener);
+        
+        //handling sub segment mrks and sub tags
+        $this->xmlparser->registerElement('trans-unit > target > mrk[type=seg], trans-unit > target sub', null, function($tag, $key, $opener){
+            $this->currentTarget[$this->calculateMid($opener, false)] = $this->getTargetMeta($tag, $key, $opener);
+        });
+        
+        $this->xmlparser->registerElement('*', null, function($tag, $key, $opener){
+            //error_log("Unknown in XLF Parser ". $tag);
         });
     }
     
+    /**
+     * puts the given target chunk in an array with additonal meta data 
+     */
     protected function getTargetMeta($tag, $key, $opener) {
         //is initialized with null to check if there is no target tag at all,
         // here in the target handler we have to convert the null to an empty array
@@ -215,37 +253,86 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             'openerMeta' => $opener,
         ];
         if($tag == 'source'){
-            //point to the plain/real source tag:
+            //point to the plain/real source tag, needed for <target> injection
             $this->currentPlainSource = $source;
         }
-        //if there is already "source" content:
-        if(!empty($this->currentSource)) {
-            //we are handling </source> but we have already content from seg-source or seg-source > mrk so do nothing
-            if($tag == 'source'){
-                return;
-            }
-            $lastSource = end($this->currentSource);
-            //we are handling </mrk type=seg> or </seg-source>
-            // if we have already source content from a ordinary source segment, we have to discard it,
-            // since we want use the mrk content or the seg-source content (if there are no mrks in it).
-            // Looking just at the last currentSource is OK, since if it was a source tag, there is only one entry.
-            if(($tag == 'mrk' || $tag = 'seg-source') && $lastSource['tag'] == 'source'){
-                $this->currentSource = [];
-            }
-            //we are handling </seg-source> but we have already processed content from seg-source > mrk so do nothing
-            if($tag == 'seg-source' && $lastSource['tag'] == 'mrk'){
-                return;
-            }
-        }
+        $sourceImportance = $this->compareSourceOrigin($tag);
         
-        //if the content was coming from a mrk tag, we have to track the mids for target matching
-        if($tag == 'mrk' && $mid = $this->xmlparser->getAttribute($opener['attributes'], 'mid')) {
-            $this->currentSource[$mid] = $source;
+        //source content with heigher importance was set before, ignore current content 
+        // for the importance see $this->sourceOriginImportance
+        if($sourceImportance < 0){
             return;
         }
-        $this->currentSource[] = $source;
+
+        //$sourceImportance == 0, no importance change add each found content:
+        $this->currentSource[$this->calculateMid($opener, true)] = $source;
     }
 
+    /**
+     * calculates the MID for mapping source to target fragment
+     * @param array $opener
+     * @param boolean $source defines for which column the content is calculated: true if source, false if target  
+     * @return string
+     */
+    protected function calculateMid(array $opener, $source) {
+        //if the content was coming from a mrk tag, we have to track the mids for target matching
+            //FIXME die IDs müssen genamespaced werden! für sub wie auch für mrk im source und im target!
+            // Weiter muss ich bei den sub tags, im DOM nach oben wandern, bis ich ein Element mit ID finde, und dieses dann als MID hier verwenden.
+            // Der Hintergrund ist das Mapping von <source><sub> zu <target><sub> was nur über die Position falsche Ergebnisse liefert kann (wenn die tags umsortiert sind=
+            
+        $prefix = '';
+        if($opener['tag'] == 'sub') {
+            $prefix = 'sub-';
+        }
+        if($opener['tag'] == 'mrk') {
+            $prefix = 'mrk-';
+        }
+        if(!($opener['tag'] == 'mrk' && $mid = $this->xmlparser->getAttribute($opener['attributes'], 'mid'))) {
+            $toConsider = $source ? $this->currentSource : $this->currentTarget;
+            $toConsider = array_filter(array_keys($toConsider), function($item){
+                return is_numeric($item);
+            });
+            if(empty($toConsider)){
+                $mid = 0;
+            }
+            else {
+                //instead of using the length of the array  we consider only the numeric keys, take the biggest one and increase it
+                $mid = max($toConsider) + 1; 
+            }
+        }
+        return $prefix.$mid;
+    }
+    
+    /**
+     * Sets the source origin importance
+     * @see compareSourceOrigin
+     * @param string $tag
+     */
+    protected function setSourceOrigin($tag) {
+        $origin = $this->sourceOriginImportance[$tag];
+        if($origin === 0) {
+            return;
+        }
+        if($origin > $this->sourceOrigin){
+            $this->sourceOrigin = $origin;
+        }
+    }
+    
+    /**
+     * compares the importance of source origin. lowest importance has the content of a source tag, 
+     *  more important is seg-source, with the most importance is seg-source>mrk 
+     *  The content with the highes importance is used
+     * @param string $tag
+     * @return integer return <0 if a higher important source was set already, >0 if a more important source is set now, and 0 if the importance was the same (with mrks and subs possible only)
+     */
+    protected function compareSourceOrigin($tag) {
+        $origin = $this->sourceOriginImportance[$tag];
+        if($origin === 0) {
+            return $this->sourceOrigin;
+        }
+        return $origin - $this->sourceOrigin;
+    }
+    
     /**
      * registers handlers for structural nodes (group, transunit)
      */
@@ -258,6 +345,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         
         $this->xmlparser->registerElement('trans-unit', function($tag, $attributes, $key){
             $this->processSegment = $this->isTranslateable($attributes);
+            $this->sourceOrigin = 0;
             $this->currentSource = [];
             $this->currentTarget = [];
             $this->currentPlainSource = null;
@@ -364,17 +452,17 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             if(!empty($this->currentTarget) && empty($this->currentTarget[$mid])){
                 $log = ZfExtended_Factory::get('ZfExtended_Log');
                 /* @var $log ZfExtended_Log */
-                $transUnitMid = $this->xmlparser->getAttribute($transUnit, 'mid', '-na-');
-                $msg  = 'MRK tag of source not found in target with Mid: '.$mid."\n";
+                $transUnitMid = $this->xmlparser->getAttribute($transUnit, 'id', '-na-');
+                $msg  = 'MRK/SUB tag of source not found in target with Mid: '.$mid."\n";
                 $msg .= 'Transunit mid: '.$transUnitMid.' and TaskGuid: '.$this->task->getTaskGuid();
                 $log->logError($msg);
-                continue;
             }
-            if(empty($this->currentTarget)){
+            if(empty($this->currentTarget) || empty($this->currentTarget[$mid])){
                 $targetSegment = '';
             }
             else {
                 $currentTarget = $this->currentTarget[$mid];
+                unset($this->currentTarget[$mid]);
                 //parse the target chunks
                 $targetChunks = $this->xmlparser->getRange($currentTarget['opener']+1, $currentTarget['closer']-1);
                 $targetSegment = $this->contentConverter->convert($targetChunks);
@@ -401,6 +489,15 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
             $segmentId = $this->setAndSaveSegmentValues();
             $placeHolders[$mid] = $this->getFieldPlaceholder($segmentId, $targetName);
+        }
+        
+        if(!empty($this->currentTarget)){
+            $log = ZfExtended_Factory::get('ZfExtended_Log');
+            /* @var $log ZfExtended_Log */
+            $transUnitMid = $this->xmlparser->getAttribute($transUnit, 'id', '-na-');
+            $msg  = 'MRK/SUB tag of target not found in source with Mid(s): '.join(', ', array_keys($this->currentTarget))."\n";
+            $msg .= 'Transunit mid: '.$transUnitMid.' and TaskGuid: '.$this->task->getTaskGuid();
+            $log->logError($msg);
         }
         
         //if we dont find any usable segment, we dont have to place the placeholder

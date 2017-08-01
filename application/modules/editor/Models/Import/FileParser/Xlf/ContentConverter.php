@@ -29,7 +29,6 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Converts XLF segment content chunks into translate5 internal segment content string
- * TODO Missing <mrk type="seg"> support! 
  */
 class editor_Models_Import_FileParser_Xlf_ContentConverter {
     use editor_Models_Import_FileParser_TagTrait;
@@ -83,7 +82,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $this->xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
         $this->xmlparser->registerElement('mrk', function($tag, $attributes){
             //test transunits with mrk tags are disabledd in the test xlf!
-            $this->throwParseError('The file contains MRK tags, which are currently not supported! Stop Import.');
+            $this->throwParseError('The trans-unit content contains MRK tags other than type=seg, which are currently not supported! Stop Import.');
         });
         
         //since phs may contain only <sub> elements we have to handle text only inside a ph
@@ -101,6 +100,12 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         
         $this->xmlparser->registerElement('x,bx,ex', null, [$this, 'handleReplacerTag']);
         $this->xmlparser->registerElement('g', [$this, 'handleGTagOpener'], [$this, 'handleGTagCloser']);
+        
+        $this->xmlparser->registerElement('sub', function() {
+            //disable this parser until the end of the sub tag.
+            // for the sub content the main XLF parser creates a new content converter instance
+            $this->xmlparser->disableHandlersUntilEndtag();
+        });
         
         $this->xmlparser->registerElement('*', [$this, 'handleUnknown']); // → all other tags
         $this->xmlparser->registerOther([$this, 'handleText']);
@@ -272,9 +277,6 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             case 'g': 
             case 'bx':
             case 'ex':
-            case 'source':
-            case 'target':
-            case 'seg-source':
             return;
         }
         $this->throwParseError('The file contains '.$tag.' tags, which are currently not supported! Stop Import.');
