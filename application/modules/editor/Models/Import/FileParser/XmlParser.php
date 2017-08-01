@@ -224,6 +224,33 @@ class editor_Models_Import_FileParser_XmlParser {
     }
     
     /**
+     * returns a parent node, matching to the given selector, null if no match found
+     * @param string $selector
+     * @return NULL|mixed
+     */
+    public function getParent($selector) {
+        $stackIndex = count($this->xmlStack) - 1; //remove current node
+        $tag = $this->parseSelector($selector, $selectorParts);
+        if($stackIndex <= 0 || empty($selectorParts)) { 
+            //if current node is root node, there is no parent
+            return null;
+        }
+        while($stackIndex) {
+            $node = $this->xmlStack[$stackIndex];
+            if($node['tag'] !== $tag) {
+                $stackIndex--;
+                continue;
+            }
+            //for the selector match the Index has to be increased again, since the doesSelectorMatch decreases it
+            if($this->doesSelectorMatch($selectorParts, $stackIndex + 1)) {
+                return $node;
+            }
+            $stackIndex--;
+        }
+        return null;
+    }
+    
+    /**
      * parses the CSS like selector 
      * currently supported: 
      *    element                   a simple type selector
@@ -237,11 +264,11 @@ class editor_Models_Import_FileParser_XmlParser {
      * returns the last matched tag as string, needed for our streamed based parsing
      * 
      * @param string $tagSelector
-     * @param Closure $filter
+     * @param array $selectorParts
      * @return string
      */
-    protected function parseSelector($tagSelector, &$filter) {
-        $filter = [];
+    protected function parseSelector($tagSelector, &$selectorParts) {
+        $selectorParts = [];
         $tagSelector = trim($tagSelector);
         if($tagSelector === self::DEFAULT_HANDLER) {
             return $tagSelector;
@@ -250,20 +277,20 @@ class editor_Models_Import_FileParser_XmlParser {
         //regex to get the single selector parts
         $regex = '/(([-\w_:.]+)(\[[^\]]+])?)([>\s]+)?/';
         
-        $res = preg_match_all($regex, $tagSelector, $selectorParts, PREG_SET_ORDER );
+        $res = preg_match_all($regex, $tagSelector, $parts, PREG_SET_ORDER );
         //0 matches or false, both is wrong here
         if(!$res) {
             return false;
         }
         
-        $selector = end($selectorParts);
+        $selector = end($parts);
         
         if(!empty($selector[4])){
             //after the last tag in the selector, there may not be any operator
             throw new ZfExtended_Exception('after the last tag there may not be any operator, given selector: '.$tagSelector);
         }
         
-        $filter = $selectorParts; //return the selectorparts as referenced variable
+        $selectorParts = $parts; //return the selectorparts as referenced variable
         return $this->normalizeTag($selector[2]);
     }
     
@@ -278,9 +305,10 @@ class editor_Models_Import_FileParser_XmlParser {
     /**
      * checks if the given selector parts are matched by the current XML Stack (including the current Node)
      * @param array $selectorParts
+     * @param integer $startStackIndex optional, defaults to the idx of the last item in the stack
      * @return boolean
      */
-    protected function doesSelectorMatch(array $selectorParts) {
+    protected function doesSelectorMatch(array $selectorParts, $startStackIndex = null) {
         if(empty($selectorParts)){
             return true;
         }
@@ -288,9 +316,11 @@ class editor_Models_Import_FileParser_XmlParser {
         //the operator of the last tag must always be the direct operator since it must match
         $selector['operator'] = '>';
         
-        $stackIndex = count($this->xmlStack);
-        while($stackIndex && !empty($selector)) {
-            $node = $this->xmlStack[--$stackIndex];
+        if(is_null($startStackIndex)) {
+            $startStackIndex = count($this->xmlStack);
+        }
+        while($startStackIndex && !empty($selector)) {
+            $node = $this->xmlStack[--$startStackIndex];
             $match = $node['tag'] == $selector['tag'] 
                 && $this->doesAttributesFilterMatch($node['attributes'], $selector['attrFilter']);
             
@@ -332,17 +362,56 @@ class editor_Models_Import_FileParser_XmlParser {
     }
     
     /**
-     * FIXME currently this filter is not implemented and returns always true
      * checks if the given attribute filter matches the given attributes
      * @param array $attributes
      * @param string $filter
      * @return boolean
      */
     protected function doesAttributesFilterMatch(array $attributes, $filter) {
-        //FIXME 
-        //implement tag[attr] attribute existence
-        //implement tag[attr=foo] attribute value equals
-        return true;
+        $filter = trim($filter, '[]');
+        if(empty($filter)) {
+            return true;
+        }
+        
+        if(preg_match('/([^\^=$*]+)([^\^=$*]{0,1}=)([^=]+)$/', $filter, $parts)) {
+            $attribute = $parts[1];
+            $operator = $parts[2];
+            $comparator = $parts[3];
+        }
+        else {
+            //empty filter is excluded above, so reaching here can mean only the "existence" operator
+            $attribute = $filter;
+            $operator = 'has'; 
+        }
+        
+        if(!array_key_exists($attribute, $attributes)) {
+            return false;
+        }
+        
+        $value = $attributes[$attribute];
+        
+        switch ($operator) {
+            // tag[attr] attribute existence
+            case 'has':
+                return true; //for false see above
+                
+            // tag[attr=foo] attribute value equals
+            case '=':
+                return $value == $comparator;
+                
+            // tag[attr^=foo] attribute value starts with
+            case '^=':
+                return mb_strpos($value, $comparator) === 0;
+                
+            // tag[attr$=foo] attribute value ends with
+            case '$=':
+                return mb_strpos(strrev($value), strrev($comparator)) === 0;
+                
+            // tag[attr*=foo] attribute value contains
+            case '*=':
+                return mb_strpos($value, $comparator) !== false;
+        }
+        return false;
     }
     
     /**

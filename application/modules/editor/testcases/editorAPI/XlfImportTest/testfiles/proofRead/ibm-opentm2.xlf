@@ -190,12 +190,28 @@
       
       <trans-unit id="6" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
         <source>f2-6 - Test given translations with MRK and sub tags. Test alignment of source and target fragments.</source>
-        <seg-source><mrk type="seg" mid="0">f2-6 - Test given <ph>&lt;img src=&quot;foo&quot; title=&quot;<sub>f2-6 - test sub fragment</sub>&quot;/&gt;</ph>translations with MRK and sub tags. </mrk><mrk type="seg" mid="1">f2-6 - Test alignment of source and target fragments.</mrk></seg-source>
-        <target><mrk type="seg" mid="0">f2-6 - Test mit gegebenen <ph>&lt;img src=&quot;foo&quot; title=&quot;<sub>f2-6 - teste sub Fragment</sub>&quot;/&gt;</ph>Übersetzungen mit MRK und SUB Tags. </mrk><mrk type="seg" mid="1">f2-6 - Teste das Alignment von Quell- und Zielfragmenten.</mrk></target>
+        <seg-source><mrk type="seg" mid="0">f2-6 - Test given <ph id="1">&lt;img src=&quot;foo&quot; title=&quot;<sub>f2-6 - test sub fragment</sub>&quot;/&gt;</ph>translations with MRK and sub tags. </mrk><mrk type="seg" mid="1">f2-6 - Test alignment of source and target fragments.</mrk></seg-source>
+        <target><mrk type="seg" mid="0">f2-6 - Test mit gegebenen <ph id="1">&lt;img src=&quot;foo&quot; title=&quot;<sub>f2-6 - teste sub Fragment</sub>&quot;/&gt;</ph>Übersetzungen mit MRK und SUB Tags. </mrk><mrk type="seg" mid="1">f2-6 - Teste das Alignment von Quell- und Zielfragmenten.</mrk></target>
         <count-group name="word count">
           <count count-type="word count" unit="word">123</count>
         </count-group>
       </trans-unit>
+      
+      <trans-unit id="7" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
+        <source>f2-7 - SOURCE NOT VISIBILE! <ph id="1">&lt;img title=&quot;<sub>f2-7 - this sub may also not appear</sub>&quot;/&gt;</ph></source>
+        <seg-source><mrk type="seg" mid="0">f2-7 - Test given <ph id="1">&lt;img title=&quot;1<sub>f2-7 - sub 1</sub>&quot;/&gt;</ph>translations <ph id="3">&lt;img title=&quot;3<sub>f2-7 - sub 3</sub>&quot;/&gt;</ph>with MRK and sub tags. </mrk><mrk type="seg" mid="1">f2-7 - Test alignment of source <ph id="2">&lt;img title=&quot;2<sub>f2-7 - sub 2</sub>&quot;/&gt;</ph> and target fragments.</mrk></seg-source>
+        <target><mrk type="seg" mid="0">f2-7 - Test mit <ph id="3">&lt;img title=&quot;3<sub>f2-7 - sub 3</sub>&quot;/&gt;</ph>gegebenen <ph id="1">&lt;img title=&quot;1<sub>f2-7 - sub 1</sub>&quot;/&gt;</ph>Übersetzungen mit MRK und SUB Tags. </mrk><mrk type="seg" mid="1">f2-7 - Teste das Alignment von Quell- <ph id="2">&lt;img title=&quot;2<sub>f2-7 - sub 2</sub>&quot;/&gt;</ph> und Zielfragmenten.</mrk></target>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">123</count>
+        </count-group>
+      </trans-unit>
+      
+      <OFFtrans-unit id="8" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
+          <source>f2-8 - sub tags can only be processed if there is an id in the surrounding tag: <ph id="a_3"><sub>this text is visible as segment</sub></ph> and <ph><sub>this text is NOT visible as segment</sub></ph></source>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">24</count>
+        </count-group>
+      </OFFtrans-unit>
     </body>
   </file>
 </xliff>

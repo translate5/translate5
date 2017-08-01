@@ -103,7 +103,6 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         
         $this->xmlparser->registerElement('sub', function() {
             //disable this parser until the end of the sub tag.
-            // for the sub content the main XLF parser creates a new content converter instance
             $this->xmlparser->disableHandlersUntilEndtag();
         });
         
