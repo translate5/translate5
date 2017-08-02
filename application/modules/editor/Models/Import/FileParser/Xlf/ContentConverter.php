@@ -129,15 +129,16 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
                 break;
             case 'bpt':
             case 'bx':
-                //hier ist die tagNr abhängig davon ob es schon einen Eintrag mit der RID gibt, 
-                // wenn ja nimm den wert von dort
-                // wenn nein increase und setze den Wert unter der RID
-                // Beim g tag ist die RID = 'g-'.$openerKey;
+                //the tagNr depends here on the existence of an entry with the same RID 
+                // if yes, take this value
+                // if no, increase and set the new value as new tagNr to that RID
+                // for g tags: RID = 'g-'.$openerKey;
             case 'g':
                 $type = '_leftTag';
                 break;
             case 'g-close':
-                $tag = 'g'; //g-close tag is just a hack to distinguish between open and close
+                //g-close tag is just a hack to distinguish between open and close
+                $tag = 'g'; 
             case 'ept':
             case 'ex':
                 $type = '_rightTag';
