@@ -35,19 +35,17 @@ END LICENSE AND COPYRIGHT
 
 
 /**
- * XLF Fileparser Add On to parse IBM XLF specific stuff
+ * XLF Fileparser Add On to parse Across XLF specific stuff
+ * 
+ * TODO This class is a draft! 
  */
-class editor_Models_Import_FileParser_Xlf_TmgrNamespace implements editor_Models_Import_FileParser_Xlf_INamespace{
-    const IBM_XLIFF_NAMESPACE = 'xmlns:tmgr="http://www.ibm.com"';
-
+class editor_Models_Import_FileParser_Xlf_AcrossNamespace implements editor_Models_Import_FileParser_Xlf_INamespace{
     /**
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_INamespace::transunitAttributes()
      */
     public function transunitAttributes(array $attributes, editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes) {
-        //FIXME add match rate infos into our matchRateType field!
-        settype($attributes['tmgr:matchratio'], 'integer');
-        $segmentAttributes->matchRate = $attributes['tmgr:matchratio'];
+        //TODO
     }
     
     /**
@@ -55,7 +53,7 @@ class editor_Models_Import_FileParser_Xlf_TmgrNamespace implements editor_Models
      * @see editor_Models_Import_FileParser_Xlf_INamespace::registerParserHandler()
      */
     public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser) {
-        //currently not needed
+        //TODO
     }
     
     /**
@@ -63,7 +61,7 @@ class editor_Models_Import_FileParser_Xlf_TmgrNamespace implements editor_Models
      * @see editor_Models_Import_FileParser_Xlf_INamespace::getPairedTag()
      */
     public function getPairedTag($xlfBeginTag, $xlfEndTag){
-        //currently not needed
+        //TODO
     }
     
     /**
@@ -71,14 +69,15 @@ class editor_Models_Import_FileParser_Xlf_TmgrNamespace implements editor_Models
      * @see editor_Models_Import_FileParser_Xlf_INamespace::getSingleTag()
      */
     public function getSingleTag($xlfTag){
-        //currently not needed
+        //TODO
     }
     
     /**
+     * In Across the complete tag content must be used
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_INamespace::useTagContentOnly()
      */
     public function useTagContentOnly() {
-        return null; //For OpenTM2 we can calculate this value depending on the tag
+        return false;
     }
 }

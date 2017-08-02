@@ -64,4 +64,10 @@ interface editor_Models_Import_FileParser_Xlf_INamespace {
      * @return array the internal tag to the given xlf single tag 
      */
     public function getSingleTag($xlfTag);
+    
+    /**
+     * returns if the used XLIFF derivate must or must not use the plain tag content as internal tag text, or null if should depend on the tag
+     * @return boolean|NULL
+     */
+    public function useTagContentOnly();
 }

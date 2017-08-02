@@ -105,4 +105,13 @@ class editor_Models_Import_FileParser_Xlf_Translate5Namespace implements editor_
         }
         return $this->tagMap[$xlfTag];
     }
+    
+    /**
+     * Translate5 uses x,g and bx ex tags only. So the whole content of the tags incl. the tags must be used.
+     * {@inheritDoc}
+     * @see editor_Models_Import_FileParser_Xlf_INamespace::useTagContentOnly()
+     */
+    public function useTagContentOnly() {
+        return false;
+    }
 }

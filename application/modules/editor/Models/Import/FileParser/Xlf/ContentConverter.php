@@ -69,6 +69,11 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     protected $shortTagNumbers = [];
     
     /**
+     * @var boolean
+     */
+    protected $useTagContentOnlyNamespace;
+    
+    /**
      * @param array $namespaces
      * @param editor_Models_Task $task for debugging reasons only
      * @param string $filename for debugging reasons only
@@ -78,6 +83,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $this->task = $task;
         $this->filename = $filename;
         $this->initImageTags();
+        
+        $this->useTagContentOnlyNamespace = $this->namespaces->useTagContentOnly();
         
         $this->xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
         $this->xmlparser->registerElement('mrk', function($tag, $attributes){
@@ -95,7 +102,13 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             $this->xmlparser->registerOther([$this, 'handleText']);
             $originalContent = $this->xmlparser->getRange($opener['openerKey'], $key, true);
             $rid = $this->xmlparser->getAttribute($opener['attributes'], 'rid');
-            $this->result[] = $this->createTag($rid, $tag, $originalContent, $this->xmlparser->join($this->innerTag));
+            if($this->useTagContentOnly($tag, $key, $opener)) {
+                $text = $this->xmlparser->join($this->innerTag);
+            }
+            else {
+                $text = null;
+            }
+            $this->result[] = $this->createTag($rid, $tag, $originalContent, $text);
         });
         
         $this->xmlparser->registerElement('x,bx,ex', null, [$this, 'handleReplacerTag']);
@@ -173,6 +186,33 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             $this->shortTagNumbers[$rid] = $this->shortTagIdent++;
         }
         return $this->shortTagNumbers[$rid];
+    }
+    
+    /**
+     * returns true if the tag content should only be used as text for the internal tags. 
+     * On false the surrounding tags (ph, ept, bpt, it) are also displayed.
+     * @param string $tag
+     * @param integer $key
+     * @param array $opener
+     * @return boolean
+     */
+    protected function useTagContentOnly($tag, $key, $opener) {
+        //if the namespace defines a way how to use the tag content, us that way
+        if(!is_null($this->useTagContentOnlyNamespace)) {
+            return $this->useTagContentOnlyNamespace;
+        }
+        //the native way is to check for a ctype in the tag, if there is one, show the tags also
+        if(array_key_exists('ctype', $opener['attributes'])) {
+            return false;
+        }
+        // same if the tag contains only tags, then the surrounding tag also must be shown
+        if($key - $opener['openerKey'] <= 2) {
+            //if there is only one chunk in between, we mask only that text excluding tags
+            return true;
+        }
+        $contentRange = trim($this->xmlparser->getRange($opener['openerKey']+1, $key-1, true)).'<end>';
+        //returns false if contentRange starts with <sub and ends with sub>, what means contains a sub text only
+        return (stripos($contentRange, '<sub') !== 0 || stripos($contentRange, 'sub><end>') === false);
     }
     
     /**

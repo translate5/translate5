@@ -488,9 +488,11 @@ class editor_Models_Import_FileParser_XmlParser {
     }
     
     protected function handleOther($key, $other) {
-        if($this->disableHandlerCount > 0) {
-            return;
-        }
+        //TODO For the current needs the text handler may not be disabled through disableHandler functionality
+        // if this will be needed in the future, the disableHandler functionality must be extended with a "disable type" or something
+        //if($this->disableHandlerCount > 0) {
+            //return;
+        //}
         if(!empty($this->handlerOther)){
             call_user_func($this->handlerOther, $other, $key);
         }
