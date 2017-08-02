@@ -74,6 +74,11 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     protected $useTagContentOnlyNamespace;
     
     /**
+     * @var boolean
+     */
+    protected $source = true;
+    
+    /**
      * @param array $namespaces
      * @param editor_Models_Task $task for debugging reasons only
      * @param string $filename for debugging reasons only
@@ -166,6 +171,16 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $fileNameHash = md5($imgText);
         //generate the html tag for the editor
         $tagNr = $this->getShortTagNumber($rid);
+        
+        if($this->source) {
+            //FIXME save source $tagNr to tag; tag key is = tag + join(attributes)
+        }
+        else {
+            //FIXME load target $tagNr to tag; tag key is = tag + join(attributes)
+            //What to do with not found tags? → leave this feature unsolved, 
+            // since our SDLXLIFF import is also making the numbering "wrong"
+        }
+        
         $p = $this->getTagParams($originalContent, $tagNr, $tag, $fileNameHash, $text);
         $this->{$type}->createAndSaveIfNotExists($imgText, $fileNameHash);
         return $this->{$type}->getHtmlTag($p);
@@ -220,12 +235,14 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * seg-source / target can be segmented into multiple mrk type="seg" which is one segment on our side
      * Therefore we return a list of segments here
      * @param array $chunks
+     * @param boolean $source
      * @return array
      */
-    public function convert(array $chunks) {
+    public function convert(array $chunks, $source) {
         $this->result = [];
         $this->shortTagIdent = 1;
         $this->shortTagNumbers = [];
+        $this->source = $source;
         $this->xmlparser->parseList($chunks);
         
         return $this->xmlparser->join($this->result);
