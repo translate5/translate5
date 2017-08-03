@@ -38,6 +38,9 @@ END LICENSE AND COPYRIGHT
  * Fileparsing for import of IBM-XLIFF files
  */
 class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParser {
+    const PREFIX_MRK = 'mrk-';
+    const PREFIX_SUB = 'sub-';
+    
     private $wordCount = 0;
     private $segmentCount = 1;
     
@@ -288,7 +291,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     }
 
     /**
-     * calculates the MID for mapping source to target fragment
+     * calculates the MID for mapping source to target fragment (is NOT related to the segments MID)
      * @param array $opener
      * @param boolean $source defines for which column the content is calculated: true if source, false if target  
      * @return string
@@ -300,13 +303,13 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         //   This is important for alignment of the sub tags, if the parent tags have flipped positions in source and target
         $prefix = '';
         if($opener['tag'] == 'sub') {
-            $prefix = 'sub-';
+            $prefix = self::PREFIX_SUB;
             $validParents = ['ph[id]','it[id]','bpt[id]','ept[id]'];
             $parent = false;
             while(!$parent && !empty($validParents)) {
                 $parent = $this->xmlparser->getParent(array_shift($validParents));
                 if($parent) {
-                    return $prefix.$parent['attributes']['id'];
+                    return $prefix.$parent['tag'].'-'.$parent['attributes']['id'];
                 }
             }
             $id = $this->xmlparser->getParent('trans-unit')['attributes']['id'];
@@ -316,7 +319,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             return '';
         }
         if($opener['tag'] == 'mrk') {
-            $prefix = 'mrk-';
+            $prefix = self::PREFIX_MRK;
         }
         if(!($opener['tag'] == 'mrk' && $mid = $this->xmlparser->getAttribute($opener['attributes'], 'mid'))) {
             $toConsider = $source ? $this->currentSource : $this->currentTarget;
@@ -452,6 +455,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         if(!empty($this->currentPlainTarget) && $state = $this->xmlparser->getAttribute($this->currentPlainTarget['openerMeta']['attributes'], 'state')) {
             $segmentAttributes->targetState = $state;
         }
+        
+        if(!$this->processSegment) {
+            //add also translate="no" segments but readonly
+            $segmentAttributes->editable = false;
+        }
         return $segmentAttributes;
     }
     
@@ -517,9 +525,9 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             
             //parse attributes for each found segment not only for the whole trans-unit
             $attributes = $this->parseSegmentAttributes($transUnit);
-            if(!$this->processSegment) {
-                //add also translate="no" segments but readonly
-                $attributes->editable = false;
+            //The internal $mid has to be added to the DB mid of <sub> element, needed for exporting the content again
+            if(strpos($mid, self::PREFIX_SUB) === 0) {
+                $this->setMid($this->_mid.'-'.$mid);
             }
             
             //if target was given and source contains tags only or is empty, then it will be ignored
@@ -542,20 +550,22 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             return;
         }
         
-        //if the last processed source was a mrk tag, we assume that all content is coming from MRK Tags!
-        if($currentSource['tag'] == 'mrk') {
-            //put each placeholder in one MRK tag
-            $placeHolder = join(array_map(function($mid, $ph){
-                return '<mrk type="seg" mid="'.$mid.'">'.$ph.'</mrk>';
-            },array_keys($placeHolders), $placeHolders));
+        foreach($placeHolders as $mid => $placeHolder) {
+            if(strpos($mid, self::PREFIX_MRK) === 0) {
+                //remove the mrk prefix again to get numeric ids
+                $usedMid = str_replace(self::PREFIX_MRK, '', $mid); 
+                $placeHolders[$mid] = '<mrk type="seg" mid="'.$usedMid.'">'.$placeHolder.'</mrk>';
+            }
+            if(strpos($mid, self::PREFIX_SUB) === 0) {
+                unset($placeHolders[$mid]); //remove sub element place holders, for sub elements are some new placeholders inside the tags
+            }
         }
-        else {
-            //without MRK tags $placeHolders should contain only one element
-            $placeHolder = join($placeHolders);
-        }
+        $placeHolder = join($placeHolders);
         
         //this solves TRANSLATE-879: sdlxliff and XLF import does not work with missing target
         if(is_null($this->currentPlainTarget)){
+            //FIXME currentPlainSource should point always to the last used source or seg-source, not only source. 
+            // the target tag should be added after the the latter of both
             $this->xmlparser->replaceChunk($this->currentPlainSource['closer'], "</source>\r\n        <target>".$placeHolder.'</target>');
         }
         else {

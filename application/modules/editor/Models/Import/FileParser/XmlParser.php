@@ -44,7 +44,7 @@ class editor_Models_Import_FileParser_XmlParser {
      * contains all xml chunks (xml string split in text and nodes)
      * @var array
      */
-    public $xmlChunks; //FIXME protected, just for debuggin public
+    protected $xmlChunks;
     
     /**
      * index stack of the opened nodes
@@ -70,9 +70,11 @@ class editor_Models_Import_FileParser_XmlParser {
     /**
      * walks through the given XML string and fires the registered callbacks for each found node 
      * @param string $xml
+     * @return string the parsed string with all callbacks applied
      */
     public function parse($xml) {
         $this->parseList(preg_split('/(<[^>]+>)/i', $xml, null, PREG_SPLIT_DELIM_CAPTURE));
+        return $this->__toString();
     }
     
     /**
@@ -138,7 +140,6 @@ class editor_Models_Import_FileParser_XmlParser {
      * @param integer $index the chunk index to replace
      * @param string|callable $replacement the new chunk string content, or a callable which receives the following parameters: integer $index, string $oldContent
      * @param integer $length repeats the replacement for the amount if chunks as specified in $length, defaults to 1
-     * @return string the new chunk
      */
     public function replaceChunk($index, $replacement, $length = 1) {
         for ($i = 0; $i < $length; $i++) {
@@ -235,7 +236,7 @@ class editor_Models_Import_FileParser_XmlParser {
             //if current node is root node, there is no parent
             return null;
         }
-        while($stackIndex) {
+        while($stackIndex >= 0) {
             $node = $this->xmlStack[$stackIndex];
             if($node['tag'] !== $tag) {
                 $stackIndex--;
@@ -469,6 +470,7 @@ class editor_Models_Import_FileParser_XmlParser {
             $this->disableHandlerCount = max($this->disableHandlerCount, 0); //ensure value not to be <0
         }
         if($this->disableHandlerCount > 0) {
+            array_pop($this->xmlStack);
             return;
         }
         

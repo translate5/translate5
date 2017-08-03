@@ -212,6 +212,13 @@
           <count count-type="word count" unit="word">24</count>
         </count-group>
       </trans-unit>
+      
+      <trans-unit id="9" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
+          <source>f2-9 - test nested tags and subs <ph id="a_1">x<sub>a_1 <ph id="a_3"><sub>a_3 sub text</sub></ph>sub text</sub>x</ph> and <ph id="a_2">x<sub>a_2 sub text</sub>x</ph></source>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">24</count>
+        </count-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>
