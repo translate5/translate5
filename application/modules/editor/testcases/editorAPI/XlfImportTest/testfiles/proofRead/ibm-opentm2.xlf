@@ -175,14 +175,14 @@
         </count-group>
       </trans-unit>
       <trans-unit id="4" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
-          <source>f2-4 - <ph id="1">&lt;br/&gt;</ph><bpt id="2" rid="1">&lt;b&gt;</bpt>With nice text<ex id="4" rid="2"/> <bx id="5" rid="2"/>for g<ept id="3" rid="1">&lt;/b&gt;</ept> <g id="6"><it>&lt;div class=&quot;missing in action&quot;&gt;</it>tag testing.</g></source>
+        <source>f2-4 - <ph id="1">&lt;br/&gt;</ph><bpt id="2" rid="1">&lt;b&gt;</bpt>With nice text<ex id="4" rid="2"/> <bx id="5" rid="2"/>for g<ept id="3" rid="1">&lt;/b&gt;</ept> <g id="6"><it>&lt;div class=&quot;missing in action&quot;&gt;</it>tag testing.</g></source>
         <count-group name="word count">
           <count count-type="word count" unit="word">0</count>
         </count-group>
       </trans-unit>
       
       <trans-unit id="5" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
-          <source>f2-5 - A img tag is recommended to replaced like this: <ph id="a_3" ctype="x-html-img" xhtml:src="mthood.jpg"><sub ctype="x-html-img-alt">This is the alt attribute content of the img represented as plain ph tag</sub></ph> this is described in XLIFF 1.2 Representation Guide for HTML</source>
+        <source>f2-5 - A img tag is recommended to replaced like this: <ph id="a_3" ctype="x-html-img" xhtml:src="mthood.jpg"><sub ctype="x-html-img-alt">This is the alt attribute content of the img represented as plain ph tag</sub></ph> this is described in XLIFF 1.2 Representation Guide for HTML</source>
         <count-group name="word count">
           <count count-type="word count" unit="word">24</count>
         </count-group>
@@ -215,6 +215,13 @@
       
       <trans-unit id="9" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
           <source>f2-9 - test nested tags and subs <ph id="a_1">x<sub>a_1 <ph id="a_3"><sub>a_3 sub text</sub></ph>sub text</sub>x</ph> and <ph id="a_2">x<sub>a_2 sub text</sub>x</ph></source>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">24</count>
+        </count-group>
+      </trans-unit>
+      
+      <trans-unit id="10" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
+          <source>f2-10 - test nested tags and flipped subs on editing <ph id="a_1">x<sub>a_1 <ph id="a_3"><sub>a_3 sub text</sub></ph>sub text <ph id="a_2">x<sub>a_2 sub text</sub>x</ph> text2 </sub>x</ph></source>
         <count-group name="word count">
           <count count-type="word count" unit="word">24</count>
         </count-group>
