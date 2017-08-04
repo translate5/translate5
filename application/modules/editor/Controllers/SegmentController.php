@@ -136,10 +136,14 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     /**
      * returns the index (position) of the requested segment (by segmentId) in the filtered segment list (as it would be given by indexAction)
      * if index is null, that means the segment is not given in the filtered list
+     * FIXME: this function uses the segmentNrInTask and NOT the segmentId as normal. How to solve this???
+     * Background: in the frontend (visualReview) we dont have teh segmentId, we only have the segmentNrInTask
      */
     public function positionAction() {
-        $segmentId = (int) $this->_getParam('segmentId');
-        $this->entity->load($segmentId);
+        $segmentNrInTask = (int) $this->_getParam('segmentNrInTask');
+        $session = new Zend_Session_Namespace();
+        
+        $this->entity->loadBySegmentNrInTask($segmentNrInTask, $session->taskGuid);
         $this->checkTaskGuidAndEditable();
         $index = $this->entity->getIndex();
         if($index === null) {
