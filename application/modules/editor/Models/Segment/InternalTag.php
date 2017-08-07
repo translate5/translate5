@@ -63,7 +63,7 @@ class editor_Models_Segment_InternalTag {
      * @param int $count optional, returns the replace count
      * @return mixed 
      */
-    public function replace(string $segment, $replacer, $limit = -1, &$count = null) {
+    public function replace($segment, $replacer, $limit = -1, &$count = null) {
         if(is_callable($replacer)) {
             return preg_replace_callback(self::REGEX_INTERNAL_TAGS, $replacer, $segment, $limit, $count);
         }
@@ -139,7 +139,7 @@ class editor_Models_Segment_InternalTag {
             //original id coming from import format
             $id = $match[3];
             $type = $match[1];
-            $tag = ['open' => 'bpt', 'close' => 'ept', 'single' => 'x'];
+            $tag = ['open' => 'bx', 'close' => 'ex', 'single' => 'x']; 
             //xliff tags:
             // bpt ept → begin and end tag as standalone tags in one segment
             // bx ex → start and end tag of tag pairs where the tags are distributed to different segments
