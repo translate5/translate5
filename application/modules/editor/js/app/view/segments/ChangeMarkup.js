@@ -177,7 +177,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         }
                 
                 // AT WORK: further checks for controlling what to do
-                console.dir(this.docSelRange);
+                /*console.dir(this.docSelRange);
                 if(this.docSelRange.startContainer != null) {
                     console.log("range.startContainer nodeName: " + this.docSelRange.startContainer.nodeName);
                 }
