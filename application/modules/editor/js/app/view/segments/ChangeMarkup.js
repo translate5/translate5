@@ -38,13 +38,24 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.view.segments.ChangeMarkup', {
     editor: null,
-    eventCharCode: null,
-    eventKeyChar:  null,
-    eventKeyCode:  null,
-    eventKeyWhich: null,
+    eventKey: null,
     docSel: null,
     docSelRange: null,
     stopEvent: null,
+    
+    // "CONSTANTS"
+    KEYCODE_BACKSPACE: 8,
+    KEYCODE_DELETE: 46,
+    KEYCODE_LEFT: 37,
+    KEYCODE_UP: 38,
+    KEYCODE_RIGHT: 39,
+    KEYCODE_DOWN: 40,
+    KEYCODE_ENTER: 13,
+    KEYCODE_ALT: 18,
+    KEYCODE_CTRL: 17,
+    KEYCODE_SHIFT: 16,
+    KEYCODE_ALT_GR: 225,
+    
     /**
      * The given segment content is the base for the operations provided by this method
      * @param {Editor.view.segments.HtmlEditor} content
@@ -54,10 +65,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     initEvent: function() {
         // "Reset"
-        this.eventCharCode = null;
-        this.eventKeyChar  = null;
-        this.eventKeyCode  = null;
-        this.eventKeyWhich = null;
+        this.eventKey = null;
         this.docSel = null;
         this.docSelRange = null;
         this.stopEvent = null;
@@ -71,10 +79,10 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         this.initEvent();
         
         // What keyboard event do we deal with?
-        this.setKeyEvent(event);
+        this.setEventKey(event);
         
         // keys die keinen content produzieren (strg,alt,shift alleine ohne taste, pfeile etc) müssen ignoriert werden
-        if(this.keyEventHasToBeIgnored()){ 
+        if(this.eventHasToBeIgnored()){ 
             console.log(" => Ignored!");
             return;
         }
@@ -89,54 +97,33 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     
     /**
-     * Set infos about key from event; see also:
+     * Set infos about key from event.
+     * Further information on keyboard events:
      * - http://unixpapa.com/js/key.html
      * - https://www.quirksmode.org/js/keys.html#t20
      */
-    setKeyEvent: function(event) {
-        this.eventCharCode  = event.charCode;
-        this.eventKeyChar   = event.event.key;
-        this.eventKeyCode   = event.keyCode;
-        this.eventKeyWhich  = event.event.which;
-        
-        //console.dir(event); 
-        console.log("event.event.key: " + event.event.key       + " => eventKeyChar: " +  this.eventKeyChar); 
-        console.log("event.event.which: " + event.event.which   + " => eventKeyWhich: " + this.eventKeyWhich); 
-        console.log("event.keyCode: " + event.keyCode           + " => eventKeyCode: "  + this.eventKeyCode); 
-        console.log("event.charCode: " + event.charCode         + " => eventCharCode: " + this.eventCharCode);
-        console.log("String.fromCharCode(event.event.which): " + String.fromCharCode(event.event.which));
-        
+    setEventKey: function(event) {
+        this.eventKey = event.keyCode;
     },
     
     /**
-     * Key-Events to ignore.
-     * (Detect special keys according to: http://unixpapa.com/js/key.html "Conclusions")
+     * Has the Key-Event to be IGNORED?
      */
-    keyEventHasToBeIgnored: function() {
-        return false; 
-        // TODO: Das hier funktioniert plötzlich nicht mehr; eventCharCode ist IMMER 0, auch bei der Eingabe von Buchstaben. WARUM!!!!
-        // special keys?
-        if ( (this.eventKeyWhich == null) || (this.eventKeyWhich != 0 && this.eventCharCode == 0) ) {
-            console.log("special");
-            if (this.eventIsDeletion()) {
-                console.log("eventIsDeletion");
-                return false;  // if special key is deletion: HAS NOT to be ignored
-            } else {
-                console.log("not eventIsDeletion");
-                return true;   // other special keys: HAS to be ignored
-            }
-        }
-        // otherwise: HAS NOT to be ignored
-        console.log("otherwise");
-        return false;
+    eventHasToBeIgnored: function() {
+        var keyCodesToIgnore = [
+                                this.KEYCODE_LEFT, this.KEYCODE_UP, this.KEYCODE_RIGHT, this.KEYCODE_DOWN,  // Arrow Keys
+                                this.KEYCODE_ALT, this.KEYCODE_CTRL, this.KEYCODE_SHIFT,                    // Modifier Keys
+                                this.KEYCODE_ENTER, this.KEYCODE_ALT_GR                                     // Other Keys To Ignore
+                               ];
+        return (keyCodesToIgnore.indexOf(this.eventKey) != -1);
     },
 
     /**
      * Is the Key-Event a DELETION?
      */
     eventIsDeletion: function() {
-        var keyCodesForDeletion = [8,46];
-        return (keyCodesForDeletion.indexOf(this.eventKeyCode) != -1);
+        var keyCodesForDeletion = [this.KEYCODE_BACKSPACE, this.KEYCODE_DELETE];
+        return (keyCodesForDeletion.indexOf(this.eventKey) != -1);
     },
 
     /**
@@ -164,11 +151,11 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         var node = null;
         switch(true) {
             case this.eventIsDeletion():
-                console.log(this.eventKeyChar + " => eventIsDeletion");
+                console.log(" => eventIsDeletion");
                 node = this.handleDeletion();
             break;
             case this.eventIsInsertion():
-                console.log(this.eventKeyChar + " => eventIsInsertion");
+                console.log(" => eventIsInsertion");
                 node = this.handleInsert();
             break;
             default:
@@ -177,7 +164,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         }
                 
                 // AT WORK: further checks for controlling what to do
-                /*console.dir(this.docSelRange);
+                console.dir(this.docSelRange);
                 if(this.docSelRange.startContainer != null) {
                     console.log("range.startContainer nodeName: " + this.docSelRange.startContainer.nodeName);
                 }
@@ -247,11 +234,11 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             startOffset = this.docSelRange.startOffset,
             endNode     = this.docSelRange.endContainer,
             endOffset   = this.docSelRange.endOffset;
-        switch(this.eventKeyCode) {
-            case 8: // Backspace: "deletes" the previous character 
+        switch(this.eventKey) {
+            case this.KEYCODE_BACKSPACE: // Backspace: "deletes" the previous character 
                 startOffset -= 1;
             break;
-            case 46: // Delete "deletes" the next character
+            case this.KEYCODE_DELETE: // Delete "deletes" the next character
                 endOffset += 1;
             break;
         }
