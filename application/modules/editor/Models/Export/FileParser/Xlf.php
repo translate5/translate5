@@ -44,9 +44,17 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
      * @param integer $i position of current segment in the file array
      * @return string
      * 
-     * FIXME since the mid is not unique (due multiple files in the XLF) this code is buggy!
      */
     protected function writeMatchRate(array $file, integer $i) {
+        // FIXME This code is disabled, because: 
+        //  - the mid is not unique (due multiple files in the XLF) this code is buggy
+        //  - the tmgr:matchratio should only be exported for OpenTM2 XLF and not in general
+        //  - the preg_match is leading to above problems, it would be better to use the XMLParser here to, 
+        //    and paste the new attributes on the parent trans-unit to one <lekSegmentPlaceholder>
+        //
+        //  SEE ALSO TRANSLATE-956
+        return $file;
+        
         $matchRate = $this->_segmentEntity->getMatchRate();
         $midArr = explode('_', $this->_segmentEntity->getMid());
         $mid = $midArr[0];
