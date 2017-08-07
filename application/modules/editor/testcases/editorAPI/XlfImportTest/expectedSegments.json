@@ -313,111 +313,7 @@
     },
     {
         "segmentNrInTask": "13",
-        "mid": "14_13",
-        "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
-        "userName": "manager test",
-        "editable": "1",
-        "pretrans": "0",
-        "matchRate": "80",
-        "matchRateType": "import;none",
-        "qmId": null,
-        "stateId": "0",
-        "autoStateId": "0",
-        "fileOrder": "0",
-        "comments": null,
-        "workflowStepNr": "0",
-        "workflowStep": null,
-        "source": "14 - Test an existing translation. ",
-        "sourceMd5": "88440b15c0fed881083602b3b02c9ab5",
-        "sourceToSort": "14 - Test an existing translat",
-        "target": "14 - Teste eine vorhandene \u00dcbersetzung. Mit MRK Tags und fehlerhafter Segmentierung.",
-        "targetMd5": "2c9d65b8ba24db7d1f9fddfaeea4c9b4",
-        "targetToSort": "14 - Teste eine vorhandene \u00dcbe",
-        "targetEdit": "14 - Teste eine vorhandene \u00dcbersetzung. Mit MRK Tags und fehlerhafter Segmentierung.",
-        "targetEditToSort": "14 - Teste eine vorhandene \u00dcbe",
-        "isWatched": false
-    },
-    {
-        "segmentNrInTask": "14",
-        "mid": "14_14",
-        "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
-        "userName": "manager test",
-        "editable": "1",
-        "pretrans": "0",
-        "matchRate": "80",
-        "matchRateType": "import;none",
-        "qmId": null,
-        "stateId": "0",
-        "autoStateId": "4",
-        "fileOrder": "0",
-        "comments": null,
-        "workflowStepNr": "0",
-        "workflowStep": null,
-        "source": "14 - With MRK tags and wrong segmentation.",
-        "sourceMd5": "c4406da6af763ed2612cf7ff28dd9e5a",
-        "sourceToSort": "14 - With MRK tags and wrong s",
-        "target": "",
-        "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
-        "targetToSort": "",
-        "targetEdit": "",
-        "targetEditToSort": "",
-        "isWatched": false
-    },
-    {
-        "segmentNrInTask": "15",
-        "mid": "15_15",
-        "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
-        "userName": "manager test",
-        "editable": "1",
-        "pretrans": "0",
-        "matchRate": "80",
-        "matchRateType": "import;none",
-        "qmId": null,
-        "stateId": "0",
-        "autoStateId": "0",
-        "fileOrder": "0",
-        "comments": null,
-        "workflowStepNr": "0",
-        "workflowStep": null,
-        "source": "15 - Test an existing translation. ",
-        "sourceMd5": "5310b74780a0d0f2a70706e5c8f33370",
-        "sourceToSort": "15 - Test an existing translat",
-        "target": "15 - Teste eine vorhandene \u00dcbersetzung. ",
-        "targetMd5": "ac9f2cfae459a41f98e21c01f26b2ac3",
-        "targetToSort": "15 - Teste eine vorhandene \u00dcbe",
-        "targetEdit": "15 - Teste eine vorhandene \u00dcbersetzung. ",
-        "targetEditToSort": "15 - Teste eine vorhandene \u00dcbe",
-        "isWatched": false
-    },
-    {
-        "segmentNrInTask": "16",
-        "mid": "15_16",
-        "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
-        "userName": "manager test",
-        "editable": "1",
-        "pretrans": "0",
-        "matchRate": "80",
-        "matchRateType": "import;none",
-        "qmId": null,
-        "stateId": "0",
-        "autoStateId": "0",
-        "fileOrder": "0",
-        "comments": null,
-        "workflowStepNr": "0",
-        "workflowStep": null,
-        "source": "15 - With MRK tags and wrong segmentation.",
-        "sourceMd5": "6d6878e48b845dc0a74d339b98fa4c9d",
-        "sourceToSort": "15 - With MRK tags and wrong s",
-        "target": "15 - Mit MRK Tags und ",
-        "targetMd5": "f2b95b3c9aa5e4ab03b9051c8aaa8d3e",
-        "targetToSort": "15 - Mit MRK Tags und ",
-        "targetEdit": "15 - Mit MRK Tags und ",
-        "targetEditToSort": "15 - Mit MRK Tags und ",
-        "isWatched": false
-    },
-    {
-        "segmentNrInTask": "17",
-        "mid": "16_17",
+        "mid": "16_13",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -442,8 +338,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "18",
-        "mid": "16_18",
+        "segmentNrInTask": "14",
+        "mid": "16_14",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -468,8 +364,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "19",
-        "mid": "16_19",
+        "segmentNrInTask": "15",
+        "mid": "16_15",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -494,8 +390,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "20",
-        "mid": "17_20",
+        "segmentNrInTask": "16",
+        "mid": "17_16",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -520,8 +416,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "21",
-        "mid": "17_21",
+        "segmentNrInTask": "17",
+        "mid": "17_17",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -546,8 +442,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "22",
-        "mid": "17_22",
+        "segmentNrInTask": "18",
+        "mid": "17_18",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -572,8 +468,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "23",
-        "mid": "19_24",
+        "segmentNrInTask": "19",
+        "mid": "19_20",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -598,8 +494,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "24",
-        "mid": "1_25",
+        "segmentNrInTask": "20",
+        "mid": "1_21",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -624,8 +520,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "25",
-        "mid": "2_26",
+        "segmentNrInTask": "21",
+        "mid": "2_22",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -650,8 +546,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "26",
-        "mid": "3_27",
+        "segmentNrInTask": "22",
+        "mid": "3_23",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -676,8 +572,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "27",
-        "mid": "4_28",
+        "segmentNrInTask": "23",
+        "mid": "4_24",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -702,8 +598,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "28",
-        "mid": "5_29",
+        "segmentNrInTask": "24",
+        "mid": "5_25",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -728,8 +624,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "29",
-        "mid": "5_30-sub-ph-a_3",
+        "segmentNrInTask": "25",
+        "mid": "5_26-sub-ph-a_3",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -754,8 +650,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "30",
-        "mid": "6_31",
+        "segmentNrInTask": "26",
+        "mid": "6_27",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -780,8 +676,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "31",
-        "mid": "6_32-sub-ph-1",
+        "segmentNrInTask": "27",
+        "mid": "6_28-sub-ph-1",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -806,8 +702,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "32",
-        "mid": "6_33",
+        "segmentNrInTask": "28",
+        "mid": "6_29",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -832,8 +728,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "33",
-        "mid": "7_34",
+        "segmentNrInTask": "29",
+        "mid": "7_30",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -858,8 +754,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "34",
-        "mid": "7_35-sub-ph-1",
+        "segmentNrInTask": "30",
+        "mid": "7_31-sub-ph-1",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -884,8 +780,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "35",
-        "mid": "7_36-sub-ph-3",
+        "segmentNrInTask": "31",
+        "mid": "7_32-sub-ph-3",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -910,8 +806,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "36",
-        "mid": "7_37",
+        "segmentNrInTask": "32",
+        "mid": "7_33",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -936,8 +832,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "37",
-        "mid": "7_38-sub-ph-2",
+        "segmentNrInTask": "33",
+        "mid": "7_34-sub-ph-2",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -962,60 +858,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "38",
-        "mid": "8_39",
-        "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
-        "userName": "manager test",
-        "editable": "1",
-        "pretrans": "0",
-        "matchRate": "0",
-        "matchRateType": "import;empty",
-        "qmId": null,
-        "stateId": "0",
-        "autoStateId": "4",
-        "fileOrder": "0",
-        "comments": null,
-        "workflowStepNr": "0",
-        "workflowStep": null,
-        "source": "f2-8 - sub tags can only be processed if there is an id in the surrounding tag: <div class=\"single 70682069643d22615f33223e783c7375623e7468697320746578742069732076697369626c65206173207365676d656e743c2f7375623e783c2f7068\"><span title=\"xthis text is visible as segmentx\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"383a61546ae997eca5b63266a42ae95a\" class=\"full\">xthis text is visible as segmentx<\/span><\/div> and <div class=\"single 70683e783c7375623e746869732074657874206973204e4f542076697369626c65206173207365676d656e742073696e63652074686520737572726f756e64696e67206964206973206d697373696e67213c2f7375623e783c2f7068\"><span title=\"xthis text is NOT visible as segment since the surrounding id is missing!x\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"fec7300560b8ca9a82389bdd9bd9b94d\" class=\"full\">xthis text is NOT visible as segment since the surrounding id is missing!x<\/span><\/div>",
-        "sourceMd5": "c0ae6f3b3840f4fd0aef063229e59b56",
-        "sourceToSort": "f2-8 - sub tags can only be pr",
-        "target": "",
-        "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
-        "targetToSort": "",
-        "targetEdit": "",
-        "targetEditToSort": "",
-        "isWatched": false
-    },
-    {
-        "segmentNrInTask": "39",
-        "mid": "8_40-sub-ph-a_3",
-        "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
-        "userName": "manager test",
-        "editable": "1",
-        "pretrans": "0",
-        "matchRate": "0",
-        "matchRateType": "import;empty",
-        "qmId": null,
-        "stateId": "0",
-        "autoStateId": "4",
-        "fileOrder": "0",
-        "comments": null,
-        "workflowStepNr": "0",
-        "workflowStep": null,
-        "source": "this text is visible as segment",
-        "sourceMd5": "8cf96cb606d0afd8689b590acf8307cd",
-        "sourceToSort": "this text is visible as segmen",
-        "target": "",
-        "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
-        "targetToSort": "",
-        "targetEdit": "",
-        "targetEditToSort": "",
-        "isWatched": false
-    },
-    {
-        "segmentNrInTask": "40",
-        "mid": "9_41",
+        "segmentNrInTask": "34",
+        "mid": "9_35",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -1040,8 +884,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "41",
-        "mid": "9_42-sub-ph-a_1",
+        "segmentNrInTask": "35",
+        "mid": "9_36-sub-ph-a_1",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -1066,8 +910,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "42",
-        "mid": "9_43-sub-ph-a_3",
+        "segmentNrInTask": "36",
+        "mid": "9_37-sub-ph-a_3",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -1092,8 +936,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "43",
-        "mid": "9_44-sub-ph-a_2",
+        "segmentNrInTask": "37",
+        "mid": "9_38-sub-ph-a_2",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -1118,8 +962,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "44",
-        "mid": "10_45",
+        "segmentNrInTask": "38",
+        "mid": "10_39",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -1144,8 +988,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "45",
-        "mid": "10_46-sub-ph-a_1",
+        "segmentNrInTask": "39",
+        "mid": "10_40-sub-ph-a_1",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -1170,8 +1014,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "46",
-        "mid": "10_47-sub-ph-a_3",
+        "segmentNrInTask": "40",
+        "mid": "10_41-sub-ph-a_3",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -1196,8 +1040,8 @@
         "isWatched": false
     },
     {
-        "segmentNrInTask": "47",
-        "mid": "10_48-sub-ph-a_2",
+        "segmentNrInTask": "41",
+        "mid": "10_42-sub-ph-a_2",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
