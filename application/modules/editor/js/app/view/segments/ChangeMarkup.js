@@ -148,36 +148,16 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         }
         
         // change markup according to event
-        var node = null;
         switch(true) {
             case this.eventIsDeletion():
                 console.log(" => eventIsDeletion");
-                node = this.handleDeletion();
+                this.handleDeletion();
             break;
             case this.eventIsInsertion():
                 console.log(" => eventIsInsertion");
-                node = this.handleInsert();
-            break;
-            default:
-                node = null;
+                this.handleInsert();
             break;
         }
-                
-                // AT WORK: further checks for controlling what to do
-                console.dir(this.docSelRange);
-                if(this.docSelRange.startContainer != null) {
-                    console.log("range.startContainer nodeName: " + this.docSelRange.startContainer.nodeName);
-                }
-                if(this.docSelRange.startContainer.parentElement != null) {
-                    console.log("range.startContainer.parentElement nodeName: " + this.docSelRange.startContainer.parentElement.nodeName);
-                }
-                if(this.docSelRange.startContainer.previousSibling != null) {
-                    console.log("range.startContainer.previousSibling nodeName: " + this.docSelRange.startContainer.previousSibling.nodeName);
-                }
-                if(this.docSelRange.startContainer.nextSibling != null) {
-                    console.log("range.startContainer.nextSibling nodeName: " + this.docSelRange.startContainer.nextSibling.nodeName);
-                }
-                console.log("-------------------------");
         
         //Der DOM an dieser Stelle beihaltet IMG tags, und div.term tags. 
         //Eine Verschachtelung von INS und DELs untereinander ist in keiner Weise gestattet:
@@ -196,9 +176,19 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         // - Außer bei delete ganz am Ende des DELs, dann das Zeichen dahinter löschen sprich in den DEL mit reinpacken
      */
     handleDeletion: function() {
-        // Wenn wir uns in einem DEL event befinden: stoppen
-        if(this.docSelRange.startContainer.parentElement.nodeName == "DEL") {
-            return null;
+        // Sind wir schon in einem DEL drin oder dran?
+        switch(this.checkForExistingTags("DEL")) {
+            case "useParent":
+                // Wenn wir uns in einem DEL event befinden: stoppen
+                console.log("Wir sind schon in einem DEL...!")
+                return null;
+            break;
+            case "usePrevious":
+                console.log("DEL von davor nehmen...!")
+            break;
+            case "useNext":
+                console.log("DEL von dahinter nehmen...!")
+            break;
         }
         
         // Andernfalls übernehmen wir die Handhabung des Events.
@@ -213,9 +203,24 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         // - Wenn wir uns dabei in einem DEL befinden, dieses an dieser Stelle zuerst auseinander brechen und dann den INS einfügen
      */
     handleInsert: function() {
-        // Wenn wir uns in einem INS befinden das uns gehört (und im gleichen Workflow Schritt ist → mit Marc klären), nichts machen
-        if(this.docSelRange.startContainer.parentElement.nodeName == "INS") {
-            return null;
+        // Sind wir schon in einem INS drin oder dran?
+        switch(this.checkForExistingTags("INS")) {
+            case "useParent":
+                // Wenn wir uns BEREITS IN einem INS befinden das uns gehört (und im gleichen Workflow Schritt ist → mit Marc klären), 
+                // nichts machen
+                console.log("Wir sind schon in einem INS...!")
+                return null;
+            break;
+            case "usePrevious":
+                // Wenn wir uns DIREKT HINTER einem INS befinden das uns gehört (und im gleichen Workflow Schritt ist → mit Marc klären),
+                // das INS von davor nehmen statt ein neues aufzumachen
+                console.log("INS von davor nehmen...!")
+            break;
+            case "useNext":
+                // Wenn wir uns DIREKT VOR einem INS befinden das uns gehört (und im gleichen Workflow Schritt ist → mit Marc klären),
+                // das INS von dahinter nehmen statt ein neues aufzumachen
+                console.log("INS von dahinter nehmen...!")
+            break;
         }
         
         // Das Event wird ausgeführt, aber vorher setzen wir das <ins> drumrum
@@ -255,7 +260,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     
     /**
      * Marks an insertion as inserted.
-     * (Bevor das Einfügen ausgeführt wird, umgeben wir die Stelle mit einem <ins>.)
+     * Bevor das Einfügen ausgeführt wird, umgeben wir die Stelle mit einem <ins>.
      */
     markInsertion: function() {
         // create and insert <ins>-node
@@ -268,5 +273,51 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         rangeForPos.collapse(true);
         this.docSel.removeAllRanges();
         this.docSel.setSingleRange(rangeForPos);
+    },
+    
+    /**
+     * Checks for continuing of already existing nodes instead of creating new ones
+     */
+    checkForExistingTags: function(nodeName) {
+        // TODO: Check also for author and workflow
+        switch(true) {
+            case (this.getNodeNameOfParentElement() == nodeName):
+                console.log("Wir sind schon in einem " + nodeName + "...!")
+                return "useParent";
+            break;
+            case (this.getNodeNameOfPreviousElement() == nodeName):
+                console.log(nodeName + " von davor nehmen...!")
+                return "usePrevious";
+            break;
+            case (this.getNodeNameOfNextElement() == nodeName):
+                console.log(nodeName + " von dahinter nehmen...!")
+                return "useNext";
+            break;
+            default:
+                return false;
+        }
+    },
+    
+    /**
+     * Helper for NodeNames
+     */
+    getNodeNameOfParentElement: function() {
+        // s.a. https://github.com/timdown/rangy/wiki/Rangy-Range#commonancestorcontainer
+        if (this.docSelRange.startContainer.parentElement == null) {
+            return null;
+        }
+        return this.docSelRange.startContainer.parentElement.nodeName;
+    },
+    getNodeNameOfPreviousElement: function() {
+        if (this.docSelRange.startContainer.previousSibling == null) {
+            return "null";
+        }
+        return this.docSelRange.startContainer.previousSibling.nodeName;
+    },
+    getNodeNameOfNextElement: function() {
+        if (this.docSelRange.endContainer.nextSibling == null) {
+            return "null";
+        }
+        return this.docSelRange.endContainer.nextSibling.nodeName;
     }
 });
