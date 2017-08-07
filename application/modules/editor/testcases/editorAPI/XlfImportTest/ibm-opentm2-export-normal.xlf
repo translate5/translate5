@@ -225,7 +225,7 @@
       
       <trans-unit id="9" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
           <source>f2-9 - test nested tags and subs <ph id="a_1">x<sub>a_1 <ph id="a_3"><sub>a_3 sub text</sub></ph>sub text</sub>x</ph> and <ph id="a_2">x<sub>a_2 sub text</sub>x</ph></source>
-        <target>f2-9 - test nested tags and subs <ph id="a_2">x<sub>a_2 sub text - edited43</sub>x</ph> and <ph id="a_1">x<sub>a_1 <ph id="a_3"><sub>a_3 sub text - edited42</sub></ph>sub text - edited41</sub>x</ph> - edited40</target>
+        <target>f2-9 - test nested tags and subs <ph id="a_2">x<sub>a_2 sub text - edited37</sub>x</ph> and <ph id="a_1">x<sub>a_1 <ph id="a_3"><sub>a_3 sub text - edited36</sub></ph>sub text - edited35</sub>x</ph> - edited34</target>
         <count-group name="word count">
           <count count-type="word count" unit="word">24</count>
         </count-group>
@@ -233,7 +233,7 @@
       
       <trans-unit id="10" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
           <source>f2-10 - test nested tags and flipped subs on editing <ph id="a_1">x<sub>a_1 <ph id="a_3"><sub>a_3 sub text</sub></ph>sub text <ph id="a_2">x<sub>a_2 sub text</sub>x</ph> text2 </sub>x</ph></source>
-        <target>f2-10 - test nested tags and flipped subs on editing <ph id="a_1">x<sub>a_1 <ph id="a_2">x<sub>a_2 sub text - edited47</sub>x</ph>sub text <ph id="a_3"><sub>a_3 sub text - edited46</sub></ph> text2 - edited45</sub>x</ph> - edited44</target>
+        <target>f2-10 - test nested tags and flipped subs on editing <ph id="a_1">x<sub>a_1 <ph id="a_2">x<sub>a_2 sub text - edited41</sub>x</ph>sub text <ph id="a_3"><sub>a_3 sub text - edited40</sub></ph> text2 - edited39</sub>x</ph> - edited38</target>
         <count-group name="word count">
           <count count-type="word count" unit="word">24</count>
         </count-group>

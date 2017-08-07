@@ -93,6 +93,7 @@ class editor_Models_Import_FileParser_Xlf_Namespaces implements editor_Models_Im
     }
     
     protected function call($function, $arguments) {
+        $result = false;
         foreach ($this->namespaces as $namespace){
             $result = call_user_func_array([$namespace, $function], $arguments);
             //if one of the callen namespace handlers produces a result, we return this and end the loop

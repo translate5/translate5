@@ -99,8 +99,8 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
             else {
                 $contentToUse = $segToEdit->targetEdit;
             }
-            //in the segments 40 and 45 the tags are swapping position
-            if($segToEdit->segmentNrInTask == "40" || $segToEdit->segmentNrInTask == "45") {
+            //in the segments 34 and 39 the tags are swapping position
+            if($segToEdit->segmentNrInTask == "34" || $segToEdit->segmentNrInTask == "39") {
                 $tagger = new editor_Models_Segment_InternalTag();
                 $editedData = $contentToUse.' - edited'.$segToEdit->segmentNrInTask;
                 $found = [];
