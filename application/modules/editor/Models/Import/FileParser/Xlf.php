@@ -496,6 +496,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         
         $placeHolders = [];
         
+        //must be set before the loop, since in the loop the currentTarget is cleared on success
+        $hasTargets = !empty($this->currentTarget);
         foreach($this->sourceProcessOrder as $mid) {
             
             if($mid === '') {
@@ -515,7 +517,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 continue;
             }
             
-            if(!empty($this->currentTarget) && empty($this->currentTarget[$mid])){
+            if($hasTargets && empty($this->currentTarget[$mid])){
                 $transUnitMid = $this->xmlparser->getAttribute($transUnit, 'id', '-na-');
                 $msg  = 'MRK/SUB tag of source not found in target with Mid: '.$mid."\n";
                 $this->throwSegmentationException($msg, $transUnitMid);
