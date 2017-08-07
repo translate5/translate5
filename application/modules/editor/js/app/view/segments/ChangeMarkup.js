@@ -216,7 +216,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         
         // Andernfalls übernehmen wir die Handhabung des Events.
         this.stopEvent = true;
-        this.markDeletionAsDeleted();
+        this.markDeletion();
     },
 
     /**
@@ -231,16 +231,16 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             return null;
         }
         
-        // Andernfalls übernehmen wir die Handhabung des Events.
-        this.stopEvent = true;
-        this.markInsertionAsDeleted();
+        // Das Event wird ausgeführt, aber vorher setzen wir das <ins> drumrum
+        this.stopEvent = false;
+        this.markInsertion();
     },
     
     /**
      * Marks a deletion as deleted.
      * Statt den Char zu löschen, umgeben wir ihn mit <del>
      */
-    markDeletionAsDeleted: function() {
+    markDeletion: function() {
         // create range to be marked as deleted
         var rangeForDel = rangy.createRange(),
             startNode   = this.docSelRange.startContainer,
@@ -263,20 +263,23 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         } else {
             console.log("Unable to surround range because range partially selects a non-text node. See DOM4 spec for more information.");
         }
+        // TODO: position the caret!
     },
     
     /**
      * Marks an insertion as inserted.
-     * Wir umgeben den einzufügenden Char in ein <ins> und setzen das an der aktuellen Stelle ein.
+     * (Bevor das Einfügen ausgeführt wird, umgeben wir die Stelle mit einem <ins>.)
      */
-    markInsertionAsDeleted: function() {
-        // create <ins>-node
+    markInsertion: function() {
+        // create and insert <ins>-node
         node = document.createElement("ins");
-        node.appendChild(document.createTextNode(this.eventKeyChar));
-        // insert node and place cursor at its end
         this.docSelRange.collapse(false);
         this.docSelRange.insertNode(node);
-        this.docSelRange.collapseAfter(node);
-        this.docSel.setSingleRange(this.docSelRange);
+        // position the caret
+        var rangeForPos = rangy.createRange();
+        rangeForPos.setStart(node, 0);
+        rangeForPos.collapse(true);
+        this.docSel.removeAllRanges();
+        this.docSel.setSingleRange(rangeForPos);
     }
 });
