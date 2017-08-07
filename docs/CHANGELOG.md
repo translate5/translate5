@@ -3,6 +3,17 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.5.34] - 2017-08-07
+###Added
+TRANSLATE-925: support xliff 1.2 as import format
+
+###Changed
+T5DEV-172: (Ext 6.2 update prework) Quicktip manager instances have problems if configured targets does not exist anymore
+T5DEV-171: (Ext 6.2 update prework) Get Controller instance getController works only with full classname
+
+###Bugfixes
+TRANSLATE-953: Direct Workers (like GUI TermTagging) are using the wrong worker state
+
 ## [2.5.33] - 2017-07-11
 ###Changed
 TRANSLATE-628: Log changed terminology in changes xliff
