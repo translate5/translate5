@@ -87,8 +87,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     protected $sourceProcessOrder = [];
     
     /**
-     * Pointer to the real <source> tags of the current transunit,
-     * needed for injection of missing target, mrk and our placeholder tags
+     * Pointer to the real <source>/<seg-source> tags of the current transunit,
+     * needed for injection of missing target tags
      * @var array
      */
     protected $currentPlainSource = null;
@@ -274,7 +274,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             'closer' => $key,
             'openerMeta' => $opener,
         ];
-        if($tag == 'source'){
+        //set <source> only if no seg-source was set already, seg-source can always be used, seg-source is more important as source tag
+        if($tag == 'source' && empty($this->currentPlainSource) || $tag == 'seg-source'){
             //point to the plain/real source tag, needed for <target> injection
             $this->currentPlainSource = $source;
         }
@@ -312,15 +313,19 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                     return $prefix.$parent['tag'].'-'.$parent['attributes']['id'];
                 }
             }
-            $id = $this->xmlparser->getParent('trans-unit')['attributes']['id'];
             $msg  = 'SUB tag of '.($source ? 'source' : 'target').' is not unique due missing ID in the parent node and is ignored as separate segment therefore.'."\n";
-            $msg .= 'Transunit mid: '.$id.' and TaskGuid: '.$this->task->getTaskGuid();
-            $this->log->logError($msg);
+            $this->throwSegmentationException($msg);
             return '';
         }
         if($opener['tag'] == 'mrk') {
             $prefix = self::PREFIX_MRK;
+            if($this->xmlparser->getAttribute($opener['attributes'], 'mid') === false) {
+                $msg  = 'MRK tag of '.($source ? 'source' : 'target').' has no MID attribute.';
+                $this->throwSegmentationException($msg);
+            }
         }
+        // FIXME we need the mrk mtype = seg always a MID, if no MID is given, throw an error.
+        //  stop import!
         if(!($opener['tag'] == 'mrk' && $mid = $this->xmlparser->getAttribute($opener['attributes'], 'mid'))) {
             $toConsider = $source ? $this->currentSource : $this->currentTarget;
             $toConsider = array_filter(array_keys($toConsider), function($item){
@@ -335,6 +340,18 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
         }
         return $prefix.$mid;
+    }
+    
+    /**
+     * @param string $msg
+     * @throws ZfExtended_Exception
+     */
+    protected function throwSegmentationException($msg, $transUnitId = false) {
+        if($transUnitId === false) {
+            $transUnitId = $this->xmlparser->getParent('trans-unit')['attributes']['id'];
+        }
+        $msg .= "\n".'Transunit mid: '.$transUnitId.' and TaskGuid: '.$this->task->getTaskGuid();
+        throw new ZfExtended_Exception($msg);
     }
     
     /**
@@ -501,8 +518,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             if(!empty($this->currentTarget) && empty($this->currentTarget[$mid])){
                 $transUnitMid = $this->xmlparser->getAttribute($transUnit, 'id', '-na-');
                 $msg  = 'MRK/SUB tag of source not found in target with Mid: '.$mid."\n";
-                $msg .= 'Transunit mid: '.$transUnitMid.' and TaskGuid: '.$this->task->getTaskGuid();
-                $this->log->logError($msg);
+                $this->throwSegmentationException($msg, $transUnitMid);
             }
             if(empty($this->currentTarget) || empty($this->currentTarget[$mid])){
                 $targetSegment = '';
@@ -541,8 +557,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         if(!empty($this->currentTarget)){
             $transUnitMid = $this->xmlparser->getAttribute($transUnit, 'id', '-na-');
             $msg  = 'MRK/SUB tag of target not found in source with Mid(s): '.join(', ', array_keys($this->currentTarget))."\n";
-            $msg .= 'Transunit mid: '.$transUnitMid.' and TaskGuid: '.$this->task->getTaskGuid();
-            $this->log->logError($msg);
+            $this->throwSegmentationException($msg, $transUnitMid);
         }
         
         //if we dont find any usable segment, we dont have to place the placeholder
@@ -564,9 +579,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         
         //this solves TRANSLATE-879: sdlxliff and XLF import does not work with missing target
         if(is_null($this->currentPlainTarget)){
-            //FIXME currentPlainSource should point always to the last used source or seg-source, not only source. 
+            //currentPlainSource point always to the last used source or seg-source 
             // the target tag should be added after the the latter of both
-            $this->xmlparser->replaceChunk($this->currentPlainSource['closer'], "</source>\r\n        <target>".$placeHolder.'</target>');
+            $replacement = '</'.$this->currentPlainSource['tag'].">\n        <target>".$placeHolder.'</target>';
+            $this->xmlparser->replaceChunk($this->currentPlainSource['closer'], $replacement);
         }
         else {
             //clean up target content to empty, we store only our placeholder in the skeleton file
