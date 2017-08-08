@@ -75,7 +75,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           '#Editor.$application': {
               editorViewportOpened: 'afterInitEditor'
           },
-          '#editorcontroller': {
+          '#Editor': {
               beforeKeyMapUsage: 'handleEditorKeyMapUsage'
           },
           '#ViewModes':{

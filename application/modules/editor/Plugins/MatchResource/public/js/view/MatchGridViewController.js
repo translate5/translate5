@@ -63,7 +63,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
             }
         },
         controller:{
-            '#editorcontroller': {
+            '#Editor': {
                 prevnextloaded:'calculateRows'
             }
         }
