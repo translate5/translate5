@@ -125,7 +125,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         //start task export 
         $this->checkExport($task, 'editor/task/export/id/'.$task->id, 'ibm-opentm2-export-normal.xlf');
         //start task export with diff 
-        //$this->checkExport($task, 'editor/task/export/id/'.$task->id.'/diff/1', 'specialCharactersInCSV-exportdiff-assert-equal.csv');
+        //$this->checkExport($task, 'editor/task/export/id/'.$task->id.'/diff/1', 'ibm-opentm2-export-normal.xlf');
     }
     
     /**
@@ -145,8 +145,8 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/ibm-opentm2.xlf');
         //compare it
         $expectedResult = $this->api()->getFileContent($fileToCompare);
-        file_put_contents('/home/tlauria/foo1.xlf', rtrim($expectedResult));
-        file_put_contents('/home/tlauria/foo2.xlf', rtrim($exportedFile));
+        //file_put_contents('/home/tlauria/foo1.xlf', rtrim($expectedResult));
+        //file_put_contents('/home/tlauria/foo2.xlf', rtrim($exportedFile));
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to '.$fileToCompare);
     }
     
