@@ -261,16 +261,14 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     markInsertion: function() {
         // create and insert <ins>-node
-        node = this.createNewNode("ins");
-        node.appendChild(document.createTextNode('x')); //TODO: remove 'x" and move(), and then figure out how it works in Google Chrome
-        this.docSelRange.collapse(false);
-        this.docSelRange.insertNode(node);
+        nodeEl = this.createNewNode("ins");
+        nodeEl.appendChild(document.createTextNode(' '));   // Google Chrome gets lost otherwise
+        this.docSelRange.insertNode(nodeEl);
         // position the caret
         var rangeForPos = rangy.createRange();
-        rangeForPos.setStart(node.childNodes[0], 0);
-        rangeForPos.collapse(true);
+        rangeForPos.selectNodeContents(nodeEl);
         this.docSel.setSingleRange(rangeForPos);
-        this.docSel.move("character", 1);              //TODO: remove 'x" and move(), and then figure out how it works in Google Chrome
+        nodeEl.nodeValue = '';                              // Google Chrome; see above...
     },
     
     /**
@@ -328,27 +326,22 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     isAtPrevious: function(nodeName) {
         // TODO: auch Position berücksichtigen! (Sind wir wirklich direkt dahinter?)
         // => Umstellen auf rangy-Methoden
-        return (this.getNodeNameOfPreviousElement() == nodeName);
+        return false;
     },
     isAtNext: function(nodeName) {
         // TODO: auch Position berücksichtigen! (Sind wir wirklich direkt davor?)
         // => Umstellen auf rangy-Methoden
-        return (this.getNodeNameOfNextElement() == nodeName);
-    },
-    check: function() {
-        console.dir(this.docSelRange);
-        var textNodes = this.docSelRange.getNodes([3], function(node) {
-            return true
-        });
+        return false;
     },
     
     /**
      * Create and return a new node.
      */
     createNewNode: function(nodeName){
-        node = document.createElement(nodeName);
+        nodeEl = document.createElement(nodeName);
+        nodeEl.id = nodeName + Date.now();
         // NEXT STEPS: Add info about user, workflow, ...
-        return node;
+        return nodeEl;
     },
     
     /**
