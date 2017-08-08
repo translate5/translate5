@@ -196,7 +196,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $this->handleSourceTag($tag, $key, $opener);
         };
         
-        $sourceTag = 'trans-unit > source, trans-unit > seg-source, trans-unit > seg-source > mrk[type=seg]';
+        $sourceTag = 'trans-unit > source, trans-unit > seg-source, trans-unit > seg-source > mrk[mtype=seg]';
         $sourceTag .= ', trans-unit > source sub, trans-unit > seg-source sub';
         
         $this->xmlparser->registerElement($sourceTag, function($tag, $attributes){
@@ -234,7 +234,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         });
         
         //handling sub segment mrks and sub tags
-        $this->xmlparser->registerElement('trans-unit > target > mrk[type=seg], trans-unit > target sub', null, function($tag, $key, $opener){
+        $this->xmlparser->registerElement('trans-unit > target > mrk[mtype=seg], trans-unit > target sub', null, function($tag, $key, $opener){
             $this->currentTarget[$this->calculateMid($opener, false)] = $this->getTargetMeta($tag, $key, $opener);
         });
         

@@ -18,8 +18,8 @@
       
       <trans-unit id="15" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="FUZZY" tmgr:matchratio="80">
         <source>15 - Test an existing translation. With MRK tags and wrong segmentation.</source>
-        <seg-source><mrk type="seg" mid="0">15 - Test an existing translation. </mrk><mrk type="seg" mid="1">15 - With MRK tags and wrong segmentation.</mrk></seg-source>
-        <target state="translated"><mrk type="seg" mid="0">15 - Teste eine vorhandene Übersetzung. </mrk><mrk type="seg" mid="1">15 - Mit MRK Tags und </mrk><mrk type="seg" mid="2">15 - fehlerhafter Segmentierung.</mrk></target>
+        <seg-source><mrk mtype="seg" mid="0">15 - Test an existing translation. </mrk><mrk mtype="seg" mid="1">15 - With MRK tags and wrong segmentation.</mrk></seg-source>
+        <target state="translated"><mrk mtype="seg" mid="0">15 - Teste eine vorhandene Übersetzung. </mrk><mrk mtype="seg" mid="1">15 - Mit MRK Tags und </mrk><mrk mtype="seg" mid="2">15 - fehlerhafter Segmentierung.</mrk></target>
         <count-group name="word count">
           <count count-type="word count" unit="word">10</count>
         </count-group>
