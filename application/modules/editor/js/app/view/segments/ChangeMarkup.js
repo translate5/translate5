@@ -92,7 +92,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         
         // Stop event?
         if(this.stopEvent) {
-            event.stopEvent(); 
+            event.stopEvent();
         }
     },
     
@@ -171,66 +171,63 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
 
     /**
      * Handle deletion-Events.
-        // wenn keycode ein delete oder backspace ist: 
-        // - Außer bei backspace ganz am Anfang des DELs, dann das Zeichen davor löschen sprich in den DEL mit reinpacken
-        // - Außer bei delete ganz am Ende des DELs, dann das Zeichen dahinter löschen sprich in den DEL mit reinpacken
      */
     handleDeletion: function() {
-        // Sind wir schon in einem DEL drin oder dran?
-        switch(this.checkForExistingTags("DEL")) {
-            case "useParent":
-                // Wenn wir uns in einem DEL event befinden: stoppen
-                console.log("Wir sind schon in einem DEL...!")
-                return null;
+        // Das Event wird auf jeden Fall gestoppt; Zeichen werden nicht mehr gelöscht...
+        this.stopEvent = true;
+        // ... sondern als gelöscht markiert:
+        var position = this.checkForExistingTags("DEL");
+        switch(true) {
+            case (position == "isInParent"):
+                // Wenn wir uns in einem DEL befinden: stoppen. (Das zu löschende Zeichen ist ja bereits als gelöscht markiert.)
             break;
-            case "usePrevious":
-                console.log("DEL von davor nehmen...!")
+            case (position == "isAtPrevious" && this.eventKey == this.KEYCODE_DELETE):
+                // Bei delete ganz am Ende des DELs, dann das Zeichen dahinter löschen sprich in den DEL mit reinpacken.
+                console.log("TODO: Ins vorherige DEL mit reinpacken.")
             break;
-            case "useNext":
-                console.log("DEL von dahinter nehmen...!")
+            case (position == "isAtNext" && this.eventKey == this.KEYCODE_BACKSPACE):
+                // Bei backspace ganz am Anfang des DELs, dann das Zeichen davor löschen sprich in den DEL mit reinpacken.
+                console.log("TODO: Ins nachfolgende DEL mit reinpacken.")
+            break;
+            default:
+                // Wenn wir uns nicht in oder an einem DEL-Node befinden, müssen wir uns jetzt um das Markup kümmern:
+                this.markDeletion();
             break;
         }
-        
-        // Andernfalls übernehmen wir die Handhabung des Events.
-        this.stopEvent = true;
-        this.markDeletion();
     },
 
     /**
      * Handle insert-Events.
-        //Bei normalem Tippen:
-        // - Wenn wir uns in keinem INS befinden, eine INS node hinzufügen und dann das event weiterlaufn lassen
-        // - Wenn wir uns dabei in einem DEL befinden, dieses an dieser Stelle zuerst auseinander brechen und dann den INS einfügen
+     * TODO: 
+     * - Wenn wir uns dabei in einem DEL befinden, dieses an dieser Stelle zuerst auseinander brechen und dann den INS einfügen
      */
     handleInsert: function() {
-        // Sind wir schon in einem INS drin oder dran?
-        switch(this.checkForExistingTags("INS")) {
-            case "useParent":
-                // Wenn wir uns BEREITS IN einem INS befinden das uns gehört (und im gleichen Workflow Schritt ist → mit Marc klären), 
-                // nichts machen
-                console.log("Wir sind schon in einem INS...!")
-                return null;
+        // Das Event wird anschließend ausgeführt (= das Einfügen geht dann normal vonstatten).
+        this.stopEvent = false;
+        // Aber vorher kümmern wir uns um das Markup:
+        var position = this.checkForExistingTags("INS");
+        switch(true) {
+            case (position == "isInParent"):
+                // Da wie schon im richtigen MarkUp sind, machen wir hier gar nix.
             break;
-            case "usePrevious":
-                // Wenn wir uns DIREKT HINTER einem INS befinden das uns gehört (und im gleichen Workflow Schritt ist → mit Marc klären),
-                // das INS von davor nehmen statt ein neues aufzumachen
-                console.log("INS von davor nehmen...!")
+            case (position == "isAtPrevious"):
+                // Es gibt bereits ein INS davor; an das schließen wir uns an.
+                this.usePreviousNode();
             break;
-            case "useNext":
-                // Wenn wir uns DIREKT VOR einem INS befinden das uns gehört (und im gleichen Workflow Schritt ist → mit Marc klären),
-                // das INS von dahinter nehmen statt ein neues aufzumachen
-                console.log("INS von dahinter nehmen...!")
+            case (position == "isAtNext"):
+                // Es gibt bereits ein INS dahinter; an das schließen wir uns an.
+                this.useNextNode();
+            break;
+            default:
+                // Wenn wir uns nicht in oder an einem INS-Node befinden, müssen wir uns jetzt um das Markup kümmern:
+                this.markInsertion();
             break;
         }
-        
-        // Das Event wird ausgeführt, aber vorher setzen wir das <ins> drumrum
-        this.stopEvent = false;
-        this.markInsertion();
     },
     
     /**
-     * Marks a deletion as deleted.
-     * Statt den Char zu löschen, umgeben wir ihn mit <del>
+     * Marks a deletion as deleted:
+     * Instead of deleting the character, we wrap it into a DEL-node.
      */
     markDeletion: function() {
         // create range to be marked as deleted
@@ -249,9 +246,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         }
         rangeForDel.setStartAndEnd(startNode, startOffset, endNode, endOffset);
         // create and attach <del>-Element
-        el = document.createElement("del")
-        if (rangeForDel.canSurroundContents(el)) {
-            rangeForDel.surroundContents(el);
+        node = this.createNewNode("del");
+        if (rangeForDel.canSurroundContents(node)) {
+            rangeForDel.surroundContents(node);
         } else {
             console.log("Unable to surround range because range partially selects a non-text node. See DOM4 spec for more information.");
         }
@@ -259,43 +256,99 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     
     /**
-     * Marks an insertion as inserted.
-     * Bevor das Einfügen ausgeführt wird, umgeben wir die Stelle mit einem <ins>.
+     * Marks an insertion as inserted:
+     * Before the insertion is added in the editor, we create an INS-node and position the caret in there.
      */
     markInsertion: function() {
         // create and insert <ins>-node
-        node = document.createElement("ins");
+        node = this.createNewNode("ins");
+        node.appendChild(document.createTextNode('x')); //TODO: remove 'x" and move(), and then figure out how it works in Google Chrome
         this.docSelRange.collapse(false);
         this.docSelRange.insertNode(node);
         // position the caret
         var rangeForPos = rangy.createRange();
-        rangeForPos.setStart(node, 0);
+        rangeForPos.setStart(node.childNodes[0], 0);
         rangeForPos.collapse(true);
-        this.docSel.removeAllRanges();
         this.docSel.setSingleRange(rangeForPos);
+        this.docSel.move("character", 1);              //TODO: remove 'x" and move(), and then figure out how it works in Google Chrome
     },
     
     /**
-     * Checks for continuing of already existing nodes instead of creating new ones
+     * "Switch" the range to previous node.
+     */
+    usePreviousNode: function() {
+        var previousNode = this.docSelRange.startContainer.previousSibling;
+        var rangeToUse = rangy.createRange();
+        rangeToUse.selectNodeContents(previousNode);
+        rangeToUse.collapse(false);
+        this.docSel.setSingleRange(rangeToUse);
+    },
+    
+    /**
+     * "Switch" the range to next node.
+     */
+    useNextNode: function() {
+        var nextNode = this.docSelRange.startContainer.nextSibling;
+        var rangeToUse = rangy.createRange();
+        rangeToUse.selectNodeContents(nextNode);
+        rangeToUse.collapse(true);
+        this.docSel.setSingleRange(rangeToUse);
+    },
+    
+    /**
+     * Checks for already existing nodes we are in or at.
+       - NEXT STEPS: Check also for user, workflow, ...
      */
     checkForExistingTags: function(nodeName) {
-        // TODO: Check also for author and workflow
         switch(true) {
-            case (this.getNodeNameOfParentElement() == nodeName):
-                console.log("Wir sind schon in einem " + nodeName + "...!")
-                return "useParent";
+            // Befinden wir uns BEREITS IN einem INS/DEL? (das uns gehört und im gleichen Workflow Schritt ist → mit Marc klären)
+            case (this.hasParent(nodeName)):
+                console.log("isInParent");
+                return "isInParent";
             break;
-            case (this.getNodeNameOfPreviousElement() == nodeName):
-                console.log(nodeName + " von davor nehmen...!")
-                return "usePrevious";
+            // Befinden wir uns DIREKT HINTER einem INS/DEL? (das uns gehört und im gleichen Workflow Schritt ist → mit Marc klären)
+            case (this.isAtPrevious(nodeName)):
+                console.log("previous node exists; TODO: check POSITION as well!");
+                return "isAtPrevious";
             break;
-            case (this.getNodeNameOfNextElement() == nodeName):
-                console.log(nodeName + " von dahinter nehmen...!")
-                return "useNext";
+            // Befinden wir uns DIREKT VOR einem INS/DEL? (das uns gehört und im gleichen Workflow Schritt ist → mit Marc klären)
+            case (this.isAtNext(nodeName)):
+                console.log("next node exists; TODO: check POSITION as well!");
+                return "isAtNext";
             break;
+            // Wie befinden uns weder in noch an einem INS/DEL:
             default:
+                console.log("Weder in noch dran...")
                 return false;
         }
+    },
+    hasParent: function(nodeName) {
+        return (this.getNodeNameOfParentElement() == nodeName);
+    },
+    isAtPrevious: function(nodeName) {
+        // TODO: auch Position berücksichtigen! (Sind wir wirklich direkt dahinter?)
+        // => Umstellen auf rangy-Methoden
+        return (this.getNodeNameOfPreviousElement() == nodeName);
+    },
+    isAtNext: function(nodeName) {
+        // TODO: auch Position berücksichtigen! (Sind wir wirklich direkt davor?)
+        // => Umstellen auf rangy-Methoden
+        return (this.getNodeNameOfNextElement() == nodeName);
+    },
+    check: function() {
+        console.dir(this.docSelRange);
+        var textNodes = this.docSelRange.getNodes([3], function(node) {
+            return true
+        });
+    },
+    
+    /**
+     * Create and return a new node.
+     */
+    createNewNode: function(nodeName){
+        node = document.createElement(nodeName);
+        // NEXT STEPS: Add info about user, workflow, ...
+        return node;
     },
     
     /**
@@ -308,15 +361,17 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         }
         return this.docSelRange.startContainer.parentElement.nodeName;
     },
+    
     getNodeNameOfPreviousElement: function() {
         if (this.docSelRange.startContainer.previousSibling == null) {
-            return "null";
+            return null;
         }
         return this.docSelRange.startContainer.previousSibling.nodeName;
     },
+    
     getNodeNameOfNextElement: function() {
         if (this.docSelRange.endContainer.nextSibling == null) {
-            return "null";
+            return null;
         }
         return this.docSelRange.endContainer.nextSibling.nodeName;
     }
