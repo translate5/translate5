@@ -390,17 +390,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     protected function registerStructural() {
         //check for correct xlf version
         $this->xmlparser->registerElement('xliff', function($tag, $attributes, $key){
-            $v11 = 'urn:oasis:names:tc:xliff:document:1.1';
-            $v12 = 'urn:oasis:names:tc:xliff:document:1.2';
-            
-            $schema = $this->xmlparser->getAttribute($attributes, 'xsi:schemaLocation', '');
-            if(strpos($schema, $v12) !== false) {
-                return;
-            }
-            if(!empty($attributes['xmlns']) && strpos($attributes['xmlns'], $v11) !== false) {
-                return;
-            }
-            throw new ZfExtended_Exception('XLF Parser supports only XLIFF Version 1.1 and 1.2, but the following xliff tag was given: '.$this->xmlparser->getChunk($key));
+            $this->checkXliffVersion($attributes, $key);
         });
         
         $this->xmlparser->registerElement('group', function($tag, $attributes, $key){
@@ -447,6 +437,20 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             return $group;
         }
         return true; //if not info given at all: translateable
+    }
+    
+    /**
+     * Checks if the given xliff is in the correct (supported) version
+     * @param string $xliffTag
+     * @param integer $key
+     * @throws ZfExtended_Exception
+     */
+    protected function checkXliffVersion($attributes, $key) {
+        $validVersions = ['1.1', '1.2'];
+        $version = $this->xmlparser->getAttribute($attributes, 'version');
+        if(! in_array($version, $validVersions)) {
+            throw new ZfExtended_Exception('XLF Parser supports only XLIFF Version 1.1 and 1.2, but the following xliff tag was given: '.$this->xmlparser->getChunk($key));
+        }
     }
     
     protected function initNamespaces() {
