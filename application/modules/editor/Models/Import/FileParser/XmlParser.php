@@ -522,6 +522,8 @@ class editor_Models_Import_FileParser_XmlParser {
      * @return mixed
      */
     public function getAttribute($attributes, $attribute, $default = false) {
+        //we are storing all attributes in lower case
+        $attribute = strtolower($attribute);
         if(array_key_exists($attribute, $attributes)) {
             return $attributes[$attribute];
         }
