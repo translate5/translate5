@@ -748,17 +748,17 @@
         <source>Französisch (Belgien)</source>
         <target>French (Belgium)</target>
       </trans-unit>
-      <trans-unit id="V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIERhdGVuIChaSVAsIENTViwgU0RMWExJRkYsIG9wZW5UTTItWExJRkY7IEFuZ2FiZSBub3R3ZW5kaWcp">
-        <source>Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, openTM2-XLIFF; Angabe notwendig)</source>
-        <target>Select the data to be imported (ZIP, CSV, SDLXLIFF, openTM2-XLIFF;; specifying required)</target>
+      <trans-unit id='V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIERhdGVuIChaSVAsIENTViwgU0RMWExJRkYsIFhMSUZGOyBBbmdhYmUgbm90d2VuZGlnKQ=='>
+          <source>Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, XLIFF; Angabe notwendig)</source>
+          <target>Select the data to be imported (ZIP, CSV, SDLXLIFF, XLIFF; specifying required)</target>
       </trans-unit>
       <trans-unit id='SW1wb3J0IERhdGVpwrk='>
           <source>Import Datei¹</source>
           <target>Import Datei¹</target>
       </trans-unit>
-      <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFpJUCwgQ1NWIG9kZXIgU0RMWExJRkYgRGF0ZWkh'>
-        <source>Bitte verwenden Sie eine ZIP, CSV oder SDLXLIFF Datei!</source>
-        <target>Please use a ZIP, CSV, openTM2-XLIFF oder SDLXLIFF file only!</target>
+      <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFpJUCwgQ1NWLCBYTElGRiBvZGVyIFNETFhMSUZGIERhdGVpIQ=='>
+        <source>Bitte verwenden Sie eine ZIP, CSV, XLIFF oder SDLXLIFF Datei!</source>
+        <target>Please use a ZIP, CSV, XLIFF or SDLXLIFF file only!</target>
       </trans-unit>
       <trans-unit id='V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIFRCWCBEYXRlbiBmw7xyIGRhcyBUZXJtVGFnZ2luZw=='>
         <source>Wählen Sie die zu importierenden TBX Daten für das TermTagging</source>
@@ -1094,7 +1094,6 @@
   <source>Bitte verwenden Sie nur ASCII-Zeichen in Datei- oder Verzeichnisnamen und keine Sonderzeichen oder Umlaute. Das Zip-Format übermittelt keine Informationen, in welcher Codierung Ihr Betriebssystem Datei- oder Verzeichnisnamen gespeichert hat. Aufgrund dieses Mangels des ZIP-Standards kann translate5 Nicht-ASCII-Zeichen nicht fehlerfrei auslesen. Einzige Ausnahme: Ihr Dateisystem speichert Dateinamen in der UTF-8-Kodierung, wie Linux-Systeme dies tun.</source>
   <target>Please use only ASCII characters in file or directory names and no special characters or German Umlaute. The Zip format does not provide any information in which encoding your operating system has saved a file or directory name. Due to this lack of the ZIP standard, translate5 can not read such file or directory names with NON-ASCII characters without errors. Only exception to this rule: Your file system does use UFT-8 encoding for your filesystem, like Linux systems do.</target>
 </trans-unit>
-<trans-unit id='SW1wb3J0IHZvbiBlaW56ZWxuZW4gU0RMWExJRkYgb2RlciBDU1YgRGF0ZWllbg=='><source>Import von einzelnen SDLXLIFF oder CSV Dateien</source><target>Importing single SDLXLIFF, openTM2-XLIFF or CSV files</target></trans-unit>
 <trans-unit id='U29sbCBudXIgZWluZSBlaW56ZWxuZSBDU1Ygb2RlciBTRExYTElGRiBEYXRlaSBpbnMgUHJvamVrdCBpbXBvcnRpZXJ0IHdlcmRlbiwgc28ga2FubiBkaWVzZSBhdWNoIGRpcmVrdCBob2NoZ2VsYWRlbiB3ZXJkZW4uIERpZSBFcnN0ZWxsdW5nIGVpbmVyIFpJUCBEYXRlaSBpc3Qgc28gbmljaHQgbsO2dGlnLg=='><source>Soll nur eine einzelne CSV oder SDLXLIFF Datei ins Projekt importiert werden, so kann diese auch direkt hochgeladen werden. Die Erstellung einer ZIP Datei ist so nicht nötig.</source><target>If you need to import a single CSV, openTM2-XLIFF or SDLXLIFF file as a project, you can upload this file directly. Creating a ZIP file here is not necessary.</target></trans-unit>
 <trans-unit id='SGFuZGVsdCBlcyBzaWNoIHVtIGVpbmUgU0RMWExJRkYgRGF0ZWksIHNvIGthbm4genVzw6R0emxpY2ggZWluZSBUQlggRGF0ZWkgbWl0IFRlcm1pbm9sb2dpZSBhdXNnZXfDpGhsdCB3ZXJkZW4u'><source>Handelt es sich um eine SDLXLIFF Datei, so kann zusätzlich eine TBX Datei mit Terminologie ausgewählt werden.</source><target>On importing a SDLXLIFF file, you can upload an additional TBX file to provide terminology.</target></trans-unit>
 <trans-unit id='dHJhbnNsYXRlNSBRdWVsbGNvZGUgYXVmIGJpdGJ1Y2tldA=='><source>translate5 Quellcode auf bitbucket</source><target>translate5 source code on bitbucket</target></trans-unit>
@@ -1487,9 +1486,9 @@
     <source>Change</source>
     <target>Change</target>
 </trans-unit>
-<trans-unit id='U2llIGvDtm5uZW4gbmViZW4gdW5zZXJlbSBaSVAtQ29udGFpbmVyLUZvcm1hdCBhdWNoIGRpcmVrdCBTRExYTElGRiwgb3BlblRNMi1YTElGRiBvZGVyIENTViBEYXRlaWVuIGJlbnV0emVuLiA8YSB0YXJnZXQ9Il9ibGFuayIgaHJlZj0iaHR0cDovL2NvbmZsdWVuY2UudHJhbnNsYXRlNS5uZXQvZGlzcGxheS9CVVMvQmFzaWMrdXNhZ2UiPk1laHIgSW5mbzwvYT4u'>
-    <source>Sie können neben unserem ZIP-Container-Format auch direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">Mehr Info</a>.</source>
-    <target>In addition to our ZIP-container format you can also use SDLXLIFF, OpenTM2-XLIFF or CSV files directly. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">More information</a>.</target>
+<trans-unit id='U2llIGvDtm5uZW4gbmViZW4gdW5zZXJlbSBaSVAtQ29udGFpbmVyLUZvcm1hdCBhdWNoIGRpcmVrdCBTRExYTElGRiwgWExJRkYgb2RlciBDU1YgRGF0ZWllbiBiZW51dHplbi4gPGEgdGFyZ2V0PSJfYmxhbmsiIGhyZWY9Imh0dHA6Ly9jb25mbHVlbmNlLnRyYW5zbGF0ZTUubmV0L2Rpc3BsYXkvQlVTL0Jhc2ljK3VzYWdlIj5NZWhyIEluZm88L2E+Lg=='>
+    <source>Sie können neben unserem ZIP-Container-Format auch direkt SDLXLIFF, XLIFF oder CSV Dateien benutzen. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">Mehr Info</a>.</source>
+    <target>In addition to our ZIP-container format you can also use SDLXLIFF, XLIFF or CSV files directly. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">More information</a>.</target>
 </trans-unit>
 <trans-unit id='RXJnb25vbWljIChBbnNpY2h0KQ=='>
     <source>Ergonomic (Ansicht)</source>
