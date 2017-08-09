@@ -112,7 +112,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     
     /**
      * contains the info from where current the source contet originates:
-     * plain <source>, plain <seg-source> or <seg-source><mrk type="seg">
+     * plain <source>, plain <seg-source> or <seg-source><mrk mtype="seg">
      * This info is important for preparing empty mrk tags with placeholders
      * @var integer
      */
@@ -262,7 +262,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      * "source" content is content of the
      *   <source>                       tag, if the <seg-source> does not exist 
      *   <seg-source>                   tag, plain content or
-     *   <seg-source> <mrk type="seg">  content of the mrk type=seg tags inside the seg-source
+     *   <seg-source> <mrk mtype="seg">  content of the mrk type=seg tags inside the seg-source
      * @param string $tag
      * @param integer $key
      * @param array $opener
@@ -590,7 +590,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             if(strpos($mid, self::PREFIX_MRK) === 0) {
                 //remove the mrk prefix again to get numeric ids
                 $usedMid = str_replace(self::PREFIX_MRK, '', $mid); 
-                $placeHolders[$mid] = '<mrk type="seg" mid="'.$usedMid.'">'.$placeHolder.'</mrk>';
+                $placeHolders[$mid] = '<mrk mtype="seg" mid="'.$usedMid.'">'.$placeHolder.'</mrk>';
             }
             if(strpos($mid, self::PREFIX_SUB) === 0) {
                 unset($placeHolders[$mid]); //remove sub element place holders, for sub elements are some new placeholders inside the tags
