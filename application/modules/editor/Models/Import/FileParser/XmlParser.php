@@ -68,20 +68,32 @@ class editor_Models_Import_FileParser_XmlParser {
     protected $disableHandlerCount = 0;
     
     /**
+     * Initial $preserveWhitespace value
+     * @var array
+     */
+    protected $preserveWhitespace;
+    
+    /**
      * walks through the given XML string and fires the registered callbacks for each found node 
+     * Preserving whitespace in XML is defined by the xml:space attribute on each node. 
+     *  If the attribute is not given, the parent node is considered.
+     *  The initial root value (preserve or ignore) is given here as boolean parameter 
      * @param string $xml
+     * @param boolean $preserveWhitespaceRoot 
      * @return string the parsed string with all callbacks applied
      */
-    public function parse($xml) {
-        $this->parseList(preg_split('/(<[^>]+>)/i', $xml, null, PREG_SPLIT_DELIM_CAPTURE));
+    public function parse($xml, $preserveWhitespaceRoot = false) {
+        $this->parseList(preg_split('/(<[^>]+>)/i', $xml, null, PREG_SPLIT_DELIM_CAPTURE), $preserveWhitespaceRoot);
         return $this->__toString();
     }
     
     /**
      * walks through the given XML chunk array and fires the registered callbacks for each found node 
      * @param array $chunks
+     * @param boolean $preserveWhitespaceRoot see method parse
      */
-    public function parseList(array $chunks) {
+    public function parseList(array $chunks, $preserveWhitespaceRoot = false) {
+        $this->preserveWhitespace = $preserveWhitespaceRoot;
         $this->xmlChunks = $chunks;
         foreach($this->xmlChunks as $key => $chunk) {
             $this->currentOffset = $key;
@@ -425,10 +437,16 @@ class editor_Models_Import_FileParser_XmlParser {
     protected function handleElementStart($key, $tag, $attributes, $isSingle) {
         $tag = $handleTag = $this->normalizeTag($tag);
         $this->log("START#".$tag.'#');
+        $previousNode = end($this->xmlStack);
+        //get the parent boolean preserve whitespace value
+        $preserve = is_null($previousNode) ? $this->preserveWhitespace : $previousNode['preserveWhitespace'];
+        //get the XML attribute of the current node, which could not exist at all
+        $preserve = $this->getAttribute($attributes, 'xml:space', $preserve ? 'preserve' : 'default');
         $this->xmlStack[] = [
             'openerKey' => $key,
             'tag' => $tag,
             'attributes' => $attributes,
+            'preserveWhitespace' => $preserve == 'preserve',
         ];
         
         if($this->disableHandlerCount > 0) {
@@ -486,7 +504,7 @@ class editor_Models_Import_FileParser_XmlParser {
                 call_user_func($handler['callback'], $tag, $key, $opener);
             }
         }
-        $last = array_pop($this->xmlStack);
+        array_pop($this->xmlStack);
     }
     
     protected function handleOther($key, $other) {

@@ -78,6 +78,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      */
     protected $source = true;
     
+    protected $preserveWhitespace = false;
+    
     /**
      * @param array $namespaces
      * @param editor_Models_Task $task for debugging reasons only
@@ -232,17 +234,19 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     
     /**
      * parses the given chunks containing segment source, seg-source or target content
-     * seg-source / target can be segmented into multiple mrk type="seg" which is one segment on our side
+     * seg-source / target can be segmented into multiple mrk mtype="seg" which is one segment on our side
      * Therefore we return a list of segments here
      * @param array $chunks
      * @param boolean $source
+     * @param boolean $preserveWhitespace defines if the whitespace in the XML nodes should be preserved or not
      * @return array
      */
-    public function convert(array $chunks, $source) {
+    public function convert(array $chunks, $source, $preserveWhitespace = false) {
         $this->result = [];
         $this->shortTagIdent = 1;
         $this->shortTagNumbers = [];
         $this->source = $source;
+        $this->preserveWhitespace = $preserveWhitespace; //must not be given to inline element parser, since xml:space may occur only outside of inline content 
         $this->xmlparser->parseList($chunks);
         
         return $this->xmlparser->join($this->result);
@@ -253,7 +257,12 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * @param string $text
      */
     public function handleText($text) {
-        //we have to decode entities here, otherwise our generated XLF wont be valid 
+        if(!$this->preserveWhitespace) {
+            $text = preg_replace("/[ \t\n\r]+/u", ' ', $text);
+        }
+        //we have to decode entities here, otherwise our generated XLF wont be valid
+        // although the whitespace of the content may not be preserved here, if there remain multiple spaces or other space characters, 
+        // we have to protect them here 
         $text = $this->protectWhitespace($text);
         $text = $this->whitespaceTagReplacer($text);
         $this->result[] = $text;

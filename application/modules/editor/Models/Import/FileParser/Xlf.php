@@ -528,7 +528,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             
             //parse the source chunks
             $sourceChunks = $this->xmlparser->getRange($currentSource['opener']+1, $currentSource['closer']-1);
-            $sourceSegment = $this->contentConverter->convert($sourceChunks, true);
+            $sourceSegment = $this->contentConverter->convert($sourceChunks, true, $currentSource['openerMeta']['preserveWhitespace']);
             
             //if there is no source content, nothing can be done
             if(empty($sourceSegment)){
@@ -549,7 +549,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 unset($this->currentTarget[$mid]);
                 //parse the target chunks
                 $targetChunks = $this->xmlparser->getRange($currentTarget['opener']+1, $currentTarget['closer']-1);
-                $targetSegment = $this->contentConverter->convert($targetChunks, false);
+                $targetSegment = $this->contentConverter->convert($targetChunks, false, $currentTarget['openerMeta']['preserveWhitespace']);
             }
             $this->segmentData = array();
             $this->segmentData[$sourceName] = array(

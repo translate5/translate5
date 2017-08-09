@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file original="Test1" datatype="x-testdata" xml:space="preserve" source-language="de" target-language="zen">
+    <body>
+      <trans-unit id="12344321" datatype="html">
+          <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
+            preserved.</source>
+        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz    Spacez</sub>&quot;/&gt;</ph>Whitespacez -    	      shouldz bez 
+            preservedz.</target>
+        <note priority="1" from="description">Test file preserve &gt; trans-unit undefined.</note>
+      </trans-unit>
+      <trans-unit id="12344322" datatype="html" xml:space="preserve">
+          <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
+            preserved.</source>
+        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz    Spacez</sub>&quot;/&gt;</ph>Whitespacez -    	      shouldz bez 
+            preservedz.</target>
+        <note priority="1" from="description">Test file preserve &gt; trans-unit preserve.</note>
+      </trans-unit>
+      <trans-unit id="12344323" datatype="html" xml:space="default">
+          <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
+            preserved.</source>
+        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz    Spacez</sub>&quot;/&gt;</ph>Whitespacez -    	      shouldz bez 
+            preservedz.</target>
+        <note priority="1" from="description">Test file preserve &gt; trans-unit default.</note>
+      </trans-unit>
+    </body>
+  </file>
+  <file original="Test2" datatype="x-testdata" xml:space="default" source-language="de" target-language="zen">
+    <body>
+      <trans-unit id="22344321" datatype="html">
+          <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
+            preserved.</source>
+        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz    Spacez</sub>&quot;/&gt;</ph>Whitespacez -    	      shouldz bez 
+            preservedz.</target>
+        <note priority="1" from="description">Test file default &gt; trans-unit undefined.</note>
+      </trans-unit>
+      <trans-unit id="22344322" datatype="html" xml:space="preserve">
+          <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
+            preserved.</source>
+        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz    Spacez</sub>&quot;/&gt;</ph>Whitespacez -    	      shouldz bez 
+            preservedz.</target>
+        <note priority="1" from="description">Test file default &gt; trans-unit preserve.</note>
+      </trans-unit>
+      <trans-unit id="22344323" datatype="html" xml:space="default">
+          <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
+            preserved.</source>
+        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz    Spacez</sub>&quot;/&gt;</ph>Whitespacez -    	      shouldz bez 
+            preservedz.</target>
+        <note priority="1" from="description">Test file default &gt; trans-unit default.</note>
+      </trans-unit>
+    </body>
+  </file>
+  <file original="Test3" datatype="x-testdata" source-language="de" target-language="zen">
+    <body>
+      <trans-unit id="32344321" datatype="html">
+          <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
+            preserved.</source>
+        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz    Spacez</sub>&quot;/&gt;</ph>Whitespacez -    	      shouldz bez 
+            preservedz.</target>
+        <note priority="1" from="description">Test file undefined &gt; trans-unit undefined.</note>
+      </trans-unit>
+      <trans-unit id="32344322" datatype="html" xml:space="preserve">
+          <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
+            preserved.</source>
+        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz    Spacez</sub>&quot;/&gt;</ph>Whitespacez -    	      shouldz bez 
+            preservedz.</target>
+        <note priority="1" from="description">Test file undefined &gt; trans-unit preserve.</note>
+      </trans-unit>
+      <trans-unit id="32344323" datatype="html" xml:space="default">
+          <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
+            preserved.</source>
+        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz    Spacez</sub>&quot;/&gt;</ph>Whitespacez -    	      shouldz bez 
+            preservedz.</target>
+        <note priority="1" from="description">Test file undefined &gt; trans-unit default.</note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

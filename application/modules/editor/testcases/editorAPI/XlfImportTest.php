@@ -73,8 +73,8 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         // it must be continued on continuing the XLF import. 
         
         //FIXME get task and test wordcount!!!
-        //get segment list
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        //get segment list (just the ones of the first file for that tests)
+        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=41');
         
         $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
         //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/XlfImportTest/expectedSegments-new.json", json_encode($data,JSON_PRETTY_PRINT));
@@ -85,8 +85,8 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
      * @depends testSegmentValuesAfterImport
      */
     public function testSegmentEditing() {
-        //get segment list
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        //get segment list (just the ones of the first file for that tests)
+        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=41');
         require_once 'Models/Segment/InternalTag.php';
 
         foreach($segments as $idx => $segToEdit) {
@@ -146,8 +146,16 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         //compare it
         $expectedResult = $this->api()->getFileContent($fileToCompare);
         //file_put_contents('/home/tlauria/foo1.xlf', rtrim($expectedResult));
-        //file_put_contents('/home/tlauria/foo2.xlf', rtrim($exportedFile));
+        file_put_contents('/home/tlauria/foo2.xlf', rtrim($exportedFile));
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to '.$fileToCompare);
+    }
+    
+    public function testPreserveWhitespace() {
+        $segments = $this->api()->requestJson('editor/segment?page=41&start=0&limit=200');
+        $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
+        file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/XlfImportTest/expectedSegmentsPreserveWhitespace-new.json", json_encode($data,JSON_PRETTY_PRINT));
+        //$this->assertEquals(self::$api->getFileContent('expectedSegmentsPreserveWhitespace.json'), $data, 'Imported segments are not as expected!');
+    
     }
     
     public static function tearDownAfterClass() {

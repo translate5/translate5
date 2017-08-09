@@ -42,10 +42,6 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
      */
     protected $_classNameDifftagger = 'editor_Models_Export_DiffTagger_Sdlxliff';
 
-    public function __construct(integer $fileId, boolean $diff,editor_Models_Task $task,string $path) {
-        parent::__construct($fileId, $diff,$task,$path);
-    }
-
     /**
      * Rekonstruiert in einem Segment die ursprüngliche Form der enthaltenen Tags
      *  
