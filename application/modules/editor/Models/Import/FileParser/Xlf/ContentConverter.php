@@ -249,8 +249,11 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $this->source = $source;
         $this->preserveWhitespace = $preserveWhitespace; //must not be given to inline element parser, since xml:space may occur only outside of inline content 
         $this->xmlparser->parseList($chunks);
-        
-        return $this->xmlparser->join($this->result);
+        $result = $this->xmlparser->join($this->result);
+        if(!$this->preserveWhitespace) {
+            return trim($result);
+        }
+        return $result;
     }
     
     /**
@@ -259,7 +262,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      */
     public function handleText($text) {
         if(!$this->preserveWhitespace) {
-            $text = trim(preg_replace("/[ \t\n\r]+/u", ' ', $text));
+            $text = preg_replace("/[ \t\n\r]+/u", ' ', $text);
         }
         //we have to decode entities here, otherwise our generated XLF wont be valid
         // although the whitespace of the content may not be preserved here, if there remain multiple spaces or other space characters, 
