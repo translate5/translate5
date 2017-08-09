@@ -150,12 +150,23 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to '.$fileToCompare);
     }
     
+    /**
+     * Tests if whitespace is preserved correctly, according to the XLIFF specification.
+     * Needs $this->config->runtimeOptions->import->xlf->preserveWhitespace to be false!
+     */
     public function testPreserveWhitespace() {
         $segments = $this->api()->requestJson('editor/segment?start=41&limit=200');
         $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/XlfImportTest/expectedSegmentsPreserveWhitespace-new.json", json_encode($data,JSON_PRETTY_PRINT));
-        //$this->assertEquals(self::$api->getFileContent('expectedSegmentsPreserveWhitespace.json'), $data, 'Imported segments are not as expected!');
+        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/XlfImportTest/expectedSegmentsPreserveWhitespace-new.json", json_encode($data,JSON_PRETTY_PRINT));
+        $this->assertEquals(self::$api->getFileContent('expectedSegmentsPreserveWhitespace.json'), $data, 'Imported segments are not as expected!');
+    }
     
+    /**
+     * Is incomplete since we could not change the import->xlf->preserveWhitespace config from inside the test
+     * Needs task templates therefore
+     */
+    public function testPreserveAllWhitespace() {
+        $this->markTestIncomplete('Could not be tested due missing task template functionality to set the preserve config to true.');
     }
     
     public static function tearDownAfterClass() {

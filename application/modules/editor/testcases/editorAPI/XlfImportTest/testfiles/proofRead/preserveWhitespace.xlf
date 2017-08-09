@@ -73,6 +73,11 @@
             likez configz.</target>
         <note priority="1" from="description">Test file undefined &gt; trans-unit default.</note>
       </trans-unit>
+      <trans-unit id="32344324" datatype="html">
+          <source>
+          </source>
+          <note priority="1" from="description">This segment should be ignored at all since whitespace is collapsed and segment is empty then!</note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

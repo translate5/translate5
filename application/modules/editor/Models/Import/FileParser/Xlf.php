@@ -170,7 +170,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $this->registerContent();
         $this->namespaces->registerParserHandler($this->xmlparser);
         
-        $parser->parse($this->_origFileUnicodeProtected);
+        $preserveWhitespaceDefault = $this->config->runtimeOptions->import->xlf->preserveWhitespace;
+        $parser->parse($this->_origFileUnicodeProtected, $preserveWhitespaceDefault);
         
         $this->_skeletonFile = (string) $parser;
         

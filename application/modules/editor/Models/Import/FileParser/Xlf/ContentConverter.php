@@ -214,7 +214,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * @return boolean
      */
     protected function useTagContentOnly($tag, $key, $opener) {
-        //if the namespace defines a way how to use the tag content, us that way
+        //if the namespace defines a way how to use the tag content, use that way
         if(!is_null($this->useTagContentOnlyNamespace)) {
             return $this->useTagContentOnlyNamespace;
         }
@@ -228,6 +228,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             return true;
         }
         $contentRange = trim($this->xmlparser->getRange($opener['openerKey']+1, $key-1, true)).'<end>';
+        //FIXME a img tag with sub inside a ph is not exposed as <img> but as <ph> in the GUI
         //returns false if contentRange starts with <sub and ends with sub>, what means contains a sub text only
         return (stripos($contentRange, '<sub') !== 0 || stripos($contentRange, 'sub><end>') === false);
     }
@@ -258,7 +259,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      */
     public function handleText($text) {
         if(!$this->preserveWhitespace) {
-            $text = preg_replace("/[ \t\n\r]+/u", ' ', $text);
+            $text = trim(preg_replace("/[ \t\n\r]+/u", ' ', $text));
         }
         //we have to decode entities here, otherwise our generated XLF wont be valid
         // although the whitespace of the content may not be preserved here, if there remain multiple spaces or other space characters, 

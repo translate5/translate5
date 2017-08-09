@@ -446,7 +446,7 @@ class editor_Models_Import_FileParser_XmlParser {
             'openerKey' => $key,
             'tag' => $tag,
             'attributes' => $attributes,
-            'preserveWhitespace' => $preserve == 'preserve',
+            'preserveWhitespace' => $preserve == 'preserve' || $this->preserveWhitespace,
         ];
         
         if($this->disableHandlerCount > 0) {
