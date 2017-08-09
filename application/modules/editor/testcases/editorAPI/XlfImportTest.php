@@ -82,7 +82,19 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
     }
     
     /**
+     * Tests if whitespace is preserved correctly, according to the XLIFF specification.
+     * Needs $this->config->runtimeOptions->import->xlf->preserveWhitespace to be false!
+     */
+    public function testPreserveWhitespace() {
+        $segments = $this->api()->requestJson('editor/segment?start=41&limit=200');
+        $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
+        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/XlfImportTest/expectedSegmentsPreserveWhitespace-new.json", json_encode($data,JSON_PRETTY_PRINT));
+        $this->assertEquals(self::$api->getFileContent('expectedSegmentsPreserveWhitespace.json'), $data, 'Imported segments are not as expected!');
+    }
+    
+    /**
      * @depends testSegmentValuesAfterImport
+     * @depends testPreserveWhitespace
      */
     public function testSegmentEditing() {
         //get segment list (just the ones of the first file for that tests)
@@ -124,8 +136,8 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         $task = $this->api()->getTask();
         //start task export 
         $this->checkExport($task, 'editor/task/export/id/'.$task->id, 'ibm-opentm2-export-normal.xlf');
-        //start task export with diff 
-        //$this->checkExport($task, 'editor/task/export/id/'.$task->id.'/diff/1', 'ibm-opentm2-export-normal.xlf');
+        //start task export with diff
+        // diff export will be disabled for XLF!
     }
     
     /**
@@ -148,17 +160,6 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         //file_put_contents('/home/tlauria/foo1.xlf', rtrim($expectedResult));
         //file_put_contents('/home/tlauria/foo2.xlf', rtrim($exportedFile));
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to '.$fileToCompare);
-    }
-    
-    /**
-     * Tests if whitespace is preserved correctly, according to the XLIFF specification.
-     * Needs $this->config->runtimeOptions->import->xlf->preserveWhitespace to be false!
-     */
-    public function testPreserveWhitespace() {
-        $segments = $this->api()->requestJson('editor/segment?start=41&limit=200');
-        $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/XlfImportTest/expectedSegmentsPreserveWhitespace-new.json", json_encode($data,JSON_PRETTY_PRINT));
-        $this->assertEquals(self::$api->getFileContent('expectedSegmentsPreserveWhitespace.json'), $data, 'Imported segments are not as expected!');
     }
     
     /**
