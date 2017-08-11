@@ -56,6 +56,10 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     KEYCODE_SHIFT: 16,
     KEYCODE_ALT_GR: 225,
     
+    // https://github.com/timdown/rangy/wiki/Rangy-Range#compareboundarypointsnumber-comparisontype-range-range
+    RANGY_RANGE_IS_BEFORE: -1,
+    RANGY_RANGE_IS_AFTER: 1,
+    
     /**
      * The given segment content is the base for the operations provided by this method
      * @param {Editor.view.segments.HtmlEditor} content
@@ -171,21 +175,22 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
 
     /**
      * Handle deletion-Events.
+     * - TODO: Bei Backspace kein neues DEL, wenn schon in der Position VOR der Position DAVOR ein DEL existiert
+     * - TODO: Bei Delete kein neues DEL, wenn schon in der Position NACH der Position DANACH ein DEL existiert
      */
     handleDeletion: function() {
         // Das Event wird auf jeden Fall gestoppt; Zeichen werden nicht mehr gelöscht...
         this.stopEvent = true;
         // ... sondern als gelöscht markiert:
-        var position = this.checkForExistingTags("DEL");
         switch(true) {
-            case (position == "isInParent"):
+            case (this.isInParent(this.docSelRange)):
                 // Wenn wir uns in einem DEL befinden: stoppen. (Das zu löschende Zeichen ist ja bereits als gelöscht markiert.)
             break;
-            case (position == "isAtPrevious" && this.eventKey == this.KEYCODE_DELETE):
+            case (this.isAtPrevious(this.docSelRange) && this.eventKey == this.KEYCODE_DELETE):
                 // Bei delete ganz am Ende des DELs, dann das Zeichen dahinter löschen sprich in den DEL mit reinpacken.
                 console.log("TODO: Ins vorherige DEL mit reinpacken.")
             break;
-            case (position == "isAtNext" && this.eventKey == this.KEYCODE_BACKSPACE):
+            case (this.isAtNext(this.docSelRange) && this.eventKey == this.KEYCODE_BACKSPACE):
                 // Bei backspace ganz am Anfang des DELs, dann das Zeichen davor löschen sprich in den DEL mit reinpacken.
                 console.log("TODO: Ins nachfolgende DEL mit reinpacken.")
             break;
@@ -204,29 +209,16 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     handleInsert: function() {
         // Das Event wird anschließend ausgeführt (= das Einfügen geht dann normal vonstatten).
         this.stopEvent = false;
-        // Aber vorher kümmern wir uns um das Markup:
-        var position = this.checkForExistingTags("INS");
-        switch(true) {
-            case (position == "isInParent"):
-                // Da wie schon im richtigen MarkUp sind, machen wir hier gar nix.
-            break;
-            case (position == "isAtPrevious"):
-                // Es gibt bereits ein INS davor; an das schließen wir uns an.
-                this.usePreviousNode();
-            break;
-            case (position == "isAtNext"):
-                // Es gibt bereits ein INS dahinter; an das schließen wir uns an.
-                this.useNextNode();
-            break;
-            default:
-                // Wenn wir uns nicht in oder an einem INS-Node befinden, müssen wir uns jetzt um das Markup kümmern:
-                this.markInsertion();
-            break;
+        // Wenn wir schon im richtigen MarkUp sind, machen wir sonst weiter nichts.
+        if (this.isInParent(this.docSelRange)) {
+            return;
         }
+        // Ansonsten kümmern wir uns vorher noch um das ins-Tag.
+        this.markInsertion();
     },
     
     /**
-     * Marks a deletion as deleted:
+     * Mark a deletion as deleted:
      * Instead of deleting the character, we wrap it into a DEL-node.
      */
     markDeletion: function() {
@@ -244,7 +236,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                 endOffset += 1;
             break;
         }
-        rangeForDel.setStartAndEnd(startNode, startOffset, endNode, endOffset);
+        rangeForDel.setStartAndEnd(startNode, startOffset, endNode, endOffset); // TODO: Fails to execute for 'setEnd' on 'Range' when The offset 2 is larger than the node's length (1).
         // create and attach <del>-Element
         node = this.createNewNode("del");
         if (rangeForDel.canSurroundContents(node)) {
@@ -256,7 +248,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     
     /**
-     * Marks an insertion as inserted:
+     * Mark an insertion as inserted:
      * Before the insertion is added in the editor, we create an INS-node and position the caret in there.
      */
     markInsertion: function() {
@@ -269,68 +261,66 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         rangeForPos.selectNodeContents(nodeEl);
         this.docSel.setSingleRange(rangeForPos);
         nodeEl.nodeValue = '';                              // Google Chrome; see above...
-    },
-    
-    /**
-     * "Switch" the range to previous node.
-     */
-    usePreviousNode: function() {
-        var previousNode = this.docSelRange.startContainer.previousSibling;
-        var rangeToUse = rangy.createRange();
-        rangeToUse.selectNodeContents(previousNode);
-        rangeToUse.collapse(false);
-        this.docSel.setSingleRange(rangeToUse);
-    },
-    
-    /**
-     * "Switch" the range to next node.
-     */
-    useNextNode: function() {
-        var nextNode = this.docSelRange.startContainer.nextSibling;
-        var rangeToUse = rangy.createRange();
-        rangeToUse.selectNodeContents(nextNode);
-        rangeToUse.collapse(true);
-        this.docSel.setSingleRange(rangeToUse);
-    },
-    
-    /**
-     * Checks for already existing nodes we are in or at.
-       - NEXT STEPS: Check also for user, workflow, ...
-     */
-    checkForExistingTags: function(nodeName) {
-        switch(true) {
-            // Befinden wir uns BEREITS IN einem INS/DEL? (das uns gehört und im gleichen Workflow Schritt ist → mit Marc klären)
-            case (this.hasParent(nodeName)):
-                console.log("isInParent");
-                return "isInParent";
-            break;
-            // Befinden wir uns DIREKT HINTER einem INS/DEL? (das uns gehört und im gleichen Workflow Schritt ist → mit Marc klären)
-            case (this.isAtPrevious(nodeName)):
-                console.log("previous node exists; TODO: check POSITION as well!");
-                return "isAtPrevious";
-            break;
-            // Befinden wir uns DIREKT VOR einem INS/DEL? (das uns gehört und im gleichen Workflow Schritt ist → mit Marc klären)
-            case (this.isAtNext(nodeName)):
-                console.log("next node exists; TODO: check POSITION as well!");
-                return "isAtNext";
-            break;
-            // Wie befinden uns weder in noch an einem INS/DEL:
-            default:
-                console.log("Weder in noch dran...")
-                return false;
+        
+        // if this new node is right behind an ins-node that already exists, we use that one:
+        var currentNode = rangeForPos.startContainer;
+        if(this.isAtPrevious(currentNode)) {
+            console.log("INS: use previous...")
         }
+        
+        // if this new node is right before an ins-node that already exists, we use that one:
+        var currentNode = rangeForPos.endContainer;
+        if(this.isAtNext(currentNode)) {
+            console.log("INS: use next...")
+        }
+        
     },
-    hasParent: function(nodeName) {
-        return (this.getNodeNameOfParentElement() == nodeName);
-    },
-    isAtPrevious: function(nodeName) {
-        // TODO: auch Position berücksichtigen! (Sind wir wirklich direkt dahinter?)
-        // => Umstellen auf rangy-Methoden
+    
+    /**
+     * Check for already existing markup-nodes we are in or at.
+     */
+    isInParent: function(currentNode) {
+        var parentNode = currentNode.commonAncestorContainer;
+        if (parentNode.nodeType == 3) {
+            parentNode = parentNode.parentNode;
+        }
+        // same conditions?
+        if (this.isNodesOfSameConditions(currentNode,parentNode)) {
+            return true;
+        }
+        // otherwise:
         return false;
     },
-    isAtNext: function(nodeName) {
-        // TODO: auch Position berücksichtigen! (Sind wir wirklich direkt davor?)
-        // => Umstellen auf rangy-Methoden
+    isAtPrevious: function(currentNode) {
+        var previousNode = currentNode.previousSibling;
+        // same conditions?
+        if (this.isNodesOfSameConditions(currentNode,previousNode)) {
+            // really respectively after the previous one?
+            var rangeCurrentNode = rangy.createRange(),
+                rangePreviousNode = rangy.createRange();
+            rangeCurrentNode.selectNodeContents(currentNode);
+            rangePreviousNode.selectNodeContents(previousNode);
+            if(rangeCurrentNode.compareBoundaryPoints(rangeCurrentNode.END_TO_START, rangePreviousNode) == this.RANGY_RANGE_IS_AFTER) {
+                return true;
+            }
+        }
+        // otherwise:
+        return false;
+    },
+    isAtNext: function(currentNode) {
+        var nextNode = currentNode.nextSibling;
+        // same conditions?
+        if (this.isNodesOfSameConditions(currentNode,nextNode)) {
+            // really respectively before the next one?
+            var rangeCurrentNode = rangy.createRange(),
+                rangeNextNode = rangy.createRange();
+            rangeCurrentNode.selectNodeContents(currentNode);
+            rangeNextNode.selectNodeContents(nextNode);
+            if(rangeCurrentNode.compareBoundaryPoints(rangeCurrentNode.START_TO_END, rangeNextNode) == this.RANGY_RANGE_IS_BEFORE) {
+                return true;
+            }
+        }
+        // otherwise:
         return false;
     },
     
@@ -345,27 +335,19 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     
     /**
-     * Helper for NodeNames
+     * Do the nodes share the same conditions? (nodeName, user, workflow....)
      */
-    getNodeNameOfParentElement: function() {
-        // s.a. https://github.com/timdown/rangy/wiki/Rangy-Range#commonancestorcontainer
-        if (this.docSelRange.startContainer.parentElement == null) {
-            return null;
-        }
-        return this.docSelRange.startContainer.parentElement.nodeName;
-    },
-    
-    getNodeNameOfPreviousElement: function() {
-        if (this.docSelRange.startContainer.previousSibling == null) {
-            return null;
-        }
-        return this.docSelRange.startContainer.previousSibling.nodeName;
-    },
-    
-    getNodeNameOfNextElement: function() {
-        if (this.docSelRange.endContainer.nextSibling == null) {
-            return null;
-        }
-        return this.docSelRange.endContainer.nextSibling.nodeName;
+    isNodesOfSameConditions: function(nodeA,nodeB) {
+        
+        // Same NodeName?
+        var nodeNameA = (nodeA == null) ? 'null' : nodeA.nodeName,
+            nodeNameB = (nodeB == null) ? 'null' : nodeB.nodeName;
+        var sameNodeName = (nodeNameA == nodeNameB);
+        
+        // NEXT STEPS: Check also for user, workflow, ...
+        sameUser = true;
+        sameWorkflow = true;
+        
+        return sameNodeName && sameUser && sameWorkflow;
     }
 });
