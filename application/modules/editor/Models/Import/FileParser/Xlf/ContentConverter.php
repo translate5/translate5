@@ -66,6 +66,10 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      */
     protected $task;
     
+    /**
+     * map of content tag to tagNr, to get the correct tagNr for tag pairs and between source and target column
+     * @var array
+     */
     protected $shortTagNumbers = [];
     
     /**
@@ -108,13 +112,13 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         }, function($tag, $key, $opener) {
             $this->xmlparser->registerOther([$this, 'handleText']);
             $originalContent = $this->xmlparser->getRange($opener['openerKey'], $key, true);
-            $rid = $this->xmlparser->getAttribute($opener['attributes'], 'rid');
             if($this->useTagContentOnly($tag, $key, $opener)) {
                 $text = $this->xmlparser->join($this->innerTag);
             }
             else {
                 $text = null;
             }
+            $rid = $this->getRid($opener);
             $this->result[] = $this->createTag($rid, $tag, $originalContent, $text);
         });
         
@@ -133,7 +137,6 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     /**
      * creates an internal tag out of the given data
      * @param string $rid ID to identify tag pairs (for tagNr calculation)
-     * @param string $type valid types are: single, open, close
      * @param string $tag
      * @param string $originalContent this is value which is restored on export
      * @param string $text optional, this is the tag value which should be shown in the frontend
@@ -171,30 +174,43 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         }
         $imgText = html_entity_decode($text, ENT_QUOTES, 'utf-8');
         $fileNameHash = md5($imgText);
-        //generate the html tag for the editor
         $tagNr = $this->getShortTagNumber($rid);
-        
-        if($this->source) {
-            //FIXME save source $tagNr to tag; tag key is = tag + join(attributes)
-        }
-        else {
-            //FIXME load target $tagNr to tag; tag key is = tag + join(attributes)
-            //What to do with not found tags? → leave this feature unsolved, 
-            // since our SDLXLIFF import is also making the numbering "wrong"
-        }
-        
         $p = $this->getTagParams($originalContent, $tagNr, $tag, $fileNameHash, $text);
         $this->{$type}->createAndSaveIfNotExists($imgText, $fileNameHash);
         return $this->{$type}->getHtmlTag($p);
     }
     
     /**
+     * Calculates an identifier of a tag, to match opener and closer tag (for tag numbering)
+     * @param array $openerMeta
+     */
+    protected function getRid($openerMeta) {
+        $rid = $this->xmlparser->getAttribute($openerMeta['attributes'], 'rid');
+        if($rid !== false) {
+            return $rid;
+        }
+        $id = $this->xmlparser->getAttribute($openerMeta['attributes'], 'id');
+        if($id !== false) {
+            return $id;
+        }
+        //according to the spec all tags must have an ID, so if we get here,
+        // this is invalid and we have to fake an identifier. 
+        // tagnumbering may then not be correct!
+        if(empty($openerMeta['fakedRid'])){
+            $openerMeta['fakedRid'] = $openerMeta['tag'].'-'.$openerMeta['openerKey'];
+        }
+        return $openerMeta['fakedRid'];
+    }
+    
+    /**
      * returns the short tag number to the given rid or creates one
+     * rid can be given as tag attribute, if nothing found the ID is used as fallback. 
+     * A rid should always be given, since it is also needed to map the tags in source to target, 
+     *  so that same tagNr are used for same tags there 
      * @param string $rid
      * @return number
      */
     protected function getShortTagNumber($rid) {
-        //single tags have an empty rid and must always get a new tagNr
         if(empty($rid)) {
             return $this->shortTagIdent++;
         }
@@ -244,10 +260,18 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      */
     public function convert(array $chunks, $source, $preserveWhitespace = false) {
         $this->result = [];
-        $this->shortTagIdent = 1;
-        $this->shortTagNumbers = [];
+        //this assumes that source tags come always before target tags
+        if($source) {
+            $this->shortTagIdent = 1;
+            $this->shortTagNumbers = [];
+        }
+        else {
+            //if we parse the target, we have to reuse the tagNrs found in source
+            $this->shortTagIdent = empty($this->shortTagNumbers) ? 1 : max($this->shortTagNumbers);
+        }
         $this->source = $source;
-        $this->preserveWhitespace = $preserveWhitespace; //must not be given to inline element parser, since xml:space may occur only outside of inline content 
+        //get the flag just from outside, must not be parsed by inline element parser, since xml:space may occur only outside of inline content 
+        $this->preserveWhitespace = $preserveWhitespace; 
         $this->xmlparser->parseList($chunks);
         $result = $this->xmlparser->join($this->result);
         if(!$this->preserveWhitespace) {
@@ -293,8 +317,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             $this->result[] = $single;
             return;
         }
-        //returns false if no rid found (default for x tags)
-        $rid = $this->xmlparser->getAttribute($opener['attributes'], 'rid');
+        $rid = $this->getRid($opener);
         $this->result[] = $this->createTag($rid, $tag, $chunk);
     }
     
@@ -311,8 +334,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             $this->result[] = $result[0];
             return;
         }
-        //for gTags we have to fake the RID for tag matching
-        $this->result[] = $this->createTag('g-'.$key, $tag, $chunk);
+        $rid = $this->getRid($this->xmlparser->current());
+        $this->result[] = $this->createTag($rid, $tag, $chunk);
     }
     
     /**
@@ -323,15 +346,15 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      */
     public function handleGTagCloser($tag, $key, $opener) {
         $openerKey = $opener['openerKey'];
-        $opener = $this->xmlparser->getChunk($openerKey);
-        $closer = $this->xmlparser->getChunk($key);
-        $result = $this->namespaces->getPairedTag($opener, $closer);
+        $openChunk = $this->xmlparser->getChunk($openerKey);
+        $closeChunk = $this->xmlparser->getChunk($key);
+        $result = $this->namespaces->getPairedTag($openChunk, $closeChunk);
         if(!empty($result)) {
             $this->result[] = $result[1];
             return;
         }
-        //to the $rid see handleGTagOpener
-        $this->result[] = $this->createTag('g-'.$openerKey, $tag.'-close', $closer);
+        $rid = $this->getRid($opener);
+        $this->result[] = $this->createTag($rid, $tag.'-close', $closeChunk);
     }
     
     /**

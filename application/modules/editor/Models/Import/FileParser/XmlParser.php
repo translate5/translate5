@@ -264,6 +264,14 @@ class editor_Models_Import_FileParser_XmlParser {
     }
     
     /**
+     * returns the current element on the stack
+     * @return mixed
+     */
+    public function current() {
+        return end($this->xmlStack);
+    }
+    
+    /**
      * parses the CSS like selector 
      * currently supported: 
      *    element                   a simple type selector
