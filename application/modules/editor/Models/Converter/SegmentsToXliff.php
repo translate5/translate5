@@ -370,7 +370,7 @@ class editor_Models_Converter_SegmentsToXliff {
         /* @var $file editor_Models_File */
         $file->load($fileId);
         $exportParser = str_replace('_Import_', '_Export_', $file->getFileParser());
-        return ZfExtended_Factory::get($exportParser, array(0, false,  $this->task, $path));
+        return ZfExtended_Factory::get($exportParser, array(0, false,  $this->task, $filename));
     }
     
     /**
