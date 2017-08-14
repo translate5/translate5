@@ -45,6 +45,15 @@ class editor_Models_Import_FileParser_Testcase extends editor_Models_Import_File
      * @var \QueryPath\DOMQuery
      */
     protected $qp;
+    
+    /**
+     * (non-PHPdoc)
+     * @see editor_Models_Import_FileParser::getFileExtensions()
+     */
+    public static function getFileExtensions() {
+        return ['testcase'];
+    }
+    
     /**
      * Init tagmapping
      */

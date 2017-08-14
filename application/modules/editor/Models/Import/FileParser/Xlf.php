@@ -134,6 +134,14 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     protected $log;
     
     /**
+     * (non-PHPdoc)
+     * @see editor_Models_Import_FileParser::getFileExtensions()
+     */
+    public static function getFileExtensions() {
+        return ['xlf','xlif','xliff','mxliff','mqxliff'];
+    }
+    
+    /**
      * Init tagmapping
      */
     public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task) {
@@ -171,9 +179,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $this->namespaces->registerParserHandler($this->xmlparser);
         
         $preserveWhitespaceDefault = $this->config->runtimeOptions->import->xlf->preserveWhitespace;
-        $parser->parse($this->_origFileUnicodeProtected, $preserveWhitespaceDefault);
-        
-        $this->_skeletonFile = (string) $parser;
+        $this->_skeletonFile = $parser->parse($this->_origFileUnicodeProtected, $preserveWhitespaceDefault);
         
         if ($this->segmentCount === 0) {
             error_log('Die Datei ' . $this->_fileName . ' enthielt keine übersetzungsrelevanten Segmente!');
@@ -220,7 +226,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         }, $sourceEndHandler);
         
         $this->xmlparser->registerElement('trans-unit > target', null, function($tag, $key, $opener){
+            //if empty targets are given as Single Tags
             $this->currentPlainTarget = $this->getTargetMeta($tag, $key, $opener);
+            if($opener['isSingle']) {
+                return;
+            }
             foreach($this->currentTarget as $target) {
                 if($target['tag'] == 'mrk'){
                     //if there is already target content coming from mrk tags inside, 
@@ -605,6 +615,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             // the target tag should be added after the the latter of both
             $replacement = '</'.$this->currentPlainSource['tag'].">\n        <target>".$placeHolder.'</target>';
             $this->xmlparser->replaceChunk($this->currentPlainSource['closer'], $replacement);
+        }
+        elseif($this->currentPlainTarget['openerMeta']['isSingle']) {
+            $this->xmlparser->replaceChunk($this->currentPlainTarget['closer'], function($index, $oldChunk) use ($placeHolder) {
+                return '<target>'.$placeHolder.'</target>';
+            });
         }
         else {
             //clean up target content to empty, we store only our placeholder in the skeleton file

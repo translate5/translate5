@@ -119,28 +119,12 @@ class editor_Models_Export {
      * @return editor_Models_Import_FileParser
      * @throws Zend_Exception
      */
-    protected function getFileParser(integer $fileId,string $path){
-       $ext = preg_replace('".*\.([^.]*)$"i', '\\1', $path);
-       
-       try {
-           return ZfExtended_Factory::get('editor_Models_Export_FileParser_'.ucfirst(strtolower($ext)), array($fileId, $this->optionDiff,  $this->task, $path));
-           
-        } catch (Exception $e) { 
-            throw new Zend_Exception('For the fileextension '.$ext. ' no parser is registered.',0,$e);
-        }
-    }
-    
-    /**
-     * returns a fileparser for the given task and filename
-     * @param editor_Models_Task $task
-     * @param string $filename
-     * @return editor_Models_Import_FileParser
-     */
-    public function getFileParserForXmlList(editor_Models_Task $task, $filename) {
-        $this->task = $task;
-        $this->taskGuid = $task->getTaskGuid();
-        $this->optionDiff = false;
-        return $this->getFileParser(0, $filename);
+    protected function getFileParser(integer $fileId, string $path){
+        $file = ZfExtended_Factory::get('editor_Models_File');
+        /* @var $file editor_Models_File */
+        $file->load($fileId);
+        $exportParser = str_replace('_Import_', '_Export_', $file->getFileParser());
+        return ZfExtended_Factory::get($exportParser, array($fileId, $this->optionDiff,  $this->task, $path));
     }
     
     /**

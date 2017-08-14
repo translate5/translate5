@@ -106,6 +106,14 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     protected $meta;
 
     /**
+     * (non-PHPdoc)
+     * @see editor_Models_Import_FileParser::getFileExtensions()
+     */
+    public static function getFileExtensions() {
+        return ['transit'];
+    }
+    
+    /**
      * 
      * @param string $path
      * @param string $fileName

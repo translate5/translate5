@@ -454,6 +454,7 @@ class editor_Models_Import_FileParser_XmlParser {
             'openerKey' => $key,
             'tag' => $tag,
             'attributes' => $attributes,
+            'isSingle' => $isSingle,
             'preserveWhitespace' => $preserve == 'preserve' || $this->preserveWhitespace,
         ];
         

@@ -94,6 +94,14 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     protected $_origFileUnicodeSpecialCharsRemoved = NULL;
 
     /**
+     * (non-PHPdoc)
+     * @see editor_Models_Import_FileParser::getFileExtensions()
+     */
+    public static function getFileExtensions() {
+        return ['sdlxliff'];
+    }
+    
+    /**
      * Initiert Tagmapping
      */
     public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task) {
@@ -690,6 +698,4 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $data['text'] = $this->encodeTagsForDisplay($data['text']);
         return $data;
     }
-    
-
 }
