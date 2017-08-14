@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
   <file original="Test1" datatype="x-testdata" xml:space="preserve" source-language="de" target-language="zen">
+      <header><![CDATA[This data text must be ignored by the parser! Also contained <source> tags should not make any problem.
+Also linebreaks 
+should make any problem!]]></header>
     <body>
       <trans-unit id="12344321" datatype="html">
           <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 

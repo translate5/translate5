@@ -73,6 +73,8 @@ class editor_Models_Import_FileParser_XmlParser {
      */
     protected $preserveWhitespace;
     
+    protected $cdataBlocks = [];
+    
     /**
      * walks through the given XML string and fires the registered callbacks for each found node 
      * Preserving whitespace in XML is defined by the xml:space attribute on each node. 
@@ -83,8 +85,15 @@ class editor_Models_Import_FileParser_XmlParser {
      * @return string the parsed string with all callbacks applied
      */
     public function parse($xml, $preserveWhitespaceRoot = false) {
+        $this->cdataBlocks = [];
+        $xml = preg_replace_callback('/<!\[CDATA\[.*?\]\]>/s', function($item){
+            $id = count($this->cdataBlocks);
+            $key = '<cdata id="cdata-'.$id.'"/>';
+            $this->cdataBlocks[$key] = $item[0];
+            return $key;
+        }, $xml);
         $this->parseList(preg_split('/(<[^>]+>)/i', $xml, null, PREG_SPLIT_DELIM_CAPTURE), $preserveWhitespaceRoot);
-        return $this->__toString();
+        return str_replace(array_keys($this->cdataBlocks), array_values($this->cdataBlocks), $this->__toString());
     }
     
     /**
