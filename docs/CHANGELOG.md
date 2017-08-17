@@ -3,6 +3,20 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.5.35] - 2017-08-17
+###Changed
+TRANSLATE-957: XLF Import: Different tag numbering on tags swapped position from source to target
+TRANSLATE-955: XLF Import: Whitespace import in XLF documents
+
+###Bugfixes
+TRANSLATE-937: translate untranslated GUI elements
+TRANSLATE-925: XLF Import: support xliff 1.2 as import format - several smaller fixes
+TRANSLATE-971: XLF Import: Importing an XLF with comments produces an error
+TRANSLATE-968: XLF Import: Ignore CDATA blocks in the Import XMLParser
+TRANSLATE-967: SDLXLIFF segment attributes could not be parsed
+MITTAGQI-42: Changes.xliff filename was invalid under windows and minor issue in error logging
+TRANSLATE-960: Trying to delete a task user assoc entry produces an exception
+
 ## [2.5.34] - 2017-08-07
 ###Added
 TRANSLATE-925: support xliff 1.2 as import format
