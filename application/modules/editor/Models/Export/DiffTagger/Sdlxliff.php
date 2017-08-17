@@ -580,7 +580,7 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
                 $openIds[$open] = preg_replace('".*<g[^>]*id=\"([^\"]+)\".*"', '\\1', $segment[$i]);
             } elseif (strpos($segment[$i], '</g>') !== false) {
                 if (!isset($openIds[$open])) {
-                    error_log(debug_backtrace(2));
+                    error_log(print_r(debug_backtrace(2),1));
                     trigger_error(
                             'In this segment for one closing tag no corresponding opening tag exists - or the tagorder had been syntactically incorrect already before the import in the editor. Therefore it is not possible to create an export with sdl-change-marks in it. Try to export without change-marks. The Segment had been: ' . implode('', $segment), E_USER_ERROR);
                 }
