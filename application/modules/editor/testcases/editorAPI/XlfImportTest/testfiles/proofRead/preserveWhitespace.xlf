@@ -5,6 +5,7 @@
 Also linebreaks 
 should make any problem!]]></header>
     <body>
+    <!-- What about comments? They can contain > < > characters-->
       <trans-unit id="12344321" datatype="html">
           <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
             preserved.</source>

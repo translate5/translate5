@@ -73,7 +73,7 @@ class editor_Models_Import_FileParser_XmlParser {
      */
     protected $preserveWhitespace;
     
-    protected $cdataBlocks = [];
+    protected $nonXmlBlocks = [];
     
     /**
      * walks through the given XML string and fires the registered callbacks for each found node 
@@ -85,15 +85,20 @@ class editor_Models_Import_FileParser_XmlParser {
      * @return string the parsed string with all callbacks applied
      */
     public function parse($xml, $preserveWhitespaceRoot = false) {
-        $this->cdataBlocks = [];
-        $xml = preg_replace_callback('/<!\[CDATA\[.*?\]\]>/s', function($item){
-            $id = count($this->cdataBlocks);
-            $key = '<cdata id="cdata-'.$id.'"/>';
-            $this->cdataBlocks[$key] = $item[0];
+        $this->nonXmlBlocks = [];
+        $xml = preg_replace_callback('/(<!\[CDATA\[.*?\]\]>)|(<!--.*?-->)/s', function($item){
+            $id = count($this->nonXmlBlocks);
+            if(empty($item[1]) && !empty($item[2])) {
+                $key = '<xml-comment id="comment-'.$id.'"/>';
+            }
+            else {
+                $key = '<xml-cdata id="cdata-'.$id.'"/>';
+            }
+            $this->nonXmlBlocks[$key] = $item[0];
             return $key;
         }, $xml);
         $this->parseList(preg_split('/(<[^>]+>)/i', $xml, null, PREG_SPLIT_DELIM_CAPTURE), $preserveWhitespaceRoot);
-        return str_replace(array_keys($this->cdataBlocks), array_values($this->cdataBlocks), $this->__toString());
+        return str_replace(array_keys($this->nonXmlBlocks), array_values($this->nonXmlBlocks), $this->__toString());
     }
     
     /**
@@ -115,6 +120,7 @@ class editor_Models_Import_FileParser_XmlParser {
                     $this->handleElementEnd($key, $tag);
                     continue;
                 }
+                //find attributes:
                 if(preg_match_all('/([^\s]+)="([^"]*)"/', $chunk, $matches)){
                     //ensure that all attribute keys are lowercase, original notation can be found in the orignal chunk
                     $matches[1] = array_map('strtolower', $matches[1]);
