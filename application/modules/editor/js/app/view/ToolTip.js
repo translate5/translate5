@@ -68,10 +68,12 @@ Ext.define('Editor.view.ToolTip', {
         }
         return me.callParent([xy]);
     },
+    
     onTargetOver: function(e) {
         e.preventDefault(); //prevent title tags to be shown in IE
         this.callParent(arguments);
     },
+    
     handleQmFlag: function(t, tip) {
         var me = this, 
             qmtype,
