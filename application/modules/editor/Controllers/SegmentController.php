@@ -144,12 +144,20 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $session = new Zend_Session_Namespace();
         
         $this->entity->loadBySegmentNrInTask($segmentNrInTask, $session->taskGuid);
+        
+        if($this->isEditable()){
+            $this->view->segmentNrInTask=-1;
+            $this->view->index =-1;
+            return;
+        }
+        
         $this->checkTaskGuidAndEditable();
         $index = $this->entity->getIndex();
         if($index === null) {
             throw new ZfExtended_NotFoundException();
         }
-        $this->view->segmentId = $segmentId;
+        $this->view->segmentNrInTask= $segmentNrInTask;
+        
         $this->view->index = $index;
     }
     
@@ -444,6 +452,10 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             //nach außen so tun als ob das gewünschte Entity nicht gefunden wurde
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
+    }
+    
+    protected function isEditable(){
+        return empty($this->entity->getEditable());
     }
 
     /**
