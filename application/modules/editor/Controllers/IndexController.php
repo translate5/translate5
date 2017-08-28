@@ -526,6 +526,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
                 'jpg' => 'image/jpeg',
                 'png' => 'image/png',
                 'gif' => 'image/gif',
+                'svg' => 'image/svg',
+                'woff' => 'application/woff',
+                'woff2' => 'application/woff2',
+                'ttf' => 'application/ttf',
+                'eot' => 'application/eot',
                 'html'=> 'text/html'
         );
         $slash = '/';
