@@ -182,15 +182,17 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         // Das Event wird auf jeden Fall gestoppt; Zeichen werden nicht mehr gelöscht...
         this.stopEvent = true;
         // ... sondern als gelöscht markiert:
+        var nodeForMarkup = this.createNewNodeForDeletion();
         switch(true) {
-            case (this.isInParent(this.docSelRange)):
+            case (this.isInParent(nodeForMarkup,this.docSelRange.startContainer.parentNode)):
                 // Wenn wir uns in einem DEL befinden: stoppen. (Das zu löschende Zeichen ist ja bereits als gelöscht markiert.)
+                console.log("DEL: isInParent...");
             break;
-            case (this.isAtPrevious(this.docSelRange) && this.eventKey == this.KEYCODE_DELETE):
+            case (this.isAtPrevious(this.docSelRange.startContainer) && this.eventKey == this.KEYCODE_DELETE):
                 // Bei delete ganz am Ende des DELs, dann das Zeichen dahinter löschen sprich in den DEL mit reinpacken.
                 console.log("TODO: Ins vorherige DEL mit reinpacken.")
             break;
-            case (this.isAtNext(this.docSelRange) && this.eventKey == this.KEYCODE_BACKSPACE):
+            case (this.isAtNext(this.docSelRange.startContainer) && this.eventKey == this.KEYCODE_BACKSPACE):
                 // Bei backspace ganz am Anfang des DELs, dann das Zeichen davor löschen sprich in den DEL mit reinpacken.
                 console.log("TODO: Ins nachfolgende DEL mit reinpacken.")
             break;
@@ -210,7 +212,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         // Das Event wird anschließend ausgeführt (= das Einfügen geht dann normal vonstatten).
         this.stopEvent = false;
         // Wenn wir schon im richtigen MarkUp sind, machen wir sonst weiter nichts.
-        if (this.isInParent(this.docSelRange)) {
+        var nodeForMarkup = this.createNewNodeForInsertion();
+        if (this.isInParent(nodeForMarkup,this.docSelRange.startContainer.parentNode)) {
+            console.log("INS: isInParent...");
             return;
         }
         // Ansonsten kümmern wir uns vorher noch um das ins-Tag.
@@ -238,7 +242,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         }
         rangeForDel.setStartAndEnd(startNode, startOffset, endNode, endOffset); // TODO: Fails to execute for 'setEnd' on 'Range' when The offset 2 is larger than the node's length (1).
         // create and attach <del>-Element
-        node = this.createNewNode("del");
+        node = this.createNewNodeForDeletion();
         if (rangeForDel.canSurroundContents(node)) {
             rangeForDel.surroundContents(node);
         } else {
@@ -253,37 +257,49 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     markInsertion: function() {
         // create and insert <ins>-node
-        nodeEl = this.createNewNode("ins");
+        nodeEl = this.createNewNodeForInsertion();
         nodeEl.appendChild(document.createTextNode(' '));   // Google Chrome gets lost otherwise
         this.docSelRange.insertNode(nodeEl);
         // position the caret
-        var rangeForPos = rangy.createRange();
-        rangeForPos.selectNodeContents(nodeEl);
-        this.docSel.setSingleRange(rangeForPos);
+        rangeForPosAfterInsert = this.positionCaretInNode(nodeEl);
         nodeEl.nodeValue = '';                              // Google Chrome; see above...
         
         // if this new node is right behind an ins-node that already exists, we use that one:
-        var currentNode = rangeForPos.startContainer;
+        var currentNode = rangeForPosAfterInsert.startContainer;
         if(this.isAtPrevious(currentNode)) {
             console.log("INS: use previous...")
+            // Idee: 
+            // - Caret am Ende vom previousNode platzieren (innerhalb!)
+            // - den eben neu erzeugten nodeEl wieder löschen
         }
         
         // if this new node is right before an ins-node that already exists, we use that one:
-        var currentNode = rangeForPos.endContainer;
+        var currentNode = rangeForPosAfterInsert.endContainer;
         if(this.isAtNext(currentNode)) {
-            console.log("INS: use next...")
+            console.log("INS: use next...");
+            // Idee: 
+            // - Caret am Anfang vom nextNode platzieren (innerhalb!)
+            // - den eben neu erzeugten nodeEl wieder löschen
         }
         
     },
     
     /**
+     * Helper for positioning the caret in the given node.
+     * Returns the range with the new position.
+     */
+    positionCaretInNode: function(node) {
+        var rangeForPos = rangy.createRange();
+        rangeForPos.selectNodeContents(node);
+        this.docSel.setSingleRange(rangeForPos);
+        return rangeForPos;
+    },
+    
+    /**
      * Check for already existing markup-nodes we are in or at.
      */
-    isInParent: function(currentNode) {
-        var parentNode = currentNode.commonAncestorContainer;
-        if (parentNode.nodeType == 3) {
-            parentNode = parentNode.parentNode;
-        }
+    isInParent: function(currentNode,parentNode) {
+        console.log("isInParent?");
         // same conditions?
         if (this.isNodesOfSameConditions(currentNode,parentNode)) {
             return true;
@@ -292,7 +308,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         return false;
     },
     isAtPrevious: function(currentNode) {
-        var previousNode = currentNode.previousSibling;
+        console.log("isAtPrevious?");
+        var previousNode = this.getPreviousNode(currentNode);
         // same conditions?
         if (this.isNodesOfSameConditions(currentNode,previousNode)) {
             // really respectively after the previous one?
@@ -308,7 +325,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         return false;
     },
     isAtNext: function(currentNode) {
-        var nextNode = currentNode.nextSibling;
+        console.log("isAtNext?");
+        var nextNode = this.getNextNode(currentNode);
         // same conditions?
         if (this.isNodesOfSameConditions(currentNode,nextNode)) {
             // really respectively before the next one?
@@ -327,11 +345,30 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     /**
      * Create and return a new node.
      */
+    createNewNodeForInsertion: function(){
+        return this.createNewNode('ins');
+    },
+    createNewNodeForDeletion: function(){
+        return this.createNewNode('del');
+    },
     createNewNode: function(nodeName){
         nodeEl = document.createElement(nodeName);
         nodeEl.id = nodeName + Date.now();
         // NEXT STEPS: Add info about user, workflow, ...
         return nodeEl;
+    },
+    
+    /**
+     * Helper for Nodes.
+     */
+    getParentNode: function(currentNode){
+        return currentNode.parentNode;
+    },
+    getPreviousNode: function(currentNode){
+        return currentNode.previousSibling;
+    },
+    getNextNode: function(currentNode){
+        return currentNode.nextSibling;
     },
     
     /**
