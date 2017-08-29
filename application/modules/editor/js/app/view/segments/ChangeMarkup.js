@@ -38,12 +38,16 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.view.segments.ChangeMarkup', {
     editor: null,
-    eventKey: null,
-    docSel: null,
-    docSelRange: null,
-    stopEvent: null,
+    eventKey: null,         // Keyboard-Event
+    docSel: null,           // what the user has selected
+    docSelRange: null,      // range for what the user has selected
+    stopEvent: null,        // do we stop the event here?
     
     // "CONSTANTS"
+    NODE_NAME_DEL: 'DEL',
+    NODE_NAME_INS: 'INS',
+    
+    // Key-Codes
     KEYCODE_BACKSPACE: 8,
     KEYCODE_DELETE: 46,
     KEYCODE_LEFT: 37,
@@ -182,17 +186,16 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         // Das Event wird auf jeden Fall gestoppt; Zeichen werden nicht mehr gelöscht...
         this.stopEvent = true;
         // ... sondern als gelöscht markiert:
-        var nodeForMarkup = this.createNewNodeForDeletion();
         switch(true) {
-            case (this.isInParent(nodeForMarkup,this.docSelRange.startContainer.parentNode)):
+            case (this.isInParent()):
                 // Wenn wir uns in einem DEL befinden: stoppen. (Das zu löschende Zeichen ist ja bereits als gelöscht markiert.)
                 console.log("DEL: isInParent...");
             break;
-            case (this.isAtPrevious(this.docSelRange.startContainer) && this.eventKey == this.KEYCODE_DELETE):
+            case (this.isAtPrevious() && this.eventKey == this.KEYCODE_DELETE):
                 // Bei delete ganz am Ende des DELs, dann das Zeichen dahinter löschen sprich in den DEL mit reinpacken.
                 console.log("TODO: Ins vorherige DEL mit reinpacken.")
             break;
-            case (this.isAtNext(this.docSelRange.startContainer) && this.eventKey == this.KEYCODE_BACKSPACE):
+            case (this.isAtNext() && this.eventKey == this.KEYCODE_BACKSPACE):
                 // Bei backspace ganz am Anfang des DELs, dann das Zeichen davor löschen sprich in den DEL mit reinpacken.
                 console.log("TODO: Ins nachfolgende DEL mit reinpacken.")
             break;
@@ -212,8 +215,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         // Das Event wird anschließend ausgeführt (= das Einfügen geht dann normal vonstatten).
         this.stopEvent = false;
         // Wenn wir schon im richtigen MarkUp sind, machen wir sonst weiter nichts.
-        var nodeForMarkup = this.createNewNodeForInsertion();
-        if (this.isInParent(nodeForMarkup,this.docSelRange.startContainer.parentNode)) {
+        if (this.isInParent()) {
             console.log("INS: isInParent...");
             return;
         }
@@ -256,32 +258,41 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * Before the insertion is added in the editor, we create an INS-node and position the caret in there.
      */
     markInsertion: function() {
-        // create and insert <ins>-node
-        nodeEl = this.createNewNodeForInsertion();
-        nodeEl.appendChild(document.createTextNode(' '));   // Google Chrome gets lost otherwise
-        this.docSelRange.insertNode(nodeEl);
-        // position the caret
-        rangeForPosAfterInsert = this.positionCaretInNode(nodeEl);
-        nodeEl.nodeValue = '';                              // Google Chrome; see above...
-        
-        // if this new node is right behind an ins-node that already exists, we use that one:
-        var currentNode = rangeForPosAfterInsert.startContainer;
-        if(this.isAtPrevious(currentNode)) {
-            console.log("INS: use previous...")
-            // Idee: 
-            // - Caret am Ende vom previousNode platzieren (innerhalb!)
-            // - den eben neu erzeugten nodeEl wieder löschen
+        switch(true) {
+            // if this new node is right before an ins-node that already exists, we use that one:
+                case this.isAtNext():
+                    console.log("INS: use next...");
+                    // Caret am Ende vom previousNode platzieren (innerhalb!)
+                    var focusNode = document.createElement('div'), // Workaround: temporär Node an Anfang einfügen, um setEndAfter daran ausführen zu können (andernfalls landen wir nicht INNERHALB des nextNodes!)
+                        nextNode = this.getNextNode(this.docSelRange.endContainer),
+                        rangeForPos = rangy.createRange();
+                    focusNode.style.position = "absolute"; // display the temp div out of sight, otherwise the screen flickers
+                    focusNode.style.left = "-1000px";
+                    nextNode.insertBefore(focusNode,nextNode.childNodes[0]);
+                    rangeForPos.setEndAfter(focusNode); // setStartBefore(nextNode) springt VOR die Boundary v. nextNode; setStart() mit Offset-Angabe ist ungünstig, da wir erst prüfen müssten, ob sich das Offset je nach Art auf etwas anderes bezieht (wir müssten also erst prüfen, ob im <ins> zuerst ein Textnode kommt oder nicht)
+                    rangeForPos.collapse(false);
+                    this.docSel.setSingleRange(rangeForPos);
+                    // removing the focusNode before the insert is done looses the correct position of the caret
+                    setTimeout(function() {
+                        nextNode.removeChild(focusNode);
+                      }, 10);
+                    return rangeForPos;
+                break;
+            // if this new node is right behind an ins-node that already exists, we use that one:
+                case this.isAtPrevious():
+                    console.log("INS: use previous...")
+                    // Caret am Ende vom previousNode platzieren (innerhalb!)
+                break;
+            // if we are neither in nor at an ins-node: create and insert <ins>-node:
+                default:
+                    console.log("INS: insert Markup...");
+                    var nodeEl = this.createNewNodeForInsertion();
+                    nodeEl.appendChild(document.createTextNode(' '));   // Google Chrome gets lost otherwise
+                    this.docSelRange.insertNode(nodeEl);
+                    // position the caret
+                    rangeForPosAfterInsert = this.positionCaretInNode(nodeEl);
+                    nodeEl.nodeValue = '';                              // Google Chrome; see above...
         }
-        
-        // if this new node is right before an ins-node that already exists, we use that one:
-        var currentNode = rangeForPosAfterInsert.endContainer;
-        if(this.isAtNext(currentNode)) {
-            console.log("INS: use next...");
-            // Idee: 
-            // - Caret am Anfang vom nextNode platzieren (innerhalb!)
-            // - den eben neu erzeugten nodeEl wieder löschen
-        }
-        
     },
     
     /**
@@ -296,60 +307,108 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     
     /**
-     * Check for already existing markup-nodes we are in or at.
+     * Check if the current selection is in or at already existing markup-nodes.
      */
-    isInParent: function(currentNode,parentNode) {
+    isInParent: function() {
         console.log("isInParent?");
+        var nodeForMarkup = this.createNewNodeForInsertion(),
+            parentNode = this.docSelRange.startContainer.parentNode;
         // same conditions?
-        if (this.isNodesOfSameConditions(currentNode,parentNode)) {
+        if (this.isNodesOfSameConditions(nodeForMarkup,parentNode)) {
             return true;
         }
         // otherwise:
         return false;
     },
-    isAtPrevious: function(currentNode) {
+    isAtPrevious: function() {
         console.log("isAtPrevious?");
-        var previousNode = this.getPreviousNode(currentNode);
-        // same conditions?
-        if (this.isNodesOfSameConditions(currentNode,previousNode)) {
-            // really respectively after the previous one?
-            var rangeCurrentNode = rangy.createRange(),
-                rangePreviousNode = rangy.createRange();
-            rangeCurrentNode.selectNodeContents(currentNode);
-            rangePreviousNode.selectNodeContents(previousNode);
-            if(rangeCurrentNode.compareBoundaryPoints(rangeCurrentNode.END_TO_START, rangePreviousNode) == this.RANGY_RANGE_IS_AFTER) {
-                return true;
-            }
+        var nodeForMarkup = this.createNewNodeForInsertion(),
+            previousNode = this.getPreviousNode(this.docSelRange.startContainer);
+        
+        // ------ (1) same conditions? ------
+        
+        var currentIsOfSameConditionsAsNext = this.isNodesOfSameConditions(nodeForMarkup,previousNode);
+        console.log("isNodesOfSameConditions: " + currentIsOfSameConditionsAsNext);
+        if (!currentIsOfSameConditionsAsNext) {
+            return false;
         }
-        // otherwise:
-        return false;
+        
+        // ------ (2) is after previous? ------
+        
+        // Eigentlich wollte ich die Boundaries der Ranges der aktuellen Selection und des previousNode von der Selection vergleichen; das klappt aber nicht.
+        // Workaround: Selektierte Range klonen, dort einen node einfügen, die geklonte Range dort drumsetzen und DIE dann mit der Range für den previousNode vergleichen.
+        // - For current selection:
+        var rangeForCurrentSelection = this.docSelRange.cloneRange();
+        rangeForCurrentSelection.insertNode(nodeForMarkup);
+        // - For previous node:
+        var rangeForPreviousNode = rangy.createRange();
+
+        // (2a) is after previous?
+        rangeForCurrentSelection.selectNodeContents(nodeForMarkup);
+        rangeForPreviousNode.selectNodeContents(previousNode);
+        var currentIsAfterPrevious = rangeForCurrentSelection.compareBoundaryPoints(Range.END_TO_START, rangeForPreviousNode) == this.RANGY_RANGE_IS_AFTER;
+        console.log("compareBoundaryPoints: is after?: " + currentIsAfterPrevious);
+        
+        // (2b) is right after previous, not just somewhere after it?
+        rangeForCurrentSelection.selectNode(nodeForMarkup);
+        rangeForPreviousNode.selectNode(previousNode);
+        var currentTouchesPrevious = rangeForCurrentSelection.intersectsOrTouchesRange(rangeForPreviousNode);
+        console.log("intersectsOrTouchesRange: " + currentTouchesPrevious);
+        
+        // Cleanup
+        nodeForMarkup.parentElement.removeChild(nodeForMarkup);
+        
+        return currentIsAfterPrevious && currentTouchesPrevious;
     },
-    isAtNext: function(currentNode) {
+    isAtNext: function() {
         console.log("isAtNext?");
-        var nextNode = this.getNextNode(currentNode);
-        // same conditions?
-        if (this.isNodesOfSameConditions(currentNode,nextNode)) {
-            // really respectively before the next one?
-            var rangeCurrentNode = rangy.createRange(),
-                rangeNextNode = rangy.createRange();
-            rangeCurrentNode.selectNodeContents(currentNode);
-            rangeNextNode.selectNodeContents(nextNode);
-            if(rangeCurrentNode.compareBoundaryPoints(rangeCurrentNode.START_TO_END, rangeNextNode) == this.RANGY_RANGE_IS_BEFORE) {
-                return true;
-            }
+        var nodeForMarkup = this.createNewNodeForInsertion(),
+            nextNode = this.getNextNode(this.docSelRange.endContainer);
+        
+        // ------ (1) same conditions? ------
+        
+        var currentIsOfSameConditionsAsNext = this.isNodesOfSameConditions(nodeForMarkup,nextNode);
+        console.log("isNodesOfSameConditions: " + currentIsOfSameConditionsAsNext);
+        if (!currentIsOfSameConditionsAsNext) {
+            return false;
         }
-        // otherwise:
-        return false;
+        
+        //------ (2) is before next? ------
+        
+        // Eigentlich wollte ich die Boundaries der Ranges der aktuellen Selection und des nextNode von der Selection vergleichen; das klappt aber nicht.
+        // Workaround: Selektierte Range klonen, dort einen node einfügen, die geklonte Range dort drumsetzen und DIE dann mit der Range für den nextNode vergleichen.
+        // - For current selection:
+        var rangeForCurrentSelection = this.docSelRange.cloneRange();
+        rangeForCurrentSelection.insertNode(nodeForMarkup);
+        // - For next node:
+        var rangeForNextNode = rangy.createRange();
+        
+        // (2a) is before next?
+        rangeForCurrentSelection.selectNodeContents(nodeForMarkup);
+        rangeForNextNode.selectNodeContents(nextNode);
+        var currentIsBeforeNext = rangeForCurrentSelection.compareBoundaryPoints(Range.START_TO_END, rangeForNextNode) == this.RANGY_RANGE_IS_BEFORE;
+        console.log("compareBoundaryPoints: is before? " + currentIsBeforeNext);
+        
+        // (2b) is right before next, not just somewhere before it?
+        rangeForCurrentSelection.selectNode(nodeForMarkup);
+        rangeForNextNode.selectNode(nextNode);
+        var currentTouchesNext = rangeForCurrentSelection.intersectsOrTouchesRange(rangeForNextNode);
+        console.log("intersectsOrTouchesRange: " + currentTouchesNext);
+        
+        // Cleanup
+        nodeForMarkup.parentElement.removeChild(nodeForMarkup);
+        
+        return currentIsBeforeNext && currentTouchesNext;
     },
     
     /**
      * Create and return a new node.
      */
-    createNewNodeForInsertion: function(){
-        return this.createNewNode('ins');
-    },
     createNewNodeForDeletion: function(){
-        return this.createNewNode('del');
+        return this.createNewNode(this.NODE_NAME_DEL);
+    },
+    createNewNodeForInsertion: function(){
+        return this.createNewNode(this.NODE_NAME_INS);
     },
     createNewNode: function(nodeName){
         nodeEl = document.createElement(nodeName);
@@ -376,15 +435,31 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     isNodesOfSameConditions: function(nodeA,nodeB) {
         
+        // The conditions of the given nodes must BOTH
+        // (1) fit to each other
+        // AND
+        // (2) fit to the current Event
+        switch(true) {
+            case this.eventIsDeletion():
+                nodeNameEvent = this.NODE_NAME_DEL;
+            break;
+            case this.eventIsInsertion():
+                nodeNameEvent = this.NODE_NAME_INS;
+            break;
+            default:
+                nodeNameEvent = null;
+        }
+        
         // Same NodeName?
         var nodeNameA = (nodeA == null) ? 'null' : nodeA.nodeName,
             nodeNameB = (nodeB == null) ? 'null' : nodeB.nodeName;
-        var sameNodeName = (nodeNameA == nodeNameB);
+        var sameNodeNameOfNodes = (nodeNameA == nodeNameB);                                         // (1)
+        var sameNodeNameAsEvent = ( (nodeNameA == nodeNameEvent) && (nodeNameB == nodeNameEvent) ); // (2)
         
         // NEXT STEPS: Check also for user, workflow, ...
         sameUser = true;
         sameWorkflow = true;
         
-        return sameNodeName && sameUser && sameWorkflow;
+        return sameNodeNameOfNodes && sameNodeNameAsEvent && sameUser && sameWorkflow;
     }
 });
