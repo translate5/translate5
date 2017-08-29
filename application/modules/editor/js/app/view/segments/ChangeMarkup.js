@@ -237,7 +237,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * Instead of deleting the character, we wrap it into a DEL-node.
      */
     markDeletion: function() {
-        // create range to be marked as deleted
+        // create a range to be marked as deleted
         var rangeForDel = rangy.createRange(),
             startNode   = this.docSelRange.startContainer,
             startOffset = this.docSelRange.startOffset,
