@@ -189,7 +189,12 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         switch(true) {
             case (this.isInParent()):
                 // Wenn wir uns in einem DEL befinden: stoppen. (Das zu löschende Zeichen ist ja bereits als gelöscht markiert.)
+                // TODO: Wenn wir allerdings ganz am Ende innerhalb des DEL sind, muss bei "Delete" das Zeichen dahinter mit dazugenommen werden.
                 console.log("DEL: isInParent...");
+            break;
+            case (this.isAtPrevious() && this.eventKey == this.KEYCODE_BACKSPACE):
+                // Bei Backspace in ein davor befindliches DEL hinein: nix machen, dort ist ja schon das DEL-Markup gesetzt.
+                console.log("DEL (BACKSPACE): Already marked as deleted.")
             break;
             case (this.isAtPrevious() && this.eventKey == this.KEYCODE_DELETE):
                 // Bei delete ganz am Ende des DELs, dann das Zeichen dahinter löschen sprich in den DEL mit reinpacken.
@@ -198,6 +203,10 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             case (this.isAtNext() && this.eventKey == this.KEYCODE_BACKSPACE):
                 // Bei backspace ganz am Anfang des DELs, dann das Zeichen davor löschen sprich in den DEL mit reinpacken.
                 console.log("TODO: Ins nachfolgende DEL mit reinpacken.")
+            break;
+            case (this.isAtNext() && this.eventKey == this.KEYCODE_DELETE):
+                // Bei Delete in ein nachfolgend bestehendes DEL hinein: nix machen, dort ist ja schon das DEL-Markup gesetzt.
+                console.log("DEL (DELETE): Already marked as deleted.")
             break;
             default:
                 // Wenn wir uns nicht in oder an einem DEL-Node befinden, müssen wir uns jetzt um das Markup kümmern:
@@ -244,7 +253,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         }
         rangeForDel.setStartAndEnd(startNode, startOffset, endNode, endOffset); // TODO: Fails to execute for 'setEnd' on 'Range' when The offset 2 is larger than the node's length (1).
         // create and attach <del>-Element
-        node = this.createNewNodeForDeletion();
+        node = this.createNewNodeForMarkup();
         if (rangeForDel.canSurroundContents(node)) {
             rangeForDel.surroundContents(node);
         } else {
@@ -286,7 +295,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             // if we are neither in nor at an ins-node: create and insert <ins>-node:
                 default:
                     console.log("INS: insert Markup...");
-                    var nodeEl = this.createNewNodeForInsertion();
+                    var nodeEl = this.createNewNodeForMarkup();
                     nodeEl.appendChild(document.createTextNode(' '));   // Google Chrome gets lost otherwise
                     this.docSelRange.insertNode(nodeEl);
                     // position the caret
@@ -311,7 +320,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     isInParent: function() {
         console.log("isInParent?");
-        var nodeForMarkup = this.createNewNodeForInsertion(),
+        var nodeForMarkup = this.createNewNodeForMarkup(),
             parentNode = this.docSelRange.startContainer.parentNode;
         // same conditions?
         if (this.isNodesOfSameConditions(nodeForMarkup,parentNode)) {
@@ -322,7 +331,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     isAtPrevious: function() {
         console.log("isAtPrevious?");
-        var nodeForMarkup = this.createNewNodeForInsertion(),
+        var nodeForMarkup = this.createNewNodeForMarkup(),
             previousNode = this.getPreviousNode(this.docSelRange.startContainer);
         
         // ------ (1) same conditions? ------
@@ -362,7 +371,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     isAtNext: function() {
         console.log("isAtNext?");
-        var nodeForMarkup = this.createNewNodeForInsertion(),
+        var nodeForMarkup = this.createNewNodeForMarkup(),
             nextNode = this.getNextNode(this.docSelRange.endContainer);
         
         // ------ (1) same conditions? ------
@@ -402,17 +411,26 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     
     /**
-     * Create and return a new node.
+     * Create and return a new node for Markup.
      */
-    createNewNodeForDeletion: function(){
-        return this.createNewNode(this.NODE_NAME_DEL);
-    },
-    createNewNodeForInsertion: function(){
-        return this.createNewNode(this.NODE_NAME_INS);
-    },
-    createNewNode: function(nodeName){
-        nodeEl = document.createElement(nodeName);
-        nodeEl.id = nodeName + Date.now();
+    createNewNodeForMarkup: function(){
+        switch(true) {
+            case this.eventIsDeletion():
+                nodeNameAccordingToEvent = this.NODE_NAME_DEL;
+            break;
+            case this.eventIsInsertion():
+                nodeNameAccordingToEvent = this.NODE_NAME_INS;
+            break;
+            default:
+                nodeNameAccordingToEvent = undefined;
+        }
+        
+        if(!nodeNameAccordingToEvent) {
+            return null;
+        }
+        
+        nodeEl = document.createElement(nodeNameAccordingToEvent);
+        nodeEl.id = nodeNameAccordingToEvent + Date.now();
         // NEXT STEPS: Add info about user, workflow, ...
         return nodeEl;
     },
@@ -441,20 +459,20 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         // (2) fit to the current Event
         switch(true) {
             case this.eventIsDeletion():
-                nodeNameEvent = this.NODE_NAME_DEL;
+                nodeNameAccordingToEvent = this.NODE_NAME_DEL;
             break;
             case this.eventIsInsertion():
-                nodeNameEvent = this.NODE_NAME_INS;
+                nodeNameAccordingToEvent = this.NODE_NAME_INS;
             break;
             default:
-                nodeNameEvent = null;
+                nodeNameAccordingToEvent = undefined;
         }
         
         // Same NodeName?
         var nodeNameA = (nodeA == null) ? 'null' : nodeA.nodeName,
             nodeNameB = (nodeB == null) ? 'null' : nodeB.nodeName;
-        var sameNodeNameOfNodes = (nodeNameA == nodeNameB);                                         // (1)
-        var sameNodeNameAsEvent = ( (nodeNameA == nodeNameEvent) && (nodeNameB == nodeNameEvent) ); // (2)
+        var sameNodeNameOfNodes = (nodeNameA == nodeNameB);                                                               // (1)
+        var sameNodeNameAsEvent = ( (nodeNameA == nodeNameAccordingToEvent) && (nodeNameB == nodeNameAccordingToEvent) ); // (2)
         
         // NEXT STEPS: Check also for user, workflow, ...
         sameUser = true;
