@@ -175,6 +175,10 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         // Zu den div.term tags gibt es eine Notiz im Konzept, im Prinzip kann der div.term gelöscht werden wenn darin editiert wird, denn dann passt der Term eh nicht mehr.
         // img tags sind als einzelne Zeichen zu behandeln.
         //Habe ich einige Fälle vergessen?
+        
+        // AUCH BEACHTEN:
+        // - Überlappende Markierungen, zB. Selektieren von bereits markierten Inhalten und noch bestehenden Inhalten
+        // - Ersetzen von markierten Inhalten (= dann also gelöscht) durch neuen Inhalt (= als INS markieren).
     },
 
     /**
@@ -210,6 +214,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             break;
             default:
                 // Wenn wir uns nicht in oder an einem DEL-Node befinden, müssen wir uns jetzt um das Markup kümmern:
+                console.log("DEL: insert Markup...");
                 this.markDeletion();
             break;
         }
@@ -238,23 +243,22 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     markDeletion: function() {
         // create a range to be marked as deleted
-        var rangeForDel = rangy.createRange(),
-            startNode   = this.docSelRange.startContainer,
-            startOffset = this.docSelRange.startOffset,
-            endNode     = this.docSelRange.endContainer,
-            endOffset   = this.docSelRange.endOffset;
-        switch(this.eventKey) {
-            case this.KEYCODE_BACKSPACE: // Backspace: "deletes" the previous character 
-                startOffset -= 1;
-            break;
-            case this.KEYCODE_DELETE: // Delete "deletes" the next character
-                endOffset += 1;
-            break;
+        // var rangeForDel = this.docSelRange.cloneRange(); // buggy: sometimes the cloned range is collapsed to the start although this.docSelRange is NOT.
+        var rangeForDel = this.docSelRange;
+        // If nothing is selected, the caret has just been placed somewhere:
+        if (rangeForDel.collapsed) {
+            switch(this.eventKey) {
+                case this.KEYCODE_BACKSPACE: // Backspace: "deletes" the previous character
+                    rangeForDel.moveStart("character", -1);
+                break;
+                case this.KEYCODE_DELETE: // Delete "deletes" the next character
+                    rangeForDel.moveEnd("character", 1);
+                break;
+            }
         }
-        rangeForDel.setStartAndEnd(startNode, startOffset, endNode, endOffset); // TODO: Fails to execute for 'setEnd' on 'Range' when The offset 2 is larger than the node's length (1).
-        // create and attach <del>-Element
+        // create and attach <del>-Element around the range for deletion
         node = this.createNewNodeForMarkup();
-        if (rangeForDel.canSurroundContents(node)) {
+        if (rangeForDel.canSurroundContents(node)) { // TODO: When some characters have already been marked and some other characters get selected and deleted, this sometimes throws an Uncaught Error "Range is not valid. This usually happens after DOM mutation."
             rangeForDel.surroundContents(node);
         } else {
             console.log("Unable to surround range because range partially selects a non-text node. See DOM4 spec for more information.");
