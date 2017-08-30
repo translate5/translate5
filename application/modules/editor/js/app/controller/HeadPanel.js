@@ -51,6 +51,9 @@ Ext.define('Editor.controller.HeadPanel', {
   },{
       ref: 'headToolBar',
       selector: 'headPanel toolbar#top-menu'
+  },{
+      ref: 'northPanelEditor',
+      selector: '#editorViewport headPanel[region="north"]'
   }],
   listen: {
       controller: {
@@ -73,10 +76,10 @@ Ext.define('Editor.controller.HeadPanel', {
               click: 'tasksMenuDispatcher'
           },
           '#segmentgrid #headPanelUp' : {
-              click: 'headPanelToggle'
+              click:'headPanelToggle'
           },
           '#segmentgrid #headPanelDown' : {
-              click: 'headPanelToggle'
+              click:'headPanelToggle'
           },
           '#mainHelpButton':{
         	click:'mainHelpButtonClick'  
@@ -109,13 +112,7 @@ Ext.define('Editor.controller.HeadPanel', {
   //End Events
   //***********************************************************************************
   headPanelToggle: function(tool) {
-      var hideTarget=this.getHeadPanel();
-      var visualReviewPanel = Ext.ComponentQuery.query('#visualReviewPanel');
-      if(visualReviewPanel){
-          visualReviewPanel = visualReviewPanel[0];
-          hideTarget = visualReviewPanel;
-      }
-      hideTarget.setVisible(tool.type == 'down');
+      this.getHeadPanel().setVisible(tool.type == 'down');
       if(tool.itemId == 'headPanelUp') {
           tool.ownerCt.down('#headPanelDown').show();
       }

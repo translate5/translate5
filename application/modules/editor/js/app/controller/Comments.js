@@ -48,19 +48,19 @@ Ext.define('Editor.controller.Comments', {
     selector : '#segmentgrid'
   },{
       ref : 'saveBtn',
-      selector : '#commentPanel #saveBtn'
+      selector : 'commentPanel[disabled=false] #saveBtn'
   },{
     ref: 'commentPanel',
-    selector: '#commentPanel'
+    selector: 'commentPanel[disabled=false]'
   },{
       ref: 'commentContainer',
-      selector: '#commentPanel #commentContainer'
+      selector: 'commentPanel[disabled=false] #commentContainer'
   },{
       ref: 'rowEditor',
       selector: '#roweditor'
   },{
     ref: 'commentForm',
-    selector: '#commentForm'
+    selector: 'commentPanel[disabled=false] #commentForm'
   },{
       ref: 'autoStateDisplay',
       selector: '#roweditor displayfield[name=autoStateId]'
@@ -335,7 +335,7 @@ Ext.define('Editor.controller.Comments', {
             panelController = commentPanel.getController();
         
         panelController.clearComments();
-        
+
         if(commentPanel.collapsed) {
             return; //collapsed no data load needed
         }
