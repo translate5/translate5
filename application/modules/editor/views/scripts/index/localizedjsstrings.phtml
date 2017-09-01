@@ -605,6 +605,15 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
     
+    Ext.define("Editor.locale.de.view.ReferenceFilesInfoMessage", {
+        override: "Editor.view.ReferenceFilesInfoMessage",
+        strings: {
+            windowTitle: '<?php echo $this->translate->_('Referenz-Dateien');?>', 
+            windowInfoMessage: '<?php echo $this->translate->_('There are reference files to the task. Open attachment list');?>',
+            buttonText: '<?php echo $this->translate->_('Referenz-Dateien liste');?>',
+        }
+    });
+    
 <?php
     if($hasFrontendController('Editor.controller.HeadPanel')){
 ?>
