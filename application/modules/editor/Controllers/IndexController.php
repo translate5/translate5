@@ -538,16 +538,15 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $requestedType =$this->getParam(1);
         $requestedFile =$this->getParam(2);
         $js = explode($slash, $requestedFile);
-        
         $extension = pathinfo($requestedFile, PATHINFO_EXTENSION);
         
         //pluginname is alpha characters only so check this for security reasons
         //ucfirst is needed, since in JS packages start per convention with lowercase, Plugins in PHP with uppercase! 
-        
         $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($js)));
         if(empty($plugin)) {
             throw new ZfExtended_NotFoundException();
         }
+        
         //get the plugin instance to the key
         $pm = Zend_Registry::get('PluginManager');
         /* @var $pm ZfExtended_Plugin_Manager */
@@ -557,9 +556,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             throw new ZfExtended_NotFoundException();
         }
         
-        $publicFileTypes = $plugin->getPublicFileTypes();
-        
-        if(!in_array($requestedType, $publicFileTypes)) {
+        // check if requested "fileType" is allowed
+        if (!$plugin->isPublicFileType($requestedType)) {
             throw new ZfExtended_NotFoundException();
         }
 
