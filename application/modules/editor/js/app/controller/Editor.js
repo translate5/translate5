@@ -66,6 +66,9 @@ Ext.define('Editor.controller.Editor', {
   },{
       ref : 'navi',
       selector : '#metapanel #naviToolbar'
+  },{
+      ref:'filepanel',
+      selector:'#filepanel'
   }],
   isEditing: false,
   keyMapConfig: null,
@@ -92,6 +95,9 @@ Ext.define('Editor.controller.Editor', {
           },
           '#segmentgrid': {
               afterrender: 'initEditPluginHandler'
+          },
+          '#referenceFilesInfoMessage #showReferenceFilesButton':{
+              click:'onShowReferenceFilesButtonClick'
           }
       }
   },
@@ -177,6 +183,8 @@ Ext.define('Editor.controller.Editor', {
               return false;
           }]
       }));
+      
+      me.handleReferneceFilesMessage();
   },
   
   handleSortOrFilter: function() {
@@ -946,5 +954,26 @@ Ext.define('Editor.controller.Editor', {
             failure: failure
         });
     }
+  },
+  
+  handleReferneceFilesMessage:function(){
+      if(Editor.data.task.get('referenceFiles')){
+          var referenceInfoMessage = Ext.create('Editor.view.ReferenceFilesInfoMessage',{}),
+          task = new Ext.util.DelayedTask(function(){
+              referenceInfoMessage.destroy();
+          });
+          task.delay(10000);
+          referenceInfoMessage.show();
+      }
+  },
+
+  /***
+   * "Reference files info message" window button handler
+   */
+  onShowReferenceFilesButtonClick:function(){
+      var filePanel =this.getFilepanel(); 
+      filePanel.expand();
+      filePanel.down('referenceFileTree').expand();
   }
+  
 });
