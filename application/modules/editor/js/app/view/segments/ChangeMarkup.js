@@ -59,6 +59,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     KEYCODE_CTRL: 17,
     KEYCODE_SHIFT: 16,
     KEYCODE_ALT_GR: 225,
+    KEYCODE_SPACE: 32,
     
     // https://github.com/timdown/rangy/wiki/Rangy-Range#compareboundarypointsnumber-comparisontype-range-range
     RANGY_RANGE_IS_BEFORE: -1,
@@ -192,10 +193,10 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         this.stopEvent = true;
         // ... sondern als gelöscht markiert:
         switch(true) {
-            case (this.isInParent()):
+            case (this.isWithin()):
                 // Wenn wir uns in einem DEL befinden: stoppen. (Das zu löschende Zeichen ist ja bereits als gelöscht markiert.)
                 // TODO: Wenn wir allerdings ganz am Ende innerhalb des DEL sind, muss bei "Delete" das Zeichen dahinter mit dazugenommen werden.
-                console.log("DEL: isInParent...");
+                console.log("DEL: isWithin..., we do nothing.");
             break;
             case (this.isAtPrevious() && this.eventKey == this.KEYCODE_BACKSPACE):
                 // Bei Backspace in ein davor befindliches DEL hinein: nix machen, dort ist ja schon das DEL-Markup gesetzt.
@@ -216,8 +217,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             default:
                 // Wenn wir uns nicht in oder an einem DEL-Node befinden, müssen wir uns jetzt um das Markup kümmern:
                 console.log("DEL: insert Markup...");
-                this.markDeletion();
-            break;
+                this.addDel();
         }
     },
 
@@ -227,22 +227,40 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * - Wenn wir uns dabei in einem DEL befinden, dieses an dieser Stelle zuerst auseinander brechen und dann den INS einfügen
      */
     handleInsert: function() {
-        // Das Event wird anschließend ausgeführt (= das Einfügen geht dann normal vonstatten).
+        // Das Event wird anschließend ausgeführt (= das Einfügen geht dann normal vonstatten)...
         this.stopEvent = false;
-        // Wenn wir schon im richtigen MarkUp sind, machen wir sonst weiter nichts.
-        if (this.isInParent()) {
-            console.log("INS: isInParent...");
-            return;
+        // ... vorher kümmern wir uns aber noch um das ins-Tag:
+        switch(true) {
+            case (this.isWithin()):
+                // Wenn wir schon im richtigen MarkUp sind, machen wir sonst weiter nichts.
+                console.log("INS: isWithin..., we do nothing.");
+            break;
+            case this.isAtNext():
+             // if this new node is right before an ins-node that already exists, we use that one:
+                console.log("INS: use next...");
+                this.useNextIns();
+            break;
+            case this.isAtPrevious():
+                // if this new node is right behind an ins-node that already exists, we use that one:
+                console.log("INS: use previous..."); // (scheint aber nie vorzukommen, wird immer als isWithin erkannt.)
+            break;
+            default:
+                // if we are neither in nor at an ins-node: create and insert <ins>-node:
+                if (this.eventKey == this.KEYCODE_SPACE) { // Workaround for inserting space (otherwise creates <u>-Tag, don't know why).
+                    console.log("INS: insert space with Markup...");
+                    this.addInsForSpace();
+                } else {
+                    console.log("INS: insert Markup...");
+                    this.addIns();
+                }
         }
-        // Ansonsten kümmern wir uns vorher noch um das ins-Tag.
-        this.markInsertion();
     },
     
     /**
      * Mark a deletion as deleted:
      * Instead of deleting the character, we wrap it into a DEL-node.
      */
-    markDeletion: function() {
+    addDel: function() {
         // create a range to be marked as deleted
         // var rangeForDel = this.docSelRange.cloneRange(); // buggy: sometimes the cloned range is collapsed to the start although this.docSelRange is NOT.
         var rangeForDel = this.docSelRange;
@@ -258,9 +276,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             }
         }
         // create and attach <del>-Element around the range for deletion
-        node = this.createNewNodeForMarkup();
-        if (rangeForDel.canSurroundContents(node)) { // TODO: When some characters have already been marked and some other characters get selected and deleted, this sometimes throws an Uncaught Error "Range is not valid. This usually happens after DOM mutation."
-            rangeForDel.surroundContents(node);
+        delNode = this.createNewNodeForMarkup();
+        if (rangeForDel.canSurroundContents(delNode)) { // TODO: When some characters have already been marked and some other characters get selected and deleted, this sometimes throws an Uncaught Error "Range is not valid. This usually happens after DOM mutation."
+            rangeForDel.surroundContents(delNode);
         } else {
             console.log("Unable to surround range because range partially selects a non-text node. See DOM4 spec for more information.");
         }
@@ -271,68 +289,69 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * Mark an insertion as inserted:
      * Before the insertion is added in the editor, we create an INS-node and position the caret in there.
      */
-    markInsertion: function() {
-        switch(true) {
-            // if this new node is right before an ins-node that already exists, we use that one:
-                case this.isAtNext():
-                    console.log("INS: use next...");
-                    // Caret am Ende vom previousNode platzieren (innerhalb!)
-                    var focusNode = document.createElement('div'), // Workaround: temporär Node an Anfang einfügen, um setEndAfter daran ausführen zu können (andernfalls landen wir nicht INNERHALB des nextNodes!)
-                        nextNode = this.getNextNode(this.docSelRange.endContainer),
-                        rangeForPos = rangy.createRange();
-                    focusNode.style.position = "absolute"; // display the temp div out of sight, otherwise the screen flickers
-                    focusNode.style.left = "-1000px";
-                    nextNode.insertBefore(focusNode,nextNode.childNodes[0]);
-                    rangeForPos.setEndAfter(focusNode); // setStartBefore(nextNode) springt VOR die Boundary v. nextNode; setStart() mit Offset-Angabe ist ungünstig, da wir erst prüfen müssten, ob sich das Offset je nach Art auf etwas anderes bezieht (wir müssten also erst prüfen, ob im <ins> zuerst ein Textnode kommt oder nicht)
-                    rangeForPos.collapse(false);
-                    this.docSel.setSingleRange(rangeForPos);
-                    // removing the focusNode before the insert is done looses the correct position of the caret
-                    setTimeout(function() {
-                        nextNode.removeChild(focusNode);
-                      }, 10);
-                    return rangeForPos;
-                break;
-            // if this new node is right behind an ins-node that already exists, we use that one:
-                case this.isAtPrevious():
-                    console.log("INS: use previous...")
-                    // Caret am Ende vom previousNode platzieren (innerhalb!)
-                break;
-            // if we are neither in nor at an ins-node: create and insert <ins>-node:
-                default:
-                    console.log("INS: insert Markup...");
-                    var nodeEl = this.createNewNodeForMarkup();
-                    nodeEl.appendChild(document.createTextNode('x'));   // Google Chrome gets lost otherwise
-                    this.docSelRange.insertNode(nodeEl);
-                    // position the caret
-                    rangeForPosAfterInsert = this.positionCaretInNode(nodeEl);
-                    nodeEl.nodeValue = '';                              // Google Chrome; see above...
-        }
+    addIns: function() {
+        var insNode = this.createNewNodeForMarkup();
+        insNode.appendChild(document.createTextNode('x'));   // Google Chrome gets lost otherwise
+        this.docSelRange.insertNode(insNode);
+        // position the caret over the content of the ins-node
+        var rangeForPos = rangy.createRange();
+        rangeForPos.selectNodeContents(insNode);
+        this.docSel.setSingleRange(rangeForPos);
+        insNode.nodeValue = '';                              // Google Chrome; see above...
     },
     
     /**
-     * Helper for positioning the caret in the given node.
-     * Returns the range with the new position.
+     * Add space and mark it as inserted.
      */
-    positionCaretInNode: function(node) {
+    addInsForSpace: function() {
+        var insNode = this.createNewNodeForMarkup();
+        insNode.appendChild(document.createTextNode(' '));
+        this.docSelRange.insertNode(insNode);
+        // position the caret at the end of the ins-node
         var rangeForPos = rangy.createRange();
-        rangeForPos.selectNodeContents(node);
+        rangeForPos.selectNodeContents(insNode);
+        rangeForPos.collapse(false);
         this.docSel.setSingleRange(rangeForPos);
-        return rangeForPos;
+        // space is inserted already, stop the keyboard-Event!
+        this.stopEvent = true;
+        
+        // TODO: ins-Tags in the beginning or at the end of the editor are not recognized by the editor.
+        // - Problem 1: The ins-Node including the space is visible in the code, but not in the editor.
+        // - Problem 2: when inserting another character in the beginning of the editor, the caret is recognized as being WITHIN the ins-Node with the space, 
+        //   but then the editor adds the character AFTER the space (= NOT inside the ins-Node with the space)
+    },
+    
+    /**
+     * Place the caret at the beginning of the next INS-Node (within!!!).
+     */
+    useNextIns:  function() {
+        var focusNode = document.createElement('div'), // Workaround: temporär Node an Anfang einfügen, um setEndAfter daran ausführen zu können (andernfalls landen wir nicht INNERHALB des nextNodes!)
+            nextNode = this.getNextNode(this.docSelRange.endContainer),
+            rangeForPos = rangy.createRange();
+        focusNode.style.position = "absolute"; // display the temp div out of sight, otherwise the displayed content flickers
+        focusNode.style.left = "-1000px";
+        nextNode.insertBefore(focusNode,nextNode.childNodes[0]);
+        rangeForPos.setEndAfter(focusNode); // setStartBefore(nextNode) springt VOR die Boundary v. nextNode; setStart() mit Offset-Angabe ist ungünstig, da wir erst prüfen müssten, ob sich das Offset je nach Art auf etwas anderes bezieht (wir müssten also erst prüfen, ob im <ins> zuerst ein Textnode kommt oder nicht)
+        rangeForPos.collapse(false);
+        this.docSel.setSingleRange(rangeForPos);
+        // Cleanup
+        setTimeout(function() { // removing the focusNode before the insert is done looses the correct position of the caret
+            nextNode.removeChild(focusNode);
+        }, 10);
     },
     
     /**
      * Check if the current selection is in or at already existing markup-nodes.
      */
-    isInParent: function() {
-        console.log("isInParent?");
+    isWithin: function() {
+        console.log("isWithin?");
         var nodeForMarkup = this.createNewNodeForMarkup(),
+            currentNode = this.docSelRange.startContainer,
             parentNode = this.docSelRange.startContainer.parentNode;
         // same conditions?
-        if (this.isNodesOfSameConditions(nodeForMarkup,parentNode)) {
-            return true;
-        }
-        // otherwise:
-        return false;
+        var sameAsCurrent = this.isNodesOfSameConditions(nodeForMarkup,currentNode);
+        var sameAsParent = this.isNodesOfSameConditions(nodeForMarkup,parentNode);
+        return (sameAsCurrent || sameAsParent);
     },
     isAtPrevious: function() {
         console.log("isAtPrevious?");
