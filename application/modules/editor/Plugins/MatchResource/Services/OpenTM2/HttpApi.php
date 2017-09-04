@@ -343,6 +343,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
      * @return boolean
      */
     protected function processResponse(Zend_Http_Response $response) {
+        $this->error = [];
         $this->response = $response;
         $validStates = [200, 201];
         

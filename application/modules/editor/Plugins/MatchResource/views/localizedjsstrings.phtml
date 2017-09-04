@@ -184,6 +184,7 @@ END LICENSE AND COPYRIGHT
         strings: {
             name: '<?php echo $this->translate->_('Name');?>',
             edit: '<?php echo $this->translate->_('Bearbeiten');?>',
+            tasks: '<?php echo $this->translate->_('Zugewiesene Aufgaben');?>',
             erase: '<?php echo $this->translate->_('Löschen');?>',
             download: '<?php echo $this->translate->_('Dateibasiertes TM herunterladen und lokal speichern');?>',
             resource: '<?php echo $this->translate->_('Ressource');?>',
@@ -219,6 +220,19 @@ END LICENSE AND COPYRIGHT
             importSuccess: '<?php echo $this->translate->_('Weitere TM Daten erfolgreich importiert!');?>',
             save: '<?php echo $this->translate->_('Speichern');?>',
             cancel: '<?php echo $this->translate->_('Abbrechen');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.plugins.MatchResource.view.TaskGridWindow", {
+        override: "Editor.plugins.MatchResource.view.TaskGridWindow",
+        strings: {
+            title: '<?php echo $this->translate->_('Zugewiesene Aufgaben');?>',
+            task: '<?php echo $this->translate->_('Aufgabe');?>',
+            state: '<?php echo $this->translate->_('Status');?>',
+            inUse: '<?php echo $this->translate->_('Status "{0}" durch einen anderen Benutzer');?>',
+            close: '<?php echo $this->translate->_('Schließen');?>',
+            reimport: '<?php echo $this->translate->_('Aufgaben reimportieren');?>',
+            reimportTooltip: '<?php echo $this->translate->_('Ausgewählte Aufgaben erneut ins aktuelle TM importieren');?>'
         }
     });
 });

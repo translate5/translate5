@@ -46,6 +46,7 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
         name: '#UT#Name',
         edit: '#UT#Bearbeiten',
         erase: '#UT#Löschen',
+        tasks: '#UT#Zugewiesene Aufgaben',
         download: '#UT#Dateibasiertes TM herunterladen und lokal speichern',
         resource: '#UT#Ressource',
         color: '#UT#Farbe',
@@ -152,7 +153,7 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                     }
                 },{
                     xtype: 'actioncolumn',
-                    width: 80,
+                    width: 98,
                     items: [{
                         tooltip: me.strings.edit,
                         action: 'edit',
@@ -161,6 +162,10 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                         tooltip: me.strings.erase,
                         action: 'delete',
                         iconCls: 'ico-tm-delete'
+                    },{
+                        tooltip: me.strings.tasks,
+                        action: 'tasks',
+                        iconCls: 'ico-tm-tasks'
                     },{
                         tooltip: me.strings.import,
                         action: 'import',

@@ -26,7 +26,18 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
+/**
+ * Tmmt TaskAssoc Entity Object
+ * 
+ * @method integer getId() getId()
+ * @method void setId() setId(integer $id)
+ * @method integer getTmmtId() getTmmtId()
+ * @method void setTmmtId() setTmmtId(integer $tmmtid)
+ * @method string getTaskGuid() getTaskGuid()
+ * @method void setTaskGuid() setTaskGuid(string $taskGuid)
+ * @method boolean getSegmentsUpdateable() getSegmentsUpdateable()
+ * @method void setSegmentsUpdateable() setSegmentsUpdateable(boolean $updateable)
+ */
 class editor_Plugins_MatchResource_Models_Taskassoc extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Plugins_MatchResource_Models_Db_Taskassoc';
     protected $validatorInstanceClass = 'editor_Plugins_MatchResource_Models_Validator_Taskassoc'; //→ here the new validator class
@@ -135,7 +146,7 @@ class editor_Plugins_MatchResource_Models_Taskassoc extends ZfExtended_Models_En
             return [];
         }
         $s = $this->db->select()
-        ->from(array("assocs" => "LEK_matchresource_taskassoc"), array("assocs.id","assocs.taskGuid","task.taskName","task.taskNr","assocs.tmmtId"))
+        ->from(array("assocs" => "LEK_matchresource_taskassoc"), array("assocs.id","assocs.taskGuid","task.taskName","task.state","task.lockingUser","task.taskNr","assocs.tmmtId"))
         ->setIntegrityCheck(false)
         ->join(array("task" => "LEK_task"),"assocs.taskGuid = task.taskGuid","")
         ->where('assocs.tmmtId in (?)', $tmmtids)
