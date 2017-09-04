@@ -179,6 +179,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         // AUCH BEACHTEN:
         // - Überlappende Markierungen, zB. Selektieren von bereits markierten Inhalten und noch bestehenden Inhalten
         // - Ersetzen von markierten Inhalten (= dann also gelöscht) durch neuen Inhalt (= als INS markieren).
+        // - Sollen Strg-C und Strg-V auch unterstützt werden?
     },
 
     /**
@@ -300,7 +301,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                 default:
                     console.log("INS: insert Markup...");
                     var nodeEl = this.createNewNodeForMarkup();
-                    nodeEl.appendChild(document.createTextNode(' '));   // Google Chrome gets lost otherwise
+                    nodeEl.appendChild(document.createTextNode('x'));   // Google Chrome gets lost otherwise
                     this.docSelRange.insertNode(nodeEl);
                     // position the caret
                     rangeForPosAfterInsert = this.positionCaretInNode(nodeEl);
