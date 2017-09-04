@@ -67,7 +67,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     
     /**
      * The given segment content is the base for the operations provided by this method
-     * @param {Editor.view.segments.HtmlEditor} content
+     * @param {Editor.view.segments.HtmlEditor} editor
      */
     constructor: function(editor) {
         this.editor = editor;
@@ -141,7 +141,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         return (keyCodesForDeletion.indexOf(this.eventKey) != -1);
     },
     /**
-     * Is the Key-Event a INSERTION?
+     * Is the Key-Event an INSERTION?
      * @returns {Boolean}
      */
     eventIsInsertion: function() {
@@ -196,31 +196,30 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * Handle deletion-Events.
      * - TODO: Bei Backspace kein neues DEL, wenn schon in der Position VOR der Position DAVOR ein DEL existiert
      * - TODO: Bei Delete kein neues DEL, wenn schon in der Position NACH der Position DANACH ein DEL existiert
-     * - TODO: Was tun, wenn in einem DEL etwas eingefügt wird?
      */
     handleDeletion: function() {
         // Das Event wird auf jeden Fall gestoppt; Zeichen werden nicht mehr gelöscht...
         this.stopEvent = true;
         // ... sondern als gelöscht markiert:
         switch(true) {
-            case (this.isWithin(this.NODE_NAME_DEL)):
+            case (this.isWithinOfSameKind()):
                 // Wenn wir uns in einem DEL befinden: stoppen. (Das zu löschende Zeichen ist ja bereits als gelöscht markiert.)
                 // TODO: Wenn wir allerdings ganz am Ende innerhalb des DEL sind, muss bei "Delete" das Zeichen dahinter mit dazugenommen werden.
-                console.log("DEL: isWithin..., we do nothing.");
+                console.log("DEL: isWithinOfSameKind..., we do nothing.");
             break;
-            case (this.isAtPrevious(this.NODE_NAME_DEL) && this.eventKey == this.KEYCODE_BACKSPACE):
+            case (this.isAtPreviousOfSameKind() && this.eventKey == this.KEYCODE_BACKSPACE):
                 // Bei Backspace in ein davor befindliches DEL hinein: nix machen, dort ist ja schon das DEL-Markup gesetzt.
                 console.log("DEL (BACKSPACE): Already marked as deleted.")
             break;
-            case (this.isAtPrevious(this.NODE_NAME_DEL) && this.eventKey == this.KEYCODE_DELETE):
+            case (this.isAtPreviousOfSameKind() && this.eventKey == this.KEYCODE_DELETE):
                 // Bei delete ganz am Ende des DELs, dann das Zeichen dahinter löschen sprich in den DEL mit reinpacken.
                 console.log("TODO: Ins vorherige DEL mit reinpacken.")
             break;
-            case (this.isAtNext(this.NODE_NAME_DEL) && this.eventKey == this.KEYCODE_BACKSPACE):
+            case (this.isAtNextOfSameKind() && this.eventKey == this.KEYCODE_BACKSPACE):
                 // Bei backspace ganz am Anfang des DELs, dann das Zeichen davor löschen sprich in den DEL mit reinpacken.
                 console.log("TODO: Ins nachfolgende DEL mit reinpacken.")
             break;
-            case (this.isAtNext(this.NODE_NAME_DEL) && this.eventKey == this.KEYCODE_DELETE):
+            case (this.isAtNextOfSameKind() && this.eventKey == this.KEYCODE_DELETE):
                 // Bei Delete in ein nachfolgend bestehendes DEL hinein: nix machen, dort ist ja schon das DEL-Markup gesetzt.
                 console.log("DEL (DELETE): Already marked as deleted.")
             break;
@@ -232,29 +231,34 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     /**
      * Handle insert-Events.
-     * TODO: 
-     * - Wenn wir uns dabei in einem DEL befinden, dieses an dieser Stelle zuerst auseinander brechen und dann den INS einfügen
      */
     handleInsert: function() {
         // Das Event wird anschließend ausgeführt (= das Einfügen geht dann normal vonstatten)...
         this.stopEvent = false;
         // ... vorher kümmern wir uns aber noch um das ins-Tag:
         switch(true) {
-            case (this.isWithin(this.NODE_NAME_INS)):
+            case (this.isWithinOfSameKind()):
                 // Wenn wir schon im richtigen MarkUp sind, machen wir sonst weiter nichts.
-                console.log("INS: isWithin..., we do nothing.");
+                console.log("INS: isWithinOfSameKind..., we do nothing.");
             break;
-            case this.isAtNext(this.NODE_NAME_INS):
+            case this.isAtNextOfSameKind():
              // if this new node is right before an ins-node that already exists, we use that one:
                 console.log("INS: use next...");
                 this.useNextIns();
             break;
-            case this.isAtPrevious(this.NODE_NAME_INS):
+            case this.isAtPreviousOfSameKind():
                 // if this new node is right behind an ins-node that already exists, we use that one:
-                console.log("INS: use previous..."); // (scheint aber nie vorzukommen, wird immer als isWithin erkannt.)
+                console.log("INS: use previous..."); // (scheint aber nie vorzukommen, wird immer als isWithinOfSameKind erkannt.)
             break;
             default:
-                // if we are neither in nor at an ins-node: create and insert <ins>-node:
+                // if we are neither in nor at an ins-node:
+                // (1) Wenn wir uns in einem DEL befinden, dieses an dieser Stelle zuerst auseinanderbrechen.
+                var surroundingDelNode = this.getSurroundingDel();
+                if (surroundingDelNode != null) {
+                    console.log("INS: split DEL first...");
+                    this.splitDel(surroundingDelNode);
+                }
+                // (2) create and insert <ins>-node:
                 if (this.eventKey == this.KEYCODE_SPACE) { // Workaround for inserting space (otherwise creates <u>-Tag, don't know why).
                     console.log("INS: insert space with Markup...");
                     this.addInsForSpace();
@@ -296,6 +300,26 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             console.log("Unable to surround range because range partially selects a non-text node. See DOM4 spec for more information.");
         }
         // TODO: position the caret!
+    },
+    /**
+     * Split a del-node at the current position of the selection.
+     * @param {Object} delNode
+     */
+    splitDel: function(delNode) {
+        // extract what's on the left from the caret and insert it before the delNode as a new del
+        var rangeForExtract = rangy.createRange(),
+            currentNode = this.docSelRange.startContainer,
+            currentOffset = this.docSelRange.startOffset,
+            delNodeParentNode = delNode.parentNode;
+        rangeForExtract.setStartBefore(delNode);
+        rangeForExtract.setEnd(currentNode, currentOffset);
+        var firstPartNewNode = rangeForExtract.extractContents();
+        var firstPartNodeInserted = delNodeParentNode.insertBefore(firstPartNewNode, delNode);
+        // TODO: Prüfen, ob beide Teile des gesplitteten del-Nodes dieselben Angaben haben (User, Workflow, ...)
+        // set position for further inserting (= where the delNode was split)
+        this.docSelRange.setEndBefore(delNode);
+        this.docSelRange.collapse(false);
+        this.docSel.setSingleRange(this.docSelRange);
     },
 
     // =========================================================================
@@ -360,13 +384,32 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     // =========================================================================
     
     /**
-     * Check if the current selection is within an existing markup-node.
-     * @param {String} nodeName
+     * Checks if the current selection is within a del-node of any kind and returns that node (or null otherwise).
+     * @returns {?Object}
+     */
+    getSurroundingDel: function() {
+        console.log("getSurroundingDel?");
+        var surroundingDelNode = null,
+            currentNode = this.docSelRange.startContainer,
+            parentNode = this.docSelRange.startContainer.parentNode;
+        // is within a del-node?
+        var currentNodeName = (currentNode == null) ? 'null' : currentNode.nodeName,
+            parentNodeName = (parentNode == null) ? 'null' : parentNode.nodeName;
+        if (currentNodeName == this.NODE_NAME_DEL) {
+            surroundingDelNode = currentNode;
+        } else if (parentNodeName == this.NODE_NAME_DEL) {
+            surroundingDelNode = parentNode;
+        }
+        return surroundingDelNode;
+    },  
+    /**
+     * Check if the current selection is within an existing markup-node of the same kind.
      * @returns {Boolean}
      */
-    isWithin: function(nodeName) {
-        console.log("isWithin?");
-        var nodeForMarkup = this.createNodeForMarkup(nodeName),
+    isWithinOfSameKind: function() {
+        console.log("isWithinOfSameKind?");
+        var nodeName = this.getNodeNameAccordingToEvent(),
+            nodeForMarkup = this.createNodeForMarkup(nodeName),
             currentNode = this.docSelRange.startContainer,
             parentNode = this.docSelRange.startContainer.parentNode;
         // same conditions?
@@ -375,13 +418,13 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         return (sameAsCurrent || sameAsParent);
     },    
     /**
-     * Check if the current selection is right behind an already existing markup-node.
-     * @param {String} nodeName
+     * Check if the current selection is right behind an already existing markup-node of the same kind.
      * @returns {Boolean}
      */
-    isAtPrevious: function(nodeName) {
-        console.log("isAtPrevious?");
-        var nodeForMarkup = this.createNodeForMarkup(nodeName),
+    isAtPreviousOfSameKind: function() {
+        console.log("isAtPreviousOfSameKind?");
+        var nodeName = this.getNodeNameAccordingToEvent(),
+            nodeForMarkup = this.createNodeForMarkup(nodeName),
             previousNode = this.getPreviousNode(this.docSelRange.startContainer);
         
         // ------ (1) same conditions? ------
@@ -420,13 +463,13 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         return currentIsAfterPrevious && currentTouchesPrevious;
     },
     /**
-     * Check if the current selection is right before an already existing markup-node.
-     * @param {String} nodeName
+     * Check if the current selection is right before an already existing markup-node of the same kind.
      * @returns {Boolean}
      */
-    isAtNext: function(nodeName) {
-        console.log("isAtNext?");
-        var nodeForMarkup = this.createNodeForMarkup(nodeName),
+    isAtNextOfSameKind: function() {
+        console.log("isAtNextOfSameKind?");
+        var nodeName = this.getNodeNameAccordingToEvent(),
+            nodeForMarkup = this.createNodeForMarkup(nodeName),
             nextNode = this.getNextNode(this.docSelRange.endContainer);
         
         // ------ (1) same conditions? ------
@@ -466,34 +509,35 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
 
     // =========================================================================
-    // Helpers for Nodes
+    // Helpers for creating and comparing Nodes
     // =========================================================================
     
+    /**
+     * Returns the markup-nodeName for the current event.
+     * @returns {?String} 
+     */
+    getNodeNameAccordingToEvent: function(){
+        switch(true) {
+            case this.eventIsDeletion():
+                return this.NODE_NAME_DEL;
+            break;
+            case this.eventIsInsertion():
+                return this.NODE_NAME_INS;
+            break;
+            default:
+                return null;
+        }
+    },
     /**
      * Create and return a new node for Markup.
      * @param {String} nodeName
      * @returns {Object} 
      */
     createNodeForMarkup: function(nodeName){
-        nodeEl = document.createElement(nodeName);
-        nodeEl.id = nodeName + Date.now();
+        var nodeEl = document.createElement(nodeName); // TODO: use Ext.DomHelper.createDom() instead?
+        nodeEl.id = Ext.id();
         // NEXT STEPS: Add info about user, workflow, ...
         return nodeEl;
-    },
-    /**
-     * Get the previous node according to the DOM.
-     * @param {String} currentNode
-     * @returns {Object}
-     */
-    getPreviousNode: function(currentNode){
-        return currentNode.previousSibling;
-    },/**
-     * Get the next node according to the DOM.
-     * @param {String} currentNode
-     * @returns {Object}
-     */
-    getNextNode: function(currentNode){
-        return currentNode.nextSibling;
     },
     /**
      * Do the nodes share the same conditions? (nodeName, user, workflow....)
@@ -502,32 +546,58 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @returns {Boolean}
      */
     isNodesOfSameConditions: function(nodeA,nodeB) {
-        
         // The conditions of the given nodes must BOTH
         // (1) fit to each other
         // AND
         // (2) fit to the current Event
-        switch(true) {
-            case this.eventIsDeletion():
-                nodeNameAccordingToEvent = this.NODE_NAME_DEL;
-            break;
-            case this.eventIsInsertion():
-                nodeNameAccordingToEvent = this.NODE_NAME_INS;
-            break;
-            default:
-                nodeNameAccordingToEvent = undefined;
-        }
-        
-        // Same NodeName?
-        var nodeNameA = (nodeA == null) ? 'null' : nodeA.nodeName,
-            nodeNameB = (nodeB == null) ? 'null' : nodeB.nodeName;
-        var sameNodeNameOfNodes = (nodeNameA == nodeNameB);                                                               // (1)
-        var sameNodeNameAsEvent = ( (nodeNameA == nodeNameAccordingToEvent) && (nodeNameB == nodeNameAccordingToEvent) ); // (2)
+        var sameNodeNameOfNodes = this.isNodesOfSameName(nodeA,nodeB);                                                      // (1)
+        var sameNodeNameAsEvent = ( (this.isNodeNameAccordingToEvent(nodeA)) && (this.isNodeNameAccordingToEvent(nodeB)) ); // (2)
         
         // NEXT STEPS: Check also for user, workflow, ...
-        sameUser = true;
-        sameWorkflow = true;
+        var sameUser = true;
+        var sameWorkflow = true;
         
         return sameNodeNameOfNodes && sameNodeNameAsEvent && sameUser && sameWorkflow;
+    },
+    /**
+     * Do the nodes share the same nodeName?
+     * @param {Object} nodeA
+     * @param {Object} nodeB
+     * @returns {Boolean}
+     */
+    isNodesOfSameName: function(nodeA,nodeB) {
+        var nodeNameA = (nodeA == null) ? 'null' : nodeA.nodeName,
+            nodeNameB = (nodeB == null) ? 'null' : nodeB.nodeName;
+        return (nodeNameA == nodeNameB);
+    },
+    /**
+     * Does the given node's nodeName match the nodeName according to the event?
+     * @param {Object} node
+     * @returns {Boolean}
+     */
+    isNodeNameAccordingToEvent: function(node) {
+        var nodeName = (node == null) ? 'null' : node.nodeName,
+            nodeNameAccordingToEvent = this.getNodeNameAccordingToEvent();
+        return (nodeName == nodeNameAccordingToEvent);
+    },
+
+    // =========================================================================
+    // Helpers for Nodes in general
+    // =========================================================================
+    /**
+     * Get the previous node according to the DOM.
+     * @param {String} currentNode
+     * @returns {Object}
+     */
+    getPreviousNode: function(currentNode){
+        return currentNode.previousSibling;
+    },
+    /**
+     * Get the next node according to the DOM.
+     * @param {String} currentNode
+     * @returns {Object}
+     */
+    getNextNode: function(currentNode){
+        return currentNode.nextSibling;
     }
 });
