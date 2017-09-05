@@ -38,10 +38,15 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.view.segments.ChangeMarkup', {
     editor: null,
-    eventKey: null,         // Keyboard-Event
+    
+    eventKeyCode: null,     // Keyboard-Event: Key-Code
+    eventCtrlKey: null,     // Keyboard-Event: Control-Key pressed?
+    
+    ignoreEvent: false,     // ignore event? (= we do nothing here)
+    stopEvent: false,       // do we stop the event here?
+    
     docSel: null,           // what the user has selected
     docSelRange: null,      // range for what the user has selected
-    stopEvent: null,        // do we stop the event here?
     
     // "CONSTANTS"
     NODE_NAME_DEL: 'DEL',
@@ -60,6 +65,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     KEYCODE_SHIFT: 16,
     KEYCODE_ALT_GR: 225,
     KEYCODE_SPACE: 32,
+    KEYCODE_Z: 90,
     
     // https://github.com/timdown/rangy/wiki/Rangy-Range#compareboundarypointsnumber-comparisontype-range-range
     RANGY_RANGE_IS_BEFORE: -1,
@@ -74,10 +80,12 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     initEvent: function() {
         // "Reset"
-        this.eventKey = null;
+        this.eventKeyCode = null;
+        this.eventCtrlKey = null;
+        this.ignoreEvent = false;
+        this.stopEvent = false;
         this.docSel = null;
         this.docSelRange = null;
-        this.stopEvent = null;
     },
     /**
      * This method is called if the keyboard event (= keydown) was not handled otherwise
@@ -85,20 +93,28 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     handleTargetEvent: function(event) {
         
-        // alles auf "Null"
+        // alles auf Anfang
         this.initEvent();
         
         // What keyboard event do we deal with?
-        this.setEventKey(event);
+        this.setKeyboardEvent(event);
         
-        // keys die keinen content produzieren (strg,alt,shift alleine ohne taste, pfeile etc) müssen ignoriert werden
+        // keys, die keinen content produzieren (strg,alt,shift alleine ohne taste, pfeile etc), müssen ignoriert werden
         if(this.eventHasToBeIgnored()){ 
             console.log(" => Ignored!");
-            return;
+            this.ignoreEvent = true;
+        }
+        // keys, die unseren content nicht verändern dürfen (strg-z etc), müssen ignoriert und gestoppt werden
+        if(this.eventHasToBeIgnoredAndStopped()){ 
+            console.log(" => Ignored and stopped!");
+            this.ignoreEvent = true;
+            this.stopEvent = true;
         }
         
         // Change the Markup in the Editor
-        this.changeMarkupInEditor();
+        if(!this.ignoreEvent) {
+            this.changeMarkupInEditor();
+        }
         
         // Stop event?
         if(this.stopEvent) {
@@ -117,8 +133,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * - https://www.quirksmode.org/js/keys.html#t20
      * @param {Object} event
      */
-    setEventKey: function(event) {
-        this.eventKey = event.keyCode;
+    setKeyboardEvent: function(event) {
+        this.eventKeyCode = event.keyCode;
+        this.eventCtrlKey = event.ctrlKey;
     },
     /**
      * Has the Key-Event to be IGNORED?
@@ -130,7 +147,18 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                                 this.KEYCODE_ALT, this.KEYCODE_CTRL, this.KEYCODE_SHIFT,                    // Modifier Keys
                                 this.KEYCODE_ENTER, this.KEYCODE_ALT_GR                                     // Other Keys To Ignore
                                ];
-        return (keyCodesToIgnore.indexOf(this.eventKey) != -1);
+        return (keyCodesToIgnore.indexOf(this.eventKeyCode) != -1);
+    },
+    /**
+     * Has the Key-Event to be IGNORED and STOPPED?
+     * @returns {Boolean}
+     */
+    eventHasToBeIgnoredAndStopped: function() {
+        var keyCodesToIgnoreAndStop = new Array(); 
+        if(this.eventCtrlKey) {
+            keyCodesToIgnoreAndStop.push(this.KEYCODE_Z);                                                   // Ctrl-Z
+        }
+        return (keyCodesToIgnoreAndStop.indexOf(this.eventKeyCode) != -1);
     },
     /**
      * Is the Key-Event a DELETION?
@@ -138,7 +166,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     eventIsDeletion: function() {
         var keyCodesForDeletion = [this.KEYCODE_BACKSPACE, this.KEYCODE_DELETE];
-        return (keyCodesForDeletion.indexOf(this.eventKey) != -1);
+        return (keyCodesForDeletion.indexOf(this.eventKeyCode) != -1);
     },
     /**
      * Is the Key-Event an INSERTION?
@@ -207,19 +235,19 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                 // TODO: Wenn wir allerdings ganz am Ende innerhalb des DEL sind, muss bei "Delete" das Zeichen dahinter mit dazugenommen werden.
                 console.log("DEL: isWithinOfSameKind..., we do nothing.");
             break;
-            case (this.isAtPreviousOfSameKind() && this.eventKey == this.KEYCODE_BACKSPACE):
+            case (this.isAtPreviousOfSameKind() && this.eventKeyCode == this.KEYCODE_BACKSPACE):
                 // Bei Backspace in ein davor befindliches DEL hinein: nix machen, dort ist ja schon das DEL-Markup gesetzt.
                 console.log("DEL (BACKSPACE): Already marked as deleted.")
             break;
-            case (this.isAtPreviousOfSameKind() && this.eventKey == this.KEYCODE_DELETE):
+            case (this.isAtPreviousOfSameKind() && this.eventKeyCode == this.KEYCODE_DELETE):
                 // Bei delete ganz am Ende des DELs, dann das Zeichen dahinter löschen sprich in den DEL mit reinpacken.
                 console.log("TODO: Ins vorherige DEL mit reinpacken.")
             break;
-            case (this.isAtNextOfSameKind() && this.eventKey == this.KEYCODE_BACKSPACE):
+            case (this.isAtNextOfSameKind() && this.eventKeyCode == this.KEYCODE_BACKSPACE):
                 // Bei backspace ganz am Anfang des DELs, dann das Zeichen davor löschen sprich in den DEL mit reinpacken.
                 console.log("TODO: Ins nachfolgende DEL mit reinpacken.")
             break;
-            case (this.isAtNextOfSameKind() && this.eventKey == this.KEYCODE_DELETE):
+            case (this.isAtNextOfSameKind() && this.eventKeyCode == this.KEYCODE_DELETE):
                 // Bei Delete in ein nachfolgend bestehendes DEL hinein: nix machen, dort ist ja schon das DEL-Markup gesetzt.
                 console.log("DEL (DELETE): Already marked as deleted.")
             break;
@@ -265,7 +293,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                     this.splitNode(surroundingForeignIns);
                 }
                 // (3) create and insert <ins>-node:
-                if (this.eventKey == this.KEYCODE_SPACE) { // Workaround for inserting space (otherwise creates <u>-Tag, don't know why).
+                if (this.eventKeyCode == this.KEYCODE_SPACE) { // Workaround for inserting space (otherwise creates <u>-Tag, don't know why).
                     console.log("INS: insert space with Markup...");
                     this.addInsForSpace();
                 } else {
@@ -289,7 +317,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         var rangeForDel = this.docSelRange;
         // If nothing is selected, the caret has just been placed somewhere:
         if (rangeForDel.collapsed) {
-            switch(this.eventKey) {
+            switch(this.eventKeyCode) {
                 case this.KEYCODE_BACKSPACE: // Backspace: "deletes" the previous character
                     rangeForDel.moveStart("character", -1);
                 break;
@@ -656,8 +684,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         rangeForExtract.setEnd(selectionStartNode, selectionStartOffset);
         var firstPartNewNode = rangeForExtract.extractContents();
         var firstPartNodeInserted = parentNode.insertBefore(firstPartNewNode, nodeToSplit);
-        // TODO: Prüfen, ob beide Teile des gesplitteten del-Nodes dieselben Angaben haben (User, Workflow, ...)
-        // set position for further inserting (= where the delNode was split)
+        // TODO: Prüfen, ob beide Teile des gesplitteten nodes dieselben Angaben haben (User, Workflow, ...)
+        // set position for further inserting (= where the node was split)
         this.docSelRange.setEndBefore(nodeToSplit);
         this.docSelRange.collapse(false);
         this.docSel.setSingleRange(this.docSelRange);
