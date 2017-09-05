@@ -362,6 +362,11 @@ Ext.define('Editor.controller.Editor', {
         target: docEl,
         binding: me.getKeyMapConfig()
       });
+      docEl.on('paste', function(e){
+          e.stopPropagation();
+          e.preventDefault();
+          editor.insertAtCursor((e.browserEvent.clipboardData || window.clipboardData).getData('Text'));
+      }, me, {delegated: false});
   },
   clearKeyMaps: function() {
       var me = this;
