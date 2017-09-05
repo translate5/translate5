@@ -256,9 +256,15 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                 var surroundingDelNode = this.getSurroundingDel();
                 if (surroundingDelNode != null) {
                     console.log("INS: split DEL first...");
-                    this.splitDel(surroundingDelNode);
+                    this.splitNode(surroundingDelNode);
                 }
-                // (2) create and insert <ins>-node:
+                // (2) Wenn wir uns in einem fremden INS befinden, dieses an dieser Stelle zuerst auseinanderbrechen.
+                var surroundingForeignIns = this.getSurroundingForeignIns();
+                if (surroundingForeignIns != null) {
+                    console.log("INS: split foreign INS first...");
+                    this.splitNode(surroundingForeignIns);
+                }
+                // (3) create and insert <ins>-node:
                 if (this.eventKey == this.KEYCODE_SPACE) { // Workaround for inserting space (otherwise creates <u>-Tag, don't know why).
                     console.log("INS: insert space with Markup...");
                     this.addInsForSpace();
@@ -300,26 +306,6 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             console.log("Unable to surround range because range partially selects a non-text node. See DOM4 spec for more information.");
         }
         // TODO: position the caret!
-    },
-    /**
-     * Split a del-node at the current position of the selection.
-     * @param {Object} delNode
-     */
-    splitDel: function(delNode) {
-        // extract what's on the left from the caret and insert it before the delNode as a new del
-        var rangeForExtract = rangy.createRange(),
-            currentNode = this.docSelRange.startContainer,
-            currentOffset = this.docSelRange.startOffset,
-            delNodeParentNode = delNode.parentNode;
-        rangeForExtract.setStartBefore(delNode);
-        rangeForExtract.setEnd(currentNode, currentOffset);
-        var firstPartNewNode = rangeForExtract.extractContents();
-        var firstPartNodeInserted = delNodeParentNode.insertBefore(firstPartNewNode, delNode);
-        // TODO: Prüfen, ob beide Teile des gesplitteten del-Nodes dieselben Angaben haben (User, Workflow, ...)
-        // set position for further inserting (= where the delNode was split)
-        this.docSelRange.setEndBefore(delNode);
-        this.docSelRange.collapse(false);
-        this.docSel.setSingleRange(this.docSelRange);
     },
 
     // =========================================================================
@@ -390,20 +376,39 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     getSurroundingDel: function() {
         console.log("getSurroundingDel?");
         var surroundingDelNode = null,
+            nodeForMarkup = this.createNodeForMarkup(this.NODE_NAME_DEL),
             currentNode = this.docSelRange.startContainer,
             parentNode = this.docSelRange.startContainer.parentNode;
         // is within a del-node?
-        var currentNodeName = (currentNode == null) ? 'null' : currentNode.nodeName,
-            parentNodeName = (parentNode == null) ? 'null' : parentNode.nodeName;
-        if (currentNodeName == this.NODE_NAME_DEL) {
+        if (this.isNodesOfSameName(nodeForMarkup,currentNode)) {
             surroundingDelNode = currentNode;
-        } else if (parentNodeName == this.NODE_NAME_DEL) {
+        } else if (this.isNodesOfSameName(nodeForMarkup,parentNode)) {
             surroundingDelNode = parentNode;
         }
         return surroundingDelNode;
-    },  
+    },
     /**
-     * Check if the current selection is within an existing markup-node of the same kind.
+     * Checks if the current selection is within an ins-node with different conditions (user, workflow, ...) and returns that node (or null otherwise).
+     * @returns {?Object}
+     */
+    getSurroundingForeignIns: function() {
+        console.log("getSurroundingForeignIns?");
+        var surroundingForeignInsNode = null,
+            nodeForMarkup = this.createNodeForMarkup(this.NODE_NAME_INS),
+            currentNode = this.docSelRange.startContainer,
+            parentNode = this.docSelRange.startContainer.parentNode;
+        // Bin ich (1) in einem ins-Node, der (2) nicht zu mir und dem Event gehört?
+        if (this.isNodesOfSameName(nodeForMarkup,currentNode)                          // (1)
+                && !this.isNodesOfSameConditionsAndEvent(nodeForMarkup,currentNode)) { // (2)
+            surroundingForeignInsNode = currentNode;
+        } else if (this.isNodesOfSameName(nodeForMarkup,parentNode)                    // (1)
+                && !this.isNodesOfSameConditionsAndEvent(nodeForMarkup,parentNode)) {  // (2)
+            surroundingForeignInsNode = parentNode;
+        }
+        return surroundingForeignInsNode;
+    },
+    /**
+     * Checks if the current selection is within an existing markup-node of the same kind.
      * @returns {Boolean}
      */
     isWithinOfSameKind: function() {
@@ -413,12 +418,12 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             currentNode = this.docSelRange.startContainer,
             parentNode = this.docSelRange.startContainer.parentNode;
         // same conditions?
-        var sameAsCurrent = this.isNodesOfSameConditions(nodeForMarkup,currentNode);
-        var sameAsParent = this.isNodesOfSameConditions(nodeForMarkup,parentNode);
+        var sameAsCurrent = this.isNodesOfSameConditionsAndEvent(nodeForMarkup,currentNode);
+        var sameAsParent = this.isNodesOfSameConditionsAndEvent(nodeForMarkup,parentNode);
         return (sameAsCurrent || sameAsParent);
-    },    
+    },
     /**
-     * Check if the current selection is right behind an already existing markup-node of the same kind.
+     * Checks if the current selection is right behind an already existing markup-node of the same kind.
      * @returns {Boolean}
      */
     isAtPreviousOfSameKind: function() {
@@ -427,10 +432,10 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             nodeForMarkup = this.createNodeForMarkup(nodeName),
             previousNode = this.getPreviousNode(this.docSelRange.startContainer);
         
-        // ------ (1) same conditions? ------
+        // ------ (1) same conditions & event? ------
         
-        var currentIsOfSameConditionsAsNext = this.isNodesOfSameConditions(nodeForMarkup,previousNode);
-        console.log("isNodesOfSameConditions: " + currentIsOfSameConditionsAsNext);
+        var currentIsOfSameConditionsAsNext = this.isNodesOfSameConditionsAndEvent(nodeForMarkup,previousNode);
+        console.log("isNodesOfSameConditionsAndEvent: " + currentIsOfSameConditionsAsNext);
         if (!currentIsOfSameConditionsAsNext) {
             return false;
         }
@@ -463,7 +468,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         return currentIsAfterPrevious && currentTouchesPrevious;
     },
     /**
-     * Check if the current selection is right before an already existing markup-node of the same kind.
+     * Checks if the current selection is right before an already existing markup-node of the same kind.
      * @returns {Boolean}
      */
     isAtNextOfSameKind: function() {
@@ -472,10 +477,10 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             nodeForMarkup = this.createNodeForMarkup(nodeName),
             nextNode = this.getNextNode(this.docSelRange.endContainer);
         
-        // ------ (1) same conditions? ------
+        // ------ (1) same conditions & event? ------
         
-        var currentIsOfSameConditionsAsNext = this.isNodesOfSameConditions(nodeForMarkup,nextNode);
-        console.log("isNodesOfSameConditions: " + currentIsOfSameConditionsAsNext);
+        var currentIsOfSameConditionsAsNext = this.isNodesOfSameConditionsAndEvent(nodeForMarkup,nextNode);
+        console.log("isNodesOfSameConditionsAndEvent: " + currentIsOfSameConditionsAsNext);
         if (!currentIsOfSameConditionsAsNext) {
             return false;
         }
@@ -540,24 +545,42 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         return nodeEl;
     },
     /**
+     * Do the nodes share the same conditions (nodeName, user, workflow....) AND match the event?
+     * @param {Object} nodeA
+     * @param {Object} nodeB
+     * @returns {Boolean}
+     */
+    isNodesOfSameConditionsAndEvent: function(nodeA,nodeB) {
+        // The conditions of the given nodes must BOTH
+        // (1) fit to each other
+        // AND
+        // (2) fit to the current Event
+        var isNodesOfSameConditions = this.isNodesOfSameConditions(nodeA,nodeB),
+            isNodesAccordingToEvent = ( (this.isNodeAccordingToEvent(nodeA)) && (this.isNodeAccordingToEvent(nodeB)) );
+        return isNodesOfSameConditions && isNodesAccordingToEvent;
+    },
+    /**
      * Do the nodes share the same conditions? (nodeName, user, workflow....)
      * @param {Object} nodeA
      * @param {Object} nodeB
      * @returns {Boolean}
      */
     isNodesOfSameConditions: function(nodeA,nodeB) {
-        // The conditions of the given nodes must BOTH
-        // (1) fit to each other
-        // AND
-        // (2) fit to the current Event
-        var sameNodeNameOfNodes = this.isNodesOfSameName(nodeA,nodeB);                                                      // (1)
-        var sameNodeNameAsEvent = ( (this.isNodeNameAccordingToEvent(nodeA)) && (this.isNodeNameAccordingToEvent(nodeB)) ); // (2)
-        
-        // NEXT STEPS: Check also for user, workflow, ...
-        var sameUser = true;
-        var sameWorkflow = true;
-        
-        return sameNodeNameOfNodes && sameNodeNameAsEvent && sameUser && sameWorkflow;
+        var isNodesOfSameName       = this.isNodesOfSameName(nodeA,nodeB),      // nodeName
+            isNodesOfSameUser       = this.isNodesOfSameUser(nodeA,nodeB),      // user
+            isNodesOfSameWorkflow   = this.isNodesOfSameWorkflow(nodeA,nodeB);  // workflow
+        return isNodesOfSameName && isNodesOfSameUser && isNodesOfSameWorkflow;
+    },
+    /**
+     * Do the given node's conditions match the conditions according to the event? (nodeName, user, workflow....)
+     * @param {Object} node
+     * @returns {Boolean}
+     */
+    isNodeAccordingToEvent: function(node) {
+        var isNodeNameAccordingToEvent       = this.isNodeNameAccordingToEvent(node),       // nodeName
+            isNodeOfUserAccordingToEvent     = this.isNodeOfUserAccordingToEvent(node),     // user
+            isNodeOfWorkflowAccordingToEvent = this.isNodeOfWorkflowAccordingToEvent(node); // workflow
+        return isNodeNameAccordingToEvent && isNodeOfUserAccordingToEvent && isNodeOfWorkflowAccordingToEvent;
     },
     /**
      * Do the nodes share the same nodeName?
@@ -580,13 +603,68 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             nodeNameAccordingToEvent = this.getNodeNameAccordingToEvent();
         return (nodeName == nodeNameAccordingToEvent);
     },
+    /**
+     * Do the nodes share the same user?
+     * @param {Object} nodeA
+     * @param {Object} nodeB
+     * @returns {Boolean}
+     */
+    isNodesOfSameUser: function(nodeA,nodeB) {
+        return true;
+    },
+    /**
+     * Does the given node's user match the user according to the event?
+     * @param {Object} node
+     * @returns {Boolean}
+     */
+    isNodeOfUserAccordingToEvent: function(node) {
+        return true;
+    },
+    /**
+     * Do the nodes share the same workflow?
+     * @param {Object} nodeA
+     * @param {Object} nodeB
+     * @returns {Boolean}
+     */
+    isNodesOfSameWorkflow: function(nodeA,nodeB) {
+        return true;
+    },
+    /**
+     * Does the given node's workflow match the workflow according to the event?
+     * @param {Object} node
+     * @returns {Boolean}
+     */
+    isNodeOfWorkflowAccordingToEvent: function(node) {
+        return true;
+    },
 
     // =========================================================================
     // Helpers for Nodes in general
     // =========================================================================
+    
+    /**
+     * Split a node at the current position of the selection.
+     * @param {Object} nodeToSplit
+     */
+    splitNode: function(nodeToSplit) {
+        // extract what's on the left from the caret and insert it before the node as a new node
+        var rangeForExtract = rangy.createRange(),
+            selectionStartNode = this.docSelRange.startContainer,
+            selectionStartOffset = this.docSelRange.startOffset,
+            parentNode = nodeToSplit.parentNode;
+        rangeForExtract.setStartBefore(nodeToSplit);
+        rangeForExtract.setEnd(selectionStartNode, selectionStartOffset);
+        var firstPartNewNode = rangeForExtract.extractContents();
+        var firstPartNodeInserted = parentNode.insertBefore(firstPartNewNode, nodeToSplit);
+        // TODO: Prüfen, ob beide Teile des gesplitteten del-Nodes dieselben Angaben haben (User, Workflow, ...)
+        // set position for further inserting (= where the delNode was split)
+        this.docSelRange.setEndBefore(nodeToSplit);
+        this.docSelRange.collapse(false);
+        this.docSel.setSingleRange(this.docSelRange);
+    },
     /**
      * Get the previous node according to the DOM.
-     * @param {String} currentNode
+     * @param {Object} currentNode
      * @returns {Object}
      */
     getPreviousNode: function(currentNode){
@@ -594,7 +672,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     /**
      * Get the next node according to the DOM.
-     * @param {String} currentNode
+     * @param {Object} currentNode
      * @returns {Object}
      */
     getNextNode: function(currentNode){
