@@ -90,3 +90,10 @@ END LICENSE AND COPYRIGHT
 table.matchresource-meta-data {
     
 }
+
+/**
+ * FIXME must be removed with next ext update, fixes T5DEV-181 / https://www.sencha.com/forum/showthread.php?330718-6-2-ColorField-color-preview-doesn-t-match-color
+ */
+.x-colorpicker-field input {
+    background-color: inherit;
+}
