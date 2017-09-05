@@ -45,8 +45,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     ignoreEvent: false,     // ignore event? (= we do nothing here)
     stopEvent: false,       // do we stop the event here?
     
-    docSel: null,           // what the user has selected
-    docSelRange: null,      // range for what the user has selected
+    docSel: null,           // selection in the document (initially what the user has selected, but then constantly changed according to handling the Markup)
+    docSelRange: null,      // current range for handling the markup, positioning the caret, etc... (initially what the user has selected, but then constantly changing)
     
     // "CONSTANTS"
     NODE_NAME_DEL: 'DEL',
@@ -66,6 +66,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     KEYCODE_ALT_GR: 225,
     KEYCODE_SPACE: 32,
     KEYCODE_Z: 90,
+    
+    CHAR_PLACEHOLDER: '\u0020',
     
     // https://github.com/timdown/rangy/wiki/Rangy-Range#compareboundarypointsnumber-comparisontype-range-range
     RANGY_RANGE_IS_BEFORE: -1,
@@ -230,10 +232,11 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         this.stopEvent = true;
         // ... sondern als gelöscht markiert:
         switch(true) {
-            case (this.isWithinOfSameKind()):
-                // Wenn wir uns in einem DEL befinden: stoppen. (Das zu löschende Zeichen ist ja bereits als gelöscht markiert.)
+            case (this.getSurroundingNodeByNodeName(this.NODE_NAME_DEL) != null):
+                // Wenn wir uns bereits in irgendeinem DEL befinden: stoppen. (Das zu löschende Zeichen ist ja bereits als gelöscht markiert.)
                 // TODO: Wenn wir allerdings ganz am Ende innerhalb des DEL sind, muss bei "Delete" das Zeichen dahinter mit dazugenommen werden.
-                console.log("DEL: isWithinOfSameKind..., we do nothing.");
+                //      (entweder mit da rein, wenn das anschliessende DEL uns gehört, oder in ein neues DEL, wenn wir an ein fremdes DEL anschliessen) 
+                console.log("DEL: is surrounded by DEL already..., we do nothing.");
             break;
             case (this.isAtPreviousOfSameKind() && this.eventKeyCode == this.KEYCODE_BACKSPACE):
                 // Bei Backspace in ein davor befindliches DEL hinein: nix machen, dort ist ja schon das DEL-Markup gesetzt.
@@ -254,7 +257,17 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             default:
                 // Wenn wir uns nicht in oder an einem DEL-Node befinden, müssen wir uns jetzt um das Markup kümmern:
                 console.log("DEL: insert Markup...");
-                this.addDel();
+                var delNode = this.addDel();
+                // Wenn wir uns allerdings in einem INS befinden...
+                var surroundingInsNode = this.getSurroundingNodeByNodeName(this.NODE_NAME_INS);
+                if (surroundingInsNode != null) {
+                    // ... müssen wir dieses jetzt noch an dieser Stelle auseinanderbrechen...
+                    console.log("DEL: split INS...");
+                    var splittedNodes = this.splitNode(surroundingInsNode);
+                    // ... und den eben erzeugten DEL aus dem ersten Teil-INS herausholen und zwischen die beiden neuen INS-Teile schieben.
+                    console.log("DEL: move DEL up inbetween...");
+                    this.moveNodeInbetweenSplittedNodes(delNode,splittedNodes);
+                }
         }
     },
     /**
@@ -281,21 +294,21 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             default:
                 // if we are neither in nor at an ins-node:
                 // (1) Wenn wir uns in einem DEL befinden, dieses an dieser Stelle zuerst auseinanderbrechen.
-                var surroundingDelNode = this.getSurroundingDel();
+                var surroundingDelNode = this.getSurroundingNodeByNodeName(this.NODE_NAME_DEL);
                 if (surroundingDelNode != null) {
                     console.log("INS: split DEL first...");
                     this.splitNode(surroundingDelNode);
                 }
                 // (2) Wenn wir uns in einem fremden INS befinden, dieses an dieser Stelle zuerst auseinanderbrechen.
-                var surroundingForeignIns = this.getSurroundingForeignIns();
-                if (surroundingForeignIns != null) {
+                var surroundingForeignInsNode = this.getSurroundingForeignNodeByNodeName(this.NODE_NAME_INS);
+                if (surroundingForeignInsNode != null) {
                     console.log("INS: split foreign INS first...");
-                    this.splitNode(surroundingForeignIns);
+                    this.splitNode(surroundingForeignInsNode);
                 }
                 // (3) create and insert <ins>-node:
                 if (this.eventKeyCode == this.KEYCODE_SPACE) { // Workaround for inserting space (otherwise creates <u>-Tag, don't know why).
                     console.log("INS: insert space with Markup...");
-                    this.addInsForSpace();
+                    this.addInsWithSpace();
                 } else {
                     console.log("INS: insert Markup...");
                     this.addIns();
@@ -309,13 +322,14 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     
     /**
      * Mark a deletion as deleted:
-     * Instead of deleting the character, we wrap it into a DEL-node.
+     * Instead of deleting the character, we wrap it into a DEL-node (and return that).
+     * @returns {Object} delNode
      */
     addDel: function() {
         // create a range to be marked as deleted
         // var rangeForDel = this.docSelRange.cloneRange(); // buggy: sometimes the cloned range is collapsed to the start although this.docSelRange is NOT.
         var rangeForDel = this.docSelRange;
-        // If nothing is selected, the caret has just been placed somewhere:
+        // If nothing is selected, the caret has just been placed somewhere and the deletion refers the next single character only:
         if (rangeForDel.collapsed) {
             switch(this.eventKeyCode) {
                 case this.KEYCODE_BACKSPACE: // Backspace: "deletes" the previous character
@@ -334,6 +348,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             console.log("Unable to surround range because range partially selects a non-text node. See DOM4 spec for more information.");
         }
         // TODO: position the caret!
+        return delNode;
     },
 
     // =========================================================================
@@ -346,30 +361,28 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     addIns: function() {
         var insNode = this.createNodeForMarkup(this.NODE_NAME_INS);
-        insNode.appendChild(document.createTextNode('x'));   // Google Chrome gets lost otherwise
+        insNode.appendChild(document.createTextNode(this.CHAR_PLACEHOLDER)); // eg Google Chrome gets lost otherwise
         this.docSelRange.insertNode(insNode);
         // position the caret over the content of the ins-node
-        var rangeForPos = rangy.createRange();
-        rangeForPos.selectNodeContents(insNode);
-        this.docSel.setSingleRange(rangeForPos);
-        insNode.nodeValue = '';                              // Google Chrome; see above...
+        this.docSelRange.selectNodeContents(insNode);
+        this.docSel.setSingleRange(this.docSelRange);
+        insNode.nodeValue = '';                                              // Google Chrome; see above...
     },
     /**
      * Add space and mark it as inserted.
      */
-    addInsForSpace: function() {
+    addInsWithSpace: function() {
         var insNode = this.createNodeForMarkup(this.NODE_NAME_INS);
-        insNode.appendChild(document.createTextNode(' '));
+        insNode.appendChild(document.createTextNode(this.CHAR_PLACEHOLDER));
         this.docSelRange.insertNode(insNode);
         // position the caret at the end of the ins-node
-        var rangeForPos = rangy.createRange();
-        rangeForPos.selectNodeContents(insNode);
-        rangeForPos.collapse(false);
-        this.docSel.setSingleRange(rangeForPos);
+        this.docSelRange.selectNodeContents(insNode);
+        this.docSelRange.collapse(false);
+        this.docSel.setSingleRange(this.docSelRange);
         // space is inserted already, stop the keyboard-Event!
         this.stopEvent = true;
         
-        // TODO: ins-Tags in the beginning or at the end of the editor are not recognized by the editor.
+        // TODO: Empty ins-Tags (= I mean: only with space) in the beginning or at the end of the editor are not recognized by the editor.
         // - Problem 1: The ins-Node including the space is visible in the code, but not in the editor.
         // - Problem 2: when inserting another character in the beginning of the editor, the caret is recognized as being WITHIN the ins-Node with the space, 
         //   but then the editor adds the character AFTER the space (= NOT inside the ins-Node with the space)
@@ -379,14 +392,13 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     useNextIns:  function() {
         var focusNode = document.createElement('div'), // Workaround: temporär Node an Anfang einfügen, um setEndAfter daran ausführen zu können (andernfalls landen wir nicht INNERHALB des nextNodes!)
-            nextNode = this.getNextNode(this.docSelRange.endContainer),
-            rangeForPos = rangy.createRange();
+            nextNode = this.getSiblingForCurrentSelection('next');
         focusNode.style.position = "absolute"; // display the temp div out of sight, otherwise the displayed content flickers
         focusNode.style.left = "-1000px";
         nextNode.insertBefore(focusNode,nextNode.childNodes[0]);
-        rangeForPos.setEndAfter(focusNode); // setStartBefore(nextNode) springt VOR die Boundary v. nextNode; setStart() mit Offset-Angabe ist ungünstig, da wir erst prüfen müssten, ob sich das Offset je nach Art auf etwas anderes bezieht (wir müssten also erst prüfen, ob im <ins> zuerst ein Textnode kommt oder nicht)
-        rangeForPos.collapse(false);
-        this.docSel.setSingleRange(rangeForPos);
+        this.docSelRange.setEndAfter(focusNode); // setStartBefore(nextNode) springt VOR die Boundary v. nextNode; setStart() mit Offset-Angabe ist ungünstig, da wir erst prüfen müssten, ob sich das Offset je nach Art auf etwas anderes bezieht (wir müssten also erst prüfen, ob im <ins> zuerst ein Textnode kommt oder nicht)
+        this.docSelRange.collapse(false);
+        this.docSel.setSingleRange(this.docSelRange);
         // Cleanup
         setTimeout(function() { // removing the focusNode before the insert is done looses the correct position of the caret
             nextNode.removeChild(focusNode);
@@ -398,42 +410,46 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     // =========================================================================
     
     /**
-     * Checks if the current selection is within a del-node of any kind and returns that node (or null otherwise).
+     * Checks if the current selection is within a node of the given nodeName 
+     * and returns that node (or null otherwise).
+     * @param {String} nodeName
      * @returns {?Object}
      */
-    getSurroundingDel: function() {
-        console.log("getSurroundingDel?");
-        var surroundingDelNode = null,
-            nodeForMarkup = this.createNodeForMarkup(this.NODE_NAME_DEL),
+    getSurroundingNodeByNodeName: function(nodeName) {
+        console.log("getSurroundingNodeByNodeName");
+        var surroundingNode = null,
+            nodeForMarkup = this.createNodeForMarkup(nodeName),
             currentNode = this.docSelRange.startContainer,
             parentNode = this.docSelRange.startContainer.parentNode;
-        // is within a del-node?
+        // is within a node of the given nodeName?
         if (this.isNodesOfSameName(nodeForMarkup,currentNode)) {
-            surroundingDelNode = currentNode;
+            surroundingNode = currentNode;
         } else if (this.isNodesOfSameName(nodeForMarkup,parentNode)) {
-            surroundingDelNode = parentNode;
+            surroundingNode = parentNode;
         }
-        return surroundingDelNode;
+        return surroundingNode;
     },
     /**
-     * Checks if the current selection is within an ins-node with different conditions (user, workflow, ...) and returns that node (or null otherwise).
+     * Checks if the current selection is within a node of the given nodeName, but with different conditions (user, workflow, ...), 
+     * and returns that node (or null otherwise).
+     * @param {String} nodeName
      * @returns {?Object}
      */
-    getSurroundingForeignIns: function() {
-        console.log("getSurroundingForeignIns?");
-        var surroundingForeignInsNode = null,
-            nodeForMarkup = this.createNodeForMarkup(this.NODE_NAME_INS),
+    getSurroundingForeignNodeByNodeName: function(nodeName) {
+        console.log("getSurroundingForeignNodeByNodeName");
+        var surroundingForeignNode = null,
+            nodeForMarkup = this.createNodeForMarkup(nodeName),
             currentNode = this.docSelRange.startContainer,
             parentNode = this.docSelRange.startContainer.parentNode;
-        // Bin ich (1) in einem ins-Node, der (2) nicht zu mir und dem Event gehört?
+        // Bin ich (1) in einem Node des übergebenen nodeNames, der (2) nicht zu mir und dem Event gehört?
         if (this.isNodesOfSameName(nodeForMarkup,currentNode)                          // (1)
                 && !this.isNodesOfSameConditionsAndEvent(nodeForMarkup,currentNode)) { // (2)
-            surroundingForeignInsNode = currentNode;
+            surroundingForeignNode = currentNode;
         } else if (this.isNodesOfSameName(nodeForMarkup,parentNode)                    // (1)
                 && !this.isNodesOfSameConditionsAndEvent(nodeForMarkup,parentNode)) {  // (2)
-            surroundingForeignInsNode = parentNode;
+            surroundingForeignNode = parentNode;
         }
-        return surroundingForeignInsNode;
+        return surroundingForeignNode;
     },
     /**
      * Checks if the current selection is within an existing markup-node of the same kind.
@@ -458,7 +474,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         console.log("isAtPreviousOfSameKind?");
         var nodeName = this.getNodeNameAccordingToEvent(),
             nodeForMarkup = this.createNodeForMarkup(nodeName),
-            previousNode = this.getPreviousNode(this.docSelRange.startContainer);
+            previousNode = this.getSiblingForCurrentSelection('previous');
         
         // ------ (1) same conditions & event? ------
         
@@ -472,22 +488,22 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         
         // Eigentlich wollte ich die Boundaries der Ranges der aktuellen Selection und des previousNode von der Selection vergleichen; das klappt aber nicht.
         // Workaround: Selektierte Range klonen, dort einen node einfügen, die geklonte Range dort drumsetzen und DIE dann mit der Range für den previousNode vergleichen.
-        // - For current selection:
-        var rangeForCurrentSelection = this.docSelRange.cloneRange();
-        rangeForCurrentSelection.insertNode(nodeForMarkup);
+        // - At current selection:
+        var rangeAtCurrentSelection = this.docSelRange.cloneRange();
+        rangeAtCurrentSelection.insertNode(nodeForMarkup);
         // - For previous node:
         var rangeForPreviousNode = rangy.createRange();
 
         // (2a) is after previous?
-        rangeForCurrentSelection.selectNodeContents(nodeForMarkup);
+        rangeAtCurrentSelection.selectNodeContents(nodeForMarkup);
         rangeForPreviousNode.selectNodeContents(previousNode);
-        var currentIsAfterPrevious = rangeForCurrentSelection.compareBoundaryPoints(Range.END_TO_START, rangeForPreviousNode) == this.RANGY_RANGE_IS_AFTER;
+        var currentIsAfterPrevious = rangeAtCurrentSelection.compareBoundaryPoints(Range.END_TO_START, rangeForPreviousNode) == this.RANGY_RANGE_IS_AFTER;
         console.log("compareBoundaryPoints: is after?: " + currentIsAfterPrevious);
         
         // (2b) is right after previous, not just somewhere after it?
-        rangeForCurrentSelection.selectNode(nodeForMarkup);
+        rangeAtCurrentSelection.selectNode(nodeForMarkup);
         rangeForPreviousNode.selectNode(previousNode);
-        var currentTouchesPrevious = rangeForCurrentSelection.intersectsOrTouchesRange(rangeForPreviousNode);
+        var currentTouchesPrevious = rangeAtCurrentSelection.intersectsOrTouchesRange(rangeForPreviousNode);
         console.log("intersectsOrTouchesRange: " + currentTouchesPrevious);
         
         // Cleanup
@@ -503,7 +519,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         console.log("isAtNextOfSameKind?");
         var nodeName = this.getNodeNameAccordingToEvent(),
             nodeForMarkup = this.createNodeForMarkup(nodeName),
-            nextNode = this.getNextNode(this.docSelRange.endContainer);
+            nextNode = this.getSiblingForCurrentSelection('next'),
+            surroundingDelNode = this.getSurroundingNodeByNodeName(this.NODE_NAME_DEL);
         
         // ------ (1) same conditions & event? ------
         
@@ -517,26 +534,42 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         
         // Eigentlich wollte ich die Boundaries der Ranges der aktuellen Selection und des nextNode von der Selection vergleichen; das klappt aber nicht.
         // Workaround: Selektierte Range klonen, dort einen node einfügen, die geklonte Range dort drumsetzen und DIE dann mit der Range für den nextNode vergleichen.
-        // - For current selection:
-        var rangeForCurrentSelection = this.docSelRange.cloneRange();
-        rangeForCurrentSelection.insertNode(nodeForMarkup);
+        
+        // ACHTUNG: (Beispiel):
+        // Zwischen einem gelöschten a und einem eingefügten c soll ein b eingefügt werden:
+        // <del>a</del><ins>c</ins> soll anschliessend sein: <del>a</del><ins>bc</ins>
+        // Nun landet der Cursor ("|") beim Platzieren zwischen a und c allerdings aus Sicht des Editors IN dem DEL:
+        // <del>a|</del><ins>c</ins>
+        // Nun müssen wir also prüfen, ob das DEL direkt vor einem INS ist (nicht, ob das innerhalb des DEL platzierte INS direkt vor einem INS ist).
+        var surroundingDelNode = this.getSurroundingNodeByNodeName(this.NODE_NAME_DEL),
+            nodeForSelection = (surroundingDelNode != null) ? surroundingDelNode : nodeForMarkup;
+        
+        // - At current selection:
+        if(surroundingDelNode == null) {
+            var rangeAtCurrentSelection = this.docSelRange.cloneRange();
+            rangeAtCurrentSelection.insertNode(nodeForMarkup);
+        } else {
+            var rangeAtCurrentSelection = rangy.createRange();
+        }
         // - For next node:
         var rangeForNextNode = rangy.createRange();
         
         // (2a) is before next?
-        rangeForCurrentSelection.selectNodeContents(nodeForMarkup);
+        rangeAtCurrentSelection.selectNodeContents(nodeForSelection);
         rangeForNextNode.selectNodeContents(nextNode);
-        var currentIsBeforeNext = rangeForCurrentSelection.compareBoundaryPoints(Range.START_TO_END, rangeForNextNode) == this.RANGY_RANGE_IS_BEFORE;
+        var currentIsBeforeNext = rangeAtCurrentSelection.compareBoundaryPoints(Range.START_TO_END, rangeForNextNode) == this.RANGY_RANGE_IS_BEFORE;
         console.log("compareBoundaryPoints: is before? " + currentIsBeforeNext);
         
         // (2b) is right before next, not just somewhere before it?
-        rangeForCurrentSelection.selectNode(nodeForMarkup);
+        rangeAtCurrentSelection.selectNode(nodeForSelection);
         rangeForNextNode.selectNode(nextNode);
-        var currentTouchesNext = rangeForCurrentSelection.intersectsOrTouchesRange(rangeForNextNode);
+        var currentTouchesNext = rangeAtCurrentSelection.intersectsOrTouchesRange(rangeForNextNode);
         console.log("intersectsOrTouchesRange: " + currentTouchesNext);
         
         // Cleanup
-        nodeForMarkup.parentElement.removeChild(nodeForMarkup);
+        if(nodeForMarkup.parentNode) {
+            nodeForMarkup.parentElement.removeChild(nodeForMarkup);
+        }
         
         return currentIsBeforeNext && currentTouchesNext;
     },
@@ -671,10 +704,13 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     // =========================================================================
     
     /**
-     * Split a node at the current position of the selection.
+     * Split a node at the position of the current selection.
+     * Returns the two parts of the node afterwards.
      * @param {Object} nodeToSplit
+     * @returns {Array}
      */
     splitNode: function(nodeToSplit) {
+        var splittedNodes = new Array();
         // extract what's on the left from the caret and insert it before the node as a new node
         var rangeForExtract = rangy.createRange(),
             selectionStartNode = this.docSelRange.startContainer,
@@ -682,28 +718,39 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             parentNode = nodeToSplit.parentNode;
         rangeForExtract.setStartBefore(nodeToSplit);
         rangeForExtract.setEnd(selectionStartNode, selectionStartOffset);
-        var firstPartNewNode = rangeForExtract.extractContents();
-        var firstPartNodeInserted = parentNode.insertBefore(firstPartNewNode, nodeToSplit);
-        // TODO: Prüfen, ob beide Teile des gesplitteten nodes dieselben Angaben haben (User, Workflow, ...)
-        // set position for further inserting (= where the node was split)
-        this.docSelRange.setEndBefore(nodeToSplit);
+        splittedNodes[0] = rangeForExtract.extractContents();
+        splittedNodes[1] = nodeToSplit; // nodeToSplit: ist nach extractContents() jetzt nur noch der zweite Teil des gesplitteten Nodes
+        parentNode.insertBefore(splittedNodes[0], splittedNodes[1]); // TODO: Prüfen, ob beide Teile des gesplitteten nodes dieselben Angaben haben (User, Workflow, ...)
+        // "reset" position of the user's selection (= where the node was split)
+        // TODO: prüfen, ob Rangy's getBookmark besser wäre; s.a. https://github.com/timdown/rangy/wiki/Rangy-Selection#restorerangessaved
+        this.docSelRange.setEndBefore(splittedNodes[1]);
         this.docSelRange.collapse(false);
         this.docSel.setSingleRange(this.docSelRange);
+        return splittedNodes;
     },
     /**
-     * Get the previous node according to the DOM.
-     * @param {Object} currentNode
-     * @returns {Object}
+     * Move a given node inbetween the two halfs of a formerly splitted node.
+     * @param {Object} nodeToMove
+     * @param {Array} splittedNodes
      */
-    getPreviousNode: function(currentNode){
-        return currentNode.previousSibling;
+    moveNodeInbetweenSplittedNodes: function(nodeToMove,splittedNodes) {
+        splittedNodes[1].parentNode.insertBefore(nodeToMove, splittedNodes[1]);
     },
     /**
-     * Get the next node according to the DOM.
-     * @param {Object} currentNode
+     * Get the previous or next node of the current selection.
+     * If the selection is in a text node without a sibling, the siblings of the selection's parentNode are returned.
+     * @param {String} direction (previous|next)
      * @returns {Object}
      */
-    getNextNode: function(currentNode){
-        return currentNode.nextSibling;
+    getSiblingForCurrentSelection: function(direction){
+        var docSel = this.docSelRange,
+            previous = (direction == "previous") ? true : false,
+            currentNode = (previous ? docSel.startContainer : docSel.endContainer),
+            currentParentNode = currentNode.parentNode,
+            siblingNode = (previous ? currentNode.previousSibling : currentNode.nextSibling);
+        if ( (siblingNode == null) && (currentNode.nodeType == 3) ) {
+            siblingNode = (previous ? currentParentNode.previousSibling : currentParentNode.nextSibling);
+        }
+        return siblingNode;
     }
 });
