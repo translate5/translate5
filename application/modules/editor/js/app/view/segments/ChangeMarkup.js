@@ -97,6 +97,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         
         // alles auf Anfang
         this.initEvent();
+        console.clear();
         
         // What keyboard event do we deal with?
         this.setKeyboardEvent(event);
@@ -402,20 +403,17 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     // =========================================================================
 
     /**
-     * Get the surrounding node of the current selection (= node where the selection starts). 
+     * Get the surrounding node of the current selection (= node where the selection starts).
+     * If the selection is in a text node, the selection's parentNode is returned.
      * TODO: checking the startContainer only might not be enough when the selection compasses multiple nodes.
      * @returns {Object}
      */
     getContainerNodeForCurrentSelection: function(){
-        return this.docSelRange.startContainer;
-    },
-    /**
-     * Get the parent node of the current selection (= node where the selection starts). 
-     * TODO: checking the startContainer only might not be enough when the selection compasses multiple nodes.
-     * @returns {?Object}
-     */
-    getParentNodeForCurrentSelection: function(){
-        return this.docSelRange.startContainer.parentNode;
+        var containerNode = this.docSelRange.startContainer;
+        if (containerNode.nodeType == 3) {
+            return this.docSelRange.startContainer.parentNode;
+        }
+        return containerNode;
     },
     /**
      * Get the previous or next node of the current selection.
@@ -441,18 +439,17 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     isWithinNode: function(checkConditions) {
         var tmpMarkupNode = this.createNodeForMarkup(this.getNodeNameAccordingToEvent()),
-            selectionNode = this.getContainerNodeForCurrentSelection(),
-            selectionParentNode = this.getParentNodeForCurrentSelection();
+            selectionNode = this.getContainerNodeForCurrentSelection();
         switch(checkConditions) {
             case 'sameNodeName':
-                console.log("isWithinNode ("+checkConditions+")? " + this.isNodesOfSameName(tmpMarkupNode,selectionNode + this.isNodesOfSameName(tmpMarkupNode,selectionParentNode)));
-                return ( (this.isNodesOfSameName(tmpMarkupNode,selectionNode)) || (this.isNodesOfSameName(tmpMarkupNode,selectionParentNode)) );
+                console.log("isWithinNode ("+checkConditions+")? " + this.isNodesOfSameName(tmpMarkupNode,selectionNode));
+                return this.isNodesOfSameName(tmpMarkupNode,selectionNode);
             case 'foreignMarkup':
-                console.log("isWithinNode ("+checkConditions+")? " + this.isNodesOfForeignMarkup(tmpMarkupNode,selectionNode) + this.isNodesOfForeignMarkup(tmpMarkupNode,selectionParentNode));
-                return ( (this.isNodesOfForeignMarkup(tmpMarkupNode,selectionNode)) || (this.isNodesOfForeignMarkup(tmpMarkupNode,selectionParentNode)) );
+                console.log("isWithinNode ("+checkConditions+")? " + this.isNodesOfForeignMarkup(tmpMarkupNode,selectionNode));
+                return this.isNodesOfForeignMarkup(tmpMarkupNode,selectionNode);
             case 'sameConditionsAndEvent':
-                console.log("isWithinNode ("+checkConditions+")? " + this.isNodesOfSameConditionsAndEvent(tmpMarkupNode,selectionNode) + this.isNodesOfSameConditionsAndEvent(tmpMarkupNode,selectionParentNode));
-                return ( (this.isNodesOfSameConditionsAndEvent(tmpMarkupNode,selectionNode)) || (this.isNodesOfSameConditionsAndEvent(tmpMarkupNode,selectionParentNode)) );
+                console.log("isWithinNode ("+checkConditions+")? " + this.isNodesOfSameConditionsAndEvent(tmpMarkupNode,selectionNode));
+                return this.isNodesOfSameConditionsAndEvent(tmpMarkupNode,selectionNode);
             // no default, because then we would have a bug in the code. Calling this method without a correct parameter is too dangerous in consequences.
         }
     },
