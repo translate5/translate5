@@ -39,16 +39,23 @@ Ext.define('Editor.view.ReferenceFilesInfoMessage', {
         windowInfoMessage:'#UT#There are reference files to the task. Open attachment list',
         buttonText:'#UT#Referenz-Dateien liste'
     },
+    listeners: {
+        'render': function(window) {
+            window.body.on('click', function() {
+                window.fireEvent('windowContentClick');
+            });
+         }
+    },
     initComponent:function(instanceConfig){
         var me = this;
         me.title=me.strings.windowTitle;
         me.html=me.strings.windowInfoMessage;
-        me.bbar=[{ 
-            xtype: 'button',
-            itemId:'showReferenceFilesButton',
-            text: me.strings.buttonText,
-            icon: Editor.data.moduleFolder+'images/page_attach.png'
-        }];
+        //me.bbar=[{ 
+        //    xtype: 'button',
+        //    itemId:'showReferenceFilesButton',
+        //    text: me.strings.buttonText,
+        //    icon: Editor.data.moduleFolder+'images/page_attach.png'
+        //}];
         return me.callParent([config]);
     }
 });

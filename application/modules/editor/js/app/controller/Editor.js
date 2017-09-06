@@ -96,8 +96,8 @@ Ext.define('Editor.controller.Editor', {
           '#segmentgrid': {
               afterrender: 'initEditPluginHandler'
           },
-          '#referenceFilesInfoMessage #showReferenceFilesButton':{
-              click:'onShowReferenceFilesButtonClick'
+          '#referenceFilesInfoMessage':{
+              windowContentClick:'onShowReferenceFilesButtonClick'
           }
       }
   },
