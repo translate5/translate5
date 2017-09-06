@@ -232,38 +232,37 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         this.stopEvent = true;
         // ... sondern als gelöscht markiert:
         switch(true) {
-            case (this.getSurroundingNodeByNodeName(this.NODE_NAME_DEL) != null):
+            case (this.isWithinNode('sameNodeName')):
                 // Wenn wir uns bereits in irgendeinem DEL befinden: stoppen. (Das zu löschende Zeichen ist ja bereits als gelöscht markiert.)
                 // TODO: Wenn wir allerdings ganz am Ende innerhalb des DEL sind, muss bei "Delete" das Zeichen dahinter mit dazugenommen werden.
                 //      (entweder mit da rein, wenn das anschliessende DEL uns gehört, oder in ein neues DEL, wenn wir an ein fremdes DEL anschliessen) 
                 console.log("DEL: is surrounded by DEL already..., we do nothing.");
-            break;
-            case (this.isAtPreviousOfSameKind() && this.eventKeyCode == this.KEYCODE_BACKSPACE):
+                break;
+            case (this.isAtSiblingOfSameKind('previous') && this.eventKeyCode == this.KEYCODE_BACKSPACE):
                 // Bei Backspace in ein davor befindliches DEL hinein: nix machen, dort ist ja schon das DEL-Markup gesetzt.
                 console.log("DEL (BACKSPACE): Already marked as deleted.")
-            break;
-            case (this.isAtPreviousOfSameKind() && this.eventKeyCode == this.KEYCODE_DELETE):
+                break;
+            case (this.isAtSiblingOfSameKind('previous') && this.eventKeyCode == this.KEYCODE_DELETE):
                 // Bei delete ganz am Ende des DELs, dann das Zeichen dahinter löschen sprich in den DEL mit reinpacken.
                 console.log("TODO: Ins vorherige DEL mit reinpacken.")
-            break;
-            case (this.isAtNextOfSameKind() && this.eventKeyCode == this.KEYCODE_BACKSPACE):
+                break;
+            case (this.isAtSiblingOfSameKind('next') && this.eventKeyCode == this.KEYCODE_BACKSPACE):
                 // Bei backspace ganz am Anfang des DELs, dann das Zeichen davor löschen sprich in den DEL mit reinpacken.
                 console.log("TODO: Ins nachfolgende DEL mit reinpacken.")
-            break;
-            case (this.isAtNextOfSameKind() && this.eventKeyCode == this.KEYCODE_DELETE):
+                break;
+            case (this.isAtSiblingOfSameKind('next') && this.eventKeyCode == this.KEYCODE_DELETE):
                 // Bei Delete in ein nachfolgend bestehendes DEL hinein: nix machen, dort ist ja schon das DEL-Markup gesetzt.
                 console.log("DEL (DELETE): Already marked as deleted.")
-            break;
+                break;
             default:
                 // Wenn wir uns nicht in oder an einem DEL-Node befinden, müssen wir uns jetzt um das Markup kümmern:
                 console.log("DEL: insert Markup...");
                 var delNode = this.addDel();
-                // Wenn wir uns allerdings in einem INS befinden...
-                var surroundingInsNode = this.getSurroundingNodeByNodeName(this.NODE_NAME_INS);
-                if (surroundingInsNode != null) {
-                    // ... müssen wir dieses jetzt noch an dieser Stelle auseinanderbrechen...
-                    console.log("DEL: split INS...");
-                    var splittedNodes = this.splitNode(surroundingInsNode);
+                // Wenn wir uns allerdings in einem fremden Node befinden (= INS; allg. DEL wurden oben bereits abgefragt!)...
+                if (this.isWithinNode('foreignMarkup')) {
+                    // ... dann müssen wir dieses jetzt noch an dieser Stelle auseinanderbrechen...
+                    console.log("DEL: split foreign node...");
+                    var splittedNodes = this.splitNode(this.getContainerNodeForCurrentSelection());
                     // ... und den eben erzeugten DEL aus dem ersten Teil-INS herausholen und zwischen die beiden neuen INS-Teile schieben.
                     console.log("DEL: move DEL up inbetween...");
                     this.moveNodeInbetweenSplittedNodes(delNode,splittedNodes);
@@ -278,34 +277,27 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         this.stopEvent = false;
         // ... vorher kümmern wir uns aber noch um das ins-Tag:
         switch(true) {
-            case (this.isWithinOfSameKind()):
+            case (this.isWithinNode('sameConditionsAndEvent')):
                 // Wenn wir schon im richtigen MarkUp sind, machen wir sonst weiter nichts.
-                console.log("INS: isWithinOfSameKind..., we do nothing.");
-            break;
-            case this.isAtNextOfSameKind():
+                console.log("INS: isWithinNodeOfSameKind..., we do nothing.");
+                break;
+            case this.isAtSiblingOfSameKind('next'):
              // if this new node is right before an ins-node that already exists, we use that one:
                 console.log("INS: use next...");
                 this.useNextIns();
-            break;
-            case this.isAtPreviousOfSameKind():
+                break;
+            case this.isAtSiblingOfSameKind('previous'):
                 // if this new node is right behind an ins-node that already exists, we use that one:
-                console.log("INS: use previous..."); // (scheint aber nie vorzukommen, wird immer als isWithinOfSameKind erkannt.)
-            break;
+                console.log("INS: use previous..."); // (scheint aber nie vorzukommen, wird immer als isWithinNodeOfSameKind erkannt.)
+                break;
             default:
                 // if we are neither in nor at an ins-node:
-                // (1) Wenn wir uns in einem DEL befinden, dieses an dieser Stelle zuerst auseinanderbrechen.
-                var surroundingDelNode = this.getSurroundingNodeByNodeName(this.NODE_NAME_DEL);
-                if (surroundingDelNode != null) {
-                    console.log("INS: split DEL first...");
-                    this.splitNode(surroundingDelNode);
+                // (1) Wenn wir uns in einem DEL oder einem fremden INS befinden, dieses an dieser Stelle zuerst auseinanderbrechen.
+                if (this.isWithinNode('foreignMarkup')) {
+                    console.log("INS: split foreign node first...");
+                    this.splitNode(this.getContainerNodeForCurrentSelection());
                 }
-                // (2) Wenn wir uns in einem fremden INS befinden, dieses an dieser Stelle zuerst auseinanderbrechen.
-                var surroundingForeignInsNode = this.getSurroundingForeignNodeByNodeName(this.NODE_NAME_INS);
-                if (surroundingForeignInsNode != null) {
-                    console.log("INS: split foreign INS first...");
-                    this.splitNode(surroundingForeignInsNode);
-                }
-                // (3) create and insert <ins>-node:
+                // (2) create and insert <ins>-node:
                 if (this.eventKeyCode == this.KEYCODE_SPACE) { // Workaround for inserting space (otherwise creates <u>-Tag, don't know why).
                     console.log("INS: insert space with Markup...");
                     this.addInsWithSpace();
@@ -334,10 +326,10 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             switch(this.eventKeyCode) {
                 case this.KEYCODE_BACKSPACE: // Backspace: "deletes" the previous character
                     rangeForDel.moveStart("character", -1);
-                break;
+                    break;
                 case this.KEYCODE_DELETE: // Delete "deletes" the next character
                     rangeForDel.moveEnd("character", 1);
-                break;
+                    break;
             }
         }
         // create and attach <del>-Element around the range for deletion
@@ -392,7 +384,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     useNextIns:  function() {
         var focusNode = document.createElement('div'), // Workaround: temporär Node an Anfang einfügen, um setEndAfter daran ausführen zu können (andernfalls landen wir nicht INNERHALB des nextNodes!)
-            nextNode = this.getSiblingForCurrentSelection('next');
+            nextNode = this.getSiblingNodeForCurrentSelection('next');
         focusNode.style.position = "absolute"; // display the temp div out of sight, otherwise the displayed content flickers
         focusNode.style.left = "-1000px";
         nextNode.insertBefore(focusNode,nextNode.childNodes[0]);
@@ -408,170 +400,124 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     // =========================================================================
     // Check if the current selection is in or at already existing markup-nodes
     // =========================================================================
-    
-    /**
-     * Checks if the current selection is within a node of the given nodeName 
-     * and returns that node (or null otherwise).
-     * @param {String} nodeName
-     * @returns {?Object}
-     */
-    getSurroundingNodeByNodeName: function(nodeName) {
-        console.log("getSurroundingNodeByNodeName");
-        var surroundingNode = null,
-            nodeForMarkup = this.createNodeForMarkup(nodeName),
-            currentNode = this.docSelRange.startContainer,
-            parentNode = this.docSelRange.startContainer.parentNode;
-        // is within a node of the given nodeName?
-        if (this.isNodesOfSameName(nodeForMarkup,currentNode)) {
-            surroundingNode = currentNode;
-        } else if (this.isNodesOfSameName(nodeForMarkup,parentNode)) {
-            surroundingNode = parentNode;
-        }
-        return surroundingNode;
-    },
-    /**
-     * Checks if the current selection is within a node of the given nodeName, but with different conditions (user, workflow, ...), 
-     * and returns that node (or null otherwise).
-     * @param {String} nodeName
-     * @returns {?Object}
-     */
-    getSurroundingForeignNodeByNodeName: function(nodeName) {
-        console.log("getSurroundingForeignNodeByNodeName");
-        var surroundingForeignNode = null,
-            nodeForMarkup = this.createNodeForMarkup(nodeName),
-            currentNode = this.docSelRange.startContainer,
-            parentNode = this.docSelRange.startContainer.parentNode;
-        // Bin ich (1) in einem Node des übergebenen nodeNames, der (2) nicht zu mir und dem Event gehört?
-        if (this.isNodesOfSameName(nodeForMarkup,currentNode)                          // (1)
-                && !this.isNodesOfSameConditionsAndEvent(nodeForMarkup,currentNode)) { // (2)
-            surroundingForeignNode = currentNode;
-        } else if (this.isNodesOfSameName(nodeForMarkup,parentNode)                    // (1)
-                && !this.isNodesOfSameConditionsAndEvent(nodeForMarkup,parentNode)) {  // (2)
-            surroundingForeignNode = parentNode;
-        }
-        return surroundingForeignNode;
-    },
-    /**
-     * Checks if the current selection is within an existing markup-node of the same kind.
-     * @returns {Boolean}
-     */
-    isWithinOfSameKind: function() {
-        console.log("isWithinOfSameKind?");
-        var nodeName = this.getNodeNameAccordingToEvent(),
-            nodeForMarkup = this.createNodeForMarkup(nodeName),
-            currentNode = this.docSelRange.startContainer,
-            parentNode = this.docSelRange.startContainer.parentNode;
-        // same conditions?
-        var sameAsCurrent = this.isNodesOfSameConditionsAndEvent(nodeForMarkup,currentNode);
-        var sameAsParent = this.isNodesOfSameConditionsAndEvent(nodeForMarkup,parentNode);
-        return (sameAsCurrent || sameAsParent);
-    },
-    /**
-     * Checks if the current selection is right behind an already existing markup-node of the same kind.
-     * @returns {Boolean}
-     */
-    isAtPreviousOfSameKind: function() {
-        console.log("isAtPreviousOfSameKind?");
-        var nodeName = this.getNodeNameAccordingToEvent(),
-            nodeForMarkup = this.createNodeForMarkup(nodeName),
-            previousNode = this.getSiblingForCurrentSelection('previous');
-        
-        // ------ (1) same conditions & event? ------
-        
-        var currentIsOfSameConditionsAsNext = this.isNodesOfSameConditionsAndEvent(nodeForMarkup,previousNode);
-        console.log("isNodesOfSameConditionsAndEvent: " + currentIsOfSameConditionsAsNext);
-        if (!currentIsOfSameConditionsAsNext) {
-            return false;
-        }
-        
-        // ------ (2) is after previous? ------
-        
-        // Eigentlich wollte ich die Boundaries der Ranges der aktuellen Selection und des previousNode von der Selection vergleichen; das klappt aber nicht.
-        // Workaround: Selektierte Range klonen, dort einen node einfügen, die geklonte Range dort drumsetzen und DIE dann mit der Range für den previousNode vergleichen.
-        // - At current selection:
-        var rangeAtCurrentSelection = this.docSelRange.cloneRange();
-        rangeAtCurrentSelection.insertNode(nodeForMarkup);
-        // - For previous node:
-        var rangeForPreviousNode = rangy.createRange();
 
-        // (2a) is after previous?
-        rangeAtCurrentSelection.selectNodeContents(nodeForMarkup);
-        rangeForPreviousNode.selectNodeContents(previousNode);
-        var currentIsAfterPrevious = rangeAtCurrentSelection.compareBoundaryPoints(Range.END_TO_START, rangeForPreviousNode) == this.RANGY_RANGE_IS_AFTER;
-        console.log("compareBoundaryPoints: is after?: " + currentIsAfterPrevious);
-        
-        // (2b) is right after previous, not just somewhere after it?
-        rangeAtCurrentSelection.selectNode(nodeForMarkup);
-        rangeForPreviousNode.selectNode(previousNode);
-        var currentTouchesPrevious = rangeAtCurrentSelection.intersectsOrTouchesRange(rangeForPreviousNode);
-        console.log("intersectsOrTouchesRange: " + currentTouchesPrevious);
-        
-        // Cleanup
-        nodeForMarkup.parentElement.removeChild(nodeForMarkup);
-        
-        return currentIsAfterPrevious && currentTouchesPrevious;
+    /**
+     * Get the surrounding node of the current selection (= node where the selection starts). 
+     * TODO: checking the startContainer only might not be enough when the selection compasses multiple nodes.
+     * @returns {Object}
+     */
+    getContainerNodeForCurrentSelection: function(){
+        return this.docSelRange.startContainer;
     },
     /**
-     * Checks if the current selection is right before an already existing markup-node of the same kind.
+     * Get the parent node of the current selection (= node where the selection starts). 
+     * TODO: checking the startContainer only might not be enough when the selection compasses multiple nodes.
+     * @returns {?Object}
+     */
+    getParentNodeForCurrentSelection: function(){
+        return this.docSelRange.startContainer.parentNode;
+    },
+    /**
+     * Get the previous or next node of the current selection.
+     * If the selection is in a text node without a sibling, the sibling of the selection's parentNode is returned.
+     * @param {String} direction (previous|next)
+     * @returns {?Object}
+     */
+    getSiblingNodeForCurrentSelection: function(direction){
+        var docSel = this.docSelRange,
+            lookForPrevious = (direction == "previous") ? true : false,
+            currentNode = (lookForPrevious ? docSel.startContainer : docSel.endContainer),
+            currentParentNode = currentNode.parentNode;
+        var siblingNode = (lookForPrevious ? currentNode.previousSibling : currentNode.nextSibling);
+        if ( (siblingNode == null) && (currentNode.nodeType == 3) ) {
+            siblingNode = (lookForPrevious ? currentParentNode.previousSibling : currentParentNode.nextSibling);
+        }
+        return siblingNode;
+    },
+    /**
+     * Checks if the current selection is within an existing markup-node of the given conditions to check.
+     * @param {String} checkConditions (sameNodeName|foreignMarkup|sameConditionsAndEvent)
      * @returns {Boolean}
      */
-    isAtNextOfSameKind: function() {
-        console.log("isAtNextOfSameKind?");
-        var nodeName = this.getNodeNameAccordingToEvent(),
-            nodeForMarkup = this.createNodeForMarkup(nodeName),
-            nextNode = this.getSiblingForCurrentSelection('next'),
-            surroundingDelNode = this.getSurroundingNodeByNodeName(this.NODE_NAME_DEL);
+    isWithinNode: function(checkConditions) {
+        var tmpMarkupNode = this.createNodeForMarkup(this.getNodeNameAccordingToEvent()),
+            selectionNode = this.getContainerNodeForCurrentSelection(),
+            selectionParentNode = this.getParentNodeForCurrentSelection();
+        switch(checkConditions) {
+            case 'sameNodeName':
+                console.log("isWithinNode ("+checkConditions+")? " + this.isNodesOfSameName(tmpMarkupNode,selectionNode + this.isNodesOfSameName(tmpMarkupNode,selectionParentNode)));
+                return ( (this.isNodesOfSameName(tmpMarkupNode,selectionNode)) || (this.isNodesOfSameName(tmpMarkupNode,selectionParentNode)) );
+            case 'foreignMarkup':
+                console.log("isWithinNode ("+checkConditions+")? " + this.isNodesOfForeignMarkup(tmpMarkupNode,selectionNode) + this.isNodesOfForeignMarkup(tmpMarkupNode,selectionParentNode));
+                return ( (this.isNodesOfForeignMarkup(tmpMarkupNode,selectionNode)) || (this.isNodesOfForeignMarkup(tmpMarkupNode,selectionParentNode)) );
+            case 'sameConditionsAndEvent':
+                console.log("isWithinNode ("+checkConditions+")? " + this.isNodesOfSameConditionsAndEvent(tmpMarkupNode,selectionNode) + this.isNodesOfSameConditionsAndEvent(tmpMarkupNode,selectionParentNode));
+                return ( (this.isNodesOfSameConditionsAndEvent(tmpMarkupNode,selectionNode)) || (this.isNodesOfSameConditionsAndEvent(tmpMarkupNode,selectionParentNode)) );
+            // no default, because then we would have a bug in the code. Calling this method without a correct parameter is too dangerous in consequences.
+        }
+    },
+    /**
+     * Checks if the current selection is right before or after an already existing markup-node of the same kind.
+     * ('previous' checks for previous sibling, 'next' checks for next sibling).
+     * @param {String} direction (previous|next)
+     * @returns {Boolean}
+     */
+    isAtSiblingOfSameKind: function(direction) {
+        console.log("isAtSiblingOfSameKind ("+direction+")?");
+        var tmpMarkupNode = this.createNodeForMarkup(this.getNodeNameAccordingToEvent()),
+            siblingNode = this.getSiblingNodeForCurrentSelection(direction);
         
-        // ------ (1) same conditions & event? ------
+        // ------ (1) is of same conditions & event? ------
         
-        var currentIsOfSameConditionsAsNext = this.isNodesOfSameConditionsAndEvent(nodeForMarkup,nextNode);
-        console.log("isNodesOfSameConditionsAndEvent: " + currentIsOfSameConditionsAsNext);
-        if (!currentIsOfSameConditionsAsNext) {
+        var currentIsOfSameConditionsAsSibling = this.isNodesOfSameConditionsAndEvent(tmpMarkupNode,siblingNode);
+        console.log("currentIsOfSameConditionsAsSibling: " + currentIsOfSameConditionsAsSibling);
+        if (!currentIsOfSameConditionsAsSibling) {
             return false;
         }
         
-        //------ (2) is before next? ------
+        //------ (2) is at sibling? ------
+
+        var rangeAtCurrentSelection = rangy.createRange(),
+            rangeForSiblingNode = rangy.createRange();
         
         // Eigentlich wollte ich die Boundaries der Ranges der aktuellen Selection und des nextNode von der Selection vergleichen; das klappt aber nicht.
         // Workaround: Selektierte Range klonen, dort einen node einfügen, die geklonte Range dort drumsetzen und DIE dann mit der Range für den nextNode vergleichen.
+        rangeAtCurrentSelection = this.docSelRange.cloneRange();
+        rangeAtCurrentSelection.insertNode(tmpMarkupNode);
         
-        // ACHTUNG: (Beispiel):
-        // Zwischen einem gelöschten a und einem eingefügten c soll ein b eingefügt werden:
+        // ACHTUNG (Beispiel): Zwischen einem gelöschten a und einem eingefügten c soll ein b eingefügt werden:
         // <del>a</del><ins>c</ins> soll anschliessend sein: <del>a</del><ins>bc</ins>
         // Nun landet der Cursor ("|") beim Platzieren zwischen a und c allerdings aus Sicht des Editors IN dem DEL:
         // <del>a|</del><ins>c</ins>
-        // Nun müssen wir also prüfen, ob das DEL direkt vor einem INS ist (nicht, ob das innerhalb des DEL platzierte INS direkt vor einem INS ist).
-        var surroundingDelNode = this.getSurroundingNodeByNodeName(this.NODE_NAME_DEL),
-            nodeForSelection = (surroundingDelNode != null) ? surroundingDelNode : nodeForMarkup;
-        
-        // - At current selection:
-        if(surroundingDelNode == null) {
-            var rangeAtCurrentSelection = this.docSelRange.cloneRange();
-            rangeAtCurrentSelection.insertNode(nodeForMarkup);
+        // Nun müssen wir also prüfen, ob das DEL direkt vor einem INS ist (nicht, ob das innerhalb des DEL platzierte Markup-INS direkt vor einem INS ist).
+        if (this.isWithinNode('foreignMarkup')) {
+            var nodeForSelection = this.getContainerNodeForCurrentSelection();
         } else {
-            var rangeAtCurrentSelection = rangy.createRange();
+            var nodeForSelection = tmpMarkupNode;
         }
-        // - For next node:
-        var rangeForNextNode = rangy.createRange();
         
-        // (2a) is before next?
+        // (2a) has a sibling?
         rangeAtCurrentSelection.selectNodeContents(nodeForSelection);
-        rangeForNextNode.selectNodeContents(nextNode);
-        var currentIsBeforeNext = rangeAtCurrentSelection.compareBoundaryPoints(Range.START_TO_END, rangeForNextNode) == this.RANGY_RANGE_IS_BEFORE;
-        console.log("compareBoundaryPoints: is before? " + currentIsBeforeNext);
+        rangeForSiblingNode.selectNodeContents(siblingNode);
+        if (direction == 'previous') {
+            var currentHasSibling = rangeAtCurrentSelection.compareBoundaryPoints(Range.END_TO_START, rangeForSiblingNode) == this.RANGY_RANGE_IS_AFTER;
+        } else {
+            var currentHasSibling = rangeAtCurrentSelection.compareBoundaryPoints(Range.START_TO_END, rangeForSiblingNode) == this.RANGY_RANGE_IS_BEFORE;
+        }
+        console.log("compareBoundaryPoints: " + currentHasSibling);
         
-        // (2b) is right before next, not just somewhere before it?
+        // (2b) is right at the sibling, not just somewhere?
         rangeAtCurrentSelection.selectNode(nodeForSelection);
-        rangeForNextNode.selectNode(nextNode);
-        var currentTouchesNext = rangeAtCurrentSelection.intersectsOrTouchesRange(rangeForNextNode);
-        console.log("intersectsOrTouchesRange: " + currentTouchesNext);
+        rangeForSiblingNode.selectNode(siblingNode);
+        var currentTouchesSibling = rangeAtCurrentSelection.intersectsOrTouchesRange(rangeForSiblingNode);
+        console.log("intersectsOrTouchesRange: " + currentTouchesSibling);
         
         // Cleanup
-        if(nodeForMarkup.parentNode) {
-            nodeForMarkup.parentElement.removeChild(nodeForMarkup);
+        if(tmpMarkupNode.parentNode) {
+            tmpMarkupNode.parentElement.removeChild(tmpMarkupNode);
         }
         
-        return currentIsBeforeNext && currentTouchesNext;
+        return currentHasSibling && currentTouchesSibling;
     },
 
     // =========================================================================
@@ -579,19 +525,26 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     // =========================================================================
     
     /**
-     * Returns the markup-nodeName for the current event.
-     * @returns {?String} 
+     * Returns the markup-nodeNames for all events handled.
+     * @returns {Object} 
+     */
+    getMarkupNodeNamesForEvents: function(){
+        return {
+            'deletion':  this.NODE_NAME_DEL,
+            'insertion': this.NODE_NAME_INS
+        }
+    },
+    /**
+     * Returns the markup-nodeName according to the current event.
+     * @returns {String} 
      */
     getNodeNameAccordingToEvent: function(){
+        var nodeNamesForEvents = this.getMarkupNodeNamesForEvents();
         switch(true) {
             case this.eventIsDeletion():
-                return this.NODE_NAME_DEL;
-            break;
+                return nodeNamesForEvents.deletion;
             case this.eventIsInsertion():
-                return this.NODE_NAME_INS;
-            break;
-            default:
-                return null;
+                return nodeNamesForEvents.insertion;
         }
     },
     /**
@@ -604,6 +557,54 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         nodeEl.id = Ext.id();
         // NEXT STEPS: Add info about user, workflow, ...
         return nodeEl;
+    },
+    /**
+     * Is the Node of a markup-type (DEL, INS)?
+     * @param {Object} node
+     * @returns {Boolean}
+     */
+    isNodeOfTypeMarkup: function(node) {
+        var nodeName = (node == null) ? 'null' : node.nodeName,
+            nodeNamesForEvents = this.getMarkupNodeNamesForEvents();
+        for (var key in nodeNamesForEvents) {
+            if (nodeNamesForEvents[key] == nodeName) {
+                return true;
+            }
+        }
+        return false;
+    },
+    /**
+     * Are the nodes NOT of the same Markup?
+     * 
+     * Examples for true:
+     * -----------------------------
+     *   nodeA      |   nodeB       
+     * -----------------------------
+     *    DEL       |    INS        
+     *    INS       |    DEL        
+     *  DEL abc     |  DEL def      
+     *  INS abc     |  INS def      
+     * -----------------------------
+     * 
+     * Examples for false:
+     * -----------------------------
+     *   nodeA      |   nodeB       
+     * -----------------------------
+     *    IMG       |    INS        
+     *  DEL abc     |  DEL abc      
+     *  INS abc     |  INS abc      
+     * -----------------------------
+     * 
+     * @param {Object} nodeA
+     * @param {Object} nodeB
+     * @returns {Boolean}
+     */
+    isNodesOfForeignMarkup: function(nodeA,nodeB) {
+        // Wenn einer der beiden gar kein Markup-Node ist, brauchen wir nicht weiter prüfen.
+        if (!this.isNodeOfTypeMarkup(nodeA) || !this.isNodeOfTypeMarkup(nodeB)) {
+            return false; // false weil: NEIN, ist (gar) KEIN Markup (also auch kein fremdes Markup).
+        }
+        return !this.isNodesOfSameConditionsAndEvent(nodeA,nodeB);
     },
     /**
      * Do the nodes share the same conditions (nodeName, user, workflow....) AND match the event?
@@ -735,22 +736,5 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     moveNodeInbetweenSplittedNodes: function(nodeToMove,splittedNodes) {
         splittedNodes[1].parentNode.insertBefore(nodeToMove, splittedNodes[1]);
-    },
-    /**
-     * Get the previous or next node of the current selection.
-     * If the selection is in a text node without a sibling, the siblings of the selection's parentNode are returned.
-     * @param {String} direction (previous|next)
-     * @returns {Object}
-     */
-    getSiblingForCurrentSelection: function(direction){
-        var docSel = this.docSelRange,
-            previous = (direction == "previous") ? true : false,
-            currentNode = (previous ? docSel.startContainer : docSel.endContainer),
-            currentParentNode = currentNode.parentNode,
-            siblingNode = (previous ? currentNode.previousSibling : currentNode.nextSibling);
-        if ( (siblingNode == null) && (currentNode.nodeType == 3) ) {
-            siblingNode = (previous ? currentParentNode.previousSibling : currentParentNode.nextSibling);
-        }
-        return siblingNode;
     }
 });
