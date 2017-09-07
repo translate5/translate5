@@ -217,7 +217,10 @@ Ext.define('Editor.controller.Editor', {
   handleBeforeStartEdit: function(plugin, args){
       if(!plugin.editing) {
           //if editing is started by enter or F2 on a selected row:
-          if(plugin.editByCellActivation && !args[0].get('editable')){
+          //FIXME the check for editByCellActivation is commented because is not needed. With this
+          //the message will be reused in visualReview plugin
+          //if(plugin.editByCellActivation && !args[0].get('editable')){
+          if(!args[0].get('editable')){
               Editor.MessageBox.addInfo(this.messages.f2Readonly);
           }
           return true;
@@ -358,8 +361,10 @@ Ext.define('Editor.controller.Editor', {
           me.editorKeyMap.destroy();
           me.editorKeyMap = null;
       }
-      me.generalKeyMap.destroy();
-      me.generalKeyMap = null;
+      if(me.generalKeyMap){
+          me.generalKeyMap.destroy();
+          me.generalKeyMap = null;
+      }
   },
   buttonClickDispatcher: function(btn, e) {
       var me = this,

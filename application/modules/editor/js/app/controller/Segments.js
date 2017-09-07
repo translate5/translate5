@@ -217,7 +217,7 @@ Ext.define('Editor.controller.Segments', {
         store.suppressNextFilter = false;
         //FIXME ext update: for > ext-6.0.0 this must be changed to .load since 
         //the private method attemptLoad does not exist anymore (tested in ext-6.0.1) 
-        store.attemptLoad();
+        store.load();
         me.reloadFilemap();
       }
   },
