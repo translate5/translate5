@@ -374,8 +374,10 @@ Ext.define('Editor.controller.Editor', {
           me.editorKeyMap.destroy();
           me.editorKeyMap = null;
       }
-      me.generalKeyMap.destroy();
-      me.generalKeyMap = null;
+      if(me.generalKeyMap) {
+          me.generalKeyMap.destroy();
+          me.generalKeyMap = null;
+      }
   },
   buttonClickDispatcher: function(btn, e) {
       var me = this,
