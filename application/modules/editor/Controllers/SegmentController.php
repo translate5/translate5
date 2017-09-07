@@ -142,15 +142,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     public function positionAction() {
         $segmentNrInTask = (int) $this->_getParam('segmentNrInTask');
         $session = new Zend_Session_Namespace();
-        
         $this->entity->loadBySegmentNrInTask($segmentNrInTask, $session->taskGuid);
-        
-        if($this->isEditable()){
-            $this->view->segmentNrInTask=-1;
-            $this->view->index =-1;
-            return;
-        }
-        
         $this->checkTaskGuidAndEditable();
         $index = $this->entity->getIndex();
         if($index === null) {
