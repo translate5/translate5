@@ -107,7 +107,10 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                 queryMode: 'local',
                 valueField: 'id'
             },
-            config = {
+            now = new Date(),
+            config;
+        now.setHours(0,0,0,0);
+        config = {
                 title: me.title, //see EXT6UPD-9
                 layout: 'card',
                 items:[
@@ -201,13 +204,13 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     xtype: 'datefield',
                                     name: 'orderdate',
                                     submitFormat: Editor.DATE_ISO_FORMAT,
-                                    value: new Date(),
+                                    value: now,
                                     fieldLabel: me.strings.orderdate
                                 },{
                                     xtype: 'datefield',
                                     name: 'targetDeliveryDate',
                                     submitFormat: Editor.DATE_ISO_FORMAT,
-                                    value: new Date(),
+                                    value: now,
                                     fieldLabel: me.strings.targetDeliveryLabel
                                 },{
                                     xtype: 'numberfield',
