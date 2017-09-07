@@ -374,8 +374,13 @@ Ext.define('Editor.controller.Comments', {
 
     handleEditorCommentBtnClick:function(){
         var me = this,
-            commentPanel = me.getCommentPanel(),
-            form = me.getCommentForm(),
+            commentPanel = me.getCommentPanel();
+        
+        if(!commentPanel){
+            return;
+        }
+        
+        var form = me.getCommentForm(),
             area = form.down('textarea');
 
         if(!commentPanel.isCollapsable){
