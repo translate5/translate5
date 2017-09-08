@@ -97,6 +97,10 @@ Ext.define('Editor.view.comments.PanelViewController', {
         
         form.disable();
         form._enabled = false;
+        
+        if(!btn){
+            btn=me.getView().down('#saveBtn');
+        }
         btn.setIconCls('ico-loading');
         
         rec.save({
