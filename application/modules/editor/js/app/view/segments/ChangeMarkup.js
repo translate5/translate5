@@ -52,26 +52,37 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     NODE_NAME_DEL: 'DEL',
     NODE_NAME_INS: 'INS',
     
-    // Key-Codes
+    // KEY-CODES
     KEYCODE_BACKSPACE: 8,
-    KEYCODE_DELETE: 46,
+    KEYCODE_ENTER: 13,
+    KEYCODE_SPACE: 32,
+    // Arrow Keys
     KEYCODE_LEFT: 37,
     KEYCODE_UP: 38,
     KEYCODE_RIGHT: 39,
     KEYCODE_DOWN: 40,
-    KEYCODE_ENTER: 13,
+    // Modifier Keys
     KEYCODE_ALT: 18,
     KEYCODE_CTRL: 17,
     KEYCODE_SHIFT: 16,
     KEYCODE_ALT_GR: 225,
-    KEYCODE_SPACE: 32,
+    KEYCODE_CAPSLOCK: 20,
+    KEYCODE_NUMLOCK: 144,
+    // Special Keys
+    KEYCODE_DELETE: 46,
+    KEYCODE_END: 35,
+    KEYCODE_PAGEUP: 33,
+    KEYCODE_PAGEDOWN: 34,
+    // Characters
+    KEYCODE_C: 67,
     KEYCODE_Z: 90,
-    
-    CHAR_PLACEHOLDER: '\u0020',
     
     // https://github.com/timdown/rangy/wiki/Rangy-Range#compareboundarypointsnumber-comparisontype-range-range
     RANGY_RANGE_IS_BEFORE: -1,
     RANGY_RANGE_IS_AFTER: 1,
+    
+    // "SETTINGS/CONFIG"
+    CHAR_PLACEHOLDER: '\u0020', // what's inserted when a space is inserted 
     
     /**
      * The given segment content is the base for the operations provided by this method
@@ -142,14 +153,19 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     /**
      * Has the Key-Event to be IGNORED?
+     * TODO: What about Function Keys, Keypad Keys, Branded Keys?
      * @returns {Boolean}
      */
     eventHasToBeIgnored: function() {
         var keyCodesToIgnore = [
-                                this.KEYCODE_LEFT, this.KEYCODE_UP, this.KEYCODE_RIGHT, this.KEYCODE_DOWN,  // Arrow Keys
-                                this.KEYCODE_ALT, this.KEYCODE_CTRL, this.KEYCODE_SHIFT,                    // Modifier Keys
-                                this.KEYCODE_ENTER, this.KEYCODE_ALT_GR                                     // Other Keys To Ignore
+                                this.KEYCODE_LEFT, this.KEYCODE_UP, this.KEYCODE_RIGHT, this.KEYCODE_DOWN,                            // Arrow Keys
+                                this.KEYCODE_ALT, this.KEYCODE_CAPSLOCK, this.KEYCODE_CTRL, this.KEYCODE_NUMLOCK, this.KEYCODE_SHIFT, // Modifier Keys
+                                this.KEYCODE_END, this.KEYCODE_PAGEUP, this.KEYCODE_PAGEDOWN,                                         // Special Keys
+                                this.KEYCODE_ENTER, this.KEYCODE_ALT_GR                                                               // Other Keys To Ignore
                                ];
+        if(this.eventCtrlKey) {
+            keyCodesToIgnore.push(this.KEYCODE_C);                                                          // Ctrl-C
+        }
         return (keyCodesToIgnore.indexOf(this.eventKeyCode) != -1);
     },
     /**
@@ -323,6 +339,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         // var rangeForDel = this.docSelRange.cloneRange(); // buggy: sometimes the cloned range is collapsed to the start although this.docSelRange is NOT.
         var rangeForDel = this.docSelRange;
         // If nothing is selected, the caret has just been placed somewhere and the deletion refers the next single character only:
+        // (moveStart, moveEnd:) https://github.com/timdown/rangy/wiki/Text-Range-Module#movestartstring-unit-number-count-object-options
         if (rangeForDel.collapsed) {
             switch(this.eventKeyCode) {
                 case this.KEYCODE_BACKSPACE: // Backspace: "deletes" the previous character
@@ -351,6 +368,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     /**
      * Mark an insertion as inserted:
      * Before the insertion is added in the editor, we create an INS-node and position the caret in there.
+     * TODO: When the selection is not collapsed, put ALL selected characters into the ins and keep them selected (= to be replaced by the insertion)!
      */
     addIns: function() {
         var insNode = this.createNodeForMarkup(this.NODE_NAME_INS);
@@ -379,6 +397,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         // - Problem 1: The ins-Node including the space is visible in the code, but not in the editor.
         // - Problem 2: when inserting another character in the beginning of the editor, the caret is recognized as being WITHIN the ins-Node with the space, 
         //   but then the editor adds the character AFTER the space (= NOT inside the ins-Node with the space)
+        
+        // + (seems to be the same issue:) when first inserting content in an empty element (= ins is created, but not visible and not recognized)
     },
     /**
      * Place the caret at the beginning of the next INS-Node (within!!!).
