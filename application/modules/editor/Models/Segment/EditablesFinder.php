@@ -177,9 +177,14 @@ class editor_Models_Segment_EditablesFinder {
             $this->addSortOuter($outerSql, $prop, $isAsc);
         }
         
-        $innerSql = $this->segment->db->select()
-            ->from($this->segment->db, $this->fieldsToSelect)
-            ->where('id = ?', $segmentId);
+        $db = $this->segment->db;
+        $tableName = $db->info($db::NAME);
+        $innerSql = $db->select()
+            ->from($db, $this->fieldsToSelect)
+            ->where($tableName.'.id = ?', $segmentId);
+            
+        $this->segment->addWatchlistJoin($innerSql, $tableName);
+        $this->watchList($this->filterInner, $tableName);
         $this->filterInner->applyToSelect($innerSql);
         
         $outerSql->from(array('pos' => $innerSql), null);
@@ -187,7 +192,7 @@ class editor_Models_Segment_EditablesFinder {
 
         $this->debug($outerSql);
         
-        $stmt = $this->segment->db->getAdapter()->query($outerSql);
+        $stmt = $db->getAdapter()->query($outerSql);
         $res = $stmt->fetch();
         
         //the above SQL returns null if the desired segment is on first position (produced by the IF in the outer SQL)
@@ -195,7 +200,7 @@ class editor_Models_Segment_EditablesFinder {
         //to find out which of the both cases happened, we have to load the innerSql solely:
         $foundInFilter = true; //by default we assume that we found something
         if($res['cnt'] === null) {
-            $stmt = $this->segment->db->getAdapter()->query($innerSql);
+            $stmt = $db->getAdapter()->query($innerSql);
             $foundInFilter = $stmt->fetch(); //if there was a result, we have to return 0 which is done by the (int) cast at the end
         }
         
@@ -204,6 +209,16 @@ class editor_Models_Segment_EditablesFinder {
             return null;
         }
         return (int) $res['cnt'];
+    }
+    
+    /**
+     * Adds the watchList defitions to the needed filters
+     * @param ZfExtended_Models_Filter $filter
+     * @param string $tablename
+     */
+    protected function watchList(ZfExtended_Models_Filter $filter, $tablename) {
+        $filter->setDefaultTable($tablename);
+        $filter->addTableForField('isWatched', 'sua');
     }
     
     /**
@@ -253,6 +268,7 @@ class editor_Models_Segment_EditablesFinder {
     protected function getOuterSql() {
         $outerSql = $this->segment->db->select()
             ->from(array('list' => $this->segment->db), new Zend_Db_Expr('if(count(pos.id), count(list.id), null) AS cnt'));
+        $this->watchList($this->filterOuter, 'list');
         return $this->segment->addWatchlistJoin($outerSql, 'list');
     }
     
@@ -261,10 +277,13 @@ class editor_Models_Segment_EditablesFinder {
      * @return Zend_Db_Table_Select
      */
     protected function getInnerSql() {
-        $innerSql = $this->segment->db->select()
-            ->from($this->segment->db, $this->fieldsToSelect)
+        $db = $this->segment->db;
+        $tableName = $db->info($db::NAME);
+        $innerSql = $db->select()
+            ->from($db, $this->fieldsToSelect)
             ->limit(1);
         $innerSql = $this->segment->addWatchlistJoin($innerSql);
+        $this->watchList($this->filterInner, $tableName);
         return $this->filterInner->applyToSelect($innerSql);
     }
     

@@ -143,7 +143,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $segmentNrInTask = (int) $this->_getParam('segmentNrInTask');
         $session = new Zend_Session_Namespace();
         $this->entity->loadBySegmentNrInTask($segmentNrInTask, $session->taskGuid);
-        $this->checkTaskGuidAndEditable();
+        //$this->checkTaskGuidAndEditable();
         $index = $this->entity->getIndex();
         if($index === null) {
             throw new ZfExtended_NotFoundException();
