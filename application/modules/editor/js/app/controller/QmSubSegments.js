@@ -220,14 +220,15 @@ Ext.define('Editor.controller.QmSubSegments', {
      * @param editor
      */
     initEditor: function(editor) {
+        var offset = editor.iframeEl.getXY();
         if(this.editorTooltip){
             this.editorTooltip.setTarget(editor.getEditorBody());
-            this.editorTooltip.boundFrame = editor.iframeEl;
+            this.editorTooltip.targetOffset = offset;
             return;
         }
         this.editorTooltip = Ext.create('Editor.view.ToolTip', {
             target: editor.getDoc(),
-            boundFrame: editor.iframeEl
+            targetOffset: offset
         });
     },
     /**

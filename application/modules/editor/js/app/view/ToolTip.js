@@ -60,14 +60,6 @@ Ext.define('Editor.view.ToolTip', {
             //else if hasClass for other ToolTip Types
         }
     },
-    show : function(xy) {
-        var me = this;
-        if (xy && me.boundFrame) {
-            xy[0] += me.boundFrame.getX();
-            xy[1] += me.boundFrame.getY();
-        }
-        return me.callParent([xy]);
-    },
     onTargetOver: function(e) {
         e.preventDefault(); //prevent title tags to be shown in IE
         this.callParent(arguments);
@@ -94,14 +86,34 @@ Ext.define('Editor.view.ToolTip', {
         tip.update(me.qmflagTpl.apply(meta));		
     },
     /**
-     * instead of overriding the whole setTarget method just to add the delegated config
-     * we invoke into the mon method here to inject the parameter directly
+     * Override of default setTarget, only change see below.
+     * Must be respected on ExtJS updates!
      */
-    mon: function() {
-        var config = arguments[1];
-        if(config && Ext.isObject(config) && config.mouseover && config.mouseout && config.mousemove) {
-            config.delegated = false;
+    setTarget: function(target) {
+        var me = this,
+            listeners;
+ 
+        if (me.targetListeners) {
+            me.targetListeners.destroy();
         }
-        this.callParent(arguments);
+ 
+        if (target) {
+            me.target = target = Ext.get(target.el || target);
+            listeners = {
+                mouseover: 'onTargetOver',
+                mouseout: 'onTargetOut',
+                mousemove: 'onMouseMove',
+                tap: 'onTargetTap',
+                scope: me,
+                destroyable: true,
+                delegated: false    //this is the only change in comparision to the original code
+            };
+ 
+            me.targetListeners = target.on(listeners);
+            console.log(me.targetListeners);
+        } else {
+            me.target = null;
+        }
     }
+    
 });
