@@ -337,9 +337,13 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @returns {Object} delNode
      */
     addDel: function() {
-        // create a range to be marked as deleted
-        // var rangeForDel = this.docSelRange.cloneRange(); // buggy: sometimes the cloned range is collapsed to the start although this.docSelRange is NOT.
-        var rangeForDel = this.docSelRange;
+        // "S""miz de ceillos" => "Smiz de ceillos"
+        this.docSelRange.startContainer.parentNode.normalize();
+        this.docSelRange.endContainer.parentNode.normalize();
+        // Range to move into the DEL-node
+        var rangeForDel = rangy.createRange();
+        rangeForDel.setStart(this.docSelRange.startContainer, this.docSelRange.startOffset); 
+        rangeForDel.setEnd(this.docSelRange.endContainer, this.docSelRange.endOffset);
         // If nothing is selected, the caret has just been placed somewhere and the deletion refers the next single character only:
         // (moveStart, moveEnd:) https://github.com/timdown/rangy/wiki/Text-Range-Module#movestartstring-unit-number-count-object-options
         if (rangeForDel.collapsed) {
@@ -354,7 +358,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         }
         // create and attach <del>-Element around the range for deletion
         delNode = this.createNodeForMarkup(this.NODE_NAME_DEL);
-        if (rangeForDel.canSurroundContents(delNode)) { // TODO: When some characters have already been marked and some other characters get selected and deleted, this sometimes throws an Uncaught Error "Range is not valid. This usually happens after DOM mutation."
+        if (rangeForDel.canSurroundContents(delNode)) {
             rangeForDel.surroundContents(delNode);
         } else {
             console.log("Unable to surround range because range partially selects a non-text node. See DOM4 spec for more information.");
