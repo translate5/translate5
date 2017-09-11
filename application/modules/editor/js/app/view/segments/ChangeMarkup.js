@@ -52,7 +52,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     NODE_NAME_DEL: 'DEL',
     NODE_NAME_INS: 'INS',
     
-    // KEY-CODES
+    // KEY-CODES; TODO: Umbauen auf Ext.event.Event.ALT etc. (s. http://docs.sencha.com/extjs/6.0.0/classic/src/Event.js-2.html)
     KEYCODE_BACKSPACE: 8,
     KEYCODE_ENTER: 13,
     KEYCODE_SPACE: 32,
@@ -115,7 +115,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         
         // keys, die keinen content produzieren (strg,alt,shift alleine ohne taste, pfeile etc), müssen ignoriert werden
         if(this.eventHasToBeIgnored()){ 
-            console.log(" => Ignored!");
+            console.log(" => Ignored!"); // TODO: console.logs nicht irgendwann rausschmeißen, sondern in Fkt kapseln und ein-/ausschalten
             this.ignoreEvent = true;
         }
         // keys, die unseren content nicht verändern dürfen (strg-z etc), müssen ignoriert und gestoppt werden
@@ -153,10 +153,11 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     /**
      * Has the Key-Event to be IGNORED?
-     * TODO: What about Function Keys, Keypad Keys, Branded Keys?
+     * TODO: Function Keys, Keypad Keys, Branded Keys (Opera egal; ein schlimmstenfalls unerwünscht eingefügtes Leerzeichen kann ja direkt wieder gelöscht werden)
      * @returns {Boolean}
      */
     eventHasToBeIgnored: function() {
+        // TODO: var me = this (generell prüfen; 1. Zeichen einsparen 2. Callback-Fkt.)
         var keyCodesToIgnore = [
                                 this.KEYCODE_LEFT, this.KEYCODE_UP, this.KEYCODE_RIGHT, this.KEYCODE_DOWN,                            // Arrow Keys
                                 this.KEYCODE_ALT, this.KEYCODE_CAPSLOCK, this.KEYCODE_CTRL, this.KEYCODE_NUMLOCK, this.KEYCODE_SHIFT, // Modifier Keys
@@ -277,6 +278,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                 var delNode = this.addDel();
                 // Wenn wir uns allerdings in einem fremden Node befinden (= INS; allg. DEL wurden oben bereits abgefragt!)...
                 if (this.isWithinNode('foreignMarkup')) {
+                    // TODO: DEL in einem INS von demselben User und in demselben Workflow löscht das Zeichen tatsächlich einfach.
                     // ... dann müssen wir dieses jetzt noch an dieser Stelle auseinanderbrechen...
                     console.log("DEL: split foreign node...");
                     var splittedNodes = this.splitNode(this.getContainerNodeForCurrentSelection());
@@ -454,6 +456,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     /**
      * Checks if the current selection is within an existing markup-node of the given conditions to check.
+     * TODO (Prio II) generell: Parameter als Klassen-KONSTANTEN zB mit namespace definieren (dann sind alle Optionen an einem Platz einsehbar)
      * @param {String} checkConditions (sameNodeName|foreignMarkup|sameConditionsAndEvent)
      * @returns {Boolean}
      */
@@ -570,7 +573,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @returns {Object} 
      */
     createNodeForMarkup: function(nodeName){
-        var nodeEl = document.createElement(nodeName); // TODO: use Ext.DomHelper.createDom() instead?
+        var nodeEl = document.createElement(nodeName); // TODO: use Ext.DomHelper.createDom() instead
         nodeEl.id = Ext.id();
         // NEXT STEPS: Add info about user, workflow, ...
         return nodeEl;
