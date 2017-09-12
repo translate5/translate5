@@ -187,9 +187,9 @@ $dep->dependencies = [[
     ],[
         "name" => "extjs-6",
         "label" => "ExtJS (Version 6)",
-        "version" => "6.0.0",
-        "url" => "RELEASE:ext-6.0.0-gpl.zip",
-        "target" => "public/ext-6.0.0",
+        "version" => "6.2.0",
+        "url" => "RELEASE:ext-6.2.0-gpl.zip",
+        "target" => "public/ext-6.2.0",
         "licenses" => [[
             "uses" => "ExtJS",
             "license" => "GPL 3.0",
