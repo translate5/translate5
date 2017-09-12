@@ -292,8 +292,6 @@ Ext.define('Editor.controller.Comments', {
       });
   },
 
-    //FIXME move those functions in the Commentcontroller
-    //use this function when expand and collaps is needed, insteed of expand() or collapse() the panel
     /**
     * handles expand of comment panel, reloads store if needed
     * @param {Ext.panel.Panel} pan
