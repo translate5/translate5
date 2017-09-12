@@ -110,7 +110,6 @@ Ext.define('Editor.view.ToolTip', {
             };
  
             me.targetListeners = target.on(listeners);
-            console.log(me.targetListeners);
         } else {
             me.target = null;
         }
