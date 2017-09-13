@@ -392,7 +392,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $data = $internalTag->unprotect($data);
             
             //if nothing was changed, everything was OK already
-            if($data === $this->data->{$key}) {
+            if($this->entityCleanup($data) === $this->entityCleanup($this->data->{$key})) {
                 return;
             }
             $this->restMessages->addWarning('Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!');

@@ -130,8 +130,7 @@ class editor_TaskController extends ZfExtended_RestController {
      * 
      * @see ZfExtended_RestController::indexAction()
      */
-    public function indexAction()
-    {
+    public function indexAction() {
         $unlockedTasks = $this->entity->cleanupLockedJobs();
         $userGuid = $this->user->data->userGuid;
         
