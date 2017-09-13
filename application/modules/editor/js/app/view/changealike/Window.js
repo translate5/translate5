@@ -49,8 +49,7 @@ Ext.define('Editor.view.changealike.Window', {
   items_help: 'Hilfe:',
   loadedAlikes: null,
   tools: [{
-    type:'help',
-    renderTpl: ['{label} '+Ext.panel.Tool.prototype.renderTpl]
+    type:'help'
   }],
   id: 'change-alike-window',
   openedFor: null,

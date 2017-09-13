@@ -715,5 +715,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 	  }
 	  var sel = doc.getSelection();
 	  return !(sel.isCollapsed || sel.rangeCount > 0 && sel.getRangeAt(0).collapsed);
+  },
+  destroyEditor: function() {
+      //do nothing, here since the getWin().un('unload',...); in the original method throws an exception
+      // since our htmlEditor is only destroyed once at page reload we just do nothing here
+      // the comments in the original method about leaked IE6/7 can be ignored so far
   }
 });

@@ -406,7 +406,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
               width: 100,
               dataIndex: 'orderdate',
               filter: {
-                  type: 'date'
+                  type: 'date',
+                  dateFormat: Editor.DATE_ISO_FORMAT
               },
               text: me.text_cols.orderdate
           },{
@@ -414,7 +415,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
               width: 120,
               dataIndex: 'targetDeliveryDate',
               filter: {
-                  type: 'date'
+                  type: 'date',
+                  dateFormat: Editor.DATE_ISO_FORMAT
               },
               text: me.text_cols.targetDeliveryDate
           },{
@@ -422,7 +424,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
               width: 120,
               dataIndex: 'realDeliveryDate',
               filter: {
-                  type: 'date'
+                  type: 'date',
+                  dateFormat: Editor.DATE_ISO_FORMAT
               },
               text: me.text_cols.realDeliveryDate
           },{

@@ -75,7 +75,7 @@ Ext.define('Editor.controller.Comments', {
           '#Editor.$application': {
               editorViewportClosed: 'clearComments'
           },
-          '#editorcontroller': {
+          '#Editor': {
               openComments: 'handleEditorCommentBtn',
               saveUnsavedComments: 'handleCommentSave'
           }

@@ -85,7 +85,6 @@ Ext.define('Editor.model.admin.Task', {
   ],
   hasMany: [{
       model: 'Editor.model.segment.Field',
-      foreignKey: 'taskGuid',
       name: 'segmentFields'
   },{
       model: 'Editor.model.admin.task.UserPref', 

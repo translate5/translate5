@@ -63,7 +63,7 @@ Ext.define('Editor.model.ModelOverride', {
             p.headers = {};
         }
         version = me.parseVersion(version);
-        p.headers['Mqi-Entity-Version'] = version;
+        p.headers['Mqi-Entity-Version'] = version.toString(); //string cast needed, see TRANSLATE-960
         result = me.erase(config);
         delete p.headers['Mqi-Entity-Version'];
         return result;

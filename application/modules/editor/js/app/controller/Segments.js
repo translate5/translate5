@@ -82,7 +82,6 @@ Ext.define('Editor.controller.Segments', {
    */
   filemap: {},
   lastFileMapParams: null,
-  id: 'segmentscontroller',
   loadingMaskRequests: 0,
   saveChainMutex: false,
   changeAlikeOperation: null,
@@ -108,15 +107,15 @@ Ext.define('Editor.controller.Segments', {
           '#Editor.$application': {
               editorViewportClosed: 'clearSegments'
           },
-          '#editorcontroller': {
+          '#Editor': {
               saveSegment: 'saveChainStart',
               watchlistRemoved: 'handleWatchlistRemoved'
           },
-          '#changealikecontroller': {
+          '#ChangeAlike': {
               //called after currently loaded segment data is not used anymore by the save chain / change alike handling
               segmentUsageFinished: 'onSegmentUsageFinished'
           },
-          '#fileordercontroller': {
+          '#Fileorder': {
               itemsaved: 'handleFileSaved'
           }
       },
@@ -215,9 +214,7 @@ Ext.define('Editor.controller.Segments', {
       else {
         //reset suppressNextFilter to reenable normal filtering (suppressNextFilter needed for initialGridFilters)
         store.suppressNextFilter = false;
-        //FIXME ext update: for > ext-6.0.0 this must be changed to .load since 
-        //the private method attemptLoad does not exist anymore (tested in ext-6.0.1) 
-        store.attemptLoad();
+        store.load();
         me.reloadFilemap();
       }
   },
