@@ -308,7 +308,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             //      - Wenn wir ganz am Ende eines DEL sind, muss bei "Delete" das Zeichen dahinter mit dazugenommen werden.
             //      - bei Backspace: kein neues DEL, wenn schon in der Position VOR der Position DAVOR ein DEL existiert.
             //      - bei Delete: kein neues DEL, wenn schon in der Position NACH der Position DANACH ein DEL existiert.
-            console.log("TODO for DEL: Sind wir direkt vor oder hinter einem anderen DEL dran, an das wir uns anschliessen müssten?");
+            console.log("Sind wir direkt vor oder hinter einem anderen DEL dran, an das wir uns anschliessen müssten?");
             
             var delNodePrevious = delNode.previousElementSibling,
                 delNodeNext     = delNode.nextElementSibling;
@@ -335,6 +335,15 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * Handle insert-Events.
      */
     handleInsert: function() {
+        
+        // Are we within a foreign Markup (e.g. DEL of any conditions, or INS of another user)?
+        
+            // Then we need to split that one first:
+            if (this.isWithinNode('foreignMarkup')) {
+                console.log("INS: split foreign node first...");
+                this.splitNode(this.getContainerNodeForCurrentSelection());
+            }
+        
         
         // Are characters marked to be replaced by the insert?
         
@@ -373,13 +382,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         
         // Because we are neither in nor at an INS-node:
         
-            // (1) Wenn wir uns in einem DEL oder einem fremden INS befinden, dieses an dieser Stelle zuerst auseinanderbrechen.
-            if (this.isWithinNode('foreignMarkup')) {
-                console.log("INS: split foreign node first...");
-                this.splitNode(this.getContainerNodeForCurrentSelection());
-            }
-            
-            // (2) create and insert <ins>-node:
+            // Create and insert <ins>-node:
             if (this.eventKeyCode == this.KEYCODE_SPACE) { // Workaround for inserting space (otherwise creates <u>-Tag, don't know why).
                 console.log("INS: insert space with Markup...");
                 this.addInsWithSpace();
@@ -458,7 +461,6 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     /**
      * Mark an insertion as inserted:
      * Before the insertion is added in the editor, we create an INS-node and position the caret in there.
-     * TODO: When the selection is not collapsed, put ALL selected characters into the ins and keep them selected (= to be replaced by the insertion)!
      */
     addIns: function() {
         var insNode = this.createNodeForMarkup(this.NODE_NAME_INS);
@@ -515,7 +517,6 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     /**
      * Get the surrounding node of the current selection (= node where the selection starts).
      * If the selection is in a text node, the selection's parentNode is returned.
-     * TODO: checking the startContainer only might not be enough when the selection compasses multiple nodes.
      * @returns {Object}
      */
     getContainerNodeForCurrentSelection: function(){
@@ -642,7 +643,6 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     /**
      * Checks if the two given nodes touch each other in the given direction.
-     * TODO: Prüfen, ob dies wirklich benötigt wird.
      * @returns {Boolean}
      */
     isNodesTouching: function(node,siblingNode,direction){
@@ -687,7 +687,6 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     /**
      * Checks if the current selection is at the first position within its node.
-     * TODO: Prüfen, ob dies wirklich benötigt wird.
      * @returns {Boolean}
      */
     isWithinAtFirstPosition: function(){
