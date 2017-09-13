@@ -248,6 +248,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         // - Überlappende Markierungen, zB. Selektieren von bereits markierten Inhalten und noch bestehenden Inhalten
         // - Ersetzen von markierten Inhalten (= dann also gelöscht) durch neuen Inhalt (= als INS markieren).
         // - Sollen Strg-C und Strg-V auch unterstützt werden?
+        // - "Rückwärts" markierte Selections.
     },
     /**
      * Handle deletion-Events.
@@ -334,6 +335,19 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * Handle insert-Events.
      */
     handleInsert: function() {
+        
+        // Are characters marked to be replaced by the insert?
+        
+            // Then we have to:
+            // 1) mark those with a DEL-node, and 
+            // 2) position the caret at the end of the marked range afterwards.
+            // Then the further procedure is as usual.
+            
+            if (!this.docSelRange.collapsed) {
+                var delNode = this.addDel();
+                this.docSelRange.collapseAfter(delNode);
+            }
+            
         
         // Are we in or at an INS-node?
         
