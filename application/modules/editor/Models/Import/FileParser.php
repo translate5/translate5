@@ -472,7 +472,9 @@ abstract class editor_Models_Import_FileParser {
      * returns the file extensions (in lower case) parsable by this fileparser
      * @return array;
      */
-    abstract public static function getFileExtensions();
+    public static function getFileExtensions() {
+        throw new ZfExtended_Exception('Method must be overwritten in subclass!'); //with strict standards statics may not abstract!
+    }
     
     /**
      * Gets a mapping of file extensions to possible fileparsers 
