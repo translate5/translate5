@@ -309,20 +309,22 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             //      - bei Delete: kein neues DEL, wenn schon in der Position NACH der Position DANACH ein DEL existiert.
             console.log("TODO for DEL: Sind wir direkt vor oder hinter einem anderen DEL dran, an das wir uns anschliessen müssten?");
             
-            // TODO: zu löschender Inhalt kann auch ZWISCHEN zwei DEL-Nodes sein.
-            
             var delNodePrevious = delNode.previousElementSibling,
-                delNodeNext     = delNode.nextElementSibling,
-                isOfSameConditionsAsPrevious = this.isNodesOfSameConditionsAndEvent(delNode,delNodePrevious),
-                isOfSameConditionsAsNext     = this.isNodesOfSameConditionsAndEvent(delNode,delNodeNext),
-                isTouchingPrevious = this.isNodesTouching(delNode,delNodePrevious,'previous'),
-                isTouchingNext     = this.isNodesTouching(delNode,delNodeNext,'next');
+                delNodeNext     = delNode.nextElementSibling;
             
+            // Is at previous?
+            var isOfSameConditionsAsPrevious = this.isNodesOfSameConditionsAndEvent(delNode,delNodePrevious),
+                isTouchingPrevious = this.isNodesTouching(delNode,delNodePrevious,'previous');
             if ( isOfSameConditionsAsPrevious && isTouchingPrevious ) {
                 console.log("- Ja, isAtSibling(previous)");
-                this.mergeNodesFromTo(delNode,delNodePrevious);
+                // The deleted content can be INBETWEEN two DEL-Nodes of the same conditions.
+                // Thus, for the next check we use the merged node:
+                delNode = this.mergeNodesFromTo(delNode,delNodePrevious);
             }
             
+            // Is at next?
+            var isOfSameConditionsAsNext     = this.isNodesOfSameConditionsAndEvent(delNode,delNodeNext),
+                isTouchingNext     = this.isNodesTouching(delNode,delNodeNext,'next');
             if ( isOfSameConditionsAsNext && isTouchingNext ) {
                 console.log("- Ja, isAtSibling(next)");
                 this.mergeNodesFromTo(delNodeNext,delNode);
@@ -906,15 +908,19 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     /**
      * Merge two nodes (= move the content from one node to another and remove it then).
+     * Returns the (formerly nodeTo-) node with the merged content.
      * @param {Object} nodeFrom
      * @param {Object} nodeTo
+     * @returns {Object} nodeForMergedContent
      */
     mergeNodesFromTo: function(nodeFrom,nodeTo) {
+        var nodeForMergedContent = nodeTo;
         while (nodeFrom.childNodes.length > 0) {
-            nodeTo.appendChild(nodeFrom.childNodes[0]);
+            nodeForMergedContent.appendChild(nodeFrom.childNodes[0]);
         }
-        nodeTo.normalize();
+        nodeForMergedContent.normalize();
         nodeFrom.parentNode.removeChild(nodeFrom);
         console.log("-> Nodes gemergt.");
+        return nodeForMergedContent;
     }
 });
