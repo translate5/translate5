@@ -141,6 +141,16 @@ abstract class editor_Models_Import_FileParser {
     }
     
     /**
+     * This function returns the parser which should be used by parsing
+     * normally this is $this (means the current parser)
+     * The chaining gives us the possibility to parse a XML, find out the real file type and return the correct file parser here
+     * @return editor_Models_Import_FileParser
+     */
+    public function getChainedParser() {
+        return $this;
+    }
+    
+    /**
      * Prototyp-function for getting word-count while import process.
      * This function is (or is not) overwritten by typ-specific import-parser 
      */
