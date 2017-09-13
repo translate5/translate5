@@ -127,7 +127,8 @@ Ext.application({
    * @param {Boolean} readonly optional to open the task readonly
    */
   openEditor: function(task, readonly) {
-      var me = this;
+      var me = this,
+          languages = Ext.getStore('admin.Languages');
       if(! (task instanceof Editor.model.admin.Task)) {
           me.openTaskDirect();
           return;
@@ -135,6 +136,13 @@ Ext.application({
       readonly = (readonly === true || task.isReadOnly());
       Editor.data.task = task;
       Editor.model.Segment.redefine(task.segmentFields());
+      
+      Editor.data.taskLanguages = {
+          source: languages.getById(task.get('sourceLang')),
+          relais: languages.getById(task.get('relaisLang')),
+          target: languages.getById(task.get('targetLang'))
+      }
+      
       if(me.viewport){
           me.viewport.destroy();
           me.fireEvent('adminViewportClosed');

@@ -61,6 +61,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   enableLinks : false,
   enableFont : false,
   isTagOrderClean: true,
+  isRtl: false,
   missingContentTags: [],
   duplicatedContentTags: [],
   contentEdited: false, //is set to true if text content or content tags were modified
@@ -114,9 +115,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   getDocMarkup: function() {
     var me = this,
-        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'/css/htmleditor.css?v=12" />'; //disable Img resizing
+        dir = (me.isRtl ? 'rtl' : 'ltr'),
         //ursprünglich wurde ein body style height gesetzt. Das führte aber zu Problemen beim wechsel zwischen den unterschiedlich großen Segmente, daher wurde die Höhe entfernt.
-    return Ext.String.format('<html><head><style type="text/css">body{border:0;margin:0;padding:{0}px;}</style>{1}</head><body style="font-size:12px;line-height:14px;"></body></html>', me.iframePad, additionalCss);
+        body = '<html><head><style type="text/css">body{border:0;margin:0;padding:{0}px;}</style>{1}</head><body dir="{2}" style="direction:{2};font-size:12px;line-height:14px;"></body></html>',
+        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'/css/htmleditor.css?v=12" />'; //disable Img resizing
+    return Ext.String.format(body, me.iframePad, additionalCss, dir);
   },
   /**
    * overriding default method since under some circumstances this.getWin() returns null which gives an error in original code
@@ -720,5 +723,16 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       //do nothing, here since the getWin().un('unload',...); in the original method throws an exception
       // since our htmlEditor is only destroyed once at page reload we just do nothing here
       // the comments in the original method about leaked IE6/7 can be ignored so far
+  },
+  setDirectionRtl: function(isRtl) {
+      var me = this;
+      me.isRtl = isRtl;
+      if(!me.getDoc().editorInitialized) {
+          return;
+      }
+      var body = Ext.fly(me.getEditorBody()),
+          dir = isRtl ? 'rtl' : 'ltr';
+      body.set({"dir": dir});
+      body.setStyle('direction', dir);
   }
 });

@@ -160,6 +160,8 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         me.columnClicked = col.dataIndex;
         me.mainEditor.dataIndex = col.dataIndex;
         
+        me.mainEditor.setDirectionRtl(Editor.model.segment.Field.isDirectionRTL(me.mainEditor.fieldTypeToEdit));
+        
         //if isset linkedDisplayField the cols get changed in focusContextCell
         me.linkedDisplayField = linkedDisplayField;
         return true;

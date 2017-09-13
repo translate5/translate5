@@ -66,7 +66,9 @@ Ext.define('Editor.view.segments.column.Content', {
       this.callParent(arguments);
   },
   getTypeCls: function(field) {
-      return ' type-'+field.get('type');
+      var segField = Editor.model.segment.Field,
+          type = field.get('type');
+      return ' type-'+type+' '+segField.getDirectionCls(type);
   },
   initComponent: function() {
     var me = this;

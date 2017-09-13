@@ -59,6 +59,13 @@ Ext.define('Editor.model.segment.Field', {
               }
               return typeA - typeB;
           });
+      },
+      isDirectionRTL: function(fieldType) {
+          var lang = Editor.data.taskLanguages[fieldType];
+          return lang && lang.get('rtl');
+      },
+      getDirectionCls: function(fieldType) {
+          return 'direction-' + (Editor.model.segment.Field.isDirectionRTL(fieldType) ? 'rtl' : 'ltr'); 
       }
   },
   fields: [
