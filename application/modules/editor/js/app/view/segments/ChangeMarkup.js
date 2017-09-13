@@ -52,31 +52,6 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     NODE_NAME_DEL: 'DEL',
     NODE_NAME_INS: 'INS',
     
-    // KEY-CODES; TODO: Umbauen auf Ext.event.Event.ALT etc. (s. http://docs.sencha.com/extjs/6.0.0/classic/src/Event.js-2.html)
-    KEYCODE_BACKSPACE: 8,
-    KEYCODE_ENTER: 13,
-    KEYCODE_SPACE: 32,
-    // Arrow Keys
-    KEYCODE_LEFT: 37,
-    KEYCODE_UP: 38,
-    KEYCODE_RIGHT: 39,
-    KEYCODE_DOWN: 40,
-    // Modifier Keys
-    KEYCODE_ALT: 18,
-    KEYCODE_CTRL: 17,
-    KEYCODE_SHIFT: 16,
-    KEYCODE_ALT_GR: 225,
-    KEYCODE_CAPSLOCK: 20,
-    KEYCODE_NUMLOCK: 144,
-    // Special Keys
-    KEYCODE_DELETE: 46,
-    KEYCODE_END: 35,
-    KEYCODE_PAGEUP: 33,
-    KEYCODE_PAGEDOWN: 34,
-    // Characters
-    KEYCODE_C: 67,
-    KEYCODE_Z: 90,
-    
     // https://github.com/timdown/rangy/wiki/Rangy-Range#compareboundarypointsnumber-comparisontype-range-range
     RANGY_RANGE_IS_BEFORE: -1,
     RANGY_RANGE_IS_AFTER: 1,
@@ -153,19 +128,19 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     /**
      * Has the Key-Event to be IGNORED?
-     * TODO: Function Keys, Keypad Keys, Branded Keys (Opera egal; ein schlimmstenfalls unerwünscht eingefügtes Leerzeichen kann ja direkt wieder gelöscht werden)
      * @returns {Boolean}
      */
     eventHasToBeIgnored: function() {
-        // TODO: var me = this (generell prüfen; 1. Zeichen einsparen 2. Callback-Fkt.)
-        var keyCodesToIgnore = [
-                                this.KEYCODE_LEFT, this.KEYCODE_UP, this.KEYCODE_RIGHT, this.KEYCODE_DOWN,                            // Arrow Keys
-                                this.KEYCODE_ALT, this.KEYCODE_CAPSLOCK, this.KEYCODE_CTRL, this.KEYCODE_NUMLOCK, this.KEYCODE_SHIFT, // Modifier Keys
-                                this.KEYCODE_END, this.KEYCODE_PAGEUP, this.KEYCODE_PAGEDOWN,                                         // Special Keys
-                                this.KEYCODE_ENTER, this.KEYCODE_ALT_GR                                                               // Other Keys To Ignore
+        var extEv = Ext.event.Event,
+            keyCodesToIgnore = [
+                                extEv.LEFT, extEv.UP, extEv.RIGHT, extEv.DOWN,          // Arrow Keys
+                                extEv.ALT, extEv.CAPS_LOCK, extEv.CTRL, extEv.SHIFT,    // Modifier Keys
+                                extEv.HOME, extEv.END, extEv.PAGE_UP, extEv.PAGE_DOWN,  // Special Keys
+                                extEv.F1, extEv.F2, extEv.F3, extEv.F4, extEv.F5, extEv.F6, extEv.F7, extEv.F8, extEv.F9, extEv.F10, extEv.F11, extEv.F12, // Function Keys
+                                extEv.ENTER                                             // Other Keys To Ignore
                                ];
         if(this.eventCtrlKey) {
-            keyCodesToIgnore.push(this.KEYCODE_C);                                                          // Ctrl-C
+            keyCodesToIgnore.push(extEv.C);                                             // Ctrl-C
         }
         return (keyCodesToIgnore.indexOf(this.eventKeyCode) != -1);
     },
@@ -174,9 +149,10 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @returns {Boolean}
      */
     eventHasToBeIgnoredAndStopped: function() {
-        var keyCodesToIgnoreAndStop = new Array(); 
+        var extEv = Ext.event.Event,
+            keyCodesToIgnoreAndStop = new Array(); 
         if(this.eventCtrlKey) {
-            keyCodesToIgnoreAndStop.push(this.KEYCODE_Z);                                                   // Ctrl-Z
+            keyCodesToIgnoreAndStop.push(extEv.Z);                                      // Ctrl-Z
         }
         return (keyCodesToIgnoreAndStop.indexOf(this.eventKeyCode) != -1);
     },
@@ -185,7 +161,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @returns {Boolean}
      */
     eventIsDeletion: function() {
-        var keyCodesForDeletion = [this.KEYCODE_BACKSPACE, this.KEYCODE_DELETE];
+        var extEv = Ext.event.Event,
+            keyCodesForDeletion = [extEv.BACKSPACE, extEv.DELETE];
         return (keyCodesForDeletion.indexOf(this.eventKeyCode) != -1);
     },
     /**
@@ -258,10 +235,10 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         // Is the DEL-markup already in place?
         
             if(this.isWithinNode('sameNodeName')) {
-                if ( (this.eventKeyCode == this.KEYCODE_BACKSPACE) && this.isWithinAtFirstPosition() ) {
+                if ( (this.eventKeyCode == Ext.event.Event.BACKSPACE) && this.isWithinAtFirstPosition() ) {
                     // Wenn wir ganz am Anfang innerhalb irgendeines(!) DEL sind, muss bei "Backspace" das Zeichen davor mit dazugenommen werden.
                     // Also: Kein return hierfür!
-                } else if ( (this.eventKeyCode == this.KEYCODE_DELETE) && this.isWithinAtLastPosition() ) {
+                } else if ( (this.eventKeyCode == Ext.event.Event.DELETE) && this.isWithinAtLastPosition() ) {
                     // Wenn wir ganz am Ende innerhalb irgendeines(!) DEL sind, muss bei "Delete" das Zeichen dahinter gelöscht werden.
                     // Dafür setzen gehen wir mit dem Caret HINTER das DEL und machen von da aus ganz normal weiter.
                     console.log("'DELETE' && sameNodeName && isWithinAtLastPosition): moveCaretToTheRight.");
@@ -273,13 +250,13 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                 }
             }
             
-            if (this.isAtSibling('previous','sameNodeName') && this.eventKeyCode == this.KEYCODE_BACKSPACE) {
+            if (this.isAtSibling('previous','sameNodeName') && this.eventKeyCode == Ext.event.Event.BACKSPACE) {
                 // Bei "Backspace" direkt hinter irgendeinem(!) DEL: stoppen. (Das zu löschende Zeichen ist ja bereits als gelöscht markiert.)
                 console.log("DEL: is at previous DEL already..., we do nothing.");
                 return;
             }
             
-            if (this.isAtSibling('next','sameNodeName') && this.eventKeyCode == this.KEYCODE_DELETE ){
+            if (this.isAtSibling('next','sameNodeName') && this.eventKeyCode == Ext.event.Event.DELETE ){
                 // Bei "Delete" in irgendein(!) nachfolgend bestehendes DEL hinein: stoppen. (Das zu löschende Zeichen ist ja bereits als gelöscht markiert.)
                 console.log("DEL: is at next DEL already..., we do nothing.");
                 return;
@@ -383,7 +360,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         // Because we are neither in nor at an INS-node:
         
             // Create and insert <ins>-node:
-            if (this.eventKeyCode == this.KEYCODE_SPACE) { // Workaround for inserting space (otherwise creates <u>-Tag, don't know why).
+            if (this.eventKeyCode == Ext.event.Event.SPACE) { // Workaround for inserting space (otherwise creates <u>-Tag, don't know why).
                 console.log("INS: insert space with Markup...");
                 this.addInsWithSpace();
             } else {
@@ -416,10 +393,10 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         // (moveStart, moveEnd:) https://github.com/timdown/rangy/wiki/Text-Range-Module#movestartstring-unit-number-count-object-options
         if (rangeForDel.collapsed) {
             switch(this.eventKeyCode) {
-                case this.KEYCODE_BACKSPACE: // Backspace: "deletes" the previous character
+                case Ext.event.Event.BACKSPACE: // Backspace: "deletes" the previous character
                     rangeForDel.moveStart("character", -1);
                     break;
-                case this.KEYCODE_DELETE: // Delete "deletes" the next character
+                case Ext.event.Event.DELETE: // Delete "deletes" the next character
                     rangeForDel.moveEnd("character", 1);
                     break;
             }
@@ -440,7 +417,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             console.log("Unable to surround range because range partially selects a non-text node. See DOM4 spec for more information.");
         }
         // For "Delete": position the caret at the end
-        if (this.eventKeyCode == this.KEYCODE_DELETE) {
+        if (this.eventKeyCode == Ext.event.Event.DELETE) {
             rangeForDel.collapse(false);
             this.docSel.setSingleRange(rangeForDel);
         }
