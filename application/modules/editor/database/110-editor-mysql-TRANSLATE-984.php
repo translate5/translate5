@@ -34,6 +34,9 @@ END LICENSE AND COPYRIGHT
  */
 set_time_limit(0);
 
+// disabled this migration script, since it produced some DB errors in live usage. 
+// Keeping it for reference, since the script should be run manually if needed!
+return;
 
 /* @var $this ZfExtended_Models_Installer_DbUpdater */
 
@@ -49,9 +52,10 @@ if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
 
 $db = Zend_Db_Table::getDefaultAdapter();
 
-
+$db->query('LOCK TABLES `LEK_segment_data` WRITE,  `LEK_segment_history_data` WRITE');
 $db->query('UPDATE `LEK_segment_data` SET `edited` = replace(`edited`,  "&amp;#39;","\'")');
 $db->query('UPDATE `LEK_segment_history_data` SET `edited` = replace(`edited`,  "&amp;#39;","\'")');
+$db->query('UNLOCK TABLES');
 
 
 $conf = $db->getConfig();
@@ -63,5 +67,7 @@ if(empty($tables)) {
 }
 foreach($tables as $table){
     $tableName = $table[0];
+    $db->query('LOCK TABLES `'.$tableName.'` WRITE');
     $db->query('UPDATE `'.$tableName.'` SET `targetEdit` = replace(`targetEdit`,  "&amp;#39;","\'")');
+    $db->query('UNLOCK TABLES');
 }
