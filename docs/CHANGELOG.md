@@ -3,6 +3,22 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.6.1] - 2017-09-14
+###Added
+TRANSLATE-994: Support RTL languages in the editor (must be set in LEK_languages)
+TRANSLATE-974: Save all segments of a task to a TM
+
+###Changed
+TRANSLATE-925: support xliff 1.2 as import format - improve fileparser to file extension mapping
+TRANSLATE-926: ExtJS 6.2 update
+TRANSLATE-972: translate5 does not check, if there are relevant files in the import zip
+TRANSLATE-981: User inserts content copied from rich text wordprocessing tool
+
+###Bugfixes
+TRANSLATE-984: The editor converts single quotes to the corresponding HTML entity
+TRANSLATE-997: Reset password works only once without reloading the user data
+TRANSLATE-915: JS Error: response is undefined
+
 ## [2.5.35] - 2017-08-17
 ###Changed
 TRANSLATE-957: XLF Import: Different tag numbering on tags swapped position from source to target
