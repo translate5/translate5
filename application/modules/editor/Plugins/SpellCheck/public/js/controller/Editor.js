@@ -63,14 +63,15 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
       this.callParent(arguments);
   },
   handleEditorKeyMapUsage: function(conf, area, mapOverwrite) {
-      var me = this;
-      conf.keyMapConfig['space'] = [conf.SPACE,{ctrl: false, alt: false},function(key) {
+      var me = this,
+          ev = Ext.event.Event;
+      conf.keyMapConfig['space'] = [ev.SPACE,{ctrl: false, alt: false},function(key) {
           
           console.log("Implement Here the space handler!");
           
       }, true];
       
-      conf.keyMapConfig['anotherKey'] = [conf.SPACE,{ctrl: false, alt: false},function(key) {
+      conf.keyMapConfig['anotherKey'] = [ev.UP,{ctrl: false, alt: false},function(key) {
           
           console.log("Implement Here the anotherKey handler!");
           
