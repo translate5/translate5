@@ -185,7 +185,7 @@ $dep->dependencies = [[
             "relpath" => "docs/third-party-licenses/PHPExcel-1.8.1.license.txt"
         ]]
     ],[
-        "name" => "extjs-6",
+        "name" => "extjs-62",
         "label" => "ExtJS (Version 6)",
         "version" => "6.2.0",
         "url" => "RELEASE:ext-6.2.0-gpl.zip",
