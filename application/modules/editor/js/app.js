@@ -59,7 +59,7 @@ Editor.DATEONLY_ISO_FORMAT = 'Y-m-d';
 Ext.application({
   name : 'Editor',
   models : [ 'File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field' ],
-  stores : [ 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments' ],
+  stores : [ 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages'],
   requires: ['Editor.view.ViewPort', Editor.data.app.viewport, 'Editor.model.ModelOverride', 'Editor.util.TaskActions'],
   controllers: Editor.data.app.controllers,
   appFolder : Editor.data.appFolder,
