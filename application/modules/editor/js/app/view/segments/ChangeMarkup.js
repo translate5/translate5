@@ -212,6 +212,11 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             break;
         }
         
+        // if necessary: clean up afterwards
+        // e.g. deleting a lot of content might result in a DEL-node with other DEL-nodes and INS-nodes WITHIN,
+        // but they must all be on the same level, not including children.
+        this.cleanUpMarkupInEditor();
+        
         //Der DOM an dieser Stelle beihaltet IMG tags, und div.term tags. 
         //Eine Verschachtelung von INS und DELs untereinander ist in keiner Weise gestattet:
         // Das darf nicht produziert werden: <ins><ins></ins></ins> bzw <ins><del></del></ins>
@@ -272,7 +277,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             if (this.isWithinNode('foreignMarkup')) {
                 // ... dann müssen wir dieses jetzt noch an dieser Stelle auseinanderbrechen...
                 console.log("DEL: split foreign node...");
-                var splittedNodes = this.splitNode(delNode.parentNode);
+                var splittedNodes = this.splitNode(delNode.parentNode,this.docSelRange);
                 // ... und den eben erzeugten DEL aus dem ersten Teil-INS herausholen und zwischen die beiden neuen INS-Teile schieben.
                 console.log("DEL: move DEL up inbetween...");
                 this.moveNodeInbetweenSplittedNodes(delNode,splittedNodes);
@@ -291,7 +296,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                 delNodeNext     = delNode.nextElementSibling;
             
             // Is at previous?
-            var isOfSameConditionsAsPrevious = this.isNodesOfSameConditionsAndEvent(delNode,delNodePrevious),
+            var isOfSameConditionsAsPrevious = this.isNodesOfSameNameAndConditionsAndEvent(delNode,delNodePrevious),
                 isTouchingPrevious = this.isNodesTouching(delNode,delNodePrevious,'previous');
             if ( isOfSameConditionsAsPrevious && isTouchingPrevious ) {
                 console.log("- Ja, isAtSibling(previous)");
@@ -301,7 +306,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             }
             
             // Is at next?
-            var isOfSameConditionsAsNext     = this.isNodesOfSameConditionsAndEvent(delNode,delNodeNext),
+            var isOfSameConditionsAsNext     = this.isNodesOfSameNameAndConditionsAndEvent(delNode,delNodeNext),
                 isTouchingNext     = this.isNodesTouching(delNode,delNodeNext,'next');
             if ( isOfSameConditionsAsNext && isTouchingNext ) {
                 console.log("- Ja, isAtSibling(next)");
@@ -318,7 +323,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             // Then we need to split that one first:
             if (this.isWithinNode('foreignMarkup')) {
                 console.log("INS: split foreign node first...");
-                this.splitNode(this.getContainerNodeForCurrentSelection());
+                this.splitNode(this.getContainerNodeForCurrentSelection(),this.docSelRange);
             }
         
         
@@ -532,8 +537,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         switch(checkConditions) {
             case 'insNodeWithSameConditions':
                 var tmpMarkupNode = this.createNodeForMarkup(this.NODE_NAME_INS);
-                console.log("isWithinNode ("+checkConditions+")? " + this.isNodesOfSameName(tmpMarkupNode,selectionNode) + this.isNodesOfSameConditions(tmpMarkupNode,selectionNode));
-                return this.isNodesOfSameName(tmpMarkupNode,selectionNode) && this.isNodesOfSameConditions(tmpMarkupNode,selectionNode);
+                console.log("isWithinNode ("+checkConditions+")? " + this.isNodesOfSameName(tmpMarkupNode,selectionNode) + this.isNodesOfSameNameAndConditions(tmpMarkupNode,selectionNode));
+                return this.isNodesOfSameName(tmpMarkupNode,selectionNode) && this.isNodesOfSameNameAndConditions(tmpMarkupNode,selectionNode);
             case 'sameNodeName':
                 console.log("isWithinNode ("+checkConditions+")? " + this.isNodesOfSameName(tmpMarkupNode,selectionNode));
                 return this.isNodesOfSameName(tmpMarkupNode,selectionNode);
@@ -541,8 +546,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                 console.log("isWithinNode ("+checkConditions+")? " + this.isNodesOfForeignMarkup(tmpMarkupNode,selectionNode));
                 return this.isNodesOfForeignMarkup(tmpMarkupNode,selectionNode);
             case 'sameConditionsAndEvent':
-                console.log("isWithinNode ("+checkConditions+")? " + this.isNodesOfSameConditionsAndEvent(tmpMarkupNode,selectionNode));
-                return this.isNodesOfSameConditionsAndEvent(tmpMarkupNode,selectionNode);
+                console.log("isWithinNode ("+checkConditions+")? " + this.isNodesOfSameNameAndConditionsAndEvent(tmpMarkupNode,selectionNode));
+                return this.isNodesOfSameNameAndConditionsAndEvent(tmpMarkupNode,selectionNode);
             // no default, because then we would have a bug in the code. Calling this method without a correct parameter is too dangerous in consequences.
         }
     },
@@ -566,7 +571,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             case 'sameNodeName':
                 var currentIsOfSameConditionsAsSibling = this.isNodesOfSameName(tmpMarkupNode,siblingNode);
             case 'sameConditionsAndEvent':
-                var currentIsOfSameConditionsAsSibling = this.isNodesOfSameName(tmpMarkupNode,siblingNode) && this.isNodesOfSameConditionsAndEvent(tmpMarkupNode,siblingNode);
+                var currentIsOfSameConditionsAsSibling = this.isNodesOfSameName(tmpMarkupNode,siblingNode) && this.isNodesOfSameNameAndConditionsAndEvent(tmpMarkupNode,siblingNode);
             // no default, because then we would have a bug in the code. Calling this method without a correct parameter is too dangerous in consequences.
         }
         console.log("- checkConditions (" + checkConditions + "): " + currentIsOfSameConditionsAsSibling);
@@ -763,22 +768,21 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         if (!this.isNodeOfTypeMarkup(nodeA) || !this.isNodeOfTypeMarkup(nodeB)) {
             return false; // false weil: NEIN, ist (gar) KEIN Markup (also auch kein fremdes Markup).
         }
-        return !this.isNodesOfSameConditionsAndEvent(nodeA,nodeB);
+        return !this.isNodesOfSameNameAndConditionsAndEvent(nodeA,nodeB);
     },
+    // --------------------------------------------------------------------------------------------------------
+    // Helpers for grouped checks: same nodeName / same conditions (= user, workflow, ...) / according to event
+    // --------------------------------------------------------------------------------------------------------
     /**
-     * Do the nodes share the same conditions (nodeName, user, workflow....) AND match the event?
+     * Do the nodes share the same conditions? (user, workflow....)
      * @param {Object} nodeA
      * @param {Object} nodeB
      * @returns {Boolean}
      */
-    isNodesOfSameConditionsAndEvent: function(nodeA,nodeB) {
-        // The conditions of the given nodes must BOTH
-        // (1) fit to each other
-        // AND
-        // (2) fit to the current Event
-        var isNodesOfSameConditions = this.isNodesOfSameConditions(nodeA,nodeB),
-            isNodesAccordingToEvent = ( (this.isNodeAccordingToEvent(nodeA)) && (this.isNodeAccordingToEvent(nodeB)) );
-        return isNodesOfSameConditions && isNodesAccordingToEvent;
+    isNodesOfSameConditions: function(nodeA,nodeB) {
+        var isNodesOfSameUser       = this.isNodesOfSameUser(nodeA,nodeB),      // user
+            isNodesOfSameWorkflow   = this.isNodesOfSameWorkflow(nodeA,nodeB);  // workflow
+        return isNodesOfSameUser && isNodesOfSameWorkflow;
     },
     /**
      * Do the nodes share the same conditions? (nodeName, user, workflow....)
@@ -786,11 +790,25 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @param {Object} nodeB
      * @returns {Boolean}
      */
-    isNodesOfSameConditions: function(nodeA,nodeB) {
-        var isNodesOfSameName       = this.isNodesOfSameName(nodeA,nodeB),      // nodeName
-            isNodesOfSameUser       = this.isNodesOfSameUser(nodeA,nodeB),      // user
-            isNodesOfSameWorkflow   = this.isNodesOfSameWorkflow(nodeA,nodeB);  // workflow
-        return isNodesOfSameName && isNodesOfSameUser && isNodesOfSameWorkflow;
+    isNodesOfSameNameAndConditions: function(nodeA,nodeB) {
+        var isNodesOfSameName       = this.isNodesOfSameName(nodeA,nodeB),       // nodeName
+            isNodesOfSameConditions = this.isNodesOfSameConditions(nodeA,nodeB); // user, workflow
+        return isNodesOfSameName && isNodesOfSameConditions;
+    },
+    /**
+     * Do the nodes share the same conditions (nodeName, user, workflow....) AND match the event?
+     * @param {Object} nodeA
+     * @param {Object} nodeB
+     * @returns {Boolean}
+     */
+    isNodesOfSameNameAndConditionsAndEvent: function(nodeA,nodeB) {
+        // The conditions of the given nodes must BOTH
+        // (1) fit to each other
+        // AND
+        // (2) fit to the current Event
+        var isNodesOfSameNameAndConditions = this.isNodesOfSameNameAndConditions(nodeA,nodeB),
+            isNodesAccordingToEvent = ( (this.isNodeAccordingToEvent(nodeA)) && (this.isNodeAccordingToEvent(nodeB)) );
+        return isNodesOfSameNameAndConditions && isNodesAccordingToEvent;
     },
     /**
      * Do the given node's conditions match the conditions according to the event? (nodeName, user, workflow....)
@@ -798,11 +816,14 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @returns {Boolean}
      */
     isNodeAccordingToEvent: function(node) {
-        var isNodeNameAccordingToEvent       = this.isNodeNameAccordingToEvent(node),       // nodeName
-            isNodeOfUserAccordingToEvent     = this.isNodeOfUserAccordingToEvent(node),     // user
-            isNodeOfWorkflowAccordingToEvent = this.isNodeOfWorkflowAccordingToEvent(node); // workflow
+        var isNodeNameAccordingToEvent       = this.isNodeNameAccordingToEvent(node),       // nodeName acc. to event
+            isNodeOfUserAccordingToEvent     = this.isNodeOfUserAccordingToEvent(node),     // user acc. to event
+            isNodeOfWorkflowAccordingToEvent = this.isNodeOfWorkflowAccordingToEvent(node); // workflow acc. to event
         return isNodeNameAccordingToEvent && isNodeOfUserAccordingToEvent && isNodeOfWorkflowAccordingToEvent;
     },
+    // ------------------------------------------------------------------------------------------------------------
+    // Helpers for single checks (= comparing to another node or according to event): nodeName, user, workflow, ...
+    // ------------------------------------------------------------------------------------------------------------
     /**
      * Do the nodes share the same nodeName?
      * @param {Object} nodeA
@@ -860,6 +881,63 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
 
     // =========================================================================
+    // Cleaning up
+    // =========================================================================
+    
+    /**
+     * Check all markup-nodes and arrange them on one level.
+     */
+    cleanUpMarkupInEditor: function() {
+        //TODO: bookmark the caret and reset it afterwards
+        var nodeNamesForEvents = this.getMarkupNodeNamesForEvents();
+        // Do the cleaning for each markup-type (DEL, INS):
+        for (var key in nodeNamesForEvents) {
+            //get all nodes of this markup-type:
+            var nodeName = nodeNamesForEvents[key],
+                nodesForEvent = this.editor.getDoc().getElementsByTagName(nodeName);
+            //run the checks for all nodes of this markup-type:
+            for (var k = 0; k < nodesForEvent.length; k++){
+                var markupNode = nodesForEvent[k];
+                // (1) clean up child-nodes (since we check this everytime, we won't have any grandchildren):
+                this.cleanUpChildrenInNode(markupNode);
+            }
+        }
+        // (2) Check for all nodes (now on the same level) if they can be merged:
+        // TODO
+    },
+    /**
+     * 
+     */
+    cleanUpChildrenInNode: function(node) {
+        var childrenInNode = node.childNodes;
+        for (var i = 0; i < childrenInNode.length; i++){
+            var childNode = childrenInNode[i];
+            if (this.isNodeOfTypeMarkup(childNode)) { // Check for INS- and DEL-nodes only
+                console.log("childNode? is: " + childNode.nodeName);
+                // (a) When an INS gets deleted by the same user and in the same worklflow, 
+                //     it CAN really be deleted (= we remove the node).
+                if (node.nodeName == this.NODE_NAME_DEL
+                        && childNode.nodeName == this.NODE_NAME_INS
+                        && this.isNodesOfSameConditions(node,childNode) ) {
+                    node.removeChild(childNode);
+                    node.normalize();
+                    return;
+                }
+                // (b) Otherwise: flatten the hierachy of the nodes:
+                // Range setzen....
+                var rangeForChildnode = rangy.createRange();
+                rangeForChildnode.setStartBefore(childNode);
+                // childNode rausnehmen ...
+                node.parentNode.insertBefore(childNode,node);
+                // ... node splitten ...
+                var splittedNodes = this.splitNode(node,rangeForChildnode);
+                // ... und childNode wieder einfügen:
+                this.moveNodeInbetweenSplittedNodes(childNode,splittedNodes);
+            }
+        }
+    },
+
+    // =========================================================================
     // Helpers for Nodes in general
     // =========================================================================
     
@@ -869,12 +947,13 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @param {Object} nodeToSplit
      * @returns {Array}
      */
-    splitNode: function(nodeToSplit) {
+    splitNode: function(nodeToSplit,rangeForPositionToSplit) {
+        console.log("-----");console.log("nodeToSplit: "); console.dir(nodeToSplit);console.dir(rangeForPositionToSplit); console.log("-----");
         var splittedNodes = new Array();
         // extract what's on the left from the caret and insert it before the node as a new node
         var rangeForExtract = rangy.createRange(),
-            selectionStartNode = this.docSelRange.startContainer,
-            selectionStartOffset = this.docSelRange.startOffset,
+            selectionStartNode = rangeForPositionToSplit.startContainer,
+            selectionStartOffset = rangeForPositionToSplit.startOffset,
             parentNode = nodeToSplit.parentNode;
         rangeForExtract.setStartBefore(nodeToSplit);
         rangeForExtract.setEnd(selectionStartNode, selectionStartOffset);
@@ -883,9 +962,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         parentNode.insertBefore(splittedNodes[0], splittedNodes[1]); // TODO: Prüfen, ob beide Teile des gesplitteten nodes dieselben Angaben haben (User, Workflow, ...)
         // "reset" position of the user's selection (= where the node was split)
         // TODO: prüfen, ob Rangy's getBookmark besser wäre; s.a. https://github.com/timdown/rangy/wiki/Rangy-Selection#restorerangessaved
-        this.docSelRange.setEndBefore(splittedNodes[1]);
-        this.docSelRange.collapse(false);
-        this.docSel.setSingleRange(this.docSelRange);
+        rangeForPositionToSplit.setEndBefore(splittedNodes[1]);
+        rangeForPositionToSplit.collapse(false);
+        this.docSel.setSingleRange(rangeForPositionToSplit);
         return splittedNodes;
     },
     /**
