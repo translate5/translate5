@@ -890,20 +890,28 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     cleanUpMarkupInEditor: function() {
         //TODO: bookmark the caret and reset it afterwards
         var nodeNamesForEvents = this.getMarkupNodeNamesForEvents();
-        // Do the cleaning for each markup-type (DEL, INS):
-        for (var key in nodeNamesForEvents) {
-            //get all nodes of this markup-type:
+        // step 1: clean up child-nodes (since we check this everytime, we won't have any grandchildren):
+        for (var key in nodeNamesForEvents) { // Do the cleaning for each markup-type (DEL, INS)
+            // get all nodes of this markup-type:
             var nodeName = nodeNamesForEvents[key],
                 nodesForEvent = this.editor.getDoc().getElementsByTagName(nodeName);
-            //run the checks for all nodes of this markup-type:
+            // run the checks for all nodes of this markup-type:
             for (var k = 0; k < nodesForEvent.length; k++){
                 var markupNode = nodesForEvent[k];
-                // (1) clean up child-nodes (since we check this everytime, we won't have any grandchildren):
                 this.cleanUpChildrenInNode(markupNode);
             }
         }
-        // (2) Check for all nodes (now on the same level) if they can be merged:
-        // TODO
+        // step 2: check for all nodes (now on the same level) if they can be merged:
+        for (var key in nodeNamesForEvents) { // Do the cleaning for each markup-type (DEL, INS)
+            // get all nodes again (the DOM might have been changed in step 1!):
+            var nodeName = nodeNamesForEvents[key],
+                nodesForEvent = this.editor.getDoc().getElementsByTagName(nodeName);
+            // run the checks for all nodes of this markup-type:
+            for (var k = 0; k < nodesForEvent.length; k++){
+                var markupNode = nodesForEvent[k];
+                this.cleanUpSiblingsForNode(markupNode);
+            }
+        }
     },
     /**
      * 
@@ -934,6 +942,22 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                 // ... und childNode wieder einfügen:
                 this.moveNodeInbetweenSplittedNodes(childNode,splittedNodes);
             }
+        }
+    },
+    /**
+     * 
+     */
+    cleanUpSiblingsForNode: function(node) {
+        // We check if the node touches a next node of the same conditions.
+        // If the two get merged, we check if the merged node touches a next
+        // node of the same kind, and so on.
+        var currentNode = node,
+            nextNode = node.nextElementSibling;
+        while ( this.isNodesOfSameNameAndConditions(currentNode,nextNode) 
+                && this.isNodesTouching(currentNode,nextNode,'next') ) {
+            console.log("Do Merge...");
+            currentNode = this.mergeNodesFromTo(nextNode,currentNode);
+            nextNode = currentNode.nextElementSibling;
         }
     },
 
