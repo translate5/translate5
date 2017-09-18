@@ -194,16 +194,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         // change markup according to event
         switch(true) {
             case this.eventIsDeletion():
-                if (this.isWithinNode('insNodeWithSameConditions')) {
-                    // DEL in einem INS von demselben User und in demselben Workflow löscht das Zeichen tatsächlich einfach.
-                    console.log(" => eventIsDeletion, Zeichen werden (da in INS) tatsächlich gelöscht und wir machen sonst nichts.");
-                    this.stopEvent = false; // Das Event wird anschließend ausgeführt (= das Löschen geht dann normal vonstatten).
-                } else {
-                    // Ansonsten:
-                    console.log(" => eventIsDeletion");
-                    this.stopEvent = true;  // Das Event wird auf jeden Fall gestoppt; Zeichen werden nicht mehr gelöscht (sondern nur noch als gelöscht markiert).
-                    this.handleDeletion();
-                }
+                console.log(" => eventIsDeletion");
+                this.handleDeletion();
+                this.stopEvent = true;  // Das Event wird gestoppt; die Zeichen sind jetzt entweder gelöscht oder als gelöscht markiert (= und werden nicht wirklich noch gelöscht).
             break;
             case this.eventIsInsertion():
                 console.log(" => eventIsInsertion");
@@ -236,6 +229,16 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * Handle deletion-Events.
      */
     handleDeletion: function() {
+
+        // DEL in einem INS von demselben User und in demselben Workflow löscht das/die Zeichen tatsächlich einfach.
+        // TODO: Prüfen, ob BEIDE Boundaries drinliegen, nicht nur der Start. Falls nur EINE Boundary drin liegt, 
+        //       darf nur der innenliegende Teil wirklich gelöscht werden. Der außenliegende Teil muss extra geprüft werden:
+        //       Was bereits als DEL markiert ist, bleibt unberührt. Was noch nicht als DEL markiert ist, muss noch markiert werden.
+            if (this.isWithinNode('insNodeWithSameConditions')) {
+                console.log("DEL in einem INS von demselben User und in demselben Workflow: doDel.");
+                this.doDel();
+                return;
+            }
         
         // Is the DEL-markup already in place?
         
@@ -427,6 +430,13 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             this.docSel.setSingleRange(rangeForDel);
         }
         return delNode;
+    },
+    /**
+     * Delete character(s).
+     */
+    doDel: function() {
+        var rangeForDel = this.getRangeToBeDeleted();
+        rangeForDel.deleteContents();
     },
     /**
      * 
@@ -889,9 +899,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     cleanUpMarkupInEditor: function() {
         //TODO: bookmark the caret and reset it afterwards
-        var nodeNamesForEvents = this.getMarkupNodeNamesForEvents();
+        var nodeNamesForEvents = this.getMarkupNodeNamesForEvents(); // Do each step in the cleaning for each markup-type (DEL, INS)
         // step 1: clean up child-nodes (since we check this everytime, we won't have any grandchildren):
-        for (var key in nodeNamesForEvents) { // Do the cleaning for each markup-type (DEL, INS)
+        for (var key in nodeNamesForEvents) {
             // get all nodes of this markup-type:
             var nodeName = nodeNamesForEvents[key],
                 nodesForEvent = this.editor.getDoc().getElementsByTagName(nodeName);
@@ -902,7 +912,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             }
         }
         // step 2: check for all nodes (now on the same level) if they can be merged:
-        for (var key in nodeNamesForEvents) { // Do the cleaning for each markup-type (DEL, INS)
+        for (var key in nodeNamesForEvents) {
             // get all nodes again (the DOM might have been changed in step 1!):
             var nodeName = nodeNamesForEvents[key],
                 nodesForEvent = this.editor.getDoc().getElementsByTagName(nodeName);
