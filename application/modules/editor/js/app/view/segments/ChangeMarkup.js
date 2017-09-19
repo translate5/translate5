@@ -417,13 +417,20 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * Before the insertion is added in the editor, we create an INS-node and position the caret in there.
      */
     addIns: function() {
-        var insNode = this.createNodeForMarkup(this.NODE_NAME_INS);
-        insNode.appendChild(document.createTextNode(this.CHAR_PLACEHOLDER)); // eg Google Chrome gets lost otherwise
+        var selPositionInfo = this.getSelectionPositionInfo(),
+            editorBody = this.editor.getEditorBody(),
+            insNode = this.createNodeForMarkup(this.NODE_NAME_INS),
+            insPlaceholder = document.createTextNode(this.CHAR_PLACEHOLDER); // eg Google Chrome gets lost without placeholder
+        // insert INS-Node
+        if(selPositionInfo.atStart || selPositionInfo.atEnd) {
+           insPlaceholder = document.createTextNode('x');       // empty placeholders are not recognized in the ExtJs-Editor
+        }
+        insNode.appendChild(insPlaceholder);
         this.docSelRange.insertNode(insNode);
         // position the caret over the content of the ins-node
         this.docSelRange.selectNodeContents(insNode);
         this.docSel.setSingleRange(this.docSelRange);
-        insNode.nodeValue = '';                                              // Google Chrome; see above...
+        insNode.nodeValue = '';                                 // Google Chrome; see above...
     },
     /**
      * Add space and mark it as inserted.
@@ -438,13 +445,6 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         this.docSel.setSingleRange(this.docSelRange);
         // space is inserted already, stop the keyboard-Event!
         this.stopEvent = true;
-        
-        // TODO: Empty ins-Tags (= I mean: only with space) in the beginning or at the end of the editor are not recognized by the editor.
-        // - Problem 1: The ins-Node including the space is visible in the code, but not in the editor.
-        // - Problem 2: when inserting another character in the beginning of the editor, the caret is recognized as being WITHIN the ins-Node with the space, 
-        //   but then the editor adds the character AFTER the space (= NOT inside the ins-Node with the space)
-        
-        // + (seems to be the same issue:) when first inserting content in an empty element (= ins is created, but not visible and not recognized)
     },
     /**
      * Place the caret at the beginning of the next INS-Node (within!!!).
@@ -617,6 +617,29 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         console.log("- compareBoundaryPoints: " + hasSiblingInGivenDirection);
         console.log("- intersectsOrTouchesRange: " + isTouchingSibling);
         return hasSiblingInGivenDirection && isTouchingSibling;
+    },
+    
+    /**
+     * Determine if the cursor of the current selection is at the start or end of the Editor.
+     * (https://stackoverflow.com/a/7478420)
+     * @returns {Object}
+     */
+    getSelectionPositionInfo: function() {
+        var atStart = false,
+            atEnd = false,
+            el = this.editor.getEditorBody(),
+            selRange = this.docSelRange,
+            testRange = selRange.cloneRange();
+        
+        testRange.selectNodeContents(el);
+        testRange.setEnd(selRange.startContainer, selRange.startOffset);
+        atStart = (testRange.toString() == "");
+        
+        testRange.selectNodeContents(el);
+        testRange.setStart(selRange.endContainer, selRange.endOffset);
+        atEnd = (testRange.toString() == "");
+        
+        return { atStart: atStart, atEnd: atEnd };
     },
 
     // =========================================================================
