@@ -160,6 +160,10 @@ class editor_Models_Segment_EditablesFinder {
         return (int) $res['cnt'];
     }
     
+    public function search(){
+        
+    }
+    
     /**
      * adds the where statement to the inner SELECT, the SQL differs for the following cases:
         ASC NEXT     sortField > currentSortValue || sortField = currentSortValue && idField > currentIdValue

@@ -133,6 +133,13 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         parent::__construct();
     }
     
+    public function search($searchKeyword){
+        $sql='';
+        $stmt = $this->db->getAdapter()->query($sql);
+        $retVal = $stmt->fetchAll();
+        return $retVal;
+    }
+    
     /**
      * updates the toSort attribute of the given attribute name (only if toSort exists!)
      * @param string $field

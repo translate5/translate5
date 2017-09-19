@@ -296,6 +296,14 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->view->rows = $this->entity->getDataObject();
     }
     
+    public function searchAction(){
+        //$search = ZfExtended_Factory::get('editor_Models_Segment_EditablesFinder');
+        /* @var $search editor_Models_Segment_EditablesFinder */
+        //$search->search();
+        //FIXME this is only the test implementation
+        return $this->entity->search("wird");
+    }
+    
     /**
      * Updates the target original and targetMd5 hash for repetition calculation
      * Can be done only in Workflow Step 1 and if all targets were empty on import

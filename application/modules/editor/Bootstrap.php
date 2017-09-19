@@ -123,6 +123,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ));
         $this->front->getRouter()->addRoute('editorMatchratetypes', $filemapRoute);
 
+        $searchRoute = new ZfExtended_Controller_RestFakeRoute(
+                'editor/segment/search/*',
+                array(
+                        'module' => 'editor',
+                        'controller' => 'segment',
+                        'action' => 'search'
+                ));
+        $this->front->getRouter()->addRoute('editorSearchSegment', $searchRoute);
+
         $authUserRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/user/authenticated/*',
             array(
