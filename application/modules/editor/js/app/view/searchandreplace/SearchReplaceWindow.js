@@ -32,8 +32,7 @@ Ext.define('Editor.view.searchandreplace.SearchReplaceWindow', {
     alias: 'widget.searchreplacewindow',
     itemId: 'searchreplacewindow',
     requires:[
-        'Editor.view.searchandreplace.SearchTab',
-        'Editor.view.searchandreplace.ReplaceTab'
+        'Editor.view.searchandreplace.TabPanel'
     ],
     minHeight : 350,
     width : 350,
@@ -41,29 +40,34 @@ Ext.define('Editor.view.searchandreplace.SearchReplaceWindow', {
     layout:'fit',
     strings:{
         windowTitle:'#UT#Search and replace window',
-        searchTabTitle:'#UT#Sarch',
-        replaceTabTitle:'#UT#Replace',
+        helpButtonTooltip:'#UT#Info about the search and replace'
     },
-    initComponent: function() {
-        var me = this;
-        me.callParent(arguments);
-    },
+    
     initConfig : function(instanceConfig) {
         var me = this,
-        config = {
+            config = {
                 title:me.strings.windowTitle,
                 items:[{
-                    xtype:'tabpanel',
-                    items: [{
-                        xtype:'searchTab',
-                        title:me.strings.searchTabTitle
-                    }, {
-                        xtype:'replaceTab',
-                        title:me.strings.replaceTabTitle
+                    xtype:'searchreplacetabpanel',
+                    //items: [{
+                        //xtype:'searchTab',
+                   //     xtype:'tab',
+                        //title:me.strings.searchTabTitle
+                    //}, {
+                        //xtype:'replaceTab',
+                    //    xtype:'tab',
+                        //title:me.strings.replaceTabTitle
                         //tabConfig: {
                         //    tooltip: 'A button tooltip'
                         //}
-                    }]
+                    //}]
+                }],
+                tools:[{
+                    type:'help',
+                    tooltip:me.strings.helpButtonTooltip,
+                    handler:function(){
+                        window.open('http://confluence.translate5.net/','_blank');
+                    }
                 }]
         };
         if (instanceConfig) {

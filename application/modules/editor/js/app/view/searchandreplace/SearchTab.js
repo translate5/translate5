@@ -28,16 +28,77 @@ END LICENSE AND COPYRIGHT
 */
 
 Ext.define('Editor.view.searchandreplace.SearchTab', {
-    xtype:'tab',
+    extend:'Ext.panel.Panel',
+    xtype:'searchTab',
     alias:'widget.searchTab',
     itemId:'searchTab',
     
+    closable:false,
+    
+    strings:{
+      comboFieldLabel:'#UT#Search',
+      searchInCombo:'#UT#Search in',
+      matchCase:'#UT#Match case',
+      towardsTop:'#UT#Search towards the top',
+      useForSearch:'#UT#Use for search',
+      normalSearch:'#UT#Normal" (default)',
+      wildcardsSearch:'#UT#Wildcards',
+      regularExpressionSearch:'#UT#Regular expressions',
+    },
+    
+    padding:'10 10 10 10',
+    
     initConfig : function(instanceConfig) {
         var me = this,
-        config = {};
+        config = {
+                items:[{
+                    xtype:'combo',
+                    itemId:'searchCombo',
+                    focusable:true,
+                    fieldLabel:me.strings.comboFieldLabel,
+                },{
+                    xtype:'combo',
+                    itemId:'searchInCombo',
+                    fieldLabel:me.strings.searchInCombo,
+                    displayField:'value',
+                    valueField:'id',
+                },{
+                    xtype:'checkbox',
+                    itemId:'matchCaseChekbox',
+                    boxLabel:me.strings.matchCase
+                },{
+                    xtype:'checkbox',
+                    itemId:'searchTopChekbox',
+                    boxLabel:me.strings.towardsTop
+                },{
+                    xtype      : 'fieldcontainer',
+                    fieldLabel : me.strings.useForSearch,
+                    defaultType: 'radiofield',
+                    defaults: {
+                        flex: 1
+                    },
+                    layout: 'vbox',
+                    items: [
+                        {
+                            boxLabel  : me.strings.normalSearch,
+                            name      : 'searchType',
+                            inputValue: 'normalSearch',
+                        }, {
+                            boxLabel  : me.strings.wildcardsSearch,
+                            name      : 'searchType',
+                            inputValue: 'wildcardsSearch',
+                        }, {
+                            boxLabel  : me.strings.regularExpressionSearch,
+                            name      : 'searchType',
+                            inputValue: 'regularExpressionSearch',
+                        }
+                    ]
+                }]
+        };
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
     }
+    
 });

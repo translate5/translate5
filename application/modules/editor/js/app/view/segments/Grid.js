@@ -172,7 +172,7 @@ Ext.define('Editor.view.segments.Grid', {
             
             //stored outside of function and must be set after isErgoVisible!
             firstTargetFound = firstTargetFound || isEditableTarget; 
-            
+
             if(!rec.isTarget() || ! userPref.isNonEditableColumnDisabled()) {
                 width = Math.min(Math.max(width, labelWidth), maxWidth);
                 if(isEditableTarget) {
@@ -186,6 +186,7 @@ Ext.define('Editor.view.segments.Grid', {
                     hidden: !userPref.isNonEditableColumnVisible() && rec.isTarget(),
                     isErgonomicVisible: isErgoVisible && !editable,
                     isErgonomicSetWidth: true, //currently true for all our affected default fields
+                    isContentColumn: true,//TODO this propertie is missing
                     text: label,
                     tooltip: label,
                     width: width
@@ -212,6 +213,8 @@ Ext.define('Editor.view.segments.Grid', {
                     fieldName: name,
                     isErgonomicVisible: isErgoVisible,
                     isErgonomicSetWidth: true, //currently true for all our affected default fields
+                    isContentColumn: true,//TODO those properties are missing 
+                    isEditableContentColumn: true,//TODO those properties are missing
                     tooltip: rec.get('label'),
                     text: label,
                     width: width

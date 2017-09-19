@@ -38,13 +38,54 @@ Ext.define('Editor.controller.SearchReplace', {
     listen:{
         component:{
             '#segmentgrid':{
-                afterrender:'onSegmentGridAfterRender'
+                afterrender:'onSegmentGridAfterRender',
+                filterchange:'onSegmentGridFilterChange',
+                columnshow:'onColumnVisibilityChange',
+                columnhide:'onColumnVisibilityChange'
+            },
+            '#searchreplacewindow':{
+                show:'onSearchReplaceWindowShow',
+                destroy:'onSearchReplaceWindowDestroy'
+            },
+            '#searchreplacetabpanel #searchButton':{
+                click:'onSearchButtonClick'
+            },
+            
+            '#searchreplacetabpanel #replaceButton':{
+                click:'onReplaceButtonClick'
+            },
+            
+            '#searchreplacetabpanel #replaceAllButton':{
+                click:'onReplaceAllButtonClick'
+            },
+            
+        },
+        controller:{
+            '#Editor': {
+                beforeKeyMapUsage: 'handleEditorKeyMapUsage'
             }
         }
     },
     
-    showSarchReplaceIn:['source','target'],
-
+    refs:[{
+        ref:'segmentGrid',
+        selector:'#segmentgrid'
+    }],
+    
+    searchFields:[],
+    replaceFields:[],
+    activeColumnDataIndex:'',
+    DEFAULT_COLUMN_DATA_INDEX:'targetEdit',
+    strings:{
+        searchInfoMessage:'#UT#The search will be performed only on the filtered segments',
+        comboFieldLabel:'#UT#Replace',
+    },
+    
+    initConfig:function(){
+        this.callParent(arguments);
+        this.resetActiveColumnDataIndex();
+    },
+    
     /***
      * On segment grid after render handler
      * Here we add the search and replace menu item on the needed column
@@ -59,9 +100,30 @@ Ext.define('Editor.controller.SearchReplace', {
             beforeshow:{
                 fn:me.onSegmentGridMenuBeforeShow,
                 scope:me
-                
-            }
+            },
+            hide:{
+                fn:me.onSegmentGridMenuHide,
+                scope:me
+            },
         });
+        
+        me.initColumnArrays();
+    },
+    
+    onSegmentGridFilterChange:function(store,filters,eOpts){
+        if(filters.length>0){
+            Editor.MessageBox.addInfo(this.strings.searchInfoMessage);
+        }
+    },
+    
+    onColumnVisibilityChange:function(){
+        this.initColumnArrays();
+    },
+    
+    handleEditorKeyMapUsage: function(cont, area, mapOverwrite) {
+        var me = this;
+        cont.keyMapConfig['ctrl-f'] = ['f',{ctrl: true, alt: false},me.handleSearchReplaceHotkey, true];
+        cont.keyMapConfig['ctrl-h'] = ['h',{ctrl: true, alt: false},me.handleSearchReplaceHotkey, true];
     },
     
     addSearchReplaceMenu:function(gridMenu){
@@ -71,6 +133,7 @@ Ext.define('Editor.controller.SearchReplace', {
                 itemId:'searchReplaceMenu',
                 text: 'Search and replace window',
                 iconCls:'x-fa fa-search',
+                scope:me,
                 handler:me.showSearchAndReplaceWindow
             });
     },
@@ -80,16 +143,181 @@ Ext.define('Editor.controller.SearchReplace', {
         var me=this,
             searchReplaceMenu=menu.down('#searchReplaceMenu'),
             currentDataIndex = menu.activeHeader.dataIndex;
+
+        me.activeColumnDataIndex = currentDataIndex;
         // show/hide menu item in the menu
-        if(Ext.Array.contains(me.showSarchReplaceIn,currentDataIndex)) {
+        if(Ext.Array.contains(me.searchFields,currentDataIndex)) {
             searchReplaceMenu.show();
             return;
         }
         searchReplaceMenu.hide();
     },
     
-    showSearchAndReplaceWindow:function(){
-        var searchReplaceWindow=Ext.create('Editor.view.searchandreplace.SearchReplaceWindow');
+    onSegmentGridMenuHide:function(){
+        //reset the current active column data index
+        this.resetActiveColumnDataIndex();
+    },
+    
+    resetActiveColumnDataIndex:function(){
+        var me=this;
+        me.activeColumnDataIndex =me.DEFAULT_COLUMN_DATA_INDEX;
+    },
+    
+    onSearchReplaceWindowShow:function(win){
+        var tabPanel=win.down('#searchreplacetabpanel'),
+            replaceTab=tabPanel.down('#replaceTab'),
+            activeTab=tabPanel.getActiveTab(),
+            searchCombo=activeTab.down('#searchCombo'),
+            searchInCombo=activeTab.down('#searchInCombo');
+
+        
+        replaceTab.insert(1,{
+            xtype:'combo',
+            itemId:'replaceCombo',
+            focusable:true,
+            fieldLabel:this.strings.comboFieldLabel,
+        });
+        
+        searchCombo.focus();
+        this.initSearchInComboStore(searchInCombo);
+    },
+    
+    onSearchReplaceWindowDestroy:function(){
+        this.resetActiveColumnDataIndex();
+    },
+    
+    onSearchButtonClick:function(button){
+        var searchTab=button.up('#searchreplacetabpanel'),
+            viewModel=searchTab.getViewModel();
+        
+        //TODO this will enable the replace and replace all button
+        //change this when backend will return results
+        viewModel.set('searchPerformed',true);
+        
+        this.search();
+    },
+    
+    onReplaceButtonClick:function(){
+        
+    },
+    
+    onReplaceAllButtonClick:function(){
+        
+    },
+    
+    showSearchAndReplaceWindow:function(key){
+        var me=this;
+        if(key instanceof Object){
+            me.handleSerchReplaceMenu();
+            return;
+        }
+        
+        //if it is not from menu, check if the window is opened from edited segment, if yes select to search to field the current edited segment column
+        //if onyl ctrl+f or ctrl+h is pressed and there 
+        
+        var searchReplaceWindow=Ext.widget('searchreplacewindow'),
+            plug = Editor.app.getController('Editor').getEditPlugin();
+            //rec = plug.editing && plug.context.record,
+            //grid = me.getSegmentGrid(),
+            //selModel = grid.getSelectionModel();
+
+        if(plug.editor && plug.editor.editingPlugin.editing){
+            me.activeColumnDataIndex = plug.editor.columnClicked;
+        }
+        
+        if(!key || (key == Ext.event.Event.F)){
+            focusTab = 'searchTab';
+        }
+        if(key == Ext.event.Event.H){
+            focusTab = 'replaceTab';
+        }
+        
+        var tabPanel=searchReplaceWindow.down('#searchreplacetabpanel'),
+            activeTab=tabPanel.down('#'+focusTab+'');
+        tabPanel.setActiveTab(activeTab);
+        tabPanel.getViewModel().set('searchView',(focusTab == 'searchTab') ? true : false);
         searchReplaceWindow.show();
+    },
+    
+    handleSearchReplaceHotkey:function(key){
+        var me=Editor.app.getController('SearchReplace'),
+            segmentGrid=me.getSegmentGrid();
+        if(!segmentGrid || !segmentGrid.isVisible()) {
+            return;
+        }
+        me.showSearchAndReplaceWindow(key);
+    },
+    
+    handleSerchReplaceMenu:function(){
+        var searchReplaceWindow=Ext.widget('searchreplacewindow');
+        searchInCombo=searchReplaceWindow.down('#searchInCombo');
+        searchReplaceWindow.show();
+    },
+    
+    initSearchInComboStore:function(){
+        var me=this,
+            segmentGrid=Ext.ComponentQuery.query('#segmentgrid')[0],
+            columns = segmentGrid.query('gridcolumn[isContentColumn]:not([hidden])'),
+            storeData=[],
+            searchInCombos=Ext.ComponentQuery.query('#searchInCombo');
+        
+        Ext.Array.each(columns, function(rec) {
+            storeData.push({'id':rec.dataIndex , 'value':rec.text.replace(/<(?:.|\n)*?>/gm, '')});
+        });
+        
+        Ext.Array.each(searchInCombos,function(combo){
+            combo.setStore(Ext.create('Ext.data.Store', {
+                fields: ['id', 'value'],
+                data:storeData
+            }));
+            var rec = combo.findRecord('id',me.activeColumnDataIndex);
+            if(rec){
+                combo.setSelection(rec);
+            }
+        });
+    },
+    
+    initColumnArrays:function(){
+        var me=this,
+            segmentGrid=me.getSegmentGrid();
+        me.searchFields=[];
+        me.replaceFields=[];
+        me.searchFields=me.getColumnDataIndex(segmentGrid.query('gridcolumn[isContentColumn]:not([hidden])'));
+        me.replaceFields=me.getColumnDataIndex(segmentGrid.query('gridcolumn[isEditableContentColumn]:not([hidden])'));
+    },
+    
+    getColumnDataIndex:function(columns){
+        if(columns.length < 1){
+            return [];
+        }
+        var dataArray=[];
+        Ext.Array.each(columns,function(col){
+            Ext.Array.push(dataArray,col.dataIndex)
+        });
+        return dataArray;
+    },
+    
+    search:function(){
+        var me=this,
+            segmentGrid = me.getSegmentGrid(),
+            segmentStore=segmentGrid.editingPlugin.grid.store,
+            proxy = segmentStore.getProxy(),
+            params = {};
+        
+        params[proxy.getFilterParam()] = proxy.encodeFilters(segmentStore.getFilters().items);
+        params[proxy.getSortParam()] = proxy.encodeSorters(segmentStore.getSorters().items);
+        Ext.Ajax.request({
+            url: Editor.data.restpath+'segment/search',
+            method: 'GET',
+            params: params,
+            scope: me,
+            success: function(response){
+                
+            },
+            failure: function(response){
+                
+            }
+        });
     }
+    
 });

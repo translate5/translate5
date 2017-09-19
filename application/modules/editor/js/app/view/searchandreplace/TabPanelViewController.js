@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,23 +25,24 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
-Ext.define('Editor.view.searchandreplace.ReplaceTab', {
-    extend:'Editor.view.searchandreplace.SearchTab',
-    xtype:'replaceTab',
-    alias:'widget.replaceTab',
-    itemId:'replaceTab',
-    requires:['Editor.view.searchandreplace.ReplaceTabViewController'],
-    controller:'replacetabViewcontroller',
-    closable:false,
+/**
+ * @class Editor.view.searchandreplace.TabPanelViewController
+ * @extends Ext.app.ViewController
+ */
+Ext.define('Editor.view.searchandreplace.TabPanelViewController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.tabpanelviewcontroller',
     
-    initConfig : function(instanceConfig) {
-        var me = this,
-        config = {
-        };
-        if (instanceConfig) {
-            me.self.getConfigurator().merge(me, config, instanceConfig);
-        }
-        return me.callParent([config]);
+    onCloseButtonClick:function(){
+        this.getView().up('window').destroy();
     },
+    
+    onTabPanelTabChange:function(tabpanel,newCard,oldCard,eOpts){
+        var me=this,
+            viewModel=me.getView().getViewModel(),
+            searchCombo=newCard.down('#searchCombo');
+        
+        searchCombo.focus();
+        viewModel.set('searchView',newCard.xtype == 'searchTab' ? true : false);
+    }
 });

@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,23 +25,11 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
-Ext.define('Editor.view.searchandreplace.ReplaceTab', {
-    extend:'Editor.view.searchandreplace.SearchTab',
-    xtype:'replaceTab',
-    alias:'widget.replaceTab',
-    itemId:'replaceTab',
-    requires:['Editor.view.searchandreplace.ReplaceTabViewController'],
-    controller:'replacetabViewcontroller',
-    closable:false,
-    
-    initConfig : function(instanceConfig) {
-        var me = this,
-        config = {
-        };
-        if (instanceConfig) {
-            me.self.getConfigurator().merge(me, config, instanceConfig);
-        }
-        return me.callParent([config]);
-    },
+/**
+ * @class ReplaceTabViewController
+ * @extends Ext.app.ViewController
+ */
+Ext.define('Editor.view.searchandreplace.ReplaceTabViewController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.replacetabViewcontroller',
 });
