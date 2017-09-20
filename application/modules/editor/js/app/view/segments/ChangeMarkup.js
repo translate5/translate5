@@ -613,7 +613,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         var nodeForSelection = tmpMarkupNode;
         if  (  (this.isWithinNode('foreignMarkup') && direction == 'next'     && selPositionInfo.atEnd) 
             || (this.isWithinNode('foreignMarkup') && direction == 'previous' && selPositionInfo.atStart) ) {
-                   nodeForSelection = selectionNode();
+                   nodeForSelection = selectionNode;
         }
         
         // Eigentlich wollte ich die Boundaries der Ranges der aktuellen Selection und des nextNode von der Selection vergleichen; das klappt aber nicht.
@@ -676,14 +676,15 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         return hasSiblingInGivenDirection && isTouchingSibling;
     },
     /**
-     * Determine if the cursor of the current selection is at the start or end of the Editor.
+     * Determine if the cursor of the current selection is at the start or end of the given part of content.
      * (https://stackoverflow.com/a/7478420)
+     * @param {Object} containingNode
      * @returns {Object}
      */
-    getSelectionPositionInfo: function() {
+    getSelectionPositionInfo: function(containingNode) {
         var atStart = false,
             atEnd = false,
-            el = this.editor.getEditorBody(),
+            el = containingNode,
             selRange = this.docSelRange,
             testRange = rangy.createRange();
         
