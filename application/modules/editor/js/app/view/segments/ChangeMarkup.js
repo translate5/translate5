@@ -61,6 +61,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     // "SETTINGS/CONFIG"
     CHAR_PLACEHOLDER: '\u0020', // what's inserted when a space is inserted 
     
+    USE_CONSOLE: true,      // (true|false): use true for developing using the browser's console, otherwise use false
+    
     /**
      * The given segment content is the base for the operations provided by this method
      * @param {Editor.view.segments.HtmlEditor} editor
@@ -85,19 +87,19 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         
         // alles auf Anfang
         this.initEvent();
-        console.clear();
+        this.consoleClear();
         
         // What keyboard event do we deal with?
         this.setKeyboardEvent(event);
         
         // keys, die keinen content produzieren (strg,alt,shift alleine ohne taste, pfeile etc), müssen ignoriert werden
         if(this.eventHasToBeIgnored()){ 
-            console.log(" => Ignored!"); // TODO: console.logs nicht irgendwann rausschmeißen, sondern in Fkt kapseln und ein-/ausschalten
+            this.consoleLog(" => Ignored!"); // TODO: this.consoleLogs nicht irgendwann rausschmeißen, sondern in Fkt kapseln und ein-/ausschalten
             this.ignoreEvent = true;
         }
         // keys, die unseren content nicht verändern dürfen (strg-z etc), müssen ignoriert und gestoppt werden
         if(this.eventHasToBeIgnoredAndStopped()){ 
-            console.log(" => Ignored and stopped!");
+            this.consoleLog(" => Ignored and stopped!");
             this.ignoreEvent = true;
             this.stopEvent = true;
         }
@@ -209,19 +211,19 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         this.setRangeForSelection();
         
         if (this.docSelRange == null) {
-            console.log("ChangeMarkup: getSelection FAILED.");
+            this.consoleLog("ChangeMarkup: getSelection FAILED.");
             return;
         }
         
         // change markup according to event
         switch(true) {
             case this.eventIsDeletion():
-                console.log(" => eventIsDeletion");
+                this.consoleLog(" => eventIsDeletion");
                 this.handleDeletion();
                 this.stopEvent = true;  // Das Event wird gestoppt; die Zeichen sind jetzt entweder gelöscht oder als gelöscht markiert (= und werden nicht wirklich noch gelöscht).
             break;
             case this.eventIsInsertion():
-                console.log(" => eventIsInsertion");
+                this.consoleLog(" => eventIsInsertion");
                 this.stopEvent = false; // Das Event wird anschließend ausgeführt (= das Einfügen geht dann normal vonstatten).
                 this.handleInsert();
             break;
@@ -253,13 +255,13 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             delNode = null;
         
         // Handle existing INS-Tags within the selection for deletion.
-        console.log("DEL: handleInsNodesInRange...");
+        this.consoleLog("DEL: handleInsNodesInRange...");
         delNode = this.handleInsNodesInRange();
         
         // Content that is already marked as deleted needs no further handling.
         
         // Mark unmarked contents as deleted.
-        console.log("DEL: markDeletionsInRange...");
+        this.consoleLog("DEL: markDeletionsInRange...");
         delNode = this.markDeletionsInRange();
         
         // Position the caret.
@@ -280,7 +282,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             // Then the further procedure is as usual.
             
             if (!this.docSelRange.collapsed) {
-                console.log("INS: handleDeletion first.");
+                this.consoleLog("INS: handleDeletion first.");
                 this.handleDeletion();
             }
         
@@ -288,7 +290,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         
             // Wenn wir schon im richtigen MarkUp sind, machen wir sonst weiter nichts.
             if (this.isWithinNode('sameConditionsAndEvent')) {
-                console.log("INS: isWithinNodeOfSameKind..., we do nothing.");
+                this.consoleLog("INS: isWithinNodeOfSameKind..., we do nothing.");
                 return;
             }
             
@@ -296,7 +298,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             // or if the previous position of the cursor is within an ins-node that already exists,
             // we use that one:
             if (this.isAtSibling('previous','sameConditionsAndEvent')) {
-                console.log("INS: use previous..."); 
+                this.consoleLog("INS: use previous..."); 
                 // (scheint nie vorzukommen, wird immer als isWithinNodeOfSameKind erkannt.)
                 return;
             }
@@ -305,7 +307,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             // or if the next position of the cursor is within an ins-node that already exists,
             // we use that one:
             if (this.isAtSibling('next','sameConditionsAndEvent')) {
-                console.log("INS: use next...");
+                this.consoleLog("INS: use next...");
                 this.useNextIns();
                 return;
             }
@@ -315,7 +317,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         
             // Then we need to split that one first:
             if (this.isWithinNode('foreignMarkup')) {
-                console.log("INS: split foreign node first...");
+                this.consoleLog("INS: split foreign node first...");
                 this.splitNode(this.getContainerNodeForCurrentSelection(),this.docSelRange);
             }
         
@@ -323,11 +325,11 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         
             // Create and insert <ins>-node:
             if (this.eventKeyCode == Ext.event.Event.SPACE) { // Workaround for inserting space (otherwise creates <u>-Tag, don't know why).
-                console.log("INS: insert space with Markup...");
+                this.consoleLog("INS: insert space with Markup...");
                 this.addIns(' ');
                 this.stopEvent = true; // space is already inserted now, stop the keyboard-Event!
             } else {
-                console.log("INS: insert Markup...");
+                this.consoleLog("INS: insert Markup...");
                 this.addIns('');
             }
     },
@@ -470,7 +472,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             insInnerNodeContent = this.CHAR_PLACEHOLDER;              // eg Google Chrome gets lost without placeholder
         }
         if(selPositionInfo.atStart || selPositionInfo.atEnd) {
-            console.log("(is atStart / atEnd)");
+            this.consoleLog("(is atStart / atEnd)");
             insInnerNodeContent = 'x';                                // Workaround: empty placeholders are not recognized at the beginning or the end in the ExtJs-Editor.
         }
         // insert the INS-Node
@@ -557,16 +559,16 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         switch(checkConditions) {
             case 'insNodeWithSameConditions':
                 var tmpMarkupNode = this.createNodeForMarkup(this.NODE_NAME_INS);
-                console.log("isWithinNode ("+checkConditions+")? " + this.isNodesOfSameName(tmpMarkupNode,selectionNode) + this.isNodesOfSameNameAndConditions(tmpMarkupNode,selectionNode));
+                this.consoleLog("isWithinNode ("+checkConditions+")? " + this.isNodesOfSameName(tmpMarkupNode,selectionNode) + this.isNodesOfSameNameAndConditions(tmpMarkupNode,selectionNode));
                 return this.isNodesOfSameName(tmpMarkupNode,selectionNode) && this.isNodesOfSameNameAndConditions(tmpMarkupNode,selectionNode);
             case 'sameNodeName':
-                console.log("isWithinNode ("+checkConditions+")? " + this.isNodesOfSameName(tmpMarkupNode,selectionNode));
+                this.consoleLog("isWithinNode ("+checkConditions+")? " + this.isNodesOfSameName(tmpMarkupNode,selectionNode));
                 return this.isNodesOfSameName(tmpMarkupNode,selectionNode);
             case 'foreignMarkup':
-                console.log("isWithinNode ("+checkConditions+")? " + this.isNodesOfForeignMarkup(tmpMarkupNode,selectionNode));
+                this.consoleLog("isWithinNode ("+checkConditions+")? " + this.isNodesOfForeignMarkup(tmpMarkupNode,selectionNode));
                 return this.isNodesOfForeignMarkup(tmpMarkupNode,selectionNode);
             case 'sameConditionsAndEvent':
-                console.log("isWithinNode ("+checkConditions+")? " + this.isNodesOfSameNameAndConditionsAndEvent(tmpMarkupNode,selectionNode));
+                this.consoleLog("isWithinNode ("+checkConditions+")? " + this.isNodesOfSameNameAndConditionsAndEvent(tmpMarkupNode,selectionNode));
                 return this.isNodesOfSameNameAndConditionsAndEvent(tmpMarkupNode,selectionNode);
             // no default, because then we would have a bug in the code. Calling this method without a correct parameter is too dangerous in consequences.
         }
@@ -581,7 +583,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @returns {Boolean}
      */
     isAtSibling: function(direction,checkConditions) {
-        console.log("isAtSibling ("+direction+"/" + checkConditions +")?");
+        this.consoleLog("isAtSibling ("+direction+"/" + checkConditions +")?");
         var tmpMarkupNode = this.createNodeForMarkup(this.getNodeNameAccordingToEvent()),
             selectionNode = this.getContainerNodeForCurrentSelection(),
             siblingNode = this.getSiblingNodeForCurrentSelection(direction),
@@ -596,7 +598,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                 var currentIsOfSameConditionsAsSibling = this.isNodesOfSameName(tmpMarkupNode,siblingNode) && this.isNodesOfSameNameAndConditionsAndEvent(tmpMarkupNode,siblingNode);
             // no default, because then we would have a bug in the code. Calling this method without a correct parameter is too dangerous in consequences.
         }
-        console.log("- checkConditions: " + currentIsOfSameConditionsAsSibling);
+        this.consoleLog("- checkConditions: " + currentIsOfSameConditionsAsSibling);
         if (!currentIsOfSameConditionsAsSibling) {
             return false;
         }
@@ -620,7 +622,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         rangeAtCurrentSelection.insertNode(tmpMarkupNode);
         
         var currentTouchesSibling = this.isNodesTouching(nodeForSelection,siblingNode,direction);
-        console.log("- currentTouchesSibling: " + currentTouchesSibling);
+        this.consoleLog("- currentTouchesSibling: " + currentTouchesSibling);
         
         // Cleanup
         if(tmpMarkupNode.parentNode) {
@@ -634,7 +636,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @returns {Boolean}
      */
     isNodesTouching: function(node,siblingNode,direction){
-        console.log("isNodesTouching ("+direction+")?");
+        this.consoleLog("isNodesTouching ("+direction+")?");
         if (node == null || siblingNode == null) {
             return false;   // is not even two nodes, thus it's also not two nodes touching.
         }
@@ -669,8 +671,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         }
         isTouchingSibling = rangeForNode.intersectsRange(rangeForSiblingNode); // intersectsOrTouchesRange(): touching does not apply since the nodes would be "just neighbors".
         
-        console.log("- compareBoundaryPoints: " + hasSiblingInGivenDirection);
-        console.log("- intersectsOrTouchesRange: " + isTouchingSibling);
+        this.consoleLog("- compareBoundaryPoints: " + hasSiblingInGivenDirection);
+        this.consoleLog("- intersectsOrTouchesRange: " + isTouchingSibling);
         return hasSiblingInGivenDirection && isTouchingSibling;
     },
     /**
@@ -681,14 +683,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     getSelectionPositionInfo: function() {
         var atStart = false,
             atEnd = false,
-            el = this.editor.getEditorBody();
-
-        if (el == undefined) {
-            debugger;
-            return { atStart: atStart, atEnd: atEnd };
-        }
-
-        var selRange = this.docSelRange,
+            el = this.editor.getEditorBody(),
+            selRange = this.docSelRange,
             testRange = rangy.createRange();
         
         testRange.selectNodeContents(el);
@@ -930,7 +926,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * Check all markup-nodes and arrange them on one level.
      */
     cleanUpMarkupInEditor: function() {
-        console.log("cleanUpMarkupInEditor...");
+        this.consoleLog("cleanUpMarkupInEditor...");
         this.cleanUpChildren();
         this.cleanUpSiblings();
         this.cleanUpEmptyMarkupNodes();
@@ -948,7 +944,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             for (var i = 0; i < childrenInNode.length; i++){
                 var childNode = childrenInNode[i];
                 if (this.isNodeOfTypeMarkup(childNode)) { // Check for INS- and DEL-nodes only
-                    console.log("childNode? is: " + childNode.nodeName);
+                    this.consoleLog("childNode? is: " + childNode.nodeName);
                     // (a) When an INS gets deleted by the same user and in the same workflow, 
                     //     it CAN really be deleted (= we remove the node).
                     if (node.nodeName == this.NODE_NAME_DEL
@@ -985,7 +981,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                 nextNode = node.nextElementSibling;
             while ( this.isNodesOfSameNameAndConditions(node,nextNode) 
                     && this.isNodesTouching(node,nextNode,'next') ) {
-                console.log("Do Merge...");
+                this.consoleLog("Do Merge...");
                 node = this.mergeNodesFromTo(nextNode,node);
                 nextNode = node.nextElementSibling;
             }
@@ -1021,7 +1017,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @returns {Array}
      */
     splitNode: function(nodeToSplit,rangeForPositionToSplit) {
-        console.log("-----");console.log("nodeToSplit: "); console.dir(nodeToSplit);console.dir(rangeForPositionToSplit); console.log("-----");
+        this.consoleLog("-----");this.consoleLog("nodeToSplit: "); this.consoleLog(nodeToSplit);this.consoleLog(rangeForPositionToSplit); this.consoleLog("-----");
         var splittedNodes = new Array();
         // extract what's on the left from the caret and insert it before the node as a new node
         var rangeForExtract = rangy.createRange(),
@@ -1062,7 +1058,30 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         }
         nodeForMergedContent.normalize();
         nodeFrom.parentNode.removeChild(nodeFrom);
-        console.log("-> Nodes gemergt.");
+        this.consoleLog("-> Nodes gemergt.");
         return nodeForMergedContent;
+    },
+
+    // =========================================================================
+    // Development
+    // =========================================================================
+    
+    /**
+     * Write into the browser console depending on the setting of this.USE_CONSOLE.
+     * @param {(String|Object)} outputForConsole
+     */
+    consoleLog: function(outputForConsole) {
+        if (this.USE_CONSOLE) {
+            if (typeof outputForConsole === 'string' || outputForConsole instanceof String) {
+                console.log(outputForConsole);
+            } else {
+                console.dir(outputForConsole);
+            }
+        }
+    },
+    consoleClear: function() {
+        if (this.USE_CONSOLE) {
+            console.clear();
+        }
     }
 });
