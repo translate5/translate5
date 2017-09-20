@@ -226,7 +226,7 @@ class editor_Models_Segment_InternalTag {
             $segment = preg_replace('"<x[^>]*>"','<div class="single replaceThisTagWhenInsertingInSegment"><span title="<AdditionalTagFromTM/>" class="short">&lt;'.$nextTagNr.'/&gt;</span><span data-originalid="ph" data-filename="irrelevant" class="full">&lt;AdditionalTagFromTM/&gt;</span></div>',$segment,1);
             $nextTagNr++;
         }
-        return trim($segment).'<div class="single replaceThisTagWhenInsertingInSegment"><span title="<AdditionalTagFromTM/>" class="short">&lt;'.$nextTagNr.'/&gt;</span><span data-originalid="ph" data-filename="irrelevant" class="full">&lt;AdditionalTagFromTM/&gt;</span></div>';
+        return trim($segment);
     }
     
     /**
