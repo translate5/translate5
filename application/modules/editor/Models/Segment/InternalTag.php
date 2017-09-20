@@ -211,6 +211,7 @@ class editor_Models_Segment_InternalTag {
      * @param array $map not a a key:value map, but a 2d array, since keys can exist multiple times
      */
     public function reapply2dMap(string $segment, array $map) {
+        $nextTagNr = 1;
         foreach($map as $tupel) {
             $key = $tupel[0];
             $value = $tupel[1];
@@ -219,8 +220,13 @@ class editor_Models_Segment_InternalTag {
             if ($pos !== false) {
                 $segment = mb_substr($segment, 0, $pos).$value.mb_substr($segment, $pos + mb_strlen($key));
             }
+            $nextTagNr++;
         }
-        return $segment;
+        while(preg_match('"<x[^>]*>"', $segment)){
+            $segment = preg_replace('"<x[^>]*>"','<div class="single replaceThisTagWhenInsertingInSegment"><span title="<AdditionalTagFromTM/>" class="short">&lt;'.$nextTagNr.'/&gt;</span><span data-originalid="ph" data-filename="irrelevant" class="full">&lt;AdditionalTagFromTM/&gt;</span></div>',$segment,1);
+            $nextTagNr++;
+        }
+        return trim($segment).'<div class="single replaceThisTagWhenInsertingInSegment"><span title="<AdditionalTagFromTM/>" class="short">&lt;'.$nextTagNr.'/&gt;</span><span data-originalid="ph" data-filename="irrelevant" class="full">&lt;AdditionalTagFromTM/&gt;</span></div>';
     }
     
     /**
