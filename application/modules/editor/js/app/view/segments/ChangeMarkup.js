@@ -258,6 +258,10 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         this.consoleLog("DEL: handleInsNodesInRange...");
         delNode = this.handleInsNodesInRange();
         
+        // Handle existing images within the selection for deletion.
+        this.consoleLog("DEL: handleImagesInRange...");
+        delNode = this.handleImagesInRange();
+        
         // Content that is already marked as deleted needs no further handling.
         
         // Mark unmarked contents as deleted.
@@ -412,6 +416,39 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         return delNode;
     },
     /**
+     * Handle all images within the selected range.
+     * - If the image had been inserted by the same user in the same workflow, it can really be deleted.
+     * - If not, the image just has to be marked as deleted.
+     * The last node that gets marked as deleted is returned.
+     * @returns {Object} delNode
+     */
+    handleImagesInRange: function() {
+        var me = this,
+            delNode = null,
+            tmpMarkupNode = this.createNodeForMarkup(this.getNodeNameAccordingToEvent()),
+            rangeForDel = this.getRangeToBeDeleted(),
+            rangeForImgNode = rangy.createRange(),
+            imgNodes = rangeForDel.getNodes([1], function(node) {
+                return ( node.nodeName == 'IMG' );
+            });
+        for (var i = 0; i < imgNodes.length; i++) {
+            var imgNode = imgNodes[i];
+            rangeForImgNode.selectNode(imgNode);
+            // alle INS, die zum selben User und Workflow gehören: Zeichen löschen
+            if (this.isNodesOfSameConditions(imgNode,tmpMarkupNode)) {
+                imgNode.parentNode.removeChild(imgNode);
+            } else {
+            // alle INS, die NICHT zum selben User und Workflow gehören: als gelöscht markieren
+                var delNode = this.createNodeForMarkup(this.NODE_NAME_DEL);
+                rangeForDel.collapseBefore(imgNode);
+                delNode.appendChild(imgNode);
+                rangeForDel.insertNode(delNode);
+            }
+        }
+        this.refreshSelectionAndRange(); // We might have changed the DOM quite a bit...
+        return delNode;
+    },
+    /**
      * Mark all unmarked contents within the selected range.
      * The last node that gets marked as deleted is returned.
      * @returns {Object} delNode
@@ -441,15 +478,12 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @param {Object} delNode
      */
     positionCaretAfterDeletion: function(delNode) {
-        var rangeForCaret = rangy.createRange();
         if(this.eventKeyCode == Ext.event.Event.BACKSPACE){
-            rangeForCaret.setStartBefore(delNode);
-            rangeForCaret.collapse(true);
+            this.docSelRange.collapseBefore(delNode);
         } else {
-            rangeForCaret.setEndAfter(delNode);
-            rangeForCaret.collapse(false);
+            this.docSelRange.collapseAfter(delNode);
         }
-        this.docSel.setSingleRange(rangeForCaret);
+        this.docSel.setSingleRange(this.docSelRange);
     },
 
     // =========================================================================
@@ -637,6 +671,10 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     isNodesTouching: function(node,siblingNode,direction){
         this.consoleLog("isNodesTouching ("+direction+")?");
+        this.consoleLog("- node:");
+        this.consoleLog(node);
+        this.consoleLog("- siblingNode:");
+        this.consoleLog(siblingNode);
         if (node == null || siblingNode == null) {
             return false;   // is not even two nodes, thus it's also not two nodes touching.
         }
@@ -927,7 +965,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * Check all markup-nodes and arrange them on one level.
      */
     cleanUpMarkupInEditor: function() {
-        this.consoleLog("cleanUpMarkupInEditor...");
+        this.consoleLog("cleanUpMarkupInEditor:");
         this.cleanUpChildren();
         this.cleanUpSiblings();
         this.cleanUpEmptyMarkupNodes();
@@ -938,6 +976,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * Clean up child-nodes (since we check this everytime, we won't have any grandchildren).
      */
     cleanUpChildren: function() {
+        this.consoleLog("- cleanUpChildren...");
         var allMarkupNodes = this.getAllMarkupNodesInEditor();
         for (var k = 0; k < allMarkupNodes.length; k++){
             var node = allMarkupNodes[k],
@@ -973,6 +1012,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * Merge corresponding markup-nodes.
      */
     cleanUpSiblings: function() {
+        this.consoleLog("- cleanUpSiblings...");
         var allMarkupNodes = this.getAllMarkupNodesInEditor();
         // We check if the node touches a next node of the same conditions.
         // If the two get merged, we check if the merged node touches a next
@@ -989,13 +1029,14 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         }
     },
     /**
-     * Delete all empty markup-nodes.
+     * Delete all empty markup-nodes (= no textContent AND no childNodes).
      */
     cleanUpEmptyMarkupNodes: function() {
+        this.consoleLog("- cleanUpEmptyMarkupNodes...");
         var allMarkupNodes = this.getAllMarkupNodesInEditor();
         for (var k = 0; k < allMarkupNodes.length; k++){
             var node = allMarkupNodes[k];
-            if (node.textContent == '') {
+            if (node.textContent == '' && node.childNodes.length == 0) {
                 node.parentNode.removeChild(node);
             }
         }
@@ -1004,6 +1045,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * Normalize nodes in the editor.
      */
     cleanUpEditor: function() {
+        this.consoleLog("- cleanUpEditor...");
         this.editor.getEditorBody().normalize();
     },
 
