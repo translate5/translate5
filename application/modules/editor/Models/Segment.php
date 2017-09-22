@@ -133,8 +133,28 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         parent::__construct();
     }
     
-    public function search($searchKeyword){
-        $sql='';
+    public function search($request){
+        $queryString=$request->getParam('searchCombo');
+        $searchInCombo=$request->getParam('searchInCombo');
+        $matchCaseChekbox=$request->getParam('matchCaseChekbox');
+        $searchTopChekbox=$request->getParam('searchTopChekbox');
+        $searchType=$request->getParam('searchType');
+        
+        //FIXME continue here
+        $sql=
+        ' SELECT filtered.id, filtered.row_number ,filtered.'.$searchInCombo.''.
+        ' FROM ('.
+        ' SELECT  `view`.`id`,'.
+        ' @curRow := @curRow + 1 AS row_number,'.
+        ' `view`.`'.$searchInCombo.'`, `view`.`editable`'.
+        ' FROM `LEK_segment_view_54d681b581e1e496898188f4ebab8c37` as view'.
+        ' JOIN (SELECT @curRow := 0) r'.
+        //'        #WHERE ( lower(`view`.`source`) like lower("%Mit%"))'.
+        ' ORDER BY `view`.`fileOrder` asc, `view`.`id` asc'.
+        ' ) filtered'.
+        ' WHERE ( filtered.'.$searchInCombo.' like "%'.$queryString.'%") and filtered.editable = 1'.
+        ' ORDER BY row_number ASC'.
+        ' LIMIT 0, 50;';
         $stmt = $this->db->getAdapter()->query($sql);
         $retVal = $stmt->fetchAll();
         return $retVal;

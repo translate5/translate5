@@ -300,8 +300,12 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         //$search = ZfExtended_Factory::get('editor_Models_Segment_EditablesFinder');
         /* @var $search editor_Models_Segment_EditablesFinder */
         //$search->search();
-        //FIXME this is only the test implementation
-        return $this->entity->search("wird");
+        //$retVal=$this->entity->search($this);
+        $result=$this->entity->search($this);
+        $retval['success']=true;
+        $retval['rows']=$result;
+        $retval=Zend_Json::encode((object)$retval, Zend_Json::TYPE_OBJECT);
+        echo $retval;
     }
     
     /**
