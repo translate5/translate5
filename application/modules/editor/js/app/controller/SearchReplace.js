@@ -70,15 +70,27 @@ Ext.define('Editor.controller.SearchReplace', {
     refs:[{
         ref:'segmentGrid',
         selector:'#segmentgrid'
+    },{
+        ref:'tabPanel',
+        selector:'#searchreplacetabpanel'
     }],
     
     searchFields:[],
     replaceFields:[],
     activeColumnDataIndex:'',
     DEFAULT_COLUMN_DATA_INDEX:'targetEdit',
+    
+    
+    currentIndex:null,
+    
     strings:{
         searchInfoMessage:'#UT#The search will be performed only on the filtered segments',
         comboFieldLabel:'#UT#Replace',
+    },
+    
+    activeSelection:{
+        segmentIndex:-1,
+        indexInSegment:-1,
     },
     
     initConfig:function(){
@@ -187,18 +199,23 @@ Ext.define('Editor.controller.SearchReplace', {
     },
     
     onSearchButtonClick:function(button){
-        var searchTab=button.up('#searchreplacetabpanel'),
-            viewModel=searchTab.getViewModel();
+        var me=this,
+            tabPanel=me.getTabPanel(),
+            activeTab=tabPanel.getActiveTab(),
+            vm=activeTab.getViewModel(),
+            result=vm.get('result');
         
-        //TODO this will enable the replace and replace all button
-        //change this when backend will return results
-        viewModel.set('searchPerformed',true);
-        
-        this.search();
+        if(result.length>0){
+            //if edited segment select in it all finded results
+            //if not edited open first find, and select the matches found
+            
+            //save the current position 
+            me.handleRowSelection();
+        }
+        me.search();
     },
     
     onReplaceButtonClick:function(){
-        
     },
     
     onReplaceAllButtonClick:function(){
@@ -299,6 +316,9 @@ Ext.define('Editor.controller.SearchReplace', {
     
     search:function(){
         var me=this,
+            tabPanel=me.getTabPanel(),
+            activeTab=tabPanel.getActiveTab(),
+            form=activeTab.getForm(),
             segmentGrid = me.getSegmentGrid(),
             segmentStore=segmentGrid.editingPlugin.grid.store,
             proxy = segmentStore.getProxy(),
@@ -306,18 +326,152 @@ Ext.define('Editor.controller.SearchReplace', {
         
         params[proxy.getFilterParam()] = proxy.encodeFilters(segmentStore.getFilters().items);
         params[proxy.getSortParam()] = proxy.encodeSorters(segmentStore.getSorters().items);
-        Ext.Ajax.request({
+        
+        form.submit({
             url: Editor.data.restpath+'segment/search',
-            method: 'GET',
-            params: params,
-            scope: me,
-            success: function(response){
-                
+            params:params,
+            method:'GET',
+            success: function(form, submit){
+                if(!submit.result || !submit.result.rows){
+                    return;
+                }
+                var foundSegments = submit.result.rows,
+                    activeTabViewModel=activeTab.getViewModel(),
+                    tabPanelviewModel=tabPanel.getViewModel();
+
+                tabPanelviewModel.set('searchPerformed',foundSegments.length > 0);
+                activeTabViewModel.set('resultsCount',foundSegments.length);
+                activeTabViewModel.set('result',foundSegments.length >0 ? foundSegments : [] );
+                activeTabViewModel.set('showResultsLabel',true);
             },
-            failure: function(response){
-                
+            failure: function(form, submit){
+                var res = submit.result;
+                //submit results are always state 200.
+                //If success false and errors is an array, this errors are shown in the form directly,
+                // so we dont need the handleException
+                if(!res || res.success || !Ext.isArray(res.errors)) {
+                    Editor.app.getController('ServerException').handleException(submit.response);
+                    return;
+                }
+                if(Ext.isArray(res.errors)) {
+                    form.markInvalid(res.errors);
+                    return;
+                }
             }
         });
-    }
+    },
     
+    handleRowSelection:function(){
+        var me=this,
+            plug = Editor.app.getController('Editor'),
+            editor = plug.getEditPlugin().editor,
+            grid = plug.getSegmentGrid(),
+            selModel = grid.getSelectionModel(),
+            ed = plug.getEditPlugin();
+
+        if(!me.isEditing) {
+            //FIXME find first in grid (the function from Thomas)
+            //so the starting point is definded
+        }
+        me.selectText(editor);
+    },
+    
+    selectText:function(editor){
+        //check if in the current edited segment the key is found
+        //if yes, select the first match in the colum
+        //-- put all matches in the current segment in the buffer array, so on the next click we just change the index of the current selected
+        
+        //if now find the fist mathc from the results array
+        var me=this;
+        ////TODO with this we can ged and set the value of the current edited cell
+        //editor.mainEditor.setValue("<span style='background-color:red;'>ace</span>");
+        var testWindow = editor.mainEditor.iframeEl.dom.contentWindow;
+        var testDocument = editor.mainEditor.iframeEl.dom.contentDocument || iFrame.getWin().document
+        
+        me.testSearch(testWindow,testDocument,"the");
+    },
+    
+    //FIXME refactor this function!!!!!!!!!
+    //the images should not be removed from the text, only the mark tags
+    //FIXME fix the regular expression
+    testSearch:function(testWindow,testDocument,text){
+        var me=this,
+            plug = Editor.app.getController('Editor'),
+            editor = plug.getEditPlugin().editor,
+            grid = plug.getSegmentGrid(),
+            selModel = grid.getSelectionModel(),
+            ed = plug.getEditPlugin(),
+            count = 0,
+            idx=0,
+            tabPanel=me.getTabPanel(),
+            activeTab=tabPanel.getActiveTab(),
+            searchCombo=activeTab.down('#searchCombo');
+
+        me.searchValue = searchCombo.getRawValue();
+        me.indexes = [];
+        
+        // detects html tag
+        me.tagsRe=/<[^>]*>/gm;
+        // DEL ASCII code
+        me.tagsProtect='\x0f';
+
+        if (me.searchValue !== null) {
+            me.searchRegExp = new RegExp(me.searchValue, 'g' + (me.caseSensitive ? '' : 'i'));
+            
+            //me.store.each(function(record, idx) {
+            var cell, matches, cellHTML,
+                cell = Ext.get(testDocument.body);
+            
+                //matches = cell.dom.innerHTML.match(me.tagsRe);
+                //cellHTML = cell.dom.innerHTML.replace(me.tagsRe, me.tagsProtect);
+            
+            
+                //clear the html tags from the string
+                cellHTML = cell.dom.innerHTML.replace(/<\/?[^>]+(>|$)/g, "");
+                matches = cellHTML.match(me.searchRegExp);
+            
+                // populate indexes array, set currentIndex, and replace wrap matched string in a span
+                cellHTML = cellHTML.replace(me.searchRegExp, function(m) {
+                    count++;
+                    if (me.currentIndex === null) {
+                        me.currentIndex = 1;
+                    }
+                    
+                    if(me.currentIndex === count){
+                        return '<mark style="background-color:red;">' + m + '</mark>';
+                    }
+                    return '<mark>' + m + '</mark>';
+                   //return '<span style="background-color:yellow;">' + m + '</span>';
+                   //return '<mark>' + m + '</mark>';
+                });
+                me.currentIndex++;
+                
+                if(me.currentIndex > matches.length){
+                    me.currentIndex = null;
+                }
+                cell.dom.innerHTML = cellHTML;
+        }
+    }
+    /*FIXME this works but somehow destroys the content inside the segment!!
+    testSearch:function(testWindow,testDocument,text){
+        if (testWindow.find && testWindow.getSelection) {
+            testDocument.designMode = "on";
+            var sel = testWindow.getSelection();
+            sel.collapse(testDocument.body, 0);
+
+            while (testWindow.find(text)) {
+                testDocument.execCommand("HiliteColor", false, "yellow");
+                sel.collapseToEnd();
+            }
+            testDocument.designMode = "off";
+        } else if (testDocument.body.createTextRange) {
+            var textRange = testDocument.body.createTextRange();
+            while (textRange.findText(text)) {
+                textRange.execCommand("BackColor", false, "yellow");
+                textRange.collapse(false);
+            }
+        }
+    },
+    */
 });
+    

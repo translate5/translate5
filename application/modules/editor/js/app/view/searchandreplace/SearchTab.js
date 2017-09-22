@@ -28,10 +28,18 @@ END LICENSE AND COPYRIGHT
 */
 
 Ext.define('Editor.view.searchandreplace.SearchTab', {
-    extend:'Ext.panel.Panel',
+    extend:'Ext.form.Panel',
     xtype:'searchTab',
     alias:'widget.searchTab',
     itemId:'searchTab',
+    
+    
+    requires:[
+        'Editor.view.searchandreplace.SearchReplaceViewModel',
+    ],
+    viewModel: {
+        type: 'searchreplaceviewmodel'
+    },
     
     closable:false,
     
@@ -52,23 +60,27 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
         var me = this,
         config = {
                 items:[{
-                    xtype:'combo',
+                    xtype:'textfield',
                     itemId:'searchCombo',
+                    name:'searchCombo',
                     focusable:true,
                     fieldLabel:me.strings.comboFieldLabel,
                 },{
                     xtype:'combo',
                     itemId:'searchInCombo',
+                    name:'searchInCombo',
                     fieldLabel:me.strings.searchInCombo,
                     displayField:'value',
                     valueField:'id',
                 },{
                     xtype:'checkbox',
                     itemId:'matchCaseChekbox',
+                    name:'matchCaseChekbox',
                     boxLabel:me.strings.matchCase
                 },{
                     xtype:'checkbox',
                     itemId:'searchTopChekbox',
+                    name:'searchTopChekbox',
                     boxLabel:me.strings.towardsTop
                 },{
                     xtype      : 'fieldcontainer',
@@ -93,6 +105,12 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                             inputValue: 'regularExpressionSearch',
                         }
                     ]
+                },{
+                    xtype: 'label',
+                    bind:{
+                        text:'Results found: {getResultsCount}',
+                        visible:'{showResultsLabel}'
+                    }
                 }]
         };
         if (instanceConfig) {
