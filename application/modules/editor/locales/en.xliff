@@ -1561,13 +1561,13 @@
     <source>STRG + EINFG (alternativ STRG + . (Punkt)) kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</source>
     <target>CTRL + INS (alternatively CTRL + . (period)) copies source to target.<br />CTRL + , (comma) + &gt;number&lt; copies corresponding tag to target (zero equals number 10)<br />CTRL + SHIFT + , (comma) + &gt;number&lt; copies tag numbers 11 to 20 to target.</target>
 </trans-unit>
-<trans-unit id='TGVlcmUgWmllbHNwcmFjaGVuLiBXYWhyIHdlbm4gYmVpbSBJbXBvcnQgYWxsZSB6aWVsc3ByYWNobGljaGVuIEZlbGRlciBsZWVyIHNpbmQu'>
-    <source>Leere Zielsprachen. Wahr wenn beim Import alle zielsprachlichen Felder leer sind.</source>
-    <target>Targets empty. True, if all targets are emtpy at import time</target>
+<trans-unit id='w5xiZXJzZXR6dW5nc2F1ZmdhYmUgLSBhbGxlIHppZWxzcHJhY2hsaWNoZW4gU2VnbWVudGUgYmVpbSBJbXBvcnQgbGVlciAobmljaHQgYW5nZWhha3QgYmVkZXV0ZXQgUmV2aWV3YXVmZ2FiZSku'>
+    <source>Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe).</source>
+    <target>Translation job - all target elements of the  segments have been empty at impoort time (not checked means this is a review job)</target>
 </trans-unit>
-<trans-unit id='TGVlcmUgWmllbHNwcmFjaGVu'>
-    <source>Leere Zielsprachen</source>
-    <target>Targets empty</target>
+<trans-unit id='w5xiZXJzZXR6dW5nc2F1ZmdhYmUgKGtlaW4gUmV2aWV3KQ=='>
+    <source>Übersetzungsaufgabe (kein Review)</source>
+    <target>Translation job (no review)</target>
 </trans-unit>
 <trans-unit id='PHA+QWNodHVuZyEgSW4gS8O8cnplIHdpcmQgZWluZSBXYXJ0dW5nIGFtIFN5c3RlbSBkdXJjaGdlZsO8aHJ0LjwvcD48cD5UcmFuc2xhdGU1IHdpcmQgYWIgZGllc2VtIFplaXRwdW5rdCBmw7xyIGt1cnplIFplaXQgbmljaHQgZXJyZWljaGJhciBzZWluLjwvcD48cD5HZXBsYW50ZXIgWmVpdHB1bmt0OiB7MH08L3A+'>
     <source><p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Translate5 wird ab diesem Zeitpunkt für kurze Zeit nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p></source>
