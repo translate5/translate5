@@ -39,6 +39,8 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.segments.ChangeMarkup', {
     editor: null,
     
+    editorUser: null,       // current user working in the Editor
+    
     eventKeyCode: null,     // Keyboard-Event: Key-Code
     eventCtrlKey: null,     // Keyboard-Event: Control-Key pressed?
     
@@ -52,6 +54,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     // "CONSTANTS"
     NODE_NAME_DEL: 'DEL',
     NODE_NAME_INS: 'INS',
+    
+    ATTRIBUTE_NAME_USERID: 'data-userid', 
+    ATTRIBUTE_NAME_WORKFLOWID: 'data-workflowid',
     
     // https://github.com/timdown/rangy/wiki/Rangy-Range#compareboundarypointsnumber-comparisontype-range-range
     RANGY_RANGE_IS_BEFORE: -1,
@@ -73,6 +78,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     initEvent: function() {
         // "Reset"
+        this.editorUser = null;
         this.eventKeyCode = null;
         this.eventCtrlKey = null;
         this.ignoreEvent = false;
@@ -216,6 +222,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         }
         
         this.userRangeBookmark = this.docSelRange.getBookmark();
+        
+        // some data we'll need
+        this.editorUser = Editor.data.app.user;
         
         // change markup according to event
         switch(true) {
@@ -801,8 +810,16 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     createNodeForMarkup: function(nodeName){
         var nodeEl = document.createElement(nodeName); // TODO: use Ext.DomHelper.createDom() instead
-        nodeEl.id = Ext.id();
-        // NEXT STEPS: Add info about user, workflow, ...
+        
+        // data about user and workflow
+        // (setAttribute: see https://jsperf.com/html5-dataset-vs-native-setattribute)
+        nodeEl.id = Ext.id(); // TODO: id might not be necessary in the end, but is helpful for development
+        nodeEl.setAttribute(this.ATTRIBUTE_NAME_USERID,this.editorUser.id); 
+        nodeEl.setAttribute(this.ATTRIBUTE_NAME_WORKFLOWID,'1'); // TODO
+        
+        // "tool tip"
+        nodeEl.title = this.editorUser.userName;
+        
         return nodeEl;
     },
     /**
@@ -953,7 +970,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @returns {Boolean}
      */
     isNodesOfSameUser: function(nodeA,nodeB) {
-        return true; // TODO
+        var userOfNodeA = parseInt(nodeA.getAttribute(this.ATTRIBUTE_NAME_USERID)),
+            userOfNodeB = parseInt(nodeB.getAttribute(this.ATTRIBUTE_NAME_USERID));
+        return userOfNodeA == userOfNodeB;
     },
     /**
      * Does the given node's user match the user according to the event?
@@ -961,7 +980,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @returns {Boolean}
      */
     isNodeOfUserAccordingToEvent: function(node) {
-        return true; // TODO
+        var userOfNode = parseInt(node.getAttribute(this.ATTRIBUTE_NAME_USERID)),
+            userOfEvent = this.editorUser.id;
+        return userOfNode == userOfEvent;
     },
     /**
      * Do the nodes share the same workflow?
