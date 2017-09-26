@@ -47,6 +47,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     
     docSel: null,           // selection in the document (initially what the user has selected, but then constantly changed according to handling the Markup)
     docSelRange: null,      // current range for handling the markup, positioning the caret, etc... (initially what the user has selected, but then constantly changing)
+    userRangeBookmark: null, // bookmark what the user has selected initially
     
     // "CONSTANTS"
     NODE_NAME_DEL: 'DEL',
@@ -78,6 +79,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         this.stopEvent = false;
         this.docSel = null;
         this.docSelRange = null;
+        this.userRangeBookmark = null;
     },
     /**
      * This method is called if the keyboard event (= keydown) was not handled otherwise
@@ -213,6 +215,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             return;
         }
         
+        this.userRangeBookmark = this.docSelRange.getBookmark();
+        
         // change markup according to event
         switch(true) {
             case this.eventIsDeletion():
@@ -239,21 +243,19 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         // Handle existing INS-Tags within the selection for deletion.
         this.consoleLog("DEL: handleInsNodesInDeletion...");
         delNode = this.handleInsNodesInDeletion();
+        this.positionCaretAfterDeletion(delNode);
         
         // Handle existing images within the selection for deletion.
         this.consoleLog("DEL: handleImagesInDeletion...");
         delNode = this.handleImagesInDeletion();
+        this.positionCaretAfterDeletion(delNode);
         
         // Content that is already marked as deleted needs no further handling.
         
         // Mark unmarked contents as deleted.
         this.consoleLog("DEL: addDel...");
         delNode = this.addDel();
-        
-        // Position the caret.
-        if (delNode != null) {
-            this.positionCaretAfterDeletion(delNode);
-        }
+        this.positionCaretAfterDeletion(delNode);
     },
     /**
      * Handle insert-Events.
@@ -266,10 +268,12 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             // 1) mark those with a DEL-node, and 
             // 2) position the caret at the end of the marked range afterwards.
             // Then the further procedure is as usual.
-            
             if (!this.docSelRange.collapsed) {
                 this.consoleLog("INS: handleDeletion first.");
                 this.handleDeletion();
+                this.cleanUpMarkupInEditor();
+                this.positionCaretAtBookmark();
+                this.refreshSelectionAndRange();
             }
         
         // Are we in or at an INS-node?
@@ -455,18 +459,6 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         this.refreshSelectionAndRange(); // We might have changed the DOM quite a bit...
         return delNode;
     },
-    /**
-     * Position the caret depending on the DEL-node.
-     * @param {Object} delNode
-     */
-    positionCaretAfterDeletion: function(delNode) {
-        if(this.eventKeyCode == Ext.event.Event.BACKSPACE){
-            this.docSelRange.collapseBefore(delNode);
-        } else {
-            this.docSelRange.collapseAfter(delNode);
-        }
-        this.docSel.setSingleRange(this.docSelRange);
-    },
 
     // =========================================================================
     // Insertions
@@ -502,21 +494,6 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
 
     },
     /**
-     * Position the caret depending on the INS-node.
-     * @param {Object} insNode
-     * @param {Boolean} isPlaceholder
-     */
-    positionCaretAfterInsertion: function(insNode,isPlaceholder) {
-        var rangeForCaret = rangy.createRange();
-        rangeForCaret.selectNodeContents(insNode);
-        if (isPlaceholder == false) {
-            // if the INS-Node is not used as placeholder, the caret
-            // must be positioned BEHIND the already inserted content:
-            rangeForCaret.collapse(false);
-        }
-        this.docSel.setSingleRange(rangeForCaret);
-    },
-    /**
      * Place the caret at the beginning of the next INS-Node (within!!!).
      */
     useNextIns:  function() {
@@ -533,6 +510,60 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         setTimeout(function() { // removing the focusNode before the insert is done looses the correct position of the caret
             nextNode.removeChild(focusNode);
         }, 1);
+    },
+
+    // =========================================================================
+    // Positioning the caret
+    // =========================================================================
+    
+    /**
+     * Position the caret at initial bookmark.
+     */
+    positionCaretAtBookmark: function() {
+        //     Note: moveToBookmark does not work when inserting after deletions!
+        //     Here is an example with moveToBookmark: 
+        //          abef 
+        //          => select "ab" and insert "c": 
+        //          <del>ab</del><ins>c</ins>ef 
+        //          => select "abc" and insert "d" results in:
+        //          <del>ab</del>e<ins>d</ins>f  (= wrong; correct would be: <del>ab</del><ins>d</ins>ef)
+        var rangeForCaret = rangy.createRange(),
+            bookmarkContainer = this.userRangeBookmark.containerNode,
+            bookmarkStartOffset = this.userRangeBookmark.start,
+            startNode = bookmarkContainer.childNodes[bookmarkStartOffset-1];  // -1 due to childNodes-index starting at 0
+        rangeForCaret.setStart(startNode,0);
+        rangeForCaret.collapse();
+        this.docSel.setSingleRange(rangeForCaret);
+    },
+    /**
+     * Position the caret depending on the DEL-node.
+     * @param {?Object} delNode
+     */
+    positionCaretAfterDeletion: function(delNode) {
+        if (delNode == null || delNode.parentNode == null) {
+            return;
+        }
+        if(this.eventKeyCode == Ext.event.Event.BACKSPACE){
+            this.docSelRange.collapseBefore(delNode);
+        } else {
+            this.docSelRange.collapseAfter(delNode);
+        }
+        this.docSel.setSingleRange(this.docSelRange);
+    },
+    /**
+     * Position the caret depending on the INS-node.
+     * @param {Object} insNode
+     * @param {Boolean} isPlaceholder
+     */
+    positionCaretAfterInsertion: function(insNode,isPlaceholder) {
+        var rangeForCaret = rangy.createRange();
+        rangeForCaret.selectNodeContents(insNode);
+        if (isPlaceholder == false) {
+            // if the INS-Node is not used as placeholder, the caret
+            // must be positioned BEHIND the already inserted content:
+            rangeForCaret.collapse(false);
+        }
+        this.docSel.setSingleRange(rangeForCaret);
     },
 
     // =========================================================================
@@ -819,6 +850,24 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         }
         return !this.isNodesOfSameNameAndConditionsAndEvent(nodeA,nodeB);
     },
+    /**
+     * Checks if a markup-node is "empty".
+     * @param {Object} node
+     * @returns {Boolean}
+     */
+    isEmptyMarkupNode: function(node) {
+        if (node.textContent == '') {
+            if (node.childNodes.length == 0) {
+                return true;
+            }
+            if (node.childNodes.length == 1 && node.childNodes[0].nodeType == 3 && node.childNodes[0].textContent == '') {
+                return true;
+            }
+        }
+        return false;
+    },
+    
+    
     // --------------------------------------------------------------------------------------------------------
     // Helpers for grouped checks: same nodeName / same conditions (= user, workflow, ...) / according to event
     // --------------------------------------------------------------------------------------------------------
@@ -1014,7 +1063,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         var allMarkupNodes = this.getAllMarkupNodesInEditor();
         for (var k = 0; k < allMarkupNodes.length; k++){
             var node = allMarkupNodes[k];
-            if (node.textContent == '' && node.childNodes.length == 0) {
+            if (this.isEmptyMarkupNode(node)) {
                 node.parentNode.removeChild(node);
             }
         }
