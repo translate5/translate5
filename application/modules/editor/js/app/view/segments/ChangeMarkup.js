@@ -681,8 +681,14 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         this.consoleLog(node);
         this.consoleLog("- siblingNode:");
         this.consoleLog(siblingNode);
+        
         if (node == null || siblingNode == null) {
             return false;   // is not even two nodes, thus it's also not two nodes touching.
+        }
+        
+        if (node.parentNode == null || siblingNode.parentNode == null
+                || ( node.parentNode != siblingNode.parentNode) ) {
+            return false;   // two sibling nodes will both have a parent (and: the SAME parent).
         }
         
         var hasSiblingInGivenDirection = false,
