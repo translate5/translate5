@@ -520,19 +520,16 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * Position the caret at initial bookmark.
      */
     positionCaretAtBookmark: function() {
-        //     Note: moveToBookmark does not work when inserting after deletions!
-        //     Here is an example with moveToBookmark: 
+        // TODO: moveToBookmark does not work when inserting after deletions!
+        //     Here is an example: 
         //          abef 
         //          => select "ab" and insert "c": 
         //          <del>ab</del><ins>c</ins>ef 
         //          => select "abc" and insert "d" results in:
         //          <del>ab</del>e<ins>d</ins>f  (= wrong; correct would be: <del>ab</del><ins>d</ins>ef)
-        var rangeForCaret = rangy.createRange(),
-            bookmarkContainer = this.userRangeBookmark.containerNode,
-            bookmarkStartOffset = this.userRangeBookmark.start,
-            startNode = bookmarkContainer.childNodes[bookmarkStartOffset-1];  // -1 due to childNodes-index starting at 0
-        rangeForCaret.setStart(startNode,0);
-        rangeForCaret.collapse();
+        var rangeForCaret = rangy.createRange();
+        rangeForCaret.moveToBookmark(this.userRangeBookmark);
+        rangeForCaret.collapse(false);
         this.docSel.setSingleRange(rangeForCaret);
     },
     /**
