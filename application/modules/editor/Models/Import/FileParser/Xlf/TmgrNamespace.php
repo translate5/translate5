@@ -73,4 +73,12 @@ class editor_Models_Import_FileParser_Xlf_TmgrNamespace implements editor_Models
     public function getSingleTag($xlfTag){
         //currently not needed
     }
+    
+    /**
+     * {@inheritDoc}
+     * @see editor_Models_Import_FileParser_Xlf_INamespace::useTagContentOnly()
+     */
+    public function useTagContentOnly() {
+        return null; //For OpenTM2 we can calculate this value depending on the tag
+    }
 }

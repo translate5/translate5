@@ -263,6 +263,38 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
     }
     
     /**
+     * Loads all task information entities for the given TMMT
+     * The returned data is no real task entity, although the task model is used in the frontend!
+     */
+    public function tasksAction() {
+        $this->getAction();
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->decodePutData();
+            if(!empty($this->data) && !empty($this->data->toReImport)) {
+                foreach($this->data->toReImport as $taskGuid) {
+                    $worker = ZfExtended_Factory::get('editor_Plugins_MatchResource_Worker');
+                    /* @var $worker editor_Plugins_MatchResource_Worker */
+            
+                    // init worker and queue it
+                    // Since it has to be done in a none worker request to have session access, we have to insert the worker before the taskPost 
+                    if (!$worker->init($taskGuid, ['tmmtId' => $this->entity->getId()])) {
+                        throw new ZfExtended_Exception('MatchResource ReImport Error on worker init()');
+                    }
+                    $worker->queue();
+                }
+            }
+        }
+        
+        $assoc = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_Taskassoc');
+        /* @var $assoc editor_Plugins_MatchResource_Models_Taskassoc */
+        $taskinfo = $assoc->getTaskInfoForTmmts([$this->entity->getId()]);
+        //FIXME replace lockingUser guid with concrete username and show it in the frontend!
+        $this->view->rows = $taskinfo;
+        $this->view->total = count($taskinfo);
+    }
+    
+    /**
      * Validates if choosen languages can be used by the choosen resource
      * Validates also the existence of the languages in the Lang DB 
      * @param editor_Plugins_MatchResource_Models_Resource $resource

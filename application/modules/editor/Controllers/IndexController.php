@@ -241,6 +241,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       //Editor.data.enableSourceEditing → still needed for enabling / disabling the whole feature (Checkbox at Import).
       $this->view->Php2JsVars()->set('enableSourceEditing', (boolean) $rop->import->enableSourceEditing);
       
+      $validImportExtensions = array_keys(editor_Models_Import_FileParser::getAllFileParsersMap());
+      $validImportExtensions[] = 'zip'; //ZIP is not provided by a specific fileparser
+      $this->view->Php2JsVars()->set('import.validExtensions', $validImportExtensions);
+      
       $this->view->Php2JsVars()->set('columns.widthFactorHeader', (float)$rop->editor->columns->widthFactorHeader);
       $this->view->Php2JsVars()->set('columns.widthOffsetEditable', (integer)$rop->editor->columns->widthOffsetEditable);
       $this->view->Php2JsVars()->set('columns.widthFactorErgonomic', (float)$rop->editor->columns->widthFactorErgonomic);
@@ -384,7 +388,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $result = array();
         foreach ($langs as $lang) {
             $name = $this->translate->_($lang['langName']);
-            $result[$name] = array($lang['id'], $name.' ('.$lang['rfc5646'].')');
+            $result[$name] = array($lang['id'], $name.' ('.$lang['rfc5646'].')', $lang['rtl']);
         }
         ksort($result); //sort by name of language
         if(empty($result)){

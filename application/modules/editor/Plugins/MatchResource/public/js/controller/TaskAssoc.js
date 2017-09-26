@@ -59,7 +59,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
   }],
   listen: {
       controller: {
-          '#taskpreferences': {
+          '#admin.TaskPreferences': {
               'loadPreferences': 'handleLoadPreferences'
           }
       },

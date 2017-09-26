@@ -38,13 +38,13 @@ END LICENSE AND COPYRIGHT
  * XML Fileparser
  */
 class editor_Models_Import_FileParser_XmlParser {
-    const DEFAULT_HANDLER = '';
+    const DEFAULT_HANDLER = '*';
     
     /**
      * contains all xml chunks (xml string split in text and nodes)
      * @var array
      */
-    public $xmlChunks; //FIXME protected, just for debuggin public
+    protected $xmlChunks;
     
     /**
      * index stack of the opened nodes
@@ -62,18 +62,52 @@ class editor_Models_Import_FileParser_XmlParser {
     protected $handlerOther;
     
     /**
-     * walks through the given XML string and fires the registered callbacks for each found node 
-     * @param string $xml
+     * if >0 disables the processing of the registered handlers
+     * @var integer
      */
-    public function parse($xml) {
-        $this->parseList(preg_split('/(<[^>]+>)/i', $xml, null, PREG_SPLIT_DELIM_CAPTURE));
+    protected $disableHandlerCount = 0;
+    
+    /**
+     * Initial $preserveWhitespace value
+     * @var array
+     */
+    protected $preserveWhitespace;
+    
+    protected $nonXmlBlocks = [];
+    
+    /**
+     * walks through the given XML string and fires the registered callbacks for each found node 
+     * Preserving whitespace in XML is defined by the xml:space attribute on each node. 
+     *  If the attribute is not given, the parent node is considered.
+     *  The initial root value (preserve or ignore) is given here as boolean parameter 
+     * @param string $xml
+     * @param boolean $preserveWhitespaceRoot 
+     * @return string the parsed string with all callbacks applied
+     */
+    public function parse($xml, $preserveWhitespaceRoot = false) {
+        $this->nonXmlBlocks = [];
+        $xml = preg_replace_callback('/(<!\[CDATA\[.*?\]\]>)|(<!--.*?-->)/s', function($item){
+            $id = count($this->nonXmlBlocks);
+            if(empty($item[1]) && !empty($item[2])) {
+                $key = '<xml-comment id="comment-'.$id.'"/>';
+            }
+            else {
+                $key = '<xml-cdata id="cdata-'.$id.'"/>';
+            }
+            $this->nonXmlBlocks[$key] = $item[0];
+            return $key;
+        }, $xml);
+        $this->parseList(preg_split('/(<[^>]+>)/i', $xml, null, PREG_SPLIT_DELIM_CAPTURE), $preserveWhitespaceRoot);
+        return str_replace(array_keys($this->nonXmlBlocks), array_values($this->nonXmlBlocks), $this->__toString());
     }
     
     /**
      * walks through the given XML chunk array and fires the registered callbacks for each found node 
      * @param array $chunks
+     * @param boolean $preserveWhitespaceRoot see method parse
      */
-    public function parseList(array $chunks) {
+    public function parseList(array $chunks, $preserveWhitespaceRoot = false) {
+        $this->preserveWhitespace = $preserveWhitespaceRoot;
         $this->xmlChunks = $chunks;
         foreach($this->xmlChunks as $key => $chunk) {
             $this->currentOffset = $key;
@@ -86,6 +120,7 @@ class editor_Models_Import_FileParser_XmlParser {
                     $this->handleElementEnd($key, $tag);
                     continue;
                 }
+                //find attributes:
                 if(preg_match_all('/([^\s]+)="([^"]*)"/', $chunk, $matches)){
                     //ensure that all attribute keys are lowercase, original notation can be found in the orignal chunk
                     $matches[1] = array_map('strtolower', $matches[1]);
@@ -132,7 +167,6 @@ class editor_Models_Import_FileParser_XmlParser {
      * @param integer $index the chunk index to replace
      * @param string|callable $replacement the new chunk string content, or a callable which receives the following parameters: integer $index, string $oldContent
      * @param integer $length repeats the replacement for the amount if chunks as specified in $length, defaults to 1
-     * @return string the new chunk
      */
     public function replaceChunk($index, $replacement, $length = 1) {
         for ($i = 0; $i < $length; $i++) {
@@ -172,19 +206,42 @@ class editor_Models_Import_FileParser_XmlParser {
     /**
      * registers handlers to the given tag type
      * The handlers can be null, if only one of both is needed
-     * @param string $tag tagname which should be handled, or empty string to handle all other non registered tags
+     * @param string $tag CSS selector like tag definition, see $this->parseSelector
+     * @param callable $opener Parameters: string $tag, array $attributes, integer $key, boolean $isSingle
+     * @param callable $closer Parameters: string $tag, integer $key, array $opener where opener is an assoc array: ['openerKey' => $key,'tag' => $tag,'attributes' => $attributes]
+     * @return [int] a list of the indizes of the added handlers 
+     */
+    public function registerElement($tag, callable $opener = null, callable $closer = null) {
+        //splits the tag selector into multiple handlers if a , is given
+        $tags = preg_split('/,(?=[^\]])/', $tag);
+        foreach($tags as $tag) {
+            $this->registerSingleElement($tag, $opener, $closer);
+        }
+    }
+    
+    /**
+     * registers handlers to the given tag type
+     * The handlers can be null, if only one of both is needed
+     * @param string $selector tag selector which should be handled, or empty string to handle all other non registered tags
      * @param callable $opener Parameters: string $tag, array $attributes, integer $key, boolean $isSingle
      * @param callable $closer Parameters: string $tag, integer $key, array $opener where opener is an assoc array: ['openerKey' => $key,'tag' => $tag,'attributes' => $attributes]
      */
-    public function registerElement($tag, callable $opener = null, callable $closer = null) {
-        $tag = $this->normalizeTag($tag);
+    protected function registerSingleElement($selector, callable $opener = null, callable $closer = null) {
+        $tag = $this->parseSelector($selector, $filter);
+        if($tag === false) {
+            //see parseSelector for possible selectors!
+            throw new ZfExtended_Exception('The given XLF tag selector could not be parsed: '.$selector);
+        }
         if(!empty($opener)) {
-            $this->handlerElementOpener[$tag] = $opener;
+            settype($this->handlerElementOpener[$tag], 'array');
+            $this->handlerElementOpener[$tag][$selector] = ['callback' => $opener, 'filter' => $filter];
         }
         if(!empty($closer)) {
-            $this->handlerElementCloser[$tag] = $closer;
+            settype($this->handlerElementCloser[$tag], 'array');
+            $this->handlerElementCloser[$tag][$selector] = ['callback' => $closer, 'filter' => $filter];
         }
     }
+    
     
     /**
      * Warning: parentTag works only of a handler is registered for parentTag
@@ -195,27 +252,230 @@ class editor_Models_Import_FileParser_XmlParser {
     }
     
     /**
-     * returns true if the given tag is a parent of the current
-     * @param string $tag
-     * @return boolean
+     * returns a parent node, matching to the given selector, null if no match found
+     * @param string $selector
+     * @return NULL|mixed
      */
-    public function hasParent($tag) {
-        //FIXME implement me look up in $this->xmlChunks
-        return true;
+    public function getParent($selector) {
+        $stackIndex = count($this->xmlStack) - 1; //remove current node
+        $tag = $this->parseSelector($selector, $selectorParts);
+        if($stackIndex <= 0 || empty($selectorParts)) { 
+            //if current node is root node, there is no parent
+            return null;
+        }
+        while($stackIndex >= 0) {
+            $node = $this->xmlStack[$stackIndex];
+            if($node['tag'] !== $tag) {
+                $stackIndex--;
+                continue;
+            }
+            //for the selector match the Index has to be increased again, since the doesSelectorMatch decreases it
+            if($this->doesSelectorMatch($selectorParts, $stackIndex + 1)) {
+                return $node;
+            }
+            $stackIndex--;
+        }
+        return null;
     }
     
+    /**
+     * returns the current element on the stack
+     * @return mixed
+     */
+    public function current() {
+        return end($this->xmlStack);
+    }
+    
+    /**
+     * parses the CSS like selector 
+     * currently supported: 
+     *    element                   a simple type selector
+     *    elementA elementB         the descendant selector
+     *    elementA > elementB       the direct descendant selector
+     *    elementA[attr]            attribute existence selector
+     *    elementA[attr=value]      attribute equals selector
+     *    elementA, elementB        splits up the selector at , and uses each expression as one selector
+     *    → all other selectors (especially about attributes must be developed as they are needed!)
+     
+     * returns the last matched tag as string, needed for our streamed based parsing
+     * 
+     * @param string $tagSelector
+     * @param array $selectorParts
+     * @return string
+     */
+    protected function parseSelector($tagSelector, &$selectorParts) {
+        $selectorParts = [];
+        $tagSelector = trim($tagSelector);
+        if($tagSelector === self::DEFAULT_HANDLER) {
+            return $tagSelector;
+        }
+        
+        //regex to get the single selector parts
+        $regex = '/(([-\w_:.]+)(\[[^\]]+])?)([>\s]+)?/';
+        
+        $res = preg_match_all($regex, $tagSelector, $parts, PREG_SET_ORDER );
+        //0 matches or false, both is wrong here
+        if(!$res) {
+            return false;
+        }
+        
+        $selector = end($parts);
+        
+        if(!empty($selector[4])){
+            //after the last tag in the selector, there may not be any operator
+            throw new ZfExtended_Exception('after the last tag there may not be any operator, given selector: '.$tagSelector);
+        }
+        
+        $selectorParts = $parts; //return the selectorparts as referenced variable
+        return $this->normalizeTag($selector[2]);
+    }
+    
+    /**
+     * normalizes a given tag
+     * @return string
+     */
     protected function normalizeTag($tag) {
         return strtolower($tag);
     }
     
+    /**
+     * checks if the given selector parts are matched by the current XML Stack (including the current Node)
+     * @param array $selectorParts
+     * @param integer $startStackIndex optional, defaults to the idx of the last item in the stack
+     * @return boolean
+     */
+    protected function doesSelectorMatch(array $selectorParts, $startStackIndex = null) {
+        if(empty($selectorParts)){
+            return true;
+        }
+        $selector = $this->popSelector($selectorParts);
+        //the operator of the last tag must always be the direct operator since it must match
+        $selector['operator'] = '>';
+        
+        if(is_null($startStackIndex)) {
+            $startStackIndex = count($this->xmlStack);
+        }
+        while($startStackIndex && !empty($selector)) {
+            $node = $this->xmlStack[--$startStackIndex];
+            $match = $node['tag'] == $selector['tag'] 
+                && $this->doesAttributesFilterMatch($node['attributes'], $selector['attrFilter']);
+            
+            if($match) {
+                $selector = $this->popSelector($selectorParts);
+                if(empty($selector)) {
+                    //no more selectors, the previous matched, that means return true
+                    return true;
+                }
+                continue; //proceed with next selector and next node in the XML stack
+            }
+            //if it was no match but the direct descendant operator was set this means false
+            // if the direct descendant operator was not set, we can bubble up in the XML Stack
+            if($selector['operator'] == '>') {
+                return false;
+            }
+            //bubble up in the XML Stack, keep the selector
+        }
+        //if we bubbled up without a match, we return false 
+        return false;
+    }
+    
+    /**
+     * converts the result of the preg match to a usable structure 
+     * @param array $selector
+     * @return string[]|null
+     */
+    protected function popSelector(array &$selectorParts) {
+        $selector = array_pop($selectorParts);
+        if(!$selector) {
+            return $selector;
+        }
+        $selector = [
+            'tag' => $this->normalizeTag($selector[2]),
+            'attrFilter' => empty($selector[3]) ? '' : $selector[3],
+            'operator' => empty($selector[4]) ? '' : trim($selector[4]),
+        ];
+        return $selector;
+    }
+    
+    /**
+     * checks if the given attribute filter matches the given attributes
+     * @param array $attributes
+     * @param string $filter
+     * @return boolean
+     */
+    protected function doesAttributesFilterMatch(array $attributes, $filter) {
+        $filter = trim($filter, '[]');
+        if(empty($filter)) {
+            return true;
+        }
+        
+        if(preg_match('/([^\^=$*]+)([^\^=$*]{0,1}=)([^=]+)$/', $filter, $parts)) {
+            $attribute = $parts[1];
+            $operator = $parts[2];
+            $comparator = $parts[3];
+        }
+        else {
+            //empty filter is excluded above, so reaching here can mean only the "existence" operator
+            $attribute = $filter;
+            $operator = 'has'; 
+        }
+        
+        if(!array_key_exists($attribute, $attributes)) {
+            return false;
+        }
+        
+        $value = $attributes[$attribute];
+        
+        switch ($operator) {
+            // tag[attr] attribute existence
+            case 'has':
+                return true; //for false see above
+                
+            // tag[attr=foo] attribute value equals
+            case '=':
+                return $value == $comparator;
+                
+            // tag[attr^=foo] attribute value starts with
+            case '^=':
+                return mb_strpos($value, $comparator) === 0;
+                
+            // tag[attr$=foo] attribute value ends with
+            case '$=':
+                return mb_strpos(strrev($value), strrev($comparator)) === 0;
+                
+            // tag[attr*=foo] attribute value contains
+            case '*=':
+                return mb_strpos($value, $comparator) !== false;
+        }
+        return false;
+    }
+    
+    /**
+     * Handles a start tag (single tags are a start and an end tag at once)
+     * @param integer $key the tag offset in the node list
+     * @param string $tag the found tag
+     * @param array $attributes the tag attributes
+     * @param boolean $isSingle is true if it is a single tag
+     */
     protected function handleElementStart($key, $tag, $attributes, $isSingle) {
         $tag = $handleTag = $this->normalizeTag($tag);
         $this->log("START#".$tag.'#');
+        $previousNode = end($this->xmlStack);
+        //get the parent boolean preserve whitespace value
+        $preserve = is_null($previousNode) ? $this->preserveWhitespace : $previousNode['preserveWhitespace'];
+        //get the XML attribute of the current node, which could not exist at all
+        $preserve = $this->getAttribute($attributes, 'xml:space', $preserve ? 'preserve' : 'default');
         $this->xmlStack[] = [
             'openerKey' => $key,
             'tag' => $tag,
             'attributes' => $attributes,
+            'isSingle' => $isSingle,
+            'preserveWhitespace' => $preserve == 'preserve' || $this->preserveWhitespace,
         ];
+        
+        if($this->disableHandlerCount > 0) {
+            return;
+        }
         
         if(empty($this->handlerElementOpener[$handleTag])) {
             if(empty($this->handlerElementOpener[self::DEFAULT_HANDLER])){
@@ -224,10 +484,20 @@ class editor_Models_Import_FileParser_XmlParser {
             $handleTag = self::DEFAULT_HANDLER;
         }
         
-        call_user_func($this->handlerElementOpener[$handleTag], $tag, $attributes, $key, $isSingle);
+        foreach($this->handlerElementOpener[$handleTag] as $handler) {
+            if($this->doesSelectorMatch($handler['filter'])){
+                call_user_func($handler['callback'], $tag, $attributes, $key, $isSingle);
+            }
+        }
         $this->log("ATTR#".print_r($attributes,1).'#');
     }
     
+    /**
+     * Handles a end tag
+     * @param integer $key the tag offset in the node list
+     * @param string $tag the found tag
+     * @throws ZfExtended_Exception
+     */
     protected function handleElementEnd($key, $tag) {
         $opener = end($this->xmlStack);
         $tag = $handleTag = $this->normalizeTag($tag);
@@ -237,6 +507,14 @@ class editor_Models_Import_FileParser_XmlParser {
             //if you got here because of an XML error: use an external tool like xmllint to get more details!
             throw new ZfExtended_Exception('Invalid XML: expected closing "'.$opener['tag'].'" tag, but got tag "'.$tag.'". Opening tag was: '.print_r($opener,1));
         }
+        if(!empty($opener['disableUntilEndTag'])) {
+            $this->disableHandlerCount--;
+            $this->disableHandlerCount = max($this->disableHandlerCount, 0); //ensure value not to be <0
+        }
+        if($this->disableHandlerCount > 0) {
+            array_pop($this->xmlStack);
+            return;
+        }
         
         if(empty($this->handlerElementCloser[$handleTag])) {
             if(empty($this->handlerElementCloser[self::DEFAULT_HANDLER])){
@@ -245,11 +523,20 @@ class editor_Models_Import_FileParser_XmlParser {
             }
             $handleTag = self::DEFAULT_HANDLER;
         }
-        call_user_func($this->handlerElementCloser[$handleTag], $tag, $key, $opener);
+        foreach($this->handlerElementCloser[$handleTag] as $handler) {
+            if($this->doesSelectorMatch($handler['filter'])){
+                call_user_func($handler['callback'], $tag, $key, $opener);
+            }
+        }
         array_pop($this->xmlStack);
     }
     
     protected function handleOther($key, $other) {
+        //TODO For the current needs the text handler may not be disabled through disableHandler functionality
+        // if this will be needed in the future, the disableHandler functionality must be extended with a "disable type" or something
+        //if($this->disableHandlerCount > 0) {
+            //return;
+        //}
         if(!empty($this->handlerOther)){
             call_user_func($this->handlerOther, $other, $key);
         }
@@ -258,6 +545,31 @@ class editor_Models_Import_FileParser_XmlParser {
     
     protected function log($msg) {
         //error_log($msg);
+    }
+    
+    /**
+     * disables all registered handlers until the end tag of the current node is reached
+     */
+    public function disableHandlersUntilEndtag() {
+        $this->disableHandlerCount++;
+        //sets a marker in the start tag to, which is checked and disabled on the corresponding end tag
+        $this->xmlStack[count($this->xmlStack) - 1]['disableUntilEndTag'] = true;
+    }
+    
+    /**
+     * convenience method to get one attribute of the attributes array, returns the given default if not existent
+     * @param array $attributes
+     * @param string $attribute
+     * @param string $default
+     * @return mixed
+     */
+    public function getAttribute($attributes, $attribute, $default = false) {
+        //we are storing all attributes in lower case
+        $attribute = strtolower($attribute);
+        if(array_key_exists($attribute, $attributes)) {
+            return $attributes[$attribute];
+        }
+        return $default;
     }
     
     /**

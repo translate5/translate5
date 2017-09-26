@@ -63,7 +63,7 @@ class editor_Models_Segment_InternalTag {
      * @param int $count optional, returns the replace count
      * @return mixed 
      */
-    public function replace(string $segment, $replacer, $limit = -1, &$count = null) {
+    public function replace($segment, $replacer, $limit = -1, &$count = null) {
         if(is_callable($replacer)) {
             return preg_replace_callback(self::REGEX_INTERNAL_TAGS, $replacer, $segment, $limit, $count);
         }
@@ -139,7 +139,7 @@ class editor_Models_Segment_InternalTag {
             //original id coming from import format
             $id = $match[3];
             $type = $match[1];
-            $tag = ['open' => 'bpt', 'close' => 'ept', 'single' => 'x'];
+            $tag = ['open' => 'bx', 'close' => 'ex', 'single' => 'x']; 
             //xliff tags:
             // bpt ept → begin and end tag as standalone tags in one segment
             // bx ex → start and end tag of tag pairs where the tags are distributed to different segments
@@ -162,7 +162,7 @@ class editor_Models_Segment_InternalTag {
         });
         
         if($removeOther) {
-            return strip_tags($result, '<x><x/><bpt><bpt/><ept><ept/><bx><bx/><ex><ex/>');
+            return strip_tags($result, '<x><x/><bpt><bpt/><ept><ept/><bx><bx/><ex><ex/><it><it/>');
         }
         return $result;
     }
@@ -211,6 +211,7 @@ class editor_Models_Segment_InternalTag {
      * @param array $map not a a key:value map, but a 2d array, since keys can exist multiple times
      */
     public function reapply2dMap(string $segment, array $map) {
+        $nextTagNr = 1;
         foreach($map as $tupel) {
             $key = $tupel[0];
             $value = $tupel[1];
@@ -219,8 +220,13 @@ class editor_Models_Segment_InternalTag {
             if ($pos !== false) {
                 $segment = mb_substr($segment, 0, $pos).$value.mb_substr($segment, $pos + mb_strlen($key));
             }
+            $nextTagNr++;
         }
-        return $segment;
+        while(preg_match('"<x[^>]*>"', $segment)){
+            $segment = preg_replace('"<x[^>]*>"','<div class="single replaceThisTagWhenInsertingInSegment"><span title="<AdditionalTagFromTM/>" class="short">&lt;'.$nextTagNr.'/&gt;</span><span data-originalid="ph" data-filename="irrelevant" class="full">&lt;AdditionalTagFromTM/&gt;</span></div>',$segment,1);
+            $nextTagNr++;
+        }
+        return trim($segment);
     }
     
     /**

@@ -43,8 +43,18 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
      * @param array $file that contains file as array as splitted by parse function
      * @param integer $i position of current segment in the file array
      * @return string
+     * 
      */
     protected function writeMatchRate(array $file, integer $i) {
+        // FIXME This code is disabled, because: 
+        //  - the mid is not unique (due multiple files in the XLF) this code is buggy
+        //  - the tmgr:matchratio should only be exported for OpenTM2 XLF and not in general
+        //  - the preg_match is leading to above problems, it would be better to use the XMLParser here to, 
+        //    and paste the new attributes on the parent trans-unit to one <lekSegmentPlaceholder>
+        //
+        //  SEE ALSO TRANSLATE-956
+        return $file;
+        
         $matchRate = $this->_segmentEntity->getMatchRate();
         $midArr = explode('_', $this->_segmentEntity->getMid());
         $mid = $midArr[0];
@@ -58,5 +68,75 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
         }
         $segPart = preg_replace('#(<trans-unit[^>]* id="'.$mid.'" *)#', '\\1 tmgr:matchratio="'.$matchRate.'" ', $segPart);
         return $file;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see editor_Models_Export_FileParser::getSegmentContent()
+     */
+    protected function getSegmentContent($segmentId, $field) {
+        $content = parent::getSegmentContent($segmentId, $field);
+        //without sub tags, no sub tags must be restored
+        if(stripos($content, '<sub') === false) {
+            return $content;
+        }
+        
+        //get the transunit part of the root segment
+        $transunitMid = $this->_segmentEntity->getMid();
+        $transunitMid = explode('_', $transunitMid)[0]; 
+        
+        $xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
+        /* @var $xmlparser editor_Models_Import_FileParser_XmlParser */
+        
+        $xmlparser->registerElement('sub', function($tag, $attributes, $key) use($xmlparser){
+            //disable handling of tags if we reach a sub, this is done recursivly in the loaded content of the found sub
+            $xmlparser->disableHandlersUntilEndtag();
+        }, function($tag, $key, $opener) use ($xmlparser, $transunitMid, $field){
+            $tagId = $this->getParentTagId($xmlparser);
+            if(empty($tagId)) {
+                error_log("Could not restore sub tag content since there is no id in the surrounding <ph>,<bpt>,<ept>,<it> tag!"); //FIXME better logging
+                return;
+            }
+            //now we need the segmentId to the found MID:
+            // since the MID of a <sub> segment is defined as:
+            // SEGTRANSUNITID _ SEGNR -sub- TAGID
+            // and we have only the first and the last part, we have to use like to get the segmentId
+            $s = $this->_segmentEntity->db->select('id')
+                ->where('taskGuid = ?', $this->_taskGuid)
+                ->where('mid like ?', $transunitMid.'_%-sub-'.$tagId);
+            $segmentRow = $this->_segmentEntity->db->fetchRow($s);
+            
+            //if we got a segment we have to get its segmentContent and set it as the new content in our resulting XML
+            // since we are calling getSegmentContent recursivly, the <sub> segments are replaced from innerst one out
+            if($segmentRow) {
+                //remove all chunks between the sub tag
+                $xmlparser->replaceChunk($opener['openerKey']+1,'', $key-$opener['openerKey']-1);
+                //fill one chunk with the segment content
+                $xmlparser->replaceChunk($opener['openerKey']+1,$this->getSegmentContent($segmentRow->id, $field));
+            }
+        });
+        return $xmlparser->parse($content);
+    }
+    
+    /**
+     * returns the parent tag id of the current SUB element, 
+     *  since this ID is part of the Segment MID of the created segment for the sub element
+     * @param editor_Models_Import_FileParser_XmlParser $xmlparser
+     * @return string|NULL
+     */
+    protected function getParentTagId(editor_Models_Import_FileParser_XmlParser $xmlparser) {
+        //loop through all valid parent tags 
+        $validParents = ['ph[id]','it[id]','bpt[id]','ept[id]'];
+        $parent = false;
+        while(!$parent && !empty($validParents)) {
+            $parent = $xmlparser->getParent(array_shift($validParents));
+            if($parent) {
+                //if we have found a valid parent (ID must be given) 
+                // we create the same string as it was partly used for the segments MID
+                return $parent['tag'].'-'.$parent['attributes']['id'];
+            }
+        }
+        //without the parent id no further processing is possible for that segment 
+        return null;
     }
 }

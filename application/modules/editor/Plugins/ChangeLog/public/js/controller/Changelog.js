@@ -109,6 +109,7 @@ Ext.define('Editor.plugins.ChangeLog.controller.Changelog', {
       }
       store.load({
           callback: function(records, operation, success) {
+              store.suppressNextFilter = false;
               if(records && records.length>0){
                   win.show();
                   win.down('pagingtoolbar').updateBarInfo();

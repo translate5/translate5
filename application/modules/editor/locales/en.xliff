@@ -748,17 +748,17 @@
         <source>Französisch (Belgien)</source>
         <target>French (Belgium)</target>
       </trans-unit>
-      <trans-unit id="V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIERhdGVuIChaSVAsIENTViwgU0RMWExJRkYsIG9wZW5UTTItWExJRkY7IEFuZ2FiZSBub3R3ZW5kaWcp">
-        <source>Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, openTM2-XLIFF; Angabe notwendig)</source>
-        <target>Select the data to be imported (ZIP, CSV, SDLXLIFF, openTM2-XLIFF;; specifying required)</target>
+      <trans-unit id='V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIERhdGVuIChaSVAsIENTViwgU0RMWExJRkYsIFhMSUZGOyBBbmdhYmUgbm90d2VuZGlnKQ=='>
+          <source>Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, XLIFF; Angabe notwendig)</source>
+          <target>Select the data to be imported (ZIP, CSV, SDLXLIFF, XLIFF; specifying required)</target>
       </trans-unit>
       <trans-unit id='SW1wb3J0IERhdGVpwrk='>
           <source>Import Datei¹</source>
           <target>Import Datei¹</target>
       </trans-unit>
-      <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFpJUCwgQ1NWIG9kZXIgU0RMWExJRkYgRGF0ZWkh'>
-        <source>Bitte verwenden Sie eine ZIP, CSV oder SDLXLIFF Datei!</source>
-        <target>Please use a ZIP, CSV, openTM2-XLIFF oder SDLXLIFF file only!</target>
+      <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFpJUCwgQ1NWLCBYTElGRiBvZGVyIFNETFhMSUZGIERhdGVpIQ=='>
+        <source>Bitte verwenden Sie eine ZIP, CSV, XLIFF oder SDLXLIFF Datei!</source>
+        <target>Please use a ZIP, CSV, XLIFF or SDLXLIFF file only!</target>
       </trans-unit>
       <trans-unit id='V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIFRCWCBEYXRlbiBmw7xyIGRhcyBUZXJtVGFnZ2luZw=='>
         <source>Wählen Sie die zu importierenden TBX Daten für das TermTagging</source>
@@ -778,7 +778,10 @@
         <source>Bitte verwenden Sie eine TBX Datei!</source>
         <target>Please use a TBX file!</target>
       </trans-unit>
-
+      <trans-unit id='S2VpbmUgVGVybWlub2xvZ2llIHZvcmhhbmRlbiE='>
+          <source>Keine Terminologie vorhanden!</source>
+          <target>No terminology available</target>
+      </trans-unit>
       <trans-unit id='QW5mcmFnZSBrYW5uIG5pY2h0IGFremVwdGllcnQgd2VyZGVuIQ=='>
         <source>Anfrage kann nicht akzeptiert werden!</source>
         <target>Request to the server could not be accepted!</target>
@@ -1094,7 +1097,6 @@
   <source>Bitte verwenden Sie nur ASCII-Zeichen in Datei- oder Verzeichnisnamen und keine Sonderzeichen oder Umlaute. Das Zip-Format übermittelt keine Informationen, in welcher Codierung Ihr Betriebssystem Datei- oder Verzeichnisnamen gespeichert hat. Aufgrund dieses Mangels des ZIP-Standards kann translate5 Nicht-ASCII-Zeichen nicht fehlerfrei auslesen. Einzige Ausnahme: Ihr Dateisystem speichert Dateinamen in der UTF-8-Kodierung, wie Linux-Systeme dies tun.</source>
   <target>Please use only ASCII characters in file or directory names and no special characters or German Umlaute. The Zip format does not provide any information in which encoding your operating system has saved a file or directory name. Due to this lack of the ZIP standard, translate5 can not read such file or directory names with NON-ASCII characters without errors. Only exception to this rule: Your file system does use UFT-8 encoding for your filesystem, like Linux systems do.</target>
 </trans-unit>
-<trans-unit id='SW1wb3J0IHZvbiBlaW56ZWxuZW4gU0RMWExJRkYgb2RlciBDU1YgRGF0ZWllbg=='><source>Import von einzelnen SDLXLIFF oder CSV Dateien</source><target>Importing single SDLXLIFF, openTM2-XLIFF or CSV files</target></trans-unit>
 <trans-unit id='U29sbCBudXIgZWluZSBlaW56ZWxuZSBDU1Ygb2RlciBTRExYTElGRiBEYXRlaSBpbnMgUHJvamVrdCBpbXBvcnRpZXJ0IHdlcmRlbiwgc28ga2FubiBkaWVzZSBhdWNoIGRpcmVrdCBob2NoZ2VsYWRlbiB3ZXJkZW4uIERpZSBFcnN0ZWxsdW5nIGVpbmVyIFpJUCBEYXRlaSBpc3Qgc28gbmljaHQgbsO2dGlnLg=='><source>Soll nur eine einzelne CSV oder SDLXLIFF Datei ins Projekt importiert werden, so kann diese auch direkt hochgeladen werden. Die Erstellung einer ZIP Datei ist so nicht nötig.</source><target>If you need to import a single CSV, openTM2-XLIFF or SDLXLIFF file as a project, you can upload this file directly. Creating a ZIP file here is not necessary.</target></trans-unit>
 <trans-unit id='SGFuZGVsdCBlcyBzaWNoIHVtIGVpbmUgU0RMWExJRkYgRGF0ZWksIHNvIGthbm4genVzw6R0emxpY2ggZWluZSBUQlggRGF0ZWkgbWl0IFRlcm1pbm9sb2dpZSBhdXNnZXfDpGhsdCB3ZXJkZW4u'><source>Handelt es sich um eine SDLXLIFF Datei, so kann zusätzlich eine TBX Datei mit Terminologie ausgewählt werden.</source><target>On importing a SDLXLIFF file, you can upload an additional TBX file to provide terminology.</target></trans-unit>
 <trans-unit id='dHJhbnNsYXRlNSBRdWVsbGNvZGUgYXVmIGJpdGJ1Y2tldA=='><source>translate5 Quellcode auf bitbucket</source><target>translate5 source code on bitbucket</target></trans-unit>
@@ -1231,6 +1233,10 @@
 <trans-unit id='U2VnbWVudCBhdWYgZGVuIGF1c2dld8OkaGx0ZW4gU3RhdHVzIHNldHplbg=='>
   <source>Segment auf den ausgewählten Status setzen</source>
   <target>Set segment to the choosen state</target>
+</trans-unit>
+<trans-unit id='TmljaHQgZ2VzZXR6dA=='>
+    <source>Nicht gesetzt</source>
+    <target>no status set</target>
 </trans-unit>
 <trans-unit id='RXMgaXN0IElobmVuIG5pY2h0IGVybGF1YnQsIGRlbiBTZWdtZW50aW5oYWx0IHp1IGJlYXJiZWl0ZW4uIEJpdHRlIHZlcndlbmRlbiBTaWUgU1RSRytaIHVtIElocmUgw4RuZGVydW5nZW4genVyw7xja3p1c2V0emVuIG9kZXIgYnJlY2hlbiBTaWUgZGFzIEJlYXJiZWl0ZW4gZGVzIFNlZ21lbnRzIGFiLg=='>
   <source>Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.</source>
@@ -1487,9 +1493,9 @@
     <source>Change</source>
     <target>Change</target>
 </trans-unit>
-<trans-unit id='U2llIGvDtm5uZW4gbmViZW4gdW5zZXJlbSBaSVAtQ29udGFpbmVyLUZvcm1hdCBhdWNoIGRpcmVrdCBTRExYTElGRiwgb3BlblRNMi1YTElGRiBvZGVyIENTViBEYXRlaWVuIGJlbnV0emVuLiA8YSB0YXJnZXQ9Il9ibGFuayIgaHJlZj0iaHR0cDovL2NvbmZsdWVuY2UudHJhbnNsYXRlNS5uZXQvZGlzcGxheS9CVVMvQmFzaWMrdXNhZ2UiPk1laHIgSW5mbzwvYT4u'>
-    <source>Sie können neben unserem ZIP-Container-Format auch direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">Mehr Info</a>.</source>
-    <target>In addition to our ZIP-container format you can also use SDLXLIFF, OpenTM2-XLIFF or CSV files directly. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">More information</a>.</target>
+<trans-unit id='U2llIGvDtm5uZW4gbmViZW4gdW5zZXJlbSBaSVAtQ29udGFpbmVyLUZvcm1hdCBhdWNoIGRpcmVrdCBTRExYTElGRiwgWExJRkYgb2RlciBDU1YgRGF0ZWllbiBiZW51dHplbi4gPGEgdGFyZ2V0PSJfYmxhbmsiIGhyZWY9Imh0dHA6Ly9jb25mbHVlbmNlLnRyYW5zbGF0ZTUubmV0L2Rpc3BsYXkvQlVTL0Jhc2ljK3VzYWdlIj5NZWhyIEluZm88L2E+Lg=='>
+    <source>Sie können neben unserem ZIP-Container-Format auch direkt SDLXLIFF, XLIFF oder CSV Dateien benutzen. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">Mehr Info</a>.</source>
+    <target>In addition to our ZIP-container format you can also use SDLXLIFF, XLIFF or CSV files directly. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">More information</a>.</target>
 </trans-unit>
 <trans-unit id='RXJnb25vbWljIChBbnNpY2h0KQ=='>
     <source>Ergonomic (Ansicht)</source>
@@ -1555,13 +1561,13 @@
     <source>STRG + EINFG (alternativ STRG + . (Punkt)) kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</source>
     <target>CTRL + INS (alternatively CTRL + . (period)) copies source to target.<br />CTRL + , (comma) + &gt;number&lt; copies corresponding tag to target (zero equals number 10)<br />CTRL + SHIFT + , (comma) + &gt;number&lt; copies tag numbers 11 to 20 to target.</target>
 </trans-unit>
-<trans-unit id='TGVlcmUgWmllbHNwcmFjaGVuLiBXYWhyIHdlbm4gYmVpbSBJbXBvcnQgYWxsZSB6aWVsc3ByYWNobGljaGVuIEZlbGRlciBsZWVyIHNpbmQu'>
-    <source>Leere Zielsprachen. Wahr wenn beim Import alle zielsprachlichen Felder leer sind.</source>
-    <target>Targets empty. True, if all targets are emtpy at import time</target>
+<trans-unit id='w5xiZXJzZXR6dW5nc2F1ZmdhYmUgLSBhbGxlIHppZWxzcHJhY2hsaWNoZW4gU2VnbWVudGUgYmVpbSBJbXBvcnQgbGVlciAobmljaHQgYW5nZWhha3QgYmVkZXV0ZXQgUmV2aWV3YXVmZ2FiZSku'>
+    <source>Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe).</source>
+    <target>Translation job - all target elements of the  segments have been empty at impoort time (not checked means this is a review job)</target>
 </trans-unit>
-<trans-unit id='TGVlcmUgWmllbHNwcmFjaGVu'>
-    <source>Leere Zielsprachen</source>
-    <target>Targets empty</target>
+<trans-unit id='w5xiZXJzZXR6dW5nc2F1ZmdhYmUgKGtlaW4gUmV2aWV3KQ=='>
+    <source>Übersetzungsaufgabe (kein Review)</source>
+    <target>Translation job (no review)</target>
 </trans-unit>
 <trans-unit id='PHA+QWNodHVuZyEgSW4gS8O8cnplIHdpcmQgZWluZSBXYXJ0dW5nIGFtIFN5c3RlbSBkdXJjaGdlZsO8aHJ0LjwvcD48cD5UcmFuc2xhdGU1IHdpcmQgYWIgZGllc2VtIFplaXRwdW5rdCBmw7xyIGt1cnplIFplaXQgbmljaHQgZXJyZWljaGJhciBzZWluLjwvcD48cD5HZXBsYW50ZXIgWmVpdHB1bmt0OiB7MH08L3A+'>
     <source><p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Translate5 wird ab diesem Zeitpunkt für kurze Zeit nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p></source>
@@ -1575,6 +1581,190 @@
     <source>MQM hinzufügen</source>
     <target>add MQM</target>
 </trans-unit>
+
+<trans-unit id='JTEkcyAlMiRzLAoKU2llIGVyaGFsdGVuIGRpZXNlIEVtYWlsLCB3ZWlsIElociBLb250byBhdWYgJTMkcyBuZXUgYW5nZWxlZ3Qgb2RlciBJaHIgUGFzc3dvcnQgenVyw7xja2dlc2V0enQgd3VyZGUuIAoKSWhyIEJlbnV0emVybmFtZToKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCiU2JHMKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgpXZW5uIFNpZSBJaHIgS29udG8ga8O8bmZ0aWcgbnV0emVuIG3DtmNodGVuLCBkYW5uIGZvcmRlcm4gU2llIHVudGVyIGRlciBmb2xnZW5kZW4KQWRyZXNzZSBlaW5lIExpbmsgYW4sIHVtIElociBQYXNzd29ydCBuZXUgc2V0emVuIHp1IGvDtm5uZW4uCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KJTMkcyU0JHMKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgpWaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKSWhyIFByb2pla3RtYW5hZ2VtZW50IFRlYW0KJTUkcwoKRGllc2UgRW1haWwgd3VyZGUgYXV0b21hdGlzY2ggZ2VuZXJpZXJ0LiBCaXR0ZSBhbnR3b3J0ZW4gU2llIG5pY2h0IGF1ZiBkaWVzZSBFLU1haWwu'>
+    <source>%1$s %2$s,
+
+Sie erhalten diese Email, weil Ihr Konto auf %3$s neu angelegt oder Ihr Passwort zurückgesetzt wurde. 
+
+Ihr Benutzername:
+------------------------------
+%6$s
+------------------------------
+
+Wenn Sie Ihr Konto künftig nutzen möchten, dann fordern Sie unter der folgenden
+Adresse eine Link an, um Ihr Passwort neu setzen zu können.
+
+------------------------------
+%3$s%4$s
+------------------------------
+
+Vielen Dank und viele Grüße,
+Ihr Projektmanagement Team
+%5$s
+
+Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail.</source>
+<target>%1$s %2$s,
+
+You have received this email, because your account on %3$s was created or your password was reset. 
+
+Your username:
+------------------------------
+%6$s
+------------------------------
+
+If you want to use your account in the future, then please request a link
+to reset your password from the following address.
+
+------------------------------
+%3$s%4$s
+------------------------------
+
+Many thanks and best regards,
+The Project Management team
+%5$s
+
+This e-mail has been generated automatically. Please do not reply to this e-mail.</target>
+</trans-unit>
+<trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgZnJlaWdlZ2ViZW4='>
+    <source>Translate5 - Aufgabe freigegeben</source>
+    <target>Translate5 - task opened</target>
+</trans-unit>
+
+<trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgYWJnZXNjaGxvc3Nlbg=='>
+    <source>Translate5 - Aufgabe abgeschlossen</source>
+    <target>Translate5 - task finished</target>
+</trans-unit>
+
+<trans-unit id='SW0gUHJvamVrdHBvcnRhbCBUcmFuc2xhdGU1IHd1cmRlIGRpZSBBdWZnYWJlIDxiPiUxJHMgLSAlMiRzPC9iPiBkdXJjaCBhbGxlIEJlbnV0emVyIGRlciBSb2xsZSA8aT4lMyRzPC9pPiBhYmdlc2NobG9zc2VuLjxiciAvPg=='>
+    <source>Im Projektportal Translate5 wurde die Aufgabe <b>%1$s - %2$s</b> durch alle Benutzer der Rolle <i>%3$s</i> abgeschlossen.<br /></source>
+    <target>The task <b>%1$s - %2$s</b> was finished by all users of the role <i>%3$s</i> in the task-portal Translate5.<br /></target>
+</trans-unit>
+
+<trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgYXV0b21hdGlzY2ggYWJnZXNjaGxvc3Nlbg=='>
+    <source>Translate5 - Aufgabe automatisch abgeschlossen</source>
+    <target>Translate5 - task finished automatically</target>
+</trans-unit>
+
+<trans-unit id='SW0gUHJvamVrdHBvcnRhbCBUcmFuc2xhdGU1IHd1cmRlIGRpZSBBdWZnYWJlIDxiPiUxJHMgLSAlMiRzPC9iPiBhdWZncnVuZCBlaW5lciBUZXJtaW7DvGJlcnNjaHJlaXR1bmcgYXV0b21hdGlzY2ggZsO8ciBhbGxlIEJlbnV0emVyIGRlciBSb2xsZSA8aT4lMyRzPC9pPiBhYmdlc2NobG9zc2VuLjxiciAvPg=='>
+    <source>Im Projektportal Translate5 wurde die Aufgabe <b>%1$s - %2$s</b> aufgrund einer Terminüberschreitung automatisch für alle Benutzer der Rolle <i>%3$s</i> abgeschlossen.<br /></source>
+    <target>The task <b>%1$s - %2$s</b> was finished due a missed deadline automatically for all users of the role <i>%3$s</i> in the task-portal Translate5.<br /></target>
+</trans-unit>
+
+<trans-unit id='PGJyIC8+CjxiciAvPgpTaWUgZXJyZWljaGVuIGRhcyBQb3J0YWwgdW50ZXI6IDxhIGhyZWY9IiUxJHMiPiUxJHM8L2E+PGJyIC8+CjxiciAvPgo8YnIgLz5WaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKPGJyIC8+SWhyIFByb2pla3RtYW5hZ2VtZW50IFRlYW0KPGJyIC8+JTIkcwo8YnIgLz4KPGJyIC8+RGllc2UgRW1haWwgd3VyZGUgYXV0b21hdGlzY2ggZ2VuZXJpZXJ0LiBCaXR0ZSBhbnR3b3J0ZW4gU2llIG5pY2h0IGF1ZiBkaWVzZSBFLU1haWwh'>
+    <source><br />
+<br />
+Sie erreichen das Portal unter: <a href="%1$s">%1$s</a><br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%2$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source>
+<target><br />
+<br />
+You can access the portal at: <a href="%1$s">%1$s</a><br />
+<br />
+<br />Many thanks and best regards,
+<br />The Project Management team
+<br />%2$s
+<br />
+<br />This e-mail has been generated automatically. Please do not reply to this e-mail.</target>
+</trans-unit>
+
+    <trans-unit id='U2VociBnZWVocnRlciBIZXJy'>
+        <source>Sehr geehrter Herr</source>
+        <target>Dear Mr.</target>
+    </trans-unit>
+
+<trans-unit id='JTEkcyAlMiRzLDxiciAvPgo8YnIgLz4KJTMkczxiciAvPgolNCRzPGJyIC8+CkltIGZvbGdlbmRlbiBkaWUgZ2V0w6R0aWd0ZW4gw4RuZGVydW5nZW4gZGVyIHp1dm9yIGFrdGl2ZW4gQmVudXR6ZXIgZGVyIFJvbGxlIDxiPiU1JHM8L2I+OjxiciAvPgolNiRzCjxociAvPgolNyRz'>
+    <source>%1$s %2$s,<br />
+<br />
+%3$s<br />
+%4$s<br />
+Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <b>%5$s</b>:<br />
+%6$s
+<hr />
+%7$s</source>
+<target>%1$s %2$s,<br />
+<br />
+%3$s<br />
+%4$s<br />
+The changes made by the formerly active user of the role <b>%5$s</b> are listed below:<br />
+%6$s
+<hr />
+%7$s</target>
+</trans-unit>
+
+<trans-unit id='JXMgLSBiZWFyYmVpdGV0'>
+    <source>%s - bearbeitet</source>
+    <target>%s - edited</target>
+</trans-unit>
+<trans-unit id='QXV0b1N0YXR1cw=='>
+    <source>AutoStatus</source>
+    <target>AutoStatus</target>
+</trans-unit>
+<trans-unit id='JTEkcyAlMiRzLAoKSW0gUHJvamVrdHBvcnRhbCBUcmFuc2xhdGU1IHd1cmRlIGRpZSBBdWZnYWJlICU1JHMgLSAlNiRzIGbDvHIgU2llIGZyZWlnZWdlYmVuLgoKU2llIGVycmVpY2hlbiBkYXMgUG9ydGFsIHVudGVyOiAlMyRzCgpWaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKSWhyIFByb2pla3RtYW5hZ2VtZW50IFRlYW0KJTckcwoKRGllc2UgRW1haWwgd3VyZGUgYXV0b21hdGlzY2ggZ2VuZXJpZXJ0LiBCaXR0ZSBhbnR3b3J0ZW4gU2llIG5pY2h0IGF1ZiBkaWVzZSBFLU1haWwh'>
+    <source>%1$s %2$s,
+
+Im Projektportal Translate5 wurde die Aufgabe %5$s - %6$s für Sie freigegeben.
+
+Sie erreichen das Portal unter: %3$s
+
+Vielen Dank und viele Grüße,
+Ihr Projektmanagement Team
+%7$s
+
+Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source>
+<target>%1$s %2$s,
+
+The task %5$s - %6$s was opened for you in the task-portal Translate5.
+
+You can access the portal at: %3$s
+
+Many thanks and best regards,
+The Project Management team
+%7$s
+
+This e-mail has been generated automatically. Please do not reply to this e-mail.</target>
+</trans-unit>
+
+<trans-unit id='JTEkcyAlMiRzLDxiciAvPgo8YnIgLz4KSW0gUHJvamVrdHBvcnRhbCBUcmFuc2xhdGU1IHd1cmRlIGRpZSBBdWZnYWJlIDxiPiU1JHMgLSAlNiRzPC9iPiBmw7xyIFNpZSBmcmVpZ2VnZWJlbi48YnIgLz4KPGJyIC8+CkltIGZvbGdlbmRlbiBkaWUgZ2V0w6R0aWd0ZW4gw4RuZGVydW5nZW4gZGVyIHZvcmhlcmdlaGVuZGVuIExla3RvcmVuOjxiciAvPgolNCRzCjxociAvPgo8YnIgLz4KPGJyIC8+ClNpZSBlcnJlaWNoZW4gZGFzIFBvcnRhbCB1bnRlcjogJTMkczxiciAvPgo8YnIgLz4KPGJyIC8+VmllbGVuIERhbmsgdW5kIHZpZWxlIEdyw7zDn2UsCjxiciAvPklociBQcm9qZWt0bWFuYWdlbWVudCBUZWFtCjxiciAvPiU3JHMKPGJyIC8+CjxiciAvPkRpZXNlIEVtYWlsIHd1cmRlIGF1dG9tYXRpc2NoIGdlbmVyaWVydC4gQml0dGUgYW50d29ydGVuIFNpZSBuaWNodCBhdWYgZGllc2UgRS1NYWlsIQ=='>
+    <source>%1$s %2$s,<br />
+<br />
+Im Projektportal Translate5 wurde die Aufgabe <b>%5$s - %6$s</b> für Sie freigegeben.<br />
+<br />
+Im folgenden die getätigten Änderungen der vorhergehenden Lektoren:<br />
+%4$s
+<hr />
+<br />
+<br />
+Sie erreichen das Portal unter: %3$s<br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%7$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source>
+<target>%1$s %2$s,<br />
+<br />
+The task <b>%5$s - %6$s</b> was opened for You in the task-portal Translate5.<br />
+
+<br />
+The changes made by the preceeding proofreaders are listed below:<br />
+%4$s
+<hr />
+<br />
+<br />
+You can access the portal at: %3$s<br />
+<br />
+<br />Many thanks and best regards,
+<br />The Project Management team
+<br />%7$s
+<br />
+<br />This e-mail has been generated automatically. Please do not reply to this e-mail.</target>
+</trans-unit>
+
     </body>
   </file>
 </xliff>

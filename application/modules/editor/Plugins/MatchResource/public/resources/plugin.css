@@ -31,6 +31,7 @@ END LICENSE AND COPYRIGHT
 
 /* TM Overview */
 .ico-tm-edit {background-image: url("images/book_edit.png");background-repeat:no-repeat;background-position:center;}
+.ico-tm-tasks {background-image: url("images/tasks_assoc.png");background-repeat:no-repeat;background-position:center;}
 .ico-tm-delete {background-image: url("images/book_delete.png");background-repeat:no-repeat;background-position:center;}
 .ico-tm-add {background-image: url("images/book_add.png");background-repeat:no-repeat;background-position:center;}
 .ico-tm-information {background-image: url("images/information.png"); background-repeat:no-repeat; background-position:50% 50%;}
@@ -88,4 +89,11 @@ END LICENSE AND COPYRIGHT
 
 table.matchresource-meta-data {
     
+}
+
+/**
+ * FIXME must be removed with next ext update, fixes T5DEV-181 / https://www.sencha.com/forum/showthread.php?330718-6-2-ColorField-color-preview-doesn-t-match-color
+ */
+.x-colorpicker-field input {
+    background-color: inherit;
 }

@@ -84,7 +84,16 @@ class editor_Models_Import_FileParser_Xlf_Namespaces implements editor_Models_Im
         return $this->call(__FUNCTION__, func_get_args());
     }
     
+    /**
+     * {@inheritDoc}
+     * @see editor_Models_Import_FileParser_Xlf_INamespace::useTagContentOnly()
+     */
+    public function useTagContentOnly(){
+        return $this->call(__FUNCTION__, func_get_args());
+    }
+    
     protected function call($function, $arguments) {
+        $result = false;
         foreach ($this->namespaces as $namespace){
             $result = call_user_func_array([$namespace, $function], $arguments);
             //if one of the callen namespace handlers produces a result, we return this and end the loop
@@ -92,5 +101,6 @@ class editor_Models_Import_FileParser_Xlf_Namespaces implements editor_Models_Im
                 return $result;
             }
         }
+        return $result; //for falsy values we return the last value only
     }
 }

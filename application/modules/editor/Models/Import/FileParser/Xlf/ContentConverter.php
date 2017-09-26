@@ -29,7 +29,6 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Converts XLF segment content chunks into translate5 internal segment content string
- * TODO Missing <mrk type="seg"> support! 
  */
 class editor_Models_Import_FileParser_Xlf_ContentConverter {
     use editor_Models_Import_FileParser_TagTrait;
@@ -68,6 +67,24 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     protected $task;
     
     /**
+     * map of content tag to tagNr, to get the correct tagNr for tag pairs and between source and target column
+     * @var array
+     */
+    protected $shortTagNumbers = [];
+    
+    /**
+     * @var boolean
+     */
+    protected $useTagContentOnlyNamespace;
+    
+    /**
+     * @var boolean
+     */
+    protected $source = true;
+    
+    protected $preserveWhitespace = false;
+    
+    /**
      * @param array $namespaces
      * @param editor_Models_Task $task for debugging reasons only
      * @param string $filename for debugging reasons only
@@ -78,66 +95,189 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $this->filename = $filename;
         $this->initImageTags();
         
+        $this->useTagContentOnlyNamespace = $this->namespaces->useTagContentOnly();
+        
         $this->xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
         $this->xmlparser->registerElement('mrk', function($tag, $attributes){
             //test transunits with mrk tags are disabledd in the test xlf!
-            $this->throwParseError('The file contains MRK tags, which are currently not supported! Stop Import.');
+            $this->throwParseError('The trans-unit content contains MRK tags other than type=seg, which are currently not supported! Stop Import.');
         });
         
         //since phs may contain only <sub> elements we have to handle text only inside a ph
         // that implies that the handling of <sub> elements is done in the main Xlf Parser and in the ph we get just a placeholder
         // see class description of parent Xlf Parser
-        $this->xmlparser->registerElement('ph', function($tag, $attributes){
+        $this->xmlparser->registerElement('ph,it,bpt,ept', function($tag, $attributes){
             $this->innerTag = [];
-            $this->xmlparser->registerOther([$this, 'handlePhTagText']);
+            $this->xmlparser->registerOther([$this, 'handleContentTagText']);
         }, function($tag, $key, $opener) {
             $this->xmlparser->registerOther([$this, 'handleText']);
             $originalContent = $this->xmlparser->getRange($opener['openerKey'], $key, true);
-            $this->result[] = $this->createSingleTag($tag, $this->xmlparser->join($this->innerTag), $originalContent);
+            if($this->useTagContentOnly($tag, $key, $opener)) {
+                $text = $this->xmlparser->join($this->innerTag);
+            }
+            else {
+                $text = null;
+            }
+            $rid = $this->getRid($opener);
+            $this->result[] = $this->createTag($rid, $tag, $originalContent, $text);
         });
         
-        $this->xmlparser->registerElement('x', null, [$this, 'handleXTag']);
+        $this->xmlparser->registerElement('x,bx,ex', null, [$this, 'handleReplacerTag']);
         $this->xmlparser->registerElement('g', [$this, 'handleGTagOpener'], [$this, 'handleGTagCloser']);
         
-        $this->xmlparser->registerElement('', [$this, 'handleUnknown']); // → all other tags
+        $this->xmlparser->registerElement('sub', function() {
+            //disable this parser until the end of the sub tag.
+            $this->xmlparser->disableHandlersUntilEndtag();
+        });
+        
+        $this->xmlparser->registerElement('*', [$this, 'handleUnknown']); // → all other tags
         $this->xmlparser->registerOther([$this, 'handleText']);
     }
     
     /**
      * creates an internal tag out of the given data
-     * @param unknown $text
+     * @param string $rid ID to identify tag pairs (for tagNr calculation)
+     * @param string $tag
+     * @param string $originalContent this is value which is restored on export
+     * @param string $text optional, this is the tag value which should be shown in the frontend
      * @return string
      */
-    protected function createSingleTag($tag, $text, $originalContent) {
+    protected function createTag($rid, $tag, $originalContent, $text = null) {
+        switch ($tag) {
+            case 'x':
+            case 'ph':
+            case 'it':
+                $type = '_singleTag';
+                $rid = 0;
+                break;
+            case 'bpt':
+            case 'bx':
+                //the tagNr depends here on the existence of an entry with the same RID 
+                // if yes, take this value
+                // if no, increase and set the new value as new tagNr to that RID
+                // for g tags: RID = 'g-'.$openerKey;
+            case 'g':
+                $type = '_leftTag';
+                break;
+            case 'g-close':
+                //g-close tag is just a hack to distinguish between open and close
+                $tag = 'g'; 
+            case 'ept':
+            case 'ex':
+                $type = '_rightTag';
+                break;
+            default:
+                return '<b>Programming Error! invalid tag type used!</b>';
+        }
+        if(empty($text)) {
+            $text = htmlentities($originalContent);
+        }
         $imgText = html_entity_decode($text, ENT_QUOTES, 'utf-8');
         $fileNameHash = md5($imgText);
-        //generate the html tag for the editor
-        $p = $this->getTagParams($originalContent, $this->shortTagIdent++, $tag, $fileNameHash, $text);
-        $this->_singleTag->createAndSaveIfNotExists($imgText, $fileNameHash);
-        return $this->_singleTag->getHtmlTag($p);
+        $tagNr = $this->getShortTagNumber($rid);
+        $p = $this->getTagParams($originalContent, $tagNr, $tag, $fileNameHash, $text);
+        $this->{$type}->createAndSaveIfNotExists($imgText, $fileNameHash);
+        return $this->{$type}->getHtmlTag($p);
+    }
+    
+    /**
+     * Calculates an identifier of a tag, to match opener and closer tag (for tag numbering)
+     * @param array $openerMeta
+     */
+    protected function getRid($openerMeta) {
+        $rid = $this->xmlparser->getAttribute($openerMeta['attributes'], 'rid');
+        if($rid !== false) {
+            return $rid;
+        }
+        $id = $this->xmlparser->getAttribute($openerMeta['attributes'], 'id');
+        if($id !== false) {
+            return $id;
+        }
+        //according to the spec all tags must have an ID, so if we get here,
+        // this is invalid and we have to fake an identifier. 
+        // tagnumbering may then not be correct!
+        if(empty($openerMeta['fakedRid'])){
+            $openerMeta['fakedRid'] = $openerMeta['tag'].'-'.$openerMeta['openerKey'];
+        }
+        return $openerMeta['fakedRid'];
+    }
+    
+    /**
+     * returns the short tag number to the given rid or creates one
+     * rid can be given as tag attribute, if nothing found the ID is used as fallback. 
+     * A rid should always be given, since it is also needed to map the tags in source to target, 
+     *  so that same tagNr are used for same tags there 
+     * @param string $rid
+     * @return number
+     */
+    protected function getShortTagNumber($rid) {
+        if(empty($rid)) {
+            return $this->shortTagIdent++;
+        }
+        //pairedTags have a rid, we have to look it up or to create it
+        if(empty($this->shortTagNumbers[$rid])) {
+            $this->shortTagNumbers[$rid] = $this->shortTagIdent++;
+        }
+        return $this->shortTagNumbers[$rid];
+    }
+    
+    /**
+     * returns true if the tag content should only be used as text for the internal tags. 
+     * On false the surrounding tags (ph, ept, bpt, it) are also displayed.
+     * @param string $tag
+     * @param integer $key
+     * @param array $opener
+     * @return boolean
+     */
+    protected function useTagContentOnly($tag, $key, $opener) {
+        //if the namespace defines a way how to use the tag content, use that way
+        if(!is_null($this->useTagContentOnlyNamespace)) {
+            return $this->useTagContentOnlyNamespace;
+        }
+        //the native way is to check for a ctype in the tag, if there is one, show the tags also
+        if(array_key_exists('ctype', $opener['attributes'])) {
+            return false;
+        }
+        // same if the tag contains only tags, then the surrounding tag also must be shown
+        if($key - $opener['openerKey'] <= 2) {
+            //if there is only one chunk in between, we mask only that text excluding tags
+            return true;
+        }
+        $contentRange = trim($this->xmlparser->getRange($opener['openerKey']+1, $key-1, true)).'<end>';
+        //FIXME a img tag with sub inside a ph is not exposed as <img> but as <ph> in the GUI
+        //returns false if contentRange starts with <sub and ends with sub>, what means contains a sub text only
+        return (stripos($contentRange, '<sub') !== 0 || stripos($contentRange, 'sub><end>') === false);
     }
     
     /**
      * parses the given chunks containing segment source, seg-source or target content
-     * seg-source / target can be segmented into multiple mrk type="seg" which is one segment on our side
+     * seg-source / target can be segmented into multiple mrk mtype="seg" which is one segment on our side
      * Therefore we return a list of segments here
      * @param array $chunks
+     * @param boolean $source
+     * @param boolean $preserveWhitespace defines if the whitespace in the XML nodes should be preserved or not
      * @return array
      */
-    public function convert(array $chunks) {
-        $this->segments = [];
+    public function convert(array $chunks, $source, $preserveWhitespace = false) {
         $this->result = [];
-        $this->shortTagIdent = 1;
-        $this->xmlparser->parseList($chunks);
-        
-        //if there are no mrk type="seg" we have to move the bare result into the returned segments array   
-        if(empty($this->segments) && !empty($this->result)) {
-            $this->segments[] = $this->xmlparser->join($this->result);
+        //this assumes that source tags come always before target tags
+        if($source) {
+            $this->shortTagIdent = 1;
+            $this->shortTagNumbers = [];
         }
-        
-        //TODO use mrk seg mid as $this->segments index! 
-        
-        return $this->segments;
+        else {
+            //if we parse the target, we have to reuse the tagNrs found in source
+            $this->shortTagIdent = empty($this->shortTagNumbers) ? 1 : max($this->shortTagNumbers);
+        }
+        $this->source = $source;
+        //get the flag just from outside, must not be parsed by inline element parser, since xml:space may occur only outside of inline content 
+        $this->preserveWhitespace = $preserveWhitespace; 
+        $this->xmlparser->parseList($chunks);
+        $result = $this->xmlparser->join($this->result);
+        if(!$this->preserveWhitespace) {
+            return trim($result);
+        }
+        return $result;
     }
     
     /**
@@ -145,7 +285,12 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * @param string $text
      */
     public function handleText($text) {
-        //we have to decode entities here, otherwise our generated XLF wont be valid 
+        if(!$this->preserveWhitespace) {
+            $text = preg_replace("/[ \t\n\r]+/u", ' ', $text);
+        }
+        //we have to decode entities here, otherwise our generated XLF wont be valid
+        // although the whitespace of the content may not be preserved here, if there remain multiple spaces or other space characters, 
+        // we have to protect them here 
         $text = $this->protectWhitespace($text);
         $text = $this->whitespaceTagReplacer($text);
         $this->result[] = $text;
@@ -155,7 +300,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * Inner PH tag text handler
      * @param string $text
      */
-    public function handlePhTagText($text) {
+    public function handleContentTagText($text) {
         $this->innerTag[] = $text;
     }
     
@@ -165,28 +310,32 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * @param integer $key
      * @param array $opener
      */
-    public function handleXTag($tag, $key, $opener) {
-        $single = $this->namespaces->getSingleTag($this->xmlparser->getChunk($key));
+    public function handleReplacerTag($tag, $key, $opener) {
+        $chunk = $this->xmlparser->getChunk($key);
+        $single = $this->namespaces->getSingleTag($chunk);
         if(!empty($single)) {
             $this->result[] = $single;
+            return;
         }
-        //FIXME if there is no tagMap result we have to convert the tag to an internal tag
-        //doing stuff like: $this->_singleTag->create($text);
+        $rid = $this->getRid($opener);
+        $this->result[] = $this->createTag($rid, $tag, $chunk);
     }
     
     /**
      * Handler for G tags
      * @param string $tag
+     * @param array $attributes
      * @param integer $key
-     * @param array $opener
      */
     public function handleGTagOpener($tag, $attributes, $key) {
-        $result = $this->namespaces->getPairedTag($this->xmlparser->getChunk($key), null);
+        $chunk = $this->xmlparser->getChunk($key);
+        $result = $this->namespaces->getPairedTag($chunk, null);
         if(!empty($result)) {
             $this->result[] = $result[0];
+            return;
         }
-        //FIXME if there is no tagMap result we have to convert the tag to an internal tag
-        //doing stuff like: $this->_singleTag->create($text);
+        $rid = $this->getRid($this->xmlparser->current());
+        $this->result[] = $this->createTag($rid, $tag, $chunk);
     }
     
     /**
@@ -196,14 +345,16 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * @param array $opener
      */
     public function handleGTagCloser($tag, $key, $opener) {
-        $opener = $this->xmlparser->getChunk($opener['openerKey']);
-        $closer = $this->xmlparser->getChunk($key);
-        $result = $this->namespaces->getPairedTag($opener, $closer);
+        $openerKey = $opener['openerKey'];
+        $openChunk = $this->xmlparser->getChunk($openerKey);
+        $closeChunk = $this->xmlparser->getChunk($key);
+        $result = $this->namespaces->getPairedTag($openChunk, $closeChunk);
         if(!empty($result)) {
             $this->result[] = $result[1];
+            return;
         }
-        //FIXME if there is no tagMap result we have to convert the tag to an internal tag
-        //doing stuff like: $this->_singleTag->create($text);
+        $rid = $this->getRid($opener);
+        $this->result[] = $this->createTag($rid, $tag.'-close', $closeChunk);
     }
     
     /**
@@ -211,13 +362,14 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * @param string $tag
      */
     public function handleUnknown($tag) {
-        //below tags are given to the content converter, but they are known so far, just not handled by the converter
+        //below tags are given to the content converter, 
+        // they are known so far, just not handled by the converter
+        // or they are not intended to be handled since the main action happens in the closer handler not in the opener handler
         switch ($tag) {
-            case 'x': //must also be added here, since handleUnknown is called for the x start tag call (we have only registered a closer) 
-            case 'g': //must also be added here, since handleUnknown is called for the x start tag call (we have only registered a closer) 
-            case 'source':
-            case 'target':
-            case 'seg-source':
+            case 'x':  
+            case 'g': 
+            case 'bx':
+            case 'ex':
             return;
         }
         $this->throwParseError('The file contains '.$tag.' tags, which are currently not supported! Stop Import.');

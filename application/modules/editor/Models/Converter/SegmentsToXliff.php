@@ -343,9 +343,8 @@ class editor_Models_Converter_SegmentsToXliff {
         if(empty($segmentsOfFile)) {
             return;
         }
-        $export = ZfExtended_Factory::get('editor_Models_Export');
-        /* @var $export editor_Models_Export */
-        $this->exportParser = $export->getFileParserForXmlList($this->task, $filename);
+
+        $this->exportParser = $this->getExportFileparser($segmentsOfFile[0]['fileId'], $filename);
         $file = '<file original="%1$s" source-language="%2$s" target-language="%3$s" xml:space="preserve" datatype="x-translate5">';
         $this->result[] = sprintf($file, htmlspecialchars($filename), $this->data['sourceLang'], $this->data['targetLang']);
         $this->result[] = '<body>';
@@ -358,6 +357,20 @@ class editor_Models_Converter_SegmentsToXliff {
         
         $this->result[] = '</body>';
         $this->result[] = '</file>';
+    }
+    
+    /**
+     * returns the export fileparser of the affected file
+     * @param integer $fileId
+     * @param string $filename
+     * @return mixed|object
+     */
+    protected function getExportFileparser($fileId, $filename) {
+        $file = ZfExtended_Factory::get('editor_Models_File');
+        /* @var $file editor_Models_File */
+        $file->load($fileId);
+        $exportParser = str_replace('_Import_', '_Export_', $file->getFileParser());
+        return ZfExtended_Factory::get($exportParser, array(0, false,  $this->task, $filename));
     }
     
     /**

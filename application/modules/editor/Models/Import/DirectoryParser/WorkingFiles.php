@@ -50,7 +50,7 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
    *   It is added by editor_Transit_PluginBootstrap
    * @var array
    */
-  protected $_importExtensionList = array('sdlxliff','xlf','csv','transit','testcase');
+  protected $_importExtensionList;
   
   /**
    * RootNode Container
@@ -69,6 +69,12 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
    * @var array
    */
   protected $filenames = array();
+  
+  protected $exceptionOnNoFilesFound = true;
+  
+  public function __construct() {
+      $this->_importExtensionList = array_keys(editor_Models_Import_FileParser::getAllFileParsersMap());
+  }
   
   /**
    * parses the given directory and returns a Object tree ready for output as JSON
@@ -114,6 +120,11 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
         $this->directories[$fileName] = $fileinfo->getPathname();
       }
     }
+
+    if($this->exceptionOnNoFilesFound && empty($this->filenames)) {
+        throw new ZfExtended_Exception("There are no importable files in the Task. The following file extensions can be imported: .".join(', .', $this->_importExtensionList));
+    }
+    
     $this->sortItems();
     $this->buildRecursiveTree();
   }

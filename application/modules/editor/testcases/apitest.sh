@@ -17,7 +17,7 @@ export LOGOUT_PATH=$LOGOUT_PATH
 #phpunit --verbose --include-path $INCLUDES --bootstrap bootstrap.php editorAPI/DummyTest.php
 
 if [ -n "$1" ]; then
-TO_RUN=$1
+TO_RUN=$@
 else
 TO_RUN="editorAPI"
 fi

@@ -207,28 +207,7 @@ trait editor_Models_Import_FileParser_TagTrait {
      * @param bool $xmlBased defaults to true, decides how XML Entities are encoded, see inline comments 
      */
     protected function protectWhitespace($textNode, $xmlBased = true) {
-        
-        //FIXME this is not the right place here, but here it is used for all imports.
-        // It is important that we have no entities in our DB but their UTF8 characters instead,
-        // since a XLF export of our segments would not be valid XML with the entities.
-        // And the browsers are converting the entities anyway to UTF8 characters.
-        // Refactor to a better place with TRANSLATE-296
-        if($xmlBased) {
-            // in a XML based format only the defined entities may exist
-            // - for our major XML formats these are: &amp; &lt; &gt; only
-            // - all other entities must be encoded back into their utf8 character: &zslig; into ß 
-            //   → otherwise our XLF export will fail with invalid XML
-            //   → also the browser will convert the &zslig; into ß anyway, so we do this directly on the import
-            // why using this encode(decode) see 
-            //  https://stackoverflow.com/questions/18039765/php-not-have-a-function-for-xml-safe-entity-decode-not-have-some-xml-entity-dec
-            $textNode = htmlentities(html_entity_decode($textNode), ENT_XML1);
-        }
-        else {
-            // for non XML based formats (for example CSV) all content and its contained entities are displayed to the user as they were in the import file
-            // therefore we have just to encode the < > & characters.
-            // so if the CSV contains &amp; ß < this would be converted to &amp;amp; ß &gt; to be displayed correctly in the browser
-            $textNode = htmlentities($textNode, ENT_XML1);
-        }
+        $textNode = $this->entityCleanup($textNode, $xmlBased);
         
         //replace only on real text
         $textNode = str_replace($this->protectedWhitespaceMap['search'], $this->protectedWhitespaceMap['replace'], $textNode);
@@ -252,6 +231,34 @@ trait editor_Models_Import_FileParser_TagTrait {
         return preg_replace_callback($this->protectedUnicodeList, function ($match) {
             return $this->makeInternalSpace($match[0]);
         }, $textNode);
+    }
+    
+    /**
+     * Does the entity encoding, see inline comments
+     * @param string $textNode
+     * @param boolean $xmlBased
+     * @return string
+     */
+    protected function entityCleanup($textNode, $xmlBased = true) {
+        //FIXME this is not the right place here, but here it is used for all imports.
+        // It is important that we have no entities in our DB but their UTF8 characters instead,
+        // since a XLF export of our segments would not be valid XML with the entities.
+        // And the browsers are converting the entities anyway to UTF8 characters.
+        // Refactor to a better place with TRANSLATE-296
+        if($xmlBased) {
+            // in a XML based format only the defined entities may exist
+            // - for our major XML formats these are: &amp; &lt; &gt; only
+            // - all other entities must be encoded back into their utf8 character: &zslig; into ß 
+            //   → otherwise our XLF export will fail with invalid XML
+            //   → also the browser will convert the &zslig; into ß anyway, so we do this directly on the import
+            // why using this encode(decode) see 
+            //  https://stackoverflow.com/questions/18039765/php-not-have-a-function-for-xml-safe-entity-decode-not-have-some-xml-entity-dec
+            return htmlentities(html_entity_decode($textNode, ENT_HTML5|ENT_QUOTES), ENT_XML1);
+        }
+        // for non XML based formats (for example CSV) all content and its contained entities are displayed to the user as they were in the import file
+        // therefore we have just to encode the < > & characters.
+        // so if the CSV contains &amp; ß < this would be converted to &amp;amp; ß &gt; to be displayed correctly in the browser
+        return htmlentities($textNode, ENT_XML1);
     }
     
     /**

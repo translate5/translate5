@@ -216,7 +216,13 @@ class editor_Workflow_Notification {
             return;
         }
         $suffix = '.xliff';
-        $filename = 'changes-'.date('Y-m-d\TH:i:s');
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            //windows can not deal with the : in the filename
+            $filename = 'changes-'.date('Y-m-d\TH-i-s');
+        } else {
+            //for linux we leave it for compatibility reasons
+            $filename = 'changes-'.date('Y-m-d\TH:i:s');
+        }
         $i = 0;
         $outFile = $path.DIRECTORY_SEPARATOR.$filename.$suffix;
         while(file_exists($outFile)) {

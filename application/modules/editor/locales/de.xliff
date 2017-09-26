@@ -233,7 +233,6 @@
 <trans-unit id='QmVzdGVsbGRhdHVt'><source>Bestelldatum</source><target>Bestelldatum</target></trans-unit>
 <trans-unit id='UXVlbGxzcHJhY2hlIGJlYXJiZWl0YmFy'><source>Quellsprache bearbeitbar</source><target>Quellsprache bearbeitbar</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSBlcnN0ZWxsZW4='><source>Aufgabe erstellen</source><target>Aufgabe erstellen</target></trans-unit>
-<trans-unit id='V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIERhdGVuIChaSVAsIENTVjsgQW5nYWJlIG5vdHdlbmRpZyk='><source>Wählen Sie die zu importierenden Daten (ZIP, CSV; Angabe notwendig)</source><target>Wählen Sie die zu importierenden Daten (ZIP, CSV; Angabe notwendig)</target></trans-unit>
 <trans-unit id='SW1wb3J0ZGF0ZWnCuQ=='><source>Importdatei¹</source><target>Importdatei¹</target></trans-unit>
 <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFpJUCBEYXRlaSE='><source>Bitte verwenden Sie eine ZIP Datei!</source><target>Bitte verwenden Sie eine ZIP Datei!</target></trans-unit>
 <trans-unit id='QXVmdHJhZ3NudW1tZXI='><source>Auftragsnummer</source><target>Auftragsnummer</target></trans-unit>
@@ -567,14 +566,13 @@
 <trans-unit id='dmVyYm90ZW5lIEJlbmVubnVuZw=='><source>verbotene Benennung</source><target>verbotene Benennung</target></trans-unit>
 <trans-unit id='QW5mcmFnZSBrYW5uIG5pY2h0IGFremVwdGllcnQgd2VyZGVuIQ=='><source>Anfrage kann nicht akzeptiert werden!</source><target>Anfrage kann nicht akzeptiert werden!</target></trans-unit>
 <trans-unit id='QXVmZ3J1bmQgZGVyIGxhbmdzYW1lbiBWZXJhcmJlaXR1bmcgdm9uIEphdmFzY3JpcHQgaW0gSW50ZXJuZXQgRXhwbG9yZXIga29ubnRlIGRhcyBTZWdtZW50IG5pY2h0IGtvcnJla3QgZ2VzcGVpY2hlcnQgd2VyZGVuLiBCaXR0ZSDDtmZmbmVuIFNpZSBkYXMgU2VnbWVudCBub2NobWFscyB1bmQgc3BlaWNoZXJuIFNpZSBlcyBlcm5ldXQuIFNvbGx0ZSBkYXMgUHJvYmxlbSBiZXN0ZWhlbiBibGVpYmVuLCBkcsO8Y2tlbiBTaWUgYml0dGUgRjUgdW5kIGJlYXJiZWl0ZW4gZGFubiBkYXMgU2VnbWVudCBlcm5ldXQuIFZpZWxlbiBEYW5rIQ=='><source>Aufgrund der langsamen Verarbeitung von Javascript im Internet Explorer konnte das Segment nicht korrekt gespeichert werden. Bitte öffnen Sie das Segment nochmals und speichern Sie es erneut. Sollte das Problem bestehen bleiben, drücken Sie bitte F5 und bearbeiten dann das Segment erneut. Vielen Dank!</source><target>Aufgrund der langsamen Verarbeitung von Javascript im Internet Explorer konnte das Segment nicht korrekt gespeichert werden. Bitte öffnen Sie das Segment nochmals und speichern Sie es erneut. Sollte das Problem bestehen bleiben, drücken Sie bitte F5 und bearbeiten dann das Segment erneut. Vielen Dank!</target></trans-unit>
-<trans-unit id="V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIERhdGVuIChaSVAsIENTViwgU0RMWExJRkYsIG9wZW5UTTItWExJRkY7IEFuZ2FiZSBub3R3ZW5kaWcp"><source>Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, openTM2-XLIFF; Angabe notwendig)</source><target>Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, openTM2-XLIFF; Angabe notwendig)</target></trans-unit>
+<trans-unit id='V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIERhdGVuIChaSVAsIENTViwgU0RMWExJRkYsIFhMSUZGOyBBbmdhYmUgbm90d2VuZGlnKQ=='><source>Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, XLIFF; Angabe notwendig)</source><target>Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, XLIFF; Angabe notwendig)</target></trans-unit>
 <trans-unit id='SW1wb3J0IERhdGVpwrk='><source>Import Datei¹</source><target>Import Datei¹</target></trans-unit>
-<trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFpJUCwgQ1NWIG9kZXIgU0RMWExJRkYgRGF0ZWkh'><source>Bitte verwenden Sie eine ZIP, CSV oder SDLXLIFF Datei!</source><target>Bitte verwenden Sie eine ZIP, CSV, openTM2-XLIFF oder SDLXLIFF Datei!</target></trans-unit>
+<trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFpJUCwgQ1NWLCBYTElGRiBvZGVyIFNETFhMSUZGIERhdGVpIQ=='><source>Bitte verwenden Sie eine ZIP, CSV, XLIFF oder SDLXLIFF Datei!</source><target>Bitte verwenden Sie eine ZIP, CSV, XLIFF oder SDLXLIFF Datei!</target></trans-unit>
 <trans-unit id='V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIFRCWCBEYXRlbiBmw7xyIGRhcyBUZXJtVGFnZ2luZw=='><source>Wählen Sie die zu importierenden TBX Daten für das TermTagging</source><target>Wählen Sie die zu importierenden TBX Daten für das TermTagging</target></trans-unit>
 <trans-unit id='VEJYIERhdGVpwrI='><source>TBX Datei²</source><target>TBX Datei²</target></trans-unit>
 <trans-unit id='wrIgRWluZSBUQlggRGF0ZWkgaXN0IG9wdGlvbmFsLiBFaW5lIFRCWCBEYXRlaSBpbSBUQlgtQ29yZSBGb3JtYXQgd2lyZCBiZW7DtnRpZ3QgdW0gVGVybWlub2xvZ2llIGF1c3p1emVpY2huZW4u'><source>² Eine TBX Datei ist optional. Eine TBX Datei im TBX-Core Format wird benötigt um Terminologie auszuzeichnen.</source><target>² Eine TBX Datei ist optional. Eine TBX Datei im TBX-Core Format wird benötigt um Terminologie auszuzeichnen.</target></trans-unit>
 <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRCWCBEYXRlaSE='><source>Bitte verwenden Sie eine TBX Datei!</source><target>Bitte verwenden Sie eine TBX Datei!</target></trans-unit>
-<trans-unit id="PGIgc3R5bGU9ImNvbG9yOiNmZjAwMDA7Ij5OZXU6PC9iPiBTaWUga8O2bm5lbiBudW4gbmViZW4gWklQIGF1Y2ggZGlyZWt0IFNETFhMSUZGLCBvcGVuVE0yLVhMSUZGIG9kZXIgQ1NWIERhdGVpZW4gYmVudXR6ZW4hIDxhIHRhcmdldD0iX2JsYW5rIiBocmVmPSJ7MH0vaW5kZXgvdXNhZ2Ujc2luZ2xlLWltcG9ydCI+TWVociBJbmZvPC9hPi4="><source><b style="color:#ff0000;">Neu:</b> Sie können nun neben ZIP auch direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage#single-import">Mehr Info</a>.</source><target><b style="color:#ff0000;">Neu:</b> Sie können nun neben ZIP auch direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage#single-import">Mehr Info</a>.</target></trans-unit>
 <trans-unit id='wrIgc2VwYXJhdGUgVEJYIG51ciBiZWltIEltcG9ydCBlaW5lciBTRExYTElGRiBEYXRlaSBtw7ZnbGljaC4='><source>² separate TBX nur beim Import einer SDLXLIFF Datei möglich.</source><target>² separate TBX nur beim Import einer SDLXLIFF Datei möglich.</target></trans-unit>
 <trans-unit id='U3RhbmRhcmQgQWJsYXVmcGxhbg=='><source>Standard Ablaufplan</source><target>Standard Ablaufplan</target></trans-unit>
 <trans-unit id='VGVzdCBXb3JrZmxvdw=='><source>Test Workflow</source><target>Test Workflow</target></trans-unit>
@@ -915,29 +913,100 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <b
 <trans-unit id='QnVnZml4'><source>Bugfix</source><target>Bugfix</target></trans-unit>
 <trans-unit id='RmVhdHVyZQ=='><source>Feature</source><target>Feature</target></trans-unit>
 <trans-unit id='Q2hhbmdl'><source>Change</source><target>Change</target></trans-unit>
-<trans-unit id='U2llIGvDtm5uZW4gbmViZW4gdW5zZXJlbSBaSVAtQ29udGFpbmVyLUZvcm1hdCBhdWNoIGRpcmVrdCBTRExYTElGRiwgb3BlblRNMi1YTElGRiBvZGVyIENTViBEYXRlaWVuIGJlbnV0emVuLiA8YSB0YXJnZXQ9Il9ibGFuayIgaHJlZj0iaHR0cDovL2NvbmZsdWVuY2UudHJhbnNsYXRlNS5uZXQvZGlzcGxheS9CVVMvQmFzaWMrdXNhZ2UiPk1laHIgSW5mbzwvYT4u'><source>Sie können neben unserem ZIP-Container-Format auch direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">Mehr Info</a>.</source><target>Sie können neben unserem ZIP-Container-Format auch direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">Mehr Info</a>.</target></trans-unit>
+<trans-unit id='U2llIGvDtm5uZW4gbmViZW4gdW5zZXJlbSBaSVAtQ29udGFpbmVyLUZvcm1hdCBhdWNoIGRpcmVrdCBTRExYTElGRiwgWExJRkYgb2RlciBDU1YgRGF0ZWllbiBiZW51dHplbi4gPGEgdGFyZ2V0PSJfYmxhbmsiIGhyZWY9Imh0dHA6Ly9jb25mbHVlbmNlLnRyYW5zbGF0ZTUubmV0L2Rpc3BsYXkvQlVTL0Jhc2ljK3VzYWdlIj5NZWhyIEluZm88L2E+Lg=='><source>Sie können neben unserem ZIP-Container-Format auch direkt SDLXLIFF, XLIFF oder CSV Dateien benutzen. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">Mehr Info</a>.</source><target>Sie können neben unserem ZIP-Container-Format auch direkt SDLXLIFF, XLIFF oder CSV Dateien benutzen. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">Mehr Info</a>.</target></trans-unit>
 <trans-unit id='RXJnb25vbWljIChBbnNpY2h0KQ=='><source>Ergonomic (Ansicht)</source><target>Ergonomic (Ansicht)</target></trans-unit>
 <trans-unit id='IFRlc3Q='><source> Test</source><target> Test</target></trans-unit>
 <trans-unit id='TVFN'><source>MQM</source><target>MQM</target></trans-unit>
 <trans-unit id='TVFNIFN0YXRpc3Rpaw=='><source>MQM Statistik</source><target>MQM Statistik</target></trans-unit>
 <trans-unit id='VGFzdGF0dXJrw7xyemVsIG5hY2hzY2hsYWdlbg=='><source>Tastaturkürzel nachschlagen</source><target>Tastaturkürzel nachschlagen</target></trans-unit>
 <trans-unit id='WmllbHRleHQgKHp1ciBJbXBvcnR6ZWl0KQ=='><source>Zieltext (zur Importzeit)</source><target>Zieltext (zur Importzeit)</target></trans-unit>
-<trans-unit id='U1RSRyArIEVJTkZHIGtvcGllcnQgZGVuIGtvbXBsZXR0ZW4gUXVlbGx0ZXh0IGluIGRlbiBaaWVsdGV4dDxiciAvPlNUUkcgKyAsIChLb21tYSkgKyAmZ3Q7TnVtbWVyJmx0OyBrb3BpZXJ0IGRlbiBlbnRzcHJlY2hlbmRlbiBUYWcgaW4gZGVuIFppZWx0ZXh0IChOdWxsIGVudHNwcmljaHQgVGFnIE5yLiAxMCk8YnIgLz5TVFJHICsgU0hJRlQgKyAsIChLb21tYSkgKyAmZ3Q7TnVtbWVyJmx0OyBrb3BpZXJ0IGRpZSBUYWdzIG1pdCBkZW4gTnVtbWVybiAxMSBiaXMgMjAgaW4gZGVuIFppZWx0ZXh0Lg=='>
-    <source>STRG + EINFG kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</source>
-    <target>STRG + EINFG kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</target>
-</trans-unit>
-<trans-unit id='TGVlcmUgWmllbHNwcmFjaGVuLiBXYWhyIHdlbm4gYmVpbSBJbXBvcnQgYWxsZSB6aWVsc3ByYWNobGljaGVuIEZlbGRlciBsZWVyIHNpbmQu'>
-    <source>Leere Zielsprachen. Wahr wenn beim Import alle zielsprachlichen Felder leer sind.</source>
-    <target>Leere Zielsprachen. Wahr wenn beim Import alle zielsprachlichen Felder leer sind.</target>
-</trans-unit>
-<trans-unit id='TGVlcmUgWmllbHNwcmFjaGVu'>
-    <source>Leere Zielsprachen</source>
-    <target>Leere Zielsprachen</target>
-</trans-unit>
-<trans-unit id='QXVzIGRlbSBTZWdtZW50IHd1cmRlbiBuaWNodCBkYXJzdGVsbGJhcmUgWmVpY2hlbiBlbnRmZXJudCAobWVocmVyZSBMZWVyemVpY2hlbiwgVGFidWxhdG9yZW4sIFplaWxlbnVtYnLDvGNoZSBldGMuKSE='>
-    <source>Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!</source>
-    <target>Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!</target>
-</trans-unit>
+<trans-unit id='U1RSRyArIEVJTkZHIGtvcGllcnQgZGVuIGtvbXBsZXR0ZW4gUXVlbGx0ZXh0IGluIGRlbiBaaWVsdGV4dDxiciAvPlNUUkcgKyAsIChLb21tYSkgKyAmZ3Q7TnVtbWVyJmx0OyBrb3BpZXJ0IGRlbiBlbnRzcHJlY2hlbmRlbiBUYWcgaW4gZGVuIFppZWx0ZXh0IChOdWxsIGVudHNwcmljaHQgVGFnIE5yLiAxMCk8YnIgLz5TVFJHICsgU0hJRlQgKyAsIChLb21tYSkgKyAmZ3Q7TnVtbWVyJmx0OyBrb3BpZXJ0IGRpZSBUYWdzIG1pdCBkZW4gTnVtbWVybiAxMSBiaXMgMjAgaW4gZGVuIFppZWx0ZXh0Lg=='><source>STRG + EINFG kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</source><target>STRG + EINFG kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</target></trans-unit>
+<trans-unit id='w5xiZXJzZXR6dW5nc2F1ZmdhYmUgLSBhbGxlIHppZWxzcHJhY2hsaWNoZW4gU2VnbWVudGUgYmVpbSBJbXBvcnQgbGVlciAobmljaHQgYW5nZWhha3QgYmVkZXV0ZXQgUmV2aWV3YXVmZ2FiZSku'><source>Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe).</source><target>Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe).</target></trans-unit>
+<trans-unit id='w5xiZXJzZXR6dW5nc2F1ZmdhYmUgKGtlaW4gUmV2aWV3KQ=='><source>Übersetzungsaufgabe (kein Review)</source><target>Übersetzungsaufgabe (kein Review)</target></trans-unit>
+<trans-unit id='QXVzIGRlbSBTZWdtZW50IHd1cmRlbiBuaWNodCBkYXJzdGVsbGJhcmUgWmVpY2hlbiBlbnRmZXJudCAobWVocmVyZSBMZWVyemVpY2hlbiwgVGFidWxhdG9yZW4sIFplaWxlbnVtYnLDvGNoZSBldGMuKSE='><source>Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!</source><target>Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!</target></trans-unit>
+<trans-unit id='UU0gU3Vic2VnbWVudCBTdGF0aXN0aWs='><source>QM Subsegment Statistik</source><target>QM Subsegment Statistik</target></trans-unit>
+<trans-unit id='U1RSRyArIEVJTkZHIChhbHRlcm5hdGl2IFNUUkcgKyAuIChQdW5rdCkpIGtvcGllcnQgZGVuIGtvbXBsZXR0ZW4gUXVlbGx0ZXh0IGluIGRlbiBaaWVsdGV4dDxiciAvPlNUUkcgKyAsIChLb21tYSkgKyAmZ3Q7TnVtbWVyJmx0OyBrb3BpZXJ0IGRlbiBlbnRzcHJlY2hlbmRlbiBUYWcgaW4gZGVuIFppZWx0ZXh0IChOdWxsIGVudHNwcmljaHQgVGFnIE5yLiAxMCk8YnIgLz5TVFJHICsgU0hJRlQgKyAsIChLb21tYSkgKyAmZ3Q7TnVtbWVyJmx0OyBrb3BpZXJ0IGRpZSBUYWdzIG1pdCBkZW4gTnVtbWVybiAxMSBiaXMgMjAgaW4gZGVuIFppZWx0ZXh0Lg=='><source>STRG + EINFG (alternativ STRG + . (Punkt)) kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</source><target>STRG + EINFG (alternativ STRG + . (Punkt)) kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</target></trans-unit>
+<trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgZnJlaWdlZ2ViZW4='><source>Translate5 - Aufgabe freigegeben</source><target>Translate5 - Aufgabe freigegeben</target></trans-unit>
+<trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgYXV0b21hdGlzY2ggYWJnZXNjaGxvc3Nlbg=='><source>Translate5 - Aufgabe automatisch abgeschlossen</source><target>Translate5 - Aufgabe automatisch abgeschlossen</target></trans-unit>
+<trans-unit id='SW0gUHJvamVrdHBvcnRhbCBUcmFuc2xhdGU1IHd1cmRlIGRpZSBBdWZnYWJlIDxiPiUxJHMgLSAlMiRzPC9iPiBhdWZncnVuZCBlaW5lciBUZXJtaW7DvGJlcnNjaHJlaXR1bmcgYXV0b21hdGlzY2ggZsO8ciBhbGxlIEJlbnV0emVyIGRlciBSb2xsZSA8aT4lMyRzPC9pPiBhYmdlc2NobG9zc2VuLjxiciAvPg=='><source>Im Projektportal Translate5 wurde die Aufgabe <b>%1$s - %2$s</b> aufgrund einer Terminüberschreitung automatisch für alle Benutzer der Rolle <i>%3$s</i> abgeschlossen.<br /></source><target>Im Projektportal Translate5 wurde die Aufgabe <b>%1$s - %2$s</b> aufgrund einer Terminüberschreitung automatisch für alle Benutzer der Rolle <i>%3$s</i> abgeschlossen.<br /></target></trans-unit>
+<trans-unit id='JTEkcyAlMiRzLAoKSW0gUHJvamVrdHBvcnRhbCBUcmFuc2xhdGU1IHd1cmRlIGRpZSBBdWZnYWJlICU1JHMgLSAlNiRzIGbDvHIgU2llIGZyZWlnZWdlYmVuLgoKU2llIGVycmVpY2hlbiBkYXMgUG9ydGFsIHVudGVyOiAlMyRzCgpWaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKSWhyIFByb2pla3RtYW5hZ2VtZW50IFRlYW0KJTckcwoKRGllc2UgRW1haWwgd3VyZGUgYXV0b21hdGlzY2ggZ2VuZXJpZXJ0LiBCaXR0ZSBhbnR3b3J0ZW4gU2llIG5pY2h0IGF1ZiBkaWVzZSBFLU1haWwh'><source>%1$s %2$s,
+
+Im Projektportal Translate5 wurde die Aufgabe %5$s - %6$s für Sie freigegeben.
+
+Sie erreichen das Portal unter: %3$s
+
+Vielen Dank und viele Grüße,
+Ihr Projektmanagement Team
+%7$s
+
+Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source><target>%1$s %2$s,
+
+Im Projektportal Translate5 wurde die Aufgabe %5$s - %6$s für Sie freigegeben.
+
+Sie erreichen das Portal unter: %3$s
+
+Vielen Dank und viele Grüße,
+Ihr Projektmanagement Team
+%7$s
+
+Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</target></trans-unit>
+<trans-unit id='JTEkcyAlMiRzLDxiciAvPgo8YnIgLz4KSW0gUHJvamVrdHBvcnRhbCBUcmFuc2xhdGU1IHd1cmRlIGRpZSBBdWZnYWJlIDxiPiU1JHMgLSAlNiRzPC9iPiBmw7xyIFNpZSBmcmVpZ2VnZWJlbi48YnIgLz4KPGJyIC8+CkltIGZvbGdlbmRlbiBkaWUgZ2V0w6R0aWd0ZW4gw4RuZGVydW5nZW4gZGVyIHZvcmhlcmdlaGVuZGVuIExla3RvcmVuOjxiciAvPgolNCRzCjxociAvPgo8YnIgLz4KPGJyIC8+ClNpZSBlcnJlaWNoZW4gZGFzIFBvcnRhbCB1bnRlcjogJTMkczxiciAvPgo8YnIgLz4KPGJyIC8+VmllbGVuIERhbmsgdW5kIHZpZWxlIEdyw7zDn2UsCjxiciAvPklociBQcm9qZWt0bWFuYWdlbWVudCBUZWFtCjxiciAvPiU3JHMKPGJyIC8+CjxiciAvPkRpZXNlIEVtYWlsIHd1cmRlIGF1dG9tYXRpc2NoIGdlbmVyaWVydC4gQml0dGUgYW50d29ydGVuIFNpZSBuaWNodCBhdWYgZGllc2UgRS1NYWlsIQ=='><source>%1$s %2$s,<br />
+<br />
+Im Projektportal Translate5 wurde die Aufgabe <b>%5$s - %6$s</b> für Sie freigegeben.<br />
+<br />
+Im folgenden die getätigten Änderungen der vorhergehenden Lektoren:<br />
+%4$s
+<hr />
+<br />
+<br />
+Sie erreichen das Portal unter: %3$s<br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%7$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source><target>%1$s %2$s,<br />
+<br />
+Im Projektportal Translate5 wurde die Aufgabe <b>%5$s - %6$s</b> für Sie freigegeben.<br />
+<br />
+Im folgenden die getätigten Änderungen der vorhergehenden Lektoren:<br />
+%4$s
+<hr />
+<br />
+<br />
+Sie erreichen das Portal unter: %3$s<br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%7$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</target></trans-unit>
+<trans-unit id='RGllIFJvbGxlIDxpPiUxJHM8L2k+IHdhciBuaWNodCBUZWlsIGRlciBXb3JrZmxvd2tldHRlLCBkYWhlciB3dXJkZW4ga2VpbmUgQmVudXR6ZXIgYmVuYWNocmljaHRpZ3QuPGJyIC8+XG48YnIgLz5cbg=='><source>Die Rolle <i>%1$s</i> war nicht Teil der Workflowkette, daher wurden keine Benutzer benachrichtigt.<br />\n<br />\n</source><target>Die Rolle <i>%1$s</i> war nicht Teil der Workflowkette, daher wurden keine Benutzer benachrichtigt.<br />\n<br />\n</target></trans-unit>
+<trans-unit id='VGFyZ2V0IHRleHQ='><source>Target text</source><target>Target text</target></trans-unit>
+<trans-unit id='JyV2YWx1ZSUnIGlzdCBrZWluZSBHVUlE'><source>'%value%' ist keine GUID</source><target>'%value%' ist keine GUID</target></trans-unit>
+<trans-unit id='VmVyc2NoaWViYmFyZXIgRWRpdG9yIHVuZCBoaWxmcmVpY2hlIFRhc3RhdHVya8O8cnplbA=='><source>Verschiebbarer Editor und hilfreiche Tastaturkürzel</source><target>Verschiebbarer Editor und hilfreiche Tastaturkürzel</target></trans-unit>
+<trans-unit id='QXVmZ2FiZSAiezB9IiBiZXJlaXQu'><source>Aufgabe "{0}" bereit.</source><target>Aufgabe "{0}" bereit.</target></trans-unit>
+<trans-unit id='RGF0ZWllbiB3ZXJkZW4gaG9jaGdlbGFkZW4='><source>Dateien werden hochgeladen</source><target>Dateien werden hochgeladen</target></trans-unit>
+<trans-unit id='SG9jaGxhZGVuIGJlZW5kZXQuIEltcG9ydCB1bmQgVm9yYmVyZWl0dW5nIGxhdWZlbi4='><source>Hochladen beendet. Import und Vorbereitung laufen.</source><target>Hochladen beendet. Import und Vorbereitung laufen.</target></trans-unit>
+<trans-unit id='QXVmZ2FiZSBJbXBvcnRpZXJlbg=='><source>Aufgabe Importieren</source><target>Aufgabe Importieren</target></trans-unit>
+<trans-unit id='SW1wb3J0aWVyZW4gKHdlaXRlcmUgw7xiZXJzcHJpbmdlbik='><source>Importieren (weitere überspringen)</source><target>Importieren (weitere überspringen)</target></trans-unit>
+<trans-unit id='V2VpdGVy'><source>Weiter</source><target>Weiter</target></trans-unit>
+<trans-unit id='U3RhdHVzICJ7MH0iIGR1cmNoIGVpbmVuIGFuZGVyZW4gQmVudXR6ZXI='><source>Status "{0}" durch einen anderen Benutzer</source><target>Status "{0}" durch einen anderen Benutzer</target></trans-unit>
+<trans-unit id='QXVmZ2FiZW4gcmVpbXBvcnRpZXJlbg=='><source>Aufgaben reimportieren</source><target>Aufgaben reimportieren</target></trans-unit>
+<trans-unit id='QXVzZ2V3w6RobHRlIEF1ZmdhYmVuIGVybmV1dCBpbnMgYWt0dWVsbGUgVE0gaW1wb3J0aWVyZW4='><source>Ausgewählte Aufgaben erneut ins aktuelle TM importieren</source><target>Ausgewählte Aufgaben erneut ins aktuelle TM importieren</target></trans-unit>
+<trans-unit id='R2xvYmFsZXNlIFZvcsO8YmVyc2V0enVuZyDDvGJlcnNwcmluZ2Vu'><source>Globalese Vorübersetzung überspringen</source><target>Globalese Vorübersetzung überspringen</target></trans-unit>
+<trans-unit id='R2xvYmFsZXNlIEJlbnV0emVy'><source>Globalese Benutzer</source><target>Globalese Benutzer</target></trans-unit>
+<trans-unit id='R2xvYmFsZXNlIEF1dGhlbnRpZml6aWVydW5n'><source>Globalese Authentifizierung</source><target>Globalese Authentifizierung</target></trans-unit>
+<trans-unit id='QVBJIFNjaGzDvHNzZWw='><source>API Schlüssel</source><target>API Schlüssel</target></trans-unit>
+<trans-unit id='R2xvYmFsZXNlIEVpbnN0ZWxsdW5nZW4='><source>Globalese Einstellungen</source><target>Globalese Einstellungen</target></trans-unit>
+<trans-unit id='SW1wb3J0aWVyZW4='><source>Importieren</source><target>Importieren</target></trans-unit>
+<trans-unit id='R2xvYmFsZXNlIEJlbnV0emVyZ3J1cHBl'><source>Globalese Benutzergruppe</source><target>Globalese Benutzergruppe</target></trans-unit>
+<trans-unit id='R2xvYmFsZXNlIGVuZ2luZQ=='><source>Globalese engine</source><target>Globalese engine</target></trans-unit>
+<trans-unit id='Qml0dGUgd8OkaGxlbg=='><source>Bitte wählen</source><target>Bitte wählen</target></trans-unit>
+<trans-unit id='S2VpbmUgR2xvYmFsZXNlIMOcYmVyc2V0enVuZ3MtRW5naW5lIHZlcmbDvGdiYXIgKGbDvHIgSWhyZW4gR2xvYmFsZXNlIEJlbnV0emVyIHVuZCBJaHJlIFNwcmFjaGtvbWJpbmF0aW9uKS4gQml0dGUgw6RuZGVybiBTaWUgZGVuIEJlbnV0emVyIG9kZXIgw7xiZXJzcHJpbmdlbiBTaWUgZGllIFZvcsO8YmVyc2V0enVuZy4='><source>Keine Globalese Übersetzungs-Engine verfügbar (für Ihren Globalese Benutzer und Ihre Sprachkombination). Bitte ändern Sie den Benutzer oder überspringen Sie die Vorübersetzung.</source><target>Keine Globalese Übersetzungs-Engine verfügbar (für Ihren Globalese Benutzer und Ihre Sprachkombination). Bitte ändern Sie den Benutzer oder überspringen Sie die Vorübersetzung.</target></trans-unit>
+<trans-unit id='S2VpbmUgR2xvYmFsZXNlIEJlbnV0emVyZ3J1cHBlIHZlcmbDvGdiYXIgKGbDvHIgSWhyZW4gR2xvYmFsZXNlIEJlbnV0emVyIHVuZCBJaHJlIFNwcmFjaGtvbWJpbmF0aW9uKS4gQml0dGUgw6RuZGVybiBTaWUgZGVuIEJlbnV0emVyIG9kZXIgw7xiZXJzcHJpbmdlbiBTaWUgZGllIFZvcsO8YmVyc2V0enVuZy4='><source>Keine Globalese Benutzergruppe verfügbar (für Ihren Globalese Benutzer und Ihre Sprachkombination). Bitte ändern Sie den Benutzer oder überspringen Sie die Vorübersetzung.</source><target>Keine Globalese Benutzergruppe verfügbar (für Ihren Globalese Benutzer und Ihre Sprachkombination). Bitte ändern Sie den Benutzer oder überspringen Sie die Vorübersetzung.</target></trans-unit>
+<trans-unit id='QmVudXR6ZXIgb2RlciBQYXNzd29ydCBzaW5kIG5pY2h0IHZhbGlkZS4='><source>Benutzer oder Passwort sind nicht valide.</source><target>Benutzer oder Passwort sind nicht valide.</target></trans-unit>
+<trans-unit id='TGFkZW4='><source>Laden</source><target>Laden</target></trans-unit>
   </body>
  </file>
 </xliff>

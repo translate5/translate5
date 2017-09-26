@@ -287,8 +287,6 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
             ));
         $r->addRoute('plugins_matchresource_search', $queryRoute);
         
-        
-        
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/plugins_matchresource_tmmt/:id/import',
             array(
@@ -297,5 +295,14 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
                 'action' => 'import'
             ));
         $r->addRoute('plugins_matchresource_import', $queryRoute);
+        
+        $queryRoute = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_matchresource_tmmt/:id/tasks',
+            array(
+                'module' => 'editor',
+                'controller' => 'plugins_matchresource_tmmt',
+                'action' => 'tasks'
+            ));
+        $r->addRoute('plugins_matchresource_tasks', $queryRoute);
     }
 }

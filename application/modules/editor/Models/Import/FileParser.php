@@ -137,7 +137,7 @@ abstract class editor_Models_Import_FileParser {
         $this->_taskGuid = $task->getTaskGuid();
         $this->autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         $this->matchRateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
-        $this->handleEncoding();
+        $this->updateFile();
     }
     
     /**
@@ -319,24 +319,28 @@ abstract class editor_Models_Import_FileParser {
      * - only saves encoding for formats listed in this->_convert2utf8
      * @triggers error if encoding could not be detected; in this case does not save anything to db
      */
-    protected function handleEncoding() {
+    protected function updateFile() {
+        $file = ZfExtended_Factory::get('editor_Models_File');
+        /* @var $file editor_Models_File */
+        $file->load($this->_fileId);
+        $file->setFileParser(get_class($this));
+        
         $convert = false;
         foreach ($this->_convert2utf8 as $format){
             if(preg_match('"\.'.$format.'$"i', $this->_fileName)===1){
                 $convert = TRUE;
             }
         }
-        if(!$convert)return;
-        $enc = $this->checkAndConvert2utf8();
-        if(!$enc){
-            trigger_error('The encoding of the file "'.
-                    $this->_fileName.
-                    '" is none of the encodings utf-8, iso-8859-1 and win-1252.',
-                    E_USER_ERROR);
+        if($convert) {
+            $enc = $this->checkAndConvert2utf8();
+            if(!$enc){
+                trigger_error('The encoding of the file "'.
+                        $this->_fileName.
+                        '" is none of the encodings utf-8, iso-8859-1 and win-1252.',
+                        E_USER_ERROR);
+            }
+            $file->setEncoding($enc);
         }
-        $file = ZfExtended_Factory::get('editor_Models_File');
-        $file->load($this->_fileId);
-        $file->setEncoding($enc);
         $file->save();
     }
 
@@ -462,5 +466,45 @@ abstract class editor_Models_Import_FileParser {
      */
     public function & getFieldContents() {
         return $this->segmentData;
+    }
+    
+    /**
+     * returns the file extensions (in lower case) parsable by this fileparser
+     * @return array;
+     */
+    public static function getFileExtensions() {
+        throw new ZfExtended_Exception('Method must be overwritten in subclass!'); //with strict standards statics may not abstract!
+    }
+    
+    /**
+     * Gets a mapping of file extensions to possible fileparsers 
+     * @return array
+     */
+    public static function getAllFileParsersMap() {
+        $d = dir(str_replace('.php', '', __FILE__));
+        $fileParsers = [];
+        while (false !== ($entry = $d->read())) {
+            if(strpos(strrev($entry), 'php.') !== 0) {
+                continue;
+            }
+            $cls = 'editor_Models_Import_FileParser_'.str_replace('.php', '', $entry);
+            //the class_exists triggers the autoload of the class
+            if(class_exists($cls) && is_subclass_of($cls, 'editor_Models_Import_FileParser')) {
+                $extensions = $cls::getFileExtensions();
+                foreach($extensions as $extension) {
+                    $fileParsers[$extension] = $cls;
+                }
+            }
+        }
+        $d->close();
+        return $fileParsers;
+    }
+    
+    /**
+     * returns the mimetypes valid for that fileparser
+     * @return string[]
+     */
+    public static function getValidMimeTypes() {
+        return ['application/xml'];
     }
 }

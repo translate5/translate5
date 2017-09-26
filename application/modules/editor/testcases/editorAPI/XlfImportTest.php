@@ -67,18 +67,107 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
     /**
      * Testing segment values directly after import
      */
-    public function testBasicSegmentValuesAfterImport() {
+    public function testSegmentValuesAfterImport() {
         
         //FIXME: This test is to be considered incomplete!!!
         // it must be continued on continuing the XLF import. 
         
         //FIXME get task and test wordcount!!!
-        //get segment list
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        //get segment list (just the ones of the first file for that tests)
+        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=41');
         
         $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
         //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/XlfImportTest/expectedSegments-new.json", json_encode($data,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent('expectedSegments.json'), $data, 'Imported segments are not as expected!');
+    }
+    
+    /**
+     * Tests if whitespace is preserved correctly, according to the XLIFF specification.
+     * Needs $this->config->runtimeOptions->import->xlf->preserveWhitespace to be false!
+     */
+    public function testPreserveWhitespace() {
+        $segments = $this->api()->requestJson('editor/segment?start=41&limit=200');
+        $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
+        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/XlfImportTest/expectedSegmentsPreserveWhitespace-new.json", json_encode($data,JSON_PRETTY_PRINT));
+        $this->assertEquals(self::$api->getFileContent('expectedSegmentsPreserveWhitespace.json'), $data, 'Imported segments are not as expected!');
+    }
+    
+    /**
+     * @depends testSegmentValuesAfterImport
+     * @depends testPreserveWhitespace
+     */
+    public function testSegmentEditing() {
+        //get segment list (just the ones of the first file for that tests)
+        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=41');
+        require_once 'Models/Segment/InternalTag.php';
+
+        foreach($segments as $idx => $segToEdit) {
+            if(empty($segToEdit->editable)) {
+                continue;
+            }
+            if(empty($segToEdit->targetEdit)) {
+                $contentToUse = $segToEdit->source;
+            }
+            else {
+                $contentToUse = $segToEdit->targetEdit;
+            }
+            //in the segments 34 and 39 the tags are swapping position
+            if($segToEdit->segmentNrInTask == "34" || $segToEdit->segmentNrInTask == "39") {
+                $tagger = new editor_Models_Segment_InternalTag();
+                $editedData = $contentToUse.' - edited'.$segToEdit->segmentNrInTask;
+                $found = [];
+                //replace all tags with a placeholder
+                $editedData = $tagger->replace($editedData, function($matches) use (&$found) {
+                    $idx = count($found);
+                    $key = '<splitter id="'.$idx.'">';
+                    $found[$key] = $matches[0];
+                    return $key;
+                });
+                //replace the placeholder back to the original tag, but swap positions before, by reversing the array:
+                $editedData = str_replace(array_keys($found), array_reverse(array_values($found)), $editedData);
+            }
+            else {
+                $editedData = $contentToUse.' - edited'.$segToEdit->segmentNrInTask;
+            }
+            $segmentData = $this->api()->prepareSegmentPut('targetEdit', $editedData, $segToEdit->id);
+            $this->api()->requestJson('editor/segment/'.$segToEdit->id, 'PUT', $segmentData);
+        }
+        
+        $task = $this->api()->getTask();
+        //start task export 
+        $this->checkExport($task, 'editor/task/export/id/'.$task->id, 'ibm-opentm2-export-normal.xlf');
+        //start task export with diff
+        // diff export will be disabled for XLF!
+    }
+    
+    /**
+     * tests the export results
+     * @param stdClass $task
+     * @param string $exportUrl
+     * @param string $fileToCompare
+     */
+    protected function checkExport(stdClass $task, $exportUrl, $fileToCompare) {
+        $this->api()->login('testmanager');
+        $this->api()->request($exportUrl);
+
+        //get the exported file content
+        $path = $this->api()->getTaskDataDirectory();
+        $pathToZip = $path.'export.zip';
+        $this->assertFileExists($pathToZip);
+        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/ibm-opentm2.xlf');
+        //compare it
+        $expectedResult = $this->api()->getFileContent($fileToCompare);
+        //file_put_contents('/home/tlauria/foo1.xlf', rtrim($expectedResult));
+        //file_put_contents('/home/tlauria/foo2.xlf', rtrim($exportedFile));
+        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to '.$fileToCompare);
+    }
+    
+    /**
+     * Is incomplete since we could not change the import->xlf->preserveWhitespace config from inside the test
+     * Needs task templates therefore
+     */
+    public function testPreserveAllWhitespace() {
+        $this->markTestIncomplete('Could not be tested due missing task template functionality to set the preserve config to true.');
     }
     
     public static function tearDownAfterClass() {

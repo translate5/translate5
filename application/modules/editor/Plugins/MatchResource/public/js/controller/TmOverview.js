@@ -44,7 +44,8 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
         'Editor.plugins.MatchResource.view.TmOverviewPanel',
         'Editor.plugins.MatchResource.view.AddTmWindow',
         'Editor.plugins.MatchResource.view.ImportTmWindow',
-        'Editor.plugins.MatchResource.view.EditTmWindow'
+        'Editor.plugins.MatchResource.view.EditTmWindow',
+        'Editor.plugins.MatchResource.view.TaskGridWindow'
     ],
     models: ['Editor.model.admin.Task', 'Editor.plugins.MatchResource.model.Resource','Editor.plugins.MatchResource.model.TmMt'],
     stores:['Editor.plugins.MatchResource.store.Resources','Editor.plugins.MatchResource.store.TmMts'],
@@ -363,6 +364,11 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
         win.loadRecord(rec);
         win.show();
     },
+    handleShowTasks: function(view, cell, cellIdx, rec){
+        var win = Ext.widget('matchResourceTaskGridWindow');
+        win.loadRecord(rec);
+        win.show();
+    },
     handleImportTm : function(view, cell, cellIdx, rec){
         var win = Ext.widget('importTmWindow');
         win.loadRecord(rec);
@@ -377,6 +383,9 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
         switch(f && f[1] || '') {
             case 'edit':
                 me.handleEditTm(view,cell,col,record);
+                break;
+            case 'tasks':
+                me.handleShowTasks(view,cell,col,record);
                 break;
             case 'import':
                 me.handleImportTm(view,cell,col,record);

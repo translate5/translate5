@@ -182,6 +182,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         /* @var $log ZfExtended_Log */
         $msg = 'MatchResource Plugin - could not save segment to TM'." TMMT: \n";
         $data  = print_r($this->tmmt->getDataObject(),1);
+        $data .= " \nSegment\n".print_r($segment->getDataObject(),1);
         $data .= " \nError\n".print_r($errors,1);
         $log->logError($msg, $data);
     }

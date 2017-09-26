@@ -47,6 +47,8 @@ class editor_Models_Import_DirectoryParser_ReferenceFiles extends editor_Models_
      */
     protected $_importExtensionList = array();
 
+    protected $exceptionOnNoFilesFound = false;
+    
     /**
      * Adds reference file specific infos to the tree node 
      * @param string $filename

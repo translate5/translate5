@@ -37,9 +37,6 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Import_UploadProcessor {
     const TYPE_ZIP = 'zip';
-    const TYPE_SDLXLIFF = 'sdlxliff';
-    const TYPE_XLF = 'xlf';
-    const TYPE_CSV = 'csv';
     const TYPE_TESTCASE = 'testcase';
     
     /**
@@ -49,10 +46,7 @@ class editor_Models_Import_UploadProcessor {
      */
     protected $validUploadTypes = array(
         self::TYPE_ZIP => array('application/zip'),
-        self::TYPE_SDLXLIFF => array('application/xml'),
-        self::TYPE_XLF => array('application/xml'),
         self::TYPE_TESTCASE => array('application/xml'),
-        self::TYPE_CSV => array('text/plain','application/xml','text/html'),//this is due to the fact, that csv-files may contain html or xml fragments. In these cases the php-mime-type extension may recognize them as such.
     );
     
     /**
@@ -101,6 +95,13 @@ class editor_Models_Import_UploadProcessor {
         $ext = strtolower($importName['extension']);
         $mime = $finfo->file($importFile);
 
+        $allValidExtensions = editor_Models_Import_FileParser::getAllFileParsersMap();
+        if(!empty($allValidExtensions[$ext])) {
+            $fileParserClass = $allValidExtensions[$ext];
+            //add the mimetypes of a valid fileparser to that extension to the validation array 
+            $this->validUploadTypes[$ext] = $fileParserClass::getValidMimeTypes();
+        }
+        
         foreach ($this->validUploadTypes[$ext] as $type) {
             if($mime == $type) {
                 return $ext;
@@ -131,12 +132,6 @@ class editor_Models_Import_UploadProcessor {
                 $dp = 'editor_Models_Import_DataProvider_Zip';
                 $args = array($importInfo['importUpload']['tmp_name']);
             break;
-            case self::TYPE_SDLXLIFF:
-            case self::TYPE_CSV:
-            case self::TYPE_XLF:
-                $dp = 'editor_Models_Import_DataProvider_SingleUploads';
-                $args = $this->handleSingleUpload($importInfo);
-            break;
             case self::TYPE_TESTCASE:
                 $dp = 'editor_Models_Import_DataProvider_SingleUploads';
                 $args = array(
@@ -160,8 +155,10 @@ class editor_Models_Import_UploadProcessor {
                     $args = $this->handleSingleUpload($importInfo);
                 }
             break;
-            
-            
+            default:
+                $dp = 'editor_Models_Import_DataProvider_SingleUploads';
+                $args = $this->handleSingleUpload($importInfo);
+            break;
         }
         $this->dataProvider = ZfExtended_Factory::get($dp, $args);
     }

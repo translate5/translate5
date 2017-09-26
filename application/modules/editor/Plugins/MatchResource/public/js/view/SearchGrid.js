@@ -91,6 +91,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
     initConfig: function(instanceConfig) {
         var me = this,
             config = null,
+            segField = Editor.model.segment.Field,
             searchItems = [];
 
         me.assocStore = instanceConfig.assocStore;
@@ -112,14 +113,14 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
                     sortable: false,
                     flex: 2,
                     dataIndex: 'source',
-                    tdCls: 'segment-tag-column source',
+                    tdCls: 'segment-tag-column source'+segField.getDirectionCls('source'),
                     cellWrap: true,
                     text: me.strings.source
                 },{
                     xtype: 'gridcolumn',
                     flex: 2,
                     dataIndex: 'target',
-                    tdCls: 'segment-tag-column target',
+                    tdCls: 'segment-tag-column target'+segField.getDirectionCls('target'),
                     hideable: false,
                     sortable: false,
                     cellWrap: true,
