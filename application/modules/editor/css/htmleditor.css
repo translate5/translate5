@@ -44,3 +44,5 @@ body.fakedsel strong, body.fakedsel b {font-weight:normal;background:#b0b0b0;}
 /* ChangeMarkup */
 ins {background-color: #E5FFAC; min-width: 1EM !important;}
 del {background-color: #FFD8D4;}
+body.ergonomic del img,
+body.ergonomic ins img {height: 14px !important;}
