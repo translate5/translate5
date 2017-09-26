@@ -421,6 +421,12 @@ tr.customeState td div {font-style: italic;}
 
 #segment-grid .first-in-file td  {border-top-style: solid; border-top-width: 3px; border-top-color: #99BCE8;}
 
+/* ChangeMarkup */
+.x-grid-cell ins {background-color: #E5FFAC; min-width: 1EM !important;}
+.x-grid-cell del {background-color: #FFD8D4;}
+.x-grid-cell del img,
+.x-grid-cell ins img {height: 14px !important;}
+
 /* Fix T5DEV-147 */
 .x-form-file-wrap .x-form-trigger-wrap-default.x-form-trigger-wrap-invalid .x-form-text {
     border-color: #cf4c35;

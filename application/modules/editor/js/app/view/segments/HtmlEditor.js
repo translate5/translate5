@@ -365,6 +365,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
               result.push(Ext.htmlEncode(text));
               return;
           }
+          // Keep nodes from ChangeMarkup!
+          if(item.tagName == 'INS' || item.tagName == 'DEL'){
+              result.push(item.outerHTML);
+              return;
+          }
           // recursive processing of Terminologie spans, removes the term span
           //@todo die Term Spans fliegen hier richtigerweise raus (wg. Umsortierung des Textes)
           //Allerdings muss danach die Terminologie anhand der Begriffe im Text wiederhergestellt werden.
