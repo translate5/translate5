@@ -82,6 +82,7 @@ Ext.define('Editor.controller.SearchReplace', {
     
     
     currentIndex:null,
+    isSearchPressed:true,
     
     strings:{
         searchInfoMessage:'#UT#The search will be performed only on the filtered segments',
@@ -205,6 +206,7 @@ Ext.define('Editor.controller.SearchReplace', {
             vm=activeTab.getViewModel(),
             result=vm.get('result');
         
+        me.isSearchPressed = true;
         if(result.length>0){
             //if edited segment select in it all finded results
             //if not edited open first find, and select the matches found
@@ -216,6 +218,18 @@ Ext.define('Editor.controller.SearchReplace', {
     },
     
     onReplaceButtonClick:function(){
+        var me=this,
+            tabPanel=me.getTabPanel(),
+            activeTab=tabPanel.getActiveTab(),
+            vm=activeTab.getViewModel(),
+            result=vm.get('result');
+        
+        me.isSearchPressed = false;
+        if(result.length>0){
+            //reset the current search index, so we start to replace from the first match
+            me.currentIndex=null;
+            me.handleRowSelection();
+        }
     },
     
     onReplaceAllButtonClick:function(){
@@ -343,6 +357,7 @@ Ext.define('Editor.controller.SearchReplace', {
                 activeTabViewModel.set('resultsCount',foundSegments.length);
                 activeTabViewModel.set('result',foundSegments.length >0 ? foundSegments : [] );
                 activeTabViewModel.set('showResultsLabel',true);
+                me.handleRowSelection();
             },
             failure: function(form, submit){
                 var res = submit.result;
@@ -369,89 +384,131 @@ Ext.define('Editor.controller.SearchReplace', {
             selModel = grid.getSelectionModel(),
             ed = plug.getEditPlugin();
 
-        if(!me.isEditing) {
-            //FIXME find first in grid (the function from Thomas)
-            //so the starting point is definded
+        debugger;
+        if(plug.isEditing || me.currentIndex!==null) {
+            me.selectOrReplaceText(editor);
+            return;
         }
-        me.selectText(editor);
-    },
-    
-    selectText:function(editor){
-        //check if in the current edited segment the key is found
-        //if yes, select the first match in the colum
-        //-- put all matches in the current segment in the buffer array, so on the next click we just change the index of the current selected
-        
-        //if now find the fist mathc from the results array
-        var me=this;
-        ////TODO with this we can ged and set the value of the current edited cell
-        //editor.mainEditor.setValue("<span style='background-color:red;'>ace</span>");
-        var testWindow = editor.mainEditor.iframeEl.dom.contentWindow;
-        var testDocument = editor.mainEditor.iframeEl.dom.contentDocument || iFrame.getWin().document
-        
-        me.testSearch(testWindow,testDocument,"the");
+        me.findEditorSegment(plug);
+        //FIXME find first in grid (the function from Thomas)
+        //so the starting point is definded
     },
     
     //FIXME refactor this function!!!!!!!!!
     //the images should not be removed from the text, only the mark tags
     //FIXME fix the regular expression
-    testSearch:function(testWindow,testDocument,text){
+    selectOrReplaceText:function(editor){
+        debugger;
+        if(!editor){
+            editor = Editor.app.getController('Editor').getEditPlugin().editor;
+        }
         var me=this,
-            plug = Editor.app.getController('Editor'),
-            editor = plug.getEditPlugin().editor,
-            grid = plug.getSegmentGrid(),
-            selModel = grid.getSelectionModel(),
-            ed = plug.getEditPlugin(),
+            iframeDocument = editor.mainEditor.iframeEl.dom.contentDocument || iFrame.getWin().document
             count = 0,
-            idx=0,
             tabPanel=me.getTabPanel(),
             activeTab=tabPanel.getActiveTab(),
-            searchCombo=activeTab.down('#searchCombo');
-
-        me.searchValue = searchCombo.getRawValue();
-        me.indexes = [];
+            searchCombo=activeTab.down('#searchCombo'),
+            replaceCombo=activeTab.down('#replaceCombo'),
+            searchValue ='(?!<.*?)(?![^<>]*?>)'+searchCombo.getRawValue(),///<\/?[^>]+(>|$)/g+(searchCombo.getRawValue());
+            searchRegExp=null,
+            caseSensitive=true;
         
-        // detects html tag
-        me.tagsRe=/<[^>]*>/gm;
-        // DEL ASCII code
-        me.tagsProtect='\x0f';
-
-        if (me.searchValue !== null) {
-            me.searchRegExp = new RegExp(me.searchValue, 'g' + (me.caseSensitive ? '' : 'i'));
-            
-            //me.store.each(function(record, idx) {
-            var cell, matches, cellHTML,
-                cell = Ext.get(testDocument.body);
-            
-                //matches = cell.dom.innerHTML.match(me.tagsRe);
-                //cellHTML = cell.dom.innerHTML.replace(me.tagsRe, me.tagsProtect);
-            
-            
-                //clear the html tags from the string
-                cellHTML = cell.dom.innerHTML.replace(/<\/?[^>]+(>|$)/g, "");
-                matches = cellHTML.match(me.searchRegExp);
-            
-                // populate indexes array, set currentIndex, and replace wrap matched string in a span
-                cellHTML = cellHTML.replace(me.searchRegExp, function(m) {
-                    count++;
-                    if (me.currentIndex === null) {
-                        me.currentIndex = 1;
-                    }
-                    
-                    if(me.currentIndex === count){
-                        return '<mark style="background-color:red;">' + m + '</mark>';
-                    }
-                    return '<mark>' + m + '</mark>';
-                   //return '<span style="background-color:yellow;">' + m + '</span>';
-                   //return '<mark>' + m + '</mark>';
-                });
-                me.currentIndex++;
-                
-                if(me.currentIndex > matches.length){
-                    me.currentIndex = null;
-                }
-                cell.dom.innerHTML = cellHTML;
+        if(searchCombo.getRawValue()===null || searchCombo.getRawValue()==="") {
+            return;
         }
+            
+        searchRegExp = new RegExp(searchValue, 'g' + (caseSensitive ? '' : 'i'));
+
+        //me.store.each(function(record, idx) {
+        var cell, matches, cellHTML,
+            cell = Ext.get(iframeDocument.body);
+        
+            //matches = cell.dom.innerHTML.match(me.tagsRe);
+            //cellHTML = cell.dom.innerHTML.replace(me.tagsRe, me.tagsProtect);
+        
+        
+            //clear the html tags from the string
+            if(!me.isSearchPressed){
+                cellHTML = cell.dom.innerHTML.replace(/<mark[^>]*>+|<\/mark>/g, "");
+            }else{
+                cellHTML = cell.dom.innerHTML;
+            }
+            //cellHTML = cell.dom.innerHTML.replace(/<\/?[^>]+(>|$)/g, "");
+            
+            matches = cellHTML.match(searchRegExp);
+        
+            if(!matches){
+                return;
+            }
+            // populate indexes array, set currentIndex, and replace wrap matched string in a span
+            cellHTML = cellHTML.replace(searchRegExp, function(m) {
+                count++;
+                if (me.currentIndex === null) {
+                    me.currentIndex = 1;
+                }
+                
+                if(me.currentIndex === count){
+                    return '<mark style="background-color:red;">' + (me.isSearchPressed ? m : replaceCombo.getRawValue() )+ '</mark>';
+                }
+                return '<mark>' + m + '</mark>';
+               //return '<span style="background-color:yellow;">' + m + '</span>';
+               //return '<mark>' + m + '</mark>';
+            });
+            me.currentIndex++;
+            
+            if(me.currentIndex > matches.length){
+                me.currentIndex = null;
+                me.findEditorSegment(Editor.app.getController('Editor'));
+            }
+            cell.dom.innerHTML = cellHTML;
+    },
+    
+    findEditorSegment:function(plug){
+        var me=this,
+            editor = plug.getEditPlugin().editor,
+            grid = plug.getSegmentGrid(),
+            tabPanel=me.getTabPanel(),
+            activeTab=tabPanel.getActiveTab(),
+            activeTabViewModel=activeTab.getViewModel(),
+            results=activeTabViewModel.get('result'),
+            gridView=grid.getView(),
+            firstVisibleIndex=gridView.getFirstVisibleRowIndex(),
+            goToIndex=null,
+            ed=grid.editingPlugin,
+            selModel=grid.getSelectionModel(),
+            tmpRowNumber=null;
+        
+        for(var i=0;i<results.length;i++){
+            //subtract one because this is a row number but we need the index
+            tmpRowNumber=parseInt(results[i].row_number)-1;
+            if(tmpRowNumber===firstVisibleIndex){
+                goToIndex=firstVisibleIndex;
+                break;
+            }
+        }
+        
+        if(goToIndex===null){
+            goToIndex=parseInt(results[0].row_number)-1;
+        }
+        
+        callback = function() {
+            grid.selectOrFocus(goToIndex);
+            sel = selModel.getSelection();
+            ed.startEdit(sel[0], null, ed.self.STARTEDIT_SCROLLUNDER);
+            
+            //delay the text selection because the dom is not initialized
+            new Ext.util.DelayedTask(function(){
+                me.selectOrReplaceText(editor);
+            }).delay(100);
+            
+        };
+        
+        grid.scrollTo(goToIndex, {
+            callback: callback,
+            notScrollCallback: callback
+        });
     }
+    
     /*FIXME this works but somehow destroys the content inside the segment!!
     testSearch:function(testWindow,testDocument,text){
         if (testWindow.find && testWindow.getSelection) {
