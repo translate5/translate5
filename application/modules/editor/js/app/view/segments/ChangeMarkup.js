@@ -59,7 +59,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     RANGY_IS_NODE_INSIDE: 3,
     
     // "SETTINGS/CONFIG"
-    CHAR_PLACEHOLDER: '\u0020', // what's inserted when a space is inserted 
+    CHAR_PLACEHOLDER: '\u0020', // what's inserted as placeholder when creating elements
     
     USE_CONSOLE: true,      // (true|false): use true for developing using the browser's console, otherwise use false
     
@@ -81,23 +81,22 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     /**
      * This method is called if the keyboard event (= keydown) was not handled otherwise
-     * @param {object} event
+     * @param {Object} event
      */
     handleTargetEvent: function(event) {
         
-        // alles auf Anfang
         this.initEvent();
         this.consoleClear();
         
         // What keyboard event do we deal with?
         this.setKeyboardEvent(event);
         
-        // keys, die keinen content produzieren (strg,alt,shift alleine ohne taste, pfeile etc), müssen ignoriert werden
+        // Ignore keys that dont's produce content (strg,alt,shift itself, arrows etc)
         if(this.eventHasToBeIgnored()){ 
-            this.consoleLog(" => Ignored!"); // TODO: this.consoleLogs nicht irgendwann rausschmeißen, sondern in Fkt kapseln und ein-/ausschalten
+            this.consoleLog(" => Ignored!");
             this.ignoreEvent = true;
         }
-        // keys, die unseren content nicht verändern dürfen (strg-z etc), müssen ignoriert und gestoppt werden
+        // Ignore and stop keys that must not change the content in the Editor (e.g. strg-z might revert to an INS-node with placeholder)
         if(this.eventHasToBeIgnoredAndStopped()){ 
             this.consoleLog(" => Ignored and stopped!");
             this.ignoreEvent = true;
@@ -182,8 +181,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     // =========================================================================
 
     /**
-     * Get range according to selection (using rangy-library).
-     * CAUTION! Working with cloned ranges of this.docSelRange with cloneRange() does affect the inital docSelRange (https://stackoverflow.com/a/11404869).
+     * Get range according to selection (using rangy-library: https://github.com/timdown/rangy/).
+     * CAUTION! Working with cloned ranges of this.docSelRange with cloneRange() DOES affect the inital docSelRange (https://stackoverflow.com/a/11404869).
      */
     setRangeForSelection: function() {
         this.docSelRange = this.docSel.rangeCount ? this.docSel.getRangeAt(0) : null;
@@ -206,7 +205,6 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     changeMarkupInEditor: function() {
         
         // get range according to selection (using rangy-library)
-        // CAUTION! Working with cloned ranges of this.docSelRange with cloneRange() does affect the inital docSelRange (https://stackoverflow.com/a/11404869).
         this.docSel = rangy.getSelection(this.editor.getDoc());
         this.setRangeForSelection();
         
@@ -220,53 +218,37 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             case this.eventIsDeletion():
                 this.consoleLog(" => eventIsDeletion");
                 this.handleDeletion();
-                this.stopEvent = true;  // Das Event wird gestoppt; die Zeichen sind jetzt entweder gelöscht oder als gelöscht markiert (= und werden nicht wirklich noch gelöscht).
+                this.stopEvent = true;  // Stop the delete-Event; characters are either deleted or marked as deleted now.
             break;
             case this.eventIsInsertion():
                 this.consoleLog(" => eventIsInsertion");
-                this.stopEvent = false; // Das Event wird anschließend ausgeführt (= das Einfügen geht dann normal vonstatten).
+                this.stopEvent = false; // The insert-Event continues after creating the INS-Node.
                 this.handleInsert();
             break;
         }
         
-        // if necessary: clean up afterwards
+        // clean up nested markup-tags etc.
         this.cleanUpMarkupInEditor();
-        
-        //Der DOM an dieser Stelle beihaltet IMG tags, und div.term tags. 
-        //Eine Verschachtelung von INS und DELs untereinander ist in keiner Weise gestattet:
-        // Das darf nicht produziert werden: <ins><ins></ins></ins> bzw <ins><del></del></ins>
-        // Das muss dann heißen: <ins></ins><ins></ins> bzw <ins></ins><del></del><ins></ins>
-        // Sonst ist eine Auflösung bzw. Handling der change marks nur erschwert möglich.
-        // Zu den div.term tags gibt es eine Notiz im Konzept, im Prinzip kann der div.term gelöscht werden wenn darin editiert wird, denn dann passt der Term eh nicht mehr.
-        // img tags sind als einzelne Zeichen zu behandeln.
-        //Habe ich einige Fälle vergessen?
-        
-        // AUCH BEACHTEN:
-        // - Überlappende Markierungen, zB. Selektieren von bereits markierten Inhalten und noch bestehenden Inhalten
-        // - Ersetzen von markierten Inhalten (= dann also gelöscht) durch neuen Inhalt (= als INS markieren).
-        // - Sollen Strg-C und Strg-V auch unterstützt werden?
-        // - "Rückwärts" markierte Selections.
     },
     /**
      * Handle deletion-Events.
      */
     handleDeletion: function() {
-        var me = this,
-            delNode = null;
+        var delNode = null;
         
         // Handle existing INS-Tags within the selection for deletion.
-        this.consoleLog("DEL: handleInsNodesInRange...");
-        delNode = this.handleInsNodesInRange();
+        this.consoleLog("DEL: handleInsNodesInDeletion...");
+        delNode = this.handleInsNodesInDeletion();
         
         // Handle existing images within the selection for deletion.
-        this.consoleLog("DEL: handleImagesInRange...");
-        delNode = this.handleImagesInRange();
+        this.consoleLog("DEL: handleImagesInDeletion...");
+        delNode = this.handleImagesInDeletion();
         
         // Content that is already marked as deleted needs no further handling.
         
         // Mark unmarked contents as deleted.
-        this.consoleLog("DEL: markDeletionsInRange...");
-        delNode = this.markDeletionsInRange();
+        this.consoleLog("DEL: addDel...");
+        delNode = this.addDel();
         
         // Position the caret.
         if (delNode != null) {
@@ -292,7 +274,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         
         // Are we in or at an INS-node?
         
-            // Wenn wir schon im richtigen MarkUp sind, machen wir sonst weiter nichts.
+            // if we are in an INS-Markup that fits our needs already: nothing to do.
             if (this.isWithinNode('sameConditionsAndEvent')) {
                 this.consoleLog("INS: isWithinNodeOfSameKind..., we do nothing.");
                 return;
@@ -303,7 +285,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             // we use that one:
             if (this.isAtSibling('previous','sameConditionsAndEvent')) {
                 this.consoleLog("INS: use previous..."); 
-                // (scheint nie vorzukommen, wird immer als isWithinNodeOfSameKind erkannt.)
+                // (seems to never happen; is seen as isWithinNodeOfSameKind instead.)
                 return;
             }
             
@@ -370,13 +352,13 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         return rangeForDel;
     },
     /**
-     * Handle all INS-content within the selected range.
-     * - If the content has been inserted by the same user in the same worklflow, it can really be deleted.
+     * Handle all INS-content within the selected range for deletion.
+     * - If the content has been inserted by the same user in the same workflow, it can really be deleted.
      * - If not, the content just has to be marked as deleted.
      * The last node that gets marked as deleted is returned.
-     * @returns {Object} delNode
+     * @returns {?Object} delNode
      */
-    handleInsNodesInRange: function() {
+    handleInsNodesInDeletion: function() {
         var me = this,
             delNode = null,
             tmpMarkupNode = this.createNodeForMarkup(this.getNodeNameAccordingToEvent()),
@@ -385,7 +367,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             insNodes = rangeForDel.getNodes([1], function(node) {
                 return ( node.nodeName == me.NODE_NAME_INS );
             });
-        // auch Zeichen erkennen, die von INS eingefasst sind, deren Node-Anfang/Ende hier aber nicht mit drin sind
+        // also handle characters that are within an INS-node that is only partially selected
         if (rangeForDel.commonAncestorContainer.parentNode.nodeName == this.NODE_NAME_INS) {
             insNodes.push(rangeForDel.commonAncestorContainer);
         };
@@ -394,17 +376,17 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                 rangeWithCharsForAction = rangy.createRange();
             rangeForInsNode.selectNode(insNode);
             rangeWithCharsForAction = rangeForDel.intersection(rangeForInsNode);
-            // alle INS, die zum selben User und Workflow gehören: Zeichen löschen
+            // INS-node belongs to the same user and workflow: really remove character(s)
             if (this.isNodesOfSameConditions(insNode,tmpMarkupNode)) {
                 if (rangeForDel.compareNode(insNode) == this.RANGY_IS_NODE_INSIDE) {
-                    // INS-Node ist ganz drin: kann ganz gelöscht werden.
+                    // INS-Node is selected completely: remove the node
                     insNode.parentNode.removeChild(insNode);
                 } else {
-                    // Ansonsten erst mal nur die markierten Zeichen IN dem INS-Node löschen.
+                    // INS-Node is selected partially: remove the selected chars only
                     rangeWithCharsForAction.deleteContents();
                 }
             } else {
-            // alle INS, die NICHT zum selben User und Workflow gehören: als gelöscht markieren
+            // INS-node does NOT belong to the same user and workflow: only mark character(s) as deleted, but don't remove them.
                 var contentToMoveFromInsToDel = rangeWithCharsForAction.extractContents(),
                     delNode = this.createNodeForMarkup(this.NODE_NAME_DEL);
                 delNode.appendChild(document.createTextNode(contentToMoveFromInsToDel.firstChild.innerHTML));
@@ -416,13 +398,13 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         return delNode;
     },
     /**
-     * Handle all images within the selected range.
+     * Handle all images within the selected range for deletion.
      * - If the image had been inserted by the same user in the same workflow, it can really be deleted.
      * - If not, the image just has to be marked as deleted.
      * The last node that gets marked as deleted is returned.
-     * @returns {Object} delNode
+     * @returns {?Object} delNode
      */
-    handleImagesInRange: function() {
+    handleImagesInDeletion: function() {
         var me = this,
             delNode = null,
             tmpMarkupNode = this.createNodeForMarkup(this.getNodeNameAccordingToEvent()),
@@ -434,11 +416,11 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         for (var i = 0; i < imgNodes.length; i++) {
             var imgNode = imgNodes[i];
             rangeForImgNode.selectNode(imgNode);
-            // alle INS, die zum selben User und Workflow gehören: Zeichen löschen
+            // INS-node belongs to the same user and workflow: really remove character(s)
             if (this.isNodesOfSameConditions(imgNode,tmpMarkupNode)) {
                 imgNode.parentNode.removeChild(imgNode);
             } else {
-            // alle INS, die NICHT zum selben User und Workflow gehören: als gelöscht markieren
+            // INS-node does NOT belong to the same user and workflow: only mark character(s) as deleted, but don't remove them.
                 var delNode = this.createNodeForMarkup(this.NODE_NAME_DEL);
                 rangeForDel.collapseBefore(imgNode);
                 delNode.appendChild(imgNode);
@@ -449,11 +431,11 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         return delNode;
     },
     /**
-     * Mark all unmarked contents within the selected range.
+     * Mark all unmarked contents within the selected range for deletion.
      * The last node that gets marked as deleted is returned.
-     * @returns {Object} delNode
+     * @returns {?Object} delNode
      */
-    markDeletionsInRange: function() {
+    addDel: function() {
         var me = this,
             delNode = null,
             tmpMarkupNode = this.createNodeForMarkup(this.getNodeNameAccordingToEvent()),
@@ -538,13 +520,13 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * Place the caret at the beginning of the next INS-Node (within!!!).
      */
     useNextIns:  function() {
-        var focusNode = document.createElement('div'), // Workaround: temporär Node an Anfang einfügen, um setEndAfter daran ausführen zu können (andernfalls landen wir nicht INNERHALB des nextNodes!)
+        var focusNode = document.createElement('div'), // Workaround: temporarily add a "focus-node" at the beginning within the nextNode for using setEndAfter on it (otherwise we will not end up WITHIN the nextNode!)
             nextNode = this.getSiblingNodeForCurrentSelection('next'),
             rangeForCaret = rangy.createRange();
         focusNode.style.position = "absolute"; // display the temp div out of sight, otherwise the displayed content flickers
         focusNode.style.left = "-1000px";
         nextNode.insertBefore(focusNode,nextNode.childNodes[0]);
-        rangeForCaret.setEndAfter(focusNode); // setStartBefore(nextNode) springt VOR die Boundary v. nextNode; setStart() mit Offset-Angabe ist ungünstig, da wir erst prüfen müssten, ob sich das Offset je nach Art auf etwas anderes bezieht (wir müssten also erst prüfen, ob im <ins> zuerst ein Textnode kommt oder nicht)
+        rangeForCaret.setEndAfter(focusNode); // setStartBefore(nextNode) jumps IN FRONT OF the boundary of the nextNode; setStart() using offset is inconvenient, because we don't know what the offeset refers to (does the node start with a textnode or not?)
         rangeForCaret.collapse(false);
         this.docSel.setSingleRange(rangeForCaret);
         // Cleanup
@@ -583,7 +565,6 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     /**
      * Checks if the current selection is within an existing markup-node of the given conditions to check.
-     * TODO (Prio II) generell: Parameter als Klassen-KONSTANTEN zB mit namespace definieren (dann sind alle Optionen an einem Platz einsehbar)
      * @param {String} checkConditions (insNodeWithSameConditions|sameNodeName|foreignMarkup|sameConditionsAndEvent)
      * @returns {Boolean}
      */
@@ -608,12 +589,10 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         }
     },
     /**
-     * Checks if the current selection is right before or after an already existing markup-node of the same given conditions to check.
+     * Checks if the current selection is right before or after an already existing markup-node of the given conditions to check.
      * ('previous' checks for previous sibling, 'next' checks for next sibling).
      * @param {String} direction (previous|next)
      * @param {String} checkConditions (sameNodeName|sameConditionsAndEvent)
-     * @param {Object} tmpMarkupNode
-     * @param {Object} siblingNode
      * @returns {Boolean}
      */
     isAtSibling: function(direction,checkConditions) {
@@ -625,7 +604,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         
         // ------ (1) check conditions -------------------------------------------------------
         
-        switch(checkConditions) { // TODO: DRY (s switch(checkConditions) oben)
+        switch(checkConditions) { // TODO: DRY! see switch(checkConditions) in isWithinNode()
             case 'sameNodeName':
                 var currentIsOfSameConditionsAsSibling = this.isNodesOfSameName(tmpMarkupNode,siblingNode);
             case 'sameConditionsAndEvent':
@@ -639,21 +618,17 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         
         //------ (2) check position (= is really AT the sibling in the given direction?) ------
         
-        // ACHTUNG (Beispiel): Zwischen einem gelöschten a und einem eingefügten c soll ein b eingefügt werden:
-        // <del>a</del><ins>c</ins> soll anschliessend sein: <del>a</del><ins>bc</ins>
-        // Nun landet der Cursor ("|") beim Platzieren zwischen a und c allerdings aus Sicht des Editors IN dem DEL:
+        // CAUTION! (Example): A new character "b" is to be added inbetween an already deleted "a" and an already inserted "c":
+        // (before:) <del>a</del><ins>c</ins> => (after:) <del>a</del><ins>bc</ins>
+        // Now, the editor in the browser thinks that user placed the caret ("|") IN the DEL-node:
         // <del>a|</del><ins>c</ins>
-        // Nun müssen wir also prüfen, ob das DEL direkt vor einem INS ist (nicht, ob das innerhalb des DEL platzierte Markup-INS direkt vor einem INS ist).
-        var nodeForSelection = tmpMarkupNode;
+        // Now we have to check if the DEL-node (not the INS-node we'll create for inserting the b, which would be created WITHIN the DEL-node in this case) 
+        // is in front of the INS-node!
+       var nodeForSelection = tmpMarkupNode;
         if  (  (this.isWithinNode('foreignMarkup') && direction == 'next'     && selPositionInfo.atEnd) 
             || (this.isWithinNode('foreignMarkup') && direction == 'previous' && selPositionInfo.atStart) ) {
                    nodeForSelection = selectionNode;
         }
-        
-        // Eigentlich wollte ich die Boundaries der Ranges der aktuellen Selection und des nextNode von der Selection vergleichen; das klappt aber nicht.
-        // Workaround: Selektierte Range klonen, dort einen node einfügen, die geklonte Range dort drumsetzen und DIE dann mit der Range für den nextNode vergleichen.
-        var rangeAtCurrentSelection = this.docSelRange.cloneRange(); // TODO: cloneRange hier okay?
-        rangeAtCurrentSelection.insertNode(tmpMarkupNode);
         
         var currentTouchesSibling = this.isNodesTouching(nodeForSelection,siblingNode,direction);
         this.consoleLog("- currentTouchesSibling: " + currentTouchesSibling);
@@ -667,6 +642,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     /**
      * Checks if the two given nodes touch each other in the given direction.
+     * @param {Object} node
+     * @param {Object} siblingNode
+     * @param {String} direction (previous|next)
      * @returns {Boolean}
      */
     isNodesTouching: function(node,siblingNode,direction){
@@ -766,7 +744,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     /**
      * Returns all markup-nodes (of any kind: DEL, INS, ...) in the Editor.
-     * @returns {Object} 
+     * @returns {Array} 
      */
     getAllMarkupNodesInEditor: function(){
         var allMarkupNodes = [],
@@ -835,9 +813,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @returns {Boolean}
      */
     isNodesOfForeignMarkup: function(nodeA,nodeB) {
-        // Wenn einer der beiden gar kein Markup-Node ist, brauchen wir nicht weiter prüfen.
+        // If not both of them are markup-nodes, we don't have to run any check at all.
         if (!this.isNodeOfTypeMarkup(nodeA) || !this.isNodeOfTypeMarkup(nodeB)) {
-            return false; // false weil: NEIN, ist (gar) KEIN Markup (also auch kein fremdes Markup).
+            return false; // false because: NO, the node isn't a markup-node at all (hence, it's not a foreign markup neither).
         }
         return !this.isNodesOfSameNameAndConditionsAndEvent(nodeA,nodeB);
     },
@@ -995,14 +973,14 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                         return;
                     }
                     // (b) Otherwise: flatten the hierachy of the nodes:
-                    // Range setzen....
+                    // Set range....
                     var rangeForChildnode = rangy.createRange();
                     rangeForChildnode.setStartBefore(childNode);
-                    // childNode rausnehmen ...
+                    // ... take out the childNode ...
                     node.parentNode.insertBefore(childNode,node);
-                    // ... node splitten ...
+                    // ... split the node ...
                     var splittedNodes = this.splitNode(node,rangeForChildnode);
-                    // ... und childNode wieder einfügen:
+                    // ... and insert childNode again:
                     this.moveNodeInbetweenSplittedNodes(childNode,splittedNodes);
                 }
             }
@@ -1070,10 +1048,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         rangeForExtract.setStartBefore(nodeToSplit);
         rangeForExtract.setEnd(selectionStartNode, selectionStartOffset);
         splittedNodes[0] = rangeForExtract.extractContents();
-        splittedNodes[1] = nodeToSplit; // nodeToSplit: ist nach extractContents() jetzt nur noch der zweite Teil des gesplitteten Nodes
-        parentNode.insertBefore(splittedNodes[0], splittedNodes[1]); // TODO: Prüfen, ob beide Teile des gesplitteten nodes dieselben Angaben haben (User, Workflow, ...)
+        splittedNodes[1] = nodeToSplit; // nodeToSplit: contains only the second half of the nodeToSplit after extractContents()
+        parentNode.insertBefore(splittedNodes[0], splittedNodes[1]); // TODO: Check if both parts of the splitted node share the same conditions (user, workflow, ...)
         // "reset" position of the user's selection (= where the node was split)
-        // TODO: prüfen, ob Rangy's getBookmark besser wäre; s.a. https://github.com/timdown/rangy/wiki/Rangy-Selection#restorerangessaved
         rangeForPositionToSplit.setEndBefore(splittedNodes[1]);
         rangeForPositionToSplit.collapse(false);
         this.docSel.setSingleRange(rangeForPositionToSplit);
