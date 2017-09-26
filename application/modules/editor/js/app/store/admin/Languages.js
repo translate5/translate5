@@ -33,6 +33,6 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.store.admin.Languages', {
   extend : 'Ext.data.ArrayStore',
-  fields: ['id', 'label'],
+  fields: ['id', 'label', {name: 'rtl', type: 'boolean'}],
   data: Editor.data.languages
 });

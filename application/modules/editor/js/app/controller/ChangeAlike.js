@@ -117,6 +117,7 @@ Ext.define('Editor.controller.ChangeAlike', {
       },
       controller: {
           '#Editor.$application': {
+              editorViewportOpened: 'initWindow',
               editorViewportClosed: 'clearAlikeSegments'
           },
           '#Segments': {
@@ -140,8 +141,18 @@ Ext.define('Editor.controller.ChangeAlike', {
     var me = this;
     //Diese Events können erst in onlauch gebunden werden, in init existiert das Plugin noch nicht
     me.alikeSegmentsUrl = me.getStore('AlikeSegments').getProxy().url;
-    me.window = Ext.widget('changealikeWindow');
   },
+  
+  /**
+   * The changealikeWindow must be reinitialized on each task change
+   */
+  initWindow: function() {
+      if(this.window) {
+          this.window.destroy();
+      }
+      this.window = Ext.widget('changealikeWindow');
+  },
+  
   /**
    * inits the editing plugin
    */

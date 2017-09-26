@@ -56,6 +56,7 @@ Ext.define('Editor.view.ui.changealike.Grid', {
   
   initConfig: function(instanceConfig) {
     var me = this,
+    segField = Editor.model.segment.Field,
     config;
 
     config = {
@@ -74,7 +75,7 @@ Ext.define('Editor.view.ui.changealike.Grid', {
           filter: {
               type: 'string'
           },
-          tdCls: 'alike-source-field segment-tag-column',
+          tdCls: 'alike-source-field segment-tag-column '+segField.getDirectionCls('source'),
           width: 250, 
           renderer: function(value, metaData, record) {
             if(record.get('sourceMatch')) {
@@ -90,7 +91,7 @@ Ext.define('Editor.view.ui.changealike.Grid', {
           filter: {
               type: 'string'
           },
-          tdCls: 'alike-target-field segment-tag-column',
+          tdCls: 'alike-target-field segment-tag-column '+segField.getDirectionCls('target'),
           width: 250,
           renderer: function(value, metaData, record) {
             if(record.get('targetMatch')) {

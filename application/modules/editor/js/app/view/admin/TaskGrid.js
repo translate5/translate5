@@ -59,7 +59,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       lockLocked: '#UT#In importierter Datei gesperrte Segmente sind in translate5 gesperrt',
       orderdate: '#UT#Bestelldatum',
       enableSourceEditing: '#UT#Quellsprache bearbeitbar',
-      emptyTargets: '#UT#Leere Zielsprachen'
+      emptyTargets: '#UT#Übersetzungsaufgabe (kein Review)'
   },
   strings: {
       noRelaisLang: '#UT#- Ohne Relaissprache -',
@@ -72,7 +72,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       addTaskTip: '#UT#Eine neue Aufgabe hinzufügen.',
       reloadBtn: '#UT#Aktualisieren',
       reloadBtnTip: '#UT#Aufgabenliste vom Server aktualisieren.',
-      emptyTargets: '#UT#Leere Zielsprachen. Wahr wenn beim Import alle zielsprachlichen Felder leer sind."'
+      emptyTargets: '#UT#Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe)."'
   },
   states: {
       user_state_open: '#UT#offen',
@@ -406,7 +406,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
               width: 100,
               dataIndex: 'orderdate',
               filter: {
-                  type: 'date'
+                  type: 'date',
+                  dateFormat: Editor.DATE_ISO_FORMAT
               },
               text: me.text_cols.orderdate
           },{
@@ -414,7 +415,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
               width: 120,
               dataIndex: 'targetDeliveryDate',
               filter: {
-                  type: 'date'
+                  type: 'date',
+                  dateFormat: Editor.DATE_ISO_FORMAT
               },
               text: me.text_cols.targetDeliveryDate
           },{
@@ -422,7 +424,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
               width: 120,
               dataIndex: 'realDeliveryDate',
               filter: {
-                  type: 'date'
+                  type: 'date',
+                  dateFormat: Editor.DATE_ISO_FORMAT
               },
               text: me.text_cols.realDeliveryDate
           },{

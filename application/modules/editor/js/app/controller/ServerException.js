@@ -70,7 +70,7 @@ Ext.define('Editor.controller.ServerException', {
             this.handleException(resp);
         }
         else {
-            this.handleFailedRequest(operation.error.status, operation.error.statusText);
+            this.handleFailedRequest(operation.error.status, operation.error.statusText, operation.error.response);
         }
         return false;
     },

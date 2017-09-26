@@ -44,14 +44,14 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     },
     title: '#UT#Aufgabe erstellen',
     strings: {
-        importUploadTip: '#UT#Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF; Angabe notwendig)',
+        importUploadTip: '#UT#Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, XLIFF; Angabe notwendig)',
         importUploadLabel: '#UT#Import Datei¹',
-        importUploadType: '#UT#Bitte verwenden Sie eine ZIP, CSV oder SDLXLIFF Datei!',
+        importUploadType: '#UT#Bitte verwenden Sie eine ZIP, CSV, XLIFF oder SDLXLIFF Datei!',
         importTbxTip: '#UT#Wählen Sie die zu importierenden TBX Daten für das TermTagging',
         importTbxTipDis: '#UT#Wählen Sie die zu importierenden TBX Daten für das TermTagging',
         importTbxLabel: '#UT#TBX Datei²',
         importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!',
-        importNews: '#UT#<b style="color:#ff0000;">Neu:</b> Sie können nun direkt SDLXLIFF, openTM2-XLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage">Mehr Info</a>.',
+        importNews: '#UT#Sie können direkt SDLXLIFF, XLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage">Mehr Info</a>.',
         
         taskNrLabel: '#UT#Auftragsnummer',
         taskNameTip: '#UT#Projektname (frei wählbar, Angabe notwendig)',
@@ -107,7 +107,10 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                 queryMode: 'local',
                 valueField: 'id'
             },
-            config = {
+            now = new Date(),
+            config;
+        now.setHours(0,0,0,0);
+        config = {
                 title: me.title, //see EXT6UPD-9
                 layout: 'card',
                 items:[
@@ -202,13 +205,13 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     xtype: 'datefield',
                                     name: 'orderdate',
                                     submitFormat: Editor.DATE_ISO_FORMAT,
-                                    value: new Date(),
+                                    value: now,
                                     fieldLabel: me.strings.orderdate
                                 },{
                                     xtype: 'datefield',
                                     name: 'targetDeliveryDate',
                                     submitFormat: Editor.DATE_ISO_FORMAT,
-                                    value: new Date(),
+                                    value: now,
                                     fieldLabel: me.strings.targetDeliveryLabel
                                 },{
                                     xtype: 'numberfield',

@@ -42,6 +42,17 @@ div.x-container.x-container-default {position: initial;}
   width: 250px;
 }
 
+.direction-rtl {
+    direction:rtl;
+}
+td.direction-rtl.x-grid-td div.x-grid-cell-inner {
+    text-align:right !important;
+}
+
+.direction-ltr {
+    direction:ltr;
+}
+
 #segment-grid .editing-disabled {
   color:#acacac;
 }
