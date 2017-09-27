@@ -265,6 +265,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           me.result.push(me.imgNodeToString(item, true));
           return;
       }
+      // Keep nodes from ChangeMarkup
+      if(item.tagName == 'INS' || item.tagName == 'DEL'){
+          me.result.push(item.outerHTML);
+          return;
+      }
       // Span für Terminologie
       if(item.tagName == 'DIV' && /(^|[\s])term([\s]|$)/.test(item.className)){
         termFoundCls = item.className
