@@ -57,6 +57,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     
     ATTRIBUTE_NAME_USERID: 'data-userid', 
     ATTRIBUTE_NAME_WORKFLOWID: 'data-workflowid',
+    ATTRIBUTE_NAME_TIMESTAMP: 'data-timestamp',
     
     // https://github.com/timdown/rangy/wiki/Rangy-Range#compareboundarypointsnumber-comparisontype-range-range
     RANGY_RANGE_IS_BEFORE: -1,
@@ -809,16 +810,18 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @returns {Object} 
      */
     createNodeForMarkup: function(nodeName){
-        var nodeEl = document.createElement(nodeName); // TODO: use Ext.DomHelper.createDom() instead
+        var nodeEl = document.createElement(nodeName),
+            timeCreated = new Date(),
+            timeCreatedForUser = Ext.Date.format(timeCreated, 'Y-m-d H:i:s'),
+            timeCreatedAsUnix = Ext.Date.format(timeCreated, 'timestamp');
         
-        // data about user and workflow
         // (setAttribute: see https://jsperf.com/html5-dataset-vs-native-setattribute)
-        nodeEl.id = Ext.id(); // TODO: id might not be necessary in the end, but is helpful for development
         nodeEl.setAttribute(this.ATTRIBUTE_NAME_USERID,this.editorUser.id); 
         nodeEl.setAttribute(this.ATTRIBUTE_NAME_WORKFLOWID,'1'); // TODO
+        nodeEl.setAttribute(this.ATTRIBUTE_NAME_TIMESTAMP,timeCreatedAsUnix);
         
         // "tool tip"
-        nodeEl.title = this.editorUser.userName;
+        nodeEl.title = this.editorUser.userName + ' ' + timeCreatedForUser;
         
         return nodeEl;
     },
@@ -959,6 +962,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @returns {Boolean}
      */
     isNodeNameAccordingToEvent: function(node) {
+        if (!this.isNodeOfTypeMarkup(node)) {
+            return false;
+        }
         var nodeName = (node == null) ? 'null' : node.nodeName,
             nodeNameAccordingToEvent = this.getNodeNameAccordingToEvent();
         return (nodeName == nodeNameAccordingToEvent);
@@ -970,6 +976,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @returns {Boolean}
      */
     isNodesOfSameUser: function(nodeA,nodeB) {
+        if (!this.isNodeOfTypeMarkup(nodeA) || !this.isNodeOfTypeMarkup(nodeB)) {
+            return false;
+        }
         var userOfNodeA = parseInt(nodeA.getAttribute(this.ATTRIBUTE_NAME_USERID)),
             userOfNodeB = parseInt(nodeB.getAttribute(this.ATTRIBUTE_NAME_USERID));
         return userOfNodeA == userOfNodeB;
@@ -980,6 +989,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @returns {Boolean}
      */
     isNodeOfUserAccordingToEvent: function(node) {
+        if (!this.isNodeOfTypeMarkup(node)) {
+            return false;
+        }
         var userOfNode = parseInt(node.getAttribute(this.ATTRIBUTE_NAME_USERID)),
             userOfEvent = this.editorUser.id;
         return userOfNode == userOfEvent;
@@ -991,7 +1003,12 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @returns {Boolean}
      */
     isNodesOfSameWorkflow: function(nodeA,nodeB) {
-        return true; // TODO
+        if (!this.isNodeOfTypeMarkup(nodeA) || !this.isNodeOfTypeMarkup(nodeB)) {
+            return false;
+        }
+        var workflowOfNodeA = parseInt(nodeA.getAttribute(this.ATTRIBUTE_NAME_WORKFLOWID)),
+            workflowOfNodeB = parseInt(nodeB.getAttribute(this.ATTRIBUTE_NAME_WORKFLOWID));
+        return workflowOfNodeA == workflowOfNodeB;
     },
     /**
      * Does the given node's workflow match the workflow according to the event?
@@ -999,6 +1016,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @returns {Boolean}
      */
     isNodeOfWorkflowAccordingToEvent: function(node) {
+        if (!this.isNodeOfTypeMarkup(node)) {
+            return false;
+        }
         return true; // TODO
     },
 
