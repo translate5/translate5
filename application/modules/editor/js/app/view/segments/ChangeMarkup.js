@@ -39,24 +39,25 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.segments.ChangeMarkup', {
     editor: null,
     
-    editorUser: null,       // current user working in the Editor
+    editorUser: null,               // current user working in the Editor
+    segmentWorkflowStepNr: null,    // workflow of the currently edited segment in the Editor
     
-    eventKeyCode: null,     // Keyboard-Event: Key-Code
-    eventCtrlKey: null,     // Keyboard-Event: Control-Key pressed?
+    eventKeyCode: null,             // Keyboard-Event: Key-Code
+    eventCtrlKey: null,             // Keyboard-Event: Control-Key pressed?
     
-    ignoreEvent: false,     // ignore event? (= we do nothing here)
-    stopEvent: false,       // do we stop the event here?
+    ignoreEvent: false,             // ignore event? (= we do nothing here)
+    stopEvent: false,               // do we stop the event here?
     
-    docSel: null,           // selection in the document (initially what the user has selected, but then constantly changed according to handling the Markup)
-    docSelRange: null,      // current range for handling the markup, positioning the caret, etc... (initially what the user has selected, but then constantly changing)
-    userRangeBookmark: null, // bookmark what the user has selected initially
+    docSel: null,                   // selection in the document (initially what the user has selected, but then constantly changed according to handling the Markup)
+    docSelRange: null,              // current range for handling the markup, positioning the caret, etc... (initially what the user has selected, but then constantly changing)
+    userRangeBookmark: null,        // bookmark what the user has selected initially
     
     // "CONSTANTS"
     NODE_NAME_DEL: 'DEL',
     NODE_NAME_INS: 'INS',
     
     ATTRIBUTE_NAME_USERID: 'data-userid', 
-    ATTRIBUTE_NAME_WORKFLOWID: 'data-workflowid',
+    ATTRIBUTE_NAME_WORKFLOWSTEPNR: 'data-workflowstepnr',
     ATTRIBUTE_NAME_TIMESTAMP: 'data-timestamp',
     
     // https://github.com/timdown/rangy/wiki/Rangy-Range#compareboundarypointsnumber-comparisontype-range-range
@@ -66,20 +67,22 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     RANGY_IS_NODE_INSIDE: 3,
     
     // "SETTINGS/CONFIG"
-    CHAR_PLACEHOLDER: '\u0020', // what's inserted as placeholder when creating elements
+    CHAR_PLACEHOLDER: '\u0020',     // what's inserted as placeholder when creating elements
     
-    USE_CONSOLE: true,      // (true|false): use true for developing using the browser's console, otherwise use false
+    USE_CONSOLE: true,              // (true|false): use true for developing using the browser's console, otherwise use false
     
     /**
      * The given segment content is the base for the operations provided by this method
      * @param {Editor.view.segments.HtmlEditor} editor
      */
-    constructor: function(editor) {
+    constructor: function(editor,segmentWorkflowStepNr) {
         this.editor = editor;
+        // Data we'll need independent from the event in the Editor:
+        this.editorUser = Editor.data.app.user; 
+        this.segmentWorkflowStepNr = segmentWorkflowStepNr;
     },
     initEvent: function() {
         // "Reset"
-        this.editorUser = null;
         this.eventKeyCode = null;
         this.eventCtrlKey = null;
         this.ignoreEvent = false;
@@ -223,9 +226,6 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         }
         
         this.userRangeBookmark = this.docSelRange.getBookmark();
-        
-        // some data we'll need
-        this.editorUser = Editor.data.app.user;
         
         // change markup according to event
         switch(true) {
@@ -817,7 +817,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         
         // (setAttribute: see https://jsperf.com/html5-dataset-vs-native-setattribute)
         nodeEl.setAttribute(this.ATTRIBUTE_NAME_USERID,this.editorUser.id); 
-        nodeEl.setAttribute(this.ATTRIBUTE_NAME_WORKFLOWID,'1'); // TODO
+        nodeEl.setAttribute(this.ATTRIBUTE_NAME_WORKFLOWSTEPNR,this.segmentWorkflowStepNr);
         nodeEl.setAttribute(this.ATTRIBUTE_NAME_TIMESTAMP,timeCreatedAsUnix);
         
         // "tool tip"
@@ -1006,8 +1006,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         if (!this.isNodeOfTypeMarkup(nodeA) || !this.isNodeOfTypeMarkup(nodeB)) {
             return false;
         }
-        var workflowOfNodeA = parseInt(nodeA.getAttribute(this.ATTRIBUTE_NAME_WORKFLOWID)),
-            workflowOfNodeB = parseInt(nodeB.getAttribute(this.ATTRIBUTE_NAME_WORKFLOWID));
+        var workflowOfNodeA = parseInt(nodeA.getAttribute(this.ATTRIBUTE_NAME_WORKFLOWSTEPNR)),
+            workflowOfNodeB = parseInt(nodeB.getAttribute(this.ATTRIBUTE_NAME_WORKFLOWSTEPNR));
         return workflowOfNodeA == workflowOfNodeB;
     },
     /**
@@ -1019,7 +1019,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         if (!this.isNodeOfTypeMarkup(node)) {
             return false;
         }
-        return true; // TODO
+        var workflowOfNode = parseInt(node.getAttribute(this.ATTRIBUTE_NAME_WORKFLOWSTEPNR)),
+            workflowOfEvent = this.segmentWorkflowStepNr;
+        return workflowOfNode == workflowOfEvent;
     },
 
     // =========================================================================
