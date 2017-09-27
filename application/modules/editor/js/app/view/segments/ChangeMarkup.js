@@ -383,7 +383,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             });
         // also handle characters that are within an INS-node that is only partially selected
         if (rangeForDel.commonAncestorContainer.parentNode.nodeName == this.NODE_NAME_INS) {
-            insNodes.push(rangeForDel.commonAncestorContainer);
+            insNodes.push(rangeForDel.commonAncestorContainer.parentNode);
         };
         for (var i = 0; i < insNodes.length; i++) {
             var insNode = insNodes[i],
