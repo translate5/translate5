@@ -56,6 +56,8 @@ Ext.define('Editor.view.ToolTip', {
                 fly = Ext.fly(t); 
             if(fly.hasCls('qmflag')) {
                 this.handleQmFlag(t, tip);
+            } else if (Ext.get(t).hasCls('changemarkup')) {
+                this.handleChangeMarkup(t, tip);
             }
             //else if hasClass for other ToolTip Types
         }
@@ -87,6 +89,28 @@ Ext.define('Editor.view.ToolTip', {
         }
         tip.update(me.qmflagTpl.apply(meta));		
     },
+    
+    handleChangeMarkup: function(markupNode, tip) {
+        var me = this,
+            markupNodeUsername,
+            markupNodeTimestamp;
+        if (markupNode.hasAttribute('data-username')) {
+            markupNodeUsername = markupNode.getAttribute('data-username');
+        }
+        if (markupNode.hasAttribute('data-timestamp')) {
+            markupNodeTimestamp = parseInt(markupNode.getAttribute('data-timestamp'));
+        }
+        var tplData = {
+            changemarkupUser : markupNodeUsername,
+            changemarkupDate : Ext.Date.format(new Date(markupNodeTimestamp),'Y-m-d H:i')
+        };
+        if(!me.changemarkupTpl) {
+            me.changemarkupTpl = new Ext.Template('<b>Changed by:</b><br>{changemarkupUser}<br>{changemarkupDate}');
+            me.changemarkupTpl.compile();
+        }
+        tip.update(me.changemarkupTpl.apply(tplData));
+    },
+    
     /**
      * Override of default setTarget, only change see below.
      * Must be respected on ExtJS updates!

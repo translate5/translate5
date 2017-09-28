@@ -39,7 +39,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.segments.ChangeMarkup', {
     editor: null,
     
-    editorUser: null,               // current user working in the Editor
+    editorUsername: null,           // username of current user working in the Editor
     segmentWorkflowStepNr: null,    // workflow of the currently edited segment in the Editor
     
     eventKeyCode: null,             // Keyboard-Event: Key-Code
@@ -56,9 +56,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     NODE_NAME_DEL: 'DEL',
     NODE_NAME_INS: 'INS',
     
-    ATTRIBUTE_NAME_USERID: 'data-userid', 
-    ATTRIBUTE_NAME_WORKFLOWSTEPNR: 'data-workflowstepnr',
-    ATTRIBUTE_NAME_TIMESTAMP: 'data-timestamp',
+    ATTRIBUTE_USERNAME: 'data-username', 
+    ATTRIBUTE_WORKFLOWSTEPNR: 'data-workflowstepnr',
+    ATTRIBUTE_TIMESTAMP: 'data-timestamp',
     
     // https://github.com/timdown/rangy/wiki/Rangy-Range#compareboundarypointsnumber-comparisontype-range-range
     RANGY_RANGE_IS_BEFORE: -1,
@@ -78,7 +78,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     constructor: function(editor,segmentWorkflowStepNr) {
         this.editor = editor;
         // Data we'll need independent from the event in the Editor:
-        this.editorUser = Editor.data.app.user; 
+        this.editorUsername = Editor.data.app.user.userName;
         this.segmentWorkflowStepNr = segmentWorkflowStepNr;
     },
     initEvent: function() {
@@ -811,17 +811,15 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     createNodeForMarkup: function(nodeName){
         var nodeEl = document.createElement(nodeName),
-            timeCreated = new Date(),
-            timeCreatedForUser = Ext.Date.format(timeCreated, 'Y-m-d H:i:s'),
-            timeCreatedAsUnix = Ext.Date.format(timeCreated, 'timestamp');
+            timestamp = Ext.Date.format(new Date(), 'time'); // dates are wrong with 'timestamp' although doc states differently: http://docs.sencha.com/extjs/6.2.0/classic/Ext.Date.html 
         
         // (setAttribute: see https://jsperf.com/html5-dataset-vs-native-setattribute)
-        nodeEl.setAttribute(this.ATTRIBUTE_NAME_USERID,this.editorUser.id); 
-        nodeEl.setAttribute(this.ATTRIBUTE_NAME_WORKFLOWSTEPNR,this.segmentWorkflowStepNr);
-        nodeEl.setAttribute(this.ATTRIBUTE_NAME_TIMESTAMP,timeCreatedAsUnix);
+        nodeEl.setAttribute(this.ATTRIBUTE_USERNAME,this.editorUsername); 
+        nodeEl.setAttribute(this.ATTRIBUTE_WORKFLOWSTEPNR,this.segmentWorkflowStepNr);
+        nodeEl.setAttribute(this.ATTRIBUTE_TIMESTAMP,timestamp);
         
-        // "tool tip"
-        nodeEl.title = this.editorUser.userName + ' ' + timeCreatedForUser;
+        // selector for delegate in tooltip
+        nodeEl.className = 'changemarkup';
         
         return nodeEl;
     },
@@ -979,8 +977,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         if (!this.isNodeOfTypeMarkup(nodeA) || !this.isNodeOfTypeMarkup(nodeB)) {
             return false;
         }
-        var userOfNodeA = parseInt(nodeA.getAttribute(this.ATTRIBUTE_NAME_USERID)),
-            userOfNodeB = parseInt(nodeB.getAttribute(this.ATTRIBUTE_NAME_USERID));
+        var userOfNodeA = parseInt(nodeA.getAttribute(this.ATTRIBUTE_USERNAME)),
+            userOfNodeB = parseInt(nodeB.getAttribute(this.ATTRIBUTE_USERNAME));
         return userOfNodeA == userOfNodeB;
     },
     /**
@@ -992,8 +990,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         if (!this.isNodeOfTypeMarkup(node)) {
             return false;
         }
-        var userOfNode = parseInt(node.getAttribute(this.ATTRIBUTE_NAME_USERID)),
-            userOfEvent = this.editorUser.id;
+        var userOfNode = parseInt(node.getAttribute(this.ATTRIBUTE_USERNAME)),
+            userOfEvent = this.editorUsername;
         return userOfNode == userOfEvent;
     },
     /**
@@ -1006,8 +1004,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         if (!this.isNodeOfTypeMarkup(nodeA) || !this.isNodeOfTypeMarkup(nodeB)) {
             return false;
         }
-        var workflowOfNodeA = parseInt(nodeA.getAttribute(this.ATTRIBUTE_NAME_WORKFLOWSTEPNR)),
-            workflowOfNodeB = parseInt(nodeB.getAttribute(this.ATTRIBUTE_NAME_WORKFLOWSTEPNR));
+        var workflowOfNodeA = parseInt(nodeA.getAttribute(this.ATTRIBUTE_WORKFLOWSTEPNR)),
+            workflowOfNodeB = parseInt(nodeB.getAttribute(this.ATTRIBUTE_WORKFLOWSTEPNR));
         return workflowOfNodeA == workflowOfNodeB;
     },
     /**
@@ -1019,7 +1017,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         if (!this.isNodeOfTypeMarkup(node)) {
             return false;
         }
-        var workflowOfNode = parseInt(node.getAttribute(this.ATTRIBUTE_NAME_WORKFLOWSTEPNR)),
+        var workflowOfNode = parseInt(node.getAttribute(this.ATTRIBUTE_WORKFLOWSTEPNR)),
             workflowOfEvent = this.segmentWorkflowStepNr;
         return workflowOfNode == workflowOfEvent;
     },
