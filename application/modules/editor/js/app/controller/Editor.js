@@ -99,8 +99,8 @@ Ext.define('Editor.controller.Editor', {
           '#segmentgrid': {
               afterrender: 'initEditPluginHandler'
           },
-          '#referenceFilesInfoMessage':{
-              windowContentClick:'onShowReferenceFilesButtonClick'
+          '#showReferenceFilesButton':{
+              click:'onShowReferenceFilesButtonClick'
           }
       }
   },
@@ -989,7 +989,7 @@ Ext.define('Editor.controller.Editor', {
           task = new Ext.util.DelayedTask(function(){
               referenceInfoMessage.destroy();
           });
-          task.delay(10000);
+          task.delay(10000000000);
           referenceInfoMessage.show();
       }
   },

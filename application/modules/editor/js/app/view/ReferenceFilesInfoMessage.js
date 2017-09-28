@@ -30,26 +30,29 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.ReferenceFilesInfoMessage', {
     extend: 'Ext.window.Window',
     itemId:'referenceFilesInfoMessage',
-    width:300,
+    //width:400,
     y:0,
     y:0,
-    bodyPadding:'10 10 10 10',
+    //bodyPadding:'10 10 10 10',
+    padding:'10 10 10 10',
+    layout: {
+        align: 'middle',
+        pack: 'center',
+        type: 'fit'
+    },
     strings:{
         windowTitle:'#UT#Referenz-Dateien',
-        windowInfoMessage:'#UT#There are reference files to the task. Open attachment list',
+        windowInfoMessage:'#UT#There are reference files to the task. Open attachment list.',
         buttonText:'#UT#Referenz-Dateien liste'
-    },
-    listeners: {
-        'render': function(window) {
-            window.body.on('click', function() {
-                window.fireEvent('windowContentClick');
-            });
-         }
     },
     initComponent:function(instanceConfig){
         var me = this;
         me.title=me.strings.windowTitle;
-        me.html=me.strings.windowInfoMessage;
+        me.items=[{
+            xtype: 'button',
+            itemId:'showReferenceFilesButton',
+            text: me.strings.windowInfoMessage,
+        }];
         //me.bbar=[{ 
         //    xtype: 'button',
         //    itemId:'showReferenceFilesButton',
