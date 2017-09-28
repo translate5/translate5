@@ -72,6 +72,7 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                     fieldLabel:me.strings.searchInCombo,
                     displayField:'value',
                     valueField:'id',
+                    forceSelection:true,
                 },{
                     xtype:'checkbox',
                     itemId:'matchCaseChekbox',

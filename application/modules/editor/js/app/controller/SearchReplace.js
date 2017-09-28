@@ -91,6 +91,7 @@ Ext.define('Editor.controller.SearchReplace', {
     strings:{
         searchInfoMessage:'#UT#The search will be performed only on the filtered segments',
         comboFieldLabel:'#UT#Replace',
+        noSearchResults:'#UT#No results for the current search!',
     },
     
     activeSelection:{
@@ -246,6 +247,8 @@ Ext.define('Editor.controller.SearchReplace', {
     showSearchAndReplaceWindow:function(key){
         var me=this;
         if(key instanceof Object){
+            var tmpMenu=key.up('menu');
+            me.activeColumnDataIndex=tmpMenu.activeHeader.dataIndex;
             me.handleSerchReplaceMenu();
             return;
         }
@@ -262,11 +265,18 @@ Ext.define('Editor.controller.SearchReplace', {
         if(plug.editor && plug.editor.editingPlugin.editing){
             me.activeColumnDataIndex = plug.editor.columnClicked;
         }
-        
+        debugger;
         if(!key || (key == Ext.event.Event.F)){
             focusTab = 'searchTab';
+            if(!Ext.Array.contains(me.searchFields,me.activeColumnDataIndex)){
+                me.activeColumnDataIndex=me.DEFAULT_COLUMN_DATA_INDEX;
+            }
         }
+
         if(key == Ext.event.Event.H){
+            if(Ext.Array.contains(me.replaceFields,me.activeColumnDataIndex)){
+                me.activeColumnDataIndex=me.DEFAULT_COLUMN_DATA_INDEX;
+            }
             focusTab = 'replaceTab';
         }
         
@@ -287,8 +297,9 @@ Ext.define('Editor.controller.SearchReplace', {
     },
     
     handleSerchReplaceMenu:function(){
-        var searchReplaceWindow=Ext.widget('searchreplacewindow');
-        searchInCombo=searchReplaceWindow.down('#searchInCombo');
+        var me=this,
+            searchReplaceWindow=Ext.widget('searchreplacewindow'),
+            searchInCombo=searchReplaceWindow.down('#searchInCombo');
         searchReplaceWindow.show();
     },
     
@@ -491,6 +502,11 @@ Ext.define('Editor.controller.SearchReplace', {
             goToIndex=null,
             tmpRowNumber=null;
         
+        if(results.length < 1){
+            Editor.MessageBox.addInfo(me.strings.noSearchResults);
+            return;
+        }
+
         if(!plug.isEditing){
             for(var i=0;i<results.length;i++){
                 //subtract one because this is a row number but we need the index
