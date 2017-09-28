@@ -50,11 +50,9 @@ Ext.define('Editor.controller.SearchReplace', {
             '#searchreplacetabpanel #searchButton':{
                 click:'onSearchButtonClick'
             },
-            
             '#searchreplacetabpanel #replaceButton':{
                 click:'onReplaceButtonClick'
             },
-            
             '#searchreplacetabpanel #replaceAllButton':{
                 click:'onReplaceAllButtonClick'
             },
@@ -74,7 +72,7 @@ Ext.define('Editor.controller.SearchReplace', {
         ref:'tabPanel',
         selector:'#searchreplacetabpanel'
     }],
-    
+
     searchFields:[],
     replaceFields:[],
     activeColumnDataIndex:'',
@@ -83,6 +81,12 @@ Ext.define('Editor.controller.SearchReplace', {
     
     currentIndex:null,
     isSearchPressed:true,
+    
+    activeSegment:{
+        matchIndex:0,
+        segmentResultIndex:0,
+        matchCount:0
+    },
     
     strings:{
         searchInfoMessage:'#UT#The search will be performed only on the filtered segments',
@@ -206,6 +210,7 @@ Ext.define('Editor.controller.SearchReplace', {
             vm=activeTab.getViewModel(),
             result=vm.get('result');
         
+        debugger;
         me.isSearchPressed = true;
         if(result.length>0){
             //if edited segment select in it all finded results
@@ -213,6 +218,7 @@ Ext.define('Editor.controller.SearchReplace', {
             
             //save the current position 
             me.handleRowSelection();
+            return;
         }
         me.search();
     },
@@ -227,7 +233,8 @@ Ext.define('Editor.controller.SearchReplace', {
         me.isSearchPressed = false;
         if(result.length>0){
             //reset the current search index, so we start to replace from the first match
-            me.currentIndex=null;
+            //me.activeSegment.matchIndex=null;
+            //me.activeSegment.segmentId=null;
             me.handleRowSelection();
         }
     },
@@ -383,13 +390,13 @@ Ext.define('Editor.controller.SearchReplace', {
             grid = plug.getSegmentGrid(),
             selModel = grid.getSelectionModel(),
             ed = plug.getEditPlugin();
-
-        debugger;
-        if(plug.isEditing || me.currentIndex!==null) {
-            me.selectOrReplaceText(editor);
+        
+        if(me.activeSegment.matchIndex >= me.activeSegment.matchCount) {
+            me.activeSegment.matchIndex=0;
+            me.findEditorSegment(plug);
             return;
         }
-        me.findEditorSegment(plug);
+        me.selectOrReplaceText();
         //FIXME find first in grid (the function from Thomas)
         //so the starting point is definded
     },
@@ -397,13 +404,9 @@ Ext.define('Editor.controller.SearchReplace', {
     //FIXME refactor this function!!!!!!!!!
     //the images should not be removed from the text, only the mark tags
     //FIXME fix the regular expression
-    selectOrReplaceText:function(editor){
-        debugger;
-        if(!editor){
-            editor = Editor.app.getController('Editor').getEditPlugin().editor;
-        }
+    selectOrReplaceText:function(){
         var me=this,
-            iframeDocument = editor.mainEditor.iframeEl.dom.contentDocument || iFrame.getWin().document
+            iframeDocument = me.getSegmentIframeDocument(),
             count = 0,
             tabPanel=me.getTabPanel(),
             activeTab=tabPanel.getActiveTab(),
@@ -413,7 +416,11 @@ Ext.define('Editor.controller.SearchReplace', {
             searchRegExp=null,
             caseSensitive=true;
         
-        if(searchCombo.getRawValue()===null || searchCombo.getRawValue()==="") {
+        if(!iframeDocument){
+            return;
+        }
+
+        if(searchCombo.getRawValue()===null || searchCombo.getRawValue()===""){
             return;
         }
             
@@ -426,7 +433,6 @@ Ext.define('Editor.controller.SearchReplace', {
             //matches = cell.dom.innerHTML.match(me.tagsRe);
             //cellHTML = cell.dom.innerHTML.replace(me.tagsRe, me.tagsProtect);
         
-        
             //clear the html tags from the string
             if(!me.isSearchPressed){
                 cellHTML = cell.dom.innerHTML.replace(/<mark[^>]*>+|<\/mark>/g, "");
@@ -437,35 +443,44 @@ Ext.define('Editor.controller.SearchReplace', {
             
             matches = cellHTML.match(searchRegExp);
         
+            debugger;
             if(!matches){
                 return;
             }
-            // populate indexes array, set currentIndex, and replace wrap matched string in a span
+
+            me.activeSegment.matchCount=matches.length;
+            // populate indexes array, set matchIndex, and replace wrap matched string in a span
             cellHTML = cellHTML.replace(searchRegExp, function(m) {
+                //if (me.activeSegment.matchIndex === null) {
+                //    me.activeSegment.matchIndex = 1;
+                //}
+                //if(me.activeSegment.matchIndex === count){
+                if(!me.isSearchPressed){
+                    me.activeSegment.matchIndex = me.activeSegment.matchIndex-1;
+                    me.activeSegment.matchIndex = Math.max(me.activeSegment.matchIndex,0);
+                    if(me.activeSegment.matchIndex === count){
+                        count++;
+                        return replaceCombo.getRawValue();
+                    }
+                }
+                if(me.activeSegment.matchIndex===count){
+                    count++;
+                    return '<mark style="background-color:red;">' + m + '</mark>';
+                }
                 count++;
-                if (me.currentIndex === null) {
-                    me.currentIndex = 1;
-                }
-                
-                if(me.currentIndex === count){
-                    return '<mark style="background-color:red;">' + (me.isSearchPressed ? m : replaceCombo.getRawValue() )+ '</mark>';
-                }
                 return '<mark>' + m + '</mark>';
                //return '<span style="background-color:yellow;">' + m + '</span>';
                //return '<mark>' + m + '</mark>';
             });
-            me.currentIndex++;
             
-            if(me.currentIndex > matches.length){
-                me.currentIndex = null;
-                me.findEditorSegment(Editor.app.getController('Editor'));
+            if(matches.length > 0){
+                me.activeSegment.matchIndex++;
             }
             cell.dom.innerHTML = cellHTML;
     },
     
     findEditorSegment:function(plug){
         var me=this,
-            editor = plug.getEditPlugin().editor,
             grid = plug.getSegmentGrid(),
             tabPanel=me.getTabPanel(),
             activeTab=tabPanel.getActiveTab(),
@@ -474,41 +489,67 @@ Ext.define('Editor.controller.SearchReplace', {
             gridView=grid.getView(),
             firstVisibleIndex=gridView.getFirstVisibleRowIndex(),
             goToIndex=null,
-            ed=grid.editingPlugin,
-            selModel=grid.getSelectionModel(),
             tmpRowNumber=null;
         
-        for(var i=0;i<results.length;i++){
-            //subtract one because this is a row number but we need the index
-            tmpRowNumber=parseInt(results[i].row_number)-1;
-            if(tmpRowNumber===firstVisibleIndex){
-                goToIndex=firstVisibleIndex;
-                break;
+        if(!plug.isEditing){
+            for(var i=0;i<results.length;i++){
+                //subtract one because this is a row number but we need the index
+                tmpRowNumber=parseInt(results[i].row_number);
+                if(tmpRowNumber===firstVisibleIndex){
+                    goToIndex=firstVisibleIndex;
+                    me.activeSegment.segmentResultIndex=i+1;
+                    break;
+                }
             }
         }
         
         if(goToIndex===null){
-            goToIndex=parseInt(results[0].row_number)-1;
+            goToIndex=parseInt(results[me.activeSegment.segmentResultIndex].row_number);
+            me.activeSegment.segmentResultIndex++;
+        }
+
+        if(me.activeSegment.segmentResultIndex >= results.length){
+            me.activeSegment.segmentResultIndex=0;
         }
         
+        me.goToSegment(goToIndex,plug);
+    },
+
+    goToSegment:function(goToIndex,plug){
+        var me=this,
+            grid = plug.getSegmentGrid(),
+            selModel=grid.getSelectionModel(),
+            ed=grid.editingPlugin;
+
         callback = function() {
             grid.selectOrFocus(goToIndex);
             sel = selModel.getSelection();
             ed.startEdit(sel[0], null, ed.self.STARTEDIT_SCROLLUNDER);
-            
             //delay the text selection because the dom is not initialized
             new Ext.util.DelayedTask(function(){
-                me.selectOrReplaceText(editor);
+                me.selectOrReplaceText();
             }).delay(100);
-            
         };
         
         grid.scrollTo(goToIndex, {
             callback: callback,
             notScrollCallback: callback
         });
-    }
-    
+    },
+
+    getSegmentIframeDocument:function(){
+        var me=this,
+            plug=Editor.app.getController('Editor'),
+            editor = plug.getEditPlugin().editor,
+            iframeDocument=null;
+        try {
+            iframeDocument = editor.mainEditor.iframeEl.dom.contentDocument || iFrame.getWin().document;
+        } catch(error) {
+            return false;
+        }
+        return iframeDocument;
+    },
+
     /*FIXME this works but somehow destroys the content inside the segment!!
     testSearch:function(testWindow,testDocument,text){
         if (testWindow.find && testWindow.getSelection) {
