@@ -27,6 +27,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/* T5DEV-161: visualReview requres this to be set to 'initial' and not to 'relative' else the review file will not be displayed! */
+div.x-container.x-container-default {position: initial;}
+
+
 #changealike-grid .x-grid-row .segment-tag-column .x-grid-cell-inner,
 #segment-grid .x-grid-row .x-grid-cell .x-grid-cell-inner {
   white-space: normal;

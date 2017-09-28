@@ -66,6 +66,9 @@ Ext.define('Editor.controller.Editor', {
   },{
       ref : 'navi',
       selector : '#metapanel #naviToolbar'
+  },{
+      ref:'filepanel',
+      selector:'#filepanel'
   }],
   registeredTooltips: [],
   isEditing: false,
@@ -82,9 +85,6 @@ Ext.define('Editor.controller.Editor', {
           }
       },
       component: {
-          '#metapanel metapanelNavi #watchSegmentBtn' : {
-              click : 'toggleWatchSegment'
-          },
           '#metapanel metapanelNavi button' : {
               click : 'buttonClickDispatcher'
           },
@@ -99,11 +99,14 @@ Ext.define('Editor.controller.Editor', {
               afterrender: 'initMoveToolTip'
           },
           '#segmentgrid': {
-              afterrender: 'initEditPluginHandler',
               beforeedit:function(){
                   // We need to pass the segment's workflow to the ChangeMarkup-View:
                   this.segmentWorkflowStepNr = arguments[1].record.data.workflowStepNr; // TODO: Is there a better way to get this data?
-              }
+              },
+              afterrender: 'initEditPluginHandler'
+          },
+          '#referenceFilesInfoMessage':{
+              windowContentClick:'onShowReferenceFilesButtonClick'
           }
       }
   },
@@ -116,7 +119,7 @@ Ext.define('Editor.controller.Editor', {
       
       //set the default config
       me.keyMapConfig = {
-          'ctrl-d':         ["D",{ctrl: true, alt: false}, me.toggleWatchSegment, true],
+          'ctrl-d':         ["D",{ctrl: true, alt: false}, me.watchSegment, true],
           'ctrl-s':         ["S",{ctrl: true, alt: false}, me.save, true],
           'ctrl-g':         ["G",{ctrl: true, alt: false}, me.scrollToSegment, true],
           'ctrl-enter':     [[10,13],{ctrl: true, alt: false}, me.saveNextByWorkflow],
@@ -189,6 +192,8 @@ Ext.define('Editor.controller.Editor', {
               return false;
           }]
       }));
+      
+      me.handleReferneceFilesMessage();
   },
   
   handleSortOrFilter: function() {
@@ -234,7 +239,10 @@ Ext.define('Editor.controller.Editor', {
   handleBeforeStartEdit: function(plugin, args){
       if(!plugin.editing) {
           //if editing is started by enter or F2 on a selected row:
-          if(plugin.editByCellActivation && !args[0].get('editable')){
+          //FIXME the check for editByCellActivation is commented because is not needed. With this
+          //the message will be reused in visualReview plugin
+          //if(plugin.editByCellActivation && !args[0].get('editable')){
+          if(!args[0].get('editable')){
               Editor.MessageBox.addInfo(this.messages.f2Readonly);
           }
           return true;
@@ -925,7 +933,7 @@ Ext.define('Editor.controller.Editor', {
    * Handler for watchSegmentBtn
    * @param {Ext.button.Button} button
    */
-  toggleWatchSegment: function() {
+  watchSegment: function() {
       if(!this.isEditing){
           return;
       }
@@ -978,5 +986,26 @@ Ext.define('Editor.controller.Editor', {
             failure: failure
         });
     }
+  },
+  
+  handleReferneceFilesMessage:function(){
+      if(Editor.data.task.get('referenceFiles')){
+          var referenceInfoMessage = Ext.create('Editor.view.ReferenceFilesInfoMessage',{}),
+          task = new Ext.util.DelayedTask(function(){
+              referenceInfoMessage.destroy();
+          });
+          task.delay(10000);
+          referenceInfoMessage.show();
+      }
+  },
+
+  /***
+   * "Reference files info message" window button handler
+   */
+  onShowReferenceFilesButtonClick:function(){
+      var filePanel =this.getFilepanel(); 
+      filePanel.expand();
+      filePanel.down('referenceFileTree').expand();
   }
+  
 });

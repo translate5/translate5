@@ -39,7 +39,13 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.comments.Panel', {
     extend : 'Ext.panel.Panel',
     alias : 'widget.commentPanel',
-    requires : [ 'Editor.view.comments.Grid' ],
+    controller: 'commentPanel',
+
+    requires : [ 
+        'Editor.view.comments.Grid',
+        'Editor.view.comments.PanelViewController' 
+    ],
+
     title : '#UT#Kommentare zum aktuellen Segment',
     itemId : 'commentPanel',
     layout: 'fit',
@@ -53,11 +59,21 @@ Ext.define('Editor.view.comments.Panel', {
     delete_confirm_msg: '#UT#Soll der Kommentar wirklich gelöscht werden?',
 
     /**
+     * is the panel collapsable
+     */
+    isCollapsable:true,
+    /**
      * show a confirm message box before the deletion of a comment
      * @param {Function} callback
      */
     showDeleteConfirm: function(callback) {
-        Ext.Msg.confirm(this.delete_confirm_title, this.delete_confirm_msg, callback);
+        var confirmWin = Ext.create('Ext.window.MessageBox');
+        confirmWin.confirm(this.delete_confirm_title, this.delete_confirm_msg, callback);
+        
+        //we use defere so the messagebox info is always of top
+        Ext.defer(function () {
+            confirmWin.toFront();
+        }, 50);
     },
     //in original Method beforeclose is not captured on escaping with ESC
     onEsc: function(k, e) {
@@ -118,10 +134,16 @@ Ext.define('Editor.view.comments.Panel', {
                         items : [ {
                             xtype : 'button',
                             itemId : 'cancelBtn',
+                            listeners:{
+                                click:'onCancelBtnClick'
+                            },
                             text : me.item_cancelBtn
                         }, {
                             xtype : 'button',
                             itemId : 'saveBtn',
+                            listeners:{
+                                click:'onSaveBtnClick'
+                            },
                             text : me.item_saveBtn
                         }]
                     }]
@@ -136,5 +158,21 @@ Ext.define('Editor.view.comments.Panel', {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
+    },
+
+    handleCollapse:function(){
+        if(!this.isCollapsable){
+            return;
+        }
+        this.collapse();
+    },
+
+    handleExpand:function(){
+        var me=this;
+
+        if(me.isCollapsable && me.collapsed){
+            //FIXME everything with the expangin inside the comments controoler
+            me.expand();
+        }
     }
 });

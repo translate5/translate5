@@ -66,7 +66,7 @@ Ext.define('Editor.view.segments.Grid', {
   
     cls: 'segment-tag-viewer',
     id: 'segment-grid',
-  
+
     title: '#UT#Segmentliste und Editor',
     
     tools: [
