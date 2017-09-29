@@ -989,7 +989,7 @@ Ext.define('Editor.controller.Editor', {
           task = new Ext.util.DelayedTask(function(){
               referenceInfoMessage.destroy();
           });
-          task.delay(10000000000);
+          task.delay(10000);
           referenceInfoMessage.show();
       }
   },
