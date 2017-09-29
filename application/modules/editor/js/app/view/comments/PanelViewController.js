@@ -52,8 +52,8 @@ Ext.define('Editor.view.comments.PanelViewController', {
           '#commentPanel actioncolumn' : {
               click: 'handleGridAction'
           },
-          '#commentPanel #cancelBtn' : {
-              click: 'onCancelBtnClick'
+          '#commentPanel #closeBtn' : {
+              click: 'onCloseBtnClick'
           }
         },
         controller:{
@@ -131,10 +131,20 @@ Ext.define('Editor.view.comments.PanelViewController', {
             store.insert(0, rec);
         }
     },
-
     
-    onCancelBtnClick:function(){
-        this.handleAddComment();
+    onCloseBtnClick:function(){
+        var me=this,
+            commentPanel=me.getCommentPanel();
+        if(!commentPanel){
+            return;
+        }
+        me.handleAddComment();
+        //if the panel is collapsable -> collapse the panel, else close the window
+        if(commentPanel.isCollapsable){
+            commentPanel.collapse();
+            return;
+        }
+        commentPanel.up('window').destroy();
     },
 
     /**

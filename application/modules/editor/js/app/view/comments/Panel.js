@@ -49,7 +49,6 @@ Ext.define('Editor.view.comments.Panel', {
     title : '#UT#Kommentare zum aktuellen Segment',
     itemId : 'commentPanel',
     layout: 'fit',
-    item_cancelBtn : '#UT#Abbrechen',
     item_saveBtn : '#UT#Speichern',
     item_closeBtn: '#UT#Schließen',
     item_commentNew: '#UT#Kommentar neu',
@@ -133,11 +132,11 @@ Ext.define('Editor.view.comments.Panel', {
                         },
                         items : [ {
                             xtype : 'button',
-                            itemId : 'cancelBtn',
+                            itemId : 'closeBtn',
                             listeners:{
-                                click:'onCancelBtnClick'
+                                click:'onCloseBtnClick'
                             },
-                            text : me.item_cancelBtn
+                            text : me.item_closeBtn
                         }, {
                             xtype : 'button',
                             itemId : 'saveBtn',
@@ -153,7 +152,7 @@ Ext.define('Editor.view.comments.Panel', {
                 }]
             } ]
         };
-
+        
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
