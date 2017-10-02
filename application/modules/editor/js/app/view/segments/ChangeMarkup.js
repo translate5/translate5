@@ -649,7 +649,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                 var currentIsOfSameConditionsAsSibling = this.isNodesOfSameName(tmpMarkupNode,siblingNode) && this.isNodesOfSameNameAndConditionsAndEvent(tmpMarkupNode,siblingNode);
             // no default, because then we would have a bug in the code. Calling this method without a correct parameter is too dangerous in consequences.
         }
-        this.consoleLog("- checkConditions: " + currentIsOfSameConditionsAsSibling);
+        this.consoleLog("- checkConditions ("+checkConditions+"): " + currentIsOfSameConditionsAsSibling);
         if (!currentIsOfSameConditionsAsSibling) {
             return false;
         }
@@ -977,8 +977,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         if (!this.isNodeOfTypeMarkup(nodeA) || !this.isNodeOfTypeMarkup(nodeB)) {
             return false;
         }
-        var userOfNodeA = parseInt(nodeA.getAttribute(this.ATTRIBUTE_USERNAME)),
-            userOfNodeB = parseInt(nodeB.getAttribute(this.ATTRIBUTE_USERNAME));
+        var userOfNodeA = nodeA.getAttribute(this.ATTRIBUTE_USERNAME),
+            userOfNodeB = nodeB.getAttribute(this.ATTRIBUTE_USERNAME);
         return userOfNodeA == userOfNodeB;
     },
     /**
@@ -990,7 +990,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         if (!this.isNodeOfTypeMarkup(node)) {
             return false;
         }
-        var userOfNode = parseInt(node.getAttribute(this.ATTRIBUTE_USERNAME)),
+        var userOfNode = node.getAttribute(this.ATTRIBUTE_USERNAME),
             userOfEvent = this.editorUsername;
         return userOfNode == userOfEvent;
     },
