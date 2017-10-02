@@ -42,7 +42,6 @@ Ext.define('Editor.controller.Fileorder', {
   extend : 'Ext.app.Controller',
   stores: ['Files','ReferenceFiles'],
   views: ['fileorder.Tree','fileorder.ReferenceTree'],
-  id: 'fileordercontroller',
   refs : [{
     ref : 'fileTree',
     selector : '#fileorderTree'

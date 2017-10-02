@@ -44,7 +44,6 @@ Ext.define('Editor.controller.MetaPanel', {
   models: ['SegmentUserAssoc'],
   messages: {
   },
-  id: 'metapanelcontroller',
   refs : [{
     ref : 'metaPanel',
     selector : '#metapanel'
@@ -81,7 +80,7 @@ Ext.define('Editor.controller.MetaPanel', {
           }
       },
       controller: {
-          '#editorcontroller': {
+          '#Editor': {
               changeState: 'changeState'
           }
       }

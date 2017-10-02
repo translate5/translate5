@@ -66,7 +66,7 @@ Ext.define('Editor.view.segments.Grid', {
   
     cls: 'segment-tag-viewer',
     id: 'segment-grid',
-  
+
     title: '#UT#Segmentliste und Editor',
     
     tools: [
@@ -83,6 +83,7 @@ Ext.define('Editor.view.segments.Grid', {
     
     title_readonly: '#UT#Segmentliste und Editor - [LESEMODUS]',
     column_edited: '#UT#bearbeibar',    
+    target_original: '#UT# (zur Importzeit)',    
     column_edited_icon: '{0} <img src="{1}" class="icon-editable" alt="{2}" title="{3}">',
     
     columnMap:{},
@@ -174,6 +175,9 @@ Ext.define('Editor.view.segments.Grid', {
             
             if(!rec.isTarget() || ! userPref.isNonEditableColumnDisabled()) {
                 width = Math.min(Math.max(width, labelWidth), maxWidth);
+                if(isEditableTarget) {
+                    label = label + me.target_original;
+                }
                 var col2push = {
                     xtype: 'contentColumn',
                     grid: me,
@@ -183,6 +187,7 @@ Ext.define('Editor.view.segments.Grid', {
                     isErgonomicVisible: isErgoVisible && !editable,
                     isErgonomicSetWidth: true, //currently true for all our affected default fields
                     text: label,
+                    tooltip: label,
                     width: width
                 };
                 if(width < maxWidth){
@@ -198,7 +203,7 @@ Ext.define('Editor.view.segments.Grid', {
             
             if(editable){
                 labelWidth = (label.length) * widthFactorHeader + widthOffsetEditable;
-                label = Ext.String.format(me.column_edited_icon, label, Ext.BLANK_IMAGE_URL, me.column_edited, me.column_edited);
+                label = Ext.String.format(me.column_edited_icon, rec.get('label'), Ext.BLANK_IMAGE_URL, me.column_edited, me.column_edited);
                 width = Math.min(Math.max(width, labelWidth), maxWidth);
                 var col2push = {
                     xtype: 'contentEditableColumn',

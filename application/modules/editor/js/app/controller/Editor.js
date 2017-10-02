@@ -42,6 +42,7 @@ Ext.define('Editor.controller.Editor', {
   extend : 'Ext.app.Controller',
   requires: [
     'Editor.view.segments.EditorKeyMap',
+    'Editor.view.segments.ChangeMarkup',
     'Editor.controller.editor.PrevNextSegment'
   ],
   messages: {
@@ -53,11 +54,11 @@ Ext.define('Editor.controller.Editor', {
       f2Readonly: '#UT#Das ausgewählte Segment ist nicht bearbeitbar!',
       errorTitle: '#UT# Fehler bei der Segment Validierung!',
       correctErrorsText: '#UT# Fehler beheben',
-      editorMoveTitle: '#UT#Verschiebbarer Editor',
+      editorMoveTitle: '#UT#Verschiebbarer Editor und hilfreiche Tastaturkürzel',
       editorMove: '#UT#Der Segmenteditor kann mit der Maus beliebig positioniert werden. <br />Dazu lediglich den Segmenteditor anklicken und dann verschieben.',
+      takeTagTooltip: '#UT#STRG + EINFG (alternativ STRG + . (Punkt)) kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.',
       saveAnyway: '#UT# Trotzdem speichern'
   },
-  id: 'editorcontroller',
   DEC_DIGITS: [48, 49, 50, 51, 52, 53, 54, 55, 56, 57],
   refs : [{
     ref : 'segmentGrid',
@@ -65,12 +66,18 @@ Ext.define('Editor.controller.Editor', {
   },{
       ref : 'navi',
       selector : '#metapanel #naviToolbar'
+  },{
+      ref:'filepanel',
+      selector:'#filepanel'
   }],
+  registeredTooltips: [],
   isEditing: false,
   keyMapConfig: null,
   editorKeyMap: null,
   generalKeyMap: null,
+  segmentWorkflowStepNr: null,
   prevNextSegment: null,
+  sourceTags: null,
   listen: {
       controller: {
           '#Editor.$application': {
@@ -78,9 +85,6 @@ Ext.define('Editor.controller.Editor', {
           }
       },
       component: {
-          '#metapanel metapanelNavi #watchSegmentBtn' : {
-              click : 'toggleWatchSegment'
-          },
           '#metapanel metapanelNavi button' : {
               click : 'buttonClickDispatcher'
           },
@@ -88,11 +92,21 @@ Ext.define('Editor.controller.Editor', {
               initialize: 'initEditor',
               contentErrors: 'handleSaveWithErrors'
           },
+          'roweditor': {
+              destroy: 'handleDestroyRoweditor'
+          },
           'roweditor displayfield[isContentColumn!=true]': {
               afterrender: 'initMoveToolTip'
           },
           '#segmentgrid': {
+              beforeedit:function(){
+                  // We need to pass the segment's workflow to the ChangeMarkup-View:
+                  this.segmentWorkflowStepNr = arguments[1].record.data.workflowStepNr; // TODO: Is there a better way to get this data?
+              },
               afterrender: 'initEditPluginHandler'
+          },
+          '#referenceFilesInfoMessage':{
+              windowContentClick:'onShowReferenceFilesButtonClick'
           }
       }
   },
@@ -105,7 +119,7 @@ Ext.define('Editor.controller.Editor', {
       
       //set the default config
       me.keyMapConfig = {
-          'ctrl-d':         ["D",{ctrl: true, alt: false}, me.toggleWatchSegment, true],
+          'ctrl-d':         ["D",{ctrl: true, alt: false}, me.watchSegment, true],
           'ctrl-s':         ["S",{ctrl: true, alt: false}, me.save, true],
           'ctrl-g':         ["G",{ctrl: true, alt: false}, me.scrollToSegment, true],
           'ctrl-enter':     [[10,13],{ctrl: true, alt: false}, me.saveNextByWorkflow],
@@ -121,9 +135,13 @@ Ext.define('Editor.controller.Editor', {
           'ctrl-alt-down':  [Ext.EventObjectImpl.DOWN,{ctrl: true, alt: true}, me.goToLowerNoSave, true],
           'alt-c':          ["C",{ctrl: false, alt: true}, me.handleOpenComments, true],
           'alt-s':          ["S",{ctrl: false, alt: true}, me.handleDigitPreparation(me.handleChangeState), true],
+          'ctrl-comma':     [188,{ctrl: true, alt: false, shift: false}, me.handleDigitPreparation(me.handleInsertTag), true],
+          'ctrl-shift-comma': [188,{ctrl: true, alt: false, shift: true}, me.handleDigitPreparation(me.handleInsertTagShift), true],
           'alt-DIGIT':      [me.DEC_DIGITS,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
           'DIGIT':          [me.DEC_DIGITS,{ctrl: false, alt: false}, me.handleDigit],
-          'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true]
+          'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
+          'ctrl-insert':    [Ext.EventObjectImpl.INSERT,{ctrl: true, alt: false}, me.copySourceToTarget],
+          'ctrl-dot':       [190,{ctrl: true, alt: false}, me.copySourceToTarget] //Mac Alternative key code
       };
   },
   /**
@@ -174,6 +192,8 @@ Ext.define('Editor.controller.Editor', {
               return false;
           }]
       }));
+      
+      me.handleReferneceFilesMessage();
   },
   
   handleSortOrFilter: function() {
@@ -190,15 +210,28 @@ Ext.define('Editor.controller.Editor', {
    * initializes the roweditor moveable tooltip
    */
   initMoveToolTip: function(displayfield){
-      var me = this;
+      var me = this,
+          id = displayfield.getId()+'-bodyEl';
       if(displayfield.ownQuicktip){
           return;
       }
+      me.registeredTooltips.push(id);
       Ext.tip.QuickTipManager.register({
-          target: displayfield.getId()+'-bodyEl', 
+          target: id, 
           title: me.messages.editorMoveTitle,
-          text: me.messages.editorMove
+          text: me.messages.editorMove + '<br /><br />' + me.messages.takeTagTooltip
       });
+  },
+  handleDestroyRoweditor: function() {
+      //FIXME needed for Ext 6.2, possibly removable for further ExtJS updates, see T5DEV-172
+      var me = this;
+      if(me.registeredTooltips && me.registeredTooltips.length > 0) {
+          Ext.Array.each(me.registeredTooltips, function(item) {
+              if(Ext.tip.QuickTipManager.tip) {
+                  delete Ext.tip.QuickTipManager.tip.targets[item];
+              }
+          });
+      }
   },
   /**
    * saves the segment of the already opened editor and restarts startEditing call 
@@ -206,7 +239,10 @@ Ext.define('Editor.controller.Editor', {
   handleBeforeStartEdit: function(plugin, args){
       if(!plugin.editing) {
           //if editing is started by enter or F2 on a selected row:
-          if(plugin.editByCellActivation && !args[0].get('editable')){
+          //FIXME the check for editByCellActivation is commented because is not needed. With this
+          //the message will be reused in visualReview plugin
+          //if(plugin.editByCellActivation && !args[0].get('editable')){
+          if(!args[0].get('editable')){
               Editor.MessageBox.addInfo(this.messages.f2Readonly);
           }
           return true;
@@ -223,7 +259,49 @@ Ext.define('Editor.controller.Editor', {
     var me = this;
     me.isEditing = true;
     me.prevNextSegment.calculateRows(context);//context.record, context.rowIdx
+    me.getSourceTags(context);
   },
+    getSourceTags: function(context) {
+        var me = this,
+            plug = me.getEditPlugin(),
+            source = context.record.get('source'),
+            tempNode, parse, walkNodes;
+
+        me.sourceTags = [];
+        //do nothing when editing the source field
+        if(/^source/.test(context.column.dataIndex)){
+            return;
+        }
+
+        tempNode = document.createElement('DIV');
+        Ext.fly(tempNode).update(source);
+
+        walkNodes = function(rootNode) {
+            Ext.each(rootNode.childNodes, function(item){
+                if(Ext.isTextNode(item) || item.tagName != 'DIV'){
+                    return;
+                }
+                if(item.tagName == 'DIV' && /(^|[\s])term([\s]|$)/.test(item.className)){
+                    walkNodes(item);
+                    return;
+                }
+                var divItem = Ext.fly(item),
+                    tagNr = divItem.down('span.short').dom.innerHTML.replace(/[^0-9]/g, ''),
+                    tagType = item.className.match(/^(open|single|close)\s/),
+                    //we use a real array starting at 0 for tag 1
+                    idx = tagNr-1;
+                if(!tagType) {
+                    return;
+                }
+                tagType = tagType[1];
+                if(!me.sourceTags[idx]) {
+                    me.sourceTags[idx] = {};
+                }
+                me.sourceTags[idx][plug.editor.mainEditor.idPrefix+tagType+tagNr] = '<div class="'+item.className+'">'+item.innerHTML+'</div>';
+          });
+      };
+      walkNodes(tempNode);
+    },
   /**
    * Gibt die RowEditing Instanz des Grids zurück
    * @returns Editor.view.segments.RowEditing
@@ -270,14 +348,13 @@ Ext.define('Editor.controller.Editor', {
               scope: me
           }, item[1]);
           if(item[3]) {
+              confObj.defaultEventAction = 'stopEvent';
               //prepends the event propagation stopper
-              confObj.fn = function(key, e) {
-                  e.stopEvent();
-                  item[2].apply(confObj.scope, arguments);
-              }
           }
-          else {
-              confObj.fn = item[2];
+          confObj.fn = function(key, e) {
+              item[2].apply(confObj.scope, arguments);
+              //FIXME Ausnahme für digitHandler definieren, wenn nicht im isDigitPreparation Modus!
+              return false; //stop further key binding processing
           }
           conf.push(confObj);
       });
@@ -296,8 +373,14 @@ Ext.define('Editor.controller.Editor', {
       }
       me.editorKeyMap = new Editor.view.segments.EditorKeyMap({
         target: docEl,
+        changeMarkup: new Editor.view.segments.ChangeMarkup(editor,me.segmentWorkflowStepNr), //FIXME set this config only if changeMarkup is enabled
         binding: me.getKeyMapConfig()
       });
+      docEl.on('paste', function(e){
+          e.stopPropagation();
+          e.preventDefault();
+          editor.insertAtCursor((e.browserEvent.clipboardData || window.clipboardData).getData('Text'));
+      }, me, {delegated: false});
   },
   clearKeyMaps: function() {
       var me = this;
@@ -305,8 +388,10 @@ Ext.define('Editor.controller.Editor', {
           me.editorKeyMap.destroy();
           me.editorKeyMap = null;
       }
-      me.generalKeyMap.destroy();
-      me.generalKeyMap = null;
+      if(me.generalKeyMap) {
+          me.generalKeyMap.destroy();
+          me.generalKeyMap = null;
+      }
   },
   buttonClickDispatcher: function(btn, e) {
       var me = this,
@@ -339,8 +424,9 @@ Ext.define('Editor.controller.Editor', {
    * @param {Function} must be function in the controller scope, since scope parameter is not supported
    */
   handleDigitPreparation: function(digithandler) {
-      this.digitHandler = digithandler;
+      var me = this;
       return function(key, event) {
+          me.digitHandler = digithandler;
           event.isDigitPreparation = true;
           event.stopEvent();
           return false;
@@ -791,6 +877,52 @@ Ext.define('Editor.controller.Editor', {
         });
     }
   },
+  copySourceToTarget: function() {
+      var plug = this.getEditPlugin();
+      //do only something when editing targets:
+      if(!this.isEditing || !/^target/.test(plug.editor.columnToEdit)){
+          return;
+      }
+      plug.editor.mainEditor.insertMarkup(plug.context.record.get('source'));
+  },
+
+    handleInsertTagShift: function(key, e) {
+        e.shiftKey = true; //somehow a hack, but is doing what it should do
+        this.handleInsertTag(key, e);
+    },
+    handleInsertTag: function(key, e) {
+        var me = this,
+            plug = this.getEditPlugin(),
+            editor = plug.editor.mainEditor,
+            source = plug.context.record.get('source'),
+            tagIdx = Number(key) - 49, //49 shifts tag nr down to 0 for tag 1
+            tempNode, parse;
+
+        //key 0 equals to tadIdx -1 and equals to tag nr 10 (which equals to tagIdx 9)
+        if(tagIdx < 0) {
+            tagIdx = 9;
+        }
+
+        if(e.shiftKey) {
+            tagIdx = tagIdx + 10;
+        }
+            
+        //do only something when editing targets with tags and tag nrs > 1:
+        if(!me.sourceTags || !me.sourceTags[tagIdx]){
+            return;
+        }
+
+        Ext.Object.each(me.sourceTags[tagIdx], function(id, tag){
+            if(editor.getDoc().getElementById(id)){
+                return;
+            }
+            editor.insertMarkup(tag);
+            return false;
+        });
+
+        e.stopEvent();
+        return false;
+    },
   /**
    * scrolls to the first segment.
    */
@@ -801,7 +933,7 @@ Ext.define('Editor.controller.Editor', {
    * Handler for watchSegmentBtn
    * @param {Ext.button.Button} button
    */
-  toggleWatchSegment: function() {
+  watchSegment: function() {
       if(!this.isEditing){
           return;
       }
@@ -854,5 +986,26 @@ Ext.define('Editor.controller.Editor', {
             failure: failure
         });
     }
+  },
+  
+  handleReferneceFilesMessage:function(){
+      if(Editor.data.task.get('referenceFiles')){
+          var referenceInfoMessage = Ext.create('Editor.view.ReferenceFilesInfoMessage',{}),
+          task = new Ext.util.DelayedTask(function(){
+              referenceInfoMessage.destroy();
+          });
+          task.delay(10000);
+          referenceInfoMessage.show();
+      }
+  },
+
+  /***
+   * "Reference files info message" window button handler
+   */
+  onShowReferenceFilesButtonClick:function(){
+      var filePanel =this.getFilepanel(); 
+      filePanel.expand();
+      filePanel.down('referenceFileTree').expand();
   }
+  
 });

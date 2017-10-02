@@ -27,6 +27,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/* T5DEV-161: visualReview requres this to be set to 'initial' and not to 'relative' else the review file will not be displayed! */
+div.x-container.x-container-default {position: initial;}
+
+
 #changealike-grid .x-grid-row .segment-tag-column .x-grid-cell-inner,
 #segment-grid .x-grid-row .x-grid-cell .x-grid-cell-inner {
   white-space: normal;
@@ -310,6 +314,9 @@ body.loading {background: url("../images/loading_ico.gif") center 100px no-repea
 .ico-add {background-image: url("../images/table_row_insert.png");}
 .ico-del {background-image: url("../images/table_row_delete.png");}
 .ico-task-back {background-image: url("../images/table_back.png");}
+.ico-next-wizard {background-image: url("../images/arrow_right.png");}
+.ico-skip-wizard {background-image: url("../images/resultset_last.png");}
+.ico-finish-wizard {background-image: url("../images/accept.png");}
 .adminTaskGrid tr.openable td.taskNr div {text-decoration: underline;cursor: pointer !important;}
 .adminTaskGrid .locked td.state div {padding-left:20px;background:url(../images/information.png) no-repeat left top;}
 .adminTaskGrid .error td.state div {padding-left:20px;background:url(../images/exclamation.png) no-repeat left top;}
@@ -325,6 +332,7 @@ body.loading {background: url("../images/loading_ico.gif") center 100px no-repea
 .adminTaskGrid .x-grid-header-ct .relais-lang > div {background:url("../images/relaisLanguage.png") no-repeat 10px 9px;}
 .adminTaskGrid .x-grid-header-ct .source-lang > div {background:url("../images/sourceLanguage.png") no-repeat 10px 9px;}
 .adminTaskGrid .x-grid-header-ct .target-lang > div {background:url("../images/targetLanguage.png") no-repeat 10px 9px;}
+.adminTaskGrid .x-grid-header-ct .empty-targets > div {background:url("../images/emptyTargetLanguage.png") no-repeat 10px 9px;}
 
 .adminTaskGrid .x-grid-header-ct .fullMatchEdit.ux-filtered-column span,
 .adminTaskGrid .x-grid-header-ct .terminologie.ux-filtered-column span,
@@ -343,6 +351,7 @@ body.loading {background: url("../images/loading_ico.gif") center 100px no-repea
 .adminTaskGrid .x-grid-header-ct .source-edit span.x-column-header-text-inner,
 .adminTaskGrid .x-grid-header-ct .source-lang span.x-column-header-text-inner,
 .adminTaskGrid .x-grid-header-ct .target-lang span.x-column-header-text-inner,
+.adminTaskGrid .x-grid-header-ct .empty-targets span.x-column-header-text-inner,
 .adminTaskGrid .x-grid-header-ct .relais-lang span.x-column-header-text-inner{
     display: block;
     overflow: hidden;
@@ -415,6 +424,12 @@ tr.customeState td div {font-style: italic;}
 .x-action-col-cell img{height:16px;width:16px;margin-right:2px;cursor: pointer;}
 
 #segment-grid .first-in-file td  {border-top-style: solid; border-top-width: 3px; border-top-color: #99BCE8;}
+
+/* ChangeMarkup */
+.x-grid-cell ins {background-color: #E5FFAC; min-width: 1EM !important;}
+.x-grid-cell del {background-color: #FFD8D4;}
+.x-grid-cell del img,
+.x-grid-cell ins img {height: 14px !important;}
 
 /* Fix T5DEV-147 */
 .x-form-file-wrap .x-form-trigger-wrap-default.x-form-trigger-wrap-invalid .x-form-text {

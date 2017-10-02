@@ -41,7 +41,7 @@ Ext.data.JsonP.disableCaching = false;
 Ext.data.proxy.Server.prototype.noCache = false;
 Ext.Ajax.disableCaching = false;
 
-Ext.enableAriaButtons = false; //ext6.0.0 bug, see EXT6UPD-10 
+Ext.ariaWarn = Ext.emptyFn; 
 
 Ext.override(Ext.data.Connection, {
     timeout: 60000

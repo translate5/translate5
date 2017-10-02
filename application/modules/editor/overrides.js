@@ -219,3 +219,35 @@ Ext.define('MyApp.overrides.data.request.Ajax', {
         return response;
     },
 });
+
+Ext.override(Ext.util.CSS, {
+    /***
+     * Add a custom css to the given html page
+     */
+    createStyleSheetToWindow : function(window,cssText, id) {
+        var ss,
+            head = window.getElementsByTagName("head")[0],
+            styleEl = window.createElement("style");
+
+        styleEl.setAttribute("type", "text/css");
+        if (id) {
+           styleEl.setAttribute("id", id);
+        }
+
+        if (Ext.isIE) {
+           head.appendChild(styleEl);
+           ss = styleEl.styleSheet;
+           ss.cssText = cssText;
+        } else {
+            try{
+                styleEl.appendChild(window.createTextNode(cssText));
+            } catch(e) {
+               styleEl.cssText = cssText;
+            }
+            head.appendChild(styleEl);
+            ss = styleEl.styleSheet ? styleEl.styleSheet : (styleEl.sheet || window.styleSheets[window.styleSheets.length-1]);
+        }
+        this.cacheStyleSheet(ss);
+        return ss;
+    },
+})

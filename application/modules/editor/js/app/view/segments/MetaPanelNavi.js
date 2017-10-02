@@ -55,8 +55,8 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
     //frameHeader: false,
 
     //Item Strings:
-    item_startWatchingSegment: '#UT#Segment auf die Merkliste setzen (STRG + D)',
-    item_stopWatchingSegment: '#UT#Segment von der Merkliste entfernen (STRG + D)',
+    item_startWatchingSegment: '#UT#Segment auf Lesezeichenliste (STRG + D)',
+    item_stopWatchingSegment: '#UT#Segment von Lesezeichenliste entfernen (STRG + D)',
     item_scrollToSegment: '#UT#Zur Bearbeitung geöffnetes Segment wieder in den Sichtbereich bewegen (STRG + G)',
     item_cancel: '#UT#Abbrechen (ESC)',
     item_reset: '#UT#Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)',

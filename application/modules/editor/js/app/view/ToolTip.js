@@ -46,6 +46,8 @@ Ext.define('Editor.view.ToolTip', {
     // define a own tooltip class
     renderTo : Ext.getBody(),
     strings: {
+        deletedby: '#UT#Deleted by',
+        insertedby: '#UT#Inserted by',
         severity: '#UT#Gewichtung'
     },
     listeners : {
@@ -56,22 +58,18 @@ Ext.define('Editor.view.ToolTip', {
                 fly = Ext.fly(t); 
             if(fly.hasCls('qmflag')) {
                 this.handleQmFlag(t, tip);
+            } else if (Ext.get(t).hasCls('changemarkup')) {
+                this.handleChangeMarkup(t, tip);
             }
             //else if hasClass for other ToolTip Types
         }
     },
-    show : function(xy) {
-        var me = this;
-        if (xy && me.boundFrame) {
-            xy[0] += me.boundFrame.getX();
-            xy[1] += me.boundFrame.getY();
-        }
-        return me.callParent([xy]);
-    },
+
     onTargetOver: function(e) {
         e.preventDefault(); //prevent title tags to be shown in IE
         this.callParent(arguments);
     },
+    
     handleQmFlag: function(t, tip) {
         var me = this, 
             qmtype,
@@ -93,15 +91,65 @@ Ext.define('Editor.view.ToolTip', {
         }
         tip.update(me.qmflagTpl.apply(meta));		
     },
-    /**
-     * instead of overriding the whole setTarget method just to add the delegated config
-     * we invoke into the mon method here to inject the parameter directly
-     */
-    mon: function() {
-        var config = arguments[1];
-        if(config && Ext.isObject(config) && config.mouseover && config.mouseout && config.mousemove) {
-            config.delegated = false;
+    
+    handleChangeMarkup: function(markupNode, tip) {
+        var me = this,
+            markupAction,
+            markupNodeUsername,
+            markupNodeTimestamp;
+        if (markupNode.nodeName == 'INS') {
+            markupAction = me.strings.insertedby;
+        } else if (markupNode.nodeName == 'DEL') {
+            markupAction = me.strings.deletedby;
+        } else {
+            return;
         }
-        this.callParent(arguments);
+        if (markupNode.hasAttribute('data-username')) {
+            markupNodeUsername = markupNode.getAttribute('data-username');
+        }
+        if (markupNode.hasAttribute('data-timestamp')) {
+            markupNodeTimestamp = parseInt(markupNode.getAttribute('data-timestamp'));
+        }
+        var tplData = {
+            changemarkupAction : markupAction,
+            changemarkupUser : markupNodeUsername,
+            changemarkupDate : Ext.Date.format(new Date(markupNodeTimestamp),'Y-m-d H:i')
+        };
+        if(!me.changemarkupTpl) {
+            me.changemarkupTpl = new Ext.Template('<b>{changemarkupAction}</b><br>{changemarkupUser}<br>{changemarkupDate}');
+            me.changemarkupTpl.compile();
+        }
+        tip.update(me.changemarkupTpl.apply(tplData));
+    },
+    
+    /**
+     * Override of default setTarget, only change see below.
+     * Must be respected on ExtJS updates!
+     */
+    setTarget: function(target) {
+        var me = this,
+            listeners;
+ 
+        if (me.targetListeners) {
+            me.targetListeners.destroy();
+        }
+ 
+        if (target) {
+            me.target = target = Ext.get(target.el || target);
+            listeners = {
+                mouseover: 'onTargetOver',
+                mouseout: 'onTargetOut',
+                mousemove: 'onMouseMove',
+                tap: 'onTargetTap',
+                scope: me,
+                destroyable: true,
+                delegated: false    //this is the only change in comparision to the original code
+            };
+ 
+            me.targetListeners = target.on(listeners);
+        } else {
+            me.target = null;
+        }
     }
+    
 });

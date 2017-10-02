@@ -74,7 +74,6 @@ Ext.define('Editor.controller.ChangeAlike', {
     alikePlural: '#UT#Wiederholungen wurden bearbeitet und gespeichert',
     alikesDisabled: '#UT#Das Projekt enthält alternative Übersetzungen. Der Wiederholungseditor wurde daher deaktiviert.'
   },
-  id: 'changealikecontroller',
   alikesToProcess: null,
   fetchedAlikes: null,
   saveIsRunning: false,
@@ -120,7 +119,7 @@ Ext.define('Editor.controller.ChangeAlike', {
           '#Editor.$application': {
               editorViewportClosed: 'clearAlikeSegments'
           },
-          '#segmentscontroller': {
+          '#Segments': {
               afterSaveCall: 'onAfterSaveCall',
               saveComplete: 'onSaveComplete'
           }
@@ -355,7 +354,7 @@ Ext.define('Editor.controller.ChangeAlike', {
       timeout: 90000,
       params: {
           "duration": me.timeTracking,
-          "alikes[]": alikes
+          "alikes": Ext.JSON.encode(alikes)
       },
       success: me.alikesSaveSuccessHandler,
       failure: me.alikesSaveFailureHandler,
@@ -481,6 +480,8 @@ Ext.define('Editor.controller.ChangeAlike', {
   updateSegment: function(id, data) {
     var store = this.getStore('Segments'),
         rec = store.getById(id);
+    
+    
     if(!rec) {
       if(!store.prefetchData){
           return null;
@@ -497,6 +498,9 @@ Ext.define('Editor.controller.ChangeAlike', {
     rec.set(data);
     rec.endEdit(true);
     rec.commit();
+    
+    this.fireEvent('afterUpdateChangeAlike',rec);
+    
     return rec;
   },
   handleCancelChangeAlike: function() {

@@ -22,27 +22,40 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-body{box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;cursor:text;font-size:10px;}
-body.ergonomic {font-size:13pt !important; line-height: 23px !important;}
-body.ergonomic img{height: 22px !important;}
-body.hide-tag img{display:none;}
-img {width: auto !important;height: 14px !important; vertical-align:middle;cursor: pointer;}
-img.duplicatesavecheck {width:0 !important;height:0 !important;display:none;}
-span.term {background:transparent;border-bottom:1px solid #0000ff;}
-span.source-transNotFound {border-bottom-color:#ff0000;}
-span.source-transNotDefined {border-bottom-color:#8F4C36;}
-span.notRecommended,
-span.supersededTerm,
-span.deprecatedTerm {border-bottom:none;background-color:#fa51ff;}
-body.fakedsel strong, body.fakedsel b {font-weight:normal;background:#b0b0b0;}
-
-/* ChangeMarkup */
-ins {background-color: #E5FFAC; min-width: 1EM !important;}
-del {background-color: #FFD8D4;}
-body.ergonomic del img,
-body.ergonomic ins img {height: 14px !important;}
+Ext.define('Editor.view.ReferenceFilesInfoMessage', {
+    extend: 'Ext.window.Window',
+    itemId:'referenceFilesInfoMessage',
+    width:300,
+    y:0,
+    y:0,
+    bodyPadding:'10 10 10 10',
+    strings:{
+        windowTitle:'#UT#Referenz-Dateien',
+        windowInfoMessage:'#UT#There are reference files to the task. Open attachment list',
+        buttonText:'#UT#Referenz-Dateien liste'
+    },
+    listeners: {
+        'render': function(window) {
+            window.body.on('click', function() {
+                window.fireEvent('windowContentClick');
+            });
+         }
+    },
+    initComponent:function(instanceConfig){
+        var me = this;
+        me.title=me.strings.windowTitle;
+        me.html=me.strings.windowInfoMessage;
+        //me.bbar=[{ 
+        //    xtype: 'button',
+        //    itemId:'showReferenceFilesButton',
+        //    text: me.strings.buttonText,
+        //    icon: Editor.data.moduleFolder+'images/page_attach.png'
+        //}];
+        return me.callParent([config]);
+    }
+});

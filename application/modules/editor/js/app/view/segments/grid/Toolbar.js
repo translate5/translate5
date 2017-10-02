@@ -51,10 +51,13 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_hideTagBtn: '#UT#Tags verbergen',
     item_shortTagBtn: '#UT#Tag-Kurzansicht',
     item_fullTagBtn: '#UT#Tag-Vollansicht',
-    item_qmsummaryBtn: '#UT#QM-Subsegment-Statistik',
+    item_qmsummaryBtn: '#UT#MQM',
+    item_qmsummaryTooltip: '#UT#MQM Statistik',
     item_optionsTagBtn: '#UT#Einstellungen',
-    item_clearSortAndFilterBtn: '#UT#Sortierung und Filter zurücksetzen',
-    item_watchListFilterBtn: '#UT#Merkliste',
+    item_clearSortAndFilterBtn: '#UT#Tabelle zurücksetzen',
+    item_clearSortAndFilterTooltip: '#UT#Sortierung und Filter zurücksetzen',
+    item_watchListFilterBtn: '#UT#Lesezeichen',
+    item_helpTooltip: '#UT#Tastaturkürzel nachschlagen',
     viewModel: {
         formulas: {
             isNormalEdit: function(get) {
@@ -166,6 +169,10 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     xtype: 'button',
                     itemId: 'clearSortAndFilterBtn',
                     cls: 'clearSortAndFilterBtn',
+                    tooltip: {
+                        text: me.item_clearSortAndFilterTooltip,
+                        showDelay: 0
+                    },
                     text: me.item_clearSortAndFilterBtn
                 },{
                     xtype: 'tbseparator'
@@ -183,9 +190,23 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     xtype: 'button',
                     itemId: 'qmsummaryBtn',
                     text: me.item_qmsummaryBtn,
+                    tooltip: {
+                        text: me.item_qmsummaryTooltip,
+                        showDelay: 0
+                    },
                     hidden: !Editor.data.task.hasQmSub()
                 },{
                     xtype: 'tbfill'
+                },{
+                    xtype: 'button',
+                    //FIXME let me come from a config:
+                    href: 'http://confluence.translate5.net/display/BUS/Editor+keyboard+shortcuts',
+                    hrefTarget: '_blank',
+                    icon: Editor.data.moduleFolder+'images/help.png',
+                    tooltip: {
+                        text: me.item_helpTooltip,
+                        showDelay: 0
+                    }
                 },{
                     xtype: 'button',
                     itemId: 'optionsBtn',

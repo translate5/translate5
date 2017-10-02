@@ -73,9 +73,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 	  tagRemovedText: '#UT# Es wurden Tags mit fehlendem Partner entfernt!',
       cantEditContents: '#UT#Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.'
   },
-
-  //hilfsvariable für die "letzte Segment anzeigen" Funktionalität beim Verlassen des Browsers. 
-  lastSegmentContentWithoutTags: null,
   
   //***********************************************************************************
   //Begin Events
@@ -154,8 +151,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       var me = this,
           checkTag = me.getDuplicateCheckImg(segmentId, fieldName);
       
-      me.lastSegmentContentWithoutTags = [];
-      me.setValue(me.markup(value)+checkTag);
+      me.setValue(me.markupForEditor(value)+checkTag);
   },
   /**
    * Fixing focus issues EXT6UPD-105 and EXT6UPD-137
@@ -185,7 +181,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     var me = this,
     	result,
     	body = me.getEditorBody();
-    me.lastSegmentContentWithoutTags = [];
     me.checkTags(body);
     result = me.unMarkup(body);
     me.contentEdited = me.plainContent.join('') !== result.replace(/<img[^>]+>/g, '');
@@ -194,24 +189,62 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   /**
    * ersetzt die div und spans durch images im string 
    * @private
-   * @param value String
+   * @param value {String}
+   * @returns {String}
    */
-  markup: function(value) {
+  markupForEditor: function(value) {
     var me = this,
-        tempNode = document.createElement('DIV');
+        tempNode = document.createElement('DIV'),
+        plainContent = [],
+        result;
     me.contentEdited = false;
-    me.result = [];
-    me.plainContent = []; //stores only the text content and content tags for "original content has changed" comparsion
     me.markupImages = {};
     
+    result = me.markup(value, plainContent);
+    me.plainContent = plainContent; //stores only the text content and content tags for "original content has changed" comparsion
+    return result.join('');
+  },
+  insertMarkup: function(value) {
+      var html = this.markup(value).join(''),
+          doc = this.getDoc(),
+          sel, range, frag, node, el, lastNode;
+      if (!window.getSelection) {
+          //Not supported by your browser message!
+          return;
+      }
+      sel = doc.getSelection();
+      if(sel.getRangeAt) {
+        range = sel.getRangeAt(0);
+        el = doc.createElement("div");
+        frag = doc.createDocumentFragment();
+        el.innerHTML = html;
+        while ((node = el.firstChild)) {
+            lastNode = frag.appendChild(node);
+        }
+        range.insertNode(frag);
+        range.setStartAfter(lastNode);
+        range.setEndAfter(lastNode); 
+      }
+  },
+  /**
+   * converts the given HTML String to HTML ready for the Editor (div>span to img tags)
+   * Each call adds the found internal tags to the markupImages map.
+   * @param value {String}
+   * @param plainContent {Array} optional, needed for markupForEditor only
+   */
+  markup: function(value, plainContent) {
+    var me = this,
+        tempNode = document.createElement('DIV'),
+        plainContent = plainContent || [];
+    me.result = [];
     //tempnode mit inhalt füllen => Browser HTML Parsing
     value = value.replace(/ </g, Editor.TRANSTILDE+'<');
     value = value.replace(/> /g, '>'+Editor.TRANSTILDE);
     Ext.fly(tempNode).update(value);
-    me.replaceTagToImage(tempNode);
-    return me.result.join('');
+    me.replaceTagToImage(tempNode, plainContent);
+    return me.result;
   },
-  replaceTagToImage: function(rootnode) {
+  replaceTagToImage: function(rootnode, plainContent) {
     var me = this,
     data = {
         fullPath: Editor.data.segments.fullTagPath,
@@ -224,13 +257,17 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       var termFoundCls, divItem, spanFull, spanShort, split;
       if(Ext.isTextNode(item)){
         var text = item.data.replace(new RegExp(Editor.TRANSTILDE, "g"), ' ');
-        me.lastSegmentContentWithoutTags.push(text);
         me.result.push(Ext.htmlEncode(text));
-        me.plainContent.push(Ext.htmlEncode(text));
+        plainContent.push(Ext.htmlEncode(text));
         return;
       }
       if(item.tagName == 'IMG' && !me.isDuplicateSaveTag(item)){
           me.result.push(me.imgNodeToString(item, true));
+          return;
+      }
+      // Keep nodes from ChangeMarkup
+      if(item.tagName == 'INS' || item.tagName == 'DEL'){
+          me.result.push(item.outerHTML);
           return;
       }
       // Span für Terminologie
@@ -241,7 +278,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
             termFoundCls = termFoundCls.replace(/(transFound|transNotFound|transNotDefined)/, replacement);
         }
         me.result.push(Ext.String.format('<span class="{0}" title="{1}">', termFoundCls, item.title));
-        me.replaceTagToImage(item);
+        me.replaceTagToImage(item, plainContent);
         me.result.push('</span>');
         return;
       }
@@ -308,7 +345,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       }
 
       me.result.push(me.imageTemplate.apply(data));
-      me.plainContent.push(me.markupImages[data.key].html);
+      plainContent.push(me.markupImages[data.key].html);
     });
   },
   /**
@@ -331,7 +368,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           if(Ext.isTextNode(item)){
               text = item.data;
               result.push(Ext.htmlEncode(text));
-              me.lastSegmentContentWithoutTags.push(text);
+              return;
+          }
+          // Keep nodes from ChangeMarkup!
+          if(item.tagName == 'INS' || item.tagName == 'DEL'){
+              result.push(item.outerHTML);
               return;
           }
           // recursive processing of Terminologie spans, removes the term span
@@ -684,5 +725,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 	  }
 	  var sel = doc.getSelection();
 	  return !(sel.isCollapsed || sel.rangeCount > 0 && sel.getRangeAt(0).collapsed);
+  },
+  destroyEditor: function() {
+      //do nothing, here since the getWin().un('unload',...); in the original method throws an exception
+      // since our htmlEditor is only destroyed once at page reload we just do nothing here
+      // the comments in the original method about leaked IE6/7 can be ignored so far
   }
 });

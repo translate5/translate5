@@ -69,20 +69,19 @@ Ext.define('Editor.controller.Segments', {
   extend : 'Ext.app.Controller',
   stores: ['Segments'],
   //views: ['segments.Scroller', 'segments.RowEditing', 'segments.HtmlEditor', 'segments.GridFilter'],
-  views: ['segments.RowEditing', 'segments.HtmlEditor'],
+  views: ['segments.RowEditing', 'segments.HtmlEditor', 'ToolTip'],
   messages: {
     segmentSaved: 'Das Segment wurde gespeichert!',
     sortCleared: 'Die gewählte Sortierung der Segmente wurde zurückgesetzt!',
     segmentNotSaved: '#UT# Das zuletzt geöffnete Segment (Nr. {0}) konnte nicht gespeichert werden!',
     noSegmentToFilter: 'Kein Segment dieser Datei entspricht den Filterkriterien',
-    otherFiltersActive: '#UT#ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Merkliste sichtbar sind'
+    otherFiltersActive: '#UT#ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Lesezeichenliste sichtbar sind'
   },
   /**
    * Cache der Zuordnung fileId => Grid Index des ersten Segments der Datei.
    */
   filemap: {},
   lastFileMapParams: null,
-  id: 'segmentscontroller',
   loadingMaskRequests: 0,
   saveChainMutex: false,
   changeAlikeOperation: null,
@@ -108,15 +107,15 @@ Ext.define('Editor.controller.Segments', {
           '#Editor.$application': {
               editorViewportClosed: 'clearSegments'
           },
-          '#editorcontroller': {
+          '#Editor': {
               saveSegment: 'saveChainStart',
               watchlistRemoved: 'handleWatchlistRemoved'
           },
-          '#changealikecontroller': {
+          '#ChangeAlike': {
               //called after currently loaded segment data is not used anymore by the save chain / change alike handling
               segmentUsageFinished: 'onSegmentUsageFinished'
           },
-          '#fileordercontroller': {
+          '#Fileorder': {
               itemsaved: 'handleFileSaved'
           }
       },
@@ -132,7 +131,7 @@ Ext.define('Editor.controller.Segments', {
           '#clearSortAndFilterBtn': {
               click: 'clearSortAndFilter'
           },
-          '#watchListFilterBtn': {
+          'segmentsToolbar #watchListFilterBtn': {
               click: 'watchListFilter'
           }
       },
@@ -174,6 +173,13 @@ Ext.define('Editor.controller.Segments', {
           btn.removeCls(cls);
           btnWatchList.removeCls(cls);
     }
+      // ToolTips for ChangeMarkup
+      Ext.create('Editor.view.ToolTip', {
+          target: this.getSegmentGrid().getView().el,
+          delegate: '.changemarkup',
+          trackMouse: true,
+          dismissDelay: 0
+      });
   },
   /**
    * Displays / Updates the segment count in the reset button
@@ -215,9 +221,7 @@ Ext.define('Editor.controller.Segments', {
       else {
         //reset suppressNextFilter to reenable normal filtering (suppressNextFilter needed for initialGridFilters)
         store.suppressNextFilter = false;
-        //FIXME ext update: for > ext-6.0.0 this must be changed to .load since 
-        //the private method attemptLoad does not exist anymore (tested in ext-6.0.1) 
-        store.attemptLoad();
+        store.load();
         me.reloadFilemap();
       }
   },
@@ -434,17 +438,6 @@ Ext.define('Editor.controller.Segments', {
       me.handleFilterChange();
   },
   /**
-   * Hilfsfunktion um beim Schließen des Browserfensters das letzte Segment anzuzeigen
-   * @returns boolean|string
-   */
-  getLastSegmentShortInfo: function() {
-    var grid = this.getSegmentGrid();
-    if(grid && grid.editingPlugin.editor) {
-      return this.getSegmentGrid().editingPlugin.editor.lastSegmentShortInfo;
-    }
-    return false;
-  },
-  /**
    * binds the change alike load operation to the save chain
    * @param {Editor.store.AlikeSegments} store
    * @param {Ext.data.Operation} op
@@ -590,6 +583,14 @@ Ext.define('Editor.controller.Segments', {
       Editor.MessageBox.addByOperation(operation);
       //show save segment success message 
       Editor.MessageBox.addSuccess(me.messages.segmentSaved);
+      
+      //FIXME 
+      //this event is triggered because we are not able to listen(use) the 'saveComplete' event
+      //the 'saveComplete' event is subscribed in 'ChangeAlike' controller, and it is disabled if the manual processing is disabled
+      //we are not able to use the event listener priority because of the extjs bug : https://www.sencha.com/forum/showthread.php?305085-Observable-listener-priority-does-not-work
+      //this bug also exist in extjs 6.2.0
+      me.fireEvent('beforeSaveCall',records);
+      
       //invoking change alike handling:
       if(me.fireEvent('saveComplete')){
           me.saveChainEnd(); //NEXT step in save chain

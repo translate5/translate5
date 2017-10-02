@@ -60,6 +60,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       ref: 'taskAddWindow',
       selector: '#adminTaskAddWindow'
   }],
+  alias: 'controller.taskOverviewController',
+  
+  isCardFinished:false,
   /**
    * Container for translated task handler confirmation strings
    * Deletion of an entry means to disable confirmation.
@@ -74,7 +77,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       "delete":       {title: "#UT#Aufgabe komplett löschen?", msg: "#UT#Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?"}
   },
   strings: {
-      taskImported: '#UT#Aufgabe "{0}" vollständig importiert',
+      taskImported: '#UT#Aufgabe "{0}" bereit.',
       taskError: '#UT#Die Aufgabe konnte aufgrund von Fehlern nicht importiert werden!',
       taskOpening: '#UT#Aufgabe wird im Editor geöffnet...',
       taskFinishing: '#UT#Aufgabe wird abgeschlossen...',
@@ -84,7 +87,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       taskDestroy: '#UT#Aufgabe wird gelöscht...',
       taskNotDestroyed : '#UT#Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!',
       forcedReadOnly: '#UT#Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!',
-      openTaskAdminBtn: "#UT#Aufgabenübersicht"
+      openTaskAdminBtn: "#UT#Aufgabenübersicht",
+      loadingWindowMessage:"#UT#Dateien werden hochgeladen",
   },
   init : function() {
       var me = this;
@@ -94,7 +98,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       Editor.app.on('editorViewportOpened', me.handleInitEditor, me);
       
       me.getAdminTasksStore().on('load', me.startCheckImportStates, me);
-
+      
       me.control({
           'headPanel toolbar#top-menu' : {
               beforerender: me.initMainMenu
@@ -123,11 +127,21 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           '#adminTaskAddWindow #cancel-task-btn': {
               click: me.handleTaskCancel
           },
+          '#adminTaskAddWindow #continue-wizard-btn': {
+              click: me.handleContinueWizardClick
+          },
+          '#adminTaskAddWindow #skip-wizard-btn': {
+              click: me.handleSkipWizardClick
+          },
           '#adminTaskAddWindow filefield[name=importUpload]': {
               change: me.handleChangeImportFile
           },
           '#segmentgrid': {
               afterrender: me.initTaskReadMode
+          },
+          'adminTaskAddWindow panel:not([hidden])': {
+              wizardCardFinished:me.onWizardCardFinished,
+              wizardCardSkiped:me.onWizardCardSkiped
           }
       });
   },
@@ -353,42 +367,83 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       this.getTaskAddForm().getForm().reset();
       this.getTaskAddWindow().close();
   },
+
+  handleTaskAdd: function(button) {
+      var me=this,
+          win=me.getTaskAddWindow(),
+          vm=win.getViewModel();
+          winLayout=win.getLayout(),
+          nextStep=win.down('#taskUploadCard');
+      
+      if(me.getTaskAddForm().isValid()){
+          if(nextStep.strings && nextStep.strings.wizardTitle){
+              win.setTitle(nextStep.strings.wizardTitle);
+          }
+          
+          vm.set('activeItem',nextStep);
+          winLayout.setActiveItem(nextStep);
+      }
+  },
+  
+  
   /**
-   * is called after clicking save task, starts the upload / form submit
+   * is called after clicking continue, if there are wizard panels, 
+   * then the next available wizard panel is set as active 
    */
-  handleTaskAdd: function() {
+  handleContinueWizardClick:function(){
       var me = this,
           win = me.getTaskAddWindow(),
-          error = win.down('#feedbackBtn');
-      error.hide();
-      win.setLoading(true);
-      this.getTaskAddForm().submit({
-          //Accept Header of submitted file uploads could not be changed:
-          //http://stackoverflow.com/questions/13344082/fileupload-accept-header
-          //so use format parameter jsontext here, for jsontext see REST_Controller_Action_Helper_ContextSwitch
-          
-    	  params: {
-              format: 'jsontext'
-          },
-          
-          url: Editor.data.restpath+'task',
-          scope: this,
-          success: function(form, submit) {
-              var task = me.getModel('admin.Task').create(submit.result.rows);
-              me.fireEvent('taskCreated', task);
-              win.setLoading(false);
-              me.getAdminTasksStore().load();
-              me.handleTaskCancel();
-          },
-          failure: function(form, submit) {
-              win.setLoading(false);
-              if(submit.failureType == 'server' && submit.result && submit.result.errors && !Ext.isDefined(submit.result.success)) {
-                  //all other failures should mark a field invalid
-                  error.show();
-              }
-          }
-      });
+          winLayout=win.getLayout(),
+          activeItem=winLayout.getActiveItem();
+      
+      activeItem.triggerNextCard(activeItem);
   },
+  
+  /***
+   * Called when skip button in wizard window is clicked.
+   * The function of this button is to skup the next card group (in the current wizard group, sure if there is one)
+   * 
+   */
+  handleSkipWizardClick:function(){
+      var me = this,
+          win = me.getTaskAddWindow(),
+          winLayout=win.getLayout(),
+          activeItem=winLayout.getActiveItem();
+      
+      activeItem.triggerSkipCard(activeItem);
+  },
+  
+  onWizardCardFinished:function(skipCards){
+      var me = this,
+          win = me.getTaskAddWindow(),
+          winLayout=win.getLayout(),
+          nextStep=winLayout.getNext(),
+          vm=win.getViewModel();
+      
+      if(skipCards){
+          for(var i=1;i < skipCards;i++){
+              winLayout.setActiveItem(nextStep);
+              nextStep=winLayout.getNext();
+          }
+      }
+
+      if(!nextStep){
+          //me.handleTaskCancel();
+          me.saveTask();
+          return;
+      }
+      if(nextStep.strings && nextStep.strings.wizardTitle){
+          win.setTitle(nextStep.strings.wizardTitle);
+      }
+      
+      vm.set('activeItem',nextStep);
+      winLayout.setActiveItem(nextStep);
+  },
+  
+  onWizardCardSkiped:function(){
+      this.saveTask();
+  },
+  
   handleTaskAddShow: function() {
       if(!this.isAllowed('editorAddTask')){
           return;
@@ -591,5 +646,42 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    */
   handleTaskChangeUserAssoc: function(task) {
       this.fireEvent('handleTaskChangeUserAssoc', task);
+  },
+  /***
+   * starts the upload / form submit
+   */
+  saveTask:function(){
+      var me = this,
+          win = me.getTaskAddWindow(),
+          error = win.down('#feedbackBtn');
+      error.hide();
+      win.setLoading(me.strings.loadingWindowMessage);
+      this.getTaskAddForm().submit({
+          //Accept Header of submitted file uploads could not be changed:
+          //http://stackoverflow.com/questions/13344082/fileupload-accept-header
+          //so use format parameter jsontext here, for jsontext see REST_Controller_Action_Helper_ContextSwitch
+          
+          params: {
+              format: 'jsontext'
+          },
+          
+          url: Editor.data.restpath+'task',
+          scope: this,
+          success: function(form, submit) {
+              var task = me.getModel('admin.Task').create(submit.result.rows);
+              me.fireEvent('taskCreated', task);
+              win.setLoading(false);
+              me.getAdminTasksStore().load();
+              me.handleTaskCancel();
+              Editor.MessageBox.addSuccess(win.importTaskMessage,2);
+          },
+          failure: function(form, submit) {
+              win.setLoading(false);
+              if(submit.failureType == 'server' && submit.result && submit.result.errors){//FIXME why is this chech ? && !Ext.isDefined(submit.result.success)) {
+                  //all other failures should mark a field invalid
+                  error.show();
+              }
+          }
+      });
   }
 });
