@@ -46,6 +46,8 @@ Ext.define('Editor.view.ToolTip', {
     // define a own tooltip class
     renderTo : Ext.getBody(),
     strings: {
+        deletedby: '#UT#Deleted by',
+        insertedby: '#UT#Inserted by',
         severity: '#UT#Gewichtung'
     },
     listeners : {
@@ -92,8 +94,16 @@ Ext.define('Editor.view.ToolTip', {
     
     handleChangeMarkup: function(markupNode, tip) {
         var me = this,
+            markupAction,
             markupNodeUsername,
             markupNodeTimestamp;
+        if (markupNode.nodeName == 'INS') {
+            markupAction = me.strings.insertedby;
+        } else if (markupNode.nodeName == 'DEL') {
+            markupAction = me.strings.deletedby;
+        } else {
+            return;
+        }
         if (markupNode.hasAttribute('data-username')) {
             markupNodeUsername = markupNode.getAttribute('data-username');
         }
@@ -101,11 +111,12 @@ Ext.define('Editor.view.ToolTip', {
             markupNodeTimestamp = parseInt(markupNode.getAttribute('data-timestamp'));
         }
         var tplData = {
+            changemarkupAction : markupAction,
             changemarkupUser : markupNodeUsername,
             changemarkupDate : Ext.Date.format(new Date(markupNodeTimestamp),'Y-m-d H:i')
         };
         if(!me.changemarkupTpl) {
-            me.changemarkupTpl = new Ext.Template('<b>Changed by:</b><br>{changemarkupUser}<br>{changemarkupDate}');
+            me.changemarkupTpl = new Ext.Template('<b>{changemarkupAction}</b><br>{changemarkupUser}<br>{changemarkupDate}');
             me.changemarkupTpl.compile();
         }
         tip.update(me.changemarkupTpl.apply(tplData));
