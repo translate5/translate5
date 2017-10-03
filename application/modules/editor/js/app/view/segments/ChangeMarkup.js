@@ -270,7 +270,6 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         if (delNode == 'completeSelectionIsDeleted') {
             return;
         }
-        this.positionCaretAfterDeletion(delNode);
         
         // Handle existing images within the selection for deletion.
         this.consoleLog("DEL: handleImagesInDeletion...");
@@ -279,7 +278,6 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         if (delNode == 'completeSelectionIsMarked') {
             return;
         }
-        this.positionCaretAfterDeletion(delNode);
         
         // Content that is already marked as deleted needs no further handling.
         
@@ -380,7 +378,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                 case Ext.event.Event.BACKSPACE: // Backspace: "deletes" the previous node/character
                     if (startC.isEqualNode(editorBody) 
                             && editorBody.childNodes[startO-1] != undefined
-                            && editorBody.childNodes[startO-1].nodeName == "IMG") { // for term tags etc
+                            && editorBody.childNodes[startO-1].nodeName == "IMG") { // for term tags etc if the caret is positioned within an img
                         rangeForDel.selectNodeContents(editorBody.childNodes[startO-1]);
                     } else {
                         rangeForDel.moveStart("character", -1);
@@ -390,8 +388,12 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                     selPositionInfo = this.getSelectionPositionInfo(endC);
                     if (selPositionInfo.atEnd
                             && endC.nextElementSibling != undefined
-                            && endC.nextElementSibling.nodeName == "IMG") { // for term tags etc
+                            && endC.nextElementSibling.nodeName == "IMG") { // for term tags etc if the caret is positioned exactly before an img
                         rangeForDel.selectNodeContents(endC.nextElementSibling);
+                    } else if (endC.isEqualNode(editorBody) 
+                            && editorBody.childNodes[endO] != undefined
+                            && editorBody.childNodes[endO].nodeName == "IMG") { // for term tags etc if the caret is positioned within an img
+                        rangeForDel.selectNodeContents(editorBody.childNodes[endO]);
                     } else {
                         rangeForDel.moveEnd("character", 1);
                     }
@@ -554,6 +556,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             unmarkedNode = unmarkedNodesTotal[i];
             rangeForUnmarkedNode.selectNodeContents(unmarkedNode);
             rangeWithCharsForAction = rangeForDel.intersection(rangeForUnmarkedNode);
+            delNode = this.createNodeForMarkup(this.NODE_NAME_DEL);
             if (rangeWithCharsForAction.canSurroundContents()) {
                 rangeWithCharsForAction.surroundContents(delNode);
             } else {
@@ -691,6 +694,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                         && this.isNodeOfTypeMarkup(this.docSelRange.commonAncestorContainer.parentNode))
                 containerNodeForCurrentSelection = this.docSelRange.startContainer.parentNode;
             }
+        } else if (this.docSelRange.commonAncestorContainer.isEqualNode(this.editor.getEditorBody()) ) {
+            // this.editor.getEditorBody() is our highest node
+            containerNodeForCurrentSelection = this.editor.getEditorBody();
         } else {
             containerNodeForCurrentSelection = this.docSelRange.commonAncestorContainer.parentNode;
         }
