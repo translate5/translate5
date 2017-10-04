@@ -63,8 +63,6 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     // https://github.com/timdown/rangy/wiki/Rangy-Range#compareboundarypointsnumber-comparisontype-range-range
     RANGY_RANGE_IS_BEFORE: -1,
     RANGY_RANGE_IS_AFTER: 1,
-    // https://github.com/timdown/rangy/wiki/Rangy-Range#comparenodenode-node
-    RANGY_IS_NODE_INSIDE: 3,
     
     // "SETTINGS/CONFIG"
     CHAR_PLACEHOLDER: '\u0020',     // what's inserted as placeholder when creating elements
@@ -248,17 +246,38 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * Handle deletion-Events.
      */
     handleDeletion: function() {
-        var delNode = null;
+        var delNode = null,
+            selectionNode,
+            selPositionInfo;
+        
+        // if we are in a DEL-Markup already...
+        if (this.isWithinNode('sameConditionsAndEvent')) {
+            selectionNode = this.getContainerNodeForCurrentSelection();
+            selPositionInfo = this.getSelectionPositionInfo(selectionNode);
+            // DELETE: We must NOT be at the last position (= next character is meant!)
+            // BACKSPACE: We must NOT be at the first position (= previous character is meant!)
+            if( ( this.eventKeyCode == Ext.event.Event.DELETE && !selPositionInfo.atEnd )
+                || ( this.eventKeyCode == Ext.event.Event.BACKSPACE && !selPositionInfo.atStart) ) {
+                this.consoleLog("DEL: isWithinDelNode..., we do nothing.");
+                return; // ...nothing to do!
+            }
+        }
         
         // Handle existing INS-Tags within the selection for deletion.
         this.consoleLog("DEL: handleInsNodesInDeletion...");
         delNode = this.handleInsNodesInDeletion();
-        this.positionCaretAfterDeletion(delNode);
+        // If we have aleady removed everything that was selected, then we are done here.
+        if (delNode == 'completeSelectionIsDeleted') {
+            return;
+        }
         
         // Handle existing images within the selection for deletion.
         this.consoleLog("DEL: handleImagesInDeletion...");
         delNode = this.handleImagesInDeletion();
-        this.positionCaretAfterDeletion(delNode);
+        // If we have marked an IMG that encompassed everything that was selected, then we are done here.
+        if (delNode == 'completeSelectionIsMarked') {
+            return;
+        }
         
         // Content that is already marked as deleted needs no further handling.
         
@@ -318,7 +337,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             // Then we need to split that one first:
             if (this.isWithinNode('foreignMarkup')) {
                 this.consoleLog("INS: split foreign node first...");
-                this.splitNode(this.getContainerNodeForCurrentSelection(),this.docSelRange);
+                this.splitNode(this.getContainerNodeForCurrentSelection(true),this.docSelRange);
             }
         
         // Because we are neither in nor at an INS-node:
@@ -347,6 +366,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             startO = this.docSelRange.startOffset,
             endC = this.docSelRange.endContainer,
             endO = this.docSelRange.endOffset,
+            editorBody = this.editor.getEditorBody(),
             rangeForDel = rangy.createRange();
         // set start and end according to the user's selection
         rangeForDel.setStart(startC, startO); 
@@ -355,11 +375,28 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         // (moveStart, moveEnd: https://github.com/timdown/rangy/wiki/Text-Range-Module#movestartstring-unit-number-count-object-options)
         if (rangeForDel.collapsed) {
             switch(this.eventKeyCode) {
-                case Ext.event.Event.BACKSPACE: // Backspace: "deletes" the previous character
-                    rangeForDel.moveStart("character", -1);
+                case Ext.event.Event.BACKSPACE: // Backspace: "deletes" the previous node/character
+                    if (startC.isEqualNode(editorBody) 
+                            && editorBody.childNodes[startO-1] != undefined
+                            && editorBody.childNodes[startO-1].nodeName == "IMG") { // for term tags etc if the caret is positioned within an img
+                        rangeForDel.selectNodeContents(editorBody.childNodes[startO-1]);
+                    } else {
+                        rangeForDel.moveStart("character", -1);
+                    }
                     break;
-                case Ext.event.Event.DELETE: // Delete "deletes" the next character
-                    rangeForDel.moveEnd("character", 1);
+                case Ext.event.Event.DELETE: // Delete "deletes" the next node/character
+                    selPositionInfo = this.getSelectionPositionInfo(endC);
+                    if (selPositionInfo.atEnd
+                            && endC.nextElementSibling != undefined
+                            && endC.nextElementSibling.nodeName == "IMG") { // for term tags etc if the caret is positioned exactly before an img
+                        rangeForDel.selectNodeContents(endC.nextElementSibling);
+                    } else if (endC.isEqualNode(editorBody) 
+                            && editorBody.childNodes[endO] != undefined
+                            && editorBody.childNodes[endO].nodeName == "IMG") { // for term tags etc if the caret is positioned within an img
+                        rangeForDel.selectNodeContents(editorBody.childNodes[endO]);
+                    } else {
+                        rangeForDel.moveEnd("character", 1);
+                    }
                     break;
             }
         }
@@ -369,35 +406,52 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * Handle all INS-content within the selected range for deletion.
      * - If the content has been inserted by the same user in the same workflow, it can really be deleted.
      * - If not, the content just has to be marked as deleted.
-     * The last node that gets marked as deleted is returned.
-     * @returns {?Object} delNode
+     * If the complete selection is handled already, we return "completeSelectionIsDeleted"
+     * otherwise the last node that has been created to mark a deletion is returned.
+     * @returns {(?Object|String)}
      */
     handleInsNodesInDeletion: function() {
         var me = this,
+            completeSelectionIsDeleted = false,
             delNode = null,
             tmpMarkupNode = this.createNodeForMarkup(this.getNodeNameAccordingToEvent()),
             rangeForDel = this.getRangeToBeDeleted(),
-            rangeForInsNode = rangy.createRange(),
-            insNodes = rangeForDel.getNodes([1], function(node) {
-                return ( node.nodeName == me.NODE_NAME_INS );
-            });
-        // also handle characters that are within an INS-node that is only partially selected
+            rangeWithCharsForAction = rangy.createRange(),
+            DOMWithCharsForAction,
+            insNodesTotal,
+            insNode,
+            rangeForInsNode = rangy.createRange();
+        // collect INS-nodes within what is to be deleted
+        insNodesTotal = rangeForDel.getNodes([1], function(node) {
+            return ( node.nodeName == me.NODE_NAME_INS );
+        });
+        // if the selection is completely within one and the same INS-node:
         if (rangeForDel.commonAncestorContainer.parentNode.nodeName == this.NODE_NAME_INS) {
-            insNodes.push(rangeForDel.commonAncestorContainer.parentNode);
+            insNodesTotal.push(rangeForDel.commonAncestorContainer.parentNode);
         };
-        for (var i = 0; i < insNodes.length; i++) {
-            var insNode = insNodes[i],
-                rangeWithCharsForAction = rangy.createRange();
-            rangeForInsNode.selectNode(insNode);
+        for (var i = 0; i < insNodesTotal.length; i++) {
+            insNode = insNodesTotal[i];
+            rangeForInsNode.selectNodeContents(insNode);
             rangeWithCharsForAction = rangeForDel.intersection(rangeForInsNode);
+            DOMWithCharsForAction = rangeWithCharsForAction.cloneContents();
+            if ( (DOMWithCharsForAction.textContent != '')
+                && (rangeWithCharsForAction.text() == rangeForDel.text()) ) {
+                    completeSelectionIsDeleted = true;
+                }
             // INS-node belongs to the same user and workflow: really remove character(s)
             if (this.isNodesOfSameConditions(insNode,tmpMarkupNode)) {
-                if (rangeForDel.compareNode(insNode) == this.RANGY_IS_NODE_INSIDE) {
+                if (rangeForDel.containsNodeText(insNode)) {
                     // INS-Node is selected completely: remove the node
                     insNode.parentNode.removeChild(insNode);
                 } else {
                     // INS-Node is selected partially: remove the selected chars only
-                    rangeWithCharsForAction.deleteContents();
+                    // (= we only need what is WITHIN the INS-node AND is selected).
+                    if (DOMWithCharsForAction.textContent != ''){
+                        if (rangeWithCharsForAction.text() == rangeForDel.text()) {  // rangeWithCharsForAction.containsRange(rangeForDel) does not work eg when the caret has been placed right BEFORE an ins-Node (with DEL-Key)
+                            completeSelectionIsDeleted = true;          
+                        }
+                        rangeWithCharsForAction.deleteContents();
+                    }
                 }
             } else {
             // INS-node does NOT belong to the same user and workflow: only mark character(s) as deleted, but don't remove them.
@@ -407,8 +461,14 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                 rangeWithCharsForAction.insertNode(delNode);
                 insNode.parentNode.removeChild(insNode);
             }
+            // If the selection is completely removed now, then there is nothing left to do.
+            if (completeSelectionIsDeleted) {
+                return 'completeSelectionIsDeleted';
+            }
+            // We might have changed the DOM quite a bit...
+            this.refreshSelectionAndRange();
+            rangeForDel = this.getRangeToBeDeleted();
         }
-        this.refreshSelectionAndRange(); // We might have changed the DOM quite a bit...
         return delNode;
     },
     /**
@@ -420,53 +480,110 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     handleImagesInDeletion: function() {
         var me = this,
+            completeSelectionIsMarked = false,
             delNode = null,
             tmpMarkupNode = this.createNodeForMarkup(this.getNodeNameAccordingToEvent()),
             rangeForDel = this.getRangeToBeDeleted(),
-            rangeForImgNode = rangy.createRange(),
-            imgNodes = rangeForDel.getNodes([1], function(node) {
-                return ( node.nodeName == 'IMG' );
-            });
-        for (var i = 0; i < imgNodes.length; i++) {
-            var imgNode = imgNodes[i];
-            rangeForImgNode.selectNode(imgNode);
-            // INS-node belongs to the same user and workflow: really remove character(s)
-            if (this.isNodesOfSameConditions(imgNode,tmpMarkupNode)) {
-                imgNode.parentNode.removeChild(imgNode);
-            } else {
-            // INS-node does NOT belong to the same user and workflow: only mark character(s) as deleted, but don't remove them.
-                var delNode = this.createNodeForMarkup(this.NODE_NAME_DEL);
-                rangeForDel.collapseBefore(imgNode);
-                delNode.appendChild(imgNode);
-                rangeForDel.insertNode(delNode);
+            imgNodesTotal,
+            setOfImgNodesTotal,
+            mqmPartnerImgNodes = [],
+            imgNode,
+            rangeForImgNode = rangy.createRange();
+        // collect INS-nodes within what is to be deleted
+        imgNodesTotal = rangeForDel.getNodes([1], function(node) {
+            return ( node.nodeName == 'IMG' );
+        });
+        // if the selection is completely that IMG-node:
+        if (rangeForDel.commonAncestorContainer.nodeName == 'IMG'
+            &&  rangeForDel.commonAncestorContainer.isEqualNode(rangeForDel.startContainer)
+            &&  rangeForDel.commonAncestorContainer.isEqualNode(rangeForDel.endContainer) ) {
+            imgNodesTotal.push(rangeForDel.commonAncestorContainer);
+            completeSelectionIsMarked = true;
+        };
+        // check for get MQM-partner-tags and add them to the images for changeMarkup
+        setOfImgNodesTotal = new Set(imgNodesTotal);
+        for (var i = 0; i < imgNodesTotal.length; i++) {
+            var mqmImgPartnerNode = this.getMQMPartnerTag(imgNodesTotal[i]);
+            if (mqmImgPartnerNode != null) {
+                //add imgNode only if it's not included already
+                if (!setOfImgNodesTotal.has(mqmImgPartnerNode)) {
+                    mqmPartnerImgNodes.unshift(mqmImgPartnerNode); // (unshift: handle partner-tags first, otherwise the caret will move)
+                    setOfImgNodesTotal.add(mqmImgPartnerNode);
+                }
             }
         }
-        this.refreshSelectionAndRange(); // We might have changed the DOM quite a bit...
+        imgNodesTotal = imgNodesTotal.concat(mqmPartnerImgNodes);
+        // changeMarkup for images
+        for (var i = 0; i < imgNodesTotal.length; i++) {
+            imgNode = imgNodesTotal[i];
+            rangeForImgNode.selectNode(imgNode);
+            delNode = this.createNodeForMarkup(this.NODE_NAME_DEL);
+            rangeForDel.collapseBefore(imgNode);
+            delNode.appendChild(imgNode);
+            rangeForDel.insertNode(delNode);
+            setOfImgNodesTotal.delete(imgNode);
+            // If the selection is completely marked now (including their partner-tags), 
+            // then there is nothing left to do.
+            if (completeSelectionIsMarked && setOfImgNodesTotal.size == 0) {
+                return 'completeSelectionIsMarked';
+            }
+            // We might have changed the DOM quite a bit...
+            this.refreshSelectionAndRange();
+            rangeForDel = this.getRangeToBeDeleted();
+        }
         return delNode;
     },
     /**
      * Mark all unmarked contents within the selected range for deletion.
-     * The last node that gets marked as deleted is returned.
-     * @returns {?Object} delNode
+     * The last node that gets marked as deleted is returned;
+     * but if nothing gets marked for deletion, we return false.
+     * @returns {(?Object|Boolean)} delNode
      */
     addDel: function() {
         var me = this,
-            delNode = null,
+            delNode = this.createNodeForMarkup(this.NODE_NAME_DEL),
             tmpMarkupNode = this.createNodeForMarkup(this.getNodeNameAccordingToEvent()),
             rangeForDel = this.getRangeToBeDeleted(),
             rangeForUnmarkedNode = rangy.createRange(),
-            unmarkedNodes = rangeForDel.getNodes([3], function(node) {
-                return ( !me.isNodeOfTypeMarkup(node.parentNode) );
-            });
-        for (var i = 0; i < unmarkedNodes.length; i++) {
-            var unmarkedNode = unmarkedNodes[i],
-                rangeWithCharsForAction = rangy.createRange(),
-                delNode = this.createNodeForMarkup(this.NODE_NAME_DEL);
-            rangeForUnmarkedNode.selectNode(unmarkedNode);
-            rangeWithCharsForAction = rangeForDel.intersection(rangeForUnmarkedNode);
-            rangeWithCharsForAction.surroundContents(delNode);
+            rangeWithCharsForAction = rangy.createRange(),
+            unmarkedNodesTotal,
+            unmarkedNode;
+        
+        // Is the complete range itself to be marked as deleted? 
+        // (= e.g. if a character is to be deleted within other characters)
+        if(rangeForDel.commonAncestorContainer.nodeType == 3) { // TODO: is this the only condition that must be met?
+            if (rangeForDel.canSurroundContents(delNode)) {
+                rangeForDel.surroundContents(delNode);
+                return delNode;
+            } else {
+                debugger;
+            }
         }
-        this.refreshSelectionAndRange(); // We might have changed the DOM quite a bit...
+        
+        // Otherwise: Collect element-nodes to mark as deleted...
+        unmarkedNodesTotal = rangeForDel.getNodes([1,3], function(node) {
+            // ... but only when they are not (/in) a DEL-node already
+            return ( !me.isNodeOfSameMarkupTypeAsEvent(node) && !me.isNodeOfSameMarkupTypeAsEvent(node.parentNode) );
+        });
+        
+        if(unmarkedNodesTotal.length == 0) {
+            return false;
+        }
+        
+        for (var i = 0; i < unmarkedNodesTotal.length; i++) {
+            unmarkedNode = unmarkedNodesTotal[i];
+            rangeForUnmarkedNode.selectNodeContents(unmarkedNode);
+            rangeWithCharsForAction = rangeForDel.intersection(rangeForUnmarkedNode);
+            delNode = this.createNodeForMarkup(this.NODE_NAME_DEL);
+            if (rangeWithCharsForAction.canSurroundContents()) {
+                rangeWithCharsForAction.surroundContents(delNode);
+            } else {
+                debugger;
+            }
+            // We might have changed the DOM quite a bit...
+            this.refreshSelectionAndRange();
+            rangeForDel = this.getRangeToBeDeleted();
+        }
         return delNode;
     },
 
@@ -547,7 +664,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @param {?Object} delNode
      */
     positionCaretAfterDeletion: function(delNode) {
-        if (delNode == null || delNode.parentNode == null) {
+        if (delNode == null || !delNode.nodeType || delNode.parentNode == null) {
             return;
         }
         if(this.eventKeyCode == Ext.event.Event.BACKSPACE){
@@ -578,11 +695,30 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     // =========================================================================
 
     /**
-     * Get the surrounding node of the current selection.
+     * Get the "surrounding" node of the current selection.
+     * If getMarkupNodeIfExists is given as true, we return the markup-node if we are within one.
+     * @param {Boolean} getMarkupNodeIfExists
      * @returns {Object}
      */
-    getContainerNodeForCurrentSelection: function(){
-        return this.docSelRange.commonAncestorContainer.parentNode;
+    getContainerNodeForCurrentSelection: function(getMarkupNodeIfExists){
+        var containerNodeForCurrentSelection;
+        if (this.docSelRange.collapsed && this.docSelRange.commonAncestorContainer.isEqualNode(this.editor.getEditorBody()) ) {
+            containerNodeForCurrentSelection = this.docSelRange.commonAncestorContainer.childNodes[this.docSelRange.startOffset];
+        } else if (this.docSelRange.collapsed && this.docSelRange.startContainer.isEqualNode(this.docSelRange.endContainer) ) {
+            containerNodeForCurrentSelection = this.docSelRange.startContainer;
+            // return markup-Node if it completely encompasses the selection 
+            if (getMarkupNodeIfExists != undefined && getMarkupNodeIfExists) {
+                if (this.docSelRange.commonAncestorContainer.wholeText == this.docSelRange.startContainer.wholeText
+                        && this.isNodeOfTypeMarkup(this.docSelRange.commonAncestorContainer.parentNode))
+                containerNodeForCurrentSelection = this.docSelRange.startContainer.parentNode;
+            }
+        } else if (this.docSelRange.commonAncestorContainer.isEqualNode(this.editor.getEditorBody()) ) {
+            // this.editor.getEditorBody() is our highest node
+            containerNodeForCurrentSelection = this.editor.getEditorBody();
+        } else {
+            containerNodeForCurrentSelection = this.docSelRange.commonAncestorContainer.parentNode;
+        }
+        return containerNodeForCurrentSelection;
     },
     /**
      * Get the previous or next node of the current selection.
@@ -608,7 +744,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     isWithinNode: function(checkConditions) {
         var tmpMarkupNode = this.createNodeForMarkup(this.getNodeNameAccordingToEvent()),
-            selectionNode = this.getContainerNodeForCurrentSelection();
+            selectionNode = this.getContainerNodeForCurrentSelection(true);
         switch(checkConditions) {
             case 'insNodeWithSameConditions':
                 var tmpMarkupNode = this.createNodeForMarkup(this.NODE_NAME_INS);
@@ -635,7 +771,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     isAtSibling: function(direction,checkConditions) {
         this.consoleLog("isAtSibling ("+direction+"/" + checkConditions +")?");
-        var tmpMarkupNode = this.createNodeForMarkup(this.getNodeNameAccordingToEvent()),
+        var currentIsOfSameConditionsAsSibling,
+            tmpMarkupNode = this.createNodeForMarkup(this.getNodeNameAccordingToEvent()),
             selectionNode = this.getContainerNodeForCurrentSelection(),
             siblingNode = this.getSiblingNodeForCurrentSelection(direction),
             selPositionInfo = this.getSelectionPositionInfo(selectionNode);
@@ -644,12 +781,14 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         
         switch(checkConditions) { // TODO: DRY! see switch(checkConditions) in isWithinNode()
             case 'sameNodeName':
-                var currentIsOfSameConditionsAsSibling = this.isNodesOfSameName(tmpMarkupNode,siblingNode);
+                currentIsOfSameConditionsAsSibling = this.isNodesOfSameName(tmpMarkupNode,siblingNode);
+                break;
             case 'sameConditionsAndEvent':
-                var currentIsOfSameConditionsAsSibling = this.isNodesOfSameName(tmpMarkupNode,siblingNode) && this.isNodesOfSameNameAndConditionsAndEvent(tmpMarkupNode,siblingNode);
+                currentIsOfSameConditionsAsSibling = this.isNodesOfSameName(tmpMarkupNode,siblingNode) && this.isNodesOfSameNameAndConditionsAndEvent(tmpMarkupNode,siblingNode);
+                break;
             // no default, because then we would have a bug in the code. Calling this method without a correct parameter is too dangerous in consequences.
         }
-        this.consoleLog("- checkConditions: " + currentIsOfSameConditionsAsSibling);
+        this.consoleLog("- checkConditions ("+checkConditions+"): " + currentIsOfSameConditionsAsSibling);
         if (!currentIsOfSameConditionsAsSibling) {
             return false;
         }
@@ -872,6 +1011,20 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         return !this.isNodesOfSameNameAndConditionsAndEvent(nodeA,nodeB);
     },
     /**
+     * Checks if a node is of the same markup-type as the event.
+     * (Does NOT check any further conditions!)
+     * @param {Object} node
+     * @returns {Boolean}
+     */
+    isNodeOfSameMarkupTypeAsEvent: function(node) {
+        var nodeName = (node == null) ? 'null' : node.nodeName,
+            nodeNameOfEvent = this.getNodeNameAccordingToEvent();
+        if (!this.isNodeOfTypeMarkup(node)) {
+            return false;
+        }
+        return nodeName == nodeNameOfEvent;
+    },
+    /**
      * Checks if a markup-node is "empty".
      * @param {Object} node
      * @returns {Boolean}
@@ -899,6 +1052,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @returns {Boolean}
      */
     isNodesOfSameConditions: function(nodeA,nodeB) {
+        if (!this.isNodeOfTypeMarkup(nodeA) || !this.isNodeOfTypeMarkup(nodeB)) {
+            return false;
+        }
         var isNodesOfSameUser       = this.isNodesOfSameUser(nodeA,nodeB),      // user
             isNodesOfSameWorkflow   = this.isNodesOfSameWorkflow(nodeA,nodeB);  // workflow
         return isNodesOfSameUser && isNodesOfSameWorkflow;
@@ -977,8 +1133,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         if (!this.isNodeOfTypeMarkup(nodeA) || !this.isNodeOfTypeMarkup(nodeB)) {
             return false;
         }
-        var userOfNodeA = parseInt(nodeA.getAttribute(this.ATTRIBUTE_USERNAME)),
-            userOfNodeB = parseInt(nodeB.getAttribute(this.ATTRIBUTE_USERNAME));
+        var userOfNodeA = nodeA.getAttribute(this.ATTRIBUTE_USERNAME),
+            userOfNodeB = nodeB.getAttribute(this.ATTRIBUTE_USERNAME);
         return userOfNodeA == userOfNodeB;
     },
     /**
@@ -990,7 +1146,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         if (!this.isNodeOfTypeMarkup(node)) {
             return false;
         }
-        var userOfNode = parseInt(node.getAttribute(this.ATTRIBUTE_USERNAME)),
+        var userOfNode = node.getAttribute(this.ATTRIBUTE_USERNAME),
             userOfEvent = this.editorUsername;
         return userOfNode == userOfEvent;
     },
@@ -1119,6 +1275,31 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         this.consoleLog("- cleanUpEditor...");
         this.editor.getEditorBody().normalize();
     },
+
+    // =========================================================================
+    // Helpers for Nodes related to content in the Editor
+    // =========================================================================
+    
+    /**
+     * Checks if an img is an MQM-tag and returns its partner-tag (if there is one).
+     * @param {Object} mqmImgNode
+     * @returns {?Object} imgNode
+     */ 
+    getMQMPartnerTag: function(mqmImgNode) {
+        if (Ext.fly(mqmImgNode).hasCls('qmflag') && mqmImgNode.hasAttribute('data-seq')) {
+            var imgInEditorTotal = this.editor.getDoc().images;
+            for(var i = 0; i < imgInEditorTotal.length; i++){
+                imgOnCheck = imgInEditorTotal[i];
+                if (Ext.fly(imgOnCheck).hasCls('qmflag')
+                        && imgOnCheck.hasAttribute('data-seq')
+                        && (imgOnCheck.getAttribute('data-seq') == mqmImgNode.getAttribute('data-seq') )
+                        && (imgOnCheck.id != mqmImgNode.id ) ) {
+                    return imgOnCheck;
+                }
+            }
+        }
+        return null;
+     },
 
     // =========================================================================
     // Helpers for Nodes in general
