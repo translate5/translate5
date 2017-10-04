@@ -485,6 +485,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             tmpMarkupNode = this.createNodeForMarkup(this.getNodeNameAccordingToEvent()),
             rangeForDel = this.getRangeToBeDeleted(),
             imgNodesTotal,
+            setOfImgNodesTotal,
+            mqmPartnerImgNodes = [],
             imgNode,
             rangeForImgNode = rangy.createRange();
         // collect INS-nodes within what is to be deleted
@@ -498,6 +500,20 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             imgNodesTotal.push(rangeForDel.commonAncestorContainer);
             completeSelectionIsMarked = true;
         };
+        // check for get MQM-partner-tags and add them to the images for changeMarkup
+        setOfImgNodesTotal = new Set(imgNodesTotal);
+        for (var i = 0; i < imgNodesTotal.length; i++) {
+            var mqmImgPartnerNode = this.getMQMPartnerTag(imgNodesTotal[i]);
+            if (mqmImgPartnerNode != null) {
+                //add imgNode only if it's not included already
+                if (!setOfImgNodesTotal.has(mqmImgPartnerNode)) {
+                    mqmPartnerImgNodes.unshift(mqmImgPartnerNode); // (unshift: handle partner-tags first, otherwise the caret will move)
+                    setOfImgNodesTotal.add(mqmImgPartnerNode);
+                }
+            }
+        }
+        imgNodesTotal = imgNodesTotal.concat(mqmPartnerImgNodes);
+        // changeMarkup for images
         for (var i = 0; i < imgNodesTotal.length; i++) {
             imgNode = imgNodesTotal[i];
             rangeForImgNode.selectNode(imgNode);
@@ -505,8 +521,10 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             rangeForDel.collapseBefore(imgNode);
             delNode.appendChild(imgNode);
             rangeForDel.insertNode(delNode);
-            // If the selection is completely marked now, then there is nothing left to do.
-            if (completeSelectionIsMarked) {
+            setOfImgNodesTotal.delete(imgNode);
+            // If the selection is completely marked now (including their partner-tags), 
+            // then there is nothing left to do.
+            if (completeSelectionIsMarked && setOfImgNodesTotal.size == 0) {
                 return 'completeSelectionIsMarked';
             }
             // We might have changed the DOM quite a bit...
@@ -1257,6 +1275,31 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         this.consoleLog("- cleanUpEditor...");
         this.editor.getEditorBody().normalize();
     },
+
+    // =========================================================================
+    // Helpers for Nodes related to content in the Editor
+    // =========================================================================
+    
+    /**
+     * Checks if an img is an MQM-tag and returns its partner-tag (if there is one).
+     * @param {Object} mqmImgNode
+     * @returns {?Object} imgNode
+     */ 
+    getMQMPartnerTag: function(mqmImgNode) {
+        if (Ext.fly(mqmImgNode).hasCls('qmflag') && mqmImgNode.hasAttribute('data-seq')) {
+            var imgInEditorTotal = this.editor.getDoc().images;
+            for(var i = 0; i < imgInEditorTotal.length; i++){
+                imgOnCheck = imgInEditorTotal[i];
+                if (Ext.fly(imgOnCheck).hasCls('qmflag')
+                        && imgOnCheck.hasAttribute('data-seq')
+                        && (imgOnCheck.getAttribute('data-seq') == mqmImgNode.getAttribute('data-seq') )
+                        && (imgOnCheck.id != mqmImgNode.id ) ) {
+                    return imgOnCheck;
+                }
+            }
+        }
+        return null;
+     },
 
     // =========================================================================
     // Helpers for Nodes in general
