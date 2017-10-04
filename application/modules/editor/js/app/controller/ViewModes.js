@@ -217,14 +217,16 @@ Ext.define('Editor.controller.ViewModes', {
   },
   handleViewMode: function(item) {
       switch (item.mode.type) {
-          case 'ergonomicMode':
-              this.ergonomicMode(item.mode.readonly);
-              break;
-          case 'editMode':
-          default:
-              this.editMode(item.mode.readonly);
-              break;
-      }
+        case 'visualReviewMode':
+            break;
+        case 'ergonomicMode':
+            this.ergonomicMode(item.mode.readonly);
+            break;
+        case 'editMode':
+        default:
+            this.editMode(item.mode.readonly);
+            break;
+    }
   },
   /**
    * aktiviert den Bearbeitungsmodus des Grids (alle Spalten eingeblendet, editieren möglich, Hide Tags deaktivieren) 

@@ -234,64 +234,6 @@ Ext.define('Editor.controller.Comments', {
       me.loadCommentPanel();
   },
 
-  /**
-   * updates the comments column in the grid
-   * @param {Editor.model.Comment} rec
-   * @param {String} type change type: 'save' or 'destroy'
-   */
-  handleCommentsChanged: function(rec, type) {
-      var me = this, 
-          segId = rec && rec.get('segmentId'),
-          comments = me.getCommentsStore(),
-          comment = comments.getById(rec.get('id'));
-      
-      if(! segId) {
-          return;
-      }
-      
-      //if comment store was changed and restored in the meantime, 
-      //  we have to add / edit / delete the record again
-      if(type == 'save' && comment !== rec && segId == me.getLoadedSegmentId) {
-          if(comment) {
-              comment.set(rec.data);
-              comment.commit();
-          }
-          else {
-              comments.insert(0, rec);
-          }
-      }
-      if(type == 'destroy' && comment && comment.get('id') == rec.get('id') && segId == me.getLoadedSegmentId) {
-          comments.remove(comment);
-      }
-      
-      Editor.model.Segment.load(segId, {
-          success: function(rec, op) {
-              var dis = me.getCommentDisplay(),
-                  stateid = me.getAutoStateDisplay(),
-                  ed = me.getRowEditor(),
-                  origRec = me.getSegmentsStore().getById(segId);
-              //if no origRec is given, do nothing here.
-              if(!origRec) {
-                  return;
-              }
-              //we cant update the complete segment, since this would overwrite unsaved 
-              //changes the user has made in the opened segment
-              origRec.beginEdit();
-              origRec.set('autoStateId', rec.get('autoStateId'));
-              origRec.set('workflowStep', rec.get('workflowStep'));
-              origRec.set('comments', rec.get('comments'));
-              origRec.endEdit();
-              if(ed && ed.context && me.getLoadedSegmentId == segId) {
-                  //update the context of the editor, because the set comments above changes the grid view
-                  ed.context.row = me.getSegmentGrid().getView().getNode(origRec);
-                  ed.reposition();
-                  dis.setRawValue(Editor.view.segments.column.Comments.getFirstComment(rec.get('comments')));
-                  stateid.setRawValue(ed.columns.get(stateid.id).renderer(rec.get('autoStateId')));
-              }
-          }
-      });
-  },
-
     /**
     * handles expand of comment panel, reloads store if needed
     * @param {Ext.panel.Panel} pan
@@ -401,8 +343,4 @@ Ext.define('Editor.controller.Comments', {
     getLoadedSegmentId:function(){
         return this.getCommentPanel().getController().loadedSegmentId;
     },
-
-    getActiveComment:function(){
-        return this.getCommentPanel().getController().activeComment;
-    }
 });
