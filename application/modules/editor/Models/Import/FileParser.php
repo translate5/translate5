@@ -122,6 +122,12 @@ abstract class editor_Models_Import_FileParser {
     protected $config;
     
     /**
+     * contains the classname of the used parser
+     * @var string
+     */
+    protected $usedParser;
+    
+    /**
      * @param string $path pfad zur Datei in der Kodierung des Filesystems (also runtimeOptions.fileSystemEncoding)
      * @param string $fileName Dateiname utf-8 kodiert
      * @param integer $fileId
@@ -137,16 +143,18 @@ abstract class editor_Models_Import_FileParser {
         $this->_taskGuid = $task->getTaskGuid();
         $this->autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         $this->matchRateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
-        $this->updateFile();
+        $this->usedParser = get_class($this); //this value changes if another file parser is used dynamically
     }
     
     /**
      * This function returns the parser which should be used by parsing
+     * Therefore the content of LEK_file must be saved after chaining, so this method and its overrides has to call updateFile()
      * normally this is $this (means the current parser)
      * The chaining gives us the possibility to parse a XML, find out the real file type and return the correct file parser here
      * @return editor_Models_Import_FileParser
      */
     public function getChainedParser() {
+        $this->updateFile();
         return $this;
     }
     
@@ -333,7 +341,7 @@ abstract class editor_Models_Import_FileParser {
         $file = ZfExtended_Factory::get('editor_Models_File');
         /* @var $file editor_Models_File */
         $file->load($this->_fileId);
-        $file->setFileParser(get_class($this));
+        $file->setFileParser($this->usedParser);
         
         $convert = false;
         foreach ($this->_convert2utf8 as $format){

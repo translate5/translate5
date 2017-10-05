@@ -63,7 +63,9 @@ class editor_Models_Import_FileParser_Xml extends editor_Models_Import_FileParse
             $validSchema = strpos($attributes['xsi:schemaLocation'], 'urn:oasis:names:tc:xliff:document:') === 0;
             if($validVersion && ($validXmlns || $validSchema)) {
                 //for example check here additionaly for SDL markers then create the SDLXLIFF parser here and return it instead of $this
-                return $this;
+                $this->usedParser = 'editor_Models_Import_FileParser_Xlf';
+                $this->updateFile();
+                return $this; //since xml parser extends xlf, we can just return this here
             }
         }
         throw new ZfExtended_Exception('Content of given XML file is no valid XLF! File: '.$this->_fileName.'; xliff attributes: '.print_r($attributes,1));
