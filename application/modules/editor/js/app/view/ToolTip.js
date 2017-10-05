@@ -42,7 +42,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.ToolTip', {
     extend : 'Ext.tip.ToolTip',
     //enable own ToolTips only for the following img classes 
-    delegate : 'img.ownttip', // accepts only simple selectors (no commas) so
+    delegate : '.ownttip', // accepts only simple selectors (no commas) so
     // define a own tooltip class
     renderTo : Ext.getBody(),
     strings: {
