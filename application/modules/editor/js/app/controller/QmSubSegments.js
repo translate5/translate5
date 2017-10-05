@@ -100,9 +100,6 @@ Ext.define('Editor.controller.QmSubSegments', {
             '#segmentgrid #qmsummaryBtn': {
                 click:'showQmSummary'
             },
-            '#segmentgrid': {
-                afterrender: 'handleAfterRender'
-            },
             'qmSubsegmentsFlagFieldset menuitem': {
                 click: 'handleAddQmFlagClick'
             },
@@ -110,21 +107,13 @@ Ext.define('Editor.controller.QmSubSegments', {
                 afterrender: 'handleInitEditor'
             },
             'segmentsHtmleditor': {
-                afterinitframedoc: 'initIframeDoc',
-                initialize: 'initEditor'
+                afterinitframedoc: 'initIframeDoc'
             }
         }
     },
     strings: {
     	buttonTooltip10: '#UT# (ALT+{0})',
     	buttonTooltip20: '#UT# (ALT+SHIFT+{0})'
-    },
-    handleAfterRender: function(){
-        var me = this;
-        
-        me.tooltip = Ext.create('Editor.view.ToolTip', {
-            target: me.getSegmentGrid().getEl()
-        });
     },
     handleInitEditor: function() {
         this.initFieldSet();
@@ -214,22 +203,6 @@ Ext.define('Editor.controller.QmSubSegments', {
             editor.iframeEl.on('beforedeactivate', this.handleEditorBlur, this);
             editor.iframeEl.on('focus', this.handleEditorFocus, this);
         }
-    },
-    /**
-     * initialises ToolTips and other things related to the editors iframe doc body
-     * @param editor
-     */
-    initEditor: function(editor) {
-        var offset = editor.iframeEl.getXY();
-        if(this.editorTooltip){
-            this.editorTooltip.setTarget(editor.getEditorBody());
-            this.editorTooltip.targetOffset = offset;
-            return;
-        }
-        this.editorTooltip = Ext.create('Editor.view.ToolTip', {
-            target: editor.getDoc(),
-            targetOffset: offset
-        });
     },
     /**
      * displays the QM Summary Window

@@ -157,6 +157,10 @@ Ext.define('Editor.controller.Editor', {
       plug.on('canceledit', disableEditing);
       plug.on('edit', disableEditing)
       
+      me.tooltip = Ext.create('Editor.view.ToolTip', {
+          target: me.getSegmentGrid().getEl()
+      });
+      
       me.prevNextSegment = Ext.create('Editor.controller.editor.PrevNextSegment', {
         editingPlugin: plug
       });
@@ -366,7 +370,8 @@ Ext.define('Editor.controller.Editor', {
    */
   initEditor: function(editor){
       var me = this,
-          docEl = Ext.get(editor.getDoc());
+          docEl = Ext.get(editor.getDoc()),
+          offset = editor.iframeEl.getXY();
 
       if(me.editorKeyMap) {
           me.editorKeyMap.destroy();
@@ -381,6 +386,15 @@ Ext.define('Editor.controller.Editor', {
           e.preventDefault();
           editor.insertAtCursor((e.browserEvent.clipboardData || window.clipboardData).getData('Text'));
       }, me, {delegated: false});
+      if(me.editorTooltip){
+          me.editorTooltip.setTarget(editor.getEditorBody());
+          me.editorTooltip.targetOffset = offset;
+          return;
+      }
+      me.editorTooltip = Ext.create('Editor.view.ToolTip', {
+          target: editor.getDoc(),
+          targetOffset: offset
+      });
   },
   clearKeyMaps: function() {
       var me = this;
