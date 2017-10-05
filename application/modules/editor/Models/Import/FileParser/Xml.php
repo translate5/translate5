@@ -47,15 +47,25 @@ class editor_Models_Import_FileParser_Xml extends editor_Models_Import_FileParse
     }
     
     public function getChainedParser() {
-        //FIXME check here the loaded XML content, if it is XLF everything is ok, since we extend the Xlf parser
+        // check here the loaded XML content, if it is XLF everything is ok, since we extend the Xlf parser
         // if it is another (not supported) XML type we throw an exception
-        // in the future the Okapi File Parser can be created here, as fallback parser
-        // in the okapi fallback the file content is checked if okapi can deal with it, if yes it is transfered to okapi, if no, same error as above
-        // In addition we have to change class hierarchy:
-        // editor_Models_Import_FileParser_Xml
-        // editor_Models_Import_FileParser_Okapi extends the abstract fileparser (which only has as abstract the file extension stuff and the public parseFile)
-        // For the current CSV/SDLXLIFF|TRANSIT Fileparser a new intermediate legacy abstract class has to be created
-        // For XLF, perhaps the first one is sufficient too, that must be decided on implementation of the intermediate one
-        return $this;
+        $attributes = [];
+        $validVersions = ['1.1', '1.2'];
+        $validXmlns = ['urn:oasis:names:tc:xliff:document:1.1', 'urn:oasis:names:tc:xliff:document:1.2'];
+        $isXliff = preg_match('/^(<[^>]+>[^<]+)?\s*<xliff([^>]+)>/s', $this->_origFile, $match);
+        if($isXliff && preg_match_all('/([^\s]+)="([^"]*)"/', $match[2], $matches)){
+            $attributes = array_combine($matches[1], $matches[2]);
+            settype($attributes['xmlns'], 'string');
+            settype($attributes['version'], 'string');
+            settype($attributes['xsi:schemaLocation'], 'string');
+            $validVersion = in_array($attributes['version'], $validVersions);
+            $validXmlns = in_array($attributes['xmlns'], $validXmlns);
+            $validSchema = strpos($attributes['xsi:schemaLocation'], 'urn:oasis:names:tc:xliff:document:') === 0;
+            if($validVersion && ($validXmlns || $validSchema)) {
+                //for example check here additionaly for SDL markers then create the SDLXLIFF parser here and return it instead of $this
+                return $this;
+            }
+        }
+        throw new ZfExtended_Exception('Content of given XML file is no valid XLF! File: '.$this->_fileName.'; xliff attributes: '.print_r($attributes,1));
     }
 }

@@ -111,7 +111,7 @@ class editor_Models_Import {
          * Queue Import Worker
          */
         $importWorker = ZfExtended_Factory::get('editor_Models_Import_Worker');
-        /* @var $worker editor_Models_Import_Worker */
+        /* @var $importWorker editor_Models_Import_Worker */
         $importWorker->init($this->task->getTaskGuid(), array(
                 'config' => $this->importConfig,
                 'dataProvider' => $dataProvider
