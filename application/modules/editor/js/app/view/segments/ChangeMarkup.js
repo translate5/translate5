@@ -213,6 +213,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * Insert INS-/DEL-Tags while typing
      */
     changeMarkupInEditor: function() {
+        var editorContentBefore,
+            editorContentAfter;
         
         // get range according to selection (using rangy-library)
         this.docSel = rangy.getSelection(this.editor.getDoc());
@@ -226,6 +228,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         this.userRangeBookmark = this.docSelRange.getBookmark();
         
         // change markup according to event
+        editorContentBefore = this.editor.getEditorBody().innerHTML;
         switch(true) {
             case this.eventIsDeletion():
                 this.consoleLog(" => eventIsDeletion");
@@ -238,9 +241,12 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                 this.handleInsert();
             break;
         }
+        editorContentAfter = this.editor.getEditorBody().innerHTML;
         
-        // clean up nested markup-tags etc.
-        this.cleanUpMarkupInEditor();
+        // if changeMarkup has changed the content: clean up nested markup-tags etc.
+        if (editorContentAfter != editorContentBefore) {
+            this.cleanUpMarkupInEditor();
+        }
     },
     /**
      * Handle deletion-Events.
@@ -491,7 +497,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             rangeForImgNode = rangy.createRange();
         // collect INS-nodes within what is to be deleted
         imgNodesTotal = rangeForDel.getNodes([1], function(node) {
-            return ( node.nodeName == 'IMG' );
+            return ( node.nodeName == 'IMG' && node.parentNode.nodeName != 'DEL');
         });
         // if the selection is completely that IMG-node:
         if (rangeForDel.commonAncestorContainer.nodeName == 'IMG'
