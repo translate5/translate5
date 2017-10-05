@@ -93,7 +93,9 @@ Ext.define('Editor.controller.Editor', {
               contentErrors: 'handleSaveWithErrors'
           },
           'roweditor': {
-              destroy: 'handleDestroyRoweditor'
+              destroy: 'handleDestroyRoweditor',
+              repositioned: 'repositionEditor',
+              dragend: 'handleEditorDragend'
           },
           'roweditor displayfield[isContentColumn!=true]': {
               afterrender: 'initMoveToolTip'
@@ -389,12 +391,23 @@ Ext.define('Editor.controller.Editor', {
       if(me.editorTooltip){
           me.editorTooltip.setTarget(editor.getEditorBody());
           me.editorTooltip.targetOffset = offset;
-          return;
       }
-      me.editorTooltip = Ext.create('Editor.view.ToolTip', {
-          target: editor.getDoc(),
-          targetOffset: offset
-      });
+      else {
+          me.editorTooltip = Ext.create('Editor.view.ToolTip', {
+              target: editor.getDoc(),
+              targetOffset: offset
+          });
+      }
+  },
+  repositionEditor: function(editor) {
+      if(this.editorTooltip){
+          var offset = editor.mainEditor.iframeEl.getXY();
+          this.editorTooltip.targetOffset = offset;
+      }
+  },
+  handleEditorDragend: function(moved, event){
+      var comp = (moved.proxy && !moved.comp.liveDrag) ? moved.proxy : moved.comp;
+      this.repositionEditor(comp);
   },
   clearKeyMaps: function() {
       var me = this;
