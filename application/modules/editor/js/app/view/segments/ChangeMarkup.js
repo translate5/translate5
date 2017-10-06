@@ -50,13 +50,14 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     
     docSel: null,                   // selection in the document (initially what the user has selected, but then constantly changed according to handling the Markup)
     docSelRange: null,              // current range for handling the markup, positioning the caret, etc... (initially what the user has selected, but then constantly changing)
-    userRangeBookmark: null,        // bookmark what the user has selected initially
+    initialRangeBookmark: null,     // bookmark what the user has selected initially
     
     // "CONSTANTS"
     NODE_NAME_DEL: 'DEL',
     NODE_NAME_INS: 'INS',
     
-    ATTRIBUTE_USERNAME: 'data-username', 
+    ATTRIBUTE_USERNAME: 'data-username',
+    ATTRIBUTE_USER_CSS: 'data-usercss',
     ATTRIBUTE_WORKFLOWSTEPNR: 'data-workflowstepnr',
     ATTRIBUTE_TIMESTAMP: 'data-timestamp',
     
@@ -87,7 +88,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         this.stopEvent = false;
         this.docSel = null;
         this.docSelRange = null;
-        this.userRangeBookmark = null;
+        this.initialRangeBookmark = null;
     },
     /**
      * This method is called if the keyboard event (= keydown) was not handled otherwise
@@ -225,7 +226,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             return;
         }
         
-        this.userRangeBookmark = this.docSelRange.getBookmark();
+        this.initialRangeBookmark = this.docSelRange.getBookmark();
         
         // change markup according to event
         editorContentBefore = this.editor.getEditorBody().innerHTML;
@@ -253,6 +254,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     handleDeletion: function() {
         var delNode = null;
+        
+        // TODO: this.getRangeToBeDeleted() is called multiple times during the whole process; better store it.
 
         // If the nodes/characters that are to be deleted are marked as deleted already...
         if(this.getRangeToBeDeleted() == null){
@@ -631,7 +634,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         //          => select "abc" and insert "d" results in:
         //          <del>ab</del>e<ins>d</ins>f  (= wrong; correct would be: <del>ab</del><ins>d</ins>ef)
         var rangeForCaret = rangy.createRange();
-        rangeForCaret.moveToBookmark(this.userRangeBookmark);
+        rangeForCaret.moveToBookmark(this.initialRangeBookmark);
         rangeForCaret.collapse(false);
         this.docSel.setSingleRange(rangeForCaret);
     },
@@ -1245,15 +1248,28 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     createNodeForMarkup: function(nodeName){
         var nodeEl = document.createElement(nodeName),
+            allUsers = this.getAllUsers(),
+            thisUser = this.editorUsername,
+            thisUserCSS,
+            segmentWorkflowStepNr = this.segmentWorkflowStepNr,
             timestamp = Ext.Date.format(new Date(), 'time'); // dates are wrong with 'timestamp' although doc states differently: http://docs.sencha.com/extjs/6.2.0/classic/Ext.Date.html 
         
+        // set CSS-class for specific colors for each user (in their chronological order)
+        if (allUsers[thisUser] != undefined && allUsers[thisUser] != null) {
+            thisUserCSS = allUsers[thisUser];
+        } else {
+            thisUserCSS = 'user' + (Object.keys(allUsers).length + 1).toString();
+        }
+        
         // (setAttribute: see https://jsperf.com/html5-dataset-vs-native-setattribute)
-        nodeEl.setAttribute(this.ATTRIBUTE_USERNAME,this.editorUsername); 
-        nodeEl.setAttribute(this.ATTRIBUTE_WORKFLOWSTEPNR,this.segmentWorkflowStepNr);
+        nodeEl.setAttribute(this.ATTRIBUTE_USERNAME,thisUser); 
+        nodeEl.setAttribute(this.ATTRIBUTE_USER_CSS,thisUserCSS);
+        nodeEl.setAttribute(this.ATTRIBUTE_WORKFLOWSTEPNR,segmentWorkflowStepNr);
         nodeEl.setAttribute(this.ATTRIBUTE_TIMESTAMP,timestamp);
         
-        // selector for delegate in tooltip
-        nodeEl.className = 'changemarkup';
+        // - 'changemarkup': specific selector for CSS
+        // - 'ownttip': general selector for delegate in tooltip
+        nodeEl.className = 'changemarkup ownttip';
         
         return nodeEl;
     },
@@ -1620,7 +1636,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
 
     // =========================================================================
-    // Helpers for Nodes related to content in the Editor
+    // Helpers for content related to the Editor, User etc.
     // =========================================================================
     
     /**
@@ -1643,6 +1659,25 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         }
         return null;
      },
+     /**
+      * Get an Object with all the users that have done any editing so far and 
+      * their css-selector.
+      * allUsers.userName = specificSelectorForThisUser
+      * @returns {Object}
+      */ 
+     getAllUsers: function() {
+         var allUsers = new Object(),
+             allMarkupNodes = this.getAllMarkupNodesInEditor();
+         for (var i = 0; i < allMarkupNodes.length; i++){
+             var node = allMarkupNodes[i],
+                 userOfNode = node.getAttribute(this.ATTRIBUTE_USERNAME),
+                 userCSS = node.getAttribute(this.ATTRIBUTE_USER_CSS);
+             if(allUsers[userOfNode] == undefined){
+                 allUsers[userOfNode] = userCSS;
+             }
+         }
+         return allUsers;
+      },
 
     // =========================================================================
     // Helpers for Nodes in general
