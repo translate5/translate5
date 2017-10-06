@@ -42,7 +42,24 @@ span.deprecatedTerm {border-bottom:none;background-color:#fa51ff;}
 body.fakedsel strong, body.fakedsel b {font-weight:normal;background:#b0b0b0;}
 
 /* ChangeMarkup */
-ins {background-color: #E5FFAC; min-width: 1EM !important;}
-del {background-color: #FFD8D4;}
-body.ergonomic del img,
-body.ergonomic ins img {height: 14px !important;}
+.x-grid-cell .changemarkup[data-usercss] img {height: 14px !important;}
+.x-grid-cell ins.changemarkup[data-usercss] {min-width: 1EM !important; position: relative; display: inline-block; text-decoration: none;}
+.x-grid-cell ins.changemarkup[data-usercss]::before {content: ''; width: 100%; position: absolute; right: 0; top: 85%;}
+.x-grid-cell del.changemarkup[data-usercss] {color: #999; position: relative; display: inline-block; text-decoration: none;}
+.x-grid-cell del.changemarkup[data-usercss]::before {content: ''; width: 100%; position: absolute; right: 0; top: 50%;}
+.x-grid-cell .changemarkup[data-usercss="user1"] {background-color: #f9e788;}                 /* yellow pale */
+.x-grid-cell .changemarkup[data-usercss="user1"]::before {border-bottom: 2px solid #dec00b;}  /* yellow dark */
+.x-grid-cell .changemarkup[data-usercss="user2"] {background-color: #f9b372;}                 /* orange pale */
+.x-grid-cell .changemarkup[data-usercss="user2"]::before {border-bottom: 2px solid #ce5c00;}  /* orange dark */
+.x-grid-cell .changemarkup[data-usercss="user3"] {background-color: #cbe0f9;}                 /* blue pale */
+.x-grid-cell .changemarkup[data-usercss="user3"]::before {border-bottom: 2px solid #023c88;}  /* blue dark */
+.x-grid-cell .changemarkup[data-usercss="user4"] {background-color: #f3d5ed;}                 /* lilac pale */
+.x-grid-cell .changemarkup[data-usercss="user4"]::before {border-bottom: 2px solid #7f0ba2;}  /* lilac dark */
+.x-grid-cell .changemarkup[data-usercss="user5"] {background-color: #e4fb81;}                 /* yellowish green pale */
+.x-grid-cell .changemarkup[data-usercss="user5"]::before {border-bottom: 2px solid #adc018;}  /* yellowish green dark */
+.x-grid-cell .changemarkup[data-usercss="user6"] {background-color: #FFD8D4;}                 /* pink pale */
+.x-grid-cell .changemarkup[data-usercss="user6"]::before {border-bottom: 2px solid #c95124;}  /* pink dark */
+.x-grid-cell .changemarkup[data-usercss="user7"] {background-color: #9af2db;}                 /* turquoise pale */
+.x-grid-cell .changemarkup[data-usercss="user7"]::before {border-bottom: 2px solid #18cccc;}  /* turquoise dark */
+.x-grid-cell .changemarkup[data-usercss="user8"] {background-color: #b5f3bf;}                 /* lime green pale */
+.x-grid-cell .changemarkup[data-usercss="user8"]::before {border-bottom: 2px solid #1eb538;}  /* lime green dark */
