@@ -1663,7 +1663,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
       * Get an Object with all the users that have done any editing so far and 
       * their css-selector.
       * allUsers.userName = specificSelectorForThisUser
-      * @returns {Object}
+      * @returns {Object} allUsers
       */ 
      getAllUsers: function() {
          var allUsers = new Object(),
@@ -1672,11 +1672,30 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
              var node = allMarkupNodes[i],
                  userOfNode = node.getAttribute(this.ATTRIBUTE_USERNAME),
                  userCSS = node.getAttribute(this.ATTRIBUTE_USER_CSS);
-             if(allUsers[userOfNode] == undefined){
+             if (allUsers[userOfNode] == undefined){
                  allUsers[userOfNode] = userCSS;
              }
          }
          return allUsers;
+      },
+      /**
+       * Finds the newest timestamp in the given Array of nodes.
+       * @param {Object} arrNodes
+       * @returns {Object} timestamp
+       */
+      getNewestTimestampOfNodes: function(arrNodes) {
+          var newestTimestamp;
+          for (var i = 0; i < arrNodes.length; i++){
+              var node = arrNodes[i],
+                  timestampOfNode = node.getAttribute(this.ATTRIBUTE_TIMESTAMP);
+              if (newestTimestamp == undefined){
+                  newestTimestamp = timestampOfNode;
+              }
+              if (timestampOfNode > newestTimestamp){
+                  newestTimestamp = timestampOfNode;
+              }
+          }
+          return newestTimestamp;
       },
 
     // =========================================================================
@@ -1719,16 +1738,20 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     /**
      * Merge two nodes (= move the content from one node to another and remove it then).
      * Returns the (formerly nodeTo-) node with the merged content.
+     * The merged node has the timestamp of the newer node (= was edited in the current step).
      * @param {Object} nodeFrom
      * @param {Object} nodeTo
      * @returns {Object} nodeForMergedContent
      */
     mergeNodesFromTo: function(nodeFrom,nodeTo) {
-        var nodeForMergedContent = nodeTo;
+        var nodeForMergedContent = nodeTo,
+            arrNodes = [nodeFrom,nodeTo],
+            newestTimestamp = this.getNewestTimestampOfNodes(arrNodes);
         while (nodeFrom.childNodes.length > 0) {
             nodeForMergedContent.appendChild(nodeFrom.childNodes[0]);
         }
         nodeForMergedContent.normalize();
+        nodeForMergedContent.setAttribute(this.ATTRIBUTE_TIMESTAMP,newestTimestamp);
         nodeFrom.parentNode.removeChild(nodeFrom);
         this.consoleLog("-> Nodes gemergt.");
         return nodeForMergedContent;
