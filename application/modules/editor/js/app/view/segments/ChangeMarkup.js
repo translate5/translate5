@@ -189,7 +189,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     // =========================================================================
     // Helpers regarding the Selection
     // =========================================================================
-
+    
     /**
      * Get range according to selection (using rangy-library: https://github.com/timdown/rangy/).
      * CAUTION! Working with cloned ranges of this.docSelRange with cloneRange() DOES affect the inital docSelRange (https://stackoverflow.com/a/11404869).
@@ -252,28 +252,19 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * Handle deletion-Events.
      */
     handleDeletion: function() {
-        var delNode = null,
-            selectionNode,
-            selPositionInfo;
-        
-        // if we are in a DEL-Markup already...
-        if (this.isWithinNode('sameConditionsAndEvent')) {
-            selectionNode = this.getContainerNodeForCurrentSelection();
-            selPositionInfo = this.getSelectionPositionInfo(selectionNode);
-            // DELETE: We must NOT be at the last position (= next character is meant!)
-            // BACKSPACE: We must NOT be at the first position (= previous character is meant!)
-            if( ( this.eventKeyCode == Ext.event.Event.DELETE && !selPositionInfo.atEnd )
-                || ( this.eventKeyCode == Ext.event.Event.BACKSPACE && !selPositionInfo.atStart) ) {
-                this.consoleLog("DEL: isWithinDelNode..., we do nothing.");
-                return; // ...nothing to do!
-            }
+        var delNode = null;
+
+        // If the nodes/characters that are to be deleted are marked as deleted already...
+        if(this.getRangeToBeDeleted() == null){
+            this.consoleLog("DEL: nothing to mark or everything is marked as deleted already, we do nothing.");
+            return; // ... we do nothing.
         }
         
         // Handle existing INS-Tags within the selection for deletion.
         this.consoleLog("DEL: handleInsNodesInDeletion...");
         delNode = this.handleInsNodesInDeletion();
         // If we have aleady removed everything that was selected, then we are done here.
-        if (delNode == 'completeSelectionIsDeleted') {
+        if (delNode == 'completeSelectionIsHandled') {
             return;
         }
         
@@ -281,7 +272,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         this.consoleLog("DEL: handleImagesInDeletion...");
         delNode = this.handleImagesInDeletion();
         // If we have marked an IMG that encompassed everything that was selected, then we are done here.
-        if (delNode == 'completeSelectionIsMarked') {
+        if (delNode == 'completeSelectionIsHandled') {
             return;
         }
         
@@ -296,6 +287,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * Handle insert-Events.
      */
     handleInsert: function() {
+        var insNodeBehind,
+            insNodeBefore,
+            foreignContainerNode;
         
         // Are characters marked to be replaced by the insert?
         
@@ -314,39 +308,39 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         // Are we in or at an INS-node?
         
             // if we are in an INS-Markup that fits our needs already: nothing to do.
-            if (this.isWithinNode('sameConditionsAndEvent')) {
-                this.consoleLog("INS: isWithinNodeOfSameKind..., we do nothing.");
+            if (this.selectionIsWithinINSNodeAccordingToEvent()) {
+                this.consoleLog("INS: selectionIsWithinINSNodeAccordingToEvent..., we do nothing.");
                 return;
             }
             
-            // if this new node is right behind an ins-node that already exists,
-            // or if the previous position of the cursor is within an ins-node that already exists,
+            // if we are right behind an ins-node that already exists,
             // we use that one:
-            if (this.isAtSibling('previous','sameConditionsAndEvent')) {
+            insNodeBefore = this.getINSNodeForContentBeforeCaretAccordingToEvent();
+            if (insNodeBefore != null) {
                 this.consoleLog("INS: use previous..."); 
-                // (seems to never happen; is seen as isWithinNodeOfSameKind instead.)
+                // (seems to never happen; is seen as selectionIsWithinINSNodeAccordingToEvent instead.)
                 return;
             }
             
-            // if this new node is right before an ins-node that already exists,
-            // or if the next position of the cursor is within an ins-node that already exists,
+            // if we are right before an ins-node that already exists,
             // we use that one:
-            if (this.isAtSibling('next','sameConditionsAndEvent')) {
-                this.consoleLog("INS: use next...");
-                this.useNextIns();
+            insNodeBehind = this.getINSNodeForContentBehindCaretAccordingToEvent();
+            if (insNodeBehind != null) {
+                this.consoleLog("INS: use next..."); 
+                this.positionCaretInNode(insNodeBehind);
                 return;
             }
             
-        // Are we within a foreign Markup (e.g. DEL of any conditions, or INS of another user),
-        // but (see checks above with return) NOT right at an INS-node we will use instead anyway?
-        
+        // We are neither in nor at an INS-node:
+            
+            // Are we within a foreign Markup (e.g. DEL of any conditions, or INS of another user),
+            // but (see checks above with return) NOT right at an INS-node we will use instead anyway?
             // Then we need to split that one first:
-            if (this.isWithinNode('foreignMarkup')) {
+            foreignContainerNode = this.getForeignMarkupNodeForInsertion();
+            if (foreignContainerNode != null) {
                 this.consoleLog("INS: split foreign node first...");
-                this.splitNode(this.getContainerNodeForCurrentSelection(true),this.docSelRange);
+                this.splitNode(foreignContainerNode,this.docSelRange);
             }
-        
-        // Because we are neither in nor at an INS-node:
         
             // Create and insert <ins>-node:
             if (this.eventKeyCode == Ext.event.Event.SPACE) { // Workaround for inserting space (otherwise creates <u>-Tag, don't know why).
@@ -362,63 +356,52 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     // =========================================================================
     // Deletions
     // =========================================================================
-
+    
     /**
-     * Return a range with the content that is to be marked as deleted.
-     * @returns {Object} rangeForDel
+     * Return a range with the content that is to be marked as deleted
+     * (or null if nothing is to be deleted).
+     * @returns {?Object} rangeForDel
      */
     getRangeToBeDeleted: function() {
         var startC = this.docSelRange.startContainer,
             startO = this.docSelRange.startOffset,
             endC = this.docSelRange.endContainer,
             endO = this.docSelRange.endOffset,
-            editorBody = this.editor.getEditorBody(),
-            rangeForDel = rangy.createRange();
-        // set start and end according to the user's selection
+            rangeForDel = rangy.createRange(),
+            containerWithNeighborOfCurrentCaret;
+        
+        // "Default:" set start and end according to the user's selection
         rangeForDel.setStart(startC, startO); 
         rangeForDel.setEnd(endC, endO);
-        // If nothing is selected, the caret has just been placed somewhere and the deletion refers to the next single character only:
-        // (moveStart, moveEnd: https://github.com/timdown/rangy/wiki/Text-Range-Module#movestartstring-unit-number-count-object-options)
-        if (rangeForDel.collapsed) {
-            switch(this.eventKeyCode) {
-                case Ext.event.Event.BACKSPACE: // Backspace: "deletes" the previous node/character
-                    if (startC.isEqualNode(editorBody) 
-                            && editorBody.childNodes[startO-1] != undefined
-                            && editorBody.childNodes[startO-1].nodeName == "IMG") { // for term tags etc if the caret is positioned within an img
-                        rangeForDel.selectNodeContents(editorBody.childNodes[startO-1]);
-                    } else {
-                        rangeForDel.moveStart("character", -1);
-                    }
-                    break;
-                case Ext.event.Event.DELETE: // Delete "deletes" the next node/character
-                    selPositionInfo = this.getSelectionPositionInfo(endC);
-                    if (selPositionInfo.atEnd
-                            && endC.nextElementSibling != undefined
-                            && endC.nextElementSibling.nodeName == "IMG") { // for term tags etc if the caret is positioned exactly before an img
-                        rangeForDel.selectNodeContents(endC.nextElementSibling);
-                    } else if (endC.isEqualNode(editorBody) 
-                            && editorBody.childNodes[endO] != undefined
-                            && editorBody.childNodes[endO].nodeName == "IMG") { // for term tags etc if the caret is positioned within an img
-                        rangeForDel.selectNodeContents(editorBody.childNodes[endO]);
-                    } else {
-                        rangeForDel.moveEnd("character", 1);
-                    }
-                    break;
-            }
+        
+        // If everything that is selected is within a DEL-Node already,
+        // nothing else needs to be marked as deleted:
+        if(!rangeForDel.collapsed && this.rangeIsWithinDELNode(rangeForDel)) {
+            return null; 
         }
+        
+        // If nothing is selected, the caret has just been placed somewhere and the deletion refers to the next single node/character only:
+        if (rangeForDel.collapsed) {
+            containerWithNeighborOfCurrentCaret = this.getContainerWithNeighborOfCurrentCaret();
+            rangeForDel = this.selectCharacterInRangeByOne(rangeForDel,containerWithNeighborOfCurrentCaret);
+        }
+        if (rangeForDel == null || this.rangeIsWithinDELNode(rangeForDel)) {
+            return null;
+        }
+        
         return rangeForDel;
     },
     /**
      * Handle all INS-content within the selected range for deletion.
      * - If the content has been inserted by the same user in the same workflow, it can really be deleted.
      * - If not, the content just has to be marked as deleted.
-     * If the complete selection is handled already, we return "completeSelectionIsDeleted"
+     * If the complete selection is handled already, we return "completeSelectionIsHandled"
      * otherwise the last node that has been created to mark a deletion is returned.
-     * @returns {(?Object|String)}
+     * @returns {(?Object|String)} delNode
      */
     handleInsNodesInDeletion: function() {
         var me = this,
-            completeSelectionIsDeleted = false,
+            completeSelectionIsHandled = false,
             delNode = null,
             tmpMarkupNode = this.createNodeForMarkup(this.getNodeNameAccordingToEvent()),
             rangeForDel = this.getRangeToBeDeleted(),
@@ -427,6 +410,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             insNodesTotal,
             insNode,
             rangeForInsNode = rangy.createRange();
+        if (rangeForDel == null) {
+            return false;
+        }
         // collect INS-nodes within what is to be deleted
         insNodesTotal = rangeForDel.getNodes([1], function(node) {
             return ( node.nodeName == me.NODE_NAME_INS );
@@ -442,7 +428,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             DOMWithCharsForAction = rangeWithCharsForAction.cloneContents();
             if ( (DOMWithCharsForAction.textContent != '')
                 && (rangeWithCharsForAction.text() == rangeForDel.text()) ) {
-                    completeSelectionIsDeleted = true;
+                    completeSelectionIsHandled = true;
                 }
             // INS-node belongs to the same user and workflow: really remove character(s)
             if (this.isNodesOfSameConditions(insNode,tmpMarkupNode)) {
@@ -454,27 +440,26 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                     // (= we only need what is WITHIN the INS-node AND is selected).
                     if (DOMWithCharsForAction.textContent != ''){
                         if (rangeWithCharsForAction.text() == rangeForDel.text()) {  // rangeWithCharsForAction.containsRange(rangeForDel) does not work eg when the caret has been placed right BEFORE an ins-Node (with DEL-Key)
-                            completeSelectionIsDeleted = true;          
+                            completeSelectionIsHandled = true;
                         }
                         rangeWithCharsForAction.deleteContents();
                     }
                 }
             } else {
             // INS-node does NOT belong to the same user and workflow: only mark character(s) as deleted, but don't remove them.
-                var contentToMoveFromInsToDel = rangeWithCharsForAction.extractContents(),
+                var contentToMoveFromInsToDel = rangeWithCharsForAction.toHtml(),
                     delNode = this.createNodeForMarkup(this.NODE_NAME_DEL);
-                delNode.appendChild(document.createTextNode(contentToMoveFromInsToDel.firstChild.innerHTML));
-                rangeWithCharsForAction.insertNode(delNode);
+                delNode.appendChild(document.createTextNode(contentToMoveFromInsToDel));
+                this.docSelRange.insertNode(delNode);
                 insNode.parentNode.removeChild(insNode);
             }
             // If the selection is completely removed now, then there is nothing left to do.
-            if (completeSelectionIsDeleted) {
-                return 'completeSelectionIsDeleted';
+            if (completeSelectionIsHandled) {
+                return 'completeSelectionIsHandled';
             }
-            // We might have changed the DOM quite a bit...
-            this.refreshSelectionAndRange();
-            rangeForDel = this.getRangeToBeDeleted();
         }
+        // We might have changed the DOM quite a bit...
+        this.refreshSelectionAndRange();
         return delNode;
     },
     /**
@@ -486,7 +471,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     handleImagesInDeletion: function() {
         var me = this,
-            completeSelectionIsMarked = false,
+            completeSelectionIsHandled = false,
             delNode = null,
             tmpMarkupNode = this.createNodeForMarkup(this.getNodeNameAccordingToEvent()),
             rangeForDel = this.getRangeToBeDeleted(),
@@ -495,16 +480,19 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             mqmPartnerImgNodes = [],
             imgNode,
             rangeForImgNode = rangy.createRange();
+        if (rangeForDel == null) {
+            return false;
+        }
         // collect INS-nodes within what is to be deleted
         imgNodesTotal = rangeForDel.getNodes([1], function(node) {
-            return ( node.nodeName == 'IMG' && node.parentNode.nodeName != 'DEL');
+            return (node.nodeName == 'IMG' && node.parentNode.nodeName != 'DEL');
         });
         // if the selection is completely that IMG-node:
         if (rangeForDel.commonAncestorContainer.nodeName == 'IMG'
             &&  rangeForDel.commonAncestorContainer.isEqualNode(rangeForDel.startContainer)
             &&  rangeForDel.commonAncestorContainer.isEqualNode(rangeForDel.endContainer) ) {
             imgNodesTotal.push(rangeForDel.commonAncestorContainer);
-            completeSelectionIsMarked = true;
+            completeSelectionIsHandled = true;
         };
         // check for get MQM-partner-tags and add them to the images for changeMarkup
         setOfImgNodesTotal = new Set(imgNodesTotal);
@@ -523,6 +511,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         for (var i = 0; i < imgNodesTotal.length; i++) {
             imgNode = imgNodesTotal[i];
             rangeForImgNode.selectNode(imgNode);
+            if(this.rangeMatchesNode(rangeForDel,imgNode)) {
+                completeSelectionIsHandled = true;
+            }
             delNode = this.createNodeForMarkup(this.NODE_NAME_DEL);
             rangeForDel.collapseBefore(imgNode);
             delNode.appendChild(imgNode);
@@ -530,19 +521,18 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             setOfImgNodesTotal.delete(imgNode);
             // If the selection is completely marked now (including their partner-tags), 
             // then there is nothing left to do.
-            if (completeSelectionIsMarked && setOfImgNodesTotal.size == 0) {
-                return 'completeSelectionIsMarked';
+            if (completeSelectionIsHandled && setOfImgNodesTotal.size == 0) {
+                return 'completeSelectionIsHandled';
             }
-            // We might have changed the DOM quite a bit...
-            this.refreshSelectionAndRange();
-            rangeForDel = this.getRangeToBeDeleted();
         }
+        // We might have changed the DOM quite a bit...
+        this.refreshSelectionAndRange();
         return delNode;
     },
     /**
      * Mark all unmarked contents within the selected range for deletion.
      * The last node that gets marked as deleted is returned;
-     * but if nothing gets marked for deletion, we return false.
+     * if nothing gets marked for deletion, we return false.
      * @returns {(?Object|Boolean)} delNode
      */
     addDel: function() {
@@ -555,14 +545,16 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             unmarkedNodesTotal,
             unmarkedNode;
         
+        if (rangeForDel == null) {
+            return false;
+        }
+        
         // Is the complete range itself to be marked as deleted? 
         // (= e.g. if a character is to be deleted within other characters)
-        if(rangeForDel.commonAncestorContainer.nodeType == 3) { // TODO: is this the only condition that must be met?
+        if(this.rangeMatchesNode(rangeForDel,delNode)) {
             if (rangeForDel.canSurroundContents(delNode)) {
                 rangeForDel.surroundContents(delNode);
                 return delNode;
-            } else {
-                debugger;
             }
         }
         
@@ -583,13 +575,10 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             delNode = this.createNodeForMarkup(this.NODE_NAME_DEL);
             if (rangeWithCharsForAction.canSurroundContents()) {
                 rangeWithCharsForAction.surroundContents(delNode);
-            } else {
-                debugger;
             }
-            // We might have changed the DOM quite a bit...
-            this.refreshSelectionAndRange();
-            rangeForDel = this.getRangeToBeDeleted();
         }
+        // We might have changed the DOM quite a bit...
+        this.refreshSelectionAndRange();
         return delNode;
     },
 
@@ -624,25 +613,6 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         this.positionCaretAfterInsertion(insNode,isPlaceholder);
         // "Reset" to initial content except for Workaround
         insNode.nodeValue = insInnerNodeContent;                      // Google Chrome and Workaround; see above...
-
-    },
-    /**
-     * Place the caret at the beginning of the next INS-Node (within!!!).
-     */
-    useNextIns:  function() {
-        var focusNode = document.createElement('div'), // Workaround: temporarily add a "focus-node" at the beginning within the nextNode for using setEndAfter on it (otherwise we will not end up WITHIN the nextNode!)
-            nextNode = this.getSiblingNodeForCurrentSelection('next'),
-            rangeForCaret = rangy.createRange();
-        focusNode.style.position = "absolute"; // display the temp div out of sight, otherwise the displayed content flickers
-        focusNode.style.left = "-1000px";
-        nextNode.insertBefore(focusNode,nextNode.childNodes[0]);
-        rangeForCaret.setEndAfter(focusNode); // setStartBefore(nextNode) jumps IN FRONT OF the boundary of the nextNode; setStart() using offset is inconvenient, because we don't know what the offeset refers to (does the node start with a textnode or not?)
-        rangeForCaret.collapse(false);
-        this.docSel.setSingleRange(rangeForCaret);
-        // Cleanup
-        setTimeout(function() { // removing the focusNode before the insert is done looses the correct position of the caret
-            nextNode.removeChild(focusNode);
-        }, 1);
     },
 
     // =========================================================================
@@ -666,7 +636,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         this.docSel.setSingleRange(rangeForCaret);
     },
     /**
-     * Position the caret depending on the DEL-node.
+     * Position the caret depending on the DEL-node and the Keyboard-Event.
      * @param {?Object} delNode
      */
     positionCaretAfterDeletion: function(delNode) {
@@ -695,40 +665,421 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         }
         this.docSel.setSingleRange(rangeForCaret);
     },
-
-    // =========================================================================
-    // Check if the current selection is in or at already existing markup-nodes
-    // =========================================================================
-
     /**
-     * Get the "surrounding" node of the current selection.
-     * If getMarkupNodeIfExists is given as true, we return the markup-node if we are within one.
-     * @param {Boolean} getMarkupNodeIfExists
+     * Position the caret at the beginning of the given node (within!!!).
+     * @param {?Object} node
+     */
+    positionCaretInNode:  function(node) {
+        var focusNode = document.createElement('div'), // Workaround: temporarily add a "focus-node" at the beginning within the node for using setEndAfter on it (otherwise we will not end up WITHIN the node!)
+            rangeForCaret = rangy.createRange();
+        focusNode.style.position = "absolute"; // display the temp div out of sight, otherwise the displayed content flickers
+        focusNode.style.left = "-1000px";
+        node.insertBefore(focusNode,node.childNodes[0]);
+        rangeForCaret.setEndAfter(focusNode); // setStartBefore(nextNode) jumps IN FRONT OF the boundary of the node; setStart() using offset is inconvenient, because we don't know what the offeset refers to (does the node start with a textnode or not?)
+        rangeForCaret.collapse(false);
+        this.docSel.setSingleRange(rangeForCaret);
+        // Cleanup
+        setTimeout(function() { // removing the focusNode before the insert is done looses the correct position of the caret
+            node.removeChild(focusNode);
+        }, 1);
+    },
+
+    // =========================================================================
+    // Check if the current selection is in or at nodes and handle their content
+    // =========================================================================
+    
+    // ----------------- Current Selection & Nodes: Specific (DEL) --------------------------
+    
+    /**
+     * Is eyerything of the given range within a DEL-node?
+     * @param {Object} range
+     * @returns {Boolean}
+     */
+    rangeIsWithinDELNode: function(range) {
+        return this.rangeIsWithinMarkupNodeOfCertainKind(range,this.NODE_NAME_DEL);
+    },
+    /**
+     * Returns a container (node) with the previous/next "one-space"-content from the current position of the caret
+     * (= as if DELETE or BACKSPACE would have been used after positioning the caret somewhere).
+     * DELETE:
+     * - ab|cd              => 'c'
+     * - abc| d             => ' '
+     * - abc|<IMG>d         => <IMG>
+     * - ab|<ins>cd</ins>   => 'c'
+     * - ab|c<del>d</del>   => 'c'
+     * - ab<del>|c</del>d   => 'c'
+     * BACKSPACE:
+     * - abc|d              => 'c'
+     * - abc |d             => ' '
+     * - abc<IMG>|d         => <IMG>
+     * - <ins>abc</ins>|d   => 'c'
+     * - abc<del>|d</del>   => 'c'
+     * - ab<del>c|</del>d   => 'c'
+     * 
      * @returns {Object}
      */
-    getContainerNodeForCurrentSelection: function(getMarkupNodeIfExists){
-        var containerNodeForCurrentSelection;
-        if (this.docSelRange.collapsed && this.docSelRange.commonAncestorContainer.isEqualNode(this.editor.getEditorBody()) ) {
-            containerNodeForCurrentSelection = this.docSelRange.commonAncestorContainer.childNodes[this.docSelRange.startOffset];
-        } else if (this.docSelRange.collapsed && this.docSelRange.startContainer.isEqualNode(this.docSelRange.endContainer) ) {
-            containerNodeForCurrentSelection = this.docSelRange.startContainer;
-            // return markup-Node if it completely encompasses the selection 
-            if (getMarkupNodeIfExists != undefined && getMarkupNodeIfExists) {
-                if (this.docSelRange.commonAncestorContainer.wholeText == this.docSelRange.startContainer.wholeText
-                        && this.isNodeOfTypeMarkup(this.docSelRange.commonAncestorContainer.parentNode))
-                containerNodeForCurrentSelection = this.docSelRange.startContainer.parentNode;
-            }
-        } else if (this.docSelRange.commonAncestorContainer.isEqualNode(this.editor.getEditorBody()) ) {
-            // this.editor.getEditorBody() is our highest node
-            containerNodeForCurrentSelection = this.editor.getEditorBody();
-        } else {
-            containerNodeForCurrentSelection = this.docSelRange.commonAncestorContainer.parentNode;
+    getContainerWithNeighborOfCurrentCaret: function() {
+        var container = this.getContainerNodeForCurrentSelection(),
+            containerParent = container.parentNode,
+            positionInContainer = this.getSelectionPositionInfo(container),
+            positionInParent = this.getSelectionPositionInfo(containerParent),
+            positionInEditor = this.getSelectionPositionInfo(this.editor.getEditorBody()),
+            containerSibling,
+            containerSiblingChild,
+            containerParentSibling,
+            containerParentSiblingChild,
+            isAtFinalPositionInContainer,
+            isAtFinalPositionInParent,
+            containerNextToCaret;
+        // If we are at the very beginning/end of the Editor, we cannot go any further: 
+        if( (positionInEditor.atStart && this.eventKeyCode == Ext.event.Event.BACKSPACE)
+                || (positionInEditor.atEnd && this.eventKeyCode == Ext.event.Event.DELETE) ){
+            return null;
         }
-        return containerNodeForCurrentSelection;
+        // Get position and sibling according to the event:
+        switch(this.eventKeyCode) {
+            case Ext.event.Event.BACKSPACE:                         // BACKSPACE: "deletes" the previous character/image
+                containerSibling = container.previousSibling;
+                containerSiblingChild = (containerSibling != null) ? containerSibling.lastChild : null;
+                containerParentSibling = (containerParent != null) ? containerParent.previousSibling : null;
+                containerParentSiblingChild = (containerParentSibling != null) ? containerParentSibling.lastChild : null;
+                isAtFinalPositionInContainer = positionInContainer.atStart;
+                isAtFinalPositionInParent = positionInParent.atStart;
+                break;
+            case Ext.event.Event.DELETE:                            // DELETE: "deletes" the next character/image
+                containerSibling = container.nextSibling;
+                containerSiblingChild = (containerSibling != null) ? containerSibling.firstChild : null;
+                containerParentSibling = (containerParent != null) ? containerParent.nextSibling : null;
+                containerParentSiblingChild = (containerParentSibling != null) ? containerParentSibling.firstChild : null;
+                isAtFinalPositionInContainer = positionInContainer.atEnd;
+                isAtFinalPositionInParent = positionInParent.atEnd;
+                break;
+        }
+        // ----- (1) We are NOT at the very beginning/end in our node: ---------------------------------------------------------------
+        // -----     (= moving to the left or to the right stays within the container) -----------------------------------------------
+        if (!isAtFinalPositionInContainer) {
+            // (1.1) 
+            if (container.nodeType == 3) {
+                // This will happen only for text-nodes (= we can move within our own container then) ...
+                return container;
+            } else if (this.isNodeOfTypeMarkup(container)) {
+                // ... or text-nodes within markupNodes (= we can use the container's sibling then) ...
+                return containerSibling;
+            } else {
+                // ... and that's it, because IMG-Nodes are always recognized within their own range (with both atStart and atEnd are true).
+                // Hence, if we get here, I got something wrong.
+                debugger;
+            }
+        }
+        // -----  (2) We ARE at the very beginning/end in our node: -------------------------------------------------------------------
+        // -----     (= moving to the left or to the right will refer to the previous/next container) ---------------------------------
+        
+        if (isAtFinalPositionInContainer) {
+            // (2.1) We are WITHIN a MarkupNode of any kind (eg. some text within a DEL-Node).
+            //      Only if we are at the very beginning/end of the MarkupNode; otherwise we can move within our own container, see (2.3)
+            if (this.isNodeOfTypeMarkup(containerParent) && isAtFinalPositionInParent) {
+                if (this.isNodeOfTypeMarkup(containerParentSibling)) {
+                    return containerParentSiblingChild;         // The parent's sibling is a MarkupNode, so we need to get its first/last child.
+                } else {
+                    return containerParentSibling;
+                }
+            }
+            // (2.2a) Special case for images, is a bit tricky.
+            containerNextToCaret = null;
+            if (container.nodeType == 1 && container.nodeName == 'IMG') { 
+                containerNextToCaret = this.getContainerNextToCaretForImageNodesInMarkupNodes(container,containerSibling);
+            }
+            // (2.2b) Special case for images in markup-Nodes, is a bit tricky.
+            if (this.isNodeOfTypeMarkup(container) && container.firstChild.nodeType == 1 && container.firstChild.nodeName == 'IMG') { 
+                containerNextToCaret = this.getContainerNextToCaretForImageNodesInMarkupNodes(container.firstChild,containerSibling);
+            }
+            if (containerNextToCaret != null) {
+                if (containerNextToCaret.isEqualNode(containerSibling) && this.isNodeOfTypeMarkup(containerSibling)) {
+                    return containerSiblingChild;               // The container's sibling is a MarkupNode, so we need to get its first/last child.
+                } else {
+                    return containerNextToCaret;
+                }
+            }
+            // (2.3) "Default": when we are at the border of our container, we check for our sibling on the same level.
+            if (this.isNodeOfTypeMarkup(containerSibling)) {
+                return containerSiblingChild;                   // The container's sibling is a MarkupNode, so we need to get its first/last child.
+            } else {
+                return containerSibling;
+            }
+        }
+        debugger; // If we get here, I missed something.
+    },
+    /**
+     * Returns the content "on the left" or "on the right" (according to the 
+     * current event) of the given range.
+     * If the given container is an image, we select that one;
+     * otherweise we select text by moving the range's boundary.
+     * @param {Object} range
+     * @param {Object} containerNextToCaret
+     * @returns {?Object} range
+     */
+    selectCharacterInRangeByOne: function(range,containerNextToCaret) {
+        var moveOptions  = { includeBlockContentTrailingSpace: true };
+        if(!range.collapsed) {
+            return range;
+        }
+        if (containerNextToCaret == null) {
+            return null;
+        }
+        // containerNextToCaret is an IMG => take that one.
+        if (containerNextToCaret != null && containerNextToCaret.nodeType == 1 && containerNextToCaret.nodeName == 'IMG') {
+            range.selectNodeContents(containerNextToCaret);
+        } else {
+            // Content in containerNextToCaret will be Text or Markup => moveCharacter.
+            switch(this.eventKeyCode) {
+                case Ext.event.Event.BACKSPACE:
+                    range.moveStart("character", -1, moveOptions);
+                    break;
+                case Ext.event.Event.DELETE:
+                    range.moveEnd("character", 1, moveOptions);
+                    break;
+            }
+        }
+        return range;
+    },
+    /**
+     * Returns the content "on the left" or "on the right" for the current selection
+     * if the caret is positioned next to an image that is within a markupnode.
+     * @param {Object} imgNode
+     * @param {Object} containerSibling
+     * @returns {Object}
+     */
+    getContainerNextToCaretForImageNodesInMarkupNodes: function(imgNode,containerSibling) {
+        // CAUTION: Images surrounded be Markup-Nodes are seen as "positioned" at the start AND at the end of the node. 
+        // The position of the caret  does not matter in these cases! What we can make use of is a difference in the range we get:
+        // - If the caret is on the right from the image: the range lands "within" the DEL-Node of the image.
+        // - If the caret is in the left from the image: the range stays left from the DEL-Node of the image.
+        // TODO: What happens if we are INBETWEEN two image-nodes? (check with markup also!)
+        if (this.rangeIsWithinMarkupNodeOfAnyKind(this.docSelRange) && this.eventKeyCode == Ext.event.Event.BACKSPACE) {
+            // The caret is behind the image.
+            // We are in a BACKSPACE-Event, so get the image:
+            return imgNode;
+        } else {
+            if (this.eventKeyCode == Ext.event.Event.DELETE) {
+                if(this.rangeMatchesNode(this.docSelRange,imgNode)) {
+                    // The caret is in front of the image.
+                    // We are in a DELETE-Event, so get the image:
+                    return imgNode;
+                } else {
+                    // The caret is in behind the image.
+                    // We are in a DELETE-Event, so we'll get the next content.
+                    return containerSibling;
+                }
+            } else {
+                // The caret is before the image.
+                // We are in a BACKSPACE-Event, so we'll get the previous content.
+                return containerSibling;
+            }
+        }
+    },
+    
+    // ----------------- Current Selection & Nodes: Specific (INS) --------------------------
+    
+    /**
+     * Is eyerything of the current selection within an INS-node 
+     * that has the same userand workflow as the event?
+     * @returns {Boolean}
+     */
+    selectionIsWithinINSNodeAccordingToEvent: function() {
+        var containerNode = this.getMarkupNodeForCurrentSelection(this.NODE_NAME_INS);
+        return (containerNode != null && this.isNodeAccordingToEvent(containerNode) );
+    },
+    /**
+     * Get the INS-Node EXACTLY BEFORE the current position of the caret 
+     * that has the same user and workflow as the event (if there is one).
+     * @returns {?Object}
+     */
+    getINSNodeForContentBeforeCaretAccordingToEvent: function() {
+        var nodeBeforeCaret = this.getMarkupNodeForContentBeforeCaret(this.NODE_NAME_INS);
+        if (nodeBeforeCaret != null
+                && this.isNodeAccordingToEvent(nodeBeforeCaret) ) {
+            return nodeBeforeCaret;
+        } else {
+            return null;
+        }
+    },
+    /**
+     * Get the INS-Node EXACTLY BEHIND the current position of the caret 
+     * that has the same user and workflow as the event (if there is one).
+     * @returns {?Object}
+     */
+    getINSNodeForContentBehindCaretAccordingToEvent: function() {
+        var nodeBehindCaret = this.getMarkupNodeForContentBehindCaret(this.NODE_NAME_INS);
+        if (nodeBehindCaret != null
+                && this.isNodeAccordingToEvent(nodeBehindCaret) ) {
+            return nodeBehindCaret;
+        } else {
+            return null;
+        }
+    },
+    /**
+     * Get the "surrounding" node of the current selection 
+     * that does NOT match the conditions (if there is one).
+     * @returns {?Object}
+     */
+    getForeignMarkupNodeForInsertion: function() {
+        var tmpMarkupNodeINS = this.createNodeForMarkup(this.NODE_NAME_INS),
+            containerNodeINS = this.getMarkupNodeForCurrentSelection(this.NODE_NAME_INS),
+            containerNodeDEL = this.getMarkupNodeForCurrentSelection(this.NODE_NAME_DEL);
+        // We are within a DEL-Node of any kind:
+        if (containerNodeDEL != null) {
+            return containerNodeDEL;
+        }
+        // We are within an INS-Node that does not match the current user and workflow:
+        if (containerNodeINS != null && this.isNodesOfForeignMarkup(containerNodeINS,tmpMarkupNodeINS) ) {
+            return containerNodeINS;
+        }
+        // No foreign node found:
+        return null;
+    },
+    
+    // ----------------- Current Selection & Nodes: General(Markup-Nodes) -------------------
+    
+    /**
+     * Checks if the complete given range is within one-and-the-same markup-Node of any kind.
+     * @param {Object} range
+     * @returns {Boolean}
+     */
+    rangeIsWithinMarkupNodeOfAnyKind: function(range) {
+        var container = range.commonAncestorContainer,
+            containerParent = container.parentNode;
+        // If we are in the midst of a given node, we return that node:
+        if (container.nodeType == 1 && this.isNodeOfTypeMarkup(container)) {
+            return true;
+        }
+        // If we are in the midst of a textNode within a given node, we return its surrounding node:
+        if (container.nodeType == 3 && this.isNodeOfTypeMarkup(containerParent)) {
+            return true;
+        }
+        // There is no markup-node surrounding the current selection:
+        return false;
+    },
+    /**
+     * Checks is the complete given range is within one-and-the-same markup-Node as given in the nodeName.
+     * @param {Object} range
+     * @param {String} nodeName
+     * @returns {Boolean}
+     */
+    rangeIsWithinMarkupNodeOfCertainKind: function(range,nodeName) {
+        var container = range.commonAncestorContainer,
+            containerParent = container.parentNode;
+        // If we are in the midst of a given node, we return that node:
+        if (container.nodeType == 1 && container.nodeName == nodeName) {
+            return true;
+        }
+        // If we are in the midst of a textNode within a given node, we return its surrounding node:
+        if (container.nodeType == 3 && containerParent.nodeName == nodeName) {
+            return true;
+        }
+        // There is no markup-node surrounding the current selection:
+        return false;
+    },
+    /**
+     * Get the "surrounding" markup-node of the given type (= nodeName) of the current selection (if there is one).
+     * @param {String} nodeName
+     * @returns {?Object}
+     */
+    getMarkupNodeForCurrentSelection: function(nodeName){
+        var container = this.getContainerNodeForCurrentSelection(),
+            containerParent = container.parentNode;
+        // If we are in the midst of a given node, we return that node:
+        if (container.nodeType == 1 && container.nodeName == nodeName) {
+            return container;
+        }
+        // If we are in the midst of a textNode within a given node, we return its surrounding node:
+        if (container.nodeType == 3 && containerParent.nodeName == nodeName) {
+            return containerParent;
+        }
+        // There is no markup-node surrounding the current selection:
+        return null;
+    },
+    /**
+     * Get the Node of the given type (= nodeName) EXACTLY BEFORE the current position of the caret (if there is one).
+     * @param {String} nodeName
+     * @returns {?Object}
+     */
+    getMarkupNodeForContentBeforeCaret: function(nodeName) {
+        var nodeBeforeCaret,
+            container = this.getContainerNodeForCurrentSelection(),
+            startContainer = this.docSelRange.startContainer,
+            startOffset = this.docSelRange.startOffset,
+            endContainer = this.docSelRange.endContainer,
+            endOffset = this.docSelRange.endOffset,
+            editorBody = this.editor.getEditorBody();
+        // If we are right behind an IMAGE within a markup-Node, that node of that image is what we look for.
+        // Since these image-nodes always return true for atStart and atEnd, we cannot check for the position and need a workaround:
+        if (this.rangeIsWithinDELNode(this.docSelRange)
+                && this.isNodeOfTypeMarkup(startContainer)
+                && startContainer.firstChild.isEqualNode(endContainer.lastChild)
+                && startContainer.firstChild.nodeName == 'IMG') {
+            nodeBeforeCaret = startContainer;
+        }
+        // If we are NOT at the beginning of a node (but e.g. within a DEL-node), then the previous character is within the node we are already in:
+        else if (!this.isAtStartOfCurrentSelection()) {
+            nodeBeforeCaret = this.getMarkupNodeForCurrentSelection(nodeName);
+        }
+        // If we ARE right at the beginning of any kind of node (AND not right behind to an image node), 
+        // then the previous character belongs to the the previous sibling:
+        else {
+            nodeBeforeCaret = this.getSiblingNodeForCurrentSelection('previous');
+        }
+        if (nodeBeforeCaret != null && nodeBeforeCaret.nodeName == nodeName) {
+            return nodeBeforeCaret;
+        } else {
+            return null;
+        }
+    },
+    /**
+     * Get the Node of the given type (= nodeName) EXACTLY BEHIND the current position of the caret (if there is one).
+     * @param {String} nodeName
+     * @returns {?Object}
+     */
+    getMarkupNodeForContentBehindCaret: function(nodeName) {
+        var nodeBehindCaret;
+        if (!this.isAtEndOfCurrentSelection()) {                                    // (1) If we are NOT at the end, but e.g. within a DEL-node...  
+            nodeBehindCaret = this.getMarkupNodeForCurrentSelection(nodeName);      // ... we must check for that node we are in.
+        } else {                                                                    // (2) If we are right at the end of any kind of node,
+            nodeBehindCaret = this.getSiblingNodeForCurrentSelection('next');       // ... we must check for the next sibling.
+        }
+        // TODO: Must also check for already marked images!
+        if (nodeBehindCaret != null && nodeBehindCaret.nodeName == nodeName) {
+            return nodeBehindCaret;
+        } else {
+            return null;
+        }
+    },
+    
+    // ----------------- Current Selection, Ranges & Nodes: General(Any nodes) ----------------------
+    
+    /**
+     * Get the "surrounding" node of the current selection.
+     * @returns {Object}
+     */
+    getContainerNodeForCurrentSelection: function(){
+        var commonAncestorContainer = this.docSelRange.commonAncestorContainer,
+            startContainer = this.docSelRange.startContainer,
+            startOffset = this.docSelRange.startOffset,
+            endContainer = this.docSelRange.endContainer,
+            endOffset = this.docSelRange.endOffset;
+        // (With Images for example:) If the range boundaries are "outside" of the selection
+        // although the caret is positioned within one-and-the-same node, we use that node:
+        if (startContainer.childNodes[startOffset] != null
+                && endContainer.childNodes[endOffset] != null
+                && startContainer.childNodes[startOffset].isEqualNode(endContainer.childNodes[endOffset])) {
+            return commonAncestorContainer.childNodes[startOffset];
+        } else {
+            return commonAncestorContainer;
+        }
     },
     /**
      * Get the previous or next node of the current selection.
-     * If the selection is in a text node without a sibling, the sibling of the selection's parentNode is returned.
+     * If the selection is in a textNode without a sibling, the sibling of the selection's parentNode is returned.
+     * If there is no sibling, we return null.
      * @param {String} direction (previous|next)
      * @returns {?Object}
      */
@@ -736,152 +1087,52 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         var docSel = this.docSelRange,
             lookForPrevious = (direction == "previous") ? true : false,
             currentNode = (lookForPrevious ? docSel.startContainer : docSel.endContainer),
-            currentParentNode = currentNode.parentNode;
-        var siblingNode = (lookForPrevious ? currentNode.previousSibling : currentNode.nextSibling);
+            currentParentNode = currentNode.parentNode,
+            siblingNode = null;
+        siblingNode = (lookForPrevious ? currentNode.previousSibling : currentNode.nextSibling);
         if ( (siblingNode == null) && (currentNode.nodeType == 3) ) {
             siblingNode = (lookForPrevious ? currentParentNode.previousSibling : currentParentNode.nextSibling);
         }
         return siblingNode;
     },
     /**
-     * Checks if the current selection is within an existing markup-node of the given conditions to check.
-     * @param {String} checkConditions (insNodeWithSameConditions|sameNodeName|foreignMarkup|sameConditionsAndEvent)
+     * Does the selection start right at the beginning of its container?
+     * If an img is encompassed by a Markup-Node, we cannot check whether we are before or behind the image.
      * @returns {Boolean}
      */
-    isWithinNode: function(checkConditions) {
-        var tmpMarkupNode = this.createNodeForMarkup(this.getNodeNameAccordingToEvent()),
-            selectionNode = this.getContainerNodeForCurrentSelection(true);
-        switch(checkConditions) {
-            case 'insNodeWithSameConditions':
-                var tmpMarkupNode = this.createNodeForMarkup(this.NODE_NAME_INS);
-                this.consoleLog("isWithinNode ("+checkConditions+")? " + this.isNodesOfSameName(tmpMarkupNode,selectionNode) + this.isNodesOfSameNameAndConditions(tmpMarkupNode,selectionNode));
-                return this.isNodesOfSameName(tmpMarkupNode,selectionNode) && this.isNodesOfSameNameAndConditions(tmpMarkupNode,selectionNode);
-            case 'sameNodeName':
-                this.consoleLog("isWithinNode ("+checkConditions+")? " + this.isNodesOfSameName(tmpMarkupNode,selectionNode));
-                return this.isNodesOfSameName(tmpMarkupNode,selectionNode);
-            case 'foreignMarkup':
-                this.consoleLog("isWithinNode ("+checkConditions+")? " + this.isNodesOfForeignMarkup(tmpMarkupNode,selectionNode));
-                return this.isNodesOfForeignMarkup(tmpMarkupNode,selectionNode);
-            case 'sameConditionsAndEvent':
-                this.consoleLog("isWithinNode ("+checkConditions+")? " + this.isNodesOfSameNameAndConditionsAndEvent(tmpMarkupNode,selectionNode));
-                return this.isNodesOfSameNameAndConditionsAndEvent(tmpMarkupNode,selectionNode);
-            // no default, because then we would have a bug in the code. Calling this method without a correct parameter is too dangerous in consequences.
-        }
-    },
-    /**
-     * Checks if the current selection is right before or after an already existing markup-node of the given conditions to check.
-     * ('previous' checks for previous sibling, 'next' checks for next sibling).
-     * @param {String} direction (previous|next)
-     * @param {String} checkConditions (sameNodeName|sameConditionsAndEvent)
-     * @returns {Boolean}
-     */
-    isAtSibling: function(direction,checkConditions) {
-        this.consoleLog("isAtSibling ("+direction+"/" + checkConditions +")?");
-        var currentIsOfSameConditionsAsSibling,
-            tmpMarkupNode = this.createNodeForMarkup(this.getNodeNameAccordingToEvent()),
-            selectionNode = this.getContainerNodeForCurrentSelection(),
-            siblingNode = this.getSiblingNodeForCurrentSelection(direction),
-            selPositionInfo = this.getSelectionPositionInfo(selectionNode);
-        
-        // ------ (1) check conditions -------------------------------------------------------
-        
-        switch(checkConditions) { // TODO: DRY! see switch(checkConditions) in isWithinNode()
-            case 'sameNodeName':
-                currentIsOfSameConditionsAsSibling = this.isNodesOfSameName(tmpMarkupNode,siblingNode);
-                break;
-            case 'sameConditionsAndEvent':
-                currentIsOfSameConditionsAsSibling = this.isNodesOfSameName(tmpMarkupNode,siblingNode) && this.isNodesOfSameNameAndConditionsAndEvent(tmpMarkupNode,siblingNode);
-                break;
-            // no default, because then we would have a bug in the code. Calling this method without a correct parameter is too dangerous in consequences.
-        }
-        this.consoleLog("- checkConditions ("+checkConditions+"): " + currentIsOfSameConditionsAsSibling);
-        if (!currentIsOfSameConditionsAsSibling) {
-            return false;
-        }
-        
-        //------ (2) check position (= is really AT the sibling in the given direction?) ------
-        
-        // CAUTION! (Example): A new character "b" is to be added inbetween an already deleted "a" and an already inserted "c":
-        // (before:) <del>a</del><ins>c</ins> => (after:) <del>a</del><ins>bc</ins>
-        // Now, the editor in the browser thinks that user placed the caret ("|") IN the DEL-node:
-        // <del>a|</del><ins>c</ins>
-        // Now we have to check if the DEL-node (not the INS-node we'll create for inserting the b, which would be created WITHIN the DEL-node in this case) 
-        // is in front of the INS-node!
-       var nodeForSelection = tmpMarkupNode;
-        if  (  (this.isWithinNode('foreignMarkup') && direction == 'next'     && selPositionInfo.atEnd) 
-            || (this.isWithinNode('foreignMarkup') && direction == 'previous' && selPositionInfo.atStart) ) {
-                   nodeForSelection = selectionNode;
-        }
-        
-        var currentTouchesSibling = this.isNodesTouching(nodeForSelection,siblingNode,direction);
-        this.consoleLog("- currentTouchesSibling: " + currentTouchesSibling);
-        
-        // Cleanup
-        if(tmpMarkupNode.parentNode) {
-            tmpMarkupNode.parentElement.removeChild(tmpMarkupNode);
-        }
-        
-        return currentTouchesSibling;
-    },
-    /**
-     * Checks if the two given nodes touch each other in the given direction.
-     * @param {Object} node
-     * @param {Object} siblingNode
-     * @param {String} direction (previous|next)
-     * @returns {Boolean}
-     */
-    isNodesTouching: function(node,siblingNode,direction){
-        this.consoleLog("isNodesTouching ("+direction+")?");
-        this.consoleLog("- node:");
-        this.consoleLog(node);
-        this.consoleLog("- siblingNode:");
-        this.consoleLog(siblingNode);
-        
-        if (node == null || siblingNode == null) {
-            return false;   // is not even two nodes, thus it's also not two nodes touching.
-        }
-        
-        if (node.parentNode == null || siblingNode.parentNode == null
-                || ( node.parentNode != siblingNode.parentNode) ) {
-            return false;   // two sibling nodes will both have a parent (and: the SAME parent).
-        }
-        
-        var hasSiblingInGivenDirection = false,
-            isTouchingSibling = false,
-            rangeForNode                = rangy.createRange(),
-            rangeForNodeContents        = rangy.createRange(),
-            rangeForSiblingNode         = rangy.createRange(),
-            rangeForSiblingNodeContents = rangy.createRange();
-        
-        rangeForNode.selectNode(node);
-        rangeForSiblingNode.selectNode(siblingNode);
-        rangeForNodeContents.selectNodeContents(node);
-        rangeForSiblingNodeContents.selectNodeContents(siblingNode);
-        
-        // (a) is the sibling in the given direction?
-        if (direction == 'previous') {
-            hasSiblingInGivenDirection = rangeForNodeContents.compareBoundaryPoints(Range.END_TO_START, rangeForSiblingNodeContents) == this.RANGY_RANGE_IS_AFTER;
+    isAtStartOfCurrentSelection: function() {
+        var selRange = this.docSelRange,
+            startContainer = selRange.startContainer,
+            containingNode,
+            selectionPosition;
+        if(this.isNodeOfTypeMarkup(startContainer)) {
+            containingNode = startContainer.firstChild;
         } else {
-            hasSiblingInGivenDirection = rangeForNodeContents.compareBoundaryPoints(Range.START_TO_END, rangeForSiblingNodeContents) == this.RANGY_RANGE_IS_BEFORE;
+            containingNode = startContainer;
         }
-        
-        // (b) is right at the sibling, not just somewhere?
-        // Workaround: move the node's boundary by one character "into" it's sibling (according to the direction),
-        // otherwise the ranges are neighbors, but don't share one common boundary 
-        // (= which is necessary for ranges to be seen as "touching": https://github.com/timdown/rangy/wiki/Rangy-Range#intersectsortouchesrangerange-range).
-        if (direction == 'previous') {
-            rangeForNode.moveStart('character',-1);
-        } else {
-            rangeForNode.moveEnd('character',1);
-        }
-        isTouchingSibling = rangeForNode.intersectsRange(rangeForSiblingNode); // intersectsOrTouchesRange(): touching does not apply since the nodes would be "just neighbors".
-        
-        this.consoleLog("- compareBoundaryPoints: " + hasSiblingInGivenDirection);
-        this.consoleLog("- intersectsOrTouchesRange: " + isTouchingSibling);
-        return hasSiblingInGivenDirection && isTouchingSibling;
+        selectionPosition = this.getSelectionPositionInfo(containingNode);
+        return selectionPosition.atStart;
     },
     /**
-     * Determine if the cursor of the current selection is at the start or end of the given part of content.
+     * Does the selection start right at the beginning of its container?
+     * If an img is encompassed by a Markup-Node, we cannot check whether we are before or behind the image.
+     * @returns {Boolean}
+     */
+    isAtEndOfCurrentSelection: function() {
+        var selRange = this.docSelRange,
+            endContainer = selRange.endContainer,
+            containingNode,
+            selectionPosition;
+        if(this.isNodeOfTypeMarkup(endContainer)) {
+            containingNode = endContainer.lastChild;
+        } else {
+            containingNode = endContainer;
+        }
+        selectionPosition = this.getSelectionPositionInfo(containingNode);
+        return selectionPosition.atEnd;
+    },
+    /**
+     * Determine if the current selection is at the start or end of the given part of content.
      * (https://stackoverflow.com/a/7478420)
      * @param {Object} containingNode
      * @returns {Object}
@@ -902,6 +1153,44 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         atEnd = (testRange.toString() == "");
         
         return { atStart: atStart, atEnd: atEnd };
+    },
+    /**
+     * Is the (complete) node (somewhere) within given range?
+     * @param {Object} range
+     * @param {Object} node
+     * @returns {Boolean}
+     */
+    rangeContainsNode: function(range,node) {
+        var rangeForNode = rangy.createRange();
+        rangeForNode.selectNodeContents(node);
+        return range.containsRange(rangeForNode);
+    },
+    /**
+     * Does the node completely and exactly encompass the given range?
+     * @param {Object} range
+     * @param {Object} node
+     * @returns {Boolean}
+     */
+    rangeMatchesNode: function(range,node){
+        var commonAncestorContainer = range.commonAncestorContainer,
+            startContainer = range.startContainer,
+            startOffset = range.startOffset,
+            endContainer = range.endContainer,
+            endOffset = range.endOffset,
+            rangeForNode = rangy.createRange();
+        // If we compare text:
+        if(node.nodeType == 3) {
+            rangeForNode.selectNodeContents(node);
+            var selectionMatchesNode = rangeForNode.text() == this.docSelRange.text();
+            return selectionMatchesNode;
+        }
+        // If the selection encompasses only one node and that one completely:
+        if ( startContainer.childNodes[startOffset] != null && endContainer.childNodes[endOffset] != null
+             && startContainer.childNodes[startOffset].isEqualNode(endContainer.childNodes[endOffset]) ) {
+            var selectionMatchesNode = commonAncestorContainer.childNodes[startOffset].isEqualNode(node);
+            return selectionMatchesNode;
+        }
+        return false;
     },
 
     // =========================================================================
@@ -932,8 +1221,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         }
     },
     /**
-     * Returns all markup-nodes (of any kind: DEL, INS, ...) in the Editor.
-     * @returns {Array} 
+     * Returns an array with all markup-nodes (of any kind: DEL, INS, ...) in the Editor.
+     * @returns {Object} 
      */
     getAllMarkupNodesInEditor: function(){
         var allMarkupNodes = [],
@@ -1046,7 +1335,56 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         }
         return false;
     },
-    
+    /**
+     * Checks if the two given nodes touch each other in the given direction.
+     * @param {Object} node
+     * @param {Object} siblingNode
+     * @param {String} direction (previous|next)
+     * @returns {Boolean}
+     */
+    isNodesTouching: function(node,siblingNode,direction) {
+        var hasSiblingInGivenDirection = false,
+            isTouchingSibling = false,
+            rangeForNode                = rangy.createRange(),
+            rangeForNodeContents        = rangy.createRange(),
+            rangeForSiblingNode         = rangy.createRange(),
+            rangeForSiblingNodeContents = rangy.createRange();
+        
+        if (node == null || siblingNode == null) {
+            return false;   // is not even two nodes, thus it's also not two nodes touching.
+        }
+        
+        if (node.parentNode == null || siblingNode.parentNode == null
+                || ( node.parentNode != siblingNode.parentNode) ) {
+            return false;   // two sibling nodes will both have a parent (and: the SAME parent).
+        }
+        
+        rangeForNode.selectNode(node);
+        rangeForSiblingNode.selectNode(siblingNode);
+        rangeForNodeContents.selectNodeContents(node);
+        rangeForSiblingNodeContents.selectNodeContents(siblingNode);
+
+        // (a) is the sibling in the given direction?
+        if (direction == 'previous') {
+            hasSiblingInGivenDirection = rangeForNodeContents.compareBoundaryPoints(Range.END_TO_START, rangeForSiblingNodeContents) == this.RANGY_RANGE_IS_AFTER;
+        } else {
+            hasSiblingInGivenDirection = rangeForNodeContents.compareBoundaryPoints(Range.START_TO_END, rangeForSiblingNodeContents) == this.RANGY_RANGE_IS_BEFORE;
+        }
+        
+        // (b) is right at the sibling, not just somewhere?
+        // Workaround: move the node's boundary by one character "into" it's sibling (according to the direction),
+        // otherwise the ranges are neighbors, but don't share one common boundary 
+        // (= which is necessary for ranges to be seen as "touching": https://github.com/timdown/rangy/wiki/Rangy-Range#intersectsortouchesrangerange-range).
+        var moveOptions  = { includeBlockContentTrailingSpace: true };
+        if (direction == 'previous') {
+            rangeForNode.moveStart('character',-1, moveOptions);
+        } else {
+            rangeForNode.moveEnd('character',1, moveOptions);
+        }
+        isTouchingSibling = rangeForNode.intersectsRange(rangeForSiblingNode); // intersectsOrTouchesRange(): touching does not apply since the nodes would be "just neighbors".
+        
+        return hasSiblingInGivenDirection && isTouchingSibling;
+    },
     
     // --------------------------------------------------------------------------------------------------------
     // Helpers for grouped checks: same nodeName / same conditions (= user, workflow, ...) / according to event
@@ -1092,16 +1430,16 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         return isNodesOfSameNameAndConditions && isNodesAccordingToEvent;
     },
     /**
-     * Do the given node's conditions match the conditions according to the event? (nodeName, user, workflow....)
+     * Do the given node's conditions match the conditions according to the event? (user, workflow....)
      * @param {Object} node
      * @returns {Boolean}
      */
     isNodeAccordingToEvent: function(node) {
-        var isNodeNameAccordingToEvent       = this.isNodeNameAccordingToEvent(node),       // nodeName acc. to event
-            isNodeOfUserAccordingToEvent     = this.isNodeOfUserAccordingToEvent(node),     // user acc. to event
+        var isNodeOfUserAccordingToEvent     = this.isNodeOfUserAccordingToEvent(node),     // user acc. to event
             isNodeOfWorkflowAccordingToEvent = this.isNodeOfWorkflowAccordingToEvent(node); // workflow acc. to event
-        return isNodeNameAccordingToEvent && isNodeOfUserAccordingToEvent && isNodeOfWorkflowAccordingToEvent;
+        return isNodeOfUserAccordingToEvent && isNodeOfWorkflowAccordingToEvent;
     },
+    
     // ------------------------------------------------------------------------------------------------------------
     // Helpers for single checks (= comparing to another node or according to event): nodeName, user, workflow, ...
     // ------------------------------------------------------------------------------------------------------------
@@ -1187,7 +1525,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     // =========================================================================
     // Cleaning up
     // =========================================================================
-
+    
     // E.g. deleting a lot of content might result in neighbors of the same kind or in a DEL-node with other DEL-nodes and INS-nodes WITHIN,
     // but they must all be without duplication and on the same level, not including children.
     // Examples: 
@@ -1203,7 +1541,6 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         this.cleanUpSiblings();
         this.cleanUpEmptyMarkupNodes();
         this.cleanUpEditor();
-
     },
     /**
      * Clean up child-nodes (since we check this everytime, we won't have any grandchildren).
@@ -1313,9 +1650,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     
     /**
      * Split a node at the position of the current selection.
-     * Returns the two parts of the node afterwards.
+     * Returns an array with the two parts of the node afterwards.
      * @param {Object} nodeToSplit
-     * @returns {Array}
+     * @returns {Object} splittedNodes
      */
     splitNode: function(nodeToSplit,rangeForPositionToSplit) {
         this.consoleLog("-----");this.consoleLog("nodeToSplit: "); this.consoleLog(nodeToSplit);this.consoleLog(rangeForPositionToSplit); this.consoleLog("-----");
@@ -1339,7 +1676,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     /**
      * Move a given node inbetween the two halfs of a formerly splitted node.
      * @param {Object} nodeToMove
-     * @param {Array} splittedNodes
+     * @param {Object} splittedNodes
      */
     moveNodeInbetweenSplittedNodes: function(nodeToMove,splittedNodes) {
         splittedNodes[1].parentNode.insertBefore(nodeToMove, splittedNodes[1]);
