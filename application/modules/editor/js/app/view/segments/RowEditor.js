@@ -43,7 +43,7 @@ Ext.define('Editor.view.segments.RowEditor', {
     itemId: 'roweditor',
     liveDrag: true,
     rowToEditOrigHeight: 0,
-    editorExtraHeight: 20,
+    editorExtraHeight:35,// 20,
     editorLocalTop: 0,
     /**
      * If set to true, rowEditor remains on its position on startEdit and grid scrolls instead
@@ -411,7 +411,7 @@ Ext.define('Editor.view.segments.RowEditor', {
             rowHeight = row.setHeight(null) && row.getHeight(), //force recalculation on each call
             editorHeight = rowHeight + me.editorExtraHeight,
             moveEditor = (me.editorLocalTop + editorHeight) - me.scrollingView.getHeight();
-        
+        console.log("setEditorHeight");
         // when switching tag mode recalculation is triggered, 
         //  but when the row is not available anymore due grid reload we don't have any height information 
         //  in this case its better to leave the old height instead of use a rowHeight of 0

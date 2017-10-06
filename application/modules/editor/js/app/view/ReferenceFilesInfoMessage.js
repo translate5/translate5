@@ -32,24 +32,35 @@ Ext.define('Editor.view.ReferenceFilesInfoMessage', {
     itemId:'referenceFilesInfoMessage',
     y:0,
     y:0,
-    padding:'10 10 10 10',
-    layout: {
-        align: 'middle',
-        pack: 'center',
-        type: 'fit'
-    },
+    width:250,
+    bodyPadding:'10 10 10 10',
+    border:false,
+    //layout: {
+    //    align: 'middle',
+    //    pack: 'center',
+    //    type: 'fit'
+    //},
     strings:{
         windowTitle:'#UT#Referenz-Dateien',
-        windowInfoMessage:'#UT#There are reference files to the task. Open attachment list.',
+        windowInfoMessage:'#UT#There are reference files to the task.',
+        buttonText:'#UT#Open attachment list'
     },
     initComponent:function(instanceConfig){
         var me = this;
         me.title=me.strings.windowTitle;
-        me.items=[{
+        me.html=me.strings.windowInfoMessage;
+
+        me.bbar=[{ 
             xtype: 'button',
             itemId:'showReferenceFilesButton',
-            text: me.strings.windowInfoMessage,
+            text: me.strings.buttonText,
+            icon: Editor.data.moduleFolder+'images/page_attach.png'
         }];
+        //me.items=[{
+        //    xtype: 'button',
+        //    itemId:'showReferenceFilesButton',
+        //    text: me.strings.buttonText,
+        //}];
         return me.callParent([config]);
     }
 });

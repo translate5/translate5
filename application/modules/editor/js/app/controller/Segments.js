@@ -101,6 +101,9 @@ Ext.define('Editor.controller.Segments', {
   },{
       ref : 'watchListFilterBtn',
       selector : '#watchListFilterBtn'
+  },{
+     ref:'segmentStatusStrip',
+     selector:'#segmentStatusStrip'
   }],
   listen: {
       controller: {
@@ -123,7 +126,8 @@ Ext.define('Editor.controller.Segments', {
           '#segmentgrid' : {
               afterrender: 'gridAfterRender',
               columnhide: 'handleColumnVisibility',
-              columnshow: 'handleColumnVisibility'
+              columnshow: 'handleColumnVisibility',
+              beforeedit: 'onSegmentGridBeforeEdit',
           },
           '#fileorderTree': {
               itemclick: 'handleFileClick'
@@ -230,6 +234,20 @@ Ext.define('Editor.controller.Segments', {
           ed.editor.toggleMainEditor(col.isVisible());
       }
   },
+
+    /***
+     * on segment grid before edit
+    */
+    onSegmentGridBeforeEdit:function(row,contex){
+        var me=this;
+            segmentStatusStrip=me.getSegmentStatusStrip();
+
+        if(!segmentStatusStrip){
+            return;
+        }
+        segmentStatusStrip.setItemsRecord(contex.record);
+    },
+
   /**
    * reset grid filter and sort, grid will be reloaded and scrolled to top
    */

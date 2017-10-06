@@ -37,10 +37,16 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.segments.RowEditorColumnParts', {
     override: 'Editor.view.segments.RowEditor',
 
+    itemId:'rowEditorTestCmp',
+    
     columnToEdit: null,
-    editorFieldExtraHeight: 10,
+    editorFieldExtraHeight: 25, //was 10, FIXME depending on the existence of the additional info bar or not
     previousRecord: null,
     timeTrackingData: null,
+
+    requires:[
+        'Editor.view.segments.StatusStrip'
+    ],
     messages: {
         segmentNotSavedUserMessage: '#UT#Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank!',
         cantSaveEmptySegment: '#UT#Das Segment kann nicht ohne Inhalt gespeichert werden!'
@@ -54,7 +60,26 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         me.on('render', function(p) {
             p.body.on('dblclick', me.changeColumnByClick, me);
         });
+
+        console.log("INIT EIDTOR!");
+        
         me.mainEditor = me.add(new Editor.view.segments.HtmlEditor());
+        me.mainEditor.add({
+            xtype:'segments.statusstrip',
+            //xtype: 'container',
+            //framed: false,
+            //style: 'background: #e4edf4;',
+            //layout:'hbox',
+            //items:[{
+                //xtype: 'roweditorcommentbutton',
+            //    style: 'background: #e5edf4;font-weight:bold;padding-top:1px;',
+            //    html: '&sum; <span style="background-color: #00ff00;margin-top:1px;">11</span> <b>i</b>'
+            //},{
+            //    xtype: 'container',
+            //    style: 'background: #e5edf4;font-weight:bold;padding-top:1px;',
+            //    html: '&sum; <span style="background-color: #00ff00;margin-top:1px;">11</span> <b>i</b>'
+            //}]
+        });
     },
     
     /**
@@ -234,6 +259,7 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
     },
     setEditorHeight: function() {
         var me = this;
+        console.log("setEditorHeight-2");
         me.callParent(arguments);
         me.mainEditor.setHeight(me.rowToEditOrigHeight + me.editorFieldExtraHeight);
     },
