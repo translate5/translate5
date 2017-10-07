@@ -25,3 +25,18 @@
 -- 
 -- END LICENSE AND COPYRIGHT
 -- */
+
+
+INSERT INTO  `Zf_worker_dependencies` (`worker`,`dependency`) VALUES 
+('editor_Plugins_Okapi_Worker',  'editor_Models_Import_Worker'),
+('editor_Plugins_TermTagger_Worker_TermTaggerImport',  'editor_Plugins_Okapi_Worker'),
+('editor_Models_Import_Worker_SetTaskToOpen',  'editor_Plugins_Okapi_Worker');
+
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
+VALUES
+('runtimeOptions.worker.editor_Plugins_Okapi_Worker.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of the Okapi worker');
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
+VALUES 
+('runtimeOptions.plugins.Okapi.api.url', '1', 'editor', 'plugins', 'https://www.translate5.net:8019/okapi-longhorn/', 'https://www.translate5.net:8019/okapi-longhorn/', '', 'string', 'Url used for Okapi api');

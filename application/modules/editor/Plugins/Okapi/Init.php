@@ -38,6 +38,13 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     protected $frontendControllers = array(
     );
     
+    private $okapyFileTypes = array(
+        'html'
+    );
+
+    private $task;
+    /* @var $task editor_Models_Task */
+
     protected $localePath = 'locales';
     
     public function getFrontendControllers() {
@@ -48,10 +55,88 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         if(ZfExtended_Debug::hasLevel('plugin', 'Okapi')) {
             ZfExtended_Factory::addOverwrite('Zend_Http_Client', 'ZfExtended_Zendoverwrites_Http_DebugClient');
         }
+        $this->initEvents();
     }
     
     protected function initEvents() {
+        $this->eventManager->attach('editor_Models_Import', 'beforeImport', array($this, 'handleBeforeImport'));
+    }
+
+    public function handleBeforeImport(Zend_EventManager_Event $event) {
+        $params = $event->getParams();
+        $importFolder=$params['importFolder'];
+        $task=$params['task'];
+        $this->task=$task;
+        //$this->moveFilesToTempImport($importFolder);
+        $this->checkFiles($importFolder);
+    }
+
+    public function checkFiles($importFolder){
+        // /var/www/translate5/application/../data/editorImportedTasks/c7105c57-f270-4c05-b79a-43756141e3f2/_tempImport
+        // proofRead
+        $proofRead='proofRead';
+        $proofReadFolder=$importFolder.'/'.$proofRead;
+
+        $it = new FilesystemIterator($proofReadFolder);
         
+        $matchFiles=[];
+        
+        foreach ($it as $fileinfo) {
+            if ($fileinfo->isFile() && in_array($fileinfo->getExtension(),$this->okapyFileTypes)) {
+                //$matchFiles[]=$fileinfo->getFilename();
+                $matchFiles[]=$fileinfo->getPathname();
+            }
+        }
+
+        if(empty($matchFiles)){
+            return;
+        }
+
+        $this->handleFiles($matchFiles,$importFolder);
+    }
+
+    public function handleFiles($matchFiles,$importFolder){
+        $worker = ZfExtended_Factory::get('editor_Plugins_Okapi_Worker');
+        /* @var $worker editor_Plugins_Okapi_Worker */
+        
+        $params=[
+            'matchFiles'=>$matchFiles,
+            'importFolder'=>$importFolder
+        ];
+        
+        // init worker and queue it
+        if (!$worker->init($this->task->getTaskGuid(), $params)) {
+            $this->log->logError('Okapi-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
+            return false;
+        }
+        $worker->queue(null);
+    }
+
+     /***
+     * Move the uploaded review file to the tempImport directory (single upload only)
+     * @param string $importFolder - temp import directory path
+     */
+     private function moveFilesToTempImport($importFolder){
+         error_log($importFolder);
+         return;
+        
+        $tmpFileInfo = pathinfo($this->visualReviewFile['visualReview']['tmp_name']);
+        
+        // nothing to to because no review files are submitted
+        if (!isset($tmpFileInfo['dirname']) || empty($tmpFileInfo['filename'])) {
+            return;
+        }
+        
+        $dest = $importFolder."/".self::VISUAL_REVIEW_FOLDER_NAME;
+        // Make destination directory
+        if (!is_dir($dest)) {
+            mkdir($dest);
+        }
+        //applay the filename
+        $dest.="/".$this->visualReviewFile['visualReview']['name'];
+        $source=$tmpFileInfo['dirname']."/".$tmpFileInfo['filename'];
+        
+        rename($source, $dest);
     }
  
 }

@@ -29,6 +29,12 @@ END LICENSE AND COPYRIGHT
 
 class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
     
+
+    /**
+     * @var editor_Plugins_Okapi_Connector
+     */
+    protected $api;
+    
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
@@ -46,6 +52,15 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
      */
     public function work() {
         $params = $this->workerModel->getParameters();
+        $matchFiles=$params['matchFiles'];
+        $importFolder=$params['importFolder'];
+        
+        $this->api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
+        
+        $this->api->createProject();
+        $this->api->removeProject();
+
+        error_log(print_r($params,1));
         return true;
     }
 }
