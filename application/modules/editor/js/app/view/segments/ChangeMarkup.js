@@ -476,10 +476,11 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             delNode = null,
             tmpMarkupNode = this.createNodeForMarkup(this.getNodeNameAccordingToEvent()),
             rangeForDel = this.getRangeToBeDeleted(),
-            imgNodesTotal,
-            setOfImgNodesTotal,
-            mqmPartnerImgNodes = [],
+            imgNodesTotal = new Array(), // getNodes returns an Array
+            setOfImgNodesTotal,          // + use a set of those for easy checking
             imgNode,
+            imgPartnerNodesTotal = [],
+            imgPartnerNode,
             rangeForImgNode = rangy.createRange();
         if (rangeForDel == null) {
             return false;
@@ -495,19 +496,24 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             imgNodesTotal.push(rangeForDel.commonAncestorContainer);
             completeSelectionIsHandled = true;
         };
-        // check for get MQM-partner-tags and add them to the images for changeMarkup
+        // check for img-partner-tags and add them to the images for changeMarkup
         setOfImgNodesTotal = new Set(imgNodesTotal);
         for (var i = 0; i < imgNodesTotal.length; i++) {
-            var mqmImgPartnerNode = this.getMQMPartnerTag(imgNodesTotal[i]);
-            if (mqmImgPartnerNode != null) {
-                //add imgNode only if it's not included already
-                if (!setOfImgNodesTotal.has(mqmImgPartnerNode)) {
-                    mqmPartnerImgNodes.unshift(mqmImgPartnerNode); // (unshift: handle partner-tags first, otherwise the caret will move)
-                    setOfImgNodesTotal.add(mqmImgPartnerNode);
-                }
+            imgNode = imgNodesTotal[i];
+            // (can only match one type of partner-Tag:)
+            imgPartnerNode = this.getMQMPartnerTag(imgNode);            // MQM-Tags
+            if (imgPartnerNode == null) {
+                imgPartnerNode = this.getContentPartnerTag(imgNode);    // Content-Tags
+            }
+            //add imgPartnerNode (but only if it's not included already)
+            if (imgPartnerNode != null && !setOfImgNodesTotal.has(imgPartnerNode) ) {
+                imgPartnerNodesTotal.push(imgPartnerNode);
+                setOfImgNodesTotal.add(imgPartnerNode);
             }
         }
-        imgNodesTotal = imgNodesTotal.concat(mqmPartnerImgNodes);
+        if (imgPartnerNodesTotal.length > 0) {
+            imgNodesTotal = imgPartnerNodesTotal.concat(imgNodesTotal); // (handle partner-tags first, otherwise the caret will move)
+        }
         // changeMarkup for images
         for (var i = 0; i < imgNodesTotal.length; i++) {
             imgNode = imgNodesTotal[i];
@@ -1657,6 +1663,30 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         }
         return null;
      },
+     /**
+      * Checks if an img is a Content-tag (<i>, <b>, ...) and returns its partner-tag (if there is one).
+      * @param {Object} contentTagImgNode
+      * @returns {?Object} imgNode
+      */ 
+     getContentPartnerTag: function(contentTagImgNode) {
+         var idPrefix = this.editor.idPrefix,
+             contentTagImgClass = contentTagImgNode.className,
+             contentTagImgId = contentTagImgNode.id,
+             partnerTagImgId;
+         if (contentTagImgId.startsWith(idPrefix)) {
+             // "Toggle" id
+             switch(true){
+               case /open/.test(contentTagImgClass):
+                   partnerTagImgId = contentTagImgId.replace('open', 'close');
+                 break;
+               case /close/.test(contentTagImgClass):
+                   partnerTagImgId = contentTagImgId.replace('close', 'open');
+                 break;
+             }
+             return this.editor.getDoc().getElementById(partnerTagImgId); // getElementById() returns null if it doesn't exist
+         };
+         return null;
+      },
      /**
       * Get an Object with all the users that have done any editing so far and 
       * their css-selector.
