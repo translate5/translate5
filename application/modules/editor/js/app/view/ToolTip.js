@@ -94,9 +94,13 @@ Ext.define('Editor.view.ToolTip', {
     
     handleChangeMarkup: function(markupNode, tip) {
         var me = this,
-            markupAction,
-            markupNodeUsername,
-            markupNodeTimestamp;
+            userStore = Ext.getStore('admin.Users'),
+            attrUserId,
+            attrTimestamp,
+            markupAction = '',
+            markupUser = '',
+            markupDate = '';
+        // What has been done (INS/DEL)?
         if (markupNode.nodeName == 'INS') {
             markupAction = me.strings.insertedby;
         } else if (markupNode.nodeName == 'DEL') {
@@ -104,16 +108,21 @@ Ext.define('Editor.view.ToolTip', {
         } else {
             return;
         }
-        if (markupNode.hasAttribute('data-username')) {
-            markupNodeUsername = markupNode.getAttribute('data-username');
+        // Who has done it?
+        if (markupNode.hasAttribute('data-userid')) {
+            attrUserId = parseInt(markupNode.getAttribute('data-userid'));
+            markupUser = userStore.getUserName(attrUserId);
         }
+        // When?
         if (markupNode.hasAttribute('data-timestamp')) {
-            markupNodeTimestamp = parseInt(markupNode.getAttribute('data-timestamp'));
+            attrTimestamp = parseInt(markupNode.getAttribute('data-timestamp'));
+            markupDate = Ext.Date.format(new Date(attrTimestamp),'Y-m-d H:i');
         }
+        // Apply to Tooltip:
         var tplData = {
             changemarkupAction : markupAction,
-            changemarkupUser : markupNodeUsername,
-            changemarkupDate : Ext.Date.format(new Date(markupNodeTimestamp),'Y-m-d H:i')
+            changemarkupUser   : markupUser,
+            changemarkupDate   : markupDate
         };
         if(!me.changemarkupTpl) {
             me.changemarkupTpl = new Ext.Template('<b>{changemarkupAction}</b><br>{changemarkupUser}<br>{changemarkupDate}');

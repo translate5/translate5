@@ -39,7 +39,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.segments.ChangeMarkup', {
     editor: null,
     
-    editorUsername: null,           // username of current user working in the Editor
+    editorUserId: null,             // id of current user working in the Editor
     segmentWorkflowStepNr: null,    // workflow of the currently edited segment in the Editor
     
     eventKeyCode: null,             // Keyboard-Event: Key-Code
@@ -56,10 +56,14 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     NODE_NAME_DEL: 'DEL',
     NODE_NAME_INS: 'INS',
     
-    ATTRIBUTE_USERNAME: 'data-username',
-    ATTRIBUTE_USER_CSS: 'data-usercss',
+    ATTRIBUTE_USERID: 'data-userid',
+    ATTRIBUTE_USERCSSNR: 'data-usercssnr',
     ATTRIBUTE_WORKFLOWSTEPNR: 'data-workflowstepnr',
     ATTRIBUTE_TIMESTAMP: 'data-timestamp',
+    
+    ATTRIBUTE_USER_VALUE_PREFIX: 'usernr',
+    
+    CSS_CLASSNAME: 'changemarkup ownttip', // 'changemarkup': specific selector for CSS, 'ownttip': general selector for delegate in tooltip
     
     // https://github.com/timdown/rangy/wiki/Rangy-Range#compareboundarypointsnumber-comparisontype-range-range
     RANGY_RANGE_IS_BEFORE: -1,
@@ -77,7 +81,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     constructor: function(editor,segmentWorkflowStepNr) {
         this.editor = editor;
         // Data we'll need independent from the event in the Editor:
-        this.editorUsername = Editor.data.app.user.userName;
+        this.editorUserId = Editor.data.app.user.id;
         this.segmentWorkflowStepNr = segmentWorkflowStepNr;
     },
     initEvent: function() {
@@ -420,8 +424,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             return ( node.nodeName == me.NODE_NAME_INS );
         });
         // if the selection is completely within one and the same INS-node:
-        if (rangeForDel.commonAncestorContainer.parentNode.nodeName == this.NODE_NAME_INS) {
-            insNodesTotal.push(rangeForDel.commonAncestorContainer.parentNode);
+        if (this.rangeIsWithinMarkupNodeOfCertainKind(rangeForDel,this.NODE_NAME_INS)) {
+            insNodesTotal.push(this.getMarkupNodeForCurrentSelection(this.NODE_NAME_INS));
         };
         for (var i = 0; i < insNodesTotal.length; i++) {
             insNode = insNodesTotal[i];
@@ -453,7 +457,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                     delNode = this.createNodeForMarkup(this.NODE_NAME_DEL);
                 delNode.appendChild(document.createTextNode(contentToMoveFromInsToDel));
                 this.docSelRange.insertNode(delNode);
-                insNode.parentNode.removeChild(insNode);
+                rangeWithCharsForAction.deleteContents();
             }
             // If the selection is completely removed now, then there is nothing left to do.
             if (completeSelectionIsHandled) {
@@ -1252,29 +1256,18 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     createNodeForMarkup: function(nodeName){
         var nodeEl = document.createElement(nodeName),
-            allUsers = this.getAllUsers(),
-            thisUser = this.editorUsername,
-            thisUserCSS,
+            thisUserId = this.editorUserId,
+            thisUserCssNr = this.renderSelectorWithNrForUser(),
             segmentWorkflowStepNr = this.segmentWorkflowStepNr,
             timestamp = Ext.Date.format(new Date(), 'time'); // dates are wrong with 'timestamp' although doc states differently: http://docs.sencha.com/extjs/6.2.0/classic/Ext.Date.html 
-        
-        // set CSS-class for specific colors for each user (in their chronological order)
-        if (allUsers[thisUser] != undefined && allUsers[thisUser] != null) {
-            thisUserCSS = allUsers[thisUser];
-        } else {
-            thisUserCSS = 'user' + (Object.keys(allUsers).length + 1).toString();
-        }
-        
         // (setAttribute: see https://jsperf.com/html5-dataset-vs-native-setattribute)
-        nodeEl.setAttribute(this.ATTRIBUTE_USERNAME,thisUser); 
-        nodeEl.setAttribute(this.ATTRIBUTE_USER_CSS,thisUserCSS);
+        nodeEl.setAttribute(this.ATTRIBUTE_USERID,thisUserId);        // = id to identify the user who did the editing
+        nodeEl.setAttribute(this.ATTRIBUTE_USERCSSNR,thisUserCssNr);  // = css-selector with specific number for this user
         nodeEl.setAttribute(this.ATTRIBUTE_WORKFLOWSTEPNR,segmentWorkflowStepNr);
         nodeEl.setAttribute(this.ATTRIBUTE_TIMESTAMP,timestamp);
-        
         // - 'changemarkup': specific selector for CSS
         // - 'ownttip': general selector for delegate in tooltip
         nodeEl.className = 'changemarkup ownttip';
-        
         return nodeEl;
     },
     /**
@@ -1497,8 +1490,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         if (!this.isNodeOfTypeMarkup(nodeA) || !this.isNodeOfTypeMarkup(nodeB)) {
             return false;
         }
-        var userOfNodeA = nodeA.getAttribute(this.ATTRIBUTE_USERNAME),
-            userOfNodeB = nodeB.getAttribute(this.ATTRIBUTE_USERNAME);
+        var userOfNodeA = nodeA.getAttribute(this.ATTRIBUTE_USERID),
+            userOfNodeB = nodeB.getAttribute(this.ATTRIBUTE_USERID);
         return userOfNodeA == userOfNodeB;
     },
     /**
@@ -1510,8 +1503,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         if (!this.isNodeOfTypeMarkup(node)) {
             return false;
         }
-        var userOfNode = node.getAttribute(this.ATTRIBUTE_USERNAME),
-            userOfEvent = this.editorUsername;
+        var userOfNode = node.getAttribute(this.ATTRIBUTE_USERID),
+            userOfEvent = this.editorUserId;
         return userOfNode == userOfEvent;
     },
     /**
@@ -1686,25 +1679,40 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
              return this.editor.getDoc().getElementById(partnerTagImgId); // getElementById() returns null if it doesn't exist
          };
          return null;
-      },
+     },
+     /**
+      * Render specific selector for each user (will be used to assign different colors for different users via css). 
+      * The number of the CSS-selector is set in chronological order (= it is NOT the id of the user!).
+      * The CSS-selector is set as attribute for easier calculating the chronological order.
+      * @returns {String}
+      */ 
+     renderSelectorWithNrForUser: function() {
+         var thisUser = this.editorUserId,
+             allUsersAndClassnames = this.getAllUsersAndClassnames();
+         if (allUsersAndClassnames[thisUser] != undefined && allUsersAndClassnames[thisUser] != null) {
+             return allUsersAndClassnames[thisUser];
+         } else {
+             return this.ATTRIBUTE_USER_VALUE_PREFIX + (Object.keys(allUsersAndClassnames).length + 1).toString();
+         }
+     },
      /**
       * Get an Object with all the users that have done any editing so far and 
       * their css-selector.
       * allUsers.userName = specificSelectorForThisUser
-      * @returns {Object} allUsers
+      * @returns {Object} allUsersAndClassnames
       */ 
-     getAllUsers: function() {
-         var allUsers = new Object(),
+     getAllUsersAndClassnames: function() {
+         var allUsersAndClassnames = new Object(),
              allMarkupNodes = this.getAllMarkupNodesInEditor();
          for (var i = 0; i < allMarkupNodes.length; i++){
              var node = allMarkupNodes[i],
-                 userOfNode = node.getAttribute(this.ATTRIBUTE_USERNAME),
-                 userCSS = node.getAttribute(this.ATTRIBUTE_USER_CSS);
-             if (allUsers[userOfNode] == undefined){
-                 allUsers[userOfNode] = userCSS;
+                 userId = node.getAttribute(this.ATTRIBUTE_USERID),
+                 userCSSNr = node.getAttribute(this.ATTRIBUTE_USERCSSNR);
+             if (allUsersAndClassnames[userId] == undefined){
+                 allUsersAndClassnames[userId] = userCSSNr;
              }
          }
-         return allUsers;
+         return allUsersAndClassnames;
       },
       /**
        * Finds the newest timestamp in the given Array of nodes.
