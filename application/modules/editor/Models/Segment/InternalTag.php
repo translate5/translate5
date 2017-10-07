@@ -71,6 +71,17 @@ class editor_Models_Segment_InternalTag {
     }
     
     /**
+     * removes changeMarkup-Tags:
+     * - DEL => markup-Tag AND content inbetween is removed
+     * - INS => markup-Tag ONLY is removed
+     */
+    public function removeChangeMarkupTags(string $segment) {
+    	$segment= preg_replace('/<del[^>]*>.*?<\/del>/i', '', $segment);
+    	$segment= preg_replace('/<\/?ins[^>]*>/i', '', $segment);
+    	return $segment;
+    }
+    
+    /**
      * returns all tags
      * @param string $segment
      * @return array
