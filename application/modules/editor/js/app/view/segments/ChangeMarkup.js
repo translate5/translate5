@@ -404,7 +404,6 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      */
     handleInsNodesInDeletion: function() {
         var me = this,
-            completeSelectionIsHandled = false,
             delNode = null,
             tmpMarkupNode = this.createNodeForMarkup(this.getNodeNameAccordingToEvent()),
             rangeForDel = this.getRangeToBeDeleted(),
@@ -461,8 +460,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
                 return 'completeSelectionIsHandled';
             }
         }
-        // We might have changed the DOM quite a bit...
-        this.refreshSelectionAndRange();
+        this.refreshSelectionAndRange(); // We might have changed the DOM quite a bit...
         return delNode;
     },
     /**
