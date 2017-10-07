@@ -70,6 +70,8 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
    */
   protected $filenames = array();
   
+  protected $exceptionOnNoFilesFound = true;
+  
   public function __construct() {
       $this->_importExtensionList = array_keys(editor_Models_Import_FileParser::getAllFileParsersMap());
   }
@@ -119,7 +121,7 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
       }
     }
 
-    if(empty($this->filenames)) {
+    if($this->exceptionOnNoFilesFound && empty($this->filenames)) {
         throw new ZfExtended_Exception("There are no importable files in the Task. The following file extensions can be imported: .".join(', .', $this->_importExtensionList));
     }
     

@@ -31,13 +31,13 @@ END LICENSE AND COPYRIGHT
   README:
     changes the data structure of the internal tags of translate5
     TRANSLATE-818: internal tag replace id usage with data-originalid and data-filename
+    
+    Single task processing, fill the $taskGuid array below with the desired taskGuids!
  */
 set_time_limit(0);
 
 
 /* @var $this ZfExtended_Models_Installer_DbUpdater */
-
-//$this->doNotSavePhpForDebugging = false;
 
 /**
  * define database credential variables 
@@ -64,17 +64,6 @@ foreach($tasks as $task) {
     }
 }
 
-$res = $db->query('SELECT id, taskGuid, name, segmentId, original, edited 
-              FROM LEK_segment_data 
-              WHERE (edited like "%</span><span id=%" or original like "%</span><span id=%")');
-
-$count = $res->rowCount();
-error_log($count.' datasets to be changed by '.basename(__FILE__));
-
-//prepare update statement
-$stmt = $db->prepare('UPDATE LEK_segment_data set original = :original, edited = :edited where id = :id');
-
-
 //main replacer function to change the internal tag content
 $replacer = function($subject){
     return preg_replace_callback('#</span><span id="([^-"]*)-([^"]*)"#', function($matches){
@@ -86,83 +75,97 @@ $replacer = function($subject){
     }, $subject);
 };
 
-$done = 0;
-$donePercent = 0;
-$percentShown = [];
-while($row = $res->fetchObject()) {
-    if(is_null($row->edited)) {
-        $edited = $row->edited;
-    }
-    else {
-        $edited = $replacer($row->edited);
-    }
-    
-    $original = $replacer($row->original);
-    
-    //when there is a view to the given task update the corresponding row too
-    if(!empty($existingViews[$row->taskGuid])) {
-        $sql = 'UPDATE `'.$existingViews[$row->taskGuid].'` SET ';
-        $sql .= $row->name.' = ?';
-        $params = [$original];
-        if(!is_null($row->edited)) {
-            $sql .= ', '.$row->name.'Edit = ?';
-            $params[] = $edited;
+foreach ($tasks as $task) {
+    $res = $db->query('SELECT id, taskGuid, name, segmentId, original, edited 
+              FROM LEK_segment_data 
+              WHERE taskGuid = \''.$task.'\' and (edited like "%</span><span id=%" or original like "%</span><span id=%")');
+
+    $count = $res->rowCount();
+    error_log('Task '.$task.': '.$count.' datasets to be changed by '.basename(__FILE__));
+
+    //prepare update statement
+    $stmt = $db->prepare('UPDATE LEK_segment_data set original = :original, edited = :edited where id = :id');
+
+
+    $done = 0;
+    $donePercent = 0;
+    $percentShown = [];
+    while($row = $res->fetchObject()) {
+        if(is_null($row->edited)) {
+            $edited = $row->edited;
         }
-        $sql .= ' WHERE id = ?';
-        $params[] = $row->segmentId;
-        
-        $db->query($sql, $params);
+        else {
+            $edited = $replacer($row->edited);
+        }
+
+        $original = $replacer($row->original);
+
+        //when there is a view to the given task update the corresponding row too
+        if(!empty($existingViews[$row->taskGuid])) {
+            $sql = 'UPDATE `'.$existingViews[$row->taskGuid].'` SET ';
+            $sql .= $row->name.' = ?';
+            $params = [$original];
+            if(!is_null($row->edited)) {
+                $sql .= ', '.$row->name.'Edit = ?';
+                $params[] = $edited;
+            }
+            $sql .= ' WHERE id = ?';
+            $params[] = $row->segmentId;
+
+            $db->query($sql, $params);
+        }
+
+        //first update the view, then the data table
+        // if the script dies, this segment is recalculated again, so no old data remain 
+        $stmt->execute([
+            ':original' => $original,
+            ':edited' => $edited,
+            ':id' => $row->id,
+        ]);
+
+        //print a nice state
+        $percent = 10 * floor(++$done / $count * 10);
+        if($percent % 10 == 0 && empty($percentShown[$percent])) {
+            $percentShown[$percent] = true;
+            error_log('Task '.$task.': '.$percent.'% done ('.$done.' datasets)'); 
+        }
     }
-    
-    //first update the view, then the data table
-    // if the script dies, this segment is recalculated again, so no old data remain 
-    $stmt->execute([
-        ':original' => $original,
-        ':edited' => $edited,
-        ':id' => $row->id,
-    ]);
-    
-    //print a nice state
-    $percent = 10 * floor(++$done / $count * 10);
-    if($percent % 10 == 0 && empty($percentShown[$percent])) {
-        $percentShown[$percent] = true;
-        error_log($percent.'% done ('.$done.' datasets)'); 
+
+    error_log('Task '.$task.': '.$count." internal tags converted in segment data.\n");
+
+
+    // Same loop for history data
+
+    $res = $db->query('SELECT id, edited 
+                  FROM LEK_segment_history_data 
+                  WHERE taskGuid = \''.$task.'\' and edited like "%</span><span id=%"');
+
+    $stmt = $db->prepare('UPDATE LEK_segment_history_data set edited = :edited where id = :id');
+
+    $count = $res->rowCount();
+    error_log('Task '.$task.': '.$count.' datasets to be changed in history data!');
+
+    $done = 0;
+    $donePercent = 0;
+    $percentShown = [];
+    while($row = $res->fetchObject()) {
+        $edited = $replacer($row->edited);
+
+        //first update the view, then the data table
+        // if the script dies, this segment is recalculated again, so no old data remain 
+        $stmt->execute([
+            ':edited' => $edited,
+            ':id' => $row->id,
+        ]);
+
+        //print a nice state
+        $percent = 10 * floor(++$done / $count * 10);
+        if($percent % 10 == 0 && empty($percentShown[$percent])) {
+            $percentShown[$percent] = true;
+            error_log($percent.'% done ('.$done.' history datasets)'); 
+        }
     }
+
+    error_log('Task '.$task.': '.$count." internal tags converted in history data.\n");
+    usleep(10);
 }
-
-echo $count." internal tags converted in segment data.\n";
-
-
-// Same loop for history data
-
-$res = $db->query('SELECT id, edited 
-              FROM LEK_segment_history_data 
-              WHERE edited like "%</span><span id=%"');
-
-$stmt = $db->prepare('UPDATE LEK_segment_history_data set edited = :edited where id = :id');
-
-$count = $res->rowCount();
-error_log($count.' datasets to be changed in history data!');
-
-$done = 0;
-$donePercent = 0;
-$percentShown = [];
-while($row = $res->fetchObject()) {
-    $edited = $replacer($row->edited);
-    
-    //first update the view, then the data table
-    // if the script dies, this segment is recalculated again, so no old data remain 
-    $stmt->execute([
-        ':edited' => $edited,
-        ':id' => $row->id,
-    ]);
-    
-    //print a nice state
-    $percent = 10 * floor(++$done / $count * 10);
-    if($percent % 10 == 0 && empty($percentShown[$percent])) {
-        $percentShown[$percent] = true;
-        error_log($percent.'% done ('.$done.' history datasets)'); 
-    }
-}
-
-echo $count." internal tags converted in history data.\n";
