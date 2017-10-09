@@ -61,7 +61,7 @@ Ext.application({
   models : [ 'File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field' ],
   stores : [ 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments' ],
   requires: ['Editor.view.ViewPort', Editor.data.app.viewport, 'Editor.model.ModelOverride', 'Editor.util.TaskActions'],
-  controllers: Editor.data.app.controllers.concat(['editor.ChangeMarkup']), //FIXME ChangeMarkup Controller will come from plugin
+  controllers: Editor.data.app.controllers,
   appFolder : Editor.data.appFolder,
   viewport: null,
     //***********************************************************************************
