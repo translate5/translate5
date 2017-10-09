@@ -41,9 +41,9 @@ class editor_Plugins_Okapi_Connector {
     
     /***
      * 
-     * @var int
+     * @var string
      */
-    private $okapiProjectId;
+    private $projectUrl;
 
     /*
     * Zf config for Okapi
@@ -62,6 +62,12 @@ class editor_Plugins_Okapi_Connector {
      * @var editor_Models_Task
      */
     private $m_task;
+    
+    /***
+     * The folder in the disk where the okapi files are
+     * @var string
+     */
+    private $okapiDir;
 
     /***
      * Request timeout for the api
@@ -87,8 +93,7 @@ class editor_Plugins_Okapi_Connector {
         $http = ZfExtended_Factory::get('Zend_Http_Client');
         /* @var $http Zend_Http_Client */
         
-        $fullUrl=$this->apiUrl.$url;
-        $http->setUri($fullUrl);
+        $http->setUri($url);
         $http->setConfig(array('timeout'=>self::REQUEST_TIMEOUT_SECONDS));
         return $http;
     }
@@ -99,12 +104,11 @@ class editor_Plugins_Okapi_Connector {
      * Also the function checks for the invalid decoded json.
      * 
      * @param Zend_Http_Response $response
-     * @param boolean $responseAsXlif true if we expect xlif file as response
      * @throws ZfExtended_BadGateway
      * @throws ZfExtended_Exception
      * @return stdClass|string
      */
-    private function processResponse(Zend_Http_Response $response,$responseAsXlif=false){
+    private function processResponse(Zend_Http_Response $response){
         $validStates = [200,201,401];
         
         //check for HTTP State (REST errors)
@@ -112,28 +116,7 @@ class editor_Plugins_Okapi_Connector {
             throw new ZfExtended_BadGateway($response->getBody(), 500);
         }
         
-        //if the user is unauthorized
-        if($response->getStatus() == 401){
-            throw new ZfExtended_NotAuthenticatedException($response->getBody(),401);
-        }
-            
-        if($responseAsXlif){
-            return $response->getBody();
-        }
-        
-        $result = json_decode(trim($response->getBody()));
-        
-        //is valid response with 
-        if(is_array($result) && count($result) < 1){
-            return $response->getBody();
-        }
-        
-        //check for JSON errors
-        if(json_last_error() > 0){
-            throw new ZfExtended_Exception("Error on JSON decode: ".json_last_error_msg(), 500);
-        }
-        
-        return $result;
+        return $response->getBody();
     }
     
     /**
@@ -142,7 +125,7 @@ class editor_Plugins_Okapi_Connector {
      * @return integer Okapi project id
      */
     public function createProject() {
-        $http = $this->getHttpClient('projects/new');
+        $http = $this->getHttpClient($this->apiUrl.'projects/new');
 
         //$http->setHeaders('Content-Type: application/json');
         //$http->setHeaders('Accept: application/json');
@@ -153,12 +136,10 @@ class editor_Plugins_Okapi_Connector {
         //$http->setRawData(json_encode($params), 'application/json');
         $response = $http->request('POST');
         
-        $responseDecoded = $this->processResponse($response);
-
-        if(isset($responseDecoded->id)){
-            $this->okapiProjectId = $responseDecoded->id;
-            return $responseDecoded->id;
-        }
+        $url=$response->getHeader('Location');
+        //$noErrorResponse = $this->processResponse($response);
+        
+        $this->projectUrl= $url;
     }
     
     /**
@@ -167,9 +148,37 @@ class editor_Plugins_Okapi_Connector {
      * @param integer $projectId
      */
     public function removeProject() {
-        $url='projects/'.$this->okapiProjectId;
+        $url=$this->projectUrl;
         $http = $this->getHttpClient($url);
         $result = $http->request('DELETE');
+        
+    }
+    
+    public function uploadOkapiConfig($bconfFilePath){
+        $url=$this->projectUrl.'/batchConfiguration';
+        $http = $this->getHttpClient($url);
+        $http->setFileUpload($bconfFilePath, 'batchConfiguration');
+        $response = $http->request('POST');
+        $this->processResponse($response);
+    }
+    
+    public function uploadSourceFile($fileName){
+        //PUT http://{host}/okapi-longhorn/projects/1/inputFiles/help.html
+        //Uploads a file that will have the name 'help.html'
+        
+        $count=0;
+        //in this point the tmp imort is deleted
+        $url=$this->projectUrl.'/inputFiles/'.$fileName.'.okapi';
+        $http = $this->getHttpClient($url);
+        $http->setFileUpload($this->getOkapiDir().$fileName,'inputFile');
+        $response = $http->request('PUT');
+            
+    }
+    
+    public function executeTask(){
+        $url=$this->projectUrl.'/tasks/execute';
+        $http = $this->getHttpClient($url);
+        $response = $http->request('POST');
     }
     
     
@@ -184,4 +193,13 @@ class editor_Plugins_Okapi_Connector {
     public function getTask(){
         return $this->m_task;
     }
+    
+    public function setOkapiDir($okapiDir){
+        $this->okapiDir= $okapiDir;
+    }
+    
+    public function getOkapiDir(){
+        return $this->okapiDir;
+    }
+    
 }

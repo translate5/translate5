@@ -39,8 +39,17 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     );
     
     private $okapyFileTypes = array(
-        'html'
+            'html'
     );
+    
+    private $okapyBconf= array(
+            'bconf'
+    );
+    
+    
+    const OKAPI_BCONF_DEFAULT_NAME='okapi_default_bconf.bconf';
+    
+    const OKAPI_DIRECTORY_NAME='OkapiDirectory';
 
     private $task;
     /* @var $task editor_Models_Task */
@@ -68,40 +77,84 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $task=$params['task'];
         $this->task=$task;
         //$this->moveFilesToTempImport($importFolder);
-        $this->checkFiles($importFolder);
+        $this->handleFiles($importFolder);
     }
 
-    public function checkFiles($importFolder){
+    public function handleFiles($importFolder){
         // /var/www/translate5/application/../data/editorImportedTasks/c7105c57-f270-4c05-b79a-43756141e3f2/_tempImport
         // proofRead
         $proofRead='proofRead';
-        $proofReadFolder=$importFolder.'/'.$proofRead;
-
+        $proofReadFolder=$importFolder.DIRECTORY_SEPARATOR.$proofRead;
+        
+        $taskFolder=str_replace("_tempImport","",$importFolder);
+        $okapiDir=$taskFolder.DIRECTORY_SEPARATOR.self::OKAPI_DIRECTORY_NAME.DIRECTORY_SEPARATOR;
+        
+        //create the okapi directory on the disk in the task folder
+        if (!is_dir($okapiDir)) {
+            mkdir($okapiDir, 0777, true);
+        }
+        
+        
         $it = new FilesystemIterator($proofReadFolder);
         
-        $matchFiles=[];
+        $matchFilesName=[];
+        $bconfFilePath=[];
         
+        //find all files supported by okapi and move them in the okapi directory
         foreach ($it as $fileinfo) {
-            if ($fileinfo->isFile() && in_array($fileinfo->getExtension(),$this->okapyFileTypes)) {
+            if(!$fileinfo->isFile()){
+                continue;
+            }
+            
+            if (in_array($fileinfo->getExtension(),$this->okapyFileTypes)) {
                 //$matchFiles[]=$fileinfo->getFilename();
-                $matchFiles[]=$fileinfo->getPathname();
+                //move the files in the okapi directory
+                rename($fileinfo->getPathname(),$okapiDir.$fileinfo->getFilename());
+                
+                //add the match file in the matches array
+                $matchFilesName[]=$fileinfo->getFilename();
+                continue;
+            }
+            
+            if (in_array($fileinfo->getExtension(),$this->okapyBconf)) {
+                //$matchFiles[]=$fileinfo->getFilename();
+                rename($fileinfo->getPathname(),$importFolder.DIRECTORY_SEPARATOR.$fileinfo->getFilename());
+                $bconfFilePath[]=$importFolder.DIRECTORY_SEPARATOR.$fileinfo->getFilename();
+                continue;
             }
         }
-
-        if(empty($matchFiles)){
+        
+        //if no files are found do nothing
+        if(empty($matchFilesName)){
             return;
         }
-
-        $this->handleFiles($matchFiles,$importFolder);
+        
+        if(empty($bconfFilePath)){
+            $bconfFilePath=$this->getDefaultBconf();
+        }
+        
+        foreach ($matchFilesName as $fileName) {
+            $this->queueWorker($fileName,$bconfFilePath,$okapiDir);
+        }
     }
 
-    public function handleFiles($matchFiles,$importFolder){
+    /***
+     * Run for each file a separate worker, the worker will upload the file to the okapi, convert the file, and download the 
+     * result
+     * 
+     * @param string $fileName - the name of the file
+     * @param string $bconfFilePath - the path of the bconf file
+     * @param string $okapiDir - the path of the okapi dir on the in the task folder
+     * @return boolean
+     */
+    public function queueWorker($fileName,$bconfFilePath,$okapiDir){
         $worker = ZfExtended_Factory::get('editor_Plugins_Okapi_Worker');
         /* @var $worker editor_Plugins_Okapi_Worker */
         
         $params=[
-            'matchFiles'=>$matchFiles,
-            'importFolder'=>$importFolder
+            'fileName'=>$fileName,
+            'bconfFilePath'=>$bconfFilePath,
+            'okapiDir'=>$okapiDir
         ];
         
         // init worker and queue it
@@ -112,31 +165,9 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $worker->queue(null);
     }
 
-     /***
-     * Move the uploaded review file to the tempImport directory (single upload only)
-     * @param string $importFolder - temp import directory path
-     */
-     private function moveFilesToTempImport($importFolder){
-         error_log($importFolder);
-         return;
-        
-        $tmpFileInfo = pathinfo($this->visualReviewFile['visualReview']['tmp_name']);
-        
-        // nothing to to because no review files are submitted
-        if (!isset($tmpFileInfo['dirname']) || empty($tmpFileInfo['filename'])) {
-            return;
-        }
-        
-        $dest = $importFolder."/".self::VISUAL_REVIEW_FOLDER_NAME;
-        // Make destination directory
-        if (!is_dir($dest)) {
-            mkdir($dest);
-        }
-        //applay the filename
-        $dest.="/".$this->visualReviewFile['visualReview']['name'];
-        $source=$tmpFileInfo['dirname']."/".$tmpFileInfo['filename'];
-        
-        rename($source, $dest);
+    private function getDefaultBconf(){
+        $dataDir=APPLICATION_PATH.'/../data';
+        return $dataDir.'/'.self::OKAPI_BCONF_DEFAULT_NAME;
     }
  
 }

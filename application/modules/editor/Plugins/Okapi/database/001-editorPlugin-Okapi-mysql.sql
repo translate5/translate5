@@ -35,7 +35,7 @@ INSERT INTO  `Zf_worker_dependencies` (`worker`,`dependency`) VALUES
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES
-('runtimeOptions.worker.editor_Plugins_Okapi_Worker.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of the Okapi worker');
+('runtimeOptions.worker.editor_Plugins_Okapi_Worker.maxParallelWorkers', 1, 'editor', 'worker', 3, 3, '', 'integer', 'Max parallel running workers of the Okapi worker');
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES 
