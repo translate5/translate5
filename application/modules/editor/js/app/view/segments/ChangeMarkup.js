@@ -39,7 +39,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.segments.ChangeMarkup', {
     editor: null,
     
-    editorUserId: null,             // id of current user working in the Editor
+    editorUserGuid: null,           // id of current user working in the Editor
     segmentWorkflowStepNr: null,    // workflow of the currently edited segment in the Editor
     
     eventKeyCode: null,             // Keyboard-Event: Key-Code
@@ -53,10 +53,10 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     initialRangeBookmark: null,     // bookmark what the user has selected initially
     
     // "CONSTANTS"
-    NODE_NAME_DEL: 'DEL',
-    NODE_NAME_INS: 'INS',
+    NODE_NAME_DEL: 'del',
+    NODE_NAME_INS: 'ins',
     
-    ATTRIBUTE_USERID: 'data-userid',
+    ATTRIBUTE_USERGUID: 'data-userguid',
     ATTRIBUTE_USERCSSNR: 'data-usercssnr',
     ATTRIBUTE_WORKFLOWSTEPNR: 'data-workflowstepnr',
     ATTRIBUTE_TIMESTAMP: 'data-timestamp',
@@ -81,7 +81,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     constructor: function(editor,segmentWorkflowStepNr) {
         this.editor = editor;
         // Data we'll need independent from the event in the Editor:
-        this.editorUserId = Editor.data.app.user.id;
+        this.editorUserGuid = Editor.app.authenticatedUser.get('userGuid');
         this.segmentWorkflowStepNr = segmentWorkflowStepNr;
     },
     initEvent: function() {
@@ -181,6 +181,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     eventIsDeletion: function() {
         var extEv = Ext.event.Event,
             keyCodesForDeletion = [extEv.BACKSPACE, extEv.DELETE];
+        if(this.eventCtrlKey) {
+            keyCodesForDeletion.push(extEv.X);                                          // Ctrl-X   TODO: Can ExtJs "fill the clipboard"???
+        }
         return (keyCodesForDeletion.indexOf(this.eventKeyCode) != -1);
     },
     /**
@@ -199,15 +202,44 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * Get range according to selection (using rangy-library: https://github.com/timdown/rangy/).
      * CAUTION! Working with cloned ranges of this.docSelRange with cloneRange() DOES affect the inital docSelRange (https://stackoverflow.com/a/11404869).
      */
-    setRangeForSelection: function() {
-        this.docSelRange = this.docSel.rangeCount ? this.docSel.getRangeAt(0) : null;
+    setSelectionAndRange: function() {
+        var docSel = rangy.getSelection(this.editor.getDoc());
+            docSelRange = docSel.rangeCount ? docSel.getRangeAt(0) : null;
+        if (docSelRange != null) {
+            docSelRange = this.prepareRange(docSelRange);
+        }
+        this.docSel = docSel;
+        this.docSelRange = docSelRange;
+    },
+    /**
+     * If the range starts/end at a final position and the event refers 
+     * to the next content outside of the range, then we must move
+     * that boundary outside of the range for further checking.
+     * @param (Object) range
+     * @returns (Object) range
+     */
+    prepareRange: function(range) {
+        var container = range.commonAncestorContainer,
+            positionOfStart = this.getPositionInfoForRange(range,range.startContainer),
+            positionOfEnd = this.getPositionInfoForRange(range,range.endContainer),
+            nextSiblingOfStart = this.getSiblingNode(range.startContainer,'next'); // We nove the start(!!!)-boundary to ITS OWN next sibling, not to the sibling of the whole range
+        if ( (this.eventKeyCode == Ext.event.Event.BACKSPACE) && positionOfEnd.atStart) {
+            // does not happen, rangy gets everything right already. 
+            // So, if we do get here, I got something wrong.
+            debugger;
+        } else if (positionOfStart.atEnd) { // don't use DELETE-Event as condition here, 
+                                            // because it must also be able to check the position itself 
+                                            // (= without keyboard-Event, eg when adding MQM-Tags)
+            range.setStartBefore(nextSiblingOfStart);
+        }
+        return range;
     },
     /**
      * https://github.com/timdown/rangy/wiki/Rangy-Selection#refreshboolean-checkforchanges
      */
     refreshSelectionAndRange: function() {
         this.docSel.refresh;
-        this.setRangeForSelection();
+        this.setSelectionAndRange();
     },
 
     // =========================================================================
@@ -221,10 +253,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         var editorContentBefore,
             editorContentAfter;
         
-        // get range according to selection (using rangy-library)
-        this.docSel = rangy.getSelection(this.editor.getDoc());
-        this.setRangeForSelection();
-        
+        // set range according to selection (using rangy-library)
+        this.setSelectionAndRange();
         if (this.docSelRange == null) {
             this.consoleLog("ChangeMarkup: getSelection FAILED.");
             return;
@@ -324,8 +354,9 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             // we use that one:
             insNodeBefore = this.getINSNodeForContentBeforeCaretAccordingToEvent();
             if (insNodeBefore != null) {
-                this.consoleLog("INS: use previous..."); 
+                this.consoleLog("INS: use previous...");
                 // (seems to never happen; is seen as selectionIsWithinINSNodeAccordingToEvent instead.)
+                debugger; // If we get here, I missed somemthing.
                 return;
             }
             
@@ -334,7 +365,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             insNodeBehind = this.getINSNodeForContentBehindCaretAccordingToEvent();
             if (insNodeBehind != null) {
                 this.consoleLog("INS: use next..."); 
-                this.positionCaretInNode(insNodeBehind);
+                this.positionCaretIntoNode(insNodeBehind,'toStart');
                 return;
             }
             
@@ -424,7 +455,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             return ( node.nodeName == me.NODE_NAME_INS );
         });
         // if the selection is completely within one and the same INS-node:
-        if (this.rangeIsWithinMarkupNodeOfCertainKind(rangeForDel,this.NODE_NAME_INS)) {
+        if (this.rangeIsWithinMarkupNode(rangeForDel,this.NODE_NAME_INS)) {
             insNodesTotal.push(this.getMarkupNodeForCurrentSelection(this.NODE_NAME_INS));
         };
         for (var i = 0; i < insNodesTotal.length; i++) {
@@ -584,7 +615,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
             rangeForUnmarkedNode.selectNodeContents(unmarkedNode);
             rangeWithCharsForAction = rangeForDel.intersection(rangeForUnmarkedNode);
             delNode = this.createNodeForMarkup(this.NODE_NAME_DEL);
-            if (rangeWithCharsForAction.canSurroundContents()) {
+            if (rangeWithCharsForAction != null && rangeWithCharsForAction.canSurroundContents()) {
                 rangeWithCharsForAction.surroundContents(delNode);
             }
         }
@@ -605,25 +636,22 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         var insNode = this.createNodeForMarkup(this.NODE_NAME_INS),
             insInnerNodeContent = contentForInsNode,
             insInnerNode,
-            isPlaceholder = false,
-            selPositionInfo = this.getSelectionPositionInfo(this.editor.getEditorBody());
-        // Do we insert content or just an empty markup-Node?
+            isPlaceholder = false;
+        // If the INS-Node is not used as placeholder, the caret
+        // must be positioned BEHIND the already inserted content.
         if (insInnerNodeContent == null || insInnerNodeContent == '') {
             isPlaceholder = true;
-            insInnerNodeContent = this.CHAR_PLACEHOLDER;              // eg Google Chrome gets lost without placeholder
-        }
-        if(selPositionInfo.atStart || selPositionInfo.atEnd) {
-            this.consoleLog("(is atStart / atEnd)");
-            insInnerNodeContent = 'x';                                // Workaround: empty placeholders are not recognized at the beginning or the end in the ExtJs-Editor.
         }
         // insert the INS-Node
-        insInnerNode = document.createTextNode(insInnerNodeContent);
+        insInnerNode = document.createTextNode('x');    // Workaround: empty placeholders are not recognized. TODO!
         insNode.appendChild(insInnerNode);
-        this.docSelRange.insertNode(insNode);        
+        this.docSelRange.insertNode(insNode);
         // position the caret
-        this.positionCaretAfterInsertion(insNode,isPlaceholder);
-        // "Reset" to initial content except for Workaround
-        insNode.nodeValue = insInnerNodeContent;                      // Google Chrome and Workaround; see above...
+        if (isPlaceholder) {
+            this.positionCaretIntoNode(insNode,'atStart');
+        } else {
+            this.positionCaretIntoNode(insNode,'atEnd');
+        }
     },
 
     // =========================================================================
@@ -662,36 +690,36 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         this.docSel.setSingleRange(this.docSelRange);
     },
     /**
-     * Position the caret depending on the INS-node.
-     * @param {Object} insNode
-     * @param {Boolean} isPlaceholder
-     */
-    positionCaretAfterInsertion: function(insNode,isPlaceholder) {
-        var rangeForCaret = rangy.createRange();
-        rangeForCaret.selectNodeContents(insNode);
-        if (isPlaceholder == false) {
-            // if the INS-Node is not used as placeholder, the caret
-            // must be positioned BEHIND the already inserted content:
-            rangeForCaret.collapse(false);
-        }
-        this.docSel.setSingleRange(rangeForCaret);
-    },
-    /**
      * Position the caret at the beginning of the given node (within!!!).
-     * @param {?Object} node
+     * Workaround for positioning the caret WITHIN a node: 
+     * temporarily add a "focus-node" (otherwise we will not end up WITHIN the node!).
+     * @param {Object} node
+     * @param {String} toPosition ('toStart'|'toEnd')
      */
-    positionCaretInNode:  function(node) {
-        var focusNode = document.createElement('div'), // Workaround: temporarily add a "focus-node" at the beginning within the node for using setEndAfter on it (otherwise we will not end up WITHIN the node!)
+    positionCaretIntoNode:  function(node,toPosition) {
+        var helperNode = this.createHelperNodeForFocus(),
             rangeForCaret = rangy.createRange();
-        focusNode.style.position = "absolute"; // display the temp div out of sight, otherwise the displayed content flickers
-        focusNode.style.left = "-1000px";
-        node.insertBefore(focusNode,node.childNodes[0]);
-        rangeForCaret.setEndAfter(focusNode); // setStartBefore(nextNode) jumps IN FRONT OF the boundary of the node; setStart() using offset is inconvenient, because we don't know what the offeset refers to (does the node start with a textnode or not?)
-        rangeForCaret.collapse(false);
+        rangeForCaret.setStartBefore(node);         // We set the start-Boundary of the range to the beginning of the node.
+        rangeForCaret.collapse();
+        node.parentNode.removeChild(node);          // Then we remove the node ...
+        switch (toPosition) {
+            case 'toStart':
+                this.docSelRange.insertNode(node);          // ... insert the node via the range again ...
+                this.docSelRange.insertNode(helperNode);    // ... and insert the helper-node as well (now the node is right after the helper node).
+                rangeForCaret.setStartAfter(helperNode);    // Now we set the start of the range AFTER the helper node (= so the startContainer jumps to the beginning of our node)!
+                break;
+            case 'toEnd':
+            default:
+                this.docSelRange.insertNode(helperNode);    // ... insert the helper-node ...
+                this.docSelRange.insertNode(node);          // ... and insert the node via the range again (now the node is right before the helper node).
+                rangeForCaret.setStartBefore(helperNode);   // Now we set the start of the range BEFORE the helper node (= so the startContainer jumps to the end of our node)!
+                break;
+        }
+        rangeForCaret.collapse();
         this.docSel.setSingleRange(rangeForCaret);
         // Cleanup
-        setTimeout(function() { // removing the focusNode before the insert is done looses the correct position of the caret
-            node.removeChild(focusNode);
+        setTimeout(function() { // removing the helperNode before an insert is done looses the correct position of the caret.
+            helperNode.parentNode.removeChild(helperNode); // TODO; Inserting is broken!!
         }, 1);
     },
 
@@ -700,14 +728,15 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     // =========================================================================
     
     // ----------------- Current Selection & Nodes: Specific (DEL) --------------------------
-    
+
     /**
      * Is eyerything of the given range within a DEL-node?
+     * (Example: Is a rangeForDel, e.g. the character that is placed next to the caret, within a DEL-Node?)
      * @param {Object} range
      * @returns {Boolean}
      */
     rangeIsWithinDELNode: function(range) {
-        return this.rangeIsWithinMarkupNodeOfCertainKind(range,this.NODE_NAME_DEL);
+        return this.rangeIsWithinMarkupNode(range,this.NODE_NAME_DEL);
     },
     /**
      * Returns a container (node) with the previous/next "one-space"-content from the current position of the caret
@@ -866,7 +895,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         // - If the caret is on the right from the image: the range lands "within" the DEL-Node of the image.
         // - If the caret is in the left from the image: the range stays left from the DEL-Node of the image.
         // TODO: What happens if we are INBETWEEN two image-nodes? (check with markup also!)
-        if (this.rangeIsWithinMarkupNodeOfAnyKind(this.docSelRange) && this.eventKeyCode == Ext.event.Event.BACKSPACE) {
+        if (this.rangeIsWithinMarkupNode(this.docSelRange) && this.eventKeyCode == Ext.event.Event.BACKSPACE) {
             // The caret is behind the image.
             // We are in a BACKSPACE-Event, so get the image:
             return imgNode;
@@ -950,46 +979,6 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     
     // ----------------- Current Selection & Nodes: General(Markup-Nodes) -------------------
-    
-    /**
-     * Checks if the complete given range is within one-and-the-same markup-Node of any kind.
-     * @param {Object} range
-     * @returns {Boolean}
-     */
-    rangeIsWithinMarkupNodeOfAnyKind: function(range) {
-        var container = range.commonAncestorContainer,
-            containerParent = container.parentNode;
-        // If we are in the midst of a given node, we return that node:
-        if (container.nodeType == 1 && this.isNodeOfTypeMarkup(container)) {
-            return true;
-        }
-        // If we are in the midst of a textNode within a given node, we return its surrounding node:
-        if (container.nodeType == 3 && this.isNodeOfTypeMarkup(containerParent)) {
-            return true;
-        }
-        // There is no markup-node surrounding the current selection:
-        return false;
-    },
-    /**
-     * Checks is the complete given range is within one-and-the-same markup-Node as given in the nodeName.
-     * @param {Object} range
-     * @param {String} nodeName
-     * @returns {Boolean}
-     */
-    rangeIsWithinMarkupNodeOfCertainKind: function(range,nodeName) {
-        var container = range.commonAncestorContainer,
-            containerParent = container.parentNode;
-        // If we are in the midst of a given node, we return that node:
-        if (container.nodeType == 1 && container.nodeName == nodeName) {
-            return true;
-        }
-        // If we are in the midst of a textNode within a given node, we return its surrounding node:
-        if (container.nodeType == 3 && containerParent.nodeName == nodeName) {
-            return true;
-        }
-        // There is no markup-node surrounding the current selection:
-        return false;
-    },
     /**
      * Get the "surrounding" markup-node of the given type (= nodeName) of the current selection (if there is one).
      * @param {String} nodeName
@@ -1068,10 +1057,43 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     // ----------------- Current Selection, Ranges & Nodes: General(Any nodes) ----------------------
     
     /**
+     * Checks is the complete given range is within one-and-the-same markup-Node (as given in the nodeName, if given).
+     * @param {Object} range
+     * @param {String} nodeName (optional)
+     * @returns {Boolean}
+     */
+    rangeIsWithinMarkupNode: function(range,nodeName) {
+        var me = this,
+            container = range.commonAncestorContainer,
+            isMarkupNode = function(node){
+                if(!nodeName) {
+                    return me.isNodeOfTypeMarkup(node); // node is any kind of markup-node
+                } else {
+                    return (node.nodeName == nodeName); // node is of given nodeName
+                }
+            };
+        if (container.nodeType == 3) {
+            // if we are in a text-Node, we must check for it's parent!
+            return isMarkupNode(container.parentNode);
+        } else {
+            markupNodes = range.getNodes([1], function(node) {
+                return isMarkupNode(node);
+            });
+            return markupNodes.length > 0;
+        }
+    },
+    /**
      * Get the "surrounding" node of the current selection.
      * @returns {Object}
      */
     getContainerNodeForCurrentSelection: function(){
+        return this.getContainerNodeForRange(this.docSelRange);
+    },/**
+     * Get the "surrounding" node for a range.
+     * @param {Object} range
+     * @returns {Object}
+     */
+    getContainerNodeForRange: function(range){
         var commonAncestorContainer = this.docSelRange.commonAncestorContainer,
             startContainer = this.docSelRange.startContainer,
             startOffset = this.docSelRange.startOffset,
@@ -1089,20 +1111,31 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     /**
      * Get the previous or next node of the current selection.
-     * If the selection is in a textNode without a sibling, the sibling of the selection's parentNode is returned.
-     * If there is no sibling, we return null.
      * @param {String} direction (previous|next)
      * @returns {?Object}
      */
     getSiblingNodeForCurrentSelection: function(direction){
-        var docSel = this.docSelRange,
+        var range = this.docSelRange,
             lookForPrevious = (direction == "previous") ? true : false,
-            currentNode = (lookForPrevious ? docSel.startContainer : docSel.endContainer),
-            currentParentNode = currentNode.parentNode,
+            currentNode = (lookForPrevious ? range.startContainer : range.endContainer);
             siblingNode = null;
-        siblingNode = (lookForPrevious ? currentNode.previousSibling : currentNode.nextSibling);
-        if ( (siblingNode == null) && (currentNode.nodeType == 3) ) {
-            siblingNode = (lookForPrevious ? currentParentNode.previousSibling : currentParentNode.nextSibling);
+       return this.getSiblingNode(currentNode,direction);
+    },
+    /**
+     * Get the previous or next node of given range.
+     * If the range is in a textNode without a sibling, the sibling of the range's parentNode is returned.
+     * If there is no sibling, we return null.
+     * @param {Object} range
+     * @param {String} direction (previous|next)
+     * @returns {?Object}
+     */
+    getSiblingNode: function(node,direction){
+        var lookForPrevious = (direction == "previous") ? true : false,
+            parentNode = node.parentNode,
+            siblingNode = null;
+        siblingNode = (lookForPrevious ? node.previousSibling : node.nextSibling);
+        if ( (siblingNode == null) && (node.nodeType == 3) ) {
+            siblingNode = (lookForPrevious ? parentNode.previousSibling : parentNode.nextSibling);
         }
         return siblingNode;
     },
@@ -1149,18 +1182,26 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @returns {Object}
      */
     getSelectionPositionInfo: function(containingNode) {
+        return this.getPositionInfoForRange(this.docSelRange,containingNode);
+    },
+    /**
+     * Determine if the given range is at the start or end of the given part of content.
+     * (https://stackoverflow.com/a/7478420)
+     * @param {Object} containingNode
+     * @returns {Object}
+     */
+    getPositionInfoForRange: function(range,containingNode) {
         var atStart = false,
             atEnd = false,
             el = containingNode,
-            selRange = this.docSelRange,
             testRange = rangy.createRange();
         
         testRange.selectNodeContents(el);
-        testRange.setEnd(selRange.startContainer, selRange.startOffset);
+        testRange.setEnd(range.startContainer, range.startOffset);
         atStart = (testRange.toString() == "");
         
         testRange.selectNodeContents(el);
-        testRange.setStart(selRange.endContainer, selRange.endOffset);
+        testRange.setStart(range.endContainer, range.endOffset);
         atEnd = (testRange.toString() == "");
         
         return { atStart: atStart, atEnd: atEnd };
@@ -1178,6 +1219,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
     },
     /**
      * Does the node completely and exactly encompass the given range?
+     * (see also: https://stackoverflow.com/a/8340432)
      * @param {Object} range
      * @param {Object} node
      * @returns {Boolean}
@@ -1255,20 +1297,27 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
      * @returns {Object} 
      */
     createNodeForMarkup: function(nodeName){
-        var nodeEl = document.createElement(nodeName),
-            thisUserId = this.editorUserId,
-            thisUserCssNr = this.renderSelectorWithNrForUser(),
-            segmentWorkflowStepNr = this.segmentWorkflowStepNr,
-            timestamp = Ext.Date.format(new Date(), 'time'); // dates are wrong with 'timestamp' although doc states differently: http://docs.sencha.com/extjs/6.2.0/classic/Ext.Date.html 
-        // (setAttribute: see https://jsperf.com/html5-dataset-vs-native-setattribute)
-        nodeEl.setAttribute(this.ATTRIBUTE_USERID,thisUserId);        // = id to identify the user who did the editing
-        nodeEl.setAttribute(this.ATTRIBUTE_USERCSSNR,thisUserCssNr);  // = css-selector with specific number for this user
-        nodeEl.setAttribute(this.ATTRIBUTE_WORKFLOWSTEPNR,segmentWorkflowStepNr);
-        nodeEl.setAttribute(this.ATTRIBUTE_TIMESTAMP,timestamp);
-        // - 'changemarkup': specific selector for CSS
-        // - 'ownttip': general selector for delegate in tooltip
-        nodeEl.className = 'changemarkup ownttip';
+        var me = this,
+            nodeElParams = { tag: nodeName,
+                             [me.ATTRIBUTE_USERGUID]: me.editorUserGuid,                    // = id to identify the user who did the editing
+                             [me.ATTRIBUTE_USERCSSNR]: me.renderSelectorWithNrForUser(),    // = css-selector with specific number for this user
+                             [me.ATTRIBUTE_WORKFLOWSTEPNR]: me.segmentWorkflowStepNr,
+                             [me.ATTRIBUTE_TIMESTAMP]: Ext.Date.format(new Date(), 'time'), // dates are wrong with 'timestamp' although doc states differently: http://docs.sencha.com/extjs/6.2.0/classic/Ext.Date.html 
+                             cls: me.CSS_CLASSNAME },
+            nodeEl = Ext.DomHelper.createDom(nodeElParams);
         return nodeEl;
+    },
+    /**
+     * Create a helper-node for positioning the caret.
+     * @returns {Object} 
+     */
+    createHelperNodeForFocus: function() { // TODO: auch an den anderen Stellen einsetzen
+        var focusNode = Ext.DomHelper.createDom({
+                tag: 'div',
+                id: 'helper'
+            });
+        Ext.DomHelper.applyStyles(focusNode,{position: 'absolute', left: '-1000px'}); // display the temp div out of sight, otherwise the displayed content flickers
+        return focusNode;
     },
     /**
      * Is the Node of a markup-type (DEL, INS)?
@@ -1490,8 +1539,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         if (!this.isNodeOfTypeMarkup(nodeA) || !this.isNodeOfTypeMarkup(nodeB)) {
             return false;
         }
-        var userOfNodeA = nodeA.getAttribute(this.ATTRIBUTE_USERID),
-            userOfNodeB = nodeB.getAttribute(this.ATTRIBUTE_USERID);
+        var userOfNodeA = nodeA.getAttribute(this.ATTRIBUTE_USERGUID),
+            userOfNodeB = nodeB.getAttribute(this.ATTRIBUTE_USERGUID);
         return userOfNodeA == userOfNodeB;
     },
     /**
@@ -1503,8 +1552,8 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
         if (!this.isNodeOfTypeMarkup(node)) {
             return false;
         }
-        var userOfNode = node.getAttribute(this.ATTRIBUTE_USERID),
-            userOfEvent = this.editorUserId;
+        var userOfNode = node.getAttribute(this.ATTRIBUTE_USERGUID),
+            userOfEvent = this.editorUserGuid;
         return userOfNode == userOfEvent;
     },
     /**
@@ -1687,7 +1736,7 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
       * @returns {String}
       */ 
      renderSelectorWithNrForUser: function() {
-         var thisUser = this.editorUserId,
+         var thisUser = this.editorUserGuid,
              allUsersAndClassnames = this.getAllUsersAndClassnames();
          if (allUsersAndClassnames[thisUser] != undefined && allUsersAndClassnames[thisUser] != null) {
              return allUsersAndClassnames[thisUser];
@@ -1706,10 +1755,10 @@ Ext.define('Editor.view.segments.ChangeMarkup', {
              allMarkupNodes = this.getAllMarkupNodesInEditor();
          for (var i = 0; i < allMarkupNodes.length; i++){
              var node = allMarkupNodes[i],
-                 userId = node.getAttribute(this.ATTRIBUTE_USERID),
+                 userGuid = node.getAttribute(this.ATTRIBUTE_USERGUID),
                  userCSSNr = node.getAttribute(this.ATTRIBUTE_USERCSSNR);
-             if (allUsersAndClassnames[userId] == undefined){
-                 allUsersAndClassnames[userId] = userCSSNr;
+             if (allUsersAndClassnames[userGuid] == undefined){
+                 allUsersAndClassnames[userGuid] = userCSSNr;
              }
          }
          return allUsersAndClassnames;
