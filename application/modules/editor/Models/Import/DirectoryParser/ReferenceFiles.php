@@ -49,6 +49,11 @@ class editor_Models_Import_DirectoryParser_ReferenceFiles extends editor_Models_
 
     protected $exceptionOnNoFilesFound = false;
     
+    public function __construct() {
+        //disable (empty) the filter for reference files:
+        $this->_importExtensionList = [];
+    }
+    
     /**
      * Adds reference file specific infos to the tree node 
      * @param string $filename
