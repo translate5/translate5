@@ -51,6 +51,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     
     const OKAPI_DIRECTORY_NAME='OkapiDirectory';
     
+    //FIXME this must come from the config!!!!!!!!!!!1
     const IMPORT_FILES_FOLDER_NAME='proofRead';
 
     private $task;
@@ -97,11 +98,12 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             mkdir($okapiDir, 0777, true);
         }
         
+        $refFolder = $importFolder.'/'.$this->config->runtimeOptions->import->referenceDirectory;
         
         $directory = new RecursiveDirectoryIterator($taskFolder);
         $it= new RecursiveIteratorIterator($directory);
         
-        $matchFilesName=[];
+        $matchFiles=[];
         $bconfFilePath=[];
         
         //find all files supported by okapi and move them in the okapi directory
@@ -113,10 +115,30 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             if (in_array($fileinfo->getExtension(),$this->okapyFileTypes)) {
                 //$matchFiles[]=$fileinfo->getFilename();
                 //move the files in the okapi directory
-                rename($fileinfo->getPathname(),$okapiDir.$fileinfo->getFilename());
+                $tmpDir=basename(dirname($fileinfo->getPathname()));
+                $checkDir="";
+                if($tmpDir!=self::IMPORT_FILES_FOLDER_NAME){
+                    $checkDir=$okapiDir.$tmpDir;
+                    if (!is_dir($checkDir)) {
+                        mkdir($checkDir, 0777, true);
+                    }
+                    $checkDir.=DIRECTORY_SEPARATOR;
+                }
+    
+                if(empty($checkDir)){
+                    $targetDir=$okapiDir.$fileinfo->getFilename();
+                }else{
+                    $targetDir=$checkDir.$fileinfo->getFilename();
+                }
+                
+                rename($fileinfo->getPathname(),$targetDir);
                 
                 //add the match file in the matches array
-                $matchFilesName[]=$fileinfo->getFilename();
+                $matchFiles[]=[
+                        'fileName'=>$fileinfo->getFilename(),
+                        'filePath'=>$targetDir,
+                        'outputFolder'=>dirname($fileinfo->getPathname())
+                ];;
                 continue;
             }
             
@@ -129,7 +151,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         }
         
         //if no files are found do nothing
-        if(empty($matchFilesName)){
+        if(empty($matchFiles)){
             return;
         }
         
@@ -137,9 +159,9 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             $bconfFilePath[]=$this->getDefaultBconf();
         }
         
-        foreach ($matchFilesName as $fileName) {
+        foreach ($matchFiles as $file) {
             //FIXME in the worker, we move the files from the okapi dir, to hhe reference files dir, the file need to be on the first level of the refernece files dir
-            $this->queueWorker($fileName,$bconfFilePath,$okapiDir);
+            $this->queueWorker($file,$bconfFilePath,$okapiDir);
         }
     }
 
@@ -147,17 +169,17 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * Run for each file a separate worker, the worker will upload the file to the okapi, convert the file, and download the 
      * result
      * 
-     * @param string $fileName - the name of the file
+     * @param string $file - the source file
      * @param string $bconfFilePath - the path of the bconf file
      * @param string $okapiDir - the path of the okapi dir on the in the task folder
      * @return boolean
      */
-    public function queueWorker($fileName,$bconfFilePath,$okapiDir){
+    public function queueWorker($file,$bconfFilePath,$okapiDir){
         $worker = ZfExtended_Factory::get('editor_Plugins_Okapi_Worker');
         /* @var $worker editor_Plugins_Okapi_Worker */
         
         $params=[
-            'fileName'=>$fileName,
+            'file'=>$file,
             'bconfFilePath'=>$bconfFilePath,
             'okapiDir'=>$okapiDir
         ];

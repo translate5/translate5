@@ -52,7 +52,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
      */
     public function work() {
         $params = $this->workerModel->getParameters();
-        $fileName=$params['fileName'];
+        $file=$params['file'];//FIXME getter and setter for the file in the connector
         $okapiDir=$params['okapiDir'];
         $bconfFilePath=$params['bconfFilePath'];
         
@@ -63,8 +63,16 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
         try {
             $this->api->createProject();
             $this->api->uploadOkapiConfig($bconfFilePath);
-            $this->api->uploadSourceFile($fileName);
+            $this->api->uploadSourceFile($file);
             $this->api->executeTask();
+            $this->api->downloadFile($file);
+            //HERE move the original file to the reference folder 
+            
+            //filePath 
+            //$dir = dirname(str_replace($filePath, $proofReadPath, ''));
+            //mkdir($refFolder.'/'.$dir, 777, true);
+            //rename old(original) to new location
+            
         }catch (Exception $e){
             $this->log->logError('Error happend while converting the file. Error was: '.$e->getMessage());
         }finally {

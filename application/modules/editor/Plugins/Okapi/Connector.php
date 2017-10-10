@@ -76,6 +76,8 @@ class editor_Plugins_Okapi_Connector {
      */
     const REQUEST_TIMEOUT_SECONDS = 360;
     
+    const OUTPUT_FILE_EXTENSION='.xlf';
+    
     public function __construct() {
         $this->okapiConfig= Zend_Registry::get('config')->runtimeOptions->plugins->Okapi;
         /* @var $config Zend_Config */
@@ -126,19 +128,8 @@ class editor_Plugins_Okapi_Connector {
      */
     public function createProject() {
         $http = $this->getHttpClient($this->apiUrl.'projects/new');
-
-        //$http->setHeaders('Content-Type: application/json');
-        //$http->setHeaders('Accept: application/json');
-        
-        //$params = [
-        //];
-        
-        //$http->setRawData(json_encode($params), 'application/json');
         $response = $http->request('POST');
-        
         $url=$response->getHeader('Location');
-        //$noErrorResponse = $this->processResponse($response);
-        
         $this->projectUrl= $url;
     }
     
@@ -163,18 +154,20 @@ class editor_Plugins_Okapi_Connector {
         $http = $this->getHttpClient($url);
         $http->setFileUpload($bconfFilePath[0], 'batchConfiguration');
         $response = $http->request('POST');
-        $this->processResponse($response);
+        //$this->processResponse($response);
     }
     
-    public function uploadSourceFile($fileName){
+    public function uploadSourceFile($file){
         //PUT http://{host}/okapi-longhorn/projects/1/inputFiles/help.html
         //Uploads a file that will have the name 'help.html'
         
-        $count=0;
+        $name=$file['fileName'];
+        $filePath=$file['filePath'];
+        
         //in this point the tmp imort is deleted
-        $url=$this->projectUrl.'/inputFiles/'.$fileName.'.okapi';
+        $url=$this->projectUrl.'/inputFiles/'.$name;
         $http = $this->getHttpClient($url);
-        $http->setFileUpload($this->getOkapiDir().$fileName,'inputFile');
+        $http->setFileUpload($filePath,'inputFile');
         $response = $http->request('PUT');
             
     }
@@ -183,6 +176,14 @@ class editor_Plugins_Okapi_Connector {
         $url=$this->projectUrl.'/tasks/execute';
         $http = $this->getHttpClient($url);
         $response = $http->request('POST');
+    }
+    
+    public function downloadFile($file){
+        $url=$this->projectUrl.'/outputFiles/pack1/work/'.$file['fileName'].self::OUTPUT_FILE_EXTENSION;
+        $http = $this->getHttpClient($url);
+        $response = $http->request('GET');
+        $responseFile=$this->processResponse($response);
+        file_put_contents($file['outputFolder'].DIRECTORY_SEPARATOR.$file['fileName'].self::OUTPUT_FILE_EXTENSION, $responseFile);
     }
     
     
