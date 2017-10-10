@@ -180,6 +180,18 @@ class editor_Models_Import_Worker_Import {
      */
     protected function importFiles(){
         $filelist = $this->filelist->processProofreadAndReferenceFiles($this->importConfig->getProofReadDir());
+        $this->events->trigger("afterDirectoryParsing", $this,[
+                'task'=>$this->task,
+                'importFolder'=>$this->importConfig->importFolder,
+                'filelist'=>$filelist
+        ]);
+        
+        //FIXME split import worker in two parts, the directory parsing in one worker and the import in other workers.
+        // Then other workers affecting the files can be started in between!
+        
+        $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
+        /* @var $fileFilter editor_Models_File_FilterManager */
+        $fileFilter->init($this->task, $fileFilter::TYPE_IMPORT);
         
         $mqmProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_MqmParser', array($this->task, $this->segmentFieldManager));
         $repHash = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_RepetitionHash', array($this->task, $this->segmentFieldManager));
@@ -190,6 +202,7 @@ class editor_Models_Import_Worker_Import {
                 trigger_error('Check of File: '.$this->importConfig->importFolder.DIRECTORY_SEPARATOR.$path);
             }
             $params = $this->getFileparserParams($path, $fileId);
+            $fileFilter->applyImportFilters($params[0], $params[2]);
             $parser = $this->getFileParser($path, $params);
             /* @var $parser editor_Models_Import_FileParser */
             $segProc->setSegmentFile($fileId, $params[1]); //$params[1] => filename
