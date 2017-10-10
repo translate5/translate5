@@ -28,7 +28,7 @@
 
 
 INSERT INTO  `Zf_worker_dependencies` (`worker`,`dependency`) VALUES 
-('editor_Plugins_Okapi_Worker',  'editor_Models_Import_Worker'),
+('editor_Models_Import_Worker',  'editor_Plugins_Okapi_Worker'),
 ('editor_Plugins_TermTagger_Worker_TermTaggerImport',  'editor_Plugins_Okapi_Worker'),
 ('editor_Models_Import_Worker_SetTaskToOpen',  'editor_Plugins_Okapi_Worker');
 

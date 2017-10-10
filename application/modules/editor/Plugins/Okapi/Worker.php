@@ -60,11 +60,16 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
         
         $this->api->setOkapiDir($okapiDir);
         
-        $this->api->createProject();
-        $this->api->uploadOkapiConfig($bconfFilePath);
-        $this->api->uploadSourceFile($fileName);
-        $this->api->executeTask();
-        //$this->api->removeProject();
+        try {
+            $this->api->createProject();
+            $this->api->uploadOkapiConfig($bconfFilePath);
+            $this->api->uploadSourceFile($fileName);
+            $this->api->executeTask();
+        }catch (Exception $e){
+            $this->log->logError('Error happend while converting the file. Error was: '.$e->getMessage());
+        }finally {
+            //$this->api->removeProject();
+        }
 
         return true;
     }

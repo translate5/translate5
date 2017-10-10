@@ -47,9 +47,11 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     );
     
     
-    const OKAPI_BCONF_DEFAULT_NAME='okapi_default_bconf.bconf';
+    const OKAPI_BCONF_DEFAULT_NAME='okapi_default_import.bconf';
     
     const OKAPI_DIRECTORY_NAME='OkapiDirectory';
+    
+    const IMPORT_FILES_FOLDER_NAME='proofRead';
 
     private $task;
     /* @var $task editor_Models_Task */
@@ -83,10 +85,11 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     public function handleFiles($importFolder){
         // /var/www/translate5/application/../data/editorImportedTasks/c7105c57-f270-4c05-b79a-43756141e3f2/_tempImport
         // proofRead
-        $proofRead='proofRead';
+        $proofRead=self::IMPORT_FILES_FOLDER_NAME;
         $proofReadFolder=$importFolder.DIRECTORY_SEPARATOR.$proofRead;
         
         $taskFolder=str_replace("_tempImport","",$importFolder);
+        
         $okapiDir=$taskFolder.DIRECTORY_SEPARATOR.self::OKAPI_DIRECTORY_NAME.DIRECTORY_SEPARATOR;
         
         //create the okapi directory on the disk in the task folder
@@ -95,7 +98,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         }
         
         
-        $it = new FilesystemIterator($proofReadFolder);
+        $directory = new RecursiveDirectoryIterator($taskFolder);
+        $it= new RecursiveIteratorIterator($directory);
         
         $matchFilesName=[];
         $bconfFilePath=[];
@@ -118,8 +122,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             
             if (in_array($fileinfo->getExtension(),$this->okapyBconf)) {
                 //$matchFiles[]=$fileinfo->getFilename();
-                rename($fileinfo->getPathname(),$importFolder.DIRECTORY_SEPARATOR.$fileinfo->getFilename());
-                $bconfFilePath[]=$importFolder.DIRECTORY_SEPARATOR.$fileinfo->getFilename();
+                rename($fileinfo->getPathname(),$okapiDir.$fileinfo->getFilename());
+                $bconfFilePath[]=$okapiDir.$fileinfo->getFilename();
                 continue;
             }
         }
@@ -130,10 +134,11 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         }
         
         if(empty($bconfFilePath)){
-            $bconfFilePath=$this->getDefaultBconf();
+            $bconfFilePath[]=$this->getDefaultBconf();
         }
         
         foreach ($matchFilesName as $fileName) {
+            //FIXME in the worker, we move the files from the okapi dir, to hhe reference files dir, the file need to be on the first level of the refernece files dir
             $this->queueWorker($fileName,$bconfFilePath,$okapiDir);
         }
     }
@@ -165,9 +170,12 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $worker->queue(null);
     }
 
+    /**
+     * Return the default bconf file for the import
+     * @return string
+     */
     private function getDefaultBconf(){
-        $dataDir=APPLICATION_PATH.'/../data';
-        return $dataDir.'/'.self::OKAPI_BCONF_DEFAULT_NAME;
+        return APPLICATION_PATH.DIRECTORY_SEPARATOR.$this->getPluginPath().DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.self::OKAPI_BCONF_DEFAULT_NAME;
     }
  
 }

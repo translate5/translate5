@@ -155,9 +155,13 @@ class editor_Plugins_Okapi_Connector {
     }
     
     public function uploadOkapiConfig($bconfFilePath){
+        if(empty($bconfFilePath)){
+            return;
+        }
+        
         $url=$this->projectUrl.'/batchConfiguration';
         $http = $this->getHttpClient($url);
-        $http->setFileUpload($bconfFilePath, 'batchConfiguration');
+        $http->setFileUpload($bconfFilePath[0], 'batchConfiguration');
         $response = $http->request('POST');
         $this->processResponse($response);
     }

@@ -26,7 +26,7 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-delete from `Zf_worker_dependencies` where `worker` =  'editor_Plugins_Okapi_Worker' AND `dependency` = 'editor_Models_Import_Worker';
+delete from `Zf_worker_dependencies` where `worker` =  'editor_Models_Import_Worker' AND `dependency` = 'editor_Plugins_Okapi_Worker';
 delete from `Zf_worker_dependencies` where `worker` =  'editor_Plugins_TermTagger_Worker_TermTaggerImport' AND `dependency` = 'editor_Plugins_Okapi_Worker';
 delete from `Zf_worker_dependencies` where `worker` =  'editor_Models_Import_Worker_SetTaskToOpen' AND `dependency` = 'editor_Plugins_Okapi_Worker';
 
