@@ -46,13 +46,19 @@ class editor_Models_Import_FileParser_Xml extends editor_Models_Import_FileParse
         return ['xml'];
     }
     
-    public function getChainedParser() {
+    /**
+     * returns true if the given XML string is parsable by one of the internal existing Parsers 
+     * Currently only the check for XLIFF is supported.
+     * @param string $xml
+     * @param array $attributes by reference, optional
+     * @return boolean
+     */
+    public static function isParsable($xml, &$attributes = null) {
         // check here the loaded XML content, if it is XLF everything is ok, since we extend the Xlf parser
         // if it is another (not supported) XML type we throw an exception
-        $attributes = [];
         $validVersions = ['1.1', '1.2'];
         $validXmlns = ['urn:oasis:names:tc:xliff:document:1.1', 'urn:oasis:names:tc:xliff:document:1.2'];
-        $isXliff = preg_match('/^(<[^>]+>[^<]+)?\s*<xliff([^>]+)>/s', $this->_origFile, $match);
+        $isXliff = preg_match('/^(<[^>]+>[^<]+)?\s*<xliff([^>]+)>/s', $xml, $match);
         if($isXliff && preg_match_all('/([^\s]+)="([^"]*)"/', $match[2], $matches)){
             $attributes = array_combine($matches[1], $matches[2]);
             settype($attributes['xmlns'], 'string');
@@ -63,8 +69,19 @@ class editor_Models_Import_FileParser_Xml extends editor_Models_Import_FileParse
             $validSchema = strpos($attributes['xsi:schemaLocation'], 'urn:oasis:names:tc:xliff:document:') === 0;
             if($validVersion && ($validXmlns || $validSchema)) {
                 //for example check here additionaly for SDL markers then create the SDLXLIFF parser here and return it instead of $this
-                return $this;
+                return true;
             }
+        }
+        return false;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see editor_Models_Import_FileParser::getChainedParser()
+     */
+    public function getChainedParser() {
+        if(self::isParsable($this->_origFile, $attributes)) {
+            return $this;
         }
         throw new ZfExtended_Exception('Content of given XML file is no valid XLF! File: '.$this->_fileName.'; xliff attributes: '.print_r($attributes,1));
     }
