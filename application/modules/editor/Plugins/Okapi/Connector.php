@@ -64,12 +64,29 @@ class editor_Plugins_Okapi_Connector {
     private $m_task;
     
     /***
+     * The filepath of the import bconfig file
+     * @var string
+     */
+    private $bconfFilePath;
+    
+    /***
+     * The file which need to be converted
+     * @var string
+     */
+    private $imputFile;
+    
+    /***
      * Request timeout for the api
      * 
      * @var integer
      */
     const REQUEST_TIMEOUT_SECONDS = 360;
     
+    /***
+     * The file extenssion of the converted file
+     *  
+     * @var string
+     */
     const OUTPUT_FILE_EXTENSION='.xlf';
     
     public function __construct() {
@@ -136,14 +153,13 @@ class editor_Plugins_Okapi_Connector {
         $url=$this->projectUrl;
         $http = $this->getHttpClient($url);
         $result = $http->request('DELETE');
-        
     }
     
-    public function uploadOkapiConfig($bconfFilePath){
-        if(empty($bconfFilePath)){
+    public function uploadOkapiConfig(){
+        if(empty($this->getBconfFilePath())){
             return;
         }
-        
+        $bconfFilePath=$this->getBconfFilePath();
         $url=$this->projectUrl.'/batchConfiguration';
         $http = $this->getHttpClient($url);
         $http->setFileUpload($bconfFilePath[0], 'batchConfiguration');
@@ -151,10 +167,11 @@ class editor_Plugins_Okapi_Connector {
         //$this->processResponse($response);
     }
     
-    public function uploadSourceFile($file){
+    public function uploadSourceFile(){
         //PUT http://{host}/okapi-longhorn/projects/1/inputFiles/help.html
         //Uploads a file that will have the name 'help.html'
         
+        $file=$this->getImputFile();
         $name=$file['fileName'];
         $filePath=$file['filePath'];
         
@@ -172,7 +189,8 @@ class editor_Plugins_Okapi_Connector {
         $response = $http->request('POST');
     }
     
-    public function downloadFile($file){
+    public function downloadFile(){
+        $file=$this->getImputFile();
         $url=$this->projectUrl.'/outputFiles/pack1/work/'.$file['fileName'].self::OUTPUT_FILE_EXTENSION;
         $http = $this->getHttpClient($url);
         $response = $http->request('GET');
@@ -191,6 +209,22 @@ class editor_Plugins_Okapi_Connector {
     
     public function getTask(){
         return $this->m_task;
+    }
+    
+    public function setBconfFilePath($confPath){
+        $this->bconfFilePath=$confPath;
+    }
+    
+    public function getBconfFilePath(){
+        return $this->bconfFilePath;
+    }
+    
+    public function setImputFile($file){
+        $this->imputFile=$file;
+    }
+    
+    public function getImputFile(){
+        return $this->imputFile;
     }
     
 }

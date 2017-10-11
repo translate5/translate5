@@ -52,33 +52,35 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
      */
     public function work() {
         $params = $this->workerModel->getParameters();
-        $file=$params['file'];//FIXME getter and setter for the file in the connector
+        $file=$params['file'];
         $refFolder=$params['refFolder'];
-        $bconfFilePath=$params['bconfFilePath'];
         $proofReadFolder=$params['proofReadFolder'];
         
         $this->api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
+        $this->api->setBconfFilePath($params['bconfFilePath']);
+        $this->api->setImputFile($file);
         
         try {
-            //$this->api->createProject();
-            //$this->api->uploadOkapiConfig($bconfFilePath);
-            //$this->api->uploadSourceFile($file);
-            //$this->api->executeTask();
-            //$this->api->downloadFile($file);
-            //HERE move the original file to the reference folder 
-            
-            //filePath 
+            $this->api->createProject();
+            $this->api->uploadOkapiConfig();
+            $this->api->uploadSourceFile();
+            $this->api->executeTask();
+            $this->api->downloadFile();
+
+            //move the original files in the referenceFiles dir, in the same filestrucutre
+            //as thay were durring the import
             $fileDir=dirname($file['filePath']);
-            $folders=str_replace($fileDir, $proofReadFolder, '');
-            $dir = dirname($folders);
-            
-            if(!empty($dir)){
-                $refFolder=$refFolder.'/'.$dir;
+            $folders=str_replace($proofReadFolder,"",$fileDir);
+            if(!empty($folders)){
+                $refFolder=$refFolder.$folders;
             }
             
-            mkdir($refFolder, 777, true);
-            rename($file['filePath'], $refFolder.'/'.$file['fileName']);
-            //rename old(original) to new location
+            if (!is_dir($refFolder)) {
+                mkdir($refFolder, 0777, true);
+            }
+            $newName=$refFolder.'/'.$file['fileName'];
+            $oldName=$file['filePath'];
+            rename($oldName, $newName);
             
         }catch (Exception $e){
             $this->log->logError('Error happend while converting the file. Error was: '.$e->getMessage());

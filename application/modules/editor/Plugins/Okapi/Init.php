@@ -38,15 +38,28 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     protected $frontendControllers = array(
     );
     
+    /***
+     * Supported file-types by okapi
+     * 
+     * @var array
+     */
     private $okapyFileTypes = array(
             'html'
     );
     
+    /***
+     * The okapi config file-types
+     * @var array
+     */
     private $okapyBconf= array(
             'bconf'
     );
-    
-    
+
+    /***
+     * Name of the default okapi config file
+     * 
+     * @var string
+     */
     const OKAPI_BCONF_DEFAULT_NAME='okapi_default_import.bconf';
     
     
@@ -80,15 +93,16 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     }
 
     public function handleFiles($importFolder){
-        // /var/www/translate5/application/../data/editorImportedTasks/c7105c57-f270-4c05-b79a-43756141e3f2/_tempImport
-        // proofRead
         $import = Zend_Registry::get('config')->runtimeOptions->import;
         
+        //proofread folder
         $proofReadFolder=$importFolder.'/'.$import->importFilesDirectory;
         
+        //the task folder
         $taskFolder=str_replace("_tempImport","",$importFolder);
         
-        $refFolder = $taskFolder.'/'.$import->referenceDirectory;
+        //reference files directory path
+        $refFolder = $taskFolder.$import->referenceDirectory;
         
         $directory = new RecursiveDirectoryIterator($taskFolder);
         $it= new RecursiveIteratorIterator($directory);
@@ -138,7 +152,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * 
      * @param string $file - the source file
      * @param string $bconfFilePath - the path of the bconf file
-     * @param string $okapiDir - the path of the okapi dir on the in the task folder
+     * @param string $refFolder - referenceFiles directory of the current task 
+     * @param string $proofReadFolder - prooofRead folder of the current task
      * @return boolean
      */
     public function queueWorker($file,$bconfFilePath,$refFolder,$proofReadFolder){
