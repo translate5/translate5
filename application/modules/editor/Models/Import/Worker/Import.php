@@ -243,7 +243,7 @@ class editor_Models_Import_Worker_Import {
         if(empty($this->fileParsers[$ext])) {
             throw new Zend_Exception('For the fileextension "'.$ext.'" no parser is registered. Available parsers: '.print_r($this->fileParsers,1));
         }
-        $parser = ZfExtended_Factory::get($this->fileParsers[$ext],$params);
+        $parser = ZfExtended_Factory::get($this->fileParsers[$ext],$params)->getChainedParser();
         /* var $parser editor_Models_Import_FileParser */
         $parser->setSegmentFieldManager($this->segmentFieldManager);
         return $parser;

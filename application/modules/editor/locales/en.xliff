@@ -1764,6 +1764,20 @@ You can access the portal at: %3$s<br />
 <br />
 <br />This e-mail has been generated automatically. Please do not reply to this e-mail.</target>
 </trans-unit>
+<trans-unit id='UGFzc3dvcnQgc2V0emVu'>
+  <source>Passwort setzen</source>
+  <target>Reset password</target>
+</trans-unit>
+
+<trans-unit id='RGllIEF1ZmdhYmUgd3VyZGUgbnVuIGF1dG9tYXRpc2NoIGbDvHIgZGllIGZvbGdlbmRlbiBCZW51dHplciBpbiBkZXIgUm9sbGUgPGk+JTIkczwvaT4gZnJlaWdlZ2ViZW46PGJyIC8+CiUxJHMKPGJyIC8+CkRpZSBCZW51dHplciB3dXJkZW4gcGVyIEUtTWFpbCBkYXLDvGJlciBpbmZvcm1pZXJ0LjxiciAvPgo8YnIgLz4='><source>Die Aufgabe wurde nun automatisch für die folgenden Benutzer in der Rolle <i>%2$s</i> freigegeben:<br />
+%1$s
+<br />
+Die Benutzer wurden per E-Mail darüber informiert.<br />
+<br /></source><target>The task was opened automatically for the following users in the role <i>%2$s</i>:<br />
+%1$s
+<br />
+The users were informed by e-mail.<br />
+<br /></target></trans-unit>
 
     </body>
   </file>

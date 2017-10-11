@@ -146,7 +146,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      */
     public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task) {
         parent::__construct($path, $fileName, $fileId, $task);
-        $this->protectUnicodeSpecialChars();
         $this->initNamespaces();
         $this->contentConverter = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_ContentConverter', [$this->namespaces, $this->task, $fileName]);
         $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
@@ -179,7 +178,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $this->namespaces->registerParserHandler($this->xmlparser);
         
         $preserveWhitespaceDefault = $this->config->runtimeOptions->import->xlf->preserveWhitespace;
-        $this->_skeletonFile = $parser->parse($this->_origFileUnicodeProtected, $preserveWhitespaceDefault);
+        $this->_skeletonFile = $parser->parse($this->_origFile, $preserveWhitespaceDefault);
         
         if ($this->segmentCount === 0) {
             error_log('Die Datei ' . $this->_fileName . ' enthielt keine übersetzungsrelevanten Segmente!');
@@ -465,7 +464,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     }
     
     protected function initNamespaces() {
-        $this->namespaces = ZfExtended_Factory::get("editor_Models_Import_FileParser_Xlf_Namespaces",[$this->_origFileUnicodeProtected]);
+        $this->namespaces = ZfExtended_Factory::get("editor_Models_Import_FileParser_Xlf_Namespaces",[$this->_origFile]);
     }
     
     /**
