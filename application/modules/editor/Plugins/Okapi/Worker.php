@@ -83,6 +83,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             rename($oldName, $newName);
             
         }catch (Exception $e){
+            //taskGuid, fileName/Path where the error happens
             $this->log->logError('Error happend while converting the file. Error was: '.$e->getMessage());
         }finally {
             //$this->api->removeProject();

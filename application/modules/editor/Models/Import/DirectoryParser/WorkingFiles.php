@@ -181,6 +181,21 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
     $node->segmentid = 0;
     $node->segmentgridindex = 0;
     $node->path = $this->rootNode->path.$this->rootNode->filename.'/';
+    
+    //1. fire a new event here, 
+    // listen to that event, 
+    // in the listener manipulate above node, 
+    //   change filename from .okapi to .xlf, 
+    //   rename the file on the disk too
+    //   add a new temporary flag okapi = true to the node
+    
+    
+    $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
+    /* @var $eventManager ZfExtended_EventManager */
+    $eventManager->trigger('beforeFileNodeCreate', $this, array(
+            'node' => $node,
+    ));
+    
     return $node;
   }
   

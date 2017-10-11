@@ -126,7 +126,7 @@ class editor_Plugins_Okapi_Connector {
         
         //check for HTTP State (REST errors)
         if(!in_array($response->getStatus(), $validStates)) {
-            throw new ZfExtended_BadGateway($response->getBody(), 500);
+            throw new ZfExtended_BadGateway("HTTP Status was not 200/201/401 body: ".$response->getBody(), 500);
         }
         
         return $response->getBody();

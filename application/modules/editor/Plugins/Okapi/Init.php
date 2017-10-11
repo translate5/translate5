@@ -81,8 +81,14 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     
     protected function initEvents() {
         $this->eventManager->attach('editor_Models_Import', 'beforeImport', array($this, 'handleBeforeImport'));
+        $this->eventManager->attach('editor_Models_Import_DirectoryParser_WorkingFiles', 'beforeFileNodeCreate', array($this, 'handleBeforeFileNodeCreate'));
     }
 
+    public function beforeFileNodeCreate(Zend_EventManager_Event $event) {
+        $params = $event->getParams();
+        $node=$params['node'];
+    }
+    
     public function handleBeforeImport(Zend_EventManager_Event $event) {
         $params = $event->getParams();
         $importFolder=$params['importFolder'];
