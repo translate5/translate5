@@ -53,24 +53,31 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
     public function work() {
         $params = $this->workerModel->getParameters();
         $file=$params['file'];//FIXME getter and setter for the file in the connector
-        $okapiDir=$params['okapiDir'];
+        $refFolder=$params['refFolder'];
         $bconfFilePath=$params['bconfFilePath'];
+        $proofReadFolder=$params['proofReadFolder'];
         
         $this->api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
         
-        $this->api->setOkapiDir($okapiDir);
-        
         try {
-            $this->api->createProject();
-            $this->api->uploadOkapiConfig($bconfFilePath);
-            $this->api->uploadSourceFile($file);
-            $this->api->executeTask();
-            $this->api->downloadFile($file);
+            //$this->api->createProject();
+            //$this->api->uploadOkapiConfig($bconfFilePath);
+            //$this->api->uploadSourceFile($file);
+            //$this->api->executeTask();
+            //$this->api->downloadFile($file);
             //HERE move the original file to the reference folder 
             
             //filePath 
-            //$dir = dirname(str_replace($filePath, $proofReadPath, ''));
-            //mkdir($refFolder.'/'.$dir, 777, true);
+            $fileDir=dirname($file['filePath']);
+            $folders=str_replace($fileDir, $proofReadFolder, '');
+            $dir = dirname($folders);
+            
+            if(!empty($dir)){
+                $refFolder=$refFolder.'/'.$dir;
+            }
+            
+            mkdir($refFolder, 777, true);
+            rename($file['filePath'], $refFolder.'/'.$file['fileName']);
             //rename old(original) to new location
             
         }catch (Exception $e){

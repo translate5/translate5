@@ -35,3 +35,6 @@ WHERE `name` = 'runtimeOptions.worker.editor_Plugins_Okapi_Worker.maxParallelWor
 
 DELETE FROM `Zf_configuration` 
 WHERE `name` = 'runtimeOptions.plugins.Okapi.api.url';
+
+DELETE FROM `Zf_configuration` 
+WHERE `name` = 'runtimeOptions.import.importFilesDirectory';

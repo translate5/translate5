@@ -40,3 +40,8 @@ VALUES
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES 
 ('runtimeOptions.plugins.Okapi.api.url', '1', 'editor', 'plugins', 'https://www.translate5.net:8019/okapi-longhorn/', 'https://www.translate5.net:8019/okapi-longhorn/', '', 'string', 'Url used for Okapi api');
+
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
+VALUES ('runtimeOptions.import.importFilesDirectory', '1', 'editor', 'import', 'proofRead', 'proofRead', '', 'string', 'The name of the directory where the files which will be imported in translate5 are located');
+

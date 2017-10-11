@@ -64,12 +64,6 @@ class editor_Plugins_Okapi_Connector {
     private $m_task;
     
     /***
-     * The folder in the disk where the okapi files are
-     * @var string
-     */
-    private $okapiDir;
-
-    /***
      * Request timeout for the api
      * 
      * @var integer
@@ -183,7 +177,7 @@ class editor_Plugins_Okapi_Connector {
         $http = $this->getHttpClient($url);
         $response = $http->request('GET');
         $responseFile=$this->processResponse($response);
-        file_put_contents($file['outputFolder'].DIRECTORY_SEPARATOR.$file['fileName'].self::OUTPUT_FILE_EXTENSION, $responseFile);
+        file_put_contents($file['filePath'].self::OUTPUT_FILE_EXTENSION, $responseFile);
     }
     
     
@@ -197,14 +191,6 @@ class editor_Plugins_Okapi_Connector {
     
     public function getTask(){
         return $this->m_task;
-    }
-    
-    public function setOkapiDir($okapiDir){
-        $this->okapiDir= $okapiDir;
-    }
-    
-    public function getOkapiDir(){
-        return $this->okapiDir;
     }
     
 }

@@ -49,11 +49,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     
     const OKAPI_BCONF_DEFAULT_NAME='okapi_default_import.bconf';
     
-    const OKAPI_DIRECTORY_NAME='OkapiDirectory';
     
-    //FIXME this must come from the config!!!!!!!!!!!1
-    const IMPORT_FILES_FOLDER_NAME='proofRead';
-
     private $task;
     /* @var $task editor_Models_Task */
 
@@ -86,19 +82,13 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     public function handleFiles($importFolder){
         // /var/www/translate5/application/../data/editorImportedTasks/c7105c57-f270-4c05-b79a-43756141e3f2/_tempImport
         // proofRead
-        $proofRead=self::IMPORT_FILES_FOLDER_NAME;
-        $proofReadFolder=$importFolder.DIRECTORY_SEPARATOR.$proofRead;
+        $import = Zend_Registry::get('config')->runtimeOptions->import;
+        
+        $proofReadFolder=$importFolder.'/'.$import->importFilesDirectory;
         
         $taskFolder=str_replace("_tempImport","",$importFolder);
         
-        $okapiDir=$taskFolder.DIRECTORY_SEPARATOR.self::OKAPI_DIRECTORY_NAME.DIRECTORY_SEPARATOR;
-        
-        //create the okapi directory on the disk in the task folder
-        if (!is_dir($okapiDir)) {
-            mkdir($okapiDir, 0777, true);
-        }
-        
-        $refFolder = $importFolder.'/'.$this->config->runtimeOptions->import->referenceDirectory;
+        $refFolder = $taskFolder.'/'.$import->referenceDirectory;
         
         $directory = new RecursiveDirectoryIterator($taskFolder);
         $it= new RecursiveIteratorIterator($directory);
@@ -113,39 +103,16 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             }
             
             if (in_array($fileinfo->getExtension(),$this->okapyFileTypes)) {
-                //$matchFiles[]=$fileinfo->getFilename();
-                //move the files in the okapi directory
-                $tmpDir=basename(dirname($fileinfo->getPathname()));
-                $checkDir="";
-                if($tmpDir!=self::IMPORT_FILES_FOLDER_NAME){
-                    $checkDir=$okapiDir.$tmpDir;
-                    if (!is_dir($checkDir)) {
-                        mkdir($checkDir, 0777, true);
-                    }
-                    $checkDir.=DIRECTORY_SEPARATOR;
-                }
-    
-                if(empty($checkDir)){
-                    $targetDir=$okapiDir.$fileinfo->getFilename();
-                }else{
-                    $targetDir=$checkDir.$fileinfo->getFilename();
-                }
-                
-                rename($fileinfo->getPathname(),$targetDir);
-                
                 //add the match file in the matches array
                 $matchFiles[]=[
                         'fileName'=>$fileinfo->getFilename(),
-                        'filePath'=>$targetDir,
-                        'outputFolder'=>dirname($fileinfo->getPathname())
-                ];;
+                        'filePath'=>$fileinfo->getPathname(),
+                ];
                 continue;
             }
             
             if (in_array($fileinfo->getExtension(),$this->okapyBconf)) {
-                //$matchFiles[]=$fileinfo->getFilename();
-                rename($fileinfo->getPathname(),$okapiDir.$fileinfo->getFilename());
-                $bconfFilePath[]=$okapiDir.$fileinfo->getFilename();
+                $bconfFilePath[]=$fileinfo->getPathname();
                 continue;
             }
         }
@@ -161,7 +128,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         
         foreach ($matchFiles as $file) {
             //FIXME in the worker, we move the files from the okapi dir, to hhe reference files dir, the file need to be on the first level of the refernece files dir
-            $this->queueWorker($file,$bconfFilePath,$okapiDir);
+            $this->queueWorker($file,$bconfFilePath,$refFolder,$proofReadFolder);
         }
     }
 
@@ -174,14 +141,15 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @param string $okapiDir - the path of the okapi dir on the in the task folder
      * @return boolean
      */
-    public function queueWorker($file,$bconfFilePath,$okapiDir){
+    public function queueWorker($file,$bconfFilePath,$refFolder,$proofReadFolder){
         $worker = ZfExtended_Factory::get('editor_Plugins_Okapi_Worker');
         /* @var $worker editor_Plugins_Okapi_Worker */
         
         $params=[
             'file'=>$file,
             'bconfFilePath'=>$bconfFilePath,
-            'okapiDir'=>$okapiDir
+            'refFolder'=>$refFolder,
+            'proofReadFolder'=>$proofReadFolder
         ];
         
         // init worker and queue it
@@ -197,7 +165,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @return string
      */
     private function getDefaultBconf(){
-        return APPLICATION_PATH.DIRECTORY_SEPARATOR.$this->getPluginPath().DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.self::OKAPI_BCONF_DEFAULT_NAME;
+        return APPLICATION_PATH.'/'.$this->getPluginPath().'/'.'data'.'/'.self::OKAPI_BCONF_DEFAULT_NAME;
     }
  
 }
