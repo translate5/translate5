@@ -39,8 +39,25 @@ interface editor_Models_File_IFilter {
     /**
      * Setting the filter manager so that it can be used internally
      * @param editor_Models_File_FilterManager $manager
+     * @param editor_Models_Import_Configuration $importConfig
      */
-    public function setFilterManager(editor_Models_File_FilterManager $manager);
+    public function initFilter(editor_Models_File_FilterManager $manager, editor_Models_Import_Configuration $importConfig = null);
+    
+    /**
+     * @param editor_Models_Task $task
+     * @param integer $fileId
+     * @param string $filePath
+     * @param array $parameters
+     * @return the filename of the file (can be changed internally for further processing)
+     */
     public function applyImportFilter(editor_Models_Task $task, $fileId, $filePath, $parameters);
+    
+    /**
+     * @param editor_Models_Task $task
+     * @param integer $fileId
+     * @param string $filePath
+     * @param array $parameters
+     * @return the filename of the file (can be changed internally for further processing)
+     */
     public function applyExportFilter(editor_Models_Task $task, $fileId, $filePath, $parameters);
 }

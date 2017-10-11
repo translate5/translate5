@@ -45,6 +45,11 @@ class editor_Models_File_FilterManager {
     protected $task;
     
     /**
+     * @var editor_Models_Import_Configuration
+     */
+    protected $importConfig;
+    
+    /**
      * currently loaded filter definitions per fileId
      * @var array
      */
@@ -53,9 +58,27 @@ class editor_Models_File_FilterManager {
     /**
      * loads all file filters for a given task
      * @param editor_Models_Task $task
-     * @param unknown $type
+     * @param editor_Models_Import_Configuration $importConfig
      */
-    public function init(editor_Models_Task $task, $type) {
+    public function initImport(editor_Models_Task $task, editor_Models_Import_Configuration $importConfig) {
+        $this->importConfig = $importConfig;
+        $this->init($task, self::TYPE_IMPORT);
+    }
+    
+    /**
+     * loads all file filters for a given task
+     * @param editor_Models_Task $task
+     */
+    public function initExport(editor_Models_Task $task) {
+        $this->init($task, self::TYPE_EXPORT);
+    }
+    
+    /**
+     * loads all file filters for a given task
+     * @param editor_Models_Task $task
+     * @param string $type
+     */
+    protected function init(editor_Models_Task $task, $type) {
         $this->task = $task;
         $filter = ZfExtended_Factory::get('editor_Models_File_Filter');
         /* @var $filter editor_Models_File_Filter */
@@ -71,8 +94,9 @@ class editor_Models_File_FilterManager {
      * @param string $path
      * @param integer $fileId
      */
-    public function applyImportFilters($path, $fileId) {
-        $this->applyFilters(self::TYPE_IMPORT, $path, $fileId);
+    public function applyImportFilters($path, $fileId, array &$filelist) {
+        $filelist[$fileId] = $this->applyFilters(self::TYPE_IMPORT, $path, $fileId);
+        
     }
     
     /**
@@ -88,20 +112,22 @@ class editor_Models_File_FilterManager {
      */
     protected function applyFilters($type, string $path, integer $fileId) {
         if(empty($this->filters[$fileId])) {
-            return;
+            return $path;
         }
         $filters = $this->filters[$fileId];
         foreach($filters as $filter) {
             $filterInstance = ZfExtended_Factory::get($filter->filter);
             /* @var $filterInstance editor_Models_File_IFilter */
-            $filterInstance->setFilterManager($this);
+            $filterInstance->initFilter($this, $this->importConfig);
             if($type == self::TYPE_EXPORT) {
                 $filterInstance->applyExportFilter($this->task, $fileId, $path, $filter->parameters);
             }
             else {
-                $filterInstance->applyImportFilter($this->task, $fileId, $path, $filter->parameters);
+                //import filters may change the used file path! Dangerous!
+                $path = $filterInstance->applyImportFilter($this->task, $fileId, $path, $filter->parameters);
             }
         }
+        return $path;
     }
     
     /**

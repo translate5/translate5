@@ -191,7 +191,7 @@ class editor_Models_Import_Worker_Import {
         
         $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
         /* @var $fileFilter editor_Models_File_FilterManager */
-        $fileFilter->init($this->task, $fileFilter::TYPE_IMPORT);
+        $fileFilter->initImport($this->task, $this->importConfig);
         
         $mqmProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_MqmParser', array($this->task, $this->segmentFieldManager));
         $repHash = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_RepetitionHash', array($this->task, $this->segmentFieldManager));
@@ -202,8 +202,10 @@ class editor_Models_Import_Worker_Import {
                 trigger_error('Check of File: '.$this->importConfig->importFolder.DIRECTORY_SEPARATOR.$path);
             }
             $params = $this->getFileparserParams($path, $fileId);
-            $fileFilter->applyImportFilters($params[0], $params[2]);
-            $parser = $this->getFileParser($path, $params);
+            $fileFilter->applyImportFilters($params[0], $params[2], $filelist);
+            //filepath could be changed by the file filter, so reset:
+            $params[0] = $filelist[$fileId]; 
+            $parser = $this->getFileParser($params[0], $params);
             /* @var $parser editor_Models_Import_FileParser */
             $segProc->setSegmentFile($fileId, $params[1]); //$params[1] => filename
             $parser->addSegmentProcessor($mqmProc);

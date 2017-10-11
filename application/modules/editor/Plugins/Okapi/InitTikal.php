@@ -30,17 +30,24 @@ END LICENSE AND COPYRIGHT
 /**
  * FileManager Test Plugin
  */
-class editor_Plugins_OkapiTikal_Filter implements editor_Models_File_IFilter {
-    protected $manager;
-    public function setFilterManager(editor_Models_File_FilterManager $manager) {
-        $this->manager = $manager;
+class editor_Plugins_Okapi_InitTikal extends ZfExtended_Plugin_Abstract {
+    
+    private $okapyFileTypes = array(
+            'html',
+            'odt'
+    );
+    
+    public function init() {
+        $this->eventManager->attach('editor_Models_Import_Worker_Import', 'afterDirectoryParsing', array($this, 'handleBeforeImport'));
     }
-    public function applyImportFilter(editor_Models_Task $task, $fileId, $filePath, $parameters){
-        $m = $this->manager;
-        //DUMMY code if import was successfull (here always), then add the export filter:
-        $this->manager->addFilter($m::TYPE_EXPORT, $task, $fileId, get_class($this));
-    }
-    public function applyExportFilter(editor_Models_Task $task, $fileId, $filePath, $parameters){
-        error_log("Doing nasty things with file: ".$filePath);
+    
+    public function handleBeforeImport(Zend_EventManager_Event $event) {
+        $params = $event->getParams();
+        
+        $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
+        /* @var $fileFilter editor_Models_File_FilterManager */
+        foreach($params['filelist'] as $fileId => $relName) {
+            $fileFilter->addFilter($fileFilter::TYPE_IMPORT, $params['task']->getTaskGuid(), $fileId, 'editor_Plugins_Okapi_Tikal_Filter');
+        }
     }
 }

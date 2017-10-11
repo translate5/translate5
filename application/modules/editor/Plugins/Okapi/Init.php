@@ -137,7 +137,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
         /* @var $fileFilter editor_Models_File_FilterManager */
 
-        $fileFilter->addFilter($fileFilter::TYPE_EXPORT, $file->getTaskGuid(), $file->getId(), 'editor_Plugins_Okapi_FileFilter');
+        $fileFilter->addFilter($fileFilter::TYPE_EXPORT, $file->getTaskGuid(), $file->getId(), 'editor_Plugins_Okapi_Tikal_Filter');
     }
 
     public function handleFiles($importFolder){

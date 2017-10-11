@@ -162,6 +162,17 @@ class editor_Models_Import_Configuration {
     }
     
     /**
+     * returns the absolute path (incl. import root) to the reference files 
+     * @return string
+     */
+    public function getReferenceFilesDir() {
+        $config = Zend_Registry::get('config');
+        $prefix = $this->importFolder;
+        $refDir = $config->runtimeOptions->import->referenceDirectory;
+        return $refDir == '' ? $prefix : $prefix.DIRECTORY_SEPARATOR.$refDir; 
+    }
+    
+    /**
      * validiert / filtert die Get-Werte
      * @throws Zend_Exception
      */

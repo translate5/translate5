@@ -99,7 +99,7 @@ class editor_Models_Export {
         
         $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
         /* @var $fileFilter editor_Models_File_FilterManager */
-        $fileFilter->init($this->task, $fileFilter::TYPE_EXPORT);
+        $fileFilter->initExport($this->task);
         
         sort($dirPaths);
         foreach ($dirPaths as $path) {
