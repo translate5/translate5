@@ -76,18 +76,23 @@ trait editor_Models_Import_FileParser_TagTrait {
      * @var array
      */
     protected $protectedUnicodeList = [
-        '"\x{0009}"u', //Hex UTF-8 bytes or codepoint of horizontal tab
-        '"\x{000B}"u', //Hex UTF-8 bytes or codepoint of vertical tab
-        '"\x{000C}"u', //Hex UTF-8 bytes or codepoint of page feed
-        '"\x{0085}"u', //Hex UTF-8 bytes or codepoint of control sign for next line
-        '"\x{00A0}"u', //Hex UTF-8 bytes or codepoint of protected space
-        '"\x{1680}"u', //Hex UTF-8 bytes or codepoint of Ogam space
-        '"\x{180E}"u', //Hex UTF-8 bytes or codepoint of mongol vocal divider
-        '"\x{2028}"u', //Hex UTF-8 bytes or codepoint of line separator
-        '"\x{202F}"u', //Hex UTF-8 bytes or codepoint of small protected space
-        '"\x{205F}"u', //Hex UTF-8 bytes or codepoint of middle mathematical space
-        '"\x{3000}"u', //Hex UTF-8 bytes or codepoint of ideographic space
-        '"[\x{2000}-\x{200A}]"u', //Hex UTF-8 bytes or codepoint of eleven different small spaces, Haarspatium and em space
+        '/\p{Co}/u', //Alle private use chars
+        '/\x{2028}/u', //Hex UTF-8 bytes or codepoint 	E2 80 A8//schutzbedürftiger Whitespace + von mssql nicht vertragen
+        '/\x{2029}/u', //Hex UTF-8 bytes 	E2 80 A9//schutzbedürftiger Whitespace + von mssql nicht vertragen
+        //we do not escape that any more - mssql not in use '"\x{201E}"u', //Hex UTF-8 bytes 	E2 80 9E //von mssql nicht vertragen
+        //we do not escape that any more - mssql not in use '"\x{201C}"u' //Hex UTF-8 bytes 	E2 80 9C//von mssql nicht vertragen
+        '/\x{0009}/u', //Hex UTF-8 bytes or codepoint of horizontal tab
+        '/\x{000B}/u', //Hex UTF-8 bytes or codepoint of vertical tab
+        '/\x{000C}/u', //Hex UTF-8 bytes or codepoint of page feed
+        '/\x{0085}/u', //Hex UTF-8 bytes or codepoint of control sign for next line
+        '/\x{00A0}/u', //Hex UTF-8 bytes or codepoint of protected space
+        '/\x{1680}/u', //Hex UTF-8 bytes or codepoint of Ogam space
+        '/\x{180E}/u', //Hex UTF-8 bytes or codepoint of mongol vocal divider
+        '/\x{2028}/u', //Hex UTF-8 bytes or codepoint of line separator
+        '/\x{202F}/u', //Hex UTF-8 bytes or codepoint of small protected space
+        '/\x{205F}/u', //Hex UTF-8 bytes or codepoint of middle mathematical space
+        '/\x{3000}/u', //Hex UTF-8 bytes or codepoint of ideographic space
+        '/[\x{2000}-\x{200A}]/u', //Hex UTF-8 bytes or codepoint of eleven different small spaces, Haarspatium and em space
     ]; //Hex UTF-8 bytes 	E2 80 9C//von mssql nicht vertragen
     
     /**
@@ -105,11 +110,12 @@ trait editor_Models_Import_FileParser_TagTrait {
      * defines the GUI representation of internal used tags for masking special characters  
      * @var array
      */
-    protected $_tagMapping = array(
-        'hardReturn' => array('text' => '&lt;hardReturn/&gt;', 'imgText' => '<hardReturn/>'),
-        'softReturn' => array('text' => '&lt;softReturn/&gt;', 'imgText' => '<softReturn/>'),
-        'macReturn' => array('text' => '&lt;macReturn/&gt;', 'imgText' => '<macReturn/>'),
-        'space' => array('text' => '&lt;space/&gt;', 'imgText' => '<space/>'));
+    protected $_tagMapping = [
+        'hardReturn' => ['text' => '&lt;hardReturn/&gt;', 'imgText' => '<hardReturn/>'],
+        'softReturn' => ['text' => '&lt;softReturn/&gt;', 'imgText' => '<softReturn/>'],
+        'macReturn' => ['text' => '&lt;macReturn/&gt;', 'imgText' => '<macReturn/>'],
+        'space' => ['text' => '&lt;space/&gt;', 'imgText' => '<space/>'],
+    ];
 
     /**
      * to be called in the constructors

@@ -167,36 +167,6 @@ abstract class editor_Models_Import_FileParser {
         return false;
     }
     
-    /**
-     * Das Leerzeichen (U+0020)
-     * Schützt Zeichenketten, die im sdlxliff enthalten sind und aus einer
-     * Unicode Private Use Area oder bestimmten schutzwürdigen Whitespaces oder
-     * von mssql nicht verkrafteten Zeichen stammen mit einem Tag
-     *
-     */
-    protected function protectUnicodeSpecialChars() {
-        $this->_origFileUnicodeProtected = preg_replace_callback(
-                array('"\p{Co}"u', //Alle private use chars
-            '"\x{2028}"u', //Hex UTF-8 bytes or codepoint 	E2 80 A8//schutzbedürftiger Whitespace + von mssql nicht vertragen
-            '"\x{2029}"u', //Hex UTF-8 bytes 	E2 80 A9//schutzbedürftiger Whitespace + von mssql nicht vertragen
-            //we do not escape that any more - mssql not in use '"\x{201E}"u', //Hex UTF-8 bytes 	E2 80 9E //von mssql nicht vertragen
-            //we do not escape that any more - mssql not in use '"\x{201C}"u' //Hex UTF-8 bytes 	E2 80 9C//von mssql nicht vertragen
-            ), 
-                function ($match) {
-                    return '<unicodePrivateUseArea ts="' . implode(',', unpack('H*', $match[0])) . '"/>';
-                }, $this->_origFile);
-        $this->_origFileUnicodeSpecialCharsRemoved = preg_replace_callback(
-                array('"\p{Co}"u', //Alle private use chars
-            '"\x{2028}"u', //Hex UTF-8 bytes 	E2 80 A8//schutzbedürftiger Whitespace + von mssql nicht vertragen
-            '"\x{2029}"u', //Hex UTF-8 bytes 	E2 80 A9//schutzbedürftiger Whitespace + von mssql nicht vertragen
-            //we do not escape that any more - mssql not in use '"\x{201E}"u', //Hex UTF-8 bytes 	E2 80 9E //von mssql nicht vertragen
-            //we do not escape that any more - mssql not in use '"\x{201C}"u' //Hex UTF-8 bytes 	E2 80 9C//von mssql nicht vertragen
-            ), 
-                function ($match) {
-                    return '';
-                }, $this->_origFile);
-    }
-    
     public function addSegmentProcessor(editor_Models_Import_SegmentProcessor $proc){
         $this->segmentProcessor[] = $proc;
     }
