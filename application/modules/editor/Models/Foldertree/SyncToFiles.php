@@ -159,10 +159,15 @@ class editor_Models_Foldertree_SyncToFiles {
     }
     $this->file->save();
 
-    //also a new event afterFileSave with parameters file, node
-    // in the event listener we add a new FileFilter for nodes where okapi is true
-    
     $node->id = $this->file->getId();
+
+    //fire event after the file is saved
+    $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
+    /* @var $eventManager ZfExtended_EventManager */
+    $eventManager->trigger('afterImportfileSave', $this, array(
+            'node' => $node,
+            'file'=>$this->file
+    ));
   }
 
   /**

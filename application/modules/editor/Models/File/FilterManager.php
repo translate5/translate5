@@ -107,15 +107,15 @@ class editor_Models_File_FilterManager {
     /**
      * Adds the given file filter for the given file
      * @param string $type
-     * @param editor_Models_Task $task
+     * @param string $taskGuid
      * @param integer $fileId
      * @param string $filterClass
      */
-    public function addFilter($type, editor_Models_Task $task, $fileId, $filterClass) {
+    public function addFilter($type,$taskGuid, $fileId, $filterClass) {
         $filter = ZfExtended_Factory::get('editor_Models_File_Filter');
         /* @var $filter editor_Models_File_Filter */
         $filter->setFileId($fileId);
-        $filter->setTaskGuid($task->getTaskGuid());
+        $filter->setTaskGuid($taskGuid);
         $filter->setFilter($filterClass);
         $filter->setType($type);
         $filter->save();

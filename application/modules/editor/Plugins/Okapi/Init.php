@@ -43,7 +43,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * 
      * @var array
      */
-    private $okapyFileTypes = array(
+    private $okapiFileTypes = array(
             'html'
     );
     
@@ -51,7 +51,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * The okapi config file-types
      * @var array
      */
-    private $okapyBconf= array(
+    private $okapiBconf= array(
             'bconf'
     );
 
@@ -82,11 +82,33 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     protected function initEvents() {
         $this->eventManager->attach('editor_Models_Import', 'beforeImport', array($this, 'handleBeforeImport'));
         $this->eventManager->attach('editor_Models_Import_DirectoryParser_WorkingFiles', 'beforeFileNodeCreate', array($this, 'handleBeforeFileNodeCreate'));
+        $this->eventManager->attach('editor_Models_Foldertree_SyncToFiles', 'afterImportfileSave', array($this, 'handleAfterImportfileSave'));
     }
 
-    public function beforeFileNodeCreate(Zend_EventManager_Event $event) {
+    /***
+     * Find the files from type okapi, so the okapi file extenssion is removed from the file on the disk.
+     * This is done so we can know for which files we need to add export/import post processing
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleBeforeFileNodeCreate(Zend_EventManager_Event $event) {
         $params = $event->getParams();
         $node=$params['node'];
+        
+        //check if the file has .okapi extenssion
+        if($this->isOkapiGeneratedFile($node->filename)){
+            
+            $filePath=$params['filePath'];
+            
+            $replacePath=str_replace('.okapi', '', $filePath);
+            $newFileName=str_replace('.okapi', '', $node->filename);
+            
+            //rename the file
+            rename($filePath, $replacePath);
+            
+            $node->isOkapiFile=true;
+            $node->filename=$newFileName;
+            $node->path=$replacePath;
+        }
     }
     
     public function handleBeforeImport(Zend_EventManager_Event $event) {
@@ -96,6 +118,26 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $this->task=$task;
         //$this->moveFilesToTempImport($importFolder);
         $this->handleFiles($importFolder);
+    }
+    
+    /***
+     * For files from okapi filetype add a filefilter
+     * 
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleAfterImportfileSave(Zend_EventManager_Event $event) {
+        $params = $event->getParams();
+        $node=$params['node'];
+        $file=$params['file'];
+        
+        if(!isset($node->isOkapiFile) || !$node->isOkapiFile){
+            return;
+        }
+        
+        $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
+        /* @var $fileFilter editor_Models_File_FilterManager */
+
+        $fileFilter->addFilter($fileFilter::TYPE_EXPORT, $file->getTaskGuid(), $file->getId(), 'editor_Plugins_Okapi_FileFilter');
     }
 
     public function handleFiles($importFolder){
@@ -122,7 +164,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 continue;
             }
             
-            if (in_array($fileinfo->getExtension(),$this->okapyFileTypes)) {
+            if (in_array($fileinfo->getExtension(),$this->okapiFileTypes)) {
                 //add the match file in the matches array
                 $matchFiles[]=[
                         'fileName'=>$fileinfo->getFilename(),
@@ -131,7 +173,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 continue;
             }
             
-            if (in_array($fileinfo->getExtension(),$this->okapyBconf)) {
+            if (in_array($fileinfo->getExtension(),$this->okapiBconf)) {
                 $bconfFilePath[]=$fileinfo->getPathname();
                 continue;
             }
@@ -187,6 +229,11 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      */
     private function getDefaultBconf(){
         return APPLICATION_PATH.'/'.$this->getPluginPath().'/'.'data'.'/'.self::OKAPI_BCONF_DEFAULT_NAME;
+    }
+    
+    public function isOkapiGeneratedFile($filename){
+        $retVal=substr($filename, -strlen(editor_Plugins_Okapi_Connector::OKAPI_FILE_EXTENSION));
+        return $retVal=== editor_Plugins_Okapi_Connector::OKAPI_FILE_EXTENSION;
     }
  
 }
