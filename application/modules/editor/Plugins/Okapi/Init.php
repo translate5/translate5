@@ -182,7 +182,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $taskFolder=str_replace("_tempImport","",$importFolder);
         
         //reference files directory path
-        $refFolder = $taskFolder.$import->referenceDirectory;
+        $refFolder = $importFolder.'/'.$import->referenceDirectory;
         
         $directory = new RecursiveDirectoryIterator($taskFolder);
         $it= new RecursiveIteratorIterator($directory);

@@ -81,12 +81,10 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             rename($oldName, $newName);
             
         }catch (Exception $e){
-            //taskGuid, fileName/Path where the error happens
             $this->log->logError('Okapi Error: Error on converting a file. Task: '.$taskGuid.'; File: '.print_r($file, 1).'; Error was: '.$e);
         }finally {
             $this->api->removeProject();
         }
-
         return true;
     }
 }
