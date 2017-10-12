@@ -44,7 +44,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @var array
      */
     private $okapiFileTypes = array(
-            'html'
+            'html' => ['text/html'],
     );
     
     /***
@@ -83,6 +83,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('editor_Models_Import', 'beforeImport', array($this, 'handleBeforeImport'));
         $this->eventManager->attach('editor_Models_Import_DirectoryParser_WorkingFiles', 'beforeFileNodeCreate', array($this, 'handleBeforeFileNodeCreate'));
         $this->eventManager->attach('editor_Models_Foldertree_SyncToFiles', 'afterImportfileSave', array($this, 'handleAfterImportfileSave'));
+        $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
     }
 
     /***
@@ -140,7 +141,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $fileFilter->addFilter($fileFilter::TYPE_EXPORT, $file->getTaskGuid(), $file->getId(), 'editor_Plugins_Okapi_Tikal_Filter');
     }
 
-    public function handleFiles($importFolder){
+    protected function handleFiles($importFolder){
         $import = Zend_Registry::get('config')->runtimeOptions->import;
         
         //proofread folder
@@ -160,11 +161,13 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         
         //find all files supported by okapi and move them in the okapi directory
         foreach ($it as $fileinfo) {
+            /* @var $fileinfo SplFileInfo */
+            $extension = strtolower($fileinfo->getExtension());
             if(!$fileinfo->isFile()){
                 continue;
             }
             
-            if (in_array($fileinfo->getExtension(),$this->okapiFileTypes)) {
+            if (in_array($extension,array_keys($this->okapiFileTypes))) {
                 //add the match file in the matches array
                 $matchFiles[]=[
                         'fileName'=>$fileinfo->getFilename(),
@@ -173,7 +176,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 continue;
             }
             
-            if (in_array($fileinfo->getExtension(),$this->okapiBconf)) {
+            if (in_array($extension,$this->okapiBconf)) {
                 $bconfFilePath[]=$fileinfo->getPathname();
                 continue;
             }
@@ -231,9 +234,21 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         return APPLICATION_PATH.'/'.$this->getPluginPath().'/'.'data'.'/'.self::OKAPI_BCONF_DEFAULT_NAME;
     }
     
-    public function isOkapiGeneratedFile($filename){
+    protected function isOkapiGeneratedFile($filename){
         $retVal=substr($filename, -strlen(editor_Plugins_Okapi_Connector::OKAPI_FILE_EXTENSION));
         return $retVal=== editor_Plugins_Okapi_Connector::OKAPI_FILE_EXTENSION;
     }
  
+    /**
+     * Injecting the valid file extensions in the frontend for propper file filtering in upload dialog
+     * @param Zend_EventManager_Event $event
+     */
+    public function injectFrontendConfig(Zend_EventManager_Event $event) {
+        $view = $event->getParam('view');
+        //get existing valid extensions
+        $extensions = $view->Php2JsVars()->get('import.validExtensions');
+        //merge okapi ones (For Okapi Longhorn usage only needed in the frontend, all other places (WorkingFiles etc) are getting XLF already)
+        $extensions = array_unique(array_merge($extensions, array_keys($this->okapiFileTypes)));
+        $this->view->Php2JsVars()->set('import.validExtensions', $extensions);
+    }
 }
