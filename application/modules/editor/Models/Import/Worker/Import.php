@@ -119,7 +119,7 @@ class editor_Models_Import_Worker_Import {
         /* @var $workflowManager editor_Workflow_Manager */
         $workflowManager->initDefaultUserPrefs($this->task);
         
-        $this->events->trigger('importCleanup', $this, array('task' => $task));
+        $this->events->trigger('importCleanup', $this, array('task' => $task, 'importConfig' => $importConfig));
     }
     
     /**

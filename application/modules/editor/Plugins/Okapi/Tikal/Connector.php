@@ -110,13 +110,14 @@ class editor_Plugins_Okapi_Tikal_Connector {
         $origPath = substr($path, 0, -4);
         
         $taskPath = $this->task->getAbsoluteTaskDataPath();
-        $refDir = $taskPath.DIRECTORY_SEPARATOR.$this->config->runtimeOptions->import->referenceDirectory;
+        $refDirConf = $this->config->runtimeOptions->import->referenceDirectory;
+        $refDir = $taskPath.DIRECTORY_SEPARATOR.$refDirConf;
         
         //remove absPrefix path:
         $relPath = str_replace($taskPath, '', $origPath);
         
         //replace taskGuid (the export dir) with refDir
-        $refPath = str_replace($this->task->getTaskGuid(), $config->runtimeOptions->import->referenceDirectory, $relPath);
+        $refPath = str_replace($this->task->getTaskGuid(), $refDirConf, $relPath);
         
         copy($taskPath.$refPath, $origPath);
         

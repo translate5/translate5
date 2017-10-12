@@ -72,7 +72,7 @@ class editor_Models_Import_Worker extends editor_Models_Import_Worker_Abstract {
             //@see editor_Models_Import::triggerAfterImport
             $externalImport = ZfExtended_Factory::get('editor_Models_Import');
             /* @var $externalImport editor_Models_Import */
-            $externalImport->triggerAfterImport($task, (int) $this->workerModel->getId());
+            $externalImport->triggerAfterImport($task, (int) $this->workerModel->getId(), $parameters['config']);
             return true;
         } catch (Exception $e) {
             $task->setErroneous();

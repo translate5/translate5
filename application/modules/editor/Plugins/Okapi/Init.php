@@ -64,8 +64,10 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     const OKAPI_BCONF_DEFAULT_NAME='okapi_default_import.bconf';
     
     
+    /**
+     * @var editor_Models_Task
+     */
     private $task;
-    /* @var $task editor_Models_Task */
 
     protected $localePath = 'locales';
     
@@ -87,6 +89,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     
     protected function initEvents() {
         $this->eventManager->attach('editor_Models_Import', 'beforeImport', array($this, 'handleBeforeImport'));
+        $this->eventManager->attach('editor_Models_Import_Worker_Import', 'importCleanup', array($this, 'handleAfterImport'));
         $this->eventManager->attach('editor_Models_Import_DirectoryParser_WorkingFiles', 'beforeFileNodeCreate', array($this, 'handleBeforeFileNodeCreate'));
         $this->eventManager->attach('editor_Models_Foldertree_SyncToFiles', 'afterImportfileSave', array($this, 'handleAfterImportfileSave'));
     }
@@ -129,6 +132,19 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $this->task=$task;
         //$this->moveFilesToTempImport($importFolder);
         $this->handleFiles($importFolder);
+    }
+    
+    /**
+     * Archives the temporary data folder again after converting the files with okapi
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleAfterImport(Zend_EventManager_Event $event) {
+        $config = $event->getParam('importConfig');
+        /* @var $config editor_Models_Import_Configuration */
+        $directoryProvider = ZfExtended_Factory::get('editor_Models_Import_DataProvider_Directory', [$config->importFolder]);
+        /* @var $directoryProvider editor_Models_Import_DataProvider_Directory */
+        $directoryProvider->setTask($event->getParam('task'));
+        $directoryProvider->archiveImportedData('OkapiArchive.zip');
     }
     
     /***
