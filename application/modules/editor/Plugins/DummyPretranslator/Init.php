@@ -77,9 +77,12 @@ class editor_Plugins_DummyPretranslator_Init extends ZfExtended_Plugin_Abstract 
             $placeHolder[$id] = $matches[0];
             return $id;
         });
-        $source = preg_replace('/(<tag-[0-9]+>)?([a-z])/', '$1x', $source);
-        $source = preg_replace('/(<tag-[0-9]+>)?([A-Z])/', '$1X', $source);
-        $source = str_replace(array_keys($placeHolder), array_values($placeHolder), $source);
-        return $source;
+        $split = preg_split('/(<tag-[0-9]+>)/', $source, null, PREG_SPLIT_DELIM_CAPTURE);
+        $max = count($split);
+        
+        for($i = 0; $i < $max; $i = $i+2) {
+            $split[$i] = str_rot13($split[$i]);
+        }
+        return str_replace(array_keys($placeHolder), array_values($placeHolder), join($split));
     }
 }
