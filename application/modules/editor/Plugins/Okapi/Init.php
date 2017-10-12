@@ -31,13 +31,6 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     
-    /**
-     * Contains the Plugin Path relativ to APPLICATION_PATH or absolut if not under APPLICATION_PATH
-     * @var array
-     */
-    protected $frontendControllers = array(
-    );
-    
     /***
      * Supported file-types by okapi
      * 
@@ -70,12 +63,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      */
     private $task;
 
-    protected $localePath = 'locales';
-    
-    public function getFrontendControllers() {
-        return $this->getFrontendControllersFromAcl();
-    }
-    
     public function init() {
         if(ZfExtended_Debug::hasLevel('plugin', 'Okapi')) {
             ZfExtended_Factory::addOverwrite('Zend_Http_Client', 'ZfExtended_Zendoverwrites_Http_DebugClient');
