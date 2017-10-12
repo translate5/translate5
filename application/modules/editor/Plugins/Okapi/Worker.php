@@ -40,9 +40,6 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        //if(empty($parameters['tmmtId'])) {
-        //    return false;
-        //}
         return true;
     } 
     
@@ -55,6 +52,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
         $file=$params['file'];
         $refFolder=$params['refFolder'];
         $proofReadFolder=$params['proofReadFolder'];
+        $taskGuid=$params['taskGuid'];
         
         $this->api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
         $this->api->setBconfFilePath($params['bconfFilePath']);
@@ -84,9 +82,9 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             
         }catch (Exception $e){
             //taskGuid, fileName/Path where the error happens
-            $this->log->logError('Error happend while converting the file. Error was: '.$e->getMessage());
+            $this->log->logError('Error happend while converting the file. File name: '.$file['fileName'].' , file path: '.$file['filePath'].' , taskGuid: '.$taskGuid.' .Error was: '.$e->getMessage());
         }finally {
-            //$this->api->removeProject();
+            $this->api->removeProject();
         }
 
         return true;

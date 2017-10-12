@@ -111,6 +111,11 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         }
     }
     
+    /***
+     * Hook on the before import event and check the import files
+     * 
+     * @param Zend_EventManager_Event $event
+     */
     public function handleBeforeImport(Zend_EventManager_Event $event) {
         $params = $event->getParams();
         $importFolder=$params['importFolder'];
@@ -121,7 +126,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     }
     
     /***
-     * For files from okapi filetype add a filefilter
+     * Add export file filter to files with okapi extension
      * 
      * @param Zend_EventManager_Event $event
      */
@@ -140,11 +145,16 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $fileFilter->addFilter($fileFilter::TYPE_EXPORT, $file->getTaskGuid(), $file->getId(), 'editor_Plugins_Okapi_Tikal_Filter');
     }
 
+    /***
+     * Find all files which can be handled by okapi and start a worker so thay are converted by okapi
+     * 
+     * @param string $importFolder - tmp import directory path on disk
+     */
     public function handleFiles($importFolder){
         $import = Zend_Registry::get('config')->runtimeOptions->import;
         
         //proofread folder
-        $proofReadFolder=$importFolder.'/'.$import->importFilesDirectory;
+        $proofReadFolder=$importFolder.'/'.$import->proofReadDirectory;
         
         //the task folder
         $taskFolder=str_replace("_tempImport","",$importFolder);
@@ -188,8 +198,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             $bconfFilePath[]=$this->getDefaultBconf();
         }
         
+        //for each match file, run a okapi worker
         foreach ($matchFiles as $file) {
-            //FIXME in the worker, we move the files from the okapi dir, to hhe reference files dir, the file need to be on the first level of the refernece files dir
             $this->queueWorker($file,$bconfFilePath,$refFolder,$proofReadFolder);
         }
     }
@@ -212,7 +222,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             'file'=>$file,
             'bconfFilePath'=>$bconfFilePath,
             'refFolder'=>$refFolder,
-            'proofReadFolder'=>$proofReadFolder
+            'proofReadFolder'=>$proofReadFolder,
+            'taskGuid'=>$this->task->getTaskGuid()
         ];
         
         // init worker and queue it

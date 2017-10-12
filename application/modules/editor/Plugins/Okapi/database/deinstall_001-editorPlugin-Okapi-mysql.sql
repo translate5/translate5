@@ -37,4 +37,4 @@ DELETE FROM `Zf_configuration`
 WHERE `name` = 'runtimeOptions.plugins.Okapi.api.url';
 
 DELETE FROM `Zf_configuration` 
-WHERE `name` = 'runtimeOptions.import.importFilesDirectory';
+WHERE `name` = 'runtimeOptions.plugins.Okapi.tikal.executable';
