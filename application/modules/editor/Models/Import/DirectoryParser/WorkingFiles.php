@@ -73,7 +73,9 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
   protected $exceptionOnNoFilesFound = true;
   
   public function __construct() {
-      $this->_importExtensionList = array_keys(editor_Models_Import_FileParser::getAllFileParsersMap());
+      $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
+      /* @var $supportedFiles editor_Models_Import_SupportedFileTypes */
+      $this->_importExtensionList = array_keys($supportedFiles->getSupportedTypes());
   }
   
   /**

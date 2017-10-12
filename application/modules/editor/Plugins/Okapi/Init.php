@@ -45,6 +45,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      */
     private $okapiFileTypes = array(
             'html' => ['text/html'],
+            'htm' => ['text/html'],
     );
     
     /***
@@ -75,6 +76,11 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     public function init() {
         if(ZfExtended_Debug::hasLevel('plugin', 'Okapi')) {
             ZfExtended_Factory::addOverwrite('Zend_Http_Client', 'ZfExtended_Zendoverwrites_Http_DebugClient');
+        }
+        $fileTypes = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
+        /* @var $fileTypes editor_Models_Import_SupportedFileTypes */
+        foreach ($this->okapiFileTypes as $ext => $mimes) {
+            $fileTypes->register($ext, $mimes);
         }
         $this->initEvents();
     }
@@ -246,9 +252,10 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     public function injectFrontendConfig(Zend_EventManager_Event $event) {
         $view = $event->getParam('view');
         //get existing valid extensions
-        $extensions = $view->Php2JsVars()->get('import.validExtensions');
+        $extensions = $view->Php2JsVars()->get('import')->validExtensions;
         //merge okapi ones (For Okapi Longhorn usage only needed in the frontend, all other places (WorkingFiles etc) are getting XLF already)
         $extensions = array_unique(array_merge($extensions, array_keys($this->okapiFileTypes)));
-        $this->view->Php2JsVars()->set('import.validExtensions', $extensions);
+        error_log(print_r($extensions,1));
+        $view->Php2JsVars()->set('import.validExtensions', $extensions);
     }
 }
