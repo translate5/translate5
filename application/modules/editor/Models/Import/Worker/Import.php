@@ -75,10 +75,9 @@ class editor_Models_Import_Worker_Import {
     protected $events;
     
     /**
-     * Mapping between file extension and corresponding fileparser 
-     * @var array
+     * @var editor_Models_Import_SupportedFileTypes
      */
-    protected $fileParsers = [];
+    protected $supportedFiles;
 
     
     public function __construct() {
@@ -88,7 +87,7 @@ class editor_Models_Import_Worker_Import {
         //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         
-        $this->initFileParsers();
+        $this->supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
     }
     
     /**
@@ -121,13 +120,6 @@ class editor_Models_Import_Worker_Import {
         $workflowManager->initDefaultUserPrefs($this->task);
         
         $this->events->trigger('importCleanup', $this, array('task' => $task));
-    }
-    
-    /**
-     * Loads a mapping of file extensions to possible fileparsers 
-     */
-    protected function initFileParsers() {
-        $this->fileParsers = editor_Models_Import_FileParser::getAllFileParsersMap();
     }
     
     /**
@@ -255,10 +247,8 @@ class editor_Models_Import_Worker_Import {
      */
     protected function getFileParser(string $path,array $params){
         $ext = strtolower(preg_replace('".*\.([^.]*)$"i', '\\1', $path));
-        if(empty($this->fileParsers[$ext])) {
-            throw new Zend_Exception('For the fileextension "'.$ext.'" no parser is registered. Available parsers: '.print_r($this->fileParsers,1));
-        }
-        $parser = ZfExtended_Factory::get($this->fileParsers[$ext],$params)->getChainedParser();
+        $parserClass = $this->supportedFiles->getParser($ext);
+        $parser = ZfExtended_Factory::get($parserClass,$params)->getChainedParser();
         /* var $parser editor_Models_Import_FileParser */
         $parser->setSegmentFieldManager($this->segmentFieldManager);
         return $parser;

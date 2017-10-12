@@ -44,7 +44,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @var array
      */
     private $okapiFileTypes = array(
-            'html'
+            'html' => ['text/html'],
+            'htm' => ['text/html'],
     );
     
     /***
@@ -75,6 +76,11 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     public function init() {
         if(ZfExtended_Debug::hasLevel('plugin', 'Okapi')) {
             ZfExtended_Factory::addOverwrite('Zend_Http_Client', 'ZfExtended_Zendoverwrites_Http_DebugClient');
+        }
+        $fileTypes = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
+        /* @var $fileTypes editor_Models_Import_SupportedFileTypes */
+        foreach ($this->okapiFileTypes as $ext => $mimes) {
+            $fileTypes->register($ext, $mimes);
         }
         $this->initEvents();
     }
@@ -150,7 +156,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * 
      * @param string $importFolder - tmp import directory path on disk
      */
-    public function handleFiles($importFolder){
+    protected function handleFiles($importFolder){
         $import = Zend_Registry::get('config')->runtimeOptions->import;
         
         //proofread folder
@@ -170,11 +176,13 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         
         //find all files supported by okapi and move them in the okapi directory
         foreach ($it as $fileinfo) {
+            /* @var $fileinfo SplFileInfo */
+            $extension = strtolower($fileinfo->getExtension());
             if(!$fileinfo->isFile()){
                 continue;
             }
             
-            if (in_array($fileinfo->getExtension(),$this->okapiFileTypes)) {
+            if (in_array($extension,array_keys($this->okapiFileTypes))) {
                 //add the match file in the matches array
                 $matchFiles[]=[
                         'fileName'=>$fileinfo->getFilename(),
@@ -183,7 +191,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 continue;
             }
             
-            if (in_array($fileinfo->getExtension(),$this->okapiBconf)) {
+            if (in_array($extension,$this->okapiBconf)) {
                 $bconfFilePath[]=$fileinfo->getPathname();
                 continue;
             }
@@ -242,9 +250,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         return APPLICATION_PATH.'/'.$this->getPluginPath().'/'.'data'.'/'.self::OKAPI_BCONF_DEFAULT_NAME;
     }
     
-    public function isOkapiGeneratedFile($filename){
+    protected function isOkapiGeneratedFile($filename){
         $retVal=substr($filename, -strlen(editor_Plugins_Okapi_Connector::OKAPI_FILE_EXTENSION));
         return $retVal=== editor_Plugins_Okapi_Connector::OKAPI_FILE_EXTENSION;
     }
- 
 }
