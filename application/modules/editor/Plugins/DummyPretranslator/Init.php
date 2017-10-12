@@ -80,7 +80,6 @@ class editor_Plugins_DummyPretranslator_Init extends ZfExtended_Plugin_Abstract 
         $source = preg_replace('/(<tag-[0-9]+>)?([a-z])/', '$1x', $source);
         $source = preg_replace('/(<tag-[0-9]+>)?([A-Z])/', '$1X', $source);
         $source = str_replace(array_keys($placeHolder), array_values($placeHolder), $source);
-        error_log(print_r($source,1));
         return $source;
     }
 }
