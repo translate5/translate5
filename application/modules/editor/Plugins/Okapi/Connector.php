@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Connector to Okapi
+ * Upload/download file to okapi server, and converting it to xlf
  * One Connector Instance can contain one Okapi Project
  */
 class editor_Plugins_Okapi_Connector {
@@ -100,7 +100,6 @@ class editor_Plugins_Okapi_Connector {
     private function getHttpClient($url){
         $http = ZfExtended_Factory::get('Zend_Http_Client');
         /* @var $http Zend_Http_Client */
-        
         $http->setUri($url);
         $http->setConfig(array('timeout'=>self::REQUEST_TIMEOUT_SECONDS));
         return $http;
@@ -178,8 +177,8 @@ class editor_Plugins_Okapi_Connector {
         $name=$file['fileName'];
         $filePath=$file['filePath'];
         
-        //in this point the tmp imort is deleted
-        $url=$this->projectUrl.'/inputFiles/'.$name;
+        //we encode the filename, because the okapi api does not support whitespace in files
+        $url=$this->projectUrl.'/inputFiles/'.urlencode($name);
         $http = $this->getHttpClient($url);
         $http->setFileUpload($filePath,'inputFile');
         $response = $http->request('PUT');
@@ -203,7 +202,8 @@ class editor_Plugins_Okapi_Connector {
      */
     public function downloadFile(){
         $file=$this->getImputFile();
-        $url=$this->projectUrl.'/outputFiles/pack1/work/'.$file['fileName'].self::OUTPUT_FILE_EXTENSION;
+        //we encode the filename, because the okapi api does not support whitespace in files
+        $url=$this->projectUrl.'/outputFiles/pack1/work/'.urlencode($file['fileName']).self::OUTPUT_FILE_EXTENSION;
         $http = $this->getHttpClient($url);
         $response = $http->request('GET');
         $responseFile=$this->processResponse($response);
