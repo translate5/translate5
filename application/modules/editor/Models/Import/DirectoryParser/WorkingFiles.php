@@ -73,7 +73,9 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
   protected $exceptionOnNoFilesFound = true;
   
   public function __construct() {
-      $this->_importExtensionList = array_keys(editor_Models_Import_FileParser::getAllFileParsersMap());
+      $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
+      /* @var $supportedFiles editor_Models_Import_SupportedFileTypes */
+      $this->_importExtensionList = array_keys($supportedFiles->getSupportedTypes());
   }
   
   /**
@@ -181,6 +183,16 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
     $node->segmentid = 0;
     $node->segmentgridindex = 0;
     $node->path = $this->rootNode->path.$this->rootNode->filename.'/';
+    
+    
+    //fire event, before the filenode is created/saved to the database
+    $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
+    /* @var $eventManager ZfExtended_EventManager */
+    $eventManager->trigger('beforeFileNodeCreate', $this, array(
+            'node' => $node,
+            'filePath'=>$this->filenames[$node->filename]
+    ));
+    
     return $node;
   }
   
