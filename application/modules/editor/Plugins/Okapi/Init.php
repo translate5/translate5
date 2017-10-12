@@ -89,7 +89,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('editor_Models_Import', 'beforeImport', array($this, 'handleBeforeImport'));
         $this->eventManager->attach('editor_Models_Import_DirectoryParser_WorkingFiles', 'beforeFileNodeCreate', array($this, 'handleBeforeFileNodeCreate'));
         $this->eventManager->attach('editor_Models_Foldertree_SyncToFiles', 'afterImportfileSave', array($this, 'handleAfterImportfileSave'));
-        $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
     }
 
     /***
@@ -118,6 +117,11 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         }
     }
     
+    /***
+     * Hook on the before import event and check the import files
+     * 
+     * @param Zend_EventManager_Event $event
+     */
     public function handleBeforeImport(Zend_EventManager_Event $event) {
         $params = $event->getParams();
         $importFolder=$params['importFolder'];
@@ -128,7 +132,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     }
     
     /***
-     * For files from okapi filetype add a filefilter
+     * Add export file filter to files with okapi extension
      * 
      * @param Zend_EventManager_Event $event
      */
@@ -147,11 +151,16 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $fileFilter->addFilter($fileFilter::TYPE_EXPORT, $file->getTaskGuid(), $file->getId(), 'editor_Plugins_Okapi_Tikal_Filter');
     }
 
+    /***
+     * Find all files which can be handled by okapi and start a worker so thay are converted by okapi
+     * 
+     * @param string $importFolder - tmp import directory path on disk
+     */
     protected function handleFiles($importFolder){
         $import = Zend_Registry::get('config')->runtimeOptions->import;
         
         //proofread folder
-        $proofReadFolder=$importFolder.'/'.$import->importFilesDirectory;
+        $proofReadFolder=$importFolder.'/'.$import->proofReadDirectory;
         
         //the task folder
         $taskFolder=str_replace("_tempImport","",$importFolder);
@@ -197,8 +206,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             $bconfFilePath[]=$this->getDefaultBconf();
         }
         
+        //for each match file, run a okapi worker
         foreach ($matchFiles as $file) {
-            //FIXME in the worker, we move the files from the okapi dir, to hhe reference files dir, the file need to be on the first level of the refernece files dir
             $this->queueWorker($file,$bconfFilePath,$refFolder,$proofReadFolder);
         }
     }
@@ -221,7 +230,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             'file'=>$file,
             'bconfFilePath'=>$bconfFilePath,
             'refFolder'=>$refFolder,
-            'proofReadFolder'=>$proofReadFolder
+            'proofReadFolder'=>$proofReadFolder,
+            'taskGuid'=>$this->task->getTaskGuid()
         ];
         
         // init worker and queue it
@@ -243,19 +253,5 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     protected function isOkapiGeneratedFile($filename){
         $retVal=substr($filename, -strlen(editor_Plugins_Okapi_Connector::OKAPI_FILE_EXTENSION));
         return $retVal=== editor_Plugins_Okapi_Connector::OKAPI_FILE_EXTENSION;
-    }
- 
-    /**
-     * Injecting the valid file extensions in the frontend for propper file filtering in upload dialog
-     * @param Zend_EventManager_Event $event
-     */
-    public function injectFrontendConfig(Zend_EventManager_Event $event) {
-        $view = $event->getParam('view');
-        //get existing valid extensions
-        $extensions = $view->Php2JsVars()->get('import')->validExtensions;
-        //merge okapi ones (For Okapi Longhorn usage only needed in the frontend, all other places (WorkingFiles etc) are getting XLF already)
-        $extensions = array_unique(array_merge($extensions, array_keys($this->okapiFileTypes)));
-        error_log(print_r($extensions,1));
-        $view->Php2JsVars()->set('import.validExtensions', $extensions);
     }
 }

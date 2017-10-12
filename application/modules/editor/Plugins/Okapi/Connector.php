@@ -51,17 +51,6 @@ class editor_Plugins_Okapi_Connector {
     private $okapiConfig;
     /* @var $config Zend_Config */
     
-    /***
-     * Okapi files with errors
-     */
-    private $filesWithErrors = [];
-    
-    /***
-     * Instance of the current task
-     * 
-     * @var editor_Models_Task
-     */
-    private $m_task;
     
     /***
      * The filepath of the import bconfig file
@@ -146,6 +135,7 @@ class editor_Plugins_Okapi_Connector {
     public function createProject() {
         $http = $this->getHttpClient($this->apiUrl.'projects/new');
         $response = $http->request('POST');
+        $this->processResponse($response);
         $url=$response->getHeader('Location');
         $this->projectUrl= $url;
     }
@@ -158,9 +148,13 @@ class editor_Plugins_Okapi_Connector {
     public function removeProject() {
         $url=$this->projectUrl;
         $http = $this->getHttpClient($url);
-        $result = $http->request('DELETE');
+        $response= $http->request('DELETE');
+        $this->processResponse($response);
     }
     
+    /***
+     * Upload the bconf file
+     */
     public function uploadOkapiConfig(){
         if(empty($this->getBconfFilePath())){
             return;
@@ -170,12 +164,15 @@ class editor_Plugins_Okapi_Connector {
         $http = $this->getHttpClient($url);
         $http->setFileUpload($bconfFilePath[0], 'batchConfiguration');
         $response = $http->request('POST');
-        //$this->processResponse($response);
+        $this->processResponse($response);
     }
     
+    /***
+     * Upload the source file(the file which will be converted)
+     */
     public function uploadSourceFile(){
         //PUT http://{host}/okapi-longhorn/projects/1/inputFiles/help.html
-        //Uploads a file that will have the name 'help.html'
+        //Ex.: Uploads a file that will have the name 'help.html'
         
         $file=$this->getImputFile();
         $name=$file['fileName'];
@@ -186,15 +183,24 @@ class editor_Plugins_Okapi_Connector {
         $http = $this->getHttpClient($url);
         $http->setFileUpload($filePath,'inputFile');
         $response = $http->request('PUT');
+        $this->processResponse($response);
             
     }
     
+    /***
+     * Run the file conversion. For each uploaded files converted file will be created
+     */
     public function executeTask(){
         $url=$this->projectUrl.'/tasks/execute';
         $http = $this->getHttpClient($url);
         $response = $http->request('POST');
+        $this->processResponse($response);
     }
     
+    
+    /***
+     * Download the converted file from okapi, and save the file on the disk.
+     */
     public function downloadFile(){
         $file=$this->getImputFile();
         $url=$this->projectUrl.'/outputFiles/pack1/work/'.$file['fileName'].self::OUTPUT_FILE_EXTENSION;
@@ -203,19 +209,6 @@ class editor_Plugins_Okapi_Connector {
         $responseFile=$this->processResponse($response);
         //create the file in the proffRead folder, with the okapi extension so we know who generate this file
         file_put_contents($file['filePath'].self::OUTPUT_FILE_EXTENSION.self::OKAPI_FILE_EXTENSION, $responseFile);
-    }
-    
-    
-    public function getFilesWithErrors(){
-        return $this->filesWithErrors;
-    }
-    
-    public function setTask($task){
-        $this->m_task=$task;
-    }
-    
-    public function getTask(){
-        return $this->m_task;
     }
     
     public function setBconfFilePath($confPath){
