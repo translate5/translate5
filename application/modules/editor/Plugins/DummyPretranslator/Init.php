@@ -79,9 +79,11 @@ class editor_Plugins_DummyPretranslator_Init extends ZfExtended_Plugin_Abstract 
         });
         $split = preg_split('/(<tag-[0-9]+>)/', $source, null, PREG_SPLIT_DELIM_CAPTURE);
         $max = count($split);
-        
+
         for($i = 0; $i < $max; $i = $i+2) {
+            $split[$i] = html_entity_decode($split[$i], ENT_HTML5|ENT_QUOTES);
             $split[$i] = str_rot13($split[$i]);
+            $split[$i] = htmlentities($split[$i], ENT_XML1);
         }
         return str_replace(array_keys($placeHolder), array_values($placeHolder), join($split));
     }
