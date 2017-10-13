@@ -336,7 +336,8 @@ class editor_TaskController extends ZfExtended_RestController {
     }
     
     /**
-     * Since numeric IDs aren't really sexy to be used for languages in API, TaskController can also deal with rfc5646 strings
+     * Since numeric IDs aren't really sexy to be used for languages in API, 
+     *  TaskController can also deal with rfc5646 strings and LCID numbers. The LCID numbers must be prefixed with 'lcid-' for example lcid-123
      * Not found / invalid languages are converted to 0, this gives an error on import
      */
     protected function convertToLanguageIds() {
@@ -349,7 +350,11 @@ class editor_TaskController extends ZfExtended_RestController {
             $language = ZfExtended_Factory::get('editor_Models_Languages');
             /* @var $language editor_Models_Languages */
             try {
-                $language->loadByRfc5646($this->data[$lang]);
+                if(preg_match('/^lcid-([0-9]+)$/i', $this->data[$lang], $matches)) {
+                    $language->loadByLcid($matches[1]);
+                }else {
+                    $language->loadByRfc5646($this->data[$lang]);
+                }
             }
             catch(ZfExtended_Models_Entity_NotFoundException $e) {
                 $this->data[$lang] = 0;
@@ -385,6 +390,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->data->enableSourceEditing = (boolean)$this->data->enableSourceEditing;
         }
         $this->processClientReferenceVersion();
+        $this->convertToLanguageIds();
         $this->setDataInEntity();
         $this->entity->validate();
         $this->initWorkflow();
