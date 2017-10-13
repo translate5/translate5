@@ -41,8 +41,12 @@ END LICENSE AND COPYRIGHT
  * @method void setTaskGuid() setTaskGuid(string $guid)
  * @method string getTaskNr() getTaskNr()
  * @method void setTaskNr() setTaskNr(string $nr)
+ * @method string getForeignId() getForeignId()
+ * @method void setForeignId() setForeignId(string $id)
  * @method string getTaskName() getTaskName()
  * @method void setTaskName() setTaskName(string $name)
+ * @method string getForeignName() getForeignName()
+ * @method void setForeignName() setForeignName(string $name)
  * @method integer getSourceLang() getSourceLang()
  * @method void setSourceLang() setSourceLang(integer $id)
  * @method integer getTargetLang() getTargetLang()
@@ -64,6 +68,8 @@ END LICENSE AND COPYRIGHT
  * @method void setWorkflow() setWorkflow(string $workflow)
  * @method integer getWorkflowStep() getWorkflowStep()
  * @method void setWorkflowStep() setWorkflowStep(integer $stepNr)
+ * @method string getWorkflowStepName() getWorkflowStepName()
+ * @method void setWorkflowStepName() setWorkflowStepName(string $stepName)
  * @method integer getWordCount() getWordCount()
  * @method void setWordCount() setWordCount(integer $wordcount)
  * @method string getTargetDeliveryDate() getTargetDeliveryDate()
@@ -384,11 +390,13 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * update the workflowStep of a specific task 
      * @param string $taskGuid
      * @param integer $step
+     * @param string $stepName
      */
-    public function updateWorkflowStep(string $taskGuid, integer $step) {
-        $this->db->update(array('workflowStep' => $step), array(
-                      'taskGuid = ?' => $taskGuid)
-        );
+    public function updateWorkflowStep(string $taskGuid, integer $step, string $stepName) {
+        $this->db->update([
+                'workflowStep' => $step,
+                'workflowStepName' => $stepName,
+        ], ['taskGuid = ?' => $taskGuid]);
     }
     
     /**
@@ -405,6 +413,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $session->taskOpenState = $openState;
         $session->taskWorkflow = $this->getWorkflow();
         $session->taskWorkflowStepNr = $this->getWorkflowStep();
+        $session->taskWorkflowStepName = $this->getWorkflowStepName();
     }
     
     /**
