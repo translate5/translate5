@@ -53,13 +53,6 @@ Ext.define('Editor.view.segments.EditorKeyMap', {
         //debugger;
         var res = me.callParent([event]);
         me.lastWasDigitPreparation = event.isDigitPreparation;
-        
-        //if the key map was configured with changeMarkup enabled, pass event into it
-        //if parent handleTargetEvent returns false, this means the event was handled - so no further processing by changeMarkup is needed
-        if(me.changeMarkup && res !== false) {
-            me.changeMarkup.handleTargetEvent(event);
-        }
-
         return res;
     }
 });

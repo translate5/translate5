@@ -252,6 +252,10 @@ Ext.define('Editor.controller.QmSubSegments', {
      */
     addQmFlagToEditor: function(qmid, comment, sev){
         var editor = this.getSegmentGrid().editingPlugin.editor.mainEditor;
+        // MQM tags must not be added in DEL tags, so there must be an error message for the user when his MQM selection ends in a delete tag.
+        if(! this.fireEvent('beforeInsertMqmTag')) {
+            return;
+        }
         if(Ext.isIE) { //although >IE11 knows ranges we can't use it, because of an WrongDocumentError
             this.insertQmFlagsIE(editor,qmid, comment, sev);
         } else {

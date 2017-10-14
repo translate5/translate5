@@ -42,7 +42,6 @@ Ext.define('Editor.controller.Editor', {
   extend : 'Ext.app.Controller',
   requires: [
     'Editor.view.segments.EditorKeyMap',
-    'Editor.view.segments.ChangeMarkup',
     'Editor.controller.editor.PrevNextSegment'
   ],
   messages: {
@@ -75,7 +74,6 @@ Ext.define('Editor.controller.Editor', {
   keyMapConfig: null,
   editorKeyMap: null,
   generalKeyMap: null,
-  segmentWorkflowStepNr: null,
   prevNextSegment: null,
   sourceTags: null,
   listen: {
@@ -101,10 +99,6 @@ Ext.define('Editor.controller.Editor', {
               afterrender: 'initMoveToolTip'
           },
           '#segmentgrid': {
-              beforeedit:function(){
-                  // We need to pass the segment's workflow to the ChangeMarkup-View:
-                  this.segmentWorkflowStepNr = arguments[1].record.data.workflowStepNr; // TODO: Is there a better way to get this data?
-              },
               afterrender: 'initEditPluginHandler'
           },
           '#referenceFilesInfoMessage':{
@@ -378,11 +372,6 @@ Ext.define('Editor.controller.Editor', {
       if(me.editorKeyMap) {
           me.editorKeyMap.destroy();
       }
-      me.editorKeyMap = new Editor.view.segments.EditorKeyMap({
-        target: docEl,
-        changeMarkup: new Editor.view.segments.ChangeMarkup(editor,me.segmentWorkflowStepNr), //FIXME set this config only if changeMarkup is enabled
-        binding: me.getKeyMapConfig()
-      });
       docEl.on('paste', function(e){
           e.stopPropagation();
           e.preventDefault();

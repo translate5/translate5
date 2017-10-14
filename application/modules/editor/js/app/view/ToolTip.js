@@ -58,8 +58,8 @@ Ext.define('Editor.view.ToolTip', {
                 fly = Ext.fly(t); 
             if(fly.hasCls('qmflag')) {
                 this.handleQmFlag(t, tip);
-            } else if (Ext.get(t).hasCls('changemarkup')) {
-                this.handleChangeMarkup(t, tip);
+            } else if (Ext.get(t).hasCls('trackchanges')) {
+                this.handleTrackchanges(t, tip);
             }
             //else if hasClass for other ToolTip Types
         }
@@ -92,43 +92,43 @@ Ext.define('Editor.view.ToolTip', {
         tip.update(me.qmflagTpl.apply(meta));		
     },
     
-    handleChangeMarkup: function(markupNode, tip) {
+    handleTrackchanges: function(trackchangeNode, tip) {
         var me = this,
             userStore = Ext.getStore('admin.Users'),
-            attrUserId,
+            attrUserGuid,
             attrTimestamp,
-            markupAction = '',
-            markupUser = '',
-            markupDate = '';
+            nodeAction = '',
+            nodeUser = '',
+            nodeDate = '';
         // What has been done (INS/DEL)?
-        if (markupNode.nodeName == 'INS') {
-            markupAction = me.strings.insertedby;
-        } else if (markupNode.nodeName == 'DEL') {
-            markupAction = me.strings.deletedby;
+        if (trackchangeNode.nodeName.toLowerCase() == 'ins') {
+            nodeAction = me.strings.insertedby;
+        } else if (trackchangeNode.nodeName.toLowerCase() == 'del') {
+            nodeAction = me.strings.deletedby;
         } else {
             return;
         }
         // Who has done it?
-        if (markupNode.hasAttribute('data-userid')) {
-            attrUserId = parseInt(markupNode.getAttribute('data-userid'));
-            markupUser = userStore.getUserName(attrUserId);
+        if (trackchangeNode.hasAttribute('data-userguid')) {
+            attrUserGuid = trackchangeNode.getAttribute('data-userguid');
+            nodeUser = userStore.getUserName(attrUserGuid);
         }
         // When?
-        if (markupNode.hasAttribute('data-timestamp')) {
-            attrTimestamp = parseInt(markupNode.getAttribute('data-timestamp'));
-            markupDate = Ext.Date.format(new Date(attrTimestamp),'Y-m-d H:i');
+        if (trackchangeNode.hasAttribute('data-timestamp')) {
+            attrTimestamp = parseInt(trackchangeNode.getAttribute('data-timestamp'));
+            nodeDate = Ext.Date.format(new Date(attrTimestamp),'Y-m-d H:i');
         }
         // Apply to Tooltip:
         var tplData = {
-            changemarkupAction : markupAction,
-            changemarkupUser   : markupUser,
-            changemarkupDate   : markupDate
+            trackchangeAction : nodeAction,
+            trackchangeUser   : nodeUser,
+            trackchangeDate   : nodeDate
         };
-        if(!me.changemarkupTpl) {
-            me.changemarkupTpl = new Ext.Template('<b>{changemarkupAction}</b><br>{changemarkupUser}<br>{changemarkupDate}');
-            me.changemarkupTpl.compile();
+        if(!me.trackchangeTpl) {
+            me.trackchangeTpl = new Ext.Template('<b>{trackchangeAction}</b><br>{trackchangeUser}<br>{trackchangeDate}');
+            me.trackchangeTpl.compile();
         }
-        tip.update(me.changemarkupTpl.apply(tplData));
+        tip.update(me.trackchangeTpl.apply(tplData));
     },
     
     /**
