@@ -3,6 +3,22 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.6.2] - 2017-10-16
+###Added
+TRANSLATE-869: Okapi integration for source file format conversion
+TRANSLATE-995: Import files with generic XML suffix with auto type detection
+TRANSLATE-994: Support RTL languages in the editor
+
+###Changed
+TRANSLATE-1012: Improve REST API on task creation
+TRANSLATE-1004: Enhance text description for task grid column to show task type
+
+###Bugfixes
+TRANSLATE-1011: XLIFF Import can not deal with internal unicodePrivateUseArea tags
+TRANSLATE-1015: Reference Files are not attached to tasks
+TRANSLATE-983: More tags in OpenTM2 answer than in translate5 segment lead to error
+TRANSLATE-972: translate5 does not check, if there are relevant files in the import zip
+
 ## [2.6.1] - 2017-09-14
 ###Added
 TRANSLATE-994: Support RTL languages in the editor (must be set in LEK_languages)
