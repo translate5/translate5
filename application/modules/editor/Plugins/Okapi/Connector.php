@@ -34,18 +34,20 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_Okapi_Connector {
     
     /***
+     *
+     * The url for connecting the Okapi api
      * 
      * @var string
      */
     private $apiUrl;
     
     /***
-     * 
+     * The url for the current  active project
      * @var string
      */
     private $projectUrl;
 
-    /*
+    /***
     * Zf config for Okapi
     */
     private $okapiConfig;
@@ -62,7 +64,7 @@ class editor_Plugins_Okapi_Connector {
      * The file which need to be converted
      * @var string
      */
-    private $imputFile;
+    private $inputFile;
     
     /***
      * Request timeout for the api
@@ -173,7 +175,7 @@ class editor_Plugins_Okapi_Connector {
         //PUT http://{host}/okapi-longhorn/projects/1/inputFiles/help.html
         //Ex.: Uploads a file that will have the name 'help.html'
         
-        $file=$this->getImputFile();
+        $file=$this->getInputFile();
         $name=$file['fileName'];
         $filePath=$file['filePath'];
         
@@ -201,7 +203,7 @@ class editor_Plugins_Okapi_Connector {
      * Download the converted file from okapi, and save the file on the disk.
      */
     public function downloadFile(){
-        $file=$this->getImputFile();
+        $file=$this->getInputFile();
         //we encode the filename, because the okapi api does not support whitespace in files
         $url=$this->projectUrl.'/outputFiles/pack1/work/'.urlencode($file['fileName']).self::OUTPUT_FILE_EXTENSION;
         $http = $this->getHttpClient($url);
@@ -219,12 +221,12 @@ class editor_Plugins_Okapi_Connector {
         return $this->bconfFilePath;
     }
     
-    public function setImputFile($file){
-        $this->imputFile=$file;
+    public function setInputFile($file){
+        $this->inputFile=$file;
     }
     
-    public function getImputFile(){
-        return $this->imputFile;
+    public function getInputFile(){
+        return $this->inputFile;
     }
     
 }
