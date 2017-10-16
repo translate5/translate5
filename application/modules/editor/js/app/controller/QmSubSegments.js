@@ -251,16 +251,18 @@ Ext.define('Editor.controller.QmSubSegments', {
      * @return {Boolean}
      */
     addQmFlagToEditor: function(qmid, comment, sev){
-        var editor = this.getSegmentGrid().editingPlugin.editor.mainEditor;
+        var editor = this.getSegmentGrid().editingPlugin.editor.mainEditor,
+            tagDef;
         // MQM tags must not be added in DEL tags, so there must be an error message for the user when his MQM selection ends in a delete tag.
         if(! this.fireEvent('beforeInsertMqmTag')) {
             return;
         }
         if(Ext.isIE) { //although >IE11 knows ranges we can't use it, because of an WrongDocumentError
-            this.insertQmFlagsIE(editor,qmid, comment, sev);
+            tagDef = this.insertQmFlagsIE(editor,qmid, comment, sev);
         } else {
-            this.insertQmFlagsH5(editor,qmid, comment, sev);
+            tagDef = this.insertQmFlagsH5(editor,qmid, comment, sev);
         }
+        this.fireEvent('afterInsertMqmTag',tagDef); // Inserted tags are marked with change markers.
         this.lastSelectedRangeIE = null;
         return true;
     },
@@ -270,6 +272,7 @@ Ext.define('Editor.controller.QmSubSegments', {
      * @param {Number} qmid Qm Issue ID
      * @param {String} comment 
      * @param {String} sev Severity ID
+     * @returns {Object}
      */
     insertQmFlagsH5: function(editor, qmid, comment, sev){
 		var doc = editor.getDoc(),
@@ -285,6 +288,7 @@ Ext.define('Editor.controller.QmSubSegments', {
 		doc.getSelection().removeAllRanges();
 		rangeEnd.collapse(false);
 		doc.getSelection().addRange(rangeEnd);
+		return tagDef;
     },
     /**
      * generates a Dom Config Object with the to image tags 
