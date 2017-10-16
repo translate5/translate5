@@ -1,31 +1,31 @@
 <?php
 /*
-START LICENSE AND COPYRIGHT
-
+ START LICENSE AND COPYRIGHT
+ 
  This file is part of translate5
  
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
-
+ 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
-
+ 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+ 
  There is a plugin exception available for use with this release of translate5 for
  translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
  Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
  folder of translate5.
-  
+ 
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
-
-END LICENSE AND COPYRIGHT
-*/
+ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ 
+ END LICENSE AND COPYRIGHT
+ */
 
 /**
  * FileManager Test Plugin
@@ -68,8 +68,8 @@ class editor_Plugins_Okapi_Tikal_Connector {
      * @return boolean
      */
     public function extract($file) {
-        //FIXME Import tut, aber da die ref files nicht korrekt abgelegt werden (sind ja bereits verarbeitet) tut der export nicht 
-        // von Tasks die auf diesem Wege importiert wurden. 
+        //FIXME Import tut, aber da die ref files nicht korrekt abgelegt werden (sind ja bereits verarbeitet) tut der export nicht
+        // von Tasks die auf diesem Wege importiert wurden.
         // Problem ist ebenfalls TRANSLATE-1019
         $tikalDir = $this->task->getAbsoluteTaskDataPath().'/okapi-tikal/';
         mkdir($tikalDir);
@@ -101,8 +101,8 @@ class editor_Plugins_Okapi_Tikal_Connector {
     }
     
     /**
-     * Works currently only with the longhorn import! Not with the above Tikal Import! 
-     * 
+     * Works currently only with the longhorn import! Not with the above Tikal Import!
+     *
      * merges back the XLF content into the original files
      * @param string $path
      * @return boolean
@@ -123,7 +123,7 @@ class editor_Plugins_Okapi_Tikal_Connector {
         copy($taskPath.$refPath, $origPath);
         
         exec($this->makeCmd($path, false), $output, $result);
-        //Logging currently all tikal output. Normal all relevant data (taskGuid, filename) is given in the output, so no additonal data needed: 
+        //Logging currently all tikal output. Normal all relevant data (taskGuid, filename) is given in the output, so no additonal data needed:
         error_log(print_r($output,1));
         $res = $result === 0;
         if(!$res) {
@@ -132,7 +132,7 @@ class editor_Plugins_Okapi_Tikal_Connector {
         }
         return true;
         
-        //code needed if trying to merge files extracted nativly with tikal 
+        //code needed if trying to merge files extracted nativly with tikal
         if(substr($path, -4) != '.xlf') {
             //file was created with the tikal import filter and filename from the DB does not contain XLF suffix then, so lets rename it
             rename($path, $path.'.xlf');
@@ -149,9 +149,9 @@ class editor_Plugins_Okapi_Tikal_Connector {
         $cmd[] = $import ? '-x1' : '-m1';
         $cmd[] = escapeshellarg($filepath);
         //if($addFileParam) {
-            //$cmd[] = '< %s';
+        //$cmd[] = '< %s';
         //}
-        //$cmd[] = '2>&1';
+        $cmd[] = '2>&1';
         return join(' ', $cmd);
     }
 }
