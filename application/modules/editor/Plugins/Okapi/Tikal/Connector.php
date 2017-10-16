@@ -124,7 +124,11 @@ class editor_Plugins_Okapi_Tikal_Connector {
         
         exec($this->makeCmd($path, false), $output, $result);
         //Logging currently all tikal output. Normal all relevant data (taskGuid, filename) is given in the output, so no additonal data needed:
-        error_log(print_r($output,1));
+        
+        $log = ZfExtended_Factory::get('ZfExtended_Log');
+        /* @var $log ZfExtended_Log */
+        $log->log('Translate5 tikal export on '.$_SERVER['HTTP_HOST'], print_r($output, 1));
+        
         $res = $result === 0;
         if(!$res) {
             error_log('Okapi Tikal error: could not merge file '.$path.' message was: '.print_r($output, 1));
