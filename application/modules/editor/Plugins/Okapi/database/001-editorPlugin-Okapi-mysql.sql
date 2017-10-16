@@ -39,7 +39,7 @@ VALUES
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES 
-('runtimeOptions.plugins.Okapi.api.url', '1', 'editor', 'plugins', 'http://www.translate5.net:8019/okapi-longhorn/', 'http://www.translate5.net:8019/okapi-longhorn/', '', 'string', 'Url used for Okapi api');
+('runtimeOptions.plugins.Okapi.api.url', '1', 'editor', 'plugins', '', '', '', 'string', 'Url used for Okapi api, for example http://www.translate5.net:1234/okapi-longhorn/');
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES ('runtimeOptions.plugins.Okapi.tikal.executable', '1', 'editor', 'import', '', '', '', 'string', 'The absolute path to the tikal executable, no usable default can be given so is empty and must be configured by the user!');
