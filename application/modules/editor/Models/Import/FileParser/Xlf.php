@@ -138,7 +138,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      * @see editor_Models_Import_FileParser::getFileExtensions()
      */
     public static function getFileExtensions() {
-        return ['xlf','xlif','xliff','mxliff','mqxliff'];
+        return ['xlf','xlif','xliff','mxliff','mqxliff','okapi'];
     }
     
     /**

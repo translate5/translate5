@@ -56,7 +56,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
         
         $this->api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
         $this->api->setBconfFilePath($params['bconfFilePath']);
-        $this->api->setImputFile($file);
+        $this->api->setInputFile($file);
         
         try {
             $this->api->createProject();
@@ -76,9 +76,10 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             if (!is_dir($refFolder)) {
                 mkdir($refFolder, 0777, true);
             }
-            $originalFile = $file['filePath'];
-            $referenceFile = $refFolder.'/'.$file['fileName'];
-            rename($originalFile, $referenceFile);
+            $newName=$refFolder.'/'.$file['fileName'];
+            $oldName=$file['filePath'];
+            rename($oldName, $newName);
+            
         }catch (Exception $e){
             $this->log->logError('Okapi Error: Error on converting a file. Task: '.$taskGuid.'; File: '.print_r($file, 1).'; Error was: '.$e);
         }finally {

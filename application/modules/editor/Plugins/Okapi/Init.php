@@ -1,31 +1,31 @@
 <?php
 /*
-START LICENSE AND COPYRIGHT
-
+ START LICENSE AND COPYRIGHT
+ 
  This file is part of translate5
  
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
-
+ 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
-
+ 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+ 
  There is a plugin exception available for use with this release of translate5 for
  translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
  Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
  folder of translate5.
-  
+ 
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
-
-END LICENSE AND COPYRIGHT
-*/
+ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ 
+ END LICENSE AND COPYRIGHT
+ */
 
 /**
  */
@@ -33,7 +33,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     
     /***
      * Supported file-types by okapi
-     * 
+     *
      * @var array
      */
     private $okapiFileTypes = array(
@@ -49,10 +49,10 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     private $okapiBconf= array(
             'bconf'
     );
-
+    
     /***
      * Name of the default okapi config file
-     * 
+     *
      * @var string
      */
     const OKAPI_BCONF_DEFAULT_NAME='okapi_default_import.bconf';
@@ -62,7 +62,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @var editor_Models_Task
      */
     private $task;
-
+    
     public function init() {
         if(ZfExtended_Debug::hasLevel('plugin', 'Okapi')) {
             ZfExtended_Factory::addOverwrite('Zend_Http_Client', 'ZfExtended_Zendoverwrites_Http_DebugClient');
@@ -86,7 +86,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('editor_Models_Import_DirectoryParser_WorkingFiles', 'beforeFileNodeCreate', array($this, 'handleBeforeFileNodeCreate'));
         $this->eventManager->attach('editor_Models_Foldertree_SyncToFiles', 'afterImportfileSave', array($this, 'handleAfterImportfileSave'));
     }
-
+    
     /***
      * Find the files from type okapi, so the okapi file extenssion is removed from the file on the disk.
      * This is done so we can know for which files we need to add export/import post processing
@@ -116,7 +116,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     
     /***
      * Hook on the before import event and check the import files
-     * 
+     *
      * @param Zend_EventManager_Event $event
      */
     public function handleBeforeImport(Zend_EventManager_Event $event) {
@@ -143,7 +143,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     
     /***
      * Add export file filter to files with okapi extension
-     * 
+     *
      * @param Zend_EventManager_Event $event
      */
     public function handleAfterImportfileSave(Zend_EventManager_Event $event) {
@@ -157,13 +157,13 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         
         $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
         /* @var $fileFilter editor_Models_File_FilterManager */
-
+        
         $fileFilter->addFilter($fileFilter::TYPE_EXPORT, $file->getTaskGuid(), $file->getId(), 'editor_Plugins_Okapi_Tikal_Filter');
     }
-
+    
     /***
      * Find all files which can be handled by okapi and start a worker so thay are converted by okapi
-     * 
+     *
      * @param string $importFolder - tmp import directory path on disk
      */
     protected function handleFiles($importFolder){
@@ -221,14 +221,14 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             $this->queueWorker($file,$bconfFilePath,$refFolder,$proofReadFolder);
         }
     }
-
+    
     /***
-     * Run for each file a separate worker, the worker will upload the file to the okapi, convert the file, and download the 
+     * Run for each file a separate worker, the worker will upload the file to the okapi, convert the file, and download the
      * result
-     * 
+     *
      * @param string $file - the source file
      * @param string $bconfFilePath - the path of the bconf file
-     * @param string $refFolder - referenceFiles directory of the current task 
+     * @param string $refFolder - referenceFiles directory of the current task
      * @param string $proofReadFolder - prooofRead folder of the current task
      * @return boolean
      */
@@ -237,11 +237,11 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         /* @var $worker editor_Plugins_Okapi_Worker */
         
         $params=[
-            'file'=>$file,
-            'bconfFilePath'=>$bconfFilePath,
-            'refFolder'=>$refFolder,
-            'proofReadFolder'=>$proofReadFolder,
-            'taskGuid'=>$this->task->getTaskGuid()
+                'file'=>$file,
+                'bconfFilePath'=>$bconfFilePath,
+                'refFolder'=>$refFolder,
+                'proofReadFolder'=>$proofReadFolder,
+                'taskGuid'=>$this->task->getTaskGuid()
         ];
         
         // init worker and queue it
@@ -251,7 +251,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         }
         $worker->queue(null);
     }
-
+    
     /**
      * Return the default bconf file for the import
      * @return string
