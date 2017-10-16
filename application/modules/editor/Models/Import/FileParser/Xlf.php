@@ -609,22 +609,27 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $placeHolder = join($placeHolders);
         
         //this solves TRANSLATE-879: sdlxliff and XLF import does not work with missing target
+        //if there is no target at all:
         if(is_null($this->currentPlainTarget)){
             //currentPlainSource point always to the last used source or seg-source 
             // the target tag should be added after the the latter of both
             $replacement = '</'.$this->currentPlainSource['tag'].">\n        <target>".$placeHolder.'</target>';
             $this->xmlparser->replaceChunk($this->currentPlainSource['closer'], $replacement);
         }
+        //if the XLF contains an empty (single tag) target:
         elseif($this->currentPlainTarget['openerMeta']['isSingle']) {
             $this->xmlparser->replaceChunk($this->currentPlainTarget['closer'], function($index, $oldChunk) use ($placeHolder) {
                 return '<target>'.$placeHolder.'</target>';
             });
         }
+        //existing content in the target:
         else {
             //clean up target content to empty, we store only our placeholder in the skeleton file
             $start = $this->currentPlainTarget['opener'] + 1;
             $length = $this->currentPlainTarget['closer'] - $start;
+            //empty content between target tags:
             $this->xmlparser->replaceChunk($start, '', $length);
+            //add placeholder and ending target tag:
             $this->xmlparser->replaceChunk($this->currentPlainTarget['closer'], function($index, $oldChunk) use ($placeHolder) {
                 return $placeHolder.$oldChunk;
             });

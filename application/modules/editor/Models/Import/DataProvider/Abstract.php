@@ -49,8 +49,9 @@ abstract class editor_Models_Import_DataProvider_Abstract {
 
     /**
      * DataProvider specific method to create the import archive
+     * @param $filename optional, provide a different archive file name
      */
-    abstract public function archiveImportedData();
+    abstract public function archiveImportedData($filename = null);
     
     /**
      * returns the the absolute import path, mainly used by the import class
@@ -112,10 +113,14 @@ abstract class editor_Models_Import_DataProvider_Abstract {
     
     /**
      * returns the fix defined (=> final) archiveZipPath
+     * @param $filename optional, provide a different filename as the default
      * @return string
      */
-    protected final function getZipArchivePath() {
-        return $this->taskPath.DIRECTORY_SEPARATOR.self::TASK_ARCHIV_ZIP_NAME;
+    protected final function getZipArchivePath($filename = null) {
+        if(empty($filename)){
+            return $this->taskPath.DIRECTORY_SEPARATOR.self::TASK_ARCHIV_ZIP_NAME;
+        }
+        return $this->taskPath.DIRECTORY_SEPARATOR.$filename;
     }
     
     /**

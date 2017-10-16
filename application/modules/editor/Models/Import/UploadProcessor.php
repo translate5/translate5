@@ -95,11 +95,11 @@ class editor_Models_Import_UploadProcessor {
         $ext = strtolower($importName['extension']);
         $mime = $finfo->file($importFile);
 
-        $allValidExtensions = editor_Models_Import_FileParser::getAllFileParsersMap();
+        $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
+        /* @var $supportedFiles editor_Models_Import_SupportedFileTypes */
+        $allValidExtensions = $supportedFiles->getSupportedTypes();
         if(!empty($allValidExtensions[$ext])) {
-            $fileParserClass = $allValidExtensions[$ext];
-            //add the mimetypes of a valid fileparser to that extension to the validation array 
-            $this->validUploadTypes[$ext] = $fileParserClass::getValidMimeTypes();
+            $this->validUploadTypes[$ext] = $allValidExtensions[$ext];
         }
         
         foreach ($this->validUploadTypes[$ext] as $type) {

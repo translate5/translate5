@@ -56,6 +56,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             'LEK_change_log' => false,
             'LEK_comments' => 'taskGuid',
             'LEK_files' => 'taskGuid',
+            'LEK_file_filter' => 'taskGuid',
             'LEK_foldertree' => 'taskGuid',
             'LEK_languages' => false,
             // matchresource plugin tables disabled for archiving, since task data is not depending from them, and plugin must not be installed at all
