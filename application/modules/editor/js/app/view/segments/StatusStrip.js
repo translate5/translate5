@@ -40,8 +40,10 @@ Ext.define('Editor.view.segments.StatusStrip', {
     style: 'background: #e4edf4;',
     layout:'hbox',
 
+    /***
+     * For each child element in the status strip, set the record instance
+     */
     setItemsRecord:function(record){
-        debugger;
         var me=this,
             items=null;
         if(me.items && me.items.items.length<1){
@@ -51,10 +53,32 @@ Ext.define('Editor.view.segments.StatusStrip', {
         
         for (var index = 0; index < items.length; index++) {
             var element = items[index];
-            if(element.setContextRecord){
-                element.setContextRecord(record);
+            if(element.handleElementVisible){
+                element.handleElementVisible(record);
             }
         }
     },
+
+    /***
+     * Check if there is visible child element in the status strip
+     */
+    isItemVisible:function(){
+        var me = this;
+        if(!me.items || me.items.items.length < 1){
+            return false;
+        }
+
+        var items=me.items.items;
+        
+        for (var index = 0; index < items.length; index++) {
+            var element = items[index];
+            if(element.isVisible()){
+                return true;
+                break;
+            }
+        }
+
+        return false;
+    }
 
 });

@@ -245,6 +245,7 @@ Ext.define('Editor.controller.Segments', {
         if(!segmentStatusStrip){
             return;
         }
+        //set the record for each item in the status strip
         segmentStatusStrip.setItemsRecord(contex.record);
     },
 

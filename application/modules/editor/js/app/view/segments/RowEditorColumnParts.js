@@ -40,7 +40,7 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
     itemId:'rowEditorTestCmp',
     
     columnToEdit: null,
-    editorFieldExtraHeight: 25, //was 10, FIXME depending on the existence of the additional info bar or not
+    editorFieldExtraHeight: 10, //was 10, FIXME depending on the existence of the additional info bar or not
     previousRecord: null,
     timeTrackingData: null,
 
@@ -60,25 +60,11 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         me.on('render', function(p) {
             p.body.on('dblclick', me.changeColumnByClick, me);
         });
-
-        console.log("INIT EIDTOR!");
         
         me.mainEditor = me.add(new Editor.view.segments.HtmlEditor());
+        //add the status strip component to the row editor
         me.mainEditor.add({
             xtype:'segments.statusstrip',
-            //xtype: 'container',
-            //framed: false,
-            //style: 'background: #e4edf4;',
-            //layout:'hbox',
-            //items:[{
-                //xtype: 'roweditorcommentbutton',
-            //    style: 'background: #e5edf4;font-weight:bold;padding-top:1px;',
-            //    html: '&sum; <span style="background-color: #00ff00;margin-top:1px;">11</span> <b>i</b>'
-            //},{
-            //    xtype: 'container',
-            //    style: 'background: #e5edf4;font-weight:bold;padding-top:1px;',
-            //    html: '&sum; <span style="background-color: #00ff00;margin-top:1px;">11</span> <b>i</b>'
-            //}]
         });
     },
     
@@ -258,10 +244,17 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         }
     },
     setEditorHeight: function() {
-        var me = this;
-        console.log("setEditorHeight-2");
+        var me = this,
+            statusStrip=me.mainEditor.down('#segmentStatusStrip'),
+            statusStripHeight=0;
+        
+        //add extra height if the segment status strip contains an visible element
+        if(statusStrip.isItemVisible()){
+            statusStripHeight=15;
+        }
+        
         me.callParent(arguments);
-        me.mainEditor.setHeight(me.rowToEditOrigHeight + me.editorFieldExtraHeight);
+        me.mainEditor.setHeight(me.rowToEditOrigHeight + me.editorFieldExtraHeight + statusStripHeight);
     },
     /**
      * place the HtmlEditor/MainEditor in the rowEditor over the desired displayfield
@@ -426,5 +419,5 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         delete(result._start);
         this.timeTrackingData = {};
         return result;
-    }
+    },
 });
