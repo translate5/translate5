@@ -56,20 +56,37 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
     }
 
     /**
-     * for post requests we have to check the existance of the desired task first!
+     * for post requests we have to check the existence of the desired task first!
      * (non-PHPdoc)
      * @see ZfExtended_RestController::validate()
      */
     protected function validate() {
-        if($this->_request->isPost()) {
-            settype($this->data->taskGuid, 'string');
-            $t = ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $t editor_Models_Task */
-            $t->loadByTaskGuid($this->data->taskGuid);
+        if(!$this->_request->isPost()) {
+            return parent::validate();
         }
-        return parent::validate();
+        settype($this->data->taskGuid, 'string');
+        $t = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $t editor_Models_Task */
+        $t->loadByTaskGuid($this->data->taskGuid);
+        
+        $valid = parent::validate();
+        //add the login hash AFTER validating, since we don't need any validation for it
+        $this->entity->createStaticLoginHash();
+        return $valid;
     }
 
+    /**
+     * {@inheritDoc}
+     * @see ZfExtended_RestController::decodePutData()
+     */
+    protected function decodePutData() {
+        parent::decodePutData();
+        if(array_key_exists('staticLoginHash', $this->data)) {
+            //may not be set from outside!
+            unset($this->data['staticLoginHash']);
+        }
+    }
+    
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::putAction()
