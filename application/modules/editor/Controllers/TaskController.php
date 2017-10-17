@@ -390,7 +390,6 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->data->enableSourceEditing = (boolean)$this->data->enableSourceEditing;
         }
         $this->processClientReferenceVersion();
-        $this->convertToLanguageIds();
         $this->setDataInEntity();
         $this->entity->validate();
         $this->initWorkflow();
