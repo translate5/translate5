@@ -75,6 +75,15 @@ END LICENSE AND COPYRIGHT
  * @method void setWorkflowStepNr() setWorkflowStepNr(integer $stepNr)
  * @method string getWorkflowStep() getWorkflowStep()
  * @method void setWorkflowStep() setWorkflowStep(string $name)
+ * 
+ * this are just some helper for the always existing segment fields, similar named methods exists for all segment fields: 
+ * @method void setSource() setSource(string $content)
+ * @method void setSourceEdit() setSourceEdit(string $content)
+ * @method void setSourceMd5() setSourceMd5(string $md5hash)
+ * @method void setTarget() setTarget(string $content)
+ * @method void setTargetEdit() setTargetEdit(string $content)
+ * @method void setTargetMd5() setTargetMd5(string $md5hash)
+ * 
  */
 class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**

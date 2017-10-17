@@ -59,7 +59,7 @@ class editor_Models_Import_DataProvider_Directory  extends editor_Models_Import_
      * (non-PHPdoc)
      * @see editor_Models_Import_DataProvider_Abstract::archiveImportedData()
      */
-    public function archiveImportedData() {
+    public function archiveImportedData($filename = null) {
         $config = Zend_Registry::get('config');
         if(!$config->runtimeOptions->import->createArchivZip){
         	return;
@@ -67,7 +67,7 @@ class editor_Models_Import_DataProvider_Directory  extends editor_Models_Import_
         $filter = new Zend_Filter_Compress(array(
             'adapter' => 'Zip',
             'options' => array(
-                'archive' => $this->taskPath.DIRECTORY_SEPARATOR.'ImportArchive.zip'
+                'archive' => $this->getZipArchivePath($filename)
             ),
         ));
         if(!$filter->filter($this->importFolder)){

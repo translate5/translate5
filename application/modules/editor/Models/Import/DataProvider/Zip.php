@@ -55,13 +55,13 @@ class editor_Models_Import_DataProvider_Zip extends editor_Models_Import_DataPro
 	 * (non-PHPdoc)
 	 * @see editor_Models_Import_DataProvider_Abstract::archiveImportedData()
 	 */
-	public function archiveImportedData() {
+	public function archiveImportedData($filename = null) {
 	    $config = Zend_Registry::get('config');
 	    if(!$config->runtimeOptions->import->createArchivZip){
 	        unlink($this->importZip);
 	        return;
 	    }
-	    $target = $this->getZipArchivePath();
+	    $target = $this->getZipArchivePath($filename);
 	    if(file_exists($target)) {
 	        throw new Zend_Exception('TaskData Import Archive Zip already exists: '.$target);
 	    }
