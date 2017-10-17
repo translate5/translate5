@@ -96,7 +96,7 @@ class editor_SessionController extends ZfExtended_SessionController {
         /* @var $taskUserAssoc editor_Models_TaskUserAssoc */
         $taskUserAssoc->loadByHash($_REQUEST['authhash']);
         if($enabled == self::AUTH_HASH_DYNAMIC) {
-            $taskUserAssoc->createStaticLoginHash();
+            $taskUserAssoc->createStaticAuthHash();
             $taskUserAssoc->save();
         }
         

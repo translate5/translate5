@@ -54,6 +54,24 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->view->rows = $this->entity->loadAllWithUserInfo();
         $this->view->total = $this->entity->getTotalCount();
     }
+    
+    public function postDispatch() {
+        $user = new Zend_Session_Namespace('user');
+        $acl = ZfExtended_Acl::getInstance();
+        if($acl->isInAllowedRoles($user->data->roles, 'readAuthHash')) {
+            parent::postDispatch();
+            return;
+        }
+        if(is_array($this->view->rows)) {
+            foreach($this->view->rows as &$row) {
+                unset($row['staticAuthHash']);
+            }
+        }
+        elseif(is_object($this->view->rows)) {
+            unset($this->view->rows->staticAuthHash);
+        }
+        parent::postDispatch();
+    }
 
     /**
      * for post requests we have to check the existence of the desired task first!
@@ -71,7 +89,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         
         $valid = parent::validate();
         //add the login hash AFTER validating, since we don't need any validation for it
-        $this->entity->createStaticLoginHash();
+        $this->entity->createstaticAuthHash();
         return $valid;
     }
 
@@ -81,9 +99,9 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
      */
     protected function decodePutData() {
         parent::decodePutData();
-        if(array_key_exists('staticLoginHash', $this->data)) {
+        if(array_key_exists('staticAuthHash', $this->data)) {
             //may not be set from outside!
-            unset($this->data['staticLoginHash']);
+            unset($this->data['staticAuthHash']);
         }
     }
     

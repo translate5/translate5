@@ -51,8 +51,8 @@ END LICENSE AND COPYRIGHT
  * @method void setUsedState() setUsedState(string $state)
  * @method void setUsedInternalSessionUniqId() setUsedInternalSessionUniqId(string $sessionId)
  * @method void setIsPmOverride() setIsPmOverride(boolean $isPmOverride)
- * @method string getStaticLoginHash() getStaticLoginHash()
- * @method void setStaticLoginHash() setStaticLoginHash(string $hash)
+ * @method string getStaticAuthHash() getStaticAuthHash()
+ * @method void setStaticAuthHash() setStaticAuthHash(string $hash)
  * 
  */
 class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
@@ -98,13 +98,13 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     public function loadByHash(string $hash){
         try {
             $s = $this->db->select();
-            $s->where('not staticLoginHash is null and staticLoginHash = ?', $hash);
+            $s->where('not staticAuthHash is null and staticAuthHash = ?', $hash);
             $row = $this->db->fetchRow($s);
         } catch (Exception $e) {
             $this->notFound('NotFound after other Error', $e);
         }
         if (!$row) {
-            $this->notFound('#staticLoginHash', $hash);
+            $this->notFound('#staticAuthHash', $hash);
         }
         return $this->row = $row;
     }
@@ -392,12 +392,12 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * calculates a random GUID and sets it as staticLoginHash
+     * calculates a random GUID and sets it as staticAuthHash
      */
-    public function createStaticLoginHash() {
+    public function createStaticAuthHash() {
         $guidHelper = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
             'Guid'
         );
-        $this->setStaticLoginHash($guidHelper->create(false));
+        $this->setStaticAuthHash($guidHelper->create(false));
     }
 }

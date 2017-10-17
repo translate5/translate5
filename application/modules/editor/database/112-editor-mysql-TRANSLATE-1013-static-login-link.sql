@@ -27,7 +27,11 @@
 -- */
 
 ALTER TABLE `LEK_taskUserAssoc` 
-ADD COLUMN `staticLoginHash` VARCHAR(60) NULL AFTER `isPmOverride`;
+ADD COLUMN `staticAuthHash` VARCHAR(60) NULL AFTER `isPmOverride`;
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES ('runtimeOptions.hashAuthentication', '1', 'editor', 'system', 'disabled', 'disabled', 'disabled,dynamic,static', 'string', 'Enables and configures the ability to login via a hash value. In dynamic mode the hash changes after each usage, in static mode the hash remains the same (insecure!).');
+
+
+INSERT INTO `Zf_acl_rules` (`id`, `module`, `role`, `resource`, `right`) 
+VALUES ('null', 'editor', 'api', 'readAuthHash', 'all');
