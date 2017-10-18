@@ -582,6 +582,17 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 continue;
             }
             $segmentId = $this->setAndSaveSegmentValues();
+            $comments = $this->namespaces->getComments();
+            foreach($comments as $comment) {
+                /* @var $comment editor_Models_Comment */
+                $comment->setTaskGuid($this->task->getTaskGuid());
+                $comment->setSegmentId($segmentId);
+                $comment->save();
+            }
+            //if there was at least one processed comment, we have to sync the comment contents to the segment
+            if(!empty($comment)){
+                $comment->updateSegment((integer) $segmentId, $this->task->getTaskGuid());
+            }
             $placeHolders[$mid] = $this->getFieldPlaceholder($segmentId, $targetName);
         }
         

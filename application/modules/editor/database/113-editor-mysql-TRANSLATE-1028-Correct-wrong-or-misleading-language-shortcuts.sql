@@ -25,21 +25,9 @@
 -- 
 -- END LICENSE AND COPYRIGHT
 -- */
+UPDATE `LEK_languages` SET `rfc5646` = 'ja' WHERE `LEK_languages`.`rfc5646` = 'jp';
+UPDATE `LEK_languages` SET `rfc5646` = 'nb', `langName` = 'Norwegisch (Bokmal)' WHERE `LEK_languages`.`rfc5646` = 'no';
+UPDATE `LEK_languages` SET `rfc5646` = 'sr', `langName` = 'Serbisch (Latein)' WHERE `LEK_languages`.`rfc5646` = 'sr';
+UPDATE `LEK_languages` SET `rfc5646` = 'uz', `langName` = 'Usbekisch (Latein)' WHERE `LEK_languages`.`rfc5646` = 'uz';
+INSERT INTO `LEK_languages` (`id`, `langName`, `lcid`, `rfc5646`, `dir`, `rtl`) VALUES (NULL, 'Norwegisch (Nynorsk)', NULL, 'nn', 'ltr', '0'), (NULL, 'Serbisch (Kyrillisch)', NULL, 'sr-Cyrl', 'ltr', '0'), (NULL, 'Usbekisch (Kyrillisch)', NULL, 'uz-Cyrl', 'ltr', '0');
 
-
-INSERT INTO  `Zf_worker_dependencies` (`worker`,`dependency`) VALUES 
-('editor_Models_Import_Worker',  'editor_Plugins_Okapi_Worker'),
-('editor_Plugins_TermTagger_Worker_TermTaggerImport',  'editor_Plugins_Okapi_Worker'),
-('editor_Models_Import_Worker_SetTaskToOpen',  'editor_Plugins_Okapi_Worker');
-
-
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
-VALUES
-('runtimeOptions.worker.editor_Plugins_Okapi_Worker.maxParallelWorkers', 1, 'editor', 'worker', 3, 3, '', 'integer', 'Max parallel running workers of the Okapi worker');
-
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
-VALUES 
-('runtimeOptions.plugins.Okapi.api.url', '1', 'editor', 'plugins', '', '', '', 'string', 'Url used for Okapi api, for example http://www.translate5.net:1234/okapi-longhorn/');
-
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
-VALUES ('runtimeOptions.plugins.Okapi.tikal.executable', '1', 'editor', 'import', '', '', '', 'string', 'The absolute path to the tikal executable, no usable default can be given so is empty and must be configured by the user!');

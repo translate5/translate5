@@ -37,7 +37,7 @@ END LICENSE AND COPYRIGHT
 /**
  * XLF Fileparser Add On to parse Translate5 XLF specific stuff
  */
-class editor_Models_Import_FileParser_Xlf_Translate5Namespace implements editor_Models_Import_FileParser_Xlf_INamespace{
+class editor_Models_Import_FileParser_Xlf_Translate5Namespace extends editor_Models_Import_FileParser_Xlf_AbstractNamespace{
     const TRANSLATE5_XLIFF_NAMESPACE = 'xmlns:translate5="http://www.translate5.net/"';
     
     /**
@@ -48,7 +48,7 @@ class editor_Models_Import_FileParser_Xlf_Translate5Namespace implements editor_
     
     /**
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_INamespace::transunitAttributes()
+     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::transunitAttributes()
      */
     public function transunitAttributes(array $attributes, editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes) {
         //TODO parse:
@@ -57,7 +57,7 @@ class editor_Models_Import_FileParser_Xlf_Translate5Namespace implements editor_
     
     /**
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_INamespace::registerParserHandler()
+     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::registerParserHandler()
      */
     public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser) {
         $this->tagMap = [];
@@ -86,7 +86,7 @@ class editor_Models_Import_FileParser_Xlf_Translate5Namespace implements editor_
     
     /**
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_INamespace::getPairedTag()
+     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::getPairedTag()
      */
     public function getPairedTag($xlfBeginTag, $xlfEndTag){
         //in the translate5 internal tag map everything is mapped by the opener only:
@@ -95,7 +95,7 @@ class editor_Models_Import_FileParser_Xlf_Translate5Namespace implements editor_
     
     /**
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_INamespace::getSingleTag()
+     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::getSingleTag()
      */
     public function getSingleTag($xlfTag){
         //some foreign tools add spaces between the last attribute and the closing />
@@ -109,7 +109,7 @@ class editor_Models_Import_FileParser_Xlf_Translate5Namespace implements editor_
     /**
      * Translate5 uses x,g and bx ex tags only. So the whole content of the tags incl. the tags must be used.
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_INamespace::useTagContentOnly()
+     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::useTagContentOnly()
      */
     public function useTagContentOnly() {
         return false;

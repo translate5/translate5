@@ -26,20 +26,12 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-
-INSERT INTO  `Zf_worker_dependencies` (`worker`,`dependency`) VALUES 
-('editor_Models_Import_Worker',  'editor_Plugins_Okapi_Worker'),
-('editor_Plugins_TermTagger_Worker_TermTaggerImport',  'editor_Plugins_Okapi_Worker'),
-('editor_Models_Import_Worker_SetTaskToOpen',  'editor_Plugins_Okapi_Worker');
-
+ALTER TABLE `LEK_taskUserAssoc` 
+ADD COLUMN `staticAuthHash` VARCHAR(60) NULL AFTER `isPmOverride`;
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
-VALUES
-('runtimeOptions.worker.editor_Plugins_Okapi_Worker.maxParallelWorkers', 1, 'editor', 'worker', 3, 3, '', 'integer', 'Max parallel running workers of the Okapi worker');
+VALUES ('runtimeOptions.hashAuthentication', '1', 'editor', 'system', 'disabled', 'disabled', 'disabled,dynamic,static', 'string', 'Enables and configures the ability to login via a hash value. In dynamic mode the hash changes after each usage, in static mode the hash remains the same (insecure!).');
 
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
-VALUES 
-('runtimeOptions.plugins.Okapi.api.url', '1', 'editor', 'plugins', '', '', '', 'string', 'Url used for Okapi api, for example http://www.translate5.net:1234/okapi-longhorn/');
 
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
-VALUES ('runtimeOptions.plugins.Okapi.tikal.executable', '1', 'editor', 'import', '', '', '', 'string', 'The absolute path to the tikal executable, no usable default can be given so is empty and must be configured by the user!');
+INSERT INTO `Zf_acl_rules` (`id`, `module`, `role`, `resource`, `right`) 
+VALUES ('null', 'editor', 'api', 'readAuthHash', 'all');

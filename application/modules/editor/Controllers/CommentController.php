@@ -36,9 +36,24 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
      */
     protected $entity;
 
+    public function init() {
+        parent::init();
+        $events = Zend_EventManager_StaticEventManager::getInstance();
+        
+        //if comments are changed via REST the workflow stuff must be triggered
+        $events->attach('editor_Models_Segment', 'beforeSave', function(Zend_EventManager_Event $event) {
+            $segment = $event->getParam('entity');
+            $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+            /* @var $wfm editor_Workflow_Manager */
+            $workflow = $wfm->getActive();
+            //@todo do this with events
+            $workflow->beforeCommentedSegmentSave($segment);
+        });
+    }
+    
     public function indexAction() {
         $segmentId = (int)$this->_getParam('segmentId');
-        $this->view->rows = $this->entity->loadBySegmentId($segmentId);
+        $this->view->rows = $this->entity->loadBySegmentId($segmentId, $this->session->taskGuid);
         $this->view->total = count($this->view->rows);
     }
 
@@ -64,7 +79,7 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
         $this->entity->save();
         $this->view->rows = $this->entity->getDataObject();
         $this->view->rows->isEditable = true; //a edited comment is editable again
-        $this->entity->updateSegment((int)$this->entity->getSegmentId());
+        $this->entity->updateSegment((int)$this->entity->getSegmentId(), $this->session->taskGuid);
     }
 
     public function deleteAction() {
@@ -77,21 +92,21 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
         $wfh->checkWorkflowWriteable($this->entity->getTaskGuid(), $this->entity->getUserGuid());
         $id = (int)$this->entity->getSegmentId();
         $this->entity->delete();
-        $this->entity->updateSegment($id);
+        $this->entity->updateSegment($id, $this->session->taskGuid);
     }
 
     public function postAction() {
-        $session = new Zend_Session_Namespace();
+        $taskGuid = $this->session->taskGuid;
         $sessionUser = new Zend_Session_Namespace('user');
         $userGuid = $sessionUser->data->userGuid;
         $wfh = $this->_helper->workflow;
         /* @var $wfh ZfExtended_Controller_Helper_Workflow */
-        $wfh->checkWorkflowWriteable($session->taskGuid, $userGuid);
+        $wfh->checkWorkflowWriteable($taskGuid, $userGuid);
         $now = date('Y-m-d H:i:s');
         $this->entity->init();
         $this->entity->setModified($now);
         $this->entity->setCreated($now);
-        $this->entity->setTaskGuid($session->taskGuid);
+        $this->entity->setTaskGuid($taskGuid);
         $this->entity->setUserGuid($userGuid);
         $this->entity->setUserName($sessionUser->data->userName);
         $this->decodePutData();
@@ -102,7 +117,7 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
         $this->entity->save();
         $this->view->rows = $this->entity->getDataObject();
         $this->view->rows->isEditable = true; //a newly added comment is editable by the user
-        $this->entity->updateSegment((int)$this->entity->getSegmentId());
+        $this->entity->updateSegment((int)$this->entity->getSegmentId(), $taskGuid);
     }
     
     /**

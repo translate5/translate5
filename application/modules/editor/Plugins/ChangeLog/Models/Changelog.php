@@ -47,7 +47,8 @@ class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity
         "basic"=>1,
         "editor"=>2,
         "pm"=>4,
-        "admin"=>8
+        "admin"=>8,
+        "api"=>0, //for the API role we assume just no rights for changelog reading.
     );
 
     /**
