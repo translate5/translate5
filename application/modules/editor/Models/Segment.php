@@ -414,7 +414,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->initData($id);
         return $row;
     }
-
+    
+    public function loadByIds(array $ids){
+        $s=$this->db->select()
+        ->where('id IN (?)',$ids);
+        return $this->loadFilterdCustom($s);
+    }
     /**
      * erzeugt ein neues, ungespeichertes SegmentHistory Entity
      * @return editor_Models_SegmentHistory
@@ -670,11 +675,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * Load segments by taskGuid.
      * @param string $taskGuid
+     * @param Closure $callback is called with the select statement as parameter before passing it to loadFilterdCustom Param: Zend_Db_Table_Select
      * @return array
      */
-    public function loadByTaskGuid($taskGuid) {
+    public function loadByTaskGuid($taskGuid, Closure $callback = null) {
         try {
-            return $this->_loadByTaskGuid($taskGuid);
+            return $this->_loadByTaskGuid($taskGuid,$callback);
         }
         catch(Zend_Db_Statement_Exception $e) {
             $this->catchMissingView($e);
@@ -682,7 +688,18 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         //fallback mechanism for not existing views. If not exists, we are trying to create it.
         $this->segmentFieldManager->initFields($taskGuid);
         $this->segmentFieldManager->getView()->create();
-        return $this->_loadByTaskGuid($taskGuid);
+        return $this->_loadByTaskGuid($taskGuid,$callback);
+    }
+    
+    /**
+     * inits and returns the editor_Models_Segment_EditablesFinder
+     * @return editor_Models_Segment_EditablesFinder
+     */
+    protected function initSegmentFinder() {
+        $this->reInitDb($this->getTaskGuid());
+        $this->initDefaultSort();
+        
+        return ZfExtended_Factory::get('editor_Models_Segment_EditablesFinder', array($this));
     }
     
     /**
@@ -692,13 +709,15 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     public function findSurroundingEditables($next, array $autoStateIds = null) {
-        $this->reInitDb($this->getTaskGuid());
-        $this->initDefaultSort();
-        
-        $finder = ZfExtended_Factory::get('editor_Models_Segment_EditablesFinder', array($this));
-        /* @var $finder editor_Models_Segment_EditablesFinder */
-        
-        return $finder->find($next, $autoStateIds);
+        return $this->initSegmentFinder()->find($next, $autoStateIds);
+    }
+
+    /**
+     * returns the index/position of the current segment into the currently filtered/sorted list of all segments
+     * @return integer|null
+     */
+    public function getIndex() {
+        return $this->initSegmentFinder()->getIndex($this->getId());
     }
     
     /**
@@ -787,9 +806,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * encapsulate the load by taskGuid code.
      * @param string $taskGuid
+     * @param Closure $callback is called with the select statement as parameter before passing it to loadFilterdCustom Param: Zend_Db_Table_Select
      * @return array
      */
-    protected function _loadByTaskGuid($taskGuid) {
+    protected function _loadByTaskGuid($taskGuid, Closure $callback = null) {
         $this->segmentFieldManager->initFields($taskGuid);
         $this->reInitDb($taskGuid);
         
@@ -811,6 +831,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $s->from($this->db, $cols);
         $s = $this->addWatchlistJoin($s);
         $s = $this->addWhereTaskGuid($s, $taskGuid);
+        
+        if(!empty($callback)) {
+            $callback($s,$this->tableName);
+        }
         
         return parent::loadFilterdCustom($s);
     }

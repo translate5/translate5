@@ -368,7 +368,6 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.view.comments.Panel", {
         override: "Editor.view.comments.Panel",
         title: '<?php echo $this->translate->_('Kommentare zum aktuellen Segment');?>',
-        item_cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
         item_saveBtn: '<?php echo $this->translate->_('Speichern');?>',
         item_closeBtn: '<?php echo $this->translate->_('Schließen');?>',
         item_commentNew: '<?php echo $this->translate->_('Kommentar neu');?>',
@@ -602,6 +601,15 @@ Ext.define('Editor.controller.Localizer', {
             taskClosing: '<?php echo $this->translate->_('Aufgabe wird verlassen...');?>',
             taskFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen und verlassen...');?>',
             saveSegmentFirst: '<?php echo $this->translate->_('Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.');?>',
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.ReferenceFilesInfoMessage", {
+        override: "Editor.view.ReferenceFilesInfoMessage",
+        strings: {
+            windowTitle: '<?php echo $this->translate->_('Referenz-Dateien');?>', 
+            windowInfoMessage: '<?php echo $this->translate->_('There are reference files to the task.');?>',
+            buttonText: '<?php echo $this->translate->_('Open attachment list');?>',
         }
     });
     
