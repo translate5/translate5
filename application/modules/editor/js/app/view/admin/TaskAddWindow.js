@@ -117,6 +117,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     {
                         xtype:'panel',
                         itemId: 'taskMainCard',
+                        scrollable:'y',
                         items:[{
                             xtype: 'form',
                             padding: 5,
@@ -128,6 +129,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                             anchor: '100%',
                             items: [{
                                 xtype: 'container',
+                                itemId: 'taskMainCardContainer',
                                 flex: 1,
                                 layout: 'anchor',
                                 padding: '0 10 0 0',

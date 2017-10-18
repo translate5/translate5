@@ -37,10 +37,16 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.segments.RowEditorColumnParts', {
     override: 'Editor.view.segments.RowEditor',
 
+    itemId:'rowEditorTestCmp',
+    
     columnToEdit: null,
-    editorFieldExtraHeight: 10,
+    editorFieldExtraHeight: 10, //was 10, FIXME depending on the existence of the additional info bar or not
     previousRecord: null,
     timeTrackingData: null,
+
+    requires:[
+        'Editor.view.segments.StatusStrip'
+    ],
     messages: {
         segmentNotSavedUserMessage: '#UT#Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank!',
         cantSaveEmptySegment: '#UT#Das Segment kann nicht ohne Inhalt gespeichert werden!'
@@ -54,7 +60,12 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         me.on('render', function(p) {
             p.body.on('dblclick', me.changeColumnByClick, me);
         });
+        
         me.mainEditor = me.add(new Editor.view.segments.HtmlEditor());
+        //add the status strip component to the row editor
+        me.mainEditor.add({
+            xtype:'segments.statusstrip',
+        });
     },
     
     /**
@@ -233,9 +244,17 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         }
     },
     setEditorHeight: function() {
-        var me = this;
+        var me = this,
+            statusStrip=me.mainEditor.down('#segmentStatusStrip'),
+            statusStripHeight=0;
+        
+        //add extra height if the segment status strip contains an visible element
+        if(statusStrip.isItemVisible()){
+            statusStripHeight=15;
+        }
+        
         me.callParent(arguments);
-        me.mainEditor.setHeight(me.rowToEditOrigHeight + me.editorFieldExtraHeight);
+        me.mainEditor.setHeight(me.rowToEditOrigHeight + me.editorFieldExtraHeight + statusStripHeight);
     },
     /**
      * place the HtmlEditor/MainEditor in the rowEditor over the desired displayfield
@@ -400,5 +419,5 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         delete(result._start);
         this.timeTrackingData = {};
         return result;
-    }
+    },
 });

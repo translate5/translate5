@@ -66,6 +66,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   duplicatedContentTags: [],
   contentEdited: false, //is set to true if text content or content tags were modified
   disableErrorCheck: false,
+
+  valueAndMarkupTempVal:"",
   
   strings: {
 	  tagOrderErrorText: '#UT# Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
@@ -109,6 +111,16 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 	  this.callParent(arguments);
 	  this.fireEvent('afterinitframedoc', this);
   },
+
+  initEditor:function(){
+      var me=this;
+      if(me.valueAndMarkupTempVal!==""){
+          me.setValue(me.valueAndMarkupTempVal);
+          me.valueAndMarkupTempVal="";
+      }
+      me.callParent(arguments);
+  },
+
   /**
    * Überschreibt die Methode um den Editor Iframe mit eigenem CSS ausstatten
    * @returns string
@@ -145,17 +157,26 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       return false;
   },
   
-  /**
-   * Setzt Daten im HtmlEditor und fügt markup hinzu
-   * @param value String
-   */
-  setValueAndMarkup: function(value, segmentId, fieldName){
-      //check tag is needed for the checkplausibilityofput feature on server side 
-      var me = this,
-          checkTag = me.getDuplicateCheckImg(segmentId, fieldName);
-      
-      me.setValue(me.markupForEditor(value)+checkTag);
-  },
+    /**
+     * Setzt Daten im HtmlEditor und fügt markup hinzu
+     * @param value String
+     */
+    setValueAndMarkup: function(value, segmentId, fieldName){
+        //check tag is needed for the checkplausibilityofput feature on server side 
+        var me = this,
+            checkTag = me.getDuplicateCheckImg(segmentId, fieldName),
+            iframeBody = me.getEditorBody(),
+            patt = new RegExp(/<body>/g),
+            res = patt.test(iframeBody.parentNode.innerHTML);
+            
+        if(res){
+            me.initFrameDoc();
+            me.valueAndMarkupTempVal=me.markupForEditor(value)+checkTag;
+        }else{
+            me.setValue(me.markupForEditor(value)+checkTag);
+        }
+
+    },
   /**
    * Fixing focus issues EXT6UPD-105 and EXT6UPD-137
    */
@@ -247,6 +268,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     me.replaceTagToImage(tempNode, plainContent);
     return me.result;
   },
+
   replaceTagToImage: function(rootnode, plainContent) {
     var me = this,
     data = {
