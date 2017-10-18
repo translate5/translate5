@@ -96,13 +96,17 @@ Ext.define('Editor.controller.ViewModes', {
      */
     readonlyForced: false,
     visibleColumns: [],
-    filesRegionVisible: true,
+
+    /**
+     * Columns width for editor in edit mode
+     */
+    editModeColumnWidth:[],
+
     init : function() {
         var me = this;
         me.toggleTags(me.self.TAG_SHORT);
-        
-        
     },
+
     statics: {
         STYLE_BOX_ID: 'ergonomicStyleId',
         
@@ -143,7 +147,6 @@ Ext.define('Editor.controller.ViewModes', {
     },
     clearViewModes: function() {
         this.visibleColumns = [];
-        this.filesRegionVisible = true;
     },
     setViewMode: function(mode){
         var me = this,
@@ -203,14 +206,18 @@ Ext.define('Editor.controller.ViewModes', {
                 me.visibleColumns.push(col);
             }
         });
-        //collapsed can be also (left,right,top,bottom) as string
-        var filePanelCollapsed=me.getFilePanel().collapsed;
-        if (typeof filePanelCollapsed === 'string' || filePanelCollapsed instanceof String){
-            //FIXME why this var is named as it is, for this case now it make no sence
-            filePanelCollapsed=false;
-        }
-        me.filesRegionVisible = !filePanelCollapsed;
     },
+
+    /**
+     * Save the edit mode column width for later usage
+     */
+    saveEditModeColumnWidth:function(){
+        var me = this;
+        Ext.Array.each(me.getSegmentGrid().columns, function(col){
+            me.editModeColumnWidth[col.itemId]=col.getWidth() || col.initialConfig.width || 0;
+        });
+    },
+
     /**
      * returns all ContentColumn instances which should be hidden on view mode (and shown again in edit mode)
      * @return [Editor.view.segment.ContentColumn]
@@ -261,6 +268,8 @@ Ext.define('Editor.controller.ViewModes', {
             col.setVisible(!readonly);
         });
 
+        //save the edito mode column width for later usage
+        me.saveEditModeColumnWidth();
         me.fireEvent('viewModeChanged',me);
     },
     /**
@@ -326,6 +335,7 @@ Ext.define('Editor.controller.ViewModes', {
 
         //ergoOnly others, with other mode
         me.setViewMode(me.self.MODE_ERGONOMIC);
+
         grid.view.refresh();
         me.toggleEditorErgonomicMode();
         me.saveAlreadyOpened();
@@ -360,12 +370,13 @@ Ext.define('Editor.controller.ViewModes', {
         Ext.Array.each(me.visibleColumns, function(col){
             col.show();
         });
-        if(me.filesRegionVisible){
-            me.getFilePanel().expand();
-        }
+        
+        me.getFilePanel().expand();
+        
         Ext.Array.each(me.getSegmentGrid().columns, function(col){
-            if(col.originalWidth){
-                col.setWidth(col.originalWidth);
+            //apply the column width from saved values
+            if(me.editModeColumnWidth[col.itemId]){
+                col.setWidth(me.editModeColumnWidth[col.itemId]);
             }
         });
         Ext.util.CSS.removeStyleSheet(me.self.STYLE_BOX_ID);
