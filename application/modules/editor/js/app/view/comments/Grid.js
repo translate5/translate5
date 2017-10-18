@@ -56,7 +56,7 @@ Ext.define('Editor.view.comments.Grid', {
     
     me.commentTpl = new Ext.XTemplate([
        '<div class="comment">',
-       '<span class="content">{content}</span>',
+       '<span class="content">{content:nl2br}</span>',  //nl2br format methode anwenden!
        '<span class="author">{author}</span> - ',
        '<span class="created">{created}</span>',
        '<tpl if="isMod">',
