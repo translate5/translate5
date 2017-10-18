@@ -283,8 +283,8 @@ background-color: #EAF1FB;
 
 .comments-grid .x-action-col-cell img {height:16px;width:16px;cursor: pointer;}
 .ico-comment-add {background-image: url("../images/comment_add.png");}
-.ico-comment-edit {background-image: url("../images/comment_edit.png");}
-.ico-comment-delete {background-image: url("../images/comment_delete.png");}
+.ico-comment-edit {background-image: url("../images/comment_edit.png");background-repeat: no-repeat;}
+.ico-comment-delete {background-image: url("../images/comment_delete.png");background-repeat: no-repeat;}
 .comments-grid .readonly .x-action-col-cell img {display:none;}
 
 .comment {margin-bottom:5px;}
