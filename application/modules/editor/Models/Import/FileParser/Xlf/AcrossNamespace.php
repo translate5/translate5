@@ -41,6 +41,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Import_FileParser_Xlf_AcrossNamespace extends editor_Models_Import_FileParser_Xlf_AbstractNamespace{
     const ACROSS_XLIFF_NAMESPACE = 'xmlns:ax="AcrossXliff"';
+    const USERGUID = 'across-imported';
     
     /**
      * @var array
@@ -54,9 +55,14 @@ class editor_Models_Import_FileParser_Xlf_AcrossNamespace extends editor_Models_
     public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser) {
         $currentComment = null;
         $xmlparser->registerElement('trans-unit ax:named-property', function($tag, $attributes) use (&$currentComment){
-            $currentComment = ZfExtended_Factory::get('editor_Models_Comment');
+            if($attributes['name'] == 'Comment') {
+                $currentComment = ZfExtended_Factory::get('editor_Models_Comment');
+            }
             /* @var $currentComment editor_Models_Comment */
         }, function($tag, $key, $opener) use ($xmlparser, &$currentComment){
+            if(!$opener['attributes']['name'] == 'Comment') {
+                return;
+            }
             $title = '';
             if(!empty($currentComment->across_title)) {
                 $title .= 'Title: '.$currentComment->across_title.'';
@@ -81,7 +87,7 @@ class editor_Models_Import_FileParser_Xlf_AcrossNamespace extends editor_Models_
                     break;
                 case 'author':
                     $currentComment->setUserName($value);
-                    $currentComment->setUserGuid('across-imported');
+                    $currentComment->setUserGuid(self::USERGUID);
                     break;
                 case 'text':
                     $currentComment->setComment($value);

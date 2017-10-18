@@ -31,13 +31,61 @@ END LICENSE AND COPYRIGHT
  * @author Marc Mittag
  * @package editor
  * @version 1.0
- *
-
-/**
- * Export for Xlf uses same parser as Sdlxliff
  */
 
-class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParser_Sdlxliff{
+/**
+ * 
+ */
+class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParser {
+
+    /**
+     * @var string Klassenname des Difftaggers
+     */
+    protected $_classNameDifftagger = 'editor_Models_Export_DiffTagger_Sdlxliff';
+    
+    /**
+     * Helper to call namespace specfic parsing stuff 
+     * @var editor_Models_Export_FileParser_Xlf_Namespaces
+     */
+    protected $namespaces;
+    
+    /**
+     * übernimmt das eigentliche FileParsing
+     *
+     * - setzt an Stelle von <lekTargetSeg... wieder das überarbeitete Targetsegment ein
+     * - befüllt $this->_exportFile
+     */
+    protected function parse() {
+        $xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
+        /* @var $xmlparser editor_Models_Import_FileParser_XmlParser */
+        
+        //namespaces are not available until the xliff start tag was parsed!
+        $xmlparser->registerElement('xliff', function($tag, $attributes, $key) use ($xmlparser){
+            $this->namespaces = ZfExtended_Factory::get("editor_Models_Export_FileParser_Xlf_Namespaces",[$xmlparser->getChunk($key)]);
+            $this->namespaces->registerParserHandler($xmlparser, $this->_task);
+        });
+        
+        $xmlparser->registerElement('lekTargetSeg', null, function($tag, $key, $opener) use ($xmlparser){
+            $attributes = $opener['attributes'];
+            if(empty($attributes['id'])) {
+                throw new Zend_Exception('Missing id attribute in '.$xmlparser->getChunk($key));
+            }
+            
+            $id = $attributes['id'];
+            //alternate field is optional, use target as default
+            if(isset($attributes['field'])) {
+                $field = $attributes['field'];
+            }
+            else {
+                $field = editor_Models_SegmentField::TYPE_TARGET;
+            }
+            //$this->writeMatchRate(); refactor reapplyment of matchratio with XMLParser and namespace specific!
+            $xmlparser->replaceChunk($key, $this->getSegmentContent($id, $field));
+        });
+        $this->_exportFile = $xmlparser->parse($this->_skeletonFile);
+        
+    }
+    
     /**
      * dedicated to write the match-Rate to the right position in the target format
      * @param array $file that contains file as array as splitted by parse function
