@@ -29,5 +29,5 @@ UPDATE `LEK_languages` SET `rfc5646` = 'ja' WHERE `LEK_languages`.`rfc5646` = 'j
 UPDATE `LEK_languages` SET `rfc5646` = 'nb', `langName` = 'Norwegisch (Bokmal)' WHERE `LEK_languages`.`rfc5646` = 'no';
 UPDATE `LEK_languages` SET `rfc5646` = 'sr', `langName` = 'Serbisch (Latein)' WHERE `LEK_languages`.`rfc5646` = 'sr';
 UPDATE `LEK_languages` SET `rfc5646` = 'uz', `langName` = 'Usbekisch (Latein)' WHERE `LEK_languages`.`rfc5646` = 'uz';
-INSERT INTO `LEK_languages` (`id`, `langName`, `lcid`, `rfc5646`, `dir`, `rtl`) VALUES (NULL, 'Norwegisch (Nynorsk)', NULL, 'nn', 'ltr', '0'), (NULL, 'Serbisch (Kyrillisch)', NULL, 'sr-Cyrl', 'ltr', '0'), (NULL, 'Usbekisch (Kyrillisch)', NULL, 'uz-Cyrl', 'ltr', '0');
+INSERT INTO `LEK_languages` (`id`, `langName`, `lcid`, `rfc5646`, `rtl`) VALUES (NULL, 'Norwegisch (Nynorsk)', NULL, 'nn', '0'), (NULL, 'Serbisch (Kyrillisch)', NULL, 'sr-Cyrl', '0'), (NULL, 'Usbekisch (Kyrillisch)', NULL, 'uz-Cyrl', '0');
 
