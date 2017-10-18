@@ -77,6 +77,7 @@ Ext.define('Editor.view.segments.column.Comments', {
     },
     editor: {
         xtype: 'displayfield',
+        ownQuicktip: true,
         getModelData: function() {
             return null;
         },
