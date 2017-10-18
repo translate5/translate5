@@ -607,7 +607,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         //only update the mat view if the segment was already in DB (so do not save mat view on import!)
         if(!empty($oldIdValue)) {
-            $this->segmentFieldManager->getView()->updateSegment($this);
+            $matView = $this->segmentFieldManager->getView();
+            $matView->exists() && $matView->updateSegment($this);
         }
         return $segmentId;
     }

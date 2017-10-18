@@ -229,6 +229,20 @@ class editor_Models_Segment_MaterializedView {
     }
     
     /**
+     * returns boolean if the materialized view exists in the DB or not
+     * @return boolean
+     */
+    public function exists() {
+        $db = Zend_Db_Table::getDefaultAdapter();
+        try{
+            $result = $db->describeTable($this->viewName);
+            return ! empty($result);
+        }catch(Exception $e){
+            return false;
+        }
+    }
+    
+    /**
      * drops the segment data view to the given taskguid
      * @param string $taskGuid
      */

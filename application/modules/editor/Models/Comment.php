@@ -34,7 +34,23 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * Comment Entity Objekt
+ * Comment Entity Object
+ * @method integer getId() getId()
+ * @method void setId() setId(integer $id)
+ * @method string getTaskGuid() getTaskGuid()
+ * @method void setTaskGuid() setTaskGuid(string $taskGuid)
+ * @method integer getSegmentId() getSegmentId()
+ * @method void setSegmentId() setSegmentId(integer $segmentId)
+ * @method string getUserGuid() getUserGuid()
+ * @method void setUserGuid() setUserGuid(string $userGuid)
+ * @method string getUserName() getUserName()
+ * @method void setUserName() setUserName(string $username)
+ * @method string getComment() getComment()
+ * @method void setComment() setComment(string $comment)
+ * @method string getCreated() getCreated()
+ * @method void setCreated() setCreated(string $created)
+ * @method string getModified() getModified()
+ * @method void setModified() setModified(string $modified)
  */
 class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
   protected $dbInstanceClass = 'editor_Models_Db_Comments';
@@ -54,10 +70,10 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
   /**
    * updates the segments comments field by merging all comments to the segment, and apply HTML markup to each comment
    * @param integer $segmentId
+   * @param string $taskGuid
    */
-  public function updateSegment(integer $segmentId) {
-      $session = new Zend_Session_Namespace();
-      $comments = $this->loadBySegmentId($segmentId);
+  public function updateSegment(integer $segmentId, string $taskGuid) {
+      $comments = $this->loadBySegmentId($segmentId, $taskGuid);
       $commentsMarkup = array();
       $view = clone Zend_Layout::getMvcInstance()->getView();
       foreach($comments as $comment) {
@@ -67,14 +83,8 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
       /* @var $segment editor_Models_Segment */
       $segment->load($segmentId);
       
-      $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
-      /* @var $wfm editor_Workflow_Manager */
-      $workflow = $wfm->getActive();
-        
-      if($session->taskGuid === $segment->get('taskGuid')) {
+      if($taskGuid === $segment->get('taskGuid')) {
           $segment->set('comments', join("\n", $commentsMarkup));
-          //@todo do this with events
-          $workflow->beforeCommentedSegmentSave($segment);
           $segment->save();
       }
   }
@@ -83,17 +93,18 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
    * loads all comments to the given segmentId, filter also only the session loaded taskguid
    * sorts from newest to oldest comment, does compute the isEditable flag
    * @param integer $segmentId
+   * @param string $taskGuid
    * @return array
    */
-  public function loadBySegmentId(integer $segmentId) {
-      $session = new Zend_Session_Namespace();
+  public function loadBySegmentId(integer $segmentId, string $taskGuid) {
       $sessionUser = new Zend_Session_Namespace('user');
-      $comments = $this->loadBySegmentAndTaskPlain($segmentId, $session->taskGuid);
+      $userGuid = isset($sessionUser->data->userGuid) ? $sessionUser->data->userGuid : null;
+      $comments = $this->loadBySegmentAndTaskPlain($segmentId, $taskGuid);
       $editable = true;
       //comment is editable until an other user has edited it. 
       //the following algorithm depends on correct sort (id DESC => from newest to oldest comment)
       foreach($comments as &$comment) {
-          $comment['isEditable'] = ($editable && $comment['userGuid'] == $sessionUser->data->userGuid);
+          $comment['isEditable'] = ($editable && $userGuid && $comment['userGuid'] == $userGuid);
           $editable = $editable && $comment['isEditable'];
       }
       return $comments;

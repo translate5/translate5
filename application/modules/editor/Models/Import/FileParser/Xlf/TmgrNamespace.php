@@ -37,12 +37,12 @@ END LICENSE AND COPYRIGHT
 /**
  * XLF Fileparser Add On to parse IBM XLF specific stuff
  */
-class editor_Models_Import_FileParser_Xlf_TmgrNamespace implements editor_Models_Import_FileParser_Xlf_INamespace{
+class editor_Models_Import_FileParser_Xlf_TmgrNamespace extends editor_Models_Import_FileParser_Xlf_AbstractNamespace{
     const IBM_XLIFF_NAMESPACE = 'xmlns:tmgr="http://www.ibm.com"';
 
     /**
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_INamespace::transunitAttributes()
+     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::transunitAttributes()
      */
     public function transunitAttributes(array $attributes, editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes) {
         //FIXME add match rate infos into our matchRateType field!
@@ -52,31 +52,7 @@ class editor_Models_Import_FileParser_Xlf_TmgrNamespace implements editor_Models
     
     /**
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_INamespace::registerParserHandler()
-     */
-    public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser) {
-        //currently not needed
-    }
-    
-    /**
-     * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_INamespace::getPairedTag()
-     */
-    public function getPairedTag($xlfBeginTag, $xlfEndTag){
-        //currently not needed
-    }
-    
-    /**
-     * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_INamespace::getSingleTag()
-     */
-    public function getSingleTag($xlfTag){
-        //currently not needed
-    }
-    
-    /**
-     * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_INamespace::useTagContentOnly()
+     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::useTagContentOnly()
      */
     public function useTagContentOnly() {
         return null; //For OpenTM2 we can calculate this value depending on the tag
