@@ -37,8 +37,6 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.segments.RowEditorColumnParts', {
     override: 'Editor.view.segments.RowEditor',
 
-    itemId:'rowEditorTestCmp',
-    
     columnToEdit: null,
     editorFieldExtraHeight: 10, //was 10, FIXME depending on the existence of the additional info bar or not
     previousRecord: null,
@@ -419,5 +417,5 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         delete(result._start);
         this.timeTrackingData = {};
         return result;
-    },
+    }
 });
