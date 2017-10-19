@@ -386,6 +386,11 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
+    Ext.define("Editor.locale.de.controller.admin.TaskUserAssoc", {
+        override: "Editor.controller.admin.TaskUserAssoc",
+        title: '<?php echo $this->translate->_('Referenz-Dateie');?>'
+    });
+
     Ext.define("Editor.locale.de.controller.admin.TaskOverview", {
         override: "Editor.controller.admin.TaskOverview",
         strings: {
@@ -608,8 +613,8 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.ReferenceFilesInfoMessage",
         strings: {
             windowTitle: '<?php echo $this->translate->_('Referenz-Dateien');?>', 
-            windowInfoMessage: '<?php echo $this->translate->_('There are reference files to the task.');?>',
-            buttonText: '<?php echo $this->translate->_('Open attachment list');?>',
+            windowInfoMessage: '<?php echo $this->translate->_('Referenzdateien vorhanden');?>',
+            buttonText: '<?php echo $this->translate->_('Liste öffnen');?>',
         }
     });
     

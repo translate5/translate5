@@ -1582,6 +1582,21 @@
     <target>add MQM</target>
 </trans-unit>
 
+<trans-unit id='UmVmZXJlbnotRGF0ZWllbg=='>
+    <source>Referenz-Dateien</source>
+    <target>Reference files</target>
+</trans-unit>
+
+<trans-unit id='UmVmZXJlbnpkYXRlaWVuIHZvcmhhbmRlbg=='>
+    <source>Referenzdateien vorhanden</source>
+    <target>Reference files exist</target>
+</trans-unit>
+
+<trans-unit id='TGlzdGUgw7ZmZm5lbg=='>
+    <source>Liste öffnen</source>
+    <target>Open list</target>
+</trans-unit>
+
 <trans-unit id='JTEkcyAlMiRzLAoKU2llIGVyaGFsdGVuIGRpZXNlIEVtYWlsLCB3ZWlsIElociBLb250byBhdWYgJTMkcyBuZXUgYW5nZWxlZ3Qgb2RlciBJaHIgUGFzc3dvcnQgenVyw7xja2dlc2V0enQgd3VyZGUuIAoKSWhyIEJlbnV0emVybmFtZToKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCiU2JHMKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgpXZW5uIFNpZSBJaHIgS29udG8ga8O8bmZ0aWcgbnV0emVuIG3DtmNodGVuLCBkYW5uIGZvcmRlcm4gU2llIHVudGVyIGRlciBmb2xnZW5kZW4KQWRyZXNzZSBlaW5lIExpbmsgYW4sIHVtIElociBQYXNzd29ydCBuZXUgc2V0emVuIHp1IGvDtm5uZW4uCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KJTMkcyU0JHMKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgpWaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKSWhyIFByb2pla3RtYW5hZ2VtZW50IFRlYW0KJTUkcwoKRGllc2UgRW1haWwgd3VyZGUgYXV0b21hdGlzY2ggZ2VuZXJpZXJ0LiBCaXR0ZSBhbnR3b3J0ZW4gU2llIG5pY2h0IGF1ZiBkaWVzZSBFLU1haWwu'>
     <source>%1$s %2$s,
 
