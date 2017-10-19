@@ -582,17 +582,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 continue;
             }
             $segmentId = $this->setAndSaveSegmentValues();
-            $comments = $this->namespaces->getComments();
-            foreach($comments as $comment) {
-                /* @var $comment editor_Models_Comment */
-                $comment->setTaskGuid($this->task->getTaskGuid());
-                $comment->setSegmentId($segmentId);
-                $comment->save();
-            }
-            //if there was at least one processed comment, we have to sync the comment contents to the segment
-            if(!empty($comment)){
-                $comment->updateSegment((integer) $segmentId, $this->task->getTaskGuid());
-            }
+            $this->importComments((integer) $segmentId);
             $placeHolders[$mid] = $this->getFieldPlaceholder($segmentId, $targetName);
         }
         
@@ -656,6 +646,27 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $segmentContent = $this->internalTag->replace($segmentContent, '');
         $segmentContent = trim(strip_tags($segmentContent));
         return !empty($segmentContent);
+    }
+    
+    /**
+     * Imports the comments of last processed segment
+     * @param integer $segmentId
+     */
+    protected function importComments($segmentId) {
+        $comments = $this->namespaces->getComments();
+        if(empty($comments)) {
+            return;
+        }
+        foreach($comments as $comment) {
+            /* @var $comment editor_Models_Comment */
+            $comment->setTaskGuid($this->task->getTaskGuid());
+            $comment->setSegmentId($segmentId);
+            $comment->save();
+        }
+        //if there was at least one processed comment, we have to sync the comment contents to the segment
+        if(!empty($comment)){
+            $comment->updateSegment($segmentId, $this->task->getTaskGuid());
+        }
     }
     
     /**

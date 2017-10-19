@@ -36,12 +36,8 @@ END LICENSE AND COPYRIGHT
 
 /**
  * XLF Fileparser Add On to parse Across XLF specific stuff
- * 
- * TODO This class is a draft! 
  */
 class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_Export_FileParser_Xlf_AbstractNamespace{
-    const ACROSS_XLIFF_NAMESPACE = 'xmlns:ax="AcrossXliff"';
-    
     /**
      * @var array
      */

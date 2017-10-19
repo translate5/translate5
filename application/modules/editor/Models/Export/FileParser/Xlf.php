@@ -101,6 +101,8 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
         //    and paste the new attributes on the parent trans-unit to one <lekSegmentPlaceholder>
         //
         //  SEE ALSO TRANSLATE-956
+        //  must be implemented in editor_Models_Export_FileParser_Xlf_TmgrNamespace
+        //
         return $file;
         
         $matchRate = $this->_segmentEntity->getMatchRate();

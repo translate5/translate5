@@ -147,11 +147,12 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             case 'x':
             case 'ph':
             case 'it':
+            case 'bx':
+            case 'ex':
                 $type = '_singleTag';
                 $rid = 0;
                 break;
             case 'bpt':
-            case 'bx':
                 //the tagNr depends here on the existence of an entry with the same RID 
                 // if yes, take this value
                 // if no, increase and set the new value as new tagNr to that RID
@@ -163,7 +164,6 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
                 //g-close tag is just a hack to distinguish between open and close
                 $tag = 'g'; 
             case 'ept':
-            case 'ex':
                 $type = '_rightTag';
                 break;
             default:
