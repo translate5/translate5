@@ -3,6 +3,15 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.6.4] - 2017-10-19
+###Added
+TRANSLATE-944: Import and Export comments from Across Xliff
+TRANSLATE-1013: Improve embedded translate5 usage by a static link
+T5DEV-161: Non public VisualReview Plug-In
+
+###Changed
+TRANSLATE-1028: Correct wrong or misleading language shortcuts
+
 ## [2.6.2] - 2017-10-16
 ###Added
 TRANSLATE-869: Okapi integration for source file format conversion
