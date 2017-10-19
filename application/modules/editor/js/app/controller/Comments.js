@@ -284,8 +284,10 @@ Ext.define('Editor.controller.Comments', {
         panelController.handleAddComment();
 
         if(area.rendered && area.isVisible()) {
-            area.selectText();
-            area.focus(false, 500);
+            new Ext.util.DelayedTask(function(){
+                area.selectText();
+                area.focus();
+            }).delay(100);
         }
         
         store.load({

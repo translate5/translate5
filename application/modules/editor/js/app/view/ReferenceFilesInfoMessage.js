@@ -42,8 +42,8 @@ Ext.define('Editor.view.ReferenceFilesInfoMessage', {
     //},
     strings:{
         windowTitle:'#UT#Referenz-Dateien',
-        windowInfoMessage:'#UT#There are reference files to the task.',
-        buttonText:'#UT#Open attachment list'
+        windowInfoMessage:'#UT#Referenzdateien vorhanden',
+        buttonText:'#UT#Liste öffnen'
     },
     initComponent:function(instanceConfig){
         var me = this;
