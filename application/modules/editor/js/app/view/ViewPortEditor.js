@@ -129,7 +129,7 @@ Ext.define('Editor.view.ViewPortEditor', {
         return {
             region: 'north',
             weight: 40,
-            xtype: 'headPanel',
+            xtype: 'headPanel'
         };
     }
 });
