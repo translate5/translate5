@@ -1563,7 +1563,7 @@
 </trans-unit>
 <trans-unit id='w5xiZXJzZXR6dW5nc2F1ZmdhYmUgLSBhbGxlIHppZWxzcHJhY2hsaWNoZW4gU2VnbWVudGUgYmVpbSBJbXBvcnQgbGVlciAobmljaHQgYW5nZWhha3QgYmVkZXV0ZXQgUmV2aWV3YXVmZ2FiZSku'>
     <source>Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe).</source>
-    <target>Translation job - all target elements of the  segments have been empty at impoort time (not checked means this is a review job)</target>
+    <target>Translation job - all target elements of the  segments have been empty at import time (not checked means this is a review job)</target>
 </trans-unit>
 <trans-unit id='w5xiZXJzZXR6dW5nc2F1ZmdhYmUgKGtlaW4gUmV2aWV3KQ=='>
     <source>Übersetzungsaufgabe (kein Review)</source>

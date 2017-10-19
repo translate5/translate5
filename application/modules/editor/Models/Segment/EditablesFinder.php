@@ -161,6 +161,67 @@ class editor_Models_Segment_EditablesFinder {
     }
     
     /**
+     * gets the segment position (grid index) to the given segmentId and the configured filters
+     * returns null if the segment is not in the filtered list 
+     * @param integer $segmentId
+     * @return NULL|number
+     */
+    public function getIndex($segmentId) {
+        $outerSql = $this->getOuterSql();
+        
+        foreach($this->sortParameter as $sort) {
+            $isAsc = strtolower($sort->direction) === 'asc';
+            $prop = $this->getSortProperty($sort);
+
+            //if we ever will have multiple sort parameters, this should work out of the box because of the loop
+            $this->addSortOuter($outerSql, $prop, $isAsc);
+        }
+        
+        $db = $this->segment->db;
+        $tableName = $db->info($db::NAME);
+        $innerSql = $db->select()
+            ->from($db, $this->fieldsToSelect)
+            ->where($tableName.'.id = ?', $segmentId);
+            
+        $this->segment->addWatchlistJoin($innerSql, $tableName);
+        $this->watchList($this->filterInner, $tableName);
+        $this->filterInner->applyToSelect($innerSql);
+        
+        $outerSql->from(array('pos' => $innerSql), null);
+        $this->filterOuter->applyToSelect($outerSql);
+
+        $this->debug($outerSql);
+        
+        $stmt = $db->getAdapter()->query($outerSql);
+        $res = $stmt->fetch();
+        
+        //the above SQL returns null if the desired segment is on first position (produced by the IF in the outer SQL)
+        // it returns also null if the requested segmentId is not in the filtered set of segments.
+        //to find out which of the both cases happened, we have to load the innerSql solely:
+        $foundInFilter = true; //by default we assume that we found something
+        if($res['cnt'] === null) {
+            $stmt = $db->getAdapter()->query($innerSql);
+            $foundInFilter = $stmt->fetch(); //if there was a result, we have to return 0 which is done by the (int) cast at the end
+        }
+        
+        //if we got not result at all, or the desired segment was not in the filtered list, we return null
+        if(empty($res) || empty($foundInFilter)) {
+            return null;
+        }
+        return (int) $res['cnt'];
+    }
+    
+    /**
+     * Adds the watchList defitions to the needed filters
+     * @param ZfExtended_Models_Filter $filter
+     * @param string $tablename
+     */
+    protected function watchList(ZfExtended_Models_Filter $filter, $tablename) {
+        $filter->setDefaultTable($tablename);
+        $filter->addTableForField('isWatched', 'sua');
+    }
+    
+    /**
      * adds the where statement to the inner SELECT, the SQL differs for the following cases:
         ASC NEXT     sortField > currentSortValue || sortField = currentSortValue && idField > currentIdValue
         DESC NEXT    sortField < currentSortValue || sortField = currentSortValue && idField > currentIdValue
@@ -207,6 +268,7 @@ class editor_Models_Segment_EditablesFinder {
     protected function getOuterSql() {
         $outerSql = $this->segment->db->select()
             ->from(array('list' => $this->segment->db), new Zend_Db_Expr('if(count(pos.id), count(list.id), null) AS cnt'));
+        $this->watchList($this->filterOuter, 'list');
         return $this->segment->addWatchlistJoin($outerSql, 'list');
     }
     
@@ -215,10 +277,13 @@ class editor_Models_Segment_EditablesFinder {
      * @return Zend_Db_Table_Select
      */
     protected function getInnerSql() {
-        $innerSql = $this->segment->db->select()
-            ->from($this->segment->db, $this->fieldsToSelect)
+        $db = $this->segment->db;
+        $tableName = $db->info($db::NAME);
+        $innerSql = $db->select()
+            ->from($db, $this->fieldsToSelect)
             ->limit(1);
         $innerSql = $this->segment->addWatchlistJoin($innerSql);
+        $this->watchList($this->filterInner, $tableName);
         return $this->filterInner->applyToSelect($innerSql);
     }
     
