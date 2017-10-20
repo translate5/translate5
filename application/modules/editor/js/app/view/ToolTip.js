@@ -58,7 +58,7 @@ Ext.define('Editor.view.ToolTip', {
                 fly = Ext.fly(t); 
             if(fly.hasCls('qmflag')) {
                 this.handleQmFlag(t, tip);
-            } else if (Ext.get(t).hasCls('trackchanges')) {
+            } else if (fly.hasCls('trackchanges')) {
                 this.handleTrackchanges(t, tip);
             }
             //else if hasClass for other ToolTip Types
