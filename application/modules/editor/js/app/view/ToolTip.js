@@ -59,11 +59,13 @@ Ext.define('Editor.view.ToolTip', {
             if(fly.hasCls('qmflag')) {
                 this.handleQmFlag(t, tip);
             } else if (fly.hasCls('trackchanges')) {
+                this.userStore = Ext.getStore('admin.Users'),
                 this.handleTrackchanges(t, tip);
             }
             //else if hasClass for other ToolTip Types
         }
     },
+    userStore: null,
 
     onTargetOver: function(e) {
         e.preventDefault(); //prevent title tags to be shown in IE
@@ -94,7 +96,6 @@ Ext.define('Editor.view.ToolTip', {
     
     handleTrackchanges: function(trackchangeNode, tip) {
         var me = this,
-            userStore = Ext.getStore('admin.Users'),
             attrUserGuid,
             attrTimestamp,
             nodeAction = '',
@@ -111,7 +112,7 @@ Ext.define('Editor.view.ToolTip', {
         // Who has done it?
         if (trackchangeNode.hasAttribute('data-userguid')) {
             attrUserGuid = trackchangeNode.getAttribute('data-userguid');
-            nodeUser = userStore.getUserName(attrUserGuid);
+            nodeUser = me.userStore.getUserName(attrUserGuid);
         }
         // When?
         if (trackchangeNode.hasAttribute('data-timestamp')) {
