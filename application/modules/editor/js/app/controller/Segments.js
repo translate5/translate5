@@ -173,13 +173,6 @@ Ext.define('Editor.controller.Segments', {
           btn.removeCls(cls);
           btnWatchList.removeCls(cls);
     }
-      // ToolTips for ChangeMarkup
-      Ext.create('Editor.view.ToolTip', {
-          target: this.getSegmentGrid().getView().el,
-          delegate: '.changemarkup',
-          trackMouse: true,
-          dismissDelay: 0
-      });
   },
   /**
    * Displays / Updates the segment count in the reset button
