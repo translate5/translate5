@@ -231,6 +231,7 @@ Ext.define('Editor.view.segments.RowEditor', {
         var me = this;
         me.el.setLocalXY(-me.lastScrollLeft, me.editorLocalTop);
         me.setEditorWidth();
+        me.fireEvent('repositioned', this);
     },
     
     /**

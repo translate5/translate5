@@ -271,20 +271,52 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 
   replaceTagToImage: function(rootnode, plainContent) {
     var me = this,
-    data = {
-        fullPath: Editor.data.segments.fullTagPath,
-        shortPath: Editor.data.segments.shortTagPath
-    },
-    sp, fp, //[short|full]Path shortcuts
-    shortTagContent;
+        data = {
+            fullPath: Editor.data.segments.fullTagPath,
+            shortPath: Editor.data.segments.shortTagPath
+        };
     
     Ext.each(rootnode.childNodes, function(item){
-      var termFoundCls, divItem, spanFull, spanShort, split;
+      var termFoundCls;
       if(Ext.isTextNode(item)){
         var text = item.data.replace(new RegExp(Editor.TRANSTILDE, "g"), ' ');
         me.result.push(Ext.htmlEncode(text));
         plainContent.push(Ext.htmlEncode(text));
         return;
+      }
+      // Keep nodes from TrackChanges, but replace their images
+      if( (item.tagName.toLowerCase() == 'ins' || item.tagName.toLowerCase() == 'del')  && /(^|[\s])trackchanges([\s]|$)/.test(item.className)){
+          // TrackChange-Node might include images: 
+          // (1) add the special id to the img:
+          // (2) replace the given divs and spans with their image:
+          var allImagesInItem = item.getElementsByTagName('IMG'),
+              allDivsInItem = item.getElementsByTagName('DIV');
+          if (allImagesInItem.length > 0) {
+              for (i = 0; i < allImagesInItem.length; i++) {
+                  var imgItem = allImagesInItem[i];
+                  if (!me.isDuplicateSaveTag(imgItem)) {
+                      var htmlForItemImg = me.imgNodeToString(imgItem, true),
+                      templateEl = document.createElement('template');
+                      templateEl.innerHTML = htmlForItemImg;
+                      item.insertBefore(templateEl.content.firstChild,imgItem);
+                      item.removeChild(imgItem);
+                  }
+              }
+          }
+          if (allDivsInItem.length > 0) {
+              for (i = 0; i < allDivsInItem.length; i++) {
+                  var divItem = allDivsInItem[i],
+                      dataOfItem = me.getData(divItem,data),
+                      htmlForItemImg = me.imageTemplate.apply(dataOfItem);
+                  var templateEl = document.createElement('template');
+                  templateEl.innerHTML = htmlForItemImg;
+                  item.insertBefore(templateEl.content.firstChild,divItem);
+                  item.removeChild(divItem);
+              }
+          }
+          me.result.push(item.outerHTML);
+          plainContent.push(item.outerHTML);
+          return;
       }
       if(item.tagName == 'IMG' && !me.isDuplicateSaveTag(item)){
           me.result.push(me.imgNodeToString(item, true));
@@ -305,7 +337,21 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       if(item.tagName != 'DIV'){
         return;
       }
-      //daten aus den tags holen:
+      
+      data = me.getData(item,data);
+      
+      me.result.push(me.imageTemplate.apply(data));
+      plainContent.push(me.markupImages[data.key].html);
+    });
+  },
+  /**
+   * daten aus den tags holen
+   */
+  getData: function (item,data) {
+      var me = this,
+          divItem, spanFull, spanShort, split,
+          sp, fp, //[short|full]Path shortcuts;
+          shortTagContent;
       divItem = Ext.fly(item);
       spanFull = divItem.down('span.full');
       spanShort = divItem.down('span.short');
@@ -363,10 +409,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       else {
         data.path = sp;
       }
-
-      me.result.push(me.imageTemplate.apply(data));
-      plainContent.push(me.markupImages[data.key].html);
-    });
+      return data;
   },
   /**
    * ersetzt die images durch div und spans im string 
@@ -388,6 +431,34 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           if(Ext.isTextNode(item)){
               text = item.data;
               result.push(Ext.htmlEncode(text));
+              return;
+          }
+          // Keep nodes from TrackChanges
+          if( (item.tagName.toLowerCase() == 'ins' || item.tagName.toLowerCase() == 'del')  && /(^|[\s])trackchanges([\s]|$)/.test(item.className)){
+              // TrackChange-Node might include images => replace the images with their divs and spans:
+              var allImagesInItem = item.getElementsByTagName('img');
+              if( allImagesInItem.length > 0) {
+                  for (i = 0; i < allImagesInItem.length; i++) {
+                      var imgItem = allImagesInItem[i],
+                          imgHtml = '';
+                      if(me.isDuplicateSaveTag(imgItem)){
+                          debugger;
+                      }
+                      else if (markupImage = me.getMarkupImage(imgItem.id)){
+                          imgHtml = markupImage.html;
+                      } 
+                      else if(/^qm-image-/.test(imgItem.id)){
+                          imgHtml= me.imgNodeToString(imgItem, false);
+                      }
+                      if (imgHtml != '') {
+                          var template = document.createElement('template');
+                          template.innerHTML = imgHtml;
+                          imgItem.parentNode.insertBefore(template.content.firstChild,imgItem);
+                          imgItem.parentNode.removeChild(imgItem);
+                      }
+                  }
+              }
+              result.push(item.outerHTML);
               return;
           }
           // recursive processing of Terminologie spans, removes the term span

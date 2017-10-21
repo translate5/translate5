@@ -47,10 +47,12 @@ Ext.define('Editor.view.segments.EditorKeyMap', {
      * interceptor to handle the DIGITs prepared by another key kombination 
      */
     handleTargetEvent: function(event) {
+        var me = this;
         event.isDigitPreparation = false;
-        event.lastWasDigitPreparation = this.lastWasDigitPreparation;
-        var res = this.callParent([event]);
-        this.lastWasDigitPreparation = event.isDigitPreparation;
+        event.lastWasDigitPreparation = me.lastWasDigitPreparation;
+        //debugger;
+        var res = me.callParent([event]);
+        me.lastWasDigitPreparation = event.isDigitPreparation;
         return res;
     }
 });

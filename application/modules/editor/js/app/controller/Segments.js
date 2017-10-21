@@ -69,7 +69,7 @@ Ext.define('Editor.controller.Segments', {
   extend : 'Ext.app.Controller',
   stores: ['Segments'],
   //views: ['segments.Scroller', 'segments.RowEditing', 'segments.HtmlEditor', 'segments.GridFilter'],
-  views: ['segments.RowEditing', 'segments.HtmlEditor'],
+  views: ['segments.RowEditing', 'segments.HtmlEditor', 'ToolTip'],
   messages: {
     segmentSaved: 'Das Segment wurde gespeichert!',
     sortCleared: 'Die gewählte Sortierung der Segmente wurde zurückgesetzt!',

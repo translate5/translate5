@@ -91,7 +91,9 @@ Ext.define('Editor.controller.Editor', {
               contentErrors: 'handleSaveWithErrors'
           },
           'roweditor': {
-              destroy: 'handleDestroyRoweditor'
+              destroy: 'handleDestroyRoweditor',
+              repositioned: 'repositionEditor',
+              dragend: 'handleEditorDragend'
           },
           'roweditor displayfield[isContentColumn!=true]': {
               afterrender: 'initMoveToolTip'
@@ -150,6 +152,10 @@ Ext.define('Editor.controller.Editor', {
       plug.on('beforeedit', me.handleStartEdit, me);
       plug.on('canceledit', disableEditing);
       plug.on('edit', disableEditing)
+      
+      me.tooltip = Ext.create('Editor.view.ToolTip', {
+          target: me.getSegmentGrid().getEl()
+      });
       
       me.prevNextSegment = Ext.create('Editor.controller.editor.PrevNextSegment', {
         editingPlugin: plug
@@ -342,14 +348,13 @@ Ext.define('Editor.controller.Editor', {
               scope: me
           }, item[1]);
           if(item[3]) {
+              confObj.defaultEventAction = 'stopEvent';
               //prepends the event propagation stopper
-              confObj.fn = function(key, e) {
-                  e.stopEvent();
-                  item[2].apply(confObj.scope, arguments);
-              }
           }
-          else {
-              confObj.fn = item[2];
+          confObj.fn = function(key, e) {
+              item[2].apply(confObj.scope, arguments);
+              //FIXME Ausnahme für digitHandler definieren, wenn nicht im isDigitPreparation Modus!
+              return false; //stop further key binding processing
           }
           conf.push(confObj);
       });
@@ -361,20 +366,37 @@ Ext.define('Editor.controller.Editor', {
    */
   initEditor: function(editor){
       var me = this,
-          docEl = Ext.get(editor.getDoc());
+          docEl = Ext.get(editor.getDoc()),
+          offset = editor.iframeEl.getXY();
 
       if(me.editorKeyMap) {
           me.editorKeyMap.destroy();
       }
-      me.editorKeyMap = new Editor.view.segments.EditorKeyMap({
-        target: docEl,
-        binding: me.getKeyMapConfig()
-      });
       docEl.on('paste', function(e){
           e.stopPropagation();
           e.preventDefault();
           editor.insertAtCursor((e.browserEvent.clipboardData || window.clipboardData).getData('Text'));
       }, me, {delegated: false});
+      if(me.editorTooltip){
+          me.editorTooltip.setTarget(editor.getEditorBody());
+          me.editorTooltip.targetOffset = offset;
+      }
+      else {
+          me.editorTooltip = Ext.create('Editor.view.ToolTip', {
+              target: editor.getDoc(),
+              targetOffset: offset
+          });
+      }
+  },
+  repositionEditor: function(editor) {
+      if(this.editorTooltip){
+          var offset = editor.mainEditor.iframeEl.getXY();
+          this.editorTooltip.targetOffset = offset;
+      }
+  },
+  handleEditorDragend: function(moved, event){
+      var comp = (moved.proxy && !moved.comp.liveDrag) ? moved.proxy : moved.comp;
+      this.repositionEditor(comp);
   },
   clearKeyMaps: function() {
       var me = this;
