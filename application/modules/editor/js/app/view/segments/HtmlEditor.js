@@ -428,8 +428,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                       if (imgHtml != '') {
                           var template = document.createElement('template');
                           template.innerHTML = imgHtml;
-                          item.insertBefore(template.content.firstChild,imgItem);
-                          item.removeChild(imgItem);
+                          imgItem.parentNode.insertBefore(template.content.firstChild,imgItem);
+                          imgItem.parentNode.removeChild(imgItem);
                       }
                   }
               }

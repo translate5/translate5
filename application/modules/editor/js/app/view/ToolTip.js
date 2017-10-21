@@ -120,9 +120,12 @@ Ext.define('Editor.view.ToolTip', {
                 trackChanges: trackChangesData
             };
         // add tooltip for qmFlag?
-        if (/(^|[\s])qmflag([\s]|$)/.test(node.firstChild.className)) {
-            tplData.qmFlag = me.getQmFlagData(node.firstChild);
+        var allQmFlagNodes = node.getElementsByClassName('qmflag');
+        if (allQmFlagNodes.length == 1) {
+            tplData.qmFlag = me.getQmFlagData(allQmFlagNodes[0]);
         } else {
+            // a) there is no qmFlag-Node
+            // b) there are many qmFlag-Nodes and we don't know which exactly the mouseover refers to
             tplData.qmFlag = '';
         }
         if(!me.trackChangesTpl) {
