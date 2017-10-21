@@ -54,12 +54,12 @@ Ext.define('Editor.view.ToolTip', {
         // Change content dynamically depending on which element triggered
         // the show.
         beforeshow : function(tip) {
+            this.userStore = Ext.getStore('admin.Users');
             var t = tip.triggerElement,
                 fly = Ext.fly(t); 
             if(fly.hasCls('qmflag')) {
                 this.handleQmFlag(t, tip);
             } else if (fly.hasCls('trackchanges')) {
-                this.userStore = Ext.getStore('admin.Users'),
                 this.handleTrackChanges(t, tip);
             }
             //else if hasClass for other ToolTip Types
