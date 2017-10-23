@@ -75,8 +75,8 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                     forceSelection:true,
                 },{
                     xtype:'checkbox',
-                    itemId:'matchCaseChekbox',
-                    name:'matchCaseChekbox',
+                    itemId:'matchCase',
+                    name:'matchCase',
                     boxLabel:me.strings.matchCase
                 },{
                     xtype:'checkbox',
@@ -96,6 +96,7 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                             boxLabel  : me.strings.normalSearch,
                             name      : 'searchType',
                             inputValue: 'normalSearch',
+                            checked:true,
                         }, {
                             boxLabel  : me.strings.wildcardsSearch,
                             name      : 'searchType',

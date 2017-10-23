@@ -358,7 +358,7 @@ Ext.define('Editor.controller.SearchReplace', {
         
         params[proxy.getFilterParam()] = proxy.encodeFilters(segmentStore.getFilters().items);
         params[proxy.getSortParam()] = proxy.encodeSorters(segmentStore.getSorters().items);
-        
+        params['taskGuid']=Editor.data.task.get('taskGuid');
         form.submit({
             url: Editor.data.restpath+'segment/search',
             params:params,
