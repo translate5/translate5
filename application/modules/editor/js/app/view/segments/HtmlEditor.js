@@ -314,6 +314,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                   item.removeChild(divItem);
               }
           }
+          item.innerHTML = item.innerHTML.replace(new RegExp(Editor.TRANSTILDE, "g"), ' ');
           me.result.push(item.outerHTML);
           plainContent.push(item.outerHTML);
           return;

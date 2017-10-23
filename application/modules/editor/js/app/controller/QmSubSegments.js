@@ -211,7 +211,7 @@ Ext.define('Editor.controller.QmSubSegments', {
         this.getWindow().show();
     },
     /**
-     * Inserts the QM Issue Tag in the Editor by key shortcut, displays popup if nothing selected
+     * Inserts the QM Issue Tag in the Editor by key shortcut
      * @param key
      */
     handleAddQmFlagKey: function(key) {
@@ -224,7 +224,7 @@ Ext.define('Editor.controller.QmSubSegments', {
         }
     },
     /**
-     * Inserts the QM Issue Tag in the Editor, displays popup if nothing selected
+     * Inserts the QM Issue Tag in the Editor
      * @param menuitem
      */
     handleAddQmFlagClick: function(menuitem) {
@@ -262,7 +262,7 @@ Ext.define('Editor.controller.QmSubSegments', {
         } else {
             tagDef = this.insertQmFlagsH5(editor,qmid, comment, sev);
         }
-        this.fireEvent('afterInsertMqmTag',tagDef); // Inserted tags are marked with change markers.
+        this.fireEvent('afterInsertMqmTag',tagDef); // Inserted tags are marked with INS-trackChange-markers.
         this.lastSelectedRangeIE = null;
         return true;
     },

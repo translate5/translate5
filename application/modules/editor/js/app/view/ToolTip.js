@@ -55,7 +55,6 @@ Ext.define('Editor.view.ToolTip', {
         // Change content dynamically depending on which element triggered
         // the show.
         beforeshow : function(tip) {
-            this.userStore = Ext.getStore('admin.Users');
             var t = tip.triggerElement,
                 fly = Ext.fly(t); 
             if(fly.hasCls('qmflag')) {
@@ -138,6 +137,8 @@ Ext.define('Editor.view.ToolTip', {
         var me = this,
             attrUserGuid,
             attrTimestamp,
+            userStore = Ext.getStore('admin.Users'),
+            userItem,
             nodeAction = '',
             nodeUser = '',
             nodeDate = '';
@@ -152,7 +153,8 @@ Ext.define('Editor.view.ToolTip', {
         // Who has done it?
         if (node.hasAttribute('data-userguid')) {
             attrUserGuid = node.getAttribute('data-userguid');
-            nodeUser = me.userStore.getUserName(attrUserGuid);
+            userItem = userStore.findRecord('userGuid', attrUserGuid);
+            nodeUser = userItem.get('firstName') + ' ' + userItem.get('surName');
         }
         // When?
         if (node.hasAttribute('data-timestamp')) {
