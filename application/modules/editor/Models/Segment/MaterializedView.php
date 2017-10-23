@@ -144,7 +144,7 @@ class editor_Models_Segment_MaterializedView {
             if(empty($md[$v])) {
                 throw new Zend_Exception('Missing Column '.$v.' in LEK_segment_data on creating the materialized view!');
             }
-            $sql = 'ADD COLUMN `%s%s` '.strtoupper($md[$v]['DATA_TYPE']);
+            $sql = 'ADD COLUMN `%s%s%s` '.strtoupper($md[$v]['DATA_TYPE']);
             if(!empty($md[$v]['LENGTH'])) {
                 $sql .= '('.$md[$v]['LENGTH'].')';
             }
@@ -161,8 +161,8 @@ class editor_Models_Segment_MaterializedView {
         }
         
         //loop over all available segment fields for this task and create the SQL for
-        $walker = function($name, $suffix, $realCol) use ($addColTpl) {
-            return sprintf($addColTpl[$realCol], $name, $suffix);
+        $walker = function($prefix,$name, $suffix, $realCol) use ($addColTpl) {
+            return sprintf($addColTpl[$realCol],$prefix,$name, $suffix);
         };
         
         $addColSql = $sfm->walkFields($walker);
@@ -199,8 +199,8 @@ class editor_Models_Segment_MaterializedView {
         $selectSql = array('INSERT INTO '.$this->viewName.' SELECT s.*');
 
         $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($this->taskGuid);
-        $walker = function($name, $suffix, $realCol) use (&$selectSql) {
-            $selectSql[] = sprintf('MAX(IF(d.name = \'%s\', d.%s, NULL)) AS %s%s', $name, $realCol, $name, $suffix);
+        $walker = function($prefix,$name, $suffix, $realCol) use (&$selectSql) {
+            $selectSql[] = sprintf('MAX(IF(d.name = \'%s\', d.%s, NULL)) AS %s%s', $name, $realCol, $prefix,$name, $suffix);
         };
         //loop over all available segment fields for this task and create SQL for
         $sfm->walkFields($walker);
@@ -263,5 +263,12 @@ class editor_Models_Segment_MaterializedView {
             $sql = 'DROP TABLE IF EXISTS `'.$view.'`';
             $db->query($sql);
         }
+    }
+    
+    public function fieldExist($fieldName){
+        $db = Zend_Db_Table::getDefaultAdapter();
+        $sql='SHOW COLUMNS FROM `'.$this->getName().'` LIKE "'.$fieldName.'"';
+        $stmt = $db->query($sql);
+        return $stmt->fetchAll();
     }
 }

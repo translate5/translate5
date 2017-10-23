@@ -41,6 +41,10 @@ class editor_Models_SegmentFieldManager {
     const _MAP_DELIM = '#';
     const _EDIT_PREFIX = 'Edit';
     
+    const _MD5_PREFIX = 'Md5';
+    const _TOSORT_PREFIX = 'ToSort';
+    const _EDITTOSORT_PREFIX = 'EditToSort';
+    
     /**
      * @var array
      */
@@ -355,7 +359,10 @@ class editor_Models_SegmentFieldManager {
                 if(!$field->editable && strpos($k, self::_EDIT_PREFIX) === 0) {
                     continue;
                 }
-                $result[] = $walker($name, $k, $v);
+                if($k !== self::_MD5_PREFIX && $k !== self::_TOSORT_PREFIX &&$k !== self::_EDITTOSORT_PREFIX){
+                    $result[] = $walker("search_",$name, $k, $v);
+                }
+                $result[] = $walker("",$name, $k, $v);
             }
         }
         return $result;

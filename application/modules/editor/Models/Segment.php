@@ -135,30 +135,71 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     
     public function search($request){
         $queryString=$request->getParam('searchCombo');
-        $searchInCombo=$request->getParam('searchInCombo');
-        $matchCaseChekbox=$request->getParam('matchCaseChekbox');
+        $searchInCombo='search_'.$request->getParam('searchInCombo');
+        $matchCase=$request->getParam('matchCase');
         $searchTopChekbox=$request->getParam('searchTopChekbox');
         $searchType=$request->getParam('searchType');
+        $taskGuid=$request->getParam('taskGuid');
         
-        //FIXME continue here
+        $mv=ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
+        /* @var $mv editor_Models_Segment_MaterializedView  */
+        $mv->setTaskGuid($taskGuid);
+        $viewName=$mv->getName();
+        $checkField=$mv->fieldExist($searchInCombo);
+        if(empty($checkField)){
+            return "";
+        }
         $sql=
-        ' SELECT filtered.id, filtered.row_number ,filtered.'.$searchInCombo.''.
+        ' SELECT filtered.id,filtered.editable, filtered.row_number ,filtered.'.$searchInCombo.''.
         ' FROM ('.
         ' SELECT  `view`.`id`,'.
         ' @curRow := @curRow + 1 AS row_number,'.
         ' `view`.`'.$searchInCombo.'`, `view`.`editable`'.
-        ' FROM `LEK_segment_view_54d681b581e1e496898188f4ebab8c37` as view'.
+        ' FROM `'.$viewName.'` as view'.
         ' JOIN (SELECT @curRow := -1) r'.
+        //FIXME add filters here, this is an example of filter
         //'        #WHERE ( lower(`view`.`source`) like lower("%Mit%"))'.
         ' ORDER BY `view`.`fileOrder` asc, `view`.`id` asc'.
         ' ) filtered'.
-        ' WHERE ( filtered.'.$searchInCombo.' like "%'.$queryString.'%") and filtered.editable = 1'.
+        //' WHERE ( filtered.'.$searchInCombo.' like "%'.$queryString.'%") and filtered.editable = 1'.
+        ' WHERE ( filtered.'.$searchInCombo.
+        $this->buildSearchString($queryString, $searchType, $matchCase).
+        ' ) and filtered.editable = 1'.
         ' ORDER BY row_number ASC'.
         ' LIMIT 0, 50;';
         error_log(print_r($sql,1));
         $stmt = $this->db->getAdapter()->query($sql);
         $retVal = $stmt->fetchAll();
         return $retVal;
+    }
+    
+    public function buildSearchString($queryString,$searchType,$matchCase){
+        $outSql='';
+        
+        switch ($searchType) {
+            case 'normalSearch':
+                $outSql=' like "%'.$queryString.'%"';
+                if(!$matchCase){
+                    return $outSql;
+                }
+                $outSql=' REGEXP "[[:<:]]'.$queryString.'[[:>:]]"';
+                return $outSql;
+                break;
+            case 'wildcardsSearch':
+                $queryString=str_replace("*","%",$queryString);
+                $queryString=str_replace("?","_",$queryString);
+                $outSql=' like "%'.$queryString.'%"';
+                if(!$matchCase){
+                    return $outSql;
+                }
+                $outSql=' REGEXP "[[:<:]]'.$queryString.'[[:>:]]"';
+                break;
+            case 'regularExpressionSearch':
+                $outSql=' REGEXP "'.$queryString.'"';
+                return $outSql;
+                break;
+        }
+        
     }
     
     /**
@@ -172,6 +213,22 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         $v = $this->__call('get'.ucfirst($name), array());
         $this->__call('set'.ucfirst($toSort), array($this->truncateSegmentsToSort($v)));
+    }
+    
+    /**
+     * @param string $field
+     */
+    public function updateSearchField($name) {
+        $search= 'search_'.$name;
+        if(!$this->hasField($search)) {
+            return;
+        }
+        $value = $this->__call('get'.ucfirst($name), array());
+        if(is_string($value)){
+            $value=mb_substr(strip_tags($value),0,null,'utf-8');
+        }
+        
+        $this->__call('set'.ucfirst($search), array($value));
     }
     
     /**

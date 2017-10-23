@@ -250,12 +250,14 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $allowedToChange = array('qmId', 'stateId', 'autoStateId', 'matchRate', 'matchRateType');
         
         $allowedAlternatesToChange = $this->entity->getEditableDataIndexList();
-        $updateToSort = array_intersect(array_keys((array)$this->data), $allowedAlternatesToChange);
+        $updateSearchAndSort = array_intersect(array_keys((array)$this->data), $allowedAlternatesToChange);
         $this->checkPlausibilityOfPut($allowedAlternatesToChange);
         $this->sanitizeEditedContent($allowedAlternatesToChange);
         $this->setDataInEntity(array_merge($allowedToChange, $allowedAlternatesToChange), self::SET_DATA_WHITELIST);
-        foreach($updateToSort as $toSort) {
-            $this->entity->updateToSort($toSort);
+        foreach($updateSearchAndSort as $field) {
+            $this->entity->updateToSort($field);
+            //FIXME how do we update the new fields, mysql trigger or here in php
+            //$this->entity->updateSearchField($field);
         }
 
         $this->entity->setUserGuid($sessionUser->data->userGuid);
