@@ -56,7 +56,15 @@ Ext.define('Editor.controller.SearchReplace', {
             '#searchreplacetabpanel #replaceAllButton':{
                 click:'onReplaceAllButtonClick'
             },
-            
+            '#searchreplacetabpanel #searchCombo':{
+                change:'onSearchFieldTextChange'
+            },
+            '#roweditor':{
+                show:'onRowEditorShow'
+            },
+            '#searchTopChekbox':{
+                change:'onSearchTopChange'
+            }
         },
         controller:{
             '#Editor': {
@@ -84,7 +92,8 @@ Ext.define('Editor.controller.SearchReplace', {
     
     activeSegment:{
         matchIndex:0,
-        segmentResultIndex:0,
+        nextSegmentIndex:0,
+        currentSegmentIndex:0,
         matchCount:0
     },
     
@@ -94,10 +103,6 @@ Ext.define('Editor.controller.SearchReplace', {
         noSearchResults:'#UT#No results for the current search!',
     },
     
-    activeSelection:{
-        segmentIndex:-1,
-        indexInSegment:-1,
-    },
     
     initConfig:function(){
         this.callParent(arguments);
@@ -136,6 +141,32 @@ Ext.define('Editor.controller.SearchReplace', {
     
     onColumnVisibilityChange:function(){
         this.initColumnArrays();
+    },
+    
+    onSearchTopChange:function(checkbox,newValue,oldValue,eOpts){
+        var me=this,
+            tabPanel=me.getTabPanel(),
+            activeTab=tabPanel.getActiveTab(),
+            activeTabViewModel=activeTab.getViewModel(),
+            results=activeTabViewModel.get('result');
+        
+        //recalculate the next index
+        if(newValue){
+            //set one position back
+            me.activeSegment.nextSegmentIndex=me.activeSegment.currentSegmentIndex-1;
+        }else{
+            //set one position to front (we assume that )
+            me.activeSegment.nextSegmentIndex=me.activeSegment.currentSegmentIndex+1;
+        }
+        
+        //check if the index is out of the result boundaries
+        if(me.activeSegment.nextSegmentIndex >= results.length){
+            me.activeSegment.nextSegmentIndex=0;
+        }
+        
+        if(me.activeSegment.nextSegmentIndex < 0){
+            me.activeSegment.nextSegmentIndex=results.length-1;
+        }
     },
     
     handleEditorKeyMapUsage: function(cont, area, mapOverwrite) {
@@ -205,23 +236,17 @@ Ext.define('Editor.controller.SearchReplace', {
     },
     
     onSearchButtonClick:function(button){
-        var me=this,
-            tabPanel=me.getTabPanel(),
-            activeTab=tabPanel.getActiveTab(),
-            vm=activeTab.getViewModel(),
-            result=vm.get('result');
-        
         debugger;
+        var me=this,
+            nextSegmentNr=me.isSearchRequired();
+        
         me.isSearchPressed = true;
-        if(result.length>0){
-            //if edited segment select in it all finded results
-            //if not edited open first find, and select the matches found
-            
-            //save the current position 
-            me.handleRowSelection();
+
+        if(nextSegmentNr>=0){
+            me.search(nextSegmentNr);
             return;
         }
-        me.search();
+        me.handleRowSelection();
     },
     
     onReplaceButtonClick:function(){
@@ -233,15 +258,36 @@ Ext.define('Editor.controller.SearchReplace', {
         
         me.isSearchPressed = false;
         if(result.length>0){
-            //reset the current search index, so we start to replace from the first match
-            //me.activeSegment.matchIndex=null;
-            //me.activeSegment.segmentId=null;
             me.handleRowSelection();
         }
     },
     
     onReplaceAllButtonClick:function(){
         
+    },
+    
+    onSearchFieldTextChange:function(searchField,newValue,oldValue,eOpts){
+        if(newValue===oldValue){
+            return;
+        }
+        var me=this,
+            tabPanel=me.getTabPanel(),
+            activeTab=tabPanel.getActiveTab(),
+            vm=activeTab.getViewModel();
+        
+        vm.set('result',[]);
+        me.activeSegment.matchIndex=0;
+        me.activeSegment.nextSegmentIndex=0;
+        me.activeSegment.currentSegmentIndex=0;
+        me.activeSegment.matchCount=0;
+    },
+    
+    onRowEditorShow:function(){
+        var me=this;
+        var task = new Ext.util.DelayedTask(function(){
+            me.selectOrReplaceText();
+        });
+        task.delay(100);
     },
     
     showSearchAndReplaceWindow:function(key){
@@ -265,7 +311,7 @@ Ext.define('Editor.controller.SearchReplace', {
         if(plug.editor && plug.editor.editingPlugin.editing){
             me.activeColumnDataIndex = plug.editor.columnClicked;
         }
-        debugger;
+
         if(!key || (key == Ext.event.Event.F)){
             focusTab = 'searchTab';
             if(!Ext.Array.contains(me.searchFields,me.activeColumnDataIndex)){
@@ -346,7 +392,7 @@ Ext.define('Editor.controller.SearchReplace', {
         return dataArray;
     },
     
-    search:function(){
+    search:function(segmentNrInTask){
         var me=this,
             tabPanel=me.getTabPanel(),
             activeTab=tabPanel.getActiveTab(),
@@ -359,6 +405,8 @@ Ext.define('Editor.controller.SearchReplace', {
         params[proxy.getFilterParam()] = proxy.encodeFilters(segmentStore.getFilters().items);
         params[proxy.getSortParam()] = proxy.encodeSorters(segmentStore.getSorters().items);
         params['taskGuid']=Editor.data.task.get('taskGuid');
+        params['segmentNrInTask']=segmentNrInTask;
+        
         form.submit({
             url: Editor.data.restpath+'segment/search',
             params:params,
@@ -430,7 +478,7 @@ Ext.define('Editor.controller.SearchReplace', {
         if(!iframeDocument){
             return;
         }
-
+        
         if(searchCombo.getRawValue()===null || searchCombo.getRawValue()===""){
             return;
         }
@@ -454,7 +502,6 @@ Ext.define('Editor.controller.SearchReplace', {
             
             matches = cellHTML.match(searchRegExp);
         
-            debugger;
             if(!matches){
                 return;
             }
@@ -497,41 +544,68 @@ Ext.define('Editor.controller.SearchReplace', {
             activeTab=tabPanel.getActiveTab(),
             activeTabViewModel=activeTab.getViewModel(),
             results=activeTabViewModel.get('result'),
+            saveCurrentOpen=activeTab.down('#saveCurrentOpen').checked,
+            searchTopChekbox=activeTab.down('#searchTopChekbox').checked,
             gridView=grid.getView(),
             firstVisibleIndex=gridView.getFirstVisibleRowIndex(),
+            lastVisibleIndex=gridView.getLastVisibleRowIndex(),
             goToIndex=null,
             tmpRowNumber=null;
-        
+
         if(results.length < 1){
             Editor.MessageBox.addInfo(me.strings.noSearchResults);
             return;
         }
-
+        var startIndex= searchTopChekbox ? results.length : 0;
+        
         if(!plug.isEditing){
-            for(var i=0;i<results.length;i++){
+            
+            for(var index=startIndex;index<results.length;){
+                
                 //subtract one because this is a row number but we need the index
-                tmpRowNumber=parseInt(results[i].row_number);
-                if(tmpRowNumber===firstVisibleIndex){
-                    goToIndex=firstVisibleIndex;
-                    me.activeSegment.segmentResultIndex=i+1;
+                tmpRowNumber=parseInt(results[index].row_number);
+                
+                //if the hit row is in the range of the visible columns in the grid
+                if(tmpRowNumber>=firstVisibleIndex && tmpRowNumber<=lastVisibleIndex){
+                    goToIndex=tmpRowNumber;
+                    
+                    //find the direction of the next segment
+                    if(searchTopChekbox){
+                        me.activeSegment.nextSegmentIndex=index;
+                        index--;
+                    }else{
+                        me.activeSegment.nextSegmentIndex=index+1;
+                        index++;
+                    }
+                    me.activeSegment.currentSegmentIndex=me.activeSegment.nextSegmentIndex;
                     break;
                 }
+                
+                searchTopChekbox ? index-- : index++;
             }
         }
-        
+        //if no index is found, use the initial one -> 0
         if(goToIndex===null){
-            goToIndex=parseInt(results[me.activeSegment.segmentResultIndex].row_number);
-            me.activeSegment.segmentResultIndex++;
+            goToIndex=parseInt(results[me.activeSegment.nextSegmentIndex].row_number);
+            //save the current segment index
+            me.activeSegment.currentSegmentIndex=me.activeSegment.nextSegmentIndex;
+            
+            //set the next index
+            searchTopChekbox ? me.activeSegment.nextSegmentIndex-- : me.activeSegment.nextSegmentIndex++;
         }
 
-        if(me.activeSegment.segmentResultIndex >= results.length){
-            me.activeSegment.segmentResultIndex=0;
+        if(me.activeSegment.nextSegmentIndex >= results.length){
+            me.activeSegment.nextSegmentIndex=0;
         }
         
-        me.goToSegment(goToIndex,plug);
+        if(me.activeSegment.nextSegmentIndex < 0){
+            me.activeSegment.nextSegmentIndex=results.length-1;
+        }
+        
+        me.goToSegment(goToIndex,plug,saveCurrentOpen,activeTabViewModel);
     },
 
-    goToSegment:function(goToIndex,plug){
+    goToSegment:function(goToIndex,plug,saveCurrentOpen,activeTabViewModel){
         var me=this,
             grid = plug.getSegmentGrid(),
             selModel=grid.getSelectionModel(),
@@ -540,11 +614,12 @@ Ext.define('Editor.controller.SearchReplace', {
         callback = function() {
             grid.selectOrFocus(goToIndex);
             sel = selModel.getSelection();
+
+            if(saveCurrentOpen===false && ed.editing){
+                ed.cancelEdit();
+            }
+            
             ed.startEdit(sel[0], null, ed.self.STARTEDIT_SCROLLUNDER);
-            //delay the text selection because the dom is not initialized
-            new Ext.util.DelayedTask(function(){
-                me.selectOrReplaceText();
-            }).delay(100);
         };
         
         grid.scrollTo(goToIndex, {
@@ -565,9 +640,28 @@ Ext.define('Editor.controller.SearchReplace', {
         }
         return iframeDocument;
     },
+    
+    isSearchRequired:function(){
+        var me=this,
+            tabPanel=me.getTabPanel(),
+            activeTab=tabPanel.getActiveTab(),
+            vm=activeTab.getViewModel(),
+            result=vm.get('result');
+        
+        if(result.length < 1){
+            return 0;
+        }
+        if(me.activeSegment.matchIndex >= me.activeSegment.matchCount) {
+            return result[me.activeSegment.nextSegmentIndex].id;
+        }
+        return -1;
+    },
 
-    /*FIXME this works but somehow destroys the content inside the segment!!
-    testSearch:function(testWindow,testDocument,text){
+    //FIXME this works but somehow destroys the content inside the segment!!
+    testSearch:function(text){
+        var testWindow=Ext.getWin().dom,
+            testDocument=testWindow.document;
+        
         if (testWindow.find && testWindow.getSelection) {
             testDocument.designMode = "on";
             var sel = testWindow.getSelection();
@@ -586,6 +680,5 @@ Ext.define('Editor.controller.SearchReplace', {
             }
         }
     },
-    */
 });
     

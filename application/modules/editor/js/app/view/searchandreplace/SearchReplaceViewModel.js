@@ -36,7 +36,7 @@ Ext.define('Editor.view.searchandreplace.SearchReplaceViewModel', {
     data:{
         resultsCount:0,
         showResultsLabel:false,
-        result:[]
+        result:[],
     },
     
     formulas:{

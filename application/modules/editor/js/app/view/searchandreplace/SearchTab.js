@@ -49,9 +49,10 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
       matchCase:'#UT#Match case',
       towardsTop:'#UT#Search towards the top',
       useForSearch:'#UT#Use for search',
-      normalSearch:'#UT#Normal" (default)',
+      normalSearch:'#UT#Normal (default)',
       wildcardsSearch:'#UT#Wildcards',
       regularExpressionSearch:'#UT#Regular expressions',
+      saveCurrentOpen:'#UT#Save currently opened segment'
     },
     
     padding:'10 10 10 10',
@@ -113,6 +114,11 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                         text:'Results found: {getResultsCount}',
                         visible:'{showResultsLabel}'
                     }
+                },{
+                    xtype:'checkbox',
+                    itemId:'saveCurrentOpen',
+                    name:'saveCurrentOpen',
+                    boxLabel:me.strings.saveCurrentOpen
                 }]
         };
         if (instanceConfig) {
