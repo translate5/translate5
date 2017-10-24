@@ -200,6 +200,12 @@ class editor_Models_Segment_MaterializedView {
 
         $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($this->taskGuid);
         $walker = function($prefix,$name, $suffix, $realCol) use (&$selectSql) {
+            //if($prefix){
+            //    $selectSql[] = sprintf('MAX(IF(d.name = \'%s\', PREG_REPLACE("#<[^>]+>#","",d.%s), NULL)) AS %s%s', $name, $realCol, $prefix,$name, $suffix);
+            //}else{
+            //    $selectSql[] = sprintf('MAX(IF(d.name = \'%s\', d.%s, NULL)) AS %s%s', $name, $realCol, $prefix,$name, $suffix);
+            //}
+            //TODO create function which will remove the html tags, so the new colum have content with no html in it
             $selectSql[] = sprintf('MAX(IF(d.name = \'%s\', d.%s, NULL)) AS %s%s', $name, $realCol, $prefix,$name, $suffix);
         };
         //loop over all available segment fields for this task and create SQL for
