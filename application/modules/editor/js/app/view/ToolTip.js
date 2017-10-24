@@ -135,10 +135,8 @@ Ext.define('Editor.view.ToolTip', {
     },
     getTrackChangesData: function(node) {
         var me = this,
-            attrUserGuid,
+            attrUserName,
             attrTimestamp,
-            userStore = Ext.getStore('admin.Users'),
-            userItem,
             nodeAction = '',
             nodeUser = '',
             nodeDate = '';
@@ -151,10 +149,9 @@ Ext.define('Editor.view.ToolTip', {
             return;
         }
         // Who has done it?
-        if (node.hasAttribute('data-userguid')) {
-            attrUserGuid = node.getAttribute('data-userguid');
-            userItem = userStore.findRecord('userGuid', attrUserGuid);
-            nodeUser = userItem.get('firstName') + ' ' + userItem.get('surName');
+        if (node.hasAttribute('data-username')) {
+            attrUserName = node.getAttribute('data-username');
+            nodeUser = attrUserName; // can be used just as it is
         }
         // When?
         if (node.hasAttribute('data-timestamp')) {
