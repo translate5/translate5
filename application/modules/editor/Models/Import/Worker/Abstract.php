@@ -61,6 +61,7 @@ abstract class editor_Models_Import_Worker_Abstract extends ZfExtended_Worker_Ab
         $parentsOk = parent::checkParentDefunc();
         if(!$parentsOk) {
             $this->task->setErroneous();
+            $this->workerModel->defuncRemainingOfGroup();
         }
         return $parentsOk;
     }

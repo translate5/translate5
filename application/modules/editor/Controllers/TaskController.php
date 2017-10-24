@@ -808,7 +808,15 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     protected function checkStateAllowsActions() {
         if($this->entity->isErroneous() || $this->entity->isExclusiveState() && $this->entity->isLocked($this->entity->getTaskGuid())) {
-            throw new ZfExtended_Models_Entity_Conflict('Der aktuelle Status der Aufgabe verbietet diese Aktion!');
+            $e = new ZfExtended_Models_Entity_Conflict('Der aktuelle Status der Aufgabe verbietet diese Aktion!');
+            $e->setErrors([
+                    'task' => $this->entity->getTaskGuid(),
+                    'taskState' => $this->entity->getState(),
+                    'isLocked' => $this->entity->isLocked($this->entity->getTaskGuid()),
+                    'isErroneous' => $this->entity->isErroneous(),
+                    'isExclusiveState' => $this->entity->isExclusiveState(),
+            ]);
+            throw $e;
         }
     }
 }
