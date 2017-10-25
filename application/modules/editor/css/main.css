@@ -313,7 +313,25 @@ body.editor-readonly #segment-grid .x-grid-item-selected .comments-field .x-grid
 .ico-loading {background-image: url("../images/loading_ico.gif");}
 .autoState-999 {background-position: center;background-repeat: no-repeat;}
 .ico-refresh {background-image: url("../images/arrow_refresh_small.png");}
-body.loading {background: url("../images/loading_ico.gif") center 100px no-repeat;}
+body.loading {
+    color: #404040;
+    font-size: 13px;
+    line-height: 17px;
+    font-weight: 300;
+    font-family: 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana, sans-serif;
+}
+body.loading > div.loading {
+    height:100px;
+    width:450px;
+    margin:auto;
+    margin-top:120px;
+    text-align:left;
+    padding-left: 35px;
+    background: url("../images/loading_ico.gif") left 8px no-repeat;
+}
+div.loading div#loading-indicator-text {
+    font-style: italic;
+}
 
 /* Admin: */
 .ico-save {background-image: url("../images/tick.png");}

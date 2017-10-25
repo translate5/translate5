@@ -355,6 +355,3 @@ Ext.override(Ext.view.Table, {
         }
     }
 });
-
-
-

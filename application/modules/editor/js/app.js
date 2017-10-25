@@ -56,6 +56,10 @@ Ext.Loader.setPath('Editor.plugins', Editor.data.pluginFolder);
 Editor.DATE_ISO_FORMAT = 'Y-m-d H:i:s';
 Editor.DATEONLY_ISO_FORMAT = 'Y-m-d';
 
+Ext.ClassManager.onCreated(function(className) {
+    Ext.fly('loading-indicator-text').update(className);
+});
+
 Ext.application({
   name : 'Editor',
   models : [ 'File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field' ],
@@ -149,6 +153,7 @@ Ext.application({
       }
       else {
           Ext.getBody().removeCls('loading');
+          Ext.select("body > div.loading").destroy();
       }
       task.initWorkflow();
       me.viewport = Ext.create(Editor.data.app.viewport, {
@@ -197,6 +202,7 @@ Ext.application({
       }
       else {
           Ext.getBody().removeCls('loading');
+          Ext.select("body > div.loading").destroy();
       }
       me.viewport = Ext.create('Editor.view.ViewPort', {
           renderTo: Ext.getBody()
