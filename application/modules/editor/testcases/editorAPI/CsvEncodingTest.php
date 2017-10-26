@@ -98,6 +98,13 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
         //open task for whole testcase
         $this->api()->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
         
+        //Testing Reference files. Is a little bit hidden in here, but as separate method we would have to play with logins and the task, 
+        // in this method we are logged in and the task is opened.
+        $res = $this->api()->request('editor/referencefile/Translate%205%20Referenz%20Demonstration.pdf');
+        /*@var $res Zend_Http_Response */
+        $this->assertEquals(200, $res->getStatus(), 'GET reference file does not return HTTP 200');
+        $this->assertEquals('2a0275e5921f9127120403b0306758b5', md5($res->getBody()), 'GET reference file does not return correct body');
+        
         //get segment list
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
 
@@ -196,7 +203,7 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
         $expectedResult = $removeMqmIds($this->api()->getFileContent($fileToCompare));
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to '.$fileToCompare);
     }
-    
+
     public static function tearDownAfterClass() {
         $task = self::$api->getTask();
         self::$api->login('testmanager');

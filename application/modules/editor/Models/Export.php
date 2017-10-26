@@ -96,6 +96,11 @@ class editor_Models_Export {
         $localEncoded = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
             'LocalEncoded'
         );
+        
+        $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
+        /* @var $fileFilter editor_Models_File_FilterManager */
+        $fileFilter->initExport($this->task);
+        
         sort($dirPaths);
         foreach ($dirPaths as $path) {
             $path = $localEncoded->encode($path);
@@ -108,6 +113,8 @@ class editor_Models_Export {
             $parser = $this->getFileParser((int)$fileId, $path);
             /* @var $parser editor_Models_Export_FileParser */
             $parser->saveFile();
+            
+            $fileFilter->applyExportFilters($path, $fileId);
         }
     }
     

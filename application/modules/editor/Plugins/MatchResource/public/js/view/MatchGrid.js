@@ -104,6 +104,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 				'</table>',
 				'<br /> {ctrl} - {idx}: {takeMsg}'
 			),
+        segField = Editor.model.segment.Field,
 	    config = {
 	      bind: {
              store: '{editorquery}'
@@ -134,7 +135,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 			  hideable: false,
 			  sortable: false,
 	          cellWrap: true,
-			  tdCls: 'segment-tag-column source',
+			  tdCls: 'segment-tag-column source '+segField.getDirectionCls('source'),
 	          dataIndex: 'source',
 	          text: me.strings.source
 	      },{
@@ -143,7 +144,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 			  hideable: false,
 		      sortable: false,
 	          cellWrap: true,
-			  tdCls: 'segment-tag-column target',
+			  tdCls: 'segment-tag-column target '+segField.getDirectionCls('target'),
 	          dataIndex: 'target',
 	          text: me.strings.target
 	      },{

@@ -122,6 +122,12 @@ abstract class editor_Models_Import_FileParser {
     protected $config;
     
     /**
+     * contains the classname of the used parser
+     * @var string
+     */
+    protected $usedParser;
+    
+    /**
      * @param string $path pfad zur Datei in der Kodierung des Filesystems (also runtimeOptions.fileSystemEncoding)
      * @param string $fileName Dateiname utf-8 kodiert
      * @param integer $fileId
@@ -137,7 +143,19 @@ abstract class editor_Models_Import_FileParser {
         $this->_taskGuid = $task->getTaskGuid();
         $this->autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         $this->matchRateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
+        $this->usedParser = get_class($this); //this value changes if another file parser is used dynamically
+    }
+    
+    /**
+     * This function returns the parser which should be used by parsing
+     * Therefore the content of LEK_file must be saved after chaining, so this method and its overrides has to call updateFile()
+     * normally this is $this (means the current parser)
+     * The chaining gives us the possibility to parse a XML, find out the real file type and return the correct file parser here
+     * @return editor_Models_Import_FileParser
+     */
+    public function getChainedParser() {
         $this->updateFile();
+        return $this;
     }
     
     /**
@@ -147,36 +165,6 @@ abstract class editor_Models_Import_FileParser {
     public function getWordCount()
     {
         return false;
-    }
-    
-    /**
-     * Das Leerzeichen (U+0020)
-     * Schützt Zeichenketten, die im sdlxliff enthalten sind und aus einer
-     * Unicode Private Use Area oder bestimmten schutzwürdigen Whitespaces oder
-     * von mssql nicht verkrafteten Zeichen stammen mit einem Tag
-     *
-     */
-    protected function protectUnicodeSpecialChars() {
-        $this->_origFileUnicodeProtected = preg_replace_callback(
-                array('"\p{Co}"u', //Alle private use chars
-            '"\x{2028}"u', //Hex UTF-8 bytes or codepoint 	E2 80 A8//schutzbedürftiger Whitespace + von mssql nicht vertragen
-            '"\x{2029}"u', //Hex UTF-8 bytes 	E2 80 A9//schutzbedürftiger Whitespace + von mssql nicht vertragen
-            //we do not escape that any more - mssql not in use '"\x{201E}"u', //Hex UTF-8 bytes 	E2 80 9E //von mssql nicht vertragen
-            //we do not escape that any more - mssql not in use '"\x{201C}"u' //Hex UTF-8 bytes 	E2 80 9C//von mssql nicht vertragen
-            ), 
-                function ($match) {
-                    return '<unicodePrivateUseArea ts="' . implode(',', unpack('H*', $match[0])) . '"/>';
-                }, $this->_origFile);
-        $this->_origFileUnicodeSpecialCharsRemoved = preg_replace_callback(
-                array('"\p{Co}"u', //Alle private use chars
-            '"\x{2028}"u', //Hex UTF-8 bytes 	E2 80 A8//schutzbedürftiger Whitespace + von mssql nicht vertragen
-            '"\x{2029}"u', //Hex UTF-8 bytes 	E2 80 A9//schutzbedürftiger Whitespace + von mssql nicht vertragen
-            //we do not escape that any more - mssql not in use '"\x{201E}"u', //Hex UTF-8 bytes 	E2 80 9E //von mssql nicht vertragen
-            //we do not escape that any more - mssql not in use '"\x{201C}"u' //Hex UTF-8 bytes 	E2 80 9C//von mssql nicht vertragen
-            ), 
-                function ($match) {
-                    return '';
-                }, $this->_origFile);
     }
     
     public function addSegmentProcessor(editor_Models_Import_SegmentProcessor $proc){
@@ -323,7 +311,7 @@ abstract class editor_Models_Import_FileParser {
         $file = ZfExtended_Factory::get('editor_Models_File');
         /* @var $file editor_Models_File */
         $file->load($this->_fileId);
-        $file->setFileParser(get_class($this));
+        $file->setFileParser($this->usedParser);
         
         $convert = false;
         foreach ($this->_convert2utf8 as $format){
@@ -472,7 +460,9 @@ abstract class editor_Models_Import_FileParser {
      * returns the file extensions (in lower case) parsable by this fileparser
      * @return array;
      */
-    abstract public static function getFileExtensions();
+    public static function getFileExtensions() {
+        throw new ZfExtended_Exception('Method must be overwritten in subclass!'); //with strict standards statics may not abstract!
+    }
     
     /**
      * Gets a mapping of file extensions to possible fileparsers 

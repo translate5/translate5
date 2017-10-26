@@ -85,8 +85,9 @@ class editor_Models_Import_DataProvider_ZippedUrl extends editor_Models_Import_D
      * (non-PHPdoc)
      * @see editor_Models_Import_DataProvider_Zip::archiveImportedData()
      */
-    public function archiveImportedData() {
-        //the archive zip already exists in this DataProvider, so delete it, if no archive is wanted. 
+    public function archiveImportedData($filename = null) {
+        //the archive zip already exists in this DataProvider, so delete it, if no archive is wanted.
+        //a given filename is ignored so far
         $config = Zend_Registry::get('config');
         if(!$config->runtimeOptions->import->createArchivZip){
             unlink($this->importZip);

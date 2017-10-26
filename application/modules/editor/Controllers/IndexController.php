@@ -241,9 +241,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       //Editor.data.enableSourceEditing → still needed for enabling / disabling the whole feature (Checkbox at Import).
       $this->view->Php2JsVars()->set('enableSourceEditing', (boolean) $rop->import->enableSourceEditing);
       
-      $validImportExtensions = array_keys(editor_Models_Import_FileParser::getAllFileParsersMap());
-      $validImportExtensions[] = 'zip'; //ZIP is not provided by a specific fileparser
-      $this->view->Php2JsVars()->set('import.validExtensions', $validImportExtensions);
+      $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
+      /* @var $supportedFiles editor_Models_Import_SupportedFileTypes */
+      $this->view->Php2JsVars()->set('import.validExtensions', array_keys($supportedFiles->getSupportedTypes()));
       
       $this->view->Php2JsVars()->set('columns.widthFactorHeader', (float)$rop->editor->columns->widthFactorHeader);
       $this->view->Php2JsVars()->set('columns.widthOffsetEditable', (integer)$rop->editor->columns->widthOffsetEditable);
@@ -388,7 +388,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $result = array();
         foreach ($langs as $lang) {
             $name = $this->translate->_($lang['langName']);
-            $result[$name] = array($lang['id'], $name.' ('.$lang['rfc5646'].')');
+            $result[$name] = array($lang['id'], $name.' ('.$lang['rfc5646'].')', $lang['rtl']);
         }
         ksort($result); //sort by name of language
         if(empty($result)){
@@ -530,22 +530,27 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
                 'jpg' => 'image/jpeg',
                 'png' => 'image/png',
                 'gif' => 'image/gif',
+                'svg' => 'image/svg',
+                'woff' => 'application/woff',
+                'woff2' => 'application/woff2',
+                'ttf' => 'application/ttf',
+                'eot' => 'application/eot',
+                'html'=> 'text/html'
         );
         $slash = '/';
         // get requested file from router
         $requestedType =$this->getParam(1);
         $requestedFile =$this->getParam(2);
         $js = explode($slash, $requestedFile);
-        
         $extension = pathinfo($requestedFile, PATHINFO_EXTENSION);
         
         //pluginname is alpha characters only so check this for security reasons
         //ucfirst is needed, since in JS packages start per convention with lowercase, Plugins in PHP with uppercase! 
-        
-        $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($js))); 
-        if(empty($plugin) || !in_array($requestedType, array('js', 'resources'))) {
+        $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($js)));
+        if(empty($plugin)) {
             throw new ZfExtended_NotFoundException();
         }
+        
         //get the plugin instance to the key
         $pm = Zend_Registry::get('PluginManager');
         /* @var $pm ZfExtended_Plugin_Manager */
@@ -554,9 +559,18 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         if(empty($plugin)) {
             throw new ZfExtended_NotFoundException();
         }
+        
+        // check if requested "fileType" is allowed
+        if (!$plugin->isPublicFileType($requestedType)) {
+            throw new ZfExtended_NotFoundException();
+        }
+
         //get public files of the plugin to make a whitelist check of the file string from userland
         $allowedFiles = $plugin->getPublicFiles($requestedType, $absolutePath);
         $file = join($slash, $js);
+        if(!$allowedFiles){
+            return;
+        }
         if(!in_array($file, $allowedFiles)) {
             throw new ZfExtended_NotFoundException();
         }

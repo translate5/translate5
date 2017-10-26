@@ -48,7 +48,6 @@ class editor_Models_Import {
     protected $events;
     
     /**
-     * 
      * @var editor_Models_Import_Configuration
      */
     protected $importConfig;
@@ -106,12 +105,18 @@ class editor_Models_Import {
             throw $e;
         }
         $this->task->lock(NOW_ISO, true); //locks the task
-
+        
+        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
+        /* @var $eventManager ZfExtended_EventManager */
+        $eventManager->trigger('beforeImport', $this, array(
+                'task' => $this->task,
+                'importFolder'=>$this->importConfig->importFolder
+        ));
         /*
          * Queue Import Worker
          */
         $importWorker = ZfExtended_Factory::get('editor_Models_Import_Worker');
-        /* @var $worker editor_Models_Import_Worker */
+        /* @var $importWorker editor_Models_Import_Worker */
         $importWorker->init($this->task->getTaskGuid(), array(
                 'config' => $this->importConfig,
                 'dataProvider' => $dataProvider
@@ -137,10 +142,14 @@ class editor_Models_Import {
      * Using this proxy method for triggering the event to keep the legacy code bound to this class instead to the new worker class
      * @param editor_Models_Task $task
      */
-    public function triggerAfterImport(editor_Models_Task $task, int $parentWorkerId) {
+    public function triggerAfterImport(editor_Models_Task $task, int $parentWorkerId, editor_Models_Import_Configuration $importConfig) {
         $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         /* @var $eventManager ZfExtended_EventManager */
-        $eventManager->trigger('afterImport', $this, array('task' => $task, 'parentWorkerId' => $parentWorkerId));
+        $eventManager->trigger('afterImport', $this, [
+                'task' => $task, 
+                'parentWorkerId' => $parentWorkerId,
+                'importConfig' => $importConfig
+        ]);
     }
     
     /**

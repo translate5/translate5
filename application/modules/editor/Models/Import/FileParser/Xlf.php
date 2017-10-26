@@ -146,7 +146,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      */
     public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task) {
         parent::__construct($path, $fileName, $fileId, $task);
-        $this->protectUnicodeSpecialChars();
         $this->initNamespaces();
         $this->contentConverter = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_ContentConverter', [$this->namespaces, $this->task, $fileName]);
         $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
@@ -179,7 +178,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $this->namespaces->registerParserHandler($this->xmlparser);
         
         $preserveWhitespaceDefault = $this->config->runtimeOptions->import->xlf->preserveWhitespace;
-        $this->_skeletonFile = $parser->parse($this->_origFileUnicodeProtected, $preserveWhitespaceDefault);
+        $this->_skeletonFile = $parser->parse($this->_origFile, $preserveWhitespaceDefault);
         
         if ($this->segmentCount === 0) {
             error_log('Die Datei ' . $this->_fileName . ' enthielt keine übersetzungsrelevanten Segmente!');
@@ -465,7 +464,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     }
     
     protected function initNamespaces() {
-        $this->namespaces = ZfExtended_Factory::get("editor_Models_Import_FileParser_Xlf_Namespaces",[$this->_origFileUnicodeProtected]);
+        $this->namespaces = ZfExtended_Factory::get("editor_Models_Import_FileParser_Xlf_Namespaces",[$this->_origFile]);
     }
     
     /**
@@ -583,6 +582,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 continue;
             }
             $segmentId = $this->setAndSaveSegmentValues();
+            $this->importComments((integer) $segmentId);
             $placeHolders[$mid] = $this->getFieldPlaceholder($segmentId, $targetName);
         }
         
@@ -610,22 +610,27 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $placeHolder = join($placeHolders);
         
         //this solves TRANSLATE-879: sdlxliff and XLF import does not work with missing target
+        //if there is no target at all:
         if(is_null($this->currentPlainTarget)){
             //currentPlainSource point always to the last used source or seg-source 
             // the target tag should be added after the the latter of both
             $replacement = '</'.$this->currentPlainSource['tag'].">\n        <target>".$placeHolder.'</target>';
             $this->xmlparser->replaceChunk($this->currentPlainSource['closer'], $replacement);
         }
+        //if the XLF contains an empty (single tag) target:
         elseif($this->currentPlainTarget['openerMeta']['isSingle']) {
             $this->xmlparser->replaceChunk($this->currentPlainTarget['closer'], function($index, $oldChunk) use ($placeHolder) {
                 return '<target>'.$placeHolder.'</target>';
             });
         }
+        //existing content in the target:
         else {
             //clean up target content to empty, we store only our placeholder in the skeleton file
             $start = $this->currentPlainTarget['opener'] + 1;
             $length = $this->currentPlainTarget['closer'] - $start;
+            //empty content between target tags:
             $this->xmlparser->replaceChunk($start, '', $length);
+            //add placeholder and ending target tag:
             $this->xmlparser->replaceChunk($this->currentPlainTarget['closer'], function($index, $oldChunk) use ($placeHolder) {
                 return $placeHolder.$oldChunk;
             });
@@ -641,6 +646,27 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $segmentContent = $this->internalTag->replace($segmentContent, '');
         $segmentContent = trim(strip_tags($segmentContent));
         return !empty($segmentContent);
+    }
+    
+    /**
+     * Imports the comments of last processed segment
+     * @param integer $segmentId
+     */
+    protected function importComments($segmentId) {
+        $comments = $this->namespaces->getComments();
+        if(empty($comments)) {
+            return;
+        }
+        foreach($comments as $comment) {
+            /* @var $comment editor_Models_Comment */
+            $comment->setTaskGuid($this->task->getTaskGuid());
+            $comment->setSegmentId($segmentId);
+            $comment->save();
+        }
+        //if there was at least one processed comment, we have to sync the comment contents to the segment
+        if(!empty($comment)){
+            $comment->updateSegment($segmentId, $this->task->getTaskGuid());
+        }
     }
     
     /**

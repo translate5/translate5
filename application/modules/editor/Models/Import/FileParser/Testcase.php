@@ -59,8 +59,6 @@ class editor_Models_Import_FileParser_Testcase extends editor_Models_Import_File
      */
     public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task) {
         parent::__construct($path, $fileName, $fileId, $task);
-
-        $this->protectUnicodeSpecialChars();
     }
 
     /**
@@ -68,7 +66,7 @@ class editor_Models_Import_FileParser_Testcase extends editor_Models_Import_File
      * @see editor_Models_Import_FileParser::parse()
      */
     protected function parse() {
-        $this->_skeletonFile = $this->_origFileUnicodeProtected;
+        $this->_skeletonFile = $this->_origFile;
         $this->qp = qp($this->_skeletonFile, ':root',array('format_output'=> false, 'encoding'=>'UTF-8','use_parser'=>'xml'));
         $this->parseSegmentAttributes('fake - not needed, except for declaration');
         $this->extractSegment('fake - not needed, except for declaration');

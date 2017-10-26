@@ -1064,5 +1064,31 @@
         "targetEdit": "",
         "targetEditToSort": "",
         "isWatched": false
+    },
+    {
+        "segmentNrInTask": "42",
+        "mid": "11_43",
+        "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
+        "userName": "manager test",
+        "editable": "1",
+        "pretrans": "0",
+        "matchRate": "0",
+        "matchRateType": "import;empty",
+        "qmId": null,
+        "stateId": "0",
+        "autoStateId": "4",
+        "fileOrder": "0",
+        "comments": null,
+        "workflowStepNr": "0",
+        "workflowStep": null,
+        "source": "f2-11 - protected unicode characters <div class=\"open 6270742069643d223122207269643d223122202f\"><span title=\"&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; \/&gt;\" class=\"short\">&lt;1&gt;<\/span><span data-originalid=\"bpt\" data-filename=\"74c4ec5cbe7bb8852208c0a8f6807cc6\" class=\"full\">&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; \/&gt;<\/span><\/div><div class=\"single 73706163652074733d22656638313861222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div><div class=\"close 6570742069643d223222207269643d223122202f\"><span title=\"&lt;ept id=&quot;2&quot; rid=&quot;1&quot; \/&gt;\" class=\"short\">&lt;\/1&gt;<\/span><span data-originalid=\"ept\" data-filename=\"6e69c29d3276b3c192ba7947a13efa00\" class=\"full\">&lt;ept id=&quot;2&quot; rid=&quot;1&quot; \/&gt;<\/span><\/div> is a wingdings smiley",
+        "sourceMd5": "5b50c9dd0a3988706d9922839edee740",
+        "sourceToSort": "f2-11 - protected unicode char",
+        "target": "",
+        "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
+        "targetToSort": "",
+        "targetEdit": "",
+        "targetEditToSort": "",
+        "isWatched": false
     }
 ]

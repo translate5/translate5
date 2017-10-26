@@ -804,7 +804,7 @@
       </trans-unit>
       <trans-unit id='QXVmZ2FiZW5zcGV6aWZpc2NoZSBFaW5zdGVsbHVuZ2Vu'>
         <source>Aufgabenspezifische Einstellungen</source>
-        <target>Taskspecific properties</target>
+        <target>Task properties</target>
       </trans-unit>
       <trans-unit id='RWluc3RlbGx1bmdlbiB6dSBBdWZnYWJlICJ7MH0i'>
         <source>Einstellungen zu Aufgabe "{0}"</source>
@@ -1561,13 +1561,13 @@
     <source>STRG + EINFG (alternativ STRG + . (Punkt)) kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</source>
     <target>CTRL + INS (alternatively CTRL + . (period)) copies source to target.<br />CTRL + , (comma) + &gt;number&lt; copies corresponding tag to target (zero equals number 10)<br />CTRL + SHIFT + , (comma) + &gt;number&lt; copies tag numbers 11 to 20 to target.</target>
 </trans-unit>
-<trans-unit id='TGVlcmUgWmllbHNwcmFjaGVuLiBXYWhyIHdlbm4gYmVpbSBJbXBvcnQgYWxsZSB6aWVsc3ByYWNobGljaGVuIEZlbGRlciBsZWVyIHNpbmQu'>
-    <source>Leere Zielsprachen. Wahr wenn beim Import alle zielsprachlichen Felder leer sind.</source>
-    <target>Targets empty. True, if all targets are emtpy at import time</target>
+<trans-unit id='w5xiZXJzZXR6dW5nc2F1ZmdhYmUgLSBhbGxlIHppZWxzcHJhY2hsaWNoZW4gU2VnbWVudGUgYmVpbSBJbXBvcnQgbGVlciAobmljaHQgYW5nZWhha3QgYmVkZXV0ZXQgUmV2aWV3YXVmZ2FiZSku'>
+    <source>Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe).</source>
+    <target>Translation job - all target elements of the  segments have been empty at import time (not checked means this is a review job)</target>
 </trans-unit>
-<trans-unit id='TGVlcmUgWmllbHNwcmFjaGVu'>
-    <source>Leere Zielsprachen</source>
-    <target>Targets empty</target>
+<trans-unit id='w5xiZXJzZXR6dW5nc2F1ZmdhYmUgKGtlaW4gUmV2aWV3KQ=='>
+    <source>Übersetzungsaufgabe (kein Review)</source>
+    <target>Translation job (no review)</target>
 </trans-unit>
 <trans-unit id='PHA+QWNodHVuZyEgSW4gS8O8cnplIHdpcmQgZWluZSBXYXJ0dW5nIGFtIFN5c3RlbSBkdXJjaGdlZsO8aHJ0LjwvcD48cD5UcmFuc2xhdGU1IHdpcmQgYWIgZGllc2VtIFplaXRwdW5rdCBmw7xyIGt1cnplIFplaXQgbmljaHQgZXJyZWljaGJhciBzZWluLjwvcD48cD5HZXBsYW50ZXIgWmVpdHB1bmt0OiB7MH08L3A+'>
     <source><p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Translate5 wird ab diesem Zeitpunkt für kurze Zeit nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p></source>
@@ -1580,6 +1580,21 @@
 <trans-unit id='TVFNIGhpbnp1ZsO8Z2Vu'>
     <source>MQM hinzufügen</source>
     <target>add MQM</target>
+</trans-unit>
+
+<trans-unit id='UmVmZXJlbnotRGF0ZWllbg=='>
+    <source>Referenz-Dateien</source>
+    <target>Reference files</target>
+</trans-unit>
+
+<trans-unit id='UmVmZXJlbnpkYXRlaWVuIHZvcmhhbmRlbg=='>
+    <source>Referenzdateien vorhanden</source>
+    <target>Reference files exist</target>
+</trans-unit>
+
+<trans-unit id='TGlzdGUgw7ZmZm5lbg=='>
+    <source>Liste öffnen</source>
+    <target>Open list</target>
 </trans-unit>
 
 <trans-unit id='JTEkcyAlMiRzLAoKU2llIGVyaGFsdGVuIGRpZXNlIEVtYWlsLCB3ZWlsIElociBLb250byBhdWYgJTMkcyBuZXUgYW5nZWxlZ3Qgb2RlciBJaHIgUGFzc3dvcnQgenVyw7xja2dlc2V0enQgd3VyZGUuIAoKSWhyIEJlbnV0emVybmFtZToKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCiU2JHMKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgpXZW5uIFNpZSBJaHIgS29udG8ga8O8bmZ0aWcgbnV0emVuIG3DtmNodGVuLCBkYW5uIGZvcmRlcm4gU2llIHVudGVyIGRlciBmb2xnZW5kZW4KQWRyZXNzZSBlaW5lIExpbmsgYW4sIHVtIElociBQYXNzd29ydCBuZXUgc2V0emVuIHp1IGvDtm5uZW4uCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KJTMkcyU0JHMKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgpWaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKSWhyIFByb2pla3RtYW5hZ2VtZW50IFRlYW0KJTUkcwoKRGllc2UgRW1haWwgd3VyZGUgYXV0b21hdGlzY2ggZ2VuZXJpZXJ0LiBCaXR0ZSBhbnR3b3J0ZW4gU2llIG5pY2h0IGF1ZiBkaWVzZSBFLU1haWwu'>
@@ -1764,6 +1779,20 @@ You can access the portal at: %3$s<br />
 <br />
 <br />This e-mail has been generated automatically. Please do not reply to this e-mail.</target>
 </trans-unit>
+<trans-unit id='UGFzc3dvcnQgc2V0emVu'>
+  <source>Passwort setzen</source>
+  <target>Reset password</target>
+</trans-unit>
+
+<trans-unit id='RGllIEF1ZmdhYmUgd3VyZGUgbnVuIGF1dG9tYXRpc2NoIGbDvHIgZGllIGZvbGdlbmRlbiBCZW51dHplciBpbiBkZXIgUm9sbGUgPGk+JTIkczwvaT4gZnJlaWdlZ2ViZW46PGJyIC8+CiUxJHMKPGJyIC8+CkRpZSBCZW51dHplciB3dXJkZW4gcGVyIEUtTWFpbCBkYXLDvGJlciBpbmZvcm1pZXJ0LjxiciAvPgo8YnIgLz4='><source>Die Aufgabe wurde nun automatisch für die folgenden Benutzer in der Rolle <i>%2$s</i> freigegeben:<br />
+%1$s
+<br />
+Die Benutzer wurden per E-Mail darüber informiert.<br />
+<br /></source><target>The task was opened automatically for the following users in the role <i>%2$s</i>:<br />
+%1$s
+<br />
+The users were informed by e-mail.<br />
+<br /></target></trans-unit>
 
     </body>
   </file>

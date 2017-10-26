@@ -39,45 +39,88 @@ END LICENSE AND COPYRIGHT
  * 
  * TODO This class is a draft! 
  */
-class editor_Models_Import_FileParser_Xlf_AcrossNamespace implements editor_Models_Import_FileParser_Xlf_INamespace{
+class editor_Models_Import_FileParser_Xlf_AcrossNamespace extends editor_Models_Import_FileParser_Xlf_AbstractNamespace{
+    const ACROSS_XLIFF_NAMESPACE = 'xmlns:ax="AcrossXliff"';
+    const USERGUID = 'across-imported';
+    
     /**
-     * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_INamespace::transunitAttributes()
+     * @var array
      */
-    public function transunitAttributes(array $attributes, editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes) {
-        //TODO
-    }
+    protected $comments = [];
     
     /**
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_INamespace::registerParserHandler()
+     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::registerParserHandler()
      */
     public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser) {
-        //TODO
-    }
-    
-    /**
-     * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_INamespace::getPairedTag()
-     */
-    public function getPairedTag($xlfBeginTag, $xlfEndTag){
-        //TODO
-    }
-    
-    /**
-     * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_INamespace::getSingleTag()
-     */
-    public function getSingleTag($xlfTag){
-        //TODO
+        $currentComment = null;
+        $xmlparser->registerElement('trans-unit ax:named-property', function($tag, $attributes) use (&$currentComment){
+            if($attributes['name'] == 'Comment') {
+                $currentComment = ZfExtended_Factory::get('editor_Models_Comment');
+            }
+            /* @var $currentComment editor_Models_Comment */
+        }, function($tag, $key, $opener) use ($xmlparser, &$currentComment){
+            if(!$opener['attributes']['name'] == 'Comment') {
+                return;
+            }
+            $title = '';
+            if(!empty($currentComment->across_title)) {
+                $title .= 'Title: '.$currentComment->across_title.'';
+            }
+            if(!empty($currentComment->across_annotates) && $currentComment->across_annotates != 'Target') {
+                $title .= ' (annotates '.$currentComment->across_annotates.' column)';
+            }
+            if(!empty($title)) {
+                $title .= "\n";
+            }
+            $currentComment->setComment($title.$currentComment->getComment());
+            $this->comments[] = $currentComment;
+        });
+        $xmlparser->registerElement('trans-unit ax:named-property ax:named-value', null, function($tag, $key, $opener) use (&$currentComment, $xmlparser){
+            $name = strtolower($opener['attributes']['ax:name']);
+            $startText = $opener['openerKey'] + 1;
+            $length = $key - $startText;
+            $value = join($xmlparser->getChunks($startText, $length));
+            switch ($name) {
+                case 'annotates':
+                    $currentComment->across_annotates = $value;
+                    break;
+                case 'author':
+                    $currentComment->setUserName($value);
+                    $currentComment->setUserGuid(self::USERGUID);
+                    break;
+                case 'text':
+                    $currentComment->setComment($value);
+                    break;
+                case 'created':
+                    $value = date(DATE_ISO8601, strtotime('10/05/2017 11:13:38'));
+                    $currentComment->setCreated($value);
+                    $currentComment->setModified($value);
+                    break;
+                case 'title':
+                    $currentComment->across_title = $value;
+                    break;
+            }
+        });
     }
     
     /**
      * In Across the complete tag content must be used
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_INamespace::useTagContentOnly()
+     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::useTagContentOnly()
      */
     public function useTagContentOnly() {
         return false;
+    }
+    
+    /**
+     * After fetching the comments, the internal comments fetcher is resetted (if comments are inside MRKs and not the whole segment)
+     * {@inheritDoc}
+     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::getComments()
+     */
+    public function getComments() {
+        $comments = $this->comments;
+        $this->comments = [];
+        return $comments;
     }
 }

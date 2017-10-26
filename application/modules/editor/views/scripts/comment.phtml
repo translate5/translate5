@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
 $modified = $this->comment['modified']; //we ignore the locale for comments (see TRANSLATE-109)
 ?>
 <div class="comment">
-    <span class="content"><?php echo htmlspecialchars($this->comment['comment']); ?></span>
+    <span class="content"><?php echo nl2br(htmlspecialchars($this->comment['comment'])); ?></span>
     <span class="author"><?php echo htmlspecialchars($this->comment['userName']); ?></span>
     <span class="modified"><?php echo $modified; ?></span>
 </div>

@@ -284,6 +284,8 @@ abstract class editor_Models_Export_FileParser {
         
         $edited = (string) $segment->getFieldEdited($field);
         
+        $edited = $this->tagHelper->removeChangeMarkupTags($edited);
+        
         $before = $edited;
         $edited = $this->tagHelper->protect($edited);
         $edited = $this->removeTermTags($edited);

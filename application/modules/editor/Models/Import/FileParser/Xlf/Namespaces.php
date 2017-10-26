@@ -37,17 +37,22 @@ END LICENSE AND COPYRIGHT
 /**
  * XLF Namespace Handler
  */
-class editor_Models_Import_FileParser_Xlf_Namespaces implements editor_Models_Import_FileParser_Xlf_INamespace {
+class editor_Models_Import_FileParser_Xlf_Namespaces extends editor_Models_Import_FileParser_Xlf_AbstractNamespace {
     protected $namespaces = [];
     
     public function __construct($xliff) {
         //TODO this code could be improved by moving the following checks into each namespace class and loop through the existing classes
         // instead of hardcoding the checks here
+        // Additionaly this simple String check fails if the strings are somewhere in the content
+        // for a better implementation see Export Namespaces
         if (strpos($xliff, editor_Models_Import_FileParser_Xlf_TmgrNamespace::IBM_XLIFF_NAMESPACE) !== false) {
             $this->namespaces['ibm'] = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_TmgrNamespace');
         } 
         if (strpos($xliff, editor_Models_Import_FileParser_Xlf_Translate5Namespace::TRANSLATE5_XLIFF_NAMESPACE) !== false) {
             $this->namespaces['translate5'] = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_Translate5Namespace');
+        } 
+        if (strpos($xliff, editor_Models_Import_FileParser_Xlf_AcrossNamespace::ACROSS_XLIFF_NAMESPACE) !== false) {
+            $this->namespaces['across'] = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_AcrossNamespace');
         } 
     }
     
@@ -62,7 +67,7 @@ class editor_Models_Import_FileParser_Xlf_Namespaces implements editor_Models_Im
     
     /**
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_INamespace::registerParserHandler()
+     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::registerParserHandler()
      */
     public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser) {
         $this->call(__FUNCTION__, func_get_args());
@@ -70,7 +75,7 @@ class editor_Models_Import_FileParser_Xlf_Namespaces implements editor_Models_Im
     
     /**
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_INamespace::getPairedTag()
+     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::getPairedTag()
      */
     public function getPairedTag($xlfBeginTag, $xlfEndTag){
         return $this->call(__FUNCTION__, func_get_args());
@@ -78,7 +83,7 @@ class editor_Models_Import_FileParser_Xlf_Namespaces implements editor_Models_Im
     
     /**
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_INamespace::getSingleTag()
+     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::getSingleTag()
      */
     public function getSingleTag($xlfTag){
         return $this->call(__FUNCTION__, func_get_args());
@@ -86,9 +91,17 @@ class editor_Models_Import_FileParser_Xlf_Namespaces implements editor_Models_Im
     
     /**
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_INamespace::useTagContentOnly()
+     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::useTagContentOnly()
      */
     public function useTagContentOnly(){
+        return $this->call(__FUNCTION__, func_get_args());
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::getComments()
+     */
+    public function getComments() {
         return $this->call(__FUNCTION__, func_get_args());
     }
     

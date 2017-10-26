@@ -122,7 +122,6 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
      */
     public function getFile() {
         parent::getFile();
-        $this->unProtectUnicodeSpecialChars();
         $this->_exportFile = preg_replace('"(<mrk[^>]*[^/])></mrk>"i', '\\1/>', $this->_exportFile);
         $this->injectRevisions();
         $this->injectComments();
@@ -190,16 +189,5 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
                                 $revisions . '</rev-defs></doc-info>', $this->_exportFile);
             }
         }
-    }
-
-    /**
-     * Entschützt Zeichenketten, die im sdlxliff enthalten sind und mit
-     * ImportController->protectUnicodeSpecialChars geschützt wurden
-     */
-    protected function unProtectUnicodeSpecialChars() {
-        $this->_exportFile = preg_replace_callback('"<unicodePrivateUseArea ts=\"[A-Fa-f0-9]*\"/>"', function ($match) {
-                    $r = preg_replace('"<unicodePrivateUseArea ts=\"([A-Fa-f0-9]*)\"/>"', "\\1", $match[0]);
-                    return pack('H*', $r);
-                }, $this->_exportFile);
     }
 }

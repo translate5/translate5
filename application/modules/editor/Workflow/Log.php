@@ -73,7 +73,7 @@ class editor_Workflow_Log extends ZfExtended_Models_Entity_Abstract {
         
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
-        $task->updateWorkflowStep($taskGuid, $nextStep);
+        $task->updateWorkflowStep($taskGuid, $nextStep, $step);
         
         $adapter->commit();
     }
