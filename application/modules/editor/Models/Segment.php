@@ -167,10 +167,52 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         ' ) and filtered.editable = 1'.
         ' ORDER BY row_number ASC'.
         ' LIMIT 0, 50;';
-        error_log(print_r($sql,1));
+        
         $stmt = $this->db->getAdapter()->query($sql);
         $retVal = $stmt->fetchAll();
         return $retVal;
+    }
+    
+    //FIXME impruve the error handling
+    public function rellaceAll($request){
+        $queryString=$request->getParam('searchCombo');
+        $result=$request->getParam('result');
+        $searchType=$request->getParam('searchType');
+        $matchCase=$request->getParam('matchCase');
+        
+        if(!$result || empty($result)){
+            return;
+        }
+        $result=json_decode($result);
+        
+        $searchString="";
+        //"/^PHP$/"
+        switch ($searchType) {
+            case 'normalSearch':
+                $searchString='/'.$queryString.'/';
+                if(!$matchCase){
+                    break;
+                }
+                $searchString='/^'.$queryString.'$/';
+                break;
+            case 'wildcardsSearch':
+                $searchString=str_replace("*","%",$queryString);
+                $searchString=str_replace("?","_",$queryString);
+                if(!$matchCase){
+                    return $searchString;
+                }
+                $searchString=' REGEXP "[[:<:]]'.$searchString.'[[:>:]]"';
+                break;
+            case 'regularExpressionSearch':
+                $outSql=' REGEXP "'.$queryString.'"';
+                return $outSql;
+                break;
+        }
+        
+        foreach ($result as $res){
+            $value=$res->search_targetEdit;
+            
+        }
     }
     
     public function buildSearchString($queryString,$searchType,$matchCase){
@@ -193,6 +235,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
                     return $outSql;
                 }
                 $outSql=' REGEXP "[[:<:]]'.$queryString.'[[:>:]]"';
+                return $outSql;
                 break;
             case 'regularExpressionSearch':
                 $outSql=' REGEXP "'.$queryString.'"';
@@ -272,13 +315,18 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     public function set($name, $value) {
         $loc = $this->segmentFieldManager->getDataLocationByKey($name);
         if($loc !== false) {
+            error_log("call");
             if(empty($this->segmentdata[$loc['field']])) {
                 $this->segmentdata[$loc['field']] = $this->createData($loc['field']);
             }
+            //FIXME: parent::set('search_'.$loc['field'], $this->stripTags($value));
+            parent::set(''.$loc['field'].'Search', $this->stripTags($value));
             return $this->segmentdata[$loc['field']]->__set($loc['column'], $value);
         }
         return parent::set($name, $value);
     }
+    
+    
 
     /**
      * gets segment attributes, filters the fluent fields and gets them from a different location
@@ -381,7 +429,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     /**
      * strips all tags including internal tag content
-     * @param string $segmentContent
      * @return string $segmentContent
      */
     public function stripTags($segmentContent) {

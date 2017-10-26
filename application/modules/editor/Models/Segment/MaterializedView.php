@@ -138,13 +138,14 @@ class editor_Models_Segment_MaterializedView {
         $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($this->taskGuid);
         $baseCols = $sfm->getBaseColumns();
         
+        
         //define the add column states based on the field type stored in the DB
         $addColTpl = array();
         foreach($baseCols as $v) {
             if(empty($md[$v])) {
                 throw new Zend_Exception('Missing Column '.$v.' in LEK_segment_data on creating the materialized view!');
             }
-            $sql = 'ADD COLUMN `%s%s%s` '.strtoupper($md[$v]['DATA_TYPE']);
+            $sql = 'ADD COLUMN `%s%s` '.strtoupper($md[$v]['DATA_TYPE']);
             if(!empty($md[$v]['LENGTH'])) {
                 $sql .= '('.$md[$v]['LENGTH'].')';
             }
@@ -161,8 +162,8 @@ class editor_Models_Segment_MaterializedView {
         }
         
         //loop over all available segment fields for this task and create the SQL for
-        $walker = function($prefix,$name, $suffix, $realCol) use ($addColTpl) {
-            return sprintf($addColTpl[$realCol],$prefix,$name, $suffix);
+        $walker = function($name, $suffix, $realCol) use ($addColTpl) {
+            return sprintf($addColTpl[$realCol],$name, $suffix);
         };
         
         $addColSql = $sfm->walkFields($walker);
@@ -199,14 +200,8 @@ class editor_Models_Segment_MaterializedView {
         $selectSql = array('INSERT INTO '.$this->viewName.' SELECT s.*');
 
         $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($this->taskGuid);
-        $walker = function($prefix,$name, $suffix, $realCol) use (&$selectSql) {
-            //if($prefix){
-            //    $selectSql[] = sprintf('MAX(IF(d.name = \'%s\', PREG_REPLACE("#<[^>]+>#","",d.%s), NULL)) AS %s%s', $name, $realCol, $prefix,$name, $suffix);
-            //}else{
-            //    $selectSql[] = sprintf('MAX(IF(d.name = \'%s\', d.%s, NULL)) AS %s%s', $name, $realCol, $prefix,$name, $suffix);
-            //}
-            //TODO create function which will remove the html tags, so the new colum have content with no html in it
-            $selectSql[] = sprintf('MAX(IF(d.name = \'%s\', d.%s, NULL)) AS %s%s', $name, $realCol, $prefix,$name, $suffix);
+        $walker = function($name, $suffix, $realCol) use (&$selectSql) {
+            $selectSql[] = sprintf('MAX(IF(d.name = \'%s\', d.%s, NULL)) AS %s%s', $name, $realCol, $name, $suffix);
         };
         //loop over all available segment fields for this task and create SQL for
         $sfm->walkFields($walker);

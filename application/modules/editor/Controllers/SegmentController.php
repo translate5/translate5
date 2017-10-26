@@ -260,6 +260,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             //$this->entity->updateSearchField($field);
         }
 
+        
         $this->entity->setUserGuid($sessionUser->data->userGuid);
         $this->entity->setUserName($sessionUser->data->userName);
         $this->entity->restoreNotModfied();
@@ -283,7 +284,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
                 $this->entity->updateQmSubSegments($field);
             }
         }
-        
+        //FIXME check who use this event so we klnow do we trigger this on replace all or not
         $this->events->trigger("beforePutSave", $this, array(
                 'entity' => $this->entity,
                 'model' => $this->entity, //FIXME model usage is deprecated and should be removed in future (today 2016-08-10) 
@@ -304,6 +305,15 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         //$search->search();
         //$retVal=$this->entity->search($this);
         $result=$this->entity->search($this);
+        $retval['success']=true;
+        $retval['rows']=$result;
+        $retval=Zend_Json::encode((object)$retval, Zend_Json::TYPE_OBJECT);
+        echo $retval;
+    }
+    
+    public function replaceallAction(){
+        $retval=$this->entity->rellaceAll($this);
+        
         $retval['success']=true;
         $retval['rows']=$result;
         $retval=Zend_Json::encode((object)$retval, Zend_Json::TYPE_OBJECT);
