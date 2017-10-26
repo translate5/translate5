@@ -92,7 +92,7 @@ class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_
             
         });
         $xmlparser->registerElement('xliff trans-unit', null, function($tag, $key, $opener) use ($xmlparser){
-            $commentString = $this->commentsToXml($this->comments);
+            $commentString = $this->processComments();
             if(empty($this->currentPropertiesKey)) {
                 $replacement = '<ax:named-properties>'.$commentString.'</ax:named-properties>'.$xmlparser->getChunk($key);
             }
@@ -107,27 +107,27 @@ class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_
     
     /**
      * creates a comment
-     * @param array $comments
      * @return string|mixed
      */
-    protected function commentsToXml(array $comments) {
-        if(empty($comments)) {
+    protected function processComments() {
+        if(empty($this->comments)) {
             return '';
         }
 
-        foreach($comments as $comment) {
+        foreach($this->comments as $comment) {
             if($comment['userGuid'] == editor_Models_Import_FileParser_Xlf_AcrossNamespace::USERGUID) {
                 continue;
             }
             self::$xmlWriter->startElement('ax:named-property');
             self::$xmlWriter->writeAttribute('name', 'Comment');
             $this->addNamedValue('Author', $comment['userName']);
-            $this->addNamedValue('Created', $comment['modified']); //FIXME format!
+            $this->addNamedValue('Created', date('m/d/Y H:i:s', strtotime($comment['modified']))); 
             $this->addNamedValue('Annotates', 'General');
             $this->addNamedValue('Title', 'exported from translate5');
             $this->addNamedValue('Text', $comment['comment']);
             self::$xmlWriter->endElement();
         }
+        $this->comments = [];
         return self::$xmlWriter->flush();
     }
     
