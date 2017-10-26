@@ -79,6 +79,9 @@ Ext.define('Editor.controller.SearchReplace', {
     },{
         ref:'tabPanel',
         selector:'#searchreplacetabpanel'
+    },{
+        ref:'searchReplaceWindow',
+        selector:'#searchreplacewindow'
     }],
 
     searchFields:[],
@@ -236,7 +239,6 @@ Ext.define('Editor.controller.SearchReplace', {
     },
     
     onSearchButtonClick:function(button){
-        debugger;
         var me=this,
             nextSegmentNr=me.isSearchRequired();
         
@@ -263,7 +265,7 @@ Ext.define('Editor.controller.SearchReplace', {
     },
     
     onReplaceAllButtonClick:function(){
-        
+        this.replaceAll();  
     },
     
     onSearchFieldTextChange:function(searchField,newValue,oldValue,eOpts){
@@ -273,9 +275,15 @@ Ext.define('Editor.controller.SearchReplace', {
         var me=this,
             tabPanel=me.getTabPanel(),
             activeTab=tabPanel.getActiveTab(),
-            vm=activeTab.getViewModel();
+            vm=activeTab.getViewModel(),
+            tabPanelviewModel=tabPanel.getViewModel();
+
         
+        tabPanelviewModel.set('searchPerformed',false);
         vm.set('result',[]);
+        vm.set('resultsCount',0);
+        vm.set('showResultsLabel',false);
+        
         me.activeSegment.matchIndex=0;
         me.activeSegment.nextSegmentIndex=0;
         me.activeSegment.currentSegmentIndex=0;
@@ -284,6 +292,10 @@ Ext.define('Editor.controller.SearchReplace', {
     
     onRowEditorShow:function(){
         var me=this;
+        if(!me.getSearchReplaceWindow()){
+            return;
+        }
+        //delay so the roweditor is loaded
         var task = new Ext.util.DelayedTask(function(){
             me.selectOrReplaceText();
         });
@@ -424,6 +436,44 @@ Ext.define('Editor.controller.SearchReplace', {
                 activeTabViewModel.set('result',foundSegments.length >0 ? foundSegments : [] );
                 activeTabViewModel.set('showResultsLabel',true);
                 me.handleRowSelection();
+            },
+            failure: function(form, submit){
+                var res = submit.result;
+                //submit results are always state 200.
+                //If success false and errors is an array, this errors are shown in the form directly,
+                // so we dont need the handleException
+                if(!res || res.success || !Ext.isArray(res.errors)) {
+                    Editor.app.getController('ServerException').handleException(submit.response);
+                    return;
+                }
+                if(Ext.isArray(res.errors)) {
+                    form.markInvalid(res.errors);
+                    return;
+                }
+            }
+        });
+    },
+    
+    replaceAll:function(){
+        var me=this,
+            tabPanel=me.getTabPanel(),
+            activeTab=tabPanel.getActiveTab(),
+            activeTabViewModel=activeTab.getViewModel(),
+            form=activeTab.getForm(),
+            params = {};
+        
+        params['taskGuid']=Editor.data.task.get('taskGuid');
+        params['result']=JSON.stringify(activeTabViewModel.get('result'));
+        
+        form.submit({
+            url: Editor.data.restpath+'segment/replaceall',
+            params:params,
+            method:'GET',
+            success: function(form, submit){
+                if(!submit.result || !submit.result.rows){
+                    return;
+                }
+                var foundSegments = submit.result.rows;
             },
             failure: function(form, submit){
                 var res = submit.result;
