@@ -57,7 +57,13 @@ Editor.DATE_ISO_FORMAT = 'Y-m-d H:i:s';
 Editor.DATEONLY_ISO_FORMAT = 'Y-m-d';
 
 Ext.ClassManager.onCreated(function(className) {
-    Ext.fly('loading-indicator-text').update(className);
+    var boot = Ext.fly('loading-indicator-text');
+    if(boot) {
+        boot.update(className);
+    }
+    else {
+        Ext.Logger.info("Lazy load of: "+className);
+    }
 });
 
 Ext.application({
