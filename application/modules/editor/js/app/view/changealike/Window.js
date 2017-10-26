@@ -111,11 +111,20 @@ Ext.define('Editor.view.changealike.Window', {
    * @param {Editor.model.Segment} segmentRecord
    */
   updateInfoText: function(segmentRecord) {
-      var sourceEdit = segmentRecord.get('sourceEdit'),
-          targetEdit = segmentRecord.get('targetEdit');
+      var segField = Editor.model.segment.Field,
+          sourceEdit = segmentRecord.get('sourceEdit'),
+          targetEdit = segmentRecord.get('targetEdit'),
+          format = function(type, text) {
+              var dir = segField.isDirectionRTL(type) ? 'rtl' : 'ltr',
+                  style = 'direction:'+dir+';';
+              if(type == 'source') {
+                  style += 'margin-bottom:5px;';
+              }
+              return '<div style="'+style+'" dir="'+dir+'">'+text+'</div>';
+          };
 
       if(sourceEdit) {
-          targetEdit = this.overwriteSource+sourceEdit+'<br style="margin-bottom:5px;"/>'+this.overwriteTarget+targetEdit;
+          targetEdit = this.overwriteSource+format('source',sourceEdit)+this.overwriteTarget+format('target',targetEdit);
       }
       
       this.down('#infoText').update({

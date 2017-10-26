@@ -223,11 +223,17 @@ Ext.define('Editor.controller.admin.User', {
               info = Ext.String.format(msg.confirmResetPwMsg,user.get('firstName')+' '+user.get('surName'));
               Ext.Msg.confirm(msg.confirmResetPwTitle, info, function(btn){
                   if(btn == 'yes') {
-                      //workaround since setting the passwd to null is not recognized as modifying call of the record, 
-                      //  since null is converted internally to empty string
+                      var oldPw = user.get('passwd');
+                      //convert false needed since setting the passwd to null is not recognized as modifying call of the record, 
+                      //  since null is converted internally to empty string (and the value is already an empty string!)
                       user.set('passwd',null, {convert: false});
-                      // not valid in ExtJS6 .setDirty();//necessary, cause sometimes ext does not transfer the null-value in save
-                      user.save();
+                      user.save({
+                          callback: function(rec) {
+                              //reset the store passwd to the old value, so that further reset calls will set and save null again
+                              rec.set('passwd',oldPw);
+                              rec.commit();
+                          }
+                      });
                   }
               });
               break;

@@ -56,10 +56,20 @@ Ext.Loader.setPath('Editor.plugins', Editor.data.pluginFolder);
 Editor.DATE_ISO_FORMAT = 'Y-m-d H:i:s';
 Editor.DATEONLY_ISO_FORMAT = 'Y-m-d';
 
+Ext.ClassManager.onCreated(function(className) {
+    var boot = Ext.fly('loading-indicator-text');
+    if(boot) {
+        boot.update(className);
+    }
+    else {
+        Ext.Logger.info("Lazy load of: "+className);
+    }
+});
+
 Ext.application({
   name : 'Editor',
   models : [ 'File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field' ],
-  stores : [ 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments' ],
+  stores : [ 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages'],
   requires: ['Editor.view.ViewPort', Editor.data.app.viewport, 'Editor.model.ModelOverride', 'Editor.util.TaskActions'],
   controllers: Editor.data.app.controllers,
   appFolder : Editor.data.appFolder,
@@ -127,7 +137,8 @@ Ext.application({
    * @param {Boolean} readonly optional to open the task readonly
    */
   openEditor: function(task, readonly) {
-      var me = this;
+      var me = this,
+          languages = Ext.getStore('admin.Languages');
       if(! (task instanceof Editor.model.admin.Task)) {
           me.openTaskDirect();
           return;
@@ -135,12 +146,20 @@ Ext.application({
       readonly = (readonly === true || task.isReadOnly());
       Editor.data.task = task;
       Editor.model.Segment.redefine(task.segmentFields());
+      
+      Editor.data.taskLanguages = {
+          source: languages.getById(task.get('sourceLang')),
+          relais: languages.getById(task.get('relaisLang')),
+          target: languages.getById(task.get('targetLang'))
+      }
+      
       if(me.viewport){
           me.viewport.destroy();
           me.fireEvent('adminViewportClosed');
       }
       else {
           Ext.getBody().removeCls('loading');
+          Ext.select("body > div.loading").destroy();
       }
       task.initWorkflow();
       me.viewport = Ext.create(Editor.data.app.viewport, {
@@ -189,6 +208,7 @@ Ext.application({
       }
       else {
           Ext.getBody().removeCls('loading');
+          Ext.select("body > div.loading").destroy();
       }
       me.viewport = Ext.create('Editor.view.ViewPort', {
           renderTo: Ext.getBody()

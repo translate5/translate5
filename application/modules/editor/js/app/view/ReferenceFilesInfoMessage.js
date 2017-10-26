@@ -22,37 +22,45 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * @class Editor.segments.EditorKeyMap
- * @extends Ext.util.KeyMap
- * 
- * Own KeyMap implementation which uses handlers without delegation to work in the iframe body of the HtmlEditor
- */
-Ext.define('Editor.view.segments.EditorKeyMap', {
-    extend: 'Ext.util.KeyMap',
-    enable: function() {
-        var me = this;
-        
-        if (!me.enabled) {
-            me.target.on(me.eventName, me.handleTargetEvent, me, {capture: me.capture, priority: me.priority, delegated: false});
-            me.enabled = true;
-        }
+Ext.define('Editor.view.ReferenceFilesInfoMessage', {
+    extend: 'Ext.window.Window',
+    itemId:'referenceFilesInfoMessage',
+    y:0,
+    y:0,
+    width:250,
+    bodyPadding:'10 10 10 10',
+    border:false,
+    //layout: {
+    //    align: 'middle',
+    //    pack: 'center',
+    //    type: 'fit'
+    //},
+    strings:{
+        windowTitle:'#UT#Referenz-Dateien',
+        windowInfoMessage:'#UT#Referenzdateien vorhanden',
+        buttonText:'#UT#Liste öffnen'
     },
-    /**
-     * interceptor to handle the DIGITs prepared by another key kombination 
-     */
-    handleTargetEvent: function(event) {
+    initComponent:function(instanceConfig){
         var me = this;
-        event.isDigitPreparation = false;
-        event.lastWasDigitPreparation = me.lastWasDigitPreparation;
-        //debugger;
-        var res = me.callParent([event]);
-        me.lastWasDigitPreparation = event.isDigitPreparation;
-        return res;
+        me.title=me.strings.windowTitle;
+        me.html=me.strings.windowInfoMessage;
+
+        me.bbar=[{ 
+            xtype: 'button',
+            itemId:'showReferenceFilesButton',
+            text: me.strings.buttonText,
+            icon: Editor.data.moduleFolder+'images/page_attach.png'
+        }];
+        //me.items=[{
+        //    xtype: 'button',
+        //    itemId:'showReferenceFilesButton',
+        //    text: me.strings.buttonText,
+        //}];
+        return me.callParent([config]);
     }
 });

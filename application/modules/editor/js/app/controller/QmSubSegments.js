@@ -100,9 +100,6 @@ Ext.define('Editor.controller.QmSubSegments', {
             '#segmentgrid #qmsummaryBtn': {
                 click:'showQmSummary'
             },
-            '#segmentgrid': {
-                afterrender: 'handleAfterRender'
-            },
             'qmSubsegmentsFlagFieldset menuitem': {
                 click: 'handleAddQmFlagClick'
             },
@@ -110,21 +107,13 @@ Ext.define('Editor.controller.QmSubSegments', {
                 afterrender: 'handleInitEditor'
             },
             'segmentsHtmleditor': {
-                afterinitframedoc: 'initIframeDoc',
-                initialize: 'initEditor'
+                afterinitframedoc: 'initIframeDoc'
             }
         }
     },
     strings: {
     	buttonTooltip10: '#UT# (ALT+{0})',
     	buttonTooltip20: '#UT# (ALT+SHIFT+{0})'
-    },
-    handleAfterRender: function(){
-        var me = this;
-        
-        me.tooltip = Ext.create('Editor.view.ToolTip', {
-            target: me.getSegmentGrid().getEl()
-        });
     },
     handleInitEditor: function() {
         this.initFieldSet();
@@ -216,29 +205,13 @@ Ext.define('Editor.controller.QmSubSegments', {
         }
     },
     /**
-     * initialises ToolTips and other things related to the editors iframe doc body
-     * @param editor
-     */
-    initEditor: function(editor) {
-        var offset = editor.iframeEl.getXY();
-        if(this.editorTooltip){
-            this.editorTooltip.setTarget(editor.getEditorBody());
-            this.editorTooltip.targetOffset = offset;
-            return;
-        }
-        this.editorTooltip = Ext.create('Editor.view.ToolTip', {
-            target: editor.getDoc(),
-            targetOffset: offset
-        });
-    },
-    /**
      * displays the QM Summary Window
      */
     showQmSummary: function() {
         this.getWindow().show();
     },
     /**
-     * Inserts the QM Issue Tag in the Editor by key shortcut, displays popup if nothing selected
+     * Inserts the QM Issue Tag in the Editor by key shortcut
      * @param key
      */
     handleAddQmFlagKey: function(key) {
@@ -251,7 +224,7 @@ Ext.define('Editor.controller.QmSubSegments', {
         }
     },
     /**
-     * Inserts the QM Issue Tag in the Editor, displays popup if nothing selected
+     * Inserts the QM Issue Tag in the Editor
      * @param menuitem
      */
     handleAddQmFlagClick: function(menuitem) {
@@ -278,12 +251,18 @@ Ext.define('Editor.controller.QmSubSegments', {
      * @return {Boolean}
      */
     addQmFlagToEditor: function(qmid, comment, sev){
-        var editor = this.getSegmentGrid().editingPlugin.editor.mainEditor;
-        if(Ext.isIE) { //although >IE11 knows ranges we can't use it, because of an WrongDocumentError
-            this.insertQmFlagsIE(editor,qmid, comment, sev);
-        } else {
-            this.insertQmFlagsH5(editor,qmid, comment, sev);
+        var editor = this.getSegmentGrid().editingPlugin.editor.mainEditor,
+            tagDef;
+        // MQM tags must not be added in DEL tags, so there must be an error message for the user when his MQM selection ends in a delete tag.
+        if(! this.fireEvent('beforeInsertMqmTag')) {
+            return;
         }
+        if(Ext.isIE) { //although >IE11 knows ranges we can't use it, because of an WrongDocumentError
+            tagDef = this.insertQmFlagsIE(editor,qmid, comment, sev);
+        } else {
+            tagDef = this.insertQmFlagsH5(editor,qmid, comment, sev);
+        }
+        this.fireEvent('afterInsertMqmTag',tagDef); // Inserted tags are marked with INS-trackChange-markers.
         this.lastSelectedRangeIE = null;
         return true;
     },
@@ -293,6 +272,7 @@ Ext.define('Editor.controller.QmSubSegments', {
      * @param {Number} qmid Qm Issue ID
      * @param {String} comment 
      * @param {String} sev Severity ID
+     * @returns {Object}
      */
     insertQmFlagsH5: function(editor, qmid, comment, sev){
 		var doc = editor.getDoc(),
@@ -308,6 +288,7 @@ Ext.define('Editor.controller.QmSubSegments', {
 		doc.getSelection().removeAllRanges();
 		rangeEnd.collapse(false);
 		doc.getSelection().addRange(rangeEnd);
+		return tagDef;
     },
     /**
      * generates a Dom Config Object with the to image tags 

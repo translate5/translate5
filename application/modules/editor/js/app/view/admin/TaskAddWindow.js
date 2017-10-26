@@ -117,6 +117,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     {
                         xtype:'panel',
                         itemId: 'taskMainCard',
+                        scrollable:'y',
                         items:[{
                             xtype: 'form',
                             padding: 5,
@@ -128,6 +129,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                             anchor: '100%',
                             items: [{
                                 xtype: 'container',
+                                itemId: 'taskMainCardContainer',
                                 flex: 1,
                                 layout: 'anchor',
                                 padding: '0 10 0 0',
@@ -142,11 +144,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     allowBlank: false,
                                     toolTip: me.strings.taskNameTip,
                                     fieldLabel: me.strings.taskNameLabel
-                                },{
-                                    xtype: 'textfield',
-                                    maxLength: 120,
-                                    name: 'taskNr',
-                                    fieldLabel: me.strings.taskNrLabel
                                 },Ext.applyIf({
                                     name: 'sourceLang',
                                     allowBlank: false,
@@ -201,6 +198,11 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     anchor: '100%'
                                 },
                                 items: [{
+                                    xtype: 'textfield',
+                                    maxLength: 120,
+                                    name: 'taskNr',
+                                    fieldLabel: me.strings.taskNrLabel
+                                },{
                                     xtype: 'datefield',
                                     name: 'orderdate',
                                     submitFormat: Editor.DATE_ISO_FORMAT,

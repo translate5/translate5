@@ -677,7 +677,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           },
           failure: function(form, submit) {
               win.setLoading(false);
-              if(submit.failureType == 'server' && submit.result && submit.result.errors && !Ext.isDefined(submit.result.success)) {
+              if(submit.failureType == 'server' && submit.result && submit.result.errors){//FIXME why is this chech ? && !Ext.isDefined(submit.result.success)) {
                   //all other failures should mark a field invalid
                   error.show();
               }

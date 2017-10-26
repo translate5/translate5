@@ -69,7 +69,7 @@ Ext.define('Editor.controller.Segments', {
   extend : 'Ext.app.Controller',
   stores: ['Segments'],
   //views: ['segments.Scroller', 'segments.RowEditing', 'segments.HtmlEditor', 'segments.GridFilter'],
-  views: ['segments.RowEditing', 'segments.HtmlEditor'],
+  views: ['segments.RowEditing', 'segments.HtmlEditor', 'ToolTip'],
   messages: {
     segmentSaved: 'Das Segment wurde gespeichert!',
     sortCleared: 'Die gewählte Sortierung der Segmente wurde zurückgesetzt!',
@@ -101,6 +101,9 @@ Ext.define('Editor.controller.Segments', {
   },{
       ref : 'watchListFilterBtn',
       selector : '#watchListFilterBtn'
+  },{
+     ref:'segmentStatusStrip',
+     selector:'#segmentStatusStrip'
   }],
   listen: {
       controller: {
@@ -123,7 +126,8 @@ Ext.define('Editor.controller.Segments', {
           '#segmentgrid' : {
               afterrender: 'gridAfterRender',
               columnhide: 'handleColumnVisibility',
-              columnshow: 'handleColumnVisibility'
+              columnshow: 'handleColumnVisibility',
+              beforeedit: 'onSegmentGridBeforeEdit',
           },
           '#fileorderTree': {
               itemclick: 'handleFileClick'
@@ -131,7 +135,7 @@ Ext.define('Editor.controller.Segments', {
           '#clearSortAndFilterBtn': {
               click: 'clearSortAndFilter'
           },
-          '#watchListFilterBtn': {
+          'segmentsToolbar #watchListFilterBtn': {
               click: 'watchListFilter'
           }
       },
@@ -230,6 +234,21 @@ Ext.define('Editor.controller.Segments', {
           ed.editor.toggleMainEditor(col.isVisible());
       }
   },
+
+    /***
+     * on segment grid before edit
+    */
+    onSegmentGridBeforeEdit:function(row,contex){
+        var me=this;
+            segmentStatusStrip=me.getSegmentStatusStrip();
+
+        if(!segmentStatusStrip){
+            return;
+        }
+        //set the record for each item in the status strip
+        segmentStatusStrip.setItemsRecord(contex.record);
+    },
+
   /**
    * reset grid filter and sort, grid will be reloaded and scrolled to top
    */
@@ -576,6 +595,14 @@ Ext.define('Editor.controller.Segments', {
       Editor.MessageBox.addByOperation(operation);
       //show save segment success message 
       Editor.MessageBox.addSuccess(me.messages.segmentSaved);
+      
+      //FIXME 
+      //this event is triggered because we are not able to listen(use) the 'saveComplete' event
+      //the 'saveComplete' event is subscribed in 'ChangeAlike' controller, and it is disabled if the manual processing is disabled
+      //we are not able to use the event listener priority because of the extjs bug : https://www.sencha.com/forum/showthread.php?305085-Observable-listener-priority-does-not-work
+      //this bug also exist in extjs 6.2.0
+      me.fireEvent('beforeSaveCall',records);
+      
       //invoking change alike handling:
       if(me.fireEvent('saveComplete')){
           me.saveChainEnd(); //NEXT step in save chain

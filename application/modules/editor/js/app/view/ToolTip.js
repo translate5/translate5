@@ -42,12 +42,15 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.ToolTip', {
     extend : 'Ext.tip.ToolTip',
     //enable own ToolTips only for the following img classes 
-    delegate : 'img.ownttip', // accepts only simple selectors (no commas) so
+    delegate : '.ownttip', // accepts only simple selectors (no commas) so
     // define a own tooltip class
     renderTo : Ext.getBody(),
     strings: {
+        deletedby: '#UT#Deleted by',
+        insertedby: '#UT#Inserted by',
         severity: '#UT#Gewichtung'
     },
+    userStore: null,
     listeners : {
         // Change content dynamically depending on which element triggered
         // the show.
@@ -56,35 +59,109 @@ Ext.define('Editor.view.ToolTip', {
                 fly = Ext.fly(t); 
             if(fly.hasCls('qmflag')) {
                 this.handleQmFlag(t, tip);
+            } else if (fly.hasCls('trackchanges')) {
+                this.handleTrackChanges(t, tip);
             }
             //else if hasClass for other ToolTip Types
         }
     },
+
     onTargetOver: function(e) {
         e.preventDefault(); //prevent title tags to be shown in IE
         this.callParent(arguments);
     },
+    
     handleQmFlag: function(t, tip) {
-        var me = this, 
-            qmtype,
-            cache = Editor.qmFlagTypeCache,
-            meta = {sevTitle: me.strings.severity};
-
-        qmtype = t.className.match(/qmflag-([0-9]+)/);
-        if(qmtype && qmtype.length > 1) {
-            meta.cls = t.className.split(' ');
-            meta.sev = Ext.StoreMgr.get('Severities').getById(meta.cls.shift());
-            meta.sev = meta.sev ? meta.sev.get('text') : '';
-            meta.qmid = qmtype[1];
-            meta.comment = Ext.fly(t).getAttribute('data-comment');
-            meta.qmtype = cache[meta.qmid] ? cache[meta.qmid] : 'Unknown Type'; //impossible => untranslated
+        var me = this,
+            qmFlagData = me.getQmFlagData(t),
+            meta = {
+                qmFlag: qmFlagData
+            }
+        // add tooltip for trackChanges?
+        if (/(^|[\s])trackchanges([\s]|$)/.test(t.parentNode.className)) {
+            meta.trackChanges = me.getTrackChangesData(t.parentNode);
+        } else {
+            meta.trackChanges = '';
         }
         if(!me.qmflagTpl) {
-            me.qmflagTpl = new Ext.Template('<b>{qmtype}</b><br />{sevTitle}: {sev}<br />{comment}');
+            me.qmflagTpl = new Ext.Template('{qmFlag}{trackChanges}');
             me.qmflagTpl.compile();
         }
         tip.update(me.qmflagTpl.apply(meta));		
     },
+    getQmFlagData: function(node) {
+        var me = this, 
+            qmtype,
+            cache = Editor.qmFlagTypeCache,
+            meta = {sevTitle: me.strings.severity};
+        qmtype = node.className.match(/qmflag-([0-9]+)/);
+        if(qmtype && qmtype.length > 1) {
+            meta.cls = node.className.split(' ');
+            meta.sev = Ext.StoreMgr.get('Severities').getById(meta.cls.shift());
+            meta.sev = meta.sev ? meta.sev.get('text') : '';
+            meta.qmid = qmtype[1];
+            meta.comment = Ext.fly(node).getAttribute('data-comment');
+            meta.qmtype = cache[meta.qmid] ? cache[meta.qmid] : 'Unknown Type'; //impossible => untranslated
+        }
+        if (meta.comment == null) {
+            meta.comment = '';
+        } else {
+            meta.comment = '<br />'+ meta.comment
+        }
+        // For Tooltip:
+        return '<b>'+meta.qmtype+'</b><br />'+meta.sevTitle+': '+meta.sev+meta.comment+'<br />';
+    },
+    
+    handleTrackChanges: function(node, tip) {
+        var me = this,
+            trackChangesData = me.getTrackChangesData(node),
+            tplData = {
+                trackChanges: trackChangesData
+            };
+        // add tooltip for qmFlag?
+        var allQmFlagNodes = node.getElementsByClassName('qmflag');
+        if (allQmFlagNodes.length == 1) {
+            tplData.qmFlag = me.getQmFlagData(allQmFlagNodes[0]);
+        } else {
+            // a) there is no qmFlag-Node
+            // b) there are many qmFlag-Nodes and we don't know which exactly the mouseover refers to
+            tplData.qmFlag = '';
+        }
+        if(!me.trackChangesTpl) {
+            me.trackChangesTpl = new Ext.Template('{qmFlag}{trackChanges}');
+            me.trackChangesTpl.compile();
+        }
+        tip.update(me.trackChangesTpl.apply(tplData));
+    },
+    getTrackChangesData: function(node) {
+        var me = this,
+            attrUserName,
+            attrTimestamp,
+            nodeAction = '',
+            nodeUser = '',
+            nodeDate = '';
+        // What has been done (INS/DEL)?
+        if (node.nodeName.toLowerCase() == 'ins') {
+            nodeAction = me.strings.insertedby;
+        } else if (node.nodeName.toLowerCase() == 'del') {
+            nodeAction = me.strings.deletedby;
+        } else {
+            return;
+        }
+        // Who has done it?
+        if (node.hasAttribute('data-username')) {
+            attrUserName = node.getAttribute('data-username');
+            nodeUser = attrUserName; // can be used just as it is
+        }
+        // When?
+        if (node.hasAttribute('data-timestamp')) {
+            attrTimestamp = parseInt(node.getAttribute('data-timestamp'));
+            nodeDate = Ext.Date.format(new Date(attrTimestamp),'Y-m-d H:i');
+        }
+        // For Tooltip:
+        return '<b>'+nodeAction+'</b><br>'+nodeUser+'<br>'+nodeDate+'<br>';
+    },
+    
     /**
      * Override of default setTarget, only change see below.
      * Must be respected on ExtJS updates!

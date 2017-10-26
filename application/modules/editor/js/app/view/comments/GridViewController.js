@@ -22,17 +22,23 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * @class Editor.store.admin.Languages
- * @extends Ext.data.Store
+/**#@++
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
  */
-Ext.define('Editor.store.admin.Languages', {
-  extend : 'Ext.data.ArrayStore',
-  fields: ['id', 'label', {name: 'rtl', type: 'boolean'}],
-  data: Editor.data.languages
+/**
+ * @class Editor.view.comments.GridViewController
+ * @extends Ext.app.ViewController
+ */
+Ext.define('Editor.view.comments.GridViewController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.commentsGrid',
+    
 });

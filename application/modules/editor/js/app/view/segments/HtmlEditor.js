@@ -61,10 +61,13 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   enableLinks : false,
   enableFont : false,
   isTagOrderClean: true,
+  isRtl: false,
   missingContentTags: [],
   duplicatedContentTags: [],
   contentEdited: false, //is set to true if text content or content tags were modified
   disableErrorCheck: false,
+
+  valueAndMarkupTempVal:"",
   
   strings: {
 	  tagOrderErrorText: '#UT# Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
@@ -108,15 +111,27 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 	  this.callParent(arguments);
 	  this.fireEvent('afterinitframedoc', this);
   },
+
+  initEditor:function(){
+      var me=this;
+      if(me.valueAndMarkupTempVal!==""){
+          me.setValue(me.valueAndMarkupTempVal);
+          me.valueAndMarkupTempVal="";
+      }
+      me.callParent(arguments);
+  },
+
   /**
    * Überschreibt die Methode um den Editor Iframe mit eigenem CSS ausstatten
    * @returns string
    */
   getDocMarkup: function() {
     var me = this,
-        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'/css/htmleditor.css?v=12" />'; //disable Img resizing
+        dir = (me.isRtl ? 'rtl' : 'ltr'),
         //ursprünglich wurde ein body style height gesetzt. Das führte aber zu Problemen beim wechsel zwischen den unterschiedlich großen Segmente, daher wurde die Höhe entfernt.
-    return Ext.String.format('<html><head><style type="text/css">body{border:0;margin:0;padding:{0}px;}</style>{1}</head><body style="font-size:12px;line-height:14px;"></body></html>', me.iframePad, additionalCss);
+        body = '<html><head><style type="text/css">body{border:0;margin:0;padding:{0}px;}</style>{1}</head><body dir="{2}" style="direction:{2};font-size:12px;line-height:14px;"></body></html>',
+        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'/css/htmleditor.css?v=12" />'; //disable Img resizing
+    return Ext.String.format(body, me.iframePad, additionalCss, dir);
   },
   /**
    * overriding default method since under some circumstances this.getWin() returns null which gives an error in original code
@@ -142,17 +157,26 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       return false;
   },
   
-  /**
-   * Setzt Daten im HtmlEditor und fügt markup hinzu
-   * @param value String
-   */
-  setValueAndMarkup: function(value, segmentId, fieldName){
-      //check tag is needed for the checkplausibilityofput feature on server side 
-      var me = this,
-          checkTag = me.getDuplicateCheckImg(segmentId, fieldName);
-      
-      me.setValue(me.markupForEditor(value)+checkTag);
-  },
+    /**
+     * Setzt Daten im HtmlEditor und fügt markup hinzu
+     * @param value String
+     */
+    setValueAndMarkup: function(value, segmentId, fieldName){
+        //check tag is needed for the checkplausibilityofput feature on server side 
+        var me = this,
+            checkTag = me.getDuplicateCheckImg(segmentId, fieldName),
+            iframeBody = me.getEditorBody(),
+            patt = new RegExp(/<body>/g),
+            res = patt.test(iframeBody.parentNode.innerHTML);
+            
+        if(res){
+            me.initFrameDoc();
+            me.valueAndMarkupTempVal=me.markupForEditor(value)+checkTag;
+        }else{
+            me.setValue(me.markupForEditor(value)+checkTag);
+        }
+
+    },
   /**
    * Fixing focus issues EXT6UPD-105 and EXT6UPD-137
    */
@@ -244,22 +268,56 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     me.replaceTagToImage(tempNode, plainContent);
     return me.result;
   },
+
   replaceTagToImage: function(rootnode, plainContent) {
     var me = this,
-    data = {
-        fullPath: Editor.data.segments.fullTagPath,
-        shortPath: Editor.data.segments.shortTagPath
-    },
-    sp, fp, //[short|full]Path shortcuts
-    shortTagContent;
+        data = {
+            fullPath: Editor.data.segments.fullTagPath,
+            shortPath: Editor.data.segments.shortTagPath
+        };
     
     Ext.each(rootnode.childNodes, function(item){
-      var termFoundCls, divItem, spanFull, spanShort, split;
+      var termFoundCls;
       if(Ext.isTextNode(item)){
         var text = item.data.replace(new RegExp(Editor.TRANSTILDE, "g"), ' ');
         me.result.push(Ext.htmlEncode(text));
         plainContent.push(Ext.htmlEncode(text));
         return;
+      }
+      // Keep nodes from TrackChanges, but replace their images
+      if( (item.tagName.toLowerCase() == 'ins' || item.tagName.toLowerCase() == 'del')  && /(^|[\s])trackchanges([\s]|$)/.test(item.className)){
+          // TrackChange-Node might include images: 
+          // (1) add the special id to the img:
+          // (2) replace the given divs and spans with their image:
+          var allImagesInItem = item.getElementsByTagName('IMG'),
+              allDivsInItem = item.getElementsByTagName('DIV');
+          if (allImagesInItem.length > 0) {
+              for (i = 0; i < allImagesInItem.length; i++) {
+                  var imgItem = allImagesInItem[i];
+                  if (!me.isDuplicateSaveTag(imgItem)) {
+                      var htmlForItemImg = me.imgNodeToString(imgItem, true),
+                      templateEl = document.createElement('template');
+                      templateEl.innerHTML = htmlForItemImg;
+                      item.insertBefore(templateEl.content.firstChild,imgItem);
+                      item.removeChild(imgItem);
+                  }
+              }
+          }
+          if (allDivsInItem.length > 0) {
+              for (i = 0; i < allDivsInItem.length; i++) {
+                  var divItem = allDivsInItem[i],
+                      dataOfItem = me.getData(divItem,data),
+                      htmlForItemImg = me.imageTemplate.apply(dataOfItem);
+                  var templateEl = document.createElement('template');
+                  templateEl.innerHTML = htmlForItemImg;
+                  item.insertBefore(templateEl.content.firstChild,divItem);
+                  item.removeChild(divItem);
+              }
+          }
+          item.innerHTML = item.innerHTML.replace(new RegExp(Editor.TRANSTILDE, "g"), ' ');
+          me.result.push(item.outerHTML);
+          plainContent.push(item.outerHTML);
+          return;
       }
       if(item.tagName == 'IMG' && !me.isDuplicateSaveTag(item)){
           me.result.push(me.imgNodeToString(item, true));
@@ -280,7 +338,21 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       if(item.tagName != 'DIV'){
         return;
       }
-      //daten aus den tags holen:
+      
+      data = me.getData(item,data);
+      
+      me.result.push(me.imageTemplate.apply(data));
+      plainContent.push(me.markupImages[data.key].html);
+    });
+  },
+  /**
+   * daten aus den tags holen
+   */
+  getData: function (item,data) {
+      var me = this,
+          divItem, spanFull, spanShort, split,
+          sp, fp, //[short|full]Path shortcuts;
+          shortTagContent;
       divItem = Ext.fly(item);
       spanFull = divItem.down('span.full');
       spanShort = divItem.down('span.short');
@@ -338,10 +410,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       else {
         data.path = sp;
       }
-
-      me.result.push(me.imageTemplate.apply(data));
-      plainContent.push(me.markupImages[data.key].html);
-    });
+      return data;
   },
   /**
    * ersetzt die images durch div und spans im string 
@@ -363,6 +432,34 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           if(Ext.isTextNode(item)){
               text = item.data;
               result.push(Ext.htmlEncode(text));
+              return;
+          }
+          // Keep nodes from TrackChanges
+          if( (item.tagName.toLowerCase() == 'ins' || item.tagName.toLowerCase() == 'del')  && /(^|[\s])trackchanges([\s]|$)/.test(item.className)){
+              // TrackChange-Node might include images => replace the images with their divs and spans:
+              var allImagesInItem = item.getElementsByTagName('img');
+              if( allImagesInItem.length > 0) {
+                  for (i = 0; i < allImagesInItem.length; i++) {
+                      var imgItem = allImagesInItem[i],
+                          imgHtml = '';
+                      if(me.isDuplicateSaveTag(imgItem)){
+                          debugger;
+                      }
+                      else if (markupImage = me.getMarkupImage(imgItem.id)){
+                          imgHtml = markupImage.html;
+                      } 
+                      else if(/^qm-image-/.test(imgItem.id)){
+                          imgHtml= me.imgNodeToString(imgItem, false);
+                      }
+                      if (imgHtml != '') {
+                          var template = document.createElement('template');
+                          template.innerHTML = imgHtml;
+                          imgItem.parentNode.insertBefore(template.content.firstChild,imgItem);
+                          imgItem.parentNode.removeChild(imgItem);
+                      }
+                  }
+              }
+              result.push(item.outerHTML);
               return;
           }
           // recursive processing of Terminologie spans, removes the term span
@@ -720,5 +817,16 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       //do nothing, here since the getWin().un('unload',...); in the original method throws an exception
       // since our htmlEditor is only destroyed once at page reload we just do nothing here
       // the comments in the original method about leaked IE6/7 can be ignored so far
+  },
+  setDirectionRtl: function(isRtl) {
+      var me = this;
+      me.isRtl = isRtl;
+      if(!me.getDoc().editorInitialized) {
+          return;
+      }
+      var body = Ext.fly(me.getEditorBody()),
+          dir = isRtl ? 'rtl' : 'ltr';
+      body.set({"dir": dir});
+      body.setStyle('direction', dir);
   }
 });

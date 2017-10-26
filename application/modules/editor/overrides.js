@@ -219,3 +219,139 @@ Ext.define('MyApp.overrides.data.request.Ajax', {
         return response;
     },
 });
+
+Ext.override(Ext.util.CSS, {
+    /***
+     * Add a custom css to the given html page
+     */
+    createStyleSheetToWindow : function(window,cssText, id) {
+        var ss,
+            head = window.getElementsByTagName("head")[0],
+            styleEl = window.createElement("style");
+
+        styleEl.setAttribute("type", "text/css");
+        if (id) {
+           styleEl.setAttribute("id", id);
+        }
+
+        if (Ext.isIE) {
+           head.appendChild(styleEl);
+           ss = styleEl.styleSheet;
+           ss.cssText = cssText;
+        } else {
+            try{
+                styleEl.appendChild(window.createTextNode(cssText));
+            } catch(e) {
+               styleEl.cssText = cssText;
+            }
+            head.appendChild(styleEl);
+            ss = styleEl.styleSheet ? styleEl.styleSheet : (styleEl.sheet || window.styleSheets[window.styleSheets.length-1]);
+        }
+        this.cacheStyleSheet(ss);
+        return ss;
+    }
+})
+
+/**
+ * Fix for TRANSLATE-1041 / EXTJS-24549 / https://www.sencha.com/forum/showthread.php?338435-ext-all-debug-js-206678-Uncaught-TypeError-cell-focus-is-not-a-function
+ * needed for ext-6.2.0
+ * should be solved natively with next version
+ */
+Ext.override(Ext.view.Table, {
+    privates: {
+        setActionableMode: function(enabled, position) {
+            var me = this,
+                navModel = me.getNavigationModel(),
+                activeEl,
+                actionables = me.grid.actionables,
+                len = actionables.length,
+                i, record, column,
+                isActionable = false,
+                lockingPartner, cell;
+            // No mode change.
+            // ownerGrid's call will NOT fire mode change event upon false return.
+            if (me.actionableMode === enabled) {
+                // If we're not actinoable already, or (we are actionable already at that position) return false.
+                // Test using mandatory passed position because we may not have an actionPosition if we are 
+                // the lockingPartner of an actionable view that contained the action position.
+                //
+                // If we being told to go into actionable mode but at another position, we must continue.
+                // This is just actionable navigation.
+                if (!enabled || position.isEqual(me.actionPosition)) {
+                    return false;
+                }
+            }
+            // If this View or its lockingPartner contains the current focus position, then make the tab bumpers tabbable
+            // and move them to surround the focused row.
+            if (enabled) {
+                if (position && (position.view === me || (position.view === (lockingPartner = me.lockingPartner) && lockingPartner.actionableMode))) {
+                    isActionable = me.activateCell(position);
+                }
+                // Did not enter actionable mode.
+                // ownerGrid's call will NOT fire mode change event upon false return.
+                return isActionable;
+            } else {
+                // Capture before exiting from actionable mode moves focus
+                activeEl = Ext.fly(Ext.Element.getActiveElement());
+                // Blur the focused descendant, but do not trigger focusLeave.
+                // This is so that when the focus is restored to the cell which contained
+                // the active content, it will not be a FocusEnter from the universe.
+                if (me.el.contains(activeEl) && !Ext.fly(activeEl).is(me.getCellSelector())) {
+                    // Row to return focus to.
+                    record = (me.actionPosition && me.actionPosition.record) || me.getRecord(activeEl);
+                    column = me.getHeaderByCell(activeEl.findParent(me.getCellSelector()));
+                    cell = position && position.getCell();
+                    // Do not allow focus to fly out of the view when the actionables are deactivated
+                    // (and blurred/hidden). Restore focus to the cell in which actionable mode is active.
+                    // Note that the original position may no longer be valid, e.g. when the record
+                    // was removed.
+                    if (!position || !cell) {
+                        position = new Ext.grid.CellContext(me).setPosition(record || 0, column || 0);
+                        cell = position.getCell();
+                    }
+                    // Ext.grid.NavigationModel#onFocusMove will NOT react and navigate because the actionableMode
+                    // flag is still set at this point.
+                    
+                    //THIS IS THE FIXED LINE:
+                    cell && cell.focus();
+                    //ORIGINAL: just cell.focus();
+                    
+                    // Let's update the activeEl after focus here
+                    activeEl = Ext.fly(Ext.Element.getActiveElement());
+                    // If that focus triggered handlers (eg CellEditor after edit handlers) which
+                    // programatically moved focus somewhere, and the target cell has been unfocused, defer to that,
+                    // null out position, so that we do not navigate to that cell below.
+                    // See EXTJS-20395
+                    if (!(me.el.contains(activeEl) && activeEl.is(me.getCellSelector()))) {
+                        position = null;
+                    }
+                }
+                // We are exiting actionable mode.
+                // Tell all registered Actionables about this fact if they need to know.
+                for (i = 0; i < len; i++) {
+                    if (actionables[i].deactivate) {
+                        actionables[i].deactivate();
+                    }
+                }
+                // If we had begun action (we may be a dormant lockingPartner), make any tabbables untabbable
+                if (me.actionRow) {
+                    me.actionRow.saveTabbableState({
+                        skipSelf: true,
+                        includeSaved: false
+                    });
+                }
+                if (me.destroyed) {
+                    return false;
+                }
+                // These flags MUST be set before focus restoration to the owning cell.
+                // so that when Ext.grid.NavigationModel#setPosition attempts to exit actionable mode, we don't recurse.
+                me.actionableMode = me.ownerGrid.actionableMode = false;
+                me.actionPosition = navModel.actionPosition = me.actionRow = null;
+                // Push focus out to where it was requested to go.
+                if (position) {
+                    navModel.setPosition(position);
+                }
+            }
+        }
+    }
+});
