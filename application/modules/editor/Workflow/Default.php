@@ -207,4 +207,19 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
             editor_Models_LogTask::create($instance['taskGuid'], self::STATE_FINISH, $this->authenticatedUserModel, $user);
         }
     }
+    
+    protected function handleUserAssociationAdded() {
+        $this->doDebug(__FUNCTION__);
+        
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($this->newTaskUserAssoc->getTaskGuid());
+        
+        $notifier = ZfExtended_Factory::get('editor_Workflow_Notification', array($task, $this));
+        /* @var $notifier editor_Workflow_Notification */
+        $notifier->notifyNewTaskAssigned($this->newTaskUserAssoc);
+        
+        
+    }
+
 }

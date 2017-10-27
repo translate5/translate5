@@ -219,6 +219,11 @@ abstract class editor_Workflow_Abstract {
         $this->debug = ZfExtended_Debug::getLevel('core', 'workflow');
         $this->loadAuthenticatedUser();
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
+        $events = Zend_EventManager_StaticEventManager::getInstance();
+        $events->attach('Editor_TaskuserassocController', 'afterPostAction', function(Zend_EventManager_Event $event){
+            $this->newTaskUserAssoc = $event->getParam('entity');
+            $this->handleUserAssociationAdded();
+        });
     }
     
     /**
@@ -840,4 +845,9 @@ abstract class editor_Workflow_Abstract {
      * will be called daily
      */
     abstract public function doCronDaily();
+    
+    /**
+     * will be called when a new task user association is created
+     */
+    abstract protected function handleUserAssociationAdded();
 }
