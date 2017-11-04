@@ -152,6 +152,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           checkTag = me.getDuplicateCheckImg(segmentId, fieldName);
       
       me.setValue(me.markupForEditor(value)+checkTag);
+      this.fireEvent('afterSetValueAndMarkup', this);
   },
   /**
    * Fixing focus issues EXT6UPD-105 and EXT6UPD-137
@@ -416,16 +417,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
               if( allImagesInItem.length > 0) {
                   for (i = 0; i < allImagesInItem.length; i++) {
                       var imgItem = allImagesInItem[i],
-                          imgHtml = '';
-                      if(me.isDuplicateSaveTag(imgItem)){
-                          debugger;
-                      }
-                      else if (markupImage = me.getMarkupImage(imgItem.id)){
-                          imgHtml = markupImage.html;
-                      } 
-                      else if(/^qm-image-/.test(imgItem.id)){
-                          imgHtml= me.imgNodeToString(imgItem, false);
-                      }
+                          imgHtml = me.unmarkImage(imgItem);
                       if (imgHtml != '') {
                           var template = document.createElement('template');
                           template.innerHTML = imgHtml;
@@ -445,16 +437,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
               return;
           }
           if(item.tagName == 'IMG'){
-              if(me.isDuplicateSaveTag(item)){
-                  img = Ext.fly(item);
-                  result.push(me.getDuplicateCheckImg(img.getAttribute('data-segmentid'), img.getAttribute('data-fieldname')));
-              }
-              else if(markupImage = me.getMarkupImage(item.id)){
-                  result.push(markupImage.html);
-              }
-              else if(/^qm-image-/.test(item.id)){
-                  result.push(me.imgNodeToString(item, false));
-              }
+              result.push(me.unmarkImage(item));
               return;
           }
           if(item.hasChildNodes()){
@@ -464,6 +447,19 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           result.push(item.textContent || item.innerText);
       });
       return result.join('');
+  },
+  unmarkImage: function(item) {
+      var me = this;
+      if(me.isDuplicateSaveTag(item)){
+          img = Ext.fly(item);
+          return me.getDuplicateCheckImg(img.getAttribute('data-segmentid'), img.getAttribute('data-fieldname'));
+      }
+      else if(markupImage = me.getMarkupImage(item.id)){
+          return markupImage.html;
+      }
+      else if(/^qm-image-/.test(item.id)){
+          return me.imgNodeToString(item, false);
+      }
   },
   /**
    * generates a img tag string
