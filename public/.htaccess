@@ -13,7 +13,12 @@ RewriteRule ^(ext-6\..\../build)/classic/theme-(classic|gray)/(.*) /$1/examples/
 
 RewriteCond %{REQUEST_FILENAME} -s [OR]
 RewriteCond %{REQUEST_FILENAME} -l [OR]
-RewriteCond %{REQUEST_FILENAME} -d
+RewriteCond %{REQUEST_FILENAME} -d 
+RewriteRule ^.*$ - [NC,L]
+
+#files tried to be loaded from reference HTML files are not piped through PHP
+RewriteCond %{REQUEST_URI} editor/referencefile/
+RewriteCond %{HTTP_REFERER} editor/referencefile/.*\.html$ 
 RewriteRule ^.*$ - [NC,L]
 
 RewriteRule ^.*$ index.php [NC,L]
