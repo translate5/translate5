@@ -130,6 +130,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     public function __construct()
     {
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         parent::__construct();
     }
     
@@ -245,7 +246,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             if(!$isEditable || !empty($typeFilter) && $data->type !== $typeFilter) {
                 continue;
             }
-            if($this->stripTermTags($data->edited) !== $this->stripTermTags($data->original)) {
+            if($this->stripTermTagsAndTrackChanges($data->edited) !== $this->stripTermTagsAndTrackChanges($data->original)) {
                 $this->isDataModifiedAgainstOriginal = true;
             }
         }
@@ -268,7 +269,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             if(!$isEditable || !$edited || !empty($typeFilter) && $data->type !== $typeFilter) {
                 continue;
             }
-            if($this->stripTermTags($data->edited) !== $this->stripTermTags($this->getOldValue($fieldName))) {
+            if($this->stripTermTagsAndTrackChanges($data->edited) !== $this->stripTermTagsAndTrackChanges($this->getOldValue($fieldName))) {
                 $this->isDataModified = true;
             }
         }
@@ -343,7 +344,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @param string $segmentContent
      * @return string $segmentContent
      */
-    public function stripTermTags($segmentContent) {
+    public function stripTermTagsAndTrackChanges($segmentContent) {
         try {
             $options = array(
                     'format_output' => false,
@@ -352,6 +353,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
                     'convert_from_encoding' => 'utf-8',
                     'ignore_parser_warnings' => true,
             );
+            $segmentContent= $this->tagHelper->removeTrackChanges($segmentContent);
             $seg = qp('<div id="root">'.$segmentContent.'</div>', NULL, $options);
             /* @var $seg QueryPath\\DOMQuery */
             //advise libxml not to throw exceptions, but collect warnings and errors internally:
