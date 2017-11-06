@@ -268,8 +268,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           var allImagesInItem = item.getElementsByTagName('IMG'),
               allDivsInItem = item.getElementsByTagName('DIV');
           if (allImagesInItem.length > 0) {
-              for (i = 0; i < allImagesInItem.length; i++) {
+              for (var i = allImagesInItem.length; i--; ) { // backwards because we might remove items
                   var imgItem = allImagesInItem[i];
+                  console.dir(imgItem);
                   if (!me.isDuplicateSaveTag(imgItem)) {
                       var htmlForItemImg = me.imgNodeToString(imgItem, true),
                       templateEl = document.createElement('template');
@@ -280,10 +281,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
               }
           }
           if (allDivsInItem.length > 0) {
-              for (i = 0; i < allDivsInItem.length; i++) {
+              for (var i = allDivsInItem.length; i--; ) { // backwards because we might remove items
                   var divItem = allDivsInItem[i],
                       dataOfItem = me.getData(divItem,data),
                       htmlForItemImg = me.imageTemplate.apply(dataOfItem);
+                  console.dir(divItem);
                   var templateEl = document.createElement('template');
                   templateEl.innerHTML = htmlForItemImg;
                   item.insertBefore(templateEl.content.firstChild,divItem);
@@ -415,7 +417,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
               // TrackChange-Node might include images => replace the images with their divs and spans:
               var allImagesInItem = item.getElementsByTagName('img');
               if( allImagesInItem.length > 0) {
-                  for (i = 0; i < allImagesInItem.length; i++) {
+                  for (var i=allImagesInItem.length; i--; ) { // backwards because we might remove items
                       var imgItem = allImagesInItem[i],
                           imgHtml = me.unmarkImage(imgItem);
                       if (imgHtml != '') {
