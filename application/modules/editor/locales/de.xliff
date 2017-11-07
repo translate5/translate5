@@ -1007,6 +1007,24 @@ Sie erreichen das Portal unter: %3$s<br />
 <trans-unit id='S2VpbmUgR2xvYmFsZXNlIEJlbnV0emVyZ3J1cHBlIHZlcmbDvGdiYXIgKGbDvHIgSWhyZW4gR2xvYmFsZXNlIEJlbnV0emVyIHVuZCBJaHJlIFNwcmFjaGtvbWJpbmF0aW9uKS4gQml0dGUgw6RuZGVybiBTaWUgZGVuIEJlbnV0emVyIG9kZXIgw7xiZXJzcHJpbmdlbiBTaWUgZGllIFZvcsO8YmVyc2V0enVuZy4='><source>Keine Globalese Benutzergruppe verfügbar (für Ihren Globalese Benutzer und Ihre Sprachkombination). Bitte ändern Sie den Benutzer oder überspringen Sie die Vorübersetzung.</source><target>Keine Globalese Benutzergruppe verfügbar (für Ihren Globalese Benutzer und Ihre Sprachkombination). Bitte ändern Sie den Benutzer oder überspringen Sie die Vorübersetzung.</target></trans-unit>
 <trans-unit id='QmVudXR6ZXIgb2RlciBQYXNzd29ydCBzaW5kIG5pY2h0IHZhbGlkZS4='><source>Benutzer oder Passwort sind nicht valide.</source><target>Benutzer oder Passwort sind nicht valide.</target></trans-unit>
 <trans-unit id='TGFkZW4='><source>Laden</source><target>Laden</target></trans-unit>
+<trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgenVnZXdpZXNlbg=='><source>Translate5 - Aufgabe zugewiesen</source><target>Translate5 - Aufgabe zugewiesen</target></trans-unit>
+<trans-unit id='JTEkcyAlMiRzLDxiciAvPgo8YnIgLz4KSW0gUHJvamVrdHBvcnRhbCAlMyRzIHd1cmRlIElobmVuIGRpZSBBdWZnYWJlIDxiPiU0JHMgLSAlNSRzPC9iPiB6dWdld2llc2VuLjxiciAvPgo8YnIgLz4KPGJyIC8+VmllbGVuIERhbmsgdW5kIHZpZWxlIEdyw7zDn2UsCjxiciAvPklociBQcm9qZWt0bWFuYWdlbWVudCBUZWFtCjxiciAvPiU2JHMKPGJyIC8+CjxiciAvPkRpZXNlIEVtYWlsIHd1cmRlIGF1dG9tYXRpc2NoIGdlbmVyaWVydC4gQml0dGUgYW50d29ydGVuIFNpZSBuaWNodCBhdWYgZGllc2UgRS1NYWlsIQ=='><source>%1$s %2$s,<br />
+<br />
+Im Projektportal %3$s wurde Ihnen die Aufgabe <b>%4$s - %5$s</b> zugewiesen.<br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%6$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source><target>%1$s %2$s,<br />
+<br />
+Im Projektportal %3$s wurde Ihnen die Aufgabe <b>%4$s - %5$s</b> zugewiesen.<br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%6$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</target></trans-unit>
   </body>
  </file>
 </xliff>
