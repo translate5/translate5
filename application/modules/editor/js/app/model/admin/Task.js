@@ -228,7 +228,6 @@ Ext.define('Editor.model.admin.Task', {
    * @todo improve workflow handling in Javascript, => adapt the php workflow in js, a class with same methods (like getNextStep step2Role etc)
    * actually all workflow information is encapsulated in frontendRights (thats OK) 
    * and the methods in this class (isXXX Methods and initWorkflow) method, this could be improved
-   * for the logic when the filter should be triggered see: E-Mail "Re: Nachfrage Segment Filter" to thomas on 02.10.13 18:03
    */
   initWorkflow: function () {
       var me = this,
@@ -238,7 +237,8 @@ Ext.define('Editor.model.admin.Task', {
           stepChain = me.getWorkflowMetaData().stepChain,
           task = data.task,
           step = task.get('userStep'),
-          useFilter = !(me.isFinished() || me.isWaiting() || me.isEnded());
+          useFilter = !(me.isFinished() || me.isWaiting() || me.isEnded()),
+          stepIdxToStart = task.get('emptyTargets') ? 0 : 1; //define workflow chain start by task type here
       
       if(step && useFilter) {
           //preset grid filtering:
@@ -249,7 +249,12 @@ Ext.define('Editor.model.admin.Task', {
           //reset workflowstep filters of formerly opened tasks, since initialGridFilters is persistent between tasks!
           delete filter.segmentgrid;
           idx = Ext.Array.indexOf(stepChain, step);
-          if(idx > 0 && filter) {
+          
+          //TODO this was (idx > 0 && filter) which gave as the flexibility to define the 
+          // current workflow of the task just from the given task user assocs
+          // indeed we have the current workflow step in the task right now!
+          // Also the usage of isTranslationTask is more a hack as a good solution 
+          if(idx > stepIdxToStart && filter) {
               filter.segmentgrid = [{
                   type: 'workflowStep',
                   dataIndex: 'workflowStep',

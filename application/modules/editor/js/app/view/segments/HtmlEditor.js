@@ -233,7 +233,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           doc = this.getDoc(),
           sel, range, frag, node, el, lastNode;
       if (!window.getSelection) {
-          //Not supported by your browser message!
+          //FIXME Not supported by your browser message!
           return;
       }
       sel = doc.getSelection();

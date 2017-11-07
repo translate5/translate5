@@ -87,6 +87,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                       store: '{users}'
                   },
                   forceSelection: true,
+                  anyMatch: true,
                   queryMode: 'local',
                   name: 'userGuid',
                   displayField: 'longUserName',
