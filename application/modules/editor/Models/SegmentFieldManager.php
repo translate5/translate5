@@ -40,6 +40,7 @@ class editor_Models_SegmentFieldManager {
     
     const _MAP_DELIM = '#';
     const _EDIT_PREFIX = 'Edit';
+    const _TOSORT_PREFIX = 'ToSort';
     
     /**
      * @var array
@@ -357,7 +358,6 @@ class editor_Models_SegmentFieldManager {
                 }
                 $result[] = $walker($name, $k, $v);
             }
-            $result[] = $walker($name, 'Search', 'original');
         }
         return $result;
     }

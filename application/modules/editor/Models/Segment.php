@@ -86,11 +86,6 @@ END LICENSE AND COPYRIGHT
  * 
  */
 class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
-    /**
-     * This value is normally extracted from DB, because of the fluent interface we have to define it for segments
-     * @var integer
-     */
-    const TOSORT_LENGTH = 30;
     
     protected $dbInstanceClass          = 'editor_Models_Db_Segments';
     protected $validatorInstanceClass   = 'editor_Models_Validator_Segment';
@@ -142,13 +137,15 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         parent::__construct();
     }
     
+    
     public function search($request){
         $queryString=$request->getParam('searchCombo');
-        $searchInCombo='search_'.$request->getParam('searchInCombo');
+        $searchInCombo=$request->getParam('searchInCombo').editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
         $matchCase=$request->getParam('matchCase');
         $searchTopChekbox=$request->getParam('searchTopChekbox');
         $searchType=$request->getParam('searchType');
         $taskGuid=$request->getParam('taskGuid');
+        $searchOffset=$request->getParam('searchOffset');
         
         $mv=ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
         /* @var $mv editor_Models_Segment_MaterializedView  */
@@ -158,34 +155,50 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         if(empty($checkField)){
             return "";
         }
-        $sql=
-        ' SELECT filtered.id,filtered.editable, filtered.row_number ,filtered.'.$searchInCombo.''.
-        ' FROM ('.
-        ' SELECT  `view`.`id`,'.
-        ' @curRow := @curRow + 1 AS row_number,'.
-        ' `view`.`'.$searchInCombo.'`, `view`.`editable`'.
-        ' FROM `'.$viewName.'` as view'.
-        ' JOIN (SELECT @curRow := -1) r'.
-        //FIXME add filters here, this is an example of filter
-        //'        #WHERE ( lower(`view`.`source`) like lower("%Mit%"))'.
-        ' ORDER BY `view`.`fileOrder` asc, `view`.`id` asc'.
-        ' ) filtered'.
-        //' WHERE ( filtered.'.$searchInCombo.' like "%'.$queryString.'%") and filtered.editable = 1'.
-        ' WHERE ( filtered.'.$searchInCombo.
-        $this->buildSearchString($queryString, $searchType, $matchCase).
-        ' ) and filtered.editable = 1'.
-        ' ORDER BY row_number ASC'.
-        ' LIMIT 0, 50;';
         
-        $stmt = $this->db->getAdapter()->query($sql);
-        $retVal = $stmt->fetchAll();
-        return $retVal;
+        $sorts=$this->filter->getSort();
+        //if there are no sort, add a default one (this is used for search direction)
+        if(count($sorts)<1){
+            $this->filter->addSort('id');
+        }
+        
+        $searchQuery=$this->buildSearchString($queryString, $searchType, $matchCase);
+        if(!$searchQuery){
+            return "Invalid search string.";
+        }
+        
+        $select= $this->db->select()
+        ->from(array('view' => $viewName),array('view.id','view.segmentNrInTask','view.'.$searchInCombo,'view.editable'))
+        ->setIntegrityCheck(false)
+        ->where('view.'.$searchInCombo.$searchQuery)
+        ->where('view.editable = 1');
+        //FIXME add limit and offset (the offset is provided by frontend)
+        if($searchOffset>=0){
+            $select->limit(50,$searchOffset);
+        }
+        
+        //invert the order direction for the search
+        if($searchTopChekbox){
+            foreach ($sorts as &$sort){
+                if(strtolower($sort->direction)=="asc"){
+                    $sort->direction="DESC";
+                }else{
+                    $sort->direction="ASC";
+                }
+            }
+        }
+    
+        $result = $this->loadFilterdCustom($select);
+        
+        return $result;
     }
     
-    //FIXME impruve the error handling
-    public function rellaceAll($request){
+    //FIXME impruve the error handling!!!!!
+    public function replaceAll($request){
+        $result=$this->search($request,true);
+        
         $queryString=$request->getParam('searchCombo');
-        $result=$request->getParam('result');
+        $searchInCombo=$request->getParam('searchInCombo');
         $searchType=$request->getParam('searchType');
         $matchCase=$request->getParam('matchCase');
         
@@ -194,7 +207,55 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         $result=json_decode($result);
         
-        $searchString="";
+        foreach ($result as $res){
+            $value=$res->{$searchInCombo};
+            //REPLACE THE
+        }
+    }
+    
+    public function buildSearchString($queryString,$searchType,$matchCase){
+        switch ($searchType) {
+            case 'normalSearch':
+                $outSql=' like '.$this->db->getAdapter()->quote('%'.$queryString.'%');
+                if(!$matchCase){
+                    return $outSql;
+                }
+                $outSql.=' COLLATE utf8_bin';
+                return $outSql;
+                break;
+            case 'wildcardsSearch':
+                $queryString=str_replace("*","%",$queryString);
+                $queryString=str_replace("?","_",$queryString);
+                //$outSql=' like "'.$queryString.'"';
+                $outSql=' like '.$this->db->getAdapter()->quote($queryString);
+                if(!$matchCase){
+                    return $outSql;
+                }
+                //$outSql=' REGEXP "[[:<:]]'.$queryString.'[[:>:]]"';
+                $outSql.=' COLLATE utf8_bin';
+                return $outSql;
+                break;
+            case 'regularExpressionSearch':
+                $patern='#'.$queryString.'#';
+                try {
+                    @preg_match($patern, 'Test string');
+                } catch (Exception $e) {
+                    return false;
+                }
+                //$outSql=' REGEXP "'.$queryString.'"';
+                $outSql=' REGEXP '.$this->db->getAdapter()->quote($queryString);
+                return $outSql;
+                break;
+        }
+        
+    }
+    
+    //TODO here also the ins and delete segments should be added
+    public function replaceSearchString($searchString,$queryString,$searchType){
+        
+       // This must be done by the INS/DEL plugin, since the correct attributes for the tags must be added
+       // $queryString = '<del>'.$searchString.'</del><ins>'.$queryString.'</ins>';
+        
         //"/^PHP$/"
         switch ($searchType) {
             case 'normalSearch':
@@ -218,40 +279,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
                 break;
         }
         
-        foreach ($result as $res){
-            $value=$res->search_targetEdit;
-            
-        }
-    }
-    
-    public function buildSearchString($queryString,$searchType,$matchCase){
-        $outSql='';
-        
-        switch ($searchType) {
-            case 'normalSearch':
-                $outSql=' like "%'.$queryString.'%"';
-                if(!$matchCase){
-                    return $outSql;
-                }
-                $outSql=' REGEXP "[[:<:]]'.$queryString.'[[:>:]]"';
-                return $outSql;
-                break;
-            case 'wildcardsSearch':
-                $queryString=str_replace("*","%",$queryString);
-                $queryString=str_replace("?","_",$queryString);
-                $outSql=' like "%'.$queryString.'%"';
-                if(!$matchCase){
-                    return $outSql;
-                }
-                $outSql=' REGEXP "[[:<:]]'.$queryString.'[[:>:]]"';
-                return $outSql;
-                break;
-            case 'regularExpressionSearch':
-                $outSql=' REGEXP "'.$queryString.'"';
-                return $outSql;
-                break;
-        }
-        
+        return $searchString;
     }
     
     /**
@@ -268,22 +296,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * @param string $field
-     */
-    public function updateSearchField($name) {
-        $search= 'search_'.$name;
-        if(!$this->hasField($search)) {
-            return;
-        }
-        $value = $this->__call('get'.ucfirst($name), array());
-        if(is_string($value)){
-            $value=mb_substr(strip_tags($value),0,null,'utf-8');
-        }
-        
-        $this->__call('set'.ucfirst($search), array($value));
-    }
-    
-    /**
      * truncates the given segment content and strips tags for the toSort fields
      * truncation is needed for sorting in MSSQL
      * @param $segment
@@ -293,7 +305,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         if(!is_string($segment)){
             return $segment;
         }
-        return mb_substr(strip_tags($segment),0,self::TOSORT_LENGTH,'utf-8');
+        return strip_tags($segment);
     }
     
     /**
@@ -329,7 +341,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
                 $this->segmentdata[$loc['field']] = $this->createData($loc['field']);
             }
             //FIXME: parent::set('search_'.$loc['field'], $this->stripTags($value));
-            parent::set(''.$loc['field'].'Search', $this->stripTags($value));
+            //parent::set(''.$loc['field'].'Search', $this->stripTags($value));
             return $this->segmentdata[$loc['field']]->__set($loc['column'], $value);
         }
         return parent::set($name, $value);
@@ -438,6 +450,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     /**
      * strips all tags including internal tag content
+     * //TODO: this function is also used when matirialized view is created, to update the toSort fields. 
+     *         The strip tags will remove the also the del and insert tags.
+     * 
      * @return string $segmentContent
      */
     public function stripTags($segmentContent) {

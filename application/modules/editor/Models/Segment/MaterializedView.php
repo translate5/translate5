@@ -89,6 +89,7 @@ class editor_Models_Segment_MaterializedView {
         if($this->createMutexed()) {
             $this->addFields();
             $this->fillWithData();
+            $this->updateToSortColumns();
             return;
         }
         //the following check call is to avoid using a not completly filled MV in a second request accessing this task
@@ -212,6 +213,36 @@ class editor_Models_Segment_MaterializedView {
         
         $db = Zend_Db_Table::getDefaultAdapter();
         $db->query($selectSql, $this->taskGuid);
+    }
+    
+    /***
+     * Updates the toSort columns with no tag values
+     */
+    protected function updateToSortColumns(){
+        $db = Zend_Db_Table::getDefaultAdapter();
+        $select= $db->select()
+        ->from(array('view' => $this->getName()),array('view.*'));
+        $rows=$db->fetchAll($select);
+        
+        $segmentModel=ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segmentModel editor_Models_Segment */
+        
+        foreach ($rows as $row){
+            foreach ($row as $key=>$value){
+                if (!preg_match('/'.editor_Models_SegmentFieldManager::_TOSORT_PREFIX.'/',$key)){//FIXME use here static variable
+                    continue;
+                }
+                $initKey=preg_replace('/'.editor_Models_SegmentFieldManager::_TOSORT_PREFIX.'/', '', $key);
+                
+                $newValue=$row[$initKey];
+                $newValue=$segmentModel->stripTags($newValue);
+
+                $sql =' UPDATE '.$this->getName().' '.
+                      ' SET '.$key.'="'.$newValue.'"'.
+                      ' WHERE id='.$row['id'];
+                $db->query($sql);
+            }
+        }
     }
     
     /**
