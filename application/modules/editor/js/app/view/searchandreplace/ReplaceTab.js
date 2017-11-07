@@ -36,6 +36,7 @@ Ext.define('Editor.view.searchandreplace.ReplaceTab', {
         'Editor.view.searchandreplace.ReplaceTabViewController',
         'Editor.view.searchandreplace.SearchReplaceViewModel',
     ],
+    
     viewModel: {
         type: 'searchreplaceviewmodel'
     },

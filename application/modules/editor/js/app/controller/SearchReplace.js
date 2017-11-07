@@ -34,12 +34,16 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.controller.SearchReplace', {
     extend : 'Ext.app.Controller',
     
-    requires:['Editor.view.searchandreplace.SearchReplaceWindow'],
+    requires:[
+        'Editor.view.searchandreplace.SearchReplaceWindow',
+        'Editor.controller.searchandreplace.SearchSegment'
+    ],
     listen:{
         component:{
             '#segmentgrid':{
                 afterrender:'onSegmentGridAfterRender',
                 filterchange:'onSegmentGridFilterChange',
+                sortchange:'onSegmentGridSortChange',
                 columnshow:'onColumnVisibilityChange',
                 columnhide:'onColumnVisibilityChange'
             },
@@ -55,9 +59,6 @@ Ext.define('Editor.controller.SearchReplace', {
             },
             '#searchreplacetabpanel #replaceAllButton':{
                 click:'onReplaceAllButtonClick'
-            },
-            '#searchreplacetabpanel #searchCombo':{
-                change:'onSearchFieldTextChange'
             },
             '#roweditor':{
                 show:'onRowEditorShow'
@@ -93,6 +94,12 @@ Ext.define('Editor.controller.SearchReplace', {
     currentIndex:null,
     isSearchPressed:true,
     
+    /***
+     * When the filter is active and the user open the search/replace window, we display the info message that
+     * the search/replace will be performed only on filtered segments
+     */
+    isFilterActive:false,
+    
     activeSegment:{
         matchIndex:0,
         nextSegmentIndex:0,
@@ -104,6 +111,11 @@ Ext.define('Editor.controller.SearchReplace', {
         searchInfoMessage:'#UT#The search will be performed only on the filtered segments',
         comboFieldLabel:'#UT#Replace',
         noSearchResults:'#UT#No results for the current search!',
+        replaceAllWindowBtnText:'#UT#Alle Ergebnisse ersetzen',
+        cancelReplaceAllWindowBtnText:'#UT#Abbrechen',
+        replaceAllWindowTitle:'#UT#Ergebnisse ersetzen',
+        replaceAllWindowMessage:'#UT#matches found. Do you really want to replace all of them? All found segments will be changed including auto-status and last editor',
+        characterLimitError:'#UT#Der Suchstring ist zu groß'
     },
     
     
@@ -137,8 +149,17 @@ Ext.define('Editor.controller.SearchReplace', {
     },
     
     onSegmentGridFilterChange:function(store,filters,eOpts){
-        if(filters.length>0){
-            Editor.MessageBox.addInfo(this.strings.searchInfoMessage);
+        this.isFilterActive=filters.length>0;
+    },
+    
+    onSegmentGridSortChange:function(ct,column,direction,eOpts){
+        var searchWindow=Ext.ComponentQuery.query('#searchreplacewindow');
+
+        if(searchWindow.length>0){
+            for(var i=0;i<searchWindow.length;i++){
+                searchWindow[i].destroy();
+            }
+            this.handleSearchReplaceHotkey(null);
         }
     },
     
@@ -224,7 +245,7 @@ Ext.define('Editor.controller.SearchReplace', {
 
         
         replaceTab.insert(1,{
-            xtype:'combo',
+            xtype:'textfield',
             itemId:'replaceCombo',
             focusable:true,
             fieldLabel:this.strings.comboFieldLabel,
@@ -239,6 +260,23 @@ Ext.define('Editor.controller.SearchReplace', {
     },
     
     onSearchButtonClick:function(button){
+        
+        /*
+        //START OF NEW TEST
+        var me=this,
+            tabPanel=me.getTabPanel(),
+            activeTab=tabPanel.getActiveTab(),
+            searchCombo=activeTab.down('#searchCombo'),
+            searchComboRawValue=searchCombo.getRawValue();
+        
+        
+        var searchClass=Ext.create('Editor.controller.searchandreplace.SearchSegment');
+        searchClass.search(searchComboRawValue);
+        //END OF NEW TEST
+        return;
+        */
+        
+        
         var me=this,
             nextSegmentNr=me.isSearchRequired();
         
@@ -265,29 +303,40 @@ Ext.define('Editor.controller.SearchReplace', {
     },
     
     onReplaceAllButtonClick:function(){
-        this.replaceAll();  
-    },
-    
-    onSearchFieldTextChange:function(searchField,newValue,oldValue,eOpts){
-        if(newValue===oldValue){
-            return;
-        }
         var me=this,
             tabPanel=me.getTabPanel(),
             activeTab=tabPanel.getActiveTab(),
             vm=activeTab.getViewModel(),
-            tabPanelviewModel=tabPanel.getViewModel();
-
+            result=vm.get('result');
         
-        tabPanelviewModel.set('searchPerformed',false);
-        vm.set('result',[]);
-        vm.set('resultsCount',0);
-        vm.set('showResultsLabel',false);
-        
-        me.activeSegment.matchIndex=0;
-        me.activeSegment.nextSegmentIndex=0;
-        me.activeSegment.currentSegmentIndex=0;
-        me.activeSegment.matchCount=0;
+        Ext.create('Ext.window.MessageBox').show({
+            title: me.strings.replaceAllWindowTitle,
+            msg: result.length+" "+me.strings.replaceAllWindowMessage,
+            buttons: Ext.Msg.YESNO,
+            fn:me.handleLeaveTaskButton,
+            scope:me,
+            defaultFocus:'no',
+            icon: Ext.MessageBox.QUESTION,
+            buttonText: {
+                yes: me.strings.replaceAllWindowBtnText,
+                no: me.strings.cancelReplaceAllWindowBtnText
+            }
+        });
+    },
+    
+    /***
+     * Handler for the leave task dialog window.
+     * 
+     */
+    handleLeaveTaskButton:function(button){
+        if(button=="cancel"){
+            return false
+        }
+        if(button=="yes"){
+            this.replaceAll();
+            return true;
+        }
+        return false
     },
     
     onRowEditorShow:function(){
@@ -351,6 +400,11 @@ Ext.define('Editor.controller.SearchReplace', {
         if(!segmentGrid || !segmentGrid.isVisible()) {
             return;
         }
+        
+        if(me.isFilterActive){
+            Editor.MessageBox.addInfo(me.strings.searchInfoMessage);
+        }
+
         me.showSearchAndReplaceWindow(key);
     },
     
@@ -365,17 +419,22 @@ Ext.define('Editor.controller.SearchReplace', {
         var me=this,
             segmentGrid=Ext.ComponentQuery.query('#segmentgrid')[0],
             columns = segmentGrid.query('gridcolumn[isContentColumn]:not([hidden])'),
-            storeData=[],
+            searchStoreData=[],
+            replaceStoreData=[],
             searchInCombos=Ext.ComponentQuery.query('#searchInCombo');
         
+        
         Ext.Array.each(columns, function(rec) {
-            storeData.push({'id':rec.dataIndex , 'value':rec.text.replace(/<(?:.|\n)*?>/gm, '')});
+            searchStoreData.push({'id':rec.dataIndex , 'value':rec.text.replace(/<(?:.|\n)*?>/gm, '')});
+            if(rec.isEditableContentColumn){
+                replaceStoreData.push({'id':rec.dataIndex , 'value':rec.text.replace(/<(?:.|\n)*?>/gm, '')});
+            }
         });
         
         Ext.Array.each(searchInCombos,function(combo){
             combo.setStore(Ext.create('Ext.data.Store', {
                 fields: ['id', 'value'],
-                data:storeData
+                data:combo.up('#searchTab') ? searchStoreData :replaceStoreData
             }));
             var rec = combo.findRecord('id',me.activeColumnDataIndex);
             if(rec){
@@ -408,6 +467,7 @@ Ext.define('Editor.controller.SearchReplace', {
         var me=this,
             tabPanel=me.getTabPanel(),
             activeTab=tabPanel.getActiveTab(),
+            activeTabViewModel=activeTab.getViewModel(),
             form=activeTab.getForm(),
             segmentGrid = me.getSegmentGrid(),
             segmentStore=segmentGrid.editingPlugin.grid.store,
@@ -418,7 +478,8 @@ Ext.define('Editor.controller.SearchReplace', {
         params[proxy.getSortParam()] = proxy.encodeSorters(segmentStore.getSorters().items);
         params['taskGuid']=Editor.data.task.get('taskGuid');
         params['segmentNrInTask']=segmentNrInTask;
-        
+        params['searchOffset']=me.calculateSearchOffset();
+
         form.submit({
             url: Editor.data.restpath+'segment/search',
             params:params,
@@ -428,11 +489,13 @@ Ext.define('Editor.controller.SearchReplace', {
                     return;
                 }
                 var foundSegments = submit.result.rows,
-                    activeTabViewModel=activeTab.getViewModel(),
                     tabPanelviewModel=tabPanel.getViewModel();
 
                 tabPanelviewModel.set('searchPerformed',foundSegments.length > 0);
                 activeTabViewModel.set('resultsCount',foundSegments.length);
+                if(submit.result.resultsCountNoOffset){
+                    activeTabViewModel.set('resultsCountNoOffset',submit.result.resultsCountNoOffset);
+                }
                 activeTabViewModel.set('result',foundSegments.length >0 ? foundSegments : [] );
                 activeTabViewModel.set('showResultsLabel',true);
                 me.handleRowSelection();
@@ -520,25 +583,30 @@ Ext.define('Editor.controller.SearchReplace', {
             tabPanel=me.getTabPanel(),
             activeTab=tabPanel.getActiveTab(),
             searchCombo=activeTab.down('#searchCombo'),
+            searchComboRawValue=searchCombo.getRawValue(),
             replaceCombo=activeTab.down('#replaceCombo'),
-            searchValue ='(?!<.*?)(?![^<>]*?>)'+searchCombo.getRawValue(),///<\/?[^>]+(>|$)/g+(searchCombo.getRawValue());
+            searchType=activeTab.down('radiofield').getGroupValue(),
+            searchValue ='(?!<.*?)(?![^<>]*?>)'+searchComboRawValue,///<\/?[^>]+(>|$)/g+(searchCombo.getRawValue());
             searchRegExp=null,
-            caseSensitive=true;
-        
+            caseSensitive=true;//FIXME fix the case sensetive
+
         if(!iframeDocument){
             return;
         }
         
-        if(searchCombo.getRawValue()===null || searchCombo.getRawValue()===""){
+        if(searchComboRawValue===null || searchComboRawValue===""){
             return;
         }
-            
         searchRegExp = new RegExp(searchValue, 'g' + (caseSensitive ? '' : 'i'));
 
         //me.store.each(function(record, idx) {
         var cell, matches, cellHTML,
             cell = Ext.get(iframeDocument.body);
-        
+
+            //var searchClass=Ext.create('Editor.controller.searchandreplace.SearchSegment');
+            //searchClass.search(cell.dom.innerHTML,searchComboRawValue);
+            //return;
+            
             //matches = cell.dom.innerHTML.match(me.tagsRe);
             //cellHTML = cell.dom.innerHTML.replace(me.tagsRe, me.tagsProtect);
         
@@ -613,8 +681,8 @@ Ext.define('Editor.controller.SearchReplace', {
             for(var index=startIndex;index<results.length;){
                 
                 //subtract one because this is a row number but we need the index
-                tmpRowNumber=parseInt(results[index].row_number);
-                
+                //tmpRowNumber=parseInt(results[index].row_number);
+                tmpRowNumber=me.getSegmentRowNumber(grid,results[index]);
                 //if the hit row is in the range of the visible columns in the grid
                 if(tmpRowNumber>=firstVisibleIndex && tmpRowNumber<=lastVisibleIndex){
                     goToIndex=tmpRowNumber;
@@ -636,7 +704,8 @@ Ext.define('Editor.controller.SearchReplace', {
         }
         //if no index is found, use the initial one -> 0
         if(goToIndex===null){
-            goToIndex=parseInt(results[me.activeSegment.nextSegmentIndex].row_number);
+            //goToIndex=parseInt(results[me.activeSegment.nextSegmentIndex].row_number);
+            goToIndex=me.getSegmentRowNumber(grid,results[me.activeSegment.nextSegmentIndex]);
             //save the current segment index
             me.activeSegment.currentSegmentIndex=me.activeSegment.nextSegmentIndex;
             
@@ -696,15 +765,64 @@ Ext.define('Editor.controller.SearchReplace', {
             tabPanel=me.getTabPanel(),
             activeTab=tabPanel.getActiveTab(),
             vm=activeTab.getViewModel(),
-            result=vm.get('result');
+            result=vm.get('result'),
+            resultsCountNoOffset=vm.get('resultsCountNoOffset');
         
         if(result.length < 1){
             return 0;
+        }
+        if(result.length>0 && result.length<=resultsCountNoOffset){
+            return -1;
         }
         if(me.activeSegment.matchIndex >= me.activeSegment.matchCount) {
             return result[me.activeSegment.nextSegmentIndex].id;
         }
         return -1;
+    },
+    
+    getSegmentRowNumber:function(grid,record){
+        var store=grid.store,
+            newRecord=store.findRecord('id',record.id),
+            index=grid.store.indexOf(newRecord);
+        return index;
+    },
+    
+    getSearchOffset:function(){
+        var me=this,
+            tabPanel=me.getTabPanel(),
+            activeTab=tabPanel.getActiveTab(),
+            activeTabViewModel=activeTab.getViewModel();
+        return activeTabViewModel.get('searchOffset');
+    },
+
+    calculateSearchOffset:function(){
+        debugger;
+        var me=this,
+            tabPanel=me.getTabPanel(),
+            activeTab=tabPanel.getActiveTab(),
+            activeTabViewModel=activeTab.getViewModel(),
+            searchTopChekbox=activeTab.down('#searchTopChekbox').checked,
+            result=activeTabViewModel.get('result'),
+            resultsCountNoOffset=activeTabViewModel.get('resultsCountNoOffset'),
+            searchOffset=activeTabViewModel.get('searchOffset'),
+            calcOffset=-1;
+
+        if(resultsCountNoOffset<1){
+            return calcOffset;
+        }
+
+        //if(searchTopChekbox){
+        //    calcOffset=Math.min(Math.max(searchOffset - 50, 0), resultsCountNoOffset);
+        //    activeTabViewModel.set('searchOffset',calcOffset)
+        //    return calcOffset;
+        //}
+        calcOffset=Math.min(Math.max(searchOffset + 50, 0), resultsCountNoOffset);
+        activeTabViewModel.set('searchOffset',calcOffset);
+        return calcOffset;
+    },
+    
+    escapeRegExp:function(str) {
+        return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
     },
 
     //FIXME this works but somehow destroys the content inside the segment!!

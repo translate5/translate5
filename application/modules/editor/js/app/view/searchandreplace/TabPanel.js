@@ -73,9 +73,9 @@ Ext.define('Editor.view.searchandreplace.TabPanel', {
                     items: [{ 
                         xtype: 'button',
                         itemId:'searchButton',
-                        //bind:{
-                            //visible:'{isSearchPressed}',
-                        //},//FIXME view model variable so we know if the search is clicked
+                        bind:{
+                            disabled:'{isDisableSearchButton}',
+                        },
                         text: me.strings.searchButton 
                     },{ 
                         xtype: 'button',

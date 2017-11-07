@@ -36,10 +36,12 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
     
     requires:[
         'Editor.view.searchandreplace.SearchReplaceViewModel',
+        'Editor.view.searchandreplace.SearchTabViewController',
     ],
     viewModel: {
         type: 'searchreplaceviewmodel'
     },
+    controller:'searchtabviewcontroller',
     
     closable:false,
     
@@ -52,7 +54,8 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
       normalSearch:'#UT#Normal (default)',
       wildcardsSearch:'#UT#Wildcards',
       regularExpressionSearch:'#UT#Regular expressions',
-      saveCurrentOpen:'#UT#Save currently opened segment'
+      saveCurrentOpen:'#UT#Save currently opened segment',
+      invalidRegularExpression:'#UT#Invalid regular expression',
     },
     
     padding:'10 10 10 10',
@@ -63,9 +66,14 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                 items:[{
                     xtype:'textfield',
                     itemId:'searchCombo',
+                    maxLength:1024,
                     name:'searchCombo',
                     focusable:true,
                     fieldLabel:me.strings.comboFieldLabel,
+                    validator:me.validateSearchField,
+                    listeners:{
+                        change:'onSearchFieldTextChange'
+                    }
                 },{
                     xtype:'combo',
                     itemId:'searchInCombo',
@@ -125,6 +133,25 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
+    },
+    
+    validateSearchField:function(val){
+        var tabPanel=this.up('#searchreplacetabpanel'),
+            activeTab=tabPanel.getActiveTab(),
+            tabPanelviewModel=tabPanel.getViewModel(),
+            activeTab=tabPanel.getActiveTab(),
+            searchType=activeTab.down('radiofield').getGroupValue();
+        
+        if(searchType==="regularExpressionSearch"){
+            try {
+                var isValidRegexp=new RegExp(val);
+            } catch (e) {
+                tabPanelviewModel.set('disableSearchButton',true);
+                return activeTab.strings.invalidRegularExpression;
+            }
+        }
+        tabPanelviewModel.set('disableSearchButton',val===null || val==="");
+        return val!=null || val!=="";
     }
     
 });

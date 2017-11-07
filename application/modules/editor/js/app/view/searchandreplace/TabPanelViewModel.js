@@ -36,6 +36,7 @@ Ext.define('Editor.view.searchandreplace.TabPanelViewModel', {
     data:{
         searchView:true,
         searchPerformed:false,
+        disableSearchButton:true,
     },
     
     formulas:{
@@ -44,6 +45,9 @@ Ext.define('Editor.view.searchandreplace.TabPanelViewModel', {
         },
         isSearchPerformed:function(get){
             return get('searchPerformed');
+        },
+        isDisableSearchButton:function(get){
+            return get('disableSearchButton');
         }
     }
 });

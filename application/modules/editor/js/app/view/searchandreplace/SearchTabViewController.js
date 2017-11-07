@@ -26,15 +26,36 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 /**
- * @class ReplaceTabViewController
+ * @class SearchTabViewController
  * @extends Ext.app.ViewController
  */
-Ext.define('Editor.view.searchandreplace.ReplaceTabViewController', {
+Ext.define('Editor.view.searchandreplace.SearchTabViewController', {
     extend: 'Ext.app.ViewController',
-    alias: 'controller.replacetabViewcontroller',
+    alias: 'controller.searchtabviewcontroller',
     
     onSearchFieldTextChange:function(searchField,newValue,oldValue,eOpts){
-        var searchTab=Ext.ComponentQuery.query('#searchTab')[0];
-        searchTab.getController().onSearchFieldTextChange(searchField,newValue,oldValue,eOpts);
-    }
+        var me=this,
+            tabPanel=me.getView().up('#searchreplacetabpanel'),
+            activeTab=tabPanel.getActiveTab(),
+            searchType=activeTab.down('radiofield').getGroupValue(),
+            vm=activeTab.getViewModel(),
+            tabPanelviewModel=tabPanel.getViewModel(),
+            searchReplaceController=Editor.app.getController('SearchReplace');
+        
+        if(newValue===oldValue){
+            return;
+        }
+        tabPanelviewModel.set('searchPerformed',false);
+        vm.set('result',[]);
+        vm.set('resultsCount',0);
+        vm.set('resultsCountNoOffset',0);
+        vm.set('searchOffset',0);
+        vm.set('showResultsLabel',false);
+        
+        searchReplaceController.activeSegment.matchIndex=0;
+        searchReplaceController.activeSegment.nextSegmentIndex=0;
+        searchReplaceController.activeSegment.currentSegmentIndex=0;
+        searchReplaceController.activeSegment.matchCount=0;
+    },
+    
 });
