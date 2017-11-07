@@ -48,33 +48,17 @@ class editor_Workflow_Log extends ZfExtended_Models_Entity_Abstract {
      */
     protected $dbInstanceClass = 'editor_Models_Db_LogWorkflow';
 
-
     /**
-     * Adds a new log entry, save it to the db, and return the entity instance
-     * @param string $taskGuid
+     * Adds a new log entry, save it to the db
+     * @param editor_Models_Task $task
      * @param string $userGuid
-     * @param string $step
      */
-    public function log(string $taskGuid, string $userGuid, string $step) {
-        $adapter = $this->db->getAdapter();
-        $adapter->beginTransaction();
-        $db = $this->db;
-        $s = $db->select()
-        ->from($db->info($db::NAME), array('maxStep' => 'MAX(stepNr)'))
-        ->where('taskGuid = ?', $taskGuid);
-        $res = $this->db->fetchRow($s);
-        $nextStep = (empty($res->maxStep) ? 1 : ($res->maxStep + 1));
-        $this->setTaskGuid($taskGuid);
+    public function log(editor_Models_Task $task, string $userGuid) {
+        $this->setTaskGuid($task->getTaskGuid());
         $this->setUserGuid($userGuid);
-        $this->setStepName($step);
-        $this->setStepNr($nextStep);
+        $this->setStepName($task->getWorkflowStepName()); //empty step name comes from import!
+        $this->setStepNr($task->getWorkflowStep());
         //created timestamp automatic by DB
         $this->save();
-        
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->updateWorkflowStep($taskGuid, $nextStep, $step);
-        
-        $adapter->commit();
     }
 }

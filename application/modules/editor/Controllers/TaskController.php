@@ -305,10 +305,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->initWorkflow();
             //$this->entity->save(); => is done by the import call!
             $this->processUploadedFile();
-            //since the workflow needs the current user, 
-            // we leave this call here and do not move it into the worker
-            $this->workflow->doImport($this->entity);
-            //reload because entityVersion was changed by above workflow call
+            //reload because entityVersion could be changed somewhere
             $this->entity->load($this->entity->getId());
             $this->view->success = true;
             $this->view->rows = $this->entity->getDataObject();
