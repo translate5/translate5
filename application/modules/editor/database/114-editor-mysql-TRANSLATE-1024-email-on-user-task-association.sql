@@ -27,4 +27,4 @@
 -- */
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
-VALUES ('runtimeOptions.workflow.default.notification.notifyNewTaskAssigned', '1', 'editor', 'workflow', '0', '0', '', 'boolean', 'If enabled an email is send to users which are associated with status open to a task.');
+VALUES ('runtimeOptions.workflow.default.notification.notifyNewTaskAssigned', '1', 'editor', 'workflow', '1', '1', '', 'boolean', 'If enabled an email is send to users which are associated with status open to a task.');
