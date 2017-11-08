@@ -118,6 +118,12 @@ class editor_Models_Segment_AutoStates {
     const REVIEWED_PM_UNCHANGED_AUTO = 13;
     
     /**
+     * reviewed but unchanged through the repetition editor by a pm not associated in the workflow of a task
+     * @var integer
+     */
+    const TRANSLATED_AUTO = 14;
+    
+    /**
      * Internal state used to show segment is pending
      * @var integer
      */
@@ -125,6 +131,7 @@ class editor_Models_Segment_AutoStates {
     
     protected $states = array(
         self::TRANSLATED => 'Übersetzt',
+        self::TRANSLATED_AUTO => 'Autoübersetzt',
         self::NOT_TRANSLATED => 'Nicht übersetzt',
         self::REVIEWED => 'Lektoriert',
         self::REVIEWED_AUTO => 'Autolektoriert',
@@ -178,6 +185,10 @@ class editor_Models_Segment_AutoStates {
             self::REVIEWED_PM_UNCHANGED,
             self::REVIEWED_PM_UNCHANGED_AUTO,
           ),
+          $workflow::ROLE_TRANSLATOR => [
+            self::NOT_TRANSLATED,
+            self::TRANSLATED,
+          ],
           $workflow::ROLE_LECTOR => array(
             self::REVIEWED,
             self::REVIEWED_AUTO,
@@ -185,7 +196,7 @@ class editor_Models_Segment_AutoStates {
             self::REVIEWED_UNCHANGED,
             self::REVIEWED_UNCHANGED_AUTO,
           ),
-          $workflow::ROLE_TRANSLATOR => array(
+          $workflow::ROLE_TRANSLATORCHECK => array(
             self::REVIEWED_TRANSLATOR,
             self::REVIEWED_TRANSLATOR_AUTO,
           )
@@ -204,6 +215,8 @@ class editor_Models_Segment_AutoStates {
         switch ($calculatedState) {
             case self::REVIEWED:
                 return self::REVIEWED_AUTO;
+            case self::TRANSLATED:
+                return self::TRANSLATED_AUTO;
             case self::REVIEWED_UNCHANGED:
                 return self::REVIEWED_UNCHANGED_AUTO;
             case self::REVIEWED_PM:
@@ -249,6 +262,9 @@ class editor_Models_Segment_AutoStates {
         }
         
         if($tua->getRole() == $workflow::ROLE_TRANSLATOR) {
+            return $isModified ? self::TRANSLATED : self::NOT_TRANSLATED;
+        }
+        if($tua->getRole() == $workflow::ROLE_TRANSLATORCHECK) {
             return self::REVIEWED_TRANSLATOR;
         }
         if($tua->getRole() == $workflow::ROLE_LECTOR) {
@@ -290,7 +306,10 @@ class editor_Models_Segment_AutoStates {
      * @param editor_Models_Segment $segment
      */
     public function updateAfterCommented(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua) {
-        if($segment->getAutoStateId() == self::TRANSLATED || $segment->getAutoStateId() == self::NOT_TRANSLATED) {
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
+        $isTranslator = $tua->getRole() == $workflow::ROLE_TRANSLATOR;
+        $autoState = $segment->getAutoStateId();
+        if(!$isTranslator && ($autoState == self::TRANSLATED || $autoState == self::NOT_TRANSLATED)) {
             if($this->isEditWithoutAssoc($tua)) {
                 $stateToSet = self::REVIEWED_PM_UNCHANGED;
             }

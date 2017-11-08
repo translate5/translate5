@@ -26,6 +26,10 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
+CREATE TABLE `LEK_file_filter_dump` AS SELECT * FROM `LEK_file_filter`;
+
+DROP TABLE `LEK_file_filter`;
+
 CREATE TABLE `LEK_file_filter` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `fileId` INT NOT NULL,
@@ -44,3 +48,6 @@ CREATE TABLE `LEK_file_filter` (
     REFERENCES `LEK_files` (`id`)
     ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+INSERT INTO `LEK_file_filter` SELECT * FROM `LEK_file_filter_dump` WHERE `taskGuid` IN (SELECT `taskGuid` FROM `LEK_task`);
+
+DROP TABLE `LEK_file_filter_dump`;

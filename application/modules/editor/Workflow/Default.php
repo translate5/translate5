@@ -49,9 +49,8 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      * @see editor_Workflow_Abstract::handleImport()
      */
     protected function handleImport(){
-        $log = ZfExtended_Factory::get('editor_Workflow_Log');
-        /* @var $log editor_Workflow_Log */
-        $log->log($this->newTask->getTaskGuid(), $this->authenticatedUser->userGuid,  self::STEP_LECTORING);
+        $stepName = (bool) $this->newTask->getEmptyTargets() ? self::STEP_TRANSLATION : self::STEP_LECTORING;
+        $this->initWorkflowStep($this->newTask, $stepName);
         $this->doDebug(__FUNCTION__);
     }
     
@@ -70,14 +69,17 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
         
         $actions = ZfExtended_Factory::get('editor_Workflow_Actions',array($this));
         /* @var $actions editor_Workflow_Actions */
-        //@todo this needs to be adjusted to check for the workflowstep instead of the role
-        //when the workflowsystem is extended or based on a workflow engine
+        
+        
+        $nextStep = $this->getNextStep($this->getStepOfRole($newTua->getRole()));
+        if($nextStep) {
+            $this->setNextStep($task, $nextStep);
+            $nextRole = $this->getRoleOfStep($nextStep);
+            if($nextRole) {
+                $actions->openRole($nextRole, $newTua);
+            }
+        }
         if($newTua->getRole() == self::ROLE_LECTOR) {
-            $actions->openRole(self::ROLE_TRANSLATOR, $newTua);
-            $log = ZfExtended_Factory::get('editor_Workflow_Log');
-            /* @var $log editor_Workflow_Log */
-            $nextStep = $this->getNextStep($this->getStepOfRole($newTua->getRole()));
-            $log->log($taskGuid, $userGuid,  $nextStep);
             $actions->updateAutoStates($taskGuid,'setUntouchedState');
             $task->setRealDeliveryDate(date('Y-m-d', $_SERVER['REQUEST_TIME']));
             $task->save();
@@ -151,6 +153,7 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
         //when the workflowsystem is extended or based on a workflow engine
         if($newTua->getRole() == self::ROLE_LECTOR) {
             $actions = ZfExtended_Factory::get('editor_Workflow_Actions',array($this));
+            /* @var $actions editor_Workflow_Actions */
             $actions->updateAutoStates($newTua->getTaskGuid(),'setInitialStates');
         }
         $this->doDebug(__FUNCTION__);
@@ -188,8 +191,11 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
         /* @var $task editor_Models_Task */
         
         $list = $this->loadTasksByPastDeliveryDate();
+        
+        //FIXME what does this customer specific code here?
         $acl = ZfExtended_Acl::getInstance();
         $acl->allow('noRights', 'editorconnect_Models_WsdlWrapper', 'sendToUser');
+        
         //affected user:
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         foreach($list as $instance) {
@@ -207,4 +213,18 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
             editor_Models_LogTask::create($instance['taskGuid'], self::STATE_FINISH, $this->authenticatedUserModel, $user);
         }
     }
+    
+    protected function handleUserAssociationAdded() {
+        $this->doDebug(__FUNCTION__);
+        
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($this->newTaskUserAssoc->getTaskGuid());
+        
+        $notifier = ZfExtended_Factory::get('editor_Workflow_Notification', array($task, $this));
+        /* @var $notifier editor_Workflow_Notification */
+
+        $notifier->notifyNewTaskAssigned($this->newTaskUserAssoc);
+    }
+
 }

@@ -388,15 +388,17 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * update the workflowStep of a specific task 
-     * @param string $taskGuid
-     * @param integer $step
      * @param string $stepName
+     * @param boolean $increaseStep optional, by default true, increases then the workflow step nr
      */
-    public function updateWorkflowStep(string $taskGuid, integer $step, string $stepName) {
-        $this->db->update([
-                'workflowStep' => $step,
+    public function updateWorkflowStep(string $stepName, $increaseStep = true) {
+        $data = [
                 'workflowStepName' => $stepName,
-        ], ['taskGuid = ?' => $taskGuid]);
+        ];
+        if($increaseStep) {
+            $data['workflowStep'] =  new Zend_Db_Expr('`workflowStep` + 1');
+        }
+        $this->db->update($data, ['taskGuid = ?' => $this->getTaskGuid()]);
     }
     
     /**

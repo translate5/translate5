@@ -26,21 +26,5 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-CREATE TABLE `LEK_file_filter` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `fileId` INT NOT NULL,
-  `type` VARCHAR(45) NOT NULL DEFAULT 'import',
-  `filter` VARCHAR(160) NOT NULL,
-  `parameters` LONGTEXT NULL,
-  `taskGuid` VARCHAR(38) NOT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `index2` (`fileId` ASC, `taskGuid` ASC, `type` ASC),
-  CONSTRAINT `fk_LEK_file_filter_1`
-    FOREIGN KEY (`taskGuid`)
-    REFERENCES `LEK_task` (`taskGuid`)
-    ON DELETE CASCADE,
-  CONSTRAINT `fk_LEK_file_filter_2`
-    FOREIGN KEY (`fileId`)
-    REFERENCES `LEK_files` (`id`)
-    ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
+VALUES ('runtimeOptions.workflow.default.notification.notifyNewTaskAssigned', '1', 'editor', 'workflow', '1', '1', '', 'boolean', 'If enabled an email is send to users which are associated with status open to a task.');

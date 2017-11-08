@@ -1794,6 +1794,34 @@ Die Benutzer wurden per E-Mail darüber informiert.<br />
 The users were informed by e-mail.<br />
 <br /></target></trans-unit>
 
+<trans-unit id='w5xiZXJzZXR6ZXIgKMOcYmVycHLDvGZ1bmcp'>
+    <source>Übersetzer (Überprüfung)</source>
+    <target>translator (check)</target>
+</trans-unit>
+<trans-unit id='w5xiZXJzZXR6dW5n'>
+    <source>Übersetzung</source>
+    <target>translation</target>
+</trans-unit>
+<trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgenVnZXdpZXNlbg=='><source>Translate5 - Aufgabe zugewiesen</source><target>Translate5 - task associated</target></trans-unit>
+<trans-unit id='JTEkcyAlMiRzLDxiciAvPgo8YnIgLz4KSW0gUHJvamVrdHBvcnRhbCAlMyRzIHd1cmRlIElobmVuIGRpZSBBdWZnYWJlIDxiPiU0JHMgLSAlNSRzPC9iPiB6dWdld2llc2VuLjxiciAvPgo8YnIgLz4KPGJyIC8+VmllbGVuIERhbmsgdW5kIHZpZWxlIEdyw7zDn2UsCjxiciAvPklociBQcm9qZWt0bWFuYWdlbWVudCBUZWFtCjxiciAvPiU2JHMKPGJyIC8+CjxiciAvPkRpZXNlIEVtYWlsIHd1cmRlIGF1dG9tYXRpc2NoIGdlbmVyaWVydC4gQml0dGUgYW50d29ydGVuIFNpZSBuaWNodCBhdWYgZGllc2UgRS1NYWlsIQ=='><source>%1$s %2$s,<br />
+<br />
+Im Projektportal %3$s wurde Ihnen die Aufgabe <b>%4$s - %5$s</b> zugewiesen.<br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%6$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source><target>%1$s %2$s,<br />
+<br />
+The task <b>%4$s - %5$s</b> was associated to You in the task-portal Translate5.<br />
+<br />
+You can access the portal at: %3$s<br />
+<br />
+<br />Many thanks and best regards,
+<br />The Project Management team
+<br />%6$s
+<br />
+<br />This e-mail has been generated automatically. Please do not reply to this e-mail.</target></trans-unit>
     </body>
   </file>
 </xliff>

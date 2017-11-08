@@ -1007,6 +1007,73 @@ Sie erreichen das Portal unter: %3$s<br />
 <trans-unit id='S2VpbmUgR2xvYmFsZXNlIEJlbnV0emVyZ3J1cHBlIHZlcmbDvGdiYXIgKGbDvHIgSWhyZW4gR2xvYmFsZXNlIEJlbnV0emVyIHVuZCBJaHJlIFNwcmFjaGtvbWJpbmF0aW9uKS4gQml0dGUgw6RuZGVybiBTaWUgZGVuIEJlbnV0emVyIG9kZXIgw7xiZXJzcHJpbmdlbiBTaWUgZGllIFZvcsO8YmVyc2V0enVuZy4='><source>Keine Globalese Benutzergruppe verfügbar (für Ihren Globalese Benutzer und Ihre Sprachkombination). Bitte ändern Sie den Benutzer oder überspringen Sie die Vorübersetzung.</source><target>Keine Globalese Benutzergruppe verfügbar (für Ihren Globalese Benutzer und Ihre Sprachkombination). Bitte ändern Sie den Benutzer oder überspringen Sie die Vorübersetzung.</target></trans-unit>
 <trans-unit id='QmVudXR6ZXIgb2RlciBQYXNzd29ydCBzaW5kIG5pY2h0IHZhbGlkZS4='><source>Benutzer oder Passwort sind nicht valide.</source><target>Benutzer oder Passwort sind nicht valide.</target></trans-unit>
 <trans-unit id='TGFkZW4='><source>Laden</source><target>Laden</target></trans-unit>
+<trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgenVnZXdpZXNlbg=='><source>Translate5 - Aufgabe zugewiesen</source><target>Translate5 - Aufgabe zugewiesen</target></trans-unit>
+<trans-unit id='JTEkcyAlMiRzLDxiciAvPgo8YnIgLz4KSW0gUHJvamVrdHBvcnRhbCAlMyRzIHd1cmRlIElobmVuIGRpZSBBdWZnYWJlIDxiPiU0JHMgLSAlNSRzPC9iPiB6dWdld2llc2VuLjxiciAvPgo8YnIgLz4KPGJyIC8+VmllbGVuIERhbmsgdW5kIHZpZWxlIEdyw7zDn2UsCjxiciAvPklociBQcm9qZWt0bWFuYWdlbWVudCBUZWFtCjxiciAvPiU2JHMKPGJyIC8+CjxiciAvPkRpZXNlIEVtYWlsIHd1cmRlIGF1dG9tYXRpc2NoIGdlbmVyaWVydC4gQml0dGUgYW50d29ydGVuIFNpZSBuaWNodCBhdWYgZGllc2UgRS1NYWlsIQ=='><source>%1$s %2$s,<br />
+<br />
+Im Projektportal %3$s wurde Ihnen die Aufgabe <b>%4$s - %5$s</b> zugewiesen.<br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%6$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source><target>%1$s %2$s,<br />
+<br />
+Im Projektportal %3$s wurde Ihnen die Aufgabe <b>%4$s - %5$s</b> zugewiesen.<br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%6$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</target></trans-unit>
+<trans-unit id='w5xiZXJzZXR6ZXIgKMOcYmVycHLDvGZ1bmcp'><source>Übersetzer (Überprüfung)</source><target>Übersetzer (Überprüfung)</target></trans-unit>
+<trans-unit id='w5xiZXJzZXR6dW5n'><source>Übersetzung</source><target>Übersetzung</target></trans-unit>
+<trans-unit id='QXV0b8O8YmVyc2V0enQ='><source>Autoübersetzt</source><target>Autoübersetzt</target></trans-unit>
+<trans-unit id='JTEkcyAlMiRzLAoKSW0gUHJvamVrdHBvcnRhbCAlMyRzIHd1cmRlIGRpZSBBdWZnYWJlICU1JHMgLSAlNiRzIGbDvHIgU2llIGZyZWlnZWdlYmVuLgoKVmllbGVuIERhbmsgdW5kIHZpZWxlIEdyw7zDn2UsCklociBQcm9qZWt0bWFuYWdlbWVudCBUZWFtCiU3JHMKCkRpZXNlIEVtYWlsIHd1cmRlIGF1dG9tYXRpc2NoIGdlbmVyaWVydC4gQml0dGUgYW50d29ydGVuIFNpZSBuaWNodCBhdWYgZGllc2UgRS1NYWlsIQ=='><source>%1$s %2$s,
+
+Im Projektportal %3$s wurde die Aufgabe %5$s - %6$s für Sie freigegeben.
+
+Vielen Dank und viele Grüße,
+Ihr Projektmanagement Team
+%7$s
+
+Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source><target>%1$s %2$s,
+
+Im Projektportal %3$s wurde die Aufgabe %5$s - %6$s für Sie freigegeben.
+
+Vielen Dank und viele Grüße,
+Ihr Projektmanagement Team
+%7$s
+
+Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</target></trans-unit>
+<trans-unit id='JTEkcyAlMiRzLDxiciAvPgo8YnIgLz4KSW0gUHJvamVrdHBvcnRhbCAlMyRzIHd1cmRlIGRpZSBBdWZnYWJlIDxiPiU1JHMgLSAlNiRzPC9iPiBmw7xyIFNpZSBmcmVpZ2VnZWJlbi48YnIgLz4KPGJyIC8+CkltIGZvbGdlbmRlbiBkaWUgZ2V0w6R0aWd0ZW4gw4RuZGVydW5nZW4gZGVyIHZvcmhlcmdlaGVuZGVuIMOcYmVyc2V0emVyOjxiciAvPgolNCRzCjxociAvPgo8YnIgLz4KPGJyIC8+CjxiciAvPlZpZWxlbiBEYW5rIHVuZCB2aWVsZSBHcsO8w59lLAo8YnIgLz5JaHIgUHJvamVrdG1hbmFnZW1lbnQgVGVhbQo8YnIgLz4lNyRzCjxiciAvPgo8YnIgLz5EaWVzZSBFbWFpbCB3dXJkZSBhdXRvbWF0aXNjaCBnZW5lcmllcnQuIEJpdHRlIGFudHdvcnRlbiBTaWUgbmljaHQgYXVmIGRpZXNlIEUtTWFpbCE='><source>%1$s %2$s,<br />
+<br />
+Im Projektportal %3$s wurde die Aufgabe <b>%5$s - %6$s</b> für Sie freigegeben.<br />
+<br />
+Im folgenden die getätigten Änderungen der vorhergehenden Übersetzer:<br />
+%4$s
+<hr />
+<br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%7$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source><target>%1$s %2$s,<br />
+<br />
+Im Projektportal %3$s wurde die Aufgabe <b>%5$s - %6$s</b> für Sie freigegeben.<br />
+<br />
+Im folgenden die getätigten Änderungen der vorhergehenden Übersetzer:<br />
+%4$s
+<hr />
+<br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%7$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRvckNoZWNr'><source>translatorCheck</source><target>translatorCheck</target></trans-unit>
+<trans-unit id='JyV2YWx1ZSUnIHdhcyBub3QgZm91bmQgaW4gdGhlIGhheXN0YWNr'><source>'%value%' was not found in the haystack</source><target>'%value%' was not found in the haystack</target></trans-unit>
   </body>
  </file>
 </xliff>

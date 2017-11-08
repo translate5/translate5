@@ -168,6 +168,34 @@ class editor_Workflow_Notification {
     }
     
     /**
+     * Sends a notification to users which are attached newly to a task with status open
+     * @param editor_Models_TaskUserAssoc $tua
+     */
+    public function notifyNewTaskAssigned(editor_Models_TaskUserAssoc $tua) {
+        $wf = $this->workflow;
+        $wfId = $wf::WORKFLOW_ID;
+        $config = Zend_Registry::get('config');
+        $wfConfig = $config->runtimeOptions->workflow;
+        if(!$wfConfig->{$wfId} || !$wfConfig->{$wfId}->notification->notifyNewTaskAssigned) {
+            return;
+        }
+        
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $user->loadByGuid($tua->getUserGuid());
+        
+        $params = [
+            'user' => (array) $user->getDataObject(),
+            'task' => $this->task,
+        ];
+        
+        if($tua->getState() == $wf::STATE_OPEN) {
+            $this->createNotification($tua->getRole(), __FUNCTION__, $params);
+            $this->notify((array) $user->getDataObject());
+        }
+    }
+    
+    /**
      * attaches the segmentList as attachment to the internal mailer object
      * @param string $segmentHash
      * @param array $segments
