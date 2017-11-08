@@ -179,10 +179,11 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       
       Ext.Array.each(toDelete, function(toDel){
           toDel.eraseVersioned(task, {
-              success: function() {
+              success: function(rec, op) {
                   assoc.remove(toDel);
                   me.updateUsers(assoc);
                   me.fireEvent('removeUserAssoc', me, toDel, assoc);
+                  Editor.MessageBox.addByOperation(op); //does nothing since content is not provided from server :(
                   Editor.MessageBox.addSuccess(me.messages.assocDeleted);
               },
               failure: function() {
@@ -215,6 +216,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
                   me.fireEvent('addUserAssoc', me, rec, store);
               }
               task.load();//reload only the task, not the whole task prefs, should be OK
+              Editor.MessageBox.addByOperation(op);
               Editor.MessageBox.addSuccess(me.messages.assocSave);
               me.getPrefWindow().setLoading(false);
           },

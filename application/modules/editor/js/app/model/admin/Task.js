@@ -232,13 +232,14 @@ Ext.define('Editor.model.admin.Task', {
   initWorkflow: function () {
       var me = this,
           filter = null,
-          idx = 0,
+          chainIdx = 0,
           data = Editor.data,
-          stepChain = me.getWorkflowMetaData().stepChain,
+          meta = me.getWorkflowMetaData(),
+          stepChain = meta.stepChain,
+          stepsWithFilter = meta.stepsWithFilter,
           task = data.task,
           step = task.get('userStep'),
-          useFilter = !(me.isFinished() || me.isWaiting() || me.isEnded()),
-          stepIdxToStart = task.get('emptyTargets') ? 0 : 1; //define workflow chain start by task type here
+          useFilter = !(me.isFinished() || me.isWaiting() || me.isEnded());
       
       if(step && useFilter) {
           //preset grid filtering:
@@ -248,19 +249,14 @@ Ext.define('Editor.model.admin.Task', {
           filter = data.initialGridFilters; //use filter as reference 
           //reset workflowstep filters of formerly opened tasks, since initialGridFilters is persistent between tasks!
           delete filter.segmentgrid;
-          idx = Ext.Array.indexOf(stepChain, step);
-          
-          //TODO this was (idx > 0 && filter) which gave as the flexibility to define the 
-          // current workflow of the task just from the given task user assocs
-          // indeed we have the current workflow step in the task right now!
-          // Also the usage of isTranslationTask is more a hack as a good solution 
-          if(idx > stepIdxToStart && filter) {
+          chainIdx = Ext.Array.indexOf(stepChain, step);
+          if(Ext.Array.indexOf(stepsWithFilter, step) > 0 && filter) {
               filter.segmentgrid = [{
                   type: 'workflowStep',
                   dataIndex: 'workflowStep',
                   property: 'workflowStep',
                   disabled: false,
-                  value: [stepChain[idx], stepChain[idx - 1]]
+                  value: [stepChain[chainIdx], stepChain[chainIdx - 1]]
               }];
           }
       }

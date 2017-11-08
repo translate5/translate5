@@ -88,7 +88,12 @@ Ext.define('Editor.MessageBox',{
         }
         Ext.Array.each(json.errors, function(error){
             if(error.data) {
-                error.msg = error.msg += Editor.MessageBox.dataTable(error.data);
+                if(Ext.isString(error.data)) {
+                    error.msg = Ext.String.format(error.msg, error.data);
+                }
+                else {
+                    error.msg = error.msg += Editor.MessageBox.dataTable(error.data);
+                }
             }
             Editor.MessageBox.getInstance().addMessage(error.msg, error.type || Editor.MessageBox.INFO);
         });
