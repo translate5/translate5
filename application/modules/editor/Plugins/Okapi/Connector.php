@@ -204,7 +204,6 @@ class editor_Plugins_Okapi_Connector {
      */
     public function executeTask(){
         $url=$this->projectUrl.'/tasks/execute/'.$this->sourceLang.'/'.$this->targetLang;
-        error_log($url);
         $http = $this->getHttpClient($url);
         $response = $http->request('POST');
         $this->processResponse($response);
