@@ -186,7 +186,6 @@ class editor_Models_Segment_AutoStates {
             self::REVIEWED_PM_UNCHANGED_AUTO,
           ),
           $workflow::ROLE_TRANSLATOR => [
-            self::NOT_TRANSLATED,
             self::TRANSLATED,
           ],
           $workflow::ROLE_LECTOR => array(
