@@ -49,6 +49,11 @@ class editor_Plugins_TermTagger_Service {
      */
     protected $config;
     
+    /**
+     * @var editor_Models_Segment_InternalTag
+     */
+    protected $tagHelper;
+    
     
     /**
      * Two corresponding array to hold replaced tags.
@@ -64,12 +69,21 @@ class editor_Plugins_TermTagger_Service {
     */
     private $replaceCounter = 1;
     
+    /**
+     * Arrays for handling the TrackChange-Nodes.
+     * TrackChange-Nodes must be replaced in every text-element before send to the TermTagger-Server,
+     * because TermTagger can not handle text with TrackChange-Nodes.
+     */
+    private $arrTrackChangeNodes = array();
+    private $arrTermTags = array();
+    
     
     
     public function __construct() {
         $this->log = ZfExtended_Factory::get('ZfExtended_Log');
         $config = Zend_Registry::get('config');
         $this->config = $config->runtimeOptions->termTagger;
+        $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
     }
     
     /**
@@ -297,7 +311,6 @@ class editor_Plugins_TermTagger_Service {
             $segment->source = $this->decodeText($segment->source);
             $segment->target = $this->decodeText($segment->target);
         }
-        
         return $data;
     }
     
@@ -321,6 +334,8 @@ class editor_Plugins_TermTagger_Service {
         $text = preg_replace('/<div[^>]+>/is', '', $text);
         $text = preg_replace('/<\/div>/', '', $text);
         
+        $text = $this->encodeTrackChanges($text);
+        
         return $text;
     }
     
@@ -328,16 +343,92 @@ class editor_Plugins_TermTagger_Service {
         //fix TRANSLATE-713
         $text = str_replace('term-STAT_NOT_FOUND', 'term STAT_NOT_FOUND', $text);
         
-        if (empty($this->replacedTagsNeedles)) {
+        if (empty($this->replacedTagsNeedles) && empty($this->arrTrackChangeNodes)) {
             return $text;
         }
         
         $text = preg_replace('"&lt;img class=&quot;content-tag&quot; src=&quot;(\d+)&quot; alt=&quot;TaggingError&quot; /&gt;"', '<img class="content-tag" src="\\1" alt="TaggingError" />', $text);
         $text = str_replace($this->replacedTagsNeedles, $this->replacedTagsReplacements, $text);
         
+        $text = $this->decodeTrackChanges($text);
+        
         return $text;
     }
     
+    private function encodeTrackChanges($text) {
+        $text = $this->tagHelper->protect($text);
+        
+        // TrackChanges: DEL
+        $matchTrackChangesDELRegExp = '/<del[^>]*>.*?<\/del>/i';
+        preg_match_all($matchTrackChangesDELRegExp, $text, $tempMatchesTrackChangesDEL, PREG_OFFSET_CAPTURE);
+        foreach ($tempMatchesTrackChangesDEL[0] as $match) {
+            $this->arrTrackChangeNodes[$match[1]] = $match[0];
+        }
+        // TrackChanges: INS
+        $matchTrackChangesINSRegExp = '/<\/?ins[^>]*>/i';
+        preg_match_all($matchTrackChangesINSRegExp, $text, $tempMatchesTrackChangesINS, PREG_OFFSET_CAPTURE);
+        foreach ($tempMatchesTrackChangesINS[0] as $match) {
+            $this->arrTrackChangeNodes[$match[1]] = $match[0];
+        }
+        
+        ksort($this->arrTrackChangeNodes);
+        
+        $text = $this->tagHelper->unprotect($text);
+        return $this->tagHelper->removeTrackChanges($text);
+    }
+    
+    private function decodeTrackChanges($text) {
+        $text = $this->tagHelper->protect($text);
+        
+        // TermTags
+        $matchTermTagsRegExp= '/<\/?div[^>]*>/i';
+        preg_match_all($matchTermTagsRegExp, $text, $tempMatchesTermTags, PREG_OFFSET_CAPTURE);
+        foreach ($tempMatchesTermTags[0] as $match) {
+            $this->arrTermTags[$match[1]] = $match[0];
+        }
+        ksort($this->arrTermTags);
+        
+        for ($pos = 0; $pos < strlen($text); $pos++) {
+            // If there is a termTag in the text at this position, we need to:
+            if(array_key_exists($pos, $this->arrTermTags)) {
+                // - increase the following positions of the found TrackChange-Nodes by the length of the found termTag.
+                $length = strlen($this->arrTermTags[$pos]);
+                $this->arrTrackChangeNodes = $this->increaseKeysInArray($this->arrTrackChangeNodes, $length, $pos);
+            }
+            // If there is a TrackChange-Node in the text at this position, we need to:
+            if(array_key_exists($pos, $this->arrTrackChangeNodes)) {
+                // - re-enter the TrackChange-Node here
+                $text = substr($text, 0, $pos) . $this->arrTrackChangeNodes[$pos] . substr($text, $pos);
+                // - increase the following positions of the found TermTags by the length of the found TrackChange-Node.
+                $length = strlen($this->arrTrackChangeNodes[$pos]);
+                $this->arrTermTags= $this->increaseKeysInArray($this->arrTermTags, $length, $pos);
+            }
+        }
+        
+        $text = $this->tagHelper->unprotect($text);
+        return $text;
+    }
+    
+    /**
+     * Returns a "new version" of the given array with keys increased by the given number.
+     * Increases only those keys that are higher than the given treshold. 
+     * @param array $arr
+     * @param number $number
+     * @param number $treshold
+     * @return array
+     */
+    private static function increaseKeysInArray ($arr, $number, $treshold) {
+        $arrOldValues = array_values($arr);
+        $arrOldKeys = array_keys($arr);
+        $arrNewKeys = array_map(function($oldKey) use ($number, $treshold) {
+            if ($oldKey < $treshold) {
+                return $oldKey;
+            } else {
+                return $oldKey + $number;
+            }
+        }, $arrOldKeys);
+        return array_combine($arrNewKeys, $arrOldValues);
+    }
     
     /**
      * decodes the TermTagger JSON and logs an error if data can not be processed
