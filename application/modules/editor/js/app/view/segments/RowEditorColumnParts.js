@@ -349,6 +349,8 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
             //und verhindert so, dass der Record nicht als modified markiert wird, wenn am Inhalt eigentlich nichts verändert wurde
             //newValue = Ext.String.trim(me.mainEditor.getValueAndUnMarkup()).replace(/\u200B/g, '');
             newValue = me.mainEditor.getValueAndUnMarkup().replace(/\u200B/g, ''),
+            cleanValue = newValue.replace(/<img[^>]* class="duplicatesavecheck"[^>]*>/,''),
+            
             title, msg;
             
         //check, if the context delivers really the correct record, because through some issues in reallive data 
@@ -365,7 +367,7 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
             return false;
         }
         
-        if(newValue.length == 0 && record.get(me.columnToEdit).length > 0) {
+        if(cleanValue.length == 0 && record.get(me.columnToEdit).length > 0) {
             Editor.MessageBox.addError(me.messages.cantSaveEmptySegment);
             return false;
         }

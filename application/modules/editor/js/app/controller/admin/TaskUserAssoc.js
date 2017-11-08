@@ -138,7 +138,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           assoc = me.getAdminTaskUserAssocsStore(),
           task = me.getPrefWindow().actualTask,
           meta = task.getWorkflowMetaData(),
-          role = Ext.Object.getKeys(meta.roles)[0],
+          role = meta.steps2roles[task.get('workflowStepName')] || Ext.Object.getKeys(meta.roles)[0],
           state = Ext.Object.getKeys(meta.states)[0],
           newRec = assoc.model.create({
               taskGuid: task.get('taskGuid'),
@@ -245,21 +245,18 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
   initState: function(roleCombo, newValue, oldValue) {
       var me = this,
           form = me.getUserAssocForm(),
-          task = Editor.model.admin.Task.prototype,
+          task = me.getPrefWindow().actualTask,
           stateCombo = form.down('combo[name="state"]'),
           newState = task.USER_STATE_OPEN,
           rec = form.getRecord(),
-          isChanged = stateCombo.getValue() != rec.get('state');
+          isChanged = stateCombo.getValue() != rec.get('state'),
+          meta = task.getWorkflowMetaData(),
+          initialStates = meta.initialStates[task.get('workflowStepName')];
       if(!rec.phantom || isChanged) {
           return;
       }
-      switch (newValue) {
-          case 'translator':
-              newState = task.USER_STATE_WAITING;
-              break;
-          case 'lector':
-              newState = task.USER_STATE_OPEN;
-              break;
+      if(initialStates && initialStates[newValue]) {
+          newState = initialStates[newValue];
       }
       rec.set('state', newState);
       stateCombo.setValue(newState);
