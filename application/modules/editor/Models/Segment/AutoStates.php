@@ -262,7 +262,7 @@ class editor_Models_Segment_AutoStates {
         }
         
         if($tua->getRole() == $workflow::ROLE_TRANSLATOR) {
-            return $isModified ? self::TRANSLATED : self::NOT_TRANSLATED;
+            return self::TRANSLATED;
         }
         if($tua->getRole() == $workflow::ROLE_TRANSLATORCHECK) {
             return self::REVIEWED_TRANSLATOR;

@@ -207,21 +207,26 @@ abstract class editor_Workflow_Abstract {
         self::STEP_TRANSLATORCHECK=>self::ROLE_TRANSLATORCHECK
     );
     
-    protected $initalStates = [
+    /**
+     * Valid state / role combination for each step
+     * the first state of the states array is also the default state for that step and role
+     * @var array
+     */
+    protected $validStates = [
         self::STEP_TRANSLATION => [
-            self::ROLE_TRANSLATOR => self::STATE_OPEN,
-            self::ROLE_LECTOR => self::STATE_WAITING,
-            self::ROLE_TRANSLATORCHECK => self::STATE_WAITING,
+            self::ROLE_TRANSLATOR => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW],
+            self::ROLE_LECTOR => [self::STATE_WAITING],
+            self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING],
         ],
         self::STEP_LECTORING => [
-            self::ROLE_TRANSLATOR => self::STATE_FINISH,
-            self::ROLE_LECTOR => self::STATE_OPEN,
-            self::ROLE_TRANSLATORCHECK => self::STATE_WAITING,
+            self::ROLE_TRANSLATOR => [self::STATE_FINISH],
+            self::ROLE_LECTOR => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW],
+            self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING],
         ],
         self::STEP_TRANSLATORCHECK => [
-            self::ROLE_TRANSLATOR => self::STATE_FINISH,
-            self::ROLE_LECTOR => self::STATE_FINISH,
-            self::ROLE_TRANSLATORCHECK => self::STATE_OPEN,
+            self::ROLE_TRANSLATOR => [self::STATE_FINISH],
+            self::ROLE_LECTOR => [self::STATE_FINISH],
+            self::ROLE_TRANSLATORCHECK => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW],
         ],
     ];
     
@@ -238,7 +243,12 @@ abstract class editor_Workflow_Abstract {
         $events = Zend_EventManager_StaticEventManager::getInstance();
         $events->attach('Editor_TaskuserassocController', 'afterPostAction', function(Zend_EventManager_Event $event){
             $this->newTaskUserAssoc = $event->getParam('entity');
+            $this->recalculateWorkflowStep($this->newTaskUserAssoc);
             $this->handleUserAssociationAdded();
+        });
+        
+        $events->attach('Editor_TaskuserassocController', 'afterDeleteAction', function(Zend_EventManager_Event $event){
+            $this->recalculateWorkflowStep($event->getParam('entity'));
         });
     }
     
@@ -264,11 +274,27 @@ abstract class editor_Workflow_Abstract {
     }
     
     /**
+     * returns the workflow steps which should have initially an activated segment filter
+     * @return string[]
+     */
+    public function getStepsWithFilter() {
+        return [self::STEP_TRANSLATORCHECK];
+    }
+    
+    /**
      * returns the initial states of the different roles in the different steps
      * @return string[][]
      */
     public function getInitialStates() {
-        return $this->initalStates;
+        $result = [];
+        foreach($this->validStates as $step => $statesToRoles) {
+            $result[$step] = [];
+            foreach($statesToRoles as $role => $states) {
+                //the initial state per role is just the first defined state per role
+                $result[$step][$role] = reset($states);
+            }
+        }
+        return $result;
     }
     
     /**
@@ -667,6 +693,7 @@ abstract class editor_Workflow_Abstract {
             $task = $this->newTask;
         }
         $task->createMaterializedView();
+        $this->recalculateWorkflowStep($newTua);
         
         $state = $this->getTriggeredState($oldTua, $newTua);
         if(!empty($state)) {
@@ -674,6 +701,54 @@ abstract class editor_Workflow_Abstract {
                 $this->{$state}();
             } 
             $this->events->trigger($state, __CLASS__, array('oldTua' => $oldTua, 'newTua' => $newTua));
+        }
+    }
+    
+    /**
+     * recalculates the workflow step by the given task user assoc combinations
+     * If the combination of roles and states are pointing to an specific workflow step, this step is used
+     * If the states and roles does not match any valid combination, no step is changed. 
+     * @param editor_Models_TaskUserAssoc $tua
+     */
+    protected function recalculateWorkflowStep(editor_Models_TaskUserAssoc $tua) {
+        $tuas = $tua->loadByTaskGuidList([$tua->getTaskGuid()]);
+        
+        $areTuasSubset = function($toCompare) use ($tuas){
+            foreach($tuas as $tua) {
+                if(empty($toCompare[$tua['role']])) {
+                    return false;
+                }
+                if(!in_array($tua['state'], $toCompare[$tua['role']])) {
+                    return false;
+                }
+            }
+            return true;
+        };
+        
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($tua->getTaskGuid());
+        
+        $msg = ZfExtended_Factory::get('ZfExtended_Models_Messages');
+        /* @var $msg ZfExtended_Models_Messages */
+        
+        foreach($this->validStates as $step => $roleStates) {
+            if(!$areTuasSubset($roleStates)) {
+                continue;
+            }
+            if($step == $task->getWorkflowStepName()) {
+                return;
+            }
+            $task->updateWorkflowStep($step, false);
+            $log = ZfExtended_Factory::get('editor_Workflow_Log');
+            /* @var $log editor_Workflow_Log */
+            $log->log($task, $this->authenticatedUser->userGuid);
+            //set $step as new workflow step if different to before!
+            $labels = $this->getLabels();
+            $steps = $this->getSteps();
+            $step = $labels[array_search($step, $steps)];
+            $msg->addNotice('Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!', 'core', null, $step);
+            return;
         }
     }
     

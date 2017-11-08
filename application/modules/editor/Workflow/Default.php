@@ -88,7 +88,7 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
         /* @var $notifier editor_Workflow_Notification */
         $notifier->notifyAllFinishOfARole($newTua->getRole(), $this->isCron); 
     }
-
+    
     /**
      * (non-PHPdoc)
      * @see editor_Workflow_Abstract::handleFinish()
