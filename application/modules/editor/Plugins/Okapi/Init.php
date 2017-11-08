@@ -304,13 +304,18 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     public function queueWorker($file,$bconfFilePath,$refFolder,$proofReadFolder){
         $worker = ZfExtended_Factory::get('editor_Plugins_Okapi_Worker');
         /* @var $worker editor_Plugins_Okapi_Worker */
-        
+        $language = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $language editor_Models_Languages */
+        $sourceLang = $language->loadLangRfc5646($this->task->getSourceLang());
+        $targetLang = $language->loadLangRfc5646($this->task->getTargetLang());
         $params=[
                 'file'=>$file,
                 'bconfFilePath'=>$bconfFilePath,
                 'refFolder'=>$refFolder,
                 'proofReadFolder'=>$proofReadFolder,
-                'taskGuid'=>$this->task->getTaskGuid()
+                'taskGuid'=>$this->task->getTaskGuid(),
+                'sourceLang'=>$sourceLang,
+                'targetLang'=>$targetLang
         ];
         
         // init worker and queue it
