@@ -175,6 +175,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         }else{
             me.setValue(me.markupForEditor(value)+checkTag);
         }
+        this.fireEvent('afterSetValueAndMarkup', this);
 
     },
   /**
@@ -292,8 +293,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           var allImagesInItem = item.getElementsByTagName('IMG'),
               allDivsInItem = item.getElementsByTagName('DIV');
           if (allImagesInItem.length > 0) {
-              for (i = 0; i < allImagesInItem.length; i++) {
+              for (var i = allImagesInItem.length; i--; ) { // backwards because we might remove items
                   var imgItem = allImagesInItem[i];
+                  console.dir(imgItem);
                   if (!me.isDuplicateSaveTag(imgItem)) {
                       var htmlForItemImg = me.imgNodeToString(imgItem, true),
                       templateEl = document.createElement('template');
@@ -304,10 +306,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
               }
           }
           if (allDivsInItem.length > 0) {
-              for (i = 0; i < allDivsInItem.length; i++) {
+              for (var i = allDivsInItem.length; i--; ) { // backwards because we might remove items
                   var divItem = allDivsInItem[i],
                       dataOfItem = me.getData(divItem,data),
                       htmlForItemImg = me.imageTemplate.apply(dataOfItem);
+                  console.dir(divItem);
                   var templateEl = document.createElement('template');
                   templateEl.innerHTML = htmlForItemImg;
                   item.insertBefore(templateEl.content.firstChild,divItem);
@@ -439,18 +442,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
               // TrackChange-Node might include images => replace the images with their divs and spans:
               var allImagesInItem = item.getElementsByTagName('img');
               if( allImagesInItem.length > 0) {
-                  for (i = 0; i < allImagesInItem.length; i++) {
+                  for (var i=allImagesInItem.length; i--; ) { // backwards because we might remove items
                       var imgItem = allImagesInItem[i],
-                          imgHtml = '';
-                      if(me.isDuplicateSaveTag(imgItem)){
-                          debugger;
-                      }
-                      else if (markupImage = me.getMarkupImage(imgItem.id)){
-                          imgHtml = markupImage.html;
-                      } 
-                      else if(/^qm-image-/.test(imgItem.id)){
-                          imgHtml= me.imgNodeToString(imgItem, false);
-                      }
+                          imgHtml = me.unmarkImage(imgItem);
                       if (imgHtml != '') {
                           var template = document.createElement('template');
                           template.innerHTML = imgHtml;
@@ -470,16 +464,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
               return;
           }
           if(item.tagName == 'IMG'){
-              if(me.isDuplicateSaveTag(item)){
-                  img = Ext.fly(item);
-                  result.push(me.getDuplicateCheckImg(img.getAttribute('data-segmentid'), img.getAttribute('data-fieldname')));
-              }
-              else if(markupImage = me.getMarkupImage(item.id)){
-                  result.push(markupImage.html);
-              }
-              else if(/^qm-image-/.test(item.id)){
-                  result.push(me.imgNodeToString(item, false));
-              }
+              result.push(me.unmarkImage(item));
               return;
           }
           if(item.hasChildNodes()){
@@ -489,6 +474,19 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           result.push(item.textContent || item.innerText);
       });
       return result.join('');
+  },
+  unmarkImage: function(item) {
+      var me = this;
+      if(me.isDuplicateSaveTag(item)){
+          img = Ext.fly(item);
+          return me.getDuplicateCheckImg(img.getAttribute('data-segmentid'), img.getAttribute('data-fieldname'));
+      }
+      else if(markupImage = me.getMarkupImage(item.id)){
+          return markupImage.html;
+      }
+      else if(/^qm-image-/.test(item.id)){
+          return me.imgNodeToString(item, false);
+      }
   },
   /**
    * generates a img tag string
