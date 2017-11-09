@@ -69,25 +69,25 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         //get segment list
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
         
-        $this->assertCount(11, $segments);
+        $this->assertCount(13, $segments);
         
         //bulk check of all pretrans fields
         $pretrans = array_map(function($item){
             return $item->pretrans;
         }, $segments);
-        $this->assertEquals(array(1,1,1,1,1,1,0,0,0,0,0), $pretrans);
+        $this->assertEquals(array(1,1,1,1,1,1,0,0,0,0,0,0,0), $pretrans);
         
         //bulk check of all pretrans fields
         $matchRates = array_map(function($item){
             return $item->matchRate;
         }, $segments);
-        $this->assertEquals(array('100','100','100','100','100','100','0','0','0','0','0'), $matchRates);
+        $this->assertEquals(array('100','100','100','100','100','100','0','0','0','0','0','0','0'), $matchRates);
         
         //bulk check of all pretrans fields
         $autoStateIds = array_map(function($item){
             return $item->autoStateId;
         }, $segments);
-        $this->assertEquals(array('0','0','0','3','0','0','4','4','4','4','0'), $autoStateIds);
+        $this->assertEquals(array('0','0','0','3','0','0','4','4','4','4','0','4','4'), $autoStateIds);
         
         foreach($segments as $segment) {
             $this->assertEquals('{00000000-0000-0000-C100-CCDDEE000001}', $segment->userGuid);
@@ -146,8 +146,8 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals('ad22aff833942adca222e82201e5fcd9', $spaceTestSegment->targetMd5);
         
         $lastSegment = end($segments);
-        $this->assertEquals(11, $lastSegment->segmentNrInTask);
-        $this->assertEquals(11, $lastSegment->mid);
+        $this->assertEquals(13, $lastSegment->segmentNrInTask);
+        $this->assertEquals(13, $lastSegment->mid);
     }
     
     public function testSegmentEditing() {
@@ -221,19 +221,19 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         $autoStateIds = array_map(function($item){
             return $item->autoStateId;
         }, $segments);
-        $this->assertEquals(array('0','0','1','3','0','0','1','1','1','4','0'), $autoStateIds);
+        $this->assertEquals(array('0','0','1','3','0','0','1','1','1','4','0','4','4'), $autoStateIds);
         
         //bulk check of all workflowStepNr fields
         $workflowStepNr = array_map(function($item){
             return $item->workflowStepNr;
         }, $segments);
-        $this->assertEquals(array('0','0','1','0','0','0','1','1','1','0','0'), $workflowStepNr);
+        $this->assertEquals(array('0','0','1','0','0','0','1','1','1','0','0','0','0'), $workflowStepNr);
         
         //bulk check of all workflowStep fields
         $workflowStep = array_map(function($item){
             return $item->workflowStep;
         }, $segments);
-        $this->assertEquals(array('','','lectoring','','','','lectoring','lectoring','lectoring','',''), $workflowStep);
+        $this->assertEquals(array('','','lectoring','','','','lectoring','lectoring','lectoring','','','',''), $workflowStep);
     }
     
     /**

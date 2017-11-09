@@ -387,6 +387,10 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             $source = strpos($transUnit, '<seg-source') === false ? '</source>' : '</seg-source>';
             $transUnit = str_replace($source, $source.'<target></target>', $transUnit);
         }
+        else{
+            //some versions of SDL Studio adds empty <target/> tags which must be converted then to  
+            $transUnit = preg_replace('#<target[^>]*/>#', '<target></target>', $transUnit);
+        }
         
         $this->segmentData = array();
         //extrahiere das Zielsegment
