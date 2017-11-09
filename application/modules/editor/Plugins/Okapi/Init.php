@@ -48,7 +48,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             'html' => ['text/html'],
             'htm' => ['text/html'],
             'xml' => ['application/xml'],
-            'csv' => ['text/csv'],
+            //'csv' => ['text/csv'], disabled due our own importer
             'txt' => ['text/plain'],
             'dita' => ['application/dita+xml'],
             'ditamap' => ['application/dita+xml'],
