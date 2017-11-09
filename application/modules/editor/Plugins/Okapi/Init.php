@@ -231,7 +231,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     }
     
     /***
-     * Find all files which can be handled by okapi and start a worker so thay are converted by okapi
+     * Find all files which can be handled by okapi and start a worker so they are converted by okapi
      *
      * @param string $importFolder - tmp import directory path on disk
      */
@@ -241,39 +241,23 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         //proofread folder
         $proofReadFolder=$importFolder.'/'.$import->proofReadDirectory;
         
-        //the task folder
-        $taskFolder=str_replace("_tempImport","",$importFolder);
-        
         //reference files directory path
         $refFolder = $importFolder.'/'.$import->referenceDirectory;
         
-        $directory = new RecursiveDirectoryIterator($taskFolder);
+        $directory = new RecursiveDirectoryIterator($proofReadFolder);
         $it= new RecursiveIteratorIterator($directory);
         
         $matchFiles=[];
-        $bconfFilePath=[];
-        
         //find all files supported by okapi and move them in the okapi directory
         foreach ($it as $fileinfo) {
-            /* @var $fileinfo SplFileInfo */
-            $extension = strtolower($fileinfo->getExtension());
-            if(!$fileinfo->isFile()){
+            if(!$this->isProcessable($fileinfo)) {
                 continue;
             }
-            
-            if (in_array($extension,array_keys($this->okapiFileTypes))) {
-                //add the match file in the matches array
-                $matchFiles[]=[
-                        'fileName'=>$fileinfo->getFilename(),
-                        'filePath'=>$fileinfo->getPathname(),
-                ];
-                continue;
-            }
-            
-            if (in_array($extension,$this->okapiBconf)) {
-                $bconfFilePath[]=$fileinfo->getPathname();
-                continue;
-            }
+            //add the match file in the matches array
+            $matchFiles[]=[
+                    'fileName'=>$fileinfo->getFilename(),
+                    'filePath'=>$fileinfo->getPathname(),
+            ];
         }
         
         //if no files are found do nothing
@@ -281,14 +265,54 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             return;
         }
         
-        if(empty($bconfFilePath)){
-            $bconfFilePath[]=$this->getDefaultBconf();
-        }
+        $bconfFilePath = $this->getBconfFiles($importFolder);
         
         //for each match file, run a okapi worker
         foreach ($matchFiles as $file) {
             $this->queueWorker($file,$bconfFilePath,$refFolder,$proofReadFolder);
         }
+    }
+    
+    /**
+     * looks for bconf files in the import root folder and returns them
+     * @param string $importFolder
+     * @return string[]
+     */
+    protected function getBconfFiles($importFolder) {
+        $bconfFilePath=[];
+        $directory = new DirectoryIterator($importFolder);
+        
+        foreach ($directory as $fileinfo) {
+            if (in_array(strtolower($fileinfo->getExtension()),$this->okapiBconf)) {
+                $bconfFilePath[]=$fileinfo->getPathname();
+                continue;
+            }
+        }
+        
+        if(empty($bconfFilePath)){
+            $bconfFilePath[]=$this->getDefaultBconf();
+        }
+        return $bconfFilePath;
+    }
+    
+    /**
+     * Checks if the given file processable by okapi
+     * @param SplFileInfo $fileinfo
+     * @return boolean
+     */
+    protected function isProcessable(SplFileInfo $fileinfo) {
+        $extension = strtolower($fileinfo->getExtension());
+        if(!$fileinfo->isFile()){
+            return false;
+        }
+            
+        $isXml = $extension == 'xml';
+        if($extension && editor_Models_Import_FileParser_Xml::isParsable(file_get_contents($fileinfo))) {
+            //Okapi supports XML, but if it is XLIFF in the XML file we don't need Okapi:
+            return false;
+        }
+            
+        return in_array($extension,array_keys($this->okapiFileTypes));
     }
     
     /***

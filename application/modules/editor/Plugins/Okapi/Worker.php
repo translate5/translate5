@@ -44,6 +44,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
     } 
     
     /**
+     * Uploads one file to Okapi to convert it to an XLIFF file importable by translate5
      * {@inheritDoc}
      * @see ZfExtended_Worker_Abstract::work()
      */
