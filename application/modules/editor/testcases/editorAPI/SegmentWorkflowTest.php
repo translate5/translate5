@@ -56,7 +56,12 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         $api->reloadTask();
         $api->addUser('testlector');
         $api->reloadTask();
-        $api->addUser('testtranslator', 'waiting', 'translator');
+        $api->addUser('testtranslator', 'waiting', 'translatorCheck');
+    }
+    
+    public function testTranslator() {
+        //Implement tests for the new role translator and workflowstep translating!
+        $this->markTestIncomplete("Implement tests for the new role translator and workflowstep translating!");
     }
     
     /**
