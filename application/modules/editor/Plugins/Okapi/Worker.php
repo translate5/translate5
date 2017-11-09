@@ -56,6 +56,12 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
         
         $this->api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
         $this->api->setBconfFilePath($params['bconfFilePath']);
+        
+        $language = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $language editor_Models_Languages */
+        
+        $this->api->setSourceLang($language->loadLangRfc5646($this->task->getSourceLang()));
+        $this->api->setTargetLang($language->loadLangRfc5646($this->task->getTargetLang()));
         $this->api->setInputFile($file);
         
         try {

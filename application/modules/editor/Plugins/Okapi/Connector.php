@@ -60,6 +60,18 @@ class editor_Plugins_Okapi_Connector {
     private $bconfFilePath;
     
     /***
+     * The sourceLang of the imported task
+     * @var string
+     */
+    private $sourceLang;
+
+    /***
+     * The targetLang of the imported task
+     * @var string
+     */
+    private $targetLang;
+    
+    /***
      * The file which need to be converted
      * @var string
      */
@@ -191,7 +203,7 @@ class editor_Plugins_Okapi_Connector {
      * Run the file conversion. For each uploaded files converted file will be created
      */
     public function executeTask(){
-        $url=$this->projectUrl.'/tasks/execute';
+        $url=$this->projectUrl.'/tasks/execute/'.$this->sourceLang.'/'.$this->targetLang;
         $http = $this->getHttpClient($url);
         $response = $http->request('POST');
         $this->processResponse($response);
@@ -214,6 +226,14 @@ class editor_Plugins_Okapi_Connector {
     
     public function setBconfFilePath($confPath){
         $this->bconfFilePath=$confPath;
+    }
+    
+    public function setSourceLang($sourceLang){
+        $this->sourceLang=$sourceLang;
+    }
+    
+    public function setTargetLang($targetLang){
+        $this->targetLang=$targetLang;
     }
     
     public function getBconfFilePath(){
