@@ -260,17 +260,18 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         plainContent.push(Ext.htmlEncode(text));
         return;
       }
-      // Keep nodes from TrackChanges, but replace their images
+      // Keep nodes from TrackChanges, but replace their images etc.
       if( (item.tagName.toLowerCase() == 'ins' || item.tagName.toLowerCase() == 'del')  && /(^|[\s])trackchanges([\s]|$)/.test(item.className)){
           // TrackChange-Node might include images: 
-          // (1) add the special id to the img:
-          // (2) replace the given divs and spans with their image:
+          // - add the special id to the img
+          // - replace the given divs and spans with their image
+          // TrackChange-Node might include TermTag: 
+          // - replace TermTag-divs with their corresponding span
           var allImagesInItem = item.getElementsByTagName('IMG'),
               allDivsInItem = item.getElementsByTagName('DIV');
           if (allImagesInItem.length > 0) {
               for (var i = allImagesInItem.length; i--; ) { // backwards because we might remove items
                   var imgItem = allImagesInItem[i];
-                  console.dir(imgItem);
                   if (!me.isDuplicateSaveTag(imgItem)) {
                       var htmlForItemImg = me.imgNodeToString(imgItem, true),
                       templateEl = document.createElement('template');
@@ -282,14 +283,33 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           }
           if (allDivsInItem.length > 0) {
               for (var i = allDivsInItem.length; i--; ) { // backwards because we might remove items
-                  var divItem = allDivsInItem[i],
+                  var divItem = allDivsInItem[i];
+                  if(/(^|[\s])term([\s]|$)/.test(divItem.className)){
+                      var htmlForDivItem = '',
+                          termFoundCls = divItem.className;
+                      // TODO: is the same as below for "// Span für Terminologie"
+                      if(me.fieldTypeToEdit) {
+                          var replacement = me.fieldTypeToEdit+'-$1';
+                          termFoundCls = termFoundCls.replace(/(transFound|transNotFound|transNotDefined)/, replacement);
+                      }
+                      htmlForDivItem += Ext.String.format('<span class="{0}" title="{1}">', termFoundCls, divItem.title);
+                      htmlForDivItem += divItem.innerHTML;
+                      htmlForDivItem += '</span>';
+                      var templateEl = document.createElement('template');
+                      templateEl.innerHTML = htmlForDivItem;
+                      item.insertBefore(templateEl.content.firstChild,divItem.parentNode);
+                      item.removeChild(divItem.parentNode);
+                  } else {
+                      var divItem = allDivsInItem[i],
+                          dataOfItem,
+                          htmlForItemImg;
                       dataOfItem = me.getData(divItem,data),
                       htmlForItemImg = me.imageTemplate.apply(dataOfItem);
-                  console.dir(divItem);
-                  var templateEl = document.createElement('template');
-                  templateEl.innerHTML = htmlForItemImg;
-                  item.insertBefore(templateEl.content.firstChild,divItem);
-                  item.removeChild(divItem);
+                      var templateEl = document.createElement('template');
+                      templateEl.innerHTML = htmlForItemImg;
+                      item.insertBefore(templateEl.content.firstChild,divItem);
+                      item.removeChild(divItem);
+                  }
               }
           }
           item.innerHTML = item.innerHTML.replace(new RegExp(Editor.TRANSTILDE, "g"), ' ');
@@ -316,7 +336,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       if(item.tagName != 'DIV'){
         return;
       }
-      
       data = me.getData(item,data);
       
       me.result.push(me.imageTemplate.apply(data));
