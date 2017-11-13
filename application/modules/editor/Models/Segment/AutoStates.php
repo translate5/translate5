@@ -30,6 +30,9 @@ END LICENSE AND COPYRIGHT
 /**
  * Segment Auto States Helper Class
  * This class contains all autoState definitions and all autoState transitions, available by api
+ * 
+ * Warning: On changing/adding autostates, change also frontend hardcoded list Editor.data.segments.autoStates
+ *          filled in Editor.controller.Editor::init()
  */
 class editor_Models_Segment_AutoStates {
     
