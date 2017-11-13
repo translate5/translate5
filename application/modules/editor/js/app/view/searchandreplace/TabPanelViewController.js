@@ -33,9 +33,6 @@ Ext.define('Editor.view.searchandreplace.TabPanelViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.tabpanelviewcontroller',
     
-    searchTabWindowWidth:350,
-    replaceTabWindowWidth:450,
-    
     /***
      * Close button handler
      */
@@ -57,8 +54,6 @@ Ext.define('Editor.view.searchandreplace.TabPanelViewController', {
         searchCombo.focus();
         //set the search view flag
         viewModel.set('searchView',isSearchTab);
-        //resize the window if we are in replace tab
-        searchReplaceWindow.setWidth(isSearchTab ? me.searchTabWindowWidth : me.replaceTabWindowWidth);
     }
 });
 

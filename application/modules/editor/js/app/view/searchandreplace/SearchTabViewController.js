@@ -43,7 +43,24 @@ Ext.define('Editor.view.searchandreplace.SearchTabViewController', {
         }
         this.resetSearchParametars();
     },
-    
+
+    /***
+     * search type change handler
+     */
+    onSearchTypeChange:function(field,newValue,oldValue,eOpts){
+        var me=this,
+            tabPanel=me.getView().up('#searchreplacetabpanel'),
+            activeTab=tabPanel.getActiveTab(),
+            searchCombo=activeTab.down('#searchCombo');
+
+        this.resetSearchParametars();
+        
+        var task = new Ext.util.DelayedTask(function(){
+            //reset the search value
+            searchCombo.validate();
+        }).delay(0);
+    },
+
     /***
      * When form field value is changed, reset the search helper variables.
      * This function will be called from multiple form fields
@@ -56,11 +73,13 @@ Ext.define('Editor.view.searchandreplace.SearchTabViewController', {
             tabPanelviewModel=tabPanel.getViewModel(),
             searchReplaceController=Editor.app.getController('SearchReplace');
         
+        //reset the viewmodel variables
         tabPanelviewModel.set('searchPerformed',false);
         vm.set('result',[]);
         vm.set('resultsCount',0);
         vm.set('showResultsLabel',false);
         
+        //reset the search indexes
         searchReplaceController.activeSegment.matchIndex=0;
         searchReplaceController.activeSegment.nextSegmentIndex=0;
         searchReplaceController.activeSegment.currentSegmentIndex=0;

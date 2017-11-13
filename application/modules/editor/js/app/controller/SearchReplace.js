@@ -748,7 +748,6 @@ Ext.define('Editor.controller.SearchReplace', {
             Editor.MessageBox.addInfo(me.strings.noSearchResults);
             return;
         }
-        console.log(me.activeSegment);
         
         //check if all search segment parametars are 0(this is the initial state of the search)
         isSearchStart=function(){

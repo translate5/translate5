@@ -106,7 +106,7 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                     defaults: {
                         flex: 1,
                         listeners:{
-                            change:'resetSearchParametars'
+                            change:'onSearchTypeChange'
                         }
                     },
                     layout: 'vbox',
@@ -161,7 +161,7 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
             }
         }
         tabPanelviewModel.set('disableSearchButton',val===null || val==="");
-        return val!=null || val!=="";
+        return retval=val!=null || val!=="";
     }
     
 });

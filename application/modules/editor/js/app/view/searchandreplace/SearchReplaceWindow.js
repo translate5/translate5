@@ -35,7 +35,7 @@ Ext.define('Editor.view.searchandreplace.SearchReplaceWindow', {
         'Editor.view.searchandreplace.TabPanel'
     ],
     minHeight : 350,
-    width : 350,
+    width : 370,
     autoHeight: true,
     layout:'fit',
     strings:{
@@ -48,6 +48,7 @@ Ext.define('Editor.view.searchandreplace.SearchReplaceWindow', {
             config = {
                 title:me.strings.windowTitle,
                 items:[{
+                    flex:1,
                     xtype:'searchreplacetabpanel',
                 }],
                 tools:[{

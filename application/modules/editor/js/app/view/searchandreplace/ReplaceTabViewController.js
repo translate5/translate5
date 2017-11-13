@@ -33,9 +33,20 @@ Ext.define('Editor.view.searchandreplace.ReplaceTabViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.replacetabViewcontroller',
     
+    /**
+     * When the search field value (in replace tab) is changed, call the handler in the search tab
+     */
     onSearchFieldTextChange:function(searchField,newValue,oldValue,eOpts){
         var searchTab=Ext.ComponentQuery.query('#searchTab')[0];
         searchTab.getController().onSearchFieldTextChange(searchField,newValue,oldValue,eOpts);
+    },
+
+    /**
+     * When the search type value (in replace tab) is changed, call the handler in the search tab
+     */
+    onSearchTypeChange:function(field,newValue,oldValue,eOpts){
+        var searchTab=Ext.ComponentQuery.query('#searchTab')[0];
+        searchTab.getController().onSearchTypeChange(field,newValue,oldValue,eOpts);
     },
     
     /***
