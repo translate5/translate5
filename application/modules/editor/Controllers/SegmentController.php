@@ -322,7 +322,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     
     public function searchAction(){
         //check here also if the max allowed character number it is in his limit
-        $searchOffset=$this->getParam('searchOffset');
         $searchCombo=$this->getParam('searchCombo');
         $length=strlen(utf8_decode($searchCombo));
         if($length>1024){
@@ -334,17 +333,13 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         }
         
         $result=$this->entity->search($this);
+        
         if(!is_array($result)){
             $retval['success']=false;
             $retval['error']=$result;
             $retval=Zend_Json::encode((object)$retval, Zend_Json::TYPE_OBJECT);
             echo $retval;
             exit();
-        }
-        
-        if($searchOffset<0){
-            $retval['resultsCountNoOffset']=count($result);
-            $result=array_slice($result, 0,50);
         }
         
         $retval['success']=true;

@@ -618,6 +618,60 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
     
+    
+    Ext.define("Editor.locale.de.controller.SearchReplace", {
+        override: "Editor.controller.SearchReplace",
+        strings: {
+            searchInfoMessage: '<?php echo $this->translate->_('Die Suche wird nur auf den gefilterten Segmenten durchgeführt');?>',
+            comboFieldLabel: '<?php echo $this->translate->_('Ersetzen');?>',
+            noSearchResults: '<?php echo $this->translate->_('Keine Ergebnisse für die aktuelle Suche!');?>',
+            replaceAllWindowBtnText: '<?php echo $this->translate->_('Alle Ergebnisse ersetzen');?>',
+            cancelReplaceAllWindowBtnText: '<?php echo $this->translate->_('Abbrechen');?>',
+            replaceAllWindowTitle: '<?php echo $this->translate->_('Ergebnisse ersetzen');?>',
+            replaceAllWindowMessage: '<?php echo $this->translate->_('übereinstimmungen gefunden. Wollen Sie wirklich alle ersetzen? Alle gefundenen Segmente werden inklusive Auto-Status und letztem Editor geändert');?>',
+            characterLimitError: '<?php echo $this->translate->_('Der Suchstring ist zu groß');?>',
+            noIndexFound: '<?php echo $this->translate->_('Das Segment ist in Ihrer aktuellen Filterung nicht enthalten.');?>',
+            searchAndReplaceMenuItem: '<?php echo $this->translate->_('Suchen und ersetzen');?>',
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.searchandreplace.SearchReplaceWindow", {
+        override: "Editor.view.searchandreplace.SearchReplaceWindow",
+        strings: {
+            windowTitle: '<?php echo $this->translate->_('Suchen und ersetzen');?>',
+            helpButtonTooltip: '<?php echo $this->translate->_('Info zum Suchen und Ersetzen');?>',
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.searchandreplace.SearchTab", {
+        override: "Editor.view.searchandreplace.SearchTab",
+        strings: {
+            comboFieldLabel: '<?php echo $this->translate->_('Suchen nach');?>',
+            searchInCombo: '<?php echo $this->translate->_('Suchen in');?>',
+            matchCaseLabel: '<?php echo $this->translate->_('Groß/Kleinschreibung beachten');?>',
+            towardsTop: '<?php echo $this->translate->_('Nach oben suchen');?>',
+            useForSearch: '<?php echo $this->translate->_('Bei der Suche verwenden');?>',
+            normalSearch: '<?php echo $this->translate->_('Normal (Standard)');?>',
+            wildcardsSearch: '<?php echo $this->translate->_('Wildcards (* und ?)');?>',
+            regularExpressionSearch: '<?php echo $this->translate->_('Regulärer Ausdruck');?>',
+            saveCurrentOpen: '<?php echo $this->translate->_('Segment beim Schließen speichern');?>',
+            invalidRegularExpression: '<?php echo $this->translate->_('Ungültiger Regulärer Ausdruck');?>',
+            segmentMatchInfoMessage: '<?php echo $this->translate->_('Segmente mit Suchtreffer:');?>',
+        }
+    });
+    
+	Ext.define("Editor.locale.de.view.searchandreplace.TabPanel", {
+        override: "Editor.view.searchandreplace.TabPanel",
+        strings: {
+            searchTabTitle: '<?php echo $this->translate->_('Suchen');?>',
+            replaceTabTitle: '<?php echo $this->translate->_('Ersetzen');?>',
+            closeButton: '<?php echo $this->translate->_('Schließen');?>',
+            replaceAllButton: '<?php echo $this->translate->_('Alles ersetzen');?>',
+            searchButton: '<?php echo $this->translate->_('Suchen');?>',
+            replaceButton: '<?php echo $this->translate->_('Ersetzen');?>',
+        }
+    });
+    
 <?php
     if($hasFrontendController('Editor.controller.HeadPanel')){
 ?>
