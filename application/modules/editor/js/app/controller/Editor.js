@@ -139,6 +139,26 @@ Ext.define('Editor.controller.Editor', {
             'ctrl-insert':    [Ext.EventObjectImpl.INSERT,{ctrl: true, alt: false}, me.copySourceToTarget],
             'ctrl-dot':       [190,{ctrl: true, alt: false}, me.copySourceToTarget] //Mac Alternative key code
         };
+        
+        //FIXME let me come from the server out of AutoStates.php
+        Editor.data.segments.autoStates = {
+            'TRANSLATED': 0,
+            'REVIEWED': 1,
+            'REVIEWED_AUTO': 2,
+            'BLOCKED': 3,
+            'NOT_TRANSLATED': 4,
+            'REVIEWED_UNTOUCHED': 5,
+            'REVIEWED_UNCHANGED': 6,
+            'REVIEWED_UNCHANGED_AUTO': 7,
+            'REVIEWED_TRANSLATOR': 8,
+            'REVIEWED_TRANSLATOR_AUTO': 9,
+            'REVIEWED_PM': 10,
+            'REVIEWED_PM_AUTO': 11,
+            'REVIEWED_PM_UNCHANGED': 12,
+            'REVIEWED_PM_UNCHANGED_AUTO': 13,
+            'TRANSLATED_AUTO': 14,
+            'PENDING': 999
+        };
     },
     /**
      * track isEditing state 

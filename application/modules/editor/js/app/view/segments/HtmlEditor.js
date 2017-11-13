@@ -70,10 +70,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   valueAndMarkupTempVal:"",
   
   strings: {
-	  tagOrderErrorText: '#UT# Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
-	  tagMissingText: '#UT# Die nachfolgenden Tags wurden beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Versuchen Sie mit der Rückgängigfunktion STRG-Z die Tags wiederherzustellen. <br /><br />Alternativ können Sie auch die Bearbeitung des Segments durch Klick auf "Abbrechen" (<img src="images/cross.png" /> im rechten Menü) beenden und das Segment neu zur Bearbeitung öffnen.<br /><br />Fehlende Tags:',
-	  tagDuplicatedText: '#UT# Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:',
-	  tagRemovedText: '#UT# Es wurden Tags mit fehlendem Partner entfernt!',
+      tagOrderErrorText: '#UT# Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
+      tagMissingText: '#UT# Die nachfolgenden Tags wurden noch nicht hinzugefügt oder beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Die Tastenkombination<br /><ul><li>STRG + EINFG (alternativ STRG + . (Punkt)) fügt den kompletten Quelltext in den Zieltext ein.</li><li>STRG + , (Komma) + &gt;Nummer&lt; fügt den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10) ein.</li><li>STRG + SHIFT + , (Komma) + &gt;Nummer&lt; fügt die Tags mit den Nummern 11 bis 20 in den Zieltext ein.</li></ul>Fehlende Tags:',
+      tagDuplicatedText: '#UT# Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:',
+      tagRemovedText: '#UT# Es wurden Tags mit fehlendem Partner entfernt!',
       cantEditContents: '#UT#Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.'
   },
   
@@ -229,10 +229,23 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     me.plainContent = plainContent; //stores only the text content and content tags for "original content has changed" comparsion
     return result.join('');
   },
-  insertMarkup: function(value) {
+  
+  /**
+   * Inserts the given string (containing div/span internal tags) at the cursor position in the editor
+   * If second parameter is true, the content is not set in the editor, only the internal tags are stored in an internal markup table (for missing tag check for example)
+   * @param {String} value
+   * @param {Boolean} initMarkupMapOnly optional, default false/omitted
+   */
+  insertMarkup: function(value, initMarkupMapOnly) {
       var html = this.markup(value).join(''),
           doc = this.getDoc(),
           sel, range, frag, node, el, lastNode;
+      
+      //if that parameter is true, no html is inserted into the target column
+      if(initMarkupMapOnly) {
+          return;
+      }
+      
       if (!window.getSelection) {
           //FIXME Not supported by your browser message!
           return;
@@ -553,6 +566,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 
       if(me.missingContentTags.length > 0 || me.duplicatedContentTags.length > 0){
           var msg = '', 
+              //first item the field to check, second item: the error text:
               todo = [['missingContentTags', 'tagMissingText'],['duplicatedContentTags','tagDuplicatedText']];
           for(var i = 0;i<todo.length;i++) {
               if(me[todo[i][0]].length > 0) {
