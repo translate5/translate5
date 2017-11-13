@@ -298,8 +298,8 @@ class editor_Plugins_TermTagger_Service {
      */
     private function encodeSegments(editor_Plugins_TermTagger_Service_ServerCommunication $data) {
         foreach ($data->segments as & $segment) {
-            $segment->source = $this->encodeText($segment->source);
-            $segment->target = $this->encodeText($segment->target);
+            $segment->source = $this->encodeText($segment->source, $segment->id);
+            $segment->target = $this->encodeText($segment->target, $segment->id);
         }
         
         return $data;
@@ -313,13 +313,13 @@ class editor_Plugins_TermTagger_Service {
      */
     private function decodeSegments(stdClass $data) {
         foreach ($data->segments as & $segment) {
-            $segment->source = $this->decodeText($segment->source);
-            $segment->target = $this->decodeText($segment->target);
+            $segment->source = $this->decodeText($segment->source, $segment->id);
+            $segment->target = $this->decodeText($segment->target, $segment->id);
         }
         return $data;
     }
     
-    private function encodeText($text) {
+    private function encodeText($text, $segmentId) {
         $matchContentRegExp = '/<div[^>]+class="(open|close|single).*?".*?\/div>/is';
         
         preg_match_all($matchContentRegExp, $text, $tempMatches);
@@ -334,12 +334,12 @@ class editor_Plugins_TermTagger_Service {
         $text = preg_replace('/<div[^>]+>/is', '', $text);
         $text = preg_replace('/<\/div>/', '', $text);
         
-        $text = $this->encodeTrackChanges($text);
+        $text = $this->encodeTrackChanges($text, $segmentId);
         
         return $text;
     }
     
-    private function decodeText($text) {
+    private function decodeText($text, $segmentId) {
         //fix TRANSLATE-713
         $text = str_replace('term-STAT_NOT_FOUND', 'term STAT_NOT_FOUND', $text);
         
@@ -347,7 +347,7 @@ class editor_Plugins_TermTagger_Service {
             return $text;
         }
         
-        $text = $this->decodeTrackChanges($text);
+        $text = $this->decodeTrackChanges($text, $segmentId);
         
         $text = preg_replace('"&lt;img class=&quot;content-tag&quot; src=&quot;(\d+)&quot; alt=&quot;TaggingError&quot; /&gt;"', '<img class="content-tag" src="\\1" alt="TaggingError" />', $text);
         $text = str_replace($this->replacedTagsNeedles, $this->replacedTagsReplacements, $text);
@@ -355,12 +355,12 @@ class editor_Plugins_TermTagger_Service {
         return $text;
     }
     
-    private function encodeTrackChanges($text) {
+    private function encodeTrackChanges($text, $segmentId) {
         // We will need to assign the found TrackChange-Nodes to the original text later. 
         // So we have to remember which text the found TrackChange-Nodes belong to!
         $cleanText = $this->internalTagHelper->removeTrackChanges($text);
         $cleanText = $this->termTagHelper->remove($cleanText);
-        $textKey = md5($cleanText);
+        $textKey = $segmentId . '-' . md5($cleanText);
         
         $text = $this->internalTagHelper->protect($text);
         
@@ -384,19 +384,16 @@ class editor_Plugins_TermTagger_Service {
         $text = $this->internalTagHelper->unprotect($text);
         
         // Return the text without the TrackChanges.
-        error_log("\n\n----------------- SO ZUM PRÜFEN:-------");
-        error_log($this->internalTagHelper->removeTrackChanges($text));
-        error_log("---------------------------------------");
         return $this->internalTagHelper->removeTrackChanges($text);
     }
     
-    private function decodeTrackChanges($text) {
+    private function decodeTrackChanges($text, $segmentId) {
         // If we don't have any information about the TrackChange-Nodes for the original text,
         // we cannot restore them. (We also don't know if there weren't any, if so.)
         // So, this array might be empty, but we need this information!
         $cleanText = $this->internalTagHelper->removeTrackChanges($text);
         $cleanText = $this->termTagHelper->remove($cleanText);
-        $textKey = md5($cleanText);
+        $textKey = $segmentId . '-' . md5($cleanText);
         if (!array_key_exists($textKey, $this->arrTrackChangeNodes)) {
             //throw new ZfExtended_Exception('Decoding TrackChanges failed because there is no information about the original version.');
             error_log($textKey . 'Decoding TrackChanges failed because there is no information about the original version: ' . $cleanText);
@@ -433,10 +430,6 @@ class editor_Plugins_TermTagger_Service {
         }
         
         $text = $this->internalTagHelper->unprotect($text);
-        
-        error_log("\n\n----------------- SO FERTIG:-------");
-        error_log($this->internalTagHelper->removeTrackChanges($text));
-        error_log("---------------------------------------");
         
         return $text;
     }
