@@ -336,9 +336,8 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         me.setColumnToEdit(me.context.column);
         me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit), record.get('id'), me.columnToEdit);
         
-        //init internal markup table for tag check:
-        // but only if a translation task and autoState is NOT_TRANSLATED
-        if(Editor.data.task.get('emptyTargets') && record.get('autoStateId') == Editor.data.segments.autoStates.NOT_TRANSLATED) {
+        //init internal markup table for tag check, but only if a translation task
+        if(Editor.data.task.get('emptyTargets')) {
             me.mainEditor.insertMarkup(record.get('source'), true);
         }
     },
