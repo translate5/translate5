@@ -230,8 +230,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             } catch (Exception $e) {
                 return false;
             }
-            //$outSql=' REGEXP "'.$queryString.'"';
-            $outSql=' REGEXP '.$this->db->getAdapter()->quote($queryString);
+            $outSql=$searchInCombo.' REGEXP '.$this->db->getAdapter()->quote($queryString);
             return $outSql;
         }
         //search type regular wildcard
