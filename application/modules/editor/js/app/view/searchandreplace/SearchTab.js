@@ -46,16 +46,17 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
     closable:false,
     
     strings:{
-      comboFieldLabel:'#UT#Search',
-      searchInCombo:'#UT#Search in',
-      matchCase:'#UT#Match case',
-      towardsTop:'#UT#Search towards the top',
-      useForSearch:'#UT#Use for search',
-      normalSearch:'#UT#Normal (default)',
-      wildcardsSearch:'#UT#Wildcards',
-      regularExpressionSearch:'#UT#Regular expressions',
-      saveCurrentOpen:'#UT#Save currently opened segment',
-      invalidRegularExpression:'#UT#Invalid regular expression',
+      comboFieldLabel:'#UT#Suchen nach',//Search for
+      searchInCombo:'#UT#Suchen in',
+      matchCaseLabel:'#UT#Groß/Kleinschreibung beachten',//Match case
+      towardsTop:'#UT#Nach oben suchen',//Search towards the top
+      useForSearch:'#UT#Bei der Suche verwenden',//Use for search
+      normalSearch:'#UT#Normal (Standard)',//Normal (default)
+      wildcardsSearch:'#UT#Wildcards (* und ?)',
+      regularExpressionSearch:'#UT#Regulärer Ausdruck',
+      saveCurrentOpen:'#UT#Segment beim Schließen speichern',//Save segment on close
+      invalidRegularExpression:'#UT#Ungültiger Regulärer Ausdruck',
+      segmentMatchInfoMessage:'#UT#Segmente mit Suchtreffer:'
     },
     
     padding:'10 10 10 10',
@@ -82,11 +83,17 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                     displayField:'value',
                     valueField:'id',
                     forceSelection:true,
+                    listeners:{
+                        select:'resetSearchParametars'
+                    }
                 },{
                     xtype:'checkbox',
                     itemId:'matchCase',
                     name:'matchCase',
-                    boxLabel:me.strings.matchCase
+                    boxLabel:me.strings.matchCaseLabel,
+                    listeners:{
+                        change:'resetSearchParametars'
+                    }
                 },{
                     xtype:'checkbox',
                     itemId:'searchTopChekbox',
@@ -97,7 +104,10 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                     fieldLabel : me.strings.useForSearch,
                     defaultType: 'radiofield',
                     defaults: {
-                        flex: 1
+                        flex: 1,
+                        listeners:{
+                            change:'resetSearchParametars'
+                        }
                     },
                     layout: 'vbox',
                     items: [
@@ -119,7 +129,7 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                 },{
                     xtype: 'label',
                     bind:{
-                        text:'Results found: {getResultsCount}',
+                        text:me.strings.segmentMatchInfoMessage+' {getResultsCount}',
                         visible:'{showResultsLabel}'
                     }
                 },{

@@ -35,8 +35,6 @@ Ext.define('Editor.view.searchandreplace.SearchReplaceViewModel', {
     
     data:{
         resultsCount:0,
-        resultsCountNoOffset:0,
-        searchOffset:0,
         showResultsLabel:false,
         result:[],
     },

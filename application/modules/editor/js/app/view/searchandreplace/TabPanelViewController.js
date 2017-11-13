@@ -33,16 +33,34 @@ Ext.define('Editor.view.searchandreplace.TabPanelViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.tabpanelviewcontroller',
     
+    searchTabWindowWidth:350,
+    replaceTabWindowWidth:450,
+    
+    /***
+     * Close button handler
+     */
     onCloseButtonClick:function(){
         this.getView().up('window').destroy();
     },
     
+    /***
+     * On tab panel tab change handler.
+     * Set the viewmodel search view
+     */
     onTabPanelTabChange:function(tabpanel,newCard,oldCard,eOpts){
         var me=this,
             viewModel=me.getView().getViewModel(),
-            searchCombo=newCard.down('#searchCombo');
+            searchReplaceWindow=me.getView().up('window'),
+            searchCombo=newCard.down('#searchCombo'),
+            isSearchTab=newCard.xtype == 'searchTab';
         
         searchCombo.focus();
-        viewModel.set('searchView',newCard.xtype == 'searchTab' ? true : false);
+        //set the search view flag
+        viewModel.set('searchView',isSearchTab);
+        //resize the window if we are in replace tab
+        searchReplaceWindow.setWidth(isSearchTab ? me.searchTabWindowWidth : me.replaceTabWindowWidth);
     }
 });
+
+
+

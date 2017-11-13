@@ -39,8 +39,8 @@ Ext.define('Editor.view.searchandreplace.SearchReplaceWindow', {
     autoHeight: true,
     layout:'fit',
     strings:{
-        windowTitle:'#UT#Search and replace window',
-        helpButtonTooltip:'#UT#Info about the search and replace'
+        windowTitle:'#UT#Suchen und ersetzen',
+        helpButtonTooltip:'#UT#Info zum Suchen und Ersetzen'
     },
     
     initConfig : function(instanceConfig) {
@@ -49,18 +49,6 @@ Ext.define('Editor.view.searchandreplace.SearchReplaceWindow', {
                 title:me.strings.windowTitle,
                 items:[{
                     xtype:'searchreplacetabpanel',
-                    //items: [{
-                        //xtype:'searchTab',
-                   //     xtype:'tab',
-                        //title:me.strings.searchTabTitle
-                    //}, {
-                        //xtype:'replaceTab',
-                    //    xtype:'tab',
-                        //title:me.strings.replaceTabTitle
-                        //tabConfig: {
-                        //    tooltip: 'A button tooltip'
-                        //}
-                    //}]
                 }],
                 tools:[{
                     type:'help',

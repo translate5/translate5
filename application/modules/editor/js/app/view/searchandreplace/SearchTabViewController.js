@@ -33,29 +33,37 @@ Ext.define('Editor.view.searchandreplace.SearchTabViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.searchtabviewcontroller',
     
+    /***
+     * On search field text change.
+     * if the text is change reset the search helper variables
+     */
     onSearchFieldTextChange:function(searchField,newValue,oldValue,eOpts){
+        if(newValue===oldValue){
+            return;
+        }
+        this.resetSearchParametars();
+    },
+    
+    /***
+     * When form field value is changed, reset the search helper variables.
+     * This function will be called from multiple form fields
+     */
+    resetSearchParametars:function(){
         var me=this,
             tabPanel=me.getView().up('#searchreplacetabpanel'),
             activeTab=tabPanel.getActiveTab(),
-            searchType=activeTab.down('radiofield').getGroupValue(),
             vm=activeTab.getViewModel(),
             tabPanelviewModel=tabPanel.getViewModel(),
             searchReplaceController=Editor.app.getController('SearchReplace');
         
-        if(newValue===oldValue){
-            return;
-        }
         tabPanelviewModel.set('searchPerformed',false);
         vm.set('result',[]);
         vm.set('resultsCount',0);
-        vm.set('resultsCountNoOffset',0);
-        vm.set('searchOffset',0);
         vm.set('showResultsLabel',false);
         
         searchReplaceController.activeSegment.matchIndex=0;
         searchReplaceController.activeSegment.nextSegmentIndex=0;
         searchReplaceController.activeSegment.currentSegmentIndex=0;
         searchReplaceController.activeSegment.matchCount=0;
-    },
-    
+    }
 });

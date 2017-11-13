@@ -49,12 +49,12 @@ Ext.define('Editor.view.searchandreplace.TabPanel', {
     },
     
     strings:{
-        searchTabTitle:'#UT#Sarch',
-        replaceTabTitle:'#UT#Replace',
-        closeButton:'#UT#Close',
-        replaceAllButton:'#UT#Replace all',
-        searchButton:'#UT#Search',
-        replaceButton:'#UT#Replace',
+        searchTabTitle:'#UT#Suchen',
+        replaceTabTitle:'#UT#Ersetzen',
+        closeButton:'#UT#Schließen',
+        replaceAllButton:'#UT#Alles ersetzen',
+        searchButton:'#UT#Suchen',
+        replaceButton:'#UT#Ersetzen',
     },
     
     initConfig : function(instanceConfig) {
