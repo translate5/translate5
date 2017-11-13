@@ -86,4 +86,16 @@ class editor_Models_Import_FileParser_SegmentAttributes {
      * @var string
      */
     public $targetState; 
+    
+    /**
+     * Min Width of a segment, currently only characters (size-unit="char") supported
+     * @var integer
+     */
+    public $minWidth = null;
+    
+    /**
+     * Max Width of a segment, currently only characters (size-unit="char") supported
+     * @var integer
+     */
+    public $maxWidth = null;
 }

@@ -1266,7 +1266,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * convenient method to get the task meta data
+     * convenient method to get the segment meta data
      * @return editor_Models_Segment_Meta
      */
     public function meta() {
