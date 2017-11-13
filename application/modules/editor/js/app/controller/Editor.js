@@ -657,16 +657,21 @@ Ext.define('Editor.controller.Editor', {
         
         msgBox = Ext.create('Ext.window.MessageBox', {
             buttonText:{
+                ok: me.messages.correctErrorsText,
                 yes: me.messages.correctErrorsText,
                 no: me.messages.saveAnyway
             }
         });
-        msgBox.confirm(me.messages.errorTitle, msg, function(btn) {
-            if(btn == 'yes') {
-                return;
-            }
-            me.saveAndIgnoreContentErrors();
-        },me);
+        if(Editor.data.segments.userCanIgnoreTagValidation) {
+            msgBox.confirm(me.messages.errorTitle, msg, function(btn) {
+                if(btn == 'no') {
+                    me.saveAndIgnoreContentErrors();
+                }
+            },me);
+        }
+        else {
+            msgBox.alert(me.messages.errorTitle, msg);
+        }
     },
     /**
      * triggers the save chain but ignoring htmleditor content errors then
