@@ -412,20 +412,60 @@ class editor_Plugins_TermTagger_Service {
         }
         ksort($arrTermTagsInText);
         
-        for ($pos = 0; $pos < strlen($text); $pos++) {
+        $trackChangeNodeStatus= null;
+        $pos = 0;
+        while ($pos < strlen($text)) {
+            $posAtTheBeginningOfThisStep = $pos;
+            $openingTrackChangeNode = null;
+            $closingTrackChangeNode = null;
             // If there is a termTag in the text at this position, we need to:
             if(array_key_exists($pos, $arrTermTagsInText)) {
+                // get all needed items related to the current $pos before positions in the text/arrays change
+                $termTagInText = $arrTermTagsInText[$pos];
+                if ($trackChangeNodeStatus == 'open') {
+                    $openingTrackChangeNode = $this->getThresholdItemInArray($arrTrackChangeNodesInText, $pos, 'before');
+                    $closingTrackChangeNode = $this->getThresholdItemInArray($arrTrackChangeNodesInText, $pos, 'next');
+                }
+                // - close the current TrackChange-Node in case we are in the midst of one:
+                if ($closingTrackChangeNode != null) {
+                    $length = strlen($closingTrackChangeNode);
+                    $arrTrackChangeNodesInText = $this->increaseKeysInArray($arrTrackChangeNodesInText, $length, $pos);
+                    $arrTermTagsInText = $this->increaseKeysInArray($arrTermTagsInText, $length, $pos+1);
+                    $text = substr($text, 0, $pos) . $closingTrackChangeNode. substr($text, $pos);
+                    $pos += $length;
+                }
                 // - increase the following positions of the found TrackChange-Nodes by the length of the found termTag.
-                $length = strlen($arrTermTagsInText[$pos]);
+                $length = strlen($termTagInText);
                 $arrTrackChangeNodesInText = $this->increaseKeysInArray($arrTrackChangeNodesInText, $length, $pos);
+                $pos += $length;
+                // - re-open the current TrackChange-Node in case we are in the midst of one:
+                if ($openingTrackChangeNode != null) {
+                    $length = strlen($openingTrackChangeNode);
+                    $arrTrackChangeNodesInText = $this->increaseKeysInArray($arrTrackChangeNodesInText, $length, $pos);
+                    $arrTermTagsInText = $this->increaseKeysInArray($arrTermTagsInText, $length, $pos+1);
+                    $text = substr($text, 0, $pos) . $openingTrackChangeNode. substr($text, $pos);
+                    $pos += $length;
+                }
             }
             // If there is a TrackChange-Node in the text at this position, we need to:
             if(array_key_exists($pos, $arrTrackChangeNodesInText)) {
-                // - re-enter the TrackChange-Node here
-                $text = substr($text, 0, $pos) . $arrTrackChangeNodesInText[$pos] . substr($text, $pos);
+                // get all needed items related to the current $pos before positions in the text/arrays change
+                $trackChangeNodeInText = $arrTrackChangeNodesInText[$pos];
+                $length = strlen($trackChangeNodeInText);
                 // - increase the following positions of the found TermTags by the length of the found TrackChange-Node.
-                $length = strlen($arrTrackChangeNodesInText[$pos]);
                 $arrTermTagsInText = $this->increaseKeysInArray($arrTermTagsInText, $length, $pos);
+                // - re-enter the TrackChange-Node here
+                $text = substr($text, 0, $pos) . $trackChangeNodeInText. substr($text, $pos);
+                $pos += $length;
+                // - set the status of the current TrackChange-Node (open/close):
+                //   (but only when opening and closing tags are handled extra, thus not for "<del>...</del>") 
+                $matchTrackChangesDELRegExp = '/<del[^>]*>.*?<\/del>/i';
+                if (!preg_match_all($matchTrackChangesDELRegExp, $trackChangeNodeInText)) {
+                    $trackChangeNodeStatus = ($trackChangeNodeStatus == 'open') ? 'close' : 'open'; // start was null and the first step must go to 'open'
+                }
+            }
+            if ($pos == $posAtTheBeginningOfThisStep) { // if we increase $pos after it has already been increased in the current step we will skip the current $pos
+                $pos++;
             }
         }
         
@@ -433,7 +473,25 @@ class editor_Plugins_TermTagger_Service {
         
         return $text;
     }
-    
+    /**
+     * Returns the array-item of the key that is after or before/at the given threshold.
+     * @param array $arr
+     * @param number $threshold
+     * @param number $direction
+     * @return array
+     */
+    private static function getThresholdItemInArray ($arr, $threshold, $direction) {
+        if ($direction == 'next') {
+            end($arr);
+            while(key($arr) > $threshold) prev($arr);   // set internal pointer to position before $threshold
+            return next($arr);                          // return the item after that position.
+        }
+        if(array_key_exists($threshold, $arr)) {        // If there IS an item at the threshold's position
+            return $arr[$threshold];                    // return that one.
+        }
+        while(key($arr) < $threshold) next($arr);       // set internal pointer to position after $threshold
+            return prev($arr);                          // return the item before that position.
+    }
     /**
      * Returns a "new version" of the given array with keys increased by the given number.
      * Increases only those keys that are higher than the given threshold. 
