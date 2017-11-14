@@ -3,11 +3,14 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
-## [VER] - 2017-11-14
+## [2.6.10] - 2017-11-14
 ###Added
 TRANSLATE-931: Tag check can NOT be skipped in case of error
 TRANSLATE-822: segment min and max length
 TRANSLATE-1027: Add translation step in workflow
+
+###Changed
+Bundled OpenTM2 Installer 1.4.1.2 
 
 ###Bugfixes
 TRANSLATE-1001: Tag check does not work for translation tasks
