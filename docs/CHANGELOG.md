@@ -3,6 +3,17 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [VER] - 2017-11-14
+###Added
+TRANSLATE-931: Tag check can NOT be skipped in case of error
+TRANSLATE-822: segment min and max length
+TRANSLATE-1027: Add translation step in workflow
+
+###Bugfixes
+TRANSLATE-1001: Tag check does not work for translation tasks
+TRANSLATE-1037: VisualReview and feedback button are overlaying each other
+TRANSLATE-763: SDLXLIFF imports no segments with empty target tags
+
 ## [2.6.4] - 2017-10-19
 ###Added
 TRANSLATE-944: Import and Export comments from Across Xliff
