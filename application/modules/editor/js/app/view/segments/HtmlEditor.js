@@ -351,6 +351,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         me.result.push('</span>');
         return;
       }
+      //some tags are marked as to be igored in the editor, so we ignore them
+      if(item.tagName == 'DIV' && /(^|[\s])ignoreInEditor([\s]|$)/.test(item.className)){
+          return;
+      }
       if(item.tagName != 'DIV'){
         return;
       }
