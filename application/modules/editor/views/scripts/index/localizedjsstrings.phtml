@@ -693,7 +693,11 @@ Ext.define('Editor.controller.Localizer', {
         gender_female: '<?php echo $this->translate->_('Frau');?>',
         gender_male: '<?php echo $this->translate->_('Herr');?>',
         reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
-        reloadBtnTip: '<?php echo $this->translate->_('Benutzerliste vom Server aktualisieren.');?>'
+        reloadBtnTip: '<?php echo $this->translate->_('Benutzerliste vom Server aktualisieren.');?>',
+        sourceLangageLabel: '<?php echo $this->translate->_('Quellsprache(n)');?>',
+        sourceLangageTip: '<?php echo $this->translate->_('Quellsprache(n)');?>',
+        targetLangageLabel: '<?php echo $this->translate->_('Zielsprache(n)');?>',
+        targetLangageTip: '<?php echo $this->translate->_('Zielsprache(n)');?>'
     };
     
     Editor.view.admin.UserAddWindow.prototype.title = '<?php echo $this->translate->_('Benutzer erstellen');?>';
@@ -727,7 +731,12 @@ Ext.define('Editor.controller.Localizer', {
         feedbackTip: '<?php echo $this->translate->_('Fehler beim Speichern des Benutzers: Bitte wenden Sie sich an den Support!');?>',
         addBtn: '<?php echo $this->translate->_('Benutzer hinzufügen');?>',
         saveBtn: '<?php echo $this->translate->_('Benutzer speichern');?>',
-        cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>'
+        cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
+        languagesLabel: '<?php echo $this->translate->_('Zugeordnete Sprachen');?>',
+        sourceLangageLabel: '<?php echo $this->translate->_('Quellsprache(n)');?>',
+        sourceLangageTip: '<?php echo $this->translate->_('Quellsprache(n)');?>',
+        targetLangageLabel: '<?php echo $this->translate->_('Zielsprache(n)');?>',
+        targetLangageTip: '<?php echo $this->translate->_('Zielsprache(n)');?>'
     };
 <?php
     } //END if $this->hasFrontendController('Editor.controller.admin.User')
