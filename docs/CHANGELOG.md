@@ -13,6 +13,7 @@ TRANSLATE-1027: Add translation step in workflow
 TRANSLATE-1001: Tag check does not work for translation tasks
 TRANSLATE-1037: VisualReview and feedback button are overlaying each other
 TRANSLATE-763: SDLXLIFF imports no segments with empty target tags
+TRANSLATE-1051: Internal XLIFF reader for internal application translation can not deal with single tags
 
 ## [2.6.4] - 2017-10-19
 ###Added
