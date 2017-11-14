@@ -315,7 +315,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             if($role == 'noRights' || $role == 'basic') {
                 continue;
             }
-            $roles[$role] = ucfirst($role);
+            $roles[$role] = $this->translate->_(ucfirst($role));
         }
         $php2js->set('app.roles', $roles);
         
