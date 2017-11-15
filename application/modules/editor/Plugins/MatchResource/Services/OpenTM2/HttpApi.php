@@ -315,14 +315,28 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
      * @return Zend_Http_Response
      */
     protected function request(Zend_Http_Client $http) {
+        //exceptions with one of that messages are leading to badgateway exceptions
+        $badGatewayMessages = [
+            'stream_socket_client(): php_network_getaddresses: getaddrinfo failed: Name or service not known',
+            'stream_socket_client(): unable to connect to tcp',
+        ];
+        
         try {
             return $http->request();
         }
         catch (Zend_Exception $e) {
-            if(strpos($e->getMessage(), 'stream_socket_client(): unable to connect to tcp') !== 0) {
-                throw $e;
+            foreach ($badGatewayMessages as $msg) {
+                if(strpos($e->getMessage(), $msg) === false){
+                    //check next message
+                    continue;
+                }
+                $this->badGateway($e, $http);
             }
+            throw $e;
         }
+    }
+    
+    protected function badGateway(Zend_Exception $e, Zend_Http_Client $http) {
         $badGateway = new ZfExtended_BadGateway('Die angefragte OpenTM2 Instanz ist nicht erreichbar', 0, $e);
         $badGateway->setOrigin('MatchResource OpenTM2');
         
