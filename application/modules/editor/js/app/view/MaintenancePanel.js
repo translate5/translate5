@@ -32,11 +32,16 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.MaintenancePanel', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.maintenancePanel',
+    formats: {
+        en: 'l, F d, Y h:i:s A (T)',
+        de: 'l, d. F, Y H:i:s (T)'
+    },
     maintenanceMessage: '#UT#<p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Translate5 wird zu diesem Zeitpunkt kurzfristig nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p>',
     initConfig: function(instanceConfig) {
         var me = this,
+            format = me.formats[Editor.data.locale] || me.formats.en,
             date = instanceConfig.maintenanceStartDate ? instanceConfig.maintenanceStartDate : Editor.data.maintenance.startDate,
-            date = Ext.Date.format(Ext.Date.parse(date, Editor.DATE_ISO_FORMAT), Ext.Date.defaultFormat + ' ' + Ext.form.field.Time.prototype.format),
+            date = Ext.Date.format(Ext.Date.parse(date, "c"), format),
             config = {
         		frame: false,
         		border: false,
