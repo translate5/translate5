@@ -97,6 +97,9 @@ form#acceptLicense ul.errors {list-style-type: none;padding:0; margin:0 0 -10px 
 	justify-content: center;
 	padding:5px;
 }
+.maintenanceInfoPanel p {
+    margin:3px;
+}
 .login-wrapper {
     float:left;
 }
