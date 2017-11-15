@@ -226,7 +226,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('helpUrl',$rop->helpUrl);
       
       //maintenance start date
-      $this->view->Php2JsVars()->set('maintenance.startDate',isset($rop->maintenance->startDate)?$rop->maintenance->startDate:'');
+      if(isset($rop->maintenance->startDate)) {
+          $startDate = date(DATE_ISO8601, strtotime($rop->maintenance->startDate));
+      }
+      else{
+          $startDate = '';
+      }
+      $this->view->Php2JsVars()->set('maintenance.startDate',$startDate);
       //maintenance warning panel is showed
       $this->view->Php2JsVars()->set('maintenance.timeToNotify',isset($rop->maintenance->timeToNotify)?$rop->maintenance->timeToNotify:'');
       //minutes before the point in time of the update the application is locked for new log-ins
