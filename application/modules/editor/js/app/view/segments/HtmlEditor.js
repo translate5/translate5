@@ -267,7 +267,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           // - replace the given divs and spans with their image
           // TrackChange-Node might include TermTag: 
           // - replace TermTag-divs with their corresponding span
-          var allImagesInItem = item.getElementsByTagName('IMG'),
+          var allImagesInItem = item.getElementsByTagName('IMG');
               allDivsInItem = item.getElementsByTagName('DIV');
           if (allImagesInItem.length > 0) {
               for (var i = allImagesInItem.length; i--; ) { // backwards because we might remove items
@@ -284,6 +284,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           if (allDivsInItem.length > 0) {
               for (var i = allDivsInItem.length; i--; ) { // backwards because we might remove items
                   var divItem = allDivsInItem[i];
+                  if (divItem == null) {
+                      continue; // item might have been removed alreday
+                  }
                   if(/(^|[\s])term([\s]|$)/.test(divItem.className)){
                       var htmlForDivItem = '',
                           termFoundCls = divItem.className;
