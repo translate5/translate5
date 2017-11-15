@@ -267,8 +267,6 @@ Ext.define('Editor.controller.admin.User', {
       //the password will be kept in the model, so reject it here
       rec.reject();
       basic.updateRecord(rec);
-      //update the languages record value 
-      me.updateLanguagesValues(rec);
       win.setLoading(true);
       rec.save({
           //prevent default ServerException handling
@@ -350,15 +348,4 @@ Ext.define('Editor.controller.admin.User', {
   handleUserReload: function () {
       this.getAdminUsersStore().load();
   },
-  /**
-   * Update the languages record values, add leading and ending comma
-   */
-  updateLanguagesValues:function(record){
-    if(record.get('targetLanguage') != null && record.get('targetLanguage')!=""){
-        record.set('targetLanguage',","+record.get('targetLanguage')+",");
-    }
-    if(record.get('sourceLanguage') != null && record.get('sourceLanguage')!=""){
-        record.set('sourceLanguage',","+record.get('sourceLanguage')+",");
-    }
-  }
 });

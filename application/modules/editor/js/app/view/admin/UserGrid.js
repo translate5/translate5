@@ -208,18 +208,14 @@ Ext.define('Editor.view.admin.UserGrid', {
             minWidth: 160,
             dataIndex: langageType,
             renderer: function(value,metaData){
-                if(value===''){
-                    return '';
-                }
-                var values=value.split(',');
-                if(values.length < 1){
-                    return '';
+                if(value === null || value.length<1){
+                    return [];
                 }
                 var langstore=Ext.getStore('admin.Languages'),
                 lang,
                 label='',
                 fullLang="";
-                values.forEach(function(v) {
+                value.forEach(function(v) {
                     lang = langstore.findRecord('id',v,0,false,true,true);
                     if(lang){
                         label+=','+lang.get('rfc5646');
