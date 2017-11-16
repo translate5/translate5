@@ -230,11 +230,13 @@ Ext.define('Editor.view.admin.TaskGrid', {
               text: me.text_cols.taskActions,
               menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter
               xtype: 'taskActionColumn',
+              stateId:'taskGridActionColumn',
               sortable: false
           },{
               xtype: 'gridcolumn',
               width: 70,
               dataIndex: 'state',
+              stateId:'state',
               filter: {
                   type: 'list',
                   options: states,
@@ -277,6 +279,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               xtype: 'gridcolumn',
               width: 220,
               dataIndex: 'taskName',
+              stateId:'taskName',
               filter: {
                   type: 'string'
               },
@@ -285,6 +288,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               xtype: 'gridcolumn',
               width: 110,
               dataIndex: 'taskNr',
+              stateId: 'taskNr',
               filter: {
                   type: 'string'
               },
@@ -294,6 +298,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               xtype: 'numbercolumn',
               width: 70,
               dataIndex: 'wordCount',
+              stateId: 'wordCount',
               filter: {
                   type: 'numeric'
               },
@@ -303,6 +308,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               xtype: 'numbercolumn',
               width: 70,
               dataIndex: 'fileCount',
+              stateId: 'fileCount',
               filter: {
                   type: 'numeric'
               },
@@ -316,6 +322,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               cls: 'source-lang',
               renderer: me.langRenderer,
               dataIndex: 'sourceLang',
+              stateId: 'sourceLang',
               filter: {
                   type: 'list',
                   options: Editor.data.languages,
@@ -330,6 +337,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               cls: 'relais-lang',
               renderer: me.langRenderer,
               dataIndex: 'relaisLang',
+              stateId: 'relaisLang',
               filter: {
                   type: 'list',
                   options: relaisLanguages,
@@ -344,6 +352,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               cls: 'target-lang',
               renderer: me.langRenderer,
               dataIndex: 'targetLang',
+              stateId: 'targetLang',
               filter: {
                   type: 'list',
                   options: Editor.data.languages,
@@ -357,6 +366,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               cls: 'ref-files',
               width: 45,
               dataIndex: 'referenceFiles',
+              stateId: 'referenceFiles',
               filter: {
                   type: 'boolean'
               },
@@ -367,6 +377,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               width: 45,
               cls: 'terminologie',
               dataIndex: 'terminologie',
+              stateId: 'terminologie',
               filter: {
                   type: 'boolean'
               },
@@ -384,6 +395,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               tdCls: 'task-users',
               cls: 'task-users',
               dataIndex: 'userCount',
+              stateId: 'userCount',
               filter: {
                   type: 'numeric'
               },
@@ -393,6 +405,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               xtype: 'gridcolumn',
               width: 135,
               dataIndex: 'pmName',
+              stateId: 'pmName',
               filter: {
                   type: 'string'
               },
@@ -405,6 +418,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               xtype: 'datecolumn',
               width: 100,
               dataIndex: 'orderdate',
+              stateId: 'orderdate',
               filter: {
                   type: 'date',
                   dateFormat: Editor.DATE_ISO_FORMAT
@@ -414,6 +428,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               xtype: 'datecolumn',
               width: 120,
               dataIndex: 'targetDeliveryDate',
+              stateId: 'targetDeliveryDate',
               filter: {
                   type: 'date',
                   dateFormat: Editor.DATE_ISO_FORMAT
@@ -423,6 +438,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               xtype: 'datecolumn',
               width: 120,
               dataIndex: 'realDeliveryDate',
+              stateId: 'realDeliveryDate',
               filter: {
                   type: 'date',
                   dateFormat: Editor.DATE_ISO_FORMAT
@@ -433,6 +449,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               width: 45,
               cls: 'fullMatchEdit',
               dataIndex: 'edit100PercentMatch',
+              stateId: 'edit100PercentMatch',
               filter: {
                   type: 'boolean'
               },
@@ -443,6 +460,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               width: 45,
               cls: 'empty-targets',
               dataIndex: 'emptyTargets',
+              stateId: 'emptyTargets',
               filter: {
                   type: 'boolean'
               },
@@ -453,6 +471,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               width: 45,
               cls: 'lockLocked',
               dataIndex: 'lockLocked',
+              stateId: 'lockLocked',
               filter: {
                   type: 'boolean'
               },
@@ -465,6 +484,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               width: 55,
               cls: 'source-edit',
               dataIndex: 'enableSourceEditing',
+              stateId: 'enableSourceEditing',
               filter: {
                   type: 'boolean'
               },
@@ -502,6 +522,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
                 xtype: 'gridcolumn',
                 width: 60,
                 dataIndex: 'id',
+                stateId: 'id',
                 filter: {
                     type: 'numeric'
                 },
@@ -510,6 +531,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
                 xtype: 'gridcolumn',
                 width: 240,
                 dataIndex: 'taskGuid',
+                stateId: 'taskGuid',
                 filter: {
                     type: 'string'
                 },

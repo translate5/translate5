@@ -329,9 +329,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    */
   handleGridClick: function(view, colEl, colIdx, rec, rowEl, rowIdxindex, e, eOpts) {
       //logic for handling single clicks on column taskNr and dblclick on other cols
-      var isTaskNr = (view.up('grid').columns[colIdx].dataIndex == 'taskNr'),
+      var isTaskNr = (view.up('grid').getColumns()[colIdx].dataIndex == 'taskNr'),
           dbl = e.type == 'dblclick'; 
-      
       if(!rec.isLocked() && (isTaskNr || dbl)) {
           this.openTaskRequest(rec);
       }
