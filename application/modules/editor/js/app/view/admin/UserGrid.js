@@ -82,6 +82,7 @@ Ext.define('Editor.view.admin.UserGrid', {
           xtype: 'gridcolumn',
           width: 100,
           dataIndex: 'login',
+          stateId: 'login',
           filter: {
               type: 'string'
           },
@@ -90,6 +91,7 @@ Ext.define('Editor.view.admin.UserGrid', {
           xtype: 'gridcolumn',
           width: 100,
           dataIndex: 'firstName',
+          stateId: 'firstName',
           filter: {
               type: 'string'
           },
@@ -98,6 +100,7 @@ Ext.define('Editor.view.admin.UserGrid', {
           xtype: 'gridcolumn',
           width: 100,
           dataIndex: 'surName',
+          stateId: 'surName',
           filter: {
               type: 'string'
           },
@@ -112,6 +115,7 @@ Ext.define('Editor.view.admin.UserGrid', {
               return '&nbsp;';
           },
           dataIndex: 'gender',
+          stateId: 'gender',
           filter: {
             type: 'list',
             options: [
@@ -125,6 +129,7 @@ Ext.define('Editor.view.admin.UserGrid', {
           xtype: 'gridcolumn',
           width: 160,
           dataIndex: 'email',
+          stateId: 'email',
           filter: {
               type: 'string'
           },
@@ -133,6 +138,7 @@ Ext.define('Editor.view.admin.UserGrid', {
           xtype: 'gridcolumn',
           width: 120,
           dataIndex: 'roles',
+          stateId: 'roles',
           renderer: function(v) {
               return Ext.Array.map(v.split(','), function(item){
                   return Editor.data.app.roles[item] || item;
@@ -144,6 +150,7 @@ Ext.define('Editor.view.admin.UserGrid', {
           text: me.text_cols.roles
       },{
           xtype: 'actioncolumn',
+          stateId:'userGridActionColumn',
           width: 80,
           items: Ext.Array.filter([{
               tooltip: me.strings.actionEdit,
