@@ -256,6 +256,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
           $this->view->Php2JsVars()->set('supportedBrowsers', $rop->supportedBrowsers->toArray());
       }
       
+      //default state configuration for frontend components(grid)
+      $this->view->Php2JsVars()->set('frontend.defaultState', $rop->frontend->defaultState->toArray());
+      
       $this->setJsAppData();
     }
 
