@@ -215,24 +215,7 @@ Ext.define('Editor.view.admin.UserGrid', {
             minWidth: 160,
             dataIndex: langageType,
             stateId:langageType,
-            renderer: function(value,metaData){
-                if(value === null || value.length<1){
-                    return [];
-                }
-                var langstore=Ext.getStore('admin.Languages'),
-                lang,
-                label='',
-                fullLang="";
-                value.forEach(function(v) {
-                    lang = langstore.findRecord('id',v,0,false,true,true);
-                    if(lang){
-                        label+=','+lang.get('rfc5646');
-                        fullLang+=lang.get('label')+'</br>';
-                    }
-                }, this);
-                metaData.tdAttr = 'data-qtip="' +fullLang+ '"';
-                return (label!='' && label!=',')?label.substr(1):'';
-            },
+            renderer: this.userRenderer,
             text:text,
             tooltip: tooltip,
             filter: {
@@ -245,5 +228,22 @@ Ext.define('Editor.view.admin.UserGrid', {
       };
       return field;
   },
-
+    userRenderer: function(value,metaData){
+        if(value === null || value.length<1){
+            return [];
+        }
+        var langstore=Ext.getStore('admin.Languages'),
+        lang,
+        label=[],
+        fullLang=[];
+        value.forEach(function(v) {
+            lang = langstore.findRecord('id',v,0,false,true,true);
+            if(lang){
+                label.push(lang.get('rfc5646'));
+                fullLang.push(lang.get('label'));
+            }
+        }, this);
+        metaData.tdAttr = 'data-qtip="' +fullLang.join('<br/>')+ '"';
+        return label.join(', ');
+    }
 });
