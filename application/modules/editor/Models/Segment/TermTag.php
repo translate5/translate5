@@ -205,8 +205,7 @@ class editor_Models_Segment_TermTag {
      * @param string $textId
      * @return string
      */
-    public function encodeTrackChanges($text, $textId) {        
-        $this->initInternalTagHelper();
+    public function encodeTrackChanges($text, $textId) {
         $text = $this->internalTagHelper->protect($text);
         $this->fetchTrackChangeNodes($text, $textId);
         $text = $this->internalTagHelper->unprotect($text);
@@ -225,6 +224,11 @@ class editor_Models_Segment_TermTag {
         if (!array_key_exists($textId, $this->arrTrackChangeNodes)) {
             //throw new ZfExtended_Exception('Decoding TrackChanges failed because there is no information about the original version (textId: ' . $textId . '): ' . $text);
             error_log('Decoding TrackChanges failed because there is no information about the original version (textId: ' . $textId . '): ' . $text);
+            return $text;
+        }
+        
+        if (count($this->arrTrackChangeNodes[$textId]) == 0) {
+            // no TrackChange-Markup found; return the termtagged text as it is.
             return $text;
         }
         
@@ -275,7 +279,6 @@ class editor_Models_Segment_TermTag {
         }
         
         $this->text = $this->internalTagHelper->unprotect($this->text);
-        
         
         // For safety reasons: delete the decoded item from the stored items so it cannot be used for another text that might per accident have the same textId.
         // (Maybe the FIRST text using it was the wrong one, but at least we know NOW that something went wrong.)
@@ -391,7 +394,7 @@ class editor_Models_Segment_TermTag {
         $length = strlen($textToInsert);
         $this->text = substr($this->text, 0, $this->posInText) . $textToInsert . substr($this->text, $this->posInText);
         $this->posInText += $length;
-        $this->logText .= "\n- eingefuegt: " . $textToInsert .  "\n- length:" . $length . "\n- weiter bei: " . $this->posInText;
+        $this->logText .= "\n- eingefuegt: " . $textToInsert .  "\n- length: " . $length . "\n- weiter bei: " . $this->posInText;
         return $length;
     }
     
@@ -400,7 +403,7 @@ class editor_Models_Segment_TermTag {
      * @param array $arr
      * @param number $threshold
      * @param number $direction
-     * @return array
+     * @return array||string
      */
     private static function getThresholdItemInArray ($arr, $threshold, $direction) {
         if ($direction == 'next') {
