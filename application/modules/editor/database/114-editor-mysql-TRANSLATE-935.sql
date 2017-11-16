@@ -25,7 +25,7 @@
 -- 
 -- END LICENSE AND COPYRIGHT
 -- */
+
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
-VALUES ('runtimeOptions.segments.userCanIgnoreTagValidation', '1', 'editor', 'workflow', '1', '1', '', 'boolean', 'If enabled the user can ignore tag validation errors. If disabled the user must correct the errors before saving the segment.');
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES ('runtimeOptions.frontend.defaultState', '1', 'editor', 'workflow', '', '', '', 'map', 'Default state for the grids columns in the translate5');
+VALUES ('runtimeOptions.frontend.defaultState', '1', 'editor', 'workflow', '', '', '', 'map', 'Default state for the grids columns in the translate5');
 
