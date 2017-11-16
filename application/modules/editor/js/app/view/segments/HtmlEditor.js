@@ -157,7 +157,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   },
   
     /**
-     * Setzt Daten im HtmlEditor und fügt markup hinzu
+     * loads segment data into the HtmlEditor
+     * resets internally the markup table, so tag validations checks only the here set tags
      * @param value String
      */
     setValueAndMarkup: function(value, segmentId, fieldName){
@@ -211,8 +212,12 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     return result;
   },
   /**
-   * ersetzt die div und spans durch images im string 
-   * @private
+   * - replaces div/span to images
+   * - prepares content to be edited
+   * - resets markupImages (tag map for restoring and tag check)
+   * - resets plainContent for checking if plain content was changed
+   * 
+   * @private not for direct usage!
    * @param value {String}
    * @returns {String}
    */

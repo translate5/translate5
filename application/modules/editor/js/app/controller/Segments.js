@@ -493,8 +493,8 @@ Ext.define('Editor.controller.Segments', {
       me.saveChainMutex = true;
       record = ed.context.record;
       ed.completeEdit();
-      //if completeEdit fails, the plugin remains editing and the record is not dirty.
-      if(ed.editing && !ed.context.record.dirty) {
+      //if completeEdit fails, the plugin remains editing
+      if(ed.editing) {
           //TODO the below by config bound handlers can also be bound elsewhere and get no information about success or failed chainend!
           me.saveChainEnd(); 
           return;
