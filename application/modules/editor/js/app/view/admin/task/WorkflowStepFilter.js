@@ -32,7 +32,7 @@ Ext.define('Editor.view.admin.task.WorkflowStepFilter', {
   constructor: function(config) {
       var me = this,
           defaults = {
-              dataIndex: 'qmId',
+              dataIndex: 'workflowStep',
               options: [],
               labelField: 'label',
               phpMode: false

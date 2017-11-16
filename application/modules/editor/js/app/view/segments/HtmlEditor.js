@@ -640,6 +640,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           foundIds = [];
       me.missingContentTags = [];
       me.duplicatedContentTags = [];
+      
+      //FIXME ignore deleted tags!
       Ext.each(nodelist, function(img) {
           if(Ext.Array.contains(foundIds, img.id)) {
               me.duplicatedContentTags.push(me.markupImages[img.id.replace(new RegExp('^'+me.idPrefix), '')]);
