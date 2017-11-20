@@ -69,6 +69,7 @@ Ext.define('Editor.view.admin.UserAddWindow', {
         sourceLangageTip:'#UT#Quellsprache(n)',
         targetLangageLabel:'#UT#Zielsprache(n)',
         targetLangageTip:'#UT#Zielsprache(n)',
+        languageInfo: '#UT#Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.'
     },
     modal : true,
     layout:'fit',
@@ -205,6 +206,10 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                                 fields:['id','label'],
                                 data: Editor.data.languages,
                             })
+                        },{
+                            xtype: 'panel',
+                            html: me.strings.languageInfo,
+                            ui: 'fieldset'
                         }]
                     }]
                 },{
@@ -290,7 +295,7 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                     ]
                 },{
                     xtype: 'container',
-                    html: '<p>'+bottomInfo.join('</p><p style="margin-top:5px;">')+'</p>',
+                    html: '<p>'+bottomInfo.join('</p><p style="margin-top:5px;margin-left:5px;">')+'</p>',
                     dock : 'bottom'
                 }]
             }],
