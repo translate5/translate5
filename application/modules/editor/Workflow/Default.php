@@ -73,8 +73,13 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
         
         $users = $user->loadAllByLanguages($sourceLang, $targetLang);
         foreach($users as $user) {
-            
-            //FIXME NON PM USERS ONLY!!!
+            $roles = explode(',', $user['roles']);
+            $isPm = in_array(ACL_ROLE_PM, $roles);
+            $isAdmin = in_array(ACL_ROLE_ADMIN, $roles);
+            $isEditor = in_array(ACL_ROLE_EDITOR, $roles);
+            if(!$isEditor || $isPm || $isAdmin) {
+                continue;
+            }
             $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
             /* @var $tua editor_Models_TaskUserAssoc */
             $tua->setRole($role);
