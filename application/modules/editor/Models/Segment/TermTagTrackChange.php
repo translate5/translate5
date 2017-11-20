@@ -205,6 +205,15 @@ class editor_Models_Segment_TermTagTrackChange {
     }
     
     /**
+     * Are there no nodes to stored for the given textId?
+     * @param string $textId
+     * @return boolean
+     */
+    public function hasNoTrackChangeNodes($textId) {
+        return empty($this->arrTrackChangeNodes[$textId]);
+    }
+    
+    /**
      * Fetch the TermTags in the given text and return them in an array.
      * @param string $text
      * @return array

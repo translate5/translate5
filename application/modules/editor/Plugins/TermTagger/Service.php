@@ -346,13 +346,14 @@ class editor_Plugins_TermTagger_Service {
         //fix TRANSLATE-713
         $text = str_replace('term-STAT_NOT_FOUND', 'term STAT_NOT_FOUND', $text);
         
-        if (empty($this->replacedTagsNeedles) && empty($this->arrTrackChangeNodes)) {
+        $textId = $textId = $this->renderTextId($text, $segmentId);
+        
+        if (empty($this->replacedTagsNeedles) && $this->termTagTrackChangeHelper->hasNoTrackChangeNodes($textId)) {
             return $text;
         }
         
         // (3) We will need to assign the formerly found TrackChange-Nodes
         //     as stored for the $textId for the clean version of this text.
-        $textId = $textId = $this->renderTextId($text, $segmentId);
         $text = $this->termTagTrackChangeHelper->restoreNodes($text, $textId);
         
         $text = preg_replace('"&lt;img class=&quot;content-tag&quot; src=&quot;(\d+)&quot; alt=&quot;TaggingError&quot; /&gt;"', '<img class="content-tag" src="\\1" alt="TaggingError" />', $text);
