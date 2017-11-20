@@ -54,6 +54,11 @@ class editor_Plugins_TermTagger_Service {
     protected $termTagHelper;
     
     /**
+     * @var editor_Models_Segment_TermTagTrackChange
+     */
+    protected $termTagTrackChangeHelper;
+    
+    /**
      * @var editor_Models_Segment_InternalTag
      */
     protected $internalTagHelper;
@@ -81,6 +86,7 @@ class editor_Plugins_TermTagger_Service {
         $this->config = $config->runtimeOptions->termTagger;
         $this->termTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
         $this->internalTagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        $this->termTagTrackChangeHelper= ZfExtended_Factory::get('editor_Models_Segment_TermTagTrackChange');
     }
     
     /**
@@ -326,12 +332,12 @@ class editor_Plugins_TermTagger_Service {
         $text = preg_replace('/<div[^>]+>/is', '', $text);
         $text = preg_replace('/<\/div>/', '', $text);
         
-        // We will need to assign the found TrackChange-Nodes to the original text later.
-        // So we have to remember which text the found TrackChange-Nodes belong to!
-        $cleanText = $this->internalTagHelper->removeTrackChanges($text);
-        $cleanText = $this->termTagHelper->remove($cleanText);
-        $textId = $segmentId . '-' . md5($cleanText);
-        $text = $this->termTagHelper->encodeTrackChanges($text, $textId);
+        // (1) We will need to assign the found TrackChange-Nodes to the original text later.
+        //     So we have to remember which text the found TrackChange-Nodes belong to!
+        $textId = $this->renderTextId($text, $segmentId);
+        $this->termTagTrackChangeHelper->storeNodes($text, $textId);
+        // (2) Now remove the stored TrackChange-Nodes from the text:
+        $text = $this->internalTagHelper->removeTrackChanges($text);
         
         return $text;
     }
@@ -340,20 +346,32 @@ class editor_Plugins_TermTagger_Service {
         //fix TRANSLATE-713
         $text = str_replace('term-STAT_NOT_FOUND', 'term STAT_NOT_FOUND', $text);
         
-        if (empty($this->replacedTagsNeedles) && empty($this->arrTrackChangeNodes)) {
+        $textId = $textId = $this->renderTextId($text, $segmentId);
+        
+        if (empty($this->replacedTagsNeedles) && $this->termTagTrackChangeHelper->hasNoTrackChangeNodes($textId)) {
             return $text;
         }
         
-        // We will need to assign the formerly found TrackChange-Nodes as stored by the $textId.
-        $cleanText = $this->internalTagHelper->removeTrackChanges($text);
-        $cleanText = $this->termTagHelper->remove($cleanText);
-        $textId= $segmentId . '-' . md5($cleanText);
-        $text = $this->termTagHelper->decodeTrackChanges($text, $textId);
+        // (3) We will need to assign the formerly found TrackChange-Nodes
+        //     as stored for the $textId for the clean version of this text.
+        $text = $this->termTagTrackChangeHelper->restoreNodes($text, $textId);
         
         $text = preg_replace('"&lt;img class=&quot;content-tag&quot; src=&quot;(\d+)&quot; alt=&quot;TaggingError&quot; /&gt;"', '<img class="content-tag" src="\\1" alt="TaggingError" />', $text);
         $text = str_replace($this->replacedTagsNeedles, $this->replacedTagsReplacements, $text);
         
         return $text;
+    }
+    
+    /**
+     * @param string $text
+     * @param string $segmentId
+     * @return string
+     */
+    private function renderTextId ($text, $segmentId) {
+        // Remove all Tags first; they will be different before and after sending the text to the TermTagger!
+        $cleanText1 = $this->internalTagHelper->removeTrackChanges($text);
+        $cleanText2 = $this->termTagHelper->remove($cleanText1);
+        return $segmentId . '-' . md5($cleanText2);
     }
     
     /**
