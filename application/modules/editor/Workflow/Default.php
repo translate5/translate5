@@ -51,7 +51,41 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
     protected function handleImport(){
         $stepName = (bool) $this->newTask->getEmptyTargets() ? self::STEP_TRANSLATION : self::STEP_LECTORING;
         $this->initWorkflowStep($this->newTask, $stepName);
+        
+        $this->autoAssociateUsers($stepName);
+        
         $this->doDebug(__FUNCTION__);
+    }
+    
+    protected function autoAssociateUsers($stepName) {
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        
+        $sourceLang = $this->newTask->getSourceLang();
+        $targetLang = $this->newTask->getTargetLang();
+        
+        $role = $this->getRoleOfStep($stepName);
+        if(!$role) {
+            return;
+        }
+        $states = $this->getInitialStates();
+        $state = $states[$stepName][$role];
+        
+        $users = $user->loadAllByLanguages($sourceLang, $targetLang);
+        foreach($users as $user) {
+            
+            //FIXME NON PM USERS ONLY!!!
+            $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+            /* @var $tua editor_Models_TaskUserAssoc */
+            $tua->setRole($role);
+            $tua->setState($state);
+            $tua->setUserGuid($user['userGuid']);
+            $tua->setTaskGuid($this->newTask->getTaskGuid());
+            //entity version?
+            $tua->save();
+            $this->newTaskUserAssoc = $tua;
+            $this->handleUserAssociationAdded();
+        }
     }
     
     /**
@@ -80,6 +114,7 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
             }
         }
         if($newTua->getRole() == self::ROLE_LECTOR) {
+            //FIXME setze die Segmente ebenfalls auf $newTua->getUserGuid als letzten Editor!
             $actions->updateAutoStates($taskGuid,'setUntouchedState');
             $task->setRealDeliveryDate(date('Y-m-d', $_SERVER['REQUEST_TIME']));
             $task->save();
