@@ -45,7 +45,9 @@ Ext.define('Editor.model.admin.TaskUserAssoc', {
         return Editor.model.admin.User.getLongUserName(rec);
     }},
     {name: 'state', type: 'string'},
-    {name: 'role', type: 'string'}
+    {name: 'role', type: 'string'},
+    {name: 'deletable', type: 'boolean'},
+    {name: 'editable', type: 'boolean'}
   ],
   validators: {
       taskGuid: 'presence',

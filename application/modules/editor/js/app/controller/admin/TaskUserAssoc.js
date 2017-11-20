@@ -148,6 +148,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       me.getAssocDelBtn().disable();
       me.getEditInfo().hide();
       me.getUserAssocForm().show();
+      me.getUserAssocForm().setDisabled(false);
       me.getUserAssoc().loadRecord(newRec);
       me.initState(null, role, '');
   },
@@ -158,10 +159,13 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
    */
   handleAssocSelection: function(grid, selection) {
       var me = this,
-          emptySel = selection.length == 0;
-      me.getAssocDelBtn().setDisabled(emptySel);
+          emptySel = selection.length == 0,
+          record=!emptySel ? selection[0] : null,
+          userEditable=record && !record.get('editable');
+      me.getAssocDelBtn().setDisabled(emptySel || userEditable);
       me.getEditInfo().setVisible(emptySel);
       me.getUserAssocForm().setVisible(!emptySel);
+      me.getUserAssocForm().setDisabled(emptySel || userEditable);
       if(emptySel) {
           me.getUserAssocForm().getForm().reset();
       }
