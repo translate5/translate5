@@ -146,7 +146,7 @@ Ext.define('Editor.view.admin.UserGrid', {
           stateId: 'roles',
           renderer: function(v) {
               return Ext.Array.map(v.split(','), function(item){
-                  return Editor.data.app.roles[item] || item;
+                  return Editor.data.app.roles[item].label || item;
               }).join(', ');
           },
           filter: {

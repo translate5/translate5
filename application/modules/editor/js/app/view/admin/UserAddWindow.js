@@ -95,8 +95,12 @@ Ext.define('Editor.view.admin.UserAddWindow', {
         }
 
         Ext.Object.each(Editor.data.app.roles, function(key, value) {
+            //if the role is not setable for the user, do not create an check box for it
+            if(!value.setable){
+                return;
+            }
             roles.push({
-                boxLabel: value, 
+                boxLabel: value.label, 
                 name: 'roles_helper', 
                 value: key,
                 handler: me.roleCheckChange
