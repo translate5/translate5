@@ -165,13 +165,13 @@ class editor_Models_Import_FileParser_XmlParser {
     /**
      * replaces the chunk at the given index with the given replacement
      * @param integer $index the chunk index to replace
-     * @param string|callable $replacement the new chunk string content, or a callable which receives the following parameters: integer $index, string $oldContent
+     * @param string|callable $replacement the new chunk string content, or a callable (array|Closure) which receives the following parameters: integer $index, string $oldContent
      * @param integer $length repeats the replacement for the amount if chunks as specified in $length, defaults to 1
      */
     public function replaceChunk($index, $replacement, $length = 1) {
         for ($i = 0; $i < $length; $i++) {
             $idx = $index + $i;
-            if(is_callable($replacement)) {
+            if(!is_string($replacement) && is_callable($replacement)) {
                 $replacement = call_user_func($replacement, $idx, $this->xmlChunks[$idx]);
             }
             $this->xmlChunks[$idx] = $replacement;
