@@ -64,7 +64,7 @@ class editor_Models_Segment_InternalTag {
      * @return mixed 
      */
     public function replace($segment, $replacer, $limit = -1, &$count = null) {
-        if(is_callable($replacer)) {
+        if(!is_string($replacer) && is_callable($replacer)) {
             return preg_replace_callback(self::REGEX_INTERNAL_TAGS, $replacer, $segment, $limit, $count);
         }
         return preg_replace(self::REGEX_INTERNAL_TAGS, $replacer, $segment, $limit, $count);
