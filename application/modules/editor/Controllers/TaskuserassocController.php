@@ -167,15 +167,23 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
      * @param string $userGuid
      */
     protected function checkAuthenticatedIsParentOf($userGuid){
+        $userSession = new Zend_Session_Namespace('user');
+        $userData = $userSession->data;
+        
         $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
-        $userSession = new Zend_Session_Namespace('user');
-        $userData=$userSession->data;
-        if($userGuid===$userData->userGuid){
+        
+        //if i am allowed to see any user:
+        if($this->isAllowed('backend', 'seeAllUsers')) {
             return;
         }
-        $hasParent=$userModel->hasParent($userGuid,$userData->id);
-        if(!$hasParent){
+        
+        //I am allowed to see myself
+        if($userGuid === $userData->userGuid){
+            return;
+        }
+        
+        if(!$userModel->hasParent($userGuid, $userData->id)){
             throw new ZfExtended_NoAccessException();
         }
     }
