@@ -47,9 +47,15 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
      */
     protected $config;
     
+    /**
+     * @var ZfExtended_Acl
+     */
+    protected $acl;
+    
     public function init() {
         parent::init();
         $this->config = Zend_Registry::get('config');
+        $this->acl= ZfExtended_Acl::getInstance();
     }
     
     /**
@@ -308,11 +314,14 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $allRoles = $acl->getRoles();
         $roles = array();
         foreach($allRoles as $role) {
-            //
             if($role == 'noRights' || $role == 'basic') {
                 continue;
             }
-            $roles[$role] = $this->translate->_(ucfirst($role));
+            //set the setable, if the user is able to set/modefy this role
+            $roles[$role] = [
+                    'label' => $this->translate->_(ucfirst($role)),
+                    'setable' => $this->isUserRightSetable($role)
+            ];
         }
         $php2js->set('app.roles', $roles);
         
@@ -587,6 +596,18 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         header('Content-Type: '.$types[$extension]);
         readfile($wholePath);
         exit;
+    }
+    
+    /***
+     * Check if the user right can be changed/modified
+     * 
+     * @param string $right
+     * @return boolean
+     */
+    public function isUserRightSetable($right){
+        $userSession = new Zend_Session_Namespace('user');
+        $isAllowed=$this->acl->isInAllowedRoles($userSession->data->roles,"setaclrole",$right);
+        return $isAllowed;
     }
 }
 
