@@ -161,12 +161,11 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * Updates the stored user states of an given taskGuid 
      * @param string $state
      * @param string $role
-     * @param string $taskGuid
      */
-    public function setStateForRoleAndTask(string $state, string $role, string $taskGuid) {
+    public function setStateForRoleAndTask(string $state, string $role) {
         $this->db->update(array('state' => $state), array(
             'role = ?' => $role,
-            'taskGuid = ?' => $taskGuid,
+            'taskGuid = ?' => $this->getTaskGuid(),
         ));
     }
     

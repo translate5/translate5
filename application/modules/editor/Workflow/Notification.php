@@ -32,32 +32,17 @@ END LICENSE AND COPYRIGHT
  * Basicly the Notifications are E-Mail based. But this class can be overwritten
  * to redirect the generated mailer texts to over notification channels
  */
-class editor_Workflow_Notification {
+class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     /**
      * @var ZfExtended_Mail
      */
     protected $mailer;
     
     /**
-     * @var editor_Models_Task
-     */
-    protected $task;
-    
-    /**
-     * @var editor_Workflow_Abstract
-     */
-    protected $workflow;
-    
-    /**
      * @var array
      */
     protected $xmlCache = array();
     
-    public function __construct(editor_Models_Task $task, editor_Workflow_Abstract $workflow) {
-        $this->task = $task;
-        $this->workflow = $workflow;
-    }
-
     /**
      * generates and returns the template path.
      * @param string $role the affected workflow role string
@@ -72,9 +57,10 @@ class editor_Workflow_Notification {
      * @return [array] array with Pm User Data Arrays
      */
     protected function getTaskPmUsers(){
+        $task = $this->config->task;
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
-        $user->loadByGuid($this->task->getPmGuid());
+        $user->loadByGuid($task->getPmGuid());
         return array((array)$user->getDataObject());
     }
     
@@ -82,9 +68,10 @@ class editor_Workflow_Notification {
      * perhaps this method should be moved to another location (into the workflow?)
      */
     protected function getStepSegments(string $step) {
+        $task = $this->config->task;
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */
-        return $segment->loadByWorkflowStep($this->task->getTaskGuid(), $step);
+        return $segment->loadByWorkflowStep($task->getTaskGuid(), $step);
     }
     
     /**
@@ -120,20 +107,24 @@ class editor_Workflow_Notification {
      * @param string $triggeringRole
      * @param boolean $isCron
      */
-    public function notifyAllFinishOfARole($triggeringRole, $isCron = false) {
-        $currentStep = $this->workflow->getStepOfRole($triggeringRole);
+    public function notifyAllFinishOfARole() {
+        $task = $this->config->task;
+        $workflow = $this->config->workflow;
+        $isCron = $workflow->isCalledByCron();
+        $triggeringRole = $this->config->newTua->getRole();
+        $currentStep = $workflow->getStepOfRole($triggeringRole);
         if($currentStep === false){
             error_log("No workflow step to Role ".$triggeringRole." found! This is actually a workflow config error!");
         }
         $segments = $this->getStepSegments($currentStep);
         $segmentHash = md5(print_r($segments,1)); //hash to identify the given segments (for internal caching)
         
-        $nextRole = $this->workflow->getRoleOfStep((string)$this->workflow->getNextStep($currentStep));
+        $nextRole = $workflow->getRoleOfStep((string)$workflow->getNextStep($currentStep));
         
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
         
-        $users = $tua->getUsersOfRoleOfTask($nextRole,$this->task->getTaskGuid());
+        $users = $tua->getUsersOfRoleOfTask($nextRole,$task->getTaskGuid());
         $params = array(
             'triggeringRole' => $triggeringRole,
             'nextRole' => $nextRole,
@@ -141,8 +132,8 @@ class editor_Workflow_Notification {
             'segments' => $segments,
             'isCron' => $isCron,
             'users' => $users,
-            'task' => $this->task,
-            'workflow' => $this->workflow
+            'task' => $task,
+            'workflow' => $workflow
         );
         
         //send to the PM
@@ -169,10 +160,10 @@ class editor_Workflow_Notification {
     
     /**
      * Sends a notification to users which are attached newly to a task with status open
-     * @param editor_Models_TaskUserAssoc $tua
      */
-    public function notifyNewTaskAssigned(editor_Models_TaskUserAssoc $tua) {
-        $wf = $this->workflow;
+    public function notifyNewTaskAssigned() {
+        $tua = $this->config->newTua;
+        $wf = $this->config->workflow;
         $wfId = $wf::WORKFLOW_ID;
         $config = Zend_Registry::get('config');
         $wfConfig = $config->runtimeOptions->workflow;
@@ -186,13 +177,11 @@ class editor_Workflow_Notification {
         
         $params = [
             'user' => (array) $user->getDataObject(),
-            'task' => $this->task,
+            'task' => $this->config->task,
         ];
         
-        if($tua->getState() == $wf::STATE_OPEN) {
-            $this->createNotification($tua->getRole(), __FUNCTION__, $params);
-            $this->notify((array) $user->getDataObject());
-        }
+        $this->createNotification($tua->getRole(), __FUNCTION__, $params);
+        $this->notify((array) $user->getDataObject());
     }
     
     /**
@@ -217,7 +206,7 @@ class editor_Workflow_Notification {
             ];
             $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff', [$xliffConf]);
             /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff */
-            $this->xmlCache[$segmentHash] = $xliff = $xliffConverter->convert($this->task, $segments);
+            $this->xmlCache[$segmentHash] = $xliff = $xliffConverter->convert($this->config->task, $segments);
             
             if($xlfFile) {
                 $this->saveXmlToFile($xliff);
@@ -238,7 +227,7 @@ class editor_Workflow_Notification {
     }
     
     protected function saveXmlToFile($xml) {
-        $path = $this->task->getAbsoluteTaskDataPath();
+        $path = $this->config->task->getAbsoluteTaskDataPath();
         if(!is_dir($path) || !is_writeable($path)) {
             error_log('cant write changes.xliff file to path: '.$path);
             return;

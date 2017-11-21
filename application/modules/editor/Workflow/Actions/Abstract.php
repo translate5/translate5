@@ -28,47 +28,30 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Encapsulates the Default Actions triggered by the Workflow
+ * Defines a common interface for workflow actions
  */
-class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
+class editor_Workflow_Actions_Abstract {
     /**
-     * sets all segments to untouched state - if they are untouched by the user
+     * @var editor_Workflow_Actions_Config 
      */
-    public function segmentsSetUntouchedState() {
-        //FIXME setze die Segmente ebenfalls auf $newTua->getUserGuid als letzten Editor!
-        $this->updateAutoStates($this->config->task->getTaskGuid(),'setUntouchedState');
+    protected $config;
+
+    public function init(editor_Workflow_Actions_Config $config) {
+        $this->config = $config;
     }
     
     /**
-     * sets all segments to initial state - if they were untouched by the user before
-     */
-    public function segmentsSetInitialState() {
-        //FIXME Mit Marc klären, wenn wir oben die $newTua->getUserGuid als letzten Editor setzen, dann auch hier wieder zurücksetzen?
-        $this->updateAutoStates($this->config->task->getTaskGuid(),'setInitialStates');
-    }
-    
-    /**
-     * Updates the tasks real delivery date to the current timestamp
-     */
-    public function taskSetRealDeliveryDate() {
-        $task = $this->config->task;
-        $task->setRealDeliveryDate(date('Y-m-d', $_SERVER['REQUEST_TIME']));
-        $task->save();
-    }
-    
-    /**
-     * updates all Auto States of this task
+     * updates all Auto States of the current task
      * currently this method supports only updating to REVIEWED_UNTOUCHED and to initial (which is NOT_TRANSLATED and TRANSLATED)
-     * @param string $taskGuid
      * @param string $method method to call in editor_Models_Segment_AutoStates
      */
-    protected function updateAutoStates(string $taskGuid, string $method) {
+    protected function updateAutoStates(string $method) {
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */
         
         $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         /* @var $states editor_Models_Segment_AutoStates */
         
-        $states->{$method}($taskGuid, $segment);
+        $states->{$method}($this->config->task->getTaskGuid(), $segment);
     }
 }

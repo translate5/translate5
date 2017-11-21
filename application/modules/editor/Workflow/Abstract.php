@@ -235,6 +235,11 @@ abstract class editor_Workflow_Abstract {
      */
     protected $events = false;
     
+    /**
+     * determines if calls were done by cronjob
+     * @var boolean
+     */
+    protected $isCron = false;
     
     public function __construct() {
         $this->debug = ZfExtended_Debug::getLevel('core', 'workflow');
@@ -263,6 +268,14 @@ abstract class editor_Workflow_Abstract {
             return static::WORKFLOW_ID;
         }
         return call_user_func(array($className, __METHOD__));
+    }
+    
+    /**
+     * returns true if the workflow methods were triggered by a cron job and no direct user/API interaction
+     * @return boolean
+     */
+    public function isCalledByCron() {
+        return $this->isCron;
     }
     
     /**
@@ -574,7 +587,7 @@ abstract class editor_Workflow_Abstract {
             return;
         }
         if($this->debug == 1) {
-            error_log($name);
+            error_log(get_class($this).'::'.$name);
             return;
         }
         if($this->debug == 2) {
@@ -684,15 +697,16 @@ abstract class editor_Workflow_Abstract {
         $this->oldTaskUserAssoc = $oldTua;
         $this->newTaskUserAssoc = $newTua;
         
-        //ensure that segment MV is createad
         if(empty($this->newTask)) {
             $task = ZfExtended_Factory::get('editor_Models_Task');
             /* @var $task editor_Models_Task */
             $task->loadByTaskGuid($newTua->getTaskGuid());
+            $this->newTask = $task;
         }
         else {
             $task = $this->newTask;
         }
+        //ensure that segment MV is createad
         $task->createMaterializedView();
         $this->recalculateWorkflowStep($newTua);
         
@@ -703,6 +717,48 @@ abstract class editor_Workflow_Abstract {
             } 
             $this->events->trigger($state, __CLASS__, array('oldTua' => $oldTua, 'newTua' => $newTua));
         }
+    }
+    
+    /**
+     * calls the actions configured to the trigger with given role and state
+     * @param string $trigger
+     * @param string $role can be empty
+     * @param string $state can be empty
+     */
+    protected function callActions($trigger, $role = null, $state = null) {
+        $actions = ZfExtended_Factory::get('editor_Models_Workflow_Action');
+        /* @var $actions editor_Models_Workflow_Action */
+        $actions = $actions->loadByTrigger($trigger, $role, $state);
+        $instances = [];
+        foreach($actions as $action) {
+            $class = $action['actionClass'];
+            $method = $action['action'];
+            if(empty($instances[$class])) {
+                $instance = ZfExtended_Factory::get($class);
+                /* @var $instance editor_Workflow_Actions_Abstract */
+                $instance->init($this->getActionConfig());
+                $instances[$class] = $instance;
+            }
+            else {
+                $instance = $instances[$class];
+            }
+            $msg = 'Workflow called action '.$class.'::'.$method.'() through trigger '.$trigger.' with role '.$role.' and state '.$state;
+            $this->doDebug($msg);
+            $instance->$method();
+        }
+    }
+    
+    /**
+     * prepares a config object for workflow actions
+     * @return editor_Workflow_Actions_Config
+     */
+    protected function getActionConfig() {
+        $config = ZfExtended_Factory::get('editor_Workflow_Actions_Config');
+        /* @var $config editor_Workflow_Actions_Config */
+        $config->workflow = $this;
+        $config->newTua = $this->newTaskUserAssoc;
+        $config->task = $this->newTask;
+        return $config;
     }
     
     /**
