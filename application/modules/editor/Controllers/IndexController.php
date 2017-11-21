@@ -268,6 +268,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     protected function setJsAppData() {
         $userSession = new Zend_Session_Namespace('user');
         $userSession->data->passwd = '********';
+        $userRoles = $userSession->data->roles;
         
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
@@ -308,11 +309,14 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $allRoles = $acl->getRoles();
         $roles = array();
         foreach($allRoles as $role) {
-            //
             if($role == 'noRights' || $role == 'basic') {
                 continue;
             }
-            $roles[$role] = $this->translate->_(ucfirst($role));
+            //set the setable, if the user is able to set/modefy this role
+            $roles[$role] = [
+                    'label' => $this->translate->_(ucfirst($role)),
+                    'setable' => $acl->isInAllowedRoles($userRoles, "setaclrole", $role)
+            ];
         }
         $php2js->set('app.roles', $roles);
         
@@ -320,7 +324,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         /* @var $wm editor_Workflow_Manager */
         $php2js->set('app.workflows', $wm->getWorkflowData());
         
-        $php2js->set('app.userRights', $acl->getFrontendRights($userSession->data->roles));
+        $php2js->set('app.userRights', $acl->getFrontendRights($userRoles));
         
         $php2js->set('app.version', $this->view->appVersion);
     }

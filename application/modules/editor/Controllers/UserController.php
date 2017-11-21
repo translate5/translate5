@@ -36,7 +36,7 @@ class Editor_UserController extends ZfExtended_UserController {
     public function deleteAction() {
         $this->entity->load($this->_getParam('id'));
         $this->checkIsEditable();
-        
+        $this->handleUserParentId();
         /**
          * @todo check if this is still necessary, if not the whole function can be removed.
          * Here all entries in TaskUserAssoc are deleted "manually".
