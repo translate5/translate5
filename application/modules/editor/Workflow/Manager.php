@@ -36,7 +36,7 @@ class editor_Workflow_Manager {
      * a list with all available workflow classes
      * @var array
      */
-    protected $workflowList;
+    protected static $workflowList;
     
     /**
      */
@@ -44,12 +44,21 @@ class editor_Workflow_Manager {
         $config = Zend_Registry::get('config');
         if(empty($config->runtimeOptions->workflows)) {
             //setting the default workflow if nothing is configured
-            $this->workflowList[editor_Workflow_Default::WORKFLOW_ID] = 'editor_Workflow_Default';
+            $this->addWorkflow('editor_Workflow_Default');
             return;
         }
         foreach($config->runtimeOptions->workflows as $wf) {
-            $this->workflowList[constant($wf.'::WORKFLOW_ID')] = $wf;
+            $this->addWorkflow($wf);
         }
+    }
+    
+    /**
+     * New Workflow Classes can be added to the internal list
+     * @param string $wfId
+     * @param string $workflowClass
+     */
+    public function addWorkflow($workflowClass) {
+        self::$workflowList[constant($workflowClass.'::WORKFLOW_ID')] = $workflowClass;
     }
     
     /**
@@ -57,7 +66,7 @@ class editor_Workflow_Manager {
      * @return string
      */
     public function getIdToClass($className) {
-        $flipped = array_flip($this->workflowList);
+        $flipped = array_flip(self::$workflowList);
         if(empty($flipped[$className])) {
             throw new ZfExtended_Exception('Workflow to class "'.$className.'" not found!');
         }
@@ -70,10 +79,10 @@ class editor_Workflow_Manager {
      * @return editor_Workflow_Abstract
      */
     public function get($wfId) {
-        if(empty($this->workflowList[$wfId])) {
+        if(empty(self::$workflowList[$wfId])) {
             throw new ZfExtended_Exception('Workflow with ID "'.$wfId.'" not found!');
         }
-        return ZfExtended_Factory::get($this->workflowList[$wfId]);
+        return ZfExtended_Factory::get(self::$workflowList[$wfId]);
     }
     
     /**
@@ -103,7 +112,7 @@ class editor_Workflow_Manager {
      * @return array
      */
     public function getWorkflows() {
-        return $this->workflowList;
+        return self::$workflowList;
     }
 
     /**
@@ -125,7 +134,7 @@ class editor_Workflow_Manager {
             }
             return array_combine($data, $usedLabels);
         };
-        foreach($this->workflowList as $id => $cls) {
+        foreach(self::$workflowList as $id => $cls) {
             $wf = ZfExtended_Factory::get($cls);
             /* @var $wf editor_Workflow_Abstract */
             $labels = $wf->getLabels();
@@ -179,7 +188,7 @@ class editor_Workflow_Manager {
             return $row->name;
         },$sfm->getFieldList());
         
-        foreach($this->workflowList as $key => $className) {
+        foreach(self::$workflowList as $key => $className) {
             $userPref = ZfExtended_Factory::get('editor_Models_Workflow_Userpref');
             /* @var $userPref editor_Models_Workflow_Userpref */
             $userPref->setWorkflow($key);
