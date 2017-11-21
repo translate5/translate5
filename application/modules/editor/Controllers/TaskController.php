@@ -148,7 +148,7 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     public function loadAll()
     {
-        $isAllowedToLoadAll = $this->isAllowed($this->user->data->roles,'loadAllTasks');
+        $isAllowedToLoadAll = $this->isAllowed('loadAllTasks');
         $filter = $this->entity->getFilter();
         $filter->convertStates($isAllowedToLoadAll);
         $assocFilter = $filter->isUserAssocNeeded();
@@ -385,7 +385,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity->validate();
         $this->initWorkflow();
         
-        $mayLoadAllTasks = $this->isAllowed($this->user->data->roles,'loadAllTasks');
+        $mayLoadAllTasks = $this->isAllowed('loadAllTasks');
         $tua = $this->workflow->getTaskUserAssoc($taskguid, $this->user->data->userGuid);
         if(!$mayLoadAllTasks &&
                 ($this->isOpenTaskRequest(true)&&
@@ -442,7 +442,7 @@ class editor_TaskController extends ZfExtended_RestController {
      * @param array $allAssocInfos
      */
     protected function addUserInfos(array &$row, $taskguid, array $userAssocInfos, array $allAssocInfos) {
-        $isEditAll = $this->isAllowed($this->user->data->roles,'editAllTasks');
+        $isEditAll = $this->isAllowed('editAllTasks');
         //Add actual User Assoc Infos to each Task
         if(isset($userAssocInfos[$taskguid])) {
             $row['userRole'] = $userAssocInfos[$taskguid]['role'];
@@ -616,7 +616,7 @@ class editor_TaskController extends ZfExtended_RestController {
             throw new ZfExtended_Models_Entity_NotAcceptableException('Given UserState '.$this->data->userState.' does not exist.');
         }
         
-        $isEditAllTasks = $this->isAllowed($this->user->data->roles,'editAllTasks');
+        $isEditAllTasks = $this->isAllowed('editAllTasks');
         $isOpen = $this->isOpenTaskRequest();
         $isPmOverride = false;
         
