@@ -320,6 +320,21 @@ class editor_Models_Segment_AutoStates {
     }
     
     /**
+     * Returns a map with counts of each state in a task
+     * @param string $taskGuid
+     */
+    public function getStatistics(string $taskGuid) {
+        $seg = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $seg editor_Models_Segment */
+        $stats = $seg->getAutoStateCount($taskGuid);
+        $result = array_fill_keys($this->getStates(), 0);
+        foreach($stats as $stat) {
+            $result[$stat['autoStateId']] = $stat['cnt'];
+        }
+        return $result;
+    }
+    
+    /**
      * returns true if user has right to edit all Tasks, checks optionally the workflow role of the user
      * @param editor_Models_TaskUserAssoc $tua optional, if not given only acl is considered
      */

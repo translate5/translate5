@@ -1073,6 +1073,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @param string $taskGuid
      */
     protected function reInitDb($taskGuid) {
+        $this->segmentFieldManager->initFields($taskGuid);
         $mv = $this->segmentFieldManager->getView();
         /* @var $mv editor_Models_Segment_MaterializedView */
         $this->db = ZfExtended_Factory::get($this->dbInstanceClass, array(array(), $mv->getName()));
@@ -1227,6 +1228,17 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $sql = sprintf($sql, $segTable, $subQuery, count($affectedFieldNames));
         $db->getAdapter()->query($sql, $bind);
         $db->getAdapter()->commit();
+    }
+    
+    /**
+     * @param string $taskGuid
+     * @return array
+     */
+    public function getAutoStateCount(string $taskGuid) {
+        $this->reInitDb($taskGuid);
+        $s = $this->db->select()->from($this->tableName, ['autoStateId', 'cnt' => 'count(id)'])
+        ->group('autoStateId');
+        return $this->db->fetchAll($s)->toArray();
     }
     
     /**

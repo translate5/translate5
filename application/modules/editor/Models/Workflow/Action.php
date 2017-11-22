@@ -51,20 +51,28 @@ class editor_Models_Workflow_Action extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * loads all available actions for the given trigger combination
+     * @param array $workflowIds list of workflow ids to be considered
      * @param string $trigger
+     * @param string $step
      * @param string $role
      * @param string $state
      * @return array
      */
-    public function loadByTrigger($trigger, $role, $state) {
+    public function loadByTrigger(array $workflowIds, $trigger, $step, $role, $state) {
         $s = $this->db->select();
+        $s->where('`workflow` in (?)', $workflowIds);
         $s->where('`trigger` = ?', $trigger);
+        if(!empty($step)) {
+            $s->where('`instep` = ? or `instep` is null', $step);
+        }
         if(!empty($role)) {
             $s->where('`byrole` = ? or `byrole` is null', $role);
         }
         if(!empty($state)) {
             $s->where('`userState` = ? or `userState` is null', $state);
         }
+        $s->order('position');
+        $s->order('id');
         return $this->db->fetchAll($s)->toArray();   
     }
 }

@@ -103,10 +103,12 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
+        $oldStep = $task->getWorkflowStepName();
         
         //this remains as default behaviour
         $nextStep = $this->getNextStep($this->getStepOfRole($newTua->getRole()));
         if($nextStep) {
+            //Next step triggert ebenfalls eine callAction → aber irgendwie so, dass der neue Wert verwendet wird! Henne Ei!
             $this->setNextStep($task, $nextStep);
             $nextRole = $this->getRoleOfStep($nextStep);
             if($nextRole) {
@@ -114,7 +116,8 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
             }
         }
         
-        $this->callActions(__FUNCTION__, $newTua->getRole(), $newTua->getState());
+        //provide here oldStep, since this was the triggering one. The new step is given to handleNextStep trigger
+        $this->callActions(__FUNCTION__, $oldStep, $newTua->getRole(), $newTua->getState());
     }
     
     /**
@@ -178,7 +181,7 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
         $this->doDebug(__FUNCTION__);
         $newTua = $this->newTaskUserAssoc;
         /* @var $actions editor_Workflow_Actions */
-        $this->callActions(__FUNCTION__, $newTua->getRole(), $newTua->getState());
+        $this->callActions(__FUNCTION__, $this->newTask->getWorkflowStepName(), $newTua->getRole(), $newTua->getState());
     }
     
         
@@ -241,7 +244,7 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
         $tua = $this->newTaskUserAssoc;
         $this->newTask = ZfExtended_Factory::get('editor_Models_Task');
         $this->newTask->loadByTaskGuid($tua->getTaskGuid());
-        $this->callActions(__FUNCTION__, $tua->getRole(), $tua->getState());
+        $this->callActions(__FUNCTION__, $this->newTask->getWorkflowStepName(), $tua->getRole(), $tua->getState());
     }
 
 }

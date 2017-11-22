@@ -29,6 +29,9 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Abstract Workflow Class
+ * 
+ * Warning: When adding new workflows, a alter script must be provided to add 
+ *   a default userpref entry for that workflow for each task 
  */
 abstract class editor_Workflow_Abstract {
     /*
@@ -268,6 +271,21 @@ abstract class editor_Workflow_Abstract {
             return static::WORKFLOW_ID;
         }
         return call_user_func(array($className, __METHOD__));
+    }
+    
+    /**
+     * returns a recursive list of workflow IDs used by this workflows instances class hierarchy
+     * @return array
+     */
+    public function getIdList() {
+        $parents = class_parents($this);
+        $result = [static::WORKFLOW_ID];
+        foreach($parents as $parent) {
+            if (defined($parent.'::WORKFLOW_ID')) {
+                $result[] = constant($parent.'::WORKFLOW_ID');
+            }
+        }
+        return $result;
     }
     
     /**
@@ -722,13 +740,14 @@ abstract class editor_Workflow_Abstract {
     /**
      * calls the actions configured to the trigger with given role and state
      * @param string $trigger
+     * @param string $step can be empty
      * @param string $role can be empty
      * @param string $state can be empty
      */
-    protected function callActions($trigger, $role = null, $state = null) {
+    protected function callActions($trigger, $step = null, $role = null, $state = null) {
         $actions = ZfExtended_Factory::get('editor_Models_Workflow_Action');
         /* @var $actions editor_Models_Workflow_Action */
-        $actions = $actions->loadByTrigger($trigger, $role, $state);
+        $actions = $actions->loadByTrigger($this->getIdList(), $trigger, $step, $role, $state);
         $instances = [];
         foreach($actions as $action) {
             $class = $action['actionClass'];
@@ -742,7 +761,8 @@ abstract class editor_Workflow_Abstract {
             else {
                 $instance = $instances[$class];
             }
-            $msg = 'Workflow called action '.$class.'::'.$method.'() through trigger '.$trigger.' with role '.$role.' and state '.$state;
+            $msg = 'Workflow called action '.$class.'::'.$method.'() through trigger '.$trigger;
+            $msg .= ' with step '.$step.' with role '.$role.' and state '.$state;
             $this->doDebug($msg);
             $instance->$method();
         }
@@ -861,10 +881,14 @@ abstract class editor_Workflow_Abstract {
      * @param string $stepName
      */
     protected function setNextStep(editor_Models_Task $task, $stepName) {
+        $this->doDebug(__FUNCTION__);
         $task->updateWorkflowStep($stepName, true);
         $log = ZfExtended_Factory::get('editor_Workflow_Log');
         /* @var $log editor_Workflow_Log */
         $log->log($task, $this->authenticatedUser->userGuid);
+        //call action directly without separate handler method
+        $newTua = $this->newTaskUserAssoc;
+        $this->callActions('handleSetNextStep', $stepName, $newTua->getRole(), $newTua->getState());
     }
     
     /**
