@@ -372,6 +372,10 @@ Ext.define('Editor.controller.Editor', {
       if(me.editorKeyMap) {
           me.editorKeyMap.destroy();
       }
+      me.editorKeyMap = new Editor.view.segments.EditorKeyMap({
+          target: docEl,
+          binding: me.getKeyMapConfig()
+      });
       docEl.on('paste', function(e){
           e.stopPropagation();
           e.preventDefault();
