@@ -161,11 +161,12 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       var me = this,
           emptySel = selection.length == 0,
           record=!emptySel ? selection[0] : null,
-          userEditable=record && !record.get('editable');
-      me.getAssocDelBtn().setDisabled(emptySel || userEditable);
+          userEditable=record && record.get('editable');
+          userDeletable=record && record.get('deletable');
+      me.getAssocDelBtn().setDisabled(emptySel || !userDeletable);
       me.getEditInfo().setVisible(emptySel);
       me.getUserAssocForm().setVisible(!emptySel);
-      me.getUserAssocForm().setDisabled(emptySel || userEditable);
+      me.getUserAssocForm().setDisabled(emptySel || !userEditable);
       if(emptySel) {
           me.getUserAssocForm().getForm().reset();
       }
