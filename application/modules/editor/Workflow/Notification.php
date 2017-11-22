@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -164,6 +163,34 @@ class editor_Workflow_Notification {
             $this->createNotification($nextRole, __FUNCTION__, $params);
             $this->attachXliffSegmentList($segmentHash, $segments);
             $this->notify($user);
+        }
+    }
+    
+    /**
+     * Sends a notification to users which are attached newly to a task with status open
+     * @param editor_Models_TaskUserAssoc $tua
+     */
+    public function notifyNewTaskAssigned(editor_Models_TaskUserAssoc $tua) {
+        $wf = $this->workflow;
+        $wfId = $wf::WORKFLOW_ID;
+        $config = Zend_Registry::get('config');
+        $wfConfig = $config->runtimeOptions->workflow;
+        if(!$wfConfig->{$wfId} || !$wfConfig->{$wfId}->notification->notifyNewTaskAssigned) {
+            return;
+        }
+        
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $user->loadByGuid($tua->getUserGuid());
+        
+        $params = [
+            'user' => (array) $user->getDataObject(),
+            'task' => $this->task,
+        ];
+        
+        if($tua->getState() == $wf::STATE_OPEN) {
+            $this->createNotification($tua->getRole(), __FUNCTION__, $params);
+            $this->notify((array) $user->getDataObject());
         }
     }
     

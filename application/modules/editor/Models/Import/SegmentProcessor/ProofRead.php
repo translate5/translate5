@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -95,7 +94,29 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
         $seg->setFieldContents($parser->getSegmentFieldManager(), $parser->getFieldContents());
         
         $segmentId = $seg->save();
+        $this->processSegmentMeta($seg, $attributes);
         return $segmentId; 
+    }
+    
+    /**
+     * Processes additional segment attributes which are stored in the segment meta table
+     * @param editor_Models_Segment $seg
+     * @param editor_Models_Import_FileParser_SegmentAttributes $attributes
+     */
+    protected function processSegmentMeta(editor_Models_Segment $seg, editor_Models_Import_FileParser_SegmentAttributes $attributes) {
+        $modified = false;
+        $meta = $seg->meta();
+        if(!empty($attributes->maxWidth) && !is_null($attributes->maxWidth)) {
+            $meta->setMaxWidth($attributes->maxWidth);
+            $modified = true;
+        }
+        if(!empty($attributes->minWidth) && !is_null($attributes->minWidth)) {
+            $meta->setMinWidth($attributes->minWidth);
+            $modified = true;
+        }
+        if($modified) {
+            $meta->save();
+        }
     }
     
     /**

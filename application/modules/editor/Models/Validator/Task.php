@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -37,7 +36,9 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract 
     $this->addValidator('id', 'int');
     $this->addValidator('taskGuid', 'guid');
     $this->addValidator('taskNr', 'stringLength', array('min' => 0, 'max' => 120));
+    $this->addValidator('foreignId', 'stringLength', array('min' => 0, 'max' => 120));
     $this->addValidator('taskName', 'stringLength', array('min' => 0, 'max' => 255));
+    $this->addValidator('foreignName', 'stringLength', array('min' => 0, 'max' => 255));
     $this->addValidator('sourceLang', 'int');
     $this->addValidator('targetLang', 'int');
     $this->addValidator('relaisLang', 'int');

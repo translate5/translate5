@@ -761,7 +761,7 @@ Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-M
 <trans-unit id='U3BhbHRlIEE='><source>Spalte A</source><target>Spalte A</target></trans-unit>
 <trans-unit id='WmllbCAy'><source>Ziel 2</source><target>Ziel 2</target></trans-unit>
 <trans-unit id='Tm9jaCBlaW4gWmllbA=='><source>Noch ein Ziel</source><target>Noch ein Ziel</target></trans-unit>
-<trans-unit id='RGllIG5hY2hmb2xnZW5kZW4gVGFncyB3dXJkZW4gYmVpbSBFZGl0aWVyZW4gZ2Vsw7ZzY2h0LCBkYXMgU2VnbWVudCBrYW5uIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbi4gPGJyIC8+VmVyc3VjaGVuIFNpZSBtaXQgZGVyIFLDvGNrZ8OkbmdpZ2Z1bmt0aW9uIFNUUkctWiBkaWUgVGFncyB3aWVkZXJoZXJ6dXN0ZWxsZW4uIDxiciAvPkFsdGVybmF0aXYga8O2bm5lbiBTaWUgYXVjaCBkaWUgQmVhcmJlaXR1bmcgZGVzIFNlZ21lbnRzIGR1cmNoIEtsaWNrIGF1ZiAiQWJicmVjaGVuIiAoPGltZyBzcmM9Ii4uL21vZHVsZXMvZWRpdG9yL2ltYWdlcy9jcm9zcy5wbmciIC8+IGltIHJlY2h0ZW4gTWVuw7wpIGJlZW5kZW4gdW5kIGRhcyBTZWdtZW50IG5ldSB6dXIgQmVhcmJlaXR1bmcgw7ZmZm5lbi48YnIgLz5GZWhsZW5kZSBUYWdzOg=='><source>Die nachfolgenden Tags wurden beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br />Versuchen Sie mit der Rückgängigfunktion STRG-Z die Tags wiederherzustellen. <br />Alternativ können Sie auch die Bearbeitung des Segments durch Klick auf "Abbrechen" (<img src="../modules/editor/images/cross.png" /> im rechten Menü) beenden und das Segment neu zur Bearbeitung öffnen.<br />Fehlende Tags:</source><target>Die nachfolgenden Tags wurden beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br />Versuchen Sie mit der Rückgängigfunktion STRG-Z die Tags wiederherzustellen. <br />Alternativ können Sie auch die Bearbeitung des Segments durch Klick auf "Abbrechen" (<img src="../modules/editor/images/cross.png" /> im rechten Menü) beenden und das Segment neu zur Bearbeitung öffnen.<br />Fehlende Tags:</target></trans-unit>
+<trans-unit id='RGllIG5hY2hmb2xnZW5kZW4gVGFncyB3dXJkZW4gbm9jaCBuaWNodCBoaW56dWdlZsO8Z3Qgb2RlciBiZWltIEVkaXRpZXJlbiBnZWzDtnNjaHQsIGRhcyBTZWdtZW50IGthbm4gbmljaHQgZ2VzcGVpY2hlcnQgd2VyZGVuLiA8YnIgLz48YnIgLz5EaWUgVGFzdGVua29tYmluYXRpb248YnIgLz48dWw+PGxpPlNUUkcgKyBFSU5GRyAoYWx0ZXJuYXRpdiBTVFJHICsgLiAoUHVua3QpKSBmw7xndCBkZW4ga29tcGxldHRlbiBRdWVsbHRleHQgaW4gZGVuIFppZWx0ZXh0IGVpbi48L2xpPjxsaT5TVFJHICsgLCAoS29tbWEpICsgJmd0O051bW1lciZsdDsgZsO8Z3QgZGVuIGVudHNwcmVjaGVuZGVuIFRhZyBpbiBkZW4gWmllbHRleHQgKE51bGwgZW50c3ByaWNodCBUYWcgTnIuIDEwKSBlaW4uPC9saT48bGk+U1RSRyArIFNISUZUICsgLCAoS29tbWEpICsgJmd0O051bW1lciZsdDsgZsO8Z3QgZGllIFRhZ3MgbWl0IGRlbiBOdW1tZXJuIDExIGJpcyAyMCBpbiBkZW4gWmllbHRleHQgZWluLjwvbGk+PC91bD5GZWhsZW5kZSBUYWdzOg=='><source>Die nachfolgenden Tags wurden noch nicht hinzugefügt oder beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Die Tastenkombination<br /><ul><li>STRG + EINFG (alternativ STRG + . (Punkt)) fügt den kompletten Quelltext in den Zieltext ein.</li><li>STRG + , (Komma) + &gt;Nummer&lt; fügt den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10) ein.</li><li>STRG + SHIFT + , (Komma) + &gt;Nummer&lt; fügt die Tags mit den Nummern 11 bis 20 in den Zieltext ein.</li></ul>Fehlende Tags:</source><target>Die nachfolgenden Tags wurden noch nicht hinzugefügt oder beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br />Die Tastenkombination<ul><li>STRG + EINFG (alternativ STRG + . (Punkt)) fügt den kompletten Quelltext in den Zieltext ein.</li><li>STRG + , (Komma) + &gt;Nummer&lt; fügt den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10) ein.</li><li>STRG + SHIFT + , (Komma) + &gt;Nummer&lt; fügt die Tags mit den Nummern 11 bis 20 in den Zieltext ein.</li></ul>Fehlende Tags:</target></trans-unit>
 <trans-unit id='QUNIVFVORzogRWluIHdlaXRlcmVyIEZpbHRlciBpc3QgZ2VzZXR6dC4gRXMgaXN0IGRhaGVyIG3DtmdsaWNoLCBkYXNzIG5pY2h0IGFsbGUgU2VnbWVudGUgZGVyIExlc2V6ZWljaGVubGlzdGUgc2ljaHRiYXIgc2luZA=='><source>ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Lesezeichenliste sichtbar sind</source><target>ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Lesezeichenliste sichtbar sind</target></trans-unit>
 <trans-unit id='TGVzZXplaWNoZW4='><source>Lesezeichen</source><target>Lesezeichen</target></trans-unit>
 <trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgQUxUICsgRU5URVIp'><source>Speichern und nächstes Segment öffnen (STRG + ALT + ENTER)</source><target>Speichern und nächstes Segment öffnen (STRG + ALT + ENTER)</target></trans-unit>
@@ -1007,6 +1007,74 @@ Sie erreichen das Portal unter: %3$s<br />
 <trans-unit id='S2VpbmUgR2xvYmFsZXNlIEJlbnV0emVyZ3J1cHBlIHZlcmbDvGdiYXIgKGbDvHIgSWhyZW4gR2xvYmFsZXNlIEJlbnV0emVyIHVuZCBJaHJlIFNwcmFjaGtvbWJpbmF0aW9uKS4gQml0dGUgw6RuZGVybiBTaWUgZGVuIEJlbnV0emVyIG9kZXIgw7xiZXJzcHJpbmdlbiBTaWUgZGllIFZvcsO8YmVyc2V0enVuZy4='><source>Keine Globalese Benutzergruppe verfügbar (für Ihren Globalese Benutzer und Ihre Sprachkombination). Bitte ändern Sie den Benutzer oder überspringen Sie die Vorübersetzung.</source><target>Keine Globalese Benutzergruppe verfügbar (für Ihren Globalese Benutzer und Ihre Sprachkombination). Bitte ändern Sie den Benutzer oder überspringen Sie die Vorübersetzung.</target></trans-unit>
 <trans-unit id='QmVudXR6ZXIgb2RlciBQYXNzd29ydCBzaW5kIG5pY2h0IHZhbGlkZS4='><source>Benutzer oder Passwort sind nicht valide.</source><target>Benutzer oder Passwort sind nicht valide.</target></trans-unit>
 <trans-unit id='TGFkZW4='><source>Laden</source><target>Laden</target></trans-unit>
+<trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgenVnZXdpZXNlbg=='><source>Translate5 - Aufgabe zugewiesen</source><target>Translate5 - Aufgabe zugewiesen</target></trans-unit>
+<trans-unit id='JTEkcyAlMiRzLDxiciAvPgo8YnIgLz4KSW0gUHJvamVrdHBvcnRhbCAlMyRzIHd1cmRlIElobmVuIGRpZSBBdWZnYWJlIDxiPiU0JHMgLSAlNSRzPC9iPiB6dWdld2llc2VuLjxiciAvPgo8YnIgLz4KPGJyIC8+VmllbGVuIERhbmsgdW5kIHZpZWxlIEdyw7zDn2UsCjxiciAvPklociBQcm9qZWt0bWFuYWdlbWVudCBUZWFtCjxiciAvPiU2JHMKPGJyIC8+CjxiciAvPkRpZXNlIEVtYWlsIHd1cmRlIGF1dG9tYXRpc2NoIGdlbmVyaWVydC4gQml0dGUgYW50d29ydGVuIFNpZSBuaWNodCBhdWYgZGllc2UgRS1NYWlsIQ=='><source>%1$s %2$s,<br />
+<br />
+Im Projektportal %3$s wurde Ihnen die Aufgabe <b>%4$s - %5$s</b> zugewiesen.<br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%6$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source><target>%1$s %2$s,<br />
+<br />
+Im Projektportal %3$s wurde Ihnen die Aufgabe <b>%4$s - %5$s</b> zugewiesen.<br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%6$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</target></trans-unit>
+<trans-unit id='w5xiZXJzZXR6ZXIgKMOcYmVycHLDvGZ1bmcp'><source>Übersetzer (Überprüfung)</source><target>Übersetzer (Überprüfung)</target></trans-unit>
+<trans-unit id='w5xiZXJzZXR6dW5n'><source>Übersetzung</source><target>Übersetzung</target></trans-unit>
+<trans-unit id='QXV0b8O8YmVyc2V0enQ='><source>Autoübersetzt</source><target>Autoübersetzt</target></trans-unit>
+<trans-unit id='JTEkcyAlMiRzLAoKSW0gUHJvamVrdHBvcnRhbCAlMyRzIHd1cmRlIGRpZSBBdWZnYWJlICU1JHMgLSAlNiRzIGbDvHIgU2llIGZyZWlnZWdlYmVuLgoKVmllbGVuIERhbmsgdW5kIHZpZWxlIEdyw7zDn2UsCklociBQcm9qZWt0bWFuYWdlbWVudCBUZWFtCiU3JHMKCkRpZXNlIEVtYWlsIHd1cmRlIGF1dG9tYXRpc2NoIGdlbmVyaWVydC4gQml0dGUgYW50d29ydGVuIFNpZSBuaWNodCBhdWYgZGllc2UgRS1NYWlsIQ=='><source>%1$s %2$s,
+
+Im Projektportal %3$s wurde die Aufgabe %5$s - %6$s für Sie freigegeben.
+
+Vielen Dank und viele Grüße,
+Ihr Projektmanagement Team
+%7$s
+
+Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source><target>%1$s %2$s,
+
+Im Projektportal %3$s wurde die Aufgabe %5$s - %6$s für Sie freigegeben.
+
+Vielen Dank und viele Grüße,
+Ihr Projektmanagement Team
+%7$s
+
+Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</target></trans-unit>
+<trans-unit id='JTEkcyAlMiRzLDxiciAvPgo8YnIgLz4KSW0gUHJvamVrdHBvcnRhbCAlMyRzIHd1cmRlIGRpZSBBdWZnYWJlIDxiPiU1JHMgLSAlNiRzPC9iPiBmw7xyIFNpZSBmcmVpZ2VnZWJlbi48YnIgLz4KPGJyIC8+CkltIGZvbGdlbmRlbiBkaWUgZ2V0w6R0aWd0ZW4gw4RuZGVydW5nZW4gZGVyIHZvcmhlcmdlaGVuZGVuIMOcYmVyc2V0emVyOjxiciAvPgolNCRzCjxociAvPgo8YnIgLz4KPGJyIC8+CjxiciAvPlZpZWxlbiBEYW5rIHVuZCB2aWVsZSBHcsO8w59lLAo8YnIgLz5JaHIgUHJvamVrdG1hbmFnZW1lbnQgVGVhbQo8YnIgLz4lNyRzCjxiciAvPgo8YnIgLz5EaWVzZSBFbWFpbCB3dXJkZSBhdXRvbWF0aXNjaCBnZW5lcmllcnQuIEJpdHRlIGFudHdvcnRlbiBTaWUgbmljaHQgYXVmIGRpZXNlIEUtTWFpbCE='><source>%1$s %2$s,<br />
+<br />
+Im Projektportal %3$s wurde die Aufgabe <b>%5$s - %6$s</b> für Sie freigegeben.<br />
+<br />
+Im folgenden die getätigten Änderungen der vorhergehenden Übersetzer:<br />
+%4$s
+<hr />
+<br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%7$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source><target>%1$s %2$s,<br />
+<br />
+Im Projektportal %3$s wurde die Aufgabe <b>%5$s - %6$s</b> für Sie freigegeben.<br />
+<br />
+Im folgenden die getätigten Änderungen der vorhergehenden Übersetzer:<br />
+%4$s
+<hr />
+<br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%7$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRvckNoZWNr'><source>translatorCheck</source><target>translatorCheck</target></trans-unit>
+<trans-unit id='JyV2YWx1ZSUnIHdhcyBub3QgZm91bmQgaW4gdGhlIGhheXN0YWNr'><source>'%value%' was not found in the haystack</source><target>'%value%' was not found in the haystack</target></trans-unit>
+<trans-unit id='RGVyIFdvcmtmbG93IFNjaHJpdHQgZGVyIEF1ZmdhYmUgd3VyZGUgenUgInswfSIgZ2XDpG5kZXJ0IQ=='><source>Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!</source><target>Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!</target></trans-unit>
   </body>
  </file>
 </xliff>

@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -96,6 +95,11 @@ class editor_Models_Export {
         $localEncoded = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
             'LocalEncoded'
         );
+        
+        $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
+        /* @var $fileFilter editor_Models_File_FilterManager */
+        $fileFilter->initExport($this->task);
+        
         sort($dirPaths);
         foreach ($dirPaths as $path) {
             $path = $localEncoded->encode($path);
@@ -108,6 +112,8 @@ class editor_Models_Export {
             $parser = $this->getFileParser((int)$fileId, $path);
             /* @var $parser editor_Models_Export_FileParser */
             $parser->saveFile();
+            
+            $fileFilter->applyExportFilters($path, $fileId);
         }
     }
     

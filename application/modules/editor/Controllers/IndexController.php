@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -204,6 +203,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->setJsSegmentFlags('segments.stateFlags', $manualStates);
       $this->view->Php2JsVars()->set('segments.showStatus', (boolean)$rop->segments->showStatus);
       $this->view->Php2JsVars()->set('segments.showQM', (boolean)$rop->segments->showQM);
+      $this->view->Php2JsVars()->set('segments.userCanIgnoreTagValidation', (boolean)$rop->segments->userCanIgnoreTagValidation);
       $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
       /* @var $states editor_Models_Segment_AutoStates */
       $this->setJsSegmentFlags('segments.autoStateFlags', $states->getLabelMap());
@@ -226,7 +226,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('helpUrl',$rop->helpUrl);
       
       //maintenance start date
-      $this->view->Php2JsVars()->set('maintenance.startDate',isset($rop->maintenance->startDate)?$rop->maintenance->startDate:'');
+      if(isset($rop->maintenance->startDate)) {
+          $startDate = date(DATE_ISO8601, strtotime($rop->maintenance->startDate));
+      }
+      else{
+          $startDate = '';
+      }
+      $this->view->Php2JsVars()->set('maintenance.startDate',$startDate);
       //maintenance warning panel is showed
       $this->view->Php2JsVars()->set('maintenance.timeToNotify',isset($rop->maintenance->timeToNotify)?$rop->maintenance->timeToNotify:'');
       //minutes before the point in time of the update the application is locked for new log-ins
@@ -241,9 +247,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       //Editor.data.enableSourceEditing → still needed for enabling / disabling the whole feature (Checkbox at Import).
       $this->view->Php2JsVars()->set('enableSourceEditing', (boolean) $rop->import->enableSourceEditing);
       
-      $validImportExtensions = array_keys(editor_Models_Import_FileParser::getAllFileParsersMap());
-      $validImportExtensions[] = 'zip'; //ZIP is not provided by a specific fileparser
-      $this->view->Php2JsVars()->set('import.validExtensions', $validImportExtensions);
+      $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
+      /* @var $supportedFiles editor_Models_Import_SupportedFileTypes */
+      $this->view->Php2JsVars()->set('import.validExtensions', array_keys($supportedFiles->getSupportedTypes()));
       
       $this->view->Php2JsVars()->set('columns.widthFactorHeader', (float)$rop->editor->columns->widthFactorHeader);
       $this->view->Php2JsVars()->set('columns.widthOffsetEditable', (integer)$rop->editor->columns->widthOffsetEditable);
@@ -530,22 +536,27 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
                 'jpg' => 'image/jpeg',
                 'png' => 'image/png',
                 'gif' => 'image/gif',
+                'svg' => 'image/svg',
+                'woff' => 'application/woff',
+                'woff2' => 'application/woff2',
+                'ttf' => 'application/ttf',
+                'eot' => 'application/eot',
+                'html'=> 'text/html'
         );
         $slash = '/';
         // get requested file from router
         $requestedType =$this->getParam(1);
         $requestedFile =$this->getParam(2);
         $js = explode($slash, $requestedFile);
-        
         $extension = pathinfo($requestedFile, PATHINFO_EXTENSION);
         
         //pluginname is alpha characters only so check this for security reasons
         //ucfirst is needed, since in JS packages start per convention with lowercase, Plugins in PHP with uppercase! 
-        
-        $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($js))); 
-        if(empty($plugin) || !in_array($requestedType, array('js', 'resources'))) {
+        $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($js)));
+        if(empty($plugin)) {
             throw new ZfExtended_NotFoundException();
         }
+        
         //get the plugin instance to the key
         $pm = Zend_Registry::get('PluginManager');
         /* @var $pm ZfExtended_Plugin_Manager */
@@ -554,9 +565,18 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         if(empty($plugin)) {
             throw new ZfExtended_NotFoundException();
         }
+        
+        // check if requested "fileType" is allowed
+        if (!$plugin->isPublicFileType($requestedType)) {
+            throw new ZfExtended_NotFoundException();
+        }
+
         //get public files of the plugin to make a whitelist check of the file string from userland
         $allowedFiles = $plugin->getPublicFiles($requestedType, $absolutePath);
         $file = join($slash, $js);
+        if(!$allowedFiles){
+            return;
+        }
         if(!in_array($file, $allowedFiles)) {
             throw new ZfExtended_NotFoundException();
         }

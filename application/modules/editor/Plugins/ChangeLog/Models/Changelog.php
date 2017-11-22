@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -47,7 +46,8 @@ class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity
         "basic"=>1,
         "editor"=>2,
         "pm"=>4,
-        "admin"=>8
+        "admin"=>8,
+        "api"=>0, //for the API role we assume just no rights for changelog reading.
     );
 
     /**

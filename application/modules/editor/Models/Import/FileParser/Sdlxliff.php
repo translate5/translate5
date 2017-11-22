@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -84,16 +83,6 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         );
     
     /**
-     * @var string Zeichenketten für das Bodyparsing durch parseFile vorbereitet mit protectUnicodeSpecialChars
-     */
-    protected $_origFileUnicodeProtected = NULL;
-    
-    /**
-     * @var string Zeichenketten für das tag-Parsing durch prepareTagMapping vorbereitet mit protectUnicodeSpecialChars
-     */
-    protected $_origFileUnicodeSpecialCharsRemoved = NULL;
-
-    /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::getFileExtensions()
      */
@@ -110,7 +99,6 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         parent::__construct($path, $fileName, $fileId, $task);
         $this->initImageTags();
         $this->checkForSdlChangeMarker();
-        $this->protectUnicodeSpecialChars();
         $this->prepareTagMapping();
         
         //here would be the right place to set the import map, 
@@ -201,7 +189,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         }
         $xid = preg_replace('"<.* xid=\"([^\"]*)\".*>"', '\\1', $tag);
         $xid = preg_replace('"<.* xid=\"([^\"]*)\".*>"', '\\1', $tag);
-        $split = explode('id="' . $xid, $this->_origFileUnicodeProtected);
+        $split = explode('id="' . $xid, $this->_origFile);
         $content = preg_replace('"^[^>]*>.*?<source(.*?)</source>.*"s', '\\1', $split[1]);
         if (substr($content, 0, 1) === '/') {
             $text = 'NO_TEXT';
@@ -221,14 +209,14 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         // (wird unten rückgängig gemacht; für das Parsing sind bin-units völlig
         //analog zu group-Tags zu sehen, da auch sie translate-Attribut haben können
         //und gruppierende Eigenschaft haben
-        $this->_origFileUnicodeProtected = str_replace(array('<bin-unit', '</bin-unit>'), array('<group bin-unit ', '/bin-unit</group>'), $this->_origFileUnicodeProtected);
+        $this->_origFile = str_replace(array('<bin-unit', '</bin-unit>'), array('<group bin-unit ', '/bin-unit</group>'), $this->_origFile);
         //gibt die Verschachtelungstiefe der <group>-Tags an
         $groupLevel = 0;
         //array, in dem die Verschachtelungstiefe der Group-Tags in Relation zu ihrer
         //Einstellung des translate-Defaults festgehalten wird
         //der Default wird auf true gesetzt
         $translateGroupLevels = array($groupLevel - 1 => true);
-        $groups = explode('<group', $this->_origFileUnicodeProtected);
+        $groups = explode('<group', $this->_origFile);
         $counterTrans = 0;
         foreach ($groups as &$group) {
             //übernimm den Default-Wert für $translateGroupLevels von der einer Ebene niedriger
@@ -324,7 +312,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * @return array array('tagId' => array('name' => string '', 'text' => string '',['eptName' => string '', 'eptText' => string '']),'tagId2' => ...)
      */
     protected function prepareTagMapping() {
-        $file = preg_split('"<tag-defs[^>]*>"', $this->_origFileUnicodeSpecialCharsRemoved);
+        $file = preg_split('"<tag-defs[^>]*>"', $this->_origFile);
 
         //den ersten Teil ohne Tag-Defs rauswerfen.
         array_shift($file);
@@ -397,6 +385,10 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         if(strpos($transUnit, '<target') === false) {
             $source = strpos($transUnit, '<seg-source') === false ? '</source>' : '</seg-source>';
             $transUnit = str_replace($source, $source.'<target></target>', $transUnit);
+        }
+        else{
+            //some versions of SDL Studio adds empty <target/> tags which must be converted then to  
+            $transUnit = preg_replace('#<target[^>]*/>#', '<target></target>', $transUnit);
         }
         
         $this->segmentData = array();

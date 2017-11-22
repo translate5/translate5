@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -54,22 +53,57 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->view->rows = $this->entity->loadAllWithUserInfo();
         $this->view->total = $this->entity->getTotalCount();
     }
+    
+    public function postDispatch() {
+        $user = new Zend_Session_Namespace('user');
+        $acl = ZfExtended_Acl::getInstance();
+        if($acl->isInAllowedRoles($user->data->roles, 'readAuthHash')) {
+            parent::postDispatch();
+            return;
+        }
+        if(is_array($this->view->rows)) {
+            foreach($this->view->rows as &$row) {
+                unset($row['staticAuthHash']);
+            }
+        }
+        elseif(is_object($this->view->rows)) {
+            unset($this->view->rows->staticAuthHash);
+        }
+        parent::postDispatch();
+    }
 
     /**
-     * for post requests we have to check the existance of the desired task first!
+     * for post requests we have to check the existence of the desired task first!
      * (non-PHPdoc)
      * @see ZfExtended_RestController::validate()
      */
     protected function validate() {
-        if($this->_request->isPost()) {
-            settype($this->data->taskGuid, 'string');
-            $t = ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $t editor_Models_Task */
-            $t->loadByTaskGuid($this->data->taskGuid);
+        if(!$this->_request->isPost()) {
+            return parent::validate();
         }
-        return parent::validate();
+        settype($this->data->taskGuid, 'string');
+        $t = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $t editor_Models_Task */
+        $t->loadByTaskGuid($this->data->taskGuid);
+        
+        $valid = parent::validate();
+        //add the login hash AFTER validating, since we don't need any validation for it
+        $this->entity->createstaticAuthHash();
+        return $valid;
     }
 
+    /**
+     * {@inheritDoc}
+     * @see ZfExtended_RestController::decodePutData()
+     */
+    protected function decodePutData() {
+        parent::decodePutData();
+        if(array_key_exists('staticAuthHash', $this->data)) {
+            //may not be set from outside!
+            unset($this->data['staticAuthHash']);
+        }
+    }
+    
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::putAction()

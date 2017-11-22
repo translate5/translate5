@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -105,6 +104,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ));
         $this->front->getRouter()->addRoute('editorFilemap', $filemapRoute);
         
+        //must be added before the default RestRoutes 
+        $this->front->getRouter()->addRoute('editorSegmentPosition', new ZfExtended_Controller_RestLikeRoute(
+            'editor/segment/:segmentNrInTask/position',
+            array(
+                'module' => 'editor',
+                'controller' => 'segment',
+                'action' => 'position'
+            )));
+        
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/nextsegments/*',
             array(
@@ -182,7 +190,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $this->front->getRouter()->addRoute('editorLocalizedJs', $localizedJsRoute);
         
         $pluginJs = new Zend_Controller_Router_Route_Regex(
-            'editor/plugins/(js|resources)/([a-z0-9_\-./]*)',
+            'editor/plugins/([^/]+)/([a-z0-9_\-./]*)',
             array(
                 'module' => 'editor',
                 'controller' => 'index',

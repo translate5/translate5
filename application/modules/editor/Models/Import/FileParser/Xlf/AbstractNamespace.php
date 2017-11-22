@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -35,20 +34,24 @@ END LICENSE AND COPYRIGHT
 
 
 /**
- * XLF Fileparser Add On Interface
+ * XLF Fileparser Add On abstract class
  */
-interface editor_Models_Import_FileParser_Xlf_INamespace {
+abstract class editor_Models_Import_FileParser_Xlf_AbstractNamespace {
     /**
      * Gives the Namespace class the ability to add custom handlers to the xmlparser
      */
-    public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser);
+    public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser){
+        //method stub
+    }
     
     /**
      * Provides a invocation for parsing custom trans-unit attributes
      * @param array $attributes
      * @param editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes
      */
-    public function transunitAttributes(array $attributes, editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes);
+    public function transunitAttributes(array $attributes, editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes){
+        //method stub
+    }
     
     /**
      * Returns the Translate5 internal tag pair to the given XLF tag pair (<g>, <ept> etc..) from the internal tagmap stored in translate5 XLF
@@ -56,18 +59,31 @@ interface editor_Models_Import_FileParser_Xlf_INamespace {
      * @param string $xlfEndTag
      * @return array the internal tag pair to the given xlf tag pair 
      */
-    public function getPairedTag($xlfBeginTag, $xlfEndTag);
+    public function getPairedTag($xlfBeginTag, $xlfEndTag){
+        //method stub
+    }
     
     /**
      * Returns the Translate5 internal single tag to the given XLF single tag (<x>, <it> etc..) from the internal tagmap stored in translate5 XLF
      * @param string $xlfTag
      * @return array the internal tag to the given xlf single tag 
      */
-    public function getSingleTag($xlfTag);
+    public function getSingleTag($xlfTag){
+        //method stub
+    }
     
     /**
      * returns if the used XLIFF derivate must or must not use the plain tag content as internal tag text, or null if should depend on the tag
      * @return boolean|NULL
      */
-    public function useTagContentOnly();
+    abstract public function useTagContentOnly();
+    
+    /**
+     * Returns found comments, to be implemented in the subclasses!
+     * @return array
+     */
+    public function getComments() {
+        //method stub
+        return [];
+    }
 }

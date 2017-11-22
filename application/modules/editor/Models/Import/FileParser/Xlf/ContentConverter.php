@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -147,11 +146,12 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             case 'x':
             case 'ph':
             case 'it':
+            case 'bx':
+            case 'ex':
                 $type = '_singleTag';
                 $rid = 0;
                 break;
             case 'bpt':
-            case 'bx':
                 //the tagNr depends here on the existence of an entry with the same RID 
                 // if yes, take this value
                 // if no, increase and set the new value as new tagNr to that RID
@@ -163,7 +163,6 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
                 //g-close tag is just a hack to distinguish between open and close
                 $tag = 'g'; 
             case 'ept':
-            case 'ex':
                 $type = '_rightTag';
                 break;
             default:

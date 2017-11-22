@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -48,7 +47,6 @@ class editor_Models_Import {
     protected $events;
     
     /**
-     * 
      * @var editor_Models_Import_Configuration
      */
     protected $importConfig;
@@ -106,7 +104,13 @@ class editor_Models_Import {
             throw $e;
         }
         $this->task->lock(NOW_ISO, true); //locks the task
-
+        
+        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
+        /* @var $eventManager ZfExtended_EventManager */
+        $eventManager->trigger('beforeImport', $this, array(
+                'task' => $this->task,
+                'importFolder'=>$this->importConfig->importFolder
+        ));
         /*
          * Queue Import Worker
          */
@@ -137,10 +141,14 @@ class editor_Models_Import {
      * Using this proxy method for triggering the event to keep the legacy code bound to this class instead to the new worker class
      * @param editor_Models_Task $task
      */
-    public function triggerAfterImport(editor_Models_Task $task, int $parentWorkerId) {
+    public function triggerAfterImport(editor_Models_Task $task, int $parentWorkerId, editor_Models_Import_Configuration $importConfig) {
         $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         /* @var $eventManager ZfExtended_EventManager */
-        $eventManager->trigger('afterImport', $this, array('task' => $task, 'parentWorkerId' => $parentWorkerId));
+        $eventManager->trigger('afterImport', $this, [
+                'task' => $task, 
+                'parentWorkerId' => $parentWorkerId,
+                'importConfig' => $importConfig
+        ]);
     }
     
     /**

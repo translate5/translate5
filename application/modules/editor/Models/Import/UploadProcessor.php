@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -93,19 +92,18 @@ class editor_Models_Import_UploadProcessor {
         $importName = pathinfo($importInfo['importUpload']['name']);
         settype($importName['extension'], 'string');
         $ext = strtolower($importName['extension']);
-        $mime = $finfo->file($importFile);
 
-        $allValidExtensions = editor_Models_Import_FileParser::getAllFileParsersMap();
+        //FIXME WARNING: MimeTypes ware not needed anymore, since check was deactivated in UploadProcessor
+        // but since there is currently no time to refactor the stuff, we leave it as it is and refactor it later
+        $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
+        /* @var $supportedFiles editor_Models_Import_SupportedFileTypes */
+        $allValidExtensions = $supportedFiles->getSupportedTypes();
         if(!empty($allValidExtensions[$ext])) {
-            $fileParserClass = $allValidExtensions[$ext];
-            //add the mimetypes of a valid fileparser to that extension to the validation array 
-            $this->validUploadTypes[$ext] = $fileParserClass::getValidMimeTypes();
+            $this->validUploadTypes[$ext] = $allValidExtensions[$ext];
         }
         
-        foreach ($this->validUploadTypes[$ext] as $type) {
-            if($mime == $type) {
-                return $ext;
-            }
+        if(!empty($this->validUploadTypes[$ext])){
+            return $ext;
         }
         
         if(empty($importInfo['importUpload']['size'])) {
@@ -114,8 +112,8 @@ class editor_Models_Import_UploadProcessor {
         else {
             $log = ZfExtended_Factory::get('ZfExtended_Log');
             /* @var $log ZfExtended_Log */
-            $log->logError('Unknown mime type for extension "'.$ext.'" discovered',
-                            'Someone tried the file extension "'.$ext.'" which should be one of the mime-types "'.implode(', ',$this->validUploadTypes[$ext]).'" but we got the following mime: "'.$mime.'"');
+            $log->logError('Unknown extension "'.$ext.'" discovered',
+                            'Someone tried the file extension "'.$ext.'" which is not registered');
             $this->addUploadError('noValidUploadFile', $importInfo['importUpload']['name']);
         }
         
