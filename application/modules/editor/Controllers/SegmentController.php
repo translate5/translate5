@@ -286,7 +286,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         //@todo do this with events
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wfm editor_Workflow_Manager */
-        $wfm->getActive()->beforeSegmentSave($this->entity);
+        $wfm->getActive($this->entity->getTaskGuid())->beforeSegmentSave($this->entity);
         
         $wfh = $this->_helper->workflow;
         /* @var $wfh ZfExtended_Controller_Helper_Workflow */

@@ -33,9 +33,6 @@ class editor_Models_Validator_SegmentUserAssoc extends ZfExtended_Models_Validat
      * Validators for Segment User Assoc Entity
      */
     protected function defineValidators() {
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
-        /* @var $workflow editor_Workflow_Abstract */
-        //comment = string, without length contrain. No validator needed / possible
         $this->addValidator('id', 'int');
         $this->addValidator('segmentId', 'int');
         $this->addValidator('userGuid', 'guid');

@@ -128,7 +128,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $unlockedTasks = $this->entity->cleanupLockedJobs();
         $userGuid = $this->user->data->userGuid;
         
-        //we clean up ALL tasks belonging to the actual user, 
+        //we clean up ALL tasks belonging to the current user, 
         //since if this action is called he has left the task (TRANSLATE-91)
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */

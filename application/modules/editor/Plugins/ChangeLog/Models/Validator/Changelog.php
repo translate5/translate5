@@ -34,10 +34,6 @@ class editor_Plugins_ChangeLog_Models_Validator_Changelog extends ZfExtended_Mod
      * 
      */
     protected function defineValidators() {
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
-        /* @var $workflow editor_Workflow_Abstract */
-        //comment = string, without length contrain. No validator needed / possible
-        //$this->addValidator('taskGuid', 'guid');
         $this->addValidator('id', 'int');
         $this->addValidator('dateOfChange', 'stringLength', array('min' => 0, 'max' => 11));
         $this->addValidator('jiraNumber', 'stringLength', array('min' => 0, 'max' => 255));
