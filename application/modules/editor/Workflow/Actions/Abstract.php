@@ -27,19 +27,31 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Plugins_ChangeLog_Models_Validator_Changelog extends ZfExtended_Models_Validator_Abstract {
-
+/**
+ * Defines a common interface for workflow actions
+ */
+class editor_Workflow_Actions_Abstract {
     /**
-     * Validators for change log Entity
-     * 
+     * @var editor_Workflow_Actions_Config 
      */
-    protected function defineValidators() {
-        $this->addValidator('id', 'int');
-        $this->addValidator('dateOfChange', 'stringLength', array('min' => 0, 'max' => 11));
-        $this->addValidator('jiraNumber', 'stringLength', array('min' => 0, 'max' => 255));
-        $this->addValidator('title', 'stringLength', array('min' => 0, 'max' => 255));
-        $this->addValidator('description', 'stringLength', array('min' => 0, 'max' => 1000000));
-        $this->addValidator('userGroup', 'stringLength', array('min' => 0, 'max' => 255));
+    protected $config;
+
+    public function init(editor_Workflow_Actions_Config $config) {
+        $this->config = $config;
+    }
+    
+    /**
+     * updates all Auto States of the current task
+     * currently this method supports only updating to REVIEWED_UNTOUCHED and to initial (which is NOT_TRANSLATED and TRANSLATED)
+     * @param string $method method to call in editor_Models_Segment_AutoStates
+     */
+    protected function updateAutoStates(string $method) {
+        $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segment editor_Models_Segment */
         
+        $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
+        /* @var $states editor_Models_Segment_AutoStates */
+        
+        $states->{$method}($this->config->task->getTaskGuid(), $segment);
     }
 }

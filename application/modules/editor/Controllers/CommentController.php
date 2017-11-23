@@ -43,9 +43,10 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
         //if comments are changed via REST the workflow stuff must be triggered
         $events->attach('editor_Models_Segment', 'beforeSave', function(Zend_EventManager_Event $event) {
             $segment = $event->getParam('entity');
+            /* @var $segment editor_Models_Segment */
             $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
             /* @var $wfm editor_Workflow_Manager */
-            $workflow = $wfm->getActive();
+            $workflow = $wfm->getActive($segment->getTaskGuid());
             //@todo do this with events
             $workflow->beforeCommentedSegmentSave($segment);
         });

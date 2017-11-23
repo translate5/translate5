@@ -27,19 +27,23 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Plugins_ChangeLog_Models_Validator_Changelog extends ZfExtended_Models_Validator_Abstract {
+/**
+ * Workflow Action Configuration Struct 
+ */
+class editor_Workflow_Actions_Config {
+    /**
+     * @var editor_Workflow_Abstract 
+     */
+    public $workflow;
+    
+    /**
+     * @var editor_Models_Task 
+     */
+    public $task;
 
     /**
-     * Validators for change log Entity
-     * 
+     * @var editor_Models_TaskUserAssoc
      */
-    protected function defineValidators() {
-        $this->addValidator('id', 'int');
-        $this->addValidator('dateOfChange', 'stringLength', array('min' => 0, 'max' => 11));
-        $this->addValidator('jiraNumber', 'stringLength', array('min' => 0, 'max' => 255));
-        $this->addValidator('title', 'stringLength', array('min' => 0, 'max' => 255));
-        $this->addValidator('description', 'stringLength', array('min' => 0, 'max' => 1000000));
-        $this->addValidator('userGroup', 'stringLength', array('min' => 0, 'max' => 255));
-        
-    }
+    public $newTua;
+
 }

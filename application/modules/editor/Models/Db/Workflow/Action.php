@@ -27,19 +27,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Plugins_ChangeLog_Models_Validator_Changelog extends ZfExtended_Models_Validator_Abstract {
-
-    /**
-     * Validators for change log Entity
-     * 
-     */
-    protected function defineValidators() {
-        $this->addValidator('id', 'int');
-        $this->addValidator('dateOfChange', 'stringLength', array('min' => 0, 'max' => 11));
-        $this->addValidator('jiraNumber', 'stringLength', array('min' => 0, 'max' => 255));
-        $this->addValidator('title', 'stringLength', array('min' => 0, 'max' => 255));
-        $this->addValidator('description', 'stringLength', array('min' => 0, 'max' => 1000000));
-        $this->addValidator('userGroup', 'stringLength', array('min' => 0, 'max' => 255));
-        
-    }
+/**#@+
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
+ */
+/**
+ * DB table access LEK_workflow_action
+ */
+class editor_Models_Db_Workflow_Action extends Zend_Db_Table_Abstract {
+    protected $_name    = 'LEK_workflow_action';
+    public $_primary = 'id';
 }

@@ -161,12 +161,11 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * Updates the stored user states of an given taskGuid 
      * @param string $state
      * @param string $role
-     * @param string $taskGuid
      */
-    public function setStateForRoleAndTask(string $state, string $role, string $taskGuid) {
+    public function setStateForRoleAndTask(string $state, string $role) {
         $this->db->update(array('state' => $state), array(
             'role = ?' => $role,
-            'taskGuid = ?' => $taskGuid,
+            'taskGuid = ?' => $this->getTaskGuid(),
         ));
     }
     
@@ -328,7 +327,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     }
     
     protected function _cleanupLocked($taskGuid = null, $forced = false) {
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($taskGuid);
         /* @var $workflow editor_Workflow_Abstract */
         
         $validSessionIds = ZfExtended_Models_Db_Session::GET_VALID_SESSIONS_SQL;
@@ -341,6 +340,8 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             $where['taskGuid = ?'] = $taskGuid;
         }
 
+        //FIXME this is not correct here, we should loop over all affected tuas, and should load the workflow then by taskGuid of the associated task
+        // since until writing this comment a bug in getActive always returns the Default Workflow, we just keep that (getActive returns Default Workflow if no taskGuid given)
         if(!empty($workflow)) {
             //updates the workflow state back to open if allowed
             $where2 = $where;

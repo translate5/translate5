@@ -178,9 +178,6 @@ class editor_Models_Segment_AutoStates {
      * @return multitype:string
      */
     public function getRoleToStateMap() {
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
-        /* @var $workflow editor_Workflow_Abstract */
-        
         return array(
           'pm' => array(
             self::REVIEWED_PM,
@@ -188,17 +185,17 @@ class editor_Models_Segment_AutoStates {
             self::REVIEWED_PM_UNCHANGED,
             self::REVIEWED_PM_UNCHANGED_AUTO,
           ),
-          $workflow::ROLE_TRANSLATOR => [
+          editor_Workflow_Abstract::ROLE_TRANSLATOR => [
             self::TRANSLATED,
           ],
-          $workflow::ROLE_LECTOR => array(
+          editor_Workflow_Abstract::ROLE_LECTOR => array(
             self::REVIEWED,
             self::REVIEWED_AUTO,
             self::REVIEWED_UNTOUCHED,
             self::REVIEWED_UNCHANGED,
             self::REVIEWED_UNCHANGED_AUTO,
           ),
-          $workflow::ROLE_TRANSLATORCHECK => array(
+          editor_Workflow_Abstract::ROLE_TRANSLATORCHECK => array(
             self::REVIEWED_TRANSLATOR,
             self::REVIEWED_TRANSLATOR_AUTO,
           )
@@ -256,7 +253,7 @@ class editor_Models_Segment_AutoStates {
     public function calculateSegmentState(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua) {
         $isModified = $segment->isDataModifiedAgainstOriginal();
         
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($segment->getTaskGuid());
         /* @var $workflow editor_Workflow_Abstract */
         
         if($segment->getAutoStateId() == self::BLOCKED){
@@ -308,7 +305,7 @@ class editor_Models_Segment_AutoStates {
      * @param editor_Models_Segment $segment
      */
     public function updateAfterCommented(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua) {
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($segment->getTaskGuid());
         $isTranslator = $tua->getRole() == $workflow::ROLE_TRANSLATOR;
         $autoState = $segment->getAutoStateId();
         if(!$isTranslator && ($autoState == self::TRANSLATED || $autoState == self::NOT_TRANSLATED)) {
@@ -320,6 +317,21 @@ class editor_Models_Segment_AutoStates {
             }
             $segment->setAutoStateId($stateToSet);
         }
+    }
+    
+    /**
+     * Returns a map with counts of each state in a task
+     * @param string $taskGuid
+     */
+    public function getStatistics(string $taskGuid) {
+        $seg = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $seg editor_Models_Segment */
+        $stats = $seg->getAutoStateCount($taskGuid);
+        $result = array_fill_keys($this->getStates(), 0);
+        foreach($stats as $stat) {
+            $result[$stat['autoStateId']] = $stat['cnt'];
+        }
+        return $result;
     }
     
     /**

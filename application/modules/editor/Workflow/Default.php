@@ -37,8 +37,6 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      */
     const WORKFLOW_ID = 'default';
     
-    protected $isCron = false;
-    
     public function __construct() {
         parent::__construct();
         $this->events->addIdentifiers(__CLASS__);
@@ -105,28 +103,21 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
+        $oldStep = $task->getWorkflowStepName();
         
-        $actions = ZfExtended_Factory::get('editor_Workflow_Actions',array($this));
-        /* @var $actions editor_Workflow_Actions */
-        
-        
+        //this remains as default behaviour
         $nextStep = $this->getNextStep($this->getStepOfRole($newTua->getRole()));
         if($nextStep) {
+            //Next step triggert ebenfalls eine callAction → aber irgendwie so, dass der neue Wert verwendet wird! Henne Ei!
             $this->setNextStep($task, $nextStep);
             $nextRole = $this->getRoleOfStep($nextStep);
             if($nextRole) {
-                $actions->openRole($nextRole, $newTua);
+                $newTua->setStateForRoleAndTask(self::STATE_OPEN, $nextRole);
             }
         }
-        if($newTua->getRole() == self::ROLE_LECTOR) {
-            //FIXME setze die Segmente ebenfalls auf $newTua->getUserGuid als letzten Editor!
-            $actions->updateAutoStates($taskGuid,'setUntouchedState');
-            $task->setRealDeliveryDate(date('Y-m-d', $_SERVER['REQUEST_TIME']));
-            $task->save();
-        }
-        $notifier = ZfExtended_Factory::get('editor_Workflow_Notification', array($task, $this));
-        /* @var $notifier editor_Workflow_Notification */
-        $notifier->notifyAllFinishOfARole($newTua->getRole(), $this->isCron); 
+        
+        //provide here oldStep, since this was the triggering one. The new step is given to handleNextStep trigger
+        $this->callActions(__FUNCTION__, $oldStep, $newTua->getRole(), $newTua->getState());
     }
     
     /**
@@ -187,16 +178,10 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      * @see editor_Workflow_Abstract::handleUnfinish()
      */
     protected function handleUnfinish(){
+        $this->doDebug(__FUNCTION__);
         $newTua = $this->newTaskUserAssoc;
         /* @var $actions editor_Workflow_Actions */
-        //@todo this needs to be adjusted to check for the workflowstep instead of the role
-        //when the workflowsystem is extended or based on a workflow engine
-        if($newTua->getRole() == self::ROLE_LECTOR) {
-            $actions = ZfExtended_Factory::get('editor_Workflow_Actions',array($this));
-            /* @var $actions editor_Workflow_Actions */
-            $actions->updateAutoStates($newTua->getTaskGuid(),'setInitialStates');
-        }
-        $this->doDebug(__FUNCTION__);
+        $this->callActions(__FUNCTION__, $this->newTask->getWorkflowStepName(), $newTua->getRole(), $newTua->getState());
     }
     
         
@@ -256,15 +241,10 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
     
     protected function handleUserAssociationAdded() {
         $this->doDebug(__FUNCTION__);
-        
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($this->newTaskUserAssoc->getTaskGuid());
-        
-        $notifier = ZfExtended_Factory::get('editor_Workflow_Notification', array($task, $this));
-        /* @var $notifier editor_Workflow_Notification */
-
-        $notifier->notifyNewTaskAssigned($this->newTaskUserAssoc);
+        $tua = $this->newTaskUserAssoc;
+        $this->newTask = ZfExtended_Factory::get('editor_Models_Task');
+        $this->newTask->loadByTaskGuid($tua->getTaskGuid());
+        $this->callActions(__FUNCTION__, $this->newTask->getWorkflowStepName(), $tua->getRole(), $tua->getState());
     }
 
 }

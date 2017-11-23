@@ -30,28 +30,30 @@ END LICENSE AND COPYRIGHT
 /**
  * Encapsulates the Default Actions triggered by the Workflow
  */
-class editor_Workflow_Actions {
+class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
     /**
-     *
-     * @var editor_Workflow_Abstract 
+     * sets all segments to untouched state - if they are untouched by the user
      */
-    protected $workflow;
-
-    /**
-     * 
-     * @param editor_Workflow_Abstract $workflow
-     */
-    public function __construct(editor_Workflow_Abstract $workflow) {
-        $this->workflow = $workflow;
+    public function segmentsSetUntouchedState() {
+        //FIXME setze die Segmente ebenfalls auf $newTua->getUserGuid als letzten Editor!
+        $this->updateAutoStates($this->config->task->getTaskGuid(),'setUntouchedState');
     }
+    
     /**
-     * open all users of the other roles of a task
-     * @param string $role
-     * @param editor_Models_TaskUserAssoc $tua
+     * sets all segments to initial state - if they were untouched by the user before
      */
-    public function openRole(string $role, editor_Models_TaskUserAssoc $tua) {
-        $wf = $this->workflow;
-        $tua->setStateForRoleAndTask($wf::STATE_OPEN, $role, $tua->getTaskGuid());
+    public function segmentsSetInitialState() {
+        //FIXME Mit Marc klären, wenn wir oben die $newTua->getUserGuid als letzten Editor setzen, dann auch hier wieder zurücksetzen?
+        $this->updateAutoStates($this->config->task->getTaskGuid(),'setInitialStates');
+    }
+    
+    /**
+     * Updates the tasks real delivery date to the current timestamp
+     */
+    public function taskSetRealDeliveryDate() {
+        $task = $this->config->task;
+        $task->setRealDeliveryDate(date('Y-m-d', $_SERVER['REQUEST_TIME']));
+        $task->save();
     }
     
     /**
@@ -60,7 +62,7 @@ class editor_Workflow_Actions {
      * @param string $taskGuid
      * @param string $method method to call in editor_Models_Segment_AutoStates
      */
-    public function updateAutoStates(string $taskGuid, string $method) {
+    protected function updateAutoStates(string $taskGuid, string $method) {
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */
         
