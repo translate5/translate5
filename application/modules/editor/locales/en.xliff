@@ -882,9 +882,9 @@
         <source>nicht vorhanden</source>
         <target>Not available</target>
       </trans-unit>
-      <trans-unit id='RWluc3RlbGx1bmdlbiB6dXIgQXVmZ2FiZQ=='>
-        <source>Einstellungen zur Aufgabe</source>
-        <target>Task-properties</target>
+      <trans-unit id='RWluc3RlbGx1bmdlbiB6dXIgQWJsYXVmcGxhbg=='>
+        <source>Einstellungen zur Ablaufplan</source>
+        <target>Workflow-properties</target>
       </trans-unit>
       <trans-unit id='V29ya2Zsb3c='>
         <source>Workflow</source>
