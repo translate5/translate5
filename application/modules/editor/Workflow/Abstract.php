@@ -250,13 +250,18 @@ abstract class editor_Workflow_Abstract {
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         $events = Zend_EventManager_StaticEventManager::getInstance();
         $events->attach('Editor_TaskuserassocController', 'afterPostAction', function(Zend_EventManager_Event $event){
-            $this->newTaskUserAssoc = $event->getParam('entity');
-            $this->recalculateWorkflowStep($this->newTaskUserAssoc);
-            $this->handleUserAssociationAdded();
+            $tua = $event->getParam('entity');
+            $this->recalculateWorkflowStep($tua);
+            $this->doUserAssociationAdd($tua);
         });
         
         $events->attach('Editor_TaskuserassocController', 'afterDeleteAction', function(Zend_EventManager_Event $event){
             $this->recalculateWorkflowStep($event->getParam('entity'));
+        });
+        
+        $events->attach('editor_Models_Import', 'beforeImport', function(Zend_EventManager_Event $event){
+            $this->newTask = $event->getParam('task');
+            $this->handleBeforeImport();
         });
     }
     
@@ -900,7 +905,7 @@ abstract class editor_Workflow_Abstract {
         $task->updateWorkflowStep($stepName, false);
         $log = ZfExtended_Factory::get('editor_Workflow_Log');
         /* @var $log editor_Workflow_Log */
-        //since we are in the import, we don't have the current user, but the pmGuid user of the task is the same:
+        //since we are in the import, we don't have the current user, so we use the pmGuid user of the task:
         $log->log($task, $task->getPmGuid()); 
     }
     
@@ -918,6 +923,15 @@ abstract class editor_Workflow_Abstract {
     public function doImport(editor_Models_Task $importedTask) {
         $this->newTask = $importedTask;
         $this->handleImport();
+    }
+    
+    /**
+     * is called after a user association is added
+     * @param editor_Models_TaskUserAssoc $tua
+     */
+    public function doUserAssociationAdd(editor_Models_TaskUserAssoc $tua) {
+        $this->newTaskUserAssoc = $tua;
+        $this->handleUserAssociationAdded();
     }
     
     /**
@@ -998,6 +1012,11 @@ abstract class editor_Workflow_Abstract {
      * @abstract
      */
     abstract protected function handleImport();
+    
+    /**
+     * will be called directly before import is started, task is already created and available
+     */
+    abstract protected function handleBeforeImport();
     
     /**
      * will be called after a user has finished a task
