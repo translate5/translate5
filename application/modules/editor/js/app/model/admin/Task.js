@@ -177,8 +177,8 @@ Ext.define('Editor.model.admin.Task', {
       if(this.get('state') == this.STATE_IMPORT) {
           return false;
       }
-      //a user with editorEditAllTasks (normally PMs) can always open the task
-      if(Editor.app.authenticatedUser.isAllowed('editorEditAllTasks')){
+      //a user with editorEditAllTasks (normally PMs) can always open the task or if the current loged user is a pm to that project
+      if(Editor.app.authenticatedUser.isAllowed('editorEditAllTasks') || this.get('pmGuid')===Editor.data.app.user.userGuid){
           return true;
       }
       //per default all tasks associated to a user are openable

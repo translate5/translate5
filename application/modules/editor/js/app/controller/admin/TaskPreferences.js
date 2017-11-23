@@ -217,9 +217,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       me.actualTask = task;
       me.getPrefWindow().setLoading(true);
       
-      //userPrefs must be loaded after userAssocs, 
+      //workflowPrefs must be loaded after userAssocs, 
       //so add the load as a callback dynamically, based on the rights 
-      if(me.isAllowed('editorUserPrefsTask')){
+      if(me.isAllowed('editorWorkflowPrefsTask')){
           userPrefs.loadData([],false); //cleanup old contents
           var tupParams = Ext.apply({}, tuaParams); //duplicate params, and add the callback
           tupParams.callback = function() {

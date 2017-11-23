@@ -63,7 +63,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                 xtype: 'adminTaskUserAssoc'
             });
         }
-        if(auth.isAllowed('editorUserPrefsTask')) {
+        if(auth.isAllowed('editorWorkflowPrefsTask')) {
             tabs.push({
                 xtype: 'editorAdminTaskPreferences'
             });
