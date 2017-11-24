@@ -241,7 +241,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   insertMarkup: function(value, initMarkupMapOnly) {
       var html = this.markup(value).join(''),
           doc = this.getDoc(),
-          sel, range, frag, node, el, lastNode;
+          sel, range, frag, node, el, lastNode, rangeForNode;
       
       //if that parameter is true, no html is inserted into the target column
       if(initMarkupMapOnly) {
@@ -262,8 +262,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
             lastNode = frag.appendChild(node);
         }
         range.insertNode(frag);
+        rangeForNode = range.cloneRange();
         range.setStartAfter(lastNode);
         range.setEndAfter(lastNode); 
+        this.fireEvent('afterInsertMarkup', rangeForNode);
       }
   },
   /**
