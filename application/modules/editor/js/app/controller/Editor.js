@@ -433,6 +433,7 @@ Ext.define('Editor.controller.Editor', {
       me.prevNextSegment.reset();
 
       if(me.isEditing &&rec && rec.get('editable')) {
+          me.fireEvent('prepareTrackChangesForSaving');
           me.fireEvent('saveUnsavedComments');
           me.fireEvent('saveSegment');
       }
