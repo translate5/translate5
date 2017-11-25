@@ -142,7 +142,7 @@ class editor_Models_Segment_TermTagTrackChange {
         $this->trackChangeNodeStatus = null;
         $this->posInText = 0;
         $posEnd = strlen($this->text);
-        while ($this->posInText < $posEnd) {
+        while ($this->posInText <= $posEnd) {
             $posAtTheBeginningOfThisStep = $this->posInText;
             $foundTermTag = array_key_exists($this->posInText, $this->arrTermTagsInText);
             $foundTrackChangeMarkup = array_key_exists($this->posInText, $this->arrTrackChangeNodesInText);
