@@ -114,6 +114,7 @@ Ext.define('Editor.controller.Editor', {
       });
       
       //set the default config
+      //(when editing this, pls also check eventIsTranslate5() in Editor.plugins.TrackChanges.controller.Editor) 
       me.keyMapConfig = {
           'ctrl-d':         ["D",{ctrl: true, alt: false}, me.watchSegment, true],
           'ctrl-s':         ["S",{ctrl: true, alt: false}, me.save, true],
