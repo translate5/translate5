@@ -338,10 +338,16 @@ class editor_Models_Segment_AutoStates {
      * returns true if user has right to edit all Tasks, checks optionally the workflow role of the user
      * @param editor_Models_TaskUserAssoc $tua optional, if not given only acl is considered
      */
-    protected function isEditWithoutAssoc(editor_Models_TaskUserAssoc $tua = null) {
+    protected function isEditWithoutAssoc(editor_Models_TaskUserAssoc $tua) {
         $userSession = new Zend_Session_Namespace('user');
         $role = $tua && $tua->getRole();
         $acl = ZfExtended_Acl::getInstance();
-        return empty($role) && $acl->isInAllowedRoles($userSession->data->roles,'editAllTasks');
+        
+        //load the task so the check if the loagged user is also the pm to the task
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($tua->getTaskGuid());
+        $sameUserGuid = $task->getPmGuid() === $userSession->data->userGuid;
+        return empty($role) && ($acl->isInAllowedRoles($userSession->data->roles,'editAllTasks') || $sameUserGuid);
     }
 }
