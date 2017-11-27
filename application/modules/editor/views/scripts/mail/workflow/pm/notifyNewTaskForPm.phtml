@@ -1,0 +1,72 @@
+<?php
+/*
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+  
+ There is a plugin exception available for use with this release of translate5 for
+ translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
+ Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
+ folder of translate5.
+  
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
+
+/**#@+
+ * @author Marc Mittag
+ * @package portal
+ * @version 2.0
+ *
+ */
+
+$session = new Zend_Session_Namespace();
+
+$this->subject = $this->translate->_('Translate5 - Aufgabe zugewiesen').' "'.$this->task->getTaskNr().' - '.$this->task->getTaskName().'"';
+$portal = $session->runtimeOptions->server->protocol.$session->runtimeOptions->server->name;
+$portal = '<a href="'.$portal.'">'.$portal.'</a>';
+
+$mailBody = sprintf($this->translate->_('%1$s %2$s,<br />
+<br />
+Im Projektportal %3$s wurde Ihnen die Aufgabe <b>%4$s - %5$s</b> zugewiesen.<br />
+<b>Aufgabe:</b> %5$s<br />
+<b>Quellsprache:</b> %7$s<br />
+<b>Zielsprache:</b> %8$s<br />
+%9$s<b>Lieferdatum:</b> %10$s<br />
+<b>Wortanzahl:</b> %11$s<br />
+<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />%6$s
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!'),
+    $this->mailEmployeeSalutation(),
+    $this->user['surName'],
+    $portal,
+    $this->task->getTaskNr(),
+    $this->task->getTaskName(),
+    $session->runtimeOptions->companyName,
+    $this->translate->_($this->sourceLanguage),
+    $this->translate->_($this->targetLanguage),
+    ($this->relaisLanguage ? sprintf($this->translate->_('<b>Relaissprache:</b> %8$s<br />'), $this->translate->_($this->relaisLanguage)) : ''),
+    $this->task->getTargetDeliveryDate(),
+    $this->task->getWordCount()
+);
+
+$this->textbody = strip_tags($mailBody);
+echo $mailBody;
+

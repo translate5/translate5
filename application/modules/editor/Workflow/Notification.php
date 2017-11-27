@@ -100,6 +100,28 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     }
     
     /**
+     * Initiales the internal configuration through the given parameters and returns it
+     * currently the following configuration parameters exist:
+     * pmBcc boolean, true if the pm of the task should also receive the notification
+     * rolesBcc array, list of workflow roles which also should receive the notification
+     * @param $config
+     * @return stdClass
+     */
+    protected function initConfig(array $config) {
+        $defaultConfig = new stdClass();
+        $defaultConfig->pmBcc = false;
+        $defaultConfig->rolesBcc = [];
+        if(empty($config)) {
+            return $defaultConfig;
+        }
+        $config = reset($config);
+        foreach($config as $key => $v) {
+            $defaultConfig->{$key} = $v;
+        }
+        return $defaultConfig;
+    }
+    
+    /**
      * Feel free to define additional Notifications
      */
     /**
@@ -108,6 +130,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * @param boolean $isCron
      */
     public function notifyAllFinishOfARole() {
+        $config = $this->initConfig(func_get_args());
         $task = $this->config->task;
         $workflow = $this->config->workflow;
         $isCron = $workflow->isCalledByCron();
@@ -137,12 +160,22 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         );
         
         //send to the PM
-        $pms = $this->getTaskPmUsers();
+        $bccReceivers = [];
+        if($config->pmBcc) {
+            $bccReceivers = array_merge($bccReceivers, $this->getTaskPmUsers());
+        }
+        if(!empty($config->rolesBcc)) {
+            foreach($config->rolesBcc as $bccRole) {
+                $tua->getUsersOfRoleOfTask($bccRole,$task->getTaskGuid());
+            }
+        }
         foreach($pms as $pm) {
-            $params['user'] = $pm;
-            $this->createNotification('pm', __FUNCTION__, $params); //@todo PM currently not defined as WORKFLOW_ROLE, so hardcoded here
-            $this->attachXliffSegmentList($segmentHash, $segments);
-            $this->notify($pm);
+            foreach($pms as $pm) {
+                $params['user'] = $pm;
+                $this->createNotification(ACL_ROLE_PM, __FUNCTION__, $params); //@todo PM currently not defined as WORKFLOW_ROLE, so hardcoded here
+                $this->attachXliffSegmentList($segmentHash, $segments);
+                $this->notify($pm);
+            }
         }
         
         if(is_null($nextRole)){
@@ -181,6 +214,36 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         ];
         
         $this->createNotification($tua->getRole(), __FUNCTION__, $params);
+        $this->notify((array) $user->getDataObject());
+    }
+    
+    /**
+     * Notifies the tasks PM over the new task, but only if PM != the user who has uploaded the task
+     */
+    public function notifyNewTaskForPm() {
+        $task = $this->config->task;
+        $pmGuid = $task->getPmGuid();
+        $importConf = $this->config->importConfig;
+        
+        //if the user who imports the task is the same as the PM, we don't send the mail
+        // also this mail is not possible at all, if no import config is given
+        if(empty($importConf) || $importConf->userGuid == $pmGuid) {
+            return;
+        }
+        
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $user->loadByGuid($pmGuid);
+        
+        $params = [
+            'task' => $task,
+            'user' => (array) $user->getDataObject(),
+            'sourceLanguage' => $importConf->sourceLang->getLangName(),
+            'targetLanguage' => $importConf->targetLang->getLangName(),
+            'relaisLanguage' => (empty($importConf->relaisLang) ? '' : $importConf->relaisLang->getLangName())
+        ];
+        
+        $this->createNotification(ACL_ROLE_PM, __FUNCTION__, $params);
         $this->notify((array) $user->getDataObject());
     }
     

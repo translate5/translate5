@@ -148,6 +148,12 @@ abstract class editor_Workflow_Abstract {
     protected $authenticatedUserModel;
     
     /**
+     * Import config, only available on workflow stuff triggerd in the context of an import 
+     * @var editor_Models_Import_Configuration
+     */
+    protected $importConfig = null;
+    
+    /**
      * lists all roles with read access to tasks
      * @var array 
      */
@@ -766,11 +772,44 @@ abstract class editor_Workflow_Abstract {
             else {
                 $instance = $instances[$class];
             }
-            $msg = 'Workflow called action '.$class.'::'.$method.'() through trigger '.$trigger;
-            $msg .= ' with step '.$step.' with role '.$role.' and state '.$state;
+            
+            $msg = $this->actionDebugMessage($action, $trigger, $step, $role, $state);
             $this->doDebug($msg);
-            $instance->$method();
+            if(empty($action['parameters'])) {
+                call_user_func([$instance, $method]);
+                continue;
+            }
+            call_user_func([$instance, $method], json_decode($action['parameters']));
+            if(json_last_error() != JSON_ERROR_NONE) {
+                $this->doDebug('Last Workflow called action: JSON Parameters for last call could not be parsed with message: '.json_last_error_msg());
+            }
         }
+    }
+    
+    /**
+     * generates a debug message for called actions
+     * @param array $action
+     * @param string $trigger
+     * @param string $step
+     * @param string $role
+     * @param string $state
+     * @return string
+     */
+    protected function actionDebugMessage(array $action, $trigger, $step, $role, $state) {
+        $msg = 'Workflow called action '.$action['actionClass'].'::'.$action['action'].'() through trigger '.$trigger;
+        if(!empty($step)) {
+            $msg .= "\n".' with step '.$step;
+        }
+        if(!empty($role)) {
+            $msg .= "\n".' with role '.$role;
+        }
+        if(!empty($state)) {
+            $msg .= "\n".' and state '.$state;
+        }
+        if(empty($action['parameters'])) {
+            $msg .= "\n".' and parameters '.$action['parameters'];
+        }
+        return $msg;
     }
     
     /**
@@ -783,6 +822,7 @@ abstract class editor_Workflow_Abstract {
         $config->workflow = $this;
         $config->newTua = $this->newTaskUserAssoc;
         $config->task = $this->newTask;
+        $config->importConfig = $this->importConfig;
         return $config;
     }
     
@@ -920,8 +960,9 @@ abstract class editor_Workflow_Abstract {
      * is called directly after import
      * @param editor_Models_Task $importedTask
      */
-    public function doImport(editor_Models_Task $importedTask) {
+    public function doImport(editor_Models_Task $importedTask, editor_Models_Import_Configuration $importConfig) {
         $this->newTask = $importedTask;
+        $this->importConfig = $importConfig;
         $this->handleImport();
     }
     

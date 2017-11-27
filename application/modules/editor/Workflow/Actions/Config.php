@@ -46,4 +46,9 @@ class editor_Workflow_Actions_Config {
      */
     public $newTua;
 
+    /**
+     * only available for import actions
+     * @var editor_Models_Import_Configuration
+     */
+    public $importConfig;
 }
