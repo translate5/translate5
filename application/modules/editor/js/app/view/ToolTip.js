@@ -43,7 +43,6 @@ Ext.define('Editor.view.ToolTip', {
     //enable own ToolTips only for the following img classes 
     delegate : '.ownttip', // accepts only simple selectors (no commas) so
     // define a own tooltip class
-    renderTo : Ext.getBody(),
     strings: {
         deletedby: '#UT#Deleted by',
         insertedby: '#UT#Inserted by',
@@ -66,6 +65,10 @@ Ext.define('Editor.view.ToolTip', {
         }
     },
 
+    constructor: function() {
+        this.renderTo = Ext.getBody();
+        this.callParent(arguments);
+    },
     onTargetOver: function(e) {
         e.preventDefault(); //prevent title tags to be shown in IE
         this.callParent(arguments);
