@@ -69,6 +69,13 @@ td.direction-rtl.x-grid-td div.x-grid-cell-inner {
 .segment-tag-container .x-autocontainer-innerCt div.close,
 .segment-tag-container .x-autocontainer-innerCt div.single {display:inline;background:#39FFA3;}
 
+/* this css is used in visual review tooltip, for displaying the internal tags, terminologie */
+.segment-tag-container.x-tip div.open,
+.segment-tag-container .x-autocontainer-innerCt div.close,
+.segment-tag-container .x-autocontainer-innerCt div.single
+{
+  color:#17385b;
+}
 #segment-grid div.x-grid-cell-inner div.open span {} /* Grafik Style für open Tag*/
 #segment-grid div.x-grid-cell-inner div.close span {} /* Grafik Style für close Tag*/
 #segment-grid div.x-grid-cell-inner div.single span {} /* Grafik Style für single Tag*/
