@@ -25,4 +25,6 @@
 -- 
 -- END LICENSE AND COPYRIGHT
 -- */
+
+-- renaming the right to what it is used for: protecting the whole workflow prefs tab, not only the workflow userprefs
 UPDATE `Zf_acl_rules` SET `right`='editorWorkflowPrefsTask' WHERE `right`='editorUserPrefsTask';

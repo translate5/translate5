@@ -179,7 +179,7 @@ class editor_Models_Segment_AutoStates {
      */
     public function getRoleToStateMap() {
         return array(
-          'pm' => array(
+          ACL_ROLE_PM => array(
             self::REVIEWED_PM,
             self::REVIEWED_PM_AUTO,
             self::REVIEWED_PM_UNCHANGED,
@@ -270,7 +270,7 @@ class editor_Models_Segment_AutoStates {
             return $isModified ? self::REVIEWED : self::REVIEWED_UNCHANGED;
         }
         
-        if($this->isEditWithoutAssoc($tua,$segment)){
+        if($this->isEditWithoutAssoc($tua)){
             return $isModified ? self::REVIEWED_PM : self::REVIEWED_PM_UNCHANGED;
         }
         
@@ -309,7 +309,7 @@ class editor_Models_Segment_AutoStates {
         $isTranslator = $tua->getRole() == $workflow::ROLE_TRANSLATOR;
         $autoState = $segment->getAutoStateId();
         if(!$isTranslator && ($autoState == self::TRANSLATED || $autoState == self::NOT_TRANSLATED)) {
-            if($this->isEditWithoutAssoc($tua,$segment)) {
+            if($this->isEditWithoutAssoc($tua)) {
                 $stateToSet = self::REVIEWED_PM_UNCHANGED;
             }
             else {
@@ -337,18 +337,17 @@ class editor_Models_Segment_AutoStates {
     /**
      * returns true if user has right to edit all Tasks, checks optionally the workflow role of the user
      * @param editor_Models_TaskUserAssoc $tua optional, if not given only acl is considered
-     * @param editor_Models_Segment $segment used to load the task so the userGuid can be check
      */
-    protected function isEditWithoutAssoc(editor_Models_TaskUserAssoc $tua = null,editor_Models_Segment $segment) {
+    protected function isEditWithoutAssoc(editor_Models_TaskUserAssoc $tua) {
         $userSession = new Zend_Session_Namespace('user');
         $role = $tua && $tua->getRole();
         $acl = ZfExtended_Acl::getInstance();
         
         //load the task so the check if the loagged user is also the pm to the task
-        $task=ZfExtended_Factory::get('editor_Models_Task');
+        $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($segment->getTaskGuid());
-        $sameUserGuid=$task->getPmGuid() === $userSession->data->userGuid;
+        $task->loadByTaskGuid($tua->getTaskGuid());
+        $sameUserGuid = $task->getPmGuid() === $userSession->data->userGuid;
         return empty($role) && ($acl->isInAllowedRoles($userSession->data->roles,'editAllTasks') || $sameUserGuid);
     }
 }

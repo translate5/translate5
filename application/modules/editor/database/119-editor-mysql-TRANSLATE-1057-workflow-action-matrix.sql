@@ -35,15 +35,19 @@ CREATE TABLE `LEK_workflow_action` (
   `userState` VARCHAR(160) NULL COMMENT 'action os only triggered for the given state, null for all states',
   `actionClass` VARCHAR(160) NOT NULL COMMENT 'class to be called',
   `action` VARCHAR(160) NOT NULL COMMENT 'class method to be called',
+  `parameters` VARCHAR(255) NULL COMMENT 'parameters given to the action, stored as JSON here',
   `position` INT(11) NOT NULL DEFAULT 0 COMMENT 'defines the sort order of actions with same conditions',
   PRIMARY KEY (`id`),
   INDEX (`workflow` ASC, `trigger` ASC, `position` ASC)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `LEK_workflow_action` (`workflow`,`trigger`,`inStep`,`byRole`,`userState`,`actionClass`,`action`,`position`)
+INSERT INTO `LEK_workflow_action` (`workflow`,`trigger`,`inStep`,`byRole`,`userState`,`actionClass`,`action`,`parameters`,`position`)
 VALUES 
-('default', 'handleAllFinishOfARole', 'lectoring', 'lector', 'finished', 'editor_Workflow_Actions', 'segmentsSetUntouchedState',0),
-('default', 'handleAllFinishOfARole', 'lectoring', 'lector', 'finished', 'editor_Workflow_Actions', 'taskSetRealDeliveryDate',1),
-('default', 'handleAllFinishOfARole', null, null, 'finished', 'editor_Workflow_Notification', 'notifyAllFinishOfARole',2),
-('default', 'handleUserAssociationAdded', null, null, null, 'editor_Workflow_Notification', 'notifyNewTaskAssigned', 0),
-('default', 'handleUnfinish', null, 'lector', null, 'editor_Workflow_Actions', 'segmentsSetInitialState', 0);
+('default', 'handleAllFinishOfARole', 'lectoring', 'lector', 'finished', 'editor_Workflow_Actions', 'segmentsSetUntouchedState', null, 0),
+('default', 'handleAllFinishOfARole', 'lectoring', 'lector', 'finished', 'editor_Workflow_Actions', 'taskSetRealDeliveryDate', null, 1),
+('default', 'handleAllFinishOfARole', null, null, 'finished', 'editor_Workflow_Notification', 'notifyAllFinishOfARole', null, 2),
+('default', 'handleUserAssociationAdded', null, null, null, 'editor_Workflow_Notification', 'notifyNewTaskAssigned', null, 0),
+('default', 'handleUnfinish', null, 'lector', null, 'editor_Workflow_Actions', 'segmentsSetInitialState', null, 0),
+('default', 'handleBeforeImport', null, null, null, 'editor_Workflow_Actions', 'autoAssociateTaskPm', null, 0),
+('default', 'handleImport', null, null, null, 'editor_Workflow_Notification', 'notifyNewTaskForPm', null, 0),
+('default', 'handleImport', null, null, null, 'editor_Workflow_Actions', 'autoAssociateEditorUsers', null, 1);

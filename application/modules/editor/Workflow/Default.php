@@ -47,50 +47,22 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      * @see editor_Workflow_Abstract::handleImport()
      */
     protected function handleImport(){
+        $this->doDebug(__FUNCTION__);
         $stepName = (bool) $this->newTask->getEmptyTargets() ? self::STEP_TRANSLATION : self::STEP_LECTORING;
         $this->initWorkflowStep($this->newTask, $stepName);
-        
-        $this->autoAssociateUsers($stepName);
-        
+        $this->newTask->load($this->newTask->getId()); //reload task with new workflowStepName and new calculated workflowStepNr
+        $this->callActions(__FUNCTION__, $stepName);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see editor_Workflow_Abstract::handleBeforeImport()
+     */
+    protected function handleBeforeImport(){
         $this->doDebug(__FUNCTION__);
+        $this->callActions(__FUNCTION__);
     }
-    
-    protected function autoAssociateUsers($stepName) {
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $user ZfExtended_Models_User */
-        
-        $sourceLang = $this->newTask->getSourceLang();
-        $targetLang = $this->newTask->getTargetLang();
-        
-        $role = $this->getRoleOfStep($stepName);
-        if(!$role) {
-            return;
-        }
-        $states = $this->getInitialStates();
-        $state = $states[$stepName][$role];
-        
-        $users = $user->loadAllByLanguages($sourceLang, $targetLang);
-        foreach($users as $user) {
-            $roles = explode(',', $user['roles']);
-            $isPm = in_array(ACL_ROLE_PM, $roles);
-            $isAdmin = in_array(ACL_ROLE_ADMIN, $roles);
-            $isEditor = in_array(ACL_ROLE_EDITOR, $roles);
-            if(!$isEditor || $isPm || $isAdmin) {
-                continue;
-            }
-            $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-            /* @var $tua editor_Models_TaskUserAssoc */
-            $tua->setRole($role);
-            $tua->setState($state);
-            $tua->setUserGuid($user['userGuid']);
-            $tua->setTaskGuid($this->newTask->getTaskGuid());
-            //entity version?
-            $tua->save();
-            $this->newTaskUserAssoc = $tua;
-            $this->handleUserAssociationAdded();
-        }
-    }
-    
+
     /**
      * (non-PHPdoc)
      * @see editor_Workflow_Abstract::handleAllFinishOfARole()
@@ -239,11 +211,17 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
         }
     }
     
+    /**
+     * {@inheritDoc}
+     * @see editor_Workflow_Abstract::handleUserAssociationAdded()
+     */
     protected function handleUserAssociationAdded() {
         $this->doDebug(__FUNCTION__);
         $tua = $this->newTaskUserAssoc;
-        $this->newTask = ZfExtended_Factory::get('editor_Models_Task');
-        $this->newTask->loadByTaskGuid($tua->getTaskGuid());
+        if(empty($this->newTask)) {
+            $this->newTask = ZfExtended_Factory::get('editor_Models_Task');
+            $this->newTask->loadByTaskGuid($tua->getTaskGuid());
+        }
         $this->callActions(__FUNCTION__, $this->newTask->getWorkflowStepName(), $tua->getRole(), $tua->getState());
     }
 

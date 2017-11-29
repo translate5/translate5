@@ -27,28 +27,25 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Workflow Action Configuration Struct 
+/**#@+
+ * @author Marc Mittag
+ * @package portal
+ * @version 2.0
+ *
  */
-class editor_Workflow_Actions_Config {
-    /**
-     * @var editor_Workflow_Abstract 
-     */
-    public $workflow;
+
+$session = new Zend_Session_Namespace();
+$portal = $session->runtimeOptions->server->protocol.$session->runtimeOptions->server->name;
+$this->portalLink = '<a href="'.$portal.'">'.$portal.'</a>';
+$this->companyName = $session->runtimeOptions->companyName;
     
-    /**
-     * @var editor_Models_Task 
-     */
-    public $task;
+$this->header = $this->templateApply('{mailEmployeeSalutation()} {user.surName},<br />
+<br />');
 
-    /**
-     * @var editor_Models_TaskUserAssoc
-     */
-    public $newTua;
+$this->footer = $this->templateApply('<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />{companyName}
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!');
 
-    /**
-     * only available for import actions
-     * @var editor_Models_Import_Configuration
-     */
-    public $importConfig;
-}

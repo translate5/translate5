@@ -148,6 +148,12 @@ abstract class editor_Workflow_Abstract {
     protected $authenticatedUserModel;
     
     /**
+     * Import config, only available on workflow stuff triggerd in the context of an import 
+     * @var editor_Models_Import_Configuration
+     */
+    protected $importConfig = null;
+    
+    /**
      * lists all roles with read access to tasks
      * @var array 
      */
@@ -250,13 +256,18 @@ abstract class editor_Workflow_Abstract {
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         $events = Zend_EventManager_StaticEventManager::getInstance();
         $events->attach('Editor_TaskuserassocController', 'afterPostAction', function(Zend_EventManager_Event $event){
-            $this->newTaskUserAssoc = $event->getParam('entity');
-            $this->recalculateWorkflowStep($this->newTaskUserAssoc);
-            $this->handleUserAssociationAdded();
+            $tua = $event->getParam('entity');
+            $this->recalculateWorkflowStep($tua);
+            $this->doUserAssociationAdd($tua);
         });
         
         $events->attach('Editor_TaskuserassocController', 'afterDeleteAction', function(Zend_EventManager_Event $event){
             $this->recalculateWorkflowStep($event->getParam('entity'));
+        });
+        
+        $events->attach('editor_Models_Import', 'beforeImport', function(Zend_EventManager_Event $event){
+            $this->newTask = $event->getParam('task');
+            $this->handleBeforeImport();
         });
     }
     
@@ -727,7 +738,6 @@ abstract class editor_Workflow_Abstract {
         //ensure that segment MV is createad
         $task->createMaterializedView();
         $this->recalculateWorkflowStep($newTua);
-        
         $state = $this->getTriggeredState($oldTua, $newTua);
         if(!empty($state)) {
             if(method_exists($this, $state)) {
@@ -761,11 +771,44 @@ abstract class editor_Workflow_Abstract {
             else {
                 $instance = $instances[$class];
             }
-            $msg = 'Workflow called action '.$class.'::'.$method.'() through trigger '.$trigger;
-            $msg .= ' with step '.$step.' with role '.$role.' and state '.$state;
+            
+            $msg = $this->actionDebugMessage($action, $trigger, $step, $role, $state);
             $this->doDebug($msg);
-            $instance->$method();
+            if(empty($action['parameters'])) {
+                call_user_func([$instance, $method]);
+                continue;
+            }
+            call_user_func([$instance, $method], json_decode($action['parameters']));
+            if(json_last_error() != JSON_ERROR_NONE) {
+                $this->doDebug('Last Workflow called action: JSON Parameters for last call could not be parsed with message: '.json_last_error_msg());
+            }
         }
+    }
+    
+    /**
+     * generates a debug message for called actions
+     * @param array $action
+     * @param string $trigger
+     * @param string $step
+     * @param string $role
+     * @param string $state
+     * @return string
+     */
+    protected function actionDebugMessage(array $action, $trigger, $step, $role, $state) {
+        $msg = 'Workflow called action '.$action['actionClass'].'::'.$action['action'].'() through trigger '.$trigger;
+        if(!empty($step)) {
+            $msg .= "\n".' with step '.$step;
+        }
+        if(!empty($role)) {
+            $msg .= "\n".' with role '.$role;
+        }
+        if(!empty($state)) {
+            $msg .= "\n".' and state '.$state;
+        }
+        if(!empty($action['parameters'])) {
+            $msg .= "\n".' and parameters '.$action['parameters'];
+        }
+        return $msg;
     }
     
     /**
@@ -778,6 +821,7 @@ abstract class editor_Workflow_Abstract {
         $config->workflow = $this;
         $config->newTua = $this->newTaskUserAssoc;
         $config->task = $this->newTask;
+        $config->importConfig = $this->importConfig;
         return $config;
     }
     
@@ -900,7 +944,7 @@ abstract class editor_Workflow_Abstract {
         $task->updateWorkflowStep($stepName, false);
         $log = ZfExtended_Factory::get('editor_Workflow_Log');
         /* @var $log editor_Workflow_Log */
-        //since we are in the import, we don't have the current user, but the pmGuid user of the task is the same:
+        //since we are in the import, we don't have the current user, so we use the pmGuid user of the task:
         $log->log($task, $task->getPmGuid()); 
     }
     
@@ -915,9 +959,19 @@ abstract class editor_Workflow_Abstract {
      * is called directly after import
      * @param editor_Models_Task $importedTask
      */
-    public function doImport(editor_Models_Task $importedTask) {
+    public function doImport(editor_Models_Task $importedTask, editor_Models_Import_Configuration $importConfig) {
         $this->newTask = $importedTask;
+        $this->importConfig = $importConfig;
         $this->handleImport();
+    }
+    
+    /**
+     * is called after a user association is added
+     * @param editor_Models_TaskUserAssoc $tua
+     */
+    public function doUserAssociationAdd(editor_Models_TaskUserAssoc $tua) {
+        $this->newTaskUserAssoc = $tua;
+        $this->handleUserAssociationAdded();
     }
     
     /**
@@ -998,6 +1052,11 @@ abstract class editor_Workflow_Abstract {
      * @abstract
      */
     abstract protected function handleImport();
+    
+    /**
+     * will be called directly before import is started, task is already created and available
+     */
+    abstract protected function handleBeforeImport();
     
     /**
      * will be called after a user has finished a task

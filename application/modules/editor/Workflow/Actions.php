@@ -57,6 +57,76 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
     }
     
     /**
+     * Associates automatically editor users to the task by users languages
+     */
+    public function autoAssociateEditorUsers() {
+        $task = $this->config->task;
+        $workflow = $this->config->workflow;
+        $stepName = $task->getWorkflowStepName();
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        
+        $sourceLang = $task->getSourceLang();
+        $targetLang = $task->getTargetLang();
+        
+        $role = $workflow->getRoleOfStep($stepName);
+        if(!$role) {
+            return;
+        }
+        $states = $workflow->getInitialStates();
+        $state = $states[$stepName][$role];
+        
+        $users = $user->loadAllByLanguages($sourceLang, $targetLang);
+        foreach($users as $user) {
+            $roles = explode(',', $user['roles']);
+            $isPm = in_array(ACL_ROLE_PM, $roles);
+            $isAdmin = in_array(ACL_ROLE_ADMIN, $roles);
+            $isEditor = in_array(ACL_ROLE_EDITOR, $roles);
+            if(!$isEditor || $isPm || $isAdmin) {
+                continue;
+            }
+            $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+            /* @var $tua editor_Models_TaskUserAssoc */
+            $tua->setRole($role);
+            $tua->setState($state);
+            $tua->setUserGuid($user['userGuid']);
+            $tua->setTaskGuid($task->getTaskGuid());
+            //entity version?
+            $tua->save();
+            $workflow->doUserAssociationAdd($tua);
+        }
+    }
+    
+    /**
+     * Associates automatically a different PM (The one who starts the import is the default) to the task by the PMs languages
+     * @return the new PM user, false if no one found
+     */
+    public function autoAssociateTaskPm() {
+        $task = $this->config->task;
+        $workflow = $this->config->workflow;
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        
+        $sourceLang = $task->getSourceLang();
+        $targetLang = $task->getTargetLang();
+        $users = $user->loadAllByLanguages($sourceLang, $targetLang);
+        
+        foreach($users as $userData) {
+            $roles = explode(',', $userData['roles']);
+            if(!in_array(ACL_ROLE_PM, $roles)) {
+                continue;
+            }
+            $user->init($userData);
+            $task->setPmGuid($user->getUserGuid());
+            $task->setPmName($user->getUsernameLong());
+            $task->save();
+            return $user;
+        }
+        return false;
+    } 
+    
+    
+    /**
      * updates all Auto States of this task
      * currently this method supports only updating to REVIEWED_UNTOUCHED and to initial (which is NOT_TRANSLATED and TRANSLATED)
      * @param string $taskGuid
