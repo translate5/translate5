@@ -207,7 +207,7 @@ class editor_Models_Segment_MaterializedView {
         $selectSql = join(',', $selectSql).', ';
         
         //build up the segment meta cache, currently only the min and max width 
-        $selectSql .= ' CONCAT(\'{"minWidth":\', m.minWidth, \',"maxWidth":\', m.maxWidth, \'}\') metaCache ';
+        $selectSql .= ' CONCAT(\'{"minWidth":\', ifnull(m.minWidth, \'null\'), \',"maxWidth":\', ifnull(m.maxWidth, \'null\'), \'}\') metaCache ';
         $selectSql .= ' FROM LEK_segment_data d, LEK_segments s';
         $selectSql .= ' LEFT JOIN LEK_segments_meta m ON m.taskGuid = s.taskGuid AND m.segmentId = s.id';
         $selectSql .= ' WHERE d.taskGuid = ? and s.taskGuid = d.taskGuid and d.segmentId = s.id';
