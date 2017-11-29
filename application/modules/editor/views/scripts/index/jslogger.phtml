@@ -53,8 +53,8 @@ END LICENSE AND COPYRIGHT
                     titleText: 'Submit translate5 crash report'
                 },
                 maxNbrOfReportedErrors : 1,
-                version : "", // TODO,
-                frameworkVersion : "" // TODO
+                version : "<?php echo $this->appVersion; ?>",
+                frameworkVersion : "ExtJS <?php echo $this->extJsVersion; ?>"
             });
         })();
     </script>

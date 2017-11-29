@@ -79,6 +79,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         /* @var $extJs ZfExtended_Controller_Helper_ExtJs */
         $this->view->extJsCss = $extJs->getCssPath();
         $this->view->extJsBasepath = $extJs->getHttpPath();
+        $this->view->extJsVersion = $extJs->getVersion();
         
         $this->view->buildType = 'development';
         
