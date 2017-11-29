@@ -221,6 +221,10 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                  */  
                 $log = new ZfExtended_Log(false);
                 $log->logException($e);
+                $msg  = 'Loaded Segment Master '.print_r($this->entity->getDataObject(),1)."\n";
+                empty($entity) || $msg .= 'Prepared Segment Alike  '.print_r($entity->getDataObject(),1);
+                empty($history) || $msg .= 'Prepared Segment History  '.print_r($history->getDataObject(),1);
+                $log->log('Additional log info to previous '.get_class($e).' exception', $msg);
                 continue;
             }
             //Mit ID als Index um Uniqness sicherzustellen (
