@@ -122,7 +122,12 @@ class editor_TaskController extends ZfExtended_RestController {
         if(empty($wfId)) {
             $wfId = $this->entity->getWorkflow();
         }
-        $this->workflow = $this->workflowManager->getCached($wfId);
+        try {
+            $this->workflow = $this->workflowManager->getCached($wfId);
+        }
+        catch (Exception $e) {
+            $this->workflow = $this->workflowManager->getCached('default');
+        }
     }
     
     /**
