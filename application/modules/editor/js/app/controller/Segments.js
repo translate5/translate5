@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -494,8 +493,8 @@ Ext.define('Editor.controller.Segments', {
       me.saveChainMutex = true;
       record = ed.context.record;
       ed.completeEdit();
-      //if completeEdit fails, the plugin remains editing and the record is not dirty.
-      if(ed.editing && !ed.context.record.dirty) {
+      //if completeEdit fails, the plugin remains editing
+      if(ed.editing) {
           //TODO the below by config bound handlers can also be bound elsewhere and get no information about success or failed chainend!
           me.saveChainEnd(); 
           return;

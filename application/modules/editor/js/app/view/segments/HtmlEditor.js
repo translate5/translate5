@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -158,7 +157,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   },
   
     /**
-     * Setzt Daten im HtmlEditor und fügt markup hinzu
+     * loads segment data into the HtmlEditor
+     * resets internally the markup table, so tag validations checks only the here set tags
      * @param value String
      */
     setValueAndMarkup: function(value, segmentId, fieldName){
@@ -175,8 +175,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         }else{
             me.setValue(me.markupForEditor(value)+checkTag);
         }
-        this.fireEvent('afterSetValueAndMarkup', this);
-
     },
   /**
    * Fixing focus issues EXT6UPD-105 and EXT6UPD-137
@@ -212,8 +210,12 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     return result;
   },
   /**
-   * ersetzt die div und spans durch images im string 
-   * @private
+   * - replaces div/span to images
+   * - prepares content to be edited
+   * - resets markupImages (tag map for restoring and tag check)
+   * - resets plainContent for checking if plain content was changed
+   * 
+   * @private not for direct usage!
    * @param value {String}
    * @returns {String}
    */
@@ -239,7 +241,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   insertMarkup: function(value, initMarkupMapOnly) {
       var html = this.markup(value).join(''),
           doc = this.getDoc(),
-          sel, range, frag, node, el, lastNode;
+          sel, range, frag, node, el, lastNode, rangeForNode;
       
       //if that parameter is true, no html is inserted into the target column
       if(initMarkupMapOnly) {
@@ -260,8 +262,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
             lastNode = frag.appendChild(node);
         }
         range.insertNode(frag);
+        rangeForNode = range.cloneRange();
         range.setStartAfter(lastNode);
         range.setEndAfter(lastNode); 
+        this.fireEvent('afterInsertMarkup', rangeForNode);
       }
   },
   /**
@@ -298,17 +302,18 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         plainContent.push(Ext.htmlEncode(text));
         return;
       }
-      // Keep nodes from TrackChanges, but replace their images
+      // Keep nodes from TrackChanges, but replace their images etc.
       if( (item.tagName.toLowerCase() == 'ins' || item.tagName.toLowerCase() == 'del')  && /(^|[\s])trackchanges([\s]|$)/.test(item.className)){
           // TrackChange-Node might include images: 
-          // (1) add the special id to the img:
-          // (2) replace the given divs and spans with their image:
-          var allImagesInItem = item.getElementsByTagName('IMG'),
+          // - add the special id to the img
+          // - replace the given divs and spans with their image
+          // TrackChange-Node might include TermTag: 
+          // - replace TermTag-divs with their corresponding span
+          var allImagesInItem = item.getElementsByTagName('IMG');
               allDivsInItem = item.getElementsByTagName('DIV');
           if (allImagesInItem.length > 0) {
               for (var i = allImagesInItem.length; i--; ) { // backwards because we might remove items
                   var imgItem = allImagesInItem[i];
-                  console.dir(imgItem);
                   if (!me.isDuplicateSaveTag(imgItem)) {
                       var htmlForItemImg = me.imgNodeToString(imgItem, true),
                       templateEl = document.createElement('template');
@@ -320,14 +325,36 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           }
           if (allDivsInItem.length > 0) {
               for (var i = allDivsInItem.length; i--; ) { // backwards because we might remove items
-                  var divItem = allDivsInItem[i],
+                  var divItem = allDivsInItem[i];
+                  if (divItem == null) {
+                      continue; // item might have been removed alreday
+                  }
+                  if(/(^|[\s])term([\s]|$)/.test(divItem.className)){
+                      var htmlForDivItem = '',
+                          termFoundCls = divItem.className;
+                      // TODO: is the same as below for "// Span für Terminologie"
+                      if(me.fieldTypeToEdit) {
+                          var replacement = me.fieldTypeToEdit+'-$1';
+                          termFoundCls = termFoundCls.replace(/(transFound|transNotFound|transNotDefined)/, replacement);
+                      }
+                      htmlForDivItem += Ext.String.format('<span class="{0}" title="{1}">', termFoundCls, divItem.title);
+                      htmlForDivItem += divItem.innerHTML;
+                      htmlForDivItem += '</span>';
+                      var templateEl = document.createElement('template');
+                      templateEl.innerHTML = htmlForDivItem;
+                      item.insertBefore(templateEl.content.firstChild,divItem.parentNode);
+                      item.removeChild(divItem.parentNode);
+                  } else {
+                      var divItem = allDivsInItem[i],
+                          dataOfItem,
+                          htmlForItemImg;
                       dataOfItem = me.getData(divItem,data),
                       htmlForItemImg = me.imageTemplate.apply(dataOfItem);
-                  console.dir(divItem);
-                  var templateEl = document.createElement('template');
-                  templateEl.innerHTML = htmlForItemImg;
-                  item.insertBefore(templateEl.content.firstChild,divItem);
-                  item.removeChild(divItem);
+                      var templateEl = document.createElement('template');
+                      templateEl.innerHTML = htmlForItemImg;
+                      item.insertBefore(templateEl.content.firstChild,divItem);
+                      item.removeChild(divItem);
+                  }
               }
           }
           item.innerHTML = item.innerHTML.replace(new RegExp(Editor.TRANSTILDE, "g"), ' ');
@@ -351,10 +378,13 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         me.result.push('</span>');
         return;
       }
+      //some tags are marked as to be igored in the editor, so we ignore them
+      if(item.tagName == 'DIV' && /(^|[\s])ignoreInEditor([\s]|$)/.test(item.className)){
+          return;
+      }
       if(item.tagName != 'DIV'){
         return;
       }
-      
       data = me.getData(item,data);
       
       me.result.push(me.imageTemplate.apply(data));
@@ -610,6 +640,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           foundIds = [];
       me.missingContentTags = [];
       me.duplicatedContentTags = [];
+      
+      //FIXME ignore deleted tags!
       Ext.each(nodelist, function(img) {
           if(Ext.Array.contains(foundIds, img.id)) {
               me.duplicatedContentTags.push(me.markupImages[img.id.replace(new RegExp('^'+me.idPrefix), '')]);

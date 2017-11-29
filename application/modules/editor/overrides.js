@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -224,30 +223,29 @@ Ext.override(Ext.util.CSS, {
     /***
      * Add a custom css to the given html page
      */
-    createStyleSheetToWindow : function(window,cssText, id) {
+    createStyleSheetToWindow : function(window, cssText, id) {
         var ss,
-            head = window.getElementsByTagName("head")[0],
-            styleEl = window.createElement("style");
+            head = window.getElementsByTagName('head')[0],
+            styleEl = window.createElement('style');
 
-        styleEl.setAttribute("type", "text/css");
+        styleEl.setAttribute('type', 'text/css');
+    
         if (id) {
-           styleEl.setAttribute("id", id);
+           styleEl.setAttribute('id', id);
         }
-
-        if (Ext.isIE) {
-           head.appendChild(styleEl);
-           ss = styleEl.styleSheet;
-           ss.cssText = cssText;
-        } else {
-            try{
-                styleEl.appendChild(window.createTextNode(cssText));
-            } catch(e) {
-               styleEl.cssText = cssText;
-            }
+    
+        // Feature detect old IE 
+        ss = styleEl.styleSheet;
+        if (ss) {
             head.appendChild(styleEl);
-            ss = styleEl.styleSheet ? styleEl.styleSheet : (styleEl.sheet || window.styleSheets[window.styleSheets.length-1]);
+            ss.cssText = cssText;
+        } else {
+            styleEl.appendChild(window.createTextNode(cssText));
+            head.appendChild(styleEl);
+            ss = styleEl.sheet;
         }
-        this.cacheStyleSheet(ss);
+    
+        Ext.util.CSS.cacheStyleSheet(ss);
         return ss;
     }
 })
