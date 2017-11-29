@@ -41,7 +41,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         orderDate:'#UT#Bestelldatum',
         pmGuid:'#UT#Projektmanager',
         btnSave: '#UT#Speichern',
-        successUpdate:'#UT#The task attributes are update successefuly',
+        successUpdate:'#UT#Die Aufgabe wurde erfolgreich aktualisiert',
     },
     itemId:'taskAttributesPanel',
     controller:'taskattributesviewcontroller',
