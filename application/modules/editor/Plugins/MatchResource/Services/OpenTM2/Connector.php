@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -205,6 +204,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         
         //$map is returned by reference
         $queryString = $internalTag->toXliffPaired($this->getQueryString($segment), true, $map);
+        $mapCount = count($map);
         
         if($this->api->lookup($segment, $queryString, $file->getFileName())){
             $result = $this->api->getResult();
@@ -213,15 +213,63 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
             }
             foreach($result->results as $found) {
                 $meta = new stdClass();
+                if(!$this->validateInternalTags($found, $segment)) {
+                    continue;
+                }
                 $target = $internalTag->reapply2dMap($found->target, $map);
+                $target = $this->replaceAdditionalTags($target, $mapCount);
                 $this->resultList->addResult($target, $found->matchRate, $this->getMetaData($found));
                 $source = $internalTag->reapply2dMap($found->source, $map);
+                $source = $this->replaceAdditionalTags($source, $mapCount);
                 $this->resultList->setSource($source);
             }
             
             return $this->resultList; 
         }
         $this->throwBadGateway();
+    }
+    
+    /**
+     * replace additional tags from the TM to internal tags which are ignored in the frontend then
+     * @param string $segment
+     * @param integer $mapCount used as start number for the short tag numbering
+     * @return string
+     */
+    protected function replaceAdditionalTags($segment, $mapCount) {
+        $singleTag = ZfExtended_Factory::get('editor_ImageTag_Single');
+        /* @var $singleTag editor_ImageTag_Single */
+        $shortTagNr = $mapCount;
+        return preg_replace_callback('#<(x|ex|bx|g|/g)[^>]*>#', function() use (&$shortTagNr, $singleTag) {
+            $shortTag = $shortTagNr++;
+            return $singleTag->getHtmlTag([
+                'class' => 'ignoreInEditor',
+                'text' => '&lt;AdditionalTagFromTM/&gt;',
+                'id' => 'toignore-'.$shortTag,
+                'shortTag' => $shortTag,
+                'filenameHash' => 'irrelevant'
+            ]);
+        }, $segment);
+    }
+
+    /**
+     * Checks OpenTM2 result on valid segments: <it> and <ph> are invalid since they can not handled by the replaceAdditionalTags method
+     * @param string $segmentContent
+     * @return boolean true if tags were valid
+     */
+    protected function validateInternalTags($result, editor_Models_Segment $seg) {
+        //just concat source and target to check both:
+        if(preg_match('#<(it|ph)[^>]*>#', $result->source.$result->target)) {
+            $log = ZfExtended_Factory::get('ZfExtended_Log');
+            /* @var $log ZfExtended_Log */
+            $sub = 'OpenTM2 result contains <it> or <ph> tags! Segment not shown as match result!';
+            $msg = 'The <ph> or <it> tag could not be reconverted to a usable tag, so that match result was ignored! '."\n\n";
+            $msg .= 'OpenTM2 Result: '.print_r($result,1)."\n";
+            $msg .= 'Segment: '.print_r($seg->getDataObject(),1)."\n";
+            $msg .= 'TMMT: '.print_r($this->tmmt->getDataObject(),1)."\n";
+            $log->log($sub,$msg);
+            return false;
+        }
+        return true;
     }
     
     /**

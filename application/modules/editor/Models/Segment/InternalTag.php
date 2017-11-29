@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -222,7 +221,6 @@ class editor_Models_Segment_InternalTag {
      * @param array $map not a a key:value map, but a 2d array, since keys can exist multiple times
      */
     public function reapply2dMap(string $segment, array $map) {
-        $nextTagNr = 1;
         foreach($map as $tupel) {
             $key = $tupel[0];
             $value = $tupel[1];
@@ -231,11 +229,6 @@ class editor_Models_Segment_InternalTag {
             if ($pos !== false) {
                 $segment = mb_substr($segment, 0, $pos).$value.mb_substr($segment, $pos + mb_strlen($key));
             }
-            $nextTagNr++;
-        }
-        while(preg_match('"<x[^>]*>"', $segment)){
-            $segment = preg_replace('"<x[^>]*>"','<div class="single replaceThisTagWhenInsertingInSegment"><span title="<AdditionalTagFromTM/>" class="short">&lt;'.$nextTagNr.'/&gt;</span><span data-originalid="ph" data-filename="irrelevant" class="full">&lt;AdditionalTagFromTM/&gt;</span></div>',$segment,1);
-            $nextTagNr++;
         }
         return trim($segment);
     }

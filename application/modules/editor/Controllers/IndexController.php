@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -80,6 +79,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         /* @var $extJs ZfExtended_Controller_Helper_ExtJs */
         $this->view->extJsCss = $extJs->getCssPath();
         $this->view->extJsBasepath = $extJs->getHttpPath();
+        $this->view->extJsVersion = $extJs->getVersion();
         
         $this->view->buildType = 'development';
         
@@ -227,7 +227,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('helpUrl',$rop->helpUrl);
       
       //maintenance start date
-      $this->view->Php2JsVars()->set('maintenance.startDate',isset($rop->maintenance->startDate)?$rop->maintenance->startDate:'');
+      if(isset($rop->maintenance->startDate)) {
+          $startDate = date(DATE_ISO8601, strtotime($rop->maintenance->startDate));
+      }
+      else{
+          $startDate = '';
+      }
+      $this->view->Php2JsVars()->set('maintenance.startDate',$startDate);
       //maintenance warning panel is showed
       $this->view->Php2JsVars()->set('maintenance.timeToNotify',isset($rop->maintenance->timeToNotify)?$rop->maintenance->timeToNotify:'');
       //minutes before the point in time of the update the application is locked for new log-ins
@@ -312,7 +318,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             if($role == 'noRights' || $role == 'basic') {
                 continue;
             }
-            //set the setable, if the user is able to set/modefy this role
+            //set the setable, if the user is able to set/modify this role
             $roles[$role] = [
                     'label' => $this->translate->_(ucfirst($role)),
                     'setable' => $acl->isInAllowedRoles($userRoles, "setaclrole", $role)
