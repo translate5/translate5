@@ -33,7 +33,8 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
     requires: [
                'Editor.view.admin.task.PreferencesWindowViewModel',
                'Editor.view.admin.task.UserAssoc',
-               'Editor.view.admin.task.Preferences'
+               'Editor.view.admin.task.Preferences',
+               'Editor.view.admin.task.TaskAttributes'
                ],
     itemId: 'adminTaskPreferencesWindow',
     title: '#UT#Einstellungen zu Aufgabe "{0}"',
@@ -68,6 +69,17 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                 xtype: 'editorAdminTaskPreferences'
             });
         }
+
+        if(auth.isAllowed('editorEditTaskRealDeliveryDate') || 
+            auth.isAllowed('editorEditTaskOrderDate') || 
+            auth.isAllowed('editorEditTaskPm') || 
+            auth.isAllowed('editorEditTaskDeliveryDate') ||
+            auth.isAllowed('editorEditTaskTaskName')){
+            tabs.push({
+                xtype: 'taskattributes'
+            });
+        }
+        
         config = {
             height: Math.min(800, parseInt(Ext.getBody().getViewSize().height * 0.8)),
             width: 1000,

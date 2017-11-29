@@ -510,6 +510,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           success: function(rec) {
               var combo = me.getTaskWorkflow(),
                   wf = rec.get('workflow');
+                if(!combo){
+                    return;
+                }
               combo.suspendEvents();
               combo.setValue(wf);
               combo.resetOriginalValue();
