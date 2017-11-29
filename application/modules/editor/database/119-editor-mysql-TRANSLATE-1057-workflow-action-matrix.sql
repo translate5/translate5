@@ -41,11 +41,11 @@ CREATE TABLE `LEK_workflow_action` (
   INDEX (`workflow` ASC, `trigger` ASC, `position` ASC)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `LEK_workflow_action` (`workflow`,`trigger`,`inStep`,`byRole`,`userState`,`actionClass`,`action`,`position`)
+INSERT INTO `LEK_workflow_action` (`workflow`,`trigger`,`inStep`,`byRole`,`userState`,`actionClass`,`action`,`parameters`,`position`)
 VALUES 
 ('default', 'handleAllFinishOfARole', 'lectoring', 'lector', 'finished', 'editor_Workflow_Actions', 'segmentsSetUntouchedState', null, 0),
 ('default', 'handleAllFinishOfARole', 'lectoring', 'lector', 'finished', 'editor_Workflow_Actions', 'taskSetRealDeliveryDate', null, 1),
-('default', 'handleAllFinishOfARole', null, null, 'finished', 'editor_Workflow_Notification', 'notifyAllFinishOfARole', '{"bccPm": true}', 2),
+('default', 'handleAllFinishOfARole', null, null, 'finished', 'editor_Workflow_Notification', 'notifyAllFinishOfARole', null, 2),
 ('default', 'handleUserAssociationAdded', null, null, null, 'editor_Workflow_Notification', 'notifyNewTaskAssigned', null, 0),
 ('default', 'handleUnfinish', null, 'lector', null, 'editor_Workflow_Actions', 'segmentsSetInitialState', null, 0),
 ('default', 'handleBeforeImport', null, null, null, 'editor_Workflow_Actions', 'autoAssociateTaskPm', null, 0),

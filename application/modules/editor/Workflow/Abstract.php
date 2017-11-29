@@ -738,7 +738,6 @@ abstract class editor_Workflow_Abstract {
         //ensure that segment MV is createad
         $task->createMaterializedView();
         $this->recalculateWorkflowStep($newTua);
-        
         $state = $this->getTriggeredState($oldTua, $newTua);
         if(!empty($state)) {
             if(method_exists($this, $state)) {
@@ -806,7 +805,7 @@ abstract class editor_Workflow_Abstract {
         if(!empty($state)) {
             $msg .= "\n".' and state '.$state;
         }
-        if(empty($action['parameters'])) {
+        if(!empty($action['parameters'])) {
             $msg .= "\n".' and parameters '.$action['parameters'];
         }
         return $msg;

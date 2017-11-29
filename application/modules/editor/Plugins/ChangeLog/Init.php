@@ -45,6 +45,7 @@ class editor_Plugins_ChangeLog_Init extends ZfExtended_Plugin_Abstract {
     
     public function init() {
         $this->initEvents();
+        $this->addController('ChangelogController');
         $this->initRoutes();
     }
     
@@ -85,7 +86,6 @@ class editor_Plugins_ChangeLog_Init extends ZfExtended_Plugin_Abstract {
     protected function initRoutes() {
         $f = Zend_Registry::get('frontController');
         /* @var $f Zend_Controller_Front */
-        $f->addControllerDirectory(APPLICATION_PATH.'/'.$this->getPluginPath().'/Controllers', '_plugins_'.__CLASS__);
         $r = $f->getRouter();
         
         $restRoute = new Zend_Rest_Route($f, array(), array(

@@ -179,7 +179,7 @@ class editor_Models_Segment_AutoStates {
      */
     public function getRoleToStateMap() {
         return array(
-          'pm' => array(
+          ACL_ROLE_PM => array(
             self::REVIEWED_PM,
             self::REVIEWED_PM_AUTO,
             self::REVIEWED_PM_UNCHANGED,

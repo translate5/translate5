@@ -44,6 +44,12 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     protected $xmlCache = array();
     
     /**
+     * reusable $tua instance, instanced if needed
+     * @var editor_Models_TaskUserAssoc
+     */
+    protected $tua;
+    
+    /**
      * generates and returns the template path.
      * @param string $role the affected workflow role string
      * @param string $template the template name
@@ -100,17 +106,51 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     }
     
     /**
-     * Initiales the internal configuration through the given parameters and returns it
+     * Adds the users of the given cc/bcc role config to the email - if receiverRole is configured in config
+     * @param stdClass $triggerConfig the config object given in action matrix
+     * @param string $receiverRole the original receiver role of the notification to be sended
+     */
+    protected function addCopyReceivers(stdClass $triggerConfig, $receiverRole) {
+        $task = $this->config->task;
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+
+        $addReceivers = function($receiverRoleMap, $bcc = false) use ($receiverRole, $task, $user) {
+            $users = [];
+            foreach($receiverRoleMap as $recRole => $roles) {
+                if($recRole == '*' || $recRole == $receiverRole) {
+                    foreach($roles as $role) {
+                        $users = $this->tua->getUsersOfRoleOfTask($role, $task->getTaskGuid());
+                    }
+                }
+            }
+            foreach($users as $userData) {
+                $user->init($userData);
+                if($bcc) {
+                    $this->mailer->addBcc($user->getEmail());
+                }
+                else {
+                    $this->mailer->addCc($user->getEmail(), $user->getUserName());
+                }
+            }
+        };
+        
+        $addReceivers($triggerConfig->cc);
+        $addReceivers($triggerConfig->bcc, true);
+    }
+    
+    /**
+     * Initiales the internal trigger configuration through the given parameters and returns it
      * currently the following configuration parameters exist:
      * pmBcc boolean, true if the pm of the task should also receive the notification
      * rolesBcc array, list of workflow roles which also should receive the notification
      * @param $config
      * @return stdClass
      */
-    protected function initConfig(array $config) {
+    protected function initTriggerConfig(array $config) {
         $defaultConfig = new stdClass();
-        $defaultConfig->pmBcc = false;
-        $defaultConfig->rolesBcc = [];
+        $defaultConfig->cc = [];
+        $defaultConfig->bcc = [];
         if(empty($config)) {
             return $defaultConfig;
         }
@@ -130,11 +170,12 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * @param boolean $isCron
      */
     public function notifyAllFinishOfARole() {
-        $config = $this->initConfig(func_get_args());
+        $triggerConfig = $this->initTriggerConfig(func_get_args());
         $task = $this->config->task;
         $workflow = $this->config->workflow;
         $isCron = $workflow->isCalledByCron();
         $triggeringRole = $this->config->newTua->getRole();
+        $this->tua = clone $this->config->newTua; //we just reuse the already used entity
         $currentStep = $workflow->getStepOfRole($triggeringRole);
         if($currentStep === false){
             error_log("No workflow step to Role ".$triggeringRole." found! This is actually a workflow config error!");
@@ -144,10 +185,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         
         $nextRole = $workflow->getRoleOfStep((string)$workflow->getNextStep($currentStep));
         
-        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $tua editor_Models_TaskUserAssoc */
-        
-        $users = $tua->getUsersOfRoleOfTask($nextRole,$task->getTaskGuid());
+        $users = $this->tua->getUsersOfRoleOfTask($nextRole,$task->getTaskGuid());
         $params = array(
             'triggeringRole' => $triggeringRole,
             'nextRole' => $nextRole,
@@ -160,22 +198,13 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         );
         
         //send to the PM
-        $bccReceivers = [];
-        if($config->pmBcc) {
-            $bccReceivers = array_merge($bccReceivers, $this->getTaskPmUsers());
-        }
-        if(!empty($config->rolesBcc)) {
-            foreach($config->rolesBcc as $bccRole) {
-                $tua->getUsersOfRoleOfTask($bccRole,$task->getTaskGuid());
-            }
-        }
+        $pms = $this->getTaskPmUsers();
         foreach($pms as $pm) {
-            foreach($pms as $pm) {
-                $params['user'] = $pm;
-                $this->createNotification(ACL_ROLE_PM, __FUNCTION__, $params); //@todo PM currently not defined as WORKFLOW_ROLE, so hardcoded here
-                $this->attachXliffSegmentList($segmentHash, $segments);
-                $this->notify($pm);
-            }
+            $params['user'] = $pm;
+            $this->createNotification(ACL_ROLE_PM, __FUNCTION__, $params); //@todo PM currently not defined as WORKFLOW_ROLE, so hardcoded here
+            $this->attachXliffSegmentList($segmentHash, $segments);
+            $this->addCopyReceivers($triggerConfig, ACL_ROLE_PM);
+            $this->notify($pm);
         }
         
         if(is_null($nextRole)){
@@ -187,6 +216,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             $params['user'] = $user;
             $this->createNotification($nextRole, __FUNCTION__, $params);
             $this->attachXliffSegmentList($segmentHash, $segments);
+            $this->addCopyReceivers($triggerConfig, $nextRole);
             $this->notify($user);
         }
     }

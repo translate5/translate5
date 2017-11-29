@@ -139,6 +139,8 @@ class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity
     }
     /**
      * Generates usergroup bit map based on the aclRoles of the user
+     * If the user has a role not configured here, this has no influence on the bit map
+     * 
      * @param stdClass $userData
      * @return integer
      */
@@ -155,13 +157,12 @@ class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity
     }
     
     protected function checkGroups() {
-        $aclConfig = ZfExtended_Acl::getInstance()->_aclConfigObject->toArray();
-        $configured = array_values($aclConfig['roles']);
+        $configured = ZfExtended_Acl::getInstance()->getRoles();
         $used = array_keys($this->aclRoleValue);
-        sort($used);
-        sort($configured);
-        if($used != $configured) {
-            throw new ZfExtended_Exception('In aclConfig.ini configured roles ('.join(';', $configured).') are not equal to the roles configured in Changelog Model ('.join(';', $used).')');
+        foreach($used as $role) {
+            if(!defined('ACL_ROLE_'.$role)){
+                error_log('In DB available roles ('.join(';', $configured).') does not contain all roles configured in Changelog Model ('.join(';', $used).')');
+            }
         }
     }
 }

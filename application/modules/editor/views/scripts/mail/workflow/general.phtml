@@ -34,25 +34,18 @@ END LICENSE AND COPYRIGHT
  *
  */
 
-/* @var $this Zend_View */
-$this->render('workflow/general.phtml');
+$session = new Zend_Session_Namespace();
+$portal = $session->runtimeOptions->server->protocol.$session->runtimeOptions->server->name;
+$this->portalLink = '<a href="'.$portal.'">'.$portal.'</a>';
+$this->companyName = $session->runtimeOptions->companyName;
+    
+$this->header = $this->templateApply('{mailEmployeeSalutation()} {user.surName},<br />
+<br />');
 
-$this->subject = $this->translate->_('Translate5 - Aufgabe zugewiesen').' "'.$this->task->getTaskNr().' - '.$this->task->getTaskName().'"';
-
-$this->sourceLanguageTranslated = $this->translate->_($this->sourceLanguage);
-$this->targetLanguageTranslated = $this->translate->_($this->targetLanguage);
-$this->relaisLanguageTranslated = $this->translate->_($this->relaisLanguage);
-$this->relaisLanguageFragment = ($this->relaisLanguage ? $this->translate->_('<b>Relaissprache:</b> {relaisLanguage}<br />') : '');
-
-$mailBody = $this->templateApply('{header}
-Im Projektportal {portalLink} wurde Ihnen die Aufgabe <b>{task.getTaskNr()} - {task.getTaskName()}</b> zugewiesen.<br />
-<b>Aufgabe:</b> {task.getTaskName()}<br />
-<b>Quellsprache:</b> {sourceLanguageTranslated}<br />
-<b>Zielsprache:</b> {targetLanguageTranslated}<br />
-{relaisLanguageFragment}<b>Lieferdatum:</b> {task.getTargetDeliveryDate()}<br />
-<b>Wortanzahl:</b> {task.getWordCount()}<br />
-{footer}');
-
-$this->textbody = strip_tags($mailBody);
-echo $mailBody;
+$this->footer = $this->templateApply('<br />
+<br />Vielen Dank und viele Grüße,
+<br />Ihr Projektmanagement Team
+<br />{companyName}
+<br />
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!');
 
