@@ -165,6 +165,7 @@ class editor_Models_Segment_MaterializedView {
         };
         
         $addColSql = $sfm->walkFields($walker);
+        $addColSql[] = 'ADD COLUMN `metaCache` longText NOT NULL';
         
         $sql = 'ALTER TABLE `'.$this->viewName.'` '.join(', ', $addColSql).';';
         $db->query($sql);
@@ -203,8 +204,12 @@ class editor_Models_Segment_MaterializedView {
         };
         //loop over all available segment fields for this task and create SQL for
         $sfm->walkFields($walker);
-        $selectSql = join(',', $selectSql);
+        $selectSql = join(',', $selectSql).', ';
+        
+        //build up the segment meta cache, currently only the min and max width 
+        $selectSql .= ' CONCAT(\'{"minWidth":\', m.minWidth, \',"maxWidth":\', m.maxWidth, \'}\') metaCache ';
         $selectSql .= ' FROM LEK_segment_data d, LEK_segments s';
+        $selectSql .= ' LEFT JOIN LEK_segments_meta m ON m.taskGuid = s.taskGuid AND m.segmentId = s.id';
         $selectSql .= ' WHERE d.taskGuid = ? and s.taskGuid = d.taskGuid and d.segmentId = s.id';
         $selectSql .= ' GROUP BY d.segmentId';
         
