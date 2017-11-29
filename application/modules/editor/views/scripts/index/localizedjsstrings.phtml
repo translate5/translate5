@@ -467,6 +467,20 @@ Ext.define('Editor.controller.Localizer', {
             emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe (kein Review)');?>'
         }
     });
+
+    Ext.define("Editor.locale.de.view.admin.task.TaskAttributes", {
+        override: "Editor.view.admin.task.TaskAttributes",
+        title: '<?php echo $this->translate->_('Eigenschaften');?>',
+        strings:{
+            taskName: '<?php echo $this->translate->_('Aufgabenname');?>',
+            deliveryDate: '<?php echo $this->translate->_('Lieferdatum (soll)');?>',
+            realDeliveryDate: '<?php echo $this->translate->_('Lieferdatum (ist)');?>',
+            orderDate: '<?php echo $this->translate->_('Bestelldatum');?>',
+            pmGuid: '<?php echo $this->translate->_('Projektmanager');?>',
+            btnSave: '<?php echo $this->translate->_('Speichern');?>',
+            successUpdate: '<?php echo $this->translate->_('The task attributes are update successefuly');?>',
+        }
+    });
     
     Ext.define("Editor.locale.de.view.admin.TaskAddWindow", {
         override: "Editor.view.admin.TaskAddWindow",

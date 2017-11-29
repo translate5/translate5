@@ -373,6 +373,7 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $oldTask = clone $this->entity;
         $this->decodePutData();
+        $this->checkTaskAttributeField();
         //was formerly in JS: if a userState is transfered, then entityVersion has to be ignored!
         if(!empty($this->data->userState)) {
             unset($this->data->entityVersion);
@@ -809,5 +810,49 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     protected function isLoggedUserTaskPm($taskPmGuid){
         return $this->user->data->userGuid===$taskPmGuid;
+    }
+    
+    /***
+     * Check if the user has rights to modefi the task attributes:taskName, targetDeliveryDate, realDeliveryDate, orderdate, pmGuid, pmName
+     */
+    public function checkTaskAttributeField(){
+        
+        if(!empty($this->data->taskName) && !$this->isAllowed('frontend','editorEditTaskTaskName')) {
+            unset($this->data->taskName);
+            error_log("The user is not allowed to modifi the taskName. taskGuid->".$this->data->taskGuid);
+        }
+        
+        if(!empty($this->data->targetDeliveryDate) && !$this->isAllowed('frontend','editorEditTaskDeliveryDate')) {
+            unset($this->data->targetDeliveryDate);
+            error_log("The user is not allowed to modifi the targetDeliveryDate. taskGuid->".$this->data->taskGuid);
+        }
+        
+        if(!empty($this->data->realDeliveryDate) && !$this->isAllowed('frontend','editorEditTaskRealDeliveryDate')) {
+            unset($this->data->realDeliveryDate);
+            error_log("The user is not allowed to modifi the realDeliveryDate. taskGuid->".$this->data->taskGuid);
+        }
+        
+        if(!empty($this->data->orderdate) && !$this->isAllowed('frontend','editorEditTaskOrderDate')) {
+            unset($this->data->orderdate);
+            error_log("The user is not allowed to modifi the orderdate. taskGuid->".$this->data->taskGuid);
+        }
+        
+        if(!empty($this->data->pmGuid) && !$this->isAllowed('frontend','editorEditTaskPm')) {
+            unset($this->data->pmGuid);
+            error_log("The user is not allowed to modifi the pmGuid. taskGuid->".$this->data->taskGuid);
+        }else if(!empty($this->data->pmGuid)){
+            //if the pmGuid is modefied, set the pmName
+            $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
+            /* @var $userModel  ZfExtended_Models_User*/
+            $user=$userModel->loadByGuid($this->data->pmGuid);
+            $this->data->pmName=$user->getUsernameLong();
+        }
+        
+        //we need to check also the pm name
+        if(!empty($this->data->pmName) && !$this->isAllowed('frontend','editorEditTaskPm')) {
+            unset($this->data->pmName);
+            error_log("The user is not allowed to modifi the pmName. taskGuid->".$this->data->taskGuid);
+        }
+        
     }
 }
