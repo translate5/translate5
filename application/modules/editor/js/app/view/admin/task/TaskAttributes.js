@@ -58,6 +58,12 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             title: me.title, //see EXT6UPD-9
             bodyPadding: 10,
             xtype: 'form',
+            width: '100%',
+            frame: true,
+            defaults: {
+                labelWidth: 200,
+                anchor: '100%'
+            },
             items:allowedItems,
             dockedItems: [
                 {
@@ -103,7 +109,6 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             items.push({
                 xtype: 'textfield',
                 fieldLabel: me.strings.taskName,
-                width:350,
                 dataIndex:'taskName',
                 itemId:'taskName',
                 bind:{
@@ -117,7 +122,6 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             items.push({
                 xtype: 'combo',
                 fieldLabel: me.strings.pmGuid,
-                width:350,
                 allowBlank: false,
                 listConfig: {
                     loadMask: false
@@ -155,7 +159,6 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             items.push({
                 xtype: 'datefield',
                 fieldLabel: me.strings.deliveryDate,
-                width:300,
                 dataIndex:'targetDeliveryDate',
                 itemId:'targetDeliveryDate',
                 bind:{
@@ -170,7 +173,6 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             items.push({
                 xtype: 'datefield',
                 fieldLabel: me.strings.realDeliveryDate,
-                width:300,
                 dataIndex:'realDeliveryDate',
                 itemId:'realDeliveryDate',
                 bind:{
@@ -184,7 +186,6 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             items.push({
                 xtype: 'datefield',
                 fieldLabel: me.strings.orderDate,
-                width:300,
                 dataIndex:'orderdate',
                 itemId:'orderdate',
                 bind:{
