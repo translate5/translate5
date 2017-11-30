@@ -244,8 +244,8 @@ Ext.define('Editor.controller.Segments', {
         if(!segmentStatusStrip){
             return;
         }
-        //set the record for each item in the status strip
-        segmentStatusStrip.setItemsRecord(contex.record);
+        //set the record and visible for each component in status strip
+        segmentStatusStrip.setRecordAndVisible(contex.record);
     },
 
   /**

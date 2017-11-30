@@ -76,7 +76,12 @@ Ext.define('Editor.model.Segment', {
         {name: 'comments', type: 'string', persist: false},
         {name: 'qmId', type: 'string'},
         {name: 'stateId', type: 'int'},
-        {name: 'metaCache', persist: false},
+        {name: 'metaCache', convert: function(val) {
+            if(!val || val==""){
+                return null;
+            }
+            return JSON.parse(val);
+        }, persist: false},
         {name: 'isWatched', type: 'boolean', persist: false},
         {name: 'segmentUserAssocId', type: 'int', persist: false}
     ],

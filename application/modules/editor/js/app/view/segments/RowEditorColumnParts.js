@@ -62,6 +62,7 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         //add the status strip component to the row editor
         me.mainEditor.add({
             xtype:'segments.statusstrip',
+            htmlEditor: me.mainEditor
         });
     },
     
