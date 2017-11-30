@@ -39,18 +39,24 @@ $this->render('workflow/general.phtml');
 
 $this->subject = $this->translate->_('Translate5 - Aufgabe zugewiesen').' "'.$this->task->getTaskNr().' - '.$this->task->getTaskName().'"';
 
-$this->sourceLanguageTranslated = $this->translate->_($this->sourceLanguage);
-$this->targetLanguageTranslated = $this->translate->_($this->targetLanguage);
-$this->relaisLanguageTranslated = $this->translate->_($this->relaisLanguage);
-$this->relaisLanguageFragment = ($this->relaisLanguage ? $this->translate->_('<b>Relaissprache:</b> {relaisLanguage}<br />') : '');
+//is automatically merged with data from general.phtml
+$data = [
+    'sourceLanguageTranslated' => $this->translate->_($this->sourceLanguage),
+    'targetLanguageTranslated' => $this->translate->_($this->targetLanguage),
+    'relaisLanguageTranslated' => $this->translate->_($this->relaisLanguage),
+    'relaisLanguageFragment' => ($this->relaisLanguage ? $this->translate->_('<b>Relaissprache:</b> {relaisLanguage}<br />') : ''),
+    'header' => $this->header,
+    'footer' => $this->footer,
+    'task' => $this->task->getDataObject(),
+];
 
 $mailBody = $this->templateApply('{header}
-Im Projektportal {portalLink} wurde Ihnen die Aufgabe <b>{task.getTaskNr()} - {task.getTaskName()}</b> zugewiesen.<br />
-<b>Aufgabe:</b> {task.getTaskName()}<br />
+Im Projektportal {portalLink} wurde Ihnen die Aufgabe <b>{task.taskNr} - {task.taskName}</b> zugewiesen.<br />
+<b>Aufgabe:</b> {task.taskName}<br />
 <b>Quellsprache:</b> {sourceLanguageTranslated}<br />
 <b>Zielsprache:</b> {targetLanguageTranslated}<br />
-{relaisLanguageFragment}<b>Lieferdatum:</b> {task.getTargetDeliveryDate()}<br />
-<b>Wortanzahl:</b> {task.getWordCount()}<br />
+{relaisLanguageFragment}<b>Lieferdatum:</b> {task.targetDeliveryDate)}<br />
+<b>Wortanzahl:</b> {task.wordCount)}<br />
 {footer}');
 
 $this->textbody = strip_tags($mailBody);

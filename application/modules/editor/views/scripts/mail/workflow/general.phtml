@@ -36,16 +36,21 @@ END LICENSE AND COPYRIGHT
 
 $session = new Zend_Session_Namespace();
 $portal = $session->runtimeOptions->server->protocol.$session->runtimeOptions->server->name;
-$this->portalLink = '<a href="'.$portal.'">'.$portal.'</a>';
-$this->companyName = $session->runtimeOptions->companyName;
+
+$data = [
+    'portalLink' => '<a href="'.$portal.'">'.$portal.'</a>',
+    'companyName' => $session->runtimeOptions->companyName,
+    'salutation' => $this->mailEmployeeSalutation(),
+    'surName' => $this->user->surName,
+];
     
-$this->header = $this->templateApply('{mailEmployeeSalutation()} {user.surName},<br />
-<br />');
+$this->header = $this->templateApply('{salutation} {surName},<br />
+<br />', $data);
 
 $this->footer = $this->templateApply('<br />
 <br />Vielen Dank und viele Grüße,
 <br />Ihr Projektmanagement Team
 <br />{companyName}
 <br />
-<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!');
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!', $data);
 
