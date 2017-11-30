@@ -698,7 +698,8 @@ abstract class editor_Workflow_Abstract {
         //a segment mv creation is currently not needed, since doEnd deletes it, and doReopen creates it implicitly!
 
         if($newState == $oldState) {
-            $this->events->trigger("doNothing", $this, array('oldTask' => $oldTask, 'newTask' => $newTask));
+            $this->doTaskChange();
+            $this->events->trigger("doTaskChange", $this, array('oldTask' => $oldTask, 'newTask' => $newTask));
             return; //saved some other attributes, do nothing
         }
         switch($newState) {
@@ -756,7 +757,9 @@ abstract class editor_Workflow_Abstract {
     protected function callActions($trigger, $step = null, $role = null, $state = null) {
         $actions = ZfExtended_Factory::get('editor_Models_Workflow_Action');
         /* @var $actions editor_Models_Workflow_Action */
-        $actions = $actions->loadByTrigger($this->getIdList(), $trigger, $step, $role, $state);
+        $workflows = $this->getIdList();
+        $actions = $actions->loadByTrigger($workflows, $trigger, $step, $role, $state);
+        $this->doDebug($this->actionDebugMessage($workflows, $trigger, $step, $role, $state));
         $instances = [];
         foreach($actions as $action) {
             $class = $action['actionClass'];
@@ -794,7 +797,14 @@ abstract class editor_Workflow_Abstract {
      * @return string
      */
     protected function actionDebugMessage(array $action, $trigger, $step, $role, $state) {
-        $msg = 'Workflow called action '.$action['actionClass'].'::'.$action['action'].'() through trigger '.$trigger;
+        if(!empty($action) && empty($action['actionClass'])) {
+            //called in context before action load
+            $msg = ' Try to load actions for workflow(s) "'.join(', ', $action).'" through trigger '.$trigger;
+        }
+        else {
+            //called in context after action loaded
+            $msg = ' Workflow called action '.$action['actionClass'].'::'.$action['action'].'() through trigger '.$trigger;
+        }
         if(!empty($step)) {
             $msg .= "\n".' with step '.$step;
         }
@@ -819,6 +829,7 @@ abstract class editor_Workflow_Abstract {
         /* @var $config editor_Workflow_Actions_Config */
         $config->workflow = $this;
         $config->newTua = $this->newTaskUserAssoc;
+        $config->oldTask = $this->oldTask;
         $config->task = $this->newTask;
         $config->importConfig = $this->importConfig;
         return $config;
@@ -991,6 +1002,23 @@ abstract class editor_Workflow_Abstract {
      * is called when a task assoc state gets OPEN
      */
     protected function doOpen() {
+    }
+    
+    /**
+     * is called when a task changes via API
+     */
+    protected function doTaskChange() {
+        $function = 'handleTaskChange';
+        $this->doDebug($function);
+        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        try {
+            $tua->loadByParams($this->authenticatedUser->userGuid, $this->newTask->getTaskGuid());
+            $this->callActions($function, $this->newTask->getWorkflowStepName(), $tua->getRole(), $tua->getState());
+        }
+        catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            $this->callActions($function, $this->newTask->getWorkflowStepName());
+        }
     }
     
     /**

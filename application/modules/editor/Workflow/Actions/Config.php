@@ -37,6 +37,13 @@ class editor_Workflow_Actions_Config {
     public $workflow;
     
     /**
+     * Task instance before task was changed
+     * @var editor_Models_Task 
+     */
+    public $oldTask;
+    
+    /**
+     * current task instance, with changes done by the current request
      * @var editor_Models_Task 
      */
     public $task;
