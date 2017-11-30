@@ -35,38 +35,64 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     extend: 'Ext.Component',
     alias: 'widget.segment.minmaxlength',
     itemId:'segmentMinMaxLength',
-
-    //tpl: '<div class="{status}" data-qtip="{info}">{}</div>',
-    
-    //controller: 'segment.minmaxlength',
-    //icon: Editor.data.moduleFolder+'images/comment_edit.png',
-    //iconAlign: 'right',
+    tpl: '<div style="color:{0};" data-qtip="{1}">{2}</div>',
     hidden:true,
-    //style: {
-    //    backgroundColor:'red',
-    //    border:'none',
-    //},
-    //bind:{
-    //    value:'{}'
-    //},
-    tooltip:"aaaaaaaaa",
-    //autoEl: {
-    //    tag: 'div',
-    //    'data-qtip': Ext.String.htmlEncode("aceeeeeeeee")
-    //},
+    strings:{
+        minMaxTooltip:'#UT#Maximale Länge: {0}; Minimale Länge: {1}'
+    },
+    /***
+     * Segment model record
+     */
+    segmentRecord:null,
+    initConfig : function(instanceConfig) {
+        var me=this,
+            config = {
+            };
+        me.htmlEditor=instanceConfig.htmlEditor;
+        me.htmlEditor.on({
+            change:{
+                fn:me.onHtmlEditorChange,
+                scope:me
+            },
+            initialize:{
+                fn:me.onHtmlEditorInitialize,
+                scope:me
+            }
+        });
+        if (instanceConfig) {
+            me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
+    },
 
-    //FIXME use the htmleditor chanbge ebvent
-    
+    /**
+     * Handler for html editor text change
+     */
+    onHtmlEditorChange:function(htmlEditor,newValue,oldValue,eOpts){
+        var me=this;
+        if(me.isVisible()){
+            me.updateLabel(me.segmentRecord,me.getSegmentCharactersCount(null));
+        }
+    },
+
+    /***
+     * Handler for html editor initializer, the function is called after the iframe is initialized
+     */
+    onHtmlEditorInitialize:function(htmlEditor,eOpts){
+        var me=this;
+        if(me.isVisible()){
+            me.updateLabel(me.segmentRecord,me.getSegmentCharactersCount(null));
+        }
+    },
+
+    /**
+     * Return true or false if the minmax status strip should be visible
+     */
     handleElementVisible:function(record){
         var me=this,
             metaCache=record.get('metaCache'),
-            isItemVisible=false;
-        debugger;
-        if(!metaCache){
-            return isItemVisible;
-            return;    
-        }
-        var charactersCount=me.getSegmentCharactersCount(record.get('targetEdit'));
+            charactersCount=me.getSegmentCharactersCount(record.get('targetEdit'));
+        
         if(charactersCount<1 || (metaCache.minWidth===null && metaCache.maxWidth===null)){
             return false;
         }
@@ -74,34 +100,54 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     },
 
     /***
-     * Update the component
+    * Set the segment record
     */
-    updateComponent:function(record){
-        console.log("min max call");
+    setSegmentRecord:function(record){
+        var me=this;
+        me.segmentRecord=null;
+        if(me.isVisible()){
+            me.segmentRecord=record;
+        }
     },
 
+    /**
+     * Update the minmax status strip label
+     */
     updateLabel:function(record,charactersCount){
         var me=this,
             metaCache=record.get('metaCache'),
             minWidth=metaCache.minWidth,
-            maxWidth=metaCache.maxWidth;
+            maxWidth=metaCache.maxWidth,
+            cssColor='red';
 
-        if(charactersCount>=minWidth &&  charactersCount<=maxWidth){
-            me.setStyle({
-                backgroundColor:'green'
-            })
-        }else{
-            me.setStyle({
-                backgroundColor:'red'
-            })
+        charactersCount-=174;
+        if(me.isCharactersInBorder(charactersCount,minWidth,maxWidth)){
+            cssColor='green'
         }
-
-        //me.setFieldLabel("{"+charactersCount+"} | min:{"+minWidth+"},max:{"+maxWidth+"}");
+        me.lookupTpl('tpl').overwrite(me.getEl(),[
+            cssColor,
+            Ext.String.format(me.strings.minMaxTooltip,maxWidth,minWidth),
+            "{ "+charactersCount+" }"
+        ]);
     },
 
+    /**
+     * Get the character count of the segment text, without the tags in it
+     */
     getSegmentCharactersCount:function(segmentText){
+        var me=this;
+        if(segmentText===null){
+            segmentText=me.htmlEditor.getValueAndUnMarkup();
+        }
         return segmentText.length;
     },
+
+    /**
+     * Check if the given number of characters is in between allowed range
+     */
+    isCharactersInBorder:function(charactersCount,minWidth,maxWidth){
+        return charactersCount>=minWidth && charactersCount<=maxWidth;
+    }
 
     
 });

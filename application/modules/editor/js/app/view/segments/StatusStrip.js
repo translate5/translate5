@@ -45,16 +45,19 @@ Ext.define('Editor.view.segments.StatusStrip', {
      */
     isChildVisible:false,
 
-    //items: [
-        //FIXME add minMaxLength directly in 
-    //],
+    /***
+     * Html editor instance
+     * @cfg {Editor.view.segments.HtmlEditor} htmlEditor
+     */
+    htmlEditor:null,
 
     initConfig : function(instanceConfig) {
         var me = this,
-        config = {
+            config = {
             //FIXME use configuration to disable this component
             items : [{
-                xtype:'segment.minmaxlength'
+                xtype:'segment.minmaxlength',
+                htmlEditor:instanceConfig.htmlEditor
             }]
         };
 
@@ -76,11 +79,11 @@ Ext.define('Editor.view.segments.StatusStrip', {
             if(item.handleElementVisible && item.handleElementVisible(record)){
                 item.setVisible(true);
                 //update the component (add css, tooltips, etc..), 
-                item.updateComponent && item.updateComponent(record);
                 me.isChildVisible=true;
             }else{
                 item.setVisible(false);
             }
+            item.setSegmentRecord && item.setSegmentRecord(record);
         });  
     },
 
