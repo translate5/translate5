@@ -3,6 +3,18 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.6.11] - 2017-11-30
+###Added
+TRANSLATE-935: Configure columns of task overview on system level
+
+###Changed
+TRANSLATE-905: Improve formatting of the maintenance mode message and add timezone to the timestamp.
+
+###Bugfixes
+T5DEV-198: Fixes for the non public VisualReview Plug-In
+TRANSLATE-1063: VisualReview Plug-In: missing CSS for internal tags and to much line breaks
+TRANSLATE-1053: Repetition editor starts over tag check dialog on overtaking segments from MatchResource
+
 ## [2.6.10] - 2017-11-14
 ###Added
 TRANSLATE-931: Tag check can NOT be skipped in case of error
