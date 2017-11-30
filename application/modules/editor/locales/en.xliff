@@ -1823,6 +1823,10 @@ You can access the portal at: %3$s<br />
 <br />
 <br />This e-mail has been generated automatically. Please do not reply to this e-mail.</target></trans-unit>
 <trans-unit id='RGVyIFdvcmtmbG93IFNjaHJpdHQgZGVyIEF1ZmdhYmUgd3VyZGUgenUgInswfSIgZ2XDpG5kZXJ0IQ=='><source>Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!</source><target>The workflow step of the task was changed to "{0}"!</target></trans-unit>
+  <trans-unit id='TWF4aW1hbGUgTMOkbmdlOiB7MH07IE1pbmltYWxlIEzDpG5nZTogezF9'>
+    <source>Maximale Länge: {0}; Minimale Länge: {1}</source>
+    <target>Maximum length: {0}; Minimum length: {1}</target>
+  </trans-unit>
     </body>
   </file>
 </xliff>

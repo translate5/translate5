@@ -302,6 +302,13 @@ Ext.define('Editor.controller.Localizer', {
             cantEditContents: '<?php echo $this->translate->_('Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.');?>'
         }
     });
+
+    Ext.define("Editor.locale.de.view.segments.MinMaxLength", {
+        override: "Editor.view.segments.MinMaxLength",
+        strings: {
+            minMaxTooltip: '<?php echo $this->translate->_('Maximale Länge: {0}; Minimale Länge: {1}');?>',
+        }
+    });
     
 
     Editor.view.segments.RowEditor.prototype.messages = {
