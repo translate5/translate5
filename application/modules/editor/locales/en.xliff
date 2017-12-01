@@ -1994,6 +1994,8 @@ You can access the portal at: %3$s<br />
 <trans-unit id='Q2hpbmVzaXNjaCAoTWFjYXUp'><source>Chinesisch (Macau)</source><target>Chinese (Macao)</target></trans-unit>
 <trans-unit id='Q2hpbmVzaXNjaCAoU2luZ2FwdXIp'><source>Chinesisch (Singapur)</source><target>Chinese (Singapore)</target></trans-unit>
 <trans-unit id='WnVsdSAoU8O8ZGFmcmlrYSk='><source>Zulu (Südafrika)</source><target>Zulu (South Africa)</target></trans-unit>
+<trans-unit id='SGVicsOkaXNjaCAoSXNyYWVsKQ=='><source>Hebräisch (Israel)</source><target>Hebrew (Israel)</target></trans-unit>
+<trans-unit id='S3VyZGlzY2g='><source>Kurdisch</source><target>Kurdish</target></trans-unit>
 <trans-unit id='QXBp'><source>API</source><target>API</target></trans-unit>
 <trans-unit id='UmVmZXJlbnpkYXRlaWVuIHZvcmhhbmRlbg=='><source>Referenzdateien vorhanden</source><target>Reference files exist</target></trans-unit>
 <trans-unit id='TGlzdGUgw7ZmZm5lbg=='><source>Liste öffnen</source><target>Open list</target></trans-unit>

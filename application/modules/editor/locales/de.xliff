@@ -697,7 +697,6 @@ Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-M
 <trans-unit id='QXJhYmlzY2g='><source>Arabisch</source><target>Arabisch</target></trans-unit>
 <trans-unit id='RnJhbnrDtnNpc2NoKEJlbGdpZW4p'><source>Französisch(Belgien)</source><target>Französisch(Belgien)</target></trans-unit>
 <trans-unit id='SGF1c3Nh'><source>Haussa</source><target>Haussa</target></trans-unit>
-<trans-unit id='SGVicsOkaXNjaA=='><source>Hebräisch</source><target>Hebräisch</target></trans-unit>
 <trans-unit id='U2VyYm8tS3JvYXRpc2No'><source>Serbo-Kroatisch</source><target>Serbo-Kroatisch</target></trans-unit>
 <trans-unit id='VXJkdQ=='><source>Urdu</source><target>Urdu</target></trans-unit>
 <trans-unit id='RmVobGVyIGJlaGViZW4='><source>Fehler beheben</source><target>Fehler beheben</target></trans-unit>
@@ -1252,6 +1251,8 @@ Im folgenden die getätigten Änderungen der vorhergehenden Übersetzer:<br />
 <trans-unit id='QXBp'><source>API</source><target>API</target></trans-unit>
 <trans-unit id='UmVmZXJlbnpkYXRlaWVuIHZvcmhhbmRlbg=='><source>Referenzdateien vorhanden</source><target>Referenzdateien vorhanden</target></trans-unit>
 <trans-unit id='TGlzdGUgw7ZmZm5lbg=='><source>Liste öffnen</source><target>Liste öffnen</target></trans-unit>
+<trans-unit id='SGVicsOkaXNjaCAoSXNyYWVsKQ=='><source>Hebräisch (Israel)</source><target>Hebräisch (Israel)</target></trans-unit>
+<trans-unit id='S3VyZGlzY2g='><source>Kurdisch</source><target>Kurdisch</target></trans-unit>
   </body>
  </file>
 </xliff>
