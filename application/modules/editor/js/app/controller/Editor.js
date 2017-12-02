@@ -67,9 +67,6 @@ Ext.define('Editor.controller.Editor', {
     },{
         ref:'filepanel',
         selector:'#filepanel'
-    },{
-        ref:'segmentMinMaxLength',
-        selector:'#segmentMinMaxLength'
     }],
     registeredTooltips: [],
     isEditing: false,
@@ -461,7 +458,7 @@ Ext.define('Editor.controller.Editor', {
         //since save without moving was triggered, we have to reset the calculated data
         me.prevNextSegment.reset();
 
-        if(me.isEditing &&rec && rec.get('editable') && me.checkSegmentLength(rec)) {
+        if(me.isEditing &&rec && rec.get('editable')) {
             me.fireEvent('saveUnsavedComments');
             me.fireEvent('saveSegment');
         }
@@ -1062,31 +1059,4 @@ Ext.define('Editor.controller.Editor', {
         filePanel.expand();
         filePanel.down('referenceFileTree').expand();
     },
-
-    /**
-     * Check if the segment character number is within the defined borders
-     */
-    checkSegmentLength:function(record){
-        var me=this,
-            segmentMinMaxLength=me.getSegmentMinMaxLength(),
-            metaCache=record.get('metaCache');
-        
-        if(!segmentMinMaxLength){
-            return true;
-        }
-
-        if(metaCache.minWidth===null && metaCache.maxWidth===null){
-            return true;
-        }
-        //get the characters length and is segment saveble
-        var charactersLength=segmentMinMaxLength.getSegmentCharactersCount(null),
-            saveSegment=segmentMinMaxLength.isCharactersInBorder(charactersLength,metaCache.minWidth,metaCache.maxWidth);
-
-        if(!saveSegment){
-            Editor.MessageBox.addWarning("Min max border length not supplied!");
-            return false;
-        }
-        return saveSegment;
-    }
-  
 });

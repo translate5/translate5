@@ -35,10 +35,12 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     extend: 'Ext.Component',
     alias: 'widget.segment.minmaxlength',
     itemId:'segmentMinMaxLength',
-    tpl: '<div style="color:{0};" data-qtip="{1}">{2}</div>',
+    tpl: '<div style="background-color:{0};" data-qtip="{1}"><strong style="margin:0.3em;">{2}</strong></div>',
     hidden:true,
     strings:{
-        minMaxTooltip:'#UT#Maximale Länge: {0}; Minimale Länge: {1}'
+        minTooltip:'#UT#Minimale Länge: {0};',
+        maxTooltip:'#UT#Maximale Länge: {0};',
+        segmentNotInRange:'#UT#Das Segment ist nicht innerhalb der definierten Zeichenlänge'
     },
     /***
      * Segment model record
@@ -71,7 +73,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     onHtmlEditorChange:function(htmlEditor,newValue,oldValue,eOpts){
         var me=this;
         if(me.isVisible()){
-            me.updateLabel(me.segmentRecord,me.getSegmentCharactersCount(null));
+            me.updateLabel(me.segmentRecord,me.getSegmentCharactersCount(newValue));
         }
     },
 
@@ -81,7 +83,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     onHtmlEditorInitialize:function(htmlEditor,eOpts){
         var me=this;
         if(me.isVisible()){
-            me.updateLabel(me.segmentRecord,me.getSegmentCharactersCount(null));
+            me.updateLabel(me.segmentRecord,me.getSegmentCharactersCount(htmlEditor.getValue()));
         }
     },
 
@@ -91,9 +93,9 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     handleElementVisible:function(record){
         var me=this,
             metaCache=record.get('metaCache'),
-            charactersCount=me.getSegmentCharactersCount(record.get('targetEdit'));
+            charactersCount=me.getSegmentCharactersCount(me.htmlEditor.getValue());
         
-        if(charactersCount<1 || (metaCache.minWidth===null && metaCache.maxWidth===null)){
+        if(metaCache.minWidth===null && metaCache.maxWidth===null){
             return false;
         }
         return true;
@@ -118,16 +120,19 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             metaCache=record.get('metaCache'),
             minWidth=metaCache.minWidth,
             maxWidth=metaCache.maxWidth,
-            cssColor='red';
+            cssColor='#ff4242',
+            tooltipText='';
 
-        charactersCount-=174;
         if(me.isCharactersInBorder(charactersCount,minWidth,maxWidth)){
-            cssColor='green'
+            cssColor='#24f324'
         }
+        //if min or max is null do not display the tooltip
+        tooltipText+=minWidth!==null ? Ext.String.format(me.strings.minTooltip,minWidth) : "";
+        tooltipText+=maxWidth!==null ? Ext.String.format(me.strings.maxTooltip,maxWidth) : "";
         me.lookupTpl('tpl').overwrite(me.getEl(),[
             cssColor,
-            Ext.String.format(me.strings.minMaxTooltip,maxWidth,minWidth),
-            "{ "+charactersCount+" }"
+            tooltipText,
+            "  "+charactersCount+"  "
         ]);
     },
 
@@ -139,6 +144,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         if(segmentText===null){
             segmentText=me.htmlEditor.getValueAndUnMarkup();
         }
+        segmentText=me.cleanTextHtmlTags(segmentText);
         return segmentText.length;
     },
 
@@ -146,7 +152,56 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * Check if the given number of characters is in between allowed range
      */
     isCharactersInBorder:function(charactersCount,minWidth,maxWidth){
+        if(minWidth===null){
+            minWidth=0;
+        }
+        if(maxWidth===null){
+            maxWidth=Number.MAX_SAFE_INTEGER;
+        }
         return charactersCount>=minWidth && charactersCount<=maxWidth;
+    },
+
+    /**
+     * Check if the segment character number is within the defined borders
+     */
+    checkSegmentLength:function(record){
+        var me=this,
+            metaCache=record.get('metaCache');
+        
+        if(metaCache.minWidth===null && metaCache.maxWidth===null){
+            return true;
+        }
+        //get the characters length and is segment saveble
+        var charactersLength=me.getSegmentCharactersCount(null),
+            saveSegment=me.isCharactersInBorder(charactersLength,metaCache.minWidth,metaCache.maxWidth);
+
+        if(!saveSegment){
+            Editor.MessageBox.addWarning(me.strings.segmentNotInRange);
+            return false;
+        }
+        return saveSegment;
+    },
+
+    /***
+     * Remove the unneeded html tags from the segment
+     * 
+     * 
+     * TODO: probably wrong segment content text is passed to be mesured, check this
+     */
+    cleanTextHtmlTags:function(segmentText){
+        var res1=segmentText.replace(/<\/?bpt[^>]*>/ig,'');
+        res1=res1.replace(/<\/?ept[^>]*>/ig,'');
+        res1=res1.replace(/<\/?img[^>]*>/ig,'');//clean images tag
+        res1=res1.replace(/<\/?div[^>]*>/ig,'');//clean mqm tag
+        res1=res1.replace(/<del[^>]*>.*?<\/del>/ig,'');//clean del tag
+        res1=res1.replace(/<\/?ins[^>]*>/ig,'');//clean ins tag
+        res1=res1.replace(/<\/?span[^>]*>/ig,'');//clean term tag
+        //res1=Ext.util.Format.htmlEncode(res1);//FIXME this is a buggy functin
+        //this is the only function which does the job
+        var doc = new DOMParser().parseFromString(res1, "text/html");
+        res1=doc.documentElement.textContent;
+        doc=null;
+        return res1;
     }
 
     

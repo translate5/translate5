@@ -142,6 +142,12 @@ Ext.define('Editor.view.segments.RowEditing', {
     },
     //fixing https://www.sencha.com/forum/showthread.php?309102-ExtJS-6.0.0-RowEditor-Plugin-completeEdit-does-not-set-context-to-null&p=1128826#post1128826
     completeEdit: function() {
+        var minMaxLength=Ext.ComponentQuery.query('#segmentMinMaxLength');
+        //check if the the min/max length is supplied
+        //this needs to be checked before call parent
+        if(minMaxLength.length>=0 && !minMaxLength[0].checkSegmentLength(this.context.record)){
+            return;
+        }
         this.callParent(arguments);
         //if editing was successfully finished we should also reset context
         if(!this.editing) {

@@ -38,7 +38,11 @@ Ext.define('Editor.view.segments.StatusStrip', {
     ],
     framed: false,
     style: 'background: #e4edf4;',
-    layout:'hbox',
+    layout:"column",
+
+    defaults: {
+        margin: '0 5 0 5' //top right bottom left (clockwise) margins of each item/column,
+    },
 
     /***
      * Flag if there is a visible item in the status strip
