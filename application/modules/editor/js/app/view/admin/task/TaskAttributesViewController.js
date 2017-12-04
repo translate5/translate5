@@ -49,15 +49,27 @@ Ext.define('Editor.view.admin.task.TaskAttributesViewController', {
         if(!currentTask.dirty){
             return;
         }
-
+        me.getView().getEl().mask("Loading...");
+        
         currentTask.save({
             failure: function(record, operation) {
+                me.getView().getEl().unmask();
                 Editor.app.getController('ServerException').handleException(operation.error.response);
             },
             success: function(record, operation) {
+                me.getView().getEl().unmask();
                 Editor.MessageBox.addSuccess(me.getView().strings.successUpdate);
             },
         });
+    },
+    
+    onReloadTaskAttributesClick:function(){
+        //Reload the task
+        Editor.app.getController('Editor.controller.admin.TaskPreferences').handleReload();
+    },
+    
+    onCancelTaskAttributesClick:function(){
+        this.getView().up('window').destroy();
     }
 
 });

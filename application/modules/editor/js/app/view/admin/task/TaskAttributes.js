@@ -42,6 +42,9 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         pmGuid:'#UT#Projektmanager',
         btnSave: '#UT#Speichern',
         successUpdate:'#UT#Die Aufgabe wurde erfolgreich aktualisiert',
+        btnCancel:'#UT#Abbrechen',
+        btnReload: '#UT#Aktualisieren',
+        loadingMask:'#UT#Aktualisieren',
     },
     itemId:'taskAttributesPanel',
     controller:'taskattributesviewcontroller',
@@ -76,13 +79,30 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                         },
                         {
                             xtype: 'button',
+                            itemId: 'cancelTaskAttributes',
+                            iconCls : 'ico-cancel',
+                            listeners:{
+                                click:'onCancelTaskAttributesClick'
+                            },
+                            text: me.strings.btnCancel
+                        },
+                        {
+                            xtype: 'button',
+                            itemId: 'reloadTaskAttributes',
+                            iconCls: 'ico-refresh',
+                            listeners:{
+                                click:'onReloadTaskAttributesClick'
+                            },
+                            text: me.strings.btnReload
+                        },{
+                            xtype: 'button',
                             itemId: 'saveTaskAttributes',
                             iconCls : 'ico-save',
                             listeners:{
                                 click:'onSaveTaskAttributesClick'
                             },
                             text: me.strings.btnSave
-                        }
+                        },
                     ]
                 }
             ]
@@ -95,8 +115,8 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
     },
 
     /***
-     * Return the allowed fields in the task attributes tab
-     * 
+     * Return the allowed fields in the task attributes tab. If the field is not allowed for the current logged user,
+     * the component type will be displayfield(the value will be noneditable)
      * @returns Array
      */
     getAllowedFields:function(){
@@ -104,6 +124,8 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             auth = Editor.app.authenticatedUser,
             items=[];
 
+        //TODO: the displayfield value is not selectable
+        //EXTJSBUG: https://www.sencha.com/forum/showthread.php?330319-Value-not-selectable-in-display-and-text-fields-under-6-2-0
         //is the user allowed to edit the task name
         if(auth.isAllowed('editorEditTaskTaskName')) {
             items.push({
@@ -111,6 +133,14 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                 fieldLabel: me.strings.taskName,
                 dataIndex:'taskName',
                 itemId:'taskName',
+                bind:{
+                    value:'{currentTask.taskName}'
+                }
+            });
+        }else{
+            items.push({
+                xtype: 'displayfield',
+                fieldLabel: me.strings.taskName,
                 bind:{
                     value:'{currentTask.taskName}'
                 }
@@ -150,7 +180,15 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                 dataIndex: 'pmGuid',
                 itemId: 'pmGuid',
                 displayField: 'longUserName',
-                valueField: 'userGuid',
+                valueField: 'userGuid'
+            });
+        }else{
+            items.push({
+                xtype: 'displayfield',
+                fieldLabel: me.strings.pmGuid,
+                bind:{
+                    value:'{currentTask.pmName}'
+                }
             });
         }
 
@@ -166,6 +204,17 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                 }
 
             });
+        }else{
+            items.push({
+                xtype: 'displayfield',
+                fieldLabel: me.strings.deliveryDate,
+                renderer: function(value, displayField) {
+                    return Ext.Date.format(value, 'm/d/Y');
+                },
+                bind:{
+                    value:'{currentTask.targetDeliveryDate}'
+                }
+            });
         }
 
         //is the user allowed to edit the real delivery date
@@ -179,6 +228,17 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                     value:'{currentTask.realDeliveryDate}'
                 }
             });
+        }else{
+            items.push({
+                xtype: 'displayfield',
+                fieldLabel: me.strings.realDeliveryDate,
+                renderer: function(value, displayField) {
+                    return Ext.Date.format(value, 'm/d/Y');
+                },
+                bind:{
+                    value:'{currentTask.realDeliveryDate}'
+                }
+            });
         }
 
         //is the user allowed to edit the order date
@@ -188,6 +248,17 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                 fieldLabel: me.strings.orderDate,
                 dataIndex:'orderdate',
                 itemId:'orderdate',
+                bind:{
+                    value:'{currentTask.orderdate}'
+                }
+            });
+        }else{
+            items.push({
+                xtype: 'displayfield',
+                fieldLabel: me.strings.orderDate,
+                renderer: function(value, displayField) {
+                    return Ext.Date.format(value, 'm/d/Y');
+                },
                 bind:{
                     value:'{currentTask.orderdate}'
                 }
