@@ -518,6 +518,11 @@ class editor_TaskController extends ZfExtended_RestController {
         $row['defaultSegmentLayout'] = $this->segmentFieldManager->isDefaultLayout(array_map(function($field){
             return $field['name'];
         }, $row['segmentFields']));
+            
+        // fire event (eg. for the userColorMap in the TrackChanges-Plugin)
+        $this->events->trigger("afterUserInfos", $this, array(
+                'entity' => $this->entity, 'row' => &$row)
+                );
     }
     
     /**
