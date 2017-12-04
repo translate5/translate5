@@ -1823,6 +1823,184 @@ You can access the portal at: %3$s<br />
 <br />
 <br />This e-mail has been generated automatically. Please do not reply to this e-mail.</target></trans-unit>
 <trans-unit id='RGVyIFdvcmtmbG93IFNjaHJpdHQgZGVyIEF1ZmdhYmUgd3VyZGUgenUgInswfSIgZ2XDpG5kZXJ0IQ=='><source>Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!</source><target>The workflow step of the task was changed to "{0}"!</target></trans-unit>
+<trans-unit id='UG9ydHVnaWVzaXNjaCAoQnJhc2lsaWVuKQ=='><source>Portugiesisch (Brasilien)</source><target>Portuguese (Brazil)</target></trans-unit>
+<trans-unit id='QXNlcmJhaWRzY2hhbmlzY2ggKExhdGVpbik='><source>Aserbaidschanisch (Latein)</source><target>Azerbaijani (Latin)</target></trans-unit>
+<trans-unit id='S2htZXI='><source>Khmer</source><target>Khmer</target></trans-unit>
+<trans-unit id='TWFsYXlzaXNjaA=='><source>Malaysisch</source><target>Malaysian</target></trans-unit>
+<trans-unit id='U2VyYmlzY2ggKExhdGVpbik='><source>Serbisch (Latein)</source><target>Serbian (Latin)</target></trans-unit>
+<trans-unit id='VXNiZWtpc2NoIChMYXRlaW4p'><source>Usbekisch (Latein)</source><target>Uzbek (Latin)</target></trans-unit>
+<trans-unit id='RGV1dHNjaCAow5ZzdGVycmVpY2gp'><source>Deutsch (Österreich)</source><target>German (Austria)</target></trans-unit>
+<trans-unit id='Tm9yd2VnaXNjaCAoTnlub3Jzayk='><source>Norwegisch (Nynorsk)</source><target>Norwegian (Nynorsk)</target></trans-unit>
+<trans-unit id='U2VyYmlzY2ggKEt5cmlsbGlzY2gp'><source>Serbisch (Kyrillisch)</source><target>Serbian (Cyrillic)</target></trans-unit>
+<trans-unit id='VXNiZWtpc2NoIChLeXJpbGxpc2NoKQ=='><source>Usbekisch (Kyrillisch)</source><target>Uzbek (Cyrillic)</target></trans-unit>
+<trans-unit id='QWZyaWthYW5zIChTw7xkYWZyaWthKQ=='><source>Afrikaans (Südafrika)</source><target>Afrikaans (South Africa)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKFZlcmVpbmlndGUgQXJhYmlzY2hlIEVtaXJhdGUp'><source>Arabisch (Vereinigte Arabische Emirate)</source><target>Arabic (United Arab Emirates)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKEJhaHJhaW4p'><source>Arabisch (Bahrain)</source><target>Arabic (Bahrain)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKEFsZ2VyaWVuKQ=='><source>Arabisch (Algerien)</source><target>Arabic (Algeria)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKMOEZ3lwdGVuKQ=='><source>Arabisch (Ägypten)</source><target>Arabic (Egypt)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKElyYWsp'><source>Arabisch (Irak)</source><target>Arabic (Iraq)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKEpvcmRhbmllbik='><source>Arabisch (Jordanien)</source><target>Arabic (Jordan)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKEt1d2FpdCk='><source>Arabisch (Kuwait)</source><target>Arabic (Kuwait)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKExpYmFub24p'><source>Arabisch (Libanon)</source><target>Arabic (Lebanon)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKExpYnllbik='><source>Arabisch (Libyen)</source><target>Arabic (Libya)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKE1hcm9ra28p'><source>Arabisch (Marokko)</source><target>Arabic (Morocco)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKE9tYW4p'><source>Arabisch (Oman)</source><target>Arabic (Oman)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKEthdGFyKQ=='><source>Arabisch (Katar)</source><target>Arabic (Qatar)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKFNhdWRpLUFyYWJpZW4p'><source>Arabisch (Saudi-Arabien)</source><target>Arabic (Saudi Arabia)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKFN5cmllbik='><source>Arabisch (Syrien)</source><target>Arabic (Syria)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKFR1bmVzaWVuKQ=='><source>Arabisch (Tunesien)</source><target>Arabic (Tunisia)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKEplbWVuKQ=='><source>Arabisch (Jemen)</source><target>Arabic (Yemen)</target></trans-unit>
+<trans-unit id='QXNlcmJhaWRzY2hhbmlzY2ggKEt5cmlsbGlzY2gp'><source>Aserbaidschanisch (Kyrillisch)</source><target>Azerbaijani (Cyrillic)</target></trans-unit>
+<trans-unit id='QXNlcmJhaWRzY2hhbmlzY2ggKExhdGVpbikgKEFzZXJiYWlkc2NoYW4p'><source>Aserbaidschanisch (Latein) (Aserbaidschan)</source><target>Azerbaijani (Latin) (Azerbaijan)</target></trans-unit>
+<trans-unit id='QXNlcmJhaWRzY2hhbmlzY2ggKEt5cmlsbGlzY2gpIChBc2VyYmFpZHNjaGFuKQ=='><source>Aserbaidschanisch (Kyrillisch) (Aserbaidschan)</source><target>Azerbaijani (Cyrillic) (Azerbaijan)</target></trans-unit>
+<trans-unit id='V2Vpw59ydXNzaXNjaCAoV2Vpw59ydXNzbGFuZCk='><source>Weißrussisch (Weißrussland)</source><target>Belorussian (Belarus)</target></trans-unit>
+<trans-unit id='QnVsZ2FyaXNjaCAoQnVsZ2FyaWVuKQ=='><source>Bulgarisch (Bulgarien)</source><target>Bulgarian (Bulgaria)</target></trans-unit>
+<trans-unit id='Qm9zbmlzY2ggKEJvc25pZW4gdW5kIEhlcnplZ293aW5hKQ=='><source>Bosnisch (Bosnien und Herzegowina)</source><target>Bosnian (Bosnia and Herzegovina)</target></trans-unit>
+<trans-unit id='S2F0YWxhbmlzY2ggKFNwYW5pZW4p'><source>Katalanisch (Spanien)</source><target>Catalan (Spain)</target></trans-unit>
+<trans-unit id='VHNjaGVjaGlzY2ggKFRzY2hlY2hpZW4p'><source>Tschechisch (Tschechien)</source><target>Czech (Czech Republic)</target></trans-unit>
+<trans-unit id='V2FsaXNpc2No'><source>Walisisch</source><target>Welsh</target></trans-unit>
+<trans-unit id='V2FsaXNpc2NoIChVSyk='><source>Walisisch (UK)</source><target>Welsh (UK)</target></trans-unit>
+<trans-unit id='RMOkbmlzY2ggKETDpG5lbWFyayk='><source>Dänisch (Dänemark)</source><target>Danish (Denmark)</target></trans-unit>
+<trans-unit id='RGV1dHNjaCAoU2Nod2Vpeik='><source>Deutsch (Schweiz)</source><target>German (Switzerland)</target></trans-unit>
+<trans-unit id='RGV1dHNjaCAoRGV1dHNjaGxhbmQp'><source>Deutsch (Deutschland)</source><target>German Germany)</target></trans-unit>
+<trans-unit id='RGV1dHNjaCAoTGllY2h0ZW5zdGVpbik='><source>Deutsch (Liechtenstein)</source><target>German (Liechtenstein)</target></trans-unit>
+<trans-unit id='RGV1dHNjaCAoTHV4ZW1idXJnKQ=='><source>Deutsch (Luxemburg)</source><target>German (Luxembourg)</target></trans-unit>
+<trans-unit id='RGhpdmVoaQ=='><source>Dhivehi</source><target>Dhivehi</target></trans-unit>
+<trans-unit id='RGhpdmVoaSAoTWFsZWRpdmVuKQ=='><source>Dhivehi (Malediven)</source><target>Dhivehi (Maldives)</target></trans-unit>
+<trans-unit id='R3JpZWNoaXNjaCAoR3JpZWNoZW5sYW5kKQ=='><source>Griechisch (Griechenland)</source><target>Greek (Greece)</target></trans-unit>
+<trans-unit id='RW5nbGlzY2ggKEF1c3RyYWxpZW4p'><source>Englisch (Australien)</source><target>English (Australia)</target></trans-unit>
+<trans-unit id='RW5nbGlzY2ggKEJlbGl6ZSk='><source>Englisch (Belize)</source><target>English (Belize)</target></trans-unit>
+<trans-unit id='RW5nbGlzY2ggKEthbmFkYSk='><source>Englisch (Kanada)</source><target>English (Canada)</target></trans-unit>
+<trans-unit id='RW5nbGlzY2ggKEthcmliaWsp'><source>Englisch (Karibik)</source><target>English (Caribbean)</target></trans-unit>
+<trans-unit id='RW5nbGlzY2ggKElybGFuZCk='><source>Englisch (Irland)</source><target>English (Ireland)</target></trans-unit>
+<trans-unit id='RW5nbGlzY2ggKEphbWFpa2Ep'><source>Englisch (Jamaika)</source><target>English (Jamaica)</target></trans-unit>
+<trans-unit id='RW5nbGlzY2ggKE5ldXNlZWxhbmQp'><source>Englisch (Neuseeland)</source><target>English (New Zealand)</target></trans-unit>
+<trans-unit id='RW5nbGlzY2ggKFBoaWxpcHBpbmVuKQ=='><source>Englisch (Philippinen)</source><target>English (Philippines)</target></trans-unit>
+<trans-unit id='RW5nbGlzY2ggKFRyaW5pZGFkIHVuZCBUb2JlZ28p'><source>Englisch (Trinidad und Tobego)</source><target>English (Trinidad and Tobego)</target></trans-unit>
+<trans-unit id='RW5nbGlzY2ggKFPDvGRhZnJpa2Ep'><source>Englisch (Südafrika)</source><target>English (South Africa)</target></trans-unit>
+<trans-unit id='RW5nbGlzY2ggKFNpbWJhYndlKQ=='><source>Englisch (Simbabwe)</source><target>English (Zimbabwe)</target></trans-unit>
+<trans-unit id='RXNwZXJhbnRv'><source>Esperanto</source><target>Esperanto</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKEFyZ2VudGluaWVuKQ=='><source>Spanisch (Argentinien)</source><target>Spanish (Argentina)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKEJvbGl2aWVuKQ=='><source>Spanisch (Bolivien)</source><target>Spanish (Bolivia)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKENoaWxlKQ=='><source>Spanisch (Chile)</source><target>Spanish (Chile)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKENvc3RhIFJpY2Ep'><source>Spanisch (Costa Rica)</source><target>Spanish (Costa Rica)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKERvbWluaWthbmlzY2hlIFJlcHVibGlrKQ=='><source>Spanisch (Dominikanische Republik)</source><target>Spanish (Dominican Republic)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKEVjdWFkb3Ip'><source>Spanisch (Ecuador)</source><target>Spanish (Ecuador)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKFNwYW5pZW4p'><source>Spanisch (Spanien)</source><target>Spanish (Spain)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKEd1YXRlbWFsYSk='><source>Spanisch (Guatemala)</source><target>Spanish (Guatemala)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKEhvbmR1cmFzKQ=='><source>Spanisch (Honduras)</source><target>Spanish (Honduras)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKE5pY2FyYWd1YSk='><source>Spanisch (Nicaragua)</source><target>Spanish (Nicaragua)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKFBhbmFtYSk='><source>Spanisch (Panama)</source><target>Spanish (Panama)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKFBlcnUp'><source>Spanisch (Peru)</source><target>Spanish (Peru)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKFB1ZXJ0byBSaWNvKQ=='><source>Spanisch (Puerto Rico)</source><target>Spanish (Puerto Rico)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKFBhcmFndWF5KQ=='><source>Spanisch (Paraguay)</source><target>Spanish (Paraguay)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKEVsIFNhbHZhZG9yKQ=='><source>Spanisch (El Salvador)</source><target>Spanish (El Salvador)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKFVydWd1YXkp'><source>Spanisch (Uruguay)</source><target>Spanish (Uruguay)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKFZlbmV6dWVsYSk='><source>Spanisch (Venezuela)</source><target>Spanish (Venezuela)</target></trans-unit>
+<trans-unit id='RXN0bmlzY2ggKEVzdGxhbmQp'><source>Estnisch (Estland)</source><target>Estonian (Estonia)</target></trans-unit>
+<trans-unit id='QmFza2lzY2g='><source>Baskisch</source><target>Basque</target></trans-unit>
+<trans-unit id='QmFza2lzY2ggKFNwYW5pZW4p'><source>Baskisch (Spanien)</source><target>Basque (Spain)</target></trans-unit>
+<trans-unit id='UGVyc2lzY2ggKElyYW4p'><source>Persisch (Iran)</source><target>Persian (Iran)</target></trans-unit>
+<trans-unit id='RmlubmlzY2ggKEZpbm5sYW5kKQ=='><source>Finnisch (Finnland)</source><target>Finnish (Finland)</target></trans-unit>
+<trans-unit id='RsOkcsO2aXNjaA=='><source>Färöisch</source><target>Faroese</target></trans-unit>
+<trans-unit id='RsOkcsO2aXNjaCAoRsOkcsO2ZXIp'><source>Färöisch (Färöer)</source><target>Faroese (Faroe Islands)</target></trans-unit>
+<trans-unit id='RnJhbnrDtnNpc2NoIChLYW5hZGEp'><source>Französisch (Kanada)</source><target>French (Canada)</target></trans-unit>
+<trans-unit id='RnJhbnrDtnNpc2NoIChTY2h3ZWl6KQ=='><source>Französisch (Schweiz)</source><target>French (Switzerland)</target></trans-unit>
+<trans-unit id='RnJhbnrDtnNpc2NoIChGcmFua3JlaWNoKQ=='><source>Französisch (Frankreich)</source><target>French (France)</target></trans-unit>
+<trans-unit id='RnJhbnrDtnNpc2NoIChMdXhlbWJ1cmcp'><source>Französisch (Luxemburg)</source><target>French (Luxembourg)</target></trans-unit>
+<trans-unit id='RnJhbnrDtnNpc2NoIChNb25hY28p'><source>Französisch (Monaco)</source><target>French (Monaco)</target></trans-unit>
+<trans-unit id='R2FsaWNpc2No'><source>Galicisch</source><target>Galician</target></trans-unit>
+<trans-unit id='R2FsaWNpc2NoIChTcGFuaWVuKQ=='><source>Galicisch (Spanien)</source><target>Galician (Spain)</target></trans-unit>
+<trans-unit id='R3VqYXJhdGkgKEluZGllbik='><source>Gujarati (Indien)</source><target>Gujarati (India)</target></trans-unit>
+<trans-unit id='SGVicsOkaXNjaGU='><source>Hebräische</source><target>Hebrew</target></trans-unit>
+<trans-unit id='SGVicsOkaXNjaGUgKElzcmFlbCk='><source>Hebräische (Israel)</source><target>Hebrew (Israel)</target></trans-unit>
+<trans-unit id='SGluZGkgKEluZGllbik='><source>Hindi (Indien)</source><target>Hindi (India)</target></trans-unit>
+<trans-unit id='S3JvYXRpc2NoIChCb3NuaWVuIHVuZCBIZXJ6ZWdvbWluYSk='><source>Kroatisch (Bosnien und Herzegomina)</source><target>Croatian (Bosnia and Herzegomina)</target></trans-unit>
+<trans-unit id='S3JvYXRpc2NoIChLcm9hdGllbik='><source>Kroatisch (Kroatien)</source><target>Croatian (Croatia)</target></trans-unit>
+<trans-unit id='VW5nYXJpc2NoIChVbmdhcm4p'><source>Ungarisch (Ungarn)</source><target>Hungarian (Hungary)</target></trans-unit>
+<trans-unit id='QXJtZW5pc2NoIChBcm1lbmllbik='><source>Armenisch (Armenien)</source><target>Armenian (Armenia)</target></trans-unit>
+<trans-unit id='SW5kb25lc2lzY2ggKEluZG9uZXNpZW4p'><source>Indonesisch (Indonesien)</source><target>Indonesian (Indonesia)</target></trans-unit>
+<trans-unit id='SXNsw6RuZGlzY2ggKElzbGFuZCk='><source>Isländisch (Island)</source><target>Icelandic (Iceland)</target></trans-unit>
+<trans-unit id='SXRhbGllbmlzY2ggKFNjaHdlaXop'><source>Italienisch (Schweiz)</source><target>Italian (Switzerland)</target></trans-unit>
+<trans-unit id='SXRhbGllbmlzY2ggKEl0YWxpZW4p'><source>Italienisch (Italien)</source><target>Italian (Italy)</target></trans-unit>
+<trans-unit id='SmFwYW5pc2NoIChKYXBhbik='><source>Japanisch (Japan)</source><target>Japanese (Japan)</target></trans-unit>
+<trans-unit id='R2Vvcmdpc2NoIChHZW9yaWdpZW4p'><source>Georgisch (Georigien)</source><target>Georgian (Georigia)</target></trans-unit>
+<trans-unit id='S2FzYWNoaXNjaCAoS2FzYWNoc3Rhbik='><source>Kasachisch (Kasachstan)</source><target>Kazakh (Kazakhstan)</target></trans-unit>
+<trans-unit id='S2FubmFkYSAoSW5kaWVuKQ=='><source>Kannada (Indien)</source><target>Kannada (India)</target></trans-unit>
+<trans-unit id='S29yZWFuaXNjaCAoS29yZWEp'><source>Koreanisch (Korea)</source><target>Korean (Korea)</target></trans-unit>
+<trans-unit id='S29ua2FuaQ=='><source>Konkani</source><target>Konkani</target></trans-unit>
+<trans-unit id='S29ua2FuaSAoSW5kaWVuKQ=='><source>Konkani (Indien)</source><target>Konkani (India)</target></trans-unit>
+<trans-unit id='S2lyZ2lzaXNjaCAoS2lyZ2lzaXN0YW4p'><source>Kirgisisch (Kirgisistan)</source><target>Kyrgyz (Kyrgyzstan)</target></trans-unit>
+<trans-unit id='TGl0YXVpc2NoIChMaXRhdWVuKQ=='><source>Litauisch (Litauen)</source><target>Lithuanian (Lithuania)</target></trans-unit>
+<trans-unit id='TGV0dGlzY2ggKExldHRsYW5kKQ=='><source>Lettisch (Lettland)</source><target>Latvian (Latvia)</target></trans-unit>
+<trans-unit id='TcSBb3Jp'><source>Māori</source><target>Māori</target></trans-unit>
+<trans-unit id='TcSBb3JpIChOZXVzZWVsYW5kKQ=='><source>Māori (Neuseeland)</source><target>Māori (New Zealand)</target></trans-unit>
+<trans-unit id='TWF6ZWRvbmlzY2ggKE1hemVkb25pZW4p'><source>Mazedonisch (Mazedonien)</source><target>Macedonian (Macedonia)</target></trans-unit>
+<trans-unit id='TW9uZ29saXNjaA=='><source>Mongolisch</source><target>Mongolian</target></trans-unit>
+<trans-unit id='TW9uZ29saXNjaCAoTW9uZ29sZWkp'><source>Mongolisch (Mongolei)</source><target>Mongolian (Mongolia)</target></trans-unit>
+<trans-unit id='TWFyYXRoaSAoSW5kaWVuKQ=='><source>Marathi (Indien)</source><target>Marathi (India)</target></trans-unit>
+<trans-unit id='TWFsYXlzaXNjaCAoQnJ1bmVpKQ=='><source>Malaysisch (Brunei)</source><target>Malaysian (Brunei)</target></trans-unit>
+<trans-unit id='TWFsYXlzaXNjaCAoTWFsYXlzaWEp'><source>Malaysisch (Malaysia)</source><target>Malaysian (Malaysia)</target></trans-unit>
+<trans-unit id='TWFsdGVzaXNjaCAoTWFsdGEp'><source>Maltesisch (Malta)</source><target>Maltese (Malta)</target></trans-unit>
+<trans-unit id='Tm9yd2VnaXNjaCAoQm9rbWFsKSAoTm9yd2VnZW4p'><source>Norwegisch (Bokmal) (Norwegen)</source><target>Norwegian (bokmal) (Norway)</target></trans-unit>
+<trans-unit id='TmllZGVybMOkbmRpc2NoIChOaWVkZXJsYW5kZSk='><source>Niederländisch (Niederlande)</source><target>Dutch (Netherlands)</target></trans-unit>
+<trans-unit id='Tm9yd2VnaXNjaCAoTnlub3JzaykgKE5vcndlZ2VuKQ=='><source>Norwegisch (Nynorsk) (Norwegen)</source><target>Norwegian (Nynorsk) (Norway)</target></trans-unit>
+<trans-unit id='Tm9yZC1Tb3Robw=='><source>Nord-Sotho</source><target>Northern Sotho</target></trans-unit>
+<trans-unit id='Tm9yZC1Tb3RobyAoU8O8ZGFmcmlrYSk='><source>Nord-Sotho (Südafrika)</source><target>North Sotho (South Africa)</target></trans-unit>
+<trans-unit id='UGFuamFiaSAoSW5kaWVuKQ=='><source>Panjabi (Indien)</source><target>Panjabi (India)</target></trans-unit>
+<trans-unit id='UG9sbmlzY2ggKFBvbGVuKQ=='><source>Polnisch (Polen)</source><target>Polish (Poland)</target></trans-unit>
+<trans-unit id='UGFzY2h0dSAoQWZnaGFuaXN0YW4p'><source>Paschtu (Afghanistan)</source><target>Pashto (Afghanistan)</target></trans-unit>
+<trans-unit id='UG9ydHVnaWVzaXNjaCAoUG9ydHVnYWwp'><source>Portugiesisch (Portugal)</source><target>Portuguese (Portugal)</target></trans-unit>
+<trans-unit id='UXVlY2h1YQ=='><source>Quechua</source><target>Quechua</target></trans-unit>
+<trans-unit id='UXVlY2h1YSAoQm9saXZpZW4p'><source>Quechua (Bolivien)</source><target>Quechua (Bolivia)</target></trans-unit>
+<trans-unit id='UXVlY2h1YSAoRWN1YWRvcik='><source>Quechua (Ecuador)</source><target>Quechua (Ecuador)</target></trans-unit>
+<trans-unit id='UXVlY2h1YSAoUGVydSk='><source>Quechua (Peru)</source><target>Quechua (Peru)</target></trans-unit>
+<trans-unit id='UnVtw6RuaXNjaCAoUnVtw6RuaWVuKQ=='><source>Rumänisch (Rumänien)</source><target>Romanian (Romania)</target></trans-unit>
+<trans-unit id='UnVzc2lzY2ggKFJ1c3NsYW5kKQ=='><source>Russisch (Russland)</source><target>Russian (Russia)</target></trans-unit>
+<trans-unit id='U2Fuc2tyaXQ='><source>Sanskrit</source><target>Sanskrit</target></trans-unit>
+<trans-unit id='U2Fuc2tyaXQgKEluZGllbik='><source>Sanskrit (Indien)</source><target>Sanskrit (India)</target></trans-unit>
+<trans-unit id='U2FtaXNjaA=='><source>Samisch</source><target>Sami</target></trans-unit>
+<trans-unit id='U2FtaXNjaCAoRmlubmxhbmQp'><source>Samisch (Finnland)</source><target>Sami (Finland)</target></trans-unit>
+<trans-unit id='U2FtaXNjaCAoTm9yd2VnZW4p'><source>Samisch (Norwegen)</source><target>Sami (Norway)</target></trans-unit>
+<trans-unit id='U2FtaXNjaCAoU2Nod2VkZW4p'><source>Samisch (Schweden)</source><target>Sami (Sweden)</target></trans-unit>
+<trans-unit id='U2xvd2FraXNjaCAoU2xvd2FrZWkp'><source>Slowakisch (Slowakei)</source><target>Slovak (Slovakia)</target></trans-unit>
+<trans-unit id='U2xvd2VuaXNjaCAoU2xvd2VuaWVuKQ=='><source>Slowenisch (Slowenien)</source><target>Slovenian (Slovenia)</target></trans-unit>
+<trans-unit id='QWxiYW5pc2NoIChBbGJhbmllbik='><source>Albanisch (Albanien)</source><target>Albanian (Albania)</target></trans-unit>
+<trans-unit id='U2VyYmlzY2ggKExhdGVpbikgKEJvc25pZW4gdW5kIEhlcnplZ293aW5hKQ=='><source>Serbisch (Latein) (Bosnien und Herzegowina)</source><target>Serbian (Latin) (Bosnia and Herzegovina)</target></trans-unit>
+<trans-unit id='U2VyYmlzY2ggKEt5cmlsbGlzY2gpIChCb3NuaWVuIHVuZCBIZXJ6ZWdvd2luYSk='><source>Serbisch (Kyrillisch) (Bosnien und Herzegowina)</source><target>Serbian (Cyrillic) (Bosnia and Herzegovina)</target></trans-unit>
+<trans-unit id='U2VyYmlzY2ggKExhdGVpbikgKFNlcmJpZW4gdW5kIE1vbnRlbmVncm8p'><source>Serbisch (Latein) (Serbien und Montenegro)</source><target>Serbian (Latin) (Serbia and Montenegro)</target></trans-unit>
+<trans-unit id='U2VyYmlzY2ggKEt5cmlsbGlzY2gpIChTZXJiaWVuIHVuZCBNb250ZW5lZ3JvKQ=='><source>Serbisch (Kyrillisch) (Serbien und Montenegro)</source><target>Serbian (Cyrillic) (Serbia and Montenegro)</target></trans-unit>
+<trans-unit id='U2Nod2VkaXNjaCAoRmlubmxhbmQp'><source>Schwedisch (Finnland)</source><target>Swedish (Finland)</target></trans-unit>
+<trans-unit id='U2Nod2VkaXNjaCAoU2Nod2VkZW4p'><source>Schwedisch (Schweden)</source><target>Swedish (Sweden)</target></trans-unit>
+<trans-unit id='U3VhaGVsaSAoS2VuaWEp'><source>Suaheli (Kenia)</source><target>Swahili (Kenya)</target></trans-unit>
+<trans-unit id='U3lyaXNjaA=='><source>Syrisch</source><target>Syrian</target></trans-unit>
+<trans-unit id='U3lyaXNjaCAoU3lyaWVuKQ=='><source>Syrisch (Syrien)</source><target>Syriac (Syria)</target></trans-unit>
+<trans-unit id='VGFtaWxpc2NoIChJbmRpZW4p'><source>Tamilisch (Indien)</source><target>Tamil (India)</target></trans-unit>
+<trans-unit id='VGVsdWd1IChJbmRpZW4p'><source>Telugu (Indien)</source><target>Telugu (India)</target></trans-unit>
+<trans-unit id='VGhhaSAoVGhhaWxhbmQp'><source>Thai (Thailand)</source><target>Thai (Thailand)</target></trans-unit>
+<trans-unit id='VGFnYWxvZyAoUGhpbGlwcGluZW4p'><source>Tagalog (Philippinen)</source><target>Tagalog (Philippines)</target></trans-unit>
+<trans-unit id='VHN3YW5hIChTw7xkYWZyaWthKQ=='><source>Tswana (Südafrika)</source><target>Tswana (South Africa)</target></trans-unit>
+<trans-unit id='VMO8cmtpc2NoIChUw7xya2VpKQ=='><source>Türkisch (Türkei)</source><target>Turkish (Turkey)</target></trans-unit>
+<trans-unit id='VGF0YXJpc2No'><source>Tatarisch</source><target>Tatar</target></trans-unit>
+<trans-unit id='VGF0YXJpc2NoIChSdXNzbGFuZCk='><source>Tatarisch (Russland)</source><target>Tatar (Russia)</target></trans-unit>
+<trans-unit id='VHNvbmdh'><source>Tsonga</source><target>Tsonga</target></trans-unit>
+<trans-unit id='VWtyYWluaXNjaCAoVWtyYWluZSk='><source>Ukrainisch (Ukraine)</source><target>Ukrainian (Ukraine)</target></trans-unit>
+<trans-unit id='VXJkdSAoUGFraXN0YW4p'><source>Urdu (Pakistan)</source><target>Urdu (Pakistan)</target></trans-unit>
+<trans-unit id='VXNiZWtpc2NoIChMYXRlaW4pIChVc2Jla2lzdGFuKQ=='><source>Usbekisch (Latein) (Usbekistan)</source><target>Uzbek (Latin) (Uzbekistan)</target></trans-unit>
+<trans-unit id='VXNiZWtpc2NoIChLeXJpbGxpc2NoKSAoVXNiZWtpc3Rhbik='><source>Usbekisch (Kyrillisch) (Usbekistan)</source><target>Uzbek (Cyrillic) (Uzbekistan)</target></trans-unit>
+<trans-unit id='VmlldG5hbWVzaXNjaCAoVmlldG5hbSk='><source>Vietnamesisch (Vietnam)</source><target>Vietnamese (Vietnam)</target></trans-unit>
+<trans-unit id='WGhvc2EgKFPDvGRhZnJpa2Ep'><source>Xhosa (Südafrika)</source><target>Xhosa (South Africa)</target></trans-unit>
+<trans-unit id='Q2hpbmVzaXNjaCAoSG9uZyBLb25nKQ=='><source>Chinesisch (Hong Kong)</source><target>Chinese (Hong Kong)</target></trans-unit>
+<trans-unit id='Q2hpbmVzaXNjaCAoTWFjYXUp'><source>Chinesisch (Macau)</source><target>Chinese (Macao)</target></trans-unit>
+<trans-unit id='Q2hpbmVzaXNjaCAoU2luZ2FwdXIp'><source>Chinesisch (Singapur)</source><target>Chinese (Singapore)</target></trans-unit>
+<trans-unit id='WnVsdSAoU8O8ZGFmcmlrYSk='><source>Zulu (Südafrika)</source><target>Zulu (South Africa)</target></trans-unit>
+<trans-unit id='SGVicsOkaXNjaCAoSXNyYWVsKQ=='><source>Hebräisch (Israel)</source><target>Hebrew (Israel)</target></trans-unit>
+<trans-unit id='S3VyZGlzY2g='><source>Kurdisch</source><target>Kurdish</target></trans-unit>
+<trans-unit id='QXBp'><source>API</source><target>API</target></trans-unit>
+<trans-unit id='SGVicsOkaXNjaA=='><source>Hebräisch</source><target>Hebrew</target></trans-unit>
+<trans-unit id='UmVmZXJlbnpkYXRlaWVuIHZvcmhhbmRlbg=='><source>Referenzdateien vorhanden</source><target>Reference files exist</target></trans-unit>
+<trans-unit id='TGlzdGUgw7ZmZm5lbg=='><source>Liste öffnen</source><target>Open list</target></trans-unit>
+<trans-unit id='UG0='><source>PM</source><target>PM</target></trans-unit>
     </body>
   </file>
 </xliff>
