@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -123,7 +122,12 @@ class editor_TaskController extends ZfExtended_RestController {
         if(empty($wfId)) {
             $wfId = $this->entity->getWorkflow();
         }
-        $this->workflow = $this->workflowManager->getCached($wfId);
+        try {
+            $this->workflow = $this->workflowManager->getCached($wfId);
+        }
+        catch (Exception $e) {
+            $this->workflow = $this->workflowManager->getCached('default');
+        }
     }
     
     /**
@@ -305,10 +309,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->initWorkflow();
             //$this->entity->save(); => is done by the import call!
             $this->processUploadedFile();
-            //since the workflow needs the current user, 
-            // we leave this call here and do not move it into the worker
-            $this->workflow->doImport($this->entity);
-            //reload because entityVersion was changed by above workflow call
+            //reload because entityVersion could be changed somewhere
             $this->entity->load($this->entity->getId());
             $this->view->success = true;
             $this->view->rows = $this->entity->getDataObject();
@@ -808,7 +809,15 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     protected function checkStateAllowsActions() {
         if($this->entity->isErroneous() || $this->entity->isExclusiveState() && $this->entity->isLocked($this->entity->getTaskGuid())) {
-            throw new ZfExtended_Models_Entity_Conflict('Der aktuelle Status der Aufgabe verbietet diese Aktion!');
+            $e = new ZfExtended_Models_Entity_Conflict('Der aktuelle Status der Aufgabe verbietet diese Aktion!');
+            $e->setErrors([
+                    'task' => $this->entity->getTaskGuid(),
+                    'taskState' => $this->entity->getState(),
+                    'isLocked' => $this->entity->isLocked($this->entity->getTaskGuid()),
+                    'isErroneous' => $this->entity->isErroneous(),
+                    'isExclusiveState' => $this->entity->isExclusiveState(),
+            ]);
+            throw $e;
         }
     }
 }

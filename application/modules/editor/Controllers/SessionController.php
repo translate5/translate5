@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -110,10 +109,15 @@ class editor_SessionController extends ZfExtended_SessionController {
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskUserAssoc->getTaskGuid());
         
+        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $wfm editor_Workflow_Manager */
+        $workflow = $wfm->getByTask($task);
+        $state = $workflow->isWriteable($taskUserAssoc) ? $workflow::STATE_EDIT : $workflow::STATE_VIEW;
+        
         $user->setUserSessionNamespaceWithoutPwCheck($login);
         
         //open task
-        $params = ['id' => $task->getId(), 'data' => '{"userState":"edit","id":'.$task->getId().'}'];
+        $params = ['id' => $task->getId(), 'data' => '{"userState":"'.$state.'","id":'.$task->getId().'}'];
         $this->forward('put', 'task', 'editor', $params);
         //Mit dem nachfolgenden header ist man zwar authentifiziert, nicht aber im Task! Gehe ich händisch auf den Task passts. Sind die Daten noch nicht in der Session? wegen dem Exit? 
         

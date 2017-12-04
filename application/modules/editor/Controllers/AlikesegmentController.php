@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -222,6 +221,10 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                  */  
                 $log = new ZfExtended_Log(false);
                 $log->logException($e);
+                $msg  = 'Loaded Segment Master '.print_r($this->entity->getDataObject(),1)."\n";
+                empty($entity) || $msg .= 'Prepared Segment Alike  '.print_r($entity->getDataObject(),1);
+                empty($history) || $msg .= 'Prepared Segment History  '.print_r($history->getDataObject(),1);
+                $log->log('Additional log info to previous '.get_class($e).' exception', $msg);
                 continue;
             }
             //Mit ID als Index um Uniqness sicherzustellen (

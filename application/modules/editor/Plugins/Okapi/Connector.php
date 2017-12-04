@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -58,6 +57,18 @@ class editor_Plugins_Okapi_Connector {
      * @var string
      */
     private $bconfFilePath;
+    
+    /***
+     * The sourceLang of the imported task
+     * @var string
+     */
+    private $sourceLang;
+
+    /***
+     * The targetLang of the imported task
+     * @var string
+     */
+    private $targetLang;
     
     /***
      * The file which need to be converted
@@ -191,7 +202,7 @@ class editor_Plugins_Okapi_Connector {
      * Run the file conversion. For each uploaded files converted file will be created
      */
     public function executeTask(){
-        $url=$this->projectUrl.'/tasks/execute';
+        $url=$this->projectUrl.'/tasks/execute/'.$this->sourceLang.'/'.$this->targetLang;
         $http = $this->getHttpClient($url);
         $response = $http->request('POST');
         $this->processResponse($response);
@@ -214,6 +225,14 @@ class editor_Plugins_Okapi_Connector {
     
     public function setBconfFilePath($confPath){
         $this->bconfFilePath=$confPath;
+    }
+    
+    public function setSourceLang($sourceLang){
+        $this->sourceLang=$sourceLang;
+    }
+    
+    public function setTargetLang($targetLang){
+        $this->targetLang=$targetLang;
     }
     
     public function getBconfFilePath(){

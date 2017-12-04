@@ -14,9 +14,8 @@
 --  http://www.gnu.org/licenses/agpl.html
 --   
 --  There is a plugin exception available for use with this release of translate5 for
---  translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
---  Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
---  folder of translate5.
+--  translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+--  plugin-exception.txt in the root folder of translate5.
 --   
 --  @copyright  Marc Mittag, MittagQI - Quality Informatics
 --  @author     MittagQI - Quality Informatics
@@ -42,5 +41,5 @@ CREATE TABLE `LEK_file_filter` (
   CONSTRAINT `fk_LEK_file_filter_2`
     FOREIGN KEY (`fileId`)
     REFERENCES `LEK_files` (`id`)
-    ON DELETE CASCADE);
+    ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

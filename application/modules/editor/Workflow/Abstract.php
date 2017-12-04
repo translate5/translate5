@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -49,14 +48,12 @@ abstract class editor_Workflow_Abstract {
     //setting this state opens the task readonly 
     const STATE_VIEW = 'view'; 
     
-    //currently we have 2 places to define userRoles: IndexController for 
-    //translation and PHP editor_Workflow_Default for programmatic usage
-    const ROLE_VISITOR = 'visitor';
-    const ROLE_LECTOR = 'lector';
     const ROLE_TRANSLATOR = 'translator';
+    const ROLE_LECTOR = 'lector';
+    const ROLE_TRANSLATORCHECK = 'translatorCheck';
+    const ROLE_VISITOR = 'visitor';
     
-    //currently we have 2 places to define userRoles: IndexController for 
-    //translation and PHP editor_Workflow_Default for programmatic usage
+    const STEP_TRANSLATION = 'translation';
     const STEP_LECTORING = 'lectoring';
     const STEP_TRANSLATORCHECK = 'translatorCheck';
     const STEP_PM_CHECK = 'pmCheck';
@@ -75,9 +72,11 @@ abstract class editor_Workflow_Abstract {
         'STATE_OPEN' => 'offen', 
         'STATE_EDIT' => 'selbst in Arbeit', 
         'STATE_VIEW' => 'selbst geöffnet', 
-        'ROLE_VISITOR' => 'Besucher',
-        'ROLE_LECTOR' => 'Lektor',
         'ROLE_TRANSLATOR' => 'Übersetzer',
+        'ROLE_LECTOR' => 'Lektor',
+        'ROLE_TRANSLATORCHECK' => 'Übersetzer (Überprüfung)',
+        'ROLE_VISITOR' => 'Besucher',
+        'STEP_TRANSLATION' => 'Übersetzung',
         'STEP_LECTORING' => 'Lektorat',
         'STEP_TRANSLATORCHECK' => 'Übersetzer Prüfung',
         'STEP_PM_CHECK' => 'PM Prüfung',
@@ -126,12 +125,6 @@ abstract class editor_Workflow_Abstract {
     protected $newUtaState;
 
     /**
-     * latest LogEntry (actual workflow step)
-     * @var editor_Workflow_Log
-     */
-    protected $latestWorkflowLogEntry;
-    
-    /**
      * enables / disables debugging (logging), can be enabled by setting runtimeOptions.debug.core.workflow = 1 in installation.ini
      * 0 => disabled
      * 1 => log called handler methods (logging must be manually implemented in the handler methods by usage of $this->doDebug)
@@ -157,7 +150,8 @@ abstract class editor_Workflow_Abstract {
     protected $readableRoles = array(
         self::ROLE_VISITOR,
         self::ROLE_LECTOR,
-        self::ROLE_TRANSLATOR
+        self::ROLE_TRANSLATOR,
+        self::ROLE_TRANSLATORCHECK,
     );
     /**
      * lists all roles with write access to tasks
@@ -165,7 +159,8 @@ abstract class editor_Workflow_Abstract {
      */
     protected $writeableRoles = array(
         self::ROLE_LECTOR,
-        self::ROLE_TRANSLATOR
+        self::ROLE_TRANSLATOR,
+        self::ROLE_TRANSLATORCHECK,
     );
     /**
      * lists all states which allow read access to tasks
@@ -195,6 +190,7 @@ abstract class editor_Workflow_Abstract {
      * @var array 
      */
     protected $stepChain = array(
+        self::STEP_TRANSLATION,
         self::STEP_LECTORING,
         self::STEP_TRANSLATORCHECK,
     );
@@ -205,9 +201,33 @@ abstract class editor_Workflow_Abstract {
      * @var array
      */
     protected $steps2Roles = array(
+        self::STEP_TRANSLATION=>self::ROLE_TRANSLATOR,
         self::STEP_LECTORING=>self::ROLE_LECTOR,
-        self::STEP_TRANSLATORCHECK=>self::ROLE_TRANSLATOR
+        self::STEP_TRANSLATORCHECK=>self::ROLE_TRANSLATORCHECK
     );
+    
+    /**
+     * Valid state / role combination for each step
+     * the first state of the states array is also the default state for that step and role
+     * @var array
+     */
+    protected $validStates = [
+        self::STEP_TRANSLATION => [
+            self::ROLE_TRANSLATOR => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW],
+            self::ROLE_LECTOR => [self::STATE_WAITING],
+            self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING],
+        ],
+        self::STEP_LECTORING => [
+            self::ROLE_TRANSLATOR => [self::STATE_FINISH],
+            self::ROLE_LECTOR => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW],
+            self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING],
+        ],
+        self::STEP_TRANSLATORCHECK => [
+            self::ROLE_TRANSLATOR => [self::STATE_FINISH],
+            self::ROLE_LECTOR => [self::STATE_FINISH],
+            self::ROLE_TRANSLATORCHECK => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW],
+        ],
+    ];
     
     /**
      * @var ZfExtended_EventManager
@@ -219,6 +239,16 @@ abstract class editor_Workflow_Abstract {
         $this->debug = ZfExtended_Debug::getLevel('core', 'workflow');
         $this->loadAuthenticatedUser();
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
+        $events = Zend_EventManager_StaticEventManager::getInstance();
+        $events->attach('Editor_TaskuserassocController', 'afterPostAction', function(Zend_EventManager_Event $event){
+            $this->newTaskUserAssoc = $event->getParam('entity');
+            $this->recalculateWorkflowStep($this->newTaskUserAssoc);
+            $this->handleUserAssociationAdded();
+        });
+        
+        $events->attach('Editor_TaskuserassocController', 'afterDeleteAction', function(Zend_EventManager_Event $event){
+            $this->recalculateWorkflowStep($event->getParam('entity'));
+        });
     }
     
     /**
@@ -241,6 +271,31 @@ abstract class editor_Workflow_Abstract {
     public function getSteps2Roles() {
         return $this->steps2Roles;
     }
+    
+    /**
+     * returns the workflow steps which should have initially an activated segment filter
+     * @return string[]
+     */
+    public function getStepsWithFilter() {
+        return [self::STEP_TRANSLATORCHECK];
+    }
+    
+    /**
+     * returns the initial states of the different roles in the different steps
+     * @return string[][]
+     */
+    public function getInitialStates() {
+        $result = [];
+        foreach($this->validStates as $step => $statesToRoles) {
+            $result[$step] = [];
+            foreach($statesToRoles as $role => $states) {
+                //the initial state per role is just the first defined state per role
+                $result[$step][$role] = reset($states);
+            }
+        }
+        return $result;
+    }
+    
     /**
      * @param mixed $step string or null
      * @return string $role OR false if step does not exist
@@ -303,10 +358,11 @@ abstract class editor_Workflow_Abstract {
         }
         $config = Zend_Registry::get('config');
         $isCron = $config->runtimeOptions->cronIP === $_SERVER['REMOTE_ADDR'];
+        $isWorker = defined('ZFEXTENDED_IS_WORKER_THREAD');
         $this->authenticatedUserModel = ZfExtended_Factory::get('ZfExtended_Models_User');
         
         if($userGuid === false){
-            if(!$isCron) {
+            if(!$isCron && !$isWorker) {
                 throw new ZfExtended_NotAuthenticatedException("Cannot authenticate the system user!");
             }
             //set session user data with system user
@@ -637,6 +693,7 @@ abstract class editor_Workflow_Abstract {
             $task = $this->newTask;
         }
         $task->createMaterializedView();
+        $this->recalculateWorkflowStep($newTua);
         
         $state = $this->getTriggeredState($oldTua, $newTua);
         if(!empty($state)) {
@@ -644,6 +701,54 @@ abstract class editor_Workflow_Abstract {
                 $this->{$state}();
             } 
             $this->events->trigger($state, __CLASS__, array('oldTua' => $oldTua, 'newTua' => $newTua));
+        }
+    }
+    
+    /**
+     * recalculates the workflow step by the given task user assoc combinations
+     * If the combination of roles and states are pointing to an specific workflow step, this step is used
+     * If the states and roles does not match any valid combination, no step is changed. 
+     * @param editor_Models_TaskUserAssoc $tua
+     */
+    protected function recalculateWorkflowStep(editor_Models_TaskUserAssoc $tua) {
+        $tuas = $tua->loadByTaskGuidList([$tua->getTaskGuid()]);
+        
+        $areTuasSubset = function($toCompare) use ($tuas){
+            foreach($tuas as $tua) {
+                if(empty($toCompare[$tua['role']])) {
+                    return false;
+                }
+                if(!in_array($tua['state'], $toCompare[$tua['role']])) {
+                    return false;
+                }
+            }
+            return true;
+        };
+        
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($tua->getTaskGuid());
+        
+        $msg = ZfExtended_Factory::get('ZfExtended_Models_Messages');
+        /* @var $msg ZfExtended_Models_Messages */
+        
+        foreach($this->validStates as $step => $roleStates) {
+            if(!$areTuasSubset($roleStates)) {
+                continue;
+            }
+            if($step == $task->getWorkflowStepName()) {
+                return;
+            }
+            $task->updateWorkflowStep($step, false);
+            $log = ZfExtended_Factory::get('editor_Workflow_Log');
+            /* @var $log editor_Workflow_Log */
+            $log->log($task, $this->authenticatedUser->userGuid);
+            //set $step as new workflow step if different to before!
+            $labels = $this->getLabels();
+            $steps = $this->getSteps();
+            $step = $labels[array_search($step, $steps)];
+            $msg->addNotice('Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!', 'core', null, $step);
+            return;
         }
     }
     
@@ -693,6 +798,31 @@ abstract class editor_Workflow_Abstract {
         return null;
     }
 
+    /**
+     * Sets the new workflow step in the given task and increases by default the workflow step nr
+     * @param editor_Models_Task $task
+     * @param string $stepName
+     */
+    protected function setNextStep(editor_Models_Task $task, $stepName) {
+        $task->updateWorkflowStep($stepName, true);
+        $log = ZfExtended_Factory::get('editor_Workflow_Log');
+        /* @var $log editor_Workflow_Log */
+        $log->log($task, $this->authenticatedUser->userGuid);
+    }
+    
+    /**
+     * Inits the workflow step in the given task
+     * @param editor_Models_Task $task
+     * @param string $stepName
+     */
+    protected function initWorkflowStep(editor_Models_Task $task, $stepName) {
+        $task->updateWorkflowStep($stepName, false);
+        $log = ZfExtended_Factory::get('editor_Workflow_Log');
+        /* @var $log editor_Workflow_Log */
+        //since we are in the import, we don't have the current user, but the pmGuid user of the task is the same:
+        $log->log($task, $task->getPmGuid()); 
+    }
+    
     /*
     //DO Methods.
      the do.. methods 
@@ -840,4 +970,9 @@ abstract class editor_Workflow_Abstract {
      * will be called daily
      */
     abstract public function doCronDaily();
+    
+    /**
+     * will be called when a new task user association is created
+     */
+    abstract protected function handleUserAssociationAdded();
 }
