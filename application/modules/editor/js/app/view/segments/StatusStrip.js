@@ -58,12 +58,14 @@ Ext.define('Editor.view.segments.StatusStrip', {
     initConfig : function(instanceConfig) {
         var me = this,
             config = {
-            //FIXME use configuration to disable this component
-            items : [{
-                xtype:'segment.minmaxlength',
-                htmlEditor:instanceConfig.htmlEditor
-            }]
-        };
+            };
+        //add the minmaxlength component if the config is provided
+        if(Editor.data.segments.enableCountSegmentLength){
+            config.items=[{
+                    xtype:'segment.minmaxlength',
+                    htmlEditor:instanceConfig.htmlEditor
+                }];
+        }
 
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);

@@ -40,16 +40,23 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     strings:{
         minTooltip:'#UT#Minimale Länge: {0};',
         maxTooltip:'#UT#Maximale Länge: {0};',
-        segmentNotInRange:'#UT#Das Segment ist nicht innerhalb der definierten Zeichenlänge'
+        segmentBellowLimit:'#UT#Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.',
+        segmentOverLimit:'#UT#Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.',
     },
     /***
      * Segment model record
      */
     segmentRecord:null,
+    
+    /***
+     * Hold the active error message (when the segment is over the limit or bellow)
+     */
+    activeErroMessage:null,
+    
+    
     initConfig : function(instanceConfig) {
         var me=this,
-            config = {
-            };
+            config = {};
         me.htmlEditor=instanceConfig.htmlEditor;
         me.htmlEditor.on({
             change:{
@@ -152,56 +159,59 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * Check if the given number of characters is in between allowed range
      */
     isCharactersInBorder:function(charactersCount,minWidth,maxWidth){
+        var me=this;
         if(minWidth===null){
             minWidth=0;
         }
         if(maxWidth===null){
             maxWidth=Number.MAX_SAFE_INTEGER;
         }
-        return charactersCount>=minWidth && charactersCount<=maxWidth;
+        
+        //if the character count is bellow the limit, add custom error message.
+        if(charactersCount<minWidth){
+            me.activeErroMessage=Ext.String.format(me.strings.segmentBellowLimit,minWidth);
+            return false;
+        }
+      //if the character count is over the limit, add custom error message.
+        if(charactersCount>maxWidth){
+            me.activeErroMessage=Ext.String.format(me.strings.segmentOverLimit,maxWidth);
+            return false;
+        }
+        return true;
     },
 
     /**
      * Check if the segment character number is within the defined borders
      */
-    checkSegmentLength:function(record){
-        var me=this,
-            metaCache=record.get('metaCache');
+    isSegmentLengthInRange:function(segmentText){
+        var me=this;
+        
+        if(!me.segmentRecord){
+            return true;
+        }
+        
+        var metaCache=me.segmentRecord.get('metaCache');
         
         if(metaCache.minWidth===null && metaCache.maxWidth===null){
             return true;
         }
         //get the characters length and is segment saveble
-        var charactersLength=me.getSegmentCharactersCount(null),
+        var charactersLength=me.getSegmentCharactersCount(segmentText),
             saveSegment=me.isCharactersInBorder(charactersLength,metaCache.minWidth,metaCache.maxWidth);
-
-        if(!saveSegment){
-            Editor.MessageBox.addWarning(me.strings.segmentNotInRange);
-            return false;
-        }
+        
         return saveSegment;
     },
 
     /***
      * Remove the unneeded html tags from the segment
-     * 
-     * 
-     * TODO: probably wrong segment content text is passed to be mesured, check this
      */
     cleanTextHtmlTags:function(segmentText){
-        var res1=segmentText.replace(/<\/?bpt[^>]*>/ig,'');
-        res1=res1.replace(/<\/?ept[^>]*>/ig,'');
-        res1=res1.replace(/<\/?img[^>]*>/ig,'');//clean images tag
-        res1=res1.replace(/<\/?div[^>]*>/ig,'');//clean mqm tag
-        res1=res1.replace(/<del[^>]*>.*?<\/del>/ig,'');//clean del tag
-        res1=res1.replace(/<\/?ins[^>]*>/ig,'');//clean ins tag
-        res1=res1.replace(/<\/?span[^>]*>/ig,'');//clean term tag
-        //res1=Ext.util.Format.htmlEncode(res1);//FIXME this is a buggy functin
-        //this is the only function which does the job
-        var doc = new DOMParser().parseFromString(res1, "text/html");
-        res1=doc.documentElement.textContent;
-        doc=null;
-        return res1;
+        var res=segmentText.replace(/<del[^>]*>.*?<\/del>/ig,'');//clean del tag
+        var div = document.createElement("div");
+        div.innerHTML = res;
+        var text = div.textContent || div.innerText || "";
+        div=null;
+        return text;
     }
 
     
