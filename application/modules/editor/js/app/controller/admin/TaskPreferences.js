@@ -215,7 +215,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       
       me.actualTask = task;
       me.getPrefWindow().setLoading(true);
-      
+
       //workflowPrefs must be loaded after userAssocs, 
       //so add the load as a callback dynamically, based on the rights 
       if(me.isAllowed('editorWorkflowPrefsTask')){
@@ -303,7 +303,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           rec.eraseVersioned(task, {
               success: function() {
                   grid.store.remove(rec);
-                  me.calculateAvailableCombinations();
+                  if(me.isAllowed('editorWorkflowPrefsTask')){
+                      me.calculateAvailableCombinations();
+                  }
                   Editor.MessageBox.addSuccess(me.strings.entryDeleted);
                   me.handleReload();
               },
