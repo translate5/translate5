@@ -308,7 +308,8 @@ Ext.define('Editor.controller.Localizer', {
         strings: {
             minTooltip: '<?php echo $this->translate->_('Minimale Länge: {0};');?>',
             maxTooltip: '<?php echo $this->translate->_('Maximale Länge: {0};');?>',
-            segmentNotInRange: '<?php echo $this->translate->_('Das Segment ist nicht innerhalb der definierten Zeichenlänge');?>',
+            segmentBellowLimit: '<?php echo $this->translate->_('Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.');?>',
+            segmentOverLimit: '<?php echo $this->translate->_('Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.');?>'
         }
     });
     
