@@ -96,34 +96,11 @@ class editor_Models_Import_FileList {
         $refTarget = $this->getAbsReferencePath();
         $refDir = $config->runtimeOptions->import->referenceDirectory;
         $refAbsDir = $this->importConfig->importFolder.DIRECTORY_SEPARATOR.$refDir;
-        $this->recurseCopy($refAbsDir, $refTarget);
+        ZfExtended_Utils::recursiveCopy($refAbsDir, $refTarget);
     
         $parser = ZfExtended_Factory::get('editor_Models_Import_DirectoryParser_ReferenceFiles');
         /* @var $parser editor_Models_Import_DirectoryParser_ReferenceFiles */
         return $parser->parse($refTarget);
-    }
-    
-    /**
-     * does a recursive copy of the given directory
-     * @param string $src Source Directory
-     * @param string $dst Destination Directory
-     */
-    protected function recurseCopy(string $src, string $dst) {
-        $dir = opendir($src);
-        @mkdir($dst);
-        $SEP = DIRECTORY_SEPARATOR;
-        while(false !== ( $file = readdir($dir)) ) {
-            if ($file == '.' || $file == '..') {
-                continue;
-            }
-            if (is_dir($src.$SEP.$file)) {
-                $this->recurseCopy($src.$SEP.$file, $dst.$SEP.$file);
-            }
-            else {
-                copy($src.$SEP.$file, $dst.$SEP.$file);
-            }
-        }
-        closedir($dir);
     }
     
     /**

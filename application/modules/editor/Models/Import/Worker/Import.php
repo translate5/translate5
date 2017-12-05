@@ -131,7 +131,10 @@ class editor_Models_Import_Worker_Import {
         Zend_Registry::set('errorCollect', $this->importConfig->isCheckRun);
         
         $this->importMetaData();
-        $this->events->trigger("beforeDirectoryParsing", $this,array('importFolder'=>$this->importConfig->importFolder));
+        $this->events->trigger("beforeDirectoryParsing", $this,[
+                'importFolder'=>$this->importConfig->importFolder,
+                'task' => $this->task,
+        ]);
         $this->importFiles();
         $this->syncFileOrder();
         $this->removeMetaDataTmpFiles();
