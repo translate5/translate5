@@ -3,6 +3,18 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.6.12] - 2017-12-06
+###Added
+TRANSLATE-1074: Editor-only mode: On opening finished task: Open in read-only mode
+
+###Changed
+TRANSLATE-1055: Disable therootcause feedback button
+TRANSLATE-1073: Update configured languages.
+TRANSLATE-1072: Set default GUI language for users to EN
+
+###Bugfixes
+visualReview: fixes for translate5 embedded editor usage and RTL fixes
+
 ## [2.6.11] - 2017-11-30
 ###Added
 TRANSLATE-935: Configure columns of task overview on system level
