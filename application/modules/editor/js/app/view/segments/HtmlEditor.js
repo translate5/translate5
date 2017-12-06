@@ -152,6 +152,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           checkTag = me.getDuplicateCheckImg(segmentId, fieldName);
       
       me.setValue(me.markupForEditor(value)+checkTag);
+      this.fireEvent('afterInitialSetValue', this);
   },
   /**
    * Fixing focus issues EXT6UPD-105 and EXT6UPD-137
