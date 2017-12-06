@@ -268,14 +268,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           // - replace the given divs and spans with their image
           // TrackChange-Node might include TermTag: 
           // - replace TermTag-divs with their corresponding span
-          var allImagesInItem = item.getElementsByTagName('IMG');
+          var allImagesInItem = item.getElementsByTagName('IMG'),
               allDivsInItem = item.getElementsByTagName('DIV');
           if (allImagesInItem.length > 0) {
               for (var i = allImagesInItem.length; i--; ) { // backwards because we might remove items
                   var imgItem = allImagesInItem[i];
                   if (!me.isDuplicateSaveTag(imgItem)) {
                       var htmlForItemImg = me.imgNodeToString(imgItem, true),
-                      templateEl = document.createElement('template');
+                          templateEl = document.createElement('template');
                       templateEl.innerHTML = htmlForItemImg;
                       item.insertBefore(templateEl.content.firstChild,imgItem);
                       item.removeChild(imgItem);
@@ -305,11 +305,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                       item.removeChild(divItem.parentNode);
                   } else {
                       var divItem = allDivsInItem[i],
-                          dataOfItem,
-                          htmlForItemImg;
-                      dataOfItem = me.getData(divItem,data),
-                      htmlForItemImg = me.imageTemplate.apply(dataOfItem);
-                      var templateEl = document.createElement('template');
+                          dataOfItem = me.getData(divItem,data),
+                          htmlForItemImg = me.imageTemplate.apply(dataOfItem),
+                          templateEl = document.createElement('template');
                       templateEl.innerHTML = htmlForItemImg;
                       item.insertBefore(templateEl.content.firstChild,divItem);
                       item.removeChild(divItem);
