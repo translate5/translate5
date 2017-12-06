@@ -109,12 +109,13 @@ class editor_SessionController extends ZfExtended_SessionController {
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskUserAssoc->getTaskGuid());
         
+        $user->setUserSessionNamespaceWithoutPwCheck($login);
+        
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wfm editor_Workflow_Manager */
         $workflow = $wfm->getByTask($task);
         $state = $workflow->isWriteable($taskUserAssoc) ? $workflow::STATE_EDIT : $workflow::STATE_VIEW;
         
-        $user->setUserSessionNamespaceWithoutPwCheck($login);
         
         //open task
         $params = ['id' => $task->getId(), 'data' => '{"userState":"'.$state.'","id":'.$task->getId().'}'];
