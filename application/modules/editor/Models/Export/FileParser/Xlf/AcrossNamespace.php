@@ -70,7 +70,7 @@ class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_
         if(! $config->runtimeOptions->editor->export->exportComments) {
             //currently only the comment export feature is implemented in the across XLF, 
             // so if exporting comments is disabled we disable just the whole function
-            //return;
+            return;
         }
         
         $xmlparser->registerElement('trans-unit ax:named-properties', null, function($tag, $key, $opener) use ($xmlparser){
