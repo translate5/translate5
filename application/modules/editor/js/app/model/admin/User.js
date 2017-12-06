@@ -45,7 +45,8 @@ Ext.define('Editor.model.admin.User', {
     {name: 'email', type: 'string'},
     {name: 'roles', type: 'string'},
     {name: 'passwd', type: 'string'},
-    {name: 'editable', type: 'boolean', persist: false}
+    {name: 'editable', type: 'boolean', persist: false},
+    {name: 'locale', type: 'string'}
   ],
   idProperty: 'id',
   proxy : {

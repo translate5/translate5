@@ -62,7 +62,8 @@ Ext.define('Editor.view.admin.UserAddWindow', {
         feedbackTip: '#UT#Fehler beim Speichern des Benutzers: Bitte wenden Sie sich an den Support!',
         addBtn: '#UT#Benutzer hinzufügen',
         saveBtn: '#UT#Benutzer speichern',
-        cancelBtn: '#UT#Abbrechen'
+        cancelBtn: '#UT#Abbrechen',
+        localeLabel:'#UT#Lokalisierung'
     },
     modal : true,
     layout:'fit',
@@ -82,7 +83,9 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                 labelWidth: 160,
                 anchor: '100%'
             },
-            bottomInfo = [me.strings.bottomInfo];
+            bottomInfo = [me.strings.bottomInfo],
+            translations = [];
+        
         if(!instanceConfig.editMode) {
             bottomInfo.push(me.strings.bottomPwInfo);
         }
@@ -94,6 +97,9 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                 value: key,
                 handler: me.roleCheckChange
             });
+        });
+        Ext.Object.each(Editor.data.translations, function(id,value) {
+            translations.push([id,value]);
         });
         config = {
             title: me.title, //see EXT6UPD-9
@@ -178,6 +184,17 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                             tag: 'div',
                             'data-qtip': Ext.String.htmlEncode(me.strings.bottomRoleInfo)
                         }
+                    },{
+                        xtype: 'combo',
+                        itemId: 'locale',
+                        name:'locale',
+                        width:110,
+                        forceSelection: true,
+                        editable: false,
+                        store: translations,
+                        queryMode: 'local',
+                        toolTip: me.strings.localeTip,
+                        fieldLabel: me.strings.localeLabel
                     }]
                 },{
                     xtype: 'fieldset',

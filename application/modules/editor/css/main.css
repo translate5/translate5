@@ -44,6 +44,7 @@ div.x-container.x-container-default {position: initial;}
 .direction-rtl {
     direction:rtl;
 }
+.metaTermPanel .term-group div.direction-rtl,
 td.direction-rtl.x-grid-td div.x-grid-cell-inner {
     text-align:right !important;
 }
