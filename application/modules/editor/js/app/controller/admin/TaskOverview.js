@@ -135,9 +135,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           '#adminTaskAddWindow filefield[name=importUpload]': {
               change: me.handleChangeImportFile
           },
-          '#segmentgrid': {
-              afterrender: me.initTaskReadMode
-          },
           'adminTaskAddWindow panel:not([hidden])': {
               wizardCardFinished:me.onWizardCardFinished,
               wizardCardSkiped:me.onWizardCardSkiped
@@ -294,16 +291,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               targetLang.setValue(targetStore.getAt(targetIdx).get('id'));
           }
       }
-  },
-  /**
-   * Inits the loaded task and the segment grid read only if necessary
-   */
-  initTaskReadMode: function(grid) {
-      var vm = this.application.getController('ViewModes'),
-          task = Editor.data.task,
-          readonly = task.isReadOnly() || ! this.isAllowed('editorEditTask', task);
-      grid.lookupViewModel().set('taskIsReadonly', readonly);
-      vm && vm.editMode(readonly);
   },
   /**
    * Method Shortcut for convenience

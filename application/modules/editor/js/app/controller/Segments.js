@@ -189,17 +189,23 @@ Ext.define('Editor.controller.Segments', {
   gridAfterRender: function(grid) {
       var me = this,
           params = [],
-          ro = Editor.data.task && Editor.data.task.isReadOnly(),
+          vm = this.application.getController('ViewModes'),
+          task = Editor.data.task,
+          isEditor = Editor.app.authenticatedUser.isAllowed('editorEditTask', task),
+          readOnly = task.isReadOnly() || !isEditor,
           store = grid.store,
           proxy = store.getProxy(),
           initialGridFilters = Editor.data.initialGridFilters;
+      
+      grid.lookupViewModel().set('taskIsReadonly', readOnly);
+      vm && vm.editMode(readOnly);
 
       Editor.data.helpSection = 'editor';
       Editor.data.helpSectionTitle = grid.getTitle();
       
       initialGridFilters = initialGridFilters && initialGridFilters.segmentgrid;
 
-      grid.setTitle(ro ? grid.title_readonly : grid.title);
+      grid.setTitle(readOnly ? grid.title_readonly : grid.title);
       me.styleResetFilterButton(grid.store.filters);
       grid.store.on('load', me.afterStoreLoad, me);
       grid.store.on('filterchange', me.handleFilterChange, me);
@@ -633,5 +639,5 @@ Ext.define('Editor.controller.Segments', {
       if(me.loadingMaskRequests == 0) {
           me.getViewport().setLoading(false);
       }
-  } 
+  }
 });
