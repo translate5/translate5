@@ -2001,6 +2001,7 @@ You can access the portal at: %3$s<br />
 <trans-unit id='UmVmZXJlbnpkYXRlaWVuIHZvcmhhbmRlbg=='><source>Referenzdateien vorhanden</source><target>Reference files exist</target></trans-unit>
 <trans-unit id='TGlzdGUgw7ZmZm5lbg=='><source>Liste öffnen</source><target>Open list</target></trans-unit>
 <trans-unit id='UG0='><source>PM</source><target>PM</target></trans-unit>
+<trans-unit id='TG9rYWxpc2llcnVuZw==='><source>Lokalisierung</source><target>Localization</target></trans-unit>
     </body>
   </file>
 </xliff>
