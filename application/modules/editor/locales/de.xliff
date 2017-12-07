@@ -1254,6 +1254,11 @@ Im folgenden die getätigten Änderungen der vorhergehenden Übersetzer:<br />
 <trans-unit id='SGVicsOkaXNjaCAoSXNyYWVsKQ=='><source>Hebräisch (Israel)</source><target>Hebräisch (Israel)</target></trans-unit>
 <trans-unit id='S3VyZGlzY2g='><source>Kurdisch</source><target>Kurdisch</target></trans-unit>
 <trans-unit id='SGVicsOkaXNjaA=='><source>Hebräisch</source><target>Hebräisch</target></trans-unit>
+<trans-unit id='TWluaW1hbGUgTMOkbmdlOiB7MH07'><source>Minimale Länge: {0};</source><target>Minimale Länge: {0};</target></trans-unit>
+<trans-unit id='TWF4aW1hbGUgTMOkbmdlOiB7MH07'><source>Maximale Länge: {0};</source><target>Maximale Länge: {0};</target></trans-unit>
+<trans-unit id='RGVyIFNlZ21lbnRpbmhhbHQgaXN0IHp1IGt1cnohIE1pbmRlc3RlbnMgezB9IFplaWNoZW4gbcO8c3NlbiB2b3JoYW5kZW4gc2Vpbi4='><source>Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.</source><target>Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.</target></trans-unit>
+<trans-unit id='RGVyIFNlZ21lbnRpbmhhbHQgaXN0IHp1IGxhbmchIE1heGltYWwgezB9IFplaWNoZW4gc2luZCBlcmxhdWJ0Lg=='><source>Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.</source><target>Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.</target></trans-unit>
+<trans-unit id='TG9rYWxpc2llcnVuZw=='><source>Lokalisierung</source><target>Lokalisierung</target></trans-unit>
   </body>
  </file>
 </xliff>
