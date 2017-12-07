@@ -23,9 +23,8 @@
         "targetToSort": "Apache 2.0 auf Unixsystemen - ",
         "targetEdit": "Apache 2.0 auf Unixsystemen - Manual",
         "targetEditToSort": "Apache 2.0 auf Unixsystemen - ",
-        "isWatched": false,
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "isWatched": false
     },
     {
         "segmentNrInTask": "2",
@@ -51,9 +50,8 @@
         "targetToSort": "PHP Manual",
         "targetEdit": "PHP Manual",
         "targetEditToSort": "PHP Manual",
-        "isWatched": false,
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "isWatched": false
     },
     {
         "segmentNrInTask": "3",
@@ -79,8 +77,8 @@
         "targetToSort": "Teste einen weichen (Unix) Umb",
         "targetEdit": "Teste einen weichen (Unix) Umbruch<div class=\"single 736f667452657475726e2f\"><span title=\"&lt;softReturn\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"softReturn\" data-filename=\"ade8d1cbd33e857beb4d78d48543468b\" class=\"full\">&lt;softReturn\/&gt;<\/span><\/div>",
         "targetEditToSort": "Teste einen weichen (Unix) Umb",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "4",
@@ -106,8 +104,8 @@
         "targetToSort": "Teste mehrere &lt;1\/&gt;&lt;sp",
         "targetEdit": "Teste mehrere <div class=\"single 73706163652074733d223230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>Leerzeichen und<div class=\"single 73706163652074733d2230393039222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>Tabs",
         "targetEditToSort": "Teste mehrere &lt;1\/&gt;&lt;sp",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "5",
@@ -133,8 +131,8 @@
         "targetToSort": "Teste dass eine matchratio &lt",
         "targetEdit": "Teste dass eine matchratio &lt; 100 editierbar ist",
         "targetEditToSort": "Teste dass eine matchratio &lt",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "6",
@@ -160,8 +158,8 @@
         "targetToSort": "Teste unterschiedliche matchin",
         "targetEdit": "Teste unterschiedliche matchinfos",
         "targetEditToSort": "Teste unterschiedliche matchin",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "7",
@@ -187,8 +185,8 @@
         "targetToSort": "Teste &amp;para; Entities \u00b6 un",
         "targetEdit": "Teste &amp;para; Entities \u00b6 und Umlaute \u00f6\u00e4\u00fc\u00b6",
         "targetEditToSort": "Teste &amp;para; Entities \u00b6 un",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "8",
@@ -214,8 +212,8 @@
         "targetToSort": "Dieses Segment sollte nicht ed",
         "targetEdit": "Dieses Segment sollte nicht editierbar sein!",
         "targetEditToSort": "Dieses Segment sollte nicht ed",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "9",
@@ -241,8 +239,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "10",
@@ -268,8 +266,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "11",
@@ -295,8 +293,8 @@
         "targetToSort": "13 - Teste eine vorhandene \u00dcbe",
         "targetEdit": "13 - Teste eine vorhandene \u00dcbersetzung. ",
         "targetEditToSort": "13 - Teste eine vorhandene \u00dcbe",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "12",
@@ -322,8 +320,8 @@
         "targetToSort": "13 - Mit MRK Tags.",
         "targetEdit": "13 - Mit MRK Tags.",
         "targetEditToSort": "13 - Mit MRK Tags.",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "13",
@@ -349,8 +347,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "14",
@@ -376,8 +374,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "15",
@@ -403,8 +401,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "16",
@@ -430,8 +428,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "17",
@@ -457,8 +455,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "18",
@@ -484,8 +482,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "19",
@@ -511,8 +509,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "20",
@@ -538,8 +536,8 @@
         "targetToSort": "f2-1 - Teste die Verwendung ei",
         "targetEdit": "f2-1 - Teste die Verwendung einer bereits verwendeten ID - was zul\u00e4ssig ist!",
         "targetEditToSort": "f2-1 - Teste die Verwendung ei",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "21",
@@ -565,8 +563,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "22",
@@ -592,8 +590,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "23",
@@ -619,8 +617,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "24",
@@ -646,8 +644,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "25",
@@ -673,8 +671,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "26",
@@ -700,8 +698,8 @@
         "targetToSort": "f2-6 - Test mit gegebenen &lt;",
         "targetEdit": "f2-6 - Test mit gegebenen <div class=\"single 70682069643d2231223e266c743b696d67207372633d2671756f743b666f6f2671756f743b207469746c653d2671756f743b3c7375623e66322d36202d2074657374652073756220467261676d656e743c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;img src=&quot;foo&quot; title=&quot;f2-6 - teste sub Fragment&quot;\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"6ddb7b58879ea30d0922bc1b5489f0a3\" class=\"full\">&lt;img src=&quot;foo&quot; title=&quot;f2-6 - teste sub Fragment&quot;\/&gt;<\/span><\/div>\u00dcbersetzungen mit MRK und SUB Tags.",
         "targetEditToSort": "f2-6 - Test mit gegebenen &lt;",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "27",
@@ -727,8 +725,8 @@
         "targetToSort": "f2-6 - teste sub Fragment",
         "targetEdit": "f2-6 - teste sub Fragment",
         "targetEditToSort": "f2-6 - teste sub Fragment",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "28",
@@ -754,8 +752,8 @@
         "targetToSort": "f2-6 - Teste das Alignment von",
         "targetEdit": "f2-6 - Teste das Alignment von Quell- und Zielfragmenten.",
         "targetEditToSort": "f2-6 - Teste das Alignment von",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "29",
@@ -781,8 +779,8 @@
         "targetToSort": "f2-7 - Test mit &lt;1\/&gt;&lt;",
         "targetEdit": "f2-7 - Test mit <div class=\"single 70682069643d2233223e266c743b696d67207469746c653d2671756f743b333c7375623e66322d37202d2073756220333c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;img title=&quot;3f2-7 - sub 3&quot;\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"11a5014a148d68960c71171867dc22f7\" class=\"full\">&lt;img title=&quot;3f2-7 - sub 3&quot;\/&gt;<\/span><\/div>gegebenen <div class=\"single 70682069643d2231223e266c743b696d67207469746c653d2671756f743b313c7375623e66322d37202d2073756220313c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;img title=&quot;1f2-7 - sub 1&quot;\/&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"4c40a38fb9751b463b47f063efeef52d\" class=\"full\">&lt;img title=&quot;1f2-7 - sub 1&quot;\/&gt;<\/span><\/div>\u00dcbersetzungen mit MRK und SUB Tags.",
         "targetEditToSort": "f2-7 - Test mit &lt;1\/&gt;&lt;",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "30",
@@ -808,8 +806,8 @@
         "targetToSort": "f2-7 - sub 1",
         "targetEdit": "f2-7 - sub 1",
         "targetEditToSort": "f2-7 - sub 1",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "31",
@@ -835,8 +833,8 @@
         "targetToSort": "f2-7 - sub 3",
         "targetEdit": "f2-7 - sub 3",
         "targetEditToSort": "f2-7 - sub 3",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "32",
@@ -862,8 +860,8 @@
         "targetToSort": "f2-7 - Teste das Alignment von",
         "targetEdit": "f2-7 - Teste das Alignment von Quell- <div class=\"single 70682069643d2232223e266c743b696d67207469746c653d2671756f743b323c7375623e66322d37202d2073756220323c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;img title=&quot;2f2-7 - sub 2&quot;\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"2c927a3f9430c3cc28097e0cf8db1d03\" class=\"full\">&lt;img title=&quot;2f2-7 - sub 2&quot;\/&gt;<\/span><\/div> und Zielfragmenten.",
         "targetEditToSort": "f2-7 - Teste das Alignment von",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "33",
@@ -889,8 +887,8 @@
         "targetToSort": "f2-7 - sub 2",
         "targetEdit": "f2-7 - sub 2",
         "targetEditToSort": "f2-7 - sub 2",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "34",
@@ -916,8 +914,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "35",
@@ -943,8 +941,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "36",
@@ -970,8 +968,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "37",
@@ -997,8 +995,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "38",
@@ -1024,8 +1022,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "39",
@@ -1051,8 +1049,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "40",
@@ -1078,8 +1076,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "41",
@@ -1105,8 +1103,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "42",
@@ -1132,7 +1130,142 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
+    },
+    {
+        "segmentNrInTask": "43",
+        "mid": "12_44",
+        "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
+        "userName": "manager test",
+        "editable": "1",
+        "pretrans": "0",
+        "matchRate": "0",
+        "matchRateType": "import;empty",
+        "qmId": null,
+        "stateId": "0",
+        "autoStateId": "4",
+        "fileOrder": "0",
+        "comments": null,
+        "workflowStepNr": "0",
+        "workflowStep": null,
+        "source": "<div class=\"open 6270742069643d223122207269643d223122202f\"><span title=\"&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; \/&gt;\" class=\"short\">&lt;1&gt;<\/span><span data-originalid=\"bpt\" data-filename=\"74c4ec5cbe7bb8852208c0a8f6807cc6\" class=\"full\">&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; \/&gt;<\/span><\/div>f2-12 - tag encapsulated content should be imported with tags - since target is empty!<div class=\"close 6570742069643d223222207269643d223122202f\"><span title=\"&lt;ept id=&quot;2&quot; rid=&quot;1&quot; \/&gt;\" class=\"short\">&lt;\/1&gt;<\/span><span data-originalid=\"ept\" data-filename=\"6e69c29d3276b3c192ba7947a13efa00\" class=\"full\">&lt;ept id=&quot;2&quot; rid=&quot;1&quot; \/&gt;<\/span><\/div>",
+        "sourceMd5": "7f9e9af7e7bd77819ce01136828a6779",
+        "sourceToSort": "&lt;1&gt;&lt;bpt id=&quot;1&qu",
+        "target": "",
+        "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
+        "targetToSort": "",
+        "targetEdit": "",
+        "targetEditToSort": "",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
+    },
+    {
+        "segmentNrInTask": "44",
+        "mid": "13_45",
+        "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
+        "userName": "manager test",
+        "editable": "1",
+        "pretrans": "0",
+        "matchRate": "0",
+        "matchRateType": "import;none",
+        "qmId": null,
+        "stateId": "0",
+        "autoStateId": "0",
+        "fileOrder": "0",
+        "comments": null,
+        "workflowStepNr": "0",
+        "workflowStep": null,
+        "source": "f2-13 - tag encapsulated content should be imported without tags - if target has same tag structure",
+        "sourceMd5": "9cc5782e46a9e56683c7bb66609283cc",
+        "sourceToSort": "f2-13 - tag encapsulated conte",
+        "target": "f2-13 - Von Tags umgebener Inhalt soll ohne Tags importiert werden - wenn das Target die gleiche Tag Struktur hat",
+        "targetMd5": "c47db9466e201d85abe877fb980776ce",
+        "targetToSort": "f2-13 - Von Tags umgebener Inh",
+        "targetEdit": "f2-13 - Von Tags umgebener Inhalt soll ohne Tags importiert werden - wenn das Target die gleiche Tag Struktur hat",
+        "targetEditToSort": "f2-13 - Von Tags umgebener Inh",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
+    },
+    {
+        "segmentNrInTask": "45",
+        "mid": "14_46",
+        "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
+        "userName": "manager test",
+        "editable": "1",
+        "pretrans": "0",
+        "matchRate": "0",
+        "matchRateType": "import;none",
+        "qmId": null,
+        "stateId": "0",
+        "autoStateId": "0",
+        "fileOrder": "0",
+        "comments": null,
+        "workflowStepNr": "0",
+        "workflowStep": null,
+        "source": "<div class=\"open 6270742069643d223122207269643d223122202f\"><span title=\"&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; \/&gt;\" class=\"short\">&lt;1&gt;<\/span><span data-originalid=\"bpt\" data-filename=\"74c4ec5cbe7bb8852208c0a8f6807cc6\" class=\"full\">&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; \/&gt;<\/span><\/div>f2-14 - tag encapsulated content should be imported with tags - target has different tag structure<div class=\"close 6570742069643d223222207269643d223122202f\"><span title=\"&lt;ept id=&quot;2&quot; rid=&quot;1&quot; \/&gt;\" class=\"short\">&lt;\/1&gt;<\/span><span data-originalid=\"ept\" data-filename=\"6e69c29d3276b3c192ba7947a13efa00\" class=\"full\">&lt;ept id=&quot;2&quot; rid=&quot;1&quot; \/&gt;<\/span><\/div>",
+        "sourceMd5": "10302e00f1634e53043d9465f444defb",
+        "sourceToSort": "&lt;1&gt;&lt;bpt id=&quot;1&qu",
+        "target": "f2-14 - <div class=\"open 6270742069643d223122207269643d223122202f\"><span title=\"&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; \/&gt;\" class=\"short\">&lt;1&gt;<\/span><span data-originalid=\"bpt\" data-filename=\"74c4ec5cbe7bb8852208c0a8f6807cc6\" class=\"full\">&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; \/&gt;<\/span><\/div> Von Tags umgebener Inhalt soll mit Tags importiert werden - wenn das Target eine andere Tag Struktur hat<div class=\"close 6570742069643d223222207269643d223122202f\"><span title=\"&lt;ept id=&quot;2&quot; rid=&quot;1&quot; \/&gt;\" class=\"short\">&lt;\/1&gt;<\/span><span data-originalid=\"ept\" data-filename=\"6e69c29d3276b3c192ba7947a13efa00\" class=\"full\">&lt;ept id=&quot;2&quot; rid=&quot;1&quot; \/&gt;<\/span><\/div>",
+        "targetMd5": "36b2c7e9a4b4dce501278bc06f8b01ad",
+        "targetToSort": "f2-14 - &lt;1&gt;&lt;bpt id=&q",
+        "targetEdit": "f2-14 - <div class=\"open 6270742069643d223122207269643d223122202f\"><span title=\"&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; \/&gt;\" class=\"short\">&lt;1&gt;<\/span><span data-originalid=\"bpt\" data-filename=\"74c4ec5cbe7bb8852208c0a8f6807cc6\" class=\"full\">&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; \/&gt;<\/span><\/div> Von Tags umgebener Inhalt soll mit Tags importiert werden - wenn das Target eine andere Tag Struktur hat<div class=\"close 6570742069643d223222207269643d223122202f\"><span title=\"&lt;ept id=&quot;2&quot; rid=&quot;1&quot; \/&gt;\" class=\"short\">&lt;\/1&gt;<\/span><span data-originalid=\"ept\" data-filename=\"6e69c29d3276b3c192ba7947a13efa00\" class=\"full\">&lt;ept id=&quot;2&quot; rid=&quot;1&quot; \/&gt;<\/span><\/div>",
+        "targetEditToSort": "f2-14 - &lt;1&gt;&lt;bpt id=&q",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
+    },
+    {
+        "segmentNrInTask": "46",
+        "mid": "15_47",
+        "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
+        "userName": "manager test",
+        "editable": "1",
+        "pretrans": "0",
+        "matchRate": "0",
+        "matchRateType": "import;none",
+        "qmId": null,
+        "stateId": "0",
+        "autoStateId": "0",
+        "fileOrder": "0",
+        "comments": null,
+        "workflowStepNr": "0",
+        "workflowStep": null,
+        "source": "f2-15 - tag encapsulated content should be imported without tags - but import single tags<div class=\"single 782069643d2234222f\"><span title=\"&lt;x id=&quot;4&quot;\/&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"x\" data-filename=\"f90c8ae8b8da5995e2b68961a896ebb6\" class=\"full\">&lt;x id=&quot;4&quot;\/&gt;<\/span><\/div>",
+        "sourceMd5": "834eb9778c15e9c74fc4db4ddb44d26c",
+        "sourceToSort": "f2-15 - tag encapsulated conte",
+        "target": "f2-15 - Von Tags umgebener Inhalt soll ohne Tags importiert werden - aber importiere single tags<div class=\"single 782069643d2234222f\"><span title=\"&lt;x id=&quot;4&quot;\/&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"x\" data-filename=\"f90c8ae8b8da5995e2b68961a896ebb6\" class=\"full\">&lt;x id=&quot;4&quot;\/&gt;<\/span><\/div>",
+        "targetMd5": "0198bafe73bf76795ed3616a2a4dc8da",
+        "targetToSort": "f2-15 - Von Tags umgebener Inh",
+        "targetEdit": "f2-15 - Von Tags umgebener Inhalt soll ohne Tags importiert werden - aber importiere single tags<div class=\"single 782069643d2234222f\"><span title=\"&lt;x id=&quot;4&quot;\/&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"x\" data-filename=\"f90c8ae8b8da5995e2b68961a896ebb6\" class=\"full\">&lt;x id=&quot;4&quot;\/&gt;<\/span><\/div>",
+        "targetEditToSort": "f2-15 - Von Tags umgebener Inh",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
+    },
+    {
+        "segmentNrInTask": "47",
+        "mid": "16_48",
+        "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
+        "userName": "manager test",
+        "editable": "1",
+        "pretrans": "0",
+        "matchRate": "0",
+        "matchRateType": "import;none",
+        "qmId": null,
+        "stateId": "0",
+        "autoStateId": "0",
+        "fileOrder": "0",
+        "comments": null,
+        "workflowStepNr": "0",
+        "workflowStep": null,
+        "source": "f2-16 - tag encapsulated content should be imported without tags - but import single tags<div class=\"single 782069643d2234222f\"><span title=\"&lt;x id=&quot;4&quot;\/&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"x\" data-filename=\"f90c8ae8b8da5995e2b68961a896ebb6\" class=\"full\">&lt;x id=&quot;4&quot;\/&gt;<\/span><\/div>",
+        "sourceMd5": "665ea887f433fc47018a61ae2063ee7c",
+        "sourceToSort": "f2-16 - tag encapsulated conte",
+        "target": "f2-16 - Von Tags umgebener Inhalt soll ohne Tags importiert werden - hier fehlt der singletag",
+        "targetMd5": "6f8660c944dbe8ccc6cf67c1acccfc01",
+        "targetToSort": "f2-16 - Von Tags umgebener Inh",
+        "targetEdit": "f2-16 - Von Tags umgebener Inhalt soll ohne Tags importiert werden - hier fehlt der singletag",
+        "targetEditToSort": "f2-16 - Von Tags umgebener Inh",
+        "metaCache": "{\"minWidth\":10,\"maxWidth\":15}",
+        "isWatched": false
     }
 ]
