@@ -35,7 +35,8 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     extend: 'Ext.Component',
     alias: 'widget.segment.minmaxlength',
     itemId:'segmentMinMaxLength',
-    tpl: '<div style="background-color:{0};" data-qtip="{1}"><strong style="margin:0.3em;">{2}</strong></div>',
+    cls: 'segment-min-max',
+    tpl: '<div class="{0}" data-qtip="{1}">{2}</div>',
     hidden:true,
     strings:{
         minTooltip:'#UT#Minimale Länge: {0};',
@@ -127,19 +128,23 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             metaCache=record.get('metaCache'),
             minWidth=metaCache.minWidth,
             maxWidth=metaCache.maxWidth,
-            cssColor='#ff4242',
-            tooltipText='';
+            cls = 'invalid-length',
+            tooltipText = [];
 
         if(me.isCharactersInBorder(charactersCount,minWidth,maxWidth)){
-            cssColor='#24f324'
+            cls = 'valid-length'
         }
         //if min or max is null do not display the tooltip
-        tooltipText+=minWidth!==null ? Ext.String.format(me.strings.minTooltip,minWidth) : "";
-        tooltipText+=maxWidth!==null ? Ext.String.format(me.strings.maxTooltip,maxWidth) : "";
+        if(minWidth) {
+            tooltipText.push(Ext.String.format(me.strings.minTooltip,minWidth));
+        }
+        if(maxWidth) {
+            tooltipText.push(Ext.String.format(me.strings.maxTooltip,maxWidth));
+        }
         me.lookupTpl('tpl').overwrite(me.getEl(),[
-            cssColor,
-            tooltipText,
-            "  "+charactersCount+"  "
+            cls,
+            tooltipText.join('<br/>'),
+            charactersCount
         ]);
     },
 
