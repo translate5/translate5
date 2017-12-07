@@ -3,6 +3,11 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.6.13] - 2017-12-07
+###Added
+TRANSLATE-822: segment min and max length - activated in Frontend
+TRANSLATE-869: Okapi integration - improved tikal logging
+
 ## [2.6.12] - 2017-12-06
 ###Added
 TRANSLATE-1074: Editor-only mode: On opening finished task: Open in read-only mode
