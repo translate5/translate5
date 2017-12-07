@@ -1061,5 +1061,4 @@ Ext.define('Editor.controller.Editor', {
         filePanel.expand();
         filePanel.down('referenceFileTree').expand();
     }
-  
 });
