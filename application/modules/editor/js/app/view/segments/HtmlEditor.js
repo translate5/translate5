@@ -208,7 +208,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   insertMarkup: function(value) {
       var html = this.markup(value).join(''),
           doc = this.getDoc(),
-          sel, range, frag, node, el, lastNode, rangeForNode;
+          sel, range, frag, node, el, lastNode, rangeForNode,
+          termTags, termTageNode, arrLength, i;
       if (!window.getSelection) {
           //Not supported by your browser message!
           return;
@@ -222,6 +223,17 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         while ((node = el.firstChild)) {
             lastNode = frag.appendChild(node);
         }
+        // remove term-tag-markup (will be added again after saving where appropriate)
+        termTags = frag.querySelectorAll('span.term');
+        arrLength = termTags.length;
+        for( i=0; i < arrLength; i++ ) {
+            termTageNode = termTags[i];
+            while(termTageNode.firstChild) {
+                termTageNode.parentNode.insertBefore(termTageNode.firstChild,termTageNode);
+            }
+            termTageNode.parentNode.removeChild(termTageNode);
+        }
+        // insert
         range.insertNode(frag);
         rangeForNode = range.cloneRange();
         range.setStartAfter(lastNode);
