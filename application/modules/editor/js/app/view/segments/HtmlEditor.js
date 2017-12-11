@@ -66,14 +66,13 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   contentEdited: false, //is set to true if text content or content tags were modified
   disableErrorCheck: false,
   segmentLengthInRange:false,//is segment number of characters in defined range
-  valueAndMarkupTempVal:"",
-  
+
   strings: {
       tagOrderErrorText: '#UT# Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
       tagMissingText: '#UT# Die nachfolgenden Tags wurden noch nicht hinzugefügt oder beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Die Tastenkombination<br /><ul><li>STRG + EINFG (alternativ STRG + . (Punkt)) fügt den kompletten Quelltext in den Zieltext ein.</li><li>STRG + , (Komma) + &gt;Nummer&lt; fügt den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10) ein.</li><li>STRG + SHIFT + , (Komma) + &gt;Nummer&lt; fügt die Tags mit den Nummern 11 bis 20 in den Zieltext ein.</li></ul>Fehlende Tags:',
       tagDuplicatedText: '#UT# Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:',
       tagRemovedText: '#UT# Es wurden Tags mit fehlendem Partner entfernt!',
-      cantEditContents: '#UT#Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.',
+      cantEditContents: '#UT#Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.'
   },
   
   //***********************************************************************************
@@ -109,15 +108,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   initFrameDoc: function() {
 	  this.callParent(arguments);
 	  this.fireEvent('afterinitframedoc', this);
-  },
-
-  initEditor:function(){
-      var me=this;
-      if(me.valueAndMarkupTempVal!==""){
-          me.setValue(me.valueAndMarkupTempVal);
-          me.valueAndMarkupTempVal="";
-      }
-      me.callParent(arguments);
   },
 
   /**
@@ -156,28 +146,17 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       return false;
   },
   
-    /**
-     * loads segment data into the HtmlEditor
-     * resets internally the markup table, so tag validations checks only the here set tags
-     * @param value String
-     */
-    setValueAndMarkup: function(value, segmentId, fieldName){
-        //check tag is needed for the checkplausibilityofput feature on server side 
-        var me = this,
-            checkTag = me.getDuplicateCheckImg(segmentId, fieldName),
-            iframeBody = me.getEditorBody(),
-            patt = new RegExp(/<body>/g),
-            res = patt.test(iframeBody.parentNode.innerHTML);
-            
-        if(res){
-            me.initFrameDoc();
-            me.valueAndMarkupTempVal=me.markupForEditor(value)+checkTag;
-        }else{
-            me.setValue(me.markupForEditor(value)+checkTag);
-        }
-        
-        this.fireEvent('afterInitialSetValue', this);
-    },
+  /**
+   * Setzt Daten im HtmlEditor und fügt markup hinzu
+   * @param value String
+   */
+  setValueAndMarkup: function(value, segmentId, fieldName){
+      //check tag is needed for the checkplausibilityofput feature on server side 
+      var me = this,
+          checkTag = me.getDuplicateCheckImg(segmentId, fieldName);
+      
+      me.setValue(me.markupForEditor(value)+checkTag);
+  },
   /**
    * Fixing focus issues EXT6UPD-105 and EXT6UPD-137
    */
