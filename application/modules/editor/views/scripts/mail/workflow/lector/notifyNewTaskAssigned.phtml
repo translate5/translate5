@@ -34,8 +34,11 @@ END LICENSE AND COPYRIGHT
  */
 
 $session = new Zend_Session_Namespace();
-
-$this->subject = $this->translate->_('Translate5 - Aufgabe zugewiesen').' "'.$this->task->getTaskNr().' - '.$this->task->getTaskName().'"';
+$userLocale=null;
+if($this->user['locale'] && $this->user['locale']!==''){
+    $userLocale=$this->user['locale'];
+}
+$this->subject = $this->translate->_('Translate5 - Aufgabe zugewiesen',$userLocale).' "'.$this->task->getTaskNr().' - '.$this->task->getTaskName().'"';
 $portal = $session->runtimeOptions->server->protocol.$session->runtimeOptions->server->name;
 $portal = '<a href="'.$portal.'">'.$portal.'</a>';
 
@@ -47,8 +50,8 @@ Im Projektportal %3$s wurde Ihnen die Aufgabe <b>%4$s - %5$s</b> zugewiesen.<br 
 <br />Ihr Projektmanagement Team
 <br />%6$s
 <br />
-<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!'),
-    $this->mailEmployeeSalutation(),
+<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!',$userLocale),
+    $this->mailEmployeeSalutation($this->user['gender'], $userLocale),
     $this->user['surName'],
     $portal,
     $this->task->getTaskNr(),
