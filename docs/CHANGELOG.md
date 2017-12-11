@@ -3,6 +3,14 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.6.14] - 2017-12-11
+###Added
+TRANSLATE-1061: Add user locale dropdown to user add and edit window
+
+###Bugfixes
+TRANSLATE-1081: Using a taskGuid filter on /editor/task does not work for non PM users
+TRANSLATE-1077: Segment editing in IE 11 does not work
+
 ## [2.6.13] - 2017-12-07
 ###Added
 TRANSLATE-822: segment min and max length - activated in Frontend
