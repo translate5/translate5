@@ -234,7 +234,7 @@ Ext.application({
    * Apply the state for each configured grid in the defaultState config variable
    */
   applyDefaultState:function(){
-    if(Editor.data.frontend || !Editor.data.frontend.defaultState){
+    if(!Editor.data.frontend || !Editor.data.frontend.defaultState){
       return;
     }
     var me=this,
@@ -290,7 +290,28 @@ Ext.application({
   getDefaultStateConfigObject:function(selector){
       return Ext.clone(Editor.data.frontend.defaultState[selector]);
   },
-
+  
+  /***
+   * Output in the console the state
+   * (see the example: http://confluence.translate5.net/display/CON/Column+configuration+for+task+overview+and+user+management ) 
+   * for all rendered grids in the application
+   */
+  getGridState:function(){
+      var grids=Ext.ComponentQuery.query('grid');
+      if(grids.length<1){
+          console.log("No grids were found (rendered in the application).")
+          return;
+      }
+      var gridState=null,
+          gridStateContainer=[];
+      grids.forEach(function(grid) {
+          gridState=grid.getState();
+          gridStateContainer.push('"#'+grid.getItemId()+'":'+JSON.stringify(gridState))
+      });
+      
+      console.log('{'+gridStateContainer.join()+'}');
+  },
+  
   mask: function(msg, title) {
       if(!this.appMask) {
           this.appMask = Ext.widget('messagebox');
