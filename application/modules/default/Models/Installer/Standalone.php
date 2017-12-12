@@ -106,6 +106,7 @@ class Models_Installer_Standalone {
     public static function mainLinux(array $options = null) {
         $saInstaller = new self(getcwd(), $options);
         //TODO move options parameter to constructor instead of multiple usage
+        $saInstaller->checkAndCallTools();
         $saInstaller->checkEnvironment();
         $saInstaller->processDependencies();
         $saInstaller->addZendToIncludePath();
@@ -142,7 +143,17 @@ class Models_Installer_Standalone {
         }
     }
     
-    protected function checkEnvironment() {
+    protected function checkAndCallTools() {
+        if(!empty($this->options['help'])) {
+            $this->showHelp();
+            exit;
+        }
+        if(!empty($this->options['maintenance'])) {
+            $this->addZendToIncludePath();
+            $this->initApplication();
+            $this->maintenanceMode();
+            exit;
+        }
         if(!empty($this->options['updateCheck'])) {
             $this->addZendToIncludePath();
             $this->initApplication();
@@ -150,6 +161,52 @@ class Models_Installer_Standalone {
             $this->preconditonChecker->checkWorkers();
             exit; //exiting here completly after checkrun
         }
+    }
+    
+    protected function showHelp() {
+        echo "\n";
+        echo "  Usage: install-and-update.sh\n";
+        echo "  or:    install-and-update.sh [OPTION]...\n";
+        echo "  or:    install-and-update.sh [ZIPFILE]\n";
+        echo "\n";
+        echo "  Without parameters: updates translate5 installation with latest public release.\n";
+        echo "  Without ZIP File as parameter: ZIP must be a valid translate5 release, updates the current installation with the release given in the ZIP file.\n";
+        echo "  Without other arguments: do some maintenance tasks listed below.\n";
+        echo "\n\n";
+        echo "  Arguments: \n";
+        echo "    ZIPFILE               Optional, updates the installation with the given release from the ZIP file.";
+        echo "    --help                shows this help text\n";
+        echo "    --check               shows some status information about the current installation,\n"; 
+        echo "                          to decide if maintenance mode is needed or not\n";
+        echo "    --maintenance         shows maintance mode status\n"; 
+        echo "    --maintenance TIME    time in format 00:00, sets start of maintenance to TODAY TIME \n"; 
+        echo "    --maintenance off     disables maintenance, must be used after maintenance since\n"; 
+        echo "                          there is no automatic maintenance stop functionality!";
+        echo "\n\n";
+    }
+    
+    protected function maintenanceMode() {
+        require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/Maintenance.php';
+        $maintenance = new Models_Installer_Maintenance();
+        switch ($this->options['maintenance']) {
+            case '0':
+            case 'false':
+            case 'Off':
+            case 'OFF':
+            case 'off':
+                $maintenance->disable();
+                break;
+            
+            case 'show':
+                $maintenance->status();
+                break;
+            
+            default:
+                $maintenance->set($this->options['maintenance']);
+        };
+    }
+    
+    protected function checkEnvironment() {
         $this->installerFile = __FILE__;
         $this->installerHash = md5_file($this->installerFile);
         $this->preconditonChecker->checkEnvironment();
@@ -259,7 +316,7 @@ class Models_Installer_Standalone {
             exit;
         }
         $path = get_include_path();
-        set_include_path($path.PATH_SEPARATOR.$this->currentWorkingDir.self::ZEND_LIB);
+        set_include_path($path.PATH_SEPARATOR.$zendDir);
     }
     
     /**
