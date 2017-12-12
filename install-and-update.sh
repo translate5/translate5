@@ -11,6 +11,12 @@ case "$1" in
             ;;
 "--check")  CONFIG=",'updateCheck' => '1'"
             ;;
+"--help")  CONFIG=",'help' => '1'"
+            ;;
+"--maintenance")  
+            MODE=${2:-show};
+            CONFIG=",'maintenance' => '$MODE'"
+            ;;
 *)          CONFIG=",'applicationZipOverride' => '$1'"
             ;;
 esac
