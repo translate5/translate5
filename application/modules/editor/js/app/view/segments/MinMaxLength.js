@@ -103,7 +103,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             metaCache=record.get('metaCache'),
             charactersCount=me.getSegmentCharactersCount(me.htmlEditor.getValue());
         
-        if(metaCache.minWidth===null && metaCache.maxWidth===null){
+        if(!metaCache || metaCache.minWidth===null && metaCache.maxWidth===null){
             return false;
         }
         return true;
@@ -126,8 +126,8 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     updateLabel:function(record,charactersCount){
         var me=this,
             metaCache=record.get('metaCache'),
-            minWidth=metaCache.minWidth,
-            maxWidth=metaCache.maxWidth,
+            minWidth=metaCache && metaCache.minWidth,
+            maxWidth=metaCache && metaCache.maxWidth,
             cls = 'invalid-length',
             tooltipText = [];
 
