@@ -51,6 +51,7 @@ class Models_Installer_PreconditionCheck {
      * checks the implemented environment checks, stops on error
      */
     public function checkEnvironment() {
+        $this->checkGitInstallation();
         $this->checkPhpVersion();
         if(!empty($this->errorsEnvironment)) {
             $msg = 'Some system requirements of translate5 are not met: ';
@@ -68,6 +69,17 @@ class Models_Installer_PreconditionCheck {
                 $this->errorsEnvironment[] = 'Please update your xampp package manually or reinstall Translate5 with the latest windows installer from http://www.translate5.net';
                 $this->errorsEnvironment[] = 'Warning: Reinstallation can lead to data loss! Please contact support@translate5.net when you need assistance in data conversion!';
             }
+        }
+    }
+    
+    /**
+     * Checks if this is a git installation
+     */
+    protected function checkGitInstallation() {
+        if(file_exists('.git')) {
+            $msg  = 'A .git file/directory does exist in the project root!'."\n";
+            $msg .= '    Please use git to update your installation and call database import via GUI or use parameter --database.';
+            $this->errorsEnvironment[] = $msg;
         }
     }
     

@@ -154,6 +154,13 @@ class Models_Installer_Standalone {
             $this->maintenanceMode();
             exit;
         }
+        if(!empty($this->options['dbOnly'])) {
+            $this->addZendToIncludePath();
+            $this->initApplication();
+            $this->checkDb();
+            $this->updateDb();
+            exit;
+        }
         if(!empty($this->options['updateCheck'])) {
             $this->addZendToIncludePath();
             $this->initApplication();
@@ -176,6 +183,8 @@ class Models_Installer_Standalone {
         echo "  Arguments: \n";
         echo "    ZIPFILE               Optional, updates the installation with the given release from the ZIP file.";
         echo "    --help                shows this help text\n";
+        echo "    --database            just applies all available database updates\n";
+        echo "                          Does not fetch any updates and does not apply any file change!\n";
         echo "    --check               shows some status information about the current installation,\n"; 
         echo "                          to decide if maintenance mode is needed or not\n";
         echo "    --maintenance         shows maintance mode status\n"; 
