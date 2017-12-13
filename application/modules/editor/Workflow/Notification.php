@@ -180,6 +180,11 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             error_log("No workflow step to Role ".$triggeringRole." found! This is actually a workflow config error!");
         }
         $segments = $this->getStepSegments($currentStep);
+        
+        //START TEST HERE
+        $this->alexTestXliff2($task,$segments,$currentStep);
+        //END TEST HERE
+        
         $segmentHash = md5(print_r($segments,1)); //hash to identify the given segments (for internal caching)
         
         $nextRole = $workflow->getRoleOfStep((string)$workflow->getNextStep($currentStep));
@@ -195,7 +200,6 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             'task' => $task,
             'workflow' => $workflow
         );
-        
         //send to the PM
         $pms = $this->getTaskPmUsers();
         foreach($pms as $pm) {
@@ -218,6 +222,20 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             $this->addCopyReceivers($triggerConfig, $nextRole);
             $this->notify($user);
         }
+    }
+    
+    
+    public function alexTestXliff2(editor_Models_Task $task,array $segments,$workflowStep){
+        $xliffConf = [
+                editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_TERMINOLOGY => true,
+        ];
+        $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff2', [$xliffConf]);
+        /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff2 */
+        
+        $xliffConverter->workflowStep=$workflowStep;
+        error_log(print_r($segments,1));
+        $xliff=$xliffConverter->convert($task, $segments);
+        //error_log($xliff);
     }
     
     /**

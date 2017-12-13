@@ -723,20 +723,6 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->view->rows = (object)$row;
         unset($this->view->rows->qmSubsegmentFlags);
         
-        //$this->testXliff2($this->entity);
-    }
-    
-    public function testXliff2(editor_Models_Task $task){
-        $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff2', []);
-        /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff2 */
-        
-        //returns an segment iterator where the segments are ordered by segmentid,
-        // that means they are ordered by files as well
-        $segmentModel = ZfExtended_Factory::get('editor_Models_Segment');
-        /* @var $segmentModel editor_Models_Segment */
-        $segments=$segmentModel->loadByTaskGuid($task->getTaskGuid());
-        
-        error_log($xliffConverter->convert($task, $segments));
     }
     
     public function deleteAction() {

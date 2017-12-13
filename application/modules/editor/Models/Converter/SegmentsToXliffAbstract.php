@@ -190,33 +190,6 @@ class editor_Models_Converter_SegmentsToXliffAbstract {
      */
     public function setOptions(array $config) {
         $this->options = $config;
-        
-        //flags defaulting to false
-        $defaultsToFalse = [
-                self::CONFIG_INCLUDE_DIFF, 
-                self::CONFIG_PLAIN_INTERNAL_TAGS, 
-                self::CONFIG_ADD_TERMINOLOGY, 
-                self::CONFIG_ADD_ALTERNATIVES,
-        ];
-        foreach($defaultsToFalse as $key){
-            settype($this->options[$key], 'bool');
-        }
-        
-        //flags defaulting to true; if nothing given, empty is the falsy check
-        $defaultsToTrue = [
-                self::CONFIG_ADD_RELAIS_LANGUAGE, 
-                self::CONFIG_ADD_COMMENTS, 
-                self::CONFIG_ADD_STATE_QM,
-                self::CONFIG_ADD_PREVIOUS_VERSION,
-                self::CONFIG_ADD_DISCLAIMER,
-        ];
-        foreach($defaultsToTrue as $key){
-            $this->options[$key] = !(array_key_exists($key, $config) && empty($config[$key]));
-        }
-        
-        if(! $this->options[self::CONFIG_PLAIN_INTERNAL_TAGS] || $this->options[self::CONFIG_ADD_TERMINOLOGY]) {
-            $this->initTagHelper();
-        }
     }
     
     /**
@@ -245,7 +218,7 @@ class editor_Models_Converter_SegmentsToXliffAbstract {
         
         $this->data['relaisLang'] = $task->getRelaisLang();
         //disable relais export by setting relais lang to false
-        if(empty($this->data['relaisLang']) || !$this->options[self::CONFIG_ADD_RELAIS_LANGUAGE]){
+        if(empty($this->data['relaisLang']) || !isset($this->options[self::CONFIG_ADD_RELAIS_LANGUAGE])|| !$this->options[self::CONFIG_ADD_RELAIS_LANGUAGE]){
             $this->data['relaisLang'] = false;
         }
         else {
@@ -320,26 +293,6 @@ class editor_Models_Converter_SegmentsToXliffAbstract {
     }
     
     /**
-     * process and convert the segment states and QM states
-     * @param array $segment
-     */
-    protected function processStateAndQm(array $segment) {
-        $this->result[] = '<state stateid="'.$segment['stateId'].'">'.$this->segmentUtility->convertStateId($segment['stateId']).'</state>';
-        $qms = $this->segmentUtility->convertQmIds($segment['qmId']);
-        if(empty($qms)) {
-            $this->result[] = '<dx:qa-hits></dx:qa-hits>';
-        }
-        else {
-            $this->result[] = '<dx:qa-hits>';
-            $qmXml = '<dx:qa-hit dx:qa-origin="target" dx:qa-code="%1$s" dx:qa-shorttext="%2$s" />';
-            foreach ($qms as $qmid => $qm) {
-                $this->result[] = sprintf($qmXml, $qmid, $qm);
-            }
-            $this->result[] = '</dx:qa-hits>';
-        }
-    }
-    
-    /**
      * converts a 1D array in a 2D array, where the original filenames containing the segments are the keys of the first dimension.
      * returns: array('FILENAME_1' => array(seg1, seg2), 'FILENAME_2' => array(seg3, seg4)
      * 
@@ -358,58 +311,6 @@ class editor_Models_Converter_SegmentsToXliffAbstract {
             $result[$file][] = $segment;
         }
         return $result;
-    }
-    
-    /**
-     * prepares segment text parts for xml
-     * @param string $text
-     * @return string
-     */
-    protected function prepareText($text) {
-        if($this->options[self::CONFIG_PLAIN_INTERNAL_TAGS]) {
-            $text = $this->handleTerminology($text, true);
-            return $this->exportParser->exportSingleSegmentContent($text);
-        }
-        
-        //if plain internal tags are disabled:
-        // 1. toXliff converts the internal tags to xliff g,bx,ex and x tags
-        // 2. remove MQM tags
-        //TODO MQM tags are just removed and not supported by our XLIFF exporter so far!
-        $text = $this->taghelperInternal->toXliffPaired($text, true, $this->tagMap, $this->tagId);
-        $text = $this->handleTerminology($text, false); //internaltag replacment not needed, since already converted
-        $text = $this->taghelperMqm->remove($text);
-        return $text;
-    }
-    
-    /**
-     */
-    protected function handleTerminology($text, $protectInternalTags) {
-        if(!$this->options[self::CONFIG_ADD_TERMINOLOGY]){
-            return $this->taghelperTerm->remove($text);
-        }
-        $termStatus = editor_Models_Term::getAllStatus();
-        $transStatus = [
-                editor_Models_Term::TRANSSTAT_FOUND => 'found',
-                editor_Models_Term::TRANSSTAT_NOT_FOUND => 'notfound',
-                editor_Models_Term::TRANSSTAT_NOT_DEFINED => 'undefined',
-        ];
-        return $this->taghelperTerm->replace($text, function($wholeMatch, $tbxId, $classes) use ($termStatus, $transStatus) {
-            $status = '';
-            $translation = '';
-            foreach($classes as $class) {
-                if($class == editor_Models_Term::CSS_TERM_IDENTIFIER) {
-                    continue;
-                }
-                if(in_array($class, $termStatus)) {
-                    $status = $class;
-                    continue;
-                }
-                if(!empty($transStatus[$class])) {
-                    $translation = ' translate5:translated="'.$transStatus[$class].'"';
-                }
-            }
-            return '<mrk mtype="term" translate5:status="'.$status.'"'.$translation.'>';
-        }, '</mrk>', $protectInternalTags);
     }
     
     protected function initTagHelper() {
