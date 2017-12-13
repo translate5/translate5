@@ -400,7 +400,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             //some browsers create nbsp instead of normal whitespaces, since nbsp are removed by the protectWhitespace code below
             // we convert it to usual whitespaces. If there are multiple ones, they are reduced to one then.
             // This is so far the desired behavior. No characters escaped as tag by the import should be addable through the editor.
-            $this->data->{$key} = $data = str_replace($nbsp, ' ', $this->data->{$key});
+            // Empty spaces at the very beginning/end are only allowed during editing and now removed for saving.
+            $this->data->{$key} = $data = trim(str_replace($nbsp, ' ', $this->data->{$key}));
             
             //since our internal tags are a div span construct with plain content in between, we have to replace them first
             $data = $internalTag->protect($data);

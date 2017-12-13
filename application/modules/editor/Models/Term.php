@@ -301,12 +301,14 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $serialIds = '"'.implode('", "', $allIds).'"';
         
         $sql = $this->db->getAdapter()->select()
-                ->distinct()
                 ->from(array('t1' =>'LEK_terms'), array('t2.*'))
-                ->joinLeft(array('t2' =>'LEK_terms'), 't1.groupId = t2.groupId')
+                ->distinct()
+                ->joinLeft(array('t2' =>'LEK_terms'), 't1.groupId = t2.groupId', null)
+                ->join(array('l' =>'LEK_languages'), 't2.language = l.id', 'rtl')
                 ->where('t1.taskGuid = ?', $taskGuid)
                 ->where('t2.taskGuid = ?', $taskGuid)
                 ->where('t1.mid IN('.$serialIds.')');
+       
         $terms = $this->db->getAdapter()->fetchAll($sql);
         
         $termGroups = array();
