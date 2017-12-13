@@ -43,6 +43,7 @@ class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_
     protected $comments = [];
     
     protected $currentPropertiesKey = null;
+    protected $currentErrorInfosKey = null;
     protected $currentComments = [];
     
     /**
@@ -69,12 +70,16 @@ class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_
         if(! $config->runtimeOptions->editor->export->exportComments) {
             //currently only the comment export feature is implemented in the across XLF, 
             // so if exporting comments is disabled we disable just the whole function
-            //FIXME return;
+            return;
         }
         
         $xmlparser->registerElement('trans-unit ax:named-properties', null, function($tag, $key, $opener) use ($xmlparser){
             $this->currentPropertiesKey = $key;
         });
+        $xmlparser->registerElement('trans-unit ax:analysisResult ax:errorInfos', null, function($tag, $key, $opener) use ($xmlparser){
+            $this->currentErrorInfosKey = $key;
+        });
+        
         //must use another selector as in the Xlf Export itself. On using the same selector, the later one overwrites the first one
         $xmlparser->registerElement('trans-unit lekTargetSeg', null, function($tag, $key, $opener) use ($xmlparser, $task){
             $attributes = $opener['attributes'];
@@ -91,6 +96,10 @@ class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_
             
         });
         $xmlparser->registerElement('xliff trans-unit', null, function($tag, $key, $opener) use ($xmlparser){
+            /*
+            The following code adds translate5 comments as reals across comments.
+            The reading of such comments is not implemented in across yet. 
+            So we disable it here and add the comments as analysis result
             $commentString = $this->processComments();
             if(empty($this->currentPropertiesKey)) {
                 $replacement = '<ax:named-properties>'.$commentString.'</ax:named-properties>'.$xmlparser->getChunk($key);
@@ -100,12 +109,26 @@ class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_
                 $replacement = $commentString.$xmlparser->getChunk($key);
             }
             $xmlparser->replaceChunk($key, $replacement);
+            */
+            
+            $commentString = $this->processCommentsAsAnalysisResult();
+            if(empty($this->currentErrorInfosKey)) {
+                $replacement = '<ax:analysisResult><ax:errorInfos>'.$commentString.'</ax:errorInfos></ax:analysisResult>'.$xmlparser->getChunk($key);
+            }
+            else {
+                $keyToReplace = $this->currentErrorInfosKey;
+                $replacement = $commentString.$xmlparser->getChunk($key);
+            }
+            
+            $xmlparser->replaceChunk($key, $replacement);
+            
             $this->currentPropertiesKey = null;
+            $this->currentErrorInfosKey = null;
         });
     }
     
     /**
-     * creates a comment
+     * creates real across comments out of translate5 comments
      * @return string|mixed
      */
     protected function processComments() {
@@ -114,6 +137,7 @@ class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_
         }
 
         foreach($this->comments as $comment) {
+            //comments already imported from across are ignored
             if($comment['userGuid'] == editor_Models_Import_FileParser_Xlf_AcrossNamespace::USERGUID) {
                 continue;
             }
@@ -140,5 +164,44 @@ class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_
         self::$xmlWriter->writeAttribute('ax:name', $name);
         self::$xmlWriter->text($value);
         self::$xmlWriter->endElement();
+    }
+    
+    /**
+     * returns the segment comments as across analysisresult 
+     * @return string|mixed
+     */
+    protected function processCommentsAsAnalysisResult() {
+        if(empty($this->comments)) {
+            return '';
+        }
+
+        foreach($this->comments as $comment) {
+            //comments already imported from across are ignored:
+            if($comment['userGuid'] == editor_Models_Import_FileParser_Xlf_AcrossNamespace::USERGUID) {
+                continue;
+            }
+            self::$xmlWriter->startElement('ax:errorInfo');
+            self::$xmlWriter->startElement('ax:description');
+            
+            self::$xmlWriter->startElement('ax:type');
+            self::$xmlWriter->text('Comment');
+            self::$xmlWriter->endElement();
+            self::$xmlWriter->startElement('ax:title');
+            $date = date('m/d/Y H:i:s', strtotime($comment['modified']));
+            self::$xmlWriter->text('Comment from '.$comment['userName'].' ('.$date.') in translate5');
+            self::$xmlWriter->endElement();
+            self::$xmlWriter->startElement('ax:explanation');
+            self::$xmlWriter->text($comment['comment']);
+            self::$xmlWriter->endElement();
+            self::$xmlWriter->startElement('ax:instruction');
+            self::$xmlWriter->endElement();
+            self::$xmlWriter->startElement('ax:examples');
+            self::$xmlWriter->endElement();
+            
+            self::$xmlWriter->endElement(); //end ax:description
+            self::$xmlWriter->endElement(); //end ax:errorInfo
+        }
+        $this->comments = [];
+        return self::$xmlWriter->flush();
     }
 }

@@ -191,6 +191,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $alias = self::ASSOC_TABLE_ALIAS;
         $s = $this->db->select()
         ->from(array('t' => 'LEK_task'), $cols);
+        if(!empty($this->filter)) {
+            $this->filter->setDefaultTable('t');
+        }
         if($leftOuterJoin) {
             $on = $alias.'.taskGuid = t.taskGuid AND '.$alias.'.userGuid = '.$s->getAdapter()->quote($userGuid);
             $s->joinLeft(array($alias => 'LEK_taskUserAssoc'), $on, array());
