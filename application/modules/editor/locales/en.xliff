@@ -1641,6 +1641,14 @@ The Project Management team
 
 This e-mail has been generated automatically. Please do not reply to this e-mail.</target>
 </trans-unit>
+<trans-unit id='U2VociBnZWVocnRlciBIZXJy'>
+<source>Sehr geehrter Herr</source>
+    <target>Dear Mr.</target>
+</trans-unit>
+<trans-unit id='U2VociBnZWVocnRlIEZyYXU='>
+    <source>Sehr geehrte Frau</source>
+    <target>Dear Mrs.</target>
+</trans-unit>
 <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgZnJlaWdlZ2ViZW4='>
     <source>Translate5 - Aufgabe freigegeben</source>
     <target>Translate5 - task opened</target>
