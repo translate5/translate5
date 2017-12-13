@@ -47,7 +47,8 @@ Ext.define('Editor.model.admin.User', {
     {name: 'passwd', type: 'string'},
     {name: 'editable', type: 'boolean', persist: false},
     {name: 'sourceLanguage'},
-    {name: 'targetLanguage'}
+    {name: 'targetLanguage'},
+    {name: 'locale', type: 'string'}
   ],
   idProperty: 'id',
   proxy : {

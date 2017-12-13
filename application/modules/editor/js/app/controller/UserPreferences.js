@@ -45,16 +45,13 @@ Ext.define('Editor.controller.UserPreferences', {
     },
     window: null,
     refs:[{
-        ref : 'topMenu',
-        selector : 'headPanel #top-menu'
-    },{
         ref : 'form',
         selector : '#preferencesUserWindow form'
     }],
     init : function() {
         var me = this;
         me.control({
-            'headPanel': {
+            'headPanel toolbar#top-menu': {
                 afterrender: me.handleRenderHeadPanel
             },
             '#preferencesUserWindow #saveBtn': {
@@ -68,9 +65,9 @@ Ext.define('Editor.controller.UserPreferences', {
             }
         });
     },
-    handleRenderHeadPanel: function() {
-        var pos = this.getTopMenu().items.length - 1;
-        this.getTopMenu().insert(pos, {
+    handleRenderHeadPanel: function(topmenu) {
+        var pos = topmenu.items.length - 1;
+        topmenu.insert(pos, {
             xtype: 'button',
             itemId: 'mySettingsBtn',
             text: this.strings.settings

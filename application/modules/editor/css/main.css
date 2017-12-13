@@ -44,6 +44,7 @@ div.x-container.x-container-default {position: initial;}
 .direction-rtl {
     direction:rtl;
 }
+.metaTermPanel .term-group div.direction-rtl,
 td.direction-rtl.x-grid-td div.x-grid-cell-inner {
     text-align:right !important;
 }
@@ -285,6 +286,17 @@ background-color: #EAF1FB;
 #segment-grid.comments-for-locked-segments .x-grid-item-selected .editing-disabled .comments-field img.edit,
 #segment-grid.comments-for-locked-segments .x-grid-item-selected .editing-disabled .comments-field img.add {
     display:block;
+}
+
+#segment-grid .segment-min-max div {
+    font-weight:bold;
+    padding:0.1em 0.3em;
+}
+#segment-grid .segment-min-max .invalid-length {
+    background-color: #ff4242;
+}
+#segment-grid .segment-min-max .valid-length {
+    background-color: #24f324;
 }
 
 .comments-grid .x-action-col-cell img {height:16px;width:16px;cursor: pointer;}

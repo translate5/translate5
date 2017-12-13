@@ -68,7 +68,8 @@ Ext.define('Editor.view.admin.UserAddWindow', {
         sourceLangageTip:'#UT#Quellsprache(n)',
         targetLangageLabel:'#UT#Zielsprache(n)',
         targetLangageTip:'#UT#Zielsprache(n)',
-        languageInfo: '#UT#Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.'
+        languageInfo: '#UT#Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.',
+        localeLabel:'#UT#Lokalisierung'
     },
     modal : true,
     layout:'fit',
@@ -88,7 +89,9 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                 labelWidth: 160,
                 anchor: '100%'
             },
-            bottomInfo = [me.strings.bottomInfo];
+            bottomInfo = [me.strings.bottomInfo],
+            translations = [];
+        
         if(!instanceConfig.editMode) {
             bottomInfo.push(me.strings.bottomPwInfo);
         }
@@ -104,6 +107,9 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                 value: key,
                 handler: me.roleCheckChange
             });
+        });
+        Ext.Object.each(Editor.data.translations, function(id,value) {
+            translations.push([id,value]);
         });
         config = {
             title: me.title, //see EXT6UPD-9
@@ -249,7 +255,19 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                                     tag: 'div',
                                     'data-qtip': Ext.String.htmlEncode(me.strings.bottomRoleInfo)
                                 }
-                            }]
+                            },{
+		                        xtype: 'combo',
+		                        itemId: 'locale',
+		                        name:'locale',
+		                        width:110,
+		                        allowBlank: false,
+		                        editable: false,
+		                        forceSelection: true,
+		                        store: translations,
+		                        queryMode: 'local',
+		                        toolTip: me.strings.localeTip,
+		                        fieldLabel: me.strings.localeLabel
+		                    }]
                         },{
                             xtype: 'fieldset',
                             margin:5,

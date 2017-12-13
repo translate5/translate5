@@ -459,6 +459,7 @@ Ext.define('Editor.controller.Editor', {
         me.prevNextSegment.reset();
 
         if(me.isEditing &&rec && rec.get('editable')) {
+            me.fireEvent('prepareTrackChangesForSaving');
             me.fireEvent('saveUnsavedComments');
             me.fireEvent('saveSegment');
         }
@@ -588,6 +589,7 @@ Ext.define('Editor.controller.Editor', {
         if(!me.isEditing) {
             return;
         }
+        me.fireEvent('prepareTrackChangesForSaving');
         me.fireEvent('saveUnsavedComments');
         
         me.fireEvent('saveSegment', {
@@ -1059,5 +1061,4 @@ Ext.define('Editor.controller.Editor', {
         filePanel.expand();
         filePanel.down('referenceFileTree').expand();
     }
-  
 });

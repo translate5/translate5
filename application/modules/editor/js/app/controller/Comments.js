@@ -150,6 +150,7 @@ Ext.define('Editor.controller.Comments', {
             ed = me.getEditPlugin(),
             add = ev.getTarget('img.add'),
             edit = ev.getTarget('img.edit'),
+            readOnlyMode = view.lookupViewModel().get('editorIsReadonly'),
             mpController = Editor.app.getController('MetaPanel');
         me.record = null;
         
@@ -164,7 +165,7 @@ Ext.define('Editor.controller.Comments', {
         }
         
         if(add || edit) {
-            if(rec.get('editable')) {
+            if(rec.get('editable') && !readOnlyMode) {
                 ed.startEdit(rec, view.getHeaderAtIndex(0));
             }
             else {
@@ -184,10 +185,12 @@ Ext.define('Editor.controller.Comments', {
      */
     handleCommentsColumnDblClick: function (view, rec, tr, idx, ev) {
         var me = this,
+            readOnlyMode = view.lookupViewModel().get('editorIsReadonly'),
+            isEditable = (rec.get('editable') && !readOnlyMode);
             isCommentsCol = ev.getTarget('td.comments-field'),
             isForced = me.isEnabledForLocked();
         
-        if(rec.get('editable') || !isCommentsCol || !isForced) {
+        if(isEditable || !isCommentsCol || !isForced) {
             return;
         }
         me.record = rec;

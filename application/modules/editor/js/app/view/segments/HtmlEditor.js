@@ -65,6 +65,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   duplicatedContentTags: [],
   contentEdited: false, //is set to true if text content or content tags were modified
   disableErrorCheck: false,
+  segmentLengthInRange:false,//is segment number of characters in defined range
 
   strings: {
       tagOrderErrorText: '#UT# Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
@@ -185,6 +186,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     	result,
     	body = me.getEditorBody();
     me.checkTags(body);
+    me.setSegmentLengthInRange(body.textContent || body.innerText || "");
     result = me.unMarkup(body);
     me.contentEdited = me.plainContent.join('') !== result.replace(/<img[^>]+>/g, '');
     return result;
@@ -221,7 +223,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   insertMarkup: function(value, initMarkupMapOnly) {
       var html = this.markup(value).join(''),
           doc = this.getDoc(),
-          sel, range, frag, node, el, lastNode, rangeForNode;
+          sel, range, frag, node, el, lastNode, rangeForNode,
+          termTags, termTageNode, arrLength, i;
       
       //if that parameter is true, no html is inserted into the target column
       if(initMarkupMapOnly) {
@@ -241,6 +244,17 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         while ((node = el.firstChild)) {
             lastNode = frag.appendChild(node);
         }
+        // remove term-tag-markup (will be added again after saving where appropriate)
+        termTags = frag.querySelectorAll('span.term');
+        arrLength = termTags.length;
+        for( i=0; i < arrLength; i++ ) {
+            termTageNode = termTags[i];
+            while(termTageNode.firstChild) {
+                termTageNode.parentNode.insertBefore(termTageNode.firstChild,termTageNode);
+            }
+            termTageNode.parentNode.removeChild(termTageNode);
+        }
+        // insert
         range.insertNode(frag);
         rangeForNode = range.cloneRange();
         range.setStartAfter(lastNode);
@@ -574,6 +588,13 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           return true;
       }
 
+      //if the segment characters length is not in the defined range, add the message
+      if(!me.segmentLengthInRange) {
+          //fire the event, and get the message from the segmentminmaxlength component
+          me.fireEvent('contentErrors', me, me.getSegmentMinMaxLength().activeErroMessage);
+          return true;
+      }
+      
       if(me.missingContentTags.length > 0 || me.duplicatedContentTags.length > 0){
           var msg = '', 
               //first item the field to check, second item: the error text:
@@ -852,5 +873,29 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           dir = isRtl ? 'rtl' : 'ltr';
       body.set({"dir": dir});
       body.setStyle('direction', dir);
+  },
+  
+  /***
+   * Set the internal flag segmentLengthInRange based on if the currently edited segment number of characters is within the defined range.
+   */
+  setSegmentLengthInRange:function(bodyText){
+      var me=this,
+          minMaxLength=me.getSegmentMinMaxLength();
+      //check if the the min/max length is supplied
+      if(minMaxLength){
+          me.segmentLengthInRange=minMaxLength.isSegmentLengthInRange(bodyText);
+          return;
+      }
+      me.segmentLengthInRange=true;
+  },
+  
+  /***
+   * Return segmentMinMaxLength component instance
+   */
+  getSegmentMinMaxLength:function(){
+      var me=this,
+          minMaxLength=Ext.ComponentQuery.query('#segmentMinMaxLength');
+      return minMaxLength.length>0 ? minMaxLength[0] : null;
   }
+  
 });

@@ -125,6 +125,9 @@ Ext.define('Editor.view.changealike.Window', {
       if(sourceEdit) {
           targetEdit = this.overwriteSource+format('source',sourceEdit)+this.overwriteTarget+format('target',targetEdit);
       }
+      else {
+          targetEdit = format('target',targetEdit);
+      }
       
       this.down('#infoText').update({
           edited: targetEdit,
