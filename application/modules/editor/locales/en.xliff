@@ -1967,6 +1967,10 @@ The changes made by the formerly active role <b>{previousRole}</b> are listed be
 <br />
 {footer}</target>
 </trans-unit>
+<trans-unit id='SW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZGllIEF1ZmdhYmUgPGI+e3Rhc2sudGFza05yfSAtIHt0YXNrLnRhc2tOYW1lfTwvYj4gYXVmZ3J1bmQgZWluZXIgVGVybWluw7xiZXJzY2hyZWl0dW5nIGF1dG9tYXRpc2NoIGbDvHIgYWxsZSBCZW51dHplciBkZXIgUm9sbGUgPGk+e3ByZXZpb3VzUm9sZX08L2k+IGFiZ2VzY2hsb3NzZW4uPGJyIC8+'>
+    <source>Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> aufgrund einer Terminüberschreitung automatisch für alle Benutzer der Rolle <i>{previousRole}</i> abgeschlossen.<br /></source>
+    <target>The task <b>{task.taskNr} - {task.taskName}</b> was finished due a missed deadline automatically for all users of the role <i>{previousRole}</i> in the task-portal {portalLink}.<br /></target>
+</trans-unit>
     </body>
   </file>
 </xliff>
