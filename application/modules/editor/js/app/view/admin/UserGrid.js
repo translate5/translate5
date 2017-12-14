@@ -44,6 +44,7 @@ Ext.define('Editor.view.admin.UserGrid', {
       surName: '#UT#Nachname',
       gender: '#UT#Geschlecht',
       email: '#UT#E-Mail',
+      locale: '#UT#Sprache',
       roles: '#UT#Systemrollen'
   },
   strings: {
@@ -160,6 +161,15 @@ Ext.define('Editor.view.admin.UserGrid', {
       ,
         me.getLanguagesConfig('targetLanguage',me.strings.targetLangageLabel,me.strings.targetLangageTip)
       ,{
+          xtype: 'gridcolumn',
+          width: 160,
+          dataIndex: 'locale',
+          stateId: 'locale',
+          filter: {
+              type: 'string'
+          },
+          text: me.text_cols.locale
+      },{
           xtype: 'actioncolumn',
           stateId:'userGridActionColumn',
           width: 80,
