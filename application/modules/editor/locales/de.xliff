@@ -1098,6 +1098,25 @@ Adresse eine Link an, um Ihr Passwort neu setzen zu können.
 ------------------------------
 
 {footer}</target></trans-unit>
+<trans-unit id='e2hlYWRlcn0KCkltIFByb2pla3Rwb3J0YWwge3BvcnRhbExpbmt9IHd1cmRlIElobmVuIGRpZSBBdWZnYWJlIDxiPnt0YXNrLnRhc2tOcn0gLSB7dGFzay50YXNrTmFtZX08L2I+IHp1Z2V3aWVzZW4uPGJyIC8+CjxiciAvPgo8Yj5BdWZnYWJlOjwvYj4ge3Rhc2sudGFza05hbWV9PGJyIC8+CjxiPlF1ZWxsc3ByYWNoZTo8L2I+IHtzb3VyY2VMYW5ndWFnZVRyYW5zbGF0ZWR9PGJyIC8+CjxiPlppZWxzcHJhY2hlOjwvYj4ge3RhcmdldExhbmd1YWdlVHJhbnNsYXRlZH08YnIgLz4Ke3JlbGFpc0xhbmd1YWdlRnJhZ21lbnR9PGI+TGllZmVyZGF0dW06PC9iPiB7dGFzay50YXJnZXREZWxpdmVyeURhdGV9PGJyIC8+CjxiPldvcnRhbnphaGw6PC9iPiB7d29yZENvdW50fTxiciAvPgp7cHJvb2ZyZWFkZXJzRnJhZ21lbnR9e2Zvb3Rlcn0='><source>{header}
+
+Im Projektportal {portalLink} wurde Ihnen die Aufgabe <b>{task.taskNr} - {task.taskName}</b> zugewiesen.<br />
+<br />
+<b>Aufgabe:</b> {task.taskName}<br />
+<b>Quellsprache:</b> {sourceLanguageTranslated}<br />
+<b>Zielsprache:</b> {targetLanguageTranslated}<br />
+{relaisLanguageFragment}<b>Lieferdatum:</b> {task.targetDeliveryDate}<br />
+<b>Wortanzahl:</b> {wordCount}<br />
+{proofreadersFragment}{footer}</source><target>{header}
+
+Im Projektportal {portalLink} wurde Ihnen die Aufgabe <b>{task.taskNr} - {task.taskName}</b> zugewiesen.<br />
+<br />
+<b>Aufgabe:</b> {task.taskName}<br />
+<b>Quellsprache:</b> {sourceLanguageTranslated}<br />
+<b>Zielsprache:</b> {targetLanguageTranslated}<br />
+{relaisLanguageFragment}<b>Lieferdatum:</b> {task.targetDeliveryDate}<br />
+<b>Wortanzahl:</b> {wordCount}<br />
+{proofreadersFragment}{footer}</target></trans-unit>
   </body>
  </file>
 </xliff>
