@@ -722,6 +722,7 @@ class editor_TaskController extends ZfExtended_RestController {
             
         $this->view->rows = (object)$row;
         unset($this->view->rows->qmSubsegmentFlags);
+        
     }
     
     public function deleteAction() {

@@ -41,7 +41,7 @@ $data = [
     'portalLink' => '<a href="'.$portal.'">'.$portal.'</a>',
     'companyName' => $session->runtimeOptions->companyName,
     'salutation' => $this->mailEmployeeSalutation(),
-    'surName' => $this->user->surName,
+    'surName' => $this->user['surName'],
 ];
     
 $this->header = $this->templateApply('{salutation} {surName},<br />

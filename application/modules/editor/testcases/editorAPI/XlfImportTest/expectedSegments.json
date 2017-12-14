@@ -23,7 +23,9 @@
         "targetToSort": "Apache 2.0 auf Unixsystemen - ",
         "targetEdit": "Apache 2.0 auf Unixsystemen - Manual",
         "targetEditToSort": "Apache 2.0 auf Unixsystemen - ",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "2",
@@ -49,7 +51,9 @@
         "targetToSort": "PHP Manual",
         "targetEdit": "PHP Manual",
         "targetEditToSort": "PHP Manual",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "3",
@@ -75,7 +79,8 @@
         "targetToSort": "Teste einen weichen (Unix) Umb",
         "targetEdit": "Teste einen weichen (Unix) Umbruch<div class=\"single 736f667452657475726e2f\"><span title=\"&lt;softReturn\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"softReturn\" data-filename=\"ade8d1cbd33e857beb4d78d48543468b\" class=\"full\">&lt;softReturn\/&gt;<\/span><\/div>",
         "targetEditToSort": "Teste einen weichen (Unix) Umb",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "4",
@@ -101,7 +106,8 @@
         "targetToSort": "Teste mehrere &lt;1\/&gt;&lt;sp",
         "targetEdit": "Teste mehrere <div class=\"single 73706163652074733d223230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>Leerzeichen und<div class=\"single 73706163652074733d2230393039222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>Tabs",
         "targetEditToSort": "Teste mehrere &lt;1\/&gt;&lt;sp",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "5",
@@ -127,7 +133,8 @@
         "targetToSort": "Teste dass eine matchratio &lt",
         "targetEdit": "Teste dass eine matchratio &lt; 100 editierbar ist",
         "targetEditToSort": "Teste dass eine matchratio &lt",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "6",
@@ -153,7 +160,8 @@
         "targetToSort": "Teste unterschiedliche matchin",
         "targetEdit": "Teste unterschiedliche matchinfos",
         "targetEditToSort": "Teste unterschiedliche matchin",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "7",
@@ -179,7 +187,8 @@
         "targetToSort": "Teste &amp;para; Entities \u00b6 un",
         "targetEdit": "Teste &amp;para; Entities \u00b6 und Umlaute \u00f6\u00e4\u00fc\u00b6",
         "targetEditToSort": "Teste &amp;para; Entities \u00b6 un",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "8",
@@ -205,7 +214,8 @@
         "targetToSort": "Dieses Segment sollte nicht ed",
         "targetEdit": "Dieses Segment sollte nicht editierbar sein!",
         "targetEditToSort": "Dieses Segment sollte nicht ed",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "9",
@@ -231,7 +241,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "10",
@@ -257,7 +268,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "11",
@@ -283,7 +295,8 @@
         "targetToSort": "13 - Teste eine vorhandene \u00dcbe",
         "targetEdit": "13 - Teste eine vorhandene \u00dcbersetzung. ",
         "targetEditToSort": "13 - Teste eine vorhandene \u00dcbe",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "12",
@@ -309,7 +322,8 @@
         "targetToSort": "13 - Mit MRK Tags.",
         "targetEdit": "13 - Mit MRK Tags.",
         "targetEditToSort": "13 - Mit MRK Tags.",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "13",
@@ -335,7 +349,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "14",
@@ -361,7 +376,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "15",
@@ -387,7 +403,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "16",
@@ -413,7 +430,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "17",
@@ -439,7 +457,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "18",
@@ -465,7 +484,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "19",
@@ -491,7 +511,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "20",
@@ -517,7 +538,8 @@
         "targetToSort": "f2-1 - Teste die Verwendung ei",
         "targetEdit": "f2-1 - Teste die Verwendung einer bereits verwendeten ID - was zul\u00e4ssig ist!",
         "targetEditToSort": "f2-1 - Teste die Verwendung ei",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "21",
@@ -543,7 +565,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "22",
@@ -569,7 +592,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "23",
@@ -595,7 +619,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "24",
@@ -621,7 +646,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "25",
@@ -647,7 +673,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "26",
@@ -673,7 +700,8 @@
         "targetToSort": "f2-6 - Test mit gegebenen &lt;",
         "targetEdit": "f2-6 - Test mit gegebenen <div class=\"single 70682069643d2231223e266c743b696d67207372633d2671756f743b666f6f2671756f743b207469746c653d2671756f743b3c7375623e66322d36202d2074657374652073756220467261676d656e743c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;img src=&quot;foo&quot; title=&quot;f2-6 - teste sub Fragment&quot;\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"6ddb7b58879ea30d0922bc1b5489f0a3\" class=\"full\">&lt;img src=&quot;foo&quot; title=&quot;f2-6 - teste sub Fragment&quot;\/&gt;<\/span><\/div>\u00dcbersetzungen mit MRK und SUB Tags.",
         "targetEditToSort": "f2-6 - Test mit gegebenen &lt;",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "27",
@@ -699,7 +727,8 @@
         "targetToSort": "f2-6 - teste sub Fragment",
         "targetEdit": "f2-6 - teste sub Fragment",
         "targetEditToSort": "f2-6 - teste sub Fragment",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "28",
@@ -725,7 +754,8 @@
         "targetToSort": "f2-6 - Teste das Alignment von",
         "targetEdit": "f2-6 - Teste das Alignment von Quell- und Zielfragmenten.",
         "targetEditToSort": "f2-6 - Teste das Alignment von",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "29",
@@ -751,7 +781,8 @@
         "targetToSort": "f2-7 - Test mit &lt;1\/&gt;&lt;",
         "targetEdit": "f2-7 - Test mit <div class=\"single 70682069643d2233223e266c743b696d67207469746c653d2671756f743b333c7375623e66322d37202d2073756220333c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;img title=&quot;3f2-7 - sub 3&quot;\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"11a5014a148d68960c71171867dc22f7\" class=\"full\">&lt;img title=&quot;3f2-7 - sub 3&quot;\/&gt;<\/span><\/div>gegebenen <div class=\"single 70682069643d2231223e266c743b696d67207469746c653d2671756f743b313c7375623e66322d37202d2073756220313c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;img title=&quot;1f2-7 - sub 1&quot;\/&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"4c40a38fb9751b463b47f063efeef52d\" class=\"full\">&lt;img title=&quot;1f2-7 - sub 1&quot;\/&gt;<\/span><\/div>\u00dcbersetzungen mit MRK und SUB Tags.",
         "targetEditToSort": "f2-7 - Test mit &lt;1\/&gt;&lt;",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "30",
@@ -777,7 +808,8 @@
         "targetToSort": "f2-7 - sub 1",
         "targetEdit": "f2-7 - sub 1",
         "targetEditToSort": "f2-7 - sub 1",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "31",
@@ -803,7 +835,8 @@
         "targetToSort": "f2-7 - sub 3",
         "targetEdit": "f2-7 - sub 3",
         "targetEditToSort": "f2-7 - sub 3",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "32",
@@ -829,7 +862,8 @@
         "targetToSort": "f2-7 - Teste das Alignment von",
         "targetEdit": "f2-7 - Teste das Alignment von Quell- <div class=\"single 70682069643d2232223e266c743b696d67207469746c653d2671756f743b323c7375623e66322d37202d2073756220323c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;img title=&quot;2f2-7 - sub 2&quot;\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"2c927a3f9430c3cc28097e0cf8db1d03\" class=\"full\">&lt;img title=&quot;2f2-7 - sub 2&quot;\/&gt;<\/span><\/div> und Zielfragmenten.",
         "targetEditToSort": "f2-7 - Teste das Alignment von",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "33",
@@ -855,7 +889,8 @@
         "targetToSort": "f2-7 - sub 2",
         "targetEdit": "f2-7 - sub 2",
         "targetEditToSort": "f2-7 - sub 2",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "34",
@@ -881,7 +916,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "35",
@@ -907,7 +943,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "36",
@@ -933,7 +970,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "37",
@@ -959,7 +997,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "38",
@@ -985,7 +1024,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "39",
@@ -1011,7 +1051,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "40",
@@ -1037,7 +1078,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "41",
@@ -1063,7 +1105,8 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     },
     {
         "segmentNrInTask": "42",
@@ -1089,6 +1132,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "isWatched": false
+        "isWatched": false,
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
     }
 ]

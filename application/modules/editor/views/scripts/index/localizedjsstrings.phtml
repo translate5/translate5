@@ -302,6 +302,16 @@ Ext.define('Editor.controller.Localizer', {
             cantEditContents: '<?php echo $this->translate->_('Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.');?>'
         }
     });
+
+    Ext.define("Editor.locale.de.view.segments.MinMaxLength", {
+        override: "Editor.view.segments.MinMaxLength",
+        strings: {
+            minTooltip: '<?php echo $this->translate->_('Minimale Länge: {0};');?>',
+            maxTooltip: '<?php echo $this->translate->_('Maximale Länge: {0};');?>',
+            segmentBellowLimit: '<?php echo $this->translate->_('Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.');?>',
+            segmentOverLimit: '<?php echo $this->translate->_('Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.');?>'
+        }
+    });
     
 
     Editor.view.segments.RowEditor.prototype.messages = {
@@ -387,7 +397,7 @@ Ext.define('Editor.controller.Localizer', {
 
     Ext.define("Editor.locale.de.controller.admin.TaskUserAssoc", {
         override: "Editor.controller.admin.TaskUserAssoc",
-        title: '<?php echo $this->translate->_('Referenz-Dateie');?>'
+        title: '<?php echo $this->translate->_('Referenz-Dateien');?>'
     });
 
     Ext.define("Editor.locale.de.controller.admin.TaskOverview", {
@@ -752,7 +762,8 @@ Ext.define('Editor.controller.Localizer', {
         sourceLangageTip: '<?php echo $this->translate->_('Quellsprache(n)');?>',
         targetLangageLabel: '<?php echo $this->translate->_('Zielsprache(n)');?>',
         targetLangageTip: '<?php echo $this->translate->_('Zielsprache(n)');?>',
-        languageInfo: '<?php echo $this->translate->_('Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.');?>'
+        languageInfo: '<?php echo $this->translate->_('Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.');?>',
+        localeLabel: '<?php echo $this->translate->_('Lokalisierung');?>'
     };
 <?php
     } //END if $this->hasFrontendController('Editor.controller.admin.User')

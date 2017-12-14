@@ -77,9 +77,6 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
     },{
         ref: 'TmWindow',
         selector: '#addTmWindow'
-    },{
-        ref : 'topMenu',
-        selector : 'headPanel #top-menu'
     }],
     listen: {
         controller: {
@@ -127,7 +124,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
             '#tmOverviewPanel #btnRefresh':{
                 click:'handleButtonRefreshClick'
             },
-            'headPanel': {
+            'headPanel toolbar#top-menu': {
                 afterrender: 'handleRenderHeadPanel'
             },
             '#adminTaskGrid': {
@@ -190,9 +187,9 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
     showButtonTmOverview : function(){
         this.getHeadToolBar() && this.getHeadToolBar().down('#btnTmOverviewWindow').show();
     },
-    handleRenderHeadPanel: function() {
-        var pos = this.getTopMenu().items.length - 2;
-        this.getTopMenu().insert(pos, {
+    handleRenderHeadPanel: function(toolbar) {
+        var pos = toolbar.items.length - 2;
+        toolbar.insert(pos, {
             xtype: 'button',
             itemId: 'btnTmOverviewWindow',
             text: this.strings.matchresource
