@@ -42,6 +42,7 @@ $params = [
         'wordCount' => $this->task->getWordCount() > 0 ? $this->task->getWordCount() : '-',
 ];
 
+//FIXME let the languages come from triggering part!
 //get languages:
 $lang = ZfExtended_Factory::get('editor_Models_Languages');
 /* @var $lang editor_Models_Languages */

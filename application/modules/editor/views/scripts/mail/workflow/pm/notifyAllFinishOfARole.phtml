@@ -33,87 +33,67 @@ END LICENSE AND COPYRIGHT
  *
  */
 
-$session = new Zend_Session_Namespace();
+$this->render('general.phtml');
 
 //Define Action String
 if($this->isCron) {
     $this->subject = $this->translate->_('Translate5 - Aufgabe automatisch abgeschlossen').' "'.$this->task->getTaskNr().' - '.$this->task->getTaskName().'"';
-    $action = 'Im Projektportal Translate5 wurde die Aufgabe <b>%1$s - %2$s</b> aufgrund einer Terminüberschreitung automatisch für alle Benutzer der Rolle <i>%3$s</i> abgeschlossen.<br />';
+    $action = 'Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> aufgrund einer Terminüberschreitung automatisch für alle Benutzer der Rolle <i>{previousRole}</i> abgeschlossen.<br />';
 }
 else {
     $this->subject = $this->translate->_('Translate5 - Aufgabe abgeschlossen').' "'.$this->task->getTaskNr().' - '.$this->task->getTaskName().'"';
-    $action = 'Im Projektportal Translate5 wurde die Aufgabe <b>%1$s - %2$s</b> durch alle Benutzer der Rolle <i>%3$s</i> abgeschlossen.<br />';
+    $action = 'Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> durch alle Benutzer der Rolle <i>{previousRole}</i> abgeschlossen.<br />';
 }
-$action = sprintf($this->translate->_($action), $this->task->getTaskNr(),$this->task->getTaskName(),$this->triggeringRole);
+$action = $this->templateApply($this->translate->_($action), [
+    'task' => $this->task->getDataObject(),
+    'previousRole' => $this->translate->_($this->triggeringRole),
+]);
 
 //Define User List
+$params = [];
 if(empty($this->nextRole)&&  in_array($this->triggeringRole, $this->workflow->getSteps2Roles())){
     $userNotification = "Die Aufgabe ist vollständig bearbeitet, es sind keine weiteren Benutzer der Aufgabe zugeordnet.<br />\n<br />\n";
 }
 elseif(!empty($this->nextRole)&&  in_array($this->triggeringRole, $this->workflow->getSteps2Roles())) {
     $userNotification=<<<'END'
-Die Aufgabe wurde nun automatisch für die folgenden Benutzer in der Rolle <i>%2$s</i> freigegeben:<br />
-%1$s
+Die Aufgabe wurde nun automatisch für die folgenden Benutzer in der Rolle <i>{nextRole}</i> freigegeben:<br />
+{userList}<br />
 <br />
 Die Benutzer wurden per E-Mail darüber informiert.<br />
 <br />
 END;
-    $userNotification = sprintf($this->translate->_($userNotification), $this->workflowNotifyHtmlMailUserList($this->users),$this->translate->_($this->nextRole));
+    $params['nextRole'] = $this->translate->_($this->nextRole); 
+    $params['userList'] = $this->workflowNotifyHtmlMailUserList($this->users);
 }
 else{
-    $userNotification = 'Die Rolle <i>%1$s</i> war nicht Teil der Workflowkette, daher wurden keine Benutzer benachrichtigt.<br />\n<br />\n';
-    $userNotification = sprintf($this->translate->_($userNotification), $this->translate->_($this->triggeringRole));
+    $userNotification = 'Die Rolle <i>{previousRole}</i> war nicht Teil der Workflowkette, daher wurden keine Benutzer benachrichtigt.<br />\n<br />\n';
 }
+$userNotificationHTML = $this->templateApply($this->translate->_($userNotification),$params);
+$userNotificationText = $this->templateApply($this->translate->_($userNotification),[
+    'userList' => $this->translate->_('- Die Daten sind nur in der HTML-Ansicht der E-Mail verfügbar! -')
+]);
 
-//Define E-Mail Footer
-$footer = <<<'END'
+$template = $this->translate->_('{header}
+{action}<br />
+{usersNotified}<br />
 <br />
-<br />
-Sie erreichen das Portal unter: <a href="%1$s">%1$s</a><br />
-<br />
-<br />Vielen Dank und viele Grüße,
-<br />Ihr Projektmanagement Team
-<br />%2$s
-<br />
-<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!
-END;
-$footer = sprintf($this->translate->_($footer), $session->runtimeOptions->server->protocol.$session->runtimeOptions->server->name,$session->runtimeOptions->companyName);
-
-$this->textbody=<<<'END'
-%1$s %2$s,
-
-%3$s
-%4$s
-%7$s
-END;
-
-$this->textbody = sprintf($this->translate->_($this->textbody),
-    $this->mailEmployeeSalutation(),
-    $this->user['surName'],
-    strip_tags($action),
-    strip_tags("\n==================\n".$userNotification."\n==================\n"),
-    $this->translate->_($this->triggeringRole),
-    '', //displaying segments is not supported in textmails
-    strip_tags($footer)
-);
-
-$html=<<<'END'
-%1$s %2$s,<br />
-<br />
-%3$s<br />
-%4$s<br />
-Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <b>%5$s</b>:<br />
-%6$s
+Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle {previousRole}:<br />
+{changedSegments}
 <hr />
-%7$s
-END;
+<br />
+{footer}');
 
-echo sprintf($this->translate->_($html),
-    $this->mailEmployeeSalutation(),
-    $this->user['surName'],
-    $action,
-    $userNotification,
-    $this->translate->_($this->triggeringRole),
-    $this->workflowNotifyHtmlMailSegmentList($this->segments),
-    $footer
-);
+//create text body
+$this->textbody = strip_tags($this->templateApply($template, [
+    'header' => $this->header,
+    'footer' => $this->footer,
+    'action' => $action,
+    'usersNotified' => $userNotificationText,
+    'changedSegments' => $this->translate->_('- Die Daten sind nur in der HTML-Ansicht der E-Mail verfügbar! -'),
+]));
+
+echo $this->templateApply($template, [
+    //just overwrite the changedSegments
+    'usersNotified' => $userNotificationHTML,
+    'changedSegments' => $this->workflowNotifyHtmlMailSegmentList($this->segments),
+]);
