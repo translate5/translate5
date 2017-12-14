@@ -39,6 +39,7 @@ $params = [
         'task' => $this->task->getDataObject(),
         'header' => $this->header,
         'footer' => $this->footer,
+        'targetDeliveryDate' => $this->task->getTargetDeliveryDate(), //FIXME format date!
         'wordCount' => $this->task->getWordCount() > 0 ? $this->task->getWordCount() : '-',
 ];
 
@@ -94,7 +95,7 @@ Im Projektportal {portalLink} wurde Ihnen die Aufgabe <b>{task.taskNr} - {task.t
 <b>Aufgabe:</b> {task.taskName}<br />
 <b>Quellsprache:</b> {sourceLanguageTranslated}<br />
 <b>Zielsprache:</b> {targetLanguageTranslated}<br />
-{relaisLanguageFragment}<b>Lieferdatum:</b> {task.targetDeliveryDate}<br />
+{relaisLanguageFragment}<b>Lieferdatum:</b> {targetDeliveryDate}<br />
 <b>Wortanzahl:</b> {wordCount}<br />
 {proofreadersFragment}{footer}',$params);
 
