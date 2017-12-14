@@ -1053,6 +1053,51 @@
 <trans-unit id='RGVyIFNlZ21lbnRpbmhhbHQgaXN0IHp1IGxhbmchIE1heGltYWwgezB9IFplaWNoZW4gc2luZCBlcmxhdWJ0Lg=='><source>Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.</source><target>Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.</target></trans-unit>
 <trans-unit id='TG9rYWxpc2llcnVuZw=='><source>Lokalisierung</source><target>Lokalisierung</target></trans-unit>
 <trans-unit id='U3ByYWNoZQ=='><source>Sprache</source><target>Sprache</target></trans-unit>
+<trans-unit id='e3NhbHV0YXRpb259IHtzdXJOYW1lfSw8YnIvPgo8YnIvPg=='><source>{salutation} {surName},<br/>
+<br/></source><target>{salutation} {surName},<br/>
+<br/></target></trans-unit>
+<trans-unit id='PGJyLz4KPGJyLz5WaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKPGJyLz5JaHIgUHJvamVrdG1hbmFnZW1lbnQgVGVhbQo8YnIvPntjb21wYW55TmFtZX0KPGJyLz4KPGJyLz5EaWVzZSBFbWFpbCB3dXJkZSBhdXRvbWF0aXNjaCBnZW5lcmllcnQuIEJpdHRlIGFudHdvcnRlbiBTaWUgbmljaHQgYXVmIGRpZXNlIEUtTWFpbCE='><source><br/>
+<br/>Vielen Dank und viele Grüße,
+<br/>Ihr Projektmanagement Team
+<br/>{companyName}
+<br/>
+<br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source><target><br/>
+<br/>Vielen Dank und viele Grüße,
+<br/>Ihr Projektmanagement Team
+<br/>{companyName}
+<br/>
+<br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</target></trans-unit>
+<trans-unit id='e2hlYWRlcn0KU2llIGVyaGFsdGVuIGRpZXNlIEVtYWlsLCB3ZWlsIElociBLb250byBhdWYge3BvcnRhbFVybH0gbmV1IGFuZ2VsZWd0IG9kZXIgSWhyIFBhc3N3b3J0IHp1csO8Y2tnZXNldHp0IHd1cmRlLiAKCklociBCZW51dHplcm5hbWU6Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQp7bG9naW59Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKV2VubiBTaWUgSWhyIEtvbnRvIGvDvG5mdGlnIG51dHplbiBtw7ZjaHRlbiwgZGFubiBmb3JkZXJuIFNpZSB1bnRlciBkZXIgZm9sZ2VuZGVuCkFkcmVzc2UgZWluZSBMaW5rIGFuLCB1bSBJaHIgUGFzc3dvcnQgbmV1IHNldHplbiB6dSBrw7ZubmVuLgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCntwb3J0YWxVcmx9e3Jlc2V0dXJsfQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCntmb290ZXJ9'><source>{header}
+Sie erhalten diese Email, weil Ihr Konto auf {portalUrl} neu angelegt oder Ihr Passwort zurückgesetzt wurde. 
+
+Ihr Benutzername:
+------------------------------
+{login}
+------------------------------
+
+Wenn Sie Ihr Konto künftig nutzen möchten, dann fordern Sie unter der folgenden
+Adresse eine Link an, um Ihr Passwort neu setzen zu können.
+
+------------------------------
+{portalUrl}{reseturl}
+------------------------------
+
+{footer}</source><target>{header}
+Sie erhalten diese Email, weil Ihr Konto auf {portalUrl} neu angelegt oder Ihr Passwort zurückgesetzt wurde. 
+
+Ihr Benutzername:
+------------------------------
+{login}
+------------------------------
+
+Wenn Sie Ihr Konto künftig nutzen möchten, dann fordern Sie unter der folgenden
+Adresse eine Link an, um Ihr Passwort neu setzen zu können.
+
+------------------------------
+{portalUrl}{reseturl}
+------------------------------
+
+{footer}</target></trans-unit>
   </body>
  </file>
 </xliff>

@@ -1850,6 +1850,52 @@
       <source>Sprache</source>
       <target>Language</target>
   </trans-unit>
+
+<trans-unit id='e3NhbHV0YXRpb259IHtzdXJOYW1lfSw8YnIvPgo8YnIvPg=='><source>{salutation} {surName},<br/>
+<br/></source><target>{salutation} {surName},<br/>
+<br/></target></trans-unit>
+<trans-unit id='PGJyLz4KPGJyLz5WaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKPGJyLz5JaHIgUHJvamVrdG1hbmFnZW1lbnQgVGVhbQo8YnIvPntjb21wYW55TmFtZX0KPGJyLz4KPGJyLz5EaWVzZSBFbWFpbCB3dXJkZSBhdXRvbWF0aXNjaCBnZW5lcmllcnQuIEJpdHRlIGFudHdvcnRlbiBTaWUgbmljaHQgYXVmIGRpZXNlIEUtTWFpbCE='><source><br/>
+<br/>Vielen Dank und viele Grüße,
+<br/>Ihr Projektmanagement Team
+<br/>{companyName}
+<br/>
+<br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source><target><br/>
+<br/>Many thanks and best regards,
+<br/>The Project Management team
+<br/>{companyName}
+<br/>
+<br/>This e-mail has been generated automatically. Please do not reply to this e-mail.</target></trans-unit>
+<trans-unit id='e2hlYWRlcn0KU2llIGVyaGFsdGVuIGRpZXNlIEVtYWlsLCB3ZWlsIElociBLb250byBhdWYge3BvcnRhbFVybH0gbmV1IGFuZ2VsZWd0IG9kZXIgSWhyIFBhc3N3b3J0IHp1csO8Y2tnZXNldHp0IHd1cmRlLiAKCklociBCZW51dHplcm5hbWU6Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQp7bG9naW59Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKV2VubiBTaWUgSWhyIEtvbnRvIGvDvG5mdGlnIG51dHplbiBtw7ZjaHRlbiwgZGFubiBmb3JkZXJuIFNpZSB1bnRlciBkZXIgZm9sZ2VuZGVuCkFkcmVzc2UgZWluZSBMaW5rIGFuLCB1bSBJaHIgUGFzc3dvcnQgbmV1IHNldHplbiB6dSBrw7ZubmVuLgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCntwb3J0YWxVcmx9e3Jlc2V0dXJsfQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCntmb290ZXJ9'><source>{header}
+Sie erhalten diese Email, weil Ihr Konto auf {portalUrl} neu angelegt oder Ihr Passwort zurückgesetzt wurde. 
+
+Ihr Benutzername:
+------------------------------
+{login}
+------------------------------
+
+Wenn Sie Ihr Konto künftig nutzen möchten, dann fordern Sie unter der folgenden
+Adresse eine Link an, um Ihr Passwort neu setzen zu können.
+
+------------------------------
+{portalUrl}{reseturl}
+------------------------------
+
+{footer}</source><target>{header}
+You have received this email, because your account on {portalUrl} was created or your password was reset. 
+
+Your username:
+------------------------------
+{login}
+------------------------------
+
+If you want to use your account in the future, then please request a link
+to reset your password from the following address.
+
+------------------------------
+{portalUrl}{reseturl}
+------------------------------
+
+{footer}</target></trans-unit>
     </body>
   </file>
 </xliff>
