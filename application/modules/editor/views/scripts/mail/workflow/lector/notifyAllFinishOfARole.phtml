@@ -37,14 +37,14 @@ $this->subject = $this->translate->_('Translate5 - Aufgabe freigegeben').' "'.$t
 
 $this->render('general.phtml');
 
-$template = $this->translate->_('{header}
+$template = '{header}
 Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> für Sie freigegeben.<br />
 <br />
-Im folgenden die getätigten Änderungen der vorhergehenden {previousRole}:<br />
+Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRole}</b>:<br />
 {changedSegments}
 <hr />
 <br />
-{footer}');
+{footer}';
 
 $this->textbody = strip_tags($this->templateApply($template, [
     'task' => $this->task->getDataObject(),
