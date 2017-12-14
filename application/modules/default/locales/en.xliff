@@ -134,7 +134,63 @@
         <source>Ihr Passwort wurde neu gesetzt. Sie können sich nun einloggen.</source>
         <target>Your password has been reset. You can login now.</target>
     </trans-unit>
+<trans-unit id='e3NhbHV0YXRpb259IHtzdXJOYW1lfSw8YnIvPgo8YnIvPg=='><source>{salutation} {surName},<br/>
+<br/></source><target>{salutation} {surName},<br/>
+<br/></target></trans-unit>
+<trans-unit id='PGJyLz4KPGJyLz5WaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKPGJyLz5JaHIgUHJvamVrdG1hbmFnZW1lbnQgVGVhbQo8YnIvPntjb21wYW55TmFtZX0KPGJyLz4KPGJyLz5EaWVzZSBFbWFpbCB3dXJkZSBhdXRvbWF0aXNjaCBnZW5lcmllcnQuIEJpdHRlIGFudHdvcnRlbiBTaWUgbmljaHQgYXVmIGRpZXNlIEUtTWFpbCE='><source><br/>
+<br/>Vielen Dank und viele Grüße,
+<br/>Ihr Projektmanagement Team
+<br/>{companyName}
+<br/>
+<br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source><target><br/>
+<br/>Many thanks and best regards,
+<br/>The Project Management team
+<br/>{companyName}
+<br/>
+<br/>This e-mail has been generated automatically. Please do not reply to this e-mail.</target></trans-unit>
+<trans-unit id='e2hlYWRlcn0KU2llIGVyaGFsdGVuIGRpZXNlIEVtYWlsLCB3ZWlsIHdpciBlaW5lIEFuZnJhZ2UgenVyIMOEbmRlcnVuZyBkZXMgUGFzc3dvcnRlcyBmw7xyIElociBLb250byBhdWYge3BvcnRhbFVybH0gZXJoYWx0ZW4gaGFiZW4uIAoKV2VubiBTaWUgSWhyIFBhc3N3b3J0IMOkbmRlcm4gbcO2Y2h0ZW4sIGRhbm4gYmVmb2xnZW4gU2llIGJpdHRlIGZvbGdlbmRlIEFud2Vpc3VuZ2VuOgoKRGVyIGZvbGdlbmRlIExpbmsgZW50aMOkbHQgZWluZW4gZsO8ciAzMCBNaW51dGVuIGfDvGx0aWdlbiBTY2hsw7xzc2VsLCBtaXQgd2VsY2hlbSBTaWUgSWhyIFBhc3N3b3J0IG5ldSBzZXR6ZW4ga8O2bm5lbi4gQXVzIFNpY2hlcmhlaXRzZ3LDvG5kZW4gZnVua3Rpb25pZXJ0IGRpZXMgbnVyLCB3ZW5uIFNpZSBkZW4gZm9sZ2VuZGVuIExpbmsgaW0gc2VsYmVuIEJyb3dzZXIgaW4gZGVtIFNpZSBkaWUgw4RuZGVydW5nIElocmVzIFBhc3N3b3J0IGFuZ2Vmb3JkZXJ0IGhhYmVuIMO2ZmZuZW4gdW5kIHp1ZGVtIG5hY2ggWnVyw7xja3NldHplbiBkZXMgUGFzc3dvcnRzIElocmVuIEJyb3dzZXIgbmljaHQgbmV1IGdlc3RhcnRldCBoYWJlbi4KCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpMaW5rIHVtIFBhc3N3b3J0IG5ldSB6dSBzZXR6ZW4KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCntwb3J0YWxVcmx9e2hhc2h1cmx9Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KClNvbGx0ZSBJaHIgU2NobMO8c3NlbCBuaWNodCBtZWhyIGfDvGx0aWcgc2Vpbiwga8O2bm5lbiBTaWUgdW50ZXIgamVkZXJ6ZWl0IGVpbmVuIG5ldWVuIFNjaGzDvHNzZWwgYW5mb3JkZXJuLgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0Ke3BvcnRhbFVybH17cmVzZXR1cmx9Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKU29sbHRlbiBTaWUgZGllIEFuZnJhZ2UgbmljaHQgc2VsYnN0IGF1c2dlbMO2c3QgaGFiZW4sIGJpdHRlbiB3aXIgU2llIHVucyBkYXLDvGJlciB6dSBpbmZvcm1pZXJlbi4KCntmb290ZXJ9'><source>{header}
+Sie erhalten diese Email, weil wir eine Anfrage zur Änderung des Passwortes für Ihr Konto auf {portalUrl} erhalten haben. 
 
+Wenn Sie Ihr Passwort ändern möchten, dann befolgen Sie bitte folgende Anweisungen:
+
+Der folgende Link enthält einen für 30 Minuten gültigen Schlüssel, mit welchem Sie Ihr Passwort neu setzen können. Aus Sicherheitsgründen funktioniert dies nur, wenn Sie den folgenden Link im selben Browser in dem Sie die Änderung Ihres Passwort angefordert haben öffnen und zudem nach Zurücksetzen des Passworts Ihren Browser nicht neu gestartet haben.
+
+==============================
+Link um Passwort neu zu setzen
+------------------------------
+{portalUrl}{hashurl}
+------------------------------
+==============================
+
+Sollte Ihr Schlüssel nicht mehr gültig sein, können Sie unter jederzeit einen neuen Schlüssel anfordern.
+------------------------------
+{portalUrl}{reseturl}
+------------------------------
+
+Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüber zu informieren.
+
+{footer}</source><target>{header}
+You have received this e-mail because we have received a request to change the password for your account at {portalUrl}.
+
+If you have sent such a request and would like to change your password, please follow these instructions:
+
+The following link contains a key which is valid for 30 minutes, and which can be used to reset your password. For security reasons, this will only work if you open the link in the same browser in which you requested the change to your password, and in addition, if you have not re-opened your browser after resetting the password.
+
+==============================
+Link to reset password
+------------------------------
+{portalUrl}{hashurl}
+------------------------------
+==============================
+
+If your key is no longer valid, you can request a new one at any time.
+------------------------------
+{portalUrl}{reseturl}
+------------------------------
+
+If you did not send the request yourself, please inform us of this.
+
+{footer}</target></trans-unit>
     
         </body>
     </file>
