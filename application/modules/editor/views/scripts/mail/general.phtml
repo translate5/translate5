@@ -36,12 +36,12 @@ $data = [
     'surName' => $this->receiver->surName,
 ];
 
-$this->header = $this->templateApply($this->translate->_('{salutation} {surName},<br />
-<br />'), $data);
+$this->header = $this->templateApply('{salutation} {surName},<br/>
+<br/>', $data);
 
-$this->footer = $this->templateApply($this->translate->_('<br />
-<br />Vielen Dank und viele Grüße,
-<br />Ihr Projektmanagement Team
-<br />{companyName}
-<br />
-<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!'), $data);
+$this->footer = $this->templateApply('<br/>
+<br/>Vielen Dank und viele Grüße,
+<br/>Ihr Projektmanagement Team
+<br/>{companyName}
+<br/>
+<br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!', $data);
