@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  * 
  * TODO: MQM and Terminology markup export is missing! 
  */
-class editor_Models_Converter_SegmentsToXliff {
+class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_SegmentsToXliffAbstract{
     /**
      * includeDiff                = boolean, enable or disable diff generation, defaults to false
      * @var string
@@ -160,36 +160,12 @@ class editor_Models_Converter_SegmentsToXliff {
     protected $tagId = 1;
     
     /**
-     * Constructor
-     * 
-     * Supported parameters for $config are
-     * - includeDiff                = boolean, enable or disable diff generation, defaults to false
-     * - plainInternalTags          = boolean, exports internal tags plain content, 
-     *                                currently only needed for BEO export, defaults to false
-     * - addRelaisLanguage          = boolean, add relais language target as alt trans (if available), defaults to true
-     * - addComments                = boolean, add comments, defaults to true
-     * - addStateAndQm              = boolean, add segment state and QM, defaults to true
-     * - addAlternatives            = boolean, add target alternatives as alt trans, defaults to false
-     * - addPreviousVersion         = boolean, add target original as alt trans, defaults to true
-     * - addDisclaimer              = boolean, add disclaimer that format is not 100% xliff 1.2, defaults to true
-     * 
-     * @param array $config
-     */
-    public function __construct(array $config = []){
-        $this->setOptions($config);
-        
-        $this->comment = ZfExtended_Factory::get('editor_Models_Comment');
-        $this->segmentUtility = ZfExtended_Factory::get('editor_Models_Segment_Utility');
-        $this->differ = ZfExtended_Factory::get('editor_Models_Export_DiffTagger_Sdlxliff');
-    }
-    
-    /**
      * For the options see the constructor
      * @see self::__construct
      * @param array $config
      */
     public function setOptions(array $config) {
-        $this->options = $config;
+        parent::setOptions($config);
         
         //flags defaulting to false
         $defaultsToFalse = [
@@ -251,6 +227,7 @@ class editor_Models_Converter_SegmentsToXliff {
     
     /**
      * initializes internally needed data for convertion
+     * //FIXME this is universal
      */
     protected function initConvertionData() {
         $task = $this->task;
@@ -559,6 +536,7 @@ class editor_Models_Converter_SegmentsToXliff {
      * returns: array('FILENAME_1' => array(seg1, seg2), 'FILENAME_2' => array(seg3, seg4)
      * 
      * @param array $segments
+     * //FIXME this is universal also
      * @return array
      */
     protected function reorderByFilename(array $segments) {
