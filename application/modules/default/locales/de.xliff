@@ -97,59 +97,6 @@
 <trans-unit id='TmV1ZXMgUGFzc3dvcnQ='><source>Neues Passwort</source><target>Neues Passwort</target></trans-unit>
 <trans-unit id='RS1NYWlsIGFuZm9yZGVybg=='><source>E-Mail anfordern</source><target>E-Mail anfordern</target></trans-unit>
 <trans-unit id='WnVyw7xjayB6dXIgU3RhcnRzZWl0ZQ=='><source>Zurück zur Startseite</source><target>Zurück zur Startseite</target></trans-unit>
-<trans-unit id='JTEkcyAlMiRzLA0KDQpTaWUgZXJoYWx0ZW4gZGllc2UgRW1haWwsIHdlaWwgd2lyIGVpbmUgQW5mcmFnZSB6dXIgw4RuZGVydW5nIGRlcyBQYXNzd29ydGVzIGbDvHIgSWhyIEtvbnRvIGF1ZiAlMyRzJTQkcyU1JHMgZXJoYWx0ZW4gaGFiZW4uIA0KDQpXZW5uIFNpZSBJaHIgUGFzc3dvcnQgw6RuZGVybiBtw7ZjaHRlbiwgZGFubiBiZWZvbGdlbiBTaWUgYml0dGUgZm9sZ2VuZGUgQW53ZWlzdW5nZW46DQoNCkRlciBmb2xnZW5kZSBMaW5rIGVudGjDpGx0IGVpbmVuIGbDvHIgMzAgTWludXRlbiBnw7xsdGlnZW4gU2NobMO8c3NlbCwgbWl0IHdlbGNoZW0gU2llIElociBQYXNzd29ydCBuZXUgc2V0emVuIGvDtm5uZW4uIEF1cyBTaWNoZXJoZWl0c2dyw7xuZGVuIGZ1bmt0aW9uaWVydCBkaWVzIG51ciwgd2VubiBTaWUgZGVuIGZvbGdlbmRlbiBMaW5rIGltIHNlbGJlbiBCcm93c2VyIGluIGRlbSBTaWUgZGllIMOEbmRlcnVuZyBJaHJlcyBQYXNzd29ydCBhbmdlZm9yZGVydCBoYWJlbiDDtmZmbmVuIHVuZCB6dWRlbSBuYWNoIFp1csO8Y2tzZXR6ZW4gZGVzIFBhc3N3b3J0cyBJaHJlbiBCcm93c2VyIG5pY2h0IG5ldSBnZXN0YXJ0ZXQgaGFiZW4uDQoNCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KTGluayB1bSBQYXNzd29ydCBuZXUgenUgc2V0emVuDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCiUzJHMlNCRzJTUkcyU2JHMNCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09DQoNClNvbGx0ZSBJaHIgU2NobMO8c3NlbCBuaWNodCBtZWhyIGfDvGx0aWcgc2Vpbiwga8O2bm5lbiBTaWUgdW50ZXIgamVkZXJ6ZWl0IGVpbmVuIG5ldWVuIFNjaGzDvHNzZWwgYW5mb3JkZXJuLg0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQolMyRzJTQkcyU1JHMlNyRzDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCg0KU29sbHRlbiBTaWUgZGllIEFuZnJhZ2UgbmljaHQgc2VsYnN0IGF1c2dlbMO2c3QgaGFiZW4sIGJpdHRlbiB3aXIgU2llIHVucyBkYXLDvGJlciB6dSBpbmZvcm1pZXJlbi4NCg0KVmllbGVuIERhbmsgdW5kIHZpZWxlIEdyw7zDn2UsDQpJaHIgUHJvamVrdG1hbmFnZW1lbnQgVGVhbQ0KJTgkcw0KDQpEaWVzZSBFbWFpbCB3dXJkZSBhdXRvbWF0aXNjaCBnZW5lcmllcnQuIFBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBlbWFpbC4='><source>%1$s %2$s,
-
-Sie erhalten diese Email, weil wir eine Anfrage zur Änderung des Passwortes für Ihr Konto auf %3$s%4$s%5$s erhalten haben. 
-
-Wenn Sie Ihr Passwort ändern möchten, dann befolgen Sie bitte folgende Anweisungen:
-
-Der folgende Link enthält einen für 30 Minuten gültigen Schlüssel, mit welchem Sie Ihr Passwort neu setzen können. Aus Sicherheitsgründen funktioniert dies nur, wenn Sie den folgenden Link im selben Browser in dem Sie die Änderung Ihres Passwort angefordert haben öffnen und zudem nach Zurücksetzen des Passworts Ihren Browser nicht neu gestartet haben.
-
-==============================
-Link um Passwort neu zu setzen
-------------------------------
-%3$s%4$s%5$s%6$s
-------------------------------
-==============================
-
-Sollte Ihr Schlüssel nicht mehr gültig sein, können Sie unter jederzeit einen neuen Schlüssel anfordern.
-------------------------------
-%3$s%4$s%5$s%7$s
-------------------------------
-
-Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüber zu informieren.
-
-Vielen Dank und viele Grüße,
-Ihr Projektmanagement Team
-%8$s
-
-Diese Email wurde automatisch generiert. Please do not reply to this email.</source><target>%1$s %2$s,
-
-Sie erhalten diese Email, weil wir eine Anfrage zur Änderung des Passwortes für Ihr Konto auf %3$s%4$s%5$s erhalten haben. 
-
-Wenn Sie Ihr Passwort ändern möchten, dann befolgen Sie bitte folgende Anweisungen:
-
-Der folgende Link enthält einen für 30 Minuten gültigen Schlüssel, mit welchem Sie Ihr Passwort neu setzen können. Aus Sicherheitsgründen funktioniert dies nur, wenn Sie den folgenden Link im selben Browser in dem Sie die Änderung Ihres Passwort angefordert haben öffnen und zudem nach Zurücksetzen des Passworts Ihren Browser nicht neu gestartet haben.
-
-==============================
-Link um Passwort neu zu setzen
-------------------------------
-%3$s%4$s%5$s%6$s
-------------------------------
-==============================
-
-Sollte Ihr Schlüssel nicht mehr gültig sein, können Sie unter jederzeit einen neuen Schlüssel anfordern.
-------------------------------
-%3$s%4$s%5$s%7$s
-------------------------------
-
-Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüber zu informieren.
-
-Vielen Dank und viele Grüße,
-Ihr Projektmanagement Team
-%8$s
-
-Diese Email wurde automatisch generiert. Please do not reply to this email.</target></trans-unit>
 <trans-unit id='U2VociBnZWVocnRlciBIZXJy'><source>Sehr geehrter Herr</source><target>Sehr geehrter Herr</target></trans-unit>
 <trans-unit id='UGVyIEUtTWFpbCB3dXJkZSBJaG5lbiBlaW4gTGluayB6dWdlc2FuZHQsIG1pdCB3ZWxjaGVtIFNpZSBJaHIgUGFzc3dvcnQgbmV1IHNldHplbiBrw7ZubmVuLiBEaWVzZXIgTGluayBpc3QgMzAgbWluIGfDvGx0aWcgdW5kIGZ1bmt0aW9uaWVydCBudXIsIHNvIGxhbmdlIFNpZSBJaHJlbiBCcm93c2VyIG5pY2h0IHp3aXNjaGVuemVpdGxpY2ggZ2VzY2hsb3NzZW4gaGFiZW4uIFNpZSBrw7ZubmVuIGplZGVyemVpdCBlaW5lbiBuZXVlbiBMaW5rIMO8YmVyIGRpZXNlcyBGb3JtdWxhciBhbmZvcmRlcm4u'><source>Per E-Mail wurde Ihnen ein Link zugesandt, mit welchem Sie Ihr Passwort neu setzen können. Dieser Link ist 30 min gültig und funktioniert nur, so lange Sie Ihren Browser nicht zwischenzeitlich geschlossen haben. Sie können jederzeit einen neuen Link über dieses Formular anfordern.</source><target>Per E-Mail wurde Ihnen ein Link zugesandt, mit welchem Sie Ihr Passwort neu setzen können. Dieser Link ist 30 min gültig und funktioniert nur, so lange Sie Ihren Browser nicht zwischenzeitlich geschlossen haben. Sie können jederzeit einen neuen Link über dieses Formular anfordern.</target></trans-unit>
 <trans-unit id='dHJhbnNsYXRlNSBRdWVsbGNvZGUgYXVmIGJpdGJ1Y2tldA=='><source>translate5 Quellcode auf bitbucket</source><target>translate5 Quellcode auf bitbucket</target></trans-unit>
