@@ -120,7 +120,7 @@ class editor_Models_Segment_AutoStates {
     const REVIEWED_PM_UNCHANGED_AUTO = 13;
     
     /**
-     * reviewed but unchanged through the repetition editor by a pm not associated in the workflow of a task
+     * if a translator uses the repetition editor, the segments are getting that state:
      * @var integer
      */
     const TRANSLATED_AUTO = 14;
@@ -186,6 +186,7 @@ class editor_Models_Segment_AutoStates {
           ),
           editor_Workflow_Abstract::ROLE_TRANSLATOR => [
             self::TRANSLATED,
+            self::TRANSLATED_AUTO,
           ],
           editor_Workflow_Abstract::ROLE_LECTOR => array(
             self::REVIEWED,

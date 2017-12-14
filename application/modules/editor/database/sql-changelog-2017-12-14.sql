@@ -1,3 +1,4 @@
+
 -- /*
 -- START LICENSE AND COPYRIGHT
 -- 
@@ -14,8 +15,9 @@
 --  http://www.gnu.org/licenses/agpl.html
 --   
 --  There is a plugin exception available for use with this release of translate5 for
---  translate5: Please see http://www.translate5.net/plugin-exception.txt or 
---  plugin-exception.txt in the root folder of translate5.
+--  translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
+--  Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
+--  folder of translate5.
 --   
 --  @copyright  Marc Mittag, MittagQI - Quality Informatics
 --  @author     MittagQI - Quality Informatics
@@ -25,4 +27,5 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-ALTER TABLE `Zf_users` CHANGE `locale` `locale` VARCHAR(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT 'en';
+INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `description`, `userGroup`) VALUES ('2017-12-14', 'TRANSLATE-1084', 'change', 'refactor internal translation mechanism and usage of translation in emails', 'The internal translation mechanism was partly refactored, since it was not properly used in sending emails. This is fixed right now.', '12'),
+('2017-12-14', 'several smaller issues', 'bugfix', 'Several smaller issues', 'missing visitor mail templates', '12');
