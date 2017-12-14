@@ -3,6 +3,13 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.6.16] - 2017-12-14
+###Changed
+TRANSLATE-1084: refactor internal translation mechanism
+
+###Bugfixes
+several smaller issues
+
 ## [2.6.14] - 2017-12-11
 ###Added
 TRANSLATE-1061: Add user locale dropdown to user add and edit window
