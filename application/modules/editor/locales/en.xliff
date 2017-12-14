@@ -2026,6 +2026,10 @@ You can access the portal at: %3$s<br />
     <source>Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.</source>
     <target>The segment content is too long! Maximum {0} characters are allowed.</target>
   </trans-unit>
+  <trans-unit id='U3ByYWNoZQ=='>
+      <source>Sprache</source>
+      <target>Language</target>
+  </trans-unit>
     </body>
   </file>
 </xliff>
