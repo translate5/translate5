@@ -66,7 +66,7 @@ END;
     $params['userList'] = $this->workflowNotifyHtmlMailUserList($this->users);
 }
 else{
-    $userNotification = 'Die Rolle <i>{previousRole}</i> war nicht Teil der Workflowkette, daher wurden keine Benutzer benachrichtigt.<br />\n<br />\n';
+    $userNotification = "Die Rolle <i>{previousRole}</i> war nicht Teil der Workflowkette, daher wurden keine Benutzer benachrichtigt.<br />\n<br />\n";
 }
 $userNotificationHTML = $this->templateApply($userNotification,$params);
 $userNotificationText = $this->templateApply($userNotification,[

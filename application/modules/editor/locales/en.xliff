@@ -1976,6 +1976,11 @@ The changes made by the formerly active role <b>{previousRole}</b> are listed be
 </source><target>The task ist completed, there are no more users associated with the task.<br />
 <br />
 </target></trans-unit>
+<trans-unit id='RGllIFJvbGxlIDxpPntwcmV2aW91c1JvbGV9PC9pPiB3YXIgbmljaHQgVGVpbCBkZXIgV29ya2Zsb3drZXR0ZSwgZGFoZXIgd3VyZGVuIGtlaW5lIEJlbnV0emVyIGJlbmFjaHJpY2h0aWd0LjxiciAvPgo8YnIgLz4K'><source>Die Rolle <i>{previousRole}</i> war nicht Teil der Workflowkette, daher wurden keine Benutzer benachrichtigt.<br />
+<br />
+</source><target>The role <i>{previousRole}</i> was not part of workflow, so no users were notified.<br />
+<br />
+</target></trans-unit>
     </body>
   </file>
 </xliff>
