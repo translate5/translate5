@@ -33,31 +33,69 @@ END LICENSE AND COPYRIGHT
  *
  */
 
-$session = new Zend_Session_Namespace();
-$userLocale=null;
-if($this->user['locale'] && $this->user['locale']!==''){
-    $userLocale=$this->user['locale'];
-}
-$this->subject = $this->translate->_('Translate5 - Aufgabe zugewiesen',$userLocale).' "'.$this->task->getTaskNr().' - '.$this->task->getTaskName().'"';
-$portal = $session->runtimeOptions->server->protocol.$session->runtimeOptions->server->name;
-$portal = '<a href="'.$portal.'">'.$portal.'</a>';
+$this->render('general.phtml');
 
-$mailBody = sprintf($this->translate->_('%1$s %2$s,<br />
+$params = [        
+        'task' => $this->task->getDataObject(),
+        'header' => $this->header,
+        'footer' => $this->footer,
+        'wordCount' => $this->task->getWordCount() > 0 ? $this->task->getWordCount() : '-',
+];
+
+//get languages:
+$lang = ZfExtended_Factory::get('editor_Models_Languages');
+/* @var $lang editor_Models_Languages */
+
+try {
+    $lang->load($this->task->getSourceLang());
+    $params['sourceLanguageTranslated'] = $this->translate->_($lang->getLangName());
+}
+catch (Exception $e) {
+    $params['sourceLanguageTranslated'] = 'unknown';
+}
+try {
+    $lang->load($this->task->getTargetLang());
+    $params['targetLanguageTranslated'] = $this->translate->_($lang->getLangName());
+}
+catch (Exception $e) {
+    $params['targetLanguageTranslated'] = 'unknown';
+}
+
+$relais = $this->task->getRelaisLang();
+if(!empty($relais)) {
+    try {
+        $lang->load($this->task->getRelaisLang());
+        $params['relaisLanguageTranslated'] = $this->translate->_($lang->getLangName());
+    }
+    catch (Exception $e) {
+        $params['relaisLanguageTranslated'] = 'unknown';
+    }
+    $params['relaisLanguageFragment'] = $this->translate->_('<b>Relaissprache:</b> {relaisLanguageTranslated}<br />');
+}
+else {
+    $params['relaisLanguageFragment'] = '';
+}
+
+$this->subject = $this->translate->_('Translate5 - Aufgabe zugewiesen').' "'.$this->task->getTaskNr().' - '.$this->task->getTaskName().'"';
+
+if(empty($this->proofreaders)) {
+    $params['proofreadersFragment'] = '';
+}
+else {
+    //FIXME fill with proofreaders if needed
+    $params['proofreadersFragment'] = '';
+}
+
+$mailBody = $this->templateApply($this->translate->_('{header}
+
+Im Projektportal {portalLink} wurde Ihnen die Aufgabe <b>{task.taskNr} - {task.taskName}</b> zugewiesen.<br />
 <br />
-Im Projektportal %3$s wurde Ihnen die Aufgabe <b>%4$s - %5$s</b> zugewiesen.<br />
-<br />
-<br />Vielen Dank und viele Grüße,
-<br />Ihr Projektmanagement Team
-<br />%6$s
-<br />
-<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!',$userLocale),
-    $this->mailEmployeeSalutation($this->user['gender'], $userLocale),
-    $this->user['surName'],
-    $portal,
-    $this->task->getTaskNr(),
-    $this->task->getTaskName(),
-    $session->runtimeOptions->companyName
-);
+<b>Aufgabe:</b> {task.taskName}<br />
+<b>Quellsprache:</b> {sourceLanguageTranslated}<br />
+<b>Zielsprache:</b> {targetLanguageTranslated}<br />
+{relaisLanguageFragment}<b>Lieferdatum:</b> {task.targetDeliveryDate}<br />
+<b>Wortanzahl:</b> {wordCount}<br />
+{proofreadersFragment}{footer}'),$params);
 
 $this->textbody = strip_tags($mailBody);
 echo $mailBody;
