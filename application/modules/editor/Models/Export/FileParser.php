@@ -124,6 +124,11 @@ abstract class editor_Models_Export_FileParser {
     protected $termTagHelper;
     
     /**
+     * @var ZfExtended_EventManager
+     */
+    protected $events;
+    
+    /**
      * 
      * @param integer $fileId
      * @param boolean $diff
@@ -145,6 +150,8 @@ abstract class editor_Models_Export_FileParser {
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->termTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
+
+        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
     }
 
     /**
