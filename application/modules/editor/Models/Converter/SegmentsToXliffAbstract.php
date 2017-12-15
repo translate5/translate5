@@ -194,7 +194,6 @@ class editor_Models_Converter_SegmentsToXliffAbstract {
     
     /**
      * initializes internally needed data for convertion
-     * //FIXME this is universal
      */
     protected function initConvertionData() {
         $task = $this->task;

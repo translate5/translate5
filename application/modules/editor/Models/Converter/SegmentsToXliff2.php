@@ -44,6 +44,12 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
      * 
      */
     protected $unsupportedConfigs=[
+            self::CONFIG_ADD_RELAIS_LANGUAGE,
+            self::CONFIG_ADD_ALTERNATIVES,
+            self::CONFIG_PLAIN_INTERNAL_TAGS,
+            self::CONFIG_ADD_PREVIOUS_VERSION,
+            self::CONFIG_ADD_STATE_QM,
+            self::CONFIG_ADD_DISCLAIMER
     ];
     
     /***
@@ -76,6 +82,12 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
      * @var string
      */
     const XLIFF2_SEGMENT_STATE_FINAL='final';
+    
+    /**
+     * addQm              = boolean, add segment QM, defaults to true
+     * @var string
+     */
+    const CONFIG_ADD_QM = 'addQm';
     
     /***
       Mapping of translate5 autostates to xliff 2.x default segment state is as follows:
@@ -126,11 +138,21 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
      */
     protected $config;
     
+    /***
+     * Id of the ins and dels mrk tags. The number will be autoincremented
+     * after ins or del mrk tag is produced.
+     */
+    protected $insDelTagId;
     
-    
-    
+    /***
+     * Applied xliff comments (some of them need to exist only once in the file)
+     * @var array
+     */
+    private $xliffCommentsApplied=[
+            
+    ];
     public function __construct(array $config = []){
-        $this->initUnsupportedConfig();
+        $this->insDelTagId=1;
         parent::__construct($config);
     }
     
@@ -163,8 +185,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         //flags defaulting to true; if nothing given, empty is the falsy check
         $defaultsToTrue = [
                 self::CONFIG_ADD_COMMENTS,
-                self::CONFIG_ADD_STATE_QM,//TODO: valid ?
-                self::CONFIG_ADD_DISCLAIMER,//TODO: Ask Marc about additional disclamer in the new xliff 
+                self::CONFIG_ADD_QM
         ];
         foreach($defaultsToTrue as $key){
             $this->options[$key] = !(array_key_exists($key, $config) && empty($config[$key]));
@@ -269,7 +290,6 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             return;
         }
         
-        $this->exportParser = $this->getExportFileparser($segmentsOfFile[0]['fileId'], $filename);
         $file = '<file id="%s">';
         $this->result[] = sprintf($file,$segmentsOfFile[0]['fileId']);
         
@@ -324,10 +344,43 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
 
         $this->result[] = '<'.join(' ', $unitTag).'>';
         
+        //segment QM states
+        $qms=[];
+        if($this->options[self::CONFIG_ADD_QM]) {
+            $qms=$this->processQm($segment);
+        }
+        
+        
         if(!empty($segment['comments']) && $this->options[self::CONFIG_ADD_COMMENTS]) {
             $this->processComment($segment);
         }
         
+        //add the comment only once
+        if(!in_array('autostateMapComment', $this->xliffCommentsApplied)){
+            $this->result[]='<!-- 
+                              translate5 autostates show the segment state more in detail, than xliff 2 is able to. To reflect the Autostates the substate attribute of xliff 2 is used. Autostates are mapped to xliff 2 segment state as best as possible
+                            
+                              mapping of translate5 autostates to xliff 2.x default segment state is as follows:
+                            		translate5 autostatus (substate)->	mapped xliff status
+                            		untranslated		 			-> initial
+                            		blocked							-> initial
+                            		translated						-> translated
+                            		auto-translated					-> translated
+                            		reviewed						-> reviewed
+                            		auto-reviewed					-> reviewed
+                            		reviewed, untouched, auto-set	-> reviewed
+                            		reviewed, untouched				-> reviewed
+                            		auto-reviewed, untouched		-> reviewed
+                            		translator reviewed				-> final
+                            		translator autoreviewed			-> final
+                            		PM reviewed						-> final
+                            		PM auto-reviewed				-> final
+                            		PM reviewed, unchanged			-> final
+                            		PM auto-reviewed, unchanged 	-> final			 
+                            
+                            		-->';
+            array_push($this->xliffCommentsApplied, 'autostateMapComment');
+        }        
         //according to the spec, the prefix "translate5Autostate:" must always be shown in the subState value.
         $stateText="";
         if(isset($this->data['autostates'][$segment['autoStateId']])) {
@@ -336,17 +389,42 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         
         $this->result[] = '<segment id="'.$segment['segmentNrInTask'].'" state="'.$this->segmentStateMap[$segment['autoStateId']].'" subState="translate5Autostate:'.$stateText.'">';
         
-        $this->result[] = '<source>'.$this->prepareText($segment[$this->data['firstSource']]).'</source>';//FIXME: talk with Thomas
         
+        //add the comment only once
+        if(!in_array('mrkTagComment', $this->xliffCommentsApplied)){
+            $this->result[]='<!-- The translate5:translated attribut on mrk-tags of type="term" shows, if the marked term has been found as translated in the corresponding target segment or not. 
+    		     The allowed values are "found", "notfound" and "undefined". Undefined usually means, that no term has been defined in the target language of the terminology. 
+    		     The translate5:translated attribute can only occur inside of the source-tag.
+    		     
+    		     The translate5:status  attribut on mrk-tags of type="term" shows the term classification of the term in the terminology. 
+    		     Its values can be one of the following: preferredTerm, admittedTerm, legalTerm, regulatedTerm, standardizedTerm, deprecatedTerm, supersededTerm. 
+    		     translate5:status can occur in mrk tags inside of source AND target tags.
+    	    -->';
+            array_push($this->xliffCommentsApplied, 'mrkTagComment');
+        }
+        //add the source text
+        $this->result[] = '<source>'.$this->prepareText($segment[$this->data['firstSource']]).'</source>';
+        
+        //add the comment only once
+        if(!in_array('qmAndTrachChangesComment', $this->xliffCommentsApplied)){
+            $this->result[]='<!-- 
+    			If there is a QM flag on the entire segment in translate5, an mrk-tag surrounding the entire segment content with the attribute its:locQualityIssuesRef is used. 
+    			The value of the its:locQualityIssuesRef attribute contains the translate5-specific ids of all qm flags, that are added to the entire segment. 
+    			The ids are separated by underscore (this means the id e. g. looks like "1_3_5", if three QM flags have been selected for the segment and they have the ids 1, 3 and 5 in translate5). 
+    			The actual values of the qm-flags are listed in the its:locQualityIssues tag above. 
+            -->
+            
+            <!-- 
+    			mrk-tags with the translate5:trackChanges attribute show, where changes have been made inside of the segment. 
+    			translate5:trackChanges="ins" reflect inserted strings and translate5:trackChanges="del" show deleted strings. 
+    			The other attributes of these mrk tags are self-explaining. The value of the id is random, since inside of translate5 there is no id for these tags. 
+    			The value of translate5:date is in the format  "2017-12-06 13:12:34" 
+    		-->';
+            array_push($this->xliffCommentsApplied, 'qmAndTrachChangesComment');
+        }
         $fields = $this->sfm->getFieldList();
         foreach($fields as $field) {
-            $this->processSegmentField($field, $segment);
-        }
-        
-        //FIXME see the example comment about qm, i think this needs to be inside the target text
-        //TODO: i waith a response from Marc how the qm should be handled
-        if($this->options[self::CONFIG_ADD_STATE_QM]) {
-            $this->processQm($segment);
+            $this->processSegmentField($field, $segment,$qms);
         }
         
         $this->result[] = '</segment>';
@@ -359,7 +437,13 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
      */
     protected function processComment(array $segment) {
         $comments = $this->comment->loadBySegmentAndTaskPlain((integer)$segment['id'], $this->task->getTaskGuid());
-        $this->result[] = '<!-- the note id reflects the id in LEK_comments table of translate5 -->';
+        
+        //add the comment only once
+        if(!in_array('commentsComment', $this->xliffCommentsApplied)){
+            $this->result[] = '<!-- the note id reflects the id in LEK_comments table of translate5 -->';
+            array_push($this->xliffCommentsApplied, 'commentsComment');
+        }
+        
         $note = '<note id="%1$s" translate5:userGuid="%2$s" translate5:username="%3$s" translate5:created="%4$s" translate5:modified="%5$s">%6$s</note>';
         $this->result[] = '<notes>';
         foreach($comments as $comment) {
@@ -385,7 +469,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
      * @param Zend_Db_Table_Row $field
      * @param array $segment
      */
-    protected function processSegmentField(Zend_Db_Table_Row $field, array $segment) {
+    protected function processSegmentField(Zend_Db_Table_Row $field, array $segment,array $qms=[]) {
         if($field->type == editor_Models_SegmentField::TYPE_SOURCE) {
             return; //handled before
         }
@@ -403,7 +487,19 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             $targetEdit = $this->prepareText($segment[$this->sfm->getEditIndex($this->data['firstTarget'])]);
 
             $this->result[] = '<target>';
+            
+            //if there are qms for the segment add the mrk tag
+            if(!empty($qms)){
+                $this->result[] ='<mrk id="'.implode('_',array_keys($qms)).'" its:type="generic" translate="yes" its:locQualityIssuesRef="'.implode('_', array_keys($qms)).'">';
+            }
+            //add the target edit text
             $this->result[] = $targetEdit;
+
+            //if there are qms for this segment close the mark tag
+            if(!empty($qms)){
+                $this->result[] = '</mrk>';
+            }
+            
             $this->result[] = '</target>';
         }
     }
@@ -548,7 +644,6 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         if($this->options[self::CONFIG_INCLUDE_DIFF]){
             $text=$this->cleanTrackChanges($text);
         }else{
-            //TODO: track changes as mrk tags ? Talk with Thomas
             $text=$this->trackChangesAsMrk($text);
         }
         
@@ -556,7 +651,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         // 1. toXliff converts the internal tags to xliff g,bx,ex and x tags
         // 2. remove MQM tags
         //TODO MQM tags are just removed and not supported by our XLIFF exporter so far!
-        $text = $this->taghelperInternal->toXliffPaired($text, true, $this->tagMap, $this->tagId);
+        $text = $this->taghelperInternal->toXliff2Paired($text, false, $this->tagMap, $this->tagId);
         $text = $this->handleTerminology($text, false); //internaltag replacment not needed, since already converted
         $text = $this->taghelperMqm->remove($text);
         return $text;
@@ -583,6 +678,8 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             //if no title or the title is empty, do not add the value field
             $status = '';
             $translation = '';
+            $value='';
+            $attributesTitleRegex='/(title)=("[^"]*")/i';
             foreach($classes as $class) {
                 if($class == editor_Models_Term::CSS_TERM_IDENTIFIER) {
                     continue;
@@ -596,20 +693,15 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
                     $translation = ' translate5:translated="'.$transStatus[$class].'"';
                 }
             }
+            
+            preg_replace_callback($attributesTitleRegex, function($match) use (&$value){
+                $value=$match[2];
+            }, $wholeMatch);
+            
             //<mrk id="mid_in_LEK_terms" value="termDefinitionInLEK_Term__OmitAttributeIfEmpty">
             //type,status and translated are the same as in 1.2
-            return '<mrk id="'.$tbxId.'" type="term" value="termDefinitionInLEK_Term__OmitAttributeIfEmpty" translate5:status="'.$status.'"'.$translation.'>';
+            return '<mrk id="'.$tbxId.'" type="term" value='.$value.' translate5:status="'.$status.'"'.$translation.'>';
         }, '</mrk>', $protectInternalTags);
-    }
-    
-    
-    protected function initUnsupportedConfig(){
-        $this->unsupportedConfigs=[
-            self::CONFIG_ADD_RELAIS_LANGUAGE,
-            self::CONFIG_ADD_ALTERNATIVES,
-            self::CONFIG_PLAIN_INTERNAL_TAGS,
-            self::CONFIG_ADD_PREVIOUS_VERSION
-        ];
     }
     
     protected function cleanTrackChanges($text){
@@ -618,52 +710,120 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         return $text;
     }
     
+    
+    //TODO: translated status is missing in the converted mrk tag
+    //TODO: test me!!
     protected function trackChangesAsMrk($text){
+        $insOpenTag='/<ins[^>]*>/i';
+        $delOpenTag='/<del[^>]*>/i';
+        $attributesRegex='/(data-userguid|data-username|data-timestamp)=("[^"]*")/i';
+        $paramMap=[
+                'data-userguid'=>'translate5:userGuid',
+                'data-username'=>'translate5:username',
+                'data-timestamp'=>'translate5:date'
+        ];
+        
+        //find the ins or delete tags
+        $mrkConverter=function($inputText,$regex,$attributesRegex,$paramMap,$trackChangeType){
+            
+            //for each match find the ins del tags arguments
+            $inputText=preg_replace_callback($regex, function($match) use ($attributesRegex,$paramMap,$trackChangeType){
+                
+                $retVal=$match[0];
+                $buildTag=[];
+                
+                //for each argument match, get the value and key
+                $retVal=preg_replace_callback($attributesRegex, function($match2) use (&$buildTag,$paramMap,$trackChangeType){
+                    $argValue=$match2[2];
+                    $argName=$paramMap[$match2[1]];
+                    
+                    //convert the date
+                    if($argName==='translate5:date'){
+                        //2017-12-06 13:12:34
+                        $argValue= str_replace('"','', $argValue);
+                        $argValue='"'.date('Y-m-d H:i:s',$argValue).'"';
+                    }
+                    
+                    $buildTag[$argName]=$argValue;
+                    
+                    return "";
+                }, $retVal);
+                    
+                $mrkString='';
+                foreach($buildTag as $key=>$item) {
+                    $mrkString.= $key.'='.$item.' ';
+                }
+                $translate=$trackChangeType=== 'ins' ? 'yes' :'no';
+                $mrkString='<mrk id="'.$this->insDelTagId.'" translate="'.$translate.'" translate5:trackChanges="'.$trackChangeType.'" '.$mrkString.'>';
+                
+                $this->insDelTagId++;
+                
+                return $mrkString;
+                
+            }, $inputText);
+            return $inputText;
+        };
+        
+        //ins to mrk
+        $text= $mrkConverter($text,$insOpenTag,$attributesRegex,$paramMap,'ins');
+        //del to mrk
+        $text= $mrkConverter($text,$delOpenTag,$attributesRegex,$paramMap,'del');
+        
+        //clean the closing ins and del tags
+        $text= str_replace('</ins>','</mrk>', $text);
+        $text= str_replace('</del>','</mrk>', $text);
+
         return $text;
     }
     
     
     /**
-     * process and convert the segment states and QM states
+     * process and convert the segment QM states
      * @param array $segment
      */
     protected function processQm(array $segment) {
         $qms = $this->segmentUtility->convertQmIds($segment['qmId']);
-        if(!empty($qms)) {
-            $this->result[] = '<dx:qa-hits>';
-            $qmXml = '<dx:qa-hit dx:qa-origin="target" dx:qa-code="%1$s" dx:qa-shorttext="%2$s" />';
-            foreach ($qms as $qmid => $qm) {
-                $this->result[] = sprintf($qmXml, $qmid, $qm);
-            }
-            $this->result[] = '</dx:qa-hits>';
+        if(empty($qms)) {
+            return $qms;
         }
+        
+        //add the comment only once
+        if(!in_array('qmComment', $this->xliffCommentsApplied)){
+            $this->result[]='<!--  The attribute its:locQualityIssueType holds as value the qm flag value text from translate5. To be valid xliff 2.1, the used qm flags in translate5 must be ITS localization quality issues as listet at https://www.w3.org/TR/its20/#lqissue-typevalues -->';
+            array_push($this->xliffCommentsApplied, 'qmComment');
+        }
+        $this->result[]='<its:locQualityIssues xml:id="'.implode('_', array_keys($qms)).'">';
+        $qmXml = '<its:locQualityIssue locQualityIssueType="%1$s" />';
+        foreach ($qms as $qmid => $qm) {
+            $this->result[] = sprintf($qmXml,$qm);
+        }
+        $this->result[]='</its:locQualityIssues>';
+        
+        return $qms;
     }
     
     private function addUnitComment(){
-        
-        $unitComment[]='<!-- unit id is the segmentNrInTask of LEK_segment in translate5;';
-        
-        $unitComment[]='its:person is the translator name, if assigned in translate5; if no translator is assigned, it is the user of the translator-check;';
-        $unitComment[]='its:personRef is the corresponding userGuid of the person-attribute';
-        $unitComment[]='its:revPerson is the proofreader, if assigned in translate5;';
-        $unitComment[]='its:revPersonRef is the userGuid of the proofreader;';
-        
-        $unitComment[]='- If more than one proofreader or translator is assigned, the above attributes refer to the translator or proofreader that edited the segment the last time / set the autostatus flag the last time;';
-        $unitComment[]='- If the last editor is no person, that is assigned to the task, it may be the project manager.';
-        $unitComment[]='If it is the project manager, the project manager of the task is used in the following way:';
-        $unitComment[]='If the workflow step that is currently finishd is translation or translator-check, the PM is used for its:person.';
-        $unitComment[]='If the current workflow step is proofreading, than the project manager is used for its:revPerson';
-        
-        $unitComment[]='- If the last editor of a segment is no assigned user and not the PM, but we have more than one user assigned for a role, than we use the value "undefined".';
-        
-        $unitComment[]='if no user is assigned for a role, we omit the attribute (be it its:person or its:revPerson).';
-        
-        $unitComment[]='translate5 autostates show the segment state more in detail, than xliff 2 is able to. Autostates are mapped to xliff 2 segment state as best as possible and also shown in translate5:autostate attribute';
-        $unitComment[]='In xliff 2.1 generated by translate5 a unit will always only contain one segment, since xliff 2 does not allow custom attributes on segment level, yet translate5 needs autostates there';
-        
-        $unitComment[]='translate5:manualStatus is omitted, if empty';
-        $unitComment[]='-->';
-        
+        //add the comment only once
+        if(in_array('unitComment', $this->xliffCommentsApplied)){
+            return;
+        }  
+        $unitComment[]='<!-- unit id is the segmentNrInTask of LEK_segment in translate5; 
+                    	its:person is the translator name, if assigned in translate5; if no translator is assigned, it is the user of the translator-check; 
+                    	its:personRef is the corresponding userGuid of the person-attribute
+                    	its:revPerson is the proofreader, if assigned in translate5;
+                    	its:revPersonRef is the userGuid of the proofreader; 
+                    	- if more than one proofreader or translator is assigned, the above attributes refer to the translator or proofreader
+                    	  that edited the segment the last time / set the autostatus flag the last time;
+                    	- if the last editor is no person, that is assigned to the task, it may be the project manager. If it is the project manager,
+                    	  the project manager of the task is used in the following way: If the workflow step that is currently finishd is translation 
+                    	  or translator-check, the PM is used for its:person. If the current workflow step is proofreading, 
+                    	  than the project manager is used for its:revPerson
+                    	- if the last editor of a segment is no assigned user and not the PM, but we have more than one user assigned for a 
+                    	  role, than we use the value "undefined".
+                    	- if no user is assigned for a role, we omit the attribute (be it its:person or its:revPerson).
+                    	translate5:manualStatus is omitted, if empty
+                    	 -->';
         $this->result[] =join("\n", $unitComment);
+        array_push($this->xliffCommentsApplied, 'unitComment');
     }
 }

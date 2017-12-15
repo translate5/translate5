@@ -227,15 +227,16 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     
     public function alexTestXliff2(editor_Models_Task $task,array $segments,$workflowStep){
         $xliffConf = [
-                editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_TERMINOLOGY => true,
+                editor_Models_Converter_SegmentsToXliff2::CONFIG_ADD_TERMINOLOGY=>true,
+                editor_Models_Converter_SegmentsToXliff2::CONFIG_INCLUDE_DIFF=>false,
+                editor_Models_Converter_SegmentsToXliff2::CONFIG_ADD_QM=>true,
         ];
         $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff2', [$xliffConf]);
         /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff2 */
         
         $xliffConverter->workflowStep=$workflowStep;
-        error_log(print_r($segments,1));
         $xliff=$xliffConverter->convert($task, $segments);
-        //error_log($xliff);
+        error_log($xliff);
     }
     
     /**

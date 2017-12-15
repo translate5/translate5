@@ -92,6 +92,9 @@ class editor_Models_Segment_TermTag {
         else {
             $replacer = $startTagReplacer;
         }
+        
+        //TODO: if the first replacer do not replace anything, the secound one will replace,
+        //so there is the problem, alwayl </div> will be replaced with </mrk>, no matter if the the first replacement is successefull or not
         $segment = preg_replace_callback(self::REGEX_TERM_TAG_START, $replacer, $segment);
         $segment = str_replace(self::STRING_TERM_TAG_END, $endTagReplacer, $segment);
         if($preserveInternal) {
