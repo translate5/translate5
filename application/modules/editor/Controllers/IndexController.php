@@ -601,5 +601,43 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         readfile($wholePath);
         exit;
     }
+    
+    public function testnotifyAction() {
+        $this->_helper->layout->disableLayout();
+        
+        $class = 'editor_Workflow_Notification';
+        $method = 'notifyNewTaskForPm';
+        
+        $config = ZfExtended_Factory::get('editor_Workflow_Actions_Config');
+        /* @var $config editor_Workflow_Actions_Config */
+        $config->workflow = ZfExtended_Factory::get('editor_Plugins_Miele_Workflow');
+        $config->newTua = null;
+        $config->oldTask = ZfExtended_Factory::get('editor_Models_Task');
+        $config->oldTask->load(3007);
+        $config->task = $config->oldTask;
+        $config->importConfig = new editor_Models_Import_Configuration();
+        $config->importConfig->importFolder = APPLICATION_PATH.'/needed/';
+        $config->importConfig->setLanguages('de', 'it', '', ZfExtended_Languages::LANG_TYPE_RFC5646);
+        $config->importConfig->userGuid = '{F1D11C25-45D2-11D0-B0E2-444553540101}';
+        $config->importConfig->userName = 'Thomas Lauria';
+        
+        $instance = ZfExtended_Factory::get($class);
+        /* @var $instance editor_Workflow_Actions_Abstract */
+        $instance->init($config);
+        $instances[$class] = $instance;
+            
+        if(empty($action['parameters'])) {
+            call_user_func([$instance, $method]);
+            echo "CALLED ".$class.'::'.$method;
+            return;
+        }
+        call_user_func([$instance, $method], json_decode($action['parameters']));
+        if(json_last_error() != JSON_ERROR_NONE) {
+            echo 'JSON Error: '.json_last_error_msg();
+            return;
+        }
+        echo "CALLED ".$class.'::'.$method;
+        return;
+    }
 }
 

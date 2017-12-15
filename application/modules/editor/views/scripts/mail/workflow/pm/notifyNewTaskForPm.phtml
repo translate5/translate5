@@ -44,21 +44,26 @@ $data = [
     'sourceLanguageTranslated' => $this->translate->_($this->sourceLanguage),
     'targetLanguageTranslated' => $this->translate->_($this->targetLanguage),
     'relaisLanguageTranslated' => $this->translate->_($this->relaisLanguage),
-    'relaisLanguageFragment' => ($this->relaisLanguage ? $this->translate->_('<b>Relaissprache:</b> {relaisLanguage}<br />') : ''),
+    'relaisLanguageFragment' => ($this->relaisLanguage ? $this->translate->_('<b>Relaissprache:</b> {relaisLanguageTranslated}<br />') : ''),
     'header' => $this->header,
     'footer' => $this->footer,
     'task' => $this->task->getDataObject(),
 ];
+
+//FIXME date format!
+//$data['task']->targetDeliveryDate = $data['task']->targetDeliveryDate;
 
 $mailBody = $this->templateApply('{header}
 Im Projektportal {portalLink} wurde Ihnen die Aufgabe <b>{task.taskNr} - {task.taskName}</b> zugewiesen.<br />
 <b>Aufgabe:</b> {task.taskName}<br />
 <b>Quellsprache:</b> {sourceLanguageTranslated}<br />
 <b>Zielsprache:</b> {targetLanguageTranslated}<br />
-{relaisLanguageFragment}<b>Lieferdatum:</b> {task.targetDeliveryDate)}<br />
-<b>Wortanzahl:</b> {task.wordCount)}<br />
-{footer}');
+{relaisLanguageFragment}<b>Lieferdatum:</b> {task.targetDeliveryDate}<br />
+<b>Wortanzahl:</b> {task.wordCount}<br />
+{footer}', $data);
 
 $this->textbody = strip_tags($mailBody);
+//FIXME: 
+error_log($this->textbody);
 echo $mailBody;
 

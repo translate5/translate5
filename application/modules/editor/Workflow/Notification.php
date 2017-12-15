@@ -89,7 +89,6 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $this->mailer = ZfExtended_Factory::get('ZfExtended_Mail');
         $this->mailer->setParameters($parameters);
         $this->mailer->setTemplate($this->getMailTemplate($role, $template));
-        $this->mailer->setContentByTemplate();
     }
     
     /**
@@ -100,7 +99,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
         $user->init($userData);
-        $this->mailer->send($user->getEmail(), $user->getUserName());
+        $this->mailer->sendToUser($user);
         return;
     }
     
@@ -255,6 +254,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
         $user->loadByGuid($tua->getUserGuid());
+        
         
         $params = [
             'user' => (array) $user->getDataObject(),
