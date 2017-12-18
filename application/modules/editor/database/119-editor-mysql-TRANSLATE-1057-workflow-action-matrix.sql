@@ -46,7 +46,6 @@ VALUES
 ('default', 'handleAllFinishOfARole', 'lectoring', 'lector', 'finished', 'editor_Workflow_Actions', 'segmentsSetUntouchedState', null, 0),
 ('default', 'handleAllFinishOfARole', 'lectoring', 'lector', 'finished', 'editor_Workflow_Actions', 'taskSetRealDeliveryDate', null, 1),
 ('default', 'handleAllFinishOfARole', null, null, 'finished', 'editor_Workflow_Notification', 'notifyAllFinishOfARole', null, 2),
-('default', 'handleUserAssociationAdded', null, null, null, 'editor_Workflow_Notification', 'notifyNewTaskAssigned', null, 0),
 ('default', 'handleUnfinish', null, 'lector', null, 'editor_Workflow_Actions', 'segmentsSetInitialState', null, 0),
 ('default', 'handleBeforeImport', null, null, null, 'editor_Workflow_Actions', 'autoAssociateTaskPm', null, 0),
 ('default', 'handleImport', null, null, null, 'editor_Workflow_Notification', 'notifyNewTaskForPm', null, 0),
