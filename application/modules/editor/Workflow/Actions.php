@@ -89,8 +89,8 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
             $isAdmin = in_array(ACL_ROLE_ADMIN, $roles);
             $isEditor = in_array(ACL_ROLE_EDITOR, $roles);
             //the user to be added must be a editor and it must be visible for the pm of the task
-            $notVisible = !$pmSeeAll && $user->hasParent($pmId, $data['parentIds']);
-            if(!$isEditor || $isPm || $isAdmin || $notVisible) {
+            $isVisible = $pmSeeAll || $user->hasParent($pmId, $data['parentIds']);
+            if(!$isEditor || $isPm || $isAdmin || !$isVisible) {
                 continue;
             }
             $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
