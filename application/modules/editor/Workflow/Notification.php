@@ -248,7 +248,6 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         /* @var $user ZfExtended_Models_User */
         $user->loadByGuid($tua->getUserGuid());
         
-        
         $params = [
             'user' => (array) $user->getDataObject(),
             'task' => $this->config->task,
