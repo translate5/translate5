@@ -497,8 +497,6 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         $this->itsPerson=null;
         $this->itsPersonGuid=null;
         
-        //proofreader==lector
-        
         //if only one translator
         if(count($assocUsers[editor_Workflow_Abstract::ROLE_TRANSLATOR])==1){
             $this->itsPersonGuid=$assocUsers[editor_Workflow_Abstract::ROLE_TRANSLATOR][0]['userGuid'];
@@ -634,8 +632,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             $text=$this->trackChangesAsMrk($text);
         }
         
-        //if plain internal tags are disabled:
-        // 1. toXliff converts the internal tags to xliff g,bx,ex and x tags
+        // 1. toXliff converts the internal tags to xliff 2 tags
         // 2. remove MQM tags
         //TODO MQM tags are just removed and not supported by our XLIFF exporter so far!
         $text = $this->taghelperInternal->toXliff2Paired($text, false, $this->tagMap, $this->tagId);
