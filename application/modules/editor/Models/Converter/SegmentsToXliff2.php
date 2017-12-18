@@ -183,7 +183,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         if(!empty($this->options)){
             foreach ($this->options as $op=>$value){
                 if(in_array($op, $this->unsupportedConfigs)){
-                    error_log("The config variable ".$op." is unsupported in xliff v 2.1 and it will take no effect over generated xliff");
+                    error_log("The config variable ".$value." is unsupported in xliff v 2.1 and it will take no effect over generated xliff");
                 }
             }
         }
@@ -284,8 +284,12 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         
         $headParams[] = 'xmlns="urn:oasis:names:tc:xliff:document:2.0"';
         
-        $headParams[] = 'srcLang="'.htmlspecialchars($this->task->getSourceLang()).'"';
-        $headParams[] = 'trgLang="'.htmlspecialchars($this->task->getTargetLang()).'"';
+        $languagesModel=ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $languagesModel editor_Models_Languages */
+        $sourceLang=$languagesModel->loadLangRfc5646($this->task->getSourceLang());
+        $targetLang=$languagesModel->loadLangRfc5646($this->task->getTargetLang());
+        $headParams[] = 'srcLang="'.htmlspecialchars($sourceLang).'"';
+        $headParams[] = 'trgLang="'.htmlspecialchars($targetLang).'"';
         
         $headParams[] = 'xmlns:its="https://www.w3.org/2005/11/its/"';
         $this->enabledNamespaces['its'] = 'its';
@@ -464,7 +468,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             
             //if there are qms for the segment add the mrk tag
             if(!empty($qms)){
-                $this->result[] ='<mrk id="'.implode('_',array_keys($qms)).'" its:type="generic" translate="yes" its:locQualityIssuesRef="'.implode('_', array_keys($qms)).'">';
+                $this->result[] ='<mrk id="QM_'.implode('_',array_keys($qms)).'" its:type="generic" translate="yes" its:locQualityIssuesRef="QM_'.implode('_', array_keys($qms)).'">';
             }
             //add the target edit text
             $this->result[] = $targetEdit;
@@ -492,8 +496,6 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         $tmpTranslatorArray=[];
         $this->itsPerson=null;
         $this->itsPersonGuid=null;
-        
-        //proofreader==lector
         
         //if only one translator
         if(count($assocUsers[editor_Workflow_Abstract::ROLE_TRANSLATOR])==1){
@@ -630,8 +632,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             $text=$this->trackChangesAsMrk($text);
         }
         
-        //if plain internal tags are disabled:
-        // 1. toXliff converts the internal tags to xliff g,bx,ex and x tags
+        // 1. toXliff converts the internal tags to xliff 2 tags
         // 2. remove MQM tags
         //TODO MQM tags are just removed and not supported by our XLIFF exporter so far!
         $text = $this->taghelperInternal->toXliff2Paired($text, false, $this->tagMap, $this->tagId);
@@ -776,7 +777,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         
         $this->addComments('qmComment');
         
-        $this->result[]='<its:locQualityIssues xml:id="'.implode('_', array_keys($qms)).'">';
+        $this->result[]='<its:locQualityIssues xml:id="QM_'.implode('_', array_keys($qms)).'">';
         $qmXml = '<its:locQualityIssue locQualityIssueType="%1$s" />';
         foreach ($qms as $qmid => $qm) {
             $this->result[] = sprintf($qmXml,$qm);

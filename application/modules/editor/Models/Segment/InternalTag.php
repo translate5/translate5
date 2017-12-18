@@ -196,7 +196,7 @@ class editor_Models_Segment_InternalTag {
         // the problem exists only if a end tag (which needs the start tags id as startRef) comes before his start tag
         // so we abuse "protect" to mask all tags, loop over the gathered tags, modify the internal stored original tags
         // and finally we unprotect the tags to restore the replaced ones
-        $this->protect($segment);
+        $segment = $this->protect($segment);
         $origTags = [];
         $openTagIds = [];
         $closeTags = [];
@@ -277,7 +277,7 @@ class editor_Models_Segment_InternalTag {
     public function toXliff2Paired(string $segment, $removeOther = true, &$replaceMap = null, &$newid = 1) {
         $result = $this->toXliff2($segment, $removeOther, $replaceMap, $newid);
         $xml = ZfExtended_Factory::get('editor_Models_Converter_Xliff2Pairer');
-        /* @var $xml editor_Models_Converter_XmlPairer */
+        /* @var $xml editor_Models_Converter_Xliff2Pairer */
         
         return $this->pairTags($result, $replaceMap, $xml);
     }
