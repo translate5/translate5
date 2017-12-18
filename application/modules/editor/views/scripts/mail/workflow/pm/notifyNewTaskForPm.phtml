@@ -47,8 +47,10 @@ $data = [
     'relaisLanguageFragment' => ($this->relaisLanguage ? $this->translate->_('<b>Relaissprache:</b> {relaisLanguageTranslated}<br />') : ''),
     'header' => $this->header,
     'footer' => $this->footer,
-    'task' => $this->task->getDataObject(),
+    'task' => clone $this->task->getDataObject(),
 ];
+
+$data['task']->wordCount = $this->task->getWordCount() > 0 ? $this->task->getWordCount() : '-';
 
 //FIXME date format!
 //$data['task']->targetDeliveryDate = $data['task']->targetDeliveryDate;
@@ -63,7 +65,5 @@ Im Projektportal {portalLink} wurde Ihnen die Aufgabe <b>{task.taskNr} - {task.t
 {footer}', $data);
 
 $this->textbody = strip_tags($mailBody);
-//FIXME: 
-error_log($this->textbody);
 echo $mailBody;
 
