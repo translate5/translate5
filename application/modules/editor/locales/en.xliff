@@ -1823,13 +1823,13 @@ You can access the portal at: %3$s<br />
 <br />
 <br />This e-mail has been generated automatically. Please do not reply to this e-mail.</target></trans-unit>
 <trans-unit id='RGVyIFdvcmtmbG93IFNjaHJpdHQgZGVyIEF1ZmdhYmUgd3VyZGUgenUgInswfSIgZ2XDpG5kZXJ0IQ=='><source>Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!</source><target>The workflow step of the task was changed to "{0}"!</target></trans-unit>
-  <trans-unit id='TWluaW1hbGUgTMOkbmdlOiB7MH07'>
-    <source>Minimale Länge: {0};</source>
-    <target>Minimum length: {0};</target>
+  <trans-unit id='ezB9IChNaW5kZXN0LiB7MX0p'>
+    <source>{0} (Mindest. {1})</source>
+    <target>{0} (Min. {1})</target>
   </trans-unit>
-  <trans-unit id='TWF4aW1hbGUgTMOkbmdlOiB7MH07'>
-    <source>Maximale Länge: {0};</source>
-    <target>Maximum length: {0};</target>
+  <trans-unit id='ezB9IHZvbiB7MX0='>
+    <source>{0} von {1}</source>
+    <target>{0} of {1}</target>
   </trans-unit>
  <trans-unit id='RGVyIFNlZ21lbnRpbmhhbHQgaXN0IHp1IGt1cnohIE1pbmRlc3RlbnMgezB9IFplaWNoZW4gbcO8c3NlbiB2b3JoYW5kZW4gc2Vpbi4='>
     <source>Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.</source>
