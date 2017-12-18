@@ -38,8 +38,8 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     tpl: '<div style="background-color:{0};" data-qtip="{1}"><strong style="margin:0.3em;">{2}</strong></div>',
     hidden:true,
     strings:{
-        minTooltip:'#UT#Minimale Länge: {0};',
-        maxTooltip:'#UT#Maximale Länge: {0};',
+        minText:'#UT#{0} (Mindest. {1})',
+        maxText:'#UT#{0} von {1}',
         segmentBellowLimit:'#UT#Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.',
         segmentOverLimit:'#UT#Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.',
     },
@@ -128,18 +128,32 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             minWidth=metaCache.minWidth,
             maxWidth=metaCache.maxWidth,
             cssColor='#ff4242',
-            tooltipText='';
+            tooltipText=[];
 
         if(me.isCharactersInBorder(charactersCount,minWidth,maxWidth)){
             cssColor='#24f324'
         }
+        //If there is only max length: 10 of 12
+        //If there is only min length: 12 (Min. 10)
+        //If both are given: 10 of 12 (Min. 10)
+        if(maxWidth!==null){
+            tooltipText.push(Ext.String.format(me.strings.maxText,charactersCount,maxWidth));
+        }
+        
+        if(minWidth!==null){
+            var toAdd=Ext.String.format(me.strings.minText,charactersCount,minWidth);
+            if(maxWidth!==null){
+                //remove the character count value from the text (it allready exist from the maxWidth text)
+                toAdd=toAdd.split(' ');
+                toAdd=toAdd.slice(1, toAdd.length);
+            }
+            tooltipText.push(toAdd);
+        }
         //if min or max is null do not display the tooltip
-        tooltipText+=minWidth!==null ? Ext.String.format(me.strings.minTooltip,minWidth) : "";
-        tooltipText+=maxWidth!==null ? Ext.String.format(me.strings.maxTooltip,maxWidth) : "";
         me.lookupTpl('tpl').overwrite(me.getEl(),[
             cssColor,
-            tooltipText,
-            "  "+charactersCount+"  "
+            tooltipText.join(' '),
+            tooltipText.join(' ')
         ]);
     },
 
