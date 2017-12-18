@@ -152,7 +152,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           checkTag = me.getDuplicateCheckImg(segmentId, fieldName);
       
       me.setValue(me.markupForEditor(value)+checkTag);
-      this.fireEvent('afterInitialSetValue', this);
   },
   /**
    * Fixing focus issues EXT6UPD-105 and EXT6UPD-137
@@ -274,62 +273,17 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         plainContent.push(Ext.htmlEncode(text));
         return;
       }
-      // Keep nodes from TrackChanges, but replace their images etc.
+      // Keep nodes from TrackChanges, but run replaceTagToImage for them as well
       if( (item.tagName.toLowerCase() == 'ins' || item.tagName.toLowerCase() == 'del')  && /(^|[\s])trackchanges([\s]|$)/.test(item.className)){
-          // TrackChange-Node might include images: 
-          // - add the special id to the img
-          // - replace the given divs and spans with their image
-          // TrackChange-Node might include TermTag: 
-          // - replace TermTag-divs with their corresponding span
-          var allImagesInItem = item.getElementsByTagName('IMG'),
-              allDivsInItem = item.getElementsByTagName('DIV');
-          if (allImagesInItem.length > 0) {
-              for (var i = allImagesInItem.length; i--; ) { // backwards because we might remove items
-                  var imgItem = allImagesInItem[i];
-                  if (!me.isDuplicateSaveTag(imgItem)) {
-                      var htmlForItemImg = me.imgNodeToString(imgItem, true),
-                          templateEl = document.createElement('template');
-                      templateEl.innerHTML = htmlForItemImg;
-                      item.insertBefore(templateEl.content.firstChild,imgItem);
-                      item.removeChild(imgItem);
-                  }
-              }
-          }
-          if (allDivsInItem.length > 0) {
-              for (var i = allDivsInItem.length; i--; ) { // backwards because we might remove items
-                  var divItem = allDivsInItem[i];
-                  if (divItem == null) {
-                      continue; // item might have been removed alreday
-                  }
-                  if(/(^|[\s])term([\s]|$)/.test(divItem.className)){
-                      var htmlForDivItem = '',
-                          termFoundCls = divItem.className;
-                      // TODO: is the same as below for "// Span für Terminologie"
-                      if(me.fieldTypeToEdit) {
-                          var replacement = me.fieldTypeToEdit+'-$1';
-                          termFoundCls = termFoundCls.replace(/(transFound|transNotFound|transNotDefined)/, replacement);
-                      }
-                      htmlForDivItem += Ext.String.format('<span class="{0}" title="{1}">', termFoundCls, divItem.title);
-                      htmlForDivItem += divItem.innerHTML;
-                      htmlForDivItem += '</span>';
-                      var templateEl = document.createElement('template');
-                      templateEl.innerHTML = htmlForDivItem;
-                      item.insertBefore(templateEl.content.firstChild,divItem.parentNode);
-                      item.removeChild(divItem.parentNode);
-                  } else {
-                      var divItem = allDivsInItem[i],
-                          dataOfItem = me.getData(divItem,data),
-                          htmlForItemImg = me.imageTemplate.apply(dataOfItem),
-                          templateEl = document.createElement('template');
-                      templateEl.innerHTML = htmlForItemImg;
-                      item.insertBefore(templateEl.content.firstChild,divItem);
-                      item.removeChild(divItem);
-                  }
-              }
-          }
-          item.innerHTML = item.innerHTML.replace(new RegExp(Editor.TRANSTILDE, "g"), ' ');
-          me.result.push(item.outerHTML);
-          plainContent.push(item.outerHTML);
+          var regExOpening = new RegExp('<\s*'+item.tagName.toLowerCase()+'.*?>'),              // Example: /<\s*ins.*?>/g
+              regExClosing = new RegExp('<\s*\/\s*'+item.tagName.toLowerCase()+'\s*.*?>'),      // Example: /<\s*\/\s*ins\s*.*?>/g
+              openingTag =  item.outerHTML.match(regExOpening)[0],
+              closingTag =  item.outerHTML.match(regExClosing)[0];
+          me.result.push(openingTag);
+          plainContent.push(openingTag);
+          me.replaceTagToImage(item, plainContent);
+          me.result.push(closingTag);
+          plainContent.push(closingTag);
           return;
       }
       if(item.tagName == 'IMG' && !me.isDuplicateSaveTag(item)){

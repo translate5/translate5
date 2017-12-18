@@ -44,6 +44,7 @@ Ext.define('Editor.view.ToolTip', {
     //enable own ToolTips only for the following img classes 
     delegate : '.ownttip', // accepts only simple selectors (no commas) so
     // define a own tooltip class
+    cls : 't5ttip',
     renderTo : Ext.getBody(),
     strings: {
         deletedby: '#UT#Deleted by',
