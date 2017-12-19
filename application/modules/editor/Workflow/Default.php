@@ -157,57 +157,15 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
     
         
     /**
-     * Loads all not finished, lector Assocs where the task is open and the targetDeliveryDate was overdued yesterday or older
-     */
-    protected function loadTasksByPastDeliveryDate() {
-        //select tua.*,t.targetDeliveryDate from LEK_taskUserAssoc tua, LEK_task t where t.taskGuid = tua.taskGuid and role = 'lector' and targetDeliveryDate < CURRENT_DATE;
-        //$s = $this->db->getAdapter()->select()
-        $db = Zend_Registry::get('db');
-        $s = $db->select()
-        ->from(array('tua' => 'LEK_taskUserAssoc'))
-        ->join(array('t' => 'LEK_task'), 'tua.taskGuid = t.taskGuid', array())
-        ->where('tua.role = ?', self::ROLE_LECTOR)
-        ->where('tua.state != ?', self::STATE_FINISH)
-        ->where('t.state = ?', editor_Models_Task::STATE_OPEN)
-        ->where('targetDeliveryDate < CURRENT_DATE');
-        return $db->fetchAll($s);
-    }
-    
-    /**
      * checks the delivery dates, if a task is overdue, it'll be finished for all lectors, triggers normal workflow handlers if needed.
      * (non-PHPdoc)
      * @see editor_Workflow_Abstract::handleCronDaily()
      */
     public function doCronDaily() {
         $this->isCron = true;
-        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $tua editor_Models_TaskUserAssoc */
+        //provide here oldStep, since this was the triggering one. The new step is given to handleNextStep trigger
+        $this->callActions(__FUNCTION__);
         
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        
-        $list = $this->loadTasksByPastDeliveryDate();
-        
-        //FIXME what does this customer specific code here?
-        $acl = ZfExtended_Acl::getInstance();
-        $acl->allow('noRights', 'editorconnect_Models_WsdlWrapper', 'sendToUser');
-        
-        //affected user:
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        foreach($list as $instance) {
-            $task->loadByTaskGuid($instance['taskGuid']);
-            //its much easier to load the entity as setting it (INSERT instead UPDATE issue on save, because of internal zend things on initing rows)
-            $tua->load($instance['id']);
-            $user->loadByGuid($instance['userGuid']);
-            $this->doWithTask($task, $task); //nothing changed on task directly, but call is needed
-            $tuaNew = clone $tua;
-            $tuaNew->setState(self::STATE_FINISH);
-            $tuaNew->validate();
-            $this->triggerBeforeEvents($tua, $tuaNew);
-            $tuaNew->save();
-            $this->doWithUserAssoc($tua, $tuaNew);
-            editor_Models_LogTask::create($instance['taskGuid'], self::STATE_FINISH, $this->authenticatedUserModel, $user);
-        }
     }
     
     /**
