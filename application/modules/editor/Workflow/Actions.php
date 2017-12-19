@@ -56,6 +56,33 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
     }
     
     /**
+     * Updates the tasks real delivery date to the current timestamp
+     */
+    public function endTask() {
+        $task = $this->config->task;
+        
+        if($task->isErroneous() || $task->isExclusiveState() && $task->isLocked($task->getTaskGuid())) {
+            throw new ZfExtended_Exception('The attached task can not be set to state "end": '.print_r($task->getDataObject(),1));
+        }
+        $oldTask = clone $task;
+        $task->setState('end');
+
+        try {
+            $this->config->workflow->doWithTask($oldTask, $task);
+        }
+        catch (ZfExtended_Models_Entity_Conflict $e) {
+            //ignore entity conflict here
+        }
+        
+        if($oldTask->getState() != $task->getState()) {
+            $user = new Zend_Session_Namespace('user');
+            editor_Models_LogTask::createWithUserGuid($task->getTaskGuid(), $task->getState(), $user->data->userGuid);
+        }
+        
+        $task->save();
+    }
+    
+    /**
      * Associates automatically editor users to the task by users languages
      */
     public function autoAssociateEditorUsers() {
