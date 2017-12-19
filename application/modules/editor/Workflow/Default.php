@@ -163,9 +163,8 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      */
     public function doCronDaily() {
         $this->isCron = true;
-        //provide here oldStep, since this was the triggering one. The new step is given to handleNextStep trigger
+        //no info about tasks, tuas are possible in cron call, so set nothing here
         $this->callActions(__FUNCTION__);
-        
     }
     
     /**

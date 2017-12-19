@@ -162,34 +162,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         return parent::loadFilterdCustom($this->getSelectByUserAssocSql($userGuid, '*', $leftOuterJoin));
     }
     
-    
-    /***
-     * Loads all not finished, lector Assocs where the task is open and the targetDeliveryDate was overdued 
-     * yesterday(substract the days before today if defined as argument) or older
-     * @param int $daysBefore: days offset from current date
-     * @return array
-     */
-    public function loadTasksByPastDeliveryDate($daysBefore=null) {
-        //select tua.*,t.targetDeliveryDate from LEK_taskUserAssoc tua, LEK_task t where t.taskGuid = tua.taskGuid and role = 'lector' and targetDeliveryDate < CURRENT_DATE;
-        //$s = $this->db->getAdapter()->select()
-        $db = Zend_Registry::get('db');
-        
-        //if days before exist, calculate the compare date
-        $compareDate=date('Y-m-d');
-        if(!empty($daysBefore)){
-            $compareDate=date('Y-m-d',(strtotime('-'.$daysBefore.' day' ,strtotime($compareDate))));
-        }
-        
-        $s = $db->select()
-        ->from(array('tua' => 'LEK_taskUserAssoc'))
-        ->join(array('t' => 'LEK_task'), 'tua.taskGuid = t.taskGuid', array())
-        ->where('tua.role = ?', editor_Workflow_Abstract::ROLE_LECTOR)
-        ->where('tua.state != ?', editor_Workflow_Abstract::STATE_FINISH)
-        ->where('t.state = ?', self::STATE_OPEN)
-        ->where('targetDeliveryDate < ?',$compareDate);
-        return $db->fetchAll($s);
-    }
-    
     /**
      * gets the total count of all tasks associated to the user (filtered by the TaskUserAssoc table)
      * if $leftOuterJoin is true, load all tasks, user infos joined only where possible,
