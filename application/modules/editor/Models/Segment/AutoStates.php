@@ -348,6 +348,6 @@ class editor_Models_Segment_AutoStates {
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($tua->getTaskGuid());
         $sameUserGuid = $task->getPmGuid() === $userSession->data->userGuid;
-        return empty($role) && ($acl->isInAllowedRoles($userSession->data->roles,'editAllTasks') || $sameUserGuid);
+        return empty($role) && ($acl->isInAllowedRoles($userSession->data->roles, 'backend', 'editAllTasks') || $sameUserGuid);
     }
 }

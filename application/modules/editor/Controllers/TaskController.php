@@ -152,7 +152,8 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     public function loadAll()
     {
-        $isAllowedToLoadAll = $this->isAllowed('loadAllTasks');
+        // here no check for pmGuid, since this is done in task::loadListByUserAssoc
+        $isAllowedToLoadAll = $this->isAllowed('backend', 'loadAllTasks'); 
         $filter = $this->entity->getFilter();
         $filter->convertStates($isAllowedToLoadAll);
         $assocFilter = $filter->isUserAssocNeeded();
@@ -390,7 +391,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity->validate();
         $this->initWorkflow();
         
-        $mayLoadAllTasks = $this->isAllowed('loadAllTasks') || $this->isLoggedUserTaskPm($this->entity->getPmGuid());
+        $mayLoadAllTasks = $this->isAllowed('backend', 'loadAllTasks') || $this->isAuthUserTaskPm($this->entity->getPmGuid());
         $tua = $this->workflow->getTaskUserAssoc($taskguid, $this->user->data->userGuid);
         if(!$mayLoadAllTasks &&
                 ($this->isOpenTaskRequest(true)&&
@@ -447,7 +448,7 @@ class editor_TaskController extends ZfExtended_RestController {
      * @param array $allAssocInfos
      */
     protected function addUserInfos(array &$row, $taskguid, array $userAssocInfos, array $allAssocInfos) {
-        $isEditAll = $this->isAllowed('editAllTasks') || $this->isLoggedUserTaskPm($row['pmGuid']);
+        $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($row['pmGuid']);
         //Add actual User Assoc Infos to each Task
         if(isset($userAssocInfos[$taskguid])) {
             $row['userRole'] = $userAssocInfos[$taskguid]['role'];
@@ -621,7 +622,7 @@ class editor_TaskController extends ZfExtended_RestController {
             throw new ZfExtended_Models_Entity_NotAcceptableException('Given UserState '.$this->data->userState.' does not exist.');
         }
         
-        $isEditAllTasks = $this->isAllowed('editAllTasks') || $this->isLoggedUserTaskPm($this->entity->getPmGuid());
+        $isEditAllTasks = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($this->entity->getPmGuid());
         $isOpen = $this->isOpenTaskRequest();
         $isPmOverride = false;
         
@@ -813,7 +814,7 @@ class editor_TaskController extends ZfExtended_RestController {
      * @param string $pmGuid
      * @return boolean
      */
-    protected function isLoggedUserTaskPm($taskPmGuid){
+    protected function isAuthUserTaskPm($taskPmGuid){
         return $this->user->data->userGuid===$taskPmGuid;
     }
     

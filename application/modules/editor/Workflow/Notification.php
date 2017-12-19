@@ -43,7 +43,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     protected $xmlCache = array();
     
     /**
-     * reusable $tua instance, instanced if needed
+     * reusable $tua instance, instanced if needed, must be set explictly by the called notify method
      * @var editor_Models_TaskUserAssoc
      */
     protected $tua;
@@ -243,18 +243,10 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      */
     public function notifyNewTaskAssigned() {
         $tua = $this->config->newTua;
-        $wf = $this->config->workflow;
-        $wfId = $wf::WORKFLOW_ID;
-        $config = Zend_Registry::get('config');
-        $wfConfig = $config->runtimeOptions->workflow;
-        if(!$wfConfig->{$wfId} || !$wfConfig->{$wfId}->notification->notifyNewTaskAssigned) {
-            return;
-        }
         
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
         $user->loadByGuid($tua->getUserGuid());
-        
         
         $params = [
             'user' => (array) $user->getDataObject(),

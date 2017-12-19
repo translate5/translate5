@@ -65,6 +65,11 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
         
+        $user->loadByGuid($task->getPmGuid());
+        $pmId = $user->getId();
+        $aclInstance = ZfExtended_Acl::getInstance();
+        $pmSeeAll = $aclInstance->isInAllowedRoles(explode(',', $user->getRoles()), 'backend', 'seeAllUsers');
+        
         $sourceLang = $task->getSourceLang();
         $targetLang = $task->getTargetLang();
         
@@ -76,19 +81,23 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         $state = $states[$stepName][$role];
         
         $users = $user->loadAllByLanguages($sourceLang, $targetLang);
-        foreach($users as $user) {
-            $roles = explode(',', $user['roles']);
+        
+        
+        foreach($users as $data) {
+            $roles = explode(',', $data['roles']);
             $isPm = in_array(ACL_ROLE_PM, $roles);
             $isAdmin = in_array(ACL_ROLE_ADMIN, $roles);
             $isEditor = in_array(ACL_ROLE_EDITOR, $roles);
-            if(!$isEditor || $isPm || $isAdmin) {
+            //the user to be added must be a editor and it must be visible for the pm of the task
+            $isVisible = $pmSeeAll || $user->hasParent($pmId, $data['parentIds']);
+            if(!$isEditor || $isPm || $isAdmin || !$isVisible) {
                 continue;
             }
             $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
             /* @var $tua editor_Models_TaskUserAssoc */
             $tua->setRole($role);
             $tua->setState($state);
-            $tua->setUserGuid($user['userGuid']);
+            $tua->setUserGuid($data['userGuid']);
             $tua->setTaskGuid($task->getTaskGuid());
             //entity version?
             $tua->save();

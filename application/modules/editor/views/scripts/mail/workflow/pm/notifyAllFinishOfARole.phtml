@@ -63,14 +63,14 @@ Die Benutzer wurden per E-Mail darüber informiert.<br />
 <br />
 END;
     $params['nextRole'] = $this->translate->_($this->nextRole); 
-    $params['userList'] = $this->workflowNotifyHtmlMailUserList($this->users);
+    $params['userList'] = $this->workflowNotifyMail()->renderUserList($this->users);
 }
 else{
     $userNotification = "Die Rolle <i>{previousRole}</i> war nicht Teil der Workflowkette, daher wurden keine Benutzer benachrichtigt.<br />\n<br />\n";
 }
 $userNotificationHTML = $this->templateApply($userNotification,$params);
 $userNotificationText = $this->templateApply($userNotification,[
-    'userList' => $this->translate->_('- Die Daten sind nur in der HTML-Ansicht der E-Mail verfügbar! -')
+    'userList' => $this->htmlOnly
 ]);
 
 $template = '{header}
@@ -89,7 +89,7 @@ $this->textbody = strip_tags($this->templateApply($template, [
     'footer' => $this->footer,
     'action' => $action,
     'usersNotified' => $userNotificationText,
-    'changedSegments' => $this->translate->_('- Die Daten sind nur in der HTML-Ansicht der E-Mail verfügbar! -'),
+    'changedSegments' => $this->htmlOnly,
 ]));
 
 echo $this->templateApply($template, [

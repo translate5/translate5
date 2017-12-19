@@ -99,9 +99,6 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
      */
     protected function decodePutData() {
         parent::decodePutData();
-        if($this->_request->isPost()) {
-            $this->checkAuthenticatedIsParentOf($this->data->userGuid);
-        }
         if(array_key_exists('staticAuthHash', $this->data)) {
             //may not be set from outside!
             unset($this->data['staticAuthHash']);
@@ -156,40 +153,40 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
     
     public function deleteAction(){
         $this->entityLoad();
+        $this->checkAuthenticatedIsParentOfEntity();
         $this->processClientReferenceVersion();
         $this->entity->delete();
     }
     
+    /**
+     * checks user based access on POST/PUT
+     * {@inheritDoc}
+     * @see ZfExtended_RestController::additionalValidations()
+     */
+    protected function additionalValidations() {
+        $this->checkAuthenticatedIsParentOfEntity();
+    }
+    
     /***
      * Check if the current logged in user is allowed to modify the given User
-     * @param string $userGuid
      */
-    protected function checkAuthenticatedIsParentOf($userGuid){
+    protected function checkAuthenticatedIsParentOfEntity(){
         $userSession = new Zend_Session_Namespace('user');
-        $userData = $userSession->data;
-        
-        $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $userModel ZfExtended_Models_User */
+        $authenticated = $userSession->data;
         
         //if i am allowed to see any user:
         if($this->isAllowed('backend', 'seeAllUsers')) {
             return;
         }
         
-        //I am allowed to see myself
-        if($userGuid === $userData->userGuid){
+        //The authenticated user is allowed to see himself
+        if($this->entity->getUserGuid() === $authenticated->userGuid){
             return;
         }
         
-        if(!$userModel->hasParent($userGuid, $userData->id)){
+        //if the authenticated user is no parent, then he is not allowed to proceed
+        if(!$this->entity->hasParent($authenticated->id)){
             throw new ZfExtended_NoAccessException();
-        }
-    }
-    
-    protected function entityLoad() {
-        parent::entityLoad();
-        if($this->_request->isDelete() || $this->_request->isPut()) {
-            $this->checkAuthenticatedIsParentOf($this->entity->getUserGuid());
         }
     }
     
@@ -203,6 +200,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->view->rows->login = $user->getLogin();
         $this->view->rows->firstName = $user->getFirstName();
         $this->view->rows->surName = $user->getSurName();
+        $this->view->rows->parentIds = $user->getParentIds();
         $this->view->rows->longUserName=$user->getUsernameLong();
     }
     
@@ -224,7 +222,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
                     continue;
                 }
                 //check if the current loged user is a parent for the user in the row
-                $hasParent=$userModel->hasParent($row['userGuid'],$userData->id);
+                $hasParent=$userModel->hasParent($userData->id, $row['parentIds']);
                 $row['editable']=$hasParent;
                 $row['deletable']=$hasParent;
             }
@@ -236,7 +234,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
                 return;
             }
             //check if the current loged user is a parent for the user in the row
-            $hasParent=$userModel->hasParent($this->view->rows->userGuid,$userData->id);
+            $hasParent=$userModel->hasParent($userData->id, $this->view->rows->parentIds);
             $this->view->rows->editable=$hasParent;
             $this->view->rows->deletable=$hasParent;
         }
