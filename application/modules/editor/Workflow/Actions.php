@@ -124,6 +124,44 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         return false;
     } 
     
+    /***
+     * Checks the delivery dates, if a task is overdue, it'll be finished for all lectors, triggers normal workflow handlers if needed.
+     */
+    public function finishOverduedTasks(){
+        return;
+        $workflow = $this->config->workflow;
+        
+        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        
+        $list = $task->loadTasksByPastDeliveryDate();
+        
+        //TODO: see BEOSPHERE-111
+        //re enable it in a better way for beo
+        //$acl = ZfExtended_Acl::getInstance();
+        //$acl->allow('noRights', 'editorconnect_Models_WsdlWrapper', 'sendToUser');
+        
+        //affected user:
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        foreach($list as $instance) {
+            $task->loadByTaskGuid($instance['taskGuid']);
+            //its much easier to load the entity as setting it (INSERT instead UPDATE issue on save, because of internal zend things on initing rows)
+            $tua->load($instance['id']);
+            $user->loadByGuid($instance['userGuid']);
+            $workflow->doWithTask($task, $task); //nothing changed on task directly, but call is needed
+            $tuaNew = clone $tua;
+            $tuaNew->setState(self::STATE_FINISH);
+            $tuaNew->validate();
+            $workflow->triggerBeforeEvents($tua, $tuaNew);
+            $tuaNew->save();
+            $workflow->doWithUserAssoc($tua, $tuaNew);
+            editor_Models_LogTask::create($instance['taskGuid'], self::STATE_FINISH, $this->authenticatedUserModel, $user);
+        }
+    }
+    
     
     /**
      * updates all Auto States of this task
