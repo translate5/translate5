@@ -249,6 +249,10 @@ abstract class editor_Workflow_Abstract {
      */
     protected $isCron = false;
     
+    protected $validDirectTrigger = [
+            'notifyAllUsersAboutTaskAssociation',
+    ]; 
+    
     public function __construct() {
         $this->debug = ZfExtended_Debug::getLevel('core', 'workflow');
         $this->loadAuthenticatedUser();
@@ -982,6 +986,41 @@ abstract class editor_Workflow_Abstract {
     public function doUserAssociationAdd(editor_Models_TaskUserAssoc $tua) {
         $this->newTaskUserAssoc = $tua;
         $this->handleUserAssociationAdded();
+    }
+    
+    /**
+     * can be triggered via API, valid triggers are currently
+     * @param editor_Models_Task $task
+     * @param unknown $trigger
+     */
+    public function doDirectTrigger(editor_Models_Task $task, $trigger) {
+        if(!in_array($trigger, $this->validDirectTrigger)) {
+            return false;
+        }
+        $this->newTask = $task;
+        
+        //try to load an user assoc between current user and task 
+        $this->newTaskUserAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        try {
+            $this->newTaskUserAssoc->loadByParams($this->authenticatedUser->userGuid, $task->getTaskGuid());
+            $role = $this->newTaskUserAssoc->getRole();
+            $state = $this->newTaskUserAssoc->getState();
+        }
+        catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            unset($this->newTaskUserAssoc);
+            $role = null;
+            $state = null;
+        }
+        $this->callActions('handleDirect::'.$trigger, $task->getWorkflowStepName());
+        return true;
+    }
+    
+    /**
+     * returns the valid direct trigger
+     * @return string[]
+     */
+    public function getDirectTrigger() {
+        return $this->validDirectTrigger;
     }
     
     /**

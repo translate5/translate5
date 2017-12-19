@@ -821,7 +821,7 @@ class editor_TaskController extends ZfExtended_RestController {
     /***
      * Check if the user has rights to modefi the task attributes:taskName, targetDeliveryDate, realDeliveryDate, orderdate, pmGuid, pmName
      */
-    public function checkTaskAttributeField(){
+    protected function checkTaskAttributeField(){
         
         if(!empty($this->data->taskName) && !$this->isAllowed('frontend','editorEditTaskTaskName')) {
             unset($this->data->taskName);
@@ -859,6 +859,26 @@ class editor_TaskController extends ZfExtended_RestController {
             unset($this->data->pmName);
             error_log("The user is not allowed to modifi the pmName. taskGuid->".$this->data->taskGuid);
         }
-        
+    }
+    
+    /**
+     * Can be triggered with various actions from outside to trigger workflow stuff in translate5
+     */
+    public function workflowAction() {
+        if(!$this->_request->isPost()) {
+            throw new BadMethodCallException('Only HTTP method POST allowed!');
+        }
+        $this->entityLoad();
+        $this->initWorkflow($this->entity->getWorkflow());
+        $this->view->trigger = $this->getParam('trigger');
+        $this->view->success = $this->workflow->doDirectTrigger($this->entity, $this->getParam('trigger'));
+        if($this->view->success) {
+            return;
+        }
+        $errors = array('trigger' => 'Trigger is invalid. Valid triggers are listed below.');
+        $e = new ZfExtended_ValidateException();
+        $e->setErrors($errors);
+        $this->view->validTrigger = $this->workflow->getDirectTrigger();
+        $this->handleValidateException($e);
     }
 }
