@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 $portal = $this->config->runtimeOptions->server->protocol.$this->config->runtimeOptions->server->name.APPLICATION_RUNDIR;
 
+//fill data with generally needed variables
 $data = [
     'portalUrl' => $portal,
     'portalLink' => '<a href="'.$portal.'">'.$portal.'</a>',
@@ -36,9 +37,28 @@ $data = [
     'surName' => $this->receiver->surName,
 ];
 
+//prepare the htmlOnly disclaimer
+$this->htmlOnly = $this->translate->_('- Die Daten sind nur in der HTML-Ansicht der E-Mail verfügbar! -');
+
+//prepare the default taskFragment if a task is provided
+if(!empty($this->task)) {
+    $taskData = $this->workflowNotifyMail()->getTaskLanguages($this->task);
+    $taskData['task'] = $this->task->getDataObject();
+    $taskData['targetDeliveryDate'] = $this->workflowNotifyMail()->dateFormat($this->task->getTargetDeliveryDate());
+    $taskData['wordCount'] = $this->task->getWordCount() > 0 ? $this->task->getWordCount() : '-';
+    
+    $data['taskFragment'] = $this->templateApply('<b>Aufgabe:</b> {task.taskName}<br />
+    <b>Quellsprache:</b> {sourceLanguageTranslated}<br />
+    <b>Zielsprache:</b> {targetLanguageTranslated}<br />
+    {relaisLanguageFragment}<b>Lieferdatum:</b> {targetDeliveryDate}<br />
+    <b>Wortanzahl:</b> {wordCount}<br />', $taskData);
+}
+
+//prepare the header
 $this->header = $this->templateApply('{salutation} {surName},<br/>
 <br/>', $data);
 
+//prepare the footer
 $this->footer = $this->templateApply('<br/>
 <br/>Vielen Dank und viele Grüße,
 <br/>Ihr Projektmanagement Team

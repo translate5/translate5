@@ -63,15 +63,16 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * returns all users to the taskGuid and role of the given TaskUserAssoc
      * @param mixed $role string or null as a value
      * @param string $taskGuid
+     * @param array $assocFields optional, column names of the assoc table to be added in the result set
      * @return [array] list with user arrays
      */
-    public function getUsersOfRoleOfTask($role,$taskGuid){
+    public function getUsersOfRoleOfTask($role,$taskGuid, $assocFields = []){
         if (is_null($role))
             return array();
         /* @var $tua editor_Models_TaskUserAssoc */
         $this->setRole($role);
         $this->setTaskGuid($taskGuid);
-        return $this->loadAllUsers();
+        return $this->loadAllUsers($assocFields);
     }
     
     /**
@@ -182,16 +183,16 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     /**
      * returns a list with users to the actually loaded taskGuid and role
      * loads only assocs where isPmOverride not set
-     * @param string $taskGuid
-     * @param string $role
+     * @param array $assocFields optional, if given add that assoc fields to the join
      * @return array
      */
-    public function loadAllUsers() {
+    public function loadAllUsers($assocFields = []) {
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         $db = $this->db;
         $s = $user->db->select()
+        ->setIntegrityCheck(false)
         ->from(array('u' => $user->db->info($db::NAME)))
-        ->join(array('tua' => $db->info($db::NAME)), 'tua.userGuid = u.userGuid', array())
+        ->join(array('tua' => $db->info($db::NAME)), 'tua.userGuid = u.userGuid', $assocFields)
         ->where('tua.isPmOverride = 0')
         ->where('tua.role = ?', $this->getRole())
         ->where('tua.taskGuid = ?', $this->getTaskGuid());

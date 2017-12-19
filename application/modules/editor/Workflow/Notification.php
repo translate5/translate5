@@ -43,7 +43,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     protected $xmlCache = array();
     
     /**
-     * reusable $tua instance, instanced if needed
+     * reusable $tua instance, instanced if needed, must be set explictly by the called notify method
      * @var editor_Models_TaskUserAssoc
      */
     protected $tua;
