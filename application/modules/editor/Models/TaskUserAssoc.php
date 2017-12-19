@@ -209,7 +209,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $s = $db->select()
         ->setIntegrityCheck(false)
         ->from(array('tua' => $db->info($db::NAME)))
-        ->join(array('u' => $user->db->info($db::NAME)), 'tua.userGuid = u.userGuid', array('login', 'surName', 'firstName'))
+        ->join(array('u' => $user->db->info($db::NAME)), 'tua.userGuid = u.userGuid', array('login', 'surName', 'firstName', 'parentIds'))
         ->where('tua.isPmOverride = 0');
         //->where('tua.taskGuid = ?', $this->getTaskGuid()); kommt per filter aktuell!
         

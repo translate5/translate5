@@ -200,6 +200,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->view->rows->login = $user->getLogin();
         $this->view->rows->firstName = $user->getFirstName();
         $this->view->rows->surName = $user->getSurName();
+        $this->view->rows->parentIds = $user->getParentIds();
         $this->view->rows->longUserName=$user->getUsernameLong();
     }
     
