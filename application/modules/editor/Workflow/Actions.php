@@ -138,7 +138,6 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
      */
     public function finishOverduedTasks(){
         $workflow = $this->config->workflow;
-        
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
         
@@ -161,12 +160,12 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
             $user->loadByGuid($instance['userGuid']);
             $workflow->doWithTask($task, $task); //nothing changed on task directly, but call is needed
             $tuaNew = clone $tua;
-            $tuaNew->setState(self::STATE_FINISH);
+            $tuaNew->setState($workflow::STATE_FINISH);
             $tuaNew->validate();
             $workflow->triggerBeforeEvents($tua, $tuaNew);
             $tuaNew->save();
             $workflow->doWithUserAssoc($tua, $tuaNew);
-            editor_Models_LogTask::create($instance['taskGuid'], self::STATE_FINISH, $this->authenticatedUserModel, $user);
+            editor_Models_LogTask::create($instance['taskGuid'], $workflow::STATE_FINISH, $this->authenticatedUserModel, $user);
         }
     }
     

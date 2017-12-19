@@ -287,36 +287,6 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $this->notify((array) $user->getDataObject());
     }
     
-    /***
-     * Notify the lectors when the delivery date is approaching
-     */
-    public function notifyNearlyOverduedTasks(){
-        $triggerConfig = $this->initTriggerConfig(func_get_args());
-        $daysOffset=isset($triggerConfig->daysOffset) ? $triggerConfig->daysOffset : null;
-        
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        
-        $list = $task->loadTasksByPastDeliveryDate($daysOffset);
-        
-        //affected user:
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $user ZfExtended_Models_User */
-        
-        foreach($list as $instance) {
-            $user->loadByGuid($instance['userGuid']);
-            $users[]=$user;
-            
-            $params = [
-                    'task' => $instance['taskGuid'],
-                    'user' => (array) $user->getDataObject(),
-            ];
-            
-            $this->createNotification(editor_Workflow_Abstract::ROLE_LECTOR, __FUNCTION__, $params);
-            //$this->notify((array) $user->getDataObject());
-        }
-    }
-    
     /**
      * attaches the segmentList as attachment to the internal mailer object
      * @param string $segmentHash
