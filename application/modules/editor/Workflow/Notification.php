@@ -181,7 +181,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $segments = $this->getStepSegments($currentStep);
         
         //START TEST HERE
-        $this->alexTestXliff2($task,$segments,$currentStep);
+        //$this->alexTestXliff2($task,$segments,$currentStep);
         //END TEST HERE
         
         $segmentHash = md5(print_r($segments,1)); //hash to identify the given segments (for internal caching)
@@ -189,6 +189,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $nextRole = $workflow->getRoleOfStep((string)$workflow->getNextStep($currentStep));
         
         $users = $this->tua->getUsersOfRoleOfTask($nextRole,$task->getTaskGuid());
+        $previousUsers = $this->tua->getUsersOfRoleOfTask($triggeringRole,$task->getTaskGuid());
         $params = array(
             'triggeringRole' => $triggeringRole,
             'nextRole' => $nextRole,
@@ -196,13 +197,13 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             'segments' => $segments,
             'isCron' => $isCron,
             'users' => $users,
+            'previousUsers' => $previousUsers,
             'task' => $task,
             'workflow' => $workflow
         );
         //send to the PM
         $pms = $this->getTaskPmUsers();
         foreach($pms as $pm) {
-            $params['user'] = $pm;
             $this->createNotification(ACL_ROLE_PM, __FUNCTION__, $params); //@todo PM currently not defined as WORKFLOW_ROLE, so hardcoded here
             $this->attachXliffSegmentList($segmentHash, $segments);
             $this->addCopyReceivers($triggerConfig, ACL_ROLE_PM);
