@@ -1872,6 +1872,19 @@
       <target>Language</target>
   </trans-unit>
 
+<trans-unit id="QmVudXR6ZXIgYmVuYWNocmljaHRpZ2Vu">
+    <source>Benutzer benachrichtigen</source>
+    <target>Notify Users</target>
+</trans-unit>
+<trans-unit id="QWxsZSBCZW51dHplciDDvGJlciBkaWUgWnV3ZWlzdW5nIGRlciBBdWZnYWJlIGdlc2FtbWVsdCBpbmZvcm1pZXJlbg==">
+    <source>Alle Benutzer über die Zuweisung der Aufgabe gesammelt informieren</source>
+    <target>Notify all users about the association to the task</target>
+</trans-unit>
+<trans-unit id="QmVudXR6ZXIgd3VyZGVuIGVyZm9sZ3JlaWNoIHBlciBFLU1haWwgYmVuYWNocmljaHRpZ3Q=">
+    <source>Benutzer wurden erfolgreich per E-Mail benachrichtigt</source>
+    <target>Users were successfully notified by email</target>
+</trans-unit>
+  
 <trans-unit id='e3NhbHV0YXRpb259IHtzdXJOYW1lfSw8YnIvPgo8YnIvPg=='><source>{salutation} {surName},<br/>
 <br/></source><target>{salutation} {surName},<br/>
 <br/></target></trans-unit>
