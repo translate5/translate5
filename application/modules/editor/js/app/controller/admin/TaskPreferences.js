@@ -80,7 +80,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           tua;
       
       //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
-      if(Editor.controller.admin.TaskUserAssoc){
+      if(Editor.controller.admin.TaskUserAssoc && me.getPrefForm()){
           tua = me.application.getController('admin.TaskUserAssoc');
           tua.on('addUserAssoc', me.calculateAvailableCombinations, me);
           tua.on('removeUserAssoc', me.handleReload, me);
