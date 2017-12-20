@@ -282,22 +282,35 @@ class editor_Models_Segment_AutoStates {
      * sets the untouched state for a given taskGuid
      * 
      * @param string $taskGuid
-     * @param editor_Models_Segment $segment
      */
-    public function setUntouchedState(string $taskGuid, editor_Models_Segment $segment) {
+    public function setUntouchedState(string $taskGuid, ZfExtended_Models_User $user) {
+        $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segment editor_Models_Segment */
+        
+        $segment->setUserGuid($user->getUserGuid());
+        $segment->setUserName($user->getUserName());
+        
+        //TODO make history entry for all segments with state self::TRANSLATED || self::NOT_TRANSLATED
         $segment->updateAutoState($taskGuid, self::TRANSLATED, self::REVIEWED_UNTOUCHED);
         $segment->updateAutoState($taskGuid, self::NOT_TRANSLATED, self::REVIEWED_UNTOUCHED);
+        //TODO change last author each segment set to self::REVIEWED_UNTOUCHED to current user
     }
     
     /**
      * sets the untouched state for a given taskGuid back to the initial states
      * 
      * @param string $taskGuid
-     * @param editor_Models_Segment $segment
      */
-    public function setInitialStates(string $taskGuid, editor_Models_Segment $segment) {
+    public function setInitialStates(string $taskGuid) {
+        $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segment editor_Models_Segment */
+        
+        //TODO create a history entry for each segment set to self::REVIEWED_UNTOUCHED
+        //$history = $segment->getNewHistoryEntity();
+        //$history->createHistoryByAutoState([self::REVIEWED_UNTOUCHED]);
         $segment->updateAutoState($taskGuid, self::REVIEWED_UNTOUCHED, self::NOT_TRANSLATED, true);
         $segment->updateAutoState($taskGuid, self::REVIEWED_UNTOUCHED, self::TRANSLATED);
+        //TODO change last author each segment set to last author in the previous entry of the segment history table
     }
     
     /**
