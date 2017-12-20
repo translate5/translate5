@@ -26,31 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-/**
- * Diese Klasse muss mittels factoryOverwrites überschrieben werden,
- * da die Herkunft der Sprachinformationen nicht Teil des Editor-Moduls ist,
- * sondern vom Default-Modul gestellt werden muss.
- *
- * @method string getRfc5646() getRfc5646()
- * @method int getLcid() getLcid()
- * @method int getId() getId()
- */
-class editor_Models_Languages extends ZfExtended_Languages {
-	protected $dbInstanceClass = 'editor_Models_Db_Languages';
-    protected $validatorInstanceClass   = 'editor_Models_Validator_Language';
-		
-	/***
-     * Return language rfc5646 value for given language id
-     * @param int $langId
-     * @return string
-     */
-    public function loadLangRfc5646($langId){
-       return parent::loadLangRfc5646($langId);
+class editor_Models_Validator_Language extends ZfExtended_Models_Validator_Abstract {
+    protected function defineValidators() {
+        $this->addValidator('id', 'int');
+        $this->addValidator('lcid', 'int');
+        $this->addValidator('rtl', 'boolean');
+        $this->addValidator('langName', 'stringLength', array('min' => 0, 'max' => 255));
+        $this->addValidator('rfc5646', 'stringLength', array('min' => 0, 'max' => 30));
     }
 }
