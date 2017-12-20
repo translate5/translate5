@@ -497,10 +497,12 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         $this->itsPerson=null;
         $this->itsPersonGuid=null;
         
+        $isTranslatorSet=isset($assocUsers[editor_Workflow_Abstract::ROLE_TRANSLATOR]);
+        
         //if only one translator
-        if(count($assocUsers[editor_Workflow_Abstract::ROLE_TRANSLATOR])==1){
+        if($isTranslatorSet && count($assocUsers[editor_Workflow_Abstract::ROLE_TRANSLATOR])==1){
             $this->itsPersonGuid=$assocUsers[editor_Workflow_Abstract::ROLE_TRANSLATOR][0]['userGuid'];
-        }else if(count($assocUsers[editor_Workflow_Abstract::ROLE_TRANSLATOR])==0){//if the there is no translator, check for translatorCheck
+        }else if(!$isTranslatorSet || count($assocUsers[editor_Workflow_Abstract::ROLE_TRANSLATOR])==0){//if the there is no translator, check for translatorCheck
             
             //if only one translatorCheck
             if(count($assocUsers[editor_Workflow_Abstract::ROLE_TRANSLATORCHECK])==1){
