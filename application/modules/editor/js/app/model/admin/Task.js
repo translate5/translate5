@@ -176,8 +176,8 @@ Ext.define('Editor.model.admin.Task', {
       if(this.get('state') == this.STATE_IMPORT) {
           return false;
       }
-      //a user with editorEditAllTasks (normally PMs) can always open the task
-      if(Editor.app.authenticatedUser.isAllowed('editorEditAllTasks')){
+      //a user with editorEditAllTasks (normally PMs) can always open the task or if the current loged user is a pm to that project
+      if(Editor.app.authenticatedUser.isAllowed('editorEditAllTasks') || this.get('pmGuid')===Editor.data.app.user.userGuid){
           return true;
       }
       //per default all tasks associated to a user are openable
@@ -238,7 +238,8 @@ Ext.define('Editor.model.admin.Task', {
           stepsWithFilter = meta.stepsWithFilter,
           task = data.task,
           step = task.get('userStep'),
-          useFilter = !(me.isFinished() || me.isWaiting() || me.isEnded());
+          useFilter = !(me.isFinished() || me.isWaiting() || me.isEnded()),
+          filteredValues = [];
       
       if(step && useFilter) {
           //preset grid filtering:
@@ -249,13 +250,17 @@ Ext.define('Editor.model.admin.Task', {
           //reset workflowstep filters of formerly opened tasks, since initialGridFilters is persistent between tasks!
           delete filter.segmentgrid;
           chainIdx = Ext.Array.indexOf(stepChain, step);
+          filteredValues = [stepChain[chainIdx], stepChain[chainIdx - 1]];
+          if(meta.steps.pmCheck) {
+              filteredValues.push("pmCheck"); //pmCheck'ed segments should also be in the filter!
+          }
           if(Ext.Array.indexOf(stepsWithFilter, step) >= 0 && filter) {
               filter.segmentgrid = [{
                   type: 'workflowStep',
                   dataIndex: 'workflowStep',
                   property: 'workflowStep',
                   disabled: false,
-                  value: [stepChain[chainIdx], stepChain[chainIdx - 1]]
+                  value: filteredValues
               }];
           }
       }

@@ -80,7 +80,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           tua;
       
       //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
-      if(Editor.controller.admin.TaskUserAssoc){
+      if(Editor.controller.admin.TaskUserAssoc && me.getPrefForm()){
           tua = me.application.getController('admin.TaskUserAssoc');
           tua.on('addUserAssoc', me.calculateAvailableCombinations, me);
           tua.on('removeUserAssoc', me.handleReload, me);
@@ -215,10 +215,10 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       
       me.actualTask = task;
       me.getPrefWindow().setLoading(true);
-      
-      //userPrefs must be loaded after userAssocs, 
+
+      //workflowPrefs must be loaded after userAssocs, 
       //so add the load as a callback dynamically, based on the rights 
-      if(me.isAllowed('editorUserPrefsTask')){
+      if(me.isAllowed('editorWorkflowPrefsTask')){
           userPrefs.loadData([],false); //cleanup old contents
           var tupParams = Ext.apply({}, tuaParams); //duplicate params, and add the callback
           tupParams.callback = function() {
@@ -303,7 +303,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           rec.eraseVersioned(task, {
               success: function() {
                   grid.store.remove(rec);
-                  me.calculateAvailableCombinations();
+                  if(me.isAllowed('editorWorkflowPrefsTask')){
+                      me.calculateAvailableCombinations();
+                  }
                   Editor.MessageBox.addSuccess(me.strings.entryDeleted);
                   me.handleReload();
               },
@@ -509,6 +511,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           success: function(rec) {
               var combo = me.getTaskWorkflow(),
                   wf = rec.get('workflow');
+                if(!combo){
+                    return;
+                }
               combo.suspendEvents();
               combo.setValue(wf);
               combo.resetOriginalValue();

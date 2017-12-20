@@ -528,13 +528,25 @@ Ext.define('Editor.view.admin.TaskGrid', {
                 text: 'id'
             },{
                 xtype: 'gridcolumn',
-                width: 240,
+                width: 140,
                 dataIndex: 'taskGuid',
                 stateId: 'taskGuid',
                 filter: {
                     type: 'string'
                 },
                 text: 'taskGuid'
+            },{
+                xtype: 'gridcolumn',
+                width: 120,
+                dataIndex: 'workflow',
+                stateId: 'workflow',
+                renderer: function(val, meta, rec) {
+                    return val+' ('+rec.get('workflowStepName')+')';
+                },
+                filter: {
+                    type: 'string'
+                },
+                text: 'workflow'
             });
         }
         if (instanceConfig) {

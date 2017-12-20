@@ -56,7 +56,11 @@ Ext.define('Editor.view.admin.UserGrid', {
       gender_female: '#UT#weiblich',
       gender_male: '#UT#männlich',
       reloadBtn: '#UT#Aktualisieren',
-      reloadBtnTip: '#UT#Benutzerliste vom Server aktualisieren.'
+      reloadBtnTip: '#UT#Benutzerliste vom Server aktualisieren.',
+      sourceLangageLabel:'#UT#Quellsprache(n)',
+      sourceLangageTip:'#UT#Quellsprache(n)',
+      targetLangageLabel:'#UT#Zielsprache(n)',
+      targetLangageTip:'#UT#Zielsprache(n)',
   },
   store: 'admin.Users',
   viewConfig: {
@@ -141,15 +145,22 @@ Ext.define('Editor.view.admin.UserGrid', {
           dataIndex: 'roles',
           stateId: 'roles',
           renderer: function(v) {
+              if(!v || v==""){
+                  return "";
+              }
               return Ext.Array.map(v.split(','), function(item){
-                  return Editor.data.app.roles[item] || item;
+                  return Editor.data.app.roles[item].label || item;
               }).join(', ');
           },
           filter: {
               type: 'string'
           },
           text: me.text_cols.roles
-      },{
+      },
+        me.getLanguagesConfig('sourceLanguage',me.strings.sourceLangageLabel,me.strings.sourceLangageTip)
+      ,
+        me.getLanguagesConfig('targetLanguage',me.strings.targetLangageLabel,me.strings.targetLangageTip)
+      ,{
           xtype: 'gridcolumn',
           width: 160,
           dataIndex: 'locale',
@@ -205,5 +216,46 @@ Ext.define('Editor.view.admin.UserGrid', {
         me.self.getConfigurator().merge(me, config, instanceConfig);
     }
     return me.callParent([config]);
-  }
+  },
+
+  /**
+   * Return the language field configuration for type of language (sourceLanguage,targetLanguage)
+   */
+  getLanguagesConfig:function(langageType,text,tooltip){
+      var field={
+            xtype: 'gridcolumn',
+            minWidth: 160,
+            dataIndex: langageType,
+            stateId:langageType,
+            renderer: this.userRenderer,
+            text:text,
+            tooltip: tooltip,
+            filter: {
+                type: 'list',
+                idField:'id',
+                labelField:'label',
+                options: Editor.data.languages,
+                phpMode: false
+            }
+      };
+      return field;
+  },
+    userRenderer: function(value,metaData){
+        if(value === null || value.length<1){
+            return [];
+        }
+        var langstore=Ext.getStore('admin.Languages'),
+        lang,
+        label=[],
+        fullLang=[];
+        value.forEach(function(v) {
+            lang = langstore.findRecord('id',v,0,false,true,true);
+            if(lang){
+                label.push(lang.get('rfc5646'));
+                fullLang.push(lang.get('label'));
+            }
+        }, this);
+        metaData.tdAttr = 'data-qtip="' +fullLang.join('<br/>')+ '"';
+        return label.join(', ');
+    }
 });

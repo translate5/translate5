@@ -40,6 +40,9 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       ref: 'assocDelBtn',
       selector: '#adminTaskUserAssocGrid #remove-user-btn'
   },{
+    ref: 'assocNotifyBtn',
+    selector:'#adminTaskUserAssocGrid #notify-user-btn'  
+  },{
       ref: 'userAssocGrid',
       selector: '#adminTaskUserAssocGrid'
   },{
@@ -58,7 +61,8 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
   messages: {
       assocSave: '#UT#Eintrag gespeichert!',
       assocDeleted: '#UT#Eintrag gelöscht!',
-      assocSaveError: '#UT#Fehler beim Speichern der Änderungen!'
+      assocSaveError: '#UT#Fehler beim Speichern der Änderungen!',
+      userNotifySuccess:'#UT#Benutzer wurden erfolgreich per E-Mail benachrichtigt'
   },
   //***********************************************************************************
   //Begin Events
@@ -100,6 +104,9 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           },
           '#adminTaskUserAssocGrid #add-user-btn': {
               click: me.handleAddUser
+          },
+          '#adminTaskUserAssocGrid #notify-user-btn': {
+              click: me.handleNotifyUserBtn
           },
           'adminTaskUserAssoc combo[name="role"]': {
               change: me.initState
@@ -147,9 +154,38 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       me.getAssocDelBtn().disable();
       me.getEditInfo().hide();
       me.getUserAssocForm().show();
+      me.getUserAssocForm().setDisabled(false);
       me.getUserAssoc().loadRecord(newRec);
       me.initState(null, role, '');
   },
+  
+  /***
+   * Notify users handler
+   */
+  handleNotifyUserBtn:function(){
+      var me=this,
+          task = me.getPrefWindow().actualTask;
+
+      Ext.Ajax.request({
+          url: Editor.data.restpath+'task/'+task.get('id')+'/workflow',
+          method: 'POST',
+          params: {
+              trigger:'notifyAllUsersAboutTaskAssociation'
+          },
+          scope: me,
+          success: function(response){
+              var responseData = JSON.parse(response.responseText);
+              if(!responseData){
+                  return;
+              }
+              Editor.MessageBox.addSuccess(me.messages.userNotifySuccess);
+          },
+          failure: function(response){
+              Editor.app.getController('ServerException').handleException(response);
+          }
+      });
+  },
+  
   /**
    * Disable Delete Button if no User is selected
    * @param {Ext.grid.Panel} grid
@@ -157,10 +193,14 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
    */
   handleAssocSelection: function(grid, selection) {
       var me = this,
-          emptySel = selection.length == 0;
-      me.getAssocDelBtn().setDisabled(emptySel);
+          emptySel = selection.length == 0,
+          record=!emptySel ? selection[0] : null,
+          userEditable=record && record.get('editable');
+          userDeletable=record && record.get('deletable');
+      me.getAssocDelBtn().setDisabled(emptySel || !userDeletable);
       me.getEditInfo().setVisible(emptySel);
       me.getUserAssocForm().setVisible(!emptySel);
+      me.getUserAssocForm().setDisabled(emptySel || !userEditable);
       if(emptySel) {
           me.getUserAssocForm().getForm().reset();
       }
@@ -232,10 +272,13 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
    * @param {} store
    */
   updateUsers: function(store) {
-      var me = this;
+      var me = this,
+          assocNotifyBtn=me.getAssocNotifyBtn();
       if(me.getUserAssoc()) {
           me.getUserAssoc().excludeLogins = store.collect('login');
       }
+      //disable the button if there is no record in the store
+      assocNotifyBtn.setDisabled(store.getCount()< 1)
   },
   /**
    * sets the initial state value dependent on the role

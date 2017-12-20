@@ -260,6 +260,7 @@ Ext.define('Editor.controller.admin.User', {
       if(!basic.isValid()) {
           return;
       }
+
       //if in first save attempt we got an error from server, 
       //and we then disable the password in the second save, 
       //the password will be kept in the model, so reject it here
@@ -345,5 +346,5 @@ Ext.define('Editor.controller.admin.User', {
    */
   handleUserReload: function () {
       this.getAdminUsersStore().load();
-  }
+  },
 });
