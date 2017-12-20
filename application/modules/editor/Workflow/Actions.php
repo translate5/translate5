@@ -34,16 +34,28 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
      * sets all segments to untouched state - if they are untouched by the user
      */
     public function segmentsSetUntouchedState() {
-        //FIXME setze die Segmente ebenfalls auf $newTua->getUserGuid als letzten Editor!
-        $this->updateAutoStates($this->config->task->getTaskGuid(),'setUntouchedState');
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        if(empty($this->config->newTua)) {
+            $authUser = new Zend_Session_Namespace('user');
+            $user->loadByGuid($authUser->data->userGuid);
+        }
+        else {
+            $user->loadByGuid($this->config->newTua->getUserGuid());
+        }
+        
+        $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
+        /* @var $states editor_Models_Segment_AutoStates */
+        $states->setUntouchedState($this->config->task->getTaskGuid(), $user);
     }
     
     /**
      * sets all segments to initial state - if they were untouched by the user before
      */
     public function segmentsSetInitialState() {
-        //FIXME Mit Marc klären, wenn wir oben die $newTua->getUserGuid als letzten Editor setzen, dann auch hier wieder zurücksetzen?
-        $this->updateAutoStates($this->config->task->getTaskGuid(),'setInitialStates');
+        $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
+        /* @var $states editor_Models_Segment_AutoStates */
+        $states->setInitialStates($this->config->task->getTaskGuid());
     }
     
     /**
@@ -204,22 +216,5 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
             $workflow->doWithUserAssoc($tua, $tuaNew);
             editor_Models_LogTask::create($row['taskGuid'], $workflow::STATE_FINISH, $this->authenticatedUserModel, $user);
         }
-    }
-    
-    
-    /**
-     * updates all Auto States of this task
-     * currently this method supports only updating to REVIEWED_UNTOUCHED and to initial (which is NOT_TRANSLATED and TRANSLATED)
-     * @param string $taskGuid
-     * @param string $method method to call in editor_Models_Segment_AutoStates
-     */
-    protected function updateAutoStates(string $taskGuid, string $method) {
-        $segment = ZfExtended_Factory::get('editor_Models_Segment');
-        /* @var $segment editor_Models_Segment */
-        
-        $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
-        /* @var $states editor_Models_Segment_AutoStates */
-        
-        $states->{$method}($taskGuid, $segment);
     }
 }

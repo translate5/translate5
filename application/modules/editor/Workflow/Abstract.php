@@ -206,7 +206,6 @@ abstract class editor_Workflow_Abstract {
     
     /**
      * Mapping between roles and workflowSteps. 
-     * @todo Since this must not be a 1 to 1 relation, we have to save the step also in userTaskAssoc
      * @var array
      */
     protected $steps2Roles = array(
@@ -366,13 +365,12 @@ abstract class editor_Workflow_Abstract {
     }
     
     /**
-     * returns the step of a role
+     * returns the step of a role (the first configured one, if there are multiple steps for a role)
      * @param string $role
      * @return boolean
      */
     public function getStepOfRole(string $role) {
-        $roles2steps = array_flip($this->steps2Roles);
-        return isset($roles2steps[$role]) ? $roles2steps[$role] : false;
+        return array_search($role, $this->steps2Roles, true);
     }
     
     /**
