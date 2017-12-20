@@ -189,13 +189,16 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     public function loadAllUsers($assocFields = []) {
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         $db = $this->db;
+        $role = $this->getRole();
         $s = $user->db->select()
         ->setIntegrityCheck(false)
         ->from(array('u' => $user->db->info($db::NAME)))
         ->join(array('tua' => $db->info($db::NAME)), 'tua.userGuid = u.userGuid', $assocFields)
         ->where('tua.isPmOverride = 0')
-        ->where('tua.role = ?', $this->getRole())
         ->where('tua.taskGuid = ?', $this->getTaskGuid());
+        if(!empty($role)) {
+            $s->where('tua.role = ?', $role);
+        }
         return $user->db->fetchAll($s)->toArray();
     }
     

@@ -25,5 +25,5 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-INSERT INTO `LEK_workflow_action` (`workflow`, `trigger`, `actionClass`, `action`) 
-VALUES ('default', 'doCronDaily', 'editor_Workflow_Actions', 'finishOverduedTasks');
+INSERT INTO `LEK_workflow_action` (`workflow`,`trigger`,`inStep`,`byRole`,`userState`,`actionClass`,`action`,`parameters`,`position`)
+VALUES ('default', 'doCronDaily', null, null, null, 'editor_Workflow_Actions', 'finishOverduedTasks', null, 0);

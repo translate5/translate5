@@ -32,3 +32,6 @@ WHERE `name` = 'runtimeOptions.workflow.default.notification.notifyNewTaskAssign
 AND `value` = '1';
 
 DELETE FROM `Zf_configuration` WHERE `name` = 'runtimeOptions.workflow.default.notification.notifyNewTaskAssigned';
+
+INSERT INTO `LEK_workflow_action` (`workflow`,`trigger`,`inStep`,`byRole`,`userState`,`actionClass`,`action`,`parameters`,`position`)
+VALUES ('default', 'handleDirect::notifyAllUsersAboutTaskAssociation', null, null, null, 'editor_Workflow_Notification', 'notifyAllAssociatedUsers', null, 0);

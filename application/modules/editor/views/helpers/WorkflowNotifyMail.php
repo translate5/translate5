@@ -48,6 +48,7 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract {
     public function renderUserList(array $users) {
         $firstUser = reset($users);
         $hasState = !empty($firstUser) && array_key_exists('state', $firstUser);
+        $hasRole = !empty($firstUser) && array_key_exists('role', $firstUser);
         $t = $this->view->translate;
         /* @var $task editor_Models_Task */
         $result = array('<table cellpadding="4">');
@@ -57,6 +58,9 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract {
         $result[] = $th.$t->_('Vorname').'</th>';
         $result[] = $th.$t->_('Login').'</th>';
         $result[] = $th.$t->_('E-Mail Adresse').'</th>';
+        if($hasRole) {
+            $result[] = $th.$t->_('Rolle').'</th>';
+        }
         if($hasState) {
             $result[] = $th.$t->_('Status').'</th>';
         }
@@ -68,6 +72,9 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract {
             $result[] = '<td>'.$user['firstName'].'</td>';
             $result[] = '<td>'.$user['login'].'</td>';
             $result[] = '<td>'.$user['email'].'</td>';
+            if($hasRole) {
+                $result[] = '<td>'.$t->_($user['role']).'</td>';
+            }
             if($hasState) {
                 $result[] = '<td>'.$t->_($user['state']).'</td>';
             }

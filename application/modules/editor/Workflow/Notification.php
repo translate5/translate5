@@ -240,6 +240,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     
     /**
      * Sends a notification to users which are attached newly to a task with status open
+     * The User to be notified is gathered from the current active TaskUserAssociation
      */
     public function notifyNewTaskAssigned() {
         $tua = $this->config->newTua;
@@ -249,12 +250,41 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $user->loadByGuid($tua->getUserGuid());
         
         $params = [
-            'user' => (array) $user->getDataObject(),
             'task' => $this->config->task,
         ];
         
         $this->createNotification($tua->getRole(), __FUNCTION__, $params);
         $this->notify((array) $user->getDataObject());
+    }
+    
+    /**
+     * Notifies all associated users about the task association
+     * Main difference to notifyNewTaskAssigned to a single user:
+     *  This notification contains a list of all assigned users.
+     */
+    public function notifyAllAssociatedUsers() {
+        $task = $this->config->task;
+        $this->tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        $this->tua->setTaskGuid($task->getTaskGuid());
+        $tuas = $this->tua->loadAllUsers(['state','role']);
+        $roles = array_column($tuas, 'role');
+        array_multisort($roles, SORT_ASC, SORT_STRING, $tuas);
+        
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        
+        $params = [
+            'task' => $this->config->task,
+            'associatedUsers' => $tuas,
+        ];
+        
+        //we assume the PM user for all roles, since it is always the same template
+        $this->createNotification(ACL_ROLE_PM, 'notifyNewTaskAssigned', $params);
+        
+        foreach($tuas as $tua) {
+            $user->loadByGuid($tua['userGuid']);
+            $this->notify((array) $user->getDataObject());
+        }
     }
     
     /**
