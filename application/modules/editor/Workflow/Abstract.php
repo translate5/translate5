@@ -1007,7 +1007,7 @@ abstract class editor_Workflow_Abstract {
             $state = $this->newTaskUserAssoc->getState();
         }
         catch (ZfExtended_Models_Entity_NotFoundException $e) {
-            unset($this->newTaskUserAssoc);
+            $this->newTaskUserAssoc = null;
             $role = null;
             $state = null;
         }
