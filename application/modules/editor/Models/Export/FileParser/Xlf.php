@@ -135,6 +135,16 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
     }
     
     /**
+     * overwrites the parent to remove img tags, which contain currently MQM only (until we provide real MQM export)
+     * {@inheritDoc}
+     * @see editor_Models_Export_FileParser::parseSegment()
+     */
+    protected function parseSegment($segment) {
+        $segment = preg_replace('/<img[^>]*>/','', $segment);
+        return parent::parseSegment($segment);
+    }
+    
+    /**
      * dedicated to write the match-Rate to the right position in the target format
      * @param array $file that contains file as array as splitted by parse function
      * @param integer $i position of current segment in the file array

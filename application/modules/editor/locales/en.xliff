@@ -882,9 +882,9 @@
         <source>nicht vorhanden</source>
         <target>Not available</target>
       </trans-unit>
-      <trans-unit id='RWluc3RlbGx1bmdlbiB6dXIgQXVmZ2FiZQ=='>
-        <source>Einstellungen zur Aufgabe</source>
-        <target>Task-properties</target>
+      <trans-unit id='RWluc3RlbGx1bmdlbiB6dXIgQWJsYXVmcGxhbg=='>
+        <source>Einstellungen zur Ablaufplan</source>
+        <target>Workflow-properties</target>
       </trans-unit>
       <trans-unit id='V29ya2Zsb3c='>
         <source>Workflow</source>
@@ -1651,6 +1651,27 @@
 <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgenVnZXdpZXNlbg=='><source>Translate5 - Aufgabe zugewiesen</source><target>Translate5 - task associated</target></trans-unit>
 
 <trans-unit id='RGVyIFdvcmtmbG93IFNjaHJpdHQgZGVyIEF1ZmdhYmUgd3VyZGUgenUgInswfSIgZ2XDpG5kZXJ0IQ=='><source>Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!</source><target>The workflow step of the task was changed to "{0}"!</target></trans-unit>
+      <trans-unit id='WnVnZW9yZG5ldGUgU3ByYWNoZW4='>
+        <source>Zugeordnete Sprachen</source>
+        <target>Associated languages</target>
+      </trans-unit>
+      <trans-unit id='UXVlbGxzcHJhY2hlKG4p'>
+        <source>Quellsprache(n)</source>
+        <target>Source language(s)</target>
+      </trans-unit>
+      <trans-unit id='WmllbHNwcmFjaGUobik='>
+        <source>Zielsprache(n)</source>
+        <target>Target language(s)</target>
+      </trans-unit>
+      <trans-unit id='QmVpbSBJbXBvcnQgdm9uIEF1ZmdhYmVuIHdlcmRlbiAiRWRpdG9yIiBCZW51dHplciBtaXQgZGVuIHBhc3NlbmRlbiBTcHJhY2hlbiA8YSBocmVmPSJodHRwOi8vY29uZmx1ZW5jZS50cmFuc2xhdGU1Lm5ldC9wYWdlcy92aWV3cGFnZS5hY3Rpb24/cGFnZUlkPTU1NzE2NCIgdGFyZ2V0PSJfYmxhbmsiIHRpdGxlPSJtZWhyIEluZm8iPmF1dG9tYXRpc2NoIGRlciBBdWZnYWJlIHp1Z2V3aWVzZW48L2E+Lg=='>
+          <source>Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.</source>
+          <target>On importing a task, users with the role "editor" and matching languages <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">are automatically added to the task</a>.</target>
+      </trans-unit>
+
+      <trans-unit id='RGllIEF1ZmdhYmUgd3VyZGUgZXJmb2xncmVpY2ggYWt0dWFsaXNpZXJ0'>
+          <source>Die Aufgabe wurde erfolgreich aktualisiert</source>
+          <target>The task was updated successfully</target>
+      </trans-unit>
 <trans-unit id='UG9ydHVnaWVzaXNjaCAoQnJhc2lsaWVuKQ=='><source>Portugiesisch (Brasilien)</source><target>Portuguese (Brazil)</target></trans-unit>
 <trans-unit id='QXNlcmJhaWRzY2hhbmlzY2ggKExhdGVpbik='><source>Aserbaidschanisch (Latein)</source><target>Azerbaijani (Latin)</target></trans-unit>
 <trans-unit id='S2htZXI='><source>Khmer</source><target>Khmer</target></trans-unit>

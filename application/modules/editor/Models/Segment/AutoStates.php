@@ -177,28 +177,25 @@ class editor_Models_Segment_AutoStates {
      * @return multitype:string
      */
     public function getRoleToStateMap() {
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
-        /* @var $workflow editor_Workflow_Abstract */
-        
         return array(
-          'pm' => array(
+          ACL_ROLE_PM => array(
             self::REVIEWED_PM,
             self::REVIEWED_PM_AUTO,
             self::REVIEWED_PM_UNCHANGED,
             self::REVIEWED_PM_UNCHANGED_AUTO,
           ),
-          $workflow::ROLE_TRANSLATOR => [
+          editor_Workflow_Abstract::ROLE_TRANSLATOR => [
             self::TRANSLATED,
             self::TRANSLATED_AUTO,
           ],
-          $workflow::ROLE_LECTOR => array(
+          editor_Workflow_Abstract::ROLE_LECTOR => array(
             self::REVIEWED,
             self::REVIEWED_AUTO,
             self::REVIEWED_UNTOUCHED,
             self::REVIEWED_UNCHANGED,
             self::REVIEWED_UNCHANGED_AUTO,
           ),
-          $workflow::ROLE_TRANSLATORCHECK => array(
+          editor_Workflow_Abstract::ROLE_TRANSLATORCHECK => array(
             self::REVIEWED_TRANSLATOR,
             self::REVIEWED_TRANSLATOR_AUTO,
           )
@@ -256,7 +253,7 @@ class editor_Models_Segment_AutoStates {
     public function calculateSegmentState(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua) {
         $isModified = $segment->isDataModifiedAgainstOriginal();
         
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($segment->getTaskGuid());
         /* @var $workflow editor_Workflow_Abstract */
         
         if($segment->getAutoStateId() == self::BLOCKED){
@@ -285,22 +282,35 @@ class editor_Models_Segment_AutoStates {
      * sets the untouched state for a given taskGuid
      * 
      * @param string $taskGuid
-     * @param editor_Models_Segment $segment
      */
-    public function setUntouchedState(string $taskGuid, editor_Models_Segment $segment) {
+    public function setUntouchedState(string $taskGuid, ZfExtended_Models_User $user) {
+        $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segment editor_Models_Segment */
+        
+        $segment->setUserGuid($user->getUserGuid());
+        $segment->setUserName($user->getUserName());
+        
+        //TODO make history entry for all segments with state self::TRANSLATED || self::NOT_TRANSLATED
         $segment->updateAutoState($taskGuid, self::TRANSLATED, self::REVIEWED_UNTOUCHED);
         $segment->updateAutoState($taskGuid, self::NOT_TRANSLATED, self::REVIEWED_UNTOUCHED);
+        //TODO change last author each segment set to self::REVIEWED_UNTOUCHED to current user
     }
     
     /**
      * sets the untouched state for a given taskGuid back to the initial states
      * 
      * @param string $taskGuid
-     * @param editor_Models_Segment $segment
      */
-    public function setInitialStates(string $taskGuid, editor_Models_Segment $segment) {
+    public function setInitialStates(string $taskGuid) {
+        $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segment editor_Models_Segment */
+        
+        //TODO create a history entry for each segment set to self::REVIEWED_UNTOUCHED
+        //$history = $segment->getNewHistoryEntity();
+        //$history->createHistoryByAutoState([self::REVIEWED_UNTOUCHED]);
         $segment->updateAutoState($taskGuid, self::REVIEWED_UNTOUCHED, self::NOT_TRANSLATED, true);
         $segment->updateAutoState($taskGuid, self::REVIEWED_UNTOUCHED, self::TRANSLATED);
+        //TODO change last author each segment set to last author in the previous entry of the segment history table
     }
     
     /**
@@ -308,7 +318,7 @@ class editor_Models_Segment_AutoStates {
      * @param editor_Models_Segment $segment
      */
     public function updateAfterCommented(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua) {
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($segment->getTaskGuid());
         $isTranslator = $tua->getRole() == $workflow::ROLE_TRANSLATOR;
         $autoState = $segment->getAutoStateId();
         if(!$isTranslator && ($autoState == self::TRANSLATED || $autoState == self::NOT_TRANSLATED)) {
@@ -323,13 +333,34 @@ class editor_Models_Segment_AutoStates {
     }
     
     /**
+     * Returns a map with counts of each state in a task
+     * @param string $taskGuid
+     */
+    public function getStatistics(string $taskGuid) {
+        $seg = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $seg editor_Models_Segment */
+        $stats = $seg->getAutoStateCount($taskGuid);
+        $result = array_fill_keys($this->getStates(), 0);
+        foreach($stats as $stat) {
+            $result[$stat['autoStateId']] = $stat['cnt'];
+        }
+        return $result;
+    }
+    
+    /**
      * returns true if user has right to edit all Tasks, checks optionally the workflow role of the user
      * @param editor_Models_TaskUserAssoc $tua optional, if not given only acl is considered
      */
-    protected function isEditWithoutAssoc(editor_Models_TaskUserAssoc $tua = null) {
+    protected function isEditWithoutAssoc(editor_Models_TaskUserAssoc $tua) {
         $userSession = new Zend_Session_Namespace('user');
         $role = $tua && $tua->getRole();
         $acl = ZfExtended_Acl::getInstance();
-        return empty($role) && $acl->isInAllowedRoles($userSession->data->roles,'editAllTasks');
+        
+        //load the task so the check if the loagged user is also the pm to the task
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($tua->getTaskGuid());
+        $sameUserGuid = $task->getPmGuid() === $userSession->data->userGuid;
+        return empty($role) && ($acl->isInAllowedRoles($userSession->data->roles, 'backend', 'editAllTasks') || $sameUserGuid);
     }
 }

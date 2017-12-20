@@ -15,8 +15,9 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
+ translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
+ Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
+ folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -33,31 +34,22 @@ END LICENSE AND COPYRIGHT
  *
  */
 
-$session = new Zend_Session_Namespace();
-
-$this->subject = $this->translate->_('Translate5 - Aufgabe freigegeben').' "'.$this->task->getTaskNr().' - '.$this->task->getTaskName().'"';
-
+/* @var $this Zend_View */
 $this->render('general.phtml');
 
-$template = $this->translate->_('{header}
-Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> für Sie freigegeben.<br />
-<br />
-Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRole}</b>:<br />
-{changedSegments}
-<hr />
-<br />
-{footer}');
+$this->subject = $this->translate->_('Translate5 - Aufgabe zugewiesen').' "'.$this->task->getTaskNr().' - '.$this->task->getTaskName().'"';
 
-$this->textbody = strip_tags($this->templateApply($template, [
-    'task' => $this->task->getDataObject(),
+//is automatically merged with data from general.phtml
+$data = [
     'header' => $this->header,
     'footer' => $this->footer,
-    'previousRole' => $this->translate->_('Lektoren'),
-    'changedSegments' => $this->htmlOnly,
-]));
+];
 
-echo $this->templateApply($template, [
-    //just overwrite the changedSegments
-    'changedSegments' => $this->workflowNotifyHtmlMailSegmentList($this->segments),
-]);
+$mailBody = $this->templateApply('{header}
+Im Projektportal {portalLink} wurde Ihnen die Aufgabe <b>{task.taskNr} - {task.taskName}</b> zugewiesen.<br />
+<br />
+{taskFragment}{footer}', $data);
+
+$this->textbody = strip_tags($mailBody);
+echo $mailBody;
 

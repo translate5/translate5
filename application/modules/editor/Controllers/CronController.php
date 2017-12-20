@@ -71,6 +71,10 @@ class Editor_CronController extends ZfExtended_Controllers_Action {
             /* @var $workflow editor_Workflow_Abstract */
             $workflow->doCronDaily();
         }
+        
+        $taskModel=ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $taskModel editor_Models_Task */
+        $taskModel->removeOldTasks();
         echo "OK";
     }
 }

@@ -277,6 +277,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     protected function setJsAppData() {
         $userSession = new Zend_Session_Namespace('user');
         $userSession->data->passwd = '********';
+        $userRoles = $userSession->data->roles;
         
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
@@ -317,11 +318,14 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $allRoles = $acl->getRoles();
         $roles = array();
         foreach($allRoles as $role) {
-            //
             if($role == 'noRights' || $role == 'basic') {
                 continue;
             }
-            $roles[$role] = $this->translate->_(ucfirst($role));
+            //set the setable, if the user is able to set/modify this role
+            $roles[$role] = [
+                    'label' => $this->translate->_(ucfirst($role)),
+                    'setable' => $acl->isInAllowedRoles($userRoles, "setaclrole", $role)
+            ];
         }
         $php2js->set('app.roles', $roles);
         
@@ -329,7 +333,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         /* @var $wm editor_Workflow_Manager */
         $php2js->set('app.workflows', $wm->getWorkflowData());
         
-        $php2js->set('app.userRights', $acl->getFrontendRights($userSession->data->roles));
+        $php2js->set('app.userRights', $acl->getFrontendRights($userRoles));
         
         $php2js->set('app.version', $this->view->appVersion);
     }
@@ -401,7 +405,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $result = array();
         foreach ($langs as $lang) {
             $name = $this->translate->_($lang['langName']);
-            $result[$name] = array($lang['id'], $name.' ('.$lang['rfc5646'].')', $lang['rtl']);
+            $result[$name] = array($lang['id'], $name.' ('.$lang['rfc5646'].')', $lang['rtl'],$lang['rfc5646']);
         }
         ksort($result); //sort by name of language
         if(empty($result)){
@@ -596,6 +600,44 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         header('Content-Type: '.$types[$extension]);
         readfile($wholePath);
         exit;
+    }
+    
+    public function testnotifyAction() {
+        $this->_helper->layout->disableLayout();
+        
+        $class = 'editor_Workflow_Notification';
+        $method = 'notifyNewTaskForPm';
+        
+        $config = ZfExtended_Factory::get('editor_Workflow_Actions_Config');
+        /* @var $config editor_Workflow_Actions_Config */
+        $config->workflow = ZfExtended_Factory::get('editor_Plugins_Miele_Workflow');
+        $config->newTua = null;
+        $config->oldTask = ZfExtended_Factory::get('editor_Models_Task');
+        $config->oldTask->load(3007);
+        $config->task = $config->oldTask;
+        $config->importConfig = new editor_Models_Import_Configuration();
+        $config->importConfig->importFolder = APPLICATION_PATH.'/needed/';
+        $config->importConfig->setLanguages('de', 'it', '', ZfExtended_Languages::LANG_TYPE_RFC5646);
+        $config->importConfig->userGuid = '{F1D11C25-45D2-11D0-B0E2-444553540101}';
+        $config->importConfig->userName = 'Thomas Lauria';
+        
+        $instance = ZfExtended_Factory::get($class);
+        /* @var $instance editor_Workflow_Actions_Abstract */
+        $instance->init($config);
+        $instances[$class] = $instance;
+            
+        if(empty($action['parameters'])) {
+            call_user_func([$instance, $method]);
+            echo "CALLED ".$class.'::'.$method;
+            return;
+        }
+        call_user_func([$instance, $method], json_decode($action['parameters']));
+        if(json_last_error() != JSON_ERROR_NONE) {
+            echo 'JSON Error: '.json_last_error_msg();
+            return;
+        }
+        echo "CALLED ".$class.'::'.$method;
+        return;
     }
 }
 

@@ -52,6 +52,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
     public function indexAction(){
         $this->view->rows = $this->entity->loadAllWithUserInfo();
         $this->view->total = $this->entity->getTotalCount();
+        $this->applyEditableAndDeletable();
     }
     
     public function postDispatch() {
@@ -109,10 +110,9 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
      * @see ZfExtended_RestController::putAction()
      */
     public function putAction() {
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
+        $this->entityLoad();
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($this->entity->getTaskGuid());
         /* @var $workflow editor_Workflow_Abstract */
-
-        $this->entity->load($this->_getParam('id'));
         $oldEntity = clone $this->entity;
         $this->decodePutData();
         $this->processClientReferenceVersion();
@@ -138,8 +138,9 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         if(isset($this->data->state) && $oldEntity->getState() != $this->data->state){
             editor_Models_LogTask::createWithUserGuid($this->entity->getTaskGuid(), $this->data->state, $this->entity->getUserGuid());
         }
+        $this->applyEditableAndDeletable();
     }
-
+    
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::postAction()
@@ -147,6 +148,50 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
     public function postAction() {
         parent::postAction();
         $this->addUserInfoToResult();
+        $this->applyEditableAndDeletable();
+    }
+    
+    public function deleteAction(){
+        $this->entityLoad();
+        $this->checkAuthenticatedIsParentOfEntity();
+        $this->processClientReferenceVersion();
+        $this->entity->delete();
+    }
+    
+    /**
+     * checks user based access on POST/PUT
+     * {@inheritDoc}
+     * @see ZfExtended_RestController::additionalValidations()
+     */
+    protected function additionalValidations() {
+        $this->checkAuthenticatedIsParentOfEntity();
+    }
+    
+    /***
+     * Check if the current logged in user is allowed to modify the given User
+     */
+    protected function checkAuthenticatedIsParentOfEntity(){
+        $userSession = new Zend_Session_Namespace('user');
+        $authenticated = $userSession->data;
+        
+        //if i am allowed to see any user:
+        if($this->isAllowed('backend', 'seeAllUsers')) {
+            return;
+        }
+        
+        //The authenticated user is allowed to see himself
+        if($this->entity->getUserGuid() === $authenticated->userGuid){
+            return;
+        }
+        
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $user->loadByGuid($this->entity->getUserGuid());
+        
+        //if the authenticated user is no parent, then he is not allowed to proceed
+        if(!$user->hasParent($authenticated->id)){
+            throw new ZfExtended_NoAccessException();
+        }
     }
     
     /**
@@ -159,5 +204,43 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->view->rows->login = $user->getLogin();
         $this->view->rows->firstName = $user->getFirstName();
         $this->view->rows->surName = $user->getSurName();
+        $this->view->rows->parentIds = $user->getParentIds();
+        $this->view->rows->longUserName=$user->getUsernameLong();
+    }
+    
+    /***
+     * Add editable/deletable variable calculated for each user in the response rows.
+     */
+    protected function applyEditableAndDeletable(){
+        $userSession = new Zend_Session_Namespace('user');
+        $userData=$userSession->data;
+        $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $userModel ZfExtended_Models_User */
+        $seeAllUsersAllowed=$userModel->isAllowed("backend","seeAllUsers");
+        
+        if(is_array($this->view->rows)) {
+            foreach ($this->view->rows as &$row){
+                if($seeAllUsersAllowed || $row['login']==$userData->login){
+                    $row['editable']=true;
+                    $row['deletable']=true;
+                    continue;
+                }
+                //check if the current loged user is a parent for the user in the row
+                $hasParent=$userModel->hasParent($userData->id, $row['parentIds']);
+                $row['editable']=$hasParent;
+                $row['deletable']=$hasParent;
+            }
+        }
+        elseif(is_object($this->view->rows)) {
+            if($seeAllUsersAllowed || $this->view->rows->login==$userData->login){
+                $this->view->rows->editable=true;
+                $this->view->rows->deletable=true;
+                return;
+            }
+            //check if the current loged user is a parent for the user in the row
+            $hasParent=$userModel->hasParent($userData->id, $this->view->rows->parentIds);
+            $this->view->rows->editable=$hasParent;
+            $this->view->rows->deletable=$hasParent;
+        }
     }
 }

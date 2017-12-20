@@ -15,8 +15,9 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
+ translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
+ Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
+ folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -26,5 +27,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class Editor_UserController extends ZfExtended_UserController {
+/**#@+
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
+ */
+/**
+ * DB table access LEK_workflow_action
+ */
+class editor_Models_Db_Workflow_Action extends Zend_Db_Table_Abstract {
+    protected $_name    = 'LEK_workflow_action';
+    public $_primary = 'id';
 }

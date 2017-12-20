@@ -281,7 +281,8 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
             targetMsg = '',
             result = {},
             store = me.getView().getStore('editorquery'),
-            json = null;
+            json = null,
+            segment;
         if(segmentId == me.editedSegmentId){
             //removing by index is working as array only!
             store.remove([store.findExact('tmmtid',tmmtid)]);
@@ -315,8 +316,11 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
             tmmtid: tmmtid,
             state: strState
         }];
-        me.cachedResults.get(segmentId).add(tmmtid, result);
-        me.loadCachedDataIntoGrid(segmentId,tmmtid);
-        me.cachedResults.get(segmentId).removeAtKey(tmmtid);
+        segment = me.cachedResults.get(segmentId);
+        if(segment) {
+            segment.add(tmmtid, result);
+            me.loadCachedDataIntoGrid(segmentId,tmmtid);
+            segment.removeAtKey(tmmtid);
+        }
     }
 });

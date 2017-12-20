@@ -200,8 +200,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         else {
             $s->join(array($alias => 'LEK_taskUserAssoc'), $alias.'.taskGuid = t.taskGuid', array())
-            ->where($alias.'.userGuid = ?', $userGuid);
-        }
+            ->where($alias.'.userGuid = ? OR t.pmGuid = ?', $userGuid);
+        }        
         return $s;
     }
     
@@ -399,7 +399,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         ];
         if($increaseStep) {
             $data['workflowStep'] =  new Zend_Db_Expr('`workflowStep` + 1');
+            //step nr is not updated in task entity!
         }
+        $this->setWorkflowStepName($stepName);
         $this->db->update($data, ['taskGuid = ?' => $this->getTaskGuid()]);
     }
     
@@ -630,4 +632,10 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         return $this->meta;
     }
+    
+    public function removeOldTasks(){
+        $config = Zend_Registry::get('config');
+        $taskLifetimeDays= $config->runtimeOptions->taskLifetimeDays;
+    }
+    
 }

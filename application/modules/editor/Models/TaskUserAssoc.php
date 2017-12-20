@@ -63,15 +63,16 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * returns all users to the taskGuid and role of the given TaskUserAssoc
      * @param mixed $role string or null as a value
      * @param string $taskGuid
+     * @param array $assocFields optional, column names of the assoc table to be added in the result set
      * @return [array] list with user arrays
      */
-    public function getUsersOfRoleOfTask($role,$taskGuid){
+    public function getUsersOfRoleOfTask($role,$taskGuid, $assocFields = []){
         if (is_null($role))
             return array();
         /* @var $tua editor_Models_TaskUserAssoc */
         $this->setRole($role);
         $this->setTaskGuid($taskGuid);
-        return $this->loadAllUsers();
+        return $this->loadAllUsers($assocFields);
     }
     
     /**
@@ -160,12 +161,11 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * Updates the stored user states of an given taskGuid 
      * @param string $state
      * @param string $role
-     * @param string $taskGuid
      */
-    public function setStateForRoleAndTask(string $state, string $role, string $taskGuid) {
+    public function setStateForRoleAndTask(string $state, string $role) {
         $this->db->update(array('state' => $state), array(
             'role = ?' => $role,
-            'taskGuid = ?' => $taskGuid,
+            'taskGuid = ?' => $this->getTaskGuid(),
         ));
     }
     
@@ -183,19 +183,22 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     /**
      * returns a list with users to the actually loaded taskGuid and role
      * loads only assocs where isPmOverride not set
-     * @param string $taskGuid
-     * @param string $role
+     * @param array $assocFields optional, if given add that assoc fields to the join
      * @return array
      */
-    public function loadAllUsers() {
+    public function loadAllUsers($assocFields = []) {
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         $db = $this->db;
+        $role = $this->getRole();
         $s = $user->db->select()
+        ->setIntegrityCheck(false)
         ->from(array('u' => $user->db->info($db::NAME)))
-        ->join(array('tua' => $db->info($db::NAME)), 'tua.userGuid = u.userGuid', array())
+        ->join(array('tua' => $db->info($db::NAME)), 'tua.userGuid = u.userGuid', $assocFields)
         ->where('tua.isPmOverride = 0')
-        ->where('tua.role = ?', $this->getRole())
         ->where('tua.taskGuid = ?', $this->getTaskGuid());
+        if(!empty($role)) {
+            $s->where('tua.role = ?', $role);
+        }
         return $user->db->fetchAll($s)->toArray();
     }
     
@@ -210,7 +213,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $s = $db->select()
         ->setIntegrityCheck(false)
         ->from(array('tua' => $db->info($db::NAME)))
-        ->join(array('u' => $user->db->info($db::NAME)), 'tua.userGuid = u.userGuid', array('login', 'surName', 'firstName'))
+        ->join(array('u' => $user->db->info($db::NAME)), 'tua.userGuid = u.userGuid', array('login', 'surName', 'firstName', 'parentIds'))
         ->where('tua.isPmOverride = 0');
         //->where('tua.taskGuid = ?', $this->getTaskGuid()); kommt per filter aktuell!
         
@@ -327,7 +330,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     }
     
     protected function _cleanupLocked($taskGuid = null, $forced = false) {
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($taskGuid);
         /* @var $workflow editor_Workflow_Abstract */
         
         $validSessionIds = ZfExtended_Models_Db_Session::GET_VALID_SESSIONS_SQL;
@@ -340,6 +343,8 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             $where['taskGuid = ?'] = $taskGuid;
         }
 
+        //FIXME this is not correct here, we should loop over all affected tuas, and should load the workflow then by taskGuid of the associated task
+        // since until writing this comment a bug in getActive always returns the Default Workflow, we just keep that (getActive returns Default Workflow if no taskGuid given)
         if(!empty($workflow)) {
             //updates the workflow state back to open if allowed
             $where2 = $where;

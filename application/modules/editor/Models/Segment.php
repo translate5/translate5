@@ -891,7 +891,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->segmentFieldManager->initFields($taskGuid);
         $this->reInitDb($taskGuid);
         
-        $fields = array('id', 'mid', 'segmentNrInTask', 'stateId', 'autoStateId', 'matchRate', 'qmId', 'comments', 'fileId', 'userName', 'timestamp');
+        $fields = array('id', 'mid', 'segmentNrInTask', 'stateId', 'autoStateId', 'matchRate', 'qmId', 'comments', 'fileId', 'userGuid', 'userName', 'timestamp');
         $fields = array_merge($fields, $this->segmentFieldManager->getDataIndexList());
         
         $this->initDefaultSort();
@@ -1072,6 +1072,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @param string $taskGuid
      */
     protected function reInitDb($taskGuid) {
+        $this->segmentFieldManager->initFields($taskGuid);
         $mv = $this->segmentFieldManager->getView();
         /* @var $mv editor_Models_Segment_MaterializedView */
         $this->db = ZfExtended_Factory::get($this->dbInstanceClass, array(array(), $mv->getName()));
@@ -1171,7 +1172,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * Bulk updating a specific autoState of a task 
+     * Bulk updating a specific autoState of a task, affects only non edited segments
+     * If userGuid and username are set in this segment instance, the this values are also set in the affected segments
+     * FIXME test me for translation workflow!
      * @param string $taskGuid
      * @param integer $oldState
      * @param integer $newState
@@ -1184,11 +1187,22 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $segTable = $db->info($db::NAME);
         $viewName = $sfm->getView()->getName();
         
-        $sql_tpl = 'UPDATE `%s` set autoStateId = ? where autoStateId = ? and taskGuid = ?';
+        //if this segment instance have a userGuid and userName he segments are also changed with that data
+        $userGuid = $this->getUserGuid();
+        $username = $this->getUserName();
+        
+        $changeUser = !empty($userGuid) && !empty($username);
+        if($changeUser) {
+            $sql_tpl = 'UPDATE `%s` set autoStateId = ?, userGuid = ?, userName = ? where autoStateId = ? and taskGuid = ?';
+            $bind = array($newState, $userGuid, $username, $oldState, $taskGuid);
+        }
+        else {
+            $sql_tpl = 'UPDATE `%s` set autoStateId = ? where autoStateId = ? and taskGuid = ?';
+            $bind = array($newState, $oldState, $taskGuid);
+        }
         $sql = sprintf($sql_tpl, $segTable);
         $sql_view = sprintf($sql_tpl, $viewName);
         
-        $bind = array($newState, $oldState, $taskGuid);
         $db->getAdapter()->beginTransaction();
         
         if(!$emptyEditedOnly) {
@@ -1213,8 +1227,15 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->queryWithExistingView($sql_view, $bind);
         
         //updates LEK_segments directly, but only where all above requested fields are empty
-        $bind = array($taskGuid, $newState, $oldState, $taskGuid);
-        $sql  = 'UPDATE `%s` segment, %s subquery set segment.autoStateId = ? where segment.autoStateId = ? and segment.taskGuid = ? ';
+        $sql  = 'UPDATE `%s` segment, %s subquery set segment.autoStateId = ? ';
+        if($changeUser) {
+            $bind = array($taskGuid, $newState, $userGuid, $username, $oldState, $taskGuid);
+            $sql .= ', segment.userGuid = ?, segment.userName = ? ';
+        }
+        else {
+            $bind = array($taskGuid, $newState, $oldState, $taskGuid);
+        }
+        $sql .= 'where segment.autoStateId = ? and segment.taskGuid = ? ';
         $sql .= 'and subquery.segmentId = segment.id and subquery.cnt = %s';
         
         //subQuery to get the count of empty fields, fields as requested above
@@ -1226,6 +1247,17 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $sql = sprintf($sql, $segTable, $subQuery, count($affectedFieldNames));
         $db->getAdapter()->query($sql, $bind);
         $db->getAdapter()->commit();
+    }
+    
+    /**
+     * @param string $taskGuid
+     * @return array
+     */
+    public function getAutoStateCount(string $taskGuid) {
+        $this->reInitDb($taskGuid);
+        $s = $this->db->select()->from($this->tableName, ['autoStateId', 'cnt' => 'count(id)'])
+        ->group('autoStateId');
+        return $this->db->fetchAll($s)->toArray();
     }
     
     /**

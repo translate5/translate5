@@ -391,7 +391,8 @@ Ext.define('Editor.controller.Localizer', {
         messages: {
             assocSave: '<?php echo $this->translate->_('Eintrag gespeichert!');?>',
             assocDeleted: '<?php echo $this->translate->_('Eintrag gelöscht!');?>',
-            assocSaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>'
+            assocSaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>',
+            userNotifySuccess: '<?php echo $this->translate->_('Benutzer wurden erfolgreich per E-Mail benachrichtigt');?>',
         }
     });
 
@@ -474,6 +475,22 @@ Ext.define('Editor.controller.Localizer', {
             orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
             enableSourceEditing: '<?php echo $this->translate->_('Quellsprache bearbeitbar');?>',
             emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe (kein Review)');?>'
+        }
+    });
+
+    Ext.define("Editor.locale.de.view.admin.task.TaskAttributes", {
+        override: "Editor.view.admin.task.TaskAttributes",
+        title: '<?php echo $this->translate->_('Eigenschaften');?>',
+        strings:{
+            taskName: '<?php echo $this->translate->_('Aufgabenname');?>',
+            deliveryDate: '<?php echo $this->translate->_('Lieferdatum (soll)');?>',
+            realDeliveryDate: '<?php echo $this->translate->_('Lieferdatum (ist)');?>',
+            orderDate: '<?php echo $this->translate->_('Bestelldatum');?>',
+            pmGuid: '<?php echo $this->translate->_('Projektmanager');?>',
+            btnSave: '<?php echo $this->translate->_('Speichern');?>',
+            successUpdate: '<?php echo $this->translate->_('Die Aufgabe wurde erfolgreich aktualisiert');?>',
+            btnCancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            btnReload: '<?php echo $this->translate->_('Aktualisieren');?>',
         }
     });
     
@@ -588,7 +605,9 @@ Ext.define('Editor.controller.Localizer', {
             removeUser: '<?php echo $this->translate->_('Benutzer entfernen');?>',
             removeUserTip: '<?php echo $this->translate->_('Den gewählten Benutzer aus dieser Aufgabe entfernen.');?>',
             save: '<?php echo $this->translate->_('Änderungen speichern');?>',
-            cancel: '<?php echo $this->translate->_('Abbrechen');?>'
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            btnNotify: '<?php echo $this->translate->_('Benutzer benachrichtigen');?>',
+            btnNotifyTip: '<?php echo $this->translate->_('Alle Benutzer über die Zuweisung der Aufgabe gesammelt informieren');?>'
         }
     });
 
@@ -703,7 +722,11 @@ Ext.define('Editor.controller.Localizer', {
         gender_female: '<?php echo $this->translate->_('Frau');?>',
         gender_male: '<?php echo $this->translate->_('Herr');?>',
         reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
-        reloadBtnTip: '<?php echo $this->translate->_('Benutzerliste vom Server aktualisieren.');?>'
+        reloadBtnTip: '<?php echo $this->translate->_('Benutzerliste vom Server aktualisieren.');?>',
+        sourceLangageLabel: '<?php echo $this->translate->_('Quellsprache(n)');?>',
+        sourceLangageTip: '<?php echo $this->translate->_('Quellsprache(n)');?>',
+        targetLangageLabel: '<?php echo $this->translate->_('Zielsprache(n)');?>',
+        targetLangageTip: '<?php echo $this->translate->_('Zielsprache(n)');?>'
     };
     
     Editor.view.admin.UserAddWindow.prototype.title = '<?php echo $this->translate->_('Benutzer erstellen');?>';
@@ -738,6 +761,12 @@ Ext.define('Editor.controller.Localizer', {
         addBtn: '<?php echo $this->translate->_('Benutzer hinzufügen');?>',
         saveBtn: '<?php echo $this->translate->_('Benutzer speichern');?>',
         cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
+        languagesLabel: '<?php echo $this->translate->_('Zugeordnete Sprachen');?>',
+        sourceLangageLabel: '<?php echo $this->translate->_('Quellsprache(n)');?>',
+        sourceLangageTip: '<?php echo $this->translate->_('Quellsprache(n)');?>',
+        targetLangageLabel: '<?php echo $this->translate->_('Zielsprache(n)');?>',
+        targetLangageTip: '<?php echo $this->translate->_('Zielsprache(n)');?>',
+        languageInfo: '<?php echo $this->translate->_('Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.');?>',
         localeLabel: '<?php echo $this->translate->_('Lokalisierung');?>'
     };
 <?php
@@ -779,7 +808,7 @@ Ext.define('Editor.controller.Localizer', {
         visDisabled: '<?php echo $this->translate->_('nicht vorhanden');?>'
     };
     
-    Editor.view.admin.task.Preferences.prototype.title = '<?php echo $this->translate->_('Einstellungen zur Aufgabe');?>';
+    Editor.view.admin.task.Preferences.prototype.title = '<?php echo $this->translate->_('Einstellungen zur Ablaufplan');?>';
     Editor.view.admin.task.Preferences.prototype.workflow_label = '<?php echo $this->translate->_('Workflow');?>';
     Editor.view.admin.task.Preferences.prototype.editInfo = '<?php echo $this->translate->_('Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!');?>';
     
