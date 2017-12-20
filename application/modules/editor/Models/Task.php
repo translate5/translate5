@@ -632,4 +632,10 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         return $this->meta;
     }
+    
+    public function removeOldTasks(){
+        $config = Zend_Registry::get('config');
+        $taskLifetimeDays= $config->runtimeOptions->taskLifetimeDays;
+    }
+    
 }
