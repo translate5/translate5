@@ -408,7 +408,6 @@ Ext.define('Editor.controller.Editor', {
             editor.insertAtCursor((e.browserEvent.clipboardData || window.clipboardData).getData('Text'));
         }, me, {delegated: false});
         if(me.editorTooltip){
-            debugger;
             me.editorTooltip.setTarget(editor.getEditorBody());
             me.editorTooltip.targetOffset = offset;
         }
@@ -432,12 +431,12 @@ Ext.define('Editor.controller.Editor', {
     clearKeyMaps: function() {
         var me = this;
         if(me.editorKeyMap) {
-            //me.editorKeyMap.destroy();
+            me.editorKeyMap.destroy();
             me.editorKeyMap = null;
         }
         
         if(me.generalKeyMap) {
-            //me.generalKeyMap.destroy();
+            me.generalKeyMap.destroy();
             me.generalKeyMap = null;
         }
     },

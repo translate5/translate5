@@ -155,7 +155,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       var me = this,
           checkTag = me.getDuplicateCheckImg(segmentId, fieldName);
       
-      
       me.setValue(me.markupForEditor(value)+checkTag);
   },
   /**
