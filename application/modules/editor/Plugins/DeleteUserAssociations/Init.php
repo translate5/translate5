@@ -44,16 +44,6 @@ class editor_Plugins_DeleteUserAssociations_Init extends ZfExtended_Plugin_Abstr
      * @see ZfExtended_Plugin_Abstract::init()
      */
     public function init() {
-        if(ZfExtended_Debug::hasLevel('plugin', 'DeleteUserAssociations')) {
-            ZfExtended_Factory::addOverwrite('Zend_Http_Client', 'ZfExtended_Zendoverwrites_Http_DebugClient');
-        }
-        $this->initEvents();
-    }
-    
-    /**
-     * define all event listener
-     */
-    protected function initEvents() {
         $this->eventManager->attach('Editor_TaskuserassocController', 'afterIndexAction', array($this, 'handleEditableDeletable'));
         $this->eventManager->attach('Editor_TaskuserassocController', 'afterPutAction', array($this, 'handleEditableDeletable'));
         $this->eventManager->attach('Editor_TaskuserassocController', 'afterPostAction', array($this, 'handleEditableDeletable'));
@@ -70,11 +60,15 @@ class editor_Plugins_DeleteUserAssociations_Init extends ZfExtended_Plugin_Abstr
         //enable the deletable flag
         if(is_array($view->rows)) {
             foreach ($view->rows as &$row){
-                $row['deletable']=true;
+                if($row['role'] == editor_Workflow_Abstract::ROLE_TRANSLATORCHECK) {
+                    $row['deletable'] = true;
+                }
             }
         }
         elseif(is_object($view->rows)) {
-            $view->rows->deletable=true;
+            if($view->rows->role == editor_Workflow_Abstract::ROLE_TRANSLATORCHECK) {
+                $view->rows->deletable = true;
+            }
         }
     }
 
@@ -83,6 +77,16 @@ class editor_Plugins_DeleteUserAssociations_Init extends ZfExtended_Plugin_Abstr
      * @param Zend_EventManager_Event $event
      */
     public function handleTaskUserAssocBeforeDelete(Zend_EventManager_Event $event){
+        $params = $event->getParam('params');
+        if(empty($params['id'])) {
+            return;//bound to wrong action? id should exist
+        }
+        $tua = $event->getParam('entity');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        $tua->load($params['id']);
+        if($tua->getRole() != editor_Workflow_Abstract::ROLE_TRANSLATORCHECK) {
+            return;
+        }
         //add the backend right seeAllUsers to the current logged user, so the user is able to delete any assoc users
         $userSession = new Zend_Session_Namespace('user');
         $userData = $userSession->data;
