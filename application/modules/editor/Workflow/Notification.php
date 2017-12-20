@@ -201,7 +201,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $pms = $this->getTaskPmUsers();
         foreach($pms as $pm) {
             $this->createNotification(ACL_ROLE_PM, __FUNCTION__, $params); //@todo PM currently not defined as WORKFLOW_ROLE, so hardcoded here
-            $this->attachXliffSegmentList($segmentHash, $segments);
+            $this->attachXliffSegmentList($segmentHash, $segments,$currentStep);
             $this->addCopyReceivers($triggerConfig, ACL_ROLE_PM);
             $this->notify($pm);
         }
@@ -214,7 +214,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         foreach($users as $user) {
             $params['user'] = $user;
             $this->createNotification($nextRole, __FUNCTION__, $params);
-            $this->attachXliffSegmentList($segmentHash, $segments);
+            $this->attachXliffSegmentList($segmentHash, $segments,$currentStep);
             $this->addCopyReceivers($triggerConfig, $nextRole);
             $this->notify($user);
         }
@@ -303,24 +303,43 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * attaches the segmentList as attachment to the internal mailer object
      * @param string $segmentHash
      * @param array $segments
+     * @param string $currentStep
      */
-    protected function attachXliffSegmentList($segmentHash, array $segments) {
+    protected function attachXliffSegmentList($segmentHash, array $segments,$currentStep) {
         $config = Zend_Registry::get('config');
         $xlfAttachment = (boolean) $config->runtimeOptions->notification->enableSegmentXlfAttachment;
         $xlfFile =       (boolean) $config->runtimeOptions->editor->notification->saveXmlToFile;
+        $xliff2Active =       (boolean) $config->runtimeOptions->editor->notification->xliff2Active;
+        
         
         if(empty($segments) || (!$xlfAttachment && !$xlfFile)) {
             return;
         }
         if(empty($this->xmlCache[$segmentHash])) {
-            $xliffConf = [
-                editor_Models_Converter_SegmentsToXliff::CONFIG_INCLUDE_DIFF => (boolean) $config->runtimeOptions->editor->notification->includeDiff,
-                editor_Models_Converter_SegmentsToXliff::CONFIG_PLAIN_INTERNAL_TAGS => true,
-                editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_ALTERNATIVES => true,
-                editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_TERMINOLOGY => true,
-            ];
-            $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff', [$xliffConf]);
-            /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff */
+            
+            //if the config is active, convert segments to xliff2 format
+            if($xliff2Active){
+                $xliffConf = [
+                        editor_Models_Converter_SegmentsToXliff2::CONFIG_ADD_TERMINOLOGY=>true,
+                        editor_Models_Converter_SegmentsToXliff2::CONFIG_INCLUDE_DIFF=>false,
+                        editor_Models_Converter_SegmentsToXliff2::CONFIG_ADD_QM=>true,
+                ];
+                $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff2', [$xliffConf]);
+                /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff2 */
+                
+                $xliffConverter->workflowStep=$currentStep;
+                
+            }else{
+                $xliffConf = [
+                    editor_Models_Converter_SegmentsToXliff::CONFIG_INCLUDE_DIFF => (boolean) $config->runtimeOptions->editor->notification->includeDiff,
+                    editor_Models_Converter_SegmentsToXliff::CONFIG_PLAIN_INTERNAL_TAGS => true,
+                    editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_ALTERNATIVES => true,
+                    editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_TERMINOLOGY => true,
+                ];
+                $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff', [$xliffConf]);
+                /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff */
+            }
+            
             $this->xmlCache[$segmentHash] = $xliff = $xliffConverter->convert($this->config->task, $segments);
             
             if($xlfFile) {
