@@ -180,10 +180,6 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         }
         $segments = $this->getStepSegments($currentStep);
         
-        //START TEST HERE
-        //$this->alexTestXliff2($task,$segments,$currentStep);
-        //END TEST HERE
-        
         $segmentHash = md5(print_r($segments,1)); //hash to identify the given segments (for internal caching)
         
         $nextRole = $workflow->getRoleOfStep((string)$workflow->getNextStep($currentStep));
@@ -210,7 +206,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             $this->notify($pm);
         }
         
-        if(is_null($nextRole)){
+        if(!$nextRole){
             return;
         }
         
@@ -222,21 +218,6 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             $this->addCopyReceivers($triggerConfig, $nextRole);
             $this->notify($user);
         }
-    }
-    
-    
-    public function alexTestXliff2(editor_Models_Task $task,array $segments,$workflowStep){
-        $xliffConf = [
-                editor_Models_Converter_SegmentsToXliff2::CONFIG_ADD_TERMINOLOGY=>true,
-                editor_Models_Converter_SegmentsToXliff2::CONFIG_INCLUDE_DIFF=>false,
-                editor_Models_Converter_SegmentsToXliff2::CONFIG_ADD_QM=>true,
-        ];
-        $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff2', [$xliffConf]);
-        /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff2 */
-        
-        $xliffConverter->workflowStep=$workflowStep;
-        $xliff=$xliffConverter->convert($task, $segments);
-        error_log($xliff);
     }
     
     /**
