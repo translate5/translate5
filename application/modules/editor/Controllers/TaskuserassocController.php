@@ -184,8 +184,12 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
             return;
         }
         
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $user->loadByGuid($this->entity->getUserGuid());
+        
         //if the authenticated user is no parent, then he is not allowed to proceed
-        if(!$this->entity->hasParent($authenticated->id)){
+        if(!$user->hasParent($authenticated->id)){
             throw new ZfExtended_NoAccessException();
         }
     }
