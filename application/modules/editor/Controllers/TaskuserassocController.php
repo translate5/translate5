@@ -168,7 +168,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
     }
     
     /***
-     * Check if the current logged in user is allowed to modify the given User
+     * Check if the current logged in user is allowed to POST/PUT/DELETE the given TaskUser Assoc entry
      */
     protected function checkAuthenticatedIsParentOfEntity(){
         $userSession = new Zend_Session_Namespace('user');
@@ -179,7 +179,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
             return;
         }
         
-        //The authenticated user is allowed to see himself
+        //The authenticated user is allowed to see/edit himself
         if($this->entity->getUserGuid() === $authenticated->userGuid){
             return;
         }

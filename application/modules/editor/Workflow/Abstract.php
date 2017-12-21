@@ -423,12 +423,29 @@ abstract class editor_Workflow_Abstract {
     public function getSteps(){
         return $this->getFilteredConstants('STEP_');
     }
+    
     /**
      * 
      * @return array of available role constants (keys are constants, valus are constant-values)
      */
     public function getRoles(){
         return $this->getFilteredConstants('ROLE_');
+    }
+    
+    /**
+     * returns an array of wf roles which are allowed by the current user to be used in task user associations
+     * @return array of for the authenticated user usable role constants (keys are constants, valus are constant-values)
+     */
+    public function getAddableRoles(){
+        $roles = $this->getRoles();
+        //FIXME instead of checking the roles a user have, 
+        //this must come from ACL table analogous to setaclrole, use a setwfrole then
+        // check sub classes on refactoring too!
+        $user = new Zend_Session_Namespace('user');
+        if(in_array(ACL_ROLE_PM, $user->data->roles)) {
+            return $roles;
+        }
+        return [];
     }
     
     /**

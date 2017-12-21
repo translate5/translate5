@@ -149,6 +149,9 @@ class editor_Workflow_Manager {
             $data->anonymousFieldLabel = false; //FIXME true | false, comes from app.ini not from wf class
             
             $data->roles = $labelize($wf->getRoles(), $cls);
+            
+            $data->editableRoles = $labelize($wf->getAddableRoles(), $cls);
+            
             $allStates = $wf->getStates();
             $pendingStates = $wf->getPendingStates();
             //the returned states are the states without the pending ones
