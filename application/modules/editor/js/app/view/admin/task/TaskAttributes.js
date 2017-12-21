@@ -233,11 +233,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                 xtype: 'displayfield',
                 fieldLabel: me.strings.realDeliveryDate,
                 renderer: function(value, displayField) {
-<<<<<<< HEAD
                     return Ext.Date.format(value, Ext.Date.defaultFormat);
-=======
-                    return Ext.Date.format(value, 'm/d/Y');
->>>>>>> feature/Transline-workflow
                 },
                 bind:{
                     value:'{currentTask.realDeliveryDate}'
