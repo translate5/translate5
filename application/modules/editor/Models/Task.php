@@ -687,7 +687,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             if(!$taskEntity->isErroneous()){
                 $taskEntity->checkStateAllowsActions();
             }
-            //TODO: Should the entity version be check ?
+            
+            //no need for entity version check, since field loaded from db will always have one
+            
             $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array($taskEntity));
             /* @var $remover editor_Models_Task_Remover */
             $removedTasks[]=$taskEntity->getTaskName();
