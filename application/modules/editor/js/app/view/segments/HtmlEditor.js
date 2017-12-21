@@ -436,9 +436,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                       var imgItem = allImagesInItem[i],
                           imgHtml = me.unmarkImage(imgItem);
                       if (imgHtml != '') {
-                          var template = document.createElement('template');
-                          template.innerHTML = imgHtml;
-                          imgItem.parentNode.insertBefore(template.content.firstChild,imgItem);
+                          var tempDiv = document.createElement('div');
+                          tempDiv.innerHTML = imgHtml;
+                          imgItem.parentNode.insertBefore(tempDiv.firstChild,imgItem);
                           imgItem.parentNode.removeChild(imgItem);
                       }
                   }
