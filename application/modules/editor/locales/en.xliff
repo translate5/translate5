@@ -2015,6 +2015,22 @@ The changes made by the formerly active role <b>{previousRole}</b> are listed be
 </source><target>The role <i>{previousRole}</i> was not part of workflow, so no users were notified.<br />
 <br />
 </target></trans-unit>
+  <trans-unit id='ezB9IChNaW5kZXN0LiB7MX0p'>
+    <source>{0} (Mindest. {1})</source>
+    <target>{0} (Min. {1})</target>
+  </trans-unit>
+  <trans-unit id='ezB9IHZvbiB7MX0='>
+    <source>{0} von {1}</source>
+    <target>{0} of {1}</target>
+  </trans-unit>
+ <trans-unit id='RGVyIFNlZ21lbnRpbmhhbHQgaXN0IHp1IGt1cnohIE1pbmRlc3RlbnMgezB9IFplaWNoZW4gbcO8c3NlbiB2b3JoYW5kZW4gc2Vpbi4='>
+    <source>Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.</source>
+    <target>The segment content is too short! At least {0} characters must exist.</target>
+  </trans-unit>
+  <trans-unit id='RGVyIFNlZ21lbnRpbmhhbHQgaXN0IHp1IGxhbmchIE1heGltYWwgezB9IFplaWNoZW4gc2luZCBlcmxhdWJ0Lg=='>
+    <source>Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.</source>
+    <target>The segment content is too long! Maximum {0} characters are allowed.</target>
+  </trans-unit>
     </body>
   </file>
 </xliff>
