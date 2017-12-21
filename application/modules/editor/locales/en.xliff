@@ -1851,6 +1851,7 @@
 <trans-unit id='TGlzdGUgw7ZmZm5lbg=='><source>Liste öffnen</source><target>Open list</target></trans-unit>
 <trans-unit id='UG0='><source>PM</source><target>PM</target></trans-unit>
 <trans-unit id='TG9rYWxpc2llcnVuZw==='><source>Lokalisierung</source><target>Localization</target></trans-unit>
+<trans-unit id='QmVudXR6ZXJzcHJhY2hl'><source>Benutzersprache</source><target>User GUI language</target></trans-unit>
   <trans-unit id='TWluaW1hbGUgTMOkbmdlOiB7MH07'>
     <source>Minimale Länge: {0};</source>
     <target>Minimum length: {0};</target>
