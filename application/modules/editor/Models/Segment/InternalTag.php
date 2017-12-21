@@ -210,9 +210,9 @@ class editor_Models_Segment_InternalTag {
                     $result = sprintf('<ph id="%s"/>', $newid++);
                 }
                 elseif($type == 'open') {
-                    $result = sprintf('<sc id="%s"/>', $newid++);
+                    $result = sprintf('<sc id="%s"/>', $newid);
                     //store the open tag id to the original id (latter one is used to map start and close tag)
-                    $openTagIds[$originalId] = $newid;
+                    $openTagIds[$originalId] = $newid++;
                 }
                 else {
                     $result = sprintf('<ec id="%s" startRef="XXX" />', $newid++);
