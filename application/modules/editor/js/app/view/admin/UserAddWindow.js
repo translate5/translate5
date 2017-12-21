@@ -249,8 +249,10 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                             },{
                                 xtype: 'checkboxgroup',
                                 itemId: 'rolesGroup',
+                                cls: 'x-check-group-alt',
                                 fieldLabel: me.strings.rolesLabel + ' &#8505;',
                                 items: roles,
+                                columns: 3,
                                 autoEl: {
                                     tag: 'div',
                                     'data-qtip': Ext.String.htmlEncode(me.strings.bottomRoleInfo)
