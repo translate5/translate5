@@ -225,6 +225,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * The User to be notified is gathered from the current active TaskUserAssociation
      */
     public function notifyNewTaskAssigned() {
+        $triggerConfig = $this->initTriggerConfig(func_get_args());
         $tua = $this->config->newTua;
         
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
@@ -236,6 +237,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         ];
         
         $this->createNotification($tua->getRole(), __FUNCTION__, $params);
+        $this->addCopyReceivers($triggerConfig, $tua->getRole());
         $this->notify((array) $user->getDataObject());
     }
     
@@ -245,6 +247,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      *  This notification contains a list of all assigned users.
      */
     public function notifyAllAssociatedUsers() {
+        $triggerConfig = $this->initTriggerConfig(func_get_args());
         $task = $this->config->task;
         $this->tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         $this->tua->setTaskGuid($task->getTaskGuid());
@@ -265,6 +268,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         
         foreach($tuas as $tua) {
             $user->loadByGuid($tua['userGuid']);
+            $this->addCopyReceivers($triggerConfig, $tua['role']);
             $this->notify((array) $user->getDataObject());
         }
     }
@@ -273,6 +277,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * Notifies the tasks PM over the new task, but only if PM != the user who has uploaded the task
      */
     public function notifyNewTaskForPm() {
+        $triggerConfig = $this->initTriggerConfig(func_get_args());
         $task = $this->config->task;
         $pmGuid = $task->getPmGuid();
         $importConf = $this->config->importConfig;
@@ -296,6 +301,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         ];
         
         $this->createNotification(ACL_ROLE_PM, __FUNCTION__, $params);
+        $this->addCopyReceivers($triggerConfig, ACL_ROLE_PM);
         $this->notify((array) $user->getDataObject());
     }
     
