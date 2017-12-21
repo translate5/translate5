@@ -233,7 +233,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $user->loadByGuid($tua->getUserGuid());
         
         $params = [
-            'task' => $this->config->task,
+                'task' => $this->config->task,
         ];
         
         $this->createNotification($tua->getRole(), __FUNCTION__, $params);
@@ -318,32 +318,18 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $xliff2Active =       (boolean) $config->runtimeOptions->editor->notification->xliff2Active;
         
         
+        
         if(empty($segments) || (!$xlfAttachment && !$xlfFile)) {
             return;
         }
         if(empty($this->xmlCache[$segmentHash])) {
             
-            //if the config is active, convert segments to xliff2 format
-            if($xliff2Active){
-                $xliffConf = [
-                        editor_Models_Converter_SegmentsToXliff2::CONFIG_ADD_TERMINOLOGY=>true,
-                        editor_Models_Converter_SegmentsToXliff2::CONFIG_INCLUDE_DIFF=>false,
-                        editor_Models_Converter_SegmentsToXliff2::CONFIG_ADD_QM=>true,
-                ];
-                $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff2', [$xliffConf]);
-                /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff2 */
-                
-                $xliffConverter->workflowStep=$currentStep;
-                
-            }else{
-                $xliffConf = [
-                    editor_Models_Converter_SegmentsToXliff::CONFIG_INCLUDE_DIFF => (boolean) $config->runtimeOptions->editor->notification->includeDiff,
-                    editor_Models_Converter_SegmentsToXliff::CONFIG_PLAIN_INTERNAL_TAGS => true,
-                    editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_ALTERNATIVES => true,
-                    editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_TERMINOLOGY => true,
-                ];
-                $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff', [$xliffConf]);
-                /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff */
+
+            $xliffConverter=$this->getXliffConverter($currentStep,$config);
+            
+            if(!$xliffConverter){
+                error_log("Error on xliff converter initialization. Task guid -> ".$this->config->task->getTaskGuid());
+                return;
             }
             
             $this->xmlCache[$segmentHash] = $xliff = $xliffConverter->convert($this->config->task, $segments);
@@ -388,5 +374,40 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         if(file_put_contents($outFile, $xml) == 0) {
             error_log('Error on writing XML File: '.$outFile);
         }
+    }
+    
+    /***
+     * Return the xliff or xliff2 converted depending on the xliff2Active config
+     * @param string $currentStep
+     * @param Zend_Config $config
+     * @return editor_Models_Converter_SegmentsToXliff
+     */
+    private function getXliffConverter($currentStep,$config){
+        $xliff2Active =       (boolean) $config->runtimeOptions->editor->notification->xliff2Active;
+        
+        //if the config is active, convert segments to xliff2 format
+        if($xliff2Active){
+            $xliffConf = [
+                    editor_Models_Converter_SegmentsToXliff2::CONFIG_ADD_TERMINOLOGY=>true,
+                    editor_Models_Converter_SegmentsToXliff2::CONFIG_INCLUDE_DIFF=>false,
+                    editor_Models_Converter_SegmentsToXliff2::CONFIG_ADD_QM=>true,
+            ];
+            $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff2', [$xliffConf]);
+            /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff2 */
+            
+            $xliffConverter->workflowStep=$currentStep;
+            return $xliffConverter;
+        }
+        
+        $xliffConf = [
+                editor_Models_Converter_SegmentsToXliff::CONFIG_INCLUDE_DIFF => (boolean) $config->runtimeOptions->editor->notification->includeDiff,
+                editor_Models_Converter_SegmentsToXliff::CONFIG_PLAIN_INTERNAL_TAGS => true,
+                editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_ALTERNATIVES => true,
+                editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_TERMINOLOGY => true,
+        ];
+        $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff', [$xliffConf]);
+        /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff */
+        
+        return $xliffConverter;
     }
 }

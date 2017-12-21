@@ -633,9 +633,70 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         return $this->meta;
     }
     
+    /**
+     * Check if the current task status allows this action
+     * 
+     * @throws ZfExtended_Models_Entity_Conflict
+     */
+    public function checkStateAllowsActions() {
+        if($this->isErroneous() || $this->isExclusiveState() && $this->isLocked($this->getTaskGuid())) {
+            $e = new ZfExtended_Models_Entity_Conflict('Der aktuelle Status der Aufgabe verbietet diese Aktion!');
+            $e->setErrors([
+                    'task' => $this->getTaskGuid(),
+                    'taskState' => $this->getState(),
+                    'isLocked' => $this->isLocked($this->getTaskGuid()),
+                    'isErroneous' => $this->isErroneous(),
+                    'isExclusiveState' => $this->isExclusiveState(),
+            ]);
+            throw $e;
+        }
+    }
+    
+    /***
+     * Remove all task from the database and from the disk older then the current date - taskLifetimeDays config
+     */
     public function removeOldTasks(){
         $config = Zend_Registry::get('config');
         $taskLifetimeDays= $config->runtimeOptions->taskLifetimeDays;
+
+        
+        $daysOffset=isset($taskLifetimeDays) ? $taskLifetimeDays : null;
+        
+        if(!$daysOffset){
+            error_log("No task taskLifetimeDays configuration defined.");
+            return;
+        }
+        
+        //select all tasks older than the interval
+        $s = $this->db->select()
+            ->where('orderdate <= CURRENT_DATE - INTERVAL ? DAY', $daysOffset);
+        $tasks = $this->db->getAdapter()->fetchAll($s);
+        
+        if(empty($tasks)){
+            return;
+        }
+        
+        $taskEntity=null;
+        $removedTasks=[];
+        //foreach task task, check the deletable, and delete it
+        foreach ($tasks as $task){
+            $taskEntity=ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $taskEntity editor_Models_Task */
+            $taskEntity->load($task['id']);
+            
+            if(!$taskEntity->isErroneous()){
+                $taskEntity->checkStateAllowsActions();
+            }
+            
+            //no need for entity version check, since field loaded from db will always have one
+            
+            $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array($taskEntity));
+            /* @var $remover editor_Models_Task_Remover */
+            $removedTasks[]=$taskEntity->getTaskName();
+            $remover->remove();
+        }
+        error_log("Number of tasks removed: ".count($removedTasks));
+        error_log("Tasks removed by taskname: ".implode(',', $removedTasks));
     }
     
 }

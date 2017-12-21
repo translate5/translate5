@@ -372,7 +372,7 @@ class editor_TaskController extends ZfExtended_RestController {
     public function putAction() {
         $this->entity->load($this->_getParam('id'));
         
-        $this->checkStateAllowsActions();
+        $this->entity->checkStateAllowsActions();
         
         $taskguid = $this->entity->getTaskGuid();
         
@@ -730,7 +730,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entityLoad();
         //if task is erroneous then it is also deleteable, regardless of its locking state
         if(!$this->entity->isErroneous()){
-            $this->checkStateAllowsActions();
+            $this->entity->checkStateAllowsActions();
         }
         $this->processClientReferenceVersion();
         $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array($this->entity));
@@ -744,7 +744,7 @@ class editor_TaskController extends ZfExtended_RestController {
     public function exportAction() {
         parent::getAction();
         
-        $this->checkStateAllowsActions();
+        $this->entity->checkStateAllowsActions();
         
         $diff = (boolean)$this->getRequest()->getParam('diff');
 
@@ -789,23 +789,6 @@ class editor_TaskController extends ZfExtended_RestController {
         //rename file after usage to export.zip to keep backwards compatibility
         rename($zipFile, dirname($zipFile).DIRECTORY_SEPARATOR.'export.zip');
         exit;
-    }
-    
-    /**
-     * @throws ZfExtended_Models_Entity_Conflict
-     */
-    protected function checkStateAllowsActions() {
-        if($this->entity->isErroneous() || $this->entity->isExclusiveState() && $this->entity->isLocked($this->entity->getTaskGuid())) {
-            $e = new ZfExtended_Models_Entity_Conflict('Der aktuelle Status der Aufgabe verbietet diese Aktion!');
-            $e->setErrors([
-                    'task' => $this->entity->getTaskGuid(),
-                    'taskState' => $this->entity->getState(),
-                    'isLocked' => $this->entity->isLocked($this->entity->getTaskGuid()),
-                    'isErroneous' => $this->entity->isErroneous(),
-                    'isExclusiveState' => $this->entity->isExclusiveState(),
-            ]);
-            throw $e;
-        }
     }
     
     /***
