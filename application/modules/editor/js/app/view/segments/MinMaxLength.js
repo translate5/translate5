@@ -35,12 +35,11 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     extend: 'Ext.Component',
     alias: 'widget.segment.minmaxlength',
     itemId:'segmentMinMaxLength',
-    cls: 'segment-min-max',
-    tpl: '<div class="{0}" data-qtip="{1}">{2}</div>',
+    tpl: '<div style="background-color:{0};" data-qtip="{1}"><strong style="margin:0.3em;">{2}</strong></div>',
     hidden:true,
     strings:{
-        minTooltip:'#UT#Minimale Länge: {0};',
-        maxTooltip:'#UT#Maximale Länge: {0};',
+        minText:'#UT#{0} (Mindest. {1})',
+        maxText:'#UT#{0} von {1}',
         segmentBellowLimit:'#UT#Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.',
         segmentOverLimit:'#UT#Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.',
     },
@@ -103,7 +102,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             metaCache=record.get('metaCache'),
             charactersCount=me.getSegmentCharactersCount(me.htmlEditor.getValue());
         
-        if(!metaCache || metaCache.minWidth===null && metaCache.maxWidth===null){
+        if(metaCache.minWidth===null && metaCache.maxWidth===null){
             return false;
         }
         return true;
@@ -126,25 +125,35 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     updateLabel:function(record,charactersCount){
         var me=this,
             metaCache=record.get('metaCache'),
-            minWidth=metaCache && metaCache.minWidth,
-            maxWidth=metaCache && metaCache.maxWidth,
-            cls = 'invalid-length',
-            tooltipText = [];
+            minWidth=metaCache.minWidth,
+            maxWidth=metaCache.maxWidth,
+            cssColor='#ff4242',
+            tooltipText=[];
 
         if(me.isCharactersInBorder(charactersCount,minWidth,maxWidth)){
-            cls = 'valid-length'
+            cssColor='#24f324'
+        }
+        //If there is only max length: 10 of 12
+        //If there is only min length: 12 (Min. 10)
+        //If both are given: 10 of 12 (Min. 10)
+        if(maxWidth!==null){
+            tooltipText.push(Ext.String.format(me.strings.maxText,charactersCount,maxWidth));
+        }
+        
+        if(minWidth!==null){
+            var toAdd=Ext.String.format(me.strings.minText,charactersCount,minWidth);
+            if(maxWidth!==null){
+                //remove the character count value from the text (it allready exist from the maxWidth text)
+                toAdd=toAdd.split(' ');
+                toAdd=toAdd.slice(1, toAdd.length);
+            }
+            tooltipText.push(toAdd);
         }
         //if min or max is null do not display the tooltip
-        if(minWidth) {
-            tooltipText.push(Ext.String.format(me.strings.minTooltip,minWidth));
-        }
-        if(maxWidth) {
-            tooltipText.push(Ext.String.format(me.strings.maxTooltip,maxWidth));
-        }
         me.lookupTpl('tpl').overwrite(me.getEl(),[
-            cls,
-            tooltipText.join('<br/>'),
-            charactersCount
+            cssColor,
+            tooltipText.join(' '),
+            tooltipText.join(' ')
         ]);
     },
 
