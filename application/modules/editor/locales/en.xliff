@@ -1872,10 +1872,9 @@
       <source>Sprache</source>
       <target>Language</target>
   </trans-unit>
-
-<trans-unit id="QmVudXR6ZXIgYmVuYWNocmljaHRpZ2Vu">
-    <source>Benutzer benachrichtigen</source>
-    <target>Notify Users</target>
+<trans-unit id="TGVrdG9yZW4gYmVuYWNocmljaHRpZ2Vu">
+    <source>Lektoren benachrichtigen</source>
+    <target>Notify Proofreaders</target>
 </trans-unit>
 <trans-unit id="QWxsZSBCZW51dHplciDDvGJlciBkaWUgWnV3ZWlzdW5nIGRlciBBdWZnYWJlIGdlc2FtbWVsdCBpbmZvcm1pZXJlbg==">
     <source>Alle Benutzer über die Zuweisung der Aufgabe gesammelt informieren</source>

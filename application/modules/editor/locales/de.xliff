@@ -1176,7 +1176,7 @@ Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRo
 <trans-unit id='QmVudXR6ZXIgd3VyZGVuIGVyZm9sZ3JlaWNoIHBlciBFLU1haWwgYmVuYWNocmljaHRpZ3Q='><source>Benutzer wurden erfolgreich per E-Mail benachrichtigt</source><target>Benutzer wurden erfolgreich per E-Mail benachrichtigt</target></trans-unit>
 <trans-unit id='RWlnZW5zY2hhZnRlbg=='><source>Eigenschaften</source><target>Eigenschaften</target></trans-unit>
 <trans-unit id='RGllIEF1ZmdhYmUgd3VyZGUgZXJmb2xncmVpY2ggYWt0dWFsaXNpZXJ0'><source>Die Aufgabe wurde erfolgreich aktualisiert</source><target>Die Aufgabe wurde erfolgreich aktualisiert</target></trans-unit>
-<trans-unit id='QmVudXR6ZXIgYmVuYWNocmljaHRpZ2Vu'><source>Benutzer benachrichtigen</source><target>Benutzer benachrichtigen</target></trans-unit>
+<trans-unit id='TGVrdG9yZW4gYmVuYWNocmljaHRpZ2Vu'><source>Lektoren benachrichtigen</source><target>Lektoren benachrichtigen</target></trans-unit>
 <trans-unit id='QWxsZSBCZW51dHplciDDvGJlciBkaWUgWnV3ZWlzdW5nIGRlciBBdWZnYWJlIGdlc2FtbWVsdCBpbmZvcm1pZXJlbg=='><source>Alle Benutzer über die Zuweisung der Aufgabe gesammelt informieren</source><target>Alle Benutzer über die Zuweisung der Aufgabe gesammelt informieren</target></trans-unit>
 <trans-unit id='UXVlbGxzcHJhY2hlKG4p'><source>Quellsprache(n)</source><target>Quellsprache(n)</target></trans-unit>
 <trans-unit id='WmllbHNwcmFjaGUobik='><source>Zielsprache(n)</source><target>Zielsprache(n)</target></trans-unit>

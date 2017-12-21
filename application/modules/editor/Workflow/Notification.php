@@ -253,6 +253,14 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $task = $this->config->task;
         $this->tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         $this->tua->setTaskGuid($task->getTaskGuid());
+        
+        //FIXME Hack:
+        // for the current release we need only proofreaders, 
+        // in future this should be done differntly as described in TRANSLATE-1094
+        // so load now only proofreaders: 
+        $this->tua->setRole(editor_Workflow_Abstract::ROLE_LECTOR);
+        //END Hack
+        
         $tuas = $this->tua->loadAllUsers(['state','role']);
         $roles = array_column($tuas, 'role');
         array_multisort($roles, SORT_ASC, SORT_STRING, $tuas);
@@ -265,10 +273,10 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             'associatedUsers' => $tuas,
         ];
         
-        //we assume the PM user for all roles, since it is always the same template
-        $this->createNotification(ACL_ROLE_PM, 'notifyNewTaskAssigned', $params);
         
         foreach($tuas as $tua) {
+            //we assume the PM user for all roles, since it is always the same template
+            $this->createNotification(ACL_ROLE_PM, 'notifyNewTaskAssigned', $params);
             $user->loadByGuid($tua['userGuid']);
             $this->addCopyReceivers($triggerConfig, $tua['role']);
             $this->notify((array) $user->getDataObject());
