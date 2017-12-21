@@ -367,7 +367,7 @@ abstract class editor_Workflow_Abstract {
     /**
      * returns the step of a role (the first configured one, if there are multiple steps for a role)
      * @param string $role
-     * @return boolean
+     * @return string|false
      */
     public function getStepOfRole(string $role) {
         return array_search($role, $this->steps2Roles, true);
@@ -686,8 +686,8 @@ abstract class editor_Workflow_Abstract {
             $segmentToSave->setWorkflowStepNr($session->taskWorkflowStepNr);
             
             //sets the actual workflow step name, does currently depend only on the userTaskRole!
-            $roles2Step = array_flip($this->steps2Roles);
-            $segmentToSave->setWorkflowStep($roles2Step[$tua->getRole()]);
+            $step = $this->getStepOfRole($tua->getRole());
+            $step && $segmentToSave->setWorkflowStep($step);
         }
 
         $autostates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
