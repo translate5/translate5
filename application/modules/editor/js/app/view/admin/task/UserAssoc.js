@@ -157,7 +157,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
       Ext.Object.each(metaData.states, function(key, state) {
           states.push({id: key, text: state});
       });
-      Ext.Object.each(metaData.roles, function(key, role) {
+      Ext.Object.each(metaData.editableRoles, function(key, role) {
           roles.push({id: key, text: role});
       });
       vm.set('statesData', states);
