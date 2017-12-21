@@ -450,9 +450,13 @@ abstract class editor_Workflow_Abstract {
     
     /**
      * returns the already translated labels as assoc array
+     * @var boolean $translated optional, defaults to true
      * @return array
      */
-    public function getLabels() {
+    public function getLabels($translated = true) {
+        if(!$translated) {
+            return $this->labels;
+        }
         $t = ZfExtended_Zendoverwrites_Translate::getInstance();
         return array_map(function($label) use ($t) {
             return $t->_($label);
