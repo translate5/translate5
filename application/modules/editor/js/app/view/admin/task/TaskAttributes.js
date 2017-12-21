@@ -209,7 +209,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                 xtype: 'displayfield',
                 fieldLabel: me.strings.deliveryDate,
                 renderer: function(value, displayField) {
-                    return Ext.Date.format(value, 'm/d/Y');
+                    return Ext.Date.format(value, Ext.Date.defaultFormat);
                 },
                 bind:{
                     value:'{currentTask.targetDeliveryDate}'
@@ -233,7 +233,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                 xtype: 'displayfield',
                 fieldLabel: me.strings.realDeliveryDate,
                 renderer: function(value, displayField) {
-                    return Ext.Date.format(value, 'm/d/Y');
+                    return Ext.Date.format(value, Ext.Date.defaultFormat);
                 },
                 bind:{
                     value:'{currentTask.realDeliveryDate}'
@@ -257,7 +257,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                 xtype: 'displayfield',
                 fieldLabel: me.strings.orderDate,
                 renderer: function(value, displayField) {
-                    return Ext.Date.format(value, 'm/d/Y');
+                    return Ext.Date.format(value, Ext.Date.defaultFormat);
                 },
                 bind:{
                     value:'{currentTask.orderdate}'
