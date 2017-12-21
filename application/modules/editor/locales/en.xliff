@@ -1851,6 +1851,7 @@
 <trans-unit id='TGlzdGUgw7ZmZm5lbg=='><source>Liste öffnen</source><target>Open list</target></trans-unit>
 <trans-unit id='UG0='><source>PM</source><target>PM</target></trans-unit>
 <trans-unit id='TG9rYWxpc2llcnVuZw==='><source>Lokalisierung</source><target>Localization</target></trans-unit>
+<trans-unit id='QmVudXR6ZXJzcHJhY2hl'><source>Benutzersprache</source><target>User GUI language</target></trans-unit>
   <trans-unit id='TWluaW1hbGUgTMOkbmdlOiB7MH07'>
     <source>Minimale Länge: {0};</source>
     <target>Minimum length: {0};</target>
@@ -2015,14 +2016,6 @@ The changes made by the formerly active role <b>{previousRole}</b> are listed be
 </source><target>The role <i>{previousRole}</i> was not part of workflow, so no users were notified.<br />
 <br />
 </target></trans-unit>
-You can access the portal at: %3$s<br />
-<br />
-<br />Many thanks and best regards,
-<br />The Project Management team
-<br />%6$s
-<br />
-<br />This e-mail has been generated automatically. Please do not reply to this e-mail.</target></trans-unit>
-<trans-unit id='RGVyIFdvcmtmbG93IFNjaHJpdHQgZGVyIEF1ZmdhYmUgd3VyZGUgenUgInswfSIgZ2XDpG5kZXJ0IQ=='><source>Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!</source><target>The workflow step of the task was changed to "{0}"!</target></trans-unit>
   <trans-unit id='ezB9IChNaW5kZXN0LiB7MX0p'>
     <source>{0} (Mindest. {1})</source>
     <target>{0} (Min. {1})</target>
