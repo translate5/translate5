@@ -326,6 +326,7 @@ Ext.define('Editor.controller.admin.User', {
   getNewUser: function() {
       return Ext.create('Editor.model.admin.User',{
           surName: '',
+          locale:Editor.data.locale,
           firstName: '',
           email: '',
           login: '',
