@@ -113,12 +113,14 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
 
-        $addReceivers = function($receiverRoleMap, $bcc = false) use ($receiverRole, $task, $user) {
+        $tua = empty($this->tua) ? ZfExtended_Factory::get('editor_Models_TaskUserAssoc') : $this->tua;
+        
+        $addReceivers = function($receiverRoleMap, $bcc = false) use ($receiverRole, $task, $user, $tua) {
             $users = [];
             foreach($receiverRoleMap as $recRole => $roles) {
                 if($recRole == '*' || $recRole == $receiverRole) {
                     foreach($roles as $role) {
-                        $users = $this->tua->getUsersOfRoleOfTask($role, $task->getTaskGuid());
+                        $users = $tua->getUsersOfRoleOfTask($role, $task->getTaskGuid());
                     }
                 }
             }
@@ -226,7 +228,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      */
     public function notifyNewTaskAssigned() {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
-        $tua = $this->config->newTua;
+        $this->tua = $tua = $this->config->newTua;
         
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */

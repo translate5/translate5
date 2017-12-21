@@ -67,8 +67,9 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * @return [array] list with user arrays
      */
     public function getUsersOfRoleOfTask($role,$taskGuid, $assocFields = []){
-        if (is_null($role))
+        if (is_null($role)) {
             return array();
+        }
         /* @var $tua editor_Models_TaskUserAssoc */
         $this->setRole($role);
         $this->setTaskGuid($taskGuid);
