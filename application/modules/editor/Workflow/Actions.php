@@ -217,4 +217,14 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
             editor_Models_LogTask::create($row['taskGuid'], $workflow::STATE_FINISH, $this->authenticatedUserModel, $user);
         }
     }
+    
+    /***
+     * Delete all tasks where the task status is 'end',
+     * and the last entry for this task in LEK_task_log table is older than x days (where x is zf_config variable)
+     */
+    public function deleteOldEndedTasks(){
+        $taskModel=ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $taskModel editor_Models_Task */
+        $taskModel->removeOldTasks();
+    }
 }

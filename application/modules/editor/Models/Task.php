@@ -653,25 +653,31 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * Remove all task from the database and from the disk older then the current date - taskLifetimeDays config
+     * Remove all ended task from the database and from the disk when there is no 
+     * change since (taskLifetimeDays)config days in lek_task_log
      */
     public function removeOldTasks(){
         $config = Zend_Registry::get('config');
         $taskLifetimeDays= $config->runtimeOptions->taskLifetimeDays;
 
         
-        $daysOffset=isset($taskLifetimeDays) ? $taskLifetimeDays : null;
+        $daysOffset=isset($taskLifetimeDays) ? $taskLifetimeDays : 100;
         
         if(!$daysOffset){
             throw new Zend_Exception('No task taskLifetimeDays configuration defined.');
             return;
         }
         
-        //select all tasks older than the interval
+        //remove ended tasks, and when there is no change since $daysOffset days in lek_task_log
         $s = $this->db->select()
-            ->where('orderdate <= CURRENT_DATE - INTERVAL ? DAY', $daysOffset);
+             ->setIntegrityCheck(false)
+             ->from(array('t' => 'LEK_task'),'t.id AS id')
+             ->join(array('tl' => 'LEK_task_log'),'t.taskGuid=tl.taskGuid','MAX(tl.id) as taskLogId,')
+            ->where('t.state=?',self::STATE_END)
+            ->group('tl.taskGuid')
+            ->where('tl.created <= CURRENT_DATE - INTERVAL ? DAY', $daysOffset);
         $tasks = $this->db->getAdapter()->fetchAll($s);
-        
+
         if(empty($tasks)){
             return;
         }
