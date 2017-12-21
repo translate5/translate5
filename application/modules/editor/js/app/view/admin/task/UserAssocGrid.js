@@ -44,7 +44,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
       save: '#UT#Änderungen speichern',
       reload: '#UT#Aktualisieren',
       cancel: '#UT#Abbrechen',
-      btnNotify:'#UT#Benutzer benachrichtigen',
+      btnNotify:'#UT#Lektoren benachrichtigen',
       btnNotifyTip:'#UT#Alle Benutzer über die Zuweisung der Aufgabe gesammelt informieren'
   },
   viewConfig: {
