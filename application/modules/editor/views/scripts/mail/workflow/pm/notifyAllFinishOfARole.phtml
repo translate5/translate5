@@ -49,7 +49,7 @@ $action = $this->templateApply($action, [
     'previousRole' => $this->translate->_($this->triggeringRole),
 ]);
 
-//Define User List
+//Define User List of next role users 
 $params = [];
 if(empty($this->nextRole)&&  in_array($this->triggeringRole, $this->workflow->getSteps2Roles())){
     $userNotification = "Die Aufgabe ist vollständig bearbeitet, es sind keine weiteren Benutzer der Aufgabe zugeordnet.<br />\n<br />\n";
@@ -58,26 +58,35 @@ elseif(!empty($this->nextRole)&&  in_array($this->triggeringRole, $this->workflo
     $userNotification=<<<'END'
 Die Aufgabe wurde nun automatisch für die folgenden Benutzer in der Rolle <i>{nextRole}</i> freigegeben:<br />
 {userList}<br />
-<br />
 Die Benutzer wurden per E-Mail darüber informiert.<br />
 <br />
 END;
     $params['nextRole'] = $this->translate->_($this->nextRole); 
-    $params['userList'] = $this->workflowNotifyHtmlMailUserList($this->users);
+    $params['userList'] = $this->workflowNotifyMail()->renderUserList($this->users);
 }
 else{
     $userNotification = "Die Rolle <i>{previousRole}</i> war nicht Teil der Workflowkette, daher wurden keine Benutzer benachrichtigt.<br />\n<br />\n";
 }
 $userNotificationHTML = $this->templateApply($userNotification,$params);
 $userNotificationText = $this->templateApply($userNotification,[
-    'userList' => $this->translate->_('- Die Daten sind nur in der HTML-Ansicht der E-Mail verfügbar! -')
+    'userList' => $this->htmlOnly
+]);
+
+//list of previous users:
+$userPreviousTpl = "Benutzer der vorherigen Rolle <i>{previousRole}</i>:\n{previousUsers}<br/>\n";
+$userPreviousText = $this->templateApply($userPreviousTpl,[
+    'previousUsers' => $this->htmlOnly
+]);
+$userPreviousHTML = $this->templateApply($userPreviousTpl,[
+    'previousUsers' => $this->workflowNotifyMail()->renderUserList($this->previousUsers)
 ]);
 
 $template = '{header}
 {action}<br />
 {usersNotified}<br />
+{usersPreviousRole}<br />
 <br />
-Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle {previousRole}:<br />
+Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i>{previousRole}</i>:<br />
 {changedSegments}
 <hr />
 <br />
@@ -89,11 +98,13 @@ $this->textbody = strip_tags($this->templateApply($template, [
     'footer' => $this->footer,
     'action' => $action,
     'usersNotified' => $userNotificationText,
-    'changedSegments' => $this->translate->_('- Die Daten sind nur in der HTML-Ansicht der E-Mail verfügbar! -'),
+    'usersPreviousRole' => $userPreviousText,
+    'changedSegments' => $this->htmlOnly,
 ]));
 
 echo $this->templateApply($template, [
     //just overwrite the changedSegments
     'usersNotified' => $userNotificationHTML,
+    'usersPreviousRole' => $userPreviousHTML,
     'changedSegments' => $this->workflowNotifyHtmlMailSegmentList($this->segments),
 ]);

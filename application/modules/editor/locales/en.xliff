@@ -882,9 +882,9 @@
         <source>nicht vorhanden</source>
         <target>Not available</target>
       </trans-unit>
-      <trans-unit id='RWluc3RlbGx1bmdlbiB6dXIgQXVmZ2FiZQ=='>
-        <source>Einstellungen zur Aufgabe</source>
-        <target>Task-properties</target>
+      <trans-unit id='RWluc3RlbGx1bmdlbiB6dXIgQWJsYXVmcGxhbg=='>
+        <source>Einstellungen zur Ablaufplan</source>
+        <target>Workflow-properties</target>
       </trans-unit>
       <trans-unit id='V29ya2Zsb3c='>
         <source>Workflow</source>
@@ -1651,6 +1651,27 @@
 <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgenVnZXdpZXNlbg=='><source>Translate5 - Aufgabe zugewiesen</source><target>Translate5 - task associated</target></trans-unit>
 
 <trans-unit id='RGVyIFdvcmtmbG93IFNjaHJpdHQgZGVyIEF1ZmdhYmUgd3VyZGUgenUgInswfSIgZ2XDpG5kZXJ0IQ=='><source>Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!</source><target>The workflow step of the task was changed to "{0}"!</target></trans-unit>
+      <trans-unit id='WnVnZW9yZG5ldGUgU3ByYWNoZW4='>
+        <source>Zugeordnete Sprachen</source>
+        <target>Associated languages</target>
+      </trans-unit>
+      <trans-unit id='UXVlbGxzcHJhY2hlKG4p'>
+        <source>Quellsprache(n)</source>
+        <target>Source language(s)</target>
+      </trans-unit>
+      <trans-unit id='WmllbHNwcmFjaGUobik='>
+        <source>Zielsprache(n)</source>
+        <target>Target language(s)</target>
+      </trans-unit>
+      <trans-unit id='QmVpbSBJbXBvcnQgdm9uIEF1ZmdhYmVuIHdlcmRlbiAiRWRpdG9yIiBCZW51dHplciBtaXQgZGVuIHBhc3NlbmRlbiBTcHJhY2hlbiA8YSBocmVmPSJodHRwOi8vY29uZmx1ZW5jZS50cmFuc2xhdGU1Lm5ldC9wYWdlcy92aWV3cGFnZS5hY3Rpb24/cGFnZUlkPTU1NzE2NCIgdGFyZ2V0PSJfYmxhbmsiIHRpdGxlPSJtZWhyIEluZm8iPmF1dG9tYXRpc2NoIGRlciBBdWZnYWJlIHp1Z2V3aWVzZW48L2E+Lg=='>
+          <source>Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.</source>
+          <target>On importing a task, users with the role "editor" and matching languages <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">are automatically added to the task</a>.</target>
+      </trans-unit>
+
+      <trans-unit id='RGllIEF1ZmdhYmUgd3VyZGUgZXJmb2xncmVpY2ggYWt0dWFsaXNpZXJ0'>
+          <source>Die Aufgabe wurde erfolgreich aktualisiert</source>
+          <target>The task was updated successfully</target>
+      </trans-unit>
 <trans-unit id='UG9ydHVnaWVzaXNjaCAoQnJhc2lsaWVuKQ=='><source>Portugiesisch (Brasilien)</source><target>Portuguese (Brazil)</target></trans-unit>
 <trans-unit id='QXNlcmJhaWRzY2hhbmlzY2ggKExhdGVpbik='><source>Aserbaidschanisch (Latein)</source><target>Azerbaijani (Latin)</target></trans-unit>
 <trans-unit id='S2htZXI='><source>Khmer</source><target>Khmer</target></trans-unit>
@@ -1851,6 +1872,19 @@
       <target>Language</target>
   </trans-unit>
 
+<trans-unit id="QmVudXR6ZXIgYmVuYWNocmljaHRpZ2Vu">
+    <source>Benutzer benachrichtigen</source>
+    <target>Notify Users</target>
+</trans-unit>
+<trans-unit id="QWxsZSBCZW51dHplciDDvGJlciBkaWUgWnV3ZWlzdW5nIGRlciBBdWZnYWJlIGdlc2FtbWVsdCBpbmZvcm1pZXJlbg==">
+    <source>Alle Benutzer über die Zuweisung der Aufgabe gesammelt informieren</source>
+    <target>Notify all users about the association to the task</target>
+</trans-unit>
+<trans-unit id="QmVudXR6ZXIgd3VyZGVuIGVyZm9sZ3JlaWNoIHBlciBFLU1haWwgYmVuYWNocmljaHRpZ3Q=">
+    <source>Benutzer wurden erfolgreich per E-Mail benachrichtigt</source>
+    <target>Users were successfully notified by email</target>
+</trans-unit>
+  
 <trans-unit id='e3NhbHV0YXRpb259IHtzdXJOYW1lfSw8YnIvPgo8YnIvPg=='><source>{salutation} {surName},<br/>
 <br/></source><target>{salutation} {surName},<br/>
 <br/></target></trans-unit>
@@ -1981,6 +2015,30 @@ The changes made by the formerly active role <b>{previousRole}</b> are listed be
 </source><target>The role <i>{previousRole}</i> was not part of workflow, so no users were notified.<br />
 <br />
 </target></trans-unit>
+You can access the portal at: %3$s<br />
+<br />
+<br />Many thanks and best regards,
+<br />The Project Management team
+<br />%6$s
+<br />
+<br />This e-mail has been generated automatically. Please do not reply to this e-mail.</target></trans-unit>
+<trans-unit id='RGVyIFdvcmtmbG93IFNjaHJpdHQgZGVyIEF1ZmdhYmUgd3VyZGUgenUgInswfSIgZ2XDpG5kZXJ0IQ=='><source>Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!</source><target>The workflow step of the task was changed to "{0}"!</target></trans-unit>
+  <trans-unit id='ezB9IChNaW5kZXN0LiB7MX0p'>
+    <source>{0} (Mindest. {1})</source>
+    <target>{0} (Min. {1})</target>
+  </trans-unit>
+  <trans-unit id='ezB9IHZvbiB7MX0='>
+    <source>{0} von {1}</source>
+    <target>{0} of {1}</target>
+  </trans-unit>
+ <trans-unit id='RGVyIFNlZ21lbnRpbmhhbHQgaXN0IHp1IGt1cnohIE1pbmRlc3RlbnMgezB9IFplaWNoZW4gbcO8c3NlbiB2b3JoYW5kZW4gc2Vpbi4='>
+    <source>Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.</source>
+    <target>The segment content is too short! At least {0} characters must exist.</target>
+  </trans-unit>
+  <trans-unit id='RGVyIFNlZ21lbnRpbmhhbHQgaXN0IHp1IGxhbmchIE1heGltYWwgezB9IFplaWNoZW4gc2luZCBlcmxhdWJ0Lg=='>
+    <source>Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.</source>
+    <target>The segment content is too long! Maximum {0} characters are allowed.</target>
+  </trans-unit>
     </body>
   </file>
 </xliff>

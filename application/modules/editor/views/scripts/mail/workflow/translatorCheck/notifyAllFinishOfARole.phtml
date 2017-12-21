@@ -53,7 +53,7 @@ $this->textbody = strip_tags($this->templateApply($template, [
     'header' => $this->header,
     'footer' => $this->footer,
     'previousRole' => $this->translate->_('Lektoren'),
-    'changedSegments' => $this->translate->_('- Die Daten sind nur in der HTML-Ansicht der E-Mail verfügbar! -'),
+    'changedSegments' => $this->htmlOnly,
 ]));
 
 echo $this->templateApply($template, [
