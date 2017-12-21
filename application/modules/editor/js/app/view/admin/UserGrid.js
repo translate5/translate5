@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -45,6 +44,7 @@ Ext.define('Editor.view.admin.UserGrid', {
       surName: '#UT#Nachname',
       gender: '#UT#Geschlecht',
       email: '#UT#E-Mail',
+      locale: '#UT#Sprache',
       roles: '#UT#Systemrollen'
   },
   strings: {
@@ -56,7 +56,12 @@ Ext.define('Editor.view.admin.UserGrid', {
       gender_female: '#UT#weiblich',
       gender_male: '#UT#männlich',
       reloadBtn: '#UT#Aktualisieren',
-      reloadBtnTip: '#UT#Benutzerliste vom Server aktualisieren.'
+      reloadBtnTip: '#UT#Benutzerliste vom Server aktualisieren.',
+      sourceLangageLabel:'#UT#Quellsprache(n)',
+      sourceLangageTip:'#UT#Quellsprache(n)',
+      targetLangageLabel:'#UT#Zielsprache(n)',
+      targetLangageTip:'#UT#Zielsprache(n)',
+      localeTooltip:'#UT#Benutzersprache'
   },
   store: 'admin.Users',
   viewConfig: {
@@ -83,6 +88,7 @@ Ext.define('Editor.view.admin.UserGrid', {
           xtype: 'gridcolumn',
           width: 100,
           dataIndex: 'login',
+          stateId: 'login',
           filter: {
               type: 'string'
           },
@@ -91,6 +97,7 @@ Ext.define('Editor.view.admin.UserGrid', {
           xtype: 'gridcolumn',
           width: 100,
           dataIndex: 'firstName',
+          stateId: 'firstName',
           filter: {
               type: 'string'
           },
@@ -99,6 +106,7 @@ Ext.define('Editor.view.admin.UserGrid', {
           xtype: 'gridcolumn',
           width: 100,
           dataIndex: 'surName',
+          stateId: 'surName',
           filter: {
               type: 'string'
           },
@@ -113,6 +121,7 @@ Ext.define('Editor.view.admin.UserGrid', {
               return '&nbsp;';
           },
           dataIndex: 'gender',
+          stateId: 'gender',
           filter: {
             type: 'list',
             options: [
@@ -126,6 +135,7 @@ Ext.define('Editor.view.admin.UserGrid', {
           xtype: 'gridcolumn',
           width: 160,
           dataIndex: 'email',
+          stateId: 'email',
           filter: {
               type: 'string'
           },
@@ -134,17 +144,36 @@ Ext.define('Editor.view.admin.UserGrid', {
           xtype: 'gridcolumn',
           width: 120,
           dataIndex: 'roles',
+          stateId: 'roles',
           renderer: function(v) {
+              if(!v || v==""){
+                  return "";
+              }
               return Ext.Array.map(v.split(','), function(item){
-                  return Editor.data.app.roles[item] || item;
+                  return Editor.data.app.roles[item].label || item;
               }).join(', ');
           },
           filter: {
               type: 'string'
           },
           text: me.text_cols.roles
+      },
+        me.getLanguagesConfig('sourceLanguage',me.strings.sourceLangageLabel,me.strings.sourceLangageTip)
+      ,
+        me.getLanguagesConfig('targetLanguage',me.strings.targetLangageLabel,me.strings.targetLangageTip)
+      ,{
+          xtype: 'gridcolumn',
+          width: 160,
+          dataIndex: 'locale',
+          stateId: 'locale',
+          filter: {
+              type: 'string'
+          },
+          text: me.text_cols.locale,
+          tooltip: me.strings.localeTooltip
       },{
           xtype: 'actioncolumn',
+          stateId:'userGridActionColumn',
           width: 80,
           items: Ext.Array.filter([{
               tooltip: me.strings.actionEdit,
@@ -189,5 +218,46 @@ Ext.define('Editor.view.admin.UserGrid', {
         me.self.getConfigurator().merge(me, config, instanceConfig);
     }
     return me.callParent([config]);
-  }
+  },
+
+  /**
+   * Return the language field configuration for type of language (sourceLanguage,targetLanguage)
+   */
+  getLanguagesConfig:function(langageType,text,tooltip){
+      var field={
+            xtype: 'gridcolumn',
+            minWidth: 160,
+            dataIndex: langageType,
+            stateId:langageType,
+            renderer: this.userRenderer,
+            text:text,
+            tooltip: tooltip,
+            filter: {
+                type: 'list',
+                idField:'id',
+                labelField:'label',
+                options: Editor.data.languages,
+                phpMode: false
+            }
+      };
+      return field;
+  },
+    userRenderer: function(value,metaData){
+        if(value === null || value.length<1){
+            return [];
+        }
+        var langstore=Ext.getStore('admin.Languages'),
+        lang,
+        label=[],
+        fullLang=[];
+        value.forEach(function(v) {
+            lang = langstore.findRecord('id',v,0,false,true,true);
+            if(lang){
+                label.push(lang.get('rfc5646'));
+                fullLang.push(lang.get('label'));
+            }
+        }, this);
+        metaData.tdAttr = 'data-qtip="' +fullLang.join('<br/>')+ '"';
+        return label.join(', ');
+    }
 });

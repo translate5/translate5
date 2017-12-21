@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -135,9 +134,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           },
           '#adminTaskAddWindow filefield[name=importUpload]': {
               change: me.handleChangeImportFile
-          },
-          '#segmentgrid': {
-              afterrender: me.initTaskReadMode
           },
           'adminTaskAddWindow panel:not([hidden])': {
               wizardCardFinished:me.onWizardCardFinished,
@@ -297,16 +293,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       }
   },
   /**
-   * Inits the loaded task and the segment grid read only if necessary
-   */
-  initTaskReadMode: function(grid) {
-      var vm = this.application.getController('ViewModes'),
-          task = Editor.data.task,
-          readonly = task.isReadOnly() || ! this.isAllowed('editorEditTask', task);
-      grid.lookupViewModel().set('taskIsReadonly', readonly);
-      vm && vm.editMode(readonly);
-  },
-  /**
    * Method Shortcut for convenience
    * @param {String} right
    * @param {Editor.model.admin.Task} task [optional]
@@ -329,9 +315,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    */
   handleGridClick: function(view, colEl, colIdx, rec, rowEl, rowIdxindex, e, eOpts) {
       //logic for handling single clicks on column taskNr and dblclick on other cols
-      var isTaskNr = (view.up('grid').columns[colIdx].dataIndex == 'taskNr'),
+      var isTaskNr = (view.up('grid').getColumns()[colIdx].dataIndex == 'taskNr'),
           dbl = e.type == 'dblclick'; 
-      
       if(!rec.isLocked() && (isTaskNr || dbl)) {
           this.openTaskRequest(rec);
       }

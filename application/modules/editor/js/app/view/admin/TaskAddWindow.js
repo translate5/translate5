@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -117,6 +116,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     {
                         xtype:'panel',
                         itemId: 'taskMainCard',
+                        scrollable:'y',
                         items:[{
                             xtype: 'form',
                             padding: 5,
@@ -143,11 +143,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     allowBlank: false,
                                     toolTip: me.strings.taskNameTip,
                                     fieldLabel: me.strings.taskNameLabel
-                                },{
-                                    xtype: 'textfield',
-                                    maxLength: 120,
-                                    name: 'taskNr',
-                                    fieldLabel: me.strings.taskNrLabel
                                 },Ext.applyIf({
                                     name: 'sourceLang',
                                     allowBlank: false,
@@ -192,7 +187,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     allowBlank: true,
                                     toolTip: me.strings.importTbxTip,
                                     fieldLabel: me.strings.importTbxLabel
-                    }]
+                                }]
                             },{
                                 xtype: 'container',
                                 flex: 1,
@@ -202,6 +197,11 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     anchor: '100%'
                                 },
                                 items: [{
+                                    xtype: 'textfield',
+                                    maxLength: 120,
+                                    name: 'taskNr',
+                                    fieldLabel: me.strings.taskNrLabel
+                                },{
                                     xtype: 'datefield',
                                     name: 'orderdate',
                                     submitFormat: Editor.DATE_ISO_FORMAT,

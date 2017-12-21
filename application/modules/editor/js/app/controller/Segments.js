@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -101,6 +100,9 @@ Ext.define('Editor.controller.Segments', {
   },{
       ref : 'watchListFilterBtn',
       selector : '#watchListFilterBtn'
+  },{
+     ref:'segmentStatusStrip',
+     selector:'#segmentStatusStrip'
   }],
   listen: {
       controller: {
@@ -123,7 +125,8 @@ Ext.define('Editor.controller.Segments', {
           '#segmentgrid' : {
               afterrender: 'gridAfterRender',
               columnhide: 'handleColumnVisibility',
-              columnshow: 'handleColumnVisibility'
+              columnshow: 'handleColumnVisibility',
+              beforeedit: 'onSegmentGridBeforeEdit',
           },
           '#fileorderTree': {
               itemclick: 'handleFileClick'
@@ -186,17 +189,23 @@ Ext.define('Editor.controller.Segments', {
   gridAfterRender: function(grid) {
       var me = this,
           params = [],
-          ro = Editor.data.task && Editor.data.task.isReadOnly(),
+          vm = this.application.getController('ViewModes'),
+          task = Editor.data.task,
+          isEditor = Editor.app.authenticatedUser.isAllowed('editorEditTask', task),
+          readOnly = task.isReadOnly() || !isEditor,
           store = grid.store,
           proxy = store.getProxy(),
           initialGridFilters = Editor.data.initialGridFilters;
+      
+      grid.lookupViewModel().set('taskIsReadonly', readOnly);
+      vm && vm.editMode(readOnly);
 
       Editor.data.helpSection = 'editor';
       Editor.data.helpSectionTitle = grid.getTitle();
       
       initialGridFilters = initialGridFilters && initialGridFilters.segmentgrid;
 
-      grid.setTitle(ro ? grid.title_readonly : grid.title);
+      grid.setTitle(readOnly ? grid.title_readonly : grid.title);
       me.styleResetFilterButton(grid.store.filters);
       grid.store.on('load', me.afterStoreLoad, me);
       grid.store.on('filterchange', me.handleFilterChange, me);
@@ -230,6 +239,21 @@ Ext.define('Editor.controller.Segments', {
           ed.editor.toggleMainEditor(col.isVisible());
       }
   },
+
+    /***
+     * on segment grid before edit
+    */
+    onSegmentGridBeforeEdit:function(row,contex){
+        var me=this;
+            segmentStatusStrip=me.getSegmentStatusStrip();
+
+        if(!segmentStatusStrip){
+            return;
+        }
+        //set the record and visible for each component in status strip
+        segmentStatusStrip.setRecordAndVisible(contex.record);
+    },
+
   /**
    * reset grid filter and sort, grid will be reloaded and scrolled to top
    */
@@ -475,8 +499,8 @@ Ext.define('Editor.controller.Segments', {
       me.saveChainMutex = true;
       record = ed.context.record;
       ed.completeEdit();
-      //if completeEdit fails, the plugin remains editing and the record is not dirty.
-      if(ed.editing && !ed.context.record.dirty) {
+      //if completeEdit fails, the plugin remains editing
+      if(ed.editing) {
           //TODO the below by config bound handlers can also be bound elsewhere and get no information about success or failed chainend!
           me.saveChainEnd(); 
           return;
@@ -615,5 +639,5 @@ Ext.define('Editor.controller.Segments', {
       if(me.loadingMaskRequests == 0) {
           me.getViewport().setLoading(false);
       }
-  } 
+  }
 });

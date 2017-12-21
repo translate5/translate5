@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -44,7 +43,9 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
       removeUserTip: '#UT#Den gewählten Benutzer aus dieser Aufgabe entfernen.',
       save: '#UT#Änderungen speichern',
       reload: '#UT#Aktualisieren',
-      cancel: '#UT#Abbrechen'
+      cancel: '#UT#Abbrechen',
+      btnNotify:'#UT#Benutzer benachrichtigen',
+      btnNotifyTip:'#UT#Alle Benutzer über die Zuweisung der Aufgabe gesammelt informieren'
   },
   viewConfig: {
       loadMask: false
@@ -70,7 +71,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
     config = {
       columns: [{
           xtype: 'gridcolumn',
-          width: 160,
+          width: 230,
           dataIndex: 'login',
           renderer: function(v, meta, rec) {
               return rec.get('surName')+', '+rec.get('firstName')+' ('+v+')';
@@ -81,7 +82,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
           text: me.strings.userGuidCol
       },{
           xtype: 'gridcolumn',
-          width: 90,
+          width: 160,
           dataIndex: 'role',
           renderer: function(v) {
               var vm = this.lookupViewModel();
@@ -127,6 +128,13 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
               itemId: 'reload-btn',
               iconCls: 'ico-refresh',
               text: me.strings.reload
+          },
+          "-",{
+              xtype: 'button',
+              itemId: 'notify-user-btn',
+              iconCls: 'ico-notify-user',
+              text: me.strings.btnNotify,
+              tooltip: me.strings.btnNotifyTip
           }]
         }]
     };

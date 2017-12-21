@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -42,6 +41,18 @@ div.x-container.x-container-default {position: initial;}
   width: 250px;
 }
 
+.direction-rtl {
+    direction:rtl;
+}
+.metaTermPanel .term-group div.direction-rtl,
+td.direction-rtl.x-grid-td div.x-grid-cell-inner {
+    text-align:right !important;
+}
+
+.direction-ltr {
+    direction:ltr;
+}
+
 #segment-grid .editing-disabled {
   color:#acacac;
 }
@@ -59,6 +70,13 @@ div.x-container.x-container-default {position: initial;}
 .segment-tag-container .x-autocontainer-innerCt div.close,
 .segment-tag-container .x-autocontainer-innerCt div.single {display:inline;background:#39FFA3;}
 
+/* this css is used in visual review tooltip, for displaying the internal tags, terminologie */
+.segment-tag-container.x-tip div.open,
+.segment-tag-container .x-autocontainer-innerCt div.close,
+.segment-tag-container .x-autocontainer-innerCt div.single
+{
+  color:#17385b;
+}
 #segment-grid div.x-grid-cell-inner div.open span {} /* Grafik Style für open Tag*/
 #segment-grid div.x-grid-cell-inner div.close span {} /* Grafik Style für close Tag*/
 #segment-grid div.x-grid-cell-inner div.single span {} /* Grafik Style für single Tag*/
@@ -270,11 +288,21 @@ background-color: #EAF1FB;
     display:block;
 }
 
-.comments-grid .x-action-col-cell img {height:16px;width:16px;cursor: pointer;}
+#segment-grid .segment-min-max div {
+    font-weight:bold;
+    padding:0.1em 0.3em;
+}
+#segment-grid .segment-min-max .invalid-length {
+    background-color: #ff4242;
+}
+#segment-grid .segment-min-max .valid-length {
+    background-color: #24f324;
+}
+
 .ico-comment-add {background-image: url("../images/comment_add.png");}
-.ico-comment-edit {background-image: url("../images/comment_edit.png");}
-.ico-comment-delete {background-image: url("../images/comment_delete.png");}
-.comments-grid .readonly .x-action-col-cell img {display:none;}
+.ico-comment-edit {background-image: url("../images/comment_edit.png");background-repeat: no-repeat;}
+.ico-comment-delete {background-image: url("../images/comment_delete.png");background-repeat: no-repeat;}
+.comments-grid .readonly .x-action-col-icon {display:none;}
 
 .comment {margin-bottom:5px;}
 #segment-grid .comment {margin-bottom:0px; padding-right: 16px;}
@@ -302,7 +330,26 @@ body.editor-readonly #segment-grid .x-grid-item-selected .comments-field .x-grid
 .ico-loading {background-image: url("../images/loading_ico.gif");}
 .autoState-999 {background-position: center;background-repeat: no-repeat;}
 .ico-refresh {background-image: url("../images/arrow_refresh_small.png");}
-body.loading {background: url("../images/loading_ico.gif") center 100px no-repeat;}
+.ico-notify-user {background-image: url("../images/email_go.png");}
+body.loading {
+    color: #404040;
+    font-size: 13px;
+    line-height: 17px;
+    font-weight: 300;
+    font-family: 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana, sans-serif;
+}
+body.loading > div.loading {
+    height:100px;
+    width:450px;
+    margin:auto;
+    margin-top:120px;
+    text-align:left;
+    padding-left: 35px;
+    background: url("../images/loading_ico.gif") left 8px no-repeat;
+}
+div.loading div#loading-indicator-text {
+    font-style: italic;
+}
 
 /* Admin: */
 .ico-save {background-image: url("../images/tick.png");}

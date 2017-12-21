@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -117,6 +116,7 @@ Ext.define('Editor.controller.ChangeAlike', {
       },
       controller: {
           '#Editor.$application': {
+              editorViewportOpened: 'initWindow',
               editorViewportClosed: 'clearAlikeSegments'
           },
           '#Segments': {
@@ -140,8 +140,18 @@ Ext.define('Editor.controller.ChangeAlike', {
     var me = this;
     //Diese Events können erst in onlauch gebunden werden, in init existiert das Plugin noch nicht
     me.alikeSegmentsUrl = me.getStore('AlikeSegments').getProxy().url;
-    me.window = Ext.widget('changealikeWindow');
   },
+  
+  /**
+   * The changealikeWindow must be reinitialized on each task change
+   */
+  initWindow: function() {
+      if(this.window) {
+          this.window.destroy();
+      }
+      this.window = Ext.widget('changealikeWindow');
+  },
+  
   /**
    * inits the editing plugin
    */

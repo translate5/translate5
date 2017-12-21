@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -223,11 +222,17 @@ Ext.define('Editor.controller.admin.User', {
               info = Ext.String.format(msg.confirmResetPwMsg,user.get('firstName')+' '+user.get('surName'));
               Ext.Msg.confirm(msg.confirmResetPwTitle, info, function(btn){
                   if(btn == 'yes') {
-                      //workaround since setting the passwd to null is not recognized as modifying call of the record, 
-                      //  since null is converted internally to empty string
+                      var oldPw = user.get('passwd');
+                      //convert false needed since setting the passwd to null is not recognized as modifying call of the record, 
+                      //  since null is converted internally to empty string (and the value is already an empty string!)
                       user.set('passwd',null, {convert: false});
-                      // not valid in ExtJS6 .setDirty();//necessary, cause sometimes ext does not transfer the null-value in save
-                      user.save();
+                      user.save({
+                          callback: function(rec) {
+                              //reset the store passwd to the old value, so that further reset calls will set and save null again
+                              rec.set('passwd',oldPw);
+                              rec.commit();
+                          }
+                      });
                   }
               });
               break;
@@ -255,6 +260,7 @@ Ext.define('Editor.controller.admin.User', {
       if(!basic.isValid()) {
           return;
       }
+
       //if in first save attempt we got an error from server, 
       //and we then disable the password in the second save, 
       //the password will be kept in the model, so reject it here
@@ -320,6 +326,7 @@ Ext.define('Editor.controller.admin.User', {
   getNewUser: function() {
       return Ext.create('Editor.model.admin.User',{
           surName: '',
+          locale:Editor.data.locale,
           firstName: '',
           email: '',
           login: '',
@@ -340,5 +347,5 @@ Ext.define('Editor.controller.admin.User', {
    */
   handleUserReload: function () {
       this.getAdminUsersStore().load();
-  }
+  },
 });

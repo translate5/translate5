@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -33,11 +32,16 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.MaintenancePanel', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.maintenancePanel',
+    formats: {
+        en: 'l, F d, Y h:i:s A (T)',
+        de: 'l, d. F, Y H:i:s (T)'
+    },
     maintenanceMessage: '#UT#<p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Translate5 wird zu diesem Zeitpunkt kurzfristig nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p>',
     initConfig: function(instanceConfig) {
         var me = this,
+            format = me.formats[Editor.data.locale] || me.formats.en,
             date = instanceConfig.maintenanceStartDate ? instanceConfig.maintenanceStartDate : Editor.data.maintenance.startDate,
-            date = Ext.Date.format(Ext.Date.parse(date, Editor.DATE_ISO_FORMAT), Ext.Date.defaultFormat + ' ' + Ext.form.field.Time.prototype.format),
+            date = Ext.Date.format(Ext.Date.parse(date, "c"), format),
             config = {
         		frame: false,
         		border: false,

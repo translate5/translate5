@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -177,8 +176,8 @@ Ext.define('Editor.model.admin.Task', {
       if(this.get('state') == this.STATE_IMPORT) {
           return false;
       }
-      //a user with editorEditAllTasks (normally PMs) can always open the task
-      if(Editor.app.authenticatedUser.isAllowed('editorEditAllTasks')){
+      //a user with editorEditAllTasks (normally PMs) can always open the task or if the current loged user is a pm to that project
+      if(Editor.app.authenticatedUser.isAllowed('editorEditAllTasks') || this.get('pmGuid')===Editor.data.app.user.userGuid){
           return true;
       }
       //per default all tasks associated to a user are openable
@@ -228,17 +227,19 @@ Ext.define('Editor.model.admin.Task', {
    * @todo improve workflow handling in Javascript, => adapt the php workflow in js, a class with same methods (like getNextStep step2Role etc)
    * actually all workflow information is encapsulated in frontendRights (thats OK) 
    * and the methods in this class (isXXX Methods and initWorkflow) method, this could be improved
-   * for the logic when the filter should be triggered see: E-Mail "Re: Nachfrage Segment Filter" to thomas on 02.10.13 18:03
    */
   initWorkflow: function () {
       var me = this,
           filter = null,
-          idx = 0,
+          chainIdx = 0,
           data = Editor.data,
-          stepChain = me.getWorkflowMetaData().stepChain,
+          meta = me.getWorkflowMetaData(),
+          stepChain = meta.stepChain,
+          stepsWithFilter = meta.stepsWithFilter,
           task = data.task,
           step = task.get('userStep'),
-          useFilter = !(me.isFinished() || me.isWaiting() || me.isEnded());
+          useFilter = !(me.isFinished() || me.isWaiting() || me.isEnded()),
+          filteredValues = [];
       
       if(step && useFilter) {
           //preset grid filtering:
@@ -248,14 +249,18 @@ Ext.define('Editor.model.admin.Task', {
           filter = data.initialGridFilters; //use filter as reference 
           //reset workflowstep filters of formerly opened tasks, since initialGridFilters is persistent between tasks!
           delete filter.segmentgrid;
-          idx = Ext.Array.indexOf(stepChain, step);
-          if(idx > 0 && filter) {
+          chainIdx = Ext.Array.indexOf(stepChain, step);
+          filteredValues = [stepChain[chainIdx], stepChain[chainIdx - 1]];
+          if(meta.steps.pmCheck) {
+              filteredValues.push("pmCheck"); //pmCheck'ed segments should also be in the filter!
+          }
+          if(Ext.Array.indexOf(stepsWithFilter, step) >= 0 && filter) {
               filter.segmentgrid = [{
                   type: 'workflowStep',
                   dataIndex: 'workflowStep',
                   property: 'workflowStep',
                   disabled: false,
-                  value: [stepChain[idx], stepChain[idx - 1]]
+                  value: filteredValues
               }];
           }
       }

@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -41,6 +40,9 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       ref: 'assocDelBtn',
       selector: '#adminTaskUserAssocGrid #remove-user-btn'
   },{
+    ref: 'assocNotifyBtn',
+    selector:'#adminTaskUserAssocGrid #notify-user-btn'  
+  },{
       ref: 'userAssocGrid',
       selector: '#adminTaskUserAssocGrid'
   },{
@@ -59,7 +61,8 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
   messages: {
       assocSave: '#UT#Eintrag gespeichert!',
       assocDeleted: '#UT#Eintrag gelöscht!',
-      assocSaveError: '#UT#Fehler beim Speichern der Änderungen!'
+      assocSaveError: '#UT#Fehler beim Speichern der Änderungen!',
+      userNotifySuccess:'#UT#Benutzer wurden erfolgreich per E-Mail benachrichtigt'
   },
   //***********************************************************************************
   //Begin Events
@@ -102,6 +105,9 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           '#adminTaskUserAssocGrid #add-user-btn': {
               click: me.handleAddUser
           },
+          '#adminTaskUserAssocGrid #notify-user-btn': {
+              click: me.handleNotifyUserBtn
+          },
           'adminTaskUserAssoc combo[name="role"]': {
               change: me.initState
           },
@@ -138,7 +144,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           assoc = me.getAdminTaskUserAssocsStore(),
           task = me.getPrefWindow().actualTask,
           meta = task.getWorkflowMetaData(),
-          role = Ext.Object.getKeys(meta.roles)[0],
+          role = meta.steps2roles[task.get('workflowStepName')] || Ext.Object.getKeys(meta.roles)[0],
           state = Ext.Object.getKeys(meta.states)[0],
           newRec = assoc.model.create({
               taskGuid: task.get('taskGuid'),
@@ -148,9 +154,38 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       me.getAssocDelBtn().disable();
       me.getEditInfo().hide();
       me.getUserAssocForm().show();
+      me.getUserAssocForm().setDisabled(false);
       me.getUserAssoc().loadRecord(newRec);
       me.initState(null, role, '');
   },
+  
+  /***
+   * Notify users handler
+   */
+  handleNotifyUserBtn:function(){
+      var me=this,
+          task = me.getPrefWindow().actualTask;
+
+      Ext.Ajax.request({
+          url: Editor.data.restpath+'task/'+task.get('id')+'/workflow',
+          method: 'POST',
+          params: {
+              trigger:'notifyAllUsersAboutTaskAssociation'
+          },
+          scope: me,
+          success: function(response){
+              var responseData = JSON.parse(response.responseText);
+              if(!responseData){
+                  return;
+              }
+              Editor.MessageBox.addSuccess(me.messages.userNotifySuccess);
+          },
+          failure: function(response){
+              Editor.app.getController('ServerException').handleException(response);
+          }
+      });
+  },
+  
   /**
    * Disable Delete Button if no User is selected
    * @param {Ext.grid.Panel} grid
@@ -158,10 +193,14 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
    */
   handleAssocSelection: function(grid, selection) {
       var me = this,
-          emptySel = selection.length == 0;
-      me.getAssocDelBtn().setDisabled(emptySel);
+          emptySel = selection.length == 0,
+          record=!emptySel ? selection[0] : null,
+          userEditable=record && record.get('editable');
+          userDeletable=record && record.get('deletable');
+      me.getAssocDelBtn().setDisabled(emptySel || !userDeletable);
       me.getEditInfo().setVisible(emptySel);
       me.getUserAssocForm().setVisible(!emptySel);
+      me.getUserAssocForm().setDisabled(emptySel || !userEditable);
       if(emptySel) {
           me.getUserAssocForm().getForm().reset();
       }
@@ -179,10 +218,11 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       
       Ext.Array.each(toDelete, function(toDel){
           toDel.eraseVersioned(task, {
-              success: function() {
+              success: function(rec, op) {
                   assoc.remove(toDel);
                   me.updateUsers(assoc);
                   me.fireEvent('removeUserAssoc', me, toDel, assoc);
+                  Editor.MessageBox.addByOperation(op); //does nothing since content is not provided from server :(
                   Editor.MessageBox.addSuccess(me.messages.assocDeleted);
               },
               failure: function() {
@@ -215,6 +255,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
                   me.fireEvent('addUserAssoc', me, rec, store);
               }
               task.load();//reload only the task, not the whole task prefs, should be OK
+              Editor.MessageBox.addByOperation(op);
               Editor.MessageBox.addSuccess(me.messages.assocSave);
               me.getPrefWindow().setLoading(false);
           },
@@ -231,10 +272,13 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
    * @param {} store
    */
   updateUsers: function(store) {
-      var me = this;
+      var me = this,
+          assocNotifyBtn=me.getAssocNotifyBtn();
       if(me.getUserAssoc()) {
           me.getUserAssoc().excludeLogins = store.collect('login');
       }
+      //disable the button if there is no record in the store
+      assocNotifyBtn.setDisabled(store.getCount()< 1)
   },
   /**
    * sets the initial state value dependent on the role
@@ -245,21 +289,18 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
   initState: function(roleCombo, newValue, oldValue) {
       var me = this,
           form = me.getUserAssocForm(),
-          task = Editor.model.admin.Task.prototype,
+          task = me.getPrefWindow().actualTask,
           stateCombo = form.down('combo[name="state"]'),
           newState = task.USER_STATE_OPEN,
           rec = form.getRecord(),
-          isChanged = stateCombo.getValue() != rec.get('state');
+          isChanged = stateCombo.getValue() != rec.get('state'),
+          meta = task.getWorkflowMetaData(),
+          initialStates = meta.initialStates[task.get('workflowStepName')];
       if(!rec.phantom || isChanged) {
           return;
       }
-      switch (newValue) {
-          case 'translator':
-              newState = task.USER_STATE_WAITING;
-              break;
-          case 'lector':
-              newState = task.USER_STATE_OPEN;
-              break;
+      if(initialStates && initialStates[newValue]) {
+          newState = initialStates[newValue];
       }
       rec.set('state', newState);
       stateCombo.setValue(newState);

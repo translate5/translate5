@@ -26,24 +26,17 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Store for Editor.model.admin.task.UserPref
- * @class Editor.store.admin.task.UserPrefs
- * @extends Ext.data.Store
+/**#@++
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
  */
-Ext.define('Editor.store.admin.task.UserPrefs', {
-  extend : 'Ext.data.Store',
-  model: 'Editor.model.admin.task.UserPref',
-  remoteSort: false,
-  autoLoad: false,
-  pageSize: 20,
-  getDefaultFor: function(workflow) {
-      var idx = this.findBy(function(rec){
-          return (rec.get('workflow') == workflow && rec.isDefault());
-      });
-      if(idx >= 0) {
-          return this.getAt(idx);
-      }
-      return null;
-  }
+/**
+ * @class Editor.view.StatusStripViewController
+ * @extends Ext.app.ViewController
+ */
+Ext.define('Editor.view.segments.StatusStripViewController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.segmentstatusstrip',
 });

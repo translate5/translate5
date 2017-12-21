@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -40,10 +39,11 @@ Ext.define('Editor.view.segments.RowEditor', {
     requires: [
         'Editor.view.segments.RowEditorColumnParts'
     ],
+
     itemId: 'roweditor',
     liveDrag: true,
     rowToEditOrigHeight: 0,
-    editorExtraHeight: 20,
+    editorExtraHeight:20,// 20,
     editorLocalTop: 0,
     /**
      * If set to true, rowEditor remains on its position on startEdit and grid scrolls instead
@@ -405,14 +405,21 @@ Ext.define('Editor.view.segments.RowEditor', {
     syncButtonPosition: function(delta) {
         return delta;
     },
+
     setEditorHeight: function() {
         var me = this,
             context = me.context,
             row = Ext.get(context.row),
             rowHeight = row.setHeight(null) && row.getHeight(), //force recalculation on each call
             editorHeight = rowHeight + me.editorExtraHeight,
-            moveEditor = (me.editorLocalTop + editorHeight) - me.scrollingView.getHeight();
+            moveEditor = (me.editorLocalTop + editorHeight) - me.scrollingView.getHeight(),
+            segmentStatusStrip=Ext.ComponentQuery.query('#segmentStatusStrip');
         
+        //add extra height if the segment status strip contains an visible element
+        if(segmentStatusStrip.length>0 && segmentStatusStrip[0].isItemVisible()){
+            editorHeight+=15;
+        }
+
         // when switching tag mode recalculation is triggered, 
         //  but when the row is not available anymore due grid reload we don't have any height information 
         //  in this case its better to leave the old height instead of use a rowHeight of 0
