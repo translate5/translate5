@@ -167,6 +167,25 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
     private $xliffCommentsApplied=[
     ];
     
+    /***
+     * Segment id xliff prefix
+     * @var string
+     */
+    const SEGMENT_ID_PREFIX="seg";
+    
+    /***
+     * Unit id xliff prefix
+     * @var string
+     */
+    const UNIT_ID_PREFIX="unit";
+    
+    
+    /***
+     * Qm id xliff prefix
+     * @var string
+     */
+    const QM_ID_PREFIX="QM_";
+    
     public function __construct(array $config = []){
         $this->insDelTagId=1;
         parent::__construct($config);
@@ -342,7 +361,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         }
         
         $unitTag[]='unit';
-        $unitTag[]='id="'.$segment['segmentNrInTask'].'"';
+        $unitTag[]='id="'.self::UNIT_ID_PREFIX.$segment['segmentNrInTask'].'"';
         
         //set the person attributes in unit tag
         if($this->itsPerson){
@@ -389,7 +408,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             $stateText =  $this->data['autostates'][$segment['autoStateId']];
         }
         
-        $this->result[] = '<segment id="'.$segment['segmentNrInTask'].'" state="'.$this->segmentStateMap[$segment['autoStateId']].'" subState="translate5Autostate:'.$stateText.'">';
+        $this->result[] = '<segment id="'.self::SEGMENT_ID_PREFIX.$segment['segmentNrInTask'].'" state="'.$this->segmentStateMap[$segment['autoStateId']].'" subState="translate5Autostate:'.$stateText.'">';
         
         
         //add the comment only once
@@ -468,7 +487,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             
             //if there are qms for the segment add the mrk tag
             if(!empty($qms)){
-                $this->result[] ='<mrk id="QM_'.implode('_',array_keys($qms)).'" its:type="generic" translate="yes" its:locQualityIssuesRef="QM_'.implode('_', array_keys($qms)).'">';
+                $this->result[] ='<mrk id="'.self::QM_ID_PREFIX.implode('_',array_keys($qms)).'" its:type="generic" translate="yes" its:locQualityIssuesRef="'.self::QM_ID_PREFIX.implode('_', array_keys($qms)).'">';
             }
             //add the target edit text
             $this->result[] = $targetEdit;
@@ -779,7 +798,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         
         $this->addComments('qmComment');
         
-        $this->result[]='<its:locQualityIssues xml:id="QM_'.implode('_', array_keys($qms)).'">';
+        $this->result[]='<its:locQualityIssues xml:id="'.self::QM_ID_PREFIX.implode('_', array_keys($qms)).'">';
         $qmXml = '<its:locQualityIssue locQualityIssueType="%1$s" />';
         foreach ($qms as $qmid => $qm) {
             $this->result[] = sprintf($qmXml,$qm);
@@ -802,7 +821,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         $unitComment=[];
         switch ($commentType){
             case 'unitComment':
-                $unitComment[]='<!-- unit id is the segmentNrInTask of LEK_segment in translate5;
+                $unitComment[]='<!-- unit id is the segmentNrInTask of LEK_segment in translate5 with the prefix "unit"; Since we only use on segment per unit in translate5 changes xliff, the segment id is the same, but with the prefix "seg";
                     	its:person is the translator name, if assigned in translate5; if no translator is assigned, it is the user of the translator-check;
                     	translate5:personGuid is the corresponding userGuid of the person-attribute
                     	its:revPerson is the proofreader, if assigned in translate5;
@@ -872,7 +891,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
                 $unitComment[]='<!-- the note id reflects the id in LEK_comments table of translate5 -->';
                 break;
             case 'qmComment':
-                $unitComment[]='<!--  The attribute its:locQualityIssueType holds as value the qm flag value text from translate5. To be valid xliff 2.1, the used qm flags in translate5 must be ITS localization quality issues as listet at https://www.w3.org/TR/its20/#lqissue-typevalues -->';
+                $unitComment[]='<!--  The attribute its:locQualityIssueType holds as value the qm flag value text from translate5. To be valid xliff 2.1, the used qm flags in translate5 must be ITS localization quality issues as listed at https://www.w3.org/TR/its20/#lqissue-typevalues -->';
                 break;
                 
         }
