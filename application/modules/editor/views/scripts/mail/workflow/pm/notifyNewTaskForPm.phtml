@@ -43,11 +43,13 @@ $this->subject = $this->translate->_('Translate5 - Aufgabe zugewiesen').' "'.$th
 $data = [
     'header' => $this->header,
     'footer' => $this->footer,
+    'role' => $this->translate->_(ucfirst(ACL_ROLE_PM)),
 ];
 
 $mailBody = $this->templateApply('{header}
-Im Projektportal {portalLink} wurde Ihnen die Aufgabe <b>{task.taskNr} - {task.taskName}</b> zugewiesen.<br />
+Im Projektportal {portalLink} wurde Ihnen eine Aufgabe zugewiesen.<br />
 <br />
+<b>Rolle:</b> {role}<br/>
 {taskFragment}{footer}', $data);
 
 $this->textbody = strip_tags($mailBody);
