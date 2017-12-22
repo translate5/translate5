@@ -604,16 +604,34 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     
     public function testnotifyAction() {
         $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender();
         
         $class = 'editor_Workflow_Notification';
-        $method = 'notifyNewTaskForPm';
+        
         
         $config = ZfExtended_Factory::get('editor_Workflow_Actions_Config');
         /* @var $config editor_Workflow_Actions_Config */
-        $config->workflow = ZfExtended_Factory::get('editor_Plugins_Miele_Workflow');
+        $config->workflow = ZfExtended_Factory::get('editor_Workflow_Default');
         $config->newTua = null;
         $config->oldTask = ZfExtended_Factory::get('editor_Models_Task');
-        $config->oldTask->load(3007);
+        $config->oldTask->init([
+            'taskGuid' => '{97789a10-0bbb-4de5-b4b0-c5caceba3b25}',
+            'taskNr' => '',
+            'taskName' => 'Test Task',
+            'sourceLang' => 5,
+            'targetLang' => 4,
+            'relaisLang' => 4,
+            'state' => 'open',
+            'workflow' => 'default',
+            'workflowStep' => '1',
+            'workflowStepName' => 'lectoring',
+            'pmGuid' => '{dab18309-7dfd-4185-b27e-f490c3dcb888}',
+            'pmName' => 'PM Username',
+            'wordCount' => '123',
+            'targetDeliveryDate' => '2017-12-21 00:00:00',
+            'realDeliveryDate' => null,
+            'orderdate' => '2017-12-20 00:00:00',
+        ]);
         $config->task = $config->oldTask;
         $config->importConfig = new editor_Models_Import_Configuration();
         $config->importConfig->importFolder = APPLICATION_PATH.'/needed/';
@@ -621,23 +639,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $config->importConfig->userGuid = '{F1D11C25-45D2-11D0-B0E2-444553540101}';
         $config->importConfig->userName = 'Thomas Lauria';
         
-        $instance = ZfExtended_Factory::get($class);
-        /* @var $instance editor_Workflow_Actions_Abstract */
-        $instance->init($config);
-        $instances[$class] = $instance;
-            
-        if(empty($action['parameters'])) {
-            call_user_func([$instance, $method]);
-            echo "CALLED ".$class.'::'.$method;
-            return;
-        }
-        call_user_func([$instance, $method], json_decode($action['parameters']));
-        if(json_last_error() != JSON_ERROR_NONE) {
-            echo 'JSON Error: '.json_last_error_msg();
-            return;
-        }
-        echo "CALLED ".$class.'::'.$method;
-        return;
+        $notify = ZfExtended_Factory::get($class);
+        /* @var $notify editor_Workflow_Notification */
+        $notify->init($config);
+        $notify->testNotifications();
+        echo "Sent dummy test Mails";
+        exit;
     }
 }
 
