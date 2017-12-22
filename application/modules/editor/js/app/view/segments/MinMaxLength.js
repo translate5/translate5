@@ -35,7 +35,8 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     extend: 'Ext.Component',
     alias: 'widget.segment.minmaxlength',
     itemId:'segmentMinMaxLength',
-    tpl: '<div style="background-color:{0};" data-qtip="{1}"><strong style="margin:0.3em;">{2}</strong></div>',
+    cls: 'segment-min-max',
+    tpl: '<div class="{0}" data-qtip="{1}">{2}</div>',
     hidden:true,
     strings:{
         minText:'#UT#{0} (Mindest. {1})',
@@ -102,7 +103,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             metaCache=record.get('metaCache'),
             charactersCount=me.getSegmentCharactersCount(me.htmlEditor.getValue());
         
-        if(metaCache.minWidth===null && metaCache.maxWidth===null){
+        if(!metaCache || metaCache.minWidth===null && metaCache.maxWidth===null){
             return false;
         }
         return true;
@@ -125,13 +126,13 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     updateLabel:function(record,charactersCount){
         var me=this,
             metaCache=record.get('metaCache'),
-            minWidth=metaCache.minWidth,
-            maxWidth=metaCache.maxWidth,
-            cssColor='#ff4242',
+            minWidth=metaCache && metaCache.minWidth,
+            maxWidth=metaCache && metaCache.maxWidth,
+            cls = 'invalid-length',
             tooltipText=[];
 
         if(me.isCharactersInBorder(charactersCount,minWidth,maxWidth)){
-            cssColor='#24f324'
+            cls = 'valid-length';
         }
         //If there is only max length: 10 of 12
         //If there is only min length: 12 (Min. 10)
@@ -151,7 +152,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         }
         //if min or max is null do not display the tooltip
         me.lookupTpl('tpl').overwrite(me.getEl(),[
-            cssColor,
+            cls,
             tooltipText.join(' '),
             tooltipText.join(' ')
         ]);

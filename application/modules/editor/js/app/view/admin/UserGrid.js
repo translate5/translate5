@@ -61,6 +61,7 @@ Ext.define('Editor.view.admin.UserGrid', {
       sourceLangageTip:'#UT#Quellsprache(n)',
       targetLangageLabel:'#UT#Zielsprache(n)',
       targetLangageTip:'#UT#Zielsprache(n)',
+      localeTooltip:'#UT#Benutzersprache'
   },
   store: 'admin.Users',
   viewConfig: {
@@ -168,7 +169,8 @@ Ext.define('Editor.view.admin.UserGrid', {
           filter: {
               type: 'string'
           },
-          text: me.text_cols.locale
+          text: me.text_cols.locale,
+          tooltip: me.strings.localeTooltip
       },{
           xtype: 'actioncolumn',
           stateId:'userGridActionColumn',

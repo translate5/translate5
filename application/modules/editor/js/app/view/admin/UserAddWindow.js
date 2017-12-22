@@ -69,7 +69,7 @@ Ext.define('Editor.view.admin.UserAddWindow', {
         targetLangageLabel:'#UT#Zielsprache(n)',
         targetLangageTip:'#UT#Zielsprache(n)',
         languageInfo: '#UT#Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.',
-        localeLabel:'#UT#Lokalisierung'
+        localeLabel:'#UT#Benutzersprache'
     },
     modal : true,
     layout:'fit',
@@ -249,8 +249,10 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                             },{
                                 xtype: 'checkboxgroup',
                                 itemId: 'rolesGroup',
+                                cls: 'x-check-group-alt',
                                 fieldLabel: me.strings.rolesLabel + ' &#8505;',
                                 items: roles,
+                                columns: 3,
                                 autoEl: {
                                     tag: 'div',
                                     'data-qtip': Ext.String.htmlEncode(me.strings.bottomRoleInfo)
