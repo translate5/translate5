@@ -25,6 +25,9 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
+-- if the column exists already we get an error but the content is added anyway, better instead of not having the following contents
+ALTER TABLE `LEK_languages` ADD COLUMN `rtl` tinyint(1) DEFAULT 0 COMMENT 'defines if the language is a rtl language';
+
 UPDATE `LEK_languages` SET `rfc5646`='el' WHERE `rfc5646`='gr';
 INSERT INTO `LEK_languages` (`rfc5646`, `langName`, `lcid`, `rtl`) VALUES
 ('af','Afrikaans',NULL,0),
