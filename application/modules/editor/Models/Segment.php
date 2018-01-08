@@ -432,7 +432,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         
         $history->setSegmentId($this->getId());
 
-        $fields = array('taskGuid', 'userGuid', 'userName', 'timestamp', 'editable', 'pretrans', 'qmId', 'stateId', 'autoStateId', 'workflowStep', 'workflowStepNr', 'matchRate', 'matchRateType');
+        $fields = $history->getFieldsToUpdate();
         //TRANSLATE-885 
         $fields[] = 'targetMd5';
         $fields[] = 'target';
@@ -1247,6 +1247,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $sql = sprintf($sql, $segTable, $subQuery, count($affectedFieldNames));
         $db->getAdapter()->query($sql, $bind);
         $db->getAdapter()->commit();
+    }
+    
+    public function updateLastAuthorFromHistory(){
+        
     }
     
     /**
