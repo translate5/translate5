@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -66,6 +65,16 @@ class editor_Models_Converter_XmlPairer {
      */
     protected $pairMap = [];
     
+    /**
+     * @var array
+     */
+    protected $validOpenTags = ['bx', 'bpt'];
+    
+    /**
+     * @var array
+     */
+    protected $validCloseTags = ['ex', 'ept'];
+    
     public function pairTags($xmlAllUnpaired) {
         //split up tags and text in nodes
         $this->nodeList = preg_split('/(<[^>]*>)/i', $xmlAllUnpaired, null, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
@@ -93,8 +102,8 @@ class editor_Models_Converter_XmlPairer {
 
             //we cannot use rid here, since its not sure that it is unique in one segment
             // the id instead is generated on bx / ex generation and is unique
-            $newOpener = '<g id="'.$opener->id.'">';
-            $newCloser = '</g>';
+            $newOpener = $this->getOpener($opener);
+            $newCloser = $this->getCloser($closer);
             
             $this->pairMap[$this->nodeList[$opener->idx]] = $this->nodeList[$closer->idx];
             $this->replaceList[$this->nodeList[$opener->idx]] = $newOpener;
@@ -110,6 +119,14 @@ class editor_Models_Converter_XmlPairer {
         // misplaced means, where nesting level is lower as the nesting level of the pair itself
     }
 
+    protected function getOpener(editor_Models_Converter_XmlPairerNode $node) {
+        return '<g id="'.$node->id.'">';
+    }
+    
+    protected function getCloser(editor_Models_Converter_XmlPairerNode $node) {
+        return '</g>';
+    }
+    
     /**
      * returns a list of replaced single tags with g tags
      * @return array
@@ -132,24 +149,10 @@ class editor_Models_Converter_XmlPairer {
      * @param string $node
      */
     protected function parseNode($idx, $node) {
-        $matches = null;
-        //if no tag or a tag without rid information, ignore
-        if(!preg_match('#<([^\s>]+)[^>]+id="([^"]+)"[\s]+rid="([^"]+)"[^>]*>#', $node, $matches)) {
+        $m = $this->createNode($idx, $node);
+        if($m === false) {
             return;
         }
-        
-        $tag = $matches[1];
-        $id = $matches[2];
-        $rid = $matches[3];
-        
-        //ignore non paired tags
-        if($tag != 'ex' && $tag != 'bx' && $tag != 'ept' && $tag != 'bpt') {
-            return;
-        }
-        
-        //init node data, $open = ($tag == 'bx' || $tag == 'bpt')
-        $opener = ($tag == 'bx' || $tag == 'bpt');
-        $m = new editor_Models_Converter_XmlPairerNode($idx, $opener, $rid, $id);
         
         if($m->isOpener()) {
             //take care of the opener reference
@@ -170,6 +173,33 @@ class editor_Models_Converter_XmlPairer {
         $this->addAsChild($m);
         
         $this->lastNode = $m;
+    }
+    
+    /**
+     * creates a XmlPairerNode by the given nod
+     * @param integer $idx
+     * @param string $node
+     * @return boolean|editor_Models_Converter_XmlPairerNode
+     */
+    protected function createNode($idx, $node) {
+        $matches = null;
+        //if no tag or a tag without rid information, ignore
+        if(!preg_match('#<([^\s>]+)[^>]+id="([^"]+)"[\s]+rid="([^"]+)"[^>]*>#', $node, $matches)) {
+            return false;
+        }
+        
+        $tag = $matches[1];
+        $id = $matches[2];
+        $rid = $matches[3];
+        
+        //ignore non paired tags
+        if(!in_array($tag, $this->validOpenTags) && !in_array($tag, $this->validCloseTags)) {
+            return false;
+        }
+        
+        //init node data, $open = ($tag == 'bx' || $tag == 'bpt')
+        $opener = (in_array($tag, $this->validOpenTags));
+        return new editor_Models_Converter_XmlPairerNode($idx, $opener, $rid, $id);
     }
     
     /**

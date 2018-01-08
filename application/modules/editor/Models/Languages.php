@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -44,7 +43,8 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Languages extends ZfExtended_Languages {
 	protected $dbInstanceClass = 'editor_Models_Db_Languages';
-	
+    protected $validatorInstanceClass   = 'editor_Models_Validator_Language';
+		
 	/***
      * Return language rfc5646 value for given language id
      * @param int $langId

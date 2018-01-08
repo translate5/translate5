@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -386,6 +385,10 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         if(strpos($transUnit, '<target') === false) {
             $source = strpos($transUnit, '<seg-source') === false ? '</source>' : '</seg-source>';
             $transUnit = str_replace($source, $source.'<target></target>', $transUnit);
+        }
+        else{
+            //some versions of SDL Studio adds empty <target/> tags which must be converted then to  
+            $transUnit = preg_replace('#<target[^>]*/>#', '<target></target>', $transUnit);
         }
         
         $this->segmentData = array();

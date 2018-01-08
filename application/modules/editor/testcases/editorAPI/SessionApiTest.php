@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -44,15 +43,15 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         $response = $this->api()->request('editor/session', 'POST');
         
         $this->assertEquals(400, $response->getStatus());
-        $this->assertEquals('{"errors":[{"id":"login","msg":"Kein Benutzername angegeben."},{"id":"passwd","msg":"Kein Passwort angegeben."}],"message":"NOT OK","success":false}', $response->getBody());
+        $this->assertEquals('{"errors":[{"id":"login","msg":"No login given."},{"id":"passwd","msg":"No password given."}],"message":"NOT OK","success":false}', $response->getBody());
         
         $response = $this->api()->request('editor/session', 'POST', ['login' => 'givenLogin']);
         $this->assertEquals(400, $response->getStatus());
-        $this->assertEquals('{"errors":[{"id":"passwd","msg":"Kein Passwort angegeben."}],"message":"NOT OK","success":false}', $response->getBody());
+        $this->assertEquals('{"errors":[{"id":"passwd","msg":"No password given."}],"message":"NOT OK","success":false}', $response->getBody());
         
         $response = $this->api()->request('editor/session', 'POST', ['passwd' => 'givenPasswd']);
         $this->assertEquals(400, $response->getStatus());
-        $this->assertEquals('{"errors":[{"id":"login","msg":"Kein Benutzername angegeben."}],"message":"NOT OK","success":false}', $response->getBody());
+        $this->assertEquals('{"errors":[{"id":"login","msg":"No login given."}],"message":"NOT OK","success":false}', $response->getBody());
     }
     
     /**

@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -34,49 +33,28 @@ END LICENSE AND COPYRIGHT
  *
  */
 
-$session = new Zend_Session_Namespace();
-
 $this->subject = $this->translate->_('Translate5 - Aufgabe freigegeben').' "'.$this->task->getTaskNr().' - '.$this->task->getTaskName().'"';
-$this->textbody = sprintf($this->translate->_('%1$s %2$s,
 
-Im Projektportal %3$s wurde die Aufgabe %5$s - %6$s für Sie freigegeben.
+$this->render('general.phtml');
 
-Vielen Dank und viele Grüße,
-Ihr Projektmanagement Team
-%7$s
-
-Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!'),
-    $this->mailEmployeeSalutation(),
-    $this->user['surName'],
-    $session->runtimeOptions->server->protocol.$session->runtimeOptions->server->name,
-    '', //displaying segments is not supported in textmails
-    $this->task->getTaskNr(),
-    $this->task->getTaskName(),
-    $session->runtimeOptions->companyName
-);
-
-echo sprintf($this->translate->_('%1$s %2$s,<br />
+$template = '{header}
+Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> für Sie freigegeben.<br />
 <br />
-Im Projektportal %3$s wurde die Aufgabe <b>%5$s - %6$s</b> für Sie freigegeben.<br />
-<br />
-Im folgenden die getätigten Änderungen der vorhergehenden Übersetzer:<br />
-%4$s
+Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRole}</b>:<br />
+{changedSegments}
 <hr />
 <br />
-<br />
-<br />Vielen Dank und viele Grüße,
-<br />Ihr Projektmanagement Team
-<br />%7$s
-<br />
-<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!'),
-    $this->mailEmployeeSalutation(),
-    $this->user['surName'],
-    $session->runtimeOptions->server->protocol.$session->runtimeOptions->server->name,
-    $this->workflowNotifyHtmlMailSegmentList($this->segments),
-    $this->task->getTaskNr(),
-    $this->task->getTaskName(),
-    $session->runtimeOptions->companyName
-);
+{footer}';
 
+$this->textbody = strip_tags($this->templateApply($template, [
+    'task' => $this->task->getDataObject(),
+    'header' => $this->header,
+    'footer' => $this->footer,
+    'previousRole' => $this->translate->_('Übersetzer'),
+    'changedSegments' => $this->htmlOnly,
+]));
 
-
+echo $this->templateApply($template, [
+    //just overwrite the changedSegments
+    'changedSegments' => $this->workflowNotifyHtmlMailSegmentList($this->segments),
+]);

@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -316,14 +315,28 @@ class editor_Plugins_MatchResource_Services_OpenTM2_HttpApi {
      * @return Zend_Http_Response
      */
     protected function request(Zend_Http_Client $http) {
+        //exceptions with one of that messages are leading to badgateway exceptions
+        $badGatewayMessages = [
+            'stream_socket_client(): php_network_getaddresses: getaddrinfo failed: Name or service not known',
+            'stream_socket_client(): unable to connect to tcp',
+        ];
+        
         try {
             return $http->request();
         }
         catch (Zend_Exception $e) {
-            if(strpos($e->getMessage(), 'stream_socket_client(): unable to connect to tcp') !== 0) {
-                throw $e;
+            foreach ($badGatewayMessages as $msg) {
+                if(strpos($e->getMessage(), $msg) === false){
+                    //check next message
+                    continue;
+                }
+                $this->badGateway($e, $http);
             }
+            throw $e;
         }
+    }
+    
+    protected function badGateway(Zend_Exception $e, Zend_Http_Client $http) {
         $badGateway = new ZfExtended_BadGateway('Die angefragte OpenTM2 Instanz ist nicht erreichbar', 0, $e);
         $badGateway->setOrigin('MatchResource OpenTM2');
         

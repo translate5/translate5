@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -92,7 +91,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $restRoute = new Zend_Rest_Route($this->front, array(), array(
             'editor' => array(  'file', 'segment', 'alikesegment', 'referencefile', 'qmstatistics', 'comment',
                                 'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker',
-                                'taskmeta', 'config', 'segmentuserassoc', 'session'),
+                                'taskmeta', 'config', 'segmentuserassoc', 'session', 'language'),
         ));
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
 
@@ -113,6 +112,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'controller' => 'segment',
                 'action' => 'position'
             )));
+        
+        $this->front->getRouter()->addRoute('editorTaskTriggerWorkflow', new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/:id/workflow',
+            array(
+                'module' => 'editor',
+                'controller' => 'task',
+                'action' => 'workflow'
+            )
+        ));
         
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/nextsegments/*',
@@ -159,6 +167,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ));
         $this->front->getRouter()->addRoute('editorAuthUser', $authUserRoute);
 
+        $pmRoute = new ZfExtended_Controller_RestLikeRoute(
+                'editor/user/pm/*',
+                array(
+                        'module' => 'editor',
+                        'controller' => 'user',
+                        'action' => 'pm'
+                ));
+        $this->front->getRouter()->addRoute('editorUserPm', $pmRoute);
+        
         $termsRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/terms/*',
             array(

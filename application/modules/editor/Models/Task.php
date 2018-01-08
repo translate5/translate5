@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -192,14 +191,17 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $alias = self::ASSOC_TABLE_ALIAS;
         $s = $this->db->select()
         ->from(array('t' => 'LEK_task'), $cols);
+        if(!empty($this->filter)) {
+            $this->filter->setDefaultTable('t');
+        }
         if($leftOuterJoin) {
             $on = $alias.'.taskGuid = t.taskGuid AND '.$alias.'.userGuid = '.$s->getAdapter()->quote($userGuid);
             $s->joinLeft(array($alias => 'LEK_taskUserAssoc'), $on, array());
         }
         else {
             $s->join(array($alias => 'LEK_taskUserAssoc'), $alias.'.taskGuid = t.taskGuid', array())
-            ->where($alias.'.userGuid = ?', $userGuid);
-        }
+            ->where($alias.'.userGuid = ? OR t.pmGuid = ?', $userGuid);
+        }        
         return $s;
     }
     
@@ -388,15 +390,19 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * update the workflowStep of a specific task 
-     * @param string $taskGuid
-     * @param integer $step
      * @param string $stepName
+     * @param boolean $increaseStep optional, by default true, increases then the workflow step nr
      */
-    public function updateWorkflowStep(string $taskGuid, integer $step, string $stepName) {
-        $this->db->update([
-                'workflowStep' => $step,
+    public function updateWorkflowStep(string $stepName, $increaseStep = true) {
+        $data = [
                 'workflowStepName' => $stepName,
-        ], ['taskGuid = ?' => $taskGuid]);
+        ];
+        if($increaseStep) {
+            $data['workflowStep'] =  new Zend_Db_Expr('`workflowStep` + 1');
+            //step nr is not updated in task entity!
+        }
+        $this->setWorkflowStepName($stepName);
+        $this->db->update($data, ['taskGuid = ?' => $this->getTaskGuid()]);
     }
     
     /**
@@ -626,4 +632,77 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         return $this->meta;
     }
+    
+    /**
+     * Check if the current task status allows this action
+     * 
+     * @throws ZfExtended_Models_Entity_Conflict
+     */
+    public function checkStateAllowsActions() {
+        if($this->isErroneous() || $this->isExclusiveState() && $this->isLocked($this->getTaskGuid())) {
+            $e = new ZfExtended_Models_Entity_Conflict('Der aktuelle Status der Aufgabe verbietet diese Aktion!');
+            $e->setErrors([
+                    'task' => $this->getTaskGuid(),
+                    'taskState' => $this->getState(),
+                    'isLocked' => $this->isLocked($this->getTaskGuid()),
+                    'isErroneous' => $this->isErroneous(),
+                    'isExclusiveState' => $this->isExclusiveState(),
+            ]);
+            throw $e;
+        }
+    }
+    
+    /***
+     * Remove all ended task from the database and from the disk when there is no 
+     * change since (taskLifetimeDays)config days in lek_task_log
+     */
+    public function removeOldTasks(){
+        $config = Zend_Registry::get('config');
+        $taskLifetimeDays= $config->runtimeOptions->taskLifetimeDays;
+
+        
+        $daysOffset=isset($taskLifetimeDays) ? $taskLifetimeDays : 100;
+        
+        if(!$daysOffset){
+            throw new Zend_Exception('No task taskLifetimeDays configuration defined.');
+            return;
+        }
+        
+        //remove ended tasks, and when there is no change since $daysOffset days in lek_task_log
+        $s = $this->db->select()
+             ->setIntegrityCheck(false)
+             ->from(array('t' => 'LEK_task'),'t.id AS id')
+             ->join(array('tl' => 'LEK_task_log'),'t.taskGuid=tl.taskGuid','MAX(tl.id) as taskLogId,')
+            ->where('t.state=?',self::STATE_END)
+            ->group('tl.taskGuid')
+            ->where('tl.created <= CURRENT_DATE - INTERVAL ? DAY', $daysOffset);
+        $tasks = $this->db->getAdapter()->fetchAll($s);
+
+        if(empty($tasks)){
+            return;
+        }
+        
+        $taskEntity=null;
+        $removedTasks=[];
+        //foreach task task, check the deletable, and delete it
+        foreach ($tasks as $task){
+            $taskEntity=ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $taskEntity editor_Models_Task */
+            $taskEntity->load($task['id']);
+            
+            if(!$taskEntity->isErroneous()){
+                $taskEntity->checkStateAllowsActions();
+            }
+            
+            //no need for entity version check, since field loaded from db will always have one
+            
+            $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array($taskEntity));
+            /* @var $remover editor_Models_Task_Remover */
+            $removedTasks[]=$taskEntity->getTaskName();
+            $remover->remove();
+        }
+        error_log("Number of tasks removed: ".count($removedTasks));
+        error_log("Tasks removed by taskname: ".implode(',', $removedTasks));
+    }
+    
 }

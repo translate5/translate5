@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -63,6 +62,9 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
         }
         
         $this->initEvents();
+        $this->addController('ResourceController');
+        $this->addController('TaskassocController');
+        $this->addController('TmmtController');
         $this->initRoutes();
     }
     
@@ -247,7 +249,6 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
     protected function initRoutes() {
         $f = Zend_Registry::get('frontController');
         /* @var $f Zend_Controller_Front */
-        $f->addControllerDirectory(APPLICATION_PATH.'/'.$this->getPluginPath().'/Controllers', '_plugins_'.__CLASS__);
         $r = $f->getRouter();
         
         $restRoute = new Zend_Rest_Route($f, array(), array(

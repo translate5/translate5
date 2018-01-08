@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -234,7 +233,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
      */
     public function workflowNotifyHtmlMailSegmentList(array $segments, $segmentHash = null) {
         if(empty($segmentHash)) {
-            $this->segmentHash = md5(print_r($segments, 1));
+            $this->segmentHash = md5(print_r($segments, 1).$this->view->translate->getTargetLang());
         }
         else {
             $this->segmentHash = $segmentHash;

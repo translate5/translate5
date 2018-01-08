@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -114,9 +113,11 @@ class editor_Models_Import_Worker_Import {
         //saving task twice is the simplest way to do this. has meta data is only available after import.
         $this->task->save();
         
+        
         //init default user prefs
         $workflowManager = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $workflowManager editor_Workflow_Manager */
+        $workflowManager->getByTask($this->task)->doImport($this->task, $importConfig);
         $workflowManager->initDefaultUserPrefs($this->task);
         
         $this->events->trigger('importCleanup', $this, array('task' => $task, 'importConfig' => $importConfig));
@@ -130,7 +131,10 @@ class editor_Models_Import_Worker_Import {
         Zend_Registry::set('errorCollect', $this->importConfig->isCheckRun);
         
         $this->importMetaData();
-        $this->events->trigger("beforeDirectoryParsing", $this,array('importFolder'=>$this->importConfig->importFolder));
+        $this->events->trigger("beforeDirectoryParsing", $this,[
+                'importFolder'=>$this->importConfig->importFolder,
+                'task' => $this->task,
+        ]);
         $this->importFiles();
         $this->syncFileOrder();
         $this->removeMetaDataTmpFiles();

@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -125,6 +124,11 @@ abstract class editor_Models_Export_FileParser {
     protected $termTagHelper;
     
     /**
+     * @var ZfExtended_EventManager
+     */
+    protected $events;
+    
+    /**
      * 
      * @param integer $fileId
      * @param boolean $diff
@@ -146,6 +150,8 @@ abstract class editor_Models_Export_FileParser {
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->termTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
+
+        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
     }
 
     /**
@@ -284,7 +290,7 @@ abstract class editor_Models_Export_FileParser {
         
         $edited = (string) $segment->getFieldEdited($field);
         
-        $edited = $this->tagHelper->removeChangeMarkupTags($edited);
+        $edited = $this->tagHelper->removeTrackChanges($edited);
         
         $before = $edited;
         $edited = $this->tagHelper->protect($edited);

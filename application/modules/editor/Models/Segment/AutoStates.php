@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -30,6 +29,9 @@ END LICENSE AND COPYRIGHT
 /**
  * Segment Auto States Helper Class
  * This class contains all autoState definitions and all autoState transitions, available by api
+ * 
+ * Warning: On changing/adding autostates, change also frontend hardcoded list Editor.data.segments.autoStates
+ *          filled in Editor.controller.Editor::init()
  */
 class editor_Models_Segment_AutoStates {
     
@@ -118,6 +120,12 @@ class editor_Models_Segment_AutoStates {
     const REVIEWED_PM_UNCHANGED_AUTO = 13;
     
     /**
+     * if a translator uses the repetition editor, the segments are getting that state:
+     * @var integer
+     */
+    const TRANSLATED_AUTO = 14;
+    
+    /**
      * Internal state used to show segment is pending
      * @var integer
      */
@@ -125,6 +133,7 @@ class editor_Models_Segment_AutoStates {
     
     protected $states = array(
         self::TRANSLATED => 'Übersetzt',
+        self::TRANSLATED_AUTO => 'Autoübersetzt',
         self::NOT_TRANSLATED => 'Nicht übersetzt',
         self::REVIEWED => 'Lektoriert',
         self::REVIEWED_AUTO => 'Autolektoriert',
@@ -168,24 +177,25 @@ class editor_Models_Segment_AutoStates {
      * @return multitype:string
      */
     public function getRoleToStateMap() {
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
-        /* @var $workflow editor_Workflow_Abstract */
-        
         return array(
-          'pm' => array(
+          ACL_ROLE_PM => array(
             self::REVIEWED_PM,
             self::REVIEWED_PM_AUTO,
             self::REVIEWED_PM_UNCHANGED,
             self::REVIEWED_PM_UNCHANGED_AUTO,
           ),
-          $workflow::ROLE_LECTOR => array(
+          editor_Workflow_Abstract::ROLE_TRANSLATOR => [
+            self::TRANSLATED,
+            self::TRANSLATED_AUTO,
+          ],
+          editor_Workflow_Abstract::ROLE_LECTOR => array(
             self::REVIEWED,
             self::REVIEWED_AUTO,
             self::REVIEWED_UNTOUCHED,
             self::REVIEWED_UNCHANGED,
             self::REVIEWED_UNCHANGED_AUTO,
           ),
-          $workflow::ROLE_TRANSLATOR => array(
+          editor_Workflow_Abstract::ROLE_TRANSLATORCHECK => array(
             self::REVIEWED_TRANSLATOR,
             self::REVIEWED_TRANSLATOR_AUTO,
           )
@@ -204,6 +214,8 @@ class editor_Models_Segment_AutoStates {
         switch ($calculatedState) {
             case self::REVIEWED:
                 return self::REVIEWED_AUTO;
+            case self::TRANSLATED:
+                return self::TRANSLATED_AUTO;
             case self::REVIEWED_UNCHANGED:
                 return self::REVIEWED_UNCHANGED_AUTO;
             case self::REVIEWED_PM:
@@ -241,7 +253,7 @@ class editor_Models_Segment_AutoStates {
     public function calculateSegmentState(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua) {
         $isModified = $segment->isDataModifiedAgainstOriginal();
         
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($segment->getTaskGuid());
         /* @var $workflow editor_Workflow_Abstract */
         
         if($segment->getAutoStateId() == self::BLOCKED){
@@ -249,6 +261,9 @@ class editor_Models_Segment_AutoStates {
         }
         
         if($tua->getRole() == $workflow::ROLE_TRANSLATOR) {
+            return self::TRANSLATED;
+        }
+        if($tua->getRole() == $workflow::ROLE_TRANSLATORCHECK) {
             return self::REVIEWED_TRANSLATOR;
         }
         if($tua->getRole() == $workflow::ROLE_LECTOR) {
@@ -267,9 +282,22 @@ class editor_Models_Segment_AutoStates {
      * sets the untouched state for a given taskGuid
      * 
      * @param string $taskGuid
-     * @param editor_Models_Segment $segment
      */
-    public function setUntouchedState(string $taskGuid, editor_Models_Segment $segment) {
+    public function setUntouchedState(string $taskGuid, ZfExtended_Models_User $user) {
+        $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segment editor_Models_Segment */
+        
+        $segment->setUserGuid($user->getUserGuid());
+        $segment->setUserName($user->getUserName());
+        
+        $history  = ZfExtended_Factory::get('editor_Models_SegmentHistory');
+        /* @var $history editor_Models_SegmentHistory */
+        
+        $history->createHistoryByAutoState($taskGuid,[self::TRANSLATED,self::NOT_TRANSLATED]);
+        
+        //TODO make history entry for all segments with state self::TRANSLATED || self::NOT_TRANSLATED
+        
+        //TODO add note about not updateing the segment history data
         $segment->updateAutoState($taskGuid, self::TRANSLATED, self::REVIEWED_UNTOUCHED);
         $segment->updateAutoState($taskGuid, self::NOT_TRANSLATED, self::REVIEWED_UNTOUCHED);
     }
@@ -278,11 +306,20 @@ class editor_Models_Segment_AutoStates {
      * sets the untouched state for a given taskGuid back to the initial states
      * 
      * @param string $taskGuid
-     * @param editor_Models_Segment $segment
      */
-    public function setInitialStates(string $taskGuid, editor_Models_Segment $segment) {
+    public function setInitialStates(string $taskGuid) {
+        $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segment editor_Models_Segment */
+        
+        $history  = ZfExtended_Factory::get('editor_Models_SegmentHistory');
+        /* @var $history editor_Models_SegmentHistory */
+        $history->createHistoryByAutoState($taskGuid,[self::REVIEWED_UNTOUCHED]);
+        
         $segment->updateAutoState($taskGuid, self::REVIEWED_UNTOUCHED, self::NOT_TRANSLATED, true);
         $segment->updateAutoState($taskGuid, self::REVIEWED_UNTOUCHED, self::TRANSLATED);
+        //TODO change last author each segment set to last author in the previous entry of the segment history table
+        
+        //to the the last autor, get it from the segment history where state is translated
     }
     
     /**
@@ -290,7 +327,10 @@ class editor_Models_Segment_AutoStates {
      * @param editor_Models_Segment $segment
      */
     public function updateAfterCommented(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua) {
-        if($segment->getAutoStateId() == self::TRANSLATED || $segment->getAutoStateId() == self::NOT_TRANSLATED) {
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($segment->getTaskGuid());
+        $isTranslator = $tua->getRole() == $workflow::ROLE_TRANSLATOR;
+        $autoState = $segment->getAutoStateId();
+        if(!$isTranslator && ($autoState == self::TRANSLATED || $autoState == self::NOT_TRANSLATED)) {
             if($this->isEditWithoutAssoc($tua)) {
                 $stateToSet = self::REVIEWED_PM_UNCHANGED;
             }
@@ -302,13 +342,34 @@ class editor_Models_Segment_AutoStates {
     }
     
     /**
+     * Returns a map with counts of each state in a task
+     * @param string $taskGuid
+     */
+    public function getStatistics(string $taskGuid) {
+        $seg = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $seg editor_Models_Segment */
+        $stats = $seg->getAutoStateCount($taskGuid);
+        $result = array_fill_keys($this->getStates(), 0);
+        foreach($stats as $stat) {
+            $result[$stat['autoStateId']] = $stat['cnt'];
+        }
+        return $result;
+    }
+    
+    /**
      * returns true if user has right to edit all Tasks, checks optionally the workflow role of the user
      * @param editor_Models_TaskUserAssoc $tua optional, if not given only acl is considered
      */
-    protected function isEditWithoutAssoc(editor_Models_TaskUserAssoc $tua = null) {
+    protected function isEditWithoutAssoc(editor_Models_TaskUserAssoc $tua) {
         $userSession = new Zend_Session_Namespace('user');
         $role = $tua && $tua->getRole();
         $acl = ZfExtended_Acl::getInstance();
-        return empty($role) && $acl->isInAllowedRoles($userSession->data->roles,'editAllTasks');
+        
+        //load the task so the check if the loagged user is also the pm to the task
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($tua->getTaskGuid());
+        $sameUserGuid = $task->getPmGuid() === $userSession->data->userGuid;
+        return empty($role) && ($acl->isInAllowedRoles($userSession->data->roles, 'backend', 'editAllTasks') || $sameUserGuid);
     }
 }

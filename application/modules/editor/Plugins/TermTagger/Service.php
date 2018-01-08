@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -49,6 +48,21 @@ class editor_Plugins_TermTagger_Service {
      */
     protected $config;
     
+    /**
+     * @var editor_Models_Segment_TermTag
+     */
+    protected $termTagHelper;
+    
+    /**
+     * @var editor_Models_Segment_TermTagTrackChange
+     */
+    protected $termTagTrackChangeHelper;
+    
+    /**
+     * @var editor_Models_Segment_InternalTag
+     */
+    protected $internalTagHelper;
+    
     
     /**
      * Two corresponding array to hold replaced tags.
@@ -70,6 +84,9 @@ class editor_Plugins_TermTagger_Service {
         $this->log = ZfExtended_Factory::get('ZfExtended_Log');
         $config = Zend_Registry::get('config');
         $this->config = $config->runtimeOptions->termTagger;
+        $this->termTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
+        $this->internalTagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        $this->termTagTrackChangeHelper= ZfExtended_Factory::get('editor_Models_Segment_TermTagTrackChange');
     }
     
     /**
@@ -279,8 +296,8 @@ class editor_Plugins_TermTagger_Service {
      */
     private function encodeSegments(editor_Plugins_TermTagger_Service_ServerCommunication $data) {
         foreach ($data->segments as & $segment) {
-            $segment->source = $this->encodeText($segment->source);
-            $segment->target = $this->encodeText($segment->target);
+            $segment->source = $this->encodeText($segment->source, $segment->id, 'source');
+            $segment->target = $this->encodeText($segment->target, $segment->id, 'target');
         }
         
         return $data;
@@ -294,22 +311,16 @@ class editor_Plugins_TermTagger_Service {
      */
     private function decodeSegments(stdClass $data) {
         foreach ($data->segments as & $segment) {
-            $segment->source = $this->decodeText($segment->source);
-            $segment->target = $this->decodeText($segment->target);
+            $segment->source = $this->decodeText($segment->source, $segment->id, 'source');
+            $segment->target = $this->decodeText($segment->target, $segment->id, 'target');
         }
-        
         return $data;
     }
     
-    private function encodeText($text) {
+    private function encodeText($text, $segmentId, $segmentPlace='') {
         $matchContentRegExp = '/<div[^>]+class="(open|close|single).*?".*?\/div>/is';
         
         preg_match_all($matchContentRegExp, $text, $tempMatches);
-        
-        if (empty($tempMatches)) {
-            return $text;
-        }
-        $textOriginal = $text;
         
         foreach ($tempMatches[0] as $match) {
             $needle = '<img class="content-tag" src="'.$this->replaceCounter++.'" alt="TaggingError" />';
@@ -321,16 +332,29 @@ class editor_Plugins_TermTagger_Service {
         $text = preg_replace('/<div[^>]+>/is', '', $text);
         $text = preg_replace('/<\/div>/', '', $text);
         
+        // (1) We will need to assign the found TrackChange-Nodes to the original text later.
+        //     So we have to remember which text the found TrackChange-Nodes belong to!
+        $textId = $this->renderTextId($text, $segmentId, $segmentPlace);
+        $this->termTagTrackChangeHelper->storeNodes($text, $textId);
+        // (2) Now remove the stored TrackChange-Nodes from the text:
+        $text = $this->internalTagHelper->removeTrackChanges($text);
+        
         return $text;
     }
     
-    private function decodeText($text) {
+    private function decodeText($text, $segmentId, $segmentPlace='') {
         //fix TRANSLATE-713
         $text = str_replace('term-STAT_NOT_FOUND', 'term STAT_NOT_FOUND', $text);
         
-        if (empty($this->replacedTagsNeedles)) {
+        $textId = $textId = $this->renderTextId($text, $segmentId, $segmentPlace);
+        
+        if (empty($this->replacedTagsNeedles) && $this->termTagTrackChangeHelper->hasNoTrackChangeNodes($textId)) {
             return $text;
         }
+        
+        // (3) We will need to assign the formerly found TrackChange-Nodes
+        //     as stored for the $textId for the clean version of this text.
+        $text = $this->termTagTrackChangeHelper->restoreNodes($text, $textId);
         
         $text = preg_replace('"&lt;img class=&quot;content-tag&quot; src=&quot;(\d+)&quot; alt=&quot;TaggingError&quot; /&gt;"', '<img class="content-tag" src="\\1" alt="TaggingError" />', $text);
         $text = str_replace($this->replacedTagsNeedles, $this->replacedTagsReplacements, $text);
@@ -338,6 +362,17 @@ class editor_Plugins_TermTagger_Service {
         return $text;
     }
     
+    /**
+     * @param string $text
+     * @param string $segmentId
+     * @return string
+     */
+    private function renderTextId ($text, $segmentId, $segmentPlace) {
+        // Remove all Tags first; they will be different before and after sending the text to the TermTagger!
+        $cleanText1 = $this->internalTagHelper->removeTrackChanges($text);
+        $cleanText2 = $this->termTagHelper->remove($cleanText1);
+        return $segmentId . '-' . $segmentPlace. '-' . md5($cleanText2);
+    }
     
     /**
      * decodes the TermTagger JSON and logs an error if data can not be processed

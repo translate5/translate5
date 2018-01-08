@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -48,6 +47,11 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
      * @var editor_Models_Export_FileParser_Xlf_Namespaces
      */
     protected $namespaces;
+    
+    /**
+     * @var array
+     */
+    protected $segmentIdsPerUnit = [];
     
     /**
      * übernimmt das eigentliche FileParsing
@@ -82,8 +86,62 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
             //$this->writeMatchRate(); refactor reapplyment of matchratio with XMLParser and namespace specific!
             $xmlparser->replaceChunk($key, $this->getSegmentContent($id, $field));
         });
+        
+        $xmlparser->registerElement('trans-unit', null, function($tag, $key, $opener) use ($xmlparser){
+            $segments = [];
+            foreach($this->segmentIdsPerUnit as $segmentId) {
+                $segments[] = $this->getSegment($segmentId);
+            }
+            $event = new Zend_EventManager_Event();
+            //get origanal attributes:
+            if(preg_match_all('/([^\s]+)="([^"]*)"/', $xmlparser->getChunk($opener['openerKey']), $matches)){
+                $originalAttributes = array_combine($matches[1], $matches[2]);
+            } else {
+                $originalAttributes = []; 
+            }
+            $event->setParams([
+                    //just the tag name, should be trans-unit here
+                    'tag' => $tag,
+                    //the affected segments:
+                    'segments' => $segments,
+                    //this attributes field should be manipulated by the listeners, since its played back into the transunit
+                    'attributes' => $originalAttributes, 
+                    //the chunk key in $xmlparser of the closer tag
+                    'key' => $key,
+                    //all chunk information about the opener, for special manipulations in the handler 
+                    'tagOpener' => $opener,
+                    //xmlparser for special manipulations in the handler
+                    'xmlparser' => $xmlparser,
+            ]);
+            
+            //trigger an event to allow custom transunit manipulations
+            $responses = $this->events->trigger('writeTransUnit', $this, $event);
+
+            //if attributes were changed in the handlers, replace the tag with the new ones
+            if($originalAttributes !== $event->getParam('attributes')) {
+                $attributes = '';
+                foreach($event->getParam('attributes') as $attribute => $value) {
+                    $attributes .= ' '.$attribute.'="'.$value.'"';
+                }
+                $xmlparser->replaceChunk($opener['openerKey'], '<'.$tag.$attributes.'>');
+            }
+            
+            //reset segments per unit: 
+            $this->segmentIdsPerUnit = [];
+        });
+        
         $this->_exportFile = $xmlparser->parse($this->_skeletonFile);
         
+    }
+    
+    /**
+     * overwrites the parent to remove img tags, which contain currently MQM only (until we provide real MQM export)
+     * {@inheritDoc}
+     * @see editor_Models_Export_FileParser::parseSegment()
+     */
+    protected function parseSegment($segment) {
+        $segment = preg_replace('/<img[^>]*>/','', $segment);
+        return parent::parseSegment($segment);
     }
     
     /**
@@ -125,6 +183,7 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
      * @see editor_Models_Export_FileParser::getSegmentContent()
      */
     protected function getSegmentContent($segmentId, $field) {
+        $this->segmentIdsPerUnit[] = $segmentId;
         $content = parent::getSegmentContent($segmentId, $field);
         //without sub tags, no sub tags must be restored
         if(stripos($content, '<sub') === false) {

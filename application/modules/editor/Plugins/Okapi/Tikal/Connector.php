@@ -1,31 +1,30 @@
 <?php
 /*
- START LICENSE AND COPYRIGHT
- 
+START LICENSE AND COPYRIGHT
+
  This file is part of translate5
  
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
- 
+
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
- 
+
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt
- included in the packaging of this file.  Please review the following information
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
- 
+  
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
- 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
+  
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
- http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
- 
- END LICENSE AND COPYRIGHT
- */
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
 
 /**
  * FileManager Test Plugin
@@ -125,9 +124,7 @@ class editor_Plugins_Okapi_Tikal_Connector {
         exec($this->makeCmd($path, false), $output, $result);
         //Logging currently all tikal output. Normal all relevant data (taskGuid, filename) is given in the output, so no additonal data needed:
         
-        $log = ZfExtended_Factory::get('ZfExtended_Log');
-        /* @var $log ZfExtended_Log */
-        $log->log('Translate5 tikal export on '.$_SERVER['HTTP_HOST'], print_r($output, 1));
+        $this->logOnErrors($output, $relPath);
         
         $res = $result === 0;
         if(!$res) {
@@ -141,6 +138,50 @@ class editor_Plugins_Okapi_Tikal_Connector {
             //file was created with the tikal import filter and filename from the DB does not contain XLF suffix then, so lets rename it
             rename($path, $path.'.xlf');
         }
+    }
+    
+    /**
+     * Creates a log mail if tikal export was not successful
+     * @param array $output
+     * @param string $filePath
+     */
+    protected function logOnErrors(array $output, $filePath) {
+        if(strpos(end($output), 'Done in ') === 0) {
+            return;
+        }
+        
+        //find output indizes starting with "Error"
+        $errors = [];
+        foreach ($output as $idx => $row) {
+            if(strpos($row, 'Error') === 0) {
+                $errors[] = $idx; //add that index as line containing error information
+                $errors[] = $idx + 1; //add also the next line
+            }
+        }
+        $errors = array_unique($errors);
+        $errors = array_intersect_key($output, array_flip($errors));
+        $errors = array_map(function($item) {
+            return '  '.$item;
+        }, $errors);
+        
+        $info  = ['Task:       '.$this->task->getTaskName()];
+        $nr = $this->task->getTaskNr();
+        if(!empty($nr)) {
+            $info[] = 'Task Nr:    '.$nr;
+        }
+        $info[] = 'Task Guid:  '.$this->task->getTaskGuid();
+        $info[] = 'File:       '.str_replace('#/'.$this->task->getTaskGuid().'/', '', '#'.$filePath);
+        $info[] = '';
+        $info[] = 'Tikal Errors: ';
+        $errors[] = '';
+        $errors[] = '';
+        $errors[] = '';
+        $errors[] = 'Whole Tikal Output: ';
+        $output = array_merge($info, $errors, $output);
+        
+        $log = ZfExtended_Factory::get('ZfExtended_Log');
+        /* @var $log ZfExtended_Log */
+        $log->log('Translate5 tikal export on '.$_SERVER['HTTP_HOST'], join("\n", $output));
     }
     
     /**

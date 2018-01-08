@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -49,6 +48,7 @@ class Editor_CronController extends ZfExtended_Controllers_Action {
     public function init() {
         $config = Zend_Registry::get('config');
         if($config->runtimeOptions->cronIP !== $_SERVER['REMOTE_ADDR']) {
+            echo "wrong IP to call cronjobs, must be the configured one.";
             exit;
         }
     }

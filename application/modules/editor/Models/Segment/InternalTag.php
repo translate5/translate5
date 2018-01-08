@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -64,18 +63,18 @@ class editor_Models_Segment_InternalTag {
      * @return mixed 
      */
     public function replace($segment, $replacer, $limit = -1, &$count = null) {
-        if(is_callable($replacer)) {
+        if(!is_string($replacer) && is_callable($replacer)) {
             return preg_replace_callback(self::REGEX_INTERNAL_TAGS, $replacer, $segment, $limit, $count);
         }
         return preg_replace(self::REGEX_INTERNAL_TAGS, $replacer, $segment, $limit, $count);
     }
     
     /**
-     * removes changeMarkup-Tags:
+     * removes TrackChanges-Tags:
      * - DEL => markup-Tag AND content inbetween is removed
      * - INS => markup-Tag ONLY is removed
      */
-    public function removeChangeMarkupTags(string $segment) {
+    public function removeTrackChanges(string $segment) {
     	$segment= preg_replace('/<del[^>]*>.*?<\/del>/i', '', $segment);
     	$segment= preg_replace('/<\/?ins[^>]*>/i', '', $segment);
     	return $segment;
@@ -177,6 +176,75 @@ class editor_Models_Segment_InternalTag {
         }
         return $result;
     }
+    
+    /**
+     * Converts internal tags to xliff2 format
+     * @see editor_Models_Segment_InternalTag::toXliff for details see toXliff
+     * @param string $segment
+     * @param boolean $removeOther
+     * @param array $replaceMap
+     * @param number $newid
+     * @return string|mixed
+     */
+    public function toXliff2(string $segment, $removeOther = true, &$replaceMap = null, &$newid = 1) {
+        //if not external map given, we init it internally, although we don't need it
+        if(is_null($replaceMap)) {
+            $replaceMap = [];
+        }
+        
+        //we can not just loop (with replace) over the internal tags, due id and startRef generation
+        // the problem exists only if a end tag (which needs the start tags id as startRef) comes before his start tag
+        // so we abuse "protect" to mask all tags, loop over the gathered tags, modify the internal stored original tags
+        // and finally we unprotect the tags to restore the replaced ones
+        $segment = $this->protect($segment);
+        $origTags = [];
+        $openTagIds = [];
+        $closeTags = [];
+        //loop over the found internal tags, replace them with the XLIFF2 tags 
+        foreach($this->originalTags as $key => $tag) {
+            //use replace on the single tag to replace the internal tag with the xliff2 tag
+            $this->originalTags[$key] = $this->replace($tag, function($match) use ($key, &$newid, &$origTags, &$openTagIds, &$closeTags){
+                $originalId = $match[3];
+                $type = $match[1];
+                if($type == 'single') {
+                    $result = sprintf('<ph id="%s"/>', $newid++);
+                }
+                elseif($type == 'open') {
+                    $result = sprintf('<sc id="%s"/>', $newid);
+                    //store the open tag id to the original id (latter one is used to map start and close tag)
+                    $openTagIds[$originalId] = $newid++;
+                }
+                else {
+                    $result = sprintf('<ec id="%s" startRef="XXX" />', $newid++);
+                    $closeTags[$key] = $originalId;
+                }
+                $origTags[$key] = $match[0];
+                return $result;
+            });
+        }
+        
+        //loop over the close tags and inject the id of the start tag as startRef attribute
+        foreach($closeTags as $key => $originalId) {
+            if(empty($openTagIds[$originalId])) {
+                //remove optional startRef attribute if no start tag exists
+                $this->originalTags[$key] = str_replace(' startRef="XXX" ', '', $this->originalTags[$key]);
+            }
+            else {
+                $this->originalTags[$key] = str_replace('startRef="XXX"', 'startRef="'.$openTagIds[$originalId].'"', $this->originalTags[$key]);
+            }
+        }
+        
+        //fill replaceMap
+        foreach($this->originalTags as $key => $value) {
+            $replaceMap[$value] = [$value, $origTags[$key]];
+        }
+        
+        $result = $this->unprotect($segment);
+        if($removeOther) {
+            return strip_tags($result, '<cp><cp/><ph><ph/><pc><pc/><sc><sc/><ec><ec/><mrk><mrk/><sm><sm/><em><em/>');
+        }
+        return $result;
+    }
 
     /**
      * converts the given string (mainly the internal tags in the string) into valid xliff tags without content
@@ -195,14 +263,33 @@ class editor_Models_Segment_InternalTag {
         $xml = ZfExtended_Factory::get('editor_Models_Converter_XmlPairer');
         /* @var $xml editor_Models_Converter_XmlPairer */
         
-        //remove all other tags, allow <x> <bx> and <ex> 
+        return $this->pairTags($result, $replaceMap, $xml);
+    }
+    
+    /**
+     * @see self::toXliffPaired
+     * @param string $segment
+     * @param boolean $removeOther
+     * @param array &$replaceMap
+     * @param number &$newid
+     * @return string segment with xliff2 tags
+     */
+    public function toXliff2Paired(string $segment, $removeOther = true, &$replaceMap = null, &$newid = 1) {
+        $result = $this->toXliff2($segment, $removeOther, $replaceMap, $newid);
+        $xml = ZfExtended_Factory::get('editor_Models_Converter_Xliff2Pairer');
+        /* @var $xml editor_Models_Converter_Xliff2Pairer */
+        
+        return $this->pairTags($result, $replaceMap, $xml);
+    }
+    
+    protected function pairTags($result, &$replaceMap, $xml) {
         $pairedContent = $xml->pairTags($result);
         $pairedReplace = $xml->getReplaceList();
         $pairMap = $xml->getPairMap();
         
         foreach($replaceMap as $key => &$replaced) {
             if(!empty($pairedReplace[$key])) {
-                //replace the bx/ex through the g tag in the replace map
+                //replace the bx-ex/sc-ec through the g/pc tag in the replace map
                 $replaced[0] = $pairedReplace[$key];
             }
             if(!empty($pairMap[$key])) {
@@ -222,7 +309,6 @@ class editor_Models_Segment_InternalTag {
      * @param array $map not a a key:value map, but a 2d array, since keys can exist multiple times
      */
     public function reapply2dMap(string $segment, array $map) {
-        $nextTagNr = 1;
         foreach($map as $tupel) {
             $key = $tupel[0];
             $value = $tupel[1];
@@ -231,11 +317,6 @@ class editor_Models_Segment_InternalTag {
             if ($pos !== false) {
                 $segment = mb_substr($segment, 0, $pos).$value.mb_substr($segment, $pos + mb_strlen($key));
             }
-            $nextTagNr++;
-        }
-        while(preg_match('"<x[^>]*>"', $segment)){
-            $segment = preg_replace('"<x[^>]*>"','<div class="single replaceThisTagWhenInsertingInSegment"><span title="<AdditionalTagFromTM/>" class="short">&lt;'.$nextTagNr.'/&gt;</span><span data-originalid="ph" data-filename="irrelevant" class="full">&lt;AdditionalTagFromTM/&gt;</span></div>',$segment,1);
-            $nextTagNr++;
         }
         return trim($segment);
     }
