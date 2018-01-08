@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -66,14 +65,13 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   duplicatedContentTags: [],
   contentEdited: false, //is set to true if text content or content tags were modified
   disableErrorCheck: false,
+  segmentLengthInRange:false,//is segment number of characters in defined range
 
-  valueAndMarkupTempVal:"",
-  
   strings: {
-	  tagOrderErrorText: '#UT# Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
-	  tagMissingText: '#UT# Die nachfolgenden Tags wurden beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Versuchen Sie mit der Rückgängigfunktion STRG-Z die Tags wiederherzustellen. <br /><br />Alternativ können Sie auch die Bearbeitung des Segments durch Klick auf "Abbrechen" (<img src="images/cross.png" /> im rechten Menü) beenden und das Segment neu zur Bearbeitung öffnen.<br /><br />Fehlende Tags:',
-	  tagDuplicatedText: '#UT# Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:',
-	  tagRemovedText: '#UT# Es wurden Tags mit fehlendem Partner entfernt!',
+      tagOrderErrorText: '#UT# Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
+      tagMissingText: '#UT# Die nachfolgenden Tags wurden noch nicht hinzugefügt oder beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Die Tastenkombination<br /><ul><li>STRG + EINFG (alternativ STRG + . (Punkt)) fügt den kompletten Quelltext in den Zieltext ein.</li><li>STRG + , (Komma) + &gt;Nummer&lt; fügt den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10) ein.</li><li>STRG + SHIFT + , (Komma) + &gt;Nummer&lt; fügt die Tags mit den Nummern 11 bis 20 in den Zieltext ein.</li></ul>Fehlende Tags:',
+      tagDuplicatedText: '#UT# Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:',
+      tagRemovedText: '#UT# Es wurden Tags mit fehlendem Partner entfernt!',
       cantEditContents: '#UT#Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.'
   },
   
@@ -112,15 +110,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 	  this.fireEvent('afterinitframedoc', this);
   },
 
-  initEditor:function(){
-      var me=this;
-      if(me.valueAndMarkupTempVal!==""){
-          me.setValue(me.valueAndMarkupTempVal);
-          me.valueAndMarkupTempVal="";
-      }
-      me.callParent(arguments);
-  },
-
   /**
    * Überschreibt die Methode um den Editor Iframe mit eigenem CSS ausstatten
    * @returns string
@@ -157,26 +146,17 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       return false;
   },
   
-    /**
-     * Setzt Daten im HtmlEditor und fügt markup hinzu
-     * @param value String
-     */
-    setValueAndMarkup: function(value, segmentId, fieldName){
-        //check tag is needed for the checkplausibilityofput feature on server side 
-        var me = this,
-            checkTag = me.getDuplicateCheckImg(segmentId, fieldName),
-            iframeBody = me.getEditorBody(),
-            patt = new RegExp(/<body>/g),
-            res = patt.test(iframeBody.parentNode.innerHTML);
-            
-        if(res){
-            me.initFrameDoc();
-            me.valueAndMarkupTempVal=me.markupForEditor(value)+checkTag;
-        }else{
-            me.setValue(me.markupForEditor(value)+checkTag);
-        }
-
-    },
+  /**
+   * Setzt Daten im HtmlEditor und fügt markup hinzu
+   * @param value String
+   */
+  setValueAndMarkup: function(value, segmentId, fieldName){
+      //check tag is needed for the checkplausibilityofput feature on server side 
+      var me = this,
+          checkTag = me.getDuplicateCheckImg(segmentId, fieldName);
+      
+      me.setValue(me.markupForEditor(value)+checkTag);
+  },
   /**
    * Fixing focus issues EXT6UPD-105 and EXT6UPD-137
    */
@@ -206,13 +186,18 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     	result,
     	body = me.getEditorBody();
     me.checkTags(body);
+    me.setSegmentLengthInRange(body.textContent || body.innerText || "");
     result = me.unMarkup(body);
     me.contentEdited = me.plainContent.join('') !== result.replace(/<img[^>]+>/g, '');
     return result;
   },
   /**
-   * ersetzt die div und spans durch images im string 
-   * @private
+   * - replaces div/span to images
+   * - prepares content to be edited
+   * - resets markupImages (tag map for restoring and tag check)
+   * - resets plainContent for checking if plain content was changed
+   * 
+   * @private not for direct usage!
    * @param value {String}
    * @returns {String}
    */
@@ -228,12 +213,26 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     me.plainContent = plainContent; //stores only the text content and content tags for "original content has changed" comparsion
     return result.join('');
   },
-  insertMarkup: function(value) {
+  
+  /**
+   * Inserts the given string (containing div/span internal tags) at the cursor position in the editor
+   * If second parameter is true, the content is not set in the editor, only the internal tags are stored in an internal markup table (for missing tag check for example)
+   * @param {String} value
+   * @param {Boolean} initMarkupMapOnly optional, default false/omitted
+   */
+  insertMarkup: function(value, initMarkupMapOnly) {
       var html = this.markup(value).join(''),
           doc = this.getDoc(),
-          sel, range, frag, node, el, lastNode;
+          sel, range, frag, node, el, lastNode, rangeForNode,
+          termTags, termTageNode, arrLength, i;
+      
+      //if that parameter is true, no html is inserted into the target column
+      if(initMarkupMapOnly) {
+          return;
+      }
+      
       if (!window.getSelection) {
-          //Not supported by your browser message!
+          //FIXME Not supported by your browser message!
           return;
       }
       sel = doc.getSelection();
@@ -245,9 +244,22 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         while ((node = el.firstChild)) {
             lastNode = frag.appendChild(node);
         }
+        // remove term-tag-markup (will be added again after saving where appropriate)
+        termTags = frag.querySelectorAll('span.term');
+        arrLength = termTags.length;
+        for( i=0; i < arrLength; i++ ) {
+            termTageNode = termTags[i];
+            while(termTageNode.firstChild) {
+                termTageNode.parentNode.insertBefore(termTageNode.firstChild,termTageNode);
+            }
+            termTageNode.parentNode.removeChild(termTageNode);
+        }
+        // insert
         range.insertNode(frag);
+        rangeForNode = range.cloneRange();
         range.setStartAfter(lastNode);
         range.setEndAfter(lastNode); 
+        this.fireEvent('afterInsertMarkup', rangeForNode);
       }
   },
   /**
@@ -284,39 +296,17 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         plainContent.push(Ext.htmlEncode(text));
         return;
       }
-      // Keep nodes from TrackChanges, but replace their images
+      // Keep nodes from TrackChanges, but run replaceTagToImage for them as well
       if( (item.tagName.toLowerCase() == 'ins' || item.tagName.toLowerCase() == 'del')  && /(^|[\s])trackchanges([\s]|$)/.test(item.className)){
-          // TrackChange-Node might include images: 
-          // (1) add the special id to the img:
-          // (2) replace the given divs and spans with their image:
-          var allImagesInItem = item.getElementsByTagName('IMG'),
-              allDivsInItem = item.getElementsByTagName('DIV');
-          if (allImagesInItem.length > 0) {
-              for (i = 0; i < allImagesInItem.length; i++) {
-                  var imgItem = allImagesInItem[i];
-                  if (!me.isDuplicateSaveTag(imgItem)) {
-                      var htmlForItemImg = me.imgNodeToString(imgItem, true),
-                      templateEl = document.createElement('template');
-                      templateEl.innerHTML = htmlForItemImg;
-                      item.insertBefore(templateEl.content.firstChild,imgItem);
-                      item.removeChild(imgItem);
-                  }
-              }
-          }
-          if (allDivsInItem.length > 0) {
-              for (i = 0; i < allDivsInItem.length; i++) {
-                  var divItem = allDivsInItem[i],
-                      dataOfItem = me.getData(divItem,data),
-                      htmlForItemImg = me.imageTemplate.apply(dataOfItem);
-                  var templateEl = document.createElement('template');
-                  templateEl.innerHTML = htmlForItemImg;
-                  item.insertBefore(templateEl.content.firstChild,divItem);
-                  item.removeChild(divItem);
-              }
-          }
-          item.innerHTML = item.innerHTML.replace(new RegExp(Editor.TRANSTILDE, "g"), ' ');
-          me.result.push(item.outerHTML);
-          plainContent.push(item.outerHTML);
+          var regExOpening = new RegExp('<\s*'+item.tagName.toLowerCase()+'.*?>'),              // Example: /<\s*ins.*?>/g
+              regExClosing = new RegExp('<\s*\/\s*'+item.tagName.toLowerCase()+'\s*.*?>'),      // Example: /<\s*\/\s*ins\s*.*?>/g
+              openingTag =  item.outerHTML.match(regExOpening)[0],
+              closingTag =  item.outerHTML.match(regExClosing)[0];
+          me.result.push(openingTag);
+          plainContent.push(openingTag);
+          me.replaceTagToImage(item, plainContent);
+          me.result.push(closingTag);
+          plainContent.push(closingTag);
           return;
       }
       if(item.tagName == 'IMG' && !me.isDuplicateSaveTag(item)){
@@ -335,10 +325,13 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         me.result.push('</span>');
         return;
       }
+      //some tags are marked as to be igored in the editor, so we ignore them
+      if(item.tagName == 'DIV' && /(^|[\s])ignoreInEditor([\s]|$)/.test(item.className)){
+          return;
+      }
       if(item.tagName != 'DIV'){
         return;
       }
-      
       data = me.getData(item,data);
       
       me.result.push(me.imageTemplate.apply(data));
@@ -439,22 +432,13 @@ Ext.define('Editor.view.segments.HtmlEditor', {
               // TrackChange-Node might include images => replace the images with their divs and spans:
               var allImagesInItem = item.getElementsByTagName('img');
               if( allImagesInItem.length > 0) {
-                  for (i = 0; i < allImagesInItem.length; i++) {
+                  for (var i=allImagesInItem.length; i--; ) { // backwards because we might remove items
                       var imgItem = allImagesInItem[i],
-                          imgHtml = '';
-                      if(me.isDuplicateSaveTag(imgItem)){
-                          debugger;
-                      }
-                      else if (markupImage = me.getMarkupImage(imgItem.id)){
-                          imgHtml = markupImage.html;
-                      } 
-                      else if(/^qm-image-/.test(imgItem.id)){
-                          imgHtml= me.imgNodeToString(imgItem, false);
-                      }
+                          imgHtml = me.unmarkImage(imgItem);
                       if (imgHtml != '') {
-                          var template = document.createElement('template');
-                          template.innerHTML = imgHtml;
-                          imgItem.parentNode.insertBefore(template.content.firstChild,imgItem);
+                          var tempDiv = document.createElement('div');
+                          tempDiv.innerHTML = imgHtml;
+                          imgItem.parentNode.insertBefore(tempDiv.firstChild,imgItem);
                           imgItem.parentNode.removeChild(imgItem);
                       }
                   }
@@ -470,16 +454,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
               return;
           }
           if(item.tagName == 'IMG'){
-              if(me.isDuplicateSaveTag(item)){
-                  img = Ext.fly(item);
-                  result.push(me.getDuplicateCheckImg(img.getAttribute('data-segmentid'), img.getAttribute('data-fieldname')));
-              }
-              else if(markupImage = me.getMarkupImage(item.id)){
-                  result.push(markupImage.html);
-              }
-              else if(/^qm-image-/.test(item.id)){
-                  result.push(me.imgNodeToString(item, false));
-              }
+              result.push(me.unmarkImage(item));
               return;
           }
           if(item.hasChildNodes()){
@@ -489,6 +464,19 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           result.push(item.textContent || item.innerText);
       });
       return result.join('');
+  },
+  unmarkImage: function(item) {
+      var me = this;
+      if(me.isDuplicateSaveTag(item)){
+          img = Ext.fly(item);
+          return me.getDuplicateCheckImg(img.getAttribute('data-segmentid'), img.getAttribute('data-fieldname'));
+      }
+      else if(markupImage = me.getMarkupImage(item.id)){
+          return markupImage.html;
+      }
+      else if(/^qm-image-/.test(item.id)){
+          return me.imgNodeToString(item, false);
+      }
   },
   /**
    * generates a img tag string
@@ -553,8 +541,16 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           return true;
       }
 
+      //if the segment characters length is not in the defined range, add the message
+      if(!me.segmentLengthInRange) {
+          //fire the event, and get the message from the segmentminmaxlength component
+          me.fireEvent('contentErrors', me, me.getSegmentMinMaxLength().activeErroMessage);
+          return true;
+      }
+      
       if(me.missingContentTags.length > 0 || me.duplicatedContentTags.length > 0){
           var msg = '', 
+              //first item the field to check, second item: the error text:
               todo = [['missingContentTags', 'tagMissingText'],['duplicatedContentTags','tagDuplicatedText']];
           for(var i = 0;i<todo.length;i++) {
               if(me[todo[i][0]].length > 0) {
@@ -598,6 +594,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           foundIds = [];
       me.missingContentTags = [];
       me.duplicatedContentTags = [];
+      
+      //FIXME ignore deleted tags!
       Ext.each(nodelist, function(img) {
           if(Ext.Array.contains(foundIds, img.id)) {
               me.duplicatedContentTags.push(me.markupImages[img.id.replace(new RegExp('^'+me.idPrefix), '')]);
@@ -828,5 +826,29 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           dir = isRtl ? 'rtl' : 'ltr';
       body.set({"dir": dir});
       body.setStyle('direction', dir);
+  },
+  
+  /***
+   * Set the internal flag segmentLengthInRange based on if the currently edited segment number of characters is within the defined range.
+   */
+  setSegmentLengthInRange:function(bodyText){
+      var me=this,
+          minMaxLength=me.getSegmentMinMaxLength();
+      //check if the the min/max length is supplied
+      if(minMaxLength){
+          me.segmentLengthInRange=minMaxLength.isSegmentLengthInRange(bodyText);
+          return;
+      }
+      me.segmentLengthInRange=true;
+  },
+  
+  /***
+   * Return segmentMinMaxLength component instance
+   */
+  getSegmentMinMaxLength:function(){
+      var me=this,
+          minMaxLength=Ext.ComponentQuery.query('#segmentMinMaxLength');
+      return minMaxLength.length>0 ? minMaxLength[0] : null;
   }
+  
 });

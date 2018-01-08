@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -87,6 +86,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                       store: '{users}'
                   },
                   forceSelection: true,
+                  anyMatch: true,
                   queryMode: 'local',
                   name: 'userGuid',
                   displayField: 'longUserName',
@@ -157,7 +157,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
       Ext.Object.each(metaData.states, function(key, state) {
           states.push({id: key, text: state});
       });
-      Ext.Object.each(metaData.roles, function(key, role) {
+      Ext.Object.each(metaData.editableRoles, function(key, role) {
           roles.push({id: key, text: role});
       });
       vm.set('statesData', states);

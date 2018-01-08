@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -33,7 +32,8 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
     requires: [
                'Editor.view.admin.task.PreferencesWindowViewModel',
                'Editor.view.admin.task.UserAssoc',
-               'Editor.view.admin.task.Preferences'
+               'Editor.view.admin.task.Preferences',
+               'Editor.view.admin.task.TaskAttributes'
                ],
     itemId: 'adminTaskPreferencesWindow',
     title: '#UT#Einstellungen zu Aufgabe "{0}"',
@@ -63,11 +63,22 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                 xtype: 'adminTaskUserAssoc'
             });
         }
-        if(auth.isAllowed('editorUserPrefsTask')) {
+        if(auth.isAllowed('editorWorkflowPrefsTask')) {
             tabs.push({
                 xtype: 'editorAdminTaskPreferences'
             });
         }
+
+        if(auth.isAllowed('editorEditTaskRealDeliveryDate') || 
+            auth.isAllowed('editorEditTaskOrderDate') || 
+            auth.isAllowed('editorEditTaskPm') || 
+            auth.isAllowed('editorEditTaskDeliveryDate') ||
+            auth.isAllowed('editorEditTaskTaskName')){
+            tabs.push({
+                xtype: 'taskattributes'
+            });
+        }
+        
         config = {
             height: Math.min(800, parseInt(Ext.getBody().getViewSize().height * 0.8)),
             width: 1000,

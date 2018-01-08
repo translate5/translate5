@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -63,6 +62,7 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         //add the status strip component to the row editor
         me.mainEditor.add({
             xtype:'segments.statusstrip',
+            htmlEditor: me.mainEditor
         });
     },
     
@@ -335,6 +335,11 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         
         me.setColumnToEdit(me.context.column);
         me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit), record.get('id'), me.columnToEdit);
+        
+        //init internal markup table for tag check, but only if a translation task
+        if(Editor.data.task.get('emptyTargets')) {
+            me.mainEditor.insertMarkup(record.get('source'), true);
+        }
     },
     
     /**
@@ -349,6 +354,8 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
             //und verhindert so, dass der Record nicht als modified markiert wird, wenn am Inhalt eigentlich nichts verändert wurde
             //newValue = Ext.String.trim(me.mainEditor.getValueAndUnMarkup()).replace(/\u200B/g, '');
             newValue = me.mainEditor.getValueAndUnMarkup().replace(/\u200B/g, ''),
+            cleanValue = newValue.replace(/<img[^>]* class="duplicatesavecheck"[^>]*>/,''),
+            
             title, msg;
             
         //check, if the context delivers really the correct record, because through some issues in reallive data 
@@ -365,7 +372,7 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
             return false;
         }
         
-        if(newValue.length == 0 && record.get(me.columnToEdit).length > 0) {
+        if(cleanValue.length == 0 && record.get(me.columnToEdit).length > 0) {
             Editor.MessageBox.addError(me.messages.cantSaveEmptySegment);
             return false;
         }

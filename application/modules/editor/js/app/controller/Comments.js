@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -151,6 +150,7 @@ Ext.define('Editor.controller.Comments', {
             ed = me.getEditPlugin(),
             add = ev.getTarget('img.add'),
             edit = ev.getTarget('img.edit'),
+            readOnlyMode = view.lookupViewModel().get('editorIsReadonly'),
             mpController = Editor.app.getController('MetaPanel');
         me.record = null;
         
@@ -165,7 +165,7 @@ Ext.define('Editor.controller.Comments', {
         }
         
         if(add || edit) {
-            if(rec.get('editable')) {
+            if(rec.get('editable') && !readOnlyMode) {
                 ed.startEdit(rec, view.getHeaderAtIndex(0));
             }
             else {
@@ -185,10 +185,12 @@ Ext.define('Editor.controller.Comments', {
      */
     handleCommentsColumnDblClick: function (view, rec, tr, idx, ev) {
         var me = this,
+            readOnlyMode = view.lookupViewModel().get('editorIsReadonly'),
+            isEditable = (rec.get('editable') && !readOnlyMode);
             isCommentsCol = ev.getTarget('td.comments-field'),
             isForced = me.isEnabledForLocked();
         
-        if(rec.get('editable') || !isCommentsCol || !isForced) {
+        if(isEditable || !isCommentsCol || !isForced) {
             return;
         }
         me.record = rec;

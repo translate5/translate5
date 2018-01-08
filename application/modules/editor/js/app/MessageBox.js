@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -88,7 +87,12 @@ Ext.define('Editor.MessageBox',{
         }
         Ext.Array.each(json.errors, function(error){
             if(error.data) {
-                error.msg = error.msg += Editor.MessageBox.dataTable(error.data);
+                if(Ext.isString(error.data)) {
+                    error.msg = Ext.String.format(error.msg, error.data);
+                }
+                else {
+                    error.msg = error.msg += Editor.MessageBox.dataTable(error.data);
+                }
             }
             Editor.MessageBox.getInstance().addMessage(error.msg, error.type || Editor.MessageBox.INFO);
         });

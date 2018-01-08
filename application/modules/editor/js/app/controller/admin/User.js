@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -261,6 +260,7 @@ Ext.define('Editor.controller.admin.User', {
       if(!basic.isValid()) {
           return;
       }
+
       //if in first save attempt we got an error from server, 
       //and we then disable the password in the second save, 
       //the password will be kept in the model, so reject it here
@@ -326,6 +326,7 @@ Ext.define('Editor.controller.admin.User', {
   getNewUser: function() {
       return Ext.create('Editor.model.admin.User',{
           surName: '',
+          locale:Editor.data.locale,
           firstName: '',
           email: '',
           login: '',
@@ -346,5 +347,5 @@ Ext.define('Editor.controller.admin.User', {
    */
   handleUserReload: function () {
       this.getAdminUsersStore().load();
-  }
+  },
 });

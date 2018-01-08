@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -101,6 +100,7 @@ Ext.application({
       Ext.Ajax.setDefaultHeaders({
           'Accept': 'application/json'
       });
+      this.applyDefaultState();
       this.callParent(arguments);
   },
   launch : function() {
@@ -229,6 +229,89 @@ Ext.application({
       initial = me.viewport.down(me.viewport.getInitialView());
       initial.fireEvent('show', initial);
   },
+
+  /**
+   * Apply the state for each configured grid in the defaultState config variable
+   */
+  applyDefaultState:function(){
+    if(!Editor.data.frontend || !Editor.data.frontend.defaultState){
+      return;
+    }
+    var me=this,
+        states=Ext.clone(Editor.data.frontend.defaultState),
+        gridState={};
+
+    //loop over all states(states for grids), and create config object which will be applied on the component 
+    //when afterrender event is triggered
+    for (var selector in states) {
+        var configObjects = Ext.clone(states[selector]);    
+        gridState[selector]={
+            afterrender:{
+                fn:me.defaultStateHandler,
+                options:{
+                    //set lowes priority
+                    priority:-999,
+                    args:{
+                        selector:selector
+                    }
+                }   
+            }
+        };
+    }
+    me.control(gridState);
+  },
+
+  /***
+   * State handler for the controll (controls and control configs are defined in the Editor.data.frontend.defaultState variable)
+   */
+  defaultStateHandler:function(component,eOpts){
+
+        //get the config object for the current component from the configuration variable
+        var configObject=this.getDefaultStateConfigObject(eOpts.options.args.selector);
+        //apply the configuration object to the component
+        component.applyState(configObject);
+        //FIXME: Extjs bug, the header is still visible after apply state
+        //https://www.sencha.com/forum/showthread.php?306941-Apply-state-after-grid-reconfigure
+        // workaround: rehide hidden columns
+        Ext.suspendLayouts();
+        Ext.Array.forEach(component.getColumns(), function (column) {
+            if (column.hidden) {
+                column.show();
+                column.hide();
+            }
+        });
+        Ext.resumeLayouts(true);
+  },
+
+  /***
+   * Return the configuration object from the defaultState config variable.
+   * The returned value needs to be cloned because the values are modefyed by the framework 
+   */
+  getDefaultStateConfigObject:function(selector){
+      return Ext.clone(Editor.data.frontend.defaultState[selector]);
+  },
+  
+  /***
+   * Output in the console the state
+   * (see the example: http://confluence.translate5.net/display/CON/Column+configuration+for+task+overview+and+user+management ) 
+   * for all rendered grids in the application
+   */
+  getGridState:function(){
+      var grids=Ext.ComponentQuery.query('grid');
+      if(grids.length<1){
+          console.log("No grids were found (rendered in the application).")
+          return;
+      }
+      var gridState=null,
+          gridStateContainer=[];
+      grids.forEach(function(grid) {
+          gridState=grid.getState();
+          gridStateContainer.push('"#'+grid.getItemId()+'":'+JSON.stringify(gridState))
+      });
+      
+      console.log('{'+gridStateContainer.join()+'}');
+  },
+  
   mask: function(msg, title) {
       if(!this.appMask) {
           this.appMask = Ext.widget('messagebox');

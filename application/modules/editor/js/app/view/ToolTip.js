@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -44,10 +43,12 @@ Ext.define('Editor.view.ToolTip', {
     //enable own ToolTips only for the following img classes 
     delegate : '.ownttip', // accepts only simple selectors (no commas) so
     // define a own tooltip class
+    cls : 't5ttip',
     renderTo : Ext.getBody(),
     strings: {
         deletedby: '#UT#Deleted by',
         insertedby: '#UT#Inserted by',
+        history: '#UT#HISTORY',
         severity: '#UT#Gewichtung'
     },
     userStore: null,
@@ -66,6 +67,10 @@ Ext.define('Editor.view.ToolTip', {
         }
     },
 
+    constructor: function() {
+        this.renderTo = Ext.getBody();
+        this.callParent(arguments);
+    },
     onTargetOver: function(e) {
         e.preventDefault(); //prevent title tags to be shown in IE
         this.callParent(arguments);
@@ -135,31 +140,55 @@ Ext.define('Editor.view.ToolTip', {
     },
     getTrackChangesData: function(node) {
         var me = this,
+            trackChanges = Editor.plugins.TrackChanges.controller.Editor,
+            attrnameUsername = trackChanges.ATTRIBUTE_USERNAME,
+            attrnameTimestamp = trackChanges.ATTRIBUTE_TIMESTAMP,
+            attrnameHistorylist = trackChanges.ATTRIBUTE_HISTORYLIST,
+            attrnameHistoryActionPrefix = trackChanges.ATTRIBUTE_ACTION + trackChanges.ATTRIBUTE_HISTORY_SUFFIX,
+            attrnameHistoryUsernamePrefix = trackChanges.ATTRIBUTE_USERNAME + trackChanges.ATTRIBUTE_HISTORY_SUFFIX,
             attrUserName,
             attrTimestamp,
             nodeAction = '',
             nodeUser = '',
-            nodeDate = '';
+            nodeDate = '',
+            nodeHistory = '';
         // What has been done (INS/DEL)?
-        if (node.nodeName.toLowerCase() == 'ins') {
+        if (node.nodeName.toLowerCase() == trackChanges.NODE_NAME_INS) {
             nodeAction = me.strings.insertedby;
-        } else if (node.nodeName.toLowerCase() == 'del') {
+        } else if (node.nodeName.toLowerCase() == trackChanges.NODE_NAME_DEL) {
             nodeAction = me.strings.deletedby;
         } else {
             return;
         }
         // Who has done it?
-        if (node.hasAttribute('data-username')) {
-            attrUserName = node.getAttribute('data-username');
+        if (node.hasAttribute(attrnameUsername)) {
+            attrUserName = node.getAttribute(attrnameUsername);
             nodeUser = attrUserName; // can be used just as it is
         }
         // When?
-        if (node.hasAttribute('data-timestamp')) {
-            attrTimestamp = parseInt(node.getAttribute('data-timestamp'));
+        if (node.hasAttribute(attrnameTimestamp)) {
+            attrTimestamp = parseInt(node.getAttribute(attrnameTimestamp));
             nodeDate = Ext.Date.format(new Date(attrTimestamp),'Y-m-d H:i');
         }
-        // For Tooltip:
-        return '<b>'+nodeAction+'</b><br>'+nodeUser+'<br>'+nodeDate+'<br>';
+        // History
+        if (node.hasAttribute(attrnameHistorylist)) {
+            nodeHistory += '<hr><b>'+me.strings.history+':</b><hr>';
+            var historyItems = node.getAttribute(attrnameHistorylist).split(",");
+            for(var i=0, len=historyItems.length; i < len; i++){
+                var historyItemTimestamp = historyItems[i],
+                    historyItemAction = node.getAttribute(attrnameHistoryActionPrefix + historyItemTimestamp),
+                    historyItemUser   = node.getAttribute(attrnameHistoryUsernamePrefix + historyItemTimestamp),
+                    historyItemDate   = Ext.Date.format(new Date(parseInt(historyItemTimestamp)),'Y-m-d H:i');
+                if (historyItemAction.toLowerCase() == trackChanges.NODE_NAME_INS) {
+                    historyItemAction = me.strings.insertedby;
+                } else if (historyItemAction.toLowerCase() == trackChanges.NODE_NAME_DEL) {
+                    historyItemAction = me.strings.deletedby;
+                }
+                nodeHistory += '<b>'+historyItemAction+'</b><br>'+historyItemUser+'<br>'+historyItemDate+'<hr>';
+            }
+        }
+        // => For Tooltip:
+        return '<b>'+nodeAction+'</b><br>'+nodeUser+'<br>'+nodeDate+'<br>'+ nodeHistory;
     },
     
     /**

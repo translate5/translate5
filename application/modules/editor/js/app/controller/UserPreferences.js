@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -46,16 +45,13 @@ Ext.define('Editor.controller.UserPreferences', {
     },
     window: null,
     refs:[{
-        ref : 'topMenu',
-        selector : 'headPanel #top-menu'
-    },{
         ref : 'form',
         selector : '#preferencesUserWindow form'
     }],
     init : function() {
         var me = this;
         me.control({
-            'headPanel': {
+            'headPanel toolbar#top-menu': {
                 afterrender: me.handleRenderHeadPanel
             },
             '#preferencesUserWindow #saveBtn': {
@@ -69,9 +65,9 @@ Ext.define('Editor.controller.UserPreferences', {
             }
         });
     },
-    handleRenderHeadPanel: function() {
-        var pos = this.getTopMenu().items.length - 1;
-        this.getTopMenu().insert(pos, {
+    handleRenderHeadPanel: function(topmenu) {
+        var pos = topmenu.items.length - 1;
+        topmenu.insert(pos, {
             xtype: 'button',
             itemId: 'mySettingsBtn',
             text: this.strings.settings

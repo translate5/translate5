@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -114,6 +113,7 @@ Ext.define('Editor.controller.Editor', {
         });
         
         //set the default config
+        //(when editing this, pls also check eventIsTranslate5() in Editor.plugins.TrackChanges.controller.Editor) 
         me.keyMapConfig = {
             'ctrl-d':         ["D",{ctrl: true, alt: false}, me.watchSegment, true],
             'ctrl-s':         ["S",{ctrl: true, alt: false}, me.save, true],
@@ -138,6 +138,26 @@ Ext.define('Editor.controller.Editor', {
             'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
             'ctrl-insert':    [Ext.EventObjectImpl.INSERT,{ctrl: true, alt: false}, me.copySourceToTarget],
             'ctrl-dot':       [190,{ctrl: true, alt: false}, me.copySourceToTarget] //Mac Alternative key code
+        };
+        
+        //FIXME let me come from the server out of AutoStates.php
+        Editor.data.segments.autoStates = {
+            'TRANSLATED': 0,
+            'REVIEWED': 1,
+            'REVIEWED_AUTO': 2,
+            'BLOCKED': 3,
+            'NOT_TRANSLATED': 4,
+            'REVIEWED_UNTOUCHED': 5,
+            'REVIEWED_UNCHANGED': 6,
+            'REVIEWED_UNCHANGED_AUTO': 7,
+            'REVIEWED_TRANSLATOR': 8,
+            'REVIEWED_TRANSLATOR_AUTO': 9,
+            'REVIEWED_PM': 10,
+            'REVIEWED_PM_AUTO': 11,
+            'REVIEWED_PM_UNCHANGED': 12,
+            'REVIEWED_PM_UNCHANGED_AUTO': 13,
+            'TRANSLATED_AUTO': 14,
+            'PENDING': 999
         };
     },
     /**
@@ -439,6 +459,7 @@ Ext.define('Editor.controller.Editor', {
         me.prevNextSegment.reset();
 
         if(me.isEditing &&rec && rec.get('editable')) {
+            me.fireEvent('prepareTrackChangesForSaving');
             me.fireEvent('saveUnsavedComments');
             me.fireEvent('saveSegment');
         }
@@ -568,6 +589,7 @@ Ext.define('Editor.controller.Editor', {
         if(!me.isEditing) {
             return;
         }
+        me.fireEvent('prepareTrackChangesForSaving');
         me.fireEvent('saveUnsavedComments');
         
         me.fireEvent('saveSegment', {
@@ -637,16 +659,21 @@ Ext.define('Editor.controller.Editor', {
         
         msgBox = Ext.create('Ext.window.MessageBox', {
             buttonText:{
+                ok: me.messages.correctErrorsText,
                 yes: me.messages.correctErrorsText,
                 no: me.messages.saveAnyway
             }
         });
-        msgBox.confirm(me.messages.errorTitle, msg, function(btn) {
-            if(btn == 'yes') {
-                return;
-            }
-            me.saveAndIgnoreContentErrors();
-        },me);
+        if(Editor.data.segments.userCanIgnoreTagValidation) {
+            msgBox.confirm(me.messages.errorTitle, msg, function(btn) {
+                if(btn == 'no') {
+                    me.saveAndIgnoreContentErrors();
+                }
+            },me);
+        }
+        else {
+            msgBox.alert(me.messages.errorTitle, msg);
+        }
     },
     /**
      * triggers the save chain but ignoring htmleditor content errors then
@@ -1034,5 +1061,4 @@ Ext.define('Editor.controller.Editor', {
         filePanel.expand();
         filePanel.down('referenceFileTree').expand();
     }
-  
 });

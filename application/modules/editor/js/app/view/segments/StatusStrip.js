@@ -15,14 +15,13 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -35,50 +34,70 @@ Ext.define('Editor.view.segments.StatusStrip', {
     controller: 'segmentstatusstrip',
     requires:[
         'Editor.view.segments.StatusStripViewController',
+        'Editor.view.segments.MinMaxLength'
     ],
     framed: false,
     style: 'background: #e4edf4;',
-    layout:'hbox',
+    layout:"column",
+
+    defaults: {
+        margin: '0 5 0 5' //top right bottom left (clockwise) margins of each item/column,
+    },
+
+    /***
+     * Flag if there is a visible item in the status strip
+     */
+    isChildVisible:false,
+
+    /***
+     * Html editor instance
+     * @cfg {Editor.view.segments.HtmlEditor} htmlEditor
+     */
+    htmlEditor:null,
+
+    initConfig : function(instanceConfig) {
+        var me = this,
+            config = {
+            };
+        //add the minmaxlength component if the config is provided
+        if(Editor.data.segments.enableCountSegmentLength){
+            config.items=[{
+                    xtype:'segment.minmaxlength',
+                    htmlEditor:instanceConfig.htmlEditor
+                }];
+        }
+
+        if (instanceConfig) {
+            me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
+    },
 
     /***
      * For each child element in the status strip, set the record instance
      */
-    setItemsRecord:function(record){
-        var me=this,
-            items=null;
-        if(me.items && me.items.items.length<1){
-            return;
-        }
-        items=me.items.items;
-        
-        for (var index = 0; index < items.length; index++) {
-            var element = items[index];
-            if(element.handleElementVisible){
-                element.handleElementVisible(record);
+    setRecordAndVisible:function(record){
+        var me=this;
+        me.isChildVisible=false;
+        me.items.each(function(item){
+            //check if the element needs to be visible, if no visibility handler is defined
+            //hide the component
+            if(item.handleElementVisible && item.handleElementVisible(record)){
+                item.setVisible(true);
+                //update the component (add css, tooltips, etc..), 
+                me.isChildVisible=true;
+            }else{
+                item.setVisible(false);
             }
-        }
+            item.setSegmentRecord && item.setSegmentRecord(record);
+        });  
     },
 
     /***
-     * Check if there is visible child element in the status strip
+     * Flag if there is a visible item in the status strip
      */
     isItemVisible:function(){
-        var me = this;
-        if(!me.items || me.items.items.length < 1){
-            return false;
-        }
-
-        var items=me.items.items;
-        
-        for (var index = 0; index < items.length; index++) {
-            var element = items[index];
-            if(element.isVisible()){
-                return true;
-                break;
-            }
-        }
-
-        return false;
+        return this.isChildVisible;
     }
 
 });

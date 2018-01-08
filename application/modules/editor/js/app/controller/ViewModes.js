@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -277,15 +276,16 @@ Ext.define('Editor.controller.ViewModes', {
      */
     ergonomicMode: function(readonly) {
         var me = this,
-            grid = me.getSegmentGrid();
+            grid = me.getSegmentGrid(),
+            wasAlreadyErgo = me.isErgonomicMode(),
             contentColumns = grid.hasRelaisColumn ? 3 : 2;
 
         readonly = me.setReadonly(readonly);
+        
         me.getViewModeMenu().hideMenu();
         me.getShortTagBtn().toggle(true);
-
-        //ergo only
-        me.setVisibleElements();
+        
+        wasAlreadyErgo || me.setVisibleElements();
 
         //ergo only
         //collapse only if the panel is visible
@@ -328,20 +328,21 @@ Ext.define('Editor.controller.ViewModes', {
             }
         },me);
         //inject css to the head to manipulate the column css, because it is easier than to set inject ergomic class for each column in the dom
+        Ext.util.CSS.removeStyleSheet(me.self.STYLE_BOX_ID); //delete if already exists!
         Ext.util.CSS.createStyleSheet('#segment-grid .x-grid-row .x-grid-cell .x-grid-cell-inner { width: '+me.colWidth+'px; }',me.self.STYLE_BOX_ID);
         
         //ergoOnly, others remove cls
-        grid.addCls(me.self.MODE_ERGONOMIC);
+        wasAlreadyErgo || grid.addCls(me.self.MODE_ERGONOMIC);
 
         //ergoOnly others, with other mode
-        me.setViewMode(me.self.MODE_ERGONOMIC);
+        wasAlreadyErgo || me.setViewMode(me.self.MODE_ERGONOMIC);
 
         grid.view.refresh();
         me.toggleEditorErgonomicMode();
         me.saveAlreadyOpened();
 
 
-        me.fireEvent('viewModeChanged',me);
+        wasAlreadyErgo || me.fireEvent('viewModeChanged',me);
     },
     /**
      * sets and removes the ergonomic view for the editor
