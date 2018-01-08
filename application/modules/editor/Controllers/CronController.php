@@ -48,6 +48,7 @@ class Editor_CronController extends ZfExtended_Controllers_Action {
     public function init() {
         $config = Zend_Registry::get('config');
         if($config->runtimeOptions->cronIP !== $_SERVER['REMOTE_ADDR']) {
+            echo "wrong IP to call cronjobs, must be the configured one.";
             exit;
         }
     }
