@@ -14,8 +14,9 @@
 --  http://www.gnu.org/licenses/agpl.html
 --   
 --  There is a plugin exception available for use with this release of translate5 for
---  translate5: Please see http://www.translate5.net/plugin-exception.txt or 
---  plugin-exception.txt in the root folder of translate5.
+--  translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
+--  Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
+--  folder of translate5.
 --   
 --  @copyright  Marc Mittag, MittagQI - Quality Informatics
 --  @author     MittagQI - Quality Informatics
@@ -25,4 +26,8 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-ALTER TABLE `Zf_users` CHANGE `locale` `locale` VARCHAR(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT 'en';
+UPDATE `Zf_acl_rules` SET `resource` = 'backend', `right` = 'editAllTasks' 
+WHERE `resource` = 'editAllTasks' and `right` = 'all';
+
+UPDATE `Zf_acl_rules` SET `resource` = 'backend', `right` = 'loadAllTasks' 
+WHERE `resource` = 'loadAllTasks' and `right` = 'all';

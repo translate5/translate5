@@ -92,6 +92,7 @@ class editor_Models_Segment_TermTag {
         else {
             $replacer = $startTagReplacer;
         }
+        
         $segment = preg_replace_callback(self::REGEX_TERM_TAG_START, $replacer, $segment);
         $segment = str_replace(self::STRING_TERM_TAG_END, $endTagReplacer, $segment);
         if($preserveInternal) {

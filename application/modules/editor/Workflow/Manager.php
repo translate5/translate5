@@ -35,7 +35,13 @@ class editor_Workflow_Manager {
      * a list with all available workflow classes
      * @var array
      */
-    protected $workflowList;
+    protected static $workflowList;
+    
+    /**
+     * Caches the workflow instance to taskGuids
+     * @var array
+     */
+    protected static $workflowTaskCache = [];
     
     /**
      */
@@ -43,12 +49,21 @@ class editor_Workflow_Manager {
         $config = Zend_Registry::get('config');
         if(empty($config->runtimeOptions->workflows)) {
             //setting the default workflow if nothing is configured
-            $this->workflowList[editor_Workflow_Default::WORKFLOW_ID] = 'editor_Workflow_Default';
+            $this->addWorkflow('editor_Workflow_Default');
             return;
         }
         foreach($config->runtimeOptions->workflows as $wf) {
-            $this->workflowList[constant($wf.'::WORKFLOW_ID')] = $wf;
+            $this->addWorkflow($wf);
         }
+    }
+    
+    /**
+     * New Workflow Classes can be added to the internal list
+     * @param string $wfId
+     * @param string $workflowClass
+     */
+    public function addWorkflow($workflowClass) {
+        self::$workflowList[constant($workflowClass.'::WORKFLOW_ID')] = $workflowClass;
     }
     
     /**
@@ -56,7 +71,7 @@ class editor_Workflow_Manager {
      * @return string
      */
     public function getIdToClass($className) {
-        $flipped = array_flip($this->workflowList);
+        $flipped = array_flip(self::$workflowList);
         if(empty($flipped[$className])) {
             throw new ZfExtended_Exception('Workflow to class "'.$className.'" not found!');
         }
@@ -69,10 +84,10 @@ class editor_Workflow_Manager {
      * @return editor_Workflow_Abstract
      */
     public function get($wfId) {
-        if(empty($this->workflowList[$wfId])) {
+        if(empty(self::$workflowList[$wfId])) {
             throw new ZfExtended_Exception('Workflow with ID "'.$wfId.'" not found!');
         }
-        return ZfExtended_Factory::get($this->workflowList[$wfId]);
+        return ZfExtended_Factory::get(self::$workflowList[$wfId]);
     }
     
     /**
@@ -102,7 +117,7 @@ class editor_Workflow_Manager {
      * @return array
      */
     public function getWorkflows() {
-        return $this->workflowList;
+        return self::$workflowList;
     }
 
     /**
@@ -124,7 +139,7 @@ class editor_Workflow_Manager {
             }
             return array_combine($data, $usedLabels);
         };
-        foreach($this->workflowList as $id => $cls) {
+        foreach(self::$workflowList as $id => $cls) {
             $wf = ZfExtended_Factory::get($cls);
             /* @var $wf editor_Workflow_Abstract */
             $labels = $wf->getLabels();
@@ -134,6 +149,9 @@ class editor_Workflow_Manager {
             $data->anonymousFieldLabel = false; //FIXME true | false, comes from app.ini not from wf class
             
             $data->roles = $labelize($wf->getRoles(), $cls);
+            
+            $data->editableRoles = $labelize($wf->getAddableRoles(), $cls);
+            
             $allStates = $wf->getStates();
             $pendingStates = $wf->getPendingStates();
             //the returned states are the states without the pending ones
@@ -150,17 +168,25 @@ class editor_Workflow_Manager {
     }
     
     /**
-     * returns the workflow for the current "active" task, if nothing loaded take config.import.taskWorkflow as default 
+     * returns the workflow for the given taskGuid, if no taskGuid given take config.import.taskWorkflow as default
+     * @param $taskGuid
+     * @return editor_Workflow_Abstract
      */
-    public function getActive() {
-        if(!empty($session->taskWorkflow)) {
-            return $this->get($session->taskWorkflow);
+    public function getActive($taskGuid = null) {
+        if(empty($taskGuid)) {
+            $config = Zend_Registry::get('config');
+            if(empty($config->runtimeOptions->import->taskWorkflow)) {
+                return null;
+            }
+            return $this->get($this->getIdToClass($config->runtimeOptions->import->taskWorkflow));
         }
-        $config = Zend_Registry::get('config');
-        if(empty($config->runtimeOptions->import->taskWorkflow)) {
-            return null;
+        if(!empty(self::$workflowTaskCache[$taskGuid])) {
+            return self::$workflowTaskCache[$taskGuid];
         }
-        return $this->get($this->getIdToClass($config->runtimeOptions->import->taskWorkflow));
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        return self::$workflowTaskCache[$taskGuid] = $this->get($task->getWorkflow());
     }
     
     /**
@@ -178,7 +204,7 @@ class editor_Workflow_Manager {
             return $row->name;
         },$sfm->getFieldList());
         
-        foreach($this->workflowList as $key => $className) {
+        foreach(self::$workflowList as $key => $className) {
             $userPref = ZfExtended_Factory::get('editor_Models_Workflow_Userpref');
             /* @var $userPref editor_Models_Workflow_Userpref */
             $userPref->setWorkflow($key);

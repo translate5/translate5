@@ -33,29 +33,34 @@ END LICENSE AND COPYRIGHT
  *
  */
 
-$session = new Zend_Session_Namespace();
+$this->render('general.phtml');
+
+$params = [        
+        'header' => $this->header,
+        'footer' => $this->footer,
+        'role' => $this->translate->_($this->role),
+        'proofreadersFragment' => '',
+];
 
 $this->subject = $this->translate->_('Translate5 - Aufgabe zugewiesen').' "'.$this->task->getTaskNr().' - '.$this->task->getTaskName().'"';
-$portal = $session->runtimeOptions->server->protocol.$session->runtimeOptions->server->name;
-$portal = '<a href="'.$portal.'">'.$portal.'</a>';
 
-$mailBody = sprintf($this->translate->_('%1$s %2$s,<br />
-<br />
-Im Projektportal %3$s wurde Ihnen die Aufgabe <b>%4$s - %5$s</b> zugewiesen.<br />
-<br />
-<br />Vielen Dank und viele Grüße,
-<br />Ihr Projektmanagement Team
-<br />%6$s
-<br />
-<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!'),
-    $this->mailEmployeeSalutation(),
-    $this->user['surName'],
-    $portal,
-    $this->task->getTaskNr(),
-    $this->task->getTaskName(),
-    $session->runtimeOptions->companyName
-);
 
-$this->textbody = strip_tags($mailBody);
-echo $mailBody;
+$template = '{header}
+
+Im Projektportal {portalLink} wurde Ihnen eine Aufgabe zugewiesen.<br />
+<br />
+<b>Rolle:</b> {role}<br/>
+{taskFragment}{proofreadersFragment}{footer}';
+
+
+if(!empty($this->associatedUsers)) {
+    $params['proofreadersFragment'] = $this->htmlOnly;
+}
+$this->textbody = strip_tags($this->templateApply($template, $params));
+
+if(!empty($this->associatedUsers)) {
+    $params['proofreadersFragment'] = $this->translate->_("\n<br/>".'<b>Alle der Aufgabe zugeordneten Benutzer:</b>'."\n<br/>");
+    $params['proofreadersFragment'] .= $this->workflowNotifyMail()->renderUserList($this->associatedUsers);
+}
+echo $this->templateApply($template, $params);
 

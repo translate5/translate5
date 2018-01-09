@@ -43,7 +43,8 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Languages extends ZfExtended_Languages {
 	protected $dbInstanceClass = 'editor_Models_Db_Languages';
-	
+    protected $validatorInstanceClass   = 'editor_Models_Validator_Language';
+		
 	/***
      * Return language rfc5646 value for given language id
      * @param int $langId

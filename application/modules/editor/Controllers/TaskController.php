@@ -79,11 +79,6 @@ class editor_TaskController extends ZfExtended_RestController {
     protected $workflowManager;
     
     /**
-     * @var ZfExtended_Acl 
-     */
-    protected $acl;
-    
-    /**
      * @var editor_Models_SegmentFieldManager
      */
     protected $segmentFieldManager;
@@ -106,7 +101,6 @@ class editor_TaskController extends ZfExtended_RestController {
     public function init() {
         parent::init();
         $this->now = date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME']);
-        $this->acl = ZfExtended_Acl::getInstance();
         $this->user = new Zend_Session_Namespace('user');
         $this->workflowManager = ZfExtended_Factory::get('editor_Workflow_Manager');
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
@@ -138,7 +132,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $unlockedTasks = $this->entity->cleanupLockedJobs();
         $userGuid = $this->user->data->userGuid;
         
-        //we clean up ALL tasks belonging to the actual user, 
+        //we clean up ALL tasks belonging to the current user, 
         //since if this action is called he has left the task (TRANSLATE-91)
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
@@ -158,7 +152,8 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     public function loadAll()
     {
-        $isAllowedToLoadAll = $this->isAllowed('loadAllTasks');
+        // here no check for pmGuid, since this is done in task::loadListByUserAssoc
+        $isAllowedToLoadAll = $this->isAllowed('backend', 'loadAllTasks'); 
         $filter = $this->entity->getFilter();
         $filter->convertStates($isAllowedToLoadAll);
         $assocFilter = $filter->isUserAssocNeeded();
@@ -377,12 +372,13 @@ class editor_TaskController extends ZfExtended_RestController {
     public function putAction() {
         $this->entity->load($this->_getParam('id'));
         
-        $this->checkStateAllowsActions();
+        $this->entity->checkStateAllowsActions();
         
         $taskguid = $this->entity->getTaskGuid();
         
         $oldTask = clone $this->entity;
         $this->decodePutData();
+        $this->checkTaskAttributeField();
         //was formerly in JS: if a userState is transfered, then entityVersion has to be ignored!
         if(!empty($this->data->userState)) {
             unset($this->data->entityVersion);
@@ -395,7 +391,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity->validate();
         $this->initWorkflow();
         
-        $mayLoadAllTasks = $this->isAllowed('loadAllTasks');
+        $mayLoadAllTasks = $this->isAllowed('backend', 'loadAllTasks') || $this->isAuthUserTaskPm($this->entity->getPmGuid());
         $tua = $this->workflow->getTaskUserAssoc($taskguid, $this->user->data->userGuid);
         if(!$mayLoadAllTasks &&
                 ($this->isOpenTaskRequest(true)&&
@@ -452,7 +448,7 @@ class editor_TaskController extends ZfExtended_RestController {
      * @param array $allAssocInfos
      */
     protected function addUserInfos(array &$row, $taskguid, array $userAssocInfos, array $allAssocInfos) {
-        $isEditAll = $this->isAllowed('editAllTasks');
+        $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($row['pmGuid']);
         //Add actual User Assoc Infos to each Task
         if(isset($userAssocInfos[$taskguid])) {
             $row['userRole'] = $userAssocInfos[$taskguid]['role'];
@@ -626,7 +622,7 @@ class editor_TaskController extends ZfExtended_RestController {
             throw new ZfExtended_Models_Entity_NotAcceptableException('Given UserState '.$this->data->userState.' does not exist.');
         }
         
-        $isEditAllTasks = $this->isAllowed('editAllTasks');
+        $isEditAllTasks = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($this->entity->getPmGuid());
         $isOpen = $this->isOpenTaskRequest();
         $isPmOverride = false;
         
@@ -727,13 +723,14 @@ class editor_TaskController extends ZfExtended_RestController {
             
         $this->view->rows = (object)$row;
         unset($this->view->rows->qmSubsegmentFlags);
+        
     }
     
     public function deleteAction() {
         $this->entityLoad();
         //if task is erroneous then it is also deleteable, regardless of its locking state
         if(!$this->entity->isErroneous()){
-            $this->checkStateAllowsActions();
+            $this->entity->checkStateAllowsActions();
         }
         $this->processClientReferenceVersion();
         $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array($this->entity));
@@ -747,7 +744,7 @@ class editor_TaskController extends ZfExtended_RestController {
     public function exportAction() {
         parent::getAction();
         
-        $this->checkStateAllowsActions();
+        $this->entity->checkStateAllowsActions();
         
         $diff = (boolean)$this->getRequest()->getParam('diff');
 
@@ -794,30 +791,77 @@ class editor_TaskController extends ZfExtended_RestController {
         exit;
     }
     
-    /**
-     * checks if currently logged in user is allowed to access the given ressource
-     * shortcut method for convience
-     * @param string $ressource
+    /***
+     * Check if the given pmGuid(userGuid) is the same with the current logged user userGuid
+     * 
+     * @param string $pmGuid
      * @return boolean
      */
-    protected function isAllowed($ressource) {
-        return $this->acl->isInAllowedRoles($this->user->data->roles, $ressource);
+    protected function isAuthUserTaskPm($taskPmGuid){
+        return $this->user->data->userGuid===$taskPmGuid;
+    }
+    
+    /***
+     * Check if the user has rights to modefi the task attributes:taskName, targetDeliveryDate, realDeliveryDate, orderdate, pmGuid, pmName
+     */
+    protected function checkTaskAttributeField(){
+        
+        if(!empty($this->data->taskName) && !$this->isAllowed('frontend','editorEditTaskTaskName')) {
+            unset($this->data->taskName);
+            error_log("The user is not allowed to modifi the taskName. taskGuid->".$this->data->taskGuid);
+        }
+        
+        if(!empty($this->data->targetDeliveryDate) && !$this->isAllowed('frontend','editorEditTaskDeliveryDate')) {
+            unset($this->data->targetDeliveryDate);
+            error_log("The user is not allowed to modifi the targetDeliveryDate. taskGuid->".$this->data->taskGuid);
+        }
+        
+        if(!empty($this->data->realDeliveryDate) && !$this->isAllowed('frontend','editorEditTaskRealDeliveryDate')) {
+            unset($this->data->realDeliveryDate);
+            error_log("The user is not allowed to modifi the realDeliveryDate. taskGuid->".$this->data->taskGuid);
+        }
+        
+        if(!empty($this->data->orderdate) && !$this->isAllowed('frontend','editorEditTaskOrderDate')) {
+            unset($this->data->orderdate);
+            error_log("The user is not allowed to modifi the orderdate. taskGuid->".$this->data->taskGuid);
+        }
+        
+        if(!empty($this->data->pmGuid) && !$this->isAllowed('frontend','editorEditTaskPm')) {
+            unset($this->data->pmGuid);
+            error_log("The user is not allowed to modifi the pmGuid. taskGuid->".$this->data->taskGuid);
+        }else if(!empty($this->data->pmGuid)){
+            //if the pmGuid is modefied, set the pmName
+            $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
+            /* @var $userModel  ZfExtended_Models_User*/
+            $user=$userModel->loadByGuid($this->data->pmGuid);
+            $this->data->pmName=$user->getUsernameLong();
+        }
+        
+        //we need to check also the pm name
+        if(!empty($this->data->pmName) && !$this->isAllowed('frontend','editorEditTaskPm')) {
+            unset($this->data->pmName);
+            error_log("The user is not allowed to modifi the pmName. taskGuid->".$this->data->taskGuid);
+        }
     }
     
     /**
-     * @throws ZfExtended_Models_Entity_Conflict
+     * Can be triggered with various actions from outside to trigger workflow stuff in translate5
      */
-    protected function checkStateAllowsActions() {
-        if($this->entity->isErroneous() || $this->entity->isExclusiveState() && $this->entity->isLocked($this->entity->getTaskGuid())) {
-            $e = new ZfExtended_Models_Entity_Conflict('Der aktuelle Status der Aufgabe verbietet diese Aktion!');
-            $e->setErrors([
-                    'task' => $this->entity->getTaskGuid(),
-                    'taskState' => $this->entity->getState(),
-                    'isLocked' => $this->entity->isLocked($this->entity->getTaskGuid()),
-                    'isErroneous' => $this->entity->isErroneous(),
-                    'isExclusiveState' => $this->entity->isExclusiveState(),
-            ]);
-            throw $e;
+    public function workflowAction() {
+        if(!$this->_request->isPost()) {
+            throw new BadMethodCallException('Only HTTP method POST allowed!');
         }
+        $this->entityLoad();
+        $this->initWorkflow($this->entity->getWorkflow());
+        $this->view->trigger = $this->getParam('trigger');
+        $this->view->success = $this->workflow->doDirectTrigger($this->entity, $this->getParam('trigger'));
+        if($this->view->success) {
+            return;
+        }
+        $errors = array('trigger' => 'Trigger is invalid. Valid triggers are listed below.');
+        $e = new ZfExtended_ValidateException();
+        $e->setErrors($errors);
+        $this->view->validTrigger = $this->workflow->getDirectTrigger();
+        $this->handleValidateException($e);
     }
 }

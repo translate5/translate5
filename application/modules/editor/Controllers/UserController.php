@@ -27,24 +27,4 @@ END LICENSE AND COPYRIGHT
 */
 
 class Editor_UserController extends ZfExtended_UserController {
-
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_RestController::deleteAction()
-     */
-    public function deleteAction() {
-        $this->entity->load($this->_getParam('id'));
-        $this->checkIsEditable();
-        
-        /**
-         * @todo check if this is still necessary, if not the whole function can be removed.
-         * Here all entries in TaskUserAssoc are deleted "manually".
-         * Normally this should happen automatically on database-level via foreign key and cascading delete.
-         */
-        $task_user_assoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $task_user_assoc editor_Models_TaskUserAssoc */
-        $task_users = $task_user_assoc->deleteByUserguid($this->entity->getUserGuid());
-        
-        $this->entity->delete();
-    }
 }

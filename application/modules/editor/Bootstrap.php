@@ -91,7 +91,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $restRoute = new Zend_Rest_Route($this->front, array(), array(
             'editor' => array(  'file', 'segment', 'alikesegment', 'referencefile', 'qmstatistics', 'comment',
                                 'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker',
-                                'taskmeta', 'config', 'segmentuserassoc', 'session'),
+                                'taskmeta', 'config', 'segmentuserassoc', 'session', 'language'),
         ));
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
 
@@ -112,6 +112,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'controller' => 'segment',
                 'action' => 'position'
             )));
+        
+        $this->front->getRouter()->addRoute('editorTaskTriggerWorkflow', new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/:id/workflow',
+            array(
+                'module' => 'editor',
+                'controller' => 'task',
+                'action' => 'workflow'
+            )
+        ));
         
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/nextsegments/*',
@@ -140,6 +149,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ));
         $this->front->getRouter()->addRoute('editorAuthUser', $authUserRoute);
 
+        $pmRoute = new ZfExtended_Controller_RestLikeRoute(
+                'editor/user/pm/*',
+                array(
+                        'module' => 'editor',
+                        'controller' => 'user',
+                        'action' => 'pm'
+                ));
+        $this->front->getRouter()->addRoute('editorUserPm', $pmRoute);
+        
         $termsRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/terms/*',
             array(

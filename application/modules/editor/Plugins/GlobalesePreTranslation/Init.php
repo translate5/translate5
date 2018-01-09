@@ -48,6 +48,7 @@ class editor_Plugins_GlobalesePreTranslation_Init extends ZfExtended_Plugin_Abst
         }
         $this->log = ZfExtended_Factory::get('ZfExtended_Log', array(false));
         $this->initEvents();
+        $this->addController('GlobaleseController');
         $this->initRoutes();
     }
     
@@ -73,7 +74,6 @@ class editor_Plugins_GlobalesePreTranslation_Init extends ZfExtended_Plugin_Abst
     protected function initRoutes() {
         $f = Zend_Registry::get('frontController');
         /* @var $f Zend_Controller_Front */
-        $f->addControllerDirectory(APPLICATION_PATH.'/'.$this->getPluginPath().'/Controllers', '_plugins_'.__CLASS__);
         $r = $f->getRouter();
         
         $restRoute = new Zend_Rest_Route($f, array(), array(

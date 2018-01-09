@@ -233,7 +233,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
      */
     public function workflowNotifyHtmlMailSegmentList(array $segments, $segmentHash = null) {
         if(empty($segmentHash)) {
-            $this->segmentHash = md5(print_r($segments, 1));
+            $this->segmentHash = md5(print_r($segments, 1).$this->view->translate->getTargetLang());
         }
         else {
             $this->segmentHash = $segmentHash;

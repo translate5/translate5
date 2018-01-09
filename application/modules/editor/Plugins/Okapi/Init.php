@@ -153,6 +153,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         // Better solution would be to split DirectoryParsing from Import, see TRANSLATE-1019
         $this->eventManager->attach('editor_Models_Import_DirectoryParser_WorkingFiles', 'beforeFileNodeCreate', array($this, 'handleBeforeFileNodeCreate'));
         $this->eventManager->attach('editor_Models_Foldertree_SyncToFiles', 'afterImportfileSave', array($this, 'handleAfterImportfileSave'));
+        $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'handleApplicationState'));
     }
     
     /***
@@ -355,5 +356,13 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     protected function isOkapiGeneratedFile($filename){
         $retVal=substr($filename, -strlen(editor_Plugins_Okapi_Connector::OKAPI_FILE_EXTENSION));
         return $retVal=== editor_Plugins_Okapi_Connector::OKAPI_FILE_EXTENSION;
+    }
+    
+    public function handleApplicationState(Zend_EventManager_Event $event) {
+        $applicationState = $event->getParam('applicationState');
+        $applicationState->okapi = new stdClass();
+        $connector = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
+        /* @var $connector editor_Plugins_Okapi_Connector */
+        $applicationState->okapi->server = $connector->ping();
     }
 }

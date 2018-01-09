@@ -427,7 +427,13 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
 //<target state="needs-review-translation" state-qualifier="leveraged-mt" translate5:origin="Globalese">Installation und Konfiguration</target>
 //</trans-unit>
         }, function($tag, $key, $opener) {
-            $this->extractSegment($opener['attributes']);
+            try {
+                $this->extractSegment($opener['attributes']);
+            }
+            catch(Exception $e){
+                $e->setMessage($e->getMessage()."\n".'In trans-unit '.print_r($opener['attributes'],1));
+                throw $e;
+            }
             //leaving a transunit means disable segment processing
             $this->processSegment = false;
         });

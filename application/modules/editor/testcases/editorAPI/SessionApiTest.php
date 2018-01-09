@@ -43,15 +43,15 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         $response = $this->api()->request('editor/session', 'POST');
         
         $this->assertEquals(400, $response->getStatus());
-        $this->assertEquals('{"errors":[{"id":"login","msg":"Kein Benutzername angegeben."},{"id":"passwd","msg":"Kein Passwort angegeben."}],"message":"NOT OK","success":false}', $response->getBody());
+        $this->assertEquals('{"errors":[{"id":"login","msg":"No login given."},{"id":"passwd","msg":"No password given."}],"message":"NOT OK","success":false}', $response->getBody());
         
         $response = $this->api()->request('editor/session', 'POST', ['login' => 'givenLogin']);
         $this->assertEquals(400, $response->getStatus());
-        $this->assertEquals('{"errors":[{"id":"passwd","msg":"Kein Passwort angegeben."}],"message":"NOT OK","success":false}', $response->getBody());
+        $this->assertEquals('{"errors":[{"id":"passwd","msg":"No password given."}],"message":"NOT OK","success":false}', $response->getBody());
         
         $response = $this->api()->request('editor/session', 'POST', ['passwd' => 'givenPasswd']);
         $this->assertEquals(400, $response->getStatus());
-        $this->assertEquals('{"errors":[{"id":"login","msg":"Kein Benutzername angegeben."}],"message":"NOT OK","success":false}', $response->getBody());
+        $this->assertEquals('{"errors":[{"id":"login","msg":"No login given."}],"message":"NOT OK","success":false}', $response->getBody());
     }
     
     /**

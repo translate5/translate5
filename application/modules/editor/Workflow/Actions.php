@@ -29,43 +29,202 @@ END LICENSE AND COPYRIGHT
 /**
  * Encapsulates the Default Actions triggered by the Workflow
  */
-class editor_Workflow_Actions {
+class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
     /**
-     *
-     * @var editor_Workflow_Abstract 
+     * sets all segments to untouched state - if they are untouched by the user
      */
-    protected $workflow;
-
-    /**
-     * 
-     * @param editor_Workflow_Abstract $workflow
-     */
-    public function __construct(editor_Workflow_Abstract $workflow) {
-        $this->workflow = $workflow;
-    }
-    /**
-     * open all users of the other roles of a task
-     * @param string $role
-     * @param editor_Models_TaskUserAssoc $tua
-     */
-    public function openRole(string $role, editor_Models_TaskUserAssoc $tua) {
-        $wf = $this->workflow;
-        $tua->setStateForRoleAndTask($wf::STATE_OPEN, $role, $tua->getTaskGuid());
-    }
-    
-    /**
-     * updates all Auto States of this task
-     * currently this method supports only updating to REVIEWED_UNTOUCHED and to initial (which is NOT_TRANSLATED and TRANSLATED)
-     * @param string $taskGuid
-     * @param string $method method to call in editor_Models_Segment_AutoStates
-     */
-    public function updateAutoStates(string $taskGuid, string $method) {
-        $segment = ZfExtended_Factory::get('editor_Models_Segment');
-        /* @var $segment editor_Models_Segment */
+    public function segmentsSetUntouchedState() {
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        if(empty($this->config->newTua)) {
+            $authUser = new Zend_Session_Namespace('user');
+            $user->loadByGuid($authUser->data->userGuid);
+        }
+        else {
+            $user->loadByGuid($this->config->newTua->getUserGuid());
+        }
         
         $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         /* @var $states editor_Models_Segment_AutoStates */
+        $states->setUntouchedState($this->config->task->getTaskGuid(), $user);
+    }
+    
+    /**
+     * sets all segments to initial state - if they were untouched by the user before
+     */
+    public function segmentsSetInitialState() {
+        $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
+        /* @var $states editor_Models_Segment_AutoStates */
+        $states->setInitialStates($this->config->task->getTaskGuid());
+    }
+    
+    /**
+     * Updates the tasks real delivery date to the current timestamp
+     */
+    public function taskSetRealDeliveryDate() {
+        $task = $this->config->task;
+        $task->setRealDeliveryDate(date('Y-m-d', $_SERVER['REQUEST_TIME']));
+        $task->save();
+    }
+    
+    /**
+     * Updates the tasks real delivery date to the current timestamp
+     */
+    public function endTask() {
+        $task = $this->config->task;
         
-        $states->{$method}($taskGuid, $segment);
+        if($task->isErroneous() || $task->isExclusiveState() && $task->isLocked($task->getTaskGuid())) {
+            throw new ZfExtended_Exception('The attached task can not be set to state "end": '.print_r($task->getDataObject(),1));
+        }
+        $oldTask = clone $task;
+        $task->setState('end');
+
+        try {
+            $this->config->workflow->doWithTask($oldTask, $task);
+        }
+        catch (ZfExtended_Models_Entity_Conflict $e) {
+            //ignore entity conflict here
+        }
+        
+        if($oldTask->getState() != $task->getState()) {
+            $user = new Zend_Session_Namespace('user');
+            editor_Models_LogTask::createWithUserGuid($task->getTaskGuid(), $task->getState(), $user->data->userGuid);
+        }
+        
+        $task->save();
+    }
+    
+    /**
+     * Associates automatically editor users to the task by users languages
+     */
+    public function autoAssociateEditorUsers() {
+        $task = $this->config->task;
+        $workflow = $this->config->workflow;
+        $stepName = $task->getWorkflowStepName();
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        
+        $user->loadByGuid($task->getPmGuid());
+        $pmId = $user->getId();
+        $aclInstance = ZfExtended_Acl::getInstance();
+        $pmSeeAll = $aclInstance->isInAllowedRoles(explode(',', $user->getRoles()), 'backend', 'seeAllUsers');
+        
+        $sourceLang = $task->getSourceLang();
+        $targetLang = $task->getTargetLang();
+        
+        $role = $workflow->getRoleOfStep($stepName);
+        if(!$role) {
+            return;
+        }
+        $states = $workflow->getInitialStates();
+        $state = $states[$stepName][$role];
+        
+        $users = $user->loadAllByLanguages($sourceLang, $targetLang);
+        
+        
+        foreach($users as $data) {
+            $roles = explode(',', $data['roles']);
+            $isPm = in_array(ACL_ROLE_PM, $roles);
+            $isAdmin = in_array(ACL_ROLE_ADMIN, $roles);
+            $isEditor = in_array(ACL_ROLE_EDITOR, $roles);
+            //the user to be added must be a editor and it must be visible for the pm of the task
+            $isVisible = $pmSeeAll || $user->hasParent($pmId, $data['parentIds']);
+            if(!$isEditor || $isPm || $isAdmin || !$isVisible) {
+                continue;
+            }
+            $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+            /* @var $tua editor_Models_TaskUserAssoc */
+            $tua->setRole($role);
+            $tua->setState($state);
+            $tua->setUserGuid($data['userGuid']);
+            $tua->setTaskGuid($task->getTaskGuid());
+            //entity version?
+            $tua->save();
+            $workflow->doUserAssociationAdd($tua);
+        }
+    }
+    
+    /**
+     * Associates automatically a different PM (The one who starts the import is the default) to the task by the PMs languages
+     * @return the new PM user, false if no one found
+     */
+    public function autoAssociateTaskPm() {
+        $task = $this->config->task;
+        $workflow = $this->config->workflow;
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        
+        $sourceLang = $task->getSourceLang();
+        $targetLang = $task->getTargetLang();
+        $users = $user->loadAllByLanguages($sourceLang, $targetLang);
+        
+        foreach($users as $userData) {
+            $roles = explode(',', $userData['roles']);
+            if(!in_array(ACL_ROLE_PM, $roles)) {
+                continue;
+            }
+            $user->init($userData);
+            $task->setPmGuid($user->getUserGuid());
+            $task->setPmName($user->getUsernameLong());
+            $task->save();
+            return $user;
+        }
+        return false;
+    } 
+    
+    /***
+     * Checks the delivery dates, if a task is overdue, it'll be finished for all lectors, triggers normal workflow handlers if needed.
+     */
+    public function finishOverduedTasks(){
+        $workflow = $this->config->workflow;
+        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        
+        $db = Zend_Registry::get('db');
+        
+        $s = $db->select()
+        ->from(array('tua' => 'LEK_taskUserAssoc'))
+        ->join(array('t' => 'LEK_task'), 'tua.taskGuid = t.taskGuid', array())
+        ->where('tua.role = ?', editor_Workflow_Abstract::ROLE_LECTOR)
+        ->where('tua.state != ?', editor_Workflow_Abstract::STATE_FINISH)
+        ->where('t.state = ?', self::STATE_OPEN)
+        ->where('targetDeliveryDate < CURRENT_DATE');
+        $taskRows = $db->fetchAll($s);
+        
+        //FIXME: see BEOSPHERE-111
+        //FIXME $taskRows contains the same task multiple times (once per tua!)
+        //re enable it in a better way for beo
+        //$acl = ZfExtended_Acl::getInstance();
+        //$acl->allow('noRights', 'editorconnect_Models_WsdlWrapper', 'sendToUser');
+        
+        //affected user:
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        foreach($taskRows as $row) {
+            $task->loadByTaskGuid($row['taskGuid']);
+            //its much easier to load the entity as setting it (INSERT instead UPDATE issue on save, because of internal zend things on initing rows)
+            $tua->load($row['id']);
+            $user->loadByGuid($row['userGuid']);
+            $workflow->doWithTask($task, $task); //nothing changed on task directly, but call is needed
+            $tuaNew = clone $tua;
+            $tuaNew->setState($workflow::STATE_FINISH);
+            $tuaNew->validate();
+            $workflow->triggerBeforeEvents($tua, $tuaNew);
+            $tuaNew->save();
+            $workflow->doWithUserAssoc($tua, $tuaNew);
+            editor_Models_LogTask::create($row['taskGuid'], $workflow::STATE_FINISH, $this->authenticatedUserModel, $user);
+        }
+    }
+    
+    /***
+     * Delete all tasks where the task status is 'end',
+     * and the last entry for this task in LEK_task_log table is older than x days (where x is zf_config variable)
+     */
+    public function deleteOldEndedTasks(){
+        $taskModel=ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $taskModel editor_Models_Task */
+        $taskModel->removeOldTasks();
     }
 }
