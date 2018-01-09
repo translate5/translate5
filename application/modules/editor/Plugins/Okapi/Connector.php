@@ -208,6 +208,25 @@ class editor_Plugins_Okapi_Connector {
         $this->processResponse($response);
     }
     
+    /**
+     * Run the file conversion. For each uploaded files converted file will be created
+     */
+    public function ping(){
+        $url = $this->projectUrl;
+        if(empty($url)) {
+            return 'Okapi NOT configured!';
+        }
+        try {
+            $http = $this->getHttpClient($url);
+            $response = $http->request('GET');
+            $this->processResponse($response);
+        }
+        catch (Exception $e) {
+            error_log($e);
+            return 'Okapi '.$url.' DOWN!';
+        }
+        return 'Okapi '.$url.' UP!';
+    }
     
     /***
      * Download the converted file from okapi, and save the file on the disk.
