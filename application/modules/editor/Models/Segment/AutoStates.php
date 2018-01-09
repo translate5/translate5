@@ -316,10 +316,10 @@ class editor_Models_Segment_AutoStates {
         /* @var $history editor_Models_SegmentHistory */
         $history->createHistoryByAutoState($taskGuid,[self::REVIEWED_UNTOUCHED]);
         
+        $segment->updateLastAuthorFromHistory($taskGuid, self::REVIEWED_UNTOUCHED);
         $segment->updateAutoState($taskGuid, self::REVIEWED_UNTOUCHED, self::NOT_TRANSLATED, true);
         $segment->updateAutoState($taskGuid, self::REVIEWED_UNTOUCHED, self::TRANSLATED);
         
-        $segment->updateLastAuthorFromHistory($taskGuid, self::TRANSLATED);
     }
     
     /**

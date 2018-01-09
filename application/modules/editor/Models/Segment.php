@@ -1262,13 +1262,17 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         
         $sql='UPDATE LEK_segments as seg, 
             (
-                SELECT userGuid,userName,segmentId
-                FROM LEK_segment_history 
-                WHERE taskGuid='.$adapter->quote($taskGuid).' 
-                AND autoStateId='.$adapter->quote($autoState).'
-                GROUP BY segmentId DESC
+                SELECT hist.id ,hist.userGuid,hist.userName,hist.segmentId
+                FROM LEK_segment_history hist, LEK_segments s
+                WHERE s.taskGuid='.$adapter->quote($taskGuid).'
+                AND s.id = hist.segmentId 
+                AND s.autoStateId='.$adapter->quote($autoState).' -- status ist the given (UNTOUCHED)
+                GROUP BY hist.segmentId
+                ORDER BY hist.id 
             ) as h
             SET seg.userGuid = h.userGuid,seg.userName = h.userName WHERE seg.id=h.segmentId';
+        
+        error_log($sql);
         
         $adapter->query($sql);
     }

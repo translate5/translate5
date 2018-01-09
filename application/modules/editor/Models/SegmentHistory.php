@@ -193,19 +193,17 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
      * @param string $taskGuid
      * @param array $autoStates
      */
-    protected function createHistoryByAutoState($taskGuid,array $autoStates){
+    public function createHistoryByAutoState($taskGuid,array $autoStates){
         //get the updatable fields for LEK_segment_history table
         $fieldsHistory=implode(',',$this->getFieldsToUpdate());
         $fieldsSegments=implode(',seg.',$this->getFieldsToUpdate());
         
         $sql='INSERT INTO LEK_segment_history 
-                   (segmentId'.$fieldsAsString.')
-              SELECT 
-                    (seg.id,'.$fieldsSegments.')
+                   (segmentId,'.$fieldsHistory.')
+              SELECT seg.id, seg.'.$fieldsSegments.'
               FROM LEK_segments as seg
               WHERE seg.taskGuid="'.$taskGuid.'"
               AND seg.autoStateId IN('.implode(',', $autoStates).');';
-        
         $this->db->getAdapter()->query($sql);
     }
     
