@@ -568,14 +568,15 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $this->throwSegmentationException($msg, $transUnitMid);
             }
             if(empty($this->currentTarget) || empty($this->currentTarget[$mid])){
-                $targetChunks = [];
+                $targetChunksOriginal = $targetChunks = [];
             }
             else {
                 $currentTarget = $this->currentTarget[$mid];
                 unset($this->currentTarget[$mid]);
-                //parse the target chunks
-                $targetChunks = $this->xmlparser->getRange($currentTarget['opener']+1, $currentTarget['closer']-1);
-                $targetChunks = $this->contentConverter->convert($targetChunks, false, $currentTarget['openerMeta']['preserveWhitespace']);
+                //parse the target chunks, store the real chunks from the XLF separatly 
+                $targetChunksOriginal = $this->xmlparser->getRange($currentTarget['opener']+1, $currentTarget['closer']-1);
+                //in targetChunks the content is converted (tags, whitespace etc)
+                $targetChunks = $this->contentConverter->convert($targetChunksOriginal, false, $currentTarget['openerMeta']['preserveWhitespace']);
             }
             
             //reset start/end shift count. 
@@ -587,15 +588,19 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             if(!$this->hasSameStartAndEndTags($sourceChunks, $targetChunks)) {
                 //if there is just leading/trailing whitespace but no tags we reset the counter 
                 // since then we dont want to cut off something
+                //if there is whitespace between or before the leading / after the trailing tags,  
+                // this whitespace is ignored depending the preserveWhitespace setting. 
+                // above $sourceChunks $targetChunks does not contain any irrelevant whitespace (only empty chunks)
                 $this->startShiftCount = 0;
                 $this->endShiftCount = 0;
             }
             
             //we cut off and store the leading target tags for later insertion 
-            $leadingTags = $this->xmlparser->join(array_splice($targetChunks, 0, $this->startShiftCount));
+            $leadingTags = $this->xmlparser->join(array_splice($targetChunksOriginal, 0, $this->startShiftCount));
+            
             //we cut off and store the trailing target tags for later insertion 
             if($this->endShiftCount > 0) {
-                $trailingTags = $this->xmlparser->join(array_splice($targetChunks, -$this->endShiftCount));
+                $trailingTags = $this->xmlparser->join(array_splice($targetChunksOriginal, -$this->endShiftCount));
             }
             else {
                 $trailingTags = '';
@@ -603,6 +608,9 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             
             //for source column we dont have a place holder, so we just cut off the leading/trailing tags and import the rest as source 
             $sourceChunks = array_slice($sourceChunks, $this->startShiftCount, count($sourceChunks) - $this->startShiftCount - $this->endShiftCount);
+            //for target we have to do the same on the converted chunks to be used, 
+            // since the above array_sPlice calls are working on the original array
+            $targetChunks = array_slice($targetChunks, $this->startShiftCount, count($targetChunks) - $this->startShiftCount - $this->endShiftCount);
             
             $this->segmentData = array();
             $this->segmentData[$sourceName] = array(
