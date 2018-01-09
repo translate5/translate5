@@ -161,6 +161,12 @@ class Models_Installer_Standalone {
             $this->updateDb();
             exit;
         }
+        if(!empty($this->options['applicationState'])) {
+            $this->addZendToIncludePath();
+            $this->initApplication();
+            echo json_encode(ZfExtended_Debug::applicationState());
+            exit;
+        }
         if(!empty($this->options['updateCheck'])) {
             $this->addZendToIncludePath();
             $this->initApplication();

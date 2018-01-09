@@ -15,6 +15,8 @@ case "$1" in
             ;;
 "--help")  CONFIG=",'help' => '1'"
             ;;
+"--appState")  CONFIG=",'applicationState' => '1'"
+            ;;
 "--maintenance")  
             MODE=${2:-show};
             CONFIG=",'maintenance' => '$MODE'"
