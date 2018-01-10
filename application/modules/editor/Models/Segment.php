@@ -1259,22 +1259,23 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             return;
         }
         $adapter=$this->db->getAdapter();
-        
-        $sql='UPDATE LEK_segments as seg, 
+        $bind=array(
+                $taskGuid,
+                $autoState
+        );
+        $sql='UPDATE LEK_segments as seg,
             (
-                SELECT hist.id ,hist.userGuid,hist.userName,hist.segmentId
-                FROM LEK_segment_history hist, LEK_segments s
-                WHERE s.taskGuid='.$adapter->quote($taskGuid).'
-                AND s.id = hist.segmentId 
-                AND s.autoStateId='.$adapter->quote($autoState).' -- status ist the given (UNTOUCHED)
-                GROUP BY hist.segmentId
-                ORDER BY hist.id 
+                SELECT hist.id,hist.userGuid,hist.userName,hist.segmentId
+                FROM LEK_segment_history hist
+                INNER JOIN LEK_segments s
+                ON s.id = hist.segmentId
+                WHERE s.taskGuid=?
+                AND s.autoStateId=?
+                AND hist.id= (SELECT id FROM LEK_segment_history WHERE segmentId=s.id ORDER BY created DESC LIMIT 1 )
             ) as h
             SET seg.userGuid = h.userGuid,seg.userName = h.userName WHERE seg.id=h.segmentId';
         
-        error_log($sql);
-        
-        $adapter->query($sql);
+        $adapter->query($sql,$bind);
     }
     
     /**
