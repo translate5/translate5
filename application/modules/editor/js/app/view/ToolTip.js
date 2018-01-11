@@ -44,7 +44,6 @@ Ext.define('Editor.view.ToolTip', {
     delegate : '.ownttip', // accepts only simple selectors (no commas) so
     // define a own tooltip class
     cls : 't5ttip',
-    renderTo : Ext.getBody(),
     strings: {
         deletedby: '#UT#Deleted by',
         insertedby: '#UT#Inserted by',
@@ -200,7 +199,15 @@ Ext.define('Editor.view.ToolTip', {
             listeners;
  
         if (me.targetListeners) {
-            me.targetListeners.destroy();
+            
+            //FIXME: Fix for the bug in internet explorer
+            //http://jira.translate5.net/browse/TRANSLATE-1086
+            if(Ext.isIE){
+                me.targetListeners=null;
+            }else{
+                me.targetListeners.destroy();
+                me.targetListeners=null;
+            }
         }
  
         if (target) {

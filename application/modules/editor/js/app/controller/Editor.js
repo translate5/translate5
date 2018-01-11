@@ -431,12 +431,20 @@ Ext.define('Editor.controller.Editor', {
     clearKeyMaps: function() {
         var me = this;
         if(me.editorKeyMap) {
-            me.editorKeyMap.destroy();
+            //FIXME: Fix for the bug in internet explorer
+            //http://jira.translate5.net/browse/TRANSLATE-1086
+            if(!Ext.isIE){
+                me.editorKeyMap.destroy();
+            }
             me.editorKeyMap = null;
         }
         
         if(me.generalKeyMap) {
-            me.generalKeyMap.destroy();
+            //FIXME: Fix for the bug in internet explorer
+            //http://jira.translate5.net/browse/TRANSLATE-1086
+            if(!Ext.isIE){
+                me.generalKeyMap.destroy();
+            }
             me.generalKeyMap = null;
         }
     },
