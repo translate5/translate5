@@ -69,7 +69,8 @@ Ext.define('Editor.view.admin.UserAddWindow', {
         targetLangageLabel:'#UT#Zielsprache(n)',
         targetLangageTip:'#UT#Zielsprache(n)',
         languageInfo: '#UT#Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.',
-        localeLabel:'#UT#Benutzersprache'
+        localeLabel:'#UT#Benutzersprache',
+        parentUserLabel: '#UT#Übergeordneter Benutzer'
     },
     modal : true,
     layout:'fit',
@@ -258,18 +259,37 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                                     'data-qtip': Ext.String.htmlEncode(me.strings.bottomRoleInfo)
                                 }
                             },{
-		                        xtype: 'combo',
-		                        itemId: 'locale',
-		                        name:'locale',
-		                        width:110,
-		                        allowBlank: false,
-		                        editable: false,
-		                        forceSelection: true,
-		                        store: translations,
-		                        queryMode: 'local',
-		                        toolTip: me.strings.localeTip,
-		                        fieldLabel: me.strings.localeLabel
-		                    }]
+                                xtype: 'combo',
+                                itemId: 'locale',
+                                name:'locale',
+                                width:110,
+                                allowBlank: false,
+                                editable: false,
+                                forceSelection: true,
+                                store: translations,
+                                queryMode: 'local',
+                                fieldLabel: me.strings.localeLabel
+                            },{
+                                xtype: 'combo',
+                                itemId: 'parentIds',
+                                name:'parentIds',
+                                width:110,
+                                allowBlank: true,
+                                typeAhead: true,
+                                anyMatch: true,
+                                forceSelection: true,
+                                displayField: 'longUserName',
+                                valueField: 'id',
+                                store: {
+                                    type: 'store',
+                                    model: 'Editor.model.admin.User',
+                                    autoLoad: true,
+                                    remoteFilter: false,
+                                    pageSize: 0
+                                },
+                                queryMode: 'local',
+                                fieldLabel: me.strings.parentUserLabel
+                            }]
                         },{
                             xtype: 'fieldset',
                             margin:5,
