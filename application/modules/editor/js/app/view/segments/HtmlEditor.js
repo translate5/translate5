@@ -429,21 +429,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           }
           // Keep nodes from TrackChanges
           if( (item.tagName.toLowerCase() == 'ins' || item.tagName.toLowerCase() == 'del')  && /(^|[\s])trackchanges([\s]|$)/.test(item.className)){
-              // TrackChange-Node might include images => replace the images with their divs and spans:
-              var allImagesInItem = item.getElementsByTagName('img');
-              if( allImagesInItem.length > 0) {
-                  for (var i=allImagesInItem.length; i--; ) { // backwards because we might remove items
-                      var imgItem = allImagesInItem[i],
-                          imgHtml = me.unmarkImage(imgItem);
-                      if (imgHtml != '') {
-                          var tempDiv = document.createElement('div');
-                          tempDiv.innerHTML = imgHtml;
-                          imgItem.parentNode.insertBefore(tempDiv.firstChild,imgItem);
-                          imgItem.parentNode.removeChild(imgItem);
-                      }
-                  }
-              }
-              result.push(item.outerHTML);
+              var clone = item.cloneNode(false);
+              clone.innerHTML = "";
+              result.push(clone.outerHTML.replace(/<[^<>]+>$/, '')); //add start tag
+              result.push(me.unMarkup(item));
+              result.push('</'+item.tagName.toLowerCase()+'>');
               return;
           }
           // recursive processing of Terminologie spans, removes the term span
