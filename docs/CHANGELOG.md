@@ -3,6 +3,24 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.6.18] - 2018-01-17
+###Added
+TRANSLATE-950: Implement a user hierarchy for user listing and editing
+TRANSLATE-1089: Create segment history entry when set autostatus untouched, auto-set and reset username on unfinish
+TRANSLATE-1099: Exclude framing internal tags from xliff import
+TRANSLATE-941: New front-end rights
+TRANSLATE-942: New task attributes tab in task properties window
+TRANSLATE-1090: A user without setaclrole for a specific role can revoke such already granted roles
+
+###Changed
+Integrate segmentation rules for EN in Okapi default bconf-file
+TRANSLATE-1091: Rename "language" field/column in user grid / user add window
+
+###Bugfixes
+TRANSLATE-1101: Using Translate5 in internet explorer leads sometimes to logouts while application load
+TRANSLATE-1086: Leave visualReview task leads to error in IE 11
+T5DEV-219: Subsegment img found on saving some segments with tags and enabled track changes
+
 ## [2.6.16] - 2017-12-14
 ###Changed
 TRANSLATE-1084: refactor internal translation mechanism
