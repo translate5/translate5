@@ -638,8 +638,68 @@ Ext.define('Editor.controller.SearchReplace', {
         //so the starting point is definded
     },
     
-    //TODO replace text
     selectOrReplaceText:function(){
+        debugger;
+        var me=this,
+            iframeDocument = me.getSegmentIframeDocument(),
+            tabPanel=me.getTabPanel(),
+            activeTab=tabPanel.getActiveTab(),
+            searchCombo=activeTab.down('#searchCombo'),
+            searchComboRawValue=searchCombo.getRawValue(),
+            replaceCombo=activeTab.down('#replaceCombo'),
+            searchType=activeTab.down('radiofield').getGroupValue(),
+            searchValue ='(?!<.*?)(?![^<>]*?>)'+searchComboRawValue,///<\/?[^>]+(>|$)/g+(searchCombo.getRawValue());
+            searchRegExp=null,
+            caseSensitive=true;//FIXME fix the case sensetive
+        // Enable buttons
+        var classApplierModule = rangy.modules.ClassApplier;
+        if (rangy.supported && classApplierModule && classApplierModule.supported) {
+            searchResultApplier = rangy.createClassApplier("searchResult");
+
+            //var searchBox = gEBI("search"),
+                //regexCheckBox = gEBI("regex"),
+                //caseSensitiveCheckBox = gEBI("caseSensitive"),
+                //wholeWordsOnlyCheckBox = gEBI("wholeWordsOnly"),
+                //timer;
+
+            // Remove existing highlights
+            var range = rangy.createRange();
+            var caseSensitive = false;
+            var searchScopeRange = rangy.createRange();
+            searchScopeRange.selectNodeContents(iframeDocument.body);
+
+            var options = {
+                caseSensitive: caseSensitive,
+                wholeWordsOnly: false,
+                withinRange: searchScopeRange,
+                direction: "forward" // This is redundant because "forward" is the default
+            };
+
+            range.selectNodeContents(document.body);
+            searchResultApplier.undoToRange(range);
+
+            // Create search term
+            var searchTerm =searchComboRawValue; //searchBox.value;
+
+            if (searchTerm !== "") {
+                if (false) {
+                    searchTerm = new RegExp(searchTerm, caseSensitive ? "g" : "gi");
+                }
+
+                // Iterate over matches
+                while (range.findText(searchTerm, options)) {
+                    // range now encompasses the first text match
+                    searchResultApplier.applyToRange(range);
+
+                    // Collapse the range to the position immediately after the match
+                    range.collapse(false);
+                }
+            }
+        }
+    },
+    
+    //TODO replace text
+    XXXselectOrReplaceText:function(){
         var me=this,
             iframeDocument = me.getSegmentIframeDocument(),
             count = 0,
