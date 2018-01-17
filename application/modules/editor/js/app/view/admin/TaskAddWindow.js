@@ -103,6 +103,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                 typeAhead: true,
                 displayField: 'label',
                 forceSelection: true,
+                anyMatch: true,
                 queryMode: 'local',
                 valueField: 'id'
             },

@@ -46,6 +46,13 @@ Ext.define('Editor.model.admin.User', {
     {name: 'roles', type: 'string'},
     {name: 'passwd', type: 'string'},
     {name: 'editable', type: 'boolean', persist: false},
+    {name: 'parentIds', type: 'int', convert: function(v,rec) {
+        if(!v || !Ext.isString(v)) {
+            return;
+        }
+        var parentIds = v.replace(/^,|,$/g, '').split(',');
+        return parentIds ? parentIds[parentIds.length - 1] : null;
+    }},
     {name: 'sourceLanguage'},
     {name: 'targetLanguage'},
     {name: 'locale', type: 'string'}
