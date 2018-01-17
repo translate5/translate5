@@ -2102,7 +2102,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <br />
 {footer}</target>
 </trans-unit>
-
+<trans-unit id='w5xiZXJnZW9yZG5ldGVyIEJlbnV0emVy'>
+    <source>Übergeordneter Benutzer</source>
+    <target>Parent User</target>
+</trans-unit>
     </body>
   </file>
 </xliff>
