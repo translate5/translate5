@@ -1378,8 +1378,33 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $db->getAdapter()->commit();
     }
     
-    public function updateLastAuthorFromHistory(){
+    /***
+     * Find last editor from segment history, and update it in the lek segment table
+     * @param string $taskGuid
+     * @param integer $autoState
+     */
+    public function updateLastAuthorFromHistory(string $taskGuid,integer $autoState){
+        if(empty($taskGuid) || empty($autoState)){
+            return;
+        }
+        $adapter=$this->db->getAdapter();
+        $bind=array(
+                $taskGuid,
+                $autoState
+        );
+        $sql='UPDATE LEK_segments as seg,
+            (
+                SELECT hist.id,hist.userGuid,hist.userName,hist.segmentId
+                FROM LEK_segment_history hist
+                INNER JOIN LEK_segments s
+                ON s.id = hist.segmentId
+                WHERE s.taskGuid=?
+                AND s.autoStateId=?
+                AND hist.id= (SELECT id FROM LEK_segment_history WHERE segmentId=s.id ORDER BY created DESC LIMIT 1 )
+            ) as h
+            SET seg.userGuid = h.userGuid,seg.userName = h.userName WHERE seg.id=h.segmentId';
         
+        $adapter->query($sql,$bind);
     }
     
     /**

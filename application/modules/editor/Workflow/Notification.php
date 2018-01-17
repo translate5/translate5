@@ -328,9 +328,6 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $config = Zend_Registry::get('config');
         $xlfAttachment = (boolean) $config->runtimeOptions->notification->enableSegmentXlfAttachment;
         $xlfFile =       (boolean) $config->runtimeOptions->editor->notification->saveXmlToFile;
-        $xliff2Active =       (boolean) $config->runtimeOptions->editor->notification->xliff2Active;
-        
-        
         
         if(empty($segments) || (!$xlfAttachment && !$xlfFile)) {
             return;

@@ -293,11 +293,12 @@ class editor_Models_Segment_AutoStates {
         $history  = ZfExtended_Factory::get('editor_Models_SegmentHistory');
         /* @var $history editor_Models_SegmentHistory */
         
+        //NOTE: no record in segment data history is inserted because
+        //there is no related data change for this table
+        
+        //add record in the segment history
         $history->createHistoryByAutoState($taskGuid,[self::TRANSLATED,self::NOT_TRANSLATED]);
         
-        //TODO make history entry for all segments with state self::TRANSLATED || self::NOT_TRANSLATED
-        
-        //TODO add note about not updateing the segment history data
         $segment->updateAutoState($taskGuid, self::TRANSLATED, self::REVIEWED_UNTOUCHED);
         $segment->updateAutoState($taskGuid, self::NOT_TRANSLATED, self::REVIEWED_UNTOUCHED);
     }
@@ -315,11 +316,10 @@ class editor_Models_Segment_AutoStates {
         /* @var $history editor_Models_SegmentHistory */
         $history->createHistoryByAutoState($taskGuid,[self::REVIEWED_UNTOUCHED]);
         
+        $segment->updateLastAuthorFromHistory($taskGuid, self::REVIEWED_UNTOUCHED);
         $segment->updateAutoState($taskGuid, self::REVIEWED_UNTOUCHED, self::NOT_TRANSLATED, true);
         $segment->updateAutoState($taskGuid, self::REVIEWED_UNTOUCHED, self::TRANSLATED);
-        //TODO change last author each segment set to last author in the previous entry of the segment history table
         
-        //to the the last autor, get it from the segment history where state is translated
     }
     
     /**

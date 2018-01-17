@@ -431,34 +431,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     
     public function applicationstateAction() {
         $this->_helper->layout->disableLayout();
-        //$this->_helper->viewRenderer->setNoRender();
-        $result = new stdClass();
-        $downloader = ZfExtended_Factory::get('ZfExtended_Models_Installer_Downloader', array(APPLICATION_PATH.'/..'));
-        /* @var $downloader ZfExtended_Models_Installer_Downloader */
-        try {
-            $result->isUptodate = $downloader->applicationIsUptodate();
-        } catch (Exception $e) {
-            $result->isUptodate = -1;
-        }
-        $versionFile = APPLICATION_PATH.'../version';
-        if(file_exists($versionFile)) {
-            $result->version = file_get_contents($versionFile);
-        }
-        else {
-            $result->version = 'development';
-            $result->branch = exec('cd '.APPLICATION_PATH.'; git status -bs | head -1');
-        }
-        
-        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $worker ZfExtended_Models_Worker */
-        $result->worker = $worker->getSummary();
-        
-        $pm = Zend_Registry::get('PluginManager');
-        /* @var $pm ZfExtended_Plugin_Manager */
-        $result->pluginsLoaded = $pm->getActive();
-        
-        $this->view->applicationstate = $result;
-        
+        $this->view->applicationstate = ZfExtended_Debug::applicationState();
     }
     
     public function generatesmalltagsAction() {

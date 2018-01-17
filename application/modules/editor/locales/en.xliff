@@ -2108,9 +2108,9 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <target>The search will be performed only on the filtered segments</target>
 </trans-unit>
 
-<trans-unit id="RXJzZXR6ZW4=">
-    <source>Ersetzen</source>
-    <target>Replace</target>
+<trans-unit id="w5xiZXJnZW9yZG5ldGVyIEJlbnV0emVy">
+    <source>Übergeordneter Benutzer</source>
+    <target>Parent User</target>
 </trans-unit>
 
 <trans-unit id="S2VpbmUgRXJnZWJuaXNzZSBmw7xyIGRpZSBha3R1ZWxsZSBTdWNoZSE=">

@@ -78,6 +78,7 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('Editor_SegmentController', 'afterPutAction', array($this, 'handleAfterSegmentPut'));
         $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
         $this->eventManager->attach('Editor_AlikesegmentController', 'beforeSaveAlike', array($this, 'handleBeforeSaveAlike'));
+        $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'handleApplicationState'));
     }
     
     public function injectFrontendConfig(Zend_EventManager_Event $event) {
@@ -305,5 +306,27 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
                 'action' => 'tasks'
             ));
         $r->addRoute('plugins_matchresource_tasks', $queryRoute);
+    }
+    
+    public function handleApplicationState(Zend_EventManager_Event $event) {
+        $applicationState = $event->getParam('applicationState');
+        
+        $serviceManager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
+        /* @var $serviceManager editor_Plugins_MatchResource_Services_Manager */
+        $applicationState->matchresource = [];
+        $resources = $serviceManager->getAllResources();
+        foreach($resources as $resource) {
+            /* @var $resource editor_Plugins_MatchResource_Models_Resource */
+            $obj = new stdClass();
+            $obj->id = $resource->getId();
+            $obj->name = $resource->getName();
+            $obj->serviceType = $resource->getServiceType();
+            $obj->serviceName = $resource->getService();
+            
+            //FIXME implement a "ping" method in the reosurce class to ping the connection to the resource 
+            
+            $obj->url = $resource->getUrl();
+            $applicationState->matchresource[] = $obj;
+        }
     }
 }
