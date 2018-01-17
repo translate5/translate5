@@ -333,8 +333,6 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             return;
         }
         if(empty($this->xmlCache[$segmentHash])) {
-            
-
             $xliffConverter=$this->getXliffConverter($currentStep,$config);
             
             if(!$xliffConverter){
