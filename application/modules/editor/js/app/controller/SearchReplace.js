@@ -639,7 +639,17 @@ Ext.define('Editor.controller.SearchReplace', {
     },
     
     selectOrReplaceText:function(){
-        debugger;
+        var me=this;
+        
+        rangy.init();
+        var task = new Ext.util.DelayedTask(function(){
+            me.doRengySearch();
+        });
+
+        task.delay(500);
+    },
+    
+    doRengySearch:function(){
         var me=this,
             iframeDocument = me.getSegmentIframeDocument(),
             tabPanel=me.getTabPanel(),
@@ -648,7 +658,9 @@ Ext.define('Editor.controller.SearchReplace', {
             searchComboRawValue=searchCombo.getRawValue(),
             replaceCombo=activeTab.down('#replaceCombo'),
             searchType=activeTab.down('radiofield').getGroupValue(),
-            searchValue ='(?!<.*?)(?![^<>]*?>)'+searchComboRawValue,///<\/?[^>]+(>|$)/g+(searchCombo.getRawValue());
+            //searchValue ='(?!<.*?)(?![^<>]*?>)'+searchComboRawValue,///<\/?[^>]+(>|$)/g+(searchCombo.getRawValue());
+            searchValue =searchComboRawValue,///<\/?[^>]+(>|$)/g+(searchCombo.getRawValue());
+            //<del[^>]*>(.*|\n?)<\/del>
             searchRegExp=null,
             caseSensitive=true;//FIXME fix the case sensetive
         // Enable buttons
@@ -666,16 +678,56 @@ Ext.define('Editor.controller.SearchReplace', {
             var range = rangy.createRange();
             var caseSensitive = false;
             var searchScopeRange = rangy.createRange();
-            searchScopeRange.selectNodeContents(iframeDocument.body);
+            searchScopeRange.selectNodeContents(iframeDocument);
 
             var options = {
                 caseSensitive: caseSensitive,
                 wholeWordsOnly: false,
                 withinRange: searchScopeRange,
-                direction: "forward" // This is redundant because "forward" is the default
+                direction: "forward", // This is redundant because "forward" is the default,
+                wordOptions:{
+                    wordRegex: /[a-z0-9]+('[a-z0-9]+)*/gi,
+                    includeTrailingSpace: false,
+                    tokenizer:function(chars, wordOptions){
+                        debugger;
+                        var word = chars.join(""), result, tokenRanges = [];
+
+                        function createTokenRange(start, end, isWord) {
+                            tokenRanges.push( { start: start, end: end, isWord: isWord } );
+                        }
+
+                        // Match words and mark characters
+                        var lastWordEnd = 0, wordStart, wordEnd;
+                        while ( (result = wordOptions.wordRegex.exec(word)) ) {
+                            wordStart = result.index;
+                            wordEnd = wordStart + result[0].length;
+
+                            // Create token for non-word characters preceding this word
+                            if (wordStart > lastWordEnd) {
+                                createTokenRange(lastWordEnd, wordStart, false);
+                            }
+
+                            // Get trailing space characters for word
+                            if (wordOptions.includeTrailingSpace) {
+                                while ( nonLineBreakWhiteSpaceRegex.test(chars[wordEnd]) ) {
+                                    ++wordEnd;
+                                }
+                            }
+                            createTokenRange(wordStart, wordEnd, true);
+                            lastWordEnd = wordEnd;
+                        }
+
+                        // Create token for trailing non-word characters, if any exist
+                        if (lastWordEnd < chars.length) {
+                            createTokenRange(lastWordEnd, chars.length, false);
+                        }
+
+                        return tokenRanges;
+                    }
+                }
             };
 
-            range.selectNodeContents(document.body);
+            range.selectNodeContents(iframeDocument.body);
             searchResultApplier.undoToRange(range);
 
             // Create search term
@@ -685,12 +737,15 @@ Ext.define('Editor.controller.SearchReplace', {
                 if (false) {
                     searchTerm = new RegExp(searchTerm, caseSensitive ? "g" : "gi");
                 }
-
+                debugger;
                 // Iterate over matches
                 while (range.findText(searchTerm, options)) {
                     // range now encompasses the first text match
                     searchResultApplier.applyToRange(range);
-
+                    
+                    var savedSel = rangy.saveSelection();
+                    
+                    console.log(savedSel);
                     // Collapse the range to the position immediately after the match
                     range.collapse(false);
                 }
