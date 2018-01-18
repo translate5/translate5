@@ -3,6 +3,10 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.6.19] - 2018-01-18
+###Bugfixes
+TRANSLATE-1097: Current release produces SQL error on installation
+
 ## [2.6.18] - 2018-01-17
 ###Added
 TRANSLATE-950: Implement a user hierarchy for user listing and editing
