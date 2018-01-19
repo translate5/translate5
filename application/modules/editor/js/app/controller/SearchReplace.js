@@ -38,6 +38,7 @@ Ext.define('Editor.controller.SearchReplace', {
         'Editor.view.searchandreplace.SearchReplaceWindow',
         'Editor.controller.searchandreplace.SearchSegment'
     ],
+    
     listen:{
         component:{
             '#segmentgrid':{
@@ -738,17 +739,21 @@ Ext.define('Editor.controller.SearchReplace', {
                     searchTerm = new RegExp(searchTerm, caseSensitive ? "g" : "gi");
                 }
                 debugger;
+                
+                var utilRangeClass=Editor.app.getController('Editor.plugins.TrackChanges.controller.Editor');
                 // Iterate over matches
                 while (range.findText(searchTerm, options)) {
-                    // range now encompasses the first text match
-                    searchResultApplier.applyToRange(range);
+                    //if the selection does not contains an del tag, create a selection
+                    if(!utilRangeClass.getTrackchangeNodeThatContainsTheRange(range,'del')){
+                        searchResultApplier.applyToRange(range);
+                    }
                     
-                    var savedSel = rangy.saveSelection();
-                    
-                    console.log(savedSel);
-                    // Collapse the range to the position immediately after the match
                     range.collapse(false);
+                    //var savedSel = rangy.saveSelection();
+                    console.log(range);
+                    // Collapse the range to the position immediately after the match
                 }
+                //
             }
         }
     },
