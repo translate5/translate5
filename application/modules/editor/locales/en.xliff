@@ -1930,25 +1930,6 @@ to reset your password from the following address.
 ------------------------------
 
 {footer}</target></trans-unit>
-<trans-unit id='e2hlYWRlcn0KCkltIFByb2pla3Rwb3J0YWwge3BvcnRhbExpbmt9IHd1cmRlIElobmVuIGRpZSBBdWZnYWJlIDxiPnt0YXNrLnRhc2tOcn0gLSB7dGFzay50YXNrTmFtZX08L2I+IHp1Z2V3aWVzZW4uPGJyIC8+CjxiciAvPgo8Yj5BdWZnYWJlOjwvYj4ge3Rhc2sudGFza05hbWV9PGJyIC8+CjxiPlF1ZWxsc3ByYWNoZTo8L2I+IHtzb3VyY2VMYW5ndWFnZVRyYW5zbGF0ZWR9PGJyIC8+CjxiPlppZWxzcHJhY2hlOjwvYj4ge3RhcmdldExhbmd1YWdlVHJhbnNsYXRlZH08YnIgLz4Ke3JlbGFpc0xhbmd1YWdlRnJhZ21lbnR9PGI+TGllZmVyZGF0dW06PC9iPiB7dGFyZ2V0RGVsaXZlcnlEYXRlfTxiciAvPgo8Yj5Xb3J0YW56YWhsOjwvYj4ge3dvcmRDb3VudH08YnIgLz4Ke3Byb29mcmVhZGVyc0ZyYWdtZW50fXtmb290ZXJ9'><source>{header}
-
-Im Projektportal {portalLink} wurde Ihnen die Aufgabe <b>{task.taskNr} - {task.taskName}</b> zugewiesen.<br />
-<br />
-<b>Aufgabe:</b> {task.taskName}<br />
-<b>Quellsprache:</b> {sourceLanguageTranslated}<br />
-<b>Zielsprache:</b> {targetLanguageTranslated}<br />
-{relaisLanguageFragment}<b>Lieferdatum:</b> {targetDeliveryDate}<br />
-<b>Wortanzahl:</b> {wordCount}<br />
-{proofreadersFragment}{footer}</source><target>{header}
-
-The task <b>{task.taskNr} - {task.taskName}</b> was associated to You in the task-portal {portalLink}.<br />
-<br />
-<b>Task:</b> {task.taskName}<br />
-<b>Source-language:</b> {sourceLanguageTranslated}<br />
-<b>Target-language:</b> {targetLanguageTranslated}<br />
-{relaisLanguageFragment}<b>Delivery-date:</b> {targetDeliveryDate}<br />
-<b>Word-count:</b> {wordCount}<br />
-{proofreadersFragment}{footer}</target></trans-unit>
 <trans-unit id='SW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZGllIEF1ZmdhYmUgPGI+e3Rhc2sudGFza05yfSAtIHt0YXNrLnRhc2tOYW1lfTwvYj4gZHVyY2ggYWxsZSBCZW51dHplciBkZXIgUm9sbGUgPGk+e3ByZXZpb3VzUm9sZX08L2k+IGFiZ2VzY2hsb3NzZW4uPGJyIC8+'>
     <source>Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> durch alle Benutzer der Rolle <i>{previousRole}</i> abgeschlossen.<br /></source>
     <target>The task <b>{task.taskNr} - {task.taskName}</b> was finished by all users of the role <i>{previousRole}</i> in the task-portal {portalLink}.<br /></target>
@@ -2031,6 +2012,100 @@ The changes made by the formerly active role <b>{previousRole}</b> are listed be
     <source>Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.</source>
     <target>The segment content is too long! Maximum {0} characters are allowed.</target>
   </trans-unit>
+  
+  <trans-unit id='PGI+UmVsYWlzc3ByYWNoZTo8L2I+IHtyZWxhaXNMYW5ndWFnZVRyYW5zbGF0ZWR9PGJyIC8+'>
+      <source><b>Relaissprache:</b> {relaisLanguageTranslated}<br /></source>
+      <target><b>relay language:</b> {relaisLanguageTranslated}<br /></target>
+  </trans-unit>
+  <trans-unit id='PGI+QXVmZ2FiZTo8L2I+IHt0YXNrLnRhc2tOYW1lfTxiciAvPgogICAgPGI+UXVlbGxzcHJhY2hlOjwvYj4ge3NvdXJjZUxhbmd1YWdlVHJhbnNsYXRlZH08YnIgLz4KICAgIDxiPlppZWxzcHJhY2hlOjwvYj4ge3RhcmdldExhbmd1YWdlVHJhbnNsYXRlZH08YnIgLz4KICAgIHtyZWxhaXNMYW5ndWFnZUZyYWdtZW50fTxiPkxpZWZlcmRhdHVtIExla3RvcmVuOjwvYj4ge3RhcmdldERlbGl2ZXJ5RGF0ZX08YnIgLz4KICAgIDxiPldvcnRhbnphaGw6PC9iPiB7d29yZENvdW50fTxiciAvPg=='>
+<source><b>Aufgabe:</b> {task.taskName}<br />
+    <b>Quellsprache:</b> {sourceLanguageTranslated}<br />
+    <b>Zielsprache:</b> {targetLanguageTranslated}<br />
+    {relaisLanguageFragment}<b>Lieferdatum Lektoren:</b> {targetDeliveryDate}<br />
+    <b>Wortanzahl:</b> {wordCount}<br /></source>
+<target><b>Task:</b> {task.taskName}<br />
+    <b>Source-language:</b> {sourceLanguageTranslated}<br />
+    <b>Target-language:</b> {targetLanguageTranslated}<br />
+    {relaisLanguageFragment}<b>Lieferdatum Lektoren:</b> {targetDeliveryDate}<br />
+    <b>Word-count:</b> {wordCount}<br /></target>
+</trans-unit>
+
+<trans-unit id='e2hlYWRlcn0KCkltIFByb2pla3Rwb3J0YWwge3BvcnRhbExpbmt9IHd1cmRlIElobmVuIGVpbmUgQXVmZ2FiZSB6dWdld2llc2VuLjxiciAvPgo8YnIgLz4KPGI+Um9sbGU6PC9iPiB7cm9sZX08YnIvPgp7dGFza0ZyYWdtZW50fXtwcm9vZnJlYWRlcnNGcmFnbWVudH17Zm9vdGVyfQ=='>
+    <source>{header}
+
+Im Projektportal {portalLink} wurde Ihnen eine Aufgabe zugewiesen.<br />
+<br />
+<b>Rolle:</b> {role}<br/>
+{taskFragment}{proofreadersFragment}{footer}</source>
+<target>{header}
+
+A task was associated to you in the task-portal {portalLink}.<br />
+<br />
+<b>Role:</b> {role}<br/>
+{taskFragment}{proofreadersFragment}{footer}</target>
+</trans-unit>
+<trans-unit id='Cjxici8+PGI+QWxsZSBkZXIgQXVmZ2FiZSB6dWdlb3JkbmV0ZW4gQmVudXR6ZXI6PC9iPgo8YnIvPg=='>
+    <source>
+<br/><b>Alle der Aufgabe zugeordneten Benutzer:</b>
+<br/></source>
+<target>
+<br/><b>All users associated to the task:</b>
+<br/></target>
+</trans-unit>
+
+<trans-unit id='RS1NYWlsIEFkcmVzc2U='>
+    <source>E-Mail Adresse</source>
+    <target>E-mail address</target>
+</trans-unit>
+
+<trans-unit id='e2hlYWRlcn0KSW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgSWhuZW4gZWluZSBBdWZnYWJlIHp1Z2V3aWVzZW4uPGJyIC8+CjxiciAvPgo8Yj5Sb2xsZTo8L2I+IHtyb2xlfTxici8+Cnt0YXNrRnJhZ21lbnR9e2Zvb3Rlcn0='>
+    <source>{header}
+Im Projektportal {portalLink} wurde Ihnen eine Aufgabe zugewiesen.<br />
+<br />
+<b>Rolle:</b> {role}<br/>
+{taskFragment}{footer}</source>
+<target>{header}
+A task was associated to you in the task-portal {portalLink}.<br />
+<br />
+<b>Role:</b> {role}<br/>
+{taskFragment}{footer}</target>
+</trans-unit>
+
+<trans-unit id='QmVudXR6ZXIgZGVyIHZvcmhlcmlnZW4gUm9sbGUgPGk+e3ByZXZpb3VzUm9sZX08L2k+Ogp7cHJldmlvdXNVc2Vyc308YnIvPgo='>
+    <source>Benutzer der vorherigen Rolle <i>{previousRole}</i>:
+{previousUsers}<br/>
+</source>
+<target>Users of the previous role <i>{previousRole}</i>:
+{previousUsers}<br/>
+</target>
+</trans-unit>
+
+<trans-unit id='e2hlYWRlcn0Ke2FjdGlvbn08YnIgLz4Ke3VzZXJzTm90aWZpZWR9PGJyIC8+Cnt1c2Vyc1ByZXZpb3VzUm9sZX08YnIgLz4KPGJyIC8+CkltIGZvbGdlbmRlbiBkaWUgZ2V0w6R0aWd0ZW4gw4RuZGVydW5nZW4gZGVyIHp1dm9yIGFrdGl2ZW4gQmVudXR6ZXIgZGVyIFJvbGxlIDxpPntwcmV2aW91c1JvbGV9PC9pPjo8YnIgLz4Ke2NoYW5nZWRTZWdtZW50c30KPGhyIC8+CjxiciAvPgp7Zm9vdGVyfQ=='>
+    <source>{header}
+{action}<br />
+{usersNotified}<br />
+{usersPreviousRole}<br />
+<br />
+Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i>{previousRole}</i>:<br />
+{changedSegments}
+<hr />
+<br />
+{footer}</source>
+<target>{header}
+{action}<br />
+{usersNotified}<br />
+{usersPreviousRole}<br />
+<br />
+The changes made by the formerly active user of the role <i>{previousRole}</i> are listed below:<br />
+{changedSegments}
+<hr />
+<br />
+{footer}</target>
+</trans-unit>
+<trans-unit id='w5xiZXJnZW9yZG5ldGVyIEJlbnV0emVy'>
+    <source>Übergeordneter Benutzer</source>
+    <target>Parent User</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

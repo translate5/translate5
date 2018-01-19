@@ -249,9 +249,9 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     }
     
     /**
-     * parses the given chunks containing segment source, seg-source or target content
-     * seg-source / target can be segmented into multiple mrk mtype="seg" which is one segment on our side
-     * Therefore we return a list of segments here
+     * parses the given chunks containing segment source, seg-source or target content, or their child elements content like sub or mrk mtype="seg"
+     * the result is not returned as string but as array for post processing of the generated chunks
+     * 
      * @param array $chunks
      * @param boolean $source
      * @param boolean $preserveWhitespace defines if the whitespace in the XML nodes should be preserved or not
@@ -272,11 +272,13 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         //get the flag just from outside, must not be parsed by inline element parser, since xml:space may occur only outside of inline content 
         $this->preserveWhitespace = $preserveWhitespace; 
         $this->xmlparser->parseList($chunks);
-        $result = $this->xmlparser->join($this->result);
-        if(!$this->preserveWhitespace) {
-            return trim($result);
+        
+        if(!empty($this->result) && !$this->preserveWhitespace) {
+            $lastIdx = count($this->result) - 1;
+            $this->result[0] = ltrim($this->result[0]);
+            $this->result[$lastIdx] = rtrim($this->result[$lastIdx]);
         }
-        return $result;
+        return $this->result;
     }
     
     /**

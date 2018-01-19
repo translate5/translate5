@@ -43,6 +43,23 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
      */
     protected $historydata     = array();
     
+    
+    protected $fieldsToUpdate=array(
+            'taskGuid', 
+            'userGuid', 
+            'userName', 
+            'timestamp', 
+            'editable', 
+            'pretrans', 
+            'qmId', 
+            'stateId', 
+            'autoStateId', 
+            'workflowStep', 
+            'workflowStepNr', 
+            'matchRate', 
+            'matchRateType'
+    );
+    
     /**
      * loads the history entries to one segment, DESC sorted by id (creation), can be limited with $limit parameter 
      * @param integer $id
@@ -165,4 +182,30 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
             }
         }
     }
+    
+    public function getFieldsToUpdate(){
+        return $this->fieldsToUpdate;
+    }
+    
+    /***
+     * Insert record(s) in segment history table for 
+     * autostates and taskguid as condition 
+     * @param string $taskGuid
+     * @param array $autoStates
+     */
+    public function createHistoryByAutoState($taskGuid,array $autoStates){
+        //get the updatable fields for LEK_segment_history table
+        $fieldsHistory=implode(',',$this->getFieldsToUpdate());
+        $fieldsSegments=implode(',seg.',$this->getFieldsToUpdate());
+        
+        $sql='INSERT INTO LEK_segment_history 
+                   (segmentId,'.$fieldsHistory.')
+              SELECT seg.id, seg.'.$fieldsSegments.'
+              FROM LEK_segments as seg
+              WHERE seg.taskGuid=?
+              AND seg.autoStateId IN(?);';
+        $retval=$this->db->getAdapter()->query($sql,[$taskGuid,implode(',', $autoStates)]);
+    }
+    
+    
 }

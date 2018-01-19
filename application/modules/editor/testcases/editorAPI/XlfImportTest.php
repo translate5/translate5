@@ -73,7 +73,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         
         //FIXME get task and test wordcount!!!
         //get segment list (just the ones of the first file for that tests)
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=42');
+        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=47');
         
         $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
         //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/XlfImportTest/expectedSegments-new.json", json_encode($data,JSON_PRETTY_PRINT));
@@ -85,7 +85,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
      * Needs $this->config->runtimeOptions->import->xlf->preserveWhitespace to be false!
      */
     public function testPreserveWhitespace() {
-        $segments = $this->api()->requestJson('editor/segment?start=42&limit=200');
+        $segments = $this->api()->requestJson('editor/segment?start=47&limit=200');
         $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
         //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/XlfImportTest/expectedSegmentsPreserveWhitespace-new.json", json_encode($data,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent('expectedSegmentsPreserveWhitespace.json'), $data, 'Imported segments are not as expected!');

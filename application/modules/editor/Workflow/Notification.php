@@ -328,16 +328,11 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $config = Zend_Registry::get('config');
         $xlfAttachment = (boolean) $config->runtimeOptions->notification->enableSegmentXlfAttachment;
         $xlfFile =       (boolean) $config->runtimeOptions->editor->notification->saveXmlToFile;
-        $xliff2Active =       (boolean) $config->runtimeOptions->editor->notification->xliff2Active;
-        
-        
         
         if(empty($segments) || (!$xlfAttachment && !$xlfFile)) {
             return;
         }
         if(empty($this->xmlCache[$segmentHash])) {
-            
-
             $xliffConverter=$this->getXliffConverter($currentStep,$config);
             
             if(!$xliffConverter){
@@ -422,5 +417,78 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff */
         
         return $xliffConverter;
+    }
+    
+    public function testNotifications() {
+        $user = [
+            'firstName' => 'Thomas',
+            'surName' => 'Lauria',
+            'login' => 'fakeuser',
+            'email' => 'thomas@mittagqi.com',
+            'locale' => 'en',
+        ];
+        $users = [
+            ['firstName' => 'Thomas', 'surName' => 'Lauria','login' => 'fakeuser','email' => 'thomas@mittagqi.com','role' => 'Testrole','state' => 'Teststatus'],
+            ['firstName' => 'XXX', 'surName' => 'YYY','login' => 'fakeuser2','email' => 'thomas@mittagqi.com','role' => 'Testrole2','state' => 'Teststatus2'],
+        ];
+        $params = [
+            'task' => $this->config->task,
+            'associatedUsers' => $users,
+        ];
+        
+        $roles = $this->config->workflow->getRoles();
+        
+        foreach($roles as $role){
+            $this->createNotification($role, 'notifyNewTaskAssigned', $params);
+            //$this->addCopyReceivers($triggerConfig, $tua['role']);
+            $this->notify($user);
+        }
+        
+        $params = [
+            'task' => $this->config->task,
+            'user' => $user,
+            'sourceLanguage' => 'German',
+            'targetLanguage' => 'English',
+            'relaisLanguage' => 'French Relais'
+        ];
+        
+        $this->createNotification(ACL_ROLE_PM, 'notifyNewTaskForPm', $params);
+        //$this->addCopyReceivers($triggerConfig, ACL_ROLE_PM);
+        $this->notify($user);
+        
+        $segmentHash = "123";
+        $segments = json_decode(file_get_contents(APPLICATION_PATH.'/modules/editor/testcases/editorAPI/XlfImportTest/expectedSegments.json'),true);
+        $segments = array_map(function($item){
+            $item['fileId'] = 1;
+            return $item;
+        }, $segments);
+        $segments = [];
+        $currentStep = 'lectoring';
+        $params = array(
+            'triggeringRole' => 'triggerROLE',
+            'nextRole' => 'nextROLE',
+            'segmentsHash' => $segmentHash,
+            'segments' => $segments,
+            'isCron' => true,
+            'users' => $users,
+            'previousUsers' => $users,
+            'task' => $this->config->task,
+            'workflow' => $this->config->workflow
+        );
+        
+        $this->createNotification(ACL_ROLE_PM, 'notifyAllFinishOfARole', $params); //@todo PM currently not defined as WORKFLOW_ROLE, so hardcoded here
+        $this->attachXliffSegmentList($segmentHash, $segments,$currentStep);
+        //$this->addCopyReceivers($triggerConfig, ACL_ROLE_PM);
+        $this->notify($user);
+        
+        $params['user'] = $user;
+        $this->createNotification('translatorCheck', 'notifyAllFinishOfARole', $params);
+        $this->attachXliffSegmentList($segmentHash, $segments,$currentStep);
+        //$this->addCopyReceivers($triggerConfig, $nextRole);
+        $this->notify($user);
+        $this->createNotification('lector', 'notifyAllFinishOfARole', $params);
+        $this->attachXliffSegmentList($segmentHash, $segments,$currentStep);
+        //$this->addCopyReceivers($triggerConfig, $nextRole);
+        $this->notify($user);
     }
 }
