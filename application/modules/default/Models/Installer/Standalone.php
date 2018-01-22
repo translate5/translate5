@@ -472,7 +472,7 @@ class Models_Installer_Standalone {
         $content[] = 'resources.db.params.password = "'.$this->dbCredentials['password'].'"';
         $content[] = 'resources.db.params.dbname = "'.$this->dbCredentials['database'].'"';
         if(!empty($this->dbCredentials['executable'])) {
-            $content[] = 'resources.db.params.executable = "'.$this->dbCredentials['executable'].'"';
+            $content[] = 'resources.db.executable = "'.$this->dbCredentials['executable'].'"';
         }
         $content[] = '';
         $content[] = 'resources.mail.defaultFrom.email = support@translate5.net';

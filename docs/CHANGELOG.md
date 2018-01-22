@@ -3,6 +3,11 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.6.21] - 2018-01-22
+###Bugfixes
+TRANSLATE-1076: Windows Only: install-and-update-batch overwrites path to mysql executable
+TRANSLATE-1103: TrackChanges Plug-In: Open segment for editing leads to an error in IE11
+
 ## [2.6.20] - 2018-01-18
 ###Bugfixes
 TRANSLATE-1097: Current release produces SQL error on installation
