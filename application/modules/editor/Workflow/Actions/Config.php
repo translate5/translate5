@@ -58,4 +58,9 @@ class editor_Workflow_Actions_Config {
      * @var editor_Models_Import_Configuration
      */
     public $importConfig;
+    
+    /**
+     * @var ZfExtended_Models_User
+     */
+    public $authenticatedUser;
 }
