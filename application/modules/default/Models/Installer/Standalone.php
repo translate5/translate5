@@ -529,7 +529,9 @@ class Models_Installer_Standalone {
         
         //set the hostname to the configured one:
         $config = Zend_Registry::get('config');
-        $this->hostname = $config->runtimeOptions->server->name;
+        if(!$this->isInstallation){
+            $this->hostname = $config->runtimeOptions->server->name;
+        }
     }
     
     protected function done() {
