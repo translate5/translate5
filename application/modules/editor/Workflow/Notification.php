@@ -264,9 +264,17 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $this->tua->setRole(editor_Workflow_Abstract::ROLE_LECTOR);
         //END Hack
         
+        $workflow = $this->config->workflow;
+        $labels = $workflow->getLabels(false);
+        
         $tuas = $this->tua->loadAllUsers(['state','role']);
         $roles = array_column($tuas, 'role');
         array_multisort($roles, SORT_ASC, SORT_STRING, $tuas);
+        
+        foreach($tuas as &$tua) {
+            $tua['originalRole'] = $tua['role'];
+            $tua['role'] = $labels[array_search($tua['role'], $workflow->getRoles())];
+        }
         
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
@@ -276,12 +284,12 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             'associatedUsers' => $tuas,
         ];
         
-        
         foreach($tuas as $tua) {
+            $params['role'] = $tua['role'];
             //we assume the PM user for all roles, since it is always the same template
             $this->createNotification(ACL_ROLE_PM, 'notifyNewTaskAssigned', $params);
             $user->loadByGuid($tua['userGuid']);
-            $this->addCopyReceivers($triggerConfig, $tua['role']);
+            $this->addCopyReceivers($triggerConfig, $tua['originalRole']);
             $this->notify((array) $user->getDataObject());
         }
     }
