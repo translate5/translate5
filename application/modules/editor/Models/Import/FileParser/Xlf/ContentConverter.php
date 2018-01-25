@@ -318,6 +318,12 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             $this->result[] = $single;
             return;
         }
+        //hack so that we can replace original tags with <x> tag internally 
+        // and here we restore then the original content to be visible in the frontend  
+        // (<ph>orig</ph> tag would be correcter instead <x>, but can not be used due index shifting of the xml chunks then) 
+        if($originalTagData = $this->xmlparser->getAttribute($opener['attributes'], 'translate5OriginalContent')) {
+            $chunk = htmlspecialchars_decode($originalTagData);
+        }
         $rid = $this->getRid($opener);
         $this->result[] = $this->createTag($rid, $tag, $chunk);
     }
