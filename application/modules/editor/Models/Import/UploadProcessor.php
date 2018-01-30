@@ -72,12 +72,23 @@ class editor_Models_Import_UploadProcessor {
      * checks the given upload data and inits matching the dataprovider
      */
     public function initAndValidate() {
-        
+        if(!empty($this->dataProvider)) {
+            //there is already set a data provider
+            return;
+        }
         //mandatory upload file
         $importInfo = $this->upload->getFileInfo('importUpload');
         
         $type = $this->checkAndGetImportType($importInfo);
         $this->initDataProvider($type, $importInfo);
+    }
+    
+    /**
+     * Inits the dataprovider with the given ZIP file
+     * @param SplFileInfo $pathToZip
+     */
+    public function initByGivenZip(SplFileInfo $zipFile) {
+        $this->dataProvider = ZfExtended_Factory::get('editor_Models_Import_DataProvider_Zip', [$zipFile->getPathname()]);
     }
     
     /**

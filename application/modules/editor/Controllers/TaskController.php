@@ -361,6 +361,45 @@ class editor_TaskController extends ZfExtended_RestController {
     }
     
     /**
+     * clone the given task into a new task
+     * @throws BadMethodCallException
+     * @throws ZfExtended_Exception
+     */
+    public function cloneAction() {
+        if(!$this->_request->isPost()) {
+            throw new BadMethodCallException('Only HTTP method POST allowed!');
+        }
+        $this->getAction();
+        $oldTaskPath = new SplFileInfo($this->entity->getAbsoluteTaskDataPath().'/'.editor_Models_Import_DataProvider_Abstract::TASK_ARCHIV_ZIP_NAME);
+        if(!$oldTaskPath->isFile()){
+            throw new ZfExtended_Exception('The task to be cloned does not have a import archive zip! Path: '.$oldTaskPath);
+        }
+        $copy = tempnam(sys_get_temp_dir(), 'taskclone');
+        copy($oldTaskPath, $copy);
+        
+        $data = (array) $this->entity->getDataObject();
+        unset($data['id']);
+        unset($data['taskGuid']);
+        unset($data['state']);
+        unset($data['locked']);
+        unset($data['lockingUser']);
+        $this->entity->init($data);
+        $this->entity->createTaskGuidIfNeeded();
+        $copy = new SplFileInfo($copy);
+        ZfExtended_Utils::cleanZipPaths($copy, '_tempImport');
+        $this->upload->initByGivenZip($copy);
+        
+        if($this->validate()) {
+            $this->processUploadedFile();
+            //reload because entityVersion could be changed somewhere
+            $this->entity->load($this->entity->getId());
+            $this->view->success = true;
+            $this->view->rows = $this->entity->getDataObject();
+        }
+    }
+    
+    
+    /**
      * 
      * currently taskController accepts only 2 changes by REST
      * - set locked: this sets the session_id implicitly and in addition the 
