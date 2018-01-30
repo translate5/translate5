@@ -77,6 +77,9 @@ class editor_Models_Import_FileParser_Xlf_AcrossNamespace extends editor_Models_
         });
         $xmlparser->registerElement('trans-unit ax:named-property ax:named-value', null, function($tag, $key, $opener) use (&$currentComment, $xmlparser){
             $name = strtolower($opener['attributes']['ax:name']);
+            if($opener['isSingle']) {
+                return; //do nothing here, since the named-value is empty
+            }
             $startText = $opener['openerKey'] + 1;
             $length = $key - $startText;
             $value = join($xmlparser->getChunks($startText, $length));
