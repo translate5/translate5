@@ -596,6 +596,23 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       });
   },
   /**
+   * Clones the task
+   * @param {Editor.model.admin.Task} task
+   */
+  handleTaskClone: function(task) {
+      Ext.Ajax.request({
+          url: Editor.data.pathToRunDir+'/editor/task/'+task.getId()+'/clone',
+          method: 'post',
+          scope: this,
+          success: function(response){
+              this.handleTaskReload();
+          },
+          failure: function(response) {
+              Editor.app.getController('ServerException').handleException(response);
+          }
+      });
+  },
+  /**
    * displays the export menu
    * @param {Editor.model.admin.Task} task
    * @param {Ext.EventObjectImpl} event

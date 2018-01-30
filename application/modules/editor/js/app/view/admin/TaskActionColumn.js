@@ -38,6 +38,7 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
   messages: {
       actionOpen: '#UT# Aufgabe öffnen (nur Lesemodus)',
       actionEdit: '#UT# Aufgabe bearbeiten',
+      actionClone: '#UT# Aufgabe klonen',
       actionFinish: '#UT# Aufgabe abschließen',
       actionUnFinish: '#UT# Aufgabe wieder öffnen',
       actionFinishAll: '#UT# Aufgabe für alle Benutzer abschließen',
@@ -101,6 +102,10 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
               tooltip: me.messages.exp,
               isAllowedFor: 'editorShowexportmenuTask',
               iconCls: 'ico-task-showexportmenu'
+          },{
+              tooltip: me.messages.actionClone,
+              isAllowedFor: 'editorCloneTask',
+              iconCls: 'ico-task-clone'
           },{
               tooltip: me.messages.actionDelete,
               isAllowedFor: 'editorDeleteTask',
