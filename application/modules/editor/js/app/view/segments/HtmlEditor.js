@@ -50,7 +50,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       'Editor.view.segments.HtmlEditorLayout'
   ],
   componentLayout: 'htmleditorlayout',
-
+  cls: 'x-selectable', //TRANSLATE-1021
+  
   //Konfiguration der parent Klasse
   enableFormat: false,
   enableFontSize : false,
