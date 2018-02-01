@@ -53,6 +53,7 @@ class Models_Installer_PreconditionCheck {
     public function checkEnvironment() {
         $this->checkGitInstallation();
         $this->checkPhpVersion();
+        $this->checkPhpExtensions();
         if(!empty($this->errorsEnvironment)) {
             $msg = 'Some system requirements of translate5 are not met: ';
             $this->stop($msg."\n  - ".join("\n  - ", $this->errorsEnvironment)."\n");
@@ -68,6 +69,34 @@ class Models_Installer_PreconditionCheck {
             if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                 $this->errorsEnvironment[] = 'Please update your xampp package manually or reinstall Translate5 with the latest windows installer from http://www.translate5.net';
                 $this->errorsEnvironment[] = 'Warning: Reinstallation can lead to data loss! Please contact support@translate5.net when you need assistance in data conversion!';
+            }
+        }
+    }
+    
+    /**
+     * Checks the needed PHP extensions
+     */
+    protected function checkPhpExtensions() {
+        $loaded = get_loaded_extensions();
+        $needed = [
+            'dom',
+            'fileinfo',
+            'gd',
+            'iconv',
+            'mbstring',
+            'pdo_mysql',
+            'zip',
+        ];
+        $missing = array_diff($needed, $loaded);
+        if(empty($missing)) {
+            return;
+        }
+        $this->errorsEnvironment[] = 'The following PHP extensions are not loaded or not installed, but are needed by translate5: '."\n    ".join(", ", $missing);
+        
+        if(extension_loaded('gd')) {
+            $gdinfo = gd_info();
+            if(!$gdinfo['FreeType Support']) {
+                $this->errorsEnvironment[] = 'The PHP extension GD needs to be installed with freetype support!';
             }
         }
     }
