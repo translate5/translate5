@@ -101,6 +101,10 @@ abstract class editor_ImageTag {
         $path = array_merge($path, $parts);
         $path = join(DIRECTORY_SEPARATOR, $path);
         $this->setSaveBasePath($path);
+        
+        if(!file_exists($this->_tagDef->fontFilePath)) {
+            throw new ZfExtended_Exception(get_class($this).': configured font path can not be found! Font: '.$this->_tagDef->fontFilePath);
+        }
     }
 
     /**
