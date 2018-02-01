@@ -163,8 +163,11 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         /* @var $file editor_Models_File */
         $file->load($segment->getFileId());
         
-        $source = $internalTag->toXliffPaired($this->getQueryString($segment));
-        $target = $internalTag->toXliffPaired($segment->getTargetEdit());
+        $source = $internalTag->removeTrackChanges($this->getQueryString($segment));
+        $source = $internalTag->toXliffPaired($source);
+        
+        $target = $internalTag->removeTrackChanges($segment->getTargetEdit());
+        $target = $internalTag->toXliffPaired($target);
         
         if($this->api->update($source, $target, $segment, $file->getFileName())) {
             $messages->addNotice('Segment im TM aktualisiert!', 'MatchResource');
